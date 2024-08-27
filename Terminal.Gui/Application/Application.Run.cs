@@ -189,11 +189,15 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         // TODO: Should this use FindDeepestFocusableView instead?
         // Try to set initial focus to any TabStop
-        if (!toplevel.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop))
+        if (!toplevel.HasFocus)
         {
-            // That didn't work. Try TabGroup.
-            toplevel.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup);
+            if (!toplevel.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop))
+            {
+                // That didn't work. Try TabGroup.
+                toplevel.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup);
+            }
         }
+
         ApplicationOverlapped.BringOverlappedTopToFront ();
 
         if (refreshDriver)

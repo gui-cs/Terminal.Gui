@@ -26,6 +26,7 @@ public class Responder : IDisposable
     }
 
     /// <summary>Event raised when <see cref="Dispose()"/> has been called to signal that this object is being disposed.</summary>
+    [CanBeNull]
     public event EventHandler Disposing;
 
     /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>

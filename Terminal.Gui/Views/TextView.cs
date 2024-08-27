@@ -1997,6 +1997,9 @@ public class TextView : View
         CursorVisibility = CursorVisibility.Default;
         Used = true;
 
+        // By default, disable hotkeys (in case someome sets Title)
+        HotKeySpecifier = new ('\xffff');
+
         _model.LinesLoaded += Model_LinesLoaded!;
         _historyText.ChangeText += HistoryText_ChangeText!;
 

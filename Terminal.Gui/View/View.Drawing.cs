@@ -262,6 +262,7 @@ public partial class View // Drawing APIs
     ///         <see cref="View"/> .
     ///     </para>
     /// </remarks>
+    [CanBeNull]
     public event EventHandler<DrawEventArgs> DrawContent;
 
     /// <summary>Event invoked when the content area of the View is completed drawing.</summary>
@@ -272,6 +273,7 @@ public partial class View // Drawing APIs
     ///         <see cref="View"/> .
     ///     </para>
     /// </remarks>
+    [CanBeNull]
     public event EventHandler<DrawEventArgs> DrawContentComplete;
 
     /// <summary>Utility function to draw strings that contain a hotkey.</summary>

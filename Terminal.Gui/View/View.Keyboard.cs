@@ -48,7 +48,7 @@ public partial class View  // Keyboard APIs
     }
 
     /// <summary>Invoked when the <see cref="HotKey"/> is changed.</summary>
-    public event EventHandler<KeyChangedEventArgs> HotKeyChanged;
+    public event EventHandler<KeyChangedEventArgs>? HotKeyChanged;
 
     private Key _hotKey = new ();
     private void TitleTextFormatter_HotKeyChanged (object? sender, KeyChangedEventArgs e) { HotKeyChanged?.Invoke (this, e); }
@@ -364,7 +364,7 @@ public partial class View  // Keyboard APIs
     ///     </para>
     ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
     /// </remarks>
-    public event EventHandler<Key> KeyDown;
+    public event EventHandler<Key>? KeyDown;
 
     /// <summary>
     ///     Low-level API called when the user presses a key, allowing views do things during key down events. This is
@@ -412,7 +412,7 @@ public partial class View  // Keyboard APIs
     ///     </para>
     ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
     /// </remarks>
-    public event EventHandler<Key> ProcessKeyDown;
+    public event EventHandler<Key>? ProcessKeyDown;
 
     #endregion KeyDown Event
 
@@ -503,7 +503,7 @@ public partial class View  // Keyboard APIs
     ///         <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
     ///     </remarks>
     /// </summary>
-    public event EventHandler<Key> KeyUp;
+    public event EventHandler<Key>? KeyUp;
 
     #endregion KeyUp Event
 
@@ -512,7 +512,7 @@ public partial class View  // Keyboard APIs
     #region Key Bindings
 
     /// <summary>Gets the key bindings for this view.</summary>
-    public KeyBindings KeyBindings { get; internal set; }
+    public KeyBindings KeyBindings { get; internal set; } = null!;
 
     private Dictionary<Command, Func<CommandContext, bool?>> CommandImplementations { get; } = new ();
 

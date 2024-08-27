@@ -39,6 +39,9 @@ public class TextField : View
         Used = true;
         WantMousePositionReports = true;
 
+        // By default, disable hotkeys (in case someome sets Title)
+        HotKeySpecifier = new ('\xffff');
+
         _historyText.ChangeText += HistoryText_ChangeText;
 
         Initialized += TextField_Initialized;

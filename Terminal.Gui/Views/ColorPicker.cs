@@ -316,7 +316,7 @@ public class ColorPicker : View
 
     private void UpdateValueFromTextField (object? sender, HasFocusEventArgs e)
     {
-        if (e.NewValue)
+            if (e.NewValue)
         {
             return;
         }

@@ -296,6 +296,7 @@ internal class MainLoop : IDisposable
     ///     Invoked when a new timeout is added. To be used in the case when
     ///     <see cref="Application.EndAfterFirstIteration"/> is <see langword="true"/>.
     /// </summary>
+    [CanBeNull]
     internal event EventHandler<TimeoutEventArgs> TimeoutAdded;
 
     /// <summary>Wakes up the <see cref="MainLoop"/> that might be waiting on input.</summary>

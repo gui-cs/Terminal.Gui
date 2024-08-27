@@ -68,7 +68,7 @@ public class AllViewsTester : Scenario
             Y = 0,
             Width = Dim.Auto (DimAutoStyle.Content),
             Height = Dim.Fill (),
-            CanFocus = false,
+            CanFocus = true,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Title = "Classes"
         };
@@ -84,7 +84,6 @@ public class AllViewsTester : Scenario
             SelectedItem = 0,
             Source = new ListWrapper<string> (new (_viewClasses.Keys.ToList ()))
         };
-        _classListView.OpenSelectedItem += (s, a) => { _settingsPane.SetFocus (); };
 
         _classListView.SelectedItemChanged += (s, args) =>
                                               {
@@ -95,10 +94,19 @@ public class AllViewsTester : Scenario
                                                       _hostPane.Remove (_curView);
                                                       _curView.Dispose ();
                                                       _curView = null;
-                                                      _hostPane.Clear ();
                                                   }
 
                                                   _curView = CreateClass (_viewClasses.Values.ToArray () [_classListView.SelectedItem]);
+                                                  // Add
+                                                  _hostPane.Add (_curView);
+
+                                                  // Force ViewToEdit to be the view and not a subview
+                                                  if (_adornmentsEditor is { })
+                                                  {
+                                                      _adornmentsEditor.AutoSelectSuperView = _curView;
+
+                                                      _adornmentsEditor.ViewToEdit = _curView;
+                                                  }
                                               };
         _leftPane.Add (_classListView);
 
@@ -109,7 +117,9 @@ public class AllViewsTester : Scenario
             Width = Dim.Auto (),
             Height = Dim.Fill (),
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
-            BorderStyle = LineStyle.Single
+            BorderStyle = LineStyle.Single,
+            AutoSelectViewToEdit = true,
+            AutoSelectAdornments = false,
         };
 
         var expandButton = new ExpanderButton
@@ -125,7 +135,7 @@ public class AllViewsTester : Scenario
             Y = 0, // for menu
             Width = Dim.Fill (),
             Height = Dim.Auto (),
-            CanFocus = false,
+            CanFocus = true,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Title = "Settings"
         };
@@ -138,7 +148,8 @@ public class AllViewsTester : Scenario
             Y = 0,
             Height = Dim.Auto (),
             Width = Dim.Auto (),
-            Title = "Location (Pos)"
+            Title = "Location (Pos)",
+            TabStop = TabBehavior.TabStop,
         };
         _settingsPane.Add (_locationFrame);
 
@@ -188,7 +199,8 @@ public class AllViewsTester : Scenario
             Y = Pos.Y (_locationFrame),
             Height = Dim.Auto (),
             Width = Dim.Auto (),
-            Title = "Size (Dim)"
+            Title = "Size (Dim)",
+            TabStop = TabBehavior.TabStop,
         };
 
         radioItems = new [] { "Auto", "_Percent(width)", "_Fill(width)", "A_bsolute(width)" };
@@ -308,12 +320,15 @@ public class AllViewsTester : Scenario
             Y = Pos.Bottom (_settingsPane),
             Width = Dim.Fill (),
             Height = Dim.Fill (), // + 1 for status bar
+            CanFocus = true,
+            TabStop = TabBehavior.TabGroup,
             ColorScheme = Colors.ColorSchemes ["Dialog"]
         };
 
         app.Add (_leftPane, _adornmentsEditor, _settingsPane, _hostPane);
 
         _classListView.SelectedItem = 0;
+        _leftPane.SetFocus ();
 
         Application.Run (app);
         app.Dispose ();
@@ -369,10 +384,6 @@ public class AllViewsTester : Scenario
         }
 
         view.Initialized += View_Initialized;
-
-        // Add
-        _hostPane.Add (view);
-        _hostPane.SetNeedsDisplay ();
 
         return view;
     }
@@ -476,12 +487,8 @@ public class AllViewsTester : Scenario
         UpdateTitle (_curView);
     }
 
-    private void Quit () { Application.RequestStop (); }
-
     private void UpdateSettings (View view)
     {
-        _adornmentsEditor.ViewToEdit = view;
-
         var x = view.X.ToString ();
         var y = view.Y.ToString ();
 

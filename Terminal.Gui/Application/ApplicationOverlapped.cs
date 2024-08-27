@@ -96,12 +96,12 @@ public static class ApplicationOverlapped
 
         foreach (Toplevel top in OverlappedChildren)
         {
-            if (type is { } && top.GetType () == type && exclude?.Contains (top.Data.ToString ()) == false)
+            if (type is { } && top.GetType () == type && exclude?.Contains (top.Data?.ToString ()) == false)
             {
                 return top;
             }
 
-            if ((type is { } && top.GetType () != type) || exclude?.Contains (top.Data.ToString ()) == true)
+            if ((type is { } && top.GetType () != type) || exclude?.Contains (top.Data?.ToString ()) == true)
             {
                 continue;
             }

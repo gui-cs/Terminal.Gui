@@ -535,7 +535,10 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     {
         if (_popup is null)
         {
-            _popup = new Popup (this) { Frame = Rectangle.Empty };
+            _popup = new Popup (this)
+            {
+                CanFocus = false
+            };
             _top?.Add (_popup);
         }
     }

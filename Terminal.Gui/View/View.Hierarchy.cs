@@ -18,7 +18,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
     /// <summary>Returns the container for this view, or null if this view has not been added to a container.</summary>
     /// <value>The super view.</value>
-    public virtual View SuperView
+    public virtual View? SuperView
     {
         get => _superView!;
         set => throw new NotImplementedException ();
@@ -52,7 +52,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         _subviews.Add (view);
         view._superView = this;
 
-        if (view.Enabled && view.Visible && view.CanFocus)
+        if (view is { Enabled: true, Visible: true, CanFocus: true })
         {
             // Add will cause the newly added subview to gain focus if it's focusable
             if (HasFocus)
@@ -94,7 +94,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     ///         the lifecycle of the subviews to be transferred to this View.
     ///     </para>
     /// </remarks>
-    public void Add (params View [] views)
+    public void Add (params View []? views)
     {
         if (views is null)
         {
@@ -108,7 +108,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     }
 
     /// <summary>Event fired when this view is added to another.</summary>
-    public event EventHandler<SuperViewChangedEventArgs> Added;
+    public event EventHandler<SuperViewChangedEventArgs>? Added;
 
     /// <summary>Get the top superview of a given <see cref="View"/>.</summary>
     /// <returns>The superview view.</returns>
@@ -222,7 +222,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     }
 
     /// <summary>Event fired when this view is removed from another.</summary>
-    public event EventHandler<SuperViewChangedEventArgs> Removed;
+    public event EventHandler<SuperViewChangedEventArgs>? Removed;
 
 
     /// <summary>

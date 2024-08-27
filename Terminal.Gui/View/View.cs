@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿#nullable enable
+using System.ComponentModel;
 using System.Diagnostics;
 
 namespace Terminal.Gui;
@@ -112,11 +113,11 @@ public partial class View : Responder, ISupportInitializeNotification
     ///     <see cref="HandledEventArgs.Handled"/>
     ///     to cancel the event.
     /// </summary>
-    public event EventHandler<HandledEventArgs> Accept;
+    public event EventHandler<HandledEventArgs>? Accept;
 
     /// <summary>Gets or sets arbitrary data for the view.</summary>
     /// <remarks>This property is not used internally.</remarks>
-    public object Data { get; set; }
+    public object? Data { get; set; }
 
     /// <summary>Gets or sets an identifier for the view;</summary>
     /// <value>The identifier.</value>
@@ -168,7 +169,7 @@ public partial class View : Responder, ISupportInitializeNotification
     ///     Points to the current driver in use by the view, it is a convenience property for simplifying the development
     ///     of new views.
     /// </summary>
-    public static ConsoleDriver Driver => Application.Driver;
+    public static ConsoleDriver Driver => Application.Driver!;
 
     /// <summary>Initializes a new instance of <see cref="View"/>.</summary>
     /// <remarks>
@@ -191,7 +192,7 @@ public partial class View : Responder, ISupportInitializeNotification
     ///     configurations and assignments to be performed before the <see cref="View"/> being shown.
     ///     View implements <see cref="ISupportInitializeNotification"/> to allow for more sophisticated initialization.
     /// </summary>
-    public event EventHandler Initialized;
+    public event EventHandler? Initialized;
 
     /// <summary>
     ///     Get or sets if  the <see cref="View"/> has been initialized (via <see cref="ISupportInitialize.BeginInit"/>
@@ -313,7 +314,8 @@ public partial class View : Responder, ISupportInitializeNotification
                 HasFocus = false;
             }
 
-            if (_enabled && CanFocus && Visible && !HasFocus && SuperView is { } && SuperView?.Focused is null)
+            if (_enabled && CanFocus && Visible && !HasFocus
+                && SuperView is null or { HasFocus: true, Visible: true, Enabled: true, Focused: null })
             {
                 SetFocus ();
             }
@@ -345,7 +347,7 @@ public partial class View : Responder, ISupportInitializeNotification
     }
 
     /// <summary>Event fired when the <see cref="Enabled"/> value is being changed.</summary>
-    public event EventHandler EnabledChanged;
+    public event EventHandler? EnabledChanged;
 
     /// <summary>Method invoked when the <see cref="Enabled"/> property from a view is changed.</summary>
     public virtual void OnEnabledChanged () { EnabledChanged?.Invoke (this, EventArgs.Empty); }
@@ -377,8 +379,8 @@ public partial class View : Responder, ISupportInitializeNotification
                 }
             }
 
-            if (_visible && CanFocus && Enabled && !HasFocus 
-                && (SuperView is null || SuperView is { HasFocus: true, Visible: true, Enabled: true, Focused: null }))
+            if (_visible && CanFocus && Enabled && !HasFocus
+                && SuperView is null or { HasFocus: true, Visible: true, Enabled: true, Focused: null })
             {
                 SetFocus ();
             }
@@ -395,7 +397,7 @@ public partial class View : Responder, ISupportInitializeNotification
     public bool ClearOnVisibleFalse { get; set; } = true;
 
     /// <summary>Event fired when the <see cref="Visible"/> value is being changed.</summary>
-    public event EventHandler VisibleChanged;
+    public event EventHandler? VisibleChanged;
 
     /// <summary>
     /// INTERNAL method for determining if all the specified view and all views up the Superview hierarchy are visible.
@@ -409,7 +411,7 @@ public partial class View : Responder, ISupportInitializeNotification
             return false;
         }
 
-        for (View c = view.SuperView; c != null; c = c.SuperView)
+        for (View? c = view.SuperView; c != null; c = c.SuperView)
         {
             if (!c.Visible)
             {
@@ -483,7 +485,7 @@ public partial class View : Responder, ISupportInitializeNotification
                 SetHotKeyFromTitle ();
                 SetNeedsDisplay ();
 #if DEBUG
-                if (_title is { } && string.IsNullOrEmpty (Id))
+                if (string.IsNullOrEmpty (Id))
                 {
                     Id = _title;
                 }
@@ -524,13 +526,13 @@ public partial class View : Responder, ISupportInitializeNotification
     }
 
     /// <summary>Event fired after the <see cref="View.Title"/> has been changed.</summary>
-    public event EventHandler<EventArgs<string>> TitleChanged;
+    public event EventHandler<EventArgs<string>>? TitleChanged;
 
     /// <summary>
     ///     Event fired when the <see cref="View.Title"/> is changing. Set <see cref="CancelEventArgs.Cancel"/> to `true`
     ///     to cancel the Title change.
     /// </summary>
-    public event EventHandler<CancelEventArgs<string>> TitleChanging;
+    public event EventHandler<CancelEventArgs<string>>? TitleChanging;
 
     #endregion
 }

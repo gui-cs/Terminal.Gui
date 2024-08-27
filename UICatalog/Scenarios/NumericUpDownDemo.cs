@@ -15,7 +15,6 @@ public class NumericUpDownDemo : Scenario
         Window app = new ()
         {
             Title = GetQuitKeyAndName (),
-            TabStop = TabBehavior.TabGroup
         };
 
         var editor = new AdornmentsEditor
@@ -23,7 +22,6 @@ public class NumericUpDownDemo : Scenario
             X = 0,
             Y = 0,
             AutoSelectViewToEdit = true,
-            TabStop = TabBehavior.NoStop
         };
         app.Add (editor);
 
@@ -50,15 +48,15 @@ public class NumericUpDownDemo : Scenario
         {
             floatEditor!.NumericUpDown!.Increment = 0.1F;
             floatEditor!.NumericUpDown!.Format = "{0:0.0}";
-
         }
+
+        editor.AutoSelectSuperView = app;
+        intEditor.SetFocus ();
 
         Application.Run (app);
         app.Dispose ();
         Application.Shutdown ();
-
     }
-
 }
 
 internal class NumericUpDownEditor<T> : View where T : notnull
@@ -95,6 +93,7 @@ internal class NumericUpDownEditor<T> : View where T : notnull
         Width = Dim.Auto (DimAutoStyle.Content);
         Height = Dim.Auto (DimAutoStyle.Content);
         TabStop = TabBehavior.TabGroup;
+        CanFocus = true;
 
         Initialized += NumericUpDownEditorInitialized;
 
@@ -184,7 +183,7 @@ internal class NumericUpDownEditor<T> : View where T : notnull
                     // Test format to ensure it's valid
                     _ = string.Format (_format.Text, _value);
                     _numericUpDown.Format = _format.Text;
-                    
+
                     _format.ColorScheme = SuperView.ColorScheme;
 
                 }

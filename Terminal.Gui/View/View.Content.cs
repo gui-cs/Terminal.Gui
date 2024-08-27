@@ -154,7 +154,7 @@ public partial class View
     /// <summary>
     ///     Event raised when the <see cref="GetContentSize ()"/> changes.
     /// </summary>
-    public event EventHandler<SizeChangedEventArgs> ContentSizeChanged;
+    public event EventHandler<SizeChangedEventArgs>? ContentSizeChanged;
 
     /// <summary>
     ///     Converts a Content-relative location to a Screen-relative location.
@@ -357,8 +357,7 @@ public partial class View
     ///     Fired when the <see cref="Viewport"/> changes. This event is fired after the <see cref="Viewport"/> has been
     ///     updated.
     /// </summary>
-    [CanBeNull]
-    public event EventHandler<DrawEventArgs> ViewportChanged;
+    public event EventHandler<DrawEventArgs>? ViewportChanged;
 
     /// <summary>
     ///     Called when the <see cref="Viewport"/> changes. Invokes the <see cref="ViewportChanged"/> event.

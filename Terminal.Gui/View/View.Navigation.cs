@@ -152,7 +152,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <remarks>
     ///     Raised by the <see cref="OnCanFocusChanged"/> virtual method.
     /// </remarks>
-    public event EventHandler CanFocusChanged;
+    public event EventHandler? CanFocusChanged;
 
     /// <summary>
     ///     Focuses the deepest focusable Subview if one exists. If there are no focusable Subviews then the focus is set to the view itself.
@@ -485,15 +485,15 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///         Use <see cref="HasFocusChanged"/> to be notified after the focus has changed.
     ///     </para>
     /// </remarks>
-    public event EventHandler<HasFocusEventArgs> HasFocusChanging;
+    public event EventHandler<HasFocusEventArgs>? HasFocusChanging;
 
     /// <summary>
     ///     Called when this view should stop being focused.
     /// </summary>
-    /// <param name="newFocusedVew">The new focused view. If <see langword="null"/> it is not known which view will be focused.</param>
+    /// <param name="newFocusedView">The new focused view. If <see langword="null"/> it is not known which view will be focused.</param>
     /// <param name="traversingDown">Set to true to indicate method is being called recurively, traversing down the focus chain.</param>
     /// <exception cref="InvalidOperationException"></exception>
-    private void SetHasFocusFalse (View? newFocusedVew, bool traversingDown = false)
+    private void SetHasFocusFalse (View? newFocusedView, bool traversingDown = false)
     {
         // Pre-conditions
         if (!_hasFocus)
@@ -502,7 +502,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         }
 
         // If newFocusedVew is null, we need to find the view that should get focus, and SetFocus on it.
-        if (!traversingDown && newFocusedVew is null)
+        if (!traversingDown && newFocusedView is null)
         {
             if (SuperView?._previouslyMostFocused is { } && SuperView?._previouslyMostFocused != this)
             {
@@ -539,16 +539,16 @@ public partial class View // Focus and cross-view navigation management (TabStop
         // Before we can leave focus, we need to make sure that all views down the subview-hierarchy have left focus.
         View? mostFocused = MostFocused;
 
-        if (mostFocused is { } && (newFocusedVew is null || mostFocused != newFocusedVew))
+        if (mostFocused is { } && (newFocusedView is null || mostFocused != newFocusedView))
         {
             // Start at the bottom and work our way up to us
-            View bottom = mostFocused;
+            View? bottom = mostFocused;
 
             while (bottom is { } && bottom != this)
             {
                 if (bottom.HasFocus)
                 {
-                    bottom.SetHasFocusFalse (newFocusedVew, true);
+                    bottom.SetHasFocusFalse (newFocusedView, true);
                 }
 
                 bottom = bottom.SuperView;
@@ -560,7 +560,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         bool previousValue = HasFocus;
 
         // Note, can't be cancelled.
-        NotifyFocusChanging (HasFocus, !HasFocus, newFocusedVew, this);
+        NotifyFocusChanging (HasFocus, !HasFocus, newFocusedView, this);
 
         // Get whatever peer has focus, if any
         View? focusedPeer = SuperView?.Focused;
@@ -572,11 +572,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
             if (appFocused is { } || appFocused == this)
             {
-                Application.Navigation.SetFocused (SuperView);
+               Application.Navigation.SetFocused (newFocusedView ?? SuperView);
             }
         }
 
-        NotifyFocusChanged (HasFocus, this, newFocusedVew);
+        NotifyFocusChanged (HasFocus, this, newFocusedView);
 
         if (_hasFocus)
         {
@@ -633,7 +633,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///         This event cannot be cancelled.
     ///     </para>
     /// </remarks>
-    public event EventHandler<HasFocusEventArgs> HasFocusChanged;
+    public event EventHandler<HasFocusEventArgs>? HasFocusChanged;
 
     #endregion HasFocus
 

@@ -7,6 +7,8 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Layout")]
 public class Navigation : Scenario
 {
+    private int _hotkeyCount;
+
     public override void Main ()
     {
         Application.Init ();
@@ -31,7 +33,7 @@ public class Navigation : Scenario
             Title = "_1 Test Frame",
             X = Pos.Right (editor),
             Width = Dim.Fill (),
-            Height = Dim.Fill (),
+            Height = Dim.Fill ()
         };
 
         app.Add (testFrame);
@@ -40,27 +42,27 @@ public class Navigation : Scenario
         {
             X = 0,
             Y = 0,
-            Title = $"TopButton _{GetNextHotKey ()}",
+            Title = $"TopButton _{GetNextHotKey ()}"
         };
 
         testFrame.Add (button);
 
-        var tiledView1 = CreateTiledView (0, 2, 2);
-        var tiledView2 = CreateTiledView (1, Pos.Right (tiledView1), Pos.Top (tiledView1));
+        View tiledView1 = CreateTiledView (0, 2, 2);
+        View tiledView2 = CreateTiledView (1, Pos.Right (tiledView1), Pos.Top (tiledView1));
 
         testFrame.Add (tiledView1);
         testFrame.Add (tiledView2);
 
-        var tiledView3 = CreateTiledView (1, Pos.Right (tiledView2), Pos.Top (tiledView2));
+        View tiledView3 = CreateTiledView (1, Pos.Right (tiledView2), Pos.Top (tiledView2));
         tiledView3.TabStop = TabBehavior.TabGroup;
         tiledView3.BorderStyle = LineStyle.Double;
         testFrame.Add (tiledView3);
 
-        var overlappedView1 = CreateOverlappedView (2, Pos.Center () - 5, Pos.Center ());
-        var tiledSubView = CreateTiledView (4, 0, 2);
+        View overlappedView1 = CreateOverlappedView (2, Pos.Center () - 5, Pos.Center ());
+        View tiledSubView = CreateTiledView (4, 0, 2);
         overlappedView1.Add (tiledSubView);
 
-        var overlappedView2 = CreateOverlappedView (3, Pos.Center () + 10, Pos.Center () + 5);
+        View overlappedView2 = CreateOverlappedView (3, Pos.Center () + 10, Pos.Center () + 5);
 
         // BUGBUG: F6 through nested tab groups doesn't work yet.
 #if NESTED_TABGROUPS
@@ -79,59 +81,20 @@ public class Navigation : Scenario
         {
             X = Pos.AnchorEnd (),
             Y = Pos.AnchorEnd (),
-            Title = $"TopButton _{GetNextHotKey ()}",
+            Title = $"TopButton _{GetNextHotKey ()}"
         };
 
         testFrame.Add (button);
 
+        editor.AutoSelectSuperView = testFrame;
         Application.Run (app);
         app.Dispose ();
         Application.Shutdown ();
     }
 
-    private int _hotkeyCount;
-
-    private char GetNextHotKey ()
-    {
-        return (char)((int)'A' + _hotkeyCount++);
-    }
-
-    private View CreateTiledView (int id, Pos x, Pos y)
-    {
-        View overlapped = new View
-        {
-            X = x,
-            Y = y,
-            Height = Dim.Auto (),
-            Width = Dim.Auto (),
-            Title = $"Tiled{id} _{GetNextHotKey ()}",
-            Id = $"Tiled{id}",
-            BorderStyle = LineStyle.Single,
-            CanFocus = true, // Can't drag without this? BUGBUG
-            TabStop = TabBehavior.TabStop,
-            Arrangement = ViewArrangement.Fixed
-        };
-
-        Button button = new ()
-        {
-            Title = $"Tiled Button{id} _{GetNextHotKey ()}"
-        };
-        overlapped.Add (button);
-
-        button = new ()
-        {
-            Y = Pos.Bottom (button),
-            Title = $"Tiled Button{id} _{GetNextHotKey ()}"
-        };
-        overlapped.Add (button);
-
-        return overlapped;
-    }
-
-
     private View CreateOverlappedView (int id, Pos x, Pos y)
     {
-        View overlapped = new View
+        var overlapped = new View
         {
             X = x,
             Y = y,
@@ -162,4 +125,38 @@ public class Navigation : Scenario
 
         return overlapped;
     }
+
+    private View CreateTiledView (int id, Pos x, Pos y)
+    {
+        var overlapped = new View
+        {
+            X = x,
+            Y = y,
+            Height = Dim.Auto (),
+            Width = Dim.Auto (),
+            Title = $"Tiled{id} _{GetNextHotKey ()}",
+            Id = $"Tiled{id}",
+            BorderStyle = LineStyle.Single,
+            CanFocus = true, // Can't drag without this? BUGBUG
+            TabStop = TabBehavior.TabStop,
+            Arrangement = ViewArrangement.Fixed
+        };
+
+        Button button = new ()
+        {
+            Title = $"Tiled Button{id} _{GetNextHotKey ()}"
+        };
+        overlapped.Add (button);
+
+        button = new ()
+        {
+            Y = Pos.Bottom (button),
+            Title = $"Tiled Button{id} _{GetNextHotKey ()}"
+        };
+        overlapped.Add (button);
+
+        return overlapped;
+    }
+
+    private char GetNextHotKey () { return (char)('A' + _hotkeyCount++); }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Text;
 using Terminal.Gui;
 
@@ -19,31 +20,43 @@ public class AdornmentsEditor : View
 
         //SuperViewRendersLineCanvas = true;
 
+        CanFocus = true;
+
         TabStop = TabBehavior.TabGroup;
 
         Initialized += AdornmentsEditor_Initialized;
     }
 
     private readonly ViewDiagnosticFlags _savedDiagnosticFlags = Diagnostics;
-    private View _viewToEdit;
+    private View? _viewToEdit;
 
-    private Label _lblView; // Text describing the vi
+    private Label? _lblView; // Text describing the vi
 
-    private MarginEditor _marginEditor;
-    private BorderEditor _borderEditor;
-    private PaddingEditor _paddingEditor;
+    private MarginEditor? _marginEditor;
+    private BorderEditor? _borderEditor;
+    private PaddingEditor? _paddingEditor;
 
     // TODO: Move Diagnostics to a separate Editor class (DiagnosticsEditor?).
-    private CheckBox _diagPaddingCheckBox;
-    private CheckBox _diagRulerCheckBox;
+    private CheckBox? _diagPaddingCheckBox;
+    private CheckBox? _diagRulerCheckBox;
 
     /// <summary>
-    ///     Gets or sets whether the AdornmentsEditor should automatically select the View to edit when the mouse is clicked
-    ///     anywhere outside the editor.
+    ///     Gets or sets whether the AdornmentsEditor should automatically select the View to edit
+    ///     based on the values of <see cref="AutoSelectSuperView"/> and <see cref="AutoSelectAdornments"/>.
     /// </summary>
     public bool AutoSelectViewToEdit { get; set; }
 
-    public View ViewToEdit
+    /// <summary>
+    ///     Gets or sets the View that will scope the behavior of <see cref="AutoSelectViewToEdit"/>.
+    /// </summary>
+    public View? AutoSelectSuperView { get; set; }
+
+    /// <summary>
+    ///     Gets or sets whether auto select with the mouse will select Adornments or just Views.
+    /// </summary>
+    public bool AutoSelectAdornments { get; set; }
+
+    public View? ViewToEdit
     {
         get => _viewToEdit;
         set
@@ -55,11 +68,66 @@ public class AdornmentsEditor : View
 
             _viewToEdit = value;
 
-            _marginEditor.AdornmentToEdit = _viewToEdit?.Margin ?? null;
-            _borderEditor.AdornmentToEdit = _viewToEdit?.Border ?? null;
-            _paddingEditor.AdornmentToEdit = _viewToEdit?.Padding ?? null;
+            if (_viewToEdit is not Adornment)
+            {
+                _marginEditor!.AdornmentToEdit = _viewToEdit?.Margin ?? null;
+                _borderEditor!.AdornmentToEdit = _viewToEdit?.Border ?? null;
+                _paddingEditor!.AdornmentToEdit = _viewToEdit?.Padding ?? null;
+            }
 
-            _lblView.Text = $"{_viewToEdit?.GetType ().Name}: {_viewToEdit?.Id}" ?? string.Empty;
+            if (_lblView is { })
+            {
+                _lblView.Text = $"{_viewToEdit?.GetType ().Name}: {_viewToEdit?.Id}" ?? string.Empty;
+            }
+        }
+    }
+
+
+    private void NavigationOnFocusedChanged (object? sender, EventArgs e)
+    {
+        if (AutoSelectSuperView is null)
+        {
+            return;
+        }
+
+        if (ApplicationNavigation.IsInHierarchy (this, Application.Navigation!.GetFocused ()))
+        {
+            return;
+        }
+
+        if (!ApplicationNavigation.IsInHierarchy (AutoSelectSuperView, Application.Navigation!.GetFocused ()))
+        {
+            return;
+        }
+
+        ViewToEdit = Application.Navigation!.GetFocused ();
+    }
+
+    private void ApplicationOnMouseEvent (object? sender, MouseEvent e)
+    {
+        if (e.Flags != MouseFlags.Button1Clicked || !AutoSelectViewToEdit)
+        {
+            return;
+        }
+
+        if ((AutoSelectSuperView is { } && !AutoSelectSuperView.FrameToScreen ().Contains (e.Position))
+            || FrameToScreen ().Contains (e.Position))
+        {
+            return;
+        }
+
+        View view = e.View;
+
+        if (view is { })
+        {
+            if (view is Adornment adornment)
+            {
+                ViewToEdit = AutoSelectAdornments ? adornment : adornment.Parent;
+            }
+            else
+            {
+                ViewToEdit = view;
+            }
         }
     }
 
@@ -70,7 +138,7 @@ public class AdornmentsEditor : View
         base.Dispose (disposing);
     }
 
-    private void AdornmentsEditor_Initialized (object sender, EventArgs e)
+    private void AdornmentsEditor_Initialized (object? sender, EventArgs e)
     {
         BorderStyle = LineStyle.Dotted;
 
@@ -152,5 +220,8 @@ public class AdornmentsEditor : View
 
         Add (_diagRulerCheckBox);
         _diagRulerCheckBox.Y = Pos.Bottom (_diagPaddingCheckBox);
+
+        Application.MouseEvent += ApplicationOnMouseEvent;
+        Application.Navigation!.FocusedChanged += NavigationOnFocusedChanged;
     }
 }

@@ -91,7 +91,8 @@ public class AdornmentEditor : View
         BorderStyle = LineStyle.Dashed;
         Initialized += AdornmentEditor_Initialized;
 
-        TabStop = TabBehavior.TabGroup;
+        CanFocus = true;
+        TabStop = TabBehavior.TabStop;
     }
 
     private void AdornmentEditor_Initialized (object sender, EventArgs e)
