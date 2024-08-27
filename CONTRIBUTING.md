@@ -90,7 +90,13 @@ remote:
 
 Follow the template instructions found on Github.
 
-## Terminal.Gui Coding Style
+## Tenets for [gui-cs](www.github.com/gui-cs) Code Style (Unless you have better ones)
+
+* **Six-Year-Old Reading Level** - Our code style is biased towards code readability and away from terseness. This is *Systems Software* and needs to stand the test of time. Code should be structured and use variable names that make it readable by a 6-year-old, and comments in code are encouraged. 
+* **Consistency, Consistency, Consistency** - We adopt and document our standards for code style and then enforce them ruthlessly. For example, we require code reviews to pay attention to code style, not just functionality. 
+* **Don't be Weird** - Like all developers we have opinions, but our opinions on code style are tempered by existing standards. We are biased towards code style that used by Microsoft and other leading dotnet developers. For example, we choose 4 spaces for indentation instead of 8.
+* **Set and Forget** - We embrace and encourage the use of technology that makes it easy for contributors to apply best-practice code-style, such as ReSharper. As we do so we are mindful that tools can cause hidden issues and merge hell.
+* **Documentation is the Spec** - We care deeply about providing delightful developer documentation and are sticklers for grammar and clarity. If the code and the docs conflict, we are biased to believe what we wrote in the API documentation. This drives a virtuous cycle of clear thinking.
 
 **Terminal.Gui** uses a derivative of the [Microsoft C# Coding Conventions](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions), with any deviations from those (somewhat older) conventions codified in the .editorconfig for the solution, as well as even more specific definitions in team-shared dotsettings files, used by ReSharper and Rider.\
 Before you commit code, please run the formatting rules on **only the code file(s) you have modified**, in one of the following ways, in order of most preferred to least preferred:
