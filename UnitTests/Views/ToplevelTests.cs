@@ -258,7 +258,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         top.Remove (top.StatusBar);
         Assert.Null (top.StatusBar);
         Assert.NotNull (statusBar);
-#if true
+#if DEBUG_IDISPOSABLE
         Assert.False (menuBar.WasDisposed);
         Assert.False (statusBar.WasDisposed);
         menuBar.Dispose ();
@@ -407,7 +407,8 @@ public partial class ToplevelTests (ITestOutputHelper output)
         win.NewMouseEvent (new () { Position = new (6, 0), Flags = MouseFlags.Button1Pressed });
 
         //Assert.Null (Toplevel._dragPosition);
-#if true
+#if DEBUG_IDISPOSABLE
+
         Assert.False (top.MenuBar.WasDisposed);
         Assert.False (top.StatusBar.WasDisposed);
 #endif
@@ -418,7 +419,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Null (top.StatusBar);
         Assert.NotNull (menuBar);
         Assert.NotNull (statusBar);
-#if true
+#if DEBUG_IDISPOSABLE
         Assert.True (menuBar.WasDisposed);
         Assert.True (statusBar.WasDisposed);
 #endif
