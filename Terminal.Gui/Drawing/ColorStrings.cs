@@ -1,7 +1,6 @@
 #nullable enable
 using System.Collections;
 using System.Globalization;
-using System.Resources;
 using Terminal.Gui.Resources;
 
 namespace Terminal.Gui;
