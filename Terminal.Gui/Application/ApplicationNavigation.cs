@@ -83,28 +83,4 @@ public class ApplicationNavigation
 
         return false;
     }
-
-
-    /// <summary>
-    ///     Gets the deepest focused subview of the specified <paramref name="view"/>.
-    /// </summary>
-    /// <param name="view"></param>
-    /// <returns></returns>
-    internal static View? GetDeepestFocusedSubview (View? view)
-    {
-        if (view is null)
-        {
-            return null;
-        }
-
-        foreach (View v in view.Subviews)
-        {
-            if (v.HasFocus)
-            {
-                return GetDeepestFocusedSubview (v);
-            }
-        }
-
-        return view;
-    }
 }

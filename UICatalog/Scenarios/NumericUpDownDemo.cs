@@ -136,7 +136,7 @@ internal class NumericUpDownEditor<T> : View where T : notnull
                         _numericUpDown.Value = (T)Convert.ChangeType (_value.Text, typeof (T));
                     }
 
-                    _value.ColorScheme = SuperView.ColorScheme;
+                    _value.ColorScheme = SuperView!.ColorScheme;
 
                 }
                 catch (System.FormatException)
@@ -184,7 +184,7 @@ internal class NumericUpDownEditor<T> : View where T : notnull
                     _ = string.Format (_format.Text, _value);
                     _numericUpDown.Format = _format.Text;
 
-                    _format.ColorScheme = SuperView.ColorScheme;
+                    _format.ColorScheme = SuperView!.ColorScheme;
 
                 }
                 catch (System.FormatException)
@@ -239,7 +239,7 @@ internal class NumericUpDownEditor<T> : View where T : notnull
                         _numericUpDown.Increment = (T)Convert.ChangeType (_increment.Text, typeof (T));
                     }
 
-                    _increment.ColorScheme = SuperView.ColorScheme;
+                    _increment.ColorScheme = SuperView!.ColorScheme;
 
                 }
                 catch (System.FormatException)

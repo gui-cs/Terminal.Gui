@@ -1232,7 +1232,7 @@ public class OverlappedTests
         Assert.Equal (superView.MostFocused, current);
 
         // Act
-        ApplicationOverlapped.SetFocusToNextViewWithWrap (Application.Current.SuperView.Subviews, NavigationDirection.Forward);
+        ApplicationOverlapped.SetFocusToNextViewWithWrap (Application.Current!.SuperView!.Subviews, NavigationDirection.Forward);
 
         // Assert
         Assert.True (view1.HasFocus);
