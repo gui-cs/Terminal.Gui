@@ -1,7 +1,6 @@
 #nullable enable
 using System.Collections;
 using System.Globalization;
-using System.Resources;
 using Terminal.Gui.Resources;
 
 namespace Terminal.Gui;
@@ -11,8 +10,6 @@ namespace Terminal.Gui;
 /// </summary>
 public static class ColorStrings
 {
-    private static readonly ResourceManager _resourceManager = new (typeof (Strings));
-
     /// <summary>
     ///     Gets the W3C standard string for <paramref name="color"/>.
     /// </summary>
@@ -21,7 +18,7 @@ public static class ColorStrings
     public static string? GetW3CColorName (Color color)
     {
         // Fetch the color name from the resource file
-        return _resourceManager.GetString ($"#{color.R:X2}{color.G:X2}{color.B:X2}", CultureInfo.CurrentUICulture);
+        return GlobalResources.GetString ($"#{color.R:X2}{color.G:X2}{color.B:X2}", CultureInfo.CurrentUICulture);
     }
 
     /// <summary>
@@ -30,14 +27,18 @@ public static class ColorStrings
     /// <returns></returns>
     public static IEnumerable<string> GetW3CColorNames ()
     {
-        foreach (DictionaryEntry entry in _resourceManager.GetResourceSet (CultureInfo.CurrentUICulture, true, true)!)
-        {
-            string keyName = entry.Key.ToString () ?? string.Empty;
+        foreach (DictionaryEntry entry in GlobalResources.GetResourceSet (
+                                                                          CultureInfo.CurrentUICulture,
+                                                                          true,
+                                                                          true,
+                                                                          e =>
+                                                                          {
+                                                                              string keyName = e.Key.ToString () ?? string.Empty;
 
-            if (entry.Value is string colorName && keyName.StartsWith ('#'))
-            {
-                yield return colorName;
-            }
+                                                                              return e.Value is string && keyName.StartsWith ('#');
+                                                                          })!)
+        {
+            yield return (entry.Value as string)!;
         }
     }
 
@@ -50,7 +51,7 @@ public static class ColorStrings
     public static bool TryParseW3CColorName (string name, out Color color)
     {
         // Iterate through all resource entries to find the matching color name
-        foreach (DictionaryEntry entry in _resourceManager.GetResourceSet (CultureInfo.CurrentUICulture, true, true)!)
+        foreach (DictionaryEntry entry in GlobalResources.GetResourceSet (CultureInfo.CurrentUICulture, true, true)!)
         {
             if (entry.Value is string colorName && colorName.Equals (name, StringComparison.OrdinalIgnoreCase))
             {
