@@ -187,8 +187,15 @@ public static partial class Application // Mouse handling
             }
 
             //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
-            if (MouseGrabView.NewMouseEvent (viewRelativeMouseEvent) is true)
+            if (MouseGrabView?.NewMouseEvent (viewRelativeMouseEvent) is true)
             {
+                return;
+            }
+
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+            if (MouseGrabView is null && view is Adornment)
+            {
+                // The view that grabbed the mouse has been disposed
                 return;
             }
         }
