@@ -15,7 +15,6 @@ public class KeyboardTests
         _output = output;
 #if DEBUG_IDISPOSABLE
         Responder.Instances.Clear ();
-        RunState.Instances.Clear ();
 #endif
     }
 

@@ -364,16 +364,6 @@ public class UICatalogApp
         }
 
         Responder.Instances.Clear ();
-
-        // Validate there are no outstanding Application.RunState-based instances 
-        // after a scenario was selected to run. This proves the main UI Catalog
-        // 'app' closed cleanly.
-        foreach (RunState? inst in RunState.Instances)
-        {
-            Debug.Assert (inst.WasDisposed);
-        }
-
-        RunState.Instances.Clear ();
 #endif
     }
 

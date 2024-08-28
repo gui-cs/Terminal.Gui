@@ -436,8 +436,6 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 #if DEBUG_IDISPOSABLE
                 Debug.Assert (TopLevels.Count == 0);
 #endif
-                runState.Dispose ();
-
                 return;
             }
 
@@ -571,7 +569,9 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     {
         if (MainLoop!.Running && MainLoop.EventsPending ())
         {
-            // Notify Toplevel it's ready
+#if DEBUG_IDISPOSABLE
+            ObjectDisposedException.ThrowIf (state.Toplevel.WasDisposed, typeof (View));
+#endif            // Notify Toplevel it's ready
             if (firstIteration)
             {
                 state.Toplevel.OnReady ();
@@ -591,6 +591,10 @@ public static partial class Application // Run (Begin, Run, End, Stop)
                 Refresh ();
             }
         }
+
+#if DEBUG_IDISPOSABLE
+        ObjectDisposedException.ThrowIf (state.Toplevel is { WasDisposed: true }, typeof (View));
+#endif
 
         firstIteration = false;
 
@@ -670,6 +674,10 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         {
             top = Current;
         }
+
+#if DEBUG_IDISPOSABLE
+        ObjectDisposedException.ThrowIf (top is { WasDisposed: true }, typeof (View));
+#endif
 
         if (ApplicationOverlapped.OverlappedTop != null
             && top!.IsOverlappedContainer
@@ -791,6 +799,10 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     {
         ArgumentNullException.ThrowIfNull (runState);
 
+#if DEBUG_IDISPOSABLE
+        ObjectDisposedException.ThrowIf (runState.Toplevel is { WasDisposed: true }, typeof (View));
+#endif
+
         if (ApplicationOverlapped.OverlappedTop is { })
         {
             ApplicationOverlapped.OverlappedTop.OnChildUnloaded (runState.Toplevel);
@@ -878,6 +890,5 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         }
 
         runState.Toplevel = null;
-        runState.Dispose ();
     }
 }

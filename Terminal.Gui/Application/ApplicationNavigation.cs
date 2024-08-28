@@ -97,8 +97,14 @@ public class ApplicationNavigation
             return null;
         }
 
+#if DEBUG_IDISPOSABLE
+        ObjectDisposedException.ThrowIf (view is { WasDisposed: true }, typeof (View));
+#endif
         foreach (View v in view.Subviews)
         {
+#if DEBUG_IDISPOSABLE
+            ObjectDisposedException.ThrowIf (v is { WasDisposed: true }, typeof (View));
+#endif
             if (v.HasFocus)
             {
                 return GetDeepestFocusedSubview (v);

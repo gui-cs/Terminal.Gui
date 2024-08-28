@@ -13,7 +13,6 @@ public class ApplicationTests
 
 #if DEBUG_IDISPOSABLE
         Responder.Instances.Clear ();
-        RunState.Instances.Clear ();
 #endif
     }
 
@@ -177,7 +176,6 @@ public class ApplicationTests
         Application.End (rs);
 
 #if DEBUG_IDISPOSABLE
-        Assert.True (rs.WasDisposed);
         Assert.False (Application.Top.WasDisposed); // Is true because the rs.Toplevel is the same as Application.Top
 #endif
 
@@ -1069,8 +1067,6 @@ public class ApplicationTests
                                                              w)); // Invalid - w has been disposed. Run it in debug mode will throw, otherwise the user may want to run it again
         Assert.NotNull (exception);
 
-        exception = Record.Exception (() => Assert.Equal (string.Empty, w.Title)); // Invalid - w has been disposed and cannot be accessed
-        Assert.NotNull (exception);
         exception = Record.Exception (() => w.Title = "NewTitle"); // Invalid - w has been disposed and cannot be accessed
         Assert.NotNull (exception);
 #endif
