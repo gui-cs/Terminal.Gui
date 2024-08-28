@@ -373,10 +373,6 @@ public partial class View : Responder, ISupportInitializeNotification
                 {
                     HasFocus = false;
                 }
-                if (IsInitialized && ClearOnVisibleFalse)
-                {
-                    Clear ();
-                }
             }
 
             if (_visible && CanFocus && Enabled && !HasFocus
@@ -392,9 +388,6 @@ public partial class View : Responder, ISupportInitializeNotification
 
     /// <summary>Method invoked when the <see cref="Visible"/> property from a view is changed.</summary>
     public virtual void OnVisibleChanged () { VisibleChanged?.Invoke (this, EventArgs.Empty); }
-
-    /// <summary>Gets or sets whether a view is cleared if the <see cref="Visible"/> property is <see langword="false"/>.</summary>
-    public bool ClearOnVisibleFalse { get; set; } = true;
 
     /// <summary>Event fired when the <see cref="Visible"/> value is being changed.</summary>
     public event EventHandler? VisibleChanged;

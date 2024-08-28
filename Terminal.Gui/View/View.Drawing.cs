@@ -202,11 +202,6 @@ public partial class View // Drawing APIs
     /// </remarks>
     public void Draw ()
     {
-        if (!CanBeVisible (this))
-        {
-            return;
-        }
-
         OnDrawAdornments ();
 
         if (ColorScheme is { })
@@ -475,6 +470,11 @@ public partial class View // Drawing APIs
             if (SuperView is { })
             {
                 Clear ();
+            }
+
+            if (!CanBeVisible (this))
+            {
+                return;
             }
 
             if (!string.IsNullOrEmpty (TextFormatter.Text))
