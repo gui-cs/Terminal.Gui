@@ -48,6 +48,8 @@ public class TextField : View
 
         Added += TextField_Added;
 
+        Removed += TextField_Removed;
+
         // Things this view knows how to do
         AddCommand (
                     Command.DeleteCharRight,
@@ -1868,6 +1870,11 @@ public class TextField : View
             Autocomplete.HostControl = this;
             Autocomplete.PopupInsideContainer = false;
         }
+    }
+
+    private void TextField_Removed (object sender, SuperViewChangedEventArgs e)
+    {
+        Autocomplete.HostControl = null;
     }
 
     private void TextField_Initialized (object sender, EventArgs e)

@@ -64,7 +64,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 return false;
             }
 
-            // - If we are TabGrup and our SuperView has at least one other TabGroup subview, move to the SuperView's chain
+            // - If we are TabGroup and our SuperView has at least one other TabGroup subview, move to the SuperView's chain
             if (TabStop == TabBehavior.TabGroup && SuperView is { TabStop: TabBehavior.TabGroup })
             {
                 if (behavior == TabBehavior.TabGroup)

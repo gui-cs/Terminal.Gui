@@ -42,8 +42,22 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         get => _hostControl;
         set
         {
-            Debug.Assert (_hostControl is null);
+            if (value == _hostControl)
+            {
+                return;
+            }
+
             _hostControl = value;
+
+            if (_hostControl is null)
+            {
+                RemovePopupFromTop();
+                _top.Removed -= _top_Removed;
+                _top = null;
+
+                return;
+            }
+
             _top = _hostControl.SuperView;
 
             if (_top is { })
