@@ -7,7 +7,6 @@ namespace Terminal.Gui;
 /// </summary>
 public class ApplicationNavigation
 {
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="ApplicationNavigation"/> class.
     /// </summary>
@@ -16,38 +15,17 @@ public class ApplicationNavigation
         // TODO: Move navigation key bindings here from AddApplicationKeyBindings
     }
 
-    private View? _focused = null;
-
-    /// <summary>
-    ///     Gets the most focused <see cref="View"/> in the application, if there is one.
-    /// </summary>
-    public View? GetFocused () { return _focused; }
-
-    /// <summary>
-    ///     INTERNAL method to record the most focused <see cref="View"/> in the application.
-    /// </summary>
-    /// <remarks>
-    ///     Raises <see cref="FocusedChanged"/>.
-    /// </remarks>
-    internal void SetFocused (View? value)
-    {
-        if (_focused == value)
-        {
-            return;
-        }
-
-        _focused = value;
-
-        FocusedChanged?.Invoke (null, EventArgs.Empty);
-
-        return;
-    }
+    private View? _focused;
 
     /// <summary>
     ///     Raised when the most focused <see cref="View"/> in the application has changed.
     /// </summary>
     public event EventHandler<EventArgs>? FocusedChanged;
 
+    /// <summary>
+    ///     Gets the most focused <see cref="View"/> in the application, if there is one.
+    /// </summary>
+    public View? GetFocused () { return _focused; }
 
     /// <summary>
     ///     Gets whether <paramref name="view"/> is in the Subview hierarchy of <paramref name="start"/>.
@@ -74,7 +52,8 @@ public class ApplicationNavigation
                 return true;
             }
 
-            var found = IsInHierarchy (subView, view);
+            bool found = IsInHierarchy (subView, view);
+
             if (found)
             {
                 return found;
@@ -82,5 +61,23 @@ public class ApplicationNavigation
         }
 
         return false;
+    }
+
+    /// <summary>
+    ///     INTERNAL method to record the most focused <see cref="View"/> in the application.
+    /// </summary>
+    /// <remarks>
+    ///     Raises <see cref="FocusedChanged"/>.
+    /// </remarks>
+    internal void SetFocused (View? value)
+    {
+        if (_focused == value)
+        {
+            return;
+        }
+
+        _focused = value;
+
+        FocusedChanged?.Invoke (null, EventArgs.Empty);
     }
 }

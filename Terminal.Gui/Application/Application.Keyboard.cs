@@ -298,21 +298,14 @@ public static partial class Application // Keyboard handling
                     static () =>
                     {
                         // TODO: This OverlapppedTop tomfoolery goes away in addressing #2491
-                        if (ApplicationOverlapped.OverlappedTop is null)
+                        if (ApplicationOverlapped.OverlappedTop is null && Current is { })
                         {
-                            if ((View?)Current is { })
-                            {
-                                return Current.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup);
-                            }
-                        }
-                        else
-                        {
-                            ApplicationOverlapped.OverlappedMoveNext ();
-
-                            return true;
+                            return Current.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup);
                         }
 
-                        return false;
+                        ApplicationOverlapped.OverlappedMoveNext ();
+
+                        return true;
                     }
                    );
 
@@ -323,7 +316,7 @@ public static partial class Application // Keyboard handling
                         // TODO: This OverlapppedTop tomfoolery goes away in addressing #2491
                         if (ApplicationOverlapped.OverlappedTop is null)
                         {
-                            if ((View?)Current is { })
+                            if (Current is { })
                             {
                                 return Current.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup);
                             }
