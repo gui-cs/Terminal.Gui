@@ -1269,7 +1269,7 @@ internal partial class HistoryText
         Added
     }
 
-    private readonly List<HistoryTextItem> _historyTextItems = new ();
+    private readonly List<HistoryTextItemEventArgs> _historyTextItems = new ();
     private int _idxHistoryText = -1;
     private string? _originalText;
     public bool HasHistoryChanges => _idxHistoryText > -1;
@@ -1304,7 +1304,7 @@ internal partial class HistoryText
         _idxHistoryText++;
     }
 
-    public event EventHandler<HistoryTextItem>? ChangeText;
+    public event EventHandler<HistoryTextItemEventArgs>? ChangeText;
 
     public void Clear (string text)
     {
@@ -1324,7 +1324,7 @@ internal partial class HistoryText
 
             _idxHistoryText++;
 
-            var historyTextItem = new HistoryTextItem (_historyTextItems [_idxHistoryText]) { IsUndoing = false };
+            var historyTextItem = new HistoryTextItemEventArgs (_historyTextItems [_idxHistoryText]) { IsUndoing = false };
 
             ProcessChanges (ref historyTextItem);
 
@@ -1334,7 +1334,7 @@ internal partial class HistoryText
 
     public void ReplaceLast (List<List<RuneCell>> lines, Point curPos, LineStatus lineStatus)
     {
-        HistoryTextItem? found = _historyTextItems.FindLast (x => x.LineStatus == lineStatus);
+        HistoryTextItemEventArgs? found = _historyTextItems.FindLast (x => x.LineStatus == lineStatus);
 
         if (found is { })
         {
@@ -1351,7 +1351,7 @@ internal partial class HistoryText
 
             _idxHistoryText--;
 
-            var historyTextItem = new HistoryTextItem (_historyTextItems [_idxHistoryText]) { IsUndoing = true };
+            var historyTextItem = new HistoryTextItemEventArgs (_historyTextItems [_idxHistoryText]) { IsUndoing = true };
 
             ProcessChanges (ref historyTextItem);
 
@@ -1359,9 +1359,9 @@ internal partial class HistoryText
         }
     }
 
-    private void OnChangeText (HistoryTextItem? lines) { ChangeText?.Invoke (this, lines!); }
+    private void OnChangeText (HistoryTextItemEventArgs? lines) { ChangeText?.Invoke (this, lines!); }
 
-    private void ProcessChanges (ref HistoryTextItem historyTextItem)
+    private void ProcessChanges (ref HistoryTextItemEventArgs historyTextItem)
     {
         if (historyTextItem.IsUndoing)
         {
@@ -2869,7 +2869,7 @@ public class TextView : View
     }
 
 
-    /// <summary>Allows clearing the <see cref="HistoryText.HistoryTextItem"/> items updating the original text.</summary>
+    /// <summary>Allows clearing the <see cref="HistoryText.HistoryTextItemEventArgs"/> items updating the original text.</summary>
     public void ClearHistoryChanges () { _historyText?.Clear (Text); }
 
     /// <summary>Closes the contents of the stream into the <see cref="TextView"/>.</summary>
@@ -4665,7 +4665,7 @@ public class TextView : View
         return new ValueTuple<int, int> (line, col);
     }
 
-    private void HistoryText_ChangeText (object sender, HistoryText.HistoryTextItem obj)
+    private void HistoryText_ChangeText (object sender, HistoryText.HistoryTextItemEventArgs obj)
     {
         SetWrapModel ();
 

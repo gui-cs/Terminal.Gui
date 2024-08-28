@@ -3168,6 +3168,29 @@ A B C
         Assert.Equal (8, tableView.GetAllSelectedCells ().Count ());
     }
 
+    [Fact]
+    public void TestDataColumnCaption()
+    {
+        var tableView = new TableView ();
+
+        var dt = new DataTable ();
+        dt.Columns.Add (new DataColumn ()
+        {
+            Caption = "Caption 1",
+            ColumnName = "Column Name 1"
+        });
+        dt.Columns.Add (new DataColumn ()
+        {
+            ColumnName = "Column Name 2"
+        });
+
+        var dts = new DataTableSource (dt);
+        var cn = dts.ColumnNames;
+
+        Assert.Equal ("Caption 1", cn [0]);
+        Assert.Equal ("Column Name 2", cn [1]);
+    }
+
     private TableView GetABCDEFTableView (out DataTable dt)
     {
         var tableView = new TableView ();
