@@ -25,7 +25,7 @@ public class DatePickerTests
     [Fact]
     public void DatePicker_Initialize_ShouldSetCurrentDate ()
     {
-        var datePicker = new DatePicker ();
+        var datePicker = new DatePicker (DateTime.Now);
         Assert.Equal (DateTime.Now.Date.Day, datePicker.Date.Day);
         Assert.Equal (DateTime.Now.Date.Month, datePicker.Date.Month);
         Assert.Equal (DateTime.Now.Date.Year, datePicker.Date.Year);
