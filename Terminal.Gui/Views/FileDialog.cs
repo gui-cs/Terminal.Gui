@@ -508,11 +508,7 @@ public class FileDialog : Dialog
             };
             AllowedTypeMenuClicked (0);
 
-            _allowedTypeMenuBar.HasFocusChanging += (s, e) =>
-                                                    {
-                                                        _allowedTypeMenuBar.OpenMenu (0);
-                                                    };
-
+            // TODO: Using v1's menu bar here is a hack. Need to upgrade this.
             _allowedTypeMenuBar.DrawContentComplete += (s, e) =>
                                                        {
                                                            _allowedTypeMenuBar.Move (e.NewViewport.Width - 1, 0);
@@ -531,7 +527,7 @@ public class FileDialog : Dialog
         // to streamline user experience and allow direct typing of paths
         // with zero navigation we start with focus in the text box and any
         // default/current path fully selected and ready to be overwritten
-        _tbPath.FocusDeepest (NavigationDirection.Forward, null);
+        _tbPath.SetFocus ();
         _tbPath.SelectAll ();
 
         if (string.IsNullOrEmpty (Title))
