@@ -150,7 +150,11 @@ public class ConfigurationEditor : Scenario
                                         };
         }
 
-        _tileView.Tiles.ToArray () [1].ContentView.SetFocus ();
+        if (_tileView.Tiles.Count > 2)
+        {
+            _tileView.Tiles.ToArray () [1].ContentView.SetFocus ();
+        }
+
         Application.Top.LayoutSubviews ();
     }
 

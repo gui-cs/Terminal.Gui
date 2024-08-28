@@ -364,11 +364,6 @@ public partial class View // Focus and cross-view navigation management (TabStop
             return (false, true);
         }
 
-        //// If we previously had a subview with focus (`Focused = subview`), we need to make sure that all subviews down the `subview`-hierarchy LeaveFocus.
-        //// LeaveFocus will recurse down the subview hierarchy and will also set PreviouslyMostFocused
-        //View focused = Focused;
-        //focused?.SetHasFocusFalse (this, true);
-
         // Make sure superviews up the superview hierarchy have focus.
         // Any of them may cancel gaining focus. In which case we need to back out.
         if (SuperView is { HasFocus: false } sv)
@@ -408,8 +403,6 @@ public partial class View // Focus and cross-view navigation management (TabStop
                     // Couldn't advance, so we're the most focused view in the application
                     _previouslyMostFocused = null;
                     Application.Navigation?.SetFocused (this);
-
-                    //NotifyFocusChanged (HasFocus, previousFocusedView, this);
                 }
             }
         }
