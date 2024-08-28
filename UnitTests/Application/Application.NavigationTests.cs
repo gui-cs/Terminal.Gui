@@ -1,6 +1,8 @@
-﻿using Moq;
+﻿using System.Diagnostics;
+using Moq;
 using Xunit.Abstractions;
 using Terminal.Gui;
+using Terminal.Gui.ViewTests;
 
 namespace Terminal.Gui.ApplicationTests.NavigationTests;
 
@@ -190,5 +192,58 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
         Assert.Equal (subView2, Application.Navigation.GetFocused ());
 
         Application.ResetState ();
+    }
+
+    [Fact]
+    public void Begin_SetsFocus_On_Top ()
+    {
+        Application.Init(new FakeDriver());
+
+        var top = new Toplevel ();
+        Assert.False (top.HasFocus);
+
+        RunState rs = Application.Begin (top);
+        Assert.True (top.HasFocus);
+
+        top.Dispose ();
+        Application.Shutdown();
+    }
+
+    [Theory]
+    [InlineData(TabBehavior.NoStop)]
+    [InlineData (TabBehavior.TabStop)]
+    [InlineData (TabBehavior.TabGroup)]
+    public void Begin_SetsFocus_On_Deepest_Focusable_View (TabBehavior behavior)
+    {
+        Application.Init (new FakeDriver ());
+
+        var top = new Toplevel ()
+        {
+            TabStop = behavior
+        };
+        Assert.False (top.HasFocus);
+
+        View subView = new ()
+        {
+            CanFocus = true,
+            TabStop = behavior
+        };
+        top.Add (subView);
+
+        View subSubView = new ()
+        {
+            CanFocus = true,
+            TabStop = TabBehavior.NoStop
+        };
+        subView.Add (subSubView);
+
+        RunState rs = Application.Begin (top);
+        Assert.True (top.HasFocus);
+        Assert.True (subView.HasFocus);
+        Assert.True (subSubView.HasFocus);
+
+        top.Dispose ();
+
+        Application.Shutdown ();
     }
 }

@@ -192,11 +192,6 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         if (!toplevel.HasFocus)
         {
             toplevel.SetFocus ();
-            //if (!toplevel.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop))
-            //{
-            //    // That didn't work. Try TabGroup.
-            //    toplevel.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup);
-            //}
         }
 
         ApplicationOverlapped.BringOverlappedTopToFront ();
