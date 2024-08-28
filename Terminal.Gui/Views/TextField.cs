@@ -585,7 +585,7 @@ public class TextField : View
         SetNeedsDisplay ();
     }
 
-    /// <summary>Allows clearing the <see cref="HistoryText.HistoryTextItem"/> items updating the original text.</summary>
+    /// <summary>Allows clearing the <see cref="HistoryText.HistoryTextItemEventArgs"/> items updating the original text.</summary>
     public void ClearHistoryChanges () { _historyText.Clear (Text); }
 
     /// <summary>Copy the selected text to the clipboard.</summary>
@@ -1382,7 +1382,7 @@ public class TextField : View
         return new Attribute (cs.Disabled.Foreground, cs.Focus.Background);
     }
 
-    private void HistoryText_ChangeText (object sender, HistoryText.HistoryTextItem obj)
+    private void HistoryText_ChangeText (object sender, HistoryText.HistoryTextItemEventArgs obj)
     {
         if (obj is null)
         {
