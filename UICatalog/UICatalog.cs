@@ -502,7 +502,8 @@ public class UICatalogApp
                         CanFocus = false
                     },
                     HelpText = "",
-                    Key = Key.F6
+                    KeyBindingScope = KeyBindingScope.Application,
+                    Key = Key.F7
                 };
 
                 ((CheckBox)ShForce16Colors.CommandView).CheckedStateChanging += (sender, args) =>
