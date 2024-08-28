@@ -314,21 +314,14 @@ public static partial class Application // Keyboard handling
                     static () =>
                     {
                         // TODO: This OverlapppedTop tomfoolery goes away in addressing #2491
-                        if (ApplicationOverlapped.OverlappedTop is null)
+                        if (ApplicationOverlapped.OverlappedTop is null && Current is { })
                         {
-                            if (Current is { })
-                            {
-                                return Current.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup);
-                            }
-                        }
-                        else
-                        {
-                            ApplicationOverlapped.OverlappedMovePrevious ();
-
-                            return true;
+                            return Current.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup);
                         }
 
-                        return false;
+                        ApplicationOverlapped.OverlappedMovePrevious ();
+
+                        return true;
                     }
                    );
 
