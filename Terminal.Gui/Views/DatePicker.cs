@@ -13,7 +13,7 @@ namespace Terminal.Gui;
 public class DatePicker : View
 {
     private TableView _calendar;
-    private DateTime _date = DateTime.Now;
+    private DateTime _date = DateTime.MinValue;
     private DateField _dateField;
     private Label _dateLabel;
     private Button _nextMonthButton;
