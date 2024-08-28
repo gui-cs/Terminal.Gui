@@ -156,7 +156,7 @@ public class AllViewsTester : Scenario
         var label = new Label { X = 0, Y = 0, Text = "X:" };
         _locationFrame.Add (label);
         _xRadioGroup = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
-        _xRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
+        _xRadioGroup.SelectedItemChanged += OnXRadioGroupOnSelectedItemChanged;
         _xText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_xVal}" };
 
         _xText.Accept += (s, args) =>
@@ -190,7 +190,7 @@ public class AllViewsTester : Scenario
                          };
         _locationFrame.Add (_yText);
         _yRadioGroup = new () { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
-        _yRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
+        _yRadioGroup.SelectedItemChanged += OnYRadioGroupOnSelectedItemChanged;
         _locationFrame.Add (_yRadioGroup);
 
         _sizeFrame = new ()
@@ -207,7 +207,7 @@ public class AllViewsTester : Scenario
         label = new () { X = 0, Y = 0, Text = "Width:" };
         _sizeFrame.Add (label);
         _wRadioGroup = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
-        _wRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
+        _wRadioGroup.SelectedItemChanged += OnWRadioGroupOnSelectedItemChanged;
         _wText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_wVal}" };
 
         _wText.Accept += (s, args) =>
@@ -267,7 +267,7 @@ public class AllViewsTester : Scenario
         _sizeFrame.Add (_hText);
 
         _hRadioGroup = new () { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
-        _hRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
+        _hRadioGroup.SelectedItemChanged += OnHRadioGroupOnSelectedItemChanged;
         _sizeFrame.Add (_hRadioGroup);
 
         _settingsPane.Add (_sizeFrame);
@@ -334,6 +334,14 @@ public class AllViewsTester : Scenario
         app.Dispose ();
         Application.Shutdown ();
     }
+
+    private void OnHRadioGroupOnSelectedItemChanged (object s, SelectedItemChangedArgs selected) { DimPosChanged (_curView); }
+
+    private void OnWRadioGroupOnSelectedItemChanged (object s, SelectedItemChangedArgs selected) { DimPosChanged (_curView); }
+
+    private void OnYRadioGroupOnSelectedItemChanged (object s, SelectedItemChangedArgs selected) { DimPosChanged (_curView); }
+
+    private void OnXRadioGroupOnSelectedItemChanged (object s, SelectedItemChangedArgs selected) { DimPosChanged (_curView); }
 
     // TODO: Add Command.HotKey handler (pop a message box?)
     private View CreateClass (Type type)
@@ -547,7 +555,16 @@ public class AllViewsTester : Scenario
             view.Height = Dim.Fill ();
         }
 
+        _xRadioGroup.SelectedItemChanged -= OnXRadioGroupOnSelectedItemChanged;
+        _yRadioGroup.SelectedItemChanged -= OnYRadioGroupOnSelectedItemChanged;
+        _hRadioGroup.SelectedItemChanged -= OnHRadioGroupOnSelectedItemChanged;
+        _wRadioGroup.SelectedItemChanged -= OnWRadioGroupOnSelectedItemChanged;
         UpdateSettings (view);
+        _xRadioGroup.SelectedItemChanged += OnXRadioGroupOnSelectedItemChanged;
+        _yRadioGroup.SelectedItemChanged += OnYRadioGroupOnSelectedItemChanged;
+        _hRadioGroup.SelectedItemChanged += OnHRadioGroupOnSelectedItemChanged;
+        _wRadioGroup.SelectedItemChanged += OnWRadioGroupOnSelectedItemChanged;
+
         UpdateTitle (view);
     }
 }
