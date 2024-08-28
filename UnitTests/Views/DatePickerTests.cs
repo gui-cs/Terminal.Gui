@@ -40,6 +40,14 @@ public class DatePickerTests
         Assert.Equal (DateTime.Now.Date.Year, datePicker.Date.Year);
     }
 
+    [Fact]
+    public void DatePicker_X_Y_Init ()
+    {
+        var datePicker = new DatePicker { Y = Pos.Center (), X = Pos.Center () };
+        Assert.Equal (DateTime.Now.Date.Day, datePicker.Date.Day);
+        Assert.Equal (DateTime.Now.Date.Month, datePicker.Date.Month);
+        Assert.Equal (DateTime.Now.Date.Year, datePicker.Date.Year);
+    }
 
     [Fact]
     public void DatePicker_SetDate_ShouldChangeText ()
