@@ -357,12 +357,6 @@ public class AllViewsTester : Scenario
         // Instantiate view
         var view = (View)Activator.CreateInstance (type);
 
-        // Set the colorscheme to make it stand out if is null by default
-        if (view.ColorScheme == null)
-        {
-            view.ColorScheme = Colors.ColorSchemes ["Base"];
-        }
-
         if (view is IDesignable designable)
         {
             designable.EnableForDesign (ref _demoText);
@@ -398,40 +392,40 @@ public class AllViewsTester : Scenario
         try
         {
             view.X = _xRadioGroup.SelectedItem switch
-                     {
-                         0 => Pos.Percent (_xVal),
-                         1 => Pos.AnchorEnd (),
-                         2 => Pos.Center (),
-                         3 => Pos.Absolute (_xVal),
-                         _ => view.X
-                     };
+            {
+                0 => Pos.Percent (_xVal),
+                1 => Pos.AnchorEnd (),
+                2 => Pos.Center (),
+                3 => Pos.Absolute (_xVal),
+                _ => view.X
+            };
 
             view.Y = _yRadioGroup.SelectedItem switch
-                     {
-                         0 => Pos.Percent (_yVal),
-                         1 => Pos.AnchorEnd (),
-                         2 => Pos.Center (),
-                         3 => Pos.Absolute (_yVal),
-                         _ => view.Y
-                     };
+            {
+                0 => Pos.Percent (_yVal),
+                1 => Pos.AnchorEnd (),
+                2 => Pos.Center (),
+                3 => Pos.Absolute (_yVal),
+                _ => view.Y
+            };
 
             view.Width = _wRadioGroup.SelectedItem switch
-                         {
-                             0 => Dim.Auto (),
-                             1 => Dim.Percent (_wVal),
-                             2 => Dim.Fill (_wVal),
-                             3 => Dim.Absolute (_wVal),
-                             _ => view.Width
-                         };
+            {
+                0 => Dim.Auto (),
+                1 => Dim.Percent (_wVal),
+                2 => Dim.Fill (_wVal),
+                3 => Dim.Absolute (_wVal),
+                _ => view.Width
+            };
 
             view.Height = _hRadioGroup.SelectedItem switch
-                          {
-                              0 => Dim.Auto (),
-                              1 => Dim.Percent (_hVal),
-                              2 => Dim.Fill (_hVal),
-                              3 => Dim.Absolute (_hVal),
-                              _ => view.Height
-                          };
+            {
+                0 => Dim.Auto (),
+                1 => Dim.Percent (_hVal),
+                2 => Dim.Fill (_hVal),
+                3 => Dim.Absolute (_hVal),
+                _ => view.Height
+            };
         }
         catch (Exception e)
         {
@@ -500,7 +494,7 @@ public class AllViewsTester : Scenario
         catch (InvalidOperationException e)
         {
             // This is a hack to work around the fact that the Pos enum doesn't have an "Align" value yet
-            Debug.WriteLine($"{e}");
+            Debug.WriteLine ($"{e}");
         }
 
         _xText.Text = $"{view.Frame.X}";
