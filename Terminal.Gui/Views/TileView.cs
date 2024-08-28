@@ -15,12 +15,15 @@ public class TileView : View
     /// <summary>Creates a new instance of the <see cref="TileView"/> class with 2 tiles (i.e. left and right).</summary>
     public TileView () : this (2)
     {
-        CanFocus = true;
     }
 
     /// <summary>Creates a new instance of the <see cref="TileView"/> class with <paramref name="tiles"/> number of tiles.</summary>
     /// <param name="tiles"></param>
-    public TileView (int tiles) { RebuildForTileCount (tiles); }
+    public TileView (int tiles)
+    {
+        CanFocus = true;
+        RebuildForTileCount (tiles);
+    }
 
     /// <summary>The line style to use when drawing the splitter lines.</summary>
     public LineStyle LineStyle { get; set; } = LineStyle.None;
@@ -119,6 +122,7 @@ public class TileView : View
 
                 // restore old Tile and View
                 _tiles [i] = oldTile;
+                _tiles [i].ContentView.TabStop = TabStop;
                 Add (_tiles [i].ContentView);
             }
             else
@@ -357,6 +361,7 @@ public class TileView : View
 
             var tile = new Tile ();
             _tiles.Add (tile);
+            tile.ContentView.Id = $"Tile.ContentView {i}";
             Add (tile.ContentView);
             tile.TitleChanged += (s, e) => SetNeedsDisplay ();
         }

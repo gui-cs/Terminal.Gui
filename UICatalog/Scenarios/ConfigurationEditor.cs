@@ -44,7 +44,11 @@ public class ConfigurationEditor : Scenario
 
         _tileView = new TileView (0)
         {
-            Width = Dim.Fill (), Height = Dim.Fill (1), Orientation = Orientation.Vertical, LineStyle = LineStyle.Single
+            Width = Dim.Fill (),
+            Height = Dim.Fill (1),
+            Orientation = Orientation.Vertical,
+            LineStyle = LineStyle.Single,
+            TabStop = TabBehavior.TabGroup
         };
 
         top.Add (_tileView);
@@ -79,7 +83,11 @@ public class ConfigurationEditor : Scenario
 
         top.Add (statusBar);
 
-        top.Loaded += (s, a) => Open ();
+        top.Loaded += (s, a) =>
+                      {
+                          Open ();
+                          //_tileView.AdvanceFocus (NavigationDirection.Forward, null);
+                      };
 
         _editorColorSchemeChanged += () =>
                                      {
@@ -133,9 +141,16 @@ public class ConfigurationEditor : Scenario
 
             textView.Read ();
 
-            textView.HasFocusChanging += (s, e) => { _lenShortcut.Title = $"Len:{textView.Text.Length}"; };
+            textView.HasFocusChanged += (s, e) =>
+                                        {
+                                            if (e.NewValue)
+                                            {
+                                                _lenShortcut.Title = $"Len:{textView.Text.Length}";
+                                            }
+                                        };
         }
 
+        _tileView.Tiles.ToArray () [1].ContentView.SetFocus ();
         Application.Top.LayoutSubviews ();
     }
 
@@ -150,9 +165,9 @@ public class ConfigurationEditor : Scenario
                 int result = MessageBox.Query (
                                                "Save Changes",
                                                $"Save changes to {editor.FileInfo.FullName}",
-                                               "Yes",
-                                               "No",
-                                               "Cancel"
+                                               "_Yes",
+                                               "_No",
+                                               "_Cancel"
                                               );
 
                 if (result == -1 || result == 2)
@@ -196,6 +211,8 @@ public class ConfigurationEditor : Scenario
                                        }
                                    }
                                };
+            TabStop = TabBehavior.TabGroup;
+
         }
 
         internal FileInfo FileInfo { get; set; }
