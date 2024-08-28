@@ -23,13 +23,23 @@ public class DatePickerTests
     }
 
     [Fact]
-    public void DatePicker_Initialize_ShouldSetCurrentDate ()
+    public void DatePicker_Default_Constructor_ShouldSetCurrenDate ()
+    {
+        var datePicker = new DatePicker ();
+        Assert.Equal (DateTime.Now.Date.Day, datePicker.Date.Day);
+        Assert.Equal (DateTime.Now.Date.Month, datePicker.Date.Month);
+        Assert.Equal (DateTime.Now.Date.Year, datePicker.Date.Year);
+    }
+
+    [Fact]
+    public void DatePicker_Constrctor_Now_ShouldSetCurrenDate ()
     {
         var datePicker = new DatePicker (DateTime.Now);
         Assert.Equal (DateTime.Now.Date.Day, datePicker.Date.Day);
         Assert.Equal (DateTime.Now.Date.Month, datePicker.Date.Month);
         Assert.Equal (DateTime.Now.Date.Year, datePicker.Date.Year);
     }
+
 
     [Fact]
     public void DatePicker_SetDate_ShouldChangeText ()
