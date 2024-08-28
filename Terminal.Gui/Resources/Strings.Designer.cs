@@ -1762,6 +1762,33 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unable to set console mode..
+        /// </summary>
+        internal static string Win32_PInvoke_SetConsoleMode_ArgumentException {
+            get {
+                return ResourceManager.GetString("Win32_PInvoke_SetConsoleMode_ArgumentException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The console handle is closed..
+        /// </summary>
+        internal static string Win32_PInvoke_SetConsoleMode_HandleClosed {
+            get {
+                return ResourceManager.GetString("Win32_PInvoke_SetConsoleMode_HandleClosed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The console handle is invalid..
+        /// </summary>
+        internal static string Win32_PInvoke_SetConsoleMode_HandleInvalid {
+            get {
+                return ResourceManager.GetString("Win32_PInvoke_SetConsoleMode_HandleInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Back.
         /// </summary>
         internal static string wzBack {
