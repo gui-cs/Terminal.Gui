@@ -122,7 +122,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <param name="e">Event where <see cref="ViewEventArgs.View"/> is the subview being added.</param>
     public virtual void OnAdded (SuperViewChangedEventArgs e)
     {
-        View view = e.Child;
+        View view = e.SubView;
         view.IsAdded = true;
         view.OnResizeNeeded ();
         view.Added?.Invoke (this, e);
@@ -132,7 +132,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <param name="e">Event args describing the subview being removed.</param>
     public virtual void OnRemoved (SuperViewChangedEventArgs e)
     {
-        View view = e.Child;
+        View view = e.SubView;
         view.IsAdded = false;
         view.Removed?.Invoke (this, e);
     }
