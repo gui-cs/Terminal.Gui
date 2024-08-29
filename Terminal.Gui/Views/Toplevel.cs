@@ -76,11 +76,6 @@ public partial class Toplevel : View
     /// <summary>Gets the latest <see cref="StatusBar"/> added into this Toplevel.</summary>
     public StatusBar? StatusBar => (StatusBar?)Subviews?.LastOrDefault (s => s is StatusBar);
 
-    /// <inheritdoc/>
-    public override View Add (View view)
-    {
-        return base.Add (view);
-    }
 
     // TODO: Overlapped - Rename to AllSubviewsClosed - Move to View?
     /// <summary>
@@ -353,19 +348,6 @@ public partial class Toplevel : View
 
     #endregion
 
-    #region Navigation
-
-    ///// <inheritdoc/>
-    //protected override bool OnEnter (View view)
-    //{
-    //    return MostFocused?.OnEnter (view) ?? false;
-    //}
-
-    ///// <inheritdoc/>
-    //protected override void OnLeave (View view) { return MostFocused?.OnLeave (view) ?? false; }
-
-    #endregion
-
     #region Size / Position Management
 
     // TODO: Make cancelable?
@@ -376,12 +358,6 @@ public partial class Toplevel : View
     {
         if (!IsOverlappedContainer)
         {
-            //if (Focused is null)
-            //{
-            //    // 
-            //    RestoreFocus ();
-            //}
-
             return null;
         }
 
