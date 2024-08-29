@@ -54,7 +54,7 @@ public class RestoreFocusTests () : TestsAllViews
         Assert.False (subViewSubView2.HasFocus);
         Assert.False (subViewSubView3.HasFocus);
 
-        view.RestoreFocus (view.TabStop);
+        view.RestoreFocus ();
         Assert.True (view.HasFocus);
         Assert.True (subView.HasFocus);
         Assert.Equal (subView, view.Focused);
@@ -77,7 +77,7 @@ public class RestoreFocusTests () : TestsAllViews
         Assert.False (subViewSubView2.HasFocus);
         Assert.False (subViewSubView3.HasFocus);
 
-        view.RestoreFocus (view.TabStop);
+        view.RestoreFocus ();
         Assert.True (subView.HasFocus);
         Assert.Equal (subView, view.Focused);
         Assert.True (subViewSubView2.HasFocus);
@@ -155,7 +155,7 @@ public class RestoreFocusTests () : TestsAllViews
         top.HasFocus = false;
         Assert.False (top.HasFocus);
 
-        top.RestoreFocus (null);
+        top.RestoreFocus ();
         Assert.True (top.HasFocus);
         Assert.Equal (tabGroup2, top.Focused);
         Assert.Equal (tabGroup2SubView1, tabGroup2.Focused);
@@ -163,7 +163,7 @@ public class RestoreFocusTests () : TestsAllViews
         top.HasFocus = false;
         Assert.False (top.HasFocus);
 
-        top.RestoreFocus (TabBehavior.TabGroup);
+        top.RestoreFocus ();
         Assert.True (top.HasFocus);
         Assert.Equal (tabGroup2, top.Focused);
         Assert.Equal (tabGroup2SubView1, tabGroup2.Focused);

@@ -87,7 +87,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         }
 
         int focusedIndex = index.IndexOf (Focused); // Will return -1 if Focused can't be found or is null
-        var next = 0;
+        int next = 0;
 
         if (focusedIndex < index.Length - 1)
         {
@@ -255,7 +255,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <returns>
     ///     Returns true if focus was restored to a subview, false otherwise.
     /// </returns>
-    internal bool RestoreFocus (TabBehavior? behavior)
+    internal bool RestoreFocus ()
     {
         if (Focused is null && _subviews?.Count > 0)
         {
@@ -432,7 +432,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         if (!traversingUp)
         {
             // Restore focus to the previously most focused subview in the subview-hierarchy
-            if (!RestoreFocus (TabStop))
+            if (!RestoreFocus ())
             {
                 // Couldn't restore focus, so use Advance to navigate to the next focusable subview
                 if (!AdvanceFocus (NavigationDirection.Forward, null))
@@ -560,7 +560,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 // Temporarily ensure this view can't get focus
                 bool prevCanFocus = _canFocus;
                 _canFocus = false;
-                bool restoredFocus = Application.Current!.RestoreFocus (null);
+                bool restoredFocus = Application.Current!.RestoreFocus ();
                 _canFocus = prevCanFocus;
 
                 if (restoredFocus)

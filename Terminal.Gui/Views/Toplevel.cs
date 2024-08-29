@@ -376,10 +376,11 @@ public partial class Toplevel : View
     {
         if (!IsOverlappedContainer)
         {
-            if (Focused is null)
-            {
-                RestoreFocus (null);
-            }
+            //if (Focused is null)
+            //{
+            //    // 
+            //    RestoreFocus ();
+            //}
 
             return null;
         }

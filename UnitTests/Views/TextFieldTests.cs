@@ -78,7 +78,7 @@ public class TextFieldTests (ITestOutputHelper output)
     public void Cancel_TextChanging_ThenBackspace ()
     {
         var tf = new TextField ();
-        tf.RestoreFocus (null);
+        tf.SetFocus ();
         tf.NewKeyDownEvent (Key.A.WithShift);
         Assert.Equal ("A", tf.Text);
 
@@ -908,7 +908,7 @@ public class TextFieldTests (ITestOutputHelper output)
         var tf = new TextField { Width = 10 };
         top.Add (tf);
 
-        Exception exception = Record.Exception (() => tf.SetFocus());
+        Exception exception = Record.Exception (() => tf.SetFocus ());
         Assert.Null (exception);
     }
 
@@ -928,7 +928,7 @@ public class TextFieldTests (ITestOutputHelper output)
     public void Backspace_From_End ()
     {
         var tf = new TextField { Text = "ABC" };
-        tf.RestoreFocus (null);
+        tf.SetFocus ();
         Assert.Equal ("ABC", tf.Text);
         tf.BeginInit ();
         tf.EndInit ();
@@ -955,7 +955,7 @@ public class TextFieldTests (ITestOutputHelper output)
     public void Backspace_From_Middle ()
     {
         var tf = new TextField { Text = "ABC" };
-        tf.RestoreFocus (null);
+        tf.SetFocus ();
         tf.CursorPosition = 2;
         Assert.Equal ("ABC", tf.Text);
 
