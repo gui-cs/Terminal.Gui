@@ -255,7 +255,7 @@ See also [Keyboard](keyboard.md) where HotKey is covered more deeply...
 ### How to Fix (Focus API)
 
 * Use [Application.Navigation.GetFocused()](~/api/Terminal.Gui.Application.Navigation.GetFocused.yml) to get the most focused view in the application.
-* ..
+*  Use [Application.Navigation.AdvanceFocus()](~/api/Terminal.Gui.Application.Navigation.AdvanceFocus.yml) to cause focus to change.
 
 ### Keyboard Navigation
 

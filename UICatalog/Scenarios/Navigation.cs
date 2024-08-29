@@ -106,7 +106,7 @@ public class Navigation : Scenario
         statusBar.Add (
                        new Shortcut
                        {
-                           Title = "Close",
+                           Title = "Hide",
                            Text = "Hotkey",
                            Key = Key.F4,
                            Action = () =>
@@ -119,7 +119,7 @@ public class Navigation : Scenario
         statusBar.Add (
                        new Shortcut
                        {
-                           Title = "Close",
+                           Title = "Toggle Hide",
                            Text = "App",
                            KeyBindingScope = KeyBindingScope.Application,
                            Key = Key.F4.WithCtrl,
