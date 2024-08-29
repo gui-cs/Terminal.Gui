@@ -30,9 +30,9 @@ Tenets higher in the list have precedence over tenets lower in the list.
 
 * **There's Always a Way With The Keyboard** - The framework strives to ensure users' wanting to use the keyboard can't get into a situation where some element of the application is not accessible via the keyboard. For example, we have unit tests that ensure built-in Views will all have at least one navigation key that advances focus. Another example: As long as a View with a HotKey is visible and enabled, regardless of view-hierarchy, if the user presses that hotkey, the action defined by the hotkey will happen (and, by default the View that defines it will be focused). 
 
-* **Flexible Overrides** - The framework makes it easy for navigation changes to be made from code and enables changing of behavior to be done in flexible ways. For example a view can be prevented from getting focus by setting `CanFocus` to `false`, overriding `OnHasFocusChanging` and returning `true` to cancel, or subscribing to `HasFocusChanging` and setting `Cancel` to `true`. 
+* **Flexible Overrides** - The framework makes it easy for navigation changes to be made from code and enables changing of behavior to be done in flexible ways. For example a view can be prevented from getting focus by setting `CanFocus` to `false` or overriding `OnHasFocusChanging` and returning `true` to cancel. 
 
-* **Decouple Concepts** - In v1 `CanFocus` is tightly coupled with `HasFocus`, `TabIndex`, `TabIndexes`, and `TabStop` and vice-versa. There is a bunch of "magic" logic that automatically attempts to keep these concepts aligned. This results in a bunch of poorly specified, hard-to-test, and fragile APIs. In v2 we strive to keep the related navigation concepts decoupled. For example, `CanFocus` and `TabStop` are decoupled. A view with `CanFocus == true` can have `TabStop == NoStop` and still be focusable with the mouse.
+* **Decouple Concepts** - In v1 `CanFocus` is tightly coupled with `HasFocus`, `TabIndex`, `TabIndexes`, and `TabStop` and vice-versa. There was a bunch of "magic" logic that automatically attempted to keep these concepts aligned. This resulted in a poorly specified, hard-to-test, and fragile API. In v2 we strive to keep the related navigation concepts decoupled. For example, `CanFocus` and `TabStop` are decoupled. A view with `CanFocus == true` can have `TabStop == NoStop` and still be focusable with the mouse.
 
 # Design
 
@@ -61,7 +61,7 @@ See also [Keyboard](keyboard.md) where HotKey is covered more deeply...
 
 In v2, `HotKey`s can be used to navigate across the entire application view-hierarchy. They work independently of `Focus`. This enables a user to navigate across a complex UI of nested subviews if needed (even in overlapped scenarios). An example use case is the `AllViewsTester` scenario.
 
-Additionally, in v2, multiple Views in an application (even within the same SuperView) can have the same HotKey. Each press of the HotKey will invoke the next HotKey across the View hierarchy (NOT IMPLEMENTED YET - And may be too complex to implement for v2.)
+Additionally, in v2, multiple Views in an application (even within the same SuperView) can have the same HotKey. Each press of the HotKey will invoke the next HotKey across the View hierarchy (NOT IMPLEMENTED YET see https://github.com/gui-cs/Terminal.Gui/issues/3554).
 
 ## Mouse Navigation
 
@@ -73,9 +73,9 @@ Mouse-based navigation is straightforward in comparison to keyboard: If a view i
 
 The answer to both questions is:
 
-If the View was previously focused, and focus left, the system keeps a record of the Subview that was previously most-focused and restores focus to that Subview (`RestoreFocus()`).
+If the View was previously focused, the system keeps a record of the Subview that was previously most-focused and restores focus to that Subview (`RestoreFocus()`).
 
-If the View was not previously focused, `FindDeepestFocusableView()` is used to find the deepest focusable view and call `SetFocus()` on it.
+If the View was not previously focused, `AdvanceFocus()` is called.
 
 For this to work properly, there must be logic that removes the focus-cache used by `RestoreFocus()` if something changes that makes the previously-focusable view not focusable (e.g. if Visible has changed).
 

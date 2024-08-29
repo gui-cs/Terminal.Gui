@@ -1,4 +1,6 @@
 ﻿#nullable enable
+using static System.Net.Mime.MediaTypeNames;
+
 namespace Terminal.Gui;
 
 public static partial class Application // Keyboard handling
@@ -287,11 +289,11 @@ public static partial class Application // Keyboard handling
 
         AddCommand (
                     Command.NextView,
-                    static () => Current?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop));
+                    static () => Application.Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop));
 
         AddCommand (
-                    Command.PreviousView,
-                    static () => Current?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop));
+        Command.PreviousView,
+                    static () => Application.Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop));
 
         AddCommand (
                     Command.NextViewOrTop,
@@ -305,14 +307,6 @@ public static partial class Application // Keyboard handling
                                 return true;
                             };
 
-                            //// Go back down the focus chain and focus the first TabGroup
-                            //View []? views = Current.GetSubviewFocusChain (NavigationDirection.Forward, TabBehavior.TabGroup);
-
-                            //if (views.Length > 0)
-                            //{
-                            //    View []? subViews = views [0].GetSubviewFocusChain (NavigationDirection.Forward, TabBehavior.TabStop);
-                            //    return subViews? [0].SetFocus ();
-                            //}
 
                             return false;
                         }
@@ -335,14 +329,6 @@ public static partial class Application // Keyboard handling
                                 return true;
                             };
 
-                            //// Go back down the focus chain and focus the first TabGroup
-                            //View []? views = Current.GetSubviewFocusChain (NavigationDirection.Backward, TabBehavior.TabGroup);
-
-                            //if (views.Length > 0)
-                            //{
-                            //    View []? subViews = views [0].GetSubviewFocusChain (NavigationDirection.Backward, TabBehavior.TabStop);
-                            //    return subViews? [0].SetFocus ();
-                            //}
 
                             return false;
                         }

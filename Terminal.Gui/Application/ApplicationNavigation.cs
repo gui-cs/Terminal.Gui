@@ -80,4 +80,24 @@ public class ApplicationNavigation
 
         FocusedChanged?.Invoke (null, EventArgs.Empty);
     }
+
+    /// <summary>
+    ///     Advances the focus to the next or previous view in the focus chain, based on
+    ///     <paramref name="direction"/>.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         If there is no next/previous view, the focus remains on the current view.
+    ///     </para>
+    /// </remarks>
+    /// <param name="direction">The direction to advance.</param>
+    /// <param name="behavior">The tab behavior.</param>
+    /// <returns>
+    ///     <see langword="true"/> if focus was changed to another subview (or stayed on this one), <see langword="false"/>
+    ///     otherwise.
+    /// </returns>
+    public bool AdvanceFocus (NavigationDirection direction, TabBehavior? behavior)
+    {
+        return Application.Current is { } && Application.Current.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+    }
 }

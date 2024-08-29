@@ -101,13 +101,10 @@ public class Navigation : Scenario
         View overlappedInOverlapped2 = CreateOverlappedView (5, 10, 7);
         overlappedView2.Add (overlappedInOverlapped2);
 
-        StatusBar statusBar = new ()
-        {
-
-        };
+        StatusBar statusBar = new ();
 
         statusBar.Add (
-                       new Shortcut ()
+                       new Shortcut
                        {
                            Title = "Close",
                            Text = "Hotkey",
@@ -118,8 +115,9 @@ public class Navigation : Scenario
                                         overlappedView2.Enabled = overlappedView2.Visible;
                                     }
                        });
+
         statusBar.Add (
-                       new Shortcut ()
+                       new Shortcut
                        {
                            Title = "Close",
                            Text = "App",
@@ -129,7 +127,6 @@ public class Navigation : Scenario
                                     {
                                         overlappedView2.Visible = !overlappedView2.Visible;
                                         overlappedView2.Enabled = overlappedView2.Visible;
-
                                     }
                        });
         overlappedView2.Add (statusBar);
@@ -179,6 +176,7 @@ public class Navigation : Scenario
         testFrame.Add (button);
 
         editor.AutoSelectSuperView = testFrame;
+        testFrame.SetFocus ();
         Application.Run (app);
         timer.Close ();
         app.Dispose ();
