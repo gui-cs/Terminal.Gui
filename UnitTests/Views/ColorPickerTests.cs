@@ -478,6 +478,8 @@ public class ColorPickerTests
     public void ColorPicker_SwitchingColorModels_ResetsBars ()
     {
         var cp = GetColorPicker (ColorModel.RGB, false);
+        cp.BeginInit ();
+        cp.EndInit ();
         cp.SelectedColor = new (255, 0);
 
         cp.Draw ();
