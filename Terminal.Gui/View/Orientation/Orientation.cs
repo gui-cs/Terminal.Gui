@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+namespace Terminal.Gui;
 
 /// <summary>Direction of an element (horizontal or vertical)</summary>
 public enum Orientation

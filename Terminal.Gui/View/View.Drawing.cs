@@ -202,11 +202,6 @@ public partial class View // Drawing APIs
     /// </remarks>
     public void Draw ()
     {
-        if (!CanBeVisible (this))
-        {
-            return;
-        }
-
         OnDrawAdornments ();
 
         if (ColorScheme is { })
@@ -262,6 +257,7 @@ public partial class View // Drawing APIs
     ///         <see cref="View"/> .
     ///     </para>
     /// </remarks>
+    [CanBeNull]
     public event EventHandler<DrawEventArgs> DrawContent;
 
     /// <summary>Event invoked when the content area of the View is completed drawing.</summary>
@@ -272,6 +268,7 @@ public partial class View // Drawing APIs
     ///         <see cref="View"/> .
     ///     </para>
     /// </remarks>
+    [CanBeNull]
     public event EventHandler<DrawEventArgs> DrawContentComplete;
 
     /// <summary>Utility function to draw strings that contain a hotkey.</summary>
@@ -475,6 +472,11 @@ public partial class View // Drawing APIs
                 Clear ();
             }
 
+            if (!CanBeVisible (this))
+            {
+                return;
+            }
+
             if (!string.IsNullOrEmpty (TextFormatter.Text))
             {
                 if (TextFormatter is { })
@@ -505,7 +507,7 @@ public partial class View // Drawing APIs
             if (TabStop == TabBehavior.TabGroup && _subviews.Count(v => v.Arrangement.HasFlag (ViewArrangement.Overlapped)) > 0)
             {
                 // TODO: This is a temporary hack to make overlapped non-Toplevels have a zorder. See also View.SetFocus
-                subviewsNeedingDraw = _tabIndexes.Where (
+                subviewsNeedingDraw = _subviews.Where (
                                                        view => view.Visible
                                                                && (view.NeedsDisplay || view.SubViewNeedsDisplay || view.LayoutNeeded)
                                                       ).Reverse ();

@@ -2,6 +2,8 @@
 
  A toolkit for building rich Terminal User Interface (TUI) apps with .NET that run on Windows, the Mac, and Linux/Unix.
 
+ (This is the v2 API documentation. For v1 go here: https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.html)
+
 ## Features
 
 * **[Cross Platform](drivers.md)** - Windows, Mac, and Linux. Terminal drivers for Curses, Windows, and the .NET Console mean apps will work well on both color and monochrome terminals. Apps also work over SSH.

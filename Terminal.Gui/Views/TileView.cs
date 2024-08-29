@@ -10,14 +10,20 @@ public class TileView : View
     private List<Pos> _splitterDistances;
     private List<TileViewLineView> _splitterLines;
     private List<Tile> _tiles;
-    private TileView parentTileView;
+    private TileView _parentTileView;
 
     /// <summary>Creates a new instance of the <see cref="TileView"/> class with 2 tiles (i.e. left and right).</summary>
-    public TileView () : this (2) { }
+    public TileView () : this (2)
+    {
+    }
 
     /// <summary>Creates a new instance of the <see cref="TileView"/> class with <paramref name="tiles"/> number of tiles.</summary>
     /// <param name="tiles"></param>
-    public TileView (int tiles) { RebuildForTileCount (tiles); }
+    public TileView (int tiles)
+    {
+        CanFocus = true;
+        RebuildForTileCount (tiles);
+    }
 
     /// <summary>The line style to use when drawing the splitter lines.</summary>
     public LineStyle LineStyle { get; set; } = LineStyle.None;
@@ -57,7 +63,7 @@ public class TileView : View
     /// </summary>
     /// <remarks>Use <see cref="IsRootTileView"/> to determine if the returned value is the root.</remarks>
     /// <returns></returns>
-    public TileView GetParentTileView () { return parentTileView; }
+    public TileView GetParentTileView () { return _parentTileView; }
 
     /// <summary>
     ///     Returns the index of the first <see cref="Tile"/> in <see cref="Tiles"/> which contains
@@ -116,6 +122,7 @@ public class TileView : View
 
                 // restore old Tile and View
                 _tiles [i] = oldTile;
+                _tiles [i].ContentView.TabStop = TabStop;
                 Add (_tiles [i].ContentView);
             }
             else
@@ -146,7 +153,7 @@ public class TileView : View
     ///     if you want to subdivide a <see cref="TileView"/>.
     /// </remarks>
     /// <returns></returns>
-    public bool IsRootTileView () { return parentTileView == null; }
+    public bool IsRootTileView () { return _parentTileView == null; }
 
     /// <inheritdoc/>
     public override void LayoutSubviews ()
@@ -354,6 +361,7 @@ public class TileView : View
 
             var tile = new Tile ();
             _tiles.Add (tile);
+            tile.ContentView.Id = $"Tile.ContentView {i}";
             Add (tile.ContentView);
             tile.TitleChanged += (s, e) => SetNeedsDisplay ();
         }
@@ -475,7 +483,7 @@ public class TileView : View
 
         var newContainer = new TileView (numberOfPanels)
         {
-            Width = Dim.Fill (), Height = Dim.Fill (), parentTileView = this
+            Width = Dim.Fill (), Height = Dim.Fill (), _parentTileView = this
         };
 
         // Take everything out of the View we are moving
@@ -583,9 +591,9 @@ public class TileView : View
     {
         TileView root = this;
 
-        while (root.parentTileView is { })
+        while (root._parentTileView is { })
         {
-            root = root.parentTileView;
+            root = root._parentTileView;
         }
 
         return root;

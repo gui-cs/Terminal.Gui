@@ -311,10 +311,10 @@ public class Dialogs : Scenario
                               buttons.Add (button);
                               dialog.AddButton (button);
 
-                              if (buttons.Count > 1)
-                              {
-                                  button.TabIndex = buttons [buttons.Count - 2].TabIndex + 1;
-                              }
+                              //if (buttons.Count > 1)
+                              //{
+                              //    button.TabIndex = buttons [buttons.Count - 2].TabIndex + 1;
+                              //}
                           };
             dialog.Add (add);
 

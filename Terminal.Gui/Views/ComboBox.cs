@@ -8,6 +8,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Threading.Channels;
 
 namespace Terminal.Gui;
 
@@ -28,9 +29,10 @@ public class ComboBox : View, IDesignable
     /// <summary>Public constructor</summary>
     public ComboBox ()
     {
+        CanFocus = true;
         _search = new TextField () { CanFocus = true, TabStop = TabBehavior.NoStop };
 
-        _listview = new ComboListView (this, HideDropdownListOnClick) { CanFocus = true, TabStop = TabBehavior.NoStop};
+        _listview = new ComboListView (this, HideDropdownListOnClick) { CanFocus = true, TabStop = TabBehavior.NoStop };
 
         _search.TextChanged += Search_Changed;
         _search.Accept += Search_Accept;
@@ -298,44 +300,41 @@ public class ComboBox : View, IDesignable
         Driver.AddRune (Glyphs.DownArrow);
     }
 
-    /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        if (!_search.HasFocus && !_listview.HasFocus)
-        {
-            _search.SetFocus ();
-        }
-
-        _search.CursorPosition = _search.Text.GetRuneCount ();
-
-        return base.OnEnter (view);
-    }
 
     /// <summary>Virtual method which invokes the <see cref="Expanded"/> event.</summary>
     public virtual void OnExpanded () { Expanded?.Invoke (this, EventArgs.Empty); }
 
     /// <inheritdoc/>
-    public override bool OnLeave (View view)
+    protected override void OnHasFocusChanged (bool newHasFocus, View previousFocusedView, View view)
     {
-        if (_source?.Count > 0
-            && _selectedItem > -1
-            && _selectedItem < _source.Count - 1
-            && _text != _source.ToList () [_selectedItem].ToString ())
+        if (newHasFocus)
         {
-            SetValue (_source.ToList () [_selectedItem].ToString ());
+            if (!_search.HasFocus && !_listview.HasFocus)
+            {
+                _search.SetFocus ();
+            }
+            _search.CursorPosition = _search.Text.GetRuneCount ();
         }
+        else
+        { 
+            if (_source?.Count > 0
+              && _selectedItem > -1
+              && _selectedItem < _source.Count - 1
+              && _text != _source.ToList () [_selectedItem].ToString ())
+            {
+                SetValue (_source.ToList () [_selectedItem].ToString ());
+            }
 
-        if (_autoHide && IsShow && view != this && view != _search && view != _listview)
-        {
-            IsShow = false;
-            HideList ();
+            if (_autoHide && IsShow && view != this && view != _search && view != _listview)
+            {
+                IsShow = false;
+                HideList ();
+            }
+            else if (_listview.TabStop?.HasFlag (TabBehavior.TabStop) ?? false)
+            {
+                _listview.TabStop = TabBehavior.NoStop;
+            }
         }
-        else if (_listview.TabStop?.HasFlag (TabBehavior.TabStop) ?? false)
-        {
-            _listview.TabStop = TabBehavior.NoStop;
-        }
-
-        return base.OnLeave (view);
     }
 
     /// <summary>Invokes the OnOpenSelectedItem event if it is defined.</summary>
@@ -415,7 +414,10 @@ public class ComboBox : View, IDesignable
 
     private bool CancelSelected ()
     {
-        _search.SetFocus ();
+        if (HasFocus)
+        {
+            _search.SetFocus ();
+        }
 
         if (ReadOnly || HideDropdownListOnClick)
         {
@@ -493,7 +495,7 @@ public class ComboBox : View, IDesignable
         Reset (true);
         _listview.Clear ();
         _listview.TabStop = TabBehavior.NoStop;
-        SuperView?.SendSubviewToBack (this);
+        SuperView?.MoveSubviewToStart (this);
         Rectangle rect = _listview.ViewportToScreen (_listview.IsInitialized ? _listview.Viewport : Rectangle.Empty);
         SuperView?.SetNeedsDisplay (rect);
         OnCollapsed ();
@@ -563,7 +565,7 @@ public class ComboBox : View, IDesignable
     {
         if (HasItems ())
         {
-           return  _listview.MoveUp ();
+            return _listview.MoveUp ();
         }
 
         return false;
@@ -793,7 +795,7 @@ public class ComboBox : View, IDesignable
 
         _listview.Clear ();
         _listview.Height = CalculateHeight ();
-        SuperView?.BringSubviewToFront (this);
+        SuperView?.MoveSubviewToStart (this);
     }
 
     private bool UnixEmulation ()
@@ -824,6 +826,7 @@ public class ComboBox : View, IDesignable
             set => _hideDropdownListOnClick = WantContinuousButtonPressed = value;
         }
 
+        // BUGBUG: OnMouseEvent is internal!
         protected internal override bool OnMouseEvent (MouseEvent me)
         {
             var res = false;
@@ -940,28 +943,26 @@ public class ComboBox : View, IDesignable
             }
         }
 
-        public override bool OnEnter (View view)
+        protected override void OnHasFocusChanged (bool newHasFocus, [CanBeNull] View previousFocusedView, [CanBeNull] View focusedVew)
         {
-            if (_hideDropdownListOnClick)
+            if (newHasFocus)
             {
-                _isFocusing = true;
-                _highlighted = _container.SelectedItem;
-                Application.GrabMouse (this);
+                if (_hideDropdownListOnClick)
+                {
+                    _isFocusing = true;
+                    _highlighted = _container.SelectedItem;
+                    Application.GrabMouse (this);
+                }
             }
-
-            return base.OnEnter (view);
-        }
-
-        public override bool OnLeave (View view)
-        {
-            if (_hideDropdownListOnClick)
+            else
             {
-                _isFocusing = false;
-                _highlighted = _container.SelectedItem;
-                Application.UngrabMouse ();
+                if (_hideDropdownListOnClick)
+                {
+                    _isFocusing = false;
+                    _highlighted = _container.SelectedItem;
+                    Application.UngrabMouse ();
+                }
             }
-
-            return base.OnLeave (view);
         }
 
         public override bool OnSelectedChanged ()

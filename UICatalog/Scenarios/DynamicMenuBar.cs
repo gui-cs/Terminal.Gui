@@ -9,7 +9,7 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Dynamic MenuBar", "Demonstrates how to change a MenuBar dynamically.")]
-[ScenarioCategory ("Top Level Windows")]
+[ScenarioCategory ("Overlapped")]
 [ScenarioCategory ("Menus")]
 public class DynamicMenuBar : Scenario
 {
@@ -640,10 +640,10 @@ public class DynamicMenuBar : Scenario
             };
             frmMenu.Add (_lstMenus);
 
-            lblMenuBar.TabIndex = btnPrevious.TabIndex + 1;
-            _lstMenus.TabIndex = lblMenuBar.TabIndex + 1;
-            btnNext.TabIndex = _lstMenus.TabIndex + 1;
-            btnAdd.TabIndex = btnNext.TabIndex + 1;
+            //lblMenuBar.TabIndex = btnPrevious.TabIndex + 1;
+            //_lstMenus.TabIndex = lblMenuBar.TabIndex + 1;
+            //btnNext.TabIndex = _lstMenus.TabIndex + 1;
+            //btnAdd.TabIndex = btnNext.TabIndex + 1;
 
             var btnRemove = new Button { X = Pos.Left (btnAdd), Y = Pos.Top (btnAdd) + 1, Text = "Remove" };
             frmMenu.Add (btnRemove);
@@ -938,7 +938,7 @@ public class DynamicMenuBar : Scenario
                                               SetFrameDetails (menuBarItem);
                                           };
 
-            _lstMenus.Enter += (s, e) =>
+            _lstMenus.HasFocusChanging += (s, e) =>
                                {
                                    MenuItem menuBarItem = _lstMenus.SelectedItem > -1 && DataContext.Menus.Count > 0
                                                               ? DataContext.Menus [_lstMenus.SelectedItem].MenuItem
@@ -966,7 +966,7 @@ public class DynamicMenuBar : Scenario
                                        SelectCurrentMenuBarItem ();
                                    };
 
-            lblMenuBar.Enter += (s, e) =>
+            lblMenuBar.HasFocusChanging += (s, e) =>
                                  {
                                      if (_menuBar?.Menus != null)
                                      {

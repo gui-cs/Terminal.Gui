@@ -137,7 +137,6 @@ public class TextViewTests
         Assert.False (fv.CanFocus);
         Assert.False (fv.HasFocus);
 
-        Assert.Throws<InvalidOperationException> (() => tv.CanFocus = true);
         fv.CanFocus = true;
         tv.CanFocus = true;
         tv.NewMouseEvent (new MouseEvent { Position = new (1, 0), Flags = MouseFlags.Button1DoubleClicked });
@@ -152,7 +151,7 @@ public class TextViewTests
         tv.NewMouseEvent (new MouseEvent { Position = new (1, 0), Flags = MouseFlags.Button1DoubleClicked });
 
         Assert.Equal ("some ", tv.SelectedText); // Setting CanFocus to false don't change the SelectedText
-        Assert.False (tv.CanFocus);
+        Assert.True (tv.CanFocus); // v2: CanFocus is not longer automatically changed
         Assert.False (tv.HasFocus);
         Assert.False (fv.CanFocus);
         Assert.False (fv.HasFocus);
@@ -8558,4 +8557,67 @@ line.
         }
     }
 
+    [Fact]
+    public void Autocomplete_Popup_Added_To_SuperView_On_Init ()
+    {
+        View superView = new ()
+        {
+            CanFocus = true,
+        };
+
+        TextView t = new ();
+
+        superView.Add (t);
+        Assert.Single (superView.Subviews);
+
+        superView.BeginInit ();
+        superView.EndInit ();
+
+        Assert.Equal (2, superView.Subviews.Count);
+    }
+
+
+    [Fact]
+    public void Autocomplete__Added_To_SuperView_On_Add ()
+    {
+        View superView = new ()
+        {
+            CanFocus = true,
+            Id = "superView",
+        };
+
+        superView.BeginInit ();
+        superView.EndInit ();
+        Assert.Empty (superView.Subviews);
+
+        TextView t = new ()
+        {
+            Id = "t"
+        };
+
+        superView.Add (t);
+
+        Assert.Equal (2, superView.Subviews.Count);
+    }
+
+
+    [Fact]
+    public void Autocomplete_Visible_False_By_Default ()
+    {
+        View superView = new ()
+        {
+            CanFocus = true,
+        };
+
+        TextView t = new ();
+
+        superView.Add (t);
+        superView.BeginInit ();
+        superView.EndInit ();
+
+        Assert.Equal (2, superView.Subviews.Count);
+
+        Assert.True (t.Visible);
+        Assert.False (t.Autocomplete.Visible);
+    }
 }

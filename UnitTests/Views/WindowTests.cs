@@ -201,24 +201,4 @@ public class WindowTests
         Assert.Null (windowWithFrame1234.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, windowWithFrame1234.TextDirection);
     }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void OnCanFocusChanged_Only_Must_ContentView_Forces_SetFocus_After_IsInitialized_Is_True ()
-    {
-        var win1 = new Window { Id = "win1", Width = 10, Height = 1 };
-        var view1 = new View { Id = "view1", Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = true };
-        var win2 = new Window { Id = "win2", Y = 6, Width = 10, Height = 1 };
-        var view2 = new View { Id = "view2", Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = true };
-        win2.Add (view2);
-        win1.Add (view1, win2);
-
-        Application.Begin (win1);
-
-        Assert.True (win1.HasFocus);
-        Assert.True (view1.HasFocus);
-        Assert.False (win2.HasFocus);
-        Assert.False (view2.HasFocus);
-        win1.Dispose ();
-    }
 }

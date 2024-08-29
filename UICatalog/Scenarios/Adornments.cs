@@ -4,7 +4,7 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Adornments Demo", "Demonstrates Margin, Border, and Padding on Views.")]
 [ScenarioCategory ("Layout")]
-[ScenarioCategory ("Borders")]
+[ScenarioCategory ("Adornments")]
 public class Adornments : Scenario
 {
     public override void Main ()
@@ -19,11 +19,13 @@ public class Adornments : Scenario
         var editor = new AdornmentsEditor
         {
             AutoSelectViewToEdit = true,
+
             // This is for giggles, to show that the editor can be moved around.
             Arrangement = ViewArrangement.Movable,
-            X = Pos.AnchorEnd(),
+            X = Pos.AnchorEnd ()
         };
-        editor.Border.Thickness = new Thickness (1, 2, 1, 1);
+
+        editor.Border.Thickness = new (1, 2, 1, 1);
 
         app.Add (editor);
 
@@ -31,7 +33,8 @@ public class Adornments : Scenario
         {
             Title = "The _Window",
             Arrangement = ViewArrangement.Movable,
-           // X = Pos.Center (),
+
+            // X = Pos.Center (),
             Width = Dim.Percent (60),
             Height = Dim.Percent (80)
         };
@@ -126,6 +129,10 @@ public class Adornments : Scenario
                                 view.Accept += (s, e) => MessageBox.Query (20, 7, "Hi", "Window Close Button Pressed!", "Ok");
 #endif
                               };
+
+        editor.AutoSelectViewToEdit = true;
+        editor.AutoSelectSuperView = window;
+        editor.AutoSelectAdornments = true;
 
         Application.Run (app);
         app.Dispose ();

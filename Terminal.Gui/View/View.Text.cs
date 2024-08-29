@@ -4,7 +4,7 @@ namespace Terminal.Gui;
 
 public partial class View // Text Property APIs
 {
-    private string _text;
+    private string _text = null!;
 
     /// <summary>
     ///     Called when the <see cref="Text"/> has changed. Fires the <see cref="TextChanged"/> event.

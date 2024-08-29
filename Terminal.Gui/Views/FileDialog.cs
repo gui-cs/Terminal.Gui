@@ -89,10 +89,11 @@ public class FileDialog : Dialog
                                   NavigateIf (k, KeyCode.CursorUp, _tableView);
                                   NavigateIf (k, KeyCode.CursorRight, _btnOk);
                               };
-        _btnCancel.Accept += (s, e) => {
-                                 Canceled = true;
-                                 Application.RequestStop ();
-                             };
+        _btnCancel.Accept += (s, e) =>
+        {
+            Canceled = true;
+            Application.RequestStop ();
+        };
 
         _btnUp = new Button { X = 0, Y = 1, NoPadding = true };
         _btnUp.Text = GetUpButtonText ();
@@ -290,6 +291,8 @@ public class FileDialog : Dialog
 
         UpdateNavigationVisibility ();
 
+        // BUGBUG: This TabOrder is counter-intuitive. The tab order for a dialog should match the
+        // order the Views' are presented, left to right, top to bottom.
         // Determines tab order
         Add (_btnToggleSplitterCollapse);
         Add (_tbFind);
@@ -458,19 +461,6 @@ public class FileDialog : Dialog
         _btnForward.Text = GetForwardButtonText ();
         _btnToggleSplitterCollapse.Text = GetToggleSplitterText (false);
 
-        if (Style.FlipOkCancelButtonLayoutOrder)
-        {
-            _btnCancel.X = Pos.Func (CalculateOkButtonPosX);
-            _btnOk.X = Pos.Right (_btnCancel) + 1;
-
-            // Flip tab order too for consistency
-            int? p1 = _btnOk.TabIndex;
-            int? p2 = _btnCancel.TabIndex;
-
-            _btnOk.TabIndex = p2;
-            _btnCancel.TabIndex = p1;
-        }
-
         _tbPath.Caption = Style.PathCaption;
         _tbFind.Caption = Style.SearchCaption;
 
@@ -518,8 +508,7 @@ public class FileDialog : Dialog
             };
             AllowedTypeMenuClicked (0);
 
-            _allowedTypeMenuBar.Enter += (s, e) => { _allowedTypeMenuBar.OpenMenu (0); };
-
+            // TODO: Using v1's menu bar here is a hack. Need to upgrade this.
             _allowedTypeMenuBar.DrawContentComplete += (s, e) =>
                                                        {
                                                            _allowedTypeMenuBar.Move (e.NewViewport.Width - 1, 0);
@@ -538,7 +527,7 @@ public class FileDialog : Dialog
         // to streamline user experience and allow direct typing of paths
         // with zero navigation we start with focus in the text box and any
         // default/current path fully selected and ready to be overwritten
-        _tbPath.FocusFirst (null);
+        _tbPath.SetFocus ();
         _tbPath.SelectAll ();
 
         if (string.IsNullOrEmpty (Title))
@@ -546,6 +535,12 @@ public class FileDialog : Dialog
             Title = GetDefaultTitle ();
         }
 
+        if (Style.FlipOkCancelButtonLayoutOrder)
+        {
+            _btnCancel.X = Pos.Func (CalculateOkButtonPosX);
+            _btnOk.X = Pos.Right (_btnCancel) + 1;
+            MoveSubviewTowardsStart (_btnCancel);
+        }
         LayoutSubviews ();
     }
 
@@ -588,7 +583,7 @@ public class FileDialog : Dialog
 
     internal void ApplySort ()
     {
-        FileSystemInfoStats [] stats = State?.Children ?? new FileSystemInfoStats[0];
+        FileSystemInfoStats [] stats = State?.Children ?? new FileSystemInfoStats [0];
 
         // This portion is never reordered (always .. at top then folders)
         IOrderedEnumerable<FileSystemInfoStats> forcedOrder = stats
@@ -1050,7 +1045,7 @@ public class FileDialog : Dialog
     {
         if (keyEvent.KeyCode == isKey)
         {
-            to.FocusFirst (null);
+            to.FocusDeepest (NavigationDirection.Forward, null);
 
             if (to == _tbPath)
             {
@@ -1439,7 +1434,7 @@ public class FileDialog : Dialog
     {
         if (_treeView.HasFocus && Separators.Contains ((char)keyEvent))
         {
-            _tbPath.FocusFirst (null);
+            _tbPath.FocusDeepest (NavigationDirection.Forward, null);
 
             // let that keystroke go through on the tbPath instead
             return true;
@@ -1546,7 +1541,7 @@ public class FileDialog : Dialog
         public SearchState (IDirectoryInfo dir, FileDialog parent, string searchTerms) : base (dir, parent)
         {
             parent.SearchMatcher.Initialize (searchTerms);
-            Children = new FileSystemInfoStats[0];
+            Children = new FileSystemInfoStats [0];
             BeginSearch ();
         }
 

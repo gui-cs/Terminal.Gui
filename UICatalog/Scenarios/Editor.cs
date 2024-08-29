@@ -16,7 +16,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Dialogs")]
 [ScenarioCategory ("Text and Formatting")]
-[ScenarioCategory ("Top Level Windows")]
+[ScenarioCategory ("Overlapped")]
 [ScenarioCategory ("Files and IO")]
 [ScenarioCategory ("TextView")]
 [ScenarioCategory ("Menus")]
@@ -722,7 +722,7 @@ public class Editor : Scenario
             }
             else
             {
-                FocusFirst (null);
+                FocusDeepest (NavigationDirection.Forward, null);
             }
         }
 
@@ -736,10 +736,10 @@ public class Editor : Scenario
     private void ShowFindReplace (bool isFind = true)
     {
         _findReplaceWindow.Visible = true;
-        _findReplaceWindow.SuperView.BringSubviewToFront (_findReplaceWindow);
+        _findReplaceWindow.SuperView.MoveSubviewToStart (_findReplaceWindow);
         _tabView.SetFocus ();
         _tabView.SelectedTab = isFind ? _tabView.Tabs.ToArray () [0] : _tabView.Tabs.ToArray () [1];
-        _tabView.SelectedTab.View.FocusFirst (null);
+        _tabView.SelectedTab.View.FocusDeepest (NavigationDirection.Forward, null);
     }
 
     private void CreateFindReplace ()
@@ -753,10 +753,10 @@ public class Editor : Scenario
 
         _tabView.AddTab (new () { DisplayText = "Find", View = CreateFindTab () }, true);
         _tabView.AddTab (new () { DisplayText = "Replace", View = CreateReplaceTab () }, false);
-        _tabView.SelectedTabChanged += (s, e) => _tabView.SelectedTab.View.FocusFirst (null);
+        _tabView.SelectedTabChanged += (s, e) => _tabView.SelectedTab.View.FocusDeepest (NavigationDirection.Forward, null);
         _findReplaceWindow.Add (_tabView);
 
-        _tabView.SelectedTab.View.FocusLast (null); // Hack to get the first tab to be focused
+//        _tabView.SelectedTab.View.FocusLast (null); // Hack to get the first tab to be focused
         _findReplaceWindow.Visible = false;
         _appWindow.Add (_findReplaceWindow);
     }
@@ -860,7 +860,7 @@ public class Editor : Scenario
             Width = Dim.Fill (1),
             Text = _textToFind
         };
-        txtToFind.Enter += (s, e) => txtToFind.Text = _textToFind;
+        txtToFind.HasFocusChanging += (s, e) => txtToFind.Text = _textToFind;
         d.Add (txtToFind);
 
         var btnFindNext = new Button
@@ -1088,7 +1088,7 @@ public class Editor : Scenario
             Width = Dim.Fill (1),
             Text = _textToFind
         };
-        txtToFind.Enter += (s, e) => txtToFind.Text = _textToFind;
+        txtToFind.HasFocusChanging += (s, e) => txtToFind.Text = _textToFind;
         d.Add (txtToFind);
 
         var btnFindNext = new Button

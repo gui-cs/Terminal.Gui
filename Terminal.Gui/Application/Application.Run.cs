@@ -99,7 +99,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             else if (ApplicationOverlapped.OverlappedTop is { } && toplevel != Top && TopLevels.Contains (Top!))
             {
                 // BUGBUG: Don't call OnLeave/OnEnter directly! Set HasFocus to false and let the system handle it.
-                Top!.OnLeave (toplevel);
+                //Top!.OnLeave (toplevel);
             }
 
             // BUGBUG: We should not depend on `Id` internally.
@@ -186,7 +186,14 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         toplevel.LayoutSubviews ();
         toplevel.PositionToplevels ();
-        toplevel.FocusFirst (null);
+
+        // TODO: Should this use FindDeepestFocusableView instead?
+        // Try to set initial focus to any TabStop
+        if (!toplevel.HasFocus)
+        {
+            toplevel.SetFocus ();
+        }
+
         ApplicationOverlapped.BringOverlappedTopToFront ();
 
         if (refreshDriver)
@@ -858,7 +865,6 @@ public static partial class Application // Run (Begin, Run, End, Stop)
                 if (Current is { HasFocus: false })
                 {
                     Current.SetFocus ();
-                    Current.RestoreFocus ();
                 }
             }
 

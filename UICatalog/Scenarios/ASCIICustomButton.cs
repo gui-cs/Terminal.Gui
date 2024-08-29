@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using JetBrains.Annotations;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -110,27 +111,19 @@ public class ASCIICustomButtonTest : Scenario
             Add (_border, _fill, title);
         }
 
-        public override bool OnEnter (View view)
+        protected override void OnHasFocusChanged (bool newHasFocus, [CanBeNull] View previousFocusedView, [CanBeNull] View focusedVew)
         {
-            _border.Visible = false;
-            _fill.Visible = true;
-            PointerEnter.Invoke (this);
-            view = this;
-
-            return base.OnEnter (view);
-        }
-
-        public override bool OnLeave (View view)
-        {
-            _border.Visible = true;
-            _fill.Visible = false;
-
-            if (view == null)
+            if (newHasFocus)
             {
-                view = this;
+                _border.Visible = false;
+                _fill.Visible = true;
+                PointerEnter?.Invoke (this);
             }
-
-            return base.OnLeave (view);
+            else
+            {
+                _border.Visible = true;
+                _fill.Visible = false;
+            }
         }
 
         public event Action<ASCIICustomButton> PointerEnter;

@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using JetBrains.Annotations;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -859,7 +860,7 @@ public class ScrollViewTests (ITestOutputHelper output)
 ";
 
         TestHelpers.AssertDriverContentsAre (expected, output);
-        
+
         top.Dispose ();
     }
 
@@ -1119,28 +1120,20 @@ public class ScrollViewTests (ITestOutputHelper output)
             CanFocus = true;
         }
 
-        public override bool OnEnter (View view)
+        protected override void OnHasFocusChanged (bool newHasFocus, [CanBeNull] View previousFocusedView, [CanBeNull] View focusedVew)
         {
-            Border.LineStyle = LineStyle.None;
-            Border.Thickness = new (0);
-            labelFill.Visible = true;
-            view = this;
-
-            return base.OnEnter (view);
-        }
-
-        public override bool OnLeave (View view)
-        {
-            Border.LineStyle = LineStyle.Single;
-            Border.Thickness = new (1);
-            labelFill.Visible = false;
-
-            if (view == null)
+            if (newHasFocus)
             {
-                view = this;
+                Border.LineStyle = LineStyle.None;
+                Border.Thickness = new (0);
+                labelFill.Visible = true;
             }
-
-            return base.OnLeave (view);
+            else
+            {
+                Border.LineStyle = LineStyle.Single;
+                Border.Thickness = new (1);
+                labelFill.Visible = false;
+            }
         }
     }
 }

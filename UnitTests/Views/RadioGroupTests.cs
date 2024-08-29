@@ -78,18 +78,19 @@ public class RadioGroupTests (ITestOutputHelper output)
     [Fact]
     public void KeyBindings_Command ()
     {
+        Application.Navigation = new ();
         var rg = new RadioGroup { RadioLabels = new [] { "Test", "New Test" } };
         Application.Current = new Toplevel ();
         Application.Current.Add (rg);
         rg.SetFocus();
         Assert.Equal(Orientation.Vertical, rg.Orientation);
         Assert.Equal(0, rg.SelectedItem);
-        Assert.True (Application.OnKeyDown (Key.CursorUp)); // Should not change (should focus prev if there was one)
+        Assert.False (Application.OnKeyDown (Key.CursorUp)); // Should not change (should focus prev view if there was one, which there isn't)
         Assert.Equal (0, rg.SelectedItem);
         Assert.True (Application.OnKeyDown (Key.CursorDown));
         Assert.True (Application.OnKeyDown (Key.Space));
         Assert.Equal (1, rg.SelectedItem);
-        Assert.True (Application.OnKeyDown (Key.CursorDown)); // Should not change (should focus prev if there was one)
+        Assert.False (Application.OnKeyDown (Key.CursorDown)); // Should not change (should focus prev view if there was one, which there isn't)
         Assert.True (Application.OnKeyDown (Key.Space));
         Assert.Equal (1, rg.SelectedItem);
         Assert.True (Application.OnKeyDown (Key.Home));
@@ -100,7 +101,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (1, rg.SelectedItem);
         Assert.True (Application.OnKeyDown (Key.Space));
         Assert.Equal (1, rg.SelectedItem);
-        Application.Current.Dispose ();
+        Application.ResetState();
     }
 
     [Fact]

@@ -742,6 +742,10 @@ public class Shortcut : View, IOrientation, IDesignable
                 break;
 
             case KeyBindingScope.HotKey:
+                //if (!CanBeVisible(this))
+                //{
+                //    return true;
+                //}
                 cancel = base.OnAccept () == true;
 
                 if (CanFocus)
@@ -834,24 +838,10 @@ public class Shortcut : View, IOrientation, IDesignable
         }
     }
 
-    private View _lastFocusedView;
-
     /// <inheritdoc/>
-    public override bool OnEnter (View view)
+    protected override void OnHasFocusChanged (bool newHasFocus, View previousFocusedView, View view)
     {
         SetColors ();
-        _lastFocusedView = view;
-
-        return base.OnEnter (view);
-    }
-
-    /// <inheritdoc/>
-    public override bool OnLeave (View view)
-    {
-        SetColors ();
-        _lastFocusedView = this;
-
-        return base.OnLeave (view);
     }
 
     #endregion Focus

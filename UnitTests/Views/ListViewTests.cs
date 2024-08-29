@@ -612,7 +612,7 @@ Item 6",
         var lv = new ListView ();
         var top = new View ();
         top.Add (lv);
-        Exception exception = Record.Exception (lv.SetFocus);
+        Exception exception = Record.Exception (() => lv.SetFocus());
         Assert.Null (exception);
     }
 

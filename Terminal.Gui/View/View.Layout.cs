@@ -121,7 +121,7 @@ public partial class View // Layout APIs
         View? superView;
         statusBar = null!;
 
-        if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
+        if (viewToMove is not Toplevel || viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
         {
             maxDimension = Driver.Cols;
             superView = Application.Top;
@@ -163,7 +163,7 @@ public partial class View // Layout APIs
         }
         else
         {
-            View t = viewToMove!.SuperView;
+            View? t = viewToMove!.SuperView;
 
             while (t is { } and not Toplevel)
             {
@@ -194,7 +194,7 @@ public partial class View // Layout APIs
         }
         else
         {
-            View t = viewToMove!.SuperView;
+            View? t = viewToMove!.SuperView;
 
             while (t is { } and not Toplevel)
             {
@@ -311,7 +311,7 @@ public partial class View // Layout APIs
     public virtual Rectangle FrameToScreen ()
     {
         Rectangle screen = Frame;
-        View current = SuperView;
+        View? current = SuperView;
 
         while (current is { })
         {
@@ -547,14 +547,14 @@ public partial class View // Layout APIs
     ///     Subscribe to this event to perform tasks when the <see cref="View"/> has been resized or the layout has
     ///     otherwise changed.
     /// </remarks>
-    public event EventHandler<LayoutEventArgs> LayoutComplete;
+    public event EventHandler<LayoutEventArgs>? LayoutComplete;
 
     /// <summary>Fired after the View's <see cref="LayoutSubviews"/> method has completed.</summary>
     /// <remarks>
     ///     Subscribe to this event to perform tasks when the <see cref="View"/> has been resized or the layout has
     ///     otherwise changed.
     /// </remarks>
-    public event EventHandler<LayoutEventArgs> LayoutStarted;
+    public event EventHandler<LayoutEventArgs>? LayoutStarted;
 
     /// <summary>
     ///     Adjusts <see cref="Frame"/> given the SuperView's ContentSize (nominally the same as
@@ -694,7 +694,7 @@ public partial class View // Layout APIs
         HashSet<View> nodes = new ();
         HashSet<(View, View)> edges = new ();
         CollectAll (this, ref nodes, ref edges);
-        List<View> ordered = TopologicalSort (SuperView, nodes, edges);
+        List<View> ordered = TopologicalSort (SuperView!, nodes, edges);
 
         foreach (View v in ordered)
         {

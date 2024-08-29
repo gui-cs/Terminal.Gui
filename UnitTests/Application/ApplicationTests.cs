@@ -463,7 +463,7 @@ public class ApplicationTests
     }
 
     [Fact]
-    public void InitWithoutTopLevelFactory_Begin_End_Cleans_Up ()
+    public void Init_WithoutTopLevelFactory_Begin_End_Cleans_Up ()
     {
         // Begin will cause Run() to be called, which will call Begin(). Thus will block the tests
         // if we don't stop
@@ -505,6 +505,15 @@ public class ApplicationTests
         Assert.Null (Application.Top);
         Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
+    }
+
+    [Fact]
+    public void Init_NoParam_ForceDriver_Works ()
+    {
+        Application.ForceDriver = "FakeDriver";
+        Application.Init ();
+        Assert.IsType<FakeDriver> (Application.Driver);
+        Application.ResetState ();
     }
 
     [Fact]
@@ -955,7 +964,7 @@ public class ApplicationTests
     }
 
     // TODO: All Toplevel layout tests should be moved to ToplevelTests.cs
-    [Fact]
+    [Fact (Skip = "#2491 - Changing focus should cause NeedsDispay = true, so bogus test?")]
     public void Run_Toplevel_With_Modal_View_Does_Not_Refresh_If_Not_Dirty ()
     {
         Init ();

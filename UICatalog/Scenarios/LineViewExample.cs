@@ -6,7 +6,7 @@ namespace UICatalog.Scenarios;
 [ScenarioMetadata ("Line View", "Demonstrates drawing lines using the LineView control.")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("LineView")]
-[ScenarioCategory ("Borders")]
+[ScenarioCategory ("Adornments")]
 public class LineViewExample : Scenario
 {
     public override void Main ()

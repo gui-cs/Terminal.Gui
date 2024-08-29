@@ -23,9 +23,27 @@ public class DatePickerTests
     }
 
     [Fact]
-    public void DatePicker_Initialize_ShouldSetCurrentDate ()
+    public void DatePicker_Default_Constructor_ShouldSetCurrenDate ()
     {
         var datePicker = new DatePicker ();
+        Assert.Equal (DateTime.Now.Date.Day, datePicker.Date.Day);
+        Assert.Equal (DateTime.Now.Date.Month, datePicker.Date.Month);
+        Assert.Equal (DateTime.Now.Date.Year, datePicker.Date.Year);
+    }
+
+    [Fact]
+    public void DatePicker_Constrctor_Now_ShouldSetCurrenDate ()
+    {
+        var datePicker = new DatePicker (DateTime.Now);
+        Assert.Equal (DateTime.Now.Date.Day, datePicker.Date.Day);
+        Assert.Equal (DateTime.Now.Date.Month, datePicker.Date.Month);
+        Assert.Equal (DateTime.Now.Date.Year, datePicker.Date.Year);
+    }
+
+    [Fact]
+    public void DatePicker_X_Y_Init ()
+    {
+        var datePicker = new DatePicker { Y = Pos.Center (), X = Pos.Center () };
         Assert.Equal (DateTime.Now.Date.Day, datePicker.Date.Day);
         Assert.Equal (DateTime.Now.Date.Month, datePicker.Date.Month);
         Assert.Equal (DateTime.Now.Date.Year, datePicker.Date.Year);
@@ -59,12 +77,12 @@ public class DatePickerTests
         datePicker.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
 
         // Change month to December
-        Assert.True (datePicker.NewKeyDownEvent (Key.Enter));
+        Assert.True (Application.OnKeyDown (Key.Enter));
         Assert.Equal (12, datePicker.Date.Month);
 
-        // Date should not change as next month button is disabled
-        Assert.False (datePicker.NewKeyDownEvent (Key.Enter));
-        Assert.Equal (12, datePicker.Date.Month);
+        // Date should change as next month button was disabled, causing focus to advance
+        Assert.True (Application.OnKeyDown (Key.Enter));
+        Assert.Equal (11, datePicker.Date.Month);
         top.Dispose ();
     }
 
@@ -88,8 +106,8 @@ public class DatePickerTests
         Assert.True (datePicker.NewKeyDownEvent (Key.Enter));
         Assert.Equal (1, datePicker.Date.Month);
 
-        // Date should not change as previous month button is disabled
-        Assert.False (datePicker.NewKeyDownEvent (Key.Enter));
+        // Previous month button is disabled, so focus advanced to edit field
+        Assert.True (datePicker.NewKeyDownEvent (Key.Enter));
         Assert.Equal (1, datePicker.Date.Month);
         top.Dispose ();
     }
