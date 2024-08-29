@@ -1,6 +1,6 @@
 ﻿namespace Terminal.Gui;
 
-/// <summary>Defines the event arguments for <see cref="View.HasFocus"/></summary>
+/// <summary>The event arguments for <see cref="View.HasFocus"/> events.</summary>
 public class HasFocusEventArgs : CancelEventArgs<bool>
 {
     /// <summary>Initializes a new instance.</summary>
