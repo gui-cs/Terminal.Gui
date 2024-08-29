@@ -111,6 +111,7 @@ public class Navigation : Scenario
                            Key = Key.F4,
                            Action = () =>
                                     {
+                                        // TODO: move this logic into `View.ShowHide()` or similar
                                         overlappedView2.Visible = false;
                                         overlappedView2.Enabled = overlappedView2.Visible;
                                     }
@@ -125,6 +126,7 @@ public class Navigation : Scenario
                            Key = Key.F4.WithCtrl,
                            Action = () =>
                                     {
+                                        // TODO: move this logic into `View.ShowHide()` or similar
                                         overlappedView2.Visible = !overlappedView2.Visible;
                                         overlappedView2.Enabled = overlappedView2.Visible;
 
