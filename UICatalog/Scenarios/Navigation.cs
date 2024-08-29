@@ -127,6 +127,11 @@ public class Navigation : Scenario
                                     {
                                         overlappedView2.Visible = !overlappedView2.Visible;
                                         overlappedView2.Enabled = overlappedView2.Visible;
+
+                                        if (overlappedView2.Visible)
+                                        {
+                                            overlappedView2.SetFocus ();
+                                        }
                                     }
                        });
         overlappedView2.Add (statusBar);
