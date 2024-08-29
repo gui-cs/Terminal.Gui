@@ -98,7 +98,7 @@ Causes the focus to advance (forward or backwards) to the next View in the appli
 The implementation is simple:
 
 ```cs
-return Application.GetFocused()?.AdvanceFocus (direction, behavior) ?? false;
+return Application.Current?.AdvanceFocus (direction, behavior);
 ```
 
 This method is called from the `Command` handlers bound to the application-scoped keybindings created during `Application.Init`. It is `public` as a convenience.

@@ -1321,6 +1321,7 @@ e
     {
         Label label = new () { Text = "label" };
         View view = new () { Text = "view", CanFocus = true };
+        Application.Navigation = new ();
         Application.Current = new ();
         Application.Current.Add (label, view);
 

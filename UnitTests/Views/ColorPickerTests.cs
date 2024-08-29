@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using System.Reflection.Emit;
+using Xunit.Abstractions;
 using Color = Terminal.Gui.Color;
 
 namespace Terminal.Gui.ViewsTests;
@@ -692,6 +693,10 @@ public class ColorPickerTests
     public void ColorPicker_TabCompleteColorName ()
     {
         var cp = GetColorPicker (ColorModel.RGB, true, true);
+        Application.Navigation = new ();
+        Application.Current = new ();
+        Application.Current.Add (cp);
+
         cp.Draw ();
 
         var r = GetColorBar (cp, ColorPickerPart.Bar1);
@@ -728,6 +733,7 @@ public class ColorPickerTests
         Assert.Equal ("#7FFFD4", hex.Text);
 
         Application.Current?.Dispose ();
+        Application.ResetState ();
     }
 
     [Fact]
@@ -735,6 +741,10 @@ public class ColorPickerTests
     public void ColorPicker_EnterHexFor_ColorName ()
     {
         var cp = GetColorPicker (ColorModel.RGB, true, true);
+        Application.Navigation = new ();
+        Application.Current = new ();
+        Application.Current.Add (cp);
+
         cp.Draw ();
 
         var name = GetTextField (cp, ColorPickerPart.ColorName);
@@ -777,6 +787,7 @@ public class ColorPickerTests
         Assert.Equal ("Aquamarine", name.Text);
 
         Application.Current?.Dispose ();
+        Application.ResetState ();
     }
 
     [Fact]
