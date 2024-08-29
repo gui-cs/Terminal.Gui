@@ -98,6 +98,6 @@ public class ApplicationNavigation
     /// </returns>
     public bool AdvanceFocus (NavigationDirection direction, TabBehavior? behavior)
     {
-        return Application.Current is { } && Application.Current.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        return Application.Current is { } && Application.Current.AdvanceFocus (direction, behavior);
     }
 }

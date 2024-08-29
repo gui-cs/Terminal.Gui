@@ -1,6 +1,4 @@
 ﻿#nullable enable
-using static System.Net.Mime.MediaTypeNames;
-
 namespace Terminal.Gui;
 
 public static partial class Application // Keyboard handling
@@ -289,31 +287,25 @@ public static partial class Application // Keyboard handling
 
         AddCommand (
                     Command.NextView,
-                    static () => Application.Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop));
+                    static () => Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop));
 
         AddCommand (
-        Command.PreviousView,
-                    static () => Application.Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop));
+                    Command.PreviousView,
+                    static () => Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop));
 
         AddCommand (
                     Command.NextViewOrTop,
                     static () =>
                     {
                         // TODO: This OverlapppedTop tomfoolery goes away in addressing #2491
-                        if (ApplicationOverlapped.OverlappedTop is null && Current is { })
+                        if (ApplicationOverlapped.OverlappedTop is { })
                         {
-                            if (Current.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup))
-                            {
-                                return true;
-                            };
+                            ApplicationOverlapped.OverlappedMoveNext ();
 
-
-                            return false;
+                            return true;
                         }
 
-                        ApplicationOverlapped.OverlappedMoveNext ();
-
-                        return true;
+                        return Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup);
                     }
                    );
 
@@ -322,20 +314,14 @@ public static partial class Application // Keyboard handling
                     static () =>
                     {
                         // TODO: This OverlapppedTop tomfoolery goes away in addressing #2491
-                        if (ApplicationOverlapped.OverlappedTop is null && Current is { })
+                        if (ApplicationOverlapped.OverlappedTop is { })
                         {
-                            if (Current.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup))
-                            {
-                                return true;
-                            };
+                            ApplicationOverlapped.OverlappedMovePrevious ();
 
-
-                            return false;
+                            return true;
                         }
 
-                        ApplicationOverlapped.OverlappedMovePrevious ();
-
-                        return true;
+                        return Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup);
                     }
                    );
 
@@ -367,8 +353,8 @@ public static partial class Application // Keyboard handling
         KeyBindings.Add (NextTabKey, KeyBindingScope.Application, Command.NextView);
         KeyBindings.Add (PrevTabKey, KeyBindingScope.Application, Command.PreviousView);
 
-        KeyBindings.Add (NextTabGroupKey, KeyBindingScope.Application, Command.NextViewOrTop); // Needed on Unix
-        KeyBindings.Add (PrevTabGroupKey, KeyBindingScope.Application, Command.PreviousViewOrTop); // Needed on Unix
+        KeyBindings.Add (NextTabGroupKey, KeyBindingScope.Application, Command.NextViewOrTop);
+        KeyBindings.Add (PrevTabGroupKey, KeyBindingScope.Application, Command.PreviousViewOrTop);
 
         // TODO: Refresh Key should be configurable
         KeyBindings.Add (Key.F5, KeyBindingScope.Application, Command.Refresh);

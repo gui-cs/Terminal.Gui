@@ -113,7 +113,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
         Assert.True (subView1.HasFocus);
         Assert.Equal (subView1, Application.Navigation.GetFocused ());
 
-        Application.Current.AdvanceFocus (NavigationDirection.Forward, null);
+        Application.Navigation.AdvanceFocus (NavigationDirection.Forward, null);
         Assert.Equal (subView2, Application.Navigation.GetFocused ());
 
         Application.ResetState ();

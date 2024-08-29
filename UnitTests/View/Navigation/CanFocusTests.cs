@@ -324,17 +324,18 @@ public class CanFocusTests () : TestsAllViews
     {
         Label label = new () { Text = "label" };
         View view = new () { Text = "view", CanFocus = true };
+        Application.Navigation = new ();
         Application.Current = new ();
         Application.Current.Add (label, view);
 
         Application.Current.SetFocus ();
-        Assert.Equal (view, Application.Current.MostFocused);
+        Assert.Equal (view, Application.Navigation.GetFocused());
         Assert.False (label.CanFocus);
         Assert.False (label.HasFocus);
         Assert.True (view.CanFocus);
         Assert.True (view.HasFocus);
 
-        Assert.False (Application.Current.AdvanceFocus (NavigationDirection.Forward, null));
+        Assert.False (Application.Navigation.AdvanceFocus (NavigationDirection.Forward, null));
         Assert.False (label.HasFocus);
         Assert.True (view.HasFocus);
 
@@ -344,7 +345,7 @@ public class CanFocusTests () : TestsAllViews
         Assert.True (view.HasFocus);
 
         // label can now be focused, so AdvanceFocus should move to it.
-        Assert.True (Application.Current.AdvanceFocus (NavigationDirection.Forward, null));
+        Assert.True (Application.Navigation.AdvanceFocus (NavigationDirection.Forward, null));
         Assert.True (label.HasFocus);
         Assert.False (view.HasFocus);
 
