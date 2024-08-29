@@ -1,4 +1,6 @@
-﻿using Terminal.Gui;
+﻿using System;
+using System.Timers;
+using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -58,11 +60,40 @@ public class Navigation : Scenario
         tiledView3.BorderStyle = LineStyle.Double;
         testFrame.Add (tiledView3);
 
-        View overlappedView1 = CreateOverlappedView (2, Pos.Center () - 5, Pos.Center ());
+        View overlappedView1 = CreateOverlappedView (2, 10, Pos.Center ());
         View tiledSubView = CreateTiledView (4, 0, 2);
         overlappedView1.Add (tiledSubView);
 
-        View overlappedView2 = CreateOverlappedView (3, Pos.Center () + 10, Pos.Center () + 5);
+        ProgressBar progressBar = new ()
+        {
+            X = Pos.AnchorEnd (),
+            Y = Pos.AnchorEnd (),
+            Width = Dim.Fill (),
+            Id = "progressBar"
+        };
+        overlappedView1.Add (progressBar);
+
+        Timer timer = new (10)
+        {
+            AutoReset = true,
+        };
+        timer.Elapsed += (o, args) =>
+                         {
+
+                             if (progressBar.Fraction == 1.0)
+                             {
+                                 progressBar.Fraction = 0;
+                             }
+                             progressBar.Fraction += 0.01f;
+
+                             Application.Wakeup ();
+
+                             progressBar.SetNeedsDisplay ();
+
+                         };
+        timer.Start ();
+
+        View overlappedView2 = CreateOverlappedView (3, Pos.Right (overlappedView1) + 2, Pos.Top (overlappedView1) + 1);
 
         var overlappedInOverlapped1 = CreateOverlappedView (4, 1, 4);
         overlappedView2.Add (overlappedInOverlapped1);
@@ -70,16 +101,39 @@ public class Navigation : Scenario
         var overlappedInOverlapped2 = CreateOverlappedView (5, 10, 7);
         overlappedView2.Add (overlappedInOverlapped2);
 
-        CheckBox cb = new ()
+        ColorPicker colorPicker = new ()
         {
-            X = Pos.AnchorEnd (),
             Y = Pos.AnchorEnd (),
-            Title = "Checkbo_x"
+            Width = Dim.Fill (),
+            Id = "colorPicker",
+            Style = new ()
+            {
+                ShowTextFields = true,
+                ShowColorName = true
+            }
         };
-        overlappedView2.Add (cb);
+        colorPicker.ApplyStyleChanges ();
+
+        colorPicker.SelectedColor = testFrame.ColorScheme.Normal.Background;
+        colorPicker.ColorChanged += ColorPicker_ColorChanged;
+        overlappedView2.Add (colorPicker);
 
         testFrame.Add (overlappedView1);
         testFrame.Add (overlappedView2);
+
+        DatePicker datePicker = new ()
+        {
+            X = 1,
+            Y = 7,
+            Id = "datePicker",
+            ColorScheme = Colors.ColorSchemes ["Toplevel"],
+            ShadowStyle = ShadowStyle.Transparent,
+            BorderStyle = LineStyle.Double,
+            CanFocus = true, // Can't drag without this? BUGBUG
+            TabStop = TabBehavior.TabGroup,
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped
+        };
+        testFrame.Add (datePicker);
 
         button = new ()
         {
@@ -92,9 +146,17 @@ public class Navigation : Scenario
 
         editor.AutoSelectSuperView = testFrame;
         Application.Run (app);
+        timer.Close ();
         app.Dispose ();
         Application.Shutdown ();
+
+        return;
+        void ColorPicker_ColorChanged (object sender, ColorEventArgs e)
+        {
+            testFrame.ColorScheme = testFrame.ColorScheme with { Normal = new (testFrame.ColorScheme.Normal.Foreground, e.CurrentValue) };
+        }
     }
+
 
     private View CreateOverlappedView (int id, Pos x, Pos y)
     {

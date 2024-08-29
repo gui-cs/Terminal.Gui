@@ -570,6 +570,10 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
 
     private void _top_Initialized (object sender, EventArgs e)
     {
+        if (_top is null)
+        {
+            _top = sender as View;
+        }
         AddPopupToTop ();
     }
 

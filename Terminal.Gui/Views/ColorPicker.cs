@@ -1,5 +1,7 @@
 ﻿#nullable enable
 
+using System;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -335,5 +337,12 @@ public class ColorPicker : View
             // value is invalid, revert the value in the text field back to current state
             SyncSubViewValues (false);
         }
+    }
+
+
+    protected override void Dispose (bool disposing)
+    {
+        DisposeOldViews ();
+        base.Dispose (disposing);
     }
 }
