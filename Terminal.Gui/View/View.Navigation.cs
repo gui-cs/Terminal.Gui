@@ -320,23 +320,25 @@ public partial class View // Focus and cross-view navigation management (TabStop
     {
         set
         {
-            if (HasFocus != value)
+            if (HasFocus == value)
             {
-                if (value)
-                {
-                    // NOTE: If Application.Navigation is null, we pass null to FocusChanging. For unit tests.
-                    (bool focusSet, bool _) = SetHasFocusTrue (Application.Navigation?.GetFocused ());
+                return;
+            }
 
-                    if (focusSet)
-                    {
-                        // The change happened
-                        // HasFocus is now true
-                    }
-                }
-                else
+            if (value)
+            {
+                // NOTE: If Application.Navigation is null, we pass null to FocusChanging. For unit tests.
+                (bool focusSet, bool _) = SetHasFocusTrue (Application.Navigation?.GetFocused ());
+
+                if (focusSet)
                 {
-                    SetHasFocusFalse (null);
+                    // The change happened
+                    // HasFocus is now true
                 }
+            }
+            else
+            {
+                SetHasFocusFalse (null);
             }
         }
         get => _hasFocus;
