@@ -6,15 +6,18 @@ namespace Terminal.Gui;
 public partial class View // SuperView/SubView hierarchy management (SuperView, SubViews, Add, Remove, etc.)
 {
     private static readonly IList<View> _empty = new List<View> (0).AsReadOnly ();
-    private List<View>? _subviews; // This is null, and allocated on demand.
-    private View? _superView;
 
-    /// <summary>Indicates whether the view was added to <see cref="SuperView"/>.</summary>
-    public bool IsAdded { get; private set; }
+    private List<View>? _subviews; // This is null, and allocated on demand.
+
+    // Internally, we use InternalSubviews rather than subviews, as we do not expect us
+    // to make the same mistakes our users make when they poke at the Subviews.
+    internal IList<View> InternalSubviews => _subviews ?? _empty;
 
     /// <summary>This returns a list of the subviews contained by this view.</summary>
     /// <value>The subviews.</value>
     public IList<View> Subviews => _subviews?.AsReadOnly () ?? _empty;
+
+    private View? _superView;
 
     /// <summary>Returns the container for this view, or null if this view has not been added to a container.</summary>
     /// <value>The super view.</value>
@@ -24,9 +27,10 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         set => throw new NotImplementedException ();
     }
 
-    // Internally, we use InternalSubviews rather than subviews, as we do not expect us
-    // to make the same mistakes our users make when they poke at the Subviews.
-    internal IList<View> InternalSubviews => _subviews ?? _empty;
+    #region AddRemove
+
+    /// <summary>Indicates whether the view was added to <see cref="SuperView"/>.</summary>
+    public bool IsAdded { get; private set; }
 
     /// <summary>Adds a subview (child) to this view.</summary>
     /// <remarks>
@@ -114,25 +118,6 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <summary>Event fired when this view is added to another.</summary>
     public event EventHandler<SuperViewChangedEventArgs>? Added;
 
-    /// <summary>Get the top superview of a given <see cref="View"/>.</summary>
-    /// <returns>The superview view.</returns>
-    public View? GetTopSuperView (View? view = null, View? superview = null)
-    {
-        View? top = superview ?? Application.Top;
-
-        for (View? v = view?.SuperView ?? this?.SuperView; v != null; v = v.SuperView)
-        {
-            top = v;
-
-            if (top == superview)
-            {
-                break;
-            }
-        }
-
-        return top;
-    }
-
     /// <summary>Method invoked when a subview is being added to this view.</summary>
     /// <param name="e">Event where <see cref="ViewEventArgs.View"/> is the subview being added.</param>
     public virtual void OnAdded (SuperViewChangedEventArgs e)
@@ -177,6 +162,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         {
             view.HasFocus = false;
         }
+
         _subviews.Remove (view);
         view._superView = null; // Null this AFTER removing focus
 
@@ -228,6 +214,29 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <summary>Event fired when this view is removed from another.</summary>
     public event EventHandler<SuperViewChangedEventArgs>? Removed;
 
+    #endregion AddRemove
+
+    // TODO: Mark as internal. Or nuke.
+    /// <summary>Get the top superview of a given <see cref="View"/>.</summary>
+    /// <returns>The superview view.</returns>
+    public View? GetTopSuperView (View? view = null, View? superview = null)
+    {
+        View? top = superview ?? Application.Top;
+
+        for (View? v = view?.SuperView ?? this?.SuperView; v != null; v = v.SuperView)
+        {
+            top = v;
+
+            if (top == superview)
+            {
+                break;
+            }
+        }
+
+        return top;
+    }
+
+    #region SubViewOrdering
 
     /// <summary>
     ///     Moves <paramref name="subview"/> one position towards the end of the <see cref="Subviews"/> list.
@@ -265,7 +274,6 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
                                  }
                                 );
     }
-
 
     /// <summary>
     ///     Moves <paramref name="subview"/> one position towards the start of the <see cref="Subviews"/> list.
@@ -321,4 +329,5 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         subview.SetNeedsDisplay ();
     }
 
+    #endregion SubViewOrdering
 }
