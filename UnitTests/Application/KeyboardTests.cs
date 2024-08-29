@@ -375,7 +375,7 @@ public class KeyboardTests
                                      Assert.True (v3.HasFocus);
 
                                      Application.OnKeyDown (Key.F6);
-                                     Assert.True (v2.HasFocus);
+                                     Assert.True (v1.HasFocus);
 
   
                                      Application.RequestStop ();
