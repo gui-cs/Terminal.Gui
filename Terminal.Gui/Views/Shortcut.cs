@@ -742,6 +742,10 @@ public class Shortcut : View, IOrientation, IDesignable
                 break;
 
             case KeyBindingScope.HotKey:
+                //if (!CanBeVisible(this))
+                //{
+                //    return true;
+                //}
                 cancel = base.OnAccept () == true;
 
                 if (CanFocus)

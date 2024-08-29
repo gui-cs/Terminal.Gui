@@ -392,12 +392,13 @@ public partial class View : Responder, ISupportInitializeNotification
     /// <summary>Event fired when the <see cref="Visible"/> value is being changed.</summary>
     public event EventHandler? VisibleChanged;
 
+    // TODO: This API is a hack. We should make Visible propogate automatically, no? See https://github.com/gui-cs/Terminal.Gui/issues/3703
     /// <summary>
-    /// INTERNAL method for determining if all the specified view and all views up the Superview hierarchy are visible.
+    ///     INTERNAL Indicates whether all views up the Superview hierarchy are visible.
     /// </summary>
     /// <param name="view">The view to test.</param>
     /// <returns> <see langword="false"/> if `view.Visible` is  <see langword="false"/> or any Superview is not visible, <see langword="true"/> otherwise.</returns>
-    private static bool CanBeVisible (View view)
+    internal static bool CanBeVisible (View view)
     {
         if (!view.Visible)
         {

@@ -89,7 +89,10 @@ public class ColorPicker : View
         CreateTextField ();
         SelectedColor = oldValue;
 
-        LayoutSubviews ();
+        if (IsInitialized)
+        {
+            LayoutSubviews ();
+        }
     }
 
     /// <summary>

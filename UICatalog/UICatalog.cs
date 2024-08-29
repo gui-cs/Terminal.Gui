@@ -644,13 +644,6 @@ public class UICatalogApp
             Add (CategoryList);
             Add (ScenarioList);
 
-            Add (MenuBar!);
-
-            if (StatusBar is { })
-            {
-                Add (StatusBar);
-            }
-
             Loaded += LoadedHandler;
             Unloaded += UnloadedHandler;
 

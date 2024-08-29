@@ -10,7 +10,8 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("BackgroundWorker Collection", "A persisting multi Toplevel BackgroundWorker threading")]
 [ScenarioCategory ("Threading")]
-[ScenarioCategory ("Top Level Windows")]
+[ScenarioCategory ("Overlapped")]
+[ScenarioCategory ("Runnable")]
 [ScenarioCategory ("Dialogs")]
 [ScenarioCategory ("Controls")]
 public class BackgroundWorkerCollection : Scenario

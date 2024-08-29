@@ -11,7 +11,8 @@ namespace UICatalog.Scenarios;
 [ScenarioMetadata ("All Views Tester", "Provides a test UI for all classes derived from View.")]
 [ScenarioCategory ("Layout")]
 [ScenarioCategory ("Tests")]
-[ScenarioCategory ("Top Level Windows")]
+[ScenarioCategory ("Controls")]
+[ScenarioCategory ("Adornments")]
 public class AllViewsTester : Scenario
 {
     private readonly List<string> _dimNames = new () { "Auto", "Percent", "Fill", "Absolute" };

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Timers;
+﻿using System.Timers;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -7,6 +6,7 @@ namespace UICatalog.Scenarios;
 [ScenarioMetadata ("Navigation", "Navigation Tester")]
 [ScenarioCategory ("Mouse and Keyboard")]
 [ScenarioCategory ("Layout")]
+[ScenarioCategory ("Overlapped")]
 public class Navigation : Scenario
 {
     private int _hotkeyCount;
@@ -75,35 +75,68 @@ public class Navigation : Scenario
 
         Timer timer = new (10)
         {
-            AutoReset = true,
+            AutoReset = true
         };
+
         timer.Elapsed += (o, args) =>
                          {
-
                              if (progressBar.Fraction == 1.0)
                              {
                                  progressBar.Fraction = 0;
                              }
+
                              progressBar.Fraction += 0.01f;
 
                              Application.Wakeup ();
 
                              progressBar.SetNeedsDisplay ();
-
                          };
         timer.Start ();
 
-        View overlappedView2 = CreateOverlappedView (3, Pos.Right (overlappedView1) + 2, Pos.Top (overlappedView1) + 1);
+        View overlappedView2 = CreateOverlappedView (3, 8, 10);
 
-        var overlappedInOverlapped1 = CreateOverlappedView (4, 1, 4);
+        View overlappedInOverlapped1 = CreateOverlappedView (4, 1, 4);
         overlappedView2.Add (overlappedInOverlapped1);
 
-        var overlappedInOverlapped2 = CreateOverlappedView (5, 10, 7);
+        View overlappedInOverlapped2 = CreateOverlappedView (5, 10, 7);
         overlappedView2.Add (overlappedInOverlapped2);
+
+        StatusBar statusBar = new ()
+        {
+
+        };
+
+        statusBar.Add (
+                       new Shortcut ()
+                       {
+                           Title = "Close",
+                           Text = "Hotkey",
+                           Key = Key.F4,
+                           Action = () =>
+                                    {
+                                        overlappedView2.Visible = false;
+                                        overlappedView2.Enabled = overlappedView2.Visible;
+                                    }
+                       });
+        statusBar.Add (
+                       new Shortcut ()
+                       {
+                           Title = "Close",
+                           Text = "App",
+                           KeyBindingScope = KeyBindingScope.Application,
+                           Key = Key.F4.WithCtrl,
+                           Action = () =>
+                                    {
+                                        overlappedView2.Visible = !overlappedView2.Visible;
+                                        overlappedView2.Enabled = overlappedView2.Visible;
+
+                                    }
+                       });
+        overlappedView2.Add (statusBar);
 
         ColorPicker colorPicker = new ()
         {
-            Y = Pos.AnchorEnd (),
+            Y = 12,
             Width = Dim.Fill (),
             Id = "colorPicker",
             Style = new ()
@@ -117,6 +150,7 @@ public class Navigation : Scenario
         colorPicker.SelectedColor = testFrame.ColorScheme.Normal.Background;
         colorPicker.ColorChanged += ColorPicker_ColorChanged;
         overlappedView2.Add (colorPicker);
+        overlappedView2.Width = 50;
 
         testFrame.Add (overlappedView1);
         testFrame.Add (overlappedView2);
@@ -151,12 +185,12 @@ public class Navigation : Scenario
         Application.Shutdown ();
 
         return;
+
         void ColorPicker_ColorChanged (object sender, ColorEventArgs e)
         {
             testFrame.ColorScheme = testFrame.ColorScheme with { Normal = new (testFrame.ColorScheme.Normal.Foreground, e.CurrentValue) };
         }
     }
-
 
     private View CreateOverlappedView (int id, Pos x, Pos y)
     {

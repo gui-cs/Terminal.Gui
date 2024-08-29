@@ -48,7 +48,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             _subviews = [];
         }
 
-        Debug.WriteLineIf (_subviews.Contains (view), $"BUGBUG: {view} has already been added to {this}.");
+        Debug.WriteLineIf (_subviews.Contains (view), $"WARNING: {view} has already been added to {this}.");
 
         // TileView likes to add views that were previously added and have HasFocus = true. No bueno.
         view.HasFocus = false;

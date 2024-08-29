@@ -5,7 +5,7 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("View Experiments", "v2 View Experiments")]
 [ScenarioCategory ("Controls")]
-[ScenarioCategory ("Borders")]
+[ScenarioCategory ("Adornments")]
 [ScenarioCategory ("Layout")]
 [ScenarioCategory ("Proof of Concept")]
 public class ViewExperiments : Scenario
