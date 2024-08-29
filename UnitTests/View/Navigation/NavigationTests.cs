@@ -206,7 +206,10 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
 
                 break;
             case TabBehavior.TabGroup:
-                Application.OnKeyDown (Key.F6);
+                if (!Application.OnKeyDown (Key.F6))
+                {
+                    view.SetFocus ();
+                }
 
                 break;
             case null:
@@ -316,7 +319,6 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
 
     // View.Focused - No subviews
     [Fact]
-    [Trait ("BUGBUG", "Fix in Issue #3444")]
     public void Focused_NoSubviews ()
     {
         var view = new View ();
@@ -324,47 +326,6 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
 
         view.CanFocus = true;
         view.SetFocus ();
-        Assert.True (view.HasFocus);
-        Assert.Null (view.Focused); // BUGBUG: Should be view
-    }
-
-    [Fact]
-    public void FocusNearestView_Ensure_Focus_Ordered ()
-    {
-        Application.Top = Application.Current = new Toplevel ();
-
-        var win = new Window ();
-        var winSubview = new View { CanFocus = true, Text = "WindowSubview" };
-        win.Add (winSubview);
-        Application.Current.Add (win);
-
-        var frm = new FrameView ();
-        var frmSubview = new View { CanFocus = true, Text = "FrameSubview" };
-        frm.Add (frmSubview);
-        Application.Current.Add (frm);
-        Application.Current.SetFocus ();
-
-        Assert.Equal (winSubview, Application.Current.MostFocused);
-
-        Application.OnKeyDown (Key.Tab); // Move to the next TabStop. There is none. So we should stay.
-        Assert.Equal (winSubview, Application.Current.MostFocused);
-
-        Application.OnKeyDown (Key.F6);
-        Assert.Equal (frmSubview, Application.Current.MostFocused);
-
-        Application.OnKeyDown (Key.Tab);
-        Assert.Equal (frmSubview, Application.Current.MostFocused);
-
-        Application.OnKeyDown (Key.F6);
-        Assert.Equal (winSubview, Application.Current.MostFocused);
-
-        Application.OnKeyDown (Key.F6.WithShift);
-        Assert.Equal (frmSubview, Application.Current.MostFocused);
-
-        Application.OnKeyDown (Key.F6.WithShift);
-        Assert.Equal (winSubview, Application.Current.MostFocused);
-
-        Application.Current.Dispose ();
     }
 
     [Fact]

@@ -189,7 +189,6 @@ public class DatePicker : View
         Date = date;
         _dateLabel = new Label { X = 0, Y = 0, Text = "Date: " };
         CanFocus = true;
-        TabStop = TabBehavior.TabGroup;
 
         _calendar = new TableView
         {

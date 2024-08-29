@@ -73,33 +73,35 @@ public class AdvanceFocusTests ()
     }
 
     [Fact]
-    public void AdvanceFocus_Compound_Subview ()
+    public void AdvanceFocus_Compound_Subview_TabStop ()
     {
+        TabBehavior behavior = TabBehavior.TabStop;
         var top = new View { Id = "top", CanFocus = true };
 
         var compoundSubview = new View
         {
             CanFocus = true,
-            Id = "compoundSubview"
+            Id = "compoundSubview",
+            TabStop = behavior
         };
-        var v1 = new View { Id = "v1", CanFocus = true };
-        var v2 = new View { Id = "v2", CanFocus = true };
-        var v3 = new View { Id = "v3", CanFocus = false };
+        var v1 = new View { Id = "v1", CanFocus = true, TabStop = behavior };
+        var v2 = new View { Id = "v2", CanFocus = true, TabStop = behavior };
+        var v3 = new View { Id = "v3", CanFocus = false, TabStop = behavior };
 
         compoundSubview.Add (v1, v2, v3);
 
         top.Add (compoundSubview);
 
         // Cycle through v1 & v2
-        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        top.AdvanceFocus (NavigationDirection.Forward, behavior);
         Assert.True (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
-        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        top.AdvanceFocus (NavigationDirection.Forward, behavior);
         Assert.False (v1.HasFocus);
         Assert.True (v2.HasFocus);
         Assert.False (v3.HasFocus);
-        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        top.AdvanceFocus (NavigationDirection.Forward, behavior);
         Assert.True (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
@@ -108,6 +110,7 @@ public class AdvanceFocusTests ()
         View otherSubview = new ()
         {
             CanFocus = true,
+            TabStop = behavior,
             Id = "otherSubview"
         };
 
@@ -118,15 +121,15 @@ public class AdvanceFocusTests ()
         Assert.False (v1.HasFocus);
 
         // Cycle through v1 & v2
-        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        top.AdvanceFocus (NavigationDirection.Forward, behavior);
         Assert.True (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
-        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        top.AdvanceFocus (NavigationDirection.Forward, behavior);
         Assert.False (v1.HasFocus);
         Assert.True (v2.HasFocus);
         Assert.False (v3.HasFocus);
-        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        top.AdvanceFocus (NavigationDirection.Forward, behavior);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);
@@ -134,10 +137,80 @@ public class AdvanceFocusTests ()
         Assert.True (otherSubview.HasFocus);
 
         // v2 was previously focused down the compoundSubView focus chain
-        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        top.AdvanceFocus (NavigationDirection.Forward, behavior);
         Assert.False (v1.HasFocus);
         Assert.True (v2.HasFocus);
         Assert.False (v3.HasFocus);
+
+        top.Dispose ();
+    }
+
+    [Fact]
+    public void AdvanceFocus_Compound_Subview_TabGroup ()
+    {
+        var top = new View { Id = "top", CanFocus = true, TabStop = TabBehavior.TabGroup };
+
+        var compoundSubview = new View
+        {
+            CanFocus = true,
+            Id = "compoundSubview",
+            TabStop = TabBehavior.TabGroup
+        };
+        var tabStopView = new View { Id = "tabStop", CanFocus = true, TabStop = TabBehavior.TabStop };
+        var tabGroupView1 = new View { Id = "tabGroup1", CanFocus = true, TabStop = TabBehavior.TabGroup };
+        var tabGroupView2 = new View { Id = "tabGroup2", CanFocus = true, TabStop = TabBehavior.TabGroup };
+
+        compoundSubview.Add (tabStopView, tabGroupView1, tabGroupView2);
+
+        top.Add (compoundSubview);
+        top.SetFocus ();
+        Assert.True (tabStopView.HasFocus);
+
+        // TabGroup should cycle to tabGroup1 then tabGroup2
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup);
+        Assert.False (tabStopView.HasFocus);
+        Assert.True (tabGroupView1.HasFocus);
+        Assert.False (tabGroupView2.HasFocus);
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup);
+        Assert.False (tabStopView.HasFocus);
+        Assert.False (tabGroupView1.HasFocus);
+        Assert.True (tabGroupView2.HasFocus);
+
+        // Add another TabGroup subview
+        View otherTabGroupSubview = new ()
+        {
+            CanFocus = true,
+            TabStop = TabBehavior.TabGroup,
+            Id = "otherTabGroupSubview"
+        };
+
+        top.Add (otherTabGroupSubview);
+
+        // Adding a focusable subview causes advancefocus
+        Assert.True (otherTabGroupSubview.HasFocus);
+        Assert.False (tabStopView.HasFocus);
+
+        // TagBroup navs to the other subview
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup);
+        Assert.Equal (compoundSubview, top.Focused);
+        Assert.True (tabStopView.HasFocus); 
+
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup);
+        Assert.Equal (compoundSubview, top.Focused);
+        Assert.True (tabGroupView1.HasFocus);
+
+        top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup);
+        Assert.Equal (compoundSubview, top.Focused);
+        Assert.True (tabGroupView2.HasFocus); 
+
+        // Now go backwards
+        top.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup);
+        Assert.Equal (compoundSubview, top.Focused);
+        Assert.True (tabGroupView1.HasFocus);
+
+        top.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup);
+        Assert.Equal (otherTabGroupSubview, top.Focused);
+        Assert.True (otherTabGroupSubview.HasFocus);
 
         top.Dispose ();
     }

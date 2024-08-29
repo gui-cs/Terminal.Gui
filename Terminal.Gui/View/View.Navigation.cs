@@ -37,12 +37,56 @@ public partial class View // Focus and cross-view navigation management (TabStop
             return true;
         }
 
+        // AdvanceFocus did not advance
         View [] index = GetSubviewFocusChain (direction, behavior);
 
         if (index.Length == 0)
         {
             return false;
         }
+
+        if (behavior == TabBehavior.TabGroup)
+        {
+            if (direction == NavigationDirection.Forward && focused == index [^1] && SuperView is null)
+            {
+                // We're at the top of the focus chain. Go back down the focus chain and focus the first TabGroup
+                View [] views = GetSubviewFocusChain (NavigationDirection.Forward, TabBehavior.TabGroup);
+
+                if (views.Length > 0)
+                {
+                    View [] subViews = views [0].GetSubviewFocusChain (NavigationDirection.Forward, TabBehavior.TabStop);
+
+                    if (subViews.Length > 0)
+                    {
+                        if (subViews [0].SetFocus ())
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            if (direction == NavigationDirection.Backward && focused == index [0])
+            {
+                // We're at the bottom of the focus chain
+                View [] views = GetSubviewFocusChain (NavigationDirection.Forward, TabBehavior.TabGroup);
+
+                if (views.Length > 0)
+                {
+                    View [] subViews = views [^1].GetSubviewFocusChain (NavigationDirection.Forward, TabBehavior.TabStop);
+
+                    if (subViews.Length > 0)
+                    {
+                        if (subViews [0].SetFocus ())
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+        }
+
 
         int focusedIndex = index.IndexOf (Focused); // Will return -1 if Focused can't be found or is null
         var next = 0;
@@ -57,21 +101,20 @@ public partial class View // Focus and cross-view navigation management (TabStop
             // We're moving beyond the last subview
 
             // Determine if focus should remain in this focus chain, or move to the superview's focus chain
-            // BUGBUG: The logic below is sketchy and barely works. In fact, it doesn't work propertly for all nested TabGroups.
-            // - If we are TabStop and our SuperView has at least one other TabStop subview, move to the SuperView's chain
+
+            // If we are TabStop and our SuperView has at least one other TabStop subview, move to the SuperView's chain
             if (TabStop == TabBehavior.TabStop && SuperView is { } && SuperView.GetSubviewFocusChain (direction, behavior).Length > 1)
             {
                 return false;
             }
 
-            // - If we are TabGroup and our SuperView has at least one other TabGroup subview, move to the SuperView's chain
-            if (TabStop == TabBehavior.TabGroup && SuperView is { TabStop: TabBehavior.TabGroup })
+            // TabGroup is special-cased. 
+            if (focused?.TabStop == TabBehavior.TabGroup)
             {
-                if (behavior == TabBehavior.TabGroup)
+                if (SuperView?.GetSubviewFocusChain (direction, TabBehavior.TabGroup)?.Length > 0)
                 {
-                    // Wrap to first focusable views
-                    // BUGBUG: This should do a Restore Focus instead
-                    index = GetSubviewFocusChain (direction, null);
+                    // Our superview has a TabGroup subview; signal we couldn't move so we nav out to it
+                    return false;
                 }
             }
         }
@@ -560,7 +603,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
             if (appFocused is { } || appFocused == this)
             {
-               Application.Navigation.SetFocused (newFocusedView ?? SuperView);
+                Application.Navigation.SetFocused (newFocusedView ?? SuperView);
             }
         }
 
@@ -635,7 +678,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <param name="behavior"></param>
     /// <returns></returns>
     /// GetScopedTabIndexes
-    private View [] GetSubviewFocusChain (NavigationDirection direction, TabBehavior? behavior)
+    internal View [] GetSubviewFocusChain (NavigationDirection direction, TabBehavior? behavior)
     {
         IEnumerable<View>? fitleredSubviews;
 

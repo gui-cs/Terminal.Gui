@@ -300,7 +300,21 @@ public static partial class Application // Keyboard handling
                         // TODO: This OverlapppedTop tomfoolery goes away in addressing #2491
                         if (ApplicationOverlapped.OverlappedTop is null && Current is { })
                         {
-                            return Current.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup);
+                            if (Current.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup))
+                            {
+                                return true;
+                            };
+
+                            //// Go back down the focus chain and focus the first TabGroup
+                            //View []? views = Current.GetSubviewFocusChain (NavigationDirection.Forward, TabBehavior.TabGroup);
+
+                            //if (views.Length > 0)
+                            //{
+                            //    View []? subViews = views [0].GetSubviewFocusChain (NavigationDirection.Forward, TabBehavior.TabStop);
+                            //    return subViews? [0].SetFocus ();
+                            //}
+
+                            return false;
                         }
 
                         ApplicationOverlapped.OverlappedMoveNext ();
@@ -316,7 +330,21 @@ public static partial class Application // Keyboard handling
                         // TODO: This OverlapppedTop tomfoolery goes away in addressing #2491
                         if (ApplicationOverlapped.OverlappedTop is null && Current is { })
                         {
-                            return Current.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup);
+                            if (Current.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup))
+                            {
+                                return true;
+                            };
+
+                            //// Go back down the focus chain and focus the first TabGroup
+                            //View []? views = Current.GetSubviewFocusChain (NavigationDirection.Backward, TabBehavior.TabGroup);
+
+                            //if (views.Length > 0)
+                            //{
+                            //    View []? subViews = views [0].GetSubviewFocusChain (NavigationDirection.Backward, TabBehavior.TabStop);
+                            //    return subViews? [0].SetFocus ();
+                            //}
+
+                            return false;
                         }
 
                         ApplicationOverlapped.OverlappedMovePrevious ();

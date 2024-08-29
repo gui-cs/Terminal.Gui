@@ -64,15 +64,19 @@ public class Navigation : Scenario
 
         View overlappedView2 = CreateOverlappedView (3, Pos.Center () + 10, Pos.Center () + 5);
 
-        // BUGBUG: F6 through nested tab groups doesn't work yet.
-#if NESTED_TABGROUPS
         var overlappedInOverlapped1 = CreateOverlappedView (4, 1, 4);
         overlappedView2.Add (overlappedInOverlapped1);
 
         var overlappedInOverlapped2 = CreateOverlappedView (5, 10, 7);
         overlappedView2.Add (overlappedInOverlapped2);
 
-#endif
+        CheckBox cb = new ()
+        {
+            X = Pos.AnchorEnd (),
+            Y = Pos.AnchorEnd (),
+            Title = "Checkbo_x"
+        };
+        overlappedView2.Add (cb);
 
         testFrame.Add (overlappedView1);
         testFrame.Add (overlappedView2);
