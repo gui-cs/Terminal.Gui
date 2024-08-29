@@ -34,7 +34,8 @@ public class ShadowStyles : Scenario
             Width = Dim.Percent (30),
             Height = Dim.Percent (30),
             Title = "Shadow Window",
-            Arrangement = ViewArrangement.Movable,
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped,
+            BorderStyle = LineStyle.Double,
             ShadowStyle = ShadowStyle.Transparent
         };
 

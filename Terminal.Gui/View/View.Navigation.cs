@@ -84,9 +84,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
                     }
                 }
             }
-
         }
-
 
         int focusedIndex = index.IndexOf (Focused); // Will return -1 if Focused can't be found or is null
         var next = 0;
@@ -193,7 +191,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
     public event EventHandler? CanFocusChanged;
 
     /// <summary>
-    ///     Focuses the deepest focusable Subview if one exists. If there are no focusable Subviews then the focus is set to the view itself.
+    ///     Focuses the deepest focusable Subview if one exists. If there are no focusable Subviews then the focus is set to
+    ///     the view itself.
     /// </summary>
     /// <param name="direction"></param>
     /// <param name="behavior"></param>
@@ -450,8 +449,12 @@ public partial class View // Focus and cross-view navigation management (TabStop
             previousFocusedView.SetHasFocusFalse (this);
         }
 
+        if (Arrangement.HasFlag (ViewArrangement.Overlapped))
+        {
+            SuperView?.MoveSubviewToStart (this);
+        }
+
         NotifyFocusChanged (HasFocus, previousFocusedView, this);
-        SetNeedsDisplay ();
 
         // Post-conditions - prove correctness
         if (HasFocus == previousValue)
@@ -500,10 +503,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     <see langword="true"/>, if the change to <see cref="View.HasFocus"/> is to be cancelled, <see langword="false"/>
     ///     otherwise.
     /// </returns>
-    protected virtual bool OnHasFocusChanging (bool currentHasFocus, bool newHasFocus, View? currentFocused, View? newFocused)
-    {
-        return false;
-    }
+    protected virtual bool OnHasFocusChanging (bool currentHasFocus, bool newHasFocus, View? currentFocused, View? newFocused) { return false; }
 
     /// <summary>
     ///     Raised when <see cref="View.HasFocus"/> is about to change.
@@ -521,8 +521,14 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <summary>
     ///     Called when this view should stop being focused.
     /// </summary>
-    /// <param name="newFocusedView">The new focused view. If <see langword="null"/> it is not known which view will be focused.</param>
-    /// <param name="traversingDown">Set to true to indicate method is being called recurively, traversing down the focus chain.</param>
+    /// <param name="newFocusedView">
+    ///     The new focused view. If <see langword="null"/> it is not known which view will be
+    ///     focused.
+    /// </param>
+    /// <param name="traversingDown">
+    ///     Set to true to indicate method is being called recurively, traversing down the focus
+    ///     chain.
+    /// </param>
     /// <exception cref="InvalidOperationException"></exception>
     private void SetHasFocusFalse (View? newFocusedView, bool traversingDown = false)
     {

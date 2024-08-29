@@ -78,11 +78,6 @@ public class ApplicationNavigation
 
         _focused = value;
 
-        if (_focused is { } && _focused.Arrangement.HasFlag (ViewArrangement.Overlapped))
-        {
-            _focused.SuperView?.MoveSubviewToStart (_focused);
-        }
-
         FocusedChanged?.Invoke (null, EventArgs.Empty);
     }
 
