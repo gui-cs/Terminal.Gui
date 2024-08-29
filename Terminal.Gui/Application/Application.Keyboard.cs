@@ -144,28 +144,37 @@ public static partial class Application // Keyboard handling
 
                 foreach (Command command in appBinding.Commands)
                 {
-                    if (!CommandImplementations!.ContainsKey (command))
-                    {
-                        throw new NotSupportedException (
-                                                         @$"A KeyBinding was set up for the command {command} ({keyEvent}) but that command is not supported by Application."
-                                                        );
-                    }
-
-                    if (CommandImplementations.TryGetValue (command, out Func<CommandContext, bool?>? implementation))
-                    {
-                        var context = new CommandContext (command, keyEvent, appBinding); // Create the context here
-                        toReturn = implementation (context);
-                    }
-
-                    // if ever see a true then that's what we will return
-                    if (toReturn ?? false)
-                    {
-                        toReturn = true;
-                    }
+                    toReturn = InvokeCommand (command, keyEvent, appBinding);
                 }
 
                 return toReturn ?? true;
             }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// INTENRAL method to invoke one of the commands in <see cref="CommandImplementations"/>
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="keyEvent"></param>
+    /// <param name="appBinding"></param>
+    /// <returns></returns>
+    /// <exception cref="NotSupportedException"></exception>
+    private static bool? InvokeCommand (Command command, Key keyEvent, KeyBinding appBinding)
+    {
+        if (!CommandImplementations!.ContainsKey (command))
+        {
+            throw new NotSupportedException (
+                                             @$"A KeyBinding was set up for the command {command} ({keyEvent}) but that command is not supported by Application."
+                                            );
+        }
+
+        if (CommandImplementations.TryGetValue (command, out Func<CommandContext, bool?>? implementation))
+        {
+            var context = new CommandContext (command, keyEvent, appBinding); // Create the context here
+            return implementation (context);
         }
 
         return false;
@@ -364,13 +373,6 @@ public static partial class Application // Keyboard handling
         {
             KeyBindings.Add (Key.Z.WithCtrl, KeyBindingScope.Application, Command.Suspend);
         }
-
-#if UNIX_KEY_BINDINGS
-        KeyBindings.Add (Key.L.WithCtrl, Command.Refresh); // Unix
-        KeyBindings.Add (Key.F.WithCtrl, Command.NextView); // Unix
-        KeyBindings.Add (Key.I.WithCtrl, Command.NextView); // Unix
-        KeyBindings.Add (Key.B.WithCtrl, Command.PreviousView); // Unix
-#endif
     }
 
     /// <summary>
