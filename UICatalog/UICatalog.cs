@@ -13,6 +13,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json.Serialization;
 using Terminal.Gui;
+using UICatalog.Scenarios;
 using static Terminal.Gui.ConfigurationManager;
 using Command = Terminal.Gui.Command;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
@@ -337,6 +338,14 @@ public class UICatalogApp
             Apply ();
             scenario.Theme = _cachedTheme;
             scenario.TopLevelColorScheme = _topLevelColorScheme;
+
+#if DEBUG_IDISPOSABLE
+            // Measure how long it takes for the app to shut down
+            var sw = new Stopwatch ();
+            string scenarioName = scenario.GetName ();
+            Application.InitializedChanged += ApplicationOnInitializedChanged;
+#endif
+
             scenario.Main ();
             scenario.Dispose ();
 
@@ -345,10 +354,31 @@ public class UICatalogApp
             // TODO: Throw if shutdown was not called already
             Application.Shutdown ();
             VerifyObjectsWereDisposed ();
+
+#if DEBUG_IDISPOSABLE
+            Application.InitializedChanged -= ApplicationOnInitializedChanged;
+
+            void ApplicationOnInitializedChanged (object? sender, EventArgs<bool> e)
+            {
+                if (e.CurrentValue)
+                {
+                    sw.Start ();
+                }
+                else
+                {
+                    sw.Stop ();
+                    Debug.WriteLine ($"Shutdown of {scenarioName} Scenario took {sw.ElapsedMilliseconds}ms");
+                }
+            }
+#endif
         }
 
         StopConfigFileWatcher ();
         VerifyObjectsWereDisposed ();
+
+        return;
+
+
     }
 
     private static void VerifyObjectsWereDisposed ()

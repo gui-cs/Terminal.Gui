@@ -198,10 +198,16 @@ public static partial class Application // Initialization (Init/Shutdown)
     public static void Shutdown ()
     {
         // TODO: Throw an exception if Init hasn't been called.
+
+        bool wasInitialized = IsInitialized;
         ResetState ();
         PrintJsonErrors ();
-        bool init = IsInitialized;
-        InitializedChanged?.Invoke (null, new (in init));
+
+        if (wasInitialized)
+        {
+            bool init = IsInitialized;
+            InitializedChanged?.Invoke (null, new (in init));
+        }
     }
 
     /// <summary>
