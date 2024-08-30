@@ -28,7 +28,7 @@ public class Bars : Scenario
     // QuitKey and it only sticks if changed after init
     private void App_Loaded (object sender, EventArgs e)
     {
-        Application.Top.Title = GetQuitKeyAndName ();
+        Application.Top!.Title = GetQuitKeyAndName ();
 
         ObservableCollection<string> eventSource = new ();
         ListView eventLog = new ListView ()
@@ -137,6 +137,67 @@ public class Bars : Scenario
         ConfigureMenu (bar);
 
         menuLikeExamples.Add (bar);
+
+        label = new Label ()
+        {
+            Title = "Popup Menu (Right click to show):",
+            X = Pos.Right (bar) + 1,
+            Y = Pos.Top (label),
+        };
+        menuLikeExamples.Add (label);
+
+        Menuv2 popupMenu  = new Menuv2
+        {
+            Id = "popupMenu",
+            X = Pos.Left (label),
+            Y = Pos.Bottom (label),
+        };
+        ConfigureMenu (popupMenu);
+
+        popupMenu.Arrangement = ViewArrangement.Overlapped;
+        popupMenu.Visible = false;
+        popupMenu.Enabled = false;
+
+        popupMenu.Add (
+                       new Shortcut
+                       {
+                           Title = "Toggle Hide",
+                           Text = "App",
+                           KeyBindingScope = KeyBindingScope.Application,
+                           Key = Key.F4.WithCtrl,
+                           Action = () =>
+                                    {
+                                        // TODO: move this logic into `View.ShowHide()` or similar
+                                        popupMenu.Visible = !popupMenu.Visible;
+                                        popupMenu.Enabled = popupMenu.Visible;
+
+                                        if (popupMenu.Visible)
+                                        {
+                                            popupMenu.SetFocus ();
+                                        }
+                                    }
+                       });
+
+        menuLikeExamples.Add (popupMenu);
+
+        menuLikeExamples.MouseClick += MenuLikeExamples_MouseClick;
+
+        void MenuLikeExamples_MouseClick (object sender, MouseEventEventArgs e)
+        {
+            if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
+            {
+                popupMenu.X = e.MouseEvent.Position.X;
+                popupMenu.Y = e.MouseEvent.Position.Y;
+                popupMenu.Visible = true;
+                popupMenu.Enabled = popupMenu.Visible;
+                popupMenu.SetFocus ();
+            }
+            else
+            {
+                popupMenu.Visible = false;
+                popupMenu.Enabled = popupMenu.Visible;
+            }
+        }
 
         FrameView statusBarLikeExamples = new ()
         {
