@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace Terminal.Gui;
+﻿namespace Terminal.Gui;
 
 public partial class View // Drawing APIs
 {
@@ -56,7 +54,7 @@ public partial class View // Drawing APIs
     public bool SubViewNeedsDisplay { get; private set; }
 
     /// <summary>
-    ///     Gets or sets whether this View will use it's SuperView's <see cref="LineCanvas"/> for rendering any 
+    ///     Gets or sets whether this View will use it's SuperView's <see cref="LineCanvas"/> for rendering any
     ///     lines. If <see langword="true"/> the rendering of any borders drawn by this Frame will be done by its parent's
     ///     SuperView. If <see langword="false"/> (the default) this View's <see cref="OnDrawAdornments"/> method will be
     ///     called to render the borders.
@@ -86,7 +84,8 @@ public partial class View // Drawing APIs
     ///     <para>
     ///         If <see cref="ViewportSettings"/> has <see cref="Gui.ViewportSettings.ClearContentOnly"/> only
     ///         the portion of the content
-    ///         area that is visible within the <see cref="View.Viewport"/> will be cleared. This is useful for views that have a
+    ///         area that is visible within the <see cref="View.Viewport"/> will be cleared. This is useful for views that have
+    ///         a
     ///         content area larger than the Viewport (e.g. when <see cref="ViewportSettings.AllowNegativeLocation"/> is
     ///         enabled) and want
     ///         the area outside the content to be visually distinct.
@@ -143,15 +142,15 @@ public partial class View // Drawing APIs
 
     /// <summary>Sets the <see cref="ConsoleDriver"/>'s clip region to <see cref="Viewport"/>.</summary>
     /// <remarks>
-    /// <para>
-    ///     By default, the clip rectangle is set to the intersection of the current clip region and the
-    ///     <see cref="Viewport"/>. This ensures that drawing is constrained to the viewport, but allows
-    ///     content to be drawn beyond the viewport.
-    /// </para>
-    /// <para>
-    ///     If <see cref="ViewportSettings"/> has <see cref="Gui.ViewportSettings.ClipContentOnly"/> set, clipping will be
-    ///     applied to just the visible content area.
-    /// </para>
+    ///     <para>
+    ///         By default, the clip rectangle is set to the intersection of the current clip region and the
+    ///         <see cref="Viewport"/>. This ensures that drawing is constrained to the viewport, but allows
+    ///         content to be drawn beyond the viewport.
+    ///     </para>
+    ///     <para>
+    ///         If <see cref="ViewportSettings"/> has <see cref="Gui.ViewportSettings.ClipContentOnly"/> set, clipping will be
+    ///         applied to just the visible content area.
+    ///     </para>
     /// </remarks>
     /// <returns>
     ///     The current screen-relative clip region, which can be then re-applied by setting
@@ -336,6 +335,7 @@ public partial class View // Drawing APIs
     public virtual Attribute GetFocusColor ()
     {
         ColorScheme cs = ColorScheme;
+
         if (cs is null)
         {
             cs = new ();
@@ -403,7 +403,7 @@ public partial class View // Drawing APIs
             return false;
         }
 
-        var screen = ViewportToScreen (new Point (col, row));
+        Point screen = ViewportToScreen (new Point (col, row));
         Driver?.Move (screen.X, screen.Y);
 
         return true;
@@ -442,12 +442,14 @@ public partial class View // Drawing APIs
     ///     </para>
     ///     <para>
     ///         The <see cref="Viewport"/> Location and Size indicate what part of the View's content, defined
-    ///         by <see cref="GetContentSize ()"/>, is visible and should be drawn. The coordinates taken by <see cref="Move"/> and
+    ///         by <see cref="GetContentSize ()"/>, is visible and should be drawn. The coordinates taken by <see cref="Move"/>
+    ///         and
     ///         <see cref="AddRune"/> are relative to <see cref="Viewport"/>, thus if <c>ViewPort.Location.Y</c> is <c>5</c>
     ///         the 6th row of the content should be drawn using <c>MoveTo (x, 5)</c>.
     ///     </para>
     ///     <para>
-    ///         If <see cref="GetContentSize ()"/> is larger than <c>ViewPort.Size</c> drawing code should use <see cref="Viewport"/>
+    ///         If <see cref="GetContentSize ()"/> is larger than <c>ViewPort.Size</c> drawing code should use
+    ///         <see cref="Viewport"/>
     ///         to constrain drawing for better performance.
     ///     </para>
     ///     <para>
@@ -503,24 +505,13 @@ public partial class View // Drawing APIs
         // TODO: Implement OnDrawSubviews (cancelable);
         if (_subviews is { } && SubViewNeedsDisplay)
         {
-            IEnumerable<View> subviewsNeedingDraw;
-            if (TabStop == TabBehavior.TabGroup && _subviews.Count(v => v.Arrangement.HasFlag (ViewArrangement.Overlapped)) > 0)
-            {
-                // TODO: This is a temporary hack to make overlapped non-Toplevels have a zorder. See also View.SetFocus
-                subviewsNeedingDraw = _subviews.Where (
-                                                       view => view.Visible
-                                                               && (view.NeedsDisplay || view.SubViewNeedsDisplay || view.LayoutNeeded)
-                                                      ).Reverse ();
+            IEnumerable<View> subviewsNeedingDraw = _subviews.Where (
+                                                                     view => view.Visible
+                                                                             && (view.NeedsDisplay
+                                                                                 || view.SubViewNeedsDisplay
+                                                                                 || view.LayoutNeeded)
+                                                                    );
 
-            }
-            else
-            {
-                subviewsNeedingDraw = _subviews.Where (
-                                                                         view => view.Visible
-                                                                                 && (view.NeedsDisplay || view.SubViewNeedsDisplay || view.LayoutNeeded)
-                                                                        );
-
-            }
             foreach (View view in subviewsNeedingDraw)
             {
                 if (view.LayoutNeeded)
@@ -608,10 +599,7 @@ public partial class View // Drawing APIs
     ///     If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), this method
     ///     does nothing.
     /// </remarks>
-    public void SetNeedsDisplay ()
-    {
-        SetNeedsDisplay (Viewport);
-    }
+    public void SetNeedsDisplay () { SetNeedsDisplay (Viewport); }
 
     /// <summary>Expands the area of this view needing to be redrawn to include <paramref name="region"/>.</summary>
     /// <remarks>
@@ -671,8 +659,6 @@ public partial class View // Drawing APIs
         if (SuperView is { SubViewNeedsDisplay: false })
         {
             SuperView.SetSubViewNeedsDisplay ();
-
-            return;
         }
     }
 
