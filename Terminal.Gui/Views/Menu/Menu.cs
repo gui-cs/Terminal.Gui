@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -11,7 +13,7 @@ internal sealed class Menu : View
     internal int _currentChild;
     internal View _previousSubFocused;
 
-    internal static Rectangle MakeFrame (int x, int y, MenuItem [] items, Menu parent = null)
+    internal static Rectangle MakeFrame (int x, int y, MenuItem [] items, Menu? parent = null)
     {
         if (items is null || items.Length == 0)
         {
@@ -67,6 +69,25 @@ internal sealed class Menu : View
         base.BeginInit ();
 
         Frame = MakeFrame (Frame.X, Frame.Y, _barItems?.Children, Parent);
+
+        if (_barItems?.Children is { })
+        {
+            foreach (MenuItem menuItem in _barItems!.Children)
+            {
+                if (menuItem is { })
+                {
+                    menuItem._menuBar = Host;
+
+                    if (menuItem.ShortcutKey != Key.Empty)
+                    {
+                        KeyBinding keyBinding = new ([Command.Select], KeyBindingScope.HotKey, menuItem);
+                        // Remove an existent ShortcutKey
+                        menuItem._menuBar?.KeyBindings.Remove (menuItem.ShortcutKey);
+                        menuItem._menuBar?.KeyBindings.Add (menuItem.ShortcutKey, keyBinding);
+                    }
+                }
+            }
+        }
 
         if (_barItems is { IsTopLevel: true })
         {
@@ -166,9 +187,9 @@ internal sealed class Menu : View
                         return true;
                     }
                    );
-        AddCommand (Command.Select, ctx => _host?.SelectItem (ctx.KeyBinding?.Context as MenuItem));
-        AddCommand (Command.ToggleExpandCollapse, ctx => ExpandCollapse (ctx.KeyBinding?.Context as MenuItem));
-        AddCommand (Command.HotKey, ctx => _host?.SelectItem (ctx.KeyBinding?.Context as MenuItem));
+        AddCommand (Command.Select, ctx => _host?.SelectItem ((ctx.KeyBinding?.Context as MenuItem)!));
+        AddCommand (Command.ToggleExpandCollapse, ctx => ExpandCollapse ((ctx.KeyBinding?.Context as MenuItem)!));
+        AddCommand (Command.HotKey, ctx => _host?.SelectItem ((ctx.KeyBinding?.Context as MenuItem)!));
 
         // Default key bindings for this view
         KeyBindings.Add (Key.CursorUp, Command.LineUp);
@@ -179,7 +200,7 @@ internal sealed class Menu : View
         KeyBindings.Add (Key.Enter, Command.Accept);
     }
 
-    private void AddKeyBindingsHotKey (MenuBarItem menuBarItem)
+    private void AddKeyBindingsHotKey (MenuBarItem? menuBarItem)
     {
         if (menuBarItem is null || menuBarItem.Children is null)
         {
@@ -200,7 +221,7 @@ internal sealed class Menu : View
         }
     }
 
-    private void RemoveKeyBindingsHotKey (MenuBarItem menuBarItem)
+    private void RemoveKeyBindingsHotKey (MenuBarItem? menuBarItem)
     {
         if (menuBarItem is null || menuBarItem.Children is null)
         {
@@ -219,7 +240,7 @@ internal sealed class Menu : View
 
     /// <summary>Called when a key bound to Command.ToggleExpandCollapse is pressed. This means a hot key was pressed.</summary>
     /// <returns></returns>
-    private bool ExpandCollapse (MenuItem menuItem)
+    private bool ExpandCollapse (MenuItem? menuItem)
     {
         if (!IsInitialized || !Visible)
         {
@@ -243,7 +264,7 @@ internal sealed class Menu : View
 
             if (m?.Children?.Length > 0)
             {
-                MenuItem item = _barItems.Children [_currentChild];
+                MenuItem? item = _barItems.Children [_currentChild];
 
                 if (item is null)
                 {
@@ -297,7 +318,7 @@ internal sealed class Menu : View
         return _host.OnInvokingKeyBindings (keyEvent, scope);
     }
 
-    private void Current_TerminalResized (object sender, SizeChangedEventArgs e)
+    private void Current_TerminalResized (object? sender, SizeChangedEventArgs e)
     {
         if (_host.IsMenuOpen)
         {
@@ -320,7 +341,7 @@ internal sealed class Menu : View
         }
     }
 
-    private void Application_RootMouseEvent (object sender, MouseEvent a)
+    private void Application_RootMouseEvent (object? sender, MouseEvent a)
     {
         if (a.View is { } and (MenuBar or not Menu))
         {
@@ -350,7 +371,7 @@ internal sealed class Menu : View
         }
     }
 
-    internal Attribute DetermineColorSchemeFor (MenuItem item, int index)
+    internal Attribute DetermineColorSchemeFor (MenuItem? item, int index)
     {
         if (item is null)
         {
@@ -456,7 +477,7 @@ internal sealed class Menu : View
                 continue;
             }
 
-            string textToDraw = null;
+            string? textToDraw = null;
             Rune nullCheckedChar = Glyphs.CheckStateNone;
             Rune checkChar = Glyphs.Selected;
             Rune uncheckedChar = Glyphs.UnSelected;
@@ -468,7 +489,7 @@ internal sealed class Menu : View
             }
 
             // Support Checked even though CheckType wasn't set
-            if (item.CheckType == MenuItemCheckStyle.Checked && item.Checked is null)
+            if (item is { CheckType: MenuItemCheckStyle.Checked, Checked: null })
             {
                 textToDraw = $"{nullCheckedChar} {item.Title}";
             }
@@ -548,7 +569,7 @@ internal sealed class Menu : View
         // PositionCursor ();
     }
 
-    private void Current_DrawContentComplete (object sender, DrawEventArgs e)
+    private void Current_DrawContentComplete (object? sender, DrawEventArgs e)
     {
         if (Visible)
         {
@@ -573,9 +594,9 @@ internal sealed class Menu : View
         return _host?.PositionCursor ();
     }
 
-    public void Run (Action action)
+    public void Run (Action? action)
     {
-        if (action is null || _host is null)
+        if (action is null)
         {
             return;
         }
@@ -900,7 +921,7 @@ internal sealed class Menu : View
 
             if (pos == -1
                 && this != _host.OpenCurrentMenu
-                && subMenu.Children != _host.OpenCurrentMenu._barItems.Children
+                && subMenu.Children != _host.OpenCurrentMenu!._barItems.Children
                 && !_host.CloseMenu (false, true))
             {
                 return false;

@@ -1207,19 +1207,19 @@ public class FileDialog : Dialog
 
         var contextMenu = new ContextMenu
         {
-            Position = new Point (e.MouseEvent.Position.X + 1, e.MouseEvent.Position.Y + 1),
-            MenuItems = new MenuBarItem (
+            Position = new Point (e.MouseEvent.Position.X + 1, e.MouseEvent.Position.Y + 1)
+        };
+
+        var menuItems = new MenuBarItem (
                                          [
                                              new MenuItem (Strings.fdCtxNew, string.Empty, New),
                                              new MenuItem (Strings.fdCtxRename, string.Empty, Rename),
                                              new MenuItem (Strings.fdCtxDelete, string.Empty, Delete)
                                          ]
-                                        )
-        };
-
+                                        );
         _tableView.SetSelection (clickedCell.Value.X, clickedCell.Value.Y, false);
 
-        contextMenu.Show ();
+        contextMenu.Show (menuItems);
     }
 
     private void ShowHeaderContextMenu (int clickedCol, MouseEventEventArgs e)
@@ -1228,8 +1228,10 @@ public class FileDialog : Dialog
 
         var contextMenu = new ContextMenu
         {
-            Position = new Point (e.MouseEvent.Position.X + 1, e.MouseEvent.Position.Y + 1),
-            MenuItems = new MenuBarItem (
+            Position = new Point (e.MouseEvent.Position.X + 1, e.MouseEvent.Position.Y + 1)
+        };
+
+        var menuItems = new MenuBarItem (
                                          [
                                              new MenuItem (
                                                            string.Format (
@@ -1244,10 +1246,8 @@ public class FileDialog : Dialog
                                                            string.Empty,
                                                            () => SortColumn (clickedCol, isAsc))
                                          ]
-                                        )
-        };
-
-        contextMenu.Show ();
+                                        );
+        contextMenu.Show (menuItems);
     }
 
     private void SortColumn (int clickedCol)

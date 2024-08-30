@@ -415,21 +415,20 @@ public class TreeViewFileSystem : Scenario
 
     private void ShowContextMenu (Point screenPoint, IFileSystemInfo forObject)
     {
-        var menu = new ContextMenu ();
-        menu.Position = screenPoint;
+        var menu = new ContextMenu { Position = screenPoint };
 
-        menu.MenuItems = new MenuBarItem (
-                                          new [] { new MenuItem ("Properties", null, () => ShowPropertiesOf (forObject)) }
-                                         );
+        var menuItems = new MenuBarItem (
+                                         new [] { new MenuItem ("Properties", null, () => ShowPropertiesOf (forObject)) }
+                                        );
 
-        Application.Invoke (menu.Show);
+        Application.Invoke (() => menu.Show (menuItems));
     }
 
     private void ShowLines ()
     {
         _miShowLines.Checked = !_miShowLines.Checked;
 
-        _treeViewFiles.Style.ShowBranchLines = (bool)_miShowLines.Checked;
+        _treeViewFiles.Style.ShowBranchLines = (bool)_miShowLines.Checked!;
         _treeViewFiles.SetNeedsDisplay ();
     }
 

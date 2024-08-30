@@ -2498,7 +2498,7 @@ public class TextView : View
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
 
-        ContextMenu = new () { MenuItems = BuildContextMenuBarItem () };
+        ContextMenu = new ();
         ContextMenu.KeyChanged += ContextMenu_KeyChanged!;
 
         KeyBindings.Add ((KeyCode)ContextMenu.Key, KeyBindingScope.HotKey, Command.ShowContextMenu);
@@ -3494,7 +3494,7 @@ public class TextView : View
         }
         else if (ev.Flags == ContextMenu!.MouseFlags)
         {
-            ContextMenu.Position = new (ev.Position.X + 2, ev.Position.Y + 2);
+            ContextMenu.Position = ViewportToScreen ((Viewport with { X = ev.Position.X, Y = ev.Position.Y }).Location);
             ShowContextMenu ();
         }
 
@@ -4131,7 +4131,7 @@ public class TextView : View
 
     private void AppendClipboard (string text) { Clipboard.Contents += text; }
 
-    private MenuBarItem BuildContextMenuBarItem ()
+    private MenuBarItem? BuildContextMenuBarItem ()
     {
         return new (
                     new MenuItem []
@@ -6289,14 +6289,12 @@ public class TextView : View
 
     private void ShowContextMenu ()
     {
-        if (_currentCulture != Thread.CurrentThread.CurrentUICulture)
+        if (!Equals (_currentCulture, Thread.CurrentThread.CurrentUICulture))
         {
             _currentCulture = Thread.CurrentThread.CurrentUICulture;
-
-            ContextMenu!.MenuItems = BuildContextMenuBarItem ();
         }
 
-        ContextMenu!.Show ();
+        ContextMenu!.Show (BuildContextMenuBarItem ());
     }
 
     private void StartSelecting ()

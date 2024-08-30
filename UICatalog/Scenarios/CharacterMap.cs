@@ -902,31 +902,32 @@ internal class CharMap : View
 
             _contextMenu = new ()
             {
-                Position = new (me.Position.X + 1, me.Position.Y + 1),
-                MenuItems = new (
-                                 new MenuItem []
-                                 {
-                                     new (
-                                          "_Copy Glyph",
-                                          "",
-                                          CopyGlyph,
-                                          null,
-                                          null,
-                                          (KeyCode)Key.C.WithCtrl
-                                         ),
-                                     new (
-                                          "Copy Code _Point",
-                                          "",
-                                          CopyCodePoint,
-                                          null,
-                                          null,
-                                          (KeyCode)Key.C.WithCtrl
-                                                      .WithShift
-                                         )
-                                 }
-                                )
+                Position = new (me.Position.X + 1, me.Position.Y + 1)
             };
-            _contextMenu.Show ();
+
+            MenuBarItem menuItems = new (
+                                         new MenuItem []
+                                         {
+                                             new (
+                                                  "_Copy Glyph",
+                                                  "",
+                                                  CopyGlyph,
+                                                  null,
+                                                  null,
+                                                  (KeyCode)Key.C.WithCtrl
+                                                 ),
+                                             new (
+                                                  "Copy Code _Point",
+                                                  "",
+                                                  CopyCodePoint,
+                                                  null,
+                                                  null,
+                                                  (KeyCode)Key.C.WithCtrl
+                                                              .WithShift
+                                                 )
+                                         }
+                                        );
+            _contextMenu.Show (menuItems);
         }
     }
 
