@@ -26,7 +26,7 @@ public class Wizards : Scenario
         };
         win.Add (frame);
 
-        var label = new Label { X = 0, Y = 0, TextAlignment = Alignment.End, Text = "Width:" };
+        var label = new Label { X = 0, Y = 0, TextAlignment = Alignment.End, Text = "_Width:", Width = 10 };
         frame.Add (label);
 
         var widthEdit = new TextField
@@ -47,7 +47,7 @@ public class Wizards : Scenario
             Width = Dim.Width (label),
             Height = 1,
             TextAlignment = Alignment.End,
-            Text = "Height:"
+            Text = "_Height:"
         };
         frame.Add (label);
 
@@ -69,7 +69,7 @@ public class Wizards : Scenario
             Width = Dim.Width (label),
             Height = 1,
             TextAlignment = Alignment.End,
-            Text = "Title:"
+            Text = "_Title:"
         };
         frame.Add (label);
 
@@ -105,7 +105,7 @@ public class Wizards : Scenario
 
         var showWizardButton = new Button
         {
-            X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "Show Wizard"
+            X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "_Show Wizard"
         };
 
         showWizardButton.Accept += (s, e) =>
@@ -165,19 +165,11 @@ public class Wizards : Scenario
 
                                            RadioGroup radioGroup = new ()
                                            {
-                                               RadioLabels = ["_One", "_Two", "3"]
+                                               RadioLabels = ["_One", "_Two", "_3"]
                                            };
                                            firstStep.Add (radioGroup);
 
                                            wizard.AddStep (firstStep);
-                                           // TODO: Wizard.GoToStep sets focus on the next/back buttons, then raises StepChanged. Would it better if it didn't set focus?
-                                           wizard.StepChanged += (s, args) =>
-                                                                 {
-                                                                     if (args.NewStep == firstStep)
-                                                                     {
-                                                                         radioGroup.SetFocus ();
-                                                                     }
-                                                                 };
 
                                            // Add 2nd step
                                            var secondStep = new WizardStep { Title = "Second Step" };
@@ -192,6 +184,13 @@ public class Wizards : Scenario
                                            {
                                                Text = "Press Me to Rename Step", X = Pos.Right (buttonLbl), Y = Pos.Top (buttonLbl)
                                            };
+
+                                           RadioGroup radioGroup2 = new ()
+                                           {
+                                               RadioLabels = ["_A", "_B", "_C"],
+                                               Orientation = Orientation.Horizontal
+                                           };
+                                           secondStep.Add (radioGroup2);
 
                                            button.Accept += (s, e) =>
                                                             {
@@ -302,7 +301,7 @@ public class Wizards : Scenario
                                                                      }
                                                                  };
                                            fourthStep.Add (hideHelpBtn);
-                                           fourthStep.NextButtonText = "Go To Last Step";
+                                           fourthStep.NextButtonText = "_Go To Last Step";
                                            var scrollBar = new ScrollBarView (someText, true);
 
                                            scrollBar.ChangedPosition += (s, e) =>

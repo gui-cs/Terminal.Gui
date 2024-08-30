@@ -44,7 +44,7 @@ public class WizardStep : View
     /// </summary>
     public WizardStep ()
     {
-        TabStop = TabBehavior.TabStop;
+        TabStop = TabBehavior.TabGroup;
         CanFocus = true;
         BorderStyle = LineStyle.None;
         base.Add (_contentView);
