@@ -147,6 +147,7 @@ public abstract class CollectionNavigatorBase
     public virtual void OnSearchStringChanged (KeystrokeNavigatorEventArgs e) { SearchStringChanged?.Invoke (this, e); }
 
     /// <summary>This event is invoked when <see cref="SearchString"/>  changes. Useful for debugging.</summary>
+    [CanBeNull]
     public event EventHandler<KeystrokeNavigatorEventArgs> SearchStringChanged;
 
     /// <summary>Returns the collection being navigated element at <paramref name="idx"/>.</summary>

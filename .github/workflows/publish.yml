@@ -44,6 +44,7 @@ jobs:
       run: |
         dotnet-gitversion /updateprojectfiles
         dotnet build --no-incremental --nologo --force --configuration Release
+        dotnet test --configuration Release
 
     - name: Pack
       run: dotnet pack -c Release --include-symbols -p:Version='${{ steps.gitversion.outputs.SemVer }}' 

@@ -1,3 +1,4 @@
+#nullable enable
 namespace Terminal.Gui;
 
 /// <summary>
@@ -43,7 +44,7 @@ public class Bar : View, IOrientation, IDesignable
         }
     }
 
-    private void Bar_Initialized (object sender, EventArgs e) { ColorScheme = Colors.ColorSchemes ["Menu"]; }
+    private void Bar_Initialized (object? sender, EventArgs e) { ColorScheme = Colors.ColorSchemes ["Menu"]; }
 
     /// <inheritdoc/>
     public override void SetBorderStyle (LineStyle value)
@@ -72,10 +73,10 @@ public class Bar : View, IOrientation, IDesignable
     }
 
     /// <inheritdoc/>
-    public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
+    public event EventHandler<CancelEventArgs<Orientation>>? OrientationChanging;
 
     /// <inheritdoc/>
-    public event EventHandler<EventArgs<Orientation>> OrientationChanged;
+    public event EventHandler<EventArgs<Orientation>>? OrientationChanged;
 
     /// <summary>Called when <see cref="Orientation"/> has changed.</summary>
     /// <param name="newOrientation"></param>
@@ -132,9 +133,9 @@ public class Bar : View, IOrientation, IDesignable
     /// <summary>Removes a <see cref="Shortcut"/> at specified index of <see cref="View.Subviews"/>.</summary>
     /// <param name="index">The zero-based index of the item to remove.</param>
     /// <returns>The <see cref="Shortcut"/> removed.</returns>
-    public Shortcut RemoveShortcut (int index)
+    public Shortcut? RemoveShortcut (int index)
     {
-        View toRemove = null;
+        View? toRemove = null;
 
         for (var i = 0; i < Subviews.Count; i++)
         {
@@ -158,7 +159,7 @@ public class Bar : View, IOrientation, IDesignable
     {
         base.OnLayoutStarted (args);
 
-        View prevBarItem = null;
+        View? prevBarItem = null;
 
         switch (Orientation)
         {

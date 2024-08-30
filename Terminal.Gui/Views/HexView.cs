@@ -760,6 +760,10 @@ public class HexView : View
 
     private void RedisplayLine (long pos)
     {
+        if (bytesPerLine == 0)
+        {
+            return;
+        }
         var delta = (int)(pos - DisplayStart);
         int line = delta / bytesPerLine;
 

@@ -10,7 +10,7 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Dynamic StatusBar", "Demonstrates how to add and remove a StatusBar and change items dynamically.")]
-[ScenarioCategory ("Top Level Windows")]
+[ScenarioCategory ("Overlapped")]
 public class DynamicStatusBar : Scenario
 {
     public override void Main ()
@@ -440,7 +440,7 @@ public class DynamicStatusBar : Scenario
                                       }
                                   };
 
-            _lstItems.Enter += (s, e) =>
+            _lstItems.HasFocusChanging += (s, e) =>
                                {
                                    Shortcut statusItem = DataContext.Items.Count > 0
                                                                ? DataContext.Items [_lstItems.SelectedItem].Shortcut

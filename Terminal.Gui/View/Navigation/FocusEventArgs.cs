@@ -1,27 +1,23 @@
 ﻿namespace Terminal.Gui;
 
-/// <summary>Defines the event arguments for <see cref="View.SetFocus()"/></summary>
-public class FocusEventArgs : EventArgs
+/// <summary>The event arguments for <see cref="View.HasFocus"/> events.</summary>
+public class HasFocusEventArgs : CancelEventArgs<bool>
 {
-    /// <summary>Constructs.</summary>
-    /// <param name="leaving">The view that is losing focus.</param>
-    /// <param name="entering">The view that is gaining focus.</param>
-    public FocusEventArgs (View leaving, View entering) {
-        Leaving = leaving;
-        Entering = entering;
+    /// <summary>Initializes a new instance.</summary>
+    /// <param name="currentHasFocus">The current value of <see cref="View.HasFocus"/>.</param>
+    /// <param name="newHasFocus">The value <see cref="View.HasFocus"/> will have if the event is not cancelled.</param>
+    /// <param name="currentFocused">The view that is losing focus.</param>
+    /// <param name="newFocused">The view that is gaining focus.</param>
+    public HasFocusEventArgs (bool currentHasFocus, bool newHasFocus, View currentFocused, View newFocused) : base (ref currentHasFocus, ref newHasFocus)
+    {
+        CurrentFocused = currentFocused;
+        NewFocused = newFocused;
     }
 
-    /// <summary>
-    ///     Indicates if the current focus event has already been processed and the driver should stop notifying any other
-    ///     event subscriber. It's important to set this value to true specially when updating any View's layout from inside the
-    ///     subscriber method.
-    /// </summary>
-    public bool Handled { get; set; }
+    /// <summary>Gets or sets the view that is losing focus.</summary>
+    public View CurrentFocused { get; set; }
 
-    /// <summary>Indicates the view that is losing focus.</summary>
-    public View Leaving { get; set; }
-
-    /// <summary>Indicates the view that is gaining focus.</summary>
-    public View Entering { get; set; }
+    /// <summary>Gets or sets the view that is gaining focus.</summary>
+    public View NewFocused { get; set; }
 
 }

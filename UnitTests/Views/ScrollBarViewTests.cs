@@ -294,7 +294,7 @@ public class ScrollBarViewTests
 
     [Fact]
     [AutoInitShutdown]
-    public void ClearOnVisibleFalse_Gets_Sets ()
+    public void Visible_Gets_Sets ()
     {
         var text =
             "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
@@ -302,7 +302,7 @@ public class ScrollBarViewTests
         var top = new Toplevel ();
         top.Add (label);
 
-        var sbv = new ScrollBarView (label, true, false) { Size = 100, ClearOnVisibleFalse = false };
+        var sbv = new ScrollBarView (label, true, false) { Size = 100 };
         Application.Begin (top);
 
         Assert.True (sbv.Visible);
@@ -351,18 +351,18 @@ This is a tes▼
                                                       _output
                                                      );
 
-        sbv.ClearOnVisibleFalse = true;
         sbv.Visible = false;
         Assert.False (sbv.Visible);
+        top.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
-This is a tes
-This is a tes
-This is a tes
-This is a tes
-This is a tes
-This is a tes
+This is a test
+This is a test
+This is a test
+This is a test
+This is a test
+This is a test
 ",
                                                       _output
                                                      );

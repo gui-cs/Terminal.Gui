@@ -5,8 +5,10 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Wizards", "Demonstrates the Wizard class")]
 [ScenarioCategory ("Dialogs")]
-[ScenarioCategory ("Top Level Windows")]
+[ScenarioCategory ("Overlapped")]
 [ScenarioCategory ("Wizards")]
+[ScenarioCategory ("Runnable")]
+
 public class Wizards : Scenario
 {
     public override void Main ()

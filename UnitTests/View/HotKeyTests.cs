@@ -108,7 +108,7 @@ public class HotKeyTests
     public void NewKeyDownEvent_Honors_HotKey_KeyBindings_SuperView ()
     {
         var view = new View ();
-        view.KeyBindings.Add (Key.A, KeyBindingScope.HotKey, Command.HotKey); 
+        view.KeyBindings.Add (Key.A, KeyBindingScope.HotKey, Command.HotKey);
         bool invoked = false;
         view.InvokingKeyBindings += (s, e) => { invoked = true; };
 
@@ -123,19 +123,35 @@ public class HotKeyTests
 
 
     [Fact]
-    public void NewKeyDownEvent_InNewKeyDownEventvokes_HotKey_Command_With_SuperView ()
+    public void NewKeyDownEvent_InNewKeyDownEvent_Invokes_HotKey_Command_With_SuperView ()
     {
-        var view = new View { HotKeySpecifier = (Rune)'^', Title = "^Test" };
+        var superView = new View ()
+        {
+            CanFocus = true
+        };
 
-        var superView = new View ();
-        superView.Add (view);
+        var view1 = new View
+        {
+            HotKeySpecifier = (Rune)'^',
+            Title = "view^1",
+            CanFocus = true
+        };
 
-        view.CanFocus = true;
-        Assert.False (view.HasFocus);
+        var view2 = new View
+        {
+            HotKeySpecifier = (Rune)'^',
+            Title = "view^2",
+            CanFocus = true
+        };
 
-        var ke = Key.T;
+        superView.Add (view1, view2);
+
+        superView.SetFocus ();
+        Assert.True (view1.HasFocus);
+
+        var ke = Key.D2;
         superView.NewKeyDownEvent (ke);
-        Assert.True (view.HasFocus);
+        Assert.True (view2.HasFocus);
     }
 
     [Fact]

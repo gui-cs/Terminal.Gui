@@ -35,7 +35,7 @@ public class ProgressBarStyles : Scenario
 
         var editor = new AdornmentsEditor ()
         {
-            AutoSelectViewToEdit = false
+            AutoSelectViewToEdit = true
         };
         app.Add (editor);
 

@@ -86,7 +86,7 @@ public class Adornment : View
     ///     Adornments cannot be used as sub-views (see <see cref="Parent"/>); setting this property will throw
     ///     <see cref="InvalidOperationException"/>.
     /// </summary>
-    public override View SuperView
+    public override View? SuperView
     {
         get => null!;
         set => throw new InvalidOperationException (@"Adornments can not be Subviews or have SuperViews. Use Parent instead.");

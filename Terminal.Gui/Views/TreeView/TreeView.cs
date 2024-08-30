@@ -34,6 +34,8 @@ public class TreeView : TreeView<ITreeNode>
     /// </summary>
     public TreeView ()
     {
+        CanFocus = true;
+
         TreeBuilder = new TreeNodeBuilder ();
         AspectGetter = o => o is null ? "Null" : o.Text ?? o?.ToString () ?? "Unnamed Node";
     }
@@ -975,6 +977,7 @@ public class TreeView<T> : View, ITreeView where T : class
     /// <returns></returns>
     public bool IsSelected (T model) { return Equals (SelectedObject, model) || (MultiSelect && multiSelectedRegions.Any (s => s.Contains (model))); }
 
+    // BUGBUG: OnMouseEvent is internal. TreeView should not be overriding.
     ///<inheritdoc/>
     protected internal override bool OnMouseEvent (MouseEvent me)
     {
@@ -1155,14 +1158,16 @@ public class TreeView<T> : View, ITreeView where T : class
     }
 
     ///<inheritdoc/>
-    public override bool OnEnter (View view)
+    protected override void OnHasFocusChanged (bool newHasFocus, [CanBeNull] View currentFocused, [CanBeNull] View newFocused)
     {
-        if (SelectedObject is null && Objects.Any ())
+        if (newHasFocus)
         {
-            SelectedObject = Objects.First ();
+            // If there is no selected object and there are objects in the tree, select the first one
+            if (SelectedObject is null && Objects.Any ())
+            {
+                SelectedObject = Objects.First ();
+            }
         }
-
-        return base.OnEnter (view);
     }
 
     /// <inheritdoc/>

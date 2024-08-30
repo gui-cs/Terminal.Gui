@@ -10,7 +10,8 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("BackgroundWorker Collection", "A persisting multi Toplevel BackgroundWorker threading")]
 [ScenarioCategory ("Threading")]
-[ScenarioCategory ("Top Level Windows")]
+[ScenarioCategory ("Overlapped")]
+[ScenarioCategory ("Runnable")]
 [ScenarioCategory ("Dialogs")]
 [ScenarioCategory ("Controls")]
 public class BackgroundWorkerCollection : Scenario
@@ -77,7 +78,7 @@ public class BackgroundWorkerCollection : Scenario
                                               () => Quit (),
                                               null,
                                               null,
-                                              (KeyCode)Application.QuitKey
+                                              Application.QuitKey
                                              )
                                      }
                                     ),
@@ -281,7 +282,7 @@ public class BackgroundWorkerCollection : Scenario
             _listView = new ListView { X = 0, Y = 2, Width = Dim.Fill (), Height = Dim.Fill (2), Enabled = false };
             Add (_listView);
 
-            _start = new Button { Text = "Start", IsDefault = true, ClearOnVisibleFalse = false };
+            _start = new Button { Text = "Start", IsDefault = true };
 
             _start.Accept += (s, e) =>
                               {
@@ -302,19 +303,28 @@ public class BackgroundWorkerCollection : Scenario
                            }
                        };
 
-            LayoutStarted += (s, e) =>
-                             {
-                                 int btnsWidth = _start.Frame.Width + _close.Frame.Width + 2 - 1;
-                                 int shiftLeft = Math.Max ((Viewport.Width - btnsWidth) / 2 - 2, 0);
+            LayoutStarted += StagingUIController_LayoutStarted;
+            Disposing += StagingUIController_Disposing;
+        }
 
-                                 shiftLeft += _close.Frame.Width + 1;
-                                 _close.X = Pos.AnchorEnd (shiftLeft);
-                                 _close.Y = Pos.AnchorEnd (1);
+        private void StagingUIController_Disposing (object sender, EventArgs e)
+        {
+            LayoutStarted -= StagingUIController_LayoutStarted;
+            Disposing -= StagingUIController_Disposing;
+        }
 
-                                 shiftLeft += _start.Frame.Width + 1;
-                                 _start.X = Pos.AnchorEnd (shiftLeft);
-                                 _start.Y = Pos.AnchorEnd (1);
-                             };
+        private void StagingUIController_LayoutStarted (object sender, LayoutEventArgs e)
+        {
+            int btnsWidth = _start.Frame.Width + _close.Frame.Width + 2 - 1;
+            int shiftLeft = Math.Max ((Viewport.Width - btnsWidth) / 2 - 2, 0);
+
+            shiftLeft += _close.Frame.Width + 1;
+            _close.X = Pos.AnchorEnd (shiftLeft);
+            _close.Y = Pos.AnchorEnd (1);
+
+            shiftLeft += _start.Frame.Width + 1;
+            _start.X = Pos.AnchorEnd (shiftLeft);
+            _start.Y = Pos.AnchorEnd (1);
         }
 
         public Staging Staging { get; private set; }
@@ -371,11 +381,12 @@ public class BackgroundWorkerCollection : Scenario
         {
             CancelWorker ();
         }
+
         private void WorkerApp_Closing (object sender, ToplevelClosingEventArgs e)
         {
             Toplevel top = ApplicationOverlapped.OverlappedChildren!.Find (x => x.Data.ToString () == "WorkerApp");
 
-            if (Visible && top == this)
+            if (e.RequestingTop == this && Visible && top == this)
             {
                 Visible = false;
                 e.Cancel = true;

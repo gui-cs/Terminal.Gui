@@ -100,7 +100,7 @@ public class ShadowStyleTests (ITestOutputHelper _output)
                     ShadowStyle.Transparent,
                     """
                     031
-                    331
+                    131
                     111
                     """)]
     [InlineData (

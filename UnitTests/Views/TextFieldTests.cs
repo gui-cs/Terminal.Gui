@@ -78,7 +78,7 @@ public class TextFieldTests (ITestOutputHelper output)
     public void Cancel_TextChanging_ThenBackspace ()
     {
         var tf = new TextField ();
-        tf.RestoreFocus ();
+        tf.SetFocus ();
         tf.NewKeyDownEvent (Key.A.WithShift);
         Assert.Equal ("A", tf.Text);
 
@@ -126,7 +126,6 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.False (fv.CanFocus);
         Assert.False (fv.HasFocus);
 
-        Assert.Throws<InvalidOperationException> (() => tf.CanFocus = true);
         fv.CanFocus = true;
         tf.CanFocus = true;
 
@@ -147,7 +146,7 @@ public class TextFieldTests (ITestOutputHelper output)
                          );
 
         Assert.Equal ("some ", tf.SelectedText); // Setting CanFocus to false don't change the SelectedText
-        Assert.False (tf.CanFocus);
+        Assert.True (tf.CanFocus); // v2: CanFocus is not longer automatically changed
         Assert.False (tf.HasFocus);
         Assert.False (fv.CanFocus);
         Assert.False (fv.HasFocus);
@@ -909,7 +908,7 @@ public class TextFieldTests (ITestOutputHelper output)
         var tf = new TextField { Width = 10 };
         top.Add (tf);
 
-        Exception exception = Record.Exception (tf.SetFocus);
+        Exception exception = Record.Exception (() => tf.SetFocus ());
         Assert.Null (exception);
     }
 
@@ -929,7 +928,7 @@ public class TextFieldTests (ITestOutputHelper output)
     public void Backspace_From_End ()
     {
         var tf = new TextField { Text = "ABC" };
-        tf.RestoreFocus ();
+        tf.SetFocus ();
         Assert.Equal ("ABC", tf.Text);
         tf.BeginInit ();
         tf.EndInit ();
@@ -956,7 +955,7 @@ public class TextFieldTests (ITestOutputHelper output)
     public void Backspace_From_Middle ()
     {
         var tf = new TextField { Text = "ABC" };
-        tf.RestoreFocus ();
+        tf.SetFocus ();
         tf.CursorPosition = 2;
         Assert.Equal ("ABC", tf.Text);
 
@@ -1983,5 +1982,69 @@ Les Miśerables",
                 Width = 32
             };
         }
+    }
+
+    [Fact]
+    public void Autocomplete_Popup_Added_To_SuperView_On_Init ()
+    {
+        View superView = new ()
+        {
+            CanFocus = true,
+        };
+
+        TextField t = new ();
+
+        superView.Add (t);
+        Assert.Single (superView.Subviews);
+
+        superView.BeginInit ();
+        superView.EndInit ();
+
+        Assert.Equal (2, superView.Subviews.Count);
+    }
+
+
+    [Fact]
+    public void Autocomplete__Added_To_SuperView_On_Add ()
+    {
+        View superView = new ()
+        {
+            CanFocus = true,
+            Id = "superView",
+        };
+
+        superView.BeginInit ();
+        superView.EndInit ();
+        Assert.Empty (superView.Subviews);
+
+        TextField t = new ()
+        {
+            Id = "t"
+        };
+
+        superView.Add (t);
+
+        Assert.Equal (2, superView.Subviews.Count);
+    }
+
+
+    [Fact]
+    public void Autocomplete_Visible_False_By_Default ()
+    {
+        View superView = new ()
+        {
+            CanFocus = true,
+        };
+
+        TextField t = new ();
+
+        superView.Add (t);
+        superView.BeginInit ();
+        superView.EndInit ();
+
+        Assert.Equal (2, superView.Subviews.Count);
+
+        Assert.True (t.Visible);
+        Assert.False (t.Autocomplete.Visible);
     }
 }

@@ -1,4 +1,5 @@
-﻿
+﻿#nullable enable
+
 namespace Terminal.Gui;
 using System;
 
@@ -18,7 +19,7 @@ public interface IOrientation
     /// <summary>
     ///     Raised when <see cref="Orientation"/> is changing. Can be cancelled.
     /// </summary>
-    public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
+    public event EventHandler<CancelEventArgs<Orientation>>? OrientationChanging;
 
     /// <summary>
     ///     Called when <see cref="Orientation"/> is changing.
@@ -31,7 +32,7 @@ public interface IOrientation
     /// <summary>
     ///     Raised when <see cref="Orientation"/> has changed.
     /// </summary>
-    public event EventHandler<EventArgs<Orientation>> OrientationChanged;
+    public event EventHandler<EventArgs<Orientation>>? OrientationChanged;
 
     /// <summary>
     ///     Called when <see cref="Orientation"/> has been changed.

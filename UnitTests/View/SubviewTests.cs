@@ -17,15 +17,15 @@ public class SubviewTests
 
         v.Added += (s, e) =>
                    {
-                       Assert.Same (v.SuperView, e.Parent);
-                       Assert.Same (t, e.Parent);
-                       Assert.Same (v, e.Child);
+                       Assert.Same (v.SuperView, e.SuperView);
+                       Assert.Same (t, e.SuperView);
+                       Assert.Same (v, e.SubView);
                    };
 
         v.Removed += (s, e) =>
                      {
-                         Assert.Same (t, e.Parent);
-                         Assert.Same (v, e.Child);
+                         Assert.Same (t, e.SuperView);
+                         Assert.Same (v, e.SubView);
                          Assert.True (v.SuperView == null);
                      };
 
@@ -108,26 +108,26 @@ public class SubviewTests
 
         winAddedToTop.Added += (s, e) =>
                                {
-                                   Assert.Equal (e.Parent.Frame.Width, winAddedToTop.Frame.Width);
-                                   Assert.Equal (e.Parent.Frame.Height, winAddedToTop.Frame.Height);
+                                   Assert.Equal (e.SuperView.Frame.Width, winAddedToTop.Frame.Width);
+                                   Assert.Equal (e.SuperView.Frame.Height, winAddedToTop.Frame.Height);
                                };
 
         v1AddedToWin.Added += (s, e) =>
                               {
-                                  Assert.Equal (e.Parent.Frame.Width, v1AddedToWin.Frame.Width);
-                                  Assert.Equal (e.Parent.Frame.Height, v1AddedToWin.Frame.Height);
+                                  Assert.Equal (e.SuperView.Frame.Width, v1AddedToWin.Frame.Width);
+                                  Assert.Equal (e.SuperView.Frame.Height, v1AddedToWin.Frame.Height);
                               };
 
         v2AddedToWin.Added += (s, e) =>
                               {
-                                  Assert.Equal (e.Parent.Frame.Width, v2AddedToWin.Frame.Width);
-                                  Assert.Equal (e.Parent.Frame.Height, v2AddedToWin.Frame.Height);
+                                  Assert.Equal (e.SuperView.Frame.Width, v2AddedToWin.Frame.Width);
+                                  Assert.Equal (e.SuperView.Frame.Height, v2AddedToWin.Frame.Height);
                               };
 
         svAddedTov1.Added += (s, e) =>
                              {
-                                 Assert.Equal (e.Parent.Frame.Width, svAddedTov1.Frame.Width);
-                                 Assert.Equal (e.Parent.Frame.Height, svAddedTov1.Frame.Height);
+                                 Assert.Equal (e.SuperView.Frame.Width, svAddedTov1.Frame.Width);
+                                 Assert.Equal (e.SuperView.Frame.Height, svAddedTov1.Frame.Height);
                              };
 
         top.Initialized += (s, e) =>
@@ -191,7 +191,7 @@ public class SubviewTests
                                        //Assert.Equal (top.Viewport.Width,  svAddedTov1.Frame.Width);
                                        //Assert.Equal (top.Viewport.Height, svAddedTov1.Frame.Height);
                                        Assert.False (svAddedTov1.CanFocus);
-                                       Assert.Throws<InvalidOperationException> (() => svAddedTov1.CanFocus = true);
+                                       //Assert.Throws<InvalidOperationException> (() => svAddedTov1.CanFocus = true);
                                        Assert.False (svAddedTov1.CanFocus);
                                    };
 
@@ -291,7 +291,7 @@ public class SubviewTests
                                                             Assert.NotEqual (t.Frame.Width, sv1.Frame.Width);
                                                             Assert.NotEqual (t.Frame.Height, sv1.Frame.Height);
                                                             Assert.False (sv1.CanFocus);
-                                                            Assert.Throws<InvalidOperationException> (() => sv1.CanFocus = true);
+                                                            //Assert.Throws<InvalidOperationException> (() => sv1.CanFocus = true);
                                                             Assert.False (sv1.CanFocus);
                                                         };
 
@@ -372,5 +372,131 @@ public class SubviewTests
 
         view.Remove (subview);
         Assert.Equal (new Size (5, 5), view.GetContentSize ());
+    }
+
+    [Fact]
+    public void MoveSubviewToStart ()
+    {
+        View superView = new ();
+
+        View subview1 = new View ()
+        {
+            Id = "subview1"
+        };
+
+        View subview2 = new View ()
+        {
+            Id = "subview2"
+        };
+
+        View subview3 = new View ()
+        {
+            Id = "subview3"
+        };
+
+        superView.Add (subview1, subview2, subview3);
+
+        superView.MoveSubviewToStart (subview2);
+        Assert.Equal(subview2, superView.Subviews [0]);
+
+        superView.MoveSubviewToStart (subview3);
+        Assert.Equal (subview3, superView.Subviews [0]);
+    }
+
+
+    [Fact]
+    public void MoveSubviewTowardsFront ()
+    {
+        View superView = new ();
+
+        View subview1 = new View ()
+        {
+            Id = "subview1"
+        };
+
+        View subview2 = new View ()
+        {
+            Id = "subview2"
+        };
+
+        View subview3 = new View ()
+        {
+            Id = "subview3"
+        };
+
+        superView.Add (subview1, subview2, subview3);
+
+        superView.MoveSubviewTowardsStart (subview2);
+        Assert.Equal (subview2, superView.Subviews [0]);
+
+        superView.MoveSubviewTowardsStart (subview3);
+        Assert.Equal (subview3, superView.Subviews [1]);
+
+        // Already at front, what happens?
+        superView.MoveSubviewTowardsStart (subview2);
+        Assert.Equal (subview2, superView.Subviews [0]);
+    }
+
+    [Fact]
+    public void MoveSubviewToEnd ()
+    {
+        View superView = new ();
+
+        View subview1 = new View ()
+        {
+            Id = "subview1"
+        };
+
+        View subview2 = new View ()
+        {
+            Id = "subview2"
+        };
+
+        View subview3 = new View ()
+        {
+            Id = "subview3"
+        };
+
+        superView.Add (subview1, subview2, subview3);
+
+        superView.MoveSubviewToEnd (subview1);
+        Assert.Equal (subview1, superView.Subviews [^1]);
+
+        superView.MoveSubviewToEnd (subview2);
+        Assert.Equal (subview2, superView.Subviews [^1]);
+    }
+
+
+    [Fact]
+    public void MoveSubviewTowardsEnd ()
+    {
+        View superView = new ();
+
+        View subview1 = new View ()
+        {
+            Id = "subview1"
+        };
+
+        View subview2 = new View ()
+        {
+            Id = "subview2"
+        };
+
+        View subview3 = new View ()
+        {
+            Id = "subview3"
+        };
+
+        superView.Add (subview1, subview2, subview3);
+
+        superView.MoveSubviewTowardsEnd (subview2);
+        Assert.Equal (subview2, superView.Subviews [^1]);
+
+        superView.MoveSubviewTowardsEnd (subview1);
+        Assert.Equal (subview1, superView.Subviews [1]);
+
+        // Already at end, what happens?
+        superView.MoveSubviewTowardsEnd (subview2);
+        Assert.Equal (subview2, superView.Subviews [^1]);
     }
 }

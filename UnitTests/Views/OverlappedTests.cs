@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Threading;
+using JetBrains.Annotations;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -1231,7 +1232,7 @@ public class OverlappedTests
         Assert.Equal (superView.MostFocused, current);
 
         // Act
-        ApplicationOverlapped.SetFocusToNextViewWithWrap (Application.Current.SuperView.TabIndexes, NavigationDirection.Forward);
+        ApplicationOverlapped.SetFocusToNextViewWithWrap (Application.Current!.SuperView!.Subviews, NavigationDirection.Forward);
 
         // Assert
         Assert.True (view1.HasFocus);
@@ -1277,16 +1278,9 @@ public class OverlappedTests
     {
         public bool IsFocused { get; private set; }
 
-        public override bool OnEnter (View view)
+        protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedVew)
         {
-            IsFocused = true;
-            return base.OnEnter (view);
-        }
-
-        public override bool OnLeave (View view)
-        {
-            IsFocused = false;
-            return base.OnLeave (view);
+            IsFocused = newHasFocus;
         }
     }
 
@@ -1298,16 +1292,9 @@ public class OverlappedTests
         }
         public bool IsFocused { get; private set; }
 
-        public override bool OnEnter (View view)
+        protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedVew)
         {
-            IsFocused = true;
-            return base.OnEnter (view);
-        }
-
-        public override bool OnLeave (View view)
-        {
-            IsFocused = false;
-            return base.OnLeave (view);
+            IsFocused = newHasFocus;
         }
     }
 }

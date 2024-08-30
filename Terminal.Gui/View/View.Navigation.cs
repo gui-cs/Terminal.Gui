@@ -1,26 +1,14 @@
+#nullable enable
 using System.Diagnostics;
-using static Terminal.Gui.FakeDriver;
 
 namespace Terminal.Gui;
 
 public partial class View // Focus and cross-view navigation management (TabStop, TabIndex, etc...)
 {
-    // BUGBUG: This is a poor API design. Automatic behavior like this is non-obvious and should be avoided. Instead, callers to Add should be explicit about what they want.
-    // Set to true in Add() to indicate that the view being added to a SuperView has CanFocus=true.
-    // Makes it so CanFocus will update the SuperView's CanFocus property.
-    internal bool _addingViewSoCanFocusAlsoUpdatesSuperView;
-
-    private NavigationDirection _focusDirection;
-
-    private bool _hasFocus;
-
-    // Used to cache CanFocus on subviews when CanFocus is set to false so that it can be restored when CanFocus is changed back to true
-    private bool _oldCanFocus;
-
     private bool _canFocus;
 
     /// <summary>
-    ///     Advances the focus to the next or previous view in <see cref="View.TabIndexes"/>, based on
+    ///     Advances the focus to the next or previous view in the focus chain, based on
     ///     <paramref name="direction"/>.
     ///     itself.
     /// </summary>
@@ -37,137 +25,110 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// </returns>
     public bool AdvanceFocus (NavigationDirection direction, TabBehavior? behavior)
     {
-        if (!CanBeVisible (this))
+        if (!CanBeVisible (this)) // TODO: is this check needed?
         {
             return false;
         }
 
-        FocusDirection = direction;
+        View? focused = Focused;
 
-        if (TabIndexes is null || TabIndexes.Count == 0)
+        if (focused is { } && focused.AdvanceFocus (direction, behavior))
         {
-            return false;
+            return true;
         }
 
-        if (Focused is null)
-        {
-            switch (direction)
-            {
-                case NavigationDirection.Forward:
-                    FocusFirst (behavior);
+        // AdvanceFocus did not advance
+        View [] index = GetSubviewFocusChain (direction, behavior);
 
-                    break;
-                case NavigationDirection.Backward:
-                    FocusLast (behavior);
-
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException (nameof (direction), direction, null);
-            }
-
-            return Focused is { };
-        }
-
-        if (Focused is { })
-        {
-            if (Focused.AdvanceFocus (direction, behavior))
-            {
-                // TODO: Temporary hack to make Application.Navigation.FocusChanged work
-                if (Focused.Focused is null)
-                {
-                    Application.Navigation?.SetFocused (Focused);
-                }
-                return true;
-            }
-        }
-
-        var index = GetScopedTabIndexes (behavior, direction);
         if (index.Length == 0)
         {
             return false;
         }
-        var focusedIndex = index.IndexOf (Focused);
+
+        if (behavior == TabBehavior.TabGroup)
+        {
+            if (direction == NavigationDirection.Forward && focused == index [^1] && SuperView is null)
+            {
+                // We're at the top of the focus chain. Go back down the focus chain and focus the first TabGroup
+                View [] views = GetSubviewFocusChain (NavigationDirection.Forward, TabBehavior.TabGroup);
+
+                if (views.Length > 0)
+                {
+                    View [] subViews = views [0].GetSubviewFocusChain (NavigationDirection.Forward, TabBehavior.TabStop);
+
+                    if (subViews.Length > 0)
+                    {
+                        if (subViews [0].SetFocus ())
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            if (direction == NavigationDirection.Backward && focused == index [0])
+            {
+                // We're at the bottom of the focus chain
+                View [] views = GetSubviewFocusChain (NavigationDirection.Forward, TabBehavior.TabGroup);
+
+                if (views.Length > 0)
+                {
+                    View [] subViews = views [^1].GetSubviewFocusChain (NavigationDirection.Forward, TabBehavior.TabStop);
+
+                    if (subViews.Length > 0)
+                    {
+                        if (subViews [0].SetFocus ())
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        int focusedIndex = index.IndexOf (Focused); // Will return -1 if Focused can't be found or is null
         int next = 0;
 
         if (focusedIndex < index.Length - 1)
         {
+            // We're moving w/in the subviews
             next = focusedIndex + 1;
         }
         else
         {
-            // focusedIndex is at end of list. If we are going backwards,...
-            if (behavior == TabStop)
+            // We're moving beyond the last subview
+
+            // Determine if focus should remain in this focus chain, or move to the superview's focus chain
+
+            // If we are TabStop and our SuperView has at least one other TabStop subview, move to the SuperView's chain
+            if (TabStop == TabBehavior.TabStop && SuperView is { } && SuperView.GetSubviewFocusChain (direction, behavior).Length > 1)
             {
-                // Go up the hierarchy
-                // Leave
-                Focused.SetHasFocus (false, this);
-
-                // Signal that nothing is focused, and callers should try a peer-subview
-                Focused = null;
-
                 return false;
             }
-            // Wrap around
-            //if (SuperView is {})
-            //{
-            //    if (direction == NavigationDirection.Forward)
-            //    {
-            //        return false;
-            //    }
-            //    else
-            //    {
-            //        return false;
 
-            //        //SuperView.FocusFirst (groupOnly);
-            //    }
-            //    return true;
-            //}
-            //next = index.Length - 1;
-
+            // TabGroup is special-cased. 
+            if (focused?.TabStop == TabBehavior.TabGroup)
+            {
+                if (SuperView?.GetSubviewFocusChain (direction, TabBehavior.TabGroup)?.Length > 0)
+                {
+                    // Our superview has a TabGroup subview; signal we couldn't move so we nav out to it
+                    return false;
+                }
+            }
         }
 
         View view = index [next];
 
+        if (view.HasFocus)
+        {
+            // We could not advance
+            return view == this;
+        }
 
         // The subview does not have focus, but at least one other that can. Can this one be focused?
-        if (view.CanFocus && view.Visible && view.Enabled)
-        {
-            // Make Focused Leave
-            Focused.SetHasFocus (false, view);
+        (bool focusSet, bool _) = view.SetHasFocusTrue (Focused);
 
-            switch (direction)
-            {
-                case NavigationDirection.Forward:
-                    view.FocusFirst (TabBehavior.TabStop);
-
-                    break;
-                case NavigationDirection.Backward:
-                    view.FocusLast (TabBehavior.TabStop);
-
-                    break;
-            }
-
-            SetFocus (view);
-
-            // TODO: Temporary hack to make Application.Navigation.FocusChanged work
-            if (view.Focused is null)
-            {
-                Application.Navigation?.SetFocused (view);
-            }
-
-            return true;
-        }
-
-        if (Focused is { })
-        {
-            // Leave
-            Focused.SetHasFocus (false, this);
-
-            // Signal that nothing is focused, and callers should try a peer-subview
-            Focused = null;
-        }
-
-        return false;
+        return focusSet;
     }
 
     /// <summary>Gets or sets a value indicating whether this <see cref="View"/> can be focused.</summary>
@@ -180,16 +141,13 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///         the next focusable view.
     ///     </para>
     ///     <para>
-    ///         When set to <see langword="false"/>, the <see cref="TabIndex"/> will be set to -1.
-    ///     </para>
-    ///     <para>
-    ///         When set to <see langword="false"/>, the values of <see cref="CanFocus"/> and <see cref="TabIndex"/> for all
+    ///         When set to <see langword="false"/>, the value of <see cref="CanFocus"/> for all
     ///         subviews will be cached so that when <see cref="CanFocus"/> is set back to <see langword="true"/>, the subviews
     ///         will be restored to their previous values.
     ///     </para>
     ///     <para>
-    ///         Changing this peroperty to <see langword="true"/> will cause <see cref="TabStop"/> to be set to
-    ///         <see cref="TabBehavior.TabStop"/>" as a convenience. Changing this peroperty to
+    ///         Changing this property to <see langword="true"/> will cause <see cref="TabStop"/> to be set to
+    ///         <see cref="TabBehavior.TabStop"/>" as a convenience. Changing this property to
     ///         <see langword="false"/> will have no effect on <see cref="TabStop"/>.
     ///     </para>
     /// </remarks>
@@ -198,11 +156,6 @@ public partial class View // Focus and cross-view navigation management (TabStop
         get => _canFocus;
         set
         {
-            if (!_addingViewSoCanFocusAlsoUpdatesSuperView && IsInitialized && SuperView?.CanFocus == false && value)
-            {
-                throw new InvalidOperationException ("Cannot set CanFocus to true if the SuperView CanFocus is false!");
-            }
-
             if (_canFocus == value)
             {
                 return;
@@ -210,87 +163,24 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
             _canFocus = value;
 
-            switch (_canFocus)
-            {
-                case false when _tabIndex > -1:
-                    // BUGBUG: This is a poor API design. Automatic behavior like this is non-obvious and should be avoided. Callers should adjust TabIndex explicitly.
-                    //TabIndex = -1;
-
-                    break;
-
-                case true when SuperView?.CanFocus == false && _addingViewSoCanFocusAlsoUpdatesSuperView:
-                    SuperView.CanFocus = true;
-
-                    break;
-            }
-
             if (TabStop is null && _canFocus)
             {
                 TabStop = TabBehavior.TabStop;
             }
 
-            if (!_canFocus && SuperView?.Focused == this)
-            {
-                SuperView.Focused = null;
-            }
-
             if (!_canFocus && HasFocus)
             {
-                SetHasFocus (false, this);
-                SuperView?.RestoreFocus ();
-
-                // If EnsureFocus () didn't set focus to a view, focus the next focusable view in the application
-                if (SuperView is { Focused: null })
-                {
-                    SuperView.AdvanceFocus (NavigationDirection.Forward, null);
-
-                    if (SuperView.Focused is null && Application.Current is { })
-                    {
-                        Application.Current.AdvanceFocus (NavigationDirection.Forward, null);
-                    }
-
-                    ApplicationOverlapped.BringOverlappedTopToFront ();
-                }
+                // If CanFocus is set to false and this view has focus, make it leave focus
+                HasFocus = false;
             }
 
-            if (_subviews is { } && IsInitialized)
+            if (_canFocus && !HasFocus && Visible && SuperView is { } && SuperView.Focused is null)
             {
-                foreach (View view in _subviews)
-                {
-                    if (view.CanFocus != value)
-                    {
-                        if (!value)
-                        {
-                            // Cache the old CanFocus and TabIndex so that they can be restored when CanFocus is changed back to true
-                            view._oldCanFocus = view.CanFocus;
-                            view._oldTabIndex = view._tabIndex;
-                            view.CanFocus = false;
-
-                            //view._tabIndex = -1;
-                        }
-                        else
-                        {
-                            if (_addingViewSoCanFocusAlsoUpdatesSuperView)
-                            {
-                                view._addingViewSoCanFocusAlsoUpdatesSuperView = true;
-                            }
-
-                            // Restore the old CanFocus and TabIndex to the values they held before CanFocus was set to false
-                            view.CanFocus = view._oldCanFocus;
-                            view._tabIndex = view._oldTabIndex;
-                            view._addingViewSoCanFocusAlsoUpdatesSuperView = false;
-                        }
-                    }
-                }
-
-                if (this is Toplevel && Application.Current!.Focused != this)
-                {
-                    ApplicationOverlapped.BringOverlappedTopToFront ();
-                }
+                // If CanFocus is set to true and this view does not have focus, make it enter focus
+                SetFocus ();
             }
 
             OnCanFocusChanged ();
-            SetNeedsDisplay ();
         }
     }
 
@@ -298,115 +188,51 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <remarks>
     ///     Raised by the <see cref="OnCanFocusChanged"/> virtual method.
     /// </remarks>
-    public event EventHandler CanFocusChanged;
-
-    /// <summary>Raised when the view is gaining (entering) focus. Can be cancelled.</summary>
-    /// <remarks>
-    ///     Raised by the <see cref="OnEnter"/> virtual method.
-    /// </remarks>
-    public event EventHandler<FocusEventArgs> Enter;
-
-    /// <summary>Returns the currently focused Subview inside this view, or <see langword="null"/> if nothing is focused.</summary>
-    /// <value>The currently focused Subview.</value>
-    public View Focused { get; private set; }
+    public event EventHandler? CanFocusChanged;
 
     /// <summary>
-    ///     Focuses the first focusable view in <see cref="View.TabIndexes"/> if one exists. If there are no views in
-    ///     <see cref="View.TabIndexes"/> then the focus is set to the view itself.
+    ///     Focuses the deepest focusable Subview if one exists. If there are no focusable Subviews then the focus is set to
+    ///     the view itself.
     /// </summary>
+    /// <param name="direction"></param>
     /// <param name="behavior"></param>
-    public void FocusFirst (TabBehavior? behavior)
+    /// <returns><see langword="true"/> if a subview other than this was focused.</returns>
+    public bool FocusDeepest (NavigationDirection direction, TabBehavior? behavior)
     {
-        if (!CanBeVisible (this))
+        View? deepest = FindDeepestFocusableView (direction, behavior);
+
+        if (deepest is { })
         {
-            return;
+            return deepest.SetFocus ();
         }
 
-        if (_tabIndexes is null)
-        {
-            SuperView?.SetFocus (this);
-
-            return;
-        }
-
-        var indicies = GetScopedTabIndexes (behavior, NavigationDirection.Forward);
-        if (indicies.Length > 0)
-        {
-            SetFocus (indicies [0]);
-        }
+        return SetFocus ();
     }
 
-    /// <summary>
-    ///     Focuses the last focusable view in <see cref="View.TabIndexes"/> if one exists. If there are no views in
-    ///     <see cref="View.TabIndexes"/> then the focus is set to the view itself.
-    /// </summary>
-    /// <param name="behavior"></param>
-    public void FocusLast (TabBehavior? behavior)
+    /// <summary>Gets the currently focused Subview of this view, or <see langword="null"/> if nothing is focused.</summary>
+    public View? Focused
     {
-        if (!CanBeVisible (this))
-        {
-            return;
-        }
-
-        if (_tabIndexes is null)
-        {
-            SuperView?.SetFocus (this);
-
-            return;
-        }
-
-        var indicies = GetScopedTabIndexes (behavior, NavigationDirection.Forward);
-        if (indicies.Length > 0)
-        {
-            SetFocus (indicies [^1]);
-        }
-    }
-
-    /// <summary>
-    ///     Gets or sets whether this view has focus.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         Causes the <see cref="OnEnter"/> and <see cref="OnLeave"/> virtual methods (and <see cref="Enter"/> and
-    ///         <see cref="Leave"/> events to be raised) when the value changes.
-    ///     </para>
-    ///     <para>
-    ///         Setting this property to <see langword="false"/> will recursively set <see cref="HasFocus"/> to
-    ///         <see langword="false"/>
-    ///         for any focused subviews.
-    ///     </para>
-    /// </remarks>
-    public bool HasFocus
-    {
-        // Force the specified view to have focus
-        set => SetHasFocus (value, this, true);
-        get => _hasFocus;
+        get { return Subviews.FirstOrDefault (v => v.HasFocus); }
     }
 
     /// <summary>Returns a value indicating if this View is currently on Top (Active)</summary>
     public bool IsCurrentTop => Application.Current == this;
 
-    /// <summary>Raised when the view is losing (leaving) focus. Can be cancelled.</summary>
-    /// <remarks>
-    ///     Raised by the <see cref="OnLeave"/> virtual method.
-    /// </remarks>
-    public event EventHandler<FocusEventArgs> Leave;
-
     /// <summary>
-    ///     Returns the most focused Subview in the chain of subviews (the leaf view that has the focus), or
-    ///     <see langword="null"/> if nothing is focused.
+    ///     Returns the most focused Subview down the subview-hierarchy.
     /// </summary>
-    /// <value>The most focused Subview.</value>
-    public View MostFocused
+    /// <value>The most focused Subview, or <see langword="null"/> if no Subview is focused.</value>
+    public View? MostFocused
     {
         get
         {
+            // TODO: Remove this API. It's duplicative of Application.Navigation.GetFocused.
             if (Focused is null)
             {
                 return null;
             }
 
-            View most = Focused.MostFocused;
+            View? most = Focused.MostFocused;
 
             if (most is { })
             {
@@ -423,407 +249,462 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// </remarks>
     public virtual void OnCanFocusChanged () { CanFocusChanged?.Invoke (this, EventArgs.Empty); }
 
-    // BUGBUG: The focus API is poorly defined and implemented. It deeply intertwines the view hierarchy with the tab order.
-
-    /// <summary>Invoked when this view is gaining focus (entering).</summary>
-    /// <param name="leavingView">The view that is leaving focus.</param>
-    /// <returns> <see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    /// <remarks>
-    ///     <para>
-    ///         Overrides must call the base class method to ensure that the <see cref="Enter"/> event is raised. If the event
-    ///         is handled, the method should return <see langword="true"/>.
-    ///     </para>
-    /// </remarks>
-    public virtual bool OnEnter (View leavingView)
-    {
-        var args = new FocusEventArgs (leavingView, this);
-        Enter?.Invoke (this, args);
-
-        if (args.Handled)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    /// <summary>Invoked when this view is losing focus (leaving).</summary>
-    /// <param name="enteringView">The view that is entering focus.</param>
-    /// <returns> <see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    /// <remarks>
-    ///     <para>
-    ///         Overrides must call the base class method to ensure that the <see cref="Leave"/> event is raised. If the event
-    ///         is handled, the method should return <see langword="true"/>.
-    ///     </para>
-    /// </remarks>
-    public virtual bool OnLeave (View enteringView)
-    {
-        // BUGBUG: _hasFocus should ALWAYS be false when this method is called. 
-        if (_hasFocus)
-        {
-            Debug.WriteLine ($"BUGBUG: HasFocus should ALWAYS be false when OnLeave is called.");
-            return true;
-        }
-        var args = new FocusEventArgs (this, enteringView);
-        Leave?.Invoke (this, args);
-
-        if (args.Handled)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
     /// <summary>
-    ///     Causes this view to be focused. All focusable views up the Superview hierarchy will also be focused.
+    ///     INTERNAL API to restore focus to the subview that had focus before this view lost focus.
     /// </summary>
-    public void SetFocus ()
-    {
-        if (!CanBeVisible (this) || !Enabled)
-        {
-            if (HasFocus)
-            {
-                // If this view is focused, make it leave focus
-                SetHasFocus (false, this);
-            }
-
-            return;
-        }
-
-        // Recursively set focus upwards in the view hierarchy
-        if (SuperView is { })
-        {
-            SuperView.SetFocus (this);
-        }
-        else
-        {
-            SetFocus (this);
-        }
-    }
-
-    /// <summary>
-    ///     INTERNAL API that gets or sets the focus direction for this view and all subviews.
-    ///     Setting this property will set the focus direction for all views up the SuperView hierarchy.
-    /// </summary>
-    internal NavigationDirection FocusDirection
-    {
-        get => SuperView?.FocusDirection ?? _focusDirection;
-        set
-        {
-            if (SuperView is { })
-            {
-                SuperView.FocusDirection = value;
-            }
-            else
-            {
-                _focusDirection = value;
-            }
-        }
-    }
-
-    /// <summary>
-    ///     INTERNAL helper for calling <see cref="FocusFirst"/> or <see cref="FocusLast"/> based on
-    ///     <see cref="FocusDirection"/>.
-    ///     FocusDirection is not public. This API is thus non-deterministic from a public API perspective.
-    /// </summary>
-    internal void RestoreFocus ()
+    /// <returns>
+    ///     Returns true if focus was restored to a subview, false otherwise.
+    /// </returns>
+    internal bool RestoreFocus ()
     {
         if (Focused is null && _subviews?.Count > 0)
         {
-            if (FocusDirection == NavigationDirection.Forward)
+            if (_previouslyMostFocused is { } /* && (behavior is null || _previouslyMostFocused.TabStop == behavior)*/)
             {
-                FocusFirst (null);
+                return _previouslyMostFocused.SetFocus ();
+            }
+
+            return false;
+        }
+
+        return false;
+    }
+
+    private View? FindDeepestFocusableView (NavigationDirection direction, TabBehavior? behavior)
+    {
+        View [] indicies = GetSubviewFocusChain (direction, behavior);
+
+        foreach (View v in indicies)
+        {
+            return v.FindDeepestFocusableView (direction, behavior);
+        }
+
+        return null;
+    }
+
+    #region HasFocus
+
+    // Backs `HasFocus` and is the ultimate source of truth whether a View has focus or not.
+    private bool _hasFocus;
+
+    /// <summary>
+    ///     Gets or sets whether this view has focus.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Only Views that are visible, enabled, and have <see cref="CanFocus"/> set to <see langword="true"/> are
+    ///         focusable. If
+    ///         these conditions are not met when this property is set to <see langword="true"/> <see cref="HasFocus"/> will
+    ///         not change.
+    ///     </para>
+    ///     <para>
+    ///         Setting this property causes the <see cref="OnHasFocusChanging"/> and <see cref="OnHasFocusChanged"/> virtual
+    ///         methods (and <see cref="HasFocusChanging"/> and
+    ///         <see cref="HasFocusChanged"/> events to be raised). If the event is cancelled, <see cref="HasFocus"/> will not
+    ///         be changed.
+    ///     </para>
+    ///     <para>
+    ///         Setting this property to <see langword="true"/> will recursively set <see cref="HasFocus"/> to
+    ///         <see langword="true"/> for all SuperViews up the hierarchy.
+    ///     </para>
+    ///     <para>
+    ///         Setting this property to <see langword="true"/> will cause the subview furthest down the hierarchy that is
+    ///         focusable to also gain focus (as long as <see cref="TabStop"/>
+    ///     </para>
+    ///     <para>
+    ///         Setting this property to <see langword="false"/> will cause <see cref="AdvanceFocus"/> to set
+    ///         the focus on the next view to be focused.
+    ///     </para>
+    /// </remarks>
+    public bool HasFocus
+    {
+        set
+        {
+            if (HasFocus == value)
+            {
+                return;
+            }
+
+            if (value)
+            {
+                // NOTE: If Application.Navigation is null, we pass null to FocusChanging. For unit tests.
+                (bool focusSet, bool _) = SetHasFocusTrue (Application.Navigation?.GetFocused ());
+
+                if (focusSet)
+                {
+                    // The change happened
+                    // HasFocus is now true
+                }
             }
             else
             {
-                FocusLast (null);
+                SetHasFocusFalse (null);
             }
         }
+        get => _hasFocus;
     }
 
     /// <summary>
-    ///     Internal API that causes <paramref name="viewToEnterFocus"/> to enter focus.
-    ///     <paramref name="viewToEnterFocus"/> does not need to be a subview.
-    ///     Recursively sets focus upwards in the view hierarchy.
+    ///     Causes this view to be focused. Calling this method has the same effect as setting <see cref="HasFocus"/> to
+    ///     <see langword="true"/> but with the added benefit of returning a value indicating whether the focus was set.
     /// </summary>
-    /// <param name="viewToEnterFocus"></param>
-    private void SetFocus (View viewToEnterFocus)
+    public bool SetFocus ()
     {
-        if (viewToEnterFocus is null)
+        (bool focusSet, bool _) = SetHasFocusTrue (Application.Navigation?.GetFocused ());
+
+        return focusSet;
+    }
+
+    /// <summary>
+    ///     INTERNAL: Called when focus is going to change to this view. This method is called by <see cref="SetFocus"/> and
+    ///     other methods that
+    ///     set or remove focus from a view.
+    /// </summary>
+    /// <param name="previousFocusedView">
+    ///     The previously focused view. If <see langword="null"/> there is no previously focused
+    ///     view.
+    /// </param>
+    /// <param name="traversingUp"></param>
+    /// <returns><see langword="true"/> if <see cref="HasFocus"/> was changed to <see langword="true"/>.</returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    private (bool focusSet, bool cancelled) SetHasFocusTrue (View? previousFocusedView, bool traversingUp = false)
+    {
+        Debug.Assert (ApplicationNavigation.IsInHierarchy (SuperView, this));
+
+        // Pre-conditions
+        if (_hasFocus)
         {
-            return;
+            return (false, false);
         }
 
-        if (!viewToEnterFocus.CanFocus || !viewToEnterFocus.Visible || !viewToEnterFocus.Enabled)
+        if (CanFocus && SuperView is { CanFocus: false })
         {
-            return;
+            Debug.WriteLine ($@"WARNING: Attempt to FocusChanging where SuperView.CanFocus == false. {this}");
+
+            return (false, false);
         }
 
-        // If viewToEnterFocus is already the focused view, don't do anything
-        if (Focused?._hasFocus == true && Focused == viewToEnterFocus)
+        if (!CanBeVisible (this) || !Enabled)
         {
-            return;
+            return (false, false);
         }
 
-        // If a subview has focus and viewToEnterFocus is the focused view's superview OR viewToEnterFocus is this view,
-        // then make viewToEnterFocus.HasFocus = true and return
-        if ((Focused?._hasFocus == true && Focused?.SuperView == viewToEnterFocus) || viewToEnterFocus == this)
+        if (!CanFocus)
         {
-            if (!viewToEnterFocus._hasFocus)
+            return (false, false);
+        }
+
+        bool previousValue = HasFocus;
+
+        bool cancelled = NotifyFocusChanging (false, true, previousFocusedView, this);
+
+        if (cancelled)
+        {
+            return (false, true);
+        }
+
+        // Make sure superviews up the superview hierarchy have focus.
+        // Any of them may cancel gaining focus. In which case we need to back out.
+        if (SuperView is { HasFocus: false } sv)
+        {
+            (bool focusSet, bool svCancelled) = sv.SetHasFocusTrue (previousFocusedView, true);
+
+            if (!focusSet)
             {
-                viewToEnterFocus._hasFocus = true;
+                return (false, svCancelled);
+            }
+        }
+
+        if (_hasFocus)
+        {
+            // Something else beat us to the change (likely a FocusChanged handler).
+            return (true, false);
+        }
+
+        // By setting _hasFocus to true we definitively change HasFocus for this view.
+
+        // Get whatever peer has focus, if any
+        View? focusedPeer = SuperView?.Focused;
+
+        _hasFocus = true;
+
+        // Ensure that the peer loses focus
+        focusedPeer?.SetHasFocusFalse (this, true);
+
+        if (!traversingUp)
+        {
+            // Restore focus to the previously most focused subview in the subview-hierarchy
+            if (!RestoreFocus ())
+            {
+                // Couldn't restore focus, so use Advance to navigate to the next focusable subview
+                if (!AdvanceFocus (NavigationDirection.Forward, null))
+                {
+                    // Couldn't advance, so we're the most focused view in the application
+                    _previouslyMostFocused = null;
+                    Application.Navigation?.SetFocused (this);
+                }
+            }
+        }
+
+        if (previousFocusedView is { HasFocus: true } && Subviews.Contains (previousFocusedView))
+        {
+            previousFocusedView.SetHasFocusFalse (this);
+        }
+
+        if (Arrangement.HasFlag (ViewArrangement.Overlapped))
+        {
+            SuperView?.MoveSubviewToStart (this);
+        }
+
+        NotifyFocusChanged (HasFocus, previousFocusedView, this);
+
+        // Post-conditions - prove correctness
+        if (HasFocus == previousValue)
+        {
+            throw new InvalidOperationException ("NotifyFocusChanging was not cancelled and the HasFocus value did not change.");
+        }
+
+        return (true, false);
+    }
+
+    private bool NotifyFocusChanging (bool currentHasFocus, bool newHasFocus, View? currentFocused, View? newFocused)
+    {
+        // Call the virtual method
+        if (OnHasFocusChanging (currentHasFocus, newHasFocus, currentFocused, newFocused))
+        {
+            // The event was cancelled
+            return true;
+        }
+
+        var args = new HasFocusEventArgs (currentHasFocus, newHasFocus, currentFocused, newFocused);
+        HasFocusChanging?.Invoke (this, args);
+
+        if (args.Cancel)
+        {
+            // The event was cancelled
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    ///     Invoked when <see cref="View.HasFocus"/> is about to change. This method is called before the
+    ///     <see cref="HasFocusChanging"/> event is raised.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Use <see cref="OnHasFocusChanged"/> to be notified after the focus has changed.
+    ///     </para>
+    /// </remarks>
+    /// <param name="currentHasFocus">The current value of <see cref="View.HasFocus"/>.</param>
+    /// <param name="newHasFocus">The value <see cref="View.HasFocus"/> will have if the focus change happens.</param>
+    /// <param name="currentFocused">The view that is currently Focused. May be <see langword="null"/>.</param>
+    /// <param name="newFocused">The view that will be focused. May be <see langword="null"/>.</param>
+    /// <returns>
+    ///     <see langword="true"/>, if the change to <see cref="View.HasFocus"/> is to be cancelled, <see langword="false"/>
+    ///     otherwise.
+    /// </returns>
+    protected virtual bool OnHasFocusChanging (bool currentHasFocus, bool newHasFocus, View? currentFocused, View? newFocused) { return false; }
+
+    /// <summary>
+    ///     Raised when <see cref="View.HasFocus"/> is about to change.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Cancel the event to prevent the focus from changing.
+    ///     </para>
+    ///     <para>
+    ///         Use <see cref="HasFocusChanged"/> to be notified after the focus has changed.
+    ///     </para>
+    /// </remarks>
+    public event EventHandler<HasFocusEventArgs>? HasFocusChanging;
+
+    /// <summary>
+    ///     Called when this view should stop being focused.
+    /// </summary>
+    /// <param name="newFocusedView">
+    ///     The new focused view. If <see langword="null"/> it is not known which view will be
+    ///     focused.
+    /// </param>
+    /// <param name="traversingDown">
+    ///     Set to true to indicate method is being called recurively, traversing down the focus
+    ///     chain.
+    /// </param>
+    /// <exception cref="InvalidOperationException"></exception>
+    private void SetHasFocusFalse (View? newFocusedView, bool traversingDown = false)
+    {
+        // Pre-conditions
+        if (!_hasFocus)
+        {
+            throw new InvalidOperationException ("SetHasFocusFalse should not be called if the view does not have focus.");
+        }
+
+        // If newFocusedVew is null, we need to find the view that should get focus, and SetFocus on it.
+        if (!traversingDown && newFocusedView is null)
+        {
+            if (SuperView?._previouslyMostFocused is { } && SuperView?._previouslyMostFocused != this)
+            {
+                SuperView?._previouslyMostFocused?.SetFocus ();
+
+                // The above will cause SetHasFocusFalse, so we can return
+                return;
             }
 
-            return;
+            if (SuperView is { } && SuperView.AdvanceFocus (NavigationDirection.Forward, TabStop))
+            {
+                // The above will cause SetHasFocusFalse, so we can return
+                return;
+            }
+
+            if (Application.Navigation is { } && Application.Current is { })
+            {
+                // Temporarily ensure this view can't get focus
+                bool prevCanFocus = _canFocus;
+                _canFocus = false;
+                bool restoredFocus = Application.Current!.RestoreFocus ();
+                _canFocus = prevCanFocus;
+
+                if (restoredFocus)
+                {
+                    // The above caused SetHasFocusFalse, so we can return
+                    return;
+                }
+            }
+
+            // No other focusable view to be found. Just "leave" us...
         }
 
-        // Make sure that viewToEnterFocus is a subview of this view
-        View c;
+        // Before we can leave focus, we need to make sure that all views down the subview-hierarchy have left focus.
+        View? mostFocused = MostFocused;
 
-        for (c = viewToEnterFocus._superView; c != null; c = c._superView)
+        if (mostFocused is { } && (newFocusedView is null || mostFocused != newFocusedView))
         {
-            if (c == this)
+            // Start at the bottom and work our way up to us
+            View? bottom = mostFocused;
+
+            while (bottom is { } && bottom != this)
             {
-                break;
+                if (bottom.HasFocus)
+                {
+                    bottom.SetHasFocusFalse (newFocusedView, true);
+                }
+
+                bottom = bottom.SuperView;
+            }
+
+            _previouslyMostFocused = mostFocused;
+        }
+
+        bool previousValue = HasFocus;
+
+        // Note, can't be cancelled.
+        NotifyFocusChanging (HasFocus, !HasFocus, newFocusedView, this);
+
+        // Get whatever peer has focus, if any
+        View? focusedPeer = SuperView?.Focused;
+        _hasFocus = false;
+
+        if (Application.Navigation is { })
+        {
+            View? appFocused = Application.Navigation.GetFocused ();
+
+            if (appFocused is { } || appFocused == this)
+            {
+                Application.Navigation.SetFocused (newFocusedView ?? SuperView);
             }
         }
 
-        if (c is null)
+        NotifyFocusChanged (HasFocus, this, newFocusedView);
+
+        if (_hasFocus)
         {
-            throw new ArgumentException (@$"The specified view {viewToEnterFocus} is not part of the hierarchy of {this}.");
+            // Notify caused HasFocus to change to true.
+            return;
         }
 
-        // If a subview has focus, make it leave focus
-        Focused?.SetHasFocus (false, viewToEnterFocus);
-
-        // make viewToEnterFocus Focused and enter focus
-        View f = Focused;
-        Focused = viewToEnterFocus;
-        Focused.SetHasFocus (true, f);
-
-        // Ensure on either the first or last focusable subview of Focused
-        // BUGBUG: With Groups, this means the previous focus is lost
-        Focused.RestoreFocus ();
-
-        // Recursively set focus upwards in the view hierarchy
         if (SuperView is { })
         {
-            SuperView.SetFocus (this);
+            SuperView._previouslyMostFocused = focusedPeer;
         }
-        else
+
+        // Post-conditions - prove correctness
+        if (HasFocus == previousValue)
         {
-            // If there is no SuperView, then this is a top-level view
-            SetFocus (this);
-
+            throw new InvalidOperationException ("SetHasFocusFalse and the HasFocus value did not change.");
         }
 
-        // TODO: Temporary hack to make Application.Navigation.FocusChanged work
-        if (HasFocus && Focused.Focused is null)
-        {
-            Application.Navigation?.SetFocused (Focused);
-        }
-
-        // TODO: This is a temporary hack to make overlapped non-Toplevels have a zorder. See also: View.OnDrawContent.
-        if (viewToEnterFocus is { } && (viewToEnterFocus.TabStop == TabBehavior.TabGroup && viewToEnterFocus.Arrangement.HasFlag (ViewArrangement.Overlapped)))
-        {
-            viewToEnterFocus.TabIndex = 0;
-        }
-
+        SetNeedsDisplay ();
     }
 
     /// <summary>
-    ///     Internal API that sets <see cref="HasFocus"/>. This method is called by <c>HasFocus_set</c> and other methods that
-    ///     need to set or remove focus from a view.
+    ///     Caches the most focused subview when this view is losing focus. This is used by <see cref="RestoreFocus"/>.
     /// </summary>
-    /// <param name="newHasFocus">The new setting for <see cref="HasFocus"/>.</param>
-    /// <param name="view">The view that will be gaining or losing focus.</param>
-    /// <param name="force">
-    ///     <see langword="true"/> to force Enter/Leave on <paramref name="view"/> regardless of whether it
-    ///     already HasFocus or not.
-    /// </param>
-    /// <remarks>
-    ///     If <paramref name="newHasFocus"/> is <see langword="false"/> and there is a focused subview (<see cref="Focused"/>
-    ///     is not <see langword="null"/>),
-    ///     this method will recursively remove focus from any focused subviews of <see cref="Focused"/>.
-    /// </remarks>
-    private void SetHasFocus (bool newHasFocus, View view, bool force = false)
+    private View? _previouslyMostFocused;
+
+    private void NotifyFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedVew)
     {
-        if (HasFocus != newHasFocus || force)
-        {
-            _hasFocus = newHasFocus;
+        // Call the virtual method
+        OnHasFocusChanged (newHasFocus, previousFocusedView, focusedVew);
 
-            if (newHasFocus)
-            {
-                OnEnter (view);
-            }
-            else
-            {
-                OnLeave (view);
-            }
-
-            SetNeedsDisplay ();
-        }
-
-        // Remove focus down the chain of subviews if focus is removed
-        if (!newHasFocus && Focused is { })
-        {
-            View f = Focused;
-            f.OnLeave (view);
-            f.SetHasFocus (false, view);
-            Focused = null;
-        }
+        // Raise the event
+        var args = new HasFocusEventArgs (newHasFocus, newHasFocus, previousFocusedView, focusedVew);
+        HasFocusChanged?.Invoke (this, args);
     }
+
+    /// <summary>
+    ///     Invoked after <see cref="HasFocus"/> has changed. This method is called before the <see cref="HasFocusChanged"/>
+    ///     event is raised.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This event cannot be cancelled.
+    ///     </para>
+    /// </remarks>
+    /// <param name="newHasFocus">The new value of <see cref="View.HasFocus"/>.</param>
+    /// <param name="previousFocusedView"></param>
+    /// <param name="focusedVew">The view that is now focused. May be <see langword="null"/></param>
+    protected virtual void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedVew) { }
+
+    /// <summary>Raised after <see cref="HasFocus"/> has changed.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         This event cannot be cancelled.
+    ///     </para>
+    /// </remarks>
+    public event EventHandler<HasFocusEventArgs>? HasFocusChanged;
+
+    #endregion HasFocus
 
     #region Tab/Focus Handling
 
-#nullable enable
-
-    private List<View> _tabIndexes;
-
-    // TODO: This should be a get-only property?
-    // BUGBUG: This returns an AsReadOnly list, but isn't declared as such.
-    /// <summary>Gets a list of the subviews that are a <see cref="TabStop"/>.</summary>
-    /// <value>The tabIndexes.</value>
-    public IList<View> TabIndexes => _tabIndexes?.AsReadOnly () ?? _empty;
-
     /// <summary>
-    /// Gets TabIndexes that are scoped to the specified behavior and direction. If behavior is null, all TabIndexes are returned.
+    ///     Gets TabIndexes that are scoped to the specified behavior and direction. If behavior is null, all TabIndexes are
+    ///     returned.
     /// </summary>
-    /// <param name="behavior"></param>
     /// <param name="direction"></param>
-    /// <returns></returns>GetScopedTabIndexes
-    private View [] GetScopedTabIndexes (TabBehavior? behavior, NavigationDirection direction)
+    /// <param name="behavior"></param>
+    /// <returns></returns>
+    /// GetScopedTabIndexes
+    internal View [] GetSubviewFocusChain (NavigationDirection direction, TabBehavior? behavior)
     {
-        IEnumerable<View> indicies;
+        IEnumerable<View>? fitleredSubviews;
 
         if (behavior.HasValue)
         {
-            indicies = _tabIndexes.Where (v => v.TabStop == behavior && v is { CanFocus: true, Visible: true, Enabled: true });
+            fitleredSubviews = _subviews?.Where (v => v.TabStop == behavior && v is { CanFocus: true, Visible: true, Enabled: true });
         }
         else
         {
-            indicies = _tabIndexes.Where (v => v is { CanFocus: true, Visible: true, Enabled: true });
+            fitleredSubviews = _subviews?.Where (v => v is { CanFocus: true, Visible: true, Enabled: true });
         }
 
         if (direction == NavigationDirection.Backward)
         {
-            indicies = indicies.Reverse ();
+            fitleredSubviews = fitleredSubviews?.Reverse ();
         }
 
-        return indicies.ToArray ();
-
-    }
-
-    private int? _tabIndex; // null indicates the view has not yet been added to TabIndexes
-    private int? _oldTabIndex;
-
-    /// <summary>
-    ///     Indicates the order of the current <see cref="View"/> in <see cref="TabIndexes"/> list.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         If <see langword="null"/>, the view is not part of the tab order.
-    ///     </para>
-    ///     <para>
-    ///         On set, if <see cref="SuperView"/> is <see langword="null"/> or has not TabStops, <see cref="TabIndex"/> will
-    ///         be set to 0.
-    ///     </para>
-    ///     <para>
-    ///         On set, if <see cref="SuperView"/> has only one TabStop, <see cref="TabIndex"/> will be set to 0.
-    ///     </para>
-    ///     <para>
-    ///         See also <seealso cref="TabStop"/>.
-    ///     </para>
-    /// </remarks>
-    public int? TabIndex
-    {
-        get => _tabIndex;
-
-        // TOOD: This should be a get-only property. Introduce SetTabIndex (int value) (or similar).
-        set
-        {
-            // Once a view is in the tab order, it should not be removed from the tab order; set TabStop to NoStop instead.
-            Debug.Assert (value >= 0);
-            Debug.Assert (value is { });
-
-            if (SuperView?._tabIndexes is null || SuperView?._tabIndexes.Count == 1)
-            {
-                // BUGBUG: Property setters should set the property to the value passed in and not have side effects.
-                _tabIndex = 0;
-
-                return;
-            }
-
-            if (_tabIndex == value && TabIndexes.IndexOf (this) == value)
-            {
-                return;
-            }
-
-            _tabIndex = value > SuperView!.TabIndexes.Count - 1 ? SuperView._tabIndexes.Count - 1 :
-                        value < 0 ? 0 : value;
-            _tabIndex = GetGreatestTabIndexInSuperView ((int)_tabIndex);
-
-            if (SuperView._tabIndexes.IndexOf (this) != _tabIndex)
-            {
-                // BUGBUG: we have to use _tabIndexes and not TabIndexes because TabIndexes returns is a read-only version of _tabIndexes
-                SuperView._tabIndexes.Remove (this);
-                SuperView._tabIndexes.Insert ((int)_tabIndex, this);
-                ReorderSuperViewTabIndexes ();
-            }
-        }
-    }
-
-    /// <summary>
-    ///     Gets the greatest <see cref="TabIndex"/> of the <see cref="SuperView"/>'s <see cref="TabIndexes"/> that is less
-    ///     than or equal to <paramref name="idx"/>.
-    /// </summary>
-    /// <param name="idx"></param>
-    /// <returns>The minimum of <paramref name="idx"/> and the <see cref="SuperView"/>'s <see cref="TabIndexes"/>.</returns>
-    private int GetGreatestTabIndexInSuperView (int idx)
-    {
-        if (SuperView is null)
-        {
-            return 0;
-        }
-
-        var i = 0;
-
-        foreach (View superViewTabStop in SuperView._tabIndexes)
-        {
-            if (superViewTabStop._tabIndex is null || superViewTabStop == this)
-            {
-                continue;
-            }
-
-            i++;
-        }
-
-        return Math.Min (i, idx);
-    }
-
-    /// <summary>
-    ///     Re-orders the <see cref="TabIndex"/>s of the views in the <see cref="SuperView"/>'s <see cref="TabIndexes"/>.
-    /// </summary>
-    private void ReorderSuperViewTabIndexes ()
-    {
-        if (SuperView is null)
-        {
-            return;
-        }
-
-        var i = 0;
-
-        foreach (View superViewTabStop in SuperView._tabIndexes)
-        {
-            if (superViewTabStop._tabIndex is null)
-            {
-                continue;
-            }
-
-            superViewTabStop._tabIndex = i;
-            i++;
-        }
+        return fitleredSubviews?.ToArray () ?? Array.Empty<View> ();
     }
 
     private TabBehavior? _tabStop;
@@ -843,10 +724,12 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///         focus even if this property is set and vice-versa.
     ///     </para>
     ///     <para>
-    ///         The default <see cref="TabBehavior.TabStop"/> keys are <see cref="Application.NextTabKey"/> (<c>Key.Tab</c>) and <see cref="Application.PrevTabKey"/> (<c>Key>Tab.WithShift</c>).
+    ///         The default <see cref="TabBehavior.TabStop"/> keys are <see cref="Application.NextTabKey"/> (<c>Key.Tab</c>)
+    ///         and <see cref="Application.PrevTabKey"/> (<c>Key>Tab.WithShift</c>).
     ///     </para>
     ///     <para>
-    ///         The default <see cref="TabBehavior.TabGroup"/> keys are <see cref="Application.NextTabGroupKey"/> (<c>Key.F6</c>) and <see cref="Application.PrevTabGroupKey"/> (<c>Key>Key.F6.WithShift</c>).
+    ///         The default <see cref="TabBehavior.TabGroup"/> keys are <see cref="Application.NextTabGroupKey"/> (
+    ///         <c>Key.F6</c>) and <see cref="Application.PrevTabGroupKey"/> (<c>Key>Key.F6.WithShift</c>).
     ///     </para>
     /// </remarks>
     public TabBehavior? TabStop
@@ -854,17 +737,9 @@ public partial class View // Focus and cross-view navigation management (TabStop
         get => _tabStop;
         set
         {
-            if (_tabStop == value)
+            if (_tabStop is { } && _tabStop == value)
             {
                 return;
-            }
-
-            Debug.Assert (value is { });
-
-            if (_tabStop is null && TabIndex is null)
-            {
-                // This view has not yet been added to TabIndexes (TabStop has not been set previously).
-                TabIndex = GetGreatestTabIndexInSuperView (SuperView is { } ? SuperView._tabIndexes.Count : 0);
             }
 
             _tabStop = value;

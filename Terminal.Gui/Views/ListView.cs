@@ -739,14 +739,12 @@ public class ListView : View, IDesignable
     }
 
     /// <inheritdoc/>
-    public override bool OnEnter (View view)
+    protected override void OnHasFocusChanged (bool newHasFocus, [CanBeNull] View currentFocused, [CanBeNull] View newFocused)
     {
-        if (_lastSelectedItem != _selected)
+        if (newHasFocus && _lastSelectedItem != _selected)
         {
             EnsureSelectedItemVisible ();
         }
-
-        return base.OnEnter (view);
     }
 
     // TODO: This should be cancelable

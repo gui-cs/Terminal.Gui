@@ -82,8 +82,8 @@ public sealed class KeyBindings : Scenario
 
         foreach (var appBinding in Application.KeyBindings.Bindings)
         {
-                var commands = Application.KeyBindings.GetCommands (appBinding.Key);
-                appBindings.Add ($"{appBinding.Key} -> {appBinding.Value.BoundView?.GetType ().Name} - {commands [0]}");
+            var commands = Application.KeyBindings.GetCommands (appBinding.Key);
+            appBindings.Add ($"{appBinding.Key} -> {appBinding.Value.BoundView?.GetType ().Name} - {commands [0]}");
         }
 
         ObservableCollection<string> hotkeyBindings = new ();
@@ -125,8 +125,7 @@ public sealed class KeyBindings : Scenario
         };
         appWindow.Add (_focusedBindingsListView);
 
-        appWindow.Leave += AppWindow_Leave;
-        appWindow.Enter += AppWindow_Leave;
+        appWindow.HasFocusChanged += AppWindow_HasFocusChanged;
         appWindow.DrawContent += AppWindow_DrawContent;
 
         // Run - Start the application.
@@ -148,11 +147,17 @@ public sealed class KeyBindings : Scenario
         }
     }
 
-    private void AppWindow_Leave (object sender, FocusEventArgs e)
+    private void AppWindow_HasFocusChanged (object sender, HasFocusEventArgs e)
     {
-        foreach (var binding in Application.Top.MostFocused.KeyBindings.Bindings.Where (b => b.Value.Scope == KeyBindingScope.Focused))
+        if (e.NewValue)
         {
-            _focusedBindings.Add ($"{binding.Key} -> {binding.Value.Commands [0]}");
+            if (Application.Top is { MostFocused: {} })
+            {
+                foreach (var binding in Application.Top.MostFocused.KeyBindings.Bindings.Where (b => b.Value.Scope == KeyBindingScope.Focused))
+                {
+                    _focusedBindings.Add ($"{binding.Key} -> {binding.Value.Commands [0]}");
+                }
+            }
         }
     }
 }

@@ -407,6 +407,10 @@ public class ContentScrolling : Scenario
 
         app.Closed += (s, e) => View.Diagnostics = _diagnosticFlags;
 
+        editor.AutoSelectViewToEdit = true;
+        editor.AutoSelectSuperView = view;
+        editor.AutoSelectAdornments = false;
+
         Application.Run (app);
         app.Dispose ();
         Application.Shutdown ();

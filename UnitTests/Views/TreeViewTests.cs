@@ -483,7 +483,11 @@ public class TreeViewTests
     public void ObjectActivationButton_SetToNull ()
     {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
+        Assert.Null (tree.SelectedObject);
 
+        Assert.True (tree.SetFocus ());
+        tree.SelectedObject = null;
+        Assert.Null (tree.SelectedObject);
 
         // disable activation
         tree.ObjectActivationButton = null;
@@ -499,6 +503,7 @@ public class TreeViewTests
                                 };
 
         Assert.False (called);
+
 
         // double click does nothing because we changed button to null
         tree.NewMouseEvent (new MouseEvent { Flags = MouseFlags.Button1DoubleClicked });
@@ -1338,13 +1343,13 @@ oot two
         var treeView = new TreeView ();
         var accepted = false;
 
-treeView.Accept += OnAccept;
-treeView.InvokeCommand (Command.HotKey);
+        treeView.Accept += OnAccept;
+        treeView.InvokeCommand (Command.HotKey);
 
-Assert.False (accepted);
+        Assert.False (accepted);
 
-return;
-void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
+        return;
+        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
     }
 
 

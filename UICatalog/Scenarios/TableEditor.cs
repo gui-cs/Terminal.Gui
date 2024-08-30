@@ -14,7 +14,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Dialogs")]
 [ScenarioCategory ("Text and Formatting")]
-[ScenarioCategory ("Top Level Windows")]
+[ScenarioCategory ("Overlapped")]
 public class TableEditor : Scenario
 {
     private readonly HashSet<FileSystemInfo> _checkedFileSystemInfos = new ();
