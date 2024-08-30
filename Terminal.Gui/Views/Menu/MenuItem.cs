@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -6,10 +8,10 @@ namespace Terminal.Gui;
 /// </summary>
 public class MenuItem
 {
-    internal static MenuBar _menuBar;
+    internal MenuBar _menuBar;
 
     /// <summary>Initializes a new instance of <see cref="MenuItem"/></summary>
-    public MenuItem (Key shortcutKey = null) : this ("", "", null, null, null, shortcutKey) { }
+    public MenuItem (Key? shortcutKey = null) : this ("", "", null, null, null, shortcutKey) { }
 
     /// <summary>Initializes a new instance of <see cref="MenuItem"/>.</summary>
     /// <param name="title">Title for the menu item.</param>
@@ -21,24 +23,24 @@ public class MenuItem
     public MenuItem (
         string title,
         string help,
-        Action action,
-        Func<bool> canExecute = null,
-        MenuItem parent = null,
-        Key shortcutKey = null
+        Action? action,
+        Func<bool>? canExecute = null,
+        MenuItem? parent = null,
+        Key? shortcutKey = null
     )
     {
         Title = title ?? "";
         Help = help ?? "";
-        Action = action;
-        CanExecute = canExecute;
-        Parent = parent;
+        Action = action!;
+        CanExecute = canExecute!;
+        Parent = parent!;
 
         if (Parent is { } && Parent.ShortcutKey != Key.Empty)
         {
             Parent.ShortcutKey = Key.Empty;
         }
         // Setter will ensure Key.Empty if it's null
-        ShortcutKey = shortcutKey;
+        ShortcutKey = shortcutKey!;
     }
 
     private bool _allowNullChecked;
@@ -112,7 +114,7 @@ public class MenuItem
 
     /// <summary>Gets the parent for this <see cref="MenuItem"/>.</summary>
     /// <value>The parent.</value>
-    public MenuItem Parent { get; set; }
+    public MenuItem? Parent { get; set; }
 
     /// <summary>Gets or sets the title of the menu item .</summary>
     /// <value>The title.</value>
@@ -267,7 +269,7 @@ public class MenuItem
         {
             var oldKey = _shortcutKey ?? Key.Empty;
             _shortcutKey = value ?? Key.Empty;
-            UpdateShortcutKeyBinding (oldKey);
+            UpdateShortcutKeyBinding (_menuBar, oldKey);
         }
     }
 
@@ -304,8 +306,10 @@ public class MenuItem
         }
     }
 
-    internal void UpdateShortcutKeyBinding (Key oldKey)
+    internal void UpdateShortcutKeyBinding (MenuBar menuBar, Key oldKey)
     {
+        _menuBar ??= menuBar;
+
         if (_menuBar is null)
         {
             return;
@@ -334,7 +338,7 @@ public class MenuItem
     {
         if (Parent is { })
         {
-            MenuItem [] childrens = ((MenuBarItem)Parent).Children;
+            MenuItem []? childrens = ((MenuBarItem)Parent).Children;
             var i = 0;
 
             foreach (MenuItem c in childrens)

@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -16,8 +18,8 @@ public class MenuBarItem : MenuItem
         string title,
         string help,
         Action action,
-        Func<bool> canExecute = null,
-        MenuItem parent = null
+        Func<bool>? canExecute = null,
+        MenuItem? parent = null
     ) : base (title, help, action, canExecute, parent)
     {
         SetInitialProperties (title, null, null, true);
@@ -27,13 +29,13 @@ public class MenuBarItem : MenuItem
     /// <param name="title">Title for the menu item.</param>
     /// <param name="children">The items in the current menu.</param>
     /// <param name="parent">The parent <see cref="MenuItem"/> of this if any.</param>
-    public MenuBarItem (string title, MenuItem [] children, MenuItem parent = null) { SetInitialProperties (title, children, parent); }
+    public MenuBarItem (string title, MenuItem [] children, MenuItem? parent = null) { SetInitialProperties (title, children, parent); }
 
     /// <summary>Initializes a new <see cref="MenuBarItem"/> with separate list of items.</summary>
     /// <param name="title">Title for the menu item.</param>
     /// <param name="children">The list of items in the current menu.</param>
     /// <param name="parent">The parent <see cref="MenuItem"/> of this if any.</param>
-    public MenuBarItem (string title, List<MenuItem []> children, MenuItem parent = null) { SetInitialProperties (title, children, parent); }
+    public MenuBarItem (string title, List<MenuItem []> children, MenuItem? parent = null) { SetInitialProperties (title, children, parent); }
 
     /// <summary>Initializes a new <see cref="MenuBarItem"/>.</summary>
     /// <param name="children">The items in the current menu.</param>
@@ -47,7 +49,7 @@ public class MenuBarItem : MenuItem
     ///     <see cref="MenuBarItem"/>
     /// </summary>
     /// <value>The children.</value>
-    public MenuItem [] Children { get; set; }
+    public MenuItem []? Children { get; set; }
 
     internal bool IsTopLevel => Parent is null && (Children is null || Children.Length == 0) && Action != null;
 
@@ -81,13 +83,13 @@ public class MenuBarItem : MenuItem
     /// <returns>Returns <c>true</c> if it is a submenu. <c>false</c> otherwise.</returns>
     public bool IsSubMenuOf (MenuItem menuItem)
     {
-        return Children.Any (child => child == menuItem && child.Parent == menuItem.Parent);
+        return Children!.Any (child => child == menuItem && child.Parent == menuItem.Parent);
     }
 
     /// <summary>Check if a <see cref="MenuItem"/> is a <see cref="MenuBarItem"/>.</summary>
     /// <param name="menuItem"></param>
     /// <returns>Returns a <see cref="MenuBarItem"/> or null otherwise.</returns>
-    public MenuBarItem SubMenu (MenuItem menuItem) { return menuItem as MenuBarItem; }
+    public MenuBarItem SubMenu (MenuItem menuItem) { return (menuItem as MenuBarItem)!; }
 
     internal void AddShortcutKeyBindings (MenuBar menuBar)
     {
@@ -96,20 +98,24 @@ public class MenuBarItem : MenuItem
             return;
         }
 
+        _menuBar = menuBar;
+
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         foreach (MenuItem menuItem in Children.Where (m => m is { }))
         {
             // For MenuBar only add shortcuts for submenus
 
             if (menuItem.ShortcutKey != Key.Empty)
             {
-                menuItem.UpdateShortcutKeyBinding (Key.Empty);
+                menuItem._menuBar = menuBar;
+                menuItem.UpdateShortcutKeyBinding (menuItem._menuBar, Key.Empty);
             }
 
             SubMenu (menuItem)?.AddShortcutKeyBindings (menuBar);
         }
     }
 
-    private void SetInitialProperties (string title, object children, MenuItem parent = null, bool isTopLevel = false)
+    private void SetInitialProperties (string title, object? children, MenuItem? parent = null, bool isTopLevel = false)
     {
         if (!isTopLevel && children is null)
         {
@@ -179,7 +185,7 @@ public class MenuBarItem : MenuItem
     /// Add a <see cref="MenuBarItem"/> dynamically into the <see cref="MenuBar"/><c>.Menus</c>.
     /// </summary>
     /// <param name="menuItem"></param>
-    public void AddMenuBarItem (MenuItem menuItem = null)
+    public void AddMenuBarItem (MenuItem? menuItem = null)
     {
         if (menuItem is null)
         {
@@ -227,13 +233,14 @@ public class MenuBarItem : MenuItem
                 _menuBar?.KeyBindings.Remove (HotKey.WithAlt);
             }
 
-            _menuBar!.Menus [index] = null;
+            _menuBar!.Menus [index] = null!;
         }
 
         var i = 0;
 
         foreach (MenuBarItem m in _menuBar.Menus)
         {
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (m != null)
             {
                 _menuBar.Menus [i] = m;

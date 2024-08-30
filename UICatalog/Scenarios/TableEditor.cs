@@ -1266,28 +1266,28 @@ public class TableEditor : Scenario
 
         var contextMenu = new ContextMenu
         {
-            Position = new (e.MouseEvent.Position.X + 1, e.MouseEvent.Position.Y + 1),
-            MenuItems = new (
-                             [
-                                 new (
-                                      $"Hide {TrimArrows (colName)}",
-                                      "",
-                                      () => HideColumn (clickedCol)
-                                     ),
-                                 new (
-                                      $"Sort {StripArrows (sort)}",
-                                      "",
-                                      () => SortColumn (
-                                                        clickedCol,
-                                                        sort,
-                                                        isAsc
-                                                       )
-                                     )
-                             ]
-                            )
+            Position = new (e.MouseEvent.Position.X + 1, e.MouseEvent.Position.Y + 1)
         };
 
-        contextMenu.Show ();
+        MenuBarItem menuItems = new (
+                                     [
+                                         new (
+                                              $"Hide {TrimArrows (colName)}",
+                                              "",
+                                              () => HideColumn (clickedCol)
+                                             ),
+                                         new (
+                                              $"Sort {StripArrows (sort)}",
+                                              "",
+                                              () => SortColumn (
+                                                                clickedCol,
+                                                                sort,
+                                                                isAsc
+                                                               )
+                                             )
+                                     ]
+                                    );
+        contextMenu.Show (menuItems);
     }
 
     private void SortColumn (int clickedCol)
