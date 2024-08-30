@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using Terminal.Gui;
@@ -156,46 +157,50 @@ public class Bars : Scenario
 
         popOverMenu.Arrangement = ViewArrangement.Overlapped;
         popOverMenu.Visible = false;
-        popOverMenu.Enabled = false;
+        //popOverMenu.Enabled = false;
 
-        popOverMenu.Add (
-                       new Shortcut
-                       {
-                           Title = "Toggle Hide",
-                           Text = "App",
-                           KeyBindingScope = KeyBindingScope.Application,
-                           Key = Key.F4.WithCtrl,
-                           Action = () =>
-                                    {
-                                        // TODO: move this logic into `View.ShowHide()` or similar
-                                        popOverMenu.Visible = !popOverMenu.Visible;
-                                        popOverMenu.Enabled = popOverMenu.Visible;
+        var toggleShortcut = new Shortcut
+        {
+            Title = "Toggle Hide",
+            Text = "App",
+            KeyBindingScope = KeyBindingScope.Application,
+            Key = Key.F4.WithCtrl,
+        };
+        popOverMenu.Add (toggleShortcut);
 
-                                        if (popOverMenu.Visible)
-                                        {
-                                            popOverMenu.SetFocus ();
-                                        }
-                                    }
-                       });
+        popOverMenu.Accept += PopOverMenuOnAccept;
+
+        void PopOverMenuOnAccept (object o, HandledEventArgs handledEventArgs)
+        {
+            if (popOverMenu.Visible)
+            {
+                popOverMenu.Visible = false;
+            }
+            else
+            {
+                popOverMenu.Visible = true;
+                popOverMenu.SetFocus ();
+            }
+        }
 
         menuLikeExamples.Add (popOverMenu);
 
-        menuLikeExamples.MouseClick += MenuLikeExamples_MouseClick;
+        menuLikeExamples.MouseClick += MenuLikeExamplesMouseClick;
 
-        void MenuLikeExamples_MouseClick (object sender, MouseEventEventArgs e)
+        void MenuLikeExamplesMouseClick (object sender, MouseEventEventArgs e)
         {
             if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
             {
                 popOverMenu.X = e.MouseEvent.Position.X;
                 popOverMenu.Y = e.MouseEvent.Position.Y;
                 popOverMenu.Visible = true;
-                popOverMenu.Enabled = popOverMenu.Visible;
+                //popOverMenu.Enabled = popOverMenu.Visible;
                 popOverMenu.SetFocus ();
             }
             else
             {
                 popOverMenu.Visible = false;
-                popOverMenu.Enabled = popOverMenu.Visible;
+                //popOverMenu.Enabled = popOverMenu.Visible;
             }
         }
 
@@ -254,7 +259,7 @@ public class Bars : Scenario
                                  {
                                      eventSource.Add ($"Accept: {sh!.SuperView.Id} {sh!.CommandView.Text}");
                                      eventLog.MoveDown ();
-                                     args.Handled = true;
+                                     //args.Handled = true;
                                  };
                 }
             }
