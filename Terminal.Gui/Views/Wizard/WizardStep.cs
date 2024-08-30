@@ -13,7 +13,7 @@
 ///     the step is active; see also: <see cref="Wizard.StepChanged"/>. To enable or disable a step from being shown to the
 ///     user, set <see cref="View.Enabled"/>.
 /// </remarks>
-public class WizardStep : FrameView
+public class WizardStep : View
 {
     ///// <summary>
     ///// The title of the <see cref="WizardStep"/>. 
@@ -36,7 +36,7 @@ public class WizardStep : FrameView
     //private string title = string.Empty;
 
     // The contentView works like the ContentView in FrameView.
-    private readonly View _contentView = new () { Id = "WizardContentView" };
+    private readonly View _contentView = new () { CanFocus = true, TabStop = TabBehavior.TabStop, Id = "WizardContentView" };
     private readonly TextView _helpTextView = new ();
 
     /// <summary>
@@ -44,9 +44,13 @@ public class WizardStep : FrameView
     /// </summary>
     public WizardStep ()
     {
+        TabStop = TabBehavior.TabStop;
+        CanFocus = true;
         BorderStyle = LineStyle.None;
         base.Add (_contentView);
 
+        _helpTextView.CanFocus = true;
+        _helpTextView.TabStop = TabBehavior.NoStop;
         _helpTextView.ReadOnly = true;
         _helpTextView.WordWrap = true;
         base.Add (_helpTextView);

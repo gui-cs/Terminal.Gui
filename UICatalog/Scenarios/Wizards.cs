@@ -213,7 +213,8 @@ public class Wizards : Scenario
                                                Y = Pos.Bottom (thirdStepEnabledCeckBox) + 2,
                                                Width = Dim.Fill (),
                                                Height = 4,
-                                               Title = "A Broken Frame (by Depeche Mode)"
+                                               Title = "A Broken Frame (by Depeche Mode)",
+                                               TabStop = TabBehavior.TabStop
                                            };
                                            frame.Add (new TextField { Text = "This is a TextField inside of the frame." });
                                            secondStep.Add (frame);
