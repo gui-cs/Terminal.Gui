@@ -140,25 +140,25 @@ public class Bars : Scenario
 
         label = new Label ()
         {
-            Title = "Popup Menu (Right click to show):",
+            Title = "PopOver Menu (Right click to show):",
             X = Pos.Right (bar) + 1,
             Y = Pos.Top (label),
         };
         menuLikeExamples.Add (label);
 
-        Menuv2 popupMenu  = new Menuv2
+        Menuv2 popOverMenu  = new Menuv2
         {
             Id = "popupMenu",
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
         };
-        ConfigureMenu (popupMenu);
+        ConfigureMenu (popOverMenu);
 
-        popupMenu.Arrangement = ViewArrangement.Overlapped;
-        popupMenu.Visible = false;
-        popupMenu.Enabled = false;
+        popOverMenu.Arrangement = ViewArrangement.Overlapped;
+        popOverMenu.Visible = false;
+        popOverMenu.Enabled = false;
 
-        popupMenu.Add (
+        popOverMenu.Add (
                        new Shortcut
                        {
                            Title = "Toggle Hide",
@@ -168,17 +168,17 @@ public class Bars : Scenario
                            Action = () =>
                                     {
                                         // TODO: move this logic into `View.ShowHide()` or similar
-                                        popupMenu.Visible = !popupMenu.Visible;
-                                        popupMenu.Enabled = popupMenu.Visible;
+                                        popOverMenu.Visible = !popOverMenu.Visible;
+                                        popOverMenu.Enabled = popOverMenu.Visible;
 
-                                        if (popupMenu.Visible)
+                                        if (popOverMenu.Visible)
                                         {
-                                            popupMenu.SetFocus ();
+                                            popOverMenu.SetFocus ();
                                         }
                                     }
                        });
 
-        menuLikeExamples.Add (popupMenu);
+        menuLikeExamples.Add (popOverMenu);
 
         menuLikeExamples.MouseClick += MenuLikeExamples_MouseClick;
 
@@ -186,16 +186,16 @@ public class Bars : Scenario
         {
             if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
             {
-                popupMenu.X = e.MouseEvent.Position.X;
-                popupMenu.Y = e.MouseEvent.Position.Y;
-                popupMenu.Visible = true;
-                popupMenu.Enabled = popupMenu.Visible;
-                popupMenu.SetFocus ();
+                popOverMenu.X = e.MouseEvent.Position.X;
+                popOverMenu.Y = e.MouseEvent.Position.Y;
+                popOverMenu.Visible = true;
+                popOverMenu.Enabled = popOverMenu.Visible;
+                popOverMenu.SetFocus ();
             }
             else
             {
-                popupMenu.Visible = false;
-                popupMenu.Enabled = popupMenu.Visible;
+                popOverMenu.Visible = false;
+                popOverMenu.Enabled = popOverMenu.Visible;
             }
         }
 
