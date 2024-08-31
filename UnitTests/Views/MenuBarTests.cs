@@ -2938,7 +2938,7 @@ Edit
 
         Assert.Contains (Key.A.WithCtrl, menuBar.KeyBindings.Bindings);
 
-        menuBar.Menus [0].Children [0].ShortcutKey = Key.B.WithCtrl;
+        menuBar.Menus [0].Children! [0].ShortcutKey = Key.B.WithCtrl;
 
         Assert.DoesNotContain (Key.A.WithCtrl, menuBar.KeyBindings.Bindings);
         Assert.Contains (Key.B.WithCtrl, menuBar.KeyBindings.Bindings);

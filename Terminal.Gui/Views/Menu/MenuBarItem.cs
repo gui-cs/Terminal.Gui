@@ -108,7 +108,7 @@ public class MenuBarItem : MenuItem
             if (menuItem.ShortcutKey != Key.Empty)
             {
                 menuItem._menuBar = menuBar;
-                menuItem.UpdateShortcutKeyBinding (Key.Empty);
+                menuItem.AddShortcutKeyBinding (menuBar, Key.Empty);
             }
 
             SubMenu (menuItem)?.AddShortcutKeyBindings (menuBar);
@@ -126,7 +126,7 @@ public class MenuBarItem : MenuItem
                                             );
         }
 
-        Title = title;
+        SetTitle (title);
 
         if (parent is { })
         {
@@ -174,6 +174,12 @@ public class MenuBarItem : MenuItem
                 child.Parent = this;
             }
         }
+    }
+
+    private void SetTitle (string? title)
+    {
+        title ??= string.Empty;
+        Title = title;
     }
 
     /// <summary>

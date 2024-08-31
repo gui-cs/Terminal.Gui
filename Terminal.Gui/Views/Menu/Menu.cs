@@ -670,7 +670,8 @@ internal sealed class Menu : View
                 _currentChild = 0;
             }
 
-            if (this != _host.OpenCurrentMenu && _barItems?.Children? [_currentChild].IsFromSubMenu == true && _host._selectedSub > -1)
+            // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
+            if (this != _host.OpenCurrentMenu && _barItems?.Children? [_currentChild]?.IsFromSubMenu == true && _host._selectedSub > -1)
             {
                 _host.PreviousMenu (true);
                 _host.SelectEnabledItem (_barItems.Children, _currentChild, out _currentChild);

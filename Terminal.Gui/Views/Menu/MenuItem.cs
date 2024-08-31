@@ -276,6 +276,31 @@ public class MenuItem
     /// <summary>Gets the text describing the keystroke combination defined by <see cref="ShortcutKey"/>.</summary>
     public string ShortcutTag => ShortcutKey != Key.Empty ? ShortcutKey!.ToString () : string.Empty;
 
+    internal void AddShortcutKeyBinding (MenuBar menuBar, Key key)
+    {
+        ArgumentNullException.ThrowIfNull (menuBar);
+
+        _menuBar = menuBar;
+
+        AddOrUpdateShortcutKeyBinding (key);
+    }
+
+    private void AddOrUpdateShortcutKeyBinding (Key key)
+    {
+        if (key != Key.Empty)
+        {
+            _menuBar.KeyBindings.Remove (key);
+        }
+
+        if (ShortcutKey != Key.Empty)
+        {
+            KeyBinding keyBinding = new ([Command.Select], KeyBindingScope.HotKey, this);
+            // Remove an existent ShortcutKey
+            _menuBar.KeyBindings.Remove (ShortcutKey!);
+            _menuBar.KeyBindings.Add (ShortcutKey!, keyBinding);
+        }
+    }
+
     private void UpdateHotKeyBinding (Key oldKey)
     {
         if (_menuBar is null or { IsInitialized: false })
@@ -306,25 +331,15 @@ public class MenuItem
         }
     }
 
-    internal void UpdateShortcutKeyBinding (Key oldKey)
+    private void UpdateShortcutKeyBinding (Key oldKey)
     {
-        if (_menuBar is null or { IsInitialized: false })
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        if (_menuBar is null)
         {
             return;
         }
 
-        if (oldKey != Key.Empty)
-        {
-            _menuBar.KeyBindings.Remove (oldKey);
-        }
-
-        if (ShortcutKey != Key.Empty)
-        {
-            KeyBinding keyBinding = new ([Command.Select], KeyBindingScope.HotKey, this);
-            // Remove an existent ShortcutKey
-            _menuBar.KeyBindings.Remove (ShortcutKey!);
-            _menuBar.KeyBindings.Add (ShortcutKey!, keyBinding);
-        }
+        AddOrUpdateShortcutKeyBinding (oldKey);
     }
 
     #endregion Keyboard Handling
