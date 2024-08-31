@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 
 using System;
 
@@ -7,7 +7,8 @@ namespace Terminal.Gui;
 /// <summary>
 ///     True color picker using HSL
 /// </summary>
-public class ColorPicker : View
+[MustDisposeResource]
+public sealed class ColorPicker : View
 {
     /// <summary>
     ///     Creates a new instance of <see cref="ColorPicker"/>. Use
