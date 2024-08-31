@@ -14,7 +14,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         If there is no next/previous view, the focus is set to the view itself.
+    ///         If there is no next/previous view to advance to, the focus is set to the view itself.
     ///     </para>
     /// </remarks>
     /// <param name="direction"></param>
@@ -37,17 +37,19 @@ public partial class View // Focus and cross-view navigation management (TabStop
             return true;
         }
 
-        // AdvanceFocus did not advance
-        View [] index = GetSubviewFocusChain (direction, behavior);
+        // AdvanceFocus did not advance - do we wrap, or move up to the superview?
 
-        if (index.Length == 0)
+        View [] focusChain = GetSubviewFocusChain (direction, behavior);
+
+        if (focusChain.Length == 0)
         {
             return false;
         }
 
+        // Special case TabGroup
         if (behavior == TabBehavior.TabGroup)
         {
-            if (direction == NavigationDirection.Forward && focused == index [^1] && SuperView is null)
+            if (direction == NavigationDirection.Forward && focused == focusChain [^1] && SuperView is null)
             {
                 // We're at the top of the focus chain. Go back down the focus chain and focus the first TabGroup
                 View [] views = GetSubviewFocusChain (NavigationDirection.Forward, TabBehavior.TabGroup);
@@ -66,7 +68,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 }
             }
 
-            if (direction == NavigationDirection.Backward && focused == index [0])
+            if (direction == NavigationDirection.Backward && focused == focusChain [0])
             {
                 // We're at the bottom of the focus chain
                 View [] views = GetSubviewFocusChain (NavigationDirection.Forward, TabBehavior.TabGroup);
@@ -86,38 +88,38 @@ public partial class View // Focus and cross-view navigation management (TabStop
             }
         }
 
-        int focusedIndex = index.IndexOf (Focused); // Will return -1 if Focused can't be found or is null
-        int next = 0;
+        int focusedIndex = focusChain.IndexOf (Focused); // Will return -1 if Focused can't be found or is null
+        var next = 0; // Assume we wrap to start of the focus chain
 
-        if (focusedIndex < index.Length - 1)
+        if (focusedIndex < focusChain.Length - 1)
         {
             // We're moving w/in the subviews
             next = focusedIndex + 1;
         }
         else
         {
-            // We're moving beyond the last subview
-
             // Determine if focus should remain in this focus chain, or move to the superview's focus chain
-
-            // If we are TabStop and our SuperView has at least one other TabStop subview, move to the SuperView's chain
-            if (TabStop == TabBehavior.TabStop && SuperView is { } && SuperView.GetSubviewFocusChain (direction, behavior).Length > 1)
+            if (SuperView is { })
             {
-                return false;
-            }
-
-            // TabGroup is special-cased. 
-            if (focused?.TabStop == TabBehavior.TabGroup)
-            {
-                if (SuperView?.GetSubviewFocusChain (direction, TabBehavior.TabGroup)?.Length > 0)
+                // If we are TabStop, and we have at least one other focusable peer, move to the SuperView's chain
+                if (TabStop == TabBehavior.TabStop && SuperView is { } && SuperView.GetSubviewFocusChain (direction, behavior).Length > 1)
                 {
-                    // Our superview has a TabGroup subview; signal we couldn't move so we nav out to it
                     return false;
+                }
+
+                // TabGroup is special-cased. 
+                if (focused?.TabStop == TabBehavior.TabGroup)
+                {
+                    if (SuperView?.GetSubviewFocusChain (direction, TabBehavior.TabGroup)?.Length > 0)
+                    {
+                        // Our superview has a TabGroup subview; signal we couldn't move so we nav out to it
+                        return false;
+                    }
                 }
             }
         }
 
-        View view = index [next];
+        View view = focusChain [next];
 
         if (view.HasFocus)
         {
@@ -259,7 +261,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     {
         if (Focused is null && _subviews?.Count > 0)
         {
-            if (_previouslyMostFocused is { } /* && (behavior is null || _previouslyMostFocused.TabStop == behavior)*/)
+            if (_previouslyMostFocused is { })
             {
                 return _previouslyMostFocused.SetFocus ();
             }
@@ -354,6 +356,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         return focusSet;
     }
+
+    /// <summary>
+    ///     Caches the most focused subview when this view is losing focus. This is used by <see cref="RestoreFocus"/>.
+    /// </summary>
+    private View? _previouslyMostFocused;
 
     /// <summary>
     ///     INTERNAL: Called when focus is going to change to this view. This method is called by <see cref="SetFocus"/> and
@@ -625,7 +632,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         if (SuperView is { })
         {
-            SuperView._previouslyMostFocused = focusedPeer;
+            //SuperView._previouslyMostFocused = focusedPeer;
         }
 
         // Post-conditions - prove correctness
@@ -636,11 +643,6 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         SetNeedsDisplay ();
     }
-
-    /// <summary>
-    ///     Caches the most focused subview when this view is losing focus. This is used by <see cref="RestoreFocus"/>.
-    /// </summary>
-    private View? _previouslyMostFocused;
 
     private void NotifyFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedVew)
     {

@@ -36,8 +36,21 @@ public class WizardStep : View
     //private string title = string.Empty;
 
     // The contentView works like the ContentView in FrameView.
-    private readonly View _contentView = new () { CanFocus = true, TabStop = TabBehavior.TabStop, Id = "WizardContentView" };
-    private readonly TextView _helpTextView = new ();
+    private readonly View _contentView = new ()
+    {
+        CanFocus = true,
+        TabStop = TabBehavior.TabStop,
+        Id = "WizardStep._contentView"
+    };
+    private readonly TextView _helpTextView = new ()
+    {
+        CanFocus = true,
+        TabStop = TabBehavior.TabStop,
+        ReadOnly = true,
+        WordWrap = true,
+        AllowsTab = false,
+        Id = "WizardStep._helpTextView"
+    };
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Wizard"/> class.
@@ -49,10 +62,6 @@ public class WizardStep : View
         BorderStyle = LineStyle.None;
         base.Add (_contentView);
 
-        _helpTextView.CanFocus = true;
-        _helpTextView.TabStop = TabBehavior.NoStop;
-        _helpTextView.ReadOnly = true;
-        _helpTextView.WordWrap = true;
         base.Add (_helpTextView);
 
         // BUGBUG: v2 - Disabling scrolling for now
@@ -148,11 +157,6 @@ public class WizardStep : View
     /// <remarks></remarks>
     public override View Remove (View view)
     {
-        if (view is null)
-        {
-            return view;
-        }
-
         SetNeedsDisplay ();
         View container = view?.SuperView;
 

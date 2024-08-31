@@ -26,7 +26,7 @@ public class Wizards : Scenario
         };
         win.Add (frame);
 
-        var label = new Label { X = 0, Y = 0, TextAlignment = Alignment.End, Text = "Width:" };
+        var label = new Label { X = 0, Y = 0, TextAlignment = Alignment.End, Text = "_Width:", Width = 10 };
         frame.Add (label);
 
         var widthEdit = new TextField
@@ -39,7 +39,7 @@ public class Wizards : Scenario
         };
         frame.Add (widthEdit);
 
-        label = new()
+        label = new ()
         {
             X = 0,
             Y = Pos.Bottom (label),
@@ -47,7 +47,7 @@ public class Wizards : Scenario
             Width = Dim.Width (label),
             Height = 1,
             TextAlignment = Alignment.End,
-            Text = "Height:"
+            Text = "_Height:"
         };
         frame.Add (label);
 
@@ -61,7 +61,7 @@ public class Wizards : Scenario
         };
         frame.Add (heightEdit);
 
-        label = new()
+        label = new ()
         {
             X = 0,
             Y = Pos.Bottom (label),
@@ -69,7 +69,7 @@ public class Wizards : Scenario
             Width = Dim.Width (label),
             Height = 1,
             TextAlignment = Alignment.End,
-            Text = "Title:"
+            Text = "_Title:"
         };
         frame.Add (label);
 
@@ -91,7 +91,7 @@ public class Wizards : Scenario
 
         win.Loaded += Win_Loaded;
 
-        label = new()
+        label = new ()
         {
             X = Pos.Center (), Y = Pos.AnchorEnd (1), TextAlignment = Alignment.End, Text = "Action:"
         };
@@ -105,7 +105,7 @@ public class Wizards : Scenario
 
         var showWizardButton = new Button
         {
-            X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "Show Wizard"
+            X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "_Show Wizard"
         };
 
         showWizardButton.Accept += (s, e) =>
@@ -162,6 +162,13 @@ public class Wizards : Scenario
 
                                            firstStep.HelpText =
                                                "This is the End User License Agreement.\n\n\n\n\n\nThis is a test of the emergency broadcast system. This is a test of the emergency broadcast system.\nThis is a test of the emergency broadcast system.\n\n\nThis is a test of the emergency broadcast system.\n\nThis is a test of the emergency broadcast system.\n\n\n\nThe end of the EULA.";
+
+                                           RadioGroup radioGroup = new ()
+                                           {
+                                               RadioLabels = ["_One", "_Two", "_3"]
+                                           };
+                                           firstStep.Add (radioGroup);
+
                                            wizard.AddStep (firstStep);
 
                                            // Add 2nd step
@@ -178,6 +185,13 @@ public class Wizards : Scenario
                                                Text = "Press Me to Rename Step", X = Pos.Right (buttonLbl), Y = Pos.Top (buttonLbl)
                                            };
 
+                                           RadioGroup radioGroup2 = new ()
+                                           {
+                                               RadioLabels = ["_A", "_B", "_C"],
+                                               Orientation = Orientation.Horizontal
+                                           };
+                                           secondStep.Add (radioGroup2);
+
                                            button.Accept += (s, e) =>
                                                             {
                                                                 secondStep.Title = "2nd Step";
@@ -193,7 +207,7 @@ public class Wizards : Scenario
                                            var firstNameField =
                                                new TextField { Text = "Number", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
                                            secondStep.Add (lbl, firstNameField);
-                                           lbl = new() { Text = "Last Name:  ", X = 1, Y = Pos.Bottom (lbl) };
+                                           lbl = new () { Text = "Last Name:  ", X = 1, Y = Pos.Bottom (lbl) };
                                            var lastNameField = new TextField { Text = "Six", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
                                            secondStep.Add (lbl, lastNameField);
 
@@ -214,7 +228,7 @@ public class Wizards : Scenario
                                                Width = Dim.Fill (),
                                                Height = 4,
                                                Title = "A Broken Frame (by Depeche Mode)",
-                                               TabStop = TabBehavior.TabStop
+                                               TabStop = TabBehavior.NoStop
                                            };
                                            frame.Add (new TextField { Text = "This is a TextField inside of the frame." });
                                            secondStep.Add (frame);
@@ -287,7 +301,7 @@ public class Wizards : Scenario
                                                                      }
                                                                  };
                                            fourthStep.Add (hideHelpBtn);
-                                           fourthStep.NextButtonText = "Go To Last Step";
+                                           fourthStep.NextButtonText = "_Go To Last Step";
                                            var scrollBar = new ScrollBarView (someText, true);
 
                                            scrollBar.ChangedPosition += (s, e) =>
@@ -355,5 +369,10 @@ public class Wizards : Scenario
         Application.Run (win);
         win.Dispose ();
         Application.Shutdown ();
+    }
+
+    private void Wizard_StepChanged (object sender, StepChangeEventArgs e)
+    {
+        throw new NotImplementedException ();
     }
 }
