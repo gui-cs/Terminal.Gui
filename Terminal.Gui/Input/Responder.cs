@@ -53,12 +53,12 @@ public class Responder : IDisposable
     /// <param name="subclass">The view.</param>
     /// <param name="method">The method name.</param>
     /// <returns><see langword="true"/> if it's overridden, <see langword="false"/> otherwise.</returns>
-    internal static bool IsOverridden (Responder subclass, string method)
+    internal static bool IsOverridden<T> (T? subclass, string method) where T : Responder
     {
-        MethodInfo m = subclass.GetType ()
-                               .GetMethod (
-                                           method,
-                                           BindingFlags.Instance
+        MethodInfo? m = typeof (T)
+           .GetMethod (
+                       method,
+                       BindingFlags.Instance
                                            | BindingFlags.Public
                                            | BindingFlags.NonPublic
                                            | BindingFlags.DeclaredOnly
