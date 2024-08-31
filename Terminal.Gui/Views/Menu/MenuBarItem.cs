@@ -89,7 +89,7 @@ public class MenuBarItem : MenuItem
     /// <summary>Check if a <see cref="MenuItem"/> is a <see cref="MenuBarItem"/>.</summary>
     /// <param name="menuItem"></param>
     /// <returns>Returns a <see cref="MenuBarItem"/> or null otherwise.</returns>
-    public MenuBarItem SubMenu (MenuItem menuItem) { return (menuItem as MenuBarItem)!; }
+    public MenuBarItem? SubMenu (MenuItem menuItem) { return menuItem as MenuBarItem; }
 
     internal void AddShortcutKeyBindings (MenuBar menuBar)
     {
@@ -108,13 +108,14 @@ public class MenuBarItem : MenuItem
             if (menuItem.ShortcutKey != Key.Empty)
             {
                 menuItem._menuBar = menuBar;
-                menuItem.UpdateShortcutKeyBinding (menuItem._menuBar, Key.Empty);
+                menuItem.UpdateShortcutKeyBinding (Key.Empty);
             }
 
             SubMenu (menuItem)?.AddShortcutKeyBindings (menuBar);
         }
     }
 
+    // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
     private void SetInitialProperties (string title, object? children, MenuItem? parent = null, bool isTopLevel = false)
     {
         if (!isTopLevel && children is null)
@@ -125,7 +126,7 @@ public class MenuBarItem : MenuItem
                                             );
         }
 
-        SetTitle (title ?? "");
+        Title = title;
 
         if (parent is { })
         {
@@ -175,18 +176,17 @@ public class MenuBarItem : MenuItem
         }
     }
 
-    private void SetTitle (string title)
-    {
-        title ??= string.Empty;
-        Title = title;
-    }
-
     /// <summary>
     /// Add a <see cref="MenuBarItem"/> dynamically into the <see cref="MenuBar"/><c>.Menus</c>.
     /// </summary>
+    /// <param name="menuBar"></param>
     /// <param name="menuItem"></param>
-    public void AddMenuBarItem (MenuItem? menuItem = null)
+    public void AddMenuBarItem (MenuBar menuBar, MenuItem? menuItem = null)
     {
+        ArgumentNullException.ThrowIfNull (menuBar);
+
+        _menuBar = menuBar;
+
         if (menuItem is null)
         {
             MenuBarItem [] menus = _menuBar.Menus;
@@ -208,12 +208,12 @@ public class MenuBarItem : MenuItem
     {
         if (Children is { })
         {
-            foreach (MenuItem menuItem in Children)
+            foreach (MenuItem? menuItem in Children)
             {
                 if (menuItem.ShortcutKey != Key.Empty)
                 {
                     // Remove an existent ShortcutKey
-                    _menuBar?.KeyBindings.Remove (menuItem.ShortcutKey);
+                    _menuBar?.KeyBindings.Remove (menuItem.ShortcutKey!);
                 }
             }
         }
@@ -221,19 +221,19 @@ public class MenuBarItem : MenuItem
         if (ShortcutKey != Key.Empty)
         {
             // Remove an existent ShortcutKey
-            _menuBar?.KeyBindings.Remove (ShortcutKey);
+            _menuBar?.KeyBindings.Remove (ShortcutKey!);
         }
 
         var index = _menuBar!.Menus.IndexOf (this);
         if (index > -1)
         {
-            if (_menuBar!.Menus [index].HotKey != Key.Empty)
+            if (_menuBar.Menus [index].HotKey != Key.Empty)
             {
                 // Remove an existent HotKey
-                _menuBar?.KeyBindings.Remove (HotKey.WithAlt);
+                _menuBar.KeyBindings.Remove (HotKey!.WithAlt);
             }
 
-            _menuBar!.Menus [index] = null!;
+            _menuBar.Menus [index] = null!;
         }
 
         var i = 0;

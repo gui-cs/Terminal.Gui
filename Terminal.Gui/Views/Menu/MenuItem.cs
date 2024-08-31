@@ -21,8 +21,8 @@ public class MenuItem
     /// <param name="parent">The <see cref="Parent"/> of this menu item.</param>
     /// <param name="shortcutKey">The <see cref="ShortcutKey"/> keystroke combination.</param>
     public MenuItem (
-        string title,
-        string help,
+        string? title,
+        string? help,
         Action? action,
         Func<bool>? canExecute = null,
         MenuItem? parent = null,
@@ -50,7 +50,7 @@ public class MenuItem
 
     /// <summary>Gets or sets the action to be invoked when the menu item is triggered.</summary>
     /// <value>Method to invoke.</value>
-    public Action Action { get; set; }
+    public Action? Action { get; set; }
 
     /// <summary>
     ///     Used only if <see cref="CheckType"/> is of <see cref="MenuItemCheckStyle.Checked"/> type. If
@@ -72,7 +72,7 @@ public class MenuItem
     ///     returns <see langword="true"/> the menu item will be enabled. Otherwise, it will be disabled.
     /// </summary>
     /// <value>Function to determine if the action is can be executed or not.</value>
-    public Func<bool> CanExecute { get; set; }
+    public Func<bool>? CanExecute { get; set; }
 
     /// <summary>
     ///     Sets or gets whether the <see cref="MenuItem"/> shows a check indicator or not. See
@@ -188,7 +188,7 @@ public class MenuItem
                           (Checked == true || CheckType.HasFlag (MenuItemCheckStyle.Checked) || CheckType.HasFlag (MenuItemCheckStyle.Radio)
                                ? 2
                                : 0)
-                          + // check glyph + space 
+                          + // check glyph + space
                           (Help.GetColumns () > 0 ? 2 + Help.GetColumns () : 0)
                           + // Two spaces before Help
                           (ShortcutTag.GetColumns () > 0
@@ -219,12 +219,12 @@ public class MenuItem
     ///     </para>
     ///     <para>See also <see cref="ShortcutKey"/> which enable global key-bindings to menu items.</para>
     /// </summary>
-    public Key HotKey
+    public Key? HotKey
     {
         get => _hotKey;
         private set
         {
-            var oldKey = _hotKey ?? Key.Empty;
+            var oldKey = _hotKey;
             _hotKey = value ?? Key.Empty;
             UpdateHotKeyBinding (oldKey);
         }
@@ -262,30 +262,30 @@ public class MenuItem
     ///         <see cref="Help"/> text. See <see cref="ShortcutTag"/>.
     ///     </para>
     /// </summary>
-    public Key ShortcutKey
+    public Key? ShortcutKey
     {
         get => _shortcutKey;
         set
         {
-            var oldKey = _shortcutKey ?? Key.Empty;
+            var oldKey = _shortcutKey;
             _shortcutKey = value ?? Key.Empty;
-            UpdateShortcutKeyBinding (_menuBar, oldKey);
+            UpdateShortcutKeyBinding (oldKey);
         }
     }
 
     /// <summary>Gets the text describing the keystroke combination defined by <see cref="ShortcutKey"/>.</summary>
-    public string ShortcutTag => ShortcutKey != Key.Empty ? ShortcutKey.ToString () : string.Empty;
+    public string ShortcutTag => ShortcutKey != Key.Empty ? ShortcutKey!.ToString () : string.Empty;
 
     private void UpdateHotKeyBinding (Key oldKey)
     {
-        if (_menuBar is null || _menuBar?.IsInitialized == false)
+        if (_menuBar is null or { IsInitialized: false })
         {
             return;
         }
 
         if (oldKey != Key.Empty)
         {
-            var index = _menuBar.Menus?.IndexOf (this);
+            var index = _menuBar.Menus.IndexOf (this);
 
             if (index > -1)
             {
@@ -295,22 +295,20 @@ public class MenuItem
 
         if (HotKey != Key.Empty)
         {
-            var index = _menuBar.Menus?.IndexOf (this);
+            var index = _menuBar.Menus.IndexOf (this);
 
             if (index > -1)
             {
-                _menuBar.KeyBindings.Remove (HotKey.WithAlt);
+                _menuBar.KeyBindings.Remove (HotKey!.WithAlt);
                 KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, this);
                 _menuBar.KeyBindings.Add (HotKey.WithAlt, keyBinding);
             }
         }
     }
 
-    internal void UpdateShortcutKeyBinding (MenuBar menuBar, Key oldKey)
+    internal void UpdateShortcutKeyBinding (Key oldKey)
     {
-        _menuBar ??= menuBar;
-
-        if (_menuBar is null)
+        if (_menuBar is null or { IsInitialized: false })
         {
             return;
         }
@@ -324,8 +322,8 @@ public class MenuItem
         {
             KeyBinding keyBinding = new ([Command.Select], KeyBindingScope.HotKey, this);
             // Remove an existent ShortcutKey
-            _menuBar?.KeyBindings.Remove (ShortcutKey);
-            _menuBar?.KeyBindings.Add (ShortcutKey, keyBinding);
+            _menuBar.KeyBindings.Remove (ShortcutKey!);
+            _menuBar.KeyBindings.Add (ShortcutKey!, keyBinding);
         }
     }
 
@@ -341,7 +339,7 @@ public class MenuItem
             MenuItem []? childrens = ((MenuBarItem)Parent).Children;
             var i = 0;
 
-            foreach (MenuItem c in childrens)
+            foreach (MenuItem c in childrens!)
             {
                 if (c != this)
                 {
@@ -365,7 +363,7 @@ public class MenuItem
         if (ShortcutKey != Key.Empty)
         {
             // Remove an existent ShortcutKey
-            _menuBar?.KeyBindings.Remove (ShortcutKey);
+            _menuBar.KeyBindings.Remove (ShortcutKey!);
         }
     }
 }

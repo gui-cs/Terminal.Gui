@@ -182,7 +182,7 @@ public class ContextMenus : Scenario
                                                                      )
                                              ),
                                          new MenuBarItem (
-                                                          "More options",
+                                                          "M_ore options",
                                                           new MenuItem []
                                                           {
                                                               new (
@@ -220,7 +220,7 @@ public class ContextMenus : Scenario
                                                          ),
                                          _miForceMinimumPosToZero =
                                              new (
-                                                  "ForceMinimumPosToZero",
+                                                  "Fo_rceMinimumPosToZero",
                                                   "",
                                                   () =>
                                                   {
