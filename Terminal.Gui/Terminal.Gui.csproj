@@ -100,17 +100,15 @@
   <!-- i18 -->
   <!-- =================================================================== -->
   <ItemGroup>
+    <EmbeddedResource Update="Resources\Strings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <Compile Update="Resources\Strings.Designer.cs">
       <DesignTime>true</DesignTime>
       <AutoGen>true</AutoGen>
       <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Update="Resources\Strings.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
   <!-- =================================================================== -->
   <!-- Nuget  -->
