@@ -2,11 +2,13 @@
 
 namespace Terminal.Gui;
 
+using System.Numerics;
+
 /// <summary>
 /// Contains style settings for <see cref="ColorPicker"/> e.g. which <see cref="ColorModel"/>
 /// to use.
 /// </summary>
-public class ColorPickerStyle
+public record ColorPickerStyle : IEqualityOperators<ColorPickerStyle, ColorPickerStyle, bool>
 {
     /// <summary>
     ///     The color model for picking colors by RGB, HSV, etc.
