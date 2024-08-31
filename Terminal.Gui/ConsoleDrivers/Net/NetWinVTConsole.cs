@@ -150,15 +150,20 @@ internal sealed class NetWinVTConsole : IDisposable
 
     private void Dispose (bool disposing)
     {
+        if (_disposed)
+        {
+            return;
+        }
+
         _disposed = true;
-        _stdinText.Dispose ();
-        _stdinRaw.Dispose ();
+        _stdinText?.Dispose ();
+        _stdinRaw?.Dispose ();
 
-        _stdoutText.Dispose ();
-        _stdoutRaw.Dispose ();
+        _stdoutText?.Dispose ();
+        _stdoutRaw?.Dispose ();
 
-        _stderrText.Dispose ();
-        _stderrRaw.Dispose ();
+        _stderrText?.Dispose ();
+        _stderrRaw?.Dispose ();
 
         if (disposing)
         {
