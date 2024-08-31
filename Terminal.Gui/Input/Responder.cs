@@ -3,6 +3,7 @@ using System.Reflection;
 namespace Terminal.Gui;
 
 /// <summary>Responder base class implemented by objects that want to participate on keyboard and mouse input.</summary>
+[MustDisposeResource (false)]
 public class Responder : IDisposable
 {
     private bool _disposedValue;
