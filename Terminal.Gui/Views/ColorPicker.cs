@@ -1,9 +1,8 @@
 #nullable enable
 
-using System;
-
 namespace Terminal.Gui;
 
+// TODO: Declare support for INotifyPropertyChanging and INotifyPropertyChanged when all properties are wired up for it.
 /// <summary>
 ///     True color picker using HSL
 /// </summary>
@@ -24,7 +23,7 @@ public sealed class ColorPicker : View
         ApplyStyleChanges ();
     }
 
-    private readonly Dictionary<IColorBar, TextField> _textFields = new ();
+    private readonly Dictionary<IColorBar, TextField> _textFields = [];
     private readonly ColorModelStrategy _strategy = new ();
     private TextField? _tfHex;
     private Label? _lbHex;
@@ -37,7 +36,7 @@ public sealed class ColorPicker : View
     // TODO: Add interface
     private readonly IColorNameResolver _colorNameResolver = new W3CColors ();
 
-    private List<IColorBar> _bars = new ();
+    private List<IColorBar> _bars = [];
 
     /// <summary>
     ///     Rebuild the user interface to reflect the new state of <see cref="Style"/>.
@@ -48,21 +47,22 @@ public sealed class ColorPicker : View
         DisposeOldViews ();
 
         var y = 0;
-        const int textFieldWidth = 4;
+        const int DEFAULT_TEXT_FIELD_WIDTH = 4;
 
         foreach (ColorBar bar in _strategy.CreateBars (Style.ColorModel))
         {
             bar.Y = y;
-            bar.Width = Dim.Fill (Style.ShowTextFields ? textFieldWidth : 0);
+            bar.Width = Dim.Fill (Style.ShowTextFields ? DEFAULT_TEXT_FIELD_WIDTH : 0);
 
             TextField? tfValue = null;
+
             if (Style.ShowTextFields)
             {
-                tfValue = new TextField
+                tfValue = new()
                 {
-                    X = Pos.AnchorEnd (textFieldWidth),
+                    X = Pos.AnchorEnd (DEFAULT_TEXT_FIELD_WIDTH),
                     Y = y,
-                    Width = textFieldWidth
+                    Width = DEFAULT_TEXT_FIELD_WIDTH
                 };
                 tfValue.HasFocusChanged += UpdateSingleBarValueFromTextField;
                 tfValue.Accept += (s, _)=>UpdateSingleBarValueFromTextField(s);
@@ -121,11 +121,17 @@ public sealed class ColorPicker : View
         set => SetSelectedColor (value, true);
     }
 
+    private ColorPickerStyle _style = new ();
+
     /// <summary>
     ///     Style settings for the color picker.  After making changes ensure you call
     ///     <see cref="ApplyStyleChanges"/>.
     /// </summary>
-    public ColorPickerStyle Style { get; set; } = new ();
+    public ColorPickerStyle Style
+    {
+        get => _style;
+        set => SetField (ref _style, value);
+    }
 
     private void CreateNameField ()
     {
@@ -146,13 +152,13 @@ public sealed class ColorPicker : View
         Add (_lbName);
         Add (_tfName);
 
-        var auto = new AppendAutocomplete (_tfName);
-
-        auto.SuggestionGenerator = new SingleWordSuggestionGenerator
+        _tfName.Autocomplete = new AppendAutocomplete (_tfName)
         {
-            AllSuggestions = _colorNameResolver.GetColorNames ().ToList ()
+            SuggestionGenerator = new SingleWordSuggestionGenerator
+            {
+                AllSuggestions = _colorNameResolver.GetColorNames ().ToList ()
+            }
         };
-        _tfName.Autocomplete = auto;
 
         _tfName.HasFocusChanged += UpdateValueFromName;
         _tfName.Accept += (s, _) => UpdateValueFromName ();
@@ -188,6 +194,9 @@ public sealed class ColorPicker : View
         _tfHex.Accept += (_,_)=> UpdateValueFromTextField();
     }
 
+    // BUG: CONCURRENCY: This needs to be synchronized.
+    // The way this method accesses th fields is dangerous.
+    /// <exception cref="InvalidCastException">An element in the sequence cannot be cast to type <see name="ColorBar" />.</exception>
     private void DisposeOldViews ()
     {
         foreach (ColorBar bar in _bars.Cast<ColorBar> ())
@@ -204,31 +213,33 @@ public sealed class ColorPicker : View
             bar.Dispose ();
         }
 
-        _bars = new ();
+        // We might as well do this earlier.
+        // Grab a reference to the previous list, then assign a new list, then run the loop over the local reference to the old list.
+        _bars = [];
         _textFields.Clear ();
 
-        if (_lbHex != null)
+        if (_lbHex is { })
         {
             Remove (_lbHex);
             _lbHex.Dispose ();
             _lbHex = null;
         }
 
-        if (_tfHex != null)
+        if (_tfHex is { })
         {
             Remove (_tfHex);
             _tfHex.Dispose ();
             _tfHex = null;
         }
 
-        if (_lbName != null)
+        if (_lbName is { })
         {
             Remove (_lbName);
             _lbName.Dispose ();
             _lbName = null;
         }
 
-        if (_tfName != null)
+        if (_tfName is { })
         {
             Remove (_tfName);
             _tfName.Dispose ();
@@ -236,18 +247,22 @@ public sealed class ColorPicker : View
         }
     }
 
-    private void RebuildColorFromBar (object? sender, EventArgs<int> e) { SetSelectedColor (_strategy.GetColorFromBars (_bars, Style.ColorModel), false); }
+    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
+    private void RebuildColorFromBar (object? sender, EventArgs<int> e)
+    {
+        SetSelectedColor (_strategy.GetColorFromBars (_bars, Style.ColorModel), false);
+    }
 
+    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
     private void SetSelectedColor (Color value, bool syncBars)
     {
         if (_selectedColor != value)
         {
-            Color old = _selectedColor;
+            RaisePropertyChanging (this, new (nameof (SelectedColor)));
             _selectedColor = value;
+            RaisePropertyChanged (this, new (nameof (SelectedColor)));
 
-            ColorChanged?.Invoke (
-                                  this,
-                                  new (value));
+            ColorChanged?.Invoke (this, new (value));
         }
 
         SyncSubViewValues (syncBars);
