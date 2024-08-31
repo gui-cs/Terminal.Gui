@@ -153,6 +153,11 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                                                            .ToList ();
                 }
 
+                foreach (View notDependentSubView in notDependentSubViews)
+                {
+                    notDependentSubView.SetRelativeLayout (us.GetContentSize ());
+                }
+
                 for (var i = 0; i < notDependentSubViews.Count; i++)
                 {
                     View v = notDependentSubViews [i];
