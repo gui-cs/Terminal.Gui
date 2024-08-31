@@ -1,8 +1,4 @@
-﻿using System.Reflection.Emit;
-using Xunit.Abstractions;
-using Color = Terminal.Gui.Color;
-
-namespace Terminal.Gui.ViewsTests;
+﻿namespace Terminal.Gui.ViewsTests;
 
 public class ColorPickerTests
 {
@@ -604,41 +600,43 @@ public class ColorPickerTests
         {
             return cp.Subviews.OfType<ColorBar> ().ElementAt ((int)toGet);
         }
+
         throw new NotSupportedException ("ColorPickerPart must be a bar");
     }
 
-    [Fact]
+#nullable enable
+    [Theory]
+    [PairwiseData]
     [SetupFakeDriver]
-    public void ColorPicker_ChangedEvent_Fires ()
+    [Trait ("Category", "Color")]
+    [Trait ("Category", "Events")]
+    [Trait ("Category", "View Types")]
+    public void ColorPicker_ColorChangedEvent_Raised (
+        [CombinatorialRange (0x11111111, 0x55555555, 0x22222222)] uint startColor,
+        [CombinatorialRange (0x00000000, 0xAAAAAAAA, 0x22222222)] uint endColor
+    )
     {
-        Color newColor = default;
-        var count = 0;
-
-        var cp = new ColorPicker ();
-
-        cp.ColorChanged += (s, e) =>
+        ColorPicker cp = new ()
         {
-            count++;
-            newColor = e.CurrentValue;
-
-            Assert.Equal (cp.SelectedColor, e.CurrentValue);
+            SelectedColor = startColor
         };
 
-        cp.SelectedColor = new (1, 2, 3);
-        Assert.Equal (1, count);
-        Assert.Equal (new (1, 2, 3), newColor);
+        Assert.Raises<ColorEventArgs> (
+                                       SubscribeToEvent,
+                                       UnsubscribeFromEvent,
+                                       CauseEventToBeRaised);
+        cp.Dispose ();
 
-        cp.SelectedColor = new (2, 3, 4);
+        return;
 
-        Assert.Equal (2, count);
-        Assert.Equal (new (2, 3, 4), newColor);
+        void SubscribeToEvent (EventHandler<ColorEventArgs> eventUnderTest) { cp.ColorChanged += eventUnderTest; }
 
-        // Set to same value
-        cp.SelectedColor = new (2, 3, 4);
+        void UnsubscribeFromEvent (EventHandler<ColorEventArgs> eventUnderTest) { cp.ColorChanged -= eventUnderTest; }
 
-        // Should have no effect
-        Assert.Equal (2, count);
+        void CauseEventToBeRaised () { cp.SelectedColor = endColor; }
     }
+
+#nullable restore
 
     [Fact]
     [SetupFakeDriver]
