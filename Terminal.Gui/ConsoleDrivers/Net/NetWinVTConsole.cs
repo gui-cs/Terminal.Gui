@@ -1,67 +1,46 @@
 namespace Terminal.Gui.ConsoleDrivers.Net;
 
-using System.Runtime.InteropServices;
-using CommunityToolkit.Diagnostics;
-using Microsoft.Win32.SafeHandles;
+using System.Diagnostics.CodeAnalysis;
+using Windows.Interop;
+using Resources;
+using static Windows.Interop.PInvoke;
+using static Windows.Interop.CONSOLE_MODE;
+using static System.Runtime.InteropServices.Marshal;
 
 [MustDisposeResource]
-internal sealed partial class NetWinVTConsole : IDisposable
+internal sealed class NetWinVTConsole : IDisposable
 {
-    private const uint DISABLE_NEWLINE_AUTO_RETURN = 8;
-    private const uint ENABLE_ECHO_INPUT = 4;
-    private const uint ENABLE_EXTENDED_FLAGS = 128;
-    private const uint ENABLE_INSERT_MODE = 32;
-    private const uint ENABLE_LINE_INPUT = 2;
-    private const uint ENABLE_LVB_GRID_WORLDWIDE = 10;
-    private const uint ENABLE_MOUSE_INPUT = 16;
-
-    // Input modes.
-    private const uint ENABLE_PROCESSED_INPUT = 1;
-
-    // Output modes.
-    private const uint ENABLE_PROCESSED_OUTPUT = 1;
-    private const uint ENABLE_QUICK_EDIT_MODE = 64;
-    private const uint ENABLE_VIRTUAL_TERMINAL_INPUT = 512;
-    private const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4;
-    private const uint ENABLE_WINDOW_INPUT = 8;
-    private const uint ENABLE_WRAP_AT_EOL_OUTPUT = 2;
-    private const int STD_ERROR_HANDLE = -12;
-    private const int STD_INPUT_HANDLE = -10;
-    private const int STD_OUTPUT_HANDLE = -11;
-
-    private readonly SafeHandleMinusOneIsInvalid _errorHandle;
-    private readonly SafeHandleMinusOneIsInvalid _inputHandle;
-    private readonly SafeHandleMinusOneIsInvalid _outputHandle;
-    private readonly uint _originalErrorConsoleMode;
-    private readonly uint _originalInputConsoleMode;
-    private readonly uint _originalOutputConsoleMode;
-
     public NetWinVTConsole ()
     {
-        _inputHandle = GetStdHandle (STD_INPUT_HANDLE);
+        _stdinRaw = File.Create ("CONIN$");
+        _stdinText = new StreamReader (_stdinRaw, Encoding.UTF8, false, -1, true);
 
-        if (!GetConsoleMode (_inputHandle, out uint mode))
+        _stdoutRaw = File.Create ("CONOUT$");
+        _stdoutText = new StreamWriter (_stdoutRaw, Encoding.UTF8, -1, true);
+
+        _stderrRaw = File.Create ("CONERR$");
+        _stderrText = new StreamWriter (_stderrRaw, Encoding.UTF8, -1, true);
+
+        if (!GetConsoleMode (_stdinRaw.SafeFileHandle, out CONSOLE_MODE mode))
         {
-            throw new IOException ($"Failed to get input console mode, error code: {GetLastError ()}.");
+            ThrowGetIoException (Strings.StdIn);
         }
 
         _originalInputConsoleMode = mode;
 
-        if ((mode & ENABLE_VIRTUAL_TERMINAL_INPUT) < ENABLE_VIRTUAL_TERMINAL_INPUT)
+        if ((mode & ENABLE_VIRTUAL_TERMINAL_INPUT) == 0U)
         {
             mode |= ENABLE_VIRTUAL_TERMINAL_INPUT;
 
-            if (!SetConsoleMode (_inputHandle, mode))
+            if (!SetConsoleMode (_stdinRaw.SafeFileHandle, in mode))
             {
-                throw new IOException ($"Failed to set input console mode, error code: {GetLastError ()}.");
+                ThrowSetIoException (Strings.StdIn);
             }
         }
 
-        _outputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
-
-        if (!GetConsoleMode (_outputHandle, out mode))
+        if (!GetConsoleMode (_stdoutRaw.SafeFileHandle, out mode))
         {
-            throw new IOException ($"Failed to get output console mode, error code: {GetLastError ()}.");
+            ThrowGetIoException (Strings.StdOut);
         }
 
         _originalOutputConsoleMode = mode;
@@ -70,86 +49,123 @@ internal sealed partial class NetWinVTConsole : IDisposable
         {
             mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING | DISABLE_NEWLINE_AUTO_RETURN;
 
-            if (!SetConsoleMode (_outputHandle, mode))
+            if (!SetConsoleMode (_stdoutRaw.SafeFileHandle, in mode))
             {
-                throw new IOException ($"Failed to set output console mode, error code: {GetLastError ()}.");
+                ThrowSetIoException (Strings.StdOut);
             }
         }
 
-        _errorHandle = GetStdHandle (STD_ERROR_HANDLE);
-
-        if (!GetConsoleMode (_errorHandle, out mode))
+        if (!GetConsoleMode (_stderrRaw.SafeFileHandle, out mode))
         {
-            throw new IOException ($"Failed to get error console mode, error code: {GetLastError ()}.");
+            ThrowGetIoException (Strings.StdErr);
         }
 
         _originalErrorConsoleMode = mode;
 
-        if ((mode & DISABLE_NEWLINE_AUTO_RETURN) < DISABLE_NEWLINE_AUTO_RETURN)
+        if ((mode & DISABLE_NEWLINE_AUTO_RETURN) != DISABLE_NEWLINE_AUTO_RETURN)
         {
             mode |= DISABLE_NEWLINE_AUTO_RETURN;
 
-            if (!SetConsoleMode (_errorHandle, mode))
+            if (!SetConsoleMode (_stderrRaw.SafeFileHandle, in mode))
             {
-                throw new IOException ($"Failed to set error console mode, error code: {GetLastError ()}.");
+                ThrowSetIoException (Strings.StdErr);
             }
         }
+
+        return;
+
+        [DoesNotReturn]
+        static void ThrowSetIoException (string? streamName = "UNKNOWN")
+        {
+            throw new IOException (
+                                   $"""
+                                    {Strings.NetWinVtConsole_UnableToSetConsoleMode} {Strings.ForPossessive} {streamName}.
+                                    {Strings.ErrorCodeString}: {GetLastPInvokeError ()}
+                                    """);
+        }
+
+        [DoesNotReturn]
+        static void ThrowGetIoException (string? streamName = "UNKNOWN")
+        {
+            throw new IOException (
+                                   $"""
+                                    {Strings.NetWinVtConsole_UnableToGetConsoleMode} {Strings.ForPossessive} {streamName}.
+                                    {Strings.ErrorCodeString}: {GetLastPInvokeError ()}
+                                    """);
+        }
+    }
+
+    private readonly FileStream _stdinRaw;
+    private readonly TextReader _stdinText;
+    private readonly FileStream _stdoutRaw;
+    private readonly TextWriter _stdoutText;
+    private readonly FileStream _stderrRaw;
+    private readonly TextWriter _stderrText;
+    private readonly CONSOLE_MODE _originalErrorConsoleMode;
+    private readonly CONSOLE_MODE _originalInputConsoleMode;
+    private readonly CONSOLE_MODE _originalOutputConsoleMode;
+
+    private volatile bool _disposed;
+
+    /// <inheritdoc/>
+    public void Dispose ()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        Dispose (true);
     }
 
     public void Cleanup ()
     {
-        if (!SetConsoleMode (_inputHandle, _originalInputConsoleMode))
+        if (!SetConsoleMode (_stdinRaw.SafeFileHandle, in _originalInputConsoleMode))
         {
-            throw new IOException ($"Failed to restore input console mode, error code: {GetLastError ()}.");
+            ThrowIoException (Strings.StdIn);
         }
 
-        if (!SetConsoleMode (_outputHandle, _originalOutputConsoleMode))
+        if (!SetConsoleMode (_stdoutRaw.SafeFileHandle, in _originalOutputConsoleMode))
         {
-            throw new IOException ($"Failed to restore output console mode, error code: {GetLastError ()}.");
+            ThrowIoException (Strings.StdOut);
         }
 
-        if (!SetConsoleMode (_errorHandle, _originalErrorConsoleMode))
+        if (!SetConsoleMode (_stderrRaw.SafeFileHandle, in _originalErrorConsoleMode))
         {
-            throw new IOException ($"Failed to restore error console mode, error code: {GetLastError ()}.");
+            ThrowIoException (Strings.StdErr);
+        }
+
+        return;
+
+        [DoesNotReturn]
+        static void ThrowIoException (string? streamName = "UNKNOWN")
+        {
+            throw new IOException (
+                                   $"""
+                                    {Strings.NetWinVtConsole_UnableToRestoreConsoleMode} {Strings.ForPossessive} {streamName}.
+                                    {Strings.ErrorCodeString}: {GetLastPInvokeError ()}
+                                    """);
         }
     }
-
-    [LibraryImport ("kernel32")]
-    private static partial bool GetConsoleMode (SafeHandle hConsoleHandle, out uint lpMode);
-
-    [LibraryImport ("kernel32")]
-    private static partial uint GetLastError ();
-
-    [MustDisposeResource (false)]
-    [LibraryImport ("kernel32", SetLastError = true)]
-    private static partial SafeHandleMinusOneIsInvalid GetStdHandle (int nStdHandle);
-
-    [LibraryImport ("kernel32")]
-    private static partial bool SetConsoleMode (SafeHandle hConsoleHandle, uint dwMode);
-
-    private volatile bool _disposed;
 
     private void Dispose (bool disposing)
     {
+        _disposed = true;
+        _stdinText.Dispose ();
+        _stdinRaw.Dispose ();
+
+        _stdoutText.Dispose ();
+        _stdoutRaw.Dispose ();
+
+        _stderrText.Dispose ();
+        _stderrRaw.Dispose ();
+
         if (disposing)
         {
-            _errorHandle.Dispose ();
-            _inputHandle.Dispose ();
-            _outputHandle.Dispose ();
-        }
-    }
-
-    /// <inheritdoc />
-    public void Dispose ()
-    {
-        if (!_disposed)
-        {
-            Dispose (true);
-            _disposed = true;
             GC.SuppressFinalize (this);
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     ~NetWinVTConsole () { Dispose (false); }
 }

@@ -708,10 +708,34 @@
   <data name="Win32_PInvoke_SetConsoleMode_HandleInvalid" xml:space="preserve">
     <value>The console handle is invalid.</value>
   </data>
-  <data name="NetWinVtConsole_InvalidStderrHandle_IOException" xml:space="preserve">
-    <value>Failed to restore error console mode.</value>
-  </data>
   <data name="ErrorCodeString" xml:space="preserve">
     <value>Error Code</value>
+  </data>
+  <data name="NetWinVtConsole_UnableToRestoreConsoleMode" xml:space="preserve">
+    <value>Failed to restore console mode</value>
+  </data>
+  <data name="NetWinVtConsole_UnableToSetConsoleMode" xml:space="preserve">
+    <value>Failed to set console mode</value>
+  </data>
+  <data name="NetWinVtConsole_UnableToGetConsoleMode" xml:space="preserve">
+    <value>Failed to get console mode</value>
+  </data>
+  <data name="StdErr" xml:space="preserve">
+    <value>stderr</value>
+  </data>
+  <data name="StdIn" xml:space="preserve">
+    <value>stdin</value>
+  </data>
+  <data name="StdOut" xml:space="preserve">
+    <value>stdout</value>
+  </data>
+  <data name="ForPossessive" xml:space="preserve">
+    <value>for</value>
+  </data>
+  <data name="Unknown" xml:space="preserve">
+    <value>unknown</value>
+  </data>
+  <data name="IOStream" xml:space="preserve">
+    <value>stream</value>
   </data>
 </root>
