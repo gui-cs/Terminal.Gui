@@ -63,7 +63,7 @@ public class ColorPicker : View
                     Y = y,
                     Width = textFieldWidth
                 };
-                tfValue.HasFocusChanged += (s,_)=> UpdateSingleBarValueFromTextField(s);
+                tfValue.HasFocusChanged += UpdateSingleBarValueFromTextField;
                 tfValue.Accept += (s, _)=>UpdateSingleBarValueFromTextField(s);
                 _textFields.Add (bar, tfValue);
             }
@@ -153,8 +153,8 @@ public class ColorPicker : View
         };
         _tfName.Autocomplete = auto;
 
-        _tfName.HasFocusChanged += (s,_)=> UpdateValueFromName(s);
-        _tfName.Accept += (s, _) => UpdateValueFromName (s);
+        _tfName.HasFocusChanged += UpdateValueFromName;
+        _tfName.Accept += (_s, _) => UpdateValueFromName ();
     }
 
     private void CreateTextField ()
@@ -183,8 +183,8 @@ public class ColorPicker : View
         Add (_lbHex);
         Add (_tfHex);
 
-        _tfHex.HasFocusChanged += (s, _) => UpdateValueFromTextField(s);
-        _tfHex.Accept += (s, _) => UpdateValueFromTextField (s);
+        _tfHex.HasFocusChanged += UpdateValueFromTextField;
+        _tfHex.Accept += (_,_)=> UpdateValueFromTextField();
     }
 
     private void DisposeOldViews ()
@@ -277,6 +277,17 @@ public class ColorPicker : View
         }
     }
 
+    private void UpdateSingleBarValueFromTextField (object? sender, HasFocusEventArgs e)
+    {
+        // if the new value of Focused is true then it is an enter event so ignore
+        if (e.NewValue)
+        {
+            return;
+        }
+
+        // it is a leave event so update
+        UpdateSingleBarValueFromTextField (sender);
+    }
     private void UpdateSingleBarValueFromTextField (object? sender)
     {
 
@@ -292,7 +303,18 @@ public class ColorPicker : View
         }
     }
 
-    private void UpdateValueFromName (object? sender)
+    private void UpdateValueFromName (object sender, HasFocusEventArgs e)
+    {
+        // if the new value of Focused is true then it is an enter event so ignore
+        if (e.NewValue)
+        {
+            return;
+        }
+
+        // it is a leave event so update
+        UpdateValueFromName();
+    }
+    private void UpdateValueFromName ()
     {
         if (_tfName == null)
         {
@@ -310,9 +332,19 @@ public class ColorPicker : View
         }
     }
 
-    private void UpdateValueFromTextField (object? sender)
+    private void UpdateValueFromTextField (object? sender, HasFocusEventArgs e)
     {
-        
+        // if the new value of Focused is true then it is an enter event so ignore
+        if (e.NewValue)
+        {
+            return;
+        }
+
+        // it is a leave event so update
+        UpdateValueFromTextField ();
+    }
+    private void UpdateValueFromTextField ()
+    {
         if (_tfHex == null)
         {
             return;
