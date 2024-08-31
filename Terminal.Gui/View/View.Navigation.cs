@@ -89,7 +89,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         }
 
         int focusedIndex = focusChain.IndexOf (Focused); // Will return -1 if Focused can't be found or is null
-        int next = 0; // Assume we wrap to start of the focus chain
+        var next = 0; // Assume we wrap to start of the focus chain
 
         if (focusedIndex < focusChain.Length - 1)
         {
