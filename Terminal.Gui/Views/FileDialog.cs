@@ -71,24 +71,13 @@ public class FileDialog : Dialog
 
         _btnOk = new Button
         {
-            Y = Pos.AnchorEnd (1), X = Pos.Func (CalculateOkButtonPosX), IsDefault = true, Text = Style.OkButtonText
+            IsDefault = true, Text = Style.OkButtonText
         };
         _btnOk.Accept += (s, e) => Accept (true);
 
-        _btnOk.KeyDown += (s, k) =>
-                          {
-                              NavigateIf (k, KeyCode.CursorLeft, _btnCancel);
-                              NavigateIf (k, KeyCode.CursorUp, _tableView);
-                          };
 
-        _btnCancel = new Button { Y = Pos.AnchorEnd (1), X = Pos.Right (_btnOk) + 1, Text = Strings.btnCancel };
+        _btnCancel = new Button { Text = Strings.btnCancel };
 
-        _btnCancel.KeyDown += (s, k) =>
-                              {
-                                  NavigateIf (k, KeyCode.CursorLeft, _btnToggleSplitterCollapse);
-                                  NavigateIf (k, KeyCode.CursorUp, _tableView);
-                                  NavigateIf (k, KeyCode.CursorRight, _btnOk);
-                              };
         _btnCancel.Accept += (s, e) =>
         {
             Canceled = true;
@@ -158,28 +147,7 @@ public class FileDialog : Dialog
         ColumnStyle typeStyle = Style.TableStyle.GetOrCreateColumnStyle (3);
         typeStyle.MinWidth = 6;
         typeStyle.ColorGetter = ColorGetter;
-
-        _tableView.KeyDown += (s, k) =>
-                              {
-                                  if (_tableView.SelectedRow <= 0)
-                                  {
-                                      NavigateIf (k, KeyCode.CursorUp, _tbPath);
-                                  }
-
-                                  if (_tableView.SelectedRow == _tableView.Table.Rows - 1)
-                                  {
-                                      NavigateIf (k, KeyCode.CursorDown, _btnToggleSplitterCollapse);
-                                  }
-
-                                  if (_splitContainer.Tiles.First ().ContentView.Visible && _tableView.SelectedColumn == 0)
-                                  {
-                                      NavigateIf (k, KeyCode.CursorLeft, _treeView);
-                                  }
-
-                                  if (k.Handled)
-                                  { }
-                              };
-
+        
         _treeView = new TreeView<IFileSystemInfo> { Width = Dim.Fill (), Height = Dim.Fill () };
 
         var fileDialogTreeBuilder = new FileSystemTreeBuilder ();
@@ -231,16 +199,6 @@ public class FileDialog : Dialog
                                        o.Handled = true;
                                    }
                                }
-
-                               if (_tbFind.CursorIsAtEnd ())
-                               {
-                                   NavigateIf (o, KeyCode.CursorRight, _btnCancel);
-                               }
-
-                               if (_tbFind.CursorIsAtStart ())
-                               {
-                                   NavigateIf (o, KeyCode.CursorLeft, _btnToggleSplitterCollapse);
-                               }
                            };
 
         _tableView.Style.ShowHorizontalHeaderOverline = true;
@@ -262,31 +220,7 @@ public class FileDialog : Dialog
         _tableView.KeyBindings.ReplaceCommands (Key.End, Command.BottomEnd);
         _tableView.KeyBindings.ReplaceCommands (Key.Home.WithShift, Command.TopHomeExtend);
         _tableView.KeyBindings.ReplaceCommands (Key.End.WithShift, Command.BottomEndExtend);
-
-        _treeView.KeyDown += (s, k) =>
-                             {
-                                 IFileSystemInfo selected = _treeView.SelectedObject;
-
-                                 if (selected is { })
-                                 {
-                                     if (!_treeView.CanExpand (selected) || _treeView.IsExpanded (selected))
-                                     {
-                                         NavigateIf (k, KeyCode.CursorRight, _tableView);
-                                     }
-                                     else if (_treeView.GetObjectRow (selected) == 0)
-                                     {
-                                         NavigateIf (k, KeyCode.CursorUp, _tbPath);
-                                     }
-                                 }
-
-                                 if (k.Handled)
-                                 {
-                                     return;
-                                 }
-
-                                 k.Handled = TreeView_KeyDown (k);
-                             };
-
+        
         AllowsMultipleSelection = false;
 
         UpdateNavigationVisibility ();
@@ -294,16 +228,17 @@ public class FileDialog : Dialog
         // BUGBUG: This TabOrder is counter-intuitive. The tab order for a dialog should match the
         // order the Views' are presented, left to right, top to bottom.
         // Determines tab order
-        Add (_btnToggleSplitterCollapse);
-        Add (_tbFind);
-        Add (_spinnerView);
-        Add (_btnOk);
-        Add (_btnCancel);
+        Add (_tbPath);
         Add (_btnUp);
         Add (_btnBack);
         Add (_btnForward);
-        Add (_tbPath);
         Add (_splitContainer);
+        Add (_btnToggleSplitterCollapse);
+        Add (_tbFind);
+        Add (_spinnerView);
+
+        AddButton (_btnOk);
+        AddButton (_btnCancel);
     }
 
     /// <summary>
@@ -1041,23 +976,6 @@ public class FileDialog : Dialog
         return toReturn;
     }
 
-    private bool NavigateIf (Key keyEvent, KeyCode isKey, View to)
-    {
-        if (keyEvent.KeyCode == isKey)
-        {
-            to.FocusDeepest (NavigationDirection.Forward, null);
-
-            if (to == _tbPath)
-            {
-                _tbPath.MoveEnd ();
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
     private void New ()
     {
         if (State is { })
@@ -1428,19 +1346,6 @@ public class FileDialog : Dialog
         {
             _pushingState = false;
         }
-    }
-
-    private bool TreeView_KeyDown (Key keyEvent)
-    {
-        if (_treeView.HasFocus && Separators.Contains ((char)keyEvent))
-        {
-            _tbPath.FocusDeepest (NavigationDirection.Forward, null);
-
-            // let that keystroke go through on the tbPath instead
-            return true;
-        }
-
-        return false;
     }
 
     private void TreeView_SelectionChanged (object sender, SelectionChangedEventArgs<IFileSystemInfo> e)
