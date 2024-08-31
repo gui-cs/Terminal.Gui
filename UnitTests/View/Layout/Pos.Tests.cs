@@ -4,36 +4,50 @@ using static Terminal.Gui.Pos;
 
 namespace Terminal.Gui.LayoutTests;
 
+using JetBrains.Annotations;
+
+[Trait("Category", "Layout")]
 public class PosTests ()
 {
+#nullable enable annotations
     [Fact]
     public void
-        Pos_Validation_Do_Not_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
+        Pos_Validation_Do_Not_Throw_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
     {
         Application.Init (new FakeDriver ());
 
         Toplevel t = new ();
 
-        var w = new Window { X = Pos.Left (t) + 2, Y = Pos.Absolute (2) };
+        var w = new Window { X = Left (t) + 2, Y = Pos.Absolute (2) };
 
-        var v = new View { X = Pos.Center (), Y = Pos.Percent (10) };
+        var v = new View { X = Center (), Y = Percent (10) };
 
         w.Add (v);
         t.Add (w);
 
-        t.Ready += (s, e) =>
-                   {
-                       v.Frame = new Rectangle (2, 2, 10, 10);
-                       Assert.Equal (2, v.X = 2);
-                       Assert.Equal (2, v.Y = 2);
-                   };
+        t.Ready += TOnReady;
 
-        Application.Iteration += (s, a) => Application.RequestStop ();
+        Application.Iteration += ApplicationOnIteration;
 
         Application.Run (t);
         t.Dispose ();
         Application.Shutdown ();
+
+        return;
+
+        void TOnReady (object? s, EventArgs e)
+        {
+            v.Frame = new (2, 2, 10, 10);
+            Assert.Equal (2, v.X = 2);
+            Assert.Equal (2, v.Y = 2);
+        }
+
+        static void ApplicationOnIteration (object? s, IterationEventArgs a)
+        {
+            Application.RequestStop ();
+        }
     }
+#nullable restore
 
     [Fact]
     public void PosCombine_Calculate_ReturnsExpectedValue ()
