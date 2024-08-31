@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 
 namespace Terminal.Gui;
 
@@ -7,8 +7,7 @@ public class Responder : IDisposable
 {
     private bool _disposedValue;
 
-    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resource.</summary>
-
+    /// <inheritdoc cref="IDisposable.Dispose"/>
     public void Dispose ()
     {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
@@ -25,7 +24,7 @@ public class Responder : IDisposable
 #endif
     }
 
-    /// <summary>Event raised when <see cref="Dispose()"/> has been called to signal that this object is being disposed.</summary>
+    /// <summary>Event raised when <see cref="Dispose" /> has been called to signal that this object is being disposed.</summary>
     [CanBeNull]
     public event EventHandler Disposing;
 
@@ -50,7 +49,7 @@ public class Responder : IDisposable
     }
 
     // TODO: v2 - nuke this
-    /// <summary>Utilty function to determine <paramref name="method"/> is overridden in the <paramref name="subclass"/>.</summary>
+    /// <summary>Utility function to determine <paramref name="method"/> is overridden in the <paramref name="subclass"/>.</summary>
     /// <param name="subclass">The view.</param>
     /// <param name="method">The method name.</param>
     /// <returns><see langword="true"/> if it's overridden, <see langword="false"/> otherwise.</returns>
