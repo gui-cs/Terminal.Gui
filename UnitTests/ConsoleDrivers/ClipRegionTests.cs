@@ -16,15 +16,9 @@ public class ClipRegionTests
     }
 
     [Theory]
-    [InlineData (typeof (FakeDriver))]
-    [InlineData (typeof (NetDriver))]
-
-    //[InlineData (typeof (ANSIDriver))]
-    [InlineData (typeof (WindowsDriver))]
-    [InlineData (typeof (CursesDriver))]
-    public void AddRune_Is_Clipped (Type driverType)
+    [MemberData(nameof(TestHelpers.GetDriversOnly), [""], MemberType = typeof (TestHelpers))]
+    public void AddRune_Is_Clipped<T> (T driver) where T : ConsoleDriver
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
         Application.Init (driver);
         Application.Driver!.Rows = 25;
         Application.Driver!.Cols = 80;
@@ -54,15 +48,9 @@ public class ClipRegionTests
     }
 
     [Theory]
-    [InlineData (typeof (FakeDriver))]
-    [InlineData (typeof (NetDriver))]
-
-    //[InlineData (typeof (ANSIDriver))]
-    [InlineData (typeof (WindowsDriver))]
-    [InlineData (typeof (CursesDriver))]
-    public void Clip_Set_To_Empty_AllInvalid (Type driverType)
+    [MemberData (nameof (TestHelpers.GetDriversOnly), [""], MemberType = typeof (TestHelpers))]
+    public void Clip_Set_To_Empty_AllInvalid<T> (T driver) where T : ConsoleDriver
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
         Application.Init (driver);
 
         // Define a clip rectangle
