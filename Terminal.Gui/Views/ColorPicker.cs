@@ -63,7 +63,8 @@ public class ColorPicker : View
                     Y = y,
                     Width = textFieldWidth
                 };
-                tfValue.HasFocusChanged += UpdateSingleBarValueFromTextField;
+                tfValue.HasFocusChanged += (s,_)=> UpdateSingleBarValueFromTextField(s);
+                tfValue.Accept += (s, _)=>UpdateSingleBarValueFromTextField(s);
                 _textFields.Add (bar, tfValue);
             }
 
@@ -152,7 +153,8 @@ public class ColorPicker : View
         };
         _tfName.Autocomplete = auto;
 
-        _tfName.HasFocusChanged += UpdateValueFromName;
+        _tfName.HasFocusChanged += (s,_)=> UpdateValueFromName(s);
+        _tfName.Accept += (s, _) => UpdateValueFromName (s);
     }
 
     private void CreateTextField ()
@@ -181,7 +183,8 @@ public class ColorPicker : View
         Add (_lbHex);
         Add (_tfHex);
 
-        _tfHex.HasFocusChanged += UpdateValueFromTextField;
+        _tfHex.HasFocusChanged += (s, _) => UpdateValueFromTextField(s);
+        _tfHex.Accept += (s, _) => UpdateValueFromTextField (s);
     }
 
     private void DisposeOldViews ()
@@ -192,7 +195,6 @@ public class ColorPicker : View
 
             if (_textFields.TryGetValue (bar, out TextField? tf))
             {
-                tf.HasFocusChanged -= UpdateSingleBarValueFromTextField;
                 Remove (tf);
                 tf.Dispose ();
             }
@@ -214,7 +216,6 @@ public class ColorPicker : View
         if (_tfHex != null)
         {
             Remove (_tfHex);
-            _tfHex.HasFocusChanged -= UpdateValueFromTextField;
             _tfHex.Dispose ();
             _tfHex = null;
         }
@@ -229,7 +230,6 @@ public class ColorPicker : View
         if (_tfName != null)
         {
             Remove (_tfName);
-            _tfName.HasFocusChanged -= UpdateValueFromName;
             _tfName.Dispose ();
             _tfName = null;
         }
@@ -277,12 +277,8 @@ public class ColorPicker : View
         }
     }
 
-    private void UpdateSingleBarValueFromTextField (object? sender, HasFocusEventArgs e)
+    private void UpdateSingleBarValueFromTextField (object? sender)
     {
-        if (e.NewValue)
-        {
-            return;
-        }
 
         foreach (KeyValuePair<IColorBar, TextField> kvp in _textFields)
         {
@@ -296,13 +292,8 @@ public class ColorPicker : View
         }
     }
 
-    private void UpdateValueFromName (object? sender, HasFocusEventArgs e)
+    private void UpdateValueFromName (object? sender)
     {
-        if (e.NewValue)
-        {
-            return;
-        }
-
         if (_tfName == null)
         {
             return;
@@ -319,13 +310,9 @@ public class ColorPicker : View
         }
     }
 
-    private void UpdateValueFromTextField (object? sender, HasFocusEventArgs e)
+    private void UpdateValueFromTextField (object? sender)
     {
-            if (e.NewValue)
-        {
-            return;
-        }
-
+        
         if (_tfHex == null)
         {
             return;
