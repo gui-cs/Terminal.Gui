@@ -99,12 +99,13 @@ public class FileDialogTests (ITestOutputHelper output)
         string openIn = Path.Combine (Environment.CurrentDirectory, "zz");
         Directory.CreateDirectory (openIn);
         dlg.Path = openIn + Path.DirectorySeparatorChar;
-        Application.OnKeyDown (Key.Tab);
-        Application.OnKeyDown (Key.Tab);
-        Application.OnKeyDown (Key.Tab);
+
+        var tf = GetTextField (dlg, FileDialogPart.SearchField);
+        tf.SetFocus ();
 
         Assert.IsType<TextField> (dlg.MostFocused);
-        var tf = (TextField)dlg.MostFocused;
+        Assert.Same (tf, dlg.MostFocused);
+
         Assert.Equal ("Enter Search", tf.Caption);
 
         // Dialog has not yet been confirmed with a choice
@@ -140,6 +141,10 @@ public class FileDialogTests (ITestOutputHelper output)
 
         Assert.IsType<TextField> (dlg.MostFocused);
         Send ('v', ConsoleKey.DownArrow);
+
+        var tv = GetTableView(dlg);
+        tv.SetFocus ();
+
         Assert.IsType<TableView> (dlg.MostFocused);
 
         // ".." should be the first thing selected
@@ -177,8 +182,10 @@ public class FileDialogTests (ITestOutputHelper output)
         IReadOnlyCollection<string> eventMultiSelected = null;
         dlg.FilesSelected += (s, e) => { eventMultiSelected = e.Dialog.MultiSelected; };
 
-        Assert.IsType<TextField> (dlg.MostFocused);
-        Send ('v', ConsoleKey.DownArrow);
+
+        var tv = GetTableView (dlg);
+        tv.SetFocus ();
+
         Assert.IsType<TableView> (dlg.MostFocused);
 
         // Try to toggle '..'
@@ -232,8 +239,9 @@ public class FileDialogTests (ITestOutputHelper output)
         IReadOnlyCollection<string> eventMultiSelected = null;
         dlg.FilesSelected += (s, e) => { eventMultiSelected = e.Dialog.MultiSelected; };
 
-        Assert.IsType<TextField> (dlg.MostFocused);
-        Send ('v', ConsoleKey.DownArrow);
+        var tv = GetTableView (dlg);
+        tv.SetFocus ();
+
         Assert.IsType<TableView> (dlg.MostFocused);
 
         // Move selection to subfolder
@@ -284,8 +292,9 @@ public class FileDialogTests (ITestOutputHelper output)
         IReadOnlyCollection<string> eventMultiSelected = null;
         dlg.FilesSelected += (s, e) => { eventMultiSelected = e.Dialog.MultiSelected; };
 
-        Assert.IsType<TextField> (dlg.MostFocused);
-        Send ('v', ConsoleKey.DownArrow);
+        var tv = GetTableView (dlg);
+        tv.SetFocus ();
+
         Assert.IsType<TableView> (dlg.MostFocused);
 
         // Move selection to subfolder
@@ -327,8 +336,9 @@ public class FileDialogTests (ITestOutputHelper output)
         dlg.OpenMode = openModeMixed ? OpenMode.Mixed : OpenMode.Directory;
         dlg.AllowsMultipleSelection = multiple;
 
-        Assert.IsType<TextField> (dlg.MostFocused);
-        Send ('v', ConsoleKey.DownArrow);
+        var tv = GetTableView (dlg);
+        tv.SetFocus ();
+
         Assert.IsType<TableView> (dlg.MostFocused);
 
         // Should be selecting ..
@@ -733,5 +743,31 @@ public class FileDialogTests (ITestOutputHelper output)
         {
             Send ('\\', ConsoleKey.Separator);
         }
+    }
+
+    private TextField GetTextField (FileDialog dlg, FileDialogPart part)
+    {
+        switch (part)
+        {
+            case FileDialogPart.Path:
+                return dlg.Subviews.OfType<TextField> ().ElementAt (0);
+            case FileDialogPart.SearchField:
+                return dlg.Subviews.OfType<TextField> ().ElementAt (1);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException (nameof (part), part, null);
+        }
+    }
+
+    private TableView GetTableView (FileDialog dlg)
+    {
+        var tile = dlg.Subviews.OfType<TileView> ().Single ();
+        return (TableView)tile.Tiles.ElementAt (1).ContentView.Subviews.ElementAt(0);
+    }
+
+    private enum FileDialogPart
+    {
+        Path,
+        SearchField,
     }
 }
