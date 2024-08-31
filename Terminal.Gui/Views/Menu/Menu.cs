@@ -228,9 +228,7 @@ internal sealed class Menu : View
             return;
         }
 
-        IEnumerable<MenuItem> menuItems = menuBarItem.Children.Where (m => m is { })!;
-
-        foreach (MenuItem menuItem in menuItems)
+        foreach (MenuItem menuItem in menuBarItem.Children.Where (static m => m is { }))
         {
             if (menuItem.HotKey != Key.Empty)
             {
@@ -330,7 +328,7 @@ internal sealed class Menu : View
     }
 
     /// <inheritdoc/>
-    public override void OnVisibleChanged ()
+    protected override void OnVisibleChanged ()
     {
         base.OnVisibleChanged ();
 
@@ -344,6 +342,7 @@ internal sealed class Menu : View
         }
     }
 
+    /// <exception cref="InvalidOperationException">If called when <see cref="View.Visible"/> is <see langword="false"/>.</exception>
     private void Application_RootMouseEvent (object? sender, MouseEvent a)
     {
         if (a.View is { } and (MenuBar or not Menu))
@@ -353,14 +352,14 @@ internal sealed class Menu : View
 
         if (!Visible)
         {
-            throw new InvalidOperationException ("This shouldn't running on a invisible menu!");
+            throw new InvalidOperationException ("This shouldn't running on an invisible menu!");
         }
 
         View view = a.View ?? this;
 
         Point boundsPoint = view.ScreenToViewport (new (a.Position.X, a.Position.Y));
 
-        var me = new MouseEvent
+        MouseEvent me = new MouseEvent
         {
             Position = boundsPoint,
             Flags = a.Flags,
@@ -368,7 +367,7 @@ internal sealed class Menu : View
             View = view
         };
 
-        if (view.NewMouseEvent (me) == true || a.Flags == MouseFlags.Button1Pressed || a.Flags == MouseFlags.Button1Released)
+        if (view.NewMouseEvent (me) == true || a.IsMouseButton1PressedOrReleased)
         {
             a.Handled = true;
         }

@@ -1,12 +1,14 @@
 namespace Terminal.Gui;
 
+using System.Runtime.CompilerServices;
+
 /// <summary>Mouse flags reported in <see cref="MouseEvent"/>.</summary>
 /// <remarks>They just happen to map to the ncurses ones.</remarks>
 [Flags]
 public enum MouseFlags
 {
     /// <summary>
-    ///    No mouse event. This is the default value for <see cref="MouseEvent.Flags"/> when no mouse event is being reported.
+    ///     No mouse event. This is the default value for <see cref="MouseEvent.Flags"/> when no mouse event is being reported.
     /// </summary>
     None = 0,
 
@@ -99,6 +101,7 @@ public enum MouseFlags
 }
 
 // TODO: Merge MouseEvent and MouseEventEventArgs into a single class.
+// TODO: Not that.
 
 /// <summary>
 ///     Conveys the details of mouse events, such as coordinates and button state, from
@@ -110,11 +113,24 @@ public enum MouseFlags
 /// </remarks>
 public class MouseEvent
 {
-    /// <summary>Flags indicating the kind of mouse event that is being posted.</summary>
-    public MouseFlags Flags { get; set; }
+    /// <summary>Local constant to avoid run-time evaluation.</summary>
+    private const int BUTTON1_PRESSED_OR_RELEASED = (int)(MouseFlags.Button1Pressed | MouseFlags.Button1Released);
 
-    /// <summary>The View at the location for the mouse event.</summary>
-    public View View { get; set; }
+    [AccessedThroughProperty (nameof (Flags))]
+    private MouseFlags _flags;
+
+    /// <summary>Flags indicating the kind of mouse event that is being posted.</summary>
+    public MouseFlags Flags
+    {
+        get => _flags;
+        set => _flags = value;
+    }
+
+    /// <summary>
+    ///     Indicates if the current mouse event has been processed. Set this value to <see langword="true"/> to indicate the mouse
+    ///     event was handled.
+    /// </summary>
+    public bool Handled { get; set; }
 
     /// <summary>The position of the mouse in <see cref="Gui.View.Viewport"/>-relative coordinates.</summary>
     public Point Position { get; set; }
@@ -125,22 +141,25 @@ public class MouseEvent
     /// <remarks>
     ///     <para>
     ///         <see cref="Position"/> is <see cref="Gui.View.Viewport"/>-relative. When the mouse is grabbed by a view,
-    ///         <see cref="ScreenPosition"/> provides the mouse position screen-relative coordinates, enabling the grabbed view to know how much the
-    ///         mouse has moved.
+    ///         <see cref="ScreenPosition"/> provides the mouse position screen-relative coordinates, enabling the grabbed view to know
+    ///         how much the mouse has moved.
     ///     </para>
     ///     <para>
     ///         Calculated and processed in <see cref="Application.OnMouseEvent(MouseEvent)"/>.
     ///     </para>
     /// </remarks>
-    public Point ScreenPosition { get; set; }
-
-    /// <summary>
-    ///     Indicates if the current mouse event has been processed. Set this value to <see langword="true"/> to indicate the mouse
-    ///     event was handled.
-    /// </summary>
-    public bool Handled { get; set; }
+    public Point ScreenPosition { get; init; }
 
     /// <summary>Returns a <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</summary>
     /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</returns>
-    public override string ToString () { return $"({Position}):{Flags}"; }
+    public override string ToString () => $"({Position}):{_flags}";
+
+    /// <summary>The View at the location for the mouse event.</summary>
+    public View? View { get; set; }
+
+    /// <summary>
+    ///     Gets a boolean indicating if <see cref="Flags"/> has one or both of <see cref="MouseFlags.Button1Pressed"/> or
+    ///     <see cref="MouseFlags.Button1Released"/> set.
+    /// </summary>
+    internal bool IsMouseButton1PressedOrReleased => (Unsafe.As<MouseFlags, int> (ref _flags) & BUTTON1_PRESSED_OR_RELEASED) != 0;
 }
