@@ -14,13 +14,13 @@ public class Responder : IDisposable
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Disposing?.Invoke (this, EventArgs.Empty);
         Dispose (true);
-        GC.SuppressFinalize (this);
 #if DEBUG_IDISPOSABLE
         WasDisposed = true;
 
         Instances.RemoveAll (static r => r is { WasDisposed: true });
 
 #endif
+        GC.SuppressFinalize (this);
     }
 
     /// <summary>Event raised when <see cref="Dispose" /> has been called to signal that this object is being disposed.</summary>
