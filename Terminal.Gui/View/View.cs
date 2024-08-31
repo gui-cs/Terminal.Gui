@@ -106,15 +106,8 @@ namespace Terminal.Gui;
 
 #endregion API Docs
 
-public partial class View : Responder, ISupportInitializeNotification
+public partial class View : Responder, ISupportInitializeNotification, INotifyPropertyChanging, INotifyPropertyChanged
 {
-    /// <summary>
-    ///     Cancelable event fired when the <see cref="Command.Accept"/> command is invoked. Set
-    ///     <see cref="HandledEventArgs.Handled"/>
-    ///     to cancel the event.
-    /// </summary>
-    public event EventHandler<HandledEventArgs>? Accept;
-
     /// <summary>Gets or sets arbitrary data for the view.</summary>
     /// <remarks>This property is not used internally.</remarks>
     public object? Data { get; set; }
@@ -147,22 +140,6 @@ public partial class View : Responder, ISupportInitializeNotification
         Debug.Assert (InternalSubviews.Count == 0);
     }
 
-    /// <summary>
-    ///     Called when the <see cref="Command.Accept"/> command is invoked. Raises <see cref="Accept"/>
-    ///     event.
-    /// </summary>
-    /// <returns>
-    ///     If <see langword="true"/> the event was canceled. If <see langword="false"/> the event was raised but not canceled.
-    ///     If <see langword="null"/> no event was raised.
-    /// </returns>
-    protected bool? OnAccept ()
-    {
-        var args = new HandledEventArgs ();
-        Accept?.Invoke (this, args);
-
-        return Accept is null ? null : args.Handled;
-    }
-
     #region Constructors and Initialization
 
     /// <summary>
@@ -186,13 +163,6 @@ public partial class View : Responder, ISupportInitializeNotification
         //SetupMouse ();
         SetupText ();
     }
-
-    /// <summary>
-    ///     Event called only once when the <see cref="View"/> is being initialized for the first time. Allows
-    ///     configurations and assignments to be performed before the <see cref="View"/> being shown.
-    ///     View implements <see cref="ISupportInitializeNotification"/> to allow for more sophisticated initialization.
-    /// </summary>
-    public event EventHandler? Initialized;
 
     /// <summary>
     ///     Get or sets if  the <see cref="View"/> has been initialized (via <see cref="ISupportInitialize.BeginInit"/>
@@ -346,12 +316,6 @@ public partial class View : Responder, ISupportInitializeNotification
         }
     }
 
-    /// <summary>Event fired when the <see cref="Enabled"/> value is being changed.</summary>
-    public event EventHandler? EnabledChanged;
-
-    /// <summary>Method invoked when the <see cref="Enabled"/> property from a view is changed.</summary>
-    public virtual void OnEnabledChanged () { EnabledChanged?.Invoke (this, EventArgs.Empty); }
-
     private bool _visible = true;
 
     /// <summary>Gets or sets a value indicating whether this <see cref="Responder"/> and all its child controls are displayed.</summary>
@@ -385,12 +349,6 @@ public partial class View : Responder, ISupportInitializeNotification
             SetNeedsDisplay ();
         }
     }
-
-    /// <summary>Method invoked when the <see cref="Visible"/> property from a view is changed.</summary>
-    public virtual void OnVisibleChanged () { VisibleChanged?.Invoke (this, EventArgs.Empty); }
-
-    /// <summary>Event fired when the <see cref="Visible"/> value is being changed.</summary>
-    public event EventHandler? VisibleChanged;
 
     // TODO: This API is a hack. We should make Visible propogate automatically, no? See https://github.com/gui-cs/Terminal.Gui/issues/3703
     /// <summary>
@@ -492,41 +450,12 @@ public partial class View : Responder, ISupportInitializeNotification
     private void SetTitleTextFormatterSize ()
     {
         TitleTextFormatter.ConstrainToSize = new (
-                                       TextFormatter.GetWidestLineLength (TitleTextFormatter.Text)
-                                       - (TitleTextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
-                                              ? Math.Max (HotKeySpecifier.GetColumns (), 0)
-                                              : 0),
-                                       1);
+                                                  TextFormatter.GetWidestLineLength (TitleTextFormatter.Text)
+                                                - (TitleTextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
+                                                       ? Math.Max (HotKeySpecifier.GetColumns (), 0)
+                                                       : 0),
+                                                  1);
     }
-
-    /// <summary>Called when the <see cref="View.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.</summary>
-    protected void OnTitleChanged ()
-    {
-        TitleChanged?.Invoke (this, new (in _title));
-    }
-
-    /// <summary>
-    ///     Called before the <see cref="View.Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can
-    ///     be cancelled.
-    /// </summary>
-    /// <param name="newTitle">The new <see cref="View.Title"/> to be replaced.</param>
-    /// <returns>`true` if an event handler canceled the Title change.</returns>
-    protected bool OnTitleChanging (ref string newTitle)
-    {
-        CancelEventArgs<string> args = new (ref _title, ref newTitle);
-        TitleChanging?.Invoke (this, args);
-
-        return args.Cancel;
-    }
-
-    /// <summary>Event fired after the <see cref="View.Title"/> has been changed.</summary>
-    public event EventHandler<EventArgs<string>>? TitleChanged;
-
-    /// <summary>
-    ///     Event fired when the <see cref="View.Title"/> is changing. Set <see cref="CancelEventArgs.Cancel"/> to `true`
-    ///     to cancel the Title change.
-    /// </summary>
-    public event EventHandler<CancelEventArgs<string>>? TitleChanging;
 
     #endregion
 }
