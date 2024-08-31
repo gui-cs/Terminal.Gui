@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 internal enum CONSOLE_MODE : uint
 {
     /// <summary>
-    ///     Explicit zero value for .net formality.
+    ///     Explicit zero value for .net formality. No flags set.
     /// </summary>
     None = 0,
 
