@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -170,7 +170,7 @@
   </data>
   <data name="fdDirectoryAlreadyExistsFeedback" xml:space="preserve">
     <value>Directory already exists with that name</value>
-    <comment>When trying to save a file with a name already taken by a directory</comment>
+    <comment>When trying to save a file with a name already taken by a directory.</comment>
   </data>
   <data name="fdDirectoryMustExistFeedback" xml:space="preserve">
     <value>Must select an existing directory</value>
@@ -180,7 +180,7 @@
   </data>
   <data name="fdFileMustExistFeedback" xml:space="preserve">
     <value>Must select an existing file</value>
-    <comment>When trying to save a directory with a name already used by a file</comment>
+    <comment>When trying to save a directory with a name already used by a file.</comment>
   </data>
   <data name="fdFilename" xml:space="preserve">
     <value>Filename</value>
@@ -212,7 +212,7 @@
     <comment>Describes an AllowedType that matches anything</comment>
   </data>
   <data name="fdDeleteBody" xml:space="preserve">
-    <value>Are you sure you want to delete '{0}'? This operation is permanent</value>
+    <value>Are you sure you want to delete '{0}'? This operation is permanent.</value>
   </data>
   <data name="fdDeleteFailedTitle" xml:space="preserve">
     <value>Delete Failed</value>
@@ -707,5 +707,11 @@
   </data>
   <data name="Win32_PInvoke_SetConsoleMode_HandleInvalid" xml:space="preserve">
     <value>The console handle is invalid.</value>
+  </data>
+  <data name="NetWinVtConsole_InvalidStderrHandle_IOException" xml:space="preserve">
+    <value>Failed to restore error console mode.</value>
+  </data>
+  <data name="ErrorCodeString" xml:space="preserve">
+    <value>Error Code</value>
   </data>
 </root>

@@ -15,9 +15,15 @@
     <value>La manija está cerrada.</value>
   </data>
   <data name="Win32_PInvoke_SetConsoleMode_ArgumentException" xml:space="preserve">
-    <value>No se puede establecer el modo de consola.</value>
+    <value>No es posible que establecer el modo de consola.</value>
   </data>
   <data name="Win32_PInvoke_SetConsoleMode_HandleInvalid" xml:space="preserve">
     <value>La manija de la consola no está válida.</value>
+  </data>
+  <data name="ErrorCodeString" xml:space="preserve">
+    <value>Número de error</value>
+  </data>
+  <data name="NetWinVtConsole_InvalidStderrHandle_IOException" xml:space="preserve">
+    <value>No es posible que restaurar la salida de errores.</value>
   </data>
 </root>
