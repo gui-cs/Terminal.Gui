@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace Terminal.Gui;
 
@@ -18,10 +18,8 @@ public class Responder : IDisposable
 #if DEBUG_IDISPOSABLE
         WasDisposed = true;
 
-        foreach (Responder instance in Instances.Where (x => x.WasDisposed).ToList ())
-        {
-            Instances.Remove (instance);
-        }
+        Instances.RemoveAll (static r => r is { WasDisposed: true });
+
 #endif
     }
 
@@ -60,10 +58,10 @@ public class Responder : IDisposable
            .GetMethod (
                        method,
                        BindingFlags.Instance
-                                           | BindingFlags.Public
-                                           | BindingFlags.NonPublic
-                                           | BindingFlags.DeclaredOnly
-                                          );
+                     | BindingFlags.Public
+                     | BindingFlags.NonPublic
+                     | BindingFlags.DeclaredOnly
+                      );
 
         if (m is null)
         {
