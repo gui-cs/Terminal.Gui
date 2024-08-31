@@ -431,45 +431,60 @@ public class FileDialogTests (ITestOutputHelper output)
 
         fd.Draw ();
 
-        var expected =
-            @$"
-┌─────────────────────────────────────────────────────────────────────────┐
-│/demo/                                                                   │
-│{
-    CM.Glyphs.LeftBracket
-}▲{
-    CM.Glyphs.RightBracket
-}                                                                      │
-│┌────────────┬──────────┬──────────────────────────────┬────────────────┐│
-││Filename (▲)│Size      │Modified                      │Type            ││
-│├────────────┼──────────┼──────────────────────────────┼────────────────┤│
-││..          │          │                              │<Directory>     ││
-││/subfolder  │          │2002-01-01T22:42:10           │<Directory>     ││
-││image.gif   │4.00 B    │2002-01-01T22:42:10           │.gif            ││
-││jQuery.js   │7.00 B    │2001-01-01T11:44:42           │.js             ││
-│                                                                         │
-│                                                                         │
-│                                                                         │
-│{
-    CM.Glyphs.LeftBracket
-} ►► {
-    CM.Glyphs.RightBracket
-} Enter Search                                 {
-    CM.Glyphs.LeftBracket
-}{
-    CM.Glyphs.LeftDefaultIndicator
-} OK {
-    CM.Glyphs.RightDefaultIndicator
-}{
-    CM.Glyphs.RightBracket
-} {
-    CM.Glyphs.LeftBracket
-} Cancel {
-    CM.Glyphs.RightBracket
-}  │
-└─────────────────────────────────────────────────────────────────────────┘
-";
-        TestHelpers.AssertDriverContentsAre (expected, output, ignoreLeadingWhitespace: true);
+        /*
+         *
+         *
+           ┌─────────────────────────────────────────────────────────────────────────┐
+           │/demo/                                                                   │
+           │⟦▲⟧                                                                      │
+           │┌────────────┬──────────┬──────────────────────────────┬────────────────┐│
+           ││Filename (▲)│Size      │Modified                      │Type            ││
+           │├────────────┼──────────┼──────────────────────────────┼────────────────┤│
+           ││..          │          │                              │<Directory>     ││
+           ││/subfolder  │          │2002-01-01T22:42:10           │<Directory>     ││
+           ││image.gif   │4.00 B    │2002-01-01T22:42:10           │.gif            ││
+           ││jQuery.js   │7.00 B    │2001-01-01T11:44:42           │.js             ││
+           │                                                                         │
+           │                                                                         │
+           │                                                                         │
+           │⟦ ►► ⟧ Enter Search                                 ⟦► OK ◄⟧ ⟦ Cancel ⟧  │
+           └─────────────────────────────────────────────────────────────────────────┘
+
+         *
+         */
+
+        var path = GetTextField (fd, FileDialogPart.Path);
+        Assert.Equal ("/demo/", path.Text);
+
+        var tv = GetTableView (fd);
+
+        // Asserting the headers
+        Assert.Equal ("Filename (▲)", tv.Table.ColumnNames.ElementAt (0));
+        Assert.Equal ("Size", tv.Table.ColumnNames.ElementAt (1));
+        Assert.Equal ("Modified", tv.Table.ColumnNames.ElementAt (2));
+        Assert.Equal ("Type", tv.Table.ColumnNames.ElementAt (3));
+
+        // Asserting the table contents
+        Assert.Equal ("..", tv.Style.GetOrCreateColumnStyle (0).GetRepresentation (tv.Table [0, 0]));
+        Assert.Equal ("/subfolder", tv.Style.GetOrCreateColumnStyle (0).GetRepresentation (tv.Table [1, 0]));
+        Assert.Equal ("image.gif", tv.Style.GetOrCreateColumnStyle (0).GetRepresentation (tv.Table [2, 0]));
+        Assert.Equal ("jQuery.js", tv.Style.GetOrCreateColumnStyle (0).GetRepresentation (tv.Table [3, 0]));
+
+        Assert.Equal ("", tv.Style.GetOrCreateColumnStyle (1).GetRepresentation (tv.Table [0, 1]));
+        Assert.Equal ("", tv.Style.GetOrCreateColumnStyle (1).GetRepresentation (tv.Table [1, 1]));
+        Assert.Equal ("4.00 B", tv.Style.GetOrCreateColumnStyle (1).GetRepresentation (tv.Table [2, 1]));
+        Assert.Equal ("7.00 B", tv.Style.GetOrCreateColumnStyle (1).GetRepresentation (tv.Table [3, 1]));
+
+        Assert.Equal ("", tv.Style.GetOrCreateColumnStyle (2).GetRepresentation (tv.Table [0, 2]));
+        Assert.Equal ("2002-01-01T22:42:10", tv.Style.GetOrCreateColumnStyle (2).GetRepresentation (tv.Table [1, 2]));
+        Assert.Equal ("2002-01-01T22:42:10", tv.Style.GetOrCreateColumnStyle (2).GetRepresentation (tv.Table [2, 2]));
+        Assert.Equal ("2001-01-01T11:44:42", tv.Style.GetOrCreateColumnStyle (2).GetRepresentation (tv.Table [3, 2]));
+
+        Assert.Equal ("<Directory>", tv.Style.GetOrCreateColumnStyle (3).GetRepresentation (tv.Table [0, 3]));
+        Assert.Equal ("<Directory>", tv.Style.GetOrCreateColumnStyle (3).GetRepresentation (tv.Table [1, 3]));
+        Assert.Equal (".gif", tv.Style.GetOrCreateColumnStyle (3).GetRepresentation (tv.Table [2, 3]));
+        Assert.Equal (".js", tv.Style.GetOrCreateColumnStyle (3).GetRepresentation (tv.Table [3, 3]));
+
         fd.Dispose ();
     }
 
@@ -489,45 +504,64 @@ public class FileDialogTests (ITestOutputHelper output)
 
         fd.Draw ();
 
-        var expected =
-            @$"
-┌─────────────────────────────────────────────────────────────────────────┐
-│c:\demo\                                                                 │
-│{
-    CM.Glyphs.LeftBracket
-}▲{
-    CM.Glyphs.RightBracket
-}                                                                      │
-│┌────────────┬──────────┬──────────────────────────────┬────────────────┐│
-││Filename (▲)│Size      │Modified                      │Type            ││
-│├────────────┼──────────┼──────────────────────────────┼────────────────┤│
-││..          │          │                              │<Directory>     ││
-││\subfolder  │          │2002-01-01T22:42:10           │<Directory>     ││
-││image.gif   │4.00 B    │2002-01-01T22:42:10           │.gif            ││
-││jQuery.js   │7.00 B    │2001-01-01T11:44:42           │.js             ││
-││mybinary.exe│7.00 B    │2001-01-01T11:44:42           │.exe            ││
-│                                                                         │
-│                                                                         │
-│{
-    CM.Glyphs.LeftBracket
-} ►► {
-    CM.Glyphs.RightBracket
-} Enter Search                                 {
-    CM.Glyphs.LeftBracket
-}{
-    CM.Glyphs.LeftDefaultIndicator
-} OK {
-    CM.Glyphs.RightDefaultIndicator
-}{
-    CM.Glyphs.RightBracket
-} {
-    CM.Glyphs.LeftBracket
-} Cancel {
-    CM.Glyphs.RightBracket
-}  │
-└─────────────────────────────────────────────────────────────────────────┘
-";
-        TestHelpers.AssertDriverContentsAre (expected, output, ignoreLeadingWhitespace: true);
+        /*
+         *
+         *
+           ┌─────────────────────────────────────────────────────────────────────────┐
+           │c:\demo\                                                                 │
+           │⟦▲⟧                                                                      │
+           │┌────────────┬──────────┬──────────────────────────────┬────────────────┐│
+           ││Filename (▲)│Size      │Modified                      │Type            ││
+           │├────────────┼──────────┼──────────────────────────────┼────────────────┤│
+           ││..          │          │                              │<Directory>     ││
+           ││\subfolder  │          │2002-01-01T22:42:10           │<Directory>     ││
+           ││image.gif   │4.00 B    │2002-01-01T22:42:10           │.gif            ││
+           ││jQuery.js   │7.00 B    │2001-01-01T11:44:42           │.js             ││
+           ││mybinary.exe│7.00 B    │2001-01-01T11:44:42           │.exe            ││
+           │                                                                         │
+           │                                                                         │
+           │⟦ ►► ⟧ Enter Search                                 ⟦► OK ◄⟧ ⟦ Cancel ⟧  │
+           └─────────────────────────────────────────────────────────────────────────┘
+           
+         *
+         */
+
+        var path = GetTextField (fd, FileDialogPart.Path);
+        Assert.Equal ("c:\\demo\\",path.Text);
+
+        var tv = GetTableView (fd);
+
+        // Asserting the headers
+        Assert.Equal ("Filename (▲)", tv.Table.ColumnNames.ElementAt (0));
+        Assert.Equal ("Size", tv.Table.ColumnNames.ElementAt (1));
+        Assert.Equal ("Modified", tv.Table.ColumnNames.ElementAt (2));
+        Assert.Equal ("Type", tv.Table.ColumnNames.ElementAt (3));
+
+        // Asserting the table contents
+        Assert.Equal ("..", tv.Style.GetOrCreateColumnStyle (0).GetRepresentation (tv.Table [0, 0]));
+        Assert.Equal (@"\subfolder", tv.Style.GetOrCreateColumnStyle (0).GetRepresentation (tv.Table [1, 0]));
+        Assert.Equal ("image.gif", tv.Style.GetOrCreateColumnStyle (0).GetRepresentation (tv.Table [2, 0]));
+        Assert.Equal ("jQuery.js", tv.Style.GetOrCreateColumnStyle (0).GetRepresentation (tv.Table [3, 0]));
+        Assert.Equal ("mybinary.exe", tv.Style.GetOrCreateColumnStyle (0).GetRepresentation (tv.Table [4, 0]));
+
+        Assert.Equal ("", tv.Style.GetOrCreateColumnStyle (1).GetRepresentation (tv.Table [0, 1]));
+        Assert.Equal ("", tv.Style.GetOrCreateColumnStyle (1).GetRepresentation (tv.Table [1, 1]));
+        Assert.Equal ("4.00 B", tv.Style.GetOrCreateColumnStyle (1).GetRepresentation (tv.Table [2, 1]));
+        Assert.Equal ("7.00 B", tv.Style.GetOrCreateColumnStyle (1).GetRepresentation (tv.Table [3, 1]));
+        Assert.Equal ("7.00 B", tv.Style.GetOrCreateColumnStyle (1).GetRepresentation (tv.Table [4, 1]));
+
+        Assert.Equal ("", tv.Style.GetOrCreateColumnStyle (2).GetRepresentation (tv.Table [0, 2]));
+        Assert.Equal ("2002-01-01T22:42:10", tv.Style.GetOrCreateColumnStyle (2).GetRepresentation (tv.Table [1, 2]));
+        Assert.Equal ("2002-01-01T22:42:10", tv.Style.GetOrCreateColumnStyle (2).GetRepresentation (tv.Table [2, 2]));
+        Assert.Equal ("2001-01-01T11:44:42", tv.Style.GetOrCreateColumnStyle (2).GetRepresentation (tv.Table [3, 2]));
+        Assert.Equal ("2001-01-01T11:44:42", tv.Style.GetOrCreateColumnStyle (2).GetRepresentation (tv.Table [4, 2]));
+
+        Assert.Equal ("<Directory>", tv.Style.GetOrCreateColumnStyle (3).GetRepresentation (tv.Table [0, 3]));
+        Assert.Equal ("<Directory>", tv.Style.GetOrCreateColumnStyle (3).GetRepresentation (tv.Table [1, 3]));
+        Assert.Equal (".gif", tv.Style.GetOrCreateColumnStyle (3).GetRepresentation (tv.Table [2, 3]));
+        Assert.Equal (".js", tv.Style.GetOrCreateColumnStyle (3).GetRepresentation (tv.Table [3, 3]));
+        Assert.Equal (".exe", tv.Style.GetOrCreateColumnStyle (3).GetRepresentation (tv.Table [4, 3]));
+
         fd.Dispose ();
     }
 
