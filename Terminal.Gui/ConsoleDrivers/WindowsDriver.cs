@@ -8,7 +8,7 @@
 // 2) The values provided during Init (and the first WindowsConsole.EventType.WindowBufferSize) are not correct.
 //
 // If HACK_CHECK_WINCHANGED is defined then we ignore WindowsConsole.EventType.WindowBufferSize events
-// and instead check the console size every every 500ms in a thread in WidowsMainLoop. 
+// and instead check the console size every every 500ms in a thread in WidowsMainLoop.
 // As of Windows 11 23H2 25947.1000 and/or WT 1.19.2682 tearing no longer occurs when using 
 // the WindowsConsole.EventType.WindowBufferSize event. However, on Init the window size is
 // still incorrect so we still need this hack.
@@ -1081,10 +1081,9 @@ internal class WindowsDriver : ConsoleDriver
         };
     }
 
-    // INTENT: Is the same issue as in CursesDriver also true here?
-    // As far as I can tell from messing around with toy apps, the windows console appears able to show you any
-    // codepoint that your font supports.
     /// <inheritdoc />
+    /// <remarks>WindowsDriver is unreliable with non-BMP characters, so we filter for IsBmp as in CursesDriver.</remarks>
+    /// <seealso href="https://github.com/gui-cs/Terminal.Gui/issues/2615">Terminal.Gui Issue #2615</seealso>
     public override bool IsRuneSupported (in Rune rune) => rune.IsBmp && base.IsRuneSupported (in rune);
 
     public override void Refresh ()

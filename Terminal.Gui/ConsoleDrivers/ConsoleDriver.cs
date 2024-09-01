@@ -430,7 +430,7 @@ public abstract class ConsoleDriver
     /// </returns>
     public bool IsValidLocation (int col, int row)
     {
-        // INTENT: Half of this is impossible and thus redundant.
+        // TODO: Remove this commentary or implement when partial-screen is supported.
         // Screen is hard-coded to have origin at 0,0.
         // Screen is also hard-coded to be Cols x Rows in size.
         // Clip intersects it.
