@@ -1154,11 +1154,10 @@ public class TableView : View
     /// <param name="col"></param>
     /// <param name="row"></param>
     /// <param name="extendExistingSelection">True to create a multi cell selection or adjust an existing one</param>
-    /// <returns><see langword="true"/> if the selected row/col changed (ignoring multi select).</returns>>
+    /// <returns><see langword="true"/> if the selection changed (including clearing a multi select).</returns>>
     public bool SetSelection (int col, int row, bool extendExistingSelection)
     {
-        var origCol = SelectedColumn;
-        var origRow = SelectedRow;
+        IEnumerable<Point> selectedBefore = GetAllSelectedCells ();
 
         // if we are trying to increase the column index then
         // we are moving right otherwise we are moving left
@@ -1192,7 +1191,7 @@ public class TableView : View
         SelectedColumn = col;
         SelectedRow = row;
 
-        return origCol != SelectedColumn || origRow != SelectedRow;
+        return !selectedBefore.SequenceEqual (GetAllSelectedCells());
     }
 
     /// <summary>
