@@ -1068,7 +1068,7 @@ public class TableViewTests (ITestOutputHelper output)
         Application.Begin (top);
 
         tv.HasFocus = focused;
-        Assert.Equal(focused, tv.HasFocus);
+        Assert.Equal (focused, tv.HasFocus);
 
         tv.Draw ();
 
@@ -1155,7 +1155,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // when B is 2 use the custom highlight color for the row
         tv.Style.RowColorGetter += e => Convert.ToInt32 (e.Table [e.RowIndex, 1]) == 2 ? rowHighlight : null;
-        
+
         var top = new Toplevel ();
         top.Add (tv);
         Application.Begin (top);
@@ -3169,7 +3169,7 @@ A B C
     }
 
     [Fact]
-    public void TestDataColumnCaption()
+    public void TestDataColumnCaption ()
     {
         var tableView = new TableView ();
 
@@ -3209,7 +3209,7 @@ A B C
         Application.OnKeyDown (Key.CursorLeft);
 
         Assert.NotSame (tableView, Application.Current.MostFocused);
-        Assert.False(tableView.HasFocus);
+        Assert.False (tableView.HasFocus);
 
         Assert.Same (tf1, Application.Current.MostFocused);
         Assert.True (tf1.HasFocus);
@@ -3304,7 +3304,7 @@ A B C
         Application.OnKeyDown (Key.CursorLeft.WithShift);
         Assert.Same (tableView, Application.Current.MostFocused);
         Assert.True (tableView.HasFocus);
-        Assert.Equal(2,tableView.GetAllSelectedCells ().Count());
+        Assert.Equal (2, tableView.GetAllSelectedCells ().Count ());
 
         // Because we are now on the leftmost cell a further left press would normally move focus
         // However there is an ongoing selection so instead the operation clears the selection and
@@ -3312,7 +3312,7 @@ A B C
         Application.OnKeyDown (Key.CursorLeft);
 
         // Selection 'clears' just to the single cell and we remain focused
-        Assert.Single(tableView.GetAllSelectedCells ());
+        Assert.Single (tableView.GetAllSelectedCells ());
         Assert.Same (tableView, Application.Current.MostFocused);
         Assert.True (tableView.HasFocus);
 
@@ -3336,7 +3336,7 @@ A B C
     /// <param name="tv"></param>
     /// <param name="tf1"></param>
     /// <param name="tf2"></param>
-    private void GetTableViewWithSiblings (out TextField tf1, out TableView tableView,  out TextField tf2)
+    private void GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2)
     {
         tableView = new TableView ();
         tableView.BeginInit ();

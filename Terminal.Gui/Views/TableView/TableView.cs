@@ -513,7 +513,7 @@ public class TableView : View
         return new (
                     SelectedColumn,
                     SelectedRow,
-                    MultiSelectedRegions.Select (s=>s.Rectangle).ToArray ());
+                    MultiSelectedRegions.Select (s => s.Rectangle).ToArray ());
     }
 
     private bool SelectionIsSame (TableViewSelectionSnapshot oldSelection)
@@ -522,9 +522,9 @@ public class TableView : View
 
         return oldSelection.SelectedColumn == newSelection.SelectedColumn
                && oldSelection.SelectedRow == newSelection.SelectedRow
-               && oldSelection.multiSelection.SequenceEqual (newSelection.multiSelection );
+               && oldSelection.multiSelection.SequenceEqual (newSelection.multiSelection);
     }
-    private record TableViewSelectionSnapshot (int SelectedColumn,int SelectedRow, Rectangle [] multiSelection);
+    private record TableViewSelectionSnapshot (int SelectedColumn, int SelectedRow, Rectangle [] multiSelection);
 
     /// <summary>
     ///     Moves the <see cref="SelectedRow"/> and <see cref="SelectedColumn"/> by the provided offsets. Optionally
