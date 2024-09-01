@@ -131,9 +131,9 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                     notDependentSubViews = includedSubviews.Where (
                                                                    v => v.Width is { }
                                                                         && (v.X is PosAbsolute or PosFunc || v.Width is DimAuto or DimAbsolute or DimFunc) // BUGBUG: We should use v.X.Has and v.Width.Has?
-                                                                        && !v.X.Has (typeof (PosAnchorEnd), out _)
-                                                                        && !v.X.Has (typeof (PosAlign), out _)
-                                                                        && !v.X.Has (typeof (PosCenter), out _)
+                                                                        && !v.X.Has<PosAnchorEnd> (out _)
+                                                                        && !v.X.Has<PosAlign> (out _)
+                                                                        && !v.X.Has<PosCenter> (out _)
                                                                         && !v.Width.Has<DimFill> (out _)
                                                                         && !v.Width.Has<DimPercent> (out _)
                                                                   )
@@ -144,9 +144,9 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                     notDependentSubViews = includedSubviews.Where (
                                                                    v => v.Height is { }
                                                                         && (v.Y is PosAbsolute or PosFunc || v.Height is DimAuto or DimAbsolute or DimFunc) // BUGBUG: We should use v.Y.Has and v.Height.Has?
-                                                                        && !v.Y.Has (typeof (PosAnchorEnd), out _)
-                                                                        && !v.Y.Has (typeof (PosAlign), out _)
-                                                                        && !v.Y.Has (typeof (PosCenter), out _)
+                                                                        && !v.Y.Has<PosAnchorEnd> (out _)
+                                                                        && !v.Y.Has<PosAlign> (out _)
+                                                                        && !v.Y.Has<PosCenter> (out _)
                                                                         && !v.Height.Has<DimFill> (out _)
                                                                         && !v.Height.Has<DimPercent> (out _)
                                                                   )
@@ -190,11 +190,11 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                 if (dimension == Dimension.Width)
                 {
-                    centeredSubViews = us.Subviews.Where (v => v.X.Has (typeof (PosCenter), out _)).ToList ();
+                    centeredSubViews = us.Subviews.Where (v => v.X.Has<PosCenter> (out _)).ToList ();
                 }
                 else
                 {
-                    centeredSubViews = us.Subviews.Where (v => v.Y.Has (typeof (PosCenter), out _)).ToList ();
+                    centeredSubViews = us.Subviews.Where (v => v.Y.Has<PosCenter> (out _)).ToList ();
                 }
 
                 viewsNeedingLayout.AddRange (centeredSubViews);
@@ -239,14 +239,14 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                                                               {
                                                                   if (dimension == Dimension.Width)
                                                                   {
-                                                                      if (v.X.Has (typeof (PosAlign), out Pos posAlign))
+                                                                      if (v.X.Has<PosAlign> (out Pos posAlign))
                                                                       {
                                                                           return ((PosAlign)posAlign).GroupId;
                                                                       }
                                                                   }
                                                                   else
                                                                   {
-                                                                      if (v.Y.Has (typeof (PosAlign), out Pos posAlign))
+                                                                      if (v.Y.Has<PosAlign> (out Pos posAlign))
                                                                       {
                                                                           return ((PosAlign)posAlign).GroupId;
                                                                       }
@@ -294,11 +294,11 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                 if (dimension == Dimension.Width)
                 {
-                    anchoredSubViews = includedSubviews.Where (v => v.X.Has (typeof (PosAnchorEnd), out _)).ToList ();
+                    anchoredSubViews = includedSubviews.Where (v => v.X.Has<PosAnchorEnd> (out _)).ToList ();
                 }
                 else
                 {
-                    anchoredSubViews = includedSubviews.Where (v => v.Y.Has (typeof (PosAnchorEnd), out _)).ToList ();
+                    anchoredSubViews = includedSubviews.Where (v => v.Y.Has<PosAnchorEnd> (out _)).ToList ();
                 }
 
                 viewsNeedingLayout.AddRange (anchoredSubViews);
@@ -336,11 +336,11 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                 if (dimension == Dimension.Width)
                 {
-                    posViewSubViews = includedSubviews.Where (v => v.X.Has (typeof (PosView), out _)).ToList ();
+                    posViewSubViews = includedSubviews.Where (v => v.X.Has<PosView> (out _)).ToList ();
                 }
                 else
                 {
-                    posViewSubViews = includedSubviews.Where (v => v.Y.Has (typeof (PosView), out _)).ToList ();
+                    posViewSubViews = includedSubviews.Where (v => v.Y.Has<PosView> (out _)).ToList ();
                 }
 
                 for (var i = 0; i < posViewSubViews.Count; i++)

@@ -9,10 +9,10 @@ namespace Terminal.Gui;
 ///     methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
 /// </remarks>
 /// <param name="Margin">The margin to not fill.</param>
-public record DimFill (int Margin) : Dim
+public record DimFill (Dim Margin) : Dim
 {
     /// <inheritdoc/>
     public override string ToString () { return $"Fill({Margin})"; }
 
-    internal override int GetAnchor (int size) { return size - Margin; }
+    internal override int GetAnchor (int size) { return size - Margin.GetAnchor(0); }
 }
