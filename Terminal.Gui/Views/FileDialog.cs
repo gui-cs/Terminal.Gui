@@ -110,7 +110,13 @@ public class FileDialog : Dialog
         _tbPath.Autocomplete = new AppendAutocomplete (_tbPath);
         _tbPath.Autocomplete.SuggestionGenerator = new FilepathSuggestionGenerator ();
 
-        _splitContainer = new TileView { X = 0, Y = Pos.Bottom (_btnBack), Width = Dim.Fill (), Height = Dim.Fill (1) };
+        _splitContainer = new TileView
+        {
+            X = 0,
+            Y = Pos.Bottom (_btnBack),
+            Width = Dim.Fill (),
+            Height = Dim.Fill (1/*TODO needs to be 2 for shadow buttons, how best?*/)
+        };
 
         Initialized += (s, e) =>
                        {

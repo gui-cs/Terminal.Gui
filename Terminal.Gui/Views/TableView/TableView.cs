@@ -54,47 +54,19 @@ public class TableView : View
         // Things this view knows how to do
         AddCommand (
                     Command.Right,
-                    () =>
-                    {
-                        // BUGBUG: SHould return false if selectokn doesn't change (to support nav to next view)
-                        ChangeSelectionByOffset (1, 0, false);
-
-                        return true;
-                    }
-                   );
+                    () => ChangeSelectionByOffset (1, 0, false));
 
         AddCommand (
                     Command.Left,
-                    () =>
-                    {
-                        // BUGBUG: SHould return false if selectokn doesn't change (to support nav to next view)
-                        ChangeSelectionByOffset (-1, 0, false);
-
-                        return true;
-                    }
-                   );
+                    () => ChangeSelectionByOffset (-1, 0, false));
 
         AddCommand (
                     Command.LineUp,
-                    () =>
-                    {
-                        // BUGBUG: SHould return false if selectokn doesn't change (to support nav to next view)
-                        ChangeSelectionByOffset (0, -1, false);
-
-                        return true;
-                    }
-                   );
+                    () => ChangeSelectionByOffset (0, -1, false));
 
         AddCommand (
                     Command.LineDown,
-                    () =>
-                    {
-                        // BUGBUG: SHould return false if selectokn doesn't change (to support nav to next view)
-                        ChangeSelectionByOffset (0, 1, false);
-
-                        return true;
-                    }
-                   );
+                    () => ChangeSelectionByOffset (0, 1, false));
 
         AddCommand (
                     Command.PageUp,
@@ -526,10 +498,12 @@ public class TableView : View
     /// <param name="offsetX">Offset in number of columns</param>
     /// <param name="offsetY">Offset in number of rows</param>
     /// <param name="extendExistingSelection">True to create a multi cell selection or adjust an existing one</param>
-    public void ChangeSelectionByOffset (int offsetX, int offsetY, bool extendExistingSelection)
+    public bool ChangeSelectionByOffset (int offsetX, int offsetY, bool extendExistingSelection)
     {
-        SetSelection (SelectedColumn + offsetX, SelectedRow + offsetY, extendExistingSelection);
+        var result = SetSelection (SelectedColumn + offsetX, SelectedRow + offsetY, extendExistingSelection);
         Update ();
+
+        return result;
     }
 
     /// <summary>Moves or extends the selection to the last cell in the current row</summary>
@@ -1180,8 +1154,12 @@ public class TableView : View
     /// <param name="col"></param>
     /// <param name="row"></param>
     /// <param name="extendExistingSelection">True to create a multi cell selection or adjust an existing one</param>
-    public void SetSelection (int col, int row, bool extendExistingSelection)
+    /// <returns><see langword="true"/> if the selected row/col changed (ignoring multi select).</returns>>
+    public bool SetSelection (int col, int row, bool extendExistingSelection)
     {
+        var origCol = SelectedColumn;
+        var origRow = SelectedRow;
+
         // if we are trying to increase the column index then
         // we are moving right otherwise we are moving left
         bool lookRight = col > selectedColumn;
@@ -1213,6 +1191,8 @@ public class TableView : View
 
         SelectedColumn = col;
         SelectedRow = row;
+
+        return origCol != SelectedColumn || origRow != SelectedRow;
     }
 
     /// <summary>
