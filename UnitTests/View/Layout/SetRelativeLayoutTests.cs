@@ -37,11 +37,11 @@ public class SetRelativeLayoutTests
 
         Assert.Equal ("Absolute(1)", view.X.ToString ());
         Assert.Equal ("Absolute(2)", view.Y.ToString ());
-        Assert.Equal ("Fill(0)", view.Width.ToString ());
-        Assert.Equal ("Fill(0)", view.Height.ToString ());
+        Assert.Equal ("Fill(Absolute(0))", view.Width.ToString ());
+        Assert.Equal ("Fill(Absolute(0))", view.Height.ToString ());
         view.SetRelativeLayout (screen);
-        Assert.Equal ("Fill(0)", view.Width.ToString ());
-        Assert.Equal ("Fill(0)", view.Height.ToString ());
+        Assert.Equal ("Fill(Absolute(0))", view.Width.ToString ());
+        Assert.Equal ("Fill(Absolute(0))", view.Height.ToString ());
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public class SetRelativeLayoutTests
         var view = new View { X = 1, Y = 1, Width = Dim.Fill (), Height = Dim.Fill () };
 
         view.SetRelativeLayout (new Size (80, 25));
-        Assert.Equal ("Fill(0)", view.Width.ToString ());
+        Assert.Equal ("Fill(Absolute(0))", view.Width.ToString ());
         Assert.Equal (1, view.Frame.X);
         Assert.Equal (1, view.Frame.Y);
         Assert.Equal (79, view.Frame.Width);
@@ -63,7 +63,7 @@ public class SetRelativeLayoutTests
         view.X = 0;
         view.Y = 0;
         Assert.Equal ("Absolute(0)", view.X.ToString ());
-        Assert.Equal ("Fill(0)", view.Width.ToString ());
+        Assert.Equal ("Fill(Absolute(0))", view.Width.ToString ());
         view.SetRelativeLayout (new Size (80, 25));
         Assert.Equal (0, view.Frame.X);
         Assert.Equal (0, view.Frame.Y);

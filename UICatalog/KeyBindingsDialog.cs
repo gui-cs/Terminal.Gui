@@ -32,7 +32,7 @@ internal class KeyBindingsDialog : Dialog
         _commandsListView = new ListView
         {
             Width = Dim.Percent (50),
-            Height = Dim.Fill () - Dim.Func (() => IsInitialized ? Subviews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height : 1),
+            Height = Dim.Fill (Dim.Func (() => IsInitialized ? Subviews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height : 1)),
             Source = new ListWrapper<Command> (_commands),
             SelectedItem = 0
         };
