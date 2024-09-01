@@ -19,10 +19,10 @@ public class ContextMenuTests (ITestOutputHelper output)
         cm.Position = new Point (20, 10);
 
         var menuItems = new MenuBarItem (
-                                        [
-                                            new MenuItem ("First", "", null)
-                                        ]
-                                       );
+                                         [
+                                             new MenuItem ("First", "", null)
+                                         ]
+                                        );
         cm.Show (menuItems);
         Assert.Equal (new Point (20, 10), cm.Position);
         Assert.Single (cm.MenuItems!.Children);
@@ -42,6 +42,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         var view = new View { X = 5, Y = 10 };
         top.Add (view);
+
         cm = new ContextMenu
         {
             Host = view,
@@ -74,6 +75,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                              new MenuItem ("Two", "", null)
                                          ]
                                         );
+
         var menu = new MenuBar
         {
             Menus =
@@ -401,6 +403,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (Application.OnKeyDown (ContextMenu.DefaultKey));
         Assert.True (tf.ContextMenu.MenuBar!.IsMenuOpen);
         Assert.True (Application.OnKeyDown (ContextMenu.DefaultKey));
+
         // The last context menu bar opened is always preserved
         Assert.NotNull (tf.ContextMenu.MenuBar);
         top.Dispose ();
@@ -529,8 +532,8 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (
                      top.Subviews [0]
                         .NewMouseEvent (
-                                     new MouseEvent { Position = new (0, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
-                                    )
+                                        new MouseEvent { Position = new (0, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                       )
                     );
         Application.Refresh ();
         Assert.Equal (new Point (-1, -2), cm.Position);
@@ -577,8 +580,8 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (
                      top.Subviews [0]
                         .NewMouseEvent (
-                                     new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
-                                    )
+                                        new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                       )
                     );
         Application.Refresh ();
         Assert.Equal (new Point (41, -2), cm.Position);
@@ -624,8 +627,8 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (
                      top.Subviews [0]
                         .NewMouseEvent (
-                                     new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
-                                    )
+                                        new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                       )
                     );
         Application.Refresh ();
         Assert.Equal (new Point (41, 9), cm.Position);
@@ -668,8 +671,8 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (
                      top.Subviews [0]
                         .NewMouseEvent (
-                                     new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
-                                    )
+                                        new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                       )
                     );
         Application.Refresh ();
         Assert.Equal (new Point (41, 22), cm.Position);
@@ -712,8 +715,8 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (
                      top.Subviews [0]
                         .NewMouseEvent (
-                                     new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
-                                    )
+                                        new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                       )
                     );
         Application.Refresh ();
         Assert.Equal (new Point (19, 10), cm.Position);
@@ -1408,6 +1411,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (tf1.HasFocus);
         Assert.False (tf2.HasFocus);
         Assert.Equal (4, win.Subviews.Count);
+
         // The last context menu bar opened is always preserved
         Assert.NotNull (tf2.ContextMenu.MenuBar);
         Assert.Equal (win.Focused, tf1);
@@ -1419,6 +1423,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.False (tf1.HasFocus);
         Assert.True (tf2.HasFocus);
         Assert.Equal (4, win.Subviews.Count);
+
         // The last context menu bar opened is always preserved
         Assert.NotNull (tf2.ContextMenu.MenuBar);
         Assert.Equal (win.Focused, tf2);
@@ -1447,7 +1452,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
-    public void KeyBinding_Removed_On_Close_ContextMenu ()
+    public void KeyBindings_Removed_On_Close_ContextMenu ()
     {
         var newFile = false;
         var renameFile = false;
@@ -1539,7 +1544,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         var menuItems = new MenuBarItem (
                                          [
-                                             new MenuItem ("Rename File", string.Empty, Rename, null, null, Key.R.WithCtrl),
+                                             new ("Rename File", string.Empty, Rename, null, null, Key.R.WithCtrl),
                                          ]
                                         );
         var top = new Toplevel ();
@@ -1618,7 +1623,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         var menuItems = new MenuBarItem (
                                          [
-                                             new MenuItem ("New File", string.Empty, NewContextMenu, null, null, Key.N.WithCtrl),
+                                             new ("New File", string.Empty, NewContextMenu, null, null, Key.N.WithCtrl),
                                          ]
                                         );
         var top = new Toplevel ();
@@ -1643,6 +1648,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (Application.OnKeyDown (Key.N.WithCtrl));
         Application.MainLoop!.RunIteration ();
         Assert.False (newMenuBar);
+
         // The most focused shortcut is executed
         Assert.True (newContextMenu);
         Assert.False (cm.MenuBar!.IsMenuOpen);
@@ -1662,5 +1668,270 @@ public class ContextMenuTests (ITestOutputHelper output)
         void NewMenuBar () { newMenuBar = true; }
 
         void NewContextMenu () { newContextMenu = true; }
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void HotKeys_Removed_On_Close_ContextMenu ()
+    {
+        var newFile = false;
+        var renameFile = false;
+        var deleteFile = false;
+
+        var cm = new ContextMenu ();
+
+        var menuItems = new MenuBarItem (
+                                         [
+                                             new ("_New File", string.Empty, New, null, null),
+                                             new ("_Rename File", string.Empty, Rename, null, null),
+                                             new ("_Delete File", string.Empty, Delete, null, null)
+                                         ]
+                                        );
+        var top = new Toplevel ();
+        Application.Begin (top);
+
+        Assert.Null (cm.MenuBar);
+        Assert.False (Application.OnKeyDown (Key.N.WithAlt));
+        Assert.False (Application.OnKeyDown (Key.R.WithAlt));
+        Assert.False (Application.OnKeyDown (Key.D.WithAlt));
+        Assert.False (newFile);
+        Assert.False (renameFile);
+        Assert.False (deleteFile);
+
+        cm.Show (menuItems);
+        Assert.True (cm.MenuBar!.IsMenuOpen);
+        Assert.False (cm.MenuBar!.KeyBindings.Bindings.ContainsKey (Key.N.WithAlt));
+        Assert.False (cm.MenuBar!.KeyBindings.Bindings.ContainsKey (Key.N.NoShift));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.R.NoShift));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.D.WithAlt));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.D.NoShift));
+        Assert.Single (Application.Current!.Subviews);
+        View [] menus = Application.Current!.Subviews.Where (v => v is Menu m && m.Host == cm.MenuBar).ToArray ();
+        Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.N.WithAlt));
+        Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.N.NoShift));
+        Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
+        Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.R.NoShift));
+        Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.D.WithAlt));
+        Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.D.NoShift));
+
+        Assert.True (Application.OnKeyDown (Key.N.WithAlt));
+        Assert.False (cm.MenuBar!.IsMenuOpen);
+        Application.MainLoop!.RunIteration ();
+        Assert.True (newFile);
+        cm.Show (menuItems);
+        Assert.True (Application.OnKeyDown (Key.R.WithAlt));
+        Assert.False (cm.MenuBar.IsMenuOpen);
+        Application.MainLoop!.RunIteration ();
+        Assert.True (renameFile);
+        cm.Show (menuItems);
+        Assert.True (Application.OnKeyDown (Key.D.WithAlt));
+        Assert.False (cm.MenuBar.IsMenuOpen);
+        Application.MainLoop!.RunIteration ();
+        Assert.True (deleteFile);
+
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.N.WithAlt));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.N.NoShift));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.R.NoShift));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.D.WithAlt));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.D.NoShift));
+
+        newFile = false;
+        renameFile = false;
+        deleteFile = false;
+        Assert.False (Application.OnKeyDown (Key.N.WithAlt));
+        Assert.False (Application.OnKeyDown (Key.R.WithAlt));
+        Assert.False (Application.OnKeyDown (Key.D.WithAlt));
+        Assert.False (newFile);
+        Assert.False (renameFile);
+        Assert.False (deleteFile);
+
+        top.Dispose ();
+
+        void New () { newFile = true; }
+
+        void Rename () { renameFile = true; }
+
+        void Delete () { deleteFile = true; }
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void HotKeys_With_ContextMenu_And_MenuBar ()
+    {
+        var newFile = false;
+        var renameFile = false;
+
+        var menuBar = new MenuBar
+        {
+            Menus =
+            [
+                new (
+                     "_File",
+                     new MenuItem []
+                     {
+                         new ("_New", string.Empty, New)
+                     })
+            ]
+        };
+        var cm = new ContextMenu ();
+
+        var menuItems = new MenuBarItem (
+                                         [
+                                             new MenuBarItem (
+                                                              "_Edit",
+                                                              new MenuItem []
+                                                              {
+                                                                  new ("_Rename File", string.Empty, Rename)
+                                                              }
+                                                             )
+                                         ]
+                                        );
+        var top = new Toplevel ();
+        top.Add (menuBar);
+        Application.Begin (top);
+
+        Assert.True (menuBar.KeyBindings.Bindings.ContainsKey (Key.F.WithAlt));
+        Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.N.WithAlt));
+        Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
+        View [] menus = Application.Current!.Subviews.Where (v => v is Menu m && m.Host == menuBar).ToArray ();
+        Assert.Empty (menus);
+        Assert.Null (cm.MenuBar);
+
+        Assert.True (Application.OnKeyDown (Key.F.WithAlt));
+        Assert.True (menuBar.IsMenuOpen);
+        Assert.Equal (2, Application.Current!.Subviews.Count);
+        menus = Application.Current!.Subviews.Where (v => v is Menu m && m.Host == menuBar).ToArray ();
+        Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.N.WithAlt));
+        Assert.True (Application.OnKeyDown (Key.N.WithAlt));
+        Assert.False (menuBar.IsMenuOpen);
+        Assert.False (Application.OnKeyDown (Key.R.WithAlt));
+        Application.MainLoop!.RunIteration ();
+        Assert.True (newFile);
+        Assert.False (renameFile);
+
+        newFile = false;
+
+        cm.Show (menuItems);
+        Assert.True (menuBar.KeyBindings.Bindings.ContainsKey (Key.F.WithAlt));
+        Assert.True (menuBar.KeyBindings.Bindings.ContainsKey (Key.F.NoShift));
+        Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.N.WithAlt));
+        Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.N.NoShift));
+        Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.E.WithAlt));
+        Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.E.NoShift));
+        Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
+        Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.R.NoShift));
+        Assert.True (cm.MenuBar!.IsMenuOpen);
+        Assert.False (cm.MenuBar!.KeyBindings.Bindings.ContainsKey (Key.F.WithAlt));
+        Assert.False (cm.MenuBar!.KeyBindings.Bindings.ContainsKey (Key.F.NoShift));
+        Assert.False (cm.MenuBar!.KeyBindings.Bindings.ContainsKey (Key.N.WithAlt));
+        Assert.False (cm.MenuBar!.KeyBindings.Bindings.ContainsKey (Key.N.NoShift));
+        Assert.False (cm.MenuBar!.KeyBindings.Bindings.ContainsKey (Key.E.WithAlt));
+        Assert.False (cm.MenuBar!.KeyBindings.Bindings.ContainsKey (Key.E.NoShift));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.R.NoShift));
+        Assert.Equal (3, Application.Current!.Subviews.Count);
+        menus = Application.Current!.Subviews.Where (v => v is Menu m && m.Host == cm.MenuBar).ToArray ();
+        Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.E.WithAlt));
+        Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.E.NoShift));
+        Assert.True (menus [1].KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
+        Assert.True (menus [1].KeyBindings.Bindings.ContainsKey (Key.R.NoShift));
+        Assert.True (cm.MenuBar.IsMenuOpen);
+        Assert.True (Application.OnKeyDown (Key.F.WithAlt));
+        Assert.False (cm.MenuBar.IsMenuOpen);
+        Assert.True (Application.OnKeyDown (Key.N.WithAlt));
+        Application.MainLoop!.RunIteration ();
+        Assert.True (newFile);
+
+        cm.Show (menuItems);
+        Assert.True (cm.MenuBar.IsMenuOpen);
+        Assert.Equal (3, Application.Current!.Subviews.Count);
+        menus = Application.Current!.Subviews.Where (v => v is Menu m && m.Host == cm.MenuBar).ToArray ();
+        Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.E.WithAlt));
+        Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.E.NoShift));
+        Assert.False (menus [0].KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
+        Assert.False (menus [0].KeyBindings.Bindings.ContainsKey (Key.R.NoShift));
+        Assert.False (menus [1].KeyBindings.Bindings.ContainsKey (Key.E.WithAlt));
+        Assert.False (menus [1].KeyBindings.Bindings.ContainsKey (Key.E.NoShift));
+        Assert.True (menus [1].KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
+        Assert.True (menus [1].KeyBindings.Bindings.ContainsKey (Key.R.NoShift));
+        Assert.True (Application.OnKeyDown (Key.E.NoShift));
+        Assert.True (Application.OnKeyDown (Key.R.WithAlt));
+        Assert.False (cm.MenuBar.IsMenuOpen);
+        Application.MainLoop!.RunIteration ();
+        Assert.True (renameFile);
+
+        Assert.Single (Application.Current!.Subviews);
+        Assert.True (menuBar.KeyBindings.Bindings.ContainsKey (Key.F.WithAlt));
+        Assert.True (menuBar.KeyBindings.Bindings.ContainsKey (Key.F.NoShift));
+        Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.N.WithAlt));
+        Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.N.NoShift));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.E.WithAlt));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.E.NoShift));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.R.NoShift));
+
+        newFile = false;
+        renameFile = false;
+        Assert.True (Application.OnKeyDown (Key.F.WithAlt));
+        Assert.True (Application.OnKeyDown (Key.N.WithAlt));
+        Assert.False (Application.OnKeyDown (Key.R.WithAlt));
+        Application.MainLoop!.RunIteration ();
+        Assert.True (newFile);
+        Assert.False (renameFile);
+
+        top.Dispose ();
+
+        void New () { newFile = true; }
+
+        void Rename () { renameFile = true; }
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Opened_MenuBar_Is_Closed_When_Another_MenuBar_Is_Opening_Also_By_HotKey ()
+    {
+        var menuBar = new MenuBar
+        {
+            Menus =
+            [
+                new (
+                     "_File",
+                     new MenuItem []
+                     {
+                         new ("_New", string.Empty, null)
+                     })
+            ]
+        };
+        var cm = new ContextMenu ();
+
+        var menuItems = new MenuBarItem (
+                                         [
+                                             new MenuBarItem (
+                                                              "_Edit",
+                                                              new MenuItem []
+                                                              {
+                                                                  new ("_Rename File", string.Empty, null)
+                                                              }
+                                                             )
+                                         ]
+                                        );
+        var top = new Toplevel ();
+        top.Add (menuBar);
+        Application.Begin (top);
+
+        Assert.True (Application.OnKeyDown (Key.F.WithAlt));
+        Assert.True (menuBar.IsMenuOpen);
+
+        cm.Show (menuItems);
+        Assert.False (menuBar.IsMenuOpen);
+        Assert.True (cm.MenuBar!.IsMenuOpen);
+
+        Assert.True (Application.OnKeyDown (Key.F.WithAlt));
+        Assert.True (menuBar.IsMenuOpen);
+        Assert.False (cm.MenuBar!.IsMenuOpen);
+
+        top.Dispose ();
     }
 }

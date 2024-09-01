@@ -58,7 +58,7 @@ public sealed class ContextMenu : IDisposable
     public static bool IsShow { get; private set; }
 
     /// <summary>Specifies the key that will activate the context menu.</summary>
-    public new Key Key
+    public Key Key
     {
         get => _key;
         set
@@ -133,7 +133,7 @@ public sealed class ContextMenu : IDisposable
             return;
         }
 
-        foreach (var menuItem in menuBarItem.Children!)
+        foreach (MenuItem? menuItem in menuBarItem.Children!)
         {
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (menuItem is null)
@@ -150,7 +150,7 @@ public sealed class ContextMenu : IDisposable
                 if (menuItem.ShortcutKey != Key.Empty)
                 {
                     // Remove an existent ShortcutKey
-                    _menuBar?.KeyBindings.Remove (menuItem.ShortcutKey);
+                    _menuBar?.KeyBindings.Remove (menuItem.ShortcutKey!);
                 }
             }
         }
@@ -171,7 +171,7 @@ public sealed class ContextMenu : IDisposable
             Dispose ();
         }
 
-        if (menuItems is null || menuItems.Children.Length == 0)
+        if (menuItems is null || menuItems.Children!.Length == 0)
         {
             return;
         }

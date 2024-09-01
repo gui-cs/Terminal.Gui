@@ -875,7 +875,7 @@ public class DynamicMenuBar : Scenario
                                   {
                                       MenuItem newMenu = CreateNewMenu (item, _currentMenuBarItem);
                                       var menuBarItem = _currentMenuBarItem as MenuBarItem;
-                                      menuBarItem.AddMenuBarItem (newMenu);
+                                      menuBarItem.AddMenuBarItem (MenuBar, newMenu);
 
 
                                       DataContext.Menus.Add (new () { Title = newMenu.Title, MenuItem = newMenu });
@@ -913,6 +913,11 @@ public class DynamicMenuBar : Scenario
                                         if (_lstMenus.Source.Count > 0 && _lstMenus.SelectedItem > _lstMenus.Source.Count - 1)
                                         {
                                             _lstMenus.SelectedItem = _lstMenus.Source.Count - 1;
+                                        }
+
+                                        if (_menuBar.Menus.Length == 0)
+                                        {
+                                            RemoveMenuBar ();
                                         }
 
                                         _lstMenus.SetNeedsDisplay ();
@@ -992,7 +997,7 @@ public class DynamicMenuBar : Scenario
                                          }
 
                                          var newMenu = CreateNewMenu (item) as MenuBarItem;
-                                         newMenu.AddMenuBarItem ();
+                                         newMenu.AddMenuBarItem (MenuBar);
 
                                          _currentMenuBarItem = newMenu;
                                          _currentMenuBarItem.CheckType = item.CheckStyle;
@@ -1012,7 +1017,7 @@ public class DynamicMenuBar : Scenario
 
             btnRemoveMenuBar.Accept += (s, e) =>
                                         {
-                                            if (_menuBar == null || _menuBar.Menus.Length == 0)
+                                            if (_menuBar == null)
                                             {
                                                 return;
                                             }
@@ -1033,24 +1038,29 @@ public class DynamicMenuBar : Scenario
                                                                           : null;
                                             }
 
-                                            if (MenuBar != null && _currentMenuBarItem == null && _menuBar.Menus.Length == 0)
-                                            {
-                                                Remove (_menuBar);
-                                                _menuBar.Dispose ();
-                                                _menuBar = null;
-                                                DataContext.Menus = new ();
-                                                _currentMenuBarItem = null;
-                                                _currentSelectedMenuBar = -1;
-                                                lblMenuBar.Text = string.Empty;
-                                            }
-                                            else
-                                            {
-                                                lblMenuBar.Text = _menuBar.Menus [_currentSelectedMenuBar].Title;
-                                            }
+                                            RemoveMenuBar ();
 
                                             SetListViewSource (_currentMenuBarItem, true);
                                             SetFrameDetails ();
                                         };
+
+            void RemoveMenuBar ()
+            {
+                if (MenuBar != null && _currentMenuBarItem == null && _menuBar.Menus.Length == 0)
+                {
+                    Remove (_menuBar);
+                    _menuBar.Dispose ();
+                    _menuBar = null;
+                    DataContext.Menus = new ();
+                    _currentMenuBarItem = null;
+                    _currentSelectedMenuBar = -1;
+                    lblMenuBar.Text = string.Empty;
+                }
+                else
+                {
+                    lblMenuBar.Text = _menuBar.Menus [_currentSelectedMenuBar].Title;
+                }
+            }
 
             SetFrameDetails ();
 

@@ -13,7 +13,7 @@ internal sealed class Menu : View
     internal int _currentChild;
     internal View? _previousSubFocused;
 
-    internal static Rectangle MakeFrame (int x, int y, MenuItem []? items, Menu? parent = null)
+    internal static Rectangle MakeFrame (int x, int y, MenuItem? []? items, Menu? parent = null)
     {
         if (items is null || items.Length == 0)
         {

@@ -98,8 +98,8 @@ public class ContextMenus : Scenario
             Menus =
             [
                 new (
-                     "File",
-                     new MenuItem [] { new ("Quit", "", () => Application.RequestStop (), null, null, Application.QuitKey) })
+                     "_File",
+                     new MenuItem [] { new ("_Quit", "", () => Application.RequestStop (), null, null, Application.QuitKey) })
             ]
         };
 
@@ -170,6 +170,10 @@ public class ContextMenus : Scenario
         MenuBarItem menuItems = new (
                                      new []
                                      {
+                                         new MenuBarItem (
+                                                          "_Languages",
+                                                          GetSupportedCultures ()
+                                                         ),
                                          new (
                                               "_Configuration",
                                               "Show configuration",
@@ -213,10 +217,6 @@ public class ContextMenus : Scenario
                                                                               )
                                                                   )
                                                           }
-                                                         ),
-                                         new MenuBarItem (
-                                                          "_Languages",
-                                                          GetSupportedCultures ()
                                                          ),
                                          _miForceMinimumPosToZero =
                                              new (
