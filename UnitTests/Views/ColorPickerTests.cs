@@ -790,6 +790,64 @@ public class ColorPickerTests
         Application.ResetState ();
     }
 
+    /// <summary>
+    /// In this version we use the Enter button to accept the typed text instead
+    /// of tabbing to the next view.
+    /// </summary>
+    [Fact]
+    [SetupFakeDriver]
+    public void ColorPicker_EnterHexFor_ColorName_AcceptVariation ()
+    {
+        var cp = GetColorPicker (ColorModel.RGB, true, true);
+        Application.Navigation = new ();
+        Application.Current = new ();
+        Application.Current.Add (cp);
+
+        cp.Draw ();
+
+        var name = GetTextField (cp, ColorPickerPart.ColorName);
+        var hex = GetTextField (cp, ColorPickerPart.Hex);
+
+        hex.SetFocus ();
+
+        Assert.True (hex.HasFocus);
+        Assert.Same (hex, cp.Focused);
+
+        hex.Text = "";
+        name.Text = "";
+
+        Assert.Empty (hex.Text);
+        Assert.Empty (name.Text);
+
+        Application.OnKeyDown ('#');
+        Assert.Empty (name.Text);
+        //7FFFD4
+
+        Assert.Equal ("#", hex.Text);
+        Application.OnKeyDown ('7');
+        Application.OnKeyDown ('F');
+        Application.OnKeyDown ('F');
+        Application.OnKeyDown ('F');
+        Application.OnKeyDown ('D');
+        Assert.Empty (name.Text);
+
+        Application.OnKeyDown ('4');
+
+        Assert.True (hex.HasFocus);
+
+        // Should stay in the hex field (because accept not tab)
+        Application.OnKeyDown (Key.Enter);
+        Assert.True (hex.HasFocus);
+        Assert.Same (hex, cp.Focused);
+
+        // But still, Color name should be recognised as a known string and populated
+        Assert.Equal ("#7FFFD4", hex.Text);
+        Assert.Equal ("Aquamarine", name.Text);
+
+        Application.Current?.Dispose ();
+        Application.ResetState ();
+    }
+
     [Fact]
     public void TestColorNames ()
     {

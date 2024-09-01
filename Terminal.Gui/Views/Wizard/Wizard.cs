@@ -351,14 +351,11 @@ public class Wizard : Dialog
 
         UpdateButtonsAndTitle ();
 
-        // Set focus to the nav buttons
-        if (BackButton.HasFocus)
+
+        // Set focus on the contentview
+        if (newStep is { })
         {
-            BackButton.SetFocus ();
-        }
-        else
-        {
-            NextFinishButton.SetFocus ();
+            newStep.Subviews.ToArray () [0].SetFocus ();
         }
 
         if (OnStepChanged (oldStep, _currentStep))
@@ -543,7 +540,7 @@ public class Wizard : Dialog
 
         SetNeedsLayout ();
         LayoutSubviews ();
-        Draw ();
+        //Draw ();
     }
 
     private void Wizard_Closing (object sender, ToplevelClosingEventArgs obj)

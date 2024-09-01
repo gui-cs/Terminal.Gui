@@ -192,6 +192,7 @@ public class DatePicker : View
 
         _calendar = new TableView
         {
+            Id = "_calendar",
             X = 0,
             Y = Pos.Bottom (_dateLabel),
             Height = 11,
@@ -206,6 +207,7 @@ public class DatePicker : View
 
         _dateField = new DateField (DateTime.Now)
         {
+            Id = "_dateField",
             X = Pos.Right (_dateLabel),
             Y = 0,
             Width = Dim.Width (_calendar) - Dim.Width (_dateLabel),
@@ -215,6 +217,7 @@ public class DatePicker : View
 
         _previousMonthButton = new Button
         {
+            Id = "_previousMonthButton",
             X = Pos.Center () - 2,
             Y = Pos.Bottom (_calendar) - 1,
             Width = 2,
@@ -234,6 +237,7 @@ public class DatePicker : View
 
         _nextMonthButton = new Button
         {
+            Id = "_nextMonthButton",
             X = Pos.Right (_previousMonthButton) + 2,
             Y = Pos.Bottom (_calendar) - 1,
             Width = 2,
