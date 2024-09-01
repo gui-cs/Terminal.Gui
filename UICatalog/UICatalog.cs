@@ -875,7 +875,7 @@ public class UICatalogApp
                 };
             }
 
-            Enum GetDiagnosticsEnumValue (string title)
+            Enum GetDiagnosticsEnumValue (string? title)
             {
                 return title switch
                 {

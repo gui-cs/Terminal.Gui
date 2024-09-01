@@ -351,10 +351,10 @@ public class MenuItem
     {
         if (Parent is { })
         {
-            MenuItem []? childrens = ((MenuBarItem)Parent).Children;
+            MenuItem? []? childrens = ((MenuBarItem)Parent).Children;
             var i = 0;
 
-            foreach (MenuItem c in childrens!)
+            foreach (MenuItem? c in childrens!)
             {
                 if (c != this)
                 {

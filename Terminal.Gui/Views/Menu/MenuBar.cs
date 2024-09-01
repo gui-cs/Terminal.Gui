@@ -126,7 +126,12 @@ public class MenuBar : View, IDesignable
                         return true;
                     }
                    );
-        AddCommand (Command.ToggleExpandCollapse, ctx => Select (Menus.IndexOf (ctx.KeyBinding?.Context)));
+        AddCommand (Command.ToggleExpandCollapse, ctx =>
+                                                  {
+                                                      CloseOtherOpenedMenuBar ();
+
+                                                      return Select (Menus.IndexOf (ctx.KeyBinding?.Context));
+                                                  });
         AddCommand (Command.Select, ctx =>
                                     {
                                         var res =  Run ((ctx.KeyBinding?.Context as MenuItem)?.Action!);
@@ -387,6 +392,8 @@ public class MenuBar : View, IDesignable
 
         mbar?.CleanUp ();
 
+        CloseOtherOpenedMenuBar ();
+
         if (!Enabled || _openMenu is { })
         {
             return;
@@ -528,11 +535,16 @@ public class MenuBar : View, IDesignable
         _openedByAltKey = false;
         OnMenuAllClosed ();
 
+        CloseOtherOpenedMenuBar ();
+    }
+
+    private void CloseOtherOpenedMenuBar ()
+    {
         if (Application.Current is { })
         {
             // Close others menu bar opened
-            View? cm = Application.Current.Subviews.FirstOrDefault (v => v is Menu cm && cm.Host != this && cm.Host.IsMenuOpen);
-            (cm as Menu)?.Host.CleanUp ();
+            Menu? menu = Application.Current.Subviews.FirstOrDefault (v => v is Menu m && m.Host != this && m.Host.IsMenuOpen) as Menu;
+            menu?.Host.CleanUp ();
         }
     }
 
@@ -726,7 +738,7 @@ public class MenuBar : View, IDesignable
                     else if (subMenu != null
                              || (OpenCurrentMenu._currentChild > -1
                                  && !OpenCurrentMenu.BarItems!
-                                                    .Children! [OpenCurrentMenu._currentChild]
+                                                    .Children! [OpenCurrentMenu._currentChild]!
                                                     .IsFromSubMenu))
                     {
                         _selectedSub++;
@@ -999,7 +1011,7 @@ public class MenuBar : View, IDesignable
     }
 
     internal bool SelectEnabledItem (
-        IEnumerable<MenuItem>? children,
+        MenuItem? []? children,
         int current,
         out int newCurrent,
         bool forward = true
@@ -1012,11 +1024,11 @@ public class MenuBar : View, IDesignable
             return true;
         }
 
-        IEnumerable<MenuItem> childMenuItems = forward ? children : children.Reverse ();
+        IEnumerable<MenuItem?> childMenuItems = forward ? children : children.Reverse ();
 
         int count;
 
-        IEnumerable<MenuItem> menuItems = childMenuItems as MenuItem [] ?? childMenuItems.ToArray ();
+        IEnumerable<MenuItem?> menuItems = childMenuItems as MenuItem [] ?? childMenuItems.ToArray ();
 
         if (forward)
         {
@@ -1027,7 +1039,7 @@ public class MenuBar : View, IDesignable
             count = menuItems.Count ();
         }
 
-        foreach (MenuItem child in menuItems)
+        foreach (MenuItem? child in menuItems)
         {
             if (forward)
             {
