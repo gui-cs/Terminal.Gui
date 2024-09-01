@@ -110,7 +110,7 @@ public class FileDialog : Dialog
         _tbPath.Autocomplete = new AppendAutocomplete (_tbPath);
         _tbPath.Autocomplete.SuggestionGenerator = new FilepathSuggestionGenerator ();
 
-        _splitContainer = new TileView { X = 0, Y = 2, Width = Dim.Fill (), Height = Dim.Fill (1) };
+        _splitContainer = new TileView { X = 0, Y = Pos.Bottom (_btnBack), Width = Dim.Fill (), Height = Dim.Fill (1) };
 
         Initialized += (s, e) =>
                        {
@@ -118,7 +118,7 @@ public class FileDialog : Dialog
                            _splitContainer.Tiles.ElementAt (0).ContentView.Visible = false;
                        };
 
-        //			this.splitContainer.Border.BorderStyle = BorderStyle.None;
+        // this.splitContainer.Border.BorderStyle = BorderStyle.None;
 
         _tableView = new TableView
         {
@@ -160,7 +160,7 @@ public class FileDialog : Dialog
         _splitContainer.Tiles.ElementAt (0).ContentView.Add (_treeView);
         _splitContainer.Tiles.ElementAt (1).ContentView.Add (_tableView);
 
-        _btnToggleSplitterCollapse = new Button { Y = Pos.AnchorEnd (1), Text = GetToggleSplitterText (false) };
+        _btnToggleSplitterCollapse = new Button { Y = Pos.AnchorEnd (), Text = GetToggleSplitterText (false) };
 
         _btnToggleSplitterCollapse.Accept += (s, e) =>
                                               {
@@ -177,7 +177,7 @@ public class FileDialog : Dialog
             X = Pos.Right (_btnToggleSplitterCollapse) + 1,
             CaptionColor = new Color (Color.Black),
             Width = 30,
-            Y = Pos.AnchorEnd (1),
+            Y = Pos.Top (_btnToggleSplitterCollapse),
             HotKey = Key.F.WithAlt
         };
         _spinnerView = new SpinnerView { X = Pos.Right (_tbFind) + 1, Y = Pos.AnchorEnd (1), Visible = false };
