@@ -115,7 +115,7 @@ public class FileDialog : Dialog
             X = 0,
             Y = Pos.Bottom (_btnBack),
             Width = Dim.Fill (),
-            Height = Dim.Fill (1/*TODO needs to be 2 for shadow buttons, how best?*/)
+            Height = Dim.Fill (Dim.Func (() => IsInitialized ? _btnOk.Frame.Height : 1)),
         };
 
         Initialized += (s, e) =>
