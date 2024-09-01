@@ -10,6 +10,9 @@ namespace Terminal.Gui;
 /// </summary>
 public class FileDialog : Dialog
 {
+    private const int alignmentGroupInput = 32;
+    private const int alignmentGroupComplete = 55;
+
     /// <summary>Gets the Path separators for the operating system</summary>
     internal static char [] Separators =
     [
@@ -71,12 +74,19 @@ public class FileDialog : Dialog
 
         _btnOk = new Button
         {
+            X = Pos.Align (Alignment.End, AlignmentModes.AddSpaceBetweenItems, alignmentGroupComplete),
+            Y = Pos.AnchorEnd (),
             IsDefault = true, Text = Style.OkButtonText
         };
         _btnOk.Accept += (s, e) => Accept (true);
 
 
-        _btnCancel = new Button { Text = Strings.btnCancel };
+        _btnCancel = new Button
+        {
+            X = Pos.Align (Alignment.End, AlignmentModes.AddSpaceBetweenItems, alignmentGroupComplete),
+            Y = Pos.AnchorEnd(),
+            Text = Strings.btnCancel
+        };
 
         _btnCancel.Accept += (s, e) =>
         {
@@ -166,7 +176,11 @@ public class FileDialog : Dialog
         _splitContainer.Tiles.ElementAt (0).ContentView.Add (_treeView);
         _splitContainer.Tiles.ElementAt (1).ContentView.Add (_tableView);
 
-        _btnToggleSplitterCollapse = new Button { Y = Pos.AnchorEnd (), Text = GetToggleSplitterText (false) };
+        _btnToggleSplitterCollapse = new Button
+        {
+            X = Pos.Align (Alignment.Start, AlignmentModes.AddSpaceBetweenItems, alignmentGroupInput),
+            Y = Pos.AnchorEnd (), Text = GetToggleSplitterText (false)
+        };
 
         _btnToggleSplitterCollapse.Accept += (s, e) =>
                                               {
@@ -180,13 +194,13 @@ public class FileDialog : Dialog
 
         _tbFind = new TextField
         {
-            X = Pos.Right (_btnToggleSplitterCollapse) + 1,
+            X = Pos.Align (Alignment.Start,AlignmentModes.AddSpaceBetweenItems, alignmentGroupInput),
             CaptionColor = new Color (Color.Black),
             Width = 30,
             Y = Pos.Top (_btnToggleSplitterCollapse),
             HotKey = Key.F.WithAlt
         };
-        _spinnerView = new SpinnerView { X = Pos.Right (_tbFind) + 1, Y = Pos.AnchorEnd (1), Visible = false };
+        _spinnerView = new SpinnerView { X = Pos.Align (Alignment.Start, AlignmentModes.AddSpaceBetweenItems, alignmentGroupInput), Y = Pos.AnchorEnd (1), Visible = false };
 
         _tbFind.TextChanged += (s, o) => RestartSearch ();
 
@@ -231,9 +245,6 @@ public class FileDialog : Dialog
 
         UpdateNavigationVisibility ();
 
-        // BUGBUG: This TabOrder is counter-intuitive. The tab order for a dialog should match the
-        // order the Views' are presented, left to right, top to bottom.
-        // Determines tab order
         Add (_tbPath);
         Add (_btnUp);
         Add (_btnBack);
@@ -243,8 +254,8 @@ public class FileDialog : Dialog
         Add (_tbFind);
         Add (_spinnerView);
 
-        AddButton (_btnOk);
-        AddButton (_btnCancel);
+        Add(_btnOk);
+        Add(_btnCancel);
     }
 
     /// <summary>
