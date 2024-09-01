@@ -57,7 +57,14 @@ public class WizardAsView : Scenario
         topLevel.Add (menu);
 
         // No need for a Title because the border is disabled
-        var wizard = new Wizard { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
+        var wizard = new Wizard
+        {
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            ShadowStyle = ShadowStyle.None
+        };
 
         // Set Mdoal to false to cause the Wizard class to render without a frame and
         // behave like an non-modal View (vs. a modal/pop-up Window).

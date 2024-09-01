@@ -60,6 +60,7 @@ public class WizardStep : View
         TabStop = TabBehavior.TabStop;
         CanFocus = true;
         BorderStyle = LineStyle.None;
+
         base.Add (_contentView);
 
         base.Add (_helpTextView);
@@ -191,7 +192,7 @@ public class WizardStep : View
     internal void ShowHide ()
     {
         _contentView.Height = Dim.Fill ();
-        _helpTextView.Height = Dim.Fill ();
+        _helpTextView.Height = Dim.Height(_contentView);
         _helpTextView.Width = Dim.Fill ();
 
         if (_contentView.InternalSubviews?.Count > 0)
