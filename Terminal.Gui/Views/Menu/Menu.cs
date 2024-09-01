@@ -72,9 +72,8 @@ internal sealed class Menu : View
 
         if (_barItems.Children is { })
         {
-            foreach (MenuItem menuItem in _barItems.Children)
+            foreach (MenuItem? menuItem in _barItems.Children)
             {
-                // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
                 if (menuItem is { })
                 {
                     menuItem._menuBar = Host;
@@ -102,7 +101,7 @@ internal sealed class Menu : View
 
             for (var i = 0; i < _barItems.Children?.Length; i++)
             {
-                if (_barItems.Children [i].IsEnabled ())
+                if (_barItems.Children [i]!.IsEnabled ())
                 {
                     _currentChild = i;
 
@@ -126,12 +125,12 @@ internal sealed class Menu : View
                                         || (_barItems.Children is { Length: > 0 }
                                             && _currentChild > -1
                                             && _currentChild < _barItems.Children.Length
-                                            && _barItems.Children [_currentChild].IsFromSubMenu),
+                                            && _barItems.Children [_currentChild]!.IsFromSubMenu),
                                         _barItems.Children is { Length: > 0 }
                                         && _currentChild > -1
                                         && _host.UseSubMenusSingleFrame
                                         && _barItems.SubMenu (
-                                                              _barItems.Children [_currentChild]
+                                                              _barItems.Children [_currentChild]!
                                                              )
                                         != null!
                                        );
@@ -206,8 +205,9 @@ internal sealed class Menu : View
             return;
         }
 
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-        foreach (MenuItem menuItem in menuBarItem.Children.Where (m => m is { }))
+        IEnumerable<MenuItem> menuItems = menuBarItem.Children.Where (m => m is { })!;
+
+        foreach (MenuItem menuItem in menuItems)
         {
             KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, menuItem);
 
@@ -228,8 +228,9 @@ internal sealed class Menu : View
             return;
         }
 
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-        foreach (MenuItem menuItem in menuBarItem.Children.Where (m => m is { }))
+        IEnumerable<MenuItem> menuItems = menuBarItem.Children.Where (m => m is { })!;
+
+        foreach (MenuItem menuItem in menuItems)
         {
             if (menuItem.HotKey != Key.Empty)
             {
@@ -267,7 +268,6 @@ internal sealed class Menu : View
             {
                 MenuItem? item = _barItems.Children [_currentChild];
 
-                // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
                 if (item is null)
                 {
                     return true;
@@ -415,7 +415,7 @@ internal sealed class Menu : View
                 break;
             }
 
-            MenuItem item = _barItems.Children [i];
+            MenuItem? item = _barItems.Children [i];
 
             Driver.SetAttribute (
                                  // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
@@ -459,7 +459,7 @@ internal sealed class Menu : View
                 }
 
                 // This `- 3` is left border + right border + one row in from right
-                else if (p == Frame.Width - 3 && _barItems?.SubMenu (_barItems.Children [i]) is { })
+                else if (p == Frame.Width - 3 && _barItems?.SubMenu (_barItems.Children [i]!) is { })
                 {
                     Driver.AddRune (Glyphs.RightArrow);
                 }
@@ -630,12 +630,12 @@ internal sealed class Menu : View
         {
             switch (_currentChild)
             {
-                case > -1 when _barItems.Children! [_currentChild].Action != null!:
-                    Run (_barItems.Children [_currentChild].Action);
+                case > -1 when _barItems.Children! [_currentChild]!.Action != null!:
+                    Run (_barItems.Children [_currentChild]?.Action);
 
                     break;
-                case 0 when _host.UseSubMenusSingleFrame && _barItems.Children [_currentChild].Parent!.Parent != null:
-                    _host.PreviousMenu (_barItems.Children [_currentChild].Parent!.IsFromSubMenu, true);
+                case 0 when _host.UseSubMenusSingleFrame && _barItems.Children [_currentChild]?.Parent!.Parent != null:
+                    _host.PreviousMenu (_barItems.Children [_currentChild]!.Parent!.IsFromSubMenu, true);
 
                     break;
                 case > -1 when _barItems.SubMenu (_barItems.Children [_currentChild]) != null!:
@@ -670,11 +670,10 @@ internal sealed class Menu : View
                 _currentChild = 0;
             }
 
-            // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
             if (this != _host.OpenCurrentMenu && _barItems?.Children? [_currentChild]?.IsFromSubMenu == true && _host._selectedSub > -1)
             {
                 _host.PreviousMenu (true);
-                _host.SelectEnabledItem (_barItems.Children, _currentChild, out _currentChild);
+                _host.SelectEnabledItem (_barItems.Children!, _currentChild, out _currentChild);
                 _host.OpenCurrentMenu = this;
             }
 
@@ -736,7 +735,7 @@ internal sealed class Menu : View
             if (_host.UseKeysUpDownAsKeysLeftRight && !_host.UseSubMenusSingleFrame)
             {
                 if ((_currentChild == -1 || this != _host.OpenCurrentMenu)
-                    && _barItems.Children! [_currentChild + 1].IsFromSubMenu
+                    && _barItems.Children! [_currentChild + 1]!.IsFromSubMenu
                     && _host._selectedSub > -1)
                 {
                     _currentChild++;
@@ -757,11 +756,11 @@ internal sealed class Menu : View
                 _currentChild = _barItems.Children!.Length - 1;
             }
 
-            if (!_host.SelectEnabledItem (_barItems.Children, _currentChild, out _currentChild, false))
+            if (!_host.SelectEnabledItem (_barItems.Children!, _currentChild, out _currentChild, false))
             {
                 _currentChild = 0;
 
-                if (!_host.SelectEnabledItem (_barItems.Children, _currentChild, out _currentChild) && !_host.CloseMenu ())
+                if (!_host.SelectEnabledItem (_barItems.Children!, _currentChild, out _currentChild) && !_host.CloseMenu ())
                 {
                     return false;
                 }
@@ -769,12 +768,12 @@ internal sealed class Menu : View
                 break;
             }
 
-            MenuItem item = _barItems.Children! [_currentChild];
+            MenuItem item = _barItems.Children! [_currentChild]!;
             disabled = item.IsEnabled () != true;
 
             if (_host.UseSubMenusSingleFrame
                 || !_host.UseKeysUpDownAsKeysLeftRight
-                || _barItems.SubMenu (_barItems.Children [_currentChild]) == null!
+                || _barItems.SubMenu (_barItems.Children [_currentChild]!) == null!
                 || disabled
                 || !_host.IsMenuOpen)
             {
@@ -788,7 +787,7 @@ internal sealed class Menu : View
 
             break;
         }
-        while (_barItems.Children? [_currentChild] is null || disabled);
+        while (_barItems.Children [_currentChild] is null || disabled);
 
         SetNeedsDisplay ();
         SetParentSetNeedsDisplay ();
@@ -839,7 +838,7 @@ internal sealed class Menu : View
                 return me.Handled = true;
             }
 
-            MenuItem item = _barItems.Children [me.Position.Y];
+            MenuItem item = _barItems.Children [me.Position.Y]!;
 
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (item is null || !item.IsEnabled ())
@@ -875,7 +874,7 @@ internal sealed class Menu : View
                 return me.Handled = true;
             }
 
-            MenuItem item = _barItems.Children [me.Position.Y];
+            MenuItem item = _barItems.Children [me.Position.Y]!;
 
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (item is null)
@@ -909,12 +908,12 @@ internal sealed class Menu : View
 
     internal bool CheckSubMenu ()
     {
-        if (_currentChild == -1 || _barItems!.Children? [_currentChild] is null)
+        if (_currentChild == -1 || _barItems?.Children? [_currentChild] is null)
         {
             return true;
         }
 
-        MenuBarItem? subMenu = _barItems.SubMenu (_barItems.Children [_currentChild]);
+        MenuBarItem? subMenu = _barItems.SubMenu (_barItems.Children [_currentChild]!);
 
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (subMenu is { })
@@ -936,7 +935,7 @@ internal sealed class Menu : View
 
             _host.Activate (_host._selected, pos, subMenu);
         }
-        else if (_host._openSubMenu?.Count == 0 || _host._openSubMenu?.Last ()._barItems!.IsSubMenuOf (_barItems.Children [_currentChild]) == false)
+        else if (_host._openSubMenu?.Count == 0 || _host._openSubMenu?.Last ()._barItems!.IsSubMenuOf (_barItems.Children [_currentChild]!) == false)
         {
             return _host.CloseMenu (false, true);
         }
