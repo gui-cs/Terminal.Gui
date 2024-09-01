@@ -54,47 +54,19 @@ public class TableView : View
         // Things this view knows how to do
         AddCommand (
                     Command.Right,
-                    () =>
-                    {
-                        // BUGBUG: SHould return false if selectokn doesn't change (to support nav to next view)
-                        ChangeSelectionByOffset (1, 0, false);
-
-                        return true;
-                    }
-                   );
+                    () => ChangeSelectionByOffsetWithReturn (1, 0));
 
         AddCommand (
                     Command.Left,
-                    () =>
-                    {
-                        // BUGBUG: SHould return false if selectokn doesn't change (to support nav to next view)
-                        ChangeSelectionByOffset (-1, 0, false);
-
-                        return true;
-                    }
-                   );
+                    () => ChangeSelectionByOffsetWithReturn (-1, 0));
 
         AddCommand (
                     Command.LineUp,
-                    () =>
-                    {
-                        // BUGBUG: SHould return false if selectokn doesn't change (to support nav to next view)
-                        ChangeSelectionByOffset (0, -1, false);
-
-                        return true;
-                    }
-                   );
+                    () => ChangeSelectionByOffsetWithReturn (0, -1));
 
         AddCommand (
                     Command.LineDown,
-                    () =>
-                    {
-                        // BUGBUG: SHould return false if selectokn doesn't change (to support nav to next view)
-                        ChangeSelectionByOffset (0, 1, false);
-
-                        return true;
-                    }
-                   );
+                    () => ChangeSelectionByOffsetWithReturn (0, 1));
 
         AddCommand (
                     Command.PageUp,
@@ -518,6 +490,41 @@ public class TableView : View
 
         return new Point (colHit.X, tableRow + headerHeight - RowOffset);
     }
+
+    /// <summary>
+    /// Private override of <see cref="ChangeSelectionByOffset"/> that returns true if the selection has
+    /// changed as a result of moving the selection. Used by key handling logic to determine whether e.g.
+    /// the cursor right resulted in a change or should be forwarded on to toggle logic handling.
+    /// </summary>
+    /// <param name="offsetX"></param>
+    /// <param name="offsetY"></param>
+    /// <returns></returns>
+    private bool ChangeSelectionByOffsetWithReturn (int offsetX, int offsetY)
+    {
+        var oldSelection = GetSelectionSnapshot ();
+        SetSelection (SelectedColumn + offsetX, SelectedRow + offsetY, false);
+        Update ();
+
+        return !SelectionIsSame (oldSelection);
+    }
+
+    private TableViewSelectionSnapshot GetSelectionSnapshot ()
+    {
+        return new (
+                    SelectedColumn,
+                    SelectedRow,
+                    MultiSelectedRegions.Select (s => s.Rectangle).ToArray ());
+    }
+
+    private bool SelectionIsSame (TableViewSelectionSnapshot oldSelection)
+    {
+        var newSelection = GetSelectionSnapshot ();
+
+        return oldSelection.SelectedColumn == newSelection.SelectedColumn
+               && oldSelection.SelectedRow == newSelection.SelectedRow
+               && oldSelection.multiSelection.SequenceEqual (newSelection.multiSelection);
+    }
+    private record TableViewSelectionSnapshot (int SelectedColumn, int SelectedRow, Rectangle [] multiSelection);
 
     /// <summary>
     ///     Moves the <see cref="SelectedRow"/> and <see cref="SelectedColumn"/> by the provided offsets. Optionally
