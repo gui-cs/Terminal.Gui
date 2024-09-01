@@ -54,19 +54,19 @@ public class TableView : View
         // Things this view knows how to do
         AddCommand (
                     Command.Right,
-                    () => ChangeSelectionByOffset (1, 0, false));
+                    () => ChangeSelectionByOffsetWithReturn (1, 0));
 
         AddCommand (
                     Command.Left,
-                    () => ChangeSelectionByOffset (-1, 0, false));
+                    () => ChangeSelectionByOffsetWithReturn (-1, 0));
 
         AddCommand (
                     Command.LineUp,
-                    () => ChangeSelectionByOffset (0, -1, false));
+                    () => ChangeSelectionByOffsetWithReturn (0, -1));
 
         AddCommand (
                     Command.LineDown,
-                    () => ChangeSelectionByOffset (0, 1, false));
+                    () => ChangeSelectionByOffsetWithReturn (0, 1));
 
         AddCommand (
                     Command.PageUp,
@@ -492,18 +492,51 @@ public class TableView : View
     }
 
     /// <summary>
+    /// Private override of <see cref="ChangeSelectionByOffset"/> that returns true if the selection has
+    /// changed as a result of moving the selection. Used by key handling logic to determine whether e.g.
+    /// the cursor right resulted in a change or should be forwarded on to toggle logic handling.
+    /// </summary>
+    /// <param name="offsetX"></param>
+    /// <param name="offsetY"></param>
+    /// <returns></returns>
+    private bool ChangeSelectionByOffsetWithReturn (int offsetX, int offsetY)
+    {
+        var oldSelection = GetSelectionSnapshot ();
+        SetSelection (SelectedColumn + offsetX, SelectedRow + offsetY, false);
+        Update ();
+
+        return !SelectionIsSame (oldSelection);
+    }
+
+    private TableViewSelectionSnapshot GetSelectionSnapshot ()
+    {
+        return new (
+                    SelectedColumn,
+                    SelectedRow,
+                    MultiSelectedRegions.Select (s=>s.Rectangle).ToArray ());
+    }
+
+    private bool SelectionIsSame (TableViewSelectionSnapshot oldSelection)
+    {
+        var newSelection = GetSelectionSnapshot ();
+
+        return oldSelection.SelectedColumn == newSelection.SelectedColumn
+               && oldSelection.SelectedRow == newSelection.SelectedRow
+               && oldSelection.multiSelection.SequenceEqual (newSelection.multiSelection );
+    }
+    private record TableViewSelectionSnapshot (int SelectedColumn,int SelectedRow, Rectangle [] multiSelection);
+
+    /// <summary>
     ///     Moves the <see cref="SelectedRow"/> and <see cref="SelectedColumn"/> by the provided offsets. Optionally
     ///     starting a box selection (see <see cref="MultiSelect"/>)
     /// </summary>
     /// <param name="offsetX">Offset in number of columns</param>
     /// <param name="offsetY">Offset in number of rows</param>
     /// <param name="extendExistingSelection">True to create a multi cell selection or adjust an existing one</param>
-    public bool ChangeSelectionByOffset (int offsetX, int offsetY, bool extendExistingSelection)
+    public void ChangeSelectionByOffset (int offsetX, int offsetY, bool extendExistingSelection)
     {
-        var result = SetSelection (SelectedColumn + offsetX, SelectedRow + offsetY, extendExistingSelection);
+        SetSelection (SelectedColumn + offsetX, SelectedRow + offsetY, extendExistingSelection);
         Update ();
-
-        return result;
     }
 
     /// <summary>Moves or extends the selection to the last cell in the current row</summary>
@@ -1154,11 +1187,8 @@ public class TableView : View
     /// <param name="col"></param>
     /// <param name="row"></param>
     /// <param name="extendExistingSelection">True to create a multi cell selection or adjust an existing one</param>
-    /// <returns><see langword="true"/> if the selection changed (including clearing a multi select).</returns>>
-    public bool SetSelection (int col, int row, bool extendExistingSelection)
+    public void SetSelection (int col, int row, bool extendExistingSelection)
     {
-        IEnumerable<Point> selectedBefore = GetAllSelectedCells ();
-
         // if we are trying to increase the column index then
         // we are moving right otherwise we are moving left
         bool lookRight = col > selectedColumn;
@@ -1190,8 +1220,6 @@ public class TableView : View
 
         SelectedColumn = col;
         SelectedRow = row;
-
-        return !selectedBefore.SequenceEqual (GetAllSelectedCells());
     }
 
     /// <summary>
