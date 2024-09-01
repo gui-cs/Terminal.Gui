@@ -3292,6 +3292,42 @@ A B C
     }
 
 
+    [Fact]
+    public void CanTabOutOfTableViewUsingCursor_Left_ClearsSelectionFirst ()
+    {
+        GetTableViewWithSiblings (out var tf1, out var tableView, out var tf2);
+
+        // Make the selected cell one in
+        tableView.SelectedColumn = 1;
+
+        // Pressing shift-left should give us a multi selection
+        Application.OnKeyDown (Key.CursorLeft.WithShift);
+        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.True (tableView.HasFocus);
+        Assert.Equal(2,tableView.GetAllSelectedCells ().Count());
+
+        // Because we are now on the leftmost cell a further left press would normally move focus
+        // However there is an ongoing selection so instead the operation clears the selection and
+        // gets swallowed (not resulting in a focus change)
+        Application.OnKeyDown (Key.CursorLeft);
+
+        // Selection 'clears' just to the single cell and we remain focused
+        Assert.Single(tableView.GetAllSelectedCells ());
+        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.True (tableView.HasFocus);
+
+        // A further left will switch focus
+        Application.OnKeyDown (Key.CursorLeft);
+
+        Assert.NotSame (tableView, Application.Current.MostFocused);
+        Assert.False (tableView.HasFocus);
+
+        Assert.Same (tf1, Application.Current.MostFocused);
+        Assert.True (tf1.HasFocus);
+
+        Application.Current.Dispose ();
+    }
+
     /// <summary>
     /// Creates 3 views on <see cref="Application.Current"/> with the focus in the
     /// <see cref="TableView"/>.  This is a helper method to setup tests that want to
