@@ -10,8 +10,8 @@ public partial class ToplevelTests (ITestOutputHelper output)
         var top = new Toplevel ();
 
         Assert.Equal (Colors.ColorSchemes ["TopLevel"], top.ColorScheme);
-        Assert.Equal ("Fill(0)", top.Width.ToString ());
-        Assert.Equal ("Fill(0)", top.Height.ToString ());
+        Assert.Equal ("Fill(Absolute(0))", top.Width.ToString ());
+        Assert.Equal ("Fill(Absolute(0))", top.Height.ToString ());
         Assert.False (top.Running);
         Assert.False (top.Modal);
         Assert.Null (top.MenuBar);
