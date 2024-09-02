@@ -19,7 +19,7 @@ public class ScrollBar : View
     {
         _scroll = new ();
         _decrease = new ();
-        _increase = new () { VariationMode = VariationMode.Increase };
+        _increase = new () { NavigationDirection = NavigationDirection.Forward };
         Add (_scroll, _decrease, _increase);
 
         CanFocus = false;

@@ -2,12 +2,6 @@
 
 namespace Terminal.Gui;
 
-internal enum VariationMode
-{
-    Decrease,
-    Increase
-}
-
 internal class ScrollButton : View
 {
     public ScrollButton ()
@@ -15,6 +9,7 @@ internal class ScrollButton : View
         TextAlignment = Alignment.Center;
         VerticalTextAlignment = Alignment.Center;
         Id = "scrollButton";
+        NavigationDirection = NavigationDirection.Backward;
 
         //Width = Dim.Auto (DimAutoStyle.Content, 1);
         //Height = Dim.Auto (DimAutoStyle.Content, 1);
@@ -33,14 +28,14 @@ internal class ScrollButton : View
         Width = SupView.Orientation == Orientation.Vertical ? Dim.Fill () : 1;
         Height = SupView.Orientation == Orientation.Vertical ? 1 : Dim.Fill ();
 
-        switch (VariationMode)
+        switch (NavigationDirection)
         {
-            case VariationMode.Decrease:
+            case NavigationDirection.Backward:
                 X = 0;
                 Y = 0;
 
                 break;
-            case VariationMode.Increase:
+            case NavigationDirection.Forward:
                 X = SupView.Orientation == Orientation.Vertical ? 0 : Pos.AnchorEnd (1);
                 Y = SupView.Orientation == Orientation.Vertical ? Pos.AnchorEnd (1) : 0;
 
@@ -67,7 +62,7 @@ internal class ScrollButton : View
         return base.GetNormalColor ();
     }
 
-    public VariationMode VariationMode { get; init; }
+    public NavigationDirection NavigationDirection { get; init; }
 
     /// <inheritdoc/>
     protected internal override bool? OnMouseEnter (MouseEvent mouseEvent)
@@ -91,13 +86,13 @@ internal class ScrollButton : View
     {
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
-            switch (VariationMode)
+            switch (NavigationDirection)
             {
-                case VariationMode.Decrease:
+                case NavigationDirection.Backward:
                     SupView.Position--;
 
                     return true;
-                case VariationMode.Increase:
+                case NavigationDirection.Forward:
                     SupView.Position++;
 
                     return true;
@@ -123,13 +118,13 @@ internal class ScrollButton : View
 
     private void SetButtonText ()
     {
-        switch (VariationMode)
+        switch (NavigationDirection)
         {
-            case VariationMode.Decrease:
+            case NavigationDirection.Backward:
                 Text = SupView.Orientation == Orientation.Vertical ? Glyphs.UpArrow.ToString () : Glyphs.LeftArrow.ToString ();
 
                 break;
-            case VariationMode.Increase:
+            case NavigationDirection.Forward:
                 Text = SupView.Orientation == Orientation.Vertical ? Glyphs.DownArrow.ToString () : Glyphs.RightArrow.ToString ();
 
                 break;
