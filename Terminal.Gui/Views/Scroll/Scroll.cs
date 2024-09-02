@@ -174,7 +174,7 @@ public class Scroll : View
         return args;
     }
 
-    /// <summary>Virtual method called when <see cref="Size"/> has changed. Raises <see cref="SizeChanged"/>.</summary>
+    /// <summary>Called when <see cref="Size"/> has changed. Raises <see cref="SizeChanged"/>.</summary>
     protected void OnSizeChanged (int size) { SizeChanged?.Invoke (this, new (in size)); }
 
     internal void AdjustScroll ()
