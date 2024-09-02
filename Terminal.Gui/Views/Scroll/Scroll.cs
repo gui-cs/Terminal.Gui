@@ -5,8 +5,14 @@ using System.ComponentModel;
 namespace Terminal.Gui;
 
 /// <summary>
-///     Provides a proportional control for scrolling through content. Used within a <see cref="ScrollBar"/>.
+///     Indicates the position and size of scrollable content. The indicator can be dragged with the mouse. Can be
+///     oriented either vertically or horizontally. Used within a <see cref="ScrollBar"/>.
 /// </summary>
+/// <remarks>
+///     <para>
+///         By default, this view cannot be focused and does not support keyboard.
+///     </para>
+/// </remarks>
 public class Scroll : View
 {
     /// <inheritdoc/>

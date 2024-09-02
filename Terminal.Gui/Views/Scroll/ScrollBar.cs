@@ -4,13 +4,12 @@ using System.ComponentModel;
 
 namespace Terminal.Gui;
 
-/// <summary>ScrollBars are views that display a 1-character scrollbar, either horizontal or vertical</summary>
+/// <summary>A proportional scroll bar that can be oriented either horizontally or vertically.</summary>
 /// <remarks>
 ///     <para>
-///         The scrollbar is drawn to be a representation of the Size, assuming that the scroll position is set at
-///         Position.
+///         <see cref="Position"/> indicates the current location between zero and <see cref="Size"/>.
 ///     </para>
-///     <para>If the region to display the scrollbar is larger than three characters, arrow indicators are drawn.</para>
+///     <para>If the scrollbar is larger than three cells, arrow indicators are drawn.</para>
 /// </remarks>
 public class ScrollBar : View
 {
