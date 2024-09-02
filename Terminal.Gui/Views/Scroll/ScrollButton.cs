@@ -25,8 +25,8 @@ internal class ScrollButton : View
             return;
         }
 
-        Width = SupView.Orientation == Orientation.Vertical ? Dim.Fill () : 1;
-        Height = SupView.Orientation == Orientation.Vertical ? 1 : Dim.Fill ();
+        Width = SuperViewAsScrollBar.Orientation == Orientation.Vertical ? Dim.Fill () : 1;
+        Height = SuperViewAsScrollBar.Orientation == Orientation.Vertical ? 1 : Dim.Fill ();
 
         switch (NavigationDirection)
         {
@@ -36,8 +36,8 @@ internal class ScrollButton : View
 
                 break;
             case NavigationDirection.Forward:
-                X = SupView.Orientation == Orientation.Vertical ? 0 : Pos.AnchorEnd (1);
-                Y = SupView.Orientation == Orientation.Vertical ? Pos.AnchorEnd (1) : 0;
+                X = SuperViewAsScrollBar.Orientation == Orientation.Vertical ? 0 : Pos.AnchorEnd (1);
+                Y = SuperViewAsScrollBar.Orientation == Orientation.Vertical ? Pos.AnchorEnd (1) : 0;
 
                 break;
             default:
@@ -52,11 +52,11 @@ internal class ScrollButton : View
     {
         if (_savedColorScheme is null)
         {
-            ColorScheme = new () { Normal = new (SupView.ColorScheme.HotNormal.Foreground, SupView.ColorScheme.HotNormal.Background) };
+            ColorScheme = new () { Normal = new (SuperViewAsScrollBar.ColorScheme.HotNormal.Foreground, SuperViewAsScrollBar.ColorScheme.HotNormal.Background) };
         }
         else
         {
-            ColorScheme = new () { Normal = new (SupView.ColorScheme.Normal.Background, SupView.ColorScheme.Normal.Foreground) };
+            ColorScheme = new () { Normal = new (SuperViewAsScrollBar.ColorScheme.Normal.Background, SuperViewAsScrollBar.ColorScheme.Normal.Foreground) };
         }
 
         return base.GetNormalColor ();
@@ -67,7 +67,7 @@ internal class ScrollButton : View
     /// <inheritdoc/>
     protected internal override bool? OnMouseEnter (MouseEvent mouseEvent)
     {
-        _savedColorScheme ??= SupView.ColorScheme;
+        _savedColorScheme ??= SuperViewAsScrollBar.ColorScheme;
 
         ColorScheme = new ()
         {
@@ -89,11 +89,11 @@ internal class ScrollButton : View
             switch (NavigationDirection)
             {
                 case NavigationDirection.Backward:
-                    SupView.Position--;
+                    SuperViewAsScrollBar.Position--;
 
                     return true;
                 case NavigationDirection.Forward:
-                    SupView.Position++;
+                    SuperViewAsScrollBar.Position++;
 
                     return true;
                 default:
@@ -121,11 +121,11 @@ internal class ScrollButton : View
         switch (NavigationDirection)
         {
             case NavigationDirection.Backward:
-                Text = SupView.Orientation == Orientation.Vertical ? Glyphs.UpArrow.ToString () : Glyphs.LeftArrow.ToString ();
+                Text = SuperViewAsScrollBar.Orientation == Orientation.Vertical ? Glyphs.UpArrow.ToString () : Glyphs.LeftArrow.ToString ();
 
                 break;
             case NavigationDirection.Forward:
-                Text = SupView.Orientation == Orientation.Vertical ? Glyphs.DownArrow.ToString () : Glyphs.RightArrow.ToString ();
+                Text = SuperViewAsScrollBar.Orientation == Orientation.Vertical ? Glyphs.DownArrow.ToString () : Glyphs.RightArrow.ToString ();
 
                 break;
             default:
@@ -133,5 +133,5 @@ internal class ScrollButton : View
         }
     }
 
-    private ScrollBar SupView => (SuperView as ScrollBar)!;
+    private ScrollBar SuperViewAsScrollBar => (SuperView as ScrollBar)!;
 }
