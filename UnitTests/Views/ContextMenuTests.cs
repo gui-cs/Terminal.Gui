@@ -1189,7 +1189,13 @@ public class ContextMenuTests (ITestOutputHelper output)
         };
         Toplevel top = new ();
         RunState rs = Application.Begin (top);
+        top.SetFocus ();
+        Assert.NotNull (Application.Current);
+
         cm.Show ();
+        Assert.True(ContextMenu.IsShow);
+        Assert.True (Application.Top.Subviews [0].HasFocus);
+        Assert.Equal(Application.Top.Subviews [0], Application.Navigation.GetFocused());
         Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
         Application.Refresh ();
 
@@ -1373,14 +1379,14 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         Assert.True (tf1.HasFocus);
         Assert.False (tf2.HasFocus);
-        Assert.Equal (2, win.Subviews.Count);
+        Assert.Equal (4, win.Subviews.Count); // TF & TV add autocomplete popup's to their superviews.
         Assert.Null (Application.MouseEnteredView);
 
         // Right click on tf2 to open context menu
         Application.OnMouseEvent (new () { Position = new (1, 3), Flags = MouseFlags.Button3Clicked });
         Assert.False (tf1.HasFocus);
         Assert.False (tf2.HasFocus);
-        Assert.Equal (3, win.Subviews.Count);
+        Assert.Equal (5, win.Subviews.Count);
         Assert.True (tf2.ContextMenu.MenuBar.IsMenuOpen);
         Assert.True (win.Focused is Menu);
         Assert.True (Application.MouseGrabView is MenuBar);
@@ -1390,7 +1396,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.OnMouseEvent (new () { Position = new (1, 1), Flags = MouseFlags.Button1Clicked });
         Assert.True (tf1.HasFocus);
         Assert.False (tf2.HasFocus);
-        Assert.Equal (2, win.Subviews.Count);
+        Assert.Equal (4, win.Subviews.Count);
         // The last context menu bar opened is always preserved
         Assert.NotNull (tf2.ContextMenu.MenuBar);
         Assert.Equal (win.Focused, tf1);
@@ -1401,7 +1407,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.OnMouseEvent (new () { Position = new (1, 3), Flags = MouseFlags.Button1Clicked });
         Assert.False (tf1.HasFocus);
         Assert.True (tf2.HasFocus);
-        Assert.Equal (2, win.Subviews.Count);
+        Assert.Equal (4, win.Subviews.Count);
         // The last context menu bar opened is always preserved
         Assert.NotNull (tf2.ContextMenu.MenuBar);
         Assert.Equal (win.Focused, tf2);

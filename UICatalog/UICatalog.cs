@@ -477,7 +477,7 @@ public class UICatalogApp
                 ShVersion = new ()
                 {
                     Title = "Version Info",
-                    CanFocus = false
+                    CanFocus = false,
                 };
 
                 var statusBarShortcut = new Shortcut
@@ -502,7 +502,8 @@ public class UICatalogApp
                         CanFocus = false
                     },
                     HelpText = "",
-                    Key = Key.F6
+                    KeyBindingScope = KeyBindingScope.Application,
+                    Key = Key.F7
                 };
 
                 ((CheckBox)ShForce16Colors.CommandView).CheckedStateChanging += (sender, args) =>
@@ -545,7 +546,7 @@ public class UICatalogApp
                 X = 0,
                 Y = 1,
                 Width = Dim.Auto (),
-                Height = Dim.Fill (1),
+                Height = Dim.Fill (Dim.Func (() => IsInitialized ? Subviews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height : 1)),
                 AllowsMarking = false,
                 CanFocus = true,
                 Title = "_Categories",
@@ -642,13 +643,6 @@ public class UICatalogApp
 
             Add (CategoryList);
             Add (ScenarioList);
-
-            Add (MenuBar!);
-
-            if (StatusBar is { })
-            {
-                Add (StatusBar);
-            }
 
             Loaded += LoadedHandler;
             Unloaded += UnloadedHandler;

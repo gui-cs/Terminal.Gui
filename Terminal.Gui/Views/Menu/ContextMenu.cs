@@ -105,6 +105,10 @@ public sealed class ContextMenu : IDisposable
     /// <summary>Disposes the context menu object.</summary>
     public void Dispose ()
     {
+        if (_menuBar is null)
+        {
+            return;
+        }
         _menuBar.MenuAllClosed -= MenuBar_MenuAllClosed;
         Application.UngrabMouse ();
         _menuBar?.Dispose ();

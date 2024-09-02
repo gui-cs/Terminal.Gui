@@ -194,6 +194,7 @@ public partial class View // Adornments
     /// <summary>
     ///     Fired when the <see cref="BorderStyle"/> is changing. Allows the event to be cancelled.
     /// </summary>
+    [CanBeNull]
     public event EventHandler<CancelEventArgs<LineStyle>> BorderStyleChanging;
 
     /// <summary>

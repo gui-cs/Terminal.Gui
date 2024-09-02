@@ -14,7 +14,12 @@ public class Tile
     /// <summary>Creates a new instance of the <see cref="Tile"/> class.</summary>
     public Tile ()
     {
-        ContentView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
+        ContentView = new View
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            CanFocus = true
+        };
 #if DEBUG_IDISPOSABLE
         ContentView.Data = "Tile.ContentView";
 #endif

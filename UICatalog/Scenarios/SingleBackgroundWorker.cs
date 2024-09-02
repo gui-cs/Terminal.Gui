@@ -9,7 +9,8 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Single BackgroundWorker", "A single BackgroundWorker threading opening another Toplevel")]
 [ScenarioCategory ("Threading")]
-[ScenarioCategory ("Top Level Windows")]
+[ScenarioCategory ("Overlapped")]
+[ScenarioCategory ("Runnable")]
 public class SingleBackgroundWorker : Scenario
 {
     public override void Main ()

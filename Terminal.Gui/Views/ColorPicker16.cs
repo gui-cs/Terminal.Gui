@@ -51,6 +51,7 @@ public class ColorPicker16 : View
     }
 
     /// <summary>Fired when a color is picked.</summary>
+    [CanBeNull]
     public event EventHandler<ColorEventArgs> ColorChanged;
 
     /// <summary>Cursor for the selected color.</summary>

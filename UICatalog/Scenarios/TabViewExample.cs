@@ -73,6 +73,7 @@ public class TabViewExample : Scenario
 
         _tabView = new()
         {
+            Title = "_Tab View",
             X = 0,
             Y = 1,
             Width = 60,
@@ -80,9 +81,9 @@ public class TabViewExample : Scenario
             BorderStyle = LineStyle.Single
         };
 
-        _tabView.AddTab (new() { DisplayText = "Tab1", View = new Label { Text = "hodor!" } }, false);
-        _tabView.AddTab (new() { DisplayText = "Tab2", View = new TextField { Text = "durdur" } }, false);
-        _tabView.AddTab (new() { DisplayText = "Interactive Tab", View = GetInteractiveTab () }, false);
+        _tabView.AddTab (new() { DisplayText = "Tab_1", View = new Label { Text = "hodor!" } }, false);
+        _tabView.AddTab (new() { DisplayText = "Tab_2", View = new TextField { Text = "durdur", Width = 10 } }, false);
+        _tabView.AddTab (new() { DisplayText = "_Interactive Tab", View = GetInteractiveTab () }, false);
         _tabView.AddTab (new() { DisplayText = "Big Text", View = GetBigTextFileTab () }, false);
 
         _tabView.AddTab (
@@ -138,9 +139,10 @@ public class TabViewExample : Scenario
             Y = 1,
             Width = Dim.Fill (),
             Height = Dim.Fill (1),
-            Title = "About",
+            Title = "_About",
             BorderStyle = LineStyle.Single,
-            TabStop = TabBehavior.TabStop
+            TabStop = TabBehavior.TabStop,
+            CanFocus = true
         };
 
         frameRight.Add (
@@ -161,9 +163,10 @@ public class TabViewExample : Scenario
             Y = Pos.Bottom (_tabView),
             Width = _tabView.Width,
             Height = Dim.Fill (1),
-            Title = "Bottom Frame",
+            Title = "B_ottom Frame",
             BorderStyle = LineStyle.Single,
-            TabStop = TabBehavior.TabStop
+            TabStop = TabBehavior.TabStop,
+            CanFocus = true
 
         };
 
@@ -216,7 +219,11 @@ public class TabViewExample : Scenario
 
     private View GetInteractiveTab ()
     {
-        var interactiveTab = new View { Width = Dim.Fill (), Height = Dim.Fill () };
+        var interactiveTab = new View
+        {
+            Width = Dim.Fill (), Height = Dim.Fill (),
+            CanFocus = true
+        };
         var lblName = new Label { Text = "Name:" };
         interactiveTab.Add (lblName);
 

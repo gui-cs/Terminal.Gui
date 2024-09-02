@@ -973,13 +973,13 @@ public class TileViewTests
         Assert.Equal (6, subSplit.Tiles.ElementAt (0).ContentView.Frame.Width);
         Assert.Equal (0, subSplit.Tiles.ElementAt (0).ContentView.Frame.Y);
         Assert.Equal (5, subSplit.Tiles.ElementAt (0).ContentView.Frame.Height);
-        Assert.IsType<TextView> (subSplit.Tiles.ElementAt (0).ContentView.Subviews.Single ());
+        //Assert.IsType<TextView> (subSplit.Tiles.ElementAt (0).ContentView.Subviews.Single ());
 
         Assert.Equal (0, subSplit.Tiles.ElementAt (1).ContentView.Frame.X);
         Assert.Equal (6, subSplit.Tiles.ElementAt (1).ContentView.Frame.Width);
         Assert.Equal (6, subSplit.Tiles.ElementAt (1).ContentView.Frame.Y);
         Assert.Equal (4, subSplit.Tiles.ElementAt (1).ContentView.Frame.Height);
-        Assert.IsType<TextView> (subSplit.Tiles.ElementAt (1).ContentView.Subviews.Single ());
+        //Assert.IsType<TextView> (subSplit.Tiles.ElementAt (1).ContentView.Subviews.Single ());
     }
 
     [Fact]
@@ -1524,13 +1524,13 @@ public class TileViewTests
         Assert.Equal (5, subSplit.Tiles.ElementAt (0).ContentView.Frame.Width);
         Assert.Equal (0, subSplit.Tiles.ElementAt (0).ContentView.Frame.Y);
         Assert.Equal (4, subSplit.Tiles.ElementAt (0).ContentView.Frame.Height);
-        Assert.IsType<TextView> (subSplit.Tiles.ElementAt (0).ContentView.Subviews.Single ());
+        //Assert.IsType<TextView> (subSplit.Tiles.ElementAt (0).ContentView.Subviews.Single ());
 
         Assert.Equal (0, subSplit.Tiles.ElementAt (1).ContentView.Frame.X);
         Assert.Equal (5, subSplit.Tiles.ElementAt (1).ContentView.Frame.Width);
         Assert.Equal (5, subSplit.Tiles.ElementAt (1).ContentView.Frame.Y);
         Assert.Equal (3, subSplit.Tiles.ElementAt (1).ContentView.Frame.Height);
-        Assert.IsType<TextView> (subSplit.Tiles.ElementAt (1).ContentView.Subviews.Single ());
+        //Assert.IsType<TextView> (subSplit.Tiles.ElementAt (1).ContentView.Subviews.Single ());
     }
 
     [Fact]

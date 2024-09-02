@@ -161,7 +161,7 @@ public class GraphViewExample : Scenario
         };
 
         frameRight.Add (
-                        _about = new() { Width = Dim.Fill (), Height = Dim.Fill () }
+                        _about = new() { Width = Dim.Fill (), Height = Dim.Fill (), ReadOnly = true }
                        );
 
         app.Add (frameRight);
@@ -170,8 +170,8 @@ public class GraphViewExample : Scenario
                                        new Shortcut []
                                        {
                                            new (Key.G.WithCtrl, "Next Graph", () => _graphs [_currentGraph++ % _graphs.Length] ()),
-                                           new (Key.CursorUp, "Zoom In", () => Zoom (0.5f)),
-                                           new (Key.CursorDown, "Zoom Out", () => Zoom (2f))
+                                           new (Key.PageUp, "Zoom In", () => Zoom (0.5f)),
+                                           new (Key.PageDown, "Zoom Out", () => Zoom (2f))
                                        }
                                       );
         app.Add (statusBar);

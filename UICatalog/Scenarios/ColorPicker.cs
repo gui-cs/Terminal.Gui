@@ -45,7 +45,7 @@ public class ColorPickers : Scenario
 
         // Foreground ColorPicker.
         foregroundColorPicker = new ColorPicker {
-            Title = "Foreground Color",
+            Title = "_Foreground Color",
             BorderStyle = LineStyle.Single,
             Width = Dim.Percent (50)
         };
@@ -61,7 +61,7 @@ public class ColorPickers : Scenario
         // Background ColorPicker.
         backgroundColorPicker = new ColorPicker
         {
-            Title = "Background Color",
+            Title = "_Background Color",
             X = Pos.AnchorEnd (),
             Width = Dim.Percent (50),
             BorderStyle = LineStyle.Single
@@ -86,7 +86,7 @@ public class ColorPickers : Scenario
         // Foreground ColorPicker 16.
         foregroundColorPicker16 = new ColorPicker16
         {
-            Title = "Foreground Color",
+            Title = "_Foreground Color",
             BorderStyle = LineStyle.Single,
             Width = Dim.Percent (50),
             Visible = false  // We default to HSV so hide old one
@@ -97,7 +97,7 @@ public class ColorPickers : Scenario
         // Background ColorPicker 16.
         backgroundColorPicker16 = new ColorPicker16
         {
-            Title = "Background Color",
+            Title = "_Background Color",
             X = Pos.AnchorEnd (),
             Width = Dim.Percent (50),
             BorderStyle = LineStyle.Single,
@@ -132,10 +132,10 @@ public class ColorPickers : Scenario
             Height = Dim.Auto (),
             RadioLabels = new []
             {
-                "RGB",
-                "HSV",
-                "HSL",
-                "16 Colors"
+                "_RGB",
+                "_HSV",
+                "H_SL",
+                "_16 Colors"
             },
             SelectedItem = (int)foregroundColorPicker.Style.ColorModel,
         };
@@ -180,7 +180,7 @@ public class ColorPickers : Scenario
         // Checkbox for switching show text fields on and off
         var cbShowTextFields = new CheckBox ()
         {
-            Text = "Show Text Fields",
+            Text = "Show _Text Fields",
             Y = Pos.Bottom (rgColorModel)+1,
             Width = Dim.Auto (),
             Height = Dim.Auto (),
@@ -199,7 +199,7 @@ public class ColorPickers : Scenario
         // Checkbox for switching show text fields on and off
         var cbShowName = new CheckBox ()
         {
-            Text = "Show Color Name",
+            Text = "Show Color _Name",
             Y = Pos.Bottom (cbShowTextFields) + 1,
             Width = Dim.Auto (),
             Height = Dim.Auto (),

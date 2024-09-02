@@ -121,7 +121,7 @@ internal abstract class ColorBar : View, IColorBar
             }
 
             mouseEvent.Handled = true;
-            FocusFirst (null);
+            SetFocus ();
 
             return true;
         }

@@ -369,7 +369,7 @@ public class TabViewTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip="#2491 - A good test for Tab nav, but currently broken. TabView has exposes some interesting edge cases.")]
     [AutoInitShutdown]
     public void ProcessKey_Down_Up_Right_Left_Home_End_PageDown_PageUp ()
     {

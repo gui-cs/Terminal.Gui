@@ -13,7 +13,7 @@ namespace Terminal.Gui;
 public class DatePicker : View
 {
     private TableView _calendar;
-    private DateTime _date = DateTime.Now;
+    private DateTime _date;
     private DateField _dateField;
     private Label _dateLabel;
     private Button _nextMonthButton;
@@ -21,7 +21,7 @@ public class DatePicker : View
     private DataTable _table;
 
     /// <summary>Initializes a new instance of <see cref="DatePicker"/>.</summary>
-    public DatePicker () { SetInitialProperties (_date); }
+    public DatePicker () { SetInitialProperties (DateTime.Now); }
 
     /// <summary>Initializes a new instance of <see cref="DatePicker"/> with the specified date.</summary>
     public DatePicker (DateTime date) { SetInitialProperties (date); }
@@ -183,14 +183,16 @@ public class DatePicker : View
 
     private void SetInitialProperties (DateTime date)
     {
+        _date = date;
         Title = "Date Picker";
         BorderStyle = LineStyle.Single;
         Date = date;
         _dateLabel = new Label { X = 0, Y = 0, Text = "Date: " };
-        TabStop = TabBehavior.TabGroup;
+        CanFocus = true;
 
         _calendar = new TableView
         {
+            Id = "_calendar",
             X = 0,
             Y = Pos.Bottom (_dateLabel),
             Height = 11,
@@ -205,6 +207,7 @@ public class DatePicker : View
 
         _dateField = new DateField (DateTime.Now)
         {
+            Id = "_dateField",
             X = Pos.Right (_dateLabel),
             Y = 0,
             Width = Dim.Width (_calendar) - Dim.Width (_dateLabel),
@@ -214,6 +217,7 @@ public class DatePicker : View
 
         _previousMonthButton = new Button
         {
+            Id = "_previousMonthButton",
             X = Pos.Center () - 2,
             Y = Pos.Bottom (_calendar) - 1,
             Width = 2,
@@ -233,6 +237,7 @@ public class DatePicker : View
 
         _nextMonthButton = new Button
         {
+            Id = "_nextMonthButton",
             X = Pos.Right (_previousMonthButton) + 2,
             Y = Pos.Bottom (_calendar) - 1,
             Width = 2,

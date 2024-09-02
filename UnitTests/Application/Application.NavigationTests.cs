@@ -1,170 +1,157 @@
-﻿using Moq;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
-namespace Terminal.Gui.ApplicationTests;
+namespace Terminal.Gui.ApplicationTests.NavigationTests;
 
 public class ApplicationNavigationTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
 
-    [Fact]
-    public void GetDeepestFocusedSubview_ShouldReturnNull_WhenViewIsNull ()
+    [Theory]
+    [InlineData (TabBehavior.NoStop)]
+    [InlineData (TabBehavior.TabStop)]
+    [InlineData (TabBehavior.TabGroup)]
+    public void Begin_SetsFocus_On_Deepest_Focusable_View (TabBehavior behavior)
     {
-        // Act
-        var result = ApplicationNavigation.GetDeepestFocusedSubview (null);
+        Application.Init (new FakeDriver ());
 
-        // Assert
-        Assert.Null (result);
-    }
+        var top = new Toplevel
+        {
+            TabStop = behavior
+        };
+        Assert.False (top.HasFocus);
 
-    [Fact]
-    public void GetDeepestFocusedSubview_ShouldReturnSameView_WhenNoSubviewsHaveFocus ()
-    {
-        // Arrange
-        var view = new View () { Id = "view", CanFocus = true }; ;
+        View subView = new ()
+        {
+            CanFocus = true,
+            TabStop = behavior
+        };
+        top.Add (subView);
 
-        // Act
-        var result = ApplicationNavigation.GetDeepestFocusedSubview (view);
+        View subSubView = new ()
+        {
+            CanFocus = true,
+            TabStop = TabBehavior.NoStop
+        };
+        subView.Add (subSubView);
 
-        // Assert
-        Assert.Equal (view, result);
-    }
-
-    [Fact]
-    public void GetDeepestFocusedSubview_ShouldReturnFocusedSubview ()
-    {
-        // Arrange
-        var parentView = new View () { Id = "parentView", CanFocus = true }; ;
-        var childView1 = new View () { Id = "childView1", CanFocus = true }; ;
-        var childView2 = new View () { Id = "childView2", CanFocus = true }; ;
-        var grandChildView = new View () { Id = "grandChildView", CanFocus = true }; ;
-
-        parentView.Add (childView1, childView2);
-        childView2.Add (grandChildView);
-
-        grandChildView.SetFocus ();
-
-        // Act
-        var result = ApplicationNavigation.GetDeepestFocusedSubview (parentView);
-
-        // Assert
-        Assert.Equal (grandChildView, result);
-    }
-
-    [Fact]
-    public void GetDeepestFocusedSubview_ShouldReturnDeepestFocusedSubview ()
-    {
-        // Arrange
-        var parentView = new View () { Id = "parentView", CanFocus = true }; ;
-        var childView1 = new View () { Id = "childView1", CanFocus = true }; ;
-        var childView2 = new View () { Id = "childView2", CanFocus = true }; ;
-        var grandChildView = new View () { Id = "grandChildView", CanFocus = true }; ;
-        var greatGrandChildView = new View () { Id = "greatGrandChildView", CanFocus = true }; ;
-
-        parentView.Add (childView1, childView2);
-        childView2.Add (grandChildView);
-        grandChildView.Add (greatGrandChildView);
-
-        grandChildView.SetFocus ();
-
-        // Act
-        var result = ApplicationNavigation.GetDeepestFocusedSubview (parentView);
-
-        // Assert
-        Assert.Equal (greatGrandChildView, result);
-
-        // Arrange
-        greatGrandChildView.CanFocus = false;
-        grandChildView.SetFocus ();
-
-        // Act
-        result = ApplicationNavigation.GetDeepestFocusedSubview (parentView);
-
-        // Assert
-        Assert.Equal (grandChildView, result);
-    }
-
-    [Fact]
-    public void MoveNextView_ShouldMoveFocusToNextView ()
-    {
-        // Arrange
-        var top = new Toplevel ();
-        var view1 = new View () { Id = "view1", CanFocus = true };
-        var view2 = new View () { Id = "view2", CanFocus = true };
-        top.Add (view1, view2);
-        Application.Top = top;
-        Application.Current = top;
-        view1.SetFocus ();
-
-        // Act
-        ApplicationNavigation.MoveNextView ();
-
-        // Assert
-        Assert.True (view2.HasFocus);
+        RunState rs = Application.Begin (top);
+        Assert.True (top.HasFocus);
+        Assert.True (subView.HasFocus);
+        Assert.True (subSubView.HasFocus);
 
         top.Dispose ();
+
+        Application.Shutdown ();
     }
 
     [Fact]
-    public void MoveNextViewOrTop_ShouldMoveFocusToNextViewOrTop ()
+    public void Begin_SetsFocus_On_Top ()
     {
-        // Arrange
+        Application.Init (new FakeDriver ());
+
         var top = new Toplevel ();
-        var view1 = new View () { Id = "view1", CanFocus = true };
-        var view2 = new View () { Id = "view2", CanFocus = true };
-        top.Add (view1, view2);
-        Application.Top = top;
-        Application.Current = top;
-        view1.SetFocus ();
+        Assert.False (top.HasFocus);
 
-        // Act
-        ApplicationNavigation.MoveNextViewOrTop ();
-
-        // Assert
-        Assert.True (view2.HasFocus);
+        RunState rs = Application.Begin (top);
+        Assert.True (top.HasFocus);
 
         top.Dispose ();
+        Application.Shutdown ();
     }
 
     [Fact]
-    public void MovePreviousView_ShouldMoveFocusToPreviousView ()
+    public void Focused_Change_Raises_FocusedChanged ()
     {
-        // Arrange
-        var top = new Toplevel ();
-        var view1 = new View () { Id = "view1", CanFocus = true };
-        var view2 = new View () { Id = "view2", CanFocus = true };
-        top.Add (view1, view2);
-        Application.Top = top;
-        Application.Current = top;
-        view2.SetFocus ();
+        var raised = false;
 
-        // Act
-        ApplicationNavigation.MovePreviousView ();
+        Application.Navigation = new ();
 
-        // Assert
-        Assert.True (view1.HasFocus);
+        Application.Navigation.FocusedChanged += ApplicationNavigationOnFocusedChanged;
 
-        top.Dispose ();
+        Application.Navigation.SetFocused (new ());
+
+        Assert.True (raised);
+
+        Application.Navigation.GetFocused ().Dispose ();
+        Application.Navigation.SetFocused (null);
+
+        Application.Navigation.FocusedChanged -= ApplicationNavigationOnFocusedChanged;
+
+        Application.Navigation = null;
+
+        return;
+
+        void ApplicationNavigationOnFocusedChanged (object sender, EventArgs e) { raised = true; }
     }
 
     [Fact]
-    public void MovePreviousViewOrTop_ShouldMoveFocusToPreviousViewOrTop ()
+    public void GetFocused_Returns_Focused_View ()
     {
-        // Arrange
-        var top = new Toplevel ();
-        var view1 = new View () { Id = "view1", CanFocus = true, TabStop = TabBehavior.TabGroup };
-        var view2 = new View () { Id = "view2", CanFocus = true, TabStop = TabBehavior.TabGroup };
-        top.Add (view1, view2);
-        Application.Top = top;
-        Application.Current = top;
-        view2.SetFocus ();
+        Application.Navigation = new ();
 
-        // Act
-        ApplicationNavigation.MovePreviousViewOrTop ();
+        Application.Current = new()
+        {
+            Id = "top",
+            CanFocus = true
+        };
 
-        // Assert
-        Assert.True (view1.HasFocus);
+        var subView1 = new View
+        {
+            Id = "subView1",
+            CanFocus = true
+        };
 
-        top.Dispose ();
+        var subView2 = new View
+        {
+            Id = "subView2",
+            CanFocus = true
+        };
+        Application.Current.Add (subView1, subView2);
+        Assert.False (Application.Current.HasFocus);
+
+        Application.Current.SetFocus ();
+        Assert.True (subView1.HasFocus);
+        Assert.Equal (subView1, Application.Navigation.GetFocused ());
+
+        Application.Navigation.AdvanceFocus (NavigationDirection.Forward, null);
+        Assert.Equal (subView2, Application.Navigation.GetFocused ());
+
+        Application.ResetState ();
+    }
+
+    [Fact]
+    public void GetFocused_Returns_Null_If_No_Focused_View ()
+    {
+        Application.Navigation = new ();
+
+        Application.Current = new()
+        {
+            Id = "top",
+            CanFocus = true
+        };
+
+        var subView1 = new View
+        {
+            Id = "subView1",
+            CanFocus = true
+        };
+
+        Application.Current.Add (subView1);
+        Assert.False (Application.Current.HasFocus);
+
+        Application.Current.SetFocus ();
+        Assert.True (subView1.HasFocus);
+        Assert.Equal (subView1, Application.Navigation.GetFocused ());
+
+        subView1.HasFocus = false;
+        Assert.False (subView1.HasFocus);
+        Assert.True (Application.Current.HasFocus);
+        Assert.Equal (Application.Current, Application.Navigation.GetFocused ());
+
+        Application.Current.HasFocus = false;
+        Assert.False (Application.Current.HasFocus);
+        Assert.Null (Application.Navigation.GetFocused ());
+
+        Application.ResetState ();
     }
 }
