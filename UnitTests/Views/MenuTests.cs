@@ -43,4 +43,68 @@ public class MenuTests
 
         void Run () { }
     }
+
+    [Fact]
+    public void MenuBarItem_SubMenu_Can_Return_Null ()
+    {
+        var menuItem = new MenuItem ();
+        var menuBarItem = new MenuBarItem ();
+        Assert.Null (menuBarItem.SubMenu (menuItem));
+    }
+
+    [Fact]
+    public void MenuBarItem_Constructors_Defaults ()
+    {
+        var menuBarItem = new MenuBarItem ();
+        Assert.Equal ("", menuBarItem.Title);
+        Assert.Equal ("", menuBarItem.Help);
+        Assert.Null (menuBarItem.Action);
+        Assert.Null (menuBarItem.CanExecute);
+        Assert.Null (menuBarItem.Parent);
+        Assert.Equal (Key.Empty, menuBarItem.ShortcutKey);
+        Assert.Equal ([], menuBarItem.Children);
+        Assert.False (menuBarItem.IsTopLevel);
+
+        menuBarItem = new MenuBarItem (null!, null!, Run, () => true, new ());
+        Assert.Equal ("", menuBarItem.Title);
+        Assert.Equal ("", menuBarItem.Help);
+        Assert.Equal (Run, menuBarItem.Action);
+        Assert.NotNull (menuBarItem.CanExecute);
+        Assert.NotNull (menuBarItem.Parent);
+        Assert.Equal (Key.Empty, menuBarItem.ShortcutKey);
+        Assert.Null (menuBarItem.Children);
+        Assert.False (menuBarItem.IsTopLevel);
+
+        menuBarItem = new MenuBarItem (null!, Array.Empty<MenuItem> (), new ());
+        Assert.Equal ("", menuBarItem.Title);
+        Assert.Equal ("", menuBarItem.Help);
+        Assert.Null (menuBarItem.Action);
+        Assert.Null (menuBarItem.CanExecute);
+        Assert.NotNull (menuBarItem.Parent);
+        Assert.Equal (Key.Empty, menuBarItem.ShortcutKey);
+        Assert.Equal ([], menuBarItem.Children);
+        Assert.False (menuBarItem.IsTopLevel);
+
+        menuBarItem = new MenuBarItem (null!, new List<MenuItem []> (), new ());
+        Assert.Equal ("", menuBarItem.Title);
+        Assert.Equal ("", menuBarItem.Help);
+        Assert.Null (menuBarItem.Action);
+        Assert.Null (menuBarItem.CanExecute);
+        Assert.NotNull (menuBarItem.Parent);
+        Assert.Equal (Key.Empty, menuBarItem.ShortcutKey);
+        Assert.Equal ([], menuBarItem.Children);
+        Assert.False (menuBarItem.IsTopLevel);
+
+        menuBarItem = new MenuBarItem ([]);
+        Assert.Equal ("", menuBarItem.Title);
+        Assert.Equal ("", menuBarItem.Help);
+        Assert.Null (menuBarItem.Action);
+        Assert.Null (menuBarItem.CanExecute);
+        Assert.Null (menuBarItem.Parent);
+        Assert.Equal (Key.Empty, menuBarItem.ShortcutKey);
+        Assert.Equal ([], menuBarItem.Children);
+        Assert.False (menuBarItem.IsTopLevel);
+
+        void Run () { }
+    }
 }

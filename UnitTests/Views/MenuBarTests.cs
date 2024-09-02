@@ -15,10 +15,10 @@ public class MenuBarTests (ITestOutputHelper output)
         Assert.Equal ("n", menuBarItem.HotKey);
         Assert.Equal ("i", menuItem.HotKey);
         Assert.Empty (menuBar.Menus);
-        menuBarItem.AddMenuBarItem (menuItem);
+        menuBarItem.AddMenuBarItem (menuBar, menuItem);
         menuBar.Menus = [menuBarItem];
         Assert.Single (menuBar.Menus);
-        Assert.Single (menuBar.Menus [0].Children);
+        Assert.Single (menuBar.Menus [0].Children!);
         Assert.Contains (Key.N.WithAlt, menuBar.KeyBindings.Bindings);
         Assert.DoesNotContain (Key.I, menuBar.KeyBindings.Bindings);
 
@@ -2938,7 +2938,7 @@ Edit
 
         Assert.Contains (Key.A.WithCtrl, menuBar.KeyBindings.Bindings);
 
-        menuBar.Menus [0].Children [0].ShortcutKey = Key.B.WithCtrl;
+        menuBar.Menus [0].Children! [0].ShortcutKey = Key.B.WithCtrl;
 
         Assert.DoesNotContain (Key.A.WithCtrl, menuBar.KeyBindings.Bindings);
         Assert.Contains (Key.B.WithCtrl, menuBar.KeyBindings.Bindings);

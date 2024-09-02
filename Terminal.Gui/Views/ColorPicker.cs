@@ -361,7 +361,7 @@ public class ColorPicker : View
         }
     }
 
-
+    /// <inheritdoc />
     protected override void Dispose (bool disposing)
     {
         DisposeOldViews ();
