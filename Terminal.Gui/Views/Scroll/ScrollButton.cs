@@ -10,9 +10,6 @@ internal class ScrollButton : View
         VerticalTextAlignment = Alignment.Center;
         Id = "scrollButton";
         NavigationDirection = NavigationDirection.Backward;
-
-        //Width = Dim.Auto (DimAutoStyle.Content, 1);
-        //Height = Dim.Auto (DimAutoStyle.Content, 1);
         WantContinuousButtonPressed = true;
     }
 
