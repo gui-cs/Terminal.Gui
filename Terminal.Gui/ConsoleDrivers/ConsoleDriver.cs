@@ -407,6 +407,7 @@ public abstract class ConsoleDriver
     /// <returns><see langword="true"/> upon success</returns>
     public abstract bool GetCursorVisibility (out CursorVisibility visibility);
 
+    // TODO: Eliminate GetType calls
     /// <summary>Returns the name of the driver and relevant library version information.</summary>
     /// <returns></returns>
     public virtual string GetVersionInfo () { return GetType ().Name; }
@@ -417,7 +418,7 @@ public abstract class ConsoleDriver
     ///     <see langword="true"/> if the rune can be properly presented; <see langword="false"/> if the driver does not
     ///     support displaying this rune.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public virtual bool IsRuneSupported (in Rune rune) => Rune.IsValid (rune.Value);
 
     /// <summary>Tests whether the specified coordinate are valid for drawing.</summary>
