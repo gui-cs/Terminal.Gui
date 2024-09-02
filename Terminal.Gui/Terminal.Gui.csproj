@@ -1,144 +1,147 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <!-- =================================================================== -->
-  <!-- Version numbers -->
-  <!-- Automatically updated by gitversion (run `dotnet-gitversion /updateprojectfiles`)  -->
-  <!-- GitVersion.xml controls settings  -->
-  <!-- =================================================================== -->
-  <PropertyGroup>
-    <Version>2.0.0</Version>
-  </PropertyGroup>
-  <!-- =================================================================== -->
-  <!-- Assembly name. -->
-  <!-- Referenced throughout this file for consistency. -->
-  <!-- =================================================================== -->
-<PropertyGroup>
-  <AssemblyName>Terminal.Gui</AssemblyName>
-</PropertyGroup>
+    <!-- =================================================================== -->
+    <!-- Version numbers -->
+    <!-- Automatically updated by gitversion (run `dotnet-gitversion /updateprojectfiles`)  -->
+    <!-- GitVersion.xml controls settings  -->
+    <!-- =================================================================== -->
+    <PropertyGroup>
+        <Version>2.0.0</Version>
+    </PropertyGroup>
+    <!-- =================================================================== -->
+    <!-- Assembly name. -->
+    <!-- Referenced throughout this file for consistency. -->
+    <!-- =================================================================== -->
+    <PropertyGroup>
+        <AssemblyName>Terminal.Gui</AssemblyName>
+    </PropertyGroup>
 
-  <!-- =================================================================== -->
-  <!-- .NET Build Settings -->
-  <!-- =================================================================== -->
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <LangVersion>12</LangVersion>
-    <RootNamespace>$(AssemblyName)</RootNamespace>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineTrace>true</DefineTrace>
-    <DebugType>portable</DebugType>
-    <DefineConstants>$(DefineConstants);CONTRACTS_FULL;CODE_ANALYSIS</DefineConstants>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <NoLogo>true</NoLogo>
-    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
-    <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
-    <IsTrimmable>true</IsTrimmable>
-    <IsAotCompatible>true</IsAotCompatible>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <DefineDebug>true</DefineDebug>
-    <DefineConstants>$(DefineConstants);DEBUG_IDISPOSABLE</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <Optimize>true</Optimize>
-    <VersionSuffix></VersionSuffix>
-  </PropertyGroup>
-  <!-- =================================================================== -->
-  <!-- Configuration Manager -->
-  <!-- =================================================================== -->
-  <ItemGroup>
-    <None Remove="Resources\config.json" />
-    <EmbeddedResource Include="Resources\config.json" />
-  </ItemGroup>
-  <!-- =================================================================== -->
-  <!-- Dependencies -->
-  <!-- =================================================================== -->
-  <ItemGroup>
-    <PackageReference Include="ColorHelper" Version="[1.8.1,2)" />
-    <PackageReference Include="JetBrains.Annotations" Version="[2024.2.0,)" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="[4.10,5)" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="[4.10,5)" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="[4.10,5)" PrivateAssets="all" />
-    <!-- Enable Nuget Source Link for github -->
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="[8,9)" PrivateAssets="all" />
-    <PackageReference Include="System.IO.Abstractions" Version="[21.0.22,22)" />
-    <PackageReference Include="System.Text.Json" Version="[8.0.4,9)" />
-    <PackageReference Include="Wcwidth" Version="[2,3)" />
-  </ItemGroup>
-  <!-- =================================================================== -->
-  <!-- Global Usings and Type Aliases -->
-  <!-- =================================================================== -->
-  <ItemGroup>
-    <Using Include="JetBrains.Annotations" />
-    <Using Include="JetBrains.Annotations.PureAttribute" Alias="PureAttribute" />
-    <Using Include="System.Drawing" />
-    <Using Include="System.Text" />
-    <Using Include="Terminal.Gui.EnumExtensions" />
-  </ItemGroup>
-  <!-- =================================================================== -->
-  <!-- Assembliy names for which internal items are visible -->
-  <!-- =================================================================== -->
-  <ItemGroup>
-    <InternalsVisibleTo Include="UnitTests" />
-    <InternalsVisibleTo Include="TerminalGuiDesigner" />
-  </ItemGroup>
-  <!-- =================================================================== -->
-  <!-- API Documentation -->
-  <!-- =================================================================== -->
-  <ItemGroup>
-    <None Include="..\docfx\images\logo.png">
-      <Pack>true</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Include="..\README.md">
-      <Pack>true</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
-  <!-- =================================================================== -->
-  <!-- i18 -->
-  <!-- =================================================================== -->
-  <ItemGroup>
-    <Compile Update="Resources\Strings.Designer.cs">
-      <DesignTime>true</DesignTime>
-      <AutoGen>true</AutoGen>
-      <DependentUpon>Strings.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Update="Resources\Strings.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <!-- =================================================================== -->
-  <!-- Nuget  -->
-  <!-- =================================================================== -->
-  <PropertyGroup>
-    <PackageId>$(AssemblyName)</PackageId>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/gui-cs/$(AssemblyName)</PackageProjectUrl>
-    <PackageIcon>logo.png</PackageIcon>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageTags>csharp, terminal, c#, f#, gui, toolkit, console, tui</PackageTags>
-    <Description>Cross platform Terminal UI toolkit for .NET</Description>
-    <Owners>Miguel de Icaza, Tig Kindel</Owners>
-    <Summary>A toolkit for building rich console apps for .NET that works on Windows, Mac, and Linux/Unix.</Summary>
-    <Title>$(AssemblyName) - Cross-platform Terminal User Interface (TUI) toolkit for .NET</Title>
-    <PackageReleaseNotes>
-      See: $(PackageProjectUrl)/releases
-    </PackageReleaseNotes>
-    <DocumentationFile>bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
-    <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Debug' ">true</GeneratePackageOnBuild>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <RepositoryUrl>https://github.com/gui-cs/$(AssemblyName).git</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <!-- Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <GitRepositoryRemoteName>upstream</GitRepositoryRemoteName>
-    <!-- Embed source files that are not tracked by the source control manager in the PDB -->
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <EnableSourceLink>true</EnableSourceLink>
-    <Authors>Miguel de Icaza, Tig Kindel (@tig), @BDisp</Authors>
-  </PropertyGroup>
+    <!-- =================================================================== -->
+    <!-- .NET Build Settings -->
+    <!-- =================================================================== -->
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <LangVersion>12</LangVersion>
+        <RootNamespace>$(AssemblyName)</RootNamespace>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <DefineTrace>true</DefineTrace>
+        <DebugType>portable</DebugType>
+        <DefineConstants>$(DefineConstants);CONTRACTS_FULL;CODE_ANALYSIS</DefineConstants>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <NoLogo>true</NoLogo>
+        <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+        <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+        <IsTrimmable>true</IsTrimmable>
+        <IsAotCompatible>true</IsAotCompatible>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+        <DefineDebug>true</DefineDebug>
+        <DefineConstants>$(DefineConstants);DEBUG_IDISPOSABLE</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <Optimize>true</Optimize>
+        <VersionSuffix></VersionSuffix>
+    </PropertyGroup>
+    <!-- =================================================================== -->
+    <!-- Configuration Manager -->
+    <!-- =================================================================== -->
+    <ItemGroup>
+        <None Remove="Resources\config.json" />
+        <EmbeddedResource Include="Resources\config.json" />
+    </ItemGroup>
+    <!-- =================================================================== -->
+    <!-- Dependencies -->
+    <!-- =================================================================== -->
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.49-beta">
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="ColorHelper" Version="[1.8.1,2)" />
+        <PackageReference Include="JetBrains.Annotations" Version="[2024.2.0,)" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis" Version="[4.10,5)" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="[4.10,5)" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="[4.10,5)" PrivateAssets="all" />
+        <!-- Enable Nuget Source Link for github -->
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="[8,9)" PrivateAssets="all" />
+        <PackageReference Include="System.IO.Abstractions" Version="[21.0.22,22)" />
+        <PackageReference Include="System.Text.Json" Version="[8.0.4,9)" />
+        <PackageReference Include="Wcwidth" Version="[2,3)" />
+    </ItemGroup>
+    <!-- =================================================================== -->
+    <!-- Global Usings and Type Aliases -->
+    <!-- =================================================================== -->
+    <ItemGroup>
+        <Using Include="JetBrains.Annotations" />
+        <Using Include="JetBrains.Annotations.PureAttribute" Alias="PureAttribute" />
+        <Using Include="System.Drawing" />
+        <Using Include="System.Text" />
+        <Using Include="Terminal.Gui.EnumExtensions" />
+    </ItemGroup>
+    <!-- =================================================================== -->
+    <!-- Assembliy names for which internal items are visible -->
+    <!-- =================================================================== -->
+    <ItemGroup>
+        <InternalsVisibleTo Include="UnitTests" />
+        <InternalsVisibleTo Include="TerminalGuiDesigner" />
+    </ItemGroup>
+    <!-- =================================================================== -->
+    <!-- API Documentation -->
+    <!-- =================================================================== -->
+    <ItemGroup>
+        <None Include="..\docfx\images\logo.png">
+            <Pack>true</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+        <None Include="..\README.md">
+            <Pack>true</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+    </ItemGroup>
+    <!-- =================================================================== -->
+    <!-- i18 -->
+    <!-- =================================================================== -->
+    <ItemGroup>
+        <Compile Update="Resources\Strings.Designer.cs">
+            <DesignTime>true</DesignTime>
+            <AutoGen>true</AutoGen>
+            <DependentUpon>Strings.resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Update="Resources\Strings.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+    </ItemGroup>
+    <!-- =================================================================== -->
+    <!-- Nuget  -->
+    <!-- =================================================================== -->
+    <PropertyGroup>
+        <PackageId>$(AssemblyName)</PackageId>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/gui-cs/$(AssemblyName)</PackageProjectUrl>
+        <PackageIcon>logo.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageTags>csharp, terminal, c#, f#, gui, toolkit, console, tui</PackageTags>
+        <Description>Cross platform Terminal UI toolkit for .NET</Description>
+        <Owners>Miguel de Icaza, Tig Kindel</Owners>
+        <Summary>A toolkit for building rich console apps for .NET that works on Windows, Mac, and Linux/Unix.</Summary>
+        <Title>$(AssemblyName) - Cross-platform Terminal User Interface (TUI) toolkit for .NET</Title>
+        <PackageReleaseNotes>
+            See: $(PackageProjectUrl)/releases
+        </PackageReleaseNotes>
+        <DocumentationFile>bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
+        <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Debug' ">true</GeneratePackageOnBuild>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <RepositoryUrl>https://github.com/gui-cs/$(AssemblyName).git</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <!-- Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <GitRepositoryRemoteName>upstream</GitRepositoryRemoteName>
+        <!-- Embed source files that are not tracked by the source control manager in the PDB -->
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <EnableSourceLink>true</EnableSourceLink>
+        <Authors>Miguel de Icaza, Tig Kindel (@tig), @BDisp</Authors>
+    </PropertyGroup>
 </Project>
