@@ -49,7 +49,7 @@ using System.Numerics;
 ///             </item>
 ///             <item>
 ///                 <term>
-///                     <see cref="Dim.Fill(int)"/>
+///                     <see cref="Dim.Fill(Dim)"/>
 ///                 </term>
 ///                 <description>
 ///                     Creates a <see cref="Dim"/> object that fills the dimension from the View's X position
