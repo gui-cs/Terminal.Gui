@@ -7,6 +7,42 @@ public class ScrollBarTests
     public ScrollBarTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
 
+    [Fact]
+    [AutoInitShutdown]
+    public void AutoHideScrollBar_CheckScrollBarVisibility ()
+    {
+        var scrollBar = new ScrollBar { Width = 2, Height = Dim.Fill (), Size = 30 };
+        View scrollBarSuperView = ScrollBarSuperView ();
+        scrollBarSuperView.Add (scrollBar);
+        Application.Begin ((scrollBarSuperView.SuperView as Toplevel)!);
+
+        Assert.Equal (Orientation.Vertical, scrollBar.Orientation);
+        Assert.True (scrollBar.ShowScrollIndicator);
+        Assert.True (scrollBar.Visible);
+        Assert.Equal ("Absolute(2)", scrollBar.Width!.ToString ());
+        Assert.Equal (2, scrollBar.Viewport.Width);
+        Assert.Equal ("Fill(Absolute(0))", scrollBar.Height!.ToString ());
+        Assert.Equal (25, scrollBar.Viewport.Height);
+
+        scrollBar.Size = 10;
+        Assert.False (scrollBar.ShowScrollIndicator);
+        Assert.False (scrollBar.Visible);
+
+        scrollBar.Size = 30;
+        Assert.True (scrollBar.ShowScrollIndicator);
+        Assert.True (scrollBar.Visible);
+
+        scrollBar.AutoHideScrollBar = false;
+        Assert.True (scrollBar.ShowScrollIndicator);
+        Assert.True (scrollBar.Visible);
+
+        scrollBar.Size = 10;
+        Assert.True (scrollBar.ShowScrollIndicator);
+        Assert.True (scrollBar.Visible);
+
+        scrollBarSuperView.SuperView!.Dispose ();
+    }
+
     [Theory]
     [AutoInitShutdown]
     [InlineData (
@@ -189,6 +225,10 @@ public class ScrollBarTests
         Assert.Equal (Orientation.Vertical, scrollBar.Orientation);
         Assert.Equal (0, scrollBar.Size);
         Assert.Equal (0, scrollBar.Position);
+        Assert.Equal ("Auto(Content,Absolute(1),)", scrollBar.Width!.ToString ());
+        Assert.Equal ("Auto(Content,Absolute(1),)", scrollBar.Height!.ToString ());
+        Assert.True (scrollBar.ShowScrollIndicator);
+        Assert.True (scrollBar.AutoHideScrollBar);
     }
 
     [Theory]
@@ -711,6 +751,65 @@ public class ScrollBarTests
     [AutoInitShutdown]
     [InlineData (Orientation.Vertical)]
     [InlineData (Orientation.Horizontal)]
+    public void Mouse_Pressed_On_ScrollButton_Changes_Position (Orientation orientation)
+    {
+        var scrollBar = new ScrollBar
+        {
+            X = 10, Y = 10, Width = orientation == Orientation.Vertical ? 1 : 10, Height = orientation == Orientation.Vertical ? 10 : 1, Size = 20,
+            Orientation = orientation
+        };
+        var top = new Toplevel ();
+        top.Add (scrollBar);
+        Application.Begin (top);
+
+        var scroll = (Scroll)scrollBar.Subviews.FirstOrDefault (x => x is Scroll);
+        Rectangle scrollSliderFrame = scroll!.Subviews.FirstOrDefault (x => x is ScrollSlider)!.Frame;
+        Assert.Equal (scrollSliderFrame, orientation == Orientation.Vertical ? new (0, 0, 1, 4) : new (0, 0, 4, 1));
+        Assert.Equal (0, scrollBar.Position);
+
+        // ScrollButton increase
+        for (var i = 0; i < 13; i++)
+        {
+            Application.OnMouseEvent (
+                                      new ()
+                                      {
+                                          Position = orientation == Orientation.Vertical ? new (10, 19) : new (19, 10), Flags = MouseFlags.Button1Pressed
+                                      });
+
+            if (i < 12)
+            {
+                Assert.Equal (i + 1, scrollBar.Position);
+            }
+            else
+            {
+                Assert.Equal (i, scrollBar.Position);
+
+                Assert.Equal (
+                              orientation == Orientation.Vertical ? new (0, 4) : new (4, 0),
+                              scroll.Subviews.FirstOrDefault (x => x is ScrollSlider)!.Frame.Location);
+            }
+        }
+
+        for (var i = 12; i > -1; i--)
+        {
+            Application.OnMouseEvent (new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed });
+
+            if (i > 0)
+            {
+                Assert.Equal (i - 1, scrollBar.Position);
+            }
+            else
+            {
+                Assert.Equal (0, scrollBar.Position);
+                Assert.Equal (new (0, 0), scroll.Subviews.FirstOrDefault (x => x is ScrollSlider)!.Frame.Location);
+            }
+        }
+    }
+
+    [Theory]
+    [AutoInitShutdown]
+    [InlineData (Orientation.Vertical)]
+    [InlineData (Orientation.Horizontal)]
     public void Moving_Mouse_Outside_Host_Ensures_Correct_Location (Orientation orientation)
     {
         var scrollBar = new ScrollBar
@@ -878,6 +977,30 @@ public class ScrollBarTests
     }
 
     [Fact]
+    [AutoInitShutdown]
+    public void ShowScrollIndicator_CheckScrollBarVisibility ()
+    {
+        var scrollBar = new ScrollBar { Width = 2, Height = Dim.Fill (), Size = 30 };
+        View scrollBarSuperView = ScrollBarSuperView ();
+        scrollBarSuperView.Add (scrollBar);
+        Application.Begin ((scrollBarSuperView.SuperView as Toplevel)!);
+
+        Assert.True (scrollBar.ShowScrollIndicator);
+        Assert.True (scrollBar.Visible);
+
+        scrollBar.ShowScrollIndicator = false;
+        Assert.True (scrollBar.AutoHideScrollBar);
+        Assert.True (scrollBar.ShowScrollIndicator);
+        Assert.True (scrollBar.Visible);
+
+        scrollBar.AutoHideScrollBar = false;
+        Assert.False (scrollBar.ShowScrollIndicator);
+        Assert.False (scrollBar.Visible);
+
+        scrollBarSuperView.SuperView!.Dispose ();
+    }
+
+    [Fact]
     public void SizeChanged_Event ()
     {
         var count = 0;
@@ -967,58 +1090,17 @@ public class ScrollBarTests
         _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
     }
 
-    [Theory]
-    [AutoInitShutdown]
-    [InlineData (Orientation.Vertical)]
-    [InlineData (Orientation.Horizontal)]
-    public void Mouse_Pressed_On_ScrollButton_Changes_Position (Orientation orientation)
+    private View ScrollBarSuperView ()
     {
-        var scrollBar = new ScrollBar
+        var view = new View
         {
-            X = 10, Y = 10, Width = orientation == Orientation.Vertical ? 1 : 10, Height = orientation == Orientation.Vertical ? 10 : 1, Size = 20,
-            Orientation = orientation
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
         };
+
         var top = new Toplevel ();
-        top.Add (scrollBar);
-        Application.Begin (top);
+        top.Add (view);
 
-        var scroll = (Scroll)scrollBar.Subviews.FirstOrDefault (x => x is Scroll);
-        Rectangle scrollSliderFrame = scroll!.Subviews.FirstOrDefault (x => x is ScrollSlider)!.Frame;
-        Assert.Equal (scrollSliderFrame, orientation == Orientation.Vertical ? new (0, 0, 1, 4) : new (0, 0, 4, 1));
-        Assert.Equal (0, scrollBar.Position);
-
-        // ScrollButton increase
-        for (int i = 0; i < 13; i++)
-        {
-            Application.OnMouseEvent (new () { Position = orientation == Orientation.Vertical ? new (10, 19) : new (19, 10), Flags = MouseFlags.Button1Pressed });
-
-            if (i < 12)
-            {
-                Assert.Equal (i + 1, scrollBar.Position);
-            }
-            else
-            {
-                Assert.Equal (i, scrollBar.Position);
-                Assert.Equal (
-                              orientation == Orientation.Vertical ? new (0, 4) : new (4, 0),
-                              scroll.Subviews.FirstOrDefault (x => x is ScrollSlider)!.Frame.Location);
-            }
-
-        }
-
-        for (int i = 12; i > -1; i--)
-        {
-            Application.OnMouseEvent (new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed });
-
-            if (i > 0)
-            {
-                Assert.Equal (i - 1, scrollBar.Position);
-            }
-            else
-            {
-                Assert.Equal (0, scrollBar.Position);
-                Assert.Equal (new (0, 0), scroll.Subviews.FirstOrDefault (x => x is ScrollSlider)!.Frame.Location);
-            }
-        }
+        return view;
     }
 }

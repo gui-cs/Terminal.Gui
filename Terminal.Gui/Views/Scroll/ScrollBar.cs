@@ -35,6 +35,23 @@ public class ScrollBar : View
     private readonly ScrollButton _decrease;
     private readonly ScrollButton _increase;
 
+    private bool _autoHideScrollBar = true;
+    private bool _showScrollIndicator = true;
+
+    /// <summary>If true the vertical/horizontal scroll bars won't be shown if it's not needed.</summary>
+    public bool AutoHideScrollBar
+    {
+        get => _autoHideScrollBar;
+        set
+        {
+            if (_autoHideScrollBar != value)
+            {
+                _autoHideScrollBar = value;
+                AdjustAll ();
+            }
+        }
+    }
+
     /// <summary>Defines if a scrollbar is vertical or horizontal.</summary>
     public Orientation Orientation
     {
@@ -67,6 +84,39 @@ public class ScrollBar : View
     /// </summary>
     public event EventHandler<CancelEventArgs<int>>? PositionChanging;
 
+    /// <summary>Gets or sets the visibility for the vertical or horizontal scroll indicator.</summary>
+    /// <value><c>true</c> if show vertical or horizontal scroll indicator; otherwise, <c>false</c>.</value>
+    public bool ShowScrollIndicator
+    {
+        get => Visible;
+        set
+        {
+            if (value == _showScrollIndicator)
+            {
+                return;
+            }
+
+            _showScrollIndicator = value;
+
+            if (IsInitialized)
+            {
+                SetNeedsLayout ();
+
+                if (value)
+                {
+                    Visible = true;
+                }
+                else
+                {
+                    Visible = false;
+                    Position = 0;
+                }
+
+                AdjustAll ();
+            }
+        }
+    }
+
     /// <summary>
     ///     Gets or sets the size of the Scroll. This is the total size of the content that can be scrolled through.
     /// </summary>
@@ -95,9 +145,47 @@ public class ScrollBar : View
 
     private void AdjustAll ()
     {
+        CheckScrollBarVisibility ();
         _scroll.AdjustScroll ();
         _decrease.AdjustButton ();
         _increase.AdjustButton ();
+    }
+
+    private bool CheckScrollBarVisibility ()
+    {
+        if (!AutoHideScrollBar)
+        {
+            if (Visible != _showScrollIndicator)
+            {
+                Visible = _showScrollIndicator;
+                SetNeedsDisplay ();
+            }
+
+            return _showScrollIndicator;
+        }
+
+        int barSize = Orientation == Orientation.Vertical ? Viewport.Height : Viewport.Width;
+
+        if (barSize == 0 || barSize >= Size)
+        {
+            if (ShowScrollIndicator)
+            {
+                Visible = false;
+                SetNeedsDisplay ();
+
+                return false;
+            }
+        }
+        else
+        {
+            if (!Visible)
+            {
+                Visible = true;
+                SetNeedsDisplay ();
+            }
+        }
+
+        return true;
     }
 
     private void Resize (Orientation orientation)
