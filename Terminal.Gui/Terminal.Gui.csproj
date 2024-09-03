@@ -54,12 +54,12 @@
   <ItemGroup>
     <PackageReference Include="ColorHelper" Version="[1.8.1,2)" />
     <PackageReference Include="JetBrains.Annotations" Version="[2024.2.0,)" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="[4.10,5)" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="[4.10,5)" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="[4.10,5)" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.11.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.11.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" PrivateAssets="all" />
     <!-- Enable Nuget Source Link for github -->
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="[8,9)" PrivateAssets="all" />
-    <PackageReference Include="System.IO.Abstractions" Version="[21.0.22,22)" />
+    <PackageReference Include="System.IO.Abstractions" Version="21.0.29" />
     <PackageReference Include="System.Text.Json" Version="[8.0.4,9)" />
     <PackageReference Include="Wcwidth" Version="[2,3)" />
   </ItemGroup>
