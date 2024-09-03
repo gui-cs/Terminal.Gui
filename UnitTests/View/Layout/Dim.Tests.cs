@@ -342,7 +342,7 @@ public class DimTests
 #if DEBUG
                        Assert.Equal ("Combine(Fill(Absolute(0))-Absolute(2))", v2.Height.ToString ());
 #else
-                       Assert.Equal ("Combine(Fill(0)-Absolute(2))", v2.Height.ToString ());
+                       Assert.Equal ("Combine(Fill(Absolute(0))-Absolute(2))", v2.Height.ToString ());
 #endif
                        Assert.Equal (47, v2.Frame.Width); // 49-2=47
                        Assert.Equal (89, v2.Frame.Height); // 98-5-2-2=89

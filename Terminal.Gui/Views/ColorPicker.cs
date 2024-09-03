@@ -154,7 +154,7 @@ public class ColorPicker : View
         _tfName.Autocomplete = auto;
 
         _tfName.HasFocusChanged += UpdateValueFromName;
-        _tfName.Accept += (_s, _) => UpdateValueFromName ();
+        _tfName.Accept += (s, _) => UpdateValueFromName ();
     }
 
     private void CreateTextField ()
@@ -303,7 +303,7 @@ public class ColorPicker : View
         }
     }
 
-    private void UpdateValueFromName (object sender, HasFocusEventArgs e)
+    private void UpdateValueFromName (object? sender, HasFocusEventArgs e)
     {
         // if the new value of Focused is true then it is an enter event so ignore
         if (e.NewValue)

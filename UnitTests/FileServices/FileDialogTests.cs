@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.FileServicesTests;
 
-public class FileDialogTests (ITestOutputHelper output)
+public class FileDialogTests ()
 {
     [Theory]
     [InlineData (true)]
@@ -787,7 +787,6 @@ public class FileDialogTests (ITestOutputHelper output)
                 return dlg.Subviews.OfType<TextField> ().ElementAt (0);
             case FileDialogPart.SearchField:
                 return dlg.Subviews.OfType<TextField> ().ElementAt (1);
-                break;
             default:
                 throw new ArgumentOutOfRangeException (nameof (part), part, null);
         }
