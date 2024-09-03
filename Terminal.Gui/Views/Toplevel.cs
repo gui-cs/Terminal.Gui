@@ -24,7 +24,7 @@ public partial class Toplevel : View
     /// <summary>
     ///     Initializes a new instance of the <see cref="Toplevel"/> class,
     ///     defaulting to full screen. The <see cref="View.Width"/> and <see cref="View.Height"/> properties will be set to the
-    ///     dimensions of the terminal using <see cref="Dim.Fill"/>.
+    ///     dimensions of the terminal using <see cref="Dim.Fill(Dim)"/>.
     /// </summary>
     public Toplevel ()
     {

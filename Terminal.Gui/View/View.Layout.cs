@@ -451,7 +451,7 @@ public partial class View // Layout APIs
     ///         .
     ///     </para>
     ///     <para>
-    ///         If set to a relative value (e.g. <see cref="Dim.Fill(int)"/>) the value is indeterminate until the view has
+    ///         If set to a relative value (e.g. <see cref="Dim.Fill(Dim)"/>) the value is indeterminate until the view has
     ///         been initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout"/> has been
     ///         called.
     ///     </para>
@@ -500,7 +500,7 @@ public partial class View // Layout APIs
     ///         .
     ///     </para>
     ///     <para>
-    ///         If set to a relative value (e.g. <see cref="Dim.Fill(int)"/>) the value is indeterminate until the view has
+    ///         If set to a relative value (e.g. <see cref="Dim.Fill(Dim)"/>) the value is indeterminate until the view has
     ///         been initialized ( <see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout"/> has been
     ///         called.
     ///     </para>

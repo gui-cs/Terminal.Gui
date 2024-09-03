@@ -110,6 +110,7 @@ public static class ConfigurationManager
         TypeInfoResolver = SourceGenerationContext.Default
     };
 
+    [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     internal static readonly SourceGenerationContext _serializerContext = new (_serializerOptions);
 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
