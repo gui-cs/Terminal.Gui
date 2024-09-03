@@ -71,7 +71,7 @@ internal class ScrollSlider : View
     {
         int location = SuperViewAsScroll.Orientation == Orientation.Vertical ? mouseEvent.Position.Y : mouseEvent.Position.X;
         int offset = _lastLocation > -1 ? location - _lastLocation : 0;
-        int barSize = SuperViewAsScroll.Orientation == Orientation.Vertical ? SuperViewAsScroll.GetContentSize ().Height : SuperViewAsScroll.GetContentSize ().Width;
+        int barSize = SuperViewAsScroll.Orientation == Orientation.Vertical ? SuperViewAsScroll.Viewport.Height : SuperViewAsScroll.Viewport.Width;
 
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed) && _lastLocation == -1)
         {
