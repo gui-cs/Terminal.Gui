@@ -207,7 +207,7 @@ public class Scroll : View
 
     internal ScrollBar? SupView => SuperView as ScrollBar;
 
-    private int BarSize => Orientation == Orientation.Vertical ? GetContentSize ().Height : GetContentSize ().Width;
+    private int BarSize => Orientation == Orientation.Vertical ? Viewport.Height : Viewport.Width;
 
     private void SetScrollText ()
     {
