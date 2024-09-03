@@ -326,7 +326,7 @@ public class ContentScrolling : Scenario
         // Add demo views to show that things work correctly
         var textField = new TextField { X = 20, Y = 7, Width = 15, Text = "Test TextField" };
 
-        var colorPicker = new ColorPicker { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd (), Y = 10 };
+        var colorPicker = new ColorPicker16 { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd (), Y = 10 };
         colorPicker.BorderStyle = LineStyle.RoundedDotted;
 
         colorPicker.ColorChanged += (s, e) =>
@@ -335,7 +335,7 @@ public class ContentScrolling : Scenario
                                         {
                                             Normal = new (
                                                           colorPicker.SuperView.ColorScheme.Normal.Foreground,
-                                                          e.Color
+                                                          e.CurrentValue
                                                          )
                                         };
                                     };
@@ -406,6 +406,10 @@ public class ContentScrolling : Scenario
         editor.Initialized += (s, e) => { editor.ViewToEdit = view; };
 
         app.Closed += (s, e) => View.Diagnostics = _diagnosticFlags;
+
+        editor.AutoSelectViewToEdit = true;
+        editor.AutoSelectSuperView = view;
+        editor.AutoSelectAdornments = false;
 
         Application.Run (app);
         app.Dispose ();

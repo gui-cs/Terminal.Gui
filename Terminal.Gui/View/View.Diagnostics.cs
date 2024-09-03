@@ -1,6 +1,4 @@
-﻿
-
-
+﻿#nullable enable
 namespace Terminal.Gui;
 
 /// <summary>Enables diagnostic functions for <see cref="View"/>.</summary>

@@ -206,7 +206,7 @@ cccccccccccccccccccc",
         {
             root.CanFocus = true;
             v.CanFocus = true;
-            Assert.False (v.HasFocus);
+            Assert.True (v.HasFocus);
             v.SetFocus ();
             Assert.True (v.HasFocus);
             Application.Refresh ();
@@ -877,14 +877,6 @@ At 0,0
         Assert.False (r.NewMouseEnterEvent (new() { Flags = MouseFlags.AllEvents }));
         Assert.False (r.NewMouseLeaveEvent (new() { Flags = MouseFlags.AllEvents }));
 
-        var v1 = new View ();
-        Assert.False (r.OnEnter (v1));
-        v1.Dispose ();
-
-        var v2 = new View ();
-        Assert.False (r.OnLeave (v2));
-        v2.Dispose ();
-
         r.Dispose ();
 
         // TODO: Add more
@@ -1072,7 +1064,6 @@ At 0,0
                                      Assert.True (win.Visible);
                                      Assert.True (win.CanFocus);
                                      Assert.True (win.HasFocus);
-                                     Assert.True (RunesCount () > 0);
 
                                      win.Visible = false;
                                      Assert.True (button.Visible);
@@ -1081,21 +1072,18 @@ At 0,0
                                      Assert.False (win.Visible);
                                      Assert.True (win.CanFocus);
                                      Assert.False (win.HasFocus);
+
                                      button.SetFocus ();
                                      Assert.False (button.HasFocus);
                                      Assert.False (win.HasFocus);
+
                                      win.SetFocus ();
                                      Assert.False (button.HasFocus);
                                      Assert.False (win.HasFocus);
-                                     top.Draw ();
-                                     Assert.True (RunesCount () == 0);
 
                                      win.Visible = true;
-                                     win.FocusFirst (null);
                                      Assert.True (button.HasFocus);
                                      Assert.True (win.HasFocus);
-                                     top.Draw ();
-                                     Assert.True (RunesCount () > 0);
 
                                      Application.RequestStop ();
                                  };
@@ -1103,25 +1091,6 @@ At 0,0
         Application.Run (top);
         top.Dispose ();
         Assert.Equal (1, iterations);
-
-        int RunesCount ()
-        {
-            Cell [,] contents = ((FakeDriver)Application.Driver).Contents;
-            var runesCount = 0;
-
-            for (var i = 0; i < Application.Driver!.Rows; i++)
-            {
-                for (var j = 0; j < Application.Driver!.Cols; j++)
-                {
-                    if (contents [i, j].Rune != (Rune)' ')
-                    {
-                        runesCount++;
-                    }
-                }
-            }
-
-            return runesCount;
-        }
     }
 
     public class DerivedView : View

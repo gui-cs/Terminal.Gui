@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -6,49 +8,49 @@ namespace Terminal.Gui;
 /// </summary>
 public class MenuItem
 {
-    private readonly ShortcutHelper _shortcutHelper;
-    private bool _allowNullChecked;
-    private MenuItemCheckStyle _checkType;
+    internal MenuBar _menuBar;
 
-    private string _title;
-
-    // TODO: Update to use Key instead of KeyCode
     /// <summary>Initializes a new instance of <see cref="MenuItem"/></summary>
-    public MenuItem (KeyCode shortcut = KeyCode.Null) : this ("", "", null, null, null, shortcut) { }
+    public MenuItem (Key? shortcutKey = null) : this ("", "", null, null, null, shortcutKey) { }
 
-    // TODO: Update to use Key instead of KeyCode
     /// <summary>Initializes a new instance of <see cref="MenuItem"/>.</summary>
     /// <param name="title">Title for the menu item.</param>
     /// <param name="help">Help text to display.</param>
     /// <param name="action">Action to invoke when the menu item is activated.</param>
     /// <param name="canExecute">Function to determine if the action can currently be executed.</param>
     /// <param name="parent">The <see cref="Parent"/> of this menu item.</param>
-    /// <param name="shortcut">The <see cref="Shortcut"/> keystroke combination.</param>
+    /// <param name="shortcutKey">The <see cref="ShortcutKey"/> keystroke combination.</param>
     public MenuItem (
-        string title,
-        string help,
-        Action action,
-        Func<bool> canExecute = null,
-        MenuItem parent = null,
-        KeyCode shortcut = KeyCode.Null
+        string? title,
+        string? help,
+        Action? action,
+        Func<bool>? canExecute = null,
+        MenuItem? parent = null,
+        Key? shortcutKey = null
     )
     {
         Title = title ?? "";
         Help = help ?? "";
-        Action = action;
-        CanExecute = canExecute;
-        Parent = parent;
-        _shortcutHelper = new ();
+        Action = action!;
+        CanExecute = canExecute!;
+        Parent = parent!;
 
-        if (shortcut != KeyCode.Null)
+        if (Parent is { } && Parent.ShortcutKey != Key.Empty)
         {
-            Shortcut = shortcut;
+            Parent.ShortcutKey = Key.Empty;
         }
+        // Setter will ensure Key.Empty if it's null
+        ShortcutKey = shortcutKey!;
     }
+
+    private bool _allowNullChecked;
+    private MenuItemCheckStyle _checkType;
+
+    private string _title;
 
     /// <summary>Gets or sets the action to be invoked when the menu item is triggered.</summary>
     /// <value>Method to invoke.</value>
-    public Action Action { get; set; }
+    public Action? Action { get; set; }
 
     /// <summary>
     ///     Used only if <see cref="CheckType"/> is of <see cref="MenuItemCheckStyle.Checked"/> type. If
@@ -70,7 +72,7 @@ public class MenuItem
     ///     returns <see langword="true"/> the menu item will be enabled. Otherwise, it will be disabled.
     /// </summary>
     /// <value>Function to determine if the action is can be executed or not.</value>
-    public Func<bool> CanExecute { get; set; }
+    public Func<bool>? CanExecute { get; set; }
 
     /// <summary>
     ///     Sets or gets whether the <see cref="MenuItem"/> shows a check indicator or not. See
@@ -104,9 +106,15 @@ public class MenuItem
     /// <value>The help text.</value>
     public string Help { get; set; }
 
+    /// <summary>
+    ///     Returns <see langword="true"/> if the menu item is enabled. This method is a wrapper around
+    ///     <see cref="CanExecute"/>.
+    /// </summary>
+    public bool IsEnabled () { return CanExecute?.Invoke () ?? true; }
+
     /// <summary>Gets the parent for this <see cref="MenuItem"/>.</summary>
     /// <value>The parent.</value>
-    public MenuItem Parent { get; set; }
+    public MenuItem? Parent { get; set; }
 
     /// <summary>Gets or sets the title of the menu item .</summary>
     /// <value>The title.</value>
@@ -124,46 +132,6 @@ public class MenuItem
             GetHotKey ();
         }
     }
-
-    /// <summary>Gets if this <see cref="MenuItem"/> is from a sub-menu.</summary>
-    internal bool IsFromSubMenu => Parent != null;
-
-    internal int TitleLength => GetMenuBarItemLength (Title);
-
-    // 
-    // ┌─────────────────────────────┐
-    // │ Quit  Quit UI Catalog  Ctrl+Q │
-    // └─────────────────────────────┘
-    // ┌─────────────────┐
-    // │ ◌ TopLevel Alt+T │
-    // └─────────────────┘
-    // TODO: Replace the `2` literals with named constants 
-    internal int Width => 1
-                          + // space before Title
-                          TitleLength
-                          + 2
-                          + // space after Title - BUGBUG: This should be 1 
-                          (Checked == true || CheckType.HasFlag (MenuItemCheckStyle.Checked) || CheckType.HasFlag (MenuItemCheckStyle.Radio)
-                               ? 2
-                               : 0)
-                          + // check glyph + space 
-                          (Help.GetColumns () > 0 ? 2 + Help.GetColumns () : 0)
-                          + // Two spaces before Help
-                          (ShortcutTag.GetColumns () > 0
-                               ? 2 + ShortcutTag.GetColumns ()
-                               : 0); // Pad two spaces before shortcut tag (which are also aligned right)
-
-    /// <summary>Merely a debugging aid to see the interaction with main.</summary>
-    internal bool GetMenuBarItem () { return IsFromSubMenu; }
-
-    /// <summary>Merely a debugging aid to see the interaction with main.</summary>
-    internal MenuItem GetMenuItem () { return this; }
-
-    /// <summary>
-    ///     Returns <see langword="true"/> if the menu item is enabled. This method is a wrapper around
-    ///     <see cref="CanExecute"/>.
-    /// </summary>
-    public bool IsEnabled () { return CanExecute?.Invoke () ?? true; }
 
     /// <summary>
     ///     Toggle the <see cref="Checked"/> between three states if <see cref="AllowNullChecked"/> is
@@ -193,6 +161,40 @@ public class MenuItem
         }
     }
 
+    /// <summary>Merely a debugging aid to see the interaction with main.</summary>
+    internal bool GetMenuBarItem () { return IsFromSubMenu; }
+
+    /// <summary>Merely a debugging aid to see the interaction with main.</summary>
+    internal MenuItem GetMenuItem () { return this; }
+
+    /// <summary>Gets if this <see cref="MenuItem"/> is from a sub-menu.</summary>
+    internal bool IsFromSubMenu => Parent != null;
+
+    internal int TitleLength => GetMenuBarItemLength (Title);
+
+    // 
+    // ┌─────────────────────────────┐
+    // │ Quit  Quit UI Catalog  Ctrl+Q │
+    // └─────────────────────────────┘
+    // ┌─────────────────┐
+    // │ ◌ TopLevel Alt+T │
+    // └─────────────────┘
+    // TODO: Replace the `2` literals with named constants
+    internal int Width => 1
+                          + // space before Title
+                          TitleLength
+                          + 2
+                          + // space after Title - BUGBUG: This should be 1
+                          (Checked == true || CheckType.HasFlag (MenuItemCheckStyle.Checked) || CheckType.HasFlag (MenuItemCheckStyle.Radio)
+                               ? 2
+                               : 0)
+                          + // check glyph + space
+                          (Help.GetColumns () > 0 ? 2 + Help.GetColumns () : 0)
+                          + // Two spaces before Help
+                          (ShortcutTag.GetColumns () > 0
+                               ? 2 + ShortcutTag.GetColumns ()
+                               : 0); // Pad two spaces before shortcut tag (which are also aligned right)
+
     private static int GetMenuBarItemLength (string title)
     {
         return title.EnumerateRunes ()
@@ -202,21 +204,32 @@ public class MenuItem
 
     #region Keyboard Handling
 
-    // TODO: Update to use Key instead of Rune
+    private Key _hotKey = Key.Empty;
+
     /// <summary>
     ///     The HotKey is used to activate a <see cref="MenuItem"/> with the keyboard. HotKeys are defined by prefixing the
     ///     <see cref="Title"/> of a MenuItem with an underscore ('_').
     ///     <para>
     ///         Pressing Alt-Hotkey for a <see cref="MenuBarItem"/> (menu items on the menu bar) works even if the menu is
-    ///         not active). Once a menu has focus and is active, pressing just the HotKey will activate the MenuItem.
+    ///         not active. Once a menu has focus and is active, pressing just the HotKey will activate the MenuItem.
     ///     </para>
     ///     <para>
     ///         For example for a MenuBar with a "_File" MenuBarItem that contains a "_New" MenuItem, Alt-F will open the
     ///         File menu. Pressing the N key will then activate the New MenuItem.
     ///     </para>
-    ///     <para>See also <see cref="Shortcut"/> which enable global key-bindings to menu items.</para>
+    ///     <para>See also <see cref="ShortcutKey"/> which enable global key-bindings to menu items.</para>
     /// </summary>
-    public Rune HotKey { get; set; }
+    public Key? HotKey
+    {
+        get => _hotKey;
+        private set
+        {
+            var oldKey = _hotKey;
+            _hotKey = value ?? Key.Empty;
+            UpdateHotKeyBinding (oldKey);
+        }
+    }
+
     private void GetHotKey ()
     {
         var nextIsHot = false;
@@ -227,47 +240,145 @@ public class MenuItem
             {
                 nextIsHot = true;
             }
-            else
+            else if (nextIsHot)
             {
-                if (nextIsHot)
-                {
-                    HotKey = (Rune)char.ToUpper (x);
+                    HotKey = char.ToLower (x);
 
-                    break;
-                }
-
-                nextIsHot = false;
-                HotKey = default (Rune);
+                    return;
             }
         }
+
+        HotKey = Key.Empty;
     }
 
-    // TODO: Update to use Key instead of KeyCode
+    private Key _shortcutKey = Key.Empty;
+
     /// <summary>
     ///     Shortcut defines a key binding to the MenuItem that will invoke the MenuItem's action globally for the
     ///     <see cref="View"/> that is the parent of the <see cref="MenuBar"/> or <see cref="ContextMenu"/> this
     ///     <see cref="MenuItem"/>.
     ///     <para>
-    ///         The <see cref="KeyCode"/> will be drawn on the MenuItem to the right of the <see cref="Title"/> and
+    ///         The <see cref="Key"/> will be drawn on the MenuItem to the right of the <see cref="Title"/> and
     ///         <see cref="Help"/> text. See <see cref="ShortcutTag"/>.
     ///     </para>
     /// </summary>
-    public KeyCode Shortcut
+    public Key? ShortcutKey
     {
-        get => _shortcutHelper.Shortcut;
+        get => _shortcutKey;
         set
         {
-            if (_shortcutHelper.Shortcut != value && (ShortcutHelper.PostShortcutValidation (value) || value == KeyCode.Null))
+            var oldKey = _shortcutKey;
+            _shortcutKey = value ?? Key.Empty;
+            UpdateShortcutKeyBinding (oldKey);
+        }
+    }
+
+    /// <summary>Gets the text describing the keystroke combination defined by <see cref="ShortcutKey"/>.</summary>
+    public string ShortcutTag => ShortcutKey != Key.Empty ? ShortcutKey!.ToString () : string.Empty;
+
+    internal void AddShortcutKeyBinding (MenuBar menuBar, Key key)
+    {
+        ArgumentNullException.ThrowIfNull (menuBar);
+
+        _menuBar = menuBar;
+
+        AddOrUpdateShortcutKeyBinding (key);
+    }
+
+    private void AddOrUpdateShortcutKeyBinding (Key key)
+    {
+        if (key != Key.Empty)
+        {
+            _menuBar.KeyBindings.Remove (key);
+        }
+
+        if (ShortcutKey != Key.Empty)
+        {
+            KeyBinding keyBinding = new ([Command.Select], KeyBindingScope.HotKey, this);
+            // Remove an existent ShortcutKey
+            _menuBar.KeyBindings.Remove (ShortcutKey!);
+            _menuBar.KeyBindings.Add (ShortcutKey!, keyBinding);
+        }
+    }
+
+    private void UpdateHotKeyBinding (Key oldKey)
+    {
+        if (_menuBar is null or { IsInitialized: false })
+        {
+            return;
+        }
+
+        if (oldKey != Key.Empty)
+        {
+            var index = _menuBar.Menus.IndexOf (this);
+
+            if (index > -1)
             {
-                _shortcutHelper.Shortcut = value;
+                _menuBar.KeyBindings.Remove (oldKey.WithAlt);
+            }
+        }
+
+        if (HotKey != Key.Empty)
+        {
+            var index = _menuBar.Menus.IndexOf (this);
+
+            if (index > -1)
+            {
+                _menuBar.KeyBindings.Remove (HotKey!.WithAlt);
+                KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, this);
+                _menuBar.KeyBindings.Add (HotKey.WithAlt, keyBinding);
             }
         }
     }
 
-    /// <summary>Gets the text describing the keystroke combination defined by <see cref="Shortcut"/>.</summary>
-    public string ShortcutTag => _shortcutHelper.Shortcut == KeyCode.Null
-                                     ? string.Empty
-                                     : Key.ToString (_shortcutHelper.Shortcut, MenuBar.ShortcutDelimiter);
+    private void UpdateShortcutKeyBinding (Key oldKey)
+    {
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        if (_menuBar is null)
+        {
+            return;
+        }
+
+        AddOrUpdateShortcutKeyBinding (oldKey);
+    }
 
     #endregion Keyboard Handling
+
+    /// <summary>
+    /// Removes a <see cref="MenuItem"/> dynamically from the <see cref="Parent"/>.
+    /// </summary>
+    public virtual void RemoveMenuItem ()
+    {
+        if (Parent is { })
+        {
+            MenuItem? []? childrens = ((MenuBarItem)Parent).Children;
+            var i = 0;
+
+            foreach (MenuItem? c in childrens!)
+            {
+                if (c != this)
+                {
+                    childrens [i] = c;
+                    i++;
+                }
+            }
+
+            Array.Resize (ref childrens, childrens.Length - 1);
+
+            if (childrens.Length == 0)
+            {
+                ((MenuBarItem)Parent).Children = null;
+            }
+            else
+            {
+                ((MenuBarItem)Parent).Children = childrens;
+            }
+        }
+
+        if (ShortcutKey != Key.Empty)
+        {
+            // Remove an existent ShortcutKey
+            _menuBar.KeyBindings.Remove (ShortcutKey!);
+        }
+    }
 }

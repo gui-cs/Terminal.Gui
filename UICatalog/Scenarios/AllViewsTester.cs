@@ -11,7 +11,8 @@ namespace UICatalog.Scenarios;
 [ScenarioMetadata ("All Views Tester", "Provides a test UI for all classes derived from View.")]
 [ScenarioCategory ("Layout")]
 [ScenarioCategory ("Tests")]
-[ScenarioCategory ("Top Level Windows")]
+[ScenarioCategory ("Controls")]
+[ScenarioCategory ("Adornments")]
 public class AllViewsTester : Scenario
 {
     private readonly List<string> _dimNames = new () { "Auto", "Percent", "Fill", "Absolute" };
@@ -68,7 +69,7 @@ public class AllViewsTester : Scenario
             Y = 0,
             Width = Dim.Auto (DimAutoStyle.Content),
             Height = Dim.Fill (),
-            CanFocus = false,
+            CanFocus = true,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Title = "Classes"
         };
@@ -84,7 +85,6 @@ public class AllViewsTester : Scenario
             SelectedItem = 0,
             Source = new ListWrapper<string> (new (_viewClasses.Keys.ToList ()))
         };
-        _classListView.OpenSelectedItem += (s, a) => { _settingsPane.SetFocus (); };
 
         _classListView.SelectedItemChanged += (s, args) =>
                                               {
@@ -95,10 +95,19 @@ public class AllViewsTester : Scenario
                                                       _hostPane.Remove (_curView);
                                                       _curView.Dispose ();
                                                       _curView = null;
-                                                      _hostPane.Clear ();
                                                   }
 
                                                   _curView = CreateClass (_viewClasses.Values.ToArray () [_classListView.SelectedItem]);
+                                                  // Add
+                                                  _hostPane.Add (_curView);
+
+                                                  // Force ViewToEdit to be the view and not a subview
+                                                  if (_adornmentsEditor is { })
+                                                  {
+                                                      _adornmentsEditor.AutoSelectSuperView = _curView;
+
+                                                      _adornmentsEditor.ViewToEdit = _curView;
+                                                  }
                                               };
         _leftPane.Add (_classListView);
 
@@ -109,7 +118,9 @@ public class AllViewsTester : Scenario
             Width = Dim.Auto (),
             Height = Dim.Fill (),
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
-            BorderStyle = LineStyle.Single
+            BorderStyle = LineStyle.Single,
+            AutoSelectViewToEdit = true,
+            AutoSelectAdornments = false,
         };
 
         var expandButton = new ExpanderButton
@@ -125,7 +136,7 @@ public class AllViewsTester : Scenario
             Y = 0, // for menu
             Width = Dim.Fill (),
             Height = Dim.Auto (),
-            CanFocus = false,
+            CanFocus = true,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Title = "Settings"
         };
@@ -138,14 +149,15 @@ public class AllViewsTester : Scenario
             Y = 0,
             Height = Dim.Auto (),
             Width = Dim.Auto (),
-            Title = "Location (Pos)"
+            Title = "Location (Pos)",
+            TabStop = TabBehavior.TabStop,
         };
         _settingsPane.Add (_locationFrame);
 
         var label = new Label { X = 0, Y = 0, Text = "X:" };
         _locationFrame.Add (label);
         _xRadioGroup = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
-        _xRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
+        _xRadioGroup.SelectedItemChanged += OnXRadioGroupOnSelectedItemChanged;
         _xText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_xVal}" };
 
         _xText.Accept += (s, args) =>
@@ -179,7 +191,7 @@ public class AllViewsTester : Scenario
                          };
         _locationFrame.Add (_yText);
         _yRadioGroup = new () { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
-        _yRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
+        _yRadioGroup.SelectedItemChanged += OnYRadioGroupOnSelectedItemChanged;
         _locationFrame.Add (_yRadioGroup);
 
         _sizeFrame = new ()
@@ -188,14 +200,15 @@ public class AllViewsTester : Scenario
             Y = Pos.Y (_locationFrame),
             Height = Dim.Auto (),
             Width = Dim.Auto (),
-            Title = "Size (Dim)"
+            Title = "Size (Dim)",
+            TabStop = TabBehavior.TabStop,
         };
 
         radioItems = new [] { "Auto", "_Percent(width)", "_Fill(width)", "A_bsolute(width)" };
         label = new () { X = 0, Y = 0, Text = "Width:" };
         _sizeFrame.Add (label);
         _wRadioGroup = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
-        _wRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
+        _wRadioGroup.SelectedItemChanged += OnWRadioGroupOnSelectedItemChanged;
         _wText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_wVal}" };
 
         _wText.Accept += (s, args) =>
@@ -255,7 +268,7 @@ public class AllViewsTester : Scenario
         _sizeFrame.Add (_hText);
 
         _hRadioGroup = new () { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
-        _hRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
+        _hRadioGroup.SelectedItemChanged += OnHRadioGroupOnSelectedItemChanged;
         _sizeFrame.Add (_hRadioGroup);
 
         _settingsPane.Add (_sizeFrame);
@@ -308,17 +321,28 @@ public class AllViewsTester : Scenario
             Y = Pos.Bottom (_settingsPane),
             Width = Dim.Fill (),
             Height = Dim.Fill (), // + 1 for status bar
+            CanFocus = true,
+            TabStop = TabBehavior.TabGroup,
             ColorScheme = Colors.ColorSchemes ["Dialog"]
         };
 
         app.Add (_leftPane, _adornmentsEditor, _settingsPane, _hostPane);
 
         _classListView.SelectedItem = 0;
+        _leftPane.SetFocus ();
 
         Application.Run (app);
         app.Dispose ();
         Application.Shutdown ();
     }
+
+    private void OnHRadioGroupOnSelectedItemChanged (object s, SelectedItemChangedArgs selected) { DimPosChanged (_curView); }
+
+    private void OnWRadioGroupOnSelectedItemChanged (object s, SelectedItemChangedArgs selected) { DimPosChanged (_curView); }
+
+    private void OnYRadioGroupOnSelectedItemChanged (object s, SelectedItemChangedArgs selected) { DimPosChanged (_curView); }
+
+    private void OnXRadioGroupOnSelectedItemChanged (object s, SelectedItemChangedArgs selected) { DimPosChanged (_curView); }
 
     // TODO: Add Command.HotKey handler (pop a message box?)
     private View CreateClass (Type type)
@@ -342,12 +366,6 @@ public class AllViewsTester : Scenario
         // Instantiate view
         var view = (View)Activator.CreateInstance (type);
 
-        // Set the colorscheme to make it stand out if is null by default
-        if (view.ColorScheme == null)
-        {
-            view.ColorScheme = Colors.ColorSchemes ["Base"];
-        }
-
         if (view is IDesignable designable)
         {
             designable.EnableForDesign (ref _demoText);
@@ -370,10 +388,6 @@ public class AllViewsTester : Scenario
 
         view.Initialized += View_Initialized;
 
-        // Add
-        _hostPane.Add (view);
-        _hostPane.SetNeedsDisplay ();
-
         return view;
     }
 
@@ -387,40 +401,40 @@ public class AllViewsTester : Scenario
         try
         {
             view.X = _xRadioGroup.SelectedItem switch
-                     {
-                         0 => Pos.Percent (_xVal),
-                         1 => Pos.AnchorEnd (),
-                         2 => Pos.Center (),
-                         3 => Pos.Absolute (_xVal),
-                         _ => view.X
-                     };
+            {
+                0 => Pos.Percent (_xVal),
+                1 => Pos.AnchorEnd (),
+                2 => Pos.Center (),
+                3 => Pos.Absolute (_xVal),
+                _ => view.X
+            };
 
             view.Y = _yRadioGroup.SelectedItem switch
-                     {
-                         0 => Pos.Percent (_yVal),
-                         1 => Pos.AnchorEnd (),
-                         2 => Pos.Center (),
-                         3 => Pos.Absolute (_yVal),
-                         _ => view.Y
-                     };
+            {
+                0 => Pos.Percent (_yVal),
+                1 => Pos.AnchorEnd (),
+                2 => Pos.Center (),
+                3 => Pos.Absolute (_yVal),
+                _ => view.Y
+            };
 
             view.Width = _wRadioGroup.SelectedItem switch
-                         {
-                             0 => Dim.Auto (),
-                             1 => Dim.Percent (_wVal),
-                             2 => Dim.Fill (_wVal),
-                             3 => Dim.Absolute (_wVal),
-                             _ => view.Width
-                         };
+            {
+                0 => Dim.Auto (),
+                1 => Dim.Percent (_wVal),
+                2 => Dim.Fill (_wVal),
+                3 => Dim.Absolute (_wVal),
+                _ => view.Width
+            };
 
             view.Height = _hRadioGroup.SelectedItem switch
-                          {
-                              0 => Dim.Auto (),
-                              1 => Dim.Percent (_hVal),
-                              2 => Dim.Fill (_hVal),
-                              3 => Dim.Absolute (_hVal),
-                              _ => view.Height
-                          };
+            {
+                0 => Dim.Auto (),
+                1 => Dim.Percent (_hVal),
+                2 => Dim.Fill (_hVal),
+                3 => Dim.Absolute (_hVal),
+                _ => view.Height
+            };
         }
         catch (Exception e)
         {
@@ -476,12 +490,8 @@ public class AllViewsTester : Scenario
         UpdateTitle (_curView);
     }
 
-    private void Quit () { Application.RequestStop (); }
-
     private void UpdateSettings (View view)
     {
-        _adornmentsEditor.ViewToEdit = view;
-
         var x = view.X.ToString ();
         var y = view.Y.ToString ();
 
@@ -493,7 +503,7 @@ public class AllViewsTester : Scenario
         catch (InvalidOperationException e)
         {
             // This is a hack to work around the fact that the Pos enum doesn't have an "Align" value yet
-            Debug.WriteLine($"{e}");
+            Debug.WriteLine ($"{e}");
         }
 
         _xText.Text = $"{view.Frame.X}";
@@ -546,7 +556,16 @@ public class AllViewsTester : Scenario
             view.Height = Dim.Fill ();
         }
 
+        _xRadioGroup.SelectedItemChanged -= OnXRadioGroupOnSelectedItemChanged;
+        _yRadioGroup.SelectedItemChanged -= OnYRadioGroupOnSelectedItemChanged;
+        _hRadioGroup.SelectedItemChanged -= OnHRadioGroupOnSelectedItemChanged;
+        _wRadioGroup.SelectedItemChanged -= OnWRadioGroupOnSelectedItemChanged;
         UpdateSettings (view);
+        _xRadioGroup.SelectedItemChanged += OnXRadioGroupOnSelectedItemChanged;
+        _yRadioGroup.SelectedItemChanged += OnYRadioGroupOnSelectedItemChanged;
+        _hRadioGroup.SelectedItemChanged += OnHRadioGroupOnSelectedItemChanged;
+        _wRadioGroup.SelectedItemChanged += OnWRadioGroupOnSelectedItemChanged;
+
         UpdateTitle (view);
     }
 }

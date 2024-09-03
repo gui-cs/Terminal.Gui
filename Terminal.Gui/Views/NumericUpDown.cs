@@ -67,7 +67,7 @@ public class NumericUpDown<T> : View where T : notnull
             Width = Dim.Auto (minimumContentDim: Dim.Func (() => string.Format (Format, Value).Length)),
             Height = 1,
             TextAlignment = Alignment.Center,
-            CanFocus = true
+            CanFocus = true,
         };
 
         _up = new ()
@@ -100,7 +100,7 @@ public class NumericUpDown<T> : View where T : notnull
                             return false;
                         }
 
-                        if (Value is { })
+                        if (Value is { } && Increment is { })
                         {
                             Value = (dynamic)Value + (dynamic)Increment;
                         }
@@ -117,10 +117,11 @@ public class NumericUpDown<T> : View where T : notnull
                             return false;
                         }
 
-                        if (Value is { })
+                        if (Value is { } && Increment is { })
                         {
                             Value = (dynamic)Value - (dynamic)Increment;
                         }
+
 
                         return true;
                     });
@@ -218,23 +219,23 @@ public class NumericUpDown<T> : View where T : notnull
         Text = _number.Text;
     }
 
-    private T _increment;
+    private T? _increment;
 
     /// <summary>
     /// </summary>
-    public T Increment
+    public T? Increment
     {
         get => _increment;
         set
         {
-            if ((dynamic)_increment == (dynamic)value)
+            if (_increment is { } && value is { } && (dynamic)_increment == (dynamic)value)
             {
                 return;
             }
 
             _increment = value;
 
-            IncrementChanged?.Invoke (this, new (value));
+            IncrementChanged?.Invoke (this, new (value!));
         }
     }
 

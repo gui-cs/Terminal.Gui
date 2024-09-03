@@ -39,9 +39,16 @@ public class TextField : View
         Used = true;
         WantMousePositionReports = true;
 
+        // By default, disable hotkeys (in case someome sets Title)
+        HotKeySpecifier = new ('\xffff');
+
         _historyText.ChangeText += HistoryText_ChangeText;
 
         Initialized += TextField_Initialized;
+
+        Added += TextField_Added;
+
+        Removed += TextField_Removed;
 
         // Things this view knows how to do
         AddCommand (
@@ -134,7 +141,7 @@ public class TextField : View
                     }
                    );
 
-        AddCommand (Command.Left,  () => MoveLeft ());
+        AddCommand (Command.Left, () => MoveLeft ());
 
         AddCommand (
                     Command.RightEnd,
@@ -398,12 +405,13 @@ public class TextField : View
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
 
-        ContextMenu = new ContextMenu { Host = this, MenuItems = BuildContextMenuBarItem () };
+        ContextMenu = new ContextMenu { Host = this };
         ContextMenu.KeyChanged += ContextMenu_KeyChanged;
 
         KeyBindings.Add (ContextMenu.Key, KeyBindingScope.HotKey, Command.ShowContextMenu);
         KeyBindings.Add (Key.Enter, Command.Accept);
     }
+
 
     /// <summary>
     ///     Provides autocomplete context menu based on suggestions at the current cursor position. Configure
@@ -585,7 +593,7 @@ public class TextField : View
         SetNeedsDisplay ();
     }
 
-    /// <summary>Allows clearing the <see cref="HistoryText.HistoryTextItem"/> items updating the original text.</summary>
+    /// <summary>Allows clearing the <see cref="HistoryText.HistoryTextItemEventArgs"/> items updating the original text.</summary>
     public void ClearHistoryChanges () { _historyText.Clear (Text); }
 
     /// <summary>Copy the selected text to the clipboard.</summary>
@@ -1016,8 +1024,7 @@ public class TextField : View
 
         RenderCaption ();
 
-        ProcessAutocomplete ();
-
+        DrawAutocomplete ();
         _isDrawing = false;
     }
 
@@ -1034,7 +1041,7 @@ public class TextField : View
     }
 
     /// <inheritdoc/>
-    public override bool OnLeave (View view)
+    protected override void OnHasFocusChanged (bool newHasFocus, View previousFocusedView, View view)
     {
         if (Application.MouseGrabView is { } && Application.MouseGrabView == this)
         {
@@ -1044,7 +1051,7 @@ public class TextField : View
         //if (SelectedLength != 0 && !(Application.MouseGrabView is MenuBar))
         //	ClearAllSelection ();
 
-        return base.OnLeave (view);
+        return;
     }
 
     /// TODO: Flush out these docs
@@ -1383,7 +1390,7 @@ public class TextField : View
         return new Attribute (cs.Disabled.Foreground, cs.Focus.Background);
     }
 
-    private void HistoryText_ChangeText (object sender, HistoryText.HistoryTextItem obj)
+    private void HistoryText_ChangeText (object sender, HistoryText.HistoryTextItemEventArgs obj)
     {
         if (obj is null)
         {
@@ -1767,8 +1774,21 @@ public class TextField : View
             return;
         }
 
-        // draw autocomplete
         GenerateSuggestions ();
+    }
+
+    private void DrawAutocomplete ()
+    {
+
+        if (SelectedLength > 0)
+        {
+            return;
+        }
+
+        if (Autocomplete?.Context == null)
+        {
+            return;
+        }
 
         var renderAt = new Point (
                                   Autocomplete.Context.CursorPosition,
@@ -1833,14 +1853,26 @@ public class TextField : View
 
     private void ShowContextMenu ()
     {
-        if (_currentCulture != Thread.CurrentThread.CurrentUICulture)
+        if (!Equals (_currentCulture, Thread.CurrentThread.CurrentUICulture))
         {
             _currentCulture = Thread.CurrentThread.CurrentUICulture;
-
-            ContextMenu.MenuItems = BuildContextMenuBarItem ();
         }
 
-        ContextMenu.Show ();
+        ContextMenu.Show (BuildContextMenuBarItem ());
+    }
+
+    private void TextField_Added (object sender, SuperViewChangedEventArgs e)
+    {
+        if (Autocomplete.HostControl is null)
+        {
+            Autocomplete.HostControl = this;
+            Autocomplete.PopupInsideContainer = false;
+        }
+    }
+
+    private void TextField_Removed (object sender, SuperViewChangedEventArgs e)
+    {
+        Autocomplete.HostControl = null;
     }
 
     private void TextField_Initialized (object sender, EventArgs e)
@@ -1852,8 +1884,11 @@ public class TextField : View
             ScrollOffset = _cursorPosition > Viewport.Width + 1 ? _cursorPosition - Viewport.Width + 1 : 0;
         }
 
-        Autocomplete.HostControl = this;
-        Autocomplete.PopupInsideContainer = false;
+        if (Autocomplete.HostControl is null)
+        {
+            Autocomplete.HostControl = this;
+            Autocomplete.PopupInsideContainer = false;
+        }
     }
 }
 

@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+namespace Terminal.Gui;
 
 /// <summary>
 ///     Helper class for implementing <see cref="IOrientation"/>.
@@ -119,7 +120,7 @@ public class OrientationHelper
     ///         it was not canceled).
     ///     </para>
     /// </remarks>
-    public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
+    public event EventHandler<CancelEventArgs<Orientation>>? OrientationChanging;
 
     /// <summary>
     ///     Raised when the orientation has changed.
@@ -134,5 +135,5 @@ public class OrientationHelper
     ///         This event will be raised after the <see cref="IOrientation.OnOrientationChanged"/> method is called.
     ///     </para>
     /// </remarks>
-    public event EventHandler<EventArgs<Orientation>> OrientationChanged;
+    public event EventHandler<EventArgs<Orientation>>? OrientationChanged;
 }

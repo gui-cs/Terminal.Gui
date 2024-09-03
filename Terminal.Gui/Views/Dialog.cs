@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Terminal.Gui;
+﻿namespace Terminal.Gui;
 
 /// <summary>
 ///     The <see cref="Dialog"/> <see cref="View"/> is a <see cref="Window"/> that by default is centered and contains
@@ -19,13 +17,11 @@ public class Dialog : Window
     /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
     /// <remarks>This property can be set in a Theme.</remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter<Alignment>))]
     public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End; // Default is set in config.json
 
-    /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
+    /// <summary>The default <see cref="AlignmentModes"/> for <see cref="Dialog"/>.</summary>
     /// <remarks>This property can be set in a Theme.</remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter<AlignmentModes>))]
     public static AlignmentModes DefaultButtonAlignmentModes { get; set; } = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems;
 
     /// <summary>
@@ -47,7 +43,6 @@ public class Dialog : Window
     /// Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter<ShadowStyle>))]
     public new static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None; // Default is set in config.json
 
     /// <summary>
@@ -56,7 +51,6 @@ public class Dialog : Window
     /// </summary>
 
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter<LineStyle>))]
     public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single; // Default is set in config.json
 
     private readonly List<Button> _buttons = new ();
@@ -97,6 +91,22 @@ public class Dialog : Window
                         return true;
                     });
         KeyBindings.Add (Key.Esc, Command.QuitToplevel);
+    }
+
+    // BUGBUG: We override GetNormal/FocusColor because "Dialog" ColorScheme is goofy.
+    // BUGBUG: By defn, a Dialog is Modal, and thus HasFocus is always true. OnDrawContent
+    // BUGBUG: Calls these methods.
+    // TODO: Fix this in https://github.com/gui-cs/Terminal.Gui/issues/2381
+    /// <inheritdoc />
+    public override Attribute GetNormalColor ()
+    {
+        return ColorScheme.Normal;
+    }
+
+    /// <inheritdoc />
+    public override Attribute GetFocusColor ()
+    {
+        return ColorScheme.Normal;
     }
 
     private bool _canceled;
@@ -172,12 +182,5 @@ public class Dialog : Window
 
         _buttons.Add (button);
         Add (button);
-
-        SetNeedsDisplay ();
-
-        if (IsInitialized)
-        {
-            LayoutSubviews ();
-        }
     }
 }

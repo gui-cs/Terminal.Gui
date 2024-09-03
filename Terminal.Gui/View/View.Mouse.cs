@@ -1,17 +1,17 @@
-﻿using System.ComponentModel;
+﻿#nullable enable
+using System.ComponentModel;
 
 namespace Terminal.Gui;
 
 public partial class View // Mouse APIs
 {
-    [CanBeNull]
-    private ColorScheme _savedHighlightColorScheme;
+    private ColorScheme? _savedHighlightColorScheme;
 
     /// <summary>
     ///     Fired when the view is highlighted. Set <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/>
     ///     to implement a custom highlight scheme or prevent the view from being highlighted.
     /// </summary>
-    public event EventHandler<CancelEventArgs<HighlightStyle>> Highlight;
+    public event EventHandler<CancelEventArgs<HighlightStyle>>? Highlight;
 
     /// <summary>
     ///     Gets or sets whether the <see cref="View"/> will be highlighted visually while the mouse button is
@@ -29,10 +29,10 @@ public partial class View // Mouse APIs
     ///         The coordinates are relative to <see cref="View.Viewport"/>.
     ///     </para>
     /// </remarks>
-    public event EventHandler<MouseEventEventArgs> MouseClick;
+    public event EventHandler<MouseEventEventArgs>? MouseClick;
 
     /// <summary>Event fired when the mouse moves into the View's <see cref="Viewport"/>.</summary>
-    public event EventHandler<MouseEventEventArgs> MouseEnter;
+    public event EventHandler<MouseEventEventArgs>? MouseEnter;
 
     /// <summary>Event fired when a mouse event occurs.</summary>
     /// <remarks>
@@ -40,10 +40,10 @@ public partial class View // Mouse APIs
     ///         The coordinates are relative to <see cref="View.Viewport"/>.
     ///     </para>
     /// </remarks>
-    public event EventHandler<MouseEventEventArgs> MouseEvent;
+    public event EventHandler<MouseEventEventArgs>? MouseEvent;
 
     /// <summary>Event fired when the mouse leaves the View's <see cref="Viewport"/>.</summary>
-    public event EventHandler<MouseEventEventArgs> MouseLeave;
+    public event EventHandler<MouseEventEventArgs>? MouseLeave;
 
     /// <summary>
     ///     Processes a <see cref="MouseEvent"/>. This method is called by <see cref="Application.OnMouseEvent"/> when a mouse
@@ -87,7 +87,7 @@ public partial class View // Mouse APIs
             return mouseEvent.Handled = true;
         }
 
-        if (HighlightStyle != HighlightStyle.None || WantContinuousButtonPressed)
+        if (HighlightStyle != HighlightStyle.None || (WantContinuousButtonPressed && WantMousePositionReports))
         {
             if (HandlePressed (mouseEvent))
             {
@@ -244,7 +244,7 @@ public partial class View // Mouse APIs
         if (!Enabled)
         {
             // QUESTION: Is this right? Should a disabled view eat mouse clicks?
-            return args.Handled = true;
+            return args.Handled = false;
         }
 
         MouseClick?.Invoke (this, args);

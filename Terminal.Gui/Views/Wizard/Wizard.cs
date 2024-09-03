@@ -70,16 +70,18 @@ public class Wizard : Dialog
         ButtonAlignmentModes |= AlignmentModes.IgnoreFirstOrLast;
         BorderStyle = LineStyle.Double;
 
-        //// Add a horiz separator
-        var separator = new LineView (Orientation.Horizontal) { Y = Pos.AnchorEnd (2) };
-        Add (separator);
-
-        // BUGBUG: Space is to work around https://github.com/gui-cs/Terminal.Gui/issues/1812
         BackButton = new () { Text = Strings.wzBack };
-        AddButton (BackButton);
+        NextFinishButton = new ()
+        {
+            Text = Strings.wzFinish,
+            IsDefault = true
+        };
 
-        NextFinishButton = new () { Text = Strings.wzFinish };
-        NextFinishButton.IsDefault = true;
+        //// Add a horiz separator
+        var separator = new LineView (Orientation.Horizontal) { Y = Pos.Top (BackButton) - 1 };
+
+        Add (separator);
+        AddButton (BackButton);
         AddButton (NextFinishButton);
 
         BackButton.Accept += BackBtn_Clicked;
@@ -351,14 +353,11 @@ public class Wizard : Dialog
 
         UpdateButtonsAndTitle ();
 
-        // Set focus to the nav buttons
-        if (BackButton.HasFocus)
+
+        // Set focus on the contentview
+        if (newStep is { })
         {
-            BackButton.SetFocus ();
-        }
-        else
-        {
-            NextFinishButton.SetFocus ();
+            newStep.Subviews.ToArray () [0].SetFocus ();
         }
 
         if (OnStepChanged (oldStep, _currentStep))
@@ -498,14 +497,14 @@ public class Wizard : Dialog
             // If we're modal, then we expand the WizardStep so that the top and side 
             // borders and not visible. The bottom border is the separator above the buttons.
             step.X = step.Y = 0;
-            step.Height = Dim.Fill (2); // for button frame
+            step.Height = Dim.Fill (Dim.Func (() => IsInitialized ? Subviews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height + 1 : 1)); // for button frame (+1 for lineView)
             step.Width = Dim.Fill ();
         }
         else
         {
             // If we're not a modal, then we show the border around the WizardStep
             step.X = step.Y = 0;
-            step.Height = Dim.Fill (1); // for button frame
+            step.Height = Dim.Fill (Dim.Func (() => IsInitialized ? Subviews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height + 1 : 2)); // for button frame (+1 for lineView)
             step.Width = Dim.Fill ();
         }
     }
@@ -543,7 +542,7 @@ public class Wizard : Dialog
 
         SetNeedsLayout ();
         LayoutSubviews ();
-        Draw ();
+        //Draw ();
     }
 
     private void Wizard_Closing (object sender, ToplevelClosingEventArgs obj)

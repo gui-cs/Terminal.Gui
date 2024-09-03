@@ -32,7 +32,7 @@ public static partial class Application
     /// <returns>A string representation of the Application </returns>
     public new static string ToString ()
     {
-        ConsoleDriver driver = Driver;
+        ConsoleDriver? driver = Driver;
 
         if (driver is null)
         {
@@ -47,13 +47,17 @@ public static partial class Application
     /// </summary>
     /// <param name="driver">The driver to use to render the contents.</param>
     /// <returns>A string representation of the Application </returns>
-    public static string ToString (ConsoleDriver driver)
+    public static string ToString (ConsoleDriver? driver)
     {
+        if (driver is null)
+        {
+            return string.Empty;
+        }
         var sb = new StringBuilder ();
 
-        Cell [,] contents = driver.Contents;
+        Cell [,] contents = driver?.Contents!;
 
-        for (var r = 0; r < driver.Rows; r++)
+        for (var r = 0; r < driver!.Rows; r++)
         {
             for (var c = 0; c < driver.Cols; c++)
             {
@@ -134,6 +138,8 @@ public static partial class Application
     // starts running and after Shutdown returns.
     internal static void ResetState (bool ignoreDisposed = false)
     {
+        Application.Navigation = new ApplicationNavigation ();
+
         // Shutdown is the bookend for Init. As such it needs to clean up all resources
         // Init created. Apps that do any threading will need to code defensively for this.
         // e.g. see Issue #537

@@ -408,7 +408,7 @@ public class UICatalogApp
             _themeMenuItems = CreateThemeMenuItems ();
             _themeMenuBarItem = new ("_Themes", _themeMenuItems);
 
-            MenuBar = new ()
+            MenuBar menuBar = new ()
             {
                 Menus =
                 [
@@ -462,20 +462,22 @@ public class UICatalogApp
                         )
                 ]
             };
+            Add (menuBar);
 
-            StatusBar = new ()
+            StatusBar statusBar = new ()
             {
                 Visible = ShowStatusBar,
                 AlignmentModes = AlignmentModes.IgnoreFirstOrLast,
                 CanFocus = false
             };
+            Add (statusBar);
 
             if (StatusBar is { })
             {
                 ShVersion = new ()
                 {
                     Title = "Version Info",
-                    CanFocus = false
+                    CanFocus = false,
                 };
 
                 var statusBarShortcut = new Shortcut
@@ -484,7 +486,11 @@ public class UICatalogApp
                     Title = "Show/Hide Status Bar",
                     CanFocus = false,
                 };
-                statusBarShortcut.Accept += (sender, args) => { StatusBar.Visible = !StatusBar.Visible; };
+                statusBarShortcut.Accept += (sender, args) =>
+                                            {
+                                                StatusBar.Visible = !StatusBar.Visible;
+                                                args.Handled = true;
+                                            };
 
                 ShForce16Colors = new ()
                 {
@@ -496,7 +502,8 @@ public class UICatalogApp
                         CanFocus = false
                     },
                     HelpText = "",
-                    Key = Key.F6
+                    KeyBindingScope = KeyBindingScope.Application,
+                    Key = Key.F7
                 };
 
                 ((CheckBox)ShForce16Colors.CommandView).CheckedStateChanging += (sender, args) =>
@@ -539,7 +546,7 @@ public class UICatalogApp
                 X = 0,
                 Y = 1,
                 Width = Dim.Auto (),
-                Height = Dim.Fill (1),
+                Height = Dim.Fill (Dim.Func (() => IsInitialized ? Subviews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height : 1)),
                 AllowsMarking = false,
                 CanFocus = true,
                 Title = "_Categories",
@@ -637,13 +644,6 @@ public class UICatalogApp
             Add (CategoryList);
             Add (ScenarioList);
 
-            Add (MenuBar);
-
-            if (StatusBar is { })
-            {
-                Add (StatusBar);
-            }
-
             Loaded += LoadedHandler;
             Unloaded += UnloadedHandler;
 
@@ -676,7 +676,7 @@ public class UICatalogApp
 
             ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
 
-            MenuBar!.Menus [0].Children [0].Shortcut = (KeyCode)Application.QuitKey;
+            MenuBar!.Menus [0].Children [0].ShortcutKey = Application.QuitKey;
 
             if (StatusBar is { })
             {
@@ -700,8 +700,8 @@ public class UICatalogApp
             {
                 var item = new MenuItem
                 {
-                    Title = $"_{theme.Key}",
-                    Shortcut = (KeyCode)new Key ((KeyCode)((uint)KeyCode.D1 + schemeCount++))
+                    Title = theme.Key == "Dark" ? $"{theme.Key.Substring (0, 3)}_{theme.Key.Substring (3, 1)}" : $"_{theme.Key}",
+                    ShortcutKey = new Key ((KeyCode)((uint)KeyCode.D1 + schemeCount++))
                         .WithCtrl
                 };
                 item.CheckType |= MenuItemCheckStyle.Checked;
@@ -735,6 +735,7 @@ public class UICatalogApp
                                    ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
                                    Application.Top!.SetNeedsDisplay ();
                                };
+                item.ShortcutKey = ((Key)sc.Key [0].ToString ().ToLower ()).WithCtrl;
                 schemeMenuItems.Add (item);
             }
 
@@ -796,7 +797,7 @@ public class UICatalogApp
             {
                 var item = new MenuItem
                 {
-                    Title = GetDiagnosticsTitle (diag), Shortcut = (KeyCode)new Key (index.ToString () [0]).WithAlt
+                    Title = GetDiagnosticsTitle (diag), ShortcutKey = new Key (index.ToString () [0]).WithAlt
                 };
                 index++;
                 item.CheckType |= MenuItemCheckStyle.Checked;
@@ -874,7 +875,7 @@ public class UICatalogApp
                 };
             }
 
-            Enum GetDiagnosticsEnumValue (string title)
+            Enum GetDiagnosticsEnumValue (string? title)
             {
                 return title switch
                 {
@@ -951,9 +952,8 @@ public class UICatalogApp
             List<MenuItem> menuItems = new ();
             MiIsMenuBorderDisabled = new () { Title = "Disable Menu _Border" };
 
-            MiIsMenuBorderDisabled.Shortcut =
-                (KeyCode)new Key (MiIsMenuBorderDisabled!.Title!.Substring (14, 1) [0]).WithAlt
-                                                                                       .WithCtrl.NoShift;
+            MiIsMenuBorderDisabled.ShortcutKey =
+                new Key (MiIsMenuBorderDisabled!.Title!.Substring (14, 1) [0]).WithAlt.WithCtrl.NoShift;
             MiIsMenuBorderDisabled.CheckType |= MenuItemCheckStyle.Checked;
 
             MiIsMenuBorderDisabled.Action += () =>
@@ -974,8 +974,8 @@ public class UICatalogApp
             List<MenuItem> menuItems = new ();
             MiIsMouseDisabled = new () { Title = "_Disable Mouse" };
 
-            MiIsMouseDisabled.Shortcut =
-                (KeyCode)new Key (MiIsMouseDisabled!.Title!.Substring (1, 1) [0]).WithAlt.WithCtrl.NoShift;
+            MiIsMouseDisabled.ShortcutKey =
+                new Key (MiIsMouseDisabled!.Title!.Substring (1, 1) [0]).WithAlt.WithCtrl.NoShift;
             MiIsMouseDisabled.CheckType |= MenuItemCheckStyle.Checked;
 
             MiIsMouseDisabled.Action += () =>
@@ -994,7 +994,7 @@ public class UICatalogApp
             List<MenuItem> menuItems = new ();
             MiUseSubMenusSingleFrame = new () { Title = "Enable _Sub-Menus Single Frame" };
 
-            MiUseSubMenusSingleFrame.Shortcut = KeyCode.CtrlMask
+            MiUseSubMenusSingleFrame.ShortcutKey = KeyCode.CtrlMask
                                                 | KeyCode.AltMask
                                                 | (KeyCode)MiUseSubMenusSingleFrame!.Title!.Substring (8, 1) [
                                                  0];
@@ -1017,7 +1017,7 @@ public class UICatalogApp
             MiForce16Colors = new ()
             {
                 Title = "Force _16 Colors",
-                Shortcut = (KeyCode)Key.F6,
+                ShortcutKey = Key.F6,
                 Checked = Application.Force16Colors,
                 CanExecute = () => Application.Driver?.SupportsTrueColor ?? false
             };

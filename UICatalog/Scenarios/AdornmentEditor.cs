@@ -8,7 +8,7 @@ namespace UICatalog.Scenarios;
 /// </summary>
 public class AdornmentEditor : View
 {
-    private readonly ColorPicker _backgroundColorPicker = new ()
+    private readonly ColorPicker16 _backgroundColorPicker = new ()
     {
         Title = "_BG",
         BoxWidth = 1,
@@ -18,7 +18,7 @@ public class AdornmentEditor : View
         Enabled = false
     };
 
-    private readonly ColorPicker _foregroundColorPicker = new ()
+    private readonly ColorPicker16 _foregroundColorPicker = new ()
     {
         Title = "_FG",
         BoxWidth = 1,
@@ -91,7 +91,8 @@ public class AdornmentEditor : View
         BorderStyle = LineStyle.Dashed;
         Initialized += AdornmentEditor_Initialized;
 
-        TabStop = TabBehavior.TabGroup;
+        CanFocus = true;
+        TabStop = TabBehavior.TabStop;
     }
 
     private void AdornmentEditor_Initialized (object sender, EventArgs e)

@@ -8,35 +8,24 @@ namespace Terminal.Gui;
 ///     This is a low-level API that is typically used internally by the layout system. Use the various static
 ///     methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
 /// </remarks>
-/// <param name="percent">The percentage.</param>
-/// <param name="mode">
+/// <param name="Percentage">The percentage.</param>
+/// <param name="Mode">
 ///     If <see cref="DimPercentMode.Position"/> the dimension is computed using the View's position (<see cref="View.X"/> or
 ///     <see cref="View.Y"/>); otherwise, the dimension is computed using the View's <see cref="View.GetContentSize ()"/>.
 /// </param>
-public class DimPercent (int percent, DimPercentMode mode = DimPercentMode.ContentSize) : Dim
+public record DimPercent (int Percentage, DimPercentMode Mode = DimPercentMode.ContentSize) : Dim
 {
-    /// <inheritdoc/>
-    public override bool Equals (object? other) { return other is DimPercent f && f.Percent == Percent && f.Mode == Mode; }
-
-    /// <inheritdoc/>
-    public override int GetHashCode () { return Percent.GetHashCode (); }
-
-    /// <summary>
-    ///     Gets the percentage.
-    /// </summary>
-    public new int Percent { get; } = percent;
-
     /// <summary>
     /// </summary>
     /// <returns></returns>
-    public override string ToString () { return $"Percent({Percent},{Mode})"; }
+    public override string ToString () { return $"Percent({Percentage},{Mode})"; }
 
     /// <summary>
     ///     Gets whether the dimension is computed using the View's position or GetContentSize ().
     /// </summary>
-    public DimPercentMode Mode { get; } = mode;
+    public DimPercentMode Mode { get; } = Mode;
 
-    internal override int GetAnchor (int size) { return (int)(size * (Percent / 100f)); }
+    internal override int GetAnchor (int size) { return (int)(size * (Percentage / 100f)); }
 
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {

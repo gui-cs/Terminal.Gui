@@ -1,5 +1,6 @@
 ﻿
 #nullable enable
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;

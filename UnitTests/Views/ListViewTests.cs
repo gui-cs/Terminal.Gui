@@ -612,7 +612,7 @@ Item 6",
         var lv = new ListView ();
         var top = new View ();
         top.Add (lv);
-        Exception exception = Record.Exception (lv.SetFocus);
+        Exception exception = Record.Exception (() => lv.SetFocus());
         Assert.Null (exception);
     }
 
@@ -674,8 +674,10 @@ Item 6",
 
     private class NewListDataSource : IListDataSource
     {
+#pragma warning disable CS0067
         /// <inheritdoc />
         public event NotifyCollectionChangedEventHandler CollectionChanged;
+#pragma warning restore CS0067
 
         public int Count => 0;
         public int Length => 0;

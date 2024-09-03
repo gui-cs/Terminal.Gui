@@ -1,279 +1,370 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
 
-/// <summary>Event arguments for the <see cref="Color"/> events.</summary>
-public class ColorEventArgs : EventArgs
-{
-    /// <summary>Initializes a new instance of <see cref="ColorEventArgs"/></summary>
-    public ColorEventArgs () { }
+using System;
 
-    /// <summary>The new Thickness.</summary>
-    public Color Color { get; set; }
+namespace Terminal.Gui;
 
-    /// <summary>The previous Thickness.</summary>
-    public Color PreviousColor { get; set; }
-}
-
-/// <summary>The <see cref="ColorPicker"/> <see cref="View"/> Color picker.</summary>
+/// <summary>
+///     True color picker using HSL
+/// </summary>
 public class ColorPicker : View
 {
-    /// <summary>Columns of color boxes</summary>
-    private readonly int _cols = 8;
-
-    /// <summary>Rows of color boxes</summary>
-    private readonly int _rows = 2;
-
-    private int _boxHeight = 2;
-    private int _boxWidth = 4;
-    private int _selectColorIndex = (int)Color.Black;
-
-    /// <summary>Initializes a new instance of <see cref="ColorPicker"/>.</summary>
-    public ColorPicker () { SetInitialProperties (); }
-
-    private void SetInitialProperties ()
+    /// <summary>
+    ///     Creates a new instance of <see cref="ColorPicker"/>. Use
+    ///     <see cref="Style"/> to change color model. Use <see cref="SelectedColor"/>
+    ///     to change initial <see cref="Color"/>.
+    /// </summary>
+    public ColorPicker ()
     {
-        HighlightStyle = Gui.HighlightStyle.PressedOutside | Gui.HighlightStyle.Pressed;
-
         CanFocus = true;
-        AddCommands ();
-        AddKeyBindings ();
-
-        Width = Dim.Auto (minimumContentDim: _boxWidth * _cols);
-        Height = Dim.Auto (minimumContentDim: _boxHeight * _rows);
-        SetContentSize (new (_boxWidth * _cols, _boxHeight * _rows));
-
-        MouseClick += ColorPicker_MouseClick;
+        TabStop = TabBehavior.TabStop;
+        Height = Dim.Auto ();
+        Width = Dim.Auto ();
+        ApplyStyleChanges ();
     }
 
-    // TODO: Decouple Cursor from SelectedColor so that mouse press-and-hold can show the color under the cursor.
+    private readonly Dictionary<IColorBar, TextField> _textFields = new ();
+    private readonly ColorModelStrategy _strategy = new ();
+    private TextField? _tfHex;
+    private Label? _lbHex;
 
-    private void ColorPicker_MouseClick (object sender, MouseEventEventArgs me)
-    {
-       // if (CanFocus)
-        {
-            Cursor = new Point (me.MouseEvent.Position.X / _boxWidth, me.MouseEvent.Position.Y / _boxHeight);
-            SetFocus ();
-            me.Handled = true;
-        }
-    }
+    private TextField? _tfName;
+    private Label? _lbName;
 
-    /// <summary>Height of a color box</summary>
-    public int BoxHeight
+    private Color _selectedColor = Color.Black;
+
+    // TODO: Add interface
+    private readonly IColorNameResolver _colorNameResolver = new W3CColors ();
+
+    private List<IColorBar> _bars = new ();
+
+    /// <summary>
+    ///     Rebuild the user interface to reflect the new state of <see cref="Style"/>.
+    /// </summary>
+    public void ApplyStyleChanges ()
     {
-        get => _boxHeight;
-        set
+        Color oldValue = _selectedColor;
+        DisposeOldViews ();
+
+        var y = 0;
+        const int textFieldWidth = 4;
+
+        foreach (ColorBar bar in _strategy.CreateBars (Style.ColorModel))
         {
-            if (_boxHeight != value)
+            bar.Y = y;
+            bar.Width = Dim.Fill (Style.ShowTextFields ? textFieldWidth : 0);
+
+            TextField? tfValue = null;
+            if (Style.ShowTextFields)
             {
-                _boxHeight = value;
-                Width = Dim.Auto (minimumContentDim: _boxWidth * _cols);
-                Height = Dim.Auto (minimumContentDim: _boxHeight * _rows);
-                SetContentSize (new (_boxWidth * _cols, _boxHeight * _rows));
-                SetNeedsLayout ();
+                tfValue = new TextField
+                {
+                    X = Pos.AnchorEnd (textFieldWidth),
+                    Y = y,
+                    Width = textFieldWidth
+                };
+                tfValue.HasFocusChanged += UpdateSingleBarValueFromTextField;
+                tfValue.Accept += (s, _)=>UpdateSingleBarValueFromTextField(s);
+                _textFields.Add (bar, tfValue);
+            }
+
+            y++;
+
+            bar.ValueChanged += RebuildColorFromBar;
+
+            _bars.Add (bar);
+
+            Add (bar);
+
+            if (tfValue is { })
+            {
+                Add (tfValue);
             }
         }
-    }
 
-    /// <summary>Width of a color box</summary>
-    public int BoxWidth
-    {
-        get => _boxWidth;
-        set
+        if (Style.ShowColorName)
         {
-            if (_boxWidth != value)
-            {
-                _boxWidth = value;
-                Width = Dim.Auto (minimumContentDim: _boxWidth * _cols);
-                Height = Dim.Auto (minimumContentDim: _boxHeight * _rows);
-                SetContentSize (new (_boxWidth * _cols, _boxHeight * _rows));
-                SetNeedsLayout ();
-            }
+            CreateNameField ();
+        }
+
+        CreateTextField ();
+        SelectedColor = oldValue;
+
+        if (IsInitialized)
+        {
+            LayoutSubviews ();
         }
     }
 
-    /// <summary>Cursor for the selected color.</summary>
-    public Point Cursor
-    {
-        get => new (_selectColorIndex % _cols, _selectColorIndex / _cols);
-        set
-        {
-            int colorIndex = value.Y * _cols + value.X;
-            SelectedColor = (ColorName)colorIndex;
-        }
-    }
+    /// <summary>
+    ///     Fired when color is changed.
+    /// </summary>
+    public event EventHandler<ColorEventArgs>? ColorChanged;
 
-    /// <summary>Selected color.</summary>
-    public ColorName SelectedColor
-    {
-        get => (ColorName)_selectColorIndex;
-        set
-        {
-            if (value == (ColorName)_selectColorIndex)
-            {
-                return;
-            }
-            var prev = (ColorName)_selectColorIndex;
-            _selectColorIndex = (int)value;
-
-            ColorChanged?.Invoke (
-                                  this,
-                                  new ColorEventArgs { PreviousColor = new Color (prev), Color = new Color (value) }
-                                 );
-            SetNeedsDisplay ();
-        }
-    }
-
-    /// <summary>Fired when a color is picked.</summary>
-    public event EventHandler<ColorEventArgs> ColorChanged;
-
-
-    /// <summary>Moves the selected item index to the previous column.</summary>
-    /// <returns></returns>
-    public virtual bool MoveLeft ()
-    {
-        if (Cursor.X > 0)
-        {
-            SelectedColor--;
-        }
-
-        return true;
-    }
-
-    /// <summary>Moves the selected item index to the next column.</summary>
-    /// <returns></returns>
-    public virtual bool MoveRight ()
-    {
-        if (Cursor.X < _cols - 1)
-        {
-            SelectedColor++;
-        }
-
-        return true;
-    }
-
-    /// <summary>Moves the selected item index to the previous row.</summary>
-    /// <returns></returns>
-    public virtual bool MoveUp ()
-    {
-        if (Cursor.Y > 0)
-        {
-            SelectedColor -= _cols;
-        }
-
-        return true;
-    }
-
-    /// <summary>Moves the selected item index to the next row.</summary>
-    /// <returns></returns>
-    public virtual bool MoveDown ()
-    {
-        if (Cursor.Y < _rows - 1)
-        {
-            SelectedColor += _cols;
-        }
-
-        return true;
-    }
-
-    ///<inheritdoc/>
+    /// <inheritdoc/>
     public override void OnDrawContent (Rectangle viewport)
     {
         base.OnDrawContent (viewport);
+        Attribute normal = GetNormalColor ();
+        Driver.SetAttribute (new (SelectedColor, normal.Background));
+        int y = _bars.Count + (Style.ShowColorName ? 1 : 0);
+        AddRune (13, y, (Rune)'■');
+    }
 
-        Driver.SetAttribute (HasFocus ? ColorScheme.Focus : GetNormalColor ());
-        var colorIndex = 0;
+    /// <summary>
+    ///     The color selected in the picker
+    /// </summary>
+    public Color SelectedColor
+    {
+        get => _selectedColor;
+        set => SetSelectedColor (value, true);
+    }
 
-        for (var y = 0; y < Math.Max (2, viewport.Height / BoxHeight); y++)
+    /// <summary>
+    ///     Style settings for the color picker.  After making changes ensure you call
+    ///     <see cref="ApplyStyleChanges"/>.
+    /// </summary>
+    public ColorPickerStyle Style { get; set; } = new ();
+
+    private void CreateNameField ()
+    {
+        _lbName = new ()
         {
-            for (var x = 0; x < Math.Max (8, viewport.Width / BoxWidth); x++)
+            Text = "Name:",
+            X = 0,
+            Y = 3
+        };
+
+        _tfName = new ()
+        {
+            Y = 3,
+            X = 6,
+            Width = 20 // width of "LightGoldenRodYellow" - the longest w3c color name
+        };
+
+        Add (_lbName);
+        Add (_tfName);
+
+        var auto = new AppendAutocomplete (_tfName);
+
+        auto.SuggestionGenerator = new SingleWordSuggestionGenerator
+        {
+            AllSuggestions = _colorNameResolver.GetColorNames ().ToList ()
+        };
+        _tfName.Autocomplete = auto;
+
+        _tfName.HasFocusChanged += UpdateValueFromName;
+        _tfName.Accept += (_s, _) => UpdateValueFromName ();
+    }
+
+    private void CreateTextField ()
+    {
+        int y = _bars.Count;
+
+        if (Style.ShowColorName)
+        {
+            y++;
+        }
+
+        _lbHex = new ()
+        {
+            Text = "Hex:",
+            X = 0,
+            Y = y
+        };
+
+        _tfHex = new ()
+        {
+            Y = y,
+            X = 4,
+            Width = 8,
+        };
+
+        Add (_lbHex);
+        Add (_tfHex);
+
+        _tfHex.HasFocusChanged += UpdateValueFromTextField;
+        _tfHex.Accept += (_,_)=> UpdateValueFromTextField();
+    }
+
+    private void DisposeOldViews ()
+    {
+        foreach (ColorBar bar in _bars.Cast<ColorBar> ())
+        {
+            bar.ValueChanged -= RebuildColorFromBar;
+
+            if (_textFields.TryGetValue (bar, out TextField? tf))
             {
-                int foregroundColorIndex = y == 0 ? colorIndex + _cols : colorIndex - _cols;
-                Driver.SetAttribute (new Attribute ((ColorName)foregroundColorIndex, (ColorName)colorIndex));
-                bool selected = x == Cursor.X && y == Cursor.Y;
-                DrawColorBox (x, y, selected);
-                colorIndex++;
+                Remove (tf);
+                tf.Dispose ();
+            }
+
+            Remove (bar);
+            bar.Dispose ();
+        }
+
+        _bars = new ();
+        _textFields.Clear ();
+
+        if (_lbHex != null)
+        {
+            Remove (_lbHex);
+            _lbHex.Dispose ();
+            _lbHex = null;
+        }
+
+        if (_tfHex != null)
+        {
+            Remove (_tfHex);
+            _tfHex.Dispose ();
+            _tfHex = null;
+        }
+
+        if (_lbName != null)
+        {
+            Remove (_lbName);
+            _lbName.Dispose ();
+            _lbName = null;
+        }
+
+        if (_tfName != null)
+        {
+            Remove (_tfName);
+            _tfName.Dispose ();
+            _tfName = null;
+        }
+    }
+
+    private void RebuildColorFromBar (object? sender, EventArgs<int> e) { SetSelectedColor (_strategy.GetColorFromBars (_bars, Style.ColorModel), false); }
+
+    private void SetSelectedColor (Color value, bool syncBars)
+    {
+        if (_selectedColor != value)
+        {
+            Color old = _selectedColor;
+            _selectedColor = value;
+
+            ColorChanged?.Invoke (
+                                  this,
+                                  new (value));
+        }
+
+        SyncSubViewValues (syncBars);
+    }
+
+    private void SyncSubViewValues (bool syncBars)
+    {
+        if (syncBars)
+        {
+            _strategy.SetBarsToColor (_bars, _selectedColor, Style.ColorModel);
+        }
+
+        foreach (KeyValuePair<IColorBar, TextField> kvp in _textFields)
+        {
+            kvp.Value.Text = kvp.Key.Value.ToString ();
+        }
+
+        var colorHex = _selectedColor.ToString ($"#{SelectedColor.R:X2}{SelectedColor.G:X2}{SelectedColor.B:X2}");
+
+        if (_tfName != null)
+        {
+            _tfName.Text = _colorNameResolver.TryNameColor (_selectedColor, out string name) ? name : string.Empty;
+        }
+
+        if (_tfHex != null)
+        {
+            _tfHex.Text = colorHex;
+        }
+    }
+
+    private void UpdateSingleBarValueFromTextField (object? sender, HasFocusEventArgs e)
+    {
+        // if the new value of Focused is true then it is an enter event so ignore
+        if (e.NewValue)
+        {
+            return;
+        }
+
+        // it is a leave event so update
+        UpdateSingleBarValueFromTextField (sender);
+    }
+    private void UpdateSingleBarValueFromTextField (object? sender)
+    {
+
+        foreach (KeyValuePair<IColorBar, TextField> kvp in _textFields)
+        {
+            if (kvp.Value == sender)
+            {
+                if (int.TryParse (kvp.Value.Text, out int v))
+                {
+                    kvp.Key.Value = v;
+                }
             }
         }
     }
 
-
-    /// <summary>Add the commands.</summary>
-    private void AddCommands ()
+    private void UpdateValueFromName (object sender, HasFocusEventArgs e)
     {
-        AddCommand (Command.Left, () => MoveLeft ());
-        AddCommand (Command.Right, () => MoveRight ());
-        AddCommand (Command.LineUp, () => MoveUp ());
-        AddCommand (Command.LineDown, () => MoveDown ());
-    }
-
-    /// <summary>Add the KeyBindinds.</summary>
-    private void AddKeyBindings ()
-    {
-        KeyBindings.Add (Key.CursorLeft, Command.Left);
-        KeyBindings.Add (Key.CursorRight, Command.Right);
-        KeyBindings.Add (Key.CursorUp, Command.LineUp);
-        KeyBindings.Add (Key.CursorDown, Command.LineDown);
-    }
-
-    /// <summary>Draw a box for one color.</summary>
-    /// <param name="x">X location.</param>
-    /// <param name="y">Y location</param>
-    /// <param name="selected"></param>
-    private void DrawColorBox (int x, int y, bool selected)
-    {
-        var index = 0;
-
-        for (var zoomedY = 0; zoomedY < BoxHeight; zoomedY++)
+        // if the new value of Focused is true then it is an enter event so ignore
+        if (e.NewValue)
         {
-            for (var zoomedX = 0; zoomedX < BoxWidth; zoomedX++)
-            {
-                Move (x * BoxWidth + zoomedX, y * BoxHeight + zoomedY);
-                Driver.AddRune ((Rune)' ');
-                index++;
-            }
+            return;
         }
 
-        if (selected)
-        {
-            DrawFocusRect (new (x * BoxWidth, y * BoxHeight, BoxWidth, BoxHeight));
-        }
+        // it is a leave event so update
+        UpdateValueFromName();
     }
-
-    private void DrawFocusRect (Rectangle rect)
+    private void UpdateValueFromName ()
     {
-        var lc = new LineCanvas ();
-
-        if (rect.Width == 1)
+        if (_tfName == null)
         {
-            lc.AddLine (rect.Location, rect.Height, Orientation.Vertical, LineStyle.Dotted);
+            return;
         }
-        else if (rect.Height == 1)
+
+        if (_colorNameResolver.TryParseColor (_tfName.Text, out Color newColor))
         {
-            lc.AddLine (rect.Location, rect.Width, Orientation.Horizontal, LineStyle.Dotted);
+            SelectedColor = newColor;
         }
         else
         {
-            lc.AddLine (rect.Location, rect.Width, Orientation.Horizontal, LineStyle.Dotted);
-
-            lc.AddLine (
-                        rect.Location with { Y = rect.Location.Y + rect.Height - 1 },
-                        rect.Width,
-                        Orientation.Horizontal,
-                        LineStyle.Dotted
-                       );
-
-            lc.AddLine (rect.Location, rect.Height, Orientation.Vertical, LineStyle.Dotted);
-
-            lc.AddLine (
-                        rect.Location with { X = rect.Location.X + rect.Width - 1 },
-                        rect.Height,
-                        Orientation.Vertical,
-                        LineStyle.Dotted
-                       );
+            // value is invalid, revert the value in the text field back to current state
+            SyncSubViewValues (false);
         }
+    }
 
-        foreach (KeyValuePair<Point, Rune> p in lc.GetMap ())
+    private void UpdateValueFromTextField (object? sender, HasFocusEventArgs e)
+    {
+        // if the new value of Focused is true then it is an enter event so ignore
+        if (e.NewValue)
         {
-            AddRune (p.Key.X, p.Key.Y, p.Value);
+            return;
         }
+
+        // it is a leave event so update
+        UpdateValueFromTextField ();
+    }
+    private void UpdateValueFromTextField ()
+    {
+        if (_tfHex == null)
+        {
+            return;
+        }
+
+        if (Color.TryParse (_tfHex.Text, out Color? newColor))
+        {
+            SelectedColor = newColor.Value;
+        }
+        else
+        {
+            // value is invalid, revert the value in the text field back to current state
+            SyncSubViewValues (false);
+        }
+    }
+
+    /// <inheritdoc />
+    protected override void Dispose (bool disposing)
+    {
+        DisposeOldViews ();
+        base.Dispose (disposing);
     }
 }

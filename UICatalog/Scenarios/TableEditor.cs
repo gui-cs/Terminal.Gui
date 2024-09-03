@@ -14,7 +14,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Dialogs")]
 [ScenarioCategory ("Text and Formatting")]
-[ScenarioCategory ("Top Level Windows")]
+[ScenarioCategory ("Overlapped")]
 public class TableEditor : Scenario
 {
     private readonly HashSet<FileSystemInfo> _checkedFileSystemInfos = new ();
@@ -1266,28 +1266,28 @@ public class TableEditor : Scenario
 
         var contextMenu = new ContextMenu
         {
-            Position = new (e.MouseEvent.Position.X + 1, e.MouseEvent.Position.Y + 1),
-            MenuItems = new (
-                             [
-                                 new (
-                                      $"Hide {TrimArrows (colName)}",
-                                      "",
-                                      () => HideColumn (clickedCol)
-                                     ),
-                                 new (
-                                      $"Sort {StripArrows (sort)}",
-                                      "",
-                                      () => SortColumn (
-                                                        clickedCol,
-                                                        sort,
-                                                        isAsc
-                                                       )
-                                     )
-                             ]
-                            )
+            Position = new (e.MouseEvent.Position.X + 1, e.MouseEvent.Position.Y + 1)
         };
 
-        contextMenu.Show ();
+        MenuBarItem menuItems = new (
+                                     [
+                                         new (
+                                              $"Hide {TrimArrows (colName)}",
+                                              "",
+                                              () => HideColumn (clickedCol)
+                                             ),
+                                         new (
+                                              $"Sort {StripArrows (sort)}",
+                                              "",
+                                              () => SortColumn (
+                                                                clickedCol,
+                                                                sort,
+                                                                isAsc
+                                                               )
+                                             )
+                                     ]
+                                    );
+        contextMenu.Show (menuItems);
     }
 
     private void SortColumn (int clickedCol)

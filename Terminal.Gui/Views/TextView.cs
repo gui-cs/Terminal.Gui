@@ -1269,7 +1269,7 @@ internal partial class HistoryText
         Added
     }
 
-    private readonly List<HistoryTextItem> _historyTextItems = new ();
+    private readonly List<HistoryTextItemEventArgs> _historyTextItems = new ();
     private int _idxHistoryText = -1;
     private string? _originalText;
     public bool HasHistoryChanges => _idxHistoryText > -1;
@@ -1304,7 +1304,7 @@ internal partial class HistoryText
         _idxHistoryText++;
     }
 
-    public event EventHandler<HistoryTextItem>? ChangeText;
+    public event EventHandler<HistoryTextItemEventArgs>? ChangeText;
 
     public void Clear (string text)
     {
@@ -1324,7 +1324,7 @@ internal partial class HistoryText
 
             _idxHistoryText++;
 
-            var historyTextItem = new HistoryTextItem (_historyTextItems [_idxHistoryText]) { IsUndoing = false };
+            var historyTextItem = new HistoryTextItemEventArgs (_historyTextItems [_idxHistoryText]) { IsUndoing = false };
 
             ProcessChanges (ref historyTextItem);
 
@@ -1334,7 +1334,7 @@ internal partial class HistoryText
 
     public void ReplaceLast (List<List<RuneCell>> lines, Point curPos, LineStatus lineStatus)
     {
-        HistoryTextItem? found = _historyTextItems.FindLast (x => x.LineStatus == lineStatus);
+        HistoryTextItemEventArgs? found = _historyTextItems.FindLast (x => x.LineStatus == lineStatus);
 
         if (found is { })
         {
@@ -1351,7 +1351,7 @@ internal partial class HistoryText
 
             _idxHistoryText--;
 
-            var historyTextItem = new HistoryTextItem (_historyTextItems [_idxHistoryText]) { IsUndoing = true };
+            var historyTextItem = new HistoryTextItemEventArgs (_historyTextItems [_idxHistoryText]) { IsUndoing = true };
 
             ProcessChanges (ref historyTextItem);
 
@@ -1359,9 +1359,9 @@ internal partial class HistoryText
         }
     }
 
-    private void OnChangeText (HistoryTextItem? lines) { ChangeText?.Invoke (this, lines!); }
+    private void OnChangeText (HistoryTextItemEventArgs? lines) { ChangeText?.Invoke (this, lines!); }
 
-    private void ProcessChanges (ref HistoryTextItem historyTextItem)
+    private void ProcessChanges (ref HistoryTextItemEventArgs historyTextItem)
     {
         if (historyTextItem.IsUndoing)
         {
@@ -1997,10 +1997,15 @@ public class TextView : View
         CursorVisibility = CursorVisibility.Default;
         Used = true;
 
+        // By default, disable hotkeys (in case someome sets Title)
+        HotKeySpecifier = new ('\xffff');
+
         _model.LinesLoaded += Model_LinesLoaded!;
         _historyText.ChangeText += HistoryText_ChangeText!;
 
         Initialized += TextView_Initialized!;
+
+        Added += TextView_Added!;
 
         LayoutComplete += TextView_LayoutComplete;
 
@@ -2493,10 +2498,15 @@ public class TextView : View
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
 
-        ContextMenu = new () { MenuItems = BuildContextMenuBarItem () };
+        ContextMenu = new ();
         ContextMenu.KeyChanged += ContextMenu_KeyChanged!;
 
         KeyBindings.Add ((KeyCode)ContextMenu.Key, KeyBindingScope.HotKey, Command.ShowContextMenu);
+    }
+
+    private void TextView_Added1 (object? sender, SuperViewChangedEventArgs e)
+    {
+        throw new NotImplementedException ();
     }
 
     // BUGBUG: AllowsReturn is mis-named. It should be EnterKeyAccepts.
@@ -2859,7 +2869,7 @@ public class TextView : View
     }
 
 
-    /// <summary>Allows clearing the <see cref="HistoryText.HistoryTextItem"/> items updating the original text.</summary>
+    /// <summary>Allows clearing the <see cref="HistoryText.HistoryTextItemEventArgs"/> items updating the original text.</summary>
     public void ClearHistoryChanges () { _historyText?.Clear (Text); }
 
     /// <summary>Closes the contents of the stream into the <see cref="TextView"/>.</summary>
@@ -3484,7 +3494,7 @@ public class TextView : View
         }
         else if (ev.Flags == ContextMenu!.MouseFlags)
         {
-            ContextMenu.Position = new (ev.Position.X + 2, ev.Position.Y + 2);
+            ContextMenu.Position = ViewportToScreen ((Viewport with { X = ev.Position.X, Y = ev.Position.Y }).Location);
             ShowContextMenu ();
         }
 
@@ -3650,14 +3660,14 @@ public class TextView : View
     }
 
     /// <inheritdoc/>
-    public override bool OnLeave (View view)
+    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view)
     {
         if (Application.MouseGrabView is { } && Application.MouseGrabView == this)
         {
             Application.UngrabMouse ();
         }
 
-        return base.OnLeave (view);
+        return;
     }
 
     /// <inheritdoc/>
@@ -4121,7 +4131,7 @@ public class TextView : View
 
     private void AppendClipboard (string text) { Clipboard.Contents += text; }
 
-    private MenuBarItem BuildContextMenuBarItem ()
+    private MenuBarItem? BuildContextMenuBarItem ()
     {
         return new (
                     new MenuItem []
@@ -4655,7 +4665,7 @@ public class TextView : View
         return new ValueTuple<int, int> (line, col);
     }
 
-    private void HistoryText_ChangeText (object sender, HistoryText.HistoryTextItem obj)
+    private void HistoryText_ChangeText (object sender, HistoryText.HistoryTextItemEventArgs obj)
     {
         SetWrapModel ();
 
@@ -6279,14 +6289,12 @@ public class TextView : View
 
     private void ShowContextMenu ()
     {
-        if (_currentCulture != Thread.CurrentThread.CurrentUICulture)
+        if (!Equals (_currentCulture, Thread.CurrentThread.CurrentUICulture))
         {
             _currentCulture = Thread.CurrentThread.CurrentUICulture;
-
-            ContextMenu!.MenuItems = BuildContextMenuBarItem ();
         }
 
-        ContextMenu!.Show ();
+        ContextMenu!.Show (BuildContextMenuBarItem ());
     }
 
     private void StartSelecting ()
@@ -6334,9 +6342,21 @@ public class TextView : View
         return StringExtensions.ToString (encoded);
     }
 
+    private void TextView_Added (object sender, SuperViewChangedEventArgs e)
+    {
+        if (Autocomplete.HostControl is null)
+        {
+            Autocomplete.HostControl = this;
+        }
+    }
+
+
     private void TextView_Initialized (object sender, EventArgs e)
     {
-        Autocomplete.HostControl = this;
+        if (Autocomplete.HostControl is null)
+        {
+            Autocomplete.HostControl = this;
+        }
         OnContentsChanged ();
     }
 

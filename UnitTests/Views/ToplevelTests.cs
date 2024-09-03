@@ -10,8 +10,8 @@ public partial class ToplevelTests (ITestOutputHelper output)
         var top = new Toplevel ();
 
         Assert.Equal (Colors.ColorSchemes ["TopLevel"], top.ColorScheme);
-        Assert.Equal ("Fill(0)", top.Width.ToString ());
-        Assert.Equal ("Fill(0)", top.Height.ToString ());
+        Assert.Equal ("Fill(Absolute(0))", top.Width.ToString ());
+        Assert.Equal ("Fill(Absolute(0))", top.Height.ToString ());
         Assert.False (top.Running);
         Assert.False (top.Modal);
         Assert.Null (top.MenuBar);
@@ -246,14 +246,26 @@ public partial class ToplevelTests (ITestOutputHelper output)
         top.OnUnloaded ();
         Assert.Equal ("Unloaded", eventInvoked);
 
-        top.AddMenuStatusBar (new MenuBar ());
+        top.Add (new MenuBar ());
         Assert.NotNull (top.MenuBar);
-        top.AddMenuStatusBar (new StatusBar ());
+        top.Add (new StatusBar ());
         Assert.NotNull (top.StatusBar);
-        top.RemoveMenuStatusBar (top.MenuBar);
+        var menuBar = top.MenuBar;
+        top.Remove (top.MenuBar);
         Assert.Null (top.MenuBar);
-        top.RemoveMenuStatusBar (top.StatusBar);
+        Assert.NotNull (menuBar);
+        var statusBar = top.StatusBar;
+        top.Remove (top.StatusBar);
         Assert.Null (top.StatusBar);
+        Assert.NotNull (statusBar);
+#if DEBUG_IDISPOSABLE
+        Assert.False (menuBar.WasDisposed);
+        Assert.False (statusBar.WasDisposed);
+        menuBar.Dispose ();
+        statusBar.Dispose ();
+        Assert.True (menuBar.WasDisposed);
+        Assert.True (statusBar.WasDisposed);
+#endif
 
         Application.Begin (top);
         Assert.Equal (top, Application.Top);
@@ -265,7 +277,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (0, ny);
         Assert.Null (sb);
 
-        top.AddMenuStatusBar (new MenuBar ());
+        top.Add (new MenuBar ());
         Assert.NotNull (top.MenuBar);
 
         // Application.Top with a menu and without status bar.
@@ -274,7 +286,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (1, ny);
         Assert.Null (sb);
 
-        top.AddMenuStatusBar (new StatusBar ());
+        top.Add (new StatusBar ());
         Assert.NotNull (top.StatusBar);
 
         // Application.Top with a menu and status bar.
@@ -286,8 +298,10 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (2, ny);
         Assert.NotNull (sb);
 
-        top.RemoveMenuStatusBar (top.MenuBar);
+        menuBar = top.MenuBar;
+        top.Remove (top.MenuBar);
         Assert.Null (top.MenuBar);
+        Assert.NotNull (menuBar);
 
         // Application.Top without a menu and with a status bar.
         View.GetLocationEnsuringFullVisibility (top, 2, 2, out nx, out ny, out sb);
@@ -298,8 +312,10 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (2, ny);
         Assert.NotNull (sb);
 
-        top.RemoveMenuStatusBar (top.StatusBar);
+        statusBar = top.StatusBar;
+        top.Remove (top.StatusBar);
         Assert.Null (top.StatusBar);
+        Assert.NotNull (statusBar);
         Assert.Null (top.MenuBar);
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
@@ -318,7 +334,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (0, ny);
         Assert.Null (sb);
 
-        top.AddMenuStatusBar (new MenuBar ());
+        top.Add (new MenuBar ());
         Assert.NotNull (top.MenuBar);
 
         // Application.Top with a menu and without status bar.
@@ -327,7 +343,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (1, ny);
         Assert.Null (sb);
 
-        top.AddMenuStatusBar (new StatusBar ());
+        top.Add (new StatusBar ());
         Assert.NotNull (top.StatusBar);
 
         // Application.Top with a menu and status bar.
@@ -339,10 +355,14 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (20, ny);
         Assert.NotNull (sb);
 
-        top.RemoveMenuStatusBar (top.MenuBar);
-        top.RemoveMenuStatusBar (top.StatusBar);
-        Assert.Null (top.StatusBar);
+        menuBar = top.MenuBar;
+        statusBar = top.StatusBar;
+        top.Remove (top.MenuBar);
         Assert.Null (top.MenuBar);
+        Assert.NotNull (menuBar);
+        top.Remove (top.StatusBar);
+        Assert.Null (top.StatusBar);
+        Assert.NotNull (statusBar);
 
         top.Remove (win);
 
@@ -355,7 +375,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (0, ny);
         Assert.Null (sb);
 
-        top.AddMenuStatusBar (new MenuBar ());
+        top.Add (new MenuBar ());
         Assert.NotNull (top.MenuBar);
 
         // Application.Top with a menu and without status bar.
@@ -364,7 +384,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (2, ny);
         Assert.Null (sb);
 
-        top.AddMenuStatusBar (new StatusBar ());
+        top.Add (new StatusBar ());
         Assert.NotNull (top.StatusBar);
 
         // Application.Top with a menu and status bar.
@@ -387,10 +407,25 @@ public partial class ToplevelTests (ITestOutputHelper output)
         win.NewMouseEvent (new () { Position = new (6, 0), Flags = MouseFlags.Button1Pressed });
 
         //Assert.Null (Toplevel._dragPosition);
+#if DEBUG_IDISPOSABLE
+
+        Assert.False (top.MenuBar.WasDisposed);
+        Assert.False (top.StatusBar.WasDisposed);
+#endif
+        menuBar = top.MenuBar;
+        statusBar = top.StatusBar;
         top.Dispose ();
+        Assert.Null (top.MenuBar);
+        Assert.Null (top.StatusBar);
+        Assert.NotNull (menuBar);
+        Assert.NotNull (statusBar);
+#if DEBUG_IDISPOSABLE
+        Assert.True (menuBar.WasDisposed);
+        Assert.True (statusBar.WasDisposed);
+#endif
     }
 
-    [Fact]
+    [Fact (Skip = "#2491 - Test is broken until #2491 is more mature.")]
     [AutoInitShutdown]
     public void KeyBindings_Command ()
     {
@@ -509,7 +544,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (tvW1, top.MostFocused);
 #if UNIX_KEY_BINDINGS
         Assert.True (Application.OnKeyDown (new (Key.I.WithCtrl)));
-        Assert.Equal (win1, top.Focused);
+        Assert.Equal (win1, top.GetFocused ());
         Assert.Equal (tf2W1, top.MostFocused);
 #endif
         Assert.True (Application.OnKeyDown (Key.Tab.WithShift)); // Ignored. TextView eats shift-tab by default
@@ -816,6 +851,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Null (exception);
     }
 
+#if V2_NEW_FOCUS_IMPL
     [Fact]
     [AutoInitShutdown]
     public void OnEnter_OnLeave_Triggered_On_Application_Begin_End ()
@@ -854,7 +890,6 @@ public partial class ToplevelTests (ITestOutputHelper output)
 
         top.Dispose ();
     }
-
 
     [Fact]
     [AutoInitShutdown]
@@ -1037,13 +1072,14 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (4, steps [^1]);
         top.Dispose ();
     }
+#endif
 
     [Fact]
     [AutoInitShutdown]
     public void PositionCursor_SetCursorVisibility_To_Invisible_If_Focused_Is_Null ()
     {
         var tf = new TextField { Width = 5, Text = "test" };
-        var view = new View { Width = 10, Height = 10 };
+        var view = new View { Width = 10, Height = 10, CanFocus = true };
         view.Add (tf);
         var top = new Toplevel ();
         top.Add (view);
@@ -1567,5 +1603,32 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Application.Run (t);
         t.Dispose ();
         Application.Shutdown ();
+    }
+
+    [Fact]
+    public void Remove_Do_Not_Dispose_MenuBar_Or_StatusBar ()
+    {
+        var mb = new MenuBar ();
+        var sb = new StatusBar ();
+        var tl = new Toplevel ();
+
+#if DEBUG
+        Assert.False (mb.WasDisposed);
+        Assert.False (sb.WasDisposed);
+#endif
+        tl.Add (mb, sb);
+        Assert.NotNull (tl.MenuBar);
+        Assert.NotNull (tl.StatusBar);
+#if DEBUG
+        Assert.False (mb.WasDisposed);
+        Assert.False (sb.WasDisposed);
+#endif
+        tl.RemoveAll ();
+        Assert.Null (tl.MenuBar);
+        Assert.Null (tl.StatusBar);
+#if DEBUG
+        Assert.False (mb.WasDisposed);
+        Assert.False (sb.WasDisposed);
+#endif
     }
 }

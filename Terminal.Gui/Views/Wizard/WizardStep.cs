@@ -13,7 +13,7 @@
 ///     the step is active; see also: <see cref="Wizard.StepChanged"/>. To enable or disable a step from being shown to the
 ///     user, set <see cref="View.Enabled"/>.
 /// </remarks>
-public class WizardStep : FrameView
+public class WizardStep : View
 {
     ///// <summary>
     ///// The title of the <see cref="WizardStep"/>. 
@@ -36,19 +36,33 @@ public class WizardStep : FrameView
     //private string title = string.Empty;
 
     // The contentView works like the ContentView in FrameView.
-    private readonly View _contentView = new () { Id = "WizardContentView" };
-    private readonly TextView _helpTextView = new ();
+    private readonly View _contentView = new ()
+    {
+        CanFocus = true,
+        TabStop = TabBehavior.TabStop,
+        Id = "WizardStep._contentView"
+    };
+    private readonly TextView _helpTextView = new ()
+    {
+        CanFocus = true,
+        TabStop = TabBehavior.TabStop,
+        ReadOnly = true,
+        WordWrap = true,
+        AllowsTab = false,
+        Id = "WizardStep._helpTextView"
+    };
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Wizard"/> class.
     /// </summary>
     public WizardStep ()
     {
+        TabStop = TabBehavior.TabStop;
+        CanFocus = true;
         BorderStyle = LineStyle.None;
+
         base.Add (_contentView);
 
-        _helpTextView.ReadOnly = true;
-        _helpTextView.WordWrap = true;
         base.Add (_helpTextView);
 
         // BUGBUG: v2 - Disabling scrolling for now
@@ -144,11 +158,6 @@ public class WizardStep : FrameView
     /// <remarks></remarks>
     public override View Remove (View view)
     {
-        if (view is null)
-        {
-            return view;
-        }
-
         SetNeedsDisplay ();
         View container = view?.SuperView;
 
@@ -183,7 +192,7 @@ public class WizardStep : FrameView
     internal void ShowHide ()
     {
         _contentView.Height = Dim.Fill ();
-        _helpTextView.Height = Dim.Fill ();
+        _helpTextView.Height = Dim.Height(_contentView);
         _helpTextView.Width = Dim.Fill ();
 
         if (_contentView.InternalSubviews?.Count > 0)

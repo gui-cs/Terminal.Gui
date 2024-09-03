@@ -1,116 +1,21 @@
 ﻿#nullable enable
-using System.Text.Json.Serialization;
-
 namespace Terminal.Gui;
 
 public static partial class Application // Keyboard handling
 {
-    private static Key _nextTabKey = Key.Tab; // Resources/config.json overrrides
-
-    /// <summary>Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-    [JsonConverter (typeof (KeyJsonConverter))]
-    public static Key NextTabKey
-    {
-        get => _nextTabKey;
-        set
-        {
-            if (_nextTabKey != value)
-            {
-                ReplaceKey (_nextTabKey, value);
-                _nextTabKey = value;
-            }
-        }
-    }
-
-    private static Key _prevTabKey = Key.Tab.WithShift; // Resources/config.json overrrides
-
-    /// <summary>Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-    [JsonConverter (typeof (KeyJsonConverter))]
-    public static Key PrevTabKey
-    {
-        get => _prevTabKey;
-        set
-        {
-            if (_prevTabKey != value)
-            {
-                ReplaceKey (_prevTabKey, value);
-                _prevTabKey = value;
-            }
-        }
-    }
-
     private static Key _nextTabGroupKey = Key.F6; // Resources/config.json overrrides
-
-    /// <summary>Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-    [JsonConverter (typeof (KeyJsonConverter))]
-    public static Key NextTabGroupKey
-    {
-        get => _nextTabGroupKey;
-        set
-        {
-            if (_nextTabGroupKey != value)
-            {
-                ReplaceKey (_nextTabGroupKey, value);
-                _nextTabGroupKey = value;
-            }
-        }
-    }
+    private static Key _nextTabKey = Key.Tab; // Resources/config.json overrrides
 
     private static Key _prevTabGroupKey = Key.F6.WithShift; // Resources/config.json overrrides
 
-    /// <summary>Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-    [JsonConverter (typeof (KeyJsonConverter))]
-    public static Key PrevTabGroupKey
-    {
-        get => _prevTabGroupKey;
-        set
-        {
-            if (_prevTabGroupKey != value)
-            {
-                ReplaceKey (_prevTabGroupKey, value);
-                _prevTabGroupKey = value;
-            }
-        }
-    }
+    private static Key _prevTabKey = Key.Tab.WithShift; // Resources/config.json overrrides
 
     private static Key _quitKey = Key.Esc; // Resources/config.json overrrides
 
-    /// <summary>Gets or sets the key to quit the application.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-    [JsonConverter (typeof (KeyJsonConverter))]
-    public static Key QuitKey
-    {
-        get => _quitKey;
-        set
-        {
-            if (_quitKey != value)
-            {
-                ReplaceKey (_quitKey, value);
-                _quitKey = value;
-            }
-        }
-    }
+    static Application () { AddApplicationKeyBindings (); }
 
-    private static void ReplaceKey (Key oldKey, Key newKey)
-    {
-        if (KeyBindings.Bindings.Count == 0)
-        {
-            return;
-        }
-
-        if (newKey == Key.Empty)
-        {
-            KeyBindings.Remove (oldKey);
-        }
-        else
-        {
-            KeyBindings.ReplaceKey (oldKey, newKey);
-        }
-    }
+    /// <summary>Gets the key bindings for this view.</summary>
+    public static KeyBindings KeyBindings { get; internal set; } = new ();
 
     /// <summary>
     ///     Event fired when the user presses a key. Fired by <see cref="OnKeyDown"/>.
@@ -125,6 +30,50 @@ public static partial class Application // Keyboard handling
     ///     <para>Fired after <see cref="KeyDown"/> and before <see cref="KeyUp"/>.</para>
     /// </remarks>
     public static event EventHandler<Key>? KeyDown;
+
+    /// <summary>
+    ///     Event fired when the user releases a key. Fired by <see cref="OnKeyUp"/>.
+    ///     <para>
+    ///         Set <see cref="Key.Handled"/> to <see langword="true"/> to indicate the key was handled and to prevent
+    ///         additional processing.
+    ///     </para>
+    /// </summary>
+    /// <remarks>
+    ///     All drivers support firing the <see cref="KeyDown"/> event. Some drivers (Curses) do not support firing the
+    ///     <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
+    ///     <para>Fired after <see cref="KeyDown"/>.</para>
+    /// </remarks>
+    public static event EventHandler<Key>? KeyUp;
+
+    /// <summary>Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.</summary>
+    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Key NextTabGroupKey
+    {
+        get => _nextTabGroupKey;
+        set
+        {
+            if (_nextTabGroupKey != value)
+            {
+                ReplaceKey (_nextTabGroupKey, value);
+                _nextTabGroupKey = value;
+            }
+        }
+    }
+
+    /// <summary>Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.</summary>
+    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Key NextTabKey
+    {
+        get => _nextTabKey;
+        set
+        {
+            if (_nextTabKey != value)
+            {
+                ReplaceKey (_nextTabKey, value);
+                _nextTabKey = value;
+            }
+        }
+    }
 
     /// <summary>
     ///     Called by the <see cref="ConsoleDriver"/> when the user presses a key. Fires the <see cref="KeyDown"/> event
@@ -195,24 +144,7 @@ public static partial class Application // Keyboard handling
 
                 foreach (Command command in appBinding.Commands)
                 {
-                    if (!CommandImplementations.ContainsKey (command))
-                    {
-                        throw new NotSupportedException (
-                                                         @$"A KeyBinding was set up for the command {command} ({keyEvent}) but that command is not supported by Application."
-                                                        );
-                    }
-
-                    if (CommandImplementations.TryGetValue (command, out Func<CommandContext, bool?>? implementation))
-                    {
-                        var context = new CommandContext (command, keyEvent, appBinding); // Create the context here
-                        toReturn = implementation (context);
-                    }
-
-                    // if ever see a true then that's what we will return
-                    if (toReturn ?? false)
-                    {
-                        toReturn = true;
-                    }
+                    toReturn = InvokeCommand (command, keyEvent, appBinding);
                 }
 
                 return toReturn ?? true;
@@ -223,18 +155,30 @@ public static partial class Application // Keyboard handling
     }
 
     /// <summary>
-    ///     Event fired when the user releases a key. Fired by <see cref="OnKeyUp"/>.
-    ///     <para>
-    ///         Set <see cref="Key.Handled"/> to <see langword="true"/> to indicate the key was handled and to prevent
-    ///         additional processing.
-    ///     </para>
+    /// INTENRAL method to invoke one of the commands in <see cref="CommandImplementations"/>
     /// </summary>
-    /// <remarks>
-    ///     All drivers support firing the <see cref="KeyDown"/> event. Some drivers (Curses) do not support firing the
-    ///     <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
-    ///     <para>Fired after <see cref="KeyDown"/>.</para>
-    /// </remarks>
-    public static event EventHandler<Key>? KeyUp;
+    /// <param name="command"></param>
+    /// <param name="keyEvent"></param>
+    /// <param name="appBinding"></param>
+    /// <returns></returns>
+    /// <exception cref="NotSupportedException"></exception>
+    private static bool? InvokeCommand (Command command, Key keyEvent, KeyBinding appBinding)
+    {
+        if (!CommandImplementations!.ContainsKey (command))
+        {
+            throw new NotSupportedException (
+                                             @$"A KeyBinding was set up for the command {command} ({keyEvent}) but that command is not supported by Application."
+                                            );
+        }
+
+        if (CommandImplementations.TryGetValue (command, out Func<CommandContext, bool?>? implementation))
+        {
+            var context = new CommandContext (command, keyEvent, appBinding); // Create the context here
+            return implementation (context);
+        }
+
+        return false;
+    }
 
     /// <summary>
     ///     Called by the <see cref="ConsoleDriver"/> when the user releases a key. Fires the <see cref="KeyUp"/> event
@@ -273,33 +217,50 @@ public static partial class Application // Keyboard handling
         return false;
     }
 
-    /// <summary>Gets the key bindings for this view.</summary>
-    public static KeyBindings KeyBindings { get; internal set; } = new ();
+    /// <summary>Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.</summary>
+    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Key PrevTabGroupKey
+    {
+        get => _prevTabGroupKey;
+        set
+        {
+            if (_prevTabGroupKey != value)
+            {
+                ReplaceKey (_prevTabGroupKey, value);
+                _prevTabGroupKey = value;
+            }
+        }
+    }
 
-    /// <summary>
-    ///     Commands for Application.
-    /// </summary>
-    private static Dictionary<Command, Func<CommandContext, bool?>> CommandImplementations { get; set; }
+    /// <summary>Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.</summary>
+    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Key PrevTabKey
+    {
+        get => _prevTabKey;
+        set
+        {
+            if (_prevTabKey != value)
+            {
+                ReplaceKey (_prevTabKey, value);
+                _prevTabKey = value;
+            }
+        }
+    }
 
-    /// <summary>
-    ///     <para>
-    ///         Sets the function that will be invoked for a <see cref="Command"/>.
-    ///     </para>
-    ///     <para>
-    ///         If AddCommand has already been called for <paramref name="command"/> <paramref name="f"/> will
-    ///         replace the old one.
-    ///     </para>
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         This version of AddCommand is for commands that do not require a <see cref="CommandContext"/>.
-    ///     </para>
-    /// </remarks>
-    /// <param name="command">The command.</param>
-    /// <param name="f">The function.</param>
-    private static void AddCommand (Command command, Func<bool?> f) { CommandImplementations [command] = ctx => f (); }
-
-    static Application () { AddApplicationKeyBindings (); }
+    /// <summary>Gets or sets the key to quit the application.</summary>
+    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Key QuitKey
+    {
+        get => _quitKey;
+        set
+        {
+            if (_quitKey != value)
+            {
+                ReplaceKey (_quitKey, value);
+                _quitKey = value;
+            }
+        }
+    }
 
     internal static void AddApplicationKeyBindings ()
     {
@@ -308,7 +269,7 @@ public static partial class Application // Keyboard handling
         // Things this view knows how to do
         AddCommand (
                     Command.QuitToplevel, // TODO: IRunnable: Rename to Command.Quit to make more generic.
-                    () =>
+                    static () =>
                     {
                         if (ApplicationOverlapped.OverlappedTop is { })
                         {
@@ -325,7 +286,7 @@ public static partial class Application // Keyboard handling
 
         AddCommand (
                     Command.Suspend,
-                    () =>
+                    static () =>
                     {
                         Driver?.Suspend ();
 
@@ -335,47 +296,47 @@ public static partial class Application // Keyboard handling
 
         AddCommand (
                     Command.NextView,
-                    () =>
-                    {
-                        ApplicationNavigation.MoveNextView ();
-
-                        return true;
-                    }
-                   );
+                    static () => Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop));
 
         AddCommand (
                     Command.PreviousView,
-                    () =>
-                    {
-                        ApplicationNavigation.MovePreviousView ();
-
-                        return true;
-                    }
-                   );
+                    static () => Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop));
 
         AddCommand (
                     Command.NextViewOrTop,
-                    () =>
+                    static () =>
                     {
-                        ApplicationNavigation.MoveNextViewOrTop ();
+                        // TODO: This OverlapppedTop tomfoolery goes away in addressing #2491
+                        if (ApplicationOverlapped.OverlappedTop is { })
+                        {
+                            ApplicationOverlapped.OverlappedMoveNext ();
 
-                        return true;
+                            return true;
+                        }
+
+                        return Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup);
                     }
                    );
 
         AddCommand (
                     Command.PreviousViewOrTop,
-                    () =>
+                    static () =>
                     {
-                        ApplicationNavigation.MovePreviousViewOrTop ();
+                        // TODO: This OverlapppedTop tomfoolery goes away in addressing #2491
+                        if (ApplicationOverlapped.OverlappedTop is { })
+                        {
+                            ApplicationOverlapped.OverlappedMovePrevious ();
 
-                        return true;
+                            return true;
+                        }
+
+                        return Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup);
                     }
                    );
 
         AddCommand (
                     Command.Refresh,
-                    () =>
+                    static () =>
                     {
                         Refresh ();
 
@@ -401,8 +362,8 @@ public static partial class Application // Keyboard handling
         KeyBindings.Add (NextTabKey, KeyBindingScope.Application, Command.NextView);
         KeyBindings.Add (PrevTabKey, KeyBindingScope.Application, Command.PreviousView);
 
-        KeyBindings.Add (NextTabGroupKey, KeyBindingScope.Application, Command.NextViewOrTop); // Needed on Unix
-        KeyBindings.Add (PrevTabGroupKey, KeyBindingScope.Application, Command.PreviousViewOrTop); // Needed on Unix
+        KeyBindings.Add (NextTabGroupKey, KeyBindingScope.Application, Command.NextViewOrTop);
+        KeyBindings.Add (PrevTabGroupKey, KeyBindingScope.Application, Command.PreviousViewOrTop);
 
         // TODO: Refresh Key should be configurable
         KeyBindings.Add (Key.F5, KeyBindingScope.Application, Command.Refresh);
@@ -412,13 +373,6 @@ public static partial class Application // Keyboard handling
         {
             KeyBindings.Add (Key.Z.WithCtrl, KeyBindingScope.Application, Command.Suspend);
         }
-
-#if UNIX_KEY_BINDINGS
-        KeyBindings.Add (Key.L.WithCtrl, Command.Refresh); // Unix
-        KeyBindings.Add (Key.F.WithCtrl, Command.NextView); // Unix
-        KeyBindings.Add (Key.I.WithCtrl, Command.NextView); // Unix
-        KeyBindings.Add (Key.B.WithCtrl, Command.PreviousView); // Unix
-#endif
     }
 
     /// <summary>
@@ -438,30 +392,43 @@ public static partial class Application // Keyboard handling
                           .ToList ();
     }
 
-    ///// <summary>
-    /////     Gets the list of Views that have <see cref="KeyBindingScope.Application"/> key bindings for the specified key.
-    ///// </summary>
-    ///// <remarks>
-    /////     This is an internal method used by the <see cref="View"/> class to add Application key bindings.
-    ///// </remarks>
-    ///// <param name="key">The key to check.</param>
-    ///// <param name="views">Outputs the list of views bound to <paramref name="key"/></param>
-    ///// <returns><see langword="True"/> if successful.</returns>
-    //internal static bool TryGetKeyBindings (Key key, out List<View> views) { return _keyBindings.TryGetValue (key, out views); }
-
     /// <summary>
-    ///     Removes all <see cref="KeyBindingScope.Application"/> scoped key bindings for the specified view.
+    ///     <para>
+    ///         Sets the function that will be invoked for a <see cref="Command"/>.
+    ///     </para>
+    ///     <para>
+    ///         If AddCommand has already been called for <paramref name="command"/> <paramref name="f"/> will
+    ///         replace the old one.
+    ///     </para>
     /// </summary>
     /// <remarks>
-    ///     This is an internal method used by the <see cref="View"/> class to remove Application key bindings.
+    ///     <para>
+    ///         This version of AddCommand is for commands that do not require a <see cref="CommandContext"/>.
+    ///     </para>
     /// </remarks>
-    /// <param name="view">The view that is bound to the key.</param>
-    internal static void RemoveKeyBindings (View view)
+    /// <param name="command">The command.</param>
+    /// <param name="f">The function.</param>
+    private static void AddCommand (Command command, Func<bool?> f) { CommandImplementations! [command] = ctx => f (); }
+
+    /// <summary>
+    ///     Commands for Application.
+    /// </summary>
+    private static Dictionary<Command, Func<CommandContext, bool?>>? CommandImplementations { get; set; }
+
+    private static void ReplaceKey (Key oldKey, Key newKey)
     {
-        List<KeyBinding> list = KeyBindings.Bindings
-                                           .Where (kv => kv.Value.Scope != KeyBindingScope.Application)
-                                           .Select (kv => kv.Value)
-                                           .Distinct ()
-                                           .ToList ();
+        if (KeyBindings.Bindings.Count == 0)
+        {
+            return;
+        }
+
+        if (newKey == Key.Empty)
+        {
+            KeyBindings.Remove (oldKey);
+        }
+        else
+        {
+            KeyBindings.ReplaceKey (oldKey, newKey);
+        }
     }
 }

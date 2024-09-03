@@ -500,8 +500,13 @@ public class ComboBoxTests (ITestOutputHelper output)
         cb.SetSource (["One", "Two", "Three"]);
         cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
         var top = new Toplevel ();
-        top.Add (cb);
+
+        View otherView = new View () { CanFocus = true };
+
+        top.Add (otherView, cb);
         Application.Begin (top);
+
+        Assert.True (cb.HasFocus);
 
         Assert.True (cb.HideDropdownListOnClick);
         Assert.False (cb.IsShow);
@@ -806,7 +811,7 @@ Three ",
         top.Dispose ();
     }
 
-    [Fact (Skip = "BUGBUG: New focus stuff broke. Fix later.")]
+    [Fact]
     [AutoInitShutdown]
     public void KeyBindings_Command ()
     {
@@ -819,7 +824,6 @@ Three ",
 
         var otherView = new View () { CanFocus = true };
         top.Add (otherView);
-        //        top.FocusFirst (null);
         Application.Begin (top);
 
         Assert.True (cb.HasFocus);
@@ -839,6 +843,7 @@ Three ",
         Assert.False (Application.OnKeyDown (Key.Enter));
         Assert.True (Application.OnKeyDown (Key.F4)); // with no source also expand empty
         Assert.True (cb.IsShow);
+
         Assert.Equal (-1, cb.SelectedItem);
         cb.SetSource (source);
         cb.Text = "";
@@ -852,10 +857,11 @@ Three ",
         Assert.True (Application.OnKeyDown (Key.CursorDown)); // losing focus
         Assert.False (cb.IsShow);
         Assert.False (cb.HasFocus);
-        top.FocusFirst (null); // Gets focus again
+        cb.SetFocus ();
         Assert.False (cb.IsShow);
         Assert.True (cb.HasFocus);
         cb.Expand ();
+
         Assert.True (cb.IsShow);
         Assert.Equal (0, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
@@ -884,6 +890,7 @@ Three ",
         Assert.Equal (0, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
 
+        cb.Draw ();
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 One      ▼
@@ -896,8 +903,9 @@ One
         Assert.True (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
-        Application.Begin (top);
+//        Application.Begin (top);
 
+        cb.Draw ();
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 Two      ▼
@@ -910,8 +918,9 @@ Two
         Assert.True (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
         Assert.Equal ("Three", cb.Text);
-        Application.Begin (top);
+        //Application.Begin (top);
 
+        cb.Draw ();
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 Three    ▼
@@ -960,7 +969,8 @@ Three
         Assert.False (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
-        top.FocusFirst (null); // Gets focus again
+
+        cb.SetFocus ();
         Assert.True (cb.HasFocus);
         Assert.False (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
@@ -974,13 +984,16 @@ Three
         top.Dispose ();
     }
 
-    [Fact (Skip = "BUGBUG: New focus stuff broke. Fix later.")]
+    [Fact]
     public void Source_Equal_Null_Or_Count_Equal_Zero_Sets_SelectedItem_Equal_To_Minus_One ()
     {
+        Application.Navigation = new ();
         var cb = new ComboBox ();
         var top = new Toplevel ();
+        Application.Current = top;
+
         top.Add (cb);
-        top.FocusFirst (null);
+        top.FocusDeepest (NavigationDirection.Forward, null);
         Assert.Null (cb.Source);
         Assert.Equal (-1, cb.SelectedItem);
         ObservableCollection<string> source = [];
@@ -1015,5 +1028,6 @@ Three
         Assert.Equal (0, cb.Source.Count);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
+        Application.ResetState ();
     }
 }

@@ -15,63 +15,16 @@ namespace Terminal.Gui;
 ///         methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
 ///     </para>
 /// </remarks>
-public class DimAuto : Dim
+/// <param name="MaximumContentDim">The maximum dimension the View's ContentSize will be fit to.</param>
+/// <param name="MinimumContentDim">The minimum dimension the View's ContentSize will be constrained to.</param>
+/// <param name="Style">The <see cref="DimAutoStyle"/> of the <see cref="DimAuto"/>.</param>
+public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoStyle Style) : Dim
 {
-    private readonly Dim? _maximumContentDim;
-
-    private readonly Dim? _minimumContentDim;
-
-    private readonly DimAutoStyle _style;
-
-    /// <inheritdoc/>
-    public override bool Equals (object? other)
-    {
-        if (other is not DimAuto auto)
-        {
-            return false;
-        }
-
-        return auto.MinimumContentDim == MinimumContentDim && auto.MaximumContentDim == MaximumContentDim && auto.Style == Style;
-    }
-
-    /// <inheritdoc/>
-    public override int GetHashCode () { return HashCode.Combine (MinimumContentDim, MaximumContentDim, Style); }
-
-    /// <summary>
-    ///     Gets the maximum dimension the View's ContentSize will be fit to. NOT CURRENTLY SUPPORTED.
-    /// </summary>
-
-    // ReSharper disable once ConvertToAutoProperty
-    public required Dim? MaximumContentDim
-    {
-        get => _maximumContentDim;
-        init => _maximumContentDim = value;
-    }
-
-    /// <summary>
-    ///     Gets the minimum dimension the View's ContentSize will be constrained to.
-    /// </summary>
-
-    // ReSharper disable once ConvertToAutoProperty
-    public required Dim? MinimumContentDim
-    {
-        get => _minimumContentDim;
-        init => _minimumContentDim = value;
-    }
-
-    /// <summary>
-    ///     Gets the style of the DimAuto.
-    /// </summary>
-
-    // ReSharper disable once ConvertToAutoProperty
-    public required DimAutoStyle Style
-    {
-        get => _style;
-        init => _style = value;
-    }
-
     /// <inheritdoc/>
     public override string ToString () { return $"Auto({Style},{MinimumContentDim},{MaximumContentDim})"; }
+
+    /// <inheritdoc />
+    internal override int GetAnchor (int size) => 0;
 
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
@@ -178,11 +131,11 @@ public class DimAuto : Dim
                     notDependentSubViews = includedSubviews.Where (
                                                                    v => v.Width is { }
                                                                         && (v.X is PosAbsolute or PosFunc || v.Width is DimAuto or DimAbsolute or DimFunc) // BUGBUG: We should use v.X.Has and v.Width.Has?
-                                                                        && !v.X.Has (typeof (PosAnchorEnd), out _)
-                                                                        && !v.X.Has (typeof (PosAlign), out _)
-                                                                        && !v.X.Has (typeof (PosCenter), out _)
-                                                                        && !v.Width.Has (typeof (DimFill), out _)
-                                                                        && !v.Width.Has (typeof (DimPercent), out _)
+                                                                        && !v.X.Has<PosAnchorEnd> (out _)
+                                                                        && !v.X.Has<PosAlign> (out _)
+                                                                        && !v.X.Has<PosCenter> (out _)
+                                                                        && !v.Width.Has<DimFill> (out _)
+                                                                        && !v.Width.Has<DimPercent> (out _)
                                                                   )
                                                            .ToList ();
                 }
@@ -191,13 +144,18 @@ public class DimAuto : Dim
                     notDependentSubViews = includedSubviews.Where (
                                                                    v => v.Height is { }
                                                                         && (v.Y is PosAbsolute or PosFunc || v.Height is DimAuto or DimAbsolute or DimFunc) // BUGBUG: We should use v.Y.Has and v.Height.Has?
-                                                                        && !v.Y.Has (typeof (PosAnchorEnd), out _)
-                                                                        && !v.Y.Has (typeof (PosAlign), out _)
-                                                                        && !v.Y.Has (typeof (PosCenter), out _)
-                                                                        && !v.Height.Has (typeof (DimFill), out _)
-                                                                        && !v.Height.Has (typeof (DimPercent), out _)
+                                                                        && !v.Y.Has<PosAnchorEnd> (out _)
+                                                                        && !v.Y.Has<PosAlign> (out _)
+                                                                        && !v.Y.Has<PosCenter> (out _)
+                                                                        && !v.Height.Has<DimFill> (out _)
+                                                                        && !v.Height.Has<DimPercent> (out _)
                                                                   )
                                                            .ToList ();
+                }
+
+                foreach (View notDependentSubView in notDependentSubViews)
+                {
+                    notDependentSubView.SetRelativeLayout (us.GetContentSize ());
                 }
 
                 for (var i = 0; i < notDependentSubViews.Count; i++)
@@ -232,11 +190,11 @@ public class DimAuto : Dim
 
                 if (dimension == Dimension.Width)
                 {
-                    centeredSubViews = us.Subviews.Where (v => v.X.Has (typeof (PosCenter), out _)).ToList ();
+                    centeredSubViews = us.Subviews.Where (v => v.X.Has<PosCenter> (out _)).ToList ();
                 }
                 else
                 {
-                    centeredSubViews = us.Subviews.Where (v => v.Y.Has (typeof (PosCenter), out _)).ToList ();
+                    centeredSubViews = us.Subviews.Where (v => v.Y.Has<PosCenter> (out _)).ToList ();
                 }
 
                 viewsNeedingLayout.AddRange (centeredSubViews);
@@ -281,14 +239,14 @@ public class DimAuto : Dim
                                                               {
                                                                   if (dimension == Dimension.Width)
                                                                   {
-                                                                      if (v.X.Has (typeof (PosAlign), out Pos posAlign))
+                                                                      if (v.X.Has<PosAlign> (out Pos posAlign))
                                                                       {
                                                                           return ((PosAlign)posAlign).GroupId;
                                                                       }
                                                                   }
                                                                   else
                                                                   {
-                                                                      if (v.Y.Has (typeof (PosAlign), out Pos posAlign))
+                                                                      if (v.Y.Has<PosAlign> (out Pos posAlign))
                                                                       {
                                                                           return ((PosAlign)posAlign).GroupId;
                                                                       }
@@ -336,11 +294,11 @@ public class DimAuto : Dim
 
                 if (dimension == Dimension.Width)
                 {
-                    anchoredSubViews = includedSubviews.Where (v => v.X.Has (typeof (PosAnchorEnd), out _)).ToList ();
+                    anchoredSubViews = includedSubviews.Where (v => v.X.Has<PosAnchorEnd> (out _)).ToList ();
                 }
                 else
                 {
-                    anchoredSubViews = includedSubviews.Where (v => v.Y.Has (typeof (PosAnchorEnd), out _)).ToList ();
+                    anchoredSubViews = includedSubviews.Where (v => v.Y.Has<PosAnchorEnd> (out _)).ToList ();
                 }
 
                 viewsNeedingLayout.AddRange (anchoredSubViews);
@@ -378,11 +336,11 @@ public class DimAuto : Dim
 
                 if (dimension == Dimension.Width)
                 {
-                    posViewSubViews = includedSubviews.Where (v => v.X.Has (typeof (PosView), out _)).ToList ();
+                    posViewSubViews = includedSubviews.Where (v => v.X.Has<PosView> (out _)).ToList ();
                 }
                 else
                 {
-                    posViewSubViews = includedSubviews.Where (v => v.Y.Has (typeof (PosView), out _)).ToList ();
+                    posViewSubViews = includedSubviews.Where (v => v.Y.Has<PosView> (out _)).ToList ();
                 }
 
                 for (var i = 0; i < posViewSubViews.Count; i++)
@@ -419,11 +377,11 @@ public class DimAuto : Dim
 
                 if (dimension == Dimension.Width)
                 {
-                    dimViewSubViews = includedSubviews.Where (v => v.Width is { } && v.Width.Has (typeof (DimView), out _)).ToList ();
+                    dimViewSubViews = includedSubviews.Where (v => v.Width is { } && v.Width.Has<DimView> (out _)).ToList ();
                 }
                 else
                 {
-                    dimViewSubViews = includedSubviews.Where (v => v.Height is { } && v.Height.Has (typeof (DimView), out _)).ToList ();
+                    dimViewSubViews = includedSubviews.Where (v => v.Height is { } && v.Height.Has<DimView> (out _)).ToList ();
                 }
 
                 for (var i = 0; i < dimViewSubViews.Count; i++)

@@ -4,7 +4,7 @@ namespace Terminal.Gui;
 /// <summary>
 ///     Represents a position that is centered.
 /// </summary>
-public class PosCenter : Pos
+public record PosCenter : Pos
 {
     /// <inheritdoc/>
     public override string ToString () { return "Center"; }

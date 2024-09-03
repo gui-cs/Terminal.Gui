@@ -1,7 +1,7 @@
 ﻿using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
-public class StatusBarTests (ITestOutputHelper output)
+public class StatusBarTests
 {
     [Fact]
     public void AddItemAt_RemoveItem_Replacing ()

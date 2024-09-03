@@ -263,6 +263,7 @@ public class Dialogs : Scenario
             dialog = new ()
             {
                 Title = titleEdit.Text,
+                Text = "Dialog Text",
                 ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentRadioGroup.RadioLabels [alignmentRadioGroup.SelectedItem]),
 
                 Buttons = buttons.ToArray ()
@@ -310,10 +311,10 @@ public class Dialogs : Scenario
                               buttons.Add (button);
                               dialog.AddButton (button);
 
-                              if (buttons.Count > 1)
-                              {
-                                  button.TabIndex = buttons [buttons.Count - 2].TabIndex + 1;
-                              }
+                              //if (buttons.Count > 1)
+                              //{
+                              //    button.TabIndex = buttons [buttons.Count - 2].TabIndex + 1;
+                              //}
                           };
             dialog.Add (add);
 
