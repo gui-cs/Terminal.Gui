@@ -74,7 +74,7 @@ public class Scroll : View
                 SetRelativeLayout (SupView.Frame.Size);
             }
 
-            int barSize = Orientation == Orientation.Vertical ? GetContentSize ().Height : GetContentSize ().Width;
+            int barSize = BarSize;
 
             if (value + barSize > Size)
             {
@@ -126,7 +126,7 @@ public class Scroll : View
     protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
     {
         int location = Orientation == Orientation.Vertical ? mouseEvent.Position.Y : mouseEvent.Position.X;
-        int barSize = Orientation == Orientation.Vertical ? GetContentSize ().Height : GetContentSize ().Width;
+        int barSize = BarSize;
 
         (int topLeft, int bottomRight) sliderPos = _orientation == Orientation.Vertical
                                                        ? new (_slider.Frame.Y, _slider.Frame.Bottom - 1)
@@ -206,6 +206,8 @@ public class Scroll : View
     }
 
     internal ScrollBar? SupView => SuperView as ScrollBar;
+
+    private int BarSize => Orientation == Orientation.Vertical ? GetContentSize ().Height : GetContentSize ().Width;
 
     private void SetScrollText ()
     {
