@@ -27,7 +27,6 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Layout")]
 [ScenarioCategory ("Scrolling")]
-
 public class CharacterMap : Scenario
 {
     public Label _errorLabel;
@@ -243,7 +242,6 @@ public class CharacterMap : Scenario
             // Ensure the typed glyph is selected 
             _charMap.SelectedCodePoint = (int)result;
 
-
             // Cancel the event to prevent ENTER from being handled elsewhere
             e.Handled = true;
         }
@@ -305,7 +303,6 @@ public class CharacterMap : Scenario
 
         return item;
     }
-
 }
 
 internal class CharMap : View
@@ -464,6 +461,7 @@ internal class CharMap : View
 
         // Add scrollbars
         Padding.Thickness = new (0, 0, 1, 0);
+
         ScrollBar hScrollBar = new ()
         {
             X = 0,
@@ -473,10 +471,7 @@ internal class CharMap : View
             Orientation = Orientation.Horizontal
         };
 
-        hScrollBar.VisibleChanged += (sender, args) =>
-                                     {
-                                         Padding.Thickness = Padding.Thickness with { Bottom = hScrollBar.Visible ? 1 : 0 };
-                                     };
+        hScrollBar.VisibleChanged += (sender, args) => { Padding.Thickness = Padding.Thickness with { Bottom = hScrollBar.Visible ? 1 : 0 }; };
 
         ScrollBar vScrollBar = new ()
         {
@@ -491,14 +486,12 @@ internal class CharMap : View
         Padding.Add (vScrollBar, hScrollBar);
         hScrollBar.PositionChanged += (sender, args) => { Viewport = Viewport with { X = args.CurrentValue }; };
 
-        ViewportChanged += UpdateVertialScrollBar;
-
-        void UpdateVertialScrollBar (object sender, DrawEventArgs e)
-        {
-            vScrollBar.Size = GetContentSize ().Height;
-            vScrollBar.Position = Viewport.Y;
-        }
-    }
+        ViewportChanged += (sender, args) =>
+                           {
+                               vScrollBar.Size = GetContentSize ().Height;
+                               vScrollBar.Position = Viewport.Y;
+                           };
+    };
 
     private void Handle_MouseEvent (object sender, MouseEventEventArgs e)
     {
@@ -861,6 +854,7 @@ internal class CharMap : View
         if (me.Flags == MouseFlags.Button1Clicked)
         {
             SelectedCodePoint = val;
+
             return;
         }
 
@@ -976,7 +970,7 @@ internal class CharMap : View
                                                         document.RootElement,
                                                         new
                                                             JsonSerializerOptions
-                                                        { WriteIndented = true }
+                                                            { WriteIndented = true }
                                                        );
             }
 
@@ -1053,7 +1047,7 @@ internal class CharMap : View
             };
             dlg.Add (label);
 
-            var json = new TextView ()
+            var json = new TextView
             {
                 X = 0,
                 Y = Pos.Bottom (label),

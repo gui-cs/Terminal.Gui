@@ -35,24 +35,24 @@ public class ScrollBar : View
     private readonly ScrollButton _decrease;
     private readonly ScrollButton _increase;
 
-    private bool _autoHideScrollBar = true;
+    private bool _autoHide = true;
     private bool _showScrollIndicator = true;
 
-    /// <summary>If true the vertical/horizontal scroll bars won't be shown if it's not needed.</summary>
-    public bool AutoHideScrollBar
+    /// <summary>Gets or sets whether <see cref="View.Visible"/> will be set to <see langword="false"/> if the dimension of the scroll bar is greater than or equal to <see cref="Size"/>.</summary>
+    public bool AutoHide
     {
-        get => _autoHideScrollBar;
+        get => _autoHide;
         set
         {
-            if (_autoHideScrollBar != value)
+            if (_autoHide != value)
             {
-                _autoHideScrollBar = value;
+                _autoHide = value;
                 AdjustAll ();
             }
         }
     }
 
-    /// <summary>Defines if a scrollbar is vertical or horizontal.</summary>
+    /// <summary>Gets or sets if a scrollbar is vertical or horizontal.</summary>
     public Orientation Orientation
     {
         get => _scroll.Orientation;
@@ -63,7 +63,7 @@ public class ScrollBar : View
         }
     }
 
-    /// <summary>The position, relative to <see cref="Size"/>, to set the scrollbar at.</summary>
+    /// <summary>Gets or sets the position, relative to <see cref="Size"/>, to set the scrollbar at.</summary>
     /// <value>The position.</value>
     public int Position
     {
@@ -145,15 +145,15 @@ public class ScrollBar : View
 
     private void AdjustAll ()
     {
-        CheckScrollBarVisibility ();
+        CheckVisibility ();
         _scroll.AdjustScroll ();
         _decrease.AdjustButton ();
         _increase.AdjustButton ();
     }
 
-    private bool CheckScrollBarVisibility ()
+    private bool CheckVisibility ()
     {
-        if (!AutoHideScrollBar)
+        if (!AutoHide)
         {
             if (Visible != _showScrollIndicator)
             {
