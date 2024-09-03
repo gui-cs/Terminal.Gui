@@ -333,7 +333,7 @@ public abstract record Pos
     /// <summary>
     ///     Indicates whether the specified type <typeparamref name="T"/> is in the hierarchy of this Pos object.
     /// </summary>
-    /// <param name="pos">A reference to this <see cref="Pos}"/> instance.</param>
+    /// <param name="pos">A reference to this <see cref="Pos"/> instance.</param>
     /// <returns></returns>
     public bool Has<T> (out Pos pos) where T : Pos
     {

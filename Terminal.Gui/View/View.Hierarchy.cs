@@ -1,10 +1,12 @@
 #nullable enable
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui;
 
 public partial class View // SuperView/SubView hierarchy management (SuperView, SubViews, Add, Remove, etc.)
 {
+    [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     private static readonly IList<View> _empty = new List<View> (0).AsReadOnly ();
 
     private List<View>? _subviews; // This is null, and allocated on demand.
