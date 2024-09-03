@@ -66,8 +66,8 @@ public class TableEditor : Scenario
              "Cuneiform Numbers and Punctuation"
             ),
         new (
-             (uint)(CharMap.MaxCodePoint - 16),
-             (uint)CharMap.MaxCodePoint,
+             (uint)(CharMap._maxCodePoint - 16),
+             (uint)CharMap._maxCodePoint,
              "End"
             ),
         new (0x0020, 0x007F, "Basic Latin"),
