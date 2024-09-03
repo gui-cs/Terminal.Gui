@@ -27,31 +27,31 @@ public class ListViewWithSelection : Scenario
 
         _appWindow = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            Title = GetQuitKeyAndName (),
         };
 
         _scenarios = GetScenarios ();
 
         _customRenderCB = new CheckBox { X = 0, Y = 0, Text = "Use custom rendering" };
         _appWindow.Add (_customRenderCB);
-        _customRenderCB.Toggled += _customRenderCB_Toggled;
+        _customRenderCB.CheckedStateChanging += _customRenderCB_Toggle;
 
         _allowMarkingCB = new CheckBox
         {
-            X = Pos.Right (_customRenderCB) + 1, Y = 0, Text = "Allow Marking", AllowNullChecked = false
+            X = Pos.Right (_customRenderCB) + 1, Y = 0, Text = "Allow Marking", AllowCheckStateNone = false
         };
         _appWindow.Add (_allowMarkingCB);
-        _allowMarkingCB.Toggled += AllowMarkingCB_Toggled;
+        _allowMarkingCB.CheckedStateChanging += AllowMarkingCB_Toggle;
 
         _allowMultipleCB = new CheckBox
         {
             X = Pos.Right (_allowMarkingCB) + 1,
             Y = 0,
-            Visible = (bool)_allowMarkingCB.Checked,
+            Visible = _allowMarkingCB.CheckedState == CheckState.Checked,
             Text = "Allow Multi-Select"
         };
         _appWindow.Add (_allowMultipleCB);
-        _allowMultipleCB.Toggled += AllowMultipleCB_Toggled;
+        _allowMultipleCB.CheckedStateChanging += AllowMultipleCB_Toggle;
 
         _listView = new ListView
         {
@@ -108,9 +108,9 @@ public class ListViewWithSelection : Scenario
 
         var keepCheckBox = new CheckBox
         {
-            X = Pos.AnchorEnd (k.Length + 3), Y = 0, Text = k, Checked = scrollBar.AutoHideScrollBars
+            X = Pos.AnchorEnd (k.Length + 3), Y = 0, Text = k, CheckedState = scrollBar.AutoHideScrollBars ? CheckState.Checked : CheckState.UnChecked
         };
-        keepCheckBox.Toggled += (s, e) => scrollBar.KeepContentAlwaysInViewport = (bool)keepCheckBox.Checked;
+        keepCheckBox.CheckedStateChanging += (s, e) => scrollBar.KeepContentAlwaysInViewport = e.NewValue == CheckState.Checked;
         _appWindow.Add (keepCheckBox);
 
         Application.Run (_appWindow);
@@ -118,9 +118,9 @@ public class ListViewWithSelection : Scenario
         Application.Shutdown ();
     }
 
-    private void _customRenderCB_Toggled (object sender, StateEventArgs<bool?> stateEventArgs)
+    private void _customRenderCB_Toggle (object sender, CancelEventArgs<CheckState> stateEventArgs)
     {
-        if (stateEventArgs.OldValue == true)
+        if (stateEventArgs.CurrentValue == CheckState.Checked)
         {
             _listView.SetSource (_scenarios);
         }
@@ -132,16 +132,16 @@ public class ListViewWithSelection : Scenario
         _appWindow.SetNeedsDisplay ();
     }
 
-    private void AllowMarkingCB_Toggled (object sender, [NotNull] StateEventArgs<bool?> stateEventArgs)
+    private void AllowMarkingCB_Toggle (object sender, [NotNull] CancelEventArgs<CheckState> stateEventArgs)
     {
-        _listView.AllowsMarking = (bool)!stateEventArgs.OldValue;
+        _listView.AllowsMarking = stateEventArgs.NewValue == CheckState.Checked;
         _allowMultipleCB.Visible = _listView.AllowsMarking;
         _appWindow.SetNeedsDisplay ();
     }
 
-    private void AllowMultipleCB_Toggled (object sender, [NotNull] StateEventArgs<bool?> stateEventArgs)
+    private void AllowMultipleCB_Toggle (object sender, [NotNull] CancelEventArgs<CheckState> stateEventArgs)
     {
-        _listView.AllowsMultipleSelection = (bool)!stateEventArgs.OldValue;
+        _listView.AllowsMultipleSelection = stateEventArgs.NewValue == CheckState.Checked;
         _appWindow.SetNeedsDisplay ();
     }
 
@@ -202,10 +202,12 @@ public class ListViewWithSelection : Scenario
 
             return false;
         }
-
+#pragma warning disable CS0067
         /// <inheritdoc />
         public event NotifyCollectionChangedEventHandler CollectionChanged;
-        public int Count => Scenarios != null ? Scenarios.Count : 0;
+#pragma warning restore CS0067
+
+        public int Count => Scenarios?.Count ?? 0;
         public int Length { get; private set; }
         public bool SuspendCollectionChangedEvent { get => throw new System.NotImplementedException (); set => throw new System.NotImplementedException (); }
 

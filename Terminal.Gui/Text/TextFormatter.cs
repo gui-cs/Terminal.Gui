@@ -1,22 +1,21 @@
+#nullable enable
 using System.Diagnostics;
 
 namespace Terminal.Gui;
 
 /// <summary>
-///     Provides text formatting. Supports <see cref="View.HotKey"/>s, horizontal alignment, vertical alignment,
+///     Provides text formatting. Supports <see cref="View.HotKey"/>s, horizontal and vertical alignment, text direction,
 ///     multiple lines, and word-based line wrap.
 /// </summary>
 public class TextFormatter
 {
-    private bool _autoSize;
     private Key _hotKey = new ();
     private int _hotKeyPos = -1;
     private List<string> _lines = new ();
     private bool _multiLine;
     private bool _preserveTrailingSpaces;
-    private Size _size;
     private int _tabWidth = 4;
-    private string _text;
+    private string? _text;
     private Alignment _textAlignment = Alignment.Start;
     private TextDirection _textDirection;
     private Alignment _textVerticalAlignment = Alignment.Start;
@@ -30,67 +29,6 @@ public class TextFormatter
         set => _textAlignment = EnableNeedsFormat (value);
     }
 
-    /// <summary>Gets or sets whether the <see cref="Size"/> should be automatically changed to fit the <see cref="Text"/>.</summary>
-    /// <remarks>
-    ///     <para>Used when <see cref="View"/> is using <see cref="Dim.Auto"/> to resize the view's <see cref="View.Viewport"/> to fit <see cref="Size"/>.</para>
-    ///     <para>
-    ///         AutoSize is ignored if <see cref="Gui.Alignment.Fill"/> is used.
-    ///     </para>
-    /// </remarks>
-    public bool AutoSize
-    {
-        get => _autoSize;
-        set
-        {
-            _autoSize = EnableNeedsFormat (value);
-
-            if (_autoSize)
-            {
-                Size = GetAutoSize ();
-            }
-        }
-    }
-
-    internal Size GetAutoSize ()
-    {
-        Size size = CalcRect (0, 0, Text, Direction, TabWidth).Size;
-        return size with
-        {
-            Width = size.Width - GetHotKeySpecifierLength (),
-            Height = size.Height - GetHotKeySpecifierLength (false)
-        };
-
-    }
-    /// <summary>
-    ///     Gets the width or height of the <see cref="TextFormatter.HotKeySpecifier"/> characters
-    ///     in the <see cref="Text"/> property.
-    /// </summary>
-    /// <remarks>
-    ///     Only the first HotKey specifier found in <see cref="Text"/> is supported.
-    /// </remarks>
-    /// <param name="isWidth">
-    ///     If <see langword="true"/> (the default) the width required for the HotKey specifier is returned. Otherwise, the
-    ///     height is returned.
-    /// </param>
-    /// <returns>
-    ///     The number of characters required for the <see cref="TextFormatter.HotKeySpecifier"/>. If the text
-    ///     direction specified
-    ///     by <see cref="TextDirection"/> does not match the <paramref name="isWidth"/> parameter, <c>0</c> is returned.
-    /// </returns>
-    public int GetHotKeySpecifierLength (bool isWidth = true)
-    {
-        if (isWidth)
-        {
-            return TextFormatter.IsHorizontalDirection (Direction) && Text?.Contains ((char)HotKeySpecifier.Value) == true
-                       ? Math.Max (HotKeySpecifier.GetColumns (), 0)
-                       : 0;
-        }
-
-        return TextFormatter.IsVerticalDirection (Direction) && Text?.Contains ((char)HotKeySpecifier.Value) == true
-                   ? Math.Max (HotKeySpecifier.GetColumns (), 0)
-                   : 0;
-    }
-
     /// <summary>
     ///     Gets the cursor position of the <see cref="HotKey"/>. If the <see cref="HotKey"/> is defined, the cursor will
     ///     be positioned over it.
@@ -102,139 +40,7 @@ public class TextFormatter
     public TextDirection Direction
     {
         get => _textDirection;
-        set
-        {
-            _textDirection = EnableNeedsFormat (value);
-
-            if (AutoSize)
-            {
-                Size = GetAutoSize ();
-            }
-        }
-    }
-    
-    /// <summary>
-    ///     Determines if the viewport width will be used or only the text width will be used,
-    ///     If <see langword="true"/> all the viewport area will be filled with whitespaces and the same background color
-    ///     showing a perfect rectangle.
-    /// </summary>
-    public bool FillRemaining { get; set; }
-
-    /// <summary>Gets or sets the hot key. Fires the <see cref="HotKeyChanged"/> event.</summary>
-    public Key HotKey
-    {
-        get => _hotKey;
-        internal set
-        {
-            if (_hotKey != value)
-            {
-                Key oldKey = _hotKey;
-                _hotKey = value;
-                HotKeyChanged?.Invoke (this, new KeyChangedEventArgs (oldKey, value));
-            }
-        }
-    }
-
-    /// <summary>The position in the text of the hot key. The hot key will be rendered using the hot color.</summary>
-    public int HotKeyPos
-    {
-        get => _hotKeyPos;
-        internal set => _hotKeyPos = value;
-    }
-
-    /// <summary>
-    ///     The specifier character for the hot key (e.g. '_'). Set to '\xffff' to disable hot key support for this View
-    ///     instance. The default is '\xffff'.
-    /// </summary>
-    public Rune HotKeySpecifier { get; set; } = (Rune)0xFFFF;
-
-    /// <summary>Gets or sets a value indicating whether multi line is allowed.</summary>
-    /// <remarks>Multi line is ignored if <see cref="WordWrap"/> is <see langword="true"/>.</remarks>
-    public bool MultiLine
-    {
-        get => _multiLine;
-        set => _multiLine = EnableNeedsFormat (value);
-    }
-
-    /// <summary>Gets or sets whether the <see cref="TextFormatter"/> needs to format the text.</summary>
-    /// <remarks>
-    ///     <para>If <see langword="false"/> when Draw is called, the Draw call will be faster.</para>
-    ///     <para>Used by <see cref="Draw"/></para>
-    ///     <para>Set to <see langword="true"/> when any of the properties of <see cref="TextFormatter"/> are set.</para>
-    ///     <para>Set to <see langword="false"/> when the text is formatted (if <see cref="GetLines"/> is accessed).</para>
-    /// </remarks>
-    public bool NeedsFormat { get; set; }
-
-    /// <summary>
-    ///     Gets or sets whether trailing spaces at the end of word-wrapped lines are preserved or not when
-    ///     <see cref="TextFormatter.WordWrap"/> is enabled. If <see langword="true"/> trailing spaces at the end of wrapped
-    ///     lines will be removed when <see cref="Text"/> is formatted for display. The default is <see langword="false"/>.
-    /// </summary>
-    public bool PreserveTrailingSpaces
-    {
-        get => _preserveTrailingSpaces;
-        set => _preserveTrailingSpaces = EnableNeedsFormat (value);
-    }
-
-    /// <summary>Gets or sets the size <see cref="Text"/> will be constrained to when formatted.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         Does not return the size of the formatted text but the size that will be used to constrain the text when
-    ///         formatted.
-    ///     </para>
-    ///     <para>When set, <see cref="NeedsFormat"/> is set to <see langword="true"/>.</para>
-    /// </remarks>
-    public Size Size
-    {
-        get => _size;
-        set
-        {
-            if (AutoSize)
-            {
-                _size = EnableNeedsFormat (GetAutoSize());
-            }
-            else
-            {
-                _size = EnableNeedsFormat (value);
-            }
-        }
-    }
-
-    /// <summary>Gets or sets the number of columns used for a tab.</summary>
-    public int TabWidth
-    {
-        get => _tabWidth;
-        set => _tabWidth = EnableNeedsFormat (value);
-    }
-
-    /// <summary>The text to be formatted. This string is never modified.</summary>
-    public virtual string Text
-    {
-        get => _text;
-        set
-        {
-            _text = EnableNeedsFormat (value);
-
-            if (AutoSize)
-            {
-                Size = GetAutoSize (); ;
-            }
-        }
-    }
-
-    /// <summary>Gets or sets the vertical text-alignment.</summary>
-    /// <value>The text vertical alignment.</value>
-    public Alignment VerticalAlignment
-    {
-        get => _textVerticalAlignment;
-        set => _textVerticalAlignment = EnableNeedsFormat (value);
-    }
-
-    /// <summary>Gets or sets whether word wrap will be used to fit <see cref="Text"/> to <see cref="Size"/>.</summary>
-    public bool WordWrap
-    {
-        get => _wordWrap;
-        set => _wordWrap = EnableNeedsFormat (value);
+        set => _textDirection = EnableNeedsFormat (value);
     }
 
     /// <summary>Draws the text held by <see cref="TextFormatter"/> to <see cref="ConsoleDriver"/> using the colors specified.</summary>
@@ -253,7 +59,7 @@ public class TextFormatter
         Attribute normalColor,
         Attribute hotColor,
         Rectangle maximum = default,
-        ConsoleDriver driver = null
+        ConsoleDriver? driver = null
     )
     {
         // With this check, we protect against subclasses with overrides of Text (like Button)
@@ -451,16 +257,16 @@ public class TextFormatter
             }
             else
             {
-               Debug.WriteLine ($"Unsupported Alignment: {nameof (VerticalAlignment)}");
+                Debug.WriteLine ($"Unsupported Alignment: {nameof (VerticalAlignment)}");
 
-               return;
+                return;
             }
 
             int colOffset = screen.X < 0 ? Math.Abs (screen.X) : 0;
             int start = isVertical ? screen.Top : screen.Left;
             int size = isVertical ? screen.Height : screen.Width;
             int current = start + colOffset;
-            List<Point?> lastZeroWidthPos = null;
+            List<Point?> lastZeroWidthPos = null!;
             Rune rune = default;
             int zeroLengthCount = isVertical ? runes.Sum (r => r.GetColumns () == 0 ? 1 : 0) : 0;
 
@@ -487,8 +293,12 @@ public class TextFormatter
                         break;
                     }
 
-                    if ((!isVertical && (current - start > maxScreen.Left + maxScreen.Width - screen.X + colOffset || (idx < runes.Length && runes [idx].GetColumns () > screen.Width)))
-                        || (isVertical && ((current > start + size + zeroLengthCount && idx > maxScreen.Top + maxScreen.Height - screen.Y) || (idx < runes.Length && runes [idx].GetColumns () > screen.Width))))
+                    if ((!isVertical
+                         && (current - start > maxScreen.Left + maxScreen.Width - screen.X + colOffset
+                             || (idx < runes.Length && runes [idx].GetColumns () > screen.Width)))
+                        || (isVertical
+                            && ((current > start + size + zeroLengthCount && idx > maxScreen.Top + maxScreen.Height - screen.Y)
+                                || (idx < runes.Length && runes [idx].GetColumns () > screen.Width))))
                     {
                         break;
                     }
@@ -525,12 +335,12 @@ public class TextFormatter
                             {
                                 lastZeroWidthPos [foundIdx] =
                                     new Point (
-                                               lastZeroWidthPos [foundIdx].Value.X + 1,
+                                               lastZeroWidthPos [foundIdx]!.Value.X + 1,
                                                current
                                               );
 
                                 driver?.Move (
-                                              lastZeroWidthPos [foundIdx].Value.X,
+                                              lastZeroWidthPos [foundIdx]!.Value.X,
                                               current
                                              );
                             }
@@ -581,7 +391,7 @@ public class TextFormatter
                         {
                             if (lastZeroWidthPos is null)
                             {
-                                lastZeroWidthPos = new List<Point?> ();
+                                lastZeroWidthPos = new ();
                             }
 
                             int foundIdx = lastZeroWidthPos.IndexOf (
@@ -626,7 +436,14 @@ public class TextFormatter
         }
     }
 
-    /// <summary>Returns the formatted text, constrained to <see cref="Size"/>.</summary>
+    /// <summary>
+    ///     Determines if the viewport width will be used or only the text width will be used,
+    ///     If <see langword="true"/> all the viewport area will be filled with whitespaces and the same background color
+    ///     showing a perfect rectangle.
+    /// </summary>
+    public bool FillRemaining { get; set; }
+
+    /// <summary>Returns the formatted text, constrained to <see cref="ConstrainToSize"/>.</summary>
     /// <remarks>
     ///     If <see cref="NeedsFormat"/> is <see langword="true"/>, causes a format, resetting <see cref="NeedsFormat"/>
     ///     to <see langword="false"/>.
@@ -645,23 +462,110 @@ public class TextFormatter
         return sb.ToString ().TrimEnd (Environment.NewLine.ToCharArray ());
     }
 
-    /// <summary>Gets the size required to hold the formatted text, given the constraints placed by <see cref="Size"/>.</summary>
+    /// <summary>Gets the size required to hold the formatted text, given the constraints placed by <see cref="ConstrainToSize"/>.</summary>
     /// <remarks>Causes a format, resetting <see cref="NeedsFormat"/> to <see langword="false"/>.</remarks>
+    /// <param name="constrainSize">
+    ///     If provided, will cause the text to be constrained to the provided size instead of <see cref="ConstrainToWidth"/> and
+    ///     <see cref="ConstrainToHeight"/>.
+    /// </param>
     /// <returns>The size required to hold the formatted text.</returns>
-    public Size FormatAndGetSize ()
+    public Size FormatAndGetSize (Size? constrainSize = null)
     {
-        if (string.IsNullOrEmpty (Text) || Size.Height == 0 || Size.Width == 0)
+        if (string.IsNullOrEmpty (Text))
         {
-            return Size.Empty;
+            return System.Drawing.Size.Empty;
         }
 
-        int width = GetLines ().Max (static line => line.GetColumns ());
-        int height = GetLines ().Count;
+        int? prevWidth = _constrainToWidth;
+        int? prevHeight = _constrainToHeight;
+
+        if (constrainSize is { })
+        {
+            _constrainToWidth = constrainSize?.Width;
+            _constrainToHeight = constrainSize?.Height;
+        }
+
+        // HACK: Fill normally will fill the entire constraint size, but we need to know the actual size of the text.
+        Alignment prevAlignment = Alignment;
+
+        if (Alignment == Alignment.Fill)
+        {
+            Alignment = Alignment.Start;
+        }
+
+        Alignment prevVerticalAlignment = VerticalAlignment;
+
+        if (VerticalAlignment == Alignment.Fill)
+        {
+            VerticalAlignment = Alignment.Start;
+        }
+
+        // This calls Format
+        List<string> lines = GetLines ();
+
+        // Undo hacks
+        Alignment = prevAlignment;
+        VerticalAlignment = prevVerticalAlignment;
+
+        if (constrainSize is { })
+        {
+            _constrainToWidth = prevWidth ?? null;
+            _constrainToHeight = prevHeight ?? null;
+        }
+
+        if (lines.Count == 0)
+        {
+            return System.Drawing.Size.Empty;
+        }
+
+        int width;
+        int height;
+
+        if (IsVerticalDirection (Direction))
+        {
+            width = GetColumnsRequiredForVerticalText (lines, 0, lines.Count, TabWidth);
+            height = lines.Max (static line => line.Length);
+        }
+        else
+        {
+            width = lines.Max (static line => line.GetColumns ());
+            height = lines.Count;
+        }
 
         return new (width, height);
     }
 
-    /// <summary>Gets a list of formatted lines, constrained to <see cref="Size"/>.</summary>
+    /// <summary>
+    ///     Gets the width or height of the <see cref="TextFormatter.HotKeySpecifier"/> characters
+    ///     in the <see cref="Text"/> property.
+    /// </summary>
+    /// <remarks>
+    ///     Only the first HotKey specifier found in <see cref="Text"/> is supported.
+    /// </remarks>
+    /// <param name="isWidth">
+    ///     If <see langword="true"/> (the default) the width required for the HotKey specifier is returned. Otherwise, the
+    ///     height is returned.
+    /// </param>
+    /// <returns>
+    ///     The number of characters required for the <see cref="TextFormatter.HotKeySpecifier"/>. If the text
+    ///     direction specified
+    ///     by <see cref="TextDirection"/> does not match the <paramref name="isWidth"/> parameter, <c>0</c> is returned.
+    /// </returns>
+    public int GetHotKeySpecifierLength (bool isWidth = true)
+    {
+        if (isWidth)
+        {
+            return IsHorizontalDirection (Direction) && Text?.Contains ((char)HotKeySpecifier.Value) == true
+                       ? Math.Max (HotKeySpecifier.GetColumns (), 0)
+                       : 0;
+        }
+
+        return IsVerticalDirection (Direction) && Text?.Contains ((char)HotKeySpecifier.Value) == true
+                   ? Math.Max (HotKeySpecifier.GetColumns (), 0)
+                   : 0;
+    }
+
+    /// <summary>Gets a list of formatted lines, constrained to <see cref="ConstrainToSize"/>.</summary>
     /// <remarks>
     ///     <para>
     ///         If the text needs to be formatted (if <see cref="NeedsFormat"/> is <see langword="true"/>)
@@ -669,86 +573,282 @@ public class TextFormatter
     ///         <see cref="NeedsFormat"/> will be <see langword="false"/>.
     ///     </para>
     ///     <para>
-    ///         If either of the dimensions of <see cref="Size"/> are zero, the text will not be formatted and no lines will
+    ///         If either of the dimensions of <see cref="ConstrainToSize"/> are zero, the text will not be formatted and no lines will
     ///         be returned.
     ///     </para>
     /// </remarks>
     public List<string> GetLines ()
     {
+        string text = _text!.ReplaceLineEndings ();
+
         // With this check, we protect against subclasses with overrides of Text
-        if (string.IsNullOrEmpty (Text) || Size.Height == 0 || Size.Width == 0)
+        if (string.IsNullOrEmpty (Text) || ConstrainToWidth is 0 || ConstrainToHeight is 0)
         {
-            _lines = new List<string> { string.Empty };
+            _lines = [string.Empty];
             NeedsFormat = false;
 
             return _lines;
         }
 
-        if (NeedsFormat)
+        if (!NeedsFormat)
         {
-            string text = _text;
-
-            if (FindHotKey (_text, HotKeySpecifier, out _hotKeyPos, out Key newHotKey))
-            {
-                HotKey = newHotKey;
-                text = RemoveHotKeySpecifier (Text, _hotKeyPos, HotKeySpecifier);
-                text = ReplaceHotKeyWithTag (text, _hotKeyPos);
-            }
-
-            if (IsVerticalDirection (Direction))
-            {
-                int colsWidth = GetSumMaxCharWidth (text, 0, 1, TabWidth);
-
-                _lines = Format (
-                                 text,
-                                 Size.Height,
-                                 VerticalAlignment == Alignment.Fill,
-                                 Size.Width > colsWidth && WordWrap,
-                                 PreserveTrailingSpaces,
-                                 TabWidth,
-                                 Direction,
-                                 MultiLine,
-                                 this
-                                );
-
-                if (!AutoSize)
-                {
-                    colsWidth = GetMaxColsForWidth (_lines, Size.Width, TabWidth);
-
-                    if (_lines.Count > colsWidth)
-                    {
-                        _lines.RemoveRange (colsWidth, _lines.Count - colsWidth);
-                    }
-                }
-            }
-            else
-            {
-                _lines = Format (
-                                 text,
-                                 Size.Width,
-                                 Alignment == Alignment.Fill,
-                                 Size.Height > 1 && WordWrap,
-                                 PreserveTrailingSpaces,
-                                 TabWidth,
-                                 Direction,
-                                 MultiLine,
-                                 this
-                                );
-
-                if (!AutoSize && _lines.Count > Size.Height)
-                {
-                    _lines.RemoveRange (Size.Height, _lines.Count - Size.Height);
-                }
-            }
-
-            NeedsFormat = false;
+            return _lines;
         }
+
+        int width = ConstrainToWidth ?? int.MaxValue;
+        int height = ConstrainToHeight ?? int.MaxValue;
+
+        if (FindHotKey (_text!, HotKeySpecifier, out _hotKeyPos, out Key newHotKey))
+        {
+            HotKey = newHotKey;
+            text = RemoveHotKeySpecifier (Text, _hotKeyPos, HotKeySpecifier);
+            text = ReplaceHotKeyWithTag (text, _hotKeyPos);
+        }
+
+        if (IsVerticalDirection (Direction))
+        {
+            int colsWidth = GetSumMaxCharWidth (text, 0, 1, TabWidth);
+
+            _lines = Format (
+                             text,
+                             height,
+                             VerticalAlignment == Alignment.Fill,
+                             width > colsWidth && WordWrap,
+                             PreserveTrailingSpaces,
+                             TabWidth,
+                             Direction,
+                             MultiLine,
+                             this
+                            );
+
+            colsWidth = GetMaxColsForWidth (_lines, width, TabWidth);
+
+            if (_lines.Count > colsWidth)
+            {
+                _lines.RemoveRange (colsWidth, _lines.Count - colsWidth);
+            }
+        }
+        else
+        {
+            _lines = Format (
+                             text,
+                             width,
+                             Alignment == Alignment.Fill,
+                             height > 1 && WordWrap,
+                             PreserveTrailingSpaces,
+                             TabWidth,
+                             Direction,
+                             MultiLine,
+                             this
+                            );
+
+            if (_lines.Count > height)
+            {
+                _lines.RemoveRange (height, _lines.Count - height);
+            }
+        }
+
+        NeedsFormat = false;
 
         return _lines;
     }
 
+    private int? _constrainToWidth;
+
+    /// <summary>Gets or sets the width <see cref="Text"/> will be constrained to when formatted.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         Does not return the width of the formatted text but the width that will be used to constrain the text when
+    ///         formatted.
+    ///     </para>
+    ///     <para>
+    ///         If <see langword="null"/> the height will be unconstrained. if both <see cref="ConstrainToWidth"/> and <see cref="ConstrainToHeight"/> are <see langword="null"/> the text will be formatted to the size of the text.
+    ///     </para>
+    ///     <para>
+    ///         Use <see cref="FormatAndGetSize"/> to get the size of the formatted text.
+    ///     </para>
+    ///     <para>When set, <see cref="NeedsFormat"/> is set to <see langword="true"/>.</para>
+    /// </remarks>
+    public int? ConstrainToWidth
+    {
+        get => _constrainToWidth;
+        set
+        {
+            if (_constrainToWidth == value)
+            {
+                return;
+            }
+
+            ArgumentOutOfRangeException.ThrowIfNegative (value.GetValueOrDefault (), nameof (ConstrainToWidth));
+
+            _constrainToWidth = EnableNeedsFormat (value);
+        }
+    }
+
+    private int? _constrainToHeight;
+
+    /// <summary>Gets or sets the height <see cref="Text"/> will be constrained to when formatted.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         Does not return the height of the formatted text but the height that will be used to constrain the text when
+    ///         formatted.
+    ///     </para>
+    ///     <para>
+    ///         If <see langword="null"/> the height will be unconstrained. if both <see cref="ConstrainToWidth"/> and <see cref="ConstrainToHeight"/> are <see langword="null"/> the text will be formatted to the size of the text.
+    ///     </para>
+    ///     <para>
+    ///         Use <see cref="FormatAndGetSize"/> to get the size of the formatted text.
+    ///     </para>
+    ///     <para>When set, <see cref="NeedsFormat"/> is set to <see langword="true"/>.</para>
+    /// </remarks>
+
+    public int? ConstrainToHeight
+    {
+        get => _constrainToHeight;
+        set
+        {
+            if (_constrainToHeight == value)
+            {
+                return;
+            }
+
+            ArgumentOutOfRangeException.ThrowIfNegative (value.GetValueOrDefault (), nameof (ConstrainToHeight));
+
+            _constrainToHeight = EnableNeedsFormat (value);
+        }
+    }
+
+    /// <summary>Gets or sets the width and height <see cref="Text"/> will be constrained to when formatted.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         Does not return the size of the formatted text but the size that will be used to constrain the text when
+    ///         formatted.
+    ///     </para>
+    ///     <para>
+    ///         If <see langword="null"/> both the width and height will be unconstrained and text will be formatted to the size of the text.
+    ///     </para>
+    ///     <para>
+    ///         Setting this property is the same as setting <see cref="ConstrainToWidth"/> and <see cref="ConstrainToHeight"/> separately.
+    ///     </para>
+    ///     <para>
+    ///         Use <see cref="FormatAndGetSize"/> to get the size of the formatted text.
+    ///     </para>
+    ///     <para>When set, <see cref="NeedsFormat"/> is set to <see langword="true"/>.</para>
+    /// </remarks>
+    public Size? ConstrainToSize
+    {
+        get
+        {
+            if (_constrainToWidth is null || _constrainToHeight is null)
+            {
+                return null;
+            }
+
+            return new Size (_constrainToWidth.Value, _constrainToHeight.Value);
+        }
+        set
+        {
+            if (value is null)
+            {
+                _constrainToWidth = null;
+                _constrainToHeight = null;
+                EnableNeedsFormat (true);
+            }
+            else
+            {
+                _constrainToWidth = EnableNeedsFormat (value.Value.Width);
+                _constrainToHeight = EnableNeedsFormat (value.Value.Height);
+            }
+        }
+    }
+
+    /// <summary>Gets or sets the hot key. Fires the <see cref="HotKeyChanged"/> event.</summary>
+    public Key HotKey
+    {
+        get => _hotKey;
+        internal set
+        {
+            if (_hotKey != value)
+            {
+                Key oldKey = _hotKey;
+                _hotKey = value;
+                HotKeyChanged?.Invoke (this, new (oldKey, value));
+            }
+        }
+    }
+
     /// <summary>Event invoked when the <see cref="HotKey"/> is changed.</summary>
-    public event EventHandler<KeyChangedEventArgs> HotKeyChanged;
+    public event EventHandler<KeyChangedEventArgs>? HotKeyChanged;
+
+    /// <summary>The position in the text of the hot key. The hot key will be rendered using the hot color.</summary>
+    public int HotKeyPos
+    {
+        get => _hotKeyPos;
+        internal set => _hotKeyPos = value;
+    }
+
+    /// <summary>
+    ///     The specifier character for the hot key (e.g. '_'). Set to '\xffff' to disable hot key support for this View
+    ///     instance. The default is '\xffff'.
+    /// </summary>
+    public Rune HotKeySpecifier { get; set; } = (Rune)0xFFFF;
+
+    /// <summary>Gets or sets a value indicating whether multi line is allowed.</summary>
+    /// <remarks>Multi line is ignored if <see cref="WordWrap"/> is <see langword="true"/>.</remarks>
+    public bool MultiLine
+    {
+        get => _multiLine;
+        set => _multiLine = EnableNeedsFormat (value);
+    }
+
+    /// <summary>Gets or sets whether the <see cref="TextFormatter"/> needs to format the text.</summary>
+    /// <remarks>
+    ///     <para>If <see langword="false"/> when Draw is called, the Draw call will be faster.</para>
+    ///     <para>Used by <see cref="Draw"/></para>
+    ///     <para>Set to <see langword="true"/> when any of the properties of <see cref="TextFormatter"/> are set.</para>
+    ///     <para>Set to <see langword="false"/> when the text is formatted (if <see cref="GetLines"/> is accessed).</para>
+    /// </remarks>
+    public bool NeedsFormat { get; set; }
+
+    /// <summary>
+    ///     Gets or sets whether trailing spaces at the end of word-wrapped lines are preserved or not when
+    ///     <see cref="TextFormatter.WordWrap"/> is enabled. If <see langword="true"/> trailing spaces at the end of wrapped
+    ///     lines will be removed when <see cref="Text"/> is formatted for display. The default is <see langword="false"/>.
+    /// </summary>
+    public bool PreserveTrailingSpaces
+    {
+        get => _preserveTrailingSpaces;
+        set => _preserveTrailingSpaces = EnableNeedsFormat (value);
+    }
+
+    /// <summary>Gets or sets the number of columns used for a tab.</summary>
+    public int TabWidth
+    {
+        get => _tabWidth;
+        set => _tabWidth = EnableNeedsFormat (value);
+    }
+
+    /// <summary>The text to be formatted. This string is never modified.</summary>
+    public string Text
+    {
+        get => _text!;
+        set => _text = EnableNeedsFormat (value);
+    }
+
+    /// <summary>Gets or sets the vertical text-alignment.</summary>
+    /// <value>The text vertical alignment.</value>
+    public Alignment VerticalAlignment
+    {
+        get => _textVerticalAlignment;
+        set => _textVerticalAlignment = EnableNeedsFormat (value);
+    }
+
+    /// <summary>Gets or sets whether word wrap will be used to fit <see cref="Text"/> to <see cref="ConstrainToSize"/>.</summary>
+    public bool WordWrap
+    {
+        get => _wordWrap;
+        set => _wordWrap = EnableNeedsFormat (value);
+    }
 
     /// <summary>Sets <see cref="NeedsFormat"/> to <see langword="true"/> and returns the value.</summary>
     /// <typeparam name="T"></typeparam>
@@ -767,48 +867,48 @@ public class TextFormatter
     public static bool IsHorizontalDirection (TextDirection textDirection)
     {
         return textDirection switch
-        {
-            TextDirection.LeftRight_TopBottom => true,
-            TextDirection.LeftRight_BottomTop => true,
-            TextDirection.RightLeft_TopBottom => true,
-            TextDirection.RightLeft_BottomTop => true,
-            _ => false
-        };
+               {
+                   TextDirection.LeftRight_TopBottom => true,
+                   TextDirection.LeftRight_BottomTop => true,
+                   TextDirection.RightLeft_TopBottom => true,
+                   TextDirection.RightLeft_BottomTop => true,
+                   _ => false
+               };
     }
 
     /// <summary>Check if it is a vertical direction</summary>
     public static bool IsVerticalDirection (TextDirection textDirection)
     {
         return textDirection switch
-        {
-            TextDirection.TopBottom_LeftRight => true,
-            TextDirection.TopBottom_RightLeft => true,
-            TextDirection.BottomTop_LeftRight => true,
-            TextDirection.BottomTop_RightLeft => true,
-            _ => false
-        };
+               {
+                   TextDirection.TopBottom_LeftRight => true,
+                   TextDirection.TopBottom_RightLeft => true,
+                   TextDirection.BottomTop_LeftRight => true,
+                   TextDirection.BottomTop_RightLeft => true,
+                   _ => false
+               };
     }
 
     /// <summary>Check if it is Left to Right direction</summary>
     public static bool IsLeftToRight (TextDirection textDirection)
     {
         return textDirection switch
-        {
-            TextDirection.LeftRight_TopBottom => true,
-            TextDirection.LeftRight_BottomTop => true,
-            _ => false
-        };
+               {
+                   TextDirection.LeftRight_TopBottom => true,
+                   TextDirection.LeftRight_BottomTop => true,
+                   _ => false
+               };
     }
 
     /// <summary>Check if it is Top to Bottom direction</summary>
     public static bool IsTopToBottom (TextDirection textDirection)
     {
         return textDirection switch
-        {
-            TextDirection.TopBottom_LeftRight => true,
-            TextDirection.TopBottom_RightLeft => true,
-            _ => false
-        };
+               {
+                   TextDirection.TopBottom_LeftRight => true,
+                   TextDirection.TopBottom_RightLeft => true,
+                   _ => false
+               };
     }
 
     // TODO: Move to StringExtensions?
@@ -896,7 +996,7 @@ public class TextFormatter
             return str.Replace ("\t", "");
         }
 
-        return str.Replace ("\t", new string (' ', tabWidth));
+        return str.Replace ("\t", new (' ', tabWidth));
     }
 
     // TODO: Move to StringExtensions?
@@ -987,7 +1087,7 @@ public class TextFormatter
         }
 
         // value is too wide
-        return new string (text.TakeWhile (c => (width -= ((Rune)c).GetColumns ()) >= 0).ToArray ());
+        return new (text.TakeWhile (c => (width -= ((Rune)c).GetColumns ()) >= 0).ToArray ());
     }
 
     /// <summary>Formats the provided text to fit within the width provided using word wrapping.</summary>
@@ -1016,13 +1116,10 @@ public class TextFormatter
         bool preserveTrailingSpaces = false,
         int tabWidth = 0,
         TextDirection textDirection = TextDirection.LeftRight_TopBottom,
-        TextFormatter textFormatter = null
+        TextFormatter? textFormatter = null
     )
     {
-        if (width < 0)
-        {
-            throw new ArgumentOutOfRangeException ($"{nameof (width)} cannot be negative.");
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative (width, nameof (width));
 
         List<string> lines = new ();
 
@@ -1200,21 +1297,21 @@ public class TextFormatter
                     case ' ':
                         return GetNextWhiteSpace (to + 1, cWidth, out incomplete, length);
                     case '\t':
+                    {
+                        length += tabWidth + 1;
+
+                        if (length == tabWidth && tabWidth > cWidth)
                         {
-                            length += tabWidth + 1;
-
-                            if (length == tabWidth && tabWidth > cWidth)
-                            {
-                                return to + 1;
-                            }
-
-                            if (length > cWidth && tabWidth > cWidth)
-                            {
-                                return to;
-                            }
-
-                            return GetNextWhiteSpace (to + 1, cWidth, out incomplete, length);
+                            return to + 1;
                         }
+
+                        if (length > cWidth && tabWidth > cWidth)
+                        {
+                            return to;
+                        }
+
+                        return GetNextWhiteSpace (to + 1, cWidth, out incomplete, length);
+                    }
                     default:
                         to++;
 
@@ -1223,11 +1320,11 @@ public class TextFormatter
             }
 
             return cLength switch
-            {
-                > 0 when to < runes.Count && runes [to].Value != ' ' && runes [to].Value != '\t' => from,
-                > 0 when to < runes.Count && (runes [to].Value == ' ' || runes [to].Value == '\t') => from,
-                _ => to
-            };
+                   {
+                       > 0 when to < runes.Count && runes [to].Value != ' ' && runes [to].Value != '\t' => from,
+                       > 0 when to < runes.Count && (runes [to].Value == ' ' || runes [to].Value == '\t') => from,
+                       _ => to
+                   };
         }
 
         if (start < text.GetRuneCount ())
@@ -1263,7 +1360,7 @@ public class TextFormatter
         Alignment textAlignment,
         TextDirection textDirection = TextDirection.LeftRight_TopBottom,
         int tabWidth = 0,
-        TextFormatter textFormatter = null
+        TextFormatter? textFormatter = null
     )
     {
         return ClipAndJustify (text, width, textAlignment == Alignment.Fill, textDirection, tabWidth, textFormatter);
@@ -1286,13 +1383,10 @@ public class TextFormatter
         bool justify,
         TextDirection textDirection = TextDirection.LeftRight_TopBottom,
         int tabWidth = 0,
-        TextFormatter textFormatter = null
+        TextFormatter? textFormatter = null
     )
     {
-        if (width < 0)
-        {
-            throw new ArgumentOutOfRangeException ($"{nameof (width)} cannot be negative.");
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative (width, nameof (width));
 
         if (string.IsNullOrEmpty (text))
         {
@@ -1412,10 +1506,7 @@ public class TextFormatter
         int tabWidth = 0
     )
     {
-        if (width < 0)
-        {
-            throw new ArgumentOutOfRangeException ($"{nameof (width)} cannot be negative.");
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative (width, nameof (width));
 
         if (string.IsNullOrEmpty (text))
         {
@@ -1507,7 +1598,7 @@ public class TextFormatter
         int tabWidth = 0,
         TextDirection textDirection = TextDirection.LeftRight_TopBottom,
         bool multiLine = false,
-        TextFormatter textFormatter = null
+        TextFormatter? textFormatter = null
     )
     {
         return Format (
@@ -1555,13 +1646,10 @@ public class TextFormatter
         int tabWidth = 0,
         TextDirection textDirection = TextDirection.LeftRight_TopBottom,
         bool multiLine = false,
-        TextFormatter textFormatter = null
+        TextFormatter? textFormatter = null
     )
     {
-        if (width < 0)
-        {
-            throw new ArgumentOutOfRangeException ($"{nameof (width)} cannot be negative.");
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative (width, nameof (width));
 
         List<string> lineResult = new ();
 
@@ -1586,7 +1674,7 @@ public class TextFormatter
                     return lineResult;
                 }
 
-                string [] lines = null;
+                string []? lines = null;
 
                 if (text.Contains ("\r\n"))
                 {
@@ -1601,8 +1689,14 @@ public class TextFormatter
 
                 foreach (string line in lines)
                 {
-
-                    lineResult.Add (ClipAndJustify (PerformCorrectFormatDirection (textDirection, line), width, justify, textDirection, tabWidth, textFormatter));
+                    lineResult.Add (
+                                    ClipAndJustify (
+                                                    PerformCorrectFormatDirection (textDirection, line),
+                                                    width,
+                                                    justify,
+                                                    textDirection,
+                                                    tabWidth,
+                                                    textFormatter));
                 }
 
                 return PerformCorrectFormatDirection (textDirection, lineResult);
@@ -1692,18 +1786,6 @@ public class TextFormatter
                };
     }
 
-    /// <summary>Returns the number of lines needed to render the specified text given the width.</summary>
-    /// <remarks>Calls <see cref="Format()"/>.</remarks>
-    /// <returns>Number of lines.</returns>
-    /// <param name="text">Text, may contain newlines.</param>
-    /// <param name="width">The minimum width for the text.</param>
-    public static int GetLineCount (string text, int width)
-    {
-        List<string> result = Format (text, width, false, true);
-
-        return result.Count;
-    }
-
     /// <summary>
     ///     Returns the number of columns required to render <paramref name="lines"/> oriented vertically.
     /// </summary>
@@ -1713,7 +1795,10 @@ public class TextFormatter
     /// </remarks>
     /// <param name="lines">The lines.</param>
     /// <param name="startLine">The line in the list to start with (any lines before will be ignored).</param>
-    /// <param name="linesCount">The number of lines to process (if less than <c>lines.Count</c>, any lines after will be ignored).</param>
+    /// <param name="linesCount">
+    ///     The number of lines to process (if less than <c>lines.Count</c>, any lines after will be
+    ///     ignored).
+    /// </param>
     /// <param name="tabWidth">The number of columns used for a tab.</param>
     /// <returns>The width required.</returns>
     public static int GetColumnsRequiredForVerticalText (
@@ -1730,11 +1815,13 @@ public class TextFormatter
              i++)
         {
             string runes = lines [i];
+
             if (runes.Length > 0)
             {
                 max += runes.EnumerateRunes ().Max (r => GetRuneWidth (r, tabWidth));
             }
         }
+
         return max;
     }
 
@@ -1743,7 +1830,7 @@ public class TextFormatter
     ///     (uses <see cref="StringExtensions.GetColumns"/>). <paramref name="text"/> if it contains newlines.
     /// </summary>
     /// <remarks>
-    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
+    ///     This API will return incorrect results if the text includes glyphs whose width is dependent on surrounding
     ///     glyphs (e.g. Arabic).
     /// </remarks>
     /// <param name="text">Text, may contain newlines.</param>
@@ -1761,7 +1848,7 @@ public class TextFormatter
     ///     <paramref name="length"/>.
     /// </summary>
     /// <remarks>
-    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
+    ///     This API will return incorrect results if the text includes glyphs whose width is dependent on surrounding
     ///     glyphs (e.g. Arabic).
     /// </remarks>
     /// <param name="text">The text.</param>
@@ -1786,7 +1873,7 @@ public class TextFormatter
 
     /// <summary>Gets the number of the Runes in the text that will fit in <paramref name="width"/>.</summary>
     /// <remarks>
-    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
+    ///     This API will return incorrect results if the text includes glyphs whose width is dependent on surrounding
     ///     glyphs (e.g. Arabic).
     /// </remarks>
     /// <param name="text">The text.</param>
@@ -1796,12 +1883,12 @@ public class TextFormatter
     /// <returns>The index of the text that fit the width.</returns>
     public static int GetLengthThatFits (string text, int width, int tabWidth = 0, TextDirection textDirection = TextDirection.LeftRight_TopBottom)
     {
-        return GetLengthThatFits (text?.ToRuneList (), width, tabWidth, textDirection);
+        return GetLengthThatFits (text?.ToRuneList () ?? [], width, tabWidth, textDirection);
     }
 
     /// <summary>Gets the number of the Runes in a list of Runes that will fit in <paramref name="width"/>.</summary>
     /// <remarks>
-    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
+    ///     This API will return incorrect results if the text includes glyphs whose width is dependent on surrounding
     ///     glyphs (e.g. Arabic).
     /// </remarks>
     /// <param name="runes">The list of runes.</param>
@@ -1834,8 +1921,15 @@ public class TextFormatter
         return runeIdx;
     }
 
-    private static int GetRuneWidth (string str, int tabWidth, TextDirection textDirection = TextDirection.LeftRight_TopBottom) { return GetRuneWidth (str.EnumerateRunes ().ToList (), tabWidth, textDirection); }
-    private static int GetRuneWidth (List<Rune> runes, int tabWidth, TextDirection textDirection = TextDirection.LeftRight_TopBottom) { return runes.Sum (r => GetRuneWidth (r, tabWidth, textDirection)); }
+    private static int GetRuneWidth (string str, int tabWidth, TextDirection textDirection = TextDirection.LeftRight_TopBottom)
+    {
+        return GetRuneWidth (str.EnumerateRunes ().ToList (), tabWidth, textDirection);
+    }
+
+    private static int GetRuneWidth (List<Rune> runes, int tabWidth, TextDirection textDirection = TextDirection.LeftRight_TopBottom)
+    {
+        return runes.Sum (r => GetRuneWidth (r, tabWidth, textDirection));
+    }
 
     private static int GetRuneWidth (Rune rune, int tabWidth, TextDirection textDirection = TextDirection.LeftRight_TopBottom)
     {
@@ -1856,7 +1950,7 @@ public class TextFormatter
 
     /// <summary>Gets the index position from the list based on the <paramref name="width"/>.</summary>
     /// <remarks>
-    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
+    ///     This API will return incorrect results if the text includes glyphs whose width is dependent on surrounding
     ///     glyphs (e.g. Arabic).
     /// </remarks>
     /// <param name="lines">The lines.</param>
@@ -1885,147 +1979,6 @@ public class TextFormatter
         }
 
         return lineIdx;
-    }
-
-    /// <summary>Calculates the rectangle required to hold text, assuming no word wrapping or alignment.</summary>
-    /// <remarks>
-    ///     This API will return incorrect results if the text includes glyphs who's width is dependent on surrounding
-    ///     glyphs (e.g. Arabic).
-    /// </remarks>
-    /// <param name="x">The x location of the rectangle</param>
-    /// <param name="y">The y location of the rectangle</param>
-    /// <param name="text">The text to measure</param>
-    /// <param name="direction">The text direction.</param>
-    /// <param name="tabWidth">The number of columns used for a tab.</param>
-    /// <returns></returns>
-    public static Rectangle CalcRect (
-        int x,
-        int y,
-        string text,
-        TextDirection direction = TextDirection.LeftRight_TopBottom,
-        int tabWidth = 0
-    )
-    {
-        if (string.IsNullOrEmpty (text))
-        {
-            return new (new (x, y), Size.Empty);
-        }
-
-        int w, h;
-
-        if (IsHorizontalDirection (direction))
-        {
-            var mw = 0;
-            var ml = 1;
-
-            var cols = 0;
-
-            foreach (Rune rune in text.EnumerateRunes ())
-            {
-                if (rune.Value == '\n')
-                {
-                    ml++;
-
-                    if (cols > mw)
-                    {
-                        mw = cols;
-                    }
-
-                    cols = 0;
-                }
-                else if (rune.Value != '\r')
-                {
-                    cols++;
-                    var rw = 0;
-
-                    if (rune.Value == '\t')
-                    {
-                        rw += tabWidth - 1;
-                    }
-                    else
-                    {
-                        rw = rune.GetColumns ();
-
-                        if (rw > 0)
-                        {
-                            rw--;
-                        }
-                        else if (rw == 0)
-                        {
-                            cols--;
-                        }
-                    }
-
-                    cols += rw;
-                }
-            }
-
-            if (cols > mw)
-            {
-                mw = cols;
-            }
-
-            w = mw;
-            h = ml;
-        }
-        else
-        {
-            int vw = 1, cw = 1;
-            var vh = 0;
-
-            var rows = 0;
-
-            foreach (Rune rune in text.EnumerateRunes ())
-            {
-                if (rune.Value == '\n')
-                {
-                    vw++;
-
-                    if (rows > vh)
-                    {
-                        vh = rows;
-                    }
-
-                    rows = 0;
-                    cw = 1;
-                }
-                else if (rune.Value != '\r')
-                {
-                    rows++;
-                    var rw = 0;
-
-                    if (rune.Value == '\t')
-                    {
-                        rw += tabWidth - 1;
-                        rows += rw;
-                    }
-                    else
-                    {
-                        rw = rune.GetColumns ();
-
-                        if (rw == 0)
-                        {
-                            rows--;
-                        }
-                        else if (cw < rw)
-                        {
-                            cw = rw;
-                            vw++;
-                        }
-                    }
-                }
-            }
-
-            if (rows > vh)
-            {
-                vh = rows;
-            }
-
-            w = vw;
-            h = vh;
-        }
-
-        return new (x, y, w, h);
     }
 
     /// <summary>Finds the HotKey and its location in text.</summary>
@@ -2146,7 +2099,7 @@ public class TextFormatter
 
         if (Rune.IsLetterOrDigit (runes [hotPos]))
         {
-            runes [hotPos] = new Rune ((uint)runes [hotPos].Value);
+            runes [hotPos] = new ((uint)runes [hotPos].Value);
         }
 
         return StringExtensions.ToString (runes);

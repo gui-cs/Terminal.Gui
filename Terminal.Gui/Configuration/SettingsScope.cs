@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -37,12 +38,14 @@ public class SettingsScope : Scope<SettingsScope>
     /// <summary>Updates the <see cref="SettingsScope"/> with the settings in a JSON string.</summary>
     /// <param name="stream">Json document to update the settings with.</param>
     /// <param name="source">The source (filename/resource name) the Json document was read from.</param>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     public SettingsScope? Update (Stream stream, string source)
     {
         // Update the existing settings with the new settings.
         try
         {
-            Update (JsonSerializer.Deserialize<SettingsScope> (stream, _serializerOptions)!);
+            Update ((SettingsScope)JsonSerializer.Deserialize (stream, typeof (SettingsScope), _serializerOptions)!);
             OnUpdated ();
             Debug.WriteLine ($"ConfigurationManager: Read configuration from \"{source}\"");
             if (!Sources.Contains (source))
@@ -67,6 +70,8 @@ public class SettingsScope : Scope<SettingsScope>
 
     /// <summary>Updates the <see cref="SettingsScope"/> with the settings in a JSON file.</summary>
     /// <param name="filePath"></param>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     public SettingsScope? Update (string filePath)
     {
         string realPath = filePath.Replace ("~", Environment.GetFolderPath (Environment.SpecialFolder.UserProfile));
@@ -93,6 +98,8 @@ public class SettingsScope : Scope<SettingsScope>
     /// <summary>Updates the <see cref="SettingsScope"/> with the settings in a JSON string.</summary>
     /// <param name="json">Json document to update the settings with.</param>
     /// <param name="source">The source (filename/resource name) the Json document was read from.</param>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     public SettingsScope? Update (string json, string source)
     {
         var stream = new MemoryStream ();
@@ -107,6 +114,8 @@ public class SettingsScope : Scope<SettingsScope>
     /// <summary>Updates the <see cref="SettingsScope"/> with the settings from a Json resource.</summary>
     /// <param name="assembly"></param>
     /// <param name="resourceName"></param>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     public SettingsScope? UpdateFromResource (Assembly assembly, string resourceName)
     {
         if (resourceName is null || string.IsNullOrEmpty (resourceName))
@@ -118,6 +127,9 @@ public class SettingsScope : Scope<SettingsScope>
             return this;
         }
 
+        // BUG: Not trim-compatible
+        // Not a bug, per se, but it's easily fixable by just loading the file.
+        // Defaults can just be field initializers for involved types.
         using Stream? stream = assembly.GetManifestResourceStream (resourceName)!;
 
         if (stream is null)

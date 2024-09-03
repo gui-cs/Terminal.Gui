@@ -18,7 +18,7 @@ public class SpinnerViewStyles : Scenario
 
         Window app = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = GetQuitKeyAndName ()
         };
 
         const int DEFAULT_DELAY = 130;
@@ -53,7 +53,7 @@ public class SpinnerViewStyles : Scenario
             X = Pos.Center () - 7,
             Y = Pos.Bottom (preview),
             Enabled = false,
-            Checked = true,
+            CheckedState = CheckState.Checked,
             Text = "Ascii Only"
         };
         app.Add (ckbAscii);
@@ -63,20 +63,20 @@ public class SpinnerViewStyles : Scenario
             X = Pos.Center () + 7,
             Y = Pos.Bottom (preview),
             Enabled = false,
-            Checked = true,
+            CheckedState = CheckState.Checked,
             Text = "No Special"
         };
         app.Add (ckbNoSpecial);
 
         var ckbReverse = new CheckBox
         {
-            X = Pos.Center () - 22, Y = Pos.Bottom (preview) + 1, Checked = false, Text = "Reverse"
+            X = Pos.Center () - 22, Y = Pos.Bottom (preview) + 1, CheckedState = CheckState.UnChecked, Text = "Reverse"
         };
         app.Add (ckbReverse);
 
         var ckbBounce = new CheckBox
         {
-            X = Pos.Right (ckbReverse) + 2, Y = Pos.Bottom (preview) + 1, Checked = false, Text = "Bounce"
+            X = Pos.Right (ckbReverse) + 2, Y = Pos.Bottom (preview) + 1, CheckedState = CheckState.UnChecked, Text = "Bounce"
         };
         app.Add (ckbBounce);
 
@@ -157,16 +157,16 @@ public class SpinnerViewStyles : Scenario
                                               spinner.Visible = true;
                                               spinner.Style = (SpinnerStyle)Activator.CreateInstance (styleDict [e.Item].Value);
                                               delayField.Text = spinner.SpinDelay.ToString ();
-                                              ckbBounce.Checked = spinner.SpinBounce;
-                                              ckbNoSpecial.Checked = !spinner.HasSpecialCharacters;
-                                              ckbAscii.Checked = spinner.IsAsciiOnly;
-                                              ckbReverse.Checked = false;
+                                              ckbBounce.CheckedState = spinner.SpinBounce ? CheckState.Checked : CheckState.UnChecked;
+                                              ckbNoSpecial.CheckedState = !spinner.HasSpecialCharacters ? CheckState.Checked : CheckState.UnChecked;
+                                              ckbAscii.CheckedState = spinner.IsAsciiOnly ? CheckState.Checked : CheckState.UnChecked;
+                                              ckbReverse.CheckedState = CheckState.UnChecked;
                                           }
                                       };
 
-        ckbReverse.Toggled += (s, e) => { spinner.SpinReverse = (bool)!e.OldValue; };
+        ckbReverse.CheckedStateChanging += (s, e) => { spinner.SpinReverse = e.NewValue == CheckState.Checked; };
 
-        ckbBounce.Toggled += (s, e) => { spinner.SpinBounce = (bool)!e.OldValue; };
+        ckbBounce.CheckedStateChanging += (s, e) => { spinner.SpinBounce = e.NewValue == CheckState.Checked; };
 
         app.Unloaded += App_Unloaded;
 

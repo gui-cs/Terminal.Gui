@@ -29,13 +29,18 @@ public class ThemeScopeTests
     {
         Reset ();
         Assert.NotEmpty (Themes);
-        Assert.Equal (Alignment.End, Dialog.DefaultButtonAlignment);
+        Alignment savedValue = Dialog.DefaultButtonAlignment;
+        Alignment newValue = Alignment.Center != savedValue ? Alignment.Center : Alignment.Start;
 
-        Themes ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue = Alignment.Center;
+        Themes ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue = newValue;
 
         ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
-        Assert.Equal (Alignment.Center, Dialog.DefaultButtonAlignment);
-        Reset ();
+        Assert.Equal (newValue, Dialog.DefaultButtonAlignment);
+
+        // Replace with the savedValue to avoid failures on other unit tests that rely on the default value
+        Themes ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue = savedValue;
+        ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
+        Assert.Equal (savedValue, Dialog.DefaultButtonAlignment);
     }
 
     [Fact]

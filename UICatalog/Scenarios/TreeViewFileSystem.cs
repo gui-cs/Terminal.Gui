@@ -34,11 +34,16 @@ public class TreeViewFileSystem : Scenario
     /// <summary>A tree view where nodes are files and folders</summary>
     private TreeView<IFileSystemInfo> _treeViewFiles;
 
-    public override void Setup ()
+    public override void Main ()
     {
-        Win.Title = GetName ();
-        Win.Y = 1; // menu
-        Win.Height = Dim.Fill ();
+        Application.Init ();
+        var win = new Window
+        {
+            Title = GetName (),
+            Y = 1, // menu
+            Height = Dim.Fill ()
+        };
+        var top = new Toplevel ();
 
         var menu = new MenuBar
         {
@@ -172,7 +177,7 @@ public class TreeViewFileSystem : Scenario
                                 )
             ]
         };
-        Top.Add (menu);
+        top.Add (menu);
 
         _treeViewFiles = new TreeView<IFileSystemInfo> { X = 0, Y = 0, Width = Dim.Percent (50), Height = Dim.Fill () };
         _treeViewFiles.DrawLine += TreeViewFiles_DrawLine;
@@ -182,14 +187,15 @@ public class TreeViewFileSystem : Scenario
             X = Pos.Right (_treeViewFiles), Y = 0, Width = Dim.Fill (), Height = Dim.Fill ()
         };
 
-        Win.Add (_detailsFrame);
+        win.Add (_detailsFrame);
         _treeViewFiles.MouseClick += TreeViewFiles_MouseClick;
         _treeViewFiles.KeyDown += TreeViewFiles_KeyPress;
         _treeViewFiles.SelectionChanged += TreeViewFiles_SelectionChanged;
 
         SetupFileTree ();
 
-        Win.Add (_treeViewFiles);
+        win.Add (_treeViewFiles);
+        top.Add (win);
         _treeViewFiles.GoToFirst ();
         _treeViewFiles.Expand ();
 
@@ -198,6 +204,10 @@ public class TreeViewFileSystem : Scenario
         _treeViewFiles.SetFocus ();
 
         UpdateIconCheckedness ();
+
+        Application.Run (top);
+        top.Dispose ();
+        Application.Shutdown ();
     }
 
     private string AspectGetter (IFileSystemInfo f) { return (_iconProvider.GetIconWithOptionalSpace (f) + f.Name).Trim (); }
@@ -405,21 +415,20 @@ public class TreeViewFileSystem : Scenario
 
     private void ShowContextMenu (Point screenPoint, IFileSystemInfo forObject)
     {
-        var menu = new ContextMenu ();
-        menu.Position = screenPoint;
+        var menu = new ContextMenu { Position = screenPoint };
 
-        menu.MenuItems = new MenuBarItem (
-                                          new [] { new MenuItem ("Properties", null, () => ShowPropertiesOf (forObject)) }
-                                         );
+        var menuItems = new MenuBarItem (
+                                         new [] { new MenuItem ("Properties", null, () => ShowPropertiesOf (forObject)) }
+                                        );
 
-        Application.Invoke (menu.Show);
+        Application.Invoke (() => menu.Show (menuItems));
     }
 
     private void ShowLines ()
     {
         _miShowLines.Checked = !_miShowLines.Checked;
 
-        _treeViewFiles.Style.ShowBranchLines = (bool)_miShowLines.Checked;
+        _treeViewFiles.Style.ShowBranchLines = (bool)_miShowLines.Checked!;
         _treeViewFiles.SetNeedsDisplay ();
     }
 

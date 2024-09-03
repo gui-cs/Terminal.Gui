@@ -2,7 +2,7 @@ name: Publish Terminal.Gui
 
 on:
   push:
-    branches: [ main, develop, v2_release, v2_develop ]
+    branches: [ v1_release, v1_develop, v2_release, v2_develop ]
     tags:
       - v*
     paths-ignore:
@@ -19,13 +19,13 @@ jobs:
         fetch-depth: 0 # fetch-depth is needed for GitVersion
 
     - name: Install GitVersion 
-      uses: gittools/actions/gitversion/setup@v0
+      uses: gittools/actions/gitversion/setup@v2
       with:
           versionSpec: '5.x'
           includePrerelease: true
 
     - name: Determine Version
-      uses: gittools/actions/gitversion/execute@v0
+      uses: gittools/actions/gitversion/execute@v2
       with:
         useConfigFile: true
         #additionalArguments: /b develop
@@ -43,8 +43,8 @@ jobs:
     - name: Build Release
       run: |
         dotnet-gitversion /updateprojectfiles
-        dotnet build ./Analyzers/Terminal.Gui.Analyzers.Internal --no-incremental --nologo --force --configuration Release
         dotnet build --no-incremental --nologo --force --configuration Release
+        dotnet test --configuration Release
 
     - name: Pack
       run: dotnet pack -c Release --include-symbols -p:Version='${{ steps.gitversion.outputs.SemVer }}' 

@@ -1,5 +1,4 @@
-﻿using Terminal.Gui.ViewsTests;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
@@ -93,193 +92,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         view.NewMouseEvent (new MouseEvent () { Flags = mouseFlags });
         Assert.Equal (mouseFlagsFromEvent, expectedMouseFlagsFromEvent);
     }
-
-    [Theory]
-    [MemberData (nameof (AllViewTypes))]
-
-    public void AllViews_Enter_Leave_Events (Type viewType)
-    {
-        var view = CreateInstanceIfNotGeneric (viewType);
-
-        if (view == null)
-        {
-            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
-            return;
-        }
-
-        if (!view.CanFocus)
-        {
-            output.WriteLine ($"Ignoring {viewType} - It can't focus.");
-
-            return;
-        }
-
-        if (view is Toplevel && ((Toplevel)view).Modal)
-        {
-            output.WriteLine ($"Ignoring {viewType} - It's a Modal Toplevel");
-
-            return;
-        }
-
-        Application.Init (new FakeDriver ());
-
-        Toplevel top = new ()
-        {
-            Height = 10,
-            Width = 10
-        };
-
-        View otherView = new ()
-        {
-            X = 0, Y = 0,
-            Height = 1,
-            Width = 1,
-            CanFocus = true,
-        };
-
-        view.X = Pos.Right (otherView);
-        view.Y = 0;
-        view.Width = 10;
-        view.Height = 1;
-
-        var nEnter = 0;
-        var nLeave = 0;
-
-        view.Enter += (s, e) => nEnter++;
-        view.Leave += (s, e) => nLeave++;
-
-        top.Add (view, otherView);
-        Application.Begin (top);
-
-        // Start with the focus on our test view
-        view.SetFocus ();
-
-        Assert.Equal (1, nEnter);
-        Assert.Equal (0, nLeave);
-
-        // Use keyboard to navigate to next view (otherView). 
-        if (view is TextView)
-        {
-            top.NewKeyDownEvent (Key.Tab.WithCtrl);
-        }
-        else if (view is DatePicker)
-        {
-            for (var i = 0; i < 4; i++)
-            {
-                top.NewKeyDownEvent (Key.Tab.WithCtrl);
-            }
-        }
-        else
-        {
-            top.NewKeyDownEvent (Key.Tab);
-        }
-
-        Assert.Equal (1, nEnter);
-        Assert.Equal (1, nLeave);
-
-        top.NewKeyDownEvent (Key.Tab);
-
-        Assert.Equal (2, nEnter);
-        Assert.Equal (1, nLeave);
-
-        top.Dispose ();
-        Application.Shutdown ();
-    }
-
-
-    [Theory]
-    [MemberData (nameof (AllViewTypes))]
-
-    public void AllViews_Enter_Leave_Events_Visible_False (Type viewType)
-    {
-        var view = CreateInstanceIfNotGeneric (viewType);
-
-        if (view == null)
-        {
-            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
-            return;
-        }
-
-        if (!view.CanFocus)
-        {
-            output.WriteLine ($"Ignoring {viewType} - It can't focus.");
-
-            return;
-        }
-
-        if (view is Toplevel && ((Toplevel)view).Modal)
-        {
-            output.WriteLine ($"Ignoring {viewType} - It's a Modal Toplevel");
-
-            return;
-        }
-
-        Application.Init (new FakeDriver ());
-
-        Toplevel top = new ()
-        {
-            Height = 10,
-            Width = 10
-        };
-
-        View otherView = new ()
-        {
-            X = 0, Y = 0,
-            Height = 1,
-            Width = 1,
-            CanFocus = true,
-        };
-
-        view.Visible = false;
-        view.X = Pos.Right (otherView);
-        view.Y = 0;
-        view.Width = 10;
-        view.Height = 1;
-
-        var nEnter = 0;
-        var nLeave = 0;
-
-        view.Enter += (s, e) => nEnter++;
-        view.Leave += (s, e) => nLeave++;
-
-        top.Add (view, otherView);
-        Application.Begin (top);
-
-        // Start with the focus on our test view
-        view.SetFocus ();
-
-        Assert.Equal (0, nEnter);
-        Assert.Equal (0, nLeave);
-
-        // Use keyboard to navigate to next view (otherView). 
-        if (view is TextView)
-        {
-            top.NewKeyDownEvent (Key.Tab.WithCtrl);
-        }
-        else if (view is DatePicker)
-        {
-            for (var i = 0; i < 4; i++)
-            {
-                top.NewKeyDownEvent (Key.Tab.WithCtrl);
-            }
-        }
-        else
-        {
-            top.NewKeyDownEvent (Key.Tab);
-        }
-
-        Assert.Equal (0, nEnter);
-        Assert.Equal (0, nLeave);
-
-        top.NewKeyDownEvent (Key.Tab);
-
-        Assert.Equal (0, nEnter);
-        Assert.Equal (0, nLeave);
-
-        top.Dispose ();
-        Application.Shutdown ();
-    }
-
+    
     [Fact]
     public void NewMouseEvent_Invokes_MouseEvent_Properly ()
     {
@@ -419,7 +232,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released)]
     [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released)]
     [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released)]
-    public void WantContinuousButtonPressed_True_Button_Press_Release_Clicks (MouseFlags pressed, MouseFlags released)
+    public void WantContinuousButtonPressed_True_And_WantMousePositionReports_True_Button_Press_Release_Clicks (MouseFlags pressed, MouseFlags released)
     {
         var me = new MouseEvent ();
 
@@ -427,7 +240,8 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         {
             Width = 1,
             Height = 1,
-            WantContinuousButtonPressed = true
+            WantContinuousButtonPressed = true,
+            WantMousePositionReports = true
         };
 
         var clickedCount = 0;
@@ -450,7 +264,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
     [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released, MouseFlags.Button3Clicked)]
     [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
-    public void WantContinuousButtonPressed_True_Button_Press_Release_Clicks_Repeatedly (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
+    public void WantContinuousButtonPressed_True_And_WantMousePositionReports_True_Button_Press_Release_Clicks_Repeatedly (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
     {
         var me = new MouseEvent ();
 
@@ -458,7 +272,8 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         {
             Width = 1,
             Height = 1,
-            WantContinuousButtonPressed = true
+            WantContinuousButtonPressed = true,
+            WantMousePositionReports = true
         };
 
         var clickedCount = 0;
@@ -488,7 +303,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     }
 
     [Fact]
-    public void WantContinuousButtonPressed_True_Move_InViewport_OutOfViewport_Keeps_Counting ()
+    public void WantContinuousButtonPressed_True_And_WantMousePositionReports_True_Move_InViewport_OutOfViewport_Keeps_Counting ()
     {
         var me = new MouseEvent ();
 
@@ -496,7 +311,8 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         {
             Width = 1,
             Height = 1,
-            WantContinuousButtonPressed = true
+            WantContinuousButtonPressed = true,
+            WantMousePositionReports = true
         };
 
         var clickedCount = 0;
@@ -566,9 +382,9 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
 
         return;
 
-        void View_Highlight (object sender, HighlightEventArgs e)
+        void View_Highlight (object sender, CancelEventArgs<HighlightStyle> e)
         {
-            if (e.HighlightStyle == HighlightStyle.None)
+            if (e.NewValue == HighlightStyle.None)
             {
                 disablingHighlight++;
             }
@@ -635,9 +451,9 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
 
         return;
 
-        void View_Highlight (object sender, HighlightEventArgs e)
+        void View_Highlight (object sender, CancelEventArgs<HighlightStyle> e)
         {
-            if (e.HighlightStyle == HighlightStyle.None)
+            if (e.NewValue == HighlightStyle.None)
             {
                 disablingHighlight++;
             }
@@ -647,5 +463,4 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
             }
         }
     }
-
 }

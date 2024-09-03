@@ -4,7 +4,7 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Adornments Demo", "Demonstrates Margin, Border, and Padding on Views.")]
 [ScenarioCategory ("Layout")]
-[ScenarioCategory ("Borders")]
+[ScenarioCategory ("Adornments")]
 public class Adornments : Scenario
 {
     public override void Main ()
@@ -13,18 +13,19 @@ public class Adornments : Scenario
 
         Window app = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = GetQuitKeyAndName ()
         };
 
         var editor = new AdornmentsEditor
         {
             AutoSelectViewToEdit = true,
+
             // This is for giggles, to show that the editor can be moved around.
             Arrangement = ViewArrangement.Movable,
-            X = Pos.AnchorEnd()
-
+            X = Pos.AnchorEnd ()
         };
-        editor.Border.Thickness = new Thickness (1, 3, 1, 1);
+
+        editor.Border.Thickness = new (1, 2, 1, 1);
 
         app.Add (editor);
 
@@ -32,14 +33,15 @@ public class Adornments : Scenario
         {
             Title = "The _Window",
             Arrangement = ViewArrangement.Movable,
-           // X = Pos.Center (),
+
+            // X = Pos.Center (),
             Width = Dim.Percent (60),
             Height = Dim.Percent (80)
         };
         app.Add (window);
 
         var tf1 = new TextField { Width = 10, Text = "TextField" };
-        var color = new ColorPicker { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd () };
+        var color = new ColorPicker16 { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd () };
         color.BorderStyle = LineStyle.RoundedDotted;
 
         color.ColorChanged += (s, e) =>
@@ -48,7 +50,7 @@ public class Adornments : Scenario
                                   {
                                       Normal = new (
                                                     color.SuperView.ColorScheme.Normal.Foreground,
-                                                    e.Color
+                                                    e.CurrentValue
                                                    )
                                   };
                               };
@@ -104,7 +106,7 @@ public class Adornments : Scenario
                                   window.Padding.Add (labelInPadding);
 
                                   var textFieldInPadding = new TextField
-                                  { X = Pos.Right (labelInPadding) + 1, Y = Pos.Top (labelInPadding), Width = 15, Text = "some text" };
+                                      { X = Pos.Right (labelInPadding) + 1, Y = Pos.Top (labelInPadding), Width = 15, Text = "some text" };
                                   textFieldInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "TextField", textFieldInPadding.Text, "Ok");
                                   window.Padding.Add (textFieldInPadding);
 
@@ -127,6 +129,10 @@ public class Adornments : Scenario
                                 view.Accept += (s, e) => MessageBox.Query (20, 7, "Hi", "Window Close Button Pressed!", "Ok");
 #endif
                               };
+
+        editor.AutoSelectViewToEdit = true;
+        editor.AutoSelectSuperView = window;
+        editor.AutoSelectAdornments = true;
 
         Application.Run (app);
         app.Dispose ();

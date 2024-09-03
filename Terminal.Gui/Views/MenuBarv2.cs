@@ -43,8 +43,6 @@ public class MenuBarv2 : Bar
 
         if (view is Shortcut shortcut)
         {
-            shortcut.KeyBindingScope = KeyBindingScope.Application;
-
             // TODO: not happy about using AlignmentModes for this. Too implied.
             // TODO: instead, add a property (a style enum?) to Shortcut to control this
             //shortcut.AlignmentModes = AlignmentModes.EndToStart;

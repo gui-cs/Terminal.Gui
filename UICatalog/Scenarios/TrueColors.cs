@@ -13,17 +13,17 @@ public class TrueColors : Scenario
 
         Window app = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = GetQuitKeyAndName ()
         };
 
         var x = 2;
         var y = 1;
 
-        bool canTrueColor = Application.Driver.SupportsTrueColor;
+        bool canTrueColor = Application.Driver?.SupportsTrueColor ?? false;
 
         var lblDriverName = new Label
         {
-            X = x, Y = y++, Text = $"Current driver is {Application.Driver.GetType ().Name}"
+            X = x, Y = y++, Text = $"Current driver is {Application.Driver?.GetType ().Name}"
         };
         app.Add (lblDriverName);
         y++;
@@ -32,8 +32,9 @@ public class TrueColors : Scenario
         {
             X = x,
             Y = y++,
-            Checked = canTrueColor,
+            CheckedState = canTrueColor ? CheckState.Checked : CheckState.UnChecked,
             CanFocus = false,
+            Enabled = false,
             Text = "Driver supports true color "
         };
         app.Add (cbSupportsTrueColor);
@@ -42,11 +43,11 @@ public class TrueColors : Scenario
         {
             X = x,
             Y = y++,
-            Checked = Application.Force16Colors,
+            CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
             Enabled = canTrueColor,
             Text = "Force 16 colors"
         };
-        cbUseTrueColor.Toggled += (_, evt) => { Application.Force16Colors = evt.NewValue ?? false; };
+        cbUseTrueColor.CheckedStateChanging += (_, evt) => { Application.Force16Colors = evt.NewValue == CheckState.Checked; };
         app.Add (cbUseTrueColor);
 
         y += 2;

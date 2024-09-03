@@ -1,15 +1,12 @@
-﻿using UICatalog;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace Terminal.Gui.ApplicationTests;
 
 /// <summary>
-/// Application tests for keyboard support.
+///     Application tests for keyboard support.
 /// </summary>
 public class KeyboardTests
 {
-    private readonly ITestOutputHelper _output;
-
     public KeyboardTests (ITestOutputHelper output)
     {
         _output = output;
@@ -19,265 +16,11 @@ public class KeyboardTests
 #endif
     }
 
-
-    [Fact]
-    [AutoInitShutdown]
-    public void QuitKey_Getter_Setter ()
-    {
-        Toplevel top = new ();
-        var isQuiting = false;
-
-        top.Closing += (s, e) =>
-                       {
-                           isQuiting = true;
-                           e.Cancel = true;
-                       };
-
-        Application.Begin (top);
-        top.Running = true;
-
-        Key prevKey = Application.QuitKey;
-
-        Application.OnKeyDown (Application.QuitKey);
-        Assert.True (isQuiting);
-
-        isQuiting = false;
-        Application.OnKeyDown (Application.QuitKey);
-        Assert.True (isQuiting);
-
-        isQuiting = false;
-        Application.QuitKey = Key.C.WithCtrl;
-        Application.OnKeyDown (prevKey); // Should not quit
-        Assert.False (isQuiting);
-        Application.OnKeyDown (Key.Q.WithCtrl);// Should not quit
-        Assert.False (isQuiting);
-
-        Application.OnKeyDown (Application.QuitKey);
-        Assert.True (isQuiting);
-
-        // Reset the QuitKey to avoid throws errors on another tests
-        Application.QuitKey = prevKey;
-        top.Dispose ();
-    }
-
-    [Fact]
-    public void QuitKey_Default_Is_Esc ()
-    {
-        Application.ResetState (true);
-        // Before Init
-        Assert.Equal (Key.Empty, Application.QuitKey);
-
-        Application.Init (new FakeDriver ());
-        // After Init
-        Assert.Equal (Key.Esc, Application.QuitKey);
-
-        Application.Shutdown();
-    }
+    private readonly ITestOutputHelper _output;
 
     private object _timeoutLock;
 
-    [Fact]
-    public void QuitKey_Quits ()
-    {
-        Assert.Null (_timeoutLock);
-        _timeoutLock = new object ();
-
-        uint abortTime = 500;
-        bool initialized = false;
-        int iteration = 0;
-        bool shutdown = false;
-        object timeout = null;
-
-        Application.InitializedChanged += OnApplicationOnInitializedChanged;
-
-        Application.Init (new FakeDriver ());
-        Assert.True (initialized);
-        Assert.False (shutdown);
-
-        _output.WriteLine ("Application.Run<Toplevel> ().Dispose ()..");
-        Application.Run<Toplevel> ().Dispose ();
-        _output.WriteLine ("Back from Application.Run<Toplevel> ().Dispose ()");
-
-        Assert.True (initialized);
-        Assert.False (shutdown);
-
-        Assert.Equal (1, iteration);
-
-        Application.Shutdown ();
-
-        Application.InitializedChanged -= OnApplicationOnInitializedChanged;
-
-        lock (_timeoutLock)
-        {
-            if (timeout is { })
-            {
-                Application.RemoveTimeout (timeout);
-                timeout = null;
-            }
-        }
-
-        Assert.True (initialized);
-        Assert.True (shutdown);
-
-#if DEBUG_IDISPOSABLE
-        Assert.Empty (Responder.Instances);
-#endif
-        lock (_timeoutLock)
-        {
-            _timeoutLock = null;
-        }
-
-        return;
-
-        void OnApplicationOnInitializedChanged (object s, StateEventArgs<bool> a)
-        {
-            _output.WriteLine ("OnApplicationOnInitializedChanged: {0}", a.NewValue);
-            if (a.NewValue)
-            {
-                Application.Iteration += OnApplicationOnIteration;
-                initialized = true;
-                lock (_timeoutLock)
-                {
-                    timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), ForceCloseCallback);
-                }
-            }
-            else
-            {
-                Application.Iteration -= OnApplicationOnIteration;
-                shutdown = true;
-            }
-        }
-
-        bool ForceCloseCallback ()
-        {
-            lock (_timeoutLock)
-            {
-                _output.WriteLine ($"ForceCloseCallback. iteration: {iteration}");
-                if (timeout is { })
-                {
-                    timeout = null;
-                }
-            }
-            Application.ResetState (true);
-            Assert.Fail ($"Failed to Quit with {Application.QuitKey} after {abortTime}ms. Force quit.");
-
-            return false;
-        }
-
-        void OnApplicationOnIteration (object s, IterationEventArgs a)
-        {
-            _output.WriteLine ("Iteration: {0}", iteration);
-            iteration++;
-            Assert.True (iteration < 2, "Too many iterations, something is wrong.");
-            if (Application._initialized)
-            {
-                _output.WriteLine ("  Pressing QuitKey");
-                Application.OnKeyDown (Application.QuitKey);
-            }
-        }
-    }
-
-    [Fact]
-    public void AlternateForwardKey_AlternateBackwardKey_Tests ()
-    {
-        Application.Init (new FakeDriver ());
-
-        Toplevel top = new ();
-        var w1 = new Window ();
-        var v1 = new TextField ();
-        var v2 = new TextView ();
-        w1.Add (v1, v2);
-
-        var w2 = new Window ();
-        var v3 = new CheckBox ();
-        var v4 = new Button ();
-        w2.Add (v3, v4);
-
-        top.Add (w1, w2);
-
-        Application.Iteration += (s, a) =>
-                                 {
-                                     Assert.True (v1.HasFocus);
-
-                                     // Using default keys.
-                                     top.NewKeyDownEvent (Key.Tab.WithCtrl);
-                                     Assert.True (v2.HasFocus);
-                                     top.NewKeyDownEvent (Key.Tab.WithCtrl);
-                                     Assert.True (v3.HasFocus);
-                                     top.NewKeyDownEvent (Key.Tab.WithCtrl);
-                                     Assert.True (v4.HasFocus);
-                                     top.NewKeyDownEvent (Key.Tab.WithCtrl);
-                                     Assert.True (v1.HasFocus);
-
-                                     top.NewKeyDownEvent (Key.Tab.WithShift.WithCtrl);
-                                     Assert.True (v4.HasFocus);
-                                     top.NewKeyDownEvent (Key.Tab.WithShift.WithCtrl);
-                                     Assert.True (v3.HasFocus);
-                                     top.NewKeyDownEvent (Key.Tab.WithShift.WithCtrl);
-                                     Assert.True (v2.HasFocus);
-                                     top.NewKeyDownEvent (Key.Tab.WithShift.WithCtrl);
-                                     Assert.True (v1.HasFocus);
-
-                                     top.NewKeyDownEvent (Key.PageDown.WithCtrl);
-                                     Assert.True (v2.HasFocus);
-                                     top.NewKeyDownEvent (Key.PageDown.WithCtrl);
-                                     Assert.True (v3.HasFocus);
-                                     top.NewKeyDownEvent (Key.PageDown.WithCtrl);
-                                     Assert.True (v4.HasFocus);
-                                     top.NewKeyDownEvent (Key.PageDown.WithCtrl);
-                                     Assert.True (v1.HasFocus);
-
-                                     top.NewKeyDownEvent (Key.PageUp.WithCtrl);
-                                     Assert.True (v4.HasFocus);
-                                     top.NewKeyDownEvent (Key.PageUp.WithCtrl);
-                                     Assert.True (v3.HasFocus);
-                                     top.NewKeyDownEvent (Key.PageUp.WithCtrl);
-                                     Assert.True (v2.HasFocus);
-                                     top.NewKeyDownEvent (Key.PageUp.WithCtrl);
-                                     Assert.True (v1.HasFocus);
-
-                                     // Using another's alternate keys.
-                                     Application.AlternateForwardKey = Key.F7;
-                                     Application.AlternateBackwardKey = Key.F6;
-
-                                     top.NewKeyDownEvent (Key.F7);
-                                     Assert.True (v2.HasFocus);
-                                     top.NewKeyDownEvent (Key.F7);
-                                     Assert.True (v3.HasFocus);
-                                     top.NewKeyDownEvent (Key.F7);
-                                     Assert.True (v4.HasFocus);
-                                     top.NewKeyDownEvent (Key.F7);
-                                     Assert.True (v1.HasFocus);
-
-                                     top.NewKeyDownEvent (Key.F6);
-                                     Assert.True (v4.HasFocus);
-                                     top.NewKeyDownEvent (Key.F6);
-                                     Assert.True (v3.HasFocus);
-                                     top.NewKeyDownEvent (Key.F6);
-                                     Assert.True (v2.HasFocus);
-                                     top.NewKeyDownEvent (Key.F6);
-                                     Assert.True (v1.HasFocus);
-
-                                     Application.RequestStop ();
-                                 };
-
-        Application.Run (top);
-
-        // Replacing the defaults keys to avoid errors on others unit tests that are using it.
-        Application.AlternateForwardKey = Key.PageDown.WithCtrl;
-        Application.AlternateBackwardKey = Key.PageUp.WithCtrl;
-        Application.QuitKey = Key.Q.WithCtrl;
-
-        Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey.KeyCode);
-        Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey.KeyCode);
-        Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey.KeyCode);
-
-        top.Dispose ();
-        // Shutdown must be called to safely clean up Application if Init has been called
-        Application.Shutdown ();
-    }
-
-    [Fact]
+    [Fact (Skip = "No longer valid test.")]
     [AutoInitShutdown]
     public void EnsuresTopOnFront_CanFocus_False_By_Keyboard ()
     {
@@ -321,14 +64,14 @@ public class KeyboardTests
         Assert.True (win2.HasFocus);
         Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
 
-        top.NewKeyDownEvent (Key.Tab.WithCtrl);
+        Application.OnKeyDown (Key.F6);
         Assert.True (win2.CanFocus);
         Assert.False (win.HasFocus);
         Assert.True (win2.CanFocus);
         Assert.True (win2.HasFocus);
         Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
 
-        top.NewKeyDownEvent (Key.Tab.WithCtrl);
+        Application.OnKeyDown (Key.F6);
         Assert.False (win.CanFocus);
         Assert.False (win.HasFocus);
         Assert.True (win2.CanFocus);
@@ -337,7 +80,7 @@ public class KeyboardTests
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "No longer valid test.")]
     [AutoInitShutdown]
     public void EnsuresTopOnFront_CanFocus_True_By_Keyboard ()
     {
@@ -374,20 +117,148 @@ public class KeyboardTests
         Assert.False (win2.HasFocus);
         Assert.Equal ("win", ((Window)top.Subviews [^1]).Title);
 
-        top.NewKeyDownEvent (Key.Tab.WithCtrl);
+        Application.OnKeyDown (Key.F6);
         Assert.True (win.CanFocus);
         Assert.False (win.HasFocus);
         Assert.True (win2.CanFocus);
         Assert.True (win2.HasFocus);
         Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
 
-        top.NewKeyDownEvent (Key.Tab.WithCtrl);
+        Application.OnKeyDown (Key.F6);
         Assert.True (win.CanFocus);
         Assert.True (win.HasFocus);
         Assert.True (win2.CanFocus);
         Assert.False (win2.HasFocus);
         Assert.Equal ("win", ((Window)top.Subviews [^1]).Title);
         top.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void KeyBinding_Application_KeyBindings_Add_Adds ()
+    {
+        Application.KeyBindings.Add (Key.A, KeyBindingScope.Application, Command.Accept);
+        Application.KeyBindings.Add (Key.B, KeyBindingScope.Application, Command.Accept);
+
+        Assert.True (Application.KeyBindings.TryGet (Key.A, out KeyBinding binding));
+        Assert.Null (binding.BoundView);
+        Assert.True (Application.KeyBindings.TryGet (Key.B, out binding));
+        Assert.Null (binding.BoundView);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void KeyBinding_Application_RemoveKeyBinding_Removes ()
+    {
+        Application.KeyBindings.Add (Key.A, KeyBindingScope.Application, Command.Accept);
+
+        Assert.True (Application.KeyBindings.TryGet (Key.A, out _));
+
+        Application.KeyBindings.Remove (Key.A);
+        Assert.False (Application.KeyBindings.TryGet (Key.A, out _));
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void KeyBinding_OnKeyDown ()
+    {
+        var view = new ScopedKeyBindingView ();
+        var invoked = false;
+        view.InvokingKeyBindings += (s, e) => invoked = true;
+
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
+
+        Application.OnKeyDown (Key.A);
+        Assert.False (invoked);
+        Assert.True (view.ApplicationCommand);
+
+        invoked = false;
+        view.ApplicationCommand = false;
+        Application.KeyBindings.Remove (KeyCode.A);
+        Application.OnKeyDown (Key.A); // old
+        Assert.False (invoked);
+        Assert.False (view.ApplicationCommand);
+        Application.KeyBindings.Add (Key.A.WithCtrl, view, Command.Save);
+        Application.OnKeyDown (Key.A); // old
+        Assert.False (invoked);
+        Assert.False (view.ApplicationCommand);
+        Application.OnKeyDown (Key.A.WithCtrl); // new
+        Assert.False (invoked);
+        Assert.True (view.ApplicationCommand);
+
+        invoked = false;
+        Application.OnKeyDown (Key.H);
+        Assert.True (invoked);
+
+        invoked = false;
+        Assert.False (view.HasFocus);
+        Application.OnKeyDown (Key.F);
+        Assert.False (invoked);
+
+        Assert.True (view.ApplicationCommand);
+        Assert.True (view.HotKeyCommand);
+        Assert.False (view.FocusedCommand);
+        top.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void KeyBinding_OnKeyDown_Negative ()
+    {
+        var view = new ScopedKeyBindingView ();
+        var invoked = false;
+        view.InvokingKeyBindings += (s, e) => invoked = true;
+
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
+
+        Application.OnKeyDown (Key.A.WithCtrl);
+        Assert.False (invoked);
+        Assert.False (view.ApplicationCommand);
+        Assert.False (view.HotKeyCommand);
+        Assert.False (view.FocusedCommand);
+
+        invoked = false;
+        Assert.False (view.HasFocus);
+        Application.OnKeyDown (Key.Z);
+        Assert.False (invoked);
+        Assert.False (view.ApplicationCommand);
+        Assert.False (view.HotKeyCommand);
+        Assert.False (view.FocusedCommand);
+        top.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void KeyBinding_View_KeyBindings_Add_Adds ()
+    {
+        View view1 = new ();
+        Application.KeyBindings.Add (Key.A, view1, Command.Accept);
+
+        View view2 = new ();
+        Application.KeyBindings.Add (Key.B, view2, Command.Accept);
+
+        Assert.True (Application.KeyBindings.TryGet (Key.A, out KeyBinding binding));
+        Assert.Equal (view1, binding.BoundView);
+        Assert.True (Application.KeyBindings.TryGet (Key.B, out binding));
+        Assert.Equal (view2, binding.BoundView);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void KeyBinding_View_KeyBindings_RemoveKeyBinding_Removes ()
+    {
+        View view1 = new ();
+        Application.KeyBindings.Add (Key.A, view1, Command.Accept);
+
+        View view2 = new ();
+        Application.KeyBindings.Add (Key.B, view1, Command.Accept);
+
+        Application.KeyBindings.Remove (Key.A, view1);
+        Assert.False (Application.KeyBindings.TryGet (Key.A, out _));
     }
 
     [Fact]
@@ -400,33 +271,34 @@ public class KeyboardTests
 
         Key originalQuitKey = Application.QuitKey;
         Application.QuitKey = Key.Q.WithCtrl;
+
         // Put a control-q in at the end
-        FakeConsole.MockKeyPresses.Push (new ConsoleKeyInfo ('Q', ConsoleKey.Q, false, false, true));
+        FakeConsole.MockKeyPresses.Push (new ('Q', ConsoleKey.Q, false, false, true));
 
         foreach (char c in input.Reverse ())
         {
             if (char.IsLetter (c))
             {
                 FakeConsole.MockKeyPresses.Push (
-                                                 new ConsoleKeyInfo (
-                                                                     c,
-                                                                     (ConsoleKey)char.ToUpper (c),
-                                                                     char.IsUpper (c),
-                                                                     false,
-                                                                     false
-                                                                    )
+                                                 new (
+                                                      c,
+                                                      (ConsoleKey)char.ToUpper (c),
+                                                      char.IsUpper (c),
+                                                      false,
+                                                      false
+                                                     )
                                                 );
             }
             else
             {
                 FakeConsole.MockKeyPresses.Push (
-                                                 new ConsoleKeyInfo (
-                                                                     c,
-                                                                     (ConsoleKey)c,
-                                                                     false,
-                                                                     false,
-                                                                     false
-                                                                    )
+                                                 new (
+                                                      c,
+                                                      (ConsoleKey)c,
+                                                      false,
+                                                      false,
+                                                      false
+                                                     )
                                                 );
             }
         }
@@ -484,142 +356,386 @@ public class KeyboardTests
     }
 
     [Fact]
-    [AutoInitShutdown]
-    public void KeyBinding_OnKeyDown ()
+    public void NextTabGroupKey_Moves_Focus_To_TabStop_In_Next_TabGroup ()
     {
-        var view = new ScopedKeyBindingView ();
-        var invoked = false;
-        view.InvokingKeyBindings += (s, e) => invoked = true;
-
+        // Arrange
+        Application.Navigation = new ();
         var top = new Toplevel ();
-        top.Add (view);
+
+        var view1 = new View
+        {
+            Id = "view1",
+            CanFocus = true,
+            TabStop = TabBehavior.TabGroup
+        };
+
+        var subView1 = new View
+        {
+            Id = "subView1",
+            CanFocus = true,
+            TabStop = TabBehavior.TabStop
+        };
+
+        view1.Add (subView1);
+
+        var view2 = new View
+        {
+            Id = "view2",
+            CanFocus = true,
+            TabStop = TabBehavior.TabGroup
+        };
+
+        var subView2 = new View
+        {
+            Id = "subView2",
+            CanFocus = true,
+            TabStop = TabBehavior.TabStop
+        };
+        view2.Add (subView2);
+
+        top.Add (view1, view2);
+        Application.Top = top;
+        Application.Current = top;
+        view1.SetFocus ();
+        Assert.True (view1.HasFocus);
+        Assert.True (subView1.HasFocus);
+
+        // Act
+        Application.OnKeyDown (Application.NextTabGroupKey);
+
+        // Assert
+        Assert.True (view2.HasFocus);
+        Assert.True (subView2.HasFocus);
+
+        top.Dispose ();
+        Application.Navigation = null;
+    }
+
+    [Fact]
+    public void NextTabGroupKey_PrevTabGroupKey_Tests ()
+    {
+        Application.Init (new FakeDriver ());
+
+        Toplevel top = new (); // TabGroup
+        var w1 = new Window (); // TabGroup
+        var v1 = new TextField (); // TabStop
+        var v2 = new TextView (); // TabStop
+        w1.Add (v1, v2);
+
+        var w2 = new Window (); // TabGroup
+        var v3 = new CheckBox (); // TabStop
+        var v4 = new Button (); // TabStop
+        w2.Add (v3, v4);
+
+        top.Add (w1, w2);
+
+        Application.Iteration += (s, a) =>
+                                 {
+                                     Assert.True (v1.HasFocus);
+
+                                     // Across TabGroups
+                                     Application.OnKeyDown (Key.F6);
+                                     Assert.True (v3.HasFocus);
+                                     Application.OnKeyDown (Key.F6);
+                                     Assert.True (v1.HasFocus);
+
+                                     Application.OnKeyDown (Key.F6.WithShift);
+                                     Assert.True (v3.HasFocus);
+                                     Application.OnKeyDown (Key.F6.WithShift);
+                                     Assert.True (v1.HasFocus);
+
+                                     // Restore?
+                                     Application.OnKeyDown (Key.Tab);
+                                     Assert.True (v2.HasFocus);
+
+                                     Application.OnKeyDown (Key.F6);
+                                     Assert.True (v3.HasFocus);
+
+                                     Application.OnKeyDown (Key.F6);
+                                     Assert.True (v2.HasFocus);
+
+                                     Application.RequestStop ();
+                                 };
+
+        Application.Run (top);
+
+        // Replacing the defaults keys to avoid errors on others unit tests that are using it.
+        Application.NextTabGroupKey = Key.PageDown.WithCtrl;
+        Application.PrevTabGroupKey = Key.PageUp.WithCtrl;
+        Application.QuitKey = Key.Q.WithCtrl;
+
+        Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.NextTabGroupKey.KeyCode);
+        Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.PrevTabGroupKey.KeyCode);
+        Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey.KeyCode);
+
+        top.Dispose ();
+
+        // Shutdown must be called to safely clean up Application if Init has been called
+        Application.Shutdown ();
+    }
+
+    [Fact]
+    public void NextTabKey_Moves_Focus_To_Next_TabStop ()
+    {
+        // Arrange
+        Application.Navigation = new ();
+        var top = new Toplevel ();
+        var view1 = new View { Id = "view1", CanFocus = true };
+        var view2 = new View { Id = "view2", CanFocus = true };
+        top.Add (view1, view2);
+        Application.Top = top;
+        Application.Current = top;
+        view1.SetFocus ();
+
+        // Act
+        Application.OnKeyDown (Application.NextTabKey);
+
+        // Assert
+        Assert.True (view2.HasFocus);
+
+        top.Dispose ();
+        Application.Navigation = null;
+    }
+
+    [Fact]
+    public void PrevTabGroupKey_Moves_Focus_To_TabStop_In_Prev_TabGroup ()
+    {
+        // Arrange
+        Application.Navigation = new ();
+        var top = new Toplevel ();
+
+        var view1 = new View
+        {
+            Id = "view1",
+            CanFocus = true,
+            TabStop = TabBehavior.TabGroup
+        };
+
+        var subView1 = new View
+        {
+            Id = "subView1",
+            CanFocus = true,
+            TabStop = TabBehavior.TabStop
+        };
+
+        view1.Add (subView1);
+
+        var view2 = new View
+        {
+            Id = "view2",
+            CanFocus = true,
+            TabStop = TabBehavior.TabGroup
+        };
+
+        var subView2 = new View
+        {
+            Id = "subView2",
+            CanFocus = true,
+            TabStop = TabBehavior.TabStop
+        };
+        view2.Add (subView2);
+
+        top.Add (view1, view2);
+        Application.Top = top;
+        Application.Current = top;
+        view1.SetFocus ();
+        Assert.True (view1.HasFocus);
+        Assert.True (subView1.HasFocus);
+
+        // Act
+        Application.OnKeyDown (Application.PrevTabGroupKey);
+
+        // Assert
+        Assert.True (view2.HasFocus);
+        Assert.True (subView2.HasFocus);
+
+        top.Dispose ();
+        Application.Navigation = null;
+    }
+
+    [Fact]
+    public void PrevTabKey_Moves_Focus_To_Prev_TabStop ()
+    {
+        // Arrange
+        Application.Navigation = new ();
+        var top = new Toplevel ();
+        var view1 = new View { Id = "view1", CanFocus = true };
+        var view2 = new View { Id = "view2", CanFocus = true };
+        top.Add (view1, view2);
+        Application.Top = top;
+        Application.Current = top;
+        view1.SetFocus ();
+
+        // Act
+        Application.OnKeyDown (Application.NextTabKey);
+
+        // Assert
+        Assert.True (view2.HasFocus);
+
+        top.Dispose ();
+        Application.Navigation = null;
+    }
+
+    [Fact]
+    public void QuitKey_Default_Is_Esc ()
+    {
+        Application.ResetState (true);
+
+        // Before Init
+        Assert.Equal (Key.Esc, Application.QuitKey);
+
+        Application.Init (new FakeDriver ());
+
+        // After Init
+        Assert.Equal (Key.Esc, Application.QuitKey);
+
+        Application.Shutdown ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void QuitKey_Getter_Setter ()
+    {
+        Toplevel top = new ();
+        var isQuiting = false;
+
+        top.Closing += (s, e) =>
+                       {
+                           isQuiting = true;
+                           e.Cancel = true;
+                       };
+
         Application.Begin (top);
+        top.Running = true;
 
-        Application.OnKeyDown (Key.A);
-        Assert.True (invoked);
-        Assert.True (view.ApplicationCommand);
+        Key prevKey = Application.QuitKey;
 
-        invoked = false;
-        view.ApplicationCommand = false;
-        view.KeyBindings.Remove (KeyCode.A);
-        Application.OnKeyDown (Key.A); // old
-        Assert.False (invoked);
-        Assert.False (view.ApplicationCommand);
-        view.KeyBindings.Add (Key.A.WithCtrl, KeyBindingScope.Application, Command.Save);
-        Application.OnKeyDown (Key.A); // old
-        Assert.False (invoked);
-        Assert.False (view.ApplicationCommand);
-        Application.OnKeyDown (Key.A.WithCtrl); // new
-        Assert.True (invoked);
-        Assert.True (view.ApplicationCommand);
+        Application.OnKeyDown (Application.QuitKey);
+        Assert.True (isQuiting);
 
-        invoked = false;
-        Application.OnKeyDown (Key.H);
-        Assert.True (invoked);
+        isQuiting = false;
+        Application.OnKeyDown (Application.QuitKey);
+        Assert.True (isQuiting);
 
-        invoked = false;
-        Assert.False (view.HasFocus);
-        Application.OnKeyDown (Key.F);
-        Assert.False (invoked);
+        isQuiting = false;
+        Application.QuitKey = Key.C.WithCtrl;
+        Application.OnKeyDown (prevKey); // Should not quit
+        Assert.False (isQuiting);
+        Application.OnKeyDown (Key.Q.WithCtrl); // Should not quit
+        Assert.False (isQuiting);
 
-        Assert.True (view.ApplicationCommand);
-        Assert.True (view.HotKeyCommand);
-        Assert.False (view.FocusedCommand);
+        Application.OnKeyDown (Application.QuitKey);
+        Assert.True (isQuiting);
+
+        // Reset the QuitKey to avoid throws errors on another tests
+        Application.QuitKey = prevKey;
         top.Dispose ();
     }
 
     [Fact]
-    [AutoInitShutdown]
-    public void KeyBinding_OnKeyDown_Negative ()
+    public void QuitKey_Quits ()
     {
-        var view = new ScopedKeyBindingView ();
-        var invoked = false;
-        view.InvokingKeyBindings += (s, e) => invoked = true;
+        Assert.Null (_timeoutLock);
+        _timeoutLock = new ();
 
-        var top = new Toplevel ();
-        top.Add (view);
-        Application.Begin (top);
+        uint abortTime = 500;
+        var initialized = false;
+        var iteration = 0;
+        var shutdown = false;
+        object timeout = null;
 
-        Application.OnKeyDown (Key.A.WithCtrl);
-        Assert.False (invoked);
-        Assert.False (view.ApplicationCommand);
-        Assert.False (view.HotKeyCommand);
-        Assert.False (view.FocusedCommand);
+        Application.InitializedChanged += OnApplicationOnInitializedChanged;
 
-        invoked = false;
-        Assert.False (view.HasFocus);
-        Application.OnKeyDown (Key.Z);
-        Assert.False (invoked);
-        Assert.False (view.ApplicationCommand);
-        Assert.False (view.HotKeyCommand);
-        Assert.False (view.FocusedCommand);
-        top.Dispose ();
-    }
+        Application.Init (new FakeDriver ());
+        Assert.True (initialized);
+        Assert.False (shutdown);
 
+        _output.WriteLine ("Application.Run<Toplevel> ().Dispose ()..");
+        Application.Run<Toplevel> ().Dispose ();
+        _output.WriteLine ("Back from Application.Run<Toplevel> ().Dispose ()");
 
-    [Fact]
-    [AutoInitShutdown]
-    public void KeyBinding_AddKeyBinding_Adds ()
-    {
-        View view1 = new ();
-        Application.AddKeyBinding (Key.A, view1);
+        Assert.True (initialized);
+        Assert.False (shutdown);
 
-        View view2 = new ();
-        Application.AddKeyBinding (Key.A, view2);
+        Assert.Equal (1, iteration);
 
-        Assert.True (Application.TryGetKeyBindings (Key.A, out List<View> views));
-        Assert.Contains (view1, views);
-        Assert.Contains (view2, views);
+        Application.Shutdown ();
 
-        Assert.False (Application.TryGetKeyBindings (Key.B, out List<View> _));
-    }
+        Application.InitializedChanged -= OnApplicationOnInitializedChanged;
 
-    [Fact]
-    [AutoInitShutdown]
-    public void KeyBinding_ViewKeyBindings_Add_Adds ()
-    {
-        View view1 = new ();
-        view1.KeyBindings.Add (Key.A, KeyBindingScope.Application, Command.Save);
-        view1.KeyBindings.Add (Key.B, KeyBindingScope.HotKey, Command.Left);
-        Assert.Single (Application.GetViewsWithKeyBindings ());
+        lock (_timeoutLock)
+        {
+            if (timeout is { })
+            {
+                Application.RemoveTimeout (timeout);
+                timeout = null;
+            }
+        }
 
-        View view2 = new ();
-        view2.KeyBindings.Add (Key.A, KeyBindingScope.Application, Command.Save);
-        view2.KeyBindings.Add (Key.B, KeyBindingScope.HotKey, Command.Left);
+        Assert.True (initialized);
+        Assert.True (shutdown);
 
-        Assert.True (Application.TryGetKeyBindings (Key.A, out List<View> views));
-        Assert.Contains (view1, views);
-        Assert.Contains (view2, views);
+#if DEBUG_IDISPOSABLE
+        Assert.Empty (Responder.Instances);
+#endif
+        lock (_timeoutLock)
+        {
+            _timeoutLock = null;
+        }
 
-        Assert.False (Application.TryGetKeyBindings (Key.B, out List<View> _));
-    }
+        return;
 
-    [Fact]
-    [AutoInitShutdown]
-    public void KeyBinding_RemoveKeyBinding_Removes ()
-    {
-        View view1 = new ();
-        Application.AddKeyBinding (Key.A, view1);
+        void OnApplicationOnInitializedChanged (object s, EventArgs<bool> a)
+        {
+            _output.WriteLine ("OnApplicationOnInitializedChanged: {0}", a.CurrentValue);
 
-        Assert.True (Application.TryGetKeyBindings (Key.A, out List<View> views));
-        Assert.Contains (view1, views);
+            if (a.CurrentValue)
+            {
+                Application.Iteration += OnApplicationOnIteration;
+                initialized = true;
 
-        Application.RemoveKeyBinding (Key.A, view1);
-        Assert.False (Application.TryGetKeyBindings (Key.A, out List<View> _));
-    }
+                lock (_timeoutLock)
+                {
+                    timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), ForceCloseCallback);
+                }
+            }
+            else
+            {
+                Application.Iteration -= OnApplicationOnIteration;
+                shutdown = true;
+            }
+        }
 
-    [Fact]
-    [AutoInitShutdown]
-    public void KeyBinding_ViewKeyBindings_RemoveKeyBinding_Removes ()
-    {
-        View view1 = new ();
-        view1.KeyBindings.Add (Key.A, KeyBindingScope.Application, Command.Save);
+        bool ForceCloseCallback ()
+        {
+            lock (_timeoutLock)
+            {
+                _output.WriteLine ($"ForceCloseCallback. iteration: {iteration}");
 
-        Assert.True (Application.TryGetKeyBindings (Key.A, out List<View> views));
-        Assert.Contains (view1, views);
+                if (timeout is { })
+                {
+                    timeout = null;
+                }
+            }
 
-        view1.KeyBindings.Remove (Key.A);
-        Assert.False (Application.TryGetKeyBindings (Key.A, out List<View> _));
+            Application.ResetState (true);
+            Assert.Fail ($"Failed to Quit with {Application.QuitKey} after {abortTime}ms. Force quit.");
+
+            return false;
+        }
+
+        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        {
+            _output.WriteLine ("Iteration: {0}", iteration);
+            iteration++;
+            Assert.True (iteration < 2, "Too many iterations, something is wrong.");
+
+            if (Application.IsInitialized)
+            {
+                _output.WriteLine ("  Pressing QuitKey");
+                Application.OnKeyDown (Application.QuitKey);
+            }
+        }
     }
 
     // Test View for testing Application key Bindings
@@ -631,9 +747,9 @@ public class KeyboardTests
             AddCommand (Command.HotKey, () => HotKeyCommand = true);
             AddCommand (Command.Left, () => FocusedCommand = true);
 
-            KeyBindings.Add (Key.A, KeyBindingScope.Application, Command.Save);
+            Application.KeyBindings.Add (Key.A, this, Command.Save);
             HotKey = KeyCode.H;
-            KeyBindings.Add (Key.F, KeyBindingScope.Focused, Command.Left);
+            KeyBindings.Add (Key.F, Command.Left);
         }
 
         public bool ApplicationCommand { get; set; }

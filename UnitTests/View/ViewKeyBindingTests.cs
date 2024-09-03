@@ -19,7 +19,8 @@ public class ViewKeyBindingTests (ITestOutputHelper output)
         Application.Begin (top);
 
         Application.OnKeyDown (Key.A);
-        Assert.True (invoked);
+        Assert.False (invoked);
+        Assert.True (view.ApplicationCommand);
 
         invoked = false;
         Application.OnKeyDown (Key.H);
@@ -134,7 +135,7 @@ public class ViewKeyBindingTests (ITestOutputHelper output)
             AddCommand (Command.HotKey, () => HotKeyCommand = true);
             AddCommand (Command.Left, () => FocusedCommand = true);
 
-            KeyBindings.Add (Key.A, KeyBindingScope.Application, Command.Save);
+            Application.KeyBindings.Add (Key.A, this, Command.Save);
             HotKey = KeyCode.H;
             KeyBindings.Add (Key.F, KeyBindingScope.Focused, Command.Left);
         }

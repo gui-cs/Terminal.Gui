@@ -33,16 +33,14 @@ public class ConfigurationManagerTests
 
             // assert
             Assert.Equal (KeyCode.Q, Application.QuitKey.KeyCode);
-            Assert.Equal (KeyCode.F, Application.AlternateForwardKey.KeyCode);
-            Assert.Equal (KeyCode.B, Application.AlternateBackwardKey.KeyCode);
-            Assert.True (Application.IsMouseDisabled);
+            Assert.Equal (KeyCode.F, Application.NextTabGroupKey.KeyCode);
+            Assert.Equal (KeyCode.B, Application.PrevTabGroupKey.KeyCode);
         }
 
         // act
-        Settings ["Application.QuitKey"].PropertyValue = Key.Q;
-        Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
-        Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
-        Settings ["Application.IsMouseDisabled"].PropertyValue = true;
+        Settings! ["Application.QuitKey"].PropertyValue = Key.Q;
+        Settings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
+        Settings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
 
         Apply ();
 
@@ -132,7 +130,7 @@ public class ConfigurationManagerTests
             { "Disabled", new Attribute (Color.White) }, { "Normal", new Attribute (Color.Blue) }
         };
         dictCopy = (Dictionary<string, Attribute>)DeepMemberWiseCopy (dictSrc, dictDest);
-        Assert.Equal (2, dictCopy.Count);
+        Assert.Equal (2, dictCopy!.Count);
         Assert.Equal (dictSrc ["Disabled"], dictCopy ["Disabled"]);
         Assert.Equal (dictSrc ["Normal"], dictCopy ["Normal"]);
 
@@ -143,7 +141,7 @@ public class ConfigurationManagerTests
         };
         dictSrc = new Dictionary<string, Attribute> { { "Disabled", new Attribute (Color.White) } };
         dictCopy = (Dictionary<string, Attribute>)DeepMemberWiseCopy (dictSrc, dictDest);
-        Assert.Equal (2, dictCopy.Count);
+        Assert.Equal (2, dictCopy!.Count);
         Assert.Equal (dictSrc ["Disabled"], dictCopy ["Disabled"]);
         Assert.Equal (dictDest ["Normal"], dictCopy ["Normal"]);
     }
@@ -153,10 +151,9 @@ public class ConfigurationManagerTests
     {
         Reset ();
 
-        Settings ["Application.QuitKey"].PropertyValue = Key.Q;
-        Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
-        Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
-        Settings ["Application.IsMouseDisabled"].PropertyValue = true;
+        Settings! ["Application.QuitKey"].PropertyValue = Key.Q;
+        Settings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
+        Settings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
 
         Updated += ConfigurationManager_Updated;
         var fired = false;
@@ -166,18 +163,17 @@ public class ConfigurationManagerTests
             fired = true;
 
             // assert
-            Assert.Equal (Key.Esc, ((Key)Settings ["Application.QuitKey"].PropertyValue).KeyCode);
+            Assert.Equal (Key.Esc, (((Key)Settings! ["Application.QuitKey"].PropertyValue)!).KeyCode);
 
             Assert.Equal (
-                          KeyCode.PageDown | KeyCode.CtrlMask,
-                          ((Key)Settings ["Application.AlternateForwardKey"].PropertyValue).KeyCode
+                          KeyCode.F6,
+                          (((Key)Settings ["Application.NextTabGroupKey"].PropertyValue)!).KeyCode
                          );
 
             Assert.Equal (
-                          KeyCode.PageUp | KeyCode.CtrlMask,
-                          ((Key)Settings ["Application.AlternateBackwardKey"].PropertyValue).KeyCode
+                          KeyCode.F6 | KeyCode.ShiftMask,
+                          (((Key)Settings ["Application.PrevTabGroupKey"].PropertyValue)!).KeyCode
                          );
-            Assert.False ((bool)Settings ["Application.IsMouseDisabled"].PropertyValue);
         }
 
         Load (true);
@@ -232,34 +228,30 @@ public class ConfigurationManagerTests
 
         // arrange
         Reset ();
-        Settings ["Application.QuitKey"].PropertyValue = Key.Q;
-        Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
-        Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
-        Settings ["Application.IsMouseDisabled"].PropertyValue = true;
+        Settings! ["Application.QuitKey"].PropertyValue = Key.Q;
+        Settings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
+        Settings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
         Settings.Apply ();
 
         // assert apply worked
         Assert.Equal (KeyCode.Q, Application.QuitKey.KeyCode);
-        Assert.Equal (KeyCode.F, Application.AlternateForwardKey.KeyCode);
-        Assert.Equal (KeyCode.B, Application.AlternateBackwardKey.KeyCode);
-        Assert.True (Application.IsMouseDisabled);
+        Assert.Equal (KeyCode.F, Application.NextTabGroupKey.KeyCode);
+        Assert.Equal (KeyCode.B, Application.PrevTabGroupKey.KeyCode);
 
         //act
         Reset ();
 
         // assert
-        Assert.NotEmpty (Themes);
+        Assert.NotEmpty (Themes!);
         Assert.Equal ("Default", Themes.Theme);
         Assert.Equal (Key.Esc, Application.QuitKey);
-        Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey.KeyCode);
-        Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey.KeyCode);
-        Assert.False (Application.IsMouseDisabled);
+        Assert.Equal (Key.F6, Application.NextTabGroupKey);
+        Assert.Equal (Key.F6.WithShift, Application.PrevTabGroupKey);
 
         // arrange
         Settings ["Application.QuitKey"].PropertyValue = Key.Q;
-        Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
-        Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
-        Settings ["Application.IsMouseDisabled"].PropertyValue = true;
+        Settings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
+        Settings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
         Settings.Apply ();
 
         Locations = ConfigLocations.DefaultOnly;
@@ -272,9 +264,8 @@ public class ConfigurationManagerTests
         Assert.NotEmpty (Themes);
         Assert.Equal ("Default", Themes.Theme);
         Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
-        Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey.KeyCode);
-        Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey.KeyCode);
-        Assert.False (Application.IsMouseDisabled);
+        Assert.Equal (Key.F6, Application.NextTabGroupKey);
+        Assert.Equal (Key.F6.WithShift, Application.PrevTabGroupKey);
         Reset ();
     }
 
@@ -283,7 +274,7 @@ public class ConfigurationManagerTests
     {
         Locations = ConfigLocations.DefaultOnly;
         Reset ();
-        Assert.NotEmpty (Themes);
+        Assert.NotEmpty (Themes!);
         Assert.Equal ("Default", Themes.Theme);
     }
 
@@ -376,7 +367,7 @@ public class ConfigurationManagerTests
         // Serialize to a JSON string
         string json = ToJson ();
 
-        // Write the JSON string to the file 
+        // Write the JSON string to the file
         File.WriteAllText ("config.json", json);
     }
 
@@ -386,36 +377,38 @@ public class ConfigurationManagerTests
         Locations = ConfigLocations.All;
         Reset ();
 
-        Assert.NotEmpty (Settings);
+        Assert.NotEmpty (Settings!);
 
         // test that all ConfigProperties have our attribute
         Assert.All (
                     Settings,
                     item => Assert.NotEmpty (
-                                             item.Value.PropertyInfo.CustomAttributes.Where (
-                                                                                             a => a.AttributeType == typeof (SerializableConfigurationProperty)
-                                                                                            )
+                                             item.Value.PropertyInfo!.CustomAttributes.Where (
+                                                                                              a => a.AttributeType == typeof (SerializableConfigurationProperty)
+                                                                                             )
                                             )
                    );
 
+#pragma warning disable xUnit2029
         Assert.Empty (
                       Settings.Where (
-                                      cp => cp.Value.PropertyInfo.GetCustomAttribute (
-                                                                                      typeof (SerializableConfigurationProperty)
-                                                                                     )
+                                      cp => cp.Value.PropertyInfo!.GetCustomAttribute (
+                                                                                       typeof (SerializableConfigurationProperty)
+                                                                                      )
                                             == null
                                      )
                      );
+#pragma warning restore xUnit2029
 
         // Application is a static class
         PropertyInfo pi = typeof (Application).GetProperty ("QuitKey");
         Assert.Equal (pi, Settings ["Application.QuitKey"].PropertyInfo);
-        
 
         // FrameView is not a static class and DefaultBorderStyle is Scope.Scheme
         pi = typeof (FrameView).GetProperty ("DefaultBorderStyle");
         Assert.False (Settings.ContainsKey ("FrameView.DefaultBorderStyle"));
-        Assert.True (Themes ["Default"].ContainsKey ("FrameView.DefaultBorderStyle"));
+        Assert.True (Themes! ["Default"].ContainsKey ("FrameView.DefaultBorderStyle"));
+        Assert.Equal (pi, Themes! ["Default"] ["FrameView.DefaultBorderStyle"].PropertyInfo);
     }
 
     [Fact]
@@ -423,31 +416,31 @@ public class ConfigurationManagerTests
     {
         // Color.ColorSchemes is serialized as "ColorSchemes", not "Colors.ColorSchemes"
         PropertyInfo pi = typeof (Colors).GetProperty ("ColorSchemes");
-        var scp = (SerializableConfigurationProperty)pi.GetCustomAttribute (typeof (SerializableConfigurationProperty));
-        Assert.True (scp.Scope == typeof (ThemeScope));
+        var scp = (SerializableConfigurationProperty)pi!.GetCustomAttribute (typeof (SerializableConfigurationProperty));
+        Assert.True (scp!.Scope == typeof (ThemeScope));
         Assert.True (scp.OmitClassName);
 
         Reset ();
-        Assert.Equal (pi, Themes ["Default"] ["ColorSchemes"].PropertyInfo);
+        Assert.Equal (pi, Themes! ["Default"] ["ColorSchemes"].PropertyInfo);
     }
 
     [Fact]
     [AutoInitShutdown (configLocation: ConfigLocations.DefaultOnly)]
     public void TestConfigurationManagerInitDriver ()
     {
-        Assert.Equal ("Default", Themes.Theme);
+        Assert.Equal ("Default", Themes!.Theme);
 
-        Assert.Equal (new Color (Color.White), Colors.ColorSchemes ["Base"].Normal.Foreground);
+        Assert.Equal (new Color (Color.White), Colors.ColorSchemes ["Base"]!.Normal.Foreground);
         Assert.Equal (new Color (Color.Blue), Colors.ColorSchemes ["Base"].Normal.Background);
 
         // Change Base
         Stream json = ToStream ();
 
-        Settings.Update (json, "TestConfigurationManagerInitDriver");
+        Settings!.Update (json, "TestConfigurationManagerInitDriver");
 
         Dictionary<string, ColorScheme> colorSchemes =
             (Dictionary<string, ColorScheme>)Themes [Themes.Theme] ["ColorSchemes"].PropertyValue;
-        Assert.Equal (Colors.ColorSchemes ["Base"], colorSchemes ["Base"]);
+        Assert.Equal (Colors.ColorSchemes ["Base"], colorSchemes! ["Base"]);
         Assert.Equal (Colors.ColorSchemes ["TopLevel"], colorSchemes ["TopLevel"]);
         Assert.Equal (Colors.ColorSchemes ["Error"], colorSchemes ["Error"]);
         Assert.Equal (Colors.ColorSchemes ["Dialog"], colorSchemes ["Dialog"]);
@@ -498,7 +491,7 @@ public class ConfigurationManagerTests
 				}
 			}";
 
-        Settings.Update (json, "test");
+        Settings!.Update (json, "test");
 
         // AbNormal is not a ColorScheme attribute
         json = @"
@@ -523,7 +516,7 @@ public class ConfigurationManagerTests
 
         Settings.Update (json, "test");
 
-        // Modify hotNormal background only 
+        // Modify hotNormal background only
         json = @"
 			{
 				""Themes"" :  [ 
@@ -581,7 +574,7 @@ public class ConfigurationManagerTests
 				]
 			}";
 
-        var jsonException = Assert.Throws<JsonException> (() => Settings.Update (json, "test"));
+        var jsonException = Assert.Throws<JsonException> (() => Settings!.Update (json, "test"));
         Assert.Equal ("Unexpected color name: brown.", jsonException.Message);
 
         // AbNormal is not a ColorScheme attribute
@@ -605,10 +598,10 @@ public class ConfigurationManagerTests
 				]
 			}";
 
-        jsonException = Assert.Throws<JsonException> (() => Settings.Update (json, "test"));
+        jsonException = Assert.Throws<JsonException> (() => Settings!.Update (json, "test"));
         Assert.Equal ("Unrecognized ColorScheme Attribute name: AbNormal.", jsonException.Message);
 
-        // Modify hotNormal background only 
+        // Modify hotNormal background only
         json = @"
 			{
 				""Themes"" : [ 
@@ -628,7 +621,7 @@ public class ConfigurationManagerTests
 				]
 			}";
 
-        jsonException = Assert.Throws<JsonException> (() => Settings.Update (json, "test"));
+        jsonException = Assert.Throws<JsonException> (() => Settings!.Update (json, "test"));
         Assert.Equal ("Both Foreground and Background colors must be provided.", jsonException.Message);
 
         // Unknown property
@@ -637,7 +630,7 @@ public class ConfigurationManagerTests
 				""Unknown"" : ""Not known""
 			}";
 
-        jsonException = Assert.Throws<JsonException> (() => Settings.Update (json, "test"));
+        jsonException = Assert.Throws<JsonException> (() => Settings!.Update (json, "test"));
         Assert.StartsWith ("Unknown property", jsonException.Message);
 
         Assert.Equal (0, _jsonErrors.Length);
@@ -653,7 +646,7 @@ public class ConfigurationManagerTests
         GetHardCodedDefaults ();
         Stream stream = ToStream ();
 
-        Settings.Update (stream, "TestConfigurationManagerToJson");
+        Settings!.Update (stream, "TestConfigurationManagerToJson");
     }
 
     [Fact]
@@ -799,19 +792,19 @@ public class ConfigurationManagerTests
         Reset ();
         ThrowOnJsonErrors = true;
 
-        Settings.Update (json, "TestConfigurationManagerUpdateFromJson");
+        Settings!.Update (json, "TestConfigurationManagerUpdateFromJson");
 
         Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
-        Assert.Equal (KeyCode.Z | KeyCode.AltMask, ((Key)Settings ["Application.QuitKey"].PropertyValue).KeyCode);
+        Assert.Equal (KeyCode.Z | KeyCode.AltMask, ((Key)Settings ["Application.QuitKey"].PropertyValue)!.KeyCode);
 
-        Assert.Equal ("Default", Themes.Theme);
+        Assert.Equal ("Default", Themes!.Theme);
 
-        Assert.Equal (new Color (Color.White), Colors.ColorSchemes ["Base"].Normal.Foreground);
+        Assert.Equal (new Color (Color.White), Colors.ColorSchemes ["Base"]!.Normal.Foreground);
         Assert.Equal (new Color (Color.Blue), Colors.ColorSchemes ["Base"].Normal.Background);
 
         Dictionary<string, ColorScheme> colorSchemes =
             (Dictionary<string, ColorScheme>)Themes.First ().Value ["ColorSchemes"].PropertyValue;
-        Assert.Equal (new Color (Color.White), colorSchemes ["Base"].Normal.Foreground);
+        Assert.Equal (new Color (Color.White), colorSchemes! ["Base"].Normal.Foreground);
         Assert.Equal (new Color (Color.Blue), colorSchemes ["Base"].Normal.Background);
 
         // Now re-apply

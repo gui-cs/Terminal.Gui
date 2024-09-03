@@ -616,7 +616,7 @@ public class TableViewTests (ITestOutputHelper output)
         top.Add (tableView);
         Application.Begin (top);
 
-        top.FocusFirst ();
+        top.FocusDeepest (NavigationDirection.Forward, null);
         Assert.True (tableView.HasFocus);
 
         Assert.Equal (0, tableView.RowOffset);
@@ -671,7 +671,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.SelectedRow = 3; // row is 0 indexed so this is the 4th visible row
 
         // Scroll down
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorDown });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorDown });
 
         // Scrolled off the page by 1 row so it should only have moved down 1 line of RowOffset
         Assert.Equal (4, tableView.SelectedRow);
@@ -723,7 +723,7 @@ public class TableViewTests (ITestOutputHelper output)
         TestHelpers.AssertDriverContentsAre (expected, output);
 
         // Scroll right
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
 
         // since A is now pushed off screen we get indicator showing
         // that user can scroll left to see first column
@@ -738,8 +738,8 @@ public class TableViewTests (ITestOutputHelper output)
         TestHelpers.AssertDriverContentsAre (expected, output);
 
         // Scroll right twice more (to end of columns)
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorRight });
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
 
         tableView.Draw ();
 
@@ -798,7 +798,7 @@ public class TableViewTests (ITestOutputHelper output)
         TestHelpers.AssertDriverContentsAre (expected, output);
 
         // Scroll right
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
 
         tableView.Draw ();
 
@@ -858,7 +858,7 @@ public class TableViewTests (ITestOutputHelper output)
         TestHelpers.AssertDriverContentsAre (expected, output);
 
         // Scroll right
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
 
         tableView.Draw ();
 
@@ -1035,12 +1035,13 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [SetupFakeDriver]
+    [AutoInitShutdown]
     [InlineData (false)]
     [InlineData (true)]
     public void TableView_ColorsTest_ColorGetter (bool focused)
     {
         TableView tv = SetUpMiniTable (out DataTable dt);
+
         tv.LayoutSubviews ();
 
         // width exactly matches the max col widths
@@ -1062,12 +1063,12 @@ public class TableViewTests (ITestOutputHelper output)
 
         bStyle.ColorGetter = a => Convert.ToInt32 (a.CellValue) == 2 ? cellHighlight : null;
 
-        // private method for forcing the view to be focused/not focused
-        MethodInfo setFocusMethod =
-            typeof (View).GetMethod ("SetHasFocus", BindingFlags.Instance | BindingFlags.NonPublic);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
-        // when the view is/isn't focused 
-        setFocusMethod.Invoke (tv, new object [] { focused, tv, true });
+        tv.HasFocus = focused;
+        Assert.Equal (focused, tv.HasFocus);
 
         tv.Draw ();
 
@@ -1126,10 +1127,12 @@ public class TableViewTests (ITestOutputHelper output)
                                                tv.ColorScheme.Normal,
                                                focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal
                                               );
+
+        top.Dispose ();
     }
 
     [Theory]
-    [SetupFakeDriver]
+    [AutoInitShutdown]
     [InlineData (false)]
     [InlineData (true)]
     public void TableView_ColorsTest_RowColorGetter (bool focused)
@@ -1153,13 +1156,12 @@ public class TableViewTests (ITestOutputHelper output)
         // when B is 2 use the custom highlight color for the row
         tv.Style.RowColorGetter += e => Convert.ToInt32 (e.Table [e.RowIndex, 1]) == 2 ? rowHighlight : null;
 
-        // private method for forcing the view to be focused/not focused
-        MethodInfo setFocusMethod =
-            typeof (View).GetMethod ("SetHasFocus", BindingFlags.Instance | BindingFlags.NonPublic);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
-        // when the view is/isn't focused 
-        setFocusMethod.Invoke (tv, new object [] { focused, tv, true });
-
+        tv.HasFocus = focused;
+        Assert.Equal (focused, tv.HasFocus);
         tv.Draw ();
 
         var expected = @"
@@ -1217,10 +1219,11 @@ public class TableViewTests (ITestOutputHelper output)
                                                tv.ColorScheme.Normal,
                                                focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal
                                               );
+        top.Dispose ();
     }
 
     [Theory]
-    [SetupFakeDriver]
+    [AutoInitShutdown]
     [InlineData (false)]
     [InlineData (true)]
     public void TableView_ColorTests_FocusedOrNot (bool focused)
@@ -1231,12 +1234,12 @@ public class TableViewTests (ITestOutputHelper output)
         // width exactly matches the max col widths
         tv.Viewport = new (0, 0, 5, 4);
 
-        // private method for forcing the view to be focused/not focused
-        MethodInfo setFocusMethod =
-            typeof (View).GetMethod ("SetHasFocus", BindingFlags.Instance | BindingFlags.NonPublic);
+        var top = new Toplevel ();
+        top.Add (tv);
+        Application.Begin (top);
 
-        // when the view is/isn't focused 
-        setFocusMethod.Invoke (tv, new object [] { focused, tv, true });
+        tv.HasFocus = focused;
+        Assert.Equal (focused, tv.HasFocus);
 
         tv.Draw ();
 
@@ -1261,7 +1264,7 @@ public class TableViewTests (ITestOutputHelper output)
                                                tv.ColorScheme.Normal,
                                                focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal
                                               );
-
+        top.Dispose ();
     }
 
     [Theory]
@@ -1277,12 +1280,8 @@ public class TableViewTests (ITestOutputHelper output)
         // width exactly matches the max col widths
         tv.Viewport = new (0, 0, 5, 4);
 
-        // private method for forcing the view to be focused/not focused
-        MethodInfo setFocusMethod =
-            typeof (View).GetMethod ("SetHasFocus", BindingFlags.Instance | BindingFlags.NonPublic);
-
-        // when the view is/isn't focused 
-        setFocusMethod.Invoke (tv, new object [] { focused, tv, true });
+        tv.HasFocus = focused;
+        Assert.Equal (focused, tv.HasFocus);
 
         tv.Draw ();
 
@@ -1569,7 +1568,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         tv.Table = new EnumerableTableSource<string> (
                                                       new [] { "fish", "troll", "trap", "zoo" },
-                                                      new() { { "Name", t => t }, { "EndsWith", t => t.Last () } }
+                                                      new () { { "Name", t => t }, { "EndsWith", t => t.Last () } }
                                                      );
 
         tv.LayoutSubviews ();
@@ -1594,11 +1593,11 @@ public class TableViewTests (ITestOutputHelper output)
         Assert.False (tv.HasFocus);
 
         // already on fish
-        tv.NewKeyDownEvent (new() { KeyCode = KeyCode.F });
+        tv.NewKeyDownEvent (new () { KeyCode = KeyCode.F });
         Assert.Equal (0, tv.SelectedRow);
 
         // not focused
-        tv.NewKeyDownEvent (new() { KeyCode = KeyCode.Z });
+        tv.NewKeyDownEvent (new () { KeyCode = KeyCode.Z });
         Assert.Equal (0, tv.SelectedRow);
 
         // ensure that TableView has the input focus
@@ -1606,42 +1605,42 @@ public class TableViewTests (ITestOutputHelper output)
         top.Add (tv);
         Application.Begin (top);
 
-        top.FocusFirst ();
+        top.FocusDeepest (NavigationDirection.Forward, null);
         Assert.True (tv.HasFocus);
 
         // already on fish
-        tv.NewKeyDownEvent (new() { KeyCode = KeyCode.F });
+        tv.NewKeyDownEvent (new () { KeyCode = KeyCode.F });
         Assert.Equal (0, tv.SelectedRow);
 
         // move to zoo
-        tv.NewKeyDownEvent (new() { KeyCode = KeyCode.Z });
+        tv.NewKeyDownEvent (new () { KeyCode = KeyCode.Z });
         Assert.Equal (3, tv.SelectedRow);
 
         // move to troll
-        tv.NewKeyDownEvent (new() { KeyCode = KeyCode.T });
+        tv.NewKeyDownEvent (new () { KeyCode = KeyCode.T });
         Assert.Equal (1, tv.SelectedRow);
 
         // move to trap
-        tv.NewKeyDownEvent (new() { KeyCode = KeyCode.T });
+        tv.NewKeyDownEvent (new () { KeyCode = KeyCode.T });
         Assert.Equal (2, tv.SelectedRow);
 
         // change columns to navigate by column 2
         Assert.Equal (0, tv.SelectedColumn);
         Assert.Equal (2, tv.SelectedRow);
-        tv.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorRight });
+        tv.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
         Assert.Equal (1, tv.SelectedColumn);
         Assert.Equal (2, tv.SelectedRow);
 
         // nothing ends with t so stay where you are
-        tv.NewKeyDownEvent (new() { KeyCode = KeyCode.T });
+        tv.NewKeyDownEvent (new () { KeyCode = KeyCode.T });
         Assert.Equal (2, tv.SelectedRow);
 
         //jump to fish which ends in h
-        tv.NewKeyDownEvent (new() { KeyCode = KeyCode.H });
+        tv.NewKeyDownEvent (new () { KeyCode = KeyCode.H });
         Assert.Equal (0, tv.SelectedRow);
 
         // jump to zoo which ends in o
-        tv.NewKeyDownEvent (new() { KeyCode = KeyCode.O });
+        tv.NewKeyDownEvent (new () { KeyCode = KeyCode.O });
         Assert.Equal (3, tv.SelectedRow);
         top.Dispose ();
     }
@@ -1884,7 +1883,7 @@ public class TableViewTests (ITestOutputHelper output)
         Assert.Equal (1, tableView.SelectedColumn);
 
         tableView.NewKeyDownEvent (
-                                   new() { KeyCode = useHome ? KeyCode.Home : KeyCode.CursorLeft }
+                                   new () { KeyCode = useHome ? KeyCode.Home : KeyCode.CursorLeft }
                                   );
 
         // Expect the cursor to stay at 1
@@ -1935,7 +1934,7 @@ public class TableViewTests (ITestOutputHelper output)
         Assert.Equal (2, tableView.SelectedColumn);
 
         tableView.NewKeyDownEvent (
-                                   new() { KeyCode = useEnd ? KeyCode.End : KeyCode.CursorRight }
+                                   new () { KeyCode = useEnd ? KeyCode.End : KeyCode.CursorRight }
                                   );
 
         // Expect the cursor to stay at 2
@@ -2032,12 +2031,12 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.Style.GetOrCreateColumnStyle (1).Visible = false;
         tableView.SelectedColumn = 0;
 
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
 
         // Expect the cursor navigation to skip over the invisible column(s)
         Assert.Equal (2, tableView.SelectedColumn);
 
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorLeft });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorLeft });
 
         // Expect the cursor navigation backwards to skip over invisible column too
         Assert.Equal (0, tableView.SelectedColumn);
@@ -2170,7 +2169,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                          new() { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
+                          new () { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
                          );
 
         // should select that row
@@ -2178,7 +2177,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // shift clicking top row
         tv.NewMouseEvent (
-                          new() { Position = new (1, 2), Flags = MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl }
+                          new () { Position = new (1, 2), Flags = MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl }
                          );
 
         // should extend the selection
@@ -2196,14 +2195,14 @@ public class TableViewTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void TestEnumerableDataSource_BasicTypes ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize(100,100);
+        ((FakeDriver)Application.Driver!).SetBufferSize (100, 100);
         var tv = new TableView ();
         tv.ColorScheme = Colors.ColorSchemes ["TopLevel"];
         tv.Viewport = new (0, 0, 50, 6);
 
         tv.Table = new EnumerableTableSource<Type> (
                                                     new [] { typeof (string), typeof (int), typeof (float) },
-                                                    new()
+                                                    new ()
                                                     {
                                                         { "Name", t => t.Name }, { "Namespace", t => t.Namespace },
                                                         { "BaseType", t => t.BaseType }
@@ -2243,7 +2242,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                          new() { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
+                          new () { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
                          );
 
         // should select that row
@@ -2298,7 +2297,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                          new() { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
+                          new () { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
                          );
 
         // should select that row
@@ -2351,7 +2350,7 @@ A B C
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                          new() { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
+                          new () { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
                          );
 
         // should select that row
@@ -2407,7 +2406,7 @@ A B C
         tv.ColorScheme = Colors.ColorSchemes ["TopLevel"];
         tv.Viewport = new (0, 0, 25, 4);
 
-        tv.Style = new()
+        tv.Style = new ()
         {
             ShowHeaders = false, ShowHorizontalHeaderOverline = false, ShowHorizontalHeaderUnderline = false
         };
@@ -2532,7 +2531,7 @@ A B C
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                          new() { Position = new (1, 3), Flags = MouseFlags.Button1Clicked }
+                          new () { Position = new (1, 3), Flags = MouseFlags.Button1Clicked }
                          );
 
         // should select that row
@@ -2540,7 +2539,7 @@ A B C
 
         // shift clicking top row
         tv.NewMouseEvent (
-                          new() { Position = new (1, 2), Flags = MouseFlags.Button1Clicked | MouseFlags.ButtonShift }
+                          new () { Position = new (1, 2), Flags = MouseFlags.Button1Clicked | MouseFlags.ButtonShift }
                          );
 
         // should extend the selection
@@ -2582,7 +2581,9 @@ A B C
 
         TestHelpers.AssertDriverContentsAre (expected, output);
 
+#pragma warning disable xUnit2029
         Assert.Empty (pets.Where (p => p.IsPicked));
+#pragma warning restore xUnit2029
 
         tv.NewKeyDownEvent (Key.Space);
 
@@ -2795,7 +2796,9 @@ A B C
 
         tv.NewKeyDownEvent (Key.Space);
 
+#pragma warning disable xUnit2029
         Assert.Empty (pets.Where (p => p.IsPicked));
+#pragma warning restore xUnit2029
 
         tv.Draw ();
 
@@ -2924,7 +2927,9 @@ A B C
 
         TestHelpers.AssertDriverContentsAre (expected, output);
 
+#pragma warning disable xUnit2029
         Assert.Empty (pets.Where (p => p.IsPicked));
+#pragma warning restore xUnit2029
 
         tv.NewKeyDownEvent (Key.Space);
 
@@ -2993,7 +2998,7 @@ A B C
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
 
         tableView.MultiSelect = true;
-        tableView.KeyBindings.Add (Key.Space, Command.Select);
+        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Select);
 
         Point selectedCell = tableView.GetAllSelectedCells ().Single ();
         Assert.Equal (0, selectedCell.X);
@@ -3042,14 +3047,14 @@ A B C
         Assert.Equal (1, s2.Y);
 
         // Go back to the toggled cell
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorRight });
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorUp });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorUp });
 
         // Toggle off 
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.Space });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.Space });
 
         // Go Left
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorLeft });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorLeft });
 
         selectedCell = tableView.GetAllSelectedCells ().Single ();
         Assert.Equal (0, selectedCell.X);
@@ -3065,13 +3070,13 @@ A B C
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         tableView.FullRowSelect = true;
         tableView.MultiSelect = true;
-        tableView.KeyBindings.Add (Key.Space, Command.Select);
+        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Select);
 
         // Toggle Select Cell 0,0
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.Space });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.Space });
 
         // Go Down
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorDown });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorDown });
 
         TableSelection m = tableView.MultiSelectedRegions.Single ();
         Assert.True (m.IsToggled);
@@ -3081,15 +3086,17 @@ A B C
         //First row toggled and Second row active = 12 selected cells
         Assert.Equal (12, tableView.GetAllSelectedCells ().Count ());
 
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorRight });
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorUp });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorUp });
 
         Assert.Single (tableView.MultiSelectedRegions.Where (r => r.IsToggled));
 
         // Can untoggle at 1,0 even though 0,0 was initial toggle because FullRowSelect is on
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.Space });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.Space });
 
+#pragma warning disable xUnit2029
         Assert.Empty (tableView.MultiSelectedRegions.Where (r => r.IsToggled));
+#pragma warning restore xUnit2029
     }
 
     [Fact]
@@ -3101,19 +3108,19 @@ A B C
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         tableView.MultiSelect = true;
-        tableView.KeyBindings.Add (Key.Space, Command.Select);
+        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Select);
 
         // Make a square selection
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.ShiftMask | KeyCode.CursorDown });
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.ShiftMask | KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.ShiftMask | KeyCode.CursorDown });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.ShiftMask | KeyCode.CursorRight });
 
         Assert.Equal (4, tableView.GetAllSelectedCells ().Count ());
 
         // Toggle the square selected region on
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.Space });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.Space });
 
         // Go Right
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
 
         //Toggled on square + the active cell (x=2,y=1)
         Assert.Equal (5, tableView.GetAllSelectedCells ().Count ());
@@ -3122,11 +3129,11 @@ A B C
 
         // Untoggle the rectangular region by hitting toggle in
         // any cell in that rect
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorUp });
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorLeft });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorUp });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorLeft });
 
         Assert.Equal (4, tableView.GetAllSelectedCells ().Count ());
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.Space });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.Space });
         Assert.Single (tableView.GetAllSelectedCells ());
     }
 
@@ -3142,23 +3149,215 @@ A B C
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         tableView.MultiSelect = true;
-        tableView.KeyBindings.Add (Key.Space, Command.Select);
+        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Select);
 
         // Make first square selection (0,0 to 1,1)
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.ShiftMask | KeyCode.CursorDown });
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.ShiftMask | KeyCode.CursorRight });
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.Space });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.ShiftMask | KeyCode.CursorDown });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.ShiftMask | KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.Space });
         Assert.Equal (4, tableView.GetAllSelectedCells ().Count ());
 
         // Make second square selection leaving 1 unselected line between them
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorLeft });
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorDown });
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.CursorDown });
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.ShiftMask | KeyCode.CursorDown });
-        tableView.NewKeyDownEvent (new() { KeyCode = KeyCode.ShiftMask | KeyCode.CursorRight });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorLeft });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorDown });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorDown });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.ShiftMask | KeyCode.CursorDown });
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.ShiftMask | KeyCode.CursorRight });
 
         // 2 square selections
         Assert.Equal (8, tableView.GetAllSelectedCells ().Count ());
+    }
+
+    [Fact]
+    public void TestDataColumnCaption ()
+    {
+        var tableView = new TableView ();
+
+        var dt = new DataTable ();
+        dt.Columns.Add (new DataColumn ()
+        {
+            Caption = "Caption 1",
+            ColumnName = "Column Name 1"
+        });
+        dt.Columns.Add (new DataColumn ()
+        {
+            ColumnName = "Column Name 2"
+        });
+
+        var dts = new DataTableSource (dt);
+        var cn = dts.ColumnNames;
+
+        Assert.Equal ("Caption 1", cn [0]);
+        Assert.Equal ("Column Name 2", cn [1]);
+    }
+
+
+    [Fact]
+    public void CanTabOutOfTableViewUsingCursor_Left ()
+    {
+        GetTableViewWithSiblings (out var tf1, out var tableView, out var tf2);
+
+        // Make the selected cell one in
+        tableView.SelectedColumn = 1;
+
+        // Pressing left should move us to the first column without changing focus
+        Application.OnKeyDown (Key.CursorLeft);
+        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.True (tableView.HasFocus);
+
+        // Because we are now on the leftmost cell a further left press should move focus
+        Application.OnKeyDown (Key.CursorLeft);
+
+        Assert.NotSame (tableView, Application.Current.MostFocused);
+        Assert.False (tableView.HasFocus);
+
+        Assert.Same (tf1, Application.Current.MostFocused);
+        Assert.True (tf1.HasFocus);
+
+        Application.Current.Dispose ();
+    }
+
+    [Fact]
+    public void CanTabOutOfTableViewUsingCursor_Up ()
+    {
+        GetTableViewWithSiblings (out var tf1, out var tableView, out var tf2);
+
+        // Make the selected cell one in
+        tableView.SelectedRow = 1;
+
+        // First press should move us up
+        Application.OnKeyDown (Key.CursorUp);
+        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.True (tableView.HasFocus);
+
+        // Because we are now on the top row a further press should move focus
+        Application.OnKeyDown (Key.CursorUp);
+
+        Assert.NotSame (tableView, Application.Current.MostFocused);
+        Assert.False (tableView.HasFocus);
+
+        Assert.Same (tf1, Application.Current.MostFocused);
+        Assert.True (tf1.HasFocus);
+
+        Application.Current.Dispose ();
+    }
+    [Fact]
+    public void CanTabOutOfTableViewUsingCursor_Right ()
+    {
+        GetTableViewWithSiblings (out var tf1, out var tableView, out var tf2);
+
+        // Make the selected cell one in from the rightmost column
+        tableView.SelectedColumn = tableView.Table.Columns - 2;
+
+        // First press should move us to the rightmost column without changing focus
+        Application.OnKeyDown (Key.CursorRight);
+        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.True (tableView.HasFocus);
+
+        // Because we are now on the rightmost cell, a further right press should move focus
+        Application.OnKeyDown (Key.CursorRight);
+
+        Assert.NotSame (tableView, Application.Current.MostFocused);
+        Assert.False (tableView.HasFocus);
+
+        Assert.Same (tf2, Application.Current.MostFocused);
+        Assert.True (tf2.HasFocus);
+
+        Application.Current.Dispose ();
+    }
+
+    [Fact]
+    public void CanTabOutOfTableViewUsingCursor_Down ()
+    {
+        GetTableViewWithSiblings (out var tf1, out var tableView, out var tf2);
+
+        // Make the selected cell one in from the bottommost row
+        tableView.SelectedRow = tableView.Table.Rows - 2;
+
+        // First press should move us to the bottommost row without changing focus
+        Application.OnKeyDown (Key.CursorDown);
+        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.True (tableView.HasFocus);
+
+        // Because we are now on the bottommost cell, a further down press should move focus
+        Application.OnKeyDown (Key.CursorDown);
+
+        Assert.NotSame (tableView, Application.Current.MostFocused);
+        Assert.False (tableView.HasFocus);
+
+        Assert.Same (tf2, Application.Current.MostFocused);
+        Assert.True (tf2.HasFocus);
+
+        Application.Current.Dispose ();
+    }
+
+
+    [Fact]
+    public void CanTabOutOfTableViewUsingCursor_Left_ClearsSelectionFirst ()
+    {
+        GetTableViewWithSiblings (out var tf1, out var tableView, out var tf2);
+
+        // Make the selected cell one in
+        tableView.SelectedColumn = 1;
+
+        // Pressing shift-left should give us a multi selection
+        Application.OnKeyDown (Key.CursorLeft.WithShift);
+        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.True (tableView.HasFocus);
+        Assert.Equal (2, tableView.GetAllSelectedCells ().Count ());
+
+        // Because we are now on the leftmost cell a further left press would normally move focus
+        // However there is an ongoing selection so instead the operation clears the selection and
+        // gets swallowed (not resulting in a focus change)
+        Application.OnKeyDown (Key.CursorLeft);
+
+        // Selection 'clears' just to the single cell and we remain focused
+        Assert.Single (tableView.GetAllSelectedCells ());
+        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.True (tableView.HasFocus);
+
+        // A further left will switch focus
+        Application.OnKeyDown (Key.CursorLeft);
+
+        Assert.NotSame (tableView, Application.Current.MostFocused);
+        Assert.False (tableView.HasFocus);
+
+        Assert.Same (tf1, Application.Current.MostFocused);
+        Assert.True (tf1.HasFocus);
+
+        Application.Current.Dispose ();
+    }
+
+    /// <summary>
+    /// Creates 3 views on <see cref="Application.Current"/> with the focus in the
+    /// <see cref="TableView"/>.  This is a helper method to setup tests that want to
+    /// explore moving input focus out of a tableview.
+    /// </summary>
+    /// <param name="tv"></param>
+    /// <param name="tf1"></param>
+    /// <param name="tf2"></param>
+    private void GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2)
+    {
+        tableView = new TableView ();
+        tableView.BeginInit ();
+        tableView.EndInit ();
+
+        Application.Navigation = new ();
+        Application.Current = new ();
+        tf1 = new TextField ();
+        tf2 = new TextField ();
+        Application.Current.Add (tf1);
+        Application.Current.Add (tableView);
+        Application.Current.Add (tf2);
+
+        tableView.SetFocus ();
+
+        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.True (tableView.HasFocus);
+
+
+        // Set big table
+        tableView.Table = BuildTable (25, 50);
     }
 
     private TableView GetABCDEFTableView (out DataTable dt)
@@ -3205,7 +3404,7 @@ A B C
 
         tv.Table = source = new (
                                  pets,
-                                 new()
+                                 new ()
                                  {
                                      { "Name", p => p.Name }, { "Kind", p => p.Kind }
                                  }

@@ -55,7 +55,7 @@ public class ListViewTests (ITestOutputHelper output)
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (12, 12);
+        ((FakeDriver)Application.Driver!).SetBufferSize (12, 12);
         Application.Refresh ();
 
         Assert.Equal (-1, lv.SelectedItem);
@@ -357,7 +357,7 @@ Item 6",
 
             for (var i = 0; i < 7; i++)
             {
-                item += Application.Driver.Contents [line, i].Rune;
+                item += Application.Driver?.Contents [line, i].Rune;
             }
 
             return item;
@@ -420,7 +420,7 @@ Item 6",
 
         return;
 
-        void OnAccept (object sender, CancelEventArgs e) { accepted = true; }
+        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -451,7 +451,7 @@ Item 6",
             selectedValue = e.Value.ToString ();
         }
 
-        void Accept (object sender, CancelEventArgs e) { accepted = true; }
+        void Accept (object sender, HandledEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -482,10 +482,10 @@ Item 6",
             selectedValue = e.Value.ToString ();
         }
 
-        void Accept (object sender, CancelEventArgs e)
+        void Accept (object sender, HandledEventArgs e)
         {
             accepted = true;
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 
@@ -612,7 +612,7 @@ Item 6",
         var lv = new ListView ();
         var top = new View ();
         top.Add (lv);
-        Exception exception = Record.Exception (lv.SetFocus);
+        Exception exception = Record.Exception (() => lv.SetFocus());
         Assert.Null (exception);
     }
 
@@ -674,8 +674,10 @@ Item 6",
 
     private class NewListDataSource : IListDataSource
     {
+#pragma warning disable CS0067
         /// <inheritdoc />
         public event NotifyCollectionChangedEventHandler CollectionChanged;
+#pragma warning restore CS0067
 
         public int Count => 0;
         public int Length => 0;

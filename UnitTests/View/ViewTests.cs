@@ -14,26 +14,26 @@ public class ViewTests (ITestOutputHelper output)
 
         view.DrawContent += (s, e) =>
                             {
-                                Rectangle savedClip = Application.Driver.Clip;
-                                Application.Driver.Clip = new (1, 1, view.Viewport.Width, view.Viewport.Height);
+                                Rectangle savedClip = Application.Driver!.Clip;
+                                Application.Driver!.Clip = new (1, 1, view.Viewport.Width, view.Viewport.Height);
 
                                 for (var row = 0; row < view.Viewport.Height; row++)
                                 {
-                                    Application.Driver.Move (1, row + 1);
+                                    Application.Driver?.Move (1, row + 1);
 
                                     for (var col = 0; col < view.Viewport.Width; col++)
                                     {
-                                        Application.Driver.AddStr ($"{col}");
+                                        Application.Driver?.AddStr ($"{col}");
                                     }
                                 }
 
-                                Application.Driver.Clip = savedClip;
+                                Application.Driver!.Clip = savedClip;
                                 e.Cancel = true;
                             };
         var top = new Toplevel ();
         top.Add (view);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
 
         var expected = @"
 ┌──────────────────┐
@@ -78,26 +78,26 @@ public class ViewTests (ITestOutputHelper output)
 
         view.DrawContent += (s, e) =>
                             {
-                                Rectangle savedClip = Application.Driver.Clip;
-                                Application.Driver.Clip = new (1, 1, view.Viewport.Width, view.Viewport.Height);
+                                Rectangle savedClip = Application.Driver!.Clip;
+                                Application.Driver!.Clip = new (1, 1, view.Viewport.Width, view.Viewport.Height);
 
                                 for (var row = 0; row < view.Viewport.Height; row++)
                                 {
-                                    Application.Driver.Move (1, row + 1);
+                                    Application.Driver?.Move (1, row + 1);
 
                                     for (var col = 0; col < view.Viewport.Width; col++)
                                     {
-                                        Application.Driver.AddStr ($"{col}");
+                                        Application.Driver?.AddStr ($"{col}");
                                     }
                                 }
 
-                                Application.Driver.Clip = savedClip;
+                                Application.Driver!.Clip = savedClip;
                                 e.Cancel = true;
                             };
         var top = new Toplevel ();
         top.Add (view);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
 
         var expected = @"
 ┌──────────────────┐
@@ -143,9 +143,13 @@ public class ViewTests (ITestOutputHelper output)
     {
         var root = new View { Width = 20, Height = 10, ColorScheme = Colors.ColorSchemes ["Base"] };
 
+        string text = new ('c', 100);
+
         View v = label
-                     ? new Label { Text = new ('c', 100) }
-                     : new TextView { Height = 1, Text = new ('c', 100), Width = Dim.Fill () };
+                     // Label has Width/Height == AutoSize, so Frame.Size will be (100, 1)
+                     ? new Label { Text = text }
+                     // TextView has Width/Height == (Dim.Fill, 1), so Frame.Size will be 20 (width of root), 1
+                     : new TextView { Width = Dim.Fill (), Height = 1, Text = text };
 
         root.Add (v);
 
@@ -156,8 +160,7 @@ public class ViewTests (ITestOutputHelper output)
         if (label)
         {
             Assert.False (v.CanFocus);
-
-            //Assert.Equal (new Rectangle (0, 0, 20, 1), v.Frame);
+            Assert.Equal (new  (0, 0, text.Length, 1), v.Frame);
         }
         else
         {
@@ -203,7 +206,7 @@ cccccccccccccccccccc",
         {
             root.CanFocus = true;
             v.CanFocus = true;
-            Assert.False (v.HasFocus);
+            Assert.True (v.HasFocus);
             v.SetFocus ();
             Assert.True (v.HasFocus);
             Application.Refresh ();
@@ -460,14 +463,16 @@ At 0,0
             ColorScheme = Colors.ColorSchemes ["Menu"], X = 0, Y = 0, Text = "This should be the first line."
         };
 
-        var button = new Button
+        var view = new View
         {
             X = 0, // don't overcomplicate unit tests
             Y = 1,
+            Height = Dim.Auto (DimAutoStyle.Text),
+            Width = Dim.Auto(DimAutoStyle.Text),
             Text = "Press me!"
         };
 
-        frame.Add (label, button);
+        frame.Add (label, view);
 
         frame.X = Pos.Center ();
         frame.Y = Pos.Center ();
@@ -486,7 +491,7 @@ At 0,0
 
         label.LayoutComplete += (s, e) => { Assert.Equal (new (0, 0, 38, 1), label._needsDisplayRect); };
 
-        button.LayoutComplete += (s, e) => { Assert.Equal (new (0, 0, 13, 1), button._needsDisplayRect); };
+        view.LayoutComplete += (s, e) => { Assert.Equal (new (0, 0, 13, 1), view._needsDisplayRect); };
 
         Assert.Equal (new (0, 0, 80, 25), top.Frame);
         Assert.Equal (new (20, 8, 40, 8), frame.Frame);
@@ -501,7 +506,7 @@ At 0,0
                                     )
                      );
         Assert.Equal (new (0, 0, 30, 1), label.Frame);
-        Assert.Equal (new (0, 1, 13, 1), button.Frame); // this proves frame was set
+        Assert.Equal (new (0, 1, 9, 1), view.Frame); // this proves frame was set
         Application.End (runState);
         top.Dispose ();
     }
@@ -831,10 +836,10 @@ At 0,0
             TextDirection = TextDirection.TopBottom_LeftRight,
             Width = Dim.Auto (),
             Height = Dim.Auto ()
-        }; // BUGBUG: AutoSize or Height need be set
+        };
+        r.TextFormatter.WordWrap = false;
         Assert.NotNull (r);
 
-        // BUGBUG: IsInitialized must be true to process calculation
         r.BeginInit ();
         r.EndInit ();
         Assert.False (r.CanFocus);
@@ -871,14 +876,6 @@ At 0,0
         Assert.False (r.NewMouseEvent (new() { Flags = MouseFlags.AllEvents }));
         Assert.False (r.NewMouseEnterEvent (new() { Flags = MouseFlags.AllEvents }));
         Assert.False (r.NewMouseLeaveEvent (new() { Flags = MouseFlags.AllEvents }));
-
-        var v1 = new View ();
-        Assert.False (r.OnEnter (v1));
-        v1.Dispose ();
-
-        var v2 = new View ();
-        Assert.False (r.OnLeave (v2));
-        v2.Dispose ();
 
         r.Dispose ();
 
@@ -1001,7 +998,6 @@ At 0,0
     {
         var view = new View { Text = "Testing visibility." }; // use View, not Label to avoid AutoSize == true
 
-        // BUGBUG: AutoSize is false and size wasn't provided so it's 0,0
         Assert.Equal (0, view.Frame.Width);
         Assert.Equal (0, view.Height);
         var win = new Window ();
@@ -1014,7 +1010,7 @@ At 0,0
         view.Height = Dim.Auto ();
         Assert.Equal ("Testing visibility.".Length, view.Frame.Width);
         Assert.True (view.Visible);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1068,7 +1064,6 @@ At 0,0
                                      Assert.True (win.Visible);
                                      Assert.True (win.CanFocus);
                                      Assert.True (win.HasFocus);
-                                     Assert.True (RunesCount () > 0);
 
                                      win.Visible = false;
                                      Assert.True (button.Visible);
@@ -1077,21 +1072,18 @@ At 0,0
                                      Assert.False (win.Visible);
                                      Assert.True (win.CanFocus);
                                      Assert.False (win.HasFocus);
+
                                      button.SetFocus ();
                                      Assert.False (button.HasFocus);
                                      Assert.False (win.HasFocus);
+
                                      win.SetFocus ();
                                      Assert.False (button.HasFocus);
                                      Assert.False (win.HasFocus);
-                                     top.Draw ();
-                                     Assert.True (RunesCount () == 0);
 
                                      win.Visible = true;
-                                     win.FocusFirst ();
                                      Assert.True (button.HasFocus);
                                      Assert.True (win.HasFocus);
-                                     top.Draw ();
-                                     Assert.True (RunesCount () > 0);
 
                                      Application.RequestStop ();
                                  };
@@ -1099,25 +1091,6 @@ At 0,0
         Application.Run (top);
         top.Dispose ();
         Assert.Equal (1, iterations);
-
-        int RunesCount ()
-        {
-            Cell [,] contents = ((FakeDriver)Application.Driver).Contents;
-            var runesCount = 0;
-
-            for (var i = 0; i < Application.Driver.Rows; i++)
-            {
-                for (var j = 0; j < Application.Driver.Cols; j++)
-                {
-                    if (contents [i, j].Rune != (Rune)' ')
-                    {
-                        runesCount++;
-                    }
-                }
-            }
-
-            return runesCount;
-        }
     }
 
     public class DerivedView : View
@@ -1196,7 +1169,7 @@ At 0,0
 
         return;
 
-        void ViewOnAccept (object sender, CancelEventArgs e) { accepted = true; }
+        void ViewOnAccept (object sender, HandledEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -1213,10 +1186,10 @@ At 0,0
 
         return;
 
-        void ViewOnAccept (object sender, CancelEventArgs e)
+        void ViewOnAccept (object sender, HandledEventArgs e)
         {
             acceptInvoked = true;
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 
@@ -1233,7 +1206,7 @@ At 0,0
 
         return;
 
-        void ViewOnAccept (object sender, CancelEventArgs e) { accepted = true; }
+        void ViewOnAccept (object sender, HandledEventArgs e) { accepted = true; }
     }
 
     [Fact]

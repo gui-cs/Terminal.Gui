@@ -1,7 +1,7 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     EventArgs for events where the state of the <see cref="View.SuperView"/> of a <see cref="View"/> is changing (e.g.
+///     Args for events where the <see cref="View.SuperView"/> of a <see cref="View"/> is changed (e.g.
 ///     <see cref="View.Removed"/> / <see cref="View.Added"/> events).
 /// </summary>
 public class SuperViewChangedEventArgs : EventArgs
@@ -15,12 +15,12 @@ public class SuperViewChangedEventArgs : EventArgs
         SubView = subView;
     }
 
-    /// <summary>The SubView that is either being added or removed from <see cref="Parent"/>.</summary>
+    /// <summary>The view that is having it's <see cref="View.SuperView"/> changed</summary>
     public View SubView { get; }
 
     /// <summary>
-    ///     The SuperView that is changing state. For <see cref="View.Removed"/> this is the SuperView <see cref="SubView"/> is being removed from. For
-    ///     <see cref="View.Added"/> it is the SuperView <see cref="SubView"/> is being added to.
+    ///     The parent.  For <see cref="View.Removed"/> this is the old parent (new parent now being null).  For
+    ///     <see cref="View.Added"/> it is the new parent to whom view now belongs.
     /// </summary>
     public View SuperView { get; }
 }

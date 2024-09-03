@@ -1,7 +1,6 @@
 #nullable enable
 
 using System.ComponentModel;
-using System.Drawing;
 
 namespace Terminal.Gui;
 
@@ -24,18 +23,12 @@ namespace Terminal.Gui;
 ///         The alignment is applied to all views with the same <see cref="GroupId"/>.
 ///     </para>
 /// </remarks>
-public class PosAlign : Pos
+public record PosAlign : Pos
 {
     /// <summary>
     ///     The cached location. Used to store the calculated location to minimize recalculating it.
     /// </summary>
     public int? _cachedLocation;
-
-    /// <summary>
-    ///     Gets the identifier of a set of views that should be aligned together. When only a single
-    ///     set of views in a SuperView is aligned, setting <see cref="GroupId"/> is not needed because it defaults to 0.
-    /// </summary>
-    public int GroupId { get; init; }
 
     private readonly Aligner? _aligner;
 
@@ -57,128 +50,9 @@ public class PosAlign : Pos
         }
     }
 
-    /// <summary>
-    ///     Aligns the views in <paramref name="views"/> that have the same group ID as <paramref name="groupId"/>.
-    ///     Updates each view's cached _location.
-    /// </summary>
-    /// <param name="groupId"></param>
-    /// <param name="views"></param>
-    /// <param name="dimension"></param>
-    /// <param name="size"></param>
-    private static void AlignAndUpdateGroup (int groupId, IList<View> views, Dimension dimension, int size)
-    {
-        List<int> dimensionsList = new ();
-
-        // PERF: If this proves a perf issue, consider caching a ref to this list in each item
-        List<PosAlign?> posAligns = views.Select (
-                                                v =>
-                                                {
-                                                    switch (dimension)
-                                                    {
-                                                        case Dimension.Width when v.X.Has (typeof (PosAlign), out var pos):
-
-                                                            if (pos is PosAlign posAlignX && posAlignX.GroupId == groupId)
-                                                            {
-                                                                return posAlignX;
-                                                            }
-
-                                                            break;
-                                                        case Dimension.Height when v.Y.Has (typeof (PosAlign), out var pos):
-                                                            if (pos is PosAlign posAlignY && posAlignY.GroupId == groupId)
-                                                            {
-                                                                return posAlignY;
-                                                            }
-
-                                                            break;
-                                                    }
-
-                                                    return null;
-                                                })
-                                       .ToList ();
-
-        // PERF: We iterate over viewsInGroup multiple times here.
-
-        Aligner? firstInGroup = null;
-
-        // Update the dimensionList with the sizes of the views
-        for (var index = 0; index < posAligns.Count; index++)
-        {
-            if (posAligns [index] is { })
-            {
-                if (firstInGroup is null)
-                {
-                    firstInGroup = posAligns [index]!.Aligner;
-                }
-
-                dimensionsList.Add (dimension == Dimension.Width ? views [index].Frame.Width : views [index].Frame.Height);
-            }
-        }
-
-        if (firstInGroup is null)
-        {
-            return;
-        }
-
-        // Update the first item in the group with the new container size.
-        firstInGroup.ContainerSize = size;
-
-        // Align
-        int [] locations = firstInGroup.Align (dimensionsList.ToArray ());
-
-        // Update the cached location for each item
-        for (int posIndex = 0, locIndex = 0; posIndex < posAligns.Count; posIndex++)
-        {
-            if (posAligns [posIndex] is { })
-            {
-                posAligns [posIndex]!._cachedLocation = locations [locIndex++];
-            }
-        }
-    }
-
-    private void Aligner_PropertyChanged (object? sender, PropertyChangedEventArgs e) { _cachedLocation = null; }
-
-    /// <inheritdoc/>
-    public override bool Equals (object? other)
-    {
-        return other is PosAlign align
-               && GroupId == align.GroupId
-               && align.Aligner.Alignment == Aligner.Alignment
-               && align.Aligner.AlignmentModes == Aligner.AlignmentModes;
-    }
-
-    /// <inheritdoc/>
-    public override int GetHashCode () { return HashCode.Combine (Aligner, GroupId); }
-
-    /// <inheritdoc/>
-    public override string ToString () { return $"Align(alignment={Aligner.Alignment},modes={Aligner.AlignmentModes},groupId={GroupId})"; }
-
-    internal override int GetAnchor (int width) { return _cachedLocation ?? 0 - width; }
-
-    internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
-    {
-        if (_cachedLocation.HasValue && Aligner.ContainerSize == superviewDimension)
-        {
-            return _cachedLocation.Value;
-        }
-
-        if (us?.SuperView is null)
-        {
-            return 0;
-        }
-
-        AlignAndUpdateGroup (GroupId, us.SuperView.Subviews, dimension, superviewDimension);
-
-        if (_cachedLocation.HasValue)
-        {
-            return _cachedLocation.Value;
-        }
-
-        return 0;
-    }
-
     // TODO: PosAlign.CalculateMinDimension is a hack. Need to figure out a better way of doing this.
     /// <summary>
-    /// Returns the minimum size a group of views with the same <paramref name="groupId"/> can be.
+    ///     Returns the minimum size a group of views with the same <paramref name="groupId"/> can be.
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="views"></param>
@@ -224,4 +98,117 @@ public class PosAlign : Pos
         // Align
         return dimensionsList.Sum ();
     }
+
+    /// <summary>
+    ///     Gets the identifier of a set of views that should be aligned together. When only a single
+    ///     set of views in a SuperView is aligned, setting <see cref="GroupId"/> is not needed because it defaults to 0.
+    /// </summary>
+    public int GroupId { get; init; }
+
+    /// <inheritdoc/>
+    public override string ToString () { return $"Align(alignment={Aligner.Alignment},modes={Aligner.AlignmentModes},groupId={GroupId})"; }
+
+    internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
+    {
+        if (_cachedLocation.HasValue && Aligner.ContainerSize == superviewDimension)
+        {
+            return _cachedLocation.Value;
+        }
+
+        if (us?.SuperView is null)
+        {
+            return 0;
+        }
+
+        AlignAndUpdateGroup (GroupId, us.SuperView.Subviews, dimension, superviewDimension);
+
+        if (_cachedLocation.HasValue)
+        {
+            return _cachedLocation.Value;
+        }
+
+        return 0;
+    }
+
+    internal override int GetAnchor (int width) { return _cachedLocation ?? 0 - width; }
+
+    /// <summary>
+    ///     Aligns the views in <paramref name="views"/> that have the same group ID as <paramref name="groupId"/>.
+    ///     Updates each view's cached _location.
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="views"></param>
+    /// <param name="dimension"></param>
+    /// <param name="size"></param>
+    private static void AlignAndUpdateGroup (int groupId, IList<View> views, Dimension dimension, int size)
+    {
+        List<int> dimensionsList = new ();
+
+        // PERF: If this proves a perf issue, consider caching a ref to this list in each item
+        List<PosAlign?> posAligns = views.Select (
+                                                  v =>
+                                                  {
+                                                      switch (dimension)
+                                                      {
+                                                          case Dimension.Width when v.X.Has<PosAlign> (out Pos pos):
+
+                                                              if (pos is PosAlign posAlignX && posAlignX.GroupId == groupId)
+                                                              {
+                                                                  return posAlignX;
+                                                              }
+
+                                                              break;
+                                                          case Dimension.Height when v.Y.Has<PosAlign> (out Pos pos):
+                                                              if (pos is PosAlign posAlignY && posAlignY.GroupId == groupId)
+                                                              {
+                                                                  return posAlignY;
+                                                              }
+
+                                                              break;
+                                                      }
+
+                                                      return null;
+                                                  })
+                                         .ToList ();
+
+        // PERF: We iterate over viewsInGroup multiple times here.
+
+        Aligner? firstInGroup = null;
+
+        // Update the dimensionList with the sizes of the views
+        for (var index = 0; index < posAligns.Count; index++)
+        {
+            if (posAligns [index] is { })
+            {
+                if (firstInGroup is null)
+                {
+                    firstInGroup = posAligns [index]!.Aligner;
+                }
+
+                dimensionsList.Add (dimension == Dimension.Width ? views [index].Frame.Width : views [index].Frame.Height);
+            }
+        }
+
+        if (firstInGroup is null)
+        {
+            return;
+        }
+
+        // Update the first item in the group with the new container size.
+        firstInGroup.ContainerSize = size;
+
+        // Align
+        int [] locations = firstInGroup.Align (dimensionsList.ToArray ());
+
+        // Update the cached location for each item
+        for (int posIndex = 0, locIndex = 0; posIndex < posAligns.Count; posIndex++)
+        {
+            if (posAligns [posIndex] is { })
+            {
+                posAligns [posIndex]!._cachedLocation = locations [locIndex++];
+            }
+        }
+    }
+
+    private void Aligner_PropertyChanged (object? sender, PropertyChangedEventArgs e) { _cachedLocation = null; }
 }

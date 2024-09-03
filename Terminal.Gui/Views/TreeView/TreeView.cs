@@ -34,8 +34,10 @@ public class TreeView : TreeView<ITreeNode>
     /// </summary>
     public TreeView ()
     {
+        CanFocus = true;
+
         TreeBuilder = new TreeNodeBuilder ();
-        AspectGetter = o => o is null ? "Null" : o.Text ?? o?.ToString () ?? "Unamed Node";
+        AspectGetter = o => o is null ? "Null" : o.Text ?? o?.ToString () ?? "Unnamed Node";
     }
 }
 
@@ -72,7 +74,7 @@ public class TreeView<T> : View, ITreeView where T : class
     private T selectedObject;
 
     /// <summary>
-    ///     Creates a new tree view with absolute positioning. Use <see cref="AddObjects(IEnumerable{T})"/> to set set
+    ///     Creates a new tree view with absolute positioning. Use <see cref="AddObjects(IEnumerable{T})"/> to set
     ///     root objects for the tree. Children will not be rendered until you set <see cref="TreeBuilder"/>.
     /// </summary>
     public TreeView ()
@@ -299,7 +301,7 @@ public class TreeView<T> : View, ITreeView where T : class
 
     /// <summary>
     ///     Initialises <see cref="TreeBuilder"/>.Creates a new tree view with absolute positioning. Use
-    ///     <see cref="AddObjects(IEnumerable{T})"/> to set set root objects for the tree.
+    ///     <see cref="AddObjects(IEnumerable{T})"/> to set root objects for the tree.
     /// </summary>
     public TreeView (ITreeBuilder<T> builder) : this () { TreeBuilder = builder; }
 
@@ -315,7 +317,7 @@ public class TreeView<T> : View, ITreeView where T : class
     public AspectGetterDelegate<T> AspectGetter { get; set; } = o => o.ToString () ?? "";
 
     /// <summary>
-    ///     Delegate for multi colored tree views. Return the <see cref="ColorScheme"/> to use for each passed object or
+    ///     Delegate for multi-colored tree views. Return the <see cref="ColorScheme"/> to use for each passed object or
     ///     null to use the default.
     /// </summary>
     public Func<T, ColorScheme> ColorGetter { get; set; }
@@ -352,7 +354,7 @@ public class TreeView<T> : View, ITreeView where T : class
         {
             if (objectActivationKey != value)
             {
-                KeyBindings.Replace (ObjectActivationKey, value);
+                KeyBindings.ReplaceKey (ObjectActivationKey, value);
                 objectActivationKey = value;
             }
         }
@@ -374,7 +376,7 @@ public class TreeView<T> : View, ITreeView where T : class
 
     /// <summary>The amount of tree view that has been scrolled off the top of the screen (by the user scrolling down).</summary>
     /// <remarks>
-    ///     Setting a value of less than 0 will result in a offset of 0. To see changes in the UI call
+    ///     Setting a value of less than 0 will result in an offset of 0. To see changes in the UI call
     ///     <see cref="View.SetNeedsDisplay()"/>.
     /// </remarks>
     public int ScrollOffsetVertical
@@ -402,7 +404,7 @@ public class TreeView<T> : View, ITreeView where T : class
         }
     }
 
-    /// <summary>Determines how sub branches of the tree are dynamically built at runtime as the user expands root nodes.</summary>
+    /// <summary>Determines how sub-branches of the tree are dynamically built at runtime as the user expands root nodes.</summary>
     /// <value></value>
     public ITreeBuilder<T> TreeBuilder { get; set; }
 
@@ -500,7 +502,7 @@ public class TreeView<T> : View, ITreeView where T : class
     /// </param>
     public void AdjustSelection (int offset, bool expandSelection = false)
     {
-        // if it is not a shift click or we don't allow multi select
+        // if it is not a shift click, or we don't allow multi select
         if (!expandSelection || !MultiSelect)
         {
             multiSelectedRegions.Clear ();
@@ -518,7 +520,7 @@ public class TreeView<T> : View, ITreeView where T : class
 
             if (idx == -1)
             {
-                // The current selection has disapeared!
+                // The current selection has disappeared!
                 SelectedObject = roots.Keys.FirstOrDefault ();
             }
             else
@@ -975,6 +977,7 @@ public class TreeView<T> : View, ITreeView where T : class
     /// <returns></returns>
     public bool IsSelected (T model) { return Equals (SelectedObject, model) || (MultiSelect && multiSelectedRegions.Any (s => s.Contains (model))); }
 
+    // BUGBUG: OnMouseEvent is internal. TreeView should not be overriding.
     ///<inheritdoc/>
     protected internal override bool OnMouseEvent (MouseEvent me)
     {
@@ -1090,7 +1093,7 @@ public class TreeView<T> : View, ITreeView where T : class
             SelectedObject = clickedBranch.Model;
             SetNeedsDisplay ();
 
-            // trigger activation event				
+            // trigger activation event
             OnObjectActivated (new ObjectActivatedEventArgs<T> (this, clickedBranch.Model));
 
             // mouse event is handled.
@@ -1155,14 +1158,16 @@ public class TreeView<T> : View, ITreeView where T : class
     }
 
     ///<inheritdoc/>
-    public override bool OnEnter (View view)
+    protected override void OnHasFocusChanged (bool newHasFocus, [CanBeNull] View currentFocused, [CanBeNull] View newFocused)
     {
-        if (SelectedObject is null && Objects.Any ())
+        if (newHasFocus)
         {
-            SelectedObject = Objects.First ();
+            // If there is no selected object and there are objects in the tree, select the first one
+            if (SelectedObject is null && Objects.Any ())
+            {
+                SelectedObject = Objects.First ();
+            }
         }
-
-        return base.OnEnter (view);
     }
 
     /// <inheritdoc/>
@@ -1324,7 +1329,7 @@ public class TreeView<T> : View, ITreeView where T : class
 
     /// <summary>
     ///     Implementation of <see cref="Collapse(T)"/> and <see cref="CollapseAll(T)"/>. Performs operation and updates
-    ///     selection if disapeared.
+    ///     selection if disappeared.
     /// </summary>
     /// <param name="toCollapse"></param>
     /// <param name="all"></param>

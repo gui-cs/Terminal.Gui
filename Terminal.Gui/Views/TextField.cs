@@ -39,9 +39,16 @@ public class TextField : View
         Used = true;
         WantMousePositionReports = true;
 
+        // By default, disable hotkeys (in case someome sets Title)
+        HotKeySpecifier = new ('\xffff');
+
         _historyText.ChangeText += HistoryText_ChangeText;
 
         Initialized += TextField_Initialized;
+
+        Added += TextField_Added;
+
+        Removed += TextField_Removed;
 
         // Things this view knows how to do
         AddCommand (
@@ -134,15 +141,7 @@ public class TextField : View
                     }
                    );
 
-        AddCommand (
-                    Command.Left,
-                    () =>
-                    {
-                        MoveLeft ();
-
-                        return true;
-                    }
-                   );
+        AddCommand (Command.Left, () => MoveLeft ());
 
         AddCommand (
                     Command.RightEnd,
@@ -154,15 +153,7 @@ public class TextField : View
                     }
                    );
 
-        AddCommand (
-                    Command.Right,
-                    () =>
-                    {
-                        MoveRight ();
-
-                        return true;
-                    }
-                   );
+        AddCommand (Command.Right, () => MoveRight ());
 
         AddCommand (
                     Command.CutToEndLine,
@@ -334,9 +325,9 @@ public class TextField : View
                     }
                    );
 
-        // OnAccept returns true if the event is canceled.
-        // By Default pressing ENTER should be ignored (Invoke(Command.Accept) should return false).
-        AddCommand (Command.Accept, () => OnAccept () != true);
+        // By Default pressing ENTER should be ignored (OnAccept will return false or null). Only cancel if the
+        // event was fired and set Cancel = true.
+        AddCommand (Command.Accept, () => OnAccept () == false);
 
         // Default keybindings for this view
         // We follow this as closely as possible: https://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
@@ -414,12 +405,13 @@ public class TextField : View
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
 
-        ContextMenu = new ContextMenu { Host = this, MenuItems = BuildContextMenuBarItem () };
+        ContextMenu = new ContextMenu { Host = this };
         ContextMenu.KeyChanged += ContextMenu_KeyChanged;
 
         KeyBindings.Add (ContextMenu.Key, KeyBindingScope.HotKey, Command.ShowContextMenu);
         KeyBindings.Add (Key.Enter, Command.Accept);
     }
+
 
     /// <summary>
     ///     Provides autocomplete context menu based on suggestions at the current cursor position. Configure
@@ -532,9 +524,11 @@ public class TextField : View
                 return;
             }
 
-            StateEventArgs<string> newText = OnTextChanging (value.Replace ("\t", "").Split ("\n") [0]);
+            string newText = value.Replace ("\t", "").Split ("\n") [0];
+            CancelEventArgs<string> args = new (ref oldText, ref newText);
+            OnTextChanging (args);
 
-            if (newText.Cancel)
+            if (args.Cancel)
             {
                 if (_cursorPosition > _text.Count)
                 {
@@ -545,7 +539,9 @@ public class TextField : View
             }
 
             ClearAllSelection ();
-            _text = newText.NewValue.EnumerateRunes ().ToList ();
+
+            // Note we use NewValue here; TextChanging subscribers may have changed it
+            _text = args.NewValue.EnumerateRunes ().ToList ();
 
             if (!Secret && !_historyText.IsFromHistory)
             {
@@ -561,7 +557,7 @@ public class TextField : View
                                  );
             }
 
-            OnTextChanged (oldText, StringExtensions.ToString (_text));
+            OnTextChanged ();
 
             ProcessAutocomplete ();
 
@@ -597,7 +593,7 @@ public class TextField : View
         SetNeedsDisplay ();
     }
 
-    /// <summary>Allows clearing the <see cref="HistoryText.HistoryTextItem"/> items updating the original text.</summary>
+    /// <summary>Allows clearing the <see cref="HistoryText.HistoryTextItemEventArgs"/> items updating the original text.</summary>
     public void ClearHistoryChanges () { _historyText.Clear (Text); }
 
     /// <summary>Copy the selected text to the clipboard.</summary>
@@ -1028,8 +1024,7 @@ public class TextField : View
 
         RenderCaption ();
 
-        ProcessAutocomplete ();
-
+        DrawAutocomplete ();
         _isDrawing = false;
     }
 
@@ -1046,7 +1041,7 @@ public class TextField : View
     }
 
     /// <inheritdoc/>
-    public override bool OnLeave (View view)
+    protected override void OnHasFocusChanged (bool newHasFocus, View previousFocusedView, View view)
     {
         if (Application.MouseGrabView is { } && Application.MouseGrabView == this)
         {
@@ -1056,7 +1051,7 @@ public class TextField : View
         //if (SelectedLength != 0 && !(Application.MouseGrabView is MenuBar))
         //	ClearAllSelection ();
 
-        return base.OnLeave (view);
+        return;
     }
 
     /// TODO: Flush out these docs
@@ -1101,14 +1096,13 @@ public class TextField : View
     }
 
     /// <summary>Virtual method that invoke the <see cref="TextChanging"/> event if it's defined.</summary>
-    /// <param name="newText">The new text to be replaced.</param>
-    /// <returns>Returns the <see cref="StringEventArgs"/></returns>
-    public virtual StateEventArgs<string> OnTextChanging (string newText)
+    /// <param name="args">The event arguments.</param>
+    /// <returns><see langword="true"/> if the event was cancelled.</returns>
+    public bool OnTextChanging (CancelEventArgs<string> args)
     {
-        StateEventArgs<string> ev = new (string.Empty, newText);
-        TextChanging?.Invoke (this, ev);
+        TextChanging?.Invoke (this, args);
 
-        return ev;
+        return args.Cancel;
     }
 
     /// <summary>Paste the selected text from the clipboard.</summary>
@@ -1195,7 +1189,7 @@ public class TextField : View
     //public event EventHandler<StateEventArgs<string>> TextChanged;
 
     /// <summary>Changing event, raised before the <see cref="Text"/> changes and can be canceled or changing the new text.</summary>
-    public event EventHandler<StateEventArgs<string>> TextChanging;
+    public event EventHandler<CancelEventArgs<string>> TextChanging;
 
     /// <summary>Undoes the latest changes.</summary>
     public void Undo ()
@@ -1329,7 +1323,10 @@ public class TextField : View
                                );
     }
 
-    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey.KeyCode, e.NewKey.KeyCode); }
+    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e)
+    {
+        KeyBindings.ReplaceKey (e.OldKey.KeyCode, e.NewKey.KeyCode);
+    }
 
     private List<Rune> DeleteSelectedText ()
     {
@@ -1393,7 +1390,7 @@ public class TextField : View
         return new Attribute (cs.Disabled.Foreground, cs.Focus.Background);
     }
 
-    private void HistoryText_ChangeText (object sender, HistoryText.HistoryTextItem obj)
+    private void HistoryText_ChangeText (object sender, HistoryText.HistoryTextItemEventArgs obj)
     {
         if (obj is null)
         {
@@ -1541,15 +1538,19 @@ public class TextField : View
         }
     }
 
-    private void MoveLeft ()
+    private bool MoveLeft ()
     {
-        ClearAllSelection ();
 
         if (_cursorPosition > 0)
         {
+            ClearAllSelection ();
             _cursorPosition--;
             Adjust ();
+
+            return true;
         }
+
+        return false;
     }
 
     private void MoveLeftExtend ()
@@ -1560,17 +1561,19 @@ public class TextField : View
         }
     }
 
-    private void MoveRight ()
+    private bool MoveRight ()
     {
-        ClearAllSelection ();
-
         if (_cursorPosition == _text.Count)
         {
-            return;
+            return false;
         }
+
+        ClearAllSelection ();
 
         _cursorPosition++;
         Adjust ();
+
+        return true;
     }
 
     private void MoveRightExtend ()
@@ -1771,8 +1774,21 @@ public class TextField : View
             return;
         }
 
-        // draw autocomplete
         GenerateSuggestions ();
+    }
+
+    private void DrawAutocomplete ()
+    {
+
+        if (SelectedLength > 0)
+        {
+            return;
+        }
+
+        if (Autocomplete?.Context == null)
+        {
+            return;
+        }
 
         var renderAt = new Point (
                                   Autocomplete.Context.CursorPosition,
@@ -1837,14 +1853,26 @@ public class TextField : View
 
     private void ShowContextMenu ()
     {
-        if (_currentCulture != Thread.CurrentThread.CurrentUICulture)
+        if (!Equals (_currentCulture, Thread.CurrentThread.CurrentUICulture))
         {
             _currentCulture = Thread.CurrentThread.CurrentUICulture;
-
-            ContextMenu.MenuItems = BuildContextMenuBarItem ();
         }
 
-        ContextMenu.Show ();
+        ContextMenu.Show (BuildContextMenuBarItem ());
+    }
+
+    private void TextField_Added (object sender, SuperViewChangedEventArgs e)
+    {
+        if (Autocomplete.HostControl is null)
+        {
+            Autocomplete.HostControl = this;
+            Autocomplete.PopupInsideContainer = false;
+        }
+    }
+
+    private void TextField_Removed (object sender, SuperViewChangedEventArgs e)
+    {
+        Autocomplete.HostControl = null;
     }
 
     private void TextField_Initialized (object sender, EventArgs e)
@@ -1856,8 +1884,11 @@ public class TextField : View
             ScrollOffset = _cursorPosition > Viewport.Width + 1 ? _cursorPosition - Viewport.Width + 1 : 0;
         }
 
-        Autocomplete.HostControl = this;
-        Autocomplete.PopupInsideContainer = false;
+        if (Autocomplete.HostControl is null)
+        {
+            Autocomplete.HostControl = this;
+            Autocomplete.PopupInsideContainer = false;
+        }
     }
 }
 

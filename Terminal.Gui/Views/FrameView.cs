@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Terminal.Gui;
+﻿namespace Terminal.Gui;
 
 /// <summary>
 ///     The FrameView is a container View with a border around it. 
@@ -13,6 +11,8 @@ public class FrameView : View
     /// </summary>
     public FrameView ()
     {
+        CanFocus = true;
+        TabStop = TabBehavior.TabGroup;
         Border.Thickness = new Thickness (1);
         Border.LineStyle = DefaultBorderStyle;
 
@@ -36,6 +36,5 @@ public class FrameView : View
     ///     <see cref="FrameView"/>s.
     /// </remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter))]
     public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
 }

@@ -40,6 +40,7 @@ public class ScenarioTests : TestsAllViews
         var initialized = false;
         var shutdown = false;
         object timeout = null;
+        int iterationCount = 0;
 
         Application.InitializedChanged += OnApplicationOnInitializedChanged;
 
@@ -73,9 +74,9 @@ public class ScenarioTests : TestsAllViews
 
         return;
 
-        void OnApplicationOnInitializedChanged (object s, StateEventArgs<bool> a)
+        void OnApplicationOnInitializedChanged (object s, EventArgs<bool> a)
         {
-            if (a.NewValue)
+            if (a.CurrentValue)
             {
                 Application.Iteration += OnApplicationOnIteration;
                 initialized = true;
@@ -106,7 +107,7 @@ public class ScenarioTests : TestsAllViews
             }
 
             Assert.Fail (
-                         $"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms. Force quit.");
+                         $"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms and {iterationCount} iterations. Force quit.");
 
             Application.ResetState (true);
 
@@ -115,7 +116,8 @@ public class ScenarioTests : TestsAllViews
 
         void OnApplicationOnIteration (object s, IterationEventArgs a)
         {
-            if (Application._initialized)
+            iterationCount++;
+            if (Application.IsInitialized)
             {
                 // Press QuitKey 
                 //_output.WriteLine ($"Forcing Quit with {Application.QuitKey}");

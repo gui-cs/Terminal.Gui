@@ -1,4 +1,5 @@
-﻿using Terminal.Gui;
+﻿using System;
+using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -46,7 +47,7 @@ public class ScrollDemo : Scenario
         };
         view.Add (lblWidthHeight);
 
-        Buttons.NumericUpDown<int> scrollWidthHeight = new ()
+        NumericUpDown<int> scrollWidthHeight = new ()
         {
             Value = scroll.Frame.Width,
             X = Pos.Right (lblWidthHeight) + 1,
@@ -56,8 +57,13 @@ public class ScrollDemo : Scenario
 
         scrollWidthHeight.ValueChanging += (s, e) =>
                                            {
-                                               if (e.NewValue < 1)
+                                               if (e.NewValue < 1
+                                                   || (e.NewValue
+                                                       > (scroll.Orientation == Orientation.Vertical
+                                                              ? scroll.SuperView?.GetContentSize ().Width
+                                                              : scroll.SuperView?.GetContentSize ().Height)))
                                                {
+                                                   // TODO: This must be handled in the ScrollSlider if Width and Height being virtual
                                                    e.Cancel = true;
 
                                                    return;
@@ -93,6 +99,7 @@ public class ScrollDemo : Scenario
                                                      scroll.Orientation = Orientation.Vertical;
                                                      scroll.X = Pos.AnchorEnd ();
                                                      scroll.Y = 0;
+                                                     scrollWidthHeight.Value = Math.Min (scrollWidthHeight.Value, scroll.SuperView.GetContentSize ().Width);
                                                      scroll.Width = scrollWidthHeight.Value;
                                                      scroll.Height = Dim.Fill ();
                                                      scroll.Size /= 3;
@@ -103,6 +110,8 @@ public class ScrollDemo : Scenario
                                                      scroll.X = 0;
                                                      scroll.Y = Pos.AnchorEnd ();
                                                      scroll.Width = Dim.Fill ();
+
+                                                     scrollWidthHeight.Value = Math.Min (scrollWidthHeight.Value, scroll.SuperView.GetContentSize ().Height);
                                                      scroll.Height = scrollWidthHeight.Value;
                                                      scroll.Size *= 3;
                                                  }
@@ -115,7 +124,7 @@ public class ScrollDemo : Scenario
         };
         view.Add (lblSize);
 
-        Buttons.NumericUpDown<int> scrollSize = new ()
+        NumericUpDown<int> scrollSize = new ()
         {
             Value = scroll.Size,
             X = Pos.Right (lblSize) + 1,
@@ -145,7 +154,7 @@ public class ScrollDemo : Scenario
         };
         view.Add (lblPosition);
 
-        Buttons.NumericUpDown<int> scrollPosition = new ()
+        NumericUpDown<int> scrollPosition = new ()
         {
             Value = scroll.Position,
             X = Pos.Right (lblPosition) + 1,
@@ -181,11 +190,11 @@ public class ScrollDemo : Scenario
 
         scroll.SizeChanged += (s, e) =>
                               {
-                                  lblSizeChanged.Text = $"SizeChanged event - OldValue: {e.OldValue}; NewValue: {e.NewValue}";
+                                  lblSizeChanged.Text = $"SizeChanged event - CurrentValue: {e.CurrentValue}";
 
-                                  if (scrollSize.Value != e.NewValue)
+                                  if (scrollSize.Value != e.CurrentValue)
                                   {
-                                      scrollSize.Value = e.NewValue;
+                                      scrollSize.Value = e.CurrentValue;
                                   }
                               };
 
@@ -195,7 +204,7 @@ public class ScrollDemo : Scenario
         };
         view.Add (lblPosChanging);
 
-        scroll.PositionChanging += (s, e) => { lblPosChanging.Text = $"PositionChanging event - OldValue: {e.OldValue}; NewValue: {e.NewValue}"; };
+        scroll.PositionChanging += (s, e) => { lblPosChanging.Text = $"PositionChanging event - CurrentValue: {e.CurrentValue}; NewValue: {e.NewValue}"; };
 
         var lblPositionChanged = new Label
         {
@@ -205,8 +214,8 @@ public class ScrollDemo : Scenario
 
         scroll.PositionChanged += (s, e) =>
                                   {
-                                      lblPositionChanged.Text = $"PositionChanged event - OldValue: {e.OldValue}; NewValue: {e.NewValue}";
-                                      scrollPosition.Value = e.NewValue;
+                                      lblPositionChanged.Text = $"PositionChanged event - CurrentValue: {e.CurrentValue}";
+                                      scrollPosition.Value = e.CurrentValue;
                                   };
 
         var lblScrollFrame = new Label

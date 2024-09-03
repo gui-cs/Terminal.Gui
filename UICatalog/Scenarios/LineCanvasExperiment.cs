@@ -4,7 +4,7 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("LineCanvas Experiments", "Experiments with LineCanvas")]
 [ScenarioCategory ("Drawing")]
-[ScenarioCategory ("Borders")]
+[ScenarioCategory ("Adornments")]
 [ScenarioCategory ("Proof of Concept")]
 public class LineCanvasExperiment : Scenario
 {
@@ -14,7 +14,7 @@ public class LineCanvasExperiment : Scenario
 
         Window app = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = GetQuitKeyAndName ()
         };
 
         var frame1 = new FrameView

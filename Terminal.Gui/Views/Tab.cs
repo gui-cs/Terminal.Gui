@@ -5,18 +5,19 @@ public class Tab : View
 {
     private string _displayText;
 
-    /// <summary>Creates a new unamed tab with no controls inside.</summary>
+    /// <summary>Creates a new unnamed tab with no controls inside.</summary>
     public Tab ()
     {
         BorderStyle = LineStyle.Rounded;
         CanFocus = true;
+        TabStop = TabBehavior.NoStop;
     }
 
     /// <summary>The text to display in a <see cref="TabView"/>.</summary>
     /// <value></value>
     public string DisplayText
     {
-        get => _displayText ?? "Unamed";
+        get => _displayText ?? "Unnamed";
         set => _displayText = value;
     }
 

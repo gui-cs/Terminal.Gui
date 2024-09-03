@@ -15,7 +15,6 @@ public class DimPercentTests
         Assert.Equal (50, result);
     }
 
-
     [Fact]
     public void DimPercent_Equals ()
     {
@@ -64,12 +63,21 @@ public class DimPercentTests
     }
 
     [Fact]
+    public void TestEquality ()
+    {
+        var a = Dim.Percent (32);
+        var b = Dim.Percent (32);
+        Assert.True (a.Equals (b));
+        Assert.True (a.GetHashCode () == b.GetHashCode ());
+    }
+
+    [Fact]
     public void DimPercent_Invalid_Throws ()
     {
         Dim dim = Dim.Percent (0);
-        Assert.Throws<ArgumentException> (() => dim = Dim.Percent (-1));
+        Assert.Throws<ArgumentOutOfRangeException> (() => dim = Dim.Percent (-1));
         //Assert.Throws<ArgumentException> (() => dim = Dim.Percent (101));
-        Assert.Throws<ArgumentException> (() => dim = Dim.Percent (-1000001));
+        Assert.Throws<ArgumentOutOfRangeException> (() => dim = Dim.Percent (-1000001));
         //Assert.Throws<ArgumentException> (() => dim = Dim.Percent (1000001));
     }
 
@@ -157,7 +165,7 @@ public class DimPercentTests
     }
 
     [Theory]
-    [InlineData(0)]
+    [InlineData (0)]
     [InlineData (1)]
     [InlineData (50)]
     [InlineData (100)]

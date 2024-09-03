@@ -25,13 +25,19 @@ namespace Terminal.Gui;
 ///         invoked repeatedly while the button is pressed.
 ///     </para>
 /// </remarks>
-public class Button : View
+public class Button : View, IDesignable
 {
     private readonly Rune _leftBracket;
     private readonly Rune _leftDefault;
     private readonly Rune _rightBracket;
     private readonly Rune _rightDefault;
     private bool _isDefault;
+
+    /// <summary>
+    /// Gets or sets whether <see cref="Button"/>s are shown with a shadow effect by default.
+    /// </summary>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
 
     /// <summary>Initializes a new instance of <see cref="Button"/>.</summary>
     public Button ()
@@ -44,14 +50,15 @@ public class Button : View
         _leftDefault = Glyphs.LeftDefaultIndicator;
         _rightDefault = Glyphs.RightDefaultIndicator;
 
+        Height = Dim.Auto (DimAutoStyle.Text);
         Width = Dim.Auto (DimAutoStyle.Text);
-        Height = Dim.Auto (DimAutoStyle.Text, minimumContentDim: 1);
 
         CanFocus = true;
         HighlightStyle |= HighlightStyle.Pressed;
 #if HOVER
         HighlightStyle |= HighlightStyle.Hover;
 #endif
+
         // Override default behavior of View
         AddCommand (Command.HotKey, () =>
         {
@@ -64,6 +71,8 @@ public class Button : View
 
         TitleChanged += Button_TitleChanged;
         MouseClick += Button_MouseClick;
+
+        ShadowStyle = DefaultShadow;
     }
 
     private bool _wantContinuousButtonPressed;
@@ -94,12 +103,12 @@ public class Button : View
 
     private void Button_MouseClick (object sender, MouseEventEventArgs e)
     {
-       e.Handled = InvokeCommand (Command.HotKey) == true;
+        e.Handled = InvokeCommand (Command.HotKey) == true;
     }
 
-    private void Button_TitleChanged (object sender, StateEventArgs<string> e)
+    private void Button_TitleChanged (object sender, EventArgs<string> e)
     {
-        base.Text = e.NewValue;
+        base.Text = e.CurrentValue;
         TextFormatter.HotKeySpecifier = HotKeySpecifier;
     }
 
@@ -157,6 +166,7 @@ public class Button : View
     /// <inheritdoc/>
     protected override void UpdateTextFormatterText ()
     {
+        base.UpdateTextFormatterText();
         if (NoDecorations)
         {
             TextFormatter.Text = Text;
@@ -176,5 +186,13 @@ public class Button : View
                 TextFormatter.Text = $"{_leftBracket} {Text} {_rightBracket}";
             }
         }
+    }
+
+    /// <inheritdoc />
+    public bool EnableForDesign ()
+    {
+        Title = "_Button";
+
+        return true;
     }
 }

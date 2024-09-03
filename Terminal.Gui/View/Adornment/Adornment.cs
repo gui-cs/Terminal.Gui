@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+using Terminal.Gui;
+using Attribute = Terminal.Gui.Attribute;
 
 /// <summary>
 ///     Adornments are a special form of <see cref="View"/> that appear outside the <see cref="View.Viewport"/>:
@@ -33,7 +35,7 @@ public class Adornment : View
     ///     Adornments are distinguished from typical View classes in that they are not sub-views, but have a parent/child
     ///     relationship with their containing View.
     /// </remarks>
-    public View Parent { get; set; }
+    public View? Parent { get; set; }
 
     #region Thickness
 
@@ -45,10 +47,10 @@ public class Adornment : View
         get => _thickness;
         set
         {
-            Thickness prev = _thickness;
+            Thickness current = _thickness;
             _thickness = value;
 
-            if (prev != _thickness)
+            if (current != _thickness)
             {
                 if (Parent?.IsInitialized == false)
                 {
@@ -61,21 +63,19 @@ public class Adornment : View
                     Parent?.LayoutSubviews ();
                 }
 
-                OnThicknessChanged (prev);
+                OnThicknessChanged ();
             }
         }
     }
 
     /// <summary>Fired whenever the <see cref="Thickness"/> property changes.</summary>
-    public event EventHandler<ThicknessEventArgs> ThicknessChanged;
+    [CanBeNull]
+    public event EventHandler? ThicknessChanged;
 
     /// <summary>Called whenever the <see cref="Thickness"/> property changes.</summary>
-    public void OnThicknessChanged (Thickness previousThickness)
+    public void OnThicknessChanged ()
     {
-        ThicknessChanged?.Invoke (
-                                  this,
-                                  new () { Thickness = Thickness, PreviousThickness = previousThickness }
-                                 );
+        ThicknessChanged?.Invoke (this, EventArgs.Empty);
     }
 
     #endregion Thickness
@@ -86,9 +86,9 @@ public class Adornment : View
     ///     Adornments cannot be used as sub-views (see <see cref="Parent"/>); setting this property will throw
     ///     <see cref="InvalidOperationException"/>.
     /// </summary>
-    public override View SuperView
+    public override View? SuperView
     {
-        get => null;
+        get => null!;
         set => throw new InvalidOperationException (@"Adornments can not be Subviews or have SuperViews. Use Parent instead.");
     }
 
@@ -137,7 +137,7 @@ public class Adornment : View
     /// <inheritdoc/>
     public override Point ScreenToFrame (in Point location)
     {
-        return Parent.ScreenToFrame (new (location.X - Frame.X, location.Y - Frame.Y));
+        return Parent!.ScreenToFrame (new (location.X - Frame.X, location.Y - Frame.Y));
     }
 
     /// <summary>Does nothing for Adornment</summary>
@@ -165,7 +165,7 @@ public class Adornment : View
         {
             if (TextFormatter is { })
             {
-                TextFormatter.Size = Frame.Size;
+                TextFormatter.ConstrainToSize = Frame.Size;
                 TextFormatter.NeedsFormat = true;
             }
         }

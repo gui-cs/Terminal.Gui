@@ -14,7 +14,7 @@ public class DimFillTests (ITestOutputHelper output)
         var top = new Toplevel ();
         top.Add (view);
         RunState rs = Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (32, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (32, 5);
 
         //view.SetNeedsLayout ();
         top.LayoutSubviews ();
@@ -127,15 +127,28 @@ public class DimFillTests (ITestOutputHelper output)
     {
         var testMargin = 0;
         Dim dim = Dim.Fill ();
-        Assert.Equal ($"Fill({testMargin})", dim.ToString ());
+        Assert.Equal (testMargin, dim!.GetAnchor(0));
 
         testMargin = 0;
         dim = Dim.Fill (testMargin);
-        Assert.Equal ($"Fill({testMargin})", dim.ToString ());
+        Assert.Equal (testMargin, dim!.GetAnchor (0));
 
         testMargin = 5;
         dim = Dim.Fill (testMargin);
-        Assert.Equal ($"Fill({testMargin})", dim.ToString ());
+        Assert.Equal (-testMargin, dim!.GetAnchor (0));
+    }
+
+    [Fact]
+    public void DimFill_Margin_Is_Dim_SetsValue ()
+    {
+        Dim testMargin = Dim.Func (() => 0);
+        Dim dim = Dim.Fill (testMargin);
+        Assert.Equal (0, dim!.GetAnchor (0));
+
+
+        testMargin = Dim.Func (() => 5);
+        dim = Dim.Fill (testMargin);
+        Assert.Equal (-5, dim!.GetAnchor (0));
     }
 
     [Fact]

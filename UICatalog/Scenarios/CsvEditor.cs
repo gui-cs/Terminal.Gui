@@ -16,7 +16,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Dialogs")]
 [ScenarioCategory ("Text and Formatting")]
 [ScenarioCategory ("Dialogs")]
-[ScenarioCategory ("Top Level Windows")]
+[ScenarioCategory ("Overlapped")]
 [ScenarioCategory ("Files and IO")]
 public class CsvEditor : Scenario
 {
@@ -565,7 +565,7 @@ public class CsvEditor : Scenario
         }
     }
 
-    private void SelectedCellLabel_TextChanged (object sender, StateEventArgs<string> e)
+    private void SelectedCellLabel_TextChanged (object sender, EventArgs e)
     {
         // if user is in the text control and editing the selected cell
         if (!_selectedCellTextField.HasFocus)

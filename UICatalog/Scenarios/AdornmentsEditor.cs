@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Text;
 using Terminal.Gui;
 
@@ -9,44 +10,139 @@ namespace UICatalog.Scenarios;
 /// </summary>
 public class AdornmentsEditor : View
 {
-    private View _viewToEdit;
-
-    private Label _lblView; // Text describing the vi
-
-    private MarginEditor _marginEditor;
-    private BorderEditor _borderEditor;
-    private PaddingEditor _paddingEditor;
-
-    // TODO: Move Diagnostics to a separate Editor class (DiagnosticsEditor?).
-    private CheckBox _diagPaddingCheckBox;
-    private CheckBox _diagRulerCheckBox;
-    private readonly ViewDiagnosticFlags _savedDiagnosticFlags = Diagnostics;
-
     public AdornmentsEditor ()
     {
         //ColorScheme = Colors.ColorSchemes ["Dialog"];
-        Title = $"AdornmentsEditor";
+        Title = "AdornmentsEditor";
 
         Width = Dim.Auto (DimAutoStyle.Content);
         Height = Dim.Auto (DimAutoStyle.Content);
 
         //SuperViewRendersLineCanvas = true;
 
-        Application.MouseEvent += Application_MouseEvent;
+        CanFocus = true;
+
+        TabStop = TabBehavior.TabGroup;
+
         Initialized += AdornmentsEditor_Initialized;
     }
 
+    private readonly ViewDiagnosticFlags _savedDiagnosticFlags = Diagnostics;
+    private View? _viewToEdit;
+
+    private Label? _lblView; // Text describing the vi
+
+    private MarginEditor? _marginEditor;
+    private BorderEditor? _borderEditor;
+    private PaddingEditor? _paddingEditor;
+
+    // TODO: Move Diagnostics to a separate Editor class (DiagnosticsEditor?).
+    private CheckBox? _diagPaddingCheckBox;
+    private CheckBox? _diagRulerCheckBox;
+
     /// <summary>
-    /// Gets or sets whether the AdornmentsEditor should automatically select the View to edit when the mouse is clicked
-    /// anywhere outside the editor.
+    ///     Gets or sets whether the AdornmentsEditor should automatically select the View to edit
+    ///     based on the values of <see cref="AutoSelectSuperView"/> and <see cref="AutoSelectAdornments"/>.
     /// </summary>
     public bool AutoSelectViewToEdit { get; set; }
 
-    private void AdornmentsEditor_Initialized (object sender, EventArgs e)
+    /// <summary>
+    ///     Gets or sets the View that will scope the behavior of <see cref="AutoSelectViewToEdit"/>.
+    /// </summary>
+    public View? AutoSelectSuperView { get; set; }
+
+    /// <summary>
+    ///     Gets or sets whether auto select with the mouse will select Adornments or just Views.
+    /// </summary>
+    public bool AutoSelectAdornments { get; set; }
+
+    public View? ViewToEdit
+    {
+        get => _viewToEdit;
+        set
+        {
+            if (_viewToEdit == value)
+            {
+                return;
+            }
+
+            _viewToEdit = value;
+
+            if (_viewToEdit is not Adornment)
+            {
+                _marginEditor!.AdornmentToEdit = _viewToEdit?.Margin ?? null;
+                _borderEditor!.AdornmentToEdit = _viewToEdit?.Border ?? null;
+                _paddingEditor!.AdornmentToEdit = _viewToEdit?.Padding ?? null;
+            }
+
+            if (_lblView is { })
+            {
+                _lblView.Text = $"{_viewToEdit?.GetType ().Name}: {_viewToEdit?.Id}" ?? string.Empty;
+            }
+        }
+    }
+
+
+    private void NavigationOnFocusedChanged (object? sender, EventArgs e)
+    {
+        if (AutoSelectSuperView is null)
+        {
+            return;
+        }
+
+        if (ApplicationNavigation.IsInHierarchy (this, Application.Navigation!.GetFocused ()))
+        {
+            return;
+        }
+
+        if (!ApplicationNavigation.IsInHierarchy (AutoSelectSuperView, Application.Navigation!.GetFocused ()))
+        {
+            return;
+        }
+
+        ViewToEdit = Application.Navigation!.GetFocused ();
+    }
+
+    private void ApplicationOnMouseEvent (object? sender, MouseEvent e)
+    {
+        if (e.Flags != MouseFlags.Button1Clicked || !AutoSelectViewToEdit)
+        {
+            return;
+        }
+
+        if ((AutoSelectSuperView is { } && !AutoSelectSuperView.FrameToScreen ().Contains (e.Position))
+            || FrameToScreen ().Contains (e.Position))
+        {
+            return;
+        }
+
+        View view = e.View;
+
+        if (view is { })
+        {
+            if (view is Adornment adornment)
+            {
+                ViewToEdit = AutoSelectAdornments ? adornment : adornment.Parent;
+            }
+            else
+            {
+                ViewToEdit = view;
+            }
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        Diagnostics = _savedDiagnosticFlags;
+        base.Dispose (disposing);
+    }
+
+    private void AdornmentsEditor_Initialized (object? sender, EventArgs e)
     {
         BorderStyle = LineStyle.Dotted;
 
-        ExpanderButton expandButton = new ExpanderButton ()
+        var expandButton = new ExpanderButton
         {
             Orientation = Orientation.Horizontal
         };
@@ -56,7 +152,7 @@ public class AdornmentsEditor : View
         {
             X = 0,
             Y = 0,
-            Height = 2,
+            Height = 2
         };
         _lblView.TextFormatter.WordWrap = true;
         _lblView.TextFormatter.MultiLine = true;
@@ -90,95 +186,42 @@ public class AdornmentsEditor : View
         Add (_paddingEditor);
 
         _diagPaddingCheckBox = new () { Text = "_Diagnostic Padding" };
-        _diagPaddingCheckBox.Checked = Diagnostics.FastHasFlags (ViewDiagnosticFlags.Padding);
+        _diagPaddingCheckBox.CheckedState = Diagnostics.FastHasFlags (ViewDiagnosticFlags.Padding) ? CheckState.Checked : CheckState.UnChecked;
 
-        _diagPaddingCheckBox.Toggled += (s, e) =>
-                                        {
-                                            if (e.NewValue == true)
-                                            {
-                                                Diagnostics |= ViewDiagnosticFlags.Padding;
-                                            }
-                                            else
-                                            {
-                                                Diagnostics &= ~ViewDiagnosticFlags.Padding;
-                                            }
-                                        };
+        _diagPaddingCheckBox.CheckedStateChanging += (s, e) =>
+                                       {
+                                           if (e.NewValue == CheckState.Checked)
+                                           {
+                                               Diagnostics |= ViewDiagnosticFlags.Padding;
+                                           }
+                                           else
+                                           {
+                                               Diagnostics &= ~ViewDiagnosticFlags.Padding;
+                                           }
+                                       };
 
         Add (_diagPaddingCheckBox);
         _diagPaddingCheckBox.Y = Pos.Bottom (_paddingEditor);
 
         _diagRulerCheckBox = new () { Text = "_Diagnostic Ruler" };
-        _diagRulerCheckBox.Checked = Diagnostics.FastHasFlags (ViewDiagnosticFlags.Ruler);
+        _diagRulerCheckBox.CheckedState = Diagnostics.FastHasFlags (ViewDiagnosticFlags.Ruler) ? CheckState.Checked : CheckState.UnChecked;
 
-        _diagRulerCheckBox.Toggled += (s, e) =>
-                                      {
-                                          if (e.NewValue == true)
-                                          {
-                                              Diagnostics |= ViewDiagnosticFlags.Ruler;
-                                          }
-                                          else
-                                          {
-                                              Diagnostics &= ~ViewDiagnosticFlags.Ruler;
-                                          }
-                                      };
+        _diagRulerCheckBox.CheckedStateChanging += (s, e) =>
+                                     {
+                                         if (e.NewValue == CheckState.Checked)
+                                         {
+                                             Diagnostics |= ViewDiagnosticFlags.Ruler;
+                                         }
+                                         else
+                                         {
+                                             Diagnostics &= ~ViewDiagnosticFlags.Ruler;
+                                         }
+                                     };
 
         Add (_diagRulerCheckBox);
         _diagRulerCheckBox.Y = Pos.Bottom (_diagPaddingCheckBox);
 
-        // BUGBUG: This should not be needed. There's some bug in the layout system that doesn't update the layout.
-        SuperView.LayoutSubviews();
-
-    }
-
-    private void Application_MouseEvent (object sender, MouseEvent e)
-    {
-        if (!AutoSelectViewToEdit || FrameToScreen ().Contains (e.Position))
-        {
-            return;
-        }
-
-        // TODO: Add a setting (property) so only subviews of a specified view are considered.
-        var view = e.View;
-        if (view is { } && e.Flags == MouseFlags.Button1Clicked)
-        {
-            if (view is Adornment adornment)
-            {
-                ViewToEdit = adornment.Parent;
-            }
-            else
-            {
-                ViewToEdit = view;
-            }
-        }
-    }
-
-    /// <inheritdoc />
-    protected override void Dispose (bool disposing)
-    {
-        View.Diagnostics = _savedDiagnosticFlags;
-        base.Dispose (disposing);
-    }
-
-    public View ViewToEdit
-    {
-        get => _viewToEdit;
-        set
-        {
-            if (_viewToEdit == value)
-            {
-                return;
-            }
-
-            _viewToEdit = value;
-
-
-            _marginEditor.AdornmentToEdit = _viewToEdit.Margin ?? null;
-            _borderEditor.AdornmentToEdit = _viewToEdit.Border ?? null;
-            _paddingEditor.AdornmentToEdit = _viewToEdit.Padding ?? null;
-
-            _lblView.Text = _viewToEdit.ToString ();
-
-            return;
-        }
+        Application.MouseEvent += ApplicationOnMouseEvent;
+        Application.Navigation!.FocusedChanged += NavigationOnFocusedChanged;
     }
 }

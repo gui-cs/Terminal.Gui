@@ -30,12 +30,12 @@ public class ProgressBarStyles : Scenario
 
         Window app = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}", BorderStyle = LineStyle.Single,
+            Title = GetQuitKeyAndName (), BorderStyle = LineStyle.Single,
         };
 
         var editor = new AdornmentsEditor ()
         {
-            AutoSelectViewToEdit = false
+            AutoSelectViewToEdit = true
         };
         app.Add (editor);
 
@@ -63,55 +63,25 @@ public class ProgressBarStyles : Scenario
 
         #region ColorPicker
 
-        ColorName ChooseColor (string text, ColorName colorName)
-        {
-            var colorPicker = new ColorPicker { Title = text, SelectedColor = colorName };
-
-            var dialog = new Dialog { Title = text };
-
-            dialog.Initialized += (sender, args) =>
-                                     {
-                                         // TODO: Replace with Dim.Auto
-                                         dialog.X = _pbList.Frame.X;
-                                         dialog.Y = _pbList.Frame.Height;
-                                     };
-
-            dialog.LayoutComplete += (sender, args) =>
-                                    {
-                                        dialog.Viewport = Rectangle.Empty with
-                                        {
-                                            Width = colorPicker.Frame.Width,
-                                            Height = colorPicker.Frame.Height
-                                        };
-                                        Application.Top.LayoutSubviews ();
-                                    };
-
-            dialog.Add (colorPicker);
-            colorPicker.ColorChanged += (s, e) => { dialog.RequestStop (); };
-            Application.Run (dialog);
-            dialog.Dispose ();
-
-            ColorName retColor = colorPicker.SelectedColor;
-            colorPicker.Dispose ();
-
-            return retColor;
-        }
 
         var fgColorPickerBtn = new Button
         {
             Text = "Foreground HotNormal Color",
             X = Pos.Center (),
-            Y = Pos.Align (Alignment.Start),
+            Y = Pos.Align (Alignment.Start)
         };
         container.Add (fgColorPickerBtn);
 
         fgColorPickerBtn.Accept += (s, e) =>
                                     {
-                                        ColorName newColor = ChooseColor (
-                                                                          fgColorPickerBtn.Text,
-                                                                          editor.ViewToEdit.ColorScheme.HotNormal.Foreground
-                                                                                .GetClosestNamedColor ()
-                                                                         );
+                                        if (!LineDrawing.PromptForColor (
+                                                                         fgColorPickerBtn.Text,
+                                                                         editor.ViewToEdit.ColorScheme.HotNormal.Foreground,
+                                                                         out var newColor
+                                                                        ))
+                                        {
+                                            return;
+                                        }
 
                                         var cs = new ColorScheme (editor.ViewToEdit.ColorScheme)
                                         {
@@ -134,11 +104,14 @@ public class ProgressBarStyles : Scenario
 
         bgColorPickerBtn.Accept += (s, e) =>
                                     {
-                                        ColorName newColor = ChooseColor (
-                                                                          fgColorPickerBtn.Text,
-                                                                          editor.ViewToEdit.ColorScheme.HotNormal.Background
-                                                                                .GetClosestNamedColor ()
-                                                                         );
+                                        if (!LineDrawing.PromptForColor (
+                                                                         fgColorPickerBtn.Text,
+                                                                         editor.ViewToEdit.ColorScheme.HotNormal.Background
+                                                                        , out var newColor))
+
+                                        {
+                                            return;
+                                        }
 
                                         var cs = new ColorScheme (editor.ViewToEdit.ColorScheme)
                                         {
@@ -233,7 +206,10 @@ public class ProgressBarStyles : Scenario
 
         var ckbBidirectional = new CheckBox
         {
-            X = Pos.Center (), Y = Pos.Bottom (continuousPB) + 1, Text = "BidirectionalMarquee", Checked = true
+            X = Pos.Center (),
+            Y = Pos.Bottom (continuousPB),
+            Text = "BidirectionalMarquee", 
+            CheckedState = CheckState.Checked
         };
         container.Add (ckbBidirectional);
 
@@ -276,7 +252,7 @@ public class ProgressBarStyles : Scenario
                                                                                             && v.Title == (string)e.Value
                                                                                        );
                                       };
-        
+
 
         rbPBFormat.SelectedItemChanged += (s, e) =>
                                           {
@@ -286,11 +262,12 @@ public class ProgressBarStyles : Scenario
                                               marqueesContinuousPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
                                           };
 
-        ckbBidirectional.Toggled += (s, e) =>
-                                    {
-                                        ckbBidirectional.Checked = marqueesBlocksPB.BidirectionalMarquee =
-                                                                       marqueesContinuousPB.BidirectionalMarquee = (bool)!e.OldValue;
-                                    };
+        ckbBidirectional.CheckedStateChanging += (s, e) =>
+                                   {
+                                       ckbBidirectional.CheckedState = e.NewValue;
+                                       marqueesBlocksPB.BidirectionalMarquee =
+                                                                  marqueesContinuousPB.BidirectionalMarquee = e.NewValue == CheckState.Checked;
+                                   };
 
 
 

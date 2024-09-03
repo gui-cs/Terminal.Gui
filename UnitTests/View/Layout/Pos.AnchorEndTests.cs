@@ -28,15 +28,6 @@ public class PosAnchorEndTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void PosAnchorEnd_GetHashCode ()
-    {
-        var posAnchorEnd = new PosAnchorEnd (10);
-        var expectedHashCode = 10.GetHashCode ();
-
-        Assert.Equal (expectedHashCode, posAnchorEnd.GetHashCode ());
-    }
-
-    [Fact]
     public void PosAnchorEnd_ToString ()
     {
         var posAnchorEnd = new PosAnchorEnd (10);
@@ -67,7 +58,7 @@ public class PosAnchorEndTests (ITestOutputHelper output)
     {
         Pos pos;
         int n = -1;
-        Assert.Throws<ArgumentException> (() => pos = Pos.AnchorEnd (n));
+        Assert.Throws<ArgumentOutOfRangeException> (() => pos = Pos.AnchorEnd (n));
     }
 
     [Theory]
@@ -184,7 +175,7 @@ public class PosAnchorEndTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void  PosAnchorEnd_View_And_Button ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 5);
 
         var b = $"{CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket}";
 

@@ -1,16 +1,22 @@
 ﻿using System;
+using System.Linq;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Wizards", "Demonstrates the Wizard class")]
 [ScenarioCategory ("Dialogs")]
-[ScenarioCategory ("Top Level Windows")]
+[ScenarioCategory ("Overlapped")]
 [ScenarioCategory ("Wizards")]
+[ScenarioCategory ("Runnable")]
+
 public class Wizards : Scenario
 {
-    public override void Setup ()
+    public override void Main ()
     {
+        Application.Init ();
+        var win = new Window { Title = GetQuitKeyAndName () };
+
         var frame = new FrameView
         {
             X = Pos.Center (),
@@ -19,9 +25,9 @@ public class Wizards : Scenario
             ColorScheme = Colors.ColorSchemes ["Base"],
             Title = "Wizard Options"
         };
-        Win.Add (frame);
+        win.Add (frame);
 
-        var label = new Label { X = 0, Y = 0, TextAlignment = Alignment.End, Text = "Width:" };
+        var label = new Label { X = 0, Y = 0, TextAlignment = Alignment.End, Text = "_Width:", Width = 10 };
         frame.Add (label);
 
         var widthEdit = new TextField
@@ -34,7 +40,7 @@ public class Wizards : Scenario
         };
         frame.Add (widthEdit);
 
-        label = new()
+        label = new ()
         {
             X = 0,
             Y = Pos.Bottom (label),
@@ -42,7 +48,7 @@ public class Wizards : Scenario
             Width = Dim.Width (label),
             Height = 1,
             TextAlignment = Alignment.End,
-            Text = "Height:"
+            Text = "_Height:"
         };
         frame.Add (label);
 
@@ -56,7 +62,7 @@ public class Wizards : Scenario
         };
         frame.Add (heightEdit);
 
-        label = new()
+        label = new ()
         {
             X = 0,
             Y = Pos.Bottom (label),
@@ -64,7 +70,7 @@ public class Wizards : Scenario
             Width = Dim.Width (label),
             Height = 1,
             TextAlignment = Alignment.End,
-            Text = "Title:"
+            Text = "_Title:"
         };
         frame.Add (label);
 
@@ -78,29 +84,29 @@ public class Wizards : Scenario
         };
         frame.Add (titleEdit);
 
-        void Top_Loaded (object sender, EventArgs args)
+        void Win_Loaded (object sender, EventArgs args)
         {
             frame.Height = widthEdit.Frame.Height + heightEdit.Frame.Height + titleEdit.Frame.Height + 2;
-            Top.Loaded -= Top_Loaded;
+            win.Loaded -= Win_Loaded;
         }
 
-        Top.Loaded += Top_Loaded;
+        win.Loaded += Win_Loaded;
 
-        label = new()
+        label = new ()
         {
             X = Pos.Center (), Y = Pos.AnchorEnd (1), TextAlignment = Alignment.End, Text = "Action:"
         };
-        Win.Add (label);
+        win.Add (label);
 
         var actionLabel = new Label
         {
             X = Pos.Right (label), Y = Pos.AnchorEnd (1), ColorScheme = Colors.ColorSchemes ["Error"]
         };
-        Win.Add (actionLabel);
+        win.Add (actionLabel);
 
         var showWizardButton = new Button
         {
-            X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "Show Wizard"
+            X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "_Show Wizard"
         };
 
         showWizardButton.Accept += (s, e) =>
@@ -157,6 +163,13 @@ public class Wizards : Scenario
 
                                            firstStep.HelpText =
                                                "This is the End User License Agreement.\n\n\n\n\n\nThis is a test of the emergency broadcast system. This is a test of the emergency broadcast system.\nThis is a test of the emergency broadcast system.\n\n\nThis is a test of the emergency broadcast system.\n\nThis is a test of the emergency broadcast system.\n\n\n\nThe end of the EULA.";
+
+                                           RadioGroup radioGroup = new ()
+                                           {
+                                               RadioLabels = ["_One", "_Two", "_3"]
+                                           };
+                                           firstStep.Add (radioGroup);
+
                                            wizard.AddStep (firstStep);
 
                                            // Add 2nd step
@@ -173,6 +186,13 @@ public class Wizards : Scenario
                                                Text = "Press Me to Rename Step", X = Pos.Right (buttonLbl), Y = Pos.Top (buttonLbl)
                                            };
 
+                                           RadioGroup radioGroup2 = new ()
+                                           {
+                                               RadioLabels = ["_A", "_B", "_C"],
+                                               Orientation = Orientation.Horizontal
+                                           };
+                                           secondStep.Add (radioGroup2);
+
                                            button.Accept += (s, e) =>
                                                             {
                                                                 secondStep.Title = "2nd Step";
@@ -188,14 +208,14 @@ public class Wizards : Scenario
                                            var firstNameField =
                                                new TextField { Text = "Number", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
                                            secondStep.Add (lbl, firstNameField);
-                                           lbl = new() { Text = "Last Name:  ", X = 1, Y = Pos.Bottom (lbl) };
+                                           lbl = new () { Text = "Last Name:  ", X = 1, Y = Pos.Bottom (lbl) };
                                            var lastNameField = new TextField { Text = "Six", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
                                            secondStep.Add (lbl, lastNameField);
 
                                            var thirdStepEnabledCeckBox = new CheckBox
                                            {
                                                Text = "Enable Step _3",
-                                               Checked = false,
+                                               CheckedState = CheckState.UnChecked,
                                                X = Pos.Left (lastNameField),
                                                Y = Pos.Bottom (lastNameField)
                                            };
@@ -208,7 +228,8 @@ public class Wizards : Scenario
                                                Y = Pos.Bottom (thirdStepEnabledCeckBox) + 2,
                                                Width = Dim.Fill (),
                                                Height = 4,
-                                               Title = "A Broken Frame (by Depeche Mode)"
+                                               Title = "A Broken Frame (by Depeche Mode)",
+                                               TabStop = TabBehavior.NoStop
                                            };
                                            frame.Add (new TextField { Text = "This is a TextField inside of the frame." });
                                            secondStep.Add (frame);
@@ -242,8 +263,8 @@ public class Wizards : Scenario
                                                X = Pos.Right (progLbl), Y = Pos.Top (progLbl), Width = 40, Fraction = 0.42F
                                            };
                                            thirdStep.Add (progLbl, progressBar);
-                                           thirdStep.Enabled = (bool)thirdStepEnabledCeckBox.Checked;
-                                           thirdStepEnabledCeckBox.Toggled += (s, e) => { thirdStep.Enabled = (bool)thirdStepEnabledCeckBox.Checked; };
+                                           thirdStep.Enabled = thirdStepEnabledCeckBox.CheckedState == CheckState.Checked;
+                                           thirdStepEnabledCeckBox.CheckedStateChanging += (s, e) => { thirdStep.Enabled = thirdStepEnabledCeckBox.CheckedState == CheckState.Checked; };
 
                                            // Add 4th step
                                            var fourthStep = new WizardStep { Title = "Step Four" };
@@ -256,17 +277,26 @@ public class Wizards : Scenario
                                                X = 0,
                                                Y = 0,
                                                Width = Dim.Fill (),
-                                               Height = Dim.Fill (1),
                                                WordWrap = true,
                                                AllowsTab = false,
                                                ColorScheme = Colors.ColorSchemes ["Base"]
                                            };
+
+                                           someText.Height = Dim.Fill (
+                                                                       Dim.Func (
+                                                                                 () => someText.SuperView is { IsInitialized: true }
+                                                                                           ? someText.SuperView.Subviews
+                                                                                                     .First (view => view.Y.Has<PosAnchorEnd> (out _))
+                                                                                                     .Frame.Height
+                                                                                           : 1));
                                            var help = "This is helpful.";
                                            fourthStep.Add (someText);
 
                                            var hideHelpBtn = new Button
                                            {
-                                               Text = "Press me to show/hide help", X = Pos.Center (), Y = Pos.AnchorEnd (1)
+                                               Text = "Press me to show/hide help",
+                                               X = Pos.Center (),
+                                               Y = Pos.AnchorEnd ()
                                            };
 
                                            hideHelpBtn.Accept += (s, e) =>
@@ -281,7 +311,7 @@ public class Wizards : Scenario
                                                                      }
                                                                  };
                                            fourthStep.Add (hideHelpBtn);
-                                           fourthStep.NextButtonText = "Go To Last Step";
+                                           fourthStep.NextButtonText = "_Go To Last Step";
                                            var scrollBar = new ScrollBarView (someText, true);
 
                                            scrollBar.ChangedPosition += (s, e) =>
@@ -320,7 +350,7 @@ public class Wizards : Scenario
                                                "The wizard is complete!\n\nPress the Finish button to continue.\n\nPressing ESC will cancel the wizard.";
 
                                            var finalFinalStepEnabledCeckBox =
-                                               new CheckBox { Text = "Enable _Final Final Step", Checked = false, X = 0, Y = 1 };
+                                               new CheckBox { Text = "Enable _Final Final Step", CheckedState = CheckState.UnChecked, X = 0, Y = 1 };
                                            lastStep.Add (finalFinalStepEnabledCeckBox);
 
                                            // Add an optional FINAL last step
@@ -329,11 +359,11 @@ public class Wizards : Scenario
 
                                            finalFinalStep.HelpText =
                                                "This step only shows if it was enabled on the other last step.";
-                                           finalFinalStep.Enabled = (bool)thirdStepEnabledCeckBox.Checked;
+                                           finalFinalStep.Enabled = thirdStepEnabledCeckBox.CheckedState == CheckState.Checked;
 
-                                           finalFinalStepEnabledCeckBox.Toggled += (s, e) =>
+                                           finalFinalStepEnabledCeckBox.CheckedStateChanging += (s, e) =>
                                                                                    {
-                                                                                       finalFinalStep.Enabled = (bool)finalFinalStepEnabledCeckBox.Checked;
+                                                                                       finalFinalStep.Enabled = finalFinalStepEnabledCeckBox.CheckedState == CheckState.Checked;
                                                                                    };
 
                                            Application.Run (wizard);
@@ -344,6 +374,15 @@ public class Wizards : Scenario
                                            actionLabel.Text = "Invalid Options";
                                        }
                                    };
-        Win.Add (showWizardButton);
+        win.Add (showWizardButton);
+
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
+    }
+
+    private void Wizard_StepChanged (object sender, StepChangeEventArgs e)
+    {
+        throw new NotImplementedException ();
     }
 }

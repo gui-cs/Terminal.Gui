@@ -131,7 +131,7 @@ namespace Terminal.Gui;
 ///         </list>
 ///     </para>
 /// </remarks>
-public abstract class Pos
+public abstract record Pos
 {
     #region static Pos creation methods
 
@@ -197,10 +197,7 @@ public abstract class Pos
     /// </example>
     public static Pos AnchorEnd (int offset)
     {
-        if (offset < 0)
-        {
-            throw new ArgumentException (@"Must be positive", nameof (offset));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative (offset, nameof (offset));
 
         return new PosAnchorEnd (offset);
     }
@@ -246,10 +243,7 @@ public abstract class Pos
     /// </example>
     public static Pos Percent (int percent)
     {
-        if (percent is < 0)
-        {
-            throw new ArgumentException ("Percent value must be positive.");
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative (percent, nameof (percent));
 
         return new PosPercent (percent);
     }
@@ -257,22 +251,22 @@ public abstract class Pos
     /// <summary>Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.</summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Top (View view) { return new PosView (view, Side.Top); }
+    public static Pos Top (View? view) { return new PosView (view, Side.Top); }
 
     /// <summary>Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.</summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Y (View view) { return new PosView (view, Side.Top); }
+    public static Pos Y (View? view) { return new PosView (view, Side.Top); }
 
     /// <summary>Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.</summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Left (View view) { return new PosView (view, Side.Left); }
+    public static Pos Left (View? view) { return new PosView (view, Side.Left); }
 
     /// <summary>Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.</summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos X (View view) { return new PosView (view, Side.Left); }
+    public static Pos X (View? view) { return new PosView (view, Side.Left); }
 
     /// <summary>
     ///     Creates a <see cref="Pos"/> object that tracks the Bottom (Y+Height) coordinate of the specified
@@ -280,7 +274,7 @@ public abstract class Pos
     /// </summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Bottom (View view) { return new PosView (view, Side.Bottom); }
+    public static Pos Bottom (View? view) { return new PosView (view, Side.Bottom); }
 
     /// <summary>
     ///     Creates a <see cref="Pos"/> object that tracks the Right (X+Width) coordinate of the specified
@@ -288,7 +282,7 @@ public abstract class Pos
     /// </summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Right (View view) { return new PosView (view, Side.Right); }
+    public static Pos Right (View? view) { return new PosView (view, Side.Right); }
 
     #endregion static Pos creation methods
 
@@ -337,27 +331,20 @@ public abstract class Pos
     internal virtual bool ReferencesOtherViews () { return false; }
 
     /// <summary>
-    ///     Indicates whether the specified type is in the hierarchy of this Pos object.
+    ///     Indicates whether the specified type <typeparamref name="T"/> is in the hierarchy of this Pos object.
     /// </summary>
-    /// <param name="type"></param>
-    /// <param name="pos"></param>
+    /// <param name="pos">A reference to this <see cref="Pos"/> instance.</param>
     /// <returns></returns>
-    public bool Has (Type type, out Pos pos)
+    public bool Has<T> (out Pos pos) where T : Pos
     {
         pos = this;
-        if (type == GetType ())
-        {
-            return true;
-        }
 
-        // If we are a PosCombine, we have to check the left and right
-        // to see if they are of the type we are looking for.
-        if (this is PosCombine { } combine && (combine.Left.Has (type, out pos) || combine.Right.Has (type, out pos)))
-        {
-            return true;
-        }
-
-        return false;
+        return this switch
+               {
+                   PosCombine combine => combine.Left.Has<T> (out pos) || combine.Right.Has<T> (out pos),
+                   T => true,
+                   _ => false
+               };
     }
 
     #endregion virtual methods
@@ -379,7 +366,7 @@ public abstract class Pos
 
         if (left is PosView view)
         {
-            view.Target.SetNeedsLayout ();
+            view.Target?.SetNeedsLayout ();
         }
 
         return newPos;
@@ -408,7 +395,7 @@ public abstract class Pos
 
         if (left is PosView view)
         {
-            view.Target.SetNeedsLayout ();
+            view.Target?.SetNeedsLayout ();
         }
 
         return newPos;

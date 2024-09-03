@@ -101,7 +101,7 @@ public interface IListDataSource: IDisposable
 ///         first item that starts with what the user types will be selected.
 ///     </para>
 /// </remarks>
-public class ListView : View
+public class ListView : View, IDesignable
 {
     private bool _allowsMarking;
     private bool _allowsMultipleSelection = true;
@@ -122,7 +122,10 @@ public class ListView : View
         CanFocus = true;
 
         // Things this view knows how to do
+        // 
+        // BUGBUG: SHould return false if selectokn doesn't change (to support nav to next view)
         AddCommand (Command.LineUp, () => MoveUp ());
+        // BUGBUG: SHould return false if selectokn doesn't change (to support nav to next view)
         AddCommand (Command.LineDown, () => MoveDown ());
         AddCommand (Command.ScrollUp, () => ScrollVertical (-1));
         AddCommand (Command.ScrollDown, () => ScrollVertical (1));
@@ -724,8 +727,8 @@ public class ListView : View
                 if (_allowsMarking)
                 {
                     Driver.AddRune (
-                                    _source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.Checked : Glyphs.Selected :
-                                    AllowsMultipleSelection ? Glyphs.UnChecked : Glyphs.UnSelected
+                                    _source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.CheckStateChecked : Glyphs.Selected :
+                                    AllowsMultipleSelection ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected
                                    );
                     Driver.AddRune ((Rune)' ');
                 }
@@ -736,14 +739,12 @@ public class ListView : View
     }
 
     /// <inheritdoc/>
-    public override bool OnEnter (View view)
+    protected override void OnHasFocusChanged (bool newHasFocus, [CanBeNull] View currentFocused, [CanBeNull] View newFocused)
     {
-        if (_lastSelectedItem != _selected)
+        if (newHasFocus && _lastSelectedItem != _selected)
         {
             EnsureSelectedItemVisible ();
         }
-
-        return base.OnEnter (view);
     }
 
     // TODO: This should be cancelable
@@ -920,6 +921,15 @@ public class ListView : View
         {
             Source.SuspendCollectionChangedEvent = false;
         }
+    }
+
+    /// <inheritdoc />
+    public bool EnableForDesign ()
+    {
+        var source = new ListWrapper<string> (["List Item 1", "List Item two", "List Item Quattro", "Last List Item"]);
+        Source = source;
+
+        return true;
     }
 }
 

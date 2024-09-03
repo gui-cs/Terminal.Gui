@@ -1,3 +1,4 @@
+#nullable enable
 namespace Terminal.Gui;
 
 /// <summary>
@@ -11,8 +12,10 @@ namespace Terminal.Gui;
 ///         align them in a specific order.
 ///     </para>
 /// </remarks>
-public class Bar : View
+public class Bar : View, IOrientation, IDesignable
 {
+    private readonly OrientationHelper _orientationHelper;
+
     /// <inheritdoc/>
     public Bar () : this ([]) { }
 
@@ -23,6 +26,10 @@ public class Bar : View
 
         Width = Dim.Auto ();
         Height = Dim.Auto ();
+
+        _orientationHelper = new (this);
+        _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
+        _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
 
         Initialized += Bar_Initialized;
 
@@ -37,7 +44,7 @@ public class Bar : View
         }
     }
 
-    private void Bar_Initialized (object sender, EventArgs e) { ColorScheme = Colors.ColorSchemes ["Menu"]; }
+    private void Bar_Initialized (object? sender, EventArgs e) { ColorScheme = Colors.ColorSchemes ["Menu"]; }
 
     /// <inheritdoc/>
     public override void SetBorderStyle (LineStyle value)
@@ -46,7 +53,7 @@ public class Bar : View
         Border.LineStyle = value;
     }
 
-    private Orientation _orientation = Orientation.Horizontal;
+    #region IOrientation members
 
     /// <summary>
     ///     Gets or sets the <see cref="Orientation"/> for this <see cref="Bar"/>. The default is
@@ -58,15 +65,26 @@ public class Bar : View
     ///         Vertical orientation arranges the command, help, and key parts of each <see cref="Shortcut"/>s from left to right.
     ///     </para>
     /// </remarks>
+
     public Orientation Orientation
     {
-        get => _orientation;
-        set
-        {
-            _orientation = value;
-            SetNeedsLayout ();
-        }
+        get => _orientationHelper.Orientation;
+        set => _orientationHelper.Orientation = value;
     }
+
+    /// <inheritdoc/>
+    public event EventHandler<CancelEventArgs<Orientation>>? OrientationChanging;
+
+    /// <inheritdoc/>
+    public event EventHandler<EventArgs<Orientation>>? OrientationChanged;
+
+    /// <summary>Called when <see cref="Orientation"/> has changed.</summary>
+    /// <param name="newOrientation"></param>
+    public void OnOrientationChanged (Orientation newOrientation)
+    {
+        SetNeedsLayout ();
+    }
+    #endregion
 
     private AlignmentModes _alignmentModes = AlignmentModes.StartToEnd;
 
@@ -115,9 +133,9 @@ public class Bar : View
     /// <summary>Removes a <see cref="Shortcut"/> at specified index of <see cref="View.Subviews"/>.</summary>
     /// <param name="index">The zero-based index of the item to remove.</param>
     /// <returns>The <see cref="Shortcut"/> removed.</returns>
-    public Shortcut RemoveShortcut (int index)
+    public Shortcut? RemoveShortcut (int index)
     {
-        View toRemove = null;
+        View? toRemove = null;
 
         for (var i = 0; i < Subviews.Count; i++)
         {
@@ -141,7 +159,7 @@ public class Bar : View
     {
         base.OnLayoutStarted (args);
 
-        View prevBarItem = null;
+        View? prevBarItem = null;
 
         switch (Orientation)
         {
@@ -153,11 +171,9 @@ public class Bar : View
                     barItem.ColorScheme = ColorScheme;
                     barItem.X = Pos.Align (Alignment.Start, AlignmentModes);
                     barItem.Y = 0; //Pos.Center ();
-
                     // HACK: This should not be needed
                     barItem.SetRelativeLayout (GetContentSize ());
                 }
-
                 break;
 
             case Orientation.Vertical:
@@ -168,7 +184,7 @@ public class Bar : View
                 List<Shortcut> shortcuts = Subviews.Where (s => s is Shortcut && s.Visible).Cast<Shortcut> ().ToList ();
                 foreach (Shortcut shortcut in shortcuts)
                 {
-                    // Let AutoSize do its thing to get the minimum width of each CommandView and HelpView
+                    // Let DimAuto do its thing to get the minimum width of each CommandView and HelpView
                     //shortcut.CommandView.SetRelativeLayout (new Size (int.MaxValue, int.MaxValue));
                     minKeyWidth = int.Max (minKeyWidth, shortcut.KeyView.Text.GetColumns ());
                 }
@@ -225,5 +241,29 @@ public class Bar : View
 
                 break;
         }
+    }
+
+    /// <inheritdoc />
+    public bool EnableForDesign ()
+    {
+        var shortcut = new Shortcut
+        {
+            Text = "Quit",
+            Title = "Q_uit",
+            Key = Key.Z.WithCtrl,
+        };
+
+        Add (shortcut);
+
+        shortcut = new Shortcut
+        {
+            Text = "Help Text",
+            Title = "Help",
+            Key = Key.F1,
+        };
+
+        Add (shortcut);
+
+        return true;
     }
 }

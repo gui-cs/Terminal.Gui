@@ -53,7 +53,7 @@ public class WindowTests
         Toplevel top = new ();
         top.Add (win);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -70,7 +70,7 @@ public class WindowTests
                                                       _output
                                                      );
 
-        ((FakeDriver)Application.Driver).SetBufferSize (40, 20);
+        ((FakeDriver)Application.Driver!).SetBufferSize (40, 20);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -97,7 +97,7 @@ public class WindowTests
                                                       _output
                                                      );
 
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -130,8 +130,8 @@ public class WindowTests
         Assert.Equal ($"Window(){defaultWindow.Frame}", defaultWindow.ToString ());
         Assert.True (defaultWindow.CanFocus);
         Assert.False (defaultWindow.HasFocus);
-        Assert.Equal (new Rectangle (0, 0, 2147483645, 2147483645), defaultWindow.Viewport);
-        Assert.Equal (new Rectangle (0, 0, 2147483647, 2147483647), defaultWindow.Frame);
+        Assert.Equal (new Rectangle (0, 0, Application.Screen.Width - 2, Application.Screen.Height - 2), defaultWindow.Viewport);
+        Assert.Equal (new Rectangle (0, 0, Application.Screen.Width, Application.Screen.Height), defaultWindow.Frame);
         Assert.Null (defaultWindow.Focused);
         Assert.NotNull (defaultWindow.ColorScheme);
         Assert.Equal (0, defaultWindow.X);
@@ -200,25 +200,5 @@ public class WindowTests
         Assert.Null (windowWithFrame1234.SuperView);
         Assert.Null (windowWithFrame1234.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, windowWithFrame1234.TextDirection);
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void OnCanFocusChanged_Only_Must_ContentView_Forces_SetFocus_After_IsInitialized_Is_True ()
-    {
-        var win1 = new Window { Id = "win1", Width = 10, Height = 1 };
-        var view1 = new View { Id = "view1", Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = true };
-        var win2 = new Window { Id = "win2", Y = 6, Width = 10, Height = 1 };
-        var view2 = new View { Id = "view2", Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = true };
-        win2.Add (view2);
-        win1.Add (view1, win2);
-
-        Application.Begin (win1);
-
-        Assert.True (win1.HasFocus);
-        Assert.True (view1.HasFocus);
-        Assert.False (win2.HasFocus);
-        Assert.False (view2.HasFocus);
-        win1.Dispose ();
     }
 }

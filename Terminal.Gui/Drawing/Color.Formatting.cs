@@ -284,7 +284,7 @@ public readonly partial record struct Color
                                                                                               ),
 
                    // Any string too short to possibly be any supported format.
-                   { Length: > 0 and < 4 } => throw new ColorParseException (
+                   { Length: > 0 and < 3 } => throw new ColorParseException (
                                                                              in text,
                                                                              "Text was too short to be any possible supported format.",
                                                                              in text

@@ -14,31 +14,33 @@
     <IsPackable>false</IsPackable>
     <UseDataCollector />
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineTrace>True</DefineTrace>
+    <DefineTrace>true</DefineTrace>
     <DebugType>portable</DebugType>
     <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL</DefineConstants>
     <ImplicitUsings>enable</ImplicitUsings>
-    <NoLogo>True</NoLogo>
+    <NoLogo>true</NoLogo>
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineDebug>True</DefineDebug>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <DefineDebug>true</DefineDebug>
     <DefineConstants>$(DefineConstants);DEBUG_IDISPOSABLE</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <Optimize>True</Optimize>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <Optimize>true</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-    <PackageReference Include="ReportGenerator" Version="5.2.5" />
-    <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="21.0.2" />
-    <PackageReference Include="xunit" Version="2.8.0" />
-    <PackageReference Include="Xunit.Combinatorial" Version="1.6.24" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.0">
+    <PackageReference Include="JetBrains.Annotations" Version="[2024.2.0,)" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="[17.10,18)" />
+    <PackageReference Include="Moq" Version="[4.20.70,5)" />
+    <PackageReference Include="ReportGenerator" Version="[5.3.8,6)" />
+    <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="[21.0.29,22)" />
+    <PackageReference Include="xunit" Version="[2.9.0,3)" />
+    <PackageReference Include="Xunit.Combinatorial" Version="[1.6.24,2)" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="[2.8.2,3)">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="coverlet.collector" Version="6.0.2">
+    <PackageReference Include="coverlet.collector" Version="[6.0.2,7)">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -56,6 +58,9 @@
     <Using Include="System.Drawing" />
     <Using Include="Terminal.Gui" />
     <Using Include="Xunit" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="View\Orientation\" />
   </ItemGroup>
   <PropertyGroup Label="FineCodeCoverage">
     <Enabled>
@@ -75,7 +80,5 @@
     <IncludeTestAssembly>
       False
     </IncludeTestAssembly>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 </Project>

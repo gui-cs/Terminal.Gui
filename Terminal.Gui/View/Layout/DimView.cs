@@ -8,14 +8,14 @@ namespace Terminal.Gui;
 ///     This is a low-level API that is typically used internally by the layout system. Use the various static
 ///     methods on the <see cref="Dim"/> class to create <see cref="Dim"/> objects instead.
 /// </remarks>
-public class DimView : Dim
+public record DimView : Dim
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="DimView"/> class.
     /// </summary>
     /// <param name="view">The view the dimension is anchored to.</param>
     /// <param name="dimension">Indicates which dimension is tracked.</param>
-    public DimView (View view, Dimension dimension)
+    public DimView (View? view, Dimension dimension)
     {
         Target = view;
         Dimension = dimension;
@@ -26,16 +26,10 @@ public class DimView : Dim
     /// </summary>
     public Dimension Dimension { get; }
 
-    /// <inheritdoc/>
-    public override bool Equals (object? other) { return other is DimView abs && abs.Target == Target && abs.Dimension == Dimension; }
-
-    /// <inheritdoc/>
-    public override int GetHashCode () { return Target.GetHashCode (); }
-
     /// <summary>
     ///     Gets the View the dimension is anchored to.
     /// </summary>
-    public View Target { get; init; }
+    public View? Target { get; init; }
 
     /// <inheritdoc/>
     public override string ToString ()
@@ -52,8 +46,8 @@ public class DimView : Dim
     {
         return Dimension switch
                {
-                   Dimension.Height => Target.Frame.Height,
-                   Dimension.Width => Target.Frame.Width,
+                   Dimension.Height => Target!.Frame.Height,
+                   Dimension.Width => Target!.Frame.Width,
                    _ => 0
                };
     }

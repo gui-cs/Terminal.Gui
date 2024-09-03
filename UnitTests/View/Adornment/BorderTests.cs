@@ -18,7 +18,7 @@ public class BorderTests (ITestOutputHelper output)
         view.Border.Thickness = new (0, 1, 0, 0);
         view.Border.LineStyle = LineStyle.Single;
 
-        view.ColorScheme = new()
+        view.ColorScheme = new ()
         {
             Normal = new (Color.Red, Color.Green),
             Focus = new (Color.Green, Color.Red)
@@ -53,7 +53,7 @@ public class BorderTests (ITestOutputHelper output)
         view.Border.Thickness = new (0, 1, 0, 0);
         view.Border.LineStyle = LineStyle.Single;
 
-        view.ColorScheme = new()
+        view.ColorScheme = new ()
         {
             Normal = new (Color.Red, Color.Green), Focus = new (Color.Green, Color.Red)
         };
@@ -90,12 +90,12 @@ public class BorderTests (ITestOutputHelper output)
         {
             Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Double
         };
-        win.Border.Thickness.Top = 4;
+        win.Border.Thickness = win.Border.Thickness with { Top = 4 };
 
         RunState rs = Application.Begin (win);
         var firstIteration = false;
 
-        ((FakeDriver)Application.Driver).SetBufferSize (width, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (width, 5);
         Application.RunIteration (ref rs, ref firstIteration);
         var expected = string.Empty;
 
@@ -224,12 +224,12 @@ public class BorderTests (ITestOutputHelper output)
         {
             Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Double
         };
-        win.Border.Thickness.Top = 3;
+        win.Border.Thickness = win.Border.Thickness with { Top = 3 };
 
         RunState rs = Application.Begin (win);
         var firstIteration = false;
 
-        ((FakeDriver)Application.Driver).SetBufferSize (width, 4);
+        ((FakeDriver)Application.Driver!).SetBufferSize (width, 4);
         Application.RunIteration (ref rs, ref firstIteration);
         var expected = string.Empty;
 
@@ -358,12 +358,12 @@ public class BorderTests (ITestOutputHelper output)
         {
             Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Double
         };
-        win.Border.Thickness.Top = 2;
+        win.Border.Thickness = win.Border.Thickness with { Top = 2 };
 
         RunState rs = Application.Begin (win);
         var firstIteration = false;
 
-        ((FakeDriver)Application.Driver).SetBufferSize (width, 4);
+        ((FakeDriver)Application.Driver!).SetBufferSize (width, 4);
         Application.RunIteration (ref rs, ref firstIteration);
         var expected = string.Empty;
 
@@ -486,7 +486,7 @@ public class BorderTests (ITestOutputHelper output)
         RunState rs = Application.Begin (win);
         var firstIteration = false;
 
-        ((FakeDriver)Application.Driver).SetBufferSize (20, height);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, height);
         Application.RunIteration (ref rs, ref firstIteration);
         var expected = string.Empty;
 
@@ -548,7 +548,7 @@ public class BorderTests (ITestOutputHelper output)
         RunState rs = Application.Begin (win);
         var firstIteration = false;
 
-        ((FakeDriver)Application.Driver).SetBufferSize (width, 3);
+        ((FakeDriver)Application.Driver!).SetBufferSize (width, 3);
         Application.RunIteration (ref rs, ref firstIteration);
         var expected = string.Empty;
 
@@ -728,7 +728,7 @@ public class BorderTests (ITestOutputHelper output)
         RunState rs = Application.Begin (top);
         var firstIteration = false;
 
-        ((FakeDriver)Application.Driver).SetBufferSize (5, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (5, 5);
         Application.RunIteration (ref rs, ref firstIteration);
 
         var expected = @"
@@ -756,7 +756,7 @@ public class BorderTests (ITestOutputHelper output)
         RunState rs = Application.Begin (top);
         var firstIteration = false;
 
-        ((FakeDriver)Application.Driver).SetBufferSize (10, 4);
+        ((FakeDriver)Application.Driver!).SetBufferSize (10, 4);
         Application.RunIteration (ref rs, ref firstIteration);
 
         var expected = @"
@@ -779,7 +779,7 @@ public class BorderTests (ITestOutputHelper output)
         RunState rs = Application.Begin (win);
         var firstIteration = false;
 
-        ((FakeDriver)Application.Driver).SetBufferSize (3, 3);
+        ((FakeDriver)Application.Driver!).SetBufferSize (3, 3);
         Application.RunIteration (ref rs, ref firstIteration);
 
         var expected = @"

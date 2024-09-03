@@ -334,7 +334,7 @@ internal class TextModel
                         {
                             lastValidCol = nCol;
 
-                            if (runeType == RuneType.IsWhiteSpace || runeType == RuneType.IsUnknow)
+                            if (runeType == RuneType.IsWhiteSpace || runeType == RuneType.IsUnknown)
                             {
                                 runeType = GetRuneType (nRune);
                             }
@@ -1063,7 +1063,7 @@ internal class TextModel
             return RuneType.IsPunctuation;
         }
 
-        return RuneType.IsUnknow;
+        return RuneType.IsUnknown;
     }
 
     private bool IsSameRuneType (Rune newRune, RuneType runeType)
@@ -1255,7 +1255,7 @@ internal class TextModel
         IsWhiteSpace,
         IsLetterOrDigit,
         IsPunctuation,
-        IsUnknow
+        IsUnknown
     }
 }
 
@@ -1269,7 +1269,7 @@ internal partial class HistoryText
         Added
     }
 
-    private readonly List<HistoryTextItem> _historyTextItems = new ();
+    private readonly List<HistoryTextItemEventArgs> _historyTextItems = new ();
     private int _idxHistoryText = -1;
     private string? _originalText;
     public bool HasHistoryChanges => _idxHistoryText > -1;
@@ -1304,7 +1304,7 @@ internal partial class HistoryText
         _idxHistoryText++;
     }
 
-    public event EventHandler<HistoryTextItem>? ChangeText;
+    public event EventHandler<HistoryTextItemEventArgs>? ChangeText;
 
     public void Clear (string text)
     {
@@ -1324,7 +1324,7 @@ internal partial class HistoryText
 
             _idxHistoryText++;
 
-            var historyTextItem = new HistoryTextItem (_historyTextItems [_idxHistoryText]) { IsUndoing = false };
+            var historyTextItem = new HistoryTextItemEventArgs (_historyTextItems [_idxHistoryText]) { IsUndoing = false };
 
             ProcessChanges (ref historyTextItem);
 
@@ -1334,7 +1334,7 @@ internal partial class HistoryText
 
     public void ReplaceLast (List<List<RuneCell>> lines, Point curPos, LineStatus lineStatus)
     {
-        HistoryTextItem? found = _historyTextItems.FindLast (x => x.LineStatus == lineStatus);
+        HistoryTextItemEventArgs? found = _historyTextItems.FindLast (x => x.LineStatus == lineStatus);
 
         if (found is { })
         {
@@ -1351,7 +1351,7 @@ internal partial class HistoryText
 
             _idxHistoryText--;
 
-            var historyTextItem = new HistoryTextItem (_historyTextItems [_idxHistoryText]) { IsUndoing = true };
+            var historyTextItem = new HistoryTextItemEventArgs (_historyTextItems [_idxHistoryText]) { IsUndoing = true };
 
             ProcessChanges (ref historyTextItem);
 
@@ -1359,9 +1359,9 @@ internal partial class HistoryText
         }
     }
 
-    private void OnChangeText (HistoryTextItem? lines) { ChangeText?.Invoke (this, lines!); }
+    private void OnChangeText (HistoryTextItemEventArgs? lines) { ChangeText?.Invoke (this, lines!); }
 
-    private void ProcessChanges (ref HistoryTextItem historyTextItem)
+    private void ProcessChanges (ref HistoryTextItemEventArgs historyTextItem)
     {
         if (historyTextItem.IsUndoing)
         {
@@ -1772,8 +1772,8 @@ internal class WordWrapManager
         nCol = 0;
         nStartRow = 0;
         nStartCol = 0;
-        bool isRowAndColSetted = row == 0 && col == 0;
-        bool isStartRowAndColSetted = startRow == 0 && startCol == 0;
+        bool isRowAndColSet = row == 0 && col == 0;
+        bool isStartRowAndColSet = startRow == 0 && startCol == 0;
         List<WrappedLine> wModelLines = new ();
 
         for (var i = 0; i < Model.Count; i++)
@@ -1796,7 +1796,7 @@ internal class WordWrapManager
             {
                 List<RuneCell> wrapLine = wrappedLines [j];
 
-                if (!isRowAndColSetted && modelRow == i)
+                if (!isRowAndColSet && modelRow == i)
                 {
                     if (nCol + wrapLine.Count <= modelCol)
                     {
@@ -1806,12 +1806,12 @@ internal class WordWrapManager
                         if (nCol == modelCol)
                         {
                             nCol = wrapLine.Count;
-                            isRowAndColSetted = true;
+                            isRowAndColSet = true;
                         }
                         else if (j == wrappedLines.Count - 1)
                         {
                             nCol = wrapLine.Count - j + modelCol - nCol;
-                            isRowAndColSetted = true;
+                            isRowAndColSet = true;
                         }
                     }
                     else
@@ -1819,11 +1819,11 @@ internal class WordWrapManager
                         int offset = nCol + wrapLine.Count - modelCol;
                         nCol = wrapLine.Count - offset;
                         nRow = lines;
-                        isRowAndColSetted = true;
+                        isRowAndColSet = true;
                     }
                 }
 
-                if (!isStartRowAndColSetted && modelStartRow == i)
+                if (!isStartRowAndColSet && modelStartRow == i)
                 {
                     if (nStartCol + wrapLine.Count <= modelStartCol)
                     {
@@ -1833,12 +1833,12 @@ internal class WordWrapManager
                         if (nStartCol == modelStartCol)
                         {
                             nStartCol = wrapLine.Count;
-                            isStartRowAndColSetted = true;
+                            isStartRowAndColSet = true;
                         }
                         else if (j == wrappedLines.Count - 1)
                         {
                             nStartCol = wrapLine.Count - j + modelStartCol - nStartCol;
-                            isStartRowAndColSetted = true;
+                            isStartRowAndColSet = true;
                         }
                     }
                     else
@@ -1846,7 +1846,7 @@ internal class WordWrapManager
                         int offset = nStartCol + wrapLine.Count - modelStartCol;
                         nStartCol = wrapLine.Count - offset;
                         nStartRow = lines;
-                        isStartRowAndColSetted = true;
+                        isStartRowAndColSet = true;
                     }
                 }
 
@@ -1997,10 +1997,15 @@ public class TextView : View
         CursorVisibility = CursorVisibility.Default;
         Used = true;
 
+        // By default, disable hotkeys (in case someome sets Title)
+        HotKeySpecifier = new ('\xffff');
+
         _model.LinesLoaded += Model_LinesLoaded!;
         _historyText.ChangeText += HistoryText_ChangeText!;
 
         Initialized += TextView_Initialized!;
+
+        Added += TextView_Added!;
 
         LayoutComplete += TextView_LayoutComplete;
 
@@ -2045,15 +2050,7 @@ public class TextView : View
                     }
                    );
 
-        AddCommand (
-                    Command.LineDown,
-                    () =>
-                    {
-                        ProcessMoveDown ();
-
-                        return true;
-                    }
-                   );
+        AddCommand (Command.LineDown, () => ProcessMoveDown ());
 
         AddCommand (
                     Command.LineDownExtend,
@@ -2065,15 +2062,7 @@ public class TextView : View
                     }
                    );
 
-        AddCommand (
-                    Command.LineUp,
-                    () =>
-                    {
-                        ProcessMoveUp ();
-
-                        return true;
-                    }
-                   );
+        AddCommand (Command.LineUp, () => ProcessMoveUp ());
 
         AddCommand (
                     Command.LineUpExtend,
@@ -2369,8 +2358,6 @@ public class TextView : View
                    );
         AddCommand (Command.Tab, () => ProcessTab ());
         AddCommand (Command.BackTab, () => ProcessBackTab ());
-        AddCommand (Command.NextView, () => ProcessMoveNextView ());
-        AddCommand (Command.PreviousView, () => ProcessMovePreviousView ());
 
         AddCommand (
                     Command.Undo,
@@ -2503,12 +2490,6 @@ public class TextView : View
         KeyBindings.Add (Key.Tab, Command.Tab);
         KeyBindings.Add (Key.Tab.WithShift, Command.BackTab);
 
-        KeyBindings.Add (Key.Tab.WithCtrl, Command.NextView);
-        KeyBindings.Add (Application.AlternateForwardKey, Command.NextView);
-
-        KeyBindings.Add (Key.Tab.WithCtrl.WithShift, Command.PreviousView);
-        KeyBindings.Add (Application.AlternateBackwardKey, Command.PreviousView);
-
         KeyBindings.Add (Key.Z.WithCtrl, Command.Undo);
         KeyBindings.Add (Key.R.WithCtrl, Command.Redo);
 
@@ -2517,16 +2498,32 @@ public class TextView : View
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
 
-        ContextMenu = new () { MenuItems = BuildContextMenuBarItem () };
+        ContextMenu = new ();
         ContextMenu.KeyChanged += ContextMenu_KeyChanged!;
 
         KeyBindings.Add ((KeyCode)ContextMenu.Key, KeyBindingScope.HotKey, Command.ShowContextMenu);
     }
 
+    private void TextView_Added1 (object? sender, SuperViewChangedEventArgs e)
+    {
+        throw new NotImplementedException ();
+    }
+
+    // BUGBUG: AllowsReturn is mis-named. It should be EnterKeyAccepts.
     /// <summary>
-    ///     Gets or sets a value indicating whether pressing ENTER in a <see cref="TextView"/> creates a new line of text
-    ///     in the view or activates the default button for the Toplevel.
+    ///     Gets or sets whether pressing ENTER in a <see cref="TextView"/> creates a new line of text
+    ///     in the view or invokes the <see cref="View.Accept"/> event.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Setting this property alters <see cref="Multiline"/>.
+    ///         If <see cref="AllowsReturn"/> is set to <see langword="true"/>, then <see cref="Multiline"/> is also set to `true` and
+    ///         vice-versa.
+    ///     </para>
+    ///     <para>
+    ///         If <see cref="AllowsReturn"/> is set to <see langword="false"/>, then <see cref="AllowsTab"/> gets set to <see langword="false"/>.
+    ///     </para>
+    /// </remarks>
     public bool AllowsReturn
     {
         get => _allowsReturn;
@@ -2536,12 +2533,14 @@ public class TextView : View
 
             if (_allowsReturn && !_multiline)
             {
+                // BUGBUG: Setting properties should not have side-effects like this. Multiline and AllowsReturn should be independent.
                 Multiline = true;
             }
 
             if (!_allowsReturn && _multiline)
             {
                 Multiline = false;
+                // BUGBUG: Setting properties should not have side-effects like this. Multiline and AllowsTab should be independent.
                 AllowsTab = false;
             }
 
@@ -2807,7 +2806,6 @@ public class TextView : View
         }
         set
         {
-            string old = Text;
             ResetPosition ();
             _model.LoadString (value);
 
@@ -2817,7 +2815,7 @@ public class TextView : View
                 _model = _wrapManager.WrapModel (Viewport.Width, out _, out _, out _, out _);
             }
 
-            OnTextChanged (old, Text);
+            OnTextChanged ();
             SetNeedsDisplay ();
 
             _historyText.Clear (Text);
@@ -2871,7 +2869,7 @@ public class TextView : View
     }
 
 
-    /// <summary>Allows clearing the <see cref="HistoryText.HistoryTextItem"/> items updating the original text.</summary>
+    /// <summary>Allows clearing the <see cref="HistoryText.HistoryTextItemEventArgs"/> items updating the original text.</summary>
     public void ClearHistoryChanges () { _historyText?.Clear (Text); }
 
     /// <summary>Closes the contents of the stream into the <see cref="TextView"/>.</summary>
@@ -3496,7 +3494,7 @@ public class TextView : View
         }
         else if (ev.Flags == ContextMenu!.MouseFlags)
         {
-            ContextMenu.Position = new (ev.Position.X + 2, ev.Position.Y + 2);
+            ContextMenu.Position = ViewportToScreen ((Viewport with { X = ev.Position.X, Y = ev.Position.Y }).Location);
             ShowContextMenu ();
         }
 
@@ -3662,14 +3660,14 @@ public class TextView : View
     }
 
     /// <inheritdoc/>
-    public override bool OnLeave (View view)
+    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view)
     {
         if (Application.MouseGrabView is { } && Application.MouseGrabView == this)
         {
             Application.UngrabMouse ();
         }
 
-        return base.OnLeave (view);
+        return;
     }
 
     /// <inheritdoc/>
@@ -4133,7 +4131,7 @@ public class TextView : View
 
     private void AppendClipboard (string text) { Clipboard.Contents += text; }
 
-    private MenuBarItem BuildContextMenuBarItem ()
+    private MenuBarItem? BuildContextMenuBarItem ()
     {
         return new (
                     new MenuItem []
@@ -4306,7 +4304,7 @@ public class TextView : View
         DoNeededAction ();
     }
 
-    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey, e.NewKey); }
+    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.ReplaceKey (e.OldKey, e.NewKey); }
 
     private bool DeleteTextBackwards ()
     {
@@ -4667,7 +4665,7 @@ public class TextView : View
         return new ValueTuple<int, int> (line, col);
     }
 
-    private void HistoryText_ChangeText (object sender, HistoryText.HistoryTextItem obj)
+    private void HistoryText_ChangeText (object sender, HistoryText.HistoryTextItemEventArgs obj)
     {
         SetWrapModel ();
 
@@ -5290,7 +5288,7 @@ public class TextView : View
         MoveEnd ();
     }
 
-    private void MoveDown ()
+    private bool MoveDown ()
     {
         if (CurrentRow + 1 < _model.Count)
         {
@@ -5314,8 +5312,14 @@ public class TextView : View
         {
             Adjust ();
         }
+        else
+        {
+            return false;
+        }
 
         DoNeededAction ();
+
+        return true;
     }
 
     private void MoveEndOfLine ()
@@ -5326,7 +5330,7 @@ public class TextView : View
         DoNeededAction ();
     }
 
-    private void MoveLeft ()
+    private bool MoveLeft ()
     {
         if (CurrentColumn > 0)
         {
@@ -5347,20 +5351,16 @@ public class TextView : View
                 List<RuneCell> currentLine = GetCurrentLine ();
                 CurrentColumn = Math.Max (currentLine.Count - (ReadOnly ? 1 : 0), 0);
             }
+            else
+            {
+                return false;
+            }
         }
 
         Adjust ();
         DoNeededAction ();
-    }
 
-    private bool MoveNextView ()
-    {
-        if (Application.OverlappedTop is { })
-        {
-            return SuperView?.FocusNext () == true;
-        }
-
-        return false;
+        return true;
     }
 
     private void MovePageDown ()
@@ -5419,17 +5419,7 @@ public class TextView : View
         DoNeededAction ();
     }
 
-    private bool MovePreviousView ()
-    {
-        if (Application.OverlappedTop is { })
-        {
-            return SuperView?.FocusPrev () == true;
-        }
-
-        return false;
-    }
-
-    private void MoveRight ()
+    private bool MoveRight ()
     {
         List<RuneCell> currentLine = GetCurrentLine ();
 
@@ -5449,11 +5439,21 @@ public class TextView : View
                     _topRow++;
                     SetNeedsDisplay ();
                 }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
             }
         }
 
         Adjust ();
         DoNeededAction ();
+
+        return true;
     }
 
     private void MoveStartOfLine ()
@@ -5488,7 +5488,7 @@ public class TextView : View
         MoveHome ();
     }
 
-    private void MoveUp ()
+    private bool MoveUp ()
     {
         if (CurrentRow > 0)
         {
@@ -5508,8 +5508,13 @@ public class TextView : View
             TrackColumn ();
             PositionCursor ();
         }
+        else
+        {
+            return false;
+        }
 
         DoNeededAction ();
+        return true;
     }
 
     private void MoveWordBackward ()
@@ -5605,7 +5610,7 @@ public class TextView : View
 
         if (!AllowsTab || _isReadOnly)
         {
-            return ProcessMovePreviousView ();
+            return false;
         }
 
         if (CurrentColumn > 0)
@@ -5812,16 +5817,15 @@ public class TextView : View
         line = r!;
     }
 
-    private void ProcessMoveDown ()
+    private bool ProcessMoveDown ()
     {
         ResetContinuousFindTrack ();
-
         if (_shiftSelecting && Selecting)
         {
             StopSelecting ();
         }
 
-        MoveDown ();
+        return MoveDown ();
     }
 
     private void ProcessMoveDownExtend ()
@@ -5878,20 +5882,6 @@ public class TextView : View
         MoveLeft ();
     }
 
-    private bool ProcessMoveNextView ()
-    {
-        ResetColumnTrack ();
-
-        return MoveNextView ();
-    }
-
-    private bool ProcessMovePreviousView ()
-    {
-        ResetColumnTrack ();
-
-        return MovePreviousView ();
-    }
-
     private bool ProcessMoveRight ()
     {
         // if the user presses Right (without any control keys)
@@ -5943,7 +5933,7 @@ public class TextView : View
         MoveStartOfLine ();
     }
 
-    private void ProcessMoveUp ()
+    private bool ProcessMoveUp ()
     {
         ResetContinuousFindTrack ();
 
@@ -5952,7 +5942,7 @@ public class TextView : View
             StopSelecting ();
         }
 
-        MoveUp ();
+        return MoveUp ();
     }
 
     private void ProcessMoveUpExtend ()
@@ -6054,9 +6044,16 @@ public class TextView : View
     {
         ResetColumnTrack ();
 
-        if (!AllowsReturn || _isReadOnly)
+        if (_isReadOnly)
         {
             return false;
+        }
+
+        if (!AllowsReturn)
+        {
+            // By Default pressing ENTER should be ignored (OnAccept will return false or null). Only cancel if the
+            // event was fired and set Cancel = true.
+            return OnAccept () == false;
         }
 
         SetWrapModel ();
@@ -6144,7 +6141,7 @@ public class TextView : View
 
         if (!AllowsTab || _isReadOnly)
         {
-            return ProcessMoveNextView ();
+            return false;
         }
 
         InsertText (new Key ((KeyCode)'\t'));
@@ -6292,14 +6289,12 @@ public class TextView : View
 
     private void ShowContextMenu ()
     {
-        if (_currentCulture != Thread.CurrentThread.CurrentUICulture)
+        if (!Equals (_currentCulture, Thread.CurrentThread.CurrentUICulture))
         {
             _currentCulture = Thread.CurrentThread.CurrentUICulture;
-
-            ContextMenu!.MenuItems = BuildContextMenuBarItem ();
         }
 
-        ContextMenu!.Show ();
+        ContextMenu!.Show (BuildContextMenuBarItem ());
     }
 
     private void StartSelecting ()
@@ -6347,16 +6342,21 @@ public class TextView : View
         return StringExtensions.ToString (encoded);
     }
 
+    private void TextView_Added (object sender, SuperViewChangedEventArgs e)
+    {
+        if (Autocomplete.HostControl is null)
+        {
+            Autocomplete.HostControl = this;
+        }
+    }
+
+
     private void TextView_Initialized (object sender, EventArgs e)
     {
-        Autocomplete.HostControl = this;
-
-        if (Application.Top is { })
+        if (Autocomplete.HostControl is null)
         {
-            Application.Top.AlternateForwardKeyChanged += Top_AlternateForwardKeyChanged!;
-            Application.Top.AlternateBackwardKeyChanged += Top_AlternateBackwardKeyChanged!;
+            Autocomplete.HostControl = this;
         }
-
         OnContentsChanged ();
     }
 
@@ -6373,9 +6373,6 @@ public class TextView : View
         _selectionStartColumn = CurrentColumn;
         _selectionStartRow = CurrentRow;
     }
-
-    private void Top_AlternateBackwardKeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey, e.NewKey); }
-    private void Top_AlternateForwardKeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey, e.NewKey); }
 
     // Tries to snap the cursor to the tracking column
     private void TrackColumn ()

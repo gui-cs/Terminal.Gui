@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui;
 
-/// <summary>An attribute that can be applied to a property to indicate that it should included in the configuration file.</summary>
+/// <summary>An attribute that can be applied to a property to indicate that it should be included in the configuration file.</summary>
 /// <example>
 ///     [SerializableConfigurationProperty(Scope = typeof(Configuration.ThemeManager.ThemeScope)), JsonConverter
 ///     (typeof (JsonStringEnumConverter))] public static LineStyle DefaultBorderStyle { ...

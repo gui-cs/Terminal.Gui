@@ -62,7 +62,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Frame.Size);
         Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Viewport.Size);
         Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.GetContentSize ());
-        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.TextFormatter.Size);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.TextFormatter.ConstrainToSize);
 
         btn1.Dispose ();
     }
@@ -76,15 +76,13 @@ public class ButtonTests (ITestOutputHelper output)
     [InlineData (10, 3, 10, 3)]
     public void Button_AbsoluteSize_DefaultText (int width, int height, int expectedWidth, int expectedHeight)
     {
-        var btn1 = new Button
-        {
-            Width = width,
-            Height = height,
-        };
+        var btn1 = new Button ();
+        btn1.Width = width;
+        btn1.Height = height;
 
         Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Frame.Size);
         Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Viewport.Size);
-        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.TextFormatter.Size);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.TextFormatter.ConstrainToSize);
 
         btn1.Dispose ();
     }
@@ -178,7 +176,7 @@ public class ButtonTests (ITestOutputHelper output)
         btn.Dispose ();
 
         btn = new () { Text = "_Test", IsDefault = true };
-        Assert.Equal (new (10, 1), btn.TextFormatter.Size);
+        Assert.Equal (new (10, 1), btn.TextFormatter.ConstrainToSize);
 
 
 
@@ -201,7 +199,7 @@ public class ButtonTests (ITestOutputHelper output)
         // [* Test *]
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
         Assert.Equal (10, btn.TextFormatter.Format ().Length);
-        Assert.Equal (new (10, 1), btn.TextFormatter.Size);
+        Assert.Equal (new (10, 1), btn.TextFormatter.ConstrainToSize);
         Assert.Equal (new (10, 1), btn.GetContentSize ());
         Assert.Equal (new (0, 0, 10, 1), btn.Viewport);
         Assert.Equal (new (0, 0, 10, 1), btn.Frame);
@@ -224,7 +222,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
         Assert.True (btn.CanFocus);
 
-        Application.Driver.ClearContents ();
+        Application.Driver?.ClearContents ();
         btn.Draw ();
 
         expected = @$"
@@ -484,7 +482,7 @@ public class ButtonTests (ITestOutputHelper output)
 
         return;
 
-        void ButtonOnAccept (object sender, CancelEventArgs e) { accepted = true; }
+        void ButtonOnAccept (object sender, HandledEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -503,10 +501,10 @@ public class ButtonTests (ITestOutputHelper output)
 
         return;
 
-        void ButtonAccept (object sender, CancelEventArgs e)
+        void ButtonAccept (object sender, HandledEventArgs e)
         {
             acceptInvoked = true;
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 
@@ -563,7 +561,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.False (btn.IsInitialized);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
 
         Assert.True (btn.IsInitialized);
         Assert.Equal ("Say Hello 你", btn.Text);
@@ -597,7 +595,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.False (btn.IsInitialized);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
 
         Assert.True (btn.IsInitialized);
         Assert.Equal ("Say Hello 你", btn.Text);

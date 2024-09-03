@@ -18,11 +18,11 @@ public class Buttons : Scenario
 
         Window main = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"
+            Title = GetQuitKeyAndName ()
         };
 
         // Add a label & text field so we can demo IsDefault
-        var editLabel = new Label { X = 0, Y = 0, TabStop = true, Text = "TextField (to demo IsDefault):" };
+        var editLabel = new Label { X = 0, Y = 0, Text = "TextField (to demo IsDefault):" };
         main.Add (editLabel);
 
         // Add a TextField using Absolute layout. 
@@ -129,7 +129,7 @@ public class Buttons : Scenario
             X = 0,
             Y = Pos.Bottom (removeButton) + 1,
             Width = Dim.Percent (50),
-            Height = 5,
+            Height = 6,
             Title = "Computed Layout"
         };
         main.Add (computedFrame);
@@ -140,7 +140,6 @@ public class Buttons : Scenario
             X = 0,
             Y = Pos.Center () - 1,
             Width = 30,
-            Height = 1,
             ColorScheme = Colors.ColorSchemes ["Error"],
             Text = "Move This \u263b Button v_ia Pos"
         };
@@ -157,7 +156,6 @@ public class Buttons : Scenario
             Y = Pos.Center () + 1,
             X = 0,
             Width = 30,
-            Height = 1,
             Text = "Grow This \u263a Button _via Pos",
             ColorScheme = Colors.ColorSchemes ["Error"],
         };
@@ -173,7 +171,7 @@ public class Buttons : Scenario
             X = Pos.Right (computedFrame),
             Y = Pos.Bottom (removeButton) + 1,
             Width = Dim.Fill (),
-            Height = 5,
+            Height = 6,
             Title = "Absolute Layout"
         };
         main.Add (absoluteFrame);
@@ -211,7 +209,8 @@ public class Buttons : Scenario
 
         var label = new Label
         {
-            X = 2, Y = Pos.Bottom (computedFrame) + 1, Text = "Text Alignment (changes the four buttons above): "
+            X = 2, Y = Pos.Bottom (computedFrame) + 1, 
+            Text = "Text Alignment (changes the four buttons above): "
         };
         main.Add (label);
 
@@ -262,7 +261,6 @@ public class Buttons : Scenario
         {
             X = 2,
             Y = Pos.Bottom (radioGroup) + 1,
-            Height = 1,
             Width = Dim.Width (computedFrame) - 2,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Text = mhkb
@@ -276,7 +274,6 @@ public class Buttons : Scenario
         {
             X = Pos.Left (absoluteFrame) + 1,
             Y = Pos.Bottom (radioGroup) + 1,
-            Height = 1,
             Width = Dim.Width (absoluteFrame) - 2,
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Text = muhkb
@@ -339,12 +336,10 @@ public class Buttons : Scenario
             Value = 69,
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            Width = 5,
-            Height = 1
         };
         numericUpDown.ValueChanged += NumericUpDown_ValueChanged;
 
-        void NumericUpDown_ValueChanged (object sender, StateEventArgs<int> e) { }
+        void NumericUpDown_ValueChanged (object sender, EventArgs<int> e) { }
 
         main.Add (label, numericUpDown);
 
@@ -388,167 +383,29 @@ public class Buttons : Scenario
             X = Pos.Right (repeatButton) + 1,
             Y = Pos.Top (repeatButton),
             Title = "Enabled",
-            Checked = true
+            CheckedState = CheckState.Checked
         };
-        enableCB.Toggled += (s, e) => { repeatButton.Enabled = !repeatButton.Enabled; };
+        enableCB.CheckedStateChanging += (s, e) => { repeatButton.Enabled = !repeatButton.Enabled; };
         main.Add (label, repeatButton, enableCB);
 
-        main.Ready += (s, e) => radioGroup.Refresh ();
+        var decNumericUpDown = new NumericUpDown<int>
+        {
+            Value = 911,
+            Increment = 1,
+            Format = "{0:X}",
+            X = 0,
+            Y = Pos.Bottom (enableCB) + 1,
+        };
+
+        main.Add (decNumericUpDown);
+
+        main.Ready += (s, e) =>
+                      {
+                          radioGroup.Refresh ();
+                      };
         Application.Run (main);
         main.Dispose ();
         Application.Shutdown ();
-    }
-
-    /// <summary>
-    /// Enables the user to increase or decrease a value by clicking on the up or down buttons.
-    /// </summary>
-    /// <remarks>
-    ///     Supports the following types: <see cref="int"/>, <see cref="long"/>, <see cref="float"/>, <see cref="double"/>, <see cref="decimal"/>.
-    ///     Supports only one digit of precision.
-    /// </remarks>
-    public class NumericUpDown<T> : View
-    {
-        private readonly Button _down;
-        // TODO: Use a TextField instead of a Label
-        private readonly View _number;
-        private readonly Button _up;
-
-        public NumericUpDown ()
-        {
-            Type type = typeof (T);
-            if (!(type == typeof (int) || type == typeof (long) || type == typeof (float) || type == typeof (double) || type == typeof (decimal)))
-            {
-                throw new InvalidOperationException ("T must be a numeric type that supports addition and subtraction.");
-            }
-
-            Width = Dim.Auto (DimAutoStyle.Content); //Dim.Function (() => Digits + 2); // button + 3 for number + button
-            Height = Dim.Auto (DimAutoStyle.Content);
-
-            _down = new ()
-            {
-                Height = 1,
-                Width = 1,
-                NoPadding = true,
-                NoDecorations = true,
-                Title = $"{CM.Glyphs.DownArrow}",
-                WantContinuousButtonPressed = true,
-                CanFocus = false,
-            };
-
-            _number = new ()
-            {
-                Text = Value.ToString (),
-                X = Pos.Right (_down),
-                Y = Pos.Top (_down),
-                Width = Dim.Func (() => _number is null ? Digits : Math.Max (Digits, _number.Text.Length)),
-                Height = 1,
-                TextAlignment = Alignment.Center,
-                CanFocus = true
-            };
-
-            _up = new ()
-            {
-                X = Pos.AnchorEnd (),
-                Y = Pos.Top (_number),
-                Height = 1,
-                Width = 1,
-                NoPadding = true,
-                NoDecorations = true,
-                Title = $"{CM.Glyphs.UpArrow}",
-                WantContinuousButtonPressed = true,
-                CanFocus = false,
-            };
-
-            CanFocus = true;
-
-            _down.Accept += OnDownButtonOnAccept;
-            _up.Accept += OnUpButtonOnAccept;
-
-            Add (_down, _number, _up);
-
-
-            AddCommand (Command.ScrollUp, () =>
-                                          {
-                                              Value = (dynamic)Value + 1;
-                                              _number.Text = Value.ToString ();
-
-                                              return true;
-                                          });
-            AddCommand (Command.ScrollDown, () =>
-                                            {
-                                                Value = (dynamic)Value - 1;
-                                                _number.Text = Value.ToString ();
-
-                                                return true;
-                                            });
-
-            KeyBindings.Add (Key.CursorUp, Command.ScrollUp);
-            KeyBindings.Add (Key.CursorDown, Command.ScrollDown);
-
-            return;
-
-            void OnDownButtonOnAccept (object s, CancelEventArgs e)
-            {
-                InvokeCommand (Command.ScrollDown);
-            }
-
-            void OnUpButtonOnAccept (object s, CancelEventArgs e)
-            {
-                InvokeCommand (Command.ScrollUp);
-            }
-        }
-
-        private void _up_Enter (object sender, FocusEventArgs e)
-        {
-            throw new NotImplementedException ();
-        }
-
-        private T _value;
-
-        /// <summary>
-        /// The value that will be incremented or decremented.
-        /// </summary>
-        public T Value
-        {
-            get => _value;
-            set
-            {
-                if (_value.Equals (value))
-                {
-                    return;
-                }
-
-                T oldValue = value;
-                StateEventArgs<T> args = new StateEventArgs<T> (_value, value);
-                ValueChanging?.Invoke (this, args);
-
-                if (args.Cancel)
-                {
-                    return;
-                }
-
-                _value = value;
-                _number.Text = _value.ToString ();
-                ValueChanged?.Invoke (this, new (oldValue, _value));
-            }
-        }
-
-        /// <summary>
-        /// Fired when the value is about to change. Set <see cref="StateEventArgs{T}.Cancel"/> to true to prevent the change.
-        /// </summary>
-        [CanBeNull]
-        public event EventHandler<StateEventArgs<T>> ValueChanging;
-
-        /// <summary>
-        /// Fired when the value has changed.
-        /// </summary>
-        [CanBeNull]
-        public event EventHandler<StateEventArgs<T>> ValueChanged;
-
-        /// <summary>
-        /// The number of digits to display. The <see cref="View.Viewport"/> will be resized to fit this number of characters plus the buttons. The default is 3.
-        /// </summary>
-        public int Digits { get; set; } = 3;
     }
 }
 

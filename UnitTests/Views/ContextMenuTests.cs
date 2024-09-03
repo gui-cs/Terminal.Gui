@@ -10,42 +10,54 @@ public class ContextMenuTests (ITestOutputHelper output)
     public void ContextMenu_Constructors ()
     {
         var cm = new ContextMenu ();
+        var top = new Toplevel ();
+        Application.Begin (top);
+
         Assert.Equal (Point.Empty, cm.Position);
-        Assert.Empty (cm.MenuItems.Children);
+        Assert.Null (cm.MenuItems);
         Assert.Null (cm.Host);
         cm.Position = new Point (20, 10);
 
-        cm.MenuItems = new MenuBarItem (
-                                        [
-                                            new MenuItem ("First", "", null)
-                                        ]
-                                       );
+        var menuItems = new MenuBarItem (
+                                         [
+                                             new MenuItem ("First", "", null)
+                                         ]
+                                        );
+        cm.Show (menuItems);
         Assert.Equal (new Point (20, 10), cm.Position);
-        Assert.Single (cm.MenuItems.Children);
+        Assert.Single (cm.MenuItems!.Children);
 
         cm = new ContextMenu
         {
-            Position = new Point (5, 10),
-            MenuItems = new MenuBarItem (
-                                         new [] { new MenuItem ("One", "", null), new MenuItem ("Two", "", null) }
-                                        )
+            Position = new Point (5, 10)
         };
+
+        menuItems = new MenuBarItem (
+                                     new [] { new MenuItem ("One", "", null), new MenuItem ("Two", "", null) }
+                                    );
+        cm.Show (menuItems);
         Assert.Equal (new Point (5, 10), cm.Position);
-        Assert.Equal (2, cm.MenuItems.Children.Length);
+        Assert.Equal (2, cm.MenuItems!.Children.Length);
         Assert.Null (cm.Host);
 
+        var view = new View { X = 5, Y = 10 };
+        top.Add (view);
+
         cm = new ContextMenu
         {
-            Host = new View { X = 5, Y = 10 },
-            Position = new Point (5, 10),
-            MenuItems = new MenuBarItem (
-                                         new [] { new MenuItem ("One", "", null), new MenuItem ("Two", "", null) }
-                                        )
+            Host = view,
+            Position = new Point (5, 10)
         };
 
+        menuItems = new MenuBarItem (
+                                     new [] { new MenuItem ("One", "", null), new MenuItem ("Two", "", null) }
+                                    );
+        cm.Show (menuItems);
         Assert.Equal (new Point (5, 10), cm.Position);
         Assert.Equal (2, cm.MenuItems.Children.Length);
         Assert.NotNull (cm.Host);
+
+        top.Dispose ();
     }
 
     [Fact]
@@ -54,14 +66,15 @@ public class ContextMenuTests (ITestOutputHelper output)
     {
         var cm = new ContextMenu
         {
-            Position = new Point (10, 5),
-            MenuItems = new MenuBarItem (
+            Position = new Point (10, 5)
+        };
+
+        var menuItems = new MenuBarItem (
                                          [
                                              new MenuItem ("One", "", null),
                                              new MenuItem ("Two", "", null)
                                          ]
-                                        )
-        };
+                                        );
 
         var menu = new MenuBar
         {
@@ -78,7 +91,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         Assert.Null (Application.MouseGrabView);
 
-        cm.Show ();
+        cm.Show (menuItems);
         Assert.True (ContextMenu.IsShow);
         Assert.Equal (cm.MenuBar, Application.MouseGrabView);
         Assert.False (menu.IsMenuOpen);
@@ -87,7 +100,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.Equal (menu, Application.MouseGrabView);
         Assert.True (menu.IsMenuOpen);
 
-        cm.Show ();
+        cm.Show (menuItems);
         Assert.True (ContextMenu.IsShow);
         Assert.Equal (cm.MenuBar, Application.MouseGrabView);
         Assert.False (menu.IsMenuOpen);
@@ -98,7 +111,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (menu.IsMenuOpen);
 #endif
 
-        cm.Show ();
+        cm.Show (menuItems);
         Assert.True (ContextMenu.IsShow);
         Assert.Equal (cm.MenuBar, Application.MouseGrabView);
         Assert.False (menu.IsMenuOpen);
@@ -117,9 +130,9 @@ public class ContextMenuTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Draw_A_ContextMenu_Over_A_Borderless_Top ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 15);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 15);
 
-        Assert.Equal (new Rectangle (0, 0, 20, 15), Application.Driver.Clip);
+        Assert.Equal (new Rectangle (0, 0, 20, 15), Application.Driver?.Clip);
         TestHelpers.AssertDriverContentsWithFrameAre ("", output);
 
         var top = new Toplevel { X = 2, Y = 2, Width = 15, Height = 4 };
@@ -167,7 +180,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         var win = new Window ();
         top.Add (win);
         RunState rsTop = Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 15);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 15);
 
         Assert.Equal (new Rectangle (0, 0, 20, 15), win.Frame);
 
@@ -252,9 +265,9 @@ public class ContextMenuTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Draw_A_ContextMenu_Over_A_Top_Dialog ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize (20, 15);
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 15);
 
-        Assert.Equal (new Rectangle (0, 0, 20, 15), Application.Driver.Clip);
+        Assert.Equal (new Rectangle (0, 0, 20, 15), Application.Driver?.Clip);
         TestHelpers.AssertDriverContentsWithFrameAre ("", output);
 
         // Don't use Dialog here as it has more layout logic. Use Window instead.
@@ -305,21 +318,21 @@ public class ContextMenuTests (ITestOutputHelper output)
     {
         var cm = new ContextMenu
         {
-            Position = new Point (-1, -2),
-            MenuItems = new MenuBarItem (
+            Position = new Point (-1, -2)
+        };
+
+        var menuItems = new MenuBarItem (
                                          [
                                              new MenuItem ("One", "", null),
                                              new MenuItem ("Two", "", null)
                                          ]
-                                        )
-        };
-
+                                        );
         Assert.Equal (new Point (-1, -2), cm.Position);
-        
+
         Toplevel top = new ();
         Application.Begin (top);
 
-        cm.Show ();
+        cm.Show (menuItems);
         Assert.Equal (new Point (-1, -2), cm.Position);
         Application.Refresh ();
 
@@ -334,7 +347,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (0, 1, 8, 4), pos);
 
         cm.ForceMinimumPosToZero = false;
-        cm.Show ();
+        cm.Show (menuItems);
         Assert.Equal (new Point (-1, -2), cm.Position);
         Application.Refresh ();
 
@@ -355,22 +368,22 @@ public class ContextMenuTests (ITestOutputHelper output)
     {
         var cm = new ContextMenu
         {
-            Position = new Point (80, 25),
-            MenuItems = new MenuBarItem (
+            Position = new Point (80, 25)
+        };
+
+        var menuItems = new MenuBarItem (
                                          [
                                              new MenuItem ("One", "", null),
                                              new MenuItem ("Two", "", null)
                                          ]
-                                        )
-        };
-
+                                        );
         Toplevel top = new ();
         Application.Begin (top);
         top.Running = true;
 
         Assert.False (ContextMenu.IsShow);
 
-        cm.Show ();
+        cm.Show (menuItems);
         Assert.True (ContextMenu.IsShow);
 
         top.RequestStop ();
@@ -388,9 +401,11 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.Begin (top);
 
         Assert.True (Application.OnKeyDown (ContextMenu.DefaultKey));
-        Assert.True (tf.ContextMenu.MenuBar.IsMenuOpen);
+        Assert.True (tf.ContextMenu.MenuBar!.IsMenuOpen);
         Assert.True (Application.OnKeyDown (ContextMenu.DefaultKey));
-        Assert.Null (tf.ContextMenu.MenuBar);
+
+        // The last context menu bar opened is always preserved
+        Assert.NotNull (tf.ContextMenu.MenuBar);
         top.Dispose ();
     }
 
@@ -414,18 +429,18 @@ public class ContextMenuTests (ITestOutputHelper output)
     {
         var cm = new ContextMenu
         {
-            Position = new Point (10, 5),
-            MenuItems = new MenuBarItem (
+            Position = new Point (10, 5)
+        };
+
+        var menuItems = new MenuBarItem (
                                          [
                                              new MenuItem ("One", "", null),
                                              new MenuItem ("Two", "", null)
                                          ]
-                                        )
-        };
-
+                                        );
         Toplevel top = new ();
         Application.Begin (top);
-        cm.Show ();
+        cm.Show (menuItems);
         Application.Refresh ();
 
         var expected = @"
@@ -437,15 +452,15 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverContentsAre (expected, output);
 
-        cm.MenuItems = new MenuBarItem (
-                                        [
-                                            new MenuItem ("First", "", null),
-                                            new MenuItem ("Second", "", null),
-                                            new MenuItem ("Third", "", null)
-                                        ]
-                                       );
+        menuItems = new MenuBarItem (
+                                     [
+                                         new MenuItem ("First", "", null),
+                                         new MenuItem ("Second", "", null),
+                                         new MenuItem ("Third", "", null)
+                                     ]
+                                    );
 
-        cm.Show ();
+        cm.Show (menuItems);
         Application.Refresh ();
 
         expected = @"
@@ -466,8 +481,10 @@ public class ContextMenuTests (ITestOutputHelper output)
     {
         var cm = new ContextMenu
         {
-            Position = new Point (-1, -2),
-            MenuItems = new MenuBarItem (
+            Position = new Point (-1, -2)
+        };
+
+        var menuItems = new MenuBarItem (
                                          [
                                              new MenuItem ("One", "", null),
                                              new MenuItem ("Two", "", null),
@@ -487,15 +504,13 @@ public class ContextMenuTests (ITestOutputHelper output)
                                              new MenuItem ("Five", "", null),
                                              new MenuItem ("Six", "", null)
                                          ]
-                                        )
-        };
-
+                                        );
         Assert.Equal (new Point (-1, -2), cm.Position);
 
         Toplevel top = new ();
         Application.Begin (top);
 
-        cm.Show ();
+        cm.Show (menuItems);
         Application.Refresh ();
 
         Assert.Equal (new Point (-1, -2), cm.Position);
@@ -517,8 +532,8 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (
                      top.Subviews [0]
                         .NewMouseEvent (
-                                     new MouseEvent { Position = new (0, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
-                                    )
+                                        new MouseEvent { Position = new (0, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                       )
                     );
         Application.Refresh ();
         Assert.Equal (new Point (-1, -2), cm.Position);
@@ -542,9 +557,9 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        ((FakeDriver)Application.Driver).SetBufferSize (40, 20);
+        ((FakeDriver)Application.Driver!).SetBufferSize (40, 20);
         cm.Position = new Point (41, -2);
-        cm.Show ();
+        cm.Show (menuItems);
         Application.Refresh ();
         Assert.Equal (new Point (41, -2), cm.Position);
 
@@ -565,8 +580,8 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (
                      top.Subviews [0]
                         .NewMouseEvent (
-                                     new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
-                                    )
+                                        new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                       )
                     );
         Application.Refresh ();
         Assert.Equal (new Point (41, -2), cm.Position);
@@ -591,7 +606,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                      );
 
         cm.Position = new Point (41, 9);
-        cm.Show ();
+        cm.Show (menuItems);
         Application.Refresh ();
         Assert.Equal (new Point (41, 9), cm.Position);
 
@@ -612,8 +627,8 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (
                      top.Subviews [0]
                         .NewMouseEvent (
-                                     new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
-                                    )
+                                        new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                       )
                     );
         Application.Refresh ();
         Assert.Equal (new Point (41, 9), cm.Position);
@@ -635,7 +650,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                      );
 
         cm.Position = new Point (41, 22);
-        cm.Show ();
+        cm.Show (menuItems);
         Application.Refresh ();
         Assert.Equal (new Point (41, 22), cm.Position);
 
@@ -656,8 +671,8 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (
                      top.Subviews [0]
                         .NewMouseEvent (
-                                     new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
-                                    )
+                                        new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                       )
                     );
         Application.Refresh ();
         Assert.Equal (new Point (41, 22), cm.Position);
@@ -677,9 +692,9 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        ((FakeDriver)Application.Driver).SetBufferSize (18, 8);
+        ((FakeDriver)Application.Driver!).SetBufferSize (18, 8);
         cm.Position = new Point (19, 10);
-        cm.Show ();
+        cm.Show (menuItems);
         Application.Refresh ();
         Assert.Equal (new Point (19, 10), cm.Position);
 
@@ -700,8 +715,8 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (
                      top.Subviews [0]
                         .NewMouseEvent (
-                                     new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
-                                    )
+                                        new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                       )
                     );
         Application.Refresh ();
         Assert.Equal (new Point (19, 10), cm.Position);
@@ -772,18 +787,18 @@ public class ContextMenuTests (ITestOutputHelper output)
     {
         var cm = new ContextMenu
         {
-            Position = new Point (10, 5),
-            MenuItems = new MenuBarItem (
+            Position = new Point (10, 5)
+        };
+
+        var menuItems = new MenuBarItem (
                                          [
                                              new MenuItem ("One", "", null),
                                              new MenuItem ("Two", "", null)
                                          ]
-                                        )
-        };
-
+                                        );
         Toplevel top = new ();
         Application.Begin (top);
-        cm.Show ();
+        cm.Show (menuItems);
         Application.Refresh ();
 
         var expected = @"
@@ -797,7 +812,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         cm.Position = new Point (5, 10);
 
-        cm.Show ();
+        cm.Show (menuItems);
         Application.Refresh ();
 
         expected = @"
@@ -815,7 +830,14 @@ public class ContextMenuTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void RequestStop_While_ContextMenu_Is_Open_Does_Not_Throws ()
     {
-        ContextMenu cm = Create_ContextMenu_With_Two_MenuItem (10, 5);
+        ContextMenu cm = new ContextMenu
+        {
+            Position = new Point (10, 5)
+        };
+
+        var menuItems = new MenuBarItem (
+                                         new MenuItem [] { new ("One", "", null), new ("Two", "", null) }
+                                        );
         Toplevel top = new ();
         var isMenuAllClosed = false;
         MenuBarItem mi = null;
@@ -827,7 +849,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
                                      if (iterations == 0)
                                      {
-                                         cm.Show ();
+                                         cm.Show (menuItems);
                                          Assert.True (ContextMenu.IsShow);
                                          mi = cm.MenuBar.Menus [0];
 
@@ -852,7 +874,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                      else if (iterations == 3)
                                      {
                                          isMenuAllClosed = false;
-                                         cm.Show ();
+                                         cm.Show (menuItems);
                                          Assert.True (ContextMenu.IsShow);
                                          cm.MenuBar.MenuAllClosed += (_, _) => isMenuAllClosed = true;
                                      }
@@ -891,24 +913,24 @@ public class ContextMenuTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Show_Display_At_Zero_If_The_Toplevel_Height_Is_Less_Than_The_Menu_Height ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize (80, 3);
+        ((FakeDriver)Application.Driver!).SetBufferSize (80, 3);
 
         var cm = new ContextMenu
         {
-            Position = Point.Empty,
-            MenuItems = new MenuBarItem (
+            Position = Point.Empty
+        };
+
+        var menuItems = new MenuBarItem (
                                          [
                                              new MenuItem ("One", "", null),
                                              new MenuItem ("Two", "", null)
                                          ]
-                                        )
-        };
-
+                                        );
         Assert.Equal (Point.Empty, cm.Position);
 
         Toplevel top = new ();
         Application.Begin (top);
-        cm.Show ();
+        cm.Show (menuItems);
         Assert.Equal (Point.Empty, cm.Position);
         Application.Refresh ();
 
@@ -929,24 +951,24 @@ public class ContextMenuTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Show_Display_At_Zero_If_The_Toplevel_Width_Is_Less_Than_The_Menu_Width ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize (5, 25);
+        ((FakeDriver)Application.Driver!).SetBufferSize (5, 25);
 
         var cm = new ContextMenu
         {
-            Position = Point.Empty,
-            MenuItems = new MenuBarItem (
+            Position = Point.Empty
+        };
+
+        var menuItems = new MenuBarItem (
                                          [
                                              new MenuItem ("One", "", null),
                                              new MenuItem ("Two", "", null)
                                          ]
-                                        )
-        };
-
+                                        );
         Assert.Equal (Point.Empty, cm.Position);
 
         Toplevel top = new ();
         Application.Begin (top);
-        cm.Show ();
+        cm.Show (menuItems);
         Assert.Equal (Point.Empty, cm.Position);
         Application.Refresh ();
 
@@ -980,22 +1002,22 @@ public class ContextMenuTests (ITestOutputHelper output)
         var cm = new ContextMenu
         {
             Host = view,
-            Position = new Point (10, 5),
-            MenuItems = new MenuBarItem (
+            Position = new Point (10, 5)
+        };
+
+        var menuItems = new MenuBarItem (
                                          [
                                              new MenuItem ("One", "", null),
                                              new MenuItem ("Two", "", null)
                                          ]
-                                        )
-        };
-
+                                        );
         var top = new Toplevel ();
         top.Add (view);
         Application.Begin (top);
 
         Assert.Equal (new Point (10, 5), cm.Position);
 
-        cm.Show ();
+        cm.Show (menuItems);
         top.Draw ();
         Assert.Equal (new Point (10, 5), cm.Position);
 
@@ -1016,7 +1038,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         cm.Host.Y = 10;
         cm.Host.Height = 3;
 
-        cm.Show ();
+        cm.Show (menuItems);
         Application.Top.Draw ();
         Assert.Equal (new Point (5, 12), cm.Position);
 
@@ -1044,20 +1066,20 @@ public class ContextMenuTests (ITestOutputHelper output)
     {
         var cm = new ContextMenu
         {
-            Position = new Point (80, 25),
-            MenuItems = new MenuBarItem (
+            Position = new Point (80, 25)
+        };
+
+        var menuItems = new MenuBarItem (
                                          [
                                              new MenuItem ("One", "", null),
                                              new MenuItem ("Two", "", null)
                                          ]
-                                        )
-        };
-
+                                        );
         Assert.Equal (new Point (80, 25), cm.Position);
 
         Toplevel top = new ();
         Application.Begin (top);
-        cm.Show ();
+        cm.Show (menuItems);
         Assert.Equal (new Point (80, 25), cm.Position);
         Application.Refresh ();
 
@@ -1091,15 +1113,15 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         var cm = new ContextMenu
         {
-            Host = view,
-            MenuItems = new MenuBarItem (
+            Host = view
+        };
+
+        var menuItems = new MenuBarItem (
                                          [
                                              new MenuItem ("One", "", null),
                                              new MenuItem ("Two", "", null)
                                          ]
-                                        )
-        };
-
+                                        );
         var top = new Toplevel ();
         top.Add (view);
         Application.Begin (top);
@@ -1107,7 +1129,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (70, 24, 10, 1), view.Frame);
         Assert.Equal (Point.Empty, cm.Position);
 
-        cm.Show ();
+        cm.Show (menuItems);
         Assert.Equal (new Point (70, 24), cm.Position);
         top.Draw ();
 
@@ -1131,11 +1153,18 @@ public class ContextMenuTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Show_Hide_IsShow ()
     {
-        ContextMenu cm = Create_ContextMenu_With_Two_MenuItem (10, 5);
+        ContextMenu cm = new ContextMenu
+        {
+            Position = new Point (10, 5)
+        };
+
+        var menuItems = new MenuBarItem (
+                                         new MenuItem [] { new ("One", "", null), new ("Two", "", null) }
+                                        );
 
         Toplevel top = new ();
         Application.Begin (top);
-        cm.Show ();
+        cm.Show (menuItems);
         Assert.True (ContextMenu.IsShow);
         Application.Refresh ();
 
@@ -1166,7 +1195,10 @@ public class ContextMenuTests (ITestOutputHelper output)
         var cm = new ContextMenu
         {
             Position = new Point (5, 10),
-            MenuItems = new MenuBarItem (
+            UseSubMenusSingleFrame = true
+        };
+
+        var menuItems = new MenuBarItem (
                                          "Numbers",
                                          [
                                              new MenuItem ("One", "", null),
@@ -1183,13 +1215,11 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                              ),
                                              new MenuItem ("Three", "", null)
                                          ]
-                                        ),
-            UseSubMenusSingleFrame = true
-        };
+                                        );
         Toplevel top = new ();
         RunState rs = Application.Begin (top);
-        cm.Show ();
-        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
+        cm.Show (menuItems);
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top!.Subviews [0].Frame);
         Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -1247,8 +1277,10 @@ public class ContextMenuTests (ITestOutputHelper output)
     {
         var cm = new ContextMenu
         {
-            Position = new Point (5, 10),
-            MenuItems = new MenuBarItem (
+            Position = new Point (5, 10)
+        };
+
+        var menuItems = new MenuBarItem (
                                          "Numbers",
                                          [
                                              new MenuItem ("One", "", null),
@@ -1263,7 +1295,8 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                                   new MenuItem ("Two-Menu 2", "", null)
                                                               ]
                                                              ),
-                                             new MenuBarItem ("Three",
+                                             new MenuBarItem (
+                                                              "Three",
                                                               [
                                                                   new MenuItem (
                                                                                 "Three-Menu 1",
@@ -1274,11 +1307,10 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                               ]
                                                              )
                                          ]
-                                        )
-        };
+                                        );
         Toplevel top = new ();
         RunState rs = Application.Begin (top);
-        cm.Show ();
+        cm.Show (menuItems);
 
         Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
         Application.Refresh ();
@@ -1349,14 +1381,557 @@ public class ContextMenuTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    private ContextMenu Create_ContextMenu_With_Two_MenuItem (int x, int y)
+    [Fact]
+    [AutoInitShutdown]
+    public void Handling_TextField_With_Opened_ContextMenu_By_Mouse_HasFocus ()
     {
-        return new ContextMenu
+        var tf1 = new TextField { Width = 10, Text = "TextField 1" };
+        var tf2 = new TextField { Y = 2, Width = 10, Text = "TextField 2" };
+        var win = new Window ();
+        win.Add (tf1, tf2);
+        var rs = Application.Begin (win);
+
+        Assert.True (tf1.HasFocus);
+        Assert.False (tf2.HasFocus);
+        Assert.Equal (4, win.Subviews.Count); // TF & TV add autocomplete popup's to their superviews.
+        Assert.Null (Application.MouseEnteredView);
+
+        // Right click on tf2 to open context menu
+        Application.OnMouseEvent (new () { Position = new (1, 3), Flags = MouseFlags.Button3Clicked });
+        Assert.False (tf1.HasFocus);
+        Assert.False (tf2.HasFocus);
+        Assert.Equal (5, win.Subviews.Count);
+        Assert.True (tf2.ContextMenu.MenuBar.IsMenuOpen);
+        Assert.True (win.Focused is Menu);
+        Assert.True (Application.MouseGrabView is MenuBar);
+        Assert.Equal (tf2, Application.MouseEnteredView);
+
+        // Click on tf1 to focus it, which cause context menu being closed
+        Application.OnMouseEvent (new () { Position = new (1, 1), Flags = MouseFlags.Button1Clicked });
+        Assert.True (tf1.HasFocus);
+        Assert.False (tf2.HasFocus);
+        Assert.Equal (4, win.Subviews.Count);
+
+        // The last context menu bar opened is always preserved
+        Assert.NotNull (tf2.ContextMenu.MenuBar);
+        Assert.Equal (win.Focused, tf1);
+        Assert.Null (Application.MouseGrabView);
+        Assert.Equal (tf1, Application.MouseEnteredView);
+
+        // Click on tf2 to focus it
+        Application.OnMouseEvent (new () { Position = new (1, 3), Flags = MouseFlags.Button1Clicked });
+        Assert.False (tf1.HasFocus);
+        Assert.True (tf2.HasFocus);
+        Assert.Equal (4, win.Subviews.Count);
+
+        // The last context menu bar opened is always preserved
+        Assert.NotNull (tf2.ContextMenu.MenuBar);
+        Assert.Equal (win.Focused, tf2);
+        Assert.Null (Application.MouseGrabView);
+        Assert.Equal (tf2, Application.MouseEnteredView);
+
+        Application.End (rs);
+        win.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Empty_Menus_Items_Children_Does_Not_Open_The_Menu ()
+    {
+        var cm = new ContextMenu ();
+        Assert.Null (cm.MenuItems);
+
+        var top = new Toplevel ();
+        Application.Begin (top);
+
+        cm.Show (cm.MenuItems);
+        Assert.Null (cm.MenuBar);
+
+        top.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void KeyBindings_Removed_On_Close_ContextMenu ()
+    {
+        var newFile = false;
+        var renameFile = false;
+        var deleteFile = false;
+
+        var cm = new ContextMenu ();
+
+        var menuItems = new MenuBarItem (
+                                         [
+                                             new MenuItem ("New File", string.Empty, New, null, null, Key.N.WithCtrl),
+                                             new MenuItem ("Rename File", string.Empty, Rename, null, null, Key.R.WithCtrl),
+                                             new MenuItem ("Delete File", string.Empty, Delete, null, null, Key.D.WithCtrl)
+                                         ]
+                                        );
+        var top = new Toplevel ();
+        Application.Begin (top);
+
+        Assert.Null (cm.MenuBar);
+        Assert.False (Application.OnKeyDown (Key.N.WithCtrl));
+        Assert.False (Application.OnKeyDown (Key.R.WithCtrl));
+        Assert.False (Application.OnKeyDown (Key.D.WithCtrl));
+        Assert.False (newFile);
+        Assert.False (renameFile);
+        Assert.False (deleteFile);
+
+        cm.Show (menuItems);
+        Assert.True (cm.MenuBar!.KeyBindings.Bindings.ContainsKey (Key.N.WithCtrl));
+        Assert.True (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.R.WithCtrl));
+        Assert.True (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.D.WithCtrl));
+
+        Assert.True (Application.OnKeyDown (Key.N.WithCtrl));
+        Application.MainLoop!.RunIteration ();
+        Assert.True (newFile);
+        Assert.False (cm.MenuBar!.IsMenuOpen);
+        cm.Show (menuItems);
+        Assert.True (Application.OnKeyDown (Key.R.WithCtrl));
+        Application.MainLoop!.RunIteration ();
+        Assert.True (renameFile);
+        Assert.False (cm.MenuBar.IsMenuOpen);
+        cm.Show (menuItems);
+        Assert.True (Application.OnKeyDown (Key.D.WithCtrl));
+        Application.MainLoop!.RunIteration ();
+        Assert.True (deleteFile);
+        Assert.False (cm.MenuBar.IsMenuOpen);
+
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.N.WithCtrl));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.R.WithCtrl));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.D.WithCtrl));
+
+        newFile = false;
+        renameFile = false;
+        deleteFile = false;
+        Assert.False (Application.OnKeyDown (Key.N.WithCtrl));
+        Assert.False (Application.OnKeyDown (Key.R.WithCtrl));
+        Assert.False (Application.OnKeyDown (Key.D.WithCtrl));
+        Assert.False (newFile);
+        Assert.False (renameFile);
+        Assert.False (deleteFile);
+
+        top.Dispose ();
+
+        void New () { newFile = true; }
+
+        void Rename () { renameFile = true; }
+
+        void Delete () { deleteFile = true; }
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void KeyBindings_With_ContextMenu_And_MenuBar ()
+    {
+        var newFile = false;
+        var renameFile = false;
+
+        var menuBar = new MenuBar
         {
-            Position = new Point (x, y),
-            MenuItems = new MenuBarItem (
-                                         new MenuItem [] { new ("One", "", null), new ("Two", "", null) }
-                                        )
+            Menus =
+            [
+                new (
+                     "File",
+                     new MenuItem []
+                     {
+                         new ("New", string.Empty, New, null, null, Key.N.WithCtrl)
+                     })
+            ]
         };
+        var cm = new ContextMenu ();
+
+        var menuItems = new MenuBarItem (
+                                         [
+                                             new ("Rename File", string.Empty, Rename, null, null, Key.R.WithCtrl),
+                                         ]
+                                        );
+        var top = new Toplevel ();
+        top.Add (menuBar);
+        Application.Begin (top);
+
+        Assert.True (menuBar.KeyBindings.Bindings.ContainsKey (Key.N.WithCtrl));
+        Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.R.WithCtrl));
+        Assert.Null (cm.MenuBar);
+
+        Assert.True (Application.OnKeyDown (Key.N.WithCtrl));
+        Assert.False (Application.OnKeyDown (Key.R.WithCtrl));
+        Application.MainLoop!.RunIteration ();
+        Assert.True (newFile);
+        Assert.False (renameFile);
+
+        newFile = false;
+
+        cm.Show (menuItems);
+        Assert.True (menuBar.KeyBindings.Bindings.ContainsKey (Key.N.WithCtrl));
+        Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.R.WithCtrl));
+        Assert.False (cm.MenuBar!.KeyBindings.Bindings.ContainsKey (Key.N.WithCtrl));
+        Assert.True (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.R.WithCtrl));
+
+        Assert.True (cm.MenuBar.IsMenuOpen);
+        Assert.True (Application.OnKeyDown (Key.N.WithCtrl));
+        Application.MainLoop!.RunIteration ();
+        Assert.True (newFile);
+        Assert.False (cm.MenuBar!.IsMenuOpen);
+        cm.Show (menuItems);
+        Assert.True (Application.OnKeyDown (Key.R.WithCtrl));
+        Application.MainLoop!.RunIteration ();
+        Assert.True (renameFile);
+        Assert.False (cm.MenuBar.IsMenuOpen);
+
+        Assert.True (menuBar.KeyBindings.Bindings.ContainsKey (Key.N.WithCtrl));
+        Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.R.WithCtrl));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.N.WithCtrl));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.R.WithCtrl));
+
+        newFile = false;
+        renameFile = false;
+        Assert.True (Application.OnKeyDown (Key.N.WithCtrl));
+        Assert.False (Application.OnKeyDown (Key.R.WithCtrl));
+        Application.MainLoop!.RunIteration ();
+        Assert.True (newFile);
+        Assert.False (renameFile);
+
+        top.Dispose ();
+
+        void New () { newFile = true; }
+
+        void Rename () { renameFile = true; }
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void KeyBindings_With_Same_Shortcut_ContextMenu_And_MenuBar ()
+    {
+        var newMenuBar = false;
+        var newContextMenu = false;
+
+        var menuBar = new MenuBar
+        {
+            Menus =
+            [
+                new (
+                     "File",
+                     new MenuItem []
+                     {
+                         new ("New", string.Empty, NewMenuBar, null, null, Key.N.WithCtrl)
+                     })
+            ]
+        };
+        var cm = new ContextMenu ();
+
+        var menuItems = new MenuBarItem (
+                                         [
+                                             new ("New File", string.Empty, NewContextMenu, null, null, Key.N.WithCtrl),
+                                         ]
+                                        );
+        var top = new Toplevel ();
+        top.Add (menuBar);
+        Application.Begin (top);
+
+        Assert.True (menuBar.KeyBindings.Bindings.ContainsKey (Key.N.WithCtrl));
+        Assert.Null (cm.MenuBar);
+
+        Assert.True (Application.OnKeyDown (Key.N.WithCtrl));
+        Application.MainLoop!.RunIteration ();
+        Assert.True (newMenuBar);
+        Assert.False (newContextMenu);
+
+        newMenuBar = false;
+
+        cm.Show (menuItems);
+        Assert.True (menuBar.KeyBindings.Bindings.ContainsKey (Key.N.WithCtrl));
+        Assert.True (cm.MenuBar!.KeyBindings.Bindings.ContainsKey (Key.N.WithCtrl));
+
+        Assert.True (cm.MenuBar.IsMenuOpen);
+        Assert.True (Application.OnKeyDown (Key.N.WithCtrl));
+        Application.MainLoop!.RunIteration ();
+        Assert.False (newMenuBar);
+
+        // The most focused shortcut is executed
+        Assert.True (newContextMenu);
+        Assert.False (cm.MenuBar!.IsMenuOpen);
+
+        Assert.True (menuBar.KeyBindings.Bindings.ContainsKey (Key.N.WithCtrl));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.N.WithCtrl));
+
+        newMenuBar = false;
+        newContextMenu = false;
+        Assert.True (Application.OnKeyDown (Key.N.WithCtrl));
+        Application.MainLoop!.RunIteration ();
+        Assert.True (newMenuBar);
+        Assert.False (newContextMenu);
+
+        top.Dispose ();
+
+        void NewMenuBar () { newMenuBar = true; }
+
+        void NewContextMenu () { newContextMenu = true; }
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void HotKeys_Removed_On_Close_ContextMenu ()
+    {
+        var newFile = false;
+        var renameFile = false;
+        var deleteFile = false;
+
+        var cm = new ContextMenu ();
+
+        var menuItems = new MenuBarItem (
+                                         [
+                                             new ("_New File", string.Empty, New, null, null),
+                                             new ("_Rename File", string.Empty, Rename, null, null),
+                                             new ("_Delete File", string.Empty, Delete, null, null)
+                                         ]
+                                        );
+        var top = new Toplevel ();
+        Application.Begin (top);
+
+        Assert.Null (cm.MenuBar);
+        Assert.False (Application.OnKeyDown (Key.N.WithAlt));
+        Assert.False (Application.OnKeyDown (Key.R.WithAlt));
+        Assert.False (Application.OnKeyDown (Key.D.WithAlt));
+        Assert.False (newFile);
+        Assert.False (renameFile);
+        Assert.False (deleteFile);
+
+        cm.Show (menuItems);
+        Assert.True (cm.MenuBar!.IsMenuOpen);
+        Assert.False (cm.MenuBar!.KeyBindings.Bindings.ContainsKey (Key.N.WithAlt));
+        Assert.False (cm.MenuBar!.KeyBindings.Bindings.ContainsKey (Key.N.NoShift));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.R.NoShift));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.D.WithAlt));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.D.NoShift));
+        Assert.Single (Application.Current!.Subviews);
+        View [] menus = Application.Current!.Subviews.Where (v => v is Menu m && m.Host == cm.MenuBar).ToArray ();
+        Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.N.WithAlt));
+        Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.N.NoShift));
+        Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
+        Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.R.NoShift));
+        Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.D.WithAlt));
+        Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.D.NoShift));
+
+        Assert.True (Application.OnKeyDown (Key.N.WithAlt));
+        Assert.False (cm.MenuBar!.IsMenuOpen);
+        Application.MainLoop!.RunIteration ();
+        Assert.True (newFile);
+        cm.Show (menuItems);
+        Assert.True (Application.OnKeyDown (Key.R.WithAlt));
+        Assert.False (cm.MenuBar.IsMenuOpen);
+        Application.MainLoop!.RunIteration ();
+        Assert.True (renameFile);
+        cm.Show (menuItems);
+        Assert.True (Application.OnKeyDown (Key.D.WithAlt));
+        Assert.False (cm.MenuBar.IsMenuOpen);
+        Application.MainLoop!.RunIteration ();
+        Assert.True (deleteFile);
+
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.N.WithAlt));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.N.NoShift));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.R.NoShift));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.D.WithAlt));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.D.NoShift));
+
+        newFile = false;
+        renameFile = false;
+        deleteFile = false;
+        Assert.False (Application.OnKeyDown (Key.N.WithAlt));
+        Assert.False (Application.OnKeyDown (Key.R.WithAlt));
+        Assert.False (Application.OnKeyDown (Key.D.WithAlt));
+        Assert.False (newFile);
+        Assert.False (renameFile);
+        Assert.False (deleteFile);
+
+        top.Dispose ();
+
+        void New () { newFile = true; }
+
+        void Rename () { renameFile = true; }
+
+        void Delete () { deleteFile = true; }
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void HotKeys_With_ContextMenu_And_MenuBar ()
+    {
+        var newFile = false;
+        var renameFile = false;
+
+        var menuBar = new MenuBar
+        {
+            Menus =
+            [
+                new (
+                     "_File",
+                     new MenuItem []
+                     {
+                         new ("_New", string.Empty, New)
+                     })
+            ]
+        };
+        var cm = new ContextMenu ();
+
+        var menuItems = new MenuBarItem (
+                                         [
+                                             new MenuBarItem (
+                                                              "_Edit",
+                                                              new MenuItem []
+                                                              {
+                                                                  new ("_Rename File", string.Empty, Rename)
+                                                              }
+                                                             )
+                                         ]
+                                        );
+        var top = new Toplevel ();
+        top.Add (menuBar);
+        Application.Begin (top);
+
+        Assert.True (menuBar.KeyBindings.Bindings.ContainsKey (Key.F.WithAlt));
+        Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.N.WithAlt));
+        Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
+        View [] menus = Application.Current!.Subviews.Where (v => v is Menu m && m.Host == menuBar).ToArray ();
+        Assert.Empty (menus);
+        Assert.Null (cm.MenuBar);
+
+        Assert.True (Application.OnKeyDown (Key.F.WithAlt));
+        Assert.True (menuBar.IsMenuOpen);
+        Assert.Equal (2, Application.Current!.Subviews.Count);
+        menus = Application.Current!.Subviews.Where (v => v is Menu m && m.Host == menuBar).ToArray ();
+        Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.N.WithAlt));
+        Assert.True (Application.OnKeyDown (Key.N.WithAlt));
+        Assert.False (menuBar.IsMenuOpen);
+        Assert.False (Application.OnKeyDown (Key.R.WithAlt));
+        Application.MainLoop!.RunIteration ();
+        Assert.True (newFile);
+        Assert.False (renameFile);
+
+        newFile = false;
+
+        cm.Show (menuItems);
+        Assert.True (menuBar.KeyBindings.Bindings.ContainsKey (Key.F.WithAlt));
+        Assert.True (menuBar.KeyBindings.Bindings.ContainsKey (Key.F.NoShift));
+        Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.N.WithAlt));
+        Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.N.NoShift));
+        Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.E.WithAlt));
+        Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.E.NoShift));
+        Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
+        Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.R.NoShift));
+        Assert.True (cm.MenuBar!.IsMenuOpen);
+        Assert.False (cm.MenuBar!.KeyBindings.Bindings.ContainsKey (Key.F.WithAlt));
+        Assert.False (cm.MenuBar!.KeyBindings.Bindings.ContainsKey (Key.F.NoShift));
+        Assert.False (cm.MenuBar!.KeyBindings.Bindings.ContainsKey (Key.N.WithAlt));
+        Assert.False (cm.MenuBar!.KeyBindings.Bindings.ContainsKey (Key.N.NoShift));
+        Assert.False (cm.MenuBar!.KeyBindings.Bindings.ContainsKey (Key.E.WithAlt));
+        Assert.False (cm.MenuBar!.KeyBindings.Bindings.ContainsKey (Key.E.NoShift));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.R.NoShift));
+        Assert.Equal (3, Application.Current!.Subviews.Count);
+        menus = Application.Current!.Subviews.Where (v => v is Menu m && m.Host == cm.MenuBar).ToArray ();
+        Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.E.WithAlt));
+        Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.E.NoShift));
+        Assert.True (menus [1].KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
+        Assert.True (menus [1].KeyBindings.Bindings.ContainsKey (Key.R.NoShift));
+        Assert.True (cm.MenuBar.IsMenuOpen);
+        Assert.True (Application.OnKeyDown (Key.F.WithAlt));
+        Assert.False (cm.MenuBar.IsMenuOpen);
+        Assert.True (Application.OnKeyDown (Key.N.WithAlt));
+        Application.MainLoop!.RunIteration ();
+        Assert.True (newFile);
+
+        cm.Show (menuItems);
+        Assert.True (cm.MenuBar.IsMenuOpen);
+        Assert.Equal (3, Application.Current!.Subviews.Count);
+        menus = Application.Current!.Subviews.Where (v => v is Menu m && m.Host == cm.MenuBar).ToArray ();
+        Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.E.WithAlt));
+        Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.E.NoShift));
+        Assert.False (menus [0].KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
+        Assert.False (menus [0].KeyBindings.Bindings.ContainsKey (Key.R.NoShift));
+        Assert.False (menus [1].KeyBindings.Bindings.ContainsKey (Key.E.WithAlt));
+        Assert.False (menus [1].KeyBindings.Bindings.ContainsKey (Key.E.NoShift));
+        Assert.True (menus [1].KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
+        Assert.True (menus [1].KeyBindings.Bindings.ContainsKey (Key.R.NoShift));
+        Assert.True (Application.OnKeyDown (Key.E.NoShift));
+        Assert.True (Application.OnKeyDown (Key.R.WithAlt));
+        Assert.False (cm.MenuBar.IsMenuOpen);
+        Application.MainLoop!.RunIteration ();
+        Assert.True (renameFile);
+
+        Assert.Single (Application.Current!.Subviews);
+        Assert.True (menuBar.KeyBindings.Bindings.ContainsKey (Key.F.WithAlt));
+        Assert.True (menuBar.KeyBindings.Bindings.ContainsKey (Key.F.NoShift));
+        Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.N.WithAlt));
+        Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.N.NoShift));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.E.WithAlt));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.E.NoShift));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
+        Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.R.NoShift));
+
+        newFile = false;
+        renameFile = false;
+        Assert.True (Application.OnKeyDown (Key.F.WithAlt));
+        Assert.True (Application.OnKeyDown (Key.N.WithAlt));
+        Assert.False (Application.OnKeyDown (Key.R.WithAlt));
+        Application.MainLoop!.RunIteration ();
+        Assert.True (newFile);
+        Assert.False (renameFile);
+
+        top.Dispose ();
+
+        void New () { newFile = true; }
+
+        void Rename () { renameFile = true; }
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Opened_MenuBar_Is_Closed_When_Another_MenuBar_Is_Opening_Also_By_HotKey ()
+    {
+        var menuBar = new MenuBar
+        {
+            Menus =
+            [
+                new (
+                     "_File",
+                     new MenuItem []
+                     {
+                         new ("_New", string.Empty, null)
+                     })
+            ]
+        };
+        var cm = new ContextMenu ();
+
+        var menuItems = new MenuBarItem (
+                                         [
+                                             new MenuBarItem (
+                                                              "_Edit",
+                                                              new MenuItem []
+                                                              {
+                                                                  new ("_Rename File", string.Empty, null)
+                                                              }
+                                                             )
+                                         ]
+                                        );
+        var top = new Toplevel ();
+        top.Add (menuBar);
+        Application.Begin (top);
+
+        Assert.True (Application.OnKeyDown (Key.F.WithAlt));
+        Assert.True (menuBar.IsMenuOpen);
+
+        cm.Show (menuItems);
+        Assert.False (menuBar.IsMenuOpen);
+        Assert.True (cm.MenuBar!.IsMenuOpen);
+
+        Assert.True (Application.OnKeyDown (Key.F.WithAlt));
+        Assert.True (menuBar.IsMenuOpen);
+        Assert.False (cm.MenuBar!.IsMenuOpen);
+
+        top.Dispose ();
     }
 }

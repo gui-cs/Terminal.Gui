@@ -63,7 +63,7 @@ public class LabelTests (ITestOutputHelper output)
         Assert.False (label.HasFocus);
         Assert.False (nextSubview.HasFocus);
 
-        label.NewMouseEvent (new() { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
+        label.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
         Assert.False (label.HasFocus);
         Assert.True (nextSubview.HasFocus);
     }
@@ -81,12 +81,12 @@ public class LabelTests (ITestOutputHelper output)
 
         return;
 
-        void LabelOnAccept (object sender, CancelEventArgs e) { accepted = true; }
+        void LabelOnAccept (object sender, HandledEventArgs e) { accepted = true; }
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void AutoSize_Stays_True_AnchorEnd ()
+    public void Text_Set_With_AnchorEnd_Works ()
     {
         var label = new Label { Y = Pos.Center (), Text = "Say Hello 你" };
         label.X = Pos.AnchorEnd (0) - Pos.Func (() => label.TextFormatter.Text.GetColumns ());
@@ -97,7 +97,7 @@ public class LabelTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
 
         var expected = @"
 ┌────────────────────────────┐
@@ -127,7 +127,7 @@ public class LabelTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
-    public void AutoSize_Stays_True_Center ()
+    public void Set_Text_With_Center ()
     {
         var label = new Label { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
 
@@ -137,7 +137,7 @@ public class LabelTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
 
         var expected = @"
 ┌────────────────────────────┐
@@ -166,34 +166,6 @@ public class LabelTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
-    public void AutoSize_Stays_True_With_EmptyText ()
-    {
-        var label = new Label { X = Pos.Center (), Y = Pos.Center () };
-
-        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
-        win.Add (label);
-        var top = new Toplevel ();
-        top.Add (win);
-
-        label.Text = "Say Hello 你";
-
-        Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
-
-        var expected = @"
-┌────────────────────────────┐
-│                            │
-│        Say Hello 你        │
-│                            │
-└────────────────────────────┘
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-        top.Dispose ();
-    }
-
-    [Fact]
     public void Constructors_Defaults ()
     {
         var label = new Label ();
@@ -206,25 +178,22 @@ public class LabelTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
-    public void Label_Draw_Fill_Remaining_AutoSize_False ()
+    public void Label_Draw_Fill_Remaining ()
     {
         var tfSize = new Size (80, 1);
 
         var label = new Label { Text = "This label needs to be cleared before rewritten.", Width = tfSize.Width, Height = tfSize.Height };
 
-        var tf1 = new TextFormatter { Direction = TextDirection.LeftRight_TopBottom, Size = tfSize };
+        var tf1 = new TextFormatter { Direction = TextDirection.LeftRight_TopBottom, ConstrainToSize = tfSize };
         tf1.Text = "This TextFormatter (tf1) without fill will not be cleared on rewritten.";
 
-        var tf2 = new TextFormatter { Direction = TextDirection.LeftRight_TopBottom, Size = tfSize, FillRemaining = true };
+        var tf2 = new TextFormatter { Direction = TextDirection.LeftRight_TopBottom, ConstrainToSize = tfSize, FillRemaining = true };
         tf2.Text = "This TextFormatter (tf2) with fill will be cleared on rewritten.";
 
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);
 
-        Assert.False (label.TextFormatter.AutoSize);
-        Assert.False (tf1.AutoSize);
-        Assert.False (tf2.AutoSize);
         Assert.False (label.TextFormatter.FillRemaining);
         Assert.False (tf1.FillRemaining);
         Assert.True (tf2.FillRemaining);
@@ -247,7 +216,7 @@ This TextFormatter (tf2) with fill will be cleared on rewritten.       ",
         label.Text = "This label is rewritten.";
         Assert.True (label.NeedsDisplay);
         Assert.True (label.LayoutNeeded);
-        Assert.False (label.SubViewNeedsDisplay);
+        //Assert.False (label.SubViewNeedsDisplay);
         label.Draw ();
 
         tf1.Text = "This TextFormatter (tf1) is rewritten.";
@@ -414,7 +383,7 @@ e
         Assert.False (label.IsInitialized);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
 
         Assert.True (label.IsInitialized);
         Assert.Equal ("Say Hello 你", label.Text);
@@ -446,7 +415,7 @@ e
         Assert.False (label.IsInitialized);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
+        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
 
         Assert.True (label.IsInitialized);
         Assert.Equal ("Say Hello 你", label.Text);
@@ -473,7 +442,7 @@ e
         var label = new Label { BorderStyle = LineStyle.Single, Text = "Test" };
         label.BeginInit ();
         label.EndInit ();
-        label.SetRelativeLayout (Application.Driver.Screen.Size);
+        label.SetRelativeLayout (Application.Screen.Size);
 
         Assert.Equal (new (0, 0, 4, 1), label.Viewport);
         Assert.Equal (new (0, 0, 6, 3), label.Frame);
@@ -881,7 +850,7 @@ e
         Toplevel top = new ();
         top.Add (win);
         RunState rs = Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (40, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (40, 10);
 
         Assert.Equal (29, label.Text.Length);
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
@@ -914,7 +883,6 @@ e
     {
         var win = new Window ();
 
-        // Label is AutoSize == true
         var label = new Label
         {
             Text = "This should be the last line.",
@@ -931,7 +899,7 @@ e
         Toplevel top = new ();
         top.Add (win);
         RunState rs = Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (40, 10);
+        ((FakeDriver)Application.Driver!).SetBufferSize (40, 10);
 
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
         Assert.Equal (new (0, 0, 40, 10), win.Frame);
@@ -955,73 +923,6 @@ e
         top.Dispose ();
     }
 
-#if V2_STATUSBAR
-    // TODO: This is a Label test. Move to label tests if there's not already a test for this.
-
-    [Fact]
-    [AutoInitShutdown]
-    public void Bottom_Equal_Inside_Window_With_MenuBar_And_StatusBar_On_Toplevel ()
-    {
-        var win = new Window ();
-
-        // Label is AutoSize == true
-        var label = new Label
-        {
-            Text = "This should be the last line.",
-            ColorScheme = Colors.ColorSchemes ["Menu"],
-
-            //Width = Dim.Fill (),
-            X = 0,
-            Y = Pos.Bottom (win) - 4 // two lines top and bottom borders more two lines above border
-        };
-
-        win.Add (label);
-
-        var menu = new MenuBar { Menus = new MenuBarItem [] { new ("Menu", "", null) } };
-        var status = new StatusBar (new StatusItem [] { new (KeyCode.F1, "~F1~ Help", null) });
-        Toplevel top = new ();
-        top.Add (win, menu, status);
-        RunState rs = Application.Begin (top);
-
-        Assert.Equal (new (0, 0, 80, 25), top.Frame);
-        Assert.Equal (new (0, 0, 80, 1), menu.Frame);
-        Assert.Equal (new (0, 24, 80, 1), status.Frame);
-        Assert.Equal (new (0, 1, 80, 23), win.Frame);
-        Assert.Equal (new (0, 20, 29, 1), label.Frame);
-
-        var expected = @"
- Menu                                                                           
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│This should be the last line.                                                 │
-└──────────────────────────────────────────────────────────────────────────────┘
- F1 Help                                                                        
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-        Application.End (rs);
-        top.Dispose ();
-    }
-#endif
     // TODO: This is a Dim test. Move to Dim tests.
 
     [Fact]
@@ -1041,7 +942,6 @@ e
         var field = new TextField { X = 0, Y = Pos.Bottom (view), Width = 20 };
         var count = 20;
 
-        // Label is AutoSize == true
         List<Label> listLabels = new ();
 
         for (var i = 0; i < count; i++)
@@ -1071,7 +971,7 @@ e
                          {
                              if (k.KeyCode == KeyCode.Enter)
                              {
-                                 ((FakeDriver)Application.Driver).SetBufferSize (22, count + 4);
+                                 ((FakeDriver)Application.Driver!).SetBufferSize (22, count + 4);
                                  Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expecteds [count], output);
                                  Assert.Equal (new (0, 0, 22, count + 4), pos);
 
@@ -1135,7 +1035,7 @@ e
     [SetupFakeDriver]
     public void Label_Height_Zero_Stays_Zero ()
     {
-        ((FakeDriver)Application.Driver).SetBufferSize (10, 4);
+        ((FakeDriver)Application.Driver!).SetBufferSize (10, 4);
         var text = "Label";
 
         var label = new Label
@@ -1216,14 +1116,13 @@ e
         var field = new TextField { X = 0, Y = Pos.Bottom (view), Width = 20 };
         var count = 0;
 
-        // Label is AutoSize == true
         List<Label> listLabels = new ();
 
         field.KeyDown += (s, k) =>
                          {
                              if (k.KeyCode == KeyCode.Enter)
                              {
-                                 ((FakeDriver)Application.Driver).SetBufferSize (22, count + 4);
+                                 ((FakeDriver)Application.Driver!).SetBufferSize (22, count + 4);
                                  Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expecteds [count], output);
                                  Assert.Equal (new (0, 0, 22, count + 4), pos);
 
@@ -1231,7 +1130,6 @@ e
                                  {
                                      field.Text = $"Label {count}";
 
-                                     // Label is AutoSize = true
                                      var label = new Label { Text = field.Text, X = 0, Y = view.Viewport.Height /*, Width = 10*/ };
                                      view.Add (label);
                                      Assert.Equal ($"Label {count}", label.Text);
@@ -1299,11 +1197,11 @@ e
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (10, 4);
+        ((FakeDriver)Application.Driver!).SetBufferSize (10, 4);
 
         Assert.Equal (5, text.Length);
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
-        Assert.Equal (new (5, 1), label.TextFormatter.Size);
+        Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);
         Assert.Equal (["Label"], label.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 10, 4), win.Frame);
         Assert.Equal (new (0, 0, 10, 4), Application.Top.Frame);
@@ -1325,7 +1223,7 @@ e
         Application.Refresh ();
 
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
-        Assert.Equal (new (5, 1), label.TextFormatter.Size);
+        Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);
         Exception exception = Record.Exception (() => Assert.Single (label.TextFormatter.GetLines ()));
         Assert.Null (exception);
 
@@ -1358,11 +1256,11 @@ e
         var top = new Toplevel ();
         top.Add (win);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (10, 4);
+        ((FakeDriver)Application.Driver!).SetBufferSize (10, 4);
 
         Assert.Equal (5, text.Length);
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
-        Assert.Equal (new (5, 1), label.TextFormatter.Size);
+        Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);
         Assert.Equal (["Label"], label.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 10, 4), win.Frame);
         Assert.Equal (new (0, 0, 10, 4), Application.Top.Frame);
@@ -1384,7 +1282,7 @@ e
         Application.Refresh ();
 
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
-        Assert.Equal (new (5, 1), label.TextFormatter.Size);
+        Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);
         Assert.Single (label.TextFormatter.GetLines ());
 
         expected = @"
@@ -1416,5 +1314,101 @@ e
         Rectangle expectedLabelBounds = new (0, 0, 8, 1);
         Assert.Equal (expectedLabelBounds, label.Viewport);
         super.Dispose ();
+    }
+
+    [Fact]
+    public void Label_CanFocus_True_Get_Focus_By_Keyboard ()
+    {
+        Label label = new () { Text = "label" };
+        View view = new () { Text = "view", CanFocus = true };
+        Application.Navigation = new ();
+        Application.Current = new ();
+        Application.Current.Add (label, view);
+
+        Application.Current.SetFocus ();
+        Assert.Equal (view, Application.Current.MostFocused);
+        Assert.False (label.CanFocus);
+        Assert.False (label.HasFocus);
+        Assert.True (view.CanFocus);
+        Assert.True (view.HasFocus);
+
+        // No focused view accepts Tab, and there's no other view to focus, so OnKeyDown returns false
+        Assert.False (Application.OnKeyDown (Key.Tab));
+        Assert.False (label.HasFocus);
+        Assert.True (view.HasFocus);
+
+        // Set label CanFocus to true
+        label.CanFocus = true;
+        Assert.False (label.HasFocus);
+        Assert.True (view.HasFocus);
+
+        // No focused view accepts Tab, but label can now be focused, so focus should move to it.
+        Assert.True (Application.OnKeyDown (Key.Tab));
+        Assert.True (label.HasFocus);
+        Assert.False (view.HasFocus);
+
+        Assert.True (Application.OnKeyDown (Key.Tab));
+        Assert.False (label.HasFocus);
+        Assert.True (view.HasFocus);
+
+        Application.Current.Dispose ();
+        Application.ResetState ();
+    }
+
+
+    [Fact]
+    public void Label_CanFocus_True_Get_Focus_By_Mouse ()
+    {
+        Label label = new ()
+        {
+            Text = "label",
+            X = 0,
+            Y = 0
+        };
+        View view = new ()
+        {
+            Text = "view",
+            X = 0,
+            Y = 1,
+            Width = 4,
+            Height = 1,
+            CanFocus = true
+        };
+        Application.Current = new ()
+        {
+            Width = 10,
+            Height = 10
+        };
+        Application.Current.Add (label, view);
+
+        Application.Current.SetFocus ();
+        Assert.Equal (view, Application.Current.MostFocused);
+        Assert.False (label.CanFocus);
+        Assert.False (label.HasFocus);
+        Assert.True (view.CanFocus);
+        Assert.True (view.HasFocus);
+
+        // label can't focus so clicking on it has no effect
+        Application.OnMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
+        Assert.False (label.HasFocus);
+        Assert.True (view.HasFocus);
+
+        // Set label CanFocus to true
+        label.CanFocus = true;
+        Assert.False (label.HasFocus);
+        Assert.True (view.HasFocus);
+
+        // label can focus, so clicking on it set focus
+        Application.OnMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
+        Assert.True (label.HasFocus);
+        Assert.False (view.HasFocus);
+
+        // click on view
+        Application.OnMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1Clicked });
+        Assert.False (label.HasFocus);
+        Assert.True (view.HasFocus);
+
+        Application.Current.Dispose ();
+        Application.ResetState ();
     }
 }

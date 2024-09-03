@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -11,9 +12,12 @@ namespace Terminal.Gui;
 ///     data to/from <see cref="ConfigurationManager"/> JSON documents.
 /// </summary>
 /// <typeparam name="scopeT"></typeparam>
-internal class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT : Scope<scopeT>
+internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] scopeT> : JsonConverter<scopeT> where scopeT : Scope<scopeT>
 {
+    [RequiresDynamicCode ("Calls System.Type.MakeGenericType(params Type[])")]
+#pragma warning disable IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
     public override scopeT Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+#pragma warning restore IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
     {
         if (reader.TokenType != JsonTokenType.StartObject)
         {
@@ -85,7 +89,7 @@ internal class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT :
                     try
                     {
                         scope! [propertyName].PropertyValue =
-                            JsonSerializer.Deserialize (ref reader, propertyType!, options);
+                            JsonSerializer.Deserialize (ref reader, propertyType!, _serializerContext);
                     }
                     catch (Exception ex)
                     {
@@ -133,7 +137,7 @@ internal class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT :
                 if (property is { })
                 {
                     PropertyInfo prop = scope.GetType ().GetProperty (propertyName!)!;
-                    prop.SetValue (scope, JsonSerializer.Deserialize (ref reader, prop.PropertyType, options));
+                    prop.SetValue (scope, JsonSerializer.Deserialize (ref reader, prop.PropertyType, _serializerContext));
                 }
                 else
                 {
@@ -160,7 +164,8 @@ internal class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT :
         foreach (PropertyInfo p in properties)
         {
             writer.WritePropertyName (ConfigProperty.GetJsonPropertyName (p));
-            JsonSerializer.Serialize (writer, scope.GetType ().GetProperty (p.Name)?.GetValue (scope), options);
+            object? prop = scope.GetType ().GetProperty (p.Name)?.GetValue (scope);
+            JsonSerializer.Serialize (writer, prop, prop!.GetType (), _serializerContext);
         }
 
         foreach (KeyValuePair<string, ConfigProperty> p in from p in scope
@@ -205,7 +210,8 @@ internal class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT :
             }
             else
             {
-                JsonSerializer.Serialize (writer, p.Value.PropertyValue, options);
+                object? prop = p.Value.PropertyValue;
+                JsonSerializer.Serialize (writer, prop, prop!.GetType (), _serializerContext);
             }
         }
 
@@ -221,6 +227,8 @@ internal class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT :
     internal class ReadHelper<converterT> : ReadHelper
     {
         private readonly ReadDelegate _readDelegate;
+
+        [RequiresUnreferencedCode ("Calls System.Delegate.CreateDelegate(Type, Object, String)")]
         public ReadHelper (object converter) { _readDelegate = (ReadDelegate)Delegate.CreateDelegate (typeof (ReadDelegate), converter, "Read"); }
 
         public override object? Read (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options)

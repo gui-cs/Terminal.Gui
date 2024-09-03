@@ -70,16 +70,18 @@ public class Wizard : Dialog
         ButtonAlignmentModes |= AlignmentModes.IgnoreFirstOrLast;
         BorderStyle = LineStyle.Double;
 
-        //// Add a horiz separator
-        var separator = new LineView (Orientation.Horizontal) { Y = Pos.AnchorEnd (2) };
-        Add (separator);
-
-        // BUGBUG: Space is to work around https://github.com/gui-cs/Terminal.Gui/issues/1812
         BackButton = new () { Text = Strings.wzBack };
-        AddButton (BackButton);
+        NextFinishButton = new ()
+        {
+            Text = Strings.wzFinish,
+            IsDefault = true
+        };
 
-        NextFinishButton = new () { Text = Strings.wzFinish };
-        NextFinishButton.IsDefault = true;
+        //// Add a horiz separator
+        var separator = new LineView (Orientation.Horizontal) { Y = Pos.Top (BackButton) - 1 };
+
+        Add (separator);
+        AddButton (BackButton);
         AddButton (NextFinishButton);
 
         BackButton.Accept += BackBtn_Clicked;
@@ -195,7 +197,7 @@ public class Wizard : Dialog
     }
 
     /// <summary>
-    ///     Raised when the user has cancelled the <see cref="Wizard"/> by pressin the Esc key. To prevent a modal (
+    ///     Raised when the user has cancelled the <see cref="Wizard"/> by pressing the Esc key. To prevent a modal (
     ///     <see cref="Wizard.Modal"/> is <c>true</c>) Wizard from closing, cancel the event by setting
     ///     <see cref="WizardButtonEventArgs.Cancel"/> to <c>true</c> before returning from the event handler.
     /// </summary>
@@ -302,7 +304,7 @@ public class Wizard : Dialog
     }
 
     /// <summary>
-    ///     Causes the wizad to move to the previous enabled step (or first step if <see cref="CurrentStep"/> is not set).
+    ///     Causes the wizard to move to the previous enabled step (or first step if <see cref="CurrentStep"/> is not set).
     ///     If there is no previous step, does nothing.
     /// </summary>
     public void GoBack ()
@@ -316,7 +318,7 @@ public class Wizard : Dialog
     }
 
     /// <summary>
-    ///     Causes the wizad to move to the next enabled step (or last step if <see cref="CurrentStep"/> is not set). If
+    ///     Causes the wizard to move to the next enabled step (or last step if <see cref="CurrentStep"/> is not set). If
     ///     there is no previous step, does nothing.
     /// </summary>
     public void GoNext ()
@@ -351,14 +353,11 @@ public class Wizard : Dialog
 
         UpdateButtonsAndTitle ();
 
-        // Set focus to the nav buttons
-        if (BackButton.HasFocus)
+
+        // Set focus on the contentview
+        if (newStep is { })
         {
-            BackButton.SetFocus ();
-        }
-        else
-        {
-            NextFinishButton.SetFocus ();
+            newStep.Subviews.ToArray () [0].SetFocus ();
         }
 
         if (OnStepChanged (oldStep, _currentStep))
@@ -388,7 +387,7 @@ public class Wizard : Dialog
     ///     <see cref="Wizard"/> is derived from <see cref="Dialog"/> and Dialog causes <c>Esc</c> to call
     ///     <see cref="Application.RequestStop(Toplevel)"/>, closing the Dialog. Wizard overrides
     ///     <see cref="OnProcessKeyDown"/> to instead fire the <see cref="Cancelled"/> event when Wizard is being used as a
-    ///     non-modal (see <see cref="Wizard.Modal"/>.
+    ///     non-modal (see <see cref="Wizard.Modal"/>).
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
@@ -498,14 +497,14 @@ public class Wizard : Dialog
             // If we're modal, then we expand the WizardStep so that the top and side 
             // borders and not visible. The bottom border is the separator above the buttons.
             step.X = step.Y = 0;
-            step.Height = Dim.Fill (2); // for button frame
+            step.Height = Dim.Fill (Dim.Func (() => IsInitialized ? Subviews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height + 1 : 1)); // for button frame (+1 for lineView)
             step.Width = Dim.Fill ();
         }
         else
         {
             // If we're not a modal, then we show the border around the WizardStep
             step.X = step.Y = 0;
-            step.Height = Dim.Fill (1); // for button frame
+            step.Height = Dim.Fill (Dim.Func (() => IsInitialized ? Subviews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height + 1 : 2)); // for button frame (+1 for lineView)
             step.Width = Dim.Fill ();
         }
     }
@@ -543,7 +542,7 @@ public class Wizard : Dialog
 
         SetNeedsLayout ();
         LayoutSubviews ();
-        Draw ();
+        //Draw ();
     }
 
     private void Wizard_Closing (object sender, ToplevelClosingEventArgs obj)
@@ -562,11 +561,11 @@ public class Wizard : Dialog
         // gets the first step if CurrentStep == null
     }
 
-    private void Wizard_TitleChanged (object sender, StateEventArgs<string> e)
+    private void Wizard_TitleChanged (object sender, EventArgs<string> e)
     {
         if (string.IsNullOrEmpty (_wizardTitle))
         {
-            _wizardTitle = e.NewValue;
+            _wizardTitle = e.CurrentValue;
         }
     }
 }

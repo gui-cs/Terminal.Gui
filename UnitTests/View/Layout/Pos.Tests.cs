@@ -6,8 +6,6 @@ namespace Terminal.Gui.LayoutTests;
 
 public class PosTests ()
 {
-    // Was named AutoSize_Pos_Validation_Do_Not_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
-    // but doesn't actually have anything to do with AutoSize.
     [Fact]
     public void
         Pos_Validation_Do_Not_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
@@ -145,21 +143,6 @@ public class PosTests ()
                       $"View(Side=Bottom,Target=View(V){v.Frame})",
                       pos.ToString ()
                      );
-    }
-
-    [Fact]
-    public void PosFunction_Equal ()
-    {
-        Func<int> f1 = () => 0;
-        Func<int> f2 = () => 0;
-
-        Pos pos1 = Pos.Func (f1);
-        Pos pos2 = Pos.Func (f2);
-        Assert.Equal (pos1, pos2);
-
-        f2 = () => 1;
-        pos2 = Pos.Func (f2);
-        Assert.NotEqual (pos1, pos2);
     }
 
     [Fact]

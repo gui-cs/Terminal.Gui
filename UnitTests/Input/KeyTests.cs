@@ -61,7 +61,6 @@ public class KeyTests
     [InlineData ((KeyCode)'英', '英')]
     [InlineData ((KeyCode)'{', '{')]
     [InlineData ((KeyCode)'\'', '\'')]
-    [InlineData ((KeyCode)'\r', '\r')]
     [InlineData ((KeyCode)'ó', 'ó')]
     [InlineData ((KeyCode)'ó' | KeyCode.ShiftMask, 'ó')]
     [InlineData ((KeyCode)'Ó', 'Ó')]
@@ -111,9 +110,6 @@ public class KeyTests
     [InlineData ('!', (KeyCode)'!')]
     [InlineData ('\r', KeyCode.Enter)]
     [InlineData ('\t', KeyCode.Tab)]
-#pragma warning disable xUnit1025 // InlineData should be unique within the Theory it belongs to
-    [InlineData ('\r', (KeyCode)13)]
-#pragma warning restore xUnit1025 // InlineData should be unique within the Theory it belongs to
     [InlineData ('\n', (KeyCode)10)]
     [InlineData ('ó', (KeyCode)'ó')]
     [InlineData ('Ó', (KeyCode)'Ó')]
@@ -537,7 +533,7 @@ public class KeyTests
         var b = Key.A;
         Assert.True (a.Equals (b));
     }
-    
+
     [Fact]
     public void Equals_Handled_Changed_ShouldReturnTrue_WhenEqual ()
     {
@@ -555,5 +551,21 @@ public class KeyTests
         a.Handled = true;
         var b = Key.A;
         Assert.False (a.Equals (b));
+    }
+
+    [Fact]
+    public void Set_Key_Separator_With_Rune_Default_Ensure_Using_The_Default_Plus ()
+    {
+        Key key = new (Key.A.WithCtrl);
+        Assert.Equal ((Rune)'+', Key.Separator);
+        Assert.Equal ("Ctrl+A", key.ToString ());
+
+        Key.Separator = new ('-');
+        Assert.Equal ((Rune)'-', Key.Separator);
+        Assert.Equal ("Ctrl-A", key.ToString ());
+
+        Key.Separator = new ();
+        Assert.Equal ((Rune)'+', Key.Separator);
+        Assert.Equal ("Ctrl+A", key.ToString ());
     }
 }

@@ -30,7 +30,7 @@ The entire library has been reviewed and simplified. As a result, the API is mor
 * New! *`Dim.Auto`* - Automatically sizes the view to fitthe view's Text, SubViews, or ContentArea.
 * Improved! *`Pos.AnchorEnd ()`* - New to v2 is `Pos.AnchorEnd ()` (with no parameters) which allows a view to be anchored to the right or bottom of the Superview. 
 * New! *`Pos.Align ()`* - Aligns a set of views horizontally or vertically (left, rigth, center, etc...).
-* ...	
+* Keyboard [Navigation](navigation.md) has been revamped to be more reliability and ensure TUI apps built with Terminal.Gui are accessible. 
 
 ## New and Improved Built-in Views
 
@@ -44,6 +44,7 @@ The entire library has been reviewed and simplified. As a result, the API is mor
 * *[MenuBar](~/api/Terminal.Gui.MenuBar.yml)* - COMING SOON! New implementation based on `Bar`
 * *[ContextMenu](~/api/Terminal.Gui.ContextMenu.yml)* - COMING SOON! New implementation based on `Bar`
 * *[FileDialog](~/api/Terminal.Gui.FileDialog.yml)* - The new, modern file dialog includes icons (in TUI!) for files/folders, search, and a `TreeView`. 
+* [ColorPicker](~/api/Terminal.Gui/ColorPicker.yml)* - Fully supports TrueColor with the ability to choose a color using HSV, RGB, or HSL as well as W3C standard color names.
 
 ## Configuration Manager
 

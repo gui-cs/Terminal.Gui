@@ -17,11 +17,13 @@ public class Text : Scenario
     private Label _labelMirroringTimeField;
     private TimeField _timeField;
 
-    public override void Setup ()
+    public override void Main ()
     {
+        Application.Init ();
+        var win = new Window { Title = GetQuitKeyAndName () };
         // TextField is a simple, single-line text input control
         var label = new Label { Text = "_TextField:" };
-        Win.Add (label);
+        win.Add (label);
 
         var textField = new TextField
         {
@@ -35,7 +37,7 @@ public class Text : Scenario
         textField.Autocomplete.SuggestionGenerator = singleWordGenerator;
         textField.TextChanging += TextField_TextChanging;
 
-        void TextField_TextChanging (object sender, StateEventArgs<string> e)
+        void TextField_TextChanging (object sender, CancelEventArgs<string> e)
         {
             singleWordGenerator.AllSuggestions = Regex.Matches (e.NewValue, "\\w+")
                                                       .Select (s => s.Value)
@@ -43,7 +45,7 @@ public class Text : Scenario
                                                       .ToList ();
         }
 
-        Win.Add (textField);
+        win.Add (textField);
 
         var labelMirroringTextField = new Label
         {
@@ -54,12 +56,12 @@ public class Text : Scenario
             Height = 1,
             Text = textField.Text
         };
-        Win.Add (labelMirroringTextField);
+        win.Add (labelMirroringTextField);
         textField.TextChanged += (s, prev) => { labelMirroringTextField.Text = textField.Text; };
 
         // TextView is a rich (as in functionality, not formatting) text editing control
         label = new() { Text = "T_extView:", Y = Pos.Bottom (label) + 1 };
-        Win.Add (label);
+        win.Add (label);
 
         var textView = new TextView
         {
@@ -80,7 +82,7 @@ public class Text : Scenario
                                                       .ToList ();
         }
 
-        Win.Add (textView);
+        win.Add (textView);
 
         var labelMirroringTextView = new Label
         {
@@ -90,7 +92,7 @@ public class Text : Scenario
             Width = Dim.Fill (1) - 1,
             Height = Dim.Height (textView) - 1
         };
-        Win.Add (labelMirroringTextView);
+        win.Add (labelMirroringTextView);
 
         // Use ContentChanged to detect if the user has typed something in a TextView.
         // The TextChanged property is only fired if the TextView.Text property is
@@ -105,19 +107,19 @@ public class Text : Scenario
         // single-line mode.
         var chxMultiline = new CheckBox
         {
-            X = Pos.Left (textView), Y = Pos.Bottom (textView), Checked = textView.Multiline, Text = "_Multiline"
+            X = Pos.Left (textView), Y = Pos.Bottom (textView), CheckedState = textView.Multiline ? CheckState.Checked : CheckState.UnChecked, Text = "_Multiline"
         };
-        Win.Add (chxMultiline);
+        win.Add (chxMultiline);
 
         var chxWordWrap = new CheckBox
         {
             X = Pos.Right (chxMultiline) + 2,
             Y = Pos.Top (chxMultiline),
-            Checked = textView.WordWrap,
+            CheckedState = textView.WordWrap ? CheckState.Checked : CheckState.UnChecked,
             Text = "_Word Wrap"
         };
-        chxWordWrap.Toggled += (s, e) => textView.WordWrap = (bool)e.NewValue;
-        Win.Add (chxWordWrap);
+        chxWordWrap.CheckedStateChanging += (s, e) => textView.WordWrap = e.NewValue == CheckState.Checked;
+        win.Add (chxWordWrap);
 
         // TextView captures Tabs (so users can enter /t into text) by default;
         // This means using Tab to navigate doesn't work by default. This shows
@@ -126,31 +128,31 @@ public class Text : Scenario
         {
             X = Pos.Right (chxWordWrap) + 2,
             Y = Pos.Top (chxWordWrap),
-            Checked = textView.AllowsTab,
+            CheckedState = textView.AllowsTab ? CheckState.Checked : CheckState.UnChecked,
             Text = "_Capture Tabs"
         };
 
-        chxMultiline.Toggled += (s, e) =>
+        chxMultiline.CheckedStateChanging += (s, e) =>
                                 {
-                                    textView.Multiline = (bool)e.NewValue;
+                                    textView.Multiline = e.NewValue == CheckState.Checked;
 
-                                    if (!textView.Multiline && (bool)chxWordWrap.Checked)
+                                    if (!textView.Multiline && chxWordWrap.CheckedState == CheckState.Checked)
                                     {
-                                        chxWordWrap.Checked = false;
+                                        chxWordWrap.CheckedState = CheckState.UnChecked;
                                     }
 
-                                    if (!textView.Multiline && (bool)chxCaptureTabs.Checked)
+                                    if (!textView.Multiline && chxCaptureTabs.CheckedState == CheckState.Checked)
                                     {
-                                        chxCaptureTabs.Checked = false;
+                                        chxCaptureTabs.CheckedState = CheckState.UnChecked;
                                     }
                                 };
 
         Key keyTab = textView.KeyBindings.GetKeyFromCommands (Command.Tab);
         Key keyBackTab = textView.KeyBindings.GetKeyFromCommands (Command.BackTab);
 
-        chxCaptureTabs.Toggled += (s, e) =>
+        chxCaptureTabs.CheckedStateChanging += (s, e) =>
                                   {
-                                      if (e.NewValue == true)
+                                      if (e.NewValue == CheckState.Checked)
                                       {
                                           textView.KeyBindings.Add (keyTab, Command.Tab);
                                           textView.KeyBindings.Add (keyBackTab, Command.BackTab);
@@ -161,13 +163,13 @@ public class Text : Scenario
                                           textView.KeyBindings.Remove (keyBackTab);
                                       }
 
-                                      textView.AllowsTab = (bool)e.NewValue;
+                                      textView.AllowsTab = e.NewValue == CheckState.Checked;
                                   };
-        Win.Add (chxCaptureTabs);
+        win.Add (chxCaptureTabs);
 
         // Hex editor
         label = new() { Text = "_HexView:", Y = Pos.Bottom (chxMultiline) + 1 };
-        Win.Add (label);
+        win.Add (label);
 
         var hexEditor =
             new HexView (
@@ -176,7 +178,7 @@ public class Text : Scenario
             {
                 X = Pos.Right (label) + 1, Y = Pos.Bottom (chxMultiline) + 1, Width = Dim.Percent (50) - 1, Height = Dim.Percent (30)
             };
-        Win.Add (hexEditor);
+        win.Add (hexEditor);
 
         var labelMirroringHexEditor = new Label
         {
@@ -195,14 +197,14 @@ public class Text : Scenario
                                 byte [] array = ((MemoryStream)hexEditor.Source).ToArray ();
                                 labelMirroringHexEditor.Text = Encoding.UTF8.GetString (array, 0, array.Length);
                             };
-        Win.Add (labelMirroringHexEditor);
+        win.Add (labelMirroringHexEditor);
 
         // DateField
         label = new() { Text = "_DateField:", Y = Pos.Bottom (hexEditor) + 1 };
-        Win.Add (label);
+        win.Add (label);
 
         var dateField = new DateField (DateTime.Now) { X = Pos.Right (label) + 1, Y = Pos.Bottom (hexEditor) + 1, Width = 20 };
-        Win.Add (dateField);
+        win.Add (dateField);
 
         var labelMirroringDateField = new Label
         {
@@ -213,13 +215,13 @@ public class Text : Scenario
             Height = Dim.Height (dateField),
             Text = dateField.Text
         };
-        Win.Add (labelMirroringDateField);
+        win.Add (labelMirroringDateField);
 
         dateField.TextChanged += (s, prev) => { labelMirroringDateField.Text = dateField.Text; };
 
         // TimeField
         label = new() { Text = "T_imeField:", Y = Pos.Top (dateField), X = Pos.Right (labelMirroringDateField) + 5 };
-        Win.Add (label);
+        win.Add (label);
 
         _timeField = new()
         {
@@ -229,7 +231,7 @@ public class Text : Scenario
             IsShortFormat = false,
             Time = DateTime.Now.TimeOfDay
         };
-        Win.Add (_timeField);
+        win.Add (_timeField);
 
         _labelMirroringTimeField = new()
         {
@@ -240,7 +242,7 @@ public class Text : Scenario
             Height = Dim.Height (_timeField),
             Text = _timeField.Text
         };
-        Win.Add (_labelMirroringTimeField);
+        win.Add (_labelMirroringTimeField);
 
         _timeField.TimeChanged += TimeChanged;
 
@@ -251,7 +253,7 @@ public class Text : Scenario
             Y = Pos.Bottom (dateField) + 1,
             Text = "_NetMaskedTextProvider [ 999 000 LLL >LLL |AAA aaa ]:"
         };
-        Win.Add (netProviderLabel);
+        win.Add (netProviderLabel);
 
         var netProvider = new NetMaskedTextProvider ("999 000 LLL >LLL |AAA aaa");
 
@@ -259,7 +261,7 @@ public class Text : Scenario
         {
             X = Pos.Right (netProviderLabel) + 1, Y = Pos.Y (netProviderLabel), Provider = netProvider
         };
-        Win.Add (netProviderField);
+        win.Add (netProviderField);
 
         var labelMirroringNetProviderField = new Label
         {
@@ -270,7 +272,7 @@ public class Text : Scenario
             Height = Dim.Height (netProviderField),
             Text = netProviderField.Text
         };
-        Win.Add (labelMirroringNetProviderField);
+        win.Add (labelMirroringNetProviderField);
 
         netProviderField.Provider.TextChanged += (s, prev) => { labelMirroringNetProviderField.Text = netProviderField.Text; };
 
@@ -281,7 +283,7 @@ public class Text : Scenario
             Y = Pos.Bottom (netProviderLabel) + 1,
             Text = "Text_RegexProvider [ ^([0-9]?[0-9]?[0-9]|1000)$ ]:"
         };
-        Win.Add (regexProvider);
+        win.Add (regexProvider);
 
         var provider2 = new TextRegexProvider ("^([0-9]?[0-9]?[0-9]|1000)$") { ValidateOnInput = false };
 
@@ -293,7 +295,7 @@ public class Text : Scenario
             TextAlignment = Alignment.Center,
             Provider = provider2
         };
-        Win.Add (regexProviderField);
+        win.Add (regexProviderField);
 
         var labelMirroringRegexProviderField = new Label
         {
@@ -304,7 +306,7 @@ public class Text : Scenario
             Height = Dim.Height (regexProviderField),
             Text = regexProviderField.Text
         };
-        Win.Add (labelMirroringRegexProviderField);
+        win.Add (labelMirroringRegexProviderField);
 
         regexProviderField.Provider.TextChanged += (s, prev) => { labelMirroringRegexProviderField.Text = regexProviderField.Text; };
 
@@ -428,8 +430,12 @@ public class Text : Scenario
             }
         };
 
-        Win.Add (labelAppendAutocomplete);
-        Win.Add (appendAutocompleteTextField);
+        win.Add (labelAppendAutocomplete);
+        win.Add (appendAutocompleteTextField);
+
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 
     private void TimeChanged (object sender, DateTimeEventArgs<TimeSpan> e) { _labelMirroringTimeField.Text = _timeField.Text; }

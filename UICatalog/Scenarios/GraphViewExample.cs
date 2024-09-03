@@ -161,7 +161,7 @@ public class GraphViewExample : Scenario
         };
 
         frameRight.Add (
-                        _about = new() { Width = Dim.Fill (), Height = Dim.Fill () }
+                        _about = new() { Width = Dim.Fill (), Height = Dim.Fill (), ReadOnly = true }
                        );
 
         app.Add (frameRight);
@@ -170,8 +170,8 @@ public class GraphViewExample : Scenario
                                        new Shortcut []
                                        {
                                            new (Key.G.WithCtrl, "Next Graph", () => _graphs [_currentGraph++ % _graphs.Length] ()),
-                                           new (Key.CursorUp, "Zoom In", () => Zoom (0.5f)),
-                                           new (Key.CursorDown, "Zoom Out", () => Zoom (2f))
+                                           new (Key.PageUp, "Zoom In", () => Zoom (0.5f)),
+                                           new (Key.PageDown, "Zoom Out", () => Zoom (2f))
                                        }
                                       );
         app.Add (statusBar);
@@ -196,13 +196,13 @@ public class GraphViewExample : Scenario
         Application.Shutdown ();
     }
 
-    private void DiagShortcut_Accept (object sender, CancelEventArgs e)
+    private void DiagShortcut_Accept (object sender, HandledEventArgs e)
     {
         ToggleDiagnostics ();
 
         if (sender is Shortcut shortcut && shortcut.CommandView is CheckBox checkBox)
         {
-            checkBox.Checked = _miDiags.Checked;
+            checkBox.CheckedState = _miDiags.Checked ?? false ? CheckState.Checked : CheckState.UnChecked;
         }
     }
 

@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections.Frozen;
 using System.Diagnostics.Contracts;
+using System.Drawing;
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -248,6 +249,27 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
         var hsl = ColorHelper.ColorConverter.RgbToHsl(new RGB (R, G, B));
 
         var amount = .7;
+        if (hsl.L <= 5)
+        {
+            return DarkGray;
+        }
+        hsl.L = (byte)(hsl.L * amount);
+
+        var rgb = ColorHelper.ColorConverter.HslToRgb (hsl);
+        return new (rgb.R, rgb.G, rgb.B);
+
+    }
+
+    /// <summary>
+    /// Gets a color that is the same hue as the current color, but with a different lightness.
+    /// </summary>
+    /// <returns></returns>
+    public Color GetDarkerColor ()
+    {
+        // TODO: This is a temporary implementation; just enough to show how it could work. 
+        var hsl = ColorHelper.ColorConverter.RgbToHsl (new RGB (R, G, B));
+
+        var amount = .3;
         if (hsl.L <= 5)
         {
             return DarkGray;

@@ -14,7 +14,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Dialogs")]
 [ScenarioCategory ("Text and Formatting")]
-[ScenarioCategory ("Top Level Windows")]
+[ScenarioCategory ("Overlapped")]
 public class TableEditor : Scenario
 {
     private readonly HashSet<FileSystemInfo> _checkedFileSystemInfos = new ();
@@ -769,7 +769,7 @@ public class TableEditor : Scenario
                                      }
                                  };
 
-        _tableView.KeyBindings.Add (Key.Space, Command.Accept);
+        _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Accept);
 
         // Run - Start the application.
         Application.Run (appWindow);
@@ -1083,13 +1083,16 @@ public class TableEditor : Scenario
                      };
         var cancel = new Button { Text = "Cancel" };
         cancel.Accept += (s, e) => { Application.RequestStop (); };
-        var d = new Dialog { Title = prompt, Buttons = [ok, cancel] };
+        var d = new Dialog
+        {
+            Title = prompt,
+            Buttons = [ok, cancel]
+        };
 
         ColumnStyle style = _tableView.Style.GetOrCreateColumnStyle (col.Value);
 
-        var lbl = new Label { X = 0, Y = 1, Text = _tableView.Table.ColumnNames [col.Value] };
-
-        var tf = new TextField { Text = getter (style).ToString (), X = 0, Y = 2, Width = Dim.Fill () };
+        var lbl = new Label { X = 0, Y = 0, Text = $"{_tableView.Table.ColumnNames [col.Value]}: " };
+        var tf = new TextField { Text = getter (style).ToString (), X = Pos.Right (lbl), Y = 0, Width = 20 };
 
         d.Add (lbl, tf);
         tf.SetFocus ();
@@ -1263,28 +1266,28 @@ public class TableEditor : Scenario
 
         var contextMenu = new ContextMenu
         {
-            Position = new (e.MouseEvent.Position.X + 1, e.MouseEvent.Position.Y + 1),
-            MenuItems = new (
-                             [
-                                 new (
-                                      $"Hide {TrimArrows (colName)}",
-                                      "",
-                                      () => HideColumn (clickedCol)
-                                     ),
-                                 new (
-                                      $"Sort {StripArrows (sort)}",
-                                      "",
-                                      () => SortColumn (
-                                                        clickedCol,
-                                                        sort,
-                                                        isAsc
-                                                       )
-                                     )
-                             ]
-                            )
+            Position = new (e.MouseEvent.Position.X + 1, e.MouseEvent.Position.Y + 1)
         };
 
-        contextMenu.Show ();
+        MenuBarItem menuItems = new (
+                                     [
+                                         new (
+                                              $"Hide {TrimArrows (colName)}",
+                                              "",
+                                              () => HideColumn (clickedCol)
+                                             ),
+                                         new (
+                                              $"Sort {StripArrows (sort)}",
+                                              "",
+                                              () => SortColumn (
+                                                                clickedCol,
+                                                                sort,
+                                                                isAsc
+                                                               )
+                                             )
+                                     ]
+                                    );
+        contextMenu.Show (menuItems);
     }
 
     private void SortColumn (int clickedCol)
@@ -1461,7 +1464,8 @@ public class TableEditor : Scenario
                                                                              treeSource,
                                                                              _checkedFileSystemInfos.Contains,
                                                                              CheckOrUncheckFile
-                                                                            ) { UseRadioButtons = radio };
+                                                                            )
+            { UseRadioButtons = radio };
         }
         else
         {

@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+
+namespace Terminal.Gui;
 
 /// <summary>
 ///     ContextMenu provides a pop-up menu that can be positioned anywhere within a <see cref="View"/>. ContextMenu is
@@ -16,15 +18,15 @@
 ///     </para>
 ///     <para>
 ///         Callers can cause the ContextMenu to be activated on a right-mouse click (or other interaction) by calling
-///         <see cref="Show()"/>.
+///         <see cref="Show"/>.
 ///     </para>
-///     <para>ContextMenus are located using screen using screen coordinates and appear above all other Views.</para>
+///     <para>ContextMenus are located using screen coordinates and appear above all other Views.</para>
 /// </summary>
 public sealed class ContextMenu : IDisposable
 {
-    private static MenuBar _menuBar;
+    private static MenuBar? _menuBar;
 
-    private Toplevel _container;
+    private Toplevel? _container;
     private Key _key = DefaultKey;
     private MouseFlags _mouseFlags = MouseFlags.Button3Clicked;
 
@@ -33,15 +35,9 @@ public sealed class ContextMenu : IDisposable
     {
         if (IsShow)
         {
-            if (_menuBar.SuperView is { })
-            {
-                Hide ();
-            }
-
+            Hide ();
             IsShow = false;
         }
-
-        MenuItems = new MenuBarItem ();
     }
 
     /// <summary>The default shortcut key for activating the context menu.</summary>
@@ -56,7 +52,7 @@ public sealed class ContextMenu : IDisposable
     public bool ForceMinimumPosToZero { get; set; } = true;
 
     /// <summary>The host <see cref="View "/> which position will be used, otherwise if it's null the container will be used.</summary>
-    public View Host { get; set; }
+    public View? Host { get; set; }
 
     /// <summary>Gets whether the ContextMenu is showing or not.</summary>
     public static bool IsShow { get; private set; }
@@ -74,10 +70,10 @@ public sealed class ContextMenu : IDisposable
     }
 
     /// <summary>Gets the <see cref="MenuBar"/> that is hosting this context menu.</summary>
-    public MenuBar MenuBar => _menuBar;
+    public MenuBar? MenuBar => _menuBar;
 
     /// <summary>Gets or sets the menu items for this context menu.</summary>
-    public MenuBarItem MenuItems { get; set; }
+    public MenuBarItem? MenuItems { get; private set; }
 
     /// <summary><see cref="Gui.MouseFlags"/> specifies the mouse action used to activate the context menu by mouse.</summary>
     public MouseFlags MouseFlags
@@ -105,52 +101,93 @@ public sealed class ContextMenu : IDisposable
     /// <summary>Disposes the context menu object.</summary>
     public void Dispose ()
     {
-        if (IsShow)
+        if (_menuBar is { })
         {
             _menuBar.MenuAllClosed -= MenuBar_MenuAllClosed;
-            _menuBar.Dispose ();
-            _menuBar = null;
-            IsShow = false;
         }
+        Application.UngrabMouse ();
+        _menuBar?.Dispose ();
+        _menuBar = null;
+        IsShow = false;
 
         if (_container is { })
         {
             _container.Closing -= Container_Closing;
             _container.Deactivate -= Container_Deactivate;
+            _container.Disposing -= Container_Disposing;
         }
     }
 
     /// <summary>Hides (closes) the ContextMenu.</summary>
     public void Hide ()
     {
+        RemoveKeyBindings (MenuItems);
         _menuBar?.CleanUp ();
-        Dispose ();
+        IsShow = false;
+    }
+
+    private void RemoveKeyBindings (MenuBarItem? menuBarItem)
+    {
+        if (menuBarItem is null)
+        {
+            return;
+        }
+
+        foreach (MenuItem? menuItem in menuBarItem.Children!)
+        {
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+            if (menuItem is null)
+            {
+                continue;
+            }
+
+            if (menuItem is MenuBarItem barItem)
+            {
+                RemoveKeyBindings (barItem);
+            }
+            else
+            {
+                if (menuItem.ShortcutKey != Key.Empty)
+                {
+                    // Remove an existent ShortcutKey
+                    _menuBar?.KeyBindings.Remove (menuItem.ShortcutKey!);
+                }
+            }
+        }
     }
 
     /// <summary>Event invoked when the <see cref="ContextMenu.Key"/> is changed.</summary>
-    public event EventHandler<KeyChangedEventArgs> KeyChanged;
+    public event EventHandler<KeyChangedEventArgs>? KeyChanged;
 
     /// <summary>Event invoked when the <see cref="ContextMenu.MouseFlags"/> is changed.</summary>
-    public event EventHandler<MouseFlagsChangedEventArgs> MouseFlagsChanged;
+    public event EventHandler<MouseFlagsChangedEventArgs>? MouseFlagsChanged;
 
     /// <summary>Shows (opens) the ContextMenu, displaying the <see cref="MenuItem"/>s it contains.</summary>
-    public void Show ()
+    public void Show (MenuBarItem? menuItems)
     {
         if (_menuBar is { })
         {
             Hide ();
+            Dispose ();
         }
 
+        if (menuItems is null || menuItems.Children!.Length == 0)
+        {
+            return;
+        }
+
+        MenuItems = menuItems;
         _container = Application.Current;
-        _container.Closing += Container_Closing;
+        _container!.Closing += Container_Closing;
         _container.Deactivate += Container_Deactivate;
-        Rectangle frame = Application.Driver.Screen;
+        _container.Disposing += Container_Disposing;
+        Rectangle frame = Application.Screen;
         Point position = Position;
 
         if (Host is { })
         {
             Point pos = Host.ViewportToScreen (frame).Location;
-            pos.Y += Host.Frame.Height - 1;
+            pos.Y += Host.Frame.Height > 0 ? Host.Frame.Height - 1 : 0;
 
             if (position != pos)
             {
@@ -219,7 +256,9 @@ public sealed class ContextMenu : IDisposable
         _menuBar.OpenMenu ();
     }
 
-    private void Container_Deactivate (object sender, ToplevelEventArgs e) { Hide (); }
-    private void Container_Closing (object sender, ToplevelClosingEventArgs obj) { Hide (); }
-    private void MenuBar_MenuAllClosed (object sender, EventArgs e) { Dispose (); }
+    private void Container_Closing (object? sender, ToplevelClosingEventArgs obj) { Hide (); }
+    private void Container_Deactivate (object? sender, ToplevelEventArgs e) { Hide (); }
+    private void Container_Disposing (object? sender, EventArgs e) { Dispose (); }
+
+    private void MenuBar_MenuAllClosed (object? sender, EventArgs e) { Hide (); }
 }

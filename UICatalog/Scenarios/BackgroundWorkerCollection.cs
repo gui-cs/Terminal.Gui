@@ -10,7 +10,8 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("BackgroundWorker Collection", "A persisting multi Toplevel BackgroundWorker threading")]
 [ScenarioCategory ("Threading")]
-[ScenarioCategory ("Top Level Windows")]
+[ScenarioCategory ("Overlapped")]
+[ScenarioCategory ("Runnable")]
 [ScenarioCategory ("Dialogs")]
 [ScenarioCategory ("Controls")]
 public class BackgroundWorkerCollection : Scenario
@@ -20,10 +21,10 @@ public class BackgroundWorkerCollection : Scenario
         Application.Run<OverlappedMain> ().Dispose ();
 
 #if DEBUG_IDISPOSABLE
-        if (Application.OverlappedChildren is { })
+        if (ApplicationOverlapped.OverlappedChildren is { })
         {
-            Debug.Assert (Application.OverlappedChildren?.Count == 0);
-            Debug.Assert (Application.Top == Application.OverlappedTop);
+            Debug.Assert (ApplicationOverlapped.OverlappedChildren?.Count == 0);
+            Debug.Assert (Application.Top == ApplicationOverlapped.OverlappedTop);
         }
 #endif
 
@@ -77,7 +78,7 @@ public class BackgroundWorkerCollection : Scenario
                                               () => Quit (),
                                               null,
                                               null,
-                                              (KeyCode)Application.QuitKey
+                                              Application.QuitKey
                                              )
                                      }
                                     ),
@@ -134,7 +135,7 @@ public class BackgroundWorkerCollection : Scenario
         {
             var index = 1;
             List<MenuItem> menuItems = new ();
-            List<Toplevel> sortedChildren = Application.OverlappedChildren;
+            List<Toplevel> sortedChildren = ApplicationOverlapped.OverlappedChildren;
             sortedChildren.Sort (new ToplevelComparer ());
 
             foreach (Toplevel top in sortedChildren)
@@ -151,7 +152,7 @@ public class BackgroundWorkerCollection : Scenario
                 string topTitle = top is Window ? ((Window)top).Title : top.Data.ToString ();
                 string itemTitle = item.Title.Substring (index.ToString ().Length + 1);
 
-                if (top == Application.GetTopOverlappedChild () && topTitle == itemTitle)
+                if (top == ApplicationOverlapped.GetTopOverlappedChild () && topTitle == itemTitle)
                 {
                     item.Checked = true;
                 }
@@ -160,7 +161,7 @@ public class BackgroundWorkerCollection : Scenario
                     item.Checked = false;
                 }
 
-                item.Action += () => { Application.MoveToOverlappedChild (top); };
+                item.Action += () => { ApplicationOverlapped.MoveToOverlappedChild (top); };
                 menuItems.Add (item);
             }
 
@@ -188,7 +189,7 @@ public class BackgroundWorkerCollection : Scenario
         {
             List<MenuItem> menuItems = new ();
             var item = new MenuItem { Title = "WorkerApp", CheckType = MenuItemCheckStyle.Checked };
-            Toplevel top = Application.OverlappedChildren?.Find (x => x.Data.ToString () == "WorkerApp");
+            Toplevel top = ApplicationOverlapped.OverlappedChildren?.Find (x => x.Data.ToString () == "WorkerApp");
 
             if (top != null)
             {
@@ -197,16 +198,16 @@ public class BackgroundWorkerCollection : Scenario
 
             item.Action += () =>
                            {
-                               Toplevel top = Application.OverlappedChildren.Find (x => x.Data.ToString () == "WorkerApp");
+                               Toplevel top = ApplicationOverlapped.OverlappedChildren.Find (x => x.Data.ToString () == "WorkerApp");
                                item.Checked = top.Visible = (bool)!item.Checked;
 
                                if (top.Visible)
                                {
-                                   Application.MoveToOverlappedChild (top);
+                                   ApplicationOverlapped.MoveToOverlappedChild (top);
                                }
                                else
                                {
-                                   Application.OverlappedTop.SetNeedsDisplay ();
+                                   ApplicationOverlapped.OverlappedTop!.SetNeedsDisplay ();
                                }
                            };
             menuItems.Add (item);
@@ -281,7 +282,7 @@ public class BackgroundWorkerCollection : Scenario
             _listView = new ListView { X = 0, Y = 2, Width = Dim.Fill (), Height = Dim.Fill (2), Enabled = false };
             Add (_listView);
 
-            _start = new Button { Text = "Start", IsDefault = true, ClearOnVisibleFalse = false };
+            _start = new Button { Text = "Start", IsDefault = true };
 
             _start.Accept += (s, e) =>
                               {
@@ -302,19 +303,28 @@ public class BackgroundWorkerCollection : Scenario
                            }
                        };
 
-            LayoutStarted += (s, e) =>
-                             {
-                                 int btnsWidth = _start.Frame.Width + _close.Frame.Width + 2 - 1;
-                                 int shiftLeft = Math.Max ((Viewport.Width - btnsWidth) / 2 - 2, 0);
+            LayoutStarted += StagingUIController_LayoutStarted;
+            Disposing += StagingUIController_Disposing;
+        }
 
-                                 shiftLeft += _close.Frame.Width + 1;
-                                 _close.X = Pos.AnchorEnd (shiftLeft);
-                                 _close.Y = Pos.AnchorEnd (1);
+        private void StagingUIController_Disposing (object sender, EventArgs e)
+        {
+            LayoutStarted -= StagingUIController_LayoutStarted;
+            Disposing -= StagingUIController_Disposing;
+        }
 
-                                 shiftLeft += _start.Frame.Width + 1;
-                                 _start.X = Pos.AnchorEnd (shiftLeft);
-                                 _start.Y = Pos.AnchorEnd (1);
-                             };
+        private void StagingUIController_LayoutStarted (object sender, LayoutEventArgs e)
+        {
+            int btnsWidth = _start.Frame.Width + _close.Frame.Width + 2 - 1;
+            int shiftLeft = Math.Max ((Viewport.Width - btnsWidth) / 2 - 2, 0);
+
+            shiftLeft += _close.Frame.Width + 1;
+            _close.X = Pos.AnchorEnd (shiftLeft);
+            _close.Y = Pos.AnchorEnd (1);
+
+            shiftLeft += _start.Frame.Width + 1;
+            _start.X = Pos.AnchorEnd (shiftLeft);
+            _start.Y = Pos.AnchorEnd (1);
         }
 
         public Staging Staging { get; private set; }
@@ -371,16 +381,17 @@ public class BackgroundWorkerCollection : Scenario
         {
             CancelWorker ();
         }
+
         private void WorkerApp_Closing (object sender, ToplevelClosingEventArgs e)
         {
-            Toplevel top = Application.OverlappedChildren.Find (x => x.Data.ToString () == "WorkerApp");
+            Toplevel top = ApplicationOverlapped.OverlappedChildren!.Find (x => x.Data.ToString () == "WorkerApp");
 
-            if (Visible && top == this)
+            if (e.RequestingTop == this && Visible && top == this)
             {
                 Visible = false;
                 e.Cancel = true;
 
-                Application.OverlappedMoveNext ();
+                ApplicationOverlapped.OverlappedMoveNext ();
             }
         }
 
@@ -481,7 +492,7 @@ public class BackgroundWorkerCollection : Scenario
                                                  _stagingsUi.Add (stagingUI);
                                                  _stagingWorkers.Remove (staging);
 #if DEBUG_IDISPOSABLE
-                                                 if (Application.OverlappedTop is null)
+                                                 if (ApplicationOverlapped.OverlappedTop is null)
                                                  {
                                                      stagingUI.Dispose ();
                                                      return;

@@ -4,6 +4,13 @@ namespace Terminal.Gui;
 /// <summary>Facilitates box drawing and line intersection detection and rendering.  Does not support diagonal lines.</summary>
 public class LineCanvas : IDisposable
 {
+    /// <summary>
+    ///     Optional <see cref="FillPair"/> which when present overrides the <see cref="StraightLine.Attribute"/>
+    ///     (colors) of lines in the canvas. This can be used e.g. to apply a global <see cref="GradientFill"/>
+    ///     across all lines.
+    /// </summary>
+    public FillPair? Fill { get; set; }
+
     private readonly List<StraightLine> _lines = [];
 
     private readonly Dictionary<IntersectionRuneType, IntersectionRuneResolver> _runeResolvers = new ()
@@ -85,7 +92,7 @@ public class LineCanvas : IDisposable
                     viewport = Rectangle.Union (viewport, _lines [i].Viewport);
                 }
 
-                if (viewport is {Width: 0} or {Height: 0})
+                if (viewport is { Width: 0 } or { Height: 0 })
                 {
                     viewport = viewport with
                     {
@@ -135,7 +142,7 @@ public class LineCanvas : IDisposable
     )
     {
         _cachedViewport = Rectangle.Empty;
-        _lines.Add (new StraightLine (start, length, orientation, style, attribute));
+        _lines.Add (new (start, length, orientation, style, attribute));
     }
 
     /// <summary>Adds a new line to the canvas</summary>
@@ -165,9 +172,9 @@ public class LineCanvas : IDisposable
     ///     intersection symbols.
     /// </summary>
     /// <returns>A map of all the points within the canvas.</returns>
-    public Dictionary<Point, Cell> GetCellMap ()
+    public Dictionary<Point, Cell?> GetCellMap ()
     {
-        Dictionary<Point, Cell> map = new ();
+        Dictionary<Point, Cell?> map = new ();
 
         // walk through each pixel of the bitmap
         for (int y = Viewport.Y; y < Viewport.Y + Viewport.Height; y++)
@@ -183,7 +190,7 @@ public class LineCanvas : IDisposable
 
                 if (cell is { })
                 {
-                    map.Add (new Point (x, y), cell);
+                    map.Add (new (x, y), cell);
                 }
             }
         }
@@ -192,7 +199,7 @@ public class LineCanvas : IDisposable
     }
 
     // TODO: Unless there's an obvious use case for this API we should delete it in favor of the
-    // simpler version that doensn't take an area.
+    // simpler version that doesn't take an area.
     /// <summary>
     ///     Evaluates the lines that have been added to the canvas and returns a map containing the glyphs and their
     ///     locations. The glyphs are the characters that should be rendered so that all lines connect up with the appropriate
@@ -218,7 +225,7 @@ public class LineCanvas : IDisposable
 
                 if (rune is { })
                 {
-                    map.Add (new Point (x, y), rune.Value);
+                    map.Add (new (x, y), rune.Value);
                 }
             }
         }
@@ -324,9 +331,12 @@ public class LineCanvas : IDisposable
     /// <returns></returns>
     private bool Exactly (HashSet<IntersectionType> intersects, params IntersectionType [] types) { return intersects.SetEquals (types); }
 
-    private Attribute? GetAttributeForIntersects (IntersectionDefinition? [] intersects) { return intersects [0]!.Line.Attribute; }
+    private Attribute? GetAttributeForIntersects (IntersectionDefinition? [] intersects)
+    {
+        return Fill != null ? Fill.GetAttribute (intersects [0]!.Point) : intersects [0]!.Line.Attribute;
+    }
 
-    private Cell? GetCellForIntersects (ConsoleDriver driver, IntersectionDefinition? [] intersects)
+    private Cell? GetCellForIntersects (ConsoleDriver? driver, IntersectionDefinition? [] intersects)
     {
         if (!intersects.Any ())
         {
@@ -346,7 +356,7 @@ public class LineCanvas : IDisposable
         return cell;
     }
 
-    private Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition? [] intersects)
+    private Rune? GetRuneForIntersects (ConsoleDriver? driver, IntersectionDefinition? [] intersects)
     {
         if (!intersects.Any ())
         {
@@ -428,12 +438,12 @@ public class LineCanvas : IDisposable
                        useThickDotted ? Glyphs.VLineHvDa4 : Glyphs.VLine;
 
             default:
-                throw new Exception (
-                                     "Could not find resolver or switch case for "
-                                     + nameof (runeType)
-                                     + ":"
-                                     + runeType
-                                    );
+                throw new (
+                           "Could not find resolver or switch case for "
+                           + nameof (runeType)
+                           + ":"
+                           + runeType
+                          );
         }
     }
 
@@ -669,7 +679,7 @@ public class LineCanvas : IDisposable
         internal Rune _thickV;
         public IntersectionRuneResolver () { SetGlyphs (); }
 
-        public Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition? [] intersects)
+        public Rune? GetRuneForIntersects (ConsoleDriver? driver, IntersectionDefinition? [] intersects)
         {
             bool useRounded = intersects.Any (
                                               i => i?.Line.Length != 0

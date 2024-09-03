@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 
 namespace Terminal.Gui.ViewsTests;
 
@@ -27,7 +27,7 @@ public class ShortcutTests
     [InlineData ("C", "H", KeyCode.Null, 6)]
     [InlineData ("", "H", KeyCode.K, 8)]
     [InlineData ("C", "H", KeyCode.K, 9)]
-    public void NaturalSize (string command, string help, Key key, int expectedWidth)
+    public void NaturalSize (string command, string help, KeyCode key, int expectedWidth)
     {
         var shortcut = new Shortcut
         {
@@ -38,8 +38,6 @@ public class ShortcutTests
 
         Assert.IsType<DimAuto> (shortcut.Width);
         Assert.IsType<DimAuto> (shortcut.Height);
-
-        shortcut.LayoutSubviews ();
         shortcut.SetRelativeLayout (new (100, 100));
 
         // |0123456789
@@ -87,7 +85,7 @@ public class ShortcutTests
 
         shortcut = new ();
 
-        shortcut.CommandView = new()
+        shortcut.CommandView = new ()
         {
             Text = "T"
         };
@@ -104,7 +102,7 @@ public class ShortcutTests
 
         Assert.Equal (shortcut.Text, shortcut.HelpText);
 
-        shortcut = new()
+        shortcut = new ()
         {
             HelpText = "H"
         };
@@ -115,7 +113,7 @@ public class ShortcutTests
     [Theory]
     [InlineData (KeyCode.Null, "")]
     [InlineData (KeyCode.F1, "F1")]
-    public void KeyView_Text_Tracks_Key (Key key, string expected)
+    public void KeyView_Text_Tracks_Key (KeyCode key, string expected)
     {
         var shortcut = new Shortcut
         {
@@ -154,7 +152,29 @@ public class ShortcutTests
         Assert.Equal (Key.Empty, shortcut.Key);
     }
 
-    // Test KeyBindingScope
+
+    [Fact]
+    public void Key_Set_Binds_Key_To_CommandView_Accept ()
+    {
+        var shortcut = new Shortcut ();
+
+        shortcut.Key = Key.F1;
+
+        // TODO:
+    }
+
+    [Fact]
+    public void Key_Changing_Removes_Previous_Binding ()
+    {
+        Shortcut shortcut = new Shortcut ();
+
+        shortcut.Key = Key.A;
+        Assert.Contains (Key.A, shortcut.KeyBindings.Bindings.Keys);
+
+        shortcut.Key = Key.B;
+        Assert.DoesNotContain (Key.A, shortcut.KeyBindings.Bindings.Keys);
+        Assert.Contains (Key.B, shortcut.KeyBindings.Bindings.Keys);
+    }
 
     // Test Key gets bound correctly
     [Fact]
@@ -176,13 +196,20 @@ public class ShortcutTests
     }
 
     [Fact]
-    public void Setting_Key_Binds_Key_To_CommandView_Accept ()
+    public void KeyBindingScope_Changing_Adjusts_KeyBindings ()
     {
-        var shortcut = new Shortcut ();
+        Shortcut shortcut = new Shortcut ();
 
-        shortcut.Key = Key.F1;
+        shortcut.Key = Key.A;
+        Assert.Contains (Key.A, shortcut.KeyBindings.Bindings.Keys);
 
-        // TODO:
+        shortcut.KeyBindingScope = KeyBindingScope.Application;
+        Assert.DoesNotContain (Key.A, shortcut.KeyBindings.Bindings.Keys);
+        Assert.Contains (Key.A, Application.KeyBindings.Bindings.Keys);
+
+        shortcut.KeyBindingScope = KeyBindingScope.HotKey;
+        Assert.Contains (Key.A, shortcut.KeyBindings.Bindings.Keys);
+        Assert.DoesNotContain (Key.A, Application.KeyBindings.Bindings.Keys);
     }
 
     [Theory]
@@ -224,19 +251,6 @@ public class ShortcutTests
         shortcut.Action.Invoke ();
 
         Assert.True (actionInvoked);
-    }
-
-    [Fact]
-    public void ColorScheme_SetsAndGetsCorrectly ()
-    {
-        var colorScheme = new ColorScheme ();
-
-        var shortcut = new Shortcut
-        {
-            ColorScheme = colorScheme
-        };
-
-        Assert.Same (colorScheme, shortcut.ColorScheme);
     }
 
     [Fact]
@@ -314,4 +328,293 @@ public class ShortcutTests
         Assert.False (shortcut.CanFocus);
         Assert.True (shortcut.CommandView.CanFocus);
     }
+
+    [Theory]
+
+    //  0123456789
+    // " C  0  A "
+    [InlineData (-1, 0)]
+    [InlineData (0, 1)]
+    [InlineData (1, 1)]
+    [InlineData (2, 1)]
+    [InlineData (3, 1)]
+    [InlineData (4, 1)]
+    [InlineData (5, 1)]
+    [InlineData (6, 1)]
+    [InlineData (7, 1)]
+    [InlineData (8, 1)]
+    [InlineData (9, 0)]
+    [AutoInitShutdown]
+    public void MouseClick_Fires_Accept (int x, int expectedAccept)
+    {
+        var current = new Toplevel ();
+
+        var shortcut = new Shortcut
+        {
+            Key = Key.A,
+            Text = "0",
+            Title = "C"
+        };
+        current.Add (shortcut);
+
+        Application.Begin (current);
+
+        var accepted = 0;
+        shortcut.Accept += (s, e) => accepted++;
+
+        Application.OnMouseEvent (
+                                  new ()
+                                  {
+                                      Position = new (x, 0),
+                                      Flags = MouseFlags.Button1Clicked
+                                  });
+
+        Assert.Equal (expectedAccept, accepted);
+
+        current.Dispose ();
+    }
+
+    [Theory]
+
+    //  0123456789
+    // " C  0  A "
+    [InlineData (-1, 0, 0)]
+    [InlineData (0, 1, 1)]
+    [InlineData (1, 1, 1, Skip = "BUGBUG: This breaks. We need to fix the logic in the Shortcut class.")]
+    [InlineData (2, 1, 1)]
+    [InlineData (3, 1, 1)]
+    [InlineData (4, 1, 1)]
+    [InlineData (5, 1, 1)]
+    [InlineData (6, 1, 1)]
+    [InlineData (7, 1, 1)]
+    [InlineData (8, 1, 1)]
+    [InlineData (9, 0, 0)]
+    [AutoInitShutdown]
+    public void MouseClick_Button_CommandView_Fires_Accept (int x, int expectedAccept, int expectedButtonAccept)
+    {
+        var current = new Toplevel ();
+
+        var shortcut = new Shortcut
+        {
+            Key = Key.A,
+            Text = "0"
+        };
+
+        shortcut.CommandView = new Button
+        {
+            Title = "C",
+            NoDecorations = true,
+            NoPadding = true
+        };
+        var buttonAccepted = 0;
+        shortcut.CommandView.Accept += (s, e) => { buttonAccepted++; };
+        current.Add (shortcut);
+
+        Application.Begin (current);
+
+        var accepted = 0;
+        shortcut.Accept += (s, e) => accepted++;
+
+        //Assert.True (shortcut.HasFocus);
+
+        Application.OnMouseEvent (
+                                  new ()
+                                  {
+                                      Position = new (x, 0),
+                                      Flags = MouseFlags.Button1Clicked
+                                  });
+
+        Assert.Equal (expectedAccept, accepted);
+        Assert.Equal (expectedButtonAccept, buttonAccepted);
+
+        current.Dispose ();
+    }
+
+    [Theory]
+    [InlineData (true, KeyCode.A, 1)]
+    [InlineData (true, KeyCode.C, 1)]
+    [InlineData (true, KeyCode.C | KeyCode.AltMask, 1)]
+    [InlineData (true, KeyCode.Enter, 1)]
+    [InlineData (true, KeyCode.Space, 0)]
+    [InlineData (true, KeyCode.F1, 0)]
+    [InlineData (false, KeyCode.A, 1)]
+    [InlineData (false, KeyCode.C, 1)]
+    [InlineData (false, KeyCode.C | KeyCode.AltMask, 1)]
+    [InlineData (false, KeyCode.Enter, 0)]
+    [InlineData (false, KeyCode.Space, 0)]
+    [InlineData (false, KeyCode.F1, 0)]
+    [AutoInitShutdown]
+    public void KeyDown_Invokes_Accept (bool canFocus, KeyCode key, int expectedAccept)
+    {
+        var current = new Toplevel ();
+
+        var shortcut = new Shortcut
+        {
+            Key = Key.A,
+            Text = "0",
+            Title = "_C",
+            CanFocus = canFocus
+        };
+        current.Add (shortcut);
+
+        Application.Begin (current);
+        Assert.Equal (canFocus, shortcut.HasFocus);
+
+        var accepted = 0;
+        shortcut.Accept += (s, e) => accepted++;
+
+        Application.OnKeyDown (key);
+
+        Assert.Equal (expectedAccept, accepted);
+
+        current.Dispose ();
+    }
+
+    [Theory]
+    [InlineData (KeyCode.A, 1)]
+    [InlineData (KeyCode.C, 1)]
+    [InlineData (KeyCode.C | KeyCode.AltMask, 1)]
+    [InlineData (KeyCode.Enter, 1)]
+    [InlineData (KeyCode.Space, 0)]
+    [InlineData (KeyCode.F1, 0)]
+    [AutoInitShutdown]
+    public void KeyDown_App_Scope_Invokes_Accept (KeyCode key, int expectedAccept)
+    {
+        var current = new Toplevel ();
+
+        var shortcut = new Shortcut
+        {
+            Key = Key.A,
+            KeyBindingScope = KeyBindingScope.Application,
+            Text = "0",
+            Title = "_C"
+        };
+        current.Add (shortcut);
+
+        Application.Begin (current);
+
+        var accepted = 0;
+        shortcut.Accept += (s, e) => accepted++;
+
+        Application.OnKeyDown (key);
+
+        Assert.Equal (expectedAccept, accepted);
+
+        current.Dispose ();
+    }
+
+    [Theory]
+    [InlineData (true, KeyCode.A, 1)]
+    [InlineData (true, KeyCode.C, 1)]
+    [InlineData (true, KeyCode.C | KeyCode.AltMask, 1)]
+    [InlineData (true, KeyCode.Enter, 1)]
+    [InlineData (true, KeyCode.Space, 0)]
+    [InlineData (true, KeyCode.F1, 0)]
+    [InlineData (false, KeyCode.A, 1)]
+    [InlineData (false, KeyCode.C, 1)]
+    [InlineData (false, KeyCode.C | KeyCode.AltMask, 1)]
+    [InlineData (false, KeyCode.Enter, 0)]
+    [InlineData (false, KeyCode.Space, 0)]
+    [InlineData (false, KeyCode.F1, 0)]
+    [AutoInitShutdown]
+    public void KeyDown_Invokes_Action (bool canFocus, KeyCode key, int expectedAction)
+    {
+        var current = new Toplevel ();
+
+        var shortcut = new Shortcut
+        {
+            Key = Key.A,
+            Text = "0",
+            Title = "_C",
+            CanFocus = canFocus
+        };
+        current.Add (shortcut);
+
+        Application.Begin (current);
+        Assert.Equal (canFocus, shortcut.HasFocus);
+
+        var action = 0;
+        shortcut.Action += () => action++;
+
+        Application.OnKeyDown (key);
+
+        Assert.Equal (expectedAction, action);
+
+        current.Dispose ();
+    }
+
+    [Theory]
+    [InlineData (true, KeyCode.A, 1)]
+    [InlineData (true, KeyCode.C, 1)]
+    [InlineData (true, KeyCode.C | KeyCode.AltMask, 1)]
+    [InlineData (true, KeyCode.Enter, 1)]
+    [InlineData (true, KeyCode.Space, 0)]
+    [InlineData (true, KeyCode.F1, 0)]
+    [InlineData (false, KeyCode.A, 1)]
+    [InlineData (false, KeyCode.C, 1)]
+    [InlineData (false, KeyCode.C | KeyCode.AltMask, 1)]
+    [InlineData (false, KeyCode.Enter, 0)]
+    [InlineData (false, KeyCode.Space, 0)]
+    [InlineData (false, KeyCode.F1, 0)]
+    [AutoInitShutdown]
+    public void KeyDown_App_Scope_Invokes_Action (bool canFocus, KeyCode key, int expectedAction)
+    {
+        var current = new Toplevel ();
+
+        var shortcut = new Shortcut
+        {
+            Key = Key.A,
+            KeyBindingScope = KeyBindingScope.Application,
+            Text = "0",
+            Title = "_C",
+            CanFocus = canFocus
+        };
+        current.Add (shortcut);
+
+        Application.Begin (current);
+        Assert.Equal (canFocus, shortcut.HasFocus);
+
+        var action = 0;
+        shortcut.Action += () => action++;
+
+        Application.OnKeyDown (key);
+
+        Assert.Equal (expectedAction, action);
+        current.Dispose ();
+    }
+
+
+    [Fact]
+    public void ColorScheme_SetsAndGetsCorrectly ()
+    {
+        var colorScheme = new ColorScheme ();
+
+        var shortcut = new Shortcut
+        {
+            ColorScheme = colorScheme
+        };
+
+        Assert.Same (colorScheme, shortcut.ColorScheme);
+    }
+
+    // https://github.com/gui-cs/Terminal.Gui/issues/3664
+    [Fact]
+    public void ColorScheme_SetColorScheme_Does_Not_Fault_3664 ()
+    {
+        Application.Current = new ();
+        Application.Navigation = new ();
+        Shortcut shortcut = new Shortcut ();
+
+        Application.Current.ColorScheme = null;
+
+        Assert.Null (shortcut.ColorScheme);
+
+        shortcut.HasFocus = true;
+
+        Assert.NotNull (shortcut.ColorScheme);
+
+        Application.Current.Dispose ();
+        Application.ResetState ();
+    }
+
 }

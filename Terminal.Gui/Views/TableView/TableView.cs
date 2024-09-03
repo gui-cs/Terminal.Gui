@@ -54,43 +54,19 @@ public class TableView : View
         // Things this view knows how to do
         AddCommand (
                     Command.Right,
-                    () =>
-                    {
-                        ChangeSelectionByOffset (1, 0, false);
-
-                        return true;
-                    }
-                   );
+                    () => ChangeSelectionByOffsetWithReturn (1, 0));
 
         AddCommand (
                     Command.Left,
-                    () =>
-                    {
-                        ChangeSelectionByOffset (-1, 0, false);
-
-                        return true;
-                    }
-                   );
+                    () => ChangeSelectionByOffsetWithReturn (-1, 0));
 
         AddCommand (
                     Command.LineUp,
-                    () =>
-                    {
-                        ChangeSelectionByOffset (0, -1, false);
-
-                        return true;
-                    }
-                   );
+                    () => ChangeSelectionByOffsetWithReturn (0, -1));
 
         AddCommand (
                     Command.LineDown,
-                    () =>
-                    {
-                        ChangeSelectionByOffset (0, 1, false);
-
-                        return true;
-                    }
-                   );
+                    () => ChangeSelectionByOffsetWithReturn (0, 1));
 
         AddCommand (
                     Command.PageUp,
@@ -266,6 +242,7 @@ public class TableView : View
                     Command.Accept,
                     () =>
                     {
+                        // BUGBUG: This should return false if the event is not handled
                         OnCellActivated (new CellActivatedEventArgs (Table, SelectedColumn, SelectedRow));
 
                         return true;
@@ -319,11 +296,15 @@ public class TableView : View
         {
             if (cellActivationKey != value)
             {
-                KeyBindings.Replace (cellActivationKey, value);
+                if (KeyBindings.TryGet (cellActivationKey, out _))
+                {
+                    KeyBindings.ReplaceKey (cellActivationKey, value);
+                }
+                else
+                {
+                    KeyBindings.Add (value, Command.Accept);
+                }
 
-                // of API user is mixing and matching old and new methods of keybinding then they may have lost
-                // the old binding (e.g. with ClearKeybindings) so KeyBindings.Replace alone will fail
-                KeyBindings.Add (value, Command.Accept);
                 cellActivationKey = value;
             }
         }
@@ -509,6 +490,41 @@ public class TableView : View
 
         return new Point (colHit.X, tableRow + headerHeight - RowOffset);
     }
+
+    /// <summary>
+    /// Private override of <see cref="ChangeSelectionByOffset"/> that returns true if the selection has
+    /// changed as a result of moving the selection. Used by key handling logic to determine whether e.g.
+    /// the cursor right resulted in a change or should be forwarded on to toggle logic handling.
+    /// </summary>
+    /// <param name="offsetX"></param>
+    /// <param name="offsetY"></param>
+    /// <returns></returns>
+    private bool ChangeSelectionByOffsetWithReturn (int offsetX, int offsetY)
+    {
+        var oldSelection = GetSelectionSnapshot ();
+        SetSelection (SelectedColumn + offsetX, SelectedRow + offsetY, false);
+        Update ();
+
+        return !SelectionIsSame (oldSelection);
+    }
+
+    private TableViewSelectionSnapshot GetSelectionSnapshot ()
+    {
+        return new (
+                    SelectedColumn,
+                    SelectedRow,
+                    MultiSelectedRegions.Select (s => s.Rectangle).ToArray ());
+    }
+
+    private bool SelectionIsSame (TableViewSelectionSnapshot oldSelection)
+    {
+        var newSelection = GetSelectionSnapshot ();
+
+        return oldSelection.SelectedColumn == newSelection.SelectedColumn
+               && oldSelection.SelectedRow == newSelection.SelectedRow
+               && oldSelection.multiSelection.SequenceEqual (newSelection.multiSelection);
+    }
+    private record TableViewSelectionSnapshot (int SelectedColumn, int SelectedRow, Rectangle [] multiSelection);
 
     /// <summary>
     ///     Moves the <see cref="SelectedRow"/> and <see cref="SelectedColumn"/> by the provided offsets. Optionally
@@ -787,7 +803,7 @@ public class TableView : View
     }
 
     ///<inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent me)
+    protected internal override bool OnMouseEvent (MouseEvent me)
     {
         if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
             && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
@@ -1438,13 +1454,13 @@ public class TableView : View
                     // is there enough space to meet the MinAcceptableWidth
                     availableHorizontalSpace - usedSpace >= colStyle.MinAcceptableWidth)
                 {
-                    // show column and use use whatever space is 
+                    // show column and use whatever space is
                     // left for rendering it
                     showColumn = true;
                     colWidth = availableHorizontalSpace - usedSpace;
                 }
 
-                // If its the only column we are able to render then
+                // If it's the only column we are able to render then
                 // accept it anyway (that must be one massively wide column!)
                 if (first)
                 {
@@ -1674,7 +1690,7 @@ public class TableView : View
                 }
                 else if (Style.ExpandLastColumn == false && columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c))
                 {
-                    // if the next console column is the lastcolumns end
+                    // if the next console column is the last column's end
                     rune = Glyphs.BottomTee;
                 }
             }
@@ -1748,7 +1764,7 @@ public class TableView : View
                     rune = Glyphs.URCorner;
                 }
 
-                // if the next console column is the lastcolumns end
+                // if the next console column is the last column's end
                 else if (Style.ExpandLastColumn == false && columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c))
                 {
                     rune = Glyphs.TopTee;
@@ -1841,7 +1857,7 @@ public class TableView : View
                     }
                 }
 
-                // if the next console column is the lastcolumns end
+                // if the next console column is the last column's end
                 else if (Style.ExpandLastColumn == false && columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c))
                 {
                     rune = Style.ShowVerticalCellLines ? Glyphs.Cross : Glyphs.BottomTee;

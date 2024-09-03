@@ -1,14 +1,14 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>Displays a group of labels each with a selected indicator. Only one of those can be selected at a given time.</summary>
-public class RadioGroup : View
+public class RadioGroup : View, IDesignable, IOrientation
 {
     private int _cursor;
     private List<(int pos, int length)> _horizontal;
     private int _horizontalSpace = 2;
-    private Orientation _orientation = Orientation.Vertical;
     private List<string> _radioLabels = [];
     private int _selected;
+    private readonly OrientationHelper _orientationHelper;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="RadioGroup"/> class.
@@ -30,9 +30,7 @@ public class RadioGroup : View
                             return false;
                         }
 
-                        MoveUpLeft ();
-
-                        return true;
+                        return MoveUpLeft ();
                     }
                    );
 
@@ -44,9 +42,7 @@ public class RadioGroup : View
                         {
                             return false;
                         }
-                        MoveDownRight ();
-
-                        return true;
+                        return MoveDownRight ();
                     }
                    );
 
@@ -58,6 +54,7 @@ public class RadioGroup : View
                         {
                             return false;
                         }
+
                         MoveHome ();
 
                         return true;
@@ -72,6 +69,7 @@ public class RadioGroup : View
                         {
                             return false;
                         }
+
                         MoveEnd ();
 
                         return true;
@@ -84,7 +82,7 @@ public class RadioGroup : View
                     {
                         SelectedItem = _cursor;
 
-                        return !OnAccept ();
+                        return OnAccept () is true or null;
                     }
                    );
 
@@ -93,15 +91,21 @@ public class RadioGroup : View
                     ctx =>
                     {
                         SetFocus ();
+
                         if (ctx.KeyBinding?.Context is { } && (int)ctx.KeyBinding?.Context! < _radioLabels.Count)
                         {
                             SelectedItem = (int)ctx.KeyBinding?.Context!;
 
-                            return !OnAccept();
+                            return OnAccept () is true or null;
                         }
 
                         return true;
                     });
+
+        _orientationHelper = new (this);
+        _orientationHelper.Orientation = Orientation.Vertical;
+        _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
+        _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
 
         SetupKeyBindings ();
 
@@ -142,15 +146,15 @@ public class RadioGroup : View
         int viewportX = e.MouseEvent.Position.X;
         int viewportY = e.MouseEvent.Position.Y;
 
-        int pos = _orientation == Orientation.Horizontal ? viewportX : viewportY;
+        int pos = Orientation == Orientation.Horizontal ? viewportX : viewportY;
 
-        int rCount = _orientation == Orientation.Horizontal
+        int rCount = Orientation == Orientation.Horizontal
                          ? _horizontal.Last ().pos + _horizontal.Last ().length
                          : _radioLabels.Count;
 
         if (pos < rCount)
         {
-            int c = _orientation == Orientation.Horizontal
+            int c = Orientation == Orientation.Horizontal
                         ? _horizontal.FindIndex (x => x.pos <= viewportX && x.pos + x.length - 2 >= viewportX)
                         : viewportY;
 
@@ -173,23 +177,13 @@ public class RadioGroup : View
         get => _horizontalSpace;
         set
         {
-            if (_horizontalSpace != value && _orientation == Orientation.Horizontal)
+            if (_horizontalSpace != value && Orientation == Orientation.Horizontal)
             {
                 _horizontalSpace = value;
                 UpdateTextFormatterText ();
                 SetContentSize ();
             }
         }
-    }
-
-    /// <summary>
-    ///     Gets or sets the <see cref="Orientation"/> for this <see cref="RadioGroup"/>. The default is
-    ///     <see cref="Orientation.Vertical"/>.
-    /// </summary>
-    public Orientation Orientation
-    {
-        get => _orientation;
-        set => OnOrientationChanged (value);
     }
 
     /// <summary>
@@ -226,32 +220,6 @@ public class RadioGroup : View
 
             SelectedItem = 0;
             SetContentSize ();
-        }
-    }
-
-    /// <inheritdoc/>
-    public override string Text
-    {
-        get
-        {
-            if (_radioLabels.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            // Return labels as a CSV string
-            return string.Join (",", _radioLabels);
-        }
-        set
-        {
-            if (string.IsNullOrEmpty (value))
-            {
-                RadioLabels = [];
-            }
-            else
-            {
-                RadioLabels = value.Split (',').Select (x => x.Trim ()).ToArray ();
-            }
         }
     }
 
@@ -304,7 +272,7 @@ public class RadioGroup : View
 
                     if (j == hotPos && i == _cursor)
                     {
-                        Application.Driver.SetAttribute (
+                        Application.Driver?.SetAttribute (
                                                          HasFocus
                                                              ? ColorScheme.HotFocus
                                                              : GetHotNormalColor ()
@@ -312,11 +280,11 @@ public class RadioGroup : View
                     }
                     else if (j == hotPos && i != _cursor)
                     {
-                        Application.Driver.SetAttribute (GetHotNormalColor ());
+                        Application.Driver?.SetAttribute (GetHotNormalColor ());
                     }
                     else if (HasFocus && i == _cursor)
                     {
-                        Application.Driver.SetAttribute (ColorScheme.Focus);
+                        Application.Driver?.SetAttribute (ColorScheme.Focus);
                     }
 
                     if (rune == HotKeySpecifier && j + 1 < rlRunes.Length)
@@ -326,7 +294,7 @@ public class RadioGroup : View
 
                         if (i == _cursor)
                         {
-                            Application.Driver.SetAttribute (
+                            Application.Driver?.SetAttribute (
                                                              HasFocus
                                                                  ? ColorScheme.HotFocus
                                                                  : GetHotNormalColor ()
@@ -334,11 +302,11 @@ public class RadioGroup : View
                         }
                         else if (i != _cursor)
                         {
-                            Application.Driver.SetAttribute (GetHotNormalColor ());
+                            Application.Driver?.SetAttribute (GetHotNormalColor ());
                         }
                     }
 
-                    Application.Driver.AddRune (rune);
+                    Application.Driver?.AddRune (rune);
                     Driver.SetAttribute (GetNormalColor ());
                 }
             }
@@ -349,43 +317,48 @@ public class RadioGroup : View
         }
     }
 
-    /// <summary>Called when the view orientation has changed. Invokes the <see cref="OrientationChanged"/> event.</summary>
-    /// <param name="newOrientation"></param>
-    /// <returns>True of the event was cancelled.</returns>
-    public virtual bool OnOrientationChanged (Orientation newOrientation)
+    /// <summary>
+    ///     Gets or sets the <see cref="Orientation"/> for this <see cref="RadioGroup"/>. The default is
+    ///     <see cref="Orientation.Vertical"/>.
+    /// </summary>
+    public Orientation Orientation
     {
-        var args = new OrientationEventArgs (newOrientation);
-        OrientationChanged?.Invoke (this, args);
-
-        if (!args.Cancel)
-        {
-            _orientation = newOrientation;
-            SetupKeyBindings ();
-            SetContentSize ();
-        }
-
-        return args.Cancel;
+        get => _orientationHelper.Orientation;
+        set => _orientationHelper.Orientation = value;
     }
+
+    #region IOrientation
+
+    /// <inheritdoc/>
+    public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
+
+    /// <inheritdoc/>
+    public event EventHandler<EventArgs<Orientation>> OrientationChanged;
+
+    /// <summary>Called when <see cref="Orientation"/> has changed.</summary>
+    /// <param name="newOrientation"></param>
+    public void OnOrientationChanged (Orientation newOrientation)
+    {
+        SetupKeyBindings ();
+        SetContentSize ();
+    }
+
+    #endregion IOrientation
 
     // TODO: This should be cancelable
     /// <summary>Called whenever the current selected item changes. Invokes the <see cref="SelectedItemChanged"/> event.</summary>
     /// <param name="selectedItem"></param>
     /// <param name="previousSelectedItem"></param>
     public virtual void OnSelectedItemChanged (int selectedItem, int previousSelectedItem)
-    { 
+    {
         if (_selected == selectedItem)
         {
             return;
         }
+
         _selected = selectedItem;
         SelectedItemChanged?.Invoke (this, new (selectedItem, previousSelectedItem));
     }
-
-    /// <summary>
-    ///     Fired when the view orientation has changed. Can be cancelled by setting
-    ///     <see cref="OrientationEventArgs.Cancel"/> to true.
-    /// </summary>
-    public event EventHandler<OrientationEventArgs> OrientationChanged;
 
     /// <inheritdoc/>
     public override Point? PositionCursor ()
@@ -400,7 +373,10 @@ public class RadioGroup : View
 
                 break;
             case Orientation.Horizontal:
-                x = _horizontal [_cursor].pos;
+                if (_horizontal.Count > 0)
+                {
+                    x = _horizontal [_cursor].pos;
+                }
 
                 break;
 
@@ -420,42 +396,41 @@ public class RadioGroup : View
     /// <summary>Invoked when the selected radio label has changed.</summary>
     public event EventHandler<SelectedItemChangedArgs> SelectedItemChanged;
 
-    private void MoveDownRight ()
+    private bool MoveDownRight ()
     {
         if (_cursor + 1 < _radioLabels.Count)
         {
             _cursor++;
             SetNeedsDisplay ();
+
+            return true;
         }
-        else if (_cursor > 0)
-        {
-            _cursor = 0;
-            SetNeedsDisplay ();
-        }
+
+        // Moving past should move focus to next view, not wrap
+        return false;
     }
 
     private void MoveEnd () { _cursor = Math.Max (_radioLabels.Count - 1, 0); }
     private void MoveHome () { _cursor = 0; }
 
-    private void MoveUpLeft ()
+    private bool MoveUpLeft ()
     {
         if (_cursor > 0)
         {
             _cursor--;
             SetNeedsDisplay ();
+
+            return true;
         }
-        else if (_radioLabels.Count - 1 > 0)
-        {
-            _cursor = _radioLabels.Count - 1;
-            SetNeedsDisplay ();
-        }
+        // Moving past should move focus to next view, not wrap
+        return false;
     }
 
     private void RadioGroup_LayoutStarted (object sender, EventArgs e) { SetContentSize (); }
 
     private void SetContentSize ()
     {
-        switch (_orientation)
+        switch (Orientation)
         {
             case Orientation.Vertical:
                 var width = 0;
@@ -486,5 +461,13 @@ public class RadioGroup : View
 
                 break;
         }
+    }
+
+    /// <inheritdoc/>
+    public bool EnableForDesign ()
+    {
+        RadioLabels = new [] { "Option _1", "Option _2", "Option _3" };
+
+        return true;
     }
 }

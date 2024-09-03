@@ -8,7 +8,7 @@ namespace UICatalog.Scenarios;
 /// </summary>
 public class AdornmentEditor : View
 {
-    private readonly ColorPicker _backgroundColorPicker = new ()
+    private readonly ColorPicker16 _backgroundColorPicker = new ()
     {
         Title = "_BG",
         BoxWidth = 1,
@@ -18,7 +18,7 @@ public class AdornmentEditor : View
         Enabled = false
     };
 
-    private readonly ColorPicker _foregroundColorPicker = new ()
+    private readonly ColorPicker16 _foregroundColorPicker = new ()
     {
         Title = "_FG",
         BoxWidth = 1,
@@ -78,10 +78,10 @@ public class AdornmentEditor : View
         AdornmentChanged?.Invoke (this, EventArgs.Empty);
     }
 
-    private Buttons.NumericUpDown<int> _topEdit;
-    private Buttons.NumericUpDown<int> _leftEdit;
-    private Buttons.NumericUpDown<int> _bottomEdit;
-    private Buttons.NumericUpDown<int> _rightEdit;
+    private NumericUpDown<int> _topEdit;
+    private NumericUpDown<int> _leftEdit;
+    private NumericUpDown<int> _bottomEdit;
+    private NumericUpDown<int> _rightEdit;
 
     public AdornmentEditor ()
     {
@@ -90,6 +90,9 @@ public class AdornmentEditor : View
 
         BorderStyle = LineStyle.Dashed;
         Initialized += AdornmentEditor_Initialized;
+
+        CanFocus = true;
+        TabStop = TabBehavior.TabStop;
     }
 
     private void AdornmentEditor_Initialized (object sender, EventArgs e)
@@ -100,6 +103,7 @@ public class AdornmentEditor : View
         _topEdit = new ()
         {
             X = Pos.Center (), Y = 0,
+            Format = "{0, 2}",
             Enabled = false
         };
 
@@ -108,7 +112,8 @@ public class AdornmentEditor : View
 
         _leftEdit = new ()
         {
-            X = Pos.Left (_topEdit) - Pos.Func (() => _topEdit.Digits) - 2, Y = Pos.Bottom (_topEdit),
+            X = Pos.Left (_topEdit) - Pos.Func (() => _topEdit.Text.Length) - 2, Y = Pos.Bottom (_topEdit),
+            Format = _topEdit.Format,
             Enabled = false
         };
 
@@ -118,6 +123,7 @@ public class AdornmentEditor : View
         _rightEdit = new ()
         {
             X = Pos.Right (_leftEdit) + 5, Y = Pos.Bottom (_topEdit),
+            Format = _topEdit.Format,
             Enabled = false
         };
 
@@ -127,6 +133,7 @@ public class AdornmentEditor : View
         _bottomEdit = new ()
         {
             X = Pos.Center (), Y = Pos.Bottom (_leftEdit),
+            Format = _topEdit.Format,
             Enabled = false
         };
 
@@ -186,7 +193,7 @@ public class AdornmentEditor : View
                };
     }
 
-    private void Top_ValueChanging (object sender, StateEventArgs<int> e)
+    private void Top_ValueChanging (object sender, CancelEventArgs<int> e)
     {
         if (e.NewValue < 0 || AdornmentToEdit is null)
         {
@@ -198,7 +205,7 @@ public class AdornmentEditor : View
         AdornmentToEdit.Thickness = new (AdornmentToEdit.Thickness.Left, e.NewValue, AdornmentToEdit.Thickness.Right, AdornmentToEdit.Thickness.Bottom);
     }
 
-    private void Left_ValueChanging (object sender, StateEventArgs<int> e)
+    private void Left_ValueChanging (object sender, CancelEventArgs<int> e)
     {
         if (e.NewValue < 0 || AdornmentToEdit is null)
         {
@@ -210,7 +217,7 @@ public class AdornmentEditor : View
         AdornmentToEdit.Thickness = new (e.NewValue, AdornmentToEdit.Thickness.Top, AdornmentToEdit.Thickness.Right, AdornmentToEdit.Thickness.Bottom);
     }
 
-    private void Right_ValueChanging (object sender, StateEventArgs<int> e)
+    private void Right_ValueChanging (object sender, CancelEventArgs<int> e)
     {
         if (e.NewValue < 0 || AdornmentToEdit is null)
         {
@@ -222,7 +229,7 @@ public class AdornmentEditor : View
         AdornmentToEdit.Thickness = new (AdornmentToEdit.Thickness.Left, AdornmentToEdit.Thickness.Top, e.NewValue, AdornmentToEdit.Thickness.Bottom);
     }
 
-    private void Bottom_ValueChanging (object sender, StateEventArgs<int> e)
+    private void Bottom_ValueChanging (object sender, CancelEventArgs<int> e)
     {
         if (e.NewValue < 0 || AdornmentToEdit is null)
         {

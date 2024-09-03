@@ -26,104 +26,110 @@ public class FileDialogExamples : Scenario
     private TextField _tbCancelButton;
     private TextField _tbOkButton;
 
-    public override void Setup ()
+    public override void Main ()
     {
+        Application.Init ();
         var y = 0;
         var x = 1;
+        var win = new Window { Title = GetQuitKeyAndName () };
 
-        _cbMustExist = new CheckBox { Checked = true, Y = y++, X = x, Text = "Must Exist" };
-        Win.Add (_cbMustExist);
+        _cbMustExist = new CheckBox { CheckedState = CheckState.Checked, Y = y++, X = x, Text = "Must Exist" };
+        win.Add (_cbMustExist);
 
-        _cbUseColors = new CheckBox { Checked = FileDialogStyle.DefaultUseColors, Y = y++, X = x, Text = "Use Colors" };
-        Win.Add (_cbUseColors);
+        _cbUseColors = new CheckBox { CheckedState = FileDialogStyle.DefaultUseColors ? CheckState.Checked : CheckState.UnChecked, Y = y++, X = x, Text = "Use Colors" };
+        win.Add (_cbUseColors);
 
-        _cbCaseSensitive = new CheckBox { Checked = false, Y = y++, X = x, Text = "Case Sensitive Search" };
-        Win.Add (_cbCaseSensitive);
+        _cbCaseSensitive = new CheckBox { CheckedState = CheckState.UnChecked, Y = y++, X = x, Text = "Case Sensitive Search" };
+        win.Add (_cbCaseSensitive);
 
-        _cbAllowMultipleSelection = new CheckBox { Checked = false, Y = y++, X = x, Text = "Multiple" };
-        Win.Add (_cbAllowMultipleSelection);
+        _cbAllowMultipleSelection = new CheckBox { CheckedState = CheckState.UnChecked, Y = y++, X = x, Text = "Multiple" };
+        win.Add (_cbAllowMultipleSelection);
 
-        _cbShowTreeBranchLines = new CheckBox { Checked = true, Y = y++, X = x, Text = "Tree Branch Lines" };
-        Win.Add (_cbShowTreeBranchLines);
+        _cbShowTreeBranchLines = new CheckBox { CheckedState = CheckState.Checked, Y = y++, X = x, Text = "Tree Branch Lines" };
+        win.Add (_cbShowTreeBranchLines);
 
-        _cbAlwaysTableShowHeaders = new CheckBox { Checked = true, Y = y++, X = x, Text = "Always Show Headers" };
-        Win.Add (_cbAlwaysTableShowHeaders);
+        _cbAlwaysTableShowHeaders = new CheckBox { CheckedState = CheckState.Checked, Y = y++, X = x, Text = "Always Show Headers" };
+        win.Add (_cbAlwaysTableShowHeaders);
 
-        _cbDrivesOnlyInTree = new CheckBox { Checked = false, Y = y++, X = x, Text = "Only Show Drives" };
-        Win.Add (_cbDrivesOnlyInTree);
+        _cbDrivesOnlyInTree = new CheckBox { CheckedState = CheckState.UnChecked, Y = y++, X = x, Text = "Only Show Drives" };
+        win.Add (_cbDrivesOnlyInTree);
 
         y = 0;
         x = 24;
 
-        Win.Add (
+        win.Add (
                  new LineView (Orientation.Vertical) { X = x++, Y = 1, Height = 4 }
                 );
-        Win.Add (new Label { X = x++, Y = y++, Text = "Caption" });
+        win.Add (new Label { X = x++, Y = y++, Text = "Caption" });
 
         _rgCaption = new RadioGroup { X = x, Y = y };
         _rgCaption.RadioLabels = new [] { "Ok", "Open", "Save" };
-        Win.Add (_rgCaption);
+        win.Add (_rgCaption);
 
         y = 0;
         x = 34;
 
-        Win.Add (
+        win.Add (
                  new LineView (Orientation.Vertical) { X = x++, Y = 1, Height = 4 }
                 );
-        Win.Add (new Label { X = x++, Y = y++, Text = "OpenMode" });
+        win.Add (new Label { X = x++, Y = y++, Text = "OpenMode" });
 
         _rgOpenMode = new RadioGroup { X = x, Y = y };
         _rgOpenMode.RadioLabels = new [] { "File", "Directory", "Mixed" };
-        Win.Add (_rgOpenMode);
+        win.Add (_rgOpenMode);
 
         y = 0;
         x = 48;
 
-        Win.Add (
+        win.Add (
                  new LineView (Orientation.Vertical) { X = x++, Y = 1, Height = 4 }
                 );
-        Win.Add (new Label { X = x++, Y = y++, Text = "Icons" });
+        win.Add (new Label { X = x++, Y = y++, Text = "Icons" });
 
         _rgIcons = new RadioGroup { X = x, Y = y };
         _rgIcons.RadioLabels = new [] { "None", "Unicode", "Nerd*" };
-        Win.Add (_rgIcons);
+        win.Add (_rgIcons);
 
-        Win.Add (new Label { Y = Pos.AnchorEnd (2), Text = "* Requires installing Nerd fonts" });
-        Win.Add (new Label { Y = Pos.AnchorEnd (1), Text = "  (see: https://github.com/devblackops/Terminal-Icons)" });
+        win.Add (new Label { Y = Pos.AnchorEnd (2), Text = "* Requires installing Nerd fonts" });
+        win.Add (new Label { Y = Pos.AnchorEnd (1), Text = "  (see: https://github.com/devblackops/Terminal-Icons)" });
 
         y = 5;
         x = 24;
 
-        Win.Add (
+        win.Add (
                  new LineView (Orientation.Vertical) { X = x++, Y = y + 1, Height = 4 }
                 );
-        Win.Add (new Label { X = x++, Y = y++, Text = "Allowed" });
+        win.Add (new Label { X = x++, Y = y++, Text = "Allowed" });
 
         _rgAllowedTypes = new RadioGroup { X = x, Y = y };
         _rgAllowedTypes.RadioLabels = new [] { "Any", "Csv (Recommended)", "Csv (Strict)" };
-        Win.Add (_rgAllowedTypes);
+        win.Add (_rgAllowedTypes);
 
         y = 5;
         x = 45;
 
-        Win.Add (
+        win.Add (
                  new LineView (Orientation.Vertical) { X = x++, Y = y + 1, Height = 4 }
                 );
-        Win.Add (new Label { X = x++, Y = y++, Text = "Buttons" });
+        win.Add (new Label { X = x++, Y = y++, Text = "Buttons" });
 
-        Win.Add (new Label { X = x, Y = y++, Text = "Ok Text:" });
+        win.Add (new Label { X = x, Y = y++, Text = "Ok Text:" });
         _tbOkButton = new TextField { X = x, Y = y++, Width = 12 };
-        Win.Add (_tbOkButton);
-        Win.Add (new Label { X = x, Y = y++, Text = "Cancel Text:" });
+        win.Add (_tbOkButton);
+        win.Add (new Label { X = x, Y = y++, Text = "Cancel Text:" });
         _tbCancelButton = new TextField { X = x, Y = y++, Width = 12 };
-        Win.Add (_tbCancelButton);
+        win.Add (_tbCancelButton);
         _cbFlipButtonOrder = new CheckBox { X = x, Y = y++, Text = "Flip Order" };
-        Win.Add (_cbFlipButtonOrder);
+        win.Add (_cbFlipButtonOrder);
 
         var btn = new Button { X = 1, Y = 9, Text = "Run Dialog" };
 
         SetupHandler (btn);
-        Win.Add (btn);
+        win.Add (btn);
+
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 
     private void ConfirmOverwrite (object sender, FilesSelectedEventArgs e)
@@ -145,8 +151,8 @@ public class FileDialogExamples : Scenario
             OpenMode = Enum.Parse<OpenMode> (
                                              _rgOpenMode.RadioLabels [_rgOpenMode.SelectedItem]
                                             ),
-            MustExist = _cbMustExist.Checked ?? false,
-            AllowsMultipleSelection = _cbAllowMultipleSelection.Checked ?? false
+            MustExist = _cbMustExist.CheckedState == CheckState.Checked,
+            AllowsMultipleSelection = _cbAllowMultipleSelection.CheckedState == CheckState.Checked
         };
 
         fd.Style.OkButtonText = _rgCaption.RadioLabels [_rgCaption.SelectedItem];
@@ -160,19 +166,19 @@ public class FileDialogExamples : Scenario
         fd.Style.IconProvider.UseUnicodeCharacters = _rgIcons.SelectedItem == 1;
         fd.Style.IconProvider.UseNerdIcons = _rgIcons.SelectedItem == 2;
 
-        if (_cbCaseSensitive.Checked ?? false)
+        if (_cbCaseSensitive.CheckedState == CheckState.Checked)
         {
             fd.SearchMatcher = new CaseSensitiveSearchMatcher ();
         }
 
-        fd.Style.UseColors = _cbUseColors.Checked ?? false;
+        fd.Style.UseColors = _cbUseColors.CheckedState == CheckState.Checked;
 
-        fd.Style.TreeStyle.ShowBranchLines = _cbShowTreeBranchLines.Checked ?? false;
-        fd.Style.TableStyle.AlwaysShowHeaders = _cbAlwaysTableShowHeaders.Checked ?? false;
+        fd.Style.TreeStyle.ShowBranchLines = _cbShowTreeBranchLines.CheckedState == CheckState.Checked;
+        fd.Style.TableStyle.AlwaysShowHeaders = _cbAlwaysTableShowHeaders.CheckedState == CheckState.Checked;
 
         IDirectoryInfoFactory dirInfoFactory = new FileSystem ().DirectoryInfo;
 
-        if (_cbDrivesOnlyInTree.Checked ?? false)
+        if (_cbDrivesOnlyInTree.CheckedState == CheckState.Checked)
         {
             fd.Style.TreeRootGetter = () => { return Environment.GetLogicalDrives ().ToDictionary (dirInfoFactory.New, k => k); };
         }
@@ -197,7 +203,7 @@ public class FileDialogExamples : Scenario
             fd.Style.CancelButtonText = _tbCancelButton.Text;
         }
 
-        if (_cbFlipButtonOrder.Checked ?? false)
+        if (_cbFlipButtonOrder.CheckedState == CheckState.Checked)
         {
             fd.Style.FlipOkCancelButtonLayoutOrder = true;
         }
@@ -219,7 +225,7 @@ public class FileDialogExamples : Scenario
                               "Ok"
                              );
         }
-        else if (_cbAllowMultipleSelection.Checked ?? false)
+        else if (_cbAllowMultipleSelection.CheckedState == CheckState.Checked)
         {
             MessageBox.Query (
                               "Chosen!",

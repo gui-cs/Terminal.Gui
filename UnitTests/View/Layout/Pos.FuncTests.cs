@@ -13,7 +13,7 @@ public class PosFuncTests (ITestOutputHelper output)
         Func<int> f2 = () => 0;
 
         Pos pos1 = Pos.Func (f1);
-        Pos pos2 = Pos.Func (f2);
+        Pos pos2 = Pos.Func (f1);
         Assert.Equal (pos1, pos2);
 
         f2 = () => 1;

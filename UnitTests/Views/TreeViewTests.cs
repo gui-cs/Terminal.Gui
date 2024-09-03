@@ -114,7 +114,7 @@ public class TreeViewTests
         tv.SelectAll ();
         tv.CursorVisibility = CursorVisibility.Default;
         Application.PositionCursor (top);
-        Application.Driver.GetCursorVisibility (out CursorVisibility visibility);
+        Application.Driver!.GetCursorVisibility (out CursorVisibility visibility);
         Assert.Equal (CursorVisibility.Default, tv.CursorVisibility);
         Assert.Equal (CursorVisibility.Default, visibility);
         top.Dispose ();
@@ -483,7 +483,11 @@ public class TreeViewTests
     public void ObjectActivationButton_SetToNull ()
     {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
+        Assert.Null (tree.SelectedObject);
 
+        Assert.True (tree.SetFocus ());
+        tree.SelectedObject = null;
+        Assert.Null (tree.SelectedObject);
 
         // disable activation
         tree.ObjectActivationButton = null;
@@ -499,6 +503,7 @@ public class TreeViewTests
                                 };
 
         Assert.False (called);
+
 
         // double click does nothing because we changed button to null
         tree.NewMouseEvent (new MouseEvent { Flags = MouseFlags.Button1DoubleClicked });
@@ -1344,7 +1349,7 @@ oot two
         Assert.False (accepted);
 
         return;
-        void OnAccept (object sender, CancelEventArgs e) { accepted = true; }
+        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
     }
 
 
@@ -1375,7 +1380,7 @@ oot two
             activated = true;
             selectedObject = e.ActivatedObject;
         }
-        void Accept (object sender, CancelEventArgs e) { accepted = true; }
+        void Accept (object sender, HandledEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -1404,10 +1409,10 @@ oot two
             selectedObject = e.ActivatedObject;
         }
 
-        void Accept (object sender, CancelEventArgs e)
+        void Accept (object sender, HandledEventArgs e)
         {
             accepted = true;
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 }

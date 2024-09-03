@@ -73,6 +73,7 @@ public class TabViewExample : Scenario
 
         _tabView = new()
         {
+            Title = "_Tab View",
             X = 0,
             Y = 1,
             Width = 60,
@@ -80,9 +81,9 @@ public class TabViewExample : Scenario
             BorderStyle = LineStyle.Single
         };
 
-        _tabView.AddTab (new() { DisplayText = "Tab1", View = new Label { Text = "hodor!" } }, false);
-        _tabView.AddTab (new() { DisplayText = "Tab2", View = new TextField { Text = "durdur" } }, false);
-        _tabView.AddTab (new() { DisplayText = "Interactive Tab", View = GetInteractiveTab () }, false);
+        _tabView.AddTab (new() { DisplayText = "Tab_1", View = new Label { Text = "hodor!" } }, false);
+        _tabView.AddTab (new() { DisplayText = "Tab_2", View = new TextField { Text = "durdur", Width = 10 } }, false);
+        _tabView.AddTab (new() { DisplayText = "_Interactive Tab", View = GetInteractiveTab () }, false);
         _tabView.AddTab (new() { DisplayText = "Big Text", View = GetBigTextFileTab () }, false);
 
         _tabView.AddTab (
@@ -132,42 +133,50 @@ public class TabViewExample : Scenario
 
         appWindow.Add (_tabView);
 
-        var frameRight = new FrameView
+        var frameRight = new View
         {
             X = Pos.Right (_tabView),
             Y = 1,
             Width = Dim.Fill (),
             Height = Dim.Fill (1),
-            Title = "About"
+            Title = "_About",
+            BorderStyle = LineStyle.Single,
+            TabStop = TabBehavior.TabStop,
+            CanFocus = true
         };
 
         frameRight.Add (
                         new TextView
                         {
-                            Text = "This demos the tabs control\nSwitch between tabs using cursor keys",
+                            Text = "This demos the tabs control\nSwitch between tabs using cursor keys.\nThis TextView has AllowsTab = false, so tab should nav too.",
                             Width = Dim.Fill (),
-                            Height = Dim.Fill ()
+                            Height = Dim.Fill (),
+                            AllowsTab = false,
                         }
                        );
 
         appWindow.Add (frameRight);
 
-        var frameBelow = new FrameView
+        var frameBelow = new View
         {
             X = 0,
             Y = Pos.Bottom (_tabView),
             Width = _tabView.Width,
             Height = Dim.Fill (1),
-            Title = "Bottom Frame"
+            Title = "B_ottom Frame",
+            BorderStyle = LineStyle.Single,
+            TabStop = TabBehavior.TabStop,
+            CanFocus = true
+
         };
 
         frameBelow.Add (
                         new TextView
                         {
                             Text =
-                                "This frame exists to check you can still tab here\nand that the tab control doesn't overspill it's bounds",
+                                "This frame exists to check that you can still tab here\nand that the tab control doesn't overspill it's bounds\nAllowsTab is true.",
                             Width = Dim.Fill (),
-                            Height = Dim.Fill ()
+                            Height = Dim.Fill (),
                         }
                        );
 
@@ -210,7 +219,11 @@ public class TabViewExample : Scenario
 
     private View GetInteractiveTab ()
     {
-        var interactiveTab = new View { Width = Dim.Fill (), Height = Dim.Fill () };
+        var interactiveTab = new View
+        {
+            Width = Dim.Fill (), Height = Dim.Fill (),
+            CanFocus = true
+        };
         var lblName = new Label { Text = "Name:" };
         interactiveTab.Add (lblName);
 

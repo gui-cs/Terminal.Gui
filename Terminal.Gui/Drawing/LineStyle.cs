@@ -1,7 +1,10 @@
 #nullable enable
+using System.Text.Json.Serialization;
+
 namespace Terminal.Gui;
 
 /// <summary>Defines the style of lines for a <see cref="LineCanvas"/>.</summary>
+[JsonConverter (typeof (JsonStringEnumConverter<LineStyle>))]
 public enum LineStyle
 {
     /// <summary>No border is drawn.</summary>
@@ -41,7 +44,7 @@ public enum LineStyle
     RoundedDotted
 
     // TODO: Support Ruler
-    ///// <summary> 
+    ///// <summary>
     ///// The border is drawn as a diagnostic ruler ("|123456789...").
     ///// </summary>
     //Ruler

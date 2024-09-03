@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Terminal.Gui;
 
 /// <summary>Control that hosts multiple sub views, presenting a single one at once.</summary>
@@ -25,34 +27,21 @@ public class TabView : View
     public TabView ()
     {
         CanFocus = true;
+        TabStop = TabBehavior.TabStop; // Because TabView has focusable subviews, it must be a TabGroup
         _tabsBar = new TabRowView (this);
-        _contentView = new View ();
-
+        _contentView = new View ()
+        {
+            //Id = "TabView._contentView",
+        };
         ApplyStyleChanges ();
 
         base.Add (_tabsBar);
         base.Add (_contentView);
 
         // Things this view knows how to do
-        AddCommand (
-                    Command.Left,
-                    () =>
-                    {
-                        SwitchTabBy (-1);
+        AddCommand (Command.Left, () => SwitchTabBy (-1));
 
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.Right,
-                    () =>
-                    {
-                        SwitchTabBy (1);
-
-                        return true;
-                    }
-                   );
+        AddCommand (Command.Right, () => SwitchTabBy (1));
 
         AddCommand (
                     Command.LeftHome,
@@ -71,31 +60,6 @@ public class TabView : View
                     {
                         TabScrollOffset = Tabs.Count - 1;
                         SelectedTab = Tabs.LastOrDefault ();
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.NextView,
-                    () =>
-                    {
-                        if (_contentView is { HasFocus: false })
-                        {
-                            _contentView.SetFocus ();
-
-                            return true;
-                        }
-
-                        return false;
-                    }
-                   );
-
-        AddCommand (
-                    Command.PreviousView,
-                    () =>
-                    {
-                        SuperView?.FocusPrev ();
 
                         return true;
                     }
@@ -128,8 +92,6 @@ public class TabView : View
         KeyBindings.Add (Key.CursorRight, Command.Right);
         KeyBindings.Add (Key.Home, Command.LeftHome);
         KeyBindings.Add (Key.End, Command.RightEnd);
-        KeyBindings.Add (Key.CursorDown, Command.NextView);
-        KeyBindings.Add (Key.CursorUp, Command.PreviousView);
         KeyBindings.Add (Key.PageDown, Command.PageDown);
         KeyBindings.Add (Key.PageUp, Command.PageUp);
     }
@@ -168,8 +130,11 @@ public class TabView : View
                 if (_selectedTab.View is { })
                 {
                     _contentView.Add (_selectedTab.View);
+                   // _contentView.Id = $"_contentView for {_selectedTab.DisplayText}";
                 }
             }
+
+            _contentView.CanFocus = _contentView.Subviews.Count (v => v.CanFocus) > 0;
 
             EnsureSelectedTabIsVisible ();
 
@@ -268,7 +233,7 @@ public class TabView : View
             int tabHeight = GetTabHeight (true);
 
             //move content down to make space for tabs
-            _contentView.Y = Pos.Bottom (_tabsBar);
+            _contentView.Y = Pos.Bottom (_tabsBar) ;
 
             // Fill client area leaving space at bottom for border
             _contentView.Height = Dim.Fill ();
@@ -373,11 +338,11 @@ public class TabView : View
     ///     left.  If no tab is currently selected then the first tab will become selected.
     /// </summary>
     /// <param name="amount"></param>
-    public void SwitchTabBy (int amount)
+    public bool SwitchTabBy (int amount)
     {
         if (Tabs.Count == 0)
         {
-            return;
+            return false;
         }
 
         // if there is only one tab anyway or nothing is selected
@@ -386,7 +351,7 @@ public class TabView : View
             SelectedTab = Tabs.ElementAt (0);
             SetNeedsDisplay ();
 
-            return;
+            return SelectedTab is { };
         }
 
         int currentIdx = Tabs.IndexOf (SelectedTab);
@@ -397,15 +362,22 @@ public class TabView : View
             SelectedTab = Tabs.ElementAt (0);
             SetNeedsDisplay ();
 
-            return;
+            return true;
         }
 
         int newIdx = Math.Max (0, Math.Min (currentIdx + amount, Tabs.Count - 1));
+
+        if (newIdx == currentIdx)
+        {
+            return false;
+        }
 
         SelectedTab = _tabs [newIdx];
         SetNeedsDisplay ();
 
         EnsureSelectedTabIsVisible ();
+
+        return true;
     }
 
     /// <summary>
@@ -433,7 +405,10 @@ public class TabView : View
     }
 
     /// <summary>Raises the <see cref="SelectedTabChanged"/> event.</summary>
-    protected virtual void OnSelectedTabChanged (Tab oldTab, Tab newTab) { SelectedTabChanged?.Invoke (this, new TabChangedEventArgs (oldTab, newTab)); }
+    protected virtual void OnSelectedTabChanged (Tab oldTab, Tab newTab)
+    {
+        SelectedTabChanged?.Invoke (this, new TabChangedEventArgs (oldTab, newTab));
+    }
 
     /// <summary>Returns which tabs to render at each x location.</summary>
     /// <returns></returns>
@@ -533,7 +508,10 @@ public class TabView : View
         return Style.ShowTopLine ? 3 : 2;
     }
 
-    private void Tab_MouseClick (object sender, MouseEventEventArgs e) { e.Handled = _tabsBar.NewMouseEvent (e.MouseEvent) == true; }
+    private void Tab_MouseClick (object sender, MouseEventEventArgs e)
+    {
+        e.Handled = _tabsBar.NewMouseEvent (e.MouseEvent) == true;
+    }
 
     private void UnSetCurrentTabs ()
     {
@@ -562,6 +540,7 @@ public class TabView : View
         public TabRowView (TabView host)
         {
             _host = host;
+            Id = "tabRowView";
 
             CanFocus = true;
             Height = 1; // BUGBUG: Views should avoid setting Height as doing so implies Frame.Size == GetContentSize ().
@@ -590,7 +569,7 @@ public class TabView : View
             Add (_rightScrollIndicator, _leftScrollIndicator);
         }
 
-        protected internal override bool OnMouseEvent  (MouseEvent me)
+        protected internal override bool OnMouseEvent (MouseEvent me)
         {
             Tab hit = me.View is Tab ? (Tab)me.View : null;
 
@@ -667,7 +646,7 @@ public class TabView : View
             RenderTabLine ();
 
             RenderUnderline ();
-            Driver.SetAttribute (GetNormalColor ());
+            Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
         }
 
         public override void OnDrawContentComplete (Rectangle viewport)
@@ -1296,7 +1275,7 @@ public class TabView : View
                 {
                     if (_host.Focused == this)
                     {
-                        // if focus is the tab bar ourself then show that they can switch tabs
+                        // if focus is the tab bar itself then show that they can switch tabs
                         prevAttr = ColorScheme.HotFocus;
                     }
                     else
@@ -1342,7 +1321,7 @@ public class TabView : View
                 _leftScrollIndicator.Visible = true;
 
                 // Ensures this is clicked instead of the first tab
-                BringSubviewToFront (_leftScrollIndicator);
+                MoveSubviewToEnd (_leftScrollIndicator);
                 _leftScrollIndicator.Draw ();
             }
             else
@@ -1360,7 +1339,7 @@ public class TabView : View
                 _rightScrollIndicator.Visible = true;
 
                 // Ensures this is clicked instead of the last tab if under this
-                BringSubviewToFront (_rightScrollIndicator);
+                MoveSubviewToStart (_rightScrollIndicator);
                 _rightScrollIndicator.Draw ();
             }
             else

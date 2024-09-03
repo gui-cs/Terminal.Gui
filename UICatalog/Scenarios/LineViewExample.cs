@@ -6,14 +6,14 @@ namespace UICatalog.Scenarios;
 [ScenarioMetadata ("Line View", "Demonstrates drawing lines using the LineView control.")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("LineView")]
-[ScenarioCategory ("Borders")]
+[ScenarioCategory ("Adornments")]
 public class LineViewExample : Scenario
 {
     public override void Main ()
     {
         Application.Init ();
         // Setup - Create a top-level application window and configure it.
-        Toplevel appWindow = new ();
+        Toplevel top = new ();
 
         var menu = new MenuBar
         {
@@ -22,8 +22,9 @@ public class LineViewExample : Scenario
                 new ("_File", new MenuItem [] { new ("_Quit", "", () => Quit ()) })
             ]
         };
-        appWindow.Add (menu);
+        top.Add (menu);
 
+        var appWindow = new Window ();
         appWindow.Add (new Label { Y = 1, Text = "Regular Line" });
 
         // creates a horizontal line
@@ -78,11 +79,12 @@ public class LineViewExample : Scenario
                                            new (Application.QuitKey, "Quit", Quit)
                                        }
                                       );
-        appWindow.Add (statusBar);
+        top.Add (statusBar);
+        top.Add (appWindow);
 
         // Run - Start the application.
-        Application.Run (appWindow);
-        appWindow.Dispose ();
+        Application.Run (top);
+        top.Dispose ();
 
         // Shutdown - Calling Application.Shutdown is required.
         Application.Shutdown ();

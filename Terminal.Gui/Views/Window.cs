@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Terminal.Gui;
+﻿namespace Terminal.Gui;
 
 /// <summary>
 ///     A <see cref="Toplevel"/> <see cref="View"/> with <see cref="View.BorderStyle"/> set to
@@ -14,14 +12,25 @@ namespace Terminal.Gui;
 /// </remarks>
 public class Window : Toplevel
 {
+
+    /// <summary>
+    /// Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
+    /// </summary>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
+
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="Window"/> class.
     /// </summary>
     public Window ()
     {
         CanFocus = true;
+        TabStop = TabBehavior.TabGroup;
+        Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped;
         ColorScheme = Colors.ColorSchemes ["Base"]; // TODO: make this a theme property
         BorderStyle = DefaultBorderStyle;
+        ShadowStyle = DefaultShadow;
 
         // This enables the default button to be activated by the Enter key.
         AddCommand (
@@ -64,6 +73,5 @@ public class Window : Toplevel
     ///     s.
     /// </remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter))]
     public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
 }

@@ -4,6 +4,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Runtime.Versioning;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -49,6 +50,7 @@ namespace Terminal.Gui;
 ///         Lowest Precedence.
 ///     </para>
 /// </summary>
+[ComponentGuarantees (ComponentGuaranteesOptions.None)]
 public static class ConfigurationManager
 {
     /// <summary>
@@ -104,8 +106,12 @@ public static class ConfigurationManager
         },
 
         // Enables Key to be "Ctrl+Q" vs "Ctrl\u002BQ"
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        TypeInfoResolver = SourceGenerationContext.Default
     };
+
+    [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+    internal static readonly SourceGenerationContext _serializerContext = new (_serializerOptions);
 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     internal static StringBuilder _jsonErrors = new ();
@@ -120,7 +126,7 @@ public static class ConfigurationManager
     /// </remarks>
     private static SettingsScope? _settings;
 
-    /// <summary>Name of the running application. By default this property is set to the application's assembly name.</summary>
+    /// <summary>Name of the running application. By default, this property is set to the application's assembly name.</summary>
     public static string AppName { get; set; } = Assembly.GetEntryAssembly ()?.FullName?.Split (',') [0]?.Trim ()!;
 
     /// <summary>Application-specific configuration settings scope.</summary>
@@ -148,6 +154,8 @@ public static class ConfigurationManager
     /// </summary>
     public static SettingsScope? Settings
     {
+        [RequiresUnreferencedCode ("AOT")]
+        [RequiresDynamicCode ("AOT")]
         get
         {
             if (_settings is null)
@@ -179,6 +187,8 @@ public static class ConfigurationManager
     public static event EventHandler<ConfigurationManagerEventArgs>? Applied;
 
     /// <summary>Applies the configuration settings to the running <see cref="Application"/> instance.</summary>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     public static void Apply ()
     {
         var settings = false;
@@ -220,7 +230,7 @@ public static class ConfigurationManager
         var emptyScope = new SettingsScope ();
         emptyScope.Clear ();
 
-        return JsonSerializer.Serialize (emptyScope, _serializerOptions);
+        return JsonSerializer.Serialize (emptyScope, typeof (SettingsScope), _serializerContext);
     }
 
     /// <summary>
@@ -233,6 +243,8 @@ public static class ConfigurationManager
     ///     If <see langword="true"/> the state of <see cref="ConfigurationManager"/> will be reset to the
     ///     defaults.
     /// </param>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     public static void Load (bool reset = false)
     {
         Debug.WriteLine ("ConfigurationManager.Load()");
@@ -320,6 +332,8 @@ public static class ConfigurationManager
     ///     <see langword="true"/>.
     /// </summary>
     /// <remarks></remarks>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     public static void Reset ()
     {
         Debug.WriteLine (@"ConfigurationManager.Reset()");
@@ -473,6 +487,8 @@ public static class ConfigurationManager
     ///         make sure you copy the Theme definitions from the existing <c>Terminal.Gui.Resources.config.json</c> file.
     ///     </para>
     /// </remarks>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     internal static void GetHardCodedDefaults ()
     {
         if (_allConfigProperties is null)
@@ -494,6 +510,7 @@ public static class ConfigurationManager
     ///     Initializes the internal state of ConfigurationManager. Nominally called once as part of application startup
     ///     to initialize global state. Also called from some Unit Tests to ensure correctness (e.g. Reset()).
     /// </summary>
+    [RequiresUnreferencedCode ("AOT")]
     internal static void Initialize ()
     {
         _allConfigProperties = new ();
@@ -583,16 +600,20 @@ public static class ConfigurationManager
 
     /// <summary>Creates a JSON document with the configuration specified.</summary>
     /// <returns></returns>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     internal static string ToJson ()
     {
         //Debug.WriteLine ("ConfigurationManager.ToJson()");
 
-        return JsonSerializer.Serialize (Settings!, _serializerOptions);
+        return JsonSerializer.Serialize (Settings!, typeof (SettingsScope), _serializerContext);
     }
 
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     internal static Stream ToStream ()
     {
-        string json = JsonSerializer.Serialize (Settings!, _serializerOptions);
+        string json = JsonSerializer.Serialize (Settings!, typeof (SettingsScope), _serializerContext);
 
         // turn it into a stream
         var stream = new MemoryStream ();

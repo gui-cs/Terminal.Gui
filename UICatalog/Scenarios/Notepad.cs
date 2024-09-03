@@ -11,7 +11,7 @@ namespace UICatalog.Scenarios;
 public class Notepad : Scenario
 {
     private TabView _focusedTabView;
-    public Shortcut LenShortcut { get; private set; } 
+    public Shortcut LenShortcut { get; private set; }
     private int _numNewTabs = 1;
     private TabView _tabView;
 
@@ -84,7 +84,7 @@ public class Notepad : Scenario
 
         _focusedTabView = _tabView;
         _tabView.SelectedTabChanged += TabView_SelectedTabChanged;
-        _tabView.Enter += (s, e) => _focusedTabView = _tabView;
+        _tabView.HasFocusChanging += (s, e) => _focusedTabView = _tabView;
 
         top.Ready += (s, e) =>
                      {
@@ -241,7 +241,7 @@ public class Notepad : Scenario
 
         tv.TabClicked += TabView_TabClicked;
         tv.SelectedTabChanged += TabView_SelectedTabChanged;
-        tv.Enter += (s, e) => _focusedTabView = tv;
+        tv.HasFocusChanging += (s, e) => _focusedTabView = tv;
 
         return tv;
     }
@@ -309,9 +309,8 @@ public class Notepad : Scenario
         tab.CloneTo (newTabView);
         newTile.ContentView.Add (newTabView);
 
-        newTabView.EnsureFocus ();
-        newTabView.FocusFirst ();
-        newTabView.FocusNext ();
+        newTabView.FocusDeepest (NavigationDirection.Forward, null);
+        newTabView.AdvanceFocus (NavigationDirection.Forward, null);
     }
 
     private void SplitDown (TabView sender, OpenedFile tab) { Split (1, Orientation.Horizontal, sender, tab); }
@@ -363,9 +362,9 @@ public class Notepad : Scenario
 
         var screen = ((View)sender).ViewportToScreen (e.MouseEvent.Position);
 
-        var contextMenu = new ContextMenu { Position = screen, MenuItems = items };
+        var contextMenu = new ContextMenu { Position = screen };
 
-        contextMenu.Show ();
+        contextMenu.Show (items);
         e.MouseEvent.Handled = true;
     }
 

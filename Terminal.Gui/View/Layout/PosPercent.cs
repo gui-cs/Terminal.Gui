@@ -10,19 +10,13 @@ namespace Terminal.Gui;
 ///         methods on the <see cref="Pos"/> class to create <see cref="Pos"/> objects instead.
 ///     </para>
 /// </remarks>
-/// <param name="percent"></param>
-public class PosPercent (int percent) : Pos
+/// <param name="Percent"></param>
+public record PosPercent (int Percent) : Pos
 {
     /// <summary>
     ///     Gets the percentage of the width or height of the SuperView.
     /// </summary>
-    public new int Percent { get; } = percent;
-
-    /// <inheritdoc/>
-    public override bool Equals (object? other) { return other is PosPercent i && i.Percent == Percent; }
-
-    /// <inheritdoc/>
-    public override int GetHashCode () { return Percent.GetHashCode (); }
+    public new int Percent { get; } = Percent;
 
     /// <inheritdoc/>
     public override string ToString () { return $"Percent({Percent})"; }

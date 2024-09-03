@@ -36,6 +36,7 @@ public class ExpanderButton : Button
         Height = 1;
         NoDecorations = true;
         NoPadding = true;
+        ShadowStyle = ShadowStyle.None;
 
         AddCommand (Command.HotKey, Toggle);
         AddCommand (Command.ToggleExpandCollapse, Toggle);
@@ -73,7 +74,7 @@ public class ExpanderButton : Button
     /// <returns>True of the event was cancelled.</returns>
     protected virtual bool OnOrientationChanging (Orientation newOrientation)
     {
-        var args = new OrientationEventArgs (newOrientation);
+        var args = new CancelEventArgs<Orientation> (in _orientation, ref newOrientation);
         OrientationChanging?.Invoke (this, args);
 
         if (!args.Cancel)
@@ -95,8 +96,6 @@ public class ExpanderButton : Button
                 ExpandedGlyph = new ('\u21d2'); // ⇒
             }
 
-            Text = $"{(Collapsed ? CollapsedGlyph : ExpandedGlyph)}";
-
             ExpandOrCollapse (Collapsed);
         }
 
@@ -104,10 +103,9 @@ public class ExpanderButton : Button
     }
 
     /// <summary>
-    ///     Fired when the orientation has changed. Can be cancelled by setting
-    ///     <see cref="OrientationEventArgs.Cancel"/> to true.
+    ///     Fired when the orientation has changed. Can be cancelled.
     /// </summary>
-    public event EventHandler<OrientationEventArgs> OrientationChanging;
+    public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
 
     /// <summary>
     ///     The glyph to display when the view is collapsed.
@@ -132,15 +130,16 @@ public class ExpanderButton : Button
 
     /// <summary>Called when the orientation is changing. Invokes the <see cref="OrientationChanging"/> event.</summary>
     /// <param name="newOrientation"></param>
+    /// <param name="newValue"></param>
     /// <returns>True of the event was cancelled.</returns>
     protected virtual bool OnCollapsedChanging (bool newValue)
     {
-        StateEventArgs<bool> args = new (Collapsed, newValue);
+        CancelEventArgs<bool> args = new (ref _collapsed, ref newValue);
         CollapsedChanging?.Invoke (this, args);
 
         if (!args.Cancel)
         {
-            _collapsed = newValue;
+            _collapsed = args.NewValue;
 
             ExpandOrCollapse (_collapsed);
 
@@ -155,9 +154,6 @@ public class ExpanderButton : Button
                 subview.Visible = !Collapsed;
                 subview.Enabled = !Collapsed;
             }
-
-            // BUGBUG: This should not be needed. There's some bug in the layout system that doesn't update the layout.
-            superView.SuperView?.LayoutSubviews ();
         }
 
         return args.Cancel;
@@ -167,7 +163,7 @@ public class ExpanderButton : Button
     ///     Fired when the orientation has changed. Can be cancelled by setting
     ///     <see cref="OrientationEventArgs.Cancel"/> to true.
     /// </summary>
-    public event EventHandler<StateEventArgs<bool>> CollapsedChanging;
+    public event EventHandler<CancelEventArgs<bool>> CollapsedChanging;
 
     /// <summary>
     ///     Collapses or Expands the view.
@@ -184,6 +180,8 @@ public class ExpanderButton : Button
 
     private void ExpandOrCollapse (bool collapse)
     {
+        Text = $"{(Collapsed ? CollapsedGlyph : ExpandedGlyph)}";
+
         View superView = SuperView;
         if (superView is Adornment adornment)
         {

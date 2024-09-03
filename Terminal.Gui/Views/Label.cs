@@ -28,12 +28,15 @@ public class Label : View
 
     private void Label_MouseClick (object sender, MouseEventEventArgs e)
     {
-        e.Handled = InvokeCommand (Command.HotKey) == true;
+        if (!CanFocus)
+        {
+            e.Handled = InvokeCommand (Command.HotKey) == true;
+        }
     }
 
-    private void Label_TitleChanged (object sender, StateEventArgs<string> e)
+    private void Label_TitleChanged (object sender, EventArgs<string> e)
     {
-        base.Text = e.NewValue;
+        base.Text = e.CurrentValue;
         TextFormatter.HotKeySpecifier = HotKeySpecifier;
     }
 
@@ -51,9 +54,9 @@ public class Label : View
         set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value;
     }
 
-    private new bool? FocusNext ()
+    private bool? FocusNext ()
     {
-        var me = SuperView?.Subviews.IndexOf (this) ?? -1;
+        int me = SuperView?.Subviews.IndexOf (this) ?? -1;
         if (me != -1 && me < SuperView?.Subviews.Count - 1)
         {
             SuperView?.Subviews [me + 1].SetFocus ();

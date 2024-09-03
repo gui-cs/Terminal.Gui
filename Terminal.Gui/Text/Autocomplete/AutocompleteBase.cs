@@ -36,17 +36,14 @@ public abstract class AutocompleteBase : IAutocomplete
     /// <inheritdoc/>
     public abstract ColorScheme ColorScheme { get; set; }
 
-    // TODO: Update to use Key instead of KeyCode
     /// <inheritdoc/>
-    public virtual KeyCode SelectionKey { get; set; } = KeyCode.Enter;
+    public virtual Key SelectionKey { get; set; } = Key.Enter;
 
-    // TODO: Update to use Key instead of KeyCode
     /// <inheritdoc/>
-    public virtual KeyCode CloseKey { get; set; } = KeyCode.Esc;
+    public virtual Key CloseKey { get; set; } = Key.Esc;
 
-    // TODO: Update to use Key instead of KeyCode
     /// <inheritdoc/>
-    public virtual KeyCode Reopen { get; set; } = (KeyCode)Key.Space.WithCtrl.WithAlt;
+    public virtual Key Reopen { get; set; } = Key.Space.WithCtrl.WithAlt;
 
     /// <inheritdoc/>
     public virtual AutocompleteContext Context { get; set; }

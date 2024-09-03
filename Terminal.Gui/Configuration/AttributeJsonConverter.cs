@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
-/// <summary>Json converter fro the <see cref="Attribute"/> class.</summary>
+/// <summary>Json converter from the <see cref="Attribute"/> class.</summary>
 internal class AttributeJsonConverter : JsonConverter<Attribute>
 {
     private static AttributeJsonConverter _instance;
@@ -57,11 +57,11 @@ internal class AttributeJsonConverter : JsonConverter<Attribute>
             switch (propertyName?.ToLower ())
             {
                 case "foreground":
-                    foreground = JsonSerializer.Deserialize<Color> (color, options);
+                    foreground = JsonSerializer.Deserialize (color, _serializerContext.Color);
 
                     break;
                 case "background":
-                    background = JsonSerializer.Deserialize<Color> (color, options);
+                    background = JsonSerializer.Deserialize (color, _serializerContext.Color);
 
                     break;
 
