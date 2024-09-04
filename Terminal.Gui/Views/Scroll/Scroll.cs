@@ -128,15 +128,15 @@ public class Scroll : View
         int location = Orientation == Orientation.Vertical ? mouseEvent.Position.Y : mouseEvent.Position.X;
         int barSize = BarSize;
 
-        (int topLeft, int bottomRight) sliderPos = _orientation == Orientation.Vertical
-                                                       ? new (_slider.Frame.Y, _slider.Frame.Bottom - 1)
-                                                       : new (_slider.Frame.X, _slider.Frame.Right - 1);
+        (int start, int end) sliderPos = _orientation == Orientation.Vertical
+                                             ? new (_slider.Frame.Y, _slider.Frame.Bottom - 1)
+                                             : new (_slider.Frame.X, _slider.Frame.Right - 1);
 
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed) && location < sliderPos.topLeft)
+        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed) && location < sliderPos.start)
         {
             Position = Math.Max (Position - barSize, 0);
         }
-        else if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed) && location > sliderPos.bottomRight)
+        else if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed) && location > sliderPos.end)
         {
             Position = Math.Min (Position + barSize, Size - barSize);
         }
