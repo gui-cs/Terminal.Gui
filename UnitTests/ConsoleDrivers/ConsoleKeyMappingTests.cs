@@ -1,3 +1,5 @@
+#nullable enable
+
 using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
 
 namespace Terminal.Gui.ConsoleDrivers;
@@ -479,93 +481,107 @@ public class ConsoleKeyMappingTests
         Assert.Equal (scanCode, expectedScanCode);
     }
 
+    // TODO: Separate this test into tests of the individual methods it calls.
     [Theory]
-    [InlineData ('a', 'A', KeyCode.A | KeyCode.ShiftMask)]
-    [InlineData ('z', 'Z', KeyCode.Z | KeyCode.ShiftMask)]
-    [InlineData ('á', 'Á', (KeyCode)'Á' | KeyCode.ShiftMask)]
-    [InlineData ('à', 'À', (KeyCode)'À' | KeyCode.ShiftMask)]
-    [InlineData ('ý', 'Ý', (KeyCode)'Ý' | KeyCode.ShiftMask)]
-    [InlineData ('1', '!', (KeyCode)'!' | KeyCode.ShiftMask)]
-    [InlineData ('2', '"', (KeyCode)'"' | KeyCode.ShiftMask)]
-    [InlineData ('3', '#', (KeyCode)'#' | KeyCode.ShiftMask)]
-    [InlineData ('4', '$', (KeyCode)'$' | KeyCode.ShiftMask)]
-    [InlineData ('5', '%', (KeyCode)'%' | KeyCode.ShiftMask)]
-    [InlineData ('6', '&', (KeyCode)'&' | KeyCode.ShiftMask)]
-    [InlineData ('7', '/', (KeyCode)'/' | KeyCode.ShiftMask)]
-    [InlineData ('8', '(', (KeyCode)'(' | KeyCode.ShiftMask)]
-    [InlineData ('9', ')', (KeyCode)')' | KeyCode.ShiftMask)]
-    [InlineData ('0', '=', (KeyCode)'=' | KeyCode.ShiftMask)]
-    [InlineData ('\\', '|', (KeyCode)'|' | KeyCode.ShiftMask)]
-    [InlineData ('\'', '?', (KeyCode)'?' | KeyCode.ShiftMask)]
-    [InlineData ('«', '»', (KeyCode)'»' | KeyCode.ShiftMask)]
-    [InlineData ('+', '*', (KeyCode)'*' | KeyCode.ShiftMask)]
-    [InlineData ('´', '`', (KeyCode)'`' | KeyCode.ShiftMask)]
-    [InlineData ('º', 'ª', (KeyCode)'ª' | KeyCode.ShiftMask)]
-    [InlineData ('~', '^', (KeyCode)'^' | KeyCode.ShiftMask)]
-    [InlineData ('<', '>', (KeyCode)'>' | KeyCode.ShiftMask)]
-    [InlineData (',', ';', (KeyCode)';' | KeyCode.ShiftMask)]
-    [InlineData ('.', ':', (KeyCode)':' | KeyCode.ShiftMask)]
-    [InlineData ('-', '_', (KeyCode)'_' | KeyCode.ShiftMask)]
+    [MemberData (nameof (ShiftedTestTuples))]
     public void GetKeyChar_Shifted_Char_From_UnShifted_Char (
         char unicodeChar,
         char expectedKeyChar,
-        KeyCode excpectedKeyCode
+        KeyCode expectedKeyCode
     )
     {
         ConsoleModifiers modifiers = GetModifiers (true, false, false);
-        uint keyChar = GetKeyChar (unicodeChar, modifiers);
+        uint keyChar = GetKeyValueUInt32 (unicodeChar, modifiers);
         Assert.Equal (keyChar, expectedKeyChar);
 
-        var keyCode = (KeyCode)keyChar;
-        keyCode = MapToKeyCodeModifiers (modifiers, keyCode);
-
-        Assert.Equal (keyCode, excpectedKeyCode);
-    }
-
-    [Theory]
-    [InlineData ('A', 'a', (KeyCode)'a')]
-    [InlineData ('Z', 'z', (KeyCode)'z')]
-    [InlineData ('Á', 'á', (KeyCode)'á')]
-    [InlineData ('À', 'à', (KeyCode)'à')]
-    [InlineData ('Ý', 'ý', (KeyCode)'ý')]
-    [InlineData ('!', '1', KeyCode.D1)]
-    [InlineData ('"', '2', KeyCode.D2)]
-    [InlineData ('#', '3', KeyCode.D3)]
-    [InlineData ('$', '4', KeyCode.D4)]
-    [InlineData ('%', '5', KeyCode.D5)]
-    [InlineData ('&', '6', KeyCode.D6)]
-    [InlineData ('/', '7', KeyCode.D7)]
-    [InlineData ('(', '8', KeyCode.D8)]
-    [InlineData (')', '9', KeyCode.D9)]
-    [InlineData ('=', '0', KeyCode.D0)]
-    [InlineData ('|', '\\', (KeyCode)'\\')]
-    [InlineData ('?', '\'', (KeyCode)'\'')]
-    [InlineData ('»', '«', (KeyCode)'«')]
-    [InlineData ('*', '+', (KeyCode)'+')]
-    [InlineData ('`', '´', (KeyCode)'´')]
-    [InlineData ('ª', 'º', (KeyCode)'º')]
-    [InlineData ('^', '~', (KeyCode)'~')]
-    [InlineData ('>', '<', (KeyCode)'<')]
-    [InlineData (';', ',', (KeyCode)',')]
-    [InlineData (':', '.', (KeyCode)'.')]
-    [InlineData ('_', '-', (KeyCode)'-')]
-    public void GetKeyChar_UnShifted_Char_From_Shifted_Char (
-        char unicodeChar,
-        char expectedKeyChar,
-        KeyCode excpectedKeyCode
-    )
-    {
-        ConsoleModifiers modifiers = GetModifiers (false, false, false);
-        uint keyChar = GetKeyChar (unicodeChar, modifiers);
-        Assert.Equal (keyChar, expectedKeyChar);
-
-        var keyCode = (KeyCode)keyChar;
+        KeyCode keyCode = (KeyCode)keyChar;
         keyCode = MapToKeyCodeModifiers (modifiers, keyCode);
 
         Assert.Equal (keyCode, expectedKeyCode);
     }
 
-    private static uint GetKeyChar (uint keyValue, ConsoleModifiers modifiers)
+    // TODO: Separate this test into tests of the individual methods it calls.
+    [Theory]
+    [MemberData (nameof (UnShiftedTestTuples))]
+    public void GetKeyChar_UnShifted_Char_From_Shifted_Char (
+        char unicodeChar,
+        char expectedKeyChar,
+        KeyCode expectedKeyCode
+    )
+    {
+        ConsoleModifiers modifiers = GetModifiers (false, false, false);
+        uint keyValue = GetKeyValueUInt32 (unicodeChar, modifiers);
+        Assert.Equal (keyValue, expectedKeyChar);
+
+        KeyCode keyCode = (KeyCode)keyValue;
+        keyCode = MapToKeyCodeModifiers (modifiers, keyCode);
+
+        Assert.Equal (keyCode, expectedKeyCode);
+    }
+
+    public static TheoryData<char, char, KeyCode> UnShiftedTestTuples =>
+        new ()
+        {
+            { 'A', 'a', (KeyCode)'a' },
+            { 'Z', 'z', (KeyCode)'z' },
+            { 'Á', 'á', (KeyCode)'á' },
+            { 'À', 'à', (KeyCode)'à' },
+            { 'Ý', 'ý', (KeyCode)'ý' },
+            { '!', '1', KeyCode.D1 },
+            { '"', '2', KeyCode.D2 },
+            { '#', '3', KeyCode.D3 },
+            { '$', '4', KeyCode.D4 },
+            { '%', '5', KeyCode.D5 },
+            { '&', '6', KeyCode.D6 },
+            { '/', '7', KeyCode.D7 },
+            { '(', '8', KeyCode.D8 },
+            { ')', '9', KeyCode.D9 },
+            { '=', '0', KeyCode.D0 },
+            { '|', '\\', (KeyCode)'\\' },
+            { '?', '\'', (KeyCode)'\'' },
+            { '»', '«', (KeyCode)'«' },
+            { '*', '+', (KeyCode)'+' },
+            { '`', '´', (KeyCode)'´' },
+            { 'ª', 'º', (KeyCode)'º' },
+            { '^', '~', (KeyCode)'~' },
+            { '>', '<', (KeyCode)'<' },
+            { ';', ',', (KeyCode)',' },
+            { ':', '.', (KeyCode)'.' },
+            { '_', '-', (KeyCode)'-' }
+        };
+
+    public static TheoryData<char, char, KeyCode> ShiftedTestTuples =>
+        new ()
+        {
+            { 'a', 'A', KeyCode.A | KeyCode.ShiftMask },
+            { 'z', 'Z', KeyCode.Z | KeyCode.ShiftMask },
+            { 'á', 'Á', (KeyCode)'Á' | KeyCode.ShiftMask },
+            { 'à', 'À', (KeyCode)'À' | KeyCode.ShiftMask },
+            { 'ý', 'Ý', (KeyCode)'Ý' | KeyCode.ShiftMask },
+            { '1', '!', (KeyCode)'!' | KeyCode.ShiftMask },
+            { '2', '"', (KeyCode)'"' | KeyCode.ShiftMask },
+            { '3', '#', (KeyCode)'#' | KeyCode.ShiftMask },
+            { '4', '$', (KeyCode)'$' | KeyCode.ShiftMask },
+            { '5', '%', (KeyCode)'%' | KeyCode.ShiftMask },
+            { '6', '&', (KeyCode)'&' | KeyCode.ShiftMask },
+            { '7', '/', (KeyCode)'/' | KeyCode.ShiftMask },
+            { '8', '(', (KeyCode)'(' | KeyCode.ShiftMask },
+            { '9', ')', (KeyCode)')' | KeyCode.ShiftMask },
+            { '0', '=', (KeyCode)'=' | KeyCode.ShiftMask },
+            { '\\', '|', (KeyCode)'|' | KeyCode.ShiftMask },
+            { '\'', '?', (KeyCode)'?' | KeyCode.ShiftMask },
+            { '«', '»', (KeyCode)'»' | KeyCode.ShiftMask },
+            { '+', '*', (KeyCode)'*' | KeyCode.ShiftMask },
+            { '´', '`', (KeyCode)'`' | KeyCode.ShiftMask },
+            { 'º', 'ª', (KeyCode)'ª' | KeyCode.ShiftMask },
+            { '~', '^', (KeyCode)'^' | KeyCode.ShiftMask },
+            { '<', '>', (KeyCode)'>' | KeyCode.ShiftMask },
+            { ',', ';', (KeyCode)';' | KeyCode.ShiftMask },
+            { '.', ':', (KeyCode)':' | KeyCode.ShiftMask },
+            { '-', '_', (KeyCode)'_' | KeyCode.ShiftMask },
+        };
+
+    private static uint GetKeyValueUInt32 (uint keyValue, ConsoleModifiers modifiers)
     {
         if (modifiers == ConsoleModifiers.Shift && keyValue - 32 is >= 'A' and <= 'Z')
         {
