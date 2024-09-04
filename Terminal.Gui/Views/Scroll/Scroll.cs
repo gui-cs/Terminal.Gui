@@ -68,10 +68,10 @@ public class Scroll : View
                 return;
             }
 
-            if (SupView is { IsInitialized: false })
+            if (SuperViewAsScrollBar is { IsInitialized: false })
             {
                 // Ensures a more exactly calculation
-                SetRelativeLayout (SupView.Frame.Size);
+                SetRelativeLayout (SuperViewAsScrollBar.Frame.Size);
             }
 
             int barSize = BarSize;
@@ -185,7 +185,7 @@ public class Scroll : View
 
     internal void AdjustScroll ()
     {
-        if (SupView is { })
+        if (SuperViewAsScrollBar is { })
         {
             X = Orientation == Orientation.Vertical ? 0 : 1;
             Y = Orientation == Orientation.Vertical ? 1 : 0;
@@ -205,7 +205,7 @@ public class Scroll : View
         AdjustScroll ();
     }
 
-    internal ScrollBar? SupView => SuperView as ScrollBar;
+    internal ScrollBar? SuperViewAsScrollBar => SuperView as ScrollBar;
 
     private int BarSize => Orientation == Orientation.Vertical ? Viewport.Height : Viewport.Width;
 
