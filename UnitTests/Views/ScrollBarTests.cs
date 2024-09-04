@@ -231,6 +231,37 @@ public class ScrollBarTests
         Assert.True (scrollBar.AutoHide);
     }
 
+    [Fact]
+    [AutoInitShutdown]
+    public void KeepContentInAllViewport_True_False ()
+    {
+        var view = new View { Width = Dim.Fill (), Height = Dim.Fill () };
+        view.Padding.Thickness = new (0, 0, 2, 0);
+        view.SetContentSize (new (view.Viewport.Width, 30));
+        var scrollBar = new ScrollBar { Width = 2, Height = Dim.Fill (), Size = view.GetContentSize ().Height };
+        scrollBar.PositionChanged += (_, e) => view.Viewport = view.Viewport with { Y = e.CurrentValue };
+        view.Padding.Add (scrollBar);
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
+
+        Assert.True (scrollBar.KeepContentInAllViewport);
+        Assert.Equal (80, view.Padding.Viewport.Width);
+        Assert.Equal (25, view.Padding.Viewport.Height);
+        Assert.Equal (2, scrollBar.Viewport.Width);
+        Assert.Equal (25, scrollBar.Viewport.Height);
+        Assert.Equal (30, scrollBar.Size);
+
+        scrollBar.KeepContentInAllViewport = false;
+        scrollBar.Position = 50;
+        Assert.Equal (scrollBar.Position, scrollBar.Size - 1);
+        Assert.Equal (scrollBar.Position, view.Viewport.Y);
+        Assert.Equal (29, scrollBar.Position);
+        Assert.Equal (29, view.Viewport.Y);
+
+        top.Dispose ();
+    }
+
     [Theory]
     [AutoInitShutdown]
     [InlineData (
@@ -848,9 +879,9 @@ public class ScrollBarTests
     }
 
     [Theory]
-    [InlineData (Orientation.Vertical, 20, 10)]
-    [InlineData (Orientation.Vertical, 40, 30)]
-    public void Position_Cannot_Be_Negative_Nor_Greater_Than_Size_Minus_Frame_Length (Orientation orientation, int size, int expectedPos)
+    [InlineData (Orientation.Vertical, 20, 12, 10)]
+    [InlineData (Orientation.Vertical, 40, 32, 30)]
+    public void Position_Cannot_Be_Negative_Nor_Greater_Than_Size_Minus_Frame_Length (Orientation orientation, int size, int expectedPos1, int expectedPos2)
     {
         var scrollBar = new ScrollBar { Orientation = orientation, Height = 10, Size = size };
         Assert.Equal (0, scrollBar.Position);
@@ -859,10 +890,10 @@ public class ScrollBarTests
         Assert.Equal (0, scrollBar.Position);
 
         scrollBar.Position = size;
-        Assert.Equal (0, scrollBar.Position);
+        Assert.Equal (expectedPos1, scrollBar.Position);
 
-        scrollBar.Position = expectedPos;
-        Assert.Equal (expectedPos, scrollBar.Position);
+        scrollBar.Position = expectedPos2;
+        Assert.Equal (expectedPos2, scrollBar.Position);
     }
 
     [Fact]

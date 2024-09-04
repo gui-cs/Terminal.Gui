@@ -33,6 +33,7 @@ public class Scroll : View
     private Orientation _orientation;
     private int _position;
     private int _size;
+    private bool _keepContentInAllViewport = true;
 
     /// <inheritdoc/>
     public override void EndInit ()
@@ -40,6 +41,37 @@ public class Scroll : View
         base.EndInit ();
 
         AdjustScroll ();
+    }
+
+    /// <summary>Get or sets if the view-port is kept in all visible area of this <see cref="Scroll"/></summary>
+    public bool KeepContentInAllViewport
+    {
+        get => _keepContentInAllViewport;
+        set
+        {
+            if (_keepContentInAllViewport != value)
+            {
+                _keepContentInAllViewport = value;
+                var pos = 0;
+
+                if (value && Orientation == Orientation.Horizontal && _position + SuperViewAsScrollBar!.Viewport.Width > Size)
+                {
+                    pos = Size - SuperViewAsScrollBar.Viewport.Width;
+                }
+
+                if (value && Orientation == Orientation.Vertical && _position + SuperViewAsScrollBar!.Viewport.Height > Size)
+                {
+                    pos = _size - SuperViewAsScrollBar.Viewport.Height;
+                }
+
+                if (pos != 0)
+                {
+                    Position = pos;
+                    SetNeedsDisplay ();
+                    AdjustScroll ();
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -74,21 +106,21 @@ public class Scroll : View
                 SetRelativeLayout (SuperViewAsScrollBar.Frame.Size);
             }
 
-            int barSize = BarSize;
+            int pos = SetPosition (value);
 
-            if (value + barSize > Size)
+            if (pos == _position)
             {
                 return;
             }
 
-            CancelEventArgs<int> args = OnPositionChanging (_position, value);
+            CancelEventArgs<int> args = OnPositionChanging (_position, pos);
 
             if (args.Cancel)
             {
                 return;
             }
 
-            _position = value;
+            _position = pos;
 
             AdjustScroll ();
 
@@ -204,6 +236,18 @@ public class Scroll : View
     internal ScrollBar? SuperViewAsScrollBar => SuperView as ScrollBar;
 
     private int BarSize => Orientation == Orientation.Vertical ? Viewport.Height : Viewport.Width;
+
+    private int SetPosition (int position)
+    {
+        int barSize = BarSize;
+
+        if (position + barSize > Size)
+        {
+            return KeepContentInAllViewport ? Math.Max (Size - barSize, 0) : Math.Max (Size - 1, 0);
+        }
+
+        return position;
+    }
 
     private void SetScrollText ()
     {

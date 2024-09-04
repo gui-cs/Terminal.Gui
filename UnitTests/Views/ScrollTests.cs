@@ -190,6 +190,38 @@ public class ScrollTests
         Assert.Equal (Orientation.Vertical, scroll.Orientation);
         Assert.Equal (0, scroll.Size);
         Assert.Equal (0, scroll.Position);
+        Assert.True (scroll.KeepContentInAllViewport);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void KeepContentInAllViewport_True_False ()
+    {
+        var view = new View { Width = Dim.Fill (), Height = Dim.Fill () };
+        view.Padding.Thickness = new (0, 0, 2, 0);
+        view.SetContentSize (new (view.Viewport.Width, 30));
+        var scroll = new Scroll { Width = 2, Height = Dim.Fill (), Size = view.GetContentSize ().Height };
+        scroll.PositionChanged += (_, e) => view.Viewport = view.Viewport with { Y = e.CurrentValue };
+        view.Padding.Add (scroll);
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
+
+        Assert.True (scroll.KeepContentInAllViewport);
+        Assert.Equal (80, view.Padding.Viewport.Width);
+        Assert.Equal (25, view.Padding.Viewport.Height);
+        Assert.Equal (2, scroll.Viewport.Width);
+        Assert.Equal (25, scroll.Viewport.Height);
+        Assert.Equal (30, scroll.Size);
+
+        scroll.KeepContentInAllViewport = false;
+        scroll.Position = 50;
+        Assert.Equal (scroll.Position, scroll.Size - 1);
+        Assert.Equal (scroll.Position, view.Viewport.Y);
+        Assert.Equal (29, scroll.Position);
+        Assert.Equal (29, view.Viewport.Y);
+
+        top.Dispose ();
     }
 
     [Theory]
@@ -759,7 +791,7 @@ public class ScrollTests
         Assert.Equal (0, scroll.Position);
 
         scroll.Position = size;
-        Assert.Equal (0, scroll.Position);
+        Assert.Equal (expectedPos, scroll.Position);
 
         scroll.Position = expectedPos;
         Assert.Equal (expectedPos, scroll.Position);

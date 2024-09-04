@@ -38,7 +38,10 @@ public class ScrollBar : View
     private bool _autoHide = true;
     private bool _showScrollIndicator = true;
 
-    /// <summary>Gets or sets whether <see cref="View.Visible"/> will be set to <see langword="false"/> if the dimension of the scroll bar is greater than or equal to <see cref="Size"/>.</summary>
+    /// <summary>
+    ///     Gets or sets whether <see cref="View.Visible"/> will be set to <see langword="false"/> if the dimension of the
+    ///     scroll bar is greater than or equal to <see cref="Size"/>.
+    /// </summary>
     public bool AutoHide
     {
         get => _autoHide;
@@ -50,6 +53,13 @@ public class ScrollBar : View
                 AdjustAll ();
             }
         }
+    }
+
+    /// <summary>Get or sets if the view-port is kept in all visible area of this <see cref="ScrollBar"/></summary>
+    public bool KeepContentInAllViewport
+    {
+        get => _scroll.KeepContentInAllViewport;
+        set => _scroll.KeepContentInAllViewport = value;
     }
 
     /// <summary>Gets or sets if a scrollbar is vertical or horizontal.</summary>
