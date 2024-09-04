@@ -168,7 +168,7 @@ public class ScrollBar : View
 
         if (barSize == 0 || barSize >= Size)
         {
-            if (ShowScrollIndicator)
+            if (Visible)
             {
                 Visible = false;
                 SetNeedsDisplay ();
