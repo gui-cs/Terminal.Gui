@@ -182,9 +182,17 @@ public class ScrollDemo : Scenario
                                             }
                                         };
 
+        var ckbKeepContentInAllViewport = new CheckBox
+        {
+            Y = Pos.Bottom (scrollPosition), Text = "KeepContentInAllViewport",
+            CheckedState = scroll.KeepContentInAllViewport ? CheckState.Checked : CheckState.UnChecked
+        };
+        ckbKeepContentInAllViewport.CheckedStateChanging += (s, e) => scroll.KeepContentInAllViewport = e.NewValue == CheckState.Checked;
+        view.Add (ckbKeepContentInAllViewport);
+
         var lblSizeChanged = new Label
         {
-            Y = Pos.Bottom (lblPosition) + 1
+            Y = Pos.Bottom (ckbKeepContentInAllViewport) + 1
         };
         view.Add (lblSizeChanged);
 

@@ -89,8 +89,13 @@ internal class ScrollSlider : View
         {
             if (SuperViewAsScroll.Orientation == Orientation.Vertical)
             {
-                Y = Frame.Y + offset < 0 ? 0 :
-                    Frame.Y + offset + Frame.Height > barSize ? Math.Max (barSize - Frame.Height, 0) : Frame.Y + offset;
+                Y = Frame.Y + offset < 0
+                        ? 0
+                        :
+                        Frame.Y + offset + Frame.Height > barSize + (SuperViewAsScroll.KeepContentInAllViewport ? 0 : barSize)
+                            ?
+                            Math.Max (barSize - Frame.Height, 0)
+                            : Frame.Y + offset;
 
                 SuperViewAsScroll.Position = GetPositionFromSliderLocation (Frame.Y);
             }
@@ -157,7 +162,7 @@ internal class ScrollSlider : View
         if ((SuperViewAsScroll.Orientation == Orientation.Vertical && location + Frame.Height >= scrollSize)
             || (SuperViewAsScroll.Orientation == Orientation.Horizontal && location + Frame.Width >= scrollSize))
         {
-            return SuperViewAsScroll.Size - scrollSize;
+            return SuperViewAsScroll.Size - scrollSize + (SuperViewAsScroll.KeepContentInAllViewport ? 0 : scrollSize);
         }
 
         return (int)Math.Min (Math.Round ((double)(location * SuperViewAsScroll.Size + location) / scrollSize), SuperViewAsScroll.Size - scrollSize);

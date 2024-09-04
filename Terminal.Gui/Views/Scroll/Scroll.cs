@@ -54,22 +54,27 @@ public class Scroll : View
                 _keepContentInAllViewport = value;
                 var pos = 0;
 
-                if (value && Orientation == Orientation.Horizontal && _position + SuperViewAsScrollBar!.Viewport.Width > Size)
+                if (value
+                    && Orientation == Orientation.Horizontal
+                    && _position + (SuperViewAsScrollBar is { } ? SuperViewAsScrollBar.Viewport.Width : Viewport.Width) > Size)
                 {
-                    pos = Size - SuperViewAsScrollBar.Viewport.Width;
+                    pos = Size - (SuperViewAsScrollBar is { } ? SuperViewAsScrollBar.Viewport.Width : Viewport.Width);
                 }
 
-                if (value && Orientation == Orientation.Vertical && _position + SuperViewAsScrollBar!.Viewport.Height > Size)
+                if (value
+                    && Orientation == Orientation.Vertical
+                    && _position + (SuperViewAsScrollBar is { } ? SuperViewAsScrollBar.Viewport.Height : Viewport.Height) > Size)
                 {
-                    pos = _size - SuperViewAsScrollBar.Viewport.Height;
+                    pos = _size - (SuperViewAsScrollBar is { } ? SuperViewAsScrollBar.Viewport.Height : Viewport.Height);
                 }
 
                 if (pos != 0)
                 {
                     Position = pos;
-                    SetNeedsDisplay ();
-                    AdjustScroll ();
                 }
+
+                SetNeedsDisplay ();
+                AdjustScroll ();
             }
         }
     }
@@ -175,12 +180,12 @@ public class Scroll : View
         }
         else if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed) && location > sliderPos.end)
         {
-            Position = Math.Min (Position + barSize, Size - barSize);
+            Position = Math.Min (Position + barSize, Size - barSize + (KeepContentInAllViewport ? 0 : barSize));
         }
         else if ((mouseEvent.Flags == MouseFlags.WheeledDown && Orientation == Orientation.Vertical)
                  || (mouseEvent.Flags == MouseFlags.WheeledRight && Orientation == Orientation.Horizontal))
         {
-            Position = Math.Min (Position + 1, Size - barSize);
+            Position = Math.Min (Position + 1, Size - barSize + (KeepContentInAllViewport ? 0 : barSize));
         }
         else if ((mouseEvent.Flags == MouseFlags.WheeledUp && Orientation == Orientation.Vertical)
                  || (mouseEvent.Flags == MouseFlags.WheeledLeft && Orientation == Orientation.Horizontal))
