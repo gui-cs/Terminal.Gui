@@ -562,6 +562,65 @@ public class ConsoleKeyMappingTests
         var keyCode = (KeyCode)keyChar;
         keyCode = MapToKeyCodeModifiers (modifiers, keyCode);
 
-        Assert.Equal (keyCode, excpectedKeyCode);
+        Assert.Equal (keyCode, expectedKeyCode);
     }
+
+    private static uint GetKeyChar (uint keyValue, ConsoleModifiers modifiers)
+    {
+        if (modifiers == ConsoleModifiers.Shift && keyValue - 32 is >= 'A' and <= 'Z')
+        {
+            return keyValue - 32;
+        }
+
+        if (modifiers == ConsoleModifiers.None && keyValue is >= 'A' and <= 'Z')
+        {
+            return keyValue + 32;
+        }
+
+        if (modifiers == ConsoleModifiers.Shift && keyValue - 32 is >= 'À' and <= 'Ý')
+        {
+            (ConsoleModifiers.Shift, '7')                                                  => '/',
+            (ConsoleModifiers.Shift, >= '1' and <= '9' and not '7')                        => keyValue - 16,
+            (ConsoleModifiers.Shift, _) when keyValue - 32 is >= 'A' and <= 'Z'            => keyValue - 32,
+            (ConsoleModifiers.Shift, _) when keyValue - 32 is >= 'À' and <= 'Ý'            => keyValue - 32,
+            (ConsoleModifiers.Shift, '0')                                                  => '=',
+            (ConsoleModifiers.Shift, '\'')                                                 => '?',
+            (ConsoleModifiers.Shift, '«')                                                  => '»',
+            (ConsoleModifiers.Shift, '\\')                                                 => '|',
+            (ConsoleModifiers.Shift, '+')                                                  => '*',
+            (ConsoleModifiers.Shift, '´')                                                  => '`',
+            (ConsoleModifiers.Shift, 'º')                                                  => 'ª',
+            (ConsoleModifiers.Shift, '~')                                                  => '^',
+            (ConsoleModifiers.Shift, '<')                                                  => '>',
+            (ConsoleModifiers.Shift, ',')                                                  => ';',
+            (ConsoleModifiers.Shift, '.')                                                  => ':',
+            (ConsoleModifiers.Shift, '-')                                                  => '_',
+            (ConsoleModifiers.None, '/')                                                   => '7',
+            (ConsoleModifiers.None, _) when keyValue + 16 is >= '1' and <= '9' and not '7' => keyValue + 16,
+            (ConsoleModifiers.None, >= 'A' and <= 'Z')                                     => keyValue + 32,
+            (ConsoleModifiers.None, >= 'À' and <= 'Ý')                                     => keyValue + 32,
+            (ConsoleModifiers.None, '=')                                                   => '0',
+            (ConsoleModifiers.None, '?')                                                   => '\'',
+            (ConsoleModifiers.None, '»')                                                   => '«',
+            (ConsoleModifiers.None, '|')                                                   => '\\',
+            (ConsoleModifiers.None, '*')                                                   => '+',
+            (ConsoleModifiers.None, '`')                                                   => '´',
+            (ConsoleModifiers.None, 'ª')                                                   => 'º',
+            (ConsoleModifiers.None, '^')                                                   => '~',
+            (ConsoleModifiers.None, '>')                                                   => '<',
+            (ConsoleModifiers.None, ';')                                                   => ',',
+            (ConsoleModifiers.None, ':')                                                   => '.',
+            (ConsoleModifiers.None, '_')                                                   => '-',
+            (_, _)                                                                         => keyValue
+        };
+
+    /// <summary>Gets <see cref="ConsoleModifiers"/> from <see cref="bool"/> modifiers.</summary>
+    /// <param name="shift">The shift key.</param>
+    /// <param name="alt">The alt key.</param>
+    /// <param name="control">The control key.</param>
+    /// <returns>The console modifiers.</returns>
+    private static ConsoleModifiers GetModifiers (bool shift, bool alt, bool control) =>
+        (shift ? ConsoleModifiers.Shift : 0)
+      | (alt ? ConsoleModifiers.Alt : 0)
+      | (control ? ConsoleModifiers.Control : 0);
 }
