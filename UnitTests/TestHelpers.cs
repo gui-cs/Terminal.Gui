@@ -787,6 +787,17 @@ internal partial class TestHelpers
             yield return [nameof (CursesDriver), new CursesDriver ()];
         }
     }
+
+    public static IEnumerable<object []> DriversAndTrueColorSupport
+    {
+        get
+        {
+            yield return [new FakeDriver (), false];
+            yield return [new NetDriver (), true];
+            yield return [new WindowsDriver (), true];
+            yield return [new CursesDriver (), false];
+        }
+    }
 #nullable restore
 }
 

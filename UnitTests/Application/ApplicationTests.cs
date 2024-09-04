@@ -396,26 +396,19 @@ public class ApplicationTests
     }
 
     [Theory]
-    [MemberData (nameof (TestHelpers.GetDriverNames), [""], MemberType = typeof (TestHelpers))]
+    [MemberData (nameof (TestHelpers.GetDriversOnly), [""], MemberType = typeof (TestHelpers))]
     [Trait ("Category", "Console Drivers")]
     [Trait ("Category", "Lifecycle")]
     [Trait ("Category", "Events")]
-    public void Init_Shutdown_Raise_InitializedChanged (string driverName)
+    public void Init_Shutdown_Raise_InitializedChanged<T> (T driver) where T : ConsoleDriver
     {
         bool initialized = false;
         bool shutdown = false;
 
         Application.InitializedChanged += OnApplicationOnInitializedChanged;
 
-        Application.Init (driverName: driverName);
-        Assert.True (initialized);
-        Assert.False (shutdown);
-
-        Application.Shutdown ();
-        Assert.True (initialized);
-        Assert.True (shutdown);
-
-        Application.InitializedChanged -= OnApplicationOnInitializedChanged;
+        Assert.Raises<EventArgs<bool>> (SubscribeToEvent, UnsubscribeFromEvent, () => Application.Init (driver));
+        Assert.Raises<EventArgs<bool>> (SubscribeToEvent, UnsubscribeFromEvent, Application.Shutdown);
 
         return;
 
@@ -430,6 +423,12 @@ public class ApplicationTests
                 shutdown = true;
             }
         }
+
+        return;
+
+        static void SubscribeToEvent (EventHandler<EventArgs<bool>> eventUnderTest) { Application.InitializedChanged += eventUnderTest; }
+
+        static void UnsubscribeFromEvent (EventHandler<EventArgs<bool>> eventUnderTest) { Application.InitializedChanged -= eventUnderTest; }
     }
 
     [Fact]
