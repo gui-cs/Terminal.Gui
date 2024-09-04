@@ -183,7 +183,7 @@ public class ScrollBarDemo : Scenario
                                         };
 
         var ckbAutoHideScrollBar = new CheckBox { Y = Pos.Bottom (scrollPosition), Text = "AutoHideScrollBar" };
-        ckbAutoHideScrollBar.CheckedStateChanging += (s, e) => scrollBar.AutoHideScrollBar = e.NewValue == CheckState.Checked;
+        ckbAutoHideScrollBar.CheckedStateChanging += (s, e) => scrollBar.AutoHide = e.NewValue == CheckState.Checked;
         view.Add (ckbAutoHideScrollBar);
 
         var ckbShowScrollIndicator = new CheckBox { X = Pos.Right (ckbAutoHideScrollBar) + 1, Y = Pos.Bottom (scrollPosition), Text = "ShowScrollIndicator" };

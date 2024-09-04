@@ -491,7 +491,7 @@ internal class CharMap : View
                                vScrollBar.Size = GetContentSize ().Height;
                                vScrollBar.Position = Viewport.Y;
                            };
-    };
+    }
 
     private void Handle_MouseEvent (object sender, MouseEventEventArgs e)
     {

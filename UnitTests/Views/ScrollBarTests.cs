@@ -32,7 +32,7 @@ public class ScrollBarTests
         Assert.True (scrollBar.ShowScrollIndicator);
         Assert.True (scrollBar.Visible);
 
-        scrollBar.AutoHideScrollBar = false;
+        scrollBar.AutoHide = false;
         Assert.True (scrollBar.ShowScrollIndicator);
         Assert.True (scrollBar.Visible);
 
@@ -228,7 +228,7 @@ public class ScrollBarTests
         Assert.Equal ("Auto(Content,Absolute(1),)", scrollBar.Width!.ToString ());
         Assert.Equal ("Auto(Content,Absolute(1),)", scrollBar.Height!.ToString ());
         Assert.True (scrollBar.ShowScrollIndicator);
-        Assert.True (scrollBar.AutoHideScrollBar);
+        Assert.True (scrollBar.AutoHide);
     }
 
     [Theory]
@@ -989,11 +989,11 @@ public class ScrollBarTests
         Assert.True (scrollBar.Visible);
 
         scrollBar.ShowScrollIndicator = false;
-        Assert.True (scrollBar.AutoHideScrollBar);
+        Assert.True (scrollBar.AutoHide);
         Assert.True (scrollBar.ShowScrollIndicator);
         Assert.True (scrollBar.Visible);
 
-        scrollBar.AutoHideScrollBar = false;
+        scrollBar.AutoHide = false;
         Assert.False (scrollBar.ShowScrollIndicator);
         Assert.False (scrollBar.Visible);
 
