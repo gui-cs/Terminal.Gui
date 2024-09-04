@@ -572,95 +572,25 @@ public class ApplicationTests
     [AutoInitShutdown]
     public void SetCurrentAsTop_Run_A_Not_Modal_Toplevel_Make_It_The_Current_Application_Top ()
     {
-        Toplevel top = new Toplevel ();
+        using Toplevel top = new (), t1 = new (), t2 = new (), t3 = new ();
 
-        Toplevel t1 = new Toplevel ();
-        Toplevel t2 = new Toplevel ();
-        Toplevel t3 = new Toplevel ();
-
-        // Don't use Dialog here as it has more layout logic. Use Window instead.
-        Dialog d = new Dialog ();
-        Toplevel t4 = new Toplevel ();
+        // TODO: Don't use Dialog here as it has more layout logic. Use Window instead.
+        using Dialog d = new ();
+        using Toplevel t4 = new ();
 
         // t1, t2, t3, d, t4
         int iterations = 5;
 
-        t1.Ready += (s, e) =>
-                    {
-                        Assert.Equal (t1, Application.Top);
-                        Application.Run (t2);
-                    };
-
-        t2.Ready += (s, e) =>
-                    {
-                        Assert.Equal (t2, Application.Top);
-                        Application.Run (t3);
-                    };
-
-        t3.Ready += (s, e) =>
-                    {
-                        Assert.Equal (t3, Application.Top);
-                        Application.Run (d);
-                    };
-
-        d.Ready += (s, e) =>
-                   {
-                       Assert.Equal (t3, Application.Top);
-                       Application.Run (t4);
-                   };
-
-        t4.Ready += (s, e) =>
-                    {
-                        Assert.Equal (t4, Application.Top);
-                        t4.RequestStop ();
-                        d.RequestStop ();
-                        t3.RequestStop ();
-                        t2.RequestStop ();
-                    };
+        t1.Ready += T1OnReady;
+        t2.Ready += T2OnReady;
+        t3.Ready += T3OnReady;
+        d.Ready += DOnReady;
+        t4.Ready += T4OnReady;
 
         // Now this will close the OverlappedContainer when all OverlappedChildren was closed
-        t2.Closed += (s, _) => { t1.RequestStop (); };
+        t2.Closed += T2OnClosed;
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     if (iterations == 5)
-                                     {
-                                         // The Current still is t4 because Current.Running is false.
-                                         Assert.Equal (t4, Application.Current);
-                                         Assert.False (Application.Current.Running);
-                                         Assert.Equal (t4, Application.Top);
-                                     }
-                                     else if (iterations == 4)
-                                     {
-                                         // The Current is d and Current.Running is false.
-                                         Assert.Equal (d, Application.Current);
-                                         Assert.False (Application.Current.Running);
-                                         Assert.Equal (t4, Application.Top);
-                                     }
-                                     else if (iterations == 3)
-                                     {
-                                         // The Current is t3 and Current.Running is false.
-                                         Assert.Equal (t3, Application.Current);
-                                         Assert.False (Application.Current.Running);
-                                         Assert.Equal (t3, Application.Top);
-                                     }
-                                     else if (iterations == 2)
-                                     {
-                                         // The Current is t2 and Current.Running is false.
-                                         Assert.Equal (t2, Application.Current);
-                                         Assert.False (Application.Current.Running);
-                                         Assert.Equal (t2, Application.Top);
-                                     }
-                                     else
-                                     {
-                                         // The Current is t1.
-                                         Assert.Equal (t1, Application.Current);
-                                         Assert.False (Application.Current.Running);
-                                         Assert.Equal (t1, Application.Top);
-                                     }
-
-                                     iterations--;
-                                 };
+        Application.Iteration += ApplicationOnIteration;
 
         Application.Run (t1);
 
@@ -673,6 +603,84 @@ public class ApplicationTests
         t1.Dispose ();
         Assert.True (Application.Top.WasDisposed);
 #endif
+
+        return;
+
+        void T1OnReady (object? s, EventArgs e)
+        {
+            Assert.Equal (t1, Application.Top);
+            Application.Run (t2);
+        }
+
+        void T2OnReady (object? s, EventArgs e)
+        {
+            Assert.Equal (t2, Application.Top);
+            Application.Run (t3);
+        }
+
+        void T3OnReady (object? s, EventArgs e)
+        {
+            Assert.Equal (t3, Application.Top);
+            Application.Run (d);
+        }
+
+        void DOnReady (object? s, EventArgs e)
+        {
+            Assert.Equal (t3, Application.Top);
+            Application.Run (t4);
+        }
+
+        void T4OnReady (object? s, EventArgs e)
+        {
+            Assert.Equal (t4, Application.Top);
+            t4.RequestStop ();
+            d.RequestStop ();
+            t3.RequestStop ();
+            t2.RequestStop ();
+        }
+
+        void T2OnClosed (object? s, ToplevelEventArgs _) { t1.RequestStop (); }
+
+        void ApplicationOnIteration (object? s, IterationEventArgs a)
+        {
+            if (iterations == 5)
+            {
+                // The Current still is t4 because Current.Running is false.
+                Assert.Equal (t4, Application.Current);
+                Assert.False (Application.Current.Running);
+                Assert.Equal (t4, Application.Top);
+            }
+            else if (iterations == 4)
+            {
+                // The Current is d and Current.Running is false.
+                Assert.Equal (d, Application.Current);
+                Assert.False (Application.Current.Running);
+                Assert.Equal (t4, Application.Top);
+            }
+            else if (iterations == 3)
+            {
+                // The Current is t3 and Current.Running is false.
+                Assert.Equal (t3, Application.Current);
+                Assert.False (Application.Current.Running);
+                Assert.Equal (t3, Application.Top);
+            }
+            else if (iterations == 2)
+            {
+                // The Current is t2 and Current.Running is false.
+                Assert.Equal (t2, Application.Current);
+                Assert.False (Application.Current.Running);
+                Assert.Equal (t2, Application.Top);
+            }
+            else
+            {
+                // The Current is t1.
+                Assert.Equal (t1, Application.Current);
+                Assert.False (Application.Current.Running);
+                Assert.Equal (t1, Application.Top);
+            }
+
+            iterations--;
+        }
     }
 
     private void Init ()
