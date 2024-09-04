@@ -56,16 +56,16 @@ public class Scroll : View
 
                 if (value
                     && Orientation == Orientation.Horizontal
-                    && _position + (SuperViewAsScrollBar is { } ? SuperViewAsScrollBar.Viewport.Width : Viewport.Width) > Size)
+                    && _position + (SuperViewAsScrollBar is { } ? SuperViewAsScrollBar.GetContentSize ().Width : GetContentSize ().Width) > Size)
                 {
-                    pos = Size - (SuperViewAsScrollBar is { } ? SuperViewAsScrollBar.Viewport.Width : Viewport.Width);
+                    pos = Size - (SuperViewAsScrollBar is { } ? SuperViewAsScrollBar.GetContentSize ().Width : GetContentSize ().Width);
                 }
 
                 if (value
                     && Orientation == Orientation.Vertical
-                    && _position + (SuperViewAsScrollBar is { } ? SuperViewAsScrollBar.Viewport.Height : Viewport.Height) > Size)
+                    && _position + (SuperViewAsScrollBar is { } ? SuperViewAsScrollBar.GetContentSize ().Height : GetContentSize ().Height) > Size)
                 {
-                    pos = _size - (SuperViewAsScrollBar is { } ? SuperViewAsScrollBar.Viewport.Height : Viewport.Height);
+                    pos = _size - (SuperViewAsScrollBar is { } ? SuperViewAsScrollBar.GetContentSize ().Height : GetContentSize ().Height);
                 }
 
                 if (pos != 0)
