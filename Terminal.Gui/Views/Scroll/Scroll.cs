@@ -161,10 +161,6 @@ public class Scroll : View
         return base.OnMouseEvent (mouseEvent);
     }
 
-    // TODO: Move this into "ScrollSlider" and override it there. Scroll can then subscribe to _slider.LayoutComplete and call AdjustSlider.
-    // QUESTION: I've been meaning to add a "View.FrameChanged" event (fired from LayoutComplete only if Frame has changed). Should we do that as part of this PR?
-    // QUESTION: Note I *did* add "View.ViewportChanged" in a previous PR.
-
     /// <summary>Virtual method called when <see cref="Position"/> has changed. Raises <see cref="PositionChanged"/>.</summary>
     protected virtual void OnPositionChanged (int position) { PositionChanged?.Invoke (this, new (in position)); }
 
