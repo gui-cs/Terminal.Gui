@@ -145,6 +145,11 @@ public class Scroll : View
         get => _size;
         set
         {
+            if (value == _size || value < 0)
+            {
+                return;
+            }
+
             _size = value;
             OnSizeChanged (_size);
             AdjustScroll ();

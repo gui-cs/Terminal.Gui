@@ -1032,6 +1032,15 @@ public class ScrollBarTests
     }
 
     [Fact]
+    public void Size_Cannot_Be_Negative ()
+    {
+        var scrollBar = new ScrollBar { Height = 10, Size = -1 };
+        Assert.Equal (0, scrollBar.Size);
+        scrollBar.Size = -10;
+        Assert.Equal (0, scrollBar.Size);
+    }
+
+    [Fact]
     public void SizeChanged_Event ()
     {
         var count = 0;

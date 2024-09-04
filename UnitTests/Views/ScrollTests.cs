@@ -897,6 +897,15 @@ public class ScrollTests
     }
 
     [Fact]
+    public void Size_Cannot_Be_Negative ()
+    {
+        var scroll = new Scroll { Height = 10, Size = -1 };
+        Assert.Equal (0, scroll.Size);
+        scroll.Size = -10;
+        Assert.Equal (0, scroll.Size);
+    }
+
+    [Fact]
     public void SizeChanged_Event ()
     {
         var count = 0;
