@@ -52,12 +52,11 @@ internal sealed class NetMainLoop : IMainLoopDriver
 
         try
         {
-            if (!_eventReadyTokenSource.IsCancellationRequested)
-            {
-                // Note: ManualResetEventSlim.Wait will wait indefinitely if the timeout is -1. The timeout is -1 when there
-                // are no timers, but there IS an idle handler waiting.
+            _eventReadyTokenSource.Token.ThrowIfCancellationRequested ();
+
+            // NOTE: ManualResetEventSlim.Wait will wait indefinitely if the timeout is -1.
+            // The timeout is -1 when there are no timers, but there IS an idle handler waiting.
                 _eventReady.Wait (waitTimeout, _eventReadyTokenSource.Token);
-            }
         }
         catch (OperationCanceledException)
         {
@@ -70,12 +69,7 @@ internal sealed class NetMainLoop : IMainLoopDriver
 
         _eventReadyTokenSource.Token.ThrowIfCancellationRequested ();
 
-        if (!_eventReadyTokenSource.IsCancellationRequested)
-        {
-            return _resultQueue.Count > 0 || _mainLoop.CheckTimersAndIdleHandlers (out _);
-        }
-
-        return true;
+        return _resultQueue.Count > 0 || _mainLoop.CheckTimersAndIdleHandlers (out _);
     }
 
     void IMainLoopDriver.Iteration ()
