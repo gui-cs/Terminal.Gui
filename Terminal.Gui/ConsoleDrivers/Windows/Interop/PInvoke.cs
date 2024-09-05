@@ -1,4 +1,4 @@
-namespace Terminal.Gui.ConsoleDrivers.Windows.Interop;
+﻿namespace Terminal.Gui.ConsoleDrivers.Windows.Interop;
 
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -17,8 +17,6 @@ using static System.Runtime.InteropServices.Marshal;
 [SupportedOSPlatform ("windows")]
 internal static unsafe class PInvoke
 {
-    internal const nint INVALID_HANDLE_VALUE = -1;
-
     /// <summary>Retrieves the current input mode of a console's input buffer or the current output mode of a console screen buffer.</summary>
     /// <param name="hConsoleHandle">
     ///     A handle to the console input buffer or the console screen buffer.
