@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui.ConsoleDrivers.Windows.Interop;
+﻿#nullable enable
+
+namespace Terminal.Gui.ConsoleDrivers.Windows.Interop;
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;

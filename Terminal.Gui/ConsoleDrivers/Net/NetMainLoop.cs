@@ -1,3 +1,4 @@
+#nullable enable
 namespace Terminal.Gui.ConsoleDrivers.Net;
 
 /// <summary>
@@ -7,31 +8,32 @@ namespace Terminal.Gui.ConsoleDrivers.Net;
 /// <remarks>This implementation is used for NetDriver.</remarks>
 internal sealed class NetMainLoop : IMainLoopDriver
 {
-    internal NetEvents _netEvents;
-
-    /// <summary>Invoked when a Key is pressed.</summary>
-    internal Action<NetEvents.InputResult> ProcessInput;
-
-    private readonly ManualResetEventSlim _eventReady = new (false);
-    private readonly CancellationTokenSource _inputHandlerTokenSource = new ();
-    private readonly Queue<NetEvents.InputResult?> _resultQueue = new ();
-    private readonly ManualResetEventSlim _waitForProbe = new (false);
-    private readonly CancellationTokenSource _eventReadyTokenSource = new ();
-    private MainLoop _mainLoop;
-
     /// <summary>Initializes the class with the console driver.</summary>
     /// <remarks>Passing a consoleDriver is provided to capture windows resizing.</remarks>
     /// <param name="consoleDriver">The console driver used by this Net main loop.</param>
     /// <exception cref="ArgumentNullException"></exception>
-    public NetMainLoop (ConsoleDriver consoleDriver = null)
+    public NetMainLoop (ConsoleDriver? consoleDriver = null)
     {
         if (consoleDriver is null)
         {
             throw new ArgumentNullException (nameof (consoleDriver));
         }
 
-        _netEvents = new NetEvents (consoleDriver);
+        // BUG: This needs to be disposed somewhere.
+        _netEvents = new (consoleDriver);
     }
+
+    // INTENT: Why is this not an event? It's identical in nearly every way except it allows breaking encapsulation.
+    /// <summary>Invoked when a Key is pressed.</summary>
+    internal Action<NetEvents.InputResult>? ProcessInput;
+
+    private readonly ManualResetEventSlim _eventReady = new (false);
+    private readonly CancellationTokenSource _inputHandlerTokenSource = new ();
+    private readonly Queue<NetEvents.InputResult?> _resultQueue = [];
+    private readonly ManualResetEventSlim _waitForProbe = new (false);
+    private readonly CancellationTokenSource _eventReadyTokenSource = new ();
+    private NetEvents _netEvents;
+    private MainLoop? _mainLoop;
 
     void IMainLoopDriver.Setup (MainLoop mainLoop)
     {
@@ -61,10 +63,12 @@ internal sealed class NetMainLoop : IMainLoopDriver
 
             // NOTE: ManualResetEventSlim.Wait will wait indefinitely if the timeout is -1.
             // The timeout is -1 when there are no timers, but there IS an idle handler waiting.
-                _eventReady.Wait (waitTimeout, _eventReadyTokenSource.Token);
+            _eventReady.Wait (waitTimeout, _eventReadyTokenSource.Token);
         }
         catch (OperationCanceledException)
         {
+            // TODO: Analyze this in depth.
+            // Looks suspicious to me because this looks like an atypical way to use cooperative cancellation.
             return true;
         }
         finally
@@ -87,9 +91,9 @@ internal sealed class NetMainLoop : IMainLoopDriver
 
     void IMainLoopDriver.TearDown ()
     {
-        _inputHandlerTokenSource?.Cancel ();
+        _inputHandlerTokenSource.Cancel ();
         _inputHandlerTokenSource?.Dispose ();
-        _eventReadyTokenSource?.Cancel ();
+        _eventReadyTokenSource.Cancel ();
         _eventReadyTokenSource?.Dispose ();
 
         _eventReady?.Dispose ();

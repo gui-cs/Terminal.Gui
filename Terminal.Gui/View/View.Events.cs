@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+
+namespace Terminal.Gui;
 
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
