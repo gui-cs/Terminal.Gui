@@ -117,7 +117,7 @@ public class ScrollTests
 ░░███░░░░░",
                     @"
 ░██░░░░░░░")]
-    public void Changing_Position_Size_Orientation_Draws_Correctly (
+    public void Changing_Position_Size_Orientation_Draws_Correctly_KeepContentInAllViewport_True (
         int size,
         string firstVertExpected,
         string middleVertExpected,
@@ -133,7 +133,8 @@ public class ScrollTests
         {
             Orientation = Orientation.Vertical,
             Size = size,
-            Height = 10
+            Height = 10,
+            KeepContentInAllViewport = true
         };
         var top = new Toplevel ();
         top.Add (scroll);
@@ -302,14 +303,15 @@ public class ScrollTests
                     20,
                     @"
 ░░░░░███░░")]
-    public void Mouse_On_The_Container (Orientation orientation, int size, int position, int location, string output, int expectedPos, string expectedOut)
+    public void Mouse_On_The_Container_KeepContentInAllViewport_True (Orientation orientation, int size, int position, int location, string output, int expectedPos, string expectedOut)
     {
         var scroll = new Scroll
         {
             Width = orientation == Orientation.Vertical ? 1 : 10,
             Height = orientation == Orientation.Vertical ? 10 : 1,
             Orientation = orientation, Size = size,
-            Position = position
+            Position = position,
+            KeepContentInAllViewport = true
         };
         var top = new Toplevel ();
         top.Add (scroll);
@@ -744,12 +746,12 @@ public class ScrollTests
     [AutoInitShutdown]
     [InlineData (Orientation.Vertical)]
     [InlineData (Orientation.Horizontal)]
-    public void Moving_Mouse_Outside_Host_Ensures_Correct_Location (Orientation orientation)
+    public void Moving_Mouse_Outside_Host_Ensures_Correct_Location_KeepContentInAllViewport_True (Orientation orientation)
     {
         var scroll = new Scroll
         {
             X = 10, Y = 10, Width = orientation == Orientation.Vertical ? 1 : 10, Height = orientation == Orientation.Vertical ? 10 : 1, Size = 20,
-            Position = 5, Orientation = orientation
+            Position = 5, Orientation = orientation, KeepContentInAllViewport = true
         };
         var top = new Toplevel ();
         top.Add (scroll);
@@ -972,7 +974,7 @@ public class ScrollTests
 │████░░░░│
 │████░░░░│
 └────────┘")]
-    public void Vertical_Horizontal_Draws_Correctly (int sizeWidth, int sizeHeight, int widthHeight, Orientation orientation, string expected)
+    public void Vertical_Horizontal_Draws_Correctly_KeepContentInAllViewport_True (int sizeWidth, int sizeHeight, int widthHeight, Orientation orientation, string expected)
     {
         var super = new Window { Id = "super", Width = Dim.Fill (), Height = Dim.Fill () };
         var top = new Toplevel ();
@@ -983,7 +985,8 @@ public class ScrollTests
             Orientation = orientation,
             Size = orientation == Orientation.Vertical ? sizeHeight * 2 : sizeWidth * 2,
             Width = orientation == Orientation.Vertical ? widthHeight : Dim.Fill (),
-            Height = orientation == Orientation.Vertical ? Dim.Fill () : widthHeight
+            Height = orientation == Orientation.Vertical ? Dim.Fill () : widthHeight,
+            KeepContentInAllViewport = true
         };
         super.Add (scroll);
 
