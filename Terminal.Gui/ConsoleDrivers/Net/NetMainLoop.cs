@@ -45,6 +45,11 @@ internal sealed class NetMainLoop : IMainLoopDriver
     {
         _waitForProbe.Set ();
 
+        if (_mainLoop is not { })
+        {
+            throw new InvalidOperationException ("MainLoop was null when attempting to process input events.");
+        }
+
         if (_mainLoop.CheckTimersAndIdleHandlers (out int waitTimeout))
         {
             return true;
