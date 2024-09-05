@@ -1811,12 +1811,6 @@ internal class WindowsDriver : ConsoleDriver
         int delay = startDelay;
         while (_isButtonPressed)
         {
-            var me = new MouseEvent
-            {
-                Position = _pointMove,
-                Flags = mouseFlag
-            };
-
             // TODO: This makes ConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
             View view = Application.WantContinuousButtonPressedView;
 
@@ -1830,6 +1824,12 @@ internal class WindowsDriver : ConsoleDriver
                 delay = fastDelay;
             }
             await Task.Delay (delay);
+
+            var me = new MouseEvent
+            {
+                Position = _pointMove,
+                Flags = mouseFlag
+            };
 
             //Debug.WriteLine($"ProcessContinuousButtonPressedAsync: {view}");
             if (_isButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0)
