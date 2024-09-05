@@ -4,6 +4,8 @@ using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
 
 namespace Terminal.Gui.ConsoleDrivers;
 
+[Trait ("Category", "Key Value Processing")]
+[Trait ("Category", "Text Handling")]
 public class ConsoleKeyMappingTests
 {
 #if ENABLE_VK_PACKET_NON_WINDOWS
@@ -342,6 +344,7 @@ public class ConsoleKeyMappingTests
 #endif
 
     [Theory]
+    [Trait ("Category", "Unicode")]
     [InlineData ('a', ConsoleKey.A, false, false, false, (KeyCode)'a')]
     [InlineData ('A', ConsoleKey.A, true, false, false, KeyCode.A | KeyCode.ShiftMask)]
     [InlineData ('á', ConsoleKey.A, false, false, false, (KeyCode)'á')]
@@ -373,6 +376,7 @@ public class ConsoleKeyMappingTests
     }
 
     [Theory]
+    [Trait ("Category", "Unicode")]
     [InlineData ('a', false, false, false, (KeyCode)'a')]
     [InlineData ('A', true, false, false, KeyCode.A | KeyCode.ShiftMask)]
     [InlineData ('á', false, false, false, (KeyCode)'á')]
@@ -405,6 +409,7 @@ public class ConsoleKeyMappingTests
     }
 
     [Theory]
+    [Trait ("Category", "Unicode")]
     [InlineData ('a', ConsoleKey.A, false, false, false, 30)]
     [InlineData ('A', ConsoleKey.A, true, false, false, 30)]
     [InlineData ('á', ConsoleKey.A, false, false, false, 30)]
