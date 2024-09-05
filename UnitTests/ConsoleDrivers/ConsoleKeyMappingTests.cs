@@ -581,19 +581,8 @@ public class ConsoleKeyMappingTests
             { '-', '_', (KeyCode)'_' | KeyCode.ShiftMask },
         };
 
-    private static uint GetKeyValueUInt32 (uint keyValue, ConsoleModifiers modifiers)
-    {
-        if (modifiers == ConsoleModifiers.Shift && keyValue - 32 is >= 'A' and <= 'Z')
-        {
-            return keyValue - 32;
-        }
-
-        if (modifiers == ConsoleModifiers.None && keyValue is >= 'A' and <= 'Z')
-        {
-            return keyValue + 32;
-        }
-
-        if (modifiers == ConsoleModifiers.Shift && keyValue - 32 is >= 'À' and <= 'Ý')
+    private static uint GetKeyValueUInt32 (uint keyValue, ConsoleModifiers modifiers) =>
+        (modifiers, keyValue) switch
         {
             (ConsoleModifiers.Shift, '7')                                                  => '/',
             (ConsoleModifiers.Shift, >= '1' and <= '9' and not '7')                        => keyValue - 16,
@@ -629,14 +618,4 @@ public class ConsoleKeyMappingTests
             (ConsoleModifiers.None, '_')                                                   => '-',
             (_, _)                                                                         => keyValue
         };
-
-    /// <summary>Gets <see cref="ConsoleModifiers"/> from <see cref="bool"/> modifiers.</summary>
-    /// <param name="shift">The shift key.</param>
-    /// <param name="alt">The alt key.</param>
-    /// <param name="control">The control key.</param>
-    /// <returns>The console modifiers.</returns>
-    private static ConsoleModifiers GetModifiers (bool shift, bool alt, bool control) =>
-        (shift ? ConsoleModifiers.Shift : 0)
-      | (alt ? ConsoleModifiers.Alt : 0)
-      | (control ? ConsoleModifiers.Control : 0);
 }
