@@ -1,8 +1,8 @@
 namespace Terminal.Gui.ConsoleDrivers.Net;
 
 /// <summary>
-///     Mainloop intended to be used with the .NET System.Console API, and can be used on Windows and Unix, it is
-///     cross-platform but lacks things like file descriptor monitoring.
+///     <see cref="IMainLoopDriver"/> intended to be used with the .NET System.Console API, and can be used on Windows and Unix.<br/>
+///     It is cross-platform but lacks things like file descriptor monitoring.
 /// </summary>
 /// <remarks>This implementation is used for NetDriver.</remarks>
 internal sealed class NetMainLoop : IMainLoopDriver
