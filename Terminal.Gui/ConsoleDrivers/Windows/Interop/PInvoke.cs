@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.ConsoleDrivers.Windows.Interop;
+namespace Terminal.Gui.ConsoleDrivers.Windows.Interop;
 
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -45,7 +45,7 @@ internal static unsafe class PInvoke
             {
                 consoleHandleNativeMarshaller.FromManaged (hConsoleHandle);
 
-                if (UnsafeNativeMethods.GetConsoleMode (consoleHandleNativeMarshaller.ToUnmanaged (), consoleModeValuePointer) == 0)
+                if (UnsafeNativeMethods.GetConsoleMode (consoleHandleNativeMarshaller.ToUnmanaged (), consoleModeValuePointer))
                 {
                     return true;
                 }
@@ -96,7 +96,7 @@ internal static unsafe class PInvoke
             // Clear this in case it is non-zero from something else.
             SetLastSystemError (0);
 
-            if (UnsafeNativeMethods.SetConsoleMode (consoleHandleNativeMarshaller.ToUnmanaged (), dwMode) == 0)
+            if (UnsafeNativeMethods.SetConsoleMode (consoleHandleNativeMarshaller.ToUnmanaged (), dwMode))
             {
                 return true;
             }
@@ -170,8 +170,8 @@ file static class ThrowHelpers
 file static unsafe class UnsafeNativeMethods
 {
     [DllImport ("kernel32", EntryPoint = "GetConsoleMode", ExactSpelling = true)]
-    internal static extern int GetConsoleMode (nint hConsoleHandle, CONSOLE_MODE* lpMode);
+    internal static extern BOOL GetConsoleMode (nint hConsoleHandle, CONSOLE_MODE* lpMode);
 
     [DllImport ("kernel32", EntryPoint = "SetConsoleMode", ExactSpelling = true)]
-    internal static extern int SetConsoleMode (nint hConsoleHandle, CONSOLE_MODE dwMode);
+    internal static extern BOOL SetConsoleMode (nint hConsoleHandle, CONSOLE_MODE dwMode);
 }
