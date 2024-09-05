@@ -481,7 +481,7 @@ public class ConsoleKeyMappingTests
         Assert.Equal (scanCode, expectedScanCode);
     }
 
-    // TODO: Separate this test into tests of the individual methods it calls.
+    // POSSIBLE TEST BUG: Isn't this keyboard layout and code page specific?
     [Theory]
     [MemberData (nameof (ShiftedTestTuples))]
     public void GetKeyChar_Shifted_Char_From_UnShifted_Char (
@@ -500,7 +500,7 @@ public class ConsoleKeyMappingTests
         Assert.Equal (keyCode, expectedKeyCode);
     }
 
-    // TODO: Separate this test into tests of the individual methods it calls.
+    // POSSIBLE TEST BUG: Isn't this keyboard layout and code page specific?
     [Theory]
     [MemberData (nameof (UnShiftedTestTuples))]
     public void GetKeyChar_UnShifted_Char_From_Shifted_Char (
