@@ -135,6 +135,7 @@ public partial class View : Responder, ISupportInitializeNotification
 
         DisposeKeyboard ();
         DisposeAdornments ();
+        DisposeScrollBars ();
 
         for (int i = InternalSubviews.Count - 1; i >= 0; i--)
         {
@@ -185,6 +186,8 @@ public partial class View : Responder, ISupportInitializeNotification
 
         //SetupMouse ();
         SetupText ();
+
+        SetupScrollBars ();
     }
 
     /// <summary>

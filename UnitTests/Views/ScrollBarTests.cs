@@ -245,7 +245,8 @@ public class ScrollBarTests
         top.Add (view);
         Application.Begin (top);
 
-        Assert.True (scrollBar.KeepContentInAllViewport);
+        Assert.False (scrollBar.KeepContentInAllViewport);
+        scrollBar.KeepContentInAllViewport = true;
         Assert.Equal (80, view.Padding.Viewport.Width);
         Assert.Equal (25, view.Padding.Viewport.Height);
         Assert.Equal (2, scrollBar.Viewport.Width);
@@ -705,7 +706,7 @@ public class ScrollBarTests
                     20,
                     @"
 ◄░░░░██░░►")]
-    public void Mouse_On_The_Slider (
+    public void Mouse_On_The_Slider_KeepContentInAllViewport_True (
         Orientation orientation,
         int size,
         int position,
@@ -722,7 +723,8 @@ public class ScrollBarTests
             Width = orientation == Orientation.Vertical ? 1 : 10,
             Height = orientation == Orientation.Vertical ? 10 : 1,
             Orientation = orientation,
-            Size = size, Position = position
+            Size = size, Position = position,
+            KeepContentInAllViewport = true
         };
         var top = new Toplevel ();
         top.Add (scrollBar);
@@ -782,12 +784,12 @@ public class ScrollBarTests
     [AutoInitShutdown]
     [InlineData (Orientation.Vertical)]
     [InlineData (Orientation.Horizontal)]
-    public void Mouse_Pressed_On_ScrollButton_Changes_Position (Orientation orientation)
+    public void Mouse_Pressed_On_ScrollButton_Changes_Position_KeepContentInAllViewport_True (Orientation orientation)
     {
         var scrollBar = new ScrollBar
         {
             X = 10, Y = 10, Width = orientation == Orientation.Vertical ? 1 : 10, Height = orientation == Orientation.Vertical ? 10 : 1, Size = 20,
-            Orientation = orientation
+            Orientation = orientation, KeepContentInAllViewport = true
         };
         var top = new Toplevel ();
         top.Add (scrollBar);
@@ -881,9 +883,9 @@ public class ScrollBarTests
     [Theory]
     [InlineData (Orientation.Vertical, 20, 12, 10)]
     [InlineData (Orientation.Vertical, 40, 32, 30)]
-    public void Position_Cannot_Be_Negative_Nor_Greater_Than_Size_Minus_Frame_Length (Orientation orientation, int size, int expectedPos1, int expectedPos2)
+    public void Position_Cannot_Be_Negative_Nor_Greater_Than_Size_Minus_Frame_Length_KeepContentInAllViewport_True (Orientation orientation, int size, int expectedPos1, int expectedPos2)
     {
-        var scrollBar = new ScrollBar { Orientation = orientation, Height = 10, Size = size };
+        var scrollBar = new ScrollBar { Orientation = orientation, Height = 10, Size = size, KeepContentInAllViewport = true };
         Assert.Equal (0, scrollBar.Position);
 
         scrollBar.Position = -1;
@@ -926,12 +928,12 @@ public class ScrollBarTests
     }
 
     [Fact]
-    public void PositionChanging_PositionChanged_Events_Only_Raises_Once_If_Position_Was_Really_Changed ()
+    public void PositionChanging_PositionChanged_Events_Only_Raises_Once_If_Position_Was_Really_Changed_KeepContentInAllViewport_True ()
     {
         var changing = 0;
         var cancel = false;
         var changed = 0;
-        var scrollBar = new ScrollBar { Height = 10, Size = 20 };
+        var scrollBar = new ScrollBar { Height = 10, Size = 20, KeepContentInAllViewport = true };
         scrollBar.PositionChanging += Scroll_PositionChanging;
         scrollBar.PositionChanged += Scroll_PositionChanged;
 

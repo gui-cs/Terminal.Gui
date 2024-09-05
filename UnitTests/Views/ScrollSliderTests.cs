@@ -14,7 +14,7 @@ public class ScrollSliderTests
     [InlineData (Orientation.Vertical, 26, 236, 27, 210)]
     [InlineData (Orientation.Vertical, 37, 236, 2, 13)]
     [InlineData (Orientation.Vertical, 42, 236, 29, 164)]
-    public void Test_Position_Location_Consistency (Orientation orientation, int scrollLength, int size, int location, int expectedPosition)
+    public void Test_Position_Location_Consistency_KeepContentInAllViewport_True (Orientation orientation, int scrollLength, int size, int location, int expectedPosition)
     {
         // Arrange
         Scroll scroll = new ()
@@ -22,7 +22,8 @@ public class ScrollSliderTests
             Orientation = orientation,
             Width = orientation == Orientation.Vertical ? 1 : scrollLength,
             Height = orientation == Orientation.Vertical ? scrollLength : 1,
-            Size = size
+            Size = size,
+            KeepContentInAllViewport = true
         };
 
         scroll.BeginInit ();

@@ -33,7 +33,7 @@ public class Scroll : View
     private Orientation _orientation;
     private int _position;
     private int _size;
-    private bool _keepContentInAllViewport = true;
+    private bool _keepContentInAllViewport;
 
     /// <inheritdoc/>
     public override void EndInit ()
@@ -251,7 +251,7 @@ public class Scroll : View
     {
         int barSize = BarSize;
 
-        if (position + barSize > Size)
+        if (position + barSize > Size + (KeepContentInAllViewport ? 0 : barSize))
         {
             return KeepContentInAllViewport ? Math.Max (Size - barSize, 0) : Math.Max (Size - 1, 0);
         }
