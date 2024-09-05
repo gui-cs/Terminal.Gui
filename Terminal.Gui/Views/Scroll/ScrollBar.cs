@@ -55,7 +55,7 @@ public class ScrollBar : View
         }
     }
 
-    /// <summary>Get or sets if the view-port is kept in all visible area of this <see cref="ScrollBar"/></summary>
+    /// <summary>Get or sets if the view-port is kept in all visible area of this <see cref="ScrollBar"/>.</summary>
     public bool KeepContentInAllViewport
     {
         get => _scroll.KeepContentInAllViewport;
