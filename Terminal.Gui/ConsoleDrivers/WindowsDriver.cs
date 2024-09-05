@@ -1082,6 +1082,9 @@ internal class WindowsDriver : ConsoleDriver
     }
 
     /// <inheritdoc />
+    public override string GetVersionInfo () => nameof (WindowsDriver);
+
+    /// <inheritdoc />
     /// <remarks>WindowsDriver is unreliable with non-BMP characters, so we filter for IsBmp as in CursesDriver.</remarks>
     /// <seealso href="https://github.com/gui-cs/Terminal.Gui/issues/2615">Terminal.Gui Issue #2615</seealso>
     public override bool IsRuneSupported (in Rune rune) => rune.IsBmp && base.IsRuneSupported (in rune);

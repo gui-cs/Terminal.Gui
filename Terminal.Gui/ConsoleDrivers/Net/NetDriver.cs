@@ -580,6 +580,9 @@ internal sealed class NetDriver : ConsoleDriver
         return visibility == CursorVisibility.Default;
     }
 
+    /// <inheritdoc />
+    public override string GetVersionInfo () => nameof (NetDriver);
+
     public override bool SetCursorVisibility (CursorVisibility visibility)
     {
         _cachedCursorVisibility = visibility;

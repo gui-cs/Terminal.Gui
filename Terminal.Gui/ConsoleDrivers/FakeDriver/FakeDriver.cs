@@ -362,6 +362,9 @@ public sealed class FakeDriver : ConsoleDriver
         return FakeConsole.CursorVisible;
     }
 
+    /// <inheritdoc />
+    public override string GetVersionInfo () => nameof (FakeDriver);
+
     /// <inheritdoc/>
     public override bool SetCursorVisibility (CursorVisibility visibility)
     {

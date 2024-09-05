@@ -407,10 +407,9 @@ public abstract class ConsoleDriver
     /// <returns><see langword="true"/> upon success</returns>
     public abstract bool GetCursorVisibility (out CursorVisibility visibility);
 
-    // TODO: Eliminate GetType calls
     /// <summary>Returns the name of the driver and relevant library version information.</summary>
     /// <returns></returns>
-    public virtual string GetVersionInfo () { return GetType ().Name; }
+    public abstract string GetVersionInfo ();
 
     /// <summary>Tests if the specified rune is supported by the driver.</summary>
     /// <param name="rune"></param>
