@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 
 namespace Terminal.Gui.ConsoleDrivers.Windows.Interop;
 
@@ -28,7 +28,7 @@ using System.Runtime.CompilerServices;
                      "InconsistentNaming",
                      Justification = "Following recommendation to keep types named the same as the native types.")]
 internal readonly struct BOOL : IEqualityOperators<BOOL, BOOL, bool>, IEqualityOperators<BOOL, bool, bool>,
-                                       ITrueFalseOperators<BOOL>, IEquatable<bool>
+                                ITrueFalseOperators<BOOL>, IEquatable<bool>, IEquatable<BOOL>
 {
     /// <summary>
     ///     Creates a new <see cref="BOOL"/> directly from the provided <see cref="int"/>.
@@ -39,14 +39,14 @@ internal readonly struct BOOL : IEqualityOperators<BOOL, BOOL, bool>, IEqualityO
     ///     is recommended.
     /// </remarks>
     /// <remarks><see cref="INumberBase{TSelf}.Zero"/> is the only value interpreted as <see langword="false"/>.</remarks>
-    internal BOOL (int value) { Value = value; }
+    private BOOL (int value) { Value = value; }
 
     /// <summary>
     ///     Constructor which sets the new <see cref="BOOL"/> to <see cref="IBinaryNumber{T}.AllBitsSet"/> for <see langword="true"/> or
     ///     <see cref="IBinaryNumber{T}.Zero"/> for <see langword="false"/>.
     /// </summary>
     /// <param name="value">The equivalent <see langword="bool"/> value to initialize the new <see cref="BOOL"/> to.</param>
-    internal BOOL (bool value) { Value = value ? -1 : 0; }
+    private BOOL (bool value) { Value = value ? -1 : 0; }
 
     internal readonly int Value;
 
@@ -55,25 +55,33 @@ internal readonly struct BOOL : IEqualityOperators<BOOL, BOOL, bool>, IEqualityO
 
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static bool operator != (BOOL left, bool right) => !left.Equals (right);
+
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static bool operator == (BOOL left, BOOL right) => left.Equals (right);
 
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static bool operator != (BOOL left, BOOL right) => !left.Equals (right);
 
-    /// <inheritdoc/>
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public bool Equals (BOOL other) => IsTrue == other.IsTrue;
-
-    /// <inheritdoc/>
+    /// <inheritdoc cref="ValueType.Equals(object?)"/>
+    /// <remarks>This is value equality.</remarks>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public bool Equals (bool other) => other == IsTrue;
+
+    /// <inheritdoc cref="ValueType.Equals(object?)"/>
+    /// <remarks>This is value equality.</remarks>
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
+    public bool Equals (BOOL other) => IsTrue == other.IsTrue;
 
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static bool operator false (BOOL value) => value.IsFalse;
 
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public static bool operator true (BOOL value) => value.IsTrue;
+
+    /// <inheritdoc cref="ValueType.Equals(object?)"/>
+    /// <remarks>This is value equality.</remarks>
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
+    public override bool Equals (object? obj) => obj is BOOL other && Equals (other);
 
     /// <inheritdoc/>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
