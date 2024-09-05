@@ -165,9 +165,7 @@ internal class ScrollSlider : View
         if ((SuperViewAsScroll.Orientation == Orientation.Vertical && location + Frame.Height >= scrollSize)
             || (SuperViewAsScroll.Orientation == Orientation.Horizontal && location + Frame.Width >= scrollSize))
         {
-            return Math.Min (
-                             Math.Max (SuperViewAsScroll.Position + location, 0),
-                             SuperViewAsScroll.KeepContentInAllViewport ? SuperViewAsScroll.Size - scrollSize : SuperViewAsScroll.Size - 1);
+            return SuperViewAsScroll.Size - scrollSize + (SuperViewAsScroll.KeepContentInAllViewport ? 0 : scrollSize);
         }
 
         return (int)Math.Min (

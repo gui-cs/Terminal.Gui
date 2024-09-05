@@ -43,8 +43,8 @@ public class ScrollSliderTests
 
     // Randomized Test for more extensive testing
     [Theory]
-    [InlineData (Orientation.Vertical, 26, 236, 5)]
-    public void Test_Position_Location_Consistency_Random (Orientation orientation, int scrollLength, int size, int testCount)
+    [InlineData (Orientation.Vertical, true, 26, 236, 5)]
+    public void Test_Position_Location_Consistency_Random (Orientation orientation, bool keepContentInAllViewport, int scrollLength, int size, int testCount)
     {
         var random = new Random ();
 
@@ -53,7 +53,8 @@ public class ScrollSliderTests
             Orientation = orientation,
             Width = orientation == Orientation.Vertical ? 1 : scrollLength,
             Height = orientation == Orientation.Vertical ? scrollLength : 1,
-            Size = size
+            Size = size,
+            KeepContentInAllViewport = keepContentInAllViewport
         };
 
         scroll.BeginInit ();
