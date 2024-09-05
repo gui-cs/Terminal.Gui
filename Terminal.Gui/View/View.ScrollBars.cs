@@ -36,19 +36,19 @@ public partial class View
 
                                         Padding?.Add (scrollBar);
 
-                                        scrollBar.Initialized += (sender, args) =>
+                                        scrollBar.Initialized += (_, _) =>
                                         {
-                                            Padding.Thickness = Padding.Thickness with
+                                            Padding!.Thickness = Padding.Thickness with
                                             {
                                                 Bottom = scrollBar.Visible ? Padding.Thickness.Bottom + 1 : 0
                                             };
 
-                                            scrollBar.PositionChanged += (sender, args) =>
+                                            scrollBar.PositionChanged += (_, args) =>
                                             {
                                                 Viewport = Viewport with { X = args.CurrentValue };
                                             };
 
-                                            scrollBar.VisibleChanged += (sender, args) =>
+                                            scrollBar.VisibleChanged += (_, _) =>
                                             {
                                                 Padding.Thickness = Padding.Thickness with
                                                 {
@@ -87,33 +87,36 @@ public partial class View
 
                                       Padding?.Add (scrollBar);
 
-                                      scrollBar.Initialized += (sender, args) =>
+                                      scrollBar.Initialized += (_, _) =>
                                       {
-                                          Padding.Thickness = Padding.Thickness with
-                                          {
-                                              Right = scrollBar.Visible ? Padding.Thickness.Right + 1 : 0
-                                          };
-
-                                          scrollBar.PositionChanged += (sender, args) =>
-                                          {
-                                              Viewport = Viewport with { Y = args.CurrentValue };
-                                          };
-
-                                          scrollBar.VisibleChanged += (sender, args) =>
+                                          if (Padding is { })
                                           {
                                               Padding.Thickness = Padding.Thickness with
                                               {
-                                                  Right = scrollBar.Visible
-                                                      ? Padding.Thickness.Right + 1
-                                                      : Padding.Thickness.Right - 1
+                                                  Right = scrollBar.Visible ? Padding.Thickness.Right + 1 : 0
                                               };
-                                          };
+
+                                              scrollBar.PositionChanged += (_, args) =>
+                                                                           {
+                                                                               Viewport = Viewport with { Y = args.CurrentValue };
+                                                                           };
+
+                                              scrollBar.VisibleChanged += (_, _) =>
+                                                                          {
+                                                                              Padding.Thickness = Padding.Thickness with
+                                                                              {
+                                                                                  Right = scrollBar.Visible
+                                                                                      ? Padding.Thickness.Right + 1
+                                                                                      : Padding.Thickness.Right - 1
+                                                                              };
+                                                                          };
+                                          }
                                       };
 
                                       return scrollBar;
                                   });
 
-        ViewportChanged += (sender, args) =>
+        ViewportChanged += (_, _) =>
         {
             if (_verticalScrollBar.IsValueCreated)
             {
@@ -126,7 +129,7 @@ public partial class View
             }
         };
 
-        ContentSizeChanged += (sender, args) =>
+        ContentSizeChanged += (_, _) =>
         {
             if (_verticalScrollBar.IsValueCreated)
             {
@@ -141,11 +144,11 @@ public partial class View
 
     /// <summary>
     /// </summary>
-    public ScrollBar? HorizontalScrollBar => _horizontalScrollBar.Value;
+    public ScrollBar HorizontalScrollBar => _horizontalScrollBar.Value;
 
     /// <summary>
     /// </summary>
-    public ScrollBar? VerticalScrollBar => _verticalScrollBar.Value;
+    public ScrollBar VerticalScrollBar => _verticalScrollBar.Value;
 
     /// <summary>
     ///     Clean up the ScrollBars of the View. Called by View.Dispose.
