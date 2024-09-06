@@ -3,6 +3,8 @@ using System.Runtime.InteropServices;
 
 namespace Terminal.Gui.ConsoleDrivers;
 
+using System.Runtime.CompilerServices;
+
 /// <summary>Helper class to handle the scan code and virtual key from a <see cref="ConsoleKey"/>.</summary>
 public static class ConsoleKeyMapping
 {
@@ -130,21 +132,15 @@ public static class ConsoleKeyMapping
         }
     }
 
-    private static ConsoleModifiers GetModifiers (ConsoleModifiers modifiers)
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
+    private static ConsoleModifiers FilterModifiersForScanCode (ConsoleModifiers modifiers)
     {
-        if (modifiers.HasFlag (ConsoleModifiers.Shift)
-            && !modifiers.HasFlag (ConsoleModifiers.Alt)
-            && !modifiers.HasFlag (ConsoleModifiers.Control))
-        {
-            return ConsoleModifiers.Shift;
-        }
-
-        if (modifiers == (ConsoleModifiers.Alt | ConsoleModifiers.Control))
-        {
-            return modifiers;
-        }
-
-        return 0;
+        return modifiers switch
+               {
+                   ConsoleModifiers.Shift                            => modifiers,
+                   (ConsoleModifiers.Alt | ConsoleModifiers.Control) => modifiers,
+                   _                                                 => 0
+               };
     }
 
     private static ScanCodeMapping GetScanCode (string propName, uint keyValue, ConsoleModifiers modifiers)
@@ -181,7 +177,7 @@ public static class ConsoleKeyMapping
     /// <returns>The value if apply.</returns>
     public static uint GetScanCodeFromConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
     {
-        ConsoleModifiers mod = GetModifiers (consoleKeyInfo.Modifiers);
+        ConsoleModifiers mod = FilterModifiersForScanCode (consoleKeyInfo.Modifiers);
         ScanCodeMapping scode = GetScanCode ("VirtualKey", (uint)consoleKeyInfo.Key, mod);
 
         if (scode is { })
@@ -203,7 +199,7 @@ public static class ConsoleKeyMapping
 
         if (isConsoleKey)
         {
-            ConsoleModifiers mod = GetModifiers (modifiers);
+            ConsoleModifiers mod = FilterModifiersForScanCode (modifiers);
             ScanCodeMapping scode = GetScanCode ("VirtualKey", keyValue, mod);
 
             if (scode is { })
@@ -359,7 +355,7 @@ public static class ConsoleKeyMapping
         uint decodedChar = unicodeChar >> 8 == 0xff ? unicodeChar & 0xff : unicodeChar;
         uint keyChar = decodedChar;
         consoleKey = 0;
-        ConsoleModifiers mod = GetModifiers (modifiers);
+        ConsoleModifiers mod = FilterModifiersForScanCode (modifiers);
         scanCode = 0;
         ScanCodeMapping scode = null;
 
