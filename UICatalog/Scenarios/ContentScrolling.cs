@@ -137,19 +137,6 @@ public class ContentScrolling : Scenario
             CanFocus = false
         };
         cbAllowNegativeX.CheckedState = view.ViewportSettings.HasFlag (ViewportSettings.AllowNegativeX) ? CheckState.Checked : CheckState.UnChecked;
-        cbAllowNegativeX.CheckedStateChanging += AllowNegativeX_Toggle;
-
-        void AllowNegativeX_Toggle (object sender, CancelEventArgs<CheckState> e)
-        {
-            if (e.NewValue == CheckState.Checked)
-            {
-                view.ViewportSettings |= ViewportSettings.AllowNegativeX;
-            }
-            else
-            {
-                view.ViewportSettings &= ~ViewportSettings.AllowNegativeX;
-            }
-        }
 
         view.Padding.Add (cbAllowNegativeX);
 
@@ -161,19 +148,6 @@ public class ContentScrolling : Scenario
             CanFocus = false
         };
         cbAllowNegativeY.CheckedState = view.ViewportSettings.HasFlag (ViewportSettings.AllowNegativeY) ? CheckState.Checked : CheckState.UnChecked;
-        cbAllowNegativeY.CheckedStateChanging += AllowNegativeY_Toggle;
-
-        void AllowNegativeY_Toggle (object sender, CancelEventArgs<CheckState> e)
-        {
-            if (e.NewValue == CheckState.Checked)
-            {
-                view.ViewportSettings |= ViewportSettings.AllowNegativeY;
-            }
-            else
-            {
-                view.ViewportSettings &= ~ViewportSettings.AllowNegativeY;
-            }
-        }
 
         view.Padding.Add (cbAllowNegativeY);
 
@@ -184,7 +158,22 @@ public class ContentScrolling : Scenario
             CanFocus = false
         };
         cbAllowXGreaterThanContentWidth.CheckedState = view.ViewportSettings.HasFlag (ViewportSettings.AllowXGreaterThanContentWidth) ? CheckState.Checked : CheckState.UnChecked;
-        cbAllowXGreaterThanContentWidth.CheckedStateChanging += AllowXGreaterThanContentWidth_Toggle;
+
+        view.Padding.Add (cbAllowXGreaterThanContentWidth);
+
+        void AllowNegativeX_Toggle (object sender, CancelEventArgs<CheckState> e)
+        {
+            if (e.NewValue == CheckState.Checked)
+            {
+                view.ViewportSettings |= ViewportSettings.AllowNegativeX;
+            }
+            else
+            {
+                view.ViewportSettings &= ~ViewportSettings.AllowNegativeX;
+            }
+
+            SetHorizontalScrollBar (e.NewValue, cbAllowXGreaterThanContentWidth.CheckedState);
+        }
 
         void AllowXGreaterThanContentWidth_Toggle (object sender, CancelEventArgs<CheckState> e)
         {
@@ -196,9 +185,9 @@ public class ContentScrolling : Scenario
             {
                 view.ViewportSettings &= ~ViewportSettings.AllowXGreaterThanContentWidth;
             }
-        }
 
-        view.Padding.Add (cbAllowXGreaterThanContentWidth);
+            SetHorizontalScrollBar (e.NewValue, cbAllowNegativeX.CheckedState);
+        }
 
         var cbAllowYGreaterThanContentHeight = new CheckBox
         {
@@ -208,7 +197,22 @@ public class ContentScrolling : Scenario
             CanFocus = false
         };
         cbAllowYGreaterThanContentHeight.CheckedState = view.ViewportSettings.HasFlag (ViewportSettings.AllowYGreaterThanContentHeight) ? CheckState.Checked : CheckState.UnChecked;
-        cbAllowYGreaterThanContentHeight.CheckedStateChanging += AllowYGreaterThanContentHeight_Toggle;
+
+        view.Padding.Add (cbAllowYGreaterThanContentHeight);
+
+        void AllowNegativeY_Toggle (object sender, CancelEventArgs<CheckState> e)
+        {
+            if (e.NewValue == CheckState.Checked)
+            {
+                view.ViewportSettings |= ViewportSettings.AllowNegativeY;
+            }
+            else
+            {
+                view.ViewportSettings &= ~ViewportSettings.AllowNegativeY;
+            }
+
+            SetVerticalScrollBar (e.NewValue, cbAllowYGreaterThanContentHeight.CheckedState);
+        }
 
         void AllowYGreaterThanContentHeight_Toggle (object sender, CancelEventArgs<CheckState> e)
         {
@@ -220,9 +224,9 @@ public class ContentScrolling : Scenario
             {
                 view.ViewportSettings &= ~ViewportSettings.AllowYGreaterThanContentHeight;
             }
-        }
 
-        view.Padding.Add (cbAllowYGreaterThanContentHeight);
+            SetVerticalScrollBar (e.NewValue, cbAllowNegativeY.CheckedState);
+        }
 
         var labelContentSize = new Label
         {
@@ -343,10 +347,10 @@ public class ContentScrolling : Scenario
             Title = "Horizontal ScrollBar",
             X = Pos.Right (cbVerticalScrollBar) + 1,
             Y = Pos.Bottom (labelContentSize),
-            CanFocus = false
+            CanFocus = false,
+            CheckedState = view.HorizontalScrollBar.ShowScrollIndicator ? CheckState.Checked : CheckState.UnChecked
         };
         view.HorizontalScrollBar.ShowScrollIndicator = false;
-        cbHorizontalScrollBar.CheckedState = view.HorizontalScrollBar.ShowScrollIndicator ? CheckState.Checked : CheckState.UnChecked;
         cbHorizontalScrollBar.CheckedStateChanging += HorizontalScrollBar_Toggle;
 
         void HorizontalScrollBar_Toggle (object sender, CancelEventArgs<CheckState> e)
@@ -354,24 +358,81 @@ public class ContentScrolling : Scenario
             view.HorizontalScrollBar.ShowScrollIndicator = e.NewValue == CheckState.Checked;
         }
 
-        var cbAutoHideScrollBars = new CheckBox
+        var cbAutoHideVerticalScrollBar = new CheckBox
         {
-            Title = "Auto-hide ScrollBars",
+            Title = "Auto-hide Vertical ScrollBar",
             X = Pos.Right (cbHorizontalScrollBar) + 1,
             Y = Pos.Bottom (labelContentSize),
-            CanFocus = false
+            CanFocus = false,
+            CheckedState = view.HorizontalScrollBar.AutoHide ? CheckState.Checked : CheckState.UnChecked
         };
-        view.HorizontalScrollBar.AutoHide = true;
         view.VerticalScrollBar.AutoHide = true;
-        cbAutoHideScrollBars.CheckedState = view.HorizontalScrollBar.AutoHide ? CheckState.Checked : CheckState.UnChecked;
-        cbAutoHideScrollBars.CheckedStateChanging += AutoHideScrollBars_Toggle;
+        cbAutoHideVerticalScrollBar.CheckedStateChanging += AutoHideVerticalScrollBar_Toggle;
 
-        void AutoHideScrollBars_Toggle (object sender, CancelEventArgs<CheckState> e)
+        void AutoHideVerticalScrollBar_Toggle (object sender, CancelEventArgs<CheckState> e)
         {
-            view.HorizontalScrollBar.AutoHide = view.VerticalScrollBar.AutoHide = e.NewValue == CheckState.Checked;
+            view.VerticalScrollBar.AutoHide = e.NewValue == CheckState.Checked;
         }
 
-        view.Padding.Add (labelContentSize, contentSizeWidth, labelComma, contentSizeHeight, cbClearOnlyVisible, cbDoNotClipContent, cbVerticalScrollBar, cbHorizontalScrollBar, cbAutoHideScrollBars);
+        var cbAutoHideHorizontalScrollBar = new CheckBox
+        {
+            Title = "Auto-hide Horizontal ScrollBar",
+            X = Pos.Right (cbAutoHideVerticalScrollBar) + 1,
+            Y = Pos.Bottom (labelContentSize),
+            CanFocus = false,
+            CheckedState = view.HorizontalScrollBar.AutoHide ? CheckState.Checked : CheckState.UnChecked
+        };
+        view.HorizontalScrollBar.AutoHide = true;
+        cbAutoHideHorizontalScrollBar.CheckedStateChanging += AutoHideHorizontalScrollBar_Toggle;
+
+        void AutoHideHorizontalScrollBar_Toggle (object sender, CancelEventArgs<CheckState> e)
+        {
+            view.HorizontalScrollBar.AutoHide = e.NewValue == CheckState.Checked;
+        }
+
+        cbAllowNegativeX.CheckedStateChanging += AllowNegativeX_Toggle;
+        cbAllowNegativeY.CheckedStateChanging += AllowNegativeY_Toggle;
+
+        cbAllowXGreaterThanContentWidth.CheckedStateChanging += AllowXGreaterThanContentWidth_Toggle;
+        cbAllowYGreaterThanContentHeight.CheckedStateChanging += AllowYGreaterThanContentHeight_Toggle;
+
+        void SetHorizontalScrollBar (CheckState newValue, CheckState value)
+        {
+            if (newValue == CheckState.Checked)
+            {
+                cbAutoHideHorizontalScrollBar.CheckedState = CheckState.UnChecked;
+                view.HorizontalScrollBar.AutoHide = view.HorizontalScrollBar.ShowScrollIndicator = false;
+                cbHorizontalScrollBar.CheckedState = CheckState.UnChecked;
+            }
+            else
+            {
+                cbAutoHideHorizontalScrollBar.CheckedState = CheckState.Checked;
+
+                view.HorizontalScrollBar.AutoHide = view.HorizontalScrollBar.ShowScrollIndicator = newValue == CheckState.UnChecked
+                                                    && value == CheckState.UnChecked;
+                cbHorizontalScrollBar.CheckedState = CheckState.Checked;
+            }
+        }
+
+        void SetVerticalScrollBar (CheckState newValue, CheckState value)
+        {
+            if (newValue == CheckState.Checked)
+            {
+                cbAutoHideVerticalScrollBar.CheckedState = CheckState.UnChecked;
+                view.VerticalScrollBar.AutoHide = view.VerticalScrollBar.ShowScrollIndicator = false;
+                cbVerticalScrollBar.CheckedState = CheckState.UnChecked;
+            }
+            else
+            {
+                cbAutoHideVerticalScrollBar.CheckedState = CheckState.Checked;
+
+                view.VerticalScrollBar.AutoHide = view.VerticalScrollBar.ShowScrollIndicator = newValue == CheckState.UnChecked
+                                                  && value == CheckState.UnChecked;
+                cbVerticalScrollBar.CheckedState = CheckState.Checked;
+            }
+        }
+
+        view.Padding.Add (labelContentSize, contentSizeWidth, labelComma, contentSizeHeight, cbClearOnlyVisible, cbDoNotClipContent, cbVerticalScrollBar, cbHorizontalScrollBar, cbAutoHideVerticalScrollBar, cbAutoHideHorizontalScrollBar);
 
         // Add demo views to show that things work correctly
         var textField = new TextField { X = 20, Y = 7, Width = 15, Text = "Test TextField" };
