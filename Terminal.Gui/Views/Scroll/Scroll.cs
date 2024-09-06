@@ -251,9 +251,9 @@ public class Scroll : View
     {
         int barSize = BarSize;
 
-        if (position + barSize > Size + (KeepContentInAllViewport ? 0 : barSize))
+        if (position + barSize > Size + (KeepContentInAllViewport ? 0 : barSize) - (SuperViewAsScrollBar is { } ? 2 : 0))
         {
-            return KeepContentInAllViewport ? Math.Max (Size - barSize, 0) : Math.Max (Size - 1, 0);
+            return KeepContentInAllViewport ? Math.Max (Size - barSize - (SuperViewAsScrollBar is { } ? 2 : 0), 0) : Math.Max (Size - 1, 0);
         }
 
         return position;

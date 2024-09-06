@@ -474,7 +474,7 @@ public class ScrollBarTests
 █
 ▼",
                     MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition,
-                    12,
+                    10,
                     @"
 ▲
 ░
@@ -516,7 +516,7 @@ public class ScrollBarTests
 █
 ▼",
                     MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition,
-                    12,
+                    10,
                     @"
 ▲
 ░
@@ -537,7 +537,7 @@ public class ScrollBarTests
                     @"
 ◄░░░░████►",
                     MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition,
-                    12,
+                    10,
                     @"
 ◄░░░░████►")]
     [InlineData (
@@ -803,7 +803,7 @@ public class ScrollBarTests
         Assert.Equal (0, scrollBar.Position);
 
         // ScrollButton increase
-        for (var i = 0; i < 13; i++)
+        for (var i = 0; i < 11; i++)
         {
             Application.OnMouseEvent (
                                       new ()
@@ -811,7 +811,7 @@ public class ScrollBarTests
                                           Position = orientation == Orientation.Vertical ? new (10, 19) : new (19, 10), Flags = MouseFlags.Button1Pressed
                                       });
 
-            if (i < 12)
+            if (i < 10)
             {
                 Assert.Equal (i + 1, scrollBar.Position);
             }
@@ -825,7 +825,7 @@ public class ScrollBarTests
             }
         }
 
-        for (var i = 12; i > -1; i--)
+        for (var i = 10; i > -1; i--)
         {
             Application.OnMouseEvent (new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed });
 
@@ -883,8 +883,8 @@ public class ScrollBarTests
     }
 
     [Theory]
-    [InlineData (Orientation.Vertical, 20, 12, 10)]
-    [InlineData (Orientation.Vertical, 40, 32, 30)]
+    [InlineData (Orientation.Vertical, 20, 10, 10)]
+    [InlineData (Orientation.Vertical, 40, 30, 30)]
     public void Position_Cannot_Be_Negative_Nor_Greater_Than_Size_Minus_Frame_Length_KeepContentInAllViewport_True (Orientation orientation, int size, int expectedPos1, int expectedPos2)
     {
         var scrollBar = new ScrollBar { Orientation = orientation, Height = 10, Size = size, KeepContentInAllViewport = true };
@@ -970,19 +970,19 @@ public class ScrollBarTests
 
         Reset ();
         scrollBar.Position = 11;
-        Assert.Equal (11, scrollBar.Position);
-        Assert.Equal (1, changing);
-        Assert.Equal (1, changed);
+        Assert.Equal (10, scrollBar.Position);
+        Assert.Equal (0, changing);
+        Assert.Equal (0, changed);
 
         Reset ();
         scrollBar.Position = 12;
-        Assert.Equal (12, scrollBar.Position);
-        Assert.Equal (1, changing);
-        Assert.Equal (1, changed);
+        Assert.Equal (10, scrollBar.Position);
+        Assert.Equal (0, changing);
+        Assert.Equal (0, changed);
 
         Reset ();
         scrollBar.Position = 13;
-        Assert.Equal (12, scrollBar.Position);
+        Assert.Equal (10, scrollBar.Position);
         Assert.Equal (0, changing);
         Assert.Equal (0, changed);
 
