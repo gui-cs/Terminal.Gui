@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <!-- =================================================================== -->
   <!-- Version numbers -->
   <!-- Automatically updated by gitversion (run `dotnet-gitversion /updateprojectfiles`)  -->
@@ -74,6 +74,7 @@
     <Using Include="System.Drawing" />
     <Using Include="System.Text" />
     <Using Include="Terminal.Gui.EnumExtensions" />
+    <Using Include="Terminal.Gui.ConsoleDrivers" />
     <Using Include="Terminal.Gui.ConsoleDrivers.Net" />
   </ItemGroup>
   <!-- =================================================================== -->

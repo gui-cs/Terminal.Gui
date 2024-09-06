@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <!-- Version numbers are automatically updated by gitversion when a release is released -->
     <!-- In the source tree the version will always be 2.0 for all projects. -->
@@ -59,6 +59,7 @@
   <ItemGroup>
     <Using Include="System.Drawing" />
     <Using Include="Terminal.Gui" />
+    <Using Include="Terminal.Gui.ConsoleDrivers" />
     <Using Include="Terminal.Gui.ConsoleDrivers.Net" />
     <Using Include="Xunit" />
   </ItemGroup>

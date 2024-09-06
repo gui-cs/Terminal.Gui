@@ -8,7 +8,7 @@
 
 using System.Collections.ObjectModel;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.ConsoleDrivers;
 
 /// <summary>Interface to create a platform specific <see cref="MainLoop"/> driver.</summary>
 internal interface IMainLoopDriver
