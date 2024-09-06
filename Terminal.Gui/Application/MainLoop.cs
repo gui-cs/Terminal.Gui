@@ -1,4 +1,5 @@
-﻿//
+#nullable enable
+//
 // MainLoop.cs: IMainLoopDriver and MainLoop for Terminal.Gui
 //
 // Authors:
@@ -36,9 +37,10 @@ internal interface IMainLoopDriver
 ///     Monitoring of file descriptors is only available on Unix, there does not seem to be a way of supporting this
 ///     on Windows.
 /// </remarks>
+[MustDisposeResource]
 internal class MainLoop : IDisposable
 {
-    internal List<Func<bool>> _idleHandlers = new ();
+    internal List<Func<bool>> _idleHandlers = [];
     internal SortedList<long, Timeout> _timeouts = new ();
 
     /// <summary>The idle handlers and lock that must be held while manipulating them</summary>
@@ -72,7 +74,7 @@ internal class MainLoop : IDisposable
 
     /// <summary>The current <see cref="IMainLoopDriver"/> in use.</summary>
     /// <value>The main loop driver.</value>
-    internal IMainLoopDriver MainLoopDriver { get; private set; }
+    internal IMainLoopDriver? MainLoopDriver { get; private set; }
 
     /// <summary>Used for unit tests.</summary>
     internal bool Running { get; set; }
@@ -117,7 +119,7 @@ internal class MainLoop : IDisposable
             _idleHandlers.Add (idleHandler);
         }
 
-        MainLoopDriver.Wakeup ();
+        MainLoopDriver?.Wakeup ();
 
         return idleHandler;
     }
@@ -130,12 +132,9 @@ internal class MainLoop : IDisposable
     /// </remarks>
     internal object AddTimeout (TimeSpan time, Func<bool> callback)
     {
-        if (callback is null)
-        {
-            throw new ArgumentNullException (nameof (callback));
-        }
+        ArgumentNullException.ThrowIfNull (callback);
 
-        var timeout = new Timeout { Span = time, Callback = callback };
+        Timeout timeout = new() { Span = time, Callback = callback };
         AddTimeout (time, timeout);
 
         return timeout;
@@ -191,7 +190,7 @@ internal class MainLoop : IDisposable
     ///     You can use this method if you want to probe if events are pending. Typically used if you need to flush the
     ///     input queue while still running some of your own code in your main thread.
     /// </remarks>
-    internal bool EventsPending () { return MainLoopDriver.EventsPending (); }
+    internal bool EventsPending () { return MainLoopDriver?.EventsPending () ?? false; }
 
     /// <summary>Removes an idle handler added with <see cref="AddIdle(Func{bool})"/> from processing.</summary>
     /// <param name="token">A token returned by <see cref="AddIdle(Func{bool})"/></param>
@@ -270,7 +269,7 @@ internal class MainLoop : IDisposable
             }
         }
 
-        MainLoopDriver.Iteration ();
+        MainLoopDriver?.Iteration ();
 
         var runIdle = false;
 
@@ -296,19 +295,19 @@ internal class MainLoop : IDisposable
     ///     Invoked when a new timeout is added. To be used in the case when
     ///     <see cref="Application.EndAfterFirstIteration"/> is <see langword="true"/>.
     /// </summary>
-    [CanBeNull]
-    internal event EventHandler<TimeoutEventArgs> TimeoutAdded;
+    internal event EventHandler<TimeoutEventArgs>? TimeoutAdded;
 
     /// <summary>Wakes up the <see cref="MainLoop"/> that might be waiting on input.</summary>
     internal void Wakeup () { MainLoopDriver?.Wakeup (); }
 
-    private void AddTimeout (TimeSpan time, Timeout timeout)
+    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
+    private void AddTimeout (in TimeSpan time, in Timeout timeout)
     {
         lock (_timeoutsLockToken)
         {
-            long k = (DateTime.UtcNow + time).Ticks;
+            long k = DateTimeOffset.UtcNow.Add (time).Ticks;
             _timeouts.Add (NudgeToUniqueKey (k), timeout);
-            TimeoutAdded?.Invoke (this, new TimeoutEventArgs (timeout, k));
+            TimeoutAdded?.Invoke (this, new (timeout, k));
         }
     }
 
@@ -335,6 +334,7 @@ internal class MainLoop : IDisposable
     // CONCURRENCY: Potential deadlock city here.
     // CONCURRENCY: Multiple concurrency pitfalls on the delegates themselves.
     // INTENT: It looks like the general architecture here is trying to be a form of publisher/consumer pattern.
+    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
     private void RunIdle ()
     {
         List<Func<bool>> iterate;
@@ -342,7 +342,7 @@ internal class MainLoop : IDisposable
         lock (_idleHandlersLock)
         {
             iterate = _idleHandlers;
-            _idleHandlers = new List<Func<bool>> ();
+            _idleHandlers = [];
         }
 
         foreach (Func<bool> idle in iterate)
@@ -369,7 +369,7 @@ internal class MainLoop : IDisposable
         lock (_timeoutsLockToken)
         {
             copy = _timeouts;
-            _timeouts = new SortedList<long, Timeout> ();
+            _timeouts = new ();
         }
 
         foreach ((long k, Timeout timeout) in copy)
