@@ -111,5 +111,24 @@ public enum ViewportSettings
     ///     <see cref="ClipContentOnly"/> must be set for this setting to work (clipping beyond the visible area must be
     ///     disabled).
     /// </remarks>
-    ClearContentOnly = 32
+    ClearContentOnly = 32,
+
+    /// <summary>
+    ///     If set, the vertical scroll bar (see <see cref="View.HorizontalScrollBar"/>) will be enabled and automatically made visible
+    ///     when the dimension of the <see cref="View.Viewport"/> is smaller than the dimension of <see cref="View.GetContentSize()"/>.
+    /// </summary>
+    EnableHorizontalScrollBar = 64,
+
+    /// <summary>
+    ///     If set, the vertical scroll bar (see <see cref="View.VerticalScrollBar"/>) will be enabled and automatically made visible
+    ///     when the dimension of the <see cref="View.Viewport"/> is smaller than the dimension of <see cref="View.GetContentSize()"/>.
+    /// </summary>
+    EnableVerticalScrollBar = 128,
+
+    /// <summary>
+    ///     If set, the horizontal and vertical scroll bars (see cref="View.HorizontalScrollBar"/> and <see cref="View.VerticalScrollBar"/>)
+    ///     will be enabled and automatically made visible when the dimension of the <see cref="View.Viewport"/> is smaller than the
+    ///     dimension of <see cref="View.GetContentSize()"/>.
+    /// </summary>
+    EnableScrollBars = EnableHorizontalScrollBar | EnableVerticalScrollBar
 }
