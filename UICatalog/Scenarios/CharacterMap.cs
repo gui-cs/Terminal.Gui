@@ -464,10 +464,10 @@ internal class CharMap : View
 
         ScrollBar hScrollBar = new ()
         {
-            X = 0,
+            X = RowLabelWidth + 1,
             Y = Pos.AnchorEnd (),
             Width = Dim.Fill (1),
-            Size = GetContentSize ().Width,
+            Size = COLUMN_WIDTH * 15,
             Orientation = Orientation.Horizontal
         };
 
@@ -476,10 +476,10 @@ internal class CharMap : View
         ScrollBar vScrollBar = new ()
         {
             X = Pos.AnchorEnd (),
-            Y = 0,
+            Y = 1, // Header
             Height = Dim.Fill (Dim.Func (() => hScrollBar.Visible ? 1 : 0)),
             Orientation = Orientation.Vertical,
-            Size = GetContentSize ().Height
+            Size = GetContentSize ().Height - _rowHeight, // Minus one row so last row stays visible
         };
         vScrollBar.PositionChanged += (sender, args) => { Viewport = Viewport with { Y = args.CurrentValue }; };
 
@@ -488,7 +488,7 @@ internal class CharMap : View
 
         ViewportChanged += (sender, args) =>
                            {
-                               vScrollBar.Size = GetContentSize ().Height;
+                               vScrollBar.Size = GetContentSize ().Height - _rowHeight; // Minus one row so last row stays visible
                                vScrollBar.Position = Viewport.Y;
                            };
     }
@@ -970,7 +970,7 @@ internal class CharMap : View
                                                         document.RootElement,
                                                         new
                                                             JsonSerializerOptions
-                                                            { WriteIndented = true }
+                                                        { WriteIndented = true }
                                                        );
             }
 
