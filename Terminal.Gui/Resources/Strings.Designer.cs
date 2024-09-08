@@ -1312,6 +1312,15 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Comparison of BOOL and the given object is not supported..
+        /// </summary>
+        internal static string BOOL_CompareTo_UnsupportedType {
+            get {
+                return ResourceManager.GetString("BOOL_CompareTo_UnsupportedType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Cancel.
         /// </summary>
         internal static string btnCancel {

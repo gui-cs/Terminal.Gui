@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -141,6 +141,12 @@
   <data name="NetWinVtConsole_UnableToRestoreConsoleMode" xml:space="preserve">
     <value>No es posible que restaurar el modo de consola</value>
   </data>
+  <data name="NetWinVtConsole_UnableToSetConsoleMode" xml:space="preserve">
+    <value>No es posible que establecer el modo de consola</value>
+  </data>
+  <data name="NetWinVtConsole_UnableToGetConsoleMode" xml:space="preserve">
+    <value>No es posible que determinar el modo de consola</value>
+  </data>
   <data name="StdErr" xml:space="preserve">
     <value>el stderr</value>
   </data>
@@ -156,10 +162,7 @@
   <data name="IOStream" xml:space="preserve">
     <value>flujo</value>
   </data>
-  <data name="NetWinVtConsole_UnableToSetConsoleMode" xml:space="preserve">
-    <value>No es posible que establecer el modo de consola</value>
-  </data>
-  <data name="NetWinVtConsole_UnableToGetConsoleMode" xml:space="preserve">
-    <value>No es posible que determinar el modo de consola</value>
+  <data name="BOOL_CompareTo_UnsupportedType" xml:space="preserve">
+    <value>No es posible comparar el BOOL y eso objeto.</value>
   </data>
 </root>

@@ -738,4 +738,8 @@
   <data name="IOStream" xml:space="preserve">
     <value>stream</value>
   </data>
+  <data name="BOOL_CompareTo_UnsupportedType" xml:space="preserve">
+    <value>Comparison of BOOL and the given object is not supported.</value>
+    <comment>Exception text when an unsupported type was given to BOOL.CompareTo(object? obj)</comment>
+  </data>
 </root>
