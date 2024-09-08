@@ -30,6 +30,7 @@ using Resources;
                      "InconsistentNaming",
                      Justification = "Following recommendation to keep types named the same as the native types.")]
 [PublicAPI]
+[StructLayout (LayoutKind.Explicit)]
 public readonly struct BOOL :
     IComparisonOperators<BOOL, BOOL, bool>,
     IEqualityOperators<BOOL, bool, bool>,
@@ -72,6 +73,7 @@ public readonly struct BOOL :
     ///     PInvoke calls.<br/>
     ///     Only the zero or non-zero status of the field is significant and .
     /// </remarks>
+    [FieldOffset (0)]
     [MarshalAs (UnmanagedType.I4)]
     private readonly int Value;
 
