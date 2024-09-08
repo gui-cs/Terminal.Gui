@@ -72,7 +72,7 @@ public readonly struct BOOL :
     ///     PInvoke calls.<br/>
     ///     Only the zero or non-zero status of the field is significant and .
     /// </remarks>
-    [MarshalAs (UnmanagedType.Bool)]
+    [MarshalAs (UnmanagedType.I4)]
     private readonly int Value;
 
     /// <inheritdoc/>
