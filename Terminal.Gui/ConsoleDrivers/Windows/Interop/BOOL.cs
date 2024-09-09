@@ -122,7 +122,7 @@ public readonly struct BOOL :
 
     /// <inheritdoc/>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public int CompareTo (BOOL value) => this == value ? 0 : IsTrue ? 1 : -1;
+    public int CompareTo (BOOL value) => CompareTo (value.IsTrue);
 
     /// <inheritdoc/>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]

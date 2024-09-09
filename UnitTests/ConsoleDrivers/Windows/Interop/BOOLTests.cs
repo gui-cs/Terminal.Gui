@@ -1,12 +1,10 @@
-#nullable enable
+﻿#nullable enable
 using System.Runtime.CompilerServices;
 using Terminal.Gui.ConsoleDrivers.Windows.Interop;
 
 [assembly: TypeForwardedTo (typeof (BOOL))]
 
 namespace UnitTests.ConsoleDrivers.Windows.Interop;
-
-using Terminal.Gui.ConsoleDrivers.Windows.Interop;
 
 // ReSharper disable once InconsistentNaming
 // ReSharper disable once MemberCanBeFileLocal
@@ -63,6 +61,20 @@ public partial class BOOLTests
     {
         Unsafe.SkipInit (out BOOL justForReference);
         Assert.Equal (expectedResult, cast (ref justForReference, fromValue));
+
+        return Task.CompletedTask;
+    }
+
+    [Theory]
+    [CombinatorialData]
+    [Trait ("Category", "Type Checks")]
+    [Trait ("Category", "Operators")]
+    public Task CompareTo_BOOL_ProperOrdering ([CombinatorialRange (-1, 1, 1)] int left, [CombinatorialRange (-1, 1, 1)] int right)
+    {
+        int expected = (left != 0).CompareTo (right != 0);
+        Assert.Equal (expected, new BOOL (left).CompareTo (new BOOL (right)));
+        expected = (right != 0).CompareTo (left != 0);
+        Assert.Equal (expected, new BOOL (right).CompareTo (new BOOL (left)));
 
         return Task.CompletedTask;
     }
