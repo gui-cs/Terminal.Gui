@@ -320,7 +320,7 @@ internal class CharMap : View
         CanFocus = true;
         CursorVisibility = CursorVisibility.Default;
 
-        SetContentSize (new (RowWidth, (_maxCodePoint / 16 + 2) * _rowHeight));
+        SetContentSize (new (RowWidth, (_maxCodePoint / 16 + 1) * _rowHeight));
 
         AddCommand (
                     Command.ScrollUp,
@@ -367,6 +367,11 @@ internal class CharMap : View
                         if (Cursor.X > RowLabelWidth + 1)
                         {
                             ScrollHorizontal (-COLUMN_WIDTH);
+                        }
+
+                        if (Cursor.X >= Viewport.Width)
+                        {
+                            ScrollHorizontal (Cursor.X - Viewport.Width + 1);
                         }
 
                         return true;
@@ -464,6 +469,7 @@ internal class CharMap : View
 
         ScrollBar hScrollBar = new ()
         {
+            AutoHide = false,
             X = RowLabelWidth + 1,
             Y = Pos.AnchorEnd (),
             Width = Dim.Fill (1),
@@ -471,15 +477,14 @@ internal class CharMap : View
             Orientation = Orientation.Horizontal
         };
 
-        hScrollBar.VisibleChanged += (sender, args) => { Padding.Thickness = Padding.Thickness with { Bottom = hScrollBar.Visible ? 1 : 0 }; };
-
         ScrollBar vScrollBar = new ()
         {
+            AutoHide = false,
             X = Pos.AnchorEnd (),
             Y = 1, // Header
-            Height = Dim.Fill (Dim.Func (() => hScrollBar.Visible ? 1 : 0)),
+            Height = Dim.Fill (Dim.Func (() => Padding.Thickness.Bottom)),
             Orientation = Orientation.Vertical,
-            Size = GetContentSize ().Height - _rowHeight, // Minus one row so last row stays visible
+            Size = GetContentSize ().Height,
         };
         vScrollBar.PositionChanged += (sender, args) => { Viewport = Viewport with { Y = args.CurrentValue }; };
 
@@ -488,7 +493,19 @@ internal class CharMap : View
 
         ViewportChanged += (sender, args) =>
                            {
-                               vScrollBar.Size = GetContentSize ().Height - _rowHeight; // Minus one row so last row stays visible
+                               if (Viewport.Width < GetContentSize ().Width)
+                               {
+                                   Padding.Thickness = Padding.Thickness with { Bottom = 1 };
+                               }
+                               else
+                               {
+                                   Padding.Thickness = Padding.Thickness with { Bottom = 0 };
+                               }
+
+                               hScrollBar.Size = COLUMN_WIDTH * 15;
+                               hScrollBar.Position = Viewport.X;
+
+                               vScrollBar.Size = GetContentSize ().Height;
                                vScrollBar.Position = Viewport.Y;
                            };
     }
