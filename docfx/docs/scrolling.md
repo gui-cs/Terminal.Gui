@@ -27,7 +27,18 @@ Scrolling with the mouse and keyboard are enabled by:
 3) Subscribing to [View.MouseEvent](~/api/Terminal.Gui.View.MouseEvent.yml) and calling calling [View.ScrollHorizontal()](~/api/Terminal.Gui.View.ScrollHorizontal.yml)/[ScrollVertical()](~/api/Terminal.Gui.View.ScrollVertical.yml) as needed.
 4) Enabling the [ScrollBar](~/api/Terminal.Gui.ScrollBar.yml)s built into View ([View.HorizontalScrollBar/VerticalScrollBar](~/api/Terminal.Gui.View.HorizontalScrollBar.yml)) by setting the flag [ViewportSettings.EnableScrollBars](~/api/Terminal.Gui.ViewportSettings.EnableScrollBars.yml) on [View.ViewportSettings](~/api/Terminal.Gui.View.ViewportSettings.yml). 
 
-### [Viewport Settings](~/api/Terminal.Gui.ViewportSettings.yml)
+## Examples
+
+These Scenarios illustrate Terminal.Gui scrolling:
+
+* *Content Scrolling* - Demonstrates the various [Viewport Settings](~/api/Terminal.Gui.ViewportSettings.yml) (see below) in an interactive manner. Used by the development team to visually verify that convoluted View layout and arrangement scenarios scroll properly.
+* *Character Map* - Demonstrates a sophisticated scrolling use-case. The entire set of Unicode code-points can be scrolled and searched. From a scrolling perspective, this Scenario illustrates how to manually configure `Viewport`, `SetContentArea()`, and `ViewportSettings` to enable horizontal and vertical headers (as might appear in a spreadsheet), full keyboard and mouse support, and more. 
+* *Scroll Demo* - Designed to demonstrate using the `Scroll` view in a standalone manner.
+* *ScrollBar Demo* - Designed to demonstrate using the `ScrollBar` view in a standalone manner.
+* *Scrolling* - A legacy Scenario from v1 that is used to visually test that scrolling is working properly.
+* *ListView* and *TableView* - The source code to these built-in Views are good references for how to support scrolling and ScrollBars in a re-usable View sub-class. 
+
+## [Viewport Settings](~/api/Terminal.Gui.ViewportSettings.yml)
 
 Use [View.ViewportSettings](~/api/Terminal.Gui.View.ViewportSettings.yml) to adjust the behavior of scrolling. 
 
@@ -42,7 +53,7 @@ Use [View.ViewportSettings](~/api/Terminal.Gui.View.ViewportSettings.yml) to adj
 * [EnableHorizontal/VerticalScrollBar](~/api/Terminal.Gui.ViewportSettings.EnableHorizontalScrollBar) - If set, the scroll bar will be enabled and automatically made visible when the corresponding dimension of [View.Viewport](~/api/Terminal.Gui.View.Viewport.yml) is smaller than the dimension of [View.GetContentSize()](~/api/Terminal.Gui.View.GetContentSize.yml).
 
 
-### [ScrollBar](~/api/Terminal.Gui.ScrollBar.yml)
+## [ScrollBar](~/api/Terminal.Gui.ScrollBar.yml)
 
 Provides a visual indicator that content can be scrolled. ScrollBars consist of two buttons, one each for scrolling forward or backwards, a Scroll that can be clicked to scroll large amounts, and a ScrollSlider that can be dragged to scroll continuously. ScrollBars can be oriented either horizontally or vertically and support the user dragging and clicking with the mouse to scroll.
 
