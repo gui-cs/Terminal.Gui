@@ -4,7 +4,12 @@ using System.ComponentModel;
 
 namespace Terminal.Gui;
 
-/// <summary>A proportional scroll bar that can be oriented either horizontally or vertically.</summary>
+/// <summary>
+///     Provides a visual indicator that content can be scrolled. ScrollBars consist of two buttons, one each for scrolling
+///     forward or backwards, a Scroll that can be clicked to scroll large amounts, and a ScrollSlider that can be dragged
+///     to scroll continuously. ScrollBars can be oriented either horizontally or vertically and support the user dragging
+///     and clicking with the mouse to scroll.
+/// </summary>
 /// <remarks>
 ///     <para>
 ///         <see cref="Position"/> indicates the current location between zero and <see cref="Size"/>.

@@ -5,8 +5,11 @@ using System.ComponentModel;
 namespace Terminal.Gui;
 
 /// <summary>
-///     Indicates the position and size of scrollable content. The indicator can be dragged with the mouse. Can be
-///     oriented either vertically or horizontally. Used within a <see cref="ScrollBar"/>.
+///     Indicates the size of scrollable content and provides a visible element, referred to as the "ScrollSlider" that
+///     that is sized to
+///     show the proportion of the scrollable content to the size of the <see cref="View.Viewport"/>. The ScrollSlider
+///     can be dragged with the mouse. A Scroll can be oriented either vertically or horizontally and is used within a
+///     <see cref="ScrollBar"/>.
 /// </summary>
 /// <remarks>
 ///     <para>
