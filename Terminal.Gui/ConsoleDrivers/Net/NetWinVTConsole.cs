@@ -84,7 +84,7 @@ internal sealed class NetWinVTConsole : IDisposable
         {
             throw new IOException (
                                    $"""
-                                    {Strings.NetWinVtConsole_UnableToSetConsoleMode} {Strings.ForPossessive} {streamName}.
+                                    {Strings.Win32Interop_UnableToSetConsoleMode} {Strings.ForPossessive} {streamName}.
                                     {Strings.ErrorCodeString}: {GetLastPInvokeError ()}
                                     """);
         }
@@ -94,7 +94,7 @@ internal sealed class NetWinVTConsole : IDisposable
         {
             throw new IOException (
                                    $"""
-                                    {Strings.NetWinVtConsole_UnableToGetConsoleMode} {Strings.ForPossessive} {streamName}.
+                                    {Strings.Win32Interop_UnableToGetConsoleMode} {Strings.ForPossessive} {streamName}.
                                     {Strings.ErrorCodeString}: {GetLastPInvokeError ()}
                                     """);
         }

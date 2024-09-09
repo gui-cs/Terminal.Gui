@@ -714,10 +714,10 @@
   <data name="NetWinVtConsole_UnableToRestoreConsoleMode" xml:space="preserve">
     <value>Failed to restore console mode</value>
   </data>
-  <data name="NetWinVtConsole_UnableToSetConsoleMode" xml:space="preserve">
+  <data name="Win32Interop_UnableToSetConsoleMode" xml:space="preserve">
     <value>Failed to set console mode</value>
   </data>
-  <data name="NetWinVtConsole_UnableToGetConsoleMode" xml:space="preserve">
+  <data name="Win32Interop_UnableToGetConsoleMode" xml:space="preserve">
     <value>Failed to get console mode</value>
   </data>
   <data name="StdErr" xml:space="preserve">

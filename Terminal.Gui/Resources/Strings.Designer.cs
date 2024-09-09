@@ -1798,29 +1798,11 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to get console mode.
-        /// </summary>
-        internal static string NetWinVtConsole_UnableToGetConsoleMode {
-            get {
-                return ResourceManager.GetString("NetWinVtConsole_UnableToGetConsoleMode", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Failed to restore console mode.
         /// </summary>
         internal static string NetWinVtConsole_UnableToRestoreConsoleMode {
             get {
                 return ResourceManager.GetString("NetWinVtConsole_UnableToRestoreConsoleMode", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to set console mode.
-        /// </summary>
-        internal static string NetWinVtConsole_UnableToSetConsoleMode {
-            get {
-                return ResourceManager.GetString("NetWinVtConsole_UnableToSetConsoleMode", resourceCulture);
             }
         }
         
@@ -1884,6 +1866,24 @@ namespace Terminal.Gui.Resources {
         internal static string Win32_PInvoke_SetConsoleMode_HandleInvalid {
             get {
                 return ResourceManager.GetString("Win32_PInvoke_SetConsoleMode_HandleInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to get console mode.
+        /// </summary>
+        internal static string Win32Interop_UnableToGetConsoleMode {
+            get {
+                return ResourceManager.GetString("Win32Interop_UnableToGetConsoleMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to set console mode.
+        /// </summary>
+        internal static string Win32Interop_UnableToSetConsoleMode {
+            get {
+                return ResourceManager.GetString("Win32Interop_UnableToSetConsoleMode", resourceCulture);
             }
         }
         
