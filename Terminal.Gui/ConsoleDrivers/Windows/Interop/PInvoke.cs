@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.ConsoleDrivers.Windows.Interop;
+namespace Terminal.Gui.ConsoleDrivers.Windows.Interop;
 
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -17,6 +17,94 @@ using static System.Runtime.InteropServices.Marshal;
 [SupportedOSPlatform ("WINDOWS")]
 internal static unsafe class PInvoke
 {
+    /// <summary>Sets the current size and position of a console screen buffer's window.</summary>
+    /// <param name="hConsoleOutput">A <see cref="SafeFileHandle"/> to the console screen buffer.</param>
+    /// <param name="bAbsolute">
+    ///     If this parameter is <see langword="true"/>, the coordinates specify the new upper-left and lower-right corners of the
+    ///     window.<br/>
+    ///     If it is <see langword="false"/>, the coordinates are relative to the current window-corner coordinates.
+    /// </param>
+    /// <param name="lpConsoleWindow">
+    ///     A <see langword="readonly"/> reference to a <see cref="SmallRect"/> structure that specifies the new upper-left and
+    ///     lower-right corners of the window.
+    /// </param>
+    /// <returns>
+    ///     If the method succeeds, the return value is <see langword="true"/>.<br/>
+    ///     If the method fails, the return value is <see langword="false"/>.
+    /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         The method fails if <paramref name="lpConsoleWindow"/> extends beyond the boundaries of the console screen buffer.<br/>
+    ///         This means that the <see cref="SmallRect.Top"/> and <see cref="SmallRect.Left"/> members of
+    ///         <paramref name="lpConsoleWindow"/> (or the calculated top and left coordinates, if <paramref name="bAbsolute"/> is
+    ///         <see langword="false"/>) cannot be less than zero.<br/>
+    ///         Similarly, the <see cref="SmallRect.Bottom"/> and <see cref="SmallRect.Right"/> members (or the calculated bottom and
+    ///         right coordinates) cannot be greater than (screen buffer height – 1) and (screen buffer width – 1), respectively.
+    ///     </para>
+    ///     <para>
+    ///         The method also fails if the <see cref="SmallRect.Right"/> member (or calculated right coordinate) is less than or
+    ///         equal to the <see cref="SmallRect.Left"/> member (or calculated left coordinate) or if the <see cref="SmallRect.Bottom"/>
+    ///         member (or calculated bottom coordinate) is less than or equal to the <see cref="SmallRect.Top"/> member (or calculated
+    ///         top coordinate).
+    ///     </para>
+    ///     <para>
+    ///         For consoles with more than one screen buffer, changing the window location for one screen buffer does not affect the
+    ///         window locations of the other screen buffers.
+    ///     </para>
+    ///     <para>
+    ///         To determine the current size and position of a screen buffer's window, use the <see cref="GetConsoleScreenBufferInfo"/>
+    ///         method.<br/>
+    ///         This method also returns the maximum size of the window, given the current screen buffer size, the current font size, and
+    ///         the screen size.<br/>
+    ///         The <see cref="GetLargestConsoleWindowSize"/> method returns the maximum window size given the current font and screen
+    ///         sizes, but it does not consider the size of the console screen buffer.
+    ///     </para>
+    ///     <para>
+    ///         SetConsoleWindowInfo can be used to scroll the contents of the console screen buffer by shifting the position of the
+    ///         window rectangle without changing its size.
+    ///     </para>
+    /// </remarks>
+    [SkipLocalsInit]
+    public static bool SetConsoleWindowInfo (SafeFileHandle hConsoleOutput, bool bAbsolute, in SmallRect lpConsoleWindow)
+    {
+        // Semi-redundant with the attribute, but same IL in release build and easier to debug in debug builds.
+        Unsafe.SkipInit (out nint consoleHandle);
+        Unsafe.SkipInit (out BOOL result);
+        Unsafe.SkipInit (out BOOL absolute);
+
+        ValidateSafeFileHandle (hConsoleOutput);
+
+        SafeHandleMarshaller<SafeFileHandle>.ManagedToUnmanagedIn consoleHandleNativeMarshaller = new ();
+
+        try
+        {
+            consoleHandleNativeMarshaller.FromManaged (hConsoleOutput);
+
+            fixed (SmallRect* lpConsoleWindowNative = &lpConsoleWindow)
+            {
+                SetLastSystemError (0);
+
+                consoleHandle = consoleHandleNativeMarshaller.ToUnmanaged ();
+                absolute = new (bAbsolute);
+
+                result = UnsafeNativeMethods.SetConsoleWindowInfo (consoleHandle, absolute, lpConsoleWindowNative);
+
+                if (result)
+                {
+                    return true;
+                }
+
+                SetLastPInvokeError (GetLastSystemError ());
+
+                return false;
+            }
+        }
+        finally
+        {
+            consoleHandleNativeMarshaller.Free ();
+        }
+    }
+
     /// <summary>Retrieves the current input mode of a console's input buffer or the current output mode of a console screen buffer.</summary>
     /// <param name="hConsoleHandle">
     ///     A handle to the console input buffer or the console screen buffer.
@@ -172,4 +260,7 @@ file static unsafe class UnsafeNativeMethods
 
     [DllImport ("kernel32", EntryPoint = "SetConsoleMode", ExactSpelling = true)]
     internal static extern BOOL SetConsoleMode (nint hConsoleHandle, CONSOLE_MODE dwMode);
+
+    [DllImport ("kernel32", EntryPoint = "SetConsoleWindowInfo", ExactSpelling = true)]
+    internal static extern BOOL SetConsoleWindowInfo (nint hConsoleOutput, BOOL bAbsolute, SmallRect* lpConsoleWindow);
 }
