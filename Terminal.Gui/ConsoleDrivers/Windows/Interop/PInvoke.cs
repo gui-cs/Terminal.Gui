@@ -113,8 +113,8 @@ internal static unsafe class PInvoke
     ///     An out reference that receives the current mode of the specified buffer.
     /// </param>
     /// <returns>
-    ///     If the function succeeds, the return value is true. If the function fails, the return value is false. To get extended
-    ///     error information, call GetLastError.
+    ///     If the method succeeds, the return value is <see langword="true"/>.<br/>
+    ///     If the method fails, the return value is <see langword="false"/>.
     /// </returns>
     /// <seealso href="https://learn.microsoft.com/windows/console/getconsolemode">Read more on Microsoft Learn</seealso>
     [SkipLocalsInit]
@@ -144,6 +144,71 @@ internal static unsafe class PInvoke
         }
         finally
         {
+            consoleHandleNativeMarshaller.Free ();
+        }
+    }
+
+    /// <summary>
+    ///     Sets the <see cref="FileStream"/> to be the currently active console screen buffer.
+    /// </summary>
+    /// <param name="outputStream">The <see cref="FileStream"/> holding the console output buffer handle.</param>
+    /// <returns>
+    ///     If the method succeeds, the return value is <see langword="true"/>.<br/>
+    ///     If the method fails, the return value is <see langword="false"/>.
+    /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         A console can have multiple screen buffers.<br/>
+    ///         <see cref="SetConsoleActiveScreenBuffer"/> determines which one is displayed.
+    ///     </para>
+    ///     <para>
+    ///         You can write to an inactive screen buffer and then use <see cref="SetConsoleActiveScreenBuffer"/> to display the
+    ///         buffer's contents.
+    ///     </para>
+    ///     <para>
+    ///         This API is not recommended, but it does have an approximate virtual terminal equivalent in the alternate screen buffer
+    ///         sequence.<br/>
+    ///         See
+    ///         <see href="https://learn.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences#alternate-screen-buffer"/>
+    ///         for details on the virtual terminal sequence alternative.
+    ///     </para>
+    ///     <para>
+    ///         Setting the alternate screen buffer can provide an application with a separate, isolated space for drawing over the
+    ///         course of its session runtime while preserving the content that was displayed by the application's invoker.<br/>
+    ///         This maintains that drawing information for simple restoration on process exit.
+    ///     </para>
+    /// </remarks>
+    [SkipLocalsInit]
+    internal static bool SetConsoleActiveScreenBuffer (FileStream outputStream)
+    {
+        Unsafe.SkipInit (out nint consoleHandle);
+        Unsafe.SkipInit (out BOOL result);
+
+        ValidateSafeFileHandle (outputStream.SafeFileHandle);
+
+        SafeHandleMarshaller<SafeFileHandle>.ManagedToUnmanagedIn consoleHandleNativeMarshaller = new ();
+
+        try
+        {
+            SetLastSystemError (0);
+
+            consoleHandleNativeMarshaller.FromManaged (outputStream.SafeFileHandle);
+            consoleHandle = consoleHandleNativeMarshaller.ToUnmanaged ();
+
+            result = UnsafeNativeMethods.SetConsoleActiveScreenBuffer (consoleHandle);
+
+            if (result)
+            {
+                return true;
+            }
+
+            SetLastPInvokeError (GetLastSystemError ());
+
+            return false;
+        }
+        finally
+        {
+            // CleanupCallerAllocated - Perform cleanup of caller allocated resources.
             consoleHandleNativeMarshaller.Free ();
         }
     }
@@ -257,6 +322,9 @@ file static unsafe class UnsafeNativeMethods
 {
     [DllImport ("kernel32", EntryPoint = "GetConsoleMode", ExactSpelling = true)]
     internal static extern BOOL GetConsoleMode (nint hConsoleHandle, CONSOLE_MODE* lpMode);
+
+    [DllImport ("kernel32", EntryPoint = "SetConsoleActiveScreenBuffer", ExactSpelling = true)]
+    internal static extern BOOL SetConsoleActiveScreenBuffer (nint hConsoleOutput);
 
     [DllImport ("kernel32", EntryPoint = "SetConsoleMode", ExactSpelling = true)]
     internal static extern BOOL SetConsoleMode (nint hConsoleHandle, CONSOLE_MODE dwMode);
