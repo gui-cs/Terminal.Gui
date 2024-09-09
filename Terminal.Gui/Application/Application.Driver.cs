@@ -26,4 +26,6 @@ public static partial class Application // Driver abstractions
     /// </remarks>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     public static string ForceDriver { get; set; } = string.Empty;
+
+    public static string Sixel;
 }

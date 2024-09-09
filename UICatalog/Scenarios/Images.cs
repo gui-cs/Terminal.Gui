@@ -48,7 +48,7 @@ public class Images : Scenario
 
         var btnOpenImage = new Button { X = Pos.Right (cbUseTrueColor) + 2, Y = 0, Text = "Open Image" };
         win.Add (btnOpenImage);
-
+        
         var imageView = new ImageView
         {
             X = 0, Y = Pos.Bottom (lblDriverName), Width = Dim.Fill (), Height = Dim.Fill ()
@@ -103,10 +103,15 @@ public class Images : Scenario
                                    Application.Refresh ();
                                };
 
+        var btnSixel = new Button () { X = Pos.Right (btnOpenImage) + 2, Y = 0, Text = "Output Sixel" };
+        btnSixel.Accept += (s, e) => { imageView.OutputSixel ();};
+        win.Add (btnSixel);
+
         Application.Run (win);
         win.Dispose ();
         Application.Shutdown ();
     }
+
 
     private class ImageView : View
     {
@@ -154,6 +159,38 @@ public class Images : Scenario
         {
             _fullResImage = image;
             SetNeedsDisplay ();
+        }
+
+        public void OutputSixel ()
+        {
+            if (_fullResImage == null)
+            {
+                return;
+            }
+
+            var encoder = new SixelEncoder ();
+
+            var encoded = encoder.EncodeSixel (ConvertToColorArray (_fullResImage));
+
+            Application.Sixel = encoded;
+        }
+        public static Color [,] ConvertToColorArray (Image<Rgba32> image)
+        {
+            int width = image.Width;
+            int height = image.Height;
+            Color [,] colors = new Color [width, height];
+
+            // Loop through each pixel and convert Rgba32 to System.Drawing.Color
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    var pixel = image [x, y];
+                    colors [x, y] = new Color (pixel.A, pixel.R, pixel.G, pixel.B); // Convert Rgba32 to System.Drawing.Color
+                }
+            }
+
+            return colors;
         }
     }
 }
