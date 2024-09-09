@@ -7,8 +7,6 @@ namespace Terminal.Gui;
 /// </summary>
 public class SixelEncoder
 {
-
-
     /// <summary>
     /// Encode the given bitmap into sixel encoding
     /// </summary>
@@ -37,16 +35,27 @@ public class SixelEncoder
         return start + defaultRatios + completeStartSequence + noScaling + fillArea + pallette + pixelData + terminator;
     }
 
-    private string GetColorPallette (Color [,] pixels, out Dictionary<Color, int> dictionary)
+    private string GetColorPallette (Color [,] pixels, out ColorQuantizer quantizer)
     {
+        quantizer = new ColorQuantizer ();
+        quantizer.BuildColorPalette (pixels);
 
-        dictionary = new Dictionary<Color, int>
+
+        // Color definitions in the format "#<index>;<type>;<R>;<G>;<B>" - For type the 2 means RGB.  The values range 0 to 100
+
+        StringBuilder paletteSb = new StringBuilder ();
+
+        for (int i = 0; i < quantizer.Palette.Count; i++)
         {
-            {new Color(255,0,0),0}
-        };
+            var color = quantizer.Palette [i];
+            paletteSb.AppendFormat ("#{0};2;{1};{2};{3}",
+                                    i,
+                                    color.R * 100 / 255,
+                                    color.G * 100 / 255,
+                                    color.B * 100 / 255);
+        }
 
-        // Red color definition in the format "#<index>;<type>;<R>;<G>;<B>" - 2 means RGB.  The values range 0 to 100
-        return "#0;2;100;0;0";
+        return paletteSb.ToString ();
     }
 
     private string GetFillArea (Color [,] pixels)
