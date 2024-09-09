@@ -2,8 +2,6 @@
 using System.Runtime.CompilerServices;
 using Terminal.Gui.ConsoleDrivers.Windows.Interop;
 
-[assembly: TypeForwardedTo (typeof (BOOL))]
-
 namespace UnitTests.ConsoleDrivers.Windows.Interop;
 
 // ReSharper disable once InconsistentNaming
