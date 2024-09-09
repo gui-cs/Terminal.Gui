@@ -2,6 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
+// NOTE: This is getting replaced with a struct which handles things better than the enum can in a commit to come later.
 /// <summary>
 ///     Native type for Windows interop.<br/>
 ///     Bit-flagged value for control of console operation.
@@ -11,6 +12,7 @@ using System.Diagnostics.CodeAnalysis;
 /// </remarks>
 /// <seealso href="https://learn.microsoft.com/en-us/windows/console/setconsolemode" />
 [Flags]
+[Obsolete ("Will be replaced by a struct of the same name in a future change.", false)]
 [SuppressMessage (
                      "ReSharper",
                      "InconsistentNaming",
