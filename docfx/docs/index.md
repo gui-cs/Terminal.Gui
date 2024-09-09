@@ -110,7 +110,7 @@ All visible elements in a Terminal.Gui application are implemented as
 See the full list of [Views provided by the Terminal.Gui library here](views.md).
 
 Every view can contain an arbitrary number of child views, called `SubViews`. Call the
-[View.Add](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_Add_Terminal_Gui_View_) method to add a couple of buttons to a UI:
+[View.Add](~/api/Terminal.Gui.View.Add.yml) method to add a couple of buttons to a UI:
 
 ```csharp
 void SetupMyView (View myView)

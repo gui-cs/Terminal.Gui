@@ -213,6 +213,7 @@ public partial class View
             {
                 // Force set Viewport to cause settings to be applied as needed
                 SetViewport (Viewport);
+                SetScrollBarsKeepContentInAllViewport (_viewportSettings);
             }
         }
     }

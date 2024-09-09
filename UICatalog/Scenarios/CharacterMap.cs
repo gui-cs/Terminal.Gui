@@ -27,7 +27,6 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Layout")]
 [ScenarioCategory ("Scrolling")]
-
 public class CharacterMap : Scenario
 {
     public Label _errorLabel;
@@ -243,7 +242,6 @@ public class CharacterMap : Scenario
             // Ensure the typed glyph is selected 
             _charMap.SelectedCodePoint = (int)result;
 
-
             // Cancel the event to prevent ENTER from being handled elsewhere
             e.Handled = true;
         }
@@ -305,7 +303,6 @@ public class CharacterMap : Scenario
 
         return item;
     }
-
 }
 
 internal class CharMap : View
@@ -323,7 +320,7 @@ internal class CharMap : View
         CanFocus = true;
         CursorVisibility = CursorVisibility.Default;
 
-        SetContentSize (new (RowWidth, (MaxCodePoint / 16 + 2) * _rowHeight));
+        SetContentSize (new (RowWidth, (_maxCodePoint / 16 + 1) * _rowHeight));
 
         AddCommand (
                     Command.ScrollUp,
@@ -344,7 +341,7 @@ internal class CharMap : View
                     Command.ScrollDown,
                     () =>
                     {
-                        if (SelectedCodePoint <= MaxCodePoint - 16)
+                        if (SelectedCodePoint <= _maxCodePoint - 16)
                         {
                             SelectedCodePoint += 16;
                         }
@@ -372,6 +369,11 @@ internal class CharMap : View
                             ScrollHorizontal (-COLUMN_WIDTH);
                         }
 
+                        if (Cursor.X >= Viewport.Width)
+                        {
+                            ScrollHorizontal (Cursor.X - Viewport.Width + 1);
+                        }
+
                         return true;
                     }
                    );
@@ -380,7 +382,7 @@ internal class CharMap : View
                     Command.ScrollRight,
                     () =>
                     {
-                        if (SelectedCodePoint < MaxCodePoint)
+                        if (SelectedCodePoint < _maxCodePoint)
                         {
                             SelectedCodePoint++;
                         }
@@ -411,7 +413,7 @@ internal class CharMap : View
                     () =>
                     {
                         int page = (Viewport.Height - 1 / _rowHeight) * 16;
-                        SelectedCodePoint += Math.Min (page, MaxCodePoint - SelectedCodePoint);
+                        SelectedCodePoint += Math.Min (page, _maxCodePoint - SelectedCodePoint);
                         Viewport = Viewport with { Y = SelectedCodePoint / 16 * _rowHeight };
 
                         return true;
@@ -432,7 +434,7 @@ internal class CharMap : View
                     Command.BottomEnd,
                     () =>
                     {
-                        SelectedCodePoint = MaxCodePoint;
+                        SelectedCodePoint = _maxCodePoint;
                         Viewport = Viewport with { Y = SelectedCodePoint / 16 * _rowHeight };
 
                         return true;
@@ -462,66 +464,50 @@ internal class CharMap : View
         MouseClick += Handle_MouseClick;
         MouseEvent += Handle_MouseEvent;
 
-        // Prototype scrollbars
-        Padding.Thickness = new (0, 0, 1, 1);
+        // Add scrollbars
+        Padding.Thickness = new (0, 0, 1, 0);
 
-        var up = new Button
+        ScrollBar hScrollBar = new ()
         {
-            X = Pos.AnchorEnd (1),
-            Y = 0,
-            Height = 1,
-            Width = 1,
-            NoPadding = true,
-            NoDecorations = true,
-            Title = CM.Glyphs.UpArrow.ToString (),
-            WantContinuousButtonPressed = true,
-            CanFocus = false
+            AutoHide = false,
+            X = RowLabelWidth + 1,
+            Y = Pos.AnchorEnd (),
+            Width = Dim.Fill (1),
+            Size = COLUMN_WIDTH * 15,
+            Orientation = Orientation.Horizontal
         };
-        up.Accept += (sender, args) => { args.Handled = ScrollVertical (-1) == true; };
 
-        var down = new Button
+        ScrollBar vScrollBar = new ()
         {
-            X = Pos.AnchorEnd (1),
-            Y = Pos.AnchorEnd (2),
-            Height = 1,
-            Width = 1,
-            NoPadding = true,
-            NoDecorations = true,
-            Title = CM.Glyphs.DownArrow.ToString (),
-            WantContinuousButtonPressed = true,
-            CanFocus = false
+            AutoHide = false,
+            X = Pos.AnchorEnd (),
+            Y = 1, // Header
+            Height = Dim.Fill (Dim.Func (() => Padding.Thickness.Bottom)),
+            Orientation = Orientation.Vertical,
+            Size = GetContentSize ().Height,
         };
-        down.Accept += (sender, args) => { ScrollVertical (1); };
+        vScrollBar.PositionChanged += (sender, args) => { Viewport = Viewport with { Y = args.CurrentValue }; };
 
-        var left = new Button
-        {
-            X = 0,
-            Y = Pos.AnchorEnd (1),
-            Height = 1,
-            Width = 1,
-            NoPadding = true,
-            NoDecorations = true,
-            Title = CM.Glyphs.LeftArrow.ToString (),
-            WantContinuousButtonPressed = true,
-            CanFocus = false
-        };
-        left.Accept += (sender, args) => { ScrollHorizontal (-1); };
+        Padding.Add (vScrollBar, hScrollBar);
+        hScrollBar.PositionChanged += (sender, args) => { Viewport = Viewport with { X = args.CurrentValue }; };
 
-        var right = new Button
-        {
-            X = Pos.AnchorEnd (2),
-            Y = Pos.AnchorEnd (1),
-            Height = 1,
-            Width = 1,
-            NoPadding = true,
-            NoDecorations = true,
-            Title = CM.Glyphs.RightArrow.ToString (),
-            WantContinuousButtonPressed = true,
-            CanFocus = false
-        };
-        right.Accept += (sender, args) => { ScrollHorizontal (1); };
+        ViewportChanged += (sender, args) =>
+                           {
+                               if (Viewport.Width < GetContentSize ().Width)
+                               {
+                                   Padding.Thickness = Padding.Thickness with { Bottom = 1 };
+                               }
+                               else
+                               {
+                                   Padding.Thickness = Padding.Thickness with { Bottom = 0 };
+                               }
 
-        Padding.Add (up, down, left, right);
+                               hScrollBar.Size = COLUMN_WIDTH * 15;
+                               hScrollBar.Position = Viewport.X;
+
+                               vScrollBar.Size = GetContentSize ().Height;
+                               vScrollBar.Position = Viewport.Y;
+                           };
     }
 
     private void Handle_MouseEvent (object sender, MouseEventEventArgs e)
@@ -571,7 +557,7 @@ internal class CharMap : View
         set => throw new NotImplementedException ();
     }
 
-    public static int MaxCodePoint = UnicodeRange.Ranges.Max (r => r.End);
+    public static int _maxCodePoint = UnicodeRange.Ranges.Max (r => r.End);
 
     /// <summary>
     ///     Specifies the starting offset for the character map. The default is 0x2500 which is the Box Drawing
@@ -650,7 +636,7 @@ internal class CharMap : View
         }
     }
 
-    private static int RowLabelWidth => $"U+{MaxCodePoint:x5}".Length + 1;
+    private static int RowLabelWidth => $"U+{_maxCodePoint:x5}".Length + 1;
     private static int RowWidth => RowLabelWidth + COLUMN_WIDTH * 16;
     public event EventHandler<ListViewItemEventArgs> Hover;
 
@@ -698,7 +684,7 @@ internal class CharMap : View
 
             int val = row * 16;
 
-            if (val > MaxCodePoint)
+            if (val > _maxCodePoint)
             {
                 break;
             }
@@ -865,7 +851,7 @@ internal class CharMap : View
 
         int val = row * 16 + col;
 
-        if (val > MaxCodePoint)
+        if (val > _maxCodePoint)
         {
             return;
         }
@@ -885,6 +871,7 @@ internal class CharMap : View
         if (me.Flags == MouseFlags.Button1Clicked)
         {
             SelectedCodePoint = val;
+
             return;
         }
 
@@ -1077,7 +1064,7 @@ internal class CharMap : View
             };
             dlg.Add (label);
 
-            var json = new TextView ()
+            var json = new TextView
             {
                 X = 0,
                 Y = Pos.Bottom (label),
