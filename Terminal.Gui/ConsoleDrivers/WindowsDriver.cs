@@ -22,6 +22,7 @@ namespace Terminal.Gui;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using ConsoleDrivers.Windows.Interop;
 using Terminal.Gui.ConsoleDrivers.Windows;
 
 internal class WindowsDriver : ConsoleDriver
@@ -54,7 +55,7 @@ internal class WindowsDriver : ConsoleDriver
 
     private readonly bool _isWindowsTerminal;
 
-    private WindowsConsole.SmallRect _damageRegion;
+    private SmallRect _damageRegion;
     private bool _isButtonDoubleClicked;
     private bool _isButtonPressed;
     private bool _isButtonReleased;
@@ -285,13 +286,10 @@ internal class WindowsDriver : ConsoleDriver
             }
         }
 
-        _damageRegion = new()
-        {
-            Top = 0,
-            Left = 0,
-            Bottom = (short)Rows,
-            Right = (short)Cols
-        };
+        _damageRegion = new (
+                             rows: (short)Rows,
+                             cols: (short)Cols
+                            );
 
         if (!RunningUnitTests
          && WinConsole != null
@@ -305,7 +303,7 @@ internal class WindowsDriver : ConsoleDriver
             }
         }
 
-        WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
+        SmallRect.MakeEmpty (ref _damageRegion);
     }
 
     public WindowsConsole WinConsole { get; private set; }
@@ -349,7 +347,7 @@ internal class WindowsDriver : ConsoleDriver
                     Rows = winSize.Height;
                 }
 
-                WindowsConsole.SmallRect.MakeEmpty (ref _damageRegion);
+                SmallRect.MakeEmpty (ref _damageRegion);
 
                 if (_isWindowsTerminal)
                 {
@@ -372,13 +370,10 @@ internal class WindowsDriver : ConsoleDriver
         // CONCURRENCY: Unsynchronized access to Clip is not safe.
         Clip = new (0, 0, Cols, Rows);
 
-        _damageRegion = new()
-        {
-            Top = 0,
-            Left = 0,
-            Bottom = (short)Rows,
-            Right = (short)Cols
-        };
+        _damageRegion = new (
+                             rows: (short)Rows,
+                             cols: (short)Cols
+                            );
 
         ClearContents ();
 
@@ -797,13 +792,10 @@ internal class WindowsDriver : ConsoleDriver
         // CONCURRENCY: Unsynchronized access to Clip is not safe.
         Clip = new (0, 0, Cols, Rows);
 
-        _damageRegion = new()
-        {
-            Top = 0,
-            Left = 0,
-            Bottom = (short)Rows,
-            Right = (short)Cols
-        };
+        _damageRegion = new (
+                             rows: (short)Rows,
+                             cols: (short)Cols
+                            );
         _dirtyLines = new bool [Rows];
 
         WinConsole?.ForceRefreshCursorVisibility ();
