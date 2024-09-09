@@ -1,8 +1,9 @@
 namespace Terminal.Gui.ConsoleDrivers.Windows.Interop;
 
 using System.Runtime.InteropServices;
+using static System.Runtime.InteropServices.UnmanagedType;
 
-[StructLayout (LayoutKind.Sequential)]
+[StructLayout (LayoutKind.Explicit, Size = 8)]
 public struct SmallRect
 {
     public SmallRect (short cols, short rows) : this (0, 0, cols, rows) { }
@@ -15,9 +16,20 @@ public struct SmallRect
         Bottom = bottom;
     }
 
+    [FieldOffset (0)]
+    [MarshalAs (I2)]
     public short Left;
+
+    [FieldOffset (2)]
+    [MarshalAs (I2)]
     public short Top;
+
+    [FieldOffset (4)]
+    [MarshalAs (I2)]
     public short Right;
+
+    [FieldOffset (6)]
+    [MarshalAs (I2)]
     public short Bottom;
 
     public static void MakeEmpty (ref SmallRect rect) { rect.Left = -1; }
