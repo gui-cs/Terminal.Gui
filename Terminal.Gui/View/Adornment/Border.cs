@@ -1,3 +1,6 @@
+using System.Diagnostics;
+using static Terminal.Gui.SpinnerStyle;
+
 namespace Terminal.Gui;
 
 /// <summary>The Border for a <see cref="View"/>.</summary>
@@ -52,8 +55,9 @@ public class Border : Adornment
     /// <inheritdoc/>
     public Border (View parent) : base (parent)
     {
-        /* Do nothing; View.CreateAdornment requires a constructor that takes a parent */
         Parent = parent;
+        CanFocus = false;
+
         Application.GrabbingMouse += Application_GrabbingMouse;
         Application.UnGrabbingMouse += Application_UnGrabbingMouse;
 
@@ -69,6 +73,10 @@ public class Border : Adornment
     /// </summary>
     public Button CloseButton { get; internal set; }
 #endif
+
+
+    [CanBeNull]
+    private Button _arrangeButton;
 
     /// <inheritdoc/>
     public override void BeginInit ()
@@ -108,7 +116,10 @@ public class Border : Adornment
             LayoutStarted += OnLayoutStarted;
     }
 #endif
+        
     }
+
+
 
 #if SUBVIEW_BASED_BORDER
     private void OnLayoutStarted (object sender, LayoutEventArgs e)
@@ -427,6 +438,8 @@ public class Border : Adornment
         int sideLineLength = borderBounds.Height;
         bool canDrawBorder = borderBounds is { Width: > 0, Height: > 0 };
 
+        LineStyle lineStyle = LineStyle;
+
         if (Settings.FastHasFlags (BorderSettings.Title))
         {
             if (Thickness.Top == 2)
@@ -506,7 +519,7 @@ public class Border : Adornment
                                 new (borderBounds.Location.X, titleY),
                                 borderBounds.Width,
                                 Orientation.Horizontal,
-                                LineStyle,
+                                lineStyle,
                                 Driver.GetAttribute ()
                                );
                 }
@@ -521,7 +534,7 @@ public class Border : Adornment
                                     new (borderBounds.X + 1, topTitleLineY),
                                     Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                     Orientation.Horizontal,
-                                    LineStyle,
+                                    lineStyle,
                                     Driver.GetAttribute ()
                                    );
                     }
@@ -535,7 +548,7 @@ public class Border : Adornment
                                     new (borderBounds.X + 1, topTitleLineY),
                                     Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                     Orientation.Horizontal,
-                                    LineStyle,
+                                    lineStyle,
                                     Driver.GetAttribute ()
                                    );
 
@@ -543,7 +556,7 @@ public class Border : Adornment
                                     new (borderBounds.X + 1, topTitleLineY + 2),
                                     Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                     Orientation.Horizontal,
-                                    LineStyle,
+                                    lineStyle,
                                     Driver.GetAttribute ()
                                    );
                     }
@@ -554,7 +567,7 @@ public class Border : Adornment
                                 new (borderBounds.Location.X, titleY),
                                 2,
                                 Orientation.Horizontal,
-                                LineStyle,
+                                lineStyle,
                                 Driver.GetAttribute ()
                                );
 
@@ -593,7 +606,7 @@ public class Border : Adornment
                                     ),
                                 borderBounds.Width - Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                 Orientation.Horizontal,
-                                LineStyle,
+                                lineStyle,
                                 Driver.GetAttribute ()
                                );
                 }
@@ -607,7 +620,7 @@ public class Border : Adornment
                             new (borderBounds.Location.X, titleY),
                             sideLineLength,
                             Orientation.Vertical,
-                            LineStyle,
+                            lineStyle,
                             Driver.GetAttribute ()
                            );
             }
@@ -619,7 +632,7 @@ public class Border : Adornment
                             new (borderBounds.X, borderBounds.Y + borderBounds.Height - 1),
                             borderBounds.Width,
                             Orientation.Horizontal,
-                            LineStyle,
+                            lineStyle,
                             Driver.GetAttribute ()
                            );
             }
@@ -630,7 +643,7 @@ public class Border : Adornment
                             new (borderBounds.X + borderBounds.Width - 1, titleY),
                             sideLineLength,
                             Orientation.Vertical,
-                            LineStyle,
+                            lineStyle,
                             Driver.GetAttribute ()
                            );
             }
@@ -705,7 +718,7 @@ public class Border : Adornment
     private static void GetAppealingGradientColors (out List<Color> stops, out List<int> steps)
     {
         // Define the colors of the gradient stops with more appealing colors
-        stops = new()
+        stops = new ()
         {
             new (0, 128, 255), // Bright Blue
             new (0, 255, 128), // Bright Green
@@ -716,6 +729,174 @@ public class Border : Adornment
 
         // Define the number of steps between each color for smoother transitions
         // If we pass only a single value then it will assume equal steps between all pairs
-        steps = new() { 15 };
+        steps = new () { 15 };
+    }
+
+    private ViewArrangement _arranging;
+
+    public bool? Arrange ()
+    {
+        Debug.Assert (_arranging == ViewArrangement.Fixed);
+
+        CanFocus = true;
+        SetFocus ();
+
+        Debug.Assert (_arrangeButton is null);
+        _arrangeButton = new Button
+        {
+            CanFocus = true,
+            Width = 1,
+            Height = 1,
+            NoDecorations = true,
+            NoPadding = true,
+            ShadowStyle = ShadowStyle.None,
+            Text = $"{Glyphs.Diamond}",
+        };
+        Add (_arrangeButton);
+
+        AddCommand (Command.QuitToplevel, EndArrange);
+
+        AddCommand (Command.LineUp,
+                    () =>
+                    {
+                        if (_arranging == ViewArrangement.Movable)
+                        {
+                            Parent!.Y = Parent.Y - 1;
+                        }
+
+                        if (_arranging == ViewArrangement.Resizable)
+                        {
+                            if (Parent!.Viewport.Height > 0)
+                            {
+                                Parent!.Height = Parent.Height - 1;
+                            }
+                        }
+
+                        return true;
+                    });
+
+        AddCommand (Command.LineDown,
+                    () =>
+                    {
+                        if (_arranging == ViewArrangement.Movable)
+                        {
+                            Parent!.Y = Parent.Y + 1;
+                        }
+
+                        if (_arranging == ViewArrangement.Resizable)
+                        {
+                            Parent!.Height = Parent.Height + 1;
+                        }
+
+                        return true;
+                    });
+        AddCommand (Command.Left,
+                    () =>
+                    {
+                        if (_arranging == ViewArrangement.Movable)
+                        {
+                            Parent!.X = Parent.X - 1;
+                        }
+
+                        if (_arranging == ViewArrangement.Resizable)
+                        {
+                            if (Parent!.Viewport.Width > 0)
+                            {
+                                Parent!.Width = Parent.Width - 1;
+                            }
+                        }
+                        return true;
+                    });
+
+        AddCommand (Command.Right,
+                    () =>
+                    {
+                        if (_arranging == ViewArrangement.Movable)
+                        {
+                            Parent!.X = Parent.X + 1;
+                        }
+
+                        if (_arranging == ViewArrangement.Resizable)
+                        {
+                            Parent!.Width = Parent.Width + 1;
+                        }
+
+                        return true;
+                    });
+
+        AddCommand (Command.Tab,
+                    () =>
+                    {
+                        // TODO: Move arrangement focus to next side
+                        if (Parent!.Arrangement.HasFlag (ViewArrangement.Resizable))
+                        {
+                            _arranging = ViewArrangement.Resizable;
+                            _arrangeButton.X = Pos.AnchorEnd ();
+                            _arrangeButton.Y = Pos.AnchorEnd ();
+
+                            return true;
+                        }
+                        return true;
+                    });
+
+        AddCommand (Command.BackTab,
+                    () =>
+                    {
+                        // TODO: Move arrangement focus to prev side
+                        if (Parent!.Arrangement.HasFlag (ViewArrangement.Movable))
+                        {
+                            _arranging = ViewArrangement.Movable;
+                            _arrangeButton.X = 0;
+                            _arrangeButton.Y = 0;
+                            return true;
+                        }
+                        return true;
+                    });
+
+        KeyBindings.Add (Key.Esc, KeyBindingScope.HotKey, Command.QuitToplevel);
+        KeyBindings.Add (Application.ArrangeKey, KeyBindingScope.HotKey, Command.QuitToplevel);
+        KeyBindings.Add (Key.CursorUp, KeyBindingScope.HotKey, Command.LineUp);
+        KeyBindings.Add (Key.CursorDown, KeyBindingScope.HotKey, Command.LineDown);
+        KeyBindings.Add (Key.CursorLeft, KeyBindingScope.HotKey, Command.Left);
+        KeyBindings.Add (Key.CursorRight, KeyBindingScope.HotKey, Command.Right);
+
+        KeyBindings.Add (Key.Tab, KeyBindingScope.HotKey, Command.Tab);
+        KeyBindings.Add (Key.Tab.WithShift, KeyBindingScope.HotKey, Command.BackTab);
+
+        if (Parent!.Arrangement.HasFlag (ViewArrangement.Movable))
+        {
+            _arranging = ViewArrangement.Movable;
+            _arrangeButton.X = 0;
+            _arrangeButton.Y = 0;
+            return true;
+        }
+        else
+        {
+            if (Parent!.Arrangement.HasFlag (ViewArrangement.Resizable))
+            {
+                _arranging = ViewArrangement.Resizable;
+                _arrangeButton.X = Pos.AnchorEnd ();
+                _arrangeButton.Y = Pos.AnchorEnd ();
+
+                return true;
+            }
+        }
+
+        // Hack for now
+        EndArrange ();
+        return false;
+    }
+    private bool? EndArrange ()
+    {
+        _arranging = ViewArrangement.Fixed;
+        CanFocus = false;
+
+        KeyBindings.Clear ();
+
+        Remove (_arrangeButton);
+        _arrangeButton.Dispose ();
+        _arrangeButton = null;
+
+        return true;
     }
 }

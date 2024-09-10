@@ -80,17 +80,6 @@ public class Dialog : Window
         Modal = true;
         ButtonAlignment = DefaultButtonAlignment;
         ButtonAlignmentModes = DefaultButtonAlignmentModes;
-
-        AddCommand (
-                    Command.QuitToplevel,
-                    () =>
-                    {
-                        Canceled = true;
-                        RequestStop ();
-
-                        return true;
-                    });
-        KeyBindings.Add (Key.Esc, Command.QuitToplevel);
     }
 
     // BUGBUG: We override GetNormal/FocusColor because "Dialog" ColorScheme is goofy.

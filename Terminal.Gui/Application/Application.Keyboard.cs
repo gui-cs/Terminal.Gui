@@ -5,12 +5,10 @@ public static partial class Application // Keyboard handling
 {
     private static Key _nextTabGroupKey = Key.F6; // Resources/config.json overrrides
     private static Key _nextTabKey = Key.Tab; // Resources/config.json overrrides
-
     private static Key _prevTabGroupKey = Key.F6.WithShift; // Resources/config.json overrrides
-
     private static Key _prevTabKey = Key.Tab.WithShift; // Resources/config.json overrrides
-
     private static Key _quitKey = Key.Esc; // Resources/config.json overrrides
+    private static Key _arrangeKey = Key.F5.WithCtrl; // Resources/config.json overrrides
 
     static Application () { AddApplicationKeyBindings (); }
 
@@ -262,6 +260,22 @@ public static partial class Application // Keyboard handling
         }
     }
 
+
+    /// <summary>Gets or sets the key to activate arranging views using the keyboard.</summary>
+    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Key ArrangeKey
+    {
+        get => _arrangeKey;
+        set
+        {
+            if (_arrangeKey != value)
+            {
+                ReplaceKey (_arrangeKey, value);
+                _arrangeKey = value;
+            }
+        }
+    }
+
     internal static void AddApplicationKeyBindings ()
     {
         CommandImplementations = new ();
@@ -344,6 +358,24 @@ public static partial class Application // Keyboard handling
                     }
                    );
 
+        AddCommand (Command.Edit, static () =>
+                                  {
+                                      View? viewToArrange = Navigation?.GetFocused ();
+
+                                      // Go up the superview hierarchy and find the first that is not ViewArrangement.Fixed
+                                      while (viewToArrange?.SuperView is { } && viewToArrange.Arrangement == ViewArrangement.Fixed)
+                                      {
+                                          viewToArrange = viewToArrange.SuperView;
+                                      }
+
+                                      if (viewToArrange is { })
+                                      {
+                                          return viewToArrange.Border?.Arrange ();
+                                      }
+
+                                      return false;
+                                  });
+
         KeyBindings.Clear ();
 
         // Resources/config.json overrrides
@@ -352,6 +384,7 @@ public static partial class Application // Keyboard handling
         NextTabGroupKey = Key.F6;
         PrevTabGroupKey = Key.F6.WithShift;
         QuitKey = Key.Esc;
+        ArrangeKey = Key.F5.WithCtrl;
 
         KeyBindings.Add (QuitKey, KeyBindingScope.Application, Command.QuitToplevel);
 
@@ -364,6 +397,8 @@ public static partial class Application // Keyboard handling
 
         KeyBindings.Add (NextTabGroupKey, KeyBindingScope.Application, Command.NextViewOrTop);
         KeyBindings.Add (PrevTabGroupKey, KeyBindingScope.Application, Command.PreviousViewOrTop);
+
+        KeyBindings.Add (ArrangeKey, KeyBindingScope.Application, Command.Edit);
 
         // TODO: Refresh Key should be configurable
         KeyBindings.Add (Key.F5, KeyBindingScope.Application, Command.Refresh);

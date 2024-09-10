@@ -267,5 +267,10 @@ public enum Command
     New,
 
     /// <summary>Shows context about the item (e.g. a context menu).</summary>
-    ShowContextMenu
+    ShowContextMenu,
+
+    /// <summary>
+    /// Invokes a user interface for editing.
+    /// </summary>
+    Edit
 }

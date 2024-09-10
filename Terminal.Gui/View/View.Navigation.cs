@@ -422,6 +422,20 @@ public partial class View // Focus and cross-view navigation management (TabStop
             }
         }
 
+        // Are we an Adornment? 
+        if (this is Adornment adornment)
+        {
+            if (adornment.Parent is { HasFocus: false } parent)
+            {
+                (bool focusSet, bool parentCancelled) = parent.SetHasFocusTrue (previousFocusedView, true);
+
+                if (!focusSet)
+                {
+                    return (false, parentCancelled);
+                }
+            }
+        }
+
         if (_hasFocus)
         {
             // Something else beat us to the change (likely a FocusChanged handler).
@@ -432,6 +446,15 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         // Get whatever peer has focus, if any
         View? focusedPeer = SuperView?.Focused;
+
+        if (focusedPeer is null)
+        {
+            // Are we an Adornment? 
+            if (this is Adornment ad)
+            {
+                focusedPeer = ad.Parent?.Focused;
+            }
+        }
 
         _hasFocus = true;
 
