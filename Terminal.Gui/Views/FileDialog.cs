@@ -10,6 +10,9 @@ namespace Terminal.Gui;
 /// </summary>
 public class FileDialog : Dialog
 {
+    private const int alignmentGroupInput = 32;
+    private const int alignmentGroupComplete = 55;
+
     /// <summary>Gets the Path separators for the operating system</summary>
     internal static char [] Separators =
     [
@@ -71,24 +74,20 @@ public class FileDialog : Dialog
 
         _btnOk = new Button
         {
-            Y = Pos.AnchorEnd (1), X = Pos.Func (CalculateOkButtonPosX), IsDefault = true, Text = Style.OkButtonText
+            X = Pos.Align (Alignment.End, AlignmentModes.AddSpaceBetweenItems, alignmentGroupComplete),
+            Y = Pos.AnchorEnd (),
+            IsDefault = true, Text = Style.OkButtonText
         };
         _btnOk.Accept += (s, e) => Accept (true);
 
-        _btnOk.KeyDown += (s, k) =>
-                          {
-                              NavigateIf (k, KeyCode.CursorLeft, _btnCancel);
-                              NavigateIf (k, KeyCode.CursorUp, _tableView);
-                          };
 
-        _btnCancel = new Button { Y = Pos.AnchorEnd (1), X = Pos.Right (_btnOk) + 1, Text = Strings.btnCancel };
+        _btnCancel = new Button
+        {
+            X = Pos.Align (Alignment.End, AlignmentModes.AddSpaceBetweenItems, alignmentGroupComplete),
+            Y = Pos.AnchorEnd(),
+            Text = Strings.btnCancel
+        };
 
-        _btnCancel.KeyDown += (s, k) =>
-                              {
-                                  NavigateIf (k, KeyCode.CursorLeft, _btnToggleSplitterCollapse);
-                                  NavigateIf (k, KeyCode.CursorUp, _tableView);
-                                  NavigateIf (k, KeyCode.CursorRight, _btnOk);
-                              };
         _btnCancel.Accept += (s, e) =>
         {
             Canceled = true;
@@ -121,7 +120,13 @@ public class FileDialog : Dialog
         _tbPath.Autocomplete = new AppendAutocomplete (_tbPath);
         _tbPath.Autocomplete.SuggestionGenerator = new FilepathSuggestionGenerator ();
 
-        _splitContainer = new TileView { X = 0, Y = 2, Width = Dim.Fill (), Height = Dim.Fill (1) };
+        _splitContainer = new TileView
+        {
+            X = 0,
+            Y = Pos.Bottom (_btnBack),
+            Width = Dim.Fill (),
+            Height = Dim.Fill (Dim.Func (() => IsInitialized ? _btnOk.Frame.Height : 1)),
+        };
 
         Initialized += (s, e) =>
                        {
@@ -129,7 +134,7 @@ public class FileDialog : Dialog
                            _splitContainer.Tiles.ElementAt (0).ContentView.Visible = false;
                        };
 
-        //			this.splitContainer.Border.BorderStyle = BorderStyle.None;
+        // this.splitContainer.Border.BorderStyle = BorderStyle.None;
 
         _tableView = new TableView
         {
@@ -158,28 +163,7 @@ public class FileDialog : Dialog
         ColumnStyle typeStyle = Style.TableStyle.GetOrCreateColumnStyle (3);
         typeStyle.MinWidth = 6;
         typeStyle.ColorGetter = ColorGetter;
-
-        _tableView.KeyDown += (s, k) =>
-                              {
-                                  if (_tableView.SelectedRow <= 0)
-                                  {
-                                      NavigateIf (k, KeyCode.CursorUp, _tbPath);
-                                  }
-
-                                  if (_tableView.SelectedRow == _tableView.Table.Rows - 1)
-                                  {
-                                      NavigateIf (k, KeyCode.CursorDown, _btnToggleSplitterCollapse);
-                                  }
-
-                                  if (_splitContainer.Tiles.First ().ContentView.Visible && _tableView.SelectedColumn == 0)
-                                  {
-                                      NavigateIf (k, KeyCode.CursorLeft, _treeView);
-                                  }
-
-                                  if (k.Handled)
-                                  { }
-                              };
-
+        
         _treeView = new TreeView<IFileSystemInfo> { Width = Dim.Fill (), Height = Dim.Fill () };
 
         var fileDialogTreeBuilder = new FileSystemTreeBuilder ();
@@ -192,7 +176,11 @@ public class FileDialog : Dialog
         _splitContainer.Tiles.ElementAt (0).ContentView.Add (_treeView);
         _splitContainer.Tiles.ElementAt (1).ContentView.Add (_tableView);
 
-        _btnToggleSplitterCollapse = new Button { Y = Pos.AnchorEnd (1), Text = GetToggleSplitterText (false) };
+        _btnToggleSplitterCollapse = new Button
+        {
+            X = Pos.Align (Alignment.Start, AlignmentModes.AddSpaceBetweenItems, alignmentGroupInput),
+            Y = Pos.AnchorEnd (), Text = GetToggleSplitterText (false)
+        };
 
         _btnToggleSplitterCollapse.Accept += (s, e) =>
                                               {
@@ -206,13 +194,13 @@ public class FileDialog : Dialog
 
         _tbFind = new TextField
         {
-            X = Pos.Right (_btnToggleSplitterCollapse) + 1,
+            X = Pos.Align (Alignment.Start,AlignmentModes.AddSpaceBetweenItems, alignmentGroupInput),
             CaptionColor = new Color (Color.Black),
             Width = 30,
-            Y = Pos.AnchorEnd (1),
+            Y = Pos.Top (_btnToggleSplitterCollapse),
             HotKey = Key.F.WithAlt
         };
-        _spinnerView = new SpinnerView { X = Pos.Right (_tbFind) + 1, Y = Pos.AnchorEnd (1), Visible = false };
+        _spinnerView = new SpinnerView { X = Pos.Align (Alignment.Start, AlignmentModes.AddSpaceBetweenItems, alignmentGroupInput), Y = Pos.AnchorEnd (1), Visible = false };
 
         _tbFind.TextChanged += (s, o) => RestartSearch ();
 
@@ -230,16 +218,6 @@ public class FileDialog : Dialog
                                    {
                                        o.Handled = true;
                                    }
-                               }
-
-                               if (_tbFind.CursorIsAtEnd ())
-                               {
-                                   NavigateIf (o, KeyCode.CursorRight, _btnCancel);
-                               }
-
-                               if (_tbFind.CursorIsAtStart ())
-                               {
-                                   NavigateIf (o, KeyCode.CursorLeft, _btnToggleSplitterCollapse);
                                }
                            };
 
@@ -262,48 +240,22 @@ public class FileDialog : Dialog
         _tableView.KeyBindings.ReplaceCommands (Key.End, Command.BottomEnd);
         _tableView.KeyBindings.ReplaceCommands (Key.Home.WithShift, Command.TopHomeExtend);
         _tableView.KeyBindings.ReplaceCommands (Key.End.WithShift, Command.BottomEndExtend);
-
-        _treeView.KeyDown += (s, k) =>
-                             {
-                                 IFileSystemInfo selected = _treeView.SelectedObject;
-
-                                 if (selected is { })
-                                 {
-                                     if (!_treeView.CanExpand (selected) || _treeView.IsExpanded (selected))
-                                     {
-                                         NavigateIf (k, KeyCode.CursorRight, _tableView);
-                                     }
-                                     else if (_treeView.GetObjectRow (selected) == 0)
-                                     {
-                                         NavigateIf (k, KeyCode.CursorUp, _tbPath);
-                                     }
-                                 }
-
-                                 if (k.Handled)
-                                 {
-                                     return;
-                                 }
-
-                                 k.Handled = TreeView_KeyDown (k);
-                             };
-
+        
         AllowsMultipleSelection = false;
 
         UpdateNavigationVisibility ();
 
-        // BUGBUG: This TabOrder is counter-intuitive. The tab order for a dialog should match the
-        // order the Views' are presented, left to right, top to bottom.
-        // Determines tab order
-        Add (_btnToggleSplitterCollapse);
-        Add (_tbFind);
-        Add (_spinnerView);
-        Add (_btnOk);
-        Add (_btnCancel);
+        Add (_tbPath);
         Add (_btnUp);
         Add (_btnBack);
         Add (_btnForward);
-        Add (_tbPath);
         Add (_splitContainer);
+        Add (_btnToggleSplitterCollapse);
+        Add (_tbFind);
+        Add (_spinnerView);
+
+        Add(_btnOk);
+        Add(_btnCancel);
     }
 
     /// <summary>
@@ -1041,23 +993,6 @@ public class FileDialog : Dialog
         return toReturn;
     }
 
-    private bool NavigateIf (Key keyEvent, KeyCode isKey, View to)
-    {
-        if (keyEvent.KeyCode == isKey)
-        {
-            to.FocusDeepest (NavigationDirection.Forward, null);
-
-            if (to == _tbPath)
-            {
-                _tbPath.MoveEnd ();
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
     private void New ()
     {
         if (State is { })
@@ -1272,19 +1207,19 @@ public class FileDialog : Dialog
 
         var contextMenu = new ContextMenu
         {
-            Position = new Point (e.MouseEvent.Position.X + 1, e.MouseEvent.Position.Y + 1),
-            MenuItems = new MenuBarItem (
+            Position = new Point (e.MouseEvent.Position.X + 1, e.MouseEvent.Position.Y + 1)
+        };
+
+        var menuItems = new MenuBarItem (
                                          [
                                              new MenuItem (Strings.fdCtxNew, string.Empty, New),
                                              new MenuItem (Strings.fdCtxRename, string.Empty, Rename),
                                              new MenuItem (Strings.fdCtxDelete, string.Empty, Delete)
                                          ]
-                                        )
-        };
-
+                                        );
         _tableView.SetSelection (clickedCell.Value.X, clickedCell.Value.Y, false);
 
-        contextMenu.Show ();
+        contextMenu.Show (menuItems);
     }
 
     private void ShowHeaderContextMenu (int clickedCol, MouseEventEventArgs e)
@@ -1293,8 +1228,10 @@ public class FileDialog : Dialog
 
         var contextMenu = new ContextMenu
         {
-            Position = new Point (e.MouseEvent.Position.X + 1, e.MouseEvent.Position.Y + 1),
-            MenuItems = new MenuBarItem (
+            Position = new Point (e.MouseEvent.Position.X + 1, e.MouseEvent.Position.Y + 1)
+        };
+
+        var menuItems = new MenuBarItem (
                                          [
                                              new MenuItem (
                                                            string.Format (
@@ -1309,10 +1246,8 @@ public class FileDialog : Dialog
                                                            string.Empty,
                                                            () => SortColumn (clickedCol, isAsc))
                                          ]
-                                        )
-        };
-
-        contextMenu.Show ();
+                                        );
+        contextMenu.Show (menuItems);
     }
 
     private void SortColumn (int clickedCol)
@@ -1428,19 +1363,6 @@ public class FileDialog : Dialog
         {
             _pushingState = false;
         }
-    }
-
-    private bool TreeView_KeyDown (Key keyEvent)
-    {
-        if (_treeView.HasFocus && Separators.Contains ((char)keyEvent))
-        {
-            _tbPath.FocusDeepest (NavigationDirection.Forward, null);
-
-            // let that keystroke go through on the tbPath instead
-            return true;
-        }
-
-        return false;
     }
 
     private void TreeView_SelectionChanged (object sender, SelectionChangedEventArgs<IFileSystemInfo> e)

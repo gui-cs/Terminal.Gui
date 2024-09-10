@@ -49,7 +49,7 @@ using System.Numerics;
 ///             </item>
 ///             <item>
 ///                 <term>
-///                     <see cref="Dim.Fill(int)"/>
+///                     <see cref="Dim.Fill(Dim)"/>
 ///                 </term>
 ///                 <description>
 ///                     Creates a <see cref="Dim"/> object that fills the dimension from the View's X position
@@ -120,11 +120,17 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     }
 
     /// <summary>
+    ///     Creates a <see cref="Dim"/> object that fills the dimension, leaving no margin.
+    /// </summary>
+    /// <returns>The Fill dimension.</returns>
+    public static Dim? Fill () { return new DimFill (0); }
+
+    /// <summary>
     ///     Creates a <see cref="Dim"/> object that fills the dimension, leaving the specified margin.
     /// </summary>
     /// <returns>The Fill dimension.</returns>
     /// <param name="margin">Margin to use.</param>
-    public static Dim? Fill (int margin = 0) { return new DimFill (margin); }
+    public static Dim? Fill (Dim margin) { return new DimFill (margin); }
 
     /// <summary>
     ///     Creates a function <see cref="Dim"/> object that computes the dimension by executing the provided function.

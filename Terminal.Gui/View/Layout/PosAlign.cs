@@ -67,11 +67,11 @@ public record PosAlign : Pos
                                                v =>
                                                {
                                                    return dimension switch
-                                                          {
-                                                              Dimension.Width when v.X is PosAlign alignX => alignX.GroupId == groupId,
-                                                              Dimension.Height when v.Y is PosAlign alignY => alignY.GroupId == groupId,
-                                                              _ => false
-                                                          };
+                                                   {
+                                                       Dimension.Width when v.X is PosAlign alignX => alignX.GroupId == groupId,
+                                                       Dimension.Height when v.Y is PosAlign alignY => alignY.GroupId == groupId,
+                                                       _ => false
+                                                   };
                                                })
                                        .ToList ();
 
@@ -150,7 +150,7 @@ public record PosAlign : Pos
                                                   {
                                                       switch (dimension)
                                                       {
-                                                          case Dimension.Width when v.X.Has (typeof (PosAlign), out Pos pos):
+                                                          case Dimension.Width when v.X.Has<PosAlign> (out Pos pos):
 
                                                               if (pos is PosAlign posAlignX && posAlignX.GroupId == groupId)
                                                               {
@@ -158,7 +158,7 @@ public record PosAlign : Pos
                                                               }
 
                                                               break;
-                                                          case Dimension.Height when v.Y.Has (typeof (PosAlign), out Pos pos):
+                                                          case Dimension.Height when v.Y.Has<PosAlign> (out Pos pos):
                                                               if (pos is PosAlign posAlignY && posAlignY.GroupId == groupId)
                                                               {
                                                                   return posAlignY;

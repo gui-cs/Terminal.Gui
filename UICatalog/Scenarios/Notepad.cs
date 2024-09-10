@@ -362,9 +362,9 @@ public class Notepad : Scenario
 
         var screen = ((View)sender).ViewportToScreen (e.MouseEvent.Position);
 
-        var contextMenu = new ContextMenu { Position = screen, MenuItems = items };
+        var contextMenu = new ContextMenu { Position = screen };
 
-        contextMenu.Show ();
+        contextMenu.Show (items);
         e.MouseEvent.Handled = true;
     }
 

@@ -1068,7 +1068,7 @@ public class TableViewTests (ITestOutputHelper output)
         Application.Begin (top);
 
         tv.HasFocus = focused;
-        Assert.Equal(focused, tv.HasFocus);
+        Assert.Equal (focused, tv.HasFocus);
 
         tv.Draw ();
 
@@ -1155,7 +1155,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // when B is 2 use the custom highlight color for the row
         tv.Style.RowColorGetter += e => Convert.ToInt32 (e.Table [e.RowIndex, 1]) == 2 ? rowHighlight : null;
-        
+
         var top = new Toplevel ();
         top.Add (tv);
         Application.Begin (top);
@@ -3169,7 +3169,7 @@ A B C
     }
 
     [Fact]
-    public void TestDataColumnCaption()
+    public void TestDataColumnCaption ()
     {
         var tableView = new TableView ();
 
@@ -3189,6 +3189,175 @@ A B C
 
         Assert.Equal ("Caption 1", cn [0]);
         Assert.Equal ("Column Name 2", cn [1]);
+    }
+
+
+    [Fact]
+    public void CanTabOutOfTableViewUsingCursor_Left ()
+    {
+        GetTableViewWithSiblings (out var tf1, out var tableView, out var tf2);
+
+        // Make the selected cell one in
+        tableView.SelectedColumn = 1;
+
+        // Pressing left should move us to the first column without changing focus
+        Application.OnKeyDown (Key.CursorLeft);
+        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.True (tableView.HasFocus);
+
+        // Because we are now on the leftmost cell a further left press should move focus
+        Application.OnKeyDown (Key.CursorLeft);
+
+        Assert.NotSame (tableView, Application.Current.MostFocused);
+        Assert.False (tableView.HasFocus);
+
+        Assert.Same (tf1, Application.Current.MostFocused);
+        Assert.True (tf1.HasFocus);
+
+        Application.Current.Dispose ();
+    }
+
+    [Fact]
+    public void CanTabOutOfTableViewUsingCursor_Up ()
+    {
+        GetTableViewWithSiblings (out var tf1, out var tableView, out var tf2);
+
+        // Make the selected cell one in
+        tableView.SelectedRow = 1;
+
+        // First press should move us up
+        Application.OnKeyDown (Key.CursorUp);
+        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.True (tableView.HasFocus);
+
+        // Because we are now on the top row a further press should move focus
+        Application.OnKeyDown (Key.CursorUp);
+
+        Assert.NotSame (tableView, Application.Current.MostFocused);
+        Assert.False (tableView.HasFocus);
+
+        Assert.Same (tf1, Application.Current.MostFocused);
+        Assert.True (tf1.HasFocus);
+
+        Application.Current.Dispose ();
+    }
+    [Fact]
+    public void CanTabOutOfTableViewUsingCursor_Right ()
+    {
+        GetTableViewWithSiblings (out var tf1, out var tableView, out var tf2);
+
+        // Make the selected cell one in from the rightmost column
+        tableView.SelectedColumn = tableView.Table.Columns - 2;
+
+        // First press should move us to the rightmost column without changing focus
+        Application.OnKeyDown (Key.CursorRight);
+        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.True (tableView.HasFocus);
+
+        // Because we are now on the rightmost cell, a further right press should move focus
+        Application.OnKeyDown (Key.CursorRight);
+
+        Assert.NotSame (tableView, Application.Current.MostFocused);
+        Assert.False (tableView.HasFocus);
+
+        Assert.Same (tf2, Application.Current.MostFocused);
+        Assert.True (tf2.HasFocus);
+
+        Application.Current.Dispose ();
+    }
+
+    [Fact]
+    public void CanTabOutOfTableViewUsingCursor_Down ()
+    {
+        GetTableViewWithSiblings (out var tf1, out var tableView, out var tf2);
+
+        // Make the selected cell one in from the bottommost row
+        tableView.SelectedRow = tableView.Table.Rows - 2;
+
+        // First press should move us to the bottommost row without changing focus
+        Application.OnKeyDown (Key.CursorDown);
+        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.True (tableView.HasFocus);
+
+        // Because we are now on the bottommost cell, a further down press should move focus
+        Application.OnKeyDown (Key.CursorDown);
+
+        Assert.NotSame (tableView, Application.Current.MostFocused);
+        Assert.False (tableView.HasFocus);
+
+        Assert.Same (tf2, Application.Current.MostFocused);
+        Assert.True (tf2.HasFocus);
+
+        Application.Current.Dispose ();
+    }
+
+
+    [Fact]
+    public void CanTabOutOfTableViewUsingCursor_Left_ClearsSelectionFirst ()
+    {
+        GetTableViewWithSiblings (out var tf1, out var tableView, out var tf2);
+
+        // Make the selected cell one in
+        tableView.SelectedColumn = 1;
+
+        // Pressing shift-left should give us a multi selection
+        Application.OnKeyDown (Key.CursorLeft.WithShift);
+        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.True (tableView.HasFocus);
+        Assert.Equal (2, tableView.GetAllSelectedCells ().Count ());
+
+        // Because we are now on the leftmost cell a further left press would normally move focus
+        // However there is an ongoing selection so instead the operation clears the selection and
+        // gets swallowed (not resulting in a focus change)
+        Application.OnKeyDown (Key.CursorLeft);
+
+        // Selection 'clears' just to the single cell and we remain focused
+        Assert.Single (tableView.GetAllSelectedCells ());
+        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.True (tableView.HasFocus);
+
+        // A further left will switch focus
+        Application.OnKeyDown (Key.CursorLeft);
+
+        Assert.NotSame (tableView, Application.Current.MostFocused);
+        Assert.False (tableView.HasFocus);
+
+        Assert.Same (tf1, Application.Current.MostFocused);
+        Assert.True (tf1.HasFocus);
+
+        Application.Current.Dispose ();
+    }
+
+    /// <summary>
+    /// Creates 3 views on <see cref="Application.Current"/> with the focus in the
+    /// <see cref="TableView"/>.  This is a helper method to setup tests that want to
+    /// explore moving input focus out of a tableview.
+    /// </summary>
+    /// <param name="tv"></param>
+    /// <param name="tf1"></param>
+    /// <param name="tf2"></param>
+    private void GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2)
+    {
+        tableView = new TableView ();
+        tableView.BeginInit ();
+        tableView.EndInit ();
+
+        Application.Navigation = new ();
+        Application.Current = new ();
+        tf1 = new TextField ();
+        tf2 = new TextField ();
+        Application.Current.Add (tf1);
+        Application.Current.Add (tableView);
+        Application.Current.Add (tf2);
+
+        tableView.SetFocus ();
+
+        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.True (tableView.HasFocus);
+
+
+        // Set big table
+        tableView.Table = BuildTable (25, 50);
     }
 
     private TableView GetABCDEFTableView (out DataTable dt)

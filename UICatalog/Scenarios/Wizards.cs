@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -276,17 +277,26 @@ public class Wizards : Scenario
                                                X = 0,
                                                Y = 0,
                                                Width = Dim.Fill (),
-                                               Height = Dim.Fill (1),
                                                WordWrap = true,
                                                AllowsTab = false,
                                                ColorScheme = Colors.ColorSchemes ["Base"]
                                            };
+
+                                           someText.Height = Dim.Fill (
+                                                                       Dim.Func (
+                                                                                 () => someText.SuperView is { IsInitialized: true }
+                                                                                           ? someText.SuperView.Subviews
+                                                                                                     .First (view => view.Y.Has<PosAnchorEnd> (out _))
+                                                                                                     .Frame.Height
+                                                                                           : 1));
                                            var help = "This is helpful.";
                                            fourthStep.Add (someText);
 
                                            var hideHelpBtn = new Button
                                            {
-                                               Text = "Press me to show/hide help", X = Pos.Center (), Y = Pos.AnchorEnd (1)
+                                               Text = "Press me to show/hide help",
+                                               X = Pos.Center (),
+                                               Y = Pos.AnchorEnd ()
                                            };
 
                                            hideHelpBtn.Accept += (s, e) =>

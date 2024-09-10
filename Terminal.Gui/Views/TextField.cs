@@ -405,7 +405,7 @@ public class TextField : View
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
 
-        ContextMenu = new ContextMenu { Host = this, MenuItems = BuildContextMenuBarItem () };
+        ContextMenu = new ContextMenu { Host = this };
         ContextMenu.KeyChanged += ContextMenu_KeyChanged;
 
         KeyBindings.Add (ContextMenu.Key, KeyBindingScope.HotKey, Command.ShowContextMenu);
@@ -1853,14 +1853,12 @@ public class TextField : View
 
     private void ShowContextMenu ()
     {
-        if (_currentCulture != Thread.CurrentThread.CurrentUICulture)
+        if (!Equals (_currentCulture, Thread.CurrentThread.CurrentUICulture))
         {
             _currentCulture = Thread.CurrentThread.CurrentUICulture;
-
-            ContextMenu.MenuItems = BuildContextMenuBarItem ();
         }
 
-        ContextMenu.Show ();
+        ContextMenu.Show (BuildContextMenuBarItem ());
     }
 
     private void TextField_Added (object sender, SuperViewChangedEventArgs e)

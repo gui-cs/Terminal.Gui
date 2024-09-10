@@ -331,27 +331,20 @@ public abstract record Pos
     internal virtual bool ReferencesOtherViews () { return false; }
 
     /// <summary>
-    ///     Indicates whether the specified type is in the hierarchy of this Pos object.
+    ///     Indicates whether the specified type <typeparamref name="T"/> is in the hierarchy of this Pos object.
     /// </summary>
-    /// <param name="type"></param>
-    /// <param name="pos"></param>
+    /// <param name="pos">A reference to this <see cref="Pos"/> instance.</param>
     /// <returns></returns>
-    public bool Has (Type type, out Pos pos)
+    public bool Has<T> (out Pos pos) where T : Pos
     {
         pos = this;
-        if (type == GetType ())
-        {
-            return true;
-        }
 
-        // If we are a PosCombine, we have to check the left and right
-        // to see if they are of the type we are looking for.
-        if (this is PosCombine { } combine && (combine.Left.Has (type, out pos) || combine.Right.Has (type, out pos)))
-        {
-            return true;
-        }
-
-        return false;
+        return this switch
+               {
+                   PosCombine combine => combine.Left.Has<T> (out pos) || combine.Right.Has<T> (out pos),
+                   T => true,
+                   _ => false
+               };
     }
 
     #endregion virtual methods

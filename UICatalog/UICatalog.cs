@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.CommandLine;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -56,9 +57,11 @@ public class UICatalogApp
     private static int _cachedScenarioIndex;
     private static string? _cachedTheme = string.Empty;
     private static ObservableCollection<string>? _categories;
+    [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     private static readonly FileSystemWatcher _currentDirWatcher = new ();
     private static ViewDiagnosticFlags _diagnosticFlags;
     private static string _forceDriver = string.Empty;
+    [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     private static readonly FileSystemWatcher _homeDirWatcher = new ();
     private static bool _isFirstRunning = true;
     private static Options _options;
@@ -436,7 +439,7 @@ public class UICatalogApp
             _diagnosticFlags = Diagnostics;
 
             _themeMenuItems = CreateThemeMenuItems ();
-            _themeMenuBarItem = new ("_Themes", _themeMenuItems);
+            _themeMenuBarItem = new ("_Themes", _themeMenuItems!);
 
             MenuBar menuBar = new ()
             {
@@ -507,7 +510,7 @@ public class UICatalogApp
                 ShVersion = new ()
                 {
                     Title = "Version Info",
-                    CanFocus = false
+                    CanFocus = false,
                 };
 
                 var statusBarShortcut = new Shortcut
@@ -576,7 +579,7 @@ public class UICatalogApp
                 X = 0,
                 Y = 1,
                 Width = Dim.Auto (),
-                Height = Dim.Fill (1),
+                Height = Dim.Fill (Dim.Func (() => IsInitialized ? Subviews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height : 1)),
                 AllowsMarking = false,
                 CanFocus = true,
                 Title = "_Categories",
@@ -706,7 +709,7 @@ public class UICatalogApp
 
             ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
 
-            MenuBar!.Menus [0].Children [0].ShortcutKey = Application.QuitKey;
+            MenuBar!.Menus [0].Children! [0]!.ShortcutKey = Application.QuitKey;
 
             if (StatusBar is { })
             {
@@ -813,6 +816,7 @@ public class UICatalogApp
 
         private void ConfigAppliedHandler (object? sender, ConfigurationManagerEventArgs? a) { ConfigChanged (); }
 
+        [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
         private MenuItem [] CreateDiagnosticFlagsMenuItems ()
         {
             const string OFF = "View Diagnostics: _Off";
@@ -905,7 +909,7 @@ public class UICatalogApp
                 };
             }
 
-            Enum GetDiagnosticsEnumValue (string title)
+            Enum GetDiagnosticsEnumValue (string? title)
             {
                 return title switch
                 {
