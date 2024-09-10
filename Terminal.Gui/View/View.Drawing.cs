@@ -21,6 +21,11 @@ public partial class View // Drawing APIs
             if (_colorScheme != value)
             {
                 _colorScheme = value;
+
+                if (Border is {} && Border.LineStyle != LineStyle.None && Border.ColorScheme is { })
+                {
+                    Border.ColorScheme = _colorScheme;
+                }
                 SetNeedsDisplay ();
             }
         }

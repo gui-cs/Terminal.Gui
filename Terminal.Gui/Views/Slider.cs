@@ -1466,6 +1466,34 @@ public class Slider<T> : View, IOrientation
 
     private Dictionary<int, SliderOption<T>> GetSetOptionDictionary () { return _setOptions.ToDictionary (e => e, e => _options [e]); }
 
+    /// <summary>
+    /// Sets or unsets <paramref name="optionIndex"/> based on <paramref name="set"/>.
+    /// </summary>
+    /// <param name="optionIndex">The option to change.</param>
+    /// <param name="set">If <see langword="true"/>, sets the option. Unsets it otherwise.</param>
+    public void ChangeOption (int optionIndex, bool set)
+    {
+        if (set)
+        {
+            if (!_setOptions.Contains (optionIndex))
+            {
+                _setOptions.Add (optionIndex);
+                _options [optionIndex].OnSet ();
+            }
+        }
+        else
+        {
+            if (_setOptions.Contains (optionIndex))
+            {
+                _setOptions.Remove (optionIndex);
+                _options [optionIndex].OnUnSet ();
+            }
+        }
+
+        // Raise slider changed event.
+        OnOptionsChanged ();
+    }
+
     private void SetFocusedOption ()
     {
         switch (_config._type)
