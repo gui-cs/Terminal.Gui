@@ -328,7 +328,7 @@ internal sealed class NetEvents : IDisposable
     }
 
     [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "<Pending>")]
-    private MouseButtonState MapMouseFlags (MouseFlags mouseFlags)
+    private static MouseButtonState MapMouseFlags (MouseFlags mouseFlags)
     {
         MouseButtonState mbs = default;
 
@@ -628,7 +628,7 @@ internal sealed class NetEvents : IDisposable
         /// <summary>Prints a ConsoleKeyInfoEx structure</summary>
         /// <param name="cki"></param>
         /// <returns></returns>
-        public readonly string ToString (ConsoleKeyInfo cki)
+        public static string ToString (ConsoleKeyInfo cki)
         {
             Key ke = new ((KeyCode)cki.KeyChar);
             StringBuilder sb = new ();

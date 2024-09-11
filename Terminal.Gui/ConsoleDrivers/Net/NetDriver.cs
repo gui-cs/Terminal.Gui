@@ -260,7 +260,8 @@ internal sealed class NetDriver : ConsoleDriver
 
         _cachedCursorVisibility = savedVisibility;
 
-        void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
+        // TODO: Eliminate StringBuilder uses where possible.
+        static void WriteToConsole (StringBuilder outputLocal, ref int lastColumn, int row, ref int outputWidth)
         {
             SetCursorPosition (lastCol, row);
             Console.Write (output);
@@ -517,7 +518,7 @@ internal sealed class NetDriver : ConsoleDriver
     };
 
     // Map a ConsoleColor to a platform dependent value.
-    private int MapColors (ConsoleColor color, bool isForeground = true) =>
+    private static int MapColors (ConsoleColor color, bool isForeground = true) =>
         colorMap.TryGetValue (color, out int colorValue) ? colorValue + (isForeground ? 0 : 10) : 0;
 
     ///// <remarks>
@@ -539,7 +540,7 @@ internal sealed class NetDriver : ConsoleDriver
 
     #region Cursor Handling
 
-    private bool SetCursorPosition (int col, int row)
+    private static bool SetCursorPosition (int col, int row)
     {
         if (IsWinPlatform)
         {
@@ -615,7 +616,7 @@ internal sealed class NetDriver : ConsoleDriver
 
     #region Mouse Handling
 
-    public void StartReportingMouseMoves ()
+    public static void StartReportingMouseMoves ()
     {
         if (!RunningUnitTests)
         {
@@ -623,7 +624,7 @@ internal sealed class NetDriver : ConsoleDriver
         }
     }
 
-    public void StopReportingMouseMoves ()
+    public static void StopReportingMouseMoves ()
     {
         if (!RunningUnitTests)
         {
@@ -631,7 +632,7 @@ internal sealed class NetDriver : ConsoleDriver
         }
     }
 
-    private MouseEvent ToDriverMouse (NetEvents.MouseEvent me)
+    private static MouseEvent ToDriverMouse (NetEvents.MouseEvent me)
     {
         //System.Diagnostics.Debug.WriteLine ($"X: {me.Position.X}; Y: {me.Position.Y}; ButtonState: {me.ButtonState}");
 
@@ -784,7 +785,7 @@ internal sealed class NetDriver : ConsoleDriver
 
     #region Keyboard Handling
 
-    private ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
+    private static ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
     {
         if (consoleKeyInfo.Key != ConsoleKey.Packet)
         {
@@ -801,7 +802,7 @@ internal sealed class NetDriver : ConsoleDriver
         return new (cKeyInfo.KeyChar, cKeyInfo.Key, shift, alt, control);
     }
 
-    private KeyCode MapKey (ConsoleKeyInfo keyInfo)
+    private static KeyCode MapKey (ConsoleKeyInfo keyInfo)
     {
         switch (keyInfo.Key)
         {
