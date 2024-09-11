@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using Resources;
 
 /// <summary>
@@ -22,8 +23,11 @@ using Resources;
 /// <remarks>
 ///     The .net <see langword="bool"/> type is not blittable, mostly for reasons around inconsistent implementations between
 ///     different APIs.<br/>
-///     This struct is blittable and is a signed 32-bit integer (DWORD), as the BOOL type in WinDef.h is defined.
+///     This struct is blittable and is a signed 32-bit integer (DWORD), as the BOOL type in WinDef.h is defined.<br/>
+///     NB: This struct should NOT be used for interop with other APIs such as the GNU C stdlib or any other which does not define
+///     the values for true as any non-zero value and false as exactly zero, as consistent behavior cannot be guaranteed..
 /// </remarks>
+[SupportedOSPlatform("windows")]
 [DebuggerDisplay ($"{{{nameof (Value)}}}")]
 [SuppressMessage (
                      "ReSharper",
