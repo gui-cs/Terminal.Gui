@@ -17,7 +17,7 @@ using Resources;
 /// </summary>
 /// <remarks>
 ///     This type is what should be used for any actual DllImport/LibraryImport PInvoke methods that return or take BOOL, instead of
-///     <see langword="bool"/>, which is not blittable..
+///     <see langword="bool"/>, which is not blittable.
 /// </remarks>
 /// <remarks>This type is not intended for use outside of interop with the Win32 APIs.</remarks>
 /// <remarks>
@@ -25,9 +25,9 @@ using Resources;
 ///     different APIs.<br/>
 ///     This struct is blittable and is a signed 32-bit integer (DWORD), as the BOOL type in WinDef.h is defined.<br/>
 ///     NB: This struct should NOT be used for interop with other APIs such as the GNU C stdlib or any other which does not define
-///     the values for true as any non-zero value and false as exactly zero, as consistent behavior cannot be guaranteed..
+///     the values for true as any non-zero value and false as exactly zero, as consistent behavior cannot be guaranteed.
 /// </remarks>
-[SupportedOSPlatform("windows")]
+[SupportedOSPlatform("WINDOWS")]
 [DebuggerDisplay ($"{{{nameof (Value)}}}")]
 [SuppressMessage (
                      "ReSharper",

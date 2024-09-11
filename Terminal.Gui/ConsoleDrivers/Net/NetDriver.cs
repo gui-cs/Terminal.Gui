@@ -2,15 +2,18 @@
 // NetDriver.cs: The System.Console-based .NET driver, works on Windows and Unix, but is not particularly efficient.
 //
 
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Versioning;
 using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
 using static Terminal.Gui.ConsoleDrivers.Net.NetEvents;
+using static Terminal.Gui.EscSeqUtils;
 
 namespace Terminal.Gui.ConsoleDrivers.Net;
 
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
-using static EscSeqUtils;
 
+[SupportedOSPlatform("WINDOWS")]
+[SupportedOSPlatform("OSX")]
+[SupportedOSPlatform("LINUX")]
 internal sealed class NetDriver : ConsoleDriver
 {
     private const int COLOR_BLACK = 30;

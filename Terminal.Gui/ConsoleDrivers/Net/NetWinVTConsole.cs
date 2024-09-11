@@ -10,6 +10,7 @@ using static Windows.Interop.PInvoke;
 using static Windows.Interop.CONSOLE_MODE;
 using static System.Runtime.InteropServices.Marshal;
 
+[SupportedOSPlatform("windows")]
 [MustDisposeResource]
 internal sealed class NetWinVTConsole : IDisposable
 {

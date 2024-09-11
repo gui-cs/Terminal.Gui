@@ -14,7 +14,7 @@ using static System.Runtime.InteropServices.Marshal;
 ///     called from code in this file.
 /// </summary>
 /// <remarks>Marked unsafe because the out reference will not be initialized unless the operation succeeds.</remarks>
-[SupportedOSPlatform ("windows")]
+[SupportedOSPlatform ("WINDOWS")]
 internal static unsafe class PInvoke
 {
     /// <summary>Retrieves the current input mode of a console's input buffer or the current output mode of a console screen buffer.</summary>
