@@ -212,7 +212,7 @@ internal sealed class NetEvents : IDisposable
 
                 int buffHeight, buffWidth;
 
-                if (((NetDriver)_consoleDriver).IsWinPlatform)
+                if (OperatingSystem.IsWindows())
                 {
                     buffHeight = Math.Max (Console.BufferHeight, 0);
                     buffWidth = Math.Max (Console.BufferWidth, 0);

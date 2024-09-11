@@ -33,7 +33,6 @@ internal sealed class NetDriver : ConsoleDriver
     private const int COLOR_WHITE = 37;
     private const int COLOR_YELLOW = 33;
     private NetMainLoop _mainLoopDriver = null!;
-    public bool IsWinPlatform { get; private set; }
     public NetWinVTConsole? NetWinConsole { get; private set; }
 
     public override void Refresh ()
@@ -60,8 +59,11 @@ internal sealed class NetDriver : ConsoleDriver
         }
     }
 
-    public override bool SupportsTrueColor => Environment.OSVersion.Platform == PlatformID.Unix
-                                           || (IsWinPlatform && Environment.OSVersion.Version.Build >= 14931);
+    // TODO: Evaluate using SupportedOSPlatform guards instead of this property.
+    public override bool SupportsTrueColor => OperatingSystem.IsLinux ()
+                                              || OperatingSystem.IsMacOS ()
+                                              || OperatingSystem.IsFreeBSD ()
+                                              || OperatingSystem.IsWindowsVersionAtLeast (10, 0, 14931);
 
     public override void Suspend ()
     {
@@ -273,7 +275,7 @@ internal sealed class NetDriver : ConsoleDriver
 
     internal override void End ()
     {
-        if (IsWinPlatform)
+        if (OperatingSystem.IsWindows())
         {
             NetWinConsole?.Cleanup ();
         }
@@ -295,26 +297,21 @@ internal sealed class NetDriver : ConsoleDriver
 
     internal override MainLoop Init ()
     {
-        if (Environment.OSVersion.Platform is PlatformID.Win32NT or PlatformID.Win32S or PlatformID.Win32Windows)
+        if (OperatingSystem.IsWindows ())
         {
-            IsWinPlatform = true;
-
-            try
-            {
-                NetWinConsole = new ();
-            }
-            catch (IOException ioe) when (Console.IsOutputRedirected || Console.IsInputRedirected)
-            {
+          try
+          {
+            NetWinConsole = new ();
+          }
+          catch (IOException) when (Console.IsOutputRedirected || Console.IsInputRedirected)
+          {
             // TODO: Deal with this more formally
-                // Likely running as a unit test, or in a non-interactive session.
-            }
-        }
+            // Likely running as a unit test, or in a non-interactive session.
+          }
 
-        if (IsWinPlatform)
-        {
-            Clipboard = new WindowsClipboard ();
+          Clipboard = new WindowsClipboard ();
         }
-        else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX))
+        else if (OperatingSystem.IsMacOS ())
         {
             Clipboard = new MacOSXClipboard ();
         }
@@ -444,7 +441,7 @@ internal sealed class NetDriver : ConsoleDriver
     {
         // TODO: Break the windows-specific part out into a method attributed as such.
         // Not supported on Unix.
-        if (IsWinPlatform)
+        if (OperatingSystem.IsWindows ())
         {
             // Can raise an exception while still resizing.
             try
@@ -550,7 +547,8 @@ internal sealed class NetDriver : ConsoleDriver
 
     private static bool SetCursorPosition (int col, int row)
     {
-        if (IsWinPlatform)
+        // TODO: Break the windows-specific part out into a method attributed as such.
+        if (OperatingSystem.IsWindows ())
         {
             // Could happen that the windows is still resizing and the col is bigger than Console.WindowWidth.
             try
