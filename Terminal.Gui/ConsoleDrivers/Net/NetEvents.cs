@@ -462,6 +462,7 @@ internal sealed class NetEvents : IDisposable
     }
 
     private Point _lastCursorPosition;
+    private volatile bool _disposed;
 
     private void HandleRequestResponseEvent (string c1Control, string code, string [] values, string terminating)
     {
@@ -652,6 +653,13 @@ internal sealed class NetEvents : IDisposable
 
     public void Dispose ()
     {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+
         _inputReadyCancellationTokenSource?.Cancel ();
         _inputReadyCancellationTokenSource?.Dispose ();
         _inputReadyCancellationTokenSource = null;

@@ -121,6 +121,7 @@ internal sealed class NetWinVTConsole : IDisposable
         }
 
         Dispose (true);
+        GC.SuppressFinalize (this);
     }
 
     public void Cleanup ()
@@ -153,6 +154,8 @@ internal sealed class NetWinVTConsole : IDisposable
         }
     }
 
+    // TODO: Remove suppression or remove parameter once this is all done.
+    // ReSharper disable once UnusedParameter.Local
     private void Dispose (bool disposing)
     {
         if (_disposed)
@@ -169,10 +172,6 @@ internal sealed class NetWinVTConsole : IDisposable
 
         _stderrText.Dispose ();
         _stderrRaw.Dispose ();
-        if (disposing)
-        {
-            GC.SuppressFinalize (this);
-        }
     }
 
     /// <inheritdoc/>
