@@ -184,6 +184,14 @@ The API for handling keyboard input is significantly improved. See [Keyboard API
 + Application.KeyDown(object? sender, Key e)
 ```
 
+## [Command]((~/api/Terminal.Gui.Command.yml)) has been expanded and simplified
+
+In v1, the `Command` enum had duplicate entries and inconsistent naming. In v2 it has been both expanded and simplified.
+
+### How To Fix
+
+* Update any references to old `Command` values with the updated versions.
+
 ## Updated Mouse API
 
 The API for mouse input is now internally consistent and easier to use.
