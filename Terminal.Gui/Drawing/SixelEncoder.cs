@@ -45,6 +45,8 @@ public class SixelEncoder
 
     private string WriteSixel (Color [,] pixels, ColorQuantizer quantizer)
     {
+        var distanceAlgorithm = new EuclideanColorDistance ();
+
         StringBuilder sb = new StringBuilder ();
         int height = pixels.GetLength (1);
         int width = pixels.GetLength (0);
@@ -55,7 +57,7 @@ public class SixelEncoder
         {
             int p = y * width;
             Color cachedColor = pixels [0, y];
-            int cachedColorIndex = quantizer.GetNearestColor (cachedColor);
+            int cachedColorIndex = quantizer.GetNearestColor (cachedColor,distanceAlgorithm );
             int count = 1;
             int c = -1;
 
@@ -63,7 +65,7 @@ public class SixelEncoder
             for (int x = 0; x < width; x++)
             {
                 Color color = pixels [x, y];
-                int colorIndex = quantizer.GetNearestColor (color);
+                int colorIndex = quantizer.GetNearestColor (color,distanceAlgorithm);
 
                 if (colorIndex == cachedColorIndex)
                 {
@@ -162,7 +164,7 @@ public class SixelEncoder
     private string GetColorPallette (Color [,] pixels, out ColorQuantizer quantizer)
     {
         quantizer = new ColorQuantizer ();
-        quantizer.BuildPaletteUsingMedianCut (pixels);
+        quantizer.BuildPalette (pixels,new MedianCutPaletteBuilder ());
 
 
         // Color definitions in the format "#<index>;<type>;<R>;<G>;<B>" - For type the 2 means RGB.  The values range 0 to 100
