@@ -365,7 +365,7 @@ public static partial class Application // Keyboard handling
                         View? viewToArrange = Navigation?.GetFocused ();
 
                         // Go up the superview hierarchy and find the first that is not ViewArrangement.Fixed
-                        while (viewToArrange?.SuperView is { } && viewToArrange.Arrangement == ViewArrangement.Fixed)
+                        while (viewToArrange is { SuperView: { }, Arrangement: ViewArrangement.Fixed })
                         {
                             viewToArrange = viewToArrange.SuperView;
                         }

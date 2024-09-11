@@ -748,9 +748,6 @@ public class Border : Adornment
             return false;
         }
 
-        CanFocus = true;
-        SetFocus ();
-
         Debug.Assert (_arrangeButton is null);
         _arrangeButton = new Button
         {
@@ -763,6 +760,9 @@ public class Border : Adornment
             Text = $"{Glyphs.Diamond}",
         };
         Add (_arrangeButton);
+
+        CanFocus = true;
+        //_arrangeButton.SetFocus ();
 
         AddCommand (Command.Quit, EndArrange);
 
@@ -834,34 +834,8 @@ public class Border : Adornment
                         return true;
                     });
 
-        AddCommand (Command.Tab,
-                    () =>
-                    {
-                        // TODO: Move arrangement focus to next side
-                        if (Parent!.Arrangement.HasFlag (ViewArrangement.Resizable))
-                        {
-                            _arranging = ViewArrangement.Resizable;
-                            _arrangeButton.X = Pos.AnchorEnd ();
-                            _arrangeButton.Y = Pos.AnchorEnd ();
-
-                            return true;
-                        }
-                        return true;
-                    });
-
-        AddCommand (Command.BackTab,
-                    () =>
-                    {
-                        // TODO: Move arrangement focus to prev side
-                        if (Parent!.Arrangement.HasFlag (ViewArrangement.Movable))
-                        {
-                            _arranging = ViewArrangement.Movable;
-                            _arrangeButton.X = 0;
-                            _arrangeButton.Y = 0;
-                            return true;
-                        }
-                        return true;
-                    });
+        AddCommand (Command.Tab, Navigate);
+        AddCommand (Command.BackTab, Navigate);
 
         KeyBindings.Add (Key.Esc, KeyBindingScope.HotKey, Command.Quit);
         KeyBindings.Add (Application.ArrangeKey, KeyBindingScope.HotKey, Command.Quit);
@@ -895,17 +869,42 @@ public class Border : Adornment
         // Hack for now
         EndArrange ();
         return false;
+
+        bool? Navigate ()
+        {
+            if (_arranging == ViewArrangement.Movable)
+            {
+                if (Parent!.Arrangement.HasFlag (ViewArrangement.Resizable))
+                {
+                    _arranging = ViewArrangement.Resizable;
+                    _arrangeButton.X = Pos.AnchorEnd ();
+                    _arrangeButton.Y = Pos.AnchorEnd ();
+                }
+            }
+            else if (_arranging == ViewArrangement.Resizable)
+            {
+                if (Parent!.Arrangement.HasFlag (ViewArrangement.Movable))
+                {
+                    _arranging = ViewArrangement.Movable;
+                    _arrangeButton.X = 0;
+                    _arrangeButton.Y = 0;
+                }
+            }
+
+            return true;
+        }
     }
     private bool? EndArrange ()
     {
         _arranging = ViewArrangement.Fixed;
         CanFocus = false;
 
-        KeyBindings.Clear ();
-
         Remove (_arrangeButton);
         _arrangeButton.Dispose ();
         _arrangeButton = null;
+
+        KeyBindings.Clear ();
+
 
         return true;
     }

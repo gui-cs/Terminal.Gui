@@ -587,6 +587,16 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 return;
             }
 
+            // Are we an Adornment? 
+            if (this is Adornment ad)
+            {
+                if (ad.Parent is {} && ad.Parent.RestoreFocus ())
+                {
+                    // The above will cause SetHasFocusFalse, so we can return
+                    return;
+                }
+            }
+
             if (Application.Navigation is { } && Application.Current is { })
             {
                 // Temporarily ensure this view can't get focus

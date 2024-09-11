@@ -225,7 +225,7 @@ public class Navigation : Scenario
             BorderStyle = LineStyle.Double,
             CanFocus = true, // Can't drag without this? BUGBUG
             TabStop = TabBehavior.TabGroup,
-            Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped | ViewArrangement.Resizable
         };
 
         Button button = new ()
