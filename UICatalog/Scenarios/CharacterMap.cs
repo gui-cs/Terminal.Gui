@@ -419,7 +419,7 @@ internal class CharMap : View
                    );
 
         AddCommand (
-                    Command.TopHome,
+                    Command.Start,
                     () =>
                     {
                         SelectedCodePoint = 0;
@@ -429,7 +429,7 @@ internal class CharMap : View
                    );
 
         AddCommand (
-                    Command.BottomEnd,
+                    Command.End,
                     () =>
                     {
                         SelectedCodePoint = MaxCodePoint;
@@ -456,8 +456,8 @@ internal class CharMap : View
         KeyBindings.Add (Key.CursorRight, Command.ScrollRight);
         KeyBindings.Add (Key.PageUp, Command.PageUp);
         KeyBindings.Add (Key.PageDown, Command.PageDown);
-        KeyBindings.Add (Key.Home, Command.TopHome);
-        KeyBindings.Add (Key.End, Command.BottomEnd);
+        KeyBindings.Add (Key.Home, Command.Start);
+        KeyBindings.Add (Key.End, Command.End);
 
         MouseClick += Handle_MouseClick;
         MouseEvent += Handle_MouseEvent;

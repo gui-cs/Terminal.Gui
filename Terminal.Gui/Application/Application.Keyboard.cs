@@ -282,7 +282,7 @@ public static partial class Application // Keyboard handling
 
         // Things this view knows how to do
         AddCommand (
-                    Command.QuitToplevel, // TODO: IRunnable: Rename to Command.Quit to make more generic.
+                    Command.Quit, // TODO: IRunnable: Rename to Command.Quit to make more generic.
                     static () =>
                     {
                         if (ApplicationOverlapped.OverlappedTop is { })
@@ -309,15 +309,15 @@ public static partial class Application // Keyboard handling
                    );
 
         AddCommand (
-                    Command.NextView,
+                    Command.NextTabStop,
                     static () => Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop));
 
         AddCommand (
-                    Command.PreviousView,
+                    Command.PreviousTabStop,
                     static () => Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop));
 
         AddCommand (
-                    Command.NextViewOrTop,
+                    Command.NextTabGroup,
                     static () =>
                     {
                         // TODO: This OverlapppedTop tomfoolery goes away in addressing #2491
@@ -333,7 +333,7 @@ public static partial class Application // Keyboard handling
                    );
 
         AddCommand (
-                    Command.PreviousViewOrTop,
+                    Command.PreviousTabGroup,
                     static () =>
                     {
                         // TODO: This OverlapppedTop tomfoolery goes away in addressing #2491
@@ -386,17 +386,17 @@ public static partial class Application // Keyboard handling
         QuitKey = Key.Esc;
         ArrangeKey = Key.F5.WithCtrl;
 
-        KeyBindings.Add (QuitKey, KeyBindingScope.Application, Command.QuitToplevel);
+        KeyBindings.Add (QuitKey, KeyBindingScope.Application, Command.Quit);
 
-        KeyBindings.Add (Key.CursorRight, KeyBindingScope.Application, Command.NextView);
-        KeyBindings.Add (Key.CursorDown, KeyBindingScope.Application, Command.NextView);
-        KeyBindings.Add (Key.CursorLeft, KeyBindingScope.Application, Command.PreviousView);
-        KeyBindings.Add (Key.CursorUp, KeyBindingScope.Application, Command.PreviousView);
-        KeyBindings.Add (NextTabKey, KeyBindingScope.Application, Command.NextView);
-        KeyBindings.Add (PrevTabKey, KeyBindingScope.Application, Command.PreviousView);
+        KeyBindings.Add (Key.CursorRight, KeyBindingScope.Application, Command.NextTabStop);
+        KeyBindings.Add (Key.CursorDown, KeyBindingScope.Application, Command.NextTabStop);
+        KeyBindings.Add (Key.CursorLeft, KeyBindingScope.Application, Command.PreviousTabStop);
+        KeyBindings.Add (Key.CursorUp, KeyBindingScope.Application, Command.PreviousTabStop);
+        KeyBindings.Add (NextTabKey, KeyBindingScope.Application, Command.NextTabStop);
+        KeyBindings.Add (PrevTabKey, KeyBindingScope.Application, Command.PreviousTabStop);
 
-        KeyBindings.Add (NextTabGroupKey, KeyBindingScope.Application, Command.NextViewOrTop);
-        KeyBindings.Add (PrevTabGroupKey, KeyBindingScope.Application, Command.PreviousViewOrTop);
+        KeyBindings.Add (NextTabGroupKey, KeyBindingScope.Application, Command.NextTabGroup);
+        KeyBindings.Add (PrevTabGroupKey, KeyBindingScope.Application, Command.PreviousTabGroup);
 
         KeyBindings.Add (ArrangeKey, KeyBindingScope.Application, Command.Edit);
 

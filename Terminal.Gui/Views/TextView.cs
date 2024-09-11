@@ -2050,10 +2050,10 @@ public class TextView : View
                     }
                    );
 
-        AddCommand (Command.LineDown, () => ProcessMoveDown ());
+        AddCommand (Command.Down, () => ProcessMoveDown ());
 
         AddCommand (
-                    Command.LineDownExtend,
+                    Command.DownExtend,
                     () =>
                     {
                         ProcessMoveDownExtend ();
@@ -2062,10 +2062,10 @@ public class TextView : View
                     }
                    );
 
-        AddCommand (Command.LineUp, () => ProcessMoveUp ());
+        AddCommand (Command.Up, () => ProcessMoveUp ());
 
         AddCommand (
-                    Command.LineUpExtend,
+                    Command.UpExtend,
                     () =>
                     {
                         ProcessMoveUpExtend ();
@@ -2107,20 +2107,20 @@ public class TextView : View
                    );
 
         AddCommand (
-                    Command.StartOfLine,
+                    Command.LeftStart,
                     () =>
                     {
-                        ProcessMoveStartOfLine ();
+                        ProcessMoveLeftStart ();
 
                         return true;
                     }
                    );
 
         AddCommand (
-                    Command.StartOfLineExtend,
+                    Command.LeftStartExtend,
                     () =>
                     {
-                        ProcessMoveStartOfLineExtend ();
+                        ProcessMoveLeftStartExtend ();
 
                         return true;
                     }
@@ -2137,7 +2137,7 @@ public class TextView : View
                    );
 
         AddCommand (
-                    Command.EndOfLine,
+                    Command.RightEnd,
                     () =>
                     {
                         ProcessMoveEndOfLine ();
@@ -2147,10 +2147,10 @@ public class TextView : View
                    );
 
         AddCommand (
-                    Command.EndOfLineExtend,
+                    Command.RightEndExtend,
                     () =>
                     {
-                        ProcessMoveEndOfLineExtend ();
+                        ProcessMoveRightEndExtend ();
 
                         return true;
                     }
@@ -2170,7 +2170,7 @@ public class TextView : View
                     Command.CutToStartLine,
                     () =>
                     {
-                        KillToStartOfLine ();
+                        KillToLeftStart ();
 
                         return true;
                     }
@@ -2278,7 +2278,7 @@ public class TextView : View
         AddCommand (Command.NewLine, () => ProcessReturn ());
 
         AddCommand (
-                    Command.BottomEnd,
+                    Command.End,
                     () =>
                     {
                         MoveBottomEnd ();
@@ -2288,7 +2288,7 @@ public class TextView : View
                    );
 
         AddCommand (
-                    Command.BottomEndExtend,
+                    Command.EndExtend,
                     () =>
                     {
                         MoveBottomEndExtend ();
@@ -2298,7 +2298,7 @@ public class TextView : View
                    );
 
         AddCommand (
-                    Command.TopHome,
+                    Command.Start,
                     () =>
                     {
                         MoveTopHome ();
@@ -2308,7 +2308,7 @@ public class TextView : View
                    );
 
         AddCommand (
-                    Command.TopHomeExtend,
+                    Command.StartExtend,
                     () =>
                     {
                         MoveTopHomeExtend ();
@@ -2390,7 +2390,7 @@ public class TextView : View
                    );
 
         AddCommand (
-                    Command.ShowContextMenu,
+                    Command.Context,
                     () =>
                     {
                         ContextMenu!.Position = new (
@@ -2414,15 +2414,15 @@ public class TextView : View
 
         KeyBindings.Add (Key.PageUp.WithShift, Command.PageUpExtend);
 
-        KeyBindings.Add (Key.N.WithCtrl, Command.LineDown);
-        KeyBindings.Add (Key.CursorDown, Command.LineDown);
+        KeyBindings.Add (Key.N.WithCtrl, Command.Down);
+        KeyBindings.Add (Key.CursorDown, Command.Down);
 
-        KeyBindings.Add (Key.CursorDown.WithShift, Command.LineDownExtend);
+        KeyBindings.Add (Key.CursorDown.WithShift, Command.DownExtend);
 
-        KeyBindings.Add (Key.P.WithCtrl, Command.LineUp);
-        KeyBindings.Add (Key.CursorUp, Command.LineUp);
+        KeyBindings.Add (Key.P.WithCtrl, Command.Up);
+        KeyBindings.Add (Key.CursorUp, Command.Up);
 
-        KeyBindings.Add (Key.CursorUp.WithShift, Command.LineUpExtend);
+        KeyBindings.Add (Key.CursorUp.WithShift, Command.UpExtend);
 
         KeyBindings.Add (Key.F.WithCtrl, Command.Right);
         KeyBindings.Add (Key.CursorRight, Command.Right);
@@ -2436,18 +2436,18 @@ public class TextView : View
 
         KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
 
-        KeyBindings.Add (Key.Home, Command.StartOfLine);
-        KeyBindings.Add (Key.A.WithCtrl, Command.StartOfLine);
+        KeyBindings.Add (Key.Home, Command.LeftStart);
+        KeyBindings.Add (Key.A.WithCtrl, Command.LeftStart);
 
-        KeyBindings.Add (Key.Home.WithShift, Command.StartOfLineExtend);
+        KeyBindings.Add (Key.Home.WithShift, Command.LeftStartExtend);
 
         KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
         KeyBindings.Add (Key.D.WithCtrl, Command.DeleteCharRight);
 
-        KeyBindings.Add (Key.End, Command.EndOfLine);
-        KeyBindings.Add (Key.E.WithCtrl, Command.EndOfLine);
+        KeyBindings.Add (Key.End, Command.RightEnd);
+        KeyBindings.Add (Key.E.WithCtrl, Command.RightEnd);
 
-        KeyBindings.Add (Key.End.WithShift, Command.EndOfLineExtend);
+        KeyBindings.Add (Key.End.WithShift, Command.RightEndExtend);
 
         KeyBindings.Add (Key.K.WithCtrl, Command.CutToEndLine); // kill-to-end
 
@@ -2481,10 +2481,10 @@ public class TextView : View
 
         // BUGBUG: If AllowsReturn is false, Key.Enter should not be bound (so that Toplevel can cause Command.Accept).
         KeyBindings.Add (Key.Enter, Command.NewLine);
-        KeyBindings.Add (Key.End.WithCtrl, Command.BottomEnd);
-        KeyBindings.Add (Key.End.WithCtrl.WithShift, Command.BottomEndExtend);
-        KeyBindings.Add (Key.Home.WithCtrl, Command.TopHome);
-        KeyBindings.Add (Key.Home.WithCtrl.WithShift, Command.TopHomeExtend);
+        KeyBindings.Add (Key.End.WithCtrl, Command.End);
+        KeyBindings.Add (Key.End.WithCtrl.WithShift, Command.EndExtend);
+        KeyBindings.Add (Key.Home.WithCtrl, Command.Start);
+        KeyBindings.Add (Key.Home.WithCtrl.WithShift, Command.StartExtend);
         KeyBindings.Add (Key.T.WithCtrl, Command.SelectAll);
         KeyBindings.Add (Key.InsertChar, Command.ToggleOverwrite);
         KeyBindings.Add (Key.Tab, Command.Tab);
@@ -2501,7 +2501,7 @@ public class TextView : View
         ContextMenu = new ();
         ContextMenu.KeyChanged += ContextMenu_KeyChanged!;
 
-        KeyBindings.Add ((KeyCode)ContextMenu.Key, KeyBindingScope.HotKey, Command.ShowContextMenu);
+        KeyBindings.Add ((KeyCode)ContextMenu.Key, KeyBindingScope.HotKey, Command.Context);
     }
 
     private void TextView_Added1 (object? sender, SuperViewChangedEventArgs e)
@@ -5019,7 +5019,7 @@ public class TextView : View
         DoNeededAction ();
     }
 
-    private void KillToStartOfLine ()
+    private void KillToLeftStart ()
     {
         if (_isReadOnly)
         {
@@ -5456,7 +5456,7 @@ public class TextView : View
         return true;
     }
 
-    private void MoveStartOfLine ()
+    private void MoveLeftStart ()
     {
         if (_leftColumn > 0)
         {
@@ -5847,7 +5847,7 @@ public class TextView : View
         MoveEndOfLine ();
     }
 
-    private void ProcessMoveEndOfLineExtend ()
+    private void ProcessMoveRightEndExtend ()
     {
         ResetAllTrack ();
         StartSelecting ();
@@ -5914,7 +5914,7 @@ public class TextView : View
         MoveRight ();
     }
 
-    private void ProcessMoveStartOfLine ()
+    private void ProcessMoveLeftStart ()
     {
         ResetAllTrack ();
 
@@ -5923,14 +5923,14 @@ public class TextView : View
             StopSelecting ();
         }
 
-        MoveStartOfLine ();
+        MoveLeftStart ();
     }
 
-    private void ProcessMoveStartOfLineExtend ()
+    private void ProcessMoveLeftStartExtend ()
     {
         ResetAllTrack ();
         StartSelecting ();
-        MoveStartOfLine ();
+        MoveLeftStart ();
     }
 
     private bool ProcessMoveUp ()

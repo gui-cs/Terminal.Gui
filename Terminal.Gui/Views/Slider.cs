@@ -1413,10 +1413,10 @@ public class Slider<T> : View, IOrientation
     private void SetCommands ()
     {
         AddCommand (Command.Right, () => MovePlus ());
-        AddCommand (Command.LineDown, () => MovePlus ());
+        AddCommand (Command.Down, () => MovePlus ());
         AddCommand (Command.Left, () => MoveMinus ());
-        AddCommand (Command.LineUp, () => MoveMinus ());
-        AddCommand (Command.LeftHome, () => MoveStart ());
+        AddCommand (Command.Up, () => MoveMinus ());
+        AddCommand (Command.LeftStart, () => MoveStart ());
         AddCommand (Command.RightEnd, () => MoveEnd ());
         AddCommand (Command.RightExtend, () => ExtendPlus ());
         AddCommand (Command.LeftExtend, () => ExtendMinus ());
@@ -1444,9 +1444,9 @@ public class Slider<T> : View, IOrientation
         else
         {
             KeyBindings.Remove (Key.CursorRight);
-            KeyBindings.Add (Key.CursorDown, Command.LineDown);
+            KeyBindings.Add (Key.CursorDown, Command.Down);
             KeyBindings.Remove (Key.CursorLeft);
-            KeyBindings.Add (Key.CursorUp, Command.LineUp);
+            KeyBindings.Add (Key.CursorUp, Command.Up);
 
             KeyBindings.Remove (Key.CursorRight.WithCtrl);
             KeyBindings.Add (Key.CursorDown.WithCtrl, Command.RightExtend);
@@ -1455,7 +1455,7 @@ public class Slider<T> : View, IOrientation
         }
 
         KeyBindings.Remove (Key.Home);
-        KeyBindings.Add (Key.Home, Command.LeftHome);
+        KeyBindings.Add (Key.Home, Command.LeftStart);
         KeyBindings.Remove (Key.End);
         KeyBindings.Add (Key.End, Command.RightEnd);
         KeyBindings.Remove (Key.Enter);

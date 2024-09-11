@@ -163,7 +163,7 @@ public class TreeView<T> : View, ITreeView where T : class
                    );
 
         AddCommand (
-                    Command.LineUp,
+                    Command.Up,
                     () =>
                     {
                         AdjustSelection (-1);
@@ -173,7 +173,7 @@ public class TreeView<T> : View, ITreeView where T : class
                    );
 
         AddCommand (
-                    Command.LineUpExtend,
+                    Command.UpExtend,
                     () =>
                     {
                         AdjustSelection (-1, true);
@@ -193,7 +193,7 @@ public class TreeView<T> : View, ITreeView where T : class
                    );
 
         AddCommand (
-                    Command.LineDown,
+                    Command.Down,
                     () =>
                     {
                         AdjustSelection (1);
@@ -203,7 +203,7 @@ public class TreeView<T> : View, ITreeView where T : class
                    );
 
         AddCommand (
-                    Command.LineDownExtend,
+                    Command.DownExtend,
                     () =>
                     {
                         AdjustSelection (1, true);
@@ -223,7 +223,7 @@ public class TreeView<T> : View, ITreeView where T : class
                    );
 
         AddCommand (
-                    Command.TopHome,
+                    Command.Start,
                     () =>
                     {
                         GoToFirst ();
@@ -233,7 +233,7 @@ public class TreeView<T> : View, ITreeView where T : class
                    );
 
         AddCommand (
-                    Command.BottomEnd,
+                    Command.End,
                     () =>
                     {
                         GoToEnd ();
@@ -285,16 +285,16 @@ public class TreeView<T> : View, ITreeView where T : class
         KeyBindings.Add (Key.CursorLeft, Command.Collapse);
         KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.CollapseAll);
 
-        KeyBindings.Add (Key.CursorUp, Command.LineUp);
-        KeyBindings.Add (Key.CursorUp.WithShift, Command.LineUpExtend);
+        KeyBindings.Add (Key.CursorUp, Command.Up);
+        KeyBindings.Add (Key.CursorUp.WithShift, Command.UpExtend);
         KeyBindings.Add (Key.CursorUp.WithCtrl, Command.LineUpToFirstBranch);
 
-        KeyBindings.Add (Key.CursorDown, Command.LineDown);
-        KeyBindings.Add (Key.CursorDown.WithShift, Command.LineDownExtend);
+        KeyBindings.Add (Key.CursorDown, Command.Down);
+        KeyBindings.Add (Key.CursorDown.WithShift, Command.DownExtend);
         KeyBindings.Add (Key.CursorDown.WithCtrl, Command.LineDownToLastBranch);
 
-        KeyBindings.Add (Key.Home, Command.TopHome);
-        KeyBindings.Add (Key.End, Command.BottomEnd);
+        KeyBindings.Add (Key.Home, Command.Start);
+        KeyBindings.Add (Key.End, Command.End);
         KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
         KeyBindings.Add (ObjectActivationKey, Command.Select);
     }

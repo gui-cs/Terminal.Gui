@@ -664,9 +664,9 @@ public class UICatalogApp
 
             // TableView typically is a grid where nav keys are biased for moving left/right.
             ScenarioList.KeyBindings.Remove (Key.Home);
-            ScenarioList.KeyBindings.Add (Key.Home, Command.TopHome);
+            ScenarioList.KeyBindings.Add (Key.Home, Command.Start);
             ScenarioList.KeyBindings.Remove (Key.End);
-            ScenarioList.KeyBindings.Add (Key.End, Command.BottomEnd);
+            ScenarioList.KeyBindings.Add (Key.End, Command.End);
 
             // Ideally, TableView.MultiSelect = false would turn off any keybindings for
             // multi-select options. But it currently does not. UI Catalog uses Ctrl-A for

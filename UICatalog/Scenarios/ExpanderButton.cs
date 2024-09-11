@@ -39,8 +39,8 @@ public class ExpanderButton : Button
         ShadowStyle = ShadowStyle.None;
 
         AddCommand (Command.HotKey, Toggle);
-        AddCommand (Command.ToggleExpandCollapse, Toggle);
-        KeyBindings.Add (Key.F4, Command.ToggleExpandCollapse);
+        AddCommand (Command.Toggle, Toggle);
+        KeyBindings.Add (Key.F4, Command.Toggle);
 
         Orientation = Orientation.Vertical;
 

@@ -504,7 +504,7 @@ Item 6",
         Assert.Equal (-1, lv.SelectedItem);
 
         // bind shift down to move down twice in control
-        lv.KeyBindings.Add (Key.CursorDown.WithShift, Command.LineDown, Command.LineDown);
+        lv.KeyBindings.Add (Key.CursorDown.WithShift, Command.Down, Command.Down);
 
         Key ev = Key.CursorDown.WithShift;
 
@@ -536,7 +536,7 @@ Item 6",
         Assert.False (lv.Source.IsMarked (1));
         Assert.False (lv.Source.IsMarked (2));
 
-        lv.KeyBindings.Add (Key.Space.WithShift, Command.Select, Command.LineDown);
+        lv.KeyBindings.Add (Key.Space.WithShift, Command.Select, Command.Down);
 
         Key ev = Key.Space.WithShift;
 

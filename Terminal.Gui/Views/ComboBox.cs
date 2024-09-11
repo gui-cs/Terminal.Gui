@@ -77,27 +77,27 @@ public class ComboBox : View, IDesignable
 
         // Things this view knows how to do
         AddCommand (Command.Accept, () => ActivateSelected ());
-        AddCommand (Command.ToggleExpandCollapse, () => ExpandCollapse ());
+        AddCommand (Command.Toggle, () => ExpandCollapse ());
         AddCommand (Command.Expand, () => Expand ());
         AddCommand (Command.Collapse, () => Collapse ());
-        AddCommand (Command.LineDown, () => MoveDown ());
-        AddCommand (Command.LineUp, () => MoveUp ());
+        AddCommand (Command.Down, () => MoveDown ());
+        AddCommand (Command.Up, () => MoveUp ());
         AddCommand (Command.PageDown, () => PageDown ());
         AddCommand (Command.PageUp, () => PageUp ());
-        AddCommand (Command.TopHome, () => MoveHome ());
-        AddCommand (Command.BottomEnd, () => MoveEnd ());
+        AddCommand (Command.Start, () => MoveHome ());
+        AddCommand (Command.End, () => MoveEnd ());
         AddCommand (Command.Cancel, () => CancelSelected ());
         AddCommand (Command.UnixEmulation, () => UnixEmulation ());
 
         // Default keybindings for this view
         KeyBindings.Add (Key.Enter, Command.Accept);
-        KeyBindings.Add (Key.F4, Command.ToggleExpandCollapse);
-        KeyBindings.Add (Key.CursorDown, Command.LineDown);
-        KeyBindings.Add (Key.CursorUp, Command.LineUp);
+        KeyBindings.Add (Key.F4, Command.Toggle);
+        KeyBindings.Add (Key.CursorDown, Command.Down);
+        KeyBindings.Add (Key.CursorUp, Command.Up);
         KeyBindings.Add (Key.PageDown, Command.PageDown);
         KeyBindings.Add (Key.PageUp, Command.PageUp);
-        KeyBindings.Add (Key.Home, Command.TopHome);
-        KeyBindings.Add (Key.End, Command.BottomEnd);
+        KeyBindings.Add (Key.Home, Command.Start);
+        KeyBindings.Add (Key.End, Command.End);
         KeyBindings.Add (Key.Esc, Command.Cancel);
         KeyBindings.Add (Key.U.WithCtrl, Command.UnixEmulation);
     }
@@ -992,7 +992,7 @@ public class ComboBox : View, IDesignable
                                                              "ComboBox container cannot be null."
                                                             );
             HideDropdownListOnClick = hideDropdownListOnClick;
-            AddCommand (Command.LineUp, () => _container.MoveUpList ());
+            AddCommand (Command.Up, () => _container.MoveUpList ());
         }
     }
 

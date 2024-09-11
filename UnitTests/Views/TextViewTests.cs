@@ -1796,7 +1796,7 @@ This is the second line.
 
     [Fact]
     [AutoInitShutdown]
-    public void HistoryText_Undo_Redo_KillToStartOfLine ()
+    public void HistoryText_Undo_Redo_KillToLeftStart ()
     {
         var text = "First line.\nSecond line.";
         var tv = new TextView { Text = text };

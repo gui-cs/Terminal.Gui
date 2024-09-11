@@ -153,8 +153,8 @@ internal sealed class Menu : View
         Application.MouseEvent += Application_RootMouseEvent;
 
         // Things this view knows how to do
-        AddCommand (Command.LineUp, () => MoveUp ());
-        AddCommand (Command.LineDown, () => MoveDown ());
+        AddCommand (Command.Up, () => MoveUp ());
+        AddCommand (Command.Down, () => MoveDown ());
 
         AddCommand (
                     Command.Left,
@@ -186,12 +186,12 @@ internal sealed class Menu : View
                     }
                    );
         AddCommand (Command.Select, ctx => _host?.SelectItem ((ctx.KeyBinding?.Context as MenuItem)!));
-        AddCommand (Command.ToggleExpandCollapse, ctx => ExpandCollapse ((ctx.KeyBinding?.Context as MenuItem)!));
+        AddCommand (Command.Toggle, ctx => ExpandCollapse ((ctx.KeyBinding?.Context as MenuItem)!));
         AddCommand (Command.HotKey, ctx => _host?.SelectItem ((ctx.KeyBinding?.Context as MenuItem)!));
 
         // Default key bindings for this view
-        KeyBindings.Add (Key.CursorUp, Command.LineUp);
-        KeyBindings.Add (Key.CursorDown, Command.LineDown);
+        KeyBindings.Add (Key.CursorUp, Command.Up);
+        KeyBindings.Add (Key.CursorDown, Command.Down);
         KeyBindings.Add (Key.CursorLeft, Command.Left);
         KeyBindings.Add (Key.CursorRight, Command.Right);
         KeyBindings.Add (Key.Esc, Command.Cancel);
@@ -209,7 +209,7 @@ internal sealed class Menu : View
 
         foreach (MenuItem menuItem in menuItems)
         {
-            KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, menuItem);
+            KeyBinding keyBinding = new ([Command.Toggle], KeyBindingScope.HotKey, menuItem);
 
             if (menuItem.HotKey != Key.Empty)
             {

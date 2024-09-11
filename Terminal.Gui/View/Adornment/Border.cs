@@ -754,9 +754,9 @@ public class Border : Adornment
         };
         Add (_arrangeButton);
 
-        AddCommand (Command.QuitToplevel, EndArrange);
+        AddCommand (Command.Quit, EndArrange);
 
-        AddCommand (Command.LineUp,
+        AddCommand (Command.Up,
                     () =>
                     {
                         if (_arranging == ViewArrangement.Movable)
@@ -775,7 +775,7 @@ public class Border : Adornment
                         return true;
                     });
 
-        AddCommand (Command.LineDown,
+        AddCommand (Command.Down,
                     () =>
                     {
                         if (_arranging == ViewArrangement.Movable)
@@ -853,10 +853,10 @@ public class Border : Adornment
                         return true;
                     });
 
-        KeyBindings.Add (Key.Esc, KeyBindingScope.HotKey, Command.QuitToplevel);
-        KeyBindings.Add (Application.ArrangeKey, KeyBindingScope.HotKey, Command.QuitToplevel);
-        KeyBindings.Add (Key.CursorUp, KeyBindingScope.HotKey, Command.LineUp);
-        KeyBindings.Add (Key.CursorDown, KeyBindingScope.HotKey, Command.LineDown);
+        KeyBindings.Add (Key.Esc, KeyBindingScope.HotKey, Command.Quit);
+        KeyBindings.Add (Application.ArrangeKey, KeyBindingScope.HotKey, Command.Quit);
+        KeyBindings.Add (Key.CursorUp, KeyBindingScope.HotKey, Command.Up);
+        KeyBindings.Add (Key.CursorDown, KeyBindingScope.HotKey, Command.Down);
         KeyBindings.Add (Key.CursorLeft, KeyBindingScope.HotKey, Command.Left);
         KeyBindings.Add (Key.CursorRight, KeyBindingScope.HotKey, Command.Right);
 

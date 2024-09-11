@@ -165,7 +165,7 @@ public class KeyBindingTests
         Command [] commands1 = { Command.Right, Command.Left };
         keyBindings.Add (Key.A, KeyBindingScope.Application, commands1);
 
-        Command [] commands2 = { Command.LineUp, Command.LineDown };
+        Command [] commands2 = { Command.Up, Command.Down };
         keyBindings.Add (Key.B, KeyBindingScope.Application, commands2);
 
         Key key = keyBindings.GetKeyFromCommands (commands1);
@@ -175,7 +175,7 @@ public class KeyBindingTests
         Assert.Equal (Key.B, key);
 
         // Negative case
-        Assert.Throws<InvalidOperationException> (() => key = keyBindings.GetKeyFromCommands (Command.EndOfLine));
+        Assert.Throws<InvalidOperationException> (() => key = keyBindings.GetKeyFromCommands (Command.RightEnd));
     }
 
     [Fact]

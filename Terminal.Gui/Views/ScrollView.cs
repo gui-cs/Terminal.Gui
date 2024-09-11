@@ -88,9 +88,9 @@ public class ScrollView : View
         AddCommand (Command.PageDown, () => ScrollDown (Viewport.Height));
         AddCommand (Command.PageLeft, () => ScrollLeft (Viewport.Width));
         AddCommand (Command.PageRight, () => ScrollRight (Viewport.Width));
-        AddCommand (Command.TopHome, () => ScrollUp (GetContentSize ().Height));
-        AddCommand (Command.BottomEnd, () => ScrollDown (GetContentSize ().Height));
-        AddCommand (Command.LeftHome, () => ScrollLeft (GetContentSize ().Width));
+        AddCommand (Command.Start, () => ScrollUp (GetContentSize ().Height));
+        AddCommand (Command.End, () => ScrollDown (GetContentSize ().Height));
+        AddCommand (Command.LeftStart, () => ScrollLeft (GetContentSize ().Width));
         AddCommand (Command.RightEnd, () => ScrollRight (GetContentSize ().Width));
 
         // Default keybindings for this view
@@ -107,9 +107,9 @@ public class ScrollView : View
 
         KeyBindings.Add (Key.PageUp.WithCtrl, Command.PageLeft);
         KeyBindings.Add (Key.PageDown.WithCtrl, Command.PageRight);
-        KeyBindings.Add (Key.Home, Command.TopHome);
-        KeyBindings.Add (Key.End, Command.BottomEnd);
-        KeyBindings.Add (Key.Home.WithCtrl, Command.LeftHome);
+        KeyBindings.Add (Key.Home, Command.Start);
+        KeyBindings.Add (Key.End, Command.End);
+        KeyBindings.Add (Key.Home.WithCtrl, Command.LeftStart);
         KeyBindings.Add (Key.End.WithCtrl, Command.RightEnd);
 
         Initialized += (s, e) =>

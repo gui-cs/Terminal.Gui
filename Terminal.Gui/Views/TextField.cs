@@ -72,7 +72,7 @@ public class TextField : View
                    );
 
         AddCommand (
-                    Command.LeftHomeExtend,
+                    Command.LeftStartExtend,
                     () =>
                     {
                         MoveHomeExtend ();
@@ -92,7 +92,7 @@ public class TextField : View
                    );
 
         AddCommand (
-                    Command.LeftHome,
+                    Command.LeftStart,
                     () =>
                     {
                         MoveHome ();
@@ -316,7 +316,7 @@ public class TextField : View
                    );
 
         AddCommand (
-                    Command.ShowContextMenu,
+                    Command.Context,
                     () =>
                     {
                         ShowContextMenu ();
@@ -336,17 +336,17 @@ public class TextField : View
 
         KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
 
-        KeyBindings.Add (Key.Home.WithShift, Command.LeftHomeExtend);
-        KeyBindings.Add (Key.Home.WithShift.WithCtrl, Command.LeftHomeExtend);
-        KeyBindings.Add (Key.A.WithShift.WithCtrl, Command.LeftHomeExtend);
+        KeyBindings.Add (Key.Home.WithShift, Command.LeftStartExtend);
+        KeyBindings.Add (Key.Home.WithShift.WithCtrl, Command.LeftStartExtend);
+        KeyBindings.Add (Key.A.WithShift.WithCtrl, Command.LeftStartExtend);
 
         KeyBindings.Add (Key.End.WithShift, Command.RightEndExtend);
         KeyBindings.Add (Key.End.WithShift.WithCtrl, Command.RightEndExtend);
         KeyBindings.Add (Key.E.WithShift.WithCtrl, Command.RightEndExtend);
 
-        KeyBindings.Add (Key.Home, Command.LeftHome);
-        KeyBindings.Add (Key.Home.WithCtrl, Command.LeftHome);
-        KeyBindings.Add (Key.A.WithCtrl, Command.LeftHome);
+        KeyBindings.Add (Key.Home, Command.LeftStart);
+        KeyBindings.Add (Key.Home.WithCtrl, Command.LeftStart);
+        KeyBindings.Add (Key.A.WithCtrl, Command.LeftStart);
 
         KeyBindings.Add (Key.CursorLeft.WithShift, Command.LeftExtend);
         KeyBindings.Add (Key.CursorUp.WithShift, Command.LeftExtend);
@@ -408,7 +408,7 @@ public class TextField : View
         ContextMenu = new ContextMenu { Host = this };
         ContextMenu.KeyChanged += ContextMenu_KeyChanged;
 
-        KeyBindings.Add (ContextMenu.Key, KeyBindingScope.HotKey, Command.ShowContextMenu);
+        KeyBindings.Add (ContextMenu.Key, KeyBindingScope.HotKey, Command.Context);
         KeyBindings.Add (Key.Enter, Command.Accept);
     }
 

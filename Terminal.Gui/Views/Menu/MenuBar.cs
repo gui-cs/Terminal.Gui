@@ -126,7 +126,7 @@ public class MenuBar : View, IDesignable
                         return true;
                     }
                    );
-        AddCommand (Command.ToggleExpandCollapse, ctx =>
+        AddCommand (Command.Toggle, ctx =>
                                                   {
                                                       CloseOtherOpenedMenuBar ();
 
@@ -147,7 +147,7 @@ public class MenuBar : View, IDesignable
         KeyBindings.Add (Key.CursorDown, Command.Accept);
         KeyBindings.Add (Key.Enter, Command.Accept);
 
-        KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, -1); // -1 indicates Key was used
+        KeyBinding keyBinding = new ([Command.Toggle], KeyBindingScope.HotKey, -1); // -1 indicates Key was used
         KeyBindings.Add (Key, keyBinding);
 
         // TODO: Why do we have two keybindings for opening the menu? Ctrl-Space and Key?
@@ -190,10 +190,10 @@ public class MenuBar : View, IDesignable
                 if (menuBarItem.HotKey != Key.Empty)
                 {
                     KeyBindings.Remove (menuBarItem.HotKey!);
-                    KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.Focused, menuBarItem);
+                    KeyBinding keyBinding = new ([Command.Toggle], KeyBindingScope.Focused, menuBarItem);
                     KeyBindings.Add (menuBarItem.HotKey!, keyBinding);
                     KeyBindings.Remove (menuBarItem.HotKey!.WithAlt);
-                    keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, menuBarItem);
+                    keyBinding = new ([Command.Toggle], KeyBindingScope.HotKey, menuBarItem);
                     KeyBindings.Add (menuBarItem.HotKey.WithAlt, keyBinding);
                 }
 
@@ -1272,7 +1272,7 @@ public class MenuBar : View, IDesignable
             }
 
             KeyBindings.Remove (_key);
-            KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, -1); // -1 indicates Key was used
+            KeyBinding keyBinding = new ([Command.Toggle], KeyBindingScope.HotKey, -1); // -1 indicates Key was used
             KeyBindings.Add (value, keyBinding);
             _key = value;
         }
