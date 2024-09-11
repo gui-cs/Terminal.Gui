@@ -22,7 +22,8 @@ internal sealed class NetWinVTConsole : IDisposable
         _stdoutRaw = File.Create ("CONOUT$");
         _stdoutText = new StreamWriter (_stdoutRaw, Encoding.UTF8, -1, true);
 
-        _stderrRaw = File.Create ("CONERR$");
+        // In a Windows console app, stderr is just another handle to stdout.
+        _stderrRaw = File.Create ("CONOUT$");
         _stderrText = new StreamWriter (_stderrRaw, Encoding.UTF8, -1, true);
 
         if (!GetConsoleMode (_stdinRaw.SafeFileHandle, out CONSOLE_MODE mode))
