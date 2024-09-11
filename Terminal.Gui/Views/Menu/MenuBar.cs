@@ -306,7 +306,7 @@ public class MenuBar : View, IDesignable
 
             if (i == _selected && IsMenuOpen)
             {
-                hotColor = i == _selected ? ColorScheme.HotFocus : GetHotNormalColor ();
+                hotColor = i == _selected ? ColorScheme!.HotFocus : GetHotNormalColor ();
                 normalColor = i == _selected ? GetFocusColor () : GetNormalColor ();
             }
             else

@@ -1,11 +1,12 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+namespace Terminal.Gui;
 
 public partial class View // Drawing APIs
 {
-    private ColorScheme _colorScheme;
+    private ColorScheme? _colorScheme;
 
     /// <summary>The color scheme for this view, if it is not defined, it returns the <see cref="SuperView"/>'s color scheme.</summary>
-    public virtual ColorScheme ColorScheme
+    public virtual ColorScheme? ColorScheme
     {
         get
         {
@@ -261,8 +262,7 @@ public partial class View // Drawing APIs
     ///         <see cref="View"/> .
     ///     </para>
     /// </remarks>
-    [CanBeNull]
-    public event EventHandler<DrawEventArgs> DrawContent;
+    public event EventHandler<DrawEventArgs>? DrawContent;
 
     /// <summary>Event invoked when the content area of the View is completed drawing.</summary>
     /// <remarks>
@@ -272,8 +272,7 @@ public partial class View // Drawing APIs
     ///         <see cref="View"/> .
     ///     </para>
     /// </remarks>
-    [CanBeNull]
-    public event EventHandler<DrawEventArgs> DrawContentComplete;
+    public event EventHandler<DrawEventArgs>? DrawContentComplete;
 
     /// <summary>Utility function to draw strings that contain a hotkey.</summary>
     /// <param name="text">String to display, the hotkey specifier before a letter flags the next letter as the hotkey.</param>
@@ -339,7 +338,7 @@ public partial class View // Drawing APIs
     /// </returns>
     public virtual Attribute GetFocusColor ()
     {
-        ColorScheme cs = ColorScheme;
+        ColorScheme? cs = ColorScheme;
 
         if (cs is null)
         {
@@ -357,7 +356,7 @@ public partial class View // Drawing APIs
     /// </returns>
     public virtual Attribute GetHotNormalColor ()
     {
-        ColorScheme cs = ColorScheme;
+        ColorScheme? cs = ColorScheme;
 
         if (cs is null)
         {
@@ -375,7 +374,7 @@ public partial class View // Drawing APIs
     /// </returns>
     public virtual Attribute GetNormalColor ()
     {
-        ColorScheme cs = ColorScheme;
+        ColorScheme? cs = ColorScheme;
 
         if (cs is null)
         {
@@ -499,7 +498,7 @@ public partial class View // Drawing APIs
             TextFormatter?.Draw (
                                  drawRect,
                                  HasFocus ? GetFocusColor () : GetNormalColor (),
-                                 HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
+                                 HasFocus ? ColorScheme!.HotFocus : GetHotNormalColor (),
                                  Rectangle.Empty
                                 );
             SetSubViewNeedsDisplay ();
@@ -560,7 +559,7 @@ public partial class View // Drawing APIs
                 // Get the entire map
                 if (p.Value is { })
                 {
-                    Driver.SetAttribute (p.Value.Value.Attribute ?? ColorScheme.Normal);
+                    Driver.SetAttribute (p.Value.Value.Attribute ?? ColorScheme!.Normal);
                     Driver.Move (p.Key.X, p.Key.Y);
 
                     // TODO: #2616 - Support combining sequences that don't normalize
@@ -585,7 +584,7 @@ public partial class View // Drawing APIs
                 // Get the entire map
                 if (p.Value is { })
                 {
-                    Driver.SetAttribute (p.Value.Value.Attribute ?? ColorScheme.Normal);
+                    Driver.SetAttribute (p.Value.Value.Attribute ?? ColorScheme!.Normal);
                     Driver.Move (p.Key.X, p.Key.Y);
 
                     // TODO: #2616 - Support combining sequences that don't normalize

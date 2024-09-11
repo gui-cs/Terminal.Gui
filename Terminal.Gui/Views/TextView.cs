@@ -3149,7 +3149,7 @@ public class TextView : View
             cs = new ();
         }
 
-        return Enabled ? cs.Focus : cs.Disabled;
+        return Enabled ? cs!.Focus : cs!.Disabled;
     }
 
     /// <summary>
@@ -4019,8 +4019,8 @@ public class TextView : View
         {
             Driver.SetAttribute (
                                  new (
-                                      ColorScheme.Focus.Background,
-                                      ColorScheme.Focus.Foreground
+                                      ColorScheme!.Focus.Background,
+                                      ColorScheme!.Focus.Foreground
                                      )
                                 );
         }
@@ -6258,11 +6258,11 @@ public class TextView : View
         DoNeededAction ();
     }
 
-    private static void SetValidUsedColor (ColorScheme colorScheme)
+    private static void SetValidUsedColor (ColorScheme? colorScheme)
     {
         // BUGBUG: (v2 truecolor) This code depends on 8-bit color names; disabling for now
         //if ((colorScheme!.HotNormal.Foreground & colorScheme.Focus.Background) == colorScheme.Focus.Foreground) {
-        Driver.SetAttribute (new (colorScheme.Focus.Background, colorScheme.Focus.Foreground));
+        Driver.SetAttribute (new (colorScheme!.Focus.Background, colorScheme!.Focus.Foreground));
     }
 
     /// <summary>Restore from original model.</summary>

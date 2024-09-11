@@ -224,7 +224,7 @@ public sealed class ArrangementEditor : View
             else
             {
                 _viewToEdit.ShadowStyle = ShadowStyle.None;
-                _viewToEdit.ColorScheme = _viewToEdit.SuperView.ColorScheme;
+                _viewToEdit.ColorScheme = _viewToEdit!.SuperView!.ColorScheme;
             }
 
             if (_viewToEdit.Arrangement.HasFlag (ViewArrangement.Movable))

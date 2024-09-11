@@ -372,7 +372,7 @@ public static partial class Application // Keyboard handling
 
                         if (viewToArrange is { })
                         {
-                            return viewToArrange.Border?.Arrange ();
+                            return viewToArrange.Border?.EnterArrangeMode ();
                         }
 
                         return false;

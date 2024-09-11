@@ -1,3 +1,4 @@
+#nullable enable
 using System.Diagnostics;
 using static Terminal.Gui.SpinnerStyle;
 
@@ -75,9 +76,6 @@ public class Border : Adornment
 #endif
 
 
-    [CanBeNull]
-    private Button _arrangeButton;
-
     /// <inheritdoc/>
     public override void BeginInit ()
     {
@@ -142,7 +140,7 @@ public class Border : Adornment
     ///     The color scheme for the Border. If set to <see langword="null"/>, gets the <see cref="Adornment.Parent"/>
     ///     scheme. color scheme.
     /// </summary>
-    public override ColorScheme ColorScheme
+    public override ColorScheme? ColorScheme
     {
         get
         {
@@ -151,7 +149,12 @@ public class Border : Adornment
                 return base.ColorScheme;
             }
 
-            return Parent?.ColorScheme;
+            if (Parent?.ColorScheme is { })
+            {
+                return Parent.ColorScheme;
+            }
+
+            return null;
         }
         set
         {
@@ -204,7 +207,7 @@ public class Border : Adornment
             // TODO: Make Border.LineStyle inherit from the SuperView hierarchy
             // TODO: Right now, Window and FrameView use CM to set BorderStyle, which negates
             // TODO: all this.
-            return Parent.SuperView?.BorderStyle ?? LineStyle.None;
+            return Parent!.SuperView?.BorderStyle ?? LineStyle.None;
         }
         set => _lineStyle = value;
     }
@@ -234,9 +237,9 @@ public class Border : Adornment
 
     private Color? _savedForeColor;
 
-    private void Border_Highlight (object sender, CancelEventArgs<HighlightStyle> e)
+    private void Border_Highlight (object? sender, CancelEventArgs<HighlightStyle> e)
     {
-        if (!Parent.Arrangement.HasFlag (ViewArrangement.Movable))
+        if (!Parent!.Arrangement.HasFlag (ViewArrangement.Movable))
         {
             e.Cancel = true;
 
@@ -247,12 +250,12 @@ public class Border : Adornment
         {
             if (!_savedForeColor.HasValue)
             {
-                _savedForeColor = ColorScheme.Normal.Foreground;
+                _savedForeColor = ColorScheme!.Normal.Foreground;
             }
 
             var cs = new ColorScheme (ColorScheme)
             {
-                Normal = new (ColorScheme.Normal.Foreground.GetHighlightColor (), ColorScheme.Normal.Background)
+                Normal = new (ColorScheme!.Normal.Foreground.GetHighlightColor (), ColorScheme.Normal.Background)
             };
             ColorScheme = cs;
         }
@@ -271,7 +274,7 @@ public class Border : Adornment
         {
             var cs = new ColorScheme (ColorScheme)
             {
-                Normal = new (_savedForeColor.Value, ColorScheme.Normal.Background)
+                Normal = new (_savedForeColor.Value, ColorScheme!.Normal.Background)
             };
             ColorScheme = cs;
         }
@@ -297,7 +300,7 @@ public class Border : Adornment
         //    return false;
         //}
 
-        if (!Parent.Arrangement.HasFlag (ViewArrangement.Movable))
+        if (!Parent!.Arrangement.HasFlag (ViewArrangement.Movable))
         {
             return false;
         }
@@ -330,7 +333,7 @@ public class Border : Adornment
                 if (Parent.SuperView is null)
                 {
                     // Redraw the entire app window.
-                    Application.Top.SetNeedsDisplay ();
+                    Application.Top!.SetNeedsDisplay ();
                 }
                 else
                 {
@@ -380,7 +383,7 @@ public class Border : Adornment
         base.Dispose (disposing);
     }
 
-    private void Application_GrabbingMouse (object sender, GrabMouseEventArgs e)
+    private void Application_GrabbingMouse (object? sender, GrabMouseEventArgs e)
     {
         if (Application.MouseGrabView == this && _dragPosition.HasValue)
         {
@@ -388,7 +391,7 @@ public class Border : Adornment
         }
     }
 
-    private void Application_UnGrabbingMouse (object sender, GrabMouseEventArgs e)
+    private void Application_UnGrabbingMouse (object? sender, GrabMouseEventArgs e)
     {
         if (Application.MouseGrabView == this && _dragPosition.HasValue)
         {
@@ -428,7 +431,7 @@ public class Border : Adornment
         int maxTitleWidth = Math.Max (
                                       0,
                                       Math.Min (
-                                                Parent.TitleTextFormatter.FormatAndGetSize ().Width,
+                                                Parent!.TitleTextFormatter.FormatAndGetSize ().Width,
                                                 Math.Min (screenBounds.Width - 4, borderBounds.Width - 4)
                                                )
                                      );
@@ -490,7 +493,7 @@ public class Border : Adornment
 
         if (canDrawBorder && LineStyle != LineStyle.None)
         {
-            LineCanvas lc = Parent?.LineCanvas;
+            LineCanvas? lc = Parent?.LineCanvas;
 
             bool drawTop = Thickness.Top > 0 && Frame.Width > 1 && Frame.Height >= 1;
             bool drawLeft = Thickness.Left > 0 && (Frame.Height > 1 || Thickness.Top == 0);
@@ -505,7 +508,7 @@ public class Border : Adornment
             }
             else
             {
-                Driver.SetAttribute (Parent.GetNormalColor ());
+                Driver.SetAttribute (Parent!.GetNormalColor ());
             }
 
             if (drawTop)
@@ -515,7 +518,7 @@ public class Border : Adornment
                 if (borderBounds.Width < 4 || !Settings.FastHasFlags (BorderSettings.Title) || string.IsNullOrEmpty (Parent?.Title))
                 {
                     // ╔╡╞╗ should be ╔══╗
-                    lc.AddLine (
+                    lc?.AddLine (
                                 new (borderBounds.Location.X, titleY),
                                 borderBounds.Width,
                                 Orientation.Horizontal,
@@ -530,7 +533,7 @@ public class Border : Adornment
                     //│
                     if (Thickness.Top == 2)
                     {
-                        lc.AddLine (
+                        lc?.AddLine (
                                     new (borderBounds.X + 1, topTitleLineY),
                                     Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                     Orientation.Horizontal,
@@ -544,7 +547,7 @@ public class Border : Adornment
                     //│
                     if (borderBounds.Width >= 4 && Thickness.Top > 2)
                     {
-                        lc.AddLine (
+                        lc?.AddLine (
                                     new (borderBounds.X + 1, topTitleLineY),
                                     Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                     Orientation.Horizontal,
@@ -552,7 +555,7 @@ public class Border : Adornment
                                     Driver.GetAttribute ()
                                    );
 
-                        lc.AddLine (
+                        lc?.AddLine (
                                     new (borderBounds.X + 1, topTitleLineY + 2),
                                     Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                     Orientation.Horizontal,
@@ -563,7 +566,7 @@ public class Border : Adornment
 
                     // ╔╡Title╞═════╗
                     // Add a short horiz line for ╔╡
-                    lc.AddLine (
+                    lc?.AddLine (
                                 new (borderBounds.Location.X, titleY),
                                 2,
                                 Orientation.Horizontal,
@@ -572,7 +575,7 @@ public class Border : Adornment
                                );
 
                     // Add a vert line for ╔╡
-                    lc.AddLine (
+                    lc?.AddLine (
                                 new (borderBounds.X + 1, topTitleLineY),
                                 titleBarsLength,
                                 Orientation.Vertical,
@@ -581,7 +584,7 @@ public class Border : Adornment
                                );
 
                     // Add a vert line for ╞
-                    lc.AddLine (
+                    lc?.AddLine (
                                 new (
                                      borderBounds.X
                                      + 1
@@ -596,7 +599,7 @@ public class Border : Adornment
                                );
 
                     // Add the right hand line for ╞═════╗
-                    lc.AddLine (
+                    lc?.AddLine (
                                 new (
                                      borderBounds.X
                                      + 1
@@ -616,7 +619,7 @@ public class Border : Adornment
 
             if (drawLeft)
             {
-                lc.AddLine (
+                lc?.AddLine (
                             new (borderBounds.Location.X, titleY),
                             sideLineLength,
                             Orientation.Vertical,
@@ -628,7 +631,7 @@ public class Border : Adornment
 
             if (drawBottom)
             {
-                lc.AddLine (
+                lc?.AddLine (
                             new (borderBounds.X, borderBounds.Y + borderBounds.Height - 1),
                             borderBounds.Width,
                             Orientation.Horizontal,
@@ -639,7 +642,7 @@ public class Border : Adornment
 
             if (drawRight)
             {
-                lc.AddLine (
+                lc?.AddLine (
                             new (borderBounds.X + borderBounds.Width - 1, titleY),
                             sideLineLength,
                             Orientation.Vertical,
@@ -664,7 +667,7 @@ public class Border : Adornment
                 // Redraw title 
                 if (drawTop && maxTitleWidth > 0 && Settings.FastHasFlags (BorderSettings.Title))
                 {
-                    Parent.TitleTextFormatter.Draw (
+                    Parent!.TitleTextFormatter.Draw (
                                                     new (borderBounds.X + 2, titleY, maxTitleWidth, 1),
                                                     Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor (),
                                                     Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor ());
@@ -694,11 +697,11 @@ public class Border : Adornment
             // TODO: This should not be done on each draw?
             if (Settings.FastHasFlags (BorderSettings.Gradient))
             {
-                SetupGradientLineCanvas (lc, screenBounds);
+                SetupGradientLineCanvas (lc!, screenBounds);
             }
             else
             {
-                lc.Fill = null;
+                lc!.Fill = null;
             }
         }
     }
@@ -718,23 +721,34 @@ public class Border : Adornment
     private static void GetAppealingGradientColors (out List<Color> stops, out List<int> steps)
     {
         // Define the colors of the gradient stops with more appealing colors
-        stops = new ()
-        {
+        stops =
+        [
             new (0, 128, 255), // Bright Blue
             new (0, 255, 128), // Bright Green
             new (255, 255), // Bright Yellow
             new (255, 128), // Bright Orange
-            new (255, 0, 128) // Bright Pink
-        };
+            new (255, 0, 128)
+        ];
 
         // Define the number of steps between each color for smoother transitions
         // If we pass only a single value then it will assume equal steps between all pairs
-        steps = new () { 15 };
+        steps = [15];
     }
 
     private ViewArrangement _arranging;
 
-    public bool? Arrange ()
+    private Button? _arrangeButton;
+
+    /// <summary>
+    ///     Starts "Arrange Mode" where <see cref="Adornment.Parent"/> can be moved and/or resized using the mouse
+    ///     or keyboard.
+    /// </summary>
+    /// <remarks>
+    ///     Arrange Mode is exited by the user pressing <see cref="Application.ArrangeKey"/>, <see cref="Key.Esc"/>, or by clicking
+    ///     the mouse out of the <see cref="Adornment.Parent"/>'s Frame.
+    /// </remarks>
+    /// <returns></returns>
+    public bool? EnterArrangeMode ()
     {
         Debug.Assert (_arranging == ViewArrangement.Fixed);
 
@@ -769,6 +783,11 @@ public class Border : Adornment
         AddCommand (Command.Up,
                     () =>
                     {
+                        if (Parent is null)
+                        {
+                            return false;
+                        }
+
                         if (_arranging == ViewArrangement.Movable)
                         {
                             Parent!.Y = Parent.Y - 1;
@@ -778,7 +797,7 @@ public class Border : Adornment
                         {
                             if (Parent!.Viewport.Height > 0)
                             {
-                                Parent!.Height = Parent.Height - 1;
+                                Parent!.Height = Parent.Height! - 1;
                             }
                         }
 
@@ -788,6 +807,11 @@ public class Border : Adornment
         AddCommand (Command.Down,
                     () =>
                     {
+                        if (Parent is null)
+                        {
+                            return false;
+                        }
+
                         if (_arranging == ViewArrangement.Movable)
                         {
                             Parent!.Y = Parent.Y + 1;
@@ -795,7 +819,7 @@ public class Border : Adornment
 
                         if (_arranging == ViewArrangement.Resizable)
                         {
-                            Parent!.Height = Parent.Height + 1;
+                            Parent!.Height = Parent.Height! + 1;
                         }
 
                         return true;
@@ -803,6 +827,11 @@ public class Border : Adornment
         AddCommand (Command.Left,
                     () =>
                     {
+                        if (Parent is null)
+                        {
+                            return false;
+                        }
+
                         if (_arranging == ViewArrangement.Movable)
                         {
                             Parent!.X = Parent.X - 1;
@@ -812,7 +841,7 @@ public class Border : Adornment
                         {
                             if (Parent!.Viewport.Width > 0)
                             {
-                                Parent!.Width = Parent.Width - 1;
+                                Parent!.Width = Parent.Width! - 1;
                             }
                         }
                         return true;
@@ -821,6 +850,11 @@ public class Border : Adornment
         AddCommand (Command.Right,
                     () =>
                     {
+                        if (Parent is null)
+                        {
+                            return false;
+                        }
+
                         if (_arranging == ViewArrangement.Movable)
                         {
                             Parent!.X = Parent.X + 1;
@@ -828,7 +862,7 @@ public class Border : Adornment
 
                         if (_arranging == ViewArrangement.Resizable)
                         {
-                            Parent!.Width = Parent.Width + 1;
+                            Parent!.Width = Parent.Width! + 1;
                         }
 
                         return true;
@@ -899,9 +933,12 @@ public class Border : Adornment
         _arranging = ViewArrangement.Fixed;
         CanFocus = false;
 
-        Remove (_arrangeButton);
-        _arrangeButton.Dispose ();
-        _arrangeButton = null;
+        if (_arrangeButton is { })
+        {
+            Remove (_arrangeButton);
+            _arrangeButton.Dispose ();
+            _arrangeButton = null;
+        }
 
         KeyBindings.Clear ();
 
