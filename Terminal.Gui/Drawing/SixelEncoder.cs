@@ -45,8 +45,6 @@ public class SixelEncoder
 
     private string WriteSixel (Color [,] pixels, ColorQuantizer quantizer)
     {
-        var distanceAlgorithm = new EuclideanColorDistance ();
-
         StringBuilder sb = new StringBuilder ();
         int height = pixels.GetLength (1);
         int width = pixels.GetLength (0);
@@ -57,7 +55,7 @@ public class SixelEncoder
         {
             int p = y * width;
             Color cachedColor = pixels [0, y];
-            int cachedColorIndex = quantizer.GetNearestColor (cachedColor,distanceAlgorithm );
+            int cachedColorIndex = quantizer.GetNearestColor (cachedColor );
             int count = 1;
             int c = -1;
 
@@ -65,7 +63,7 @@ public class SixelEncoder
             for (int x = 0; x < width; x++)
             {
                 Color color = pixels [x, y];
-                int colorIndex = quantizer.GetNearestColor (color,distanceAlgorithm);
+                int colorIndex = quantizer.GetNearestColor (color);
 
                 if (colorIndex == cachedColorIndex)
                 {
@@ -164,7 +162,7 @@ public class SixelEncoder
     private string GetColorPallette (Color [,] pixels, out ColorQuantizer quantizer)
     {
         quantizer = new ColorQuantizer ();
-        quantizer.BuildPalette (pixels,new MedianCutPaletteBuilder ());
+        quantizer.BuildPalette (pixels);
 
 
         // Color definitions in the format "#<index>;<type>;<R>;<G>;<B>" - For type the 2 means RGB.  The values range 0 to 100
@@ -173,7 +171,7 @@ public class SixelEncoder
 
         for (int i = 0; i < quantizer.Palette.Count; i++)
         {
-            var color = quantizer.Palette [i];
+            var color = quantizer.Palette.ElementAt (i);
             paletteSb.AppendFormat ("#{0};2;{1};{2};{3}",
                                     i,
                                     color.R * 100 / 255,
