@@ -1,3 +1,4 @@
+#nullable enable
 namespace Terminal.Gui.ConsoleDrivers.Net;
 
 using System.Diagnostics.CodeAnalysis;
@@ -6,14 +7,16 @@ using System.Diagnostics.CodeAnalysis;
 internal sealed class NetEvents : IDisposable
 {
     private readonly ManualResetEventSlim _inputReady = new (false);
-    private CancellationTokenSource _inputReadyCancellationTokenSource;
+    private CancellationTokenSource? _inputReadyCancellationTokenSource;
     private readonly ManualResetEventSlim _waitForStart = new (false);
 
     //CancellationTokenSource _waitForStartCancellationTokenSource;
     private readonly ManualResetEventSlim _winChange = new (false);
     private readonly Queue<InputResult?> _inputQueue = new ();
     private readonly ConsoleDriver _consoleDriver;
-    private ConsoleKeyInfo [] _cki;
+
+    // TODO: Evaluate this for possible elimination of constant nulling/reallocation
+    private ConsoleKeyInfo []? _cki;
     private bool _isEscSeq;
 #if PROCESS_REQUEST
     bool _neededProcessRequest;
@@ -282,7 +285,7 @@ internal sealed class NetEvents : IDisposable
     private void ProcessRequestResponse (
         ref ConsoleKeyInfo newConsoleKeyInfo,
         ref ConsoleKey key,
-        ConsoleKeyInfo [] cki,
+        ConsoleKeyInfo []? cki,
         ref ConsoleModifiers mod
     )
     {
@@ -609,7 +612,7 @@ internal sealed class NetEvents : IDisposable
         public WindowPositionEvent WindowPositionEvent;
         public RequestResponseEvent RequestResponseEvent;
 
-        public readonly override string ToString ()
+        public readonly override string? ToString ()
         {
             return EventType switch
                    {

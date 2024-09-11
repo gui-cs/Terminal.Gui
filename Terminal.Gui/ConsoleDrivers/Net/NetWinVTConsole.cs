@@ -1,3 +1,6 @@
+#nullable enable
+using System.Runtime.Versioning;
+
 namespace Terminal.Gui.ConsoleDrivers.Net;
 
 using System.Diagnostics.CodeAnalysis;
@@ -156,15 +159,14 @@ internal sealed class NetWinVTConsole : IDisposable
         }
 
         _disposed = true;
-        _stdinText?.Dispose ();
-        _stdinRaw?.Dispose ();
+        _stdinText.Dispose ();
+        _stdinRaw.Dispose ();
 
-        _stdoutText?.Dispose ();
-        _stdoutRaw?.Dispose ();
+        _stdoutText.Dispose ();
+        _stdoutRaw.Dispose ();
 
-        _stderrText?.Dispose ();
-        _stderrRaw?.Dispose ();
-
+        _stderrText.Dispose ();
+        _stderrRaw.Dispose ();
         if (disposing)
         {
             GC.SuppressFinalize (this);

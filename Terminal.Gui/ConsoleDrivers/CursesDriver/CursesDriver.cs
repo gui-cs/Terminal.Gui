@@ -446,7 +446,7 @@ internal class CursesDriver : ConsoleDriver
                 {
                     Key kea = null;
 
-                    ConsoleKeyInfo [] cki =
+                    ConsoleKeyInfo []? cki =
                     {
                         new ((char)KeyCode.Esc, 0, false, false, false),
                         new ('[', 0, false, false, false),
@@ -536,7 +536,7 @@ internal class CursesDriver : ConsoleDriver
                 }
                 else
                 {
-                    ConsoleKeyInfo [] cki =
+                    ConsoleKeyInfo []? cki =
                     [
                         new ((char)KeyCode.Esc, 0, false, false, false), new ((char)wch2, 0, false, false, false)
                     ];
@@ -655,7 +655,7 @@ internal class CursesDriver : ConsoleDriver
         ref KeyCode k,
         ref int wch2,
         ref Key keyEventArgs,
-        ref ConsoleKeyInfo [] cki
+        ref ConsoleKeyInfo []? cki
     )
     {
         ConsoleKey ck = 0;

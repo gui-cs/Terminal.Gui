@@ -176,7 +176,7 @@ public static class EscSeqUtils
         EscSeqRequests escSeqRequests,
         ref ConsoleKeyInfo newConsoleKeyInfo,
         ref ConsoleKey key,
-        ConsoleKeyInfo [] cki,
+        ConsoleKeyInfo []? cki,
         ref ConsoleModifiers mod,
         out string c1Control,
         out string code,
@@ -495,7 +495,7 @@ public static class EscSeqUtils
     /// <param name="cki"></param>
     /// <returns>The char array of the escape sequence.</returns>
     // PERF: This is expensive
-    public static char [] GetKeyCharArray (ConsoleKeyInfo [] cki)
+    public static char [] GetKeyCharArray (ConsoleKeyInfo []? cki)
     {
         char [] kChar = { };
         var length = 0;
@@ -518,7 +518,7 @@ public static class EscSeqUtils
     /// <param name="pos">The mouse position.</param>
     /// <param name="continuousButtonPressedHandler">The handler that will process the event.</param>
     public static void GetMouse (
-        ConsoleKeyInfo [] cki,
+        ConsoleKeyInfo []? cki,
         out List<MouseFlags> mouseFlags,
         out Point pos,
         Action<MouseFlags, Point> continuousButtonPressedHandler
@@ -1018,7 +1018,7 @@ public static class EscSeqUtils
     /// <param name="consoleKeyInfo">The <see cref="ConsoleKeyInfo"/>.</param>
     /// <param name="cki">The <see cref="ConsoleKeyInfo"/> array to resize.</param>
     /// <returns>The <see cref="ConsoleKeyInfo"/> resized.</returns>
-    public static ConsoleKeyInfo [] ResizeArray (ConsoleKeyInfo consoleKeyInfo, ConsoleKeyInfo [] cki)
+    public static ConsoleKeyInfo []? ResizeArray (ConsoleKeyInfo consoleKeyInfo, ConsoleKeyInfo []? cki)
     {
         Array.Resize (ref cki, cki is null ? 1 : cki.Length + 1);
         cki [cki.Length - 1] = consoleKeyInfo;
