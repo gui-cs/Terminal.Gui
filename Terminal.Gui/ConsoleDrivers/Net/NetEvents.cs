@@ -469,6 +469,7 @@ internal sealed class NetEvents : IDisposable
         switch (terminating)
         {
             // BUGBUG: I can't find where we send a request for cursor position (ESC[?6n), so I'm not sure if this is needed.
+            // TODO: Address the warnings about parser culture-sensitivity.
             case EscSeqUtils.CSI_RequestCursorPositionReport_Terminator:
                 Point point = new() { X = int.Parse (values [1]) - 1, Y = int.Parse (values [0]) - 1 };
 
@@ -492,6 +493,8 @@ internal sealed class NetEvents : IDisposable
             case EscSeqUtils.CSI_ReportTerminalSizeInChars_Terminator:
                 switch (values [0])
                 {
+                    // TODO: Address the warnings about parser culture-sensitivity.
+                    // TODO: Don't parse twice.
                     case EscSeqUtils.CSI_ReportTerminalSizeInChars_ResponseValue:
                         EnqueueWindowSizeEvent (
                                                 Math.Max (int.Parse (values [1]), 0),
@@ -633,6 +636,7 @@ internal sealed class NetEvents : IDisposable
         {
             Key ke = new ((KeyCode)cki.KeyChar);
             StringBuilder sb = new ();
+            // TODO: Address the warnings about culture-sensitivity.
             sb.Append ($"Key: {(KeyCode)cki.Key} ({cki.Key})");
             sb.Append ((cki.Modifiers & ConsoleModifiers.Shift) != 0 ? " | Shift" : string.Empty);
             sb.Append ((cki.Modifiers & ConsoleModifiers.Control) != 0 ? " | Control" : string.Empty);

@@ -305,6 +305,7 @@ internal sealed class NetDriver : ConsoleDriver
             }
             catch (IOException ioe) when (Console.IsOutputRedirected || Console.IsInputRedirected)
             {
+            // TODO: Deal with this more formally
                 // Likely running as a unit test, or in a non-interactive session.
             }
         }
@@ -346,6 +347,9 @@ internal sealed class NetDriver : ConsoleDriver
         {
             // We are being run in an environment that does not support a console
             // such as a unit test, or a pipe.
+
+            // TODO: Consider using a stream of some sort, like FileStream or MemoryStream,
+            // to eliminate that problem.
             Cols = 80;
             Rows = 24;
         }
@@ -357,6 +361,9 @@ internal sealed class NetDriver : ConsoleDriver
         StartReportingMouseMoves ();
 
         _mainLoopDriver = new (this);
+
+        // TODO: This should be an event.
+        // Might want to explore alternatives, regardless.
         _mainLoopDriver.ProcessInput = ProcessInput;
 
         return new (_mainLoopDriver);
@@ -435,10 +442,11 @@ internal sealed class NetDriver : ConsoleDriver
 
     public void ResizeScreen ()
     {
+        // TODO: Break the windows-specific part out into a method attributed as such.
         // Not supported on Unix.
         if (IsWinPlatform)
         {
-            // Can raise an exception while is still resizing.
+            // Can raise an exception while still resizing.
             try
             {
 #pragma warning disable CA1416
@@ -544,7 +552,7 @@ internal sealed class NetDriver : ConsoleDriver
     {
         if (IsWinPlatform)
         {
-            // Could happens that the windows is still resizing and the col is bigger than Console.WindowWidth.
+            // Could happen that the windows is still resizing and the col is bigger than Console.WindowWidth.
             try
             {
                 Console.SetCursorPosition (col, row);
