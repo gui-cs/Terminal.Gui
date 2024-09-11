@@ -71,6 +71,7 @@ public class Wizard : Dialog
         BorderStyle = LineStyle.Double;
 
         BackButton = new () { Text = Strings.wzBack };
+
         NextFinishButton = new ()
         {
             Text = Strings.wzFinish,
@@ -90,7 +91,7 @@ public class Wizard : Dialog
         Loaded += Wizard_Loaded;
         Closing += Wizard_Closing;
         TitleChanged += Wizard_TitleChanged;
-        
+
         SetNeedsLayout ();
     }
 
@@ -121,7 +122,8 @@ public class Wizard : Dialog
     ///             <description>Add the Wizard to a containing view with <see cref="View.Add(View)"/>.</description>
     ///         </item>
     ///     </list>
-    ///     If a non-Modal Wizard is added to the application after <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> has
+    ///     If a non-Modal Wizard is added to the application after
+    ///     <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> has
     ///     been called the first step must be explicitly set by setting <see cref="CurrentStep"/> to
     ///     <see cref="GetNextStep()"/>:
     ///     <code>
@@ -347,7 +349,6 @@ public class Wizard : Dialog
 
         UpdateButtonsAndTitle ();
 
-
         // Set focus on the contentview
         if (newStep is { })
         {
@@ -491,14 +492,24 @@ public class Wizard : Dialog
             // If we're modal, then we expand the WizardStep so that the top and side 
             // borders and not visible. The bottom border is the separator above the buttons.
             step.X = step.Y = 0;
-            step.Height = Dim.Fill (Dim.Func (() => IsInitialized ? Subviews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height + 1 : 1)); // for button frame (+1 for lineView)
+
+            step.Height = Dim.Fill (
+                                    Dim.Func (
+                                              () => IsInitialized
+                                                        ? Subviews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height + 1
+                                                        : 1)); // for button frame (+1 for lineView)
             step.Width = Dim.Fill ();
         }
         else
         {
             // If we're not a modal, then we show the border around the WizardStep
             step.X = step.Y = 0;
-            step.Height = Dim.Fill (Dim.Func (() => IsInitialized ? Subviews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height + 1 : 2)); // for button frame (+1 for lineView)
+
+            step.Height = Dim.Fill (
+                                    Dim.Func (
+                                              () => IsInitialized
+                                                        ? Subviews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height + 1
+                                                        : 2)); // for button frame (+1 for lineView)
             step.Width = Dim.Fill ();
         }
     }
@@ -536,6 +547,7 @@ public class Wizard : Dialog
 
         SetNeedsLayout ();
         LayoutSubviews ();
+
         //Draw ();
     }
 
