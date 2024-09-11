@@ -263,12 +263,12 @@ internal sealed class NetDriver : ConsoleDriver
         _cachedCursorVisibility = savedVisibility;
 
         // TODO: Eliminate StringBuilder uses where possible.
-        static void WriteToConsole (StringBuilder outputLocal, ref int lastColumn, int row, ref int outputWidth)
+        static void WriteToConsole (StringBuilder outputStringBuilder, ref int lastColumn, int row, ref int outputWidth)
         {
-            SetCursorPosition (lastCol, row);
-            Console.Write (output);
-            output.Clear ();
-            lastCol += outputWidth;
+            SetCursorPosition (lastColumn, row);
+            Console.Write (outputStringBuilder);
+            outputStringBuilder.Clear ();
+            lastColumn += outputWidth;
             outputWidth = 0;
         }
     }
@@ -415,7 +415,7 @@ internal sealed class NetDriver : ConsoleDriver
             case EventType.WindowPosition:
                 break;
             default:
-                throw new ArgumentOutOfRangeException ();
+                throw new ArgumentOutOfRangeException (nameof (inputEvent));
         }
     }
 
@@ -495,11 +495,6 @@ internal sealed class NetDriver : ConsoleDriver
                                       "AOT",
                                       "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
                                       Justification = "<Pending>")]
-    private static readonly HashSet<int> ConsoleColorValues = new (
-                                                                   Enum.GetValues (typeof (ConsoleColor))
-                                                                       .OfType<ConsoleColor> ()
-                                                                       .Select (c => (int)c)
-                                                                  );
 
     // Dictionary for mapping ConsoleColor values to the values used by System.Net.Console.
     private static readonly Dictionary<ConsoleColor, int> colorMap = new ()
@@ -527,8 +522,8 @@ internal sealed class NetDriver : ConsoleDriver
         colorMap.TryGetValue (color, out int colorValue) ? colorValue + (isForeground ? 0 : 10) : 0;
 
     ///// <remarks>
-    ///// In the NetDriver, colors are encoded as an int. 
-    ///// However, the foreground color is stored in the most significant 16 bits, 
+    ///// In the NetDriver, colors are encoded as an int.
+    ///// However, the foreground color is stored in the most significant 16 bits,
     ///// and the background color is stored in the least significant 16 bits.
     ///// </remarks>
     //public override Attribute MakeColor (Color foreground, Color background)
@@ -828,7 +823,7 @@ internal sealed class NetDriver : ConsoleDriver
             case ConsoleKey.Oem102:
                 if (keyInfo.KeyChar == 0)
                 {
-                    // If the keyChar is 0, keyInfo.Key value is not a printable character. 
+                    // If the keyChar is 0, keyInfo.Key value is not a printable character.
 
                     return KeyCode.Null; // MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode)keyInfo.Key);
                 }
