@@ -105,13 +105,13 @@ public readonly struct BOOL :
     }
 
     /// <inheritdoc/>
-    /// <remarks>Directly compares <see cref="IsTrue"/> to <paramref name="value"/> to avoid type conversion.</remarks>
+    /// <remarks>Directly compares <see cref="IsTrue"/> to <paramref name="other"/> to avoid type conversion.</remarks>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public int CompareTo (bool value)
+    public int CompareTo (bool other)
     {
         // Truth table.
         // Orders the same way as System.Boolean.
-        return (IsTrue, value) switch
+        return (IsTrue, other) switch
                {
                    (false, false) => 0,
                    (false, true)  => -1,
@@ -122,7 +122,7 @@ public readonly struct BOOL :
 
     /// <inheritdoc/>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public int CompareTo (BOOL value) => CompareTo (value.IsTrue);
+    public int CompareTo (BOOL other) => CompareTo (other.IsTrue);
 
     /// <inheritdoc/>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
