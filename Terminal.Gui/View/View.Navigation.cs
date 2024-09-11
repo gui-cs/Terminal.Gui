@@ -665,7 +665,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         if (SuperView is { })
         {
-            //SuperView._previouslyMostFocused = focusedPeer;
+            SuperView._previouslyMostFocused = focusedPeer;
         }
 
         // Post-conditions - prove correctness
