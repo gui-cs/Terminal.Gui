@@ -107,6 +107,7 @@ internal enum CONSOLE_MODE : uint
     ///     are processed.<br/>It should be enabled when using control sequences or when <see cref="ENABLE_VIRTUAL_TERMINAL_PROCESSING"/>
     ///     is set.
     /// </summary>
+    [SuppressMessage ("Design", "CA1069:Enums values should not be duplicated", Justification = "Will be replaced by a struct of the same name in a future change.")]
     ENABLE_PROCESSED_OUTPUT = 0x00000001,
 
     /// <summary>
@@ -117,6 +118,7 @@ internal enum CONSOLE_MODE : uint
     ///     the console screen buffer.<br/>
     ///     If this mode is disabled, the last character in the row is overwritten with any subsequent characters.
     /// </summary>
+    [SuppressMessage ("Design", "CA1069:Enums values should not be duplicated", Justification = "Will be replaced by a struct of the same name in a future change.")]
     ENABLE_WRAP_AT_EOL_OUTPUT = 0x00000002,
 
     /// <summary>
@@ -127,6 +129,7 @@ internal enum CONSOLE_MODE : uint
     /// <remarks>
     ///     Ensure <see cref="ENABLE_PROCESSED_OUTPUT"/> is set when using this flag.
     /// </remarks>
+    [SuppressMessage ("Design", "CA1069:Enums values should not be duplicated", Justification = "Will be replaced by a struct of the same name in a future change.")]
     ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x00000004,
 
     /// <summary>
@@ -150,6 +153,7 @@ internal enum CONSOLE_MODE : uint
     ///         without triggering an immediate scroll is the desired behavior.
     ///     </para>
     /// </remarks>
+    [SuppressMessage ("Design", "CA1069:Enums values should not be duplicated", Justification = "Will be replaced by a struct of the same name in a future change.")]
     DISABLE_NEWLINE_AUTO_RETURN = 0x00000008,
 
     /// <summary>
@@ -176,5 +180,6 @@ internal enum CONSOLE_MODE : uint
     ///         Terminal Sequences.
     ///     </para>
     /// </summary>
+    [SuppressMessage ("Design", "CA1069:Enums values should not be duplicated", Justification = "Will be replaced by a struct of the same name in a future change.")]
     ENABLE_LVB_GRID_WORLDWIDE = 0x00000010
 }
