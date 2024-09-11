@@ -149,12 +149,7 @@ public class Border : Adornment
                 return base.ColorScheme;
             }
 
-            if (Parent?.ColorScheme is { })
-            {
-                return Parent.ColorScheme;
-            }
-
-            return null;
+            return Parent?.ColorScheme;
         }
         set
         {
