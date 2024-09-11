@@ -1,5 +1,7 @@
 #nullable enable
 
+using System.Diagnostics;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -75,6 +77,8 @@ public class ApplicationNavigation
         {
             return;
         }
+
+        Debug.Assert(value is {});
 
         _focused = value;
 

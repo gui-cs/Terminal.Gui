@@ -1,5 +1,6 @@
 #nullable enable
 using System.Diagnostics;
+using Microsoft.CodeAnalysis;
 using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui;
@@ -65,6 +66,7 @@ public class Border : Adornment
         HighlightStyle |= HighlightStyle.Pressed;
         Highlight += Border_Highlight;
     }
+
 
 #if SUBVIEW_BASED_BORDER
     private Line _left;
@@ -289,13 +291,12 @@ public class Border : Adornment
             return true;
         }
 
-        // BUGBUG: Shouldn't non-focusable views be draggable??
-        //if (!Parent.CanFocus)
-        //{
-        //    return false;
-        //}
-
-        if (!Parent!.Arrangement.HasFlag (ViewArrangement.Movable))
+        if (!Parent!.Arrangement.HasFlag (ViewArrangement.Movable)
+            && !Parent!.Arrangement.HasFlag (ViewArrangement.BottomResizable)
+            && !Parent!.Arrangement.HasFlag (ViewArrangement.TopResizable)
+            && !Parent!.Arrangement.HasFlag (ViewArrangement.LeftResizable)
+            && !Parent!.Arrangement.HasFlag (ViewArrangement.RightResizable)
+           )
         {
             return false;
         }
@@ -321,9 +322,9 @@ public class Border : Adornment
             return true;
         }
 
-        if (mouseEvent.Flags is (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
+        if (mouseEvent.Flags is (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) && Application.MouseGrabView == this)
         {
-            if (Application.MouseGrabView == this && _dragPosition.HasValue)
+            if (_dragPosition.HasValue)
             {
                 if (Parent.SuperView is null)
                 {
@@ -366,16 +367,6 @@ public class Border : Adornment
         }
 
         return false;
-    }
-
-    /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
-    {
-        Application.GrabbingMouse -= Application_GrabbingMouse;
-        Application.UnGrabbingMouse -= Application_UnGrabbingMouse;
-
-        _dragPosition = null;
-        base.Dispose (disposing);
     }
 
     private void Application_GrabbingMouse (object? sender, GrabMouseEventArgs e)
@@ -771,7 +762,6 @@ public class Border : Adornment
         Add (_arrangeButton);
 
         CanFocus = true;
-        //_arrangeButton.SetFocus ();
 
         AddCommand (Command.Quit, EndArrange);
 
@@ -876,6 +866,9 @@ public class Border : Adornment
         KeyBindings.Add (Key.Tab, KeyBindingScope.HotKey, Command.Tab);
         KeyBindings.Add (Key.Tab.WithShift, KeyBindingScope.HotKey, Command.BackTab);
 
+        Application.MouseEvent += ApplicationOnMouseEvent;
+
+
         if (Parent!.Arrangement.HasFlag (ViewArrangement.Movable))
         {
             _arranging = ViewArrangement.Movable;
@@ -923,9 +916,38 @@ public class Border : Adornment
             return true;
         }
     }
+
+    private void ApplicationOnMouseEvent (object? sender, MouseEvent e)
+    {
+        if (e.Flags != MouseFlags.Button1Clicked)
+        {
+            return;
+        }
+
+        // If mouse click is outside of Border.Thickness then exit Arrange Mode
+        // e.Position is screen relative
+        Point framePos = ScreenToFrame(e.ScreenPosition);
+
+        if (!Thickness.Contains (Frame, framePos))
+        {
+            EndArrange ();
+
+            return;
+        }
+    }
+
     private bool? EndArrange ()
     {
+        Debug.Assert (_arranging != ViewArrangement.Fixed);
         _arranging = ViewArrangement.Fixed;
+
+        Application.MouseEvent -= ApplicationOnMouseEvent;
+
+        if (Application.MouseGrabView == this && _dragPosition.HasValue)
+        {
+            Application.UngrabMouse();
+        }
+
         CanFocus = false;
 
         if (_arrangeButton is { })
@@ -937,7 +959,17 @@ public class Border : Adornment
 
         KeyBindings.Clear ();
 
-
         return true;
     }
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        Application.GrabbingMouse -= Application_GrabbingMouse;
+        Application.UnGrabbingMouse -= Application_UnGrabbingMouse;
+
+        _dragPosition = null;
+        base.Dispose (disposing);
+    }
+
 }

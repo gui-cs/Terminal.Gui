@@ -573,27 +573,40 @@ public partial class View // Focus and cross-view navigation management (TabStop
         // If newFocusedVew is null, we need to find the view that should get focus, and SetFocus on it.
         if (!traversingDown && newFocusedView is null)
         {
-            if (SuperView?._previouslyMostFocused is { } && SuperView?._previouslyMostFocused != this)
+            if (SuperView?._previouslyMostFocused is { })
             {
-                SuperView?._previouslyMostFocused?.SetFocus ();
+                if (SuperView?._previouslyMostFocused != this)
+                {
+                    SuperView?._previouslyMostFocused?.SetFocus ();
 
-                // The above will cause SetHasFocusFalse, so we can return
-                return;
+                    // The above will cause SetHasFocusFalse, so we can return
+                    return;
+                }
+                newFocusedView = SuperView?._previouslyMostFocused;
             }
 
-            if (SuperView is { } && SuperView.AdvanceFocus (NavigationDirection.Forward, TabStop))
+            if (SuperView is { })
             {
-                // The above will cause SetHasFocusFalse, so we can return
-                return;
+                if (SuperView.AdvanceFocus (NavigationDirection.Forward, TabStop))
+                {
+                    // The above will cause SetHasFocusFalse, so we can return
+                    return;
+                }
+                newFocusedView = SuperView;
             }
+
 
             // Are we an Adornment? 
             if (this is Adornment ad)
             {
-                if (ad.Parent is {} && ad.Parent.RestoreFocus ())
+                if (ad.Parent is {})
                 {
-                    // The above will cause SetHasFocusFalse, so we can return
-                    return;
+                    if (ad.Parent.RestoreFocus ())
+                    {
+                        // The above will cause SetHasFocusFalse, so we can return
+                        return;
+                    }
+                    newFocusedView = ad.Parent;
                 }
             }
 
