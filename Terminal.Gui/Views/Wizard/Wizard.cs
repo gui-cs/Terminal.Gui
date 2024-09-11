@@ -90,13 +90,7 @@ public class Wizard : Dialog
         Loaded += Wizard_Loaded;
         Closing += Wizard_Closing;
         TitleChanged += Wizard_TitleChanged;
-
-        if (Modal)
-        {
-            KeyBindings.Clear (Command.QuitToplevel);
-            KeyBindings.Add (Key.Esc, Command.QuitToplevel);
-        }
-
+        
         SetNeedsLayout ();
     }
 
