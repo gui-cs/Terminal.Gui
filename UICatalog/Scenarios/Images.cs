@@ -6,6 +6,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Terminal.Gui;
+using Terminal.Gui.Drawing.Quant;
 using Color = Terminal.Gui.Color;
 
 namespace UICatalog.Scenarios;
@@ -103,6 +104,8 @@ public class Images : Scenario
                                    Application.Refresh ();
                                };
 
+
+
         var btnSixel = new Button () { X = Pos.Right (btnOpenImage) + 2, Y = 0, Text = "Output Sixel" };
         btnSixel.Accept += (s, e) => { imageView.OutputSixel ();};
         win.Add (btnSixel);
@@ -169,6 +172,7 @@ public class Images : Scenario
             }
 
             var encoder = new SixelEncoder ();
+            encoder.Quantizer.PaletteBuildingAlgorithm = new KMeansPaletteBuilder (new EuclideanColorDistance());
 
             var encoded = encoder.EncodeSixel (ConvertToColorArray (_fullResImage));
 

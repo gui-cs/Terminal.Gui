@@ -1,10 +1,19 @@
-﻿namespace Terminal.Gui;
+﻿using Terminal.Gui.Drawing.Quant;
+
+namespace Terminal.Gui;
 
 /// <summary>
 /// Encodes a images into the sixel console image output format.
 /// </summary>
 public class SixelEncoder
 {
+    /// <summary>
+    /// Gets or sets the quantizer responsible for building a representative
+    /// limited color palette for images and for mapping novel colors in
+    /// images to their closest palette color
+    /// </summary>
+    public ColorQuantizer Quantizer { get; set; } = new ();
+
     /// <summary>
     /// Encode the given bitmap into sixel encoding
     /// </summary>
@@ -21,9 +30,9 @@ public class SixelEncoder
 
         string fillArea = GetFillArea (pixels);
 
-        string pallette = GetColorPallette (pixels, out var quantizer);
+        string pallette = GetColorPallette (pixels );
 
-        string pixelData = WriteSixel (pixels, quantizer);
+        string pixelData = WriteSixel (pixels);
 
         const string terminator = "\u001b\\"; // End sixel sequence
 
@@ -43,7 +52,7 @@ public class SixelEncoder
        [ ]  - Bit 5 (bottom-most pixel)
     */
 
-    private string WriteSixel (Color [,] pixels, ColorQuantizer quantizer)
+    private string WriteSixel (Color [,] pixels)
     {
         StringBuilder sb = new StringBuilder ();
         int height = pixels.GetLength (1);
@@ -55,7 +64,7 @@ public class SixelEncoder
         {
             int p = y * width;
             Color cachedColor = pixels [0, y];
-            int cachedColorIndex = quantizer.GetNearestColor (cachedColor );
+            int cachedColorIndex = Quantizer.GetNearestColor (cachedColor );
             int count = 1;
             int c = -1;
 
@@ -63,7 +72,7 @@ public class SixelEncoder
             for (int x = 0; x < width; x++)
             {
                 Color color = pixels [x, y];
-                int colorIndex = quantizer.GetNearestColor (color);
+                int colorIndex = Quantizer.GetNearestColor (color);
 
                 if (colorIndex == cachedColorIndex)
                 {
@@ -159,19 +168,18 @@ public class SixelEncoder
 
 
 
-    private string GetColorPallette (Color [,] pixels, out ColorQuantizer quantizer)
+    private string GetColorPallette (Color [,] pixels)
     {
-        quantizer = new ColorQuantizer ();
-        quantizer.BuildPalette (pixels);
+        Quantizer.BuildPalette (pixels);
 
 
         // Color definitions in the format "#<index>;<type>;<R>;<G>;<B>" - For type the 2 means RGB.  The values range 0 to 100
 
         StringBuilder paletteSb = new StringBuilder ();
 
-        for (int i = 0; i < quantizer.Palette.Count; i++)
+        for (int i = 0; i < Quantizer.Palette.Count; i++)
         {
-            var color = quantizer.Palette.ElementAt (i);
+            var color = Quantizer.Palette.ElementAt (i);
             paletteSb.AppendFormat ("#{0};2;{1};{2};{3}",
                                     i,
                                     color.R * 100 / 255,
