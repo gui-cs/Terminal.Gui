@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Diagnostics;
 using Xunit.Abstractions;
 // ReSharper disable SuggestVarOrType_SimpleTypes
 
@@ -19,9 +20,9 @@ public class ApplicationTests
 #endif
     }
 
-    private readonly ITestOutputHelper _output;
+    private readonly ITestOutputHelper? _output;
 
-    private object _timeoutLock;
+    private object? _timeoutLock;
 
     [Fact]
     public void AddTimeout_Fires ()
@@ -42,9 +43,9 @@ public class ApplicationTests
         Assert.True (initialized);
         Assert.False (shutdown);
 
-        _output.WriteLine ("Application.Run<Toplevel> ().Dispose ()..");
+        _output?.WriteLine ("Application.Run<Toplevel> ().Dispose ()..");
         Application.Run<Toplevel> ().Dispose ();
-        _output.WriteLine ("Back from Application.Run<Toplevel> ().Dispose ()");
+        _output?.WriteLine ("Back from Application.Run<Toplevel> ().Dispose ()");
 
         Assert.True (initialized);
         Assert.False (shutdown);
@@ -85,7 +86,7 @@ public class ApplicationTests
 
                 lock (_timeoutLock)
                 {
-                    _output.WriteLine ($"Setting timeout for {timeoutTime}ms");
+                    _output?.WriteLine ($"Setting timeout for {timeoutTime}ms");
                     timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (timeoutTime), TimeoutCallback);
                 }
             }
@@ -100,11 +101,11 @@ public class ApplicationTests
         {
             lock (_timeoutLock)
             {
-                _output.WriteLine ($"TimeoutCallback. Count: {++timeoutCount}. Application Iteration: {iteration}");
+                _output?.WriteLine ($"TimeoutCallback. Count: {++timeoutCount}. Application Iteration: {iteration}");
 
                 if (timeout is { })
                 {
-                    _output.WriteLine ("  Nulling timeout.");
+                    _output?.WriteLine ("  Nulling timeout.");
                     timeout = null;
                 }
             }
@@ -119,7 +120,7 @@ public class ApplicationTests
             {
                 if (timeoutCount > 0)
                 {
-                    _output.WriteLine ($"Iteration #{iteration} - Timeout fired. Calling Application.RequestStop.");
+                    _output?.WriteLine ($"Iteration #{iteration} - Timeout fired. Calling Application.RequestStop.");
                     Application.RequestStop ();
 
                     return;
@@ -134,7 +135,7 @@ public class ApplicationTests
             // Worst case scenario - something went wrong
             if (Application.IsInitialized && iteration > 25)
             {
-                _output.WriteLine ($"Too many iterations ({iteration}): Calling Application.RequestStop.");
+                _output?.WriteLine ($"Too many iterations ({iteration}): Calling Application.RequestStop.");
                 Application.RequestStop ();
             }
         }
@@ -163,6 +164,10 @@ public class ApplicationTests
         Assert.Null (Application.Top);
         Toplevel top = new ();
         Application.Begin (top);
+
+        Assume.NotNull (Application.Top);
+        Debug.Assert (Application.Top != null, "Application.Top != null");
+
         Assert.Equal (new (0, 0, 80, 25), Application.Top.Frame);
         ((FakeDriver)Application.Driver!).SetBufferSize (5, 5);
         Assert.Equal (new (0, 0, 5, 5), Application.Top.Frame);
@@ -180,6 +185,8 @@ public class ApplicationTests
 
 #if DEBUG_IDISPOSABLE
         Assert.True (rs.WasDisposed);
+
+        Assert.NotNull(Application.Top);
         Assert.False (Application.Top.WasDisposed); // Is true because the rs.Toplevel is the same as Application.Top
 #endif
 
@@ -188,7 +195,7 @@ public class ApplicationTests
         Toplevel top = Application.Top;
 
 #if DEBUG_IDISPOSABLE
-        Exception exception = Record.Exception (() => Shutdown ());
+        Exception? exception = Record.Exception (Shutdown);
         Assert.NotNull (exception);
         Assert.False (top.WasDisposed);
         top.Dispose ();
@@ -205,16 +212,11 @@ public class ApplicationTests
 
         // Begin will cause Run() to be called, which will call Begin(). Thus will block the tests
         // if we don't stop
-        Application.Iteration += (s, a) => { Application.RequestStop (); };
+        Application.Iteration += OnApplicationOnIteration;
 
         RunState? runState = null;
 
-        EventHandler<RunStateEventArgs> newRunStateFn = (s, e) =>
-                                                        {
-                                                            Assert.NotNull (e.State);
-                                                            runState = e.State;
-                                                        };
-        Application.NotifyNewRunState += newRunStateFn;
+        Application.NotifyNewRunState += NewRunStateFn;
 
         Toplevel topLevel = new Toplevel ();
         RunState rs = Application.Begin (topLevel);
@@ -225,7 +227,7 @@ public class ApplicationTests
         Assert.Equal (topLevel, Application.Top);
         Assert.Equal (topLevel, Application.Current);
 
-        Application.NotifyNewRunState -= newRunStateFn;
+        Application.NotifyNewRunState -= NewRunStateFn;
         Application.End (runState);
 
         Assert.Null (Application.Current);
@@ -239,6 +241,16 @@ public class ApplicationTests
         Assert.Null (Application.Top);
         Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
+
+        return;
+
+        void NewRunStateFn (object? s, RunStateEventArgs e)
+        {
+          Assert.NotNull (e.State);
+          runState = e.State;
+        }
+
+        static void OnApplicationOnIteration (object? s, IterationEventArgs a) { Application.RequestStop (); }
     }
 
     [Theory]
@@ -250,7 +262,7 @@ public class ApplicationTests
         Application.Init (driverName: driverName);
         Assert.NotNull (Application.Driver);
         Assert.NotEqual (driver, Application.Driver);
-        Assert.Equal (typeof (T), Application.Driver?.GetType ());
+        Assert.Equal (typeof (T), Application.Driver.GetType ());
         Shutdown ();
     }
 
@@ -282,7 +294,7 @@ public class ApplicationTests
         // Reset
         Application.ResetState ();
 
-        void CheckReset ()
+        static void CheckReset ()
         {
             // Check that all fields and properties are set to their default values
 
@@ -355,9 +367,7 @@ public class ApplicationTests
         Application.NextTabGroupKey = Key.B;
         Application.QuitKey = Key.C;
         Application.KeyBindings.Add (Key.D, KeyBindingScope.Application, Command.Cancel);
-
-        //ApplicationOverlapped.OverlappedChildren = new List<View> ();
-        //ApplicationOverlapped.OverlappedTop = 
+        
         Application.MouseEnteredView = new ();
 
         //Application.WantContinuousButtonPressedView = new View ();
@@ -402,27 +412,8 @@ public class ApplicationTests
     [Trait ("Category", "Events")]
     public void Init_Shutdown_Raise_InitializedChanged<T> (T driver) where T : ConsoleDriver
     {
-        bool initialized = false;
-        bool shutdown = false;
-
-        Application.InitializedChanged += OnApplicationOnInitializedChanged;
-
         Assert.Raises<EventArgs<bool>> (SubscribeToEvent, UnsubscribeFromEvent, () => Application.Init (driver));
         Assert.Raises<EventArgs<bool>> (SubscribeToEvent, UnsubscribeFromEvent, Application.Shutdown);
-
-        return;
-
-        void OnApplicationOnInitializedChanged (object? s, EventArgs<bool> a)
-        {
-            if (a.CurrentValue)
-            {
-                initialized = true;
-            }
-            else
-            {
-                shutdown = true;
-            }
-        }
 
         return;
 
@@ -457,9 +448,7 @@ public class ApplicationTests
     [Fact]
     public void Init_WithoutTopLevelFactory_Begin_End_Cleans_Up ()
     {
-        // Begin will cause Run() to be called, which will call Begin(). Thus will block the tests
-        // if we don't stop
-        Application.Iteration += (s, a) => { Application.RequestStop (); };
+      Application.Iteration += OnApplicationOnIteration;
 
         // NOTE: Run<T>, when called after Init has been called behaves differently than
         // when called if Init has not been called.
@@ -468,12 +457,7 @@ public class ApplicationTests
 
         RunState? runstate = null;
 
-        EventHandler<RunStateEventArgs> newRunStateFn = (s, e) =>
-                                                        {
-                                                            Assert.NotNull (e.State);
-                                                            runstate = e.State;
-                                                        };
-        Application.NotifyNewRunState += newRunStateFn;
+        Application.NotifyNewRunState += NewRunStateFn;
 
         RunState rs = Application.Begin (topLevel);
         Assert.NotNull (rs);
@@ -483,7 +467,7 @@ public class ApplicationTests
         Assert.Equal (topLevel, Application.Top);
         Assert.Equal (topLevel, Application.Current);
 
-        Application.NotifyNewRunState -= newRunStateFn;
+        Application.NotifyNewRunState -= NewRunStateFn;
         Application.End (runstate);
 
         Assert.Null (Application.Current);
@@ -497,6 +481,18 @@ public class ApplicationTests
         Assert.Null (Application.Top);
         Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
+
+        return;
+
+        // Begin will cause Run() to be called, which will call Begin(). Thus will block the tests
+        // if we don't stop
+        static void OnApplicationOnIteration (object? s, IterationEventArgs a) { Application.RequestStop (); }
+
+        void NewRunStateFn (object? s, RunStateEventArgs e)
+        {
+          Assert.NotNull (e.State);
+          runstate = e.State;
+        }
     }
 
     [Fact]
@@ -519,7 +515,7 @@ public class ApplicationTests
         Assert.Null (Application.MouseGrabView); // public
         Assert.Null (Application.WantContinuousButtonPressedView); // public
         Assert.False (ApplicationOverlapped.MoveToOverlappedChild (Application.Top!));
-        Application.Top.Dispose ();
+        Application.Top?.Dispose ();
     }
 
     // Invoke Tests
@@ -534,6 +530,7 @@ public class ApplicationTests
 
         int actionCalled = 0;
         Application.Invoke (() => { actionCalled++; });
+        Assert.NotNull (Application.MainLoop);
         Application.MainLoop.Running = true;
         Application.RunIteration (ref rs, ref firstIteration);
         Assert.Equal (1, actionCalled);
@@ -594,6 +591,7 @@ public class ApplicationTests
 
         Application.Run (t1);
 
+        Assert.NotNull (Application.Top);
         Assert.Equal (t1, Application.Top);
 
         // top wasn't run and so never was added to toplevel's stack
@@ -647,35 +645,35 @@ public class ApplicationTests
             {
                 // The Current still is t4 because Current.Running is false.
                 Assert.Equal (t4, Application.Current);
-                Assert.False (Application.Current.Running);
+                Assert.False (Application.Current!.Running);
                 Assert.Equal (t4, Application.Top);
             }
             else if (iterations == 4)
             {
                 // The Current is d and Current.Running is false.
                 Assert.Equal (d, Application.Current);
-                Assert.False (Application.Current.Running);
+                Assert.False (Application.Current!.Running);
                 Assert.Equal (t4, Application.Top);
             }
             else if (iterations == 3)
             {
                 // The Current is t3 and Current.Running is false.
                 Assert.Equal (t3, Application.Current);
-                Assert.False (Application.Current.Running);
+                Assert.False (Application.Current!.Running);
                 Assert.Equal (t3, Application.Top);
             }
             else if (iterations == 2)
             {
                 // The Current is t2 and Current.Running is false.
                 Assert.Equal (t2, Application.Current);
-                Assert.False (Application.Current.Running);
+                Assert.False (Application.Current!.Running);
                 Assert.Equal (t2, Application.Top);
             }
             else
             {
                 // The Current is t1.
                 Assert.Equal (t1, Application.Current);
-                Assert.False (Application.Current.Running);
+                Assert.False (Application.Current!.Running);
                 Assert.Equal (t1, Application.Top);
             }
 
@@ -699,8 +697,8 @@ public class ApplicationTests
         Assert.NotNull (Application.MainLoop);
 
         // FakeDriver is always 80x25
-        Assert.Equal (80, Application.Driver!.Cols);
-        Assert.Equal (25, Application.Driver!.Rows);
+        Assert.Equal (80, Application.Driver.Cols);
+        Assert.Equal (25, Application.Driver.Rows);
     }
 
     private void Pre_Init_State ()
@@ -726,7 +724,7 @@ public class ApplicationTests
         // Setup Mock driver
         Init ();
 
-        Application.Iteration += (s, e) => Application.RequestStop ();
+        Application.Iteration += OnApplicationOnIteration;
 
         // Run<Toplevel> when already initialized or not with a Driver will not throw (because Window is derived from Toplevel)
         // Using another type not derived from Toplevel will throws at compile time
@@ -739,6 +737,10 @@ public class ApplicationTests
         Assert.Null (Application.Top);
         Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
+
+        return;
+
+        static void OnApplicationOnIteration (object? s, IterationEventArgs e) => Application.RequestStop ();
     }
 
     [Fact]
@@ -794,6 +796,7 @@ public class ApplicationTests
         initTop.Dispose ();
         Assert.True (initTop.WasDisposed);
 #endif
+        Assert.NotNull (Application.Top);
         Application.Top.Dispose ();
         Shutdown ();
 
@@ -814,6 +817,7 @@ public class ApplicationTests
         // Init has been called and we're passing no driver to Run<TestTopLevel>. This is ok.
         Application.Run<TestToplevel> ();
 
+        Assert.NotNull (Application.Top);
         Application.Top.Dispose ();
         Shutdown ();
 
@@ -836,6 +840,7 @@ public class ApplicationTests
         // Init has been called, selecting FakeDriver; we're passing no driver to Run<TestTopLevel>. Should be fine.
         Application.Run<TestToplevel> ();
 
+        Assert.NotNull (Application.Top);
         Application.Top.Dispose ();
         Shutdown ();
 
@@ -873,6 +878,7 @@ public class ApplicationTests
         Application.Run<TestToplevel> ();
         Assert.Equal (typeof (FakeDriver), Application.Driver?.GetType ());
 
+        Assert.NotNull (Application.Top);
         Application.Top.Dispose ();
         Shutdown ();
 
@@ -890,6 +896,7 @@ public class ApplicationTests
         // Init has NOT been called and we're passing a valid driver to Run<TestTopLevel>. This is ok.
         Application.Run<TestToplevel> (null, new FakeDriver ());
 
+        Assert.NotNull (Application.Top);
         Application.Top.Dispose ();
         Shutdown ();
 
@@ -1137,6 +1144,7 @@ public class ApplicationTests
                                  };
         Application.Run<Toplevel> (null, driver);
 #if DEBUG_IDISPOSABLE
+        Assert.NotNull (Application.Top);
         Assert.False (Application.Top.WasDisposed);
         Exception? exception = Record.Exception (Application.Shutdown);
         Assert.NotNull (exception);

@@ -41,7 +41,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     ///     in the screen. This is usually followed by executing the <see cref="RunLoop"/> method, and then the
     ///     <see cref="End(RunState)"/> method upon termination which will undo these changes.
     /// </remarks>
-    public static RunState Begin (Toplevel toplevel)
+    public static RunState Begin (Toplevel? toplevel)
     {
         ArgumentNullException.ThrowIfNull (toplevel);
 
