@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Runtime.CompilerServices;
 using Terminal.Gui.ConsoleDrivers.Windows.Interop;
 
@@ -46,7 +46,8 @@ public partial class BOOLTests
     ///     This validates not only that the cast works as expected, but that it exists and is defined exactly as the referenced method.
     ///     <br/>
     ///     This also ensures that implicit type conversion does not happen, as would be possible if the casts were tested by normal
-    ///     means.
+    ///     means.<br/>
+    ///     Besides, directly casting isn't an option with unconstrained type arguments anyway.
     /// </remarks>
     [Theory]
     [MemberData (nameof (CastOperatorTestData))]
@@ -61,7 +62,7 @@ public partial class BOOLTests
     )
     {
         Unsafe.SkipInit (out BOOL justForReference);
-        Assert.Equal (cast (ref justForReference, fromValue), expectedResult);
+        Assert.Equal (expectedResult, cast (ref justForReference, fromValue));
 
         return Task.CompletedTask;
     }
@@ -71,7 +72,7 @@ public partial class BOOLTests
     public Task Constructor_Boolean_KnowsTheTruth (bool value)
     {
         BOOL testBOOL = new (value);
-        Assert.Equal (GetIsTrueProperty (ref testBOOL), value);
+        Assert.Equal (value, GetIsTrueProperty (ref testBOOL));
 
         return Task.CompletedTask;
     }
@@ -82,7 +83,7 @@ public partial class BOOLTests
     {
         bool intTruth = value != 0;
         BOOL testBOOL = new (value);
-        Assert.Equal (GetIsTrueProperty (ref testBOOL), intTruth);
+        Assert.Equal (intTruth, GetIsTrueProperty (ref testBOOL));
 
         return Task.CompletedTask;
     }
@@ -101,7 +102,7 @@ public partial class BOOLTests
     )
     {
         Unsafe.SkipInit (out BOOL justForReference);
-        Assert.Equal (equalityOperator (ref justForReference, left, right), expectedResult);
+        Assert.Equal (expectedResult, equalityOperator (ref justForReference, left, right));
 
         return Task.CompletedTask;
     }
