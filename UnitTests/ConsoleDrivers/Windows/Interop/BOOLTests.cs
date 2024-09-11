@@ -204,6 +204,9 @@ public partial class BOOLTests
     public void IsTrue_IsFalse_AreOpposite (bool value)
     {
         BOOL testBOOL = new (value);
+        Assume.Equal (value, GetIsTrueProperty (ref testBOOL));
+        Assume.NotEqual (value, GetIsFalseProperty (ref testBOOL));
+
         Assert.NotEqual (GetIsTrueProperty (ref testBOOL), GetIsFalseProperty (ref testBOOL));
     }
 }
