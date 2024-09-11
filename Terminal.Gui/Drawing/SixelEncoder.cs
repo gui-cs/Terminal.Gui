@@ -162,7 +162,7 @@ public class SixelEncoder
     private string GetColorPallette (Color [,] pixels, out ColorQuantizer quantizer)
     {
         quantizer = new ColorQuantizer ();
-        quantizer.BuildColorPalette (pixels);
+        quantizer.BuildPaletteUsingMedianCut (pixels);
 
 
         // Color definitions in the format "#<index>;<type>;<R>;<G>;<B>" - For type the 2 means RGB.  The values range 0 to 100
