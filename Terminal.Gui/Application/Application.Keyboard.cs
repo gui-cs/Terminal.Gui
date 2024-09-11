@@ -153,7 +153,7 @@ public static partial class Application // Keyboard handling
     }
 
     /// <summary>
-    /// INTENRAL method to invoke one of the commands in <see cref="CommandImplementations"/>
+    ///     INTENRAL method to invoke one of the commands in <see cref="CommandImplementations"/>
     /// </summary>
     /// <param name="command"></param>
     /// <param name="keyEvent"></param>
@@ -172,6 +172,7 @@ public static partial class Application // Keyboard handling
         if (CommandImplementations.TryGetValue (command, out Func<CommandContext, bool?>? implementation))
         {
             var context = new CommandContext (command, keyEvent, appBinding); // Create the context here
+
             return implementation (context);
         }
 
@@ -260,7 +261,6 @@ public static partial class Application // Keyboard handling
         }
     }
 
-
     /// <summary>Gets or sets the key to activate arranging views using the keyboard.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key ArrangeKey
@@ -282,7 +282,7 @@ public static partial class Application // Keyboard handling
 
         // Things this view knows how to do
         AddCommand (
-                    Command.Quit, // TODO: IRunnable: Rename to Command.Quit to make more generic.
+                    Command.Quit,
                     static () =>
                     {
                         if (ApplicationOverlapped.OverlappedTop is { })
@@ -358,23 +358,25 @@ public static partial class Application // Keyboard handling
                     }
                    );
 
-        AddCommand (Command.Edit, static () =>
-                                  {
-                                      View? viewToArrange = Navigation?.GetFocused ();
+        AddCommand (
+                    Command.Edit,
+                    static () =>
+                    {
+                        View? viewToArrange = Navigation?.GetFocused ();
 
-                                      // Go up the superview hierarchy and find the first that is not ViewArrangement.Fixed
-                                      while (viewToArrange?.SuperView is { } && viewToArrange.Arrangement == ViewArrangement.Fixed)
-                                      {
-                                          viewToArrange = viewToArrange.SuperView;
-                                      }
+                        // Go up the superview hierarchy and find the first that is not ViewArrangement.Fixed
+                        while (viewToArrange?.SuperView is { } && viewToArrange.Arrangement == ViewArrangement.Fixed)
+                        {
+                            viewToArrange = viewToArrange.SuperView;
+                        }
 
-                                      if (viewToArrange is { })
-                                      {
-                                          return viewToArrange.Border?.Arrange ();
-                                      }
+                        if (viewToArrange is { })
+                        {
+                            return viewToArrange.Border?.Arrange ();
+                        }
 
-                                      return false;
-                                  });
+                        return false;
+                    });
 
         KeyBindings.Clear ();
 

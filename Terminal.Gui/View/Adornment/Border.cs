@@ -116,7 +116,7 @@ public class Border : Adornment
             LayoutStarted += OnLayoutStarted;
     }
 #endif
-        
+
     }
 
 
@@ -737,6 +737,16 @@ public class Border : Adornment
     public bool? Arrange ()
     {
         Debug.Assert (_arranging == ViewArrangement.Fixed);
+
+        if (!Parent!.Arrangement.HasFlag (ViewArrangement.Movable)
+            && !Parent!.Arrangement.HasFlag (ViewArrangement.BottomResizable)
+            && !Parent!.Arrangement.HasFlag (ViewArrangement.TopResizable)
+            && !Parent!.Arrangement.HasFlag (ViewArrangement.LeftResizable)
+            && !Parent!.Arrangement.HasFlag (ViewArrangement.RightResizable)
+            )
+        {
+            return false;
+        }
 
         CanFocus = true;
         SetFocus ();
