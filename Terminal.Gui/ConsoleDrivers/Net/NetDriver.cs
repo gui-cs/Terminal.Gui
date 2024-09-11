@@ -235,9 +235,9 @@ internal sealed class NetDriver : ConsoleDriver
                         // 
                         // For now, we just ignore the list of CMs.
                         //foreach (var combMark in Contents [row, col].CombiningMarks) {
-                        //	output.Append (combMark);
+                        //    output.Append (combMark);
                         //}
-                        // WriteToConsole (output, ref lastCol, row, ref outputWidth);
+                        //WriteToConsole (output, ref lastCol, row, ref outputWidth);
                     }
                     else if (rune.IsSurrogatePair () && rune.GetColumns () < 2)
                     {
@@ -370,7 +370,7 @@ internal sealed class NetDriver : ConsoleDriver
                 ConsoleKeyInfo consoleKeyInfo = inputEvent.ConsoleKeyInfo;
 
                 //if (consoleKeyInfo.Key == ConsoleKey.Packet) {
-                //	consoleKeyInfo = FromVKPacketToKConsoleKeyInfo (consoleKeyInfo);
+                //    consoleKeyInfo = FromVKPacketToKConsoleKeyInfo (consoleKeyInfo);
                 //}
 
                 //Debug.WriteLine ($"event: {inputEvent}");
@@ -399,7 +399,7 @@ internal sealed class NetDriver : ConsoleDriver
                 Left = 0;
                 Cols = inputEvent.WindowSizeEvent.Size.Width;
                 Rows = Math.Max (inputEvent.WindowSizeEvent.Size.Height, 0);
-                ;
+
                 ResizeScreen ();
                 ClearContents ();
                 _winSizeChanging = false;
@@ -528,12 +528,12 @@ internal sealed class NetDriver : ConsoleDriver
     ///// </remarks>
     //public override Attribute MakeColor (Color foreground, Color background)
     //{
-    //	// Encode the colors into the int value.
-    //	return new Attribute (
-    //		platformColor: ((((int)foreground.ColorName) & 0xffff) << 16) | (((int)background.ColorName) & 0xffff),
-    //		foreground: foreground,
-    //		background: background
-    //	);
+    //  // Encode the colors into the int value.
+    //  return new Attribute (
+    //    platformColor: ((((int)foreground.ColorName) & 0xffff) << 16) | (((int)background.ColorName) & 0xffff),
+    //    foreground: foreground,
+    //    background: background
+    //  );
     //}
 
     #endregion
