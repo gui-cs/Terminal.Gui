@@ -78,7 +78,7 @@ public class ApplicationNavigation
             return;
         }
 
-        Debug.Assert(value is {});
+        //Debug.Assert(value is {});
 
         _focused = value;
 

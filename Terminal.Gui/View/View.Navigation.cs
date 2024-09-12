@@ -595,7 +595,6 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 newFocusedView = SuperView;
             }
 
-
             // Are we an Adornment? 
             if (this is Adornment ad)
             {
