@@ -482,7 +482,7 @@ public class Border : Adornment
                         break;
 
                     case ViewArrangement.BottomResizable:
-                        Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + 1);
+                        Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + Parent!.Margin.Thickness.Bottom + 1);
                         break;
 
                     case ViewArrangement.LeftResizable:
@@ -499,13 +499,13 @@ public class Border : Adornment
                         break;
 
                     case ViewArrangement.RightResizable:
-                        Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + 1);
+                        Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + Parent!.Margin.Thickness.Right + 1);
 
                         break;
 
                     case ViewArrangement.BottomResizable | ViewArrangement.RightResizable:
-                        Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + 1);
-                        Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + 1);
+                        Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + Parent!.Margin.Thickness.Right + 1);
+                        Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + Parent!.Margin.Thickness.Bottom + 1);
 
                         break;
 
@@ -519,7 +519,7 @@ public class Border : Adornment
                             Parent.X = parentLoc.X - _startGrabPoint.X;
                         }
 
-                        Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + 1);
+                        Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + Parent!.Margin.Thickness.Bottom + 1);
                         break;
 
                     case ViewArrangement.TopResizable | ViewArrangement.RightResizable:
@@ -532,7 +532,7 @@ public class Border : Adornment
                             Parent.Y = parentLoc.Y - _startGrabPoint.Y;
                         }
 
-                        Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + 1);
+                        Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + Parent!.Margin.Thickness.Right + 1);
                         break;
 
                     case ViewArrangement.TopResizable | ViewArrangement.LeftResizable:
@@ -1113,7 +1113,7 @@ public class Border : Adornment
 
                 case ViewArrangement.LeftResizable:
                     _arrangeButton.X = 0;
-                    _arrangeButton.Y = Pos.Center ();
+                    _arrangeButton.Y = Pos.Center () + Parent!.Margin.Thickness.Vertical;
                     return true;
 
                 case ViewArrangement.RightResizable:
