@@ -172,7 +172,6 @@ public class Images : Scenario
             }
 
             var encoder = new SixelEncoder ();
-            encoder.Quantizer.PaletteBuildingAlgorithm = new KMeansPaletteBuilder (new EuclideanColorDistance());
 
             var encoded = encoder.EncodeSixel (ConvertToColorArray (_fullResImage));
 

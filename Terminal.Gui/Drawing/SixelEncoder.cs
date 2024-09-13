@@ -30,7 +30,7 @@ public class SixelEncoder
 
         string fillArea = GetFillArea (pixels);
 
-        string pallette = GetColorPallette (pixels );
+        string pallette = GetColorPalette (pixels );
 
         string pixelData = WriteSixel (pixels);
 
@@ -52,6 +52,7 @@ public class SixelEncoder
        [ ]  - Bit 5 (bottom-most pixel)
     */
 
+
     private string WriteSixel (Color [,] pixels)
     {
         StringBuilder sb = new StringBuilder ();
@@ -60,120 +61,110 @@ public class SixelEncoder
         int n = 1; // Used for checking when to add the line terminator
 
         // Iterate over each row of the image
-        for (int y = 0; y < height; y++)
+        for (int y = 0; y < height; y += 6)
         {
-            int p = y * width;
-            Color cachedColor = pixels [0, y];
-            int cachedColorIndex = Quantizer.GetNearestColor (cachedColor );
-            int count = 1;
-            int c = -1;
+            sb.Append (ProcessBand (pixels, y, Math.Min (6, height - y), width));
 
-            // Iterate through each column in the row
-            for (int x = 0; x < width; x++)
+            // Line separator between bands
+            if (y + 6 < height) // Only add separator if not the last band
             {
-                Color color = pixels [x, y];
-                int colorIndex = Quantizer.GetNearestColor (color);
-
-                if (colorIndex == cachedColorIndex)
-                {
-                    count++;
-                }
-                else
-                {
-                    // Output the cached color first
-                    if (cachedColorIndex == -1)
-                    {
-                        c = 0x3f; // Key color or transparent
-                    }
-                    else
-                    {
-                        c = 0x3f + n;
-                        sb.AppendFormat ("#{0}", cachedColorIndex);
-                    }
-
-                    // If count is less than 3, we simply repeat the character
-                    if (count < 3)
-                    {
-                        sb.Append ((char)c, count);
-                    }
-                    else
-                    {
-                        // RLE if count is greater than 3
-                        sb.AppendFormat ("!{0}{1}", count, (char)c);
-                    }
-
-                    // Reset for the new color
-                    count = 1;
-                    cachedColorIndex = colorIndex;
-                }
-            }
-
-            // Handle the last run of the color
-            if (c != -1 && count > 1)
-            {
-                if (cachedColorIndex == -1)
-                {
-                    c = 0x3f; // Key color
-                }
-                else
-                {
-                    sb.AppendFormat ("#{0}", cachedColorIndex);
-                }
-
-                if (count < 3)
-                {
-                    sb.Append ((char)c, count);
-                }
-                else
-                {
-                    sb.AppendFormat ("!{0}{1}", count, (char)c);
-                }
-            }
-
-            // Line terminator or separator depending on `n`
-            if (n == 32)
-            {
-                /*
-                 2. Line Separator (-):
-                   
-                   The line separator instructs the sixel renderer to move to the next row of sixels.
-                   After a -, the renderer will start a new row from the leftmost column. This marks the end of one line of sixel data and starts a new line.
-                   This ensures that the sixel data drawn after the separator appears below the previous row rather than overprinting it.
-               
-                   Use case: When you want to start drawing a new line of sixels (e.g., after completing a row of sixel columns).
-                */
-
-                n = 1;
-                sb.Append ("-"); // Write sixel line separator
-            }
-            else
-            {
-                /*
-                 *1. Line Terminator ($):
-                   
-                   The line terminator instructs the sixel renderer to return to the start of the current row but allows subsequent sixel characters to be overprinted on the same row.
-                   This is used when you are working with multiple color layers or want to continue drawing in the same row but with a different color.
-                   The $ allows you to overwrite sixel characters in the same vertical position by using different colors, effectively allowing you to combine colors on a per-sixel basis.
-                   
-                   Use case: When you need to draw multiple colors within the same vertical slice of 6 pixels.
-                 */
-
-                n <<= 1;
-                sb.Append ("$"); // Write line terminator
+                sb.Append ("-");
             }
         }
 
         return sb.ToString ();
     }
 
+    private string ProcessBand (Color [,] pixels, int startY, int bandHeight, int width)
+    {
+        var last = new sbyte [Quantizer.Palette.Count + 1];
+        var code = new byte [Quantizer.Palette.Count + 1];
+        var accu = new ushort [Quantizer.Palette.Count + 1];
+        var slots = new short [Quantizer.Palette.Count + 1];
 
+        Array.Fill (last, (sbyte)-1);
+        Array.Fill (accu, (ushort)1);
+        Array.Fill (slots, (short)-1);
 
-    private string GetColorPallette (Color [,] pixels)
+        var usedColorIdx = new List<int> ();
+        var targets = new List<List<string>> ();
+
+        // Process columns within the band
+        for (int x = 0; x < width; ++x)
+        {
+            Array.Clear (code, 0, usedColorIdx.Count);
+
+            // Process each row in the 6-pixel high band
+            for (int row = 0; row < bandHeight; ++row)
+            {
+                var color = pixels [x, startY + row];
+                int colorIndex = Quantizer.GetNearestColor (color);
+
+                if (slots [colorIndex] == -1)
+                {
+                    targets.Add (new List<string> ());
+                    if (x > 0)
+                    {
+                        last [usedColorIdx.Count] = 0;
+                        accu [usedColorIdx.Count] = (ushort)x;
+                    }
+                    slots [colorIndex] = (short)usedColorIdx.Count;
+                    usedColorIdx.Add (colorIndex);
+                }
+
+                code [slots [colorIndex]] |= (byte)(1 << row); // Accumulate SIXEL data
+            }
+
+            // Handle transitions between columns
+            for (int j = 0; j < usedColorIdx.Count; ++j)
+            {
+                if (code [j] == last [j])
+                {
+                    accu [j]++;
+                }
+                else
+                {
+                    if (last [j] != -1)
+                    {
+                        targets [j].Add (CodeToSixel (last [j], accu [j]));
+                    }
+                    last [j] = (sbyte)code [j];
+                    accu [j] = 1;
+                }
+            }
+        }
+
+        // Process remaining data for this band
+        for (int j = 0; j < usedColorIdx.Count; ++j)
+        {
+            if (last [j] != 0)
+            {
+                targets [j].Add (CodeToSixel (last [j], accu [j]));
+            }
+        }
+
+        // Build the final output for this band
+        var result = new StringBuilder ();
+        for (int j = 0; j < usedColorIdx.Count; ++j)
+        {
+            result.Append ($"#{usedColorIdx [j]}{string.Join ("", targets [j])}$");
+        }
+
+        return result.ToString ();
+    }
+
+    private static string CodeToSixel (int code, int repeat)
+    {
+        char c = (char)(code + 63);
+        if (repeat > 3) return "!" + repeat + c;
+        if (repeat == 3) return c.ToString () + c + c;
+        if (repeat == 2) return c.ToString () + c;
+        return c.ToString ();
+    }
+
+    private string GetColorPalette (Color [,] pixels)
     {
         Quantizer.BuildPalette (pixels);
-
-
-        // Color definitions in the format "#<index>;<type>;<R>;<G>;<B>" - For type the 2 means RGB.  The values range 0 to 100
 
         StringBuilder paletteSb = new StringBuilder ();
 
@@ -181,10 +172,10 @@ public class SixelEncoder
         {
             var color = Quantizer.Palette.ElementAt (i);
             paletteSb.AppendFormat ("#{0};2;{1};{2};{3}",
-                                    i,
-                                    color.R * 100 / 255,
-                                    color.G * 100 / 255,
-                                    color.B * 100 / 255);
+                i,
+                color.R * 100 / 255,
+                color.G * 100 / 255,
+                color.B * 100 / 255);
         }
 
         return paletteSb.ToString ();
@@ -197,17 +188,15 @@ public class SixelEncoder
 
         return $"{widthInChars};{heightInChars}";
     }
+
     private int GetHeightInChars (Color [,] pixels)
     {
-        // Height in pixels is equal to the number of rows in the pixel array
         int height = pixels.GetLength (1);
-
-        // Each SIXEL character represents 6 pixels vertically
-        return (height + 5) / 6; // Equivalent to ceiling(height / 6)
+        return (height + 5) / 6;
     }
+
     private int GetWidthInChars (Color [,] pixels)
     {
-        // Width in pixels is equal to the number of columns in the pixel array
         return pixels.GetLength (0);
     }
 }

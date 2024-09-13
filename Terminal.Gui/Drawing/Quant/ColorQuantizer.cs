@@ -50,7 +50,7 @@ public class ColorQuantizer
 
     public int GetNearestColor (Color toTranslate)
     {
-        // Simple nearest color matching based on Euclidean distance in RGB space
+        // Simple nearest color matching based on DistanceAlgorithm
         double minDistance = double.MaxValue;
         int nearestIndex = 0;
 
