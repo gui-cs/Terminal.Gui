@@ -203,13 +203,13 @@ public class Images : Scenario
             int height = image.Height;
             Color [,] colors = new Color [width, height];
 
-            // Loop through each pixel and convert Rgba32 to System.Drawing.Color
+            // Loop through each pixel and convert Rgba32 to Terminal.Gui color
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
                 {
                     var pixel = image [x, y];
-                    colors [x, y] = new Color (pixel.R, pixel.G, pixel.B); // Convert Rgba32 to System.Drawing.Color
+                    colors [x, y] = new Color (pixel.R, pixel.G, pixel.B); // Convert Rgba32 to Terminal.Gui color
                 }
             }
 
