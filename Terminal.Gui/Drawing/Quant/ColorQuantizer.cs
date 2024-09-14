@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
+using Terminal.Gui.Drawing.Quant;
 
-namespace Terminal.Gui.Drawing.Quant;
+namespace Terminal.Gui;
 
 /// <summary>
 /// Translates colors in an image into a Palette of up to 256 colors.
@@ -27,9 +28,8 @@ public class ColorQuantizer
 
     /// <summary>
     /// Gets or sets the algorithm used to build the <see cref="Palette"/>.
-    /// Defaults to <see cref="MedianCutPaletteBuilder"/>
     /// </summary>
-    public IPaletteBuilder PaletteBuildingAlgorithm { get; set; } = new MedianCutPaletteBuilder ();
+    public IPaletteBuilder PaletteBuildingAlgorithm { get; set; } = new KMeansPaletteBuilder (new EuclideanColorDistance ()) ;
 
     public void BuildPalette (Color [,] pixels)
     {

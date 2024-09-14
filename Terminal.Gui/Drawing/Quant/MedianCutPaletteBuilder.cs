@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Drawing.Quant;
+﻿namespace Terminal.Gui;
 
 public class MedianCutPaletteBuilder : IPaletteBuilder
 {
@@ -10,7 +10,7 @@ public class MedianCutPaletteBuilder : IPaletteBuilder
         // Keep splitting boxes until we have the desired number of colors
         while (boxes.Count < maxColors)
         {
-            // Find the box with the largest range and split it
+            // Find the box with the largest brightness range and split it
             ColorBox boxToSplit = FindBoxWithLargestRange (boxes);
 
             if (boxToSplit == null || boxToSplit.Colors.Count == 0)
@@ -18,25 +18,25 @@ public class MedianCutPaletteBuilder : IPaletteBuilder
                 break;
             }
 
-            // Split the box into two smaller boxes
-            var splitBoxes = SplitBox (boxToSplit);
+            // Split the box into two smaller boxes, based on luminance
+            var splitBoxes = SplitBoxByLuminance (boxToSplit);
             boxes.Remove (boxToSplit);
             boxes.AddRange (splitBoxes);
         }
 
         // Average the colors in each box to get the final palette
-        return boxes.Select (box => box.GetAverageColor ()).ToList ();
+        return boxes.Select (box => box.GetWeightedAverageColor ()).ToList ();
     }
 
-    // Find the box with the largest color range (R, G, or B)
+    // Find the box with the largest brightness range (based on luminance)
     private ColorBox FindBoxWithLargestRange (List<ColorBox> boxes)
     {
         ColorBox largestRangeBox = null;
-        int largestRange = 0;
+        double largestRange = 0;
 
         foreach (var box in boxes)
         {
-            int range = box.GetColorRange ();
+            double range = box.GetBrightnessRange ();
             if (range > largestRange)
             {
                 largestRange = range;
@@ -47,14 +47,10 @@ public class MedianCutPaletteBuilder : IPaletteBuilder
         return largestRangeBox;
     }
 
-    // Split a box at the median point in its largest color channel
-    private List<ColorBox> SplitBox (ColorBox box)
+    // Split a box at the median point based on brightness (luminance)
+    private List<ColorBox> SplitBoxByLuminance (ColorBox box)
     {
-        List<ColorBox> result = new List<ColorBox> ();
-
-        // Find the color channel with the largest range (R, G, or B)
-        int channel = box.GetLargestChannel ();
-        var sortedColors = box.Colors.OrderBy (c => GetColorChannelValue (c, channel)).ToList ();
+        var sortedColors = box.Colors.OrderBy (c => GetBrightness (c)).ToList ();
 
         // Split the box at the median
         int medianIndex = sortedColors.Count / 2;
@@ -62,22 +58,18 @@ public class MedianCutPaletteBuilder : IPaletteBuilder
         var lowerHalf = sortedColors.Take (medianIndex).ToList ();
         var upperHalf = sortedColors.Skip (medianIndex).ToList ();
 
-        result.Add (new ColorBox (lowerHalf));
-        result.Add (new ColorBox (upperHalf));
-
-        return result;
+        return new List<ColorBox>
+        {
+            new ColorBox(lowerHalf),
+            new ColorBox(upperHalf)
+        };
     }
 
-    // Helper method to get the value of a color channel (R = 0, G = 1, B = 2)
-    private static int GetColorChannelValue (Color color, int channel)
+    // Calculate the brightness (luminance) of a color
+    private static double GetBrightness (Color color)
     {
-        switch (channel)
-        {
-            case 0: return color.R;
-            case 1: return color.G;
-            case 2: return color.B;
-            default: throw new ArgumentException ("Invalid channel index");
-        }
+        // Luminance formula (standard)
+        return 0.299 * color.R + 0.587 * color.G + 0.114 * color.B;
     }
 
     // The ColorBox class to represent a subset of colors
@@ -90,72 +82,57 @@ public class MedianCutPaletteBuilder : IPaletteBuilder
             Colors = colors;
         }
 
-        // Get the color channel with the largest range (0 = R, 1 = G, 2 = B)
-        public int GetLargestChannel ()
+        // Get the range of brightness (luminance) in this box
+        public double GetBrightnessRange ()
         {
-            int rRange = GetColorRangeForChannel (0);
-            int gRange = GetColorRangeForChannel (1);
-            int bRange = GetColorRangeForChannel (2);
-
-            if (rRange >= gRange && rRange >= bRange)
-            {
-                return 0;
-            }
-
-            if (gRange >= rRange && gRange >= bRange)
-            {
-                return 1;
-            }
-
-            return 2;
-        }
-
-        // Get the range of colors for a given channel (0 = R, 1 = G, 2 = B)
-        private int GetColorRangeForChannel (int channel)
-        {
-            int min = int.MaxValue, max = int.MinValue;
+            double minBrightness = double.MaxValue, maxBrightness = double.MinValue;
 
             foreach (var color in Colors)
             {
-                int value = GetColorChannelValue (color, channel);
-                if (value < min)
+                double brightness = GetBrightness (color);
+                if (brightness < minBrightness)
                 {
-                    min = value;
+                    minBrightness = brightness;
                 }
 
-                if (value > max)
+                if (brightness > maxBrightness)
                 {
-                    max = value;
+                    maxBrightness = brightness;
                 }
             }
 
-            return max - min;
+            return maxBrightness - minBrightness;
         }
 
-        // Get the overall color range across all channels (for finding the box to split)
-        public int GetColorRange ()
+        // Calculate the average color in the box, weighted by brightness (darker colors have more weight)
+        public Color GetWeightedAverageColor ()
         {
-            int rRange = GetColorRangeForChannel (0);
-            int gRange = GetColorRangeForChannel (1);
-            int bRange = GetColorRangeForChannel (2);
-
-            return Math.Max (rRange, Math.Max (gRange, bRange));
-        }
-
-        // Calculate the average color in the box
-        public Color GetAverageColor ()
-        {
-            int totalR = 0, totalG = 0, totalB = 0;
+            double totalR = 0, totalG = 0, totalB = 0;
+            double totalWeight = 0;
 
             foreach (var color in Colors)
             {
-                totalR += color.R;
-                totalG += color.G;
-                totalB += color.B;
+                double brightness = GetBrightness (color);
+                double weight = 1.0 - brightness / 255.0; // Darker colors get more weight
+
+                totalR += color.R * weight;
+                totalG += color.G * weight;
+                totalB += color.B * weight;
+                totalWeight += weight;
             }
 
-            int count = Colors.Count;
-            return new Color (totalR / count, totalG / count, totalB / count);
+            // Normalize by the total weight
+            totalR /= totalWeight;
+            totalG /= totalWeight;
+            totalB /= totalWeight;
+
+            return new Color ((int)totalR, (int)totalG, (int)totalB);
+        }
+
+        // Calculate brightness (luminance) of a color
+        private static double GetBrightness (Color color)
+        {
+            return 0.299 * color.R + 0.587 * color.G + 0.114 * color.B;
         }
     }
 }

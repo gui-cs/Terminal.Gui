@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Drawing.Quant;
+﻿namespace Terminal.Gui;
 
 /// <summary>
 /// Interface for algorithms that compute the relative distance between pairs of colors.

@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Drawing.Quant;
+﻿namespace Terminal.Gui;
 
 public interface IPaletteBuilder
 {

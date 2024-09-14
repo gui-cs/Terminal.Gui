@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Drawing.Quant;
+﻿namespace Terminal.Gui;
 
 /// <summary>
 /// This is the simplest method to measure color difference in the CIE Lab color space. The Euclidean distance in Lab

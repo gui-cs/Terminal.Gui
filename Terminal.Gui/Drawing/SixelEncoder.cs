@@ -1,4 +1,4 @@
-﻿using Terminal.Gui.Drawing.Quant;
+﻿using Terminal.Gui;
 
 namespace Terminal.Gui;
 

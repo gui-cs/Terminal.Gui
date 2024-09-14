@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Drawing.Quant;
+﻿namespace Terminal.Gui;
 
 /// <summary>
 /// CIE94 improves on CIE76 by introducing adjustments for chroma (color intensity) and lightness.

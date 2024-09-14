@@ -8,7 +8,6 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Terminal.Gui;
-using Terminal.Gui.Drawing.Quant;
 using Color = Terminal.Gui.Color;
 
 namespace UICatalog.Scenarios;
@@ -210,7 +209,7 @@ public class Images : Scenario
                 for (int y = 0; y < height; y++)
                 {
                     var pixel = image [x, y];
-                    colors [x, y] = new Color (pixel.A, pixel.R, pixel.G, pixel.B); // Convert Rgba32 to System.Drawing.Color
+                    colors [x, y] = new Color (pixel.R, pixel.G, pixel.B); // Convert Rgba32 to System.Drawing.Color
                 }
             }
 

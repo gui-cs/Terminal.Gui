@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Drawing.Quant;
+﻿namespace Terminal.Gui;
 
 /// <summary>
 /// Calculates the distance between two colors using Euclidean distance in 3D RGB space.

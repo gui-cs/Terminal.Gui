@@ -1,6 +1,6 @@
 ﻿using ColorHelper;
 
-namespace Terminal.Gui.Drawing.Quant;
+namespace Terminal.Gui;
 
 public abstract class LabColorDistance : IColorDistance
 {
