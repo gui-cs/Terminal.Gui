@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -175,6 +177,25 @@ public class Images : Scenario
 
             var encoded = encoder.EncodeSixel (ConvertToColorArray (_fullResImage));
 
+            var pv = new PaletteView (encoder.Quantizer.Palette.ToList ());
+
+            var dlg = new Dialog ()
+            {
+                Title = "Palette (Esc to close)",
+                Width = Dim.Fill (2),
+                Height = Dim.Fill (1),
+            };
+
+            var btn = new Button ()
+            {
+                Text = "Ok"
+            };
+
+            btn.Accept += (s, e) => Application.RequestStop ();
+            dlg.Add (pv);
+            dlg.AddButton (btn);
+            Application.Run (dlg);
+
             Application.Sixel = encoded;
         }
         public static Color [,] ConvertToColorArray (Image<Rgba32> image)
@@ -194,6 +215,78 @@ public class Images : Scenario
             }
 
             return colors;
+        }
+    }
+    public class PaletteView : View
+    {
+        private List<Color> _palette;
+
+        public PaletteView (List<Color> palette)
+        {
+            _palette = palette ?? new List<Color> ();
+            Width = Dim.Fill ();
+            Height = Dim.Fill ();
+        }
+
+        // Automatically calculates rows and columns based on the available bounds
+        private (int columns, int rows) CalculateGridSize (Rectangle bounds)
+        {
+            // Characters are twice as wide as they are tall, so use 2:1 width-to-height ratio
+            int availableWidth = bounds.Width / 2;  // Each color block is 2 character wide
+            int availableHeight = bounds.Height;
+
+            int numColors = _palette.Count;
+
+            // Calculate the number of columns and rows we can fit within the bounds
+            int columns = Math.Min (availableWidth, numColors);
+            int rows = (numColors + columns - 1) / columns;  // Ceiling division for rows
+
+            // Ensure we do not exceed the available height
+            if (rows > availableHeight)
+            {
+                rows = availableHeight;
+                columns = (numColors + rows - 1) / rows;  // Recalculate columns if needed
+            }
+
+            return (columns, rows);
+        }
+
+        public override void OnDrawContent (Rectangle bounds)
+        {
+            base.OnDrawContent (bounds);
+
+            if (_palette == null || _palette.Count == 0)
+                return;
+
+            // Calculate the grid size based on the bounds
+            var (columns, rows) = CalculateGridSize (bounds);
+
+            // Draw the colors in the palette
+            for (int i = 0; i < _palette.Count && i < columns * rows; i++)
+            {
+                int row = i / columns;
+                int col = i % columns;
+
+                // Calculate position in the grid
+                int x = col * 2; // Each color block takes up 2 horizontal spaces
+                int y = row;
+
+                // Set the color attribute for the block
+                Driver.SetAttribute (new Terminal.Gui.Attribute (_palette [i], _palette [i]));
+
+                // Draw the block (2 characters wide per block)
+                for (int dx = 0; dx < 2; dx++) // Fill the width of the block
+                {
+                    AddRune (x + dx, y, (Rune)' ');
+                }
+            }
+        }
+
+        // Allows dynamically changing the palette
+        public void SetPalette (List<Color> palette)
+        {
+            _palette = palette ?? new List<Color> ();
+            SetNeedsDisplay ();
         }
     }
 }
