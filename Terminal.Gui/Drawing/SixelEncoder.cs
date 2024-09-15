@@ -51,6 +51,15 @@ public class SixelEncoder
        [ ]  - Bit 3
        [ ]  - Bit 4
        [ ]  - Bit 5 (bottom-most pixel)
+
+    Special Characters
+        The '-' acts like '\n'. It moves the drawing cursor
+        to beginning of next line
+        
+        The '$' acts like the <Home> key.  It moves drawing
+        cursor back to beginning of the current line 
+        e.g. to draw more color layers.
+        
     */
 
     /**
@@ -62,12 +71,14 @@ public class SixelEncoder
      */
     private string WriteSixel (Color [,] pixels)
     {
+
         StringBuilder sb = new StringBuilder ();
         int height = pixels.GetLength (1);
         int width = pixels.GetLength (0);
-        int n = 1; // Used for checking when to add the line terminator
 
-        // Iterate over each row of the image
+        // Iterate over each 'row' of the image. Because each sixel write operation
+        // outputs a screen area 6 pixels high (and 1+ across) we must process the image
+        // 6 'y' units at once (1 band)
         for (int y = 0; y < height; y += 6)
         {
             sb.Append (ProcessBand (pixels, y, Math.Min (6, height - y), width));
@@ -75,6 +86,9 @@ public class SixelEncoder
             // Line separator between bands
             if (y + 6 < height) // Only add separator if not the last band
             {
+                // This completes the drawing of the current line of sixel and
+                // returns the 'cursor' to beginning next line, newly drawn sixel
+                // after this will draw in the next 6 pixel high band (i.e. below).
                 sb.Append ("-");
             }
         }
