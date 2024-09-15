@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿using Terminal.Gui;
+using Color = Terminal.Gui.Color;
+
 public class MedianCutPaletteBuilder : IPaletteBuilder
 {
     private readonly IColorDistance _colorDistance;
@@ -31,6 +33,14 @@ public class MedianCutPaletteBuilder : IPaletteBuilder
             var largestCube = cubes.Last ();
             cubes.RemoveAt (cubes.Count - 1);
 
+            // Check if the largest cube contains only one unique color
+            if (IsSingleColorCube (largestCube))
+            {
+                // Add back and stop splitting this cube
+                cubes.Add (largestCube);
+                break;
+            }
+
             var (cube1, cube2) = SplitCube (largestCube);
 
             if (cube1.Any ())
@@ -45,6 +55,7 @@ public class MedianCutPaletteBuilder : IPaletteBuilder
                 added = true;
             }
 
+            // Break the loop if no new cubes were added
             if (!added)
             {
                 break;
@@ -52,7 +63,14 @@ public class MedianCutPaletteBuilder : IPaletteBuilder
         }
 
         // Calculate average color for each cube
-        return cubes.Select (AverageColor).Distinct().ToList ();
+        return cubes.Select (AverageColor).Distinct ().ToList ();
+    }
+
+    // Checks if all colors in the cube are the same
+    private bool IsSingleColorCube (List<Color> cube)
+    {
+        var firstColor = cube.First ();
+        return cube.All (c => c.R == firstColor.R && c.G == firstColor.G && c.B == firstColor.B);
     }
 
     // Splits the cube based on the largest color component range
