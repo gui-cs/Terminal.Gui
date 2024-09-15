@@ -41,6 +41,7 @@ public class SixelEncoder
 
 
     /*
+
         A sixel is a column of 6 pixels - with a width of 1 pixel
 
      Column controlled by one sixel character:
@@ -52,7 +53,13 @@ public class SixelEncoder
        [ ]  - Bit 5 (bottom-most pixel)
     */
 
-
+    /**
+     * This method is adapted from
+     * https://github.com/jerch/node-sixel/
+     * 
+     * Copyright (c) 2019 Joerg Breitbart.
+     * @license MIT
+     */
     private string WriteSixel (Color [,] pixels)
     {
         StringBuilder sb = new StringBuilder ();
