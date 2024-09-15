@@ -1,138 +1,123 @@
 ﻿namespace Terminal.Gui;
-
 public class MedianCutPaletteBuilder : IPaletteBuilder
 {
+    private readonly IColorDistance _colorDistance;
+
+    public MedianCutPaletteBuilder (IColorDistance colorDistance)
+    {
+        _colorDistance = colorDistance;
+    }
+
     public List<Color> BuildPalette (List<Color> colors, int maxColors)
     {
-        // Initial step: place all colors in one large box
-        List<ColorBox> boxes = new List<ColorBox> { new ColorBox (colors) };
-
-        // Keep splitting boxes until we have the desired number of colors
-        while (boxes.Count < maxColors)
+        if (colors == null || colors.Count == 0 || maxColors <= 0)
         {
-            // Find the box with the largest brightness range and split it
-            ColorBox boxToSplit = FindBoxWithLargestRange (boxes);
+            return new List<Color> ();
+        }
 
-            if (boxToSplit == null || boxToSplit.Colors.Count == 0)
+        return MedianCut (colors, maxColors);
+    }
+
+    private List<Color> MedianCut (List<Color> colors, int maxColors)
+    {
+        var cubes = new List<List<Color>> () { colors };
+
+        // Recursively split color regions
+        while (cubes.Count < maxColors)
+        {
+            bool added = false;
+            cubes.Sort ((a, b) => Volume (a).CompareTo (Volume (b)));
+
+            var largestCube = cubes.Last ();
+            cubes.RemoveAt (cubes.Count - 1);
+
+            var (cube1, cube2) = SplitCube (largestCube);
+
+            if (cube1.Any ())
+            {
+                cubes.Add (cube1);
+                added = true;
+            }
+
+            if (cube2.Any ())
+            {
+                cubes.Add (cube2);
+                added = true;
+            }
+
+            if (!added)
             {
                 break;
             }
-
-            // Split the box into two smaller boxes, based on luminance
-            var splitBoxes = SplitBoxByLuminance (boxToSplit);
-            boxes.Remove (boxToSplit);
-            boxes.AddRange (splitBoxes);
         }
 
-        // Average the colors in each box to get the final palette
-        return boxes.Select (box => box.GetWeightedAverageColor ()).ToList ();
+        // Calculate average color for each cube
+        return cubes.Select (AverageColor).Distinct().ToList ();
     }
 
-    // Find the box with the largest brightness range (based on luminance)
-    private ColorBox FindBoxWithLargestRange (List<ColorBox> boxes)
+    // Splits the cube based on the largest color component range
+    private (List<Color>, List<Color>) SplitCube (List<Color> cube)
     {
-        ColorBox largestRangeBox = null;
-        double largestRange = 0;
+        var (component, range) = FindLargestRange (cube);
 
-        foreach (var box in boxes)
+        // Sort by the largest color range component (either R, G, or B)
+        cube.Sort ((c1, c2) => component switch
         {
-            double range = box.GetBrightnessRange ();
-            if (range > largestRange)
-            {
-                largestRange = range;
-                largestRangeBox = box;
-            }
-        }
+            0 => c1.R.CompareTo (c2.R),
+            1 => c1.G.CompareTo (c2.G),
+            2 => c1.B.CompareTo (c2.B),
+            _ => 0
+        });
 
-        return largestRangeBox;
+        var medianIndex = cube.Count / 2;
+        var cube1 = cube.Take (medianIndex).ToList ();
+        var cube2 = cube.Skip (medianIndex).ToList ();
+
+        return (cube1, cube2);
     }
 
-    // Split a box at the median point based on brightness (luminance)
-    private List<ColorBox> SplitBoxByLuminance (ColorBox box)
+    private (int, int) FindLargestRange (List<Color> cube)
     {
-        var sortedColors = box.Colors.OrderBy (c => GetBrightness (c)).ToList ();
+        var minR = cube.Min (c => c.R);
+        var maxR = cube.Max (c => c.R);
+        var minG = cube.Min (c => c.G);
+        var maxG = cube.Max (c => c.G);
+        var minB = cube.Min (c => c.B);
+        var maxB = cube.Max (c => c.B);
 
-        // Split the box at the median
-        int medianIndex = sortedColors.Count / 2;
+        var rangeR = maxR - minR;
+        var rangeG = maxG - minG;
+        var rangeB = maxB - minB;
 
-        var lowerHalf = sortedColors.Take (medianIndex).ToList ();
-        var upperHalf = sortedColors.Skip (medianIndex).ToList ();
-
-        return new List<ColorBox>
-        {
-            new ColorBox(lowerHalf),
-            new ColorBox(upperHalf)
-        };
+        if (rangeR >= rangeG && rangeR >= rangeB) return (0, rangeR);
+        if (rangeG >= rangeR && rangeG >= rangeB) return (1, rangeG);
+        return (2, rangeB);
     }
 
-    // Calculate the brightness (luminance) of a color
-    private static double GetBrightness (Color color)
+    private Color AverageColor (List<Color> cube)
     {
-        // Luminance formula (standard)
-        return 0.299 * color.R + 0.587 * color.G + 0.114 * color.B;
+        var avgR = (byte)(cube.Average (c => c.R));
+        var avgG = (byte)(cube.Average (c => c.G));
+        var avgB = (byte)(cube.Average (c => c.B));
+
+        return new Color (avgR, avgG, avgB);
     }
 
-    // The ColorBox class to represent a subset of colors
-    public class ColorBox
+    private int Volume (List<Color> cube)
     {
-        public List<Color> Colors { get; private set; }
-
-        public ColorBox (List<Color> colors)
+        if (cube == null || cube.Count == 0)
         {
-            Colors = colors;
+            // Return a volume of 0 if the cube is empty or null
+            return 0;
         }
 
-        // Get the range of brightness (luminance) in this box
-        public double GetBrightnessRange ()
-        {
-            double minBrightness = double.MaxValue, maxBrightness = double.MinValue;
+        var minR = cube.Min (c => c.R);
+        var maxR = cube.Max (c => c.R);
+        var minG = cube.Min (c => c.G);
+        var maxG = cube.Max (c => c.G);
+        var minB = cube.Min (c => c.B);
+        var maxB = cube.Max (c => c.B);
 
-            foreach (var color in Colors)
-            {
-                double brightness = GetBrightness (color);
-                if (brightness < minBrightness)
-                {
-                    minBrightness = brightness;
-                }
-
-                if (brightness > maxBrightness)
-                {
-                    maxBrightness = brightness;
-                }
-            }
-
-            return maxBrightness - minBrightness;
-        }
-
-        // Calculate the average color in the box, weighted by brightness (darker colors have more weight)
-        public Color GetWeightedAverageColor ()
-        {
-            double totalR = 0, totalG = 0, totalB = 0;
-            double totalWeight = 0;
-
-            foreach (var color in Colors)
-            {
-                double brightness = GetBrightness (color);
-                double weight = 1.0 - brightness / 255.0; // Darker colors get more weight
-
-                totalR += color.R * weight;
-                totalG += color.G * weight;
-                totalB += color.B * weight;
-                totalWeight += weight;
-            }
-
-            // Normalize by the total weight
-            totalR /= totalWeight;
-            totalG /= totalWeight;
-            totalB /= totalWeight;
-
-            return new Color ((int)totalR, (int)totalG, (int)totalB);
-        }
-
-        // Calculate brightness (luminance) of a color
-        private static double GetBrightness (Color color)
-        {
-            return 0.299 * color.R + 0.587 * color.G + 0.114 * color.B;
-        }
+        return (maxR - minR) * (maxG - minG) * (maxB - minB);
     }
 }

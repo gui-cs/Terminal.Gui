@@ -37,6 +37,10 @@ public class SixelEncoderTests
         var encoder = new SixelEncoder (); // Assuming SixelEncoder is the class that contains the EncodeSixel method
         string result = encoder.EncodeSixel (pixels);
 
+        // Since image is only red we should only have 1 color definition
+        Color c1 = Assert.Single (encoder.Quantizer.Palette);
+
+        Assert.Equal (new Color(255,0,0),c1);
 
         Assert.Equal (expected, result);
     }

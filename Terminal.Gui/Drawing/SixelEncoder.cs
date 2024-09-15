@@ -7,6 +7,29 @@ namespace Terminal.Gui;
 /// </summary>
 public class SixelEncoder
 {
+    /*
+
+    A sixel is a column of 6 pixels - with a width of 1 pixel
+
+    Column controlled by one sixel character:
+      [ ]  - Bit 0 (top-most pixel)
+      [ ]  - Bit 1
+      [ ]  - Bit 2
+      [ ]  - Bit 3
+      [ ]  - Bit 4
+      [ ]  - Bit 5 (bottom-most pixel)
+
+   Special Characters
+       The '-' acts like '\n'. It moves the drawing cursor
+       to beginning of next line
+
+       The '$' acts like the <Home> key.  It moves drawing
+       cursor back to beginning of the current line
+       e.g. to draw more color layers.
+
+   */
+
+
     /// <summary>
     /// Gets or sets the quantizer responsible for building a representative
     /// limited color palette for images and for mapping novel colors in
@@ -38,29 +61,6 @@ public class SixelEncoder
 
         return start + defaultRatios + completeStartSequence + noScaling + fillArea + pallette + pixelData + terminator;
     }
-
-
-    /*
-
-        A sixel is a column of 6 pixels - with a width of 1 pixel
-
-     Column controlled by one sixel character:
-       [ ]  - Bit 0 (top-most pixel)
-       [ ]  - Bit 1
-       [ ]  - Bit 2
-       [ ]  - Bit 3
-       [ ]  - Bit 4
-       [ ]  - Bit 5 (bottom-most pixel)
-
-    Special Characters
-        The '-' acts like '\n'. It moves the drawing cursor
-        to beginning of next line
-        
-        The '$' acts like the <Home> key.  It moves drawing
-        cursor back to beginning of the current line 
-        e.g. to draw more color layers.
-        
-    */
 
     /**
      * This method is adapted from

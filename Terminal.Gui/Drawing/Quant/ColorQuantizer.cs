@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using Terminal.Gui.Drawing.Quant;
+﻿
 
 namespace Terminal.Gui;
 
@@ -29,7 +28,7 @@ public class ColorQuantizer
     /// <summary>
     /// Gets or sets the algorithm used to build the <see cref="Palette"/>.
     /// </summary>
-    public IPaletteBuilder PaletteBuildingAlgorithm { get; set; } = new KMeansPaletteBuilder (new EuclideanColorDistance ()) ;
+    public IPaletteBuilder PaletteBuildingAlgorithm { get; set; } = new MedianCutPaletteBuilder (new EuclideanColorDistance ()) ;
 
     public void BuildPalette (Color [,] pixels)
     {
