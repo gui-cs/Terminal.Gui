@@ -477,9 +477,6 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 if (!AdvanceFocus (NavigationDirection.Forward, null))
                 {
                     // Couldn't advance, so we're the most focused view in the application
-                    _previouslyFocused = null;
-
-                    Application.Navigation?.SetFocused (this);
                 }
             }
         }
@@ -496,6 +493,9 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 previousFocusedView.SetHasFocusFalse (this);
             }
         }
+
+        _previouslyFocused = null;
+        Application.Navigation?.SetFocused (this);
 
         if (Arrangement.HasFlag (ViewArrangement.Overlapped))
         {

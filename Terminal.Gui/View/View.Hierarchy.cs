@@ -160,6 +160,10 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         Rectangle touched = view.Frame;
 
         bool hadFocus = view.HasFocus;
+        bool couldFocus = view.CanFocus;
+
+        view.CanFocus = false; // If view had focus, this will ensure it doesn't and it stays that way
+        Debug.Assert (!view.HasFocus);
 
         _subviews.Remove (view);
         view._superView = null;
@@ -175,19 +179,12 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             }
         }
 
+        view.CanFocus = couldFocus; // Restore to previous value
+
         if (_previouslyFocused == view)
         {
             _previouslyFocused = null;
         }
-
-        if (hadFocus)
-        {
-            // Access _hasFocus directly; don't use HasFocus because it will try to find the focused view
-            view._hasFocus = false;
-            AdvanceFocus (NavigationDirection.Forward, null);
-        }
-
-        Debug.Assert (!view.HasFocus);
 
         OnRemoved (new (this, view));
 
