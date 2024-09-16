@@ -59,6 +59,7 @@ public class Border : Adornment
     {
         Parent = parent;
         CanFocus = false;
+        TabStop = TabBehavior.TabGroup;
 
         Application.GrabbingMouse += Application_GrabbingMouse;
         Application.UnGrabbingMouse += Application_UnGrabbingMouse;
@@ -291,21 +292,21 @@ public class Border : Adornment
             return true;
         }
 
-        if (!Parent!.Arrangement.HasFlag (ViewArrangement.Movable)
-            && !Parent!.Arrangement.HasFlag (ViewArrangement.BottomResizable)
-            && !Parent!.Arrangement.HasFlag (ViewArrangement.TopResizable)
-            && !Parent!.Arrangement.HasFlag (ViewArrangement.LeftResizable)
-            && !Parent!.Arrangement.HasFlag (ViewArrangement.RightResizable)
-           )
-        {
-            return false;
-        }
-
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/3312
         if (!_dragPosition.HasValue && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
             Parent.SetFocus ();
             ApplicationOverlapped.BringOverlappedTopToFront ();
+
+            if (!Parent!.Arrangement.HasFlag (ViewArrangement.Movable)
+                && !Parent!.Arrangement.HasFlag (ViewArrangement.BottomResizable)
+                && !Parent!.Arrangement.HasFlag (ViewArrangement.TopResizable)
+                && !Parent!.Arrangement.HasFlag (ViewArrangement.LeftResizable)
+                && !Parent!.Arrangement.HasFlag (ViewArrangement.RightResizable)
+               )
+            {
+                return false;
+            }
 
             // Only start grabbing if the user clicks in the Thickness area
             // Adornment.Contains takes Parent SuperView=relative coords.
@@ -930,11 +931,16 @@ public class Border : Adornment
 
     private ViewArrangement _arranging;
 
-    private Button? _arrangeButton;
+    private Button? _moveButton; // always top-left
+    private Button? _allSizeButton;
+    private Button? _leftSizeButton;
+    private Button? _rightSizeButton;
+    private Button? _topSizeButton;
+    private Button? _bottomSizeButton;
 
     /// <summary>
     ///     Starts "Arrange Mode" where <see cref="Adornment.Parent"/> can be moved and/or resized using the mouse
-    ///     or keyboard.
+    ///     or keyboard. If <paramref name="arrangement"/> is <see cref="ViewArrangement.Fixed"/> keyboard mode is enabled.
     /// </summary>
     /// <remarks>
     ///     Arrange Mode is exited by the user pressing <see cref="Application.ArrangeKey"/>, <see cref="Key.Esc"/>, or by clicking
@@ -955,21 +961,231 @@ public class Border : Adornment
             return false;
         }
 
-        Debug.Assert (_arrangeButton is null);
-        _arrangeButton = new Button
+        // Add Commands and Keybindigs - Note it's ok these get added each time. KeyBindings are cleared in EndArrange()
+        AddArrangeModeKeyBindings ();
+
+        Application.MouseEvent += ApplicationOnMouseEvent;
+
+        // Create buttons for resizing and moving
+        if (Parent!.Arrangement.HasFlag (ViewArrangement.Movable))
         {
-            CanFocus = true,
-            Width = 1,
-            Height = 1,
-            NoDecorations = true,
-            NoPadding = true,
-            ShadowStyle = ShadowStyle.None,
-            Text = $"{Glyphs.Diamond}",
-        };
-        Add (_arrangeButton);
+            Debug.Assert (_moveButton is null);
 
-        CanFocus = true;
+            _moveButton = new Button
+            {
+                Id = "moveButton",
+                CanFocus = true,
+                Width = 1,
+                Height = 1,
+                NoDecorations = true,
+                NoPadding = true,
+                ShadowStyle = ShadowStyle.None,
+                Text = $"{Glyphs.Diamond}",
+                Visible = false,
+            };
+            Add (_moveButton);
+        }
 
+        if (Parent!.Arrangement.HasFlag (ViewArrangement.Resizable))
+        {
+            Debug.Assert (_allSizeButton is null);
+
+            _allSizeButton = new Button
+            {
+                Id = "allSizeButton",
+                CanFocus = true,
+                Width = 1,
+                Height = 1,
+                NoDecorations = true,
+                NoPadding = true,
+                ShadowStyle = ShadowStyle.None,
+                Text = $"{Glyphs.Diamond}",
+                X = Pos.AnchorEnd (),
+                Y = Pos.AnchorEnd (),
+                Visible = false,
+            };
+            Add (_allSizeButton);
+        }
+
+        if (Parent!.Arrangement.HasFlag (ViewArrangement.TopResizable))
+        {
+            Debug.Assert (_topSizeButton is null);
+
+            _topSizeButton = new Button
+            {
+                Id = "topSizeButton",
+                CanFocus = true,
+                Width = 1,
+                Height = 1,
+                NoDecorations = true,
+                NoPadding = true,
+                ShadowStyle = ShadowStyle.None,
+                Text = $"{Glyphs.Diamond}",
+                X = Pos.Center () + Parent!.Margin.Thickness.Horizontal,
+                Y = 0,
+                Visible = false,
+            };
+            Add (_topSizeButton);
+        }
+
+        if (Parent!.Arrangement.HasFlag (ViewArrangement.RightResizable))
+        {
+            Debug.Assert (_rightSizeButton is null);
+
+            _rightSizeButton = new Button
+            {
+                Id = "rightSizeButton",
+                CanFocus = true,
+                Width = 1,
+                Height = 1,
+                NoDecorations = true,
+                NoPadding = true,
+                ShadowStyle = ShadowStyle.None,
+                Text = $"{Glyphs.Diamond}",
+                X = Pos.AnchorEnd (),
+                Y = Pos.Center () + Parent!.Margin.Thickness.Vertical,
+                Visible = false,
+            };
+            Add (_rightSizeButton);
+        }
+
+        if (Parent!.Arrangement.HasFlag (ViewArrangement.LeftResizable))
+        {
+            Debug.Assert (_leftSizeButton is null);
+
+            _leftSizeButton = new Button
+            {
+                Id = "leftSizeButton",
+                CanFocus = true,
+                Width = 1,
+                Height = 1,
+                NoDecorations = true,
+                NoPadding = true,
+                ShadowStyle = ShadowStyle.None,
+                Text = $"{Glyphs.Diamond}",
+                X = 0,
+                Y = Pos.Center () + Parent!.Margin.Thickness.Vertical,
+                Visible = false,
+            };
+            Add (_leftSizeButton);
+        }
+
+        if (Parent!.Arrangement.HasFlag (ViewArrangement.BottomResizable))
+        {
+            Debug.Assert (_bottomSizeButton is null);
+
+            _bottomSizeButton = new Button
+            {
+                Id = "bottomSizeButton",
+                CanFocus = true,
+                Width = 1,
+                Height = 1,
+                NoDecorations = true,
+                NoPadding = true,
+                ShadowStyle = ShadowStyle.None,
+                Text = $"{Glyphs.Diamond}",
+                X = Pos.Center () + Parent!.Margin.Thickness.Horizontal,
+                Y = Pos.AnchorEnd (),
+                Visible = false,
+            };
+            Add (_bottomSizeButton);
+        }
+
+
+        if (arrangement == ViewArrangement.Fixed)
+        {
+            // Keyboard mode
+            if (Parent!.Arrangement.HasFlag (ViewArrangement.Movable))
+            {
+                _arranging = ViewArrangement.Movable;
+                _moveButton!.Visible = true;
+            }
+
+            if (Parent!.Arrangement.HasFlag (ViewArrangement.Resizable))
+            {
+                _arranging = ViewArrangement.Resizable;
+                _allSizeButton!.Visible = true;
+            }
+        }
+        else
+        {
+            // Mouse mode
+            _arranging = arrangement;
+
+            switch (_arranging)
+            {
+                case ViewArrangement.Movable:
+                    _moveButton!.Visible = true;
+                    break;
+
+                case ViewArrangement.RightResizable | ViewArrangement.BottomResizable:
+                case ViewArrangement.Resizable:
+                    _rightSizeButton!.Visible = true;
+                    _bottomSizeButton!.Visible = true;
+                    _allSizeButton!.X = Pos.AnchorEnd ();
+                    _allSizeButton!.Y = Pos.AnchorEnd ();
+                    _allSizeButton!.Visible = true;
+                    break;
+
+                case ViewArrangement.LeftResizable:
+                    _leftSizeButton!.Visible = true;
+                    break;
+
+                case ViewArrangement.RightResizable:
+                    _rightSizeButton!.Visible = true;
+                    break;
+
+                case ViewArrangement.TopResizable:
+                    _topSizeButton!.Visible = true;
+                    break;
+
+                case ViewArrangement.BottomResizable:
+                    _bottomSizeButton!.Visible = true;
+                    break;
+
+                case ViewArrangement.LeftResizable | ViewArrangement.BottomResizable:
+                    _rightSizeButton!.Visible = true;
+                    _bottomSizeButton!.Visible = true;
+                    _allSizeButton!.X = 0;
+                    _allSizeButton!.Y = Pos.AnchorEnd ();
+                    _allSizeButton!.Visible = true;
+                    break;
+
+                case ViewArrangement.LeftResizable | ViewArrangement.TopResizable:
+                    _leftSizeButton!.Visible = true;
+                    _topSizeButton!.Visible = true;
+                    break;
+
+                case ViewArrangement.RightResizable | ViewArrangement.TopResizable:
+                    _rightSizeButton!.Visible = true;
+                    _topSizeButton!.Visible = true;
+                    _allSizeButton!.X = Pos.AnchorEnd ();
+                    _allSizeButton!.Y = 0;
+                    _allSizeButton!.Visible = true;
+
+                    break;
+
+            }
+        }
+
+        if (_arranging != ViewArrangement.Fixed)
+        {
+            if (arrangement == ViewArrangement.Fixed)
+            {
+                // Keyboard mode - enable nav
+                CanFocus = true;
+                SetFocus ();
+            }
+            return true;
+        }
+
+        // Hack for now
+        EndArrange ();
+        return false;
+    }
+
+    private void AddArrangeModeKeyBindings ()
+    {
         AddCommand (Command.Quit, EndArrange);
 
         AddCommand (Command.Up,
@@ -1060,8 +1276,18 @@ public class Border : Adornment
                         return true;
                     });
 
-        AddCommand (Command.Tab, Navigate);
-        AddCommand (Command.BackTab, Navigate);
+        AddCommand (Command.Tab, () =>
+                                 {
+                                     AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+
+                                     return true; // Always eat
+                                 });
+        AddCommand (Command.BackTab, () =>
+                                     {
+                                         AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
+
+                                         return true;  // Always eat
+                                     });
 
         KeyBindings.Add (Key.Esc, KeyBindingScope.HotKey, Command.Quit);
         KeyBindings.Add (Application.ArrangeKey, KeyBindingScope.HotKey, Command.Quit);
@@ -1072,113 +1298,6 @@ public class Border : Adornment
 
         KeyBindings.Add (Key.Tab, KeyBindingScope.HotKey, Command.Tab);
         KeyBindings.Add (Key.Tab.WithShift, KeyBindingScope.HotKey, Command.BackTab);
-
-        Application.MouseEvent += ApplicationOnMouseEvent;
-
-        if (arrangement == ViewArrangement.Fixed)
-        {
-            if (Parent!.Arrangement.HasFlag (ViewArrangement.Movable))
-            {
-                _arranging = ViewArrangement.Movable;
-                _arrangeButton.X = 0;
-                _arrangeButton.Y = 0;
-                return true;
-            }
-
-            if (Parent!.Arrangement.HasFlag (ViewArrangement.Resizable))
-            {
-                _arranging = ViewArrangement.Resizable;
-                _arrangeButton.X = Pos.AnchorEnd ();
-                _arrangeButton.Y = Pos.AnchorEnd ();
-
-                return true;
-            }
-        }
-        else
-        {
-            _arranging = arrangement;
-
-            switch (_arranging)
-            {
-                case ViewArrangement.Movable:
-                    _arrangeButton.X = 0;
-                    _arrangeButton.Y = 0;
-                    return true;
-
-                case ViewArrangement.RightResizable | ViewArrangement.BottomResizable:
-                case ViewArrangement.Resizable:
-                    _arrangeButton.X = Pos.AnchorEnd ();
-                    _arrangeButton.Y = Pos.AnchorEnd ();
-                    return true;
-
-                case ViewArrangement.LeftResizable:
-                    _arrangeButton.X = 0;
-                    _arrangeButton.Y = Pos.Center () + Parent!.Margin.Thickness.Vertical;
-                    return true;
-
-                case ViewArrangement.RightResizable:
-                    _arrangeButton.X = Pos.AnchorEnd ();
-                    _arrangeButton.Y = Pos.Center ();
-                    return true;
-
-                case ViewArrangement.TopResizable:
-                    _arrangeButton.X = Pos.Center ();
-                    _arrangeButton.Y = 0;
-                    return true;
-
-                case ViewArrangement.BottomResizable:
-                    _arrangeButton.X = Pos.Center ();
-                    _arrangeButton.Y = Pos.AnchorEnd ();
-                    return true;
-
-                case ViewArrangement.LeftResizable | ViewArrangement.BottomResizable:
-                    _arrangeButton.X = 0;
-                    _arrangeButton.Y = Pos.AnchorEnd ();
-
-                    return true;
-
-                case ViewArrangement.LeftResizable | ViewArrangement.TopResizable:
-                    _arrangeButton.X = 0;
-                    _arrangeButton.Y = 0;
-
-                    return true;
-
-                case ViewArrangement.RightResizable | ViewArrangement.TopResizable:
-                    _arrangeButton.X = Pos.AnchorEnd (); ;
-                    _arrangeButton.Y = 0;
-
-                    return true;
-
-            }
-        }
-
-        // Hack for now
-        EndArrange ();
-        return false;
-
-        bool? Navigate ()
-        {
-            if (_arranging == ViewArrangement.Movable)
-            {
-                if (Parent!.Arrangement.HasFlag (ViewArrangement.Resizable))
-                {
-                    _arranging = ViewArrangement.Resizable;
-                    _arrangeButton.X = Pos.AnchorEnd ();
-                    _arrangeButton.Y = Pos.AnchorEnd ();
-                }
-            }
-            else if (_arranging == ViewArrangement.Resizable)
-            {
-                if (Parent!.Arrangement.HasFlag (ViewArrangement.Movable))
-                {
-                    _arranging = ViewArrangement.Movable;
-                    _arrangeButton.X = 0;
-                    _arrangeButton.Y = 0;
-                }
-            }
-
-            return true;
-        }
     }
 
     private void ApplicationOnMouseEvent (object? sender, MouseEvent e)
@@ -1210,16 +1329,54 @@ public class Border : Adornment
             Application.UngrabMouse ();
         }
 
-        CanFocus = false;
-
-        if (_arrangeButton is { })
+        if (_moveButton is { })
         {
-            Remove (_arrangeButton);
-            _arrangeButton.Dispose ();
-            _arrangeButton = null;
+            Remove (_moveButton);
+            _moveButton.Dispose ();
+            _moveButton = null;
+        }
+
+        if (_allSizeButton is { })
+        {
+            Remove (_allSizeButton);
+            _allSizeButton.Dispose ();
+            _allSizeButton = null;
+        }
+
+        if (_leftSizeButton is { })
+        {
+            Remove (_leftSizeButton);
+            _leftSizeButton.Dispose ();
+            _leftSizeButton = null;
+        }
+
+        if (_rightSizeButton is { })
+        {
+            Remove (_rightSizeButton);
+            _rightSizeButton.Dispose ();
+            _rightSizeButton = null;
+        }
+
+        if (_topSizeButton is { })
+        {
+            Remove (_topSizeButton);
+            _topSizeButton.Dispose ();
+            _topSizeButton = null;
+        }
+
+        if (_bottomSizeButton is { })
+        {
+            Remove (_bottomSizeButton);
+            _bottomSizeButton.Dispose ();
+            _bottomSizeButton = null;
         }
 
         KeyBindings.Clear ();
+
+        if (CanFocus)
+        {
+            CanFocus = false;
+        }
 
         return true;
     }

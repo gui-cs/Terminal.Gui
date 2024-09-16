@@ -62,6 +62,11 @@ public class ApplicationNavigation
             }
         }
 
+        //if (start.Border is { })
+        //{
+        //    return IsInHierarchy (start.Border, view);
+        //}
+
         return false;
     }
 

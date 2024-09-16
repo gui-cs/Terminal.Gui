@@ -214,7 +214,33 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <summary>Gets the currently focused Subview of this view, or <see langword="null"/> if nothing is focused.</summary>
     public View? Focused
     {
-        get { return Subviews.FirstOrDefault (v => v.HasFocus); }
+        get
+        {
+            View? focused = Subviews.FirstOrDefault (v => v.HasFocus);
+
+            if (focused is { })
+            {
+                return focused;
+            }
+
+            // How about in Adornments?
+            if (Margin is { HasFocus:true })
+            {
+                return Margin;
+            }
+
+            if (Border is { HasFocus: true })
+            {
+                return Border;
+            }
+
+            if (Padding is { HasFocus: true })
+            {
+                return Padding;
+            }
+
+            return null;
+        }
     }
 
     /// <summary>Returns a value indicating if this View is currently on Top (Active)</summary>
@@ -384,7 +410,10 @@ public partial class View // Focus and cross-view navigation management (TabStop
             return (false, false);
         }
 
-        if (CanFocus && SuperView is { CanFocus: false })
+        var thisAsAdornment = this as Adornment;
+        View? superViewOrParent = thisAsAdornment?.Parent ?? SuperView;
+
+        if (CanFocus && superViewOrParent is { CanFocus: false })
         {
             Debug.WriteLine ($@"WARNING: Attempt to FocusChanging where SuperView.CanFocus == false. {this}");
 
@@ -412,27 +441,13 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         // Make sure superviews up the superview hierarchy have focus.
         // Any of them may cancel gaining focus. In which case we need to back out.
-        if (SuperView is { HasFocus: false } sv)
+        if (superViewOrParent is { HasFocus: false } sv)
         {
             (bool focusSet, bool svCancelled) = sv.SetHasFocusTrue (previousFocusedView, true);
 
             if (!focusSet)
             {
                 return (false, svCancelled);
-            }
-        }
-
-        // Are we an Adornment? 
-        if (this is Adornment adornment)
-        {
-            if (adornment.Parent is { HasFocus: false } parent)
-            {
-                (bool focusSet, bool parentCancelled) = parent.SetHasFocusTrue (previousFocusedView, true);
-
-                if (!focusSet)
-                {
-                    return (false, parentCancelled);
-                }
             }
         }
 
@@ -445,16 +460,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         // By setting _hasFocus to true we definitively change HasFocus for this view.
 
         // Get whatever peer has focus, if any
-        View? focusedPeer = SuperView?.Focused;
-
-        if (focusedPeer is null)
-        {
-            // Are we an Adornment? 
-            if (this is Adornment ad)
-            {
-                focusedPeer = ad.Parent?.Focused;
-            }
-        }
+        View? focusedPeer = superViewOrParent?.Focused;
 
         _hasFocus = true;
 
@@ -479,6 +485,14 @@ public partial class View // Focus and cross-view navigation management (TabStop
         if (previousFocusedView is { HasFocus: true } && Subviews.Contains (previousFocusedView))
         {
             previousFocusedView.SetHasFocusFalse (this);
+        }
+
+        if (previousFocusedView is { HasFocus: true })
+        {
+            if (previousFocusedView.SuperView is Adornment a)
+            {
+                previousFocusedView.SetHasFocusFalse (this);
+            }
         }
 
         if (Arrangement.HasFlag (ViewArrangement.Overlapped))
@@ -570,43 +584,34 @@ public partial class View // Focus and cross-view navigation management (TabStop
             throw new InvalidOperationException ("SetHasFocusFalse should not be called if the view does not have focus.");
         }
 
+        var thisAsAdornment = this as Adornment;
+        View? superViewOrParent = thisAsAdornment?.Parent ?? SuperView;
+
         // If newFocusedVew is null, we need to find the view that should get focus, and SetFocus on it.
         if (!traversingDown && newFocusedView is null)
         {
-            if (SuperView?._previouslyMostFocused is { })
+            if (superViewOrParent?._previouslyMostFocused is { })
             {
-                if (SuperView?._previouslyMostFocused != this)
+                if (superViewOrParent?._previouslyMostFocused != this)
                 {
-                    SuperView?._previouslyMostFocused?.SetFocus ();
+                    superViewOrParent?._previouslyMostFocused?.SetFocus ();
 
                     // The above will cause SetHasFocusFalse, so we can return
                     return;
                 }
-                newFocusedView = SuperView?._previouslyMostFocused;
+
+                newFocusedView = superViewOrParent?._previouslyMostFocused;
             }
 
-            if (SuperView is { })
+            if (superViewOrParent is { })
             {
-                if (SuperView.AdvanceFocus (NavigationDirection.Forward, TabStop))
+                if (superViewOrParent.AdvanceFocus (NavigationDirection.Forward, TabStop))
                 {
                     // The above will cause SetHasFocusFalse, so we can return
                     return;
                 }
-                newFocusedView = SuperView;
-            }
 
-            // Are we an Adornment? 
-            if (this is Adornment ad)
-            {
-                if (ad.Parent is {})
-                {
-                    if (ad.Parent.RestoreFocus ())
-                    {
-                        // The above will cause SetHasFocusFalse, so we can return
-                        return;
-                    }
-                    newFocusedView = ad.Parent;
-                }
+                newFocusedView = superViewOrParent;
             }
 
             if (Application.Navigation is { } && Application.Current is { })
@@ -645,6 +650,13 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 bottom = bottom.SuperView;
             }
 
+            if (bottom == this && bottom.SuperView is Adornment a)
+            {
+                a.SetHasFocusFalse (newFocusedView, true);
+            }
+
+            Debug.Assert (!mostFocused.WasDisposed);
+
             _previouslyMostFocused = mostFocused;
         }
 
@@ -654,7 +666,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         NotifyFocusChanging (HasFocus, !HasFocus, newFocusedView, this);
 
         // Get whatever peer has focus, if any
-        View? focusedPeer = SuperView?.Focused;
+        View? focusedPeer = superViewOrParent?.Focused;
         _hasFocus = false;
 
         if (Application.Navigation is { })
@@ -663,7 +675,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
             if (appFocused is { } || appFocused == this)
             {
-                Application.Navigation.SetFocused (newFocusedView ?? SuperView);
+                Application.Navigation.SetFocused (newFocusedView ?? superViewOrParent);
             }
         }
 
@@ -675,9 +687,10 @@ public partial class View // Focus and cross-view navigation management (TabStop
             return;
         }
 
-        if (SuperView is { })
+        if (superViewOrParent is { })
         {
-            SuperView._previouslyMostFocused = focusedPeer;
+            Debug.Assert(!focusedPeer.WasDisposed);
+            superViewOrParent._previouslyMostFocused = focusedPeer;
         }
 
         // Post-conditions - prove correctness

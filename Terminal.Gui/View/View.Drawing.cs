@@ -473,15 +473,16 @@ public partial class View // Drawing APIs
     {
         if (NeedsDisplay)
         {
+            if (!CanBeVisible (this))
+            {
+                return;
+            }
+
             if (SuperView is { })
             {
                 Clear ();
             }
 
-            if (!CanBeVisible (this))
-            {
-                return;
-            }
 
             if (!string.IsNullOrEmpty (TextFormatter.Text))
             {
