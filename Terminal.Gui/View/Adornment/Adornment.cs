@@ -26,7 +26,8 @@ public class Adornment : View
     /// <param name="parent"></param>
     public Adornment (View parent)
     {
-        CanFocus = true;
+        // By default Adornments can't get focus; has to be enabled specifically.
+        CanFocus = false;
         Parent = parent;
     }
 

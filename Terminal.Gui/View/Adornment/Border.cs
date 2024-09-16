@@ -1,7 +1,5 @@
 #nullable enable
 using System.Diagnostics;
-using Microsoft.CodeAnalysis;
-using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui;
 
@@ -68,7 +66,6 @@ public class Border : Adornment
         Highlight += Border_Highlight;
     }
 
-
 #if SUBVIEW_BASED_BORDER
     private Line _left;
 
@@ -77,7 +74,6 @@ public class Border : Adornment
     /// </summary>
     public Button CloseButton { get; internal set; }
 #endif
-
 
     /// <inheritdoc/>
     public override void BeginInit ()
@@ -117,10 +113,7 @@ public class Border : Adornment
             LayoutStarted += OnLayoutStarted;
     }
 #endif
-
     }
-
-
 
 #if SUBVIEW_BASED_BORDER
     private void OnLayoutStarted (object sender, LayoutEventArgs e)
@@ -164,6 +157,7 @@ public class Border : Adornment
     internal Rectangle GetBorderRectangle ()
     {
         Rectangle screenRect = ViewportToScreen (Viewport);
+
         return new (
                     screenRect.X + Math.Max (0, Thickness.Left - 1),
                     screenRect.Y + Math.Max (0, Thickness.Top - 1),
@@ -312,6 +306,11 @@ public class Border : Adornment
             // Adornment.Contains takes Parent SuperView=relative coords.
             if (Contains (new (mouseEvent.Position.X + Parent.Frame.X + Frame.X, mouseEvent.Position.Y + Parent.Frame.Y + Frame.Y)))
             {
+                if (_arranging != ViewArrangement.Fixed)
+                {
+                    EndArrangeMode ();
+                }
+
                 // Set the start grab point to the Frame coords
                 _startGrabPoint = new (mouseEvent.Position.X + Frame.X, mouseEvent.Position.Y + Frame.Y);
                 _dragPosition = mouseEvent.Position;
@@ -319,23 +318,19 @@ public class Border : Adornment
 
                 SetHighlight (HighlightStyle);
 
+                // If not resizable, but movable: Drag anywhere is move
                 // If resizable and movable: Drag on top is move, other 3 sides are size
                 // If not movable, but resizable: Drag on any side sizes.
 
                 // Get rectangle representing Thickness.Top
                 // If mouse is in that rectangle, set _arranging to ViewArrangement.Movable
-                Rectangle sideRect = new (Frame.X + Thickness.Left, Frame.Y, Frame.Width - Thickness.Left - Thickness.Right, Thickness.Top);
-                if (Parent!.Arrangement.HasFlag (ViewArrangement.Movable) && sideRect.Contains (_startGrabPoint))
-                {
-                    EnterArrangeMode (ViewArrangement.Movable);
-
-                    return true;
-                }
+                Rectangle sideRect;
 
                 // If mouse is in any other rectangle, set _arranging to ViewArrangement.<side>
                 if (Parent!.Arrangement.HasFlag (ViewArrangement.LeftResizable))
                 {
                     sideRect = new (Frame.X, Frame.Y + Thickness.Top, Thickness.Left, Frame.Height - Thickness.Top - Thickness.Bottom);
+
                     if (sideRect.Contains (_startGrabPoint))
                     {
                         EnterArrangeMode (ViewArrangement.LeftResizable);
@@ -346,7 +341,12 @@ public class Border : Adornment
 
                 if (Parent!.Arrangement.HasFlag (ViewArrangement.RightResizable))
                 {
-                    sideRect = new (Frame.X + Frame.Width - Thickness.Right, Frame.Y + Thickness.Top, Thickness.Right, Frame.Height - Thickness.Top - Thickness.Bottom);
+                    sideRect = new (
+                                    Frame.X + Frame.Width - Thickness.Right,
+                                    Frame.Y + Thickness.Top,
+                                    Thickness.Right,
+                                    Frame.Height - Thickness.Top - Thickness.Bottom);
+
                     if (sideRect.Contains (_startGrabPoint))
                     {
                         EnterArrangeMode (ViewArrangement.RightResizable);
@@ -355,9 +355,10 @@ public class Border : Adornment
                     }
                 }
 
-                if (Parent!.Arrangement.HasFlag (ViewArrangement.TopResizable))
+                if (Parent!.Arrangement.HasFlag (ViewArrangement.TopResizable) && !Parent!.Arrangement.HasFlag (ViewArrangement.Movable))
                 {
                     sideRect = new (Frame.X + Thickness.Left, Frame.Y, Frame.Width - Thickness.Left - Thickness.Right, Thickness.Top);
+
                     if (sideRect.Contains (_startGrabPoint))
                     {
                         EnterArrangeMode (ViewArrangement.TopResizable);
@@ -368,7 +369,12 @@ public class Border : Adornment
 
                 if (Parent!.Arrangement.HasFlag (ViewArrangement.BottomResizable))
                 {
-                    sideRect = new (Frame.X + Thickness.Left, Frame.Y + Frame.Height - Thickness.Bottom, Frame.Width - Thickness.Left - Thickness.Right, Thickness.Bottom);
+                    sideRect = new (
+                                    Frame.X + Thickness.Left,
+                                    Frame.Y + Frame.Height - Thickness.Bottom,
+                                    Frame.Width - Thickness.Left - Thickness.Right,
+                                    Thickness.Bottom);
+
                     if (sideRect.Contains (_startGrabPoint))
                     {
                         EnterArrangeMode (ViewArrangement.BottomResizable);
@@ -377,10 +383,10 @@ public class Border : Adornment
                     }
                 }
 
-
                 if (Parent!.Arrangement.HasFlag (ViewArrangement.BottomResizable) && Parent!.Arrangement.HasFlag (ViewArrangement.LeftResizable))
                 {
                     sideRect = new (Frame.X, Frame.Height - Thickness.Top, Thickness.Left, Thickness.Bottom);
+
                     if (sideRect.Contains (_startGrabPoint))
                     {
                         EnterArrangeMode (ViewArrangement.BottomResizable | ViewArrangement.LeftResizable);
@@ -392,6 +398,7 @@ public class Border : Adornment
                 if (Parent!.Arrangement.HasFlag (ViewArrangement.BottomResizable) && Parent!.Arrangement.HasFlag (ViewArrangement.RightResizable))
                 {
                     sideRect = new (Frame.X + Frame.Width - Thickness.Right, Frame.Height - Thickness.Top, Thickness.Right, Thickness.Bottom);
+
                     if (sideRect.Contains (_startGrabPoint))
                     {
                         EnterArrangeMode (ViewArrangement.BottomResizable | ViewArrangement.RightResizable);
@@ -403,6 +410,7 @@ public class Border : Adornment
                 if (Parent!.Arrangement.HasFlag (ViewArrangement.TopResizable) && Parent!.Arrangement.HasFlag (ViewArrangement.RightResizable))
                 {
                     sideRect = new (Frame.X + Frame.Width - Thickness.Right, Frame.Y, Thickness.Right, Thickness.Top);
+
                     if (sideRect.Contains (_startGrabPoint))
                     {
                         EnterArrangeMode (ViewArrangement.TopResizable | ViewArrangement.RightResizable);
@@ -414,6 +422,7 @@ public class Border : Adornment
                 if (Parent!.Arrangement.HasFlag (ViewArrangement.TopResizable) && Parent!.Arrangement.HasFlag (ViewArrangement.LeftResizable))
                 {
                     sideRect = new (Frame.X, Frame.Y, Thickness.Left, Thickness.Top);
+
                     if (sideRect.Contains (_startGrabPoint))
                     {
                         EnterArrangeMode (ViewArrangement.TopResizable | ViewArrangement.LeftResizable);
@@ -422,7 +431,17 @@ public class Border : Adornment
                     }
                 }
 
+                if (Parent!.Arrangement.HasFlag (ViewArrangement.Movable))
+                {
+                    //sideRect = new (Frame.X + Thickness.Left, Frame.Y, Frame.Width - Thickness.Left - Thickness.Right, Thickness.Top);
 
+                    //if (sideRect.Contains (_startGrabPoint))
+                    {
+                        EnterArrangeMode (ViewArrangement.Movable);
+
+                        return true;
+                    }
+                }
             }
 
             return true;
@@ -449,10 +468,10 @@ public class Border : Adornment
 
                 int minHeight = Thickness.Vertical + Parent!.Margin.Thickness.Bottom;
                 int minWidth = Thickness.Horizontal + Parent!.Margin.Thickness.Right;
+
                 switch (_arranging)
                 {
                     case ViewArrangement.Movable:
-
 
                         GetLocationEnsuringFullVisibility (
                                                            Parent,
@@ -484,6 +503,7 @@ public class Border : Adornment
 
                     case ViewArrangement.BottomResizable:
                         Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + Parent!.Margin.Thickness.Bottom + 1);
+
                         break;
 
                     case ViewArrangement.LeftResizable:
@@ -497,6 +517,7 @@ public class Border : Adornment
                             Parent.Width = newWidth;
                             Parent.X = parentLoc.X - _startGrabPoint.X;
                         }
+
                         break;
 
                     case ViewArrangement.RightResizable:
@@ -521,6 +542,7 @@ public class Border : Adornment
                         }
 
                         Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + Parent!.Margin.Thickness.Bottom + 1);
+
                         break;
 
                     case ViewArrangement.TopResizable | ViewArrangement.RightResizable:
@@ -534,6 +556,7 @@ public class Border : Adornment
                         }
 
                         Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + Parent!.Margin.Thickness.Right + 1);
+
                         break;
 
                     case ViewArrangement.TopResizable | ViewArrangement.LeftResizable:
@@ -554,10 +577,9 @@ public class Border : Adornment
                             Parent.Width = newW2;
                             Parent.X = parentLoc.X - _startGrabPoint.X;
                         }
+
                         break;
-
                 }
-
 
                 return true;
             }
@@ -569,7 +591,7 @@ public class Border : Adornment
             Application.UngrabMouse ();
             SetHighlight (HighlightStyle.None);
 
-            EndArrange ();
+            EndArrangeMode ();
 
             return true;
         }
@@ -713,12 +735,12 @@ public class Border : Adornment
                 {
                     // ╔╡╞╗ should be ╔══╗
                     lc?.AddLine (
-                                new (borderBounds.Location.X, titleY),
-                                borderBounds.Width,
-                                Orientation.Horizontal,
-                                lineStyle,
-                                Driver.GetAttribute ()
-                               );
+                                 new (borderBounds.Location.X, titleY),
+                                 borderBounds.Width,
+                                 Orientation.Horizontal,
+                                 lineStyle,
+                                 Driver.GetAttribute ()
+                                );
                 }
                 else
                 {
@@ -728,12 +750,12 @@ public class Border : Adornment
                     if (Thickness.Top == 2)
                     {
                         lc?.AddLine (
-                                    new (borderBounds.X + 1, topTitleLineY),
-                                    Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
-                                    Orientation.Horizontal,
-                                    lineStyle,
-                                    Driver.GetAttribute ()
-                                   );
+                                     new (borderBounds.X + 1, topTitleLineY),
+                                     Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
+                                     Orientation.Horizontal,
+                                     lineStyle,
+                                     Driver.GetAttribute ()
+                                    );
                     }
 
                     // ┌────┐
@@ -742,70 +764,70 @@ public class Border : Adornment
                     if (borderBounds.Width >= 4 && Thickness.Top > 2)
                     {
                         lc?.AddLine (
-                                    new (borderBounds.X + 1, topTitleLineY),
-                                    Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
-                                    Orientation.Horizontal,
-                                    lineStyle,
-                                    Driver.GetAttribute ()
-                                   );
+                                     new (borderBounds.X + 1, topTitleLineY),
+                                     Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
+                                     Orientation.Horizontal,
+                                     lineStyle,
+                                     Driver.GetAttribute ()
+                                    );
 
                         lc?.AddLine (
-                                    new (borderBounds.X + 1, topTitleLineY + 2),
-                                    Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
-                                    Orientation.Horizontal,
-                                    lineStyle,
-                                    Driver.GetAttribute ()
-                                   );
+                                     new (borderBounds.X + 1, topTitleLineY + 2),
+                                     Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
+                                     Orientation.Horizontal,
+                                     lineStyle,
+                                     Driver.GetAttribute ()
+                                    );
                     }
 
                     // ╔╡Title╞═════╗
                     // Add a short horiz line for ╔╡
                     lc?.AddLine (
-                                new (borderBounds.Location.X, titleY),
-                                2,
-                                Orientation.Horizontal,
-                                lineStyle,
-                                Driver.GetAttribute ()
-                               );
+                                 new (borderBounds.Location.X, titleY),
+                                 2,
+                                 Orientation.Horizontal,
+                                 lineStyle,
+                                 Driver.GetAttribute ()
+                                );
 
                     // Add a vert line for ╔╡
                     lc?.AddLine (
-                                new (borderBounds.X + 1, topTitleLineY),
-                                titleBarsLength,
-                                Orientation.Vertical,
-                                LineStyle.Single,
-                                Driver.GetAttribute ()
-                               );
+                                 new (borderBounds.X + 1, topTitleLineY),
+                                 titleBarsLength,
+                                 Orientation.Vertical,
+                                 LineStyle.Single,
+                                 Driver.GetAttribute ()
+                                );
 
                     // Add a vert line for ╞
                     lc?.AddLine (
-                                new (
-                                     borderBounds.X
-                                     + 1
-                                     + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2)
-                                     - 1,
-                                     topTitleLineY
-                                    ),
-                                titleBarsLength,
-                                Orientation.Vertical,
-                                LineStyle.Single,
-                                Driver.GetAttribute ()
-                               );
+                                 new (
+                                      borderBounds.X
+                                      + 1
+                                      + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2)
+                                      - 1,
+                                      topTitleLineY
+                                     ),
+                                 titleBarsLength,
+                                 Orientation.Vertical,
+                                 LineStyle.Single,
+                                 Driver.GetAttribute ()
+                                );
 
                     // Add the right hand line for ╞═════╗
                     lc?.AddLine (
-                                new (
-                                     borderBounds.X
-                                     + 1
-                                     + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2)
-                                     - 1,
-                                     titleY
-                                    ),
-                                borderBounds.Width - Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
-                                Orientation.Horizontal,
-                                lineStyle,
-                                Driver.GetAttribute ()
-                               );
+                                 new (
+                                      borderBounds.X
+                                      + 1
+                                      + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2)
+                                      - 1,
+                                      titleY
+                                     ),
+                                 borderBounds.Width - Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
+                                 Orientation.Horizontal,
+                                 lineStyle,
+                                 Driver.GetAttribute ()
+                                );
                 }
             }
 
@@ -814,35 +836,35 @@ public class Border : Adornment
             if (drawLeft)
             {
                 lc?.AddLine (
-                            new (borderBounds.Location.X, titleY),
-                            sideLineLength,
-                            Orientation.Vertical,
-                            lineStyle,
-                            Driver.GetAttribute ()
-                           );
+                             new (borderBounds.Location.X, titleY),
+                             sideLineLength,
+                             Orientation.Vertical,
+                             lineStyle,
+                             Driver.GetAttribute ()
+                            );
             }
 #endif
 
             if (drawBottom)
             {
                 lc?.AddLine (
-                            new (borderBounds.X, borderBounds.Y + borderBounds.Height - 1),
-                            borderBounds.Width,
-                            Orientation.Horizontal,
-                            lineStyle,
-                            Driver.GetAttribute ()
-                           );
+                             new (borderBounds.X, borderBounds.Y + borderBounds.Height - 1),
+                             borderBounds.Width,
+                             Orientation.Horizontal,
+                             lineStyle,
+                             Driver.GetAttribute ()
+                            );
             }
 
             if (drawRight)
             {
                 lc?.AddLine (
-                            new (borderBounds.X + borderBounds.Width - 1, titleY),
-                            sideLineLength,
-                            Orientation.Vertical,
-                            lineStyle,
-                            Driver.GetAttribute ()
-                           );
+                             new (borderBounds.X + borderBounds.Width - 1, titleY),
+                             sideLineLength,
+                             Orientation.Vertical,
+                             lineStyle,
+                             Driver.GetAttribute ()
+                            );
             }
 
             Driver.SetAttribute (prevAttr);
@@ -862,9 +884,9 @@ public class Border : Adornment
                 if (drawTop && maxTitleWidth > 0 && Settings.FastHasFlags (BorderSettings.Title))
                 {
                     Parent!.TitleTextFormatter.Draw (
-                                                    new (borderBounds.X + 2, titleY, maxTitleWidth, 1),
-                                                    Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor (),
-                                                    Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor ());
+                                                     new (borderBounds.X + 2, titleY, maxTitleWidth, 1),
+                                                     Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor (),
+                                                     Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor ());
                 }
 
                 //Left
@@ -943,7 +965,8 @@ public class Border : Adornment
     ///     or keyboard. If <paramref name="arrangement"/> is <see cref="ViewArrangement.Fixed"/> keyboard mode is enabled.
     /// </summary>
     /// <remarks>
-    ///     Arrange Mode is exited by the user pressing <see cref="Application.ArrangeKey"/>, <see cref="Key.Esc"/>, or by clicking
+    ///     Arrange Mode is exited by the user pressing <see cref="Application.ArrangeKey"/>, <see cref="Key.Esc"/>, or by
+    ///     clicking
     ///     the mouse out of the <see cref="Adornment.Parent"/>'s Frame.
     /// </remarks>
     /// <returns></returns>
@@ -956,7 +979,7 @@ public class Border : Adornment
             && !Parent!.Arrangement.HasFlag (ViewArrangement.TopResizable)
             && !Parent!.Arrangement.HasFlag (ViewArrangement.LeftResizable)
             && !Parent!.Arrangement.HasFlag (ViewArrangement.RightResizable)
-            )
+           )
         {
             return false;
         }
@@ -971,7 +994,7 @@ public class Border : Adornment
         {
             Debug.Assert (_moveButton is null);
 
-            _moveButton = new Button
+            _moveButton = new ()
             {
                 Id = "moveButton",
                 CanFocus = true,
@@ -980,8 +1003,9 @@ public class Border : Adornment
                 NoDecorations = true,
                 NoPadding = true,
                 ShadowStyle = ShadowStyle.None,
-                Text = $"{Glyphs.Diamond}",
+                Text = $"{Glyphs.Move}",
                 Visible = false,
+                Data = ViewArrangement.Movable
             };
             Add (_moveButton);
         }
@@ -990,7 +1014,7 @@ public class Border : Adornment
         {
             Debug.Assert (_allSizeButton is null);
 
-            _allSizeButton = new Button
+            _allSizeButton = new ()
             {
                 Id = "allSizeButton",
                 CanFocus = true,
@@ -999,10 +1023,11 @@ public class Border : Adornment
                 NoDecorations = true,
                 NoPadding = true,
                 ShadowStyle = ShadowStyle.None,
-                Text = $"{Glyphs.Diamond}",
+                Text = $"{Glyphs.SizeBottomRight}",
                 X = Pos.AnchorEnd (),
                 Y = Pos.AnchorEnd (),
                 Visible = false,
+                Data = ViewArrangement.Resizable
             };
             Add (_allSizeButton);
         }
@@ -1011,7 +1036,7 @@ public class Border : Adornment
         {
             Debug.Assert (_topSizeButton is null);
 
-            _topSizeButton = new Button
+            _topSizeButton = new ()
             {
                 Id = "topSizeButton",
                 CanFocus = true,
@@ -1020,10 +1045,11 @@ public class Border : Adornment
                 NoDecorations = true,
                 NoPadding = true,
                 ShadowStyle = ShadowStyle.None,
-                Text = $"{Glyphs.Diamond}",
+                Text = $"{Glyphs.SizeVertical}",
                 X = Pos.Center () + Parent!.Margin.Thickness.Horizontal,
                 Y = 0,
                 Visible = false,
+                Data = ViewArrangement.TopResizable
             };
             Add (_topSizeButton);
         }
@@ -1032,7 +1058,7 @@ public class Border : Adornment
         {
             Debug.Assert (_rightSizeButton is null);
 
-            _rightSizeButton = new Button
+            _rightSizeButton = new ()
             {
                 Id = "rightSizeButton",
                 CanFocus = true,
@@ -1041,10 +1067,11 @@ public class Border : Adornment
                 NoDecorations = true,
                 NoPadding = true,
                 ShadowStyle = ShadowStyle.None,
-                Text = $"{Glyphs.Diamond}",
+                Text = $"{Glyphs.SizeHorizontal}",
                 X = Pos.AnchorEnd (),
-                Y = Pos.Center () + Parent!.Margin.Thickness.Vertical,
+                Y = Pos.Center () + Parent!.Margin.Thickness.Vertical / 2,
                 Visible = false,
+                Data = ViewArrangement.RightResizable
             };
             Add (_rightSizeButton);
         }
@@ -1053,7 +1080,7 @@ public class Border : Adornment
         {
             Debug.Assert (_leftSizeButton is null);
 
-            _leftSizeButton = new Button
+            _leftSizeButton = new ()
             {
                 Id = "leftSizeButton",
                 CanFocus = true,
@@ -1062,10 +1089,11 @@ public class Border : Adornment
                 NoDecorations = true,
                 NoPadding = true,
                 ShadowStyle = ShadowStyle.None,
-                Text = $"{Glyphs.Diamond}",
+                Text = $"{Glyphs.SizeHorizontal}",
                 X = 0,
-                Y = Pos.Center () + Parent!.Margin.Thickness.Vertical,
+                Y = Pos.Center () + Parent!.Margin.Thickness.Vertical / 2,
                 Visible = false,
+                Data = ViewArrangement.LeftResizable
             };
             Add (_leftSizeButton);
         }
@@ -1074,7 +1102,7 @@ public class Border : Adornment
         {
             Debug.Assert (_bottomSizeButton is null);
 
-            _bottomSizeButton = new Button
+            _bottomSizeButton = new ()
             {
                 Id = "bottomSizeButton",
                 CanFocus = true,
@@ -1083,29 +1111,31 @@ public class Border : Adornment
                 NoDecorations = true,
                 NoPadding = true,
                 ShadowStyle = ShadowStyle.None,
-                Text = $"{Glyphs.Diamond}",
-                X = Pos.Center () + Parent!.Margin.Thickness.Horizontal,
+                Text = $"{Glyphs.SizeVertical}",
+                X = Pos.Center () + Parent!.Margin.Thickness.Horizontal / 2,
                 Y = Pos.AnchorEnd (),
                 Visible = false,
+                Data = ViewArrangement.BottomResizable
             };
             Add (_bottomSizeButton);
         }
-
 
         if (arrangement == ViewArrangement.Fixed)
         {
             // Keyboard mode
             if (Parent!.Arrangement.HasFlag (ViewArrangement.Movable))
             {
-                _arranging = ViewArrangement.Movable;
                 _moveButton!.Visible = true;
             }
 
             if (Parent!.Arrangement.HasFlag (ViewArrangement.Resizable))
             {
-                _arranging = ViewArrangement.Resizable;
                 _allSizeButton!.Visible = true;
             }
+
+            _arranging = ViewArrangement.Movable;
+            CanFocus = true;
+            SetFocus ();
         }
         else
         {
@@ -1116,55 +1146,74 @@ public class Border : Adornment
             {
                 case ViewArrangement.Movable:
                     _moveButton!.Visible = true;
+
                     break;
 
                 case ViewArrangement.RightResizable | ViewArrangement.BottomResizable:
                 case ViewArrangement.Resizable:
                     _rightSizeButton!.Visible = true;
                     _bottomSizeButton!.Visible = true;
-                    _allSizeButton!.X = Pos.AnchorEnd ();
-                    _allSizeButton!.Y = Pos.AnchorEnd ();
-                    _allSizeButton!.Visible = true;
+
+                    if (_allSizeButton is { })
+                    {
+                        _allSizeButton!.X = Pos.AnchorEnd ();
+                        _allSizeButton!.Y = Pos.AnchorEnd ();
+                        _allSizeButton!.Visible = true;
+                    }
+
                     break;
 
                 case ViewArrangement.LeftResizable:
                     _leftSizeButton!.Visible = true;
+
                     break;
 
                 case ViewArrangement.RightResizable:
                     _rightSizeButton!.Visible = true;
+
                     break;
 
                 case ViewArrangement.TopResizable:
                     _topSizeButton!.Visible = true;
+
                     break;
 
                 case ViewArrangement.BottomResizable:
                     _bottomSizeButton!.Visible = true;
+
                     break;
 
                 case ViewArrangement.LeftResizable | ViewArrangement.BottomResizable:
                     _rightSizeButton!.Visible = true;
                     _bottomSizeButton!.Visible = true;
-                    _allSizeButton!.X = 0;
-                    _allSizeButton!.Y = Pos.AnchorEnd ();
-                    _allSizeButton!.Visible = true;
+
+                    if (_allSizeButton is { })
+                    {
+                        _allSizeButton.X = 0;
+                        _allSizeButton.Y = Pos.AnchorEnd ();
+                        _allSizeButton.Visible = true;
+                    }
+
                     break;
 
                 case ViewArrangement.LeftResizable | ViewArrangement.TopResizable:
                     _leftSizeButton!.Visible = true;
                     _topSizeButton!.Visible = true;
+
                     break;
 
                 case ViewArrangement.RightResizable | ViewArrangement.TopResizable:
                     _rightSizeButton!.Visible = true;
                     _topSizeButton!.Visible = true;
-                    _allSizeButton!.X = Pos.AnchorEnd ();
-                    _allSizeButton!.Y = 0;
-                    _allSizeButton!.Visible = true;
+
+                    if (_allSizeButton is { })
+                    {
+                        _allSizeButton.X = Pos.AnchorEnd ();
+                        _allSizeButton.Y = 0;
+                        _allSizeButton.Visible = true;
+                    }
 
                     break;
-
             }
         }
 
@@ -1173,22 +1222,24 @@ public class Border : Adornment
             if (arrangement == ViewArrangement.Fixed)
             {
                 // Keyboard mode - enable nav
-                CanFocus = true;
-                SetFocus ();
+
             }
+
             return true;
         }
 
         // Hack for now
-        EndArrange ();
+        EndArrangeMode ();
+
         return false;
     }
 
     private void AddArrangeModeKeyBindings ()
     {
-        AddCommand (Command.Quit, EndArrange);
+        AddCommand (Command.Quit, EndArrangeMode);
 
-        AddCommand (Command.Up,
+        AddCommand (
+                    Command.Up,
                     () =>
                     {
                         if (Parent is null)
@@ -1212,7 +1263,8 @@ public class Border : Adornment
                         return true;
                     });
 
-        AddCommand (Command.Down,
+        AddCommand (
+                    Command.Down,
                     () =>
                     {
                         if (Parent is null)
@@ -1232,7 +1284,9 @@ public class Border : Adornment
 
                         return true;
                     });
-        AddCommand (Command.Left,
+
+        AddCommand (
+                    Command.Left,
                     () =>
                     {
                         if (Parent is null)
@@ -1252,10 +1306,12 @@ public class Border : Adornment
                                 Parent!.Width = Parent.Width! - 1;
                             }
                         }
+
                         return true;
                     });
 
-        AddCommand (Command.Right,
+        AddCommand (
+                    Command.Right,
                     () =>
                     {
                         if (Parent is null)
@@ -1276,18 +1332,25 @@ public class Border : Adornment
                         return true;
                     });
 
-        AddCommand (Command.Tab, () =>
-                                 {
-                                     AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        AddCommand (
+                    Command.Tab,
+                    () =>
+                    {
+                        AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+                        _arranging = (ViewArrangement)(Focused?.Data ?? ViewArrangement.Fixed);
 
-                                     return true; // Always eat
-                                 });
-        AddCommand (Command.BackTab, () =>
-                                     {
-                                         AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
+                        return true; // Always eat
+                    });
 
-                                         return true;  // Always eat
-                                     });
+        AddCommand (
+                    Command.BackTab,
+                    () =>
+                    {
+                        AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
+                        _arranging = (ViewArrangement)(Focused?.Data ?? ViewArrangement.Fixed);
+
+                        return true; // Always eat
+                    });
 
         KeyBindings.Add (Key.Esc, KeyBindingScope.HotKey, Command.Quit);
         KeyBindings.Add (Application.ArrangeKey, KeyBindingScope.HotKey, Command.Quit);
@@ -1313,11 +1376,11 @@ public class Border : Adornment
 
         if (!Thickness.Contains (Frame, framePos))
         {
-            EndArrange ();
+            EndArrangeMode ();
         }
     }
 
-    private bool? EndArrange ()
+    private bool? EndArrangeMode ()
     {
         // Debug.Assert (_arranging != ViewArrangement.Fixed);
         _arranging = ViewArrangement.Fixed;
@@ -1390,5 +1453,4 @@ public class Border : Adornment
         _dragPosition = null;
         base.Dispose (disposing);
     }
-
 }
