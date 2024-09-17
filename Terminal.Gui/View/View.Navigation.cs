@@ -488,7 +488,6 @@ public partial class View // Focus and cross-view navigation management (TabStop
         if (previousFocusedView is { HasFocus: true } && GetFocusChain (NavigationDirection.Forward, TabStop).Contains (previousFocusedView))
         {
             previousFocusedView.SetHasFocusFalse (this);
-            Debug.Assert (!_hasFocus);
         }
 
         _previouslyFocused = null;
