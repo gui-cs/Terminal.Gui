@@ -24,6 +24,11 @@ public class AdornmentsEditor : View
 
         TabStop = TabBehavior.TabGroup;
 
+        _expandButton = new ()
+        {
+            Orientation = Orientation.Horizontal
+        };
+
         Initialized += AdornmentsEditor_Initialized;
     }
 
@@ -138,15 +143,15 @@ public class AdornmentsEditor : View
         base.Dispose (disposing);
     }
 
+    private ExpanderButton? _expandButton;
+
+    public ExpanderButton? ExpandButton => _expandButton;
+
     private void AdornmentsEditor_Initialized (object? sender, EventArgs e)
     {
         BorderStyle = LineStyle.Dotted;
 
-        var expandButton = new ExpanderButton
-        {
-            Orientation = Orientation.Horizontal
-        };
-        Border.Add (expandButton);
+        Border.Add (_expandButton);
 
         _lblView = new ()
         {

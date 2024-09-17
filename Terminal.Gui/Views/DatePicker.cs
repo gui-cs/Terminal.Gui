@@ -184,7 +184,6 @@ public class DatePicker : View
     private void SetInitialProperties (DateTime date)
     {
         _date = date;
-        Title = "Date Picker";
         BorderStyle = LineStyle.Single;
         Date = date;
         _dateLabel = new Label { X = 0, Y = 0, Text = "Date: " };

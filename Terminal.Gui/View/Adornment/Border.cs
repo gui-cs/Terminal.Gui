@@ -1222,7 +1222,7 @@ public class Border : Adornment
             if (arrangement == ViewArrangement.Fixed)
             {
                 // Keyboard mode - enable nav
-
+                _arranging = (ViewArrangement)(Focused?.Data ?? ViewArrangement.Fixed);
             }
 
             return true;
