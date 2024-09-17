@@ -83,8 +83,6 @@ public class ApplicationNavigation
             return;
         }
 
-        //Debug.Assert(value is {});
-
         _focused = value;
 
         FocusedChanged?.Invoke (null, EventArgs.Empty);

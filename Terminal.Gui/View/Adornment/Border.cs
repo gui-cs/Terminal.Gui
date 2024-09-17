@@ -289,7 +289,7 @@ public class Border : Adornment
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/3312
         if (!_dragPosition.HasValue && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
-            Parent.SetFocus ();
+            Parent!.SetFocus ();
             ApplicationOverlapped.BringOverlappedTopToFront ();
 
             if (!Parent!.Arrangement.HasFlag (ViewArrangement.Movable)
@@ -451,7 +451,7 @@ public class Border : Adornment
         {
             if (_dragPosition.HasValue)
             {
-                if (Parent.SuperView is null)
+                if (Parent!.SuperView is null)
                 {
                     // Redraw the entire app window.
                     Application.Top!.SetNeedsDisplay ();

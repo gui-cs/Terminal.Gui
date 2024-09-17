@@ -589,7 +589,6 @@ public partial class View // Focus and cross-view navigation management (TabStop
         {
             if (superViewOrParent?._previouslyFocused is { })
             {
-                Debug.Assert (!superViewOrParent._previouslyFocused.WasDisposed);
                 if (superViewOrParent._previouslyFocused != this)
                 {
                     superViewOrParent?._previouslyFocused?.SetFocus ();
