@@ -28,6 +28,7 @@ public class Adornment : View
     {
         // By default Adornments can't get focus; has to be enabled specifically.
         CanFocus = false;
+        TabStop = TabBehavior.NoStop;
         Parent = parent;
     }
 

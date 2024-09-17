@@ -162,7 +162,10 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         bool hadFocus = view.HasFocus;
         bool couldFocus = view.CanFocus;
 
-        view.CanFocus = false; // If view had focus, this will ensure it doesn't and it stays that way
+        if (hadFocus)
+        {
+            view.CanFocus = false; // If view had focus, this will ensure it doesn't and it stays that way
+        }
         Debug.Assert (!view.HasFocus);
 
         _subviews.Remove (view);

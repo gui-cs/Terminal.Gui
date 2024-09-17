@@ -329,7 +329,7 @@ public class CanFocusTests () : TestsAllViews
         Application.Current.Add (label, view);
 
         Application.Current.SetFocus ();
-        Assert.Equal (view, Application.Navigation.GetFocused());
+        Assert.Equal (view, Application.Navigation.GetFocused ());
         Assert.False (label.CanFocus);
         Assert.False (label.HasFocus);
         Assert.True (view.CanFocus);

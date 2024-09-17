@@ -286,14 +286,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// </returns>
     internal bool RestoreFocus ()
     {
-        if (Focused is null && _subviews?.Count > 0)
-        {
-            if (_previouslyFocused is { })
-            {
-                return _previouslyFocused.SetFocus ();
-            }
+        View [] indicies = GetFocusChain (NavigationDirection.Forward, TabStop);
 
-            return false;
+        if (Focused is null && _previouslyFocused is { } && indicies.Contains (_previouslyFocused))
+        {
+            return _previouslyFocused.SetFocus ();
         }
 
         return false;
@@ -368,6 +365,12 @@ public partial class View // Focus and cross-view navigation management (TabStop
             else
             {
                 SetHasFocusFalse (null);
+
+                if (_hasFocus)
+                {
+                    // force it.
+                    _hasFocus = false;
+                }
             }
         }
         get => _hasFocus;
@@ -477,25 +480,18 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 if (!AdvanceFocus (NavigationDirection.Forward, null))
                 {
                     // Couldn't advance, so we're the most focused view in the application
+                    Application.Navigation?.SetFocused (this);
                 }
             }
         }
 
-        if (previousFocusedView is { HasFocus: true } && Subviews.Contains (previousFocusedView))
+        if (previousFocusedView is { HasFocus: true } && GetFocusChain (NavigationDirection.Forward, TabStop).Contains (previousFocusedView))
         {
             previousFocusedView.SetHasFocusFalse (this);
-        }
-
-        if (previousFocusedView is { HasFocus: true })
-        {
-            if (previousFocusedView.SuperView is Adornment a)
-            {
-                previousFocusedView.SetHasFocusFalse (this);
-            }
+            Debug.Assert (!_hasFocus);
         }
 
         _previouslyFocused = null;
-        Application.Navigation?.SetFocused (this);
 
         if (Arrangement.HasFlag (ViewArrangement.Overlapped))
         {
@@ -633,6 +629,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             // No other focusable view to be found. Just "leave" us...
         }
 
+
         // Before we can leave focus, we need to make sure that all views down the subview-hierarchy have left focus.
         View? mostFocused = MostFocused;
 
@@ -646,6 +643,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 if (bottom.HasFocus)
                 {
                     bottom.SetHasFocusFalse (newFocusedView, true);
+
+                    Debug.Assert (_hasFocus);
                 }
 
                 bottom = bottom.SuperView;
@@ -653,8 +652,12 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
             if (bottom == this && bottom.SuperView is Adornment a)
             {
-                a.SetHasFocusFalse (newFocusedView, true);
+                //a.SetHasFocusFalse (newFocusedView, true);
+
+                Debug.Assert (_hasFocus);
             }
+
+            Debug.Assert (_hasFocus);
 
         }
 

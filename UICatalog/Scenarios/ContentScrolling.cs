@@ -128,12 +128,13 @@ public class ContentScrolling : Scenario
         // Add Scroll Setting UI to Padding
         view.Padding.Thickness = new (0, 3, 0, 0);
         view.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
+        view.Padding.CanFocus = true;
 
         var cbAllowNegativeX = new CheckBox
         {
             Title = "Allow _X < 0",
             Y = 0,
-            CanFocus = false
+            CanFocus = true
         };
         cbAllowNegativeX.CheckedState = view.ViewportSettings.HasFlag(ViewportSettings.AllowNegativeX) ? CheckState.Checked : CheckState.UnChecked;
         cbAllowNegativeX.CheckedStateChanging += AllowNegativeX_Toggle;
@@ -157,7 +158,7 @@ public class ContentScrolling : Scenario
             Title = "Allow _Y < 0",
             X = Pos.Right (cbAllowNegativeX) + 1,
             Y = 0,
-            CanFocus = false
+            CanFocus = true
         };
         cbAllowNegativeY.CheckedState = view.ViewportSettings.HasFlag(ViewportSettings.AllowNegativeY) ? CheckState.Checked : CheckState.UnChecked;
         cbAllowNegativeY.CheckedStateChanging += AllowNegativeY_Toggle;
@@ -180,7 +181,7 @@ public class ContentScrolling : Scenario
         {
             Title = "All_ow X > Content",
             Y = Pos.Bottom (cbAllowNegativeX),
-            CanFocus = false
+            CanFocus = true
         };
         cbAllowXGreaterThanContentWidth.CheckedState = view.ViewportSettings.HasFlag(ViewportSettings.AllowXGreaterThanContentWidth) ? CheckState.Checked : CheckState.UnChecked;
         cbAllowXGreaterThanContentWidth.CheckedStateChanging += AllowXGreaterThanContentWidth_Toggle;
@@ -204,7 +205,7 @@ public class ContentScrolling : Scenario
             Title = "Allo_w Y > Content",
             X = Pos.Right (cbAllowXGreaterThanContentWidth) + 1,
             Y = Pos.Bottom (cbAllowNegativeX),
-            CanFocus = false
+            CanFocus = true
         };
         cbAllowYGreaterThanContentHeight.CheckedState = view.ViewportSettings.HasFlag(ViewportSettings.AllowYGreaterThanContentHeight) ? CheckState.Checked : CheckState.UnChecked;
         cbAllowYGreaterThanContentHeight.CheckedStateChanging += AllowYGreaterThanContentHeight_Toggle;
@@ -233,7 +234,8 @@ public class ContentScrolling : Scenario
         {
             Value = view.GetContentSize ().Width,
             X = Pos.Right (labelContentSize) + 1,
-            Y = Pos.Top (labelContentSize)
+            Y = Pos.Top (labelContentSize),
+            CanFocus = true
         };
         contentSizeWidth.ValueChanging += ContentSizeWidth_ValueChanged;
 
@@ -261,7 +263,7 @@ public class ContentScrolling : Scenario
             Value = view.GetContentSize ().Height,
             X = Pos.Right (labelComma) + 1,
             Y = Pos.Top (labelContentSize),
-            CanFocus = false
+            CanFocus = true
         };
         contentSizeHeight.ValueChanging += ContentSizeHeight_ValueChanged;
 
@@ -277,17 +279,17 @@ public class ContentScrolling : Scenario
             view.SetContentSize (view.GetContentSize () with { Height = e.NewValue });
         }
 
-        var cbClearOnlyVisible = new CheckBox
+        var cbClearContentOnly = new CheckBox
         {
             Title = "ClearContentOnly",
             X = Pos.Right (contentSizeHeight) + 1,
             Y = Pos.Top (labelContentSize),
-            CanFocus = false
+            CanFocus = true
         };
-        cbClearOnlyVisible.CheckedState = view.ViewportSettings.HasFlag(ViewportSettings.ClearContentOnly) ? CheckState.Checked : CheckState.UnChecked;
-        cbClearOnlyVisible.CheckedStateChanging += ClearVisibleContentOnly_Toggle;
+        cbClearContentOnly.CheckedState = view.ViewportSettings.HasFlag(ViewportSettings.ClearContentOnly) ? CheckState.Checked : CheckState.UnChecked;
+        cbClearContentOnly.CheckedStateChanging += ClearContentOnly_Toggle;
 
-        void ClearVisibleContentOnly_Toggle (object sender, CancelEventArgs<CheckState> e)
+        void ClearContentOnly_Toggle (object sender, CancelEventArgs<CheckState> e)
         {
             if (e.NewValue == CheckState.Checked)
             {
@@ -299,17 +301,17 @@ public class ContentScrolling : Scenario
             }
         }
 
-        var cbDoNotClipContent = new CheckBox
+        var cbClipContentOnly = new CheckBox
         {
             Title = "ClipContentOnly",
-            X = Pos.Right (cbClearOnlyVisible) + 1,
+            X = Pos.Right (cbClearContentOnly) + 1,
             Y = Pos.Top (labelContentSize),
-            CanFocus = false
+            CanFocus = true
         };
-        cbDoNotClipContent.CheckedState = view.ViewportSettings.HasFlag (ViewportSettings.ClipContentOnly) ? CheckState.Checked : CheckState.UnChecked;
-        cbDoNotClipContent.CheckedStateChanging += ClipVisibleContentOnly_Toggle;
+        cbClipContentOnly.CheckedState = view.ViewportSettings.HasFlag (ViewportSettings.ClipContentOnly) ? CheckState.Checked : CheckState.UnChecked;
+        cbClipContentOnly.CheckedStateChanging += ClipContentOnlyOnly_Toggle;
 
-        void ClipVisibleContentOnly_Toggle (object sender, CancelEventArgs<CheckState> e)
+        void ClipContentOnlyOnly_Toggle (object sender, CancelEventArgs<CheckState> e)
         {
             if (e.NewValue == CheckState.Checked)
             {
@@ -321,7 +323,7 @@ public class ContentScrolling : Scenario
             }
         }
 
-        view.Padding.Add (labelContentSize, contentSizeWidth, labelComma, contentSizeHeight, cbClearOnlyVisible, cbDoNotClipContent);
+        view.Padding.Add (labelContentSize, contentSizeWidth, labelComma, contentSizeHeight, cbClearContentOnly, cbClipContentOnly);
 
         // Add demo views to show that things work correctly
         var textField = new TextField { X = 20, Y = 7, Width = 15, Text = "Test TextField" };
