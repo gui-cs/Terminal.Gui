@@ -1322,11 +1322,11 @@ e
         Label label = new () { Text = "label" };
         View view = new () { Text = "view", CanFocus = true };
         Application.Navigation = new ();
-        Application.Current = new ();
-        Application.Current.Add (label, view);
+        Application.Top = new ();
+        Application.Top.Add (label, view);
 
-        Application.Current.SetFocus ();
-        Assert.Equal (view, Application.Current.MostFocused);
+        Application.Top.SetFocus ();
+        Assert.Equal (view, Application.Top.MostFocused);
         Assert.False (label.CanFocus);
         Assert.False (label.HasFocus);
         Assert.True (view.CanFocus);
@@ -1351,7 +1351,7 @@ e
         Assert.False (label.HasFocus);
         Assert.True (view.HasFocus);
 
-        Application.Current.Dispose ();
+        Application.Top.Dispose ();
         Application.ResetState ();
     }
 
@@ -1374,15 +1374,15 @@ e
             Height = 1,
             CanFocus = true
         };
-        Application.Current = new ()
+        Application.Top = new ()
         {
             Width = 10,
             Height = 10
         };
-        Application.Current.Add (label, view);
+        Application.Top.Add (label, view);
 
-        Application.Current.SetFocus ();
-        Assert.Equal (view, Application.Current.MostFocused);
+        Application.Top.SetFocus ();
+        Assert.Equal (view, Application.Top.MostFocused);
         Assert.False (label.CanFocus);
         Assert.False (label.HasFocus);
         Assert.True (view.CanFocus);
@@ -1408,7 +1408,7 @@ e
         Assert.False (label.HasFocus);
         Assert.True (view.HasFocus);
 
-        Application.Current.Dispose ();
+        Application.Top.Dispose ();
         Application.ResetState ();
     }
 }

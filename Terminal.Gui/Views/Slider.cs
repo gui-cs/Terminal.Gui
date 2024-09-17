@@ -848,7 +848,7 @@ public class Slider<T> : View, IOrientation
 
         if (IsInitialized)
         {
-            normalAttr = ColorScheme?.Normal ?? Application.Current.ColorScheme.Normal;
+            normalAttr = ColorScheme?.Normal ?? Application.Top.ColorScheme.Normal;
             setAttr = Style.SetChar.Attribute ?? ColorScheme!.HotNormal;
         }
 

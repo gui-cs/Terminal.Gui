@@ -95,7 +95,7 @@ public static partial class Application // Keyboard handling
             return true;
         }
 
-        if (Current is null)
+        if (Top is null)
         {
             foreach (Toplevel topLevel in TopLevels.ToList ())
             {
@@ -112,7 +112,7 @@ public static partial class Application // Keyboard handling
         }
         else
         {
-            if (Current.NewKeyDownEvent (keyEvent))
+            if (Top.NewKeyDownEvent (keyEvent))
             {
                 return true;
             }
@@ -285,15 +285,7 @@ public static partial class Application // Keyboard handling
                     Command.Quit,
                     static () =>
                     {
-                        if (ApplicationOverlapped.OverlappedTop is { })
-                        {
-                            RequestStop (Current!);
-                        }
-                        else
-                        {
-                            RequestStop ();
-                        }
-
+                        RequestStop ();
                         return true;
                     }
                    );
@@ -318,35 +310,11 @@ public static partial class Application // Keyboard handling
 
         AddCommand (
                     Command.NextTabGroup,
-                    static () =>
-                    {
-                        // TODO: This OverlapppedTop tomfoolery goes away in addressing #2491
-                        if (ApplicationOverlapped.OverlappedTop is { })
-                        {
-                            ApplicationOverlapped.OverlappedMoveNext ();
-
-                            return true;
-                        }
-
-                        return Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup);
-                    }
-                   );
+                    static () => Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup));
 
         AddCommand (
                     Command.PreviousTabGroup,
-                    static () =>
-                    {
-                        // TODO: This OverlapppedTop tomfoolery goes away in addressing #2491
-                        if (ApplicationOverlapped.OverlappedTop is { })
-                        {
-                            ApplicationOverlapped.OverlappedMovePrevious ();
-
-                            return true;
-                        }
-
-                        return Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup);
-                    }
-                   );
+                    static () => Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup));
 
         AddCommand (
                     Command.Refresh,

@@ -290,7 +290,6 @@ public class Border : Adornment
         if (!_dragPosition.HasValue && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
             Parent!.SetFocus ();
-            ApplicationOverlapped.BringOverlappedTopToFront ();
 
             if (!Parent!.Arrangement.HasFlag (ViewArrangement.Movable)
                 && !Parent!.Arrangement.HasFlag (ViewArrangement.BottomResizable)
@@ -580,6 +579,7 @@ public class Border : Adornment
 
                         break;
                 }
+                Application.Refresh ();
 
                 return true;
             }
@@ -1260,6 +1260,8 @@ public class Border : Adornment
                             }
                         }
 
+                        Application.Refresh ();
+
                         return true;
                     });
 
@@ -1281,6 +1283,8 @@ public class Border : Adornment
                         {
                             Parent!.Height = Parent.Height! + 1;
                         }
+
+                        Application.Refresh ();
 
                         return true;
                     });
@@ -1307,6 +1311,8 @@ public class Border : Adornment
                             }
                         }
 
+                        Application.Refresh ();
+
                         return true;
                     });
 
@@ -1328,6 +1334,8 @@ public class Border : Adornment
                         {
                             Parent!.Width = Parent.Width! + 1;
                         }
+
+                        Application.Refresh ();
 
                         return true;
                     });

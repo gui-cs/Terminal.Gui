@@ -136,7 +136,7 @@ public class PosCombineTests (ITestOutputHelper output)
 
         Assert.Throws<InvalidOperationException> (() => Application.Run ());
         top.Dispose ();
-        Application.Shutdown ();
+        Application.ResetState (ignoreDisposed: true);
     }
 
 }

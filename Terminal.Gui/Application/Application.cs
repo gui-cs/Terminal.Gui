@@ -149,7 +149,6 @@ public static partial class Application
         }
 
         TopLevels.Clear ();
-        Current = null;
 #if DEBUG_IDISPOSABLE
 
         // Don't dispose the Top. It's up to caller dispose it

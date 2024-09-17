@@ -961,7 +961,6 @@ public class ToScreenTests (ITestOutputHelper output)
 
         Application.Begin (top);
 
-        Assert.Equal (Application.Current, top);
         Assert.Equal (new (0, 0, 80, 25), new Rectangle (0, 0, View.Driver.Cols, View.Driver.Rows));
         Assert.Equal (new (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
         Assert.Equal (new (0, 0, 80, 25), top.Frame);
@@ -1117,7 +1116,6 @@ public class ToScreenTests (ITestOutputHelper output)
 
         Application.Begin (top);
 
-        Assert.Equal (Application.Current, top);
         Assert.Equal (new (0, 0, 80, 25), new Rectangle (0, 0, View.Driver.Cols, View.Driver.Rows));
         Assert.NotEqual (new (0, 0, View.Driver.Cols, View.Driver.Rows), top.Frame);
         Assert.Equal (new (3, 2, 20, 10), top.Frame);

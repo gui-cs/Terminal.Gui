@@ -144,10 +144,10 @@ internal sealed class Menu : View
 
     public Menu ()
     {
-        if (Application.Current is { })
+        if (Application.Top is { })
         {
-            Application.Current.DrawContentComplete += Current_DrawContentComplete;
-            Application.Current.SizeChanging += Current_TerminalResized;
+            Application.Top.DrawContentComplete += Current_DrawContentComplete;
+            Application.Top.SizeChanging += Current_TerminalResized;
         }
 
         Application.MouseEvent += Application_RootMouseEvent;
@@ -607,6 +607,7 @@ internal sealed class Menu : View
 
         Application.UngrabMouse ();
         _host.CloseAllMenus ();
+        Application.Driver!.ClearContents ();
         Application.Refresh ();
 
         _host.Run (action);
@@ -952,10 +953,10 @@ internal sealed class Menu : View
     {
         RemoveKeyBindingsHotKey (_barItems);
 
-        if (Application.Current is { })
+        if (Application.Top is { })
         {
-            Application.Current.DrawContentComplete -= Current_DrawContentComplete;
-            Application.Current.SizeChanging -= Current_TerminalResized;
+            Application.Top.DrawContentComplete -= Current_DrawContentComplete;
+            Application.Top.SizeChanging -= Current_TerminalResized;
         }
 
         Application.MouseEvent -= Application_RootMouseEvent;

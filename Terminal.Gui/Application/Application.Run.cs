@@ -54,11 +54,6 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         }
 #endif
 
-        if (toplevel.IsOverlappedContainer && ApplicationOverlapped.OverlappedTop != toplevel && ApplicationOverlapped.OverlappedTop is { })
-        {
-            throw new InvalidOperationException ("Only one Overlapped Container is allowed.");
-        }
-
         // Ensure the mouse is ungrabbed.
         MouseGrabView = null;
 
@@ -96,11 +91,6 @@ public static partial class Application // Run (Begin, Run, End, Stop)
                     throw new ObjectDisposedException (Top.GetType ().FullName);
                 }
             }
-            else if (ApplicationOverlapped.OverlappedTop is { } && toplevel != Top && TopLevels.Contains (Top!))
-            {
-                // BUGBUG: Don't call OnLeave/OnEnter directly! Set HasFocus to false and let the system handle it.
-                //Top!.OnLeave (toplevel);
-            }
 
             // BUGBUG: We should not depend on `Id` internally.
             // BUGBUG: It is super unclear what this code does anyway.
@@ -135,79 +125,46 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             }
         }
 
-        if (Top is null || toplevel.IsOverlappedContainer)
+        if (Top is null)
         {
             Top = toplevel;
         }
 
-        var refreshDriver = true;
-
-        if (ApplicationOverlapped.OverlappedTop is null
-            || toplevel.IsOverlappedContainer
-            || (Current?.Modal == false && toplevel.Modal)
-            || (Current?.Modal == false && !toplevel.Modal)
-            || (Current?.Modal == true && toplevel.Modal))
+        if ((Top?.Modal == false && toplevel.Modal)
+            || (Top?.Modal == false && !toplevel.Modal)
+            || (Top?.Modal == true && toplevel.Modal))
         {
             if (toplevel.Visible)
             {
-                if (Current is { HasFocus: true })
+                if (Top is { HasFocus: true })
                 {
-                    Current.HasFocus = false;
+                    Top.HasFocus = false;
                 }
 
-                Current?.OnDeactivate (toplevel);
-                Toplevel previousCurrent = Current!;
+                Top?.OnDeactivate (toplevel);
+                Toplevel previousCurrent = Top!;
 
-                Current = toplevel;
-                Current.OnActivate (previousCurrent);
-
-                ApplicationOverlapped.SetCurrentOverlappedAsTop ();
+                Top = toplevel;
+                Top.OnActivate (previousCurrent);
             }
-            else
-            {
-                refreshDriver = false;
-            }
-        }
-        else if ((toplevel != ApplicationOverlapped.OverlappedTop
-                  && Current?.Modal == true
-                  && !TopLevels.Peek ().Modal)
-                 || (toplevel != ApplicationOverlapped.OverlappedTop && Current?.Running == false))
-        {
-            refreshDriver = false;
-            ApplicationOverlapped.MoveCurrent (toplevel);
-        }
-        else
-        {
-            refreshDriver = false;
-            ApplicationOverlapped.MoveCurrent (Current!);
         }
 
         toplevel.SetRelativeLayout (Driver!.Screen.Size);
-
         toplevel.LayoutSubviews ();
-        toplevel.PositionToplevels ();
 
-        // TODO: Should this use FindDeepestFocusableView instead?
         // Try to set initial focus to any TabStop
         if (!toplevel.HasFocus)
         {
             toplevel.SetFocus ();
         }
 
-        ApplicationOverlapped.BringOverlappedTopToFront ();
+        toplevel.OnLoaded ();
 
-        if (refreshDriver)
+        Refresh ();
+
+        if (PositionCursor ())
         {
-            ApplicationOverlapped.OverlappedTop?.OnChildLoaded (toplevel);
-            toplevel.OnLoaded ();
-            toplevel.SetNeedsDisplay ();
-            toplevel.Draw ();
-            Driver.UpdateScreen ();
-
-            if (PositionCursor (toplevel))
-            {
-                Driver.UpdateCursor ();
-            }
+            Driver.UpdateCursor ();
         }
 
         NotifyNewRunState?.Invoke (toplevel, new (rs));
@@ -226,25 +183,13 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     ///     </para>
     /// </remarks>
     /// <returns><see langword="true"/> if a view positioned the cursor and the position is visible.</returns>
-    internal static bool PositionCursor (View view)
+    internal static bool PositionCursor ()
     {
         // Find the most focused view and position the cursor there.
-        View? mostFocused = view?.MostFocused;
-
-        if (mostFocused is null)
-        {
-            if (view is { HasFocus: true })
-            {
-                mostFocused = view;
-            }
-            else
-            {
-                return false;
-            }
-        }
+        View? mostFocused = Navigation?.GetFocused ();
 
         // If the view is not visible or enabled, don't position the cursor
-        if (!mostFocused.Visible || !mostFocused.Enabled)
+        if (mostFocused is null || !mostFocused.Visible || !mostFocused.Enabled)
         {
             Driver!.GetCursorVisibility (out CursorVisibility current);
 
@@ -510,11 +455,12 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// <summary>Triggers a refresh of the entire display.</summary>
     public static void Refresh ()
     {
-        // TODO: Figure out how to remove this call to ClearContents. Refresh should just repaint damaged areas, not clear
-        Driver!.ClearContents ();
-
         foreach (Toplevel v in TopLevels.Reverse ())
         {
+            if (v.LayoutNeeded)
+            {
+                v.LayoutSubviews ();
+            }
             if (v.Visible)
             {
                 v.SetNeedsDisplay ();
@@ -523,7 +469,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             }
         }
 
-        Driver.Refresh ();
+        Driver!.Refresh ();
     }
 
     /// <summary>This event is raised on each iteration of the main loop.</summary>
@@ -586,80 +532,22 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
             MainLoop.RunIteration ();
             Iteration?.Invoke (null, new ());
-            EnsureModalOrVisibleAlwaysOnTop (state.Toplevel);
-
-            // TODO: Overlapped - Move elsewhere
-            if (state.Toplevel != Current)
-            {
-                ApplicationOverlapped.OverlappedTop?.OnDeactivate (state.Toplevel);
-                state.Toplevel = Current;
-                ApplicationOverlapped.OverlappedTop?.OnActivate (state.Toplevel!);
-                Top!.SetSubViewNeedsDisplay ();
-                Refresh ();
-            }
         }
 
         firstIteration = false;
 
-        if (Current == null)
+        if (Top is null)
         {
             return;
         }
 
-        if (state.Toplevel != Top && (Top!.NeedsDisplay || Top.SubViewNeedsDisplay || Top.LayoutNeeded))
-        {
-            state.Toplevel!.SetNeedsDisplay (state.Toplevel.Frame);
-            Top.Draw ();
+        Refresh ();
 
-            foreach (Toplevel top in TopLevels.Reverse ())
-            {
-                if (top != Top && top != state.Toplevel)
-                {
-                    top.SetNeedsDisplay ();
-                    top.SetSubViewNeedsDisplay ();
-                    top.Draw ();
-                }
-            }
-        }
-
-        if (TopLevels.Count == 1
-            && state.Toplevel == Top
-            && (Driver!.Cols != state.Toplevel!.Frame.Width
-                || Driver!.Rows != state.Toplevel.Frame.Height)
-            && (state.Toplevel.NeedsDisplay
-                || state.Toplevel.SubViewNeedsDisplay
-                || state.Toplevel.LayoutNeeded))
-        {
-            Driver.ClearContents ();
-        }
-
-        if (state.Toplevel!.NeedsDisplay || state.Toplevel.SubViewNeedsDisplay || state.Toplevel.LayoutNeeded || ApplicationOverlapped.OverlappedChildNeedsDisplay ())
-        {
-            state.Toplevel.SetNeedsDisplay ();
-            state.Toplevel.Draw ();
-            Driver!.UpdateScreen ();
-
-            //Driver.UpdateCursor ();
-        }
-
-        if (PositionCursor (state.Toplevel))
+        if (PositionCursor ())
         {
             Driver!.UpdateCursor ();
         }
 
-        //        else
-        {
-            //if (PositionCursor (state.Toplevel))
-            //{
-            //    Driver.Refresh ();
-            //}
-            //Driver.UpdateCursor ();
-        }
-
-        if (state.Toplevel != Top && !state.Toplevel.Modal && (Top!.NeedsDisplay || Top.SubViewNeedsDisplay || Top.LayoutNeeded))
-        {
-            Top.Draw ();
-        }
     }
 
     /// <summary>Stops the provided <see cref="Toplevel"/>, causing or the <paramref name="top"/> if provided.</summary>
@@ -673,112 +561,26 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// </remarks>
     public static void RequestStop (Toplevel? top = null)
     {
-        if (ApplicationOverlapped.OverlappedTop is null || top is null)
+        if (top is null)
         {
-            top = Current;
+            top = Top;
         }
 
-        if (ApplicationOverlapped.OverlappedTop != null
-            && top!.IsOverlappedContainer
-            && top?.Running == true
-            && (Current?.Modal == false || Current is { Modal: true, Running: false }))
+        if (!top!.Running)
         {
-            ApplicationOverlapped.OverlappedTop.RequestStop ();
+            return;
         }
-        else if (ApplicationOverlapped.OverlappedTop != null
-                 && top != Current
-                 && Current is { Running: true, Modal: true }
-                 && top!.Modal
-                 && top.Running)
+
+        var ev = new ToplevelClosingEventArgs (top);
+        top.OnClosing (ev);
+
+        if (ev.Cancel)
         {
-            var ev = new ToplevelClosingEventArgs (Current);
-            Current.OnClosing (ev);
-
-            if (ev.Cancel)
-            {
-                return;
-            }
-
-            ev = new (top);
-            top.OnClosing (ev);
-
-            if (ev.Cancel)
-            {
-                return;
-            }
-
-            Current.Running = false;
-            OnNotifyStopRunState (Current);
-            top.Running = false;
-            OnNotifyStopRunState (top);
+            return;
         }
-        else if ((ApplicationOverlapped.OverlappedTop != null
-                  && top != ApplicationOverlapped.OverlappedTop
-                  && top != Current
-                  && Current is { Modal: false, Running: true }
-                  && !top!.Running)
-                 || (ApplicationOverlapped.OverlappedTop != null
-                     && top != ApplicationOverlapped.OverlappedTop
-                     && top != Current
-                     && Current is { Modal: false, Running: false }
-                     && !top!.Running
-                     && TopLevels.ToArray () [1].Running))
-        {
-            ApplicationOverlapped.MoveCurrent (top);
-        }
-        else if (ApplicationOverlapped.OverlappedTop != null
-                 && Current != top
-                 && Current?.Running == true
-                 && !top!.Running
-                 && Current?.Modal == true
-                 && top.Modal)
-        {
-            // The Current and the top are both modal so needed to set the Current.Running to false too.
-            Current.Running = false;
-            OnNotifyStopRunState (Current);
-        }
-        else if (ApplicationOverlapped.OverlappedTop != null
-                 && Current == top
-                 && ApplicationOverlapped.OverlappedTop?.Running == true
-                 && Current?.Running == true
-                 && top!.Running
-                 && Current?.Modal == true
-                 && top!.Modal)
-        {
-            // The OverlappedTop was requested to stop inside a modal Toplevel which is the Current and top,
-            // both are the same, so needed to set the Current.Running to false too.
-            Current.Running = false;
-            OnNotifyStopRunState (Current);
-        }
-        else
-        {
-            Toplevel currentTop;
 
-            if (top == Current || (Current?.Modal == true && !top!.Modal))
-            {
-                currentTop = Current!;
-            }
-            else
-            {
-                currentTop = top!;
-            }
-
-            if (!currentTop.Running)
-            {
-                return;
-            }
-
-            var ev = new ToplevelClosingEventArgs (currentTop);
-            currentTop.OnClosing (ev);
-
-            if (ev.Cancel)
-            {
-                return;
-            }
-
-            currentTop.Running = false;
-            OnNotifyStopRunState (currentTop);
-        }
+        top.Running = false;
+        OnNotifyStopRunState (top);
     }
 
     private static void OnNotifyStopRunState (Toplevel top)
@@ -798,14 +600,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     {
         ArgumentNullException.ThrowIfNull (runState);
 
-        if (ApplicationOverlapped.OverlappedTop is { })
-        {
-            ApplicationOverlapped.OverlappedTop.OnChildUnloaded (runState.Toplevel);
-        }
-        else
-        {
-            runState.Toplevel.OnUnloaded ();
-        }
+        runState.Toplevel.OnUnloaded ();
 
         // End the RunState.Toplevel
         // First, take it off the Toplevel Stack
@@ -824,64 +619,25 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         // Notify that it is closing
         runState.Toplevel?.OnClosed (runState.Toplevel);
 
-        // If there is a OverlappedTop that is not the RunState.Toplevel then RunState.Toplevel
-        // is a child of MidTop, and we should notify the OverlappedTop that it is closing
-        if (ApplicationOverlapped.OverlappedTop is { } && !runState.Toplevel!.Modal && runState.Toplevel != ApplicationOverlapped.OverlappedTop)
+        if (TopLevels.Count > 0)
         {
-            ApplicationOverlapped.OverlappedTop.OnChildClosed (runState.Toplevel);
+            Top = TopLevels.Peek ();
         }
 
-        // Set Current and Top to the next TopLevel on the stack
-        if (TopLevels.Count == 0)
+        // BUGBUG: We should not call OnEnter/OnLeave directly; they should only be called by SetHasFocus
+        if (runState.Toplevel is { HasFocus: true })
         {
-            if (Current is { HasFocus: true })
-            {
-                Current.HasFocus = false;
-            }
-            Current = null;
-        }
-        else
-        {
-            if (TopLevels.Count > 1 && TopLevels.Peek () == ApplicationOverlapped.OverlappedTop && ApplicationOverlapped.OverlappedChildren?.Any (t => t.Visible) != null)
-            {
-                ApplicationOverlapped.OverlappedMoveNext ();
-            }
-
-            Current = TopLevels.Peek ();
-
-            if (TopLevels.Count == 1 && Current == ApplicationOverlapped.OverlappedTop)
-            {
-                ApplicationOverlapped.OverlappedTop.OnAllChildClosed ();
-            }
-            else
-            {
-                ApplicationOverlapped.SetCurrentOverlappedAsTop ();
-                // BUGBUG: We should not call OnEnter/OnLeave directly; they should only be called by SetHasFocus
-                if (runState.Toplevel is { HasFocus: true })
-                {
-                    runState.Toplevel.HasFocus = false;
-                }
-
-                if (Current is { HasFocus: false })
-                {
-                    Current.SetFocus ();
-                }
-            }
-
-            Refresh ();
+            runState.Toplevel.HasFocus = false;
         }
 
-        // Don't dispose runState.Toplevel. It's up to caller dispose it
-        // If it's not the same as the current in the RunIteration,
-        // it will be fixed later in the next RunIteration.
-        if (ApplicationOverlapped.OverlappedTop is { } && !TopLevels.Contains (ApplicationOverlapped.OverlappedTop))
+        if (Top is { HasFocus: false })
         {
-            _cachedRunStateToplevel = ApplicationOverlapped.OverlappedTop;
+            Top.SetFocus ();
         }
-        else
-        {
-            _cachedRunStateToplevel = runState.Toplevel;
-        }
+
+        //Refresh ();
+
+        _cachedRunStateToplevel = runState.Toplevel;
 
         runState.Toplevel = null;
         runState.Dispose ();

@@ -1009,14 +1009,14 @@ This is the second line.
 
         Assert.Equal (0, tv.LeftColumn);
         Assert.Equal (Point.Empty, tv.CursorPosition);
-        Application.PositionCursor (top);
+        Application.PositionCursor ();
         Assert.Equal (CursorVisibility.Default, tv.CursorVisibility);
 
         for (var i = 0; i < 12; i++)
         {
             tv.NewMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledRight });
             Assert.Equal (Math.Min (i + 1, 11), tv.LeftColumn);
-            Application.PositionCursor (top);
+            Application.PositionCursor ();
             Application.Driver!.GetCursorVisibility (out CursorVisibility cursorVisibility);
             Assert.Equal (CursorVisibility.Invisible, cursorVisibility);
         }
@@ -1026,7 +1026,7 @@ This is the second line.
             tv.NewMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledLeft });
             Assert.Equal (i - 1, tv.LeftColumn);
 
-            Application.PositionCursor (top);
+            Application.PositionCursor ();
             Application.Driver!.GetCursorVisibility (out CursorVisibility cursorVisibility);
 
             if (i - 1 == 0)
@@ -1061,13 +1061,13 @@ This is the second line.
         Application.Begin (top);
 
         Assert.Equal (0, tv.TopRow);
-        Application.PositionCursor (top);
+        Application.PositionCursor ();
         Assert.Equal (CursorVisibility.Default, tv.CursorVisibility);
 
         for (var i = 0; i < 12; i++)
         {
             tv.NewMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledDown });
-            Application.PositionCursor (top);
+            Application.PositionCursor ();
             Assert.Equal (i + 1, tv.TopRow);
             Application.Driver!.GetCursorVisibility (out CursorVisibility cursorVisibility);
             Assert.Equal (CursorVisibility.Invisible, cursorVisibility);
@@ -1076,10 +1076,10 @@ This is the second line.
         for (var i = 12; i > 0; i--)
         {
             tv.NewMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledUp });
-            Application.PositionCursor (top);
+            Application.PositionCursor ();
             Assert.Equal (i - 1, tv.TopRow);
 
-            Application.PositionCursor (top);
+            Application.PositionCursor ();
             Application.Driver!.GetCursorVisibility (out CursorVisibility cursorVisibility);
 
             if (i - 1 == 0)

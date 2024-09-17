@@ -349,7 +349,6 @@ public class KeyboardTests
 
         top.Dispose ();
         Application.Shutdown ();
-        Assert.Null (Application.Current);
         Assert.Null (Application.Top);
         Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
@@ -395,7 +394,6 @@ public class KeyboardTests
 
         top.Add (view1, view2);
         Application.Top = top;
-        Application.Current = top;
         view1.SetFocus ();
         Assert.True (view1.HasFocus);
         Assert.True (subView1.HasFocus);
@@ -484,7 +482,6 @@ public class KeyboardTests
         var view2 = new View { Id = "view2", CanFocus = true };
         top.Add (view1, view2);
         Application.Top = top;
-        Application.Current = top;
         view1.SetFocus ();
 
         // Act
@@ -537,7 +534,6 @@ public class KeyboardTests
 
         top.Add (view1, view2);
         Application.Top = top;
-        Application.Current = top;
         view1.SetFocus ();
         Assert.True (view1.HasFocus);
         Assert.True (subView1.HasFocus);
@@ -563,7 +559,6 @@ public class KeyboardTests
         var view2 = new View { Id = "view2", CanFocus = true };
         top.Add (view1, view2);
         Application.Top = top;
-        Application.Current = top;
         view1.SetFocus ();
 
         // Act

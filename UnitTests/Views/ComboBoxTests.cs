@@ -903,7 +903,7 @@ One
         Assert.True (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
-//        Application.Begin (top);
+        //        Application.Begin (top);
 
         cb.Draw ();
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -990,7 +990,7 @@ Three
         Application.Navigation = new ();
         var cb = new ComboBox ();
         var top = new Toplevel ();
-        Application.Current = top;
+        Application.Top = top;
 
         top.Add (cb);
         top.FocusDeepest (NavigationDirection.Forward, null);
@@ -1028,6 +1028,8 @@ Three
         Assert.Equal (0, cb.Source.Count);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
-        Application.ResetState ();
+
+        Application.Top.Dispose ();
+        Application.ResetState (ignoreDisposed: true);
     }
 }

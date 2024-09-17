@@ -175,55 +175,7 @@ public partial class Toplevel : View
     /// </summary>
     public virtual void RequestStop ()
     {
-        if (IsOverlappedContainer
-            && Running
-            && (Application.Current == this
-                || Application.Current?.Modal == false
-                || (Application.Current?.Modal == true && Application.Current?.Running == false)))
-        {
-            foreach (Toplevel child in ApplicationOverlapped.OverlappedChildren!)
-            {
-                var ev = new ToplevelClosingEventArgs (this);
-
-                if (child.OnClosing (ev))
-                {
-                    return;
-                }
-
-                child.Running = false;
-                Application.RequestStop (child);
-            }
-
-            Running = false;
-            Application.RequestStop (this);
-        }
-        else if (IsOverlappedContainer && Running && Application.Current?.Modal == true && Application.Current?.Running == true)
-        {
-            var ev = new ToplevelClosingEventArgs (Application.Current);
-
-            if (OnClosing (ev))
-            {
-                return;
-            }
-
-            Application.RequestStop (Application.Current);
-        }
-        else if (!IsOverlappedContainer && Running && (!Modal || (Modal && Application.Current != this)))
-        {
-            var ev = new ToplevelClosingEventArgs (this);
-
-            if (OnClosing (ev))
-            {
-                return;
-            }
-
-            Running = false;
-            Application.RequestStop (this);
-        }
-        else
-        {
-            Application.RequestStop (Application.Current);
-        }
+        Application.RequestStop (Application.Top);
     }
 
     /// <summary>
@@ -246,11 +198,6 @@ public partial class Toplevel : View
 
     internal virtual void OnChildClosed (Toplevel top)
     {
-        if (IsOverlappedContainer)
-        {
-            SetSubViewNeedsDisplay ();
-        }
-
         ChildClosed?.Invoke (this, new (top));
     }
 
@@ -311,26 +258,8 @@ public partial class Toplevel : View
             Clear ();
 
             //LayoutSubviews ();
-            PositionToplevels ();
-
-            if (this == ApplicationOverlapped.OverlappedTop)
-            {
-                // This enables correct draw behavior when switching between overlapped subviews
-                foreach (Toplevel top in ApplicationOverlapped.OverlappedChildren!.AsEnumerable ().Reverse ())
-                {
-                    if (top.Frame.IntersectsWith (Viewport))
-                    {
-                        if (top != this && !top.IsCurrentTop && !OutsideTopFrame (top) && top.Visible)
-                        {
-                            top.SetNeedsLayout ();
-                            top.SetNeedsDisplay (top.Viewport);
-                            top.Draw ();
-                            top.OnRenderLineCanvas ();
-                        }
-                    }
-                }
-            }
-
+            //PositionToplevels ();
+            
             // BUGBUG: This appears to be a hack to get ScrollBarViews to render correctly.
             foreach (View view in Subviews)
             {
@@ -352,35 +281,6 @@ public partial class Toplevel : View
 
     // TODO: Make cancelable?
     internal virtual void OnSizeChanging (SizeChangedEventArgs size) { SizeChanging?.Invoke (this, size); }
-
-    /// <inheritdoc/>
-    public override Point? PositionCursor ()
-    {
-        if (!IsOverlappedContainer)
-        {
-            return null;
-        }
-
-        // This code path only happens when the Toplevel is an Overlapped container
-
-        if (Focused is null)
-        {
-            // TODO: this is an Overlapped hack
-            foreach (Toplevel top in ApplicationOverlapped.OverlappedChildren!)
-            {
-                if (top != this && top.Visible)
-                {
-                    top.SetFocus ();
-
-                    return null;
-                }
-            }
-        }
-
-        Point? cursor2 = base.PositionCursor ();
-
-        return null;
-    }
 
     /// <summary>
     ///     Adjusts the location and size of <paramref name="top"/> within this Toplevel. Virtual method enabling
@@ -416,8 +316,10 @@ public partial class Toplevel : View
             maxWidth -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
         }
 
-        if ((superView != top || top?.SuperView is { } || (top != Application.Top && top!.Modal) || (top?.SuperView is null && ApplicationOverlapped.IsOverlapped (top)))
+        // BUGBUG: The && true is a temp hack
+        if ((superView != top || top?.SuperView is { } || (top != Application.Top && top!.Modal) || (top == Application.Top && top?.SuperView is null))
             && (top!.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y))
+
         {
             if (top?.X is null or PosAbsolute && top?.Frame.X != nx)
             {
@@ -470,6 +372,9 @@ public partial class Toplevel : View
     // TODO: v2 - Not sure this is needed anymore.
     internal void PositionToplevels ()
     {
+        return;
+
+
         PositionToplevel (this);
 
         foreach (View top in Subviews)

@@ -240,7 +240,7 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
     public override void Before (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
-        Application.ResetState ();
+        Application.ResetState (ignoreDisposed: true);
         Assert.Null (Application.Driver);
         Application.Driver = new FakeDriver { Rows = 25, Cols = 25 };
         base.Before (methodUnderTest);
@@ -750,11 +750,11 @@ internal partial class TestHelpers
         string replaced = toReplace;
 
         replaced = Environment.NewLine.Length switch
-                   {
-                       2 when !replaced.Contains ("\r\n") => replaced.Replace ("\n", Environment.NewLine),
-                       1 => replaced.Replace ("\r\n", Environment.NewLine),
-                       var _ => replaced
-                   };
+        {
+            2 when !replaced.Contains ("\r\n") => replaced.Replace ("\n", Environment.NewLine),
+            1 => replaced.Replace ("\r\n", Environment.NewLine),
+            var _ => replaced
+        };
 
         return replaced;
     }

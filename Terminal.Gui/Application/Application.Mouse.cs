@@ -139,7 +139,7 @@ public static partial class Application // Mouse handling
             return;
         }
 
-        var view = View.FindDeepestView (Current, mouseEvent.Position);
+        var view = View.FindDeepestView (Top, mouseEvent.Position);
 
         if (view is { })
         {
@@ -207,23 +207,6 @@ public static partial class Application // Mouse handling
                                               { WantContinuousButtonPressed: true } => view,
                                               _                                     => null
                                           };
-
-        if (view is not Adornment
-         && (view is null || view == ApplicationOverlapped.OverlappedTop)
-         && Current is { Modal: false }
-         && ApplicationOverlapped.OverlappedTop != null
-         && mouseEvent.Flags is not MouseFlags.ReportMousePosition and not 0)
-        {
-            // This occurs when there are multiple overlapped "tops"
-            // E.g. "Mdi" - in the Background Worker Scenario
-            View? top = ApplicationOverlapped.FindDeepestTop (Top!, mouseEvent.Position);
-            view = View.FindDeepestView (top, mouseEvent.Position);
-
-            if (view is { } && view != ApplicationOverlapped.OverlappedTop && top != Current && top is { })
-            {
-                ApplicationOverlapped.MoveCurrent ((Toplevel)top);
-            }
-        }
 
         // May be null before the prior condition or the condition may set it as null.
         // So, the checking must be outside the prior condition.
@@ -310,8 +293,6 @@ public static partial class Application // Mouse handling
                 View = view
             };
         }
-
-        ApplicationOverlapped.BringOverlappedTopToFront ();
     }
 
     #endregion Mouse handling

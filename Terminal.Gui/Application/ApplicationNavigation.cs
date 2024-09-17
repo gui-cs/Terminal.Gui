@@ -85,6 +85,11 @@ public class ApplicationNavigation
 
         _focused = value;
 
+        //if (_focused is { } && Application.PositionCursor ())
+        //{
+        //    Application.Driver?.UpdateCursor ();
+        //}
+
         FocusedChanged?.Invoke (null, EventArgs.Empty);
     }
 
@@ -105,6 +110,6 @@ public class ApplicationNavigation
     /// </returns>
     public bool AdvanceFocus (NavigationDirection direction, TabBehavior? behavior)
     {
-        return Application.Current is { } && Application.Current.AdvanceFocus (direction, behavior);
+        return Application.Top is { } && Application.Top.AdvanceFocus (direction, behavior);
     }
 }
