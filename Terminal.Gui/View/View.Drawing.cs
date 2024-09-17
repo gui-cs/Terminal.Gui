@@ -478,7 +478,7 @@ public partial class View // Drawing APIs
                 return;
             }
 
-            if (SuperView is { })
+            if (SuperView is { } || this == Application.Top)
             {
                 Clear ();
             }

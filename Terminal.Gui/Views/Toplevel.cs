@@ -245,35 +245,35 @@ public partial class Toplevel : View
 
     #region Draw
 
-    /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle viewport)
-    {
-        if (!Visible)
-        {
-            return;
-        }
+    ///// <inheritdoc/>
+    //public override void OnDrawContent (Rectangle viewport)
+    //{
+    //    if (!Visible)
+    //    {
+    //        return;
+    //    }
 
-        if (NeedsDisplay || SubViewNeedsDisplay /*|| LayoutNeeded*/)
-        {
-            Clear ();
+    //    if (NeedsDisplay || SubViewNeedsDisplay /*|| LayoutNeeded*/)
+    //    {
+    //        Clear ();
 
-            //LayoutSubviews ();
-            //PositionToplevels ();
+    //        //LayoutSubviews ();
+    //        //PositionToplevels ();
             
-            // BUGBUG: This appears to be a hack to get ScrollBarViews to render correctly.
-            foreach (View view in Subviews)
-            {
-                if (view.Frame.IntersectsWith (Viewport) && !OutsideTopFrame (this))
-                {
-                    //view.SetNeedsLayout ();
-                    view.SetNeedsDisplay ();
-                    view.SetSubViewNeedsDisplay ();
-                }
-            }
+    //        // BUGBUG: This appears to be a hack to get ScrollBarViews to render correctly.
+    //        foreach (View view in Subviews)
+    //        {
+    //            if (view.Frame.IntersectsWith (Viewport) && !OutsideTopFrame (this))
+    //            {
+    //                //view.SetNeedsLayout ();
+    //                view.SetNeedsDisplay ();
+    //                view.SetSubViewNeedsDisplay ();
+    //            }
+    //        }
 
-            base.OnDrawContent (viewport);
-        }
-    }
+    //        base.OnDrawContent (viewport);
+    //    }
+    //}
 
     #endregion
 
@@ -441,44 +441,5 @@ public class ToplevelEqualityComparer : IEqualityComparer<Toplevel>
         }
 
         return hCode.GetHashCode ();
-    }
-}
-
-/// <summary>
-///     Implements the <see cref="IComparer{T}"/> to sort the <see cref="Toplevel"/> from the
-///     <see cref="ApplicationOverlapped.OverlappedChildren"/> if needed.
-/// </summary>
-public sealed class ToplevelComparer : IComparer<Toplevel>
-{
-    /// <summary>
-    ///     Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the
-    ///     other.
-    /// </summary>
-    /// <param name="x">The first object to compare.</param>
-    /// <param name="y">The second object to compare.</param>
-    /// <returns>
-    ///     A signed integer that indicates the relative values of <paramref name="x"/> and <paramref name="y"/>, as shown
-    ///     in the following table.Value Meaning Less than zero <paramref name="x"/> is less than <paramref name="y"/>.Zero
-    ///     <paramref name="x"/> equals <paramref name="y"/> .Greater than zero <paramref name="x"/> is greater than
-    ///     <paramref name="y"/>.
-    /// </returns>
-    public int Compare (Toplevel? x, Toplevel? y)
-    {
-        if (ReferenceEquals (x, y))
-        {
-            return 0;
-        }
-
-        if (x is null)
-        {
-            return -1;
-        }
-
-        if (y is null)
-        {
-            return 1;
-        }
-
-        return string.CompareOrdinal (x.Id, y.Id);
     }
 }

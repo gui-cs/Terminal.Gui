@@ -461,10 +461,8 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             {
                 v.LayoutSubviews ();
             }
-            if (v.Visible)
+            if (v.Visible && (v.NeedsDisplay || v.SubViewNeedsDisplay))
             {
-                v.SetNeedsDisplay ();
-                v.SetSubViewNeedsDisplay ();
                 v.Draw ();
             }
         }
@@ -622,9 +620,9 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         if (TopLevels.Count > 0)
         {
             Top = TopLevels.Peek ();
+            Top.SetNeedsDisplay ();
         }
 
-        // BUGBUG: We should not call OnEnter/OnLeave directly; they should only be called by SetHasFocus
         if (runState.Toplevel is { HasFocus: true })
         {
             runState.Toplevel.HasFocus = false;
@@ -634,8 +632,6 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         {
             Top.SetFocus ();
         }
-
-        //Refresh ();
 
         _cachedRunStateToplevel = runState.Toplevel;
 

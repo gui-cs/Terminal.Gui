@@ -768,8 +768,17 @@ public partial class View // Layout APIs
             LayoutAdornments ();
         }
 
-        SetNeedsDisplay ();
         SetNeedsLayout ();
+
+        SetNeedsDisplay ();
+        foreach (Toplevel v in Application.TopLevels)
+        {
+            if (v.Visible && (v != this))
+            {
+                v.SetNeedsDisplay ();
+            }
+        }
+
     }
 
     internal bool LayoutNeeded { get; private set; } = true;
