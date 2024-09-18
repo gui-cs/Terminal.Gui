@@ -35,3 +35,5 @@ h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
 .toc .flex-fill {
     font-size: var(--bs-body-font-size);
 }
+
+.inheritedMembers { display: none; }

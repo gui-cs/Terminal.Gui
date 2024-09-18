@@ -35,7 +35,7 @@ public enum DimAutoStyle
     ///     </para>
     ///     <para>
     ///         If <see cref="DimAuto.MaximumContentDim"/> is set, the dimension will be the maximum of the formatted text and the
-    ///         demension provided by <see cref="DimAuto.MaximumContentDim"/>. Otherwise, the dimension will be that of the formatted text.
+    ///         dimension provided by <see cref="DimAuto.MaximumContentDim"/>. Otherwise, the dimension will be that of the formatted text.
     ///     </para>
     /// </summary>
     Text = 2,
