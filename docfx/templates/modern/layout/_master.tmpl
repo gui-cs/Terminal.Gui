@@ -14,6 +14,7 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <meta name="title" content="{{#title}}{{title}}{{/title}}{{^title}}{{>partials/title}}{{/title}} {{#_appTitle}}| {{_appTitle}} {{/_appTitle}}">
       {{#_description}}<meta name="description" content="{{_description}}">{{/_description}}
+      {{#description}}<meta name="description" content="{{description}}">{{/description}}
       <link rel="icon" href="{{_rel}}{{{_appFaviconPath}}}{{^_appFaviconPath}}favicon.ico{{/_appFaviconPath}}">
       <link rel="stylesheet" href="{{_rel}}public/docfx.min.css">
       <link rel="stylesheet" href="{{_rel}}public/main.css">
@@ -36,29 +37,30 @@
       <meta name="loc:changeTheme" content="{{__global.changeTheme}}">
       <meta name="loc:copy" content="{{__global.copy}}">
       <meta name="loc:downloadPdf" content="{{__global.downloadPdf}}">
+
+      <script type="module" src="./{{_rel}}public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+      {{#_googleAnalyticsTagId}}
+      <script async src="https://www.googletagmanager.com/gtag/js?id={{_googleAnalyticsTagId}}"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', '{{_googleAnalyticsTagId}}');
+      </script>
+      {{/_googleAnalyticsTagId}}
     {{/redirect_url}}
   </head>
 
   {{^redirect_url}}
-  <script type="module" src="./{{_rel}}public/docfx.min.js"></script>
-
-  <script>
-    const theme = localStorage.getItem('theme') || 'auto'
-    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
-  </script>
-
-  {{#_googleAnalyticsTagId}}
-  <script async src="https://www.googletagmanager.com/gtag/js?id={{_googleAnalyticsTagId}}"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-    gtag('config', '{{_googleAnalyticsTagId}}');
-  </script>
-  {{/_googleAnalyticsTagId}}
-
   <body class="tex2jax_ignore" data-layout="{{_layout}}{{layout}}" data-yaml-mime="{{yamlmime}}">
     <header class="bg-body border-bottom">
+      {{^_disableNavbar}}
       <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
         <div class="container-xxl flex-nowrap">
           <a class="navbar-brand" href="{{_appLogoUrl}}{{^_appLogoUrl}}{{_rel}}index.html{{/_appLogoUrl}}">
@@ -80,9 +82,11 @@
           </div>
         </div>
       </nav>
+      {{/_disableNavbar}}
     </header>
 
     <main class="container-xxl">
+      {{^_disableToc}}
       <div class="toc-offcanvas">
         <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
           <div class="offcanvas-header">
@@ -94,16 +98,21 @@
           </div>
         </div>
       </div>
+      {{/_disableToc}}
 
       <div class="content">
         <div class="actionbar">
-          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em"
+          {{^_disableToc}}
+          <button class="btn btn-lg border-0 d-md-none"
               type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas"
               aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
             <i class="bi bi-list"></i>
           </button>
+          {{/_disableToc}}
 
+          {{^_disableBreadcrumb}}
           <nav id="breadcrumb"></nav>
+          {{/_disableBreadcrumb}}
         </div>
 
         <article data-uid="{{uid}}">
@@ -127,9 +136,11 @@
 
       </div>
 
+      {{^_disableAffix}}
       <div class="affix">
         <nav id="affix"></nav>
       </div>
+      {{/_disableAffix}}
     </main>
 
     {{#_enableSearch}}

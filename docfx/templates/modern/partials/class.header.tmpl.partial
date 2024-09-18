@@ -96,7 +96,7 @@
 {{/inClass}}
 
 {{#inheritedMembers.0}}
-<dl class="typelist derived">
+<dl class="typelist inheritedMembers">
   <dt>{{__global.inheritedMembers}}</dt>
   <dd>
 {{/inheritedMembers.0}}
