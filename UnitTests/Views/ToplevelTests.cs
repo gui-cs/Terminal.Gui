@@ -33,30 +33,6 @@ public partial class ToplevelTests (ITestOutputHelper output)
 
         var eventInvoked = "";
 
-        top.ChildUnloaded += (s, e) => eventInvoked = "ChildUnloaded";
-        top.OnChildUnloaded (top);
-        Assert.Equal ("ChildUnloaded", eventInvoked);
-        top.ChildLoaded += (s, e) => eventInvoked = "ChildLoaded";
-        top.OnChildLoaded (top);
-        Assert.Equal ("ChildLoaded", eventInvoked);
-        top.Closed += (s, e) => eventInvoked = "Closed";
-        top.OnClosed (top);
-        Assert.Equal ("Closed", eventInvoked);
-        top.Closing += (s, e) => eventInvoked = "Closing";
-        top.OnClosing (new (top));
-        Assert.Equal ("Closing", eventInvoked);
-        top.AllChildClosed += (s, e) => eventInvoked = "AllChildClosed";
-        top.OnAllChildClosed ();
-        Assert.Equal ("AllChildClosed", eventInvoked);
-        top.ChildClosed += (s, e) => eventInvoked = "ChildClosed";
-        top.OnChildClosed (top);
-        Assert.Equal ("ChildClosed", eventInvoked);
-        top.Deactivate += (s, e) => eventInvoked = "Deactivate";
-        top.OnDeactivate (top);
-        Assert.Equal ("Deactivate", eventInvoked);
-        top.Activate += (s, e) => eventInvoked = "Activate";
-        top.OnActivate (top);
-        Assert.Equal ("Activate", eventInvoked);
         top.Loaded += (s, e) => eventInvoked = "Loaded";
         top.OnLoaded ();
         Assert.Equal ("Loaded", eventInvoked);

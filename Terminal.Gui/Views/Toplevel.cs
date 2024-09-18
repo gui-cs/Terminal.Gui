@@ -76,29 +76,6 @@ public partial class Toplevel : View
     /// <summary>Gets the latest <see cref="StatusBar"/> added into this Toplevel.</summary>
     public StatusBar? StatusBar => (StatusBar?)Subviews?.LastOrDefault (s => s is StatusBar);
 
-
-    // TODO: Overlapped - Rename to AllSubviewsClosed - Move to View?
-    /// <summary>
-    ///     Invoked when the last child of the Toplevel <see cref="RunState"/> is closed from by
-    ///     <see cref="Application.End(RunState)"/>.
-    /// </summary>
-    public event EventHandler? AllChildClosed;
-
-    // TODO: Overlapped - Rename to *Subviews* - Move to View?
-    /// <summary>
-    ///     Invoked when a child of the Toplevel <see cref="RunState"/> is closed by
-    ///     <see cref="Application.End(RunState)"/>.
-    /// </summary>
-    public event EventHandler<ToplevelEventArgs>? ChildClosed;
-
-    // TODO: Overlapped - Rename to *Subviews* - Move to View?
-    /// <summary>Invoked when a child Toplevel's <see cref="RunState"/> has been loaded.</summary>
-    public event EventHandler<ToplevelEventArgs>? ChildLoaded;
-
-    // TODO: Overlapped - Rename to *Subviews* - Move to View?
-    /// <summary>Invoked when a cjhild Toplevel's <see cref="RunState"/> has been unloaded.</summary>
-    public event EventHandler<ToplevelEventArgs>? ChildUnloaded;
-
     #endregion
 
     #region Life Cycle
@@ -186,23 +163,6 @@ public partial class Toplevel : View
 
     internal virtual void OnActivate (Toplevel deactivated) { Activate?.Invoke (this, new (deactivated)); }
 
-    /// <summary>
-    ///     Stops and closes the <see cref="Toplevel"/> specified by <paramref name="top"/>. If <paramref name="top"/> is
-    ///     the top-most Toplevel, <see cref="Application.RequestStop(Toplevel)"/> will be called, causing the application to
-    ///     exit.
-    /// </summary>
-    /// <param name="top">The Toplevel to request stop.</param>
-    //public virtual void RequestStop (Toplevel top) { top.RequestStop (); }
-
-    internal virtual void OnAllChildClosed () { AllChildClosed?.Invoke (this, EventArgs.Empty); }
-
-    internal virtual void OnChildClosed (Toplevel top)
-    {
-        ChildClosed?.Invoke (this, new (top));
-    }
-
-    internal virtual void OnChildLoaded (Toplevel top) { ChildLoaded?.Invoke (this, new (top)); }
-    internal virtual void OnChildUnloaded (Toplevel top) { ChildUnloaded?.Invoke (this, new (top)); }
     internal virtual void OnClosed (Toplevel top) { Closed?.Invoke (this, new (top)); }
 
     internal virtual bool OnClosing (ToplevelClosingEventArgs ev)
@@ -242,41 +202,7 @@ public partial class Toplevel : View
     }
 
     #endregion
-
-    #region Draw
-
-    ///// <inheritdoc/>
-    //public override void OnDrawContent (Rectangle viewport)
-    //{
-    //    if (!Visible)
-    //    {
-    //        return;
-    //    }
-
-    //    if (NeedsDisplay || SubViewNeedsDisplay /*|| LayoutNeeded*/)
-    //    {
-    //        Clear ();
-
-    //        //LayoutSubviews ();
-    //        //PositionToplevels ();
-            
-    //        // BUGBUG: This appears to be a hack to get ScrollBarViews to render correctly.
-    //        foreach (View view in Subviews)
-    //        {
-    //            if (view.Frame.IntersectsWith (Viewport) && !OutsideTopFrame (this))
-    //            {
-    //                //view.SetNeedsLayout ();
-    //                view.SetNeedsDisplay ();
-    //                view.SetSubViewNeedsDisplay ();
-    //            }
-    //        }
-
-    //        base.OnDrawContent (viewport);
-    //    }
-    //}
-
-    #endregion
-
+    
     #region Size / Position Management
 
     // TODO: Make cancelable?
@@ -358,16 +284,6 @@ public partial class Toplevel : View
 
     /// <summary>Invoked when the terminal has been resized. The new <see cref="Size"/> of the terminal is provided.</summary>
     public event EventHandler<SizeChangedEventArgs>? SizeChanging;
-
-    private bool OutsideTopFrame (Toplevel top)
-    {
-        if (top.Frame.X > Driver.Cols || top.Frame.Y > Driver.Rows)
-        {
-            return true;
-        }
-
-        return false;
-    }
 
     #endregion
 }
