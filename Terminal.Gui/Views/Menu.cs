@@ -1238,7 +1238,7 @@ namespace Terminal.Gui {
 				mi = openCurrentMenu.barItems.Children [openCurrentMenu.current];
 			} else if (openCurrentMenu.barItems.IsTopLevel) {
 				mi = openCurrentMenu.barItems;
-			} else {
+			} else if (openCurrentMenu?.current > -1) {
 				mi = openMenu.barItems.Children [openMenu.current];
 			}
 			MenuOpened?.Invoke (mi);
