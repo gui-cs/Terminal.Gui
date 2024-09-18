@@ -2,6 +2,8 @@
 
 Terminal.Gui provides a rich system for how `View` objects are laid out relative to each other. The layout system also defines how coordinates are specified.
 
+In addition to the Layout system described here, Terminal.Gui provides a feature of Layout known as **Arrangement**, which controls how the user can use the mouse and keyboard to arrange views and enables either **Tiled** or **Overlapped** layouts. See the [Arrangement Deep Dive](arrangement.md) for more. 
+
 ## Coordinates
 
 * **Screen-Relative** - Describes the dimensions and characteristics of the underlying terminal. Currently Terminal.Gui only supports applications that run "full-screen", meaning they fill the entire terminal when running. As the user resizes their terminal, the `Screen` changes size and the applicaiton will be resized to fit. *Screen-Relative* means an origin (`0, 0`) at the top-left corner of the terminal. `ConsoleDriver`s operate exclusively on *Screen-Relative* coordinates.
@@ -33,6 +35,8 @@ The default `ViewportSettings` also constrains the Viewport to the size of the c
 ## Layout
 
 Terminal.Gui provides a rich system for how views are laid out relative to each other. The position of a view is set by setting the `X` and `Y` properties, which are of time [Pos](~/api/Terminal.Gui.Pos.yml). The size is set via `Width` and `Height`, which are of type [Dim](~/api/Terminal.Gui.Dim.yml).
+
+See also [Arrangement API](arrangement.md).
 
 ```cs
 var label1 = new Label () { X = 1, Y = 2, Width = 3, Height = 4, Title = "Absolute")

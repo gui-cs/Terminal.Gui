@@ -26,6 +26,7 @@ See [What's New in V2 For more](newinv2.md).
 * [Navigation](navigation.md)
 * [Keyboard API](keyboard.md)
 * [Mouse API](mouse.md)
+* [Arrangement API](arrangement.md)
 * [Configuration and Theme Manager](config.md)
 * [Multi-tasking and the Application Main Loop](mainloop.md)
 * [Cross-platform Driver Model](drivers.md)

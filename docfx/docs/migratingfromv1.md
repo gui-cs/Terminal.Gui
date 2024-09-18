@@ -452,3 +452,25 @@ In v2, these methods have been named correctly.
 - `SendSubViewBackward` -> `MoveSubviewTowardsStart` - Moves the specified subview one position towards the start of the list.
 - `SendSubViewToFront` -> `MoveSubviewToEnd` - Moves the specified subview to the end of the list.
 - `SendSubViewForward` -> `MoveSubviewTowardsEnd` - Moves the specified subview one position towards the end of the list.
+
+## `Mdi` Replaced by `ViewArrangement.Overlapped`
+
+In v1, it apps with multiple overlapping views could be created using a set of APIs spread across `Application` (e.g. `Application.MdiTop`) and `Toplevel` (e.g. `IsMdiContainer`). This functionality has been replaced in v2 with [View.Arrangement](~/api/Terminal.Gui.View.Arrangement.yml). Specifically, overlapped views with [View.Arrangement](~/api/Terminal.Gui.View.Arrangement.yml) having the [ViewArrangement.Overlapped](~/api/Terminal.Gui.ViewArrangement.Overlapped.yml) flag set will be arranged in an overlapped fashion using the order in their SuperView's subview list as the Z-order. 
+
+Setting the [ViewArrangement.Movable](~/api/Terminal.Gui.ViewArrangement.Movable.yml) flag will enable the overlapped views to be movable with the mouse or keyboard (`Ctrl+F5` to activate).
+
+Setting the [ViewArrangement.Sizable](~/api/Terminal.Gui.ViewArrangement.Sizable.yml) flag will enable the overlapped views to be resized with the mouse or keyboard (`Ctrl+F5` to activate).
+
+In v1, only Views derived from `Toplevel` could be overlapped. In v2, any view can be.
+
+v1 conflated the concepts of 
+
+## Others...
+
+* `View` and all subclasses support `IDisposable` and must be disposed (by calling `view.Dispose ()`) by whatever code owns the instance when the instance is longer needed. 
+
+* To simplify programming, any `View` added as a Subview another `View` will have it's lifecycle owned by the Superview; when a `View` is disposed, it will call `Dispose` on all the items in the `Subviews` property. Note this behavior is the same as it was in v1, just clarified.
+
+* In v1, [Application.End](~/api/Terminal.Gui.Application.Run.yml) called `Dispose ()` on [Application.Top](~/api/Terminal.Gui.Application.Top.yml) (via `Runstate.Toplevel`). This was incorrect as it meant that after `Application.Run` returned, `Application.Top` had been disposed, and any code that wanted to interrogate the results of `Run` by accessing `Application.Top` only worked by accident. This is because GC had not actually happened; if it had the application would have crashed. In v2 `Application.End` does NOT call `Dispose`, and it is the caller to `Application.Run` who is responsible for disposing the `Toplevel` that was either passed to `Application.Run (View)` or created by `Application.Run<T> ()`.
+
+* Any code that creates a `Toplevel`, either by using `top = new()` or by calling either `top = Application.Run ()` or `top = ApplicationRun<T>()` must call `top.Dispose` when complete. The exception to this is if `top` is passed to `myView.Add(top)` making it a subview of `myView`. This is because the semantics of `Add` are that the `myView` takes over responsibility for the subviews lifetimes. Of course, if someone calls `myView.Remove(top)` to remove said subview, they then re-take responsbility for `top`'s lifetime and they must call `top.Dispose`.
