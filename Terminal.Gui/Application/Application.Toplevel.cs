@@ -8,7 +8,7 @@ public static partial class Application // Toplevel handling
     /// <summary>Holds the stack of TopLevel views.</summary>
     internal static Stack<Toplevel> TopLevels { get; } = new ();
 
-    /// <summary>The <see cref="Toplevel"/> object used for the application on startup (<seealso cref="Top"/>)</summary>
+    /// <summary>The <see cref="Toplevel"/> that is currently active.</summary>
     /// <value>The top.</value>
     public static Toplevel? Top { get; internal set; }
 }
