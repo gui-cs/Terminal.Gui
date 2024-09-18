@@ -173,11 +173,10 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     }
 
     /// <summary>
-    ///     Calls <see cref="View.PositionCursor"/> on the most focused view in the view starting with <paramref name="view"/>.
+    ///     Calls <see cref="View.PositionCursor"/> on the most focused view.
     /// </summary>
     /// <remarks>
-    ///     Does nothing if <paramref name="view"/> is <see langword="null"/> or if the most focused view is not visible or
-    ///     enabled.
+    ///     Does nothing if there is no most focused view.
     ///     <para>
     ///         If the most focused view is not visible within it's superview, the cursor will be hidden.
     ///     </para>

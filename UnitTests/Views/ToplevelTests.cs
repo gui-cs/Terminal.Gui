@@ -214,9 +214,6 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (9, ny); // 9+15+1(mb)=25
         Assert.NotNull (sb);
 
-        top.PositionToplevels ();
-        //Assert.Equal (new (0, 1, 60, 15), win.Frame);
-
         //Assert.Null (Toplevel._dragPosition);
         win.NewMouseEvent (new () { Position = new (6, 0), Flags = MouseFlags.Button1Pressed });
 

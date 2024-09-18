@@ -369,23 +369,6 @@ public partial class Toplevel : View
         return false;
     }
 
-    // TODO: v2 - Not sure this is needed anymore.
-    internal void PositionToplevels ()
-    {
-        return;
-
-
-        PositionToplevel (this);
-
-        foreach (View top in Subviews)
-        {
-            if (top is Toplevel)
-            {
-                PositionToplevel ((Toplevel)top);
-            }
-        }
-    }
-
     #endregion
 }
 
