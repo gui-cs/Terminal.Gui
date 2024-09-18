@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace Terminal.Gui;
 
-/// <summary>The Border for a <see cref="View"/>.</summary>
+/// <summary>The Border for a <see cref="View"/>. Accessed via <see cref="View.Border"/></summary>
 /// <remarks>
 ///     <para>
 ///         Renders a border around the view with the <see cref="View.Title"/>. A border using <see cref="LineStyle"/>
