@@ -192,7 +192,7 @@ public partial class Toplevel : View
     ///     exit.
     /// </summary>
     /// <param name="top">The Toplevel to request stop.</param>
-    public virtual void RequestStop (Toplevel top) { top.RequestStop (); }
+    //public virtual void RequestStop (Toplevel top) { top.RequestStop (); }
 
     internal virtual void OnAllChildClosed () { AllChildClosed?.Invoke (this, EventArgs.Empty); }
 
