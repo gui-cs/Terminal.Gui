@@ -62,11 +62,6 @@ public class ApplicationNavigation
             }
         }
 
-        //if (start.Border is { })
-        //{
-        //    return IsInHierarchy (start.Border, view);
-        //}
-
         return false;
     }
 
@@ -84,11 +79,6 @@ public class ApplicationNavigation
         }
 
         _focused = value;
-
-        //if (_focused is { } && Application.PositionCursor ())
-        //{
-        //    Application.Driver?.UpdateCursor ();
-        //}
 
         FocusedChanged?.Invoke (null, EventArgs.Empty);
     }

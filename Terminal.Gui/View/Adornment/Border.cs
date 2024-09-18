@@ -317,6 +317,9 @@ public class Border : Adornment
 
                 SetHighlight (HighlightStyle);
 
+                // Arrange Mode -
+                // TODO: This code can be refactored to be more readable and maintainable.
+
                 // If not resizable, but movable: Drag anywhere is move
                 // If resizable and movable: Drag on top is move, other 3 sides are size
                 // If not movable, but resizable: Drag on any side sizes.
@@ -468,6 +471,7 @@ public class Border : Adornment
                 int minHeight = Thickness.Vertical + Parent!.Margin.Thickness.Bottom;
                 int minWidth = Thickness.Horizontal + Parent!.Margin.Thickness.Right;
 
+                // TODO: This code can be refactored to be more readable and maintainable.
                 switch (_arranging)
                 {
                     case ViewArrangement.Movable:
@@ -989,6 +993,8 @@ public class Border : Adornment
 
         Application.MouseEvent += ApplicationOnMouseEvent;
 
+        // TODO: This code can be refactored to be more readable and maintainable.
+
         // Create buttons for resizing and moving
         if (Parent!.Arrangement.HasFlag (ViewArrangement.Movable))
         {
@@ -1222,6 +1228,7 @@ public class Border : Adornment
             if (arrangement == ViewArrangement.Fixed)
             {
                 // Keyboard mode - enable nav
+                // TODO: Keyboard mode only supports sizing from bottom/right.
                 _arranging = (ViewArrangement)(Focused?.Data ?? ViewArrangement.Fixed);
             }
 
@@ -1344,6 +1351,11 @@ public class Border : Adornment
                     Command.Tab,
                     () =>
                     {
+                        // BUGBUG: If an arrangable view has only arrangable subviews, it's not possible to activate
+                        // BUGBUG: ArrangeMode with keyboard for the superview.
+                        // BUGBUG: AdvanceFocus should be wise to this and when in ArrangeMode, should move across
+                        // BUGBUG: the view hierachy.
+
                         AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
                         _arranging = (ViewArrangement)(Focused?.Data ?? ViewArrangement.Fixed);
 

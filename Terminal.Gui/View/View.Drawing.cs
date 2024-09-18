@@ -187,10 +187,14 @@ public partial class View // Drawing APIs
     }
 
     /// <summary>
-    ///     Draws the view. Causes the following virtual methods to be called (along with their related events):
+    ///     Draws the view if it needs to be drawn. Causes the following virtual methods to be called (along with their related events):
     ///     <see cref="OnDrawContent"/>, <see cref="OnDrawContentComplete"/>.
     /// </summary>
     /// <remarks>
+    ///     <para>
+    ///         The view will only be drawn if it is visible, and has any of <see cref="NeedsDisplay"/>, <see cref="SubViewNeedsDisplay"/>,
+    ///         or <see cref="LayoutNeeded"/> set.
+    ///     </para>
     ///     <para>
     ///         Always use <see cref="Viewport"/> (view-relative) when calling <see cref="OnDrawContent(Rectangle)"/>, NOT
     ///         <see cref="Frame"/> (superview-relative).

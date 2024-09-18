@@ -771,6 +771,8 @@ public partial class View // Layout APIs
 
         SetNeedsLayout ();
 
+        // TODO: This ensures overlapped views are drawn correctly. However, this is inefficient.
+        // TODO: The correct fix is to implement non-rectangular clip regions: https://github.com/gui-cs/Terminal.Gui/issues/3413
         if (Arrangement.HasFlag (ViewArrangement.Overlapped))
         {
             foreach (Toplevel v in Application.TopLevels)
