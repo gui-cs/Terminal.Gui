@@ -252,6 +252,10 @@ public partial class View // Layout APIs
     /// </value>
     /// <remarks>
     ///     <para>
+    ///         See the View Layout Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///     </para>
+    ///     <para>
     ///         Frame is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="GetContentSize ()"/>
     ///         .
     ///     </para>
@@ -288,6 +292,7 @@ public partial class View // Layout APIs
             {
                 OnResizeNeeded ();
             }
+
             SetNeedsDisplay ();
         }
     }
@@ -370,6 +375,10 @@ public partial class View // Layout APIs
     /// <value>The <see cref="Pos"/> object representing the X position.</value>
     /// <remarks>
     ///     <para>
+    ///         See the View Layout Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///     </para>
+    ///     <para>
     ///         The position is relative to the <see cref="SuperView"/>'s Content, which is bound by
     ///         <see cref="GetContentSize ()"/>.
     ///     </para>
@@ -409,6 +418,10 @@ public partial class View // Layout APIs
     /// <value>The <see cref="Pos"/> object representing the Y position.</value>
     /// <remarks>
     ///     <para>
+    ///         See the View Layout Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///     </para>
+    ///     <para>
     ///         The position is relative to the <see cref="SuperView"/>'s Content, which is bound by
     ///         <see cref="GetContentSize ()"/>.
     ///     </para>
@@ -446,6 +459,10 @@ public partial class View // Layout APIs
     /// <summary>Gets or sets the height dimension of the view.</summary>
     /// <value>The <see cref="Dim"/> object representing the height of the view (the number of rows).</value>
     /// <remarks>
+    ///     <para>
+    ///         See the View Layout Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///     </para>
     ///     <para>
     ///         The dimension is relative to the <see cref="SuperView"/>'s Content, which is bound by
     ///         <see cref="GetContentSize ()"/>
@@ -495,6 +512,10 @@ public partial class View // Layout APIs
     /// <summary>Gets or sets the width dimension of the view.</summary>
     /// <value>The <see cref="Dim"/> object representing the width of the view (the number of columns).</value>
     /// <remarks>
+    ///     <para>
+    ///         See the View Layout Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///     </para>
     ///     <para>
     ///         The dimension is relative to the <see cref="SuperView"/>'s Content, which is bound by
     ///         <see cref="GetContentSize ()"/>
@@ -667,6 +688,10 @@ public partial class View // Layout APIs
     /// </summary>
     /// <remarks>
     ///     <para>
+    ///         See the View Layout Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///     </para>
+    ///     <para>
     ///         The position and dimensions of the view are indeterminate until the view has been initialized. Therefore, the
     ///         behavior of this method is indeterminate if <see cref="IsInitialized"/> is <see langword="false"/>.
     ///     </para>
@@ -777,13 +802,12 @@ public partial class View // Layout APIs
         {
             foreach (Toplevel v in Application.TopLevels)
             {
-                if (v.Visible && (v != this))
+                if (v.Visible && v != this)
                 {
                     v.SetNeedsDisplay ();
                 }
             }
         }
-
     }
 
     internal bool LayoutNeeded { get; private set; } = true;

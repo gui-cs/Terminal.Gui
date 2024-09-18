@@ -17,6 +17,9 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     <para>
     ///         If there is no next/previous view to advance to, the focus is set to the view itself.
     ///     </para>
+    ///     <para>
+    ///         See the View Navigation Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/navigation.html"/>
+    ///     </para>
     /// </remarks>
     /// <param name="direction"></param>
     /// <param name="behavior"></param>
@@ -136,6 +139,9 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
     /// <summary>Gets or sets a value indicating whether this <see cref="View"/> can be focused.</summary>
     /// <remarks>
+    ///     <para>
+    ///         See the View Navigation Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/navigation.html"/>
+    ///     </para>
     ///     <para>
     ///         <see cref="SuperView"/> must also have <see cref="CanFocus"/> set to <see langword="true"/>.
     ///     </para>
@@ -318,6 +324,9 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// </summary>
     /// <remarks>
     ///     <para>
+    ///         See the View Navigation Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/navigation.html"/>
+    ///     </para>
+    ///     <para>
     ///         Only Views that are visible, enabled, and have <see cref="CanFocus"/> set to <see langword="true"/> are
     ///         focusable. If
     ///         these conditions are not met when this property is set to <see langword="true"/> <see cref="HasFocus"/> will
@@ -380,6 +389,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     Causes this view to be focused. Calling this method has the same effect as setting <see cref="HasFocus"/> to
     ///     <see langword="true"/> but with the added benefit of returning a value indicating whether the focus was set.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         See the View Navigation Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/navigation.html"/>
+    ///     </para>
+    /// </remarks>
     public bool SetFocus ()
     {
         (bool focusSet, bool _) = SetHasFocusTrue (Application.Navigation?.GetFocused ());
@@ -791,7 +805,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     Gets or sets the behavior of <see cref="AdvanceFocus"/> for keyboard navigation.
     /// </summary>
     /// <remarks>
+    /// <remarks>
     ///     <para>
+    ///         See the View Navigation Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/navigation.html"/>
+    ///     </para>
+    /// </remarks>    ///     <para>
     ///         If <see langword="null"/> the tab stop has not been set and setting <see cref="CanFocus"/> to true will set it
     ///         to
     ///         <see cref="TabBehavior.TabStop"/>.
@@ -799,7 +817,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     <para>
     ///         TabStop is independent of <see cref="CanFocus"/>. If <see cref="CanFocus"/> is <see langword="false"/>, the
     ///         view will not gain
-    ///         focus even if this property is set and vice-versa.
+    ///         focus even if this property is set and vice versa.
     ///     </para>
     ///     <para>
     ///         The default <see cref="TabBehavior.TabStop"/> keys are <see cref="Application.NextTabKey"/> (<c>Key.Tab</c>)
