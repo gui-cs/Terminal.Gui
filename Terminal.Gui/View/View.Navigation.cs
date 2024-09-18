@@ -499,6 +499,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         NotifyFocusChanged (HasFocus, previousFocusedView, this);
 
+        SetNeedsDisplay ();
+
         // Post-conditions - prove correctness
         if (HasFocus == previousValue)
         {

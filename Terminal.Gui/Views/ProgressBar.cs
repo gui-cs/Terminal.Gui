@@ -71,6 +71,7 @@ public class ProgressBar : View, IDesignable
         {
             _fraction = Math.Min (value, 1);
             _isActivity = false;
+            SetNeedsDisplay ();
         }
     }
 
@@ -108,6 +109,7 @@ public class ProgressBar : View, IDesignable
 
                     break;
             }
+            SetNeedsDisplay ();
         }
     }
 

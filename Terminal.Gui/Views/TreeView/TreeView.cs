@@ -356,6 +356,7 @@ public class TreeView<T> : View, ITreeView where T : class
             {
                 KeyBindings.ReplaceKey (ObjectActivationKey, value);
                 objectActivationKey = value;
+                SetNeedsDisplay ();
             }
         }
     }
@@ -371,7 +372,11 @@ public class TreeView<T> : View, ITreeView where T : class
     public int ScrollOffsetHorizontal
     {
         get => scrollOffsetHorizontal;
-        set => scrollOffsetHorizontal = Math.Max (0, value);
+        set
+        {
+            scrollOffsetHorizontal = Math.Max (0, value);
+            SetNeedsDisplay ();
+        }
     }
 
     /// <summary>The amount of tree view that has been scrolled off the top of the screen (by the user scrolling down).</summary>
@@ -382,7 +387,11 @@ public class TreeView<T> : View, ITreeView where T : class
     public int ScrollOffsetVertical
     {
         get => scrollOffsetVertical;
-        set => scrollOffsetVertical = Math.Max (0, value);
+        set
+        {
+            scrollOffsetVertical = Math.Max (0, value);
+            SetNeedsDisplay ();
+        }
     }
 
     /// <summary>

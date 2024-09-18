@@ -30,7 +30,7 @@ public partial class Toplevel : View
     {
         CanFocus = true;
         TabStop = TabBehavior.TabGroup;
-        Arrangement = ViewArrangement.Fixed;
+        Arrangement = ViewArrangement.Overlapped;
         Width = Dim.Fill ();
         Height = Dim.Fill ();
         ColorScheme = Colors.ColorSchemes ["TopLevel"];
@@ -280,7 +280,7 @@ public partial class Toplevel : View
     #region Size / Position Management
 
     // TODO: Make cancelable?
-    internal virtual void OnSizeChanging (SizeChangedEventArgs size) { SizeChanging?.Invoke (this, size); }
+    internal void OnSizeChanging (SizeChangedEventArgs size) { SizeChanging?.Invoke (this, size); }
 
     /// <summary>
     ///     Adjusts the location and size of <paramref name="top"/> within this Toplevel. Virtual method enabling

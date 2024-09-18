@@ -20,11 +20,11 @@ public class ListViewTests (ITestOutputHelper output)
         Assert.NotNull (lv.Source);
         Assert.Equal (-1, lv.SelectedItem);
 
-        lv = new() { Source = new NewListDataSource () };
+        lv = new () { Source = new NewListDataSource () };
         Assert.NotNull (lv.Source);
         Assert.Equal (-1, lv.SelectedItem);
 
-        lv = new()
+        lv = new ()
         {
             Y = 1, Width = 10, Height = 20, Source = new ListWrapper<string> (["One", "Two", "Three"])
         };
@@ -32,7 +32,7 @@ public class ListViewTests (ITestOutputHelper output)
         Assert.Equal (-1, lv.SelectedItem);
         Assert.Equal (new (0, 1, 10, 20), lv.Frame);
 
-        lv = new() { Y = 1, Width = 10, Height = 20, Source = new NewListDataSource () };
+        lv = new () { Y = 1, Width = 10, Height = 20, Source = new NewListDataSource () };
         Assert.NotNull (lv.Source);
         Assert.Equal (-1, lv.SelectedItem);
         Assert.Equal (new (0, 1, 10, 20), lv.Frame);
@@ -78,6 +78,7 @@ public class ListViewTests (ITestOutputHelper output)
                                                      );
 
         Assert.True (lv.ScrollVertical (10));
+        //Application.Refresh ();
         lv.Draw ();
         Assert.Equal (-1, lv.SelectedItem);
 
@@ -612,7 +613,7 @@ Item 6",
         var lv = new ListView ();
         var top = new View ();
         top.Add (lv);
-        Exception exception = Record.Exception (() => lv.SetFocus());
+        Exception exception = Record.Exception (() => lv.SetFocus ());
         Assert.Null (exception);
     }
 
@@ -868,7 +869,7 @@ Item 6",
         var removed = 0;
         var otherActions = 0;
         IList<string> source1 = [];
-        var lv = new ListView { Source = new ListWrapper<string> (new ( source1)) };
+        var lv = new ListView { Source = new ListWrapper<string> (new (source1)) };
 
         lv.CollectionChanged += (sender, args) =>
                                 {

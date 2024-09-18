@@ -23,7 +23,7 @@ public partial class View // Drawing APIs
             {
                 _colorScheme = value;
 
-                if (Border is {} && Border.LineStyle != LineStyle.None && Border.ColorScheme is { })
+                if (Border is { } && Border.LineStyle != LineStyle.None && Border.ColorScheme is { })
                 {
                     Border.ColorScheme = _colorScheme;
                 }
@@ -207,6 +207,23 @@ public partial class View // Drawing APIs
     /// </remarks>
     public void Draw ()
     {
+        if (!CanBeVisible (this))
+        {
+            return;
+        }
+
+        // TODO: This ensures overlapped views are drawn correctly. However, this is inefficient.
+        // TODO: The correct fix is to implement non-rectangular clip regions: https://github.com/gui-cs/Terminal.Gui/issues/3413
+        if (Arrangement.HasFlag (ViewArrangement.Overlapped))
+        {
+            SetNeedsDisplay ();
+        }
+
+        if (!NeedsDisplay && !SubViewNeedsDisplay && !LayoutNeeded)
+        {
+            return;
+        }
+
         OnDrawAdornments ();
 
         if (ColorScheme is { })
@@ -478,11 +495,11 @@ public partial class View // Drawing APIs
                 return;
             }
 
-            if (SuperView is { } || this == Application.Top)
+            // BUGBUG: this clears way too frequently. Need to optimize this.
+            if (SuperView is { } || Arrangement.HasFlag (ViewArrangement.Overlapped))
             {
                 Clear ();
             }
-
 
             if (!string.IsNullOrEmpty (TextFormatter.Text))
             {
@@ -514,14 +531,22 @@ public partial class View // Drawing APIs
                                                                      view => view.Visible
                                                                              && (view.NeedsDisplay
                                                                                  || view.SubViewNeedsDisplay
-                                                                                 || view.LayoutNeeded)
-                                                                    );
+                                                                                 || view.LayoutNeeded
+                                                                                 || view.Arrangement.HasFlag (ViewArrangement.Overlapped)
+                                                                    ));
 
             foreach (View view in subviewsNeedingDraw)
             {
                 if (view.LayoutNeeded)
                 {
                     view.LayoutSubviews ();
+                }
+
+                // TODO: This ensures overlapped views are drawn correctly. However, this is inefficient.
+                // TODO: The correct fix is to implement non-rectangular clip regions: https://github.com/gui-cs/Terminal.Gui/issues/3413
+                if (view.Arrangement.HasFlag (ViewArrangement.Overlapped))
+                {
+                    view.SetNeedsDisplay ();
                 }
 
                 view.Draw ();

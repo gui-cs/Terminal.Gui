@@ -716,7 +716,7 @@ w ";
         Assert.Equal (new (0, 0, 3, 1), lbl._needsDisplayRect);
         Assert.Equal (new (0, 0, 0, 0), lbl.SuperView._needsDisplayRect);
         Assert.True (lbl.SuperView.LayoutNeeded);
-        lbl.SuperView.Draw ();
+        Application.Refresh();
         Assert.Equal ("12  ", GetContents ());
 
         string GetContents ()

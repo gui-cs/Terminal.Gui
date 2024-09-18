@@ -323,7 +323,11 @@ public class TableView : View
         get => columnOffset;
 
         //try to prevent this being set to an out of bounds column
-        set => columnOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Columns - 1, value));
+        set
+        {
+            columnOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Columns - 1, value));
+            SetNeedsDisplay ();
+        }
     }
 
     /// <summary>True to select the entire row at once.  False to select individual cells.  Defaults to false</summary>

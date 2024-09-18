@@ -288,6 +288,7 @@ public partial class View // Layout APIs
             {
                 OnResizeNeeded ();
             }
+            SetNeedsDisplay ();
         }
     }
 
@@ -770,12 +771,14 @@ public partial class View // Layout APIs
 
         SetNeedsLayout ();
 
-        SetNeedsDisplay ();
-        foreach (Toplevel v in Application.TopLevels)
+        if (Arrangement.HasFlag (ViewArrangement.Overlapped))
         {
-            if (v.Visible && (v != this))
+            foreach (Toplevel v in Application.TopLevels)
             {
-                v.SetNeedsDisplay ();
+                if (v.Visible && (v != this))
+                {
+                    v.SetNeedsDisplay ();
+                }
             }
         }
 
@@ -784,7 +787,7 @@ public partial class View // Layout APIs
     internal bool LayoutNeeded { get; private set; } = true;
 
     /// <summary>
-    ///     Sets the internal <see cref="LayoutNeeded"/> flag for this View and all of it's subviews and it's SuperView.
+    ///     Sets <see cref="LayoutNeeded"/> for this View and all of it's subviews and it's SuperView.
     ///     The main loop will call SetRelativeLayout and LayoutSubviews for any view with <see cref="LayoutNeeded"/> set.
     /// </summary>
     internal void SetNeedsLayout ()

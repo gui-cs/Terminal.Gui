@@ -66,7 +66,7 @@ public class Dialog : Window
     /// </remarks>
     public Dialog ()
     {
-        Arrangement = ViewArrangement.Movable;
+        Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped;
         ShadowStyle = DefaultShadow;
         BorderStyle = DefaultBorderStyle;
 

@@ -455,16 +455,14 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// <summary>Triggers a refresh of the entire display.</summary>
     public static void Refresh ()
     {
-        foreach (Toplevel v in TopLevels.Reverse ())
+        foreach (Toplevel tl in TopLevels.Reverse ())
         {
-            if (v.LayoutNeeded)
+            if (tl.LayoutNeeded)
             {
-                v.LayoutSubviews ();
+                tl.LayoutSubviews ();
             }
-            if (v.Visible && (v.NeedsDisplay || v.SubViewNeedsDisplay))
-            {
-                v.Draw ();
-            }
+
+            tl.Draw ();
         }
 
         Driver!.Refresh ();
@@ -637,5 +635,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         runState.Toplevel = null;
         runState.Dispose ();
+
+        Refresh ();
     }
 }

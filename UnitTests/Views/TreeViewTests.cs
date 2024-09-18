@@ -1242,6 +1242,7 @@ oot two
 
         // redraw now that the custom color
         // delegate is registered
+        tv.SetNeedsDisplay ();
         tv.Draw ();
 
         // Same text

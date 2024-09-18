@@ -255,6 +255,7 @@ At 0,0
         Assert.Equal (new (3, 3, 10, 1), view.Frame);
         Assert.Equal (new (0, 0, 10, 1), view.Viewport);
         Assert.Equal (new (0, 0, 10, 1), view._needsDisplayRect);
+        //Application.Refresh();
         top.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (

@@ -37,9 +37,7 @@ public static partial class Application // Screen related stuff
         {
             t.SetRelativeLayout (args.Size.Value);
             t.LayoutSubviews ();
-            //t.PositionToplevels ();
             t.OnSizeChanging (new (args.Size));
-
         }
 
         Refresh ();
