@@ -6,10 +6,14 @@
   href: newinv2.md
 - name: v1 To v2 Migration
   href: migratingfromv1.md  
+- name: View Deep Dive
+  href: View.md  
 - name: List of Views
   href: views.md
 - name: Layout Engine
   href: layout.md
+- name: Arrangement
+  href: arrangement.md
 - name: Navigation
   href: navigation.md
 - name: Keyboard
