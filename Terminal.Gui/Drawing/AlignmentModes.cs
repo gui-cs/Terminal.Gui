@@ -34,10 +34,8 @@ public enum AlignmentModes
     ///    When aligning via <see cref="Alignment.Start"/> or <see cref="Alignment.End"/>, the item opposite to the alignment (the first or last item) will be ignored.
     /// </summary>
     /// <remarks>
-    ///     <para>
     ///         If the container is smaller than the total size of the items, the end items will be clipped (their locations
     ///         will be greater than the container size).
-    ///     </para>
     /// </remarks>
     /// <example>
     ///     <c>

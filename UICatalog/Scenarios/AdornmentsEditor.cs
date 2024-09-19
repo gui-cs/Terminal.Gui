@@ -143,7 +143,7 @@ public class AdornmentsEditor : View
         base.Dispose (disposing);
     }
 
-    private ExpanderButton? _expandButton;
+    private readonly ExpanderButton? _expandButton;
 
     public ExpanderButton? ExpandButton => _expandButton;
 
@@ -151,7 +151,7 @@ public class AdornmentsEditor : View
     {
         BorderStyle = LineStyle.Dotted;
 
-        Border.Add (_expandButton);
+        Border.Add (_expandButton!);
 
         _lblView = new ()
         {

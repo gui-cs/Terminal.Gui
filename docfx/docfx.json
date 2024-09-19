@@ -27,7 +27,6 @@
   ],
   "build": {
     "template": [
-      "default",
       "templates/modern"
     ],
     "output": "_site",

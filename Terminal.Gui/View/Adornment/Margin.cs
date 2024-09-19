@@ -69,7 +69,7 @@ public class Margin : Adornment
     ///     The color scheme for the Margin. If set to <see langword="null"/>, gets the <see cref="Adornment.Parent"/>'s
     ///     <see cref="View.SuperView"/> scheme. color scheme.
     /// </summary>
-    public override ColorScheme ColorScheme
+    public override ColorScheme? ColorScheme
     {
         get
         {

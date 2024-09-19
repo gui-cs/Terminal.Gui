@@ -16,7 +16,7 @@ namespace Terminal.Gui;
 /// 	public static bool? MyProperty { get; set; } = true;
 ///  }
 ///  </code>
-///     <para>THe resultant Json will look like this:</para>
+///     <para>The resultant Json will look like this:</para>
 ///     <code>
 ///    "AppSettings": {
 ///      "MyAppSettings.MyProperty": true,
