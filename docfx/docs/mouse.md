@@ -12,7 +12,7 @@ Tenets higher in the list have precedence over tenets lower in the list.
 
 At the core of *Terminal.Gui*'s mouse API is the *[MouseEvent](~/api/Terminal.Gui.MouseEvent.yml)* class. The `MouseEvent` class provides a platform-independent abstraction for common mouse events. Every mouse event can be fully described in a `MouseEvent` instance, and most of the mouse-related APIs are simply helper functions for decoding a `MouseEvent`.
 
-When the user does something with the mouse, the `ConsoleDriver` maps the platform-specific mouse event into a `MouseEvent` and calls `Application.OnMouseEvent`. Then, `Application.OnMouseEvent` determines which `View` the event should go to. The `View.OnMouseEvent` method can be overridden or the `View.MouseEvent` event can be subscribed to, to handle the low-level mouse event. If the low-level event is not handled by a view, `Appliation` will then call the appropriate high-level helper APIs. For example, if the user double-clicks the mouse, `View.OnMouseClick` will be called/`View.MouseClick` will be fired with the event arguments indicating which mouse button was double-clicked. 
+When the user does something with the mouse, the `ConsoleDriver` maps the platform-specific mouse event into a `MouseEvent` and calls `Application.OnMouseEvent`. Then, `Application.OnMouseEvent` determines which `View` the event should go to. The `View.OnMouseEvent` method can be overridden or the `View.MouseEvent` event can be subscribed to, to handle the low-level mouse event. If the low-level event is not handled by a view, `Application` will then call the appropriate high-level helper APIs. For example, if the user double-clicks the mouse, `View.OnMouseClick` will be called/`View.MouseClick` will be fired with the event arguments indicating which mouse button was double-clicked. 
 
 ## Mouse Button and Movement Concepts
 
@@ -22,6 +22,6 @@ When the user does something with the mouse, the `ConsoleDriver` maps the platfo
 * **Clicked** - Indicates the user pressed then released the mouse button while over a particular View. 
 * **Moved** - Indicates the mouse moved to a new location since the last mouse event.
 
-## **[Global Mouse Handling](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_MouseEvent)**
+## **[Global Mouse Handling](~/api/Terminal.Gui.Application.MouseEvent.yml)**
 
 The `Application.MouseEvent` event can be used if an application wishes to recieve all mouse events.

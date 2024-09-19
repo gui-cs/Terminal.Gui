@@ -27,7 +27,8 @@
   ],
   "build": {
     "template": [
-      "templates/modern"
+      "default",
+      "_exported_templates/modern"
     ],
     "output": "_site",
     "content": [
