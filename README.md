@@ -8,7 +8,7 @@
 
 * The current, stable, release of Terminal.Gui v1 is [![Version](https://img.shields.io/nuget/v/Terminal.Gui.svg)](https://www.nuget.org/packages/Terminal.Gui).
 * The current `prealpha` release of Terminal.Gui v2 can be found on [Nuget](https://www.nuget.org/packages/Terminal.Gui).
-* Developers starting new TUI projects are encouraged to target `v2`. The API is signifcantly changed, and significantly improved. There will be breaking changes in the API before Beta, but the core API is stable.
+* Developers starting new TUI projects are encouraged to target `v2`. The API is significantly changed, and significantly improved. There will be breaking changes in the API before Beta, but the core API is stable.
 * `v1` is in maintenance mode and we will only accept PRs for issues impacting existing functionality.
  
 **Terminal.Gui**: A toolkit for building rich console apps for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix.
@@ -35,9 +35,9 @@ dotnet run
 * [API Documentation](https://gui-cs.github.io/Terminal.GuiV2Docs/api/Terminal.Gui.html)
 * [Documentation Home](https://gui-cs.github.io/Terminal.GuiV2Docs)
 
-The above documentation matches the most recent Nuget release from the `v2_develop` branch. Get the [v1 documentation here](This is the v2 API documentation. For v1 go here: https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.html)
+The above documentation matches the most recent Nuget release from the `v2_develop` branch. Get the [v1 documentation here](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.html).
 
-See the [`Terminal.Gui/` README](https://github.com/gui-cs/Terminal.Gui/tree/master/Terminal.Gui) for an overview of how the library is structured. 
+See the [`Terminal.Gui/`README](https://github.com/gui-cs/Terminal.Gui/tree/master/Terminal.Gui) for an overview of how the library is structured. 
 
 ## Showcase & Examples
 
