@@ -4,11 +4,11 @@
 
 ### Hierarchy
 
-  * *[View](~/api/Terminal.Gui.View.yml)* - The base class for implementing higher-level visual/interactive Terminal.Gui elements. Implemented in the [View](~/api/Terminal.Gui.View.yml) base class.
+  * *@"Terminal.Gui.View"* - The base class for implementing higher-level visual/interactive Terminal.Gui elements. Implemented in the @Terminal.Gui.View base class.
   
-  * *SubView* - A View that is contained in another view and will be rendered as part of the containing view's *ContentArea*. SubViews are added to another view via the [View.Add](~/api/Terminal.Gui.View.Add.yml) method. A View may only be a SubView of a single View. Each View has a [Subviews](~/api/Terminal.Gui.View.Subviews.yml) property that is a list of all Subviews that have been added.
+  * *SubView* - A View that is contained in another view and will be rendered as part of the containing view's **ContentArea**. SubViews are added to another view via the @"Terminal.Gui.View.Add(Terminal.Gui.View)" method. A View may only be a SubView of a single View. Each View has a @Terminal.Gui.View.Subviews property that is a list of all Subviews that have been added.
   
-  * *[SuperView](~/api/Terminal.Gui.View.SuperView.yml)* - The View that is a container for SubViews. Each View has a [SuperView](~/api/Terminal.Gui.View.SuperView.yml) property that references it's SuperView after it has been added.
+  * *@"Terminal.Gui.View.SuperView"* - The View that is a container for SubViews. Each View has a @Terminal.Gui.View.SuperView property that references it's SuperView after it has been added.
   
   * *Child View* - A view that holds a reference to another view in a parent/child relationship. Terminal.Gui uses the terms "Child" and "Parent" sparingly. Generally Subview/SuperView is preferred.
   

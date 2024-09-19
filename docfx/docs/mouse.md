@@ -22,6 +22,6 @@ When the user does something with the mouse, the `ConsoleDriver` maps the platfo
 * **Clicked** - Indicates the user pressed then released the mouse button while over a particular View. 
 * **Moved** - Indicates the mouse moved to a new location since the last mouse event.
 
-## **[Global Mouse Handling](~/api/Terminal.Gui.Application.MouseEvent.yml)**
+## **Global Mouse Handling**
 
-The `Application.MouseEvent` event can be used if an application wishes to recieve all mouse events.
+The @Terminal.Gui.Application.MouseEvent event can be used if an application wishes to receive all mouse events.

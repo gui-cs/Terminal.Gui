@@ -93,11 +93,11 @@ public partial class Toplevel : View
     public bool IsLoaded { get; private set; }
 
     // TODO: IRunnable: Re-implement as an event on IRunnable; IRunnable.Activating/Activate
-    /// <summary>Invoked when the Toplevel <see cref="RunState"/> becomes the <see cref="Application.Current"/> Toplevel.</summary>
+    /// <summary>Invoked when the Toplevel <see cref="RunState"/> active.</summary>
     public event EventHandler<ToplevelEventArgs>? Activate;
 
     // TODO: IRunnable: Re-implement as an event on IRunnable; IRunnable.Deactivating/Deactivate?
-    /// <summary>Invoked when the Toplevel<see cref="RunState"/> ceases to be the <see cref="Application.Current"/> Toplevel.</summary>
+    /// <summary>Invoked when the Toplevel<see cref="RunState"/> ceases to be active.</summary>
     public event EventHandler<ToplevelEventArgs>? Deactivate;
 
     /// <summary>Invoked when the Toplevel's <see cref="RunState"/> is closed by <see cref="Application.End(RunState)"/>.</summary>

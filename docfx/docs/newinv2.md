@@ -16,23 +16,23 @@ Apps built with Terminal.Gui now feel modern thanks to these improvements:
 
 ## Simplified API
 
-The entire library has been reviewed and simplified. As a result, the API is more consistent and uses modern .NET API standards (e.g. for events). This refactoring resulted in the removal of thousands of lines of code, better unit tests, and higher performance than v1. See [Simplified API](overview.md#simplified-api) for details.
+The entire library has been reviewed and simplified. As a result, the API is more consistent and uses modern .NET API standards (e.g. for events). This refactoring resulted in the removal of thousands of lines of code, better unit tests, and higher performance than v1.
 
 ## [View](~/api/Terminal.Gui.View.yml) Improvements
-* *Improved!* View Lifetime Management is Now Deterministic - In v1 the rules ofr lifetime management of `View` objects was unclear and led to non-dterministic behavior and hard to diagnose bugs. This was particularly acute in the behavior of [Application.Run](~/api/Terminal.Gui.Application.Run.yml). In v2, the rules are clear and the code and unit test infrastructure tries to enforce them. See [Migrating From v1 To v2](migratingfromv1.md) for more details.
-* *New!* Adornments - Adornments are a special form of View that appear outside the `Viewport`: [Margin](~/api/Terminal.Gui.View.Margin.yml), [Border](~/api/Terminal.Gui.View.Border.yml), and [Padding](~/api/Terminal.Gui.View.Padding.yml).
+* *Improved!* View Lifetime Management is Now Deterministic - In v1 the rules ofr lifetime management of `View` objects was unclear and led to non-dterministic behavior and hard to diagnose bugs. This was particularly acute in the behavior of `Application.Run`. In v2, the rules are clear and the code and unit test infrastructure tries to enforce them. See [Migrating From v1 To v2](migratingfromv1.md) for more details.
+* *New!* Adornments - Adornments are a special form of View that appear outside the `Viewport`: @Terminal.Gui.View.Margin, @Terminal.Gui.View.Border, and @Terminal.Gui.View.Padding.
 * *New!* Built-in Scrolling/Virtual Content Area - In v1, to have a view a user could scroll required either a bespoke scrolling implementation, inheriting from `ScrollView`, or managing the complexity of `ScrollBarView` directly. In v2, the base-View class supports scrolling inherently. The area of a view visible to the user at a given moment was previously a rectangle called `Bounds`. `Bounds.Location` was always `Point.Empty`. In v2 the visible area is a rectangle called `Viewport` which is a protal into the Views content, which can be bigger (or smaller) than the area visible to the user. Causing a view to scroll is as simple as changing `View.Viewport.Location`. The View's content described by `View.GetContentSize()`. See [Layout](layout.md) for details.
-* *New!* [Dim.Auto](~/api/Terminal.Gui.Dim.Auto.yml) - Automatically sizes the view to fitthe view's Text, SubViews, or ContentArea.
-* *Improved!* [Pos.AnchorEnd](~/api/Terminal.Gui.Pos.AnchorEnd.yml) - New to v2 is `Pos.AnchorEnd ()` (with no parameters) which allows a view to be anchored to the right or bottom of the Superview. 
-* *New!* [Pos.Align](~/api/Terminal.Gui.Pos.Align.yml) - Aligns a set of views horizontally or vertically (left, rigth, center, etc...).
-* *New!* [View.Arrangement](~/api/Terminal.Gui.View.Arrangement.yml) enables tiled and overlapped view arrangement and moving/resizing Views with the keyboard and mouse. See [Arrangement](arrangement.md).
+* *New!* @Terminal.Gui.DimAuto - Automatically sizes the view to fit the view's Text, SubViews, or ContentArea.
+* *Improved!* @Terminal.Gui.PosAnchorEnd - New to v2 is `Pos.AnchorEnd ()` (with no parameters) which allows a view to be anchored to the right or bottom of the SuperView. 
+* *New!* @Terminal.Gui.PosAlign - Aligns a set of views horizontally or vertically (left, right, center, etc...).
+* *New!* @Terminal.Gui.View.Arrangement enables tiled and overlapped view arrangement and moving/resizing Views with the keyboard and mouse. See [Arrangement](arrangement.md).
 * *Improved!* Keyboard [Navigation](navigation.md) has been revamped to be more reliability and ensure TUI apps built with Terminal.Gui are accessible. 
 
 ## New and Improved Built-in Views
 
 * *[DatePicker](~/api/Terminal.Gui.DatePicker.yml)* - NEW! 
-* *[ScrollView](~/api/Terminal.Gui.ScrollView.yml)* - Replaced by built-in scrolling.
-* *[ScrollBar](~/api/Terminal.Gui.ScrollBar.yml)* - Replaces *ScrollBarView* with a much simpler view.
+* *ScrollView* - Replaced by built-in scrolling.
+* *@"Terminal.Gui.ScrollBar"* - Replaces *ScrollBarView* with a much simpler view.
 * *[Slider](~/api/Terminal.Gui.Slider.yml)* - NEW!
 * *[Shortcut](~/api/Terminal.Gui.Shortcut.yml)* - NEW! An opinionated (visually & API) View for displaying a command, helptext, key.
 * *[Bar](~/api/Terminal.Gui.Bar.yml)* - NEW! Building-block View for containing Shortcuts. Opinionated relative to Orientation but minimially so. The basis for the new StatusBar, MenuBar, and Menu views.
@@ -40,7 +40,7 @@ The entire library has been reviewed and simplified. As a result, the API is mor
 * *[MenuBar](~/api/Terminal.Gui.MenuBar.yml)* - COMING SOON! New implementation based on `Bar`
 * *[ContextMenu](~/api/Terminal.Gui.ContextMenu.yml)* - COMING SOON! New implementation based on `Bar`
 * *[FileDialog](~/api/Terminal.Gui.FileDialog.yml)* - The new, modern file dialog includes icons (in TUI!) for files/folders, search, and a `TreeView`. 
-* [ColorPicker](~/api/Terminal.Gui/ColorPicker.yml)* - Fully supports TrueColor with the ability to choose a color using HSV, RGB, or HSL as well as W3C standard color names.
+* *@"Terminal.Gui.ColorPicker"* - Fully supports TrueColor with the ability to choose a color using HSV, RGB, or HSL as well as W3C standard color names.
 
 ## Configuration Manager
 

@@ -81,7 +81,7 @@ public sealed class ArrangementEditor : View
 
     /// <summary>
     ///     Gets or sets whether the ArrangementEditor should automatically select the View to edit
-    ///     based on the values of <see cref="AutoSelectSuperView"/> and <see cref="AutoSelect"/>.
+    ///     based on the values of <see cref="AutoSelectSuperView"/>.
     /// </summary>
     public bool AutoSelectViewToEdit { get; set; }
 

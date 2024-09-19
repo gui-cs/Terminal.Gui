@@ -32,7 +32,7 @@ namespace UICatalog;
 ///     <para>
 ///         <list type="number">
 ///             <item>
-///                 <description>Be an easy to use showcase for Terminal.Gui concepts and features.</description>
+///                 <description>Be an easy-to-use showcase for Terminal.Gui concepts and features.</description>
 ///             </item>
 ///             <item>
 ///                 <description>Provide sample code that illustrates how to properly implement said concepts & features.</description>
@@ -41,10 +41,6 @@ namespace UICatalog;
 ///                 <description>Make it easy for contributors to add additional samples in a structured way.</description>
 ///             </item>
 ///         </list>
-///     </para>
-///     <para>
-///         See the project README for more details
-///         (https://github.com/gui-cs/Terminal.Gui/tree/master/UICatalog/README.md).
 ///     </para>
 /// </remarks>
 public class UICatalogApp

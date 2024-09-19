@@ -226,8 +226,6 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     /// <param name="inputColor"></param>
     /// <remarks>
     ///     Distance is defined here as the Euclidean distance between each color interpreted as a <see cref="Vector3"/>.
-    ///     <para/>
-    ///     The order of the values in the passed Vector3 must be
     /// </remarks>
     /// <returns></returns>
     [SkipLocalsInit]

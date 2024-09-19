@@ -26,6 +26,9 @@
     }
   ],
   "build": {
+    "xref": [
+      "https://learn.microsoft.com/en-us/dotnet/.xrefmap.json"
+    ],
     "template": [
       "default",
       "_exported_templates/modern"

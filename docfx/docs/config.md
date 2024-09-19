@@ -32,14 +32,15 @@ The `UI Catalog` application provides an example of how to use the [`Configurati
 
 (Note, this list may not be complete; search the source code for `SerializableConfigurationProperty` to find all settings that can be configured.)
 
-  * [Application.QuitKey](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_QuitKey)
-  * [Application.NextTabKey](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_NextTabKey)
-  * [Application.PrevTabKey](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_PrevTabKey)
-  * [Application.NextTabGroupKey](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_NextTabGroupKey)
-  * [Application.PrevTabGroupKey](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_PrevTabGroupKey)
-  * [Application.ForceDriver](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_ForceDriver)
-  * [Application.Force16Colors](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_Force16Colors)
-  * [Application.IsMouseDisabled](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_IsMouseDisabled)
+  * @Terminal.Gui.Application.QuitKey
+  * @Terminal.Gui.Application.NextTabKey
+  * @Terminal.Gui.Application.PrevTabKey
+  * @Terminal.Gui.Application.NextTabGroupKey
+  * @Terminal.Gui.Application.PrevTabGroupKey
+  * @Terminal.Gui.Application.ArrangeKey
+  * @Terminal.Gui.Application.ForceDriver
+  * @Terminal.Gui.Application.Force16Colors
+  * @Terminal.Gui.Application.IsMouseDisabled
   
 ## Glyphs
 

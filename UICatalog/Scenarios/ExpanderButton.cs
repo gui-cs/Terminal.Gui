@@ -144,8 +144,7 @@ public class ExpanderButton : Button
     }
 
     /// <summary>
-    ///     Fired when the orientation has changed. Can be cancelled by setting
-    ///     <see cref="OrientationEventArgs.Cancel"/> to true.
+    ///     Fired when the orientation has changed. Can be cancelled.
     /// </summary>
     public event EventHandler<CancelEventArgs<bool>> CollapsedChanging;
 
