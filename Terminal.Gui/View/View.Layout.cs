@@ -12,22 +12,28 @@ public partial class View // Layout APIs
     /// <returns><see langword="true"/> if the specified SuperView-relative coordinates are within the View.</returns>
     public virtual bool Contains (in Point location) { return Frame.Contains (location); }
 
-    /// <summary>Finds the first Subview of <paramref name="start"/> that is visible at the provided location.</summary>
+    /// <summary>Finds the first Subview of <see cref="Application.Top"/> or <see cref="Application.Popover"/> that is visible at the provided location.</summary>
     /// <remarks>
     ///     <para>
     ///         Used to determine what view the mouse is over.
     ///     </para>
     /// </remarks>
-    /// <param name="start">The view to scope the search by.</param>
-    /// <param name="location"><paramref name="start"/>.SuperView-relative coordinate.</param>
+    /// <param name="location">Screen-relative coordinate.</param>
     /// <returns>
     ///     The view that was found at the <paramref name="location"/> coordinate.
     ///     <see langword="null"/> if no view was found.
     /// </returns>
 
     // CONCURRENCY: This method is not thread-safe. Undefined behavior and likely program crashes are exposed by unsynchronized access to InternalSubviews.
-    internal static View? FindDeepestView (View? start, in Point location)
+    internal static View? FindDeepestView (in Point location)
     {
+        View? start = Application.Top;
+
+        if (Application.Popover?.Visible == true)
+        {
+            start = Application.Popover;
+        }
+
         Point currentLocation = location;
 
         while (start is { Visible: true } && start.Contains (currentLocation))

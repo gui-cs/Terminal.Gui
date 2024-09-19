@@ -464,6 +464,13 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             tl.Draw ();
         }
 
+        if (Popover is { LayoutNeeded: true })
+        {
+            Popover.LayoutSubviews ();
+        }
+
+        Popover?.Draw ();
+
         Driver!.Refresh ();
     }
 

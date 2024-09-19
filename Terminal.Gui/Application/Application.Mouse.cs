@@ -139,7 +139,7 @@ public static partial class Application // Mouse handling
             return;
         }
 
-        var view = View.FindDeepestView (Top, mouseEvent.Position);
+        var view = View.FindDeepestView (mouseEvent.Position);
 
         if (view is { })
         {
