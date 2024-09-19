@@ -34,8 +34,9 @@ public class ApplicationNavigation
     /// </summary>
     /// <param name="start"></param>
     /// <param name="view"></param>
+    /// <param name="includeAdornments">Will search the subview hierarchy of the adornments if true.</param>
     /// <returns></returns>
-    public static bool IsInHierarchy (View? start, View? view)
+    public static bool IsInHierarchy (View? start, View? view, bool includeAdornments = false)
     {
         if (view is null)
         {
@@ -54,7 +55,31 @@ public class ApplicationNavigation
                 return true;
             }
 
-            bool found = IsInHierarchy (subView, view);
+            bool found = IsInHierarchy (subView, view, includeAdornments);
+
+            if (found)
+            {
+                return found;
+            }
+        }
+
+        if (includeAdornments)
+        {
+            bool found = IsInHierarchy (start.Padding, view, includeAdornments);
+
+            if (found)
+            {
+                return found;
+            }
+
+            found = IsInHierarchy (start.Border, view, includeAdornments);
+
+            if (found)
+            {
+                return found;
+            }
+
+            found = IsInHierarchy (start.Margin, view, includeAdornments);
 
             if (found)
             {
@@ -100,6 +125,10 @@ public class ApplicationNavigation
     /// </returns>
     public bool AdvanceFocus (NavigationDirection direction, TabBehavior? behavior)
     {
+        if (Application.Popover is { Visible: true })
+        {
+            Application.Popover.AdvanceFocus (direction, behavior);
+        }
         return Application.Top is { } && Application.Top.AdvanceFocus (direction, behavior);
     }
 }

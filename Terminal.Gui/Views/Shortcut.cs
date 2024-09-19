@@ -806,7 +806,10 @@ public class Shortcut : View, IOrientation, IDesignable
     internal void SetColors ()
     {
         // Border should match superview.
-        Border.ColorScheme = SuperView?.ColorScheme;
+        if (Border is { })
+        {
+            Border.ColorScheme = SuperView?.ColorScheme;
+        }
 
         if (HasFocus)
         {

@@ -3,34 +3,74 @@ namespace Terminal.Gui;
 
 public static partial class Application // Popover handling
 {
-    /// <summary>The <see cref="View"/> that is currently active as the sole-Application Popover.</summary>
-    /// <value>The Popover.</value>
-    public static View? Popover { get; internal set; }
-    public static bool ShowPopover (View popoverView)
+    private static View? _popover;
+
+    /// <summary>Gets or sets the Application Popover View.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         To show or hide the Popover, set it's <see cref="View.Visible"/> property.
+    ///     </para>
+    /// </remarks>
+    public static View? Popover
     {
-        if (Popover is { })
+        get => _popover;
+        set
         {
-            Popover.Visible = false;
+            if (_popover == value)
+            {
+                return;
+            }
+
+            if (_popover is { })
+            {
+                _popover.Visible = false;
+                _popover.VisibleChanged -= PopoverVisibleChanged;
+            }
+
+            _popover = value;
+
+            if (_popover is { })
+            {
+                if (!_popover.IsInitialized)
+                {
+                    _popover.BeginInit ();
+                    _popover.EndInit ();
+                }
+                _popover.Arrangement |= ViewArrangement.Overlapped;
+
+                if (_popover.ColorScheme is null)
+                {
+                    _popover.ColorScheme = Top?.ColorScheme;
+                }
+
+                _popover.SetRelativeLayout (Screen.Size);
+
+                _popover.VisibleChanged += PopoverVisibleChanged;
+            }
         }
-
-        if (!popoverView.IsInitialized)
-        {
-            popoverView.BeginInit ();
-            popoverView.EndInit ();
-        }
-
-        Popover = popoverView;
-        Popover.Visible = true;
-        Popover.SetRelativeLayout (Screen.Size);
-
-        return true;
     }
 
-    public static void HidePopover ()
+    private static void PopoverVisibleChanged (object? sender, EventArgs e)
     {
-        if (Popover is { })
+        if (Popover is null)
         {
-            Popover.Visible = false;
+            return;
+        }
+
+        if (Popover.Visible)
+        {
+            Popover.Arrangement |= ViewArrangement.Overlapped;
+
+            if (Popover.ColorScheme is null)
+            {
+                Popover.ColorScheme = Top?.ColorScheme;
+            }
+            Popover.SetRelativeLayout (Screen.Size);
+            Popover.SetFocus ();
+        }
+        else
+        {
+            
         }
     }
 }

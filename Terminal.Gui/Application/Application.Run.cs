@@ -639,6 +639,11 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         _cachedRunStateToplevel = runState.Toplevel;
 
+        if (Popover is { })
+        {
+            Popover = null;
+        }
+
         runState.Toplevel = null;
         runState.Dispose ();
 

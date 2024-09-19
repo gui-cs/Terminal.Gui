@@ -54,6 +54,28 @@ public class ViewExperiments : Scenario
             Title = $"TopButton _{GetNextHotKey ()}",
         };
 
+        var popoverView = new Button ()
+        {
+            X = Pos.Center (),
+            Y = Pos.Center (),
+            Width = Dim.Percent (50),
+            Height = Dim.Percent (50),
+            Title = "Popover",
+            Text = "This is a popover",
+            Visible = false,
+            Arrangement = ViewArrangement.Resizable | ViewArrangement.Movable
+        };
+        popoverView.BorderStyle = LineStyle.RoundedDotted;
+        popoverView.Accept += (sender, e) => Application.Popover!.Visible = false;
+
+        button.Accept += ButtonAccept;
+
+        void ButtonAccept (object sender, System.ComponentModel.HandledEventArgs e)
+        {
+            Application.Popover = popoverView;
+            Application.Popover!.Visible = true;
+        }
+
         testFrame.Add (button);
 
         editor.AutoSelectViewToEdit = true;
@@ -61,12 +83,14 @@ public class ViewExperiments : Scenario
         editor.AutoSelectAdornments = true;
 
         Application.Run (app);
+        popoverView.Dispose ();
         app.Dispose ();
 
         Application.Shutdown ();
 
         return;
     }
+
 
     private int _hotkeyCount;
 

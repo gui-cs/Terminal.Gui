@@ -1,4 +1,6 @@
 #nullable enable
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
+
 namespace Terminal.Gui;
 
 public static partial class Application // Mouse handling
@@ -139,7 +141,17 @@ public static partial class Application // Mouse handling
             return;
         }
 
-        var view = View.FindDeepestView (mouseEvent.Position);
+        View? view;
+        view = View.FindDeepestView (mouseEvent.Position);
+
+        if ((mouseEvent.Flags == MouseFlags.Button1Pressed
+             || mouseEvent.Flags == MouseFlags.Button2Pressed
+             || mouseEvent.Flags == MouseFlags.Button3Pressed
+             || mouseEvent.Flags == MouseFlags.Button4Pressed)
+            && Popover is { Visible: true } && !ApplicationNavigation.IsInHierarchy (Popover, view, includeAdornments: true))
+        {
+            Popover.Visible = false;
+        }
 
         if (view is { })
         {
@@ -203,10 +215,10 @@ public static partial class Application // Mouse handling
         // We can combine this into the switch expression to reduce cognitive complexity even more and likely
         // avoid one or two of these checks in the process, as well.
         WantContinuousButtonPressedView = view switch
-                                          {
-                                              { WantContinuousButtonPressed: true } => view,
-                                              _                                     => null
-                                          };
+        {
+            { WantContinuousButtonPressed: true } => view,
+            _ => null
+        };
 
         // May be null before the prior condition or the condition may set it as null.
         // So, the checking must be outside the prior condition.

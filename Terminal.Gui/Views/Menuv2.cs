@@ -17,13 +17,40 @@ public class Menuv2 : Bar
         Orientation = Orientation.Vertical;
         Width = Dim.Auto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
-        ColorScheme = Colors.ColorSchemes ["Menu"];
         Initialized += Menuv2_Initialized;
+        VisibleChanged += OnVisibleChanged;
+    }
+
+    //private void OnMouseEvent (object sender, MouseEventEventArgs e)
+    //{
+    //    if (!e.MouseEvent.Flags.HasFlag(MouseFlags.ReportMousePosition))
+    //    {
+    //        return;
+    //    }
+
+
+    //}
+
+    private void OnVisibleChanged (object sender, EventArgs e)
+    {
+        if (Visible)
+        {
+            //Application.GrabMouse(this);
+        }
+        else
+        {
+            if (Application.MouseGrabView == this)
+            {
+                //Application.UngrabMouse ();
+            }
+        }
     }
 
     private void Menuv2_Initialized (object sender, EventArgs e)
     {
         Border.Thickness = new Thickness (1, 1, 1, 1);
+        Border.LineStyle = LineStyle.Single;
+        ColorScheme = Colors.ColorSchemes ["Menu"];
     }
 
     // Menuv2 arranges the items horizontally.

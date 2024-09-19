@@ -285,6 +285,12 @@ public static partial class Application // Keyboard handling
                     Command.Quit,
                     static () =>
                     {
+                        if (Popover is {Visible: true})
+                        {
+                            Popover.Visible = false;
+
+                            return true;
+                        }
                         RequestStop ();
                         return true;
                     }
