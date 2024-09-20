@@ -1,4 +1,10 @@
 #nullable enable
+<<<<<<< Updated upstream
+=======
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
+
+>>>>>>> Stashed changes
 namespace Terminal.Gui;
 
 public static partial class Application // Mouse handling
@@ -116,8 +122,8 @@ public static partial class Application // Mouse handling
         UnGrabbedMouse?.Invoke (view, new (view));
     }
 
-    // Used by OnMouseEvent to track the last view that was clicked on.
-    internal static View? MouseEnteredView { get; set; }
+    // Used by OnMouseEvent to suppport MouseEnter and MouseLeave events
+    internal static List<View?> ViewsUnderMouse { get; } = new ();
 
     /// <summary>Event fired when a mouse move or click occurs. Coordinates are screen relative.</summary>
     /// <remarks>
@@ -139,17 +145,32 @@ public static partial class Application // Mouse handling
             return;
         }
 
+<<<<<<< Updated upstream
         var view = View.FindDeepestView (Current, mouseEvent.Position);
+=======
+        Stack<View?> viewsUnderMouse = View.GetViewsUnderMouse (mouseEvent.Position);
 
-        if (view is { })
+        View? deepestViewUnderMouse = viewsUnderMouse.TryPeek (out View? result) ? result : null;
+
+        if ((mouseEvent.Flags == MouseFlags.Button1Pressed
+             || mouseEvent.Flags == MouseFlags.Button2Pressed
+             || mouseEvent.Flags == MouseFlags.Button3Pressed
+             || mouseEvent.Flags == MouseFlags.Button4Pressed)
+            && Popover is { Visible: true } && !ApplicationNavigation.IsInHierarchy (Popover, deepestViewUnderMouse, includeAdornments: true))
+        {
+            Popover.Visible = false;
+        }
+>>>>>>> Stashed changes
+
+        if (deepestViewUnderMouse is { })
         {
 #if DEBUG_IDISPOSABLE
-            if (view.WasDisposed)
+            if (deepestViewUnderMouse.WasDisposed)
             {
-                throw new ObjectDisposedException (view.GetType ().FullName);
+                throw new ObjectDisposedException (deepestViewUnderMouse.GetType ().FullName);
             }
 #endif
-            mouseEvent.View = view;
+            mouseEvent.View = deepestViewUnderMouse;
         }
 
         MouseEvent?.Invoke (null, mouseEvent);
@@ -177,7 +198,7 @@ public static partial class Application // Mouse handling
                 Position = frameLoc,
                 Flags = mouseEvent.Flags,
                 ScreenPosition = mouseEvent.Position,
-                View = view ?? MouseGrabView
+                View = deepestViewUnderMouse ?? MouseGrabView
             };
 
             if ((MouseGrabView.Viewport with { Location = Point.Empty }).Contains (viewRelativeMouseEvent.Position) is false)
@@ -193,7 +214,7 @@ public static partial class Application // Mouse handling
             }
 
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            if (MouseGrabView is null && view is Adornment)
+            if (MouseGrabView is null && deepestViewUnderMouse is Adornment)
             {
                 // The view that grabbed the mouse has been disposed
                 return;
@@ -202,6 +223,7 @@ public static partial class Application // Mouse handling
 
         // We can combine this into the switch expression to reduce cognitive complexity even more and likely
         // avoid one or two of these checks in the process, as well.
+<<<<<<< Updated upstream
         WantContinuousButtonPressedView = view switch
                                           {
                                               { WantContinuousButtonPressed: true } => view,
@@ -224,17 +246,24 @@ public static partial class Application // Mouse handling
                 ApplicationOverlapped.MoveCurrent ((Toplevel)top);
             }
         }
+=======
+        WantContinuousButtonPressedView = deepestViewUnderMouse switch
+        {
+            { WantContinuousButtonPressed: true } => deepestViewUnderMouse,
+            _ => null
+        };
+>>>>>>> Stashed changes
 
         // May be null before the prior condition or the condition may set it as null.
         // So, the checking must be outside the prior condition.
-        if (view is null)
+        if (deepestViewUnderMouse is null)
         {
             return;
         }
 
         MouseEvent? me;
 
-        if (view is Adornment adornment)
+        if (deepestViewUnderMouse is Adornment adornment)
         {
             Point frameLoc = adornment.ScreenToFrame (mouseEvent.Position);
 
@@ -243,19 +272,19 @@ public static partial class Application // Mouse handling
                 Position = frameLoc,
                 Flags = mouseEvent.Flags,
                 ScreenPosition = mouseEvent.Position,
-                View = view
+                View = deepestViewUnderMouse
             };
         }
-        else if (view.ViewportToScreen (Rectangle.Empty with { Size = view.Viewport.Size }).Contains (mouseEvent.Position))
+        else if (deepestViewUnderMouse.ViewportToScreen (Rectangle.Empty with { Size = deepestViewUnderMouse.Viewport.Size }).Contains (mouseEvent.Position))
         {
-            Point viewportLocation = view.ScreenToViewport (mouseEvent.Position);
+            Point viewportLocation = deepestViewUnderMouse.ScreenToViewport (mouseEvent.Position);
 
             me = new ()
             {
                 Position = viewportLocation,
                 Flags = mouseEvent.Flags,
                 ScreenPosition = mouseEvent.Position,
-                View = view
+                View = deepestViewUnderMouse
             };
         }
         else
@@ -263,51 +292,97 @@ public static partial class Application // Mouse handling
             return;
         }
 
-        if (MouseEnteredView is null)
-        {
-            MouseEnteredView = view;
-            view.NewMouseEnterEvent (me);
-        }
-        else if (MouseEnteredView != view)
-        {
-            MouseEnteredView.NewMouseLeaveEvent (me);
-            view.NewMouseEnterEvent (me);
-            MouseEnteredView = view;
-        }
+        // Mouse Enter/Leave events
 
-        if (!view.WantMousePositionReports && mouseEvent.Flags == MouseFlags.ReportMousePosition)
+        // Tell any views that are no longer under the mouse that the mouse has left and remove them from list
+        List<View?> viewsToLeave = ViewsUnderMouse.Where (v => v is { } && !viewsUnderMouse.Contains (v)).ToList ();
+        foreach (View? view in viewsToLeave)
         {
-            return;
-        }
+            if (view is null)
+            {
+                continue;
+            }
 
-        WantContinuousButtonPressedView = view.WantContinuousButtonPressed ? view : null;
-
-        //Debug.WriteLine ($"OnMouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags}");
-
-        while (view.NewMouseEvent (me) is not true && MouseGrabView is not { })
-        {
             if (view is Adornment adornmentView)
             {
-                view = adornmentView.Parent!.SuperView;
+                Point frameLoc = adornmentView.ScreenToFrame (mouseEvent.Position);
+                if (adornmentView.Parent is { } && !adornmentView.Contains (frameLoc))
+                {
+                    ViewsUnderMouse.Remove (view);
+                    view.NewMouseLeaveEvent (me);
+                }
             }
             else
             {
-                view = view.SuperView;
+                Point viewportLocation = view.ScreenToViewport (mouseEvent.Position);
+                if (!view.Contains (viewportLocation))
+                {
+                    ViewsUnderMouse.Remove (view);
+                    view.NewMouseLeaveEvent (me);
+                }
+
+            }
+        }
+
+        // Tell any views that are now under the mouse (viewsUnderMouse) that the mouse has entered and add them to the list
+        foreach (View? view in viewsUnderMouse)
+        {
+            if (view is null)
+            {
+                continue;
             }
 
-            if (view is null)
+            Point viewportLocation = view.ScreenToViewport (mouseEvent.Position);
+
+            if (view is Adornment adornmentView)
+            {
+
+                if (adornmentView.Parent is { } && !adornmentView.Contains (viewportLocation))
+                {
+                    ViewsUnderMouse.Add (view);
+                    view.NewMouseEnterEvent (me);
+                }
+            }
+            else if (view.Contains (viewportLocation))
+            {
+                ViewsUnderMouse.Add (view);
+                view.NewMouseEnterEvent (me);
+            }
+        }
+
+
+        WantContinuousButtonPressedView = deepestViewUnderMouse.WantContinuousButtonPressed ? deepestViewUnderMouse : null;
+
+        //Debug.WriteLine ($"OnMouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags}");
+        if (deepestViewUnderMouse.Id == "mouseDemo")
+        {
+
+        }
+
+        while (deepestViewUnderMouse.NewMouseEvent (me) is not true && MouseGrabView is not { })
+        {
+            if (deepestViewUnderMouse is Adornment adornmentView)
+            {
+                deepestViewUnderMouse = adornmentView.Parent!.SuperView;
+            }
+            else
+            {
+                deepestViewUnderMouse = deepestViewUnderMouse.SuperView;
+            }
+
+            if (deepestViewUnderMouse is null)
             {
                 break;
             }
 
-            Point boundsPoint = view.ScreenToViewport (mouseEvent.Position);
+            Point boundsPoint = deepestViewUnderMouse.ScreenToViewport (mouseEvent.Position);
 
             me = new ()
             {
                 Position = boundsPoint,
                 Flags = mouseEvent.Flags,
                 ScreenPosition = mouseEvent.Position,
-                View = view
+                View = deepestViewUnderMouse
             };
         }
 

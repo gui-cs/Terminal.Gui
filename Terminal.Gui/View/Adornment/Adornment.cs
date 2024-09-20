@@ -205,6 +205,7 @@ public class Adornment : View
     #region Mouse Support
 
 
+    // TODO: It's stoopid that this override changes the defn of the input coords from base. 
     /// <summary>
     /// Indicates whether the specified Parent's SuperView-relative coordinates are within the Adornment's Thickness.
     /// </summary>
@@ -229,15 +230,15 @@ public class Adornment : View
     /// <inheritdoc/>
     protected internal override bool? OnMouseEnter (MouseEvent mouseEvent)
     {
-        // Invert Normal
-        if (Diagnostics.HasFlag (ViewDiagnosticFlags.MouseEnter) && ColorScheme != null)
-        {
-            var cs = new ColorScheme (ColorScheme)
-            {
-                Normal = new (ColorScheme.Normal.Background, ColorScheme.Normal.Foreground)
-            };
-            ColorScheme = cs;
-        }
+        //// Invert Normal
+        //if (Diagnostics.HasFlag (ViewDiagnosticFlags.MouseEnter) && ColorScheme != null)
+        //{
+        //    var cs = new ColorScheme (ColorScheme)
+        //    {
+        //        Normal = new (ColorScheme.Normal.Background, ColorScheme.Normal.Foreground)
+        //    };
+        //    ColorScheme = cs;
+        //}
 
         return base.OnMouseEnter (mouseEvent);
     }
@@ -245,15 +246,15 @@ public class Adornment : View
     /// <inheritdoc/>   
     protected internal override bool OnMouseLeave (MouseEvent mouseEvent)
     {
-        // Invert Normal
-        if (Diagnostics.FastHasFlags (ViewDiagnosticFlags.MouseEnter) && ColorScheme != null)
-        {
-            var cs = new ColorScheme (ColorScheme)
-            {
-                Normal = new (ColorScheme.Normal.Background, ColorScheme.Normal.Foreground)
-            };
-            ColorScheme = cs;
-        }
+        //// Invert Normal
+        //if (Diagnostics.FastHasFlags (ViewDiagnosticFlags.MouseEnter) && ColorScheme != null)
+        //{
+        //    var cs = new ColorScheme (ColorScheme)
+        //    {
+        //        Normal = new (ColorScheme.Normal.Background, ColorScheme.Normal.Foreground)
+        //    };
+        //    ColorScheme = cs;
+        //}
 
         return base.OnMouseLeave (mouseEvent);
     }

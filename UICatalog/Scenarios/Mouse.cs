@@ -187,13 +187,18 @@ public class Mouse : Scenario
         Application.Shutdown ();
     }
 
-    public class MouseDemo : View
+    public class MouseDemo : Shortcut
     {
         private bool _button1PressedOnEnter;
 
         public MouseDemo ()
         {
             CanFocus = true;
+            Id = "mouseDemo";
+            Title = "Hi";
+            Key = Key.A.WithAlt;
+            HelpText = "Help!";
+            WantMousePositionReports = true;
 
             MouseEvent += (s, e) =>
                           {
@@ -214,10 +219,14 @@ public class Mouse : Scenario
 
             MouseLeave += (s, e) =>
                           {
-                              ColorScheme = Colors.ColorSchemes ["Dialog"];
+                              ColorScheme = Colors.ColorSchemes ["Menu"];
                               _button1PressedOnEnter = false;
                           };
-            MouseEnter += (s, e) => { _button1PressedOnEnter = e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed); };
+            MouseEnter += (s, e) =>
+                          {
+                              ColorScheme = Colors.ColorSchemes ["Error"];
+                              _button1PressedOnEnter = e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed);
+                          };
         }
     }
 }

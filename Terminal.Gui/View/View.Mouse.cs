@@ -80,6 +80,11 @@ public partial class View // Mouse APIs
             return false;
         }
 
+        if (!WantMousePositionReports && mouseEvent.Flags == MouseFlags.ReportMousePosition)
+        {
+            return false;
+        }
+
         if (OnMouseEvent (mouseEvent))
         {
             // Technically mouseEvent.Handled should already be true if implementers of OnMouseEvent
@@ -328,23 +333,24 @@ public partial class View // Mouse APIs
     }
 
     /// <summary>
-    ///     Called by <see cref="Application.OnMouseEvent"/> when the mouse enters <see cref="Viewport"/>. The view will
-    ///     then receive mouse events until <see cref="NewMouseLeaveEvent"/> is called indicating the mouse has left
-    ///     the view.
+    ///     Called by <see cref="Application.OnMouseEvent"/> when the mouse enters <see cref="Viewport"/>. <see cref="MouseLeave"/> will
+    ///     be raised when the mouse is no longer over the <see cref="Viewport"/>. If another View occludes the current one, the
+    ///     that View will also receive a MouseEnter event.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         A view must be both enabled and visible to receive mouse events.
+    ///         A view must be visible to receive Enter/Leave events.
     ///     </para>
     ///     <para>
-    ///         This method calls <see cref="OnMouseEnter"/> to fire the event.
+    ///         This method calls <see cref="OnMouseEnter"/> to raise the <see cref="MouseEnter"/> event.
     ///     </para>
     ///     <para>
     ///         See <see cref="SetHighlight"/> for more information.
     ///     </para>
     /// </remarks>
     /// <param name="mouseEvent"></param>
-    /// <returns><see langword="true"/> if the event was handled, <see langword="false"/> otherwise.</returns>
+    /// <returns><see langword="true"/> if the event was handled, <see langword="false"/> otherwise. Handling the event
+    /// prevents Views higher in the visible hierarchy from recieving Enter/Leave events.</returns>
     internal bool? NewMouseEnterEvent (MouseEvent mouseEvent)
     {
         if (!Enabled)
@@ -375,29 +381,23 @@ public partial class View // Mouse APIs
     }
 
     /// <summary>
-    ///     Called by <see cref="Application.OnMouseEvent"/> when the mouse leaves <see cref="Viewport"/>. The view will
-    ///     then no longer receive mouse events.
+    ///     Called by <see cref="Application.OnMouseEvent"/> when the mouse leaves <see cref="Viewport"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         A view must be both enabled and visible to receive mouse events.
+    ///         A view must be visible to receive Enter/Leave events.
     ///     </para>
     ///     <para>
-    ///         This method calls <see cref="OnMouseLeave"/> to fire the event.
+    ///         This method calls <see cref="OnMouseLeave"/> to raise the <see cref="MouseLeave"/> event.
     ///     </para>
     ///     <para>
     ///         See <see cref="SetHighlight"/> for more information.
     ///     </para>
     /// </remarks>
     /// <param name="mouseEvent"></param>
-    /// <returns><see langword="true"/> if the event was handled, <see langword="false"/> otherwise.</returns>
+    /// <returns><see langword="true"/> if the event was handled, <see langword="false"/> otherwise. </returns>
     internal bool? NewMouseLeaveEvent (MouseEvent mouseEvent)
     {
-        if (!Enabled)
-        {
-            return true;
-        }
-
         if (!CanBeVisible (this))
         {
             return false;

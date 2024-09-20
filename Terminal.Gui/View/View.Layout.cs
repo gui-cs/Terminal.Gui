@@ -1,5 +1,6 @@
 #nullable enable
 using System.Diagnostics;
+using Microsoft.CodeAnalysis;
 
 namespace Terminal.Gui;
 
@@ -28,6 +29,23 @@ public partial class View // Layout APIs
     // CONCURRENCY: This method is not thread-safe. Undefined behavior and likely program crashes are exposed by unsynchronized access to InternalSubviews.
     internal static View? FindDeepestView (View? start, in Point location)
     {
+<<<<<<< Updated upstream
+=======
+        return GetViewsUnderMouse (location).TryPeek (out View? result) ? result : null;
+    }
+
+    internal static Stack<View?> GetViewsUnderMouse (in Point location)
+    {
+        Stack<View> viewsUnderMouse = new ();
+
+        View? start = Application.Top;
+
+        if (Application.Popover?.Visible == true)
+        {
+            start = Application.Popover;
+        }
+
+>>>>>>> Stashed changes
         Point currentLocation = location;
 
         while (start is { Visible: true } && start.Contains (currentLocation))
@@ -51,6 +69,8 @@ public partial class View // Layout APIs
 
             if (found is { })
             {
+                //viewsUnderMouse.Push (found);
+
                 start = found;
                 viewportOffset = found.Parent?.Frame.Location ?? Point.Empty;
             }
@@ -70,6 +90,7 @@ public partial class View // Layout APIs
                     currentLocation.Y = startOffsetY + start.Viewport.Y;
 
                     // start is the deepest subview under the mouse; stop searching the subviews
+                    viewsUnderMouse.Push (start);
                     break;
                 }
             }
@@ -77,14 +98,16 @@ public partial class View // Layout APIs
             if (subview is null)
             {
                 // No subview was found that's under the mouse, so we're done
-                return start;
+                viewsUnderMouse.Push (start);
+                return viewsUnderMouse;
             }
 
             // We found a subview of start that's under the mouse, continue...
             start = subview;
+            //viewsUnderMouse.Push (subview);
         }
 
-        return null;
+        return viewsUnderMouse;
     }
 
     // BUGBUG: This method interferes with Dialog/MessageBox default min/max size.
