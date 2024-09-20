@@ -570,4 +570,78 @@ public partial class View // Mouse APIs
 
         return false;
     }
+
+    /// <summary>
+    ///    INTERNAL: Gets the Views that are under the mouse at <paramref name="location"/>, including Adornments.
+    /// </summary>
+    /// <param name="location"></param>
+    /// <returns></returns>
+    internal static List<View?> GetViewsUnderMouse (in Point location)
+    {
+        List<View> viewsUnderMouse = new ();
+
+        View? start = Application.Current ?? Application.Top;
+
+        Point currentLocation = location;
+
+        while (start is { Visible: true } && start.Contains (currentLocation))
+        {
+            viewsUnderMouse.Add (start);
+
+            Adornment? found = null;
+
+            if (start.Margin.Contains (currentLocation))
+            {
+                found = start.Margin;
+            }
+            else if (start.Border.Contains (currentLocation))
+            {
+                found = start.Border;
+            }
+            else if (start.Padding.Contains (currentLocation))
+            {
+                found = start.Padding;
+            }
+
+            Point viewportOffset = start.GetViewportOffsetFromFrame ();
+
+            if (found is { })
+            {
+                start = found;
+                viewsUnderMouse.Add (start);
+                viewportOffset = found.Parent?.Frame.Location ?? Point.Empty;
+            }
+
+            int startOffsetX = currentLocation.X - (start.Frame.X + viewportOffset.X);
+            int startOffsetY = currentLocation.Y - (start.Frame.Y + viewportOffset.Y);
+
+            View? subview = null;
+
+            for (int i = start.InternalSubviews.Count - 1; i >= 0; i--)
+            {
+                if (start.InternalSubviews [i].Visible
+                    && start.InternalSubviews [i].Contains (new (startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y)))
+                {
+                    subview = start.InternalSubviews [i];
+                    currentLocation.X = startOffsetX + start.Viewport.X;
+                    currentLocation.Y = startOffsetY + start.Viewport.Y;
+
+                    // start is the deepest subview under the mouse; stop searching the subviews
+                    break;
+                }
+            }
+
+            if (subview is null)
+            {
+                // No subview was found that's under the mouse, so we're done
+                return viewsUnderMouse;
+            }
+
+            // We found a subview of start that's under the mouse, continue...
+            start = subview;
+        }
+
+        return viewsUnderMouse;
+    }
+
 }

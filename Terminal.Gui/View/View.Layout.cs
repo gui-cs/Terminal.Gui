@@ -27,87 +27,9 @@ public partial class View // Layout APIs
     /// </returns>
 
     // CONCURRENCY: This method is not thread-safe. Undefined behavior and likely program crashes are exposed by unsynchronized access to InternalSubviews.
-    internal static View? FindDeepestView (View? start, in Point location)
+    internal static View? FindDeepestView (in Point location)
     {
-<<<<<<< Updated upstream
-=======
-        return GetViewsUnderMouse (location).TryPeek (out View? result) ? result : null;
-    }
-
-    internal static Stack<View?> GetViewsUnderMouse (in Point location)
-    {
-        Stack<View> viewsUnderMouse = new ();
-
-        View? start = Application.Top;
-
-        if (Application.Popover?.Visible == true)
-        {
-            start = Application.Popover;
-        }
-
->>>>>>> Stashed changes
-        Point currentLocation = location;
-
-        while (start is { Visible: true } && start.Contains (currentLocation))
-        {
-            Adornment? found = null;
-
-            if (start.Margin.Contains (currentLocation))
-            {
-                found = start.Margin;
-            }
-            else if (start.Border.Contains (currentLocation))
-            {
-                found = start.Border;
-            }
-            else if (start.Padding.Contains (currentLocation))
-            {
-                found = start.Padding;
-            }
-
-            Point viewportOffset = start.GetViewportOffsetFromFrame ();
-
-            if (found is { })
-            {
-                //viewsUnderMouse.Push (found);
-
-                start = found;
-                viewportOffset = found.Parent?.Frame.Location ?? Point.Empty;
-            }
-
-            int startOffsetX = currentLocation.X - (start.Frame.X + viewportOffset.X);
-            int startOffsetY = currentLocation.Y - (start.Frame.Y + viewportOffset.Y);
-
-            View? subview = null;
-
-            for (int i = start.InternalSubviews.Count - 1; i >= 0; i--)
-            {
-                if (start.InternalSubviews [i].Visible
-                    && start.InternalSubviews [i].Contains (new (startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y)))
-                {
-                    subview = start.InternalSubviews [i];
-                    currentLocation.X = startOffsetX + start.Viewport.X;
-                    currentLocation.Y = startOffsetY + start.Viewport.Y;
-
-                    // start is the deepest subview under the mouse; stop searching the subviews
-                    viewsUnderMouse.Push (start);
-                    break;
-                }
-            }
-
-            if (subview is null)
-            {
-                // No subview was found that's under the mouse, so we're done
-                viewsUnderMouse.Push (start);
-                return viewsUnderMouse;
-            }
-
-            // We found a subview of start that's under the mouse, continue...
-            start = subview;
-            //viewsUnderMouse.Push (subview);
-        }
-
-        return viewsUnderMouse;
+        return GetViewsUnderMouse (location).LastOrDefault ();
     }
 
     // BUGBUG: This method interferes with Dialog/MessageBox default min/max size.

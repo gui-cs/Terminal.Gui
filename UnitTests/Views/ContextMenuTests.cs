@@ -1394,7 +1394,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (tf1.HasFocus);
         Assert.False (tf2.HasFocus);
         Assert.Equal (4, win.Subviews.Count); // TF & TV add autocomplete popup's to their superviews.
-        Assert.Null (Application.MouseEnteredView);
+        Assert.Empty (Application.ViewsUnderMouse);
 
         // Right click on tf2 to open context menu
         Application.OnMouseEvent (new () { Position = new (1, 3), Flags = MouseFlags.Button3Clicked });
@@ -1404,7 +1404,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (tf2.ContextMenu.MenuBar.IsMenuOpen);
         Assert.True (win.Focused is Menu);
         Assert.True (Application.MouseGrabView is MenuBar);
-        Assert.Equal (tf2, Application.MouseEnteredView);
+        Assert.Equal (tf2, Application.ViewsUnderMouse.LastOrDefault ());
 
         // Click on tf1 to focus it, which cause context menu being closed
         Application.OnMouseEvent (new () { Position = new (1, 1), Flags = MouseFlags.Button1Clicked });
@@ -1416,7 +1416,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.NotNull (tf2.ContextMenu.MenuBar);
         Assert.Equal (win.Focused, tf1);
         Assert.Null (Application.MouseGrabView);
-        Assert.Equal (tf1, Application.MouseEnteredView);
+        Assert.Equal (tf1, Application.ViewsUnderMouse.LastOrDefault ());
 
         // Click on tf2 to focus it
         Application.OnMouseEvent (new () { Position = new (1, 3), Flags = MouseFlags.Button1Clicked });
@@ -1428,7 +1428,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.NotNull (tf2.ContextMenu.MenuBar);
         Assert.Equal (win.Focused, tf2);
         Assert.Null (Application.MouseGrabView);
-        Assert.Equal (tf2, Application.MouseEnteredView);
+        Assert.Equal (tf2, Application.ViewsUnderMouse.LastOrDefault ());
 
         Application.End (rs);
         win.Dispose ();

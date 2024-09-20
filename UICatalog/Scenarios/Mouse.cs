@@ -43,7 +43,10 @@ public class Mouse : Scenario
 
         for (var i = 0; i < filterSlider.Options.Count; i++)
         {
-            filterSlider.SetOption (i);
+            if (filterSlider.Options [i].Data != MouseFlags.ReportMousePosition)
+            {
+                filterSlider.SetOption (i);
+            }
         }
 
         win.Add (filterSlider);
@@ -93,17 +96,51 @@ public class Mouse : Scenario
 
         win.Add (cbHighlightOnPress);
 
-        var demo = new MouseDemo
+        var demo = new MouseEventDemoView
         {
             X = Pos.Right (filterSlider),
             Y = Pos.Bottom (cbHighlightOnPress),
-            Width = 20,
-            Height = 3,
-            Text = "Enter/Leave Demo",
-            TextAlignment = Alignment.Center,
-            VerticalTextAlignment = Alignment.Center,
-            ColorScheme = Colors.ColorSchemes ["Dialog"]
+            Width = Dim.Fill (),
+            Height = 15,
+            Title = "Enter/Leave Demo",
         };
+
+        demo.Padding.Initialized += DemoPaddingOnInitialized;
+
+        void DemoPaddingOnInitialized (object o, EventArgs eventArgs)
+        {
+            demo.Padding.Add (
+                              new MouseEventDemoView ()
+                              {
+                                  X = 0,
+                                  Y = 0,
+                                  Width = Dim.Fill (),
+                                  Height = Dim.Func (() => demo.Padding.Thickness.Top),
+                                  Title = "inPadding"
+                              });
+            demo.Padding.Thickness = demo.Padding.Thickness with { Top = 5 };
+        }
+
+        demo.Add (
+                  new MouseEventDemoView ()
+                  {
+                      X = 0,
+                      Y = 0,
+                      Width = Dim.Percent(30),
+                      Height = Dim.Fill(),
+                      Title = "sub1",
+                  });
+
+        demo.Add (
+                  new MouseEventDemoView ()
+                  {
+                      X = Pos.AnchorEnd(),
+                      Y = 0,
+                      Width = Dim.Percent (30),
+                      Height = Dim.Fill (),
+                      Title = "sub2",
+                  });
+
         win.Add (demo);
 
         var label = new Label
@@ -187,45 +224,48 @@ public class Mouse : Scenario
         Application.Shutdown ();
     }
 
-    public class MouseDemo : Shortcut
+    public class MouseEventDemoView : View
     {
-        private bool _button1PressedOnEnter;
-
-        public MouseDemo ()
+        public MouseEventDemoView ()
         {
             CanFocus = true;
-            Id = "mouseDemo";
-            Title = "Hi";
-            Key = Key.A.WithAlt;
-            HelpText = "Help!";
-            WantMousePositionReports = true;
+            Id = "mouseEventDemoView";
 
-            MouseEvent += (s, e) =>
-                          {
-                              if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
-                              {
-                                  if (!_button1PressedOnEnter)
-                                  {
-                                      ColorScheme = Colors.ColorSchemes ["Toplevel"];
-                                  }
-                              }
+            Padding.Thickness = new Thickness (1, 1, 1, 1);
 
-                              if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Released))
-                              {
-                                  ColorScheme = Colors.ColorSchemes ["Dialog"];
-                                  _button1PressedOnEnter = false;
-                              }
-                          };
+            Initialized += OnInitialized;
+
+            void OnInitialized (object sender, EventArgs e)
+            {
+                TextAlignment = Alignment.Center;
+                VerticalTextAlignment = Alignment.Center;
+
+                Padding.ColorScheme = new ColorScheme (new Attribute (Color.Black));
+
+                Padding.MouseEnter += PaddingOnMouseEnter;
+                Padding.MouseLeave += PaddingOnMouseLeave;
+
+                void PaddingOnMouseEnter (object o, MouseEventEventArgs mouseEventEventArgs)
+                {
+                    Padding.ColorScheme = Colors.ColorSchemes ["Error"];
+                }
+
+                void PaddingOnMouseLeave (object o, MouseEventEventArgs mouseEventEventArgs)
+                {
+                    Padding.ColorScheme = Colors.ColorSchemes ["Dialog"];
+                }
+
+                Border.Thickness = new Thickness (1);
+                Border.LineStyle = LineStyle.Rounded;
+            }
 
             MouseLeave += (s, e) =>
                           {
-                              ColorScheme = Colors.ColorSchemes ["Menu"];
-                              _button1PressedOnEnter = false;
+                              Text = "Leave";
                           };
             MouseEnter += (s, e) =>
                           {
-                              ColorScheme = Colors.ColorSchemes ["Error"];
-                              _button1PressedOnEnter = e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed);
+                              Text = "Enter";
                           };
         }
     }

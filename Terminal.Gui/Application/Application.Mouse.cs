@@ -1,16 +1,12 @@
 #nullable enable
-<<<<<<< Updated upstream
-=======
+using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
->>>>>>> Stashed changes
 namespace Terminal.Gui;
 
 public static partial class Application // Mouse handling
 {
-    #region Mouse handling
-
     /// <summary>Disable or enable the mouse. The mouse is enabled by default.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool IsMouseDisabled { get; set; }
@@ -145,22 +141,9 @@ public static partial class Application // Mouse handling
             return;
         }
 
-<<<<<<< Updated upstream
-        var view = View.FindDeepestView (Current, mouseEvent.Position);
-=======
-        Stack<View?> viewsUnderMouse = View.GetViewsUnderMouse (mouseEvent.Position);
+        List<View?> currentViewsUnderMouse = View.GetViewsUnderMouse (mouseEvent.Position);
 
-        View? deepestViewUnderMouse = viewsUnderMouse.TryPeek (out View? result) ? result : null;
-
-        if ((mouseEvent.Flags == MouseFlags.Button1Pressed
-             || mouseEvent.Flags == MouseFlags.Button2Pressed
-             || mouseEvent.Flags == MouseFlags.Button3Pressed
-             || mouseEvent.Flags == MouseFlags.Button4Pressed)
-            && Popover is { Visible: true } && !ApplicationNavigation.IsInHierarchy (Popover, deepestViewUnderMouse, includeAdornments: true))
-        {
-            Popover.Visible = false;
-        }
->>>>>>> Stashed changes
+        View? deepestViewUnderMouse = currentViewsUnderMouse.LastOrDefault ();
 
         if (deepestViewUnderMouse is { })
         {
@@ -223,36 +206,12 @@ public static partial class Application // Mouse handling
 
         // We can combine this into the switch expression to reduce cognitive complexity even more and likely
         // avoid one or two of these checks in the process, as well.
-<<<<<<< Updated upstream
-        WantContinuousButtonPressedView = view switch
-                                          {
-                                              { WantContinuousButtonPressed: true } => view,
-                                              _                                     => null
-                                          };
 
-        if (view is not Adornment
-         && (view is null || view == ApplicationOverlapped.OverlappedTop)
-         && Current is { Modal: false }
-         && ApplicationOverlapped.OverlappedTop != null
-         && mouseEvent.Flags is not MouseFlags.ReportMousePosition and not 0)
-        {
-            // This occurs when there are multiple overlapped "tops"
-            // E.g. "Mdi" - in the Background Worker Scenario
-            View? top = ApplicationOverlapped.FindDeepestTop (Top!, mouseEvent.Position);
-            view = View.FindDeepestView (top, mouseEvent.Position);
-
-            if (view is { } && view != ApplicationOverlapped.OverlappedTop && top != Current && top is { })
-            {
-                ApplicationOverlapped.MoveCurrent ((Toplevel)top);
-            }
-        }
-=======
         WantContinuousButtonPressedView = deepestViewUnderMouse switch
         {
             { WantContinuousButtonPressed: true } => deepestViewUnderMouse,
             _ => null
         };
->>>>>>> Stashed changes
 
         // May be null before the prior condition or the condition may set it as null.
         // So, the checking must be outside the prior condition.
@@ -289,67 +248,11 @@ public static partial class Application // Mouse handling
         }
         else
         {
+            Debug.Fail ("This should never happen");
             return;
         }
 
-        // Mouse Enter/Leave events
-
-        // Tell any views that are no longer under the mouse that the mouse has left and remove them from list
-        List<View?> viewsToLeave = ViewsUnderMouse.Where (v => v is { } && !viewsUnderMouse.Contains (v)).ToList ();
-        foreach (View? view in viewsToLeave)
-        {
-            if (view is null)
-            {
-                continue;
-            }
-
-            if (view is Adornment adornmentView)
-            {
-                Point frameLoc = adornmentView.ScreenToFrame (mouseEvent.Position);
-                if (adornmentView.Parent is { } && !adornmentView.Contains (frameLoc))
-                {
-                    ViewsUnderMouse.Remove (view);
-                    view.NewMouseLeaveEvent (me);
-                }
-            }
-            else
-            {
-                Point viewportLocation = view.ScreenToViewport (mouseEvent.Position);
-                if (!view.Contains (viewportLocation))
-                {
-                    ViewsUnderMouse.Remove (view);
-                    view.NewMouseLeaveEvent (me);
-                }
-
-            }
-        }
-
-        // Tell any views that are now under the mouse (viewsUnderMouse) that the mouse has entered and add them to the list
-        foreach (View? view in viewsUnderMouse)
-        {
-            if (view is null)
-            {
-                continue;
-            }
-
-            Point viewportLocation = view.ScreenToViewport (mouseEvent.Position);
-
-            if (view is Adornment adornmentView)
-            {
-
-                if (adornmentView.Parent is { } && !adornmentView.Contains (viewportLocation))
-                {
-                    ViewsUnderMouse.Add (view);
-                    view.NewMouseEnterEvent (me);
-                }
-            }
-            else if (view.Contains (viewportLocation))
-            {
-                ViewsUnderMouse.Add (view);
-                view.NewMouseEnterEvent (me);
-            }
-        }
-
+        RaiseMouseEnterLeaveEvents (me.ScreenPosition, currentViewsUnderMouse, me);
 
         WantContinuousButtonPressedView = deepestViewUnderMouse.WantContinuousButtonPressed ? deepestViewUnderMouse : null;
 
@@ -389,5 +292,64 @@ public static partial class Application // Mouse handling
         ApplicationOverlapped.BringOverlappedTopToFront ();
     }
 
-    #endregion Mouse handling
+    // TODO: Refactor MouseEnter/LeaveEvents to not take MouseEvent param.
+    internal static void RaiseMouseEnterLeaveEvents (Point screenPosition, List<View?> currentViewsUnderMouse, MouseEvent me)
+    {
+        // Tell any views that are no longer under the mouse that the mouse has left
+        List<View?> viewsToLeave = ViewsUnderMouse.Where (v => v is { } && !currentViewsUnderMouse.Contains (v)).ToList ();
+        foreach (View? view in viewsToLeave)
+        {
+            if (view is null)
+            {
+                continue;
+            }
+
+            if (view is Adornment adornmentView)
+            {
+                Point frameLoc = adornmentView.ScreenToFrame (screenPosition);
+                if (adornmentView.Parent is { } && !adornmentView.Contains (frameLoc))
+                {
+                    view.NewMouseLeaveEvent (me);
+                }
+            }
+            else
+            {
+                Point superViewLoc = view.SuperView?.ScreenToViewport (screenPosition) ?? screenPosition;
+                if (!view.Contains (superViewLoc))
+                {
+                    view.NewMouseLeaveEvent (me);
+                }
+            }
+        }
+
+        ViewsUnderMouse.Clear ();
+
+        // Tell any views that are now under the mouse that the mouse has entered and add them to the list
+        foreach (View? view in currentViewsUnderMouse)
+        {
+            if (view is null)
+            {
+                continue;
+            }
+
+            ViewsUnderMouse.Add (view);
+
+            if (view is Adornment adornmentView)
+            {
+                Point frameLoc = view.ScreenToFrame (me.ScreenPosition);
+                if (adornmentView.Parent is { } && !adornmentView.Contains (frameLoc))
+                {
+                    view.NewMouseEnterEvent (me);
+                }
+            }
+            else
+            {
+                Point superViewLoc = view.SuperView?.ScreenToViewport (me.ScreenPosition) ?? me.ScreenPosition;
+                if (view.Contains (superViewLoc))
+                {
+                    view.NewMouseEnterEvent (me);
+                }
+            }
+        }
+    }
 }
