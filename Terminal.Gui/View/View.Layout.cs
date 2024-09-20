@@ -13,27 +13,7 @@ public partial class View // Layout APIs
     /// <returns><see langword="true"/> if the specified SuperView-relative coordinates are within the View.</returns>
     public virtual bool Contains (in Point location) { return Frame.Contains (location); }
 
-    /// <summary>Finds the first Subview of <paramref name="start"/> that is visible at the provided location.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         Used to determine what view the mouse is over.
-    ///     </para>
-    /// </remarks>
-    /// <param name="start">The view to scope the search by.</param>
-    /// <param name="location"><paramref name="start"/>.SuperView-relative coordinate.</param>
-    /// <returns>
-    ///     The view that was found at the <paramref name="location"/> coordinate.
-    ///     <see langword="null"/> if no view was found.
-    /// </returns>
-
-    // CONCURRENCY: This method is not thread-safe. Undefined behavior and likely program crashes are exposed by unsynchronized access to InternalSubviews.
-    internal static View? FindDeepestView (in Point location)
-    {
-        return GetViewsUnderMouse (location).LastOrDefault ();
-    }
-
     // BUGBUG: This method interferes with Dialog/MessageBox default min/max size.
-
     /// <summary>
     ///     Gets a new location of the <see cref="View"/> that is within the Viewport of the <paramref name="viewToMove"/>'s
     ///     <see cref="View.SuperView"/> (e.g. for dragging a Window). The `out` parameters are the new X and Y coordinates.

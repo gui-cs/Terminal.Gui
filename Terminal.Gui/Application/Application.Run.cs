@@ -187,7 +187,6 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         toplevel.LayoutSubviews ();
         toplevel.PositionToplevels ();
 
-        // TODO: Should this use FindDeepestFocusableView instead?
         // Try to set initial focus to any TabStop
         if (!toplevel.HasFocus)
         {

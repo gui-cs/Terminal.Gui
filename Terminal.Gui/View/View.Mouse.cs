@@ -578,7 +578,7 @@ public partial class View // Mouse APIs
     /// <returns></returns>
     internal static List<View?> GetViewsUnderMouse (in Point location)
     {
-        List<View> viewsUnderMouse = new ();
+        List<View?> viewsUnderMouse = new ();
 
         View? start = Application.Current ?? Application.Top;
 
