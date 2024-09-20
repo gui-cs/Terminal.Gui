@@ -118,9 +118,6 @@ public static partial class Application // Mouse handling
         UnGrabbedMouse?.Invoke (view, new (view));
     }
 
-    // Used by OnMouseEvent to suppport MouseEnter and MouseLeave events
-    internal static List<View?> ViewsUnderMouse { get; } = new ();
-
     /// <summary>Event fired when a mouse move or click occurs. Coordinates are screen relative.</summary>
     /// <remarks>
     ///     <para>
@@ -163,45 +160,9 @@ public static partial class Application // Mouse handling
             return;
         }
 
-        if (MouseGrabView is { })
+        if (GrabMouse (deepestViewUnderMouse, mouseEvent))
         {
-
-#if DEBUG_IDISPOSABLE
-            if (MouseGrabView.WasDisposed)
-            {
-                throw new ObjectDisposedException (MouseGrabView.GetType ().FullName);
-            }
-#endif
-            // If the mouse is grabbed, send the event to the view that grabbed it.
-            // The coordinates are relative to the Bounds of the view that grabbed the mouse.
-            Point frameLoc = MouseGrabView.ScreenToViewport (mouseEvent.Position);
-
-            var viewRelativeMouseEvent = new MouseEvent
-            {
-                Position = frameLoc,
-                Flags = mouseEvent.Flags,
-                ScreenPosition = mouseEvent.Position,
-                View = deepestViewUnderMouse ?? MouseGrabView
-            };
-
-            if ((MouseGrabView.Viewport with { Location = Point.Empty }).Contains (viewRelativeMouseEvent.Position) is false)
-            {
-                // The mouse has moved outside the bounds of the view that grabbed the mouse
-                //MouseGrabView.NewMouseLeaveEvent (mouseEvent);
-            }
-
-            //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
-            if (MouseGrabView?.NewMouseEvent (viewRelativeMouseEvent) is true)
-            {
-                return;
-            }
-
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            if (MouseGrabView is null && deepestViewUnderMouse is Adornment)
-            {
-                // The view that grabbed the mouse has been disposed
-                return;
-            }
+            return;
         }
 
         // We can combine this into the switch expression to reduce cognitive complexity even more and likely
@@ -220,6 +181,7 @@ public static partial class Application // Mouse handling
             return;
         }
 
+        // TODO: Move this after call to RaiseMouseEnterLeaveEvents once MouseEnter/Leave don't use MouseEvent anymore.
         MouseEvent? me;
 
         if (deepestViewUnderMouse is Adornment adornment)
@@ -292,11 +254,59 @@ public static partial class Application // Mouse handling
         ApplicationOverlapped.BringOverlappedTopToFront ();
     }
 
+    internal static bool GrabMouse (View? deepestViewUnderMouse, MouseEvent mouseEvent)
+    {
+        if (MouseGrabView is { })
+        {
+
+#if DEBUG_IDISPOSABLE
+            if (MouseGrabView.WasDisposed)
+            {
+                throw new ObjectDisposedException (MouseGrabView.GetType ().FullName);
+            }
+#endif
+            // If the mouse is grabbed, send the event to the view that grabbed it.
+            // The coordinates are relative to the Bounds of the view that grabbed the mouse.
+            Point frameLoc = MouseGrabView.ScreenToViewport (mouseEvent.Position);
+
+            var viewRelativeMouseEvent = new MouseEvent
+            {
+                Position = frameLoc,
+                Flags = mouseEvent.Flags,
+                ScreenPosition = mouseEvent.Position,
+                View = deepestViewUnderMouse ?? MouseGrabView
+            };
+
+            //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
+            if (MouseGrabView?.NewMouseEvent (viewRelativeMouseEvent) is true)
+            {
+                return true;
+            }
+
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+            if (MouseGrabView is null && deepestViewUnderMouse is Adornment)
+            {
+                // The view that grabbed the mouse has been disposed
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    internal static readonly List<View?> _cachedViewsUnderMouse = new ();
+
     // TODO: Refactor MouseEnter/LeaveEvents to not take MouseEvent param.
+    /// <summary>
+    ///     INTERNAL: Raises the MouseEnter and MouseLeave events for the views that are under the mouse.
+    /// </summary>
+    /// <param name="screenPosition">The position of the mouse.</param>
+    /// <param name="currentViewsUnderMouse">The most recent result from GetViewsUnderMouse().</param>
+    /// <param name="me">TODO: Remove once MouseEnter/Leave don't use MouseEvent anymore.</param>
     internal static void RaiseMouseEnterLeaveEvents (Point screenPosition, List<View?> currentViewsUnderMouse, MouseEvent me)
     {
         // Tell any views that are no longer under the mouse that the mouse has left
-        List<View?> viewsToLeave = ViewsUnderMouse.Where (v => v is { } && !currentViewsUnderMouse.Contains (v)).ToList ();
+        List<View?> viewsToLeave = _cachedViewsUnderMouse.Where (v => v is { } && !currentViewsUnderMouse.Contains (v)).ToList ();
         foreach (View? view in viewsToLeave)
         {
             if (view is null)
@@ -322,7 +332,7 @@ public static partial class Application // Mouse handling
             }
         }
 
-        ViewsUnderMouse.Clear ();
+        _cachedViewsUnderMouse.Clear ();
 
         // Tell any views that are now under the mouse that the mouse has entered and add them to the list
         foreach (View? view in currentViewsUnderMouse)
@@ -332,7 +342,7 @@ public static partial class Application // Mouse handling
                 continue;
             }
 
-            ViewsUnderMouse.Add (view);
+            _cachedViewsUnderMouse.Add (view);
 
             if (view is Adornment adornmentView)
             {

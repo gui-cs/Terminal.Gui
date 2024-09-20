@@ -317,7 +317,7 @@ public class ApplicationTests
             Assert.False (Application._forceFakeConsole);
             Assert.Equal (-1, Application.MainThreadId);
             Assert.Empty (Application.TopLevels);
-            Assert.Empty (Application.ViewsUnderMouse);
+            Assert.Empty (Application._cachedViewsUnderMouse);
 
             // Keyboard
             Assert.Empty (Application.GetViewKeyBindings ());
@@ -347,7 +347,7 @@ public class ApplicationTests
         Application.MainThreadId = 1;
 
         //Application._topLevels = new List<Toplevel> ();
-        Application.ViewsUnderMouse.Clear ();
+        Application._cachedViewsUnderMouse.Clear ();
 
         //Application.SupportedCultures = new List<CultureInfo> ();
         Application.Force16Colors = true;
@@ -361,7 +361,7 @@ public class ApplicationTests
 
         //ApplicationOverlapped.OverlappedChildren = new List<View> ();
         //ApplicationOverlapped.OverlappedTop = 
-        Application.ViewsUnderMouse.Clear ();
+        Application._cachedViewsUnderMouse.Clear ();
 
         //Application.WantContinuousButtonPressedView = new View ();
 
