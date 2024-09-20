@@ -2241,6 +2241,7 @@ wo
     [AutoInitShutdown]
     public void MenuOpened_On_Disabled_MenuItem ()
     {
+        MenuItem parent = null;
         MenuItem miCurrent = null;
         Menu mCurrent = null;
 
@@ -2273,6 +2274,7 @@ wo
 
         menu.MenuOpened += (s, e) =>
                            {
+                               parent = e.Parent;
                                miCurrent = e.MenuItem;
                                mCurrent = menu._openMenu;
                            };
@@ -2288,6 +2290,7 @@ wo
                                         )
                     );
         Assert.True (menu.IsMenuOpen);
+        Assert.Equal ("_File", parent.Title);
         Assert.Equal ("_File", miCurrent.Parent.Title);
         Assert.Equal ("_New", miCurrent.Title);
 
@@ -2297,6 +2300,7 @@ wo
                                             )
                     );
         Assert.True (menu.IsMenuOpen);
+        Assert.Equal ("_File", parent.Title);
         Assert.Equal ("_File", miCurrent.Parent.Title);
         Assert.Equal ("_New", miCurrent.Title);
 
@@ -2306,6 +2310,7 @@ wo
                                             )
                     );
         Assert.True (menu.IsMenuOpen);
+        Assert.Equal ("_File", parent.Title);
         Assert.Equal ("_File", miCurrent.Parent.Title);
         Assert.Equal ("_New", miCurrent.Title);
 
@@ -2315,6 +2320,7 @@ wo
                                             )
                     );
         Assert.True (menu.IsMenuOpen);
+        Assert.Equal ("_File", parent.Title);
         Assert.Equal ("_File", miCurrent.Parent.Title);
         Assert.Equal ("_Save", miCurrent.Title);
 
@@ -2331,18 +2337,20 @@ wo
         Assert.True (menu.IsMenuOpen);
 
         // The _New doc is enabled but the sub-menu isn't enabled. Is show but can't be selected and executed
+        Assert.Equal ("_New", parent.Title);
         Assert.Equal ("_New", miCurrent.Parent.Title);
         Assert.Equal ("_New doc", miCurrent.Title);
 
         Assert.True (mCurrent.NewKeyDownEvent (Key.CursorDown));
         Assert.True (menu.IsMenuOpen);
+        Assert.Equal ("_File", parent.Title);
         Assert.Equal ("_File", miCurrent.Parent.Title);
         Assert.Equal ("_Save", miCurrent.Title);
 
         Assert.True (mCurrent.NewKeyDownEvent (Key.CursorUp));
         Assert.True (menu.IsMenuOpen);
-        Assert.Equal ("_File", miCurrent.Parent.Title);
-        Assert.Equal ("_New", miCurrent.Title);
+        Assert.Equal ("_File", parent.Title);
+        Assert.Null (miCurrent);
 
         // close the menu
         Assert.True (menu.NewKeyDownEvent (menu.Key));
