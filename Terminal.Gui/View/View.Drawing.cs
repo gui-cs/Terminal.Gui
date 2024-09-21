@@ -379,6 +379,7 @@ public partial class View // Drawing APIs
 
         if (Diagnostics.HasFlag (ViewDiagnosticFlags.MouseEnter) && _mouseOver)
         {
+            // Make Normal and Disabled darker when the mouse is over the view
             cs = new ColorScheme (cs)
             {
                 Normal = new (ColorScheme.Normal.Foreground.GetDarkerColor (), ColorScheme.Normal.Background.GetDarkerColor()),

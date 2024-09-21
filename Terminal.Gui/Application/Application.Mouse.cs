@@ -326,11 +326,12 @@ public static partial class Application // Mouse handling
                 continue;
             }
 
-            if (!_cachedViewsUnderMouse.Contains (view))
+            if (_cachedViewsUnderMouse.Contains (view))
             {
-                _cachedViewsUnderMouse.Add (view);
+                continue;
             }
 
+            _cachedViewsUnderMouse.Add (view);
             bool raise = false;
             if (view is Adornment { Parent: { } } adornmentView)
             {
@@ -343,15 +344,17 @@ public static partial class Application // Mouse handling
                 raise = view.Contains (superViewLoc);
             }
 
-            if (raise)
+            if (!raise)
             {
-                CancelEventArgs eventArgs = new ();
-                bool? cancelled = view.NewMouseEnterEvent (eventArgs);
+                continue;
+            }
 
-                if (cancelled is true || eventArgs.Cancel)
-                {
-                    break;
-                }
+            CancelEventArgs eventArgs = new ();
+            bool? cancelled = view.NewMouseEnterEvent (eventArgs);
+
+            if (cancelled is true || eventArgs.Cancel)
+            {
+                break;
             }
         }
     }

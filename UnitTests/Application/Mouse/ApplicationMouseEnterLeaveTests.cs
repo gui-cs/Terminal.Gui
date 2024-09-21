@@ -342,6 +342,7 @@ public class ApplicationMouseEnterLeaveTests
 
         var view1 = new TestView
         {
+            Id = "view1",
             Width = 2,
             Height = 2,
             Arrangement = ViewArrangement.Overlapped
@@ -349,6 +350,7 @@ public class ApplicationMouseEnterLeaveTests
 
         var subView = new TestView
         {
+            Id = "subView",
             Width = 2,
             Height = 2,
             X = 1,
@@ -399,7 +401,7 @@ public class ApplicationMouseEnterLeaveTests
                                                     View.GetViewsUnderMouse (mousePosition));
 
             // Assert
-            Assert.Equal (2, view1.OnMouseEnterCalled);
+            Assert.Equal (1, view1.OnMouseEnterCalled);
             Assert.Equal (0, view1.OnMouseLeaveCalled);
             Assert.Equal (1, subView.OnMouseEnterCalled);
             Assert.Equal (0, subView.OnMouseLeaveCalled);
@@ -412,7 +414,7 @@ public class ApplicationMouseEnterLeaveTests
                                                     View.GetViewsUnderMouse (mousePosition));
 
             // Assert
-            Assert.Equal (2, view1.OnMouseEnterCalled);
+            Assert.Equal (1, view1.OnMouseEnterCalled);
             Assert.Equal (1, view1.OnMouseLeaveCalled);
             Assert.Equal (1, subView.OnMouseEnterCalled);
             Assert.Equal (1, subView.OnMouseLeaveCalled);
@@ -425,7 +427,7 @@ public class ApplicationMouseEnterLeaveTests
                                                     View.GetViewsUnderMouse (mousePosition));
 
             // Assert
-            Assert.Equal (3, view1.OnMouseEnterCalled);
+            Assert.Equal (2, view1.OnMouseEnterCalled);
             Assert.Equal (1, view1.OnMouseLeaveCalled);
             Assert.Equal (2, subView.OnMouseEnterCalled);
             Assert.Equal (1, subView.OnMouseLeaveCalled);
@@ -438,10 +440,10 @@ public class ApplicationMouseEnterLeaveTests
                                                     View.GetViewsUnderMouse (mousePosition));
 
             // Assert
-            Assert.Equal (3, view1.OnMouseEnterCalled);
+            Assert.Equal (2, view1.OnMouseEnterCalled);
             Assert.Equal (2, view1.OnMouseLeaveCalled);
             Assert.Equal (2, subView.OnMouseEnterCalled);
-            Assert.Equal (1, subView.OnMouseLeaveCalled);
+            Assert.Equal (2, subView.OnMouseLeaveCalled);
 
             // Act
             mousePosition = new (0, 0);
@@ -451,10 +453,10 @@ public class ApplicationMouseEnterLeaveTests
                                                     View.GetViewsUnderMouse (mousePosition));
 
             // Assert
-            Assert.Equal (3, view1.OnMouseEnterCalled);
+            Assert.Equal (2, view1.OnMouseEnterCalled);
             Assert.Equal (2, view1.OnMouseLeaveCalled);
             Assert.Equal (2, subView.OnMouseEnterCalled);
-            Assert.Equal (1, subView.OnMouseLeaveCalled);
+            Assert.Equal (2, subView.OnMouseLeaveCalled);
 
             // Act
             mousePosition = new (2, 2);
@@ -464,10 +466,10 @@ public class ApplicationMouseEnterLeaveTests
                                                     View.GetViewsUnderMouse (mousePosition));
 
             // Assert
-            Assert.Equal (4, view1.OnMouseEnterCalled);
+            Assert.Equal (3, view1.OnMouseEnterCalled);
             Assert.Equal (2, view1.OnMouseLeaveCalled);
             Assert.Equal (3, subView.OnMouseEnterCalled);
-            Assert.Equal (1, subView.OnMouseLeaveCalled);
+            Assert.Equal (2, subView.OnMouseLeaveCalled);
         }
         finally
         {
