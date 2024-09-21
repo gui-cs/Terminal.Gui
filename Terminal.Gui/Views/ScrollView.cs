@@ -11,6 +11,8 @@
 // - Raise events
 // - Perhaps allow an option to not display the scrollbar arrow indicators?
 
+using System.ComponentModel;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -743,7 +745,7 @@ public class ScrollView : View
         }
     }
 
-    private void View_MouseEnter (object sender, MouseEventEventArgs e) { Application.GrabMouse (this); }
+    private void View_MouseEnter (object sender, CancelEventArgs e) { Application.GrabMouse (this); }
 
     private void View_MouseLeave (object sender, MouseEventEventArgs e)
     {

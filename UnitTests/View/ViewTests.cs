@@ -874,8 +874,6 @@ At 0,0
         //Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
         Assert.False (r.OnKeyUp (new() { KeyCode = KeyCode.Null }));
         Assert.False (r.NewMouseEvent (new() { Flags = MouseFlags.AllEvents }));
-        Assert.False (r.NewMouseEnterEvent (new() { Flags = MouseFlags.AllEvents }));
-        Assert.False (r.NewMouseLeaveEvent (new() { Flags = MouseFlags.AllEvents }));
 
         r.Dispose ();
 

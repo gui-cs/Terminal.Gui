@@ -1,3 +1,5 @@
+using System.ComponentModel;
+
 namespace Terminal.Gui.ViewMouseTests;
 
 [Trait ("Category", "Input")]
@@ -11,29 +13,26 @@ public class MouseEnterLeaveTests
             MouseLeave += OnMouseLeaveHandler;
         }
 
-        public bool HandleOnEnter { get; init; }
-        public bool HandleOnLeave { get; }
+        public bool CancelOnEnter { get; init; }
 
-        public bool HandleEnterEvent { get; init; }
-        public bool HandleLeaveEvent { get; }
+        public bool CancelEnterEvent { get; init; }
 
         public bool OnMouseEnterCalled { get; private set; }
         public bool OnMouseLeaveCalled { get; private set; }
 
-        protected internal override bool? OnMouseEnter (MouseEvent mouseEvent)
+        protected override bool OnMouseEnter (CancelEventArgs eventArgs)
         {
             OnMouseEnterCalled = true;
-            mouseEvent.Handled = HandleOnEnter;
+            eventArgs.Cancel = CancelOnEnter;
 
-            base.OnMouseEnter (mouseEvent);
+            base.OnMouseEnter (eventArgs);
 
-            return mouseEvent.Handled;
+            return eventArgs.Cancel;
         }
 
         protected internal override bool OnMouseLeave (MouseEvent mouseEvent)
         {
             OnMouseLeaveCalled = true;
-            mouseEvent.Handled = HandleOnLeave;
 
             base.OnMouseLeave (mouseEvent);
 
@@ -43,25 +42,17 @@ public class MouseEnterLeaveTests
         public bool MouseEnterRaised { get; private set; }
         public bool MouseLeaveRaised { get; private set; }
 
-        private void OnMouseEnterHandler (object s, MouseEventEventArgs e)
+        private void OnMouseEnterHandler (object s, CancelEventArgs e)
         {
             MouseEnterRaised = true;
 
-            if (HandleEnterEvent)
+            if (CancelEnterEvent)
             {
-                e.Handled = true;
+                e.Cancel = true;
             }
         }
 
-        private void OnMouseLeaveHandler (object s, MouseEventEventArgs e)
-        {
-            MouseLeaveRaised = true;
-
-            if (HandleLeaveEvent)
-            {
-                e.Handled = true;
-            }
-        }
+        private void OnMouseLeaveHandler (object s, MouseEventEventArgs e) { MouseLeaveRaised = true; }
     }
 
     [Fact]
@@ -76,20 +67,22 @@ public class MouseEnterLeaveTests
 
         var mouseEvent = new MouseEvent ();
 
+        var eventArgs = new CancelEventArgs ();
+
         // Act
-        bool? handled = view.NewMouseEnterEvent (mouseEvent);
+        bool? cancelled = view.NewMouseEnterEvent (eventArgs);
 
         // Assert
         Assert.True (view.OnMouseEnterCalled);
-        Assert.False (handled);
-        Assert.False (mouseEvent.Handled);
+        Assert.False (cancelled);
+        Assert.False (eventArgs.Cancel);
 
         // Cleanup
         view.Dispose ();
     }
 
     [Fact]
-    public void NewMouseEnterEvent_ViewIsDisabled_DoesNotCallOnMouseEnter ()
+    public void NewMouseEnterEvent_ViewIsDisabled_CallsOnMouseEnter ()
     {
         // Arrange
         var view = new TestView
@@ -98,15 +91,15 @@ public class MouseEnterLeaveTests
             Visible = true
         };
 
-        var mouseEvent = new MouseEvent ();
+        var eventArgs = new CancelEventArgs ();
 
         // Act
-        bool? handled = view.NewMouseEnterEvent (mouseEvent);
+        bool? cancelled = view.NewMouseEnterEvent (eventArgs);
 
         // Assert
-        Assert.False (view.OnMouseEnterCalled);
-        Assert.False (handled);
-        Assert.False (mouseEvent.Handled);
+        Assert.True (view.OnMouseEnterCalled);
+        Assert.False (cancelled);
+        Assert.False (eventArgs.Cancel);
 
         // Cleanup
         view.Dispose ();
@@ -122,15 +115,15 @@ public class MouseEnterLeaveTests
             Visible = false
         };
 
-        var mouseEvent = new MouseEvent ();
+        var eventArgs = new CancelEventArgs ();
 
         // Act
-        bool? handled = view.NewMouseEnterEvent (mouseEvent);
+        bool? cancelled = view.NewMouseEnterEvent (eventArgs);
 
         // Assert
         Assert.False (view.OnMouseEnterCalled);
-        Assert.False (handled);
-        Assert.False (mouseEvent.Handled);
+        Assert.Null (cancelled);
+        Assert.False (eventArgs.Cancel);
 
         // Cleanup
         view.Dispose ();
@@ -148,11 +141,11 @@ public class MouseEnterLeaveTests
         var mouseEvent = new MouseEvent ();
 
         // Act
-        bool? handled = view.NewMouseLeaveEvent (mouseEvent);
+        bool? cancelled = view.NewMouseLeaveEvent (mouseEvent);
 
         // Assert
         Assert.True (view.OnMouseLeaveCalled);
-        Assert.False (handled);
+        Assert.False (cancelled);
         Assert.False (mouseEvent.Handled);
 
         // Cleanup
@@ -172,11 +165,11 @@ public class MouseEnterLeaveTests
         var mouseEvent = new MouseEvent ();
 
         // Act
-        bool? handled = view.NewMouseLeaveEvent (mouseEvent);
+        bool? cancelled = view.NewMouseLeaveEvent (mouseEvent);
 
         // Assert
         Assert.True (view.OnMouseLeaveCalled);
-        Assert.False (handled);
+        Assert.False (cancelled);
         Assert.False (mouseEvent.Handled);
 
         // Cleanup
@@ -195,22 +188,22 @@ public class MouseEnterLeaveTests
             Visible = true
         };
 
-        var mouseEvent = new MouseEvent ();
+        var eventArgs = new CancelEventArgs ();
 
         // Act
-        bool? handled = view.NewMouseEnterEvent (mouseEvent);
+        bool? cancelled = view.NewMouseEnterEvent (eventArgs);
 
         // Assert
         Assert.True (view.MouseEnterRaised);
-        Assert.False (handled);
-        Assert.False (mouseEvent.Handled);
+        Assert.False (cancelled);
+        Assert.False (eventArgs.Cancel);
 
         // Cleanup
         view.Dispose ();
     }
 
     [Fact]
-    public void NewMouseEnterEvent_ViewIsDisabled_DoesNotRaiseMouseEnter ()
+    public void NewMouseEnterEvent_ViewIsDisabled_RaisesMouseEnter ()
     {
         // Arrange
         var view = new TestView
@@ -219,15 +212,15 @@ public class MouseEnterLeaveTests
             Visible = true
         };
 
-        var mouseEvent = new MouseEvent ();
+        var eventArgs = new CancelEventArgs ();
 
         // Act
-        bool? handled = view.NewMouseEnterEvent (mouseEvent);
+        bool? cancelled = view.NewMouseEnterEvent (eventArgs);
 
         // Assert
-        Assert.False (view.MouseEnterRaised);
-        Assert.False (handled);
-        Assert.False (mouseEvent.Handled);
+        Assert.True (view.MouseEnterRaised);
+        Assert.False (cancelled);
+        Assert.False (eventArgs.Cancel);
 
         // Cleanup
         view.Dispose ();
@@ -243,15 +236,15 @@ public class MouseEnterLeaveTests
             Visible = false
         };
 
-        var mouseEvent = new MouseEvent ();
+        var eventArgs = new CancelEventArgs ();
 
         // Act
-        bool? handled = view.NewMouseEnterEvent (mouseEvent);
+        bool? cancelled = view.NewMouseEnterEvent (eventArgs);
 
         // Assert
         Assert.False (view.MouseEnterRaised);
-        Assert.False (handled);
-        Assert.False (mouseEvent.Handled);
+        Assert.Null (cancelled);
+        Assert.False (eventArgs.Cancel);
 
         // Cleanup
         view.Dispose ();
@@ -263,18 +256,18 @@ public class MouseEnterLeaveTests
         // Arrange
         var view = new TestView
         {
-            Enabled = true, 
+            Enabled = true,
             Visible = true
         };
 
         var mouseEvent = new MouseEvent ();
 
         // Act
-        bool? handled = view.NewMouseLeaveEvent (mouseEvent);
+        bool? cancelled = view.NewMouseLeaveEvent (mouseEvent);
 
         // Assert
         Assert.True (view.MouseLeaveRaised);
-        Assert.False (handled);
+        Assert.False (cancelled);
         Assert.False (mouseEvent.Handled);
 
         // Cleanup
@@ -282,7 +275,7 @@ public class MouseEnterLeaveTests
     }
 
     [Fact]
-    public void NewMouseLeaveEvent_ViewIsNotVisible_DoesNotRaiseMouseLeave ()
+    public void NewMouseLeaveEvent_ViewIsNotVisible_RaisesMouseLeave ()
     {
         // Arrange
         var view = new TestView
@@ -294,11 +287,11 @@ public class MouseEnterLeaveTests
         var mouseEvent = new MouseEvent ();
 
         // Act
-        bool? handled = view.NewMouseLeaveEvent (mouseEvent);
+        bool? cancelled = view.NewMouseLeaveEvent (mouseEvent);
 
         // Assert
         Assert.True (view.MouseLeaveRaised);
-        Assert.False (handled);
+        Assert.False (cancelled);
         Assert.False (mouseEvent.Handled);
 
         // Cleanup
@@ -314,18 +307,18 @@ public class MouseEnterLeaveTests
         {
             Enabled = true,
             Visible = true,
-            HandleOnEnter = true
+            CancelOnEnter = true
         };
 
-        var mouseEvent = new MouseEvent ();
+        var eventArgs = new CancelEventArgs ();
 
         // Act
-        bool? handled = view.NewMouseEnterEvent (mouseEvent);
+        bool? cancelled = view.NewMouseEnterEvent (eventArgs);
 
         // Assert
         Assert.True (view.OnMouseEnterCalled);
-        Assert.True (handled);
-        Assert.True (mouseEvent.Handled);
+        Assert.True (cancelled);
+        Assert.True (eventArgs.Cancel);
 
         Assert.False (view.MouseEnterRaised);
 
@@ -341,18 +334,18 @@ public class MouseEnterLeaveTests
         {
             Enabled = true,
             Visible = true,
-            HandleEnterEvent = true
+            CancelEnterEvent = true
         };
 
-        var mouseEvent = new MouseEvent ();
+        var eventArgs = new CancelEventArgs ();
 
         // Act
-        bool? handled = view.NewMouseEnterEvent (mouseEvent);
+        bool? cancelled = view.NewMouseEnterEvent (eventArgs);
 
         // Assert
         Assert.True (view.OnMouseEnterCalled);
-        Assert.True (handled);
-        Assert.True (mouseEvent.Handled);
+        Assert.True (cancelled);
+        Assert.True (eventArgs.Cancel);
 
         Assert.True (view.MouseEnterRaised);
 

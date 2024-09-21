@@ -2,6 +2,7 @@
 
 namespace Terminal.Gui.ViewMouseTests;
 
+[Trait ("Category", "Input")]
 public class GetViewsUnderMouseTests
 {
     [Theory]
@@ -57,21 +58,30 @@ public class GetViewsUnderMouseTests
     [InlineData (1, 1, 1, 1, 1, 8, 8, typeof (Padding))]
     [InlineData (1, 1, 1, 1, 1, 9, 9, typeof (Border))]
     [InlineData (1, 1, 1, 1, 1, 10, 10, typeof (Margin))]
-    public void GetViewsUnderMouse_Top_Adornments_Returns_Correct_View (int frameX, int frameY, int marginThickness, int borderThickness, int paddingThickness, int testX, int testY, Type? expectedViewType)
+    public void GetViewsUnderMouse_Top_Adornments_Returns_Correct_View (
+        int frameX,
+        int frameY,
+        int marginThickness,
+        int borderThickness,
+        int paddingThickness,
+        int testX,
+        int testY,
+        Type? expectedViewType
+    )
     {
         // Arrange
         Application.Top = new ()
         {
-            Frame = new Rectangle (frameX, frameY, 10, 10),
+            Frame = new (frameX, frameY, 10, 10)
         };
-        Application.Top.Margin.Thickness = new Thickness (marginThickness);
-        Application.Top.Border.Thickness = new Thickness (borderThickness);
-        Application.Top.Padding.Thickness = new Thickness (paddingThickness);
+        Application.Top.Margin.Thickness = new (marginThickness);
+        Application.Top.Border.Thickness = new (borderThickness);
+        Application.Top.Padding.Thickness = new (paddingThickness);
 
         var location = new Point (testX, testY);
 
         // Act
-        var viewsUnderMouse = View.GetViewsUnderMouse (location);
+        List<View?> viewsUnderMouse = View.GetViewsUnderMouse (location);
 
         // Assert
         if (expectedViewType == null)
@@ -82,8 +92,9 @@ public class GetViewsUnderMouseTests
         {
             Assert.Contains (viewsUnderMouse, v => v?.GetType () == expectedViewType);
         }
+
         Application.Top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
+        Application.ResetState (true);
     }
 
     [Theory]
@@ -95,18 +106,18 @@ public class GetViewsUnderMouseTests
         // Arrange
         Application.Top = new ()
         {
-            Frame = new Rectangle (0, 0, 10, 10)
+            Frame = new (0, 0, 10, 10)
         };
 
         var location = new Point (testX, testY);
 
         // Act
-        var viewsUnderMouse = View.GetViewsUnderMouse (location);
+        List<View?> viewsUnderMouse = View.GetViewsUnderMouse (location);
 
         // Assert
         Assert.Contains (viewsUnderMouse, v => v == Application.Top);
         Application.Top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
+        Application.ResetState (true);
     }
 
     [Theory]
@@ -118,13 +129,13 @@ public class GetViewsUnderMouseTests
         // Arrange
         var view = new View
         {
-            Frame = new Rectangle (0, 0, 10, 10)
+            Frame = new (0, 0, 10, 10)
         };
 
         var location = new Point (testX, testY);
 
         // Act
-        var viewsUnderMouse = View.GetViewsUnderMouse (location);
+        List<View?> viewsUnderMouse = View.GetViewsUnderMouse (location);
 
         // Assert
         Assert.Empty (viewsUnderMouse);
@@ -139,14 +150,14 @@ public class GetViewsUnderMouseTests
         // Arrange
         var view = new View
         {
-            Frame = new Rectangle (0, 0, 10, 10),
+            Frame = new (0, 0, 10, 10),
             Visible = false
         };
 
         var location = new Point (testX, testY);
 
         // Act
-        var viewsUnderMouse = View.GetViewsUnderMouse (location);
+        List<View?> viewsUnderMouse = View.GetViewsUnderMouse (location);
 
         // Assert
         Assert.Empty (viewsUnderMouse);
@@ -165,12 +176,12 @@ public class GetViewsUnderMouseTests
         // Arrange
         Application.Top = new ()
         {
-            Frame = new Rectangle (0, 0, 10, 10)
+            Frame = new (0, 0, 10, 10)
         };
 
         var subView = new View
         {
-            Frame = new Rectangle (1, 1, 8, 8)
+            Frame = new (1, 1, 8, 8)
         };
 
         Application.Top.Add (subView);
@@ -178,7 +189,7 @@ public class GetViewsUnderMouseTests
         var location = new Point (testX, testY);
 
         // Act
-        var viewsUnderMouse = View.GetViewsUnderMouse (location);
+        List<View?> viewsUnderMouse = View.GetViewsUnderMouse (location);
 
         // Assert
         if (expected)
@@ -189,39 +200,36 @@ public class GetViewsUnderMouseTests
         {
             Assert.DoesNotContain (viewsUnderMouse, v => v == subView);
         }
+
         Application.Top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
+        Application.ResetState (true);
     }
 
-     [Theory]
+    [Theory]
     [InlineData (0, 0, 0, 0, 0, -1, -1, null)]
     [InlineData (0, 0, 0, 0, 0, 0, 0, typeof (View))]
     [InlineData (0, 0, 0, 0, 0, 1, 1, typeof (View))]
     [InlineData (0, 0, 0, 0, 0, 4, 4, typeof (View))]
     [InlineData (0, 0, 0, 0, 0, 9, 9, typeof (View))]
     [InlineData (0, 0, 0, 0, 0, 10, 10, null)]
-
     [InlineData (1, 1, 0, 0, 0, -1, -1, null)]
     [InlineData (1, 1, 0, 0, 0, 0, 0, null)]
     [InlineData (1, 1, 0, 0, 0, 1, 1, typeof (View))]
     [InlineData (1, 1, 0, 0, 0, 4, 4, typeof (View))]
     [InlineData (1, 1, 0, 0, 0, 9, 9, typeof (View))]
     [InlineData (1, 1, 0, 0, 0, 10, 10, typeof (View))]
-
     [InlineData (0, 0, 1, 0, 0, -1, -1, null)]
     [InlineData (0, 0, 1, 0, 0, 0, 0, typeof (Margin))]
     [InlineData (0, 0, 1, 0, 0, 1, 1, typeof (View))]
     [InlineData (0, 0, 1, 0, 0, 4, 4, typeof (View))]
     [InlineData (0, 0, 1, 0, 0, 9, 9, typeof (Margin))]
     [InlineData (0, 0, 1, 0, 0, 10, 10, null)]
-
     [InlineData (0, 0, 1, 1, 0, -1, -1, null)]
     [InlineData (0, 0, 1, 1, 0, 0, 0, typeof (Margin))]
     [InlineData (0, 0, 1, 1, 0, 1, 1, typeof (Border))]
     [InlineData (0, 0, 1, 1, 0, 4, 4, typeof (View))]
     [InlineData (0, 0, 1, 1, 0, 9, 9, typeof (Margin))]
     [InlineData (0, 0, 1, 1, 0, 10, 10, null)]
-
     [InlineData (0, 0, 1, 1, 1, -1, -1, null)]
     [InlineData (0, 0, 1, 1, 1, 0, 0, typeof (Margin))]
     [InlineData (0, 0, 1, 1, 1, 1, 1, typeof (Border))]
@@ -229,7 +237,6 @@ public class GetViewsUnderMouseTests
     [InlineData (0, 0, 1, 1, 1, 4, 4, typeof (View))]
     [InlineData (0, 0, 1, 1, 1, 9, 9, typeof (Margin))]
     [InlineData (0, 0, 1, 1, 1, 10, 10, null)]
-
     [InlineData (1, 1, 1, 0, 0, -1, -1, null)]
     [InlineData (1, 1, 1, 0, 0, 0, 0, null)]
     [InlineData (1, 1, 1, 0, 0, 1, 1, typeof (Margin))]
@@ -251,18 +258,28 @@ public class GetViewsUnderMouseTests
     [InlineData (1, 1, 1, 1, 1, 8, 8, typeof (Padding))]
     [InlineData (1, 1, 1, 1, 1, 9, 9, typeof (Border))]
     [InlineData (1, 1, 1, 1, 1, 10, 10, typeof (Margin))]
-    public void Contains (int frameX, int frameY, int marginThickness, int borderThickness, int paddingThickness, int testX, int testY, Type? expectedAdornmentType)
+    public void Contains (
+        int frameX,
+        int frameY,
+        int marginThickness,
+        int borderThickness,
+        int paddingThickness,
+        int testX,
+        int testY,
+        Type? expectedAdornmentType
+    )
     {
-        var view = new View ()
+        var view = new View
         {
             X = frameX, Y = frameY,
-            Width = 10, Height = 10,
+            Width = 10, Height = 10
         };
-        view.Margin.Thickness = new Thickness (marginThickness);
-        view.Border.Thickness = new Thickness (borderThickness);
-        view.Padding.Thickness = new Thickness (paddingThickness);
+        view.Margin.Thickness = new (marginThickness);
+        view.Border.Thickness = new (borderThickness);
+        view.Padding.Thickness = new (paddingThickness);
 
         Type? containedType = null;
+
         if (view.Contains (new (testX, testY)))
         {
             containedType = view.GetType ();
@@ -282,8 +299,8 @@ public class GetViewsUnderMouseTests
         {
             containedType = view.Padding.GetType ();
         }
-        Assert.Equal (expectedAdornmentType, containedType);
 
+        Assert.Equal (expectedAdornmentType, containedType);
     }
 
     // Test that GetViewsUnderMouse returns the correct view if the start view has no subviews
@@ -295,12 +312,12 @@ public class GetViewsUnderMouseTests
     {
         Application.Top = new ()
         {
-            Width = 10, Height = 10,
+            Width = 10, Height = 10
         };
 
-        Assert.Same (Application.Top, View.GetViewsUnderMouse(new Point(testX, testY)).LastOrDefault());
+        Assert.Same (Application.Top, View.GetViewsUnderMouse (new (testX, testY)).LastOrDefault ());
         Application.Top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
+        Application.ResetState (true);
     }
 
     // Test that GetViewsUnderMouse returns null if the start view has no subviews and coords are outside the view
@@ -313,12 +330,12 @@ public class GetViewsUnderMouseTests
         Application.Top = new ()
         {
             X = 1, Y = 2,
-            Width = 10, Height = 10,
+            Width = 10, Height = 10
         };
 
-        Assert.Null (View.GetViewsUnderMouse(new Point(testX, testY)).LastOrDefault());
+        Assert.Null (View.GetViewsUnderMouse (new (testX, testY)).LastOrDefault ());
         Application.Top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
+        Application.ResetState (true);
     }
 
     [Theory]
@@ -331,12 +348,12 @@ public class GetViewsUnderMouseTests
         {
             X = 1, Y = 2,
             Width = 10, Height = 10,
-            Visible = false,
+            Visible = false
         };
 
-        Assert.Null (View.GetViewsUnderMouse(new Point(testX, testY)).LastOrDefault());
+        Assert.Null (View.GetViewsUnderMouse (new (testX, testY)).LastOrDefault ());
         Application.Top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
+        Application.ResetState (true);
     }
 
     // Test that GetViewsUnderMouse returns the correct view if the start view has subviews
@@ -346,28 +363,27 @@ public class GetViewsUnderMouseTests
     [InlineData (9, 9, false)]
     [InlineData (10, 10, false)]
     [InlineData (6, 7, false)]
-
     [InlineData (1, 2, true)]
     [InlineData (5, 6, true)]
     public void Returns_Correct_If_SubViews (int testX, int testY, bool expectedSubViewFound)
     {
         Application.Top = new ()
         {
-            Width = 10, Height = 10,
+            Width = 10, Height = 10
         };
 
-        var subview = new View ()
+        var subview = new View
         {
             X = 1, Y = 2,
-            Width = 5, Height = 5,
+            Width = 5, Height = 5
         };
         Application.Top.Add (subview);
 
-        var found = View.GetViewsUnderMouse(new Point(testX, testY)).LastOrDefault();
+        View? found = View.GetViewsUnderMouse (new (testX, testY)).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == subview);
         Application.Top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
+        Application.ResetState (true);
     }
 
     [Theory]
@@ -382,10 +398,10 @@ public class GetViewsUnderMouseTests
     {
         Application.Top = new ()
         {
-            Width = 10, Height = 10,
+            Width = 10, Height = 10
         };
 
-        var subview = new View ()
+        var subview = new View
         {
             X = 1, Y = 2,
             Width = 5, Height = 5,
@@ -393,13 +409,12 @@ public class GetViewsUnderMouseTests
         };
         Application.Top.Add (subview);
 
-        var found = View.GetViewsUnderMouse(new Point(testX, testY)).LastOrDefault();
+        View? found = View.GetViewsUnderMouse (new (testX, testY)).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == subview);
         Application.Top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
+        Application.ResetState (true);
     }
-
 
     [Theory]
     [InlineData (0, 0, false)]
@@ -417,20 +432,20 @@ public class GetViewsUnderMouseTests
             Visible = false
         };
 
-        var subview = new View ()
+        var subview = new View
         {
             X = 1, Y = 2,
-            Width = 5, Height = 5,
+            Width = 5, Height = 5
         };
         Application.Top.Add (subview);
         subview.Visible = true;
         Assert.True (subview.Visible);
         Assert.False (Application.Top.Visible);
-        var found = View.GetViewsUnderMouse(new Point(testX, testY)).LastOrDefault();
+        View? found = View.GetViewsUnderMouse (new (testX, testY)).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == subview);
         Application.Top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
+        Application.ResetState (true);
     }
 
     // Test that GetViewsUnderMouse works if the start view has positive Adornments
@@ -441,7 +456,6 @@ public class GetViewsUnderMouseTests
     [InlineData (10, 10, false)]
     [InlineData (7, 8, false)]
     [InlineData (1, 2, false)]
-
     [InlineData (2, 3, true)]
     [InlineData (5, 6, true)]
     [InlineData (6, 7, true)]
@@ -449,22 +463,22 @@ public class GetViewsUnderMouseTests
     {
         Application.Top = new ()
         {
-            Width = 10, Height = 10,
+            Width = 10, Height = 10
         };
-        Application.Top.Margin.Thickness = new Thickness (1);
+        Application.Top.Margin.Thickness = new (1);
 
-        var subview = new View ()
+        var subview = new View
         {
             X = 1, Y = 2,
-            Width = 5, Height = 5,
+            Width = 5, Height = 5
         };
         Application.Top.Add (subview);
 
-        var found = View.GetViewsUnderMouse(new Point(testX, testY)).LastOrDefault();
+        View? found = View.GetViewsUnderMouse (new (testX, testY)).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == subview);
         Application.Top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
+        Application.ResetState (true);
     }
 
     // Test that GetViewsUnderMouse works if the start view has offset Viewport location
@@ -472,7 +486,6 @@ public class GetViewsUnderMouseTests
     [InlineData (1, 0, 0, true)]
     [InlineData (1, 1, 1, true)]
     [InlineData (1, 2, 2, false)]
-
     [InlineData (-1, 3, 3, true)]
     [InlineData (-1, 2, 2, true)]
     [InlineData (-1, 1, 1, false)]
@@ -486,18 +499,18 @@ public class GetViewsUnderMouseTests
         };
         Application.Top.Viewport = new (offset, offset, 10, 10);
 
-        var subview = new View ()
+        var subview = new View
         {
             X = 1, Y = 1,
-            Width = 2, Height = 2,
+            Width = 2, Height = 2
         };
         Application.Top.Add (subview);
 
-        var found = View.GetViewsUnderMouse(new Point(testX, testY)).LastOrDefault();
+        View? found = View.GetViewsUnderMouse (new (testX, testY)).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == subview);
         Application.Top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
+        Application.ResetState (true);
     }
 
     [Theory]
@@ -514,59 +527,55 @@ public class GetViewsUnderMouseTests
     {
         Application.Top = new ()
         {
-            Width = 10, Height = 10,
+            Width = 10, Height = 10
         };
-        Application.Top.Padding.Thickness = new Thickness (1);
+        Application.Top.Padding.Thickness = new (1);
 
-        var subview = new View ()
+        var subview = new View
         {
             X = Pos.AnchorEnd (1), Y = Pos.AnchorEnd (1),
-            Width = 1, Height = 1,
+            Width = 1, Height = 1
         };
         Application.Top.Padding.Add (subview);
         Application.Top.BeginInit ();
         Application.Top.EndInit ();
 
-        var found = View.GetViewsUnderMouse(new Point(testX, testY)).LastOrDefault();
+        View? found = View.GetViewsUnderMouse (new (testX, testY)).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == subview);
         Application.Top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
+        Application.ResetState (true);
     }
-
 
     [Theory]
     [InlineData (0, 0, typeof (Margin))]
     [InlineData (9, 9, typeof (Margin))]
-
     [InlineData (1, 1, typeof (Border))]
     [InlineData (8, 8, typeof (Border))]
-
     [InlineData (2, 2, typeof (Padding))]
     [InlineData (7, 7, typeof (Padding))]
-
     [InlineData (5, 5, typeof (Toplevel))]
     public void Returns_Adornment_If_Start_Has_Adornments (int testX, int testY, Type expectedAdornmentType)
     {
         Application.Top = new ()
         {
-            Width = 10, Height = 10,
+            Width = 10, Height = 10
         };
-        Application.Top.Margin.Thickness = new Thickness (1);
-        Application.Top.Border.Thickness = new Thickness (1);
-        Application.Top.Padding.Thickness = new Thickness (1);
+        Application.Top.Margin.Thickness = new (1);
+        Application.Top.Border.Thickness = new (1);
+        Application.Top.Padding.Thickness = new (1);
 
-        var subview = new View ()
+        var subview = new View
         {
             X = 1, Y = 1,
-            Width = 1, Height = 1,
+            Width = 1, Height = 1
         };
         Application.Top.Add (subview);
 
-        var found = View.GetViewsUnderMouse(new Point(testX, testY)).LastOrDefault();
+        View? found = View.GetViewsUnderMouse (new (testX, testY)).LastOrDefault ();
         Assert.Equal (expectedAdornmentType, found!.GetType ());
         Application.Top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
+        Application.ResetState (true);
     }
 
     // Test that GetViewsUnderMouse works if the subview has positive Adornments
@@ -579,28 +588,27 @@ public class GetViewsUnderMouseTests
     [InlineData (6, 7, false)]
     [InlineData (1, 2, false)]
     [InlineData (5, 6, false)]
-
     [InlineData (2, 3, true)]
     public void Returns_Correct_If_SubView_Has_Adornments (int testX, int testY, bool expectedSubViewFound)
     {
         Application.Top = new ()
         {
-            Width = 10, Height = 10,
+            Width = 10, Height = 10
         };
 
-        var subview = new View ()
+        var subview = new View
         {
             X = 1, Y = 2,
-            Width = 5, Height = 5,
+            Width = 5, Height = 5
         };
-        subview.Margin.Thickness = new Thickness (1);
+        subview.Margin.Thickness = new (1);
         Application.Top.Add (subview);
 
-        var found = View.GetViewsUnderMouse(new Point(testX, testY)).LastOrDefault();
+        View? found = View.GetViewsUnderMouse (new (testX, testY)).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == subview);
         Application.Top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
+        Application.ResetState (true);
     }
 
     [Theory]
@@ -618,36 +626,36 @@ public class GetViewsUnderMouseTests
     {
         Application.Top = new ()
         {
-            Width = 10, Height = 10,
+            Width = 10, Height = 10
         };
 
         // A subview with + Padding
-        var subview = new View ()
+        var subview = new View
         {
             X = 1, Y = 1,
-            Width = 5, Height = 5,
+            Width = 5, Height = 5
         };
         subview.Padding.Thickness = new (1);
 
         // This subview will be at the bottom-right-corner of subview
         // So screen-relative location will be X + Width - 1 = 5
-        var paddingSubview = new View ()
+        var paddingSubview = new View
         {
             X = Pos.AnchorEnd (1),
             Y = Pos.AnchorEnd (1),
             Width = 1,
-            Height = 1,
+            Height = 1
         };
         subview.Padding.Add (paddingSubview);
         Application.Top.Add (subview);
         Application.Top.BeginInit ();
         Application.Top.EndInit ();
 
-        var found = View.GetViewsUnderMouse(new Point(testX, testY)).LastOrDefault();
+        View? found = View.GetViewsUnderMouse (new (testX, testY)).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == paddingSubview);
         Application.Top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
+        Application.ResetState (true);
     }
 
     [Theory]
@@ -665,14 +673,14 @@ public class GetViewsUnderMouseTests
     {
         Application.Top = new ()
         {
-            Width = 10, Height = 10,
+            Width = 10, Height = 10
         };
 
         // A subview with + Padding
-        var subview = new View ()
+        var subview = new View
         {
             X = 1, Y = 1,
-            Width = 5, Height = 5,
+            Width = 5, Height = 5
         };
         subview.Padding.Thickness = new (1);
 
@@ -682,23 +690,23 @@ public class GetViewsUnderMouseTests
 
         // This subview will be at the bottom-right-corner of subview
         // So screen-relative location will be X + Width - 1 = 5
-        var paddingSubview = new View ()
+        var paddingSubview = new View
         {
             X = Pos.AnchorEnd (1),
             Y = Pos.AnchorEnd (1),
             Width = 1,
-            Height = 1,
+            Height = 1
         };
         subview.Padding.Add (paddingSubview);
         Application.Top.Add (subview);
         Application.Top.BeginInit ();
         Application.Top.EndInit ();
 
-        var found = View.GetViewsUnderMouse(new (testX, testY)).LastOrDefault();
+        View? found = View.GetViewsUnderMouse (new (testX, testY)).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == paddingSubview);
         Application.Top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
+        Application.ResetState (true);
     }
 
     // Test that GetViewsUnderMouse works with nested subviews
@@ -706,7 +714,6 @@ public class GetViewsUnderMouseTests
     [InlineData (0, 0, -1)]
     [InlineData (9, 9, -1)]
     [InlineData (10, 10, -1)]
-
     [InlineData (1, 1, 0)]
     [InlineData (1, 2, 0)]
     [InlineData (2, 2, 1)]
@@ -719,14 +726,15 @@ public class GetViewsUnderMouseTests
             Width = 10, Height = 10
         };
 
-        int numSubViews = 3;
-        List<View> subviews = new List<View> ();
-        for (int i = 0; i < numSubViews; i++)
+        var numSubViews = 3;
+        List<View> subviews = new ();
+
+        for (var i = 0; i < numSubViews; i++)
         {
-            var subview = new View ()
+            var subview = new View
             {
                 X = 1, Y = 1,
-                Width = 5, Height = 5,
+                Width = 5, Height = 5
             };
             subviews.Add (subview);
 
@@ -738,9 +746,60 @@ public class GetViewsUnderMouseTests
 
         Application.Top.Add (subviews [0]);
 
-        var found = View.GetViewsUnderMouse(new (testX, testY)).LastOrDefault();
+        View? found = View.GetViewsUnderMouse (new (testX, testY)).LastOrDefault ();
         Assert.Equal (expectedSubViewFound, subviews.IndexOf (found!));
         Application.Top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
+        Application.ResetState (true);
+    }
+
+    [Theory]
+    [InlineData (0, 0, new [] { "top" })]
+    [InlineData (9, 9, new [] { "top" })]
+    [InlineData (10, 10, new string [] { })]
+    [InlineData (1, 1, new [] { "top", "view" })]
+    [InlineData (1, 2, new [] { "top", "view" })]
+    [InlineData (2, 1, new [] { "top", "view" })]
+    [InlineData (2, 2, new [] { "top", "view", "subView" })]
+    [InlineData (3, 3, new [] { "top" })] // clipped
+    [InlineData (2, 3, new [] { "top" })] // clipped
+    public void GetViewsUnderMouse_Tiled_Subviews (int mouseX, int mouseY, string [] viewIdStrings)
+    {
+        // Arrange
+        Application.Top = new ()
+        {
+            Frame = new (0, 0, 10, 10),
+            Id = "top"
+        };
+
+        var view = new View
+        {
+            Id = "view",
+            X = 1,
+            Y = 1,
+            Width = 2,
+            Height = 2,
+            Arrangement = ViewArrangement.Overlapped
+        }; // at 1,1 to 3,2 (screen)
+
+        var subView = new View
+        {
+            Id = "subView",
+            X = 1,
+            Y = 1,
+            Width = 2,
+            Height = 2,
+            Arrangement = ViewArrangement.Overlapped
+        }; // at 2,2 to 4,3 (screen)
+        view.Add (subView);
+        Application.Top.Add (view);
+
+        List<View?> found = View.GetViewsUnderMouse (new (mouseX, mouseY));
+
+        string [] foundIds = found.Select (v => v.Id).ToArray ();
+
+        Assert.Equal (viewIdStrings, foundIds);
+
+        Application.Top.Dispose ();
+        Application.ResetState (true);
     }
 }

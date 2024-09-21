@@ -1,4 +1,5 @@
 #nullable enable
+using System.ComponentModel;
 using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
@@ -344,20 +345,26 @@ public static partial class Application // Mouse handling
 
             _cachedViewsUnderMouse.Add (view);
 
-            if (view is Adornment adornmentView)
+            bool raise = false;
+            if (view is Adornment { Parent: { } } adornmentView)
             {
                 Point frameLoc = view.ScreenToFrame (me.ScreenPosition);
-                if (adornmentView.Parent is { } && !adornmentView.Contains (frameLoc))
-                {
-                    view.NewMouseEnterEvent (me);
-                }
+                raise = adornmentView.Contains (frameLoc);
             }
             else
             {
                 Point superViewLoc = view.SuperView?.ScreenToViewport (me.ScreenPosition) ?? me.ScreenPosition;
-                if (view.Contains (superViewLoc))
+                raise = view.Contains (superViewLoc);
+            }
+
+            if (raise)
+            {
+                CancelEventArgs eventArgs = new ();
+                bool? cancelled = view.NewMouseEnterEvent (eventArgs);
+
+                if (cancelled is true || eventArgs.Cancel)
                 {
-                    view.NewMouseEnterEvent (me);
+                    break;
                 }
             }
         }

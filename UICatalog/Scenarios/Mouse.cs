@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using Terminal.Gui;
 
@@ -245,7 +246,7 @@ public class Mouse : Scenario
                 Padding.MouseEnter += PaddingOnMouseEnter;
                 Padding.MouseLeave += PaddingOnMouseLeave;
 
-                void PaddingOnMouseEnter (object o, MouseEventEventArgs mouseEventEventArgs)
+                void PaddingOnMouseEnter (object o, CancelEventArgs e)
                 {
                     Padding.ColorScheme = Colors.ColorSchemes ["Error"];
                 }

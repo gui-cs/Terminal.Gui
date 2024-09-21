@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.ComponentModel;
 using Terminal.Gui;
 using Attribute = Terminal.Gui.Attribute;
 
@@ -225,38 +226,6 @@ public class Adornment : View
         frame.Offset (Parent.Frame.Location);
 
         return Thickness.Contains (frame, location);
-    }
-
-    /// <inheritdoc/>
-    protected internal override bool? OnMouseEnter (MouseEvent mouseEvent)
-    {
-        //// Invert Normal
-        //if (Diagnostics.HasFlag (ViewDiagnosticFlags.MouseEnter) && ColorScheme != null)
-        //{
-        //    var cs = new ColorScheme (ColorScheme)
-        //    {
-        //        Normal = new (ColorScheme.Normal.Background, ColorScheme.Normal.Foreground)
-        //    };
-        //    ColorScheme = cs;
-        //}
-
-        return base.OnMouseEnter (mouseEvent);
-    }
-
-    /// <inheritdoc/>   
-    protected internal override bool OnMouseLeave (MouseEvent mouseEvent)
-    {
-        //// Invert Normal
-        //if (Diagnostics.FastHasFlags (ViewDiagnosticFlags.MouseEnter) && ColorScheme != null)
-        //{
-        //    var cs = new ColorScheme (ColorScheme)
-        //    {
-        //        Normal = new (ColorScheme.Normal.Background, ColorScheme.Normal.Foreground)
-        //    };
-        //    ColorScheme = cs;
-        //}
-
-        return base.OnMouseLeave (mouseEvent);
     }
 
     #endregion Mouse Support

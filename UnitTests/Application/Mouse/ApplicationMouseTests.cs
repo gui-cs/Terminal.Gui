@@ -4,11 +4,12 @@
 
 namespace Terminal.Gui.ApplicationTests;
 
-public class MouseTests
+[Trait ("Category", "Input")]
+public class ApplicationMouseTests
 {
     private readonly ITestOutputHelper _output;
 
-    public MouseTests (ITestOutputHelper output)
+    public ApplicationMouseTests (ITestOutputHelper output)
     {
         _output = output;
 #if DEBUG_IDISPOSABLE
@@ -401,5 +402,6 @@ public class MouseTests
         Assert.Equal (0, count);
         top.Dispose ();
     }
+
     #endregion
 }
