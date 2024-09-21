@@ -2,6 +2,8 @@
 
 namespace Terminal.Gui.ViewTests;
 
+[Trait ("Category", "Input")]
+
 public class MouseTests (ITestOutputHelper output) : TestsAllViews
 {
     [Theory]
