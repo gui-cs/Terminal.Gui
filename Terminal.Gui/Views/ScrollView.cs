@@ -747,7 +747,7 @@ public class ScrollView : View
 
     private void View_MouseEnter (object sender, CancelEventArgs e) { Application.GrabMouse (this); }
 
-    private void View_MouseLeave (object sender, MouseEventEventArgs e)
+    private void View_MouseLeave (object sender, EventArgs e)
     {
         if (Application.MouseGrabView is { } && Application.MouseGrabView != this && Application.MouseGrabView != _vertical && Application.MouseGrabView != _horizontal)
         {

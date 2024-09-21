@@ -39,9 +39,6 @@ public partial class View // Mouse APIs
     /// </remarks>
     public event EventHandler<MouseEventEventArgs>? MouseEvent;
 
-    /// <summary>Event fired when the mouse leaves the View's <see cref="Viewport"/>.</summary>
-    public event EventHandler<MouseEventEventArgs>? MouseLeave;
-
     /// <summary>
     ///     Processes a <see cref="MouseEvent"/>. This method is called by <see cref="Application.OnMouseEvent"/> when a mouse
     ///     event occurs.
@@ -180,7 +177,7 @@ public partial class View // Mouse APIs
 
     /// <summary>
     ///     Called when the mouse moves over the View's <see cref="Frame"/> and no other non-Subview occludes it. <see cref="MouseLeave"/> will
-    ///     be raised when the mouse is no longer over the <see cref="Frame"/>. 
+    ///     be raised when the mouse is no longer over the <see cref="Frame"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -230,6 +227,60 @@ public partial class View // Mouse APIs
     /// </remarks>
     public event EventHandler<CancelEventArgs>? MouseEnter;
 
+    /// <summary>
+    ///     INTERNAL Called by <see cref="Application.OnMouseEvent"/> when the mouse leaves <see cref="Frame"/>, or is occluded by another non-SubView.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method calls <see cref="OnMouseLeave"/> and raises the <see cref="MouseLeave"/> event.
+    ///     </para>
+    ///     <para>
+    ///         Adornments receive MouseEnter/Leave events when the mouse is over the Adornment's <see cref="Thickness"/>.
+    ///     </para>
+    ///     <para>
+    ///         See <see cref="SetHighlight"/> for more information.
+    ///     </para>
+    /// </remarks>
+    internal void NewMouseLeaveEvent ()
+    {
+        OnMouseLeave ();
+
+        MouseLeave?.Invoke (this, EventArgs.Empty);
+
+#if HOVER
+        if (HighlightStyle.HasFlag (HighlightStyle.Hover))
+        {
+            SetHighlight (HighlightStyle.None);
+        }
+#endif
+    }
+
+    /// <summary>
+    ///     Called when the mouse moves outside View's <see cref="Frame"/>, or is occluded by another non-SubView.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Adornments receive MouseEnter/Leave events when the mouse is over the Adornment's <see cref="Thickness"/>.
+    ///     </para>
+    ///     <para>
+    ///         See <see cref="SetHighlight"/> for more information.
+    ///     </para>
+    /// </remarks>
+    protected virtual void OnMouseLeave () { }
+
+    /// <summary>
+    ///     Raised when the mouse moves outside View's <see cref="Frame"/>, or is occluded by another non-SubView. 
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Adornments receive MouseEnter/Leave events when the mouse is over the Adornment's <see cref="Thickness"/>.
+    ///     </para>
+    ///     <para>
+    ///         See <see cref="SetHighlight"/> for more information.
+    ///     </para>
+    /// </remarks>
+    public event EventHandler? MouseLeave;
+
     #endregion MouseEnterLeave
 
     /// <summary>Called when a mouse event occurs within the view's <see cref="Viewport"/>.</summary>
@@ -248,22 +299,6 @@ public partial class View // Mouse APIs
 
         return args.Handled;
     }
-
-    /// <summary>
-    ///     Called by <see cref="NewMouseEvent"/> when a mouse leaves <see cref="Viewport"/>. The view will
-    ///     no longer receive mouse events.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         Override this method or subscribe to <see cref="MouseEnter"/> to change the default leave behavior.
-    ///     </para>
-    ///     <para>
-    ///         The coordinates are relative to <see cref="View.Viewport"/>.
-    ///     </para>
-    /// </remarks>
-    /// <param name="mouseEvent"></param>
-    /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    protected internal virtual bool OnMouseLeave (MouseEvent mouseEvent) { return false; }
 
     /// <summary>
     ///     Called when the view is to be highlighted.
@@ -383,45 +418,6 @@ public partial class View // Mouse APIs
         }
 
         return false;
-    }
-
-    /// <summary>
-    ///     INTERNAL Called by <see cref="Application.OnMouseEvent"/> when the mouse leaves <see cref="Frame"/>.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         A view must be visible to receive Enter events (Leave events are always received).
-    ///     </para>
-    ///     <para>
-    ///         This method calls <see cref="OnMouseLeave"/> to raise the <see cref="MouseLeave"/> event.
-    ///     </para>
-    ///     <para>
-    ///         Adornments receive MouseEnter/Leave events when the mouse is over the Adornment's <see cref="Thickness"/>.
-    ///     </para>
-    ///     <para>
-    ///         See <see cref="SetHighlight"/> for more information.
-    ///     </para>
-    /// </remarks>
-    /// <param name="mouseEvent"></param>
-    /// <returns><see langword="true"/> if the event was handled, <see langword="false"/> otherwise. </returns>
-    internal bool? NewMouseLeaveEvent (MouseEvent mouseEvent)
-    {
-        if (OnMouseLeave (mouseEvent))
-        {
-            return true;
-        }
-
-        var args = new MouseEventEventArgs (mouseEvent);
-        MouseLeave?.Invoke (this, args);
-
-#if HOVER
-        if (HighlightStyle.HasFlag (HighlightStyle.Hover))
-        {
-            SetHighlight (HighlightStyle.None);
-        }
-#endif
-
-        return args.Handled;
     }
 
     /// <summary>

@@ -29,13 +29,11 @@ public class ApplicationMouseEnterLeaveTests
             return eventArgs.Cancel;
         }
 
-        protected internal override bool OnMouseLeave (MouseEvent mouseEvent)
+        protected override void OnMouseLeave ()
         {
             OnMouseLeaveCalled++;
 
-            base.OnMouseLeave (mouseEvent);
-
-            return mouseEvent.Handled;
+            base.OnMouseLeave ();
         }
     }
 

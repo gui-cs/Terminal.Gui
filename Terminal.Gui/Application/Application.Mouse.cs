@@ -320,7 +320,7 @@ public static partial class Application // Mouse handling
                 Point frameLoc = adornmentView.ScreenToFrame (screenPosition);
                 if (adornmentView.Parent is { } && !adornmentView.Contains (frameLoc))
                 {
-                    view.NewMouseLeaveEvent (me);
+                    view.NewMouseLeaveEvent ();
                 }
             }
             else
@@ -328,7 +328,7 @@ public static partial class Application // Mouse handling
                 Point superViewLoc = view.SuperView?.ScreenToViewport (screenPosition) ?? screenPosition;
                 if (!view.Contains (superViewLoc))
                 {
-                    view.NewMouseLeaveEvent (me);
+                    view.NewMouseLeaveEvent ();
                 }
             }
         }

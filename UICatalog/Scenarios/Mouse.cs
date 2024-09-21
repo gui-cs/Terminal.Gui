@@ -251,7 +251,7 @@ public class Mouse : Scenario
                     Padding.ColorScheme = Colors.ColorSchemes ["Error"];
                 }
 
-                void PaddingOnMouseLeave (object o, MouseEventEventArgs mouseEventEventArgs)
+                void PaddingOnMouseLeave (object o, EventArgs e)
                 {
                     Padding.ColorScheme = Colors.ColorSchemes ["Dialog"];
                 }
