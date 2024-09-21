@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-namespace Terminal.Gui.ViewTests;
+namespace Terminal.Gui.ViewMouseTests;
 
 public class GetViewsUnderMouseTests
 {

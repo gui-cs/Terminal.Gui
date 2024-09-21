@@ -157,10 +157,7 @@ public partial class View // Mouse APIs
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
     protected internal virtual bool? OnMouseEnter (MouseEvent mouseEvent)
     {
-        var args = new MouseEventEventArgs (mouseEvent);
-        MouseEnter?.Invoke (this, args);
-
-        return args.Handled;
+        return false;
     }
 
     /// <summary>Called when a mouse event occurs within the view's <see cref="Viewport"/>.</summary>
@@ -196,20 +193,7 @@ public partial class View // Mouse APIs
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
     protected internal virtual bool OnMouseLeave (MouseEvent mouseEvent)
     {
-        if (!Enabled)
-        {
-            return true;
-        }
-
-        if (!CanBeVisible (this))
-        {
-            return false;
-        }
-
-        var args = new MouseEventEventArgs (mouseEvent);
-        MouseLeave?.Invoke (this, args);
-
-        return args.Handled;
+        return false;
     }
 
     /// <summary>
@@ -333,9 +317,9 @@ public partial class View // Mouse APIs
     }
 
     /// <summary>
-    ///     Called by <see cref="Application.OnMouseEvent"/> when the mouse enters <see cref="Viewport"/>. <see cref="MouseLeave"/> will
-    ///     be raised when the mouse is no longer over the <see cref="Viewport"/>. If another View occludes the current one, the
-    ///     that View will also receive a MouseEnter event.
+    ///     INTERNAL Called by <see cref="Application.OnMouseEvent"/> when the mouse moves over the View's <see cref="Frame"/>. <see cref="MouseLeave"/> will
+    ///     be raised when the mouse is no longer over the <see cref="Frame"/>. If another View occludes this View, the
+    ///     that View will also receive MouseEnter/Leave events.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -345,17 +329,20 @@ public partial class View // Mouse APIs
     ///         This method calls <see cref="OnMouseEnter"/> to raise the <see cref="MouseEnter"/> event.
     ///     </para>
     ///     <para>
+    ///         Adornments receive MouseEnter/Leave events when the mouse is over the Adornment's <see cref="Thickness"/>.
+    ///     </para>
+    ///     <para>
     ///         See <see cref="SetHighlight"/> for more information.
     ///     </para>
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/> if the event was handled, <see langword="false"/> otherwise. Handling the event
-    /// prevents Views higher in the visible hierarchy from recieving Enter/Leave events.</returns>
+    /// prevents Views higher in the visible hierarchy from receiving Enter/Leave events.</returns>
     internal bool? NewMouseEnterEvent (MouseEvent mouseEvent)
     {
         if (!Enabled)
         {
-            return true;
+            return false;
         }
 
         if (!CanBeVisible (this))
@@ -368,6 +355,9 @@ public partial class View // Mouse APIs
             return true;
         }
 
+        var args = new MouseEventEventArgs (mouseEvent);
+        MouseEnter?.Invoke (this, args);
+
 #if HOVER
         if (HighlightStyle.HasFlag(HighlightStyle.Hover))
         {
@@ -377,11 +367,12 @@ public partial class View // Mouse APIs
             }
         }
 #endif
-        return false;
+
+        return args.Handled;
     }
 
     /// <summary>
-    ///     Called by <see cref="Application.OnMouseEvent"/> when the mouse leaves <see cref="Viewport"/>.
+    ///     INTERNAL Called by <see cref="Application.OnMouseEvent"/> when the mouse leaves <see cref="Frame"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -389,6 +380,9 @@ public partial class View // Mouse APIs
     ///     </para>
     ///     <para>
     ///         This method calls <see cref="OnMouseLeave"/> to raise the <see cref="MouseLeave"/> event.
+    ///     </para>
+    ///     <para>
+    ///         Adornments receive MouseEnter/Leave events when the mouse is over the Adornment's <see cref="Thickness"/>.
     ///     </para>
     ///     <para>
     ///         See <see cref="SetHighlight"/> for more information.
@@ -407,6 +401,10 @@ public partial class View // Mouse APIs
         {
             return true;
         }
+
+        var args = new MouseEventEventArgs (mouseEvent);
+        MouseLeave?.Invoke (this, args);
+
 #if HOVER
         if (HighlightStyle.HasFlag (HighlightStyle.Hover))
         {
@@ -414,7 +412,7 @@ public partial class View // Mouse APIs
         }
 #endif
 
-        return false;
+        return args.Handled;
     }
 
     /// <summary>

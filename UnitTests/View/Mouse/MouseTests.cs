@@ -1,6 +1,6 @@
 ﻿using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace Terminal.Gui.ViewMouseTests;
 
 [Trait ("Category", "Input")]
 
@@ -465,4 +465,6 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
             }
         }
     }
+
+
 }
