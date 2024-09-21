@@ -215,7 +215,7 @@ public static partial class Application // Mouse handling
             return;
         }
 
-        RaiseMouseEnterLeaveEvents (me.ScreenPosition, currentViewsUnderMouse, me);
+        RaiseMouseEnterLeaveEvents (me.ScreenPosition, currentViewsUnderMouse);
 
         WantContinuousButtonPressedView = deepestViewUnderMouse.WantContinuousButtonPressed ? deepestViewUnderMouse : null;
 
@@ -303,8 +303,7 @@ public static partial class Application // Mouse handling
     /// </summary>
     /// <param name="screenPosition">The position of the mouse.</param>
     /// <param name="currentViewsUnderMouse">The most recent result from GetViewsUnderMouse().</param>
-    /// <param name="me">TODO: Remove once MouseEnter/Leave don't use MouseEvent anymore.</param>
-    internal static void RaiseMouseEnterLeaveEvents (Point screenPosition, List<View?> currentViewsUnderMouse, MouseEvent me)
+    internal static void RaiseMouseEnterLeaveEvents (Point screenPosition, List<View?> currentViewsUnderMouse)
     {
         // Tell any views that are no longer under the mouse that the mouse has left
         List<View?> viewsToLeave = _cachedViewsUnderMouse.Where (v => v is { } && !currentViewsUnderMouse.Contains (v)).ToList ();
@@ -315,25 +314,9 @@ public static partial class Application // Mouse handling
                 continue;
             }
 
-            if (view is Adornment adornmentView)
-            {
-                Point frameLoc = adornmentView.ScreenToFrame (screenPosition);
-                if (adornmentView.Parent is { } && !adornmentView.Contains (frameLoc))
-                {
-                    view.NewMouseLeaveEvent ();
-                }
-            }
-            else
-            {
-                Point superViewLoc = view.SuperView?.ScreenToViewport (screenPosition) ?? screenPosition;
-                if (!view.Contains (superViewLoc))
-                {
-                    view.NewMouseLeaveEvent ();
-                }
-            }
+            view.NewMouseLeaveEvent ();
+            _cachedViewsUnderMouse.Remove (view);
         }
-
-        _cachedViewsUnderMouse.Clear ();
 
         // Tell any views that are now under the mouse that the mouse has entered and add them to the list
         foreach (View? view in currentViewsUnderMouse)
@@ -343,17 +326,20 @@ public static partial class Application // Mouse handling
                 continue;
             }
 
-            _cachedViewsUnderMouse.Add (view);
+            if (!_cachedViewsUnderMouse.Contains (view))
+            {
+                _cachedViewsUnderMouse.Add (view);
+            }
 
             bool raise = false;
             if (view is Adornment { Parent: { } } adornmentView)
             {
-                Point frameLoc = view.ScreenToFrame (me.ScreenPosition);
-                raise = adornmentView.Contains (frameLoc);
+                Point superViewLoc = adornmentView.Parent.SuperView?.ScreenToViewport (screenPosition) ?? screenPosition;
+                raise = adornmentView.Contains (superViewLoc);
             }
             else
             {
-                Point superViewLoc = view.SuperView?.ScreenToViewport (me.ScreenPosition) ?? me.ScreenPosition;
+                Point superViewLoc = view.SuperView?.ScreenToViewport (screenPosition) ?? screenPosition;
                 raise = view.Contains (superViewLoc);
             }
 

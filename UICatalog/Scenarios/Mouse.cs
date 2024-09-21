@@ -117,29 +117,32 @@ public class Mouse : Scenario
                                   Y = 0,
                                   Width = Dim.Fill (),
                                   Height = Dim.Func (() => demo.Padding.Thickness.Top),
-                                  Title = "inPadding"
+                                  Title = "inPadding",
+                                  Id = "inPadding"
                               });
             demo.Padding.Thickness = demo.Padding.Thickness with { Top = 5 };
         }
 
-        demo.Add (
-                  new MouseEventDemoView ()
-                  {
-                      X = 0,
-                      Y = 0,
-                      Width = Dim.Percent(30),
-                      Height = Dim.Fill(),
-                      Title = "sub1",
-                  });
+        View sub1 = new MouseEventDemoView ()
+        {
+            X = 0,
+            Y = 0,
+            Width = Dim.Percent (20),
+            Height = Dim.Fill (),
+            Title = "sub1",
+            Id = "sub1",
+        };
+        demo.Add (sub1);
 
         demo.Add (
                   new MouseEventDemoView ()
                   {
-                      X = Pos.AnchorEnd(),
-                      Y = 0,
-                      Width = Dim.Percent (30),
-                      Height = Dim.Fill (),
+                      X = Pos.Right (sub1) - 4,
+                      Y = Pos.Top (sub1) + 1,
+                      Width = Dim.Percent (20),
+                      Height = Dim.Fill (1),
                       Title = "sub2",
+                      Id = "sub2",
                   });
 
         win.Add (demo);

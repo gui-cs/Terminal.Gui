@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System;
 using System.ComponentModel;
 
 namespace Terminal.Gui;
@@ -136,6 +137,8 @@ public partial class View // Mouse APIs
 
     #region MouseEnterLeave
 
+    private bool _mouseOver;
+
     /// <summary>
     ///     INTERNAL Called by <see cref="Application.OnMouseEvent"/> when the mouse moves over the View's <see cref="Frame"/>.
     ///     <see cref="MouseLeave"/> will
@@ -172,7 +175,20 @@ public partial class View // Mouse APIs
         }
 #endif
 
-        return eventArgs.Cancel;
+        _mouseOver = !eventArgs.Cancel;
+
+        if (eventArgs.Cancel)
+        {
+            return true;
+        }
+
+        // Invert Normal
+        if (Diagnostics.HasFlag (ViewDiagnosticFlags.MouseEnter) && ColorScheme != null)
+        {
+            SetNeedsDisplay ();
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -253,6 +269,8 @@ public partial class View // Mouse APIs
             SetHighlight (HighlightStyle.None);
         }
 #endif
+
+        _mouseOver = false;
     }
 
     /// <summary>

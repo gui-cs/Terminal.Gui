@@ -228,5 +228,34 @@ public class Adornment : View
         return Thickness.Contains (frame, location);
     }
 
+    ///// <inheritdoc/>
+    //protected override bool OnMouseEnter (CancelEventArgs mouseEvent)
+    //{
+    //    // Invert Normal
+    //    if (Diagnostics.HasFlag (ViewDiagnosticFlags.MouseEnter) && ColorScheme != null)
+    //    {
+    //        var cs = new ColorScheme (ColorScheme)
+    //        {
+    //            Normal = new (ColorScheme.Normal.Background, ColorScheme.Normal.Foreground)
+    //        };
+    //        ColorScheme = cs;
+    //    }
+
+    //    return false;
+    //}
+
+    ///// <inheritdoc/>   
+    //protected override void OnMouseLeave ()
+    //{
+    //    // Invert Normal
+    //    if (Diagnostics.FastHasFlags (ViewDiagnosticFlags.MouseEnter) && ColorScheme != null)
+    //    {
+    //        var cs = new ColorScheme (ColorScheme)
+    //        {
+    //            Normal = new (ColorScheme.Normal.Background, ColorScheme.Normal.Foreground)
+    //        };
+    //        ColorScheme = cs;
+    //    }
+    //}
     #endregion Mouse Support
 }

@@ -377,6 +377,14 @@ public partial class View // Drawing APIs
             cs = new ();
         }
 
+        if (Diagnostics.HasFlag (ViewDiagnosticFlags.MouseEnter) && _mouseOver)
+        {
+            cs = new ColorScheme (cs)
+            {
+                Normal = new (ColorScheme.Normal.Foreground.GetDarkerColor (), ColorScheme.Normal.Background.GetDarkerColor()),
+                Disabled = new (ColorScheme.Disabled.Foreground.GetDarkerColor (), ColorScheme.Disabled.Background.GetDarkerColor ())
+            };
+        }
         return Enabled ? cs.Normal : cs.Disabled;
     }
 
