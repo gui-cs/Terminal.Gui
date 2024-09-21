@@ -128,7 +128,7 @@ public static partial class Application // Mouse handling
     /// </remarks>
     public static event EventHandler<MouseEvent>? MouseEvent;
 
-    /// <summary>Called when a mouse event occurs. Raises the <see cref="MouseEvent"/> event.</summary>
+    /// <summary>Called when a mouse event is raised by the driver.</summary>
     /// <remarks>This method can be used to simulate a mouse event, e.g. in unit tests.</remarks>
     /// <param name="mouseEvent">The mouse event with coordinates relative to the screen.</param>
     internal static void OnMouseEvent (MouseEvent mouseEvent)

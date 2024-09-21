@@ -323,7 +323,7 @@ public partial class View // Mouse APIs
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         A view must be visible to receive Enter/Leave events.
+    ///         A view must be visible to receive Enter events (Leave events are always received).
     ///     </para>
     ///     <para>
     ///         This method calls <see cref="OnMouseEnter"/> to raise the <see cref="MouseEnter"/> event.
@@ -376,7 +376,7 @@ public partial class View // Mouse APIs
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         A view must be visible to receive Enter/Leave events.
+    ///         A view must be visible to receive Enter events (Leave events are always received).
     ///     </para>
     ///     <para>
     ///         This method calls <see cref="OnMouseLeave"/> to raise the <see cref="MouseLeave"/> event.
@@ -392,11 +392,6 @@ public partial class View // Mouse APIs
     /// <returns><see langword="true"/> if the event was handled, <see langword="false"/> otherwise. </returns>
     internal bool? NewMouseLeaveEvent (MouseEvent mouseEvent)
     {
-        if (!CanBeVisible (this))
-        {
-            return false;
-        }
-
         if (OnMouseLeave (mouseEvent))
         {
             return true;

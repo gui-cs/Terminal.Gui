@@ -160,7 +160,7 @@ public class MouseEnterLeaveTests
     }
 
     [Fact]
-    public void NewMouseLeaveEvent_ViewIsNotVisible_DoesNotCallOnMouseLeave ()
+    public void NewMouseLeaveEvent_ViewIsNotVisible_CallsOnMouseLeave ()
     {
         // Arrange
         var view = new TestView
@@ -175,7 +175,7 @@ public class MouseEnterLeaveTests
         bool? handled = view.NewMouseLeaveEvent (mouseEvent);
 
         // Assert
-        Assert.False (view.OnMouseLeaveCalled);
+        Assert.True (view.OnMouseLeaveCalled);
         Assert.False (handled);
         Assert.False (mouseEvent.Handled);
 
@@ -263,7 +263,8 @@ public class MouseEnterLeaveTests
         // Arrange
         var view = new TestView
         {
-            Enabled = true, Visible = true
+            Enabled = true, 
+            Visible = true
         };
 
         var mouseEvent = new MouseEvent ();
@@ -296,7 +297,7 @@ public class MouseEnterLeaveTests
         bool? handled = view.NewMouseLeaveEvent (mouseEvent);
 
         // Assert
-        Assert.False (view.MouseLeaveRaised);
+        Assert.True (view.MouseLeaveRaised);
         Assert.False (handled);
         Assert.False (mouseEvent.Handled);
 
