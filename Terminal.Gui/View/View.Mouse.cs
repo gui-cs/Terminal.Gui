@@ -137,7 +137,7 @@ public partial class View // Mouse APIs
 
     #region MouseEnterLeave
 
-    private bool _mouseOver;
+    private bool _Hover;
 
     /// <summary>
     ///     INTERNAL Called by <see cref="Application.OnMouseEvent"/> when the mouse moves over the View's <see cref="Frame"/>.
@@ -165,14 +165,14 @@ public partial class View // Mouse APIs
 
         MouseEnter?.Invoke (this, eventArgs);
 
-        _mouseOver = !eventArgs.Cancel;
+        _Hover = !eventArgs.Cancel;
 
         if (eventArgs.Cancel)
         {
             return true;
         }
 
-        if ((HighlightStyle.HasFlag(HighlightStyle.Hover) ||  Diagnostics.HasFlag (ViewDiagnosticFlags.MouseOver)))
+        if ((HighlightStyle.HasFlag(HighlightStyle.Hover) ||  Diagnostics.HasFlag (ViewDiagnosticFlags.Hover)))
         {
             SetNeedsDisplay ();
         }
@@ -252,9 +252,9 @@ public partial class View // Mouse APIs
 
         MouseLeave?.Invoke (this, EventArgs.Empty);
 
-        _mouseOver = false;
+        _Hover = false;
 
-        if ((HighlightStyle.HasFlag (HighlightStyle.Hover) || Diagnostics.HasFlag (ViewDiagnosticFlags.MouseOver)))
+        if ((HighlightStyle.HasFlag (HighlightStyle.Hover) || Diagnostics.HasFlag (ViewDiagnosticFlags.Hover)))
         {
             SetNeedsDisplay ();
         }

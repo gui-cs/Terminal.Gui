@@ -22,7 +22,7 @@ public enum ViewDiagnosticFlags : uint
     /// <summary>
     ///     When enabled the View's colors will be darker when the mouse is hovering over the View (See <see cref="View.MouseEnter"/> and <see cref="View.MouseLeave"/>.
     /// </summary>
-    MouseOver = 0b_0000_00100
+    Hover = 0b_0000_00100
 }
 
 public partial class View

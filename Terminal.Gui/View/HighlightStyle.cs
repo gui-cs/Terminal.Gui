@@ -15,7 +15,7 @@ public enum HighlightStyle
     None = 0,
 
     /// <summary>
-    /// The mouse is hovering over the view.
+    /// The mouse is hovering over the view (but not pressed). See <see cref="View.MouseEnter"/>.
     /// </summary>
     Hover = 1,
 
