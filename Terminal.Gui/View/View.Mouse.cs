@@ -8,17 +8,6 @@ public partial class View // Mouse APIs
 {
     private ColorScheme? _savedHighlightColorScheme;
 
-    /// <summary>
-    ///     Fired when the view is highlighted. Set <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/>
-    ///     to implement a custom highlight scheme or prevent the view from being highlighted.
-    /// </summary>
-    public event EventHandler<CancelEventArgs<HighlightStyle>>? Highlight;
-
-    /// <summary>
-    ///     Gets or sets whether the <see cref="View"/> will be highlighted visually while the mouse button is
-    ///     pressed.
-    /// </summary>
-    public HighlightStyle HighlightStyle { get; set; }
 
     /// <summary>Event fired when a mouse click occurs.</summary>
     /// <remarks>
@@ -305,30 +294,6 @@ public partial class View // Mouse APIs
         return args.Handled;
     }
 
-    /// <summary>
-    ///     Called when the view is to be highlighted.
-    /// </summary>
-    /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    protected virtual bool? OnHighlight (CancelEventArgs<HighlightStyle> args)
-    {
-        Highlight?.Invoke (this, args);
-
-        if (args.Cancel)
-        {
-            return true;
-        }
-
-        Margin?.Highlight?.Invoke (this, args);
-
-        //args = new (highlight);
-        //Border?.Highlight?.Invoke (this, args);
-
-        //args = new (highlight);
-        //Padding?.Highlight?.Invoke (this, args);
-
-        return args.Cancel;
-    }
-
     /// <summary>Invokes the MouseClick event.</summary>
     /// <remarks>
     ///     <para>
@@ -425,6 +390,41 @@ public partial class View // Mouse APIs
         return false;
     }
 
+    #region Highlight
+
+    /// <summary>
+    ///     Gets or sets whether the <see cref="View"/> will be highlighted visually while the mouse button is
+    ///     pressed.
+    /// </summary>
+    public HighlightStyle HighlightStyle { get; set; }
+    private bool RaiseHighlight (CancelEventArgs<HighlightStyle> args)
+    {
+        if (OnHighlight (args) == true)
+        {
+            return true;
+        }
+
+        Highlight?.Invoke (this, args);
+
+        return args.Cancel;
+    }
+
+    /// <summary>
+    ///     Called when the view is to be highlighted.
+    /// </summary>
+    /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
+    protected virtual bool OnHighlight (CancelEventArgs<HighlightStyle> args)
+    {
+        return false;
+    }
+
+    /// <summary>
+    ///     Fired when the view is highlighted. Set <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/>
+    ///     to implement a custom highlight scheme or prevent the view from being highlighted.
+    /// </summary>
+    public event EventHandler<CancelEventArgs<HighlightStyle>>? Highlight;
+
+
     /// <summary>
     ///     Enables the highlight for the view when the mouse is pressed. Called from OnMouseEvent.
     /// </summary>
@@ -452,10 +452,13 @@ public partial class View // Mouse APIs
         HighlightStyle copy = HighlightStyle;
         CancelEventArgs<HighlightStyle> args = new (ref copy, ref newHighlightStyle);
 
-        if (OnHighlight (args) == true)
+        if (RaiseHighlight (args))
         {
             return true;
         }
+
+        // For Shadow
+        Margin?.RaiseHighlight (args);
 
         if (args.NewValue.HasFlag (HighlightStyle.Pressed) || args.NewValue.HasFlag (HighlightStyle.PressedOutside))
         {
@@ -499,6 +502,8 @@ public partial class View // Mouse APIs
 
         return false;
     }
+
+    #endregion
 
     /// <summary>
     ///     For cases where the view is grabbed and the mouse is clicked, this method handles the released event (typically

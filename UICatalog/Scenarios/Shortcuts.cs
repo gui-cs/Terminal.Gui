@@ -57,6 +57,8 @@ public class Shortcuts : Scenario
             Text = "Width is 35",
             KeyBindingScope = KeyBindingScope.Application,
         };
+        vShortcut1.HighlightStyle |= HighlightStyle.Hover;
+
         Application.Top.Add (vShortcut1);
 
         var vShortcut2 = new Shortcut
@@ -72,14 +74,14 @@ public class Shortcuts : Scenario
             {
                 Orientation = Orientation.Vertical,
                 RadioLabels = ["O_ne", "T_wo", "Th_ree", "Fo_ur"]
-            }
+            },
         };
 
         ((RadioGroup)vShortcut2.CommandView).SelectedItemChanged += (o, args) =>
-                                                                   {
-                                                                       eventSource.Add ($"SelectedItemChanged: {o.GetType ().Name} - {args.SelectedItem}");
-                                                                       eventLog.MoveDown ();
-                                                                   };
+                                                                    {
+                                                                        eventSource.Add ($"SelectedItemChanged: {o.GetType ().Name} - {args.SelectedItem}");
+                                                                        eventLog.MoveDown ();
+                                                                    };
 
         vShortcut2.Accept += (o, args) =>
                             {
@@ -378,6 +380,6 @@ public class Shortcuts : Scenario
     private void Button_Clicked (object sender, HandledEventArgs e)
     {
         //e.Cancel = true;
-        MessageBox.Query ("Hi", $"You clicked {sender}"); 
+        MessageBox.Query ("Hi", $"You clicked {sender}");
     }
 }
