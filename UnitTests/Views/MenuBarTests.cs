@@ -657,7 +657,7 @@ public class MenuBarTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.None)]
+    [AutoInitShutdown]
     public void Draw_A_Menu_Over_A_Top_Dialog ()
     {
         ((FakeDriver)Application.Driver).SetBufferSize (40, 15);
