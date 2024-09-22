@@ -53,6 +53,7 @@ public class Menuv2 : Bar
             shortcut.CanFocus = true;
             shortcut.KeyBindingScope = KeyBindingScope.Application;
             shortcut.Orientation = Orientation.Vertical;
+            shortcut.HighlightStyle |= HighlightStyle.Hover;
 
             // TODO: not happy about using AlignmentModes for this. Too implied.
             // TODO: instead, add a property (a style enum?) to Shortcut to control this

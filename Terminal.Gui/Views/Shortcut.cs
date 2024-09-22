@@ -54,7 +54,7 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         Id = "_shortcut";
         HighlightStyle = HighlightStyle.Pressed;
-        Highlight += Shortcut_Highlight;
+        //Highlight += Shortcut_Highlight;
         CanFocus = true;
         Width = GetWidthDimAuto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
@@ -148,6 +148,21 @@ public class Shortcut : View, IOrientation, IDesignable
     private int? _minimumDimAutoWidth;
 
     private Color? _savedForeColor;
+
+    /// <inheritdoc />
+    protected override bool OnHighlight (CancelEventArgs<HighlightStyle> args)
+    {
+        if (args.NewValue.HasFlag (HighlightStyle.Hover))
+        {
+            SetColors (true);
+        }
+        else
+        {
+            SetColors (false);
+        }
+
+        return true;
+    }
 
     /// <inheritdoc/>
     public bool EnableForDesign ()
@@ -803,12 +818,12 @@ public class Shortcut : View, IOrientation, IDesignable
 
     /// <summary>
     /// </summary>
-    internal void SetColors ()
+    internal void SetColors (bool highlight = false)
     {
         // Border should match superview.
         Border.ColorScheme = SuperView?.ColorScheme;
 
-        if (HasFocus)
+        if (HasFocus || highlight)
         {
             base.ColorScheme ??= new (Attribute.Default);
 

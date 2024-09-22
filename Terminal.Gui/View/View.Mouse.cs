@@ -163,7 +163,15 @@ public partial class View // Mouse APIs
 
         if ((HighlightStyle.HasFlag(HighlightStyle.Hover) ||  Diagnostics.HasFlag (ViewDiagnosticFlags.Hover)))
         {
+            HighlightStyle copy = HighlightStyle;
+            HighlightStyle hover = HighlightStyle.Hover;
+            CancelEventArgs<HighlightStyle> args = new (ref copy, ref hover);
+            if (!RaiseHighlight (args))
+            {
+            }
             SetNeedsDisplay ();
+
+            return args.Cancel;
         }
 
         return false;
@@ -245,7 +253,13 @@ public partial class View // Mouse APIs
 
         if ((HighlightStyle.HasFlag (HighlightStyle.Hover) || Diagnostics.HasFlag (ViewDiagnosticFlags.Hover)))
         {
-            SetNeedsDisplay ();
+            HighlightStyle copy = HighlightStyle;
+            HighlightStyle hover = HighlightStyle.None;
+            CancelEventArgs<HighlightStyle> args = new (ref copy, ref hover);
+            if (!RaiseHighlight (args))
+            {
+                SetNeedsDisplay ();
+            }
         }
     }
 
