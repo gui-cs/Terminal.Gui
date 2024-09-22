@@ -73,14 +73,6 @@ public class Border : Adornment
     /// <inheritdoc/>
     public override void BeginInit ()
     {
-#if HOVER
-        // TOOD: Hack - make Arrangement overridable
-        if ((Parent?.Arrangement & ViewArrangement.Movable) != 0)
-        {
-            HighlightStyle |= HighlightStyle.Hover;
-        }
-#endif
-
         base.BeginInit ();
 
 #if SUBVIEW_BASED_BORDER
@@ -245,16 +237,7 @@ public class Border : Adornment
             };
             ColorScheme = cs;
         }
-#if HOVER
-        else if (e.HighlightStyle.HasFlag (HighlightStyle.Hover))
-        {
-            if (!_savedHighlightLineStyle.HasValue)
-            {
-                _savedHighlightLineStyle = Parent?.BorderStyle ?? LineStyle;
-            }
-            LineStyle = LineStyle.Double;
-        }
-#endif
+
 
         if (e.NewValue == HighlightStyle.None && _savedForeColor.HasValue)
         {

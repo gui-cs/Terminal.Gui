@@ -165,16 +165,6 @@ public partial class View // Mouse APIs
 
         MouseEnter?.Invoke (this, eventArgs);
 
-#if HOVER
-        if (HighlightStyle.HasFlag(HighlightStyle.Hover))
-        {
-            if (SetHighlight (HighlightStyle.Hover))
-            {
-                return true;
-            }
-        }
-#endif
-
         _mouseOver = !eventArgs.Cancel;
 
         if (eventArgs.Cancel)
@@ -182,8 +172,7 @@ public partial class View // Mouse APIs
             return true;
         }
 
-        // Invert Normal
-        if (Diagnostics.HasFlag (ViewDiagnosticFlags.MouseEnter) && ColorScheme != null)
+        if ((HighlightStyle.HasFlag(HighlightStyle.Hover) ||  Diagnostics.HasFlag (ViewDiagnosticFlags.MouseOver)))
         {
             SetNeedsDisplay ();
         }
@@ -263,14 +252,12 @@ public partial class View // Mouse APIs
 
         MouseLeave?.Invoke (this, EventArgs.Empty);
 
-#if HOVER
-        if (HighlightStyle.HasFlag (HighlightStyle.Hover))
-        {
-            SetHighlight (HighlightStyle.None);
-        }
-#endif
-
         _mouseOver = false;
+
+        if ((HighlightStyle.HasFlag (HighlightStyle.Hover) || Diagnostics.HasFlag (ViewDiagnosticFlags.MouseOver)))
+        {
+            SetNeedsDisplay ();
+        }
     }
 
     /// <summary>
@@ -443,7 +430,7 @@ public partial class View // Mouse APIs
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Set <see cref="HighlightStyle"/> to have the view highlighted based on the mouse.
+    ///         Set <see cref="HighlightStyle"/> to <see cref="HighlightStyle.Pressed"/> to enable.
     ///     </para>
     ///     <para>
     ///         Calls <see cref="OnHighlight"/> which fires the <see cref="Highlight"/> event.
@@ -469,24 +456,7 @@ public partial class View // Mouse APIs
         {
             return true;
         }
-#if HOVER
-        if (style.HasFlag (HighlightStyle.Hover))
-        {
-            if (_savedHighlightColorScheme is null && ColorScheme is { })
-            {
-                _savedHighlightColorScheme ??= ColorScheme;
 
-                var cs = new ColorScheme (ColorScheme)
-                {
-                    Normal = GetFocusColor (),
-                    HotNormal = ColorScheme.HotFocus
-                };
-                ColorScheme = cs;
-            }
-
-            return true;
-        }
-#endif
         if (args.NewValue.HasFlag (HighlightStyle.Pressed) || args.NewValue.HasFlag (HighlightStyle.PressedOutside))
         {
             if (_savedHighlightColorScheme is null && ColorScheme is { })

@@ -3142,14 +3142,7 @@ public class TextView : View
     /// <inheritdoc/>
     public override Attribute GetNormalColor ()
     {
-        ColorScheme? cs = ColorScheme;
-
-        if (ColorScheme is null)
-        {
-            cs = new ();
-        }
-
-        return Enabled ? cs.Focus : cs.Disabled;
+        return GetFocusColor ();
     }
 
     /// <summary>

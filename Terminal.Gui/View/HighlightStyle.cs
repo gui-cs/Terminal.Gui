@@ -1,8 +1,11 @@
-﻿namespace Terminal.Gui;
+﻿using System.Text.Json.Serialization;
+
+namespace Terminal.Gui;
 
 /// <summary>
 /// Describes the highlight style of a view.
 /// </summary>
+[JsonConverter (typeof (JsonStringEnumConverter<HighlightStyle>))]
 [Flags]
 public enum HighlightStyle
 {
@@ -11,12 +14,10 @@ public enum HighlightStyle
     /// </summary>
     None = 0,
 
-#if HOVER
     /// <summary>
     /// The mouse is hovering over the view.
     /// </summary>
     Hover = 1,
-#endif
 
     /// <summary>
     /// The mouse is pressed within the <see cref="View.Viewport"/>.
