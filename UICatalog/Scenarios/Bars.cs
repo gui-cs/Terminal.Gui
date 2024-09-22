@@ -116,7 +116,7 @@ public class Bars : Scenario
             //Width = Dim.Percent (40),
             Orientation = Orientation.Vertical,
         };
-            ConfigureMenu (bar);
+        ConfigureMenu (bar);
 
         menuLikeExamples.Add (bar);
 
@@ -390,13 +390,6 @@ public class Bars : Scenario
             HighlightStyle = HighlightStyle.Hover
         };
 
-        var line = new Line ()
-        {
-            BorderStyle = LineStyle.Dotted,
-            Orientation = Orientation.Horizontal,
-            CanFocus = false,
-        };
-
         var shortcut3 = new Shortcut
         {
             Title = "_Three",
@@ -405,7 +398,24 @@ public class Bars : Scenario
             HighlightStyle = HighlightStyle.Hover
         };
 
-        bar.Add (shortcut1, shortcut2, line, shortcut3);
+        var line = new Line ()
+        {
+            BorderStyle = LineStyle.Dotted,
+            Orientation = Orientation.Horizontal,
+            CanFocus = false,
+        };
+        // HACK: Bug in Line
+        line.Orientation = Orientation.Vertical;
+        line.Orientation = Orientation.Horizontal;
+
+        var shortcut4 = new Shortcut
+        {
+            Title = "_Four",
+            Text = "Below the line",
+            Key = Key.D3.WithAlt,
+            HighlightStyle = HighlightStyle.Hover
+        };
+        bar.Add (shortcut1, shortcut2, shortcut3, line, shortcut4);
     }
 
     public void ConfigStatusBar (Bar bar)

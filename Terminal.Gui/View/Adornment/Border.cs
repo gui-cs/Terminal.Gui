@@ -289,7 +289,7 @@ public class Border : Adornment
                 _dragPosition = mouseEvent.Position;
                 Application.GrabMouse (this);
 
-                SetHighlight (HighlightStyle);
+                SetPressedHighlight (HighlightStyle);
             }
 
             return true;
@@ -334,7 +334,7 @@ public class Border : Adornment
         {
             _dragPosition = null;
             Application.UngrabMouse ();
-            SetHighlight (HighlightStyle.None);
+            SetPressedHighlight (HighlightStyle.None);
 
             return true;
         }

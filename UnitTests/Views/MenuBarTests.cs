@@ -660,14 +660,13 @@ public class MenuBarTests (ITestOutputHelper output)
     [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.None)]
     public void Draw_A_Menu_Over_A_Top_Dialog ()
     {
-
         ((FakeDriver)Application.Driver).SetBufferSize (40, 15);
+
         // Override CM
         Window.DefaultBorderStyle = LineStyle.Single;
         Dialog.DefaultButtonAlignment = Alignment.Center;
         Dialog.DefaultBorderStyle = LineStyle.Single;
         Button.DefaultShadow = ShadowStyle.None;
-
 
         Assert.Equal (new (0, 0, 40, 15), Application.Driver?.Clip);
         TestHelpers.AssertDriverContentsWithFrameAre (@"", output);

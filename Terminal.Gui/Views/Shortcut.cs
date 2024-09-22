@@ -146,19 +146,12 @@ public class Shortcut : View, IOrientation, IDesignable
     // This is used to calculate the minimum width of the Shortcut when the width is NOT Dim.Auto
     private int? _minimumDimAutoWidth;
 
-    private Color? _savedForeColor;
-
     /// <inheritdoc />
     protected override bool OnHighlight (CancelEventArgs<HighlightStyle> args)
     {
         if (args.NewValue.HasFlag (HighlightStyle.Hover))
         {
-            SetColors (highlight: true);
-        }
-        else
-        {
-            // If we have focus, act like we're highlighted
-            SetColors (highlight: HasFocus);
+            HasFocus = true;
         }
 
         return true;
@@ -339,35 +332,6 @@ public class Shortcut : View, IOrientation, IDesignable
         return false;
     }
 
-    private void Shortcut_Highlight (object sender, CancelEventArgs<HighlightStyle> e)
-    {
-        if (e.CurrentValue.HasFlag (HighlightStyle.Pressed))
-        {
-            if (!_savedForeColor.HasValue)
-            {
-                _savedForeColor = base.ColorScheme.Normal.Foreground;
-            }
-
-            var cs = new ColorScheme (base.ColorScheme)
-            {
-                Normal = new (ColorScheme.Normal.Foreground.GetHighlightColor (), base.ColorScheme.Normal.Background)
-            };
-            base.ColorScheme = cs;
-        }
-
-        if (e.CurrentValue == HighlightStyle.None && _savedForeColor.HasValue)
-        {
-            var cs = new ColorScheme (base.ColorScheme)
-            {
-                Normal = new (_savedForeColor.Value, base.ColorScheme.Normal.Background)
-            };
-            base.ColorScheme = cs;
-        }
-
-        SuperView?.SetNeedsDisplay ();
-        e.Cancel = true;
-    }
-
     private void Shortcut_MouseClick (object sender, MouseEventEventArgs e)
     {
         // When the Shortcut is clicked, we want to invoke the Command and Set focus
@@ -522,6 +486,7 @@ public class Shortcut : View, IOrientation, IDesignable
         CommandView.Margin.Thickness = GetMarginThickness ();
         CommandView.X = Pos.Align (Alignment.End, AlignmentModes);
         CommandView.Y = 0; //Pos.Center ();
+        HelpView.HighlightStyle = HighlightStyle.None;
     }
 
     private void Shortcut_TitleChanged (object sender, EventArgs<string> e)
@@ -551,6 +516,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
         HelpView.Visible = true;
         HelpView.VerticalTextAlignment = Alignment.Center;
+        HelpView.HighlightStyle = HighlightStyle.None;
     }
 
     /// <summary>
@@ -692,6 +658,7 @@ public class Shortcut : View, IOrientation, IDesignable
         KeyView.TextAlignment = Alignment.End;
         KeyView.VerticalTextAlignment = Alignment.Center;
         KeyView.KeyBindings.Clear ();
+        HelpView.HighlightStyle = HighlightStyle.None;
     }
 
     private void UpdateKeyBinding (Key oldKey)

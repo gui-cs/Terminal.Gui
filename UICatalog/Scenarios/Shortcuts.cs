@@ -57,7 +57,6 @@ public class Shortcuts : Scenario
             Text = "Width is 35",
             KeyBindingScope = KeyBindingScope.Application,
         };
-        vShortcut1.HighlightStyle |= HighlightStyle.Hover;
 
         Application.Top.Add (vShortcut1);
 
