@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.ComponentModel;
 using Terminal.Gui;
 using Attribute = Terminal.Gui.Attribute;
 
@@ -228,37 +229,34 @@ public class Adornment : View
         return Thickness.Contains (frame, location);
     }
 
-    /// <inheritdoc/>
-    protected internal override bool? OnMouseEnter (MouseEvent mouseEvent)
-    {
-        // Invert Normal
-        if (Diagnostics.HasFlag (ViewDiagnosticFlags.MouseEnter) && ColorScheme != null)
-        {
-            var cs = new ColorScheme (ColorScheme)
-            {
-                Normal = new (ColorScheme.Normal.Background, ColorScheme.Normal.Foreground)
-            };
-            ColorScheme = cs;
-        }
+    ///// <inheritdoc/>
+    //protected override bool OnMouseEnter (CancelEventArgs mouseEvent)
+    //{
+    //    // Invert Normal
+    //    if (Diagnostics.HasFlag (ViewDiagnosticFlags.MouseEnter) && ColorScheme != null)
+    //    {
+    //        var cs = new ColorScheme (ColorScheme)
+    //        {
+    //            Normal = new (ColorScheme.Normal.Background, ColorScheme.Normal.Foreground)
+    //        };
+    //        ColorScheme = cs;
+    //    }
 
-        return base.OnMouseEnter (mouseEvent);
-    }
+    //    return false;
+    //}
 
-    /// <inheritdoc/>   
-    protected internal override bool OnMouseLeave (MouseEvent mouseEvent)
-    {
-        // Invert Normal
-        if (Diagnostics.FastHasFlags (ViewDiagnosticFlags.MouseEnter) && ColorScheme != null)
-        {
-            var cs = new ColorScheme (ColorScheme)
-            {
-                Normal = new (ColorScheme.Normal.Background, ColorScheme.Normal.Foreground)
-            };
-            ColorScheme = cs;
-        }
-
-        return base.OnMouseLeave (mouseEvent);
-    }
-
+    ///// <inheritdoc/>   
+    //protected override void OnMouseLeave ()
+    //{
+    //    // Invert Normal
+    //    if (Diagnostics.FastHasFlags (ViewDiagnosticFlags.MouseEnter) && ColorScheme != null)
+    //    {
+    //        var cs = new ColorScheme (ColorScheme)
+    //        {
+    //            Normal = new (ColorScheme.Normal.Background, ColorScheme.Normal.Foreground)
+    //        };
+    //        ColorScheme = cs;
+    //    }
+    //}
     #endregion Mouse Support
 }

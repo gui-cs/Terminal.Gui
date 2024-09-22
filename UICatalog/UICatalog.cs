@@ -543,18 +543,6 @@ public class UICatalogApp
                                                                       Application.Refresh ();
                                                                   };
 
-                //ShDiagnostics = new Shortcut ()
-                //{
-                //    HelpText = "Diagnostic flags",
-                //    CommandView = new RadioGroup()
-                //    {
-                //        RadioLabels = ["Off", "Ruler", "Padding", "MouseEnter"],
-
-                //        CanFocus = false,
-                //        Orientation = Orientation.Vertical,
-                //    }
-                //};
-
                 StatusBar.Add (
                                new Shortcut
                                {
@@ -819,7 +807,7 @@ public class UICatalogApp
             const string OFF = "View Diagnostics: _Off";
             const string RULER = "View Diagnostics: _Ruler";
             const string PADDING = "View Diagnostics: _Padding";
-            const string MOUSEENTER = "View Diagnostics: _MouseEnter";
+            const string Hover = "View Diagnostics: _Hover";
             var index = 0;
 
             List<MenuItem> menuItems = new ();
@@ -837,7 +825,7 @@ public class UICatalogApp
                 {
                     item.Checked = !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Padding)
                                    && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Ruler)
-                                   && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.MouseEnter);
+                                   && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Hover);
                 }
                 else
                 {
@@ -850,12 +838,12 @@ public class UICatalogApp
 
                                    if (item.Title == t && item.Checked == false)
                                    {
-                                       _diagnosticFlags &= ~(ViewDiagnosticFlags.Padding | ViewDiagnosticFlags.Ruler | ViewDiagnosticFlags.MouseEnter);
+                                       _diagnosticFlags &= ~(ViewDiagnosticFlags.Padding | ViewDiagnosticFlags.Ruler | ViewDiagnosticFlags.Hover);
                                        item.Checked = true;
                                    }
                                    else if (item.Title == t && item.Checked == true)
                                    {
-                                       _diagnosticFlags |= ViewDiagnosticFlags.Padding | ViewDiagnosticFlags.Ruler | ViewDiagnosticFlags.MouseEnter;
+                                       _diagnosticFlags |= ViewDiagnosticFlags.Padding | ViewDiagnosticFlags.Ruler | ViewDiagnosticFlags.Hover;
                                        item.Checked = false;
                                    }
                                    else
@@ -878,7 +866,7 @@ public class UICatalogApp
                                        {
                                            menuItem.Checked = !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Ruler)
                                                               && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Padding)
-                                                              && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.MouseEnter);
+                                                              && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Hover);
                                        }
                                        else if (menuItem.Title != t)
                                        {
@@ -901,7 +889,7 @@ public class UICatalogApp
                     "Off" => OFF,
                     "Ruler" => RULER,
                     "Padding" => PADDING,
-                    "MouseEnter" => MOUSEENTER,
+                    "Hover" => Hover,
                     _ => ""
                 };
             }
@@ -912,7 +900,7 @@ public class UICatalogApp
                 {
                     RULER => ViewDiagnosticFlags.Ruler,
                     PADDING => ViewDiagnosticFlags.Padding,
-                    MOUSEENTER => ViewDiagnosticFlags.MouseEnter,
+                    Hover => ViewDiagnosticFlags.Hover,
                     _ => null!
                 };
             }
@@ -943,14 +931,14 @@ public class UICatalogApp
                         }
 
                         break;
-                    case ViewDiagnosticFlags.MouseEnter:
+                    case ViewDiagnosticFlags.Hover:
                         if (add)
                         {
-                            _diagnosticFlags |= ViewDiagnosticFlags.MouseEnter;
+                            _diagnosticFlags |= ViewDiagnosticFlags.Hover;
                         }
                         else
                         {
-                            _diagnosticFlags &= ~ViewDiagnosticFlags.MouseEnter;
+                            _diagnosticFlags &= ~ViewDiagnosticFlags.Hover;
                         }
 
                         break;

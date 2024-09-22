@@ -1,5 +1,6 @@
 #nullable enable
 using System.Diagnostics;
+using Microsoft.CodeAnalysis;
 
 namespace Terminal.Gui;
 
@@ -12,89 +13,7 @@ public partial class View // Layout APIs
     /// <returns><see langword="true"/> if the specified SuperView-relative coordinates are within the View.</returns>
     public virtual bool Contains (in Point location) { return Frame.Contains (location); }
 
-    /// <summary>Finds the first Subview of <see cref="Application.Top"/> or <see cref="Application.Popover"/> that is visible at the provided location.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         Used to determine what view the mouse is over.
-    ///     </para>
-    /// </remarks>
-    /// <param name="location">Screen-relative coordinate.</param>
-    /// <returns>
-    ///     The view that was found at the <paramref name="location"/> coordinate.
-    ///     <see langword="null"/> if no view was found.
-    /// </returns>
-
-    // CONCURRENCY: This method is not thread-safe. Undefined behavior and likely program crashes are exposed by unsynchronized access to InternalSubviews.
-    internal static View? FindDeepestView (in Point location)
-    {
-        View? start = Application.Top;
-
-        if (Application.Popover?.Visible == true)
-        {
-            start = Application.Popover;
-        }
-
-        Point currentLocation = location;
-
-        while (start is { Visible: true } && start.Contains (currentLocation))
-        {
-            Adornment? found = null;
-
-            if (start.Margin.Contains (currentLocation))
-            {
-                found = start.Margin;
-            }
-            else if (start.Border.Contains (currentLocation))
-            {
-                found = start.Border;
-            }
-            else if (start.Padding.Contains (currentLocation))
-            {
-                found = start.Padding;
-            }
-
-            Point viewportOffset = start.GetViewportOffsetFromFrame ();
-
-            if (found is { })
-            {
-                start = found;
-                viewportOffset = found.Parent?.Frame.Location ?? Point.Empty;
-            }
-
-            int startOffsetX = currentLocation.X - (start.Frame.X + viewportOffset.X);
-            int startOffsetY = currentLocation.Y - (start.Frame.Y + viewportOffset.Y);
-
-            View? subview = null;
-
-            for (int i = start.InternalSubviews.Count - 1; i >= 0; i--)
-            {
-                if (start.InternalSubviews [i].Visible
-                    && start.InternalSubviews [i].Contains (new (startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y)))
-                {
-                    subview = start.InternalSubviews [i];
-                    currentLocation.X = startOffsetX + start.Viewport.X;
-                    currentLocation.Y = startOffsetY + start.Viewport.Y;
-
-                    // start is the deepest subview under the mouse; stop searching the subviews
-                    break;
-                }
-            }
-
-            if (subview is null)
-            {
-                // No subview was found that's under the mouse, so we're done
-                return start;
-            }
-
-            // We found a subview of start that's under the mouse, continue...
-            start = subview;
-        }
-
-        return null;
-    }
-
     // BUGBUG: This method interferes with Dialog/MessageBox default min/max size.
-
     /// <summary>
     ///     Gets a new location of the <see cref="View"/> that is within the Viewport of the <paramref name="viewToMove"/>'s
     ///     <see cref="View.SuperView"/> (e.g. for dragging a Window). The `out` parameters are the new X and Y coordinates.

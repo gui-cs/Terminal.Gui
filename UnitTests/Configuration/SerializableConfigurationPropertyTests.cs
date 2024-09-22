@@ -8,6 +8,10 @@ namespace Terminal.Gui.ConfigurationTests;
 
 public class SerializableConfigurationPropertyTests
 {
+
+    /// <summary>
+    ///     If this test fails, you need to add a new property with the SerializableConfigurationProperty attribute.
+    /// </summary>
     [Fact]
     public void Test_SerializableConfigurationProperty_Types_Added_To_JsonSerializerContext ()
     {

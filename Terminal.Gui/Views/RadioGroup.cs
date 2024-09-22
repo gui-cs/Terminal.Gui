@@ -284,7 +284,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                     }
                     else if (HasFocus && i == _cursor)
                     {
-                        Application.Driver?.SetAttribute (ColorScheme.Focus);
+                        Application.Driver?.SetAttribute (GetFocusColor ());
                     }
 
                     if (rune == HotKeySpecifier && j + 1 < rlRunes.Length)
@@ -312,7 +312,7 @@ public class RadioGroup : View, IDesignable, IOrientation
             }
             else
             {
-                DrawHotString (rl, HasFocus && i == _cursor, ColorScheme);
+                DrawHotString (rl, HasFocus && i == _cursor);
             }
         }
     }

@@ -39,6 +39,12 @@ public class Button : View, IDesignable
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
 
+    /// <summary>
+    /// Gets or sets the default Highlight Style.
+    /// </summary>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static HighlightStyle DefaultHighlightStyle { get; set; } = HighlightStyle.Pressed | HighlightStyle.Hover;
+
     /// <summary>Initializes a new instance of <see cref="Button"/>.</summary>
     public Button ()
     {
@@ -54,10 +60,7 @@ public class Button : View, IDesignable
         Width = Dim.Auto (DimAutoStyle.Text);
 
         CanFocus = true;
-        HighlightStyle |= HighlightStyle.Pressed;
-#if HOVER
-        HighlightStyle |= HighlightStyle.Hover;
-#endif
+        HighlightStyle = DefaultHighlightStyle;
 
         // Override default behavior of View
         AddCommand (Command.HotKey, () =>
