@@ -20,7 +20,7 @@ public enum ViewDiagnosticFlags : uint
     Padding = 0b_0000_0010,
 
     /// <summary>
-    ///     When enabled, <see cref="Adornment.OnMouseEnter(Gui.MouseEvent)"/> and <see cref="Adornment.OnMouseLeave(Gui.MouseEvent)"/>
+    ///     When enabled, <see cref="Adornment.OnMouseEnter"/> and <see cref="Adornment.OnMouseLeave"/>
     ///     will invert the foreground and background colors.
     /// </summary>
     MouseEnter = 0b_0000_00100

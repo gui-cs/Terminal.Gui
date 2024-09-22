@@ -206,7 +206,6 @@ public class Adornment : View
     #region Mouse Support
 
 
-    // TODO: It's stoopid that this override changes the defn of the input coords from base. 
     /// <summary>
     /// Indicates whether the specified Parent's SuperView-relative coordinates are within the Adornment's Thickness.
     /// </summary>

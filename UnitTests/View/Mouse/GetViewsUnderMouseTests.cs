@@ -795,7 +795,7 @@ public class GetViewsUnderMouseTests
 
         List<View?> found = View.GetViewsUnderMouse (new (mouseX, mouseY));
 
-        string [] foundIds = found.Select (v => v.Id).ToArray ();
+        string [] foundIds = found.Select (v => v!.Id).ToArray ();
 
         Assert.Equal (viewIdStrings, foundIds);
 
