@@ -98,6 +98,17 @@ public record ColorScheme : IEqualityOperators<ColorScheme, ColorScheme, bool>
         init => _normal = value;
     }
 
+    public ColorScheme GetHighlightColorScheme ()
+    {
+        return this with
+        {
+            Normal = new (Normal.Foreground.GetHighlightColor (), Normal.Background),
+            HotNormal = new (HotNormal.Foreground.GetHighlightColor (), HotNormal.Background),
+            Focus = new (Focus.Foreground.GetHighlightColor (), Focus.Background),
+            HotFocus = new (HotFocus.Foreground.GetHighlightColor (), HotFocus.Background),
+        };
+    }
+
     /// <summary>Compares two <see cref="ColorScheme"/> objects for equality.</summary>
     /// <param name="other"></param>
     /// <returns>true if the two objects are equal</returns>

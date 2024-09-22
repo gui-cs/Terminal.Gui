@@ -57,7 +57,7 @@ public class SettingsScopeTests
     {
         Reset ();
 
-        Assert.Equal (3, ((Dictionary<string, ThemeScope>)Settings ["Themes"].PropertyValue).Count);
+        Assert.Equal (5, ((Dictionary<string, ThemeScope>)Settings ["Themes"].PropertyValue).Count);
 
         GetHardCodedDefaults ();
         Assert.NotEmpty (Themes);

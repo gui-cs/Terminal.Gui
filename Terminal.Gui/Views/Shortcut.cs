@@ -54,7 +54,6 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         Id = "_shortcut";
         HighlightStyle = HighlightStyle.Pressed;
-        //Highlight += Shortcut_Highlight;
         CanFocus = true;
         Width = GetWidthDimAuto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
@@ -154,11 +153,12 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         if (args.NewValue.HasFlag (HighlightStyle.Hover))
         {
-            SetColors (true);
+            SetColors (highlight: true);
         }
         else
         {
-            SetColors (false);
+            // If we have focus, act like we're highlighted
+            SetColors (highlight: HasFocus);
         }
 
         return true;

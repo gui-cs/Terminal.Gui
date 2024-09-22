@@ -161,17 +161,28 @@ public partial class View // Mouse APIs
             return true;
         }
 
-        if ((HighlightStyle.HasFlag(HighlightStyle.Hover) ||  Diagnostics.HasFlag (ViewDiagnosticFlags.Hover)))
+        if ((HighlightStyle.HasFlag (HighlightStyle.Hover) || Diagnostics.HasFlag (ViewDiagnosticFlags.Hover)))
         {
             HighlightStyle copy = HighlightStyle;
             HighlightStyle hover = HighlightStyle.Hover;
             CancelEventArgs<HighlightStyle> args = new (ref copy, ref hover);
-            if (!RaiseHighlight (args))
-            {
-            }
-            SetNeedsDisplay ();
+            RaiseHighlight (args);
 
-            return args.Cancel;
+            if (args.Cancel)
+            {
+                return args.Cancel;
+            }
+
+            ColorScheme cs = ColorScheme;
+
+            if (cs is null)
+            {
+                cs = new ();
+            }
+
+            _savedNonHighlightColorScheme = cs;
+
+            ColorScheme = ColorScheme.GetHighlightColorScheme ();
         }
 
         return false;
@@ -255,11 +266,10 @@ public partial class View // Mouse APIs
         {
             HighlightStyle copy = HighlightStyle;
             HighlightStyle hover = HighlightStyle.None;
-            CancelEventArgs<HighlightStyle> args = new (ref copy, ref hover);
-            if (!RaiseHighlight (args))
-            {
-                SetNeedsDisplay ();
-            }
+            RaiseHighlight (new (ref copy, ref hover));
+
+            ColorScheme = _savedNonHighlightColorScheme;
+            _savedNonHighlightColorScheme = default;
         }
     }
 
@@ -424,7 +434,7 @@ public partial class View // Mouse APIs
     }
 
     /// <summary>
-    ///     Called when the view is to be highlighted.
+    ///     Called when the view is to be highlighted. See <see cref="HighlightStyle"/>.
     /// </summary>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
     protected virtual bool OnHighlight (CancelEventArgs<HighlightStyle> args)
@@ -433,10 +443,12 @@ public partial class View // Mouse APIs
     }
 
     /// <summary>
-    ///     Fired when the view is highlighted. Set <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/>
-    ///     to implement a custom highlight scheme or prevent the view from being highlighted.
+    ///     Fired when the view is highlighted. See <see cref="HighlightStyle"/>.
     /// </summary>
     public event EventHandler<CancelEventArgs<HighlightStyle>>? Highlight;
+
+    private ColorScheme _savedNonHighlightColorScheme;
+
 
 
     /// <summary>

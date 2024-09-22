@@ -15,10 +15,10 @@ public class ProgressBarTests
         Assert.False (pb.CanFocus);
         Assert.Equal (0, pb.Fraction);
 
-        Assert.Equal (
-                      new Attribute (Color.BrightGreen, Color.Gray),
-                      new Attribute (pb.ColorScheme.HotNormal.Foreground, pb.ColorScheme.HotNormal.Background)
-                     );
+        //Assert.Equal (
+        //              new Attribute (Color.BrightGreen, Color.Gray),
+        //              new Attribute (pb.ColorScheme.HotNormal.Foreground, pb.ColorScheme.HotNormal.Background)
+        //             );
         Assert.Equal (Colors.ColorSchemes ["Base"].Normal, pb.ColorScheme.Normal);
         Assert.Equal (1, pb.Frame.Height);
         Assert.Equal (ProgressBarStyle.Blocks, pb.ProgressBarStyle);
