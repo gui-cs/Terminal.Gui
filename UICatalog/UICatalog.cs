@@ -862,7 +862,7 @@ public class UICatalogApp
                     "Off" => OFF,
                     "Ruler" => RULER,
                     "Padding" => PADDING,
-                    "MouseEnter" => MOUSEOVER,
+                    "MouseOver" => MOUSEOVER,
                     _ => ""
                 };
             }
