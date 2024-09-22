@@ -411,6 +411,11 @@ public partial class View // Drawing APIs
             attr = new (inputAttribute.Foreground.GetHighlightColor (), inputAttribute.Background);
         }
 
+        if (Diagnostics.HasFlag (ViewDiagnosticFlags.MouseOver) && _mouseOver)
+        {
+            attr = new (attr.Foreground.GetDarkerColor (), attr.Background.GetDarkerColor ());
+        }
+
         return attr;
     }
 
