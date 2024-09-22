@@ -138,6 +138,8 @@ public class MessageBoxTests
         int iterations = -1;
 
         ((FakeDriver)Application.Driver!).SetBufferSize (15, 15); // 15 x 15 gives us enough room for a button with one char (9x1)
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         Rectangle mbFrame = Rectangle.Empty;
 
@@ -177,6 +179,8 @@ public class MessageBoxTests
         // Override CM
         MessageBox.DefaultButtonAlignment = Alignment.End;
         MessageBox.DefaultBorderStyle = LineStyle.Double;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         Application.Iteration += (s, a) =>
                                  {
@@ -246,6 +250,8 @@ public class MessageBoxTests
         // Override CM
         MessageBox.DefaultButtonAlignment = Alignment.End;
         MessageBox.DefaultBorderStyle = LineStyle.Double;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         Application.Iteration += (s, a) =>
                                  {
@@ -426,6 +432,8 @@ public class MessageBoxTests
         // Override CM
         MessageBox.DefaultButtonAlignment = Alignment.End;
         MessageBox.DefaultBorderStyle = LineStyle.Double;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         Application.Iteration += (s, a) =>
                                  {

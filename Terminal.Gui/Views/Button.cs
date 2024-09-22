@@ -60,7 +60,6 @@ public class Button : View, IDesignable
         Width = Dim.Auto (DimAutoStyle.Text);
 
         CanFocus = true;
-        HighlightStyle = DefaultHighlightStyle;
 
         // Override default behavior of View
         AddCommand (Command.HotKey, () =>
@@ -76,6 +75,7 @@ public class Button : View, IDesignable
         MouseClick += Button_MouseClick;
 
         ShadowStyle = DefaultShadow;
+        HighlightStyle = DefaultHighlightStyle;
     }
 
     private bool _wantContinuousButtonPressed;
@@ -169,7 +169,7 @@ public class Button : View, IDesignable
     /// <inheritdoc/>
     protected override void UpdateTextFormatterText ()
     {
-        base.UpdateTextFormatterText();
+        base.UpdateTextFormatterText ();
         if (NoDecorations)
         {
             TextFormatter.Text = Text;

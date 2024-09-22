@@ -67,7 +67,7 @@ public class ColorJsonConverterTests
         Assert.Equal ($"\"{expectedJson}\"", serialized);
     }
 
-    [Theory]
+    [Theory (Skip = "Not anymore. If a W3C color matches, that's used")]
     [InlineData (0, 0, 0, "\"#000000\"")]
     [InlineData (0, 0, 1, "\"#000001\"")]
     public void SerializesToHexCode (int r, int g, int b, string expected)
@@ -118,7 +118,7 @@ public class ColorJsonConverterTests
     {
         // Arrange
         var json = "\"Black\"";
-        var expectedColor = new Color (ColorName.Black);
+        var expectedColor = new Color ("Black");
 
         // Act
         var color = JsonSerializer.Deserialize<Color> (

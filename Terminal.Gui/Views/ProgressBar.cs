@@ -265,10 +265,10 @@ public class ProgressBar : View, IDesignable
 
     private void ProgressBar_Initialized (object sender, EventArgs e)
     {
-        ColorScheme = new ColorScheme (ColorScheme ?? SuperView?.ColorScheme ?? Colors.ColorSchemes ["Base"])
-        {
-            HotNormal = new Attribute (Color.BrightGreen, Color.Gray)
-        };
+        //ColorScheme = new ColorScheme (ColorScheme ?? SuperView?.ColorScheme ?? Colors.ColorSchemes ["Base"])
+        //{
+        //    HotNormal = new Attribute (Color.BrightGreen, Color.Gray)
+        //};
     }
 
     private void SetInitialProperties ()

@@ -1380,6 +1380,8 @@ public class Slider<T> : View, IOrientation
             SetNeedsDisplay ();
 
             mouseEvent.Handled = true;
+
+            // BUGBUG: OnMouseClick is/should be internal. 
             return OnMouseClick (new (mouseEvent));
         }
 

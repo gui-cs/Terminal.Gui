@@ -421,7 +421,7 @@ public partial class View // Drawing APIs
         }
 
         Attribute disabled = new (cs.Disabled.Foreground, cs.Disabled.Background);
-        if (Diagnostics.HasFlag (ViewDiagnosticFlags.Hover) && _Hover)
+        if (Diagnostics.HasFlag (ViewDiagnosticFlags.Hover) && _hovering)
         {
             disabled = new (disabled.Foreground.GetDarkerColor (), disabled.Background.GetDarkerColor ());
         }
@@ -431,12 +431,7 @@ public partial class View // Drawing APIs
     private Attribute GetColor (Attribute inputAttribute)
     {
         Attribute attr = inputAttribute;
-        if (HighlightStyle.HasFlag (HighlightStyle.Hover) && _Hover)
-        {
-            attr = new (inputAttribute.Foreground.GetHighlightColor (), inputAttribute.Background);
-        }
-
-        if (Diagnostics.HasFlag (ViewDiagnosticFlags.Hover) && _Hover)
+        if (Diagnostics.HasFlag (ViewDiagnosticFlags.Hover) && _hovering)
         {
             attr = new (attr.Foreground.GetDarkerColor (), attr.Background.GetDarkerColor ());
         }

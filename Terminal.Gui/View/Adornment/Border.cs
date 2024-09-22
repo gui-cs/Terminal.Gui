@@ -1,5 +1,8 @@
 #nullable enable
 using System.Diagnostics;
+using Terminal.Gui;
+using Attribute = System.Attribute;
+using Color = System.Drawing.Color;
 
 namespace Terminal.Gui;
 
@@ -283,7 +286,6 @@ public class Border : Adornment
             {
                 return false;
             }
-
             // Only start grabbing if the user clicks in the Thickness area
             // Adornment.Contains takes Parent SuperView=relative coords.
             if (Contains (new (mouseEvent.Position.X + Parent.Frame.X + Frame.X, mouseEvent.Position.Y + Parent.Frame.Y + Frame.Y)))
@@ -298,7 +300,7 @@ public class Border : Adornment
                 _dragPosition = mouseEvent.Position;
                 Application.GrabMouse (this);
 
-                SetHighlight (HighlightStyle);
+                SetPressedHighlight (HighlightStyle);
 
                 // Arrange Mode -
                 // TODO: This code can be refactored to be more readable and maintainable.
@@ -576,9 +578,7 @@ public class Border : Adornment
         {
             _dragPosition = null;
             Application.UngrabMouse ();
-            SetHighlight (HighlightStyle.None);
-
-            EndArrangeMode ();
+            SetPressedHighlight (HighlightStyle.None);
 
             return true;
         }

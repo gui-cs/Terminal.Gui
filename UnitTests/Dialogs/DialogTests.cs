@@ -29,6 +29,8 @@ public class DialogTests
         // Override CM
         Dialog.DefaultButtonAlignment = Alignment.Center;
         Dialog.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         // Default (center)
         var dlg = new Dialog
@@ -138,6 +140,8 @@ public class DialogTests
         RunState runstate = null;
 
         var d = (FakeDriver)Driver;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var title = "1234";
 
@@ -229,6 +233,8 @@ public class DialogTests
         RunState runstate = null;
 
         var d = (FakeDriver)Driver;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var title = "1234";
 
@@ -322,6 +328,8 @@ public class DialogTests
         RunState runstate = null;
 
         var d = (FakeDriver)Driver;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var title = "1234";
 
@@ -414,6 +422,8 @@ public class DialogTests
         RunState runstate = null;
 
         var d = (FakeDriver)Driver;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var title = "1234";
 
@@ -507,6 +517,8 @@ public class DialogTests
     {
         var d = (FakeDriver)Driver;
         RunState runstate = null;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var title = "1234";
 
@@ -646,6 +658,8 @@ public class DialogTests
         RunState runstate = null;
 
         var d = (FakeDriver)Driver;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var title = "1234";
 
@@ -730,6 +744,8 @@ public class DialogTests
         RunState runstate = null;
 
         var d = (FakeDriver)Driver;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var title = "1234";
 
@@ -809,6 +825,8 @@ public class DialogTests
         var firstIteration = false;
 
         var d = (FakeDriver)Driver;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var title = "1234";
 
@@ -883,6 +901,8 @@ public class DialogTests
         Window.DefaultBorderStyle = LineStyle.Single;
         Dialog.DefaultButtonAlignment = Alignment.Center;
         Dialog.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var win = new Window ();
 
@@ -988,6 +1008,10 @@ public class DialogTests
         // Override CM
         Dialog.DefaultButtonAlignment = Alignment.Center;
         Dialog.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         Iteration += (s, a) =>
                      {
@@ -1028,6 +1052,8 @@ public class DialogTests
         // Override CM
         Dialog.DefaultButtonAlignment = Alignment.Center;
         Dialog.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var btn1 = new Button { Text = "press me 1" };
         Button btn2 = null;
@@ -1103,7 +1129,7 @@ public class DialogTests
                                                                            _output
                                                                           );
 
-                             Assert.True (Top!.NewKeyDownEvent (Key.Enter));
+                             Assert.True (Top.NewKeyDownEvent (Key.Enter));
                          }
                          else if (iterations == 3)
                          {
@@ -1178,6 +1204,8 @@ public class DialogTests
         Window.DefaultBorderStyle = LineStyle.Single;
         Dialog.DefaultButtonAlignment = Alignment.Center;
         Dialog.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var expected = 5;
         var d = new Dialog { X = expected, Y = expected, Height = 5, Width = 5 };
@@ -1199,85 +1227,106 @@ public class DialogTests
         d.Dispose ();
     }
 
-//    [Fact]
-//    [AutoInitShutdown]
-//    public void Location_When_Not_Application_Top_Not_Default ()
-//    {
-//        var top = new Toplevel ();
-//        top.BorderStyle = LineStyle.Double;
+    [Fact]
+    [AutoInitShutdown]
+    public void Location_When_Not_Application_Top_Not_Default ()
+    {
+        var top = new Toplevel ();
+        top.BorderStyle = LineStyle.Double;
 
-//        int iterations = -1;
+        int iterations = -1;
 
-//        // Override CM
-//        Window.DefaultBorderStyle = LineStyle.Single;
-//        Dialog.DefaultButtonAlignment = Alignment.Center;
-//        Dialog.DefaultBorderStyle = LineStyle.Single;
-//        Dialog.DefaultShadow = ShadowStyle.None;
+        // Override CM
+        Window.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultButtonAlignment = Alignment.Center;
+        Dialog.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
-//        Iteration += (s, a) =>
-//                     {
-//                         iterations++;
+        Iteration += (s, a) =>
+                     {
+                         iterations++;
 
-//                         if (iterations == 0)
-//                         {
-//                             var d = new Dialog { X = 5, Y = 5, Height = 3, Width = 5 };
-//                             RunState rs = Begin (d);
+                         if (iterations == 0)
+                         {
+                             var d = new Dialog { X = 5, Y = 5, Height = 3, Width = 5 };
+                             RunState rs = Begin (d);
 
-//                             Assert.Equal (new (5, 5), d.Frame.Location);
+                             Assert.Equal (new (5, 5), d.Frame.Location);
 
-//                             TestHelpers.AssertDriverContentsWithFrameAre (
-//                                                                           @"
-//╔══════════════════╗
-//║                  ║
-//║                  ║
-//║                  ║
-//║                  ║
-//║    ┌───┐         ║
-//║    │   │         ║
-//║    └───┘         ║
-//║                  ║
-//╚══════════════════╝",
-//                                                                           _output
-//                                                                          );
-//                             End (rs);
-//                             d.Dispose ();
+                             TestHelpers.AssertDriverContentsWithFrameAre (
+                                                                           @"
+╔══════════════════╗
+║                  ║
+║                  ║
+║                  ║
+║                  ║
+║    ┌───┐         ║
+║    │   │         ║
+║    └───┘         ║
+║                  ║
+╚══════════════════╝",
+                                                                           _output
+                                                                          );
+                             End (rs);
+                             d.Dispose ();
 
-//                             d = new ()
-//                             {
-//                                 X = 5, Y = 5,
-//                                 Width = Dim.Percent (85),
-//                                 Height = Dim.Percent (85)
+                             d = new ()
+                             {
+                                 X = 5, Y = 5,
+                                 Width = Dim.Percent (85),
+                                 Height = Dim.Percent (85)
 
-//                             };
-//                             rs = Begin (d);
+                             };
+                             rs = Begin (d);
 
-//                             TestHelpers.AssertDriverContentsWithFrameAre (
-//                                                                           @"
-//╔══════════════════╗
-//║                  ║
-//║                  ║
-//║                  ║
-//║                  ║
-//║    ┌──────────────
-//║    │              
-//║    │              
-//║    │              
-//╚════│    ",
-//                                                                           _output
-//                                                                          );
-//                             End (rs);
-//                             d.Dispose ();
-//                         }
-//                         else if (iterations > 0)
-//                         {
-//                             RequestStop ();
-//                         }
-//                     };
+                             // This is because of PostionTopLevels and EnsureVisibleBounds
+                             Assert.Equal (new (3, 2), d.Frame.Location);
 
-//        ((FakeDriver)Driver).SetBufferSize (20, 10);
-//        Run (top);
-//        top.Dispose ();
-//    }
+                             // #3127: Before					
+                             //					Assert.Equal (new (17, 8), d.Frame.Size);
+                             //					TestHelpers.AssertDriverContentsWithFrameAre (@"
+                             //╔══════════════════╗
+                             //║                  ║
+                             //║  ┌───────────────┐
+                             //║  │               │
+                             //║  │               │
+                             //║  │               │
+                             //║  │               │
+                             //║  │               │
+                             //║  │               │
+                             //╚══└───────────────┘", _output);
+
+                             // #3127: After: Because Toplevel is now Width/Height = Dim.Filll
+                             Assert.Equal (new (15, 6), d.Frame.Size);
+
+                             TestHelpers.AssertDriverContentsWithFrameAre (
+                                                                           @"
+╔══════════════════╗
+║                  ║
+║  ┌─────────────┐ ║
+║  │             │ ║
+║  │             │ ║
+║  │             │ ║
+║  │             │ ║
+║  └─────────────┘ ║
+║                  ║
+╚══════════════════╝",
+                                                                           _output
+                                                                          );
+                             End (rs);
+                             d.Dispose ();
+                         }
+                         else if (iterations > 0)
+                         {
+                             RequestStop ();
+                         }
+                     };
+
+        ((FakeDriver)Driver).SetBufferSize (20, 10);
+        Run (top);
+        top.Dispose ();
+    }
 
     [Fact]
     [AutoInitShutdown]
@@ -1286,6 +1335,8 @@ public class DialogTests
         RunState runstate = null;
 
         var d = (FakeDriver)Driver;
+
+        Button.DefaultShadow = ShadowStyle.None;
 
         var title = "";
         var btnText = "ok";
@@ -1329,6 +1380,8 @@ public class DialogTests
     [AutoInitShutdown]
     public void Size_Not_Default ()
     {
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
         var d = new Dialog { Width = 50, Height = 50 };
 
         Begin (d);
@@ -1370,6 +1423,8 @@ public class DialogTests
         // Override CM
         Dialog.DefaultButtonAlignment = Alignment.Center;
         Dialog.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var dlg = new Dialog
         {

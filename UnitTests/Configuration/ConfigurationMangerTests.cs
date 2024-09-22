@@ -563,7 +563,7 @@ public class ConfigurationManagerTests
 							{
 								""UserDefined"": {
 									""hotNormal"": {
-										""foreground"": ""brown"",
+										""foreground"": ""brownish"",
 										""background"": ""1234""
 									}
 								}
@@ -575,7 +575,7 @@ public class ConfigurationManagerTests
 			}";
 
         var jsonException = Assert.Throws<JsonException> (() => Settings!.Update (json, "test"));
-        Assert.Equal ("Unexpected color name: brown.", jsonException.Message);
+        Assert.Equal ("Unexpected color name: brownish.", jsonException.Message);
 
         // AbNormal is not a ColorScheme attribute
         json = @"
