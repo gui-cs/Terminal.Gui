@@ -77,7 +77,7 @@ public class Button : View, IDesignable
         ShadowStyle = DefaultShadow;
         HighlightStyle = DefaultHighlightStyle;
     }
-    
+
     private bool _wantContinuousButtonPressed;
 
     /// <inheritdoc />
@@ -169,7 +169,7 @@ public class Button : View, IDesignable
     /// <inheritdoc/>
     protected override void UpdateTextFormatterText ()
     {
-        base.UpdateTextFormatterText();
+        base.UpdateTextFormatterText ();
         if (NoDecorations)
         {
             TextFormatter.Text = Text;

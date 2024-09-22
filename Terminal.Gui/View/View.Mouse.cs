@@ -126,7 +126,8 @@ public partial class View // Mouse APIs
 
     #region MouseEnterLeave
 
-    private bool _Hover;
+    private bool _hovering;
+    private ColorScheme? _savedNonHoverColorScheme;
 
     /// <summary>
     ///     INTERNAL Called by <see cref="Application.OnMouseEvent"/> when the mouse moves over the View's <see cref="Frame"/>.
@@ -154,7 +155,7 @@ public partial class View // Mouse APIs
 
         MouseEnter?.Invoke (this, eventArgs);
 
-        _Hover = !eventArgs.Cancel;
+        _hovering = !eventArgs.Cancel;
 
         if (eventArgs.Cancel)
         {
@@ -166,9 +167,8 @@ public partial class View // Mouse APIs
             HighlightStyle copy = HighlightStyle;
             HighlightStyle hover = HighlightStyle.Hover;
             CancelEventArgs<HighlightStyle> args = new (ref copy, ref hover);
-            RaiseHighlight (args);
-
-            if (args.Cancel)
+            
+            if (RaiseHighlight (args) || args.Cancel)
             {
                 return args.Cancel;
             }
@@ -180,7 +180,7 @@ public partial class View // Mouse APIs
                 cs = new ();
             }
 
-            _savedNonHighlightColorScheme = cs;
+            _savedNonHoverColorScheme = cs;
 
             ColorScheme = ColorScheme.GetHighlightColorScheme ();
         }
@@ -260,7 +260,7 @@ public partial class View // Mouse APIs
 
         MouseLeave?.Invoke (this, EventArgs.Empty);
 
-        _Hover = false;
+        _hovering = false;
 
         if ((HighlightStyle.HasFlag (HighlightStyle.Hover) || Diagnostics.HasFlag (ViewDiagnosticFlags.Hover)))
         {
@@ -268,8 +268,11 @@ public partial class View // Mouse APIs
             HighlightStyle hover = HighlightStyle.None;
             RaiseHighlight (new (ref copy, ref hover));
 
-            ColorScheme = _savedNonHighlightColorScheme;
-            _savedNonHighlightColorScheme = default;
+            if (_savedNonHoverColorScheme is { })
+            {
+                ColorScheme = _savedNonHoverColorScheme;
+                _savedNonHoverColorScheme = null;
+            }
         }
     }
 
@@ -446,9 +449,6 @@ public partial class View // Mouse APIs
     ///     Fired when the view is highlighted. See <see cref="HighlightStyle"/>.
     /// </summary>
     public event EventHandler<CancelEventArgs<HighlightStyle>>? Highlight;
-
-    private ColorScheme _savedNonHighlightColorScheme;
-
 
 
     /// <summary>
