@@ -3920,6 +3920,8 @@ public class TextFormatterTests
     public void Draw_Vertical_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
     {
         Application.Init (new FakeDriver ());
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         Toplevel top = new ();
 

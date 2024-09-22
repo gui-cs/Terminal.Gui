@@ -177,6 +177,9 @@ public class PosAnchorEndTests (ITestOutputHelper output)
     {
         ((FakeDriver)Application.Driver!).SetBufferSize (20, 5);
 
+        // Override CM
+        Button.DefaultShadow = ShadowStyle.None;
+        
         var b = $"{CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket}";
 
         var frame = new FrameView { Width = 18, Height = 3 };

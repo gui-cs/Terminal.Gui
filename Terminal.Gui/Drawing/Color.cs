@@ -109,7 +109,20 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
 
     /// <summary>Initializes a new instance of the <see cref="Color"/> color from a legacy 16-color named value.</summary>
     /// <param name="colorName">The 16-color value.</param>
-    public Color (in ColorName colorName) { this = ColorExtensions.ColorNameToColorMap [colorName]; }
+    public Color (in ColorName colorName)
+    {
+        string? name = Enum.GetName<ColorName> (colorName);
+
+        if (name is null)
+        {
+            return;
+        }
+
+        if (ColorStrings.TryParseW3CColorName (name, out Color color))
+        {
+            this = color;
+        }
+    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Color"/> color from string. See
@@ -246,7 +259,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     public Color GetHighlightColor ()
     {
         // TODO: This is a temporary implementation; just enough to show how it could work. 
-        var hsl = ColorHelper.ColorConverter.RgbToHsl(new RGB (R, G, B));
+        var hsl = ColorHelper.ColorConverter.RgbToHsl (new RGB (R, G, B));
 
         var amount = .7;
         if (hsl.L <= 5)

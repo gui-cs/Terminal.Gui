@@ -54,5 +54,8 @@ internal class ColorJsonConverter : JsonConverter<Color>
         throw new JsonException ($"Unexpected token when parsing Color: {reader.TokenType}");
     }
 
-    public override void Write (Utf8JsonWriter writer, Color value, JsonSerializerOptions options) { writer.WriteStringValue (value.ToString ()); }
+    public override void Write (Utf8JsonWriter writer, Color value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue (value.ToString ());
+    }
 }

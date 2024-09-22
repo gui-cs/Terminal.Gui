@@ -424,7 +424,7 @@ public class MenuBarTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.None)]
     public void Draw_A_Menu_Over_A_Dialog ()
     {
         // Override CM
@@ -657,13 +657,9 @@ public class MenuBarTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.None)]
     public void Draw_A_Menu_Over_A_Top_Dialog ()
     {
-        // Override CM
-        Window.DefaultBorderStyle = LineStyle.Single;
-        Dialog.DefaultButtonAlignment = Alignment.Center;
-        Dialog.DefaultBorderStyle = LineStyle.Single;
 
         ((FakeDriver)Application.Driver).SetBufferSize (40, 15);
 

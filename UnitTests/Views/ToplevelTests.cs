@@ -1355,7 +1355,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
 
     // Don't use Dialog as a Top, use a Window instead - dialog has complex layout behavior that is not needed here.
     [Fact]
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.None)]
     public void Draw_A_Top_Subview_On_A_Window ()
     {
         Toplevel top = new ();

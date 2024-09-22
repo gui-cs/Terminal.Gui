@@ -29,6 +29,8 @@ public class DialogTests
         // Override CM
         Dialog.DefaultButtonAlignment = Alignment.Center;
         Dialog.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         // Default (center)
         var dlg = new Dialog
@@ -138,6 +140,8 @@ public class DialogTests
         RunState runstate = null;
 
         var d = (FakeDriver)Driver;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var title = "1234";
 
@@ -229,6 +233,8 @@ public class DialogTests
         RunState runstate = null;
 
         var d = (FakeDriver)Driver;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var title = "1234";
 
@@ -322,6 +328,8 @@ public class DialogTests
         RunState runstate = null;
 
         var d = (FakeDriver)Driver;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var title = "1234";
 
@@ -414,6 +422,8 @@ public class DialogTests
         RunState runstate = null;
 
         var d = (FakeDriver)Driver;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var title = "1234";
 
@@ -507,6 +517,8 @@ public class DialogTests
     {
         var d = (FakeDriver)Driver;
         RunState runstate = null;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var title = "1234";
 
@@ -646,6 +658,8 @@ public class DialogTests
         RunState runstate = null;
 
         var d = (FakeDriver)Driver;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var title = "1234";
 
@@ -730,6 +744,8 @@ public class DialogTests
         RunState runstate = null;
 
         var d = (FakeDriver)Driver;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var title = "1234";
 
@@ -809,6 +825,8 @@ public class DialogTests
         var firstIteration = false;
 
         var d = (FakeDriver)Driver;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var title = "1234";
 
@@ -883,6 +901,8 @@ public class DialogTests
         Window.DefaultBorderStyle = LineStyle.Single;
         Dialog.DefaultButtonAlignment = Alignment.Center;
         Dialog.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var win = new Window ();
 
@@ -988,6 +1008,10 @@ public class DialogTests
         // Override CM
         Dialog.DefaultButtonAlignment = Alignment.Center;
         Dialog.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         Iteration += (s, a) =>
                      {
@@ -1028,6 +1052,8 @@ public class DialogTests
         // Override CM
         Dialog.DefaultButtonAlignment = Alignment.Center;
         Dialog.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var btn1 = new Button { Text = "press me 1" };
         Button btn2 = null;
@@ -1178,6 +1204,8 @@ public class DialogTests
         Window.DefaultBorderStyle = LineStyle.Single;
         Dialog.DefaultButtonAlignment = Alignment.Center;
         Dialog.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var expected = 5;
         var d = new Dialog { X = expected, Y = expected, Height = 5, Width = 5 };
@@ -1212,6 +1240,8 @@ public class DialogTests
         Window.DefaultBorderStyle = LineStyle.Single;
         Dialog.DefaultButtonAlignment = Alignment.Center;
         Dialog.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         Iteration += (s, a) =>
                      {
@@ -1306,6 +1336,8 @@ public class DialogTests
 
         var d = (FakeDriver)Driver;
 
+        Button.DefaultShadow = ShadowStyle.None;
+
         var title = "";
         var btnText = "ok";
 
@@ -1348,6 +1380,8 @@ public class DialogTests
     [AutoInitShutdown]
     public void Size_Not_Default ()
     {
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
         var d = new Dialog { Width = 50, Height = 50 };
 
         Begin (d);
@@ -1389,6 +1423,8 @@ public class DialogTests
         // Override CM
         Dialog.DefaultButtonAlignment = Alignment.Center;
         Dialog.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var dlg = new Dialog
         {
