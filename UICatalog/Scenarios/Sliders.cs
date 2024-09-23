@@ -468,7 +468,7 @@ public class Sliders : Scenario
 
         List<SliderOption<(Color, Color)>> colorOptions = new ();
 
-        foreach (ColorName colorIndex in Enum.GetValues<ColorName> ())
+        foreach (ColorName16 colorIndex in Enum.GetValues<ColorName16> ())
         {
             var colorName = colorIndex.ToString ();
 

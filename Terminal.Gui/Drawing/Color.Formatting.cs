@@ -205,7 +205,7 @@ public readonly partial record struct Color
     /// <summary>Converts the provided <see langword="string"/> to a new <see cref="Color"/> value.</summary>
     /// <param name="text">
     ///     The text to analyze. Formats supported are "#RGB", "#RRGGBB", "#ARGB", "#AARRGGBB", "rgb(r,g,b)",
-    ///     "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the <see cref="Gui.ColorName"/> string values.
+    ///     "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the <see cref="ColorName16"/> string values.
     /// </param>
     /// <param name="formatProvider">
     ///     If specified and not <see langword="null"/>, will be passed to
@@ -246,7 +246,7 @@ public readonly partial record struct Color
     /// </summary>
     /// <param name="text">
     ///     The text to analyze. Formats supported are "#RGB", "#RRGGBB", "#RGBA", "#AARRGGBB", "rgb(r,g,b)",
-    ///     "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the <see cref="Gui.ColorName"/> string values.
+    ///     "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the <see cref="ColorName16"/> string values.
     /// </param>
     /// <param name="formatProvider">
     ///     Optional <see cref="IFormatProvider"/> to provide parsing services for the input text.
@@ -350,10 +350,6 @@ public readonly partial record struct Color
             // Attempt to parse as a named color from the ColorStrings resources
             { } when char.IsLetter (text [0]) && ColorStrings.TryParseW3CColorName (text.ToString (), out Color color) =>
                 new Color (color),
-
-            // Attempt to parse as a named color from the ColorName enum
-            { } when char.IsLetter (text [0]) && Enum.TryParse (text, true, out ColorName colorName) =>
-                new Color (colorName),
 
             // Any other input
             _ => throw new ColorParseException (in text, "Text did not match any expected format.", in text, [])
@@ -475,7 +471,7 @@ public readonly partial record struct Color
     /// <summary>Converts the provided <see langword="string"/> to a new <see cref="Color"/> value.</summary>
     /// <param name="text">
     ///     The text to analyze. Formats supported are "#RGB", "#RRGGBB", "#ARGB", "#AARRGGBB", "rgb(r,g,b)",
-    ///     "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the <see cref="GetClosestNamedColor (Color)"/> string
+    ///     "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the <see cref="GetClosestNamedColor16(Terminal.Gui.Color)"/> string
     ///     values.
     /// </param>
     /// <param name="formatProvider">
@@ -505,7 +501,7 @@ public readonly partial record struct Color
     /// </summary>
     /// <param name="text">
     ///     The text to analyze. Formats supported are "#RGB", "#RRGGBB", "#ARGB", "#AARRGGBB", "rgb(r,g,b)",
-    ///     "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the <see cref="GetClosestNamedColor (Color)"/> string
+    ///     "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the <see cref="GetClosestNamedColor16(Terminal.Gui.Color)"/> string
     ///     values.
     /// </param>
     /// <param name="formatProvider">
@@ -602,7 +598,7 @@ public readonly partial record struct Color
     /// <summary>Converts the provided string to a new <see cref="Color"/> instance.</summary>
     /// <param name="text">
     ///     The text to analyze. Formats supported are "#RGB", "#RRGGBB", "#ARGB", "#AARRGGBB", "rgb(r,g,b)",
-    ///     "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the <see cref="Gui.ColorName"/> string values.
+    ///     "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the <see cref="ColorName16"/> string values.
     /// </param>
     /// <param name="color">The parsed value.</param>
     /// <returns>A boolean value indicating whether parsing was successful.</returns>

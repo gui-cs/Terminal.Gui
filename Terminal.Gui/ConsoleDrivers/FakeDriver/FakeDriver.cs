@@ -93,7 +93,7 @@ public class FakeDriver : ConsoleDriver
         FakeConsole.Clear ();
         ResizeScreen ();
         CurrentAttribute = new Attribute (Color.White, Color.Black);
-        ClearContents ();
+        //ClearContents ();
 
         _mainLoopDriver = new FakeMainLoop (this);
         _mainLoopDriver.MockKeyPressed = MockKeyPressedHandler;
@@ -165,8 +165,8 @@ public class FakeDriver : ConsoleDriver
                     if (attr != redrawAttr)
                     {
                         redrawAttr = attr;
-                        FakeConsole.ForegroundColor = (ConsoleColor)attr.Foreground.GetClosestNamedColor ();
-                        FakeConsole.BackgroundColor = (ConsoleColor)attr.Background.GetClosestNamedColor ();
+                        FakeConsole.ForegroundColor = (ConsoleColor)attr.Foreground.GetClosestNamedColor16 ();
+                        FakeConsole.BackgroundColor = (ConsoleColor)attr.Background.GetClosestNamedColor16 ();
                     }
 
                     outputWidth++;

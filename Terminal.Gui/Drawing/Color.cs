@@ -17,7 +17,7 @@ namespace Terminal.Gui;
 /// </summary>
 /// <seealso cref="Attribute"/>
 /// <seealso cref="ColorExtensions"/>
-/// <seealso cref="ColorName"/>
+/// <seealso cref="ColorName16"/>
 [JsonConverter (typeof (ColorJsonConverter))]
 [StructLayout (LayoutKind.Explicit)]
 public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Color>, ISpanFormattable,
@@ -109,20 +109,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
 
     /// <summary>Initializes a new instance of the <see cref="Color"/> color from a legacy 16-color named value.</summary>
     /// <param name="colorName">The 16-color value.</param>
-    public Color (in ColorName colorName)
-    {
-        string? name = Enum.GetName<ColorName> (colorName);
-
-        if (name is null)
-        {
-            return;
-        }
-
-        if (ColorStrings.TryParseW3CColorName (name, out Color color))
-        {
-            this = color;
-        }
-    }
+    public Color (in ColorName16 colorName) { this = ColorExtensions.ColorName16ToColorMap [colorName]; }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Color"/> color from string. See
@@ -144,26 +131,28 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     /// <summary>Initializes a new instance of the <see cref="Color"/> with all channels set to 0.</summary>
     public Color () { Argb = 0u; }
 
+    // TODO: ColorName and AnsiColorCode are only needed when a driver is in Force16Color mode and we
+    // TODO: should be able to remove these from any non-Driver-specific usages.
     /// <summary>Gets or sets the 3-byte/6-character hexadecimal value for each of the legacy 16-color values.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
-    public static Dictionary<ColorName, string> Colors
+    public static Dictionary<ColorName16, string> Colors16
     {
         get =>
 
             // Transform _colorToNameMap into a Dictionary<ColorNames,string>
-            ColorExtensions.ColorToNameMap.ToDictionary (static kvp => kvp.Value, static kvp => kvp.Key.ToString ("g"));
+            ColorExtensions.ColorToName16Map.ToDictionary (static kvp => kvp.Value, static kvp => kvp.Key.ToString ("g"));
         set
         {
             // Transform Dictionary<ColorNames,string> into _colorToNameMap
-            ColorExtensions.ColorToNameMap = value.ToFrozenDictionary (GetColorToNameMapKey, GetColorToNameMapValue);
+            ColorExtensions.ColorToName16Map = value.ToFrozenDictionary (GetColorToNameMapKey, GetColorToNameMapValue);
 
             return;
 
-            static Color GetColorToNameMapKey (KeyValuePair<ColorName, string> kvp) { return new Color (kvp.Value); }
+            static Color GetColorToNameMapKey (KeyValuePair<ColorName16, string> kvp) { return new Color (kvp.Value); }
 
-            static ColorName GetColorToNameMapValue (KeyValuePair<ColorName, string> kvp)
+            static ColorName16 GetColorToNameMapValue (KeyValuePair<ColorName16, string> kvp)
             {
-                return Enum.TryParse (kvp.Key.ToString (), true, out ColorName colorName)
+                return Enum.TryParse (kvp.Key.ToString (), true, out ColorName16 colorName)
                            ? colorName
                            : throw new ArgumentException ($"Invalid color name: {kvp.Key}");
             }
@@ -171,31 +160,31 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     }
 
     /// <summary>
-    ///     Gets the <see cref="Color"/> using a legacy 16-color <see cref="ColorName"/> value. <see langword="get"/> will
+    ///     Gets the <see cref="Color"/> using a legacy 16-color <see cref="ColorName16"/> value. <see langword="get"/> will
     ///     return the closest 16 color match to the true color when no exact value is found.
     /// </summary>
     /// <remarks>
-    ///     Get returns the <see cref="GetClosestNamedColor (Color)"/> of the closest 24-bit color value. Set sets the RGB
+    ///     Get returns the <see cref="GetClosestNamedColor16(Color)"/> of the closest 24-bit color value. Set sets the RGB
     ///     value using a hard-coded map.
     /// </remarks>
-    public AnsiColorCode GetAnsiColorCode () { return ColorExtensions.ColorNameToAnsiColorMap [GetClosestNamedColor ()]; }
+    public AnsiColorCode GetAnsiColorCode () { return ColorExtensions.ColorName16ToAnsiColorMap [GetClosestNamedColor16 ()]; }
 
     /// <summary>
-    ///     Gets the <see cref="Color"/> using a legacy 16-color <see cref="Gui.ColorName"/> value. <see langword="get"/>
+    ///     Gets the <see cref="Color"/> using a legacy 16-color <see cref="ColorName16"/> value. <see langword="get"/>
     ///     will return the closest 16 color match to the true color when no exact value is found.
     /// </summary>
     /// <remarks>
-    ///     Get returns the <see cref="GetClosestNamedColor (Color)"/> of the closest 24-bit color value. Set sets the RGB
+    ///     Get returns the <see cref="GetClosestNamedColor16(Terminal.Gui.Color)"/> of the closest 24-bit color value. Set sets the RGB
     ///     value using a hard-coded map.
     /// </remarks>
-    public ColorName GetClosestNamedColor () { return GetClosestNamedColor (this); }
+    public ColorName16 GetClosestNamedColor16 () { return GetClosestNamedColor16 (this); }
 
     /// <summary>
     ///     Determines if the closest named <see cref="Color"/> to <see langword="this"/> is the provided
     ///     <paramref name="namedColor"/>.
     /// </summary>
     /// <param name="namedColor">
-    ///     The <see cref="GetClosestNamedColor (Color)"/> to check if this <see cref="Color"/> is closer
+    ///     The <see cref="GetClosestNamedColor16(Terminal.Gui.Color)"/> to check if this <see cref="Color"/> is closer
     ///     to than any other configured named color.
     /// </param>
     /// <returns>
@@ -208,18 +197,18 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     /// </remarks>
     [Pure]
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public bool IsClosestToNamedColor (in ColorName namedColor) { return GetClosestNamedColor () == namedColor; }
+    public bool IsClosestToNamedColor16 (in ColorName16 namedColor) { return GetClosestNamedColor16 () == namedColor; }
 
     /// <summary>
     ///     Determines if the closest named <see cref="Color"/> to <paramref name="color"/>/> is the provided
     ///     <paramref name="namedColor"/>.
     /// </summary>
     /// <param name="color">
-    ///     The color to test against the <see cref="GetClosestNamedColor (Color)"/> value in
+    ///     The color to test against the <see cref="GetClosestNamedColor16(Terminal.Gui.Color)"/> value in
     ///     <paramref name="namedColor"/>.
     /// </param>
     /// <param name="namedColor">
-    ///     The <see cref="GetClosestNamedColor (Color)"/> to check if this <see cref="Color"/> is closer
+    ///     The <see cref="GetClosestNamedColor16(Terminal.Gui.Color)"/> to check if this <see cref="Color"/> is closer
     ///     to than any other configured named color.
     /// </param>
     /// <returns>
@@ -233,7 +222,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     /// </remarks>
     [Pure]
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public static bool IsColorClosestToNamedColor (in Color color, in ColorName namedColor) { return color.IsClosestToNamedColor (in namedColor); }
+    public static bool IsColorClosestToNamedColor16 (in Color color, in ColorName16 namedColor) { return color.IsClosestToNamedColor16 (in namedColor); }
 
     /// <summary>Gets the "closest" named color to this <see cref="Color"/> value.</summary>
     /// <param name="inputColor"></param>
@@ -242,9 +231,9 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     /// </remarks>
     /// <returns></returns>
     [SkipLocalsInit]
-    internal static ColorName GetClosestNamedColor (Color inputColor)
+    internal static ColorName16 GetClosestNamedColor16 (Color inputColor)
     {
-        return ColorExtensions.ColorToNameMap.MinBy (pair => CalculateColorDistance (inputColor, pair.Key)).Value;
+        return ColorExtensions.ColorToName16Map.MinBy (pair => CalculateColorDistance (inputColor, pair.Key)).Value;
     }
 
     [SkipLocalsInit]
@@ -295,52 +284,52 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     #region Legacy Color Names
 
     /// <summary>The black color.</summary>
-    public const ColorName Black = ColorName.Black;
+    public const ColorName16 Black = ColorName16.Black;
 
     /// <summary>The blue color.</summary>
-    public const ColorName Blue = ColorName.Blue;
+    public const ColorName16 Blue = ColorName16.Blue;
 
     /// <summary>The green color.</summary>
-    public const ColorName Green = ColorName.Green;
+    public const ColorName16 Green = ColorName16.Green;
 
     /// <summary>The cyan color.</summary>
-    public const ColorName Cyan = ColorName.Cyan;
+    public const ColorName16 Cyan = ColorName16.Cyan;
 
     /// <summary>The red color.</summary>
-    public const ColorName Red = ColorName.Red;
+    public const ColorName16 Red = ColorName16.Red;
 
     /// <summary>The magenta color.</summary>
-    public const ColorName Magenta = ColorName.Magenta;
+    public const ColorName16 Magenta = ColorName16.Magenta;
 
     /// <summary>The yellow color.</summary>
-    public const ColorName Yellow = ColorName.Yellow;
+    public const ColorName16 Yellow = ColorName16.Yellow;
 
     /// <summary>The gray color.</summary>
-    public const ColorName Gray = ColorName.Gray;
+    public const ColorName16 Gray = ColorName16.Gray;
 
     /// <summary>The dark gray color.</summary>
-    public const ColorName DarkGray = ColorName.DarkGray;
+    public const ColorName16 DarkGray = ColorName16.DarkGray;
 
     /// <summary>The bright bBlue color.</summary>
-    public const ColorName BrightBlue = ColorName.BrightBlue;
+    public const ColorName16 BrightBlue = ColorName16.BrightBlue;
 
     /// <summary>The bright green color.</summary>
-    public const ColorName BrightGreen = ColorName.BrightGreen;
+    public const ColorName16 BrightGreen = ColorName16.BrightGreen;
 
     /// <summary>The bright cyan color.</summary>
-    public const ColorName BrightCyan = ColorName.BrightCyan;
+    public const ColorName16 BrightCyan = ColorName16.BrightCyan;
 
     /// <summary>The bright red color.</summary>
-    public const ColorName BrightRed = ColorName.BrightRed;
+    public const ColorName16 BrightRed = ColorName16.BrightRed;
 
     /// <summary>The bright magenta color.</summary>
-    public const ColorName BrightMagenta = ColorName.BrightMagenta;
+    public const ColorName16 BrightMagenta = ColorName16.BrightMagenta;
 
     /// <summary>The bright yellow color.</summary>
-    public const ColorName BrightYellow = ColorName.BrightYellow;
+    public const ColorName16 BrightYellow = ColorName16.BrightYellow;
 
     /// <summary>The White color.</summary>
-    public const ColorName White = ColorName.White;
+    public const ColorName16 White = ColorName16.White;
 
     #endregion
 }

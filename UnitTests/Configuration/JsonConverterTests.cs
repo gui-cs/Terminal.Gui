@@ -41,23 +41,23 @@ public class ColorJsonConverterTests
     }
 
     [Theory]
-    [InlineData (ColorName.Black, "Black")]
-    [InlineData (ColorName.Blue, "Blue")]
-    [InlineData (ColorName.Green, "Green")]
-    [InlineData (ColorName.Cyan, "Cyan")]
-    [InlineData (ColorName.Gray, "Gray")]
-    [InlineData (ColorName.Red, "Red")]
-    [InlineData (ColorName.Magenta, "Magenta")]
-    [InlineData (ColorName.Yellow, "Yellow")]
-    [InlineData (ColorName.DarkGray, "DarkGray")]
-    [InlineData (ColorName.BrightBlue, "BrightBlue")]
-    [InlineData (ColorName.BrightGreen, "BrightGreen")]
-    [InlineData (ColorName.BrightCyan, "BrightCyan")]
-    [InlineData (ColorName.BrightRed, "BrightRed")]
-    [InlineData (ColorName.BrightMagenta, "BrightMagenta")]
-    [InlineData (ColorName.BrightYellow, "BrightYellow")]
-    [InlineData (ColorName.White, "White")]
-    public void SerializesEnumValuesAsStrings (ColorName colorName, string expectedJson)
+    [InlineData (ColorName16.Black, "Black")]
+    [InlineData (ColorName16.Blue, "Blue")]
+    [InlineData (ColorName16.Green, "Green")]
+    [InlineData (ColorName16.Cyan, "Cyan")]
+    [InlineData (ColorName16.Gray, "Gray")]
+    [InlineData (ColorName16.Red, "Red")]
+    [InlineData (ColorName16.Magenta, "Magenta")]
+    [InlineData (ColorName16.Yellow, "Yellow")]
+    [InlineData (ColorName16.DarkGray, "DarkGray")]
+    [InlineData (ColorName16.BrightBlue, "BrightBlue")]
+    [InlineData (ColorName16.BrightGreen, "BrightGreen")]
+    [InlineData (ColorName16.BrightCyan, "BrightCyan")]
+    [InlineData (ColorName16.BrightRed, "BrightRed")]
+    [InlineData (ColorName16.BrightMagenta, "BrightMagenta")]
+    [InlineData (ColorName16.BrightYellow, "BrightYellow")]
+    [InlineData (ColorName16.White, "White")]
+    public void SerializesEnumValuesAsStrings (ColorName16 colorName, string expectedJson)
     {
         var converter = new ColorJsonConverter ();
         var options = new JsonSerializerOptions { Converters = { converter } };
@@ -101,7 +101,7 @@ public class ColorJsonConverterTests
     [InlineData ("Magenta", Color.Magenta)]
     [InlineData ("Red", Color.Red)]
     [InlineData ("White", Color.White)]
-    public void TestColorDeserializationFromHumanReadableColorNames (string colorName, ColorName expectedColor)
+    public void TestColorDeserializationFromHumanReadableColorName16 (string colorName, ColorName16 expectedColor)
     {
         // Arrange
         var json = $"\"{colorName}\"";
@@ -135,7 +135,7 @@ public class ColorJsonConverterTests
     {
         // Arrange
         var json = "\"BrightRed\"";
-        var expectedColor = new Color (ColorName.BrightRed);
+        var expectedColor = Color.BrightRed;
 
         // Act
         var color = JsonSerializer.Deserialize<Color> (
@@ -188,14 +188,14 @@ public class AttributeJsonConverterTests
         // Test deserializing from human-readable color names
         var json = "{\"Foreground\":\"Blue\",\"Background\":\"Green\"}";
         var attribute = JsonSerializer.Deserialize<Attribute> (json, ConfigurationManagerTests._jsonOptions);
-        Assert.Equal (Color.Blue, attribute.Foreground.GetClosestNamedColor ());
-        Assert.Equal (Color.Green, attribute.Background.GetClosestNamedColor ());
+        Assert.Equal (Color.Blue, attribute.Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (Color.Green, attribute.Background.GetClosestNamedColor16 ());
 
         // Test deserializing from RGB values
         json = "{\"Foreground\":\"rgb(255,0,0)\",\"Background\":\"rgb(0,255,0)\"}";
         attribute = JsonSerializer.Deserialize<Attribute> (json, ConfigurationManagerTests._jsonOptions);
-        Assert.Equal (Color.Red, attribute.Foreground.GetClosestNamedColor ());
-        Assert.Equal (Color.BrightGreen, attribute.Background.GetClosestNamedColor ());
+        Assert.Equal (Color.Red, attribute.Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (Color.BrightGreen, attribute.Background.GetClosestNamedColor16 ());
     }
 
     [Fact]

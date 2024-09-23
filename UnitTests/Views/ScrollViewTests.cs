@@ -174,7 +174,7 @@ public class ScrollViewTests (ITestOutputHelper output)
 
     // There are still issue with the lower right corner of the scroll view
     [Fact]
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
     public void Clear_Window_Inside_ScrollView ()
     {
         var topLabel = new Label { X = 15, Text = "At 15,0" };

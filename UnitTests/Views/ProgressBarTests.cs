@@ -5,7 +5,7 @@ namespace Terminal.Gui.ViewsTests;
 public class ProgressBarTests
 {
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.None)]
+    [AutoInitShutdown]
     public void Default_Constructor ()
     {
         var pb = new ProgressBar ();

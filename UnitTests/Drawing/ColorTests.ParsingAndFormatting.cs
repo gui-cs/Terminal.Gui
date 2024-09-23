@@ -10,7 +10,7 @@ public partial class ColorTests
     public void Color_ToString_WithNamedColor ()
     {
         // Arrange
-        var color = new Color (ColorName.Blue);// Blue
+        var color = new Color (ColorName16.Blue);// Blue
 
         // Act
         var colorString = color.ToString ();

@@ -10,6 +10,7 @@ public class ApplicationTests
     {
         _output = output;
         ConsoleDriver.RunningUnitTests = true;
+        ConfigurationManager.Locations = ConfigurationManager.ConfigLocations.None;
 
 #if DEBUG_IDISPOSABLE
         Responder.Instances.Clear ();
@@ -390,6 +391,12 @@ public class ApplicationTests
         // 'app' closed cleanly.
         Assert.Empty (Responder.Instances);
 #endif
+    }
+
+    [Fact]
+    public void Shutdown_Alone_Does_Nothing ()
+    {
+        Application.Shutdown ();
     }
 
     [Theory]

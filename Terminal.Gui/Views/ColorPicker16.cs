@@ -61,7 +61,7 @@ public class ColorPicker16 : View
         set
         {
             int colorIndex = value.Y * _cols + value.X;
-            SelectedColor = (ColorName)colorIndex;
+            SelectedColor = (ColorName16)colorIndex;
         }
     }
 
@@ -132,7 +132,7 @@ public class ColorPicker16 : View
                     continue;
                 }
 
-                Driver.SetAttribute (new ((ColorName)foregroundColorIndex, (ColorName)colorIndex));
+                Driver.SetAttribute (new ((ColorName16)foregroundColorIndex, (ColorName16)colorIndex));
                 bool selected = x == Cursor.X && y == Cursor.Y;
                 DrawColorBox (x, y, selected);
                 colorIndex++;
@@ -141,12 +141,12 @@ public class ColorPicker16 : View
     }
 
     /// <summary>Selected color.</summary>
-    public ColorName SelectedColor
+    public ColorName16 SelectedColor
     {
-        get => (ColorName)_selectColorIndex;
+        get => (ColorName16)_selectColorIndex;
         set
         {
-            if (value == (ColorName)_selectColorIndex)
+            if (value == (ColorName16)_selectColorIndex)
             {
                 return;
             }

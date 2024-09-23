@@ -1010,9 +1010,7 @@ public class DialogTests
         Dialog.DefaultBorderStyle = LineStyle.Single;
         Dialog.DefaultShadow = ShadowStyle.None;
         Button.DefaultShadow = ShadowStyle.None;
-        Dialog.DefaultShadow = ShadowStyle.None;
-        Button.DefaultShadow = ShadowStyle.None;
-
+ 
         Iteration += (s, a) =>
                      {
                          iterations++;

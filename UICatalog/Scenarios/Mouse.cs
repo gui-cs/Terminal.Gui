@@ -71,7 +71,6 @@ public class Mouse : Scenario
             Y = Pos.Bottom (ml),
             Title = "_Want Continuous Button Pressed"
         };
-        cbWantContinuousPresses.CheckedStateChanging += (s, e) => { win.WantContinuousButtonPressed = !win.WantContinuousButtonPressed; };
 
         win.Add (cbWantContinuousPresses);
 
@@ -81,19 +80,6 @@ public class Mouse : Scenario
             Y = Pos.Bottom (cbWantContinuousPresses),
             Title = "_Highlight on Press"
         };
-        cbHighlightOnPress.CheckedState = win.HighlightStyle == (HighlightStyle.Pressed | HighlightStyle.PressedOutside) ? CheckState.Checked : CheckState.UnChecked;
-
-        cbHighlightOnPress.CheckedStateChanging += (s, e) =>
-                                      {
-                                          if (e.NewValue == CheckState.Checked)
-                                          {
-                                              win.HighlightStyle = HighlightStyle.Pressed | HighlightStyle.PressedOutside;
-                                          }
-                                          else
-                                          {
-                                              win.HighlightStyle = HighlightStyle.None;
-                                          }
-                                      };
 
         win.Add (cbHighlightOnPress);
 
@@ -146,6 +132,63 @@ public class Mouse : Scenario
                   });
 
         win.Add (demo);
+
+        cbHighlightOnPress.CheckedState = demo.HighlightStyle == (HighlightStyle.Pressed | HighlightStyle.PressedOutside) ? CheckState.Checked : CheckState.UnChecked;
+
+        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/3753
+        cbHighlightOnPress.CheckedStateChanging += (s, e) =>
+                                                   {
+                                                       if (e.NewValue == CheckState.Checked)
+                                                       {
+                                                           demo.HighlightStyle = HighlightStyle.Pressed | HighlightStyle.PressedOutside;
+                                                       }
+                                                       else
+                                                       {
+                                                           demo.HighlightStyle = HighlightStyle.None;
+                                                       }
+
+                                                       foreach (View subview in demo.Subviews)
+                                                       {
+                                                           if (e.NewValue == CheckState.Checked)
+                                                           {
+                                                               subview.HighlightStyle = HighlightStyle.Pressed | HighlightStyle.PressedOutside;
+                                                           }
+                                                           else
+                                                           {
+                                                               subview.HighlightStyle = HighlightStyle.None;
+                                                           }
+                                                       }
+
+                                                       foreach (View subview in demo.Padding.Subviews)
+                                                       {
+                                                           if (e.NewValue == CheckState.Checked)
+                                                           {
+                                                               subview.HighlightStyle = HighlightStyle.Pressed | HighlightStyle.PressedOutside;
+                                                           }
+                                                           else
+                                                           {
+                                                               subview.HighlightStyle = HighlightStyle.None;
+                                                           }
+                                                       }
+
+                                                   };
+
+        cbWantContinuousPresses.CheckedStateChanging += (s, e) =>
+                                                        {
+                                                            demo.WantContinuousButtonPressed = !demo.WantContinuousButtonPressed;
+
+                                                            foreach (View subview in demo.Subviews)
+                                                            {
+                                                                subview.WantContinuousButtonPressed = demo.WantContinuousButtonPressed;
+                                                            }
+
+                                                            foreach (View subview in demo.Padding.Subviews)
+                                                            {
+                                                                subview.WantContinuousButtonPressed = demo.WantContinuousButtonPressed;
+                                                            }
+
+                                                        };
+
 
         var label = new Label
         {

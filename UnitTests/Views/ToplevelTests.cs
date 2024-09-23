@@ -926,9 +926,15 @@ public partial class ToplevelTests (ITestOutputHelper output)
 
     // Don't use Dialog as a Top, use a Window instead - dialog has complex layout behavior that is not needed here.
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.None)]
+    [AutoInitShutdown]
     public void Draw_A_Top_Subview_On_A_Window ()
     {
+        // Override CM
+        Dialog.DefaultButtonAlignment = Alignment.Center;
+        Dialog.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
+
         Toplevel top = new ();
         var win = new Window ();
         top.Add (win);

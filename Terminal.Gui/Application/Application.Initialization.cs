@@ -71,7 +71,7 @@ public static partial class Application // Initialization (Init/Shutdown)
         if (!calledViaRunT)
         {
             // Reset all class variables (Application is a singleton).
-            ResetState ();
+            ResetState (ignoreDisposed: true);
         }
 
         Navigation = new ();

@@ -374,7 +374,7 @@ internal class CursesDriver : ConsoleDriver
                                                            );
         }
 
-        CurrentAttribute = new Attribute (ColorName.White, ColorName.Black);
+        CurrentAttribute = new Attribute (ColorName16.White, ColorName16.Black);
 
         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
         {
@@ -859,8 +859,8 @@ internal class CursesDriver : ConsoleDriver
 
         return new Attribute (
                               Curses.ColorPair (v),
-                              CursesColorNumberToColorName (foreground),
-                              CursesColorNumberToColorName (background)
+                              CursesColorNumberToColorName16 (foreground),
+                              CursesColorNumberToColorName16 (background)
                              );
     }
 
@@ -875,8 +875,8 @@ internal class CursesDriver : ConsoleDriver
         if (!RunningUnitTests)
         {
             return MakeColor (
-                              ColorNameToCursesColorNumber (foreground.GetClosestNamedColor ()),
-                              ColorNameToCursesColorNumber (background.GetClosestNamedColor ())
+                              ColorNameToCursesColorNumber (foreground.GetClosestNamedColor16 ()),
+                              ColorNameToCursesColorNumber (background.GetClosestNamedColor16 ())
                              );
         }
 
@@ -887,83 +887,83 @@ internal class CursesDriver : ConsoleDriver
                              );
     }
 
-    private static short ColorNameToCursesColorNumber (ColorName color)
+    private static short ColorNameToCursesColorNumber (ColorName16 color)
     {
         switch (color)
         {
-            case ColorName.Black:
+            case ColorName16.Black:
                 return Curses.COLOR_BLACK;
-            case ColorName.Blue:
+            case ColorName16.Blue:
                 return Curses.COLOR_BLUE;
-            case ColorName.Green:
+            case ColorName16.Green:
                 return Curses.COLOR_GREEN;
-            case ColorName.Cyan:
+            case ColorName16.Cyan:
                 return Curses.COLOR_CYAN;
-            case ColorName.Red:
+            case ColorName16.Red:
                 return Curses.COLOR_RED;
-            case ColorName.Magenta:
+            case ColorName16.Magenta:
                 return Curses.COLOR_MAGENTA;
-            case ColorName.Yellow:
+            case ColorName16.Yellow:
                 return Curses.COLOR_YELLOW;
-            case ColorName.Gray:
+            case ColorName16.Gray:
                 return Curses.COLOR_WHITE;
-            case ColorName.DarkGray:
+            case ColorName16.DarkGray:
                 return Curses.COLOR_GRAY;
-            case ColorName.BrightBlue:
+            case ColorName16.BrightBlue:
                 return Curses.COLOR_BLUE | Curses.COLOR_GRAY;
-            case ColorName.BrightGreen:
+            case ColorName16.BrightGreen:
                 return Curses.COLOR_GREEN | Curses.COLOR_GRAY;
-            case ColorName.BrightCyan:
+            case ColorName16.BrightCyan:
                 return Curses.COLOR_CYAN | Curses.COLOR_GRAY;
-            case ColorName.BrightRed:
+            case ColorName16.BrightRed:
                 return Curses.COLOR_RED | Curses.COLOR_GRAY;
-            case ColorName.BrightMagenta:
+            case ColorName16.BrightMagenta:
                 return Curses.COLOR_MAGENTA | Curses.COLOR_GRAY;
-            case ColorName.BrightYellow:
+            case ColorName16.BrightYellow:
                 return Curses.COLOR_YELLOW | Curses.COLOR_GRAY;
-            case ColorName.White:
+            case ColorName16.White:
                 return Curses.COLOR_WHITE | Curses.COLOR_GRAY;
         }
 
         throw new ArgumentException ("Invalid color code");
     }
 
-    private static ColorName CursesColorNumberToColorName (short color)
+    private static ColorName16 CursesColorNumberToColorName16 (short color)
     {
         switch (color)
         {
             case Curses.COLOR_BLACK:
-                return ColorName.Black;
+                return ColorName16.Black;
             case Curses.COLOR_BLUE:
-                return ColorName.Blue;
+                return ColorName16.Blue;
             case Curses.COLOR_GREEN:
-                return ColorName.Green;
+                return ColorName16.Green;
             case Curses.COLOR_CYAN:
-                return ColorName.Cyan;
+                return ColorName16.Cyan;
             case Curses.COLOR_RED:
-                return ColorName.Red;
+                return ColorName16.Red;
             case Curses.COLOR_MAGENTA:
-                return ColorName.Magenta;
+                return ColorName16.Magenta;
             case Curses.COLOR_YELLOW:
-                return ColorName.Yellow;
+                return ColorName16.Yellow;
             case Curses.COLOR_WHITE:
-                return ColorName.Gray;
+                return ColorName16.Gray;
             case Curses.COLOR_GRAY:
-                return ColorName.DarkGray;
+                return ColorName16.DarkGray;
             case Curses.COLOR_BLUE | Curses.COLOR_GRAY:
-                return ColorName.BrightBlue;
+                return ColorName16.BrightBlue;
             case Curses.COLOR_GREEN | Curses.COLOR_GRAY:
-                return ColorName.BrightGreen;
+                return ColorName16.BrightGreen;
             case Curses.COLOR_CYAN | Curses.COLOR_GRAY:
-                return ColorName.BrightCyan;
+                return ColorName16.BrightCyan;
             case Curses.COLOR_RED | Curses.COLOR_GRAY:
-                return ColorName.BrightRed;
+                return ColorName16.BrightRed;
             case Curses.COLOR_MAGENTA | Curses.COLOR_GRAY:
-                return ColorName.BrightMagenta;
+                return ColorName16.BrightMagenta;
             case Curses.COLOR_YELLOW | Curses.COLOR_GRAY:
-                return ColorName.BrightYellow;
+                return ColorName16.BrightYellow;
             case Curses.COLOR_WHITE | Curses.COLOR_GRAY:
-                return ColorName.White;
+                return ColorName16.White;
         }
 
         throw new ArgumentException ("Invalid curses color code");

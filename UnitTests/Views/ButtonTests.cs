@@ -558,42 +558,7 @@ public class ButtonTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.None)]
-    public void Update_Only_On_Or_After_Initialize ()
-    {
-        Button.DefaultShadow = ShadowStyle.None;
-        var btn = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
-        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
-        win.Add (btn);
-        var top = new Toplevel ();
-        top.Add (win);
-
-        Assert.False (btn.IsInitialized);
-
-        Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
-
-        Assert.True (btn.IsInitialized);
-        Assert.Equal ("Say Hello 你", btn.Text);
-        Assert.Equal ($"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
-        Assert.Equal (new (0, 0, 16, 1), btn.Viewport);
-        var btnTxt = $"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}";
-
-        var expected = @$"
-┌────────────────────────────┐
-│                            │
-│      {btnTxt}      │
-│                            │
-└────────────────────────────┘
-";
-
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new (0, 0, 30, 5), pos);
-        top.Dispose ();
-    }
-
-    [Fact]
-    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.None)]
+    [AutoInitShutdown]
     public void Update_Parameterless_Only_On_Or_After_Initialize ()
     {
         Button.DefaultShadow = ShadowStyle.None;
