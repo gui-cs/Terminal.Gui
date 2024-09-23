@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Xunit.Abstractions;
 using Xunit.Sdk;
+using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui;
 
@@ -99,11 +100,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
                 Application.ResetState (ignoreDisposed: true);
 #endif
                 ConfigurationManager.Reset ();
-
-                if (CM.Locations != CM.ConfigLocations.None)
-                {
-                    SetCurrentConfig (_savedValues);
-                }
+                ConfigurationManager.Locations = CM.ConfigLocations.None;
             }
 
 
@@ -131,11 +128,6 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
             }
 #endif
             Application.Init ((ConsoleDriver)Activator.CreateInstance (_driverType));
-
-            if (CM.Locations != CM.ConfigLocations.None)
-            {
-                _savedValues = GetCurrentConfig ();
-            }
         }
     }
 
@@ -143,65 +135,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
     private List<object> _savedValues;
 
-    private List<object> GetCurrentConfig ()
-    {
-        CM.Reset ();
-
-        List<object> savedValues =
-        [
-            Dialog.DefaultButtonAlignment,
-            Dialog.DefaultButtonAlignmentModes,
-            MessageBox.DefaultBorderStyle
-        ];
-        CM.Themes! ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue = Alignment.End;
-        CM.Themes! ["Default"] ["Dialog.DefaultButtonAlignmentModes"].PropertyValue = AlignmentModes.AddSpaceBetweenItems;
-        CM.Themes! ["Default"] ["MessageBox.DefaultBorderStyle"].PropertyValue = LineStyle.Double;
-        ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
-
-        return savedValues;
-    }
-
-    private void SetCurrentConfig (List<object> values)
-    {
-        CM.Reset ();
-        bool needApply = false;
-
-        foreach (object value in values)
-        {
-            switch (value)
-            {
-                case Alignment alignment:
-                    if ((Alignment)CM.Themes! ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue! != alignment)
-                    {
-                        needApply = true;
-                        CM.Themes! ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue = alignment;
-                    }
-
-                    break;
-                case AlignmentModes alignmentModes:
-                    if ((AlignmentModes)CM.Themes! ["Default"] ["Dialog.DefaultButtonAlignmentModes"].PropertyValue! != alignmentModes)
-                    {
-                        needApply = true;
-                        CM.Themes! ["Default"] ["Dialog.DefaultButtonAlignmentModes"].PropertyValue = alignmentModes;
-                    }
-
-                    break;
-                case LineStyle lineStyle:
-                    if ((LineStyle)CM.Themes! ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue! != lineStyle)
-                    {
-                        needApply = true;
-                        CM.Themes! ["Default"] ["MessageBox.DefaultBorderStyle"].PropertyValue = lineStyle;
-                    }
-
-                    break;
-            }
-        }
-
-        if (needApply)
-        {
-            ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
-        }
-    }
+   
 }
 
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
@@ -259,6 +193,7 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
         Application.ResetState ();
         Assert.Null (Application.Driver);
         Application.Driver = new FakeDriver { Rows = 25, Cols = 25 };
+
         base.Before (methodUnderTest);
     }
 }
@@ -766,11 +701,11 @@ internal partial class TestHelpers
         string replaced = toReplace;
 
         replaced = Environment.NewLine.Length switch
-                   {
-                       2 when !replaced.Contains ("\r\n") => replaced.Replace ("\n", Environment.NewLine),
-                       1 => replaced.Replace ("\r\n", Environment.NewLine),
-                       var _ => replaced
-                   };
+        {
+            2 when !replaced.Contains ("\r\n") => replaced.Replace ("\n", Environment.NewLine),
+            1 => replaced.Replace ("\r\n", Environment.NewLine),
+            var _ => replaced
+        };
 
         return replaced;
     }

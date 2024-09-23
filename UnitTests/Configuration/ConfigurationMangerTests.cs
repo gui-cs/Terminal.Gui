@@ -149,6 +149,8 @@ public class ConfigurationManagerTests
     [Fact]
     public void Load_FiresUpdated ()
     {
+        ConfigLocations savedLocations = Locations;
+        Locations = ConfigLocations.All;
         Reset ();
 
         Settings! ["Application.QuitKey"].PropertyValue = Key.Q;
@@ -183,6 +185,7 @@ public class ConfigurationManagerTests
 
         Updated -= ConfigurationManager_Updated;
         Reset ();
+        Locations = savedLocations;
     }
 
     [Fact]
@@ -414,6 +417,9 @@ public class ConfigurationManagerTests
     [Fact]
     public void TestConfigPropertyOmitClassName ()
     {
+        ConfigLocations savedLocations = Locations;
+        Locations = ConfigLocations.All;
+
         // Color.ColorSchemes is serialized as "ColorSchemes", not "Colors.ColorSchemes"
         PropertyInfo pi = typeof (Colors).GetProperty ("ColorSchemes");
         var scp = (SerializableConfigurationProperty)pi!.GetCustomAttribute (typeof (SerializableConfigurationProperty));
@@ -422,6 +428,8 @@ public class ConfigurationManagerTests
 
         Reset ();
         Assert.Equal (pi, Themes! ["Default"] ["ColorSchemes"].PropertyInfo);
+
+        Locations = savedLocations;
     }
 
     [Fact]
@@ -652,6 +660,9 @@ public class ConfigurationManagerTests
     [Fact]
     public void TestConfigurationManagerUpdateFromJson ()
     {
+        ConfigLocations savedLocations = Locations;
+        Locations = ConfigLocations.All;
+
         // Arrange
         var json = @"
 {
@@ -816,6 +827,8 @@ public class ConfigurationManagerTests
         Assert.Equal (new Color (Color.White), Colors.ColorSchemes ["Base"].Normal.Foreground);
         Assert.Equal (new Color (Color.Blue), Colors.ColorSchemes ["Base"].Normal.Background);
         Reset ();
+
+        Locations = savedLocations;
     }
 
     [Fact]
