@@ -431,6 +431,8 @@ public class MenuBarTests (ITestOutputHelper output)
         Window.DefaultBorderStyle = LineStyle.Single;
         Dialog.DefaultButtonAlignment = Alignment.Center;
         Dialog.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         Toplevel top = new ();
         var win = new Window ();
@@ -666,6 +668,7 @@ public class MenuBarTests (ITestOutputHelper output)
         Window.DefaultBorderStyle = LineStyle.Single;
         Dialog.DefaultButtonAlignment = Alignment.Center;
         Dialog.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultShadow = ShadowStyle.None;
         Button.DefaultShadow = ShadowStyle.None;
 
         Assert.Equal (new (0, 0, 40, 15), Application.Driver?.Clip);

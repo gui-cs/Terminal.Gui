@@ -1137,6 +1137,13 @@ This is a test
     [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.None)]
     public void ShowScrollIndicator_False_Must_Also_Set_Visible_To_False_To_Not_Respond_To_Events ()
     {
+        // Override CM
+        Window.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultButtonAlignment = Alignment.Center;
+        Dialog.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
+
         var clicked = false;
         var text = "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
         var label = new Label { Width = 14, Height = 5, Text = text };
