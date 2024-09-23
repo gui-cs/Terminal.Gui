@@ -351,7 +351,7 @@ public class MenuBar : View, IDesignable
     /// <summary>Virtual method that will invoke the <see cref="MenuOpened"/> event if it's defined.</summary>
     public virtual void OnMenuOpened ()
     {
-        MenuItem? mi;
+        MenuItem? mi = null;
         MenuBarItem? parent;
 
         if (OpenCurrentMenu?.BarItems?.Children is { Length: > 0 }
@@ -368,7 +368,11 @@ public class MenuBar : View, IDesignable
         else
         {
             parent = _openMenu?.BarItems;
-            mi = parent?.Children?.Length > 0 ? parent.Children [_openMenu!._currentChild] : null;
+
+            if (OpenCurrentMenu?._currentChild > -1)
+            {
+                mi = parent?.Children?.Length > 0 ? parent.Children [_openMenu!._currentChild] : null;
+            }
         }
 
         MenuOpened?.Invoke (this, new (parent, mi));
