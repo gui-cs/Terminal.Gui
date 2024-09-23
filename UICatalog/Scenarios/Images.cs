@@ -357,3 +357,150 @@ public class CIE76ColorDistance : LabColorDistance
         return Math.Sqrt (Math.Pow (lab1.L - lab2.L, 2) + Math.Pow (lab1.A - lab2.A, 2) + Math.Pow (lab1.B - lab2.B, 2));
     }
 }
+
+public class MedianCutPaletteBuilder : IPaletteBuilder
+{
+    private readonly IColorDistance _colorDistance;
+
+    public MedianCutPaletteBuilder (IColorDistance colorDistance) { _colorDistance = colorDistance; }
+
+    public List<Color> BuildPalette (List<Color> colors, int maxColors)
+    {
+        if (colors == null || colors.Count == 0 || maxColors <= 0)
+        {
+            return new ();
+        }
+
+        return MedianCut (colors, maxColors);
+    }
+
+    private List<Color> MedianCut (List<Color> colors, int maxColors)
+    {
+        List<List<Color>> cubes = new() { colors };
+
+        // Recursively split color regions
+        while (cubes.Count < maxColors)
+        {
+            var added = false;
+            cubes.Sort ((a, b) => Volume (a).CompareTo (Volume (b)));
+
+            List<Color> largestCube = cubes.Last ();
+            cubes.RemoveAt (cubes.Count - 1);
+
+            // Check if the largest cube contains only one unique color
+            if (IsSingleColorCube (largestCube))
+            {
+                // Add back and stop splitting this cube
+                cubes.Add (largestCube);
+
+                break;
+            }
+
+            (List<Color> cube1, List<Color> cube2) = SplitCube (largestCube);
+
+            if (cube1.Any ())
+            {
+                cubes.Add (cube1);
+                added = true;
+            }
+
+            if (cube2.Any ())
+            {
+                cubes.Add (cube2);
+                added = true;
+            }
+
+            // Break the loop if no new cubes were added
+            if (!added)
+            {
+                break;
+            }
+        }
+
+        // Calculate average color for each cube
+        return cubes.Select (AverageColor).Distinct ().ToList ();
+    }
+
+    // Checks if all colors in the cube are the same
+    private bool IsSingleColorCube (List<Color> cube)
+    {
+        Color firstColor = cube.First ();
+
+        return cube.All (c => c.R == firstColor.R && c.G == firstColor.G && c.B == firstColor.B);
+    }
+
+    // Splits the cube based on the largest color component range
+    private (List<Color>, List<Color>) SplitCube (List<Color> cube)
+    {
+        (int component, int range) = FindLargestRange (cube);
+
+        // Sort by the largest color range component (either R, G, or B)
+        cube.Sort (
+                   (c1, c2) => component switch
+                               {
+                                   0 => c1.R.CompareTo (c2.R),
+                                   1 => c1.G.CompareTo (c2.G),
+                                   2 => c1.B.CompareTo (c2.B),
+                                   _ => 0
+                               });
+
+        int medianIndex = cube.Count / 2;
+        List<Color> cube1 = cube.Take (medianIndex).ToList ();
+        List<Color> cube2 = cube.Skip (medianIndex).ToList ();
+
+        return (cube1, cube2);
+    }
+
+    private (int, int) FindLargestRange (List<Color> cube)
+    {
+        byte minR = cube.Min (c => c.R);
+        byte maxR = cube.Max (c => c.R);
+        byte minG = cube.Min (c => c.G);
+        byte maxG = cube.Max (c => c.G);
+        byte minB = cube.Min (c => c.B);
+        byte maxB = cube.Max (c => c.B);
+
+        int rangeR = maxR - minR;
+        int rangeG = maxG - minG;
+        int rangeB = maxB - minB;
+
+        if (rangeR >= rangeG && rangeR >= rangeB)
+        {
+            return (0, rangeR);
+        }
+
+        if (rangeG >= rangeR && rangeG >= rangeB)
+        {
+            return (1, rangeG);
+        }
+
+        return (2, rangeB);
+    }
+
+    private Color AverageColor (List<Color> cube)
+    {
+        var avgR = (byte)cube.Average (c => c.R);
+        var avgG = (byte)cube.Average (c => c.G);
+        var avgB = (byte)cube.Average (c => c.B);
+
+        return new (avgR, avgG, avgB);
+    }
+
+    private int Volume (List<Color> cube)
+    {
+        if (cube == null || cube.Count == 0)
+        {
+            // Return a volume of 0 if the cube is empty or null
+            return 0;
+        }
+
+        byte minR = cube.Min (c => c.R);
+        byte maxR = cube.Max (c => c.R);
+        byte minG = cube.Min (c => c.G);
+        byte maxG = cube.Max (c => c.G);
+        byte minB = cube.Min (c => c.B);
+        byte maxB = cube.Max (c => c.B);
+
+        return (maxR - minR) * (maxG - minG) * (maxB - minB);
+    }
+}

@@ -3,7 +3,7 @@
 namespace Terminal.Gui;
 
 /// <summary>
-/// Translates colors in an image into a Palette of up to 256 colors.
+/// Translates colors in an image into a Palette of up to <see cref="MaxColors"/> colors (typically 256).
 /// </summary>
 public class ColorQuantizer
 {
@@ -21,14 +21,14 @@ public class ColorQuantizer
 
     /// <summary>
     /// Gets or sets the algorithm used to map novel colors into existing
-    /// palette colors (closest match). Defaults to <see cref="CIE94ColorDistance"/>
+    /// palette colors (closest match). Defaults to <see cref="EuclideanColorDistance"/>
     /// </summary>
-    public IColorDistance DistanceAlgorithm { get; set; } = new CIE94ColorDistance ();
+    public IColorDistance DistanceAlgorithm { get; set; } = new EuclideanColorDistance ();
 
     /// <summary>
     /// Gets or sets the algorithm used to build the <see cref="Palette"/>.
     /// </summary>
-    public IPaletteBuilder PaletteBuildingAlgorithm { get; set; } = new MedianCutPaletteBuilder (new EuclideanColorDistance ()) ;
+    public IPaletteBuilder PaletteBuildingAlgorithm { get; set; } = new PopularityPaletteWithThreshold (new EuclideanColorDistance (),50) ;
 
     public void BuildPalette (Color [,] pixels)
     {
