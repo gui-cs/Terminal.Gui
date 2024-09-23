@@ -9,8 +9,10 @@ namespace Terminal.Gui.ResourcesTests;
 
 public class ResourceManagerTests
 {
-    private const string DODGER_BLUE_COLOR_KEY = "#1E90FF";
+    private const string DODGER_BLUE_COLOR_KEY = "DodgerBlue";
     private const string DODGER_BLUE_COLOR_NAME = "DodgerBlue";
+    private const string NO_NAMED_COLOR_KEY = "#1E80FF";
+    private const string NO_NAMED_COLOR_NAME = "#1E80FF";
     private const string EXISTENT_CULTURE = "pt-PT";
     private const string NO_EXISTENT_CULTURE = "de-DE";
     private const string NO_EXISTENT_KEY = "blabla";
@@ -62,7 +64,7 @@ public class ResourceManagerTests
         RestoreCurrentCultures ();
     }
 
-    [Fact (Skip = "Tig broke this test and doesn't understand why.")]
+    [Fact]
     public void GetResourceSet_FallBack_To_Default_For_Not_Translated_Existent_Culture_File ()
     {
         CultureInfo.CurrentCulture = new (EXISTENT_CULTURE);
@@ -81,6 +83,14 @@ public class ResourceManagerTests
         // ColorStrings.TryParseW3CColorName method uses GetResourceSet method to retrieve a color value
         Assert.True (ColorStrings.TryParseW3CColorName (DODGER_BLUE_COLOR_NAME, out Color color));
         Assert.Equal (DODGER_BLUE_COLOR_KEY, color.ToString ());
+
+        // W3CColors.GetColorNames also calls ColorStrings.GetW3CColorNames for no-named colors
+        colorNames = new W3CColors ().GetColorNames ().ToArray ();
+        Assert.DoesNotContain (NO_NAMED_COLOR_NAME, colorNames);
+
+        // ColorStrings.TryParseW3CColorName method uses GetResourceSet method to retrieve a color value for no-named colors
+        Assert.True (ColorStrings.TryParseW3CColorName (NO_NAMED_COLOR_NAME, out color));
+        Assert.Equal (NO_NAMED_COLOR_KEY, color.ToString ());
 
         RestoreCurrentCultures ();
     }
