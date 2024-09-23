@@ -93,9 +93,8 @@ public class PopularityPaletteWithThreshold : IPaletteBuilder
                 mergedHistogram [currentColor] = entry.Value;
             }
 
-
             // Early exit if we've reduced the colors to the maxColors limit
-            if (mergedHistogram.Count <= maxColors)
+            if (mergedHistogram.Count >= maxColors)
             {
                 return mergedHistogram;
             }

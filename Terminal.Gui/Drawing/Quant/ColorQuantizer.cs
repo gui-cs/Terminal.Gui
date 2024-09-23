@@ -28,7 +28,7 @@ public class ColorQuantizer
     /// <summary>
     /// Gets or sets the algorithm used to build the <see cref="Palette"/>.
     /// </summary>
-    public IPaletteBuilder PaletteBuildingAlgorithm { get; set; } = new PopularityPaletteWithThreshold (new EuclideanColorDistance (),50) ;
+    public IPaletteBuilder PaletteBuildingAlgorithm { get; set; } = new PopularityPaletteWithThreshold (new EuclideanColorDistance (),5) ;
 
     public void BuildPalette (Color [,] pixels)
     {
