@@ -36,6 +36,7 @@ public static partial class Application // Popover handling
                     _popover.BeginInit ();
                     _popover.EndInit ();
                 }
+
                 _popover.Arrangement |= ViewArrangement.Overlapped;
 
                 if (_popover.ColorScheme is null)
@@ -65,12 +66,9 @@ public static partial class Application // Popover handling
             {
                 Popover.ColorScheme = Top?.ColorScheme;
             }
+
             Popover.SetRelativeLayout (Screen.Size);
             Popover.SetFocus ();
-        }
-        else
-        {
-            
         }
     }
 }
