@@ -424,7 +424,7 @@ public class MenuBarTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.None)]
+    [AutoInitShutdown]
     public void Draw_A_Menu_Over_A_Dialog ()
     {
         // Override CM

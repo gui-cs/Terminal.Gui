@@ -558,7 +558,6 @@ public class ButtonTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.None)]
     public void Update_Only_On_Or_After_Initialize ()
     {
         Button.DefaultShadow = ShadowStyle.None;
@@ -593,7 +592,7 @@ public class ButtonTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.None)]
+    [AutoInitShutdown]
     public void Update_Parameterless_Only_On_Or_After_Initialize ()
     {
         Button.DefaultShadow = ShadowStyle.None;
