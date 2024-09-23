@@ -1358,6 +1358,12 @@ public partial class ToplevelTests (ITestOutputHelper output)
     [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.None)]
     public void Draw_A_Top_Subview_On_A_Window ()
     {
+        // Override CM
+        Dialog.DefaultButtonAlignment = Alignment.Center;
+        Dialog.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
+
         Toplevel top = new ();
         var win = new Window ();
         top.Add (win);
