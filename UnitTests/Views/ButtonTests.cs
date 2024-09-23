@@ -560,7 +560,6 @@ public class ButtonTests (ITestOutputHelper output)
     [Fact]
     public void Update_Only_On_Or_After_Initialize ()
     {
-        Button.DefaultShadow = ShadowStyle.None;
         var btn = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (btn);
@@ -571,6 +570,7 @@ public class ButtonTests (ITestOutputHelper output)
 
         Application.Begin (top);
         ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
+        Button.DefaultShadow = ShadowStyle.None;
 
         Assert.True (btn.IsInitialized);
         Assert.Equal ("Say Hello 你", btn.Text);
