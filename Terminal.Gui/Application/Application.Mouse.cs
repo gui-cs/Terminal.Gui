@@ -1,8 +1,6 @@
 #nullable enable
 using System.ComponentModel;
 using System.Diagnostics;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
 namespace Terminal.Gui;
 

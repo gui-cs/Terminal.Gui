@@ -17,7 +17,7 @@ namespace Terminal.Gui;
 [JsonSerializable (typeof (ShadowStyle))]
 [JsonSerializable (typeof (HighlightStyle))]
 [JsonSerializable (typeof (bool?))]
-[JsonSerializable (typeof (Dictionary<ColorName, string>))]
+[JsonSerializable (typeof (Dictionary<ColorName16, string>))]
 [JsonSerializable (typeof (Dictionary<string, ThemeScope>))]
 [JsonSerializable (typeof (Dictionary<string, ColorScheme>))]
 internal partial class SourceGenerationContext : JsonSerializerContext

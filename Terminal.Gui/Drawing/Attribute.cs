@@ -15,7 +15,7 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
 {
     /// <summary>Default empty attribute.</summary>
     [JsonIgnore]
-    public static Attribute Default => new (Color.White, ColorName.Black);
+    public static Attribute Default => new (Color.White, Color.Black);
 
     /// <summary>The <see cref="ConsoleDriver"/>-specific color value.</summary>
     [JsonIgnore (Condition = JsonIgnoreCondition.Always)]
@@ -65,28 +65,28 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     }
 
     /// <summary>
-    ///     Initializes a new instance with a <see cref="ColorName"/> value. Both <see cref="Foreground"/> and
+    ///     Initializes a new instance with a <see cref="ColorName16"/> value. Both <see cref="Foreground"/> and
     ///     <see cref="Background"/> will be set to the specified color.
     /// </summary>
     /// <param name="colorName">Value.</param>
-    internal Attribute (in ColorName colorName) : this (in colorName, in colorName) { }
+    internal Attribute (in ColorName16 colorName) : this (in colorName, in colorName) { }
 
     /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
     /// <param name="foregroundName">Foreground</param>
     /// <param name="backgroundName">Background</param>
-    public Attribute (in ColorName foregroundName, in ColorName backgroundName)
+    public Attribute (in ColorName16 foregroundName, in ColorName16 backgroundName)
         : this (new Color (in foregroundName), new Color (in backgroundName))
     { }
 
     /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
     /// <param name="foregroundName">Foreground</param>
     /// <param name="background">Background</param>
-    public Attribute (in ColorName foregroundName, in Color background) : this (new Color (in foregroundName), in background) { }
+    public Attribute (in ColorName16 foregroundName, in Color background) : this (new Color (in foregroundName), in background) { }
 
     /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
     /// <param name="foreground">Foreground</param>
     /// <param name="backgroundName">Background</param>
-    public Attribute (in Color foreground, in ColorName backgroundName) : this (in foreground, new Color (in backgroundName)) { }
+    public Attribute (in Color foreground, in ColorName16 backgroundName) : this (in foreground, new Color (in backgroundName)) { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Attribute"/> struct with the same colors for the foreground and

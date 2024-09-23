@@ -17,7 +17,7 @@ public class PaddingTests (ITestOutputHelper output)
             Normal = new (Color.Red, Color.Green), Focus = new (Color.Green, Color.Red)
         };
 
-        Assert.Equal (ColorName.Red, view.Padding.GetNormalColor ().Foreground.GetClosestNamedColor ());
+        Assert.Equal (ColorName16.Red, view.Padding.GetNormalColor ().Foreground.GetClosestNamedColor16 ());
         Assert.Equal (view.GetNormalColor (), view.Padding.GetNormalColor ());
 
         view.BeginInit ();

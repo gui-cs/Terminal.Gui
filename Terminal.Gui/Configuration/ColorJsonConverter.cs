@@ -37,7 +37,7 @@ internal class ColorJsonConverter : JsonConverter<Color>
                 return new (color1);
             }
 
-            if (Enum.TryParse (colorString, true, out ColorName color))
+            if (Enum.TryParse (colorString, true, out ColorName16 color))
             {
                 // Return the parsed color
                 return new (in color);
