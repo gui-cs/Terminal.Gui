@@ -54,19 +54,28 @@ public class ViewExperiments : Scenario
             Title = $"TopButton _{GetNextHotKey ()}",
         };
 
-        var popoverView = new Button ()
+        var popoverView = new View ()
         {
             X = Pos.Center (),
             Y = Pos.Center (),
-            Width = Dim.Percent (50),
-            Height = Dim.Percent (50),
+            Width = 30,
+            Height = 10,
             Title = "Popover",
             Text = "This is a popover",
             Visible = false,
+            CanFocus = true,
             Arrangement = ViewArrangement.Resizable | ViewArrangement.Movable
         };
         popoverView.BorderStyle = LineStyle.RoundedDotted;
-        popoverView.Accept += (sender, e) => Application.Popover!.Visible = false;
+
+        Button popoverButton = new ()
+        {
+            X = Pos.Center (),
+            Y = Pos.Center (),
+            Title = $"_Close",
+        };
+        popoverButton.Accept += (sender, e) => Application.Popover!.Visible = false;
+        popoverView.Add (popoverButton);
 
         button.Accept += ButtonAccept;
 
@@ -74,6 +83,19 @@ public class ViewExperiments : Scenario
         {
             Application.Popover = popoverView;
             Application.Popover!.Visible = true;
+        }
+
+        testFrame.MouseClick += TestFrameOnMouseClick;
+
+        void TestFrameOnMouseClick (object sender, MouseEventEventArgs e)
+        {
+            if (e.MouseEvent.Flags == MouseFlags.Button3Clicked)
+            {
+                popoverView.X = e.MouseEvent.ScreenPosition.X;
+                popoverView.Y = e.MouseEvent.ScreenPosition.Y;
+                Application.Popover = popoverView;
+                Application.Popover!.Visible = true;
+            }
         }
 
         testFrame.Add (button);

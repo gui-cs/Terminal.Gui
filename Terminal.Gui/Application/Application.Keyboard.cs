@@ -95,7 +95,14 @@ public static partial class Application // Keyboard handling
             return true;
         }
 
-        if (Top is null)
+        View? top = Top;
+
+        if (Popover is { Visible: true })
+        {
+            top = Popover;
+        }
+
+        if (top is null)
         {
             foreach (Toplevel topLevel in TopLevels.ToList ())
             {
@@ -112,7 +119,7 @@ public static partial class Application // Keyboard handling
         }
         else
         {
-            if (Top.NewKeyDownEvent (keyEvent))
+            if (top.NewKeyDownEvent (keyEvent))
             {
                 return true;
             }

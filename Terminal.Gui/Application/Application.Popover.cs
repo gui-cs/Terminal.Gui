@@ -67,7 +67,20 @@ public static partial class Application // Popover handling
                 Popover.ColorScheme = Top?.ColorScheme;
             }
 
+            View.GetLocationEnsuringFullVisibility (
+                                                    Popover,
+                                                    Popover.Frame.X,
+                                                    Popover.Frame.Y,
+                                                    out int nx,
+                                                    out int ny,
+                                                    out StatusBar? sb
+                                                   );
+
+            Popover.X = nx;
+            Popover.Y = ny;
+
             Popover.SetRelativeLayout (Screen.Size);
+            Top.HasFocus = false;
             Popover.SetFocus ();
         }
     }

@@ -27,7 +27,10 @@ public class ApplicationNavigation
     /// <summary>
     ///     Gets the most focused <see cref="View"/> in the application, if there is one.
     /// </summary>
-    public View? GetFocused () { return _focused; }
+    public View? GetFocused ()
+    {
+        return _focused;
+    }
 
     /// <summary>
     ///     INTERNAL method to record the most focused <see cref="View"/> in the application.
@@ -37,6 +40,10 @@ public class ApplicationNavigation
     /// </remarks>
     internal void SetFocused (View? value)
     {
+        if (value is null)
+        {
+
+        }
         if (_focused == value)
         {
             return;
