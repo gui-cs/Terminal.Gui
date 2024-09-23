@@ -47,7 +47,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         bool useFakeClipboard = true,
         bool fakeClipboardAlwaysThrowsNotSupportedException = false,
         bool fakeClipboardIsSupportedAlwaysTrue = false,
-        ConfigurationManager.ConfigLocations configLocation = ConfigurationManager.ConfigLocations.DefaultOnly
+        ConfigurationManager.ConfigLocations configLocation = ConfigurationManager.ConfigLocations.None
     )
     {
         AutoInit = autoInit;
@@ -72,25 +72,41 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
         if (AutoInit)
         {
-            // TODO: This Dispose call is here until all unit tests that don't correctly dispose Toplevel's they create are fixed.
-            Application.Top?.Dispose ();
-            Application.Shutdown ();
+            try
+            {
+                // TODO: This Dispose call is here until all unit tests that don't correctly dispose Toplevel's they create are fixed.
+                //Application.Top?.Dispose ();
+                Application.Shutdown ();
 #if DEBUG_IDISPOSABLE
-            if (Responder.Instances.Count == 0)
-            {
-                Assert.Empty (Responder.Instances);
-            }
-            else
-            {
-                Responder.Instances.Clear ();
-            }
+                if (Responder.Instances.Count == 0)
+                {
+                    Assert.Empty (Responder.Instances);
+                }
+                else
+                {
+                    Responder.Instances.Clear ();
+                }
 #endif
-            ConfigurationManager.Reset ();
-
-            if (CM.Locations != CM.ConfigLocations.None)
-            {
-                SetCurrentConfig (_savedValues);
             }
+            catch (Exception e)
+            {
+                Assert.Fail ($"Application.Shutdown threw an exception after the test exited: {e}");
+            }
+            finally
+            {
+#if DEBUG_IDISPOSABLE
+                Responder.Instances.Clear ();
+                Application.ResetState (ignoreDisposed: true);
+#endif
+                ConfigurationManager.Reset ();
+
+                if (CM.Locations != CM.ConfigLocations.None)
+                {
+                    SetCurrentConfig (_savedValues);
+                }
+            }
+
+
         }
     }
 

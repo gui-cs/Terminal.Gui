@@ -233,6 +233,7 @@ public class MessageBoxTests
                                  };
 
         Application.Run (top);
+        top.Dispose ();
     }
 
     [Fact]
@@ -481,7 +482,7 @@ public class MessageBoxTests
         var top = new Toplevel ();
         top.BorderStyle = LineStyle.Single;
         Application.Run (top);
-
+        top.Dispose ();
     }
 }
 
