@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using ColorHelper;
 
 namespace Terminal.Gui;
 
@@ -35,12 +36,6 @@ internal class ColorJsonConverter : JsonConverter<Color>
             {
                 // Return the parsed color
                 return new (color1);
-            }
-
-            if (Enum.TryParse (colorString, true, out ColorName16 color))
-            {
-                // Return the parsed color
-                return new (in color);
             }
 
             if (Color.TryParse (colorString, null, out Color parsedColor))
