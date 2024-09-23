@@ -136,7 +136,7 @@ public class ViewTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
     [InlineData (true)]
     [InlineData (false)]
     public void Clear_Does_Not_Spillover_Its_Parent (bool label)

@@ -50,7 +50,7 @@ public class RuneCellTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
     public void RuneCell_LoadRuneCells_InheritsPreviousColorScheme ()
     {
         List<RuneCell> runeCells = new ();

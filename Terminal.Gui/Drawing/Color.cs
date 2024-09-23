@@ -109,20 +109,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
 
     /// <summary>Initializes a new instance of the <see cref="Color"/> color from a legacy 16-color named value.</summary>
     /// <param name="colorName">The 16-color value.</param>
-    public Color (in ColorName16 colorName)
-    {
-        string? name = Enum.GetName<ColorName16> (colorName);
-
-        if (name is null)
-        {
-            return;
-        }
-
-        if (ColorStrings.TryParseW3CColorName (name, out Color color))
-        {
-            this = color;
-        }
-    }
+    public Color (in ColorName16 colorName) { this = ColorExtensions.ColorName16ToColorMap [colorName]; }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Color"/> color from string. See

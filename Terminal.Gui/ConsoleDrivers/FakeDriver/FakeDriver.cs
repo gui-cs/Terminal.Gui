@@ -93,7 +93,7 @@ public class FakeDriver : ConsoleDriver
         FakeConsole.Clear ();
         ResizeScreen ();
         CurrentAttribute = new Attribute (Color.White, Color.Black);
-        ClearContents ();
+        //ClearContents ();
 
         _mainLoopDriver = new FakeMainLoop (this);
         _mainLoopDriver.MockKeyPressed = MockKeyPressedHandler;

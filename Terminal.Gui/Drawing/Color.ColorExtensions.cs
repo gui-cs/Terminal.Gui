@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using ColorHelper;
 
 namespace Terminal.Gui;
 
@@ -32,17 +33,26 @@ internal static class ColorExtensions
         };
         ColorName16ToAnsiColorMap = nameToCodeMap.ToFrozenDictionary ();
 
-        var colorToNameDict = new Dictionary<Color, ColorName16> ();
-
-        foreach (ColorName16 colorName in Enum.GetValues<ColorName16> ())
+        ColorToName16Map = new Dictionary<Color, ColorName16>
         {
-            if (ColorStrings.TryParseW3CColorName (Enum.GetName<ColorName16> (colorName), out Color color))
-            {
-                colorToNameDict [color] = colorName;
-            }
-        }
-
-        ColorToName16Map = colorToNameDict.ToFrozenDictionary ();
+            // These match the values in Strings.resx, which are the W3C colors.
+            { new Color(0, 0, 0), ColorName16.Black },
+            { new Color(0, 0, 255), ColorName16.Blue },
+            { new Color(0, 128, 0), ColorName16.Green },
+            { new Color(0, 255, 255), ColorName16.Cyan },
+            { new Color(255, 0, 0), ColorName16.Red },
+            { new Color(255, 0, 255), ColorName16.Magenta },
+            { new Color(255, 255, 0), ColorName16.Yellow },
+            { new Color(128, 128, 128), ColorName16.Gray },
+            { new Color(118, 118, 118), ColorName16.DarkGray },
+            { new Color(59, 120, 255), ColorName16.BrightBlue },
+            { new Color(22, 198, 12), ColorName16.BrightGreen },
+            { new Color(97, 214, 214), ColorName16.BrightCyan },
+            { new Color(231, 72, 86), ColorName16.BrightRed },
+            { new Color(180, 0, 158), ColorName16.BrightMagenta },
+            { new Color(249, 241, 165), ColorName16.BrightYellow },
+            { new Color(255, 255, 255), ColorName16.White }
+        }.ToFrozenDictionary ();
     }
 
     /// <summary>Defines the 16 legacy color names and their corresponding ANSI color codes.</summary>
