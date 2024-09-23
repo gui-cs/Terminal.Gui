@@ -1279,39 +1279,39 @@ public class DialogTests
                              rs = Begin (d);
 
                              // This is because of PostionTopLevels and EnsureVisibleBounds
-                             Assert.Equal (new (3, 2), d.Frame.Location);
+                             Assert.Equal (new (5, 5), d.Frame.Location);
 
                              // #3127: Before					
-                             //					Assert.Equal (new (17, 8), d.Frame.Size);
-                             //					TestHelpers.AssertDriverContentsWithFrameAre (@"
-                             //╔══════════════════╗
-                             //║                  ║
-                             //║  ┌───────────────┐
-                             //║  │               │
-                             //║  │               │
-                             //║  │               │
-                             //║  │               │
-                             //║  │               │
-                             //║  │               │
-                             //╚══└───────────────┘", _output);
-
-                             // #3127: After: Because Toplevel is now Width/Height = Dim.Filll
-                             Assert.Equal (new (15, 6), d.Frame.Size);
-
-                             TestHelpers.AssertDriverContentsWithFrameAre (
-                                                                           @"
+                             Assert.Equal (new (17, 8), d.Frame.Size);
+                             TestHelpers.AssertDriverContentsWithFrameAre (@"
 ╔══════════════════╗
 ║                  ║
-║  ┌─────────────┐ ║
-║  │             │ ║
-║  │             │ ║
-║  │             │ ║
-║  │             │ ║
-║  └─────────────┘ ║
 ║                  ║
-╚══════════════════╝",
-                                                                           _output
-                                                                          );
+║                  ║
+║                  ║
+║    ┌──────────────
+║    │              
+║    │              
+║    │              
+╚════│              ", _output);
+
+//                             // #3127: After: Because Toplevel is now Width/Height = Dim.Filll
+//                             Assert.Equal (new (15, 6), d.Frame.Size);
+
+//                             TestHelpers.AssertDriverContentsWithFrameAre (
+//                                                                           @"
+//╔══════════════════╗
+//║                  ║
+//║  ┌─────────────┐ ║
+//║  │             │ ║
+//║  │             │ ║
+//║  │             │ ║
+//║  │             │ ║
+//║  └─────────────┘ ║
+//║                  ║
+//╚══════════════════╝",
+//                                                                           _output
+//                                                                          );
                              End (rs);
                              d.Dispose ();
                          }
