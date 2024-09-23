@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using ColorHelper;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -20,7 +21,7 @@ public class Images : Scenario
     public override void Main ()
     {
         Application.Init ();
-        var win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName()}" };
+        var win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
 
         bool canTrueColor = Application.Driver?.SupportsTrueColor ?? false;
 
@@ -50,7 +51,7 @@ public class Images : Scenario
 
         var btnOpenImage = new Button { X = Pos.Right (cbUseTrueColor) + 2, Y = 0, Text = "Open Image" };
         win.Add (btnOpenImage);
-        
+
         var imageView = new ImageView
         {
             X = 0, Y = Pos.Bottom (lblDriverName), Width = Dim.Fill (), Height = Dim.Fill ()
@@ -105,17 +106,14 @@ public class Images : Scenario
                                    Application.Refresh ();
                                };
 
-
-
-        var btnSixel = new Button () { X = Pos.Right (btnOpenImage) + 2, Y = 0, Text = "Output Sixel" };
-        btnSixel.Accept += (s, e) => { imageView.OutputSixel ();};
+        var btnSixel = new Button { X = Pos.Right (btnOpenImage) + 2, Y = 0, Text = "Output Sixel" };
+        btnSixel.Accept += (s, e) => { imageView.OutputSixel (); };
         win.Add (btnSixel);
 
         Application.Run (win);
         win.Dispose ();
         Application.Shutdown ();
     }
-
 
     private class ImageView : View
     {
@@ -147,10 +145,10 @@ public class Images : Scenario
 
                     Attribute attr = _cache.GetOrAdd (
                                                       rgb,
-                                                      rgb => new Attribute (
-                                                                            new Color (),
-                                                                            new Color (rgb.R, rgb.G, rgb.B)
-                                                                           )
+                                                      rgb => new (
+                                                                  new Color (),
+                                                                  new Color (rgb.R, rgb.G, rgb.B)
+                                                                 )
                                                      );
 
                     Driver.SetAttribute (attr);
@@ -174,18 +172,18 @@ public class Images : Scenario
 
             var encoder = new SixelEncoder ();
 
-            var encoded = encoder.EncodeSixel (ConvertToColorArray (_fullResImage));
+            string encoded = encoder.EncodeSixel (ConvertToColorArray (_fullResImage));
 
             var pv = new PaletteView (encoder.Quantizer.Palette.ToList ());
 
-            var dlg = new Dialog ()
+            var dlg = new Dialog
             {
                 Title = "Palette (Esc to close)",
                 Width = Dim.Fill (2),
-                Height = Dim.Fill (1),
+                Height = Dim.Fill (1)
             };
 
-            var btn = new Button ()
+            var btn = new Button
             {
                 Text = "Ok"
             };
@@ -197,6 +195,7 @@ public class Images : Scenario
 
             Application.Sixel = encoded;
         }
+
         public static Color [,] ConvertToColorArray (Image<Rgba32> image)
         {
             int width = image.Width;
@@ -204,18 +203,19 @@ public class Images : Scenario
             Color [,] colors = new Color [width, height];
 
             // Loop through each pixel and convert Rgba32 to Terminal.Gui color
-            for (int x = 0; x < width; x++)
+            for (var x = 0; x < width; x++)
             {
-                for (int y = 0; y < height; y++)
+                for (var y = 0; y < height; y++)
                 {
-                    var pixel = image [x, y];
-                    colors [x, y] = new Color (pixel.R, pixel.G, pixel.B); // Convert Rgba32 to Terminal.Gui color
+                    Rgba32 pixel = image [x, y];
+                    colors [x, y] = new (pixel.R, pixel.G, pixel.B); // Convert Rgba32 to Terminal.Gui color
                 }
             }
 
             return colors;
         }
     }
+
     public class PaletteView : View
     {
         private List<Color> _palette;
@@ -231,20 +231,20 @@ public class Images : Scenario
         private (int columns, int rows) CalculateGridSize (Rectangle bounds)
         {
             // Characters are twice as wide as they are tall, so use 2:1 width-to-height ratio
-            int availableWidth = bounds.Width / 2;  // Each color block is 2 character wide
+            int availableWidth = bounds.Width / 2; // Each color block is 2 character wide
             int availableHeight = bounds.Height;
 
             int numColors = _palette.Count;
 
             // Calculate the number of columns and rows we can fit within the bounds
             int columns = Math.Min (availableWidth, numColors);
-            int rows = (numColors + columns - 1) / columns;  // Ceiling division for rows
+            int rows = (numColors + columns - 1) / columns; // Ceiling division for rows
 
             // Ensure we do not exceed the available height
             if (rows > availableHeight)
             {
                 rows = availableHeight;
-                columns = (numColors + rows - 1) / rows;  // Recalculate columns if needed
+                columns = (numColors + rows - 1) / rows; // Recalculate columns if needed
             }
 
             return (columns, rows);
@@ -255,13 +255,15 @@ public class Images : Scenario
             base.OnDrawContent (bounds);
 
             if (_palette == null || _palette.Count == 0)
+            {
                 return;
+            }
 
             // Calculate the grid size based on the bounds
-            var (columns, rows) = CalculateGridSize (bounds);
+            (int columns, int rows) = CalculateGridSize (bounds);
 
             // Draw the colors in the palette
-            for (int i = 0; i < _palette.Count && i < columns * rows; i++)
+            for (var i = 0; i < _palette.Count && i < columns * rows; i++)
             {
                 int row = i / columns;
                 int col = i % columns;
@@ -271,10 +273,10 @@ public class Images : Scenario
                 int y = row;
 
                 // Set the color attribute for the block
-                Driver.SetAttribute (new Terminal.Gui.Attribute (_palette [i], _palette [i]));
+                Driver.SetAttribute (new (_palette [i], _palette [i]));
 
                 // Draw the block (2 characters wide per block)
-                for (int dx = 0; dx < 2; dx++) // Fill the width of the block
+                for (var dx = 0; dx < 2; dx++) // Fill the width of the block
                 {
                     AddRune (x + dx, y, (Rune)' ');
                 }
@@ -287,5 +289,71 @@ public class Images : Scenario
             _palette = palette ?? new List<Color> ();
             SetNeedsDisplay ();
         }
+    }
+}
+
+public abstract class LabColorDistance : IColorDistance
+{
+    // Reference white point for D65 illuminant (can be moved to constants)
+    private const double RefX = 95.047;
+    private const double RefY = 100.000;
+    private const double RefZ = 108.883;
+
+    // Conversion from RGB to Lab
+    protected LabColor RgbToLab (Color c)
+    {
+        XYZ xyz = ColorConverter.RgbToXyz (new (c.R, c.G, c.B));
+
+        // Normalize XYZ values by reference white point
+        double x = xyz.X / RefX;
+        double y = xyz.Y / RefY;
+        double z = xyz.Z / RefZ;
+
+        // Apply the nonlinear transformation for Lab
+        x = x > 0.008856 ? Math.Pow (x, 1.0 / 3.0) : 7.787 * x + 16.0 / 116.0;
+        y = y > 0.008856 ? Math.Pow (y, 1.0 / 3.0) : 7.787 * y + 16.0 / 116.0;
+        z = z > 0.008856 ? Math.Pow (z, 1.0 / 3.0) : 7.787 * z + 16.0 / 116.0;
+
+        // Calculate Lab values
+        double l = 116.0 * y - 16.0;
+        double a = 500.0 * (x - y);
+        double b = 200.0 * (y - z);
+
+        return new (l, a, b);
+    }
+
+    // LabColor class encapsulating L, A, and B values
+    protected class LabColor
+    {
+        public double L { get; }
+        public double A { get; }
+        public double B { get; }
+
+        public LabColor (double l, double a, double b)
+        {
+            L = l;
+            A = a;
+            B = b;
+        }
+    }
+
+    /// <inheritdoc/>
+    public abstract double CalculateDistance (Color c1, Color c2);
+}
+
+/// <summary>
+///     This is the simplest method to measure color difference in the CIE Lab color space. The Euclidean distance in Lab
+///     space is more aligned with human perception than RGB space, as Lab attempts to model how humans perceive color
+///     differences.
+/// </summary>
+public class CIE76ColorDistance : LabColorDistance
+{
+    public override double CalculateDistance (Color c1, Color c2)
+    {
+        LabColor lab1 = RgbToLab (c1);
+        LabColor lab2 = RgbToLab (c2);
+
+        // Euclidean distance in Lab color space
+        return Math.Sqrt (Math.Pow (lab1.L - lab2.L, 2) + Math.Pow (lab1.A - lab2.A, 2) + Math.Pow (lab1.B - lab2.B, 2));
     }
 }
