@@ -131,12 +131,12 @@ public sealed class ArrangementEditor : View
 
         View? view = Application.Navigation!.GetFocused ();
 
-        if (ApplicationNavigation.IsInHierarchy (this, view))
+        if (IsInHierarchy (this, view))
         {
             return;
         }
 
-        if (!ApplicationNavigation.IsInHierarchy (AutoSelectSuperView, view))
+        if (!IsInHierarchy (AutoSelectSuperView, view))
         {
             return;
         }

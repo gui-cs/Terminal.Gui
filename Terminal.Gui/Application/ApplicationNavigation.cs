@@ -30,67 +30,6 @@ public class ApplicationNavigation
     public View? GetFocused () { return _focused; }
 
     /// <summary>
-    ///     Gets whether <paramref name="view"/> is in the Subview hierarchy of <paramref name="start"/>.
-    /// </summary>
-    /// <param name="start"></param>
-    /// <param name="view"></param>
-    /// <param name="includeAdornments">Will search the subview hierarchy of the adornments if true.</param>
-    /// <returns></returns>
-    public static bool IsInHierarchy (View? start, View? view, bool includeAdornments = false)
-    {
-        if (view is null)
-        {
-            return false;
-        }
-
-        if (view == start || start is null)
-        {
-            return true;
-        }
-
-        foreach (View subView in start.Subviews)
-        {
-            if (view == subView)
-            {
-                return true;
-            }
-
-            bool found = IsInHierarchy (subView, view, includeAdornments);
-
-            if (found)
-            {
-                return found;
-            }
-        }
-
-        if (includeAdornments)
-        {
-            bool found = IsInHierarchy (start.Padding, view, includeAdornments);
-
-            if (found)
-            {
-                return found;
-            }
-
-            found = IsInHierarchy (start.Border, view, includeAdornments);
-
-            if (found)
-            {
-                return found;
-            }
-
-            found = IsInHierarchy (start.Margin, view, includeAdornments);
-
-            if (found)
-            {
-                return found;
-            }
-        }
-
-        return false;
-    }
-
-    /// <summary>
     ///     INTERNAL method to record the most focused <see cref="View"/> in the application.
     /// </summary>
     /// <remarks>

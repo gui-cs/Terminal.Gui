@@ -243,6 +243,67 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         return top;
     }
 
+    /// <summary>
+    ///     Gets whether <paramref name="view"/> is in the Subview hierarchy of <paramref name="start"/>.
+    /// </summary>
+    /// <param name="start"></param>
+    /// <param name="view"></param>
+    /// <param name="includeAdornments">Will search the subview hierarchy of the adornments if true.</param>
+    /// <returns></returns>
+    public static bool IsInHierarchy (View? start, View? view, bool includeAdornments = false)
+    {
+        if (view is null)
+        {
+            return false;
+        }
+
+        if (view == start || start is null)
+        {
+            return true;
+        }
+
+        foreach (View subView in start.Subviews)
+        {
+            if (view == subView)
+            {
+                return true;
+            }
+
+            bool found = IsInHierarchy (subView, view, includeAdornments);
+
+            if (found)
+            {
+                return found;
+            }
+        }
+
+        if (includeAdornments)
+        {
+            bool found = IsInHierarchy (start.Padding, view, includeAdornments);
+
+            if (found)
+            {
+                return found;
+            }
+
+            found = IsInHierarchy (start.Border, view, includeAdornments);
+
+            if (found)
+            {
+                return found;
+            }
+
+            found = IsInHierarchy (start.Margin, view, includeAdornments);
+
+            if (found)
+            {
+                return found;
+            }
+        }
+
+        return false;
+    }
+
     #region SubViewOrdering
 
     /// <summary>

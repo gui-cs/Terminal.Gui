@@ -153,7 +153,7 @@ public static partial class Application // Mouse handling
         }
 
         if (Popover is { Visible: true }
-            && Popover != deepestViewUnderMouse
+            && View.IsInHierarchy (Popover, deepestViewUnderMouse, includeAdornments: true) is false
             && (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
                 || mouseEvent.Flags.HasFlag (MouseFlags.Button2Pressed)
                 || mouseEvent.Flags.HasFlag (MouseFlags.Button3Pressed)))
