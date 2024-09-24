@@ -101,7 +101,7 @@ internal sealed class Menu : View
 
             for (var i = 0; i < _barItems.Children?.Length; i++)
             {
-                if (_barItems.Children [i]!.IsEnabled ())
+                if (_barItems.Children [i]?.IsEnabled () == true)
                 {
                     _currentChild = i;
 
