@@ -646,6 +646,11 @@ public partial class View // Mouse APIs
 
         View? start = Application.Top;
 
+        if (Application.Popover?.Visible == true)
+        {
+            start = Application.Popover;
+        }
+
         Point currentLocation = location;
 
         while (start is { Visible: true } && start.Contains (currentLocation))

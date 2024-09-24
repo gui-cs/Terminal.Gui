@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -12,6 +11,8 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 public class Bars : Scenario
 {
+    private Menuv2 _popoverMenu;
+
     public override void Main ()
     {
         Application.Init ();
@@ -19,7 +20,13 @@ public class Bars : Scenario
 
         app.Loaded += App_Loaded;
 
+        _popoverMenu = new Menuv2
+        {
+            Id = "popoverMenu",
+        };
+
         Application.Run (app);
+        _popoverMenu.Dispose ();
         app.Dispose ();
         Application.Shutdown ();
     }
@@ -141,23 +148,16 @@ public class Bars : Scenario
 
         label = new Label ()
         {
-            Title = "PopOver Menu (Right click to show):",
+            Title = "Popover Menu (Right click to show):",
             X = Pos.Right (bar) + 1,
             Y = Pos.Top (label),
         };
         menuLikeExamples.Add (label);
 
-        Menuv2 popOverMenu  = new Menuv2
-        {
-            Id = "popupMenu",
-            X = Pos.Left (label),
-            Y = Pos.Bottom (label),
-        };
-        ConfigureMenu (popOverMenu);
+        ConfigureMenu (_popoverMenu);
 
-        popOverMenu.Arrangement = ViewArrangement.Overlapped;
-        popOverMenu.Visible = false;
-        //popOverMenu.Enabled = false;
+        _popoverMenu.ColorScheme = Colors.ColorSchemes ["Menu"];
+        _popoverMenu.Visible = false;
 
         var toggleShortcut = new Shortcut
         {
@@ -166,24 +166,31 @@ public class Bars : Scenario
             KeyBindingScope = KeyBindingScope.Application,
             Key = Key.F4.WithCtrl,
         };
-        popOverMenu.Add (toggleShortcut);
+        _popoverMenu.Add (toggleShortcut);
 
-        popOverMenu.Accept += PopOverMenuOnAccept;
+        _popoverMenu.Accept += PopoverMenuOnAccept;
 
-        void PopOverMenuOnAccept (object o, HandledEventArgs handledEventArgs)
+        void PopoverMenuOnAccept (object o, HandledEventArgs handledEventArgs)
         {
-            if (popOverMenu.Visible)
+            if (_popoverMenu.Visible)
             {
-                popOverMenu.Visible = false;
+                _popoverMenu.Visible = false;
             }
             else
             {
-                popOverMenu.Visible = true;
-                popOverMenu.SetFocus ();
+                _popoverMenu.Visible = true;
             }
         }
 
-        menuLikeExamples.Add (popOverMenu);
+        foreach (Shortcut sh in _popoverMenu.Subviews.Where (s => s is Shortcut)!)
+        {
+            sh.Accept += (o, args) =>
+                         {
+                             eventSource.Add ($"Accept: {sh!.SuperView.Id} {sh!.CommandView.Text}");
+                             eventLog.MoveDown ();
+                             //args.Handled = true;
+                         };
+        }
 
         menuLikeExamples.MouseClick += MenuLikeExamplesMouseClick;
 
@@ -191,16 +198,11 @@ public class Bars : Scenario
         {
             if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
             {
-                popOverMenu.X = e.MouseEvent.Position.X;
-                popOverMenu.Y = e.MouseEvent.Position.Y;
-                popOverMenu.Visible = true;
-                //popOverMenu.Enabled = popOverMenu.Visible;
-                popOverMenu.SetFocus ();
-            }
-            else
-            {
-                popOverMenu.Visible = false;
-                //popOverMenu.Enabled = popOverMenu.Visible;
+                Application.Popover = _popoverMenu;
+
+                _popoverMenu.X = e.MouseEvent.ScreenPosition.X;
+                _popoverMenu.Y = e.MouseEvent.ScreenPosition.Y;
+                _popoverMenu.Visible = true;
             }
         }
 
@@ -417,6 +419,31 @@ public class Bars : Scenario
             Key = Key.D0.WithAlt,
             HighlightStyle = HighlightStyle.Hover
         };
+
+        fileMenuBarItem.Accept += (sender, args) =>
+                                  {
+                                      var fileMenu = new Menuv2
+                                      {
+                                          Id = "fileMenu",
+                                      };
+                                      ConfigureMenu (fileMenu);
+                                      fileMenu.VisibleChanged += (sender, args) =>
+                                                                 {
+                                                                     if (Application.Popover is { Visible: false })
+                                                                     {
+                                                                         Application.Popover?.Dispose ();
+                                                                         Application.Popover = null;
+                                                                     }
+                                                                 };
+                                      Application.Popover = fileMenu;
+                                      Rectangle screen = fileMenuBarItem.FrameToScreen ();
+                                      fileMenu.X = screen.X;
+                                      fileMenu.Y = screen.Y + screen.Height;
+                                      fileMenu.Visible = true;
+
+                                  };
+
+
 
         var editMenuBarItem = new Shortcut
         {

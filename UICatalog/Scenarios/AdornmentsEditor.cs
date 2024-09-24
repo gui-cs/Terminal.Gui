@@ -95,12 +95,12 @@ public class AdornmentsEditor : View
             return;
         }
 
-        if (ApplicationNavigation.IsInHierarchy (this, Application.Navigation!.GetFocused ()))
+        if (IsInHierarchy (this, Application.Navigation!.GetFocused ()))
         {
             return;
         }
 
-        if (!ApplicationNavigation.IsInHierarchy (AutoSelectSuperView, Application.Navigation!.GetFocused ()))
+        if (!IsInHierarchy (AutoSelectSuperView, Application.Navigation!.GetFocused ()))
         {
             return;
         }

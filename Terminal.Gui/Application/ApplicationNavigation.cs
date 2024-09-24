@@ -27,42 +27,9 @@ public class ApplicationNavigation
     /// <summary>
     ///     Gets the most focused <see cref="View"/> in the application, if there is one.
     /// </summary>
-    public View? GetFocused () { return _focused; }
-
-    /// <summary>
-    ///     Gets whether <paramref name="view"/> is in the Subview hierarchy of <paramref name="start"/>.
-    /// </summary>
-    /// <param name="start"></param>
-    /// <param name="view"></param>
-    /// <returns></returns>
-    public static bool IsInHierarchy (View? start, View? view)
+    public View? GetFocused ()
     {
-        if (view is null)
-        {
-            return false;
-        }
-
-        if (view == start || start is null)
-        {
-            return true;
-        }
-
-        foreach (View subView in start.Subviews)
-        {
-            if (view == subView)
-            {
-                return true;
-            }
-
-            bool found = IsInHierarchy (subView, view);
-
-            if (found)
-            {
-                return found;
-            }
-        }
-
-        return false;
+        return _focused;
     }
 
     /// <summary>
@@ -73,6 +40,10 @@ public class ApplicationNavigation
     /// </remarks>
     internal void SetFocused (View? value)
     {
+        if (value is null)
+        {
+
+        }
         if (_focused == value)
         {
             return;
@@ -100,6 +71,10 @@ public class ApplicationNavigation
     /// </returns>
     public bool AdvanceFocus (NavigationDirection direction, TabBehavior? behavior)
     {
+        if (Application.Popover is { Visible: true })
+        {
+            Application.Popover.AdvanceFocus (direction, behavior);
+        }
         return Application.Top is { } && Application.Top.AdvanceFocus (direction, behavior);
     }
 }

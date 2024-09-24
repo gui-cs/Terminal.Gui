@@ -168,10 +168,20 @@ public static partial class Application // Mouse handling
         // avoid one or two of these checks in the process, as well.
 
         WantContinuousButtonPressedView = deepestViewUnderMouse switch
+                                          {
+                                              { WantContinuousButtonPressed: true } => deepestViewUnderMouse,
+                                              _ => null
+                                          };
+
+
+        if (Popover is { Visible: true }
+            && View.IsInHierarchy (Popover, deepestViewUnderMouse, includeAdornments: true) is false
+            && (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
+                || mouseEvent.Flags.HasFlag (MouseFlags.Button2Pressed)
+                || mouseEvent.Flags.HasFlag (MouseFlags.Button3Pressed)))
         {
-            { WantContinuousButtonPressed: true } => deepestViewUnderMouse,
-            _ => null
-        };
+            Popover.Visible = false;
+        }
 
         // May be null before the prior condition or the condition may set it as null.
         // So, the checking must be outside the prior condition.
@@ -210,6 +220,7 @@ public static partial class Application // Mouse handling
         else
         {
             Debug.Fail ("This should never happen");
+
             return;
         }
 
@@ -219,9 +230,7 @@ public static partial class Application // Mouse handling
 
         //Debug.WriteLine ($"OnMouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags}");
         if (deepestViewUnderMouse.Id == "mouseDemo")
-        {
-
-        }
+        { }
 
         while (deepestViewUnderMouse.NewMouseEvent (me) is not true && MouseGrabView is not { })
         {
@@ -255,13 +264,13 @@ public static partial class Application // Mouse handling
     {
         if (MouseGrabView is { })
         {
-
 #if DEBUG_IDISPOSABLE
             if (MouseGrabView.WasDisposed)
             {
                 throw new ObjectDisposedException (MouseGrabView.GetType ().FullName);
             }
 #endif
+
             // If the mouse is grabbed, send the event to the view that grabbed it.
             // The coordinates are relative to the Bounds of the view that grabbed the mouse.
             Point frameLoc = MouseGrabView.ScreenToViewport (mouseEvent.Position);
@@ -303,6 +312,7 @@ public static partial class Application // Mouse handling
     {
         // Tell any views that are no longer under the mouse that the mouse has left
         List<View?> viewsToLeave = _cachedViewsUnderMouse.Where (v => v is { } && !currentViewsUnderMouse.Contains (v)).ToList ();
+
         foreach (View? view in viewsToLeave)
         {
             if (view is null)
@@ -328,7 +338,8 @@ public static partial class Application // Mouse handling
             }
 
             _cachedViewsUnderMouse.Add (view);
-            bool raise = false;
+            var raise = false;
+
             if (view is Adornment { Parent: { } } adornmentView)
             {
                 Point superViewLoc = adornmentView.Parent.SuperView?.ScreenToViewport (screenPosition) ?? screenPosition;
