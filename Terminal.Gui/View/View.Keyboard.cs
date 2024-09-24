@@ -579,6 +579,13 @@ public partial class View // Keyboard APIs
 
     private bool ProcessAdornmentKeyBindings (Adornment adornment, Key keyEvent, KeyBindingScope scope, ref bool? handled)
     {
+        bool? adornmentHandled = adornment.OnInvokingKeyBindings (keyEvent, scope);
+
+        if (adornmentHandled is true)
+        {
+            return true;
+        }
+
         if (adornment?.Subviews is null)
         {
             return false;

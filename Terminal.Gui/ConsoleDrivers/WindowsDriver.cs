@@ -72,7 +72,7 @@ internal class WindowsConsole
                 {
                     Char = new CharUnion { UnicodeChar = info.Char },
                     Attributes =
-                        (ushort)((int)info.Attribute.Foreground.GetClosestNamedColor () | ((int)info.Attribute.Background.GetClosestNamedColor () << 4))
+                        (ushort)((int)info.Attribute.Foreground.GetClosestNamedColor16 () | ((int)info.Attribute.Background.GetClosestNamedColor16 () << 4))
                 };
             }
 

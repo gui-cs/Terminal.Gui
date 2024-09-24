@@ -54,7 +54,6 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         Id = "_shortcut";
         HighlightStyle = HighlightStyle.Pressed;
-        Highlight += Shortcut_Highlight;
         CanFocus = true;
         Width = GetWidthDimAuto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
@@ -147,7 +146,16 @@ public class Shortcut : View, IOrientation, IDesignable
     // This is used to calculate the minimum width of the Shortcut when the width is NOT Dim.Auto
     private int? _minimumDimAutoWidth;
 
-    private Color? _savedForeColor;
+    /// <inheritdoc />
+    protected override bool OnHighlight (CancelEventArgs<HighlightStyle> args)
+    {
+        if (args.NewValue.HasFlag (HighlightStyle.Hover))
+        {
+            HasFocus = true;
+        }
+
+        return true;
+    }
 
     /// <inheritdoc/>
     public bool EnableForDesign ()
@@ -324,35 +332,6 @@ public class Shortcut : View, IOrientation, IDesignable
         return false;
     }
 
-    private void Shortcut_Highlight (object sender, CancelEventArgs<HighlightStyle> e)
-    {
-        if (e.CurrentValue.HasFlag (HighlightStyle.Pressed))
-        {
-            if (!_savedForeColor.HasValue)
-            {
-                _savedForeColor = base.ColorScheme.Normal.Foreground;
-            }
-
-            var cs = new ColorScheme (base.ColorScheme)
-            {
-                Normal = new (ColorScheme.Normal.Foreground.GetHighlightColor (), base.ColorScheme.Normal.Background)
-            };
-            base.ColorScheme = cs;
-        }
-
-        if (e.CurrentValue == HighlightStyle.None && _savedForeColor.HasValue)
-        {
-            var cs = new ColorScheme (base.ColorScheme)
-            {
-                Normal = new (_savedForeColor.Value, base.ColorScheme.Normal.Background)
-            };
-            base.ColorScheme = cs;
-        }
-
-        SuperView?.SetNeedsDisplay ();
-        e.Cancel = true;
-    }
-
     private void Shortcut_MouseClick (object sender, MouseEventEventArgs e)
     {
         // When the Shortcut is clicked, we want to invoke the Command and Set focus
@@ -507,6 +486,7 @@ public class Shortcut : View, IOrientation, IDesignable
         CommandView.Margin.Thickness = GetMarginThickness ();
         CommandView.X = Pos.Align (Alignment.End, AlignmentModes);
         CommandView.Y = 0; //Pos.Center ();
+        HelpView.HighlightStyle = HighlightStyle.None;
     }
 
     private void Shortcut_TitleChanged (object sender, EventArgs<string> e)
@@ -536,6 +516,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
         HelpView.Visible = true;
         HelpView.VerticalTextAlignment = Alignment.Center;
+        HelpView.HighlightStyle = HighlightStyle.None;
     }
 
     /// <summary>
@@ -677,6 +658,7 @@ public class Shortcut : View, IOrientation, IDesignable
         KeyView.TextAlignment = Alignment.End;
         KeyView.VerticalTextAlignment = Alignment.Center;
         KeyView.KeyBindings.Clear ();
+        HelpView.HighlightStyle = HighlightStyle.None;
     }
 
     private void UpdateKeyBinding (Key oldKey)
@@ -803,12 +785,12 @@ public class Shortcut : View, IOrientation, IDesignable
 
     /// <summary>
     /// </summary>
-    internal void SetColors ()
+    internal void SetColors (bool highlight = false)
     {
         // Border should match superview.
         Border.ColorScheme = SuperView?.ColorScheme;
 
-        if (HasFocus)
+        if (HasFocus || highlight)
         {
             base.ColorScheme ??= new (Attribute.Default);
 

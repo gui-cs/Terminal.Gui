@@ -10,6 +10,7 @@ public class ApplicationTests
     {
         _output = output;
         ConsoleDriver.RunningUnitTests = true;
+        ConfigurationManager.Locations = ConfigurationManager.ConfigLocations.None;
 
 #if DEBUG_IDISPOSABLE
         Responder.Instances.Clear ();
@@ -221,12 +222,10 @@ public class ApplicationTests
         Assert.Equal (rs, runstate);
 
         Assert.Equal (topLevel, Application.Top);
-        Assert.Equal (topLevel, Application.Current);
 
         Application.NotifyNewRunState -= newRunStateFn;
         Application.End (runstate);
 
-        Assert.Null (Application.Current);
         Assert.NotNull (Application.Top);
         Assert.NotNull (Application.MainLoop);
         Assert.NotNull (Application.Driver);
@@ -291,7 +290,6 @@ public class ApplicationTests
 
             // Public Properties
             Assert.Null (Application.Top);
-            Assert.Null (Application.Current);
             Assert.Null (Application.MouseGrabView);
             Assert.Null (Application.WantContinuousButtonPressedView);
 
@@ -307,8 +305,6 @@ public class ApplicationTests
             Assert.Equal (Key.F6.WithShift, Application.PrevTabGroupKey);
             Assert.Equal (Key.F6, Application.NextTabGroupKey);
             Assert.Equal (Key.Esc, Application.QuitKey);
-            Assert.Null (ApplicationOverlapped.OverlappedChildren);
-            Assert.Null (ApplicationOverlapped.OverlappedTop);
 
             // Internal properties
             Assert.False (Application.IsInitialized);
@@ -317,7 +313,7 @@ public class ApplicationTests
             Assert.False (Application._forceFakeConsole);
             Assert.Equal (-1, Application.MainThreadId);
             Assert.Empty (Application.TopLevels);
-            Assert.Null (Application.MouseEnteredView);
+            Assert.Empty (Application._cachedViewsUnderMouse);
 
             // Keyboard
             Assert.Empty (Application.GetViewKeyBindings ());
@@ -347,7 +343,7 @@ public class ApplicationTests
         Application.MainThreadId = 1;
 
         //Application._topLevels = new List<Toplevel> ();
-        Application.MouseEnteredView = new ();
+        Application._cachedViewsUnderMouse.Clear ();
 
         //Application.SupportedCultures = new List<CultureInfo> ();
         Application.Force16Colors = true;
@@ -361,7 +357,7 @@ public class ApplicationTests
 
         //ApplicationOverlapped.OverlappedChildren = new List<View> ();
         //ApplicationOverlapped.OverlappedTop = 
-        Application.MouseEnteredView = new ();
+        Application._cachedViewsUnderMouse.Clear ();
 
         //Application.WantContinuousButtonPressedView = new View ();
 
@@ -395,6 +391,12 @@ public class ApplicationTests
         // 'app' closed cleanly.
         Assert.Empty (Responder.Instances);
 #endif
+    }
+
+    [Fact]
+    public void Shutdown_Alone_Does_Nothing ()
+    {
+        Application.Shutdown ();
     }
 
     [Theory]
@@ -489,12 +491,10 @@ public class ApplicationTests
         Assert.Equal (rs, runstate);
 
         Assert.Equal (topLevel, Application.Top);
-        Assert.Equal (topLevel, Application.Current);
 
         Application.NotifyNewRunState -= newRunStateFn;
         Application.End (runstate);
 
-        Assert.Null (Application.Current);
         Assert.NotNull (Application.Top);
         Assert.NotNull (Application.MainLoop);
         Assert.NotNull (Application.Driver);
@@ -526,7 +526,6 @@ public class ApplicationTests
         Assert.Equal (Application.Top, rs.Toplevel);
         Assert.Null (Application.MouseGrabView); // public
         Assert.Null (Application.WantContinuousButtonPressedView); // public
-        Assert.False (ApplicationOverlapped.MoveToOverlappedChild (Application.Top!));
         Application.Top.Dispose ();
     }
 
@@ -576,113 +575,6 @@ public class ApplicationTests
         }
     }
 
-    [Fact]
-    [AutoInitShutdown]
-    public void SetCurrentAsTop_Run_A_Not_Modal_Toplevel_Make_It_The_Current_Application_Top ()
-    {
-        var top = new Toplevel ();
-
-        var t1 = new Toplevel ();
-        var t2 = new Toplevel ();
-        var t3 = new Toplevel ();
-
-        // Don't use Dialog here as it has more layout logic. Use Window instead.
-        var d = new Dialog ();
-        var t4 = new Toplevel ();
-
-        // t1, t2, t3, d, t4
-        var iterations = 5;
-
-        t1.Ready += (s, e) =>
-                    {
-                        Assert.Equal (t1, Application.Top);
-                        Application.Run (t2);
-                    };
-
-        t2.Ready += (s, e) =>
-                    {
-                        Assert.Equal (t2, Application.Top);
-                        Application.Run (t3);
-                    };
-
-        t3.Ready += (s, e) =>
-                    {
-                        Assert.Equal (t3, Application.Top);
-                        Application.Run (d);
-                    };
-
-        d.Ready += (s, e) =>
-                   {
-                       Assert.Equal (t3, Application.Top);
-                       Application.Run (t4);
-                   };
-
-        t4.Ready += (s, e) =>
-                    {
-                        Assert.Equal (t4, Application.Top);
-                        t4.RequestStop ();
-                        d.RequestStop ();
-                        t3.RequestStop ();
-                        t2.RequestStop ();
-                    };
-
-        // Now this will close the OverlappedContainer when all OverlappedChildren was closed
-        t2.Closed += (s, _) => { t1.RequestStop (); };
-
-        Application.Iteration += (s, a) =>
-                                 {
-                                     if (iterations == 5)
-                                     {
-                                         // The Current still is t4 because Current.Running is false.
-                                         Assert.Equal (t4, Application.Current);
-                                         Assert.False (Application.Current.Running);
-                                         Assert.Equal (t4, Application.Top);
-                                     }
-                                     else if (iterations == 4)
-                                     {
-                                         // The Current is d and Current.Running is false.
-                                         Assert.Equal (d, Application.Current);
-                                         Assert.False (Application.Current.Running);
-                                         Assert.Equal (t4, Application.Top);
-                                     }
-                                     else if (iterations == 3)
-                                     {
-                                         // The Current is t3 and Current.Running is false.
-                                         Assert.Equal (t3, Application.Current);
-                                         Assert.False (Application.Current.Running);
-                                         Assert.Equal (t3, Application.Top);
-                                     }
-                                     else if (iterations == 2)
-                                     {
-                                         // The Current is t2 and Current.Running is false.
-                                         Assert.Equal (t2, Application.Current);
-                                         Assert.False (Application.Current.Running);
-                                         Assert.Equal (t2, Application.Top);
-                                     }
-                                     else
-                                     {
-                                         // The Current is t1.
-                                         Assert.Equal (t1, Application.Current);
-                                         Assert.False (Application.Current.Running);
-                                         Assert.Equal (t1, Application.Top);
-                                     }
-
-                                     iterations--;
-                                 };
-
-        Application.Run (t1);
-
-        Assert.Equal (t1, Application.Top);
-
-        // top wasn't run and so never was added to toplevel's stack
-        Assert.NotEqual (top, Application.Top);
-#if DEBUG_IDISPOSABLE
-        Assert.False (Application.Top.WasDisposed);
-        t1.Dispose ();
-        Assert.True (Application.Top.WasDisposed);
-#endif
-    }
-
     private void Init ()
     {
         Application.Init (new FakeDriver ());
@@ -691,32 +583,7 @@ public class ApplicationTests
         Assert.NotNull (SynchronizationContext.Current);
     }
 
-    private void Post_Init_State ()
-    {
-        Assert.NotNull (Application.Driver);
-        Assert.NotNull (Application.Top);
-        Assert.NotNull (Application.Current);
-        Assert.NotNull (Application.MainLoop);
-
-        // FakeDriver is always 80x25
-        Assert.Equal (80, Application.Driver!.Cols);
-        Assert.Equal (25, Application.Driver!.Rows);
-    }
-
-    private void Pre_Init_State ()
-    {
-        Assert.Null (Application.Driver);
-        Assert.Null (Application.Top);
-        Assert.Null (Application.Current);
-        Assert.Null (Application.MainLoop);
-    }
-
     private void Shutdown () { Application.Shutdown (); }
-
-    private class TestToplevel : Toplevel
-    {
-        public TestToplevel () { IsOverlappedContainer = false; }
-    }
 
     #region RunTests
 
@@ -787,7 +654,7 @@ public class ApplicationTests
                                      Application.RequestStop ();
                                  };
 
-        Application.Run<TestToplevel> ();
+        Application.Run<Toplevel> ();
 
 #if DEBUG_IDISPOSABLE
         Assert.False (initTop.WasDisposed);
@@ -812,7 +679,7 @@ public class ApplicationTests
         Application.Iteration += (s, a) => { Application.RequestStop (); };
 
         // Init has been called and we're passing no driver to Run<TestTopLevel>. This is ok.
-        Application.Run<TestToplevel> ();
+        Application.Run<Toplevel> ();
 
         Application.Top.Dispose ();
         Shutdown ();
@@ -834,7 +701,7 @@ public class ApplicationTests
         Application.Iteration += (s, a) => { Application.RequestStop (); };
 
         // Init has been called, selecting FakeDriver; we're passing no driver to Run<TestTopLevel>. Should be fine.
-        Application.Run<TestToplevel> ();
+        Application.Run<Toplevel> ();
 
         Application.Top.Dispose ();
         Shutdown ();
@@ -853,7 +720,7 @@ public class ApplicationTests
         Application.Driver = null;
 
         // Init has been called, but Driver has been set to null. Bad.
-        Assert.Throws<InvalidOperationException> (() => Application.Run<TestToplevel> ());
+        Assert.Throws<InvalidOperationException> (() => Application.Run<Toplevel> ());
 
         Shutdown ();
 
@@ -870,7 +737,7 @@ public class ApplicationTests
 
         Application.Iteration += (s, a) => { Application.RequestStop (); };
 
-        Application.Run<TestToplevel> ();
+        Application.Run<Toplevel> ();
         Assert.Equal (typeof (FakeDriver), Application.Driver?.GetType ());
 
         Application.Top.Dispose ();
@@ -888,7 +755,7 @@ public class ApplicationTests
         Application.Iteration += (s, a) => { Application.RequestStop (); };
 
         // Init has NOT been called and we're passing a valid driver to Run<TestTopLevel>. This is ok.
-        Application.Run<TestToplevel> (null, new FakeDriver ());
+        Application.Run<Toplevel> (null, new FakeDriver ());
 
         Application.Top.Dispose ();
         Shutdown ();
@@ -908,7 +775,6 @@ public class ApplicationTests
         var top = new Toplevel ();
         RunState rs = Application.Begin (top);
         Assert.NotNull (rs);
-        Assert.Equal (top, Application.Current);
 
         Application.Iteration += (s, a) => { Application.RequestStop (); };
 
@@ -916,7 +782,6 @@ public class ApplicationTests
 
         top.Dispose ();
         Application.Shutdown ();
-        Assert.Null (Application.Current);
         Assert.Null (Application.Top);
         Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
@@ -932,7 +797,6 @@ public class ApplicationTests
         var top = new Toplevel ();
         RunState rs = Application.Begin (top);
         Assert.NotNull (rs);
-        Assert.Equal (top, Application.Current);
 
         Application.Iteration += (s, a) => { top.Running = false; };
 
@@ -940,7 +804,6 @@ public class ApplicationTests
 
         top.Dispose ();
         Application.Shutdown ();
-        Assert.Null (Application.Current);
         Assert.Null (Application.Top);
         Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
@@ -948,7 +811,7 @@ public class ApplicationTests
 
     [Fact]
     [TestRespondersDisposed]
-    public void Run_Loaded_Ready_Unlodaded_Events ()
+    public void Run_Loaded_Ready_Unloaded_Events ()
     {
         Init ();
         Toplevel top = new ();
@@ -964,7 +827,7 @@ public class ApplicationTests
     }
 
     // TODO: All Toplevel layout tests should be moved to ToplevelTests.cs
-    [Fact (Skip = "#2491 - Changing focus should cause NeedsDispay = true, so bogus test?")]
+    [Fact (Skip = "#2491 - Changing focus should cause NeedsDisplay = true, so bogus test?")]
     public void Run_Toplevel_With_Modal_View_Does_Not_Refresh_If_Not_Dirty ()
     {
         Init ();
@@ -1061,7 +924,6 @@ public class ApplicationTests
         Assert.NotNull (Application.Top);
         Assert.Equal (w, Application.Top);
         Assert.NotEqual (top, Application.Top);
-        Assert.Null (Application.Current);
 
         Application.Run (w); // Valid - w has not been disposed.
 
@@ -1085,7 +947,6 @@ public class ApplicationTests
 #endif
         Application.Shutdown ();
         Assert.NotNull (w);
-        Assert.Null (Application.Current);
         Assert.NotNull (top);
         Assert.Null (Application.Top);
     }

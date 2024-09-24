@@ -25,3 +25,8 @@ When the user does something with the mouse, the `ConsoleDriver` maps the platfo
 ## **Global Mouse Handling**
 
 The @Terminal.Gui.Application.MouseEvent event can be used if an application wishes to receive all mouse events.
+
+## Mouse Enter/Leave Events
+
+The @Terminal.Gui.View.MouseEnter and @Terminal.Gui.View.MouseLeave events enable a View to take action when the mouse is over the view. Internally, this is used to enable @Terminal.Gui.View.Highlight.
+

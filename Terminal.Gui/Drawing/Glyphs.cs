@@ -106,6 +106,27 @@ public class GlyphDefinitions
     /// <summary>Identical To (U+226)</summary>
     public Rune IdenticalTo { get; set; } = (Rune)'≡';
 
+    /// <summary>Move indicator. Default is Lozenge (U+25CA) - ◊.</summary>
+    public Rune Move { get; set; } = (Rune)'◊';
+
+    /// <summary>Size Horizontally indicator. Default is ┥Left Right Arrow - ↔ U+02194</summary>
+    public Rune SizeHorizontal { get; set; } = (Rune)'↔';
+    
+    /// <summary>Size Vertical indicator. Default Up Down Arrow - ↕ U+02195</summary>
+    public Rune SizeVertical { get; set; } = (Rune)'↕';
+
+    /// <summary>Size Top Left indicator. North West Arrow - ↖ U+02196</summary>
+    public Rune SizeTopLeft { get; set; } = (Rune)'↖';
+
+    /// <summary>Size Top Right indicator. North East Arrow - ↗ U+02197</summary>
+    public Rune SizeTopRight { get; set; } = (Rune)'↗';
+
+    /// <summary>Size Bottom Right indicator. South East Arrow - ↘ U+02198</summary>
+    public Rune SizeBottomRight { get; set; } = (Rune)'↘';
+
+    /// <summary>Size Bottom Left indicator. South West Arrow - ↙ U+02199</summary>
+    public Rune SizeBottomLLeft { get; set; } = (Rune)'↙';
+    
     /// <summary>Apple (non-BMP). Because snek. And because it's an example of a non-BMP surrogate pair. See Issue #2610.</summary>
     public Rune Apple { get; set; } = "🍎".ToRunes () [0]; // nonBMP
 

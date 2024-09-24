@@ -591,7 +591,13 @@ public abstract class ConsoleDriver
 
     /// <summary>Called when a mouse event occurs. Fires the <see cref="MouseEvent"/> event.</summary>
     /// <param name="a"></param>
-    public void OnMouseEvent (MouseEvent a) { MouseEvent?.Invoke (this, a); }
+    public void OnMouseEvent (MouseEvent a)
+    {
+        // Ensure ScreenPosition is set
+        a.ScreenPosition = a.Position;
+
+        MouseEvent?.Invoke (this, a);
+    }
 
     /// <summary>Simulates a key press.</summary>
     /// <param name="keyChar">The key character.</param>

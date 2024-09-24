@@ -1,5 +1,6 @@
 #nullable enable
 using System.Diagnostics;
+using Microsoft.CodeAnalysis;
 
 namespace Terminal.Gui;
 
@@ -12,83 +13,7 @@ public partial class View // Layout APIs
     /// <returns><see langword="true"/> if the specified SuperView-relative coordinates are within the View.</returns>
     public virtual bool Contains (in Point location) { return Frame.Contains (location); }
 
-    /// <summary>Finds the first Subview of <paramref name="start"/> that is visible at the provided location.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         Used to determine what view the mouse is over.
-    ///     </para>
-    /// </remarks>
-    /// <param name="start">The view to scope the search by.</param>
-    /// <param name="location"><paramref name="start"/>.SuperView-relative coordinate.</param>
-    /// <returns>
-    ///     The view that was found at the <paramref name="location"/> coordinate.
-    ///     <see langword="null"/> if no view was found.
-    /// </returns>
-
-    // CONCURRENCY: This method is not thread-safe. Undefined behavior and likely program crashes are exposed by unsynchronized access to InternalSubviews.
-    internal static View? FindDeepestView (View? start, in Point location)
-    {
-        Point currentLocation = location;
-
-        while (start is { Visible: true } && start.Contains (currentLocation))
-        {
-            Adornment? found = null;
-
-            if (start.Margin.Contains (currentLocation))
-            {
-                found = start.Margin;
-            }
-            else if (start.Border.Contains (currentLocation))
-            {
-                found = start.Border;
-            }
-            else if (start.Padding.Contains (currentLocation))
-            {
-                found = start.Padding;
-            }
-
-            Point viewportOffset = start.GetViewportOffsetFromFrame ();
-
-            if (found is { })
-            {
-                start = found;
-                viewportOffset = found.Parent?.Frame.Location ?? Point.Empty;
-            }
-
-            int startOffsetX = currentLocation.X - (start.Frame.X + viewportOffset.X);
-            int startOffsetY = currentLocation.Y - (start.Frame.Y + viewportOffset.Y);
-
-            View? subview = null;
-
-            for (int i = start.InternalSubviews.Count - 1; i >= 0; i--)
-            {
-                if (start.InternalSubviews [i].Visible
-                    && start.InternalSubviews [i].Contains (new (startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y)))
-                {
-                    subview = start.InternalSubviews [i];
-                    currentLocation.X = startOffsetX + start.Viewport.X;
-                    currentLocation.Y = startOffsetY + start.Viewport.Y;
-
-                    // start is the deepest subview under the mouse; stop searching the subviews
-                    break;
-                }
-            }
-
-            if (subview is null)
-            {
-                // No subview was found that's under the mouse, so we're done
-                return start;
-            }
-
-            // We found a subview of start that's under the mouse, continue...
-            start = subview;
-        }
-
-        return null;
-    }
-
     // BUGBUG: This method interferes with Dialog/MessageBox default min/max size.
-
     /// <summary>
     ///     Gets a new location of the <see cref="View"/> that is within the Viewport of the <paramref name="viewToMove"/>'s
     ///     <see cref="View.SuperView"/> (e.g. for dragging a Window). The `out` parameters are the new X and Y coordinates.
@@ -252,6 +177,10 @@ public partial class View // Layout APIs
     /// </value>
     /// <remarks>
     ///     <para>
+    ///         See the View Layout Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///     </para>
+    ///     <para>
     ///         Frame is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="GetContentSize ()"/>
     ///         .
     ///     </para>
@@ -288,6 +217,8 @@ public partial class View // Layout APIs
             {
                 OnResizeNeeded ();
             }
+
+            SetNeedsDisplay ();
         }
     }
 
@@ -369,6 +300,10 @@ public partial class View // Layout APIs
     /// <value>The <see cref="Pos"/> object representing the X position.</value>
     /// <remarks>
     ///     <para>
+    ///         See the View Layout Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///     </para>
+    ///     <para>
     ///         The position is relative to the <see cref="SuperView"/>'s Content, which is bound by
     ///         <see cref="GetContentSize ()"/>.
     ///     </para>
@@ -408,6 +343,10 @@ public partial class View // Layout APIs
     /// <value>The <see cref="Pos"/> object representing the Y position.</value>
     /// <remarks>
     ///     <para>
+    ///         See the View Layout Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///     </para>
+    ///     <para>
     ///         The position is relative to the <see cref="SuperView"/>'s Content, which is bound by
     ///         <see cref="GetContentSize ()"/>.
     ///     </para>
@@ -445,6 +384,10 @@ public partial class View // Layout APIs
     /// <summary>Gets or sets the height dimension of the view.</summary>
     /// <value>The <see cref="Dim"/> object representing the height of the view (the number of rows).</value>
     /// <remarks>
+    ///     <para>
+    ///         See the View Layout Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///     </para>
     ///     <para>
     ///         The dimension is relative to the <see cref="SuperView"/>'s Content, which is bound by
     ///         <see cref="GetContentSize ()"/>
@@ -494,6 +437,10 @@ public partial class View // Layout APIs
     /// <summary>Gets or sets the width dimension of the view.</summary>
     /// <value>The <see cref="Dim"/> object representing the width of the view (the number of columns).</value>
     /// <remarks>
+    ///     <para>
+    ///         See the View Layout Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///     </para>
     ///     <para>
     ///         The dimension is relative to the <see cref="SuperView"/>'s Content, which is bound by
     ///         <see cref="GetContentSize ()"/>
@@ -666,6 +613,10 @@ public partial class View // Layout APIs
     /// </summary>
     /// <remarks>
     ///     <para>
+    ///         See the View Layout Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///     </para>
+    ///     <para>
     ///         The position and dimensions of the view are indeterminate until the view has been initialized. Therefore, the
     ///         behavior of this method is indeterminate if <see cref="IsInitialized"/> is <see langword="false"/>.
     ///     </para>
@@ -768,14 +719,26 @@ public partial class View // Layout APIs
             LayoutAdornments ();
         }
 
-        SetNeedsDisplay ();
         SetNeedsLayout ();
+
+        // TODO: This ensures overlapped views are drawn correctly. However, this is inefficient.
+        // TODO: The correct fix is to implement non-rectangular clip regions: https://github.com/gui-cs/Terminal.Gui/issues/3413
+        if (Arrangement.HasFlag (ViewArrangement.Overlapped))
+        {
+            foreach (Toplevel v in Application.TopLevels)
+            {
+                if (v.Visible && v != this)
+                {
+                    v.SetNeedsDisplay ();
+                }
+            }
+        }
     }
 
     internal bool LayoutNeeded { get; private set; } = true;
 
     /// <summary>
-    ///     Sets the internal <see cref="LayoutNeeded"/> flag for this View and all of it's subviews and it's SuperView.
+    ///     Sets <see cref="LayoutNeeded"/> for this View and all of it's subviews and it's SuperView.
     ///     The main loop will call SetRelativeLayout and LayoutSubviews for any view with <see cref="LayoutNeeded"/> set.
     /// </summary>
     internal void SetNeedsLayout ()

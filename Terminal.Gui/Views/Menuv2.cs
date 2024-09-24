@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Reflection;
 
 namespace Terminal.Gui;
@@ -53,10 +54,31 @@ public class Menuv2 : Bar
             shortcut.CanFocus = true;
             shortcut.KeyBindingScope = KeyBindingScope.Application;
             shortcut.Orientation = Orientation.Vertical;
+            shortcut.HighlightStyle |= HighlightStyle.Hover;
 
             // TODO: not happy about using AlignmentModes for this. Too implied.
             // TODO: instead, add a property (a style enum?) to Shortcut to control this
             //shortcut.AlignmentModes = AlignmentModes.EndToStart;
+
+            shortcut.Accept += ShortcutOnAccept;
+
+            void ShortcutOnAccept (object sender, HandledEventArgs e)
+            {
+                if (Arrangement.HasFlag(ViewArrangement.Overlapped) && Visible)
+                {
+                    Visible = false;
+                    e.Handled = true;
+
+                    return;
+
+                    //Enabled = Visible;
+                }
+
+                if (!e.Handled)
+                {
+                    OnAccept ();
+                }
+            }
         }
 
         return view;

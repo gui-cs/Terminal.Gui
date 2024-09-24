@@ -419,7 +419,7 @@ internal class CharMap : View
                    );
 
         AddCommand (
-                    Command.TopHome,
+                    Command.Start,
                     () =>
                     {
                         SelectedCodePoint = 0;
@@ -429,7 +429,7 @@ internal class CharMap : View
                    );
 
         AddCommand (
-                    Command.BottomEnd,
+                    Command.End,
                     () =>
                     {
                         SelectedCodePoint = MaxCodePoint;
@@ -456,8 +456,8 @@ internal class CharMap : View
         KeyBindings.Add (Key.CursorRight, Command.ScrollRight);
         KeyBindings.Add (Key.PageUp, Command.PageUp);
         KeyBindings.Add (Key.PageDown, Command.PageDown);
-        KeyBindings.Add (Key.Home, Command.TopHome);
-        KeyBindings.Add (Key.End, Command.BottomEnd);
+        KeyBindings.Add (Key.Home, Command.Start);
+        KeyBindings.Add (Key.End, Command.End);
 
         MouseClick += Handle_MouseClick;
         MouseEvent += Handle_MouseEvent;
@@ -475,6 +475,7 @@ internal class CharMap : View
             NoDecorations = true,
             Title = CM.Glyphs.UpArrow.ToString (),
             WantContinuousButtonPressed = true,
+            ShadowStyle = ShadowStyle.None,
             CanFocus = false
         };
         up.Accept += (sender, args) => { args.Handled = ScrollVertical (-1) == true; };
@@ -489,6 +490,7 @@ internal class CharMap : View
             NoDecorations = true,
             Title = CM.Glyphs.DownArrow.ToString (),
             WantContinuousButtonPressed = true,
+            ShadowStyle = ShadowStyle.None,
             CanFocus = false
         };
         down.Accept += (sender, args) => { ScrollVertical (1); };
@@ -503,6 +505,7 @@ internal class CharMap : View
             NoDecorations = true,
             Title = CM.Glyphs.LeftArrow.ToString (),
             WantContinuousButtonPressed = true,
+            ShadowStyle = ShadowStyle.None,
             CanFocus = false
         };
         left.Accept += (sender, args) => { ScrollHorizontal (-1); };
@@ -517,6 +520,7 @@ internal class CharMap : View
             NoDecorations = true,
             Title = CM.Glyphs.RightArrow.ToString (),
             WantContinuousButtonPressed = true,
+            ShadowStyle = ShadowStyle.None,
             CanFocus = false
         };
         right.Accept += (sender, args) => { ScrollHorizontal (1); };

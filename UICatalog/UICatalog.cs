@@ -14,6 +14,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json.Serialization;
 using Terminal.Gui;
+using UICatalog.Scenarios;
 using static Terminal.Gui.ConfigurationManager;
 using Command = Terminal.Gui.Command;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
@@ -31,7 +32,7 @@ namespace UICatalog;
 ///     <para>
 ///         <list type="number">
 ///             <item>
-///                 <description>Be an easy to use showcase for Terminal.Gui concepts and features.</description>
+///                 <description>Be an easy-to-use showcase for Terminal.Gui concepts and features.</description>
 ///             </item>
 ///             <item>
 ///                 <description>Provide sample code that illustrates how to properly implement said concepts & features.</description>
@@ -40,10 +41,6 @@ namespace UICatalog;
 ///                 <description>Make it easy for contributors to add additional samples in a structured way.</description>
 ///             </item>
 ///         </list>
-///     </para>
-///     <para>
-///         See the project README for more details
-///         (https://github.com/gui-cs/Terminal.Gui/tree/master/UICatalog/README.md).
 ///     </para>
 /// </remarks>
 public class UICatalogApp
@@ -340,6 +337,14 @@ public class UICatalogApp
             Apply ();
             scenario.Theme = _cachedTheme;
             scenario.TopLevelColorScheme = _topLevelColorScheme;
+
+#if DEBUG_IDISPOSABLE
+            // Measure how long it takes for the app to shut down
+            var sw = new Stopwatch ();
+            string scenarioName = scenario.GetName ();
+            Application.InitializedChanged += ApplicationOnInitializedChanged;
+#endif
+
             scenario.Main ();
             scenario.Dispose ();
 
@@ -348,10 +353,31 @@ public class UICatalogApp
             // TODO: Throw if shutdown was not called already
             Application.Shutdown ();
             VerifyObjectsWereDisposed ();
+
+#if DEBUG_IDISPOSABLE
+            Application.InitializedChanged -= ApplicationOnInitializedChanged;
+
+            void ApplicationOnInitializedChanged (object? sender, EventArgs<bool> e)
+            {
+                if (e.CurrentValue)
+                {
+                    sw.Start ();
+                }
+                else
+                {
+                    sw.Stop ();
+                    Debug.WriteLine ($"Shutdown of {scenarioName} Scenario took {sw.ElapsedMilliseconds}ms");
+                }
+            }
+#endif
         }
 
         StopConfigFileWatcher ();
         VerifyObjectsWereDisposed ();
+
+        return;
+
+
     }
 
     private static void VerifyObjectsWereDisposed ()
@@ -516,18 +542,6 @@ public class UICatalogApp
                                                                       Application.Refresh ();
                                                                   };
 
-                //ShDiagnostics = new Shortcut ()
-                //{
-                //    HelpText = "Diagnostic flags",
-                //    CommandView = new RadioGroup()
-                //    {
-                //        RadioLabels = ["Off", "Ruler", "Padding", "MouseEnter"],
-
-                //        CanFocus = false,
-                //        Orientation = Orientation.Vertical,
-                //    }
-                //};
-
                 StatusBar.Add (
                                new Shortcut
                                {
@@ -634,9 +648,9 @@ public class UICatalogApp
 
             // TableView typically is a grid where nav keys are biased for moving left/right.
             ScenarioList.KeyBindings.Remove (Key.Home);
-            ScenarioList.KeyBindings.Add (Key.Home, Command.TopHome);
+            ScenarioList.KeyBindings.Add (Key.Home, Command.Start);
             ScenarioList.KeyBindings.Remove (Key.End);
-            ScenarioList.KeyBindings.Add (Key.End, Command.BottomEnd);
+            ScenarioList.KeyBindings.Add (Key.End, Command.End);
 
             // Ideally, TableView.MultiSelect = false would turn off any keybindings for
             // multi-select options. But it currently does not. UI Catalog uses Ctrl-A for
@@ -792,7 +806,7 @@ public class UICatalogApp
             const string OFF = "View Diagnostics: _Off";
             const string RULER = "View Diagnostics: _Ruler";
             const string PADDING = "View Diagnostics: _Padding";
-            const string MOUSEENTER = "View Diagnostics: _MouseEnter";
+            const string Hover = "View Diagnostics: _Hover";
             var index = 0;
 
             List<MenuItem> menuItems = new ();
@@ -810,7 +824,7 @@ public class UICatalogApp
                 {
                     item.Checked = !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Padding)
                                    && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Ruler)
-                                   && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.MouseEnter);
+                                   && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Hover);
                 }
                 else
                 {
@@ -823,12 +837,12 @@ public class UICatalogApp
 
                                    if (item.Title == t && item.Checked == false)
                                    {
-                                       _diagnosticFlags &= ~(ViewDiagnosticFlags.Padding | ViewDiagnosticFlags.Ruler | ViewDiagnosticFlags.MouseEnter);
+                                       _diagnosticFlags &= ~(ViewDiagnosticFlags.Padding | ViewDiagnosticFlags.Ruler | ViewDiagnosticFlags.Hover);
                                        item.Checked = true;
                                    }
                                    else if (item.Title == t && item.Checked == true)
                                    {
-                                       _diagnosticFlags |= ViewDiagnosticFlags.Padding | ViewDiagnosticFlags.Ruler | ViewDiagnosticFlags.MouseEnter;
+                                       _diagnosticFlags |= ViewDiagnosticFlags.Padding | ViewDiagnosticFlags.Ruler | ViewDiagnosticFlags.Hover;
                                        item.Checked = false;
                                    }
                                    else
@@ -851,7 +865,7 @@ public class UICatalogApp
                                        {
                                            menuItem.Checked = !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Ruler)
                                                               && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Padding)
-                                                              && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.MouseEnter);
+                                                              && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Hover);
                                        }
                                        else if (menuItem.Title != t)
                                        {
@@ -874,7 +888,7 @@ public class UICatalogApp
                     "Off" => OFF,
                     "Ruler" => RULER,
                     "Padding" => PADDING,
-                    "MouseEnter" => MOUSEENTER,
+                    "Hover" => Hover,
                     _ => ""
                 };
             }
@@ -885,7 +899,7 @@ public class UICatalogApp
                 {
                     RULER => ViewDiagnosticFlags.Ruler,
                     PADDING => ViewDiagnosticFlags.Padding,
-                    MOUSEENTER => ViewDiagnosticFlags.MouseEnter,
+                    Hover => ViewDiagnosticFlags.Hover,
                     _ => null!
                 };
             }
@@ -916,14 +930,14 @@ public class UICatalogApp
                         }
 
                         break;
-                    case ViewDiagnosticFlags.MouseEnter:
+                    case ViewDiagnosticFlags.Hover:
                         if (add)
                         {
-                            _diagnosticFlags |= ViewDiagnosticFlags.MouseEnter;
+                            _diagnosticFlags |= ViewDiagnosticFlags.Hover;
                         }
                         else
                         {
-                            _diagnosticFlags &= ~ViewDiagnosticFlags.MouseEnter;
+                            _diagnosticFlags &= ~ViewDiagnosticFlags.Hover;
                         }
 
                         break;

@@ -5,6 +5,12 @@ namespace Terminal.Gui;
 public class CheckBox : View
 {
     /// <summary>
+    /// Gets or sets the default Highlight Style.
+    /// </summary>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static HighlightStyle DefaultHighlightStyle { get; set; } = HighlightStyle.PressedOutside | HighlightStyle.Pressed | HighlightStyle.Hover;
+
+    /// <summary>
     ///     Initializes a new instance of <see cref="CheckBox"/>.
     /// </summary>
     public CheckBox ()
@@ -23,7 +29,7 @@ public class CheckBox : View
 
         TitleChanged += Checkbox_TitleChanged;
 
-        HighlightStyle = Gui.HighlightStyle.PressedOutside | Gui.HighlightStyle.Pressed;
+        HighlightStyle = DefaultHighlightStyle;
         MouseClick += CheckBox_MouseClick;
     }
 

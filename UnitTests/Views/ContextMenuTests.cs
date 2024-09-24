@@ -855,7 +855,9 @@ public class ContextMenuTests (ITestOutputHelper output)
 
                                          mi.Action = () =>
                                                      {
-                                                         var dialog1 = new Dialog ();
+                                                         Assert.True (ContextMenu.IsShow);
+
+                                                         var dialog1 = new Dialog () { Id = "dialog1" };
                                                          Application.Run (dialog1);
                                                          dialog1.Dispose ();
                                                          Assert.False (ContextMenu.IsShow);
@@ -893,7 +895,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         top.Closing += (_, _) =>
                        {
-                           var dialog2 = new Dialog ();
+                           var dialog2 = new Dialog () { Id = "dialog2" };
                            Application.Run (dialog2);
                            dialog2.Dispose ();
                            Assert.False (ContextMenu.IsShow);
@@ -1394,7 +1396,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (tf1.HasFocus);
         Assert.False (tf2.HasFocus);
         Assert.Equal (4, win.Subviews.Count); // TF & TV add autocomplete popup's to their superviews.
-        Assert.Null (Application.MouseEnteredView);
+        Assert.Empty (Application._cachedViewsUnderMouse);
 
         // Right click on tf2 to open context menu
         Application.OnMouseEvent (new () { Position = new (1, 3), Flags = MouseFlags.Button3Clicked });
@@ -1404,7 +1406,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (tf2.ContextMenu.MenuBar.IsMenuOpen);
         Assert.True (win.Focused is Menu);
         Assert.True (Application.MouseGrabView is MenuBar);
-        Assert.Equal (tf2, Application.MouseEnteredView);
+        Assert.Equal (tf2, Application._cachedViewsUnderMouse.LastOrDefault ());
 
         // Click on tf1 to focus it, which cause context menu being closed
         Application.OnMouseEvent (new () { Position = new (1, 1), Flags = MouseFlags.Button1Clicked });
@@ -1416,7 +1418,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.NotNull (tf2.ContextMenu.MenuBar);
         Assert.Equal (win.Focused, tf1);
         Assert.Null (Application.MouseGrabView);
-        Assert.Equal (tf1, Application.MouseEnteredView);
+        Assert.Equal (tf1, Application._cachedViewsUnderMouse.LastOrDefault ());
 
         // Click on tf2 to focus it
         Application.OnMouseEvent (new () { Position = new (1, 3), Flags = MouseFlags.Button1Clicked });
@@ -1428,7 +1430,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.NotNull (tf2.ContextMenu.MenuBar);
         Assert.Equal (win.Focused, tf2);
         Assert.Null (Application.MouseGrabView);
-        Assert.Equal (tf2, Application.MouseEnteredView);
+        Assert.Equal (tf2, Application._cachedViewsUnderMouse.LastOrDefault ());
 
         Application.End (rs);
         win.Dispose ();
@@ -1706,8 +1708,8 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.R.NoShift));
         Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.D.WithAlt));
         Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.D.NoShift));
-        Assert.Single (Application.Current!.Subviews);
-        View [] menus = Application.Current!.Subviews.Where (v => v is Menu m && m.Host == cm.MenuBar).ToArray ();
+        Assert.Single (Application.Top!.Subviews);
+        View [] menus = Application.Top!.Subviews.Where (v => v is Menu m && m.Host == cm.MenuBar).ToArray ();
         Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.N.WithAlt));
         Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.N.NoShift));
         Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
@@ -1795,14 +1797,14 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (menuBar.KeyBindings.Bindings.ContainsKey (Key.F.WithAlt));
         Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.N.WithAlt));
         Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
-        View [] menus = Application.Current!.Subviews.Where (v => v is Menu m && m.Host == menuBar).ToArray ();
+        View [] menus = Application.Top!.Subviews.Where (v => v is Menu m && m.Host == menuBar).ToArray ();
         Assert.Empty (menus);
         Assert.Null (cm.MenuBar);
 
         Assert.True (Application.OnKeyDown (Key.F.WithAlt));
         Assert.True (menuBar.IsMenuOpen);
-        Assert.Equal (2, Application.Current!.Subviews.Count);
-        menus = Application.Current!.Subviews.Where (v => v is Menu m && m.Host == menuBar).ToArray ();
+        Assert.Equal (2, Application.Top!.Subviews.Count);
+        menus = Application.Top!.Subviews.Where (v => v is Menu m && m.Host == menuBar).ToArray ();
         Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.N.WithAlt));
         Assert.True (Application.OnKeyDown (Key.N.WithAlt));
         Assert.False (menuBar.IsMenuOpen);
@@ -1831,8 +1833,8 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.False (cm.MenuBar!.KeyBindings.Bindings.ContainsKey (Key.E.NoShift));
         Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
         Assert.False (cm.MenuBar.KeyBindings.Bindings.ContainsKey (Key.R.NoShift));
-        Assert.Equal (3, Application.Current!.Subviews.Count);
-        menus = Application.Current!.Subviews.Where (v => v is Menu m && m.Host == cm.MenuBar).ToArray ();
+        Assert.Equal (3, Application.Top!.Subviews.Count);
+        menus = Application.Top!.Subviews.Where (v => v is Menu m && m.Host == cm.MenuBar).ToArray ();
         Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.E.WithAlt));
         Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.E.NoShift));
         Assert.True (menus [1].KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
@@ -1846,8 +1848,8 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         cm.Show (menuItems);
         Assert.True (cm.MenuBar.IsMenuOpen);
-        Assert.Equal (3, Application.Current!.Subviews.Count);
-        menus = Application.Current!.Subviews.Where (v => v is Menu m && m.Host == cm.MenuBar).ToArray ();
+        Assert.Equal (3, Application.Top!.Subviews.Count);
+        menus = Application.Top!.Subviews.Where (v => v is Menu m && m.Host == cm.MenuBar).ToArray ();
         Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.E.WithAlt));
         Assert.True (menus [0].KeyBindings.Bindings.ContainsKey (Key.E.NoShift));
         Assert.False (menus [0].KeyBindings.Bindings.ContainsKey (Key.R.WithAlt));
@@ -1862,7 +1864,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.MainLoop!.RunIteration ();
         Assert.True (renameFile);
 
-        Assert.Single (Application.Current!.Subviews);
+        Assert.Single (Application.Top!.Subviews);
         Assert.True (menuBar.KeyBindings.Bindings.ContainsKey (Key.F.WithAlt));
         Assert.True (menuBar.KeyBindings.Bindings.ContainsKey (Key.F.NoShift));
         Assert.False (menuBar.KeyBindings.Bindings.ContainsKey (Key.N.WithAlt));

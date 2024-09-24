@@ -52,6 +52,9 @@ public class ButtonTests (ITestOutputHelper output)
     [InlineData ("0_12你", 10, 1, 10, 1)]
     public void Button_AbsoluteSize_Text (string text, int width, int height, int expectedWidth, int expectedHeight)
     {
+        // Override CM
+        Button.DefaultShadow = ShadowStyle.None;
+
         var btn1 = new Button
         {
             Text = text,
@@ -76,6 +79,9 @@ public class ButtonTests (ITestOutputHelper output)
     [InlineData (10, 3, 10, 3)]
     public void Button_AbsoluteSize_DefaultText (int width, int height, int expectedWidth, int expectedHeight)
     {
+        // Override CM
+        Button.DefaultShadow = ShadowStyle.None;
+
         var btn1 = new Button ();
         btn1.Width = width;
         btn1.Height = height;
@@ -143,6 +149,9 @@ public class ButtonTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void Constructors_Defaults ()
     {
+        // Override CM
+        Button.DefaultShadow = ShadowStyle.None;
+
         var btn = new Button ();
         Assert.Equal (string.Empty, btn.Text);
         btn.BeginInit ();
@@ -550,42 +559,9 @@ public class ButtonTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
-    public void Update_Only_On_Or_After_Initialize ()
-    {
-        var btn = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
-        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
-        win.Add (btn);
-        var top = new Toplevel ();
-        top.Add (win);
-
-        Assert.False (btn.IsInitialized);
-
-        Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
-
-        Assert.True (btn.IsInitialized);
-        Assert.Equal ("Say Hello 你", btn.Text);
-        Assert.Equal ($"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
-        Assert.Equal (new (0, 0, 16, 1), btn.Viewport);
-        var btnTxt = $"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}";
-
-        var expected = @$"
-┌────────────────────────────┐
-│                            │
-│      {btnTxt}      │
-│                            │
-└────────────────────────────┘
-";
-
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new (0, 0, 30, 5), pos);
-        top.Dispose ();
-    }
-
-    [Fact]
-    [AutoInitShutdown]
     public void Update_Parameterless_Only_On_Or_After_Initialize ()
     {
+        Button.DefaultShadow = ShadowStyle.None;
         var btn = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (btn);

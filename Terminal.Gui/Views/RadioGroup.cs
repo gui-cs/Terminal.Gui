@@ -22,7 +22,7 @@ public class RadioGroup : View, IDesignable, IOrientation
 
         // Things this view knows how to do
         AddCommand (
-                    Command.LineUp,
+                    Command.Up,
                     () =>
                     {
                         if (!HasFocus)
@@ -35,7 +35,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                    );
 
         AddCommand (
-                    Command.LineDown,
+                    Command.Down,
                     () =>
                     {
                         if (!HasFocus)
@@ -47,7 +47,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                    );
 
         AddCommand (
-                    Command.TopHome,
+                    Command.Start,
                     () =>
                     {
                         if (!HasFocus)
@@ -62,7 +62,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                    );
 
         AddCommand (
-                    Command.BottomEnd,
+                    Command.End,
                     () =>
                     {
                         if (!HasFocus)
@@ -125,17 +125,17 @@ public class RadioGroup : View, IDesignable, IOrientation
         // Default keybindings for this view
         if (Orientation == Orientation.Vertical)
         {
-            KeyBindings.Add (Key.CursorUp, Command.LineUp);
-            KeyBindings.Add (Key.CursorDown, Command.LineDown);
+            KeyBindings.Add (Key.CursorUp, Command.Up);
+            KeyBindings.Add (Key.CursorDown, Command.Down);
         }
         else
         {
-            KeyBindings.Add (Key.CursorLeft, Command.LineUp);
-            KeyBindings.Add (Key.CursorRight, Command.LineDown);
+            KeyBindings.Add (Key.CursorLeft, Command.Up);
+            KeyBindings.Add (Key.CursorRight, Command.Down);
         }
 
-        KeyBindings.Add (Key.Home, Command.TopHome);
-        KeyBindings.Add (Key.End, Command.BottomEnd);
+        KeyBindings.Add (Key.Home, Command.Start);
+        KeyBindings.Add (Key.End, Command.End);
         KeyBindings.Add (Key.Space, Command.Accept);
     }
 
@@ -284,7 +284,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                     }
                     else if (HasFocus && i == _cursor)
                     {
-                        Application.Driver?.SetAttribute (ColorScheme.Focus);
+                        Application.Driver?.SetAttribute (GetFocusColor ());
                     }
 
                     if (rune == HotKeySpecifier && j + 1 < rlRunes.Length)
@@ -312,7 +312,7 @@ public class RadioGroup : View, IDesignable, IOrientation
             }
             else
             {
-                DrawHotString (rl, HasFocus && i == _cursor, ColorScheme);
+                DrawHotString (rl, HasFocus && i == _cursor);
             }
         }
     }

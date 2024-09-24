@@ -138,6 +138,8 @@ public class MessageBoxTests
         int iterations = -1;
 
         ((FakeDriver)Application.Driver!).SetBufferSize (15, 15); // 15 x 15 gives us enough room for a button with one char (9x1)
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         Rectangle mbFrame = Rectangle.Empty;
 
@@ -152,7 +154,7 @@ public class MessageBoxTests
                                      }
                                      else if (iterations == 1)
                                      {
-                                         mbFrame = Application.Current.Frame;
+                                         mbFrame = Application.Top!.Frame;
                                          Application.RequestStop ();
                                      }
                                  };
@@ -177,6 +179,8 @@ public class MessageBoxTests
         // Override CM
         MessageBox.DefaultButtonAlignment = Alignment.End;
         MessageBox.DefaultBorderStyle = LineStyle.Double;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         Application.Iteration += (s, a) =>
                                  {
@@ -229,6 +233,7 @@ public class MessageBoxTests
                                  };
 
         Application.Run (top);
+        top.Dispose ();
     }
 
     [Fact]
@@ -246,6 +251,8 @@ public class MessageBoxTests
         // Override CM
         MessageBox.DefaultButtonAlignment = Alignment.End;
         MessageBox.DefaultBorderStyle = LineStyle.Double;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         Application.Iteration += (s, a) =>
                                  {
@@ -338,8 +345,8 @@ public class MessageBoxTests
                                      {
                                          Application.Refresh ();
 
-                                         Assert.IsType<Dialog> (Application.Current);
-                                         Assert.Equal (new (height, width), Application.Current.Frame.Size);
+                                         Assert.IsType<Dialog> (Application.Top);
+                                         Assert.Equal (new (height, width), Application.Top.Frame.Size);
 
                                          Application.RequestStop ();
                                      }
@@ -375,8 +382,8 @@ public class MessageBoxTests
                                      {
                                          Application.Refresh ();
 
-                                         Assert.IsType<Dialog> (Application.Current);
-                                         Assert.Equal (new (height, width), Application.Current.Frame.Size);
+                                         Assert.IsType<Dialog> (Application.Top);
+                                         Assert.Equal (new (height, width), Application.Top.Frame.Size);
 
                                          Application.RequestStop ();
                                      }
@@ -408,8 +415,8 @@ public class MessageBoxTests
                                      {
                                          Application.Refresh ();
 
-                                         Assert.IsType<Dialog> (Application.Current);
-                                         Assert.Equal (new (height, width), Application.Current.Frame.Size);
+                                         Assert.IsType<Dialog> (Application.Top);
+                                         Assert.Equal (new (height, width), Application.Top.Frame.Size);
 
                                          Application.RequestStop ();
                                      }
@@ -426,6 +433,8 @@ public class MessageBoxTests
         // Override CM
         MessageBox.DefaultButtonAlignment = Alignment.End;
         MessageBox.DefaultBorderStyle = LineStyle.Double;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         Application.Iteration += (s, a) =>
                                  {
@@ -473,7 +482,7 @@ public class MessageBoxTests
         var top = new Toplevel ();
         top.BorderStyle = LineStyle.Single;
         Application.Run (top);
-
+        top.Dispose ();
     }
 }
 

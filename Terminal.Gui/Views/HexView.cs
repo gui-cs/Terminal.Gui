@@ -59,15 +59,15 @@ public class HexView : View
         // Things this view knows how to do
         AddCommand (Command.Left, () => MoveLeft ());
         AddCommand (Command.Right, () => MoveRight ());
-        AddCommand (Command.LineDown, () => MoveDown (bytesPerLine));
-        AddCommand (Command.LineUp, () => MoveUp (bytesPerLine));
+        AddCommand (Command.Down, () => MoveDown (bytesPerLine));
+        AddCommand (Command.Up, () => MoveUp (bytesPerLine));
         AddCommand (Command.Accept, () => ToggleSide ());
         AddCommand (Command.PageUp, () => MoveUp (bytesPerLine * Frame.Height));
         AddCommand (Command.PageDown, () => MoveDown (bytesPerLine * Frame.Height));
-        AddCommand (Command.TopHome, () => MoveHome ());
-        AddCommand (Command.BottomEnd, () => MoveEnd ());
-        AddCommand (Command.StartOfLine, () => MoveStartOfLine ());
-        AddCommand (Command.EndOfLine, () => MoveEndOfLine ());
+        AddCommand (Command.Start, () => MoveHome ());
+        AddCommand (Command.End, () => MoveEnd ());
+        AddCommand (Command.LeftStart, () => MoveLeftStart ());
+        AddCommand (Command.RightEnd, () => MoveEndOfLine ());
         AddCommand (Command.StartOfPage, () => MoveUp (bytesPerLine * ((int)(position - displayStart) / bytesPerLine)));
 
         AddCommand (
@@ -78,8 +78,8 @@ public class HexView : View
         // Default keybindings for this view
         KeyBindings.Add (Key.CursorLeft, Command.Left);
         KeyBindings.Add (Key.CursorRight, Command.Right);
-        KeyBindings.Add (Key.CursorDown, Command.LineDown);
-        KeyBindings.Add (Key.CursorUp, Command.LineUp);
+        KeyBindings.Add (Key.CursorDown, Command.Down);
+        KeyBindings.Add (Key.CursorUp, Command.Up);
         KeyBindings.Add (Key.Enter, Command.Accept);
 
         KeyBindings.Add (Key.V.WithAlt, Command.PageUp);
@@ -88,10 +88,10 @@ public class HexView : View
         KeyBindings.Add (Key.V.WithCtrl, Command.PageDown);
         KeyBindings.Add (Key.PageDown, Command.PageDown);
 
-        KeyBindings.Add (Key.Home, Command.TopHome);
-        KeyBindings.Add (Key.End, Command.BottomEnd);
-        KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.StartOfLine);
-        KeyBindings.Add (Key.CursorRight.WithCtrl, Command.EndOfLine);
+        KeyBindings.Add (Key.Home, Command.Start);
+        KeyBindings.Add (Key.End, Command.End);
+        KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.LeftStart);
+        KeyBindings.Add (Key.CursorRight.WithCtrl, Command.RightEnd);
         KeyBindings.Add (Key.CursorUp.WithCtrl, Command.StartOfPage);
         KeyBindings.Add (Key.CursorDown.WithCtrl, Command.EndOfPage);
 
@@ -728,7 +728,7 @@ public class HexView : View
         return true;
     }
 
-    private bool MoveStartOfLine ()
+    private bool MoveLeftStart ()
     {
         position = position / bytesPerLine * bytesPerLine;
         SetNeedsDisplay ();

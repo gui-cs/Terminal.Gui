@@ -239,8 +239,8 @@ public class GraphViewExample : Scenario
 
         _about.Text = "Housing Expenditures by income thirds 1996-2003";
 
-        Color fore = _graphView.ColorScheme.Normal.Foreground == new Color (ColorName.Black)
-                         ? new (ColorName.White)
+        Color fore = _graphView.ColorScheme.Normal.Foreground == Color.Black
+                         ? Color.White
                          : _graphView.ColorScheme.Normal.Foreground;
         var black = new Attribute (fore, Color.Black);
         var cyan = new Attribute (Color.BrightCyan, Color.Black);

@@ -18,7 +18,11 @@ public class Tab : View
     public string DisplayText
     {
         get => _displayText ?? "Unnamed";
-        set => _displayText = value;
+        set
+        {
+            _displayText = value;
+            SetNeedsDisplay ();
+        }
     }
 
     /// <summary>The control to display when the tab is selected.</summary>

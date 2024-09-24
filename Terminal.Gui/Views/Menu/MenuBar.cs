@@ -126,7 +126,7 @@ public class MenuBar : View, IDesignable
                         return true;
                     }
                    );
-        AddCommand (Command.ToggleExpandCollapse, ctx =>
+        AddCommand (Command.Toggle, ctx =>
                                                   {
                                                       CloseOtherOpenedMenuBar ();
 
@@ -147,7 +147,7 @@ public class MenuBar : View, IDesignable
         KeyBindings.Add (Key.CursorDown, Command.Accept);
         KeyBindings.Add (Key.Enter, Command.Accept);
 
-        KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, -1); // -1 indicates Key was used
+        KeyBinding keyBinding = new ([Command.Toggle], KeyBindingScope.HotKey, -1); // -1 indicates Key was used
         KeyBindings.Add (Key, keyBinding);
 
         // TODO: Why do we have two keybindings for opening the menu? Ctrl-Space and Key?
@@ -190,10 +190,10 @@ public class MenuBar : View, IDesignable
                 if (menuBarItem.HotKey != Key.Empty)
                 {
                     KeyBindings.Remove (menuBarItem.HotKey!);
-                    KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.Focused, menuBarItem);
+                    KeyBinding keyBinding = new ([Command.Toggle], KeyBindingScope.Focused, menuBarItem);
                     KeyBindings.Add (menuBarItem.HotKey!, keyBinding);
                     KeyBindings.Remove (menuBarItem.HotKey!.WithAlt);
-                    keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, menuBarItem);
+                    keyBinding = new ([Command.Toggle], KeyBindingScope.HotKey, menuBarItem);
                     KeyBindings.Add (menuBarItem.HotKey.WithAlt, keyBinding);
                 }
 
@@ -306,7 +306,7 @@ public class MenuBar : View, IDesignable
 
             if (i == _selected && IsMenuOpen)
             {
-                hotColor = i == _selected ? ColorScheme.HotFocus : GetHotNormalColor ();
+                hotColor = i == _selected ? ColorScheme!.HotFocus : GetHotNormalColor ();
                 normalColor = i == _selected ? GetFocusColor () : GetNormalColor ();
             }
             else
@@ -406,7 +406,7 @@ public class MenuBar : View, IDesignable
         _selected = 0;
         SetNeedsDisplay ();
 
-        _previousFocused = (SuperView is null ? Application.Current?.Focused : SuperView.Focused)!;
+        _previousFocused = (SuperView is null ? Application.Top?.Focused : SuperView.Focused)!;
         OpenMenu (_selected);
 
         if (!SelectEnabledItem (
@@ -467,7 +467,7 @@ public class MenuBar : View, IDesignable
 
         if (_openMenu is null)
         {
-            _previousFocused = (SuperView is null ? Application.Current?.Focused ?? null : SuperView.Focused)!;
+            _previousFocused = (SuperView is null ? Application.Top?.Focused ?? null : SuperView.Focused)!;
         }
 
         OpenMenu (idx, sIdx, subMenu);
@@ -544,10 +544,10 @@ public class MenuBar : View, IDesignable
 
     private void CloseOtherOpenedMenuBar ()
     {
-        if (Application.Current is { })
+        if (Application.Top is { })
         {
             // Close others menu bar opened
-            Menu? menu = Application.Current.Subviews.FirstOrDefault (v => v is Menu m && m.Host != this && m.Host.IsMenuOpen) as Menu;
+            Menu? menu = Application.Top.Subviews.FirstOrDefault (v => v is Menu m && m.Host != this && m.Host.IsMenuOpen) as Menu;
             menu?.Host.CleanUp ();
         }
     }
@@ -583,7 +583,7 @@ public class MenuBar : View, IDesignable
             case false:
                 if (_openMenu is { })
                 {
-                    Application.Current?.Remove (_openMenu);
+                    Application.Top?.Remove (_openMenu);
                 }
 
                 SetNeedsDisplay ();
@@ -618,7 +618,7 @@ public class MenuBar : View, IDesignable
 
                     if (OpenCurrentMenu is { })
                     {
-                        Application.Current?.Remove (OpenCurrentMenu);
+                        Application.Top?.Remove (OpenCurrentMenu);
                         OpenCurrentMenu.Dispose ();
                         OpenCurrentMenu = null;
                     }
@@ -666,7 +666,7 @@ public class MenuBar : View, IDesignable
         }
 
         Rectangle superViewFrame = SuperView?.Frame ?? Application.Screen;
-        View? sv = SuperView ?? Application.Current;
+        View? sv = SuperView ?? Application.Top;
 
         if (sv is null)
         {
@@ -793,7 +793,7 @@ public class MenuBar : View, IDesignable
         {
             case null:
                 // Open a submenu below a MenuBar
-                _lastFocused ??= SuperView is null ? Application.Current?.MostFocused : SuperView.MostFocused;
+                _lastFocused ??= SuperView is null ? Application.Top?.MostFocused : SuperView.MostFocused;
 
                 if (_openSubMenu is { } && !CloseMenu (false, true))
                 {
@@ -802,7 +802,7 @@ public class MenuBar : View, IDesignable
 
                 if (_openMenu is { })
                 {
-                    Application.Current?.Remove (_openMenu);
+                    Application.Top?.Remove (_openMenu);
                     _openMenu.Dispose ();
                     _openMenu = null;
                 }
@@ -822,7 +822,7 @@ public class MenuBar : View, IDesignable
                     locationOffset = GetScreenOffset ();
                 }
 
-                if (SuperView is { } && SuperView != Application.Current)
+                if (SuperView is { } && SuperView != Application.Top)
                 {
                     locationOffset.X += SuperView.Border.Thickness.Left;
                     locationOffset.Y += SuperView.Border.Thickness.Top;
@@ -839,9 +839,9 @@ public class MenuBar : View, IDesignable
                 OpenCurrentMenu = _openMenu;
                 OpenCurrentMenu._previousSubFocused = _openMenu;
 
-                if (Application.Current is { })
+                if (Application.Top is { })
                 {
-                    Application.Current.Add (_openMenu);
+                    Application.Top.Add (_openMenu);
                 }
                 else
                 {
@@ -906,7 +906,7 @@ public class MenuBar : View, IDesignable
 
                     OpenCurrentMenu._previousSubFocused = last._previousSubFocused;
                     _openSubMenu.Add (OpenCurrentMenu);
-                    Application.Current?.Add (OpenCurrentMenu);
+                    Application.Top?.Add (OpenCurrentMenu);
 
                     if (!OpenCurrentMenu.IsInitialized)
                     {
@@ -989,7 +989,7 @@ public class MenuBar : View, IDesignable
         {
             foreach (Menu item in _openSubMenu)
             {
-                Application.Current!.Remove (item);
+                Application.Top!.Remove (item);
                 item.Dispose ();
             }
         }
@@ -1228,7 +1228,7 @@ public class MenuBar : View, IDesignable
             if (_openSubMenu is { })
             {
                 menu = _openSubMenu [i];
-                Application.Current!.Remove (menu);
+                Application.Top!.Remove (menu);
                 _openSubMenu.Remove (menu);
 
                 if (Application.MouseGrabView == menu)
@@ -1276,7 +1276,7 @@ public class MenuBar : View, IDesignable
             }
 
             KeyBindings.Remove (_key);
-            KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, -1); // -1 indicates Key was used
+            KeyBinding keyBinding = new ([Command.Toggle], KeyBindingScope.HotKey, -1); // -1 indicates Key was used
             KeyBindings.Add (value, keyBinding);
             _key = value;
         }

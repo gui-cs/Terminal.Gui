@@ -90,6 +90,7 @@ public class Adornments : Scenario
 
         window.Padding.Data = "Padding";
         window.Padding.Thickness = new (3);
+        window.Padding.CanFocus = true;
 
         var longLabel = new Label
         {
@@ -106,11 +107,22 @@ public class Adornments : Scenario
                                   window.Padding.Add (labelInPadding);
 
                                   var textFieldInPadding = new TextField
-                                      { X = Pos.Right (labelInPadding) + 1, Y = Pos.Top (labelInPadding), Width = 15, Text = "some text" };
+                                  {
+                                      X = Pos.Right (labelInPadding) + 1,
+                                      Y = Pos.Top (labelInPadding), Width = 15,
+                                      Text = "some text",
+                                      CanFocus = true
+                                  };
                                   textFieldInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "TextField", textFieldInPadding.Text, "Ok");
                                   window.Padding.Add (textFieldInPadding);
 
-                                  var btnButtonInPadding = new Button { X = Pos.Center (), Y = 0, Text = "_Button in Padding" };
+                                  var btnButtonInPadding = new Button
+                                  {
+                                      X = Pos.Center (),
+                                      Y = 0,
+                                      Text = "_Button in Padding",
+                                      CanFocus = true
+                                  };
                                   btnButtonInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "Hi", "Button in Padding Pressed!", "Ok");
                                   btnButtonInPadding.BorderStyle = LineStyle.Dashed;
                                   btnButtonInPadding.Border.Thickness = new (1, 1, 1, 1);
