@@ -150,6 +150,30 @@ public class MenuBarTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
+    public void CanExecute_False_Does_Not_Throws ()
+    {
+        var menu = new MenuBar
+        {
+            Menus =
+            [
+                new ("File", new MenuItem []
+                {
+                    new ("New", "", null, () => false),
+                    null,
+                    new ("Quit", "", null)
+                })
+            ]
+        };
+        var top = new Toplevel ();
+        top.Add (menu);
+        Application.Begin (top);
+
+        Assert.True (menu.NewKeyDownEvent (menu.Key));
+        Assert.True (menu.IsMenuOpen);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
     public void CanExecute_HotKey ()
     {
         Window win = null;
