@@ -15,6 +15,7 @@ public class ThemeScopeTests
     };
 
     [Fact]
+    [AutoInitShutdown (configLocation: ConfigLocations.DefaultOnly)]
     public void AllThemesPresent ()
     {
         Reset ();
@@ -24,7 +25,7 @@ public class ThemeScopeTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigLocations.DefaultOnly)]
     public void Apply_ShouldApplyUpdatedProperties ()
     {
         Reset ();
@@ -53,6 +54,7 @@ public class ThemeScopeTests
     }
 
     [Fact]
+    [AutoInitShutdown (configLocation: ConfigLocations.DefaultOnly)]
     public void TestSerialize_RoundTrip ()
     {
         Reset ();
@@ -69,6 +71,7 @@ public class ThemeScopeTests
     }
 
     [Fact]
+    [AutoInitShutdown (configLocation: ConfigLocations.DefaultOnly)]
     public void ThemeManager_ClassMethodsWork ()
     {
         Reset ();

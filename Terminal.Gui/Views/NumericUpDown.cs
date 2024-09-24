@@ -56,7 +56,7 @@ public class NumericUpDown<T> : View where T : notnull
             Title = $"{Glyphs.DownArrow}",
             WantContinuousButtonPressed = true,
             CanFocus = false,
-            ShadowStyle = ShadowStyle.None
+            ShadowStyle = ShadowStyle.None,
         };
 
         _number = new ()
@@ -81,7 +81,7 @@ public class NumericUpDown<T> : View where T : notnull
             Title = $"{Glyphs.UpArrow}",
             WantContinuousButtonPressed = true,
             CanFocus = false,
-            ShadowStyle = ShadowStyle.None
+            ShadowStyle = ShadowStyle.None,
         };
 
         CanFocus = true;

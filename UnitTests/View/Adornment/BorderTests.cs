@@ -24,8 +24,8 @@ public class BorderTests (ITestOutputHelper output)
             Focus = new (Color.Green, Color.Red)
         };
         Assert.NotEqual (view.ColorScheme.Normal.Foreground, view.ColorScheme.Focus.Foreground);
-        Assert.Equal (ColorName.Red, view.Border.GetNormalColor ().Foreground.GetClosestNamedColor ());
-        Assert.Equal (ColorName.Green, view.Border.GetFocusColor ().Foreground.GetClosestNamedColor ());
+        Assert.Equal (ColorName16.Red, view.Border.GetNormalColor ().Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (ColorName16.Green, view.Border.GetFocusColor ().Foreground.GetClosestNamedColor16 ());
         Assert.Equal (view.GetFocusColor (), view.Border.GetFocusColor ());
 
         superView.BeginInit ();
@@ -57,8 +57,8 @@ public class BorderTests (ITestOutputHelper output)
         {
             Normal = new (Color.Red, Color.Green), Focus = new (Color.Green, Color.Red)
         };
-        Assert.Equal (ColorName.Red, view.Border.GetNormalColor ().Foreground.GetClosestNamedColor ());
-        Assert.Equal (ColorName.Green, view.Border.GetFocusColor ().Foreground.GetClosestNamedColor ());
+        Assert.Equal (ColorName16.Red, view.Border.GetNormalColor ().Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (ColorName16.Green, view.Border.GetFocusColor ().Foreground.GetClosestNamedColor16 ());
         Assert.Equal (view.GetNormalColor (), view.Border.GetNormalColor ());
         Assert.Equal (view.GetFocusColor (), view.Border.GetFocusColor ());
 

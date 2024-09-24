@@ -117,7 +117,7 @@ public class Bars : Scenario
             //Width = Dim.Percent (40),
             Orientation = Orientation.Vertical,
         };
-            ConfigureMenu (bar);
+        ConfigureMenu (bar);
 
         menuLikeExamples.Add (bar);
 
@@ -415,20 +415,23 @@ public class Bars : Scenario
             Title = "_File",
             HelpText = "File Menu",
             Key = Key.D0.WithAlt,
+            HighlightStyle = HighlightStyle.Hover
         };
 
         var editMenuBarItem = new Shortcut
         {
             Title = "_Edit",
             HelpText = "Edit Menu",
-            Key = Key.D1.WithAlt
+            Key = Key.D1.WithAlt,
+            HighlightStyle = HighlightStyle.Hover
         };
 
         var helpMenuBarItem = new Shortcut
         {
             Title = "_Help",
             HelpText = "Halp Menu",
-            Key = Key.D2.WithAlt
+            Key = Key.D2.WithAlt,
+            HighlightStyle = HighlightStyle.Hover
         };
 
         bar.Add (fileMenuBarItem, editMenuBarItem, helpMenuBarItem);
@@ -442,6 +445,7 @@ public class Bars : Scenario
             Title = "Z_igzag",
             Key = Key.I.WithCtrl,
             Text = "Gonna zig zag",
+            HighlightStyle = HighlightStyle.Hover
         };
 
         var shortcut2 = new Shortcut
@@ -449,6 +453,15 @@ public class Bars : Scenario
             Title = "Za_G",
             Text = "Gonna zag",
             Key = Key.G.WithAlt,
+            HighlightStyle = HighlightStyle.Hover
+        };
+
+        var shortcut3 = new Shortcut
+        {
+            Title = "_Three",
+            Text = "The 3rd item",
+            Key = Key.D3.WithAlt,
+            HighlightStyle = HighlightStyle.Hover
         };
 
         var line = new Line ()
@@ -457,15 +470,18 @@ public class Bars : Scenario
             Orientation = Orientation.Horizontal,
             CanFocus = false,
         };
+        // HACK: Bug in Line
+        line.Orientation = Orientation.Vertical;
+        line.Orientation = Orientation.Horizontal;
 
-        var shortcut3 = new Shortcut
+        var shortcut4 = new Shortcut
         {
-            Title = "_Three",
-            Text = "The 3rd item",
+            Title = "_Four",
+            Text = "Below the line",
             Key = Key.D3.WithAlt,
+            HighlightStyle = HighlightStyle.Hover
         };
-
-        bar.Add (shortcut1, shortcut2, line, shortcut3);
+        bar.Add (shortcut1, shortcut2, shortcut3, line, shortcut4);
     }
 
     public void ConfigStatusBar (Bar bar)

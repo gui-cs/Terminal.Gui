@@ -19,7 +19,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Arrangement_Default_Is_Overlapped()
+    public void Arrangement_Default_Is_Overlapped ()
     {
         var top = new Toplevel ();
         Assert.Equal (ViewArrangement.Overlapped, top.Arrangement);
@@ -802,7 +802,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
 
         Application.Refresh ();
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
-        Assert.Equal (new (0, 0, 20, 3), window.Frame);
+        Assert.Equal (new (-11, -4, 20, 3), window.Frame);
 
         // Changes Top size to same size as Dialog more menu and scroll bar
         ((FakeDriver)Application.Driver!).SetBufferSize (20, 3);
@@ -815,7 +815,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
 
         Application.Refresh ();
         Assert.Equal (new (0, 0, 20, 3), top.Frame);
-        Assert.Equal (new (0, 0, 20, 3), window.Frame);
+        Assert.Equal (new (-1, -1, 20, 3), window.Frame);
 
         // Changes Top size smaller than Dialog size
         ((FakeDriver)Application.Driver!).SetBufferSize (19, 2);
@@ -828,7 +828,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
 
         Application.Refresh ();
         Assert.Equal (new (0, 0, 19, 2), top.Frame);
-        Assert.Equal (new (-1, 0, 20, 3), window.Frame);
+        Assert.Equal (new (-1, -1, 20, 3), window.Frame);
 
         Application.OnMouseEvent (
                                   new ()
@@ -929,6 +929,12 @@ public partial class ToplevelTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Draw_A_Top_Subview_On_A_Window ()
     {
+        // Override CM
+        Dialog.DefaultButtonAlignment = Alignment.Center;
+        Dialog.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
+
         Toplevel top = new ();
         var win = new Window ();
         top.Add (win);
@@ -962,7 +968,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
                                {
                                    Assert.Equal (new (1, 3, 18, 16), viewAddedToTop.Frame);
 
-                                   viewAddedToTop.SetNeedsDisplay();
+                                   viewAddedToTop.SetNeedsDisplay ();
                                    viewAddedToTop.Draw ();
                                    top.Move (2, 15);
                                    View.Driver.AddStr ("One");
@@ -980,7 +986,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
 
         Application.OnMouseEvent (new () { Position = new (5, 2), Flags = MouseFlags.Button1Clicked });
 
-        Application.Refresh();
+        Application.Refresh ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @$"

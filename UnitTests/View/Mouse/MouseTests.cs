@@ -1,6 +1,8 @@
 ﻿using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace Terminal.Gui.ViewMouseTests;
+
+[Trait ("Category", "Input")]
 
 public class MouseTests (ITestOutputHelper output) : TestsAllViews
 {
@@ -359,7 +361,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         int enablingHighlight = 0;
         int disablingHighlight = 0;
         view.Highlight += View_Highlight;
-        view.ColorScheme = new ColorScheme (new Attribute (ColorName.Red, ColorName.Blue));
+        view.ColorScheme = new ColorScheme (new Attribute (ColorName16.Red, ColorName16.Blue));
         ColorScheme originalColorScheme = view.ColorScheme;
 
         view.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed, });
@@ -463,4 +465,6 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
             }
         }
     }
+
+
 }

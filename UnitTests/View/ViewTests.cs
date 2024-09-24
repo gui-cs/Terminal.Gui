@@ -136,7 +136,7 @@ public class ViewTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
     [InlineData (true)]
     [InlineData (false)]
     public void Clear_Does_Not_Spillover_Its_Parent (bool label)
@@ -875,8 +875,6 @@ At 0,0
         //Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
         Assert.False (r.OnKeyUp (new() { KeyCode = KeyCode.Null }));
         Assert.False (r.NewMouseEvent (new() { Flags = MouseFlags.AllEvents }));
-        Assert.False (r.NewMouseEnterEvent (new() { Flags = MouseFlags.AllEvents }));
-        Assert.False (r.NewMouseLeaveEvent (new() { Flags = MouseFlags.AllEvents }));
 
         r.Dispose ();
 

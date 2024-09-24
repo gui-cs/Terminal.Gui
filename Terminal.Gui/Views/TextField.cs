@@ -730,14 +730,7 @@ public class TextField : View
     /// <inheritdoc/>
     public override Attribute GetNormalColor ()
     {
-        ColorScheme cs = ColorScheme;
-
-        if (ColorScheme is null)
-        {
-            cs = new ColorScheme ();
-        }
-
-        return Enabled ? cs.Focus : cs.Disabled;
+        return GetFocusColor ();
     }
 
     /// <summary>

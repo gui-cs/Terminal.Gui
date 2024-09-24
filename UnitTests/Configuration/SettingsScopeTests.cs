@@ -5,7 +5,7 @@ namespace Terminal.Gui.ConfigurationTests;
 public class SettingsScopeTests
 {
     [Fact]
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigLocations.DefaultOnly)]
     public void Apply_ShouldApplyProperties ()
     {
         // arrange
@@ -55,9 +55,11 @@ public class SettingsScopeTests
     [Fact]
     public void GetHardCodedDefaults_ShouldSetProperties ()
     {
+        ConfigLocations savedLocations = Locations;
+        Locations = ConfigLocations.DefaultOnly;
         Reset ();
 
-        Assert.Equal (3, ((Dictionary<string, ThemeScope>)Settings ["Themes"].PropertyValue).Count);
+        Assert.Equal (5, ((Dictionary<string, ThemeScope>)Settings ["Themes"].PropertyValue).Count);
 
         GetHardCodedDefaults ();
         Assert.NotEmpty (Themes);
@@ -72,5 +74,7 @@ public class SettingsScopeTests
 
         Assert.True (Settings ["Themes"].PropertyValue is Dictionary<string, ThemeScope>);
         Assert.Single ((Dictionary<string, ThemeScope>)Settings ["Themes"].PropertyValue);
+
+        Locations = savedLocations;
     }
 }

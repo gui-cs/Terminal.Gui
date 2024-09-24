@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using ColorHelper;
 
 namespace Terminal.Gui;
 
@@ -15,7 +16,7 @@ internal class ColorJsonConverter : JsonConverter<Color>
         {
             if (_instance is null)
             {
-                _instance = new ColorJsonConverter ();
+                _instance = new ();
             }
 
             return _instance;
@@ -31,10 +32,10 @@ internal class ColorJsonConverter : JsonConverter<Color>
             ReadOnlySpan<char> colorString = reader.GetString ();
 
             // Check if the color string is a color name
-            if (Enum.TryParse (colorString, true, out ColorName color))
+            if (ColorStrings.TryParseW3CColorName (colorString.ToString (), out Color color1))
             {
                 // Return the parsed color
-                return new Color (in color);
+                return new (color1);
             }
 
             if (Color.TryParse (colorString, null, out Color parsedColor))
@@ -48,5 +49,8 @@ internal class ColorJsonConverter : JsonConverter<Color>
         throw new JsonException ($"Unexpected token when parsing Color: {reader.TokenType}");
     }
 
-    public override void Write (Utf8JsonWriter writer, Color value, JsonSerializerOptions options) { writer.WriteStringValue (value.ToString ()); }
+    public override void Write (Utf8JsonWriter writer, Color value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue (value.ToString ());
+    }
 }

@@ -475,6 +475,7 @@ internal class CharMap : View
             NoDecorations = true,
             Title = CM.Glyphs.UpArrow.ToString (),
             WantContinuousButtonPressed = true,
+            ShadowStyle = ShadowStyle.None,
             CanFocus = false
         };
         up.Accept += (sender, args) => { args.Handled = ScrollVertical (-1) == true; };
@@ -489,6 +490,7 @@ internal class CharMap : View
             NoDecorations = true,
             Title = CM.Glyphs.DownArrow.ToString (),
             WantContinuousButtonPressed = true,
+            ShadowStyle = ShadowStyle.None,
             CanFocus = false
         };
         down.Accept += (sender, args) => { ScrollVertical (1); };
@@ -503,6 +505,7 @@ internal class CharMap : View
             NoDecorations = true,
             Title = CM.Glyphs.LeftArrow.ToString (),
             WantContinuousButtonPressed = true,
+            ShadowStyle = ShadowStyle.None,
             CanFocus = false
         };
         left.Accept += (sender, args) => { ScrollHorizontal (-1); };
@@ -517,6 +520,7 @@ internal class CharMap : View
             NoDecorations = true,
             Title = CM.Glyphs.RightArrow.ToString (),
             WantContinuousButtonPressed = true,
+            ShadowStyle = ShadowStyle.None,
             CanFocus = false
         };
         right.Accept += (sender, args) => { ScrollHorizontal (1); };

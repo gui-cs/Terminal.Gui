@@ -38,11 +38,11 @@ public class TextEffectsScenario : Scenario
 
         w.ColorScheme = new ()
         {
-            Normal = new (ColorName.White, ColorName.Black),
-            Focus = new (ColorName.Black, ColorName.White),
-            HotNormal = new (ColorName.White, ColorName.Black),
-            HotFocus = new (ColorName.White, ColorName.Black),
-            Disabled = new (ColorName.Gray, ColorName.Black)
+            Normal = new (ColorName16.White, ColorName16.Black),
+            Focus = new (ColorName16.Black, ColorName16.White),
+            HotNormal = new (ColorName16.White, ColorName16.Black),
+            HotFocus = new (ColorName16.White, ColorName16.Black),
+            Disabled = new (ColorName16.Gray, ColorName16.Black)
         };
 
         // Creates a window that occupies the entire terminal with a title.
@@ -100,7 +100,7 @@ public class TextEffectsScenario : Scenario
                                      new (0, 0, size.Width, size.Height),
                                      g,
                                      GradientDirection.Diagonal);
-        var back = new SolidFill (new (ColorName.Black));
+        var back = new SolidFill (new (ColorName16.Black));
 
         w.LineCanvas.Fill = new (
                                  fore,

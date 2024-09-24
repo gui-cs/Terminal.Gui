@@ -10,6 +10,7 @@ public class ApplicationTests
     {
         _output = output;
         ConsoleDriver.RunningUnitTests = true;
+        ConfigurationManager.Locations = ConfigurationManager.ConfigLocations.None;
 
 #if DEBUG_IDISPOSABLE
         Responder.Instances.Clear ();
@@ -312,7 +313,7 @@ public class ApplicationTests
             Assert.False (Application._forceFakeConsole);
             Assert.Equal (-1, Application.MainThreadId);
             Assert.Empty (Application.TopLevels);
-            Assert.Null (Application.MouseEnteredView);
+            Assert.Empty (Application._cachedViewsUnderMouse);
 
             // Keyboard
             Assert.Empty (Application.GetViewKeyBindings ());
@@ -342,7 +343,7 @@ public class ApplicationTests
         Application.MainThreadId = 1;
 
         //Application._topLevels = new List<Toplevel> ();
-        Application.MouseEnteredView = new ();
+        Application._cachedViewsUnderMouse.Clear ();
 
         //Application.SupportedCultures = new List<CultureInfo> ();
         Application.Force16Colors = true;
@@ -356,7 +357,7 @@ public class ApplicationTests
 
         //ApplicationOverlapped.OverlappedChildren = new List<View> ();
         //ApplicationOverlapped.OverlappedTop = 
-        Application.MouseEnteredView = new ();
+        Application._cachedViewsUnderMouse.Clear ();
 
         //Application.WantContinuousButtonPressedView = new View ();
 
@@ -390,6 +391,12 @@ public class ApplicationTests
         // 'app' closed cleanly.
         Assert.Empty (Responder.Instances);
 #endif
+    }
+
+    [Fact]
+    public void Shutdown_Alone_Does_Nothing ()
+    {
+        Application.Shutdown ();
     }
 
     [Theory]

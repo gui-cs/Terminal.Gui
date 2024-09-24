@@ -20,8 +20,8 @@ public class MarginTests (ITestOutputHelper output)
         };
 
         superView.Add (view);
-        Assert.Equal (ColorName.Red, view.Margin.GetNormalColor ().Foreground.GetClosestNamedColor ());
-        Assert.Equal (ColorName.Red, superView.GetNormalColor ().Foreground.GetClosestNamedColor ());
+        Assert.Equal (ColorName16.Red, view.Margin.GetNormalColor ().Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (ColorName16.Red, superView.GetNormalColor ().Foreground.GetClosestNamedColor16 ());
         Assert.Equal (superView.GetNormalColor (), view.Margin.GetNormalColor ());
         Assert.Equal (superView.GetFocusColor (), view.Margin.GetFocusColor ());
 

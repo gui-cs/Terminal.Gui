@@ -78,14 +78,6 @@ public class Border : Adornment
     /// <inheritdoc/>
     public override void BeginInit ()
     {
-#if HOVER
-        // TOOD: Hack - make Arrangement overridable
-        if ((Parent?.Arrangement & ViewArrangement.Movable) != 0)
-        {
-            HighlightStyle |= HighlightStyle.Hover;
-        }
-#endif
-
         base.BeginInit ();
 
 #if SUBVIEW_BASED_BORDER
@@ -251,16 +243,7 @@ public class Border : Adornment
             };
             ColorScheme = cs;
         }
-#if HOVER
-        else if (e.HighlightStyle.HasFlag (HighlightStyle.Hover))
-        {
-            if (!_savedHighlightLineStyle.HasValue)
-            {
-                _savedHighlightLineStyle = Parent?.BorderStyle ?? LineStyle;
-            }
-            LineStyle = LineStyle.Double;
-        }
-#endif
+
 
         if (e.NewValue == HighlightStyle.None && _savedForeColor.HasValue)
         {
@@ -315,7 +298,7 @@ public class Border : Adornment
                 _dragPosition = mouseEvent.Position;
                 Application.GrabMouse (this);
 
-                SetHighlight (HighlightStyle);
+                SetPressedHighlight (HighlightStyle);
 
                 // Arrange Mode -
                 // TODO: This code can be refactored to be more readable and maintainable.
@@ -485,8 +468,8 @@ public class Border : Adornment
                                                            out _
                                                           );
 
-                        Parent.X = nx;
-                        Parent.Y = ny;
+                        Parent.X = parentLoc.X - _startGrabPoint.X;
+                        Parent.Y = parentLoc.Y - _startGrabPoint.Y;
 
                         break;
 
@@ -593,7 +576,7 @@ public class Border : Adornment
         {
             _dragPosition = null;
             Application.UngrabMouse ();
-            SetHighlight (HighlightStyle.None);
+            SetPressedHighlight (HighlightStyle.None);
 
             EndArrangeMode ();
 

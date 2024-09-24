@@ -334,19 +334,18 @@ public partial class View // Drawing APIs
     ///     If set to <see langword="true"/> this uses the focused colors from the color scheme, otherwise
     ///     the regular ones.
     /// </param>
-    /// <param name="scheme">The color scheme to use.</param>
-    public void DrawHotString (string text, bool focused, ColorScheme scheme)
+    public void DrawHotString (string text, bool focused)
     {
         if (focused)
         {
-            DrawHotString (text, scheme.HotFocus, scheme.Focus);
+            DrawHotString (text, GetHotFocusColor (), GetFocusColor ());
         }
         else
         {
             DrawHotString (
                            text,
-                           Enabled ? scheme.HotNormal : scheme.Disabled,
-                           Enabled ? scheme.Normal : scheme.Disabled
+                           Enabled ? GetHotNormalColor () : ColorScheme.Disabled,
+                           Enabled ? GetNormalColor () : ColorScheme.Disabled
                           );
         }
     }
@@ -366,7 +365,26 @@ public partial class View // Drawing APIs
             cs = new ();
         }
 
-        return Enabled ? cs.Focus : cs.Disabled;
+        return Enabled ? GetColor (cs.Focus) : cs.Disabled;
+    }
+
+    /// <summary>Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.</summary>
+    /// <returns>
+    ///     <see cref="ColorScheme.Focus"/> if <see cref="Enabled"/> is <see langword="true"/> or
+    ///     <see cref="ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>. If it's
+    ///     overridden can return other values.
+    /// </returns>
+    public virtual Attribute GetHotFocusColor ()
+    {
+        ColorScheme cs = ColorScheme;
+
+
+        if (cs is null)
+        {
+            cs = new ();
+        }
+
+        return Enabled ? GetColor (cs.HotFocus) : cs.Disabled;
     }
 
     /// <summary>Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.</summary>
@@ -384,7 +402,7 @@ public partial class View // Drawing APIs
             cs = new ();
         }
 
-        return Enabled ? cs.HotNormal : cs.Disabled;
+        return Enabled ? GetColor (cs.HotNormal) : cs.Disabled;
     }
 
     /// <summary>Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.</summary>
@@ -402,7 +420,23 @@ public partial class View // Drawing APIs
             cs = new ();
         }
 
-        return Enabled ? cs.Normal : cs.Disabled;
+        Attribute disabled = new (cs.Disabled.Foreground, cs.Disabled.Background);
+        if (Diagnostics.HasFlag (ViewDiagnosticFlags.Hover) && _hovering)
+        {
+            disabled = new (disabled.Foreground.GetDarkerColor (), disabled.Background.GetDarkerColor ());
+        }
+        return Enabled ? GetColor (cs.Normal) : disabled;
+    }
+
+    private Attribute GetColor (Attribute inputAttribute)
+    {
+        Attribute attr = inputAttribute;
+        if (Diagnostics.HasFlag (ViewDiagnosticFlags.Hover) && _hovering)
+        {
+            attr = new (attr.Foreground.GetDarkerColor (), attr.Background.GetDarkerColor ());
+        }
+
+        return attr;
     }
 
     /// <summary>Moves the drawing cursor to the specified <see cref="Viewport"/>-relative location in the view.</summary>
@@ -520,7 +554,7 @@ public partial class View // Drawing APIs
             TextFormatter?.Draw (
                                  drawRect,
                                  HasFocus ? GetFocusColor () : GetNormalColor (),
-                                 HasFocus ? ColorScheme!.HotFocus : GetHotNormalColor (),
+                                 HasFocus ? GetHotFocusColor () : GetHotNormalColor (),
                                  Rectangle.Empty
                                 );
             SetSubViewNeedsDisplay ();
