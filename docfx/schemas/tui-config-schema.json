@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "description": "The JSON schema for the Terminal.Gui Configuration Manager (https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json).",
+  "description": "The JSON schema for the Terminal.Gui Configuration Manager (https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json).",
   "type": "object",
   "properties": {
     "Application.ArrangeKey": {
