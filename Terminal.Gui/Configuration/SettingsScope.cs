@@ -1,12 +1,9 @@
 ﻿#nullable enable
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Net.Security;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui;
 
