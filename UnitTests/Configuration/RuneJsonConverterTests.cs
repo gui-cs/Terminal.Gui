@@ -67,4 +67,80 @@ public class RunJsonConverterTests
         // Assert
         Assert.Equal (expected, deserialized.ToString ());
     }
+
+    [Fact]
+    public void Printable_Rune_Is_Serialized_As_Glyph ()
+    {
+        // Arrange
+
+        // Act
+        string json = JsonSerializer.Serialize ((Rune)'a', ConfigurationManager._serializerOptions);
+
+        // Assert
+        Assert.Equal ("\"a\"", json);
+    }
+
+    [Fact]
+    public void Non_Printable_Rune_Is_Serialized_As_u_Encoded_Value ()
+    {
+        // Arrange
+
+        // Act
+        string json = JsonSerializer.Serialize ((Rune)0x01, ConfigurationManager._serializerOptions);
+
+        // Assert
+        Assert.Equal ("\"\\u0001\"", json);
+    }
+
+    [Fact]
+    public void Json_With_Glyph_Works ()
+    {
+        // Arrange
+        var json = "\"a\"";
+
+        // Act
+        var deserialized = JsonSerializer.Deserialize<Rune> (json, ConfigurationManager._serializerOptions);
+
+        // Assert
+        Assert.Equal ("a", deserialized.ToString ());
+    }
+
+    [Fact]
+    public void Json_With_u_Encoded_Works ()
+    {
+        // Arrange
+        var json = "\"\\u0061\"";
+
+        // Act
+        var deserialized = JsonSerializer.Deserialize<Rune> (json, ConfigurationManager._serializerOptions);
+
+        // Assert
+        Assert.Equal ("a", deserialized.ToString ());
+    }
+
+    [Fact]
+    public void Json_With_U_Encoded_Works ()
+    {
+        // Arrange
+        var json = "\"U+0061\"";
+
+        // Act
+        var deserialized = JsonSerializer.Deserialize<Rune> (json, ConfigurationManager._serializerOptions);
+
+        // Assert
+        Assert.Equal ("a", deserialized.ToString ());
+    }
+
+    [Fact]
+    public void Json_With_Decimal_Works ()
+    {
+        // Arrange
+        var json = "97";
+
+        // Act
+        var deserialized = JsonSerializer.Deserialize<Rune> (json, ConfigurationManager._serializerOptions);
+
+        // Assert
+        Assert.Equal ("a", deserialized.ToString ());
+    }
 }

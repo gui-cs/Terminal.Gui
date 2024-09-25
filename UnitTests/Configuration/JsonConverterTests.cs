@@ -1,4 +1,5 @@
-﻿using System.Text.Encodings.Web;
+﻿using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
 
@@ -340,5 +341,15 @@ public class KeyJsonConverterTests
 
         // Assert
         Assert.Equal (expectedStringTo, deserializedKey.ToString ());
+    }
+
+    [Fact]
+    public void Separator_Property_Serializes_As_Glyph ()
+    {
+        // Act
+        string json = JsonSerializer.Serialize (Key.Separator, ConfigurationManager._serializerOptions);
+
+        // Assert
+        Assert.Equal ("\"+\"", json);
     }
 }

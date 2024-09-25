@@ -977,7 +977,6 @@ public class Key : EventArgs, IEquatable<Key>
 
     /// <summary>Gets or sets the separator character used when parsing and printing Keys. E.g. Ctrl+A. The default is '+'.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-    [JsonConverter (typeof (RuneJsonConverter))]
     public static Rune Separator
     {
         get => _separator;
