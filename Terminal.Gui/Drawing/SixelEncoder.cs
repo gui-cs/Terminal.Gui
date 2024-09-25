@@ -1,6 +1,13 @@
-﻿using Terminal.Gui;
+﻿// This code is based on existing implementations of sixel algorithm in MIT licensed open source libraries
+// node-sixel (Typescript) - https://github.com/jerch/node-sixel/tree/master/src
+// Copyright (c) 2019, Joerg Breitbart @license MIT
+// libsixel (C/C++) - https://github.com/saitoha/libsixel
+// Copyright (c) 2014-2016 Hayaki Saito @license MIT
+
+using Terminal.Gui;
 
 namespace Terminal.Gui;
+
 
 /// <summary>
 /// Encodes a images into the sixel console image output format.
@@ -62,13 +69,6 @@ public class SixelEncoder
         return start + defaultRatios + completeStartSequence + noScaling + fillArea + pallette + pixelData + terminator;
     }
 
-    /**
-     * This method is adapted from
-     * https://github.com/jerch/node-sixel/
-     * 
-     * Copyright (c) 2019 Joerg Breitbart.
-     * @license MIT
-     */
     private string WriteSixel (Color [,] pixels)
     {
 
