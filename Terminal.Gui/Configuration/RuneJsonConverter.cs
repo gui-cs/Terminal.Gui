@@ -11,12 +11,11 @@ namespace Terminal.Gui;
 ///         If the Rune is printable, it will be serialized as the glyph; otherwise the \u format (e.g. "\\u2611") is used.
 ///     </para>
 ///     <para>
-///         Supports deserializing a string as
-///         one of:
-///         - unicode char (e.g. "☑")
-///         - U+hex format (e.g. "U+2611")
-///         - \u format (e.g. "\\u2611")
-///         - A decimal number (e.g. "97" for "a")
+///         Supports deserializing as one of:
+///         - unicode glyph in a string (e.g. "☑")
+///         - U+hex format in a string  (e.g. "U+2611")
+///         - \u format in a string (e.g. "\\u2611")
+///         - A decimal number (e.g. 97 for "a")
 ///     </para>
 /// </summary>
 internal class RuneJsonConverter : JsonConverter<Rune>
