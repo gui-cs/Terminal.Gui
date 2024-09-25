@@ -111,7 +111,7 @@ public class GlyphDefinitions
 
     /// <summary>Size Horizontally indicator. Default is ┥Left Right Arrow - ↔ U+02194</summary>
     public Rune SizeHorizontal { get; set; } = (Rune)'↔';
-    
+
     /// <summary>Size Vertical indicator. Default Up Down Arrow - ↕ U+02195</summary>
     public Rune SizeVertical { get; set; } = (Rune)'↕';
 
@@ -125,8 +125,8 @@ public class GlyphDefinitions
     public Rune SizeBottomRight { get; set; } = (Rune)'↘';
 
     /// <summary>Size Bottom Left indicator. South West Arrow - ↙ U+02199</summary>
-    public Rune SizeBottomLLeft { get; set; } = (Rune)'↙';
-    
+    public Rune SizeBottomLeft { get; set; } = (Rune)'↙';
+
     /// <summary>Apple (non-BMP). Because snek. And because it's an example of a non-BMP surrogate pair. See Issue #2610.</summary>
     public Rune Apple { get; set; } = "🍎".ToRunes () [0]; // nonBMP
 
@@ -461,9 +461,8 @@ public class GlyphDefinitions
 
     #region ----------------- ShadowStyle -----------------
 
-
     /// <summary>Shadow - Vertical Start - Left Half Block - ▌ U+0258c</summary>
-    public Rune ShadowVerticalStart { get; set; } =  (Rune)'▖'; // Half: '\u2596'  ▖;
+    public Rune ShadowVerticalStart { get; set; } = (Rune)'▖'; // Half: '\u2596'  ▖;
 
     /// <summary>Shadow - Vertical - Left Half Block - ▌ U+0258c</summary>
     public Rune ShadowVertical { get; set; } = (Rune)'▌';
