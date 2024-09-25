@@ -4,7 +4,16 @@ using ColorHelper;
 
 namespace Terminal.Gui;
 
-/// <summary>Json converter for the <see cref="Color"/> class.</summary>
+/// <summary>
+/// Json converter for the <see cref="Color"/> class.
+/// <para>
+///     Serialization outputs a string with the color name if the color matches a name in <see cref="ColorStrings"/>
+///     or the "#RRGGBB" hexadecimal representation (e.g. "#FF0000" for red).
+/// </para>
+/// <para>
+///     Deserialization formats supported are "#RGB", "#RRGGBB", "#ARGB", "#AARRGGBB", "rgb(r,g,b)",
+///     "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", or any W3C color name.</para>
+/// </summary>
 internal class ColorJsonConverter : JsonConverter<Color>
 {
     private static ColorJsonConverter _instance;
