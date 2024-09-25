@@ -10,8 +10,7 @@
   // note that not all values here will be recreated (e.g. the Light and Dark themes and any property initialized
   // null).
   //
-  // TODO: V2 - Reference via http
-  "$schema": "../../docfx/schemas/tui-config-schema.json",
+  "$schema": "https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json",
 
   // Set this to true in a .config file to be loaded to cause JSON parsing errors
   // to throw exceptions. 
@@ -22,7 +21,7 @@
   "Application.NextTabGroupKey": "F6",
   "Application.PrevTabGroupKey": "Shift+F6",
   "Application.QuitKey": "Esc",
-  "Application.ArrangeKey":  "Ctrl+F5",
+  "Application.ArrangeKey": "Ctrl+F5",
   "Key.Separator": "+",
 
   "Theme": "Default",

@@ -14,7 +14,7 @@ namespace Terminal.Gui;
 /// <example>
 ///     <code>
 ///  {
-///    "$schema" : "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
+///    "$schema" : "https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json",
 ///    "Application.UseSystemConsole" : true,
 ///    "Theme" : "Default",
 ///    "Themes": {
@@ -32,7 +32,7 @@ public class SettingsScope : Scope<SettingsScope>
     /// <summary>Points to our JSON schema.</summary>
     [JsonInclude]
     [JsonPropertyName ("$schema")]
-    public string Schema { get; set; } = "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json";
+    public string Schema { get; set; } = "https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json";
 
     /// <summary>Updates the <see cref="SettingsScope"/> with the settings in a JSON string.</summary>
     /// <param name="stream">Json document to update the settings with.</param>
