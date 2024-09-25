@@ -94,7 +94,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         view.NewMouseEvent (new MouseEvent () { Flags = mouseFlags });
         Assert.Equal (mouseFlagsFromEvent, expectedMouseFlagsFromEvent);
     }
-    
+
     [Fact]
     public void NewMouseEvent_Invokes_MouseEvent_Properly ()
     {
@@ -302,6 +302,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         Assert.Equal (2, clickedCount);
 
         view.Dispose ();
+        Application.ResetState (ignoreDisposed: true);
     }
 
     [Fact]

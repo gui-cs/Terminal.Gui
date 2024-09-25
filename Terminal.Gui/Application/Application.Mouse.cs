@@ -217,12 +217,6 @@ public static partial class Application // Mouse handling
 
         WantContinuousButtonPressedView = deepestViewUnderMouse.WantContinuousButtonPressed ? deepestViewUnderMouse : null;
 
-        //Debug.WriteLine ($"OnMouseEvent: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags}");
-        if (deepestViewUnderMouse.Id == "mouseDemo")
-        {
-
-        }
-
         while (deepestViewUnderMouse.NewMouseEvent (me) is not true && MouseGrabView is not { })
         {
             if (deepestViewUnderMouse is Adornment adornmentView)
