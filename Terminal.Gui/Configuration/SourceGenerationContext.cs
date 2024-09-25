@@ -20,5 +20,6 @@ namespace Terminal.Gui;
 [JsonSerializable (typeof (Dictionary<ColorName16, string>))]
 [JsonSerializable (typeof (Dictionary<string, ThemeScope>))]
 [JsonSerializable (typeof (Dictionary<string, ColorScheme>))]
+[JsonSerializable (typeof (Dictionary<string, Color>))]
 internal partial class SourceGenerationContext : JsonSerializerContext
 { }
