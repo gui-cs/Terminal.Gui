@@ -666,7 +666,7 @@ public class ConfigurationManagerTests
         // Arrange
         var json = @"
 {
-  ""$schema"": ""https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json"",
+  ""$schema"": ""https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json"",
   ""Application.QuitKey"": ""Alt-Z"",
   ""Theme"": ""Default"",
   ""Themes"": [

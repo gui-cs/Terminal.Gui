@@ -40,7 +40,6 @@ public class KeyJsonConverterTests
     [InlineData (KeyCode.D4, "4")]
     [InlineData (KeyCode.Esc, "Esc")]
     [InlineData ((KeyCode)'+' | KeyCode.AltMask | KeyCode.CtrlMask, "Ctrl+Alt++")]
-    [InlineData ((KeyCode)'+' | KeyCode.AltMask | KeyCode.CtrlMask, "Ctrl+Alt++")]
     public void TestKeyRoundTripConversion (KeyCode key, string expectedStringTo)
     {
         // Arrange

@@ -24,7 +24,7 @@ namespace Terminal.Gui;
 ///     </para>
 ///     <para>
 ///         Settings are defined in JSON format, according to this schema:
-///         https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json
+///        https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json
 ///     </para>
 ///     <para>
 ///         Settings that will apply to all applications (global settings) reside in files named <c>config.json</c>.
