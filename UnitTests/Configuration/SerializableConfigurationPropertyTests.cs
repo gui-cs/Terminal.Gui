@@ -46,7 +46,7 @@ public class SerializableConfigurationPropertyTests
 
         // Ensure no property has the generic JsonStringEnumConverter<>
         EnsureNoSpecifiedConverters (properties, new [] { typeof (JsonStringEnumConverter<>) });
-        //// Ensure no property has the type RuneJsonConverter
+        /// Ensure no property has the type RuneJsonConverter
         //EnsureNoSpecifiedConverters (properties, new [] { typeof (RuneJsonConverter) });
         // Ensure no property has the type KeyJsonConverter
         EnsureNoSpecifiedConverters (properties, new [] { typeof (KeyJsonConverter) });
