@@ -10,7 +10,7 @@ public class SixelEncoderTests
         string expected = "\u001bP" // Start sixel sequence
                           + "0;0;0" // Defaults for aspect ratio and grid size
                           + "q" // Signals beginning of sixel image data
-                          + "\"1;1;12;2" // no scaling factors (1x1) and filling 12px width with 2 'sixel' height = 12 px high
+                          + "\"1;1;12;12" // no scaling factors (1x1) and filling 12x12 pixel area
                           /*
                            * Definition of the color palette
                            * #<index>;<type>;<R>;<G>;<B>" - 2 means RGB. The values range 0 to 100
@@ -82,7 +82,7 @@ public class SixelEncoderTests
         string expected = "\u001bP" // Start sixel sequence
                           + "0;0;0" // Defaults for aspect ratio and grid size
                           + "q" // Signals beginning of sixel image data
-                          + "\"1;1;12;2" // no scaling factors (1x1) and filling 12px width with 2 'sixel' height = 12 px high
+                          + "\"1;1;12;12" // no scaling factors (1x1) and filling 12x12 pixel area
                           /*
                            * Definition of the color palette
                            */

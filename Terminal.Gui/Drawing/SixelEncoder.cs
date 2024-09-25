@@ -204,20 +204,9 @@ public class SixelEncoder
 
     private string GetFillArea (Color [,] pixels)
     {
-        int widthInChars = GetWidthInChars (pixels);
-        int heightInChars = GetHeightInChars (pixels);
+        int widthInChars = pixels.GetLength (0);
+        int heightInChars = pixels.GetLength (1);
 
         return $"{widthInChars};{heightInChars}";
-    }
-
-    private int GetHeightInChars (Color [,] pixels)
-    {
-        int height = pixels.GetLength (1);
-        return (height + 5) / 6;
-    }
-
-    private int GetWidthInChars (Color [,] pixels)
-    {
-        return pixels.GetLength (0);
     }
 }
