@@ -703,6 +703,8 @@ public class UICatalogApp
 
             MiIsMouseDisabled!.Checked = Application.IsMouseDisabled;
 
+            ((CheckBox)ShForce16Colors!.CommandView!).CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
+
             Application.Top!.SetNeedsDisplay ();
         }
 

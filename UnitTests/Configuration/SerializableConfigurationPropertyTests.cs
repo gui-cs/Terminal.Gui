@@ -10,7 +10,7 @@ public class SerializableConfigurationPropertyTests
 {
 
     /// <summary>
-    ///     If this test fails, you need to add a new property with the SerializableConfigurationProperty attribute.
+    ///     If this test fails, you need to add a new property to <see cref="SourceGenerationContext"/> to support serialization of the new property type.
     /// </summary>
     [Fact]
     public void Test_SerializableConfigurationProperty_Types_Added_To_JsonSerializerContext ()
