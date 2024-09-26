@@ -21,7 +21,7 @@
 
   "Application.ArrangeKey": "Ctrl+F5",
   "Application.Force16Colors": false,
-  "Application.ForceDriver": "",
+  //"Application.ForceDriver": "", // TODO: ForceDriver should be nullable
   "Application.IsMouseDisabled": false,
   "Application.NextTabGroupKey": "F6",
   "Application.NextTabKey": "Tab",

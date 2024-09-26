@@ -16,6 +16,7 @@ public static partial class Application // Driver abstractions
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool Force16Colors { get; set; }
 
+    // BUGBUG: ForceDriver should be nullable.
     /// <summary>
     ///     Forces the use of the specified driver (one of "fake", "ansi", "curses", "net", or "windows"). If not
     ///     specified, the driver is selected based on the platform.
