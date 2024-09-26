@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui;
 
@@ -15,7 +14,7 @@ namespace Terminal.Gui;
 /// <example>
 ///     <code>
 ///  {
-///    "$schema" : "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
+///    "$schema" : "https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json",
 ///    "Application.UseSystemConsole" : true,
 ///    "Theme" : "Default",
 ///    "Themes": {
@@ -33,7 +32,7 @@ public class SettingsScope : Scope<SettingsScope>
     /// <summary>Points to our JSON schema.</summary>
     [JsonInclude]
     [JsonPropertyName ("$schema")]
-    public string Schema { get; set; } = "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json";
+    public string Schema { get; set; } = "https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json";
 
     /// <summary>Updates the <see cref="SettingsScope"/> with the settings in a JSON string.</summary>
     /// <param name="stream">Json document to update the settings with.</param>
@@ -87,12 +86,30 @@ public class SettingsScope : Scope<SettingsScope>
             return this;
         }
 
-        FileStream stream = File.OpenRead (realPath);
-        SettingsScope? s = Update (stream, filePath);
-        stream.Close ();
-        stream.Dispose ();
+        int retryCount = 0;
 
-        return s;
+        // Sometimes when the config file is written by an external agent, the change notification comes
+        // before the file is closed. This works around that.
+        while (retryCount < 2)
+        {
+            try
+            {
+                FileStream? stream = File.OpenRead (realPath);
+                SettingsScope? s = Update (stream, filePath);
+                stream.Close ();
+                stream.Dispose ();
+
+                return s;
+            }
+            catch (IOException ioe)
+            {
+                Debug.WriteLine($"Couldn't open {filePath}. Retrying...: {ioe}");
+                Task.Delay (100);
+                retryCount++;
+            }
+        }
+
+        return null;
     }
 
     /// <summary>Updates the <see cref="SettingsScope"/> with the settings in a JSON string.</summary>

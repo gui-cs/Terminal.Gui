@@ -113,7 +113,7 @@ public class TreeViewTests
 
         tv.SelectAll ();
         tv.CursorVisibility = CursorVisibility.Default;
-        Application.PositionCursor (top);
+        Application.PositionCursor ();
         Application.Driver!.GetCursorVisibility (out CursorVisibility visibility);
         Assert.Equal (CursorVisibility.Default, tv.CursorVisibility);
         Assert.Equal (CursorVisibility.Default, visibility);
@@ -1242,6 +1242,7 @@ oot two
 
         // redraw now that the custom color
         // delegate is registered
+        tv.SetNeedsDisplay ();
         tv.Draw ();
 
         // Same text

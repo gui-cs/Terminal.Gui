@@ -50,15 +50,15 @@ public class RadioGroupTests (ITestOutputHelper output)
     public void Initialize_SelectedItem_With_Minus_One ()
     {
         var rg = new RadioGroup { RadioLabels = new [] { "Test" }, SelectedItem = -1 };
-        Application.Current = new Toplevel ();
-        Application.Current.Add (rg);
+        Application.Top = new Toplevel ();
+        Application.Top.Add (rg);
         rg.SetFocus ();
 
         Assert.Equal (-1, rg.SelectedItem);
         Assert.True (Application.OnKeyDown (Key.Space));
         Assert.Equal (0, rg.SelectedItem);
 
-        Application.Current.Dispose ();
+        Application.Top.Dispose ();
     }
 
     [Fact]
@@ -80,11 +80,11 @@ public class RadioGroupTests (ITestOutputHelper output)
     {
         Application.Navigation = new ();
         var rg = new RadioGroup { RadioLabels = new [] { "Test", "New Test" } };
-        Application.Current = new Toplevel ();
-        Application.Current.Add (rg);
-        rg.SetFocus();
-        Assert.Equal(Orientation.Vertical, rg.Orientation);
-        Assert.Equal(0, rg.SelectedItem);
+        Application.Top = new Toplevel ();
+        Application.Top.Add (rg);
+        rg.SetFocus ();
+        Assert.Equal (Orientation.Vertical, rg.Orientation);
+        Assert.Equal (0, rg.SelectedItem);
         Assert.False (Application.OnKeyDown (Key.CursorUp)); // Should not change (should focus prev view if there was one, which there isn't)
         Assert.Equal (0, rg.SelectedItem);
         Assert.True (Application.OnKeyDown (Key.CursorDown));
@@ -101,15 +101,15 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (1, rg.SelectedItem);
         Assert.True (Application.OnKeyDown (Key.Space));
         Assert.Equal (1, rg.SelectedItem);
-        Application.ResetState();
+        Application.ResetState (ignoreDisposed: true);
     }
 
     [Fact]
     public void HotKeys_Select_RadioLabels ()
     {
         var rg = new RadioGroup { RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" } };
-        Application.Current = new Toplevel ();
-        Application.Current.Add (rg);
+        Application.Top = new Toplevel ();
+        Application.Top.Add (rg);
         rg.SetFocus ();
 
         Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L));
@@ -155,7 +155,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.True (superView.NewKeyDownEvent (Key.R.WithAlt));
         Assert.Equal (1, rg.SelectedItem);
 
-        Application.Current.Dispose ();
+        Application.Top.Dispose ();
     }
 
     [Fact]

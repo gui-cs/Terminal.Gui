@@ -71,6 +71,7 @@ public class ProgressBar : View, IDesignable
         {
             _fraction = Math.Min (value, 1);
             _isActivity = false;
+            SetNeedsDisplay ();
         }
     }
 
@@ -108,6 +109,7 @@ public class ProgressBar : View, IDesignable
 
                     break;
             }
+            SetNeedsDisplay ();
         }
     }
 
@@ -263,10 +265,10 @@ public class ProgressBar : View, IDesignable
 
     private void ProgressBar_Initialized (object sender, EventArgs e)
     {
-        ColorScheme = new ColorScheme (ColorScheme ?? SuperView?.ColorScheme ?? Colors.ColorSchemes ["Base"])
-        {
-            HotNormal = new Attribute (Color.BrightGreen, Color.Gray)
-        };
+        //ColorScheme = new ColorScheme (ColorScheme ?? SuperView?.ColorScheme ?? Colors.ColorSchemes ["Base"])
+        //{
+        //    HotNormal = new Attribute (Color.BrightGreen, Color.Gray)
+        //};
     }
 
     private void SetInitialProperties ()

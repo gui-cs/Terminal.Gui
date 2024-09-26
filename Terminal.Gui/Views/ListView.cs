@@ -124,39 +124,39 @@ public class ListView : View, IDesignable
         // Things this view knows how to do
         // 
         // BUGBUG: SHould return false if selectokn doesn't change (to support nav to next view)
-        AddCommand (Command.LineUp, () => MoveUp ());
+        AddCommand (Command.Up, () => MoveUp ());
         // BUGBUG: SHould return false if selectokn doesn't change (to support nav to next view)
-        AddCommand (Command.LineDown, () => MoveDown ());
+        AddCommand (Command.Down, () => MoveDown ());
         AddCommand (Command.ScrollUp, () => ScrollVertical (-1));
         AddCommand (Command.ScrollDown, () => ScrollVertical (1));
         AddCommand (Command.PageUp, () => MovePageUp ());
         AddCommand (Command.PageDown, () => MovePageDown ());
-        AddCommand (Command.TopHome, () => MoveHome ());
-        AddCommand (Command.BottomEnd, () => MoveEnd ());
+        AddCommand (Command.Start, () => MoveHome ());
+        AddCommand (Command.End, () => MoveEnd ());
         AddCommand (Command.Accept, () => OnOpenSelectedItem ());
-        AddCommand (Command.OpenSelectedItem, () => OnOpenSelectedItem ());
+        AddCommand (Command.Open, () => OnOpenSelectedItem ());
         AddCommand (Command.Select, () => MarkUnmarkRow ());
 
         AddCommand (Command.ScrollLeft, () => ScrollHorizontal (-1));
         AddCommand (Command.ScrollRight, () => ScrollHorizontal (1));
 
         // Default keybindings for all ListViews
-        KeyBindings.Add (Key.CursorUp, Command.LineUp);
-        KeyBindings.Add (Key.P.WithCtrl, Command.LineUp);
+        KeyBindings.Add (Key.CursorUp, Command.Up);
+        KeyBindings.Add (Key.P.WithCtrl, Command.Up);
 
-        KeyBindings.Add (Key.CursorDown, Command.LineDown);
-        KeyBindings.Add (Key.N.WithCtrl, Command.LineDown);
+        KeyBindings.Add (Key.CursorDown, Command.Down);
+        KeyBindings.Add (Key.N.WithCtrl, Command.Down);
 
         KeyBindings.Add (Key.PageUp, Command.PageUp);
 
         KeyBindings.Add (Key.PageDown, Command.PageDown);
         KeyBindings.Add (Key.V.WithCtrl, Command.PageDown);
 
-        KeyBindings.Add (Key.Home, Command.TopHome);
+        KeyBindings.Add (Key.Home, Command.Start);
 
-        KeyBindings.Add (Key.End, Command.BottomEnd);
+        KeyBindings.Add (Key.End, Command.End);
 
-        KeyBindings.Add (Key.Enter, Command.OpenSelectedItem);
+        KeyBindings.Add (Key.Enter, Command.Open);
     }
 
     /// <summary>Gets or sets whether this <see cref="ListView"/> allows items to be marked.</summary>

@@ -15,7 +15,7 @@ public class AppScopeTests
     };
 
     [Fact]
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigLocations.DefaultOnly)]
     public void Apply_ShouldApplyUpdatedProperties ()
     {
         Reset ();

@@ -177,7 +177,7 @@ public class SingleBackgroundWorker : Scenario
                                                       new StagingUIController (_startStaging, e.Result as ObservableCollection<string>);
                                                   Toplevel top = Application.Top;
                                                   top.Visible = false;
-                                                  Application.Current.Visible = false;
+                                                  Application.Top.Visible = false;
                                                   builderUI.Load ();
                                                   builderUI.Dispose ();
                                                   top.Visible = true;

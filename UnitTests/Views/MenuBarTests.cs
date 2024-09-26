@@ -150,6 +150,31 @@ public class MenuBarTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
+    public void CanExecute_False_Does_Not_Throws ()
+    {
+        var menu = new MenuBar
+        {
+            Menus =
+            [
+                new ("File", new MenuItem []
+                {
+                    new ("New", "", null, () => false),
+                    null,
+                    new ("Quit", "", null)
+                })
+            ]
+        };
+        var top = new Toplevel ();
+        top.Add (menu);
+        Application.Begin (top);
+
+        Assert.True (menu.NewKeyDownEvent (menu.Key));
+        Assert.True (menu.IsMenuOpen);
+        top.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
     public void CanExecute_HotKey ()
     {
         Window win = null;
@@ -290,7 +315,7 @@ public class MenuBarTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
     public void Disabled_MenuBar_Is_Never_Opened ()
     {
         Toplevel top = new ();
@@ -316,7 +341,7 @@ public class MenuBarTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
     public void Disabled_MenuItem_Is_Never_Selected ()
     {
         var menu = new MenuBar
@@ -431,6 +456,8 @@ public class MenuBarTests (ITestOutputHelper output)
         Window.DefaultBorderStyle = LineStyle.Single;
         Dialog.DefaultButtonAlignment = Alignment.Center;
         Dialog.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         Toplevel top = new ();
         var win = new Window ();
@@ -660,12 +687,14 @@ public class MenuBarTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Draw_A_Menu_Over_A_Top_Dialog ()
     {
+        ((FakeDriver)Application.Driver).SetBufferSize (40, 15);
+
         // Override CM
         Window.DefaultBorderStyle = LineStyle.Single;
         Dialog.DefaultButtonAlignment = Alignment.Center;
         Dialog.DefaultBorderStyle = LineStyle.Single;
-
-        ((FakeDriver)Application.Driver).SetBufferSize (40, 15);
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         Assert.Equal (new (0, 0, 40, 15), Application.Driver?.Clip);
         TestHelpers.AssertDriverContentsWithFrameAre (@"", output);

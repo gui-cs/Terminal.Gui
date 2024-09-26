@@ -106,6 +106,7 @@ public class TextViewTests
                                  };
 
         Application.Run (top);
+        top.Dispose ();
     }
 
     [Fact]
@@ -155,6 +156,7 @@ public class TextViewTests
         Assert.False (tv.HasFocus);
         Assert.False (fv.CanFocus);
         Assert.False (fv.HasFocus);
+        top.Dispose ();
     }
 
     [Fact]
@@ -248,6 +250,7 @@ public class TextViewTests
         top.Add (tv);
         Application.Begin (top);
         Assert.Equal (1, eventcount);
+        top.Dispose ();
     }
 
     [Fact]
@@ -340,6 +343,8 @@ public class TextViewTests
         expectedCol = 0;
         tv.Text = "defg";
         Assert.Equal (2, eventcount); // for set Text = "defg"
+        top.Dispose ();
+
     }
 
     [Fact]
@@ -374,6 +379,8 @@ public class TextViewTests
         tv.NewKeyDownEvent (Key.Y.WithShift);
         Assert.Equal (3, eventcount);
         Assert.Equal ("Yay", tv.Text);
+        top.Dispose ();
+
     }
 
     [Fact]
@@ -775,6 +782,7 @@ This is the second line.
         Assert.Equal (envText, tv.Text);
         Assert.Equal (new Point (3, 0), tv.CursorPosition);
         Assert.False (tv.IsDirty);
+        top.Dispose ();
     }
 
     [Fact]
@@ -846,6 +854,7 @@ This is the second line.
         Assert.Equal (envText, tv.Text);
         Assert.Equal (new Point (3, 0), tv.CursorPosition);
         Assert.False (tv.IsDirty);
+        top.Dispose ();
     }
 
     [Fact]
@@ -917,6 +926,7 @@ This is the second line.
         Assert.Equal (envText, tv.Text);
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
         Assert.False (tv.IsDirty);
+        top.Dispose ();
     }
 
     [Fact]
@@ -988,6 +998,7 @@ This is the second line.
         Assert.Equal (envText, tv.Text);
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
         Assert.False (tv.IsDirty);
+        top.Dispose ();
     }
 
     [Fact]
@@ -1009,14 +1020,14 @@ This is the second line.
 
         Assert.Equal (0, tv.LeftColumn);
         Assert.Equal (Point.Empty, tv.CursorPosition);
-        Application.PositionCursor (top);
+        Application.PositionCursor ();
         Assert.Equal (CursorVisibility.Default, tv.CursorVisibility);
 
         for (var i = 0; i < 12; i++)
         {
             tv.NewMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledRight });
             Assert.Equal (Math.Min (i + 1, 11), tv.LeftColumn);
-            Application.PositionCursor (top);
+            Application.PositionCursor ();
             Application.Driver!.GetCursorVisibility (out CursorVisibility cursorVisibility);
             Assert.Equal (CursorVisibility.Invisible, cursorVisibility);
         }
@@ -1026,7 +1037,7 @@ This is the second line.
             tv.NewMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledLeft });
             Assert.Equal (i - 1, tv.LeftColumn);
 
-            Application.PositionCursor (top);
+            Application.PositionCursor ();
             Application.Driver!.GetCursorVisibility (out CursorVisibility cursorVisibility);
 
             if (i - 1 == 0)
@@ -1061,13 +1072,13 @@ This is the second line.
         Application.Begin (top);
 
         Assert.Equal (0, tv.TopRow);
-        Application.PositionCursor (top);
+        Application.PositionCursor ();
         Assert.Equal (CursorVisibility.Default, tv.CursorVisibility);
 
         for (var i = 0; i < 12; i++)
         {
             tv.NewMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledDown });
-            Application.PositionCursor (top);
+            Application.PositionCursor ();
             Assert.Equal (i + 1, tv.TopRow);
             Application.Driver!.GetCursorVisibility (out CursorVisibility cursorVisibility);
             Assert.Equal (CursorVisibility.Invisible, cursorVisibility);
@@ -1076,10 +1087,10 @@ This is the second line.
         for (var i = 12; i > 0; i--)
         {
             tv.NewMouseEvent (new MouseEvent { Flags = MouseFlags.WheeledUp });
-            Application.PositionCursor (top);
+            Application.PositionCursor ();
             Assert.Equal (i - 1, tv.TopRow);
 
-            Application.PositionCursor (top);
+            Application.PositionCursor ();
             Application.Driver!.GetCursorVisibility (out CursorVisibility cursorVisibility);
 
             if (i - 1 == 0)
@@ -1796,7 +1807,7 @@ This is the second line.
 
     [Fact]
     [AutoInitShutdown]
-    public void HistoryText_Undo_Redo_KillToStartOfLine ()
+    public void HistoryText_Undo_Redo_KillToLeftStart ()
     {
         var text = "First line.\nSecond line.";
         var tv = new TextView { Text = text };
@@ -2288,6 +2299,7 @@ This is the second line.
                      );
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (4, 2), tv.CursorPosition);
+        top.Dispose ();
     }
 
     [Fact]
@@ -2421,6 +2433,7 @@ This is the second line.
                      );
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (7, 2), tv.CursorPosition);
+        top.Dispose ();
     }
 
     [Fact]
@@ -2542,6 +2555,7 @@ This is the second line.
                      );
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (13, 2), tv.CursorPosition);
+        top.Dispose ();
     }
 
     [Fact]
@@ -3030,6 +3044,7 @@ This is the second line.
         Assert.Equal (11, tv.SelectionStartColumn);
         Assert.Equal (2, tv.SelectionStartRow);
         Assert.Equal (0, tv.SelectedLength);
+        top.Dispose ();
     }
 
     [Fact]
@@ -3093,6 +3108,7 @@ This is the second line.
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
+        top.Dispose ();
     }
 
     [Fact]
@@ -3156,6 +3172,7 @@ This is the second line.
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
+        top.Dispose ();
     }
 
     [Fact]
@@ -3511,6 +3528,7 @@ This is the second line.
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
+        top.Dispose ();
     }
 
     [Fact]
@@ -3792,6 +3810,7 @@ This is the second line.
         Assert.Equal (4, tv.Lines);
         Assert.Equal (new Point (0, 3), tv.CursorPosition);
         Assert.True (tv.IsDirty);
+        top.Dispose ();
     }
 
     [Fact]
@@ -4031,6 +4050,7 @@ This is the second line.
                      );
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (4, 1), tv.CursorPosition);
+        top.Dispose ();
     }
 
     [Fact]
@@ -4088,6 +4108,7 @@ This is the second line.
                      );
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (7, 1), tv.CursorPosition);
+        top.Dispose ();
     }
 
     [Fact]
@@ -4141,6 +4162,7 @@ This is the second line.
                      );
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new Point (13, 1), tv.CursorPosition);
+        top.Dispose ();
     }
 
     [Fact]
@@ -4210,6 +4232,7 @@ This is the second line.
         Assert.Equal (11, tv.SelectionStartColumn);
         Assert.Equal (1, tv.SelectionStartRow);
         Assert.Equal (0, tv.SelectedLength);
+        top.Dispose ();
     }
 
     [Fact]
@@ -4279,6 +4302,7 @@ This is the second line.
         Assert.Equal (11, tv.SelectionStartColumn);
         Assert.Equal (1, tv.SelectionStartRow);
         Assert.Equal (0, tv.SelectedLength);
+        top.Dispose ();
     }
 
     [Fact]
@@ -4344,6 +4368,7 @@ This is the second line.
         Assert.Equal (11, tv.SelectionStartColumn);
         Assert.Equal (1, tv.SelectionStartRow);
         Assert.Equal (0, tv.SelectedLength);
+        top.Dispose ();
     }
 
     [Fact]
@@ -5413,6 +5438,7 @@ This is the second line.
 
         Assert.True (tv.NewKeyDownEvent (ContextMenu.DefaultKey));
         Assert.True (tv.ContextMenu != null && tv.ContextMenu.MenuBar.Visible);
+        top.Dispose ();
     }
 
     [Fact]
@@ -6254,6 +6280,7 @@ This is the second line.
 
         //                                             TAB to jump between text fields.
         TestHelpers.AssertDriverAttributesAre ("1111000", Application.Driver, attributes);
+        top.Dispose ();
     }
 
     [Fact]
@@ -6376,6 +6403,7 @@ This is the second line.
                                  };
 
         Application.Run (top);
+        top.Dispose ();
     }
 
     [Fact]
@@ -6418,6 +6446,7 @@ This is the second line.
                                  };
 
         Application.Run (top);
+        top.Dispose ();
     }
 
     [Fact]
@@ -6469,6 +6498,7 @@ This is the second line.
                                  };
 
         Application.Run (top);
+        top.Dispose ();
     }
 
     [Fact]
@@ -6522,6 +6552,7 @@ This is the second line.
                                  };
 
         Application.Run (top);
+        top.Dispose ();
     }
 
     [Fact]
@@ -6591,6 +6622,7 @@ This is the second line.
                                  };
 
         Application.Run (top);
+        top.Dispose ();
     }
 
     [Fact]
@@ -6639,6 +6671,7 @@ TAB to jump between text field",
 TAB to jump between text field",
                                                       _output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
@@ -6747,6 +6780,7 @@ TAB to jump between text field",
 └─────────────┘",
                                                       _output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
@@ -6824,6 +6858,7 @@ TAB to jump between text field",
 └─────────────┘",
                                                       _output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
@@ -6990,6 +7025,7 @@ line.
 ",
                                                       _output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
@@ -8108,6 +8144,7 @@ a
 ",
                                              _output
                                             );
+        top.Dispose ();
     }
 
     [Theory]
@@ -8147,6 +8184,7 @@ H
 Line 2.",
                                                       _output
                                                      );
+        top.Dispose ();
     }
 
     [Fact]
@@ -8381,9 +8419,11 @@ line.
     // This is necessary because a) Application is a singleton and Init/Shutdown must be called
     // as a pair, and b) all unit test functions should be atomic.
     [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
-    public class TextViewTestsAutoInitShutdown : AutoInitShutdownAttribute
+    public class TextViewTestsAutoInitShutdown : AutoInitShutdownAttribute 
     {
         public static string Txt = "TAB to jump between text fields.";
+
+        public TextViewTestsAutoInitShutdown () : base (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly) { }
 
         public override void After (MethodInfo methodUnderTest)
         {

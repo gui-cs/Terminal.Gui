@@ -4,11 +4,12 @@
 
 namespace Terminal.Gui.ApplicationTests;
 
-public class MouseTests
+[Trait ("Category", "Input")]
+public class ApplicationMouseTests
 {
     private readonly ITestOutputHelper _output;
 
-    public MouseTests (ITestOutputHelper output)
+    public ApplicationMouseTests (ITestOutputHelper output)
     {
         _output = output;
 #if DEBUG_IDISPOSABLE
@@ -137,7 +138,7 @@ public class MouseTests
     ///     Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked. With
     ///     Frames; Frame != Viewport
     /// </summary>
-    [AutoInitShutdown]
+    //[AutoInitShutdown]
     [Theory]
 
     // click on border
@@ -199,21 +200,24 @@ public class MouseTests
 
         var clicked = false;
 
-        var top = new Toplevel ();
-        top.X = 0;
-        top.Y = 0;
-        top.Width = size.Width * 2;
-        top.Height = size.Height * 2;
-        top.BorderStyle = LineStyle.None;
+        Application.Top = new Toplevel ()
+        {
+            Id = "top",
+        };
+        Application.Top.X = 0;
+        Application.Top.Y = 0;
+        Application.Top.Width = size.Width * 2;
+        Application.Top.Height = size.Height * 2;
+        Application.Top.BorderStyle = LineStyle.None;
 
-        var view = new View { X = pos.X, Y = pos.Y, Width = size.Width, Height = size.Height };
+        var view = new View { Id = "view", X = pos.X, Y = pos.Y, Width = size.Width, Height = size.Height };
 
         // Give the view a border. With PR #2920, mouse clicks are only passed if they are inside the view's Viewport.
         view.BorderStyle = LineStyle.Single;
         view.CanFocus = true;
 
-        top.Add (view);
-        Application.Begin (top);
+        Application.Top.Add (view);
+
         var mouseEvent = new MouseEvent { Position = new (clickX, clickY), Flags = MouseFlags.Button1Clicked };
 
         view.MouseClick += (s, e) =>
@@ -225,7 +229,9 @@ public class MouseTests
 
         Application.OnMouseEvent (mouseEvent);
         Assert.Equal (expectedClicked, clicked);
-        top.Dispose ();
+        Application.Top.Dispose ();
+        Application.ResetState (ignoreDisposed: true);
+
     }
 
     #endregion mouse coordinate tests
@@ -401,5 +407,6 @@ public class MouseTests
         Assert.Equal (0, count);
         top.Dispose ();
     }
+
     #endregion
 }

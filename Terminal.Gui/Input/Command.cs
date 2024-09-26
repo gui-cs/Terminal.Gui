@@ -6,88 +6,123 @@ namespace Terminal.Gui;
 /// <summary>Actions which can be performed by the application or bound to keys in a <see cref="View"/> control.</summary>
 public enum Command
 {
+    #region Default View Commands
+
     /// <summary>Invoked when the HotKey for the View has been pressed.</summary>
     HotKey,
 
-    /// <summary>Accepts the current state (e.g. list selection, button press, toggle, etc).</summary>
+    /// <summary>Accepts the current state (e.g. list selection, button press, toggle, etc.).</summary>
     Accept,
 
     /// <summary>Selects an item (e.g. a list item or menu item) without necessarily accepting it.</summary>
     Select,
 
-    /// <summary>Moves down one item (cell, line, etc...).</summary>
-    LineDown,
+    #endregion
 
-    /// <summary>Extends the selection down one (cell, line, etc...).</summary>
-    LineDownExtend,
-
-    /// <summary>Moves down to the last child node of the branch that holds the current selection.</summary>
-    LineDownToLastBranch,
-
-    /// <summary>Scrolls down one (cell, line, etc...) (without changing the selection).</summary>
-    ScrollDown,
-
-    // --------------------------------------------------------------------
+    #region Movement Commands
 
     /// <summary>Moves up one (cell, line, etc...).</summary>
-    LineUp,
+    Up,
 
-    /// <summary>Extends the selection up one item (cell, line, etc...).</summary>
-    LineUpExtend,
-
-    /// <summary>Moves up to the first child node of the branch that holds the current selection.</summary>
-    LineUpToFirstBranch,
-
-    /// <summary>Scrolls up one item (cell, line, etc...) (without changing the selection).</summary>
-    ScrollUp,
+    /// <summary>Moves down one item (cell, line, etc...).</summary>
+    Down,
 
     /// <summary>
-    ///     Moves the selection left one by the minimum increment supported by the <see cref="View"/> e.g. single
-    ///     character, cell, item etc.
+    ///     Moves left one (cell, line, etc...).
     /// </summary>
     Left,
 
-    /// <summary>Scrolls one item (cell, character, etc...) to the left</summary>
-    ScrollLeft,
+    /// <summary>
+    ///     Moves right one (cell, line, etc...).
+    /// </summary>
+    Right,
+
+    /// <summary>Move one page up.</summary>
+    PageUp,
+
+    /// <summary>Move one page down.</summary>
+    PageDown,
+
+    /// <summary>Moves to the left page.</summary>
+    PageLeft,
+
+    /// <summary>Moves to the right page.</summary>
+    PageRight,
+
+    /// <summary>Moves to the top of page.</summary>
+    StartOfPage,
+
+    /// <summary>Moves to the bottom of page.</summary>
+    EndOfPage,
+
+    /// <summary>Moves to the start (e.g. the top or home).</summary>
+    Start,
+
+    /// <summary>Moves to the end (e.g. the bottom).</summary>
+    End,
+
+    /// <summary>Moves left to the start on the current row/line.</summary>
+    LeftStart,
+
+    /// <summary>Moves right to the end on the current row/line.</summary>
+    RightEnd,
+
+    /// <summary>Moves to the start of the previous word.</summary>
+    WordLeft,
+
+    /// <summary>Moves the start of the next word.</summary>
+    WordRight,
+
+    #endregion
+
+    #region Movement With Extension Commands
+
+    /// <summary>Extends the selection up one item (cell, line, etc...).</summary>
+    UpExtend,
+
+    /// <summary>Extends the selection down one (cell, line, etc...).</summary>
+    DownExtend,
 
     /// <summary>
-    ///     Extends the selection left one by the minimum increment supported by the view e.g. single character, cell,
-    ///     item etc.
+    ///     Extends the selection left one item (cell, line, etc...)
     /// </summary>
     LeftExtend,
 
     /// <summary>
-    ///     Moves the selection right one by the minimum increment supported by the view e.g. single character, cell, item
-    ///     etc.
-    /// </summary>
-    Right,
-
-    /// <summary>Scrolls one item (cell, character, etc...) to the right.</summary>
-    ScrollRight,
-
-    /// <summary>
-    ///     Extends the selection right one by the minimum increment supported by the view e.g. single character, cell,
-    ///     item etc.
+    ///     Extends the selection right one item (cell, line, etc...)
     /// </summary>
     RightExtend,
-
-    /// <summary>Moves the caret to the start of the previous word.</summary>
-    WordLeft,
 
     /// <summary>Extends the selection to the start of the previous word.</summary>
     WordLeftExtend,
 
-    /// <summary>Moves the caret to the start of the next word.</summary>
-    WordRight,
-
     /// <summary>Extends the selection to the start of the next word.</summary>
     WordRightExtend,
 
-    /// <summary>Cuts to the clipboard the characters from the current position to the end of the line.</summary>
-    CutToEndLine,
+    /// <summary>Move one page down extending the selection to cover revealed objects/characters.</summary>
+    PageDownExtend,
 
-    /// <summary>Cuts to the clipboard the characters from the current position to the start of the line.</summary>
-    CutToStartLine,
+    /// <summary>Move one page up extending the selection to cover revealed objects/characters.</summary>
+    PageUpExtend,
+
+    /// <summary>Extends the selection to start (e.g. home or top).</summary>
+    StartExtend,
+
+    /// <summary>Extends the selection to end (e.g. bottom).</summary>
+    EndExtend,
+
+    /// <summary>Extends the selection to the start on the current row/line.</summary>
+    LeftStartExtend,
+
+    /// <summary>Extends the selection to the right on the current row/line.</summary>
+    RightEndExtend,
+
+    /// <summary>Toggles the selection.</summary>
+    ToggleExtend,
+
+    #endregion
+
+    #region Editing Commands
 
     /// <summary>Deletes the characters forwards.</summary>
     KillWordForwards,
@@ -101,6 +136,8 @@ public enum Command
     /// </summary>
     ToggleOverwrite,
 
+    // QUESTION: What is the difference between EnableOverwrite and ToggleOverwrite?
+
     /// <summary>
     ///     Enables overwrite mode such that newly typed text overwrites the text that is already there (typically
     ///     associated with the Insert key).
@@ -109,54 +146,6 @@ public enum Command
 
     /// <summary>Disables overwrite mode (<see cref="EnableOverwrite"/>)</summary>
     DisableOverwrite,
-
-    /// <summary>Move one page down.</summary>
-    PageDown,
-
-    /// <summary>Move one page down extending the selection to cover revealed objects/characters.</summary>
-    PageDownExtend,
-
-    /// <summary>Move one page up.</summary>
-    PageUp,
-
-    /// <summary>Move one page up extending the selection to cover revealed objects/characters.</summary>
-    PageUpExtend,
-
-    /// <summary>Moves to the top/home.</summary>
-    TopHome,
-
-    /// <summary>Extends the selection to the top/home.</summary>
-    TopHomeExtend,
-
-    /// <summary>Moves to the bottom/end.</summary>
-    BottomEnd,
-
-    /// <summary>Extends the selection to the bottom/end.</summary>
-    BottomEndExtend,
-
-    /// <summary>Open the selected item.</summary>
-    OpenSelectedItem,
-
-    /// <summary>Toggles the Expanded or collapsed state of a list or item (with subitems).</summary>
-    ToggleExpandCollapse,
-
-    /// <summary>Expands a list or item (with subitems).</summary>
-    Expand,
-
-    /// <summary>Recursively Expands all child items and their child items (if any).</summary>
-    ExpandAll,
-
-    /// <summary>Collapses a list or item (with subitems).</summary>
-    Collapse,
-
-    /// <summary>Recursively collapses a list items of their children (if any).</summary>
-    CollapseAll,
-
-    /// <summary>Cancels an action or any temporary states on the control e.g. expanding a combo list.</summary>
-    Cancel,
-
-    /// <summary>Unix emulation.</summary>
-    UnixEmulation,
 
     /// <summary>Deletes the character on the right.</summary>
     DeleteCharRight,
@@ -170,41 +159,41 @@ public enum Command
     /// <summary>Deletes all objects.</summary>
     DeleteAll,
 
-    /// <summary>Moves the cursor to the start of line.</summary>
-    StartOfLine,
+    /// <summary>Inserts a new item.</summary>
+    NewLine,
 
-    /// <summary>Extends the selection to the start of line.</summary>
-    StartOfLineExtend,
+    /// <summary>Unix emulation.</summary>
+    UnixEmulation,
 
-    /// <summary>Moves the cursor to the end of line.</summary>
-    EndOfLine,
+    #endregion
 
-    /// <summary>Extends the selection to the end of line.</summary>
-    EndOfLineExtend,
+    #region Tree Commands
 
-    /// <summary>Moves the cursor to the top of page.</summary>
-    StartOfPage,
+    /// <summary>Moves down to the last child node of the branch that holds the current selection.</summary>
+    LineDownToLastBranch,
 
-    /// <summary>Moves the cursor to the bottom of page.</summary>
-    EndOfPage,
+    /// <summary>Moves up to the first child node of the branch that holds the current selection.</summary>
+    LineUpToFirstBranch,
 
-    /// <summary>Moves to the left page.</summary>
-    PageLeft,
+    #endregion
 
-    /// <summary>Moves to the right page.</summary>
-    PageRight,
+    #region Scroll Commands
 
-    /// <summary>Moves to the left begin.</summary>
-    LeftHome,
+    /// <summary>Scrolls down one (cell, line, etc...).</summary>
+    ScrollDown,
 
-    /// <summary>Extends the selection to the left begin.</summary>
-    LeftHomeExtend,
+    /// <summary>Scrolls up one item (cell, line, etc...).</summary>
+    ScrollUp,
 
-    /// <summary>Moves to the right end.</summary>
-    RightEnd,
+    /// <summary>Scrolls one item (cell, character, etc...) to the left.</summary>
+    ScrollLeft,
 
-    /// <summary>Extends the selection to the right end.</summary>
-    RightEndExtend,
+    /// <summary>Scrolls one item (cell, character, etc...) to the right.</summary>
+    ScrollRight,
+
+    #endregion
+
+    #region Clipboard Commands
 
     /// <summary>Undo changes.</summary>
     Undo,
@@ -221,41 +210,67 @@ public enum Command
     /// <summary>Pastes the current selection.</summary>
     Paste,
 
-    /// TODO: IRunnable: Rename to Command.Quit to make more generic.
-    /// <summary>Quit a <see cref="Toplevel"/>.</summary>
-    QuitToplevel,
+    /// <summary>Cuts to the clipboard the characters from the current position to the end of the line.</summary>
+    CutToEndLine,
 
-    /// TODO: Overlapped: Add Command.ShowHide
+    /// <summary>Cuts to the clipboard the characters from the current position to the start of the line.</summary>
+    CutToStartLine,
 
-    /// <summary>Suspend an application (Only implemented in <see cref="CursesDriver"/>).</summary>
-    Suspend,
+    #endregion
 
-    /// <summary>Moves focus to the next view.</summary>
-    NextView,
+    #region Navigation Commands
 
-    /// <summary>Moves focus to the previous view.</summary>
-    PreviousView,
+    /// <summary>Moves focus to the next <see cref="TabBehavior.TabStop"/>.</summary>
+    NextTabStop,
 
-    /// <summary>Moves focus to the next view or Toplevel (case of Overlapped).</summary>
-    NextViewOrTop,
+    /// <summary>Moves focus to the previous <see cref="TabBehavior.TabStop"/>.</summary>
+    PreviousTabStop,
 
-    /// <summary>Moves focus to the next previous or Toplevel (case of Overlapped).</summary>
-    PreviousViewOrTop,
+    /// <summary>Moves focus to the next <see cref="TabBehavior.TabGroup"/>.</summary>
+    NextTabGroup,
 
-    /// <summary>Refresh.</summary>
-    Refresh,
-
-    /// <summary>Toggles the selection.</summary>
-    ToggleExtend,
-
-    /// <summary>Inserts a new item.</summary>
-    NewLine,
+    /// <summary>Moves focus to the next<see cref="TabBehavior.TabGroup"/>.</summary>
+    PreviousTabGroup,
 
     /// <summary>Tabs to the next item.</summary>
     Tab,
 
     /// <summary>Tabs back to the previous item.</summary>
     BackTab,
+
+    #endregion
+
+    #region Action Commands
+
+    /// <summary>Toggles something (e.g. the expanded or collapsed state of a list).</summary>
+    Toggle,
+
+    /// <summary>Expands a list or item (with subitems).</summary>
+    Expand,
+
+    /// <summary>Recursively Expands all child items and their child items (if any).</summary>
+    ExpandAll,
+
+    /// <summary>Collapses a list or item (with subitems).</summary>
+    Collapse,
+
+    /// <summary>Recursively collapses a list items of their children (if any).</summary>
+    CollapseAll,
+
+    /// <summary>Cancels an action or any temporary states on the control e.g. expanding a combo list.</summary>
+    Cancel,
+
+    /// <summary>Quit.</summary>
+    Quit,
+
+    /// <summary>Refresh.</summary>
+    Refresh,
+
+    /// <summary>Suspend an application (Only implemented in <see cref="CursesDriver"/>).</summary>
+    Suspend,
+
+    /// <summary>Open the selected item or invoke a UI for opening something.</summary>
+    Open,
 
     /// <summary>Saves the current document.</summary>
     Save,
@@ -267,5 +282,12 @@ public enum Command
     New,
 
     /// <summary>Shows context about the item (e.g. a context menu).</summary>
-    ShowContextMenu
+    Context,
+
+    /// <summary>
+    ///     Invokes a user interface for editing or configuring something.
+    /// </summary>
+    Edit,
+
+    #endregion
 }

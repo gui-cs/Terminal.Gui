@@ -20,10 +20,9 @@ public enum ViewDiagnosticFlags : uint
     Padding = 0b_0000_0010,
 
     /// <summary>
-    ///     When enabled, <see cref="Adornment.OnMouseEnter(Gui.MouseEvent)"/> and <see cref="Adornment.OnMouseLeave(Gui.MouseEvent)"/>
-    ///     will invert the foreground and background colors.
+    ///     When enabled the View's colors will be darker when the mouse is hovering over the View (See <see cref="View.MouseEnter"/> and <see cref="View.MouseLeave"/>.
     /// </summary>
-    MouseEnter = 0b_0000_00100
+    Hover = 0b_0000_00100
 }
 
 public partial class View

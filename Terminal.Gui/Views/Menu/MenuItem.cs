@@ -325,7 +325,7 @@ public class MenuItem
             if (index > -1)
             {
                 _menuBar.KeyBindings.Remove (HotKey!.WithAlt);
-                KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, this);
+                KeyBinding keyBinding = new ([Command.Toggle], KeyBindingScope.HotKey, this);
                 _menuBar.KeyBindings.Add (HotKey.WithAlt, keyBinding);
             }
         }

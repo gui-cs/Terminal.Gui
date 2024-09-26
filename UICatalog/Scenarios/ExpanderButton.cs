@@ -39,18 +39,15 @@ public class ExpanderButton : Button
         ShadowStyle = ShadowStyle.None;
 
         AddCommand (Command.HotKey, Toggle);
-        AddCommand (Command.ToggleExpandCollapse, Toggle);
-        KeyBindings.Add (Key.F4, Command.ToggleExpandCollapse);
+        AddCommand (Command.Toggle, Toggle);
+        KeyBindings.Add (Key.F4, Command.Toggle);
 
         Orientation = Orientation.Vertical;
 
         Initialized += ExpanderButton_Initialized;
     }
 
-    private void ExpanderButton_Initialized (object sender, EventArgs e)
-    {
-        ExpandOrCollapse (Collapsed);
-    }
+    private void ExpanderButton_Initialized (object sender, EventArgs e) { ExpandOrCollapse (Collapsed); }
 
     private Orientation _orientation = Orientation.Horizontal;
 
@@ -74,7 +71,7 @@ public class ExpanderButton : Button
     /// <returns>True of the event was cancelled.</returns>
     protected virtual bool OnOrientationChanging (Orientation newOrientation)
     {
-        var args = new CancelEventArgs<Orientation> (in _orientation, ref newOrientation);
+        CancelEventArgs<Orientation> args = new CancelEventArgs<Orientation> (in _orientation, ref newOrientation);
         OrientationChanging?.Invoke (this, args);
 
         if (!args.Cancel)
@@ -129,7 +126,6 @@ public class ExpanderButton : Button
     }
 
     /// <summary>Called when the orientation is changing. Invokes the <see cref="OrientationChanging"/> event.</summary>
-    /// <param name="newOrientation"></param>
     /// <param name="newValue"></param>
     /// <returns>True of the event was cancelled.</returns>
     protected virtual bool OnCollapsedChanging (bool newValue)
@@ -142,26 +138,13 @@ public class ExpanderButton : Button
             _collapsed = args.NewValue;
 
             ExpandOrCollapse (_collapsed);
-
-            View superView = SuperView;
-            if (superView is Adornment adornment)
-            {
-                superView = adornment.Parent;
-            }
-
-            foreach (View subview in superView.Subviews)
-            {
-                subview.Visible = !Collapsed;
-                subview.Enabled = !Collapsed;
-            }
         }
 
         return args.Cancel;
     }
 
     /// <summary>
-    ///     Fired when the orientation has changed. Can be cancelled by setting
-    ///     <see cref="OrientationEventArgs.Cancel"/> to true.
+    ///     Fired when the orientation has changed. Can be cancelled.
     /// </summary>
     public event EventHandler<CancelEventArgs<bool>> CollapsedChanging;
 
@@ -183,6 +166,7 @@ public class ExpanderButton : Button
         Text = $"{(Collapsed ? CollapsedGlyph : ExpandedGlyph)}";
 
         View superView = SuperView;
+
         if (superView is Adornment adornment)
         {
             superView = adornment.Parent;
@@ -223,6 +207,12 @@ public class ExpanderButton : Button
             {
                 superView.Width = _previousDim;
             }
+        }
+
+        foreach (View subview in superView.Subviews)
+        {
+            subview.Visible = !Collapsed;
+            subview.Enabled = !Collapsed;
         }
     }
 }

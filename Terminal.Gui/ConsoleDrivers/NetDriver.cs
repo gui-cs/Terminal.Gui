@@ -961,10 +961,10 @@ internal class NetDriver : ConsoleDriver
                             output.Append (
                                            EscSeqUtils.CSI_SetGraphicsRendition (
                                                                                  MapColors (
-                                                                                            (ConsoleColor)attr.Background.GetClosestNamedColor (),
+                                                                                            (ConsoleColor)attr.Background.GetClosestNamedColor16 (),
                                                                                             false
                                                                                            ),
-                                                                                 MapColors ((ConsoleColor)attr.Foreground.GetClosestNamedColor ())
+                                                                                 MapColors ((ConsoleColor)attr.Foreground.GetClosestNamedColor16 ())
                                                                                 )
                                           );
                         }

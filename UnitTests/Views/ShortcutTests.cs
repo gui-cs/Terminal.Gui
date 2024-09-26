@@ -601,11 +601,11 @@ public class ShortcutTests
     [Fact]
     public void ColorScheme_SetColorScheme_Does_Not_Fault_3664 ()
     {
-        Application.Current = new ();
+        Application.Top = new ();
         Application.Navigation = new ();
         Shortcut shortcut = new Shortcut ();
 
-        Application.Current.ColorScheme = null;
+        Application.Top.ColorScheme = null;
 
         Assert.Null (shortcut.ColorScheme);
 
@@ -613,7 +613,7 @@ public class ShortcutTests
 
         Assert.NotNull (shortcut.ColorScheme);
 
-        Application.Current.Dispose ();
+        Application.Top.Dispose ();
         Application.ResetState ();
     }
 

@@ -177,7 +177,7 @@ public sealed class ContextMenu : IDisposable
         }
 
         MenuItems = menuItems;
-        _container = Application.Current;
+        _container = Application.Top;
         _container!.Closing += Container_Closing;
         _container.Deactivate += Container_Deactivate;
         _container.Disposing += Container_Disposing;

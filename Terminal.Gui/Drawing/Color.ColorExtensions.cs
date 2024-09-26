@@ -1,72 +1,75 @@
 using System.Collections.Frozen;
+using ColorHelper;
 
 namespace Terminal.Gui;
 
 internal static class ColorExtensions
 {
-    private static FrozenDictionary<Color, ColorName> colorToNameMap;
+    // TODO: This should be refactored to support all W3CColors (`ColorStrings` and this should be merged).
+    // TODO: ColorName and AnsiColorCode are only needed when a driver is in Force16Color mode and we
+    // TODO: should be able to remove these from any non-Driver-specific usages.
+    private static FrozenDictionary<Color, ColorName16> colorToNameMap;
 
     static ColorExtensions ()
     {
-        Dictionary<ColorName, AnsiColorCode> nameToCodeMap = new ()
+        Dictionary<ColorName16, AnsiColorCode> nameToCodeMap = new ()
         {
-            { ColorName.Black, AnsiColorCode.BLACK },
-            { ColorName.Blue, AnsiColorCode.BLUE },
-            { ColorName.Green, AnsiColorCode.GREEN },
-            { ColorName.Cyan, AnsiColorCode.CYAN },
-            { ColorName.Red, AnsiColorCode.RED },
-            { ColorName.Magenta, AnsiColorCode.MAGENTA },
-            { ColorName.Yellow, AnsiColorCode.YELLOW },
-            { ColorName.Gray, AnsiColorCode.WHITE },
-            { ColorName.DarkGray, AnsiColorCode.BRIGHT_BLACK },
-            { ColorName.BrightBlue, AnsiColorCode.BRIGHT_BLUE },
-            { ColorName.BrightGreen, AnsiColorCode.BRIGHT_GREEN },
-            { ColorName.BrightCyan, AnsiColorCode.BRIGHT_CYAN },
-            { ColorName.BrightRed, AnsiColorCode.BRIGHT_RED },
-            { ColorName.BrightMagenta, AnsiColorCode.BRIGHT_MAGENTA },
-            { ColorName.BrightYellow, AnsiColorCode.BRIGHT_YELLOW },
-            { ColorName.White, AnsiColorCode.BRIGHT_WHITE }
+            { ColorName16.Black, AnsiColorCode.BLACK },
+            { ColorName16.Blue, AnsiColorCode.BLUE },
+            { ColorName16.Green, AnsiColorCode.GREEN },
+            { ColorName16.Cyan, AnsiColorCode.CYAN },
+            { ColorName16.Red, AnsiColorCode.RED },
+            { ColorName16.Magenta, AnsiColorCode.MAGENTA },
+            { ColorName16.Yellow, AnsiColorCode.YELLOW },
+            { ColorName16.Gray, AnsiColorCode.WHITE },
+            { ColorName16.DarkGray, AnsiColorCode.BRIGHT_BLACK },
+            { ColorName16.BrightBlue, AnsiColorCode.BRIGHT_BLUE },
+            { ColorName16.BrightGreen, AnsiColorCode.BRIGHT_GREEN },
+            { ColorName16.BrightCyan, AnsiColorCode.BRIGHT_CYAN },
+            { ColorName16.BrightRed, AnsiColorCode.BRIGHT_RED },
+            { ColorName16.BrightMagenta, AnsiColorCode.BRIGHT_MAGENTA },
+            { ColorName16.BrightYellow, AnsiColorCode.BRIGHT_YELLOW },
+            { ColorName16.White, AnsiColorCode.BRIGHT_WHITE }
         };
-        ColorNameToAnsiColorMap = nameToCodeMap.ToFrozenDictionary ();
+        ColorName16ToAnsiColorMap = nameToCodeMap.ToFrozenDictionary ();
 
-        ColorToNameMap = new Dictionary<Color, ColorName>
+        ColorToName16Map = new Dictionary<Color, ColorName16>
         {
-            // using "Windows 10 Console/PowerShell 6" here: https://i.stack.imgur.com/9UVnC.png
-            // See also: https://en.wikipedia.org/wiki/ANSI_escape_code
-            { new Color (12, 12, 12), ColorName.Black },
-            { new Color (0, 55, 218), ColorName.Blue },
-            { new Color (19, 161, 14), ColorName.Green },
-            { new Color (58, 150, 221), ColorName.Cyan },
-            { new Color (197, 15, 31), ColorName.Red },
-            { new Color (136, 23, 152), ColorName.Magenta },
-            { new Color (128, 64, 32), ColorName.Yellow },
-            { new Color (204, 204, 204), ColorName.Gray },
-            { new Color (118, 118, 118), ColorName.DarkGray },
-            { new Color (59, 120, 255), ColorName.BrightBlue },
-            { new Color (22, 198, 12), ColorName.BrightGreen },
-            { new Color (97, 214, 214), ColorName.BrightCyan },
-            { new Color (231, 72, 86), ColorName.BrightRed },
-            { new Color (180, 0, 158), ColorName.BrightMagenta },
-            { new Color (249, 241, 165), ColorName.BrightYellow },
-            { new Color (242, 242, 242), ColorName.White }
+            // These match the values in Strings.resx, which are the W3C colors.
+            { new Color(0, 0, 0), ColorName16.Black },
+            { new Color(0, 0, 255), ColorName16.Blue },
+            { new Color(0, 128, 0), ColorName16.Green },
+            { new Color(0, 255, 255), ColorName16.Cyan },
+            { new Color(255, 0, 0), ColorName16.Red },
+            { new Color(255, 0, 255), ColorName16.Magenta },
+            { new Color(255, 255, 0), ColorName16.Yellow },
+            { new Color(128, 128, 128), ColorName16.Gray },
+            { new Color(118, 118, 118), ColorName16.DarkGray },
+            { new Color(59, 120, 255), ColorName16.BrightBlue },
+            { new Color(22, 198, 12), ColorName16.BrightGreen },
+            { new Color(97, 214, 214), ColorName16.BrightCyan },
+            { new Color(231, 72, 86), ColorName16.BrightRed },
+            { new Color(180, 0, 158), ColorName16.BrightMagenta },
+            { new Color(249, 241, 165), ColorName16.BrightYellow },
+            { new Color(255, 255, 255), ColorName16.White }
         }.ToFrozenDictionary ();
     }
 
     /// <summary>Defines the 16 legacy color names and their corresponding ANSI color codes.</summary>
-    internal static FrozenDictionary<ColorName, AnsiColorCode> ColorNameToAnsiColorMap { get; }
+    internal static FrozenDictionary<ColorName16, AnsiColorCode> ColorName16ToAnsiColorMap { get; }
 
-    /// <summary>Reverse mapping for <see cref="ColorToNameMap"/>.</summary>
-    internal static FrozenDictionary<ColorName, Color> ColorNameToColorMap { get; private set; }
+    /// <summary>Reverse mapping for <see cref="ColorToName16Map"/>.</summary>
+    internal static FrozenDictionary<ColorName16, Color> ColorName16ToColorMap { get; private set; }
 
     /// <summary>
     ///     Gets or sets a <see cref="FrozenDictionary{TKey,TValue}"/> that maps legacy 16-color values to the
-    ///     corresponding <see cref="ColorName"/>.
+    ///     corresponding <see cref="ColorName16"/>.
     /// </summary>
     /// <remarks>
     ///     Setter should be called as infrequently as possible, as <see cref="FrozenDictionary{TKey,TValue}"/> is
     ///     expensive to create.
     /// </remarks>
-    internal static FrozenDictionary<Color, ColorName> ColorToNameMap
+    internal static FrozenDictionary<Color, ColorName16> ColorToName16Map
     {
         get => colorToNameMap;
         set
@@ -74,7 +77,7 @@ internal static class ColorExtensions
             colorToNameMap = value;
 
             //Also be sure to set the reverse mapping
-            ColorNameToColorMap = value.ToFrozenDictionary (static kvp => kvp.Value, static kvp => kvp.Key);
+            ColorName16ToColorMap = value.ToFrozenDictionary (static kvp => kvp.Value, static kvp => kvp.Key);
         }
     }
 }

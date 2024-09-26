@@ -21,19 +21,30 @@ public class Navigation : Scenario
             TabStop = TabBehavior.TabGroup
         };
 
-        var editor = new AdornmentsEditor
+        var adornmentsEditor = new AdornmentsEditor
         {
             X = 0,
             Y = 0,
             AutoSelectViewToEdit = true,
             TabStop = TabBehavior.NoStop
         };
-        app.Add (editor);
+        app.Add (adornmentsEditor);
+
+        var arrangementEditor = new ArrangementEditor()
+        {
+            X = Pos.Right (adornmentsEditor),
+            Y = 0,
+            //Height = Dim.Fill(),
+            AutoSelectViewToEdit = true,
+            TabStop = TabBehavior.NoStop
+        };
+        app.Add (arrangementEditor);
 
         FrameView testFrame = new ()
         {
             Title = "_1 Test Frame",
-            X = Pos.Right (editor),
+            X = Pos.Right (arrangementEditor),
+            Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill ()
         };
@@ -182,7 +193,9 @@ public class Navigation : Scenario
 
         testFrame.Add (button);
 
-        editor.AutoSelectSuperView = testFrame;
+        adornmentsEditor.AutoSelectSuperView = testFrame;
+        arrangementEditor.AutoSelectSuperView = testFrame;
+
         testFrame.SetFocus ();
         Application.Run (app);
         timer.Close ();
@@ -212,7 +225,7 @@ public class Navigation : Scenario
             BorderStyle = LineStyle.Double,
             CanFocus = true, // Can't drag without this? BUGBUG
             TabStop = TabBehavior.TabGroup,
-            Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped | ViewArrangement.Resizable
         };
 
         Button button = new ()

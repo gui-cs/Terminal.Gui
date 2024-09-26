@@ -10,8 +10,7 @@
   // note that not all values here will be recreated (e.g. the Light and Dark themes and any property initialized
   // null).
   //
-  // TODO: V2 - Reference via http
-  "$schema": "../../docfx/schemas/tui-config-schema.json",
+  "$schema": "https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json",
 
   // Set this to true in a .config file to be loaded to cause JSON parsing errors
   // to throw exceptions. 
@@ -22,6 +21,7 @@
   "Application.NextTabGroupKey": "F6",
   "Application.PrevTabGroupKey": "Shift+F6",
   "Application.QuitKey": "Esc",
+  "Application.ArrangeKey": "Ctrl+F5",
   "Key.Separator": "+",
 
   "Theme": "Default",
@@ -30,34 +30,35 @@
       "Default": {
         "Dialog.DefaultButtonAlignment": "End",
         "Dialog.DefaultButtonAlignmentModes": "AddSpaceBetweenItems",
+        "Dialog.DefaultBorderStyle": "Heavy",
+        "Dialog.DefaultShadow": "Transparent",
         "FrameView.DefaultBorderStyle": "Single",
         "Window.DefaultBorderStyle": "Single",
-        "Dialog.DefaultBorderStyle": "Heavy",
         "MessageBox.DefaultButtonAlignment": "Center",
         "MessageBox.DefaultBorderStyle": "Heavy",
-        "Button.DefaultShadow": "None",
+        "Button.DefaultShadow": "Opaque",
         "ColorSchemes": [
           {
             "TopLevel": {
               "Normal": {
                 "Foreground": "BrightGreen",
-                "Background": "Black"
+                "Background": "#505050" // DarkerGray
               },
               "Focus": {
                 "Foreground": "White",
-                "Background": "Cyan"
+                "Background": "#696969" // DimGray
               },
               "HotNormal": {
                 "Foreground": "Yellow",
-                "Background": "Black"
+                "Background": "#505050" // DarkerGray
               },
               "HotFocus": {
-                "Foreground": "Blue",
-                "Background": "Cyan"
+                "Foreground": "Yellow",
+                "Background": "#696969" // DimGray
               },
               "Disabled": {
                 "Foreground": "DarkGray",
-                "Background": "Black"
+                "Background": "#505050" // DarkerGray
               }
             }
           },
@@ -68,8 +69,8 @@
                 "Background": "Blue"
               },
               "Focus": {
-                "Foreground": "Black",
-                "Background": "Gray"
+                "Foreground": "DarkBlue",
+                "Background": "LightGray"
               },
               "HotNormal": {
                 "Foreground": "BrightCyan",
@@ -77,7 +78,7 @@
               },
               "HotFocus": {
                 "Foreground": "BrightBlue",
-                "Background": "Gray"
+                "Background": "LightGray"
               },
               "Disabled": {
                 "Foreground": "DarkGray",
@@ -89,19 +90,19 @@
             "Dialog": {
               "Normal": {
                 "Foreground": "Black",
-                "Background": "Gray"
+                "Background": "LightGray"
               },
               "Focus": {
-                "Foreground": "White",
-                "Background": "DarkGray"
+                "Foreground": "DarkGray",
+                "Background": "LightGray"
               },
               "HotNormal": {
                 "Foreground": "Blue",
-                "Background": "Gray"
+                "Background": "LightGray"
               },
               "HotFocus": {
-                "Foreground": "BrightYellow",
-                "Background": "DarkGray"
+                "Foreground": "BrightBlue",
+                "Background": "LightGray"
               },
               "Disabled": {
                 "Foreground": "Gray",
@@ -113,19 +114,19 @@
             "Menu": {
               "Normal": {
                 "Foreground": "White",
-                "Background": "DarkGray"
+                "Background": "DarkBlue"
               },
               "Focus": {
                 "Foreground": "White",
-                "Background": "Black"
+                "Background": "Blue"
               },
               "HotNormal": {
-                "Foreground": "BrightYellow",
-                "Background": "DarkGray"
+                "Foreground": "Yellow",
+                "Background": "DarkBlue"
               },
               "HotFocus": {
-                "Foreground": "BrightYellow",
-                "Background": "Black"
+                "Foreground": "Yellow",
+                "Background": "Blue"
               },
               "Disabled": {
                 "Foreground": "Gray",
@@ -137,18 +138,18 @@
             "Error": {
               "Normal": {
                 "Foreground": "Red",
-                "Background": "White"
+                "Background": "Pink"
               },
               "Focus": {
-                "Foreground": "Black",
+                "Foreground": "White",
                 "Background": "BrightRed"
               },
               "HotNormal": {
                 "Foreground": "Black",
-                "Background": "White"
+                "Background": "Pink"
               },
               "HotFocus": {
-                "Foreground": "White",
+                "Foreground": "Pink",
                 "Background": "BrightRed"
               },
               "Disabled": {
@@ -162,6 +163,15 @@
     },
     {
       "Dark": {
+        "Dialog.DefaultButtonAlignment": "End",
+        "Dialog.DefaultButtonAlignmentModes": "AddSpaceBetweenItems",
+        "Dialog.DefaultBorderStyle": "Heavy",
+        "Dialog.DefaultShadow": "Transparent",
+        "FrameView.DefaultBorderStyle": "Single",
+        "Window.DefaultBorderStyle": "Single",
+        "MessageBox.DefaultButtonAlignment": "Center",
+        "MessageBox.DefaultBorderStyle": "Heavy",
+        "Button.DefaultShadow": "Opaque",
         "ColorSchemes": [
           {
             "TopLevel": {
@@ -238,16 +248,16 @@
           {
             "Menu": {
               "Normal": {
-                "Foreground": "White",
-                "Background": "DarkGray"
+                "Foreground": "LightGray",
+                "Background": "#505050" // DarkerGray
               },
               "Focus": {
                 "Foreground": "White",
                 "Background": "Black"
               },
               "HotNormal": {
-                "Foreground": "Gray",
-                "Background": "DarkGray"
+                "Foreground": "White",
+                "Background": "#505050" // DarkerGray
               },
               "HotFocus": {
                 "Foreground": "White",
@@ -288,6 +298,15 @@
     },
     {
       "Light": {
+        "Dialog.DefaultButtonAlignment": "End",
+        "Dialog.DefaultButtonAlignmentModes": "AddSpaceBetweenItems",
+        "Dialog.DefaultBorderStyle": "Heavy",
+        "Dialog.DefaultShadow": "Transparent",
+        "FrameView.DefaultBorderStyle": "Single",
+        "Window.DefaultBorderStyle": "Single",
+        "MessageBox.DefaultButtonAlignment": "Center",
+        "MessageBox.DefaultBorderStyle": "Heavy",
+        "Button.DefaultShadow": "Opaque",
         "ColorSchemes": [
           {
             "TopLevel": {
@@ -316,7 +335,7 @@
           {
             "Base": {
               "Normal": {
-                "Foreground": "DarkGray",
+                "Foreground": "#505050", // DarkerGray
                 "Background": "White"
               },
               "Focus": {
@@ -365,19 +384,19 @@
             "Menu": {
               "Normal": {
                 "Foreground": "DarkGray",
-                "Background": "White"
+                "Background": "LightGray"
               },
               "Focus": {
                 "Foreground": "DarkGray",
-                "Background": "Gray"
+                "Background": "White"
               },
               "HotNormal": {
                 "Foreground": "BrightRed",
-                "Background": "White"
+                "Background": "LightGray"
               },
               "HotFocus": {
                 "Foreground": "BrightRed",
-                "Background": "Gray"
+                "Background": "White"
               },
               "Disabled": {
                 "Foreground": "Gray",
@@ -406,6 +425,273 @@
               "Disabled": {
                 "Foreground": "DarkGray",
                 "Background": "Gray"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "Black & White": {
+        "Dialog.DefaultShadow": "None",
+        "FrameView.DefaultBorderStyle": "Single",
+        "Window.DefaultBorderStyle": "Single",
+        "MessageBox.DefaultButtonAlignment": "Center",
+        "MessageBox.DefaultBorderStyle": "Heavy",
+        "Button.DefaultShadow": "None",
+        "ColorSchemes": [
+          {
+            "TopLevel": {
+              "Normal": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Focus": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "HotNormal": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "HotFocus": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Disabled": {
+                "Foreground": "Black",
+                "Background": "Black"
+              }
+            }
+          },
+          {
+            "Base": {
+              "Normal": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Focus": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "HotNormal": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "HotFocus": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Disabled": {
+                "Foreground": "Black",
+                "Background": "Black"
+              }
+            }
+          },
+          {
+            "Dialog": {
+              "Normal": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "Focus": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "HotNormal": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "HotFocus": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "Disabled": {
+                "Foreground": "White",
+                "Background": "White"
+              }
+            }
+          },
+          {
+            "Menu": {
+              "Normal": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "Focus": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "HotNormal": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "HotFocus": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "Disabled": {
+                "Foreground": "White",
+                "Background": "White"
+              }
+            }
+          },
+          {
+            "Error": {
+              "Normal": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Focus": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "HotNormal": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "HotFocus": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Disabled": {
+                "Foreground": "Black",
+                "Background": "Black"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "Gray Scale": {
+        "Dialog.DefaultButtonAlignment": "End",
+        "Dialog.DefaultButtonAlignmentModes": "AddSpaceBetweenItems",
+        "Dialog.DefaultBorderStyle": "Heavy",
+        "Dialog.DefaultShadow": "Transparent",
+        "FrameView.DefaultBorderStyle": "Single",
+        "Window.DefaultBorderStyle": "Single",
+        "MessageBox.DefaultButtonAlignment": "Center",
+        "MessageBox.DefaultBorderStyle": "Heavy",
+        "Button.DefaultShadow": "Opaque",
+        "ColorSchemes": [
+          {
+            "TopLevel": {
+              "Normal": {
+                "Foreground": "#A9A9A9", // DarkGray
+                "Background": "#505050" // DarkerGray
+              },
+              "Focus": {
+                "Foreground": "White",
+                "Background": "#696969" // DimGray
+              },
+              "HotNormal": {
+                "Foreground": "#808080", // Gray
+                "Background": "#505050" // DarkerGray
+              },
+              "HotFocus": {
+                "Foreground": "White",
+                "Background": "#808080" // Gray
+              },
+              "Disabled": {
+                "Foreground": "#505050", // DarkerGray
+                "Background": "Black"
+              }
+            }
+          },
+          {
+            "Base": {
+              "Normal": {
+                "Foreground": "#A9A9A9", // DarkGray
+                "Background": "Black"
+              },
+              "Focus": {
+                "Foreground": "White",
+                "Background": "#505050" // DarkerGray
+              },
+              "HotNormal": {
+                "Foreground": "#808080", // Gray
+                "Background": "Black"
+              },
+              "HotFocus": {
+                "Foreground": "White",
+                "Background": "#505050" // DarkerGray
+              },
+              "Disabled": {
+                "Foreground": "#696969", // DimGray
+                "Background": "Black"
+              }
+            }
+          },
+          {
+            "Dialog": {
+              "Normal": {
+                "Foreground": "#505050", // DarkerGray
+                "Background": "White"
+              },
+              "Focus": {
+                "Foreground": "Black",
+                "Background": "#D3D3D3" // LightGray
+              },
+              "HotNormal": {
+                "Foreground": "#808080", // Gray
+                "Background": "White"
+              },
+              "HotFocus": {
+                "Foreground": "Black",
+                "Background": "#D3D3D3" // LightGray
+              },
+              "Disabled": {
+                "Foreground": "#696969", // DimGray
+                "Background": "White"
+              }
+            }
+          },
+          {
+            "Menu": {
+              "Normal": {
+                "Foreground": "#D3D3D3", // LightGray
+                "Background": "#505050" // DarkerGray
+              },
+              "Focus": {
+                "Foreground": "White",
+                "Background": "#808080" // Gray
+              },
+              "HotNormal": {
+                "Foreground": "#808080", // Gray
+                "Background": "#505050" // DarkerGray
+              },
+              "HotFocus": {
+                "Foreground": "White",
+                "Background": "#808080" // Gray
+              },
+              "Disabled": {
+                "Foreground": "#505050", // DarkerGray
+                "Background": "#505050" // DarkerGray
+              }
+            }
+          },
+          {
+            "Error": {
+              "Normal": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "Focus": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "HotNormal": {
+                "Foreground": "Black",
+                "Background": "#D3D3D3" // LightGray
+              },
+              "HotFocus": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Disabled": {
+                "Foreground": "#696969", // DimGray
+                "Background": "White"
               }
             }
           }

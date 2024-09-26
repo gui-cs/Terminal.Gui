@@ -48,7 +48,8 @@
     "resource": [
       {
         "files": [
-          "images/**"
+          "images/**",
+          "schemas/**.json"
         ]
       }
     ],

@@ -697,4 +697,25 @@
     <data name="#9ACD32" xml:space="preserve">
     <value>YellowGreen</value>
   </data>
+    <data name="#3B78FF" xml:space="preserve">
+    <value>BrightBlue</value>
+  </data>
+    <data name="#61D6D6" xml:space="preserve">
+    <value>BrightCyan</value>
+  </data>
+    <data name="#E74856" xml:space="preserve">
+    <value>BrightRed</value>
+</data>
+    <data name="#16C60C" xml:space="preserve">
+    <value>BrightGreen</value>
+</data>
+    <data name="#B4009E" xml:space="preserve">
+    <value>BrightMagenta</value>
+</data>
+    <data name="#F9F1A5" xml:space="preserve">
+    <value>BrightYellow</value>
+</data>
+    <data name="#767676" xml:space="preserve">
+    <value>DarkGray</value>
+</data>
 </root>

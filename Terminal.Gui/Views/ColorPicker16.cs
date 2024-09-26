@@ -61,7 +61,7 @@ public class ColorPicker16 : View
         set
         {
             int colorIndex = value.Y * _cols + value.X;
-            SelectedColor = (ColorName)colorIndex;
+            SelectedColor = (ColorName16)colorIndex;
         }
     }
 
@@ -132,7 +132,7 @@ public class ColorPicker16 : View
                     continue;
                 }
 
-                Driver.SetAttribute (new ((ColorName)foregroundColorIndex, (ColorName)colorIndex));
+                Driver.SetAttribute (new ((ColorName16)foregroundColorIndex, (ColorName16)colorIndex));
                 bool selected = x == Cursor.X && y == Cursor.Y;
                 DrawColorBox (x, y, selected);
                 colorIndex++;
@@ -141,12 +141,12 @@ public class ColorPicker16 : View
     }
 
     /// <summary>Selected color.</summary>
-    public ColorName SelectedColor
+    public ColorName16 SelectedColor
     {
-        get => (ColorName)_selectColorIndex;
+        get => (ColorName16)_selectColorIndex;
         set
         {
-            if (value == (ColorName)_selectColorIndex)
+            if (value == (ColorName16)_selectColorIndex)
             {
                 return;
             }
@@ -166,8 +166,8 @@ public class ColorPicker16 : View
     {
         AddCommand (Command.Left, () => MoveLeft ());
         AddCommand (Command.Right, () => MoveRight ());
-        AddCommand (Command.LineUp, () => MoveUp ());
-        AddCommand (Command.LineDown, () => MoveDown ());
+        AddCommand (Command.Up, () => MoveUp ());
+        AddCommand (Command.Down, () => MoveDown ());
     }
 
     /// <summary>Add the KeyBindinds.</summary>
@@ -175,8 +175,8 @@ public class ColorPicker16 : View
     {
         KeyBindings.Add (Key.CursorLeft, Command.Left);
         KeyBindings.Add (Key.CursorRight, Command.Right);
-        KeyBindings.Add (Key.CursorUp, Command.LineUp);
-        KeyBindings.Add (Key.CursorDown, Command.LineDown);
+        KeyBindings.Add (Key.CursorUp, Command.Up);
+        KeyBindings.Add (Key.CursorDown, Command.Down);
     }
 
     // TODO: Decouple Cursor from SelectedColor so that mouse press-and-hold can show the color under the cursor.
