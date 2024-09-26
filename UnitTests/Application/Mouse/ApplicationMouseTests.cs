@@ -200,14 +200,17 @@ public class ApplicationMouseTests
 
         var clicked = false;
 
-        Application.Top = new Toplevel ();
+        Application.Top = new Toplevel ()
+        {
+            Id = "top",
+        };
         Application.Top.X = 0;
         Application.Top.Y = 0;
         Application.Top.Width = size.Width * 2;
         Application.Top.Height = size.Height * 2;
         Application.Top.BorderStyle = LineStyle.None;
 
-        var view = new View { X = pos.X, Y = pos.Y, Width = size.Width, Height = size.Height };
+        var view = new View { Id = "view", X = pos.X, Y = pos.Y, Width = size.Width, Height = size.Height };
 
         // Give the view a border. With PR #2920, mouse clicks are only passed if they are inside the view's Viewport.
         view.BorderStyle = LineStyle.Single;
@@ -228,6 +231,7 @@ public class ApplicationMouseTests
         Assert.Equal (expectedClicked, clicked);
         Application.Top.Dispose ();
         Application.ResetState (ignoreDisposed: true);
+
     }
 
     #endregion mouse coordinate tests

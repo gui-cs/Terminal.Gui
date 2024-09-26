@@ -501,7 +501,7 @@ public readonly partial record struct Color
     /// </summary>
     /// <param name="text">
     ///     The text to analyze. Formats supported are "#RGB", "#RRGGBB", "#ARGB", "#AARRGGBB", "rgb(r,g,b)",
-    ///     "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any of the <see cref="GetClosestNamedColor16(Terminal.Gui.Color)"/> string
+    ///     "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)", and any W3C color name."/> string
     ///     values.
     /// </param>
     /// <param name="formatProvider">

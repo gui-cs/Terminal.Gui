@@ -485,6 +485,7 @@ public abstract class ConsoleDriver
     public virtual bool SupportsTrueColor => true;
 
     // TODO: This makes ConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
+    // BUGBUG: Application.Force16Colors should be bool? so if SupportsTrueColor and Application.Force16Colors == false, this doesn't override
     /// <summary>
     ///     Gets or sets whether the <see cref="ConsoleDriver"/> should use 16 colors instead of the default TrueColors.
     ///     See <see cref="Application.Force16Colors"/> to change this setting via <see cref="ConfigurationManager"/>.

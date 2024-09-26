@@ -17,9 +17,9 @@ public class KeyTests
             { "Alt+A", Key.A.WithAlt },
             { "Shift+A", Key.A.WithShift },
             { "A", Key.A.WithShift },
-            { "â", new Key ((KeyCode)'â') },
-            { "Shift+â", new Key ((KeyCode)'â' | KeyCode.ShiftMask) },
-            { "Shift+Â", new Key ((KeyCode)'Â' | KeyCode.ShiftMask) },
+            { "â", new ((KeyCode)'â') },
+            { "Shift+â", new ((KeyCode)'â' | KeyCode.ShiftMask) },
+            { "Shift+Â", new ((KeyCode)'Â' | KeyCode.ShiftMask) },
             { "Ctrl+Shift+CursorUp", Key.CursorUp.WithShift.WithCtrl },
             { "Ctrl+Alt+Shift+CursorUp", Key.CursorUp.WithShift.WithCtrl.WithAlt },
             { "ctrl+alt+shift+cursorup", Key.CursorUp.WithShift.WithCtrl.WithAlt },
@@ -439,7 +439,7 @@ public class KeyTests
     [Fact]
     public void ToString_ShouldReturnReadableString ()
     {
-        var eventArgs = Key.A.WithCtrl;
+        Key eventArgs = Key.A.WithCtrl;
         Assert.Equal ("Ctrl+A", eventArgs.ToString ());
     }
 
@@ -454,8 +454,6 @@ public class KeyTests
     [Theory]
     [InlineData ("aa")]
     [InlineData ("-1")]
-    [InlineData ("Crtl-A")]
-    [InlineData ("Ctrl=A")]
     [InlineData ("Crtl")]
     [InlineData ("99a")]
     [InlineData ("a99")]
@@ -508,6 +506,8 @@ public class KeyTests
     [InlineData ("Alt-A", KeyCode.A | KeyCode.AltMask)]
     [InlineData ("A-Ctrl", KeyCode.A | KeyCode.CtrlMask)]
     [InlineData ("Alt-A-Ctrl", KeyCode.A | KeyCode.CtrlMask | KeyCode.AltMask)]
+    [InlineData ("120", KeyCode.X)]
+    [InlineData ("Ctrl@A", KeyCode.A | KeyCode.CtrlMask)]
     public void TryParse_ShouldReturnTrue_WhenValidKey (string keyString, KeyCode expected)
     {
         Assert.True (Key.TryParse (keyString, out Key key));
@@ -518,7 +518,7 @@ public class KeyTests
     [Fact]
     public void WithShift_ShouldReturnCorrectValue ()
     {
-        var a = Key.A;
+        Key a = Key.A;
         Assert.Equal (KeyCode.A | KeyCode.ShiftMask, a.WithShift);
 
         Key CAD = Key.Delete.WithCtrl.WithAlt;
@@ -529,17 +529,17 @@ public class KeyTests
     [Fact]
     public void Equals_ShouldReturnTrue_WhenEqual ()
     {
-        var a = Key.A;
-        var b = Key.A;
+        Key a = Key.A;
+        Key b = Key.A;
         Assert.True (a.Equals (b));
     }
 
     [Fact]
     public void Equals_Handled_Changed_ShouldReturnTrue_WhenEqual ()
     {
-        var a = Key.A;
+        Key a = Key.A;
         a.Handled = true;
-        var b = Key.A;
+        Key b = Key.A;
         b.Handled = true;
         Assert.True (a.Equals (b));
     }
@@ -547,9 +547,9 @@ public class KeyTests
     [Fact]
     public void Equals_Handled_Changed_ShouldReturnFalse_WhenNotEqual ()
     {
-        var a = Key.A;
+        Key a = Key.A;
         a.Handled = true;
-        var b = Key.A;
+        Key b = Key.A;
         Assert.False (a.Equals (b));
     }
 

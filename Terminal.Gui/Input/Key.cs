@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
@@ -80,7 +79,7 @@ public class Key : EventArgs, IEquatable<Key>
     public Key (KeyCode k) { KeyCode = k; }
 
     /// <summary>
-    /// Copy constructor.
+    ///     Copy constructor.
     /// </summary>
     /// <param name="key">The Key to copy</param>
     public Key (Key key)
@@ -155,18 +154,13 @@ public class Key : EventArgs, IEquatable<Key>
     /// </remarks>
     public Rune AsRune => ToRune (KeyCode);
 
-    private bool _handled = false;
-
     /// <summary>
     ///     Indicates if the current Key event has already been processed and the driver should stop notifying any other
-    ///     event subscriber. It's important to set this value to true specially when updating any View's layout from inside the
+    ///     event subscriber. It's important to set this value to true specially when updating any View's layout from inside
+    ///     the
     ///     subscriber method.
     /// </summary>
-    public bool Handled
-    {
-        get => _handled;
-        set => _handled = value;
-    }
+    public bool Handled { get; set; }
 
     /// <summary>Gets a value indicating whether the Alt key was pressed (real or synthesized)</summary>
     /// <value><see langword="true"/> if is alternate; otherwise, <see langword="false"/>.</value>
@@ -339,11 +333,11 @@ public class Key : EventArgs, IEquatable<Key>
         switch (baseKey)
         {
             case >= KeyCode.A and <= KeyCode.Z when !key.HasFlag (KeyCode.ShiftMask):
-                return new Rune ((uint)(baseKey + 32));
+                return new ((uint)(baseKey + 32));
             case >= KeyCode.A and <= KeyCode.Z when key.HasFlag (KeyCode.ShiftMask):
-                return new Rune ((uint)baseKey);
+                return new ((uint)baseKey);
             case > KeyCode.Null and < KeyCode.A:
-                return new Rune ((uint)baseKey);
+                return new ((uint)baseKey);
         }
 
         if (Enum.IsDefined (typeof (KeyCode), baseKey))
@@ -351,7 +345,7 @@ public class Key : EventArgs, IEquatable<Key>
             return default (Rune);
         }
 
-        return new Rune ((uint)baseKey);
+        return new ((uint)baseKey);
     }
 
     #region Operators
@@ -381,17 +375,17 @@ public class Key : EventArgs, IEquatable<Key>
 
     /// <summary>Cast <see cref="KeyCode"/> to a <see cref="Key"/>.</summary>
     /// <param name="keyCode"></param>
-    public static implicit operator Key (KeyCode keyCode) { return new Key (keyCode); }
+    public static implicit operator Key (KeyCode keyCode) { return new (keyCode); }
 
     /// <summary>Cast <see langword="char"/> to a <see cref="Key"/>.</summary>
     /// <remarks>See <see cref="Key(char)"/> for more information.</remarks>
     /// <param name="ch"></param>
-    public static implicit operator Key (char ch) { return new Key (ch); }
+    public static implicit operator Key (char ch) { return new (ch); }
 
     /// <summary>Cast <see langword="string"/> to a <see cref="Key"/>.</summary>
     /// <remarks>See <see cref="Key(string)"/> for more information.</remarks>
     /// <param name="str"></param>
-    public static implicit operator Key (string str) { return new Key (str); }
+    public static implicit operator Key (string str) { return new (str); }
 
     /// <summary>Cast a <see cref="Key"/> to a <see langword="string"/>.</summary>
     /// <remarks>See <see cref="Key(string)"/> for more information.</remarks>
@@ -399,10 +393,7 @@ public class Key : EventArgs, IEquatable<Key>
     public static implicit operator string (Key key) { return key.ToString (); }
 
     /// <inheritdoc/>
-    public override bool Equals (object obj)
-    {
-        return obj is Key k && k.KeyCode == KeyCode && k.Handled == Handled;
-    }
+    public override bool Equals (object obj) { return obj is Key k && k.KeyCode == KeyCode && k.Handled == Handled; }
 
     bool IEquatable<Key>.Equals (Key other) { return Equals (other); }
 
@@ -568,7 +559,10 @@ public class Key : EventArgs, IEquatable<Key>
     /// <summary>Converts the provided string to a new <see cref="Key"/> instance.</summary>
     /// <param name="text">
     ///     The text to analyze. Formats supported are "Ctrl+X", "Alt+X", "Shift+X", "Ctrl+Alt+X",
-    ///     "Ctrl+Shift+X", "Alt+Shift+X", "Ctrl+Alt+Shift+X", and "X".
+    ///     "Ctrl+Shift+X", "Alt+Shift+X", "Ctrl+Alt+Shift+X", "X", and "120" (Unicode codepoint).
+    ///     <para>
+    ///         The separator can be any character, not just <see cref="Key.Separator"/> (e.g. "Ctrl@Alt@X").
+    ///     </para>
     /// </param>
     /// <param name="key">The parsed value.</param>
     /// <returns>A boolean value indicating whether parsing was successful.</returns>
@@ -577,38 +571,88 @@ public class Key : EventArgs, IEquatable<Key>
     {
         if (string.IsNullOrEmpty (text))
         {
-            key = Key.Empty;
+            key = Empty;
 
             return true;
         }
 
+        switch (text)
+        {
+            case "Ctrl":
+                key = KeyCode.CtrlMask;
+
+                return true;
+            case "Alt":
+                key = KeyCode.AltMask;
+
+                return true;
+            case "Shift":
+                key = KeyCode.ShiftMask;
+
+                return true;
+        }
+
         key = null;
 
-        // Split the string into parts
-        string [] parts = text.Split ('+', '-', (char)Separator.Value);
+        Rune separator = Separator;
 
-        if (parts.Length is 0 or > 4 || parts.Any (string.IsNullOrEmpty))
+        // Perhaps the separator was written using a different Key.Separator? Does the string
+        // start with "Ctrl", "Alt" or "Shift"? If so, get the char after the modifier string and use that as the separator.
+        if (text.StartsWith ("Ctrl", StringComparison.InvariantCultureIgnoreCase))
         {
+            separator = (Rune)text [4];
+        }
+        else if (text.StartsWith ("Alt", StringComparison.InvariantCultureIgnoreCase))
+        {
+            separator = (Rune)text [3];
+        }
+        else if (text.StartsWith ("Shift", StringComparison.InvariantCultureIgnoreCase))
+        {
+            separator = (Rune)text [5];
+        }
+        else if (text.EndsWith ("Ctrl", StringComparison.InvariantCultureIgnoreCase))
+        {
+            separator = (Rune)text [^5];
+        }
+        else if (text.EndsWith ("Alt", StringComparison.InvariantCultureIgnoreCase))
+        {
+            separator = (Rune)text [^4];
+        }
+        else if (text.EndsWith ("Shift", StringComparison.InvariantCultureIgnoreCase))
+        {
+            separator = (Rune)text [^6];
+        }
+
+        // Split the string into parts using the set Separator
+        string [] parts = text.Split ((char)separator.Value);
+
+        if (parts.Length is > 4)
+        {
+            // Invalid
             return false;
         }
 
-        // if it's just a shift key
-        if (parts.Length == 1)
+        // e.g. "Ctrl++"
+        if ((Rune)text [^1] != separator && parts.Any (string.IsNullOrEmpty))
         {
-            switch (parts [0])
+            // Invalid
+            return false;
+        }
+
+        if ((Rune)text [^1] == separator)
+        {
+            parts [^1] = separator.Value.ToString ();
+            key = (char)separator.Value;
+        }
+
+        if (separator != Separator && (parts.Length is 1 || (key is { } && parts.Length is 2)))
+        {
+            parts = text.Split ((char)separator.Value);
+
+            if (parts.Length is 0 or > 4 || parts.Any (string.IsNullOrEmpty))
             {
-                case "Ctrl":
-                    key = KeyCode.CtrlMask;
-
-                    return true;
-                case "Alt":
-                    key = KeyCode.AltMask;
-
-                    return true;
-                case "Shift":
-                    key = KeyCode.ShiftMask;
-
-                    return true;
+                // Invalid
+                return false;
             }
         }
 
@@ -649,12 +693,12 @@ public class Key : EventArgs, IEquatable<Key>
                 {
                     if (parsedKeyCode is >= KeyCode.A and <= KeyCode.Z && modifiers == 0)
                     {
-                        key = new Key (parsedKeyCode | KeyCode.ShiftMask);
+                        key = new (parsedKeyCode | KeyCode.ShiftMask);
 
                         return true;
                     }
 
-                    key = new Key (parsedKeyCode | modifiers);
+                    key = new (parsedKeyCode | modifiers);
 
                     return true;
                 }
@@ -664,7 +708,8 @@ public class Key : EventArgs, IEquatable<Key>
             {
                 keyCode = keyCode & ~KeyCode.Space;
             }
-            key = new Key (keyCode | modifiers);
+
+            key = new (keyCode | modifiers);
 
             return true;
         }
@@ -675,7 +720,7 @@ public class Key : EventArgs, IEquatable<Key>
             {
                 if (parsedKeyCode is >= KeyCode.A and <= KeyCode.Z && modifiers == 0)
                 {
-                    key = new Key (parsedKeyCode | KeyCode.ShiftMask);
+                    key = new (parsedKeyCode | KeyCode.ShiftMask);
 
                     return true;
                 }
@@ -684,7 +729,8 @@ public class Key : EventArgs, IEquatable<Key>
                 {
                     parsedKeyCode = parsedKeyCode & ~KeyCode.Space;
                 }
-                key = new Key (parsedKeyCode | modifiers);
+
+                key = new (parsedKeyCode | modifiers);
 
                 return true;
             }
@@ -705,12 +751,12 @@ public class Key : EventArgs, IEquatable<Key>
 
             if ((KeyCode)parsedInt is >= KeyCode.A and <= KeyCode.Z && modifiers == 0)
             {
-                key = new Key ((KeyCode)parsedInt | KeyCode.ShiftMask);
+                key = new ((KeyCode)parsedInt | KeyCode.ShiftMask);
 
                 return true;
             }
 
-            key = new Key ((KeyCode)parsedInt);
+            key = new ((KeyCode)parsedInt);
 
             return true;
         }
@@ -722,7 +768,7 @@ public class Key : EventArgs, IEquatable<Key>
 
         if (GetIsKeyCodeAtoZ (parsedKeyCode))
         {
-            key = new Key (parsedKeyCode | (modifiers & ~KeyCode.Space));
+            key = new (parsedKeyCode | (modifiers & ~KeyCode.Space));
 
             return true;
         }
