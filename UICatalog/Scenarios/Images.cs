@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -18,12 +19,25 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Drawing")]
 public class Images : Scenario
 {
+    private ImageView _imageView;
     public override void Main ()
     {
         Application.Init ();
         var win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
 
         bool canTrueColor = Application.Driver?.SupportsTrueColor ?? false;
+
+
+        var tabBasic = new Tab ()
+        {
+            DisplayText = "Basic"
+        };
+
+        var tabSixel = new Tab ()
+        {
+            DisplayText = "Sixel"
+        };
+
 
         var lblDriverName = new Label { X = 0, Y = 0, Text = $"Driver is {Application.Driver?.GetType ().Name}" };
         win.Add (lblDriverName);
@@ -52,67 +66,95 @@ public class Images : Scenario
         var btnOpenImage = new Button { X = Pos.Right (cbUseTrueColor) + 2, Y = 0, Text = "Open Image" };
         win.Add (btnOpenImage);
 
-        var imageView = new ImageView
+
+        var tv = new TabView
         {
-            X = 0, Y = Pos.Bottom (lblDriverName), Width = Dim.Fill (), Height = Dim.Fill ()
+            Y = Pos.Bottom (lblDriverName), Width = Dim.Fill (), Height = Dim.Fill ()
         };
-        win.Add (imageView);
 
-        btnOpenImage.Accept += (_, _) =>
-                               {
-                                   var ofd = new OpenDialog { Title = "Open Image", AllowsMultipleSelection = false };
-                                   Application.Run (ofd);
+        tv.AddTab (tabBasic, true);
+        tv.AddTab (tabSixel, false);
 
-                                   if (ofd.Path is { })
-                                   {
-                                       Directory.SetCurrentDirectory (Path.GetFullPath (Path.GetDirectoryName (ofd.Path)!));
-                                   }
+        BuildBasicTab (tabBasic);
+        BuildSixelTab (tabSixel);
 
-                                   if (ofd.Canceled)
-                                   {
-                                       ofd.Dispose ();
+        btnOpenImage.Accept += OpenImage;
 
-                                       return;
-                                   }
-
-                                   string path = ofd.FilePaths [0];
-
-                                   ofd.Dispose ();
-
-                                   if (string.IsNullOrWhiteSpace (path))
-                                   {
-                                       return;
-                                   }
-
-                                   if (!File.Exists (path))
-                                   {
-                                       return;
-                                   }
-
-                                   Image<Rgba32> img;
-
-                                   try
-                                   {
-                                       img = Image.Load<Rgba32> (File.ReadAllBytes (path));
-                                   }
-                                   catch (Exception ex)
-                                   {
-                                       MessageBox.ErrorQuery ("Could not open file", ex.Message, "Ok");
-
-                                       return;
-                                   }
-
-                                   imageView.SetImage (img);
-                                   Application.Refresh ();
-                               };
-
-        var btnSixel = new Button { X = Pos.Right (btnOpenImage) + 2, Y = 0, Text = "Output Sixel" };
-        btnSixel.Accept += (s, e) => { imageView.OutputSixel (); };
-        win.Add (btnSixel);
-
+        win.Add (tv);
         Application.Run (win);
         win.Dispose ();
         Application.Shutdown ();
+    }
+
+    private void OpenImage (object sender, HandledEventArgs e)
+    {
+        var ofd = new OpenDialog { Title = "Open Image", AllowsMultipleSelection = false };
+        Application.Run (ofd);
+
+        if (ofd.Path is { })
+        {
+            Directory.SetCurrentDirectory (Path.GetFullPath (Path.GetDirectoryName (ofd.Path)!));
+        }
+
+        if (ofd.Canceled)
+        {
+            ofd.Dispose ();
+
+            return;
+        }
+
+        string path = ofd.FilePaths [0];
+
+        ofd.Dispose ();
+
+        if (string.IsNullOrWhiteSpace (path))
+        {
+            return;
+        }
+
+        if (!File.Exists (path))
+        {
+            return;
+        }
+
+        Image<Rgba32> img;
+
+        try
+        {
+            img = Image.Load<Rgba32> (File.ReadAllBytes (path));
+        }
+        catch (Exception ex)
+        {
+            MessageBox.ErrorQuery ("Could not open file", ex.Message, "Ok");
+
+            return;
+        }
+
+        _imageView.SetImage (img);
+        Application.Refresh ();
+    }
+
+    private void BuildBasicTab (Tab tabBasic)
+    {
+        _imageView = new ImageView
+        {
+            Width = Dim.Fill(),
+            Height = Dim.Fill()
+        };
+
+        tabBasic.View = _imageView;
+    }
+
+    private void BuildSixelTab (Tab tabSixel)
+    {
+        tabSixel.View = new View ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+        var btnSixel = new Button { X = 0, Y = 0, Text = "Output Sixel" };
+        btnSixel.Accept += (s, e) => { _imageView.OutputSixel (); };
+        tabSixel.View.Add (btnSixel);
     }
 
     private class ImageView : View
