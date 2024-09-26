@@ -102,9 +102,9 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
             }
         }
 
-        // Force the use of the default config file
-        Locations = ConfigLocations.DefaultOnly;
-        Reset ();
+        //// Force the use of the default config file
+        //Locations = ConfigLocations.DefaultOnly;
+        //Reset ();
 
         // Enable subsequent tests that call Init to get all config files (the default).
         Locations = ConfigLocations.All;
@@ -118,7 +118,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         {
             // Force the use of the default config file
             Locations = ConfigLocations.DefaultOnly;
-            Reset ();
+            //Reset (); // Init will do this.
 
 #if DEBUG_IDISPOSABLE
 
@@ -157,10 +157,10 @@ public class TestRespondersDisposed : BeforeAfterTestAttribute
     {
         Debug.WriteLine ($"After: {methodUnderTest.Name}");
         base.After (methodUnderTest);
-        
+
         // Reset the to default All
         Locations = ConfigLocations.All;
-        Reset ();
+        //Reset ();
 
 #if DEBUG_IDISPOSABLE
         Assert.Empty (Responder.Instances);
@@ -209,7 +209,7 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
 
         // Reset the to default All
         Locations = ConfigLocations.All;
-        Reset ();
+        //Reset ();
     }
 
     public override void Before (MethodInfo methodUnderTest)
@@ -731,11 +731,11 @@ internal partial class TestHelpers
         string replaced = toReplace;
 
         replaced = Environment.NewLine.Length switch
-                   {
-                       2 when !replaced.Contains ("\r\n") => replaced.Replace ("\n", Environment.NewLine),
-                       1 => replaced.Replace ("\r\n", Environment.NewLine),
-                       var _ => replaced
-                   };
+        {
+            2 when !replaced.Contains ("\r\n") => replaced.Replace ("\n", Environment.NewLine),
+            1 => replaced.Replace ("\r\n", Environment.NewLine),
+            var _ => replaced
+        };
 
         return replaced;
     }
