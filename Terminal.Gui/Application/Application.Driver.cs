@@ -8,6 +8,7 @@ public static partial class Application // Driver abstractions
     /// <summary>Gets the <see cref="ConsoleDriver"/> that has been selected. See also <see cref="ForceDriver"/>.</summary>
     public static ConsoleDriver? Driver { get; internal set; }
 
+    // BUGBUG: Force16Colors should be nullable.
     /// <summary>
     ///     Gets or sets whether <see cref="Application.Driver"/> will be forced to output only the 16 colors defined in
     ///     <see cref="ColorName16"/>. The default is <see langword="false"/>, meaning 24-bit (TrueColor) colors will be output
