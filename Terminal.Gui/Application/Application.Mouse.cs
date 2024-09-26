@@ -6,6 +6,13 @@ namespace Terminal.Gui;
 
 public static partial class Application // Mouse handling
 {
+    internal static Point _lastMousePosition = Point.Empty;
+
+    /// <summary>
+    ///     Gets the most recent position of the mouse.
+    /// </summary>
+    public static Point GetLastMousePosition () => _lastMousePosition;
+
     /// <summary>Disable or enable the mouse. The mouse is enabled by default.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool IsMouseDisabled { get; set; }
@@ -132,6 +139,8 @@ public static partial class Application // Mouse handling
     /// <param name="mouseEvent">The mouse event with coordinates relative to the screen.</param>
     internal static void OnMouseEvent (MouseEvent mouseEvent)
     {
+        _lastMousePosition = mouseEvent.ScreenPosition;
+
         if (IsMouseDisabled)
         {
             return;

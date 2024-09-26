@@ -290,6 +290,7 @@ public class ApplicationTests
 
             // Public Properties
             Assert.Null (Application.Top);
+            Assert.Null (Application.Popover);
             Assert.Null (Application.MouseGrabView);
             Assert.Null (Application.WantContinuousButtonPressedView);
 
@@ -317,6 +318,9 @@ public class ApplicationTests
 
             // Keyboard
             Assert.Empty (Application.GetViewKeyBindings ());
+
+            // Mouse
+            Assert.Equal (Application._lastMousePosition, Point.Empty);
 
             // Navigation
             Assert.Null (Application.Navigation);
@@ -355,11 +359,12 @@ public class ApplicationTests
         Application.QuitKey = Key.C;
         Application.KeyBindings.Add (Key.D, KeyBindingScope.Application, Command.Cancel);
 
-        //ApplicationOverlapped.OverlappedChildren = new List<View> ();
-        //ApplicationOverlapped.OverlappedTop = 
         Application._cachedViewsUnderMouse.Clear ();
 
         //Application.WantContinuousButtonPressedView = new View ();
+
+        // Mouse
+        Application._lastMousePosition = new Point (1, 1);
 
         Application.Navigation = new ();
 

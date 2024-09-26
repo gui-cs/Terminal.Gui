@@ -21,16 +21,6 @@ public class Menuv2 : Bar
         VisibleChanged += OnVisibleChanged;
     }
 
-    //private void OnMouseEvent (object sender, MouseEventEventArgs e)
-    //{
-    //    if (!e.MouseEvent.Flags.HasFlag(MouseFlags.ReportMousePosition))
-    //    {
-    //        return;
-    //    }
-
-
-    //}
-
     private void OnVisibleChanged (object sender, EventArgs e)
     {
         if (Visible)
