@@ -144,46 +144,46 @@ public class ApplicationPopoverTests
         Assert.False (popover.HasFocus);
     }
 
-    //[Theory]
-    //[InlineData (0, 0, false)]
-    //[InlineData (5, 5, true)]
-    //[InlineData (10, 10, false)]
-    //[InlineData (5, 10, false)]
-    //[InlineData (9, 9, false)]
+    [Theory]
+    [InlineData (0, 0, false)]
+    [InlineData (5, 5, true)]
+    [InlineData (10, 10, false)]
+    [InlineData (5, 10, false)]
+    [InlineData (9, 9, false)]
 
 
-    //public void Popover_MouseClick_Outside_Hides (int mouseX, int mouseY, bool expectedVisible)
-    //{
-    //    // Arrange
-    //    Application.Top = new Toplevel ()
-    //    {
-    //        Id = "top",
-    //        Height = 10,
-    //        Width = 10,
-    //    };
-    //    var popover = new View ()
-    //    {
-    //        Id = "popover",
-    //        X = 5,
-    //        Y = 5,
-    //        Width = 1,
-    //        Height = 1,
-    //        Visible = false,
-    //        CanFocus = true
-    //    };
+    public void Popover_MouseClick_Outside_Hides (int mouseX, int mouseY, bool expectedVisible)
+    {
+        // Arrange
+        Application.Top = new Toplevel ()
+        {
+            Id = "top",
+            Height = 10,
+            Width = 10,
+        };
+        var popover = new View ()
+        {
+            Id = "popover",
+            X = 5,
+            Y = 5,
+            Width = 1,
+            Height = 1,
+            Visible = false,
+            CanFocus = true
+        };
 
-    //    Application.Popover = popover;
-    //    popover.Visible = true;
-    //    Assert.True (popover.Visible);
-    //    Assert.True (popover.HasFocus);
+        Application.Popover = popover;
+        popover.Visible = true;
+        Assert.True (popover.Visible);
+        Assert.True (popover.HasFocus);
 
-    //    // Act
-    //    Application.OnMouseEvent (new () { Flags = MouseFlags.Button1Clicked, ScreenPosition = new (mouseX, mouseY) });
+        // Act
+        Application.OnMouseEvent (new () { Flags = MouseFlags.Button1Pressed, ScreenPosition = new (mouseX, mouseY) });
 
-    //    // Assert
-    //    Assert.Equal (expectedVisible, popover.Visible);
+        // Assert
+        Assert.Equal (expectedVisible, popover.Visible);
 
-    //    Application.Top.Dispose ();
-    //    Application.ResetState (ignoreDisposed: true);
-    //}
+        Application.Top.Dispose ();
+        Application.ResetState (ignoreDisposed: true);
+    }
 }

@@ -137,7 +137,10 @@ public static partial class Application // Mouse handling
             return;
         }
 
-        List<View?> currentViewsUnderMouse = View.GetViewsUnderMouse (mouseEvent.Position);
+        // The position of the mouse is the same as the screen position at the application level.
+        mouseEvent.Position = mouseEvent.ScreenPosition;
+
+        List<View?> currentViewsUnderMouse = View.GetViewsUnderMouse (mouseEvent.ScreenPosition);
 
         View? deepestViewUnderMouse = currentViewsUnderMouse.LastOrDefault ();
 
@@ -168,10 +171,10 @@ public static partial class Application // Mouse handling
         // avoid one or two of these checks in the process, as well.
 
         WantContinuousButtonPressedView = deepestViewUnderMouse switch
-                                          {
-                                              { WantContinuousButtonPressed: true } => deepestViewUnderMouse,
-                                              _ => null
-                                          };
+        {
+            { WantContinuousButtonPressed: true } => deepestViewUnderMouse,
+            _ => null
+        };
 
 
         if (Popover is { Visible: true }
@@ -190,45 +193,45 @@ public static partial class Application // Mouse handling
             return;
         }
 
-        // TODO: Move this after call to RaiseMouseEnterLeaveEvents once MouseEnter/Leave don't use MouseEvent anymore.
-        MouseEvent? me;
+        // Create a view-relative mouse event to send to the view that is under the mouse.
+        MouseEvent? viewMouseEvent;
 
         if (deepestViewUnderMouse is Adornment adornment)
         {
-            Point frameLoc = adornment.ScreenToFrame (mouseEvent.Position);
+            Point frameLoc = adornment.ScreenToFrame (mouseEvent.ScreenPosition);
 
-            me = new ()
+            viewMouseEvent = new ()
             {
                 Position = frameLoc,
                 Flags = mouseEvent.Flags,
-                ScreenPosition = mouseEvent.Position,
+                ScreenPosition = mouseEvent.ScreenPosition,
                 View = deepestViewUnderMouse
             };
         }
         else if (deepestViewUnderMouse.ViewportToScreen (Rectangle.Empty with { Size = deepestViewUnderMouse.Viewport.Size }).Contains (mouseEvent.Position))
         {
-            Point viewportLocation = deepestViewUnderMouse.ScreenToViewport (mouseEvent.Position);
+            Point viewportLocation = deepestViewUnderMouse.ScreenToViewport (mouseEvent.ScreenPosition);
 
-            me = new ()
+            viewMouseEvent = new ()
             {
                 Position = viewportLocation,
                 Flags = mouseEvent.Flags,
-                ScreenPosition = mouseEvent.Position,
+                ScreenPosition = mouseEvent.ScreenPosition,
                 View = deepestViewUnderMouse
             };
         }
         else
         {
-            Debug.Fail ("This should never happen");
+            Debug.Fail("The mouse was outside of any View. But this makes no sense as deepestViewUnderMouse is not null.");
 
             return;
         }
 
-        RaiseMouseEnterLeaveEvents (me.ScreenPosition, currentViewsUnderMouse);
+        RaiseMouseEnterLeaveEvents (viewMouseEvent.ScreenPosition, currentViewsUnderMouse);
 
         WantContinuousButtonPressedView = deepestViewUnderMouse.WantContinuousButtonPressed ? deepestViewUnderMouse : null;
 
-        while (deepestViewUnderMouse.NewMouseEvent (me) is not true && MouseGrabView is not { })
+        while (deepestViewUnderMouse.NewMouseEvent (viewMouseEvent) is not true && MouseGrabView is not { })
         {
             if (deepestViewUnderMouse is Adornment adornmentView)
             {
@@ -244,13 +247,13 @@ public static partial class Application // Mouse handling
                 break;
             }
 
-            Point boundsPoint = deepestViewUnderMouse.ScreenToViewport (mouseEvent.Position);
+            Point boundsPoint = deepestViewUnderMouse.ScreenToViewport (mouseEvent.ScreenPosition);
 
-            me = new ()
+            viewMouseEvent = new ()
             {
                 Position = boundsPoint,
                 Flags = mouseEvent.Flags,
-                ScreenPosition = mouseEvent.Position,
+                ScreenPosition = mouseEvent.ScreenPosition,
                 View = deepestViewUnderMouse
             };
         }
@@ -269,13 +272,13 @@ public static partial class Application // Mouse handling
 
             // If the mouse is grabbed, send the event to the view that grabbed it.
             // The coordinates are relative to the Bounds of the view that grabbed the mouse.
-            Point frameLoc = MouseGrabView.ScreenToViewport (mouseEvent.Position);
+            Point frameLoc = MouseGrabView.ScreenToViewport (mouseEvent.ScreenPosition);
 
             var viewRelativeMouseEvent = new MouseEvent
             {
                 Position = frameLoc,
                 Flags = mouseEvent.Flags,
-                ScreenPosition = mouseEvent.Position,
+                ScreenPosition = mouseEvent.ScreenPosition,
                 View = deepestViewUnderMouse ?? MouseGrabView
             };
 

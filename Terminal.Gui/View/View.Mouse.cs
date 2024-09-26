@@ -648,7 +648,7 @@ public partial class View // Mouse APIs
 
         if (Application.Popover?.Visible == true)
         {
-            if (Application.Top is { })
+            if (Application.Top?.Contains (location) ?? false)
             {
                 viewsUnderMouse.Add (Application.Top);
             }

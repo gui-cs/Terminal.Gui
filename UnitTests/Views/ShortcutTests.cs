@@ -365,7 +365,7 @@ public class ShortcutTests
         Application.OnMouseEvent (
                                   new ()
                                   {
-                                      Position = new (x, 0),
+                                      ScreenPosition = new (x, 0),
                                       Flags = MouseFlags.Button1Clicked
                                   });
 
@@ -420,7 +420,7 @@ public class ShortcutTests
         Application.OnMouseEvent (
                                   new ()
                                   {
-                                      Position = new (x, 0),
+                                      ScreenPosition = new (x, 0),
                                       Flags = MouseFlags.Button1Clicked
                                   });
 

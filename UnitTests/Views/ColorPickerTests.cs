@@ -437,7 +437,7 @@ public class ColorPickerTests
         Application.OnMouseEvent (new ()
         {
             Flags = MouseFlags.Button1Pressed,
-            Position = new (0, 1)
+            ScreenPosition = new (0, 1)
         });
         //cp.Subviews.OfType<GBar> ()
         //  .Single ()
@@ -456,7 +456,7 @@ public class ColorPickerTests
         Application.OnMouseEvent (new ()
         {
             Flags = MouseFlags.Button1Pressed,
-            Position = new (0, 2)
+            ScreenPosition = new (0, 2)
         });
         //cp.Subviews.OfType<BBar> ()
         //  .Single ()

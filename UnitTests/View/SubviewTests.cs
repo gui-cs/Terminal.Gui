@@ -500,6 +500,9 @@ public class SubviewTests
         Assert.Equal (subview2, superView.Subviews [^1]);
     }
 
-    //[Fact]
-    //public void IsInHierachy_
+    [Fact]
+    public void IsInHierarchy_ ()
+    {
+        
+    }
 }

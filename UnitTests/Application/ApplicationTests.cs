@@ -896,7 +896,7 @@ public class ApplicationTests
         Assert.Equal (new (0, 0), w.Frame.Location);
 
         // Move down and to the right.
-        Application.OnMouseEvent (new () { Position = new (1, 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
+        Application.OnMouseEvent (new () { ScreenPosition = new (1, 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
         Assert.Equal (new (1, 1), w.Frame.Location);
 
         Application.End (rs);

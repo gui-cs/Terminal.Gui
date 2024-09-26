@@ -802,4 +802,57 @@ public class GetViewsUnderMouseTests
         Application.Top.Dispose ();
         Application.ResetState (true);
     }
+
+    [Theory]
+    [InlineData (0, 0, new [] { "top" })]
+    [InlineData (9, 9, new [] { "top" })]
+    [InlineData (10, 10, new string [] { })]
+    [InlineData (-1, -1, new string [] { })]
+    [InlineData (1, 1, new [] { "top", "view" })]
+    [InlineData (1, 2, new [] { "top", "view" })]
+    [InlineData (2, 1, new [] { "top", "view" })]
+    [InlineData (2, 2, new [] { "top", "view", "popover" })]
+    [InlineData (3, 3, new [] { "top" })] // clipped
+    [InlineData (2, 3, new [] { "top" })] // clipped
+    public void GetViewsUnderMouse_Popover (int mouseX, int mouseY, string [] viewIdStrings)
+    {
+        // Arrange
+        Application.Top = new ()
+        {
+            Frame = new (0, 0, 10, 10),
+            Id = "top"
+        };
+
+        var view = new View
+        {
+            Id = "view",
+            X = 1,
+            Y = 1,
+            Width = 2,
+            Height = 2,
+            Arrangement = ViewArrangement.Overlapped
+        }; // at 1,1 to 3,2 (screen)
+
+        var popOver = new View
+        {
+            Id = "popover",
+            X = 1,
+            Y = 1,
+            Width = 2,
+            Height = 2,
+            Arrangement = ViewArrangement.Overlapped
+        }; // at 2,2 to 4,3 (screen)
+
+        view.Add (popOver);
+        Application.Top.Add (view);
+
+        List<View?> found = View.GetViewsUnderMouse (new (mouseX, mouseY));
+
+        string [] foundIds = found.Select (v => v!.Id).ToArray ();
+
+        Assert.Equal (viewIdStrings, foundIds);
+
+        Application.Top.Dispose ();
+        Application.ResetState (true);
+    }
 }
