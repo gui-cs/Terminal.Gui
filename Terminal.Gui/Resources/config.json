@@ -16,11 +16,8 @@
   // to throw exceptions. 
   "ConfigurationManager.ThrowOnJsonErrors": false,
 
-  "Application.NextTabKey": { "Key": "Tab" },
-  "Application.PrevTabKey": {
-    "Key": "Tab",
-    "Modifiers": [ "Ctrl" ]
-  },
+  "Application.NextTabKey": "Tab",
+  "Application.PrevTabKey": "Ctrl+Tab",
   "Application.NextTabGroupKey": "F6",
   "Application.PrevTabGroupKey": "Shift+F6",
   "Application.QuitKey": "Esc",
