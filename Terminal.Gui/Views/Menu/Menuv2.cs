@@ -69,7 +69,6 @@ public class Menuv2 : Bar
         if (view is Shortcut shortcut)
         {
             shortcut.CanFocus = true;
-            shortcut.KeyBindingScope = KeyBindingScope.Application;
             shortcut.Orientation = Orientation.Vertical;
             shortcut.HighlightStyle |= HighlightStyle.Hover;
 

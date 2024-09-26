@@ -144,6 +144,9 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         Assert.False (view.HasFocus);
         Assert.False (otherView.HasFocus);
 
+        // Ensure the view is Visible
+        view.Visible = true;
+
         Application.Top.SetFocus ();
         Assert.True (Application.Top!.HasFocus);
         Assert.True (top.HasFocus);

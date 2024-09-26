@@ -24,7 +24,7 @@ public static partial class Application // Popover handling
             if (_popover is { })
             {
                 _popover.Visible = false;
-                _popover.VisibleChanged -= PopoverVisibleChanged;
+                _popover.VisibleChanging -= PopoverVisibleChanging;
             }
 
             _popover = value;
@@ -46,19 +46,19 @@ public static partial class Application // Popover handling
 
                 _popover.SetRelativeLayout (Screen.Size);
 
-                _popover.VisibleChanged += PopoverVisibleChanged;
+                _popover.VisibleChanging += PopoverVisibleChanging;
             }
         }
     }
 
-    private static void PopoverVisibleChanged (object? sender, EventArgs e)
+    private static void PopoverVisibleChanging (object? sender, CancelEventArgs<bool> e)
     {
         if (Popover is null)
         {
             return;
         }
 
-        if (Popover.Visible)
+        if (e.NewValue)
         {
             Popover.Arrangement |= ViewArrangement.Overlapped;
 

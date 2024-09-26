@@ -229,26 +229,26 @@ public class ContextMenus : Scenario
                                                           _forceMinimumPosToZero =
                                                               !_forceMinimumPosToZero;
 
-                                                      _tfTopLeft.ContextMenu
-                                                                .ForceMinimumPosToZero =
-                                                          _forceMinimumPosToZero;
+                                                      //_tfTopLeft.ContextMenu
+                                                      //          .ForceMinimumPosToZero =
+                                                      //    _forceMinimumPosToZero;
 
-                                                      _tfTopRight.ContextMenu
-                                                                 .ForceMinimumPosToZero =
-                                                          _forceMinimumPosToZero;
+                                                      //_tfTopRight.ContextMenu
+                                                      //           .ForceMinimumPosToZero =
+                                                      //    _forceMinimumPosToZero;
 
-                                                      _tfMiddle.ContextMenu
-                                                               .ForceMinimumPosToZero =
-                                                          _forceMinimumPosToZero;
+                                                      //_tfMiddle.ContextMenu
+                                                      //         .ForceMinimumPosToZero =
+                                                      //    _forceMinimumPosToZero;
 
-                                                      _tfBottomLeft.ContextMenu
-                                                                   .ForceMinimumPosToZero =
-                                                          _forceMinimumPosToZero;
+                                                      //_tfBottomLeft.ContextMenu
+                                                      //             .ForceMinimumPosToZero =
+                                                      //    _forceMinimumPosToZero;
 
-                                                      _tfBottomRight
-                                                              .ContextMenu
-                                                              .ForceMinimumPosToZero =
-                                                          _forceMinimumPosToZero;
+                                                      //_tfBottomRight
+                                                      //        .ContextMenu
+                                                      //        .ForceMinimumPosToZero =
+                                                      //    _forceMinimumPosToZero;
                                                   }
                                                  )
                                              {
@@ -284,11 +284,11 @@ public class ContextMenus : Scenario
                                              )
                                      }
                                     );
-        _tfTopLeft.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
-        _tfTopRight.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
-        _tfMiddle.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
-        _tfBottomLeft.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
-        _tfBottomRight.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
+        //_tfTopLeft.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
+        //_tfTopRight.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
+        //_tfMiddle.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
+        //_tfBottomLeft.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
+        //_tfBottomRight.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
 
         _contextMenu.Show (menuItems);
     }

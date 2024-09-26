@@ -354,7 +354,8 @@ public partial class View : Responder, ISupportInitializeNotification
 
     private bool _visible = true;
 
-    /// <summary>Gets or sets a value indicating whether this <see cref="Responder"/> and all its child controls are displayed.</summary>
+    // TODO: Remove virtual once Menu/MenuBar are removed. MenuBar is the only override.
+    /// <summary>Gets or sets a value indicating whether this <see cref="View"/> is visible.</summary>
     public virtual bool Visible
     {
         get => _visible;

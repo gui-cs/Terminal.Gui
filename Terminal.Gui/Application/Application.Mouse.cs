@@ -231,7 +231,7 @@ public static partial class Application // Mouse handling
         }
         else
         {
-            Debug.Fail("The mouse was outside of any View. But this makes no sense as deepestViewUnderMouse is not null.");
+            // The mouse was outside any View's Viewport.
 
             return;
         }

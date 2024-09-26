@@ -73,7 +73,7 @@ public class ApplicationNavigation
     {
         if (Application.Popover is { Visible: true })
         {
-            Application.Popover.AdvanceFocus (direction, behavior);
+            return Application.Popover.AdvanceFocus (direction, behavior);
         }
         return Application.Top is { } && Application.Top.AdvanceFocus (direction, behavior);
     }

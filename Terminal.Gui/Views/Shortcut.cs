@@ -41,6 +41,17 @@ public class Shortcut : View, IOrientation, IDesignable
     /// <summary>
     ///     Creates a new instance of <see cref="Shortcut"/>.
     /// </summary>
+    public Shortcut () : this (Key.Empty, string.Empty, null) { }
+
+    public Shortcut (View targetView, Command command, string commandText, string helpText = null) : this (targetView?.KeyBindings.GetKeyFromCommands (command), commandText, null, helpText)
+    {
+        _targetView = targetView;
+        _command = command;
+    }
+
+    /// <summary>
+    ///     Creates a new instance of <see cref="Shortcut"/>.
+    /// </summary>
     /// <remarks>
     ///     <para>
     ///         This is a helper API that mimics the V1 API for creating StatusItems.
@@ -134,10 +145,10 @@ public class Shortcut : View, IOrientation, IDesignable
         }
     }
 
-    /// <summary>
-    ///     Creates a new instance of <see cref="Shortcut"/>.
-    /// </summary>
-    public Shortcut () : this (Key.Empty, string.Empty, null) { }
+    [CanBeNull]
+    private View _targetView;
+
+    private Command _command;
 
     private readonly OrientationHelper _orientationHelper;
 
@@ -753,6 +764,11 @@ public class Shortcut : View, IOrientation, IDesignable
 
             // Assume if there's a subscriber to Action, it's handled.
             cancel = true;
+        }
+
+        if (_targetView is { })
+        {
+            _targetView.InvokeCommand (_command);
         }
 
         return cancel;

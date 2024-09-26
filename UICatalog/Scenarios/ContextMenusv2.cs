@@ -52,19 +52,19 @@ public class ContextMenusv2 : Scenario
         };
         appWindow.Add (label);
 
-        _tfTopLeft = new() { Width = width, Text = text };
+        _tfTopLeft = new() { Id = "_tfTopLeft", Width = width, Text = text };
         appWindow.Add (_tfTopLeft);
 
-        _tfTopRight = new() { X = Pos.AnchorEnd (width), Width = width, Text = text };
+        _tfTopRight = new() { Id = "_tfTopRight", X = Pos.AnchorEnd (width), Width = width, Text = text };
         appWindow.Add (_tfTopRight);
 
-        _tfMiddle = new() { X = Pos.Center (), Y = Pos.Center (), Width = width, Text = text };
+        _tfMiddle = new() { Id = "_tfMiddle", X = Pos.Center (), Y = Pos.Center (), Width = width, Text = text };
         appWindow.Add (_tfMiddle);
 
-        _tfBottomLeft = new() { Y = Pos.AnchorEnd (1), Width = width, Text = text };
+        _tfBottomLeft = new() { Id = "_tfBottomLeft", Y = Pos.AnchorEnd (1), Width = width, Text = text };
         appWindow.Add (_tfBottomLeft);
 
-        _tfBottomRight = new() { X = Pos.AnchorEnd (width), Y = Pos.AnchorEnd (1), Width = width, Text = text };
+        _tfBottomRight = new() { Id = "_tfBottomRight", X = Pos.AnchorEnd (width), Y = Pos.AnchorEnd (1), Width = width, Text = text };
         appWindow.Add (_tfBottomRight);
 
         Point mousePos = default;
