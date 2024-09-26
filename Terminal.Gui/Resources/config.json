@@ -17,7 +17,7 @@
   "ConfigurationManager.ThrowOnJsonErrors": false,
 
   "Application.NextTabKey": "Tab",
-  "Application.PrevTabKey": "Ctrl+Tab",
+  "Application.PrevTabKey": "Shift+Tab",
   "Application.NextTabGroupKey": "F6",
   "Application.PrevTabGroupKey": "Shift+F6",
   "Application.QuitKey": "Esc",
