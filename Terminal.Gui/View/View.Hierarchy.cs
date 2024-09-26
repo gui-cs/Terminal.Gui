@@ -246,18 +246,18 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <summary>
     ///     Gets whether <paramref name="view"/> is in the Subview hierarchy of <paramref name="start"/>.
     /// </summary>
-    /// <param name="start"></param>
-    /// <param name="view"></param>
+    /// <param name="start">The View at the start of the hierarchy.</param>
+    /// <param name="view">The View to test.</param>
     /// <param name="includeAdornments">Will search the subview hierarchy of the adornments if true.</param>
     /// <returns></returns>
     public static bool IsInHierarchy (View? start, View? view, bool includeAdornments = false)
     {
-        if (view is null)
+        if (view is null || start is null)
         {
             return false;
         }
 
-        if (view == start || start is null)
+        if (view == start)
         {
             return true;
         }

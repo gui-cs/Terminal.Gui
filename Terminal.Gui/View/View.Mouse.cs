@@ -648,6 +648,11 @@ public partial class View // Mouse APIs
 
         if (Application.Popover?.Visible == true)
         {
+            if (Application.Top is { })
+            {
+                viewsUnderMouse.Add (Application.Top);
+            }
+
             start = Application.Popover;
         }
 

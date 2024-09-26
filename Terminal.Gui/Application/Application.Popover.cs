@@ -62,10 +62,7 @@ public static partial class Application // Popover handling
         {
             Popover.Arrangement |= ViewArrangement.Overlapped;
 
-            if (Popover.ColorScheme is null)
-            {
-                Popover.ColorScheme = Top?.ColorScheme;
-            }
+            Popover.ColorScheme ??= Top?.ColorScheme;
 
             View.GetLocationEnsuringFullVisibility (
                                                     Popover,
@@ -80,7 +77,12 @@ public static partial class Application // Popover handling
             Popover.Y = ny;
 
             Popover.SetRelativeLayout (Screen.Size);
-            Top.HasFocus = false;
+
+            if (Top is { })
+            {
+                Top.HasFocus = false;
+            }
+
             Popover.SetFocus ();
         }
     }

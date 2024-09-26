@@ -499,4 +499,7 @@ public class SubviewTests
         superView.MoveSubviewTowardsEnd (subview2);
         Assert.Equal (subview2, superView.Subviews [^1]);
     }
+
+    //[Fact]
+    //public void IsInHierachy_
 }

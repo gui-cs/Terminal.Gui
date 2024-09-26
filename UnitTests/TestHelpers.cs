@@ -48,7 +48,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         bool useFakeClipboard = true,
         bool fakeClipboardAlwaysThrowsNotSupportedException = false,
         bool fakeClipboardIsSupportedAlwaysTrue = false,
-        ConfigurationManager.ConfigLocations configLocation = ConfigurationManager.ConfigLocations.None
+        ConfigLocations configLocation = ConfigLocations.None
     )
     {
         AutoInit = autoInit;
@@ -59,7 +59,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         FakeDriver.FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException =
             fakeClipboardAlwaysThrowsNotSupportedException;
         FakeDriver.FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
-        ConfigurationManager.Locations = configLocation;
+        Locations = configLocation;
     }
 
     private readonly Type _driverType;
@@ -97,14 +97,17 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
             {
 #if DEBUG_IDISPOSABLE
                 Responder.Instances.Clear ();
-                Application.ResetState (ignoreDisposed: true);
+                Application.ResetState (true);
 #endif
-                ConfigurationManager.Reset ();
-                ConfigurationManager.Locations = CM.ConfigLocations.None;
             }
-
-
         }
+
+        // Force the use of the default config file
+        Locations = ConfigLocations.DefaultOnly;
+        Reset ();
+
+        // Enable subsequent tests that call Init to get all config files (the default).
+        Locations = ConfigLocations.All;
     }
 
     public override void Before (MethodInfo methodUnderTest)
@@ -113,7 +116,9 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
         if (AutoInit)
         {
-            ConfigurationManager.Reset ();
+            // Force the use of the default config file
+            Locations = ConfigLocations.DefaultOnly;
+            Reset ();
 
 #if DEBUG_IDISPOSABLE
 
@@ -134,10 +139,15 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     private bool AutoInit { get; }
 
     private List<object> _savedValues;
-
-   
 }
 
+/// <summary>
+///     Enables test functions annotated with the [TestRespondersDisposed] attribute to ensure all Views are disposed.
+/// </summary>
+/// <remarks>
+///     On Before, sets Configuration.Locations to ConfigLocations.DefaultOnly.
+///     On After, sets Configuration.Locations to ConfigLocations.All.
+/// </remarks>
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
 public class TestRespondersDisposed : BeforeAfterTestAttribute
 {
@@ -147,6 +157,10 @@ public class TestRespondersDisposed : BeforeAfterTestAttribute
     {
         Debug.WriteLine ($"After: {methodUnderTest.Name}");
         base.After (methodUnderTest);
+        
+        // Reset the to default All
+        Locations = ConfigLocations.All;
+        Reset ();
 
 #if DEBUG_IDISPOSABLE
         Assert.Empty (Responder.Instances);
@@ -156,6 +170,11 @@ public class TestRespondersDisposed : BeforeAfterTestAttribute
     public override void Before (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
+
+        // Force the use of the default config file
+        Locations = ConfigLocations.DefaultOnly;
+        Reset ();
+
         base.Before (methodUnderTest);
 #if DEBUG_IDISPOSABLE
 
@@ -167,15 +186,17 @@ public class TestRespondersDisposed : BeforeAfterTestAttribute
 }
 
 // TODO: Make this inherit from TestRespondersDisposed so that all tests that don't dispose Views correctly can be identified and fixed
+/// <summary>
+///     Enables test functions annotated with the [SetupFakeDriver] attribute to set Application.Driver to new
+///     FakeDriver(). The driver is set up with 25 rows and columns.
+/// </summary>
+/// <remarks>
+///     On Before, sets Configuration.Locations to ConfigLocations.DefaultOnly.
+///     On After, sets Configuration.Locations to ConfigLocations.All.
+/// </remarks>
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
 public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
 {
-    /// <summary>
-    ///     Enables test functions annotated with the [SetupFakeDriver] attribute to set Application.Driver to new
-    ///     FakeDriver(). The driver is setup with 25 rows and columns.
-    /// </summary>
-    public SetupFakeDriverAttribute () { }
-
     public override void After (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"After: {methodUnderTest.Name}");
@@ -185,16 +206,25 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
 
         Application.Driver = null;
         base.After (methodUnderTest);
+
+        // Reset the to default All
+        Locations = ConfigLocations.All;
+        Reset ();
     }
 
     public override void Before (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
-        Application.ResetState (ignoreDisposed: true);
+        // Force the use of the default config file
+        Locations = ConfigLocations.DefaultOnly;
+        Reset ();
+
+        Application.ResetState (true);
         Assert.Null (Application.Driver);
         Application.Driver = new FakeDriver { Rows = 25, Cols = 25 };
 
         base.Before (methodUnderTest);
+
     }
 }
 
@@ -701,11 +731,11 @@ internal partial class TestHelpers
         string replaced = toReplace;
 
         replaced = Environment.NewLine.Length switch
-        {
-            2 when !replaced.Contains ("\r\n") => replaced.Replace ("\n", Environment.NewLine),
-            1 => replaced.Replace ("\r\n", Environment.NewLine),
-            var _ => replaced
-        };
+                   {
+                       2 when !replaced.Contains ("\r\n") => replaced.Replace ("\n", Environment.NewLine),
+                       1 => replaced.Replace ("\r\n", Environment.NewLine),
+                       var _ => replaced
+                   };
 
         return replaced;
     }

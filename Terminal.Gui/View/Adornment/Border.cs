@@ -580,6 +580,8 @@ public class Border : Adornment
             Application.UngrabMouse ();
             SetPressedHighlight (HighlightStyle.None);
 
+            EndArrangeMode ();
+
             return true;
         }
 
