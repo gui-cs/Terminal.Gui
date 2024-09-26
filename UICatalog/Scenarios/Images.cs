@@ -20,6 +20,7 @@ namespace UICatalog.Scenarios;
 public class Images : Scenario
 {
     private ImageView _imageView;
+
     public override void Main ()
     {
         Application.Init ();
@@ -27,17 +28,15 @@ public class Images : Scenario
 
         bool canTrueColor = Application.Driver?.SupportsTrueColor ?? false;
 
-
-        var tabBasic = new Tab ()
+        var tabBasic = new Tab
         {
             DisplayText = "Basic"
         };
 
-        var tabSixel = new Tab ()
+        var tabSixel = new Tab
         {
             DisplayText = "Sixel"
         };
-
 
         var lblDriverName = new Label { X = 0, Y = 0, Text = $"Driver is {Application.Driver?.GetType ().Name}" };
         win.Add (lblDriverName);
@@ -65,7 +64,6 @@ public class Images : Scenario
 
         var btnOpenImage = new Button { X = Pos.Right (cbUseTrueColor) + 2, Y = 0, Text = "Open Image" };
         win.Add (btnOpenImage);
-
 
         var tv = new TabView
         {
@@ -136,10 +134,10 @@ public class Images : Scenario
 
     private void BuildBasicTab (Tab tabBasic)
     {
-        _imageView = new ImageView
+        _imageView = new()
         {
-            Width = Dim.Fill(),
-            Height = Dim.Fill()
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
         };
 
         tabBasic.View = _imageView;
@@ -147,14 +145,64 @@ public class Images : Scenario
 
     private void BuildSixelTab (Tab tabSixel)
     {
-        tabSixel.View = new View ()
+        tabSixel.View = new()
         {
             Width = Dim.Fill (),
             Height = Dim.Fill ()
         };
-        var btnSixel = new Button { X = 0, Y = 0, Text = "Output Sixel" };
-        btnSixel.Accept += (s, e) => { _imageView.OutputSixel (); };
+
+        var btnSixel = new Button { X = 0, Y = 0, Text = "Output Sixel", Width = Dim.Auto () };
         tabSixel.View.Add (btnSixel);
+
+        var sixelView = new View
+        {
+            Y = Pos.Bottom (btnSixel),
+            Width = Dim.Percent (50),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
+
+        tabSixel.View.Add (sixelView);
+
+        var lblPxX = new Label
+        {
+            X = Pos.Right (sixelView),
+            Text = "Pixels per Col:"
+        };
+
+        var pxX = new NumericUpDown
+        {
+            X = Pos.Right (lblPxX),
+            Value = 12
+        };
+
+        var lblPxY = new Label
+        {
+            X = lblPxX.X,
+            Y = 1,
+            Text = "Pixels per Row:"
+        };
+
+        var pxY = new NumericUpDown
+        {
+            X = Pos.Right (lblPxY),
+            Y = 1,
+            Value = 6
+        };
+
+        tabSixel.View.Add (lblPxX);
+        tabSixel.View.Add (pxX);
+        tabSixel.View.Add (lblPxY);
+        tabSixel.View.Add (pxY);
+
+        btnSixel.Accept += (s, e) =>
+                           {
+                               _imageView.OutputSixel (
+                                                       sixelView.FrameToScreen ().Location,
+                                                       sixelView.Frame.Size,
+                                                       pxX.Value,
+                                                       pxY.Value);
+                           };
     }
 
     private class ImageView : View
@@ -205,7 +253,12 @@ public class Images : Scenario
             SetNeedsDisplay ();
         }
 
-        public void OutputSixel ()
+        public void OutputSixel (
+            Point screenPosition,
+            Size maxSize,
+            int pixelsPerCellX,
+            int pixelsPerCellY
+        )
         {
             if (_fullResImage == null)
             {
@@ -214,7 +267,21 @@ public class Images : Scenario
 
             var encoder = new SixelEncoder ();
 
-            string encoded = encoder.EncodeSixel (ConvertToColorArray (_fullResImage));
+            // Calculate the target size in pixels based on console units
+            int targetWidthInPixels = maxSize.Width * pixelsPerCellX;
+            int targetHeightInPixels = maxSize.Height * pixelsPerCellY;
+
+            // Get the original image dimensions
+            int originalWidth = _fullResImage.Width;
+            int originalHeight = _fullResImage.Height;
+
+            // Use the helper function to get the resized dimensions while maintaining the aspect ratio
+            Size newSize = CalculateAspectRatioFit (originalWidth, originalHeight, targetWidthInPixels, targetHeightInPixels);
+
+            // Resize the image to match the console size
+            Image<Rgba32> resizedImage = _fullResImage.Clone (x => x.Resize (newSize.Width, newSize.Height));
+
+            string encoded = encoder.EncodeSixel (ConvertToColorArray (resizedImage));
 
             var pv = new PaletteView (encoder.Quantizer.Palette.ToList ());
 
@@ -235,7 +302,29 @@ public class Images : Scenario
             dlg.AddButton (btn);
             Application.Run (dlg);
 
-            Application.Sixel = encoded;
+            Application.Sixel.Add (
+                                   new()
+                                   {
+                                       ScreenPosition = screenPosition,
+                                       SixelData = encoded
+                                   });
+        }
+
+        private Size CalculateAspectRatioFit (int originalWidth, int originalHeight, int targetWidth, int targetHeight)
+        {
+            // Calculate the scaling factor for width and height
+            double widthScale = (double)targetWidth / originalWidth;
+            double heightScale = (double)targetHeight / originalHeight;
+
+            // Use the smaller scaling factor to maintain the aspect ratio
+            double scale = Math.Min (widthScale, heightScale);
+
+            // Calculate the new width and height while keeping the aspect ratio
+            var newWidth = (int)(originalWidth * scale);
+            var newHeight = (int)(originalHeight * scale);
+
+            // Return the new size as a Size object
+            return new (newWidth, newHeight);
         }
 
         public static Color [,] ConvertToColorArray (Image<Rgba32> image)
@@ -260,7 +349,7 @@ public class Images : Scenario
 
     public class PaletteView : View
     {
-        private List<Color> _palette;
+        private readonly List<Color> _palette;
 
         public PaletteView (List<Color> palette)
         {
@@ -323,13 +412,6 @@ public class Images : Scenario
                     AddRune (x + dx, y, (Rune)' ');
                 }
             }
-        }
-
-        // Allows dynamically changing the palette
-        public void SetPalette (List<Color> palette)
-        {
-            _palette = palette ?? new List<Color> ();
-            SetNeedsDisplay ();
         }
     }
 }
@@ -418,7 +500,7 @@ public class MedianCutPaletteBuilder : IPaletteBuilder
 
     private List<Color> MedianCut (List<Color> colors, int maxColors)
     {
-        List<List<Color>> cubes = new() { colors };
+        List<List<Color>> cubes = new () { colors };
 
         // Recursively split color regions
         while (cubes.Count < maxColors)

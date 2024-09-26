@@ -8,7 +8,6 @@ using Terminal.Gui;
 
 namespace Terminal.Gui;
 
-
 /// <summary>
 /// Encodes a images into the sixel console image output format.
 /// </summary>
