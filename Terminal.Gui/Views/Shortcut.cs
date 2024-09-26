@@ -43,7 +43,26 @@ public class Shortcut : View, IOrientation, IDesignable
     /// </summary>
     public Shortcut () : this (Key.Empty, string.Empty, null) { }
 
-    public Shortcut (View targetView, Command command, string commandText, string helpText = null) : this (targetView?.KeyBindings.GetKeyFromCommands (command), commandText, null, helpText)
+    /// <summary>
+    ///     Creates a new instance of <see cref="Shortcut"/>, binding it to <paramref name="targetView"/> and
+    ///     <paramref name="command"/>. The Key <paramref name="targetView"/>
+    ///     has bound to <paramref name="command"/> will be used as <see cref="Key"/>.
+    /// </summary>
+    /// <param name="targetView">
+    ///     The View that <paramref name="command"/> will be invoked on when <see cref="OnAccept"/> is
+    ///     raised.
+    /// </param>
+    /// <param name="command">
+    ///     The Command to invoke on <paramref name="targetView"/>. The Key <paramref name="targetView"/>
+    ///     has bound to <paramref name="command"/> will be used as <see cref="Key"/>
+    /// </param>
+    /// <param name="commandText">The text to display for the command.</param>
+    /// <param name="helpText">The help text to display.</param>
+    public Shortcut (View targetView, Command command, string commandText, string helpText = null) : this (
+                                                                                                           targetView?.KeyBindings.GetKeyFromCommands (command),
+                                                                                                           commandText,
+                                                                                                           null,
+                                                                                                           helpText)
     {
         _targetView = targetView;
         _command = command;
@@ -58,9 +77,9 @@ public class Shortcut : View, IOrientation, IDesignable
     ///     </para>
     /// </remarks>
     /// <param name="key"></param>
-    /// <param name="commandText"></param>
+    /// <param name="commandText">The text to display for the command.</param>
     /// <param name="action"></param>
-    /// <param name="helpText"></param>
+    /// <param name="helpText">The help text to display.</param>
     public Shortcut (Key key, string commandText, Action action, string helpText = null)
     {
         Id = "_shortcut";
@@ -84,7 +103,7 @@ public class Shortcut : View, IOrientation, IDesignable
         CommandView = new ()
         {
             Width = Dim.Auto (),
-            Height = Dim.Auto (DimAutoStyle.Auto, minimumContentDim: 1)
+            Height = Dim.Auto (1)
         };
 
         HelpView.Id = "_helpView";
@@ -146,9 +165,9 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     [CanBeNull]
-    private View _targetView;
+    private readonly View _targetView;
 
-    private Command _command;
+    private readonly Command _command;
 
     private readonly OrientationHelper _orientationHelper;
 
@@ -157,7 +176,7 @@ public class Shortcut : View, IOrientation, IDesignable
     // This is used to calculate the minimum width of the Shortcut when the width is NOT Dim.Auto
     private int? _minimumDimAutoWidth;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnHighlight (CancelEventArgs<HighlightStyle> args)
     {
         if (args.NewValue.HasFlag (HighlightStyle.Hover))
@@ -840,10 +859,7 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override void OnHasFocusChanged (bool newHasFocus, View previousFocusedView, View view)
-    {
-        SetColors ();
-    }
+    protected override void OnHasFocusChanged (bool newHasFocus, View previousFocusedView, View view) { SetColors (); }
 
     #endregion Focus
 }
