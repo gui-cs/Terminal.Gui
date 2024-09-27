@@ -73,10 +73,8 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
         if (AutoInit)
         {
-            try
+           // try
             {
-                // TODO: This Dispose call is here until all unit tests that don't correctly dispose Toplevel's they create are fixed.
-                //Application.Top?.Dispose ();
                 Application.Shutdown ();
 #if DEBUG_IDISPOSABLE
                 if (Responder.Instances.Count == 0)
@@ -89,11 +87,11 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
                 }
 #endif
             }
-            catch (Exception e)
-            {
-                Assert.Fail ($"Application.Shutdown threw an exception after the test exited: {e}");
-            }
-            finally
+            //catch (Exception e)
+            //{
+            //    Assert.Fail ($"Application.Shutdown threw an exception after the test exited: {e}");
+            //}
+            //finally
             {
 #if DEBUG_IDISPOSABLE
                 Responder.Instances.Clear ();
@@ -101,10 +99,6 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 #endif
             }
         }
-
-        //// Force the use of the default config file
-        //Locations = ConfigLocations.DefaultOnly;
-        //Reset ();
 
         // Enable subsequent tests that call Init to get all config files (the default).
         Locations = ConfigLocations.All;
@@ -116,10 +110,6 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
         if (AutoInit)
         {
-            // Force the use of the default config file
-            Locations = ConfigLocations.DefaultOnly;
-            //Reset (); // Init will do this.
-
 #if DEBUG_IDISPOSABLE
 
             // Clear out any lingering Responder instances from previous tests
@@ -160,7 +150,6 @@ public class TestRespondersDisposed : BeforeAfterTestAttribute
 
         // Reset the to default All
         Locations = ConfigLocations.All;
-        //Reset ();
 
 #if DEBUG_IDISPOSABLE
         Assert.Empty (Responder.Instances);
@@ -209,12 +198,12 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
 
         // Reset the to default All
         Locations = ConfigLocations.All;
-        //Reset ();
     }
 
     public override void Before (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
+
         // Force the use of the default config file
         Locations = ConfigLocations.DefaultOnly;
         Reset ();
