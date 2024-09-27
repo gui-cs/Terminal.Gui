@@ -50,11 +50,13 @@ public class Shortcut : View, IOrientation, IDesignable
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         This is a helper API that simplifies creation of multiple Shortcuts when adding them to <see cref="Bar"/>-based objects, like <see cref="MenuBarv2"/>.
+    ///         This is a helper API that simplifies creation of multiple Shortcuts when adding them to <see cref="Bar"/>-based
+    ///         objects, like <see cref="MenuBarv2"/>.
     ///     </para>
     /// </remarks>
     /// <param name="targetView">
-    ///     The View that <paramref name="command"/> will be invoked when user does something that causes the Shortcut's Accept event to be raised.
+    ///     The View that <paramref name="command"/> will be invoked when user does something that causes the Shortcut's Accept
+    ///     event to be raised.
     /// </param>
     /// <param name="command">
     ///     The Command to invoke on <paramref name="targetView"/>. The Key <paramref name="targetView"/>
@@ -107,7 +109,7 @@ public class Shortcut : View, IOrientation, IDesignable
         CommandView = new ()
         {
             Width = Dim.Auto (),
-            Height = Dim.Auto (DimAutoStyle.Auto, minimumContentDim: 1)
+            Height = Dim.Auto (1)
         };
 
         HelpView.Id = "_helpView";
@@ -169,9 +171,9 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     [CanBeNull]
-    private readonly View _targetView;
+    private readonly View _targetView; // If set, _command will be invoked
 
-    private readonly Command _command;
+    private readonly Command _command; // Used when _targetView is set
 
     private readonly OrientationHelper _orientationHelper;
 
