@@ -409,7 +409,6 @@ public class TextField : View
 
         ContextMenu = CreateContextMenu ();
         KeyBindings.Add (ContextMenu!.Key, KeyBindingScope.HotKey, Command.Context);
-
     }
 
 

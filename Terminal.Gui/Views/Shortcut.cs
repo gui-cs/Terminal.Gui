@@ -109,7 +109,7 @@ public class Shortcut : View, IOrientation, IDesignable
         CommandView = new ()
         {
             Width = Dim.Auto (),
-            Height = Dim.Auto (1)
+            Height = Dim.Auto (DimAutoStyle.Auto, minimumContentDim: 1)
         };
 
         HelpView.Id = "_helpView";
