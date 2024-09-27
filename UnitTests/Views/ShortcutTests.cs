@@ -477,11 +477,10 @@ public class ShortcutTests
     [InlineData (KeyCode.Enter, 1)]
     [InlineData (KeyCode.Space, 0)]
     [InlineData (KeyCode.F1, 0)]
-    [AutoInitShutdown]
     public void KeyDown_App_Scope_Invokes_Accept (KeyCode key, int expectedAccept)
     {
-        var current = new Toplevel ();
-
+        Application.Top = new Toplevel ();
+     
         var shortcut = new Shortcut
         {
             Key = Key.A,
@@ -489,9 +488,8 @@ public class ShortcutTests
             Text = "0",
             Title = "_C"
         };
-        current.Add (shortcut);
-
-        Application.Begin (current);
+        Application.Top.Add (shortcut);
+        Application.Top.SetFocus ();
 
         var accepted = 0;
         shortcut.Accept += (s, e) => accepted++;
@@ -500,7 +498,8 @@ public class ShortcutTests
 
         Assert.Equal (expectedAccept, accepted);
 
-        current.Dispose ();
+        Application.Top.Dispose ();
+        Application.ResetState (true);
     }
 
     [Theory]

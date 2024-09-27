@@ -15,9 +15,9 @@
 ///         - Pressing the HotKey specified by <see cref="CommandView"/>.
 ///     </para>
 ///     <para>
-///         If <see cref="KeyBindingScope"/> is <see cref="KeyBindingScope.Application"/>, <see cref="Key"/> will invoked
+///         If <see cref="KeyBindingScope"/> is <see cref="KeyBindingScope.Application"/>, <see cref="Key"/> will invoke
 ///         <see cref="Command.Accept"/>
-///         command regardless of what View has focus, enabling an application-wide keyboard shortcut.
+///         regardless of what View has focus, enabling an application-wide keyboard shortcut.
 ///     </para>
 ///     <para>
 ///         By default, a Shortcut displays the command text on the left side, the help text in the middle, and the key
@@ -48,9 +48,13 @@ public class Shortcut : View, IOrientation, IDesignable
     ///     <paramref name="command"/>. The Key <paramref name="targetView"/>
     ///     has bound to <paramref name="command"/> will be used as <see cref="Key"/>.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This is a helper API that simplifies creation of multiple Shortcuts when adding them to <see cref="Bar"/>-based objects, like <see cref="MenuBarv2"/>.
+    ///     </para>
+    /// </remarks>
     /// <param name="targetView">
-    ///     The View that <paramref name="command"/> will be invoked on when <see cref="OnAccept"/> is
-    ///     raised.
+    ///     The View that <paramref name="command"/> will be invoked when user does something that causes the Shortcut's Accept event to be raised.
     /// </param>
     /// <param name="command">
     ///     The Command to invoke on <paramref name="targetView"/>. The Key <paramref name="targetView"/>

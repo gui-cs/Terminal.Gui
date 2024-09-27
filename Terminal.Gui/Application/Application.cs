@@ -217,7 +217,8 @@ public static partial class Application
 
         AddApplicationKeyBindings ();
 
-        Colors.Reset ();
+        // BUGBUG: This should not be here as it conflics with CM
+        //Colors.Reset ();
 
         // Reset synchronization context to allow the user to run async/await,
         // as the main loop has been ended, the synchronization context from

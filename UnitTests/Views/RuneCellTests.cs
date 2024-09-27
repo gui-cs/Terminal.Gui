@@ -53,6 +53,8 @@ public class RuneCellTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void RuneCell_LoadRuneCells_InheritsPreviousColorScheme ()
     {
+        // NOTE: This test relies on CM loading the default color schemes. It will not work if the default color schemes are not loaded.
+        // NOTE: SetupFakeDriver DOES setup CM correctly.
         List<RuneCell> runeCells = new ();
 
         foreach (KeyValuePair<string, ColorScheme> color in Colors.ColorSchemes)
