@@ -285,11 +285,9 @@ public class KeyBindings
     }
 
     /// <summary>Gets the Key used by a set of commands.</summary>
-    /// <remarks></remarks>
     /// <param name="commands">The set of commands to search.</param>
-    /// <returns>The <see cref="Key"/> used by a <see cref="Command"/></returns>
-    /// <exception cref="InvalidOperationException">If no matching set of commands was found.</exception>
-    public Key GetKeyFromCommands (params Command [] commands) { return Bindings.FirstOrDefault (a => a.Value.Commands.SequenceEqual (commands)).Key; }
+    /// <returns>The <see cref="Key"/> used by a <see cref="Command"/>. <see langword="null"/> if the set of caommands was not found.</returns>
+    public Key? GetKeyFromCommands (params Command [] commands) { return Bindings.FirstOrDefault (a => a.Value.Commands.SequenceEqual (commands)).Key; }
 
     /// <summary>Removes a <see cref="KeyBinding"/> from the collection.</summary>
     /// <param name="key"></param>
