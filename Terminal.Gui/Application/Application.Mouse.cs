@@ -193,6 +193,11 @@ public static partial class Application // Mouse handling
                 || mouseEvent.Flags.HasFlag (MouseFlags.Button3Pressed)))
         {
             Popover.Visible = false;
+
+            // Recurse once
+            OnMouseEvent (mouseEvent);
+
+            return;
         }
 
         // May be null before the prior condition or the condition may set it as null.

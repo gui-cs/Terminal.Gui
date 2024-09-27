@@ -47,7 +47,7 @@ public class Bar : View, IOrientation, IDesignable
 
     private void OnMouseEvent (object? sender, MouseEventEventArgs e)
     {
-        NavigationDirection direction = NavigationDirection.Forward;
+        NavigationDirection direction = NavigationDirection.Backward;
 
         if (e.MouseEvent.Flags == MouseFlags.WheeledDown)
         {
@@ -56,7 +56,7 @@ public class Bar : View, IOrientation, IDesignable
 
         if (e.MouseEvent.Flags == MouseFlags.WheeledUp)
         {
-            direction = NavigationDirection.Backward;
+            direction = NavigationDirection.Forward;
             e.Handled = true;
         }
 
@@ -67,7 +67,7 @@ public class Bar : View, IOrientation, IDesignable
 
         if (e.MouseEvent.Flags == MouseFlags.WheeledLeft)
         {
-            direction = NavigationDirection.Backward;
+            direction = NavigationDirection.Forward;
             e.Handled = true;
         }
 

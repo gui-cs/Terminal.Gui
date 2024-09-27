@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using System.ComponentModel;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ApplicationTests;
 
@@ -144,14 +145,73 @@ public class ApplicationPopoverTests
         Assert.False (popover.HasFocus);
     }
 
+
+    [Fact]
+    public void Popover_MouseClick_Outside_Hides_Passes_Event_On ()
+    {
+        // Arrange
+        Application.Top = new Toplevel ()
+        {
+            Id = "top",
+            Height = 10,
+            Width = 10,
+        };
+
+        View otherView = new ()
+        {
+            X = 1,
+            Y = 1,
+            Height = 1,
+            Width = 1,
+            Id = "otherView",
+        };
+
+        bool otherViewPressed = false;
+        otherView.MouseEvent += (sender, e) =>
+                                {
+                                    otherViewPressed = e.MouseEvent.Flags.HasFlag(MouseFlags.Button1Pressed);
+                                };
+
+        Application.Top.Add (otherView);
+
+        var popover = new View ()
+        {
+            Id = "popover",
+            X = 5,
+            Y = 5,
+            Width = 1,
+            Height = 1,
+            Visible = false,
+            CanFocus = true
+        };
+
+        Application.Popover = popover;
+        popover.Visible = true;
+        Assert.True (popover.Visible);
+        Assert.True (popover.HasFocus);
+
+        // Act
+        // Click on popover
+        Application.OnMouseEvent (new () { Flags = MouseFlags.Button1Pressed, ScreenPosition = new (5, 5) });
+        Assert.True (popover.Visible);
+
+        // Click outside popover (on button)
+        Application.OnMouseEvent (new () { Flags = MouseFlags.Button1Pressed, ScreenPosition = new (1, 1) });
+
+        // Assert
+        Assert.True (otherViewPressed);
+        Assert.False (popover.Visible);
+
+        Application.Top.Dispose ();
+        Application.ResetState (ignoreDisposed: true);
+    }
+
     [Theory]
     [InlineData (0, 0, false)]
     [InlineData (5, 5, true)]
     [InlineData (10, 10, false)]
     [InlineData (5, 10, false)]
     [InlineData (9, 9, false)]
-
-
     public void Popover_MouseClick_Outside_Hides (int mouseX, int mouseY, bool expectedVisible)
     {
         // Arrange

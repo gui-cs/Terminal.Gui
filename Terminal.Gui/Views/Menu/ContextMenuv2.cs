@@ -44,15 +44,15 @@ public class ContextMenuv2 : Menuv2
     public ContextMenuv2 (IEnumerable<Shortcut> shortcuts) : base(shortcuts)
     {
         Visible = false;
-        VisibleChanging += OnVisibleChanging;
+        VisibleChanged += OnVisibleChanged;
         Key = DefaultKey;
     }
 
-    private void OnVisibleChanging (object? sender, CancelEventArgs<bool> args)
+    private void OnVisibleChanged (object? sender, EventArgs _)
     {
-        if (args.NewValue)
+        if (Visible && Subviews.Count > 0)
         {
-
+            Subviews [0].SetFocus ();
         }
     }
 
@@ -74,4 +74,19 @@ public class ContextMenuv2 : Menuv2
 
     /// <summary>Event raised when the <see cref="ContextMenu.Key"/> is changed.</summary>
     public event EventHandler<KeyChangedEventArgs>? KeyChanged;
+
+    /// <summary>
+    ///     Sets the position of the ContextMenu. The actual position of the menu will be adjusted to
+    ///     ensure the menu fully fits on the screen, and the mouse cursor is over the first call of the
+    ///     first Shortcut.
+    /// </summary>
+    /// <param name="screenPosition"></param>
+    public void SetPosition (Point screenPosition)
+    {
+        Frame = Frame with
+        {
+            X = screenPosition.X - GetViewportOffsetFromFrame ().X,
+            Y = screenPosition.Y - GetViewportOffsetFromFrame ().Y,
+        };
+    }
 }
