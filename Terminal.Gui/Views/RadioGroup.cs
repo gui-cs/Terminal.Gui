@@ -75,17 +75,6 @@ public class RadioGroup : View, IDesignable, IOrientation
                         return true;
                     }
                    );
-
-        AddCommand (
-                    Command.Accept,
-                    () =>
-                    {
-                        SelectedItem = _cursor;
-
-                        return OnAccept () is false;
-                    }
-                   );
-
         AddCommand (
                     Command.Select,
                     () =>
@@ -102,6 +91,15 @@ public class RadioGroup : View, IDesignable, IOrientation
 
                         return true;
                     });
+        AddCommand (
+                    Command.Accept,
+                    () =>
+                    {
+                        SelectedItem = _cursor;
+
+                        return OnAccept () is false;
+                    }
+                   );
         AddCommand (
                     Command.HotKey,
                     ctx =>
