@@ -139,7 +139,9 @@ public class Images : Scenario
         _imageView = new()
         {
             Width = Dim.Fill (),
-            Height = Dim.Fill ()
+            Height = Dim.Fill (),
+            CanFocus = true
+
         };
 
         tabBasic.View = _imageView;
@@ -150,7 +152,8 @@ public class Images : Scenario
         tabSixel.View = new()
         {
             Width = Dim.Fill (),
-            Height = Dim.Fill ()
+            Height = Dim.Fill (),
+            CanFocus = true
         };
 
         var btnSixel = new Button { X = 0, Y = 0, Text = "Output Sixel", Width = Dim.Auto () };
