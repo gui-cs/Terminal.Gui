@@ -20,6 +20,8 @@ namespace UICatalog.Scenarios;
 public class Images : Scenario
 {
     private ImageView _imageView;
+    private Point _screenLocationForSixel;
+    private string _encodedSixelData;
 
     public override void Main ()
     {
@@ -195,27 +197,134 @@ public class Images : Scenario
         tabSixel.View.Add (lblPxY);
         tabSixel.View.Add (pxY);
 
+        sixelView.DrawContent += SixelViewOnDrawContent;
+
+
         btnSixel.Accept += (s, e) =>
                            {
-                               _imageView.OutputSixel (
-                                                       sixelView.FrameToScreen ().Location,
-                                                       sixelView.Frame.Size,
-                                                       pxX.Value,
-                                                       pxY.Value);
+
+                               if (_imageView.FullResImage == null)
+                               {
+                                   return;
+                               }
+
+
+                               _screenLocationForSixel = sixelView.FrameToScreen ().Location;
+                               _encodedSixelData = GenerateSixelData(
+                                                               _imageView.FullResImage,
+                                                               sixelView.Frame.Size,
+                                                               pxX.Value,
+                                                               pxY.Value);
                            };
+    }
+    void SixelViewOnDrawContent (object sender, DrawEventArgs e)
+    {
+        if (!string.IsNullOrWhiteSpace (_encodedSixelData))
+        {
+            // Does not work
+            Application.Driver?.Move (_screenLocationForSixel.X, _screenLocationForSixel.Y);
+            Application.Driver?.AddStr (_encodedSixelData);
+
+            // Works in NetDriver but results in screen flicker when moving mouse but vanish instantly
+            // Console.SetCursorPosition (_screenLocationForSixel.X, _screenLocationForSixel.Y);
+            // Console.Write (_encodedSixelData);
+        }
+    }
+
+    public string GenerateSixelData(
+            Image<Rgba32> fullResImage,
+            Size maxSize,
+            int pixelsPerCellX,
+            int pixelsPerCellY
+        )
+    {
+        var encoder = new SixelEncoder ();
+
+        // Calculate the target size in pixels based on console units
+        int targetWidthInPixels = maxSize.Width * pixelsPerCellX;
+        int targetHeightInPixels = maxSize.Height * pixelsPerCellY;
+
+        // Get the original image dimensions
+        int originalWidth = fullResImage.Width;
+        int originalHeight = fullResImage.Height;
+
+        // Use the helper function to get the resized dimensions while maintaining the aspect ratio
+        Size newSize = CalculateAspectRatioFit (originalWidth, originalHeight, targetWidthInPixels, targetHeightInPixels);
+
+        // Resize the image to match the console size
+        Image<Rgba32> resizedImage = fullResImage.Clone (x => x.Resize (newSize.Width, newSize.Height));
+
+        string encoded = encoder.EncodeSixel (ConvertToColorArray (resizedImage));
+
+        var pv = new PaletteView (encoder.Quantizer.Palette.ToList ());
+
+        var dlg = new Dialog
+        {
+            Title = "Palette (Esc to close)",
+            Width = Dim.Fill (2),
+            Height = Dim.Fill (1)
+        };
+
+        var btn = new Button
+        {
+            Text = "Ok"
+        };
+
+        btn.Accept += (s, e) => Application.RequestStop ();
+        dlg.Add (pv);
+        dlg.AddButton (btn);
+        Application.Run (dlg);
+
+        return encoded;
+    }
+
+    private Size CalculateAspectRatioFit (int originalWidth, int originalHeight, int targetWidth, int targetHeight)
+    {
+        // Calculate the scaling factor for width and height
+        double widthScale = (double)targetWidth / originalWidth;
+        double heightScale = (double)targetHeight / originalHeight;
+
+        // Use the smaller scaling factor to maintain the aspect ratio
+        double scale = Math.Min (widthScale, heightScale);
+
+        // Calculate the new width and height while keeping the aspect ratio
+        var newWidth = (int)(originalWidth * scale);
+        var newHeight = (int)(originalHeight * scale);
+
+        // Return the new size as a Size object
+        return new (newWidth, newHeight);
+    }
+
+    public static Color [,] ConvertToColorArray (Image<Rgba32> image)
+    {
+        int width = image.Width;
+        int height = image.Height;
+        Color [,] colors = new Color [width, height];
+
+        // Loop through each pixel and convert Rgba32 to Terminal.Gui color
+        for (var x = 0; x < width; x++)
+        {
+            for (var y = 0; y < height; y++)
+            {
+                Rgba32 pixel = image [x, y];
+                colors [x, y] = new (pixel.R, pixel.G, pixel.B); // Convert Rgba32 to Terminal.Gui color
+            }
+        }
+
+        return colors;
     }
 
     private class ImageView : View
     {
         private readonly ConcurrentDictionary<Rgba32, Attribute> _cache = new ();
-        private Image<Rgba32> _fullResImage;
+        public Image<Rgba32> FullResImage;
         private Image<Rgba32> _matchSize;
 
         public override void OnDrawContent (Rectangle bounds)
         {
             base.OnDrawContent (bounds);
 
-            if (_fullResImage == null)
+            if (FullResImage == null)
             {
                 return;
             }
@@ -224,7 +333,7 @@ public class Images : Scenario
             if (_matchSize == null || bounds.Width != _matchSize.Width || bounds.Height != _matchSize.Height)
             {
                 // generate one
-                _matchSize = _fullResImage.Clone (x => x.Resize (bounds.Width, bounds.Height));
+                _matchSize = FullResImage.Clone (x => x.Resize (bounds.Width, bounds.Height));
             }
 
             for (var y = 0; y < bounds.Height; y++)
@@ -249,102 +358,11 @@ public class Images : Scenario
 
         internal void SetImage (Image<Rgba32> image)
         {
-            _fullResImage = image;
+            FullResImage = image;
             SetNeedsDisplay ();
         }
 
-        public void OutputSixel (
-            Point screenPosition,
-            Size maxSize,
-            int pixelsPerCellX,
-            int pixelsPerCellY
-        )
-        {
-            if (_fullResImage == null)
-            {
-                return;
-            }
-
-            var encoder = new SixelEncoder ();
-
-            // Calculate the target size in pixels based on console units
-            int targetWidthInPixels = maxSize.Width * pixelsPerCellX;
-            int targetHeightInPixels = maxSize.Height * pixelsPerCellY;
-
-            // Get the original image dimensions
-            int originalWidth = _fullResImage.Width;
-            int originalHeight = _fullResImage.Height;
-
-            // Use the helper function to get the resized dimensions while maintaining the aspect ratio
-            Size newSize = CalculateAspectRatioFit (originalWidth, originalHeight, targetWidthInPixels, targetHeightInPixels);
-
-            // Resize the image to match the console size
-            Image<Rgba32> resizedImage = _fullResImage.Clone (x => x.Resize (newSize.Width, newSize.Height));
-
-            string encoded = encoder.EncodeSixel (ConvertToColorArray (resizedImage));
-
-            var pv = new PaletteView (encoder.Quantizer.Palette.ToList ());
-
-            var dlg = new Dialog
-            {
-                Title = "Palette (Esc to close)",
-                Width = Dim.Fill (2),
-                Height = Dim.Fill (1)
-            };
-
-            var btn = new Button
-            {
-                Text = "Ok"
-            };
-
-            btn.Accept += (s, e) => Application.RequestStop ();
-            dlg.Add (pv);
-            dlg.AddButton (btn);
-            Application.Run (dlg);
-
-            Application.Sixel.Add (
-                                   new()
-                                   {
-                                       ScreenPosition = screenPosition,
-                                       SixelData = encoded
-                                   });
-        }
-
-        private Size CalculateAspectRatioFit (int originalWidth, int originalHeight, int targetWidth, int targetHeight)
-        {
-            // Calculate the scaling factor for width and height
-            double widthScale = (double)targetWidth / originalWidth;
-            double heightScale = (double)targetHeight / originalHeight;
-
-            // Use the smaller scaling factor to maintain the aspect ratio
-            double scale = Math.Min (widthScale, heightScale);
-
-            // Calculate the new width and height while keeping the aspect ratio
-            var newWidth = (int)(originalWidth * scale);
-            var newHeight = (int)(originalHeight * scale);
-
-            // Return the new size as a Size object
-            return new (newWidth, newHeight);
-        }
-
-        public static Color [,] ConvertToColorArray (Image<Rgba32> image)
-        {
-            int width = image.Width;
-            int height = image.Height;
-            Color [,] colors = new Color [width, height];
-
-            // Loop through each pixel and convert Rgba32 to Terminal.Gui color
-            for (var x = 0; x < width; x++)
-            {
-                for (var y = 0; y < height; y++)
-                {
-                    Rgba32 pixel = image [x, y];
-                    colors [x, y] = new (pixel.R, pixel.G, pixel.B); // Convert Rgba32 to Terminal.Gui color
-                }
-            }
-
-            return colors;
-        }
+        
     }
 
     public class PaletteView : View
