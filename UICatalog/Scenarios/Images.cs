@@ -215,15 +215,22 @@ public class Images : Scenario
                                                                sixelView.Frame.Size,
                                                                pxX.Value,
                                                                pxY.Value);
+
+                               // TODO: Static way of doing this, suboptimal
+                               Application.Sixel.Add (new SixelToRender
+                               {
+                                   SixelData = _encodedSixelData,
+                                   ScreenPosition = _screenLocationForSixel
+                               });
                            };
     }
     void SixelViewOnDrawContent (object sender, DrawEventArgs e)
     {
         if (!string.IsNullOrWhiteSpace (_encodedSixelData))
         {
-            // Does not work
-            Application.Driver?.Move (_screenLocationForSixel.X, _screenLocationForSixel.Y);
-            Application.Driver?.AddStr (_encodedSixelData);
+            // Does not work (see https://github.com/gui-cs/Terminal.Gui/issues/3763)
+            // Application.Driver?.Move (_screenLocationForSixel.X, _screenLocationForSixel.Y);
+            // Application.Driver?.AddStr (_encodedSixelData);
 
             // Works in NetDriver but results in screen flicker when moving mouse but vanish instantly
             // Console.SetCursorPosition (_screenLocationForSixel.X, _screenLocationForSixel.Y);
@@ -274,6 +281,7 @@ public class Images : Scenario
         dlg.Add (pv);
         dlg.AddButton (btn);
         Application.Run (dlg);
+        dlg.Dispose ();
 
         return encoded;
     }
