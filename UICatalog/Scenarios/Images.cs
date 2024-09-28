@@ -84,6 +84,14 @@ public class Images : Scenario
         Application.Run (win);
         win.Dispose ();
         Application.Shutdown ();
+
+    }
+
+    /// <inheritdoc />
+    protected override void Dispose (bool disposing)
+    {
+        base.Dispose (disposing);
+        _imageView.Dispose ();
     }
 
     private void OpenImage (object sender, HandledEventArgs e)
