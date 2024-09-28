@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Threading;
 using JetBrains.Annotations;
@@ -11,11 +12,13 @@ namespace UICatalog.Scenarios;
 public class ContextMenus : Scenario
 {
     [CanBeNull]
-    private ContextMenuv2 _contextMenu;
+    private ContextMenuv2 _winContextMenu;
     private bool _forceMinimumPosToZero = true;
     private MenuItem _miForceMinimumPosToZero;
     private TextField _tfTopLeft, _tfTopRight, _tfMiddle, _tfBottomLeft, _tfBottomRight;
     private bool _useSubMenusSingleFrame;
+
+    private readonly List<CultureInfo> _cultureInfos = Application.SupportedCultures;
 
     public override void Main ()
     {
@@ -28,23 +31,23 @@ public class ContextMenus : Scenario
             Title = GetQuitKeyAndName ()
         };
 
-        _contextMenu = new ContextMenuv2 ()
+        _winContextMenu = new ContextMenuv2 ()
         {
         };
 
-        ConfigureMenu (_contextMenu);
-        _contextMenu.Key = Key.Space.WithCtrl;
+        ConfigureMenu (_winContextMenu);
+        _winContextMenu.Key = Key.Space.WithCtrl;
 
         var text = "Context Menu";
         var width = 20;
 
         var label = new Label
         {
-            X = Pos.Center (), Y = 1, Text = $"Press '{_contextMenu.Key}' to open the Window context menu."
+            X = Pos.Center (), Y = 1, Text = $"Press '{_winContextMenu.Key}' to open the Window context menu."
         };
         appWindow.Add (label);
 
-        label = new()
+        label = new ()
         {
             X = Pos.Center (),
             Y = Pos.Bottom (label),
@@ -52,29 +55,28 @@ public class ContextMenus : Scenario
         };
         appWindow.Add (label);
 
-        _tfTopLeft = new() { Id = "_tfTopLeft", Width = width, Text = text };
+        _tfTopLeft = new () { Id = "_tfTopLeft", Width = width, Text = text };
         appWindow.Add (_tfTopLeft);
 
-        _tfTopRight = new() { Id = "_tfTopRight", X = Pos.AnchorEnd (width), Width = width, Text = text };
+        _tfTopRight = new () { Id = "_tfTopRight", X = Pos.AnchorEnd (width), Width = width, Text = text };
         appWindow.Add (_tfTopRight);
 
-        _tfMiddle = new() { Id = "_tfMiddle", X = Pos.Center (), Y = Pos.Center (), Width = width, Text = text };
+        _tfMiddle = new () { Id = "_tfMiddle", X = Pos.Center (), Y = Pos.Center (), Width = width, Text = text };
         appWindow.Add (_tfMiddle);
 
-        _tfBottomLeft = new() { Id = "_tfBottomLeft", Y = Pos.AnchorEnd (1), Width = width, Text = text };
+        _tfBottomLeft = new () { Id = "_tfBottomLeft", Y = Pos.AnchorEnd (1), Width = width, Text = text };
         appWindow.Add (_tfBottomLeft);
 
-        _tfBottomRight = new() { Id = "_tfBottomRight", X = Pos.AnchorEnd (width), Y = Pos.AnchorEnd (1), Width = width, Text = text };
+        _tfBottomRight = new () { Id = "_tfBottomRight", X = Pos.AnchorEnd (width), Y = Pos.AnchorEnd (1), Width = width, Text = text };
         appWindow.Add (_tfBottomRight);
 
         Point mousePos = default;
 
         appWindow.KeyDown += (s, e) =>
                              {
-                                 if (e.KeyCode == _contextMenu.Key)
+                                 if (e.KeyCode == _winContextMenu.Key)
                                  {
-                                     Application.Popover = _contextMenu;
-                                     _contextMenu.Visible = true;
+                                     ShowContextMenu (Application.GetLastMousePosition ());
                                      e.Handled = true;
                                  }
                              };
@@ -83,10 +85,7 @@ public class ContextMenus : Scenario
                                 {
                                     if (e.MouseEvent.Flags == MouseFlags.Button3Clicked)
                                     {
-                                        Application.Popover = _contextMenu;
-
-                                        _contextMenu.SetPosition (e.MouseEvent.ScreenPosition);
-                                        _contextMenu.Visible = true;
+                                        ShowContextMenu (e.MouseEvent.ScreenPosition);
                                         e.Handled = true;
                                     }
                                 };
@@ -100,7 +99,7 @@ public class ContextMenus : Scenario
         // Run - Start the application.
         Application.Run (appWindow);
         appWindow.Dispose ();
-        _contextMenu.Dispose ();
+        _winContextMenu.Dispose ();
 
         // Shutdown - Calling Application.Shutdown is required.
         Application.Shutdown ();
@@ -152,60 +151,78 @@ public class ContextMenus : Scenario
         };
         bar.Add (shortcut1, shortcut2, shortcut3, line, shortcut4);
     }
+    private Shortcut [] GetSupportedCultures ()
+    {
+        List<Shortcut> supportedCultures = new ();
+        int index = -1;
 
+        foreach (CultureInfo c in _cultureInfos)
+        {
+            Shortcut culture = new ();
 
-    //private MenuItem [] GetSupportedCultures ()
-    //{
-    //    List<MenuItem> supportedCultures = new ();
-    //    int index = -1;
+            culture.CommandView = new CheckBox () { HighlightStyle = HighlightStyle.None };
 
-    //    foreach (CultureInfo c in _cultureInfos)
-    //    {
-    //        var culture = new MenuItem { CheckType = MenuItemCheckStyle.Checked };
+            if (index == -1)
+            {
+                culture.Title = "_English";
+                culture.HelpText = "en-US";
+                ((CheckBox)culture.CommandView).CheckedState = Thread.CurrentThread.CurrentUICulture.Name == "en-US" ? CheckState.Checked : CheckState.UnChecked;
 
-    //        if (index == -1)
-    //        {
-    //            culture.Title = "_English";
-    //            culture.Help = "en-US";
-    //            culture.Checked = Thread.CurrentThread.CurrentUICulture.Name == "en-US";
-    //            CreateAction (supportedCultures, culture);
-    //            supportedCultures.Add (culture);
-    //            index++;
-    //            culture = new() { CheckType = MenuItemCheckStyle.Checked };
-    //        }
+                CreateAction (supportedCultures, culture);
+                supportedCultures.Add (culture);
+                index++;
+                culture = new ();
+                culture.CommandView = new CheckBox () { HighlightStyle = HighlightStyle.None};
+            }
 
-    //        culture.Title = $"_{c.Parent.EnglishName}";
-    //        culture.Help = c.Name;
-    //        culture.Checked = Thread.CurrentThread.CurrentUICulture.Name == c.Name;
-    //        CreateAction (supportedCultures, culture);
-    //        supportedCultures.Add (culture);
-    //    }
+            culture.Title = $"_{c.Parent.EnglishName}";
+            culture.HelpText = c.Name;
+            ((CheckBox)culture.CommandView).CheckedState = Thread.CurrentThread.CurrentUICulture.Name == culture.HelpText ? CheckState.Checked : CheckState.UnChecked;
+            CreateAction (supportedCultures, culture);
+            supportedCultures.Add (culture);
+        }
 
-    //    return supportedCultures.ToArray ();
+        return supportedCultures.ToArray ();
 
-    //    void CreateAction (List<MenuItem> supportedCultures, MenuItem culture)
-    //    {
-    //        culture.Action += () =>
-    //                          {
-    //                              Thread.CurrentThread.CurrentUICulture = new (culture.Help);
-    //                              culture.Checked = true;
+        void CreateAction (List<Shortcut> cultures, Shortcut culture)
+        {
+            culture.Action += () =>
+                              {
+                                  Thread.CurrentThread.CurrentUICulture = new (culture.HelpText);
+                                  ((CheckBox)culture.CommandView).CheckedState = CheckState.Checked;
 
-    //                              foreach (MenuItem item in supportedCultures)
-    //                              {
-    //                                  item.Checked = item.Help == Thread.CurrentThread.CurrentUICulture.Name;
-    //                              }
-    //                          };
-    //    }
-    //}
+                                  foreach (Shortcut item in cultures)
+                                  {
+                                      ((CheckBox)culture.CommandView).CheckedState = Thread.CurrentThread.CurrentUICulture.Name == culture.HelpText ? CheckState.Checked : CheckState.UnChecked;
+                                  }
+                              };
+        }
+    }
 
-    //private void ShowContextMenu (int x, int y)
-    //{
-    //    _contextMenu = new()
-    //    {
-    //        Position = new (x, y),
-    //        ForceMinimumPosToZero = _forceMinimumPosToZero,
-    //        UseSubMenusSingleFrame = _useSubMenusSingleFrame
-    //    };
+    private void ShowContextMenu (Point screenPosition)
+    {
+        if (_winContextMenu is { })
+        {
+            if (Application.Popover == _winContextMenu)
+            {
+                Application.Popover = null;
+            }
+
+            _winContextMenu.Dispose ();
+            _winContextMenu = null;
+        }
+
+        _winContextMenu = new (GetSupportedCultures())
+        {
+            //Position = new (x, y),
+            //ForceMinimumPosToZero = _forceMinimumPosToZero,
+            //UseSubMenusSingleFrame = _useSubMenusSingleFrame
+        };
+
+        _winContextMenu.SetPosition(screenPosition);
+        Application.Popover = _winContextMenu;
+        _winContextMenu.Visible = true;
+    }
 
     //    MenuBarItem menuItems = new (
     //                                 new []

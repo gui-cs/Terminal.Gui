@@ -2460,9 +2460,9 @@ public class TextView : View
         KeyBindings.Add (Key.C.WithAlt, Command.Copy);
         KeyBindings.Add (Key.C.WithCtrl, Command.Copy);
 
+        KeyBindings.Add (Key.X.WithCtrl, Command.Cut);
         KeyBindings.Add (Key.W.WithAlt, Command.Cut);
         KeyBindings.Add (Key.W.WithCtrl, Command.Cut);
-        KeyBindings.Add (Key.X.WithCtrl, Command.Cut);
 
         KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.WordLeft);
         KeyBindings.Add (Key.B.WithAlt, Command.WordLeft);
@@ -6244,7 +6244,8 @@ public class TextView : View
                 Point currentLoc = ContextMenu.Frame.Location;
                 ContextMenu.Dispose ();
                 ContextMenu = CreateContextMenu ();
-                ContextMenu.Frame = ContextMenu.Frame with { Location = currentLoc };
+                ContextMenu.X = currentLoc.X;
+                ContextMenu.Y = currentLoc.Y;
             }
         }
 

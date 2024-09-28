@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿using System.ComponentModel;
+
+namespace Terminal.Gui;
 
 /// <summary>
 ///     Displays a command, help text, and a key binding. When the key specified by <see cref="Key"/> is pressed, the
@@ -98,8 +100,8 @@ public class Shortcut : View, IOrientation, IDesignable
         _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
         _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
 
-        AddCommand (Command.HotKey, ctx => OnAccept (ctx));
-        AddCommand (Command.Accept, ctx => OnAccept (ctx));
+        AddCommand (Command.HotKey, ctx => DispatchAcceptCommand (ctx));
+        AddCommand (Command.Accept, ctx => DispatchAcceptCommand (ctx));
         AddCommand (Command.Select, ctx => OnSelect (ctx));
         KeyBindings.Add (KeyCode.Enter, Command.Accept);
         KeyBindings.Add (KeyCode.Space, Command.Select);
@@ -376,7 +378,9 @@ public class Shortcut : View, IOrientation, IDesignable
         if (!e.Handled)
         {
             // If the subview (likely CommandView) didn't handle the mouse click, invoke the command.
-            e.Handled = InvokeCommand (Command.Accept) == true;
+            KeyBinding binding = new ([Command.Select], KeyBindingScope.Focused, _commandView, null);
+            e.Handled = DispatchAcceptCommand (new CommandContext (Command.Select, null, binding)) == true;
+            //e.Handled = InvokeCommand (Command.Accept) == true;
         }
 
         if (CanFocus)
@@ -485,6 +489,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
             if (_commandView is { })
             {
+                _commandView.Accept -= CommandViewOnAccept;
                 Remove (_commandView);
                 _commandView?.Dispose ();
             }
@@ -508,6 +513,22 @@ public class Shortcut : View, IOrientation, IDesignable
             _commandView.HotKeySpecifier = new ('_');
 
             Title = _commandView.Text;
+
+            _commandView.Accept += CommandViewOnAccept;
+
+            void CommandViewOnAccept (object sender, HandledEventArgs e)
+            {
+                KeyBinding binding = new ([Command.Select], KeyBindingScope.Focused, _commandView, null);
+                e.Handled = DispatchAcceptCommand (new CommandContext (Command.Select, null, binding)) == true;
+            }
+
+            _commandView.Select += CommandViewOnSelect;
+
+            void CommandViewOnSelect (object sender, HandledEventArgs e)
+            {
+                SetFocus ();
+                //OnAccept ();
+            }
 
             SetCommandViewDefaultLayout ();
             SetHelpViewDefaultLayout ();
@@ -701,9 +722,12 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         if (Key != null && Key.IsValid)
         {
-            // Disable the command view key bindings
+            // Disable the command view HotKey bindings
             CommandView.KeyBindings.Remove (Key);
             CommandView.KeyBindings.Remove (CommandView.HotKey);
+            CommandView.KeyBindings.Remove (CommandView.HotKey.WithShift);
+            CommandView.KeyBindings.Remove (CommandView.HotKey.WithAlt);
+            CommandView.KeyBindings.Remove (CommandView.HotKey.WithShift.WithAlt);
 
             if (KeyBindingScope.FastHasFlags (KeyBindingScope.Application))
             {
@@ -740,60 +764,90 @@ public class Shortcut : View, IOrientation, IDesignable
     ///     - if the user presses the HotKey specified by CommandView
     ///     - if HasFocus and the user presses Space or Enter (or any other key bound to Command.Accept).
     /// </summary>
-    protected bool? OnAccept (CommandContext ctx)
+    protected bool? DispatchAcceptCommand (CommandContext ctx)
     {
         var cancel = false;
 
-        switch (ctx.KeyBinding?.Scope)
+        if (ctx.Command == Command.HotKey)
         {
-            case KeyBindingScope.Application:
-                cancel = base.OnAccept () == true;
+            var ret = CommandView.InvokeCommand (Command.Accept, ctx.Key, ctx.KeyBinding);
 
-                break;
+            return ret;
+        }
 
-            case KeyBindingScope.Focused:
-                base.OnAccept ();
+        if (ctx.Command == Command.Select)
+        {
+            var ret = CommandView.InvokeCommand (Command.Select, ctx.Key, ctx.KeyBinding);
 
-                // cancel if we're focused
-                cancel = true;
+            if (ret == false)
+            {
+                SetFocus ();
 
-                break;
+                return OnAccept ();
+            }
 
-            case KeyBindingScope.HotKey:
-                //if (!CanBeVisible(this))
-                //{
-                //    return true;
-                //}
-                cancel = base.OnAccept () == true;
+            return ret;
+        }
 
-                if (CanFocus)
-                {
-                    SetFocus ();
+        //if (ctx.Command == Command.Accept)
+        {
+
+
+            switch (ctx.KeyBinding?.Scope)
+            {
+                case KeyBindingScope.Application:
+                    cancel = base.OnAccept () == true;
+
+                    break;
+
+                case KeyBindingScope.Focused:
+                    cancel = base.OnAccept () == true;
+
+                    // cancel if we're focused
                     cancel = true;
-                }
 
-                break;
+                    break;
 
-            default:
-                // Mouse
-                cancel = base.OnAccept () == true;
+                case KeyBindingScope.HotKey:
+                    //if (!CanBeVisible(this))
+                    //{
+                    //    return true;
+                    //}
+                    cancel = base.OnAccept () == true;
 
-                break;
-        }
+                    if (CanFocus)
+                    {
+                        SetFocus ();
+                        cancel = true;
+                    }
 
-        CommandView.InvokeCommand (Command.Accept, ctx.Key, ctx.KeyBinding);
+                    break;
 
-        if (Action is { })
-        {
-            Action.Invoke ();
+                default:
+                    // Mouse
+                    //cancel = true;
 
-            // Assume if there's a subscriber to Action, it's handled.
-            cancel = true;
-        }
+                    break;
+            }
 
-        if (_targetView is { })
-        {
-            _targetView.InvokeCommand (_command);
+
+            if (!cancel && ctx.KeyBinding?.BoundView != CommandView)
+            {
+                CommandView.InvokeCommand (Command.Select, ctx.Key, ctx.KeyBinding);
+            }
+
+            if (Action is { })
+            {
+                Action.Invoke ();
+
+                // Assume if there's a subscriber to Action, it's handled.
+                cancel = true;
+            }
+
+            if (_targetView is { })
+            {
+                _targetView.InvokeCommand (_command);
+            }
         }
 
         return cancel;

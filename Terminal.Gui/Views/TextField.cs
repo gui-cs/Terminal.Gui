@@ -1804,6 +1804,21 @@ public class TextField : View
 
     private void ShowContextMenu (bool keyboard)
     {
+
+        if (!Equals (_currentCulture, Thread.CurrentThread.CurrentUICulture))
+        {
+            _currentCulture = Thread.CurrentThread.CurrentUICulture;
+
+            if (ContextMenu is { })
+            {
+                Point currentLoc = ContextMenu.Frame.Location;
+                ContextMenu.Dispose ();
+                ContextMenu = CreateContextMenu ();
+                ContextMenu!.X = currentLoc.X;
+                ContextMenu!.Y = currentLoc.Y;
+            }
+        }
+
         if (keyboard)
         {
             Point loc = ViewportToScreen (new Point (_cursorPosition - ScrollOffset, 1));

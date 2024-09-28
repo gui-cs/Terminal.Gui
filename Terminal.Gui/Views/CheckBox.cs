@@ -21,11 +21,25 @@ public class CheckBox : View
         CanFocus = true;
 
         // Things this view knows how to do
-        AddCommand (Command.Accept, AdvanceCheckState);
-        AddCommand (Command.HotKey, AdvanceCheckState);
+
+        AddCommand (Command.Accept, OnAccept);
+        AddCommand (Command.HotKey, () =>
+                                    {
+                                        //AdvanceCheckState ();
+
+                                        return OnAccept ();
+                                    });
+        AddCommand (Command.Select, () =>
+                                    {
+                                        OnSelect (); 
+                                        AdvanceCheckState ();
+
+                                        return false;
+                                    });
 
         // Default keybindings for this view
-        KeyBindings.Add (Key.Space, Command.Accept);
+        KeyBindings.Add (Key.Space, Command.Select);
+        KeyBindings.Add (Key.Enter, Command.Accept);
 
         TitleChanged += Checkbox_TitleChanged;
 
@@ -35,7 +49,17 @@ public class CheckBox : View
 
     private void CheckBox_MouseClick (object? sender, MouseEventEventArgs e)
     {
-        e.Handled = AdvanceCheckState () == true;
+        //e.Handled = AdvanceCheckState () == true;
+
+        //if (CanFocus)
+        {
+            e.Handled = InvokeCommand (Command.Select) == true;
+        }
+        //else
+        //{
+        //    e.Handled = InvokeCommand (Command.Accept) == true;
+        //}
+
     }
 
     private void Checkbox_TitleChanged (object? sender, EventArgs<string> e)
@@ -164,11 +188,7 @@ public class CheckBox : View
             return e.Cancel;
         }
 
-        // By default, Command.Accept calls OnAccept, so we need to call it here to ensure that the Accept event is fired.
-        if (OnAccept () == true)
-        {
-            return true;
-        }
+        SetFocus ();
 
         CheckedState = e.NewValue;
 

@@ -109,6 +109,13 @@ namespace Terminal.Gui;
 public partial class View : Responder, ISupportInitializeNotification
 {
     /// <summary>
+    ///     Cancelable event fired when the <see cref="Command.Select"/> command is invoked. Set
+    ///     <see cref="HandledEventArgs.Handled"/>
+    ///     to cancel the event.
+    /// </summary>
+    public event EventHandler<HandledEventArgs>? Select;
+
+    /// <summary>
     ///     Cancelable event fired when the <see cref="Command.Accept"/> command is invoked. Set
     ///     <see cref="HandledEventArgs.Handled"/>
     ///     to cancel the event.
@@ -161,6 +168,23 @@ public partial class View : Responder, ISupportInitializeNotification
         Accept?.Invoke (this, args);
 
         return Accept is null ? null : args.Handled;
+    }
+
+
+    /// <summary>
+    ///     Called when the <see cref="Command.Accept"/> command is invoked. Raises <see cref="Accept"/>
+    ///     event.
+    /// </summary>
+    /// <returns>
+    ///     If <see langword="true"/> the event was canceled. If <see langword="false"/> the event was raised but not canceled.
+    ///     If <see langword="null"/> no event was raised.
+    /// </returns>
+    protected bool? OnSelect ()
+    {
+        var args = new HandledEventArgs ();
+        Select?.Invoke (this, args);
+
+        return Select is null ? null : args.Handled;
     }
 
     #region Constructors and Initialization

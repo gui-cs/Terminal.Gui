@@ -133,9 +133,9 @@ public class ListView : View, IDesignable
         AddCommand (Command.PageDown, () => MovePageDown ());
         AddCommand (Command.Start, () => MoveHome ());
         AddCommand (Command.End, () => MoveEnd ());
-        AddCommand (Command.Accept, () => OnOpenSelectedItem ());
         AddCommand (Command.Open, () => OnOpenSelectedItem ());
         AddCommand (Command.Select, () => MarkUnmarkRow ());
+        AddCommand (Command.Accept, () => OnOpenSelectedItem ());
 
         AddCommand (Command.ScrollLeft, () => ScrollHorizontal (-1));
         AddCommand (Command.ScrollRight, () => ScrollHorizontal (1));

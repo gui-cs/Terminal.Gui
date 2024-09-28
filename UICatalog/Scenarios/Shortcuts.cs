@@ -72,7 +72,8 @@ public class Shortcuts : Scenario
             CommandView = new RadioGroup
             {
                 Orientation = Orientation.Vertical,
-                RadioLabels = ["O_ne", "T_wo", "Th_ree", "Fo_ur"]
+                RadioLabels = ["O_ne", "T_wo", "Th_ree", "Fo_ur"],
+                CanFocus = false
             },
         };
 
@@ -101,7 +102,7 @@ public class Shortcuts : Scenario
             Orientation = Orientation.Vertical,
             X = 0,
             Y = Pos.Bottom (vShortcut2),
-            CommandView = new CheckBox { Text = "_Align" },
+            CommandView = new CheckBox { Text = "_Align", CanFocus = false, HighlightStyle = HighlightStyle.None},
             Key = Key.F5.WithCtrl.WithAlt.WithShift,
             HelpText = "Width is Fill",
             Width = Dim.Fill () - Dim.Width (eventLog),
@@ -144,13 +145,15 @@ public class Shortcuts : Scenario
             CommandView = new Button
             {
                 Title = "_Button",
+                ShadowStyle = ShadowStyle.None,
+                HighlightStyle = HighlightStyle.None
             },
             HelpText = "Width is Fill",
             Key = Key.K,
             KeyBindingScope = KeyBindingScope.HotKey,
         };
         Button button = (Button)vShortcut4.CommandView;
-        vShortcut4.CommandView.Accept += Button_Clicked;
+        vShortcut4.Accept += Button_Clicked;
 
         Application.Top.Add (vShortcut4);
 
@@ -174,13 +177,13 @@ public class Shortcuts : Scenario
                                                              eventSource.Add ($"Toggle: {cb.Text}");
                                                              eventLog.MoveDown ();
 
-                                                             foreach (Shortcut peer in Application.Top.Subviews.Where (v => v is Shortcut)!)
-                                                             {
-                                                                 if (peer.CanFocus)
-                                                                 {
-                                                                     peer.CommandView.CanFocus = e.NewValue == CheckState.Checked;
-                                                                 }
-                                                             }
+                                                             //foreach (Shortcut peer in Application.Top.Subviews.Where (v => v is Shortcut)!)
+                                                             //{
+                                                             //    if (peer.CanFocus)
+                                                             //    {
+                                                             //        peer.CommandView.CanFocus = e.NewValue == CheckState.Checked;
+                                                             //    }
+                                                             //}
                                                          }
                                                      };
         Application.Top.Add (vShortcut5);
@@ -360,7 +363,7 @@ public class Shortcuts : Scenario
             {
                 shortcut.Accept += (o, args) =>
                                    {
-                                       eventSource.Add ($"Accept: {shortcut!.CommandView.Text}");
+                                       eventSource.Add ($"Accept: {shortcut!.CommandView.Text} ({shortcut!.Id})");
                                        eventLog.MoveDown ();
                                        args.Handled = true;
                                    };
@@ -378,7 +381,8 @@ public class Shortcuts : Scenario
 
     private void Button_Clicked (object sender, HandledEventArgs e)
     {
-        //e.Cancel = true;
-        MessageBox.Query ("Hi", $"You clicked {sender}");
+        e.Handled = true;
+        View view = sender as View;
+        MessageBox.Query ("Hi", $"You clicked {view!.Text}", "_Ok");
     }
 }

@@ -61,6 +61,17 @@ public class Button : View, IDesignable
 
         CanFocus = true;
 
+        // By default, the HotKey command sets the focus
+        AddCommand (Command.Select, () =>
+        {
+            if (!OnAccept () == true)
+            {
+                SetFocus ();
+            }
+
+            return false;
+        });
+
         // Override default behavior of View
         AddCommand (Command.HotKey, () =>
         {
@@ -106,7 +117,14 @@ public class Button : View, IDesignable
 
     private void Button_MouseClick (object sender, MouseEventEventArgs e)
     {
-        e.Handled = InvokeCommand (Command.HotKey) == true;
+        if (CanFocus)
+        {
+            e.Handled = InvokeCommand (Command.HotKey) == true;
+        }
+        else
+        {
+            e.Handled = InvokeCommand (Command.Select) == true;
+        }
     }
 
     private void Button_TitleChanged (object sender, EventArgs<string> e)

@@ -15,7 +15,14 @@ public partial class View // Keyboard APIs
         TitleTextFormatter.HotKeyChanged += TitleTextFormatter_HotKeyChanged;
 
         // By default, the HotKey command sets the focus
-        AddCommand (Command.HotKey, OnHotKey);
+        AddCommand (Command.Select, () =>
+                                    {
+                                        SetFocus ();
+                                        return OnSelect ();
+                                    });
+
+        // By default, the HotKey command sets the focus
+        AddCommand (Command.HotKey, () => SetFocus ());
 
         // By default, the Accept command raises the Accept event
         AddCommand (Command.Accept, OnAccept);
@@ -27,22 +34,6 @@ public partial class View // Keyboard APIs
     private void DisposeKeyboard () { TitleTextFormatter.HotKeyChanged -= TitleTextFormatter_HotKeyChanged; }
 
     #region HotKey Support
-
-    /// <summary>
-    ///     Called when the HotKey command (<see cref="Command.HotKey"/>) is invoked. Causes this view to be focused.
-    /// </summary>
-    /// <returns>If <see langword="true"/> the command was canceled.</returns>
-    private bool? OnHotKey ()
-    {
-        if (CanFocus)
-        {
-            SetFocus ();
-
-            return true;
-        }
-
-        return false;
-    }
 
     /// <summary>Invoked when the <see cref="HotKey"/> is changed.</summary>
     public event EventHandler<KeyChangedEventArgs>? HotKeyChanged;
