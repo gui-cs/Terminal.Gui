@@ -152,15 +152,18 @@ public class Dialogs : Scenario
         };
         frame.Add (label);
 
-        var labels = Enum.GetNames<Alignment> ();
+        // Add hotkeys
+        var labels = Enum.GetNames<Alignment> ().Select (n => n = "_" + n);
         var alignmentGroup = new RadioGroup
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             RadioLabels = labels.ToArray (),
+            Title = "Ali_gn",
+            BorderStyle = LineStyle.Dashed
         };
         frame.Add (alignmentGroup);
-        alignmentGroup.SelectedItem = labels.ToList ().IndexOf (Dialog.DefaultButtonAlignment.ToString ());
+        alignmentGroup.SelectedItem = labels.ToList ().IndexOf ("_" + Dialog.DefaultButtonAlignment.ToString ());
 
         frame.ValidatePosDim = true;
 
@@ -266,7 +269,7 @@ public class Dialogs : Scenario
             {
                 Title = titleEdit.Text,
                 Text = "Dialog Text",
-                ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentRadioGroup.RadioLabels [alignmentRadioGroup.SelectedItem]),
+                ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentRadioGroup.RadioLabels [alignmentRadioGroup.SelectedItem].Substring(1)),
 
                 Buttons = buttons.ToArray ()
             };
