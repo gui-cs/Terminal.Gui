@@ -47,6 +47,10 @@ public static class EscSeqUtils
     /// </summary>
     public const string CSI = "\u001B[";
 
+
+    public const string CSI_Device_Attributes_Request = CSI + "c";
+    public const string CSI_Device_Attributes_Request_Terminator = "c";
+
     /// <summary>
     ///     ESC [ ? 1047 h - Activate xterm alternative buffer (no backscroll)
     /// </summary>

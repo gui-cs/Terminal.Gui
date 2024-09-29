@@ -633,6 +633,9 @@ internal class NetEvents : IDisposable
                 }
 
                 break;
+            case EscSeqUtils.CSI_Device_Attributes_Request_Terminator:
+                ConsoleDriver.SupportsSixel = values.Any (v => v == "4");
+                break;
             default:
                 EnqueueRequestResponseEvent (c1Control, code, values, terminating);
 
@@ -1135,9 +1138,13 @@ internal class NetDriver : ConsoleDriver
         _mainLoopDriver = new NetMainLoop (this);
         _mainLoopDriver.ProcessInput = ProcessInput;
 
+        _mainLoopDriver._netEvents.EscSeqRequests.Add ("c");
+        // Determine if sixel is supported
+        Console.Out.Write (EscSeqUtils.CSI_Device_Attributes_Request);
+
         return new MainLoop (_mainLoopDriver);
     }
-
+    
     private void ProcessInput (InputResult inputEvent)
     {
         switch (inputEvent.EventType)
@@ -1338,6 +1345,7 @@ internal class NetDriver : ConsoleDriver
     }
 
     private CursorVisibility? _cachedCursorVisibility;
+    private static bool _supportsSixel;
 
     public override void UpdateCursor ()
     {

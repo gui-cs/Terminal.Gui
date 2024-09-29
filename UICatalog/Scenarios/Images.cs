@@ -53,6 +53,18 @@ public class Images : Scenario
         };
         win.Add (cbSupportsTrueColor);
 
+        var cbSupportsSixel = new CheckBox
+        {
+            X = Pos.Right (lblDriverName) + 2,
+            Y = 1,
+            CheckedState = ConsoleDriver.SupportsSixel
+                ? CheckState.Checked : CheckState.UnChecked,
+            CanFocus = false,
+            Enabled = false,
+            Text = "Supports Sixel"
+        };
+        win.Add (cbSupportsSixel);
+
         var cbUseTrueColor = new CheckBox
         {
             X = Pos.Right (cbSupportsTrueColor) + 2,
@@ -69,7 +81,7 @@ public class Images : Scenario
 
         var tv = new TabView
         {
-            Y = Pos.Bottom (lblDriverName), Width = Dim.Fill (), Height = Dim.Fill ()
+            Y = Pos.Bottom (cbSupportsSixel), Width = Dim.Fill (), Height = Dim.Fill ()
         };
 
         tv.AddTab (tabBasic, true);
