@@ -635,3 +635,28 @@ In v2_develop it's all kinds of confused. Here's what it SHOULD do:
 Like `Checkbox` the right thing to do is for Hotkey to NOT set focus. Why? If the user is in a TextField and wants to change a setting via a RadioGroup, they should be able to use the hotkey and NOT have to then re-focus back on the TextView. The `TextView` in `Text Input Controls` Scenario is a good example of this.
 
 ## `Slider` - Should operate just like RadioGroup
+
+- BUGBUG: Slider should support Hotkey w/in Legends
+
+## `NumericUpDown`
+
+## `ListView`
+
+### `!HasFocus`
+
+* `Enter` - n/a because no focus
+* `Space` - n/a because no focus
+* `Title.Hotkey` - `Command.Hotkey` -> Set focus. Do NOT advance state.
+* `Click` - `Command.Select` -> If `CanFocus`, sets focus and advances state to clicked ListItem.
+* `Double Click` - Sets focus and advances state to clicked ListItem and then raises `Accept`.
+
+### `HasFocus`
+
+* `Enter` - `Command.Accept` -> Advances state to selected RadioItem and Raises `Accept` 
+* `Space` - `Command.Select` -> Advances state
+* `Title.Hotkey` - `Command.Hotkey` -> does nothing
+* `RadioItem.Hotkey` - `Command.Select` -> Advance State to RadioItem with hotkey.
+* `Click` - `Command.Select` -> If `CanFocus`, sets focus and advances state to clicked ListItem.
+* `Double Click` - Sets focus and advances state to clicked ListItem and then raises `Accept`.
+
+What about `ListView.MultiSelect` and `ListViews.AllowsMarking`?

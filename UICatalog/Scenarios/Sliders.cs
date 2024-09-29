@@ -78,7 +78,7 @@ public class Sliders : Scenario
 
         var single = new Slider (singleOptions)
         {
-            Title = "Continuous",
+            Title = "_Continuous",
             X = 0,
             Y = prev == null ? 0 : Pos.Bottom (prev),
             Type = SliderType.Single,
@@ -106,14 +106,14 @@ public class Sliders : Scenario
 
         single.OptionsChanged += (s, e) =>
                                  {
-                                     single.Title = $"Continuous {e.Options.FirstOrDefault ().Key}";
+                                     single.Title = $"_Continuous {e.Options.FirstOrDefault ().Key}";
                                  };
 
         List<object> oneOption = new () { "The Only Option" };
 
         var one = new Slider (oneOption)
         {
-            Title = "One Option",
+            Title = "_One Option",
             X = 0,
             Y = prev == null ? 0 : Pos.Bottom (single),
             Type = SliderType.Single,
@@ -151,7 +151,7 @@ public class Sliders : Scenario
 
         var configView = new FrameView
         {
-            Title = "Configuration",
+            Title = "Confi_guration",
             X = Pos.Percent (50),
             Y = 0,
             Width = Dim.Fill (),

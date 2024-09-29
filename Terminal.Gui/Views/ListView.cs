@@ -471,7 +471,7 @@ public class ListView : View, IDesignable
 
         if (me.Flags == MouseFlags.Button1DoubleClicked)
         {
-            OnOpenSelectedItem ();
+            return OnOpenSelectedItem ();
         }
 
         return true;
@@ -766,6 +766,8 @@ public class ListView : View, IDesignable
         }
 
         OpenSelectedItem?.Invoke (this, new ListViewItemEventArgs (_selected, value));
+
+        // BUGBUG: this should not blindly return true.
         return true;
     }
 
