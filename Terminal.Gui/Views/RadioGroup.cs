@@ -75,31 +75,43 @@ public class RadioGroup : View, IDesignable, IOrientation
                         return true;
                     }
                    );
+        AddCommand (
+                    Command.Select,
+                    () =>
+                    {
+                        if (SelectedItem == _cursor)
+                        {
+                            if (!MoveDownRight ())
+                            {
+                                MoveHome ();
+                            }
+                        }
 
+                        SelectedItem = _cursor;
+
+                        return true;
+                    });
         AddCommand (
                     Command.Accept,
                     () =>
                     {
                         SelectedItem = _cursor;
 
-                        return OnAccept () is true or null;
+                        return OnAccept () is false;
                     }
                    );
-
         AddCommand (
                     Command.HotKey,
                     ctx =>
                     {
-                        SetFocus ();
-
                         if (ctx.KeyBinding?.Context is { } && (int)ctx.KeyBinding?.Context! < _radioLabels.Count)
                         {
                             SelectedItem = (int)ctx.KeyBinding?.Context!;
 
-                            return OnAccept () is true or null;
+                            return OnSelect () is true or null;
                         }
 
-                        return true;
+                        return !SetFocus ();
                     });
 
         _orientationHelper = new (this);
@@ -136,7 +148,8 @@ public class RadioGroup : View, IDesignable, IOrientation
 
         KeyBindings.Add (Key.Home, Command.Start);
         KeyBindings.Add (Key.End, Command.End);
-        KeyBindings.Add (Key.Space, Command.Accept);
+        KeyBindings.Add (Key.Enter, Command.Accept);
+        KeyBindings.Add (Key.Space, Command.Select);
     }
 
     private void RadioGroup_MouseClick (object sender, MouseEventEventArgs e)

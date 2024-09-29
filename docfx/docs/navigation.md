@@ -625,10 +625,13 @@ In v2_develop it's all kinds of confused. Here's what it SHOULD do:
 
 ### `HasFocus`
 
-* `Enter` - `Command.Accept` -> Raises `Accept` 
+* `Enter` - `Command.Accept` -> Advances state to selected RadioItem and Raises `Accept` 
 * `Space` - `Command.Select` -> Advances state
-* `Hotkey` - `Command.Hotkey` -> Advances state
-* `Click` - Advances state
+* `Title.Hotkey` - `Command.Hotkey` -> does nothing
+* `RadioItem.Hotkey` - `Command.Select` -> Advance State to RadioItem with hotkey.
+* `Click` - advances state to clicked RadioItem.
 * `Double Click` - Advances state to clicked RadioItem and then raises `Accept` (this is what Office does; it's pretty nice. Windows does nothing).
 
-An interesting tid-bit about the above is for `Checkbox` the right thing to do is for Hotkey to NOT set focus. Why? If the user is in a TextField and wants to change a setting via a CheckBox, they should be able to use the hotkey and NOT have to then re-focus back on the TextView. The `TextView` in `Text Input Controls` Scenario is a good example of this.
+Like `Checkbox` the right thing to do is for Hotkey to NOT set focus. Why? If the user is in a TextField and wants to change a setting via a RadioGroup, they should be able to use the hotkey and NOT have to then re-focus back on the TextView. The `TextView` in `Text Input Controls` Scenario is a good example of this.
+
+## `Slider` - Should operate just like RadioGroup

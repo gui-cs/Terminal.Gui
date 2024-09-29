@@ -109,6 +109,13 @@ namespace Terminal.Gui;
 public partial class View : Responder, ISupportInitializeNotification
 {
     /// <summary>
+    ///     Cancelable event fired when the <see cref="Command.Select"/> command is invoked. Set
+    ///     <see cref="HandledEventArgs.Handled"/>
+    ///     to cancel the event.
+    /// </summary>
+    public event EventHandler<HandledEventArgs>? Select;
+
+    /// <summary>
     ///     Cancelable event fired when the <see cref="Command.Accept"/> command is invoked. Set
     ///     <see cref="HandledEventArgs.Handled"/>
     ///     to cancel the event.
@@ -161,6 +168,23 @@ public partial class View : Responder, ISupportInitializeNotification
         Accept?.Invoke (this, args);
 
         return Accept is null ? null : args.Handled;
+    }
+
+
+    /// <summary>
+    ///     Called when the <see cref="Command.Accept"/> command is invoked. Raises <see cref="Accept"/>
+    ///     event.
+    /// </summary>
+    /// <returns>
+    ///     If <see langword="true"/> the event was canceled. If <see langword="false"/> the event was raised but not canceled.
+    ///     If <see langword="null"/> no event was raised.
+    /// </returns>
+    protected bool? OnSelect ()
+    {
+        var args = new HandledEventArgs ();
+        Select?.Invoke (this, args);
+
+        return Select is null ? null : args.Handled;
     }
 
     #region Constructors and Initialization
@@ -287,7 +311,7 @@ public partial class View : Responder, ISupportInitializeNotification
         Initialized?.Invoke (this, EventArgs.Empty);
     }
 
-#endregion Constructors and Initialization
+    #endregion Constructors and Initialization
 
     #region Visibility
 
@@ -354,13 +378,26 @@ public partial class View : Responder, ISupportInitializeNotification
 
     private bool _visible = true;
 
-    /// <summary>Gets or sets a value indicating whether this <see cref="Responder"/> and all its child controls are displayed.</summary>
+    // TODO: Remove virtual once Menu/MenuBar are removed. MenuBar is the only override.
+    /// <summary>Gets or sets a value indicating whether this <see cref="View"/> is visible.</summary>
     public virtual bool Visible
     {
         get => _visible;
         set
         {
             if (_visible == value)
+            {
+                return;
+            }
+
+            if (OnVisibleChanging ())
+            {
+                return;
+            }
+
+            CancelEventArgs<bool> args = new (in _visible, ref value);
+            VisibleChanging?.Invoke (this, args);
+            if (args.Cancel)
             {
                 return;
             }
@@ -382,14 +419,22 @@ public partial class View : Responder, ISupportInitializeNotification
             }
 
             OnVisibleChanged ();
+            VisibleChanged?.Invoke (this, EventArgs.Empty);
+
             SetNeedsDisplay ();
         }
     }
 
-    /// <summary>Method invoked when the <see cref="Visible"/> property from a view is changed.</summary>
-    public virtual void OnVisibleChanged () { VisibleChanged?.Invoke (this, EventArgs.Empty); }
+    /// <summary>Called when <see cref="Visible"/> is changing. Can be cancelled by returning <see langword="true"/>.</summary>
+    protected virtual bool OnVisibleChanging () { return false; }
 
-    /// <summary>Event fired when the <see cref="Visible"/> value is being changed.</summary>
+    /// <summary>Raised when the <see cref="Visible"/> value is being changed. Can be cancelled by setting Cancel to <see langword="true"/>.</summary>
+    public event EventHandler<CancelEventArgs<bool>>? VisibleChanging;
+
+    /// <summary>Called when <see cref="Visible"/> has changed.</summary>
+    protected virtual void OnVisibleChanged () { }
+
+    /// <summary>Raised when <see cref="Visible"/> has changed.</summary>
     public event EventHandler? VisibleChanged;
 
     // TODO: This API is a hack. We should make Visible propogate automatically, no? See https://github.com/gui-cs/Terminal.Gui/issues/3703
@@ -416,7 +461,7 @@ public partial class View : Responder, ISupportInitializeNotification
         return true;
     }
 
-#endregion Visibility
+    #endregion Visibility
 
     #region Title
 

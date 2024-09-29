@@ -330,7 +330,7 @@ internal sealed class Menu : View
     }
 
     /// <inheritdoc/>
-    public override void OnVisibleChanged ()
+    protected override void OnVisibleChanged ()
     {
         base.OnVisibleChanged ();
 
