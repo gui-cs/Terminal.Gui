@@ -14,6 +14,8 @@ public partial class View // Keyboard APIs
         HotKeySpecifier = (Rune)'_';
         TitleTextFormatter.HotKeyChanged += TitleTextFormatter_HotKeyChanged;
 
+        // TODO: It's incorrect to think of Commands as being Keyboard things. The code below should be moved to View.cs
+
         // By default, the HotKey command sets the focus
         AddCommand (Command.HotKey, OnHotKey);
 
@@ -614,7 +616,7 @@ public partial class View // Keyboard APIs
         // Now, process any key bindings in the subviews that are tagged to KeyBindingScope.HotKey.
         foreach (View subview in Subviews)
         {
-            if (subview == Focused)
+            if (subview.HasFocus)
             {
                 continue;
             }

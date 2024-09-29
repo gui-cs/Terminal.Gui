@@ -6,6 +6,7 @@
 - What are the visual cues that help the user know what keystrokes will change the focus?
 - What are the visual cues that help the user know what keystrokes will cause action in elements of the application that don't currently have focus?
 - What is the order in which UI elements are traversed when using keyboard navigation?
+- What are the default actions for standard key/mouse input (e.g. Hotkey, `Space`, `Enter`, `MouseClick`)?
 
 ## Lexicon & Taxonomy
 
@@ -208,7 +209,18 @@ These could also be named `Gain/Lose`. They could also be combined into a single
 
 QUESTION: Should we retain the same names as in v1 to simplify porting? Or, given the semantics of `Handled` v. `Cancel` are reversed would it be better to rename and/or combine?
 
-## `TabIndex` and `TabIndexes`
+## Built-In Views Interactivity
+
+|                |                         |            |               | **Keyboard** |                       |                              |                           | **Mouse**                    |                              |                              |                |               |
+|----------------|-------------------------|------------|---------------|--------------|-----------------------|------------------------------|---------------------------|------------------------------|------------------------------|------------------------------|----------------|---------------|
+|                | **Number<br>of States** | **Static** | **IsDefault** | **Hotkeys**  | **Select<br>Command** | **Accept<br>Command**        | **Hotkey<br>Command**     | **CanFocus<br>Click**        | **CanFocus<br>DblCLick**     | **!CanFocus<br>Click**       | **RightClick** | **GrabMouse** |
+| **View**       | 1                       | Yes        | No            | 1            | OnSelect              | OnAccept                     | Focus                     | Focus                        |                              |                              |                | No            |
+| **Label**      | 1                       | Yes        | No            | 1            | OnSelect              | OnAccept                     | FocusNext                 | Focus                        |                              | FocusNext                    |                | No            |
+| **Button**     | 1                       | No         | Yes           | 1            | OnSelect              | Focus<br>OnAccept            | Focus<br>OnAccept         | HotKey                       |                              | Select                       |                | No            |
+| **Checkbox**   | 3                       | No         | No            | 1            | OnSelect<br>Advance   | OnAccept                     | OnAccept                  | Select                       |                              | Select                       |                | No            |
+| **RadioGroup** | > 1                     | No         | No            | 2+           | Advance               | Set SelectedItem<br>OnAccept | Focus<br>Set SelectedItem | SetFocus<br>Set _cursor      |                              | SetFocus<br>Set _cursor      |                | No            |
+| **Slider**     | > 1                     | No         | No            | 1            | SetFocusedOption      | SetFocusedOption<br>OnAccept | Focus                     | SetFocus<br>SetFocusedOption |                              | SetFocus<br>SetFocusedOption |                | Yes           |
+| **ListView**   | > 1                     | No         | No            | 1            | MarkUnMarkRow         | OpenSelectedItem<br>OnAccept | OnAccept                  | SetMark<br>OnSelectedChanged | OpenSelectedItem<br>OnAccept |                              |                | No            |
 
 ### v1 Behavior
 

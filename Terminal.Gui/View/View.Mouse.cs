@@ -406,7 +406,11 @@ public partial class View // Mouse APIs
             // If mouse is still in bounds, generate a click
             if (!WantContinuousButtonPressed && Viewport.Contains (mouseEvent.Position))
             {
-                return OnMouseClick (new (mouseEvent));
+                var meea = new MouseEventEventArgs (mouseEvent);
+
+                // We can ignore the return value of OnMouseClick; if the click is handled
+                // meea.Handled and meea.MouseEvent.Handled will be true
+                OnMouseClick (meea);
             }
 
             return mouseEvent.Handled = true;

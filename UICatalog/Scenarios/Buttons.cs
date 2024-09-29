@@ -32,7 +32,7 @@ public class Buttons : Scenario
         // This is the default button (IsDefault = true); if user presses ENTER in the TextField
         // the scenario will quit
         var defaultButton = new Button { X = Pos.Center (), Y = Pos.AnchorEnd (), IsDefault = true, Text = "_Quit" };
-        defaultButton.Accept += (s, e) => Application.RequestStop ();
+        main.Accept += (s, e) => Application.RequestStop ();
         main.Add (defaultButton);
 
         var swapButton = new Button
@@ -46,6 +46,7 @@ public class Buttons : Scenario
 
         swapButton.Accept += (s, e) =>
                              {
+                                 e.Handled = !swapButton.IsDefault;
                                  defaultButton.IsDefault = !defaultButton.IsDefault;
                                  swapButton.IsDefault = !swapButton.IsDefault;
                              };
@@ -57,6 +58,7 @@ public class Buttons : Scenario
                              {
                                  string btnText = button.Text;
                                  MessageBox.Query ("Message", $"Did you click {txt}?", "Yes", "No");
+                                 e.Handled = true;
                              };
         }
 
@@ -96,11 +98,19 @@ public class Buttons : Scenario
         main.Add (
                   button = new () { X = 2, Y = Pos.Bottom (button) + 1, Height = 2, Text = "a Newline\nin the button" }
                  );
-        button.Accept += (s, e) => MessageBox.Query ("Message", "Question?", "Yes", "No");
+        button.Accept += (s, e) =>
+                         {
+                             MessageBox.Query ("Message", "Question?", "Yes", "No");
+                             e.Handled = true;
+                         };
 
         var textChanger = new Button { X = 2, Y = Pos.Bottom (button) + 1, Text = "Te_xt Changer" };
         main.Add (textChanger);
-        textChanger.Accept += (s, e) => textChanger.Text += "!";
+        textChanger.Accept += (s, e) =>
+                              {
+                                  textChanger.Text += "!";
+                                  e.Handled = true;
+                              };
 
         main.Add (
                   button = new ()

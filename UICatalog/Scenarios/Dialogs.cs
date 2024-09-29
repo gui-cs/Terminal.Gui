@@ -22,6 +22,7 @@ public class Dialogs : Scenario
 
         var frame = new FrameView
         {
+            TabStop = TabBehavior.TabStop, // FrameView normally sets to TabGroup
             X = Pos.Center (),
             Y = 1,
             Width = Dim.Percent (75),
@@ -181,7 +182,7 @@ public class Dialogs : Scenario
             X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "_Show Dialog"
         };
 
-        showDialogButton.Accept += (s, e) =>
+        app.Accept += (s, e) =>
                                    {
                                        Dialog dlg = CreateDemoDialog (
                                                                       widthEdit,
@@ -194,6 +195,7 @@ public class Dialogs : Scenario
                                                                      );
                                        Application.Run (dlg);
                                        dlg.Dispose ();
+                                       e.Handled = true;
                                    };
 
         app.Add (showDialogButton);

@@ -292,7 +292,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// </returns>
     internal bool RestoreFocus ()
     {
-        View [] indicies = GetFocusChain (NavigationDirection.Forward, TabStop);
+        View [] indicies = GetFocusChain (NavigationDirection.Forward, null);
 
         if (Focused is null && _previouslyFocused is { } && indicies.Contains (_previouslyFocused))
         {

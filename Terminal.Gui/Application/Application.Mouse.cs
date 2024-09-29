@@ -159,7 +159,7 @@ public static partial class Application // Mouse handling
             return;
         }
 
-        if (GrabMouse (deepestViewUnderMouse, mouseEvent))
+        if (HandleMouseGrab (deepestViewUnderMouse, mouseEvent))
         {
             return;
         }
@@ -245,7 +245,7 @@ public static partial class Application // Mouse handling
         }
     }
 
-    internal static bool GrabMouse (View? deepestViewUnderMouse, MouseEvent mouseEvent)
+    internal static bool HandleMouseGrab (View? deepestViewUnderMouse, MouseEvent mouseEvent)
     {
         if (MouseGrabView is { })
         {
