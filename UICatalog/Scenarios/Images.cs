@@ -22,11 +22,12 @@ public class Images : Scenario
     private ImageView _imageView;
     private Point _screenLocationForSixel;
     private string _encodedSixelData;
+    private Window _win;
 
     public override void Main ()
     {
         Application.Init ();
-        var win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
+        _win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
 
         bool canTrueColor = Application.Driver?.SupportsTrueColor ?? false;
 
@@ -41,7 +42,7 @@ public class Images : Scenario
         };
 
         var lblDriverName = new Label { X = 0, Y = 0, Text = $"Driver is {Application.Driver?.GetType ().Name}" };
-        win.Add (lblDriverName);
+        _win.Add (lblDriverName);
 
         var cbSupportsTrueColor = new CheckBox
         {
@@ -51,7 +52,7 @@ public class Images : Scenario
             CanFocus = false,
             Text = "supports true color "
         };
-        win.Add (cbSupportsTrueColor);
+        _win.Add (cbSupportsTrueColor);
 
         var cbSupportsSixel = new CheckBox
         {
@@ -63,7 +64,7 @@ public class Images : Scenario
             Enabled = false,
             Text = "Supports Sixel"
         };
-        win.Add (cbSupportsSixel);
+        _win.Add (cbSupportsSixel);
 
         var cbUseTrueColor = new CheckBox
         {
@@ -74,10 +75,15 @@ public class Images : Scenario
             Text = "Use true color"
         };
         cbUseTrueColor.CheckedStateChanging += (_, evt) => Application.Force16Colors = evt.NewValue == CheckState.UnChecked;
-        win.Add (cbUseTrueColor);
+        _win.Add (cbUseTrueColor);
 
         var btnOpenImage = new Button { X = Pos.Right (cbUseTrueColor) + 2, Y = 0, Text = "Open Image" };
-        win.Add (btnOpenImage);
+        _win.Add (btnOpenImage);
+
+        var btnStartFire = new Button { X = Pos.Right (cbUseTrueColor) + 2, Y = 1, Text = "Start Fire" };
+        _win.Add (btnStartFire);
+
+        btnStartFire.Accept += BtnStartFireOnAccept;
 
         var tv = new TabView
         {
@@ -92,11 +98,38 @@ public class Images : Scenario
 
         btnOpenImage.Accept += OpenImage;
 
-        win.Add (tv);
-        Application.Run (win);
-        win.Dispose ();
+        _win.Add (tv);
+        Application.Run (_win);
+        _win.Dispose ();
         Application.Shutdown ();
+    }
 
+    private void BtnStartFireOnAccept (object sender, HandledEventArgs e)
+    {
+        var fire = new DoomFire (_win.Frame.Width, _win.Frame.Height);
+        var encoder = new SixelEncoder ();
+        encoder.Quantizer.PaletteBuildingAlgorithm = new ConstPalette (fire.Palette);
+
+        Application.AddTimeout (
+                                TimeSpan.FromMilliseconds (500),
+                                () =>
+                                {
+                                    fire.AdvanceFrame ();
+
+                                    var bmp = fire.GetFirePixels ();
+
+                                    // TODO: Static way of doing this, suboptimal
+                                    Application.Sixel.Clear ();
+                                    Application.Sixel.Add (new SixelToRender
+                                    {
+                                        SixelData = encoder.EncodeSixel (bmp),
+                                        ScreenPosition = new Point (0,0)
+                                    });
+
+                                    _win.SetNeedsDisplay();
+
+                                    return true;
+                                });
     }
 
     /// <inheritdoc />
@@ -149,6 +182,7 @@ public class Images : Scenario
 
             return;
         }
+
 
         _imageView.SetImage (img);
         Application.Refresh ();
@@ -465,6 +499,19 @@ public class Images : Scenario
     }
 }
 
+internal class ConstPalette : IPaletteBuilder
+{
+    private readonly List<Color>  _palette;
+
+    public ConstPalette (Color [] palette) { _palette = palette.ToList (); }
+
+    /// <inheritdoc />
+    public List<Color> BuildPalette (List<Color> colors, int maxColors)
+    {
+        return _palette;
+    }
+}
+
 public abstract class LabColorDistance : IColorDistance
 {
     // Reference white point for D65 illuminant (can be moved to constants)
@@ -677,3 +724,93 @@ public class MedianCutPaletteBuilder : IPaletteBuilder
         return (maxR - minR) * (maxG - minG) * (maxB - minB);
     }
 }
+
+
+public class DoomFire
+{
+    private int _width;
+    private int _height;
+    private Color [,] _firePixels;
+    private static Color [] _palette;
+    public Color [] Palette => _palette;
+
+    public DoomFire (int width, int height)
+    {
+        _width = width;
+        _height = height;
+        _firePixels = new Color [width, height];
+        InitializePalette ();
+        InitializeFire ();
+    }
+
+    private void InitializePalette ()
+    {
+        // Initialize a basic fire palette. You can modify these colors as needed.
+        _palette = new Color [37]; // Using 37 colors as per the original Doom fire palette scale.
+
+        // First color is transparent black
+        _palette [0] = new Color (0, 0, 0, 0); // Transparent black (ARGB)
+
+        // The rest of the palette is fire colors
+        for (int i = 1; i < 37; i++)
+        {
+            byte r = (byte)Math.Min (255, i * 7);
+            byte g = (byte)Math.Min (255, i * 5);
+            byte b = (byte)Math.Min (255, i * 2);
+            _palette [i] = new Color (r, g, b); // Full opacity
+        }
+    }
+
+    public void InitializeFire ()
+    {
+        // Set the bottom row to full intensity (simulate the base of the fire).
+        for (int x = 0; x < _width; x++)
+        {
+            _firePixels [x, _height - 1] = _palette [36]; // Max intensity fire.
+        }
+
+        // Set the rest of the pixels to black (transparent).
+        for (int y = 0; y < _height - 1; y++)
+        {
+            for (int x = 0; x < _width; x++)
+            {
+                _firePixels [x, y] = _palette [0]; // Transparent black
+            }
+        }
+    }
+
+    public void AdvanceFrame ()
+    {
+        // Process every pixel except the bottom row
+        for (int x = 0; x < _width; x++)
+        {
+            for (int y = 1; y < _height; y++) // Skip the last row (which is always max intensity)
+            {
+                int srcX = x;
+                int srcY = y;
+                int dstY = y - 1;
+
+                // Spread fire upwards with randomness
+                int decay = new Random ().Next (0, 3);
+                int dstX = Math.Max (0, srcX - decay);
+
+                // Get the fire color from below and reduce its intensity
+                Color srcColor = _firePixels [srcX, srcY];
+                int intensity = Array.IndexOf (_palette, srcColor) - decay;
+
+                if (intensity < 0)
+                {
+                    intensity = 0;
+                }
+
+                _firePixels [dstX, dstY] = _palette [intensity];
+            }
+        }
+    }
+
+    public Color [,] GetFirePixels ()
+    {
+        return _firePixels;
+    }
+}
+

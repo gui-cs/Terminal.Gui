@@ -149,4 +149,86 @@ public class SixelEncoderTests
         // Compare the generated SIXEL string with the expected one
         Assert.Equal (expected, result);
     }
+
+    [Fact]
+    public void EncodeSixel_Transparent12x12_ReturnsExpectedSixel ()
+    {
+        string expected = "\u001bP" // Start sixel sequence
+                          + "0;0;0" // Defaults for aspect ratio and grid size
+                          + "q" // Signals beginning of sixel image data
+                          + "\"1;1;12;12" // no scaling factors (1x1) and filling 12x12 pixel area
+                          + "#0;2;0;0;0" // Black transparent (TODO: Shouldn't really be output this if it is transparent)
+                          // Since all pixels are transparent, the data should just be filled with '?'
+                          + "#0!12?$-" // Fills the transparent line with byte 0 which maps to '?'
+                          + "#0!12?$" // Second band, same fully transparent pixels
+                          + "\u001b\\"; // End sixel sequence
+
+        // Arrange: Create a 12x12 bitmap filled with fully transparent pixels
+        Color [,] pixels = new Color [12, 12];
+
+        for (var x = 0; x < 12; x++)
+        {
+            for (var y = 0; y < 12; y++)
+            {
+                pixels [x, y] = new (0, 0, 0, 0); // Fully transparent
+            }
+        }
+
+        // Act: Encode the image
+        var encoder = new SixelEncoder ();
+        string result = encoder.EncodeSixel (pixels);
+
+        // Assert: Expect the result to be fully transparent encoded output
+        Assert.Equal (expected, result);
+    }
+    [Fact]
+    public void EncodeSixel_VerticalMix_TransparentAndColor_ReturnsExpectedSixel ()
+    {
+        string expected = "\u001bP" // Start sixel sequence
+                          + "0;0;0" // Defaults for aspect ratio and grid size
+                          + "q" // Signals beginning of sixel image data
+                          + "\"1;1;12;12" // No scaling factors (1x1) and filling 12x12 pixel area
+                          /*
+                           * Define the color palette:
+                           * We'll use one color (Red) for the colored pixels.
+                           */
+                          + "#0;2;100;0;0" // Red color definition (index 0: RGB 100,0,0)
+                          + "#1;2;0;0;0" // Black transparent (TODO: Shouldn't really be output this if it is transparent)
+                          /*
+                           * Start of the Pixel data
+                           * We have alternating transparent (0) and colored (red) pixels in a vertical band.
+                           * The pattern for each sixel byte is 101010, which in binary (+63) converts to ASCII character 'T'.
+                           * Since we have 12 pixels horizontally, we'll see this pattern repeat across the row so we see
+                           * the 'sequence repeat' 12 times i.e. !12 (do the next letter 'T' 12 times).
+                           */
+                          + "#0!12T$-" // First band of alternating red and transparent pixels
+                          + "#0!12T$" // Second band, same alternating red and transparent pixels
+                          + "\u001b\\"; // End sixel sequence
+
+        // Arrange: Create a 12x12 bitmap with alternating transparent and red pixels in a vertical band
+        Color [,] pixels = new Color [12, 12];
+
+        for (var x = 0; x < 12; x++)
+        {
+            for (var y = 0; y < 12; y++)
+            {
+                // For simplicity, we'll make every other row transparent
+                if (y % 2 == 0)
+                {
+                    pixels [x, y] = new (255, 0, 0); // Red pixel
+                }
+                else
+                {
+                    pixels [x, y] = new (0, 0, 0, 0); // Transparent pixel
+                }
+            }
+        }
+
+        // Act: Encode the image
+        var encoder = new SixelEncoder ();
+        string result = encoder.EncodeSixel (pixels);
+
+        // Assert: Expect the result to match the expected sixel output
+        Assert.Equal (expected, result);
+    }
 }

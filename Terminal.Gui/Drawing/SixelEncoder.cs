@@ -113,12 +113,23 @@ public class SixelEncoder
         for (int x = 0; x < width; ++x)
         {
             Array.Clear (code, 0, usedColorIdx.Count);
+            bool anyNonTransparentPixel = false;  // Track if any non-transparent pixels are found in this column
 
             // Process each row in the 6-pixel high band
             for (int row = 0; row < bandHeight; ++row)
             {
                 var color = pixels [x, startY + row];
+
                 int colorIndex = Quantizer.GetNearestColor (color);
+
+                if (color.A == 0) // Skip fully transparent pixels
+                {
+                    continue;
+                }
+                else
+                {
+                    anyNonTransparentPixel = true;
+                }
 
                 if (slots [colorIndex] == -1)
                 {
@@ -134,6 +145,8 @@ public class SixelEncoder
 
                 code [slots [colorIndex]] |= (byte)(1 << row); // Accumulate SIXEL data
             }
+
+            // TODO: Handle fully empty rows better
 
             // Handle transitions between columns
             for (int j = 0; j < usedColorIdx.Count; ++j)
