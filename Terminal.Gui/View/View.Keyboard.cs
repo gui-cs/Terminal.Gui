@@ -13,19 +13,6 @@ public partial class View // Keyboard APIs
         KeyBindings = new (this);
         HotKeySpecifier = (Rune)'_';
         TitleTextFormatter.HotKeyChanged += TitleTextFormatter_HotKeyChanged;
-
-        // By default, the HotKey command sets the focus
-        AddCommand (Command.Select, () =>
-                                    {
-                                        SetFocus ();
-                                        return OnSelect ();
-                                    });
-
-        // By default, the HotKey command sets the focus
-        AddCommand (Command.HotKey, () => SetFocus ());
-
-        // By default, the Accept command raises the Accept event
-        AddCommand (Command.Accept, OnAccept);
     }
 
     /// <summary>

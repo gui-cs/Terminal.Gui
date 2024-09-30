@@ -6046,7 +6046,7 @@ public class TextView : View
         {
             // By Default pressing ENTER should be ignored (OnAccept will return false or null). Only cancel if the
             // event was fired and set Cancel = true.
-            return OnAccept () == false;
+            return RaiseAcceptEvent () == false;
         }
 
         SetWrapModel ();

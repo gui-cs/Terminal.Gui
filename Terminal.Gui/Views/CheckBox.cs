@@ -165,7 +165,7 @@ public class CheckBox : View
         }
 
         // By default, Command.Accept calls OnAccept, so we need to call it here to ensure that the Accept event is fired.
-        if (OnAccept () == true)
+        if (RaiseAcceptEvent () == true)
         {
             return true;
         }

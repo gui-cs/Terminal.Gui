@@ -69,7 +69,7 @@ public class Button : View, IDesignable
                     {
                         bool cachedIsDefault = IsDefault; // Supports "Swap Default" in Buttons scenario
 
-                        bool? handled = OnAccept ();
+                        bool? handled = RaiseAcceptEvent ();
 
                         if (handled == true)
                         {

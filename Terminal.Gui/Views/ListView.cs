@@ -123,22 +123,46 @@ public class ListView : View, IDesignable
 
         // Things this view knows how to do
         // 
-        // BUGBUG: SHould return false if selectokn doesn't change (to support nav to next view)
+        // BUGBUG: Should return false if selection doesn't change (to support nav to next view)
         AddCommand (Command.Up, () => MoveUp ());
-        // BUGBUG: SHould return false if selectokn doesn't change (to support nav to next view)
+        // BUGBUG: Should return false if selection doesn't change (to support nav to next view)
         AddCommand (Command.Down, () => MoveDown ());
+
         AddCommand (Command.ScrollUp, () => ScrollVertical (-1));
         AddCommand (Command.ScrollDown, () => ScrollVertical (1));
         AddCommand (Command.PageUp, () => MovePageUp ());
         AddCommand (Command.PageDown, () => MovePageDown ());
         AddCommand (Command.Start, () => MoveHome ());
         AddCommand (Command.End, () => MoveEnd ());
-        AddCommand (Command.Accept, () => OnOpenSelectedItem ());
-        AddCommand (Command.Open, () => OnOpenSelectedItem ());
-        AddCommand (Command.Select, () => MarkUnmarkRow ());
-
         AddCommand (Command.ScrollLeft, () => ScrollHorizontal (-1));
         AddCommand (Command.ScrollRight, () => ScrollHorizontal (1));
+
+        AddCommand (Command.Accept, () => OnOpenSelectedItem ());
+        AddCommand (Command.Open, () => OnOpenSelectedItem ());
+        AddCommand (Command.Select, () =>
+                                    {
+                                        if (RaiseSelectEvent () == true)
+                                        {
+                                            return true;
+
+                                        }
+                                        if (_allowsMarking)
+                                        {
+                                            return MarkUnmarkSelectedItem ();
+                                        }
+
+                                        return false;
+                                    });
+        AddCommand(Command.HotKey, () =>
+                                   {
+                                       if (SelectedItem == -1)
+                                       {
+                                           SelectedItem = 0;
+                                       }
+
+                                       return !SetFocus ();
+                                   });
+
 
         // Default keybindings for all ListViews
         KeyBindings.Add (Key.CursorUp, Command.Up);
@@ -156,6 +180,8 @@ public class ListView : View, IDesignable
 
         KeyBindings.Add (Key.End, Command.End);
 
+        KeyBindings.Add (Key.Space, Command.Select);
+
         KeyBindings.Add (Key.Enter, Command.Open);
     }
 
@@ -163,7 +189,7 @@ public class ListView : View, IDesignable
     /// <value>Set to <see langword="true"/> to allow marking elements of the list.</value>
     /// <remarks>
     ///     If set to <see langword="true"/>, <see cref="ListView"/> will render items marked items with "[x]", and
-    ///     unmarked items with "[ ]" spaces. SPACE key will toggle marking. The default is <see langword="false"/>.
+    ///     unmarked items with "[ ]". SPACE key will toggle marking. The default is <see langword="false"/>.
     /// </remarks>
     public bool AllowsMarking
     {
@@ -171,16 +197,6 @@ public class ListView : View, IDesignable
         set
         {
             _allowsMarking = value;
-
-            if (_allowsMarking)
-            {
-                KeyBindings.Add (Key.Space, Command.Select);
-            }
-            else
-            {
-                KeyBindings.Remove (Key.Space);
-            }
-
             SetNeedsDisplay ();
         }
     }
@@ -334,10 +350,10 @@ public class ListView : View, IDesignable
 
     /// <summary>
     ///     If <see cref="AllowsMarking"/> and <see cref="AllowsMultipleSelection"/> are both <see langword="true"/>,
-    ///     unmarks all marked items other than the currently selected.
+    ///     unmarks all marked items other than <see cref="SelectedItem"/>.
     /// </summary>
     /// <returns><see langword="true"/> if unmarking was successful.</returns>
-    public virtual bool AllowsAll ()
+    public bool UnmarkAllButSelected ()
     {
         if (!_allowsMarking)
         {
@@ -385,15 +401,17 @@ public class ListView : View, IDesignable
 
     /// <summary>Marks the <see cref="SelectedItem"/> if it is not already marked.</summary>
     /// <returns><see langword="true"/> if the <see cref="SelectedItem"/> was marked.</returns>
-    public virtual bool MarkUnmarkRow ()
+    public bool MarkUnmarkSelectedItem ()
     {
-        if (AllowsAll ())
+        if (UnmarkAllButSelected ())
         {
             Source.SetMark (SelectedItem, !Source.IsMarked (SelectedItem));
             SetNeedsDisplay ();
 
-            return true;
+            return Source.IsMarked (SelectedItem);
         }
+
+        // BUGBUG: Shouldn't this retrn Source.IsMarked (SelectedItem)
 
         return false;
     }
@@ -458,11 +476,8 @@ public class ListView : View, IDesignable
 
         _selected = Viewport.Y + me.Position.Y;
 
-        if (AllowsAll ())
+        if (!MarkUnmarkSelectedItem())
         {
-            Source.SetMark (SelectedItem, !Source.IsMarked (SelectedItem));
-            SetNeedsDisplay ();
-
             return true;
         }
 
@@ -760,7 +775,7 @@ public class ListView : View, IDesignable
         object value = _source.ToList () [_selected];
 
         // By default, Command.Accept calls OnAccept, so we need to call it here to ensure that the event is fired.
-        if (OnAccept () == true)
+        if (RaiseAcceptEvent () == true)
         {
             return true;
         }
@@ -796,6 +811,7 @@ public class ListView : View, IDesignable
     /// <param name="rowEventArgs"></param>
     public virtual void OnRowRender (ListViewRowEventArgs rowEventArgs) { RowRender?.Invoke (this, rowEventArgs); }
 
+    // TODO: Use standard event model
     /// <summary>Invokes the <see cref="SelectedItemChanged"/> event if it is defined.</summary>
     /// <returns></returns>
     public virtual bool OnSelectedChanged ()

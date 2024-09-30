@@ -108,19 +108,7 @@ namespace Terminal.Gui;
 
 public partial class View : Responder, ISupportInitializeNotification
 {
-    /// <summary>
-    ///     Cancelable event fired when the <see cref="Command.Select"/> command is invoked. Set
-    ///     <see cref="HandledEventArgs.Handled"/>
-    ///     to cancel the event.
-    /// </summary>
-    public event EventHandler<HandledEventArgs>? Select;
-
-    /// <summary>
-    ///     Cancelable event fired when the <see cref="Command.Accept"/> command is invoked. Set
-    ///     <see cref="HandledEventArgs.Handled"/>
-    ///     to cancel the event.
-    /// </summary>
-    public event EventHandler<HandledEventArgs>? Accept;
+    #region Constructors and Initialization
 
     /// <summary>Gets or sets arbitrary data for the view.</summary>
     /// <remarks>This property is not used internally.</remarks>
@@ -130,64 +118,6 @@ public partial class View : Responder, ISupportInitializeNotification
     /// <value>The identifier.</value>
     /// <remarks>The id should be unique across all Views that share a SuperView.</remarks>
     public string Id { get; set; } = "";
-
-    /// <summary>Pretty prints the View</summary>
-    /// <returns></returns>
-    public override string ToString () { return $"{GetType ().Name}({Id}){Frame}"; }
-
-    /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
-    {
-        LineCanvas.Dispose ();
-
-        DisposeKeyboard ();
-        DisposeAdornments ();
-
-        for (int i = InternalSubviews.Count - 1; i >= 0; i--)
-        {
-            View subview = InternalSubviews [i];
-            Remove (subview);
-            subview.Dispose ();
-        }
-
-        base.Dispose (disposing);
-        Debug.Assert (InternalSubviews.Count == 0);
-    }
-
-    /// <summary>
-    ///     Called when the <see cref="Command.Accept"/> command is invoked. Raises <see cref="Accept"/>
-    ///     event.
-    /// </summary>
-    /// <returns>
-    ///     If <see langword="true"/> the event was canceled. If <see langword="false"/> the event was raised but not canceled.
-    ///     If <see langword="null"/> no event was raised.
-    /// </returns>
-    protected bool? OnAccept ()
-    {
-        var args = new HandledEventArgs ();
-        Accept?.Invoke (this, args);
-
-        return Accept is null ? null : args.Handled;
-    }
-
-
-    /// <summary>
-    ///     Called when the <see cref="Command.Accept"/> command is invoked. Raises <see cref="Accept"/>
-    ///     event.
-    /// </summary>
-    /// <returns>
-    ///     If <see langword="true"/> the event was canceled. If <see langword="false"/> the event was raised but not canceled.
-    ///     If <see langword="null"/> no event was raised.
-    /// </returns>
-    protected bool? OnSelect ()
-    {
-        var args = new HandledEventArgs ();
-        Select?.Invoke (this, args);
-
-        return Select is null ? null : args.Handled;
-    }
-
-    #region Constructors and Initialization
 
     /// <summary>
     ///     Points to the current driver in use by the view, it is a convenience property for simplifying the development
@@ -205,10 +135,21 @@ public partial class View : Responder, ISupportInitializeNotification
     public View ()
     {
         SetupAdornments ();
+
         SetupKeyboard ();
 
         //SetupMouse ();
+
         SetupText ();
+
+        // By default, the Select command does nothing
+        AddCommand (Command.Select, RaiseSelectEvent);
+
+        // By default, the HotKey command sets the focus
+        AddCommand (Command.HotKey, RaiseHotKeyEvent);
+
+        // By default, the Accept command sets the focus
+        AddCommand (Command.Accept, RaiseAcceptEvent);
     }
 
     /// <summary>
@@ -313,6 +254,161 @@ public partial class View : Responder, ISupportInitializeNotification
 
     #endregion Constructors and Initialization
 
+    #region Base Command Events
+
+    /// <summary>
+    ///     Called when the <see cref="Command.Accept"/> command is invoked. Raises <see cref="Accept"/>
+    ///     event.
+    /// </summary>
+    /// <returns>
+    ///     If <see langword="true"/> the event was canceled. If <see langword="false"/> the event was raised but not canceled.
+    ///     If <see langword="null"/> no event was raised.
+    /// </returns>
+    protected bool? RaiseAcceptEvent ()
+    {
+        HandledEventArgs args = new ();
+
+        // Best practice is to invoke the virtual method first.
+        // This allows derived classes to handle the event and potentially cancel it.
+        if (OnAccept (args) || args.Handled)
+        {
+            return true;
+        }
+
+        // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
+        Accept?.Invoke (this, args);
+
+        return Accept is null ? null : args.Handled;
+    }
+
+    /// <summary>
+    ///     Called when the <see cref="Command.Accept"/> command is received. Set <see cref="HandledEventArgs.Handled"/> to
+    ///     <see langword="true"/> to stop processing.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The base implementation calls <see cref="SetFocus"/>.
+    ///     </para>
+    /// </remarks>
+    /// <param name="args"></param>
+    /// <returns><see langword="true"/> to stop processing.</returns>
+    protected virtual bool OnAccept (HandledEventArgs args)
+    {
+        SetFocus ();
+
+        return false;
+    }
+
+    /// <summary>
+    ///     Cancelable event raised when the <see cref="Command.Accept"/> command is invoked. Set
+    ///     <see cref="HandledEventArgs.Handled"/>
+    ///     to cancel the event.
+    /// </summary>
+    public event EventHandler<HandledEventArgs>? Accept;
+
+    /// <summary>
+    ///     Called when the <see cref="Command.Select"/> command is invoked. Raises <see cref="Select"/>
+    ///     event.
+    /// </summary>
+    /// <returns>
+    ///     If <see langword="true"/> the event was canceled. If <see langword="false"/> the event was raised but not canceled.
+    ///     If <see langword="null"/> no event was raised.
+    /// </returns>
+    protected bool? RaiseSelectEvent ()
+    {
+        HandledEventArgs args = new ();
+
+        // Best practice is to invoke the virtual method first.
+        // This allows derived classes to handle the event and potentially cancel it.
+        if (OnSelect (args) || args.Handled)
+        {
+            return true;
+        }
+
+        // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
+        Select?.Invoke (this, args);
+
+        return Select is null ? null : args.Handled;
+    }
+
+    /// <summary>
+    ///     Called when the <see cref="Command.Select"/> command is received. Set <see cref="HandledEventArgs.Handled"/> to
+    ///     <see langword="true"/> to stop processing.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The base implementation calls <see cref="SetFocus"/>.
+    ///     </para>
+    /// </remarks>
+    /// <param name="args"></param>
+    /// <returns><see langword="true"/> to stop processing.</returns>
+    protected virtual bool OnSelect (HandledEventArgs args)
+    {
+        SetFocus ();
+
+        return false;
+    }
+
+    /// <summary>
+    ///     Cancelable event raised when the <see cref="Command.Select"/> command is invoked. Set
+    ///     <see cref="HandledEventArgs.Handled"/>
+    ///     to cancel the event.
+    /// </summary>
+    public event EventHandler<HandledEventArgs>? Select;
+
+
+    /// <summary>
+    ///     Called when the <see cref="Command.HotKey"/> command is invoked. Raises <see cref="HotKey"/>
+    ///     event.
+    /// </summary>
+    /// <returns>
+    ///     If <see langword="true"/> the event was canceled. If <see langword="false"/> the event was raised but not canceled.
+    ///     If <see langword="null"/> no event was raised.
+    /// </returns>
+    protected bool? RaiseHotKeyEvent ()
+    {
+        HandledEventArgs args = new ();
+
+        // Best practice is to invoke the virtual method first.
+        // This allows derived classes to handle the event and potentially cancel it.
+        if (OnHotKey (args) || args.Handled)
+        {
+            return true;
+        }
+
+        // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
+        HotKeyCommand?.Invoke (this, args);
+
+        return HotKeyCommand is null ? null : args.Handled;
+    }
+
+    /// <summary>
+    ///     Called when the <see cref="Command.HotKey"/> command is received. Set <see cref="HandledEventArgs.Handled"/> to
+    ///     <see langword="true"/> to stop processing.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The base implementation calls <see cref="SetFocus"/>.
+    ///     </para>
+    /// </remarks>
+    /// <param name="args"></param>
+    /// <returns><see langword="true"/> to stop processing.</returns>
+    protected virtual bool OnHotKey (HandledEventArgs args)
+    {
+        SetFocus ();
+
+        return false;
+    }
+
+    /// <summary>
+    ///     Cancelable event raised when the <see cref="Command.HotKey"/> command is invoked. Set
+    ///     <see cref="HandledEventArgs.Handled"/>
+    ///     to cancel the event.
+    /// </summary>
+    public event EventHandler<HandledEventArgs>? HotKeyCommand;
+
+    #endregion Base Command Events
+
     #region Visibility
 
     private bool _enabled = true;
@@ -338,7 +434,10 @@ public partial class View : Responder, ISupportInitializeNotification
                 HasFocus = false;
             }
 
-            if (_enabled && CanFocus && Visible && !HasFocus
+            if (_enabled
+                && CanFocus
+                && Visible
+                && !HasFocus
                 && SuperView is null or { HasFocus: true, Visible: true, Enabled: true, Focused: null })
             {
                 SetFocus ();
@@ -397,6 +496,7 @@ public partial class View : Responder, ISupportInitializeNotification
 
             CancelEventArgs<bool> args = new (in _visible, ref value);
             VisibleChanging?.Invoke (this, args);
+
             if (args.Cancel)
             {
                 return;
@@ -412,7 +512,10 @@ public partial class View : Responder, ISupportInitializeNotification
                 }
             }
 
-            if (_visible && CanFocus && Enabled && !HasFocus
+            if (_visible
+                && CanFocus
+                && Enabled
+                && !HasFocus
                 && SuperView is null or { HasFocus: true, Visible: true, Enabled: true, Focused: null })
             {
                 SetFocus ();
@@ -428,7 +531,10 @@ public partial class View : Responder, ISupportInitializeNotification
     /// <summary>Called when <see cref="Visible"/> is changing. Can be cancelled by returning <see langword="true"/>.</summary>
     protected virtual bool OnVisibleChanging () { return false; }
 
-    /// <summary>Raised when the <see cref="Visible"/> value is being changed. Can be cancelled by setting Cancel to <see langword="true"/>.</summary>
+    /// <summary>
+    ///     Raised when the <see cref="Visible"/> value is being changed. Can be cancelled by setting Cancel to
+    ///     <see langword="true"/>.
+    /// </summary>
     public event EventHandler<CancelEventArgs<bool>>? VisibleChanging;
 
     /// <summary>Called when <see cref="Visible"/> has changed.</summary>
@@ -442,7 +548,10 @@ public partial class View : Responder, ISupportInitializeNotification
     ///     INTERNAL Indicates whether all views up the Superview hierarchy are visible.
     /// </summary>
     /// <param name="view">The view to test.</param>
-    /// <returns> <see langword="false"/> if `view.Visible` is  <see langword="false"/> or any Superview is not visible, <see langword="true"/> otherwise.</returns>
+    /// <returns>
+    ///     <see langword="false"/> if `view.Visible` is  <see langword="false"/> or any Superview is not visible,
+    ///     <see langword="true"/> otherwise.
+    /// </returns>
     internal static bool CanBeVisible (View view)
     {
         if (!view.Visible)
@@ -537,18 +646,15 @@ public partial class View : Responder, ISupportInitializeNotification
     private void SetTitleTextFormatterSize ()
     {
         TitleTextFormatter.ConstrainToSize = new (
-                                       TextFormatter.GetWidestLineLength (TitleTextFormatter.Text)
-                                       - (TitleTextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
-                                              ? Math.Max (HotKeySpecifier.GetColumns (), 0)
-                                              : 0),
-                                       1);
+                                                  TextFormatter.GetWidestLineLength (TitleTextFormatter.Text)
+                                                  - (TitleTextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
+                                                         ? Math.Max (HotKeySpecifier.GetColumns (), 0)
+                                                         : 0),
+                                                  1);
     }
 
     /// <summary>Called when the <see cref="View.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.</summary>
-    protected void OnTitleChanged ()
-    {
-        TitleChanged?.Invoke (this, new (in _title));
-    }
+    protected void OnTitleChanged () { TitleChanged?.Invoke (this, new (in _title)); }
 
     /// <summary>
     ///     Called before the <see cref="View.Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can
@@ -574,4 +680,27 @@ public partial class View : Responder, ISupportInitializeNotification
     public event EventHandler<CancelEventArgs<string>>? TitleChanging;
 
     #endregion
+
+    /// <summary>Pretty prints the View</summary>
+    /// <returns></returns>
+    public override string ToString () { return $"{GetType ().Name}({Id}){Frame}"; }
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        LineCanvas.Dispose ();
+
+        DisposeKeyboard ();
+        DisposeAdornments ();
+
+        for (int i = InternalSubviews.Count - 1; i >= 0; i--)
+        {
+            View subview = InternalSubviews [i];
+            Remove (subview);
+            subview.Dispose ();
+        }
+
+        base.Dispose (disposing);
+        Debug.Assert (InternalSubviews.Count == 0);
+    }
 }

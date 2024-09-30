@@ -6,7 +6,7 @@ namespace Terminal.Gui;
 /// <summary>Actions which can be performed by the application or bound to keys in a <see cref="View"/> control.</summary>
 public enum Command
 {
-    #region Default View Commands
+    #region Base View Commands
 
     /// <summary>Invoked when the HotKey for the View has been pressed.</summary>
     HotKey,

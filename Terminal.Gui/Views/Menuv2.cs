@@ -76,7 +76,7 @@ public class Menuv2 : Bar
 
                 if (!e.Handled)
                 {
-                    OnAccept ();
+                    RaiseAcceptEvent ();
                 }
             }
         }

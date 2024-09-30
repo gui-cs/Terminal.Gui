@@ -444,7 +444,7 @@ public class TreeView<T> : View, ITreeView where T : class
     public bool? ActivateSelectedObjectIfAny ()
     {
         // By default, Command.Accept calls OnAccept, so we need to call it here to ensure that the event is fired.
-        if (OnAccept () == true)
+        if (RaiseAcceptEvent () == true)
         {
             return true;
         }

@@ -97,7 +97,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                     {
                         SelectedItem = _cursor;
 
-                        return OnAccept () is false;
+                        return RaiseAcceptEvent () is false;
                     }
                    );
         AddCommand (
@@ -108,7 +108,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                         {
                             SelectedItem = (int)ctx.KeyBinding?.Context!;
 
-                            return OnSelect () is true or null;
+                            return RaiseSelectEvent () is true or null;
                         }
 
                         return !SetFocus ();

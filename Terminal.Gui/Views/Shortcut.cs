@@ -711,12 +711,12 @@ public class Shortcut : View, IOrientation, IDesignable
         switch (ctx.KeyBinding?.Scope)
         {
             case KeyBindingScope.Application:
-                cancel = base.OnAccept () == true;
+                cancel = base.RaiseAcceptEvent () == true;
 
                 break;
 
             case KeyBindingScope.Focused:
-                base.OnAccept ();
+                base.RaiseAcceptEvent ();
 
                 // cancel if we're focused
                 cancel = true;
@@ -728,7 +728,7 @@ public class Shortcut : View, IOrientation, IDesignable
                 //{
                 //    return true;
                 //}
-                cancel = base.OnAccept () == true;
+                cancel = base.RaiseAcceptEvent () == true;
 
                 if (CanFocus)
                 {
@@ -740,7 +740,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
             default:
                 // Mouse
-                cancel = base.OnAccept () == true;
+                cancel = base.RaiseAcceptEvent () == true;
 
                 break;
         }
