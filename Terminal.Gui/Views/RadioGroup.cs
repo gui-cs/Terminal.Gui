@@ -3,13 +3,6 @@
 /// <summary>Displays a group of labels each with a selected indicator. Only one of those can be selected at a given time.</summary>
 public class RadioGroup : View, IDesignable, IOrientation
 {
-    private int _cursor;
-    private List<(int pos, int length)> _horizontal;
-    private int _horizontalSpace = 2;
-    private List<string> _radioLabels = [];
-    private int _selected;
-    private readonly OrientationHelper _orientationHelper;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="RadioGroup"/> class.
     /// </summary>
@@ -42,6 +35,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                         {
                             return false;
                         }
+
                         return MoveDownRight ();
                     }
                    );
@@ -75,11 +69,12 @@ public class RadioGroup : View, IDesignable, IOrientation
                         return true;
                     }
                    );
+
         AddCommand (
                     Command.Select,
                     () =>
                     {
-                        if (SelectedItem == _cursor)
+                        if (SelectedItem == Cursor)
                         {
                             if (!MoveDownRight ())
                             {
@@ -87,19 +82,21 @@ public class RadioGroup : View, IDesignable, IOrientation
                             }
                         }
 
-                        SelectedItem = _cursor;
+                        SelectedItem = Cursor;
 
                         return true;
                     });
+
         AddCommand (
                     Command.Accept,
                     () =>
                     {
-                        SelectedItem = _cursor;
+                        SelectedItem = Cursor;
 
                         return RaiseAcceptEvent () is false;
                     }
                    );
+
         AddCommand (
                     Command.HotKey,
                     ctx =>
@@ -132,24 +129,26 @@ public class RadioGroup : View, IDesignable, IOrientation
 
     private void SetupKeyBindings ()
     {
-        KeyBindings.Clear ();
-
         // Default keybindings for this view
         if (Orientation == Orientation.Vertical)
         {
+            KeyBindings.Remove (Key.CursorUp);
             KeyBindings.Add (Key.CursorUp, Command.Up);
+            KeyBindings.Remove (Key.CursorDown);
             KeyBindings.Add (Key.CursorDown, Command.Down);
         }
         else
         {
+            KeyBindings.Remove (Key.CursorLeft);
             KeyBindings.Add (Key.CursorLeft, Command.Up);
+            KeyBindings.Remove (Key.CursorRight);
             KeyBindings.Add (Key.CursorRight, Command.Down);
         }
 
+        KeyBindings.Remove (Key.Home);
         KeyBindings.Add (Key.Home, Command.Start);
+        KeyBindings.Remove (Key.End);
         KeyBindings.Add (Key.End, Command.End);
-        KeyBindings.Add (Key.Enter, Command.Accept);
-        KeyBindings.Add (Key.Space, Command.Select);
     }
 
     private void RadioGroup_MouseClick (object sender, MouseEventEventArgs e)
@@ -173,13 +172,16 @@ public class RadioGroup : View, IDesignable, IOrientation
 
             if (c > -1)
             {
-                _cursor = SelectedItem = c;
+                Cursor = SelectedItem = c;
                 SetNeedsDisplay ();
             }
         }
 
         e.Handled = true;
     }
+
+    private List<(int pos, int length)> _horizontal;
+    private int _horizontalSpace = 2;
 
     /// <summary>
     ///     Gets or sets the horizontal space for this <see cref="RadioGroup"/> if the <see cref="Orientation"/> is
@@ -198,6 +200,8 @@ public class RadioGroup : View, IDesignable, IOrientation
             }
         }
     }
+
+    private List<string> _radioLabels = [];
 
     /// <summary>
     ///     The radio labels to display. A key binding will be added for each radio enabling the user to select
@@ -236,6 +240,8 @@ public class RadioGroup : View, IDesignable, IOrientation
         }
     }
 
+    private int _selected;
+
     /// <summary>The currently selected item from the list of radio labels</summary>
     /// <value>The selected.</value>
     public int SelectedItem
@@ -244,7 +250,7 @@ public class RadioGroup : View, IDesignable, IOrientation
         set
         {
             OnSelectedItemChanged (value, SelectedItem);
-            _cursor = Math.Max (_selected, 0);
+            Cursor = Math.Max (_selected, 0);
             SetNeedsDisplay ();
         }
     }
@@ -283,19 +289,19 @@ public class RadioGroup : View, IDesignable, IOrientation
                 {
                     Rune rune = rlRunes [j];
 
-                    if (j == hotPos && i == _cursor)
+                    if (j == hotPos && i == Cursor)
                     {
                         Application.Driver?.SetAttribute (
-                                                         HasFocus
-                                                             ? ColorScheme.HotFocus
-                                                             : GetHotNormalColor ()
-                                                        );
+                                                          HasFocus
+                                                              ? ColorScheme.HotFocus
+                                                              : GetHotNormalColor ()
+                                                         );
                     }
-                    else if (j == hotPos && i != _cursor)
+                    else if (j == hotPos && i != Cursor)
                     {
                         Application.Driver?.SetAttribute (GetHotNormalColor ());
                     }
-                    else if (HasFocus && i == _cursor)
+                    else if (HasFocus && i == Cursor)
                     {
                         Application.Driver?.SetAttribute (GetFocusColor ());
                     }
@@ -305,15 +311,15 @@ public class RadioGroup : View, IDesignable, IOrientation
                         j++;
                         rune = rlRunes [j];
 
-                        if (i == _cursor)
+                        if (i == Cursor)
                         {
                             Application.Driver?.SetAttribute (
-                                                             HasFocus
-                                                                 ? ColorScheme.HotFocus
-                                                                 : GetHotNormalColor ()
-                                                            );
+                                                              HasFocus
+                                                                  ? ColorScheme.HotFocus
+                                                                  : GetHotNormalColor ()
+                                                             );
                         }
-                        else if (i != _cursor)
+                        else if (i != Cursor)
                         {
                             Application.Driver?.SetAttribute (GetHotNormalColor ());
                         }
@@ -325,10 +331,12 @@ public class RadioGroup : View, IDesignable, IOrientation
             }
             else
             {
-                DrawHotString (rl, HasFocus && i == _cursor);
+                DrawHotString (rl, HasFocus && i == Cursor);
             }
         }
     }
+
+    #region IOrientation
 
     /// <summary>
     ///     Gets or sets the <see cref="Orientation"/> for this <see cref="RadioGroup"/>. The default is
@@ -340,7 +348,7 @@ public class RadioGroup : View, IDesignable, IOrientation
         set => _orientationHelper.Orientation = value;
     }
 
-    #region IOrientation
+    private readonly OrientationHelper _orientationHelper;
 
     /// <inheritdoc/>
     public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
@@ -373,6 +381,17 @@ public class RadioGroup : View, IDesignable, IOrientation
         SelectedItemChanged?.Invoke (this, new (selectedItem, previousSelectedItem));
     }
 
+    /// <summary>
+    ///     Gets or sets the <see cref="RadioLabels"/> index for the cursor. The cursor may or may not be the selected
+    ///     RadioItem.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Maps to either the X or Y position within <see cref="View.Viewport"/> depending on <see cref="Orientation"/>.
+    ///     </para>
+    /// </remarks>
+    public int Cursor { get; set; }
+
     /// <inheritdoc/>
     public override Point? PositionCursor ()
     {
@@ -382,13 +401,13 @@ public class RadioGroup : View, IDesignable, IOrientation
         switch (Orientation)
         {
             case Orientation.Vertical:
-                y = _cursor;
+                y = Cursor;
 
                 break;
             case Orientation.Horizontal:
                 if (_horizontal.Count > 0)
                 {
-                    x = _horizontal [_cursor].pos;
+                    x = _horizontal [Cursor].pos;
                 }
 
                 break;
@@ -411,9 +430,9 @@ public class RadioGroup : View, IDesignable, IOrientation
 
     private bool MoveDownRight ()
     {
-        if (_cursor + 1 < _radioLabels.Count)
+        if (Cursor + 1 < _radioLabels.Count)
         {
-            _cursor++;
+            Cursor++;
             SetNeedsDisplay ();
 
             return true;
@@ -423,18 +442,19 @@ public class RadioGroup : View, IDesignable, IOrientation
         return false;
     }
 
-    private void MoveEnd () { _cursor = Math.Max (_radioLabels.Count - 1, 0); }
-    private void MoveHome () { _cursor = 0; }
+    private void MoveEnd () { Cursor = Math.Max (_radioLabels.Count - 1, 0); }
+    private void MoveHome () { Cursor = 0; }
 
     private bool MoveUpLeft ()
     {
-        if (_cursor > 0)
+        if (Cursor > 0)
         {
-            _cursor--;
+            Cursor--;
             SetNeedsDisplay ();
 
             return true;
         }
+
         // Moving past should move focus to next view, not wrap
         return false;
     }

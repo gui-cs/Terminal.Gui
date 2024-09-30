@@ -652,7 +652,7 @@ Like `Checkbox` the right thing to do is for Hotkey to NOT set focus. Why? If th
 
 ### `HasFocus`
 
-* `Enter` - `Command.Accept` -> Advances state to selected RadioItem and Raises `Accept` 
+* `Enter` - `Command.Accept` -> Raises `Accept` 
 * `Space` - `Command.Select` -> Advances state
 * `Title.Hotkey` - `Command.Hotkey` -> does nothing
 * `RadioItem.Hotkey` - `Command.Select` -> Advance State to RadioItem with hotkey.

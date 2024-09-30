@@ -449,7 +449,6 @@ internal class CharMap : View
                     }
                    );
 
-        KeyBindings.Add (Key.Enter, Command.Accept);
         KeyBindings.Add (Key.CursorUp, Command.ScrollUp);
         KeyBindings.Add (Key.CursorDown, Command.ScrollDown);
         KeyBindings.Add (Key.CursorLeft, Command.ScrollLeft);

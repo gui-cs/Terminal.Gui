@@ -11,6 +11,10 @@ public partial class View // Keyboard APIs
     private void SetupKeyboard ()
     {
         KeyBindings = new (this);
+        KeyBindings.Add (Key.Space, Command.Select);
+        KeyBindings.Add (Key.Enter, Command.Accept);
+
+        // Note, setting HotKey will bind HotKey to Command.HotKey
         HotKeySpecifier = (Rune)'_';
         TitleTextFormatter.HotKeyChanged += TitleTextFormatter_HotKeyChanged;
     }

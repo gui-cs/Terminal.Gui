@@ -341,4 +341,46 @@ public class HotKeyTests
         Assert.Equal ("", view.Title);
         Assert.Equal (KeyCode.Null, view.HotKey);
     }
+
+
+    [Fact]
+    public void HotKey_Raises_HotKeyCommand ()
+    {
+        var hotKeyRaised = false;
+        var acceptRaised = false;
+        var selectRaised = false;
+        Application.Top = new Toplevel ();
+        var view = new View
+        {
+            CanFocus = true,
+            HotKeySpecifier = new Rune ('_'),
+            Title = "_Test"
+        };
+        Application.Top.Add (view);
+        view.HotKeyCommand += (s, e) => hotKeyRaised = true;
+        view.Accept += (s, e) => acceptRaised = true;
+        view.Select += (s, e) => selectRaised = true;
+
+        Assert.Equal (KeyCode.T, view.HotKey);
+        Assert.False (Application.OnKeyDown (Key.T)); // wasn't handled
+        Assert.True (hotKeyRaised);
+        Assert.False (acceptRaised);
+        Assert.False (selectRaised);
+
+        hotKeyRaised = false;
+        Assert.False (Application.OnKeyDown (Key.T.WithAlt));
+        Assert.True (hotKeyRaised);
+        Assert.False (acceptRaised);
+        Assert.False (selectRaised);
+
+        hotKeyRaised = false;
+        view.HotKey = KeyCode.E;
+        Assert.False (Application.OnKeyDown (Key.E.WithAlt));
+        Assert.True (hotKeyRaised);
+        Assert.False (acceptRaised);
+        Assert.False (selectRaised);
+
+        Application.Top.Dispose ();
+        Application.ResetState (true);
+    }
 }

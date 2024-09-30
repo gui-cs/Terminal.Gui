@@ -180,8 +180,8 @@ public class ListView : View, IDesignable
 
         KeyBindings.Add (Key.End, Command.End);
 
-        KeyBindings.Add (Key.Space, Command.Select);
-
+        // BUGBUG: This should just be Command.Accept
+        KeyBindings.Remove (Key.Enter);
         KeyBindings.Add (Key.Enter, Command.Open);
     }
 
@@ -476,9 +476,9 @@ public class ListView : View, IDesignable
 
         _selected = Viewport.Y + me.Position.Y;
 
-        if (!MarkUnmarkSelectedItem())
+        if (MarkUnmarkSelectedItem())
         {
-            return true;
+           // return true;
         }
 
         OnSelectedChanged ();

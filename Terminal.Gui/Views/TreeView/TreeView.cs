@@ -296,6 +296,8 @@ public class TreeView<T> : View, ITreeView where T : class
         KeyBindings.Add (Key.Home, Command.Start);
         KeyBindings.Add (Key.End, Command.End);
         KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
+
+        KeyBindings.Remove (ObjectActivationKey);
         KeyBindings.Add (ObjectActivationKey, Command.Select);
     }
 
@@ -1227,7 +1229,7 @@ public class TreeView<T> : View, ITreeView where T : class
             {
                 Move (0, idx - ScrollOffsetVertical);
 
-                return MultiSelect ? new (0, idx - ScrollOffsetVertical) : null ;
+                return MultiSelect ? new (0, idx - ScrollOffsetVertical) : null;
             }
         }
         return base.PositionCursor ();

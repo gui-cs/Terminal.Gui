@@ -160,7 +160,7 @@ public class ViewTests (ITestOutputHelper output)
         if (label)
         {
             Assert.False (v.CanFocus);
-            Assert.Equal (new  (0, 0, text.Length, 1), v.Frame);
+            Assert.Equal (new (0, 0, text.Length, 1), v.Frame);
         }
         else
         {
@@ -469,7 +469,7 @@ At 0,0
             X = 0, // don't overcomplicate unit tests
             Y = 1,
             Height = Dim.Auto (DimAutoStyle.Text),
-            Width = Dim.Auto(DimAutoStyle.Text),
+            Width = Dim.Auto (DimAutoStyle.Text),
             Text = "Press me!"
         };
 
@@ -783,7 +783,7 @@ At 0,0
         r.Dispose ();
 
         // Empty Rect
-        r = new() { Frame = Rectangle.Empty };
+        r = new () { Frame = Rectangle.Empty };
         Assert.NotNull (r);
         Assert.Equal ($"View(){r.Viewport}", r.ToString ());
         Assert.False (r.CanFocus);
@@ -807,7 +807,7 @@ At 0,0
         r.Dispose ();
 
         // Rect with values
-        r = new() { Frame = new (1, 2, 3, 4) };
+        r = new () { Frame = new (1, 2, 3, 4) };
         Assert.NotNull (r);
         Assert.Equal ($"View(){r.Frame}", r.ToString ());
         Assert.False (r.CanFocus);
@@ -831,7 +831,7 @@ At 0,0
         r.Dispose ();
 
         // Initializes a view with a vertical direction
-        r = new()
+        r = new ()
         {
             Text = "Vertical View",
             TextDirection = TextDirection.TopBottom_LeftRight,
@@ -870,11 +870,11 @@ At 0,0
     {
         var r = new View ();
 
-        Assert.False (r.OnKeyDown (new() { KeyCode = KeyCode.Null }));
+        Assert.False (r.OnKeyDown (new () { KeyCode = KeyCode.Null }));
 
         //Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
-        Assert.False (r.OnKeyUp (new() { KeyCode = KeyCode.Null }));
-        Assert.False (r.NewMouseEvent (new() { Flags = MouseFlags.AllEvents }));
+        Assert.False (r.OnKeyUp (new () { KeyCode = KeyCode.Null }));
+        Assert.False (r.NewMouseEvent (new () { Flags = MouseFlags.AllEvents }));
 
         r.Dispose ();
 
@@ -960,7 +960,7 @@ At 0,0
         view.Dispose ();
 
         // Object Initializer
-        view = new() { X = 1, Y = 2, Text = "" };
+        view = new () { X = 1, Y = 2, Text = "" };
         Assert.Equal (1, view.X);
         Assert.Equal (2, view.Y);
         Assert.Equal (0, view.Width);
@@ -975,7 +975,7 @@ At 0,0
         view.Y = 2;
         view.Width = 3;
         view.Height = 4;
-        super = new() { Frame = new (0, 0, 10, 10) };
+        super = new () { Frame = new (0, 0, 10, 10) };
         super.Add (view);
         super.BeginInit ();
         super.EndInit ();
@@ -1152,70 +1152,5 @@ At 0,0
 
             return true;
         }
-    }
-
-    // OnAccept/Accept tests
-    [Fact]
-    public void OnAccept_Fires_Accept ()
-    {
-        var view = new View ();
-        var accepted = false;
-
-        view.Accept += ViewOnAccept;
-
-        view.InvokeCommand (Command.Accept);
-        Assert.True (accepted);
-
-        return;
-
-        void ViewOnAccept (object sender, HandledEventArgs e) { accepted = true; }
-    }
-
-    [Fact]
-    public void Accept_Cancel_Event_OnAccept_Returns_True ()
-    {
-        var view = new View ();
-        var acceptInvoked = false;
-
-        view.Accept += ViewOnAccept;
-
-        bool? ret = view.InvokeCommand (Command.Accept);
-        Assert.True (ret);
-        Assert.True (acceptInvoked);
-
-        return;
-
-        void ViewOnAccept (object sender, HandledEventArgs e)
-        {
-            acceptInvoked = true;
-            e.Handled = true;
-        }
-    }
-
-    [Fact]
-    public void Accept_Command_Invokes_Accept_Event ()
-    {
-        var view = new View ();
-        var accepted = false;
-
-        view.Accept += ViewOnAccept;
-
-        view.InvokeCommand (Command.Accept);
-        Assert.True (accepted);
-
-        return;
-
-        void ViewOnAccept (object sender, HandledEventArgs e) { accepted = true; }
-    }
-
-    [Fact]
-    public void HotKey_Command_SetsFocus ()
-    {
-        var view = new View ();
-
-        view.CanFocus = true;
-        Assert.False (view.HasFocus);
-        view.InvokeCommand (Command.HotKey);
-        Assert.True (view.HasFocus);
     }
 }

@@ -145,7 +145,6 @@ public class MenuBar : View, IDesignable
         KeyBindings.Add (Key.CursorRight, Command.Right);
         KeyBindings.Add (Key.Esc, Command.Cancel);
         KeyBindings.Add (Key.CursorDown, Command.Accept);
-        KeyBindings.Add (Key.Enter, Command.Accept);
 
         KeyBinding keyBinding = new ([Command.Toggle], KeyBindingScope.HotKey, -1); // -1 indicates Key was used
         KeyBindings.Add (Key, keyBinding);

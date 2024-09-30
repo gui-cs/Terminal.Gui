@@ -2275,7 +2275,9 @@ public class TextView : View
                         return true;
                     }
                    );
-        AddCommand (Command.NewLine, () => ProcessReturn ());
+
+        // BUGBUG: If AllowsReturn is false, Key.Enter should not be bound (so that Toplevel can cause Command.Accept).
+        AddCommand (Command.Accept, () => ProcessReturn ());
 
         AddCommand (
                     Command.End,
@@ -2479,8 +2481,6 @@ public class TextView : View
         KeyBindings.Add (Key.Delete.WithCtrl, Command.KillWordForwards); // kill-word-forwards
         KeyBindings.Add (Key.Backspace.WithCtrl, Command.KillWordBackwards); // kill-word-backwards
 
-        // BUGBUG: If AllowsReturn is false, Key.Enter should not be bound (so that Toplevel can cause Command.Accept).
-        KeyBindings.Add (Key.Enter, Command.NewLine);
         KeyBindings.Add (Key.End.WithCtrl, Command.End);
         KeyBindings.Add (Key.End.WithCtrl.WithShift, Command.EndExtend);
         KeyBindings.Add (Key.Home.WithCtrl, Command.Start);

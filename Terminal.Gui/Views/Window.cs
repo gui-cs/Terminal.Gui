@@ -31,8 +31,6 @@ public class Window : Toplevel
         ColorScheme = Colors.ColorSchemes ["Base"]; // TODO: make this a theme property
         BorderStyle = DefaultBorderStyle;
         ShadowStyle = DefaultShadow;
-
-        KeyBindings.Add (Key.Enter, Command.Accept);
     }
 
     // TODO: enable this

@@ -283,8 +283,8 @@ public class TableView : View
         KeyBindings.Add (Key.End.WithCtrl.WithShift, Command.EndExtend);
 
         KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
+        KeyBindings.Remove (CellActivationKey);
         KeyBindings.Add (CellActivationKey, Command.Accept);
-        KeyBindings.Add (Key.Space, Command.Select);
     }
 
     // TODO: Update to use Key instead of KeyCode

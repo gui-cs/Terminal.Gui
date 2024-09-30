@@ -136,20 +136,39 @@ public partial class View : Responder, ISupportInitializeNotification
     {
         SetupAdornments ();
 
+        AddCommand (
+                    Command.Select,
+                    () =>
+                    {
+                        SetFocus ();
+
+                        return RaiseSelectEvent ();
+                    });
+
+        AddCommand (
+                    Command.HotKey,
+                    () =>
+                    {
+                        SetFocus ();
+
+                        return RaiseHotKeyCommandEvent ();
+                    });
+
+        AddCommand (
+                    Command.Accept,
+                    () =>
+                    {
+                        SetFocus ();
+
+                        return RaiseAcceptEvent ();
+                    });
+
         SetupKeyboard ();
 
         //SetupMouse ();
 
         SetupText ();
 
-        // By default, the Select command does nothing
-        AddCommand (Command.Select, RaiseSelectEvent);
-
-        // By default, the HotKey command sets the focus
-        AddCommand (Command.HotKey, RaiseHotKeyEvent);
-
-        // By default, the Accept command sets the focus
-        AddCommand (Command.Accept, RaiseAcceptEvent);
     }
 
     /// <summary>
@@ -285,19 +304,9 @@ public partial class View : Responder, ISupportInitializeNotification
     ///     Called when the <see cref="Command.Accept"/> command is received. Set <see cref="HandledEventArgs.Handled"/> to
     ///     <see langword="true"/> to stop processing.
     /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         The base implementation calls <see cref="SetFocus"/>.
-    ///     </para>
-    /// </remarks>
     /// <param name="args"></param>
     /// <returns><see langword="true"/> to stop processing.</returns>
-    protected virtual bool OnAccept (HandledEventArgs args)
-    {
-        SetFocus ();
-
-        return false;
-    }
+    protected virtual bool OnAccept (HandledEventArgs args) { return false; }
 
     /// <summary>
     ///     Cancelable event raised when the <see cref="Command.Accept"/> command is invoked. Set
@@ -335,19 +344,9 @@ public partial class View : Responder, ISupportInitializeNotification
     ///     Called when the <see cref="Command.Select"/> command is received. Set <see cref="HandledEventArgs.Handled"/> to
     ///     <see langword="true"/> to stop processing.
     /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         The base implementation calls <see cref="SetFocus"/>.
-    ///     </para>
-    /// </remarks>
     /// <param name="args"></param>
     /// <returns><see langword="true"/> to stop processing.</returns>
-    protected virtual bool OnSelect (HandledEventArgs args)
-    {
-        SetFocus ();
-
-        return false;
-    }
+    protected virtual bool OnSelect (HandledEventArgs args) { return false; }
 
     /// <summary>
     ///     Cancelable event raised when the <see cref="Command.Select"/> command is invoked. Set
@@ -356,22 +355,21 @@ public partial class View : Responder, ISupportInitializeNotification
     /// </summary>
     public event EventHandler<HandledEventArgs>? Select;
 
-
     /// <summary>
     ///     Called when the <see cref="Command.HotKey"/> command is invoked. Raises <see cref="HotKey"/>
     ///     event.
     /// </summary>
     /// <returns>
-    ///     If <see langword="true"/> the event was canceled. If <see langword="false"/> the event was raised but not canceled.
+    ///     If <see langword="true"/> the event was handled. If <see langword="false"/> the event was raised but not handled.
     ///     If <see langword="null"/> no event was raised.
     /// </returns>
-    protected bool? RaiseHotKeyEvent ()
+    protected bool? RaiseHotKeyCommandEvent ()
     {
         HandledEventArgs args = new ();
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
-        if (OnHotKey (args) || args.Handled)
+        if (OnHotKeyCommand (args) || args.Handled)
         {
             return true;
         }
@@ -386,19 +384,9 @@ public partial class View : Responder, ISupportInitializeNotification
     ///     Called when the <see cref="Command.HotKey"/> command is received. Set <see cref="HandledEventArgs.Handled"/> to
     ///     <see langword="true"/> to stop processing.
     /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         The base implementation calls <see cref="SetFocus"/>.
-    ///     </para>
-    /// </remarks>
     /// <param name="args"></param>
     /// <returns><see langword="true"/> to stop processing.</returns>
-    protected virtual bool OnHotKey (HandledEventArgs args)
-    {
-        SetFocus ();
-
-        return false;
-    }
+    protected virtual bool OnHotKeyCommand (HandledEventArgs args) { return false; }
 
     /// <summary>
     ///     Cancelable event raised when the <see cref="Command.HotKey"/> command is invoked. Set

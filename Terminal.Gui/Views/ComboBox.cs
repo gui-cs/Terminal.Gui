@@ -90,7 +90,6 @@ public class ComboBox : View, IDesignable
         AddCommand (Command.UnixEmulation, () => UnixEmulation ());
 
         // Default keybindings for this view
-        KeyBindings.Add (Key.Enter, Command.Accept);
         KeyBindings.Add (Key.F4, Command.Toggle);
         KeyBindings.Add (Key.CursorDown, Command.Down);
         KeyBindings.Add (Key.CursorUp, Command.Up);

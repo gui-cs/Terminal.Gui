@@ -247,6 +247,7 @@ In v2, the API is (NOT YET IMPLEMENTED) simplified. A view simply reports the st
 See [navigation.md](navigation.md) for more details.
 See also [Keyboard](keyboard.md) where HotKey is covered more deeply...
 
+* In v1, `View.CanFocus` was `true` by default. In v2, it is `false`. Any `View` subclass that wants to be focusable must set `CanFocus = true`.
 * In v1 it was not possible to remove focus from a view. `HasFocus` as a get-only property. In v2, `view.HasFocus` can be set as well. Setting to `true` is equivalent to calling `view.SetFocus`. Setting to `false` is equivalent to calling `view.SuperView.AdvanceFocus` (which might not actually cause `view` to stop having focus). 
 * In v1, calling `super.Add (view)` where `view.CanFocus == true` caused all views up the hierarchy (all SuperViews) to get `CanFocus` set to `true` as well. In v2, developers need to explicitly set `CanFocus` for any view in the view-hierarchy where focus is desired. This simplifies the implementation and removes confusing automatic behavior. 
 * In v1, if `view.CanFocus == true`, `Add` would automatically set `TabStop`. In v2, the automatic setting of `TabStop` in `Add` is retained because it is not overly complex to do so and is a nice convenience for developers to not have to set both `Tabstop` and `CanFocus`. Note v2 does NOT automatically change `CanFocus` if `TabStop` is changed.
@@ -262,8 +263,9 @@ See also [Keyboard](keyboard.md) where HotKey is covered more deeply...
 
 ### How to Fix (Focus API)
 
+* Set @Terminal.Gui.View.CanFocus to `true` for any View sub-class that wants to be focusable.
 * Use @Terminal.Gui.Application.Navigation.GetFocused to get the most focused view in the application.
-*  Use @Terminal.Gui.Application.Navigation.AdvanceFocus to cause focus to change.
+* Use @Terminal.Gui.Application.Navigation.AdvanceFocus to cause focus to change.
 
 ### Keyboard Navigation
 

@@ -195,7 +195,6 @@ internal sealed class Menu : View
         KeyBindings.Add (Key.CursorLeft, Command.Left);
         KeyBindings.Add (Key.CursorRight, Command.Right);
         KeyBindings.Add (Key.Esc, Command.Cancel);
-        KeyBindings.Add (Key.Enter, Command.Accept);
     }
 
     private void AddKeyBindingsHotKey (MenuBarItem? menuBarItem)

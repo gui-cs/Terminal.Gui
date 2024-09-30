@@ -89,7 +89,9 @@ public class Button : View, IDesignable
                         return false;
                     });
 
+        KeyBindings.Remove (Key.Space);
         KeyBindings.Add (Key.Space, Command.HotKey);
+        KeyBindings.Remove (Key.Enter);
         KeyBindings.Add (Key.Enter, Command.HotKey);
 
         TitleChanged += Button_TitleChanged;

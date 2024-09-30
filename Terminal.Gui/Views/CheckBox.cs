@@ -24,9 +24,6 @@ public class CheckBox : View
         AddCommand (Command.Accept, AdvanceCheckState);
         AddCommand (Command.HotKey, AdvanceCheckState);
 
-        // Default keybindings for this view
-        KeyBindings.Add (Key.Space, Command.Accept);
-
         TitleChanged += Checkbox_TitleChanged;
 
         HighlightStyle = DefaultHighlightStyle;

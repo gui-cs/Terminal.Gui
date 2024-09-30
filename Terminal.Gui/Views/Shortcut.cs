@@ -65,8 +65,6 @@ public class Shortcut : View, IOrientation, IDesignable
         AddCommand (Command.HotKey, ctx => OnAccept (ctx));
         AddCommand (Command.Accept, ctx => OnAccept (ctx));
         AddCommand (Command.Select, ctx => OnSelect (ctx));
-        KeyBindings.Add (KeyCode.Enter, Command.Accept);
-        KeyBindings.Add (KeyCode.Space, Command.Select);
 
         TitleChanged += Shortcut_TitleChanged; // This needs to be set before CommandView is set
 

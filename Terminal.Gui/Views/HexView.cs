@@ -80,7 +80,6 @@ public class HexView : View
         KeyBindings.Add (Key.CursorRight, Command.Right);
         KeyBindings.Add (Key.CursorDown, Command.Down);
         KeyBindings.Add (Key.CursorUp, Command.Up);
-        KeyBindings.Add (Key.Enter, Command.Accept);
 
         KeyBindings.Add (Key.V.WithAlt, Command.PageUp);
         KeyBindings.Add (Key.PageUp, Command.PageUp);

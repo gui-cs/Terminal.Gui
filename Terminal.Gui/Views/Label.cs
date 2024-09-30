@@ -19,9 +19,6 @@ public class Label : View
         // Things this view knows how to do
         AddCommand (Command.HotKey, FocusNext);
 
-        // Default key bindings for this view
-        KeyBindings.Add (Key.Space, Command.Accept);
-
         TitleChanged += Label_TitleChanged;
         MouseClick += Label_MouseClick;
     }
