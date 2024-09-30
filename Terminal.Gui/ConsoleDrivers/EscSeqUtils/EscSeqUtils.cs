@@ -1399,10 +1399,10 @@ public static class EscSeqUtils
     #region Requests
 
     /// <summary>
-    ///     ESC [ ? 6 n - Request Cursor Position Report (?) (DECXCPR)
-    ///     https://terminalguide.namepad.de/seq/csi_sn__p-6/
+    ///     ESC [ 6 n - Request Cursor Position Report (CPR)
+    ///     https://terminalguide.namepad.de/seq/csi_sn-6/
     /// </summary>
-    public static readonly string CSI_RequestCursorPositionReport = CSI + "?6n";
+    public static readonly string CSI_RequestCursorPositionReport = CSI + "6n";
 
     /// <summary>
     ///     The terminal reply to <see cref="CSI_RequestCursorPositionReport"/>. ESC [ ? (y) ; (x) R
