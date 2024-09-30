@@ -305,91 +305,6 @@ public static class EscSeqUtils
 
     #nullable enable
     /// <summary>
-    /// Execute an ANSI escape sequence escape which may return a response or error.
-    /// </summary>
-    /// <param name="ansiRequest">The ANSI escape sequence to request.</param>
-    /// <returns>A tuple with the response and error.</returns>
-    public static (string response, string error) ExecuteAnsiRequest (string ansiRequest)
-    {
-        var response = new StringBuilder ();
-        var error = new StringBuilder ();
-        var foundEscapeSequence = false;
-
-        try
-        {
-            switch (Application.Driver)
-            {
-                case NetDriver netDriver:
-                    netDriver.StopReportingMouseMoves ();
-
-                    break;
-                case CursesDriver cursesDriver:
-                    cursesDriver.StopReportingMouseMoves ();
-
-                    break;
-            }
-
-            Thread.Sleep (100); // Allow time for mouse stopping
-
-            // Flush the input buffer to avoid reading stale input
-            while (Console.KeyAvailable)
-            {
-                Console.ReadKey (true);
-            }
-
-            // Send the ANSI escape sequence
-            Console.Write (ansiRequest);
-            Console.Out.Flush (); // Ensure the request is sent
-
-            // Read the response from stdin (response should come back as input)
-            Thread.Sleep (100); // Allow time for the terminal to respond
-
-            // Read input until no more characters are available or another \u001B is encountered
-            while (Console.KeyAvailable)
-            {
-                // Peek the next key
-                ConsoleKeyInfo keyInfo = Console.ReadKey (true); // true to not display on the console
-
-                if (keyInfo.KeyChar == '\u001B') // Check if the key is Escape (ANSI escape sequence starts)
-                {
-                    if (foundEscapeSequence)
-                    {
-                        // If we already found one \u001B, break out of the loop when another is found
-                        break;
-                    }
-                    else
-                    {
-                        foundEscapeSequence = true; // Mark that we've encountered the first escape sequence
-                    }
-                }
-
-                // Append the current key to the response
-                response.Append (keyInfo.KeyChar);
-            }
-        }
-        catch (Exception ex)
-        {
-            error.AppendLine ($"Error executing ANSI request: {ex.Message}");
-        }
-        finally
-        {
-            switch (Application.Driver)
-            {
-                case NetDriver netDriver:
-                    netDriver.StartReportingMouseMoves ();
-
-                    break;
-                case CursesDriver cursesDriver:
-                    cursesDriver.StartReportingMouseMoves ();
-
-                    break;
-            }
-        }
-
-        return (response.ToString (), error.ToString ());
-    }
-
-    /// <summary>
     ///     Gets the c1Control used in the called escape sequence.
     /// </summary>
     /// <param name="c">The char used.</param>
@@ -1399,15 +1314,11 @@ public static class EscSeqUtils
     #region Requests
 
     /// <summary>
-    ///     ESC [ 6 n - Request Cursor Position Report (CPR)
-    ///     https://terminalguide.namepad.de/seq/csi_sn-6/
+    ///     ESC [ ? 6 n - Request Cursor Position Report (?) (DECXCPR)
+    ///     https://terminalguide.namepad.de/seq/csi_sn__p-6/
+    ///     The terminal reply to <see cref="CSI_RequestCursorPositionReport"/>. ESC [ ? (y) ; (x) ; 1 R
     /// </summary>
-    public static readonly string CSI_RequestCursorPositionReport = CSI + "6n";
-
-    /// <summary>
-    ///     The terminal reply to <see cref="CSI_RequestCursorPositionReport"/>. ESC [ ? (y) ; (x) R
-    /// </summary>
-    public const string CSI_RequestCursorPositionReport_Terminator = "R";
+    public static readonly AnsiEscapeSequenceRequest CSI_RequestCursorPositionReport = new () { Request = CSI + "?6n", Terminator = "R" };
 
     /// <summary>
     ///     ESC [ 0 c - Send Device Attributes (Primary DA)
@@ -1426,37 +1337,25 @@ public static class EscSeqUtils
     ///     28 = Rectangular area operations
     ///     32 = Text macros
     ///     42 = ISO Latin-2 character set
+    ///     The terminator indicating a reply to <see cref="CSI_SendDeviceAttributes"/> or
+    ///     <see cref="CSI_SendDeviceAttributes2"/>
     /// </summary>
-    public static readonly string CSI_SendDeviceAttributes = CSI + "0c";
+    public static readonly AnsiEscapeSequenceRequest CSI_SendDeviceAttributes = new () { Request = CSI + "0c", Terminator = "c" };
 
     /// <summary>
     ///     ESC [ > 0 c - Send Device Attributes (Secondary DA)
     ///     Windows Terminal v1.18+ emits: "\x1b[>0;10;1c" (vt100, firmware version 1.0, vt220)
-    /// </summary>
-    public static readonly string CSI_SendDeviceAttributes2 = CSI + ">0c";
-
-    /// <summary>
     ///     The terminator indicating a reply to <see cref="CSI_SendDeviceAttributes"/> or
     ///     <see cref="CSI_SendDeviceAttributes2"/>
     /// </summary>
-    public const string CSI_ReportDeviceAttributes_Terminator = "c";
+    public static readonly AnsiEscapeSequenceRequest CSI_SendDeviceAttributes2 = new () { Request = CSI + ">0c", Terminator = "c" };
 
     /// <summary>
     ///     CSI 1 8 t  | yes | yes |  yes  | report window size in chars
     ///     https://terminalguide.namepad.de/seq/csi_st-18/
-    /// </summary>
-    public static readonly string CSI_ReportTerminalSizeInChars = CSI + "18t";
-
-    /// <summary>
     ///     The terminator indicating a reply to <see cref="CSI_ReportTerminalSizeInChars"/> : ESC [ 8 ; height ; width t
     /// </summary>
-    public const string CSI_ReportTerminalSizeInChars_Terminator = "t";
-
-    /// <summary>
-    ///     The value of the response to <see cref="CSI_ReportTerminalSizeInChars"/> indicating value 1 and 2 are the terminal
-    ///     size in chars.
-    /// </summary>
-    public const string CSI_ReportTerminalSizeInChars_ResponseValue = "8";
+    public static readonly AnsiEscapeSequenceRequest CSI_ReportTerminalSizeInChars = new () { Request = CSI + "18t", Terminator = "t", Value = "8" };
 
     #endregion
 }

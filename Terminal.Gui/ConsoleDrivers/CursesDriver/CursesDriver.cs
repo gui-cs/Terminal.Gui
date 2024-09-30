@@ -177,11 +177,15 @@ internal class CursesDriver : ConsoleDriver
         return true;
     }
 
+    public bool IsReportingMouseMoves { get; private set; }
+
     public void StartReportingMouseMoves ()
     {
         if (!RunningUnitTests)
         {
             Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
+
+            IsReportingMouseMoves = true;
         }
     }
 
@@ -190,6 +194,8 @@ internal class CursesDriver : ConsoleDriver
         if (!RunningUnitTests)
         {
             Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
+
+            IsReportingMouseMoves = false;
         }
     }
 
