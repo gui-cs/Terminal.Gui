@@ -305,6 +305,91 @@ public static class EscSeqUtils
 
     #nullable enable
     /// <summary>
+    /// Execute an ANSI escape sequence escape which may return a response or error.
+    /// </summary>
+    /// <param name="ansiRequest">The ANSI escape sequence to request.</param>
+    /// <returns>A tuple with the response and error.</returns>
+    public static (string response, string error) ExecuteAnsiRequest (string ansiRequest)
+    {
+        var response = new StringBuilder ();
+        var error = new StringBuilder ();
+        var foundEscapeSequence = false;
+
+        try
+        {
+            switch (Application.Driver)
+            {
+                case NetDriver netDriver:
+                    netDriver.StopReportingMouseMoves ();
+
+                    break;
+                case CursesDriver cursesDriver:
+                    cursesDriver.StopReportingMouseMoves ();
+
+                    break;
+            }
+
+            Thread.Sleep (100); // Allow time for mouse stopping
+
+            // Flush the input buffer to avoid reading stale input
+            while (Console.KeyAvailable)
+            {
+                Console.ReadKey (true);
+            }
+
+            // Send the ANSI escape sequence
+            Console.Write (ansiRequest);
+            Console.Out.Flush (); // Ensure the request is sent
+
+            // Read the response from stdin (response should come back as input)
+            Thread.Sleep (100); // Allow time for the terminal to respond
+
+            // Read input until no more characters are available or another \u001B is encountered
+            while (Console.KeyAvailable)
+            {
+                // Peek the next key
+                ConsoleKeyInfo keyInfo = Console.ReadKey (true); // true to not display on the console
+
+                if (keyInfo.KeyChar == '\u001B') // Check if the key is Escape (ANSI escape sequence starts)
+                {
+                    if (foundEscapeSequence)
+                    {
+                        // If we already found one \u001B, break out of the loop when another is found
+                        break;
+                    }
+                    else
+                    {
+                        foundEscapeSequence = true; // Mark that we've encountered the first escape sequence
+                    }
+                }
+
+                // Append the current key to the response
+                response.Append (keyInfo.KeyChar);
+            }
+        }
+        catch (Exception ex)
+        {
+            error.AppendLine ($"Error executing ANSI request: {ex.Message}");
+        }
+        finally
+        {
+            switch (Application.Driver)
+            {
+                case NetDriver netDriver:
+                    netDriver.StartReportingMouseMoves ();
+
+                    break;
+                case CursesDriver cursesDriver:
+                    cursesDriver.StartReportingMouseMoves ();
+
+                    break;
+            }
+        }
+
+        return (response.ToString (), error.ToString ());
+    }
+
+    /// <summary>
     ///     Gets the c1Control used in the called escape sequence.
     /// </summary>
     /// <param name="c">The char used.</param>
