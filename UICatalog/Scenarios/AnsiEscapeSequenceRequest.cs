@@ -30,16 +30,16 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         var cbRequests = new ComboBox () { Width = 40, Height = 5, ReadOnly = true, Source = new ListWrapper<string> (new (scrRequests)) };
         appWindow.Add (cbRequests);
 
-        var label = new Label { Y = Pos.Bottom (cbRequests) + 1, Text = "Request:"};
-        var tfRequest = new TextField { X = Pos.Right (label) + 1, Y = Pos.Top (label), Width = 20 };
+        var label = new Label { Y = Pos.Bottom (cbRequests) + 1, Text = "Request:" };
+        var tfRequest = new TextField { X = Pos.Left (label), Y = Pos.Bottom (label), Width = 20 };
         appWindow.Add (label, tfRequest);
 
-        label = new Label { X = Pos.Right (tfRequest) + 1, Y = Pos.Top (tfRequest), Text = "Value:" };
-        var tfValue = new TextField { X = Pos.Right (label) + 1, Y = Pos.Top (label), Width = 6 };
+        label = new Label { X = Pos.Right (tfRequest) + 1, Y = Pos.Top (tfRequest) - 1, Text = "Value:" };
+        var tfValue = new TextField { X = Pos.Left (label), Y = Pos.Bottom (label), Width = 6 };
         appWindow.Add (label, tfValue);
 
-        label = new Label { X = Pos.Right (tfValue) + 1, Y = Pos.Top (tfValue), Text = "Terminator:" };
-        var tfTerminator = new TextField { X = Pos.Right (label) + 1, Y = Pos.Top (label), Width = 4 };
+        label = new Label { X = Pos.Right (tfValue) + 1, Y = Pos.Top (tfValue) - 1, Text = "Terminator:" };
+        var tfTerminator = new TextField { X = Pos.Left (label), Y = Pos.Bottom (label), Width = 4 };
         appWindow.Add (label, tfTerminator);
 
         cbRequests.SelectedItemChanged += (s, e) =>
@@ -70,19 +70,19 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         cbRequests.SelectedItem = 0;
 
         label = new Label { Y = Pos.Bottom (tfRequest) + 2, Text = "Response:" };
-        var tvResponse = new TextView { X = Pos.Right (label) + 1, Y = Pos.Top (label), Width = 30, Height = 4, ReadOnly = true };
+        var tvResponse = new TextView { X = Pos.Left (label), Y = Pos.Bottom (label), Width = 40, Height = 4, ReadOnly = true };
         appWindow.Add (label, tvResponse);
 
-        label = new Label { X = Pos.Right (tvResponse) + 1, Y = Pos.Top (tvResponse), Text = "Error:" };
-        var tvError = new TextView { X = Pos.Right (label) + 1, Y = Pos.Top (label), Width = 20, Height = 4, ReadOnly = true };
+        label = new Label { X = Pos.Right (tvResponse) + 1, Y = Pos.Top (tvResponse) - 1, Text = "Error:" };
+        var tvError = new TextView { X = Pos.Left (label), Y = Pos.Bottom (label), Width = 40, Height = 4, ReadOnly = true };
         appWindow.Add (label, tvError);
 
-        label = new Label { X = Pos.Right (tvError) + 1, Y = Pos.Top (tvError), Text = "Value:" };
-        var tvValue = new TextView { X = Pos.Right (label) + 1, Y = Pos.Top (label), Width = 6, Height = 4, ReadOnly = true };
+        label = new Label { X = Pos.Right (tvError) + 1, Y = Pos.Top (tvError) - 1, Text = "Value:" };
+        var tvValue = new TextView { X = Pos.Left (label), Y = Pos.Bottom (label), Width = 6, Height = 4, ReadOnly = true };
         appWindow.Add (label, tvValue);
 
-        label = new Label { X = Pos.Right (tvValue) + 1, Y = Pos.Top (tvValue), Text = "Terminator:" };
-        var tvTerminator = new TextView { X = Pos.Right (label) + 1, Y = Pos.Top (label), Width = 4, Height = 4, ReadOnly = true };
+        label = new Label { X = Pos.Right (tvValue) + 1, Y = Pos.Top (tvValue) - 1, Text = "Terminator:" };
+        var tvTerminator = new TextView { X = Pos.Left (label), Y = Pos.Bottom (label), Width = 4, Height = 4, ReadOnly = true };
         appWindow.Add (label, tvTerminator);
 
         var btnResponse = new Button { X = Pos.Center (), Y = Pos.Bottom (tvResponse) + 2, Text = "Send Request" };
@@ -99,7 +99,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
                                        ansiEscapeSequenceRequest
                                       );
 
-                                  tvResponse.Text =ansiEscapeSequenceResponse.Response;
+                                  tvResponse.Text = ansiEscapeSequenceResponse.Response;
                                   tvError.Text = ansiEscapeSequenceResponse.Error;
                                   tvValue.Text = ansiEscapeSequenceResponse.Value ?? "";
                                   tvTerminator.Text = ansiEscapeSequenceResponse.Terminator;
