@@ -8660,4 +8660,18 @@ line.
         Assert.True (t.Visible);
         Assert.False (t.Autocomplete.Visible);
     }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Draw_Esc_Rune ()
+    {
+        var tv = new TextView { Width = 5, Height = 1, Text = "\u001b" };
+        tv.BeginInit ();
+        tv.EndInit ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre ("\u241b", _output);
+
+        tv.Dispose ();
+    }
 }

@@ -3591,6 +3591,8 @@ public class TextView : View
                 else
                 {
                     AddRune (col, row, rune);
+                    // Ensures that cols less than 0 to be 1 because it will be converted to a printable rune
+                    cols = Math.Max (cols, 1);
                 }
 
                 if (!TextModel.SetCol (ref col, viewport.Right, cols))
@@ -3801,6 +3803,11 @@ public class TextView : View
                 if (line [idx].Rune.Value == '\t')
                 {
                     cols += TabWidth + 1;
+                }
+                else
+                {
+                    // Ensures that cols less than 0 to be 1 because it will be converted to a printable rune
+                    cols = Math.Max (cols, 1);
                 }
 
                 if (!TextModel.SetCol (ref col, Viewport.Width, cols))
