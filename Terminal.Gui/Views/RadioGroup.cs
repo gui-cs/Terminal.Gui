@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+namespace Terminal.Gui;
 
 /// <summary>Displays a group of labels each with a selected indicator. Only one of those can be selected at a given time.</summary>
 public class RadioGroup : View, IDesignable, IOrientation
@@ -82,16 +83,17 @@ public class RadioGroup : View, IDesignable, IOrientation
                             }
                         }
 
-                        SelectedItem = Cursor;
-
-                        return true;
+                        return SetSelectedItem (Cursor);
                     });
 
         AddCommand (
                     Command.Accept,
                     () =>
                     {
-                        SelectedItem = Cursor;
+                        if (!SetSelectedItem (Cursor))
+                        {
+                            return false;
+                        }
 
                         return RaiseAcceptEvent () is false;
                     }
@@ -101,14 +103,41 @@ public class RadioGroup : View, IDesignable, IOrientation
                     Command.HotKey,
                     ctx =>
                     {
-                        if (ctx.KeyBinding?.Context is { } && (int)ctx.KeyBinding?.Context! < _radioLabels.Count)
-                        {
-                            SelectedItem = (int)ctx.KeyBinding?.Context!;
+                        var item = ctx.KeyBinding?.Context as int?;
 
-                            return RaiseSelectEvent () is true or null;
+                        if (HasFocus)
+                        {
+                            if (ctx is { KeyBinding: { } } && (ctx.KeyBinding.Value.BoundView != this || HotKey == ctx.Key?.NoAlt.NoCtrl.NoShift))
+                            {
+                                // It's this.HotKey OR Another View (Label?) forwarded the hotkey command to us - Act just like `Space` (Select)
+                                return InvokeCommand (Command.Select, ctx.Key, ctx.KeyBinding);
+                            }
                         }
 
-                        return !SetFocus ();
+                        if (item is { } && item < _radioLabels.Count)
+                        {
+                            if (item.Value == SelectedItem)
+                            {
+                                return true;
+                            }
+
+                            // If a RadioItem.HotKey is pressed we always set the selected item - never SetFocus
+                            if (SetSelectedItem (item.Value))
+                            {
+                                return true;
+                            }
+
+                            return false;
+                        }
+
+                        if (SelectedItem == -1 && SetSelectedItem (0))
+                        {
+                            return true;
+                        }
+
+                        SetFocus ();
+
+                        return true;
                     });
 
         _orientationHelper = new (this);
@@ -247,12 +276,36 @@ public class RadioGroup : View, IDesignable, IOrientation
     public int SelectedItem
     {
         get => _selected;
-        set
+        set => SetSelectedItem (value);
+    }
+
+    /// <summary>
+    ///     INTERNAL Sets the selected item.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns>true if the selection changed.</returns>
+    private bool SetSelectedItem (int value)
+    {
+        if (_selected == value || value > _radioLabels.Count - 1)
         {
-            OnSelectedItemChanged (value, SelectedItem);
-            Cursor = Math.Max (_selected, 0);
-            SetNeedsDisplay ();
+            return false;
         }
+
+        if (RaiseSelectEvent () == true)
+        {
+            return false;
+        }
+
+        int savedSelected = _selected;
+        _selected = value;
+        Cursor = Math.Max (_selected, 0);
+
+        OnSelectedItemChanged (value, SelectedItem);
+        SelectedItemChanged?.Invoke (this, new (SelectedItem, savedSelected));
+
+        SetNeedsDisplay ();
+
+        return true;
     }
 
     /// <inheritdoc/>
@@ -370,16 +423,7 @@ public class RadioGroup : View, IDesignable, IOrientation
     /// <summary>Called whenever the current selected item changes. Invokes the <see cref="SelectedItemChanged"/> event.</summary>
     /// <param name="selectedItem"></param>
     /// <param name="previousSelectedItem"></param>
-    public virtual void OnSelectedItemChanged (int selectedItem, int previousSelectedItem)
-    {
-        if (_selected == selectedItem)
-        {
-            return;
-        }
-
-        _selected = selectedItem;
-        SelectedItemChanged?.Invoke (this, new (selectedItem, previousSelectedItem));
-    }
+    protected virtual void OnSelectedItemChanged (int selectedItem, int previousSelectedItem) { }
 
     /// <summary>
     ///     Gets or sets the <see cref="RadioLabels"/> index for the cursor. The cursor may or may not be the selected

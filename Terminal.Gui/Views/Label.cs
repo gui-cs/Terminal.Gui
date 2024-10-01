@@ -17,7 +17,7 @@ public class Label : View
         Width = Dim.Auto (DimAutoStyle.Text);
 
         // Things this view knows how to do
-        AddCommand (Command.HotKey, FocusNext);
+        AddCommand (Command.HotKey, context =>  InvokeHotKeyOnNext(context));
 
         TitleChanged += Label_TitleChanged;
         MouseClick += Label_MouseClick;
@@ -51,12 +51,12 @@ public class Label : View
         set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value;
     }
 
-    private bool? FocusNext ()
+    private bool? InvokeHotKeyOnNext (CommandContext context)
     {
         int me = SuperView?.Subviews.IndexOf (this) ?? -1;
         if (me != -1 && me < SuperView?.Subviews.Count - 1)
         {
-            SuperView?.Subviews [me + 1].SetFocus ();
+            SuperView?.Subviews [me + 1].InvokeCommand(Command.HotKey, context.Key, context.KeyBinding);
         }
 
         return true;

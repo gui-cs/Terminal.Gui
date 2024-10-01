@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using Xunit.Abstractions;
+// ReSharper disable AccessToModifiedClosure
 
 namespace Terminal.Gui.ViewsTests;
 
@@ -172,47 +173,99 @@ public class CheckBoxTests (ITestOutputHelper output)
     [Fact]
     public void KeyBindings_Command ()
     {
-        var toggled = false;
+        Application.Navigation = new ApplicationNavigation ();
+        Application.Top = new Toplevel ();
+        View otherView = new () { CanFocus = true };
         var ckb = new CheckBox ();
-        ckb.CheckedStateChanging += (s, e) => toggled = true;
+        Application.Top.Add (ckb, otherView);
+        Application.Top.SetFocus ();
+        Assert.True (ckb.HasFocus);
+
+        int checkedStateChangingCount = 0;
+        ckb.CheckedStateChanging += (s, e) => checkedStateChangingCount++;
+
+        int selectCount = 0;
+        ckb.Select += (s, e) => selectCount++;
+
+        int acceptCount = 0;
+        ckb.Accept += (s, e) => acceptCount++;
 
         Assert.Equal (CheckState.UnChecked, ckb.CheckedState);
-        Assert.False (toggled);
+        Assert.Equal (0, checkedStateChangingCount);
+        Assert.Equal (0, selectCount);
+        Assert.Equal (0, acceptCount);
         Assert.Equal (Key.Empty, ckb.HotKey);
 
+        // Test while focused
         ckb.Text = "_Test";
         Assert.Equal (Key.T, ckb.HotKey);
-        Assert.True (ckb.NewKeyDownEvent (Key.T));
+        ckb.NewKeyDownEvent (Key.T);
         Assert.Equal (CheckState.Checked, ckb.CheckedState);
-        Assert.True (toggled);
+        Assert.Equal (1, checkedStateChangingCount);
+        Assert.Equal (1, selectCount);
+        Assert.Equal (0, acceptCount);
 
         ckb.Text = "T_est";
-        toggled = false;
         Assert.Equal (Key.E, ckb.HotKey);
-        Assert.True (ckb.NewKeyDownEvent (Key.E.WithAlt));
-        Assert.True (toggled);
-        Assert.Equal (CheckState.UnChecked, ckb.CheckedState);
+        ckb.NewKeyDownEvent (Key.E.WithAlt);
+        Assert.Equal (2, checkedStateChangingCount);
+        Assert.Equal (2, selectCount);
+        Assert.Equal (0, acceptCount);
 
-        toggled = false;
-        Assert.Equal (Key.E, ckb.HotKey);
-        Assert.True (ckb.NewKeyDownEvent (Key.E));
-        Assert.True (toggled);
-        Assert.Equal (CheckState.Checked, ckb.CheckedState);
+        ckb.NewKeyDownEvent (Key.Space);
+        Assert.Equal (3, checkedStateChangingCount);
+        Assert.Equal (3, selectCount);
+        Assert.Equal (0, acceptCount);
 
-        toggled = false;
-        Assert.True (ckb.NewKeyDownEvent (Key.Space));
-        Assert.True (toggled);
-        Assert.Equal (CheckState.UnChecked, ckb.CheckedState);
 
-        toggled = false;
-        Assert.True (ckb.NewKeyDownEvent (Key.Space));
-        Assert.True (toggled);
-        Assert.Equal (CheckState.Checked, ckb.CheckedState);
+        ckb.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (3, checkedStateChangingCount);
+        Assert.Equal (3, selectCount);
+        Assert.Equal (1, acceptCount);
 
-        toggled = false;
-        Assert.False (ckb.NewKeyDownEvent (Key.Enter));
-        Assert.False (toggled);
-        Assert.Equal (CheckState.Checked, ckb.CheckedState);
+        //ckb.Text = "_Test";
+        //Assert.Equal (Key.T, ckb.HotKey);
+        //Assert.True (ckb.NewKeyDownEvent (Key.T));
+        //Assert.Equal (CheckState.Checked, ckb.CheckedState);
+        //Assert.True (checkedStateChangingCount);
+        //Assert.True (ckb.HasFocus);
+
+        //ckb.Text = "T_est";
+        //checkedStateChangingCount = false;
+        //Assert.Equal (Key.E, ckb.HotKey);
+        //Assert.True (ckb.NewKeyDownEvent (Key.E.WithAlt));
+        //Assert.True (checkedStateChangingCount);
+        //Assert.Equal (CheckState.UnChecked, ckb.CheckedState);
+
+        //checkedStateChangingCount = false;
+        //Assert.Equal (Key.E, ckb.HotKey);
+        //Assert.True (ckb.NewKeyDownEvent (Key.E));
+        //Assert.True (checkedStateChangingCount);
+        //Assert.Equal (CheckState.Checked, ckb.CheckedState);
+
+        //checkedStateChangingCount = false;
+        //Assert.False (ckb.NewKeyDownEvent (Key.Space));
+        //Assert.True (checkedStateChangingCount);
+        //Assert.Equal (CheckState.UnChecked, ckb.CheckedState);
+
+
+        //ckb.SetFocus ();
+        //Assert.False (ckb.NewKeyDownEvent (Key.Space));
+        //Assert.True (checkedStateChangingCount);
+        //Assert.Equal (CheckState.UnChecked, ckb.CheckedState);
+
+        //checkedStateChangingCount = false;
+        //Assert.True (ckb.NewKeyDownEvent (Key.Space));
+        //Assert.False (checkedStateChangingCount);
+        //Assert.Equal (CheckState.Checked, ckb.CheckedState);
+
+        //checkedStateChangingCount = false;
+        //Assert.False (ckb.NewKeyDownEvent (Key.Enter));
+        //Assert.False (checkedStateChangingCount);
+        //Assert.Equal (CheckState.Checked, ckb.CheckedState);
+
+        Application.Top.Dispose ();
+        Application.ResetState (false);
     }
 
     [Fact]

@@ -414,6 +414,19 @@ Same for mouse interaction:
 
 This gets really interesting when there's a View like a `Shortcut` that is a composite of several subviews. 
 
+### New Model
+
+|                |                         |            |               | **Keyboard** |                                                                                |                                                  |                                       | **Mouse**                     |                              |                               |                |               |
+|----------------|-------------------------|------------|---------------|--------------|--------------------------------------------------------------------------------|--------------------------------------------------|---------------------------------------|-------------------------------|------------------------------|-------------------------------|----------------|---------------|
+|                | **Number<br>of States** | **Static** | **IsDefault** | **Hotkeys**  | **Select<br>Command<br>`Space`**                                               | **Accept<br>Command<br>`Enter`**                 | **Hotkey<br>Command**                 | **CanFocus<br>Click**         | **CanFocus<br>DblCLick**     | **!CanFocus<br>Click**        | **RightClick** | **GrabMouse** |
+| **View**       | 1                       | Yes        | No            | 1            |                                                                                | OnAccept                                         | Focus                                 | Focus                         |                              |                               |                | No            |
+| **Label**      | 1                       | Yes        | No            | 1            |                                                                                | OnAccept                                         | FocusNext                             | Focus                         |                              | FocusNext                     |                | No            |
+| **Button**     | 1                       | No         | Yes           | 1            | Focus<br>OnAccept                                                              | Focus<br>OnAccept                                | Focus<br>OnAccept                     | Focus<br>OnAccept             |                              | OnAccept                      |                | No            |
+| **Checkbox**   | 3                       | No         | No            | 1            | AdvanceCheckState<br>OnSelect                                                  | AdvanceCheckState<br>OnAccept                    | AdvanceCheckState<br>OnAccept         | AdvanceCheckState<br>OnAccept |                              | AdvanceCheckState<br>OnAccept |                | No            |
+| **RadioGroup** | > 1                     | No         | No            | 2+           | If cursor not selected,<br>select. Else, Advance <br>selected item<br>OnSelect | Set SelectedItem<br>OnAccept                     | Focus<br>Set SelectedItem<br>OnAccept | SetFocus<br>Set _cursor       |                              | SetFocus<br>Set _cursor       |                | No            |
+| **Slider**     | > 1                     | No         | No            | 1            | SetFocusedOption<br>OnOptionsChanged                                           | SetFocusedOption<br>OnOptionsChanged<br>OnAccept | Focus                                 | SetFocus<br>SetFocusedOption  |                              | SetFocus<br>SetFocusedOption  |                | Yes           |
+| **ListView**   | > 1                     | No         | No            | 1            | MarkUnMarkRow                                                                  | OpenSelectedItem<br>OnAccept                     | OnAccept                              | SetMark<br>OnSelectedChanged  | OpenSelectedItem<br>OnAccept |                               |                | No            |
+
 ## `View` - base class
 
 ### `!HasFocus`
@@ -627,7 +640,7 @@ In v2_develop it's all kinds of confused. Here's what it SHOULD do:
 
 * `Enter` - `Command.Accept` -> Advances state to selected RadioItem and Raises `Accept` 
 * `Space` - `Command.Select` -> Advances state
-* `Title.Hotkey` - `Command.Hotkey` -> does nothing
+* `Title.Hotkey` - `Command.Hotkey` -> Advance state
 * `RadioItem.Hotkey` - `Command.Select` -> Advance State to RadioItem with hotkey.
 * `Click` - advances state to clicked RadioItem.
 * `Double Click` - Advances state to clicked RadioItem and then raises `Accept` (this is what Office does; it's pretty nice. Windows does nothing).

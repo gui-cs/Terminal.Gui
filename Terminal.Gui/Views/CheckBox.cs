@@ -1,4 +1,6 @@
 ﻿#nullable enable
+using System.Reflection.Metadata;
+
 namespace Terminal.Gui;
 
 /// <summary>Shows a check box that can be cycled between three states.</summary>
@@ -20,8 +22,13 @@ public class CheckBox : View
 
         CanFocus = true;
 
-        // Things this view knows how to do
-        AddCommand (Command.Accept, AdvanceCheckState);
+        // Select (Space key and single-click) - Advance state and raise Select event
+        AddCommand (Command.Select, AdvanceCheckState);
+
+        // Accept (Enter key and double-click) - Raise Accept event - DO NOT advance state
+        AddCommand (Command.Accept, RaiseAcceptEvent);
+
+        // Hotkey - Advance state and raise Select event - DO NOT raise Accept
         AddCommand (Command.HotKey, AdvanceCheckState);
 
         TitleChanged += Checkbox_TitleChanged;
@@ -161,15 +168,9 @@ public class CheckBox : View
             return e.Cancel;
         }
 
-        // By default, Command.Accept calls OnAccept, so we need to call it here to ensure that the Accept event is fired.
-        if (RaiseAcceptEvent () == true)
-        {
-            return true;
-        }
-
         CheckedState = e.NewValue;
 
-        return true;
+        return RaiseSelectEvent ();
     }
 
     /// <summary>Raised when the <see cref="CheckBox"/> state is changing.</summary>

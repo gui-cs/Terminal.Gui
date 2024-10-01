@@ -394,6 +394,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///         See the View Navigation Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/navigation.html"/>
     ///     </para>
     /// </remarks>
+    /// <returns><see langword="true"/> if the focus changed; <see langword="true"/> false otherwise.</returns>
     public bool SetFocus ()
     {
         (bool focusSet, bool _) = SetHasFocusTrue (Application.Navigation?.GetFocused ());

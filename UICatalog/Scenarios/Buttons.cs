@@ -220,7 +220,7 @@ public class Buttons : Scenario
         var label = new Label
         {
             X = 2, Y = Pos.Bottom (computedFrame) + 1, 
-            Text = "Text Alignment (changes the four buttons above): "
+            Text = "Text Ali_gnment (changes the four buttons above): "
         };
         main.Add (label);
 
@@ -229,7 +229,9 @@ public class Buttons : Scenario
             X = 4,
             Y = Pos.Bottom (label) + 1,
             SelectedItem = 2,
-            RadioLabels = new [] { "Start", "End", "Center", "Fill" }
+            RadioLabels = new [] { "_Start", "_End", "_Center", "_Fill" },
+            Title = "_9 RadioGroup",
+            BorderStyle = LineStyle.Dotted
         };
         main.Add (radioGroup);
 
