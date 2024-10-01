@@ -23,6 +23,8 @@ public class Images : Scenario
     private Point _screenLocationForSixel;
     private string _encodedSixelData;
     private Window _win;
+    private NumericUpDown _pxY;
+    private NumericUpDown _pxX;
 
     public override void Main ()
     {
@@ -106,15 +108,22 @@ public class Images : Scenario
 
     private void BtnStartFireOnAccept (object sender, HandledEventArgs e)
     {
-        var fire = new DoomFire (_win.Frame.Width, _win.Frame.Height);
+        
+        var fire = new DoomFire (_win.Frame.Width * _pxX.Value, _win.Frame.Height * _pxY.Value);
         var encoder = new SixelEncoder ();
         encoder.Quantizer.PaletteBuildingAlgorithm = new ConstPalette (fire.Palette);
 
+        int counter = 0;
         Application.AddTimeout (
-                                TimeSpan.FromMilliseconds (500),
+                                TimeSpan.FromMilliseconds (30),
                                 () =>
                                 {
                                     fire.AdvanceFrame ();
+                                    counter++;
+                                    if (counter % 5 != 0)
+                                    {
+                                        return true;
+                                    }
 
                                     var bmp = fire.GetFirePixels ();
 
@@ -228,11 +237,10 @@ public class Images : Scenario
             X = Pos.Right (sixelView),
             Text = "Pixels per Col:"
         };
-
-        var pxX = new NumericUpDown
+        _pxX = new NumericUpDown
         {
             X = Pos.Right (lblPxX),
-            Value = 12
+            Value = 10
         };
 
         var lblPxY = new Label
@@ -241,18 +249,17 @@ public class Images : Scenario
             Y = 1,
             Text = "Pixels per Row:"
         };
-
-        var pxY = new NumericUpDown
+        _pxY = new NumericUpDown
         {
             X = Pos.Right (lblPxY),
             Y = 1,
-            Value = 6
+            Value = 20
         };
 
         tabSixel.View.Add (lblPxX);
-        tabSixel.View.Add (pxX);
+        tabSixel.View.Add (_pxX);
         tabSixel.View.Add (lblPxY);
-        tabSixel.View.Add (pxY);
+        tabSixel.View.Add (_pxY);
 
         sixelView.DrawContent += SixelViewOnDrawContent;
 
@@ -270,8 +277,8 @@ public class Images : Scenario
                                _encodedSixelData = GenerateSixelData(
                                                                _imageView.FullResImage,
                                                                sixelView.Frame.Size,
-                                                               pxX.Value,
-                                                               pxY.Value);
+                                                               _pxX.Value,
+                                                               _pxY.Value);
 
                                // TODO: Static way of doing this, suboptimal
                                Application.Sixel.Add (new SixelToRender
@@ -733,6 +740,7 @@ public class DoomFire
     private Color [,] _firePixels;
     private static Color [] _palette;
     public Color [] Palette => _palette;
+    private Random _random = new Random ();
 
     public DoomFire (int width, int height)
     {
@@ -791,8 +799,13 @@ public class DoomFire
                 int dstY = y - 1;
 
                 // Spread fire upwards with randomness
-                int decay = new Random ().Next (0, 3);
-                int dstX = Math.Max (0, srcX - decay);
+                int decay = _random.Next (0, 2);
+                int dstX = srcX + _random.Next (-1, 2);
+
+                if (dstX < 0 || dstX >= _width) // Prevent out of bounds
+                {
+                    dstX = srcX;
+                }
 
                 // Get the fire color from below and reduce its intensity
                 Color srcColor = _firePixels [srcX, srcY];

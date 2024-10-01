@@ -53,7 +53,8 @@ public class SixelEncoder
 
         const string start = "\u001bP"; // Start sixel sequence
 
-        const string defaultRatios = "0;0;0"; // Defaults for aspect ratio and grid size
+
+            string defaultRatios = this.AnyHasAlphaOfZero(pixels) ? "0;1;0": "0;0;0"; // Defaults for aspect ratio and grid size
         const string completeStartSequence = "q"; // Signals beginning of sixel image data
         const string noScaling = "\"1;1;"; // no scaling factors (1x1);
 
@@ -146,7 +147,26 @@ public class SixelEncoder
                 code [slots [colorIndex]] |= (byte)(1 << row); // Accumulate SIXEL data
             }
 
-            // TODO: Handle fully empty rows better
+            /*
+            // If no non-transparent pixels are found in the entire column, it's fully transparent
+            if (!anyNonTransparentPixel)
+            {
+                // Emit fully transparent pixel data: #0!<width>?$
+                result.Append ($"#0!{width}?");
+
+                // Add the line terminator: use "$-" if it's not the last line, "$" if it's the last line
+                if (x < width - 1)
+                {
+                    result.Append ("$-");
+                }
+                else
+                {
+                    result.Append ("$");
+                }
+
+                // Skip to the next column as we have already handled transparency
+                continue;
+            }*/
 
             // Handle transitions between columns
             for (int j = 0; j < usedColorIdx.Count; ++j)
@@ -220,5 +240,24 @@ public class SixelEncoder
         int heightInChars = pixels.GetLength (1);
 
         return $"{widthInChars};{heightInChars}";
+    }
+    private bool AnyHasAlphaOfZero (Color [,] pixels)
+    {
+        int width = pixels.GetLength (0);
+        int height = pixels.GetLength (1);
+
+        // Loop through each pixel in the 2D array
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                // Check if the alpha component (A) is 0
+                if (pixels [x, y].A == 0)
+                {
+                    return true; // Found a pixel with A of 0
+                }
+            }
+        }
+        return false; // No pixel with A of 0 was found
     }
 }
