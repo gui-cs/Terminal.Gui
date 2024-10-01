@@ -76,7 +76,7 @@ public class AnsiEscapeSequenceRequest
 
             if (!response.ToString ().EndsWith (ansiRequest.Terminator [^1]))
             {
-                throw new InvalidOperationException ($"Terminator doesn't ends with: {ansiRequest.Terminator [^1]}");
+                throw new InvalidOperationException ($"Terminator doesn't ends with: '{ansiRequest.Terminator [^1]}'");
             }
         }
         catch (Exception ex)
@@ -109,7 +109,10 @@ public class AnsiEscapeSequenceRequest
         }
 
         AnsiEscapeSequenceResponse ansiResponse = new ()
-            { Response = response.ToString (), Error = error.ToString (), Terminator = response.ToString () [^1].ToString (), Value = values [0] };
+        {
+            Response = response.ToString (), Error = error.ToString (),
+            Terminator = string.IsNullOrEmpty (response.ToString ()) ? "" : response.ToString () [^1].ToString (), Value = values [0]
+        };
 
         // Invoke the event if it's subscribed
         ansiRequest.ResponseReceived?.Invoke (ansiRequest, ansiResponse);
