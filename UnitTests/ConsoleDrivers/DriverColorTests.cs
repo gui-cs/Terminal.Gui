@@ -60,7 +60,7 @@ public class DriverColorTests
 
     //[InlineData (typeof (ANSIDriver), true)]
     [InlineData (typeof (WindowsDriver), true)]
-    [InlineData (typeof (CursesDriver), false)]
+    [InlineData (typeof (CursesDriver), true)]
     public void SupportsTrueColor_Defaults (Type driverType, bool expectedSetting)
     {
         var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
