@@ -952,7 +952,7 @@ public class TextField : View
 
         int p = ScrollOffset;
         var col = 0;
-        int width = Frame.Width + OffSetBackground ();
+        int width = Viewport.Width + OffSetBackground ();
         int tcount = _text.Count;
         Attribute roc = GetReadOnlyColor ();
 
@@ -1140,10 +1140,10 @@ public class TextField : View
             }
 
             int cols = _text [idx].GetColumns ();
-            TextModel.SetCol (ref col, Frame.Width - 1, cols);
+            TextModel.SetCol (ref col, Viewport.Width - 1, cols);
         }
 
-        int pos = _cursorPosition - ScrollOffset + Math.Min (Frame.X, 0);
+        int pos = _cursorPosition - ScrollOffset + Math.Min (Viewport.X, 0);
         Move (pos, 0);
         return new Point (pos, 0);
     }
@@ -1225,16 +1225,16 @@ public class TextField : View
             ScrollOffset = _cursorPosition;
             need = true;
         }
-        else if (Frame.Width > 0
-                 && (ScrollOffset + _cursorPosition - (Frame.Width + offB) == 0
-                     || TextModel.DisplaySize (_text, ScrollOffset, _cursorPosition).size >= Frame.Width + offB))
+        else if (Viewport.Width > 0
+                 && (ScrollOffset + _cursorPosition - (Viewport.Width + offB) == 0
+                     || TextModel.DisplaySize (_text, ScrollOffset, _cursorPosition).size >= Viewport.Width + offB))
         {
             ScrollOffset = Math.Max (
                                      TextModel.CalculateLeftColumn (
                                                                     _text,
                                                                     ScrollOffset,
                                                                     _cursorPosition,
-                                                                    Frame.Width + offB
+                                                                    Viewport.Width + offB
                                                                    ),
                                      0
                                     );
