@@ -2470,7 +2470,6 @@ public class TextView : View
         KeyBindings.Add (Key.CursorLeft.WithCtrl.WithShift, Command.WordLeftExtend);
 
         KeyBindings.Add (Key.CursorRight.WithCtrl, Command.WordRight);
-        KeyBindings.Add (Key.F.WithAlt, Command.WordRight);
 
         KeyBindings.Add (Key.CursorRight.WithCtrl.WithShift, Command.WordRightExtend);
         KeyBindings.Add (Key.Delete.WithCtrl, Command.KillWordForwards); // kill-word-forwards
@@ -2496,6 +2495,7 @@ public class TextView : View
         KeyBindings.Add (Key.B.WithAlt, Command.WordLeft);
         KeyBindings.Add (Key.W.WithAlt, Command.Cut);
         KeyBindings.Add (Key.V.WithAlt, Command.PageUp);
+        KeyBindings.Add (Key.F.WithAlt, Command.WordRight);
 #endif
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;

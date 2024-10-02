@@ -7,7 +7,7 @@ namespace Terminal.Gui;
 #region API Docs
 
 /// <summary>
-///     View is the base class for all views on the screen and represents a visible element that can render itself and
+///     View is the base class all visible elements. View can render itself and
 ///     contains zero or more nested views, called SubViews. View provides basic functionality for layout, positioning, and
 ///     drawing. In addition, View provides keyboard and mouse event handling.
 /// </summary>
@@ -100,8 +100,7 @@ namespace Terminal.Gui;
 ///         <see cref="View"/> inheritance hierarchies to override base class layout code optimally by doing so only on
 ///         first run, instead of on every run.
 ///     </para>
-///     <para>See <see href="../docs/keyboard.md">for an overview of View keyboard handling.</see></para>
-///     ///
+///     <para>See <see href="../docs/keyboard.md"> for an overview of View keyboard handling.</see></para>
 /// </remarks>
 
 #endregion API Docs
@@ -135,6 +134,7 @@ public partial class View : Responder, ISupportInitializeNotification
     public View ()
     {
         SetupAdornments ();
+
         SetupCommands ();
 
         SetupKeyboard ();
@@ -146,7 +146,7 @@ public partial class View : Responder, ISupportInitializeNotification
     }
 
     /// <summary>
-    ///     Event called only once when the <see cref="View"/> is being initialized for the first time. Allows
+    ///     Raised once when the <see cref="View"/> is being initialized for the first time. Allows
     ///     configurations and assignments to be performed before the <see cref="View"/> being shown.
     ///     View implements <see cref="ISupportInitializeNotification"/> to allow for more sophisticated initialization.
     /// </summary>
@@ -307,10 +307,11 @@ public partial class View : Responder, ISupportInitializeNotification
         }
     }
 
-    /// <summary>Event fired when the <see cref="Enabled"/> value is being changed.</summary>
+    /// <summary>Raised when the <see cref="Enabled"/> value is being changed.</summary>
     public event EventHandler? EnabledChanged;
 
-    /// <summary>Method invoked when the <see cref="Enabled"/> property from a view is changed.</summary>
+    // TODO: Change this event to match the standard TG event model.
+    /// <summary>Invoked when the <see cref="Enabled"/> property from a view is changed.</summary>
     public virtual void OnEnabledChanged () { EnabledChanged?.Invoke (this, EventArgs.Empty); }
 
     private bool _visible = true;
@@ -381,7 +382,6 @@ public partial class View : Responder, ISupportInitializeNotification
     /// <summary>Raised when <see cref="Visible"/> has changed.</summary>
     public event EventHandler? VisibleChanged;
 
-    // TODO: This API is a hack. We should make Visible propogate automatically, no? See https://github.com/gui-cs/Terminal.Gui/issues/3703
     /// <summary>
     ///     INTERNAL Indicates whether all views up the Superview hierarchy are visible.
     /// </summary>
@@ -491,6 +491,7 @@ public partial class View : Responder, ISupportInitializeNotification
                                                   1);
     }
 
+    // TODO: Change this event to match the standard TG event model.
     /// <summary>Called when the <see cref="View.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.</summary>
     protected void OnTitleChanged () { TitleChanged?.Invoke (this, new (in _title)); }
 
@@ -508,11 +509,11 @@ public partial class View : Responder, ISupportInitializeNotification
         return args.Cancel;
     }
 
-    /// <summary>Event fired after the <see cref="View.Title"/> has been changed.</summary>
+    /// <summary>Raised after the <see cref="View.Title"/> has been changed.</summary>
     public event EventHandler<EventArgs<string>>? TitleChanged;
 
     /// <summary>
-    ///     Event fired when the <see cref="View.Title"/> is changing. Set <see cref="CancelEventArgs.Cancel"/> to `true`
+    ///     Raised when the <see cref="View.Title"/> is changing. Set <see cref="CancelEventArgs.Cancel"/> to `true`
     ///     to cancel the Title change.
     /// </summary>
     public event EventHandler<CancelEventArgs<string>>? TitleChanging;
