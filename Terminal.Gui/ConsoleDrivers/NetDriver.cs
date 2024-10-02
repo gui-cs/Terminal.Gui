@@ -1754,7 +1754,13 @@ internal class NetMainLoop : IMainLoopDriver
     {
         while (_resultQueue.Count > 0)
         {
-            ProcessInput?.Invoke (_resultQueue.Dequeue ().Value);
+            // Always dequeue even if it's null and invoke if isn't null
+            InputResult? dequeueResult = _resultQueue.Dequeue ();
+
+            if (dequeueResult is { })
+            {
+                ProcessInput?.Invoke (dequeueResult.Value);
+            }
         }
     }
 
@@ -1810,10 +1816,16 @@ internal class NetMainLoop : IMainLoopDriver
                 _resultQueue.Enqueue (_netEvents.DequeueInput ());
             }
 
-            while (_resultQueue.Count > 0 && _resultQueue.Peek () is null)
+            try
             {
-                _resultQueue.Dequeue ();
+                while (_resultQueue.Count > 0 && _resultQueue.Peek () is null)
+                {
+                    // Dequeue null values
+                    _resultQueue.Dequeue ();
+                }
             }
+            catch (InvalidOperationException) // Peek can raise an exception
+            { }
 
             if (_resultQueue.Count > 0)
             {
