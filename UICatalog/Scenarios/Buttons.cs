@@ -32,8 +32,11 @@ public class Buttons : Scenario
         // This is the default button (IsDefault = true); if user presses ENTER in the TextField
         // the scenario will quit
         var defaultButton = new Button { X = Pos.Center (), Y = Pos.AnchorEnd (), IsDefault = true, Text = "_Quit" };
-        main.Accept += (s, e) => Application.RequestStop ();
+
         main.Add (defaultButton);
+
+        // Note we handle Accept on main, not defaultButton
+        main.Accept += (s, e) => Application.RequestStop ();
 
         var swapButton = new Button
         {
@@ -50,6 +53,16 @@ public class Buttons : Scenario
                                  defaultButton.IsDefault = !defaultButton.IsDefault;
                                  swapButton.IsDefault = !swapButton.IsDefault;
                              };
+
+        defaultButton.Accept += (s, e) =>
+                                {
+                                    e.Handled = !defaultButton.IsDefault;
+
+                                    if (e.Handled)
+                                    {
+                                        MessageBox.ErrorQuery ("Error", "This button is no longer the Quit button; the Swap Default button is.", "_Ok");
+                                    }
+                                };
         main.Add (swapButton);
 
         static void DoMessage (Button button, string txt)

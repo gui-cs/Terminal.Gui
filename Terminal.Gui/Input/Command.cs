@@ -4,7 +4,7 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     Actions which can be performed by a <see cref="View"/>. Commands are typically bound to keys via
+///     Actions which can be performed by a <see cref="View"/>. Commands are typically invoked via
 ///     <see cref="View.KeyBindings"/> and mouse events.
 ///     See also <see cref="View.InvokeCommand"/>.
 /// </summary>
@@ -17,13 +17,15 @@ public enum Command
     ///     <para>
     ///         The default implementation in <see cref="View"/> calls <see cref="View.RaiseAcceptEvent"/> which raises the
     ///         <see cref="View.Accept"/> event. If the event is not handled,
-    ///         the command is invoked on <see cref="View.SuperView"/>. This enables default Accept behavior.
+    ///         the command is invoked on
+    ///             - Any peer-view that is a <see cref="Button"/> with <see cref="Button.IsDefault"/> set to <see langword="true"/>.
+    ///             - The <see cref="View.SuperView"/>. This enables default Accept behavior.
     ///     </para>
     /// </summary>
     Accept,
 
     /// <summary>
-    ///     Performs a hotkey action (e.g. setting focus, accepting, and/or moving focus to the next View).
+    ///     Performs a hot key action (e.g. setting focus, accepting, and/or moving focus to the next View).
     ///     <para>
     ///         The default implementation in <see cref="View"/> calls <see cref="View.SetFocus"/> and then
     ///         <see cref="View.RaiseHotKeyCommandEvent"/> which raises the
