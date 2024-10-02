@@ -746,7 +746,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (2, selectedItemChanged);
         Assert.Equal (2, selectCount);
         Assert.Equal (4, acceptCount);
-        Assert.Equal (2, superViewAcceptCount);
+        Assert.Equal (3, superViewAcceptCount); // Accept bubbles up to superview
 
         radioGroup.DoubleClickAccepts = false;
         Assert.False (radioGroup.NewMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1DoubleClicked }));

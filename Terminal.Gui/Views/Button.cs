@@ -150,15 +150,23 @@ public class Button : View, IDesignable
     }
 
     /// <summary>
-    ///     Gets or sets whether the <see cref="Button"/> will invoke the <see cref="Command.Accept"/>
-    ///     command on the <see cref="View.SuperView"/> if <see cref="View.Accept"/> is not handled by a subscriber.
+    ///     Gets or sets whether the <see cref="Button"/> will show an indicator indicating it is the default Button. If <see langword="true"/>
+    ///     <see cref="Command.Accept"/> will be invoked when the user presses <c>Enter</c> and no other peer-<see cref="View"/> processes the key.
+    ///     If <see cref="View.Accept"/> is not handled, the Gets or sets whether the <see cref="Button"/> will show an indicator indicating it is the default Button. If <see langword="true"/>
+    ///     <see cref="Command.Accept"/> command on the <see cref="View.SuperView"/> will be invoked.
     /// </summary>
     public bool IsDefault
     {
         get => _isDefault;
         set
         {
+            if (_isDefault == value)
+            {
+                return;
+            }
+
             _isDefault = value;
+
             UpdateTextFormatterText ();
             OnResizeNeeded ();
         }

@@ -232,7 +232,7 @@ public class Buttons : Scenario
             RadioLabels = new [] { "_Start", "_End", "_Center", "_Fill" },
             Title = "_9 RadioGroup",
             BorderStyle = LineStyle.Dotted,
-            CanFocus = false
+           // CanFocus = false
         };
         main.Add (radioGroup);
 
