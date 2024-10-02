@@ -1,7 +1,7 @@
 ﻿#nullable enable
 namespace Terminal.Gui;
 
-/// <summary>Displays a group of labels each with a selected indicator. Only one of those can be selected at a given time.</summary>
+/// <summary>Displays a group of labels with an idicator of which one is selected.</summary>
 public class RadioGroup : View, IDesignable, IOrientation
 {
     /// <summary>
@@ -176,7 +176,8 @@ public class RadioGroup : View, IDesignable, IOrientation
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         If <see langword="false"/> and Accept is not handled, the Accept event on the <see cref="View.SuperView"/> will be raised. The default is
+    ///         If <see langword="false"/> and Accept is not handled, the Accept event on the <see cref="View.SuperView"/> will
+    ///         be raised. The default is
     ///         <see langword="true"/>.
     ///     </para>
     /// </remarks>
@@ -229,7 +230,6 @@ public class RadioGroup : View, IDesignable, IOrientation
         }
     }
 
-
     private List<(int pos, int length)>? _horizontal;
     private int _horizontalSpace = 2;
 
@@ -254,7 +254,8 @@ public class RadioGroup : View, IDesignable, IOrientation
     private List<string> _radioLabels = [];
 
     /// <summary>
-    ///     The radio labels to display. A key binding will be added for each radio enabling the user to select
+    ///     The radio labels to display. A <see cref="Command.HotKey"/> key binding will be added for each label enabling the
+    ///     user to select
     ///     and/or focus the radio label using the keyboard. See <see cref="View.HotKey"/> for details on how HotKeys work.
     /// </summary>
     /// <value>The radio labels.</value>
@@ -292,8 +293,8 @@ public class RadioGroup : View, IDesignable, IOrientation
 
     private int _selected;
 
-    /// <summary>The currently selected item from the list of radio labels</summary>
-    /// <value>The selected.</value>
+    /// <summary>Gets or sets the selected radio label index.</summary>
+    /// <value>The index. -1 if no item is selected.</value>
     public int SelectedItem
     {
         get => _selected;
@@ -304,7 +305,10 @@ public class RadioGroup : View, IDesignable, IOrientation
     ///     INTERNAL Sets the selected item.
     /// </summary>
     /// <param name="value"></param>
-    /// <returns><see langword="true"/> if state change was canceled, <see langword="false"/> if the state changed, and <see langword="null"/> if the state was not changed for some other reason.</returns>
+    /// <returns>
+    ///     <see langword="true"/> if state change was canceled, <see langword="false"/> if the state changed, and
+    ///     <see langword="null"/> if the state was not changed for some other reason.
+    /// </returns>
     private bool? ChangeSelectedItem (int value)
     {
         if (_selected == value || value > _radioLabels.Count - 1)
@@ -440,7 +444,7 @@ public class RadioGroup : View, IDesignable, IOrientation
 
     #endregion IOrientation
 
-    // TODO: This should be cancelable
+    // TODO: Add a SelectedItemChanging event like CheckBox has.
     /// <summary>Called whenever the current selected item changes. Invokes the <see cref="SelectedItemChanged"/> event.</summary>
     /// <param name="selectedItem"></param>
     /// <param name="previousSelectedItem"></param>
@@ -486,11 +490,7 @@ public class RadioGroup : View, IDesignable, IOrientation
         return null; // Don't show the cursor
     }
 
-    /// <summary>Allow to invoke the <see cref="SelectedItemChanged"/> after their creation.</summary>
-    public void Refresh () { OnSelectedItemChanged (_selected, -1); }
-
-    // TODO: This should use StateEventArgs<int> and should be cancelable.
-    /// <summary>Invoked when the selected radio label has changed.</summary>
+    /// <summary>Raised when the selected radio label has changed.</summary>
     public event EventHandler<SelectedItemChangedArgs>? SelectedItemChanged;
 
     private bool MoveDownRight ()
@@ -508,6 +508,7 @@ public class RadioGroup : View, IDesignable, IOrientation
     }
 
     private void MoveEnd () { Cursor = Math.Max (_radioLabels.Count - 1, 0); }
+
     private void MoveHome () { Cursor = 0; }
 
     private bool MoveUpLeft ()

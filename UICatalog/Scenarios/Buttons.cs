@@ -425,10 +425,6 @@ public class Buttons : Scenario
 
         main.Add (decNumericUpDown);
 
-        main.Ready += (s, e) =>
-                      {
-                          radioGroup.Refresh ();
-                      };
         Application.Run (main);
         main.Dispose ();
         Application.Shutdown ();
