@@ -48,9 +48,23 @@ public partial class View // Command APIs
             Accept?.Invoke (this, args);
         }
 
-        // Accept is a special case where if the event is not canceled, the event is bubbled up the SuperView hierarchy.
+        // Accept is a special case where if the event is not canceled, the event is
+        //  - Invoked on any peer-View with IsDefault == true
+        //  - bubbled up the SuperView hierarchy.
         if (!args.Handled)
         {
+            // If there's an IsDefault peer view in Subviews, try it
+            var isDefaultView = SuperView?.Subviews.FirstOrDefault (v => v is Button { IsDefault: true });
+
+            if (isDefaultView != this && isDefaultView is Button { IsDefault: true } button)
+            {
+                bool? handled = isDefaultView.InvokeCommand (Command.Accept);
+                if (handled == true)
+                {
+                    return true;
+                }
+            }
+
             return SuperView?.InvokeCommand (Command.Accept) == true;
         }
 

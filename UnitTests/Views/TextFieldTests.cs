@@ -792,14 +792,22 @@ public class TextFieldTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData (false, 0)]
-    [InlineData (true, 1)]
+    [InlineData (false, 1)]
+    [InlineData (true, 0)]
     public void Accept_Handler_Handled_Prevents_Default_Button_Accept (bool handleAccept, int expectedButtonAccepts)
     {
-        var superView = new Window ();
-        var tf = new TextField ();
+        var superView = new Window ()
+        {
+            Id = "superView"
+        };
+
+        var tf = new TextField ()
+        {
+            Id = "tf"
+        };
         var button = new Button ()
         {
+            Id = "button",
             IsDefault = true,
         };
 
@@ -840,10 +848,18 @@ public class TextFieldTests (ITestOutputHelper output)
     [Fact]
     public void Accept_No_Handler_Enables_Default_Button_Accept ()
     {
-        var superView = new Window ();
-        var tf = new TextField ();
+        var superView = new Window ()
+        {
+            Id = "superView"
+        };
+
+        var tf = new TextField ()
+        {
+            Id = "tf"
+        };
         var button = new Button ()
         {
+            Id="button",
             IsDefault = true,
         };
 
@@ -883,13 +899,13 @@ public class TextFieldTests (ITestOutputHelper output)
         var tfAcceptedInvoked = false;
         var handle = false;
         view.Accept += TextViewAccept;
-        Assert.True (view.InvokeCommand (Command.Accept));
+        Assert.False (view.InvokeCommand (Command.Accept));
         Assert.True (tfAcceptedInvoked);
 
         tfAcceptedInvoked = false;
         handle = true;
         view.Accept += TextViewAccept;
-        Assert.False (view.InvokeCommand (Command.Accept));
+        Assert.True (view.InvokeCommand (Command.Accept));
         Assert.True (tfAcceptedInvoked);
 
         return;
