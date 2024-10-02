@@ -82,18 +82,6 @@ public class Shortcuts : Scenario
                                                                         eventLog.MoveDown ();
                                                                     };
 
-        vShortcut2.Accept += (o, args) =>
-                            {
-                                // Cycle to next item. If at end, set 0
-                                if (((RadioGroup)vShortcut2.CommandView).SelectedItem < ((RadioGroup)vShortcut2.CommandView).RadioLabels.Length - 1)
-                                {
-                                    ((RadioGroup)vShortcut2.CommandView).SelectedItem++;
-                                }
-                                else
-                                {
-                                    ((RadioGroup)vShortcut2.CommandView).SelectedItem = 0;
-                                }
-                            };
         Application.Top.Add (vShortcut2);
 
         var vShortcut3 = new Shortcut
@@ -150,7 +138,7 @@ public class Shortcuts : Scenario
             KeyBindingScope = KeyBindingScope.HotKey,
         };
         Button button = (Button)vShortcut4.CommandView;
-        vShortcut4.CommandView.Accept += Button_Clicked;
+        vShortcut4.Accept += Button_Clicked;
 
         Application.Top.Add (vShortcut4);
 
@@ -358,16 +346,29 @@ public class Shortcuts : Scenario
         {
             if (sh is Shortcut shortcut)
             {
-                shortcut.Accept += (o, args) =>
+                shortcut.Select += (o, args) =>
                                    {
-                                       eventSource.Add ($"Accept: {shortcut!.CommandView.Text}");
+                                       eventSource.Add ($"Select: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
                                        eventLog.MoveDown ();
                                        args.Handled = true;
                                    };
 
+                shortcut.CommandView.Select += (o, args) =>
+                                               {
+                                                   eventSource.Add ($"CommandView.Select: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
+                                                   eventLog.MoveDown ();
+                                               };
+
+                shortcut.Accept += (o, args) =>
+                                       {
+                                           eventSource.Add ($"Accept: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
+                                           eventLog.MoveDown ();
+                                           args.Handled = true;
+                                       };
+
                 shortcut.CommandView.Accept += (o, args) =>
                                                {
-                                                   eventSource.Add ($"CommandView.Accept: {shortcut!.CommandView.Text}");
+                                                   eventSource.Add ($"CommandView.Accept: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
                                                    eventLog.MoveDown ();
                                                };
             }
@@ -378,7 +379,7 @@ public class Shortcuts : Scenario
 
     private void Button_Clicked (object sender, HandledEventArgs e)
     {
-        //e.Cancel = true;
+        e.Handled = true;
         MessageBox.Query ("Hi", $"You clicked {sender}");
     }
 }

@@ -247,9 +247,9 @@ public class DynamicMenuBar : Scenario
                                          }
                                      };
 
-            CkbSubMenu.CheckedStateChanging += (s, e) =>
+            CkbSubMenu.CheckedStateChanged += (s, e) =>
                                   {
-                                      if (e.NewValue == CheckState.Checked)
+                                      if (e.CurrentValue == CheckState.Checked)
                                       {
                                           CkbIsTopLevel.CheckedState = CheckState.UnChecked;
                                           CkbIsTopLevel.SetNeedsDisplay ();
@@ -275,16 +275,16 @@ public class DynamicMenuBar : Scenario
                                           if (_hasParent)
                                           {
                                               TextShortcutKey.Enabled = CkbIsTopLevel.CheckedState == CheckState.UnChecked
-                                                                     && e.NewValue == CheckState.UnChecked;
+                                                                     && e.CurrentValue == CheckState.UnChecked;
                                           }
                                       }
                                   };
 
-            CkbNullCheck.CheckedStateChanging += (s, e) =>
+            CkbNullCheck.CheckedStateChanged += (s, e) =>
                                     {
                                         if (_menuItem != null)
                                         {
-                                            _menuItem.AllowNullChecked = e.NewValue == CheckState.Checked;
+                                            _menuItem.AllowNullChecked = e.CurrentValue == CheckState.Checked;
                                         }
                                     };
 

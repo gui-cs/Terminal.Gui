@@ -153,6 +153,12 @@ public class CheckBox : View
         }
 
         CancelEventArgs<CheckState> e = new (in _checkedState, ref value);
+
+        if (OnCheckedStateChanging (e))
+        {
+            return true;
+        }
+
         CheckedStateChanging?.Invoke (this, e);
         if (e.Cancel)
         {
@@ -163,8 +169,35 @@ public class CheckBox : View
         UpdateTextFormatterText ();
         OnResizeNeeded ();
 
+        EventArgs<CheckState> args = new (in _checkedState);
+        OnCheckedStateChanged (args);
+
+        CheckedStateChanged?.Invoke (this, args);
+
         return false;
     }
+
+    /// <summary>Called when the <see cref="CheckBox"/> state is changing.</summary>
+    /// <remarks>
+    /// <para>
+    ///    The state cahnge can be cancelled by setting the args.Cancel to <see langword="true"/>.
+    /// </para>
+    /// </remarks>
+    protected virtual bool OnCheckedStateChanging (CancelEventArgs<CheckState> args) { return false;}
+
+    /// <summary>Raised when the <see cref="CheckBox"/> state is changing.</summary>
+    /// <remarks>
+    /// <para>
+    ///    This event can be cancelled. If cancelled, the <see cref="CheckBox"/> will not change its state.
+    /// </para>
+    /// </remarks>
+    public event EventHandler<CancelEventArgs<CheckState>>? CheckedStateChanging;
+
+    /// <summary>Called when the <see cref="CheckBox"/> state has changed.</summary>
+    protected virtual void OnCheckedStateChanged (EventArgs<CheckState> args) { }
+
+    /// <summary>Raised when the <see cref="CheckBox"/> state has changed.</summary>
+    public event EventHandler<EventArgs<CheckState>>? CheckedStateChanged;
 
     /// <summary>
     ///     Advances <see cref="CheckedState"/> to the next value. Invokes the cancelable <see cref="CheckedStateChanging"/> event.
@@ -210,14 +243,6 @@ public class CheckBox : View
 
         return !cancelled;
     }
-
-    /// <summary>Raised when the <see cref="CheckBox"/> state is changing.</summary>
-    /// <remarks>
-    /// <para>
-    ///    This event can be cancelled. If cancelled, the <see cref="CheckBox"/> will not change its state.
-    /// </para>
-    /// </remarks>
-    public event EventHandler<CancelEventArgs<CheckState>>? CheckedStateChanging;
 
     /// <inheritdoc/>
     protected override void UpdateTextFormatterText ()

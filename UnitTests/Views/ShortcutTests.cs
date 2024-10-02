@@ -379,18 +379,18 @@ public class ShortcutTests
     //  0123456789
     // " C  0  A "
     [InlineData (-1, 0, 0)]
-    [InlineData (0, 1, 1)]
-    [InlineData (1, 1, 1, Skip = "BUGBUG: This breaks. We need to fix the logic in the Shortcut class.")]
-    [InlineData (2, 1, 1)]
-    [InlineData (3, 1, 1)]
-    [InlineData (4, 1, 1)]
-    [InlineData (5, 1, 1)]
-    [InlineData (6, 1, 1)]
-    [InlineData (7, 1, 1)]
-    [InlineData (8, 1, 1)]
+    [InlineData (0, 1, 0)]
+    [InlineData (1, 1, 1)]
+    [InlineData (2, 1, 0)]
+    [InlineData (3, 1, 0)]
+    [InlineData (4, 1, 0)]
+    [InlineData (5, 1, 0)]
+    [InlineData (6, 1, 0)]
+    [InlineData (7, 1, 0)]
+    [InlineData (8, 1, 0)]
     [InlineData (9, 0, 0)]
     [AutoInitShutdown]
-    public void MouseClick_Button_CommandView_Fires_Accept (int x, int expectedAccept, int expectedButtonAccept)
+    public void MouseClick_Button_CommandView_Fires_Shortcut_Accept (int mouseX, int expectedAccept, int expectedButtonAccept)
     {
         var current = new Toplevel ();
 
@@ -404,10 +404,15 @@ public class ShortcutTests
         {
             Title = "C",
             NoDecorations = true,
-            NoPadding = true
+            NoPadding = true,
+            CanFocus = false
         };
         var buttonAccepted = 0;
-        shortcut.CommandView.Accept += (s, e) => { buttonAccepted++; };
+        shortcut.CommandView.Accept += (s, e) => {
+                                           buttonAccepted++;
+                                           // Must indicate handled
+                                           e.Handled = true;
+                                       };
         current.Add (shortcut);
 
         Application.Begin (current);
@@ -420,12 +425,12 @@ public class ShortcutTests
         Application.OnMouseEvent (
                                   new ()
                                   {
-                                      Position = new (x, 0),
+                                      Position = new (mouseX, 0),
                                       Flags = MouseFlags.Button1Clicked
                                   });
 
-        Assert.Equal (expectedAccept, accepted);
         Assert.Equal (expectedButtonAccept, buttonAccepted);
+        Assert.Equal (expectedAccept, accepted);
 
         current.Dispose ();
     }
