@@ -2411,7 +2411,6 @@ public class TextView : View
         KeyBindings.Add (Key.PageDown.WithShift, Command.PageDownExtend);
 
         KeyBindings.Add (Key.PageUp, Command.PageUp);
-        KeyBindings.Add (Key.V.WithAlt, Command.PageUp);
 
         KeyBindings.Add (Key.PageUp.WithShift, Command.PageUpExtend);
 
@@ -2461,15 +2460,12 @@ public class TextView : View
         KeyBindings.Add (Key.Y.WithCtrl, Command.Paste); // Control-y, yank
         KeyBindings.Add (Key.Space.WithCtrl, Command.ToggleExtend);
 
-        KeyBindings.Add (Key.C.WithAlt, Command.Copy);
         KeyBindings.Add (Key.C.WithCtrl, Command.Copy);
 
-        KeyBindings.Add (Key.W.WithAlt, Command.Cut);
         KeyBindings.Add (Key.W.WithCtrl, Command.Cut);
         KeyBindings.Add (Key.X.WithCtrl, Command.Cut);
 
         KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.WordLeft);
-        KeyBindings.Add (Key.B.WithAlt, Command.WordLeft);
 
         KeyBindings.Add (Key.CursorLeft.WithCtrl.WithShift, Command.WordLeftExtend);
 
@@ -2494,6 +2490,13 @@ public class TextView : View
 
         KeyBindings.Add (Key.G.WithCtrl, Command.DeleteAll);
         KeyBindings.Add (Key.D.WithCtrl.WithShift, Command.DeleteAll);
+
+#if UNIX_KEY_BINDINGS
+        KeyBindings.Add (Key.C.WithAlt, Command.Copy);
+        KeyBindings.Add (Key.B.WithAlt, Command.WordLeft);
+        KeyBindings.Add (Key.W.WithAlt, Command.Cut);
+        KeyBindings.Add (Key.V.WithAlt, Command.PageUp);
+#endif
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
 
