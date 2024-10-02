@@ -4900,7 +4900,7 @@ This is the second line.
         Assert.True (tv.NewKeyDownEvent (Key.PageUp));
         Assert.Equal (24, tv.GetCurrentLine ().Count);
         Assert.Equal (new Point (24, 1), tv.CursorPosition);
-        Assert.True (tv.NewKeyDownEvent (new Key (Key.V.WithAlt)));
+        Assert.True (tv.NewKeyDownEvent (new Key (Key.PageUp)));
         Assert.Equal (23, tv.GetCurrentLine ().Count);
         Assert.Equal (new Point (23, 0), tv.CursorPosition);
         Assert.True (tv.NewKeyDownEvent (Key.PageDown));
@@ -5092,7 +5092,7 @@ This is the second line.
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
         Assert.Equal ("is is the first lin", Clipboard.Contents);
-        Assert.True (tv.NewKeyDownEvent (Key.K.WithAlt));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace.WithCtrl.WithShift));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
@@ -5151,7 +5151,7 @@ This is the second line.
         Assert.Equal (19, tv.SelectionStartColumn);
         Assert.Equal (0, tv.SelectionStartRow);
         tv.SelectionStartColumn = 0;
-        Assert.True (tv.NewKeyDownEvent (new Key (Key.C.WithAlt)));
+        Assert.True (tv.NewKeyDownEvent (Key.C.WithCtrl));
 
         Assert.Equal (
                       $"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
@@ -5175,7 +5175,7 @@ This is the second line.
         Assert.True (tv.Selecting);
         Assert.Equal (0, tv.SelectionStartColumn);
         Assert.Equal (0, tv.SelectionStartRow);
-        Assert.True (tv.NewKeyDownEvent (new Key (Key.W.WithAlt)));
+        Assert.True (tv.NewKeyDownEvent (Key.X.WithCtrl));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
@@ -5244,7 +5244,7 @@ This is the second line.
         Assert.Equal (6, tv.SelectedLength);
         Assert.Equal ("third ", tv.SelectedText);
         Assert.True (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (Key.B.WithAlt)));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorLeft.WithCtrl));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
@@ -5274,7 +5274,7 @@ This is the second line.
         Assert.Equal (6, tv.SelectedLength);
         Assert.Equal ("third ", tv.SelectedText);
         Assert.True (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (Key.F.WithAlt)));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight.WithCtrl));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
@@ -5284,7 +5284,7 @@ This is the second line.
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (Key.F.WithAlt)));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight.WithCtrl));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",
@@ -5294,7 +5294,7 @@ This is the second line.
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (new Key (Key.F.WithAlt)));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight.WithCtrl));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first",

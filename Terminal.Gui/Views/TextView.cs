@@ -2453,8 +2453,6 @@ public class TextView : View
 
         KeyBindings.Add (Key.Delete.WithCtrl.WithShift, Command.CutToEndLine); // kill-to-end
 
-        KeyBindings.Add (Key.K.WithAlt, Command.CutToStartLine); // kill-to-start
-
         KeyBindings.Add (Key.Backspace.WithCtrl.WithShift, Command.CutToStartLine); // kill-to-start
 
         KeyBindings.Add (Key.Y.WithCtrl, Command.Paste); // Control-y, yank
@@ -2496,6 +2494,8 @@ public class TextView : View
         KeyBindings.Add (Key.W.WithAlt, Command.Cut);
         KeyBindings.Add (Key.V.WithAlt, Command.PageUp);
         KeyBindings.Add (Key.F.WithAlt, Command.WordRight);
+        KeyBindings.Add (Key.K.WithAlt, Command.CutToStartLine); // kill-to-start
+
 #endif
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
