@@ -254,7 +254,7 @@ This an long line and against TextView.",
 
         ac.GenerateSuggestions (
                                 new (
-                                     TextModel.ToRuneCellList (tv.Text),
+                                     RuneCell.ToRuneCellList (tv.Text),
                                      2
                                     )
                                );

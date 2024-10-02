@@ -546,7 +546,7 @@ public class TextField : View
             if (!Secret && !_historyText.IsFromHistory)
             {
                 _historyText.Add (
-                                  new List<List<RuneCell>> { TextModel.ToRuneCellList (oldText) },
+                                  new List<List<RuneCell>> { RuneCell.ToRuneCellList (oldText) },
                                   new Point (_cursorPosition, 0)
                                  );
 
@@ -1342,7 +1342,7 @@ public class TextField : View
 
     private void GenerateSuggestions ()
     {
-        List<RuneCell> currentLine = TextModel.ToRuneCellList (Text);
+        List<RuneCell> currentLine = RuneCell.ToRuneCellList (Text);
         int cursorPosition = Math.Min (CursorPosition, currentLine.Count);
 
         Autocomplete.Context = new AutocompleteContext (

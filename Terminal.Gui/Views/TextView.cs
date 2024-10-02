@@ -42,6 +42,22 @@ public class RuneCell : IEquatable<RuneCell>
 
         return $"U+{Rune.Value:X4} '{Rune.ToString ()}'; {colorSchemeStr}";
     }
+
+    /// <summary>Converts the string into a <see cref="List{RuneCell}"/>.</summary>
+    /// <param name="str">The string to convert.</param>
+    /// <param name="colorScheme">The <see cref="Gui.ColorScheme"/> to use.</param>
+    /// <returns></returns>
+    public static List<RuneCell> ToRuneCellList (string str, ColorScheme? colorScheme = null)
+    {
+        List<RuneCell> cells = new ();
+
+        foreach (Rune rune in str.EnumerateRunes ())
+        {
+            cells.Add (new () { Rune = rune, ColorScheme = colorScheme });
+        }
+
+        return cells;
+    }
 }
 
 internal class TextModel
@@ -231,22 +247,6 @@ internal class TextModel
                                       .ToList ();
 
         return SplitNewLines (cells);
-    }
-
-    /// <summary>Converts the string into a <see cref="List{RuneCell}"/>.</summary>
-    /// <param name="str">The string to convert.</param>
-    /// <param name="colorScheme">The <see cref="ColorScheme"/> to use.</param>
-    /// <returns></returns>
-    public static List<RuneCell> ToRuneCellList (string str, ColorScheme? colorScheme = null)
-    {
-        List<RuneCell> cells = new ();
-
-        foreach (Rune rune in str.EnumerateRunes ())
-        {
-            cells.Add (new () { Rune = rune, ColorScheme = colorScheme });
-        }
-
-        return cells;
     }
 
     public override string ToString ()
@@ -855,7 +855,7 @@ internal class TextModel
                         found = true;
                     }
 
-                    _lines [i] = ToRuneCellList (ReplaceText (x, textToReplace!, matchText, col));
+                    _lines [i] = RuneCell.ToRuneCellList (ReplaceText (x, textToReplace!, matchText, col));
                     x = _lines [i];
                     txt = GetText (x);
                     pos = new (col, i);
@@ -1706,7 +1706,7 @@ internal class WordWrapManager
 
         foreach (string text in textList)
         {
-            runesList.Add (TextModel.ToRuneCellList (text));
+            runesList.Add (RuneCell.ToRuneCellList (text));
         }
 
         return runesList;
@@ -3715,7 +3715,7 @@ public class TextView : View
 
         if (_copyWithoutSelection && contents.FirstOrDefault (x => x == '\n' || x == '\r') == 0)
         {
-            List<RuneCell> runeList = contents is null ? new () : TextModel.ToRuneCellList (contents);
+            List<RuneCell> runeList = contents is null ? new () : RuneCell.ToRuneCellList (contents);
             List<RuneCell> currentLine = GetCurrentLine ();
 
             _historyText.Add (new () { new (currentLine) }, CursorPosition);

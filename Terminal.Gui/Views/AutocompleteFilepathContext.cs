@@ -6,7 +6,7 @@ namespace Terminal.Gui;
 internal class AutocompleteFilepathContext : AutocompleteContext
 {
     public AutocompleteFilepathContext (string currentLine, int cursorPosition, FileDialogState state)
-        : base (TextModel.ToRuneCellList (currentLine), cursorPosition)
+        : base (RuneCell.ToRuneCellList (currentLine), cursorPosition)
     {
         State = state;
     }
