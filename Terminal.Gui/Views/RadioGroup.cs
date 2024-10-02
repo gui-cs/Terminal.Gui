@@ -83,16 +83,16 @@ public class RadioGroup : View, IDesignable, IOrientation
                             }
                         }
 
-                        return SetSelectedItem (Cursor);
+                        return ChangeSelectedItem (Cursor);
                     });
 
         AddCommand (
                     Command.Accept,
                     () =>
                     {
-                        if (!SetSelectedItem (Cursor))
+                        if (ChangeSelectedItem (Cursor) == true)
                         {
-                            return false;
+                            return true;
                         }
 
                         return RaiseAcceptEvent () is false;
@@ -122,7 +122,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                             }
 
                             // If a RadioItem.HotKey is pressed we always set the selected item - never SetFocus
-                            if (SetSelectedItem (item.Value))
+                            if (ChangeSelectedItem (item.Value) == true)
                             {
                                 return true;
                             }
@@ -130,7 +130,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                             return false;
                         }
 
-                        if (SelectedItem == -1 && SetSelectedItem (0))
+                        if (SelectedItem == -1 && ChangeSelectedItem (0) == true)
                         {
                             return true;
                         }
@@ -276,24 +276,24 @@ public class RadioGroup : View, IDesignable, IOrientation
     public int SelectedItem
     {
         get => _selected;
-        set => SetSelectedItem (value);
+        set => ChangeSelectedItem (value);
     }
 
     /// <summary>
     ///     INTERNAL Sets the selected item.
     /// </summary>
     /// <param name="value"></param>
-    /// <returns>true if the selection changed.</returns>
-    private bool SetSelectedItem (int value)
+    /// <returns><see langword="true"/> if state change was canceled, <see langword="false"/> if the state changed, and <see langword="null"/> if the state was not changed for some other reason.</returns>
+    private bool? ChangeSelectedItem (int value)
     {
         if (_selected == value || value > _radioLabels.Count - 1)
         {
-            return false;
+            return null;
         }
 
         if (RaiseSelectEvent () == true)
         {
-            return false;
+            return true;
         }
 
         int savedSelected = _selected;
@@ -305,7 +305,7 @@ public class RadioGroup : View, IDesignable, IOrientation
 
         SetNeedsDisplay ();
 
-        return true;
+        return false;
     }
 
     /// <inheritdoc/>

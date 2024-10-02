@@ -107,25 +107,43 @@ public class CheckBox : View
     public CheckState CheckedState
     {
         get => _checkedState;
-        set
-        {
-            if (_checkedState == value || (value is CheckState.None && !AllowCheckStateNone))
-            {
-                return;
-            }
+        set => ChangeCheckedState (value);
+    }
 
-            _checkedState = value;
-            UpdateTextFormatterText ();
-            OnResizeNeeded ();
+    /// <summary>
+    ///     INTERNAL Sets CheckedState.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns><see langword="true"/> if state change was canceled, <see langword="false"/> if the state changed, and <see langword="null"/> if the state was not changed for some other reason.</returns>
+    private bool? ChangeCheckedState (CheckState value)
+    {
+        if (_checkedState == value || (value is CheckState.None && !AllowCheckStateNone))
+        {
+            return null;
         }
+
+        if (RaiseSelectEvent () == true)
+        {
+            return true;
+        }
+
+        CancelEventArgs<CheckState> e = new (in _checkedState, ref value);
+        CheckedStateChanging?.Invoke (this, e);
+        if (e.Cancel)
+        {
+            return e.Cancel;
+        }
+
+        _checkedState = value;
+        UpdateTextFormatterText ();
+        OnResizeNeeded ();
+
+        return false;
     }
 
     /// <summary>
     ///     Advances <see cref="CheckedState"/> to the next value. Invokes the cancelable <see cref="CheckedStateChanging"/> event.
     /// </summary>
-    /// <remarks>
-    /// </remarks>
-    /// <returns>If <see langword="true"/> the <see cref="CheckedStateChanging"/> event was canceled.</returns>
     /// <remarks>
     /// <para>
     ///     Cycles through the states <see cref="CheckState.None"/>, <see cref="CheckState.Checked"/>, and <see cref="CheckState.UnChecked"/>.
@@ -134,6 +152,7 @@ public class CheckBox : View
     ///     If the <see cref="CheckedStateChanging"/> event is not canceled, the <see cref="CheckedState"/> will be updated and the <see cref="Command.Accept"/> event will be raised.
     /// </para>
     /// </remarks>
+    /// <returns><see langword="true"/> if state change was canceled, <see langword="false"/> if the state changed, and <see langword="null"/> if the state was not changed for some other reason.</returns>
     public bool? AdvanceCheckState ()
     {
         CheckState oldValue = CheckedState;
@@ -162,15 +181,9 @@ public class CheckBox : View
                 break;
         }
 
-        CheckedStateChanging?.Invoke (this, e);
-        if (e.Cancel)
-        {
-            return e.Cancel;
-        }
+        bool? cancelled = ChangeCheckedState (e.NewValue);
 
-        CheckedState = e.NewValue;
-
-        return RaiseSelectEvent ();
+        return !cancelled;
     }
 
     /// <summary>Raised when the <see cref="CheckBox"/> state is changing.</summary>

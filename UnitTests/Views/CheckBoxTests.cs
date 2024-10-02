@@ -95,10 +95,12 @@ public class CheckBoxTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void AllowNoneChecked_Get_Set ()
+    public void AllowCheckStateNone_Get_Set ()
     {
         var checkBox = new CheckBox { Text = "Check this out 你" };
 
+        checkBox.HasFocus = true;
+        Assert.True (checkBox.HasFocus);
         Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
         Assert.True (checkBox.NewKeyDownEvent (Key.Space));
         Assert.Equal (CheckState.Checked, checkBox.CheckedState);
@@ -510,7 +512,7 @@ public class CheckBoxTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void HotKey_Command_Fires_Accept ()
+    public void HotKey_Command_Does_Not_Fire_Accept ()
     {
         var cb = new CheckBox ();
         var accepted = false;
@@ -518,34 +520,64 @@ public class CheckBoxTests (ITestOutputHelper output)
         cb.Accept += CheckBoxOnAccept;
         cb.InvokeCommand (Command.HotKey);
 
-        Assert.True (accepted);
+        Assert.False (accepted);
 
         return;
 
         void CheckBoxOnAccept (object sender, HandledEventArgs e) { accepted = true; }
     }
 
+
     [Theory]
     [InlineData (CheckState.Checked)]
     [InlineData (CheckState.UnChecked)]
     [InlineData (CheckState.None)]
-    public void Toggled_Cancel_Event_Prevents_Toggle (CheckState initialState)
+    public void Select_Handle_Event_Prevents_Change (CheckState initialState)
     {
         var ckb = new CheckBox { AllowCheckStateNone = true };
         var checkedInvoked = false;
 
-        ckb.CheckedStateChanging += CheckBoxToggle;
-
         ckb.CheckedState = initialState;
+
+        ckb.Select += OnSelect;
+
         Assert.Equal (initialState, ckb.CheckedState);
-        bool? ret = ckb.AdvanceCheckState ();
-        Assert.True (ret);
+        bool? ret = ckb.InvokeCommand (Command.Select);
+        Assert.False (ret);
         Assert.True (checkedInvoked);
         Assert.Equal (initialState, ckb.CheckedState);
 
         return;
 
-        void CheckBoxToggle (object sender, CancelEventArgs e)
+        void OnSelect (object sender, HandledEventArgs e)
+        {
+            checkedInvoked = true;
+            e.Handled = true;
+        }
+    }
+
+    [Theory]
+    [InlineData (CheckState.Checked)]
+    [InlineData (CheckState.UnChecked)]
+    [InlineData (CheckState.None)]
+    public void CheckedStateChanging_Cancel_Event_Prevents_Change (CheckState initialState)
+    {
+        var ckb = new CheckBox { AllowCheckStateNone = true };
+        var checkedInvoked = false;
+
+        ckb.CheckedState = initialState;
+
+        ckb.CheckedStateChanging += OnCheckedStateChanging;
+
+        Assert.Equal (initialState, ckb.CheckedState);
+        bool? ret = ckb.AdvanceCheckState ();
+        Assert.False (ret);
+        Assert.True (checkedInvoked);
+        Assert.Equal (initialState, ckb.CheckedState);
+
+        return;
+
+        void OnCheckedStateChanging (object sender, CancelEventArgs e)
         {
             checkedInvoked = true;
             e.Cancel = true;
