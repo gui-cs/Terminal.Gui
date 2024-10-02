@@ -231,7 +231,8 @@ public class Buttons : Scenario
             SelectedItem = 2,
             RadioLabels = new [] { "_Start", "_End", "_Center", "_Fill" },
             Title = "_9 RadioGroup",
-            BorderStyle = LineStyle.Dotted
+            BorderStyle = LineStyle.Dotted,
+            CanFocus = false
         };
         main.Add (radioGroup);
 

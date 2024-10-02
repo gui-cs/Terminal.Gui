@@ -83,21 +83,11 @@ public class RadioGroup : View, IDesignable, IOrientation
                             }
                         }
 
-                        return ChangeSelectedItem (Cursor);
+                        return ChangeSelectedItem (Cursor) is false or null;
                     });
 
-        AddCommand (
-                    Command.Accept,
-                    () =>
-                    {
-                        if (ChangeSelectedItem (Cursor) == true)
-                        {
-                            return true;
-                        }
-
-                        return RaiseAcceptEvent () is false;
-                    }
-                   );
+        // Accept (Enter key) - Raise Accept event - DO NOT advance state
+        AddCommand (Command.Accept, RaiseAcceptEvent);
 
         AddCommand (
                     Command.HotKey,
@@ -122,7 +112,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                             }
 
                             // If a RadioItem.HotKey is pressed we always set the selected item - never SetFocus
-                            if (ChangeSelectedItem (item.Value) == true)
+                            if (ChangeSelectedItem (item.Value) is null or false)
                             {
                                 return true;
                             }
@@ -180,34 +170,64 @@ public class RadioGroup : View, IDesignable, IOrientation
         KeyBindings.Add (Key.End, Command.End);
     }
 
+    /// <summary>
+    ///     Gets or sets whether double clicking on a Radio Item will cause the <see cref="View.Accept"/> event to be raised.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         If <see langword="false"/> and Accept is not handled, the Accept event on the <see cref="View.SuperView"/> will be raised. The default is
+    ///         <see langword="true"/>.
+    ///     </para>
+    /// </remarks>
+    public bool DoubleClickAccepts { get; set; } = true;
+
     private void RadioGroup_MouseClick (object sender, MouseEventEventArgs e)
     {
-        SetFocus ();
-
-        int viewportX = e.MouseEvent.Position.X;
-        int viewportY = e.MouseEvent.Position.Y;
-
-        int pos = Orientation == Orientation.Horizontal ? viewportX : viewportY;
-
-        int rCount = Orientation == Orientation.Horizontal
-                         ? _horizontal.Last ().pos + _horizontal.Last ().length
-                         : _radioLabels.Count;
-
-        if (pos < rCount)
+        if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
-            int c = Orientation == Orientation.Horizontal
-                        ? _horizontal.FindIndex (x => x.pos <= viewportX && x.pos + x.length - 2 >= viewportX)
-                        : viewportY;
+            int viewportX = e.MouseEvent.Position.X;
+            int viewportY = e.MouseEvent.Position.Y;
 
-            if (c > -1)
+            int pos = Orientation == Orientation.Horizontal ? viewportX : viewportY;
+
+            int rCount = Orientation == Orientation.Horizontal
+                             ? _horizontal.Last ().pos + _horizontal.Last ().length
+                             : _radioLabels.Count;
+
+            if (pos < rCount)
             {
-                Cursor = SelectedItem = c;
-                SetNeedsDisplay ();
+                int c = Orientation == Orientation.Horizontal
+                            ? _horizontal.FindIndex (x => x.pos <= viewportX && x.pos + x.length - 2 >= viewportX)
+                            : viewportY;
+
+                if (c > -1)
+                {
+                    if (ChangeSelectedItem (c) == false)
+                    {
+                        Cursor = c;
+                        e.Handled = true;
+                    }
+                }
             }
         }
 
-        e.Handled = true;
+        if (DoubleClickAccepts && e.MouseEvent.Flags.HasFlag (MouseFlags.Button1DoubleClicked))
+        {
+            int savedSelectedItem = SelectedItem;
+
+            if (RaiseAcceptEvent () == true)
+            {
+                e.Handled = false;
+                _selected = savedSelectedItem;
+            }
+
+            if (SuperView?.InvokeCommand (Command.Accept) is false or null)
+            {
+                e.Handled = true;
+            }
+        }
     }
+
 
     private List<(int pos, int length)> _horizontal;
     private int _horizontalSpace = 2;

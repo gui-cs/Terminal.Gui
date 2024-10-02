@@ -67,7 +67,7 @@ public class Button : View, IDesignable
                     Command.HotKey,
                     () =>
                     {
-                        bool cachedIsDefault = IsDefault; // Supports "Swap Default" in Buttons scenario
+                        bool cachedIsDefault = IsDefault; // Supports "Swap Default" in Buttons scenario where IsDefault changes
 
                         bool? handled = RaiseAcceptEvent ();
 

@@ -39,7 +39,32 @@ public class CheckBox : View
 
     private void CheckBox_MouseClick (object? sender, MouseEventEventArgs e)
     {
-        e.Handled = AdvanceCheckState () == true;
+#if CHECKBOX_SUPPORTS_DOUBLE_CLICK_ACCEPT
+        CheckState savedCheckState = CheckedState;
+#endif
+
+        if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
+        {
+            e.Handled = AdvanceCheckState () == true;
+        }
+
+#if CHECKBOX_SUPPORTS_DOUBLE_CLICK_ACCEPT
+        if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1DoubleClicked))
+        {
+            if (RaiseAcceptEvent () == true)
+            {
+                e.Handled = false;
+                _checkedState = savedCheckState;
+            }
+
+            // TODO: This needs to be made consistent with how Button.IsDefault works
+            if (SuperView is { })
+            {
+                // TODO: This should pass context
+                SuperView.InvokeCommand (Command.Accept);
+            }
+        }
+#endif
     }
 
     private void Checkbox_TitleChanged (object? sender, EventArgs<string> e)
