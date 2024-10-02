@@ -5334,16 +5334,18 @@ This is the second line.
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
         Assert.True (tv.AllowsReturn);
+
         tv.AllowsReturn = false;
         Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.False (tv.Selecting);
-        Assert.False (tv.NewKeyDownEvent (Key.Enter));
+        Assert.True (tv.NewKeyDownEvent (Key.Enter));
         Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third ", tv.Text);
         Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.Selecting);
         Assert.False (tv.AllowsReturn);
+
         tv.AllowsReturn = true;
         Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
@@ -8419,7 +8421,7 @@ line.
     // This is necessary because a) Application is a singleton and Init/Shutdown must be called
     // as a pair, and b) all unit test functions should be atomic.
     [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
-    public class TextViewTestsAutoInitShutdown : AutoInitShutdownAttribute 
+    public class TextViewTestsAutoInitShutdown : AutoInitShutdownAttribute
     {
         public static string Txt = "TAB to jump between text fields.";
 
@@ -8472,26 +8474,50 @@ line.
         void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
     }
 
-    [Fact]
-    public void Accept_Command_Fires_Accept ()
+    [Theory]
+    [InlineData (false, 1)]
+    [InlineData (true, 0)]
+    public void Accept_Command_Fires_Accept_Based_On_AllowsReturn (bool allowsReturn, int expectedAcceptEvents)
     {
-        var view = new TextView ();
+        var view = new TextView ()
+        {
+            AllowsReturn = allowsReturn,
+        };
 
-        var accepted = false;
+        int acceptEvents = 0;
         view.Accept += Accept;
         view.InvokeCommand (Command.Accept);
-        Assert.True (accepted);
+        Assert.Equal (expectedAcceptEvents, acceptEvents);
 
         return;
 
-        void Accept (object sender, HandledEventArgs e) { accepted = true; }
+        void Accept (object sender, HandledEventArgs e) { acceptEvents++; }
     }
-
 
     [Theory]
     [InlineData (false, 1)]
     [InlineData (true, 0)]
-    public void Enter_Key_Fires_Accept (bool multiline, int expectedAccepts)
+    public void Enter_Key_Fires_Accept_BasedOn_AllowsReturn (bool allowsReturn, int expectedAccepts)
+    {
+        var view = new TextView ()
+        {
+            Multiline = allowsReturn,
+        };
+
+        int accepted = 0;
+        view.Accept += Accept;
+        view.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (expectedAccepts, accepted);
+
+        return;
+
+        void Accept (object sender, HandledEventArgs e) { accepted++; }
+    }
+
+    [Theory]
+    [InlineData (false, 1)]
+    [InlineData (true, 0)]
+    public void Enter_Key_Fires_Accept_BasedOn_Multiline (bool multiline, int expectedAccepts)
     {
         var view = new TextView ()
         {
@@ -8509,11 +8535,11 @@ line.
     }
 
     [Theory]
-    [InlineData (false, false, 1, 0)]
-    [InlineData (false, true, 1, 1)]
+    [InlineData (false, false, 1, 1)]
+    [InlineData (false, true, 1, 0)]
     [InlineData (true, false, 0, 0)]
     [InlineData (true, true, 0, 0)]
-    public void Accept_Handler_Handled_Prevents_Default_Button_Accept (bool multiline, bool handleAccept, int expectedAccepts, int expectedButtonAccepts)
+    public void Accept_Event_Handled_Prevents_Default_Button_Accept (bool multiline, bool handleAccept, int expectedAccepts, int expectedButtonAccepts)
     {
         var superView = new Window ();
         var tv = new TextView ()

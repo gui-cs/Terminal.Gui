@@ -2276,8 +2276,7 @@ public class TextView : View
                     }
                    );
 
-        // BUGBUG: If AllowsReturn is false, Key.Enter should not be bound (so that Toplevel can cause Command.Accept).
-        AddCommand (Command.Accept, () => ProcessReturn ());
+        AddCommand (Command.Accept, () => ProcessEnterKey ());
 
         AddCommand (
                     Command.End,
@@ -6033,7 +6032,7 @@ public class TextView : View
         Paste ();
     }
 
-    private bool ProcessReturn ()
+    private bool ProcessEnterKey ()
     {
         ResetColumnTrack ();
 
@@ -6046,7 +6045,7 @@ public class TextView : View
         {
             // By Default pressing ENTER should be ignored (OnAccept will return false or null). Only cancel if the
             // event was fired and set Cancel = true.
-            return RaiseAcceptEvent () == false;
+            return RaiseAcceptEvent () is null or false;
         }
 
         SetWrapModel ();
