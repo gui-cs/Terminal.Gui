@@ -3,7 +3,7 @@ using System.Reflection.Metadata;
 
 namespace Terminal.Gui;
 
-/// <summary>Shows a check box that can be cycled between three states.</summary>
+/// <summary>Shows a check box that can be cycled between two or three states.</summary>
 public class CheckBox : View
 {
     /// <summary>
