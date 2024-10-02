@@ -4,7 +4,7 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("AnsiEscapeSequenceRequest", "Ansi Escape Sequence Request")]
-[ScenarioCategory ("Controls")]
+[ScenarioCategory ("Ansi Escape Sequence")]
 public sealed class AnsiEscapeSequenceRequests : Scenario
 {
     public override void Main ()
