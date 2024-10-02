@@ -18,18 +18,30 @@ public class AnsiEscapeSequenceRequest
         var response = new StringBuilder ();
         var error = new StringBuilder ();
         var savedIsReportingMouseMoves = false;
+        NetDriver? netDriver = null;
 
         try
         {
             switch (Application.Driver)
             {
-                case NetDriver netDriver:
-                    savedIsReportingMouseMoves = netDriver.IsReportingMouseMoves;
+                case NetDriver:
+                    netDriver = Application.Driver as NetDriver;
+                    savedIsReportingMouseMoves = netDriver!.IsReportingMouseMoves;
 
                     if (savedIsReportingMouseMoves)
                     {
                         netDriver.StopReportingMouseMoves ();
                     }
+
+                    while (Console.KeyAvailable)
+                    {
+                        netDriver._mainLoopDriver._netEvents._waitForStart.Set ();
+                        netDriver._mainLoopDriver._netEvents._waitForStart.Reset ();
+
+                        netDriver._mainLoopDriver._netEvents._forceRead = true;
+                    }
+
+                    netDriver._mainLoopDriver._netEvents._forceRead = false;
 
                     break;
                 case CursesDriver cursesDriver:
@@ -43,12 +55,19 @@ public class AnsiEscapeSequenceRequest
                     break;
             }
 
-            Thread.Sleep (100); // Allow time for mouse stopping and to flush the input buffer
-
-            // Flush the input buffer to avoid reading stale input
-            while (Console.KeyAvailable)
+            if (netDriver is { })
             {
-                Console.ReadKey (true);
+                NetEvents._suspendRead = true;
+            }
+            else
+            {
+                Thread.Sleep (100); // Allow time for mouse stopping and to flush the input buffer
+
+                // Flush the input buffer to avoid reading stale input
+                while (Console.KeyAvailable)
+                {
+                    Console.ReadKey (true);
+                }
             }
 
             // Send the ANSI escape sequence
@@ -89,8 +108,9 @@ public class AnsiEscapeSequenceRequest
             {
                 switch (Application.Driver)
                 {
-                    case NetDriver netDriver:
-                        netDriver.StartReportingMouseMoves ();
+                    case NetDriver:
+                        NetEvents._suspendRead = false;
+                        netDriver!.StartReportingMouseMoves ();
 
                         break;
                     case CursesDriver cursesDriver:

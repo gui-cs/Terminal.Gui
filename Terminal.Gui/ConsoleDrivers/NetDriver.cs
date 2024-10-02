@@ -136,7 +136,7 @@ internal class NetEvents : IDisposable
 {
     private readonly ManualResetEventSlim _inputReady = new (false);
     private CancellationTokenSource _inputReadyCancellationTokenSource;
-    private readonly ManualResetEventSlim _waitForStart = new (false);
+    internal readonly ManualResetEventSlim _waitForStart = new (false);
 
     //CancellationTokenSource _waitForStartCancellationTokenSource;
     private readonly ManualResetEventSlim _winChange = new (false);
@@ -202,7 +202,7 @@ internal class NetEvents : IDisposable
     {
         // if there is a key available, return it without waiting
         //  (or dispatching work to the thread queue)
-        if (Console.KeyAvailable)
+        if (Console.KeyAvailable && !_suspendRead)
         {
             return Console.ReadKey (intercept);
         }
@@ -211,7 +211,7 @@ internal class NetEvents : IDisposable
         {
             Task.Delay (100, cancellationToken).Wait (cancellationToken);
 
-            if (Console.KeyAvailable)
+            if (Console.KeyAvailable && !_suspendRead)
             {
                 return Console.ReadKey (intercept);
             }
@@ -221,6 +221,9 @@ internal class NetEvents : IDisposable
 
         return default (ConsoleKeyInfo);
     }
+
+    internal bool _forceRead;
+    internal static bool _suspendRead;
 
     private void ProcessInputQueue ()
     {
@@ -237,7 +240,7 @@ internal class NetEvents : IDisposable
 
             _waitForStart.Reset ();
 
-            if (_inputQueue.Count == 0)
+            if (_inputQueue.Count == 0 || _forceRead)
             {
                 ConsoleKey key = 0;
                 ConsoleModifiers mod = 0;
@@ -812,7 +815,7 @@ internal class NetDriver : ConsoleDriver
     private const int COLOR_RED = 31;
     private const int COLOR_WHITE = 37;
     private const int COLOR_YELLOW = 33;
-    private NetMainLoop _mainLoopDriver;
+    internal NetMainLoop _mainLoopDriver;
     public bool IsWinPlatform { get; private set; }
     public NetWinVTConsole NetWinConsole { get; private set; }
 
