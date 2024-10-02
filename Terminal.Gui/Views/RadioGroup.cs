@@ -130,10 +130,9 @@ public class RadioGroup : View, IDesignable, IOrientation
                         return true;
                     });
 
-        _orientationHelper = new (this)
-        {
-            Orientation = Orientation.Vertical
-        };
+        // ReSharper disable once UseObjectOrCollectionInitializer
+        _orientationHelper = new (this);
+        _orientationHelper.Orientation = Orientation.Vertical;
         _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
         _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
 

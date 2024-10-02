@@ -830,14 +830,18 @@ Three ",
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal (string.Empty, cb.Text);
         var opened = false;
+
         cb.OpenSelectedItem += (s, _) => opened = true;
+
         Assert.True (Application.OnKeyDown (Key.Enter));
         Assert.False (opened);
+
         cb.Text = "Tw";
         Assert.True (Application.OnKeyDown (Key.Enter));
         Assert.True (opened);
         Assert.Equal ("Tw", cb.Text);
         Assert.False (cb.IsShow);
+
         cb.SetSource<string> (null);
         Assert.False (cb.IsShow);
         Assert.False (Application.OnKeyDown (Key.Enter));

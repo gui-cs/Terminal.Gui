@@ -35,7 +35,6 @@ public class ComboBox : View, IDesignable
         _listview = new ComboListView (this, HideDropdownListOnClick) { CanFocus = true, TabStop = TabBehavior.NoStop };
 
         _search.TextChanged += Search_Changed;
-        _search.Accept += Search_Accept;
 
         _listview.Y = Pos.Bottom (_search);
         _listview.OpenSelectedItem += (sender, a) => Selected ();
@@ -315,7 +314,7 @@ public class ComboBox : View, IDesignable
             _search.CursorPosition = _search.Text.GetRuneCount ();
         }
         else
-        { 
+        {
             if (_source?.Count > 0
               && _selectedItem > -1
               && _selectedItem < _source.Count - 1
@@ -656,9 +655,6 @@ public class ComboBox : View, IDesignable
 
         SetSearchSet ();
     }
-
-    // Tell TextField to handle Accept Command (Enter)
-    void Search_Accept (object sender, HandledEventArgs e) { e.Handled = true; }
 
     private void Search_Changed (object sender, EventArgs e)
     {
