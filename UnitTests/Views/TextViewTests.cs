@@ -5889,7 +5889,7 @@ This is the second line.
             switch (iteration)
             {
                 case 0:
-                    _textView.NewKeyDownEvent (Key.K.WithAlt);
+                    _textView.NewKeyDownEvent (Key.Backspace.WithCtrl.WithShift);
                     Assert.Equal (0, _textView.CursorPosition.X);
                     Assert.Equal (1, _textView.CursorPosition.Y);
                     Assert.Equal ($"This is the first line.{Environment.NewLine}", _textView.Text);
@@ -5909,7 +5909,7 @@ This is the second line.
 
                     break;
                 case 2:
-                    _textView.NewKeyDownEvent (Key.K.WithAlt);
+                    _textView.NewKeyDownEvent (Key.Backspace.WithCtrl.WithShift);
                     Assert.Equal (0, _textView.CursorPosition.X);
                     Assert.Equal (0, _textView.CursorPosition.Y);
                     Assert.Equal ("", _textView.Text);
