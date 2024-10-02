@@ -344,8 +344,8 @@ public partial class View // Drawing APIs
         {
             DrawHotString (
                            text,
-                           Enabled ? GetHotNormalColor () : ColorScheme.Disabled,
-                           Enabled ? GetNormalColor () : ColorScheme.Disabled
+                           Enabled ? GetHotNormalColor () : ColorScheme!.Disabled,
+                           Enabled ? GetNormalColor () : ColorScheme!.Disabled
                           );
         }
     }

@@ -130,8 +130,10 @@ public class RadioGroup : View, IDesignable, IOrientation
                         return true;
                     });
 
-        _orientationHelper = new (this);
-        _orientationHelper.Orientation = Orientation.Vertical;
+        _orientationHelper = new (this)
+        {
+            Orientation = Orientation.Vertical
+        };
         _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
         _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
 
@@ -181,7 +183,7 @@ public class RadioGroup : View, IDesignable, IOrientation
     /// </remarks>
     public bool DoubleClickAccepts { get; set; } = true;
 
-    private void RadioGroup_MouseClick (object sender, MouseEventEventArgs e)
+    private void RadioGroup_MouseClick (object? sender, MouseEventEventArgs e)
     {
         if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
@@ -191,13 +193,13 @@ public class RadioGroup : View, IDesignable, IOrientation
             int pos = Orientation == Orientation.Horizontal ? viewportX : viewportY;
 
             int rCount = Orientation == Orientation.Horizontal
-                             ? _horizontal.Last ().pos + _horizontal.Last ().length
+                             ? _horizontal!.Last ().pos + _horizontal!.Last ().length
                              : _radioLabels.Count;
 
             if (pos < rCount)
             {
                 int c = Orientation == Orientation.Horizontal
-                            ? _horizontal.FindIndex (x => x.pos <= viewportX && x.pos + x.length - 2 >= viewportX)
+                            ? _horizontal!.FindIndex (x => x.pos <= viewportX && x.pos + x.length - 2 >= viewportX)
                             : viewportY;
 
                 if (c > -1)
@@ -229,7 +231,7 @@ public class RadioGroup : View, IDesignable, IOrientation
     }
 
 
-    private List<(int pos, int length)> _horizontal;
+    private List<(int pos, int length)>? _horizontal;
     private int _horizontalSpace = 2;
 
     /// <summary>
@@ -344,7 +346,7 @@ public class RadioGroup : View, IDesignable, IOrientation
 
                     break;
                 case Orientation.Horizontal:
-                    Move (_horizontal [i].pos, 0);
+                    Move (_horizontal! [i].pos, 0);
 
                     break;
             }
@@ -366,7 +368,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                     {
                         Application.Driver?.SetAttribute (
                                                           HasFocus
-                                                              ? ColorScheme.HotFocus
+                                                              ? ColorScheme!.HotFocus
                                                               : GetHotNormalColor ()
                                                          );
                     }
@@ -388,7 +390,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                         {
                             Application.Driver?.SetAttribute (
                                                               HasFocus
-                                                                  ? ColorScheme.HotFocus
+                                                                  ? ColorScheme!.HotFocus
                                                                   : GetHotNormalColor ()
                                                              );
                         }
@@ -424,10 +426,10 @@ public class RadioGroup : View, IDesignable, IOrientation
     private readonly OrientationHelper _orientationHelper;
 
     /// <inheritdoc/>
-    public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
+    public event EventHandler<CancelEventArgs<Orientation>>? OrientationChanging;
 
     /// <inheritdoc/>
-    public event EventHandler<EventArgs<Orientation>> OrientationChanged;
+    public event EventHandler<EventArgs<Orientation>>? OrientationChanged;
 
     /// <summary>Called when <see cref="Orientation"/> has changed.</summary>
     /// <param name="newOrientation"></param>
@@ -469,7 +471,7 @@ public class RadioGroup : View, IDesignable, IOrientation
 
                 break;
             case Orientation.Horizontal:
-                if (_horizontal.Count > 0)
+                if (_horizontal!.Count > 0)
                 {
                     x = _horizontal [Cursor].pos;
                 }
@@ -490,7 +492,7 @@ public class RadioGroup : View, IDesignable, IOrientation
 
     // TODO: This should use StateEventArgs<int> and should be cancelable.
     /// <summary>Invoked when the selected radio label has changed.</summary>
-    public event EventHandler<SelectedItemChangedArgs> SelectedItemChanged;
+    public event EventHandler<SelectedItemChangedArgs>? SelectedItemChanged;
 
     private bool MoveDownRight ()
     {
@@ -523,7 +525,7 @@ public class RadioGroup : View, IDesignable, IOrientation
         return false;
     }
 
-    private void RadioGroup_LayoutStarted (object sender, EventArgs e) { SetContentSize (); }
+    private void RadioGroup_LayoutStarted (object? sender, EventArgs e) { SetContentSize (); }
 
     private void SetContentSize ()
     {

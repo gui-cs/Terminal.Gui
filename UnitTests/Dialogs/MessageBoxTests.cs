@@ -11,11 +11,13 @@ public class MessageBoxTests
 
     [Fact]
     [AutoInitShutdown]
-    public void KeyBindings_Enter_Causes_Focused_Button_Click ()
+    public void KeyBindings_Enter_Causes_Focused_Button_Click_No_Accept ()
     {
         int result = -1;
 
         var iteration = 0;
+
+        int btnAcceptCount = 0;
 
         Application.Iteration += (s, a) =>
                                  {
@@ -32,6 +34,12 @@ public class MessageBoxTests
                                          case 2:
                                              // Tab to btn2
                                              Application.OnKeyDown (Key.Tab);
+
+                                             Button btn = Application.Navigation!.GetFocused () as Button;
+
+                                             btn.Accept += (sender, e) => { btnAcceptCount++; };
+
+                                             // Click
                                              Application.OnKeyDown (Key.Enter);
 
                                              break;
@@ -44,7 +52,8 @@ public class MessageBoxTests
                                  };
         Application.Run ().Dispose ();
 
-        Assert.Equal (1, result);
+        Assert.Equal (0, result);
+        Assert.Equal (btnAcceptCount, 1);
     }
 
     [Fact]
@@ -85,11 +94,13 @@ public class MessageBoxTests
 
     [Fact]
     [AutoInitShutdown]
-    public void KeyBindings_Space_Causes_Focused_Button_Click ()
+    public void KeyBindings_Space_Causes_Focused_Button_Click_No_Accept ()
     {
         int result = -1;
 
         var iteration = 0;
+
+        int btnAcceptCount = 0;
 
         Application.Iteration += (s, a) =>
                                  {
@@ -106,6 +117,11 @@ public class MessageBoxTests
                                          case 2:
                                              // Tab to btn2
                                              Application.OnKeyDown (Key.Tab);
+
+                                             Button btn = Application.Navigation!.GetFocused () as Button;
+
+                                             btn.Accept += (sender, e) => { btnAcceptCount++; };
+
                                              Application.OnKeyDown (Key.Space);
 
                                              break;
@@ -118,7 +134,9 @@ public class MessageBoxTests
                                  };
         Application.Run ().Dispose ();
 
-        Assert.Equal (1, result);
+        Assert.Equal (0, result);
+        Assert.Equal (btnAcceptCount, 1);
+
     }
 
     [Theory]

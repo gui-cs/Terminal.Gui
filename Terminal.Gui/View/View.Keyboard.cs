@@ -47,7 +47,7 @@ public partial class View // Keyboard APIs
     ///         opened.
     ///     </para>
     ///     <para>
-    ///         View subclasses can use< see cref="View.AddCommand(Command,Func{CommandContext,System.Nullable{bool}})"/> to
+    ///         View subclasses can use <see cref="View.AddCommand(Command,Func{CommandContext,System.Nullable{bool}})"/> to
     ///         define the
     ///         behavior of the hot key.
     ///     </para>
