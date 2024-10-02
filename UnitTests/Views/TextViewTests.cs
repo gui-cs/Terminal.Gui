@@ -1818,21 +1818,21 @@ This is the second line.
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (12, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (Key.K.WithAlt));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace.WithCtrl.WithShift));
         Assert.Equal ($"First line.{Environment.NewLine}", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal ("Second line.", Clipboard.Contents);
         Assert.Equal (2, tv.Lines);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (Key.K.WithAlt));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace.WithCtrl.WithShift));
         Assert.Equal ("First line.", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal ($"Second line.{Environment.NewLine}", Clipboard.Contents);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new Point (11, 0), tv.CursorPosition);
 
-        Assert.True (tv.NewKeyDownEvent (Key.K.WithAlt));
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace.WithCtrl.WithShift));
         Assert.Equal ("", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal ($"Second line.{Environment.NewLine}First line.", Clipboard.Contents);
