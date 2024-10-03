@@ -518,8 +518,8 @@ public class Shortcut : View, IOrientation, IDesignable
 
             void CommandViewOnAccept (object sender, HandledEventArgs e)
             {
-                KeyBinding binding = new ([Command.Select], KeyBindingScope.Focused, _commandView, null);
-                e.Handled = DispatchAcceptCommand (new CommandContext (Command.Select, null, binding)) == true;
+                // Always eat CommandView.Accept
+                e.Handled = true;
             }
 
             _commandView.Select += CommandViewOnSelect;
@@ -537,10 +537,11 @@ public class Shortcut : View, IOrientation, IDesignable
 
             void CommandViewOnSelect (object sender, HandledEventArgs e)
             {
-                //e.Handled = true;
-                RaiseAcceptEvent ();
+                // Always eat CommandView.Select
+                e.Handled = true;
 
-                // SetFocus ();
+                // AND raise our Accept event
+                RaiseAcceptEvent ();
             }
 
             SetCommandViewDefaultLayout ();
@@ -781,15 +782,12 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         var cancel = false;
 
-        // We don't care if CommandView handles the command or not
-        CommandView.InvokeCommand (Command.Select, ctx.Key, ctx.KeyBinding);
+        bool? handled = CommandView.InvokeCommand (Command.Select, ctx.Key, ctx.KeyBinding);
 
-        cancel = RaiseAcceptEvent () == true;
-
-        //if (!cancel && ctx.KeyBinding?.BoundView != CommandView)
-        //{
-        //   // CommandView.InvokeCommand (Command.Select, ctx.Key, ctx.KeyBinding);
-        //}
+        if (handled is null or false)
+        {
+            cancel = RaiseAcceptEvent () == true;
+        }
 
         if (Action is { })
         {

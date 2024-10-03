@@ -148,8 +148,12 @@ public class CheckBoxTests (ITestOutputHelper output)
         checkBox.HasFocus = true;
         Assert.True (checkBox.HasFocus);
         Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
+
+        // Select with keyboard
         Assert.True (checkBox.NewKeyDownEvent (Key.Space));
         Assert.Equal (CheckState.Checked, checkBox.CheckedState);
+
+        // Select with mouse
         Assert.True (checkBox.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked }));
         Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
 
@@ -576,7 +580,7 @@ public class CheckBoxTests (ITestOutputHelper output)
     [InlineData (CheckState.Checked)]
     [InlineData (CheckState.UnChecked)]
     [InlineData (CheckState.None)]
-    public void Select_Handle_Event_Prevents_Change (CheckState initialState)
+    public void Select_Handle_Event_Does_Not_Prevent_Change (CheckState initialState)
     {
         var ckb = new CheckBox { AllowCheckStateNone = true };
         var checkedInvoked = false;
@@ -589,7 +593,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         bool? ret = ckb.InvokeCommand (Command.Select);
         Assert.False (ret);
         Assert.True (checkedInvoked);
-        Assert.Equal (initialState, ckb.CheckedState);
+        Assert.NotEqual (initialState, ckb.CheckedState);
 
         return;
 
@@ -614,8 +618,9 @@ public class CheckBoxTests (ITestOutputHelper output)
         ckb.CheckedStateChanging += OnCheckedStateChanging;
 
         Assert.Equal (initialState, ckb.CheckedState);
+        // AdvanceCheckState returns false if the state was changed, true if it was cancelled, null if it was not changed
         bool? ret = ckb.AdvanceCheckState ();
-        Assert.False (ret);
+        Assert.True (ret);
         Assert.True (checkedInvoked);
         Assert.Equal (initialState, ckb.CheckedState);
 

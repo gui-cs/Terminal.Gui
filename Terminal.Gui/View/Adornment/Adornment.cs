@@ -223,10 +223,10 @@ public class Adornment : View
             return false;
         }
 
-        Rectangle frame = Frame;
-        frame.Offset (Parent.Frame.Location);
+        Rectangle outside = Parent.Frame;
+        //outside.Offset (Parent.Frame.Location);
 
-        return Thickness.Contains (frame, location);
+        return Thickness.Contains (outside, location);
     }
 
     ///// <inheritdoc/>

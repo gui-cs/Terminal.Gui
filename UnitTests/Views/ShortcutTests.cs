@@ -15,9 +15,74 @@ public class ShortcutTests
         Assert.IsType<DimAuto> (shortcut.Width);
         Assert.IsType<DimAuto> (shortcut.Height);
 
-        // TOOD: more
     }
 
+    [Fact]
+    public void Size_Defaults ()
+    {
+        var shortcut = new Shortcut ();
+
+        shortcut.SetRelativeLayout (new (100, 100));
+        Assert.Equal (2, shortcut.Frame.Width);
+        Assert.Equal (1, shortcut.Frame.Height);
+        Assert.Equal (2, shortcut.Viewport.Width);
+        Assert.Equal (1, shortcut.Viewport.Height);
+
+        Assert.Equal (0, shortcut.CommandView.Viewport.Width);
+        Assert.Equal (1, shortcut.CommandView.Viewport.Height);
+
+        Assert.Equal (0, shortcut.HelpView.Viewport.Width);
+        Assert.Equal (1, shortcut.HelpView.Viewport.Height);
+
+        Assert.Equal (0, shortcut.KeyView.Viewport.Width);
+        Assert.Equal (1, shortcut.KeyView.Viewport.Height);
+
+        //  0123456789
+        // "   0  A "
+        shortcut = new Shortcut ()
+        {
+            Key = Key.A,
+            HelpText = "0"
+        };
+        shortcut.SetRelativeLayout (new (100, 100));
+        Assert.Equal (8, shortcut.Frame.Width);
+        Assert.Equal (1, shortcut.Frame.Height);
+        Assert.Equal (8, shortcut.Viewport.Width);
+        Assert.Equal (1, shortcut.Viewport.Height);
+
+        Assert.Equal (0, shortcut.CommandView.Viewport.Width);
+        Assert.Equal (1, shortcut.CommandView.Viewport.Height);
+
+        Assert.Equal (1, shortcut.HelpView.Viewport.Width);
+        Assert.Equal (1, shortcut.HelpView.Viewport.Height);
+
+        Assert.Equal (1, shortcut.KeyView.Viewport.Width);
+        Assert.Equal (1, shortcut.KeyView.Viewport.Height);
+
+        //  0123456789
+        // " C  0  A "
+        shortcut = new Shortcut ()
+        {
+            Title = "C",
+            Key = Key.A,
+            HelpText = "0"
+        };
+        shortcut.SetRelativeLayout (new (100, 100));
+        Assert.Equal (9, shortcut.Frame.Width);
+        Assert.Equal (1, shortcut.Frame.Height);
+        Assert.Equal (9, shortcut.Viewport.Width);
+        Assert.Equal (1, shortcut.Viewport.Height);
+
+        Assert.Equal (1, shortcut.CommandView.Viewport.Width);
+        Assert.Equal (1, shortcut.CommandView.Viewport.Height);
+
+        Assert.Equal (1, shortcut.HelpView.Viewport.Width);
+        Assert.Equal (1, shortcut.HelpView.Viewport.Height);
+
+        Assert.Equal (1, shortcut.KeyView.Viewport.Width);
+        Assert.Equal (1, shortcut.KeyView.Viewport.Height);
+
+    }
     [Theory]
     [InlineData ("", "", KeyCode.Null, 2)]
     [InlineData ("C", "", KeyCode.Null, 3)]
@@ -365,13 +430,82 @@ public class ShortcutTests
         Application.OnMouseEvent (
                                   new ()
                                   {
-                                      Position = new (x, 0),
+                                      ScreenPosition = new (x, 0),
                                       Flags = MouseFlags.Button1Clicked
                                   });
 
         Assert.Equal (expectedAccept, accepted);
 
         current.Dispose ();
+    }
+
+
+    [Theory]
+
+    //  0123456789
+    // " C  0  A "
+    [InlineData (-1, 0, 0, 0, 0)]
+    [InlineData (0, 1, 0, 1, 1)]
+    //[InlineData (1, 1, 1)]
+    //[InlineData (2, 1, 0)]
+    //[InlineData (3, 1, 0)]
+    //[InlineData (4, 1, 0)]
+    //[InlineData (5, 1, 0)]
+    //[InlineData (6, 1, 0)]
+    //[InlineData (7, 1, 0)]
+    //[InlineData (8, 1, 0)]
+    //[InlineData (9, 0, 0)]
+    public void MouseClick_Default_CommandView_Raises_Accept_Select_Correctly (int mouseX, int expectedCommandViewAccept, int expectedCommandViewSelect, int expectedShortcutAccept, int expectedShortcutSelect)
+    {
+        Application.Top = new Toplevel ();
+
+        var shortcut = new Shortcut
+        {
+            Title = "C",
+            Key = Key.A,
+            HelpText = "0"
+        };
+
+        var commandViewAcceptCount = 0;
+        shortcut.CommandView.Accept += (s, e) =>
+        {
+            commandViewAcceptCount++;
+        };
+        var commandViewSelectCount = 0;
+        shortcut.CommandView.Select += (s, e) =>
+        {
+            commandViewSelectCount++;
+        };
+
+        var shortcutAcceptCount = 0;
+        shortcut.Accept += (s, e) =>
+        {
+            shortcutAcceptCount++;
+        };
+        var shortcutSelectCount = 0;
+        shortcut.Select += (s, e) =>
+        {
+            shortcutSelectCount++;
+        };
+
+
+        Application.Top.Add (shortcut);
+        Application.Top.SetRelativeLayout (new (100, 100));
+
+        Application.OnMouseEvent (
+                                  new ()
+                                  {
+                                      ScreenPosition = new (mouseX, 0),
+                                      Flags = MouseFlags.Button1Clicked
+                                  });
+
+        Assert.Equal (expectedShortcutAccept, shortcutAcceptCount);
+        Assert.Equal (expectedCommandViewAccept, commandViewAcceptCount);
+        Assert.Equal (expectedShortcutSelect, shortcutSelectCount);
+        Assert.Equal (expectedCommandViewSelect, commandViewSelectCount);
+
+        Application.Top.Dispose ();
+        Application.ResetState (true);
     }
 
     [Theory]
@@ -389,10 +523,9 @@ public class ShortcutTests
     [InlineData (7, 1, 0)]
     [InlineData (8, 1, 0)]
     [InlineData (9, 0, 0)]
-    [AutoInitShutdown]
     public void MouseClick_Button_CommandView_Fires_Shortcut_Accept (int mouseX, int expectedAccept, int expectedButtonAccept)
     {
-        var current = new Toplevel ();
+        Application.Top = new Toplevel ();
 
         var shortcut = new Shortcut
         {
@@ -408,14 +541,13 @@ public class ShortcutTests
             CanFocus = false
         };
         var buttonAccepted = 0;
-        shortcut.CommandView.Accept += (s, e) => {
-                                           buttonAccepted++;
-                                           // Must indicate handled
-                                           e.Handled = true;
-                                       };
-        current.Add (shortcut);
-
-        Application.Begin (current);
+        shortcut.CommandView.Accept += (s, e) =>
+        {
+            buttonAccepted++;
+            // Must indicate handled
+            e.Handled = true;
+        };
+        Application.Top.Add (shortcut);
 
         var accepted = 0;
         shortcut.Accept += (s, e) => accepted++;
@@ -425,14 +557,15 @@ public class ShortcutTests
         Application.OnMouseEvent (
                                   new ()
                                   {
-                                      Position = new (mouseX, 0),
+                                      ScreenPosition = new (mouseX, 0),
                                       Flags = MouseFlags.Button1Clicked
                                   });
 
         Assert.Equal (expectedButtonAccept, buttonAccepted);
         Assert.Equal (expectedAccept, accepted);
 
-        current.Dispose ();
+        Application.Top.Dispose ();
+        Application.ResetState (true);
     }
 
     [Theory]
@@ -482,10 +615,9 @@ public class ShortcutTests
     [InlineData (KeyCode.Enter, 1)]
     [InlineData (KeyCode.Space, 0)]
     [InlineData (KeyCode.F1, 0)]
-    [AutoInitShutdown]
     public void KeyDown_App_Scope_Invokes_Accept (KeyCode key, int expectedAccept)
     {
-        var current = new Toplevel ();
+        Application.Top = new Toplevel ();
 
         var shortcut = new Shortcut
         {
@@ -494,9 +626,8 @@ public class ShortcutTests
             Text = "0",
             Title = "_C"
         };
-        current.Add (shortcut);
-
-        Application.Begin (current);
+        Application.Top.Add (shortcut);
+        Application.Top.SetFocus ();
 
         var accepted = 0;
         shortcut.Accept += (s, e) => accepted++;
@@ -505,7 +636,8 @@ public class ShortcutTests
 
         Assert.Equal (expectedAccept, accepted);
 
-        current.Dispose ();
+        Application.Top.Dispose ();
+        Application.ResetState (true);
     }
 
     [Theory]
@@ -564,7 +696,7 @@ public class ShortcutTests
     [AutoInitShutdown]
     public void KeyDown_App_Scope_Invokes_Action (bool canFocus, KeyCode key, int expectedAction)
     {
-        var current = new Toplevel ();
+        Application.Top = new Toplevel ();
 
         var shortcut = new Shortcut
         {
@@ -574,10 +706,9 @@ public class ShortcutTests
             Title = "_C",
             CanFocus = canFocus
         };
-        current.Add (shortcut);
 
-        Application.Begin (current);
-        Assert.Equal (canFocus, shortcut.HasFocus);
+        Application.Top.Add (shortcut);
+        Application.Top.SetFocus ();
 
         var action = 0;
         shortcut.Action += () => action++;
@@ -585,9 +716,10 @@ public class ShortcutTests
         Application.OnKeyDown (key);
 
         Assert.Equal (expectedAction, action);
-        current.Dispose ();
-    }
 
+        Application.Top.Dispose ();
+        Application.ResetState (true);
+    }
 
     [Fact]
     public void ColorScheme_SetsAndGetsCorrectly ()

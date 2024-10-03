@@ -23,13 +23,13 @@ public class CheckBox : View
         CanFocus = true;
 
         // Select (Space key and single-click) - Advance state and raise Select event
-        AddCommand (Command.Select, AdvanceCheckState);
+        AddCommand (Command.Select, () => AdvanceCheckState () is false);
 
         // Accept (Enter key and double-click) - Raise Accept event - DO NOT advance state
         AddCommand (Command.Accept, () => RaiseAcceptEvent ());
 
         // Hotkey - Advance state and raise Select event - DO NOT raise Accept
-        AddCommand (Command.HotKey, AdvanceCheckState);
+        AddCommand (Command.HotKey, () => AdvanceCheckState () is false);
 
         TitleChanged += Checkbox_TitleChanged;
 
@@ -39,34 +39,11 @@ public class CheckBox : View
 
     private void CheckBox_MouseClick (object? sender, MouseEventEventArgs e)
     {
-#if CHECKBOX_SUPPORTS_DOUBLE_CLICK_ACCEPT
-        CheckState savedCheckState = CheckedState;
-#endif
-
         if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
-            AdvanceCheckState ();
-            ;
-            //           e.Handled = AdvanceCheckState () == true;
+            // AdvanceCheckState returns false if the state was changed
+            e.Handled = AdvanceCheckState () is false;
         }
-
-#if CHECKBOX_SUPPORTS_DOUBLE_CLICK_ACCEPT
-        if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1DoubleClicked))
-        {
-            if (RaiseAcceptEvent () == true)
-            {
-                e.Handled = false;
-                _checkedState = savedCheckState;
-            }
-
-            // TODO: This needs to be made consistent with how Button.IsDefault works
-            if (SuperView is { })
-            {
-                // TODO: This should pass context
-                SuperView.InvokeCommand (Command.Accept);
-            }
-        }
-#endif
     }
 
     private void Checkbox_TitleChanged (object? sender, EventArgs<string> e)
