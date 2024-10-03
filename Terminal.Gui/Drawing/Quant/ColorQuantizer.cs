@@ -1,4 +1,4 @@
-﻿
+﻿using System.Collections.Concurrent;
 
 namespace Terminal.Gui;
 
@@ -30,6 +30,8 @@ public class ColorQuantizer
     /// </summary>
     public IPaletteBuilder PaletteBuildingAlgorithm { get; set; } = new PopularityPaletteWithThreshold (new EuclideanColorDistance (),5) ;
 
+    private readonly ConcurrentDictionary<Color, int> _nearestColorCache = new ();
+
     public void BuildPalette (Color [,] pixels)
     {
         List<Color> allColors = new List<Color> ();
@@ -49,6 +51,11 @@ public class ColorQuantizer
 
     public int GetNearestColor (Color toTranslate)
     {
+        if (_nearestColorCache.TryGetValue (toTranslate, out var cachedAnswer))
+        {
+            return cachedAnswer;
+        }
+
         // Simple nearest color matching based on DistanceAlgorithm
         double minDistance = double.MaxValue;
         int nearestIndex = 0;
@@ -65,6 +72,7 @@ public class ColorQuantizer
             }
         }
 
+        _nearestColorCache.TryAdd (toTranslate, nearestIndex);
         return nearestIndex;
     }
 }

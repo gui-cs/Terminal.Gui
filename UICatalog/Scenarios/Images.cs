@@ -120,7 +120,10 @@ public class Images : Scenario
                                 {
                                     fire.AdvanceFrame ();
                                     counter++;
-                                    if (counter % 5 != 0)
+
+                                    // Control frame rate by adjusting this
+                                    // Lower number means more FPS
+                                    if (counter % 2 != 0)
                                     {
                                         return true;
                                     }
