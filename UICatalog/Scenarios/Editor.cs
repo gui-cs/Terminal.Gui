@@ -369,9 +369,9 @@ public class Editor : Scenario
 
         if (_textView.SelectedLength > 0)
         {
-            line = _textView.GetLine (Math.Min (_textView.SelectionStartRow, _textView.CurrentRow));
+            line = _textView.GetLine (_textView.SelectionStartRow);
 
-            if (line [Math.Min (Math.Min (_textView.SelectionStartColumn, _textView.CurrentColumn), line.Count - 1)].ColorScheme is { } csSel)
+            if (line [Math.Min (_textView.SelectionStartColumn, line.Count - 1)].ColorScheme is { } csSel)
             {
                 return new (csSel.Focus);
             }
