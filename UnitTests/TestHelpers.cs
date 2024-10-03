@@ -48,7 +48,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         bool useFakeClipboard = true,
         bool fakeClipboardAlwaysThrowsNotSupportedException = false,
         bool fakeClipboardIsSupportedAlwaysTrue = false,
-        ConfigurationManager.ConfigLocations configLocation = ConfigurationManager.ConfigLocations.None
+        ConfigLocations configLocation = ConfigLocations.None
     )
     {
         AutoInit = autoInit;
@@ -59,7 +59,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         FakeDriver.FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException =
             fakeClipboardAlwaysThrowsNotSupportedException;
         FakeDriver.FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
-        ConfigurationManager.Locations = configLocation;
+        Locations = configLocation;
     }
 
     private readonly Type _driverType;
@@ -73,10 +73,8 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
         if (AutoInit)
         {
-            try
+            // try
             {
-                // TODO: This Dispose call is here until all unit tests that don't correctly dispose Toplevel's they create are fixed.
-                //Application.Top?.Dispose ();
                 Application.Shutdown ();
 #if DEBUG_IDISPOSABLE
                 if (Responder.Instances.Count == 0)
@@ -89,22 +87,21 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
                 }
 #endif
             }
-            catch (Exception e)
-            {
-                Assert.Fail ($"Application.Shutdown threw an exception after the test exited: {e}");
-            }
-            finally
+            //catch (Exception e)
+            //{
+            //    Assert.Fail ($"Application.Shutdown threw an exception after the test exited: {e}");
+            //}
+            //finally
             {
 #if DEBUG_IDISPOSABLE
                 Responder.Instances.Clear ();
-                Application.ResetState (ignoreDisposed: true);
+                Application.ResetState (true);
 #endif
-                ConfigurationManager.Reset ();
-                ConfigurationManager.Locations = CM.ConfigLocations.None;
             }
-
-
         }
+
+        // Enable subsequent tests that call Init to get all config files (the default).
+        Locations = ConfigLocations.All;
     }
 
     public override void Before (MethodInfo methodUnderTest)
@@ -113,8 +110,6 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
         if (AutoInit)
         {
-            ConfigurationManager.Reset ();
-
 #if DEBUG_IDISPOSABLE
 
             // Clear out any lingering Responder instances from previous tests
@@ -134,10 +129,15 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     private bool AutoInit { get; }
 
     private List<object> _savedValues;
-
-   
 }
 
+/// <summary>
+///     Enables test functions annotated with the [TestRespondersDisposed] attribute to ensure all Views are disposed.
+/// </summary>
+/// <remarks>
+///     On Before, sets Configuration.Locations to ConfigLocations.DefaultOnly.
+///     On After, sets Configuration.Locations to ConfigLocations.All.
+/// </remarks>
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
 public class TestRespondersDisposed : BeforeAfterTestAttribute
 {
@@ -148,6 +148,9 @@ public class TestRespondersDisposed : BeforeAfterTestAttribute
         Debug.WriteLine ($"After: {methodUnderTest.Name}");
         base.After (methodUnderTest);
 
+        // Reset the to default All
+        Locations = ConfigLocations.All;
+
 #if DEBUG_IDISPOSABLE
         Assert.Empty (Responder.Instances);
 #endif
@@ -156,6 +159,11 @@ public class TestRespondersDisposed : BeforeAfterTestAttribute
     public override void Before (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
+
+        // Force the use of the default config file
+        Locations = ConfigLocations.DefaultOnly;
+        Reset ();
+
         base.Before (methodUnderTest);
 #if DEBUG_IDISPOSABLE
 
@@ -167,15 +175,17 @@ public class TestRespondersDisposed : BeforeAfterTestAttribute
 }
 
 // TODO: Make this inherit from TestRespondersDisposed so that all tests that don't dispose Views correctly can be identified and fixed
+/// <summary>
+///     Enables test functions annotated with the [SetupFakeDriver] attribute to set Application.Driver to new
+///     FakeDriver(). The driver is set up with 25 rows and columns.
+/// </summary>
+/// <remarks>
+///     On Before, sets Configuration.Locations to ConfigLocations.DefaultOnly.
+///     On After, sets Configuration.Locations to ConfigLocations.All.
+/// </remarks>
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
 public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
 {
-    /// <summary>
-    ///     Enables test functions annotated with the [SetupFakeDriver] attribute to set Application.Driver to new
-    ///     FakeDriver(). The driver is setup with 25 rows and columns.
-    /// </summary>
-    public SetupFakeDriverAttribute () { }
-
     public override void After (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"After: {methodUnderTest.Name}");
@@ -185,16 +195,25 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
 
         Application.Driver = null;
         base.After (methodUnderTest);
+
+        // Reset the to default All
+        Locations = ConfigLocations.All;
     }
 
     public override void Before (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
-        Application.ResetState (ignoreDisposed: true);
+
+        // Force the use of the default config file
+        Locations = ConfigLocations.DefaultOnly;
+        Reset ();
+
+        Application.ResetState (true);
         Assert.Null (Application.Driver);
         Application.Driver = new FakeDriver { Rows = 25, Cols = 25 };
 
         base.Before (methodUnderTest);
+
     }
 }
 

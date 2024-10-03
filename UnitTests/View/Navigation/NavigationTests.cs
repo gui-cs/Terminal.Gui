@@ -129,20 +129,23 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         var hasFocusFalse = 0;
 
         view.HasFocusChanged += (s, e) =>
-                                {
-                                    if (e.NewValue)
-                                    {
-                                        hasFocusTrue++;
-                                    }
-                                    else
-                                    {
-                                        hasFocusFalse++;
-                                    }
-                                };
+        {
+            if (e.NewValue)
+            {
+                hasFocusTrue++;
+            }
+            else
+            {
+                hasFocusFalse++;
+            }
+        };
 
         top.Add (view, otherView);
         Assert.False (view.HasFocus);
         Assert.False (otherView.HasFocus);
+
+        // Ensure the view is Visible
+        view.Visible = true;
 
         Application.Top.SetFocus ();
         Assert.True (Application.Top!.HasFocus);

@@ -103,7 +103,9 @@ public class KeyBindingTests
     public void Defaults ()
     {
         var keyBindings = new KeyBindings ();
-        Assert.Throws<InvalidOperationException> (() => keyBindings.GetKeyFromCommands (Command.Accept));
+        Assert.Empty (keyBindings.Bindings);
+        Assert.Null (keyBindings.GetKeyFromCommands (Command.Accept));
+        Assert.Null (keyBindings.BoundView);
     }
 
     [Fact]
@@ -173,9 +175,6 @@ public class KeyBindingTests
 
         key = keyBindings.GetKeyFromCommands (commands2);
         Assert.Equal (Key.B, key);
-
-        // Negative case
-        Assert.Throws<InvalidOperationException> (() => key = keyBindings.GetKeyFromCommands (Command.RightEnd));
     }
 
     [Fact]
@@ -186,17 +185,14 @@ public class KeyBindingTests
 
         Key key = keyBindings.GetKeyFromCommands (Command.Right);
         Assert.Equal (Key.A, key);
-
-        // Negative case
-        Assert.Throws<InvalidOperationException> (() => key = keyBindings.GetKeyFromCommands (Command.Left));
     }
 
     // GetKeyFromCommands
     [Fact]
-    public void GetKeyFromCommands_Unknown_Throws_InvalidOperationException ()
+    public void GetKeyFromCommands_Unknown_Returns_Key_Empty ()
     {
         var keyBindings = new KeyBindings ();
-        Assert.Throws<InvalidOperationException> (() => keyBindings.GetKeyFromCommands (Command.Accept));
+        Assert.Null (keyBindings.GetKeyFromCommands (Command.Accept));
     }
 
     [Fact]

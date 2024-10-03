@@ -2460,8 +2460,8 @@ public class TextView : View
 
         KeyBindings.Add (Key.C.WithCtrl, Command.Copy);
 
-        KeyBindings.Add (Key.W.WithCtrl, Command.Cut);
-        KeyBindings.Add (Key.X.WithCtrl, Command.Cut);
+        KeyBindings.Add (Key.W.WithCtrl, Command.Cut); // Move to Unix?
+        KeyBindings.Add (Key.X.WithCtrl, Command.Cut); 
 
         KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.WordLeft);
 
@@ -2495,7 +2495,6 @@ public class TextView : View
         KeyBindings.Add (Key.V.WithAlt, Command.PageUp);
         KeyBindings.Add (Key.F.WithAlt, Command.WordRight);
         KeyBindings.Add (Key.K.WithAlt, Command.CutToStartLine); // kill-to-start
-
 #endif
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;

@@ -70,7 +70,22 @@ public class RadioGroup : View, IDesignable, IOrientation
                         return true;
                     }
                    );
+        AddCommand (
+                    Command.Select,
+                    () =>
+                    {
+                        if (SelectedItem == Cursor)
+                        {
+                            if (!MoveDownRight ())
+                            {
+                                MoveHome ();
+                            }
+                        }
 
+                        SelectedItem = Cursor;
+
+                        return true;
+                    });
         AddCommand (
                     Command.Select,
                     () =>

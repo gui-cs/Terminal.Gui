@@ -421,7 +421,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <exception cref="InvalidOperationException"></exception>
     private (bool focusSet, bool cancelled) SetHasFocusTrue (View? previousFocusedView, bool traversingUp = false)
     {
-        Debug.Assert (ApplicationNavigation.IsInHierarchy (SuperView, this));
+        Debug.Assert (SuperView is null || ApplicationNavigation.IsInHierarchy (SuperView, this));
 
         // Pre-conditions
         if (_hasFocus)
