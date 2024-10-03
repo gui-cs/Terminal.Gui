@@ -442,7 +442,9 @@ public class Editor : Scenario
             cpForeground = new ColorPicker16
             {
                 SelectedColor = current!.Value.Foreground.GetClosestNamedColor16 (),
-                Width = Dim.Fill ()
+                Width = Dim.Fill (),
+                BorderStyle = LineStyle.Single,
+                Title = "Foreground"
             };
         }
         else
@@ -465,7 +467,9 @@ public class Editor : Scenario
             {
                 SelectedColor = current!.Value.Background.GetClosestNamedColor16 (),
                 Y = Pos.Bottom (cpForeground) + 1,
-                Width = Dim.Fill ()
+                Width = Dim.Fill (),
+                BorderStyle = LineStyle.Single,
+                Title = "Background"
             };
         }
         else
