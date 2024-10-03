@@ -1024,12 +1024,15 @@ internal class NetDriver : ConsoleDriver
                 Console.Write (output);
             }
 
-            foreach (var s in Application.Sixel)
+            if (ConsoleDriver.SupportsSixel)
             {
-                if (!string.IsNullOrWhiteSpace (s.SixelData))
+                foreach (var s in Application.Sixel)
                 {
-                    SetCursorPosition (s.ScreenPosition.X, s.ScreenPosition.Y);
-                    Console.Write (s.SixelData);
+                    if (!string.IsNullOrWhiteSpace (s.SixelData))
+                    {
+                        SetCursorPosition (s.ScreenPosition.X, s.ScreenPosition.Y);
+                        Console.Write (s.SixelData);
+                    }
                 }
             }
         }

@@ -62,10 +62,13 @@ public class Images : Scenario
             Y = 1,
             CheckedState = ConsoleDriver.SupportsSixel
                 ? CheckState.Checked : CheckState.UnChecked,
-            CanFocus = false,
-            Enabled = false,
             Text = "Supports Sixel"
         };
+
+        cbSupportsSixel.CheckedStateChanging += (s, e) =>
+                                                {
+                                                    ConsoleDriver.SupportsSixel = e.NewValue == CheckState.Checked;
+                                                };
         _win.Add (cbSupportsSixel);
 
         var cbUseTrueColor = new CheckBox
