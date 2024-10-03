@@ -66,7 +66,7 @@ public class Button : View, IDesignable
         Width = Dim.Auto (DimAutoStyle.Text);
 
         CanFocus = true;
-
+        
         // Override default behavior of View
         AddCommand (
                     Command.HotKey,

@@ -32,6 +32,7 @@ public class Bar : View, IOrientation, IDesignable
         _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
 
         Initialized += Bar_Initialized;
+        MouseEvent += OnMouseEvent;
 
         if (shortcuts is null)
         {
@@ -41,6 +42,38 @@ public class Bar : View, IOrientation, IDesignable
         foreach (Shortcut shortcut in shortcuts)
         {
             Add (shortcut);
+        }
+    }
+
+    private void OnMouseEvent (object? sender, MouseEventEventArgs e)
+    {
+        NavigationDirection direction = NavigationDirection.Backward;
+
+        if (e.MouseEvent.Flags == MouseFlags.WheeledDown)
+        {
+            e.Handled = true;
+        }
+
+        if (e.MouseEvent.Flags == MouseFlags.WheeledUp)
+        {
+            direction = NavigationDirection.Forward;
+            e.Handled = true;
+        }
+
+        if (e.MouseEvent.Flags == MouseFlags.WheeledRight)
+        {
+            e.Handled = true;
+        }
+
+        if (e.MouseEvent.Flags == MouseFlags.WheeledLeft)
+        {
+            direction = NavigationDirection.Forward;
+            e.Handled = true;
+        }
+
+        if (e.Handled)
+        {
+            e.Handled = AdvanceFocus (direction, TabBehavior.TabStop);
         }
     }
 
@@ -242,6 +275,7 @@ public class Bar : View, IOrientation, IDesignable
                 break;
         }
     }
+
 
     /// <inheritdoc />
     public bool EnableForDesign ()

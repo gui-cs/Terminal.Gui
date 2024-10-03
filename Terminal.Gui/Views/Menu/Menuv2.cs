@@ -17,13 +17,30 @@ public class Menuv2 : Bar
         Orientation = Orientation.Vertical;
         Width = Dim.Auto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
-        ColorScheme = Colors.ColorSchemes ["Menu"];
         Initialized += Menuv2_Initialized;
+        VisibleChanged += OnVisibleChanged;
+    }
+
+    private void OnVisibleChanged (object sender, EventArgs e)
+    {
+        if (Visible)
+        {
+            //Application.GrabMouse(this);
+        }
+        else
+        {
+            if (Application.MouseGrabView == this)
+            {
+                //Application.UngrabMouse ();
+            }
+        }
     }
 
     private void Menuv2_Initialized (object sender, EventArgs e)
     {
         Border.Thickness = new Thickness (1, 1, 1, 1);
+        Border.LineStyle = LineStyle.Single;
+        ColorScheme = Colors.ColorSchemes ["Menu"];
     }
 
     // Menuv2 arranges the items horizontally.
@@ -52,7 +69,6 @@ public class Menuv2 : Bar
         if (view is Shortcut shortcut)
         {
             shortcut.CanFocus = true;
-            shortcut.KeyBindingScope = KeyBindingScope.Application;
             shortcut.Orientation = Orientation.Vertical;
             shortcut.HighlightStyle |= HighlightStyle.Hover;
 
@@ -70,14 +86,12 @@ public class Menuv2 : Bar
                     e.Handled = true;
 
                     return;
-
-                    //Enabled = Visible;
                 }
 
-                if (!e.Handled)
-                {
-                    RaiseAcceptEvent ();
-                }
+                //if (!e.Handled)
+                //{
+                //    RaiseAcceptEvent ();
+                //}
             }
         }
 

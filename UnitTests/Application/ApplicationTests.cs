@@ -290,6 +290,7 @@ public class ApplicationTests
 
             // Public Properties
             Assert.Null (Application.Top);
+            Assert.Null (Application.Popover);
             Assert.Null (Application.MouseGrabView);
             Assert.Null (Application.WantContinuousButtonPressedView);
 
@@ -317,6 +318,9 @@ public class ApplicationTests
 
             // Keyboard
             Assert.Empty (Application.GetViewKeyBindings ());
+
+            // Mouse
+            Assert.Equal (Application._lastMousePosition, Point.Empty);
 
             // Navigation
             Assert.Null (Application.Navigation);
@@ -355,11 +359,12 @@ public class ApplicationTests
         Application.QuitKey = Key.C;
         Application.KeyBindings.Add (Key.D, KeyBindingScope.Application, Command.Cancel);
 
-        //ApplicationOverlapped.OverlappedChildren = new List<View> ();
-        //ApplicationOverlapped.OverlappedTop = 
         Application._cachedViewsUnderMouse.Clear ();
 
         //Application.WantContinuousButtonPressedView = new View ();
+
+        // Mouse
+        Application._lastMousePosition = new Point (1, 1);
 
         Application.Navigation = new ();
 
@@ -896,7 +901,7 @@ public class ApplicationTests
         Assert.Equal (new (0, 0), w.Frame.Location);
 
         // Move down and to the right.
-        Application.OnMouseEvent (new () { Position = new (1, 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
+        Application.OnMouseEvent (new () { ScreenPosition = new (1, 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
         Assert.Equal (new (1, 1), w.Frame.Location);
 
         Application.End (rs);

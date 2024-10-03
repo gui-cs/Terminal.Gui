@@ -102,7 +102,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
         AddCommand (Command.HotKey, ctx => DispatchAcceptCommand (ctx));
         AddCommand (Command.Accept, ctx => DispatchAcceptCommand (ctx));
-        AddCommand (Command.Select, ctx => OnSelect (ctx));
+        AddCommand (Command.Select, ctx => RaiseSelectEvent ());
 
         TitleChanged += Shortcut_TitleChanged; // This needs to be set before CommandView is set
 
@@ -123,8 +123,8 @@ public class Shortcut : View, IOrientation, IDesignable
 
         // If the user clicks anywhere on the Shortcut, other than the CommandView, invoke the Command
         MouseClick += Shortcut_MouseClick;
-        HelpView.MouseClick += Subview_MouseClick;
-        KeyView.MouseClick += Subview_MouseClick;
+        //HelpView.MouseClick += Subview_MouseClick;
+        //KeyView.MouseClick += Subview_MouseClick;
         LayoutStarted += OnLayoutStarted;
         Initialized += OnInitialized;
 
@@ -375,8 +375,8 @@ public class Shortcut : View, IOrientation, IDesignable
 
         if (!e.Handled)
         {
-            // If the subview (likely CommandView) didn't handle the mouse click, invoke the command.
-            e.Handled = InvokeCommand (Command.Accept) == true;
+            // If the subview (likely CommandView) didn't handle the mouse click, invoke the Select command.
+            e.Handled = CommandView.InvokeCommand (Command.Accept) == true;
         }
 
         if (CanFocus)
@@ -387,7 +387,11 @@ public class Shortcut : View, IOrientation, IDesignable
 
     private void Subview_MouseClick (object sender, MouseEventEventArgs e)
     {
-        // TODO: Remove. This does nothing.
+        if (!e.Handled)
+        {
+            // If the subview (likely CommandView) didn't handle the mouse click, invoke the command.
+            e.Handled = InvokeCommand (Command.Accept) == true;
+        }
     }
 
     #region IOrientation members
@@ -520,10 +524,23 @@ public class Shortcut : View, IOrientation, IDesignable
 
             _commandView.Select += CommandViewOnSelect;
 
+            _commandView.MouseClick += CommandViewOnMouseClick;
+
+            void CommandViewOnMouseClick (object sender, MouseEventEventArgs e)
+            {
+                //if (!e.Handled)
+                {
+                    // If the subview (likely CommandView) didn't handle the mouse click, invoke the command.
+                    InvokeCommand (Command.HotKey);
+                }
+            }
+
             void CommandViewOnSelect (object sender, HandledEventArgs e)
             {
-                SetFocus ();
-                //OnAccept ();
+                //e.Handled = true;
+                RaiseAcceptEvent ();
+
+                // SetFocus ();
             }
 
             SetCommandViewDefaultLayout ();
@@ -769,10 +786,10 @@ public class Shortcut : View, IOrientation, IDesignable
 
         cancel = RaiseAcceptEvent () == true;
 
-        if (!cancel && ctx.KeyBinding?.BoundView != CommandView)
-        {
-           // CommandView.InvokeCommand (Command.Select, ctx.Key, ctx.KeyBinding);
-        }
+        //if (!cancel && ctx.KeyBinding?.BoundView != CommandView)
+        //{
+        //   // CommandView.InvokeCommand (Command.Select, ctx.Key, ctx.KeyBinding);
+        //}
 
         if (Action is { })
         {

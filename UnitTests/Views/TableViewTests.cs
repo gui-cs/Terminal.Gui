@@ -2568,6 +2568,7 @@ A B C
     [SetupFakeDriver]
     public void TestTableViewCheckboxes_ByObject ()
     {
+        Assert.Equal(ConfigurationManager.ConfigLocations.DefaultOnly, ConfigurationManager.Locations);
         TableView tv = GetPetTable (out EnumerableTableSource<PickablePet> source);
         tv.LayoutSubviews ();
         IReadOnlyCollection<PickablePet> pets = source.Data;

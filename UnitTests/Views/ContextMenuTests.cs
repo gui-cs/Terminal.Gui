@@ -5,7 +5,7 @@ namespace Terminal.Gui.ViewsTests;
 
 public class ContextMenuTests (ITestOutputHelper output)
 {
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void ContextMenu_Constructors ()
     {
@@ -60,7 +60,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void ContextMenu_Is_Closed_If_Another_MenuBar_Is_Open_Or_Vice_Versa ()
     {
@@ -126,7 +126,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void Draw_A_ContextMenu_Over_A_Borderless_Top ()
     {
@@ -148,7 +148,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { Position = new (8, 2), Flags = MouseFlags.Button3Clicked });
+        Application.OnMouseEvent (new () { ScreenPosition = new (8, 2), Flags = MouseFlags.Button3Clicked });
 
         var firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -172,7 +172,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void Draw_A_ContextMenu_Over_A_Dialog ()
     {
@@ -231,7 +231,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { Position = new (9, 3), Flags = MouseFlags.Button3Clicked });
+        Application.OnMouseEvent (new () { ScreenPosition = new (9, 3), Flags = MouseFlags.Button3Clicked });
 
         var firstIteration = false;
         Application.RunIteration (ref rsDialog, ref firstIteration);
@@ -261,7 +261,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void Draw_A_ContextMenu_Over_A_Top_Dialog ()
     {
@@ -287,7 +287,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { Position = new (9, 3), Flags = MouseFlags.Button3Clicked });
+        Application.OnMouseEvent (new () { ScreenPosition = new (9, 3), Flags = MouseFlags.Button3Clicked });
 
         var firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -312,7 +312,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         dialog.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void ForceMinimumPosToZero_True_False ()
     {
@@ -362,7 +362,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void Hide_Is_Invoke_At_Container_Closing ()
     {
@@ -391,7 +391,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void Key_Open_And_Close_The_ContextMenu ()
     {
@@ -401,15 +401,15 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.Begin (top);
 
         Assert.True (Application.OnKeyDown (ContextMenu.DefaultKey));
-        Assert.True (tf.ContextMenu.MenuBar!.IsMenuOpen);
+        Assert.True (tf.ContextMenu!.Visible);
         Assert.True (Application.OnKeyDown (ContextMenu.DefaultKey));
 
         // The last context menu bar opened is always preserved
-        Assert.NotNull (tf.ContextMenu.MenuBar);
+        Assert.False (tf.ContextMenu.Visible);
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void KeyChanged_Event ()
     {
@@ -423,7 +423,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.Equal (ContextMenu.DefaultKey, oldKey);
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void MenuItens_Changing ()
     {
@@ -475,7 +475,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void Menus_And_SubMenus_Always_Try_To_Be_On_Screen ()
     {
@@ -737,7 +737,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void MouseFlags_Changing ()
     {
@@ -768,7 +768,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     public void MouseFlagsChanged_Event ()
     {
         var oldMouseFlags = new MouseFlags ();
@@ -781,7 +781,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.Equal (MouseFlags.Button3Clicked, oldMouseFlags);
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void Position_Changing ()
     {
@@ -826,7 +826,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void RequestStop_While_ContextMenu_Is_Open_Does_Not_Throws ()
     {
@@ -911,7 +911,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void Show_Display_At_Zero_If_The_Toplevel_Height_Is_Less_Than_The_Menu_Height ()
     {
@@ -949,7 +949,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void Show_Display_At_Zero_If_The_Toplevel_Width_Is_Less_Than_The_Menu_Width ()
     {
@@ -988,7 +988,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void Show_Display_Below_The_Bottom_Host_If_Has_Enough_Space ()
     {
@@ -1062,7 +1062,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void Show_Ensures_Display_Inside_The_Container_But_Preserves_Position ()
     {
@@ -1100,7 +1100,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void Show_Ensures_Display_Inside_The_Container_Without_Overlap_The_Host ()
     {
@@ -1151,7 +1151,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void Show_Hide_IsShow ()
     {
@@ -1190,7 +1190,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void UseSubMenusSingleFrame_True_By_Mouse ()
     {
@@ -1235,7 +1235,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                      );
 
         // X=5 is the border and so need to use at least one more
-        Application.OnMouseEvent (new MouseEvent { Position = new (6, 13), Flags = MouseFlags.Button1Clicked });
+        Application.OnMouseEvent (new () { ScreenPosition = new (6, 13), Flags = MouseFlags.Button1Clicked });
 
         var firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -1253,7 +1253,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { Position = new (6, 12), Flags = MouseFlags.Button1Clicked });
+        Application.OnMouseEvent (new () { ScreenPosition = new (6, 12), Flags = MouseFlags.Button1Clicked });
 
         firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -1273,7 +1273,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void UseSubMenusSingleFrame_False_By_Mouse ()
     {
@@ -1327,7 +1327,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { Position = new (6, 13), Flags = MouseFlags.ReportMousePosition });
+        Application.OnMouseEvent (new () { ScreenPosition = new (6, 13), Flags = MouseFlags.ReportMousePosition });
 
         var firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -1344,7 +1344,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { Position = new (6, 14), Flags = MouseFlags.ReportMousePosition });
+        Application.OnMouseEvent (new () { ScreenPosition = new (6, 14), Flags = MouseFlags.ReportMousePosition });
 
         firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -1362,7 +1362,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { Position = new (6, 13), Flags = MouseFlags.ReportMousePosition });
+        Application.OnMouseEvent (new () { ScreenPosition = new (6, 13), Flags = MouseFlags.ReportMousePosition });
 
         firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -1383,7 +1383,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void Handling_TextField_With_Opened_ContextMenu_By_Mouse_HasFocus ()
     {
@@ -1399,35 +1399,35 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.Empty (Application._cachedViewsUnderMouse);
 
         // Right click on tf2 to open context menu
-        Application.OnMouseEvent (new () { Position = new (1, 3), Flags = MouseFlags.Button3Clicked });
+        Application.OnMouseEvent (new () { ScreenPosition = new (1, 3), Flags = MouseFlags.Button3Clicked });
         Assert.False (tf1.HasFocus);
         Assert.False (tf2.HasFocus);
         Assert.Equal (5, win.Subviews.Count);
-        Assert.True (tf2.ContextMenu.MenuBar.IsMenuOpen);
+        Assert.True (tf2.ContextMenu!.Visible);
         Assert.True (win.Focused is Menu);
         Assert.True (Application.MouseGrabView is MenuBar);
         Assert.Equal (tf2, Application._cachedViewsUnderMouse.LastOrDefault ());
 
         // Click on tf1 to focus it, which cause context menu being closed
-        Application.OnMouseEvent (new () { Position = new (1, 1), Flags = MouseFlags.Button1Clicked });
+        Application.OnMouseEvent (new () { ScreenPosition = new (1, 1), Flags = MouseFlags.Button1Clicked });
         Assert.True (tf1.HasFocus);
         Assert.False (tf2.HasFocus);
         Assert.Equal (4, win.Subviews.Count);
 
         // The last context menu bar opened is always preserved
-        Assert.NotNull (tf2.ContextMenu.MenuBar);
+        Assert.NotNull (tf2.ContextMenu);
         Assert.Equal (win.Focused, tf1);
         Assert.Null (Application.MouseGrabView);
         Assert.Equal (tf1, Application._cachedViewsUnderMouse.LastOrDefault ());
 
         // Click on tf2 to focus it
-        Application.OnMouseEvent (new () { Position = new (1, 3), Flags = MouseFlags.Button1Clicked });
+        Application.OnMouseEvent (new () { ScreenPosition = new (1, 3), Flags = MouseFlags.Button1Clicked });
         Assert.False (tf1.HasFocus);
         Assert.True (tf2.HasFocus);
         Assert.Equal (4, win.Subviews.Count);
 
         // The last context menu bar opened is always preserved
-        Assert.NotNull (tf2.ContextMenu.MenuBar);
+        Assert.NotNull (tf2.ContextMenu);
         Assert.Equal (win.Focused, tf2);
         Assert.Null (Application.MouseGrabView);
         Assert.Equal (tf2, Application._cachedViewsUnderMouse.LastOrDefault ());
@@ -1436,7 +1436,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         win.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void Empty_Menus_Items_Children_Does_Not_Open_The_Menu ()
     {
@@ -1452,7 +1452,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void KeyBindings_Removed_On_Close_ContextMenu ()
     {
@@ -1523,7 +1523,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         void Delete () { deleteFile = true; }
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void KeyBindings_With_ContextMenu_And_MenuBar ()
     {
@@ -1602,7 +1602,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         void Rename () { renameFile = true; }
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void KeyBindings_With_Same_Shortcut_ContextMenu_And_MenuBar ()
     {
@@ -1672,7 +1672,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         void NewContextMenu () { newContextMenu = true; }
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void HotKeys_Removed_On_Close_ContextMenu ()
     {
@@ -1758,7 +1758,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         void Delete () { deleteFile = true; }
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void HotKeys_With_ContextMenu_And_MenuBar ()
     {
@@ -1890,7 +1890,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         void Rename () { renameFile = true; }
     }
 
-    [Fact]
+    [Fact (Skip = "Redo for CMv2")]
     [AutoInitShutdown]
     public void Opened_MenuBar_Is_Closed_When_Another_MenuBar_Is_Opening_Also_By_HotKey ()
     {

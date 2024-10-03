@@ -26,7 +26,7 @@ public class CheckBox : View
         AddCommand (Command.Select, AdvanceCheckState);
 
         // Accept (Enter key and double-click) - Raise Accept event - DO NOT advance state
-        AddCommand (Command.Accept, RaiseAcceptEvent);
+        AddCommand (Command.Accept, () =>  RaiseAcceptEvent());
 
         // Hotkey - Advance state and raise Select event - DO NOT raise Accept
         AddCommand (Command.HotKey, AdvanceCheckState);
@@ -45,7 +45,9 @@ public class CheckBox : View
 
         if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
-            e.Handled = AdvanceCheckState () == true;
+            AdvanceCheckState ();
+            ;
+ //           e.Handled = AdvanceCheckState () == true;
         }
 
 #if CHECKBOX_SUPPORTS_DOUBLE_CLICK_ACCEPT
@@ -147,11 +149,6 @@ public class CheckBox : View
             return null;
         }
 
-        if (RaiseSelectEvent () == true)
-        {
-            return true;
-        }
-
         CancelEventArgs<CheckState> e = new (in _checkedState, ref value);
 
         if (OnCheckedStateChanging (e))
@@ -173,6 +170,11 @@ public class CheckBox : View
         OnCheckedStateChanged (args);
 
         CheckedStateChanged?.Invoke (this, args);
+
+        if (RaiseSelectEvent () == true)
+        {
+            return true;
+        }
 
         return false;
     }
@@ -241,7 +243,7 @@ public class CheckBox : View
 
         bool? cancelled = ChangeCheckedState (e.NewValue);
 
-        return !cancelled;
+        return cancelled;
     }
 
     /// <inheritdoc/>
