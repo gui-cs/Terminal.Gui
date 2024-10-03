@@ -125,8 +125,6 @@ internal class WindowsConsole
                 result = WriteConsole (_screenBuffer, s, (uint)s.Length, out uint _, nint.Zero);
             }
 
-            result = WriteConsole (_screenBuffer, s, (uint)s.Length, out uint _, nint.Zero);
-
             _lastWrite = s;
 
             foreach (var sixel in Application.Sixel)
