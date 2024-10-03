@@ -551,7 +551,7 @@ public class TextField : View
                                  );
 
                 _historyText.Add (
-                                  new List<List<RuneCell>> { TextModel.ToRuneCells (_text) },
+                                  new List<List<RuneCell>> { RuneCell.ToRuneCells (_text) },
                                   new Point (_cursorPosition, 0),
                                   HistoryText.LineStatus.Replaced
                                  );
@@ -648,7 +648,7 @@ public class TextField : View
         }
 
         _historyText.Add (
-                          new List<List<RuneCell>> { TextModel.ToRuneCells (_text) },
+                          new List<List<RuneCell>> { RuneCell.ToRuneCells (_text) },
                           new Point (_cursorPosition, 0)
                          );
 
@@ -702,7 +702,7 @@ public class TextField : View
         }
 
         _historyText.Add (
-                          new List<List<RuneCell>> { TextModel.ToRuneCells (_text) },
+                          new List<List<RuneCell>> { RuneCell.ToRuneCells (_text) },
                           new Point (_cursorPosition, 0)
                          );
 
@@ -1390,7 +1390,7 @@ public class TextField : View
             return;
         }
 
-        Text = TextModel.ToString (obj?.Lines [obj.CursorPosition.Y]);
+        Text = RuneCell.ToString (obj?.Lines [obj.CursorPosition.Y]);
         CursorPosition = obj.CursorPosition.X;
         Adjust ();
     }
@@ -1398,7 +1398,7 @@ public class TextField : View
     private void InsertText (Key a, bool usePreTextChangedCursorPos)
     {
         _historyText.Add (
-                          new List<List<RuneCell>> { TextModel.ToRuneCells (_text) },
+                          new List<List<RuneCell>> { RuneCell.ToRuneCells (_text) },
                           new Point (_cursorPosition, 0)
                          );
 

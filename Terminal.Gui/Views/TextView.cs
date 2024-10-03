@@ -58,6 +58,109 @@ public class RuneCell : IEquatable<RuneCell>
 
         return cells;
     }
+
+    /// <summary>
+    ///     Splits a string into a List that will contain a <see cref="List{RuneCell}"/> for each line.
+    /// </summary>
+    /// <param name="content">The string content.</param>
+    /// <param name="colorScheme">The color scheme.</param>
+    /// <returns>A <see cref="List{RuneCell}"/> for each line.</returns>
+    public static List<List<RuneCell>> StringToLinesOfRuneCells (string content, ColorScheme? colorScheme = null)
+    {
+        List<RuneCell> cells = content.EnumerateRunes ()
+                                      .Select (x => new RuneCell { Rune = x, ColorScheme = colorScheme })
+                                      .ToList ();
+
+        return SplitNewLines (cells);
+    }
+
+    /// <summary>Converts a <see cref="RuneCell"/> generic collection into a string.</summary>
+    /// <param name="cells">The enumerable cell to convert.</param>
+    /// <returns></returns>
+    public static string ToString (IEnumerable<RuneCell> cells)
+    {
+        var str = string.Empty;
+
+        foreach (RuneCell cell in cells)
+        {
+            str += cell.Rune.ToString ();
+        }
+
+        return str;
+    }
+
+    // Turns the string into cells, this does not split the contents on a newline if it is present.
+    internal static List<RuneCell> StringToRuneCells (string str, ColorScheme? colorScheme = null)
+    {
+        List<RuneCell> cells = new ();
+
+        foreach (Rune rune in str.ToRunes ())
+        {
+            cells.Add (new () { Rune = rune, ColorScheme = colorScheme });
+        }
+
+        return cells;
+    }
+
+    internal static List<RuneCell> ToRuneCells (IEnumerable<Rune> runes, ColorScheme? colorScheme = null)
+    {
+        List<RuneCell> cells = new ();
+
+        foreach (Rune rune in runes)
+        {
+            cells.Add (new () { Rune = rune, ColorScheme = colorScheme });
+        }
+
+        return cells;
+    }
+
+    private static List<List<RuneCell>> SplitNewLines (List<RuneCell> cells)
+    {
+        List<List<RuneCell>> lines = new ();
+        int start = 0, i = 0;
+        var hasCR = false;
+
+        // ASCII code 13 = Carriage Return.
+        // ASCII code 10 = Line Feed.
+        for (; i < cells.Count; i++)
+        {
+            if (cells [i].Rune.Value == 13)
+            {
+                hasCR = true;
+
+                continue;
+            }
+
+            if (cells [i].Rune.Value == 10)
+            {
+                if (i - start > 0)
+                {
+                    lines.Add (cells.GetRange (start, hasCR ? i - 1 - start : i - start));
+                }
+                else
+                {
+                    lines.Add (StringToRuneCells (string.Empty));
+                }
+
+                start = i + 1;
+                hasCR = false;
+            }
+        }
+
+        if (i - start >= 0)
+        {
+            lines.Add (cells.GetRange (start, i - start));
+        }
+
+        return lines;
+    }
+
+    /// <summary>
+    ///     Splits a rune cell list into a List that will contain a <see cref="List{RuneCell}"/> for each line.
+    /// </summary>
+    /// <param name="cells">The cells list.</param>
+    /// <returns></returns>
+    public static List<List<RuneCell>> ToRuneCells (List<RuneCell> cells) { return SplitNewLines (cells); }
 }
 
 internal class TextModel
@@ -157,7 +260,7 @@ internal class TextModel
 
     public void LoadRuneCells (List<RuneCell> cells, ColorScheme? colorScheme)
     {
-        _lines = ToRuneCells (cells);
+        _lines = RuneCell.ToRuneCells (cells);
         SetColorSchemes (colorScheme);
         OnLinesLoaded ();
     }
@@ -207,7 +310,7 @@ internal class TextModel
 
     public void LoadString (string content)
     {
-        _lines = StringToLinesOfRuneCells (content);
+        _lines = RuneCell.StringToLinesOfRuneCells (content);
 
         OnLinesLoaded ();
     }
@@ -239,15 +342,7 @@ internal class TextModel
         }
     }
 
-    // Splits a string into a List that contains a List<RuneCell> for each line
-    public static List<List<RuneCell>> StringToLinesOfRuneCells (string content, ColorScheme? colorScheme = null)
-    {
-        List<RuneCell> cells = content.EnumerateRunes ()
-                                      .Select (x => new RuneCell { Rune = x, ColorScheme = colorScheme })
-                                      .ToList ();
 
-        return SplitNewLines (cells);
-    }
 
     public override string ToString ()
     {
@@ -255,7 +350,7 @@ internal class TextModel
 
         for (var i = 0; i < _lines.Count; i++)
         {
-            sb.Append (ToString (_lines [i]));
+            sb.Append (RuneCell.ToString (_lines [i]));
 
             if (i + 1 < _lines.Count)
             {
@@ -264,21 +359,6 @@ internal class TextModel
         }
 
         return sb.ToString ();
-    }
-
-    /// <summary>Converts a <see cref="RuneCell"/> generic collection into a string.</summary>
-    /// <param name="cells">The enumerable cell to convert.</param>
-    /// <returns></returns>
-    public static string ToString (IEnumerable<RuneCell> cells)
-    {
-        var str = string.Empty;
-
-        foreach (RuneCell cell in cells)
-        {
-            str += cell.Rune.ToString ();
-        }
-
-        return str;
     }
 
     public (int col, int row)? WordBackward (int fromCol, int fromRow)
@@ -873,7 +953,7 @@ internal class TextModel
 
         string GetText (List<RuneCell> x)
         {
-            string txt = ToString (x);
+            string txt = RuneCell.ToString (x);
 
             if (!matchCase)
             {
@@ -906,36 +986,10 @@ internal class TextModel
         return false;
     }
 
-    // Turns the string into cells, this does not split the 
-    // contents on a newline if it is present.
-    internal static List<RuneCell> StringToRuneCells (string str, ColorScheme? colorScheme = null)
-    {
-        List<RuneCell> cells = new ();
-
-        foreach (Rune rune in str.ToRunes ())
-        {
-            cells.Add (new () { Rune = rune, ColorScheme = colorScheme });
-        }
-
-        return cells;
-    }
-
-    internal static List<RuneCell> ToRuneCells (IEnumerable<Rune> runes, ColorScheme? colorScheme = null)
-    {
-        List<RuneCell> cells = new ();
-
-        foreach (Rune rune in runes)
-        {
-            cells.Add (new () { Rune = rune, ColorScheme = colorScheme });
-        }
-
-        return cells;
-    }
-
     private void Append (List<byte> line)
     {
         var str = StringExtensions.ToString (line.ToArray ());
-        _lines.Add (StringToRuneCells (str));
+        _lines.Add (RuneCell.StringToRuneCells (str));
     }
 
     private bool ApplyToFind ((Point current, bool found) foundPos)
@@ -972,7 +1026,7 @@ internal class TextModel
         for (int i = start.Y; i < linesCount; i++)
         {
             List<RuneCell> x = _lines [i];
-            string txt = ToString (x);
+            string txt = RuneCell.ToString (x);
 
             if (!matchCase)
             {
@@ -1012,7 +1066,7 @@ internal class TextModel
         for (int i = linesCount; i >= 0; i--)
         {
             List<RuneCell> x = _lines [i];
-            string txt = ToString (x);
+            string txt = RuneCell.ToString (x);
 
             if (!matchCase)
             {
@@ -1175,7 +1229,7 @@ internal class TextModel
 
     private string ReplaceText (List<RuneCell> source, string textToReplace, string matchText, int col)
     {
-        string origTxt = ToString (source);
+        string origTxt = RuneCell.ToString (source);
         (_, int len) = DisplaySize (source, 0, col, false);
         (_, int len2) = DisplaySize (source, col, col + matchText.Length, false);
         (_, int len3) = DisplaySize (source, col + matchText.Length, origTxt.GetRuneCount (), false);
@@ -1205,49 +1259,6 @@ internal class TextModel
             }
         }
     }
-
-    private static List<List<RuneCell>> SplitNewLines (List<RuneCell> cells)
-    {
-        List<List<RuneCell>> lines = new ();
-        int start = 0, i = 0;
-        var hasCR = false;
-
-        // ASCII code 13 = Carriage Return.
-        // ASCII code 10 = Line Feed.
-        for (; i < cells.Count; i++)
-        {
-            if (cells [i].Rune.Value == 13)
-            {
-                hasCR = true;
-
-                continue;
-            }
-
-            if (cells [i].Rune.Value == 10)
-            {
-                if (i - start > 0)
-                {
-                    lines.Add (cells.GetRange (start, hasCR ? i - 1 - start : i - start));
-                }
-                else
-                {
-                    lines.Add (StringToRuneCells (string.Empty));
-                }
-
-                start = i + 1;
-                hasCR = false;
-            }
-        }
-
-        if (i - start >= 0)
-        {
-            lines.Add (cells.GetRange (start, i - start));
-        }
-
-        return lines;
-    }
-
-    private static List<List<RuneCell>> ToRuneCells (List<RuneCell> cells) { return SplitNewLines (cells); }
 
     private enum RuneType
     {
@@ -1782,7 +1793,7 @@ internal class WordWrapManager
 
             List<List<RuneCell>> wrappedLines = ToListRune (
                                                             TextFormatter.Format (
-                                                                                  TextModel.ToString (line),
+                                                                                  RuneCell.ToString (line),
                                                                                   width,
                                                                                   Alignment.Start,
                                                                                   true,
@@ -2905,7 +2916,7 @@ public class TextView : View
         else
         {
             List<RuneCell> currentLine = GetCurrentLine ();
-            SetClipboard (TextModel.ToString (currentLine));
+            SetClipboard (RuneCell.ToString (currentLine));
             _copyWithoutSelection = true;
         }
 
@@ -4762,7 +4773,7 @@ public class TextView : View
             return;
         }
 
-        List<List<RuneCell>> lines = TextModel.StringToLinesOfRuneCells (text);
+        List<List<RuneCell>> lines = RuneCell.StringToLinesOfRuneCells (text);
 
         if (lines.Count == 0)
         {

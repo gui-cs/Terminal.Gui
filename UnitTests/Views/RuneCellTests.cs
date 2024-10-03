@@ -218,10 +218,10 @@ ror       ";
 
         List<List<RuneCell>> text = new ()
         {
-            TextModel.ToRuneCells (
+            RuneCell.ToRuneCells (
                                    "This is the first line.".ToRunes ()
                                   ),
-            TextModel.ToRuneCells (
+            RuneCell.ToRuneCells (
                                    "This is the second line.".ToRunes ()
                                   )
         };
@@ -237,7 +237,7 @@ ror       ";
             eventCount++;
         }
 
-        tv.Text = $"{TextModel.ToString (text [0])}\n{TextModel.ToString (text [1])}\n";
+        tv.Text = $"{RuneCell.ToString (text [0])}\n{RuneCell.ToString (text [1])}\n";
         Assert.False (tv.WordWrap);
         var top = new Toplevel ();
         top.Add (tv);

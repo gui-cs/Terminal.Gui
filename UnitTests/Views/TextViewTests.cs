@@ -4717,7 +4717,7 @@ This is the second line.
     public void Internal_Tests ()
     {
         var txt = "This is a text.";
-        List<RuneCell> txtRunes = TextModel.StringToRuneCells (txt);
+        List<RuneCell> txtRunes = RuneCell.StringToRuneCells (txt);
         Assert.Equal (txt.Length, txtRunes.Count);
         Assert.Equal ('T', txtRunes [0].Rune.Value);
         Assert.Equal ('h', txtRunes [1].Rune.Value);
@@ -4757,8 +4757,8 @@ This is the second line.
         Assert.Equal (2, TextModel.CalculateLeftColumn (txtRunes, 0, 9, 8));
 
         var tm = new TextModel ();
-        tm.AddLine (0, TextModel.StringToRuneCells ("This is first line."));
-        tm.AddLine (1, TextModel.StringToRuneCells ("This is last line."));
+        tm.AddLine (0, RuneCell.StringToRuneCells ("This is first line."));
+        tm.AddLine (1, RuneCell.StringToRuneCells ("This is last line."));
         Assert.Equal ((new Point (2, 0), true), tm.FindNextText ("is", out bool gaveFullTurn));
         Assert.False (gaveFullTurn);
         Assert.Equal ((new Point (5, 0), true), tm.FindNextText ("is", out gaveFullTurn));
@@ -4782,14 +4782,14 @@ This is the second line.
         Assert.True (gaveFullTurn);
 
         Assert.Equal ((new Point (9, 1), true), tm.ReplaceAllText ("is", false, false, "really"));
-        Assert.Equal (TextModel.StringToRuneCells ("Threally really first line."), tm.GetLine (0));
-        Assert.Equal (TextModel.StringToRuneCells ("Threally really last line."), tm.GetLine (1));
+        Assert.Equal (RuneCell.StringToRuneCells ("Threally really first line."), tm.GetLine (0));
+        Assert.Equal (RuneCell.StringToRuneCells ("Threally really last line."), tm.GetLine (1));
         tm = new TextModel ();
-        tm.AddLine (0, TextModel.StringToRuneCells ("This is first line."));
-        tm.AddLine (1, TextModel.StringToRuneCells ("This is last line."));
+        tm.AddLine (0, RuneCell.StringToRuneCells ("This is first line."));
+        tm.AddLine (1, RuneCell.StringToRuneCells ("This is last line."));
         Assert.Equal ((new Point (5, 1), true), tm.ReplaceAllText ("is", false, true, "really"));
-        Assert.Equal (TextModel.StringToRuneCells ("This really first line."), tm.GetLine (0));
-        Assert.Equal (TextModel.StringToRuneCells ("This really last line."), tm.GetLine (1));
+        Assert.Equal (RuneCell.StringToRuneCells ("This really first line."), tm.GetLine (0));
+        Assert.Equal (RuneCell.StringToRuneCells ("This really last line."), tm.GetLine (1));
     }
 
     [Fact]

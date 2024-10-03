@@ -30,7 +30,7 @@ internal class FilepathSuggestionGenerator : ISuggestionGenerator
             return Enumerable.Empty<Suggestion> ();
         }
 
-        var path = TextModel.ToString (context.CurrentLine);
+        var path = RuneCell.ToString (context.CurrentLine);
         int last = path.LastIndexOfAny (FileDialog.Separators);
 
         if (string.IsNullOrWhiteSpace (path) || !Path.IsPathRooted (path))
