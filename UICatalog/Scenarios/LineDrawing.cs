@@ -135,13 +135,14 @@ public class LineDrawing : Scenario
         var d = new Dialog
         {
             Title = title,
-            Height = 7
+            Width = Application.Force16Colors ? 35 : Dim.Auto (DimAutoStyle.Auto, Dim.Percent (80), Dim.Percent (90)),
+            Height = 10
         };
 
         var btnOk = new Button
         {
             X = Pos.Center () - 5,
-            Y = 4,
+            Y = Application.Force16Colors ? 6 : 4,
             Text = "Ok",
             Width = Dim.Auto (),
             IsDefault = true
@@ -171,21 +172,34 @@ public class LineDrawing : Scenario
         d.Add (btnOk);
         d.Add (btnCancel);
 
-        /* Does not work
         d.AddButton (btnOk);
         d.AddButton (btnCancel);
-        */
-        var cp = new ColorPicker
+
+        View cp;
+        if (Application.Force16Colors)
         {
-            SelectedColor = current,
-            Width = Dim.Fill ()
-        };
+            cp = new ColorPicker16
+            {
+                SelectedColor = current.GetClosestNamedColor16 (),
+                Width = Dim.Fill ()
+            };
+        }
+        else
+        {
+            cp = new ColorPicker
+            {
+                SelectedColor = current,
+                Width = Dim.Fill (),
+                Style = new () { ShowColorName = true, ShowTextFields = true }
+            };
+            ((ColorPicker)cp).ApplyStyleChanges ();
+        }
 
         d.Add (cp);
 
         Application.Run (d);
         d.Dispose ();
-        newColor = cp.SelectedColor;
+        newColor = Application.Force16Colors ? ((ColorPicker16)cp).SelectedColor : ((ColorPicker)cp).SelectedColor;
 
         return accept;
     }
