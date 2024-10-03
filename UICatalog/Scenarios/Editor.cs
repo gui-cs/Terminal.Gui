@@ -202,7 +202,31 @@ public class Editor : Scenario
                          CreateWrapChecked (),
                          CreateAutocomplete (),
                          CreateAllowsTabChecked (),
-                         CreateReadOnlyChecked ()
+                         CreateReadOnlyChecked (),
+                         new MenuItem (
+                                       "Colors",
+                                       "",
+                                       () =>
+                                       {
+                                           if (!PromptForColor (
+                                                                "Colors",
+                                                                GetSelectedRuneCellAttribute (),
+                                                                out Attribute newAttribute
+                                                               ))
+                                           {
+                                               return;
+                                           }
+
+                                           var cs = new ColorScheme (_textView.ColorScheme)
+                                           {
+                                               Focus = new (
+                                                                          newAttribute.Foreground,
+                                                                          newAttribute.Background
+                                                                         )
+                                           };
+
+                                           ApplyRuneCellAttribute (cs);
+                                       })
                      }
                     ),
                 new (
@@ -315,6 +339,158 @@ public class Editor : Scenario
         // Shutdown - Calling Application.Shutdown is required.
         Application.Shutdown ();
 
+    }
+
+    private void ApplyRuneCellAttribute (ColorScheme cs)
+    {
+        if (_textView.SelectedLength > 0)
+        {
+            int selectedLength = _textView.SelectedLength + _textView.CurrentRow - _textView.SelectionStartRow;
+
+            for (int r = _textView.SelectionStartRow; r <= _textView.CurrentRow; r++)
+            {
+                List<RuneCell> line = _textView.GetLine (r);
+
+                for (int c = r == _textView.SelectionStartRow ? _textView.SelectionStartColumn : 0;
+                     c < Math.Min ((r == _textView.SelectionStartRow ? _textView.SelectionStartColumn : 0) + (selectedLength > line.Count ? line.Count : selectedLength), line.Count);
+                     c++)
+                {
+                    line [c].ColorScheme = cs;
+                }
+
+                selectedLength = selectedLength - line.Count + 1 > -1 ? selectedLength - line.Count + 1 : selectedLength;
+            }
+        }
+    }
+
+    private Attribute? GetSelectedRuneCellAttribute ()
+    {
+        List<RuneCell> line;
+
+        if (_textView.SelectedLength > 0)
+        {
+            line = _textView.GetLine (Math.Min (_textView.SelectionStartRow, _textView.CurrentRow));
+
+            if (line [Math.Min (Math.Min (_textView.SelectionStartColumn, _textView.CurrentColumn), line.Count - 1)].ColorScheme is { } csSel)
+            {
+                return new (csSel.Focus);
+            }
+
+            return new (_textView.ColorScheme!.Focus);
+        }
+
+        line = _textView.GetCurrentLine ();
+
+        if (line [Math.Min (_textView.CurrentColumn, line.Count - 1)].ColorScheme is { } cs)
+        {
+            return new (cs!.Focus);
+        }
+
+        return new (_textView.ColorScheme!.Focus);
+    }
+
+    public static bool PromptForColor (string title, Attribute? current, out Attribute newAttribute)
+    {
+        var accept = false;
+
+        var d = new Dialog
+        {
+            Title = title,
+            Width = Application.Force16Colors ? 35 : Dim.Auto (DimAutoStyle.Auto, Dim.Percent (80), Dim.Percent (90)),
+            Height = 20
+        };
+
+        var btnOk = new Button
+        {
+            X = Pos.Center () - 5,
+            Y = Application.Force16Colors ? 6 : 4,
+            Text = "Ok",
+            Width = Dim.Auto (),
+            IsDefault = true
+        };
+
+        btnOk.Accept += (s, e) =>
+        {
+            accept = true;
+            e.Handled = true;
+            Application.RequestStop ();
+        };
+
+        var btnCancel = new Button
+        {
+            X = Pos.Center () + 5,
+            Y = 4,
+            Text = "Cancel",
+            Width = Dim.Auto ()
+        };
+
+        btnCancel.Accept += (s, e) =>
+        {
+            e.Handled = true;
+            Application.RequestStop ();
+        };
+
+        d.Add (btnOk);
+        d.Add (btnCancel);
+
+        d.AddButton (btnOk);
+        d.AddButton (btnCancel);
+
+        View cpForeground;
+        if (Application.Force16Colors)
+        {
+            cpForeground = new ColorPicker16
+            {
+                SelectedColor = current!.Value.Foreground.GetClosestNamedColor16 (),
+                Width = Dim.Fill ()
+            };
+        }
+        else
+        {
+            cpForeground = new ColorPicker
+            {
+                SelectedColor = current!.Value.Foreground,
+                Width = Dim.Fill (),
+                Style = new () { ShowColorName = true, ShowTextFields = true },
+                BorderStyle = LineStyle.Single,
+                Title = "Foreground"
+            };
+            ((ColorPicker)cpForeground).ApplyStyleChanges ();
+        }
+
+        View cpBackground;
+        if (Application.Force16Colors)
+        {
+            cpBackground = new ColorPicker16
+            {
+                SelectedColor = current!.Value.Background.GetClosestNamedColor16 (),
+                Y = Pos.Bottom (cpForeground) + 1,
+                Width = Dim.Fill ()
+            };
+        }
+        else
+        {
+            cpBackground = new ColorPicker
+            {
+                SelectedColor = current!.Value.Background,
+                Width = Dim.Fill (),
+                Y = Pos.Bottom (cpForeground) + 1,
+                Style = new () { ShowColorName = true, ShowTextFields = true },
+                BorderStyle = LineStyle.Single,
+                Title = "Background"
+            };
+            ((ColorPicker)cpBackground).ApplyStyleChanges ();
+        }
+
+        d.Add (cpForeground, cpBackground);
+
+        Application.Run (d);
+        d.Dispose ();
+        var newForeColor = Application.Force16Colors ? ((ColorPicker16)cpForeground).SelectedColor : ((ColorPicker)cpForeground).SelectedColor;
+        var newBackColor = Application.Force16Colors ? ((ColorPicker16)cpBackground).SelectedColor : ((ColorPicker)cpBackground).SelectedColor;
+        newAttribute = new (newForeColor, newBackColor);
+
+        return accept;
     }
 
     private bool CanCloseFile ()
