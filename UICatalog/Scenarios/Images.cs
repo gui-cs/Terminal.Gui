@@ -52,6 +52,12 @@ public class Images : Scenario
     /// </summary>
     private View _sixelView;
 
+    private DoomFire _fire;
+    private SixelEncoder _encoder;
+    private int _fireFrameCounter;
+    private bool _isDisposed;
+    private SixelToRender _fireSixel;
+
     public override void Main ()
     {
         Application.Init ();
@@ -143,42 +149,56 @@ public class Images : Scenario
 
     private void BtnStartFireOnAccept (object sender, HandledEventArgs e)
     {
-        var fire = new DoomFire (_win.Frame.Width * _pxX.Value, _win.Frame.Height * _pxY.Value);
-        var encoder = new SixelEncoder ();
-        encoder.Quantizer.PaletteBuildingAlgorithm = new ConstPalette (fire.Palette);
+        if (_fire != null)
+        {
+            return;
+        }
 
-        var counter = 0;
+        _fire = new DoomFire (_win.Frame.Width * _pxX.Value, _win.Frame.Height * _pxY.Value);
+        _encoder = new SixelEncoder ();
+        _encoder.Quantizer.PaletteBuildingAlgorithm = new ConstPalette (_fire.Palette);
 
-        Application.AddTimeout (
-                                TimeSpan.FromMilliseconds (30),
-                                () =>
-                                {
-                                    fire.AdvanceFrame ();
-                                    counter++;
+        _fireFrameCounter = 0;
 
-                                    // Control frame rate by adjusting this
-                                    // Lower number means more FPS
-                                    if (counter % 2 != 0)
-                                    {
-                                        return true;
-                                    }
+        Application.AddTimeout (TimeSpan.FromMilliseconds (30), AdvanceFireTimerCallback);
+    }
 
-                                    Color [,] bmp = fire.GetFirePixels ();
+    private void StopFire ()
+    {
 
-                                    // TODO: Static way of doing this, suboptimal
-                                    Application.Sixel.Clear ();
+    }
 
-                                    Application.Sixel.Add (
-                                                           new()
-                                                           {
-                                                               SixelData = encoder.EncodeSixel (bmp),
-                                                               ScreenPosition = new (0, 0)
-                                                           });
+    private bool AdvanceFireTimerCallback ()
+    {
+        _fire.AdvanceFrame ();
+        _fireFrameCounter++;
 
-                                    _win.SetNeedsDisplay ();
+        // Control frame rate by adjusting this
+        // Lower number means more FPS
+        if (_fireFrameCounter % 2 != 0 || _isDisposed)
+        {
+            return !_isDisposed;
+        }
 
-                                    return true;
-                                });
+        Color [,] bmp = _fire.GetFirePixels ();
+
+        // TODO: Static way of doing this, suboptimal
+        if (_fireSixel != null)
+        {
+            Application.Sixel.Remove (_fireSixel);
+        }
+
+        _fireSixel = new ()
+        {
+            SixelData = _encoder.EncodeSixel (bmp),
+            ScreenPosition = new (0, 0)
+        };
+
+        Application.Sixel.Add (_fireSixel);
+
+        _win.SetNeedsDisplay ();
+
+        return !_isDisposed;
     }
 
     /// <inheritdoc/>
@@ -188,6 +208,9 @@ public class Images : Scenario
         _imageView.Dispose ();
         _sixelNotSupported.Dispose ();
         _sixelSupported.Dispose ();
+        _isDisposed = true;
+
+        Application.Sixel.Clear ();
     }
 
     private void OpenImage (object sender, HandledEventArgs e)
