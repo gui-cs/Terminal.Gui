@@ -469,7 +469,8 @@ public class Images : Scenario
     )
     {
         var encoder = new SixelEncoder ();
-        
+        encoder.Quantizer.PaletteBuildingAlgorithm = GetPaletteBuilder ();
+        encoder.Quantizer.DistanceAlgorithm = GetDistanceAlgorithm ();
 
         // Calculate the target size in pixels based on console units
         int targetWidthInPixels = maxSize.Width * pixelsPerCellX;
