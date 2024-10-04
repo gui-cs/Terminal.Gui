@@ -345,12 +345,17 @@ public class Editor : Scenario
     {
         if (!_textView.ReadOnly && _textView.SelectedLength > 0)
         {
-            for (int r = _textView.SelectionStartRow; r <= _textView.CurrentRow; r++)
+            var startRow = Math.Min (_textView.SelectionStartRow, _textView.CurrentRow);
+            var endRow = Math.Max (_textView.CurrentRow, _textView.SelectionStartRow);
+            var startCol = _textView.SelectionStartRow <= _textView.CurrentRow ? _textView.SelectionStartColumn : _textView.CurrentColumn;
+            var endCol = _textView.CurrentRow >= _textView.SelectionStartRow ? _textView.CurrentColumn : _textView.SelectionStartColumn;
+
+            for (int r = startRow; r <= endRow; r++)
             {
                 List<RuneCell> line = _textView.GetLine (r);
 
-                for (int c = r == _textView.SelectionStartRow ? _textView.SelectionStartColumn : 0;
-                     c < (r == _textView.CurrentRow ? _textView.CurrentColumn : line.Count);
+                for (int c = r == startRow ? startCol : 0;
+                     c < (r == endRow ? endCol : line.Count);
                      c++)
                 {
                     line [c].ColorScheme = cs;
