@@ -60,6 +60,7 @@ public class Images : Scenario
     private RadioGroup _rgPaletteBuilder;
     private RadioGroup _rgDistanceAlgorithm;
     private NumericUpDown _popularityThreshold;
+    private SixelToRender _sixelImage;
 
     public override void Main ()
     {
@@ -438,13 +439,25 @@ public class Images : Scenario
                                                _pxX.Value,
                                                _pxY.Value);
 
-        // TODO: Static way of doing this, suboptimal
-        Application.Sixel.Add (
-                               new()
-                               {
-                                   SixelData = _encodedSixelData,
-                                   ScreenPosition = _screenLocationForSixel
-                               });
+        if (_sixelImage == null)
+        {
+            _sixelImage = new ()
+            {
+                SixelData = _encodedSixelData,
+                ScreenPosition = _screenLocationForSixel
+            };
+
+            Application.Sixel.Add (_sixelImage);
+        }
+        else
+        {
+            _sixelImage.ScreenPosition = _screenLocationForSixel;
+            _sixelImage.SixelData = _encodedSixelData;
+        }
+
+        _sixelView.SetNeedsDisplay();
+
+
     }
 
     private void SixelViewOnDrawContent (object sender, DrawEventArgs e)
