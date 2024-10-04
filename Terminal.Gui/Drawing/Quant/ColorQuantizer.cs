@@ -28,7 +28,7 @@ public class ColorQuantizer
     /// <summary>
     /// Gets or sets the algorithm used to build the <see cref="Palette"/>.
     /// </summary>
-    public IPaletteBuilder PaletteBuildingAlgorithm { get; set; } = new PopularityPaletteWithThreshold (new EuclideanColorDistance (),5) ;
+    public IPaletteBuilder PaletteBuildingAlgorithm { get; set; } = new PopularityPaletteWithThreshold (new EuclideanColorDistance (),8) ;
 
     private readonly ConcurrentDictionary<Color, int> _nearestColorCache = new ();
 
@@ -46,6 +46,7 @@ public class ColorQuantizer
             }
         }
 
+        _nearestColorCache.Clear ();
         Palette = PaletteBuildingAlgorithm.BuildPalette (allColors, MaxColors);
     }
 

@@ -53,10 +53,10 @@ public class Images : Scenario
     private View _sixelView;
 
     private DoomFire _fire;
-    private SixelEncoder _encoder;
+    private SixelEncoder _fireEncoder;
+    private SixelToRender _fireSixel;
     private int _fireFrameCounter;
     private bool _isDisposed;
-    private SixelToRender _fireSixel;
 
     public override void Main ()
     {
@@ -155,17 +155,12 @@ public class Images : Scenario
         }
 
         _fire = new DoomFire (_win.Frame.Width * _pxX.Value, _win.Frame.Height * _pxY.Value);
-        _encoder = new SixelEncoder ();
-        _encoder.Quantizer.PaletteBuildingAlgorithm = new ConstPalette (_fire.Palette);
+        _fireEncoder = new SixelEncoder ();
+        _fireEncoder.Quantizer.PaletteBuildingAlgorithm = new ConstPalette (_fire.Palette);
 
         _fireFrameCounter = 0;
 
         Application.AddTimeout (TimeSpan.FromMilliseconds (30), AdvanceFireTimerCallback);
-    }
-
-    private void StopFire ()
-    {
-
     }
 
     private bool AdvanceFireTimerCallback ()
@@ -190,7 +185,7 @@ public class Images : Scenario
 
         _fireSixel = new ()
         {
-            SixelData = _encoder.EncodeSixel (bmp),
+            SixelData = _fireEncoder.EncodeSixel (bmp),
             ScreenPosition = new (0, 0)
         };
 
@@ -410,6 +405,7 @@ public class Images : Scenario
     )
     {
         var encoder = new SixelEncoder ();
+        
 
         // Calculate the target size in pixels based on console units
         int targetWidthInPixels = maxSize.Width * pixelsPerCellX;
