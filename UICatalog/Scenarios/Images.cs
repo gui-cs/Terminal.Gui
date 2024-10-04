@@ -23,13 +23,39 @@ public class Images : Scenario
     private Point _screenLocationForSixel;
     private string _encodedSixelData;
     private Window _win;
+
+    /// <summary>
+    ///     Number of sixel pixels per row of characters in the console.
+    /// </summary>
     private NumericUpDown _pxY;
+
+    /// <summary>
+    ///     Number of sixel pixels per column of characters in the console
+    /// </summary>
     private NumericUpDown _pxX;
+
+    /// <summary>
+    ///     View shown in sixel tab if sixel is supported
+    /// </summary>
+    private View _sixelSupported;
+
+    /// <summary>
+    ///     View shown in sixel tab if sixel is not supported
+    /// </summary>
+    private View _sixelNotSupported;
+
+    private Tab _tabSixel;
+    private TabView _tabView;
+
+    /// <summary>
+    ///     The view into which the currently opened sixel image is bounded
+    /// </summary>
+    private View _sixelView;
 
     public override void Main ()
     {
         Application.Init ();
-        _win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
+        _win = new() { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
 
         bool canTrueColor = Application.Driver?.SupportsTrueColor ?? false;
 
@@ -38,7 +64,7 @@ public class Images : Scenario
             DisplayText = "Basic"
         };
 
-        var tabSixel = new Tab
+        _tabSixel = new()
         {
             DisplayText = "Sixel"
         };
@@ -61,14 +87,17 @@ public class Images : Scenario
             X = Pos.Right (lblDriverName) + 2,
             Y = 1,
             CheckedState = ConsoleDriver.SupportsSixel
-                ? CheckState.Checked : CheckState.UnChecked,
+                               ? CheckState.Checked
+                               : CheckState.UnChecked,
             Text = "Supports Sixel"
         };
 
         cbSupportsSixel.CheckedStateChanging += (s, e) =>
                                                 {
                                                     ConsoleDriver.SupportsSixel = e.NewValue == CheckState.Checked;
+                                                    SetupSixelSupported (e.NewValue == CheckState.Checked);
                                                 };
+
         _win.Add (cbSupportsSixel);
 
         var cbUseTrueColor = new CheckBox
@@ -85,38 +114,41 @@ public class Images : Scenario
         var btnOpenImage = new Button { X = Pos.Right (cbUseTrueColor) + 2, Y = 0, Text = "Open Image" };
         _win.Add (btnOpenImage);
 
-        var btnStartFire = new Button { X = Pos.Right (cbUseTrueColor) + 2, Y = 1, Text = "Start Fire" };
-        _win.Add (btnStartFire);
-
-        btnStartFire.Accept += BtnStartFireOnAccept;
-
-        var tv = new TabView
+        _tabView = new()
         {
-            Y = Pos.Bottom (cbSupportsSixel), Width = Dim.Fill (), Height = Dim.Fill ()
+            Y = Pos.Bottom (btnOpenImage), Width = Dim.Fill (), Height = Dim.Fill ()
         };
 
-        tv.AddTab (tabBasic, true);
-        tv.AddTab (tabSixel, false);
+        _tabView.AddTab (tabBasic, true);
+        _tabView.AddTab (_tabSixel, false);
 
         BuildBasicTab (tabBasic);
-        BuildSixelTab (tabSixel);
+        BuildSixelTab ();
+
+        SetupSixelSupported (cbSupportsSixel.CheckedState == CheckState.Checked);
 
         btnOpenImage.Accept += OpenImage;
 
-        _win.Add (tv);
+        _win.Add (_tabView);
         Application.Run (_win);
         _win.Dispose ();
         Application.Shutdown ();
     }
 
+    private void SetupSixelSupported (bool isSupported)
+    {
+        _tabSixel.View = isSupported ? _sixelSupported : _sixelNotSupported;
+        _tabView.SetNeedsDisplay ();
+    }
+
     private void BtnStartFireOnAccept (object sender, HandledEventArgs e)
     {
-        
         var fire = new DoomFire (_win.Frame.Width * _pxX.Value, _win.Frame.Height * _pxY.Value);
         var encoder = new SixelEncoder ();
         encoder.Quantizer.PaletteBuildingAlgorithm = new ConstPalette (fire.Palette);
 
-        int counter = 0;
+        var counter = 0;
+
         Application.AddTimeout (
                                 TimeSpan.FromMilliseconds (30),
                                 () =>
@@ -131,27 +163,31 @@ public class Images : Scenario
                                         return true;
                                     }
 
-                                    var bmp = fire.GetFirePixels ();
+                                    Color [,] bmp = fire.GetFirePixels ();
 
                                     // TODO: Static way of doing this, suboptimal
                                     Application.Sixel.Clear ();
-                                    Application.Sixel.Add (new SixelToRender
-                                    {
-                                        SixelData = encoder.EncodeSixel (bmp),
-                                        ScreenPosition = new Point (0,0)
-                                    });
 
-                                    _win.SetNeedsDisplay();
+                                    Application.Sixel.Add (
+                                                           new()
+                                                           {
+                                                               SixelData = encoder.EncodeSixel (bmp),
+                                                               ScreenPosition = new (0, 0)
+                                                           });
+
+                                    _win.SetNeedsDisplay ();
 
                                     return true;
                                 });
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
         base.Dispose (disposing);
         _imageView.Dispose ();
+        _sixelNotSupported.Dispose ();
+        _sixelSupported.Dispose ();
     }
 
     private void OpenImage (object sender, HandledEventArgs e)
@@ -198,103 +234,138 @@ public class Images : Scenario
             return;
         }
 
-
         _imageView.SetImage (img);
         Application.Refresh ();
     }
 
     private void BuildBasicTab (Tab tabBasic)
     {
-        _imageView = new()
+        _imageView = new ()
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             CanFocus = true
-
         };
 
         tabBasic.View = _imageView;
     }
 
-    private void BuildSixelTab (Tab tabSixel)
+    private void BuildSixelTab ()
     {
-        tabSixel.View = new()
+        _sixelSupported = new()
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             CanFocus = true
         };
 
-        var btnSixel = new Button { X = 0, Y = 0, Text = "Output Sixel", Width = Dim.Auto () };
-        tabSixel.View.Add (btnSixel);
-
-        var sixelView = new View
+        _sixelNotSupported = new()
         {
-            Y = Pos.Bottom (btnSixel),
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            CanFocus = true
+        };
+
+        _sixelNotSupported.Add (
+                                new Label
+                                {
+                                    Width = Dim.Fill (),
+                                    Height = Dim.Fill (),
+                                    TextAlignment = Alignment.Center,
+                                    Text = "Your driver does not support Sixel image format",
+                                    VerticalTextAlignment = Alignment.Center
+                                });
+
+        _sixelView = new()
+        {
             Width = Dim.Percent (50),
             Height = Dim.Fill (),
             BorderStyle = LineStyle.Dotted
         };
 
-        tabSixel.View.Add (sixelView);
+        _sixelSupported.Add (_sixelView);
+
+        var btnSixel = new Button
+        {
+            X = Pos.Right (_sixelView),
+            Y = 0,
+            Text = "Output Sixel", Width = Dim.Auto ()
+        };
+        btnSixel.Accept += OutputSixelButtonClick;
+        _sixelSupported.Add (btnSixel);
+
+        var btnStartFire = new Button
+        {
+            X = Pos.Right (_sixelView),
+            Y = Pos.Bottom (btnSixel),
+            Text = "Start Fire"
+        };
+        btnStartFire.Accept += BtnStartFireOnAccept;
+        _sixelSupported.Add (btnStartFire);
+
 
         var lblPxX = new Label
         {
-            X = Pos.Right (sixelView),
+            X = Pos.Right (_sixelView),
+            Y = Pos.Bottom (btnStartFire) + 1,
             Text = "Pixels per Col:"
         };
-        _pxX = new NumericUpDown
+
+        _pxX = new()
         {
             X = Pos.Right (lblPxX),
+            Y = Pos.Bottom (btnStartFire) + 1,
             Value = 10
         };
 
         var lblPxY = new Label
         {
             X = lblPxX.X,
-            Y = 1,
+            Y = Pos.Bottom (_pxX),
             Text = "Pixels per Row:"
         };
-        _pxY = new NumericUpDown
+
+        _pxY = new()
         {
             X = Pos.Right (lblPxY),
-            Y = 1,
+            Y = Pos.Bottom (_pxX),
             Value = 20
         };
 
-        tabSixel.View.Add (lblPxX);
-        tabSixel.View.Add (_pxX);
-        tabSixel.View.Add (lblPxY);
-        tabSixel.View.Add (_pxY);
+        _sixelSupported.Add (lblPxX);
+        _sixelSupported.Add (_pxX);
+        _sixelSupported.Add (lblPxY);
+        _sixelSupported.Add (_pxY);
 
-        sixelView.DrawContent += SixelViewOnDrawContent;
+        _sixelView.DrawContent += SixelViewOnDrawContent;
+    }
 
+    private void OutputSixelButtonClick (object sender, HandledEventArgs e)
+    {
+        if (_imageView.FullResImage == null)
+        {
+            MessageBox.Query ("No Image Loaded", "You must first open an image.  Use the 'Open Image' button above.", "Ok");
+            return;
+        }
 
-        btnSixel.Accept += (s, e) =>
-                           {
+        _screenLocationForSixel = _sixelView.FrameToScreen ().Location;
 
-                               if (_imageView.FullResImage == null)
-                               {
-                                   return;
-                               }
+        _encodedSixelData = GenerateSixelData (
+                                               _imageView.FullResImage,
+                                               _sixelView.Frame.Size,
+                                               _pxX.Value,
+                                               _pxY.Value);
 
-
-                               _screenLocationForSixel = sixelView.FrameToScreen ().Location;
-                               _encodedSixelData = GenerateSixelData(
-                                                               _imageView.FullResImage,
-                                                               sixelView.Frame.Size,
-                                                               _pxX.Value,
-                                                               _pxY.Value);
-
-                               // TODO: Static way of doing this, suboptimal
-                               Application.Sixel.Add (new SixelToRender
+        // TODO: Static way of doing this, suboptimal
+        Application.Sixel.Add (
+                               new()
                                {
                                    SixelData = _encodedSixelData,
                                    ScreenPosition = _screenLocationForSixel
                                });
-                           };
     }
-    void SixelViewOnDrawContent (object sender, DrawEventArgs e)
+
+    private void SixelViewOnDrawContent (object sender, DrawEventArgs e)
     {
         if (!string.IsNullOrWhiteSpace (_encodedSixelData))
         {
@@ -308,12 +379,12 @@ public class Images : Scenario
         }
     }
 
-    public string GenerateSixelData(
-            Image<Rgba32> fullResImage,
-            Size maxSize,
-            int pixelsPerCellX,
-            int pixelsPerCellY
-        )
+    public string GenerateSixelData (
+        Image<Rgba32> fullResImage,
+        Size maxSize,
+        int pixelsPerCellX,
+        int pixelsPerCellY
+    )
     {
         var encoder = new SixelEncoder ();
 
@@ -439,8 +510,6 @@ public class Images : Scenario
             FullResImage = image;
             SetNeedsDisplay ();
         }
-
-        
     }
 
     public class PaletteView : View
@@ -514,15 +583,12 @@ public class Images : Scenario
 
 internal class ConstPalette : IPaletteBuilder
 {
-    private readonly List<Color>  _palette;
+    private readonly List<Color> _palette;
 
     public ConstPalette (Color [] palette) { _palette = palette.ToList (); }
 
-    /// <inheritdoc />
-    public List<Color> BuildPalette (List<Color> colors, int maxColors)
-    {
-        return _palette;
-    }
+    /// <inheritdoc/>
+    public List<Color> BuildPalette (List<Color> colors, int maxColors) { return _palette; }
 }
 
 public abstract class LabColorDistance : IColorDistance
@@ -738,15 +804,14 @@ public class MedianCutPaletteBuilder : IPaletteBuilder
     }
 }
 
-
 public class DoomFire
 {
-    private int _width;
-    private int _height;
-    private Color [,] _firePixels;
+    private readonly int _width;
+    private readonly int _height;
+    private readonly Color [,] _firePixels;
     private static Color [] _palette;
     public Color [] Palette => _palette;
-    private Random _random = new Random ();
+    private readonly Random _random = new ();
 
     public DoomFire (int width, int height)
     {
@@ -763,30 +828,30 @@ public class DoomFire
         _palette = new Color [37]; // Using 37 colors as per the original Doom fire palette scale.
 
         // First color is transparent black
-        _palette [0] = new Color (0, 0, 0, 0); // Transparent black (ARGB)
+        _palette [0] = new (0, 0, 0, 0); // Transparent black (ARGB)
 
         // The rest of the palette is fire colors
-        for (int i = 1; i < 37; i++)
+        for (var i = 1; i < 37; i++)
         {
-            byte r = (byte)Math.Min (255, i * 7);
-            byte g = (byte)Math.Min (255, i * 5);
-            byte b = (byte)Math.Min (255, i * 2);
-            _palette [i] = new Color (r, g, b); // Full opacity
+            var r = (byte)Math.Min (255, i * 7);
+            var g = (byte)Math.Min (255, i * 5);
+            var b = (byte)Math.Min (255, i * 2);
+            _palette [i] = new (r, g, b); // Full opacity
         }
     }
 
     public void InitializeFire ()
     {
         // Set the bottom row to full intensity (simulate the base of the fire).
-        for (int x = 0; x < _width; x++)
+        for (var x = 0; x < _width; x++)
         {
             _firePixels [x, _height - 1] = _palette [36]; // Max intensity fire.
         }
 
         // Set the rest of the pixels to black (transparent).
-        for (int y = 0; y < _height - 1; y++)
+        for (var y = 0; y < _height - 1; y++)
         {
-            for (int x = 0; x < _width; x++)
+            for (var x = 0; x < _width; x++)
             {
                 _firePixels [x, y] = _palette [0]; // Transparent black
             }
@@ -796,9 +861,9 @@ public class DoomFire
     public void AdvanceFrame ()
     {
         // Process every pixel except the bottom row
-        for (int x = 0; x < _width; x++)
+        for (var x = 0; x < _width; x++)
         {
-            for (int y = 1; y < _height; y++) // Skip the last row (which is always max intensity)
+            for (var y = 1; y < _height; y++) // Skip the last row (which is always max intensity)
             {
                 int srcX = x;
                 int srcY = y;
@@ -827,9 +892,5 @@ public class DoomFire
         }
     }
 
-    public Color [,] GetFirePixels ()
-    {
-        return _firePixels;
-    }
+    public Color [,] GetFirePixels () { return _firePixels; }
 }
-
