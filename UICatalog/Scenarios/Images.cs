@@ -57,6 +57,9 @@ public class Images : Scenario
     private SixelToRender _fireSixel;
     private int _fireFrameCounter;
     private bool _isDisposed;
+    private RadioGroup _rgPaletteBuilder;
+    private RadioGroup _rgDistanceAlgorithm;
+    private NumericUpDown _popularityThreshold;
 
     public override void Main ()
     {
@@ -350,12 +353,73 @@ public class Images : Scenario
             Value = 20
         };
 
+        _rgPaletteBuilder = new RadioGroup
+        {
+            RadioLabels = new []
+            {
+                "Median Cut",
+                "Popularity"
+            },
+            X = Pos.Right (_sixelView),
+            Y = Pos.Bottom (_pxY)+1,
+            SelectedItem = 0
+        };
+
+        _popularityThreshold = new ()
+        {
+            X = Pos.Right (_rgPaletteBuilder),
+            Y = Pos.Top (_rgPaletteBuilder)+1,
+            Value = 8
+        };
+
+        var lblPopThreshold = new Label ()
+        {
+            Text = "(threshold)",
+            X = Pos.Right (_popularityThreshold),
+            Y = Pos.Top (_popularityThreshold),
+        };
+
+        _rgDistanceAlgorithm = new RadioGroup ()
+        {
+            RadioLabels = new []
+            {
+                "Euclidian",
+                "CIE76"
+            },
+            X = Pos.Right (_sixelView),
+            Y = Pos.Bottom (_rgPaletteBuilder)+1,
+        };
+
         _sixelSupported.Add (lblPxX);
         _sixelSupported.Add (_pxX);
         _sixelSupported.Add (lblPxY);
         _sixelSupported.Add (_pxY);
+        _sixelSupported.Add (_rgPaletteBuilder);
+        _sixelSupported.Add (_rgDistanceAlgorithm);
+        _sixelSupported.Add (_popularityThreshold);
+        _sixelSupported.Add (lblPopThreshold);
 
         _sixelView.DrawContent += SixelViewOnDrawContent;
+    }
+
+    IPaletteBuilder GetPaletteBuilder ()
+    {
+        switch (_rgPaletteBuilder.SelectedItem)
+        {
+            case 0: return new MedianCutPaletteBuilder (GetDistanceAlgorithm ());
+            case 1: return new PopularityPaletteWithThreshold (GetDistanceAlgorithm (), _popularityThreshold.Value);
+            default: throw new ArgumentOutOfRangeException ();
+        }
+    }
+
+    IColorDistance GetDistanceAlgorithm ()
+    {
+        switch (_rgDistanceAlgorithm.SelectedItem)
+        {
+            case 0: return new EuclideanColorDistance ();
+            case 1: return new CIE76ColorDistance ();
+            default: throw new ArgumentOutOfRangeException ();
+        }
     }
 
     private void OutputSixelButtonClick (object sender, HandledEventArgs e)
