@@ -343,22 +343,18 @@ public class Editor : Scenario
 
     private void ApplyRuneCellAttribute (ColorScheme cs)
     {
-        if (_textView.SelectedLength > 0)
+        if (!_textView.ReadOnly && _textView.SelectedLength > 0)
         {
-            int selectedLength = _textView.SelectedLength + _textView.CurrentRow - _textView.SelectionStartRow;
-
             for (int r = _textView.SelectionStartRow; r <= _textView.CurrentRow; r++)
             {
                 List<RuneCell> line = _textView.GetLine (r);
 
                 for (int c = r == _textView.SelectionStartRow ? _textView.SelectionStartColumn : 0;
-                     c < Math.Min ((r == _textView.SelectionStartRow ? _textView.SelectionStartColumn : 0) + (selectedLength > line.Count ? line.Count : selectedLength), line.Count);
+                     c < (r == _textView.CurrentRow ? _textView.CurrentColumn : line.Count);
                      c++)
                 {
                     line [c].ColorScheme = cs;
                 }
-
-                selectedLength = selectedLength - line.Count + 1 > -1 ? selectedLength - line.Count + 1 : selectedLength;
             }
         }
     }
