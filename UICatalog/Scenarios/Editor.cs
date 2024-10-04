@@ -392,7 +392,7 @@ public class Editor : Scenario
         var d = new Dialog
         {
             Title = title,
-            Width = Application.Force16Colors ? 35 : Dim.Auto (DimAutoStyle.Auto, Dim.Percent (80), Dim.Percent (90)),
+            Width = Application.Force16Colors ? 37 : Dim.Auto (DimAutoStyle.Auto, Dim.Percent (80), Dim.Percent (90)),
             Height = 20
         };
 
