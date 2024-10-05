@@ -9,10 +9,47 @@ namespace Terminal.Gui;
 public class AnsiEscapeSequenceRequest
 {
     /// <summary>
+    ///     Request to send e.g. see
+    ///     <see>
+    ///         <cref>EscSeqUtils.CSI_SendDeviceAttributes.Request</cref>
+    ///     </see>
+    /// </summary>
+    public required string Request { get; init; }
+
+    /// <summary>
+    ///     Invoked when the console responds with an ANSI response code that matches the
+    ///     <see cref="Terminator"/>
+    /// </summary>
+    public event EventHandler<AnsiEscapeSequenceResponse>? ResponseReceived;
+
+    /// <summary>
+    ///     <para>
+    ///         The terminator that uniquely identifies the type of response as responded
+    ///         by the console. e.g. for
+    ///         <see>
+    ///             <cref>EscSeqUtils.CSI_SendDeviceAttributes.Request</cref>
+    ///         </see>
+    ///         the terminator is
+    ///         <see>
+    ///             <cref>EscSeqUtils.CSI_SendDeviceAttributes.Terminator</cref>
+    ///         </see>
+    ///         .
+    ///     </para>
+    ///     <para>
+    ///         After sending a request, the first response with matching terminator will be matched
+    ///         to the oldest outstanding request.
+    ///     </para>
+    /// </summary>
+    public required string Terminator { get; init; }
+
+    /// <summary>
     ///     Execute an ANSI escape sequence escape which may return a response or error.
     /// </summary>
     /// <param name="ansiRequest">The ANSI escape sequence to request.</param>
-    /// <param name="result">When this method returns <see langword="true"/>, an object containing the response with an empty error.</param>
+    /// <param name="result">
+    ///     When this method returns <see langword="true"/>, an object containing the response with an empty
+    ///     error.
+    /// </param>
     /// <returns>A <see cref="AnsiEscapeSequenceResponse"/> with the response, error, terminator and value.</returns>
     public static bool TryParse (AnsiEscapeSequenceRequest ansiRequest, out AnsiEscapeSequenceResponse result)
     {
@@ -142,40 +179,6 @@ public class AnsiEscapeSequenceRequest
 
         return string.IsNullOrWhiteSpace (result.Error) && !string.IsNullOrWhiteSpace (result.Response);
     }
-
-    /// <summary>
-    ///     Request to send e.g. see
-    ///     <see>
-    ///         <cref>EscSeqUtils.CSI_SendDeviceAttributes.Request</cref>
-    ///     </see>
-    /// </summary>
-    public required string Request { get; init; }
-
-    /// <summary>
-    ///     Invoked when the console responds with an ANSI response code that matches the
-    ///     <see cref="Terminator"/>
-    /// </summary>
-    public event EventHandler<AnsiEscapeSequenceResponse>? ResponseReceived;
-
-    /// <summary>
-    ///     <para>
-    ///         The terminator that uniquely identifies the type of response as responded
-    ///         by the console. e.g. for
-    ///         <see>
-    ///             <cref>EscSeqUtils.CSI_SendDeviceAttributes.Request</cref>
-    ///         </see>
-    ///         the terminator is
-    ///         <see>
-    ///             <cref>EscSeqUtils.CSI_SendDeviceAttributes.Terminator</cref>
-    ///         </see>
-    ///         .
-    ///     </para>
-    ///     <para>
-    ///         After sending a request, the first response with matching terminator will be matched
-    ///         to the oldest outstanding request.
-    ///     </para>
-    /// </summary>
-    public required string Terminator { get; init; }
 
     /// <summary>
     ///     The value expected in the response e.g.
