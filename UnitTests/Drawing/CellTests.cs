@@ -141,9 +141,9 @@ Dialogror ";
 1111555555
 2222225555
 3333555555
-4455555555
-5555555555
-5555544445";
+4444444444
+4444555555
+4444444445";
         TestHelpers.AssertDriverAttributesAre (expectedColor, Application.Driver, attributes);
 
         tv.Undo ();
