@@ -154,13 +154,12 @@ public class SixelEncoderTests
     public void EncodeSixel_Transparent12x12_ReturnsExpectedSixel ()
     {
         string expected = "\u001bP" // Start sixel sequence
-                          + "0;0;0" // Defaults for aspect ratio and grid size
+                          + "0;1;0" // Defaults for aspect ratio and grid size
                           + "q" // Signals beginning of sixel image data
                           + "\"1;1;12;12" // no scaling factors (1x1) and filling 12x12 pixel area
                           + "#0;2;0;0;0" // Black transparent (TODO: Shouldn't really be output this if it is transparent)
-                          // Since all pixels are transparent, the data should just be filled with '?'
-                          + "#0!12?$-" // Fills the transparent line with byte 0 which maps to '?'
-                          + "#0!12?$" // Second band, same fully transparent pixels
+                          // Since all pixels are transparent we don't output any colors at all, so its just newline
+                          + "-" // Nothing on first or second lines
                           + "\u001b\\"; // End sixel sequence
 
         // Arrange: Create a 12x12 bitmap filled with fully transparent pixels
@@ -185,7 +184,7 @@ public class SixelEncoderTests
     public void EncodeSixel_VerticalMix_TransparentAndColor_ReturnsExpectedSixel ()
     {
         string expected = "\u001bP" // Start sixel sequence
-                          + "0;0;0" // Defaults for aspect ratio and grid size
+                          + "0;1;0" // Defaults for aspect ratio and grid size (1 indicates support for transparent pixels)
                           + "q" // Signals beginning of sixel image data
                           + "\"1;1;12;12" // No scaling factors (1x1) and filling 12x12 pixel area
                           /*
