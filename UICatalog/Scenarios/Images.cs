@@ -166,6 +166,7 @@ public class Images : Scenario
 
         _fire = new DoomFire (_win.Frame.Width * _pxX.Value, _win.Frame.Height * _pxY.Value);
         _fireEncoder = new SixelEncoder ();
+        _fireEncoder.Quantizer.MaxColors = Math.Min (_fireEncoder.Quantizer.MaxColors, _sixelSupport.MaxPaletteColors);
         _fireEncoder.Quantizer.PaletteBuildingAlgorithm = new ConstPalette (_fire.Palette);
 
         _fireFrameCounter = 0;
@@ -343,7 +344,7 @@ public class Images : Scenario
         {
             X = Pos.Right (lblPxX),
             Y = Pos.Bottom (btnStartFire) + 1,
-            Value = 10
+            Value = _sixelSupport.Resolution.Width
         };
 
         var lblPxY = new Label
@@ -357,7 +358,7 @@ public class Images : Scenario
         {
             X = Pos.Right (lblPxY),
             Y = Pos.Bottom (_pxX),
-            Value = 20
+            Value = _sixelSupport.Resolution.Height
         };
 
         var l1 = new Label ()
@@ -506,6 +507,7 @@ public class Images : Scenario
     )
     {
         var encoder = new SixelEncoder ();
+        encoder.Quantizer.MaxColors = Math.Min (encoder.Quantizer.MaxColors, _sixelSupport.MaxPaletteColors);
         encoder.Quantizer.PaletteBuildingAlgorithm = GetPaletteBuilder ();
         encoder.Quantizer.DistanceAlgorithm = GetDistanceAlgorithm ();
 
