@@ -354,22 +354,30 @@ public class Images : Scenario
             Value = 20
         };
 
+        var l1 = new Label ()
+        {
+            Text = "Palette Building Algorithm",
+            Width = Dim.Auto (),
+            X = Pos.Right (_sixelView),
+            Y = Pos.Bottom (_pxY) + 1,
+        };
+
         _rgPaletteBuilder = new RadioGroup
         {
             RadioLabels = new []
             {
+                "Popularity",
                 "Median Cut",
-                "Popularity"
             },
-            X = Pos.Right (_sixelView),
-            Y = Pos.Bottom (_pxY)+1,
-            SelectedItem = 0
+            X = Pos.Right (_sixelView) + 2,
+            Y = Pos.Bottom (l1),
+            SelectedItem = 1
         };
 
         _popularityThreshold = new ()
         {
-            X = Pos.Right (_rgPaletteBuilder),
-            Y = Pos.Top (_rgPaletteBuilder)+1,
+            X = Pos.Right (_rgPaletteBuilder) + 1,
+            Y = Pos.Top (_rgPaletteBuilder),
             Value = 8
         };
 
@@ -380,6 +388,13 @@ public class Images : Scenario
             Y = Pos.Top (_popularityThreshold),
         };
 
+        var l2 = new Label ()
+        {
+            Text = "Color Distance Algorithm",
+            Width = Dim.Auto (),
+            X = Pos.Right (_sixelView),
+            Y = Pos.Bottom (_rgPaletteBuilder) + 1,
+        };
         _rgDistanceAlgorithm = new RadioGroup ()
         {
             RadioLabels = new []
@@ -387,15 +402,18 @@ public class Images : Scenario
                 "Euclidian",
                 "CIE76"
             },
-            X = Pos.Right (_sixelView),
-            Y = Pos.Bottom (_rgPaletteBuilder)+1,
+            X = Pos.Right (_sixelView) + 2,
+            Y = Pos.Bottom (l2),
         };
 
         _sixelSupported.Add (lblPxX);
         _sixelSupported.Add (_pxX);
         _sixelSupported.Add (lblPxY);
         _sixelSupported.Add (_pxY);
+        _sixelSupported.Add (l1);
         _sixelSupported.Add (_rgPaletteBuilder);
+
+        _sixelSupported.Add (l2);
         _sixelSupported.Add (_rgDistanceAlgorithm);
         _sixelSupported.Add (_popularityThreshold);
         _sixelSupported.Add (lblPopThreshold);
