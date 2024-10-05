@@ -99,7 +99,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
                                       Value = string.IsNullOrEmpty (tfValue.Text) ? null : tfValue.Text
                                   };
 
-                                  var success = AnsiEscapeSequenceRequest.TryParse (
+                                  var success = AnsiEscapeSequenceRequest.TryExecuteAnsiRequest (
                                        ansiEscapeSequenceRequest,
                                        out AnsiEscapeSequenceResponse ansiEscapeSequenceResponse
                                       );

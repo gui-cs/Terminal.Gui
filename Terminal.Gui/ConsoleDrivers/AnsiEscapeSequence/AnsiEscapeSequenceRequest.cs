@@ -51,7 +51,7 @@ public class AnsiEscapeSequenceRequest
     ///     error.
     /// </param>
     /// <returns>A <see cref="AnsiEscapeSequenceResponse"/> with the response, error, terminator and value.</returns>
-    public static bool TryParse (AnsiEscapeSequenceRequest ansiRequest, out AnsiEscapeSequenceResponse result)
+    public static bool TryExecuteAnsiRequest (AnsiEscapeSequenceRequest ansiRequest, out AnsiEscapeSequenceResponse result)
     {
         var response = new StringBuilder ();
         var error = new StringBuilder ();
