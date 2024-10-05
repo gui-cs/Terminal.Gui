@@ -61,7 +61,7 @@ public class RunTExample : Scenario
             };
 
             // When login button is clicked display a message popup
-            btnLogin.Accept += (s, e) =>
+            btnLogin.Accepted += (s, e) =>
                                {
                                    if (_usernameText.Text == "admin" && passwordText.Text == "password")
                                    {

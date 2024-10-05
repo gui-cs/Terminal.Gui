@@ -245,7 +245,7 @@ public class FileDialogExamples : Scenario
 
     private void SetupHandler (Button btn)
     {
-        btn.Accept += (s, e) =>
+        btn.Accepted += (s, e) =>
                        {
                            try
                            {

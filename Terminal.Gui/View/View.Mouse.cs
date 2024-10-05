@@ -399,6 +399,7 @@ public partial class View // Mouse APIs
 
             if (SetPressedHighlight (HighlightStyle.None))
             {
+                // BUGBUG: If we retrun true here we never generate a moues click!
                 return true;
             }
 

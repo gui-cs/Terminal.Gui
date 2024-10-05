@@ -1781,7 +1781,7 @@ public class Slider<T> : View, IOrientation
     {
         SetFocusedOption ();
 
-        return RaiseAcceptEvent () == true;
+        return RaiseAccepted () == true;
     }
 
     internal bool MovePlus ()

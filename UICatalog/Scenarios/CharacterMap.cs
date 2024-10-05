@@ -77,7 +77,7 @@ public class CharacterMap : Scenario
         };
         top.Add (_errorLabel);
 
-        jumpEdit.Accept += JumpEditOnAccept;
+        jumpEdit.Accepted += JumpEditOnAccept;
 
         _categoryList = new () { X = Pos.Right (_charMap), Y = Pos.Bottom (jumpLabel), Height = Dim.Fill () };
         _categoryList.FullRowSelect = true;
@@ -477,7 +477,7 @@ internal class CharMap : View
             ShadowStyle = ShadowStyle.None,
             CanFocus = false
         };
-        up.Accept += (sender, args) => { args.Handled = ScrollVertical (-1) == true; };
+        up.Accepted += (sender, args) => { args.Handled = ScrollVertical (-1) == true; };
 
         var down = new Button
         {
@@ -492,7 +492,7 @@ internal class CharMap : View
             ShadowStyle = ShadowStyle.None,
             CanFocus = false
         };
-        down.Accept += (sender, args) => { ScrollVertical (1); };
+        down.Accepted += (sender, args) => { ScrollVertical (1); };
 
         var left = new Button
         {
@@ -507,7 +507,7 @@ internal class CharMap : View
             ShadowStyle = ShadowStyle.None,
             CanFocus = false
         };
-        left.Accept += (sender, args) => { ScrollHorizontal (-1); };
+        left.Accepted += (sender, args) => { ScrollHorizontal (-1); };
 
         var right = new Button
         {
@@ -522,7 +522,7 @@ internal class CharMap : View
             ShadowStyle = ShadowStyle.None,
             CanFocus = false
         };
-        right.Accept += (sender, args) => { ScrollHorizontal (1); };
+        right.Accepted += (sender, args) => { ScrollHorizontal (1); };
 
         Padding.Add (up, down, left, right);
     }
@@ -1015,18 +1015,18 @@ internal class CharMap : View
 
             var dlg = new Dialog { Title = title, Buttons = [copyGlyph, copyCP, cancel] };
 
-            copyGlyph.Accept += (s, a) =>
+            copyGlyph.Accepted += (s, a) =>
                                 {
                                     CopyGlyph ();
                                     dlg.RequestStop ();
                                 };
 
-            copyCP.Accept += (s, a) =>
+            copyCP.Accepted += (s, a) =>
                              {
                                  CopyCodePoint ();
                                  dlg.RequestStop ();
                              };
-            cancel.Accept += (s, a) => dlg.RequestStop ();
+            cancel.Accepted += (s, a) => dlg.RequestStop ();
 
             var rune = (Rune)SelectedCodePoint;
             var label = new Label { Text = "IsAscii: ", X = 0, Y = 0 };

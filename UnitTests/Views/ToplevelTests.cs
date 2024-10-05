@@ -947,7 +947,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         var testWindow = new Window { X = 2, Y = 1, Width = 15, Height = 10 };
         testWindow.Add (btnPopup);
 
-        btnPopup.Accept += (s, e) =>
+        btnPopup.Accepted += (s, e) =>
                            {
                                Rectangle viewToScreen = btnPopup.ViewportToScreen (top.Frame);
 

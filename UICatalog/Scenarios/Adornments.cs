@@ -57,7 +57,7 @@ public class Adornments : Scenario
 
         var button = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Press me!" };
 
-        button.Accept += (s, e) =>
+        button.Accepted += (s, e) =>
                              MessageBox.Query (20, 7, "Hi", $"Am I a {window.GetType ().Name}?", "Yes", "No");
 
         var label = new TextView
@@ -113,7 +113,7 @@ public class Adornments : Scenario
                                       Text = "some text",
                                       CanFocus = true
                                   };
-                                  textFieldInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "TextField", textFieldInPadding.Text, "Ok");
+                                  textFieldInPadding.Accepted += (s, e) => MessageBox.Query (20, 7, "TextField", textFieldInPadding.Text, "Ok");
                                   window.Padding.Add (textFieldInPadding);
 
                                   var btnButtonInPadding = new Button
@@ -123,7 +123,7 @@ public class Adornments : Scenario
                                       Text = "_Button in Padding",
                                       CanFocus = true
                                   };
-                                  btnButtonInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "Hi", "Button in Padding Pressed!", "Ok");
+                                  btnButtonInPadding.Accepted += (s, e) => MessageBox.Query (20, 7, "Hi", "Button in Padding Pressed!", "Ok");
                                   btnButtonInPadding.BorderStyle = LineStyle.Dashed;
                                   btnButtonInPadding.Border.Thickness = new (1, 1, 1, 1);
                                   window.Padding.Add (btnButtonInPadding);

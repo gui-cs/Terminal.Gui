@@ -18,7 +18,8 @@ public class Margin : Adornment
     {
         /* Do nothing; View.CreateAdornment requires a constructor that takes a parent */
 
-        HighlightStyle |= HighlightStyle.Pressed;
+        // BUGBUG: We should not set HighlightStyle.Pressed here, but wherever it is actually needed
+       // HighlightStyle |= HighlightStyle.Pressed;
         Highlight += Margin_Highlight;
         LayoutStarted += Margin_LayoutStarted;
 

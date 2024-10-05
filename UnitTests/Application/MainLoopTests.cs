@@ -682,7 +682,7 @@ public class MainLoopTests
 
         var btnLaunch = new Button { Text = "Open Window" };
 
-        btnLaunch.Accept += (s, e) => action ();
+        btnLaunch.Accepted += (s, e) => action ();
 
         var top = new Toplevel ();
         top.Add (btnLaunch);
@@ -918,11 +918,11 @@ public class MainLoopTests
 
         btn = new Button { Text = "Click Me" };
 
-        btn.Accept += RunAsyncTest;
+        btn.Accepted += RunAsyncTest;
 
         var totalbtn = new Button { X = Pos.Right (btn), Text = "total" };
 
-        totalbtn.Accept += (s, e) => { MessageBox.Query ("Count", $"Count is {total}", "Ok"); };
+        totalbtn.Accepted += (s, e) => { MessageBox.Query ("Count", $"Count is {total}", "Ok"); };
 
         startWindow.Add (btn);
         startWindow.Add (totalbtn);

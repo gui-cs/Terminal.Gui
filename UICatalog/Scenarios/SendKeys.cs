@@ -100,7 +100,7 @@ public class SendKeys : Scenario
             txtInput.SetFocus ();
         }
 
-        button.Accept += (s, e) => ProcessInput ();
+        button.Accepted += (s, e) => ProcessInput ();
 
         win.KeyDown += (s, e) =>
                        {

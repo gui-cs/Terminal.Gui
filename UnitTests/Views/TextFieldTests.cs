@@ -766,7 +766,7 @@ public class TextFieldTests (ITestOutputHelper output)
     {
         var view = new TextField ();
         var accepted = false;
-        view.Accept += OnAccept;
+        view.Accepted += OnAccept;
         view.InvokeCommand (Command.HotKey);
 
         Assert.False (accepted);
@@ -782,7 +782,7 @@ public class TextFieldTests (ITestOutputHelper output)
         var view = new TextField ();
 
         var accepted = false;
-        view.Accept += Accept;
+        view.Accepted += Accept;
         view.InvokeCommand (Command.Accept);
         Assert.True (accepted);
 
@@ -814,10 +814,10 @@ public class TextFieldTests (ITestOutputHelper output)
         superView.Add (tf, button);
 
         var buttonAccept = 0;
-        button.Accept += ButtonAccept;
+        button.Accepted += ButtonAccept;
 
         var textFieldAccept = 0;
-        tf.Accept += TextFieldAccept;
+        tf.Accepted += TextFieldAccept;
 
         tf.SetFocus ();
         Assert.True (tf.HasFocus);
@@ -866,7 +866,7 @@ public class TextFieldTests (ITestOutputHelper output)
         superView.Add (tf, button);
 
         var buttonAccept = 0;
-        button.Accept += ButtonAccept;
+        button.Accepted += ButtonAccept;
 
         tf.SetFocus ();
         Assert.True (tf.HasFocus);
@@ -898,13 +898,13 @@ public class TextFieldTests (ITestOutputHelper output)
 
         var tfAcceptedInvoked = false;
         var handle = false;
-        view.Accept += TextViewAccept;
+        view.Accepted += TextViewAccept;
         Assert.False (view.InvokeCommand (Command.Accept));
         Assert.True (tfAcceptedInvoked);
 
         tfAcceptedInvoked = false;
         handle = true;
-        view.Accept += TextViewAccept;
+        view.Accepted += TextViewAccept;
         Assert.True (view.InvokeCommand (Command.Accept));
         Assert.True (tfAcceptedInvoked);
 

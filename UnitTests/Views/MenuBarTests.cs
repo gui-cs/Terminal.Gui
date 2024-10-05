@@ -238,7 +238,7 @@ public class MenuBarTests (ITestOutputHelper output)
 
         var btnClicked = false;
         var btn = new Button { Y = 4, Text = "Test" };
-        btn.Accept += (s, e) => btnClicked = true;
+        btn.Accepted += (s, e) => btnClicked = true;
         var top = new Toplevel ();
         top.Add (menu, btn);
         Application.Begin (top);

@@ -85,8 +85,8 @@ public class Wizard : Dialog
         AddButton (BackButton);
         AddButton (NextFinishButton);
 
-        BackButton.Accept += BackBtn_Clicked;
-        NextFinishButton.Accept += NextfinishBtn_Clicked;
+        BackButton.Accepted += BackBtn_Clicked;
+        NextFinishButton.Accepted += NextfinishBtn_Clicked;
 
         Loaded += Wizard_Loaded;
         Closing += Wizard_Closing;

@@ -91,10 +91,10 @@ public class RadioGroupTests (ITestOutputHelper output)
         rg.SelectedItemChanged += (s, e) => selectedItemChangedCount++;
 
         var selectCount = 0;
-        rg.Select += (s, e) => selectCount++;
+        rg.Selected += (s, e) => selectCount++;
 
         var acceptCount = 0;
-        rg.Accept += (s, e) => acceptCount++;
+        rg.Accepted += (s, e) => acceptCount++;
 
         // By default the first item is selected
         Assert.Equal (0, rg.SelectedItem);
@@ -186,7 +186,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (0, rg.SelectedItem);
         Assert.Equal (1, rg.Cursor);
 
-        //    Selected != Cursor - Select Cursor and raise Select event - DO NOT raise Accept
+        //    Selected != Cursor - Raise HotKey event - Since we're focused, this should just advance
         Assert.True (Application.OnKeyDown (rg.HotKey));
         Assert.Equal (1, rg.SelectedItem);
         Assert.Equal (1, rg.Cursor);
@@ -220,10 +220,10 @@ public class RadioGroupTests (ITestOutputHelper output)
         rg.SelectedItemChanged += (s, e) => selectedItemChangedCount++;
 
         var selectCount = 0;
-        rg.Select += (s, e) => selectCount++;
+        rg.Selected += (s, e) => selectCount++;
 
         var acceptCount = 0;
-        rg.Accept += (s, e) => acceptCount++;
+        rg.Accepted += (s, e) => acceptCount++;
 
         // By default the first item is selected
         Assert.Equal (0, rg.SelectedItem);
@@ -297,10 +297,10 @@ public class RadioGroupTests (ITestOutputHelper output)
         rg.SelectedItemChanged += (s, e) => selectedItemChangedCount++;
 
         var selectCount = 0;
-        rg.Select += (s, e) => selectCount++;
+        rg.Selected += (s, e) => selectCount++;
 
         var acceptCount = 0;
-        rg.Accept += (s, e) => acceptCount++;
+        rg.Accepted += (s, e) => acceptCount++;
 
         // By default the first item is selected
         Assert.Equal (0, rg.SelectedItem);
@@ -492,7 +492,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         var group = new RadioGroup { RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" } };
         var accepted = false;
 
-        group.Accept += OnAccept;
+        group.Accepted += OnAccept;
         group.InvokeCommand (Command.HotKey);
 
         Assert.False (accepted);
@@ -508,7 +508,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         var group = new RadioGroup { RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" } };
         var accepted = false;
 
-        group.Accept += OnAccept;
+        group.Accepted += OnAccept;
         group.InvokeCommand (Command.Accept);
 
         Assert.True (accepted);
@@ -627,10 +627,10 @@ public class RadioGroupTests (ITestOutputHelper output)
         radioGroup.SelectedItemChanged += (s, e) => selectedItemChanged++;
 
         var selectCount = 0;
-        radioGroup.Select += (s, e) => selectCount++;
+        radioGroup.Selected += (s, e) => selectCount++;
 
         var acceptCount = 0;
-        radioGroup.Accept += (s, e) => acceptCount++;
+        radioGroup.Accepted += (s, e) => acceptCount++;
 
         Assert.Equal (Orientation.Vertical, radioGroup.Orientation);
 
@@ -674,12 +674,12 @@ public class RadioGroupTests (ITestOutputHelper output)
         radioGroup.SelectedItemChanged += (s, e) => selectedItemChanged++;
 
         var selectCount = 0;
-        radioGroup.Select += (s, e) => selectCount++;
+        radioGroup.Selected += (s, e) => selectCount++;
 
         var acceptCount = 0;
         var handleAccept = false;
 
-        radioGroup.Accept += (s, e) =>
+        radioGroup.Accepted += (s, e) =>
                              {
                                  acceptCount++;
                                  e.Handled = handleAccept;
@@ -724,7 +724,7 @@ public class RadioGroupTests (ITestOutputHelper output)
 
         var superViewAcceptCount = 0;
 
-        superView.Accept += (s, a) =>
+        superView.Accepted += (s, a) =>
                             {
                                 superViewAcceptCount++;
                                 a.Handled = true;

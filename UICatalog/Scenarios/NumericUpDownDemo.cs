@@ -114,7 +114,7 @@ internal class NumericUpDownEditor<T> : View where T : notnull
                 Width = 8,
                 Title = "Value",
             };
-            _value.Accept += ValuedOnAccept;
+            _value.Accepted += ValuedOnAccept;
 
             void ValuedOnAccept (object? sender, EventArgs e)
             {
@@ -169,7 +169,7 @@ internal class NumericUpDownEditor<T> : View where T : notnull
                 Title = "Format",
                 Width = Dim.Width (_value),
             };
-            _format.Accept += FormatOnAccept;
+            _format.Accepted += FormatOnAccept;
 
             void FormatOnAccept (object? o, EventArgs eventArgs)
             {
@@ -217,7 +217,7 @@ internal class NumericUpDownEditor<T> : View where T : notnull
                 Width = Dim.Width (_value),
             };
 
-            _increment.Accept += IncrementOnAccept;
+            _increment.Accepted += IncrementOnAccept;
 
             void IncrementOnAccept (object? o, EventArgs eventArgs)
             {

@@ -8464,7 +8464,7 @@ line.
     {
         var view = new TextView ();
         var accepted = false;
-        view.Accept += OnAccept;
+        view.Accepted += OnAccept;
         view.InvokeCommand (Command.HotKey);
 
         Assert.False (accepted);
@@ -8485,7 +8485,7 @@ line.
         };
 
         int acceptEvents = 0;
-        view.Accept += Accept;
+        view.Accepted += Accept;
         view.InvokeCommand (Command.Accept);
         Assert.Equal (expectedAcceptEvents, acceptEvents);
 
@@ -8505,7 +8505,7 @@ line.
         };
 
         int accepted = 0;
-        view.Accept += Accept;
+        view.Accepted += Accept;
         view.NewKeyDownEvent (Key.Enter);
         Assert.Equal (expectedAccepts, accepted);
 
@@ -8525,7 +8525,7 @@ line.
         };
 
         int accepted = 0;
-        view.Accept += Accept;
+        view.Accepted += Accept;
         view.NewKeyDownEvent (Key.Enter);
         Assert.Equal (expectedAccepts, accepted);
 
@@ -8554,10 +8554,10 @@ line.
         superView.Add (tv, button);
 
         var buttonAccept = 0;
-        button.Accept += ButtonAccept;
+        button.Accepted += ButtonAccept;
 
         var textViewAccept = 0;
-        tv.Accept += TextViewAccept;
+        tv.Accepted += TextViewAccept;
 
         tv.SetFocus ();
         Assert.True (tv.HasFocus);
@@ -8603,7 +8603,7 @@ line.
         superView.Add (tv, button);
 
         var buttonAccept = 0;
-        button.Accept += ButtonAccept;
+        button.Accepted += ButtonAccept;
 
         tv.SetFocus ();
         Assert.True (tv.HasFocus);

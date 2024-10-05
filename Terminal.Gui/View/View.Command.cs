@@ -12,40 +12,56 @@ public partial class View // Command APIs
     /// </summary>
     private void SetupCommands ()
     {
-        AddCommand (Command.Accept, RaiseAcceptEvent);
+        // Enter - Raise Accepted
+        AddCommand (Command.Accept, RaiseAccepted);
 
-        AddCommand (
-                    Command.HotKey,
+        // HotKey - SetFocus and raise HotKeyHandled
+        AddCommand (Command.HotKey,
                     () =>
                     {
                         SetFocus ();
 
-                        return RaiseHotKeyCommandEvent ();
+                        return RaiseHotKeyHandled ();
                     });
 
-        AddCommand (Command.Select, RaiseSelectEvent);
+        // Space or single-click - Raise Selected
+        AddCommand (Command.Select, () =>
+                                    {
+                                        bool? cancelled = RaiseSelected ();
+                                        if (cancelled is null or false && CanFocus)
+                                        {
+                                            SetFocus ();
+
+                                            return true;
+                                        }
+
+                                        return cancelled is true;
+                                    });
     }
 
     /// <summary>
-    ///     Called when the <see cref="Command.Accept"/> command is invoked. Raises <see cref="Accept"/>
-    ///     event.
+    ///     Called when the View's state has been accepted by the user. Calls <see cref="OnAccepted"/> which can be cancelled; if not cancelled raises <see cref="Accepted"/>.
+    ///     event. The default <see cref="Command.Accept"/> handler calls this method.
     /// </summary>
+    /// <remarks>
+    ///     The <see cref="Accepted"/> event should raised after the state of the View has changed (after <see cref="Selected"/> is raised).
+    /// </remarks>
     /// <returns>
     ///     If <see langword="true"/> the event was canceled. If <see langword="false"/> the event was raised but not canceled.
     ///     If <see langword="null"/> no event was raised.
     /// </returns>
-    protected bool? RaiseAcceptEvent ()
+    protected bool? RaiseAccepted ()
     {
         HandledEventArgs args = new ();
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
-        args.Handled = OnAccept (args) || args.Handled;
+        args.Handled = OnAccepted (args) || args.Handled;
 
         if (!args.Handled)
         {
             // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-            Accept?.Invoke (this, args);
+            Accepted?.Invoke (this, args);
         }
 
         // Accept is a special case where if the event is not canceled, the event is
@@ -68,108 +84,108 @@ public partial class View // Command APIs
             return SuperView?.InvokeCommand (Command.Accept) == true;
         }
 
-        return Accept is null ? null : args.Handled;
+        return Accepted is null ? null : args.Handled;
     }
 
+    // TODO: Change this to CancelEventArgs
     /// <summary>
-    ///     Called when the <see cref="Command.Accept"/> command is received. Set <see cref="HandledEventArgs.Handled"/> to
+    ///     Called when the View's state has been accepted by the user. Set <see cref="HandledEventArgs.Handled"/> to
     ///     <see langword="true"/> to stop processing.
     /// </summary>
     /// <param name="args"></param>
     /// <returns><see langword="true"/> to stop processing.</returns>
-    protected virtual bool OnAccept (HandledEventArgs args) { return false; }
+    protected virtual bool OnAccepted (HandledEventArgs args) { return false; }
 
     /// <summary>
-    ///     Cancelable event raised when the <see cref="Command.Accept"/> command is invoked. Set
-    ///     <see cref="HandledEventArgs.Handled"/>
-    ///     to cancel the event.
+    ///     Cancelable event raised when the View's state has been accepted by the user. Set
+    ///     <see cref="HandledEventArgs.Handled"/> to cancel the event.
     /// </summary>
-    public event EventHandler<HandledEventArgs>? Accept;
+    public event EventHandler<HandledEventArgs>? Accepted;
 
     /// <summary>
-    ///     Called when the <see cref="Command.Select"/> command is invoked. Raises <see cref="Select"/>
-    ///     event.
+    ///     Called when the user has selected the View or otherwise changed the state of the View. Calls <see cref="OnSelected"/> which can be cancelled; if not cancelled raises <see cref="Accepted"/>.
+    ///     event. The default <see cref="Command.Select"/> handler calls this method.
     /// </summary>
+    /// <remarks>
+    ///     The <see cref="Selected"/> event should raised after the state of the View has been changed and before see <see cref="Accepted"/>.
+    /// </remarks>
     /// <returns>
     ///     If <see langword="true"/> the event was canceled. If <see langword="false"/> the event was raised but not canceled.
     ///     If <see langword="null"/> no event was raised.
     /// </returns>
-    protected bool? RaiseSelectEvent ()
+    protected bool? RaiseSelected ()
     {
         HandledEventArgs args = new ();
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
-        if (OnSelect (args) || args.Handled)
+        if (OnSelected (args) || args.Handled)
         {
             return true;
         }
 
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-        Select?.Invoke (this, args);
+        Selected?.Invoke (this, args);
 
-        if ((Select is null || !args.Handled) && CanFocus)
-        {
-            SetFocus ();
-        }
-
-        return Select is null ? null : args.Handled;
+        return Selected is null ? null : args.Handled;
     }
 
     /// <summary>
-    ///     Called when the <see cref="Command.Select"/> command is received. Set <see cref="HandledEventArgs.Handled"/> to
+    ///     Called when the user has selected the View or otherwise changed the state of the View. Set <see cref="HandledEventArgs.Handled"/> to
     ///     <see langword="true"/> to stop processing.
     /// </summary>
     /// <param name="args"></param>
     /// <returns><see langword="true"/> to stop processing.</returns>
-    protected virtual bool OnSelect (HandledEventArgs args) { return false; }
+    protected virtual bool OnSelected (HandledEventArgs args) { return false; }
 
     /// <summary>
-    ///     Cancelable event raised when the <see cref="Command.Select"/> command is invoked. Set
+    ///     Cancelable event raised when the user has selected the View or otherwise changed the state of the View. Set
     ///     <see cref="HandledEventArgs.Handled"/>
     ///     to cancel the event.
     /// </summary>
-    public event EventHandler<HandledEventArgs>? Select;
+    public event EventHandler<HandledEventArgs>? Selected;
 
+
+    // TODO: What does this event really do? "Called when the user has pressed the View's hot key or otherwise invoked the View's hot key command.???"
     /// <summary>
-    ///     Called when the <see cref="Command.HotKey"/> command is invoked. Raises <see cref="HotKey"/>
-    ///     event.
+    ///     Called when the View has handled the user pressing the View's <see cref="HotKey"/>. Calls <see cref="OnHotKeyHandled"/> which can be cancelled; if not cancelled raises <see cref="Accepted"/>.
+    ///     event. The default <see cref="Command.HotKey"/> handler calls this method.
     /// </summary>
     /// <returns>
     ///     If <see langword="true"/> the event was handled. If <see langword="false"/> the event was raised but not handled.
     ///     If <see langword="null"/> no event was raised.
     /// </returns>
-    protected bool? RaiseHotKeyCommandEvent ()
+    protected bool? RaiseHotKeyHandled ()
     {
         HandledEventArgs args = new ();
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
-        if (OnHotKeyCommand (args) || args.Handled)
+        if (OnHotKeyHandled (args) || args.Handled)
         {
             return true;
         }
 
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-        HotKeyCommand?.Invoke (this, args);
+        HotKeyHandled?.Invoke (this, args);
 
-        return HotKeyCommand is null ? null : args.Handled;
+        return HotKeyHandled is null ? null : args.Handled;
     }
 
     /// <summary>
-    ///     Called when the <see cref="Command.HotKey"/> command is received. Set <see cref="HandledEventArgs.Handled"/> to
+    ///     Called when the View has handled the user pressing the View's <see cref="HotKey"/>. Set <see cref="HandledEventArgs.Handled"/> to
     ///     <see langword="true"/> to stop processing.
     /// </summary>
     /// <param name="args"></param>
     /// <returns><see langword="true"/> to stop processing.</returns>
-    protected virtual bool OnHotKeyCommand (HandledEventArgs args) { return false; }
+    protected virtual bool OnHotKeyHandled (HandledEventArgs args) { return false; }
 
     /// <summary>
     ///     Cancelable event raised when the <see cref="Command.HotKey"/> command is invoked. Set
     ///     <see cref="HandledEventArgs.Handled"/>
     ///     to cancel the event.
     /// </summary>
-    public event EventHandler<HandledEventArgs>? HotKeyCommand;
+    public event EventHandler<HandledEventArgs>? HotKeyHandled;
 
     #endregion Default Implementation
 
@@ -227,7 +243,7 @@ public partial class View // Command APIs
     /// <param name="keyBinding"></param>
     /// <returns>
     ///     <see langword="null"/> if no command was found.
-    ///     <see langword="true"/> if the command was invoked the command was handled.
+    ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled)
     ///     <see langword="false"/> if the command was invoked and the command was not handled.
     /// </returns>
     public bool? InvokeCommands (Command [] commands, Key? key = null, KeyBinding? keyBinding = null)
@@ -263,7 +279,7 @@ public partial class View // Command APIs
     /// <param name="keyBinding"></param>
     /// <returns>
     ///     <see langword="null"/> if no command was found. <see langword="true"/> if the command was invoked, and it
-    ///     handled the command. <see langword="false"/> if the command was invoked, and it did not handle the command.
+    ///     handled (or cancelled) the command. <see langword="false"/> if the command was invoked, and it did not handle (or cancel) the command.
     /// </returns>
     public bool? InvokeCommand (Command command, Key? key = null, KeyBinding? keyBinding = null)
     {

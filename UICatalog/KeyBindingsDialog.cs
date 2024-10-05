@@ -44,11 +44,11 @@ internal class KeyBindingsDialog : Dialog
 
         var btnChange = new Button { X = Pos.Percent (50), Y = 1, Text = "Ch_ange" };
         Add (btnChange);
-        btnChange.Accept += RemapKey;
+        btnChange.Accepted += RemapKey;
 
         var close = new Button { Text = "Ok" };
 
-        close.Accept += (s, e) =>
+        close.Accepted += (s, e) =>
                          {
                              Application.RequestStop ();
                              ViewTracker.Instance.StartUsingNewKeyMap (CurrentBindings);
@@ -56,7 +56,7 @@ internal class KeyBindingsDialog : Dialog
         AddButton (close);
 
         var cancel = new Button { Text = "Cancel" };
-        cancel.Accept += (s, e) => Application.RequestStop ();
+        cancel.Accepted += (s, e) => Application.RequestStop ();
         AddButton (cancel);
 
         // Register event handler as the last thing in constructor to prevent early calls

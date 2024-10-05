@@ -11,7 +11,7 @@ namespace Terminal.Gui;
 /// <remarks>
 ///     <para>
 ///         The following user actions will invoke the <see cref="Command.Accept"/>, causing the
-///         <see cref="View.Accept"/> event to be fired:
+///         <see cref="View.Accepted"/> event to be fired:
 ///         - Clicking on the <see cref="Shortcut"/>.
 ///         - Pressing the key specified by <see cref="Key"/>.
 ///         - Pressing the HotKey specified by <see cref="CommandView"/>.
@@ -91,7 +91,7 @@ public class Shortcut : View, IOrientation, IDesignable
     public Shortcut (Key key, string commandText, Action action, string helpText = null)
     {
         Id = "_shortcut";
-        HighlightStyle = HighlightStyle.Pressed;
+        // Disabled for now due to bugs in highlight handling and mouse clicks - HighlightStyle = HighlightStyle.Pressed;
         CanFocus = true;
         Width = GetWidthDimAuto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
@@ -100,9 +100,26 @@ public class Shortcut : View, IOrientation, IDesignable
         _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
         _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
 
-        AddCommand (Command.HotKey, ctx => DispatchAcceptCommand (ctx));
+        // Accept (Enter key) - 
         AddCommand (Command.Accept, ctx => DispatchAcceptCommand (ctx));
-        AddCommand (Command.Select, ctx => RaiseSelectEvent ());
+
+        // Hotkey - 
+        AddCommand (Command.HotKey, ctx =>
+                                    {
+                                        // The default HotKey handler sets Focus
+                                        SetFocus ();
+
+                                        if (DispatchAcceptCommand (ctx) == true)
+
+                                        {
+                                            return true;
+                                        }
+
+                                        return RaiseSelected ();
+                                    });
+
+        // Select (Space key or click) - 
+        AddCommand (Command.Select, ctx => RaiseSelected ());
 
         TitleChanged += Shortcut_TitleChanged; // This needs to be set before CommandView is set
 
@@ -128,8 +145,8 @@ public class Shortcut : View, IOrientation, IDesignable
         HelpView.MouseClick += HelpOrKeyView_MouseClick;
         KeyView.MouseClick += HelpOrKeyView_MouseClick;
 
-        HelpView.Select += HelpAndKeyViewOnSelect;
-        KeyView.Select += HelpAndKeyViewOnSelect;
+        HelpView.Selected += HelpAndKeyViewOnSelect;
+        KeyView.Selected += HelpAndKeyViewOnSelect;
 
         LayoutStarted += OnLayoutStarted;
         Initialized += OnInitialized;
@@ -388,7 +405,7 @@ public class Shortcut : View, IOrientation, IDesignable
         {
             // If the subview (likely CommandView) didn't handle the mouse click, invoke the Select command.
             // e.Handled = CommandView.InvokeCommand (Command.Select) == true;
-            e.Handled = InvokeCommand (Command.Accept) == true;
+            e.Handled = InvokeCommand (Command.HotKey) == true;
         }
 
         //if (CanFocus)
@@ -498,7 +515,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
             if (_commandView is { })
             {
-                _commandView.Accept -= CommandViewOnAccept;
+                _commandView.Accepted -= CommandViewOnSelected;
                 Remove (_commandView);
                 _commandView?.Dispose ();
             }
@@ -523,11 +540,12 @@ public class Shortcut : View, IOrientation, IDesignable
 
             Title = _commandView.Text;
 
-            _commandView.Select += CommandViewOnAccept;
+            _commandView.Selected += CommandViewOnSelected;
 
-            void CommandViewOnAccept (object sender, HandledEventArgs e)
+            void CommandViewOnSelected (object sender, HandledEventArgs e)
             {
-                // Always eat CommandView.Accept
+                // Always eat CommandView.Select
+                SetFocus ();
                 e.Handled = true;
             }
 
@@ -535,12 +553,18 @@ public class Shortcut : View, IOrientation, IDesignable
 
             void CommandViewOnMouseClick (object sender, MouseEventEventArgs e)
             {
-                //if (!e.Handled)
+                if (!e.Handled)
                 {
-                    // If the subview (likely CommandView) didn't handle the mouse click, invoke the command.
-                    InvokeCommand (Command.HotKey);
+                    // If the subview (likely CommandView) didn't handle the mouse click, invoke the Accept Command.
+                    InvokeCommand (Command.Accept);
+
+                    // Always eat the mouseclick
                     e.Handled = true;
                 }
+
+                // Always Setfocus and invoke Select
+                SetFocus ();
+                InvokeCommand (Command.Select);
             }
 
 
@@ -548,7 +572,7 @@ public class Shortcut : View, IOrientation, IDesignable
             SetHelpViewDefaultLayout ();
             SetKeyViewDefaultLayout ();
             ShowHide ();
-            UpdateKeyBinding (Key.Empty);
+            UpdateKeyBindings (Key.Empty);
         }
     }
 
@@ -645,7 +669,7 @@ public class Shortcut : View, IOrientation, IDesignable
             Key oldKey = _key;
             _key = value;
 
-            UpdateKeyBinding (oldKey);
+            UpdateKeyBindings (oldKey);
 
             KeyView.Text = Key == Key.Empty ? string.Empty : $"{Key}";
             ShowHide ();
@@ -679,7 +703,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
             _keyBindingScope = value;
 
-            UpdateKeyBinding (Key.Empty);
+            UpdateKeyBindings (Key.Empty);
         }
     }
 
@@ -732,16 +756,20 @@ public class Shortcut : View, IOrientation, IDesignable
         HelpView.HighlightStyle = HighlightStyle.None;
     }
 
-    private void UpdateKeyBinding (Key oldKey)
+    private void UpdateKeyBindings (Key oldKey)
     {
         if (Key != null && Key.IsValid)
         {
-            // Disable the command view HotKey bindings
-            CommandView.KeyBindings.Remove (Key);
-            CommandView.KeyBindings.Remove (CommandView.HotKey);
-            CommandView.KeyBindings.Remove (CommandView.HotKey.WithShift);
-            CommandView.KeyBindings.Remove (CommandView.HotKey.WithAlt);
-            CommandView.KeyBindings.Remove (CommandView.HotKey.WithShift.WithAlt);
+            //// Disable the command view HotKey bindings
+            //IEnumerable<Key> list = CommandView.KeyBindings.GetKeysFromCommands (Command.HotKey);
+            //foreach (Key cmdViewKey in list)
+            //{
+            //    CommandView.KeyBindings.Remove (cmdViewKey);
+            //    CommandView.KeyBindings.Remove (cmdViewKey.WithShift);
+            //    CommandView.KeyBindings.Remove (cmdViewKey.WithAlt);
+            //    CommandView.KeyBindings.Remove (cmdViewKey.WithShift.WithAlt);
+            //    KeyBindings.Add (cmdViewKey, Command.HotKey);
+            //}
 
             if (KeyBindingScope.FastHasFlags (KeyBindingScope.Application))
             {
@@ -751,7 +779,7 @@ public class Shortcut : View, IOrientation, IDesignable
                 }
 
                 Application.KeyBindings.Remove (Key);
-                Application.KeyBindings.Add (Key, this, Command.Accept);
+                Application.KeyBindings.Add (Key, this, Command.HotKey);
             }
             else
             {
@@ -761,7 +789,7 @@ public class Shortcut : View, IOrientation, IDesignable
                 }
 
                 KeyBindings.Remove (Key);
-                KeyBindings.Add (Key, KeyBindingScope | KeyBindingScope.HotKey, Command.Accept);
+                KeyBindings.Add (Key, KeyBindingScope | KeyBindingScope.HotKey, Command.HotKey);
             }
         }
     }
@@ -778,18 +806,15 @@ public class Shortcut : View, IOrientation, IDesignable
     ///     - if the user presses the HotKey specified by CommandView
     ///     - if HasFocus and the user presses Space or Enter (or any other key bound to Command.Accept).
     /// </summary>
-    protected bool? DispatchAcceptCommand (CommandContext ctx)
+    internal bool? DispatchAcceptCommand (CommandContext ctx)
     {
-        if (RaiseSelectEvent () == true)
-        {
-            return true;
-        }
-
+        // Invoke Select on the command view to cause it to change state if it wants to
+        // If this causes CommandView to raise Accept, we eat it
         CommandView.InvokeCommand (Command.Select);
 
         var cancel = false;
 
-        cancel = RaiseAcceptEvent () == true;
+        cancel = RaiseAccepted () == true;
 
         if (cancel is true)
         {
@@ -809,7 +834,6 @@ public class Shortcut : View, IOrientation, IDesignable
             _targetView.InvokeCommand (_command);
         }
 
-
         return cancel;
     }
 
@@ -818,7 +842,7 @@ public class Shortcut : View, IOrientation, IDesignable
     ///     mouse.
     /// </summary>
     /// <remarks>
-    ///     Note, the <see cref="View.Accept"/> event is fired first, and if cancelled, the event will not be invoked.
+    ///     Note, the <see cref="View.Accepted"/> event is fired first, and if cancelled, the event will not be invoked.
     /// </remarks>
     [CanBeNull]
     public Action Action { get; set; }

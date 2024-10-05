@@ -362,7 +362,7 @@ public class ContentScrolling : Scenario
             Height = Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Percent (20)),
         };
 
-        charMap.Accept += (s, e) =>
+        charMap.Accepted += (s, e) =>
                               MessageBox.Query (20, 7, "Hi", $"Am I a {view.GetType ().Name}?", "Yes", "No");
 
         var buttonAnchored = new Button

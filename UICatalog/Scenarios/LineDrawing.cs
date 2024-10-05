@@ -147,7 +147,7 @@ public class LineDrawing : Scenario
             IsDefault = true
         };
 
-        btnOk.Accept += (s, e) =>
+        btnOk.Accepted += (s, e) =>
                         {
                             accept = true;
                             e.Handled = true;
@@ -162,7 +162,7 @@ public class LineDrawing : Scenario
             Width = Dim.Auto ()
         };
 
-        btnCancel.Accept += (s, e) =>
+        btnCancel.Accepted += (s, e) =>
                             {
                                 e.Handled = true;
                                 Application.RequestStop ();
@@ -228,7 +228,7 @@ public class ToolsView : Window
 
         _addLayerBtn = new() { Text = "New Layer", X = Pos.Center (), Y = Pos.Bottom (_stylePicker) };
 
-        _addLayerBtn.Accept += (s, a) => AddLayer?.Invoke ();
+        _addLayerBtn.Accepted += (s, a) => AddLayer?.Invoke ();
         Add (_colors, _stylePicker, _addLayerBtn);
     }
 

@@ -146,7 +146,7 @@ public class Shortcuts : Scenario
             KeyBindingScope = KeyBindingScope.HotKey,
         };
         Button button = (Button)vShortcut4.CommandView;
-        vShortcut4.Accept += Button_Clicked;
+        vShortcut4.Accepted += Button_Clicked;
 
         Application.Top.Add (vShortcut4);
 
@@ -343,7 +343,7 @@ public class Shortcuts : Scenario
             HelpText = "App Scope",
             CanFocus = false
         };
-        hShortcut3.Accept += (o, args) =>
+        hShortcut3.Accepted += (o, args) =>
         {
             Application.RequestStop ();
         };
@@ -354,27 +354,28 @@ public class Shortcuts : Scenario
         {
             if (sh is Shortcut shortcut)
             {
-                shortcut.Select += (o, args) =>
+                shortcut.Selected += (o, args) =>
                 {
                     eventSource.Add ($"{shortcut!.Id}.Select: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
                     eventLog.MoveDown ();
                     //args.Handled = true;
                 };
 
-                shortcut.CommandView.Select += (o, args) =>
+                shortcut.CommandView.Selected += (o, args) =>
                 {
                     eventSource.Add ($"{shortcut!.Id}.CommandView.Select: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
                     eventLog.MoveDown ();
                 };
 
-                shortcut.Accept += (o, args) =>
+                shortcut.Accepted += (o, args) =>
                 {
                     eventSource.Add ($"{shortcut!.Id}.Accept: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
                     eventLog.MoveDown ();
+                    // We don't want this to exit the Scenario
                     args.Handled = true;
                 };
 
-                shortcut.CommandView.Accept += (o, args) =>
+                shortcut.CommandView.Accepted += (o, args) =>
                 {
                     eventSource.Add ($"{shortcut!.Id}.CommandView.Accept: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
                     eventLog.MoveDown ();

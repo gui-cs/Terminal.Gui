@@ -86,8 +86,8 @@ public class NumericUpDown<T> : View where T : notnull
 
         CanFocus = true;
 
-        _down.Accept += OnDownButtonOnAccept;
-        _up.Accept += OnUpButtonOnAccept;
+        _down.Accepted += OnDownButtonOnAccept;
+        _up.Accepted += OnUpButtonOnAccept;
 
         Add (_down, _number, _up);
 

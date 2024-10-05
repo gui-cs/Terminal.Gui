@@ -42,7 +42,7 @@ public class ViewCommandTests (ITestOutputHelper output)
         var view = new View ();
         var acceptInvoked = false;
 
-        view.Accept += ViewOnAccept;
+        view.Accepted += ViewOnAccept;
 
         bool? ret = view.InvokeCommand (Command.Accept);
         Assert.True (ret);
@@ -63,7 +63,7 @@ public class ViewCommandTests (ITestOutputHelper output)
         var view = new View ();
         var accepted = false;
 
-        view.Accept += ViewOnAccept;
+        view.Accepted += ViewOnAccept;
 
         view.InvokeCommand (Command.Accept);
         Assert.True (accepted);
@@ -130,19 +130,26 @@ public class ViewCommandTests (ITestOutputHelper output)
     #endregion OnAccept/Accept tests
 
     #region OnSelect/Select tests
-    [Fact]
-    public void Select_Command_Raises_SetsFocus ()
+
+    [Theory]
+    [CombinatorialData]
+    public void Select_Command_Raises_SetsFocus (bool canFocus)
     {
-        var view = new ViewEventTester ();
+        var view = new ViewEventTester ()
+        {
+            CanFocus = canFocus
+        };
+
+        Assert.Equal (canFocus, view.CanFocus);
         Assert.False (view.HasFocus);
 
-        Assert.False (view.InvokeCommand (Command.Select)); // false means it was not handled
+        Assert.Equal (canFocus, view.InvokeCommand (Command.Select));
 
         Assert.Equal (1, view.OnSelectCount);
 
         Assert.Equal (1, view.SelectCount);
 
-        Assert.True (view.HasFocus);
+        Assert.Equal (canFocus, view.HasFocus);
     }
 
     [Fact]
@@ -165,7 +172,7 @@ public class ViewCommandTests (ITestOutputHelper output)
         var view = new View ();
         var SelectInvoked = false;
 
-        view.Select += ViewOnSelect;
+        view.Selected += ViewOnSelect;
 
         bool? ret = view.InvokeCommand (Command.Select);
         Assert.True (ret);
@@ -186,7 +193,7 @@ public class ViewCommandTests (ITestOutputHelper output)
         var view = new View ();
         var Selected = false;
 
-        view.Select += ViewOnSelect;
+        view.Selected += ViewOnSelect;
 
         view.InvokeCommand (Command.Select);
         Assert.True (Selected);
@@ -228,20 +235,20 @@ public class ViewCommandTests (ITestOutputHelper output)
         {
             CanFocus = true;
 
-            Accept += (s, a) =>
+            Accepted += (s, a) =>
                       {
                           a.Handled = HandleAccept;
                           AcceptCount++;
                       };
 
-            HotKeyCommand += (s, a) =>
+            HotKeyHandled += (s, a) =>
                              {
                                  a.Handled = HandleHotKeyCommand;
                                  HotKeyCommandCount++;
                              };
 
 
-            Select += (s, a) =>
+            Selected += (s, a) =>
                              {
                                  a.Handled = HandleSelect;
                                  SelectCount++;
@@ -253,7 +260,7 @@ public class ViewCommandTests (ITestOutputHelper output)
         public bool HandleOnAccept { get; set; }
 
         /// <inheritdoc />
-        protected override bool OnAccept (HandledEventArgs args)
+        protected override bool OnAccepted (HandledEventArgs args)
         {
             OnAcceptCount++;
 
@@ -267,7 +274,7 @@ public class ViewCommandTests (ITestOutputHelper output)
         public bool HandleOnHotKeyCommand { get; set; }
 
         /// <inheritdoc />
-        protected override bool OnHotKeyCommand (HandledEventArgs args)
+        protected override bool OnHotKeyHandled (HandledEventArgs args)
         {
             OnHotKeyCommandCount++;
 
@@ -282,7 +289,7 @@ public class ViewCommandTests (ITestOutputHelper output)
         public bool HandleOnSelect { get; set; }
 
         /// <inheritdoc />
-        protected override bool OnSelect (HandledEventArgs args)
+        protected override bool OnSelected (HandledEventArgs args)
         {
             OnSelectCount++;
 

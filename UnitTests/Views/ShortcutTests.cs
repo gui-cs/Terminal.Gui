@@ -425,7 +425,7 @@ public class ShortcutTests
         Application.Begin (current);
 
         var accepted = 0;
-        shortcut.Accept += (s, e) => accepted++;
+        shortcut.Accepted += (s, e) => accepted++;
 
         Application.OnMouseEvent (
                                   new ()
@@ -445,15 +445,15 @@ public class ShortcutTests
     //  0123456789
     // " C  0  A "
     [InlineData (-1, 0, 0, 0, 0)]
-    [InlineData (0, 1, 0, 0, 1)] // mouseX = 0 is on the CommandView.Margin, so Shortcut will get MouseClick
-    [InlineData (1, 0, 0, 0, 1)] // mouseX = 1 is on the CommandView, so CommandView will get MouseClick
-    [InlineData (2, 1, 0, 0, 1)] // mouseX = 2 is on the CommandView.Margin, so Shortcut will get MouseClick
-    [InlineData (3, 0, 0, 0, 1)]
-    [InlineData (4, 0, 0, 0, 1)]
-    [InlineData (5, 0, 0, 1, 1)]
-    [InlineData (6, 0, 0, 1, 1)]
-    [InlineData (7, 0, 0, 1, 1)]
-    [InlineData (8, 0, 0, 1, 1)]
+    [InlineData (0, 0, 1, 1, 1)] // mouseX = 0 is on the CommandView.Margin, so Shortcut will get MouseClick
+    [InlineData (1, 0, 1, 1, 1)] // mouseX = 1 is on the CommandView, so CommandView will get MouseClick
+    [InlineData (2, 1, 1, 1, 1)] // mouseX = 2 is on the CommandView.Margin, so Shortcut will get MouseClick
+    [InlineData (3, 0, 1, 1, 1)]
+    [InlineData (4, 0, 1, 1, 1)]
+    [InlineData (5, 0, 1, 1, 1)]
+    [InlineData (6, 0, 1, 1, 1)]
+    [InlineData (7, 0, 1, 1, 1)]
+    [InlineData (8, 0, 1, 1, 1)]
     [InlineData (9, 0, 0, 0, 0)]
 
     //[InlineData (1, 1, 1)]
@@ -465,7 +465,8 @@ public class ShortcutTests
     //[InlineData (7, 1, 0)]
     //[InlineData (8, 1, 0)]
     //[InlineData (9, 0, 0)]
-    public void MouseClick_Default_CommandView_Raises_Accept_Select_Correctly (int mouseX, int expectedCommandViewAccept, int expectedCommandViewSelect, int expectedShortcutAccept, int expectedShortcutSelect)
+    public void MouseClick_Default_CommandView_Raises_Accept_Select_Correctly (int mouseX, int expectedCommandViewAccept, int expectedCommandViewSelect, 
+                                                                               int expectedShortcutAccept, int expectedShortcutSelect)
     {
         Application.Top = new Toplevel ();
 
@@ -477,23 +478,23 @@ public class ShortcutTests
         };
 
         var commandViewAcceptCount = 0;
-        shortcut.CommandView.Accept += (s, e) =>
+        shortcut.CommandView.Accepted += (s, e) =>
         {
             commandViewAcceptCount++;
         };
         var commandViewSelectCount = 0;
-        shortcut.CommandView.Select += (s, e) =>
+        shortcut.CommandView.Selected += (s, e) =>
         {
             commandViewSelectCount++;
         };
 
         var shortcutAcceptCount = 0;
-        shortcut.Accept += (s, e) =>
+        shortcut.Accepted += (s, e) =>
         {
             shortcutAcceptCount++;
         };
         var shortcutSelectCount = 0;
-        shortcut.Select += (s, e) =>
+        shortcut.Selected += (s, e) =>
         {
             shortcutSelectCount++;
         };
@@ -511,8 +512,8 @@ public class ShortcutTests
                                   });
 
         Assert.Equal (expectedShortcutAccept, shortcutAcceptCount);
-        Assert.Equal (expectedCommandViewAccept, commandViewAcceptCount);
         Assert.Equal (expectedShortcutSelect, shortcutSelectCount);
+        Assert.Equal (expectedCommandViewAccept, commandViewAcceptCount);
         Assert.Equal (expectedCommandViewSelect, commandViewSelectCount);
 
         Application.Top.Dispose ();
@@ -534,7 +535,8 @@ public class ShortcutTests
     [InlineData (7, 1, 0)]
     [InlineData (8, 1, 0)]
     [InlineData (9, 0, 0)]
-    public void MouseClick_Button_CommandView_Fires_Shortcut_Accept (int mouseX, int expectedAccept, int expectedButtonAccept)
+    public void MouseClick_Button_CommandView_Raises_Shortcut_Accept
+        (int mouseX, int expectedAccept, int expectedButtonAccept)
     {
         Application.Top = new Toplevel ();
 
@@ -552,7 +554,7 @@ public class ShortcutTests
             CanFocus = false
         };
         var buttonAccepted = 0;
-        shortcut.CommandView.Accept += (s, e) =>
+        shortcut.CommandView.Accepted += (s, e) =>
         {
             buttonAccepted++;
             // Must indicate handled
@@ -561,7 +563,7 @@ public class ShortcutTests
         Application.Top.Add (shortcut);
 
         var accepted = 0;
-        shortcut.Accept += (s, e) => accepted++;
+        shortcut.Accepted += (s, e) => accepted++;
 
         //Assert.True (shortcut.HasFocus);
 
@@ -610,7 +612,7 @@ public class ShortcutTests
         Assert.Equal (canFocus, shortcut.HasFocus);
 
         var accepted = 0;
-        shortcut.Accept += (s, e) => accepted++;
+        shortcut.Accepted += (s, e) => accepted++;
 
         Application.OnKeyDown (key);
 
@@ -641,7 +643,7 @@ public class ShortcutTests
         Application.Top.SetFocus ();
 
         var accepted = 0;
-        shortcut.Accept += (s, e) => accepted++;
+        shortcut.Accepted += (s, e) => accepted++;
 
         Application.OnKeyDown (key);
 
@@ -704,7 +706,6 @@ public class ShortcutTests
     [InlineData (false, KeyCode.Enter, 0)]
     [InlineData (false, KeyCode.Space, 0)]
     [InlineData (false, KeyCode.F1, 0)]
-    [AutoInitShutdown]
     public void KeyDown_App_Scope_Invokes_Action (bool canFocus, KeyCode key, int expectedAction)
     {
         Application.Top = new Toplevel ();

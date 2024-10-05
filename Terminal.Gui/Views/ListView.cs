@@ -6,7 +6,7 @@ using static Terminal.Gui.SpinnerStyle;
 namespace Terminal.Gui;
 
 /// <summary>Implement <see cref="IListDataSource"/> to provide custom rendering for a <see cref="ListView"/>.</summary>
-public interface IListDataSource: IDisposable
+public interface IListDataSource : IDisposable
 {
     /// <summary>
     /// Event to raise when an item is added, removed, or moved, or the entire list is refreshed.
@@ -137,31 +137,47 @@ public class ListView : View, IDesignable
         AddCommand (Command.ScrollLeft, () => ScrollHorizontal (-1));
         AddCommand (Command.ScrollRight, () => ScrollHorizontal (1));
 
-        AddCommand (Command.Accept, () => OnOpenSelectedItem ());
-        AddCommand (Command.Open, () => OnOpenSelectedItem ());
-        AddCommand (Command.Select, () =>
+        // Accept (Enter key) - Raise Accept event - DO NOT advance state
+        AddCommand (Command.Accept, () =>
                                     {
-                                        if (RaiseSelectEvent () == true)
+                                        if (OnOpenSelectedItem () && RaiseAccepted () == true)
                                         {
-                                            return true;
-
-                                        }
-                                        if (_allowsMarking)
-                                        {
-                                            return MarkUnmarkSelectedItem ();
+                                                return true;
                                         }
 
                                         return false;
                                     });
-        AddCommand(Command.HotKey, () =>
-                                   {
-                                       if (SelectedItem == -1)
-                                       {
-                                           SelectedItem = 0;
-                                       }
 
-                                       return !SetFocus ();
-                                   });
+        // Select (Space key and single-click) - If markable, change mark and raise Select event
+        AddCommand (Command.Select, () =>
+                                    {
+                                        if (_allowsMarking)
+                                        {
+                                            if (MarkUnmarkSelectedItem () && RaiseSelected () == true)
+                                            {
+                                                return true;
+                                            }
+                                        }
+
+                                        return false;
+                                    });
+
+
+        // Hotkey - If none set, select and raise Select event. SetFocus. - DO NOT raise Accept
+        AddCommand (Command.HotKey, () =>
+                                    {
+                                        if (SelectedItem == -1)
+                                        {
+                                            SelectedItem = 0;
+                                            if (RaiseSelected () == true)
+                                            {
+                                                return true;
+
+                                            }
+                                        }
+
+                                        return !SetFocus ();
+                                    });
 
 
         // Default keybindings for all ListViews
@@ -179,10 +195,6 @@ public class ListView : View, IDesignable
         KeyBindings.Add (Key.Home, Command.Start);
 
         KeyBindings.Add (Key.End, Command.End);
-
-        // BUGBUG: This should just be Command.Accept
-        KeyBindings.Remove (Key.Enter);
-        KeyBindings.Add (Key.Enter, Command.Open);
     }
 
     /// <summary>Gets or sets whether this <see cref="ListView"/> allows items to be marked.</summary>
@@ -476,9 +488,9 @@ public class ListView : View, IDesignable
 
         _selected = Viewport.Y + me.Position.Y;
 
-        if (MarkUnmarkSelectedItem())
+        if (MarkUnmarkSelectedItem ())
         {
-           // return true;
+            // return true;
         }
 
         OnSelectedChanged ();
@@ -486,7 +498,7 @@ public class ListView : View, IDesignable
 
         if (me.Flags == MouseFlags.Button1DoubleClicked)
         {
-            return OnOpenSelectedItem ();
+            return InvokeCommand (Command.Accept) is true;
         }
 
         return true;
@@ -773,12 +785,6 @@ public class ListView : View, IDesignable
         }
 
         object value = _source.ToList () [_selected];
-
-        // By default, Command.Accept calls OnAccept, so we need to call it here to ensure that the event is fired.
-        if (RaiseAcceptEvent () == true)
-        {
-            return true;
-        }
 
         OpenSelectedItem?.Invoke (this, new ListViewItemEventArgs (_selected, value));
 

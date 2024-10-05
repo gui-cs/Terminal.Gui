@@ -160,7 +160,7 @@ public class AllViewsTester : Scenario
         _xRadioGroup.SelectedItemChanged += OnXRadioGroupOnSelectedItemChanged;
         _xText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_xVal}" };
 
-        _xText.Accept += (s, args) =>
+        _xText.Accepted += (s, args) =>
                          {
                              try
                              {
@@ -179,7 +179,7 @@ public class AllViewsTester : Scenario
         _locationFrame.Add (label);
         _yText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_yVal}" };
 
-        _yText.Accept += (s, args) =>
+        _yText.Accepted += (s, args) =>
                          {
                              try
                              {
@@ -211,7 +211,7 @@ public class AllViewsTester : Scenario
         _wRadioGroup.SelectedItemChanged += OnWRadioGroupOnSelectedItemChanged;
         _wText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_wVal}" };
 
-        _wText.Accept += (s, args) =>
+        _wText.Accepted += (s, args) =>
                          {
                              try
                              {
@@ -242,7 +242,7 @@ public class AllViewsTester : Scenario
         _sizeFrame.Add (label);
         _hText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_hVal}" };
 
-        _hText.Accept += (s, args) =>
+        _hText.Accepted += (s, args) =>
                          {
                              try
                              {

@@ -23,13 +23,39 @@ public class CheckBox : View
         CanFocus = true;
 
         // Select (Space key and single-click) - Advance state and raise Select event
-        AddCommand (Command.Select, () => AdvanceCheckState () is false);
+        AddCommand (Command.Select, () =>
+                                    {
+                                        bool? cancelled = AdvanceCheckState ();
 
-        // Accept (Enter key and double-click) - Raise Accept event - DO NOT advance state
-        AddCommand (Command.Accept, () => RaiseAcceptEvent ());
+                                        if (cancelled is null or false)
+                                        {
+                                            if (RaiseSelected () == true)
+                                            {
+                                                return true;
+                                            }
+                                        }
+
+                                        return cancelled is false;
+                                    });
+
+        // Accept (Enter key) - Raise Accept event - DO NOT advance state
+        AddCommand (Command.Accept, () => RaiseAccepted ());
 
         // Hotkey - Advance state and raise Select event - DO NOT raise Accept
-        AddCommand (Command.HotKey, () => AdvanceCheckState () is false);
+        AddCommand (Command.HotKey, () =>
+                                    {
+                                        bool? cancelled = AdvanceCheckState ();
+
+                                        if (cancelled is null or false)
+                                        {
+                                            if (RaiseSelected () == true)
+                                            {
+                                                return true;
+                                            }
+                                        }
+
+                                        return cancelled;
+                                    });
 
         TitleChanged += Checkbox_TitleChanged;
 
@@ -41,8 +67,7 @@ public class CheckBox : View
     {
         if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
-            // AdvanceCheckState returns false if the state was changed
-            e.Handled = AdvanceCheckState () is false;
+            e.Handled = InvokeCommand (Command.Select) is true;
         }
     }
 
@@ -214,14 +239,6 @@ public class CheckBox : View
         }
 
         bool? cancelled = ChangeCheckedState (e.NewValue);
-
-        if (cancelled is null or false)
-        {
-            if (RaiseSelectEvent () == true)
-            {
-                return true;
-            }
-        }
 
         return cancelled;
     }

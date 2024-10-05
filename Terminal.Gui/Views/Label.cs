@@ -27,13 +27,14 @@ public class Label : View
         Height = Dim.Auto (DimAutoStyle.Text);
         Width = Dim.Auto (DimAutoStyle.Text);
 
-        // Things this view knows how to do
+        // On HoKey, pass it to the next view
         AddCommand (Command.HotKey, InvokeHotKeyOnNext);
 
         TitleChanged += Label_TitleChanged;
         MouseClick += Label_MouseClick;
     }
 
+    // TODO: base raises Select, but we want to raise HotKey. This can be simplified?
     private void Label_MouseClick (object sender, MouseEventEventArgs e)
     {
         if (!CanFocus)

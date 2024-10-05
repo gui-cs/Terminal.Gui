@@ -1,4 +1,6 @@
 ﻿#nullable enable
+using System.Diagnostics;
+
 namespace Terminal.Gui;
 
 /// <summary>Displays a group of labels with an idicator of which one is selected.</summary>
@@ -76,32 +78,35 @@ public class RadioGroup : View, IDesignable, IOrientation
                     Command.Select,
                     () =>
                     {
+                        bool cursorChanged = false;
                         if (SelectedItem == Cursor)
                         {
-                            if (!MoveDownRight ())
+                            cursorChanged = MoveDownRight ();
+                            if (!cursorChanged)
                             {
-                                MoveHome ();
+                                cursorChanged = MoveHome ();
                             }
                         }
 
-                        if (ChangeSelectedItem (Cursor) is true)
+                        if (SelectedItem != Cursor)
                         {
-                            return true;
-                        };
-
-                        if (RaiseSelectEvent () == true)
-                        {
-                            return true;
+                            if (ChangeSelectedItem (Cursor) && RaiseSelected () == true)
+                            {
+                                return true;
+                            }
                         }
 
-                        return false;
+                        return cursorChanged;
                     });
 
         // Accept (Enter key) - Raise Accept event - DO NOT advance state
-        AddCommand (Command.Accept, RaiseAcceptEvent);
+        AddCommand (Command.Accept, RaiseAccepted);
 
-        AddCommand (
-                    Command.HotKey,
+        // Hotkey - ctx may indicate a radio item hotkey was pressed. Beahvior depends on HasFocus
+        //          If HasFocus and it's this.HotKey invoke Select command - DO NOT raise Accept
+        //          If it's a radio item HotKey select that item and raise Seelcted event - DO NOT raise Accept
+        //          If nothing is selected, select first and raise Selected event - DO NOT raise Accept
+        AddCommand (Command.HotKey,
                     ctx =>
                     {
                         var item = ctx.KeyBinding?.Context as int?;
@@ -123,12 +128,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                             }
 
                             // If a RadioItem.HotKey is pressed we always set the selected item - never SetFocus
-                            if (ChangeSelectedItem (item.Value) == true)
-                            {
-                                return true;
-                            }
-
-                            if (RaiseSelectEvent () == true)
+                            if (ChangeSelectedItem (item.Value) && RaiseSelected () == true)
                             {
                                 return true;
                             }
@@ -136,11 +136,16 @@ public class RadioGroup : View, IDesignable, IOrientation
                             return false;
                         }
 
-                        if (SelectedItem == -1 && ChangeSelectedItem (0) == true)
+                        if (SelectedItem == -1 && ChangeSelectedItem (0))
                         {
-                            return true;
+                            if (RaiseSelected () == true)
+                            {
+                                return true;
+                            }
+                            return false;
                         }
 
+                        // Default Command.Hotkey sets focus
                         SetFocus ();
 
                         return true;
@@ -188,7 +193,7 @@ public class RadioGroup : View, IDesignable, IOrientation
     }
 
     /// <summary>
-    ///     Gets or sets whether double clicking on a Radio Item will cause the <see cref="View.Accept"/> event to be raised.
+    ///     Gets or sets whether double clicking on a Radio Item will cause the <see cref="View.Accepted"/> event to be raised.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -220,7 +225,7 @@ public class RadioGroup : View, IDesignable, IOrientation
 
                 if (c > -1)
                 {
-                    if (ChangeSelectedItem (c) == false)
+                    if (ChangeSelectedItem (c))
                     {
                         Cursor = c;
                         e.Handled = true;
@@ -233,7 +238,7 @@ public class RadioGroup : View, IDesignable, IOrientation
         {
             int savedSelectedItem = SelectedItem;
 
-            if (RaiseAcceptEvent () == true)
+            if (RaiseAccepted () == true)
             {
                 e.Handled = false;
                 _selected = savedSelectedItem;
@@ -322,14 +327,13 @@ public class RadioGroup : View, IDesignable, IOrientation
     /// </summary>
     /// <param name="value"></param>
     /// <returns>
-    ///     <see langword="true"/> if state change was canceled, <see langword="false"/> if the state changed, and
-    ///     <see langword="null"/> if the state was not changed for some other reason.
+    ///     <see langword="true"/> if the selected item changed.
     /// </returns>
-    private bool? ChangeSelectedItem (int value)
+    private bool ChangeSelectedItem (int value)
     {
         if (_selected == value || value > _radioLabels.Count - 1)
         {
-            return null;
+            return false;
         }
 
         int savedSelected = _selected;
@@ -341,7 +345,7 @@ public class RadioGroup : View, IDesignable, IOrientation
 
         SetNeedsDisplay ();
 
-        return false;
+        return true;
     }
 
     /// <inheritdoc/>
@@ -520,7 +524,17 @@ public class RadioGroup : View, IDesignable, IOrientation
 
     private void MoveEnd () { Cursor = Math.Max (_radioLabels.Count - 1, 0); }
 
-    private void MoveHome () { Cursor = 0; }
+    private bool MoveHome ()
+    {
+        if (Cursor != 0)
+        {
+            Cursor = 0;
+
+            return true;
+        }
+
+        return false;
+    }
 
     private bool MoveUpLeft ()
     {

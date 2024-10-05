@@ -595,7 +595,7 @@ public class Sliders : Scenario
 
         foreach (Slider slider in app.Subviews.Where (v => v is Slider)!)
         {
-            slider.Accept += (o, args) =>
+            slider.Accepted += (o, args) =>
                              {
                                  eventSource.Add ($"Accept: {string.Join(",", slider.GetSetOptions ())}");
                                  eventLog.MoveDown ();
