@@ -61,9 +61,15 @@ public class Images : Scenario
     private RadioGroup _rgDistanceAlgorithm;
     private NumericUpDown _popularityThreshold;
     private SixelToRender _sixelImage;
+    private SixelSupport _sixelSupport;
 
     public override void Main ()
     {
+        var sixelSupportDetector = new SixelSupportDetector ();
+        _sixelSupport = sixelSupportDetector.Detect ();
+
+        ConsoleDriver.SupportsSixel = _sixelSupport.IsSupported;
+
         Application.Init ();
         _win = new() { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
 
