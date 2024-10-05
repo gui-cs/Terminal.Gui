@@ -358,7 +358,7 @@ public class Shortcuts : Scenario
                 {
                     eventSource.Add ($"{shortcut!.Id}.Select: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
                     eventLog.MoveDown ();
-                    args.Handled = true;
+                    //args.Handled = true;
                 };
 
                 shortcut.CommandView.Select += (o, args) =>

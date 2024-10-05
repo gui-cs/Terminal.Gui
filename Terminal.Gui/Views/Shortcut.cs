@@ -121,10 +121,16 @@ public class Shortcut : View, IOrientation, IDesignable
         KeyView.CanFocus = false;
         Add (KeyView);
 
-        // If the user clicks anywhere on the Shortcut, other than the CommandView, invoke the Command
+        // If the user clicks anywhere on the Shortcut...
         MouseClick += Shortcut_MouseClick;
-        //HelpView.MouseClick += Subview_MouseClick;
-        //KeyView.MouseClick += Subview_MouseClick;
+
+        // If the user clicks on HelpView or KeyView
+        HelpView.MouseClick += HelpOrKeyView_MouseClick;
+        KeyView.MouseClick += HelpOrKeyView_MouseClick;
+
+        HelpView.Select += HelpAndKeyViewOnSelect;
+        KeyView.Select += HelpAndKeyViewOnSelect;
+
         LayoutStarted += OnLayoutStarted;
         Initialized += OnInitialized;
 
@@ -168,6 +174,11 @@ public class Shortcut : View, IOrientation, IDesignable
                              Dim.Func (() => PosAlign.CalculateMinDimension (0, Subviews, Dimension.Width)),
                              Dim.Func (() => PosAlign.CalculateMinDimension (0, Subviews, Dimension.Width)));
         }
+    }
+
+    private void HelpAndKeyViewOnSelect (object sender, HandledEventArgs e)
+    {
+        e.Handled = InvokeCommand (Command.Accept) == true;
     }
 
     [CanBeNull]
@@ -376,22 +387,20 @@ public class Shortcut : View, IOrientation, IDesignable
         if (!e.Handled)
         {
             // If the subview (likely CommandView) didn't handle the mouse click, invoke the Select command.
-            e.Handled = CommandView.InvokeCommand (Command.Accept) == true;
-        }
-
-        if (CanFocus)
-        {
-            SetFocus ();
-        }
-    }
-
-    private void Subview_MouseClick (object sender, MouseEventEventArgs e)
-    {
-        if (!e.Handled)
-        {
-            // If the subview (likely CommandView) didn't handle the mouse click, invoke the command.
+            // e.Handled = CommandView.InvokeCommand (Command.Select) == true;
             e.Handled = InvokeCommand (Command.Accept) == true;
         }
+
+        //if (CanFocus)
+        //{
+        //    SetFocus ();
+        //}
+    }
+
+    private void HelpOrKeyView_MouseClick (object sender, MouseEventEventArgs e)
+    {
+        // Always eat
+        //e.Handled = true;
     }
 
     #region IOrientation members
@@ -514,15 +523,13 @@ public class Shortcut : View, IOrientation, IDesignable
 
             Title = _commandView.Text;
 
-            _commandView.Accept += CommandViewOnAccept;
+            _commandView.Select += CommandViewOnAccept;
 
             void CommandViewOnAccept (object sender, HandledEventArgs e)
             {
                 // Always eat CommandView.Accept
                 e.Handled = true;
             }
-
-            _commandView.Select += CommandViewOnSelect;
 
             _commandView.MouseClick += CommandViewOnMouseClick;
 
@@ -532,17 +539,10 @@ public class Shortcut : View, IOrientation, IDesignable
                 {
                     // If the subview (likely CommandView) didn't handle the mouse click, invoke the command.
                     InvokeCommand (Command.HotKey);
+                    e.Handled = true;
                 }
             }
 
-            void CommandViewOnSelect (object sender, HandledEventArgs e)
-            {
-                // Always eat CommandView.Select
-                e.Handled = true;
-
-                // AND raise our Accept event
-                RaiseAcceptEvent ();
-            }
 
             SetCommandViewDefaultLayout ();
             SetHelpViewDefaultLayout ();
@@ -780,13 +780,20 @@ public class Shortcut : View, IOrientation, IDesignable
     /// </summary>
     protected bool? DispatchAcceptCommand (CommandContext ctx)
     {
+        if (RaiseSelectEvent () == true)
+        {
+            return true;
+        }
+
+        CommandView.InvokeCommand (Command.Select);
+
         var cancel = false;
 
-        bool? handled = CommandView.InvokeCommand (Command.Select, ctx.Key, ctx.KeyBinding);
+        cancel = RaiseAcceptEvent () == true;
 
-        if (handled is null or false)
+        if (cancel is true)
         {
-            cancel = RaiseAcceptEvent () == true;
+            return true;
         }
 
         if (Action is { })

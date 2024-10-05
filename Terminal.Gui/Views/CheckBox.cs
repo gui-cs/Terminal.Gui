@@ -148,11 +148,6 @@ public class CheckBox : View
 
         CheckedStateChanged?.Invoke (this, args);
 
-        if (RaiseSelectEvent () == true)
-        {
-            return true;
-        }
-
         return false;
     }
 
@@ -219,6 +214,14 @@ public class CheckBox : View
         }
 
         bool? cancelled = ChangeCheckedState (e.NewValue);
+
+        if (cancelled is null or false)
+        {
+            if (RaiseSelectEvent () == true)
+            {
+                return true;
+            }
+        }
 
         return cancelled;
     }

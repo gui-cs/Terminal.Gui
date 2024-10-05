@@ -70,6 +70,8 @@ public class RadioGroup : View, IDesignable, IOrientation
                         return true;
                     }
                    );
+
+        // Select (Space key or mouse click) - The default implementation sets focus. RadioGroup does not.
         AddCommand (
                     Command.Select,
                     () =>
@@ -82,23 +84,17 @@ public class RadioGroup : View, IDesignable, IOrientation
                             }
                         }
 
-                        SelectedItem = Cursor;
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.Select,
-                    () =>
-                    {
-                        if (SelectedItem == Cursor)
+                        if (ChangeSelectedItem (Cursor) is true)
                         {
-                            if (!MoveDownRight ())
-                            {
-                                MoveHome ();
-                            }
+                            return true;
+                        };
+
+                        if (RaiseSelectEvent () == true)
+                        {
+                            return true;
                         }
 
-                        return ChangeSelectedItem (Cursor) is false or null;
+                        return false;
                     });
 
         // Accept (Enter key) - Raise Accept event - DO NOT advance state
@@ -127,7 +123,12 @@ public class RadioGroup : View, IDesignable, IOrientation
                             }
 
                             // If a RadioItem.HotKey is pressed we always set the selected item - never SetFocus
-                            if (ChangeSelectedItem (item.Value) is null or false)
+                            if (ChangeSelectedItem (item.Value) == true)
+                            {
+                                return true;
+                            }
+
+                            if (RaiseSelectEvent () == true)
                             {
                                 return true;
                             }
@@ -329,11 +330,6 @@ public class RadioGroup : View, IDesignable, IOrientation
         if (_selected == value || value > _radioLabels.Count - 1)
         {
             return null;
-        }
-
-        if (RaiseSelectEvent () == true)
-        {
-            return true;
         }
 
         int savedSelected = _selected;

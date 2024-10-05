@@ -369,11 +369,10 @@ public partial class View // Mouse APIs
         }
 
         // Post-conditions
-        if (!HasFocus && CanFocus)
-        {
-            args.Handled = true;
-            SetFocus ();
-        }
+
+        // Always invoke Select command on MouseClick
+        // By default, this will raise Select/OnSelect - Subclasses can override this via AddCommand (Command.Select ...).
+        args.Handled = InvokeCommand (Command.Select) == true;
 
         return args.Handled;
     }

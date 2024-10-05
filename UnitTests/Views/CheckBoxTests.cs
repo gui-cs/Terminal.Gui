@@ -312,29 +312,8 @@ public class CheckBoxTests (ITestOutputHelper output)
         Assert.Equal (0, selectCount);
         Assert.Equal (0, acceptCount);
 
-#if !CHECKBOX_SUPPORTS_DOUBLE_CLICK_ACCEPT
-        Assert.False (checkBox.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked }));
-#else
-
         Assert.True (checkBox.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked }));
-        Assert.Equal (CheckState.Checked, checkBox.CheckedState);
-        Assert.Equal (1, checkedStateChangingCount);
-        Assert.Equal (1, selectCount);
-        Assert.Equal (0, acceptCount);
 
-        Assert.True (checkBox.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked }));
-        Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
-        Assert.Equal (2, checkedStateChangingCount);
-        Assert.Equal (2, selectCount);
-        Assert.Equal (0, acceptCount);
-
-        checkBox.AllowCheckStateNone = true;
-        Assert.True (checkBox.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked }));
-        Assert.Equal (CheckState.None, checkBox.CheckedState);
-        Assert.Equal (3, checkedStateChangingCount);
-        Assert.Equal (3, selectCount);
-        Assert.Equal (0, acceptCount);
-#endif
     }
 
 #endregion Mouse Tests

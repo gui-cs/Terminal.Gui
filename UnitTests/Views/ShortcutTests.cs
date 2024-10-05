@@ -445,7 +445,17 @@ public class ShortcutTests
     //  0123456789
     // " C  0  A "
     [InlineData (-1, 0, 0, 0, 0)]
-    [InlineData (0, 1, 0, 1, 1)]
+    [InlineData (0, 1, 0, 0, 1)] // mouseX = 0 is on the CommandView.Margin, so Shortcut will get MouseClick
+    [InlineData (1, 0, 0, 0, 1)] // mouseX = 1 is on the CommandView, so CommandView will get MouseClick
+    [InlineData (2, 1, 0, 0, 1)] // mouseX = 2 is on the CommandView.Margin, so Shortcut will get MouseClick
+    [InlineData (3, 0, 0, 0, 1)]
+    [InlineData (4, 0, 0, 0, 1)]
+    [InlineData (5, 0, 0, 1, 1)]
+    [InlineData (6, 0, 0, 1, 1)]
+    [InlineData (7, 0, 0, 1, 1)]
+    [InlineData (8, 0, 0, 1, 1)]
+    [InlineData (9, 0, 0, 0, 0)]
+
     //[InlineData (1, 1, 1)]
     //[InlineData (2, 1, 0)]
     //[InlineData (3, 1, 0)]
@@ -491,6 +501,7 @@ public class ShortcutTests
 
         Application.Top.Add (shortcut);
         Application.Top.SetRelativeLayout (new (100, 100));
+        Application.Top.LayoutSubviews();
 
         Application.OnMouseEvent (
                                   new ()

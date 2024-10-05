@@ -133,6 +133,7 @@ public class Buttons : Scenario
                       Text = "Lets see if this will move as \"Text Changer\" grows"
                   }
                  );
+        button.Accept += (sender, args) => { args.Handled = true; };
 
         var removeButton = new Button
         {
@@ -145,6 +146,7 @@ public class Buttons : Scenario
         removeButton.Accept += (s, e) =>
                                {
                                    removeButton.Visible = false;
+                                   e.Handled = true;
                                };
 
         var computedFrame = new FrameView
@@ -170,6 +172,7 @@ public class Buttons : Scenario
         moveBtn.Accept += (s, e) =>
                           {
                               moveBtn.X = moveBtn.Frame.X + 5;
+                              e.Handled = true;
                           };
         computedFrame.Add (moveBtn);
 
@@ -186,6 +189,7 @@ public class Buttons : Scenario
         sizeBtn.Accept += (s, e) =>
                           {
                               sizeBtn.Width = sizeBtn.Frame.Width + 5;
+                              e.Handled = true;
                           };
         computedFrame.Add (sizeBtn);
 
@@ -210,6 +214,7 @@ public class Buttons : Scenario
                                                      moveBtnA.Frame.Width,
                                                      moveBtnA.Frame.Height
                                                     );
+                               e.Handled = true;
                            };
         absoluteFrame.Add (moveBtnA);
 
@@ -227,6 +232,7 @@ public class Buttons : Scenario
                                                      sizeBtnA.Frame.Width + 5,
                                                      sizeBtnA.Frame.Height
                                                     );
+                               e.Handled = true;
                            };
         absoluteFrame.Add (sizeBtnA);
 
@@ -291,7 +297,11 @@ public class Buttons : Scenario
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Text = mhkb
         };
-        moveHotKeyBtn.Accept += (s, e) => { moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text); };
+        moveHotKeyBtn.Accept += (s, e) =>
+                                {
+                                    moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text);
+                                    e.Handled = true;
+                                };
         main.Add (moveHotKeyBtn);
 
         var muhkb = " ~  s  gui.cs   master ↑10 = Сохранить";
@@ -304,7 +314,11 @@ public class Buttons : Scenario
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Text = muhkb
         };
-        moveUnicodeHotKeyBtn.Accept += (s, e) => { moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text); };
+        moveUnicodeHotKeyBtn.Accept += (s, e) =>
+                                       {
+                                           moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text);
+                                           e.Handled = true;
+                                       };
         main.Add (moveUnicodeHotKeyBtn);
 
         radioGroup.SelectedItemChanged += (s, args) =>
@@ -384,7 +398,11 @@ public class Buttons : Scenario
             Title = $"Accept Cou_nt: {noRepeatAcceptCount}",
             WantContinuousButtonPressed = false
         };
-        noRepeatButton.Accept += (s, e) => { noRepeatButton.Title = $"Accept Cou_nt: {++noRepeatAcceptCount}"; };
+        noRepeatButton.Accept += (s, e) =>
+                                 {
+                                     noRepeatButton.Title = $"Accept Cou_nt: {++noRepeatAcceptCount}";
+                                     e.Handled = true;
+                                 };
         main.Add (label, noRepeatButton);
 
         label = new ()
@@ -402,7 +420,11 @@ public class Buttons : Scenario
             Title = $"Accept Co_unt: {acceptCount}",
             WantContinuousButtonPressed = true
         };
-        repeatButton.Accept += (s, e) => { repeatButton.Title = $"Accept Co_unt: {++acceptCount}"; };
+        repeatButton.Accept += (s, e) =>
+                               {
+                                   repeatButton.Title = $"Accept Co_unt: {++acceptCount}";
+                                   e.Handled = true;
+                               };
 
         var enableCB = new CheckBox
         {

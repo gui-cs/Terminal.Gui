@@ -108,6 +108,11 @@ public partial class View // Command APIs
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
         Select?.Invoke (this, args);
 
+        if ((Select is null || !args.Handled) && CanFocus)
+        {
+            SetFocus ();
+        }
+
         return Select is null ? null : args.Handled;
     }
 

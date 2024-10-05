@@ -116,14 +116,22 @@ public class ViewCommandTests (ITestOutputHelper output)
         Assert.Equal (6, subview.OnAcceptCount);
         Assert.Equal (3, view.OnAcceptCount);
         Assert.Equal (1, superView.OnAcceptCount);
+    }
 
+    [Fact]
+    public void MouseClick_Does_Not_Invoke_Accept_Command ()
+    {
+        var view = new ViewEventTester ();
+        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Clicked, Position = Point.Empty, View = view });
+
+        Assert.Equal (0, view.OnAcceptCount);
     }
 
     #endregion OnAccept/Accept tests
 
     #region OnSelect/Select tests
     [Fact]
-    public void Select_Command_Raises_NoFocus ()
+    public void Select_Command_Raises_SetsFocus ()
     {
         var view = new ViewEventTester ();
         Assert.False (view.HasFocus);
@@ -134,7 +142,7 @@ public class ViewCommandTests (ITestOutputHelper output)
 
         Assert.Equal (1, view.SelectCount);
 
-        Assert.False (view.HasFocus);
+        Assert.True (view.HasFocus);
     }
 
     [Fact]
@@ -188,6 +196,14 @@ public class ViewCommandTests (ITestOutputHelper output)
         void ViewOnSelect (object sender, HandledEventArgs e) { Selected = true; }
     }
 
+    [Fact]
+    public void MouseClick_Invokes_Select_Command ()
+    {
+        var view = new ViewEventTester ();
+        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Clicked, Position = Point.Empty, View = view });
+
+        Assert.Equal (1, view.OnSelectCount);
+    }
 
     #endregion OnSelect/Select tests
 

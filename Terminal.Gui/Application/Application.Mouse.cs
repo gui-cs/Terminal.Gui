@@ -147,6 +147,7 @@ public static partial class Application // Mouse handling
         }
 
         // The position of the mouse is the same as the screen position at the application level.
+        //Debug.Assert (mouseEvent.Position == mouseEvent.ScreenPosition);
         mouseEvent.Position = mouseEvent.ScreenPosition;
 
         List<View?> currentViewsUnderMouse = View.GetViewsUnderMouse (mouseEvent.ScreenPosition);

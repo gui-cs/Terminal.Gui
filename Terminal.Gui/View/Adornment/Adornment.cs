@@ -223,8 +223,8 @@ public class Adornment : View
             return false;
         }
 
-        Rectangle outside = Parent.Frame;
-        //outside.Offset (Parent.Frame.Location);
+        Rectangle outside = Frame;
+        outside.Offset (Parent.Frame.Location);
 
         return Thickness.Contains (outside, location);
     }
