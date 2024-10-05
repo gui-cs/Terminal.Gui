@@ -210,22 +210,18 @@ public class Editor : Scenario
                                        {
                                            if (!PromptForColor (
                                                                 "Colors",
-                                                                GetSelectedRuneCellAttribute (),
+                                                                GetSelectedCellAttribute (),
                                                                 out Attribute newAttribute
                                                                ))
                                            {
                                                return;
                                            }
 
-                                           var cs = new ColorScheme (_textView.ColorScheme)
-                                           {
-                                               Focus = new (
-                                                                          newAttribute.Foreground,
+                                           var attribute = new Attribute (newAttribute.Foreground,
                                                                           newAttribute.Background
-                                                                         )
-                                           };
+                                                                         );
 
-                                           ApplyRuneCellAttribute (cs);
+                                           ApplyCellAttribute (attribute);
                                        })
                      }
                     ),
@@ -341,7 +337,7 @@ public class Editor : Scenario
 
     }
 
-    private void ApplyRuneCellAttribute (ColorScheme cs)
+    private void ApplyCellAttribute (Attribute attribute)
     {
         if (!_textView.ReadOnly && _textView.SelectedLength > 0)
         {
@@ -352,29 +348,31 @@ public class Editor : Scenario
 
             for (int r = startRow; r <= endRow; r++)
             {
-                List<RuneCell> line = _textView.GetLine (r);
+                List<Cell> line = _textView.GetLine (r);
 
                 for (int c = r == startRow ? startCol : 0;
                      c < (r == endRow ? endCol : line.Count);
                      c++)
                 {
-                    line [c].ColorScheme = cs;
+                    Cell cell = line [c]; // Copy value to a new variable
+                    cell.Attribute = attribute; // Modify the copy
+                    line [c] = cell; // Assign the modified copy back
                 }
             }
         }
     }
 
-    private Attribute? GetSelectedRuneCellAttribute ()
+    private Attribute? GetSelectedCellAttribute ()
     {
-        List<RuneCell> line;
+        List<Cell> line;
 
         if (_textView.SelectedLength > 0)
         {
             line = _textView.GetLine (_textView.SelectionStartRow);
 
-            if (line [Math.Min (_textView.SelectionStartColumn, line.Count - 1)].ColorScheme is { } csSel)
+            if (line [Math.Min (_textView.SelectionStartColumn, line.Count - 1)].Attribute is { } attributeSel)
             {
-                return new (csSel.Focus);
+                return new (attributeSel);
             }
 
             return new (_textView.ColorScheme!.Focus);
@@ -382,9 +380,9 @@ public class Editor : Scenario
 
         line = _textView.GetCurrentLine ();
 
-        if (line [Math.Min (_textView.CurrentColumn, line.Count - 1)].ColorScheme is { } cs)
+        if (line [Math.Min (_textView.CurrentColumn, line.Count - 1)].Attribute is { } attribute)
         {
-            return new (cs!.Focus);
+            return new (attribute);
         }
 
         return new (_textView.ColorScheme!.Focus);

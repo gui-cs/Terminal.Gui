@@ -9,163 +9,9 @@ using Terminal.Gui.Resources;
 
 namespace Terminal.Gui;
 
-/// <summary>
-///     Represents a single row/column within the <see cref="TextView"/>. Includes the glyph and the
-///     foreground/background colors.
-/// </summary>
-[DebuggerDisplay ("{ColorSchemeDebuggerDisplay}")]
-public class RuneCell : IEquatable<RuneCell>
-{
-    /// <summary>The <see cref="Terminal.Gui.ColorScheme"/> color sets to draw the glyph with.</summary>
-    [JsonConverter (typeof (ColorSchemeJsonConverter))]
-    public ColorScheme? ColorScheme { get; set; }
-
-    /// <summary>The glyph to draw.</summary>
-    [JsonConverter (typeof (RuneJsonConverter))]
-    public Rune Rune { get; set; }
-
-    private string ColorSchemeDebuggerDisplay => ToString ();
-
-    /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
-    /// <param name="other">An object to compare with this object.</param>
-    /// <returns>
-    ///     <see langword="true"/> if the current object is equal to the <paramref name="other"/> parameter; otherwise,
-    ///     <see langword="false"/>.
-    /// </returns>
-    public bool Equals (RuneCell? other) { return other is { } && Rune.Equals (other.Rune) && ColorScheme == other.ColorScheme; }
-
-    /// <summary>Returns a string that represents the current object.</summary>
-    /// <returns>A string that represents the current object.</returns>
-    public override string ToString ()
-    {
-        string colorSchemeStr = ColorScheme?.ToString () ?? "null";
-
-        return $"U+{Rune.Value:X4} '{Rune.ToString ()}'; {colorSchemeStr}";
-    }
-
-    /// <summary>Converts the string into a <see cref="List{RuneCell}"/>.</summary>
-    /// <param name="str">The string to convert.</param>
-    /// <param name="colorScheme">The <see cref="Gui.ColorScheme"/> to use.</param>
-    /// <returns></returns>
-    public static List<RuneCell> ToRuneCellList (string str, ColorScheme? colorScheme = null)
-    {
-        List<RuneCell> cells = new ();
-
-        foreach (Rune rune in str.EnumerateRunes ())
-        {
-            cells.Add (new () { Rune = rune, ColorScheme = colorScheme });
-        }
-
-        return cells;
-    }
-
-    /// <summary>
-    ///     Splits a string into a List that will contain a <see cref="List{RuneCell}"/> for each line.
-    /// </summary>
-    /// <param name="content">The string content.</param>
-    /// <param name="colorScheme">The color scheme.</param>
-    /// <returns>A <see cref="List{RuneCell}"/> for each line.</returns>
-    public static List<List<RuneCell>> StringToLinesOfRuneCells (string content, ColorScheme? colorScheme = null)
-    {
-        List<RuneCell> cells = content.EnumerateRunes ()
-                                      .Select (x => new RuneCell { Rune = x, ColorScheme = colorScheme })
-                                      .ToList ();
-
-        return SplitNewLines (cells);
-    }
-
-    /// <summary>Converts a <see cref="RuneCell"/> generic collection into a string.</summary>
-    /// <param name="cells">The enumerable cell to convert.</param>
-    /// <returns></returns>
-    public static string ToString (IEnumerable<RuneCell> cells)
-    {
-        var str = string.Empty;
-
-        foreach (RuneCell cell in cells)
-        {
-            str += cell.Rune.ToString ();
-        }
-
-        return str;
-    }
-
-    // Turns the string into cells, this does not split the contents on a newline if it is present.
-    internal static List<RuneCell> StringToRuneCells (string str, ColorScheme? colorScheme = null)
-    {
-        List<RuneCell> cells = new ();
-
-        foreach (Rune rune in str.ToRunes ())
-        {
-            cells.Add (new () { Rune = rune, ColorScheme = colorScheme });
-        }
-
-        return cells;
-    }
-
-    internal static List<RuneCell> ToRuneCells (IEnumerable<Rune> runes, ColorScheme? colorScheme = null)
-    {
-        List<RuneCell> cells = new ();
-
-        foreach (Rune rune in runes)
-        {
-            cells.Add (new () { Rune = rune, ColorScheme = colorScheme });
-        }
-
-        return cells;
-    }
-
-    private static List<List<RuneCell>> SplitNewLines (List<RuneCell> cells)
-    {
-        List<List<RuneCell>> lines = new ();
-        int start = 0, i = 0;
-        var hasCR = false;
-
-        // ASCII code 13 = Carriage Return.
-        // ASCII code 10 = Line Feed.
-        for (; i < cells.Count; i++)
-        {
-            if (cells [i].Rune.Value == 13)
-            {
-                hasCR = true;
-
-                continue;
-            }
-
-            if (cells [i].Rune.Value == 10)
-            {
-                if (i - start > 0)
-                {
-                    lines.Add (cells.GetRange (start, hasCR ? i - 1 - start : i - start));
-                }
-                else
-                {
-                    lines.Add (StringToRuneCells (string.Empty));
-                }
-
-                start = i + 1;
-                hasCR = false;
-            }
-        }
-
-        if (i - start >= 0)
-        {
-            lines.Add (cells.GetRange (start, i - start));
-        }
-
-        return lines;
-    }
-
-    /// <summary>
-    ///     Splits a rune cell list into a List that will contain a <see cref="List{RuneCell}"/> for each line.
-    /// </summary>
-    /// <param name="cells">The cells list.</param>
-    /// <returns></returns>
-    public static List<List<RuneCell>> ToRuneCells (List<RuneCell> cells) { return SplitNewLines (cells); }
-}
-
 internal class TextModel
 {
-    private List<List<RuneCell>> _lines = new ();
+    private List<List<Cell>> _lines = new ();
     private (Point startPointToFind, Point currentPointToFind, bool found) _toFind;
 
     /// <summary>The number of text lines in the model</summary>
@@ -175,8 +21,8 @@ internal class TextModel
 
     /// <summary>Adds a line to the model at the specified position.</summary>
     /// <param name="pos">Line number where the line will be inserted.</param>
-    /// <param name="cells">The line of text and color, as a List of RuneCell.</param>
-    public void AddLine (int pos, List<RuneCell> cells) { _lines.Insert (pos, cells); }
+    /// <param name="cells">The line of text and color, as a List of Cell.</param>
+    public void AddLine (int pos, List<Cell> cells) { _lines.Insert (pos, cells); }
 
     public bool CloseFile ()
     {
@@ -191,12 +37,12 @@ internal class TextModel
         return true;
     }
 
-    public List<List<RuneCell>> GetAllLines () { return _lines; }
+    public List<List<Cell>> GetAllLines () { return _lines; }
 
     /// <summary>Returns the specified line as a List of Rune</summary>
     /// <returns>The line.</returns>
     /// <param name="line">Line number to retrieve.</param>
-    public List<RuneCell> GetLine (int line)
+    public List<Cell> GetLine (int line)
     {
         if (_lines.Count > 0)
         {
@@ -224,7 +70,7 @@ internal class TextModel
 
         for (int i = first; i < last; i++)
         {
-            List<RuneCell> line = GetLine (i);
+            List<Cell> line = GetLine (i);
             int tabSum = line.Sum (c => c.Rune.Value == '\t' ? Math.Max (tabWidth - 1, 0) : 0);
             int l = line.Count + tabSum;
 
@@ -251,17 +97,17 @@ internal class TextModel
         }
     }
 
-    public void LoadListRuneCells (List<List<RuneCell>> cellsList, ColorScheme? colorScheme)
+    public void LoadListCells (List<List<Cell>> cellsList, Attribute? attribute)
     {
         _lines = cellsList;
-        SetColorSchemes (colorScheme);
+        SetAttributes (attribute);
         OnLinesLoaded ();
     }
 
-    public void LoadRuneCells (List<RuneCell> cells, ColorScheme? colorScheme)
+    public void LoadCells (List<Cell> cells, Attribute? attribute)
     {
-        _lines = RuneCell.ToRuneCells (cells);
-        SetColorSchemes (colorScheme);
+        _lines = Cell.ToCells ((List<Cell>)cells);
+        SetAttributes (attribute);
         OnLinesLoaded ();
     }
 
@@ -310,7 +156,7 @@ internal class TextModel
 
     public void LoadString (string content)
     {
-        _lines = RuneCell.StringToLinesOfRuneCells (content);
+        _lines = Cell.StringToLinesOfCells (content);
 
         OnLinesLoaded ();
     }
@@ -330,7 +176,7 @@ internal class TextModel
         }
     }
 
-    public void ReplaceLine (int pos, List<RuneCell> runes)
+    public void ReplaceLine (int pos, List<Cell> runes)
     {
         if (_lines.Count > 0 && pos < _lines.Count)
         {
@@ -350,7 +196,7 @@ internal class TextModel
 
         for (var i = 0; i < _lines.Count; i++)
         {
-            sb.Append (RuneCell.ToString (_lines [i]));
+            sb.Append (Cell.ToString (_lines [i]));
 
             if (i + 1 < _lines.Count)
             {
@@ -373,12 +219,12 @@ internal class TextModel
 
         try
         {
-            RuneCell? cell = RuneAt (col, row);
+            Cell? cell = RuneAt (col, row);
             Rune rune;
 
             if (cell is { })
             {
-                rune = cell.Rune;
+                rune = cell.Value.Rune;
             }
             else
             {
@@ -390,7 +236,7 @@ internal class TextModel
                 if (col == 0 && row > 0)
                 {
                     row--;
-                    List<RuneCell> line = GetLine (row);
+                    List<Cell> line = GetLine (row);
 
                     return (line.Count, row);
                 }
@@ -464,7 +310,7 @@ internal class TextModel
                         return;
                     }
 
-                    List<RuneCell> line = GetLine (nRow);
+                    List<Cell> line = GetLine (nRow);
 
                     if (nCol == 0
                         && nRow == fromRow
@@ -523,7 +369,7 @@ internal class TextModel
 
         try
         {
-            Rune rune = RuneAt (col, row).Rune;
+            Rune rune = RuneAt (col, row)!.Value.Rune;
             RuneType runeType = GetRuneType (rune);
 
             int lastValidCol = IsSameRuneType (rune, runeType) && (Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) || Rune.IsSymbol (rune))
@@ -590,7 +436,7 @@ internal class TextModel
                         return;
                     }
 
-                    List<RuneCell> line = GetLine (nRow);
+                    List<Cell> line = GetLine (nRow);
 
                     if (nCol == line.Count
                         && nRow == fromRow
@@ -630,11 +476,11 @@ internal class TextModel
         }
     }
 
-    internal static int CalculateLeftColumn (List<RuneCell> t, int start, int end, int width, int tabWidth = 0)
+    internal static int CalculateLeftColumn (List<Cell> t, int start, int end, int width, int tabWidth = 0)
     {
         List<Rune> runes = new ();
 
-        foreach (RuneCell cell in t)
+        foreach (Cell cell in t)
         {
             runes.Add (cell.Rune);
         }
@@ -686,7 +532,7 @@ internal class TextModel
     }
 
     internal static (int size, int length) DisplaySize (
-        List<RuneCell> t,
+        List<Cell> t,
         int start = -1,
         int end = -1,
         bool checkNextRune = true,
@@ -695,7 +541,7 @@ internal class TextModel
     {
         List<Rune> runes = new ();
 
-        foreach (RuneCell cell in t)
+        foreach (Cell cell in t)
         {
             runes.Add (cell.Rune);
         }
@@ -856,11 +702,11 @@ internal class TextModel
         return foundPos;
     }
 
-    internal static int GetColFromX (List<RuneCell> t, int start, int x, int tabWidth = 0)
+    internal static int GetColFromX (List<Cell> t, int start, int x, int tabWidth = 0)
     {
         List<Rune> runes = new ();
 
-        foreach (RuneCell cell in t)
+        foreach (Cell cell in t)
         {
             runes.Add (cell.Rune);
         }
@@ -909,7 +755,7 @@ internal class TextModel
 
         for (var i = 0; i < _lines.Count; i++)
         {
-            List<RuneCell> x = _lines [i];
+            List<Cell> x = _lines [i];
             string txt = GetText (x);
             string matchText = !matchCase ? text.ToUpper () : text;
             int col = txt.IndexOf (matchText);
@@ -935,7 +781,7 @@ internal class TextModel
                         found = true;
                     }
 
-                    _lines [i] = RuneCell.ToRuneCellList (ReplaceText (x, textToReplace!, matchText, col));
+                    _lines [i] = Cell.ToCellList (ReplaceText (x, textToReplace!, matchText, col));
                     x = _lines [i];
                     txt = GetText (x);
                     pos = new (col, i);
@@ -951,9 +797,9 @@ internal class TextModel
             }
         }
 
-        string GetText (List<RuneCell> x)
+        string GetText (List<Cell> x)
         {
-            string txt = RuneCell.ToString (x);
+            string txt = Cell.ToString (x);
 
             if (!matchCase)
             {
@@ -989,7 +835,7 @@ internal class TextModel
     private void Append (List<byte> line)
     {
         var str = StringExtensions.ToString (line.ToArray ());
-        _lines.Add (RuneCell.StringToRuneCells (str));
+        _lines.Add (Cell.StringToCells (str));
     }
 
     private bool ApplyToFind ((Point current, bool found) foundPos)
@@ -1025,8 +871,8 @@ internal class TextModel
     {
         for (int i = start.Y; i < linesCount; i++)
         {
-            List<RuneCell> x = _lines [i];
-            string txt = RuneCell.ToString (x);
+            List<Cell> x = _lines [i];
+            string txt = Cell.ToString (x);
 
             if (!matchCase)
             {
@@ -1065,8 +911,8 @@ internal class TextModel
     {
         for (int i = linesCount; i >= 0; i--)
         {
-            List<RuneCell> x = _lines [i];
-            string txt = RuneCell.ToString (x);
+            List<Cell> x = _lines [i];
+            string txt = Cell.ToString (x);
 
             if (!matchCase)
             {
@@ -1148,7 +994,7 @@ internal class TextModel
 
     private bool MoveNext (ref int col, ref int row, out Rune rune)
     {
-        List<RuneCell> line = GetLine (row);
+        List<Cell> line = GetLine (row);
 
         if (col + 1 < line.Count)
         {
@@ -1189,7 +1035,7 @@ internal class TextModel
 
     private bool MovePrev (ref int col, ref int row, out Rune rune)
     {
-        List<RuneCell> line = GetLine (row);
+        List<Cell> line = GetLine (row);
 
         if (col > 0)
         {
@@ -1227,9 +1073,9 @@ internal class TextModel
 
     private void OnLinesLoaded () { LinesLoaded?.Invoke (this, EventArgs.Empty); }
 
-    private string ReplaceText (List<RuneCell> source, string textToReplace, string matchText, int col)
+    private string ReplaceText (List<Cell> source, string textToReplace, string matchText, int col)
     {
-        string origTxt = RuneCell.ToString (source);
+        string origTxt = Cell.ToString (source);
         (_, int len) = DisplaySize (source, 0, col, false);
         (_, int len2) = DisplaySize (source, col, col + matchText.Length, false);
         (_, int len3) = DisplaySize (source, col + matchText.Length, origTxt.GetRuneCount (), false);
@@ -1237,25 +1083,27 @@ internal class TextModel
         return origTxt [..len] + textToReplace + origTxt.Substring (len + len2, len3);
     }
 
-    private RuneCell RuneAt (int col, int row)
+    private Cell? RuneAt (int col, int row)
     {
-        List<RuneCell> line = GetLine (row);
+        List<Cell> line = GetLine (row);
 
         if (line.Count > 0)
         {
             return line [col > line.Count - 1 ? line.Count - 1 : col];
         }
 
-        return default (RuneCell)!;
+        return null;
     }
 
-    private void SetColorSchemes (ColorScheme? colorScheme)
+    private void SetAttributes (Attribute? attribute)
     {
-        foreach (List<RuneCell> line in _lines)
+        foreach (List<Cell> line in _lines)
         {
-            foreach (RuneCell cell in line)
+            for (var i = 0; i < line.Count; i++)
             {
-                cell.ColorScheme ??= colorScheme;
+                Cell cell = line [i];
+                cell.Attribute ??= attribute;
+                line [i] = cell;
             }
         }
     }
@@ -1286,7 +1134,7 @@ internal partial class HistoryText
     public bool HasHistoryChanges => _idxHistoryText > -1;
     public bool IsFromHistory { get; private set; }
 
-    public void Add (List<List<RuneCell>> lines, Point curPos, LineStatus lineStatus = LineStatus.Original)
+    public void Add (List<List<Cell>> lines, Point curPos, LineStatus lineStatus = LineStatus.Original)
     {
         if (lineStatus == LineStatus.Original && _historyTextItems.Count > 0 && _historyTextItems.Last ().LineStatus == LineStatus.Original)
         {
@@ -1343,7 +1191,7 @@ internal partial class HistoryText
         }
     }
 
-    public void ReplaceLast (List<List<RuneCell>> lines, Point curPos, LineStatus lineStatus)
+    public void ReplaceLast (List<List<Cell>> lines, Point curPos, LineStatus lineStatus)
     {
         HistoryTextItemEventArgs? found = _historyTextItems.FindLast (x => x.LineStatus == lineStatus);
 
@@ -1498,9 +1346,9 @@ internal class WordWrapManager
     {
         int modelRow = GetModelLineFromWrappedLines (row);
         int modelCol = GetModelColFromWrappedLines (row, col);
-        List<RuneCell> line = GetCurrentLine (modelRow);
+        List<Cell> line = GetCurrentLine (modelRow);
         int restCount = line.Count - modelCol;
-        List<RuneCell> rest = line.GetRange (modelCol, restCount);
+        List<Cell> rest = line.GetRange (modelCol, restCount);
         line.RemoveRange (modelCol, restCount);
         Model.AddLine (modelRow + 1, rest);
         _isWrapModelRefreshing = true;
@@ -1584,9 +1432,9 @@ internal class WordWrapManager
         return modelCol - colWidthOffset;
     }
 
-    public bool Insert (int row, int col, RuneCell cell)
+    public bool Insert (int row, int col, Cell cell)
     {
-        List<RuneCell> line = GetCurrentLine (GetModelLineFromWrappedLines (row));
+        List<Cell> line = GetCurrentLine (GetModelLineFromWrappedLines (row));
         line.Insert (GetModelColFromWrappedLines (row, col), cell);
 
         if (line.Count > _frameWidth)
@@ -1600,7 +1448,7 @@ internal class WordWrapManager
     public bool RemoveAt (int row, int col)
     {
         int modelRow = GetModelLineFromWrappedLines (row);
-        List<RuneCell> line = GetCurrentLine (modelRow);
+        List<Cell> line = GetCurrentLine (modelRow);
         int modelCol = GetModelColFromWrappedLines (row, col);
 
         if (modelCol > line.Count)
@@ -1628,7 +1476,7 @@ internal class WordWrapManager
     {
         lineRemoved = false;
         int modelRow = GetModelLineFromWrappedLines (row);
-        List<RuneCell> line = GetCurrentLine (modelRow);
+        List<Cell> line = GetCurrentLine (modelRow);
         int modelCol = GetModelColFromWrappedLines (row, col);
 
         if (modelCol == 0 && line.Count == 0)
@@ -1664,7 +1512,7 @@ internal class WordWrapManager
                 return false;
             }
 
-            List<RuneCell> nextLine = Model.GetLine (modelRow + 1);
+            List<Cell> nextLine = Model.GetLine (modelRow + 1);
             line.AddRange (nextLine);
             Model.RemoveLine (modelRow + 1);
 
@@ -1680,7 +1528,7 @@ internal class WordWrapManager
                 return false;
             }
 
-            List<RuneCell> prevLine = Model.GetLine (modelRow - 1);
+            List<Cell> prevLine = Model.GetLine (modelRow - 1);
             prevLine.AddRange (line);
             Model.RemoveLine (modelRow);
 
@@ -1696,7 +1544,7 @@ internal class WordWrapManager
     public bool RemoveRange (int row, int index, int count)
     {
         int modelRow = GetModelLineFromWrappedLines (row);
-        List<RuneCell> line = GetCurrentLine (modelRow);
+        List<Cell> line = GetCurrentLine (modelRow);
         int modelCol = GetModelColFromWrappedLines (row, index);
 
         try
@@ -1711,13 +1559,13 @@ internal class WordWrapManager
         return true;
     }
 
-    public List<List<RuneCell>> ToListRune (List<string> textList)
+    public List<List<Cell>> ToListRune (List<string> textList)
     {
-        List<List<RuneCell>> runesList = new ();
+        List<List<Cell>> runesList = new ();
 
         foreach (string text in textList)
         {
-            runesList.Add (RuneCell.ToRuneCellList (text));
+            runesList.Add (Cell.ToCellList (text));
         }
 
         return runesList;
@@ -1789,11 +1637,11 @@ internal class WordWrapManager
 
         for (var i = 0; i < Model.Count; i++)
         {
-            List<RuneCell> line = Model.GetLine (i);
+            List<Cell> line = Model.GetLine (i);
 
-            List<List<RuneCell>> wrappedLines = ToListRune (
+            List<List<Cell>> wrappedLines = ToListRune (
                                                             TextFormatter.Format (
-                                                                                  RuneCell.ToString (line),
+                                                                                  Cell.ToString (line),
                                                                                   width,
                                                                                   Alignment.Start,
                                                                                   true,
@@ -1805,7 +1653,7 @@ internal class WordWrapManager
 
             for (var j = 0; j < wrappedLines.Count; j++)
             {
-                List<RuneCell> wrapLine = wrappedLines [j];
+                List<Cell> wrapLine = wrappedLines [j];
 
                 if (!isRowAndColSet && modelRow == i)
                 {
@@ -1863,7 +1711,9 @@ internal class WordWrapManager
 
                 for (int k = j; k < wrapLine.Count; k++)
                 {
-                    wrapLine [k].ColorScheme = line [k].ColorScheme;
+                    Cell cell = wrapLine [k];
+                    cell.Attribute = line [k].Attribute;
+                    wrapLine [k] = cell;
                 }
 
                 wrappedModel.AddLine (lines, wrapLine);
@@ -1883,7 +1733,7 @@ internal class WordWrapManager
         return wrappedModel;
     }
 
-    private List<RuneCell> GetCurrentLine (int row) { return Model.GetLine (row); }
+    private List<Cell> GetCurrentLine (int row) { return Model.GetLine (row); }
 
     private class WrappedLine
     {
@@ -2613,7 +2463,7 @@ public class TextView : View
         get => new (CurrentColumn, CurrentRow);
         set
         {
-            List<RuneCell> line = _model.GetLine (Math.Max (Math.Min (value.Y, _model.Count - 1), 0));
+            List<Cell> line = _model.GetLine (Math.Max (Math.Min (value.Y, _model.Count - 1), 0));
 
             CurrentColumn = value.X < 0 ? 0 :
                             value.X > line.Count ? line.Count : value.X;
@@ -2633,11 +2483,11 @@ public class TextView : View
     public bool HasHistoryChanges => _historyText.HasHistoryChanges;
 
     /// <summary>
-    ///     If <see langword="true"/> and the current <see cref="RuneCell.ColorScheme"/> is null will inherit from the
+    ///     If <see langword="true"/> and the current <see cref="Cell.Attribute"/> is null will inherit from the
     ///     previous, otherwise if <see langword="false"/> (default) do nothing. If the text is load with
-    ///     <see cref="Load(List{RuneCell})"/> this property is automatically sets to <see langword="true"/>.
+    ///     <see cref="Load(List{Cell})"/> this property is automatically sets to <see langword="true"/>.
     /// </summary>
-    public bool InheritsPreviousColorScheme { get; set; }
+    public bool InheritsPreviousAttribute { get; set; }
 
     /// <summary>
     ///     Indicates whatever the text was changed or not. <see langword="true"/> if the text was changed
@@ -2758,7 +2608,7 @@ public class TextView : View
         get => _selectionStartColumn;
         set
         {
-            List<RuneCell> line = _model.GetLine (_selectionStartRow);
+            List<Cell> line = _model.GetLine (_selectionStartRow);
 
             _selectionStartColumn = value < 0 ? 0 :
                                     value > line.Count ? line.Count : value;
@@ -2915,8 +2765,8 @@ public class TextView : View
         }
         else
         {
-            List<RuneCell> currentLine = GetCurrentLine ();
-            SetClipboard (RuneCell.ToString (currentLine));
+            List<Cell> currentLine = GetCurrentLine ();
+            SetClipboard (Cell.ToString (currentLine));
             _copyWithoutSelection = true;
         }
 
@@ -2978,7 +2828,7 @@ public class TextView : View
 
             ClearSelectedRegion ();
 
-            List<RuneCell> currentLine = GetCurrentLine ();
+            List<Cell> currentLine = GetCurrentLine ();
 
             _historyText.Add (
                               new () { new (currentLine) },
@@ -3022,7 +2872,7 @@ public class TextView : View
 
             ClearSelectedRegion ();
 
-            List<RuneCell> currentLine = GetCurrentLine ();
+            List<Cell> currentLine = GetCurrentLine ();
 
             _historyText.Add (
                               new () { new (currentLine) },
@@ -3051,19 +2901,19 @@ public class TextView : View
     }
 
     /// <summary>Invoked when the normal color is drawn.</summary>
-    public event EventHandler<RuneCellEventArgs>? DrawNormalColor;
+    public event EventHandler<CellEventArgs>? DrawNormalColor;
 
     /// <summary>Invoked when the ready only color is drawn.</summary>
-    public event EventHandler<RuneCellEventArgs>? DrawReadOnlyColor;
+    public event EventHandler<CellEventArgs>? DrawReadOnlyColor;
 
     /// <summary>Invoked when the selection color is drawn.</summary>
-    public event EventHandler<RuneCellEventArgs>? DrawSelectionColor;
+    public event EventHandler<CellEventArgs>? DrawSelectionColor;
 
     /// <summary>
     ///     Invoked when the used color is drawn. The Used Color is used to indicate if the <see cref="Key.InsertChar"/>
     ///     was pressed and enabled.
     /// </summary>
-    public event EventHandler<RuneCellEventArgs>? DrawUsedColor;
+    public event EventHandler<CellEventArgs>? DrawUsedColor;
 
     /// <summary>Find the next text based on the match case with the option to replace it.</summary>
     /// <param name="textToFind">The text to find.</param>
@@ -3136,19 +2986,19 @@ public class TextView : View
 
     /// <summary>Gets all lines of characters.</summary>
     /// <returns></returns>
-    public List<List<RuneCell>> GetAllLines () { return _model.GetAllLines (); }
+    public List<List<Cell>> GetAllLines () { return _model.GetAllLines (); }
 
     /// <summary>
     ///     Returns the characters on the current line (where the cursor is positioned). Use <see cref="CurrentColumn"/>
     ///     to determine the position of the cursor within that line
     /// </summary>
     /// <returns></returns>
-    public List<RuneCell> GetCurrentLine () { return _model.GetLine (CurrentRow); }
+    public List<Cell> GetCurrentLine () { return _model.GetLine (CurrentRow); }
 
     /// <summary>Returns the characters on the <paramref name="line"/>.</summary>
     /// <param name="line">The intended line.</param>
     /// <returns></returns>
-    public List<RuneCell> GetLine (int line) { return _model.GetLine (line); }
+    public List<Cell> GetLine (int line) { return _model.GetLine (line); }
 
     /// <inheritdoc/>
     public override Attribute GetNormalColor ()
@@ -3231,26 +3081,26 @@ public class TextView : View
         UpdateWrapModel ();
     }
 
-    /// <summary>Loads the contents of the <see cref="RuneCell"/> list into the <see cref="TextView"/>.</summary>
+    /// <summary>Loads the contents of the <see cref="Cell"/> list into the <see cref="TextView"/>.</summary>
     /// <param name="cells">Rune cells list to load the contents from.</param>
-    public void Load (List<RuneCell> cells)
+    public void Load (List<Cell> cells)
     {
         SetWrapModel ();
-        _model.LoadRuneCells (cells, ColorScheme);
+        _model.LoadCells (cells, ColorScheme?.Focus);
         _historyText.Clear (Text);
         ResetPosition ();
         SetNeedsDisplay ();
         UpdateWrapModel ();
-        InheritsPreviousColorScheme = true;
+        InheritsPreviousAttribute = true;
     }
 
-    /// <summary>Loads the contents of the list of <see cref="RuneCell"/> list into the <see cref="TextView"/>.</summary>
+    /// <summary>Loads the contents of the list of <see cref="Cell"/> list into the <see cref="TextView"/>.</summary>
     /// <param name="cellsList">List of rune cells list to load the contents from.</param>
-    public void Load (List<List<RuneCell>> cellsList)
+    public void Load (List<List<Cell>> cellsList)
     {
         SetWrapModel ();
-        InheritsPreviousColorScheme = true;
-        _model.LoadListRuneCells (cellsList, ColorScheme);
+        InheritsPreviousAttribute = true;
+        _model.LoadListCells (cellsList, ColorScheme?.Focus);
         _historyText.Clear (Text);
         ResetPosition ();
         SetNeedsDisplay ();
@@ -3347,7 +3197,7 @@ public class TextView : View
         }
         else if (ev.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
         {
-            ProcessMouseClick (ev, out List<RuneCell> line);
+            ProcessMouseClick (ev, out List<Cell> line);
             PositionCursor ();
 
             if (_model.Count > 0 && _shiftSelecting && Selecting)
@@ -3446,7 +3296,7 @@ public class TextView : View
                 StopSelecting ();
             }
 
-            ProcessMouseClick (ev, out List<RuneCell> line);
+            ProcessMouseClick (ev, out List<Cell> line);
             (int col, int row)? newPos;
 
             if (CurrentColumn == line.Count
@@ -3483,7 +3333,7 @@ public class TextView : View
                 StopSelecting ();
             }
 
-            ProcessMouseClick (ev, out List<RuneCell> line);
+            ProcessMouseClick (ev, out List<Cell> line);
             CurrentColumn = 0;
 
             if (!Selecting)
@@ -3509,7 +3359,7 @@ public class TextView : View
     public void MoveEnd ()
     {
         CurrentRow = _model.Count - 1;
-        List<RuneCell> line = GetCurrentLine ();
+        List<Cell> line = GetCurrentLine ();
         CurrentColumn = line.Count;
         TrackColumn ();
         PositionCursor ();
@@ -3554,7 +3404,7 @@ public class TextView : View
 
         for (int idxRow = _topRow; idxRow < _model.Count; idxRow++)
         {
-            List<RuneCell> line = _model.GetLine (idxRow);
+            List<Cell> line = _model.GetLine (idxRow);
             int lineRuneCount = line.Count;
             var col = 0;
 
@@ -3726,12 +3576,12 @@ public class TextView : View
 
         if (_copyWithoutSelection && contents.FirstOrDefault (x => x == '\n' || x == '\r') == 0)
         {
-            List<RuneCell> runeList = contents is null ? new () : RuneCell.ToRuneCellList (contents);
-            List<RuneCell> currentLine = GetCurrentLine ();
+            List<Cell> runeList = contents is null ? new () : Cell.ToCellList (contents);
+            List<Cell> currentLine = GetCurrentLine ();
 
             _historyText.Add (new () { new (currentLine) }, CursorPosition);
 
-            List<List<RuneCell>> addedLine = new () { new (currentLine), runeList };
+            List<List<Cell>> addedLine = new () { new (currentLine), runeList };
 
             _historyText.Add (
                               new (addedLine),
@@ -3797,7 +3647,7 @@ public class TextView : View
             SetNeedsDisplay ();
         }
 
-        List<RuneCell> line = _model.GetLine (CurrentRow);
+        List<Cell> line = _model.GetLine (CurrentRow);
         var col = 0;
 
         if (line.Count > 0)
@@ -3956,16 +3806,16 @@ public class TextView : View
     /// <param name="line">The line.</param>
     /// <param name="idxCol">The col index.</param>
     /// <param name="idxRow">The row index.</param>
-    protected virtual void OnDrawNormalColor (List<RuneCell> line, int idxCol, int idxRow)
+    protected virtual void OnDrawNormalColor (List<Cell> line, int idxCol, int idxRow)
     {
         (int Row, int Col) unwrappedPos = GetUnwrappedPosition (idxRow, idxCol);
-        var ev = new RuneCellEventArgs (line, idxCol, unwrappedPos);
+        var ev = new CellEventArgs (line, idxCol, unwrappedPos);
         DrawNormalColor?.Invoke (this, ev);
 
-        if (line [idxCol].ColorScheme is { })
+        if (line [idxCol].Attribute is { })
         {
-            ColorScheme? colorScheme = line [idxCol].ColorScheme;
-            Driver.SetAttribute (Enabled ? colorScheme!.Focus : colorScheme!.Disabled);
+            Attribute? attribute = line [idxCol].Attribute;
+            Driver.SetAttribute ((Attribute)attribute!);
         }
         else
         {
@@ -3982,22 +3832,22 @@ public class TextView : View
     /// <param name="idxCol">The col index.</param>
     /// ///
     /// <param name="idxRow">The row index.</param>
-    protected virtual void OnDrawReadOnlyColor (List<RuneCell> line, int idxCol, int idxRow)
+    protected virtual void OnDrawReadOnlyColor (List<Cell> line, int idxCol, int idxRow)
     {
         (int Row, int Col) unwrappedPos = GetUnwrappedPosition (idxRow, idxCol);
-        var ev = new RuneCellEventArgs (line, idxCol, unwrappedPos);
+        var ev = new CellEventArgs (line, idxCol, unwrappedPos);
         DrawReadOnlyColor?.Invoke (this, ev);
 
-        ColorScheme? colorScheme = line [idxCol].ColorScheme is { } ? line [idxCol].ColorScheme : ColorScheme;
+        Attribute? cellAttribute = line [idxCol].Attribute is { } ? line [idxCol].Attribute : ColorScheme?.Disabled;
         Attribute attribute;
 
-        if (colorScheme!.Disabled.Foreground == colorScheme.Focus.Background)
+        if (cellAttribute!.Value.Foreground == cellAttribute.Value.Background)
         {
-            attribute = new (colorScheme.Focus.Foreground, colorScheme.Focus.Background);
+            attribute = new (cellAttribute.Value.Foreground, cellAttribute.Value.Background);
         }
         else
         {
-            attribute = new (colorScheme.Disabled.Foreground, colorScheme.Focus.Background);
+            attribute = new (cellAttribute.Value.Foreground, ColorScheme!.Focus.Background);
         }
 
         Driver.SetAttribute (attribute);
@@ -4012,18 +3862,18 @@ public class TextView : View
     /// <param name="idxCol">The col index.</param>
     /// ///
     /// <param name="idxRow">The row index.</param>
-    protected virtual void OnDrawSelectionColor (List<RuneCell> line, int idxCol, int idxRow)
+    protected virtual void OnDrawSelectionColor (List<Cell> line, int idxCol, int idxRow)
     {
         (int Row, int Col) unwrappedPos = GetUnwrappedPosition (idxRow, idxCol);
-        var ev = new RuneCellEventArgs (line, idxCol, unwrappedPos);
+        var ev = new CellEventArgs (line, idxCol, unwrappedPos);
         DrawSelectionColor?.Invoke (this, ev);
 
-        if (line [idxCol].ColorScheme is { })
+        if (line [idxCol].Attribute is { })
         {
-            ColorScheme? colorScheme = line [idxCol].ColorScheme;
+            Attribute? attribute = line [idxCol].Attribute;
 
             Driver.SetAttribute (
-                                 new (colorScheme!.Focus.Background, colorScheme.Focus.Foreground)
+                                 new (attribute!.Value.Background, attribute.Value.Foreground)
                                 );
         }
         else
@@ -4046,20 +3896,20 @@ public class TextView : View
     /// <param name="idxCol">The col index.</param>
     /// ///
     /// <param name="idxRow">The row index.</param>
-    protected virtual void OnDrawUsedColor (List<RuneCell> line, int idxCol, int idxRow)
+    protected virtual void OnDrawUsedColor (List<Cell> line, int idxCol, int idxRow)
     {
         (int Row, int Col) unwrappedPos = GetUnwrappedPosition (idxRow, idxCol);
-        var ev = new RuneCellEventArgs (line, idxCol, unwrappedPos);
+        var ev = new CellEventArgs (line, idxCol, unwrappedPos);
         DrawUsedColor?.Invoke (this, ev);
 
-        if (line [idxCol].ColorScheme is { })
+        if (line [idxCol].Attribute is { })
         {
-            ColorScheme? colorScheme = line [idxCol].ColorScheme;
-            SetValidUsedColor (colorScheme!);
+            Attribute? attribute = line [idxCol].Attribute;
+            SetValidUsedColor (attribute!);
         }
         else
         {
-            SetValidUsedColor (ColorScheme);
+            SetValidUsedColor (ColorScheme?.Focus);
         }
     }
 
@@ -4072,7 +3922,7 @@ public class TextView : View
     private void Adjust ()
     {
         (int width, int height) offB = OffSetBackground ();
-        List<RuneCell> line = GetCurrentLine ();
+        List<Cell> line = GetCurrentLine ();
         bool need = NeedsDisplay || _wrapNeeded || !Used;
         (int size, int length) tSize = TextModel.DisplaySize (line, -1, -1, false, TabWidth);
         (int size, int length) dSize = TextModel.DisplaySize (line, _leftColumn, CurrentColumn, true, TabWidth);
@@ -4234,11 +4084,11 @@ public class TextView : View
         var maxrow = (int)(end >> 32);
         var startCol = (int)(start & 0xffffffff);
         var endCol = (int)(end & 0xffffffff);
-        List<RuneCell> line = _model.GetLine (startRow);
+        List<Cell> line = _model.GetLine (startRow);
 
         _historyText.Add (new () { new (line) }, new (startCol, startRow));
 
-        List<List<RuneCell>> removedLines = new ();
+        List<List<Cell>> removedLines = new ();
 
         if (startRow == maxrow)
         {
@@ -4273,7 +4123,7 @@ public class TextView : View
         removedLines.Add (new (line));
 
         line.RemoveRange (startCol, line.Count - startCol);
-        List<RuneCell> line2 = _model.GetLine (maxrow);
+        List<Cell> line2 = _model.GetLine (maxrow);
         line.AddRange (line2.Skip (endCol));
 
         for (int row = startRow + 1; row <= maxrow; row++)
@@ -4324,7 +4174,7 @@ public class TextView : View
         if (CurrentColumn > 0)
         {
             // Delete backwards 
-            List<RuneCell> currentLine = GetCurrentLine ();
+            List<Cell> currentLine = GetCurrentLine ();
 
             _historyText.Add (new () { new (currentLine) }, CursorPosition);
 
@@ -4364,11 +4214,11 @@ public class TextView : View
             }
 
             int prowIdx = CurrentRow - 1;
-            List<RuneCell> prevRow = _model.GetLine (prowIdx);
+            List<Cell> prevRow = _model.GetLine (prowIdx);
 
             _historyText.Add (new () { new (prevRow) }, CursorPosition);
 
-            List<List<RuneCell>> removedLines = new () { new (prevRow) };
+            List<List<Cell>> removedLines = new () { new (prevRow) };
 
             removedLines.Add (new (GetCurrentLine ()));
 
@@ -4408,7 +4258,7 @@ public class TextView : View
     {
         SetWrapModel ();
 
-        List<RuneCell> currentLine = GetCurrentLine ();
+        List<Cell> currentLine = GetCurrentLine ();
 
         if (CurrentColumn == currentLine.Count)
         {
@@ -4421,9 +4271,9 @@ public class TextView : View
 
             _historyText.Add (new () { new (currentLine) }, CursorPosition);
 
-            List<List<RuneCell>> removedLines = new () { new (currentLine) };
+            List<List<Cell>> removedLines = new () { new (currentLine) };
 
-            List<RuneCell> nextLine = _model.GetLine (CurrentRow + 1);
+            List<Cell> nextLine = _model.GetLine (CurrentRow + 1);
 
             removedLines.Add (new (nextLine));
 
@@ -4503,7 +4353,7 @@ public class TextView : View
         }
     }
 
-    private IEnumerable<(int col, int row, RuneCell rune)> ForwardIterator (int col, int row)
+    private IEnumerable<(int col, int row, Cell rune)> ForwardIterator (int col, int row)
     {
         if (col < 0 || row < 0)
         {
@@ -4515,7 +4365,7 @@ public class TextView : View
             yield break;
         }
 
-        List<RuneCell> line = GetCurrentLine ();
+        List<Cell> line = GetCurrentLine ();
 
         if (col >= line.Count)
         {
@@ -4537,7 +4387,7 @@ public class TextView : View
 
     private void GenerateSuggestions ()
     {
-        List<RuneCell> currentLine = GetCurrentLine ();
+        List<Cell> currentLine = GetCurrentLine ();
         int cursorPosition = Math.Min (CurrentColumn, currentLine.Count);
 
         Autocomplete.Context = new (
@@ -4613,7 +4463,7 @@ public class TextView : View
         var maxrow = (int)(end >> 32);
         var startCol = (int)(start & 0xffffffff);
         var endCol = (int)(end & 0xffffffff);
-        List<RuneCell> line = model is null ? _model.GetLine (startRow) : model.GetLine (startRow);
+        List<Cell> line = model is null ? _model.GetLine (startRow) : model.GetLine (startRow);
 
         if (startRow == maxrow)
         {
@@ -4738,9 +4588,9 @@ public class TextView : View
         OnContentsChanged ();
     }
 
-    private void Insert (RuneCell cell)
+    private void Insert (Cell cell)
     {
-        List<RuneCell> line = GetCurrentLine ();
+        List<Cell> line = GetCurrentLine ();
 
         if (Used)
         {
@@ -4773,7 +4623,7 @@ public class TextView : View
             return;
         }
 
-        List<List<RuneCell>> lines = RuneCell.StringToLinesOfRuneCells (text);
+        List<List<Cell>> lines = Cell.StringToLinesOfCells (text);
 
         if (lines.Count == 0)
         {
@@ -4782,7 +4632,7 @@ public class TextView : View
 
         SetWrapModel ();
 
-        List<RuneCell> line = GetCurrentLine ();
+        List<Cell> line = GetCurrentLine ();
 
         _historyText.Add (new () { new (line) }, CursorPosition);
 
@@ -4821,7 +4671,7 @@ public class TextView : View
             return;
         }
 
-        List<RuneCell>? rest = null;
+        List<Cell>? rest = null;
         var lastp = 0;
 
         if (_model.Count > 0 && line.Count > 0 && !_copyWithoutSelection)
@@ -4837,7 +4687,7 @@ public class TextView : View
 
         //model.AddLine (currentRow, lines [0]);
 
-        List<List<RuneCell>> addedLines = new () { new (line) };
+        List<List<Cell>> addedLines = new () { new (line) };
 
         for (var i = 1; i < lines.Count; i++)
         {
@@ -4848,7 +4698,7 @@ public class TextView : View
 
         if (rest is { })
         {
-            List<RuneCell> last = _model.GetLine (CurrentRow + lines.Count - 1);
+            List<Cell> last = _model.GetLine (CurrentRow + lines.Count - 1);
             lastp = last.Count;
             last.InsertRange (last.Count, rest);
 
@@ -4872,7 +4722,7 @@ public class TextView : View
         OnContentsChanged ();
     }
 
-    private bool InsertText (Key a, ColorScheme? colorScheme = null)
+    private bool InsertText (Key a, Attribute? attribute = null)
     {
         //So that special keys like tab can be processed
         if (_isReadOnly)
@@ -4891,7 +4741,7 @@ public class TextView : View
 
         if ((uint)a.KeyCode == '\n')
         {
-            _model.AddLine (CurrentRow + 1, new ());
+            _model.AddLine (CurrentRow + 1, []);
             CurrentRow++;
             CurrentColumn = 0;
         }
@@ -4903,7 +4753,7 @@ public class TextView : View
         {
             if (Used)
             {
-                Insert (new () { Rune = a.AsRune, ColorScheme = colorScheme });
+                Insert (new () { Rune = a.AsRune, Attribute = attribute });
                 CurrentColumn++;
 
                 if (CurrentColumn >= _leftColumn + Viewport.Width)
@@ -4914,7 +4764,7 @@ public class TextView : View
             }
             else
             {
-                Insert (new () { Rune = a.AsRune, ColorScheme = colorScheme });
+                Insert (new () { Rune = a.AsRune, Attribute = attribute });
                 CurrentColumn++;
             }
         }
@@ -4946,7 +4796,7 @@ public class TextView : View
 
         SetWrapModel ();
 
-        List<RuneCell> currentLine = GetCurrentLine ();
+        List<Cell> currentLine = GetCurrentLine ();
         var setLastWasKill = true;
 
         if (currentLine.Count > 0 && CurrentColumn == currentLine.Count)
@@ -4964,7 +4814,7 @@ public class TextView : View
         {
             if (CurrentRow < _model.Count - 1)
             {
-                List<List<RuneCell>> removedLines = new () { new (currentLine) };
+                List<List<Cell>> removedLines = new () { new (currentLine) };
 
                 _model.RemoveLine (CurrentRow);
 
@@ -5000,7 +4850,7 @@ public class TextView : View
         else
         {
             int restCount = currentLine.Count - CurrentColumn;
-            List<RuneCell> rest = currentLine.GetRange (CurrentColumn, restCount);
+            List<Cell> rest = currentLine.GetRange (CurrentColumn, restCount);
             var val = string.Empty;
             val += StringFromRunes (rest);
 
@@ -5045,7 +4895,7 @@ public class TextView : View
 
         SetWrapModel ();
 
-        List<RuneCell> currentLine = GetCurrentLine ();
+        List<Cell> currentLine = GetCurrentLine ();
         var setLastWasKill = true;
 
         if (currentLine.Count > 0 && CurrentColumn == 0)
@@ -5088,7 +4938,7 @@ public class TextView : View
                 CurrentRow--;
                 currentLine = _model.GetLine (CurrentRow);
 
-                List<List<RuneCell>> removedLine =
+                List<List<Cell>> removedLine =
                 [
                     [..currentLine],
                     []
@@ -5106,7 +4956,7 @@ public class TextView : View
         else
         {
             int restCount = CurrentColumn;
-            List<RuneCell> rest = currentLine.GetRange (0, restCount);
+            List<Cell> rest = currentLine.GetRange (0, restCount);
             var val = string.Empty;
             val += StringFromRunes (rest);
 
@@ -5146,7 +4996,7 @@ public class TextView : View
 
         SetWrapModel ();
 
-        List<RuneCell> currentLine = GetCurrentLine ();
+        List<Cell> currentLine = GetCurrentLine ();
 
         _historyText.Add ([ [.. GetCurrentLine ()]], CursorPosition);
 
@@ -5214,7 +5064,7 @@ public class TextView : View
 
         SetWrapModel ();
 
-        List<RuneCell> currentLine = GetCurrentLine ();
+        List<Cell> currentLine = GetCurrentLine ();
 
         _historyText.Add ([ [.. GetCurrentLine ()]], CursorPosition);
 
@@ -5335,7 +5185,7 @@ public class TextView : View
 
     private void MoveEndOfLine ()
     {
-        List<RuneCell> currentLine = GetCurrentLine ();
+        List<Cell> currentLine = GetCurrentLine ();
         CurrentColumn = Math.Max (currentLine.Count - (ReadOnly ? 1 : 0), 0);
         Adjust ();
         DoNeededAction ();
@@ -5359,7 +5209,7 @@ public class TextView : View
                     SetNeedsDisplay ();
                 }
 
-                List<RuneCell> currentLine = GetCurrentLine ();
+                List<Cell> currentLine = GetCurrentLine ();
                 CurrentColumn = Math.Max (currentLine.Count - (ReadOnly ? 1 : 0), 0);
             }
             else
@@ -5432,7 +5282,7 @@ public class TextView : View
 
     private bool MoveRight ()
     {
-        List<RuneCell> currentLine = GetCurrentLine ();
+        List<Cell> currentLine = GetCurrentLine ();
 
         if ((ReadOnly ? CurrentColumn + 1 : CurrentColumn) < currentLine.Count)
         {
@@ -5628,7 +5478,7 @@ public class TextView : View
         {
             SetWrapModel ();
 
-            List<RuneCell> currentLine = GetCurrentLine ();
+            List<Cell> currentLine = GetCurrentLine ();
 
             if (currentLine.Count > 0 && currentLine [CurrentColumn - 1].Rune.Value == '\t')
             {
@@ -5683,13 +5533,13 @@ public class TextView : View
     // the very most previous valid color scheme.
     private void ProcessInheritsPreviousColorScheme (int row, int col)
     {
-        if (!InheritsPreviousColorScheme || (Lines == 1 && GetLine (Lines).Count == 0))
+        if (!InheritsPreviousAttribute || (Lines == 1 && GetLine (Lines).Count == 0))
         {
             return;
         }
 
-        List<RuneCell> line = GetLine (row);
-        List<RuneCell> lineToSet = line;
+        List<Cell> line = GetLine (row);
+        List<Cell> lineToSet = line;
 
         while (line.Count == 0)
         {
@@ -5704,20 +5554,25 @@ public class TextView : View
         }
 
         int colWithColor = Math.Max (Math.Min (col - 2, line.Count - 1), 0);
-        RuneCell cell = line [colWithColor];
+        Cell cell = line [colWithColor];
         int colWithoutColor = Math.Max (col - 1, 0);
 
-        if (cell.ColorScheme is { } && colWithColor == 0 && lineToSet [colWithoutColor].ColorScheme is { })
+        Cell lineTo = lineToSet [colWithoutColor];
+
+        if (cell.Attribute is { } && colWithColor == 0 && lineTo.Attribute is { })
         {
             for (int r = row - 1; r > -1; r--)
             {
-                List<RuneCell> l = GetLine (r);
+                List<Cell> l = GetLine (r);
 
                 for (int c = l.Count - 1; c > -1; c--)
                 {
-                    if (l [c].ColorScheme is null)
+                    Cell cell1 = l [c];
+
+                    if (cell1.Attribute is null)
                     {
-                        l [c].ColorScheme = cell.ColorScheme;
+                        cell1.Attribute = cell.Attribute;
+                        l [c] = cell1;
                     }
                     else
                     {
@@ -5729,18 +5584,18 @@ public class TextView : View
             return;
         }
 
-        if (cell.ColorScheme is null)
+        if (cell.Attribute is null)
         {
             for (int r = row; r > -1; r--)
             {
-                List<RuneCell> l = GetLine (r);
+                List<Cell> l = GetLine (r);
 
                 colWithColor = l.FindLastIndex (
                                                 colWithColor > -1 ? colWithColor : l.Count - 1,
-                                                rc => rc.ColorScheme != null
+                                                c => c.Attribute != null
                                                );
 
-                if (colWithColor > -1 && l [colWithColor].ColorScheme is { })
+                if (colWithColor > -1 && l [colWithColor].Attribute is { })
                 {
                     cell = l [colWithColor];
 
@@ -5752,9 +5607,9 @@ public class TextView : View
         {
             int cRow = row;
 
-            while (cell.ColorScheme is null)
+            while (cell.Attribute is null)
             {
-                if ((colWithColor == 0 || cell.ColorScheme is null) && cRow > 0)
+                if ((colWithColor == 0 || cell.Attribute is null) && cRow > 0)
                 {
                     line = GetLine (--cRow);
                     colWithColor = line.Count - 1;
@@ -5767,11 +5622,12 @@ public class TextView : View
             }
         }
 
-        if (cell.ColorScheme is { } && colWithColor > -1 && colWithoutColor < lineToSet.Count && lineToSet [colWithoutColor].ColorScheme is null)
+        if (cell.Attribute is { } && colWithColor > -1 && colWithoutColor < lineToSet.Count && lineTo.Attribute is null)
         {
-            while (lineToSet [colWithoutColor].ColorScheme is null)
+            while (lineTo.Attribute is null)
             {
-                lineToSet [colWithoutColor].ColorScheme = cell.ColorScheme;
+                lineTo.Attribute = cell.Attribute;
+                lineToSet [colWithoutColor] = lineTo;
                 colWithoutColor--;
 
                 if (colWithoutColor == -1 && row > 0)
@@ -5795,9 +5651,9 @@ public class TextView : View
         KillWordForward ();
     }
 
-    private void ProcessMouseClick (MouseEvent ev, out List<RuneCell> line)
+    private void ProcessMouseClick (MouseEvent ev, out List<Cell> line)
     {
-        List<RuneCell>? r = null;
+        List<Cell>? r = null;
 
         if (_model.Count > 0)
         {
@@ -6069,7 +5925,7 @@ public class TextView : View
 
         SetWrapModel ();
 
-        List<RuneCell> currentLine = GetCurrentLine ();
+        List<Cell> currentLine = GetCurrentLine ();
 
         _historyText.Add (new () { new (currentLine) }, CursorPosition);
 
@@ -6080,10 +5936,10 @@ public class TextView : View
         }
 
         int restCount = currentLine.Count - CurrentColumn;
-        List<RuneCell> rest = currentLine.GetRange (CurrentColumn, restCount);
+        List<Cell> rest = currentLine.GetRange (CurrentColumn, restCount);
         currentLine.RemoveRange (CurrentColumn, restCount);
 
-        List<List<RuneCell>> addedLines = new () { new (currentLine) };
+        List<List<Cell>> addedLines = new () { new (currentLine) };
 
         _model.AddLine (CurrentRow + 1, rest);
 
@@ -6269,11 +6125,11 @@ public class TextView : View
         DoNeededAction ();
     }
 
-    private static void SetValidUsedColor (ColorScheme? colorScheme)
+    private static void SetValidUsedColor (Attribute? attribute)
     {
         // BUGBUG: (v2 truecolor) This code depends on 8-bit color names; disabling for now
         //if ((colorScheme!.HotNormal.Foreground & colorScheme.Focus.Background) == colorScheme.Focus.Foreground) {
-        Driver.SetAttribute (new (colorScheme!.Focus.Background, colorScheme!.Focus.Foreground));
+        Driver.SetAttribute (new (attribute!.Value.Background, attribute!.Value.Foreground));
     }
 
     /// <summary>Restore from original model.</summary>
@@ -6328,7 +6184,7 @@ public class TextView : View
         _isButtonShift = false;
     }
 
-    private string StringFromRunes (List<RuneCell> cells)
+    private string StringFromRunes (List<Cell> cells)
     {
         if (cells is null)
         {
@@ -6337,7 +6193,7 @@ public class TextView : View
 
         var size = 0;
 
-        foreach (RuneCell cell in cells)
+        foreach (Cell cell in cells)
         {
             size += cell.Rune.GetEncodingLength ();
         }
@@ -6345,7 +6201,7 @@ public class TextView : View
         var encoded = new byte [size];
         var offset = 0;
 
-        foreach (RuneCell cell in cells)
+        foreach (Cell cell in cells)
         {
             offset += cell.Rune.Encode (encoded, offset);
         }
@@ -6389,7 +6245,7 @@ public class TextView : View
     private void TrackColumn ()
     {
         // Now track the column
-        List<RuneCell> line = GetCurrentLine ();
+        List<Cell> line = GetCurrentLine ();
 
         if (line.Count < _columnTrack)
         {

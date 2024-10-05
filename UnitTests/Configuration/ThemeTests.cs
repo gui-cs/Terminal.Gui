@@ -10,6 +10,7 @@ public class ThemeTests
         Converters = { new AttributeJsonConverter (), new ColorJsonConverter () }
     };
 
+    [Fact]
     [AutoInitShutdown (configLocation: ConfigLocations.DefaultOnly)]
     public void TestApply ()
     {

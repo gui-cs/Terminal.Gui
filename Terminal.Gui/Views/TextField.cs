@@ -546,12 +546,12 @@ public class TextField : View
             if (!Secret && !_historyText.IsFromHistory)
             {
                 _historyText.Add (
-                                  new List<List<RuneCell>> { RuneCell.ToRuneCellList (oldText) },
+                                  new List<List<Cell>> { Cell.ToCellList (oldText) },
                                   new Point (_cursorPosition, 0)
                                  );
 
                 _historyText.Add (
-                                  new List<List<RuneCell>> { RuneCell.ToRuneCells (_text) },
+                                  new List<List<Cell>> { Cell.ToCells (_text) },
                                   new Point (_cursorPosition, 0),
                                   HistoryText.LineStatus.Replaced
                                  );
@@ -648,7 +648,7 @@ public class TextField : View
         }
 
         _historyText.Add (
-                          new List<List<RuneCell>> { RuneCell.ToRuneCells (_text) },
+                          new List<List<Cell>> { Cell.ToCells (_text) },
                           new Point (_cursorPosition, 0)
                          );
 
@@ -702,7 +702,7 @@ public class TextField : View
         }
 
         _historyText.Add (
-                          new List<List<RuneCell>> { RuneCell.ToRuneCells (_text) },
+                          new List<List<Cell>> { Cell.ToCells (_text) },
                           new Point (_cursorPosition, 0)
                          );
 
@@ -1342,7 +1342,7 @@ public class TextField : View
 
     private void GenerateSuggestions ()
     {
-        List<RuneCell> currentLine = RuneCell.ToRuneCellList (Text);
+        List<Cell> currentLine = Cell.ToCellList (Text);
         int cursorPosition = Math.Min (CursorPosition, currentLine.Count);
 
         Autocomplete.Context = new AutocompleteContext (
@@ -1390,7 +1390,7 @@ public class TextField : View
             return;
         }
 
-        Text = RuneCell.ToString (obj?.Lines [obj.CursorPosition.Y]);
+        Text = Cell.ToString (obj?.Lines [obj.CursorPosition.Y]);
         CursorPosition = obj.CursorPosition.X;
         Adjust ();
     }
@@ -1398,7 +1398,7 @@ public class TextField : View
     private void InsertText (Key a, bool usePreTextChangedCursorPos)
     {
         _historyText.Add (
-                          new List<List<RuneCell>> { RuneCell.ToRuneCells (_text) },
+                          new List<List<Cell>> { Cell.ToCells (_text) },
                           new Point (_cursorPosition, 0)
                          );
 
