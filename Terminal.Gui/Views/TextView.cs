@@ -4623,7 +4623,10 @@ public class TextView : View
             return;
         }
 
-        List<List<Cell>> lines = Cell.StringToLinesOfCells (text);
+        // Get selected attribute
+        Attribute? attribute = GetSelectedAttribute (CurrentRow, CurrentColumn);
+
+        List<List<Cell>> lines = Cell.StringToLinesOfCells (text, attribute);
 
         if (lines.Count == 0)
         {
@@ -5526,6 +5529,34 @@ public class TextView : View
     {
         ResetColumnTrack ();
         DeleteCharRight ();
+    }
+
+    private Attribute? GetSelectedAttribute (int row, int col)
+    {
+        if (!InheritsPreviousAttribute || (Lines == 1 && GetLine (Lines).Count == 0))
+        {
+            return null;
+        }
+
+        List<Cell> line = GetLine (row);
+        int foundRow = row;
+
+        while (line.Count == 0)
+        {
+            if (foundRow == 0 && line.Count == 0)
+            {
+                return null;
+            }
+
+            foundRow--;
+            line = GetLine (foundRow);
+        }
+
+        int foundCol = foundRow < row ? line.Count - 1 : Math.Min (col, line.Count - 1);
+
+        Cell cell = line [foundCol];
+
+        return cell.Attribute;
     }
 
     // If InheritsPreviousColorScheme is enabled this method will check if the rune cell on
