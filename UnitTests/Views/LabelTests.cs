@@ -1316,10 +1316,56 @@ e
         super.Dispose ();
     }
 
+
     [Fact]
-    public void Label_CanFocus_True_Get_Focus_By_Keyboard ()
+    public void CanFocus_False_HotKey_SetsFocus_Next ()
     {
-        Label label = new () { Text = "label" };
+        View otherView = new () { Text = "otherView", CanFocus = true };
+        Label label = new () { Text = "_label" };
+        View nextView = new () { Text = "nextView", CanFocus = true };
+        Application.Navigation = new ();
+        Application.Top = new ();
+        Application.Top.Add (otherView, label, nextView);
+
+        Application.Top.SetFocus ();
+        Assert.True (otherView.HasFocus);
+
+        // No focused view accepts Tab, and there's no other view to focus, so OnKeyDown returns false
+        Assert.True (Application.OnKeyDown (label.HotKey));
+        Assert.False (otherView.HasFocus);
+        Assert.False (label.HasFocus);
+        Assert.True (nextView.HasFocus);
+
+        Application.Top.Dispose ();
+        Application.ResetState ();
+    }
+
+
+    [Fact]
+    public void CanFocus_False_MouseClick_SetsFocus_Next ()
+    {
+        View otherView = new () { X = 0, Y = 0, Width = 1, Height = 1, Id = "otherView", CanFocus = true };
+        Label label = new () { X = 0, Y = 1, Text = "_label" };
+        View nextView = new () { X = Pos.Right (label), Y = Pos.Top (label), Width = 1, Height = 1, Id = "nextView", CanFocus = true };
+        Application.Navigation = new ();
+        Application.Top = new ();
+        Application.Top.Add (otherView, label, nextView);
+
+        Application.Top.SetFocus ();
+
+        // click on label
+        Application.OnMouseEvent (new () { ScreenPosition = label.Frame.Location, Flags = MouseFlags.Button1Clicked });
+        Assert.False (label.HasFocus);
+        Assert.True (nextView.HasFocus);
+
+        Application.Top.Dispose ();
+        Application.ResetState ();
+    }
+
+    [Fact]
+    public void CanFocus_True_HotKey_SetsFocus ()
+    {
+        Label label = new () { Text = "_label" };
         View view = new () { Text = "view", CanFocus = true };
         Application.Navigation = new ();
         Application.Top = new ();
@@ -1333,21 +1379,7 @@ e
         Assert.True (view.HasFocus);
 
         // No focused view accepts Tab, and there's no other view to focus, so OnKeyDown returns false
-        Assert.False (Application.OnKeyDown (Key.Tab));
-        Assert.False (label.HasFocus);
-        Assert.True (view.HasFocus);
-
-        // Set label CanFocus to true
-        label.CanFocus = true;
-        Assert.False (label.HasFocus);
-        Assert.True (view.HasFocus);
-
-        // No focused view accepts Tab, but label can now be focused, so focus should move to it.
-        Assert.True (Application.OnKeyDown (Key.Tab));
-        Assert.True (label.HasFocus);
-        Assert.False (view.HasFocus);
-
-        Assert.True (Application.OnKeyDown (Key.Tab));
+        Assert.True (Application.OnKeyDown (label.HotKey));
         Assert.False (label.HasFocus);
         Assert.True (view.HasFocus);
 
@@ -1357,15 +1389,17 @@ e
 
 
     [Fact]
-    public void Label_CanFocus_True_Get_Focus_By_Mouse ()
+    public void CanFocus_True_MouseClick_Focuses ()
     {
+        Application.Navigation = new ();
         Label label = new ()
         {
             Text = "label",
             X = 0,
-            Y = 0
+            Y = 0,
+            CanFocus = true
         };
-        View view = new ()
+        View otherView = new ()
         {
             Text = "view",
             X = 0,
@@ -1379,34 +1413,26 @@ e
             Width = 10,
             Height = 10
         };
-        Application.Top.Add (label, view);
-
+        Application.Top.Add (label, otherView);
         Application.Top.SetFocus ();
-        Assert.Equal (view, Application.Top.MostFocused);
-        Assert.False (label.CanFocus);
-        Assert.False (label.HasFocus);
-        Assert.True (view.CanFocus);
-        Assert.True (view.HasFocus);
 
-        // label can't focus so clicking on it has no effect
-        Application.OnMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
-        Assert.False (label.HasFocus);
-        Assert.True (view.HasFocus);
+        Assert.True (label.CanFocus);
+        Assert.True (label.HasFocus);
+        Assert.True (otherView.CanFocus);
+        Assert.False (otherView.HasFocus);
 
-        // Set label CanFocus to true
-        label.CanFocus = true;
-        Assert.False (label.HasFocus);
-        Assert.True (view.HasFocus);
+        otherView.SetFocus ();
+        Assert.True (otherView.HasFocus);
 
         // label can focus, so clicking on it set focus
-        Application.OnMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
+        Application.OnMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.Button1Clicked });
         Assert.True (label.HasFocus);
-        Assert.False (view.HasFocus);
+        Assert.False (otherView.HasFocus);
 
         // click on view
-        Application.OnMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1Clicked });
+        Application.OnMouseEvent (new () { ScreenPosition = new (0, 1), Flags = MouseFlags.Button1Clicked });
         Assert.False (label.HasFocus);
-        Assert.True (view.HasFocus);
+        Assert.True (otherView.HasFocus);
 
         Application.Top.Dispose ();
         Application.ResetState ();

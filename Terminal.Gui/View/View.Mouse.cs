@@ -371,8 +371,8 @@ public partial class View // Mouse APIs
         // Post-conditions
 
         // Always invoke Select command on MouseClick
-        // By default, this will raise Select/OnSelect - Subclasses can override this via AddCommand (Command.Select ...).
-        args.Handled = InvokeCommand (Command.Select) == true;
+        // By default, this will raise Selected/OnSelected - Subclasses can override this via AddCommand (Command.Select ...).
+        args.Handled = InvokeCommand (Command.Select, null, new KeyBinding ([Command.Select], scope: KeyBindingScope.Focused, boundView: this, context: args.MouseEvent)) == true;
 
         return args.Handled;
     }
@@ -399,7 +399,7 @@ public partial class View // Mouse APIs
 
             if (SetPressedHighlight (HighlightStyle.None))
             {
-                // BUGBUG: If we retrun true here we never generate a moues click!
+                // BUGBUG: If we return true here we never generate a mouse click!
                 return true;
             }
 

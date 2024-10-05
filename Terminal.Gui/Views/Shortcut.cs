@@ -386,16 +386,6 @@ public class Shortcut : View, IOrientation, IDesignable
         }
     }
 
-    private bool? OnSelect (CommandContext ctx)
-    {
-        if (CommandView.GetSupportedCommands ().Contains (Command.Select))
-        {
-            return CommandView.InvokeCommand (Command.Select, ctx.Key, ctx.KeyBinding);
-        }
-
-        return false;
-    }
-
     private void Shortcut_MouseClick (object sender, MouseEventEventArgs e)
     {
         // When the Shortcut is clicked, we want to invoke the Command and Set focus

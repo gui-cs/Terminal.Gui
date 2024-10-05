@@ -24,6 +24,11 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
             return;
         }
 
+        if (view is IDesignable designable)
+        {
+            designable.EnableForDesign ();
+        }
+
         view.X = Pos.Center ();
         view.Y = Pos.Center ();
 
@@ -61,17 +66,6 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         Assert.True (Test_All_Constructors_Of_Type (viewType));
     }
 
-    //[Fact]
-    //public void AllViews_HotKey_Works ()
-    //{
-    //	foreach (var type in GetAllViewClasses ()) {
-    //		_output.WriteLine ($"Testing {type.Name}");
-    //		var view = GetTypeInitializer (type, type.GetConstructor (Array.Empty<Type> ()));
-    //		view.HotKeySpecifier = (Rune)'^';
-    //		view.Text = "^text";
-    //		Assert.Equal(Key.T, view.HotKey);
-    //	}
-    //}
 
     public bool Test_All_Constructors_Of_Type (Type type)
     {
@@ -86,5 +80,87 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         }
 
         return true;
+    }
+
+    //[Fact]
+    //public void AllViews_HotKey_Works ()
+    //{
+    //	foreach (var type in GetAllViewClasses ()) {
+    //		_output.WriteLine ($"Testing {type.Name}");
+    //		var view = GetTypeInitializer (type, type.GetConstructor (Array.Empty<Type> ()));
+    //		view.HotKeySpecifier = (Rune)'^';
+    //		view.Text = "^text";
+    //		Assert.Equal(Key.T, view.HotKey);
+    //	}
+    //}
+
+    [Theory]
+    [MemberData (nameof (AllViewTypes))]
+    public void AllViews_Command_Select_Raises_Selected (Type viewType)
+    {
+        var view = (View)CreateInstanceIfNotGeneric (viewType);
+
+        if (view == null)
+        {
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
+
+            return;
+        }
+
+        if (view is IDesignable designable)
+        {
+            designable.EnableForDesign ();
+        }
+
+        var selectedCount = 0;
+        view.Selected += (s, e) => selectedCount++;
+
+        var acceptedCount = 0;
+        view.Accepted += (s, e) =>
+                         {
+                             acceptedCount++;
+                         };
+
+
+        if (view.InvokeCommand(Command.Select) == true)
+        {
+            Assert.Equal(1, selectedCount);
+            Assert.Equal (0, acceptedCount);
+        }
+    }
+
+    [Theory]
+    [MemberData (nameof (AllViewTypes))]
+    public void AllViews_Command_Accept_Raises_Accepted (Type viewType)
+    {
+        var view = (View)CreateInstanceIfNotGeneric (viewType);
+
+        if (view == null)
+        {
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
+
+            return;
+        }
+
+        if (view is IDesignable designable)
+        {
+            designable.EnableForDesign ();
+        }
+
+        var selectedCount = 0;
+        view.Selected += (s, e) => selectedCount++;
+
+        var acceptedCount = 0;
+        view.Accepted += (s, e) =>
+                         {
+                             acceptedCount++;
+                         };
+
+
+        if (view.InvokeCommand (Command.Accept) == true)
+        {
+            Assert.Equal (0, selectedCount);
+            Assert.Equal (1, acceptedCount);
+        }
     }
 }

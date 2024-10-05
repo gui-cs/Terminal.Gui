@@ -2010,6 +2010,10 @@ public class TextView : View
         LayoutComplete += TextView_LayoutComplete;
 
         // Things this view knows how to do
+
+        // Note - NewLine is only bound to Enter if Multiline is true
+        AddCommand (Command.NewLine, () => ProcessEnterKey ());
+
         AddCommand (
                     Command.PageDown,
                     () =>
@@ -2276,8 +2280,6 @@ public class TextView : View
                     }
                    );
 
-        AddCommand (Command.Accept, () => ProcessEnterKey ());
-
         AddCommand (
                     Command.End,
                     () =>
@@ -2404,7 +2406,9 @@ public class TextView : View
                     }
                    );
 
-        // Default keybindings for this view
+        KeyBindings.Remove (Key.Enter);
+        KeyBindings.Add (Key.Enter, Multiline ? Command.NewLine : Command.Accept);
+
         KeyBindings.Add (Key.PageDown, Command.PageDown);
         KeyBindings.Add (Key.V.WithCtrl, Command.PageDown);
 
@@ -2701,6 +2705,9 @@ public class TextView : View
                 Height = _savedHeight;
                 SetNeedsDisplay ();
             }
+
+            KeyBindings.Remove (Key.Enter);
+            KeyBindings.Add (Key.Enter, Multiline ? Command.NewLine : Command.Accept);
         }
     }
 

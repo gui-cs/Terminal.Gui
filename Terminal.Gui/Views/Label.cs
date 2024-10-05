@@ -65,6 +65,11 @@ public class Label : View
 
     private bool? InvokeHotKeyOnNext (CommandContext context)
     {
+        if (CanFocus)
+        {
+            return SetFocus ();
+        }
+
         int me = SuperView?.Subviews.IndexOf (this) ?? -1;
 
         if (me != -1 && me < SuperView?.Subviews.Count - 1)

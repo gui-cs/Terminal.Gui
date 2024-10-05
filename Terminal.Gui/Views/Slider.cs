@@ -1496,8 +1496,13 @@ public class Slider<T> : View, IOrientation
         OnOptionsChanged ();
     }
 
-    private void SetFocusedOption ()
+    private bool SetFocusedOption ()
     {
+        if (_options.Count == 0)
+        {
+            return false;
+        }
+        bool changed = false;
         switch (_config._type)
         {
             case SliderType.Single:
@@ -1530,6 +1535,7 @@ public class Slider<T> : View, IOrientation
 
                 // Raise slider changed event.
                 OnOptionsChanged ();
+                changed = true;
 
                 break;
             case SliderType.Multiple:
@@ -1550,6 +1556,7 @@ public class Slider<T> : View, IOrientation
                 }
 
                 OnOptionsChanged ();
+                changed = true;
 
                 break;
 
@@ -1683,11 +1690,14 @@ public class Slider<T> : View, IOrientation
 
                 // Raise Slider Option Changed Event.
                 OnOptionsChanged ();
+                changed = true;
 
                 break;
             default:
                 throw new ArgumentOutOfRangeException (_config._type.ToString ());
         }
+
+        return changed;
     }
 
     internal bool ExtendPlus ()
@@ -1772,9 +1782,7 @@ public class Slider<T> : View, IOrientation
 
     internal bool Select ()
     {
-        SetFocusedOption ();
-
-        return true;
+        return SetFocusedOption ();
     }
 
     internal new bool Accept ()

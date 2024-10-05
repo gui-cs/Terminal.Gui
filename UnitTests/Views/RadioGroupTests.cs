@@ -90,17 +90,17 @@ public class RadioGroupTests (ITestOutputHelper output)
         var selectedItemChangedCount = 0;
         rg.SelectedItemChanged += (s, e) => selectedItemChangedCount++;
 
-        var selectCount = 0;
-        rg.Selected += (s, e) => selectCount++;
+        var selectedCount = 0;
+        rg.Selected += (s, e) => selectedCount++;
 
-        var acceptCount = 0;
-        rg.Accepted += (s, e) => acceptCount++;
+        var acceptedCount = 0;
+        rg.Accepted += (s, e) => acceptedCount++;
 
         // By default the first item is selected
         Assert.Equal (0, rg.SelectedItem);
         Assert.Equal (0, selectedItemChangedCount);
-        Assert.Equal (0, selectCount);
-        Assert.Equal (0, acceptCount);
+        Assert.Equal (0, selectedCount);
+        Assert.Equal (0, acceptedCount);
         Assert.Equal (Key.Empty, rg.HotKey);
 
         // With HasFocus
@@ -109,38 +109,38 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (0, rg.SelectedItem);
         Assert.Equal (0, rg.Cursor);
         Assert.Equal (0, selectedItemChangedCount);
-        Assert.Equal (0, selectCount);
-        Assert.Equal (0, acceptCount);
+        Assert.Equal (0, selectedCount);
+        Assert.Equal (0, acceptedCount);
 
         Assert.True (Application.OnKeyDown (Key.CursorDown));
         Assert.Equal (0, rg.SelectedItem); // Cursor changed, but selection didnt
         Assert.Equal (1, rg.Cursor);
         Assert.Equal (0, selectedItemChangedCount);
-        Assert.Equal (0, selectCount);
-        Assert.Equal (0, acceptCount);
+        Assert.Equal (0, selectedCount);
+        Assert.Equal (0, acceptedCount);
 
         Assert.False (Application.OnKeyDown (Key.CursorDown)); // Should not change selection (should focus next view if there was one, which there isn't)
         Assert.Equal (0, rg.SelectedItem);
         Assert.Equal (1, rg.Cursor);
         Assert.Equal (0, selectedItemChangedCount);
-        Assert.Equal (0, selectCount);
-        Assert.Equal (0, acceptCount);
+        Assert.Equal (0, selectedCount);
+        Assert.Equal (0, acceptedCount);
 
-        // Test Select (Space) when Cursor != SelectedItem
+        // Test Select (Space) when Cursor != SelectedItem - Should select cursor
         Assert.True (Application.OnKeyDown (Key.Space));
         Assert.Equal (1, rg.SelectedItem);
         Assert.Equal (1, rg.Cursor);
         Assert.Equal (1, selectedItemChangedCount);
-        Assert.Equal (1, selectCount);
-        Assert.Equal (0, acceptCount);
+        Assert.Equal (1, selectedCount);
+        Assert.Equal (0, acceptedCount);
 
-        // Now test Select (Space) when Cursor == SelectedItem - Should cycle
+        // Test Select (Space) when Cursor == SelectedItem - Should cycle
         Assert.True (Application.OnKeyDown (Key.Space));
         Assert.Equal (0, rg.SelectedItem);
         Assert.Equal (0, rg.Cursor);
         Assert.Equal (2, selectedItemChangedCount);
-        Assert.Equal (2, selectCount);
-        Assert.Equal (0, acceptCount);
+        Assert.Equal (2, selectedCount);
+        Assert.Equal (0, acceptedCount);
 
         Assert.True (Application.OnKeyDown (Key.Space));
         Assert.Equal (1, rg.SelectedItem);
@@ -166,8 +166,8 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (1, rg.SelectedItem);
         Assert.Equal (1, rg.Cursor);
         Assert.Equal (7, selectedItemChangedCount);
-        Assert.Equal (7, selectCount);
-        Assert.Equal (0, acceptCount);
+        Assert.Equal (7, selectedCount);
+        Assert.Equal (0, acceptedCount);
 
         // Test HotKey
         //    Selected == Cursor (1) - Advance state and raise Select event - DO NOT raise Accept
@@ -178,8 +178,8 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (0, rg.SelectedItem);
         Assert.Equal (0, rg.Cursor);
         Assert.Equal (8, selectedItemChangedCount);
-        Assert.Equal (8, selectCount);
-        Assert.Equal (0, acceptCount);
+        Assert.Equal (8, selectedCount);
+        Assert.Equal (0, acceptedCount);
 
         //     Make Selected != Cursor
         Assert.True (Application.OnKeyDown (Key.CursorDown));
@@ -191,8 +191,8 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (1, rg.SelectedItem);
         Assert.Equal (1, rg.Cursor);
         Assert.Equal (9, selectedItemChangedCount);
-        Assert.Equal (9, selectCount);
-        Assert.Equal (0, acceptCount);
+        Assert.Equal (9, selectedCount);
+        Assert.Equal (0, acceptedCount);
 
         Application.ResetState (true);
     }
@@ -372,7 +372,6 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L | KeyCode.ShiftMask));
         Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L | KeyCode.AltMask));
 
-        // BUGBUG: These tests only test that RG works on it's own, not if it's a subview
         Assert.True (Application.OnKeyDown (Key.T));
         Assert.Equal (2, rg.SelectedItem);
         Assert.True (Application.OnKeyDown (Key.L));
@@ -463,7 +462,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         group.NewKeyDownEvent (Key.G.WithAlt);
 
         Assert.Equal (0, group.SelectedItem);
-        Assert.True (group.HasFocus);
+        Assert.False (group.HasFocus);
     }
 
     [Fact]
@@ -619,18 +618,18 @@ public class RadioGroupTests (ITestOutputHelper output)
     {
         var radioGroup = new RadioGroup
         {
-            RadioLabels = ["_1", "__2"]
+            RadioLabels = ["_1", "_2"]
         };
         Assert.True (radioGroup.CanFocus);
 
         var selectedItemChanged = 0;
         radioGroup.SelectedItemChanged += (s, e) => selectedItemChanged++;
 
-        var selectCount = 0;
-        radioGroup.Selected += (s, e) => selectCount++;
+        var selectedCount = 0;
+        radioGroup.Selected += (s, e) => selectedCount++;
 
-        var acceptCount = 0;
-        radioGroup.Accepted += (s, e) => acceptCount++;
+        var acceptedCount = 0;
+        radioGroup.Accepted += (s, e) => acceptedCount++;
 
         Assert.Equal (Orientation.Vertical, radioGroup.Orientation);
 
@@ -638,26 +637,29 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.True (radioGroup.HasFocus);
         Assert.Equal (0, radioGroup.SelectedItem);
         Assert.Equal (0, selectedItemChanged);
-        Assert.Equal (0, selectCount);
-        Assert.Equal (0, acceptCount);
+        Assert.Equal (0, selectedCount);
+        Assert.Equal (0, acceptedCount);
 
-        Assert.False (radioGroup.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked }));
+        // Click on the first item, which is already selected
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked }));
         Assert.Equal (0, radioGroup.SelectedItem);
         Assert.Equal (0, selectedItemChanged);
-        Assert.Equal (0, selectCount);
-        Assert.Equal (0, acceptCount);
+        Assert.Equal (0, selectedCount);
+        Assert.Equal (0, acceptedCount);
 
+        // Click on the second item
         Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1Clicked }));
         Assert.Equal (1, radioGroup.SelectedItem);
         Assert.Equal (1, selectedItemChanged);
-        Assert.Equal (1, selectCount);
-        Assert.Equal (0, acceptCount);
+        Assert.Equal (1, selectedCount);
+        Assert.Equal (0, acceptedCount);
 
+        // Click on the first item
         Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked }));
         Assert.Equal (0, radioGroup.SelectedItem);
         Assert.Equal (2, selectedItemChanged);
-        Assert.Equal (2, selectCount);
-        Assert.Equal (0, acceptCount);
+        Assert.Equal (2, selectedCount);
+        Assert.Equal (0, acceptedCount);
     }
 
     [Fact]
@@ -673,16 +675,16 @@ public class RadioGroupTests (ITestOutputHelper output)
         var selectedItemChanged = 0;
         radioGroup.SelectedItemChanged += (s, e) => selectedItemChanged++;
 
-        var selectCount = 0;
-        radioGroup.Selected += (s, e) => selectCount++;
+        var selectedCount = 0;
+        radioGroup.Selected += (s, e) => selectedCount++;
 
-        var acceptCount = 0;
-        var handleAccept = false;
+        var acceptedCount = 0;
+        var handleAccepted = false;
 
         radioGroup.Accepted += (s, e) =>
                              {
-                                 acceptCount++;
-                                 e.Handled = handleAccept;
+                                 acceptedCount++;
+                                 e.Handled = handleAccepted;
                              };
 
         Assert.True (radioGroup.DoubleClickAccepts);
@@ -692,25 +694,32 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.True (radioGroup.HasFocus);
         Assert.Equal (0, radioGroup.SelectedItem);
         Assert.Equal (0, selectedItemChanged);
-        Assert.Equal (0, selectCount);
-        Assert.Equal (0, acceptCount);
+        Assert.Equal (0, selectedCount);
+        Assert.Equal (0, acceptedCount);
 
+        // NOTE: Drivers ALWAYS generate a Button1Clicked event before Button1DoubleClicked
+        // NOTE: We need to do the same
+
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked }));
         Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked }));
         Assert.Equal (0, radioGroup.SelectedItem);
         Assert.Equal (0, selectedItemChanged);
-        Assert.Equal (0, selectCount);
-        Assert.Equal (1, acceptCount);
+        Assert.Equal (0, selectedCount);
+        Assert.Equal (1, acceptedCount);
 
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1Clicked }));
         Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1Clicked }));
         Assert.Equal (1, radioGroup.SelectedItem);
         Assert.Equal (1, selectedItemChanged);
-        Assert.Equal (1, selectCount);
-        Assert.Equal (1, acceptCount);
+        Assert.Equal (1, selectedCount);
+        Assert.Equal (1, acceptedCount);
+
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1Clicked }));
         Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1DoubleClicked }));
         Assert.Equal (1, radioGroup.SelectedItem);
         Assert.Equal (1, selectedItemChanged);
-        Assert.Equal (1, selectCount);
-        Assert.Equal (2, acceptCount);
+        Assert.Equal (1, selectedCount);
+        Assert.Equal (2, acceptedCount);
 
         View superView = new () { Id = "superView", CanFocus = true };
         superView.Add (radioGroup);
@@ -719,8 +728,8 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked }));
         Assert.Equal (0, radioGroup.SelectedItem);
         Assert.Equal (2, selectedItemChanged);
-        Assert.Equal (2, selectCount);
-        Assert.Equal (2, acceptCount);
+        Assert.Equal (2, selectedCount);
+        Assert.Equal (2, acceptedCount);
 
         var superViewAcceptCount = 0;
 
@@ -732,24 +741,28 @@ public class RadioGroupTests (ITestOutputHelper output)
 
         Assert.Equal (0, superViewAcceptCount);
 
-        handleAccept = true;
-        Assert.False (radioGroup.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked }));
+        // By handling the event, we're cancelling it. So the radio group should not change.
+        handleAccepted = true;
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked }));
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked }));
         Assert.Equal (0, radioGroup.SelectedItem);
         Assert.Equal (2, selectedItemChanged);
-        Assert.Equal (2, selectCount);
-        Assert.Equal (3, acceptCount);
-        Assert.Equal (1, superViewAcceptCount);
+        Assert.Equal (2, selectedCount);
+        Assert.Equal (3, acceptedCount);
+        Assert.Equal (0, superViewAcceptCount);
 
-        handleAccept = false;
-        Assert.False (radioGroup.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked }));
+        handleAccepted = false;
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked }));
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked }));
         Assert.Equal (0, radioGroup.SelectedItem);
         Assert.Equal (2, selectedItemChanged);
-        Assert.Equal (2, selectCount);
-        Assert.Equal (4, acceptCount);
-        Assert.Equal (3, superViewAcceptCount); // Accept bubbles up to superview
+        Assert.Equal (2, selectedCount);
+        Assert.Equal (4, acceptedCount);
+        Assert.Equal (1, superViewAcceptCount); // Accept bubbles up to superview
 
         radioGroup.DoubleClickAccepts = false;
-        Assert.False (radioGroup.NewMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1DoubleClicked }));
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1Clicked }));
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1DoubleClicked }));
     }
 
     #endregion Mouse Tests
