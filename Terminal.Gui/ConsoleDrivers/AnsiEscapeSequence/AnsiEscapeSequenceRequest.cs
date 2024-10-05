@@ -12,8 +12,9 @@ public class AnsiEscapeSequenceRequest
     ///     Execute an ANSI escape sequence escape which may return a response or error.
     /// </summary>
     /// <param name="ansiRequest">The ANSI escape sequence to request.</param>
+    /// <param name="result">When this method returns <see langword="true"/>, an object containing the response with an empty error.</param>
     /// <returns>A <see cref="AnsiEscapeSequenceResponse"/> with the response, error, terminator and value.</returns>
-    public static AnsiEscapeSequenceResponse ExecuteAnsiRequest (AnsiEscapeSequenceRequest ansiRequest)
+    public static bool TryParse (AnsiEscapeSequenceRequest ansiRequest, out AnsiEscapeSequenceResponse result)
     {
         var response = new StringBuilder ();
         var error = new StringBuilder ();
@@ -137,7 +138,9 @@ public class AnsiEscapeSequenceRequest
         // Invoke the event if it's subscribed
         ansiRequest.ResponseReceived?.Invoke (ansiRequest, ansiResponse);
 
-        return ansiResponse;
+        result = ansiResponse;
+
+        return string.IsNullOrWhiteSpace (result.Error) && !string.IsNullOrWhiteSpace (result.Response);
     }
 
     /// <summary>

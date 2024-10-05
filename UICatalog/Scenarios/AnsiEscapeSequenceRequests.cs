@@ -86,6 +86,10 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         appWindow.Add (label, tvTerminator);
 
         var btnResponse = new Button { X = Pos.Center (), Y = Pos.Bottom (tvResponse) + 2, Text = "Send Request" };
+
+        var lblSuccess = new Label { X = Pos.Center (), Y = Pos.Bottom (btnResponse) + 1 };
+        appWindow.Add (lblSuccess);
+
         btnResponse.Accept += (s, e) =>
                               {
                                   var ansiEscapeSequenceRequest = new AnsiEscapeSequenceRequest
@@ -95,18 +99,30 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
                                       Value = string.IsNullOrEmpty (tfValue.Text) ? null : tfValue.Text
                                   };
 
-                                  var ansiEscapeSequenceResponse = AnsiEscapeSequenceRequest.ExecuteAnsiRequest (
-                                       ansiEscapeSequenceRequest
+                                  var success = AnsiEscapeSequenceRequest.TryParse (
+                                       ansiEscapeSequenceRequest,
+                                       out AnsiEscapeSequenceResponse ansiEscapeSequenceResponse
                                       );
 
                                   tvResponse.Text = ansiEscapeSequenceResponse.Response;
                                   tvError.Text = ansiEscapeSequenceResponse.Error;
                                   tvValue.Text = ansiEscapeSequenceResponse.Value ?? "";
                                   tvTerminator.Text = ansiEscapeSequenceResponse.Terminator;
+
+                                  if (success)
+                                  {
+                                      lblSuccess.ColorScheme = Colors.ColorSchemes ["Base"];
+                                      lblSuccess.Text = "Successful";
+                                  }
+                                  else
+                                  {
+                                      lblSuccess.ColorScheme = Colors.ColorSchemes ["Error"];
+                                      lblSuccess.Text = "Error";
+                                  }
                               };
         appWindow.Add (btnResponse);
 
-        appWindow.Add (new Label { Y = Pos.Bottom (btnResponse) + 2, Text = "You can send other requests by editing the TextFields." });
+        appWindow.Add (new Label { Y = Pos.Bottom (lblSuccess) + 2, Text = "You can send other requests by editing the TextFields." });
 
         // Run - Start the application.
         Application.Run (appWindow);
