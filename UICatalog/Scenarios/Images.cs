@@ -425,8 +425,8 @@ public class Images : Scenario
     {
         switch (_rgPaletteBuilder.SelectedItem)
         {
-            case 0: return new MedianCutPaletteBuilder (GetDistanceAlgorithm ());
-            case 1: return new PopularityPaletteWithThreshold (GetDistanceAlgorithm (), _popularityThreshold.Value);
+            case 0: return new PopularityPaletteWithThreshold (GetDistanceAlgorithm (), _popularityThreshold.Value);
+            case 1: return new MedianCutPaletteBuilder (GetDistanceAlgorithm ());
             default: throw new ArgumentOutOfRangeException ();
         }
     }
