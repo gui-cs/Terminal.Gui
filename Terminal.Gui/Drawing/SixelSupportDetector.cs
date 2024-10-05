@@ -16,7 +16,7 @@ public class SixelSupportDetector
     {
         var darResponse = AnsiEscapeSequenceRequest.ExecuteAnsiRequest (EscSeqUtils.CSI_SendDeviceAttributes);
         var result = new SixelSupport ();
-        result.IsSupported = darResponse.Response.Contains ('4');
+        result.IsSupported = darResponse.Response.Split (';').Contains ("4");
 
         return result;
     }
