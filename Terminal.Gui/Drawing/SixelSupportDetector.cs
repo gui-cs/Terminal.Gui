@@ -4,11 +4,18 @@ using Microsoft.CodeAnalysis;
 namespace Terminal.Gui;
 
 /// <summary>
-///     Uses ANSII escape sequences to detect whether sixel is supported
+///     Uses Ansi escape sequences to detect whether sixel is supported
 ///     by the terminal.
 /// </summary>
 public class SixelSupportDetector
 {
+    /// <summary>
+    /// Sends Ansi escape sequences to the console to determine whether
+    /// sixel is supported (and <see cref="SixelSupportResult.Resolution"/>
+    /// etc).
+    /// </summary>
+    /// <returns>Description of sixel support, may include assumptions where
+    /// expected response codes are not returned by console.</returns>
     public SixelSupportResult Detect ()
     {
         var result = new SixelSupportResult ();
