@@ -5890,6 +5890,13 @@ public class TextView : View
         // if they are at the very end of all the text do not respond (this lets the key press fall through to navigation system - which usually changes focus forward)
         if (CurrentColumn == lastCol && CurrentRow == lastRow)
         {
+            // Unless they have text selected
+            if (Selecting)
+            {
+                // In which case clear
+                StopSelecting ();
+                return true;
+            }
             return false;
         }
 

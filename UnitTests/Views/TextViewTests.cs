@@ -8660,4 +8660,58 @@ line.
         Assert.True (t.Visible);
         Assert.False (t.Autocomplete.Visible);
     }
+
+
+    [Fact]
+    public void Right_CursorAtEnd_WithSelection_ShouldClearSelection ()
+    {
+        var tv = new TextView
+        {
+            Text = "Hello",
+        };
+        tv.SetFocus ();
+
+        tv.NewKeyDownEvent (Key.End.WithShift);
+        Assert.Equal (5,tv.CursorPosition.X);
+
+        // When there is selected text and the cursor is at the end of the text field
+        Assert.Equal ("Hello", tv.SelectedText);
+
+        // Pressing right should not move focus, instead it should clear selection
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
+        Assert.Empty (tv.SelectedText);
+
+        // Now that the selection is cleared another right keypress should move focus
+        Assert.False (tv.NewKeyDownEvent (Key.CursorRight));
+    }
+    [Fact]
+    public void Left_CursorAtStart_WithSelection_ShouldClearSelection ()
+    {
+        var tv = new TextView
+        {
+            Text = "Hello",
+        };
+        tv.SetFocus ();
+
+        tv.NewKeyDownEvent (Key.CursorRight);
+        tv.NewKeyDownEvent (Key.CursorRight);
+
+        Assert.Equal (2,tv.CursorPosition.X);
+
+        Assert.True (tv.NewKeyDownEvent (Key.CursorLeft.WithShift));
+        Assert.True (tv.NewKeyDownEvent (Key.CursorLeft.WithShift));
+
+        // When there is selected text and the cursor is at the end of the text field
+        Assert.Equal ("He", tv.SelectedText);
+
+        // Pressing left should not move focus, instead it should clear selection
+        Assert.True (tv.NewKeyDownEvent (Key.CursorLeft));
+        Assert.Empty (tv.SelectedText);
+
+        // When clearing selected text with left the cursor should be at the start of the selection
+        Assert.Equal (0, tv.CursorPosition.X);
+
+        // Now that the selection is cleared another left keypress should move focus
+        Assert.False (tv.NewKeyDownEvent (Key.CursorLeft));
+    }
 }
