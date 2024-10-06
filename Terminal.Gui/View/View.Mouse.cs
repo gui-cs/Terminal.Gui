@@ -403,7 +403,7 @@ public partial class View // Mouse APIs
             }
 
             // If mouse is still in bounds, generate a click
-            if (Viewport.Contains (mouseEvent.Position))
+            if (!WantMousePositionReports && Viewport.Contains (mouseEvent.Position))
             {
                 return OnMouseClick (new (mouseEvent));
             }
