@@ -197,6 +197,7 @@ public static partial class Application
         IsInitialized = false;
 
         // Mouse
+        _lastMousePosition = Point.Empty;
         _cachedViewsUnderMouse.Clear ();
         WantContinuousButtonPressedView = null;
         MouseEvent = null;
