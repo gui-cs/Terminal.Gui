@@ -1,5 +1,5 @@
-﻿using System.ComponentModel;
-using System.Diagnostics;
+﻿#nullable enable
+using System.ComponentModel;
 
 namespace Terminal.Gui;
 
@@ -44,7 +44,7 @@ public class Shortcut : View, IOrientation, IDesignable
     /// <summary>
     ///     Creates a new instance of <see cref="Shortcut"/>.
     /// </summary>
-    public Shortcut () : this (Key.Empty, string.Empty, null) { }
+    public Shortcut () : this (Key.Empty, null, null, null) { }
 
     /// <summary>
     ///     Creates a new instance of <see cref="Shortcut"/>, binding it to <paramref name="targetView"/> and
@@ -67,11 +67,12 @@ public class Shortcut : View, IOrientation, IDesignable
     /// </param>
     /// <param name="commandText">The text to display for the command.</param>
     /// <param name="helpText">The help text to display.</param>
-    public Shortcut (View targetView, Command command, string commandText, string helpText = null) : this (
-                                                                                                           targetView?.KeyBindings.GetKeyFromCommands (command),
-                                                                                                           commandText,
-                                                                                                           null,
-                                                                                                           helpText)
+    public Shortcut (View targetView, Command command, string commandText, string helpText)
+        : this (
+                targetView?.KeyBindings.GetKeyFromCommands (command)!,
+                commandText,
+                null,
+                helpText)
     {
         _targetView = targetView;
         _command = command;
@@ -89,9 +90,10 @@ public class Shortcut : View, IOrientation, IDesignable
     /// <param name="commandText">The text to display for the command.</param>
     /// <param name="action"></param>
     /// <param name="helpText">The help text to display.</param>
-    public Shortcut (Key key, string commandText, Action action, string helpText = null)
+    public Shortcut (Key key, string? commandText, Action? action, string? helpText = null)
     {
         Id = "_shortcut";
+
         // Disabled for now due to bs in highlight handling and mouse clicks - HighlightStyle = HighlightStyle.Pressed;
         CanFocus = true;
         Width = GetWidthDimAuto ();
@@ -101,86 +103,81 @@ public class Shortcut : View, IOrientation, IDesignable
         _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
         _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
 
-        // Accept (Enter key) - 
-        AddCommand (Command.Accept, ctx => DispatchAcceptCommand (ctx));
+        // Accept (Enter key) -
+        AddCommand (Command.Accept, DispatchAcceptCommand);
 
-        // Hotkey - 
-        AddCommand (Command.HotKey, ctx =>
-                                    {
-                                        // The default HotKey handler sets Focus
-                                        SetFocus ();
+        // Hotkey -
+        AddCommand (
+                    Command.HotKey,
+                    ctx =>
+                    {
+                        if (ctx.Data != this)
+                        {
+                            ctx.Data = this;
+                            CommandView.InvokeCommand (Command.Select, ctx);
+                        }
 
-                                        if (DispatchAcceptCommand (ctx) == true)
+                        if (RaiseSelected (ctx) is true)
+                        {
+                            return true;
+                        }
 
-                                        {
-                                            return true;
-                                        }
+                        // The default HotKey handler sets Focus
+                        SetFocus ();
 
-                                        return RaiseSelected (ctx);
-                                    });
+                        return DispatchAcceptCommand (ctx);
+                    });
 
-        // Select (Space key or click) - 
-        AddCommand (Command.Select, ctx =>
-                                      {
-                                          if (ctx.Data != this)
-                                          {
-                                              ctx.Data = this;
-                                              CommandView.InvokeCommand (Command.Select, ctx);
-                                          }
+        // Select (Space key or click) -
+        AddCommand (
+                    Command.Select,
+                    ctx =>
+                    {
+                        if (ctx.Data != this)
+                        {
+                            ctx.Data = this;
+                            CommandView.InvokeCommand (Command.Select, ctx);
+                        }
 
-                                          if (RaiseSelected (ctx) is true)
-                                          {
-                                              return true;
-                                          }
+                        if (RaiseSelected (ctx) is true)
+                        {
+                            return true;
+                        }
 
-                                          // The default HotKey handler sets Focus
-                                          SetFocus ();
+                        // The default HotKey handler sets Focus
+                        SetFocus ();
 
-                                          return DispatchAcceptCommand (ctx);
-                                      });
+                        return DispatchAcceptCommand (ctx);
+                    });
 
         TitleChanged += Shortcut_TitleChanged; // This needs to be set before CommandView is set
 
         CommandView = new ()
         {
             Width = Dim.Auto (),
-            Height = Dim.Auto (DimAutoStyle.Auto, minimumContentDim: 1)
+            Height = Dim.Auto (DimAutoStyle.Auto, 1)
         };
 
         HelpView.Id = "_helpView";
         HelpView.CanFocus = false;
-        HelpView.Text = helpText;
+        HelpView.Text = helpText ?? string.Empty;
         Add (HelpView);
 
         KeyView.Id = "_keyView";
         KeyView.CanFocus = false;
         Add (KeyView);
 
-        //// If the user clicks anywhere on the Shortcut...
-        MouseClick += Shortcut_MouseClick;
-
-        //// If the user clicks on HelpView or KeyView
-        //HelpView.MouseClick += HelpOrKeyView_MouseClick;
-        //KeyView.MouseClick += HelpOrKeyView_MouseClick;
-
-        HelpView.Selected += HelpAndKeyViewOnSelected;
-        KeyView.Selected += HelpAndKeyViewOnSelected;
-
         LayoutStarted += OnLayoutStarted;
         Initialized += OnInitialized;
 
-        if (key is null)
-        {
-            key = Key.Empty;
-        }
-
+        key ??= Key.Empty;
         Key = key;
-        Title = commandText;
+        Title = commandText ?? string.Empty;
         Action = action;
 
         return;
 
-        void OnInitialized (object sender, EventArgs e)
+        void OnInitialized (object? sender, EventArgs e)
         {
             SuperViewRendersLineCanvas = true;
             Border.Settings &= ~BorderSettings.Title;
@@ -207,22 +204,11 @@ public class Shortcut : View, IOrientation, IDesignable
             return Dim.Auto (
                              DimAutoStyle.Content,
                              Dim.Func (() => PosAlign.CalculateMinDimension (0, Subviews, Dimension.Width)),
-                             Dim.Func (() => PosAlign.CalculateMinDimension (0, Subviews, Dimension.Width)));
+                             Dim.Func (() => PosAlign.CalculateMinDimension (0, Subviews, Dimension.Width)))!;
         }
     }
 
-    private void Shortcut_MouseClick (object sender, MouseEventEventArgs e)
-    {
-        //e.Handled = true;
-    }
-
-    private void HelpAndKeyViewOnSelected (object sender, CommandEventArgs e)
-    {
-        //e.Handled = InvokeCommand (Command.Select) == true;
-    }
-
-    [CanBeNull]
-    private readonly View _targetView; // If set, _command will be invoked
+    private readonly View? _targetView; // If set, _command will be invoked
 
     private readonly Command _command; // Used when _targetView is set
 
@@ -333,7 +319,7 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     // When layout starts, we need to adjust the layout of the HelpView and KeyView
-    private void OnLayoutStarted (object sender, LayoutEventArgs e)
+    private void OnLayoutStarted (object? sender, LayoutEventArgs e)
     {
         if (Width is DimAuto widthAuto)
         {
@@ -401,38 +387,10 @@ public class Shortcut : View, IOrientation, IDesignable
             else
             {
                 // Reset to default
-                //SetCommandViewDefaultLayout();
                 SetHelpViewDefaultLayout ();
-
-                //SetKeyViewDefaultLayout ();
             }
         }
     }
-
-    //private void Shortcut_MouseClick (object sender, MouseEventEventArgs e)
-    //{
-    //    // When the Shortcut is clicked, we want to invoke the Command and Set focus
-    //    var view = sender as View;
-
-    //    if (!e.Handled)
-    //    {
-    //        // If the subview (likely CommandView) didn't handle the mouse click, invoke the Select command.
-    //        // e.Handled = CommandView.InvokeCommand (Command.Select) == true;
-    //        e.Handled = InvokeCommand (Command.HotKey) == true;
-    //    }
-
-    //    //if (CanFocus)
-    //    //{
-    //    //    SetFocus ();
-    //    //}
-    //}
-
-    //private void HelpOrKeyView_MouseClick (object sender, MouseEventEventArgs e)
-    //{
-    //    // Always eat
-    //    e.Handled = true;
-    //    InvokeCommand (Command.HotKey);
-    //}
 
     #region IOrientation members
 
@@ -456,10 +414,10 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     /// <inheritdoc/>
-    public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
+    public event EventHandler<CancelEventArgs<Orientation>>? OrientationChanging;
 
     /// <inheritdoc/>
-    public event EventHandler<EventArgs<Orientation>> OrientationChanged;
+    public event EventHandler<EventArgs<Orientation>>? OrientationChanged;
 
     /// <summary>Called when <see cref="Orientation"/> has changed.</summary>
     /// <param name="newOrientation"></param>
@@ -478,6 +436,7 @@ public class Shortcut : View, IOrientation, IDesignable
     /// <summary>
     ///     Gets or sets the View that displays the command text and hotkey.
     /// </summary>
+    /// <exception cref="ArgumentNullException"></exception>
     /// <remarks>
     ///     <para>
     ///         By default, the <see cref="View.Title"/> of the <see cref="CommandView"/> is displayed as the Shortcut's
@@ -522,19 +481,20 @@ public class Shortcut : View, IOrientation, IDesignable
         get => _commandView;
         set
         {
+            ArgumentNullException.ThrowIfNull (value);
+
             if (value == null)
             {
                 throw new ArgumentNullException ();
             }
 
-            if (_commandView is { })
-            {
-                _commandView.Selected -= CommandViewOnSelected;
-                _commandView.Accepted -= CommandViewOnAccepted;
-                Remove (_commandView);
-                _commandView?.Dispose ();
-            }
+            // Clean up old 
+            _commandView.Selected -= CommandViewOnSelected;
+            _commandView.Accepted -= CommandViewOnAccepted;
+            Remove (_commandView);
+            _commandView?.Dispose ();
 
+            // Set new
             _commandView = value;
             _commandView.Id = "_commandView";
 
@@ -543,45 +503,46 @@ public class Shortcut : View, IOrientation, IDesignable
             _commandView.CanFocus = false;
 
             _commandView.HotKeyChanged += (s, e) =>
-            {
-                if (e.NewKey != Key.Empty)
-                {
-                    // Add it 
-                    AddKeyBindingsForHotKey (e.OldKey, e.NewKey);
-                }
-            };
+                                          {
+                                              if (e.NewKey != Key.Empty)
+                                              {
+                                                  // Add it
+                                                  AddKeyBindingsForHotKey (e.OldKey, e.NewKey);
+                                              }
+                                          };
 
             _commandView.HotKeySpecifier = new ('_');
 
             Title = _commandView.Text;
 
             _commandView.Selected += CommandViewOnSelected;
-            void CommandViewOnSelected (object sender, CommandEventArgs e)
-            {
-                if (e.Context.Data != this)
-                {
-                    // Forward command to ourselves
-                    InvokeCommand (Command.Select, new CommandContext (Command.Select, null, null, this));
-                    e.Cancel = true;
-                }
-                else
-                {
-                    e.Cancel = true;
-                }
-            }
 
             _commandView.Accepted += CommandViewOnAccepted;
-            void CommandViewOnAccepted (object sender, HandledEventArgs e)
-            {
-                // Always eat CommandView.Accept
-                e.Handled = true;
-            }
 
             SetCommandViewDefaultLayout ();
             SetHelpViewDefaultLayout ();
             SetKeyViewDefaultLayout ();
             ShowHide ();
             UpdateKeyBindings (Key.Empty);
+
+            return;
+
+            void CommandViewOnAccepted (object? sender, HandledEventArgs e)
+            {
+                // Always eat CommandView.Accept
+                e.Handled = true;
+            }
+
+            void CommandViewOnSelected (object? sender, CommandEventArgs e)
+            {
+                if (e.Context.Data != this)
+                {
+                    // Forward command to ourselves
+                    InvokeCommand (Command.Select, new (Command.Select, null, null, this));
+                }
+
+                e.Cancel = true;
+            }
         }
     }
 
@@ -593,7 +554,7 @@ public class Shortcut : View, IOrientation, IDesignable
         HelpView.HighlightStyle = HighlightStyle.None;
     }
 
-    private void Shortcut_TitleChanged (object sender, EventArgs<string> e)
+    private void Shortcut_TitleChanged (object? sender, EventArgs<string> e)
     {
         // If the Title changes, update the CommandView text.
         // This is a helper to make it easier to set the CommandView text.
@@ -629,14 +590,11 @@ public class Shortcut : View, IOrientation, IDesignable
     /// </summary>
     public override string Text
     {
-        get => HelpView?.Text;
+        get => HelpView.Text;
         set
         {
-            if (HelpView is { })
-            {
-                HelpView.Text = value;
-                ShowHide ();
-            }
+            HelpView.Text = value;
+            ShowHide ();
         }
     }
 
@@ -645,14 +603,11 @@ public class Shortcut : View, IOrientation, IDesignable
     /// </summary>
     public string HelpText
     {
-        get => HelpView?.Text;
+        get => HelpView.Text;
         set
         {
-            if (HelpView is { })
-            {
-                HelpView.Text = value;
-                ShowHide ();
-            }
+            HelpView.Text = value;
+            ShowHide ();
         }
     }
 
@@ -670,10 +625,7 @@ public class Shortcut : View, IOrientation, IDesignable
         get => _key;
         set
         {
-            if (value == null)
-            {
-                throw new ArgumentNullException ();
-            }
+            ArgumentNullException.ThrowIfNull (value);
 
             Key oldKey = _key;
             _key = value;
@@ -752,7 +704,7 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         KeyView.Margin.Thickness = GetMarginThickness ();
         KeyView.X = Pos.Align (Alignment.End, AlignmentModes);
-        KeyView.Y = 0; //Pos.Center ();
+        KeyView.Y = 0;
         KeyView.Width = Dim.Auto (DimAutoStyle.Text, Dim.Func (GetMinimumKeyViewSize));
         KeyView.Height = CommandView?.Visible == true ? Dim.Height (CommandView) : 1;
 
@@ -767,19 +719,8 @@ public class Shortcut : View, IOrientation, IDesignable
 
     private void UpdateKeyBindings (Key oldKey)
     {
-        if (Key != null && Key.IsValid)
+        if (Key.IsValid)
         {
-            //// Disable the command view HotKey bindings
-            //IEnumerable<Key> list = CommandView.KeyBindings.GetKeysFromCommands (Command.HotKey);
-            //foreach (Key cmdViewKey in list)
-            //{
-            //    CommandView.KeyBindings.Remove (cmdViewKey);
-            //    CommandView.KeyBindings.Remove (cmdViewKey.WithShift);
-            //    CommandView.KeyBindings.Remove (cmdViewKey.WithAlt);
-            //    CommandView.KeyBindings.Remove (cmdViewKey.WithShift.WithAlt);
-            //    KeyBindings.Add (cmdViewKey, Command.HotKey);
-            //}
-
             if (KeyBindingScope.FastHasFlags (KeyBindingScope.Application))
             {
                 if (oldKey != Key.Empty)
@@ -851,15 +792,14 @@ public class Shortcut : View, IOrientation, IDesignable
     /// <remarks>
     ///     Note, the <see cref="View.Accepted"/> event is fired first, and if cancelled, the event will not be invoked.
     /// </remarks>
-    [CanBeNull]
-    public Action Action { get; set; }
+    public Action? Action { get; set; }
 
     #endregion Accept Handling
 
     #region Focus
 
     /// <inheritdoc/>
-    public override ColorScheme ColorScheme
+    public override ColorScheme? ColorScheme
     {
         get => base.ColorScheme;
         set
@@ -910,7 +850,7 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override void OnHasFocusChanged (bool newHasFocus, View previousFocusedView, View view) { SetColors (); }
+    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view) { SetColors (); }
 
     #endregion Focus
 }

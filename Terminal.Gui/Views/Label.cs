@@ -36,7 +36,7 @@ public class Label : View, IDesignable
     {
         if (!CanFocus)
         {
-            e.Handled = InvokeCommand (Command.HotKey) == true;
+            e.Handled = InvokeCommand (Command.HotKey, ctx: new (Command.HotKey, key: null, data: this)) == true;
         }
     }
 

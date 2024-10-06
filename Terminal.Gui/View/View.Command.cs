@@ -301,6 +301,15 @@ public partial class View // Command APIs
         return null;
     }
 
+    /// <summary>
+    /// Invokes the specified command.
+    /// </summary>
+    /// <param name="command">The command to invoke.</param>
+    /// <param name="ctx">Context to pass with the invocation.</param>
+    /// <returns>
+    ///     <see langword="null"/> if no command was found. <see langword="true"/> if the command was invoked, and it
+    ///     handled (or cancelled) the command. <see langword="false"/> if the command was invoked, and it did not handle (or cancel) the command.
+    /// </returns>
     public bool? InvokeCommand (Command command, CommandContext ctx)
     {
         if (CommandImplementations.TryGetValue (command, out Func<CommandContext, bool?>? implementation))

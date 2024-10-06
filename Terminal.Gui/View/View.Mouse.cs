@@ -66,7 +66,7 @@ public partial class View // Mouse APIs
 
             _savedNonHoverColorScheme = cs;
 
-            ColorScheme = ColorScheme.GetHighlightColorScheme ();
+            ColorScheme = ColorScheme?.GetHighlightColorScheme ();
         }
 
         return false;

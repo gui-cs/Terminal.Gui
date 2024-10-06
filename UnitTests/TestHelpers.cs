@@ -42,7 +42,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     ///     <see cref="ConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
     /// </param>
     /// <param name="configLocation">Determines what config file locations <see cref="ConfigurationManager"/> will load from.</param>
-    /// <param name="VerifyShutdown">If true and <see cref="Application.IsInitialized"/> is true, the test will fail.</param>
+    /// <param name="verifyShutdown">If true and <see cref="Application.IsInitialized"/> is true, the test will fail.</param>
     public AutoInitShutdownAttribute (
         bool autoInit = true,
         Type consoleDriverType = null,
@@ -50,7 +50,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         bool fakeClipboardAlwaysThrowsNotSupportedException = false,
         bool fakeClipboardIsSupportedAlwaysTrue = false,
         ConfigLocations configLocation = ConfigLocations.None,
-        bool VerifyShutdown = false
+        bool verifyShutdown = false
     )
     {
         AutoInit = autoInit;
@@ -62,7 +62,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
             fakeClipboardAlwaysThrowsNotSupportedException;
         FakeDriver.FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
         Locations = configLocation;
-        _verifyShutdown = VerifyShutdown;
+        _verifyShutdown = verifyShutdown;
     }
 
     private bool _verifyShutdown;

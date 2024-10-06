@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -110,19 +111,23 @@ public class Shortcuts : Scenario
                 eventLog.MoveDown ();
 
                 var max = 0;
-                var toAlign = Application.Top.Subviews.Where (v => v is Shortcut { Orientation: Orientation.Vertical, Width: not DimAbsolute });
+                IEnumerable<View> toAlign = Application.Top.Subviews.Where (v => v is Shortcut { Orientation: Orientation.Vertical, Width: not DimAbsolute });
+                IEnumerable<View> enumerable = toAlign as View [] ?? toAlign.ToArray ();
 
                 if (e.NewValue == CheckState.Checked)
                 {
-                    foreach (Shortcut peer in toAlign)
+                    foreach (var view in enumerable)
                     {
+                        var peer = (Shortcut)view;
+
                         // DANGER: KeyView is internal so we can't access it. So we assume this is how it works.
                         max = Math.Max (max, peer.Key.ToString ().GetColumns ());
                     }
                 }
 
-                foreach (Shortcut peer in toAlign)
+                foreach (var view in enumerable)
                 {
+                    var peer = (Shortcut)view;
                     peer.MinimumKeyTextSize = max;
                 }
             }
@@ -145,7 +150,7 @@ public class Shortcuts : Scenario
             Key = Key.K,
             KeyBindingScope = KeyBindingScope.HotKey,
         };
-        Button button = (Button)vShortcut4.CommandView;
+        var button = (Button)vShortcut4.CommandView;
         vShortcut4.Accepted += Button_Clicked;
 
         Application.Top.Add (vShortcut4);

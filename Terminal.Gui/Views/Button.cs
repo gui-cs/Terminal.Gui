@@ -142,7 +142,7 @@ public class Button : View, IDesignable
         {
             return;
         }
-        e.Handled = InvokeCommand (Command.HotKey) == true;
+        e.Handled = InvokeCommand (Command.HotKey, ctx: new (Command.HotKey, key: null, data: this)) == true;
     }
 
     private void Button_TitleChanged (object sender, EventArgs<string> e)
