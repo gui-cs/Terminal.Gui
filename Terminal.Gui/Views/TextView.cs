@@ -180,7 +180,7 @@ internal class TextModel
     {
         if (_lines.Count > 0 && pos < _lines.Count)
         {
-            _lines [pos] = new (runes);
+            _lines [pos] = [..runes];
         }
         else if (_lines.Count == 0 || (_lines.Count > 0 && pos >= _lines.Count))
         {
@@ -1125,12 +1125,13 @@ internal partial class HistoryText
         Original,
         Replaced,
         Removed,
-        Added
+        Added,
+        Attribute
     }
 
-    private readonly List<HistoryTextItemEventArgs> _historyTextItems = new ();
+    private readonly List<HistoryTextItemEventArgs> _historyTextItems = [];
     private int _idxHistoryText = -1;
-    private string? _originalText;
+    private List<List<Cell>> _originalCellsList = [];
     public bool HasHistoryChanges => _idxHistoryText > -1;
     public bool IsFromHistory { get; private set; }
 
@@ -1165,15 +1166,51 @@ internal partial class HistoryText
 
     public event EventHandler<HistoryTextItemEventArgs>? ChangeText;
 
-    public void Clear (string text)
+    public void Clear (List<List<Cell>> cellsList)
     {
         _historyTextItems.Clear ();
         _idxHistoryText = -1;
-        _originalText = text;
+        _originalCellsList.Clear ();
+
+        foreach (List<Cell> cells in cellsList)
+        {
+            _originalCellsList.Add ([..cells]);
+        }
+
         OnChangeText (null);
     }
 
-    public bool IsDirty (string text) { return _originalText != text; }
+    public bool IsDirty (List<List<Cell>> cellsList)
+    {
+        if (cellsList.Count != _originalCellsList.Count)
+        {
+            return true;
+        }
+
+        for (var r = 0; r < cellsList.Count; r++)
+        {
+            List<Cell> cells = cellsList [r];
+            List<Cell> originalCells = _originalCellsList [r];
+
+            if (cells.Count != originalCells.Count)
+            {
+                return true;
+            }
+
+            for (var c = 0; c < cells.Count; c++)
+            {
+                Cell cell = cells [c];
+                Cell originalCell = originalCells [c];
+
+                if (!cell.Equals (originalCell))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 
     public void Redo ()
     {
@@ -1227,7 +1264,8 @@ internal partial class HistoryText
             if (_idxHistoryText - 1 > -1
                 && (_historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Added
                     || _historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Removed
-                    || (historyTextItem.LineStatus == LineStatus.Replaced && _historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Original)))
+                    || (historyTextItem.LineStatus == LineStatus.Replaced && _historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Original)
+                    || (historyTextItem.LineStatus == LineStatus.Attribute && _historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Original)))
             {
                 _idxHistoryText--;
 
@@ -1858,7 +1896,7 @@ public class TextView : View
         CursorVisibility = CursorVisibility.Default;
         Used = true;
 
-        // By default, disable hotkeys (in case someome sets Title)
+        // By default, disable hotkeys (in case someone sets Title)
         HotKeySpecifier = new ('\xffff');
 
         _model.LinesLoaded += Model_LinesLoaded!;
@@ -2264,6 +2302,15 @@ public class TextView : View
                     }
                    );
 
+        AddCommand (
+                    Command.Open,
+                    () =>
+                    {
+                        PromptForColors ();
+
+                        return true;
+                    });
+
         // Default keybindings for this view
         KeyBindings.Add (Key.PageDown, Command.PageDown);
         KeyBindings.Add (Key.V.WithCtrl, Command.PageDown);
@@ -2356,6 +2403,8 @@ public class TextView : View
 
         KeyBindings.Add (Key.G.WithCtrl, Command.DeleteAll);
         KeyBindings.Add (Key.D.WithCtrl.WithShift, Command.DeleteAll);
+
+        KeyBindings.Add (Key.L.WithCtrl, Command.Open);
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
 
@@ -2495,8 +2544,8 @@ public class TextView : View
     /// </summary>
     public bool IsDirty
     {
-        get => _historyText.IsDirty (Text);
-        set => _historyText.Clear (Text);
+        get => _historyText.IsDirty (_model.GetAllLines ());
+        set => _historyText.Clear (_model.GetAllLines ());
     }
 
     /// <summary>Gets or sets the left column.</summary>
@@ -2585,15 +2634,21 @@ public class TextView : View
     /// <summary>Length of the selected text.</summary>
     public int SelectedLength => GetSelectedLength ();
 
-    private List<List<Cell>> _selectedCellsList = [];
-
     /// <summary>
     ///     Gets the selected text as
     ///     <see>
     ///         <cref>List{List{Cell}}</cref>
     ///     </see>
     /// </summary>
-    public List<List<Cell>> SelectedCellsList => _selectedCellsList;
+    public List<List<Cell>> SelectedCellsList
+    {
+        get
+        {
+            GetRegion (out List<List<Cell>> selectedCellsList);
+
+            return selectedCellsList;
+        }
+    }
 
     /// <summary>The selected text.</summary>
     public string SelectedText
@@ -2689,7 +2744,7 @@ public class TextView : View
             OnTextChanged ();
             SetNeedsDisplay ();
 
-            _historyText.Clear (Text);
+            _historyText.Clear (_model.GetAllLines ());
         }
     }
 
@@ -2741,7 +2796,7 @@ public class TextView : View
 
 
     /// <summary>Allows clearing the <see cref="HistoryText.HistoryTextItemEventArgs"/> items updating the original text.</summary>
-    public void ClearHistoryChanges () { _historyText?.Clear (Text); }
+    public void ClearHistoryChanges () { _historyText?.Clear (_model.GetAllLines ()); }
 
     /// <summary>Closes the contents of the stream into the <see cref="TextView"/>.</summary>
     /// <returns><c>true</c>, if stream was closed, <c>false</c> otherwise.</returns>
@@ -2763,7 +2818,100 @@ public class TextView : View
     /// </remarks>
     public event EventHandler<ContentsChangedEventArgs>? ContentsChanged;
 
-    private string _copiedText;
+    internal void ApplyCellsAttribute (Attribute attribute)
+    {
+        if (!ReadOnly && SelectedLength > 0)
+        {
+            int startRow = Math.Min (SelectionStartRow, CurrentRow);
+            int endRow = Math.Max (CurrentRow, SelectionStartRow);
+            int startCol = SelectionStartRow <= CurrentRow ? SelectionStartColumn : CurrentColumn;
+            int endCol = CurrentRow >= SelectionStartRow ? CurrentColumn : SelectionStartColumn;
+            List<List<Cell>> selectedCellsOriginal = [];
+            List<List<Cell>> selectedCellsChanged = [];
+
+            for (int r = startRow; r <= endRow; r++)
+            {
+                List<Cell> line = GetLine (r);
+
+                selectedCellsOriginal.Add ([.. line]);
+
+                for (int c = r == startRow ? startCol : 0;
+                     c < (r == endRow ? endCol : line.Count);
+                     c++)
+                {
+                    Cell cell = line [c]; // Copy value to a new variable
+                    cell.Attribute = attribute; // Modify the copy
+                    line [c] = cell; // Assign the modified copy back
+                }
+
+                selectedCellsChanged.Add ([..GetLine (r)]);
+            }
+
+            GetSelectedRegion ();
+            Selecting = false;
+
+            _historyText.Add (
+                              [.. selectedCellsOriginal],
+                              new (startCol, startRow)
+                             );
+
+            _historyText.Add (
+                              [.. selectedCellsChanged],
+                              new (startCol, startRow),
+                              HistoryText.LineStatus.Attribute
+                             );
+        }
+    }
+
+    private Attribute? GetSelectedCellAttribute ()
+    {
+        List<Cell> line;
+
+        if (SelectedLength > 0)
+        {
+            line = GetLine (SelectionStartRow);
+
+            if (line [Math.Min (SelectionStartColumn, line.Count - 1)].Attribute is { } attributeSel)
+            {
+                return new (attributeSel);
+            }
+
+            return new (ColorScheme!.Focus);
+        }
+
+        line = GetCurrentLine ();
+
+        if (line [Math.Min (CurrentColumn, line.Count - 1)].Attribute is { } attribute)
+        {
+            return new (attribute);
+        }
+
+        return new (ColorScheme!.Focus);
+    }
+
+    /// <summary>
+    ///     Open a dialog to set the foreground and background colors.
+    /// </summary>
+    public void PromptForColors ()
+    {
+        if (!Colors.PromptForColors (
+                                     "Colors",
+                                     GetSelectedCellAttribute (),
+                                     out Attribute newAttribute
+                                    ))
+        {
+            return;
+        }
+
+        var attribute = new Attribute (
+                                       newAttribute.Foreground,
+                                       newAttribute.Background
+                                      );
+
+        ApplyCellsAttribute (attribute);
+    }
+
+    private string? _copiedText;
     private List<List<Cell>> _copiedCellsList = [];
 
     /// <summary>Copy the selected text to the clipboard contents.</summary>
@@ -3070,7 +3218,7 @@ public class TextView : View
         {
             SetWrapModel ();
             res = _model.LoadFile (path);
-            _historyText.Clear (Text);
+            _historyText.Clear (_model.GetAllLines ());
             ResetPosition ();
         }
         finally
@@ -3092,7 +3240,7 @@ public class TextView : View
     {
         SetWrapModel ();
         _model.LoadStream (stream);
-        _historyText.Clear (Text);
+        _historyText.Clear (_model.GetAllLines ());
         ResetPosition ();
         SetNeedsDisplay ();
         UpdateWrapModel ();
@@ -3104,7 +3252,7 @@ public class TextView : View
     {
         SetWrapModel ();
         _model.LoadCells (cells, ColorScheme?.Focus);
-        _historyText.Clear (Text);
+        _historyText.Clear (_model.GetAllLines ());
         ResetPosition ();
         SetNeedsDisplay ();
         UpdateWrapModel ();
@@ -3118,7 +3266,7 @@ public class TextView : View
         SetWrapModel ();
         InheritsPreviousAttribute = true;
         _model.LoadListCells (cellsList, ColorScheme?.Focus);
-        _historyText.Clear (Text);
+        _historyText.Clear (_model.GetAllLines ());
         ResetPosition ();
         SetNeedsDisplay ();
         UpdateWrapModel ();
@@ -4069,6 +4217,14 @@ public class TextView : View
                              null,
                              null,
                              (KeyCode)KeyBindings.GetKeyFromCommands (Command.Redo)
+                            ),
+                        new (
+                             Strings.ctxColors,
+                             "",
+                             () => PromptForColors (),
+                             null,
+                             null,
+                             (KeyCode)KeyBindings.GetKeyFromCommands (Command.Open)
                             )
                     }
                    );
@@ -4460,7 +4616,7 @@ public class TextView : View
     // Returns a string with the text in the selected 
     // region.
     //
-    private string GetRegion (
+    internal string GetRegion (
         out List<List<Cell>> cellsList,
         int? sRow = null,
         int? sCol = null,
@@ -4536,7 +4692,7 @@ public class TextView : View
 
         OnUnwrappedCursorPosition (cRow, cCol);
 
-        return GetRegion (out _selectedCellsList, sRow: startRow, sCol: startCol, cRow: cRow, cCol: cCol, model: model);
+        return GetRegion (out _, sRow: startRow, sCol: startCol, cRow: cRow, cCol: cCol, model: model);
     }
 
     private (int Row, int Col) GetUnwrappedPosition (int line, int col)
@@ -4588,12 +4744,12 @@ public class TextView : View
 
             for (var i = 0; i < obj.Lines.Count; i++)
             {
-                if (i == 0)
+                if (i == 0 || obj.LineStatus == HistoryText.LineStatus.Original || obj.LineStatus == HistoryText.LineStatus.Attribute)
                 {
                     _model.ReplaceLine (startLine, obj.Lines [i]);
                 }
-                else if ((obj.IsUndoing && obj.LineStatus == HistoryText.LineStatus.Removed)
-                         || (!obj.IsUndoing && obj.LineStatus == HistoryText.LineStatus.Added))
+                else if (obj is { IsUndoing: true, LineStatus: HistoryText.LineStatus.Removed }
+                                or { IsUndoing: false, LineStatus: HistoryText.LineStatus.Added })
                 {
                     _model.AddLine (startLine, obj.Lines [i]);
                 }
@@ -4671,7 +4827,7 @@ public class TextView : View
 
         List<Cell> line = GetCurrentLine ();
 
-        _historyText.Add (new () { new (line) }, CursorPosition);
+        _historyText.Add ([new (line)], CursorPosition);
 
         // Optimize single line
         if (lines.Count == 1)
@@ -4680,7 +4836,7 @@ public class TextView : View
             CurrentColumn += lines [0].Count;
 
             _historyText.Add (
-                              new () { new (line) },
+                              [new (line)],
                               CursorPosition,
                               HistoryText.LineStatus.Replaced
                              );
@@ -4709,7 +4865,7 @@ public class TextView : View
         }
 
         List<Cell>? rest = null;
-        var lastp = 0;
+        var lastPosition = 0;
 
         if (_model.Count > 0 && line.Count > 0 && !_copyWithoutSelection)
         {
@@ -4724,19 +4880,19 @@ public class TextView : View
 
         //model.AddLine (currentRow, lines [0]);
 
-        List<List<Cell>> addedLines = new () { new (line) };
+        List<List<Cell>> addedLines = [new (line)];
 
         for (var i = 1; i < lines.Count; i++)
         {
             _model.AddLine (CurrentRow + i, lines [i]);
 
-            addedLines.Add (new (lines [i]));
+            addedLines.Add ([..lines [i]]);
         }
 
         if (rest is { })
         {
             List<Cell> last = _model.GetLine (CurrentRow + lines.Count - 1);
-            lastp = last.Count;
+            lastPosition = last.Count;
             last.InsertRange (last.Count, rest);
 
             addedLines.Last ().InsertRange (addedLines.Last ().Count, rest);
@@ -4746,11 +4902,11 @@ public class TextView : View
 
         // Now adjust column and row positions
         CurrentRow += lines.Count - 1;
-        CurrentColumn = rest is { } ? lastp : lines [lines.Count - 1].Count;
+        CurrentColumn = rest is { } ? lastPosition : lines [^1].Count;
         Adjust ();
 
         _historyText.Add (
-                          new () { new (line) },
+                          [new (line)],
                           CursorPosition,
                           HistoryText.LineStatus.Replaced
                          );
@@ -4769,7 +4925,7 @@ public class TextView : View
 
         SetWrapModel ();
 
-        _historyText.Add (new () { new (GetCurrentLine ()) }, CursorPosition);
+        _historyText.Add ([new (GetCurrentLine ())], CursorPosition);
 
         if (Selecting)
         {
@@ -4807,7 +4963,7 @@ public class TextView : View
         }
 
         _historyText.Add (
-                          new () { new (GetCurrentLine ()) },
+                          [new (GetCurrentLine ())],
                           CursorPosition,
                           HistoryText.LineStatus.Replaced
                          );

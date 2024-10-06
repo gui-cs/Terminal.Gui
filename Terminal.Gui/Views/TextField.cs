@@ -464,7 +464,7 @@ public class TextField : View
     ///     Indicates whatever the text was changed or not. <see langword="true"/> if the text was changed
     ///     <see langword="false"/> otherwise.
     /// </summary>
-    public bool IsDirty => _historyText.IsDirty (Text);
+    public bool IsDirty => _historyText.IsDirty ([Cell.StringToCells (Text)]);
 
     /// <summary>If set to true its not allow any changes in the text.</summary>
     public bool ReadOnly { get; set; }
@@ -594,7 +594,7 @@ public class TextField : View
     }
 
     /// <summary>Allows clearing the <see cref="HistoryText.HistoryTextItemEventArgs"/> items updating the original text.</summary>
-    public void ClearHistoryChanges () { _historyText.Clear (Text); }
+    public void ClearHistoryChanges () { _historyText.Clear ([Cell.StringToCells (Text)]); }
 
     /// <summary>Copy the selected text to the clipboard.</summary>
     public virtual void Copy ()

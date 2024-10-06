@@ -72,8 +72,8 @@ public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, Ru
     public static List<List<Cell>> StringToLinesOfCells (string content, Attribute? attribute = null)
     {
         List<Cell> cells = content.EnumerateRunes ()
-                                      .Select (x => new Cell { Rune = x, Attribute = attribute })
-                                      .ToList ();
+                                  .Select (x => new Cell { Rune = x, Attribute = attribute })
+                                  .ToList ();
 
         return SplitNewLines (cells);
     }
@@ -88,6 +88,27 @@ public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, Ru
         foreach (Cell cell in cells)
         {
             str += cell.Rune.ToString ();
+        }
+
+        return str;
+    }
+
+    /// <summary>Converts a <see cref="List{Cell}"/> generic collection into a string.</summary>
+    /// <param name="cellsList">The enumerable cell to convert.</param>
+    /// <returns></returns>
+    public static string ToString (List<List<Cell>> cellsList)
+    {
+        var str = string.Empty;
+
+        for (var i = 0; i < cellsList.Count; i++)
+        {
+            IEnumerable<Cell> cellList = cellsList [i];
+            str += ToString (cellList);
+
+            if (i + 1 < cellsList.Count)
+            {
+                str += Environment.NewLine;
+            }
         }
 
         return str;

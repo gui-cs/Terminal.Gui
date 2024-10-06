@@ -4714,6 +4714,86 @@ This is the second line.
     }
 
     [Fact]
+    public void HistoryText_Undo_Redo_ApplyCellsAttribute ()
+    {
+        var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
+        var tv = new TextView { Text = text };
+
+        tv.SelectionStartColumn = 12;
+        tv.CursorPosition = new Point (18, 1);
+
+        Assert.Equal (31, tv.SelectedLength);
+        Assert.Equal ($"first line.{Environment.NewLine}This is the second", tv.SelectedText);
+        Assert.Equal ($"first line.{Environment.NewLine}This is the second", Cell.ToString (tv.SelectedCellsList));
+        Assert.Equal (new Point (18, 1), tv.CursorPosition);
+        Assert.False (tv.IsDirty);
+
+        AssertNullAttribute ();
+
+        tv.ApplyCellsAttribute (new (Color.Red, Color.Green));
+
+        AssertRedGreenAttribute ();
+
+        Assert.Equal (0, tv.SelectedLength);
+        Assert.Equal ("", tv.SelectedText);
+        Assert.Equal ($"first line.{Environment.NewLine}This is the second", Cell.ToString (tv.SelectedCellsList));
+        Assert.Equal (new Point (18, 1), tv.CursorPosition);
+        Assert.True (tv.IsDirty);
+
+        // Undo
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
+
+        AssertNullAttribute ();
+
+        Assert.Equal (12, tv.SelectionStartColumn);
+        Assert.Equal (0, tv.SelectionStartRow);
+        Assert.Equal (0, tv.SelectedLength);
+        Assert.Equal ("", tv.SelectedText);
+        Assert.Empty (tv.SelectedCellsList);
+        Assert.Equal (new Point (12, 0), tv.CursorPosition);
+        Assert.False (tv.IsDirty);
+
+        // Redo
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
+
+        AssertRedGreenAttribute ();
+
+        Assert.Equal (12, tv.SelectionStartColumn);
+        Assert.Equal (0, tv.SelectionStartRow);
+        Assert.Equal (0, tv.SelectedLength);
+        Assert.Equal ("", tv.SelectedText);
+        Assert.Empty (tv.SelectedCellsList);
+        Assert.Equal (new Point (12, 0), tv.CursorPosition);
+        Assert.True (tv.IsDirty);
+
+        void AssertNullAttribute ()
+        {
+            tv.GetRegion (out List<List<Cell>> region, 0, 12, 1, 18);
+
+            foreach (List<Cell> cells in region)
+            {
+                foreach (Cell cell in cells)
+                {
+                    Assert.Null (cell.Attribute);
+                }
+            }
+        }
+
+        void AssertRedGreenAttribute ()
+        {
+            tv.GetRegion (out List<List<Cell>> region, 0, 12, 1, 18);
+
+            foreach (List<Cell> cells in region)
+            {
+                foreach (Cell cell in cells)
+                {
+                    Assert.Equal ("[Red,Green]", cell.Attribute.ToString ());
+                }
+            }
+        }
+    }
+
+    [Fact]
     public void Internal_Tests ()
     {
         var txt = "This is a text.";

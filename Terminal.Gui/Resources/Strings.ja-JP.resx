@@ -117,26 +117,26 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ctxSelectAll" xml:space="preserve">
+    <value>全て選択 (_S)</value>
+  </data>
+  <data name="ctxDeleteAll" xml:space="preserve">
+    <value>全て削除 (_D)</value>
+  </data>
   <data name="ctxCopy" xml:space="preserve">
     <value>コピー (_C)</value>
   </data>
   <data name="ctxCut" xml:space="preserve">
     <value>切り取り (_T)</value>
   </data>
-  <data name="ctxDeleteAll" xml:space="preserve">
-    <value>全て削除 (_D)</value>
-  </data>
   <data name="ctxPaste" xml:space="preserve">
     <value>貼り付け (_P)</value>
   </data>
-  <data name="ctxRedo" xml:space="preserve">
-    <value>やり直し (_R)</value>
-  </data>
-  <data name="ctxSelectAll" xml:space="preserve">
-    <value>全て選択 (_S)</value>
-  </data>
   <data name="ctxUndo" xml:space="preserve">
     <value>元に戻す (_U)</value>
+  </data>
+  <data name="ctxRedo" xml:space="preserve">
+    <value>やり直し (_R)</value>
   </data>
   <data name="fdDirectory" xml:space="preserve">
     <value>ディレクトリ</value>
@@ -171,68 +171,35 @@
   <data name="fdDirectoryAlreadyExistsFeedback" xml:space="preserve">
     <value>同じ名前のディレクトリはすでに存在しました</value>
   </data>
-  <data name="fdDeleteBody" xml:space="preserve">
-    <value>“{0}”を削除もよろしいですか？この操作は元に戻りません</value>
-  </data>
-  <data name="fdType" xml:space="preserve">
-    <value>タイプ</value>
-  </data>
-  <data name="fdSize" xml:space="preserve">
-    <value>サイズ</value>
-  </data>
-  <data name="fdPathCaption" xml:space="preserve">
-    <value>パスを入力</value>
-  </data>
-  <data name="fdFilename" xml:space="preserve">
-    <value>ファイル名</value>
-  </data>
-  <data name="fdNewTitle" xml:space="preserve">
-    <value>新規ディレクトリ</value>
-  </data>
-  <data name="btnNo" xml:space="preserve">
-    <value>いいえ (_N)</value>
-  </data>
-  <data name="btnYes" xml:space="preserve">
-    <value>はい (_Y)</value>
-  </data>
-  <data name="fdModified" xml:space="preserve">
-    <value>変更日時</value>
-  </data>
-  <data name="fdFileOrDirectoryMustExistFeedback" xml:space="preserve">
-    <value>すでに存在したファイルまたはディレクトリを選択してください</value>
-  </data>
   <data name="fdDirectoryMustExistFeedback" xml:space="preserve">
     <value>すでに存在したディレクトリを選択してください</value>
-  </data>
-  <data name="fdFileMustExistFeedback" xml:space="preserve">
-    <value>すでに存在したファイルを選択してください</value>
-  </data>
-  <data name="fdRenamePrompt" xml:space="preserve">
-    <value>名前：</value>
-  </data>
-  <data name="fdDeleteTitle" xml:space="preserve">
-    <value>{0} を削除</value>
-  </data>
-  <data name="fdNewFailed" xml:space="preserve">
-    <value>新規失敗</value>
-  </data>
-  <data name="fdExisting" xml:space="preserve">
-    <value>既存</value>
-  </data>
-  <data name="fdRenameTitle" xml:space="preserve">
-    <value>名前を変更</value>
-  </data>
-  <data name="fdRenameFailedTitle" xml:space="preserve">
-    <value>変更失敗</value>
-  </data>
-  <data name="fdDeleteFailedTitle" xml:space="preserve">
-    <value>削除失敗</value>
   </data>
   <data name="fdFileAlreadyExistsFeedback" xml:space="preserve">
     <value>同じ名前のファイルはすでに存在しました</value>
   </data>
+  <data name="fdFileMustExistFeedback" xml:space="preserve">
+    <value>すでに存在したファイルを選択してください</value>
+  </data>
+  <data name="fdFilename" xml:space="preserve">
+    <value>ファイル名</value>
+  </data>
+  <data name="fdFileOrDirectoryMustExistFeedback" xml:space="preserve">
+    <value>すでに存在したファイルまたはディレクトリを選択してください</value>
+  </data>
+  <data name="fdModified" xml:space="preserve">
+    <value>変更日時</value>
+  </data>
+  <data name="fdPathCaption" xml:space="preserve">
+    <value>パスを入力</value>
+  </data>
   <data name="fdSearchCaption" xml:space="preserve">
     <value>検索を入力</value>
+  </data>
+  <data name="fdSize" xml:space="preserve">
+    <value>サイズ</value>
+  </data>
+  <data name="fdType" xml:space="preserve">
+    <value>タイプ</value>
   </data>
   <data name="fdWrongFileTypeFeedback" xml:space="preserve">
     <value>ファイルタイプが間違っでいます</value>
@@ -240,11 +207,38 @@
   <data name="fdAnyFiles" xml:space="preserve">
     <value>任意ファイル</value>
   </data>
-  <data name="btnCancel" xml:space="preserve">
-    <value>キャンセル (_C)</value>
+  <data name="fdDeleteBody" xml:space="preserve">
+    <value>“{0}”を削除もよろしいですか？この操作は元に戻りません</value>
   </data>
-  <data name="btnOk" xml:space="preserve">
-    <value>OK (_O)</value>
+  <data name="fdDeleteFailedTitle" xml:space="preserve">
+    <value>削除失敗</value>
+  </data>
+  <data name="fdDeleteTitle" xml:space="preserve">
+    <value>{0} を削除</value>
+  </data>
+  <data name="fdNewFailed" xml:space="preserve">
+    <value>新規失敗</value>
+  </data>
+  <data name="fdNewTitle" xml:space="preserve">
+    <value>新規ディレクトリ</value>
+  </data>
+  <data name="btnNo" xml:space="preserve">
+    <value>いいえ (_N)</value>
+  </data>
+  <data name="fdRenameFailedTitle" xml:space="preserve">
+    <value>変更失敗</value>
+  </data>
+  <data name="fdRenamePrompt" xml:space="preserve">
+    <value>名前：</value>
+  </data>
+  <data name="fdRenameTitle" xml:space="preserve">
+    <value>名前を変更</value>
+  </data>
+  <data name="btnYes" xml:space="preserve">
+    <value>はい (_Y)</value>
+  </data>
+  <data name="fdExisting" xml:space="preserve">
+    <value>既存</value>
   </data>
   <data name="btnOpen" xml:space="preserve">
     <value>開く (_O)</value>
@@ -254,6 +248,12 @@
   </data>
   <data name="btnSaveAs" xml:space="preserve">
     <value>名前を付けて保存 (_S)</value>
+  </data>
+  <data name="btnOk" xml:space="preserve">
+    <value>OK (_O)</value>
+  </data>
+  <data name="btnCancel" xml:space="preserve">
+    <value>キャンセル (_C)</value>
   </data>
   <data name="fdCtxDelete" xml:space="preserve">
     <value>削除 (_D)</value>
@@ -275,5 +275,8 @@
   </data>
   <data name="dpTitle" xml:space="preserve">
     <value>日付ピッカー</value>
+  </data>
+  <data name="ctxColors" xml:space="preserve">
+    <value>絵の具 (_L)</value>
   </data>
 </root>
