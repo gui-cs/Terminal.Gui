@@ -104,7 +104,7 @@ public class HexViewTests
 
         Assert.Equal (new (1, 1), hv.CursorPosition);
 
-        Assert.True (hv.NewKeyDownEvent (Key.Enter));
+        Assert.True (hv.NewKeyDownEvent (Key.Tab));
         Assert.True (hv.NewKeyDownEvent (Key.CursorRight.WithCtrl));
         Assert.Equal (hv.CursorPosition.X, hv.BytesPerLine);
         Assert.True (hv.NewKeyDownEvent (Key.Home));
@@ -134,7 +134,7 @@ public class HexViewTests
 
         Assert.Equal (new (1, 1), hv.CursorPosition);
 
-        Assert.True (hv.NewKeyDownEvent (Key.Enter));
+        Assert.True (hv.NewKeyDownEvent (Key.Tab));
         Assert.True (hv.NewKeyDownEvent (Key.CursorRight.WithCtrl));
         Assert.Equal (hv.CursorPosition.X, hv.BytesPerLine);
         Assert.True (hv.NewKeyDownEvent (Key.Home));
@@ -233,7 +233,7 @@ public class HexViewTests
         Assert.Equal (4, hv.BytesPerLine);
 
         // right side only needed to press one time
-        Assert.True (hv.NewKeyDownEvent (Key.Enter));
+        Assert.True (hv.NewKeyDownEvent (Key.Tab));
 
         Assert.True (hv.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (2, hv.Position);
@@ -299,7 +299,7 @@ public class HexViewTests
         Assert.Equal (2, hv.Position);
 
         // right side only needed to press one time
-        Assert.True (hv.NewKeyDownEvent (Key.Enter));
+        Assert.True (hv.NewKeyDownEvent (Key.Tab));
         Assert.Equal (63, hv.Source.Position);
         Assert.Equal (2, hv.Position);
         Assert.True (hv.NewKeyDownEvent (Key.CursorLeft));
@@ -333,7 +333,7 @@ public class HexViewTests
         Assert.Equal (2, hv.Position);
 
         // right side only needed to press one time
-        Assert.True (hv.NewKeyDownEvent (Key.Enter));
+        Assert.True (hv.NewKeyDownEvent (Key.Tab));
         Assert.Equal (126, hv.Source.Position);
         Assert.Equal (2, hv.Position);
         Assert.True (hv.NewKeyDownEvent (Key.CursorLeft));
