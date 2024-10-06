@@ -5852,6 +5852,11 @@ public class TextView : View
         // if the user presses Left (without any control keys) and they are at the start of the text
         if (CurrentColumn == 0 && CurrentRow == 0)
         {
+            if (Selecting)
+            {
+                StopSelecting ();
+                return true;
+            }
             // do not respond (this lets the key press fall through to navigation system - which usually changes focus backward)
             return false;
         }
