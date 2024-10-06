@@ -83,14 +83,14 @@ public partial class View // Command APIs
 
             if (isDefaultView != this && isDefaultView is Button { IsDefault: true } button)
             {
-                bool? handled = isDefaultView.InvokeCommand (Command.Accept);
+                bool? handled = isDefaultView.InvokeCommand (Command.Accept, ctx: new (Command.Accept, null, null, this));
                 if (handled == true)
                 {
                     return true;
                 }
             }
 
-            return SuperView?.InvokeCommand (Command.Accept) == true;
+            return SuperView?.InvokeCommand (Command.Accept, ctx: new (Command.Accept, null, null, this)) == true;
         }
 
         return Accepted is null ? null : args.Handled;

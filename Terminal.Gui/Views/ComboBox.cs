@@ -33,20 +33,17 @@ public class ComboBox : View, IDesignable
         _listview = new ComboListView (this, HideDropdownListOnClick) { CanFocus = true, TabStop = TabBehavior.NoStop };
 
         _search.TextChanged += Search_Changed;
-        _search.Accepted += Search_Accept;
 
         _listview.Y = Pos.Bottom (_search);
         _listview.OpenSelectedItem += (sender, a) => Selected ();
+        _listview.Accepted += (sender, args) =>
+                              {
+                                  // This prevents Accepted from bubbling up to the combobox
+                                  args.Handled = true;
 
-        Add (_search, _listview);
-
-        // BUGBUG: This should not be needed; LayoutComplete will handle
-        Initialized += (s, e) => ProcessLayout ();
-
-        // On resize
-        LayoutComplete += (sender, a) => ProcessLayout ();
-        ;
-
+                                  // But OpenSelectedItem won't be fired because of that. So do it here.
+                                  Selected ();
+                              };
         _listview.SelectedItemChanged += (sender, e) =>
                                          {
                                              if (!HideDropdownListOnClick && _searchSet.Count > 0)
@@ -54,6 +51,13 @@ public class ComboBox : View, IDesignable
                                                  SetValue (_searchSet [_listview.SelectedItem]);
                                              }
                                          };
+        Add (_search, _listview);
+
+        // BUGBUG: This should not be needed; LayoutComplete will handle
+        Initialized += (s, e) => ProcessLayout ();
+
+        // On resize
+        LayoutComplete += (sender, a) => ProcessLayout ();
 
         Added += (s, e) =>
                  {
@@ -74,7 +78,14 @@ public class ComboBox : View, IDesignable
                  };
 
         // Things this view knows how to do
-        AddCommand (Command.Accept, () => ActivateSelected ());
+        AddCommand (Command.Accept, (ctx) =>
+                                    {
+                                        if (ctx.Data == _search)
+                                        {
+                                            return null;
+                                        }
+                                        return ActivateSelected ();
+                                    });
         AddCommand (Command.Toggle, () => ExpandCollapse ());
         AddCommand (Command.Expand, () => Expand ());
         AddCommand (Command.Collapse, () => Collapse ());
@@ -387,7 +398,7 @@ public class ComboBox : View, IDesignable
         {
             if (Selected ())
             {
-                //return false;
+                return false;
             }
 
             return RaiseAccepted () == true;
@@ -658,12 +669,6 @@ public class ComboBox : View, IDesignable
         SetSearchSet ();
     }
 
-    // Tell TextField to handle Accepted Command (Enter)
-    void Search_Accept (object sender, HandledEventArgs e)
-    {
-        e.Handled = true;
-    }
-
     private void Search_Changed (object sender, EventArgs e)
     {
         if (_source is null)
@@ -801,7 +806,6 @@ public class ComboBox : View, IDesignable
         _listview.Clear ();
         _listview.Height = CalculateHeight ();
         SuperView?.MoveSubviewToStart (this);
-        _listview.SetFocus ();
     }
 
     private bool UnixEmulation ()
