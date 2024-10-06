@@ -6,9 +6,6 @@
 //
 
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Threading.Channels;
 
 namespace Terminal.Gui;
 
@@ -388,7 +385,7 @@ public class ComboBox : View, IDesignable
         {
             Selected ();
 
-            return true;
+            return RaiseAccepted () == true;
         }
 
         return false;
