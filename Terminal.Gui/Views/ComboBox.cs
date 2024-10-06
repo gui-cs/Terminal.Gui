@@ -35,14 +35,14 @@ public class ComboBox : View, IDesignable
         _search.TextChanged += Search_Changed;
 
         _listview.Y = Pos.Bottom (_search);
-        _listview.OpenSelectedItem += (sender, a) => Selected ();
+        _listview.OpenSelectedItem += (sender, a) => SelectText ();
         _listview.Accepted += (sender, args) =>
                               {
                                   // This prevents Accepted from bubbling up to the combobox
                                   args.Handled = true;
 
                                   // But OpenSelectedItem won't be fired because of that. So do it here.
-                                  Selected ();
+                                  SelectText ();
                               };
         _listview.SelectedItemChanged += (sender, e) =>
                                          {
@@ -396,7 +396,7 @@ public class ComboBox : View, IDesignable
     {
         if (HasItems ())
         {
-            if (Selected ())
+            if (SelectText ())
             {
                 return false;
             }
@@ -728,7 +728,7 @@ public class ComboBox : View, IDesignable
         }
     }
 
-    private bool Selected ()
+    private bool SelectText ()
     {
         IsShow = false;
         _listview.TabStop = TabBehavior.NoStop;

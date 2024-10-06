@@ -385,7 +385,7 @@ internal sealed class Menu : View
             return GetFocusColor ();
         }
 
-        return !item.IsEnabled () ? ColorScheme.Disabled : GetNormalColor ();
+        return !item.IsEnabled () ? ColorScheme!.Disabled : GetNormalColor ();
     }
 
     public override void OnDrawContent (Rectangle viewport)

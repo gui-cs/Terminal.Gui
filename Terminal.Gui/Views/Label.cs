@@ -8,13 +8,10 @@
 /// </summary>
 /// <remarks>
 ///     <para>
-///         <see cref="Label.Title"/> and <see cref="Label.Text"/> are the same property. When <see cref="Label.Title"/> is
-///         set
-///         <see cref="Label.Text"/> is also set. When <see cref="Label.Text"/> is set <see cref="Label.Title"/> is also
-///         set.
+///         Title and Text are the same property. When Title is set Text s also set. When Text is set Title is also set.
 ///     </para>
 ///     <para>
-///         If <see cref="Label.CanFocus"/> is <see langword="false"/> and the use clicks on the Label,
+///         If <see cref="View.CanFocus"/> is <see langword="false"/> and the use clicks on the Label,
 ///         the <see cref="Command.HotKey"/> will be invoked on the next <see cref="View"/> in
 ///         <see cref="View.Subviews"/>."
 ///     </para>
@@ -91,6 +88,7 @@ public class Label : View, IDesignable
     bool IDesignable.EnableForDesign ()
     {
         Text = "_Label";
+
         return true;
     }
 }

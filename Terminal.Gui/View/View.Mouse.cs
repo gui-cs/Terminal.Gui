@@ -57,7 +57,7 @@ public partial class View // Mouse APIs
                 return args.Cancel;
             }
 
-            ColorScheme cs = ColorScheme;
+            ColorScheme? cs = ColorScheme;
 
             if (cs is null)
             {
