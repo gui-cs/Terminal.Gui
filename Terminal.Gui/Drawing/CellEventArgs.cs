@@ -1,7 +1,7 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>Args for events that relate to a specific <see cref="Cell"/>.</summary>
-public class CellEventArgs
+public record struct CellEventArgs
 {
     /// <summary>Creates a new instance of the <see cref="CellEventArgs"/> class.</summary>
     /// <param name="line">The line.</param>
