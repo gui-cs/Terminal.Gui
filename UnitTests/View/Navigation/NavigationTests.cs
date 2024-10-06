@@ -61,6 +61,12 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
                 case TabBehavior.TabGroup:
                     Application.OnKeyDown (key);
 
+                    if (view.HasFocus)
+                    {
+                        // Try once more (HexView)
+                        Application.OnKeyDown (key);
+                    }
+
                     break;
                 default:
                     Application.OnKeyDown (Key.Tab);

@@ -156,7 +156,7 @@ public class ApplicationTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [AutoInitShutdown (VerifyShutdown: true)]
     public void Begin_Sets_Application_Top_To_Console_Size ()
     {
         Assert.Null (Application.Top);
@@ -521,7 +521,7 @@ public class ApplicationTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [AutoInitShutdown (VerifyShutdown: true)]
     public void Internal_Properties_Correct ()
     {
         Assert.True (Application.IsInitialized);
