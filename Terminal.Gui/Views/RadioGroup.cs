@@ -50,7 +50,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                     });
 
         // Accept (Enter key) - Raise Accept event - DO NOT advance state
-        AddCommand (Command.Accept, () => RaiseAccepted());
+        AddCommand (Command.Accept, () => RaiseAccepted ());
 
         // Hotkey - ctx may indicate a radio item hotkey was pressed. Beahvior depends on HasFocus
         //          If HasFocus and it's this.HotKey invoke Select command - DO NOT raise Accept
@@ -99,6 +99,11 @@ public class RadioGroup : View, IDesignable, IOrientation
                                     }
                                     return false;
                                 }
+
+                                if (RaiseHotKeyHandled () == true)
+                                {
+                                    return true;
+                                };
 
                                 // Default Command.Hotkey sets focus
                                 SetFocus ();

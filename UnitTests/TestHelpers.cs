@@ -742,7 +742,7 @@ public class TestsAllViews
     public static IEnumerable<object []> AllViewTypes =>
         typeof (View).Assembly
                      .GetTypes ()
-                     .Where (type => type.IsClass && !type.IsAbstract && type.IsPublic && type.IsSubclassOf (typeof (View)))
+                     .Where (type => type.IsClass && !type.IsAbstract && type.IsPublic && (type.IsSubclassOf (typeof (View)) || type == typeof(View)))
                      .Select (type => new object [] { type });
 
     public static View CreateInstanceIfNotGeneric (Type type)

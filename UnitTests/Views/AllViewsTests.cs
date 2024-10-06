@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Reflection;
+using System.Text;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -161,6 +162,52 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         {
             Assert.Equal (0, selectedCount);
             Assert.Equal (1, acceptedCount);
+        }
+    }
+
+
+    [Theory]
+    [MemberData (nameof (AllViewTypes))]
+    public void AllViews_Command_HotKey_Raises_HotKeyHandled (Type viewType)
+    {
+        var view = (View)CreateInstanceIfNotGeneric (viewType);
+
+        if (view == null)
+        {
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
+
+            return;
+        }
+
+        if (view is IDesignable designable)
+        {
+            designable.EnableForDesign ();
+        }
+        else
+        {
+            view.HotKey = Key.T;
+        }
+
+        var selectedCount = 0;
+        view.Selected += (s, e) => selectedCount++;
+
+        var acceptedCount = 0;
+        view.Accepted += (s, e) =>
+                         {
+                             acceptedCount++;
+                         };
+
+        var hotkeyHandledCount = 0;
+        view.HotKeyHandled += (s, e) =>
+                         {
+                             hotkeyHandledCount++;
+                         };
+
+        if (view.InvokeCommand (Command.HotKey) == true)
+        {
+            Assert.Equal (1, hotkeyHandledCount);
+            Assert.Equal (0, selectedCount);
+            Assert.Equal (0, acceptedCount);
         }
     }
 }

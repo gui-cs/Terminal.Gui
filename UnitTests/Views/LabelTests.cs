@@ -1320,9 +1320,20 @@ e
     [Fact]
     public void CanFocus_False_HotKey_SetsFocus_Next ()
     {
-        View otherView = new () { Text = "otherView", CanFocus = true };
-        Label label = new () { Text = "_label" };
-        View nextView = new () { Text = "nextView", CanFocus = true };
+        View otherView = new ()
+        {
+            Text = "otherView",
+            CanFocus = true
+        };
+        Label label = new ()
+        {
+            Text = "_label"
+        };
+        View nextView = new ()
+        {
+            Text = "nextView",
+            CanFocus = true
+        };
         Application.Navigation = new ();
         Application.Top = new ();
         Application.Top.Add (otherView, label, nextView);
@@ -1330,7 +1341,6 @@ e
         Application.Top.SetFocus ();
         Assert.True (otherView.HasFocus);
 
-        // No focused view accepts Tab, and there's no other view to focus, so OnKeyDown returns false
         Assert.True (Application.OnKeyDown (label.HotKey));
         Assert.False (otherView.HasFocus);
         Assert.False (label.HasFocus);
@@ -1365,23 +1375,30 @@ e
     [Fact]
     public void CanFocus_True_HotKey_SetsFocus ()
     {
-        Label label = new () { Text = "_label" };
-        View view = new () { Text = "view", CanFocus = true };
+        Label label = new ()
+        {
+            Text = "_label",
+            CanFocus = true
+        };
+        View view = new ()
+        {
+            Text = "view",
+            CanFocus = true
+        };
         Application.Navigation = new ();
         Application.Top = new ();
         Application.Top.Add (label, view);
 
-        Application.Top.SetFocus ();
-        Assert.Equal (view, Application.Top.MostFocused);
-        Assert.False (label.CanFocus);
+        view.SetFocus ();
+        Assert.True (label.CanFocus);
         Assert.False (label.HasFocus);
         Assert.True (view.CanFocus);
         Assert.True (view.HasFocus);
 
         // No focused view accepts Tab, and there's no other view to focus, so OnKeyDown returns false
         Assert.True (Application.OnKeyDown (label.HotKey));
-        Assert.False (label.HasFocus);
-        Assert.True (view.HasFocus);
+        Assert.True (label.HasFocus);
+        Assert.False (view.HasFocus);
 
         Application.Top.Dispose ();
         Application.ResetState ();

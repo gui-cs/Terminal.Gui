@@ -5338,7 +5338,7 @@ This is the second line.
         tv.AllowsReturn = false;
         Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.False (tv.Selecting);
-        Assert.True (tv.NewKeyDownEvent (Key.Enter));
+        Assert.False (tv.NewKeyDownEvent (Key.Enter)); // Accepted event not handled
         Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third ", tv.Text);
         Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
@@ -8476,28 +8476,28 @@ line.
 
     [Theory]
     [InlineData (false, 1)]
-    [InlineData (true, 0)]
-    public void Accept_Command_Fires_Accept_Based_On_AllowsReturn (bool allowsReturn, int expectedAcceptEvents)
+    [InlineData (true, 1)]
+    public void Accepted_Command_Raises_Accepted_Regardles_Of_AllowsReturn (bool allowsReturn, int expectedAcceptEvents)
     {
         var view = new TextView ()
         {
             AllowsReturn = allowsReturn,
         };
 
-        int acceptEvents = 0;
+        int acceptedEvents = 0;
         view.Accepted += Accept;
         view.InvokeCommand (Command.Accept);
-        Assert.Equal (expectedAcceptEvents, acceptEvents);
+        Assert.Equal (expectedAcceptEvents, acceptedEvents);
 
         return;
 
-        void Accept (object sender, HandledEventArgs e) { acceptEvents++; }
+        void Accept (object sender, HandledEventArgs e) { acceptedEvents++; }
     }
 
     [Theory]
     [InlineData (false, 1)]
     [InlineData (true, 0)]
-    public void Enter_Key_Fires_Accept_BasedOn_AllowsReturn (bool allowsReturn, int expectedAccepts)
+    public void Enter_Key_Fires_Accepted_BasedOn_AllowsReturn (bool allowsReturn, int expectedAccepts)
     {
         var view = new TextView ()
         {
@@ -8517,7 +8517,7 @@ line.
     [Theory]
     [InlineData (false, 1)]
     [InlineData (true, 0)]
-    public void Enter_Key_Fires_Accept_BasedOn_Multiline (bool multiline, int expectedAccepts)
+    public void Enter_Key_Fires_Accepted_BasedOn_Multiline (bool multiline, int expectedAccepts)
     {
         var view = new TextView ()
         {
@@ -8539,7 +8539,7 @@ line.
     [InlineData (false, true, 1, 0)]
     [InlineData (true, false, 0, 0)]
     [InlineData (true, true, 0, 0)]
-    public void Accept_Event_Handled_Prevents_Default_Button_Accept (bool multiline, bool handleAccept, int expectedAccepts, int expectedButtonAccepts)
+    public void Accepted_Event_Handled_Prevents_Default_Button_Accept (bool multiline, bool handleAccept, int expectedAccepts, int expectedButtonAccepts)
     {
         var superView = new Window ();
         var tv = new TextView ()
@@ -8588,7 +8588,7 @@ line.
     [Theory]
     [InlineData (true, 0)]
     [InlineData (false, 1)]
-    public void Accept_No_Handler_Enables_Default_Button_Accept (bool multiline, int expectedButtonAccept)
+    public void Accepted_No_Handler_Enables_Default_Button_Accept (bool multiline, int expectedButtonAccept)
     {
         var superView = new Window ();
         var tv = new TextView ()

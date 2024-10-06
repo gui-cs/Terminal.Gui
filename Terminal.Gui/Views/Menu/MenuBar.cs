@@ -121,9 +121,12 @@ public class MenuBar : View, IDesignable
                     Command.Accept,
                     () =>
                     {
-                        ProcessMenu (_selected, Menus [_selected]);
+                        if (Menus.Length > 0)
+                        {
+                            ProcessMenu (_selected, Menus [_selected]);
+                        }
 
-                        return true;
+                        return RaiseAccepted ();
                     }
                    );
         AddCommand (Command.Toggle, ctx =>
@@ -134,7 +137,7 @@ public class MenuBar : View, IDesignable
                                                   });
         AddCommand (Command.Select, ctx =>
                                     {
-                                        var res =  Run ((ctx.KeyBinding?.Context as MenuItem)?.Action!);
+                                        var res = Run ((ctx.KeyBinding?.Context as MenuItem)?.Action!);
                                         CloseAllMenus ();
 
                                         return res;
@@ -1153,11 +1156,11 @@ public class MenuBar : View, IDesignable
         SetNeedsDisplay ();
     }
 
-    private void ProcessMenu (int i, MenuBarItem mi)
+    private bool ProcessMenu (int i, MenuBarItem mi)
     {
         if (_selected < 0 && IsMenuOpen)
         {
-            return;
+            return false;
         }
 
         if (mi.IsTopLevel)
@@ -1180,16 +1183,18 @@ public class MenuBar : View, IDesignable
                                    )
                 && !CloseMenu ())
             {
-                return;
+                return true;
             }
 
             if (!OpenCurrentMenu.CheckSubMenu ())
             {
-                return;
+                return true;
             }
         }
 
         SetNeedsDisplay ();
+
+        return true;
     }
 
     private void RemoveSubMenu (int index, bool ignoreUseSubMenusSingleFrame = false)

@@ -19,9 +19,14 @@ public partial class View // Command APIs
         AddCommand (Command.HotKey,
                     () =>
                     {
+                        if (RaiseHotKeyHandled () is true)
+                        {
+                            return true;
+                        }
+
                         SetFocus ();
 
-                        return RaiseHotKeyHandled ();
+                        return true;
                     });
 
         // Space or single-click - Raise Selected

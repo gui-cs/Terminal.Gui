@@ -777,7 +777,7 @@ public class TextFieldTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Accept_Command_Fires_Accept ()
+    public void Accepted_Command_Fires_Accept ()
     {
         var view = new TextField ();
 
@@ -794,7 +794,7 @@ public class TextFieldTests (ITestOutputHelper output)
     [Theory]
     [InlineData (false, 1)]
     [InlineData (true, 0)]
-    public void Accept_Handler_Handled_Prevents_Default_Button_Accept (bool handleAccept, int expectedButtonAccepts)
+    public void Accepted_Handler_Handled_Prevents_Default_Button_Accept (bool handleAccept, int expectedButtonAccepts)
     {
         var superView = new Window ()
         {
@@ -846,7 +846,7 @@ public class TextFieldTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Accept_No_Handler_Enables_Default_Button_Accept ()
+    public void Accepted_No_Handler_Enables_Default_Button_Accept ()
     {
         var superView = new Window ()
         {
@@ -887,7 +887,7 @@ public class TextFieldTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Accept_Cancel_Event_HandlesCommand ()
+    public void Accepted_Cancel_Event_HandlesCommand ()
     {
         //var super = new View ();
         var view = new TextField ();

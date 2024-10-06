@@ -140,7 +140,12 @@ public class ListView : View, IDesignable
         // Accept (Enter key) - Raise Accept event - DO NOT advance state
         AddCommand (Command.Accept, () =>
                                     {
-                                        if (OnOpenSelectedItem () && RaiseAccepted () == true)
+                                        if (RaiseAccepted () == true)
+                                        {
+                                            return true;
+                                        }
+
+                                        if (OnOpenSelectedItem ())
                                         {
                                                 return true;
                                         }
@@ -153,7 +158,12 @@ public class ListView : View, IDesignable
                                     {
                                         if (_allowsMarking)
                                         {
-                                            if (MarkUnmarkSelectedItem () && RaiseSelected () == true)
+                                            if (RaiseSelected () == true)
+                                            {
+                                                return true;
+                                            }
+
+                                            if (MarkUnmarkSelectedItem ())
                                             {
                                                 return true;
                                             }

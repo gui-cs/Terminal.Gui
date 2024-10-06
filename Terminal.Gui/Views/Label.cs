@@ -19,7 +19,7 @@
 ///         <see cref="View.Subviews"/>."
 ///     </para>
 /// </remarks>
-public class Label : View
+public class Label : View, IDesignable
 {
     /// <inheritdoc/>
     public Label ()
@@ -65,18 +65,32 @@ public class Label : View
 
     private bool? InvokeHotKeyOnNext (CommandContext context)
     {
+        if (RaiseHotKeyHandled () == true)
+        {
+            return true;
+        }
+
         if (CanFocus)
         {
-            return SetFocus ();
+            SetFocus ();
+
+            return true;
         }
 
         int me = SuperView?.Subviews.IndexOf (this) ?? -1;
 
         if (me != -1 && me < SuperView?.Subviews.Count - 1)
         {
-            SuperView?.Subviews [me + 1].InvokeCommand (Command.HotKey, context.Key, context.KeyBinding);
+            return SuperView?.Subviews [me + 1].InvokeCommand (Command.HotKey, context.Key, context.KeyBinding) == true;
         }
 
+        return false;
+    }
+
+    /// <inheritdoc/>
+    bool IDesignable.EnableForDesign ()
+    {
+        Text = "_Label";
         return true;
     }
 }
