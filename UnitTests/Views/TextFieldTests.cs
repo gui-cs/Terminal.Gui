@@ -2027,6 +2027,27 @@ Les Miśerables",
         Assert.Equal (2, superView.Subviews.Count);
     }
 
+    [Fact]
+    public void Right_CursorAtEnd_WithSelection_ShouldClearSelection ()
+    {
+        var tf = new TextField
+        {
+            Text = "Hello",
+        };
+        tf.SetFocus ();
+        tf.SelectAll ();
+        tf.CursorPosition = 5;
+
+        // When there is selected text and the cursor is at the end of the text field
+        Assert.Equal ("Hello",tf.SelectedText);
+
+        // Pressing right should not move focus, instead it should clear selection
+        Assert.True(tf.NewKeyDownEvent (Key.CursorRight));
+        Assert.Null (tf.SelectedText);
+
+        // Now that the selection is cleared another right keypress should move focus
+        Assert.False (tf.NewKeyDownEvent (Key.CursorRight));
+    }
 
     [Fact]
     public void Autocomplete_Visible_False_By_Default ()

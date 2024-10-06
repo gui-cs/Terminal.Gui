@@ -1531,19 +1531,27 @@ public class TextField : View
         }
     }
 
+    /// <summary>
+    /// Moves the cursor +/- the given <paramref name="distance"/>, clearing
+    /// any selection and returning true if any meaningful changes were made.
+    /// </summary>
+    /// <param name="distance">Distance to move the cursor, will be clamped to
+    /// text length. Positive for right, Negative for left.</param>
+    /// <returns></returns>
+    private bool Move (int distance)
+    {
+        var oldCursorPosition = _cursorPosition;
+        var hadSelection = _selectedText != null && _selectedText.Length > 0;
+
+        _cursorPosition = Math.Min (_text.Count, Math.Max (0, _cursorPosition + distance));
+        ClearAllSelection ();
+        Adjust ();
+
+        return _cursorPosition != oldCursorPosition || hadSelection;
+    }
     private bool MoveLeft ()
     {
-
-        if (_cursorPosition > 0)
-        {
-            ClearAllSelection ();
-            _cursorPosition--;
-            Adjust ();
-
-            return true;
-        }
-
-        return false;
+        return Move (-1);
     }
 
     private void MoveLeftExtend ()
@@ -1556,17 +1564,7 @@ public class TextField : View
 
     private bool MoveRight ()
     {
-        if (_cursorPosition == _text.Count)
-        {
-            return false;
-        }
-
-        ClearAllSelection ();
-
-        _cursorPosition++;
-        Adjust ();
-
-        return true;
+        return Move (1);
     }
 
     private void MoveRightExtend ()
