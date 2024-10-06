@@ -137,6 +137,11 @@ public class MenuBar : View, IDesignable
                                                   });
         AddCommand (Command.Select, ctx =>
                                     {
+                                        if (ctx.KeyBinding?.Context is MouseEvent)
+                                        {
+                                            // HACK: Work around the fact that View.MouseClick always invokes Select
+                                            return false;
+                                        }
                                         var res = Run ((ctx.KeyBinding?.Context as MenuItem)?.Action!);
                                         CloseAllMenus ();
 
@@ -595,6 +600,10 @@ public class MenuBar : View, IDesignable
                     _previousFocused.SetFocus ();
                 }
 
+                if (Application.MouseGrabView == _openMenu)
+                {
+                    Application.UngrabMouse();
+                }
                 _openMenu?.Dispose ();
                 _openMenu = null;
 
@@ -621,6 +630,10 @@ public class MenuBar : View, IDesignable
                     if (OpenCurrentMenu is { })
                     {
                         Application.Top?.Remove (OpenCurrentMenu);
+                        if (Application.MouseGrabView == OpenCurrentMenu)
+                        {
+                            Application.UngrabMouse ();
+                        }
                         OpenCurrentMenu.Dispose ();
                         OpenCurrentMenu = null;
                     }
@@ -805,6 +818,10 @@ public class MenuBar : View, IDesignable
                 if (_openMenu is { })
                 {
                     Application.Top?.Remove (_openMenu);
+                    if (Application.MouseGrabView == _openMenu)
+                    {
+                        Application.UngrabMouse ();
+                    }
                     _openMenu.Dispose ();
                     _openMenu = null;
                 }
@@ -992,6 +1009,10 @@ public class MenuBar : View, IDesignable
             foreach (Menu item in _openSubMenu)
             {
                 Application.Top!.Remove (item);
+                if (Application.MouseGrabView == item)
+                {
+                    Application.UngrabMouse ();
+                }
                 item.Dispose ();
             }
         }
@@ -1168,6 +1189,10 @@ public class MenuBar : View, IDesignable
             Point screen = ViewportToScreen (new Point (0, i));
             var menu = new Menu { Host = this, X = screen.X, Y = screen.Y, BarItems = mi };
             menu.Run (mi.Action);
+            if (Application.MouseGrabView == menu)
+            {
+                Application.UngrabMouse ();
+            }
             menu.Dispose ();
         }
         else
@@ -1413,6 +1438,11 @@ public class MenuBar : View, IDesignable
                             Point screen = ViewportToScreen (new Point (0, i));
                             var menu = new Menu { Host = this, X = screen.X, Y = screen.Y, BarItems = Menus [i] };
                             menu.Run (Menus [i].Action);
+                            if (Application.MouseGrabView == menu)
+                            {
+                                Application.UngrabMouse ();
+                            }
+
                             menu.Dispose ();
                         }
                         else if (!IsMenuOpen)
