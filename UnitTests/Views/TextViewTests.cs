@@ -6271,6 +6271,7 @@ This is the second line.
 
         //                                             TAB to jump between text fields.
         TestHelpers.AssertDriverAttributesAre ("0000000", Application.Driver, attributes);
+        Assert.Empty (_textView.SelectedCellsList);
 
         _textView.NewKeyDownEvent (Key.CursorRight.WithCtrl.WithShift);
 
@@ -6280,6 +6281,7 @@ This is the second line.
 
         //                                             TAB to jump between text fields.
         TestHelpers.AssertDriverAttributesAre ("1111000", Application.Driver, attributes);
+        Assert.Equal ("TAB ", Cell.ToString (_textView.SelectedCellsList [^1]));
         top.Dispose ();
     }
 

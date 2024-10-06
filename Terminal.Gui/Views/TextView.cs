@@ -2585,6 +2585,16 @@ public class TextView : View
     /// <summary>Length of the selected text.</summary>
     public int SelectedLength => GetSelectedLength ();
 
+    private List<List<Cell>> _selectedCellsList = [];
+
+    /// <summary>
+    ///     Gets the selected text as
+    ///     <see>
+    ///         <cref>List{List{Cell}}</cref>
+    ///     </see>
+    /// </summary>
+    public List<List<Cell>> SelectedCellsList => _selectedCellsList;
+
     /// <summary>The selected text.</summary>
     public string SelectedText
     {
@@ -2753,6 +2763,9 @@ public class TextView : View
     /// </remarks>
     public event EventHandler<ContentsChangedEventArgs>? ContentsChanged;
 
+    private string _copiedText;
+    private List<List<Cell>> _copiedCellsList = [];
+
     /// <summary>Copy the selected text to the clipboard contents.</summary>
     public void Copy ()
     {
@@ -2760,13 +2773,16 @@ public class TextView : View
 
         if (Selecting)
         {
-            SetClipboard (GetRegion ());
+            _copiedText = GetRegion (out _copiedCellsList);
+            SetClipboard (_copiedText);
             _copyWithoutSelection = false;
         }
         else
         {
             List<Cell> currentLine = GetCurrentLine ();
-            SetClipboard (Cell.ToString (currentLine));
+            _copiedCellsList.Add (currentLine);
+            _copiedText = Cell.ToString (currentLine);
+            SetClipboard (_copiedText);
             _copyWithoutSelection = true;
         }
 
@@ -2778,14 +2794,15 @@ public class TextView : View
     public void Cut ()
     {
         SetWrapModel ();
-        SetClipboard (GetRegion ());
+        _copiedText = GetRegion (out _copiedCellsList);
+        SetClipboard (_copiedText);
 
         if (!_isReadOnly)
         {
             ClearRegion ();
 
             _historyText.Add (
-                              new () { new (GetCurrentLine ()) },
+                              [new (GetCurrentLine ())],
                               CursorPosition,
                               HistoryText.LineStatus.Replaced
                              );
@@ -3574,17 +3591,17 @@ public class TextView : View
         SetWrapModel ();
         string? contents = Clipboard.Contents;
 
-        if (_copyWithoutSelection && contents.FirstOrDefault (x => x == '\n' || x == '\r') == 0)
+        if (_copyWithoutSelection && contents.FirstOrDefault (x => x is '\n' or '\r') == 0)
         {
-            List<Cell> runeList = contents is null ? new () : Cell.ToCellList (contents);
+            List<Cell> runeList = contents is null ? [] : Cell.ToCellList (contents);
             List<Cell> currentLine = GetCurrentLine ();
 
-            _historyText.Add (new () { new (currentLine) }, CursorPosition);
+            _historyText.Add ([new (currentLine)], CursorPosition);
 
-            List<List<Cell>> addedLine = new () { new (currentLine), runeList };
+            List<List<Cell>> addedLine = [new (currentLine), runeList];
 
             _historyText.Add (
-                              new (addedLine),
+                              [..addedLine],
                               CursorPosition,
                               HistoryText.LineStatus.Added
                              );
@@ -3593,7 +3610,7 @@ public class TextView : View
             CurrentRow++;
 
             _historyText.Add (
-                              new () { new (GetCurrentLine ()) },
+                              [new (GetCurrentLine ())],
                               CursorPosition,
                               HistoryText.LineStatus.Replaced
                              );
@@ -3609,12 +3626,12 @@ public class TextView : View
             }
 
             _copyWithoutSelection = false;
-            InsertAllText (contents);
+            InsertAllText (contents, true);
 
             if (Selecting)
             {
                 _historyText.ReplaceLast (
-                                          new () { new (GetCurrentLine ()) },
+                                          [new (GetCurrentLine ())],
                                           CursorPosition,
                                           HistoryText.LineStatus.Original
                                          );
@@ -4444,6 +4461,7 @@ public class TextView : View
     // region.
     //
     private string GetRegion (
+        out List<List<Cell>> cellsList,
         int? sRow = null,
         int? sCol = null,
         int? cRow = null,
@@ -4451,8 +4469,9 @@ public class TextView : View
         TextModel? model = null
     )
     {
-        long start, end;
-        GetEncodedRegionBounds (out start, out end, sRow, sCol, cRow, cCol);
+        GetEncodedRegionBounds (out long start, out long end, sRow, sCol, cRow, cCol);
+
+        cellsList = [];
 
         if (start == end)
         {
@@ -4460,31 +4479,38 @@ public class TextView : View
         }
 
         var startRow = (int)(start >> 32);
-        var maxrow = (int)(end >> 32);
+        var maxRow = (int)(end >> 32);
         var startCol = (int)(start & 0xffffffff);
         var endCol = (int)(end & 0xffffffff);
         List<Cell> line = model is null ? _model.GetLine (startRow) : model.GetLine (startRow);
+        List<Cell> cells;
 
-        if (startRow == maxrow)
+        if (startRow == maxRow)
         {
-            return StringFromRunes (line.GetRange (startCol, endCol - startCol));
+            cells = line.GetRange (startCol, endCol - startCol);
+            cellsList.Add (cells);
+            return StringFromRunes (cells);
         }
 
-        string res = StringFromRunes (line.GetRange (startCol, line.Count - startCol));
+        cells = line.GetRange (startCol, line.Count - startCol);
+        cellsList.Add (cells);
+        string res = StringFromRunes (cells);
 
-        for (int row = startRow + 1; row < maxrow; row++)
+        for (int row = startRow + 1; row < maxRow; row++)
         {
+            cellsList.AddRange ([]);
+            cells = model == null ? _model.GetLine (row) : model.GetLine (row);
+            cellsList.Add (cells);
             res = res
                   + Environment.NewLine
-                  + StringFromRunes (
-                                     model == null
-                                         ? _model.GetLine (row)
-                                         : model.GetLine (row)
-                                    );
+                  + StringFromRunes (cells);
         }
 
-        line = model is null ? _model.GetLine (maxrow) : model.GetLine (maxrow);
-        res = res + Environment.NewLine + StringFromRunes (line.GetRange (0, endCol));
+        line = model is null ? _model.GetLine (maxRow) : model.GetLine (maxRow);
+        cellsList.AddRange ([]);
+        cells = line.GetRange (0, endCol);
+        cellsList.Add (cells);
+        res = res + Environment.NewLine + StringFromRunes (cells);
 
         return res;
     }
@@ -4510,7 +4536,7 @@ public class TextView : View
 
         OnUnwrappedCursorPosition (cRow, cCol);
 
-        return GetRegion (startRow, startCol, cRow, cCol, model);
+        return GetRegion (out _selectedCellsList, sRow: startRow, sCol: startCol, cRow: cRow, cCol: cCol, model: model);
     }
 
     private (int Row, int Col) GetUnwrappedPosition (int line, int col)
@@ -4616,17 +4642,25 @@ public class TextView : View
         }
     }
 
-    private void InsertAllText (string text)
+    private void InsertAllText (string text, bool fromClipboard = false)
     {
         if (string.IsNullOrEmpty (text))
         {
             return;
         }
 
-        // Get selected attribute
-        Attribute? attribute = GetSelectedAttribute (CurrentRow, CurrentColumn);
+        List<List<Cell>> lines;
 
-        List<List<Cell>> lines = Cell.StringToLinesOfCells (text, attribute);
+        if (fromClipboard && text == _copiedText)
+        {
+            lines = _copiedCellsList;
+        }
+        else
+        {
+            // Get selected attribute
+            Attribute? attribute = GetSelectedAttribute (CurrentRow, CurrentColumn);
+            lines = Cell.StringToLinesOfCells (text, attribute);
+        }
 
         if (lines.Count == 0)
         {
