@@ -61,14 +61,14 @@ public class Images : Scenario
     private RadioGroup _rgDistanceAlgorithm;
     private NumericUpDown _popularityThreshold;
     private SixelToRender _sixelImage;
-    private SixelSupport _sixelSupport;
+    private SixelSupportResult _sixelSupportResult;
 
     public override void Main ()
     {
         var sixelSupportDetector = new SixelSupportDetector ();
-        _sixelSupport = sixelSupportDetector.Detect ();
+        _sixelSupportResult = sixelSupportDetector.Detect ();
 
-        ConsoleDriver.SupportsSixel = _sixelSupport.IsSupported;
+        ConsoleDriver.SupportsSixel = _sixelSupportResult.IsSupported;
 
         Application.Init ();
         _win = new() { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
@@ -166,7 +166,7 @@ public class Images : Scenario
 
         _fire = new DoomFire (_win.Frame.Width * _pxX.Value, _win.Frame.Height * _pxY.Value);
         _fireEncoder = new SixelEncoder ();
-        _fireEncoder.Quantizer.MaxColors = Math.Min (_fireEncoder.Quantizer.MaxColors, _sixelSupport.MaxPaletteColors);
+        _fireEncoder.Quantizer.MaxColors = Math.Min (_fireEncoder.Quantizer.MaxColors, _sixelSupportResult.MaxPaletteColors);
         _fireEncoder.Quantizer.PaletteBuildingAlgorithm = new ConstPalette (_fire.Palette);
 
         _fireFrameCounter = 0;
@@ -344,7 +344,7 @@ public class Images : Scenario
         {
             X = Pos.Right (lblPxX),
             Y = Pos.Bottom (btnStartFire) + 1,
-            Value = _sixelSupport.Resolution.Width
+            Value = _sixelSupportResult.Resolution.Width
         };
 
         var lblPxY = new Label
@@ -358,7 +358,7 @@ public class Images : Scenario
         {
             X = Pos.Right (lblPxY),
             Y = Pos.Bottom (_pxX),
-            Value = _sixelSupport.Resolution.Height
+            Value = _sixelSupportResult.Resolution.Height
         };
 
         var l1 = new Label ()
@@ -507,7 +507,7 @@ public class Images : Scenario
     )
     {
         var encoder = new SixelEncoder ();
-        encoder.Quantizer.MaxColors = Math.Min (encoder.Quantizer.MaxColors, _sixelSupport.MaxPaletteColors);
+        encoder.Quantizer.MaxColors = Math.Min (encoder.Quantizer.MaxColors, _sixelSupportResult.MaxPaletteColors);
         encoder.Quantizer.PaletteBuildingAlgorithm = GetPaletteBuilder ();
         encoder.Quantizer.DistanceAlgorithm = GetDistanceAlgorithm ();
 
