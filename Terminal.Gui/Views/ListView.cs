@@ -154,11 +154,11 @@ public class ListView : View, IDesignable
                                     });
 
         // Select (Space key and single-click) - If markable, change mark and raise Select event
-        AddCommand (Command.Select, () =>
+        AddCommand (Command.Select, (ctx) =>
                                     {
                                         if (_allowsMarking)
                                         {
-                                            if (RaiseSelected () == true)
+                                            if (RaiseSelected (ctx) == true)
                                             {
                                                 return true;
                                             }
@@ -174,12 +174,12 @@ public class ListView : View, IDesignable
 
 
         // Hotkey - If none set, select and raise Select event. SetFocus. - DO NOT raise Accept
-        AddCommand (Command.HotKey, () =>
+        AddCommand (Command.HotKey, (ctx) =>
                                     {
                                         if (SelectedItem == -1)
                                         {
                                             SelectedItem = 0;
-                                            if (RaiseSelected () == true)
+                                            if (RaiseSelected (ctx) == true)
                                             {
                                                 return true;
 

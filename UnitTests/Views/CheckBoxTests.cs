@@ -576,10 +576,10 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         return;
 
-        void OnSelected (object sender, HandledEventArgs e)
+        void OnSelected (object sender, CommandEventArgs e)
         {
             checkedInvoked = true;
-            e.Handled = true;
+            e.Cancel = true;
         }
     }
 

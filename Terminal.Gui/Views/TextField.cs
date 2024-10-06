@@ -404,6 +404,8 @@ public class TextField : View
         ContextMenu.KeyChanged += ContextMenu_KeyChanged;
 
         KeyBindings.Add (ContextMenu.Key, KeyBindingScope.HotKey, Command.Context);
+
+        KeyBindings.Remove (Key.Space);
     }
 
     /// <summary>

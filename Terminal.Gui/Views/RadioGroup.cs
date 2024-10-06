@@ -20,7 +20,7 @@ public class RadioGroup : View, IDesignable, IOrientation
         // Select (Space key or mouse click) - The default implementation sets focus. RadioGroup does not.
         AddCommand (
                     Command.Select,
-                    () =>
+                    (ctx) =>
                     {
                         bool cursorChanged = false;
                         if (SelectedItem == Cursor)
@@ -40,7 +40,7 @@ public class RadioGroup : View, IDesignable, IOrientation
 
                         if (cursorChanged || selectedItemChanged)
                         {
-                            if (RaiseSelected () == true)
+                            if (RaiseSelected (ctx) == true)
                             {
                                 return true;
                             }
@@ -83,7 +83,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                                     if (selectedItemChanged)
                                     {
                                         // Doesn't matter if it's handled
-                                        RaiseSelected ();
+                                        RaiseSelected (ctx);
                                         return true;
                                     }
 
@@ -93,7 +93,7 @@ public class RadioGroup : View, IDesignable, IOrientation
 
                                 if (SelectedItem == -1 && ChangeSelectedItem (0))
                                 {
-                                    if (RaiseSelected () == true)
+                                    if (RaiseSelected (ctx) == true)
                                     {
                                         return true;
                                     }

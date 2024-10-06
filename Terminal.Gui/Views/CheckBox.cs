@@ -23,13 +23,13 @@ public class CheckBox : View
         CanFocus = true;
 
         // Select (Space key and single-click) - Advance state and raise Select event
-        AddCommand (Command.Select, () =>
+        AddCommand (Command.Select, (ctx) =>
                                     {
                                         bool? cancelled = AdvanceCheckState ();
 
                                         if (cancelled is null or false)
                                         {
-                                            if (RaiseSelected () == true)
+                                            if (RaiseSelected (ctx) == true)
                                             {
                                                 return true;
                                             }
@@ -42,13 +42,13 @@ public class CheckBox : View
         AddCommand (Command.Accept, () => RaiseAccepted ());
 
         // Hotkey - Advance state and raise Select event - DO NOT raise Accept
-        AddCommand (Command.HotKey, () =>
+        AddCommand (Command.HotKey, (ctx) =>
                                     {
                                         bool? cancelled = AdvanceCheckState ();
 
                                         if (cancelled is null or false)
                                         {
-                                            if (RaiseSelected () == true)
+                                            if (RaiseSelected (ctx) == true)
                                             {
                                                 return true;
                                             }
@@ -60,15 +60,6 @@ public class CheckBox : View
         TitleChanged += Checkbox_TitleChanged;
 
         HighlightStyle = DefaultHighlightStyle;
-        MouseClick += CheckBox_MouseClick;
-    }
-
-    private void CheckBox_MouseClick (object? sender, MouseEventEventArgs e)
-    {
-        if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
-        {
-            e.Handled = InvokeCommand (Command.Select) is true;
-        }
     }
 
     private void Checkbox_TitleChanged (object? sender, EventArgs<string> e)

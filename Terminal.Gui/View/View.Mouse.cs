@@ -372,7 +372,7 @@ public partial class View // Mouse APIs
 
         // Always invoke Select command on MouseClick
         // By default, this will raise Selected/OnSelected - Subclasses can override this via AddCommand (Command.Select ...).
-        args.Handled = InvokeCommand (Command.Select, null, new KeyBinding ([Command.Select], scope: KeyBindingScope.Focused, boundView: this, context: args.MouseEvent)) == true;
+        args.Handled = InvokeCommand (Command.Select, ctx: new (Command.Select, key: null, data: args.MouseEvent)) == true;
 
         return args.Handled;
     }
@@ -399,18 +399,13 @@ public partial class View // Mouse APIs
 
             if (SetPressedHighlight (HighlightStyle.None))
             {
-                // BUGBUG: If we return true here we never generate a mouse click!
                 return true;
             }
 
             // If mouse is still in bounds, generate a click
-            if (!WantContinuousButtonPressed && Viewport.Contains (mouseEvent.Position))
+            if (Viewport.Contains (mouseEvent.Position))
             {
-                var meea = new MouseEventEventArgs (mouseEvent);
-
-                // We can ignore the return value of OnMouseClick; if the click is handled
-                // meea.Handled and meea.MouseEvent.Handled will be true
-                OnMouseClick (meea);
+                return OnMouseClick (new (mouseEvent));
             }
 
             return mouseEvent.Handled = true;

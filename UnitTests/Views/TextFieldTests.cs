@@ -517,6 +517,60 @@ public class TextFieldTests (ITestOutputHelper output)
     }
 
     [Fact]
+    public void Space_Does_Not_Raise_Selected ()
+    {
+        TextField tf = new ();
+
+        tf.Selected += (sender, args) => Assert.Fail ("Selected should not be raied.");
+
+        Application.Top = new Toplevel ();
+        Application.Top.Add (tf);
+        tf.SetFocus ();
+        Application.OnKeyDown (Key.Space);
+
+        Application.Top.Dispose ();
+        Application.ResetState (ignoreDisposed: true);
+    }
+
+    [Fact]
+    public void Enter_Does_Not_Raise_Selected ()
+    {
+        TextField tf = new ();
+
+        int selectedCount = 0;
+        tf.Selected += (sender, args) => selectedCount++;
+
+        Application.Top = new Toplevel ();
+        Application.Top.Add (tf);
+        tf.SetFocus ();
+        Application.OnKeyDown (Key.Enter);
+
+        Assert.Equal (0, selectedCount);
+
+        Application.Top.Dispose ();
+        Application.ResetState (ignoreDisposed: true);
+    }
+
+    [Fact]
+    public void Enter_Raises_Accepted ()
+    {
+        TextField tf = new ();
+
+        int acceptedCount = 0;
+        tf.Accepted += (sender, args) => acceptedCount++;
+
+        Application.Top = new Toplevel ();
+        Application.Top.Add (tf);
+        tf.SetFocus ();
+        Application.OnKeyDown (Key.Enter);
+
+        Assert.Equal (1, acceptedCount);
+
+        Application.Top.Dispose ();
+        Application.ResetState (ignoreDisposed: true);
+    }
+
+    [Fact]
     [AutoInitShutdown (useFakeClipboard: true)]
     public void KeyBindings_Command ()
     {

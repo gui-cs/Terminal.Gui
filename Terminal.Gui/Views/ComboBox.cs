@@ -6,6 +6,7 @@
 //
 
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace Terminal.Gui;
 
@@ -32,6 +33,7 @@ public class ComboBox : View, IDesignable
         _listview = new ComboListView (this, HideDropdownListOnClick) { CanFocus = true, TabStop = TabBehavior.NoStop };
 
         _search.TextChanged += Search_Changed;
+        _search.Accepted += Search_Accept;
 
         _listview.Y = Pos.Bottom (_search);
         _listview.OpenSelectedItem += (sender, a) => Selected ();
@@ -383,7 +385,10 @@ public class ComboBox : View, IDesignable
     {
         if (HasItems ())
         {
-            Selected ();
+            if (Selected ())
+            {
+                //return false;
+            }
 
             return RaiseAccepted () == true;
         }
@@ -653,6 +658,12 @@ public class ComboBox : View, IDesignable
         SetSearchSet ();
     }
 
+    // Tell TextField to handle Accepted Command (Enter)
+    void Search_Accept (object sender, HandledEventArgs e)
+    {
+        e.Handled = true;
+    }
+
     private void Search_Changed (object sender, EventArgs e)
     {
         if (_source is null)
@@ -712,7 +723,7 @@ public class ComboBox : View, IDesignable
         }
     }
 
-    private void Selected ()
+    private bool Selected ()
     {
         IsShow = false;
         _listview.TabStop = TabBehavior.NoStop;
@@ -723,7 +734,7 @@ public class ComboBox : View, IDesignable
             HideList ();
             IsShow = false;
 
-            return;
+            return false;
         }
 
         SetValue (_listview.SelectedItem > -1 ? _searchSet [_listview.SelectedItem] : _text);
@@ -733,6 +744,8 @@ public class ComboBox : View, IDesignable
         Reset (true);
         HideList ();
         IsShow = false;
+
+        return true;
     }
 
     private void SetSearchSet ()
@@ -788,6 +801,7 @@ public class ComboBox : View, IDesignable
         _listview.Clear ();
         _listview.Height = CalculateHeight ();
         SuperView?.MoveSubviewToStart (this);
+        _listview.SetFocus ();
     }
 
     private bool UnixEmulation ()

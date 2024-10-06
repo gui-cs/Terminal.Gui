@@ -837,7 +837,7 @@ Three ",
         Assert.False (opened);
 
         cb.Text = "Tw";
-        Assert.True (Application.OnKeyDown (Key.Enter));
+        Assert.False (Application.OnKeyDown (Key.Enter));
         Assert.True (opened);
         Assert.Equal ("Tw", cb.Text);
         Assert.False (cb.IsShow);

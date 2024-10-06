@@ -33,6 +33,38 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         Assert.Equal (expectedHasFocus, testView.HasFocus);
     }
 
+
+    [Theory]
+    [InlineData (false, false, 1)]
+    [InlineData (true, false, 1)]
+    [InlineData (true, true, 1)]
+    public void MouseClick_Raises_Selected (bool canFocus, bool setFocus, int expectedSelectedCount)
+    {
+        var superView = new View { CanFocus = true, Height = 1, Width = 15 };
+        var focusedView = new View { CanFocus = true, Width = 1, Height = 1 };
+        var testView = new View { CanFocus = canFocus, X = 4, Width = 4, Height = 1 };
+        superView.Add (focusedView, testView);
+
+        focusedView.SetFocus ();
+
+        Assert.True (superView.HasFocus);
+        Assert.True (focusedView.HasFocus);
+        Assert.False (testView.HasFocus);
+
+        if (setFocus)
+        {
+            testView.SetFocus ();
+        }
+
+        int selectedCount = 0;
+        testView.Selected += (sender, args) => selectedCount++;
+
+        testView.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
+        Assert.True (superView.HasFocus);
+        Assert.Equal (expectedSelectedCount, selectedCount);
+    }
+
+
     // TODO: Add more tests that ensure the above test works with positive adornments
 
     // Test drag to move
@@ -207,7 +239,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     [InlineData (MouseFlags.Button2Clicked)]
     [InlineData (MouseFlags.Button3Clicked)]
     [InlineData (MouseFlags.Button4Clicked)]
-    public void WantContinuousButtonPressed_True_Button_Clicked_Clicks (MouseFlags clicked)
+    public void WantContinuousButtonPressed_True_Button_Clicked_Raises_MouseClick (MouseFlags clicked)
     {
         var me = new MouseEvent ();
 
@@ -225,6 +257,34 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         me.Flags = clicked;
         view.NewMouseEvent (me);
         Assert.Equal (1, clickedCount);
+
+        view.Dispose ();
+    }
+
+
+    [Theory]
+    [InlineData (MouseFlags.Button1Clicked)]
+    [InlineData (MouseFlags.Button2Clicked)]
+    [InlineData (MouseFlags.Button3Clicked)]
+    [InlineData (MouseFlags.Button4Clicked)]
+    public void WantContinuousButtonPressed_True_Button_Clicked_Raises_Selected (MouseFlags clicked)
+    {
+        var me = new MouseEvent ();
+
+        var view = new View ()
+        {
+            Width = 1,
+            Height = 1,
+            WantContinuousButtonPressed = true
+        };
+
+        var selectedCount = 0;
+
+        view.Selected += (s, e) => selectedCount++;
+
+        me.Flags = clicked;
+        view.NewMouseEvent (me);
+        Assert.Equal (1, selectedCount);
 
         view.Dispose ();
     }

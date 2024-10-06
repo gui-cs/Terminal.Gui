@@ -409,10 +409,9 @@ public class ShortcutTests
     [InlineData (7, 1)]
     [InlineData (8, 1)]
     [InlineData (9, 0)]
-    [AutoInitShutdown]
-    public void MouseClick_Fires_Accept (int x, int expectedAccept)
+    public void MouseClick_Raises_Accepted (int x, int expectedAccepted)
     {
-        var current = new Toplevel ();
+        Application.Top = new Toplevel ();
 
         var shortcut = new Shortcut
         {
@@ -420,9 +419,9 @@ public class ShortcutTests
             Text = "0",
             Title = "C"
         };
-        current.Add (shortcut);
-
-        Application.Begin (current);
+        Application.Top.Add (shortcut);
+        Application.Top.SetRelativeLayout (new (100, 100));
+        Application.Top.LayoutSubviews ();
 
         var accepted = 0;
         shortcut.Accepted += (s, e) => accepted++;
@@ -434,9 +433,10 @@ public class ShortcutTests
                                       Flags = MouseFlags.Button1Clicked
                                   });
 
-        Assert.Equal (expectedAccept, accepted);
+        Assert.Equal (expectedAccepted, accepted);
 
-        current.Dispose ();
+        Application.Top.Dispose ();
+        Application.ResetState (ignoreDisposed: true);
     }
 
 
@@ -447,7 +447,7 @@ public class ShortcutTests
     [InlineData (-1, 0, 0, 0, 0)]
     [InlineData (0, 0, 1, 1, 1)] // mouseX = 0 is on the CommandView.Margin, so Shortcut will get MouseClick
     [InlineData (1, 0, 1, 1, 1)] // mouseX = 1 is on the CommandView, so CommandView will get MouseClick
-    [InlineData (2, 1, 1, 1, 1)] // mouseX = 2 is on the CommandView.Margin, so Shortcut will get MouseClick
+    [InlineData (2, 0, 1, 1, 1)] // mouseX = 2 is on the CommandView.Margin, so Shortcut will get MouseClick
     [InlineData (3, 0, 1, 1, 1)]
     [InlineData (4, 0, 1, 1, 1)]
     [InlineData (5, 0, 1, 1, 1)]
@@ -465,7 +465,7 @@ public class ShortcutTests
     //[InlineData (7, 1, 0)]
     //[InlineData (8, 1, 0)]
     //[InlineData (9, 0, 0)]
-    public void MouseClick_Default_CommandView_Raises_Accept_Select_Correctly (int mouseX, int expectedCommandViewAccept, int expectedCommandViewSelect, 
+    public void MouseClick_Default_CommandView_Raises_Accepted_Select_Correctly (int mouseX, int expectedCommandViewAccept, int expectedCommandViewSelect, 
                                                                                int expectedShortcutAccept, int expectedShortcutSelect)
     {
         Application.Top = new Toplevel ();
@@ -526,7 +526,7 @@ public class ShortcutTests
     // " C  0  A "
     [InlineData (-1, 0, 0)]
     [InlineData (0, 1, 0)]
-    [InlineData (1, 1, 1)]
+    [InlineData (1, 1, 0)]
     [InlineData (2, 1, 0)]
     [InlineData (3, 1, 0)]
     [InlineData (4, 1, 0)]
@@ -535,7 +535,7 @@ public class ShortcutTests
     [InlineData (7, 1, 0)]
     [InlineData (8, 1, 0)]
     [InlineData (9, 0, 0)]
-    public void MouseClick_Button_CommandView_Raises_Shortcut_Accept
+    public void MouseClick_Button_CommandView_Raises_Shortcut_Accepted
         (int mouseX, int expectedAccept, int expectedButtonAccept)
     {
         Application.Top = new Toplevel ();
@@ -557,15 +557,16 @@ public class ShortcutTests
         shortcut.CommandView.Accepted += (s, e) =>
         {
             buttonAccepted++;
-            // Must indicate handled
-            e.Handled = true;
         };
         Application.Top.Add (shortcut);
+        Application.Top.SetRelativeLayout (new (100, 100));
+        Application.Top.LayoutSubviews ();
 
         var accepted = 0;
-        shortcut.Accepted += (s, e) => accepted++;
-
-        //Assert.True (shortcut.HasFocus);
+        shortcut.Accepted += (s, e) =>
+                             {
+                                 accepted++;
+                             };
 
         Application.OnMouseEvent (
                                   new ()
@@ -574,8 +575,8 @@ public class ShortcutTests
                                       Flags = MouseFlags.Button1Clicked
                                   });
 
-        Assert.Equal (expectedButtonAccept, buttonAccepted);
         Assert.Equal (expectedAccept, accepted);
+        Assert.Equal (expectedButtonAccept, buttonAccepted);
 
         Application.Top.Dispose ();
         Application.ResetState (true);
@@ -586,7 +587,7 @@ public class ShortcutTests
     [InlineData (true, KeyCode.C, 1)]
     [InlineData (true, KeyCode.C | KeyCode.AltMask, 1)]
     [InlineData (true, KeyCode.Enter, 1)]
-    [InlineData (true, KeyCode.Space, 0)]
+    [InlineData (true, KeyCode.Space, 1)]
     [InlineData (true, KeyCode.F1, 0)]
     [InlineData (false, KeyCode.A, 1)]
     [InlineData (false, KeyCode.C, 1)]
@@ -626,7 +627,7 @@ public class ShortcutTests
     [InlineData (KeyCode.C, 1)]
     [InlineData (KeyCode.C | KeyCode.AltMask, 1)]
     [InlineData (KeyCode.Enter, 1)]
-    [InlineData (KeyCode.Space, 0)]
+    [InlineData (KeyCode.Space, 1)]
     [InlineData (KeyCode.F1, 0)]
     public void KeyDown_App_Scope_Invokes_Accept (KeyCode key, int expectedAccept)
     {
@@ -658,7 +659,7 @@ public class ShortcutTests
     [InlineData (true, KeyCode.C, 1)]
     [InlineData (true, KeyCode.C | KeyCode.AltMask, 1)]
     [InlineData (true, KeyCode.Enter, 1)]
-    [InlineData (true, KeyCode.Space, 0)]
+    [InlineData (true, KeyCode.Space, 1)]
     [InlineData (true, KeyCode.F1, 0)]
     [InlineData (false, KeyCode.A, 1)]
     [InlineData (false, KeyCode.C, 1)]
@@ -698,7 +699,7 @@ public class ShortcutTests
     [InlineData (true, KeyCode.C, 1)]
     [InlineData (true, KeyCode.C | KeyCode.AltMask, 1)]
     [InlineData (true, KeyCode.Enter, 1)]
-    [InlineData (true, KeyCode.Space, 0)]
+    [InlineData (true, KeyCode.Space, 1)]
     [InlineData (true, KeyCode.F1, 0)]
     [InlineData (false, KeyCode.A, 1)]
     [InlineData (false, KeyCode.C, 1)]

@@ -242,11 +242,11 @@ public class TableView : View
 
         AddCommand (
                     Command.Select, // was Command.ToggleChecked
-                    () =>
+                    (ctx) =>
                     {
                         if (ToggleCurrentCellSelection () is true)
                         {
-                            return RaiseSelected () is true;
+                            return RaiseSelected (ctx) is true;
                         }
 
                         return false;

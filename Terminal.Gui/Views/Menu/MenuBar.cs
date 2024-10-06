@@ -137,7 +137,7 @@ public class MenuBar : View, IDesignable
                                                   });
         AddCommand (Command.Select, ctx =>
                                     {
-                                        if (ctx.KeyBinding?.Context is MouseEvent)
+                                        if (ctx.Data is MouseEvent)
                                         {
                                             // HACK: Work around the fact that View.MouseClick always invokes Select
                                             return false;

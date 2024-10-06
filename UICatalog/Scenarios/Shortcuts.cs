@@ -356,15 +356,23 @@ public class Shortcuts : Scenario
             {
                 shortcut.Selected += (o, args) =>
                 {
+                    if (args.Cancel)
+                    {
+                        return;
+                    }
                     eventSource.Add ($"{shortcut!.Id}.Select: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
                     eventLog.MoveDown ();
-                    //args.Handled = true;
                 };
 
                 shortcut.CommandView.Selected += (o, args) =>
                 {
+                    if (args.Cancel)
+                    {
+                        return;
+                    }
                     eventSource.Add ($"{shortcut!.Id}.CommandView.Select: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
                     eventLog.MoveDown ();
+                    args.Cancel = true;
                 };
 
                 shortcut.Accepted += (o, args) =>

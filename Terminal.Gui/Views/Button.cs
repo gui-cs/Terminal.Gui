@@ -70,10 +70,14 @@ public class Button : View, IDesignable
         // Override default behavior of View
         AddCommand (
                     Command.HotKey,
-                    () =>
+                    (ctx) =>
                     {
                         bool cachedIsDefault = IsDefault; // Supports "Swap Default" in Buttons scenario where IsDefault changes
 
+                        if (RaiseSelected (ctx) is true)
+                        {
+                            return true;
+                        }
                         bool? handled = RaiseAccepted ();
 
                         if (handled == true)
@@ -132,7 +136,14 @@ public class Button : View, IDesignable
         }
     }
 
-    private void Button_MouseClick (object sender, MouseEventEventArgs e) { e.Handled = InvokeCommand (Command.HotKey) == true; }
+    private void Button_MouseClick (object sender, MouseEventEventArgs e)
+    {
+        if (e.Handled)
+        {
+            return;
+        }
+        e.Handled = InvokeCommand (Command.HotKey) == true;
+    }
 
     private void Button_TitleChanged (object sender, EventArgs<string> e)
     {

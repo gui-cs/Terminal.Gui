@@ -30,17 +30,21 @@ public partial class View // Command APIs
                     });
 
         // Space or single-click - Raise Selected
-        AddCommand (Command.Select, () =>
+        AddCommand (Command.Select, (ctx) =>
                                     {
-                                        bool? cancelled = RaiseSelected ();
-                                        if (cancelled is null or false && CanFocus)
+                                        if (RaiseSelected (ctx) is true)
+                                        {
+                                            return true;
+                                        }
+
+                                        if (CanFocus)
                                         {
                                             SetFocus ();
 
                                             return true;
                                         }
 
-                                        return cancelled is true;
+                                        return false;
                                     });
     }
 
@@ -118,13 +122,13 @@ public partial class View // Command APIs
     ///     If <see langword="true"/> the event was canceled. If <see langword="false"/> the event was raised but not canceled.
     ///     If <see langword="null"/> no event was raised.
     /// </returns>
-    protected bool? RaiseSelected ()
+    protected bool? RaiseSelected (CommandContext ctx)
     {
-        HandledEventArgs args = new ();
+        CommandEventArgs args = new () { Context = ctx };
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
-        if (OnSelected (args) || args.Handled)
+        if (OnSelected (args) || args.Cancel)
         {
             return true;
         }
@@ -132,7 +136,7 @@ public partial class View // Command APIs
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
         Selected?.Invoke (this, args);
 
-        return Selected is null ? null : args.Handled;
+        return Selected is null ? null : args.Cancel;
     }
 
     /// <summary>
@@ -141,14 +145,14 @@ public partial class View // Command APIs
     /// </summary>
     /// <param name="args"></param>
     /// <returns><see langword="true"/> to stop processing.</returns>
-    protected virtual bool OnSelected (HandledEventArgs args) { return false; }
+    protected virtual bool OnSelected (CommandEventArgs args) { return false; }
 
     /// <summary>
     ///     Cancelable event raised when the user has selected the View or otherwise changed the state of the View. Set
     ///     <see cref="HandledEventArgs.Handled"/>
     ///     to cancel the event.
     /// </summary>
-    public event EventHandler<HandledEventArgs>? Selected;
+    public event EventHandler<CommandEventArgs>? Selected;
 
 
     // TODO: What does this event really do? "Called when the user has pressed the View's hot key or otherwise invoked the View's hot key command.???"
@@ -291,8 +295,17 @@ public partial class View // Command APIs
         if (CommandImplementations.TryGetValue (command, out Func<CommandContext, bool?>? implementation))
         {
             var context = new CommandContext (command, key, keyBinding); // Create the context here
-
             return implementation (context);
+        }
+
+        return null;
+    }
+
+    public bool? InvokeCommand (Command command, CommandContext ctx)
+    {
+        if (CommandImplementations.TryGetValue (command, out Func<CommandContext, bool?>? implementation))
+        {
+            return implementation (ctx);
         }
 
         return null;

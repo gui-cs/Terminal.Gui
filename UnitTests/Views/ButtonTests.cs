@@ -608,21 +608,33 @@ public class ButtonTests (ITestOutputHelper output)
             WantContinuousButtonPressed = true
         };
 
-        var acceptCount = 0;
+        var selectedCount = 0;
 
-        button.Accepted += (s, e) => acceptCount++;
+        button.Selected += (s, e) => selectedCount++;
+        var acceptedCount = 0;
+        button.Accepted += (s, e) =>
+                           {
+                               acceptedCount++;
+                               e.Handled = true;
+                           };
 
+        me = new MouseEvent ();
         me.Flags = pressed;
         button.NewMouseEvent (me);
-        Assert.Equal (1, acceptCount);
+        Assert.Equal (0, selectedCount);
+        Assert.Equal (0, acceptedCount);
 
+        me = new MouseEvent ();
         me.Flags = released;
         button.NewMouseEvent (me);
-        Assert.Equal (1, acceptCount);
+        Assert.Equal (0, selectedCount);
+        Assert.Equal (0, acceptedCount);
 
+        me = new MouseEvent ();
         me.Flags = clicked;
         button.NewMouseEvent (me);
-        Assert.Equal (1, acceptCount);
+        Assert.Equal (1, selectedCount);
+        Assert.Equal (1, acceptedCount);
 
         button.Dispose ();
     }
@@ -632,7 +644,7 @@ public class ButtonTests (ITestOutputHelper output)
     [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released)]
     [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released)]
     [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released)]
-    public void WantContinuousButtonPressed_True_ButtonPressRelease_Accepts (MouseFlags pressed, MouseFlags released)
+    public void WantContinuousButtonPressed_True_ButtonPressRelease_Does_Not_Raise_Selected_Or_Accepted (MouseFlags pressed, MouseFlags released)
     {
         var me = new MouseEvent ();
 
@@ -643,17 +655,31 @@ public class ButtonTests (ITestOutputHelper output)
             WantContinuousButtonPressed = true
         };
 
-        var acceptCount = 0;
+        var acceptedCount = 0;
 
-        button.Accepted += (s, e) => acceptCount++;
+        button.Accepted += (s, e) =>
+                           {
+                               acceptedCount++;
+                               e.Handled = true;
+                           };
+
+        var selectedCount = 0;
+
+        button.Selected += (s, e) =>
+                           {
+                               selectedCount++;
+                               e.Cancel = true;
+                           };
 
         me.Flags = pressed;
         button.NewMouseEvent (me);
-        Assert.Equal (1, acceptCount);
+        Assert.Equal (0, acceptedCount);
+        Assert.Equal (0, selectedCount);
 
         me.Flags = released;
         button.NewMouseEvent (me);
-        Assert.Equal (1, acceptCount);
+        Assert.Equal (0, acceptedCount);
+        Assert.Equal (0, selectedCount);
 
         button.Dispose ();
     }
