@@ -1549,6 +1549,7 @@ public class TextField : View
 
         return _cursorPosition != oldCursorPosition || hadSelection;
     }
+
     private bool MoveLeft ()
     {
         return Move (-1);

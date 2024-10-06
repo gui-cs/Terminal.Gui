@@ -2061,7 +2061,7 @@ Les Miśerables",
         Assert.True (tf.NewKeyDownEvent (Key.CursorLeft.WithShift));
         Assert.True (tf.NewKeyDownEvent (Key.CursorLeft.WithShift));
 
-        // When there is selected text and the cursor is at the end of the text field
+        // When there is selected text and the cursor is at the start of the text field
         Assert.Equal ("He", tf.SelectedText);
 
         // Pressing left should not move focus, instead it should clear selection
