@@ -1361,6 +1361,10 @@ public static class EscSeqUtils
     /// </summary>
     public static readonly AnsiEscapeSequenceRequest CSI_RequestSixelResolution = new () { Request = CSI + "16t", Terminator = "t" };
 
+    /// <summary>
+    ///     CSI 14 t - Request window size in pixels (width x height)
+    /// </summary>
+    public static readonly AnsiEscapeSequenceRequest CSI_RequestWindowSizeInPixels = new () { Request = CSI + "14t", Terminator = "t" };
 
     /// <summary>
     ///     CSI 1 8 t  | yes | yes |  yes  | report window size in chars

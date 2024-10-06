@@ -41,10 +41,37 @@ public class SixelSupportDetector
                 }
             }
 
-
             if (!gotResolutionDirectly)
             {
-                // TODO: Try pixel/window resolution getting
+                // Fallback to window size in pixels and characters
+                if (AnsiEscapeSequenceRequest.TryExecuteAnsiRequest (EscSeqUtils.CSI_RequestWindowSizeInPixels, out var pixelSizeResponse) &&
+                    AnsiEscapeSequenceRequest.TryExecuteAnsiRequest (EscSeqUtils.CSI_ReportTerminalSizeInChars, out var charSizeResponse))
+                {
+                    // Example [4;600;1200t
+                    var pixelMatch = Regex.Match (pixelSizeResponse.Response, @"\[\d+;(\d+);(\d+)t$");
+
+                    // Example [8;30;120t
+                    var charMatch = Regex.Match (charSizeResponse.Response, @"\[\d+;(\d+);(\d+)t$");
+
+                    if (pixelMatch.Success && charMatch.Success)
+                    {
+                        // Extract pixel dimensions
+                        if (int.TryParse (pixelMatch.Groups [1].Value, out var pixelHeight) &&
+                            int.TryParse (pixelMatch.Groups [2].Value, out var pixelWidth) &&
+                            // Extract character dimensions
+                            int.TryParse (charMatch.Groups [1].Value, out var charHeight) &&
+                            int.TryParse (charMatch.Groups [2].Value, out var charWidth) &&
+                            charWidth != 0 && charHeight != 0) // Avoid divide by zero
+                        {
+                            // Calculate the character cell size in pixels
+                            var cellWidth = pixelWidth / charWidth;
+                            var cellHeight = pixelHeight / charHeight;
+
+                            // Set the resolution based on the character cell size
+                            result.Resolution = new Size (cellWidth, cellHeight);
+                        }
+                    }
+                }
             }
         }
 
