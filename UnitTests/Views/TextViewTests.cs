@@ -4722,7 +4722,14 @@ This is the second line.
         tv.SelectionStartColumn = 12;
         tv.CursorPosition = new Point (18, 1);
 
-        Assert.Equal (31, tv.SelectedLength);
+        if (Environment.NewLine.Length == 2)
+        {
+            Assert.Equal (31, tv.SelectedLength);
+        }
+        else
+        {
+            Assert.Equal (30, tv.SelectedLength);
+        }
         Assert.Equal ($"first line.{Environment.NewLine}This is the second", tv.SelectedText);
         Assert.Equal ($"first line.{Environment.NewLine}This is the second", Cell.ToString (tv.SelectedCellsList));
         Assert.Equal (new Point (18, 1), tv.CursorPosition);
