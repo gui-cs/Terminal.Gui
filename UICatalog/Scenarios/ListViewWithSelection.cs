@@ -140,7 +140,7 @@ public class ListViewWithSelection : Scenario
         _listView.OpenSelectedItem += (s, a) => LogEvent (s as View, a, "OpenSelectedItem");
         _listView.CollectionChanged += (s, a) => LogEvent (s as View, a, "CollectionChanged");
         _listView.Accepted += (s, a) => LogEvent (s as View, a, "Accept");
-        _listView.Selected += (s, a) => LogEvent (s as View, a, "Select");
+        _listView.Selecting += (s, a) => LogEvent (s as View, a, "Select");
 
         bool? LogEvent (View sender, EventArgs args, string message)
         {

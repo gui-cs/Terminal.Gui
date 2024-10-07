@@ -359,7 +359,7 @@ public class Shortcuts : Scenario
         {
             if (sh is Shortcut shortcut)
             {
-                shortcut.Selected += (o, args) =>
+                shortcut.Selecting += (o, args) =>
                 {
                     if (args.Cancel)
                     {
@@ -369,7 +369,7 @@ public class Shortcuts : Scenario
                     eventLog.MoveDown ();
                 };
 
-                shortcut.CommandView.Selected += (o, args) =>
+                shortcut.CommandView.Selecting += (o, args) =>
                 {
                     if (args.Cancel)
                     {

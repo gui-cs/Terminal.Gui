@@ -359,7 +359,7 @@ public class HotKeyTests
         Application.Top.Add (view);
         view.HotKeyHandled += (s, e) => hotKeyRaised = true;
         view.Accepted += (s, e) => acceptRaised = true;
-        view.Selected += (s, e) => selectRaised = true;
+        view.Selecting += (s, e) => selectRaised = true;
 
         Assert.Equal (KeyCode.T, view.HotKey);
         Assert.True (Application.OnKeyDown (Key.T)); 

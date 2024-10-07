@@ -181,7 +181,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         ckb.CheckedStateChanging += (s, e) => checkedStateChangingCount++;
 
         int selectCount = 0;
-        ckb.Selected += (s, e) => selectCount++;
+        ckb.Selecting += (s, e) => selectCount++;
 
         int acceptCount = 0;
         ckb.Accepted += (s, e) => acceptCount++;
@@ -256,7 +256,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         checkBox.CheckedStateChanging += (s, e) => checkedStateChangingCount++;
 
         int selectCount = 0;
-        checkBox.Selected += (s, e) => selectCount++;
+        checkBox.Selecting += (s, e) => selectCount++;
 
         int acceptCount = 0;
         checkBox.Accepted += (s, e) => acceptCount++;
@@ -300,7 +300,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         checkBox.CheckedStateChanging += (s, e) => checkedStateChangingCount++;
 
         int selectCount = 0;
-        checkBox.Selected += (s, e) => selectCount++;
+        checkBox.Selecting += (s, e) => selectCount++;
 
         int acceptCount = 0;
         checkBox.Accepted += (s, e) => acceptCount++;
@@ -566,7 +566,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         ckb.CheckedState = initialState;
 
-        ckb.Selected += OnSelected;
+        ckb.Selecting += OnSelected;
 
         Assert.Equal (initialState, ckb.CheckedState);
         bool? ret = ckb.InvokeCommand (Command.Select);

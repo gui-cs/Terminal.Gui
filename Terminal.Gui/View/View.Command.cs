@@ -32,7 +32,7 @@ public partial class View // Command APIs
         // Space or single-click - Raise Selected
         AddCommand (Command.Select, (ctx) =>
                                     {
-                                        if (RaiseSelected (ctx) is true)
+                                        if (RaiseSelecting (ctx) is true)
                                         {
                                             return true;
                                         }
@@ -53,7 +53,7 @@ public partial class View // Command APIs
     ///     event. The default <see cref="Command.Accept"/> handler calls this method.
     /// </summary>
     /// <remarks>
-    ///     The <see cref="Accepted"/> event should raised after the state of the View has changed (after <see cref="Selected"/> is raised).
+    ///     The <see cref="Accepted"/> event should raised after the state of the View has changed (after <see cref="Selecting"/> is raised).
     /// </remarks>
     /// <returns>
     ///     If <see langword="true"/> the event was canceled. If <see langword="false"/> the event was raised but not canceled.
@@ -112,48 +112,48 @@ public partial class View // Command APIs
     public event EventHandler<HandledEventArgs>? Accepted;
 
     /// <summary>
-    ///     Called when the user has selected the View or otherwise changed the state of the View. Calls <see cref="OnSelected"/> which can be cancelled; if not cancelled raises <see cref="Accepted"/>.
+    ///     Called when the user has performed an action (e.g. <see cref="Command.Select"/>) causing the View to change state. Calls <see cref="OnSelecting"/> which can be cancelled; if not cancelled raises <see cref="Accepted"/>.
     ///     event. The default <see cref="Command.Select"/> handler calls this method.
     /// </summary>
     /// <remarks>
-    ///     The <see cref="Selected"/> event should raised after the state of the View has been changed and before see <see cref="Accepted"/>.
+    ///     The <see cref="Selecting"/> event should raised after the state of the View has been changed and before see <see cref="Accepted"/>.
     /// </remarks>
     /// <returns>
     ///     If <see langword="true"/> the event was canceled. If <see langword="false"/> the event was raised but not canceled.
     ///     If <see langword="null"/> no event was raised.
     /// </returns>
-    protected bool? RaiseSelected (CommandContext ctx)
+    protected bool? RaiseSelecting (CommandContext ctx)
     {
         CommandEventArgs args = new () { Context = ctx };
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
-        if (OnSelected (args) || args.Cancel)
+        if (OnSelecting (args) || args.Cancel)
         {
             return true;
         }
 
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-        Selected?.Invoke (this, args);
+        Selecting?.Invoke (this, args);
 
-        return Selected is null ? null : args.Cancel;
+        return Selecting is null ? null : args.Cancel;
     }
 
     /// <summary>
-    ///     Called when the user has selected the View or otherwise changed the state of the View. Set <see cref="HandledEventArgs.Handled"/> to
-    ///     <see langword="true"/> to stop processing.
+    ///     Called when the user has performed an action (e.g. <see cref="Command.Select"/>) causing the View to change state.
+    ///     Set <see cref="CommandEventArgs.Cancel"/> to
+    ///     <see langword="true"/> and return <see langword="true"/> to cancel the state change. The default implementation does nothing.
     /// </summary>
-    /// <param name="args"></param>
+    /// <param name="args">The event arguments.</param>
     /// <returns><see langword="true"/> to stop processing.</returns>
-    protected virtual bool OnSelected (CommandEventArgs args) { return false; }
+    protected virtual bool OnSelecting (CommandEventArgs args) { return false; }
 
     /// <summary>
-    ///     Cancelable event raised when the user has selected the View or otherwise changed the state of the View. Set
-    ///     <see cref="HandledEventArgs.Handled"/>
-    ///     to cancel the event.
+    ///     Cancelable event raised when the user has performed an action (e.g. <see cref="Command.Select"/>) causing the View to change state.
+    ///     Set <see cref="CommandEventArgs.Cancel"/> to
+    ///     <see langword="true"/> to cancel the state change.
     /// </summary>
-    public event EventHandler<CommandEventArgs>? Selected;
-
+    public event EventHandler<CommandEventArgs>? Selecting;
 
     // TODO: What does this event really do? "Called when the user has pressed the View's hot key or otherwise invoked the View's hot key command.???"
     /// <summary>

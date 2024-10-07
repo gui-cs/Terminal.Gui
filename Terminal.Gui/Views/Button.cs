@@ -85,7 +85,7 @@ public class Button : View, IDesignable
     {
         bool cachedIsDefault = IsDefault; // Supports "Swap Default" in Buttons scenario where IsDefault changes
 
-        if (RaiseSelected (ctx) is true)
+        if (RaiseSelecting (ctx) is true)
         {
             return true;
         }

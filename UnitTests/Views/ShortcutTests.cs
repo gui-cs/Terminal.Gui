@@ -473,12 +473,12 @@ public class ShortcutTests
         var commandViewAcceptCount = 0;
         shortcut.CommandView.Accepted += (s, e) => { commandViewAcceptCount++; };
         var commandViewSelectCount = 0;
-        shortcut.CommandView.Selected += (s, e) => { commandViewSelectCount++; };
+        shortcut.CommandView.Selecting += (s, e) => { commandViewSelectCount++; };
 
         var shortcutAcceptCount = 0;
         shortcut.Accepted += (s, e) => { shortcutAcceptCount++; };
         var shortcutSelectCount = 0;
-        shortcut.Selected += (s, e) => { shortcutSelectCount++; };
+        shortcut.Selecting += (s, e) => { shortcutSelectCount++; };
 
         Application.Top.Add (shortcut);
         Application.Top.SetRelativeLayout (new (100, 100));
@@ -590,7 +590,7 @@ public class ShortcutTests
         shortcut.CommandView.Accepted += (s, e) => { checkboxAccepted++; };
 
         var checkboxSelected = 0;
-        shortcut.CommandView.Selected += (s, e) =>
+        shortcut.CommandView.Selecting += (s, e) =>
                                          {
                                              if (e.Cancel)
                                              {
@@ -604,7 +604,7 @@ public class ShortcutTests
         Application.Top.LayoutSubviews ();
 
         var selected = 0;
-        shortcut.Selected += (s, e) =>
+        shortcut.Selecting += (s, e) =>
         {
             selected++;
         };
@@ -665,7 +665,7 @@ public class ShortcutTests
         shortcut.Accepted += (s, e) => accepted++;
 
         var selected = 0;
-        shortcut.Selected += (s, e) => selected++;
+        shortcut.Selecting += (s, e) => selected++;
 
         Application.OnKeyDown (key);
 
@@ -717,7 +717,7 @@ public class ShortcutTests
                              };
 
         var selected = 0;
-        shortcut.Selected += (s, e) => selected++;
+        shortcut.Selecting += (s, e) => selected++;
 
         Application.OnKeyDown (key);
 

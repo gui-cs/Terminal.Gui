@@ -40,7 +40,7 @@ public class RadioGroup : View, IDesignable, IOrientation
 
                         if (cursorChanged || selectedItemChanged)
                         {
-                            if (RaiseSelected (ctx) == true)
+                            if (RaiseSelecting (ctx) == true)
                             {
                                 return true;
                             }
@@ -83,7 +83,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                                     if (selectedItemChanged)
                                     {
                                         // Doesn't matter if it's handled
-                                        RaiseSelected (ctx);
+                                        RaiseSelecting (ctx);
                                         return true;
                                     }
 
@@ -93,7 +93,7 @@ public class RadioGroup : View, IDesignable, IOrientation
 
                                 if (SelectedItem == -1 && ChangeSelectedItem (0))
                                 {
-                                    if (RaiseSelected (ctx) == true)
+                                    if (RaiseSelecting (ctx) == true)
                                     {
                                         return true;
                                     }

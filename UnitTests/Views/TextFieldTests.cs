@@ -521,7 +521,7 @@ public class TextFieldTests (ITestOutputHelper output)
     {
         TextField tf = new ();
 
-        tf.Selected += (sender, args) => Assert.Fail ("Selected should not be raied.");
+        tf.Selecting += (sender, args) => Assert.Fail ("Selected should not be raied.");
 
         Application.Top = new Toplevel ();
         Application.Top.Add (tf);
@@ -538,7 +538,7 @@ public class TextFieldTests (ITestOutputHelper output)
         TextField tf = new ();
 
         int selectedCount = 0;
-        tf.Selected += (sender, args) => selectedCount++;
+        tf.Selecting += (sender, args) => selectedCount++;
 
         Application.Top = new Toplevel ();
         Application.Top.Add (tf);

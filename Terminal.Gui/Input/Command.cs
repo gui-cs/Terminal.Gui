@@ -34,7 +34,7 @@ public enum Command
     /// <summary>
     ///     Selects the View or an item in the View (e.g. a list item or menu item) without necessarily accepting it.
     ///     <para>
-    ///         The default implementation in <see cref="View"/> calls <see cref="View.RaiseSelected"/>.
+    ///         The default implementation in <see cref="View"/> calls <see cref="View.RaiseSelecting"/>.
     ///     </para>
     /// </summary>
     Select,

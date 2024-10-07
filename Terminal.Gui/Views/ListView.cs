@@ -158,7 +158,7 @@ public class ListView : View, IDesignable
                                     {
                                         if (_allowsMarking)
                                         {
-                                            if (RaiseSelected (ctx) == true)
+                                            if (RaiseSelecting (ctx) == true)
                                             {
                                                 return true;
                                             }
@@ -179,7 +179,7 @@ public class ListView : View, IDesignable
                                         if (SelectedItem == -1)
                                         {
                                             SelectedItem = 0;
-                                            if (RaiseSelected (ctx) == true)
+                                            if (RaiseSelecting (ctx) == true)
                                             {
                                                 return true;
 

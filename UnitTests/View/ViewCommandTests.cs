@@ -172,7 +172,7 @@ public class ViewCommandTests (ITestOutputHelper output)
         var view = new View ();
         var SelectedInvoked = false;
 
-        view.Selected += ViewOnSelect;
+        view.Selecting += ViewOnSelect;
 
         bool? ret = view.InvokeCommand (Command.Select);
         Assert.True (ret);
@@ -193,7 +193,7 @@ public class ViewCommandTests (ITestOutputHelper output)
         var view = new View ();
         var selected = false;
 
-        view.Selected += ViewOnSelected;
+        view.Selecting += ViewOnSelected;
 
         view.InvokeCommand (Command.Select);
         Assert.True (selected);
@@ -248,7 +248,7 @@ public class ViewCommandTests (ITestOutputHelper output)
                              };
 
 
-            Selected += (s, a) =>
+            Selecting += (s, a) =>
                              {
                                  a.Cancel = HandleSelected;
                                  SelectedCount++;
@@ -289,7 +289,7 @@ public class ViewCommandTests (ITestOutputHelper output)
         public bool HandleOnSelected { get; set; }
 
         /// <inheritdoc />
-        protected override bool OnSelected (CommandEventArgs args)
+        protected override bool OnSelecting (CommandEventArgs args)
         {
             OnSelectedCount++;
 

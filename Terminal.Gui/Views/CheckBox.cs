@@ -43,7 +43,7 @@ public class CheckBox : View
             return true;
         }
 
-        if (RaiseSelected (ctx) is true)
+        if (RaiseSelecting (ctx) is true)
         {
             return true;
         }

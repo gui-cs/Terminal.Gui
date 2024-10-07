@@ -246,7 +246,7 @@ public class TableView : View
                     {
                         if (ToggleCurrentCellSelection () is true)
                         {
-                            return RaiseSelected (ctx) is true;
+                            return RaiseSelecting (ctx) is true;
                         }
 
                         return false;

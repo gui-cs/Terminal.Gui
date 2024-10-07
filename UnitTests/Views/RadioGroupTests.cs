@@ -91,7 +91,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         rg.SelectedItemChanged += (s, e) => selectedItemChangedCount++;
 
         var selectedCount = 0;
-        rg.Selected += (s, e) => selectedCount++;
+        rg.Selecting += (s, e) => selectedCount++;
 
         var acceptedCount = 0;
         rg.Accepted += (s, e) => acceptedCount++;
@@ -220,7 +220,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         rg.SelectedItemChanged += (s, e) => selectedItemChangedCount++;
 
         var selectCount = 0;
-        rg.Selected += (s, e) => selectCount++;
+        rg.Selecting += (s, e) => selectCount++;
 
         var acceptCount = 0;
         rg.Accepted += (s, e) => acceptCount++;
@@ -297,7 +297,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         rg.SelectedItemChanged += (s, e) => selectedItemChangedCount++;
 
         var selectCount = 0;
-        rg.Selected += (s, e) => selectCount++;
+        rg.Selecting += (s, e) => selectCount++;
 
         var acceptCount = 0;
         rg.Accepted += (s, e) => acceptCount++;
@@ -626,7 +626,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         radioGroup.SelectedItemChanged += (s, e) => selectedItemChanged++;
 
         var selectedCount = 0;
-        radioGroup.Selected += (s, e) => selectedCount++;
+        radioGroup.Selecting += (s, e) => selectedCount++;
 
         var acceptedCount = 0;
         radioGroup.Accepted += (s, e) => acceptedCount++;
@@ -676,7 +676,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         radioGroup.SelectedItemChanged += (s, e) => selectedItemChanged++;
 
         var selectedCount = 0;
-        radioGroup.Selected += (s, e) => selectedCount++;
+        radioGroup.Selecting += (s, e) => selectedCount++;
 
         var acceptedCount = 0;
         var handleAccepted = false;

@@ -334,7 +334,7 @@ public class Shortcut : View, IOrientation, IDesignable
             CommandView.InvokeCommand (Command.Select, ctx);
         }
 
-        if (RaiseSelected (ctx) is true)
+        if (RaiseSelecting (ctx) is true)
         {
             return true;
         }
@@ -477,7 +477,7 @@ public class Shortcut : View, IOrientation, IDesignable
             }
 
             // Clean up old 
-            _commandView.Selected -= CommandViewOnSelected;
+            _commandView.Selecting -= CommandViewOnSelected;
             _commandView.Accepted -= CommandViewOnAccepted;
             Remove (_commandView);
             _commandView?.Dispose ();
@@ -503,7 +503,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
             Title = _commandView.Text;
 
-            _commandView.Selected += CommandViewOnSelected;
+            _commandView.Selecting += CommandViewOnSelected;
 
             _commandView.Accepted += CommandViewOnAccepted;
 
