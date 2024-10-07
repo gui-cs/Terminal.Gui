@@ -29,7 +29,7 @@ public partial class View // Command APIs
                         return true;
                     });
 
-        // Space or single-click - Raise Selected
+        // Space or single-click - Raise Selecting
         AddCommand (Command.Select, (ctx) =>
                                     {
                                         if (RaiseSelecting (ctx) is true)

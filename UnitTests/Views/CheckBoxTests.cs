@@ -566,7 +566,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         ckb.CheckedState = initialState;
 
-        ckb.Selecting += OnSelected;
+        ckb.Selecting += OnSelecting;
 
         Assert.Equal (initialState, ckb.CheckedState);
         bool? ret = ckb.InvokeCommand (Command.Select);
@@ -576,7 +576,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         return;
 
-        void OnSelected (object sender, CommandEventArgs e)
+        void OnSelecting (object sender, CommandEventArgs e)
         {
             checkedInvoked = true;
             e.Cancel = true;
