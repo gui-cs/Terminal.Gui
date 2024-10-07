@@ -8,7 +8,7 @@
 public class SixelSupportResult
 {
     /// <summary>
-    ///     Whether the current driver supports sixel graphic format.
+    ///     Whether the terminal supports sixel graphic format.
     ///     Defaults to false.
     /// </summary>
     public bool IsSupported { get; set; }
@@ -24,4 +24,10 @@ public class SixelSupportResult
     ///     to 256.
     /// </summary>
     public int MaxPaletteColors { get; set; } = 256;
+
+    /// <summary>
+    ///     Whether the terminal supports transparent background sixels.
+    ///     Defaults to false
+    /// </summary>
+    public bool SupportsTransparency { get; set; }
 }
