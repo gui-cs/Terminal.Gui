@@ -48,7 +48,7 @@ public class CheckBox : View
             return true;
         }
 
-        return cancelled is false;
+        return ctx.Command == Command.HotKey ? cancelled : cancelled is false;
     }
 
     private void Checkbox_TitleChanged (object? sender, EventArgs<string> e)
@@ -259,11 +259,11 @@ public class CheckBox : View
     private Rune GetCheckedGlyph ()
     {
         return CheckedState switch
-               {
-                   CheckState.Checked => Glyphs.CheckStateChecked,
-                   CheckState.UnChecked => Glyphs.CheckStateUnChecked,
-                   CheckState.None => Glyphs.CheckStateNone,
-                   _ => throw new ArgumentOutOfRangeException ()
-               };
+        {
+            CheckState.Checked => Glyphs.CheckStateChecked,
+            CheckState.UnChecked => Glyphs.CheckStateUnChecked,
+            CheckState.None => Glyphs.CheckStateNone,
+            _ => throw new ArgumentOutOfRangeException ()
+        };
     }
 }
