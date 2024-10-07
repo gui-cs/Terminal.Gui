@@ -71,8 +71,8 @@ public class SixelSupportDetector
                             charWidth != 0 && charHeight != 0) // Avoid divide by zero
                         {
                             // Calculate the character cell size in pixels
-                            var cellWidth = pixelWidth / charWidth;
-                            var cellHeight = pixelHeight / charHeight;
+                            var cellWidth = (int)Math.Round ((double)pixelWidth / charWidth);
+                            var cellHeight = (int)Math.Round ((double)pixelHeight / charHeight);
 
                             // Set the resolution based on the character cell size
                             result.Resolution = new Size (cellWidth, cellHeight);
