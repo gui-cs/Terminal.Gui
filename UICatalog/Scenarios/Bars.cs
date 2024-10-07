@@ -172,13 +172,23 @@ public class Bars : Scenario
 
         void PopoverMenuOnAccepting (object o, CommandEventArgs args)
         {
-            if (_popoverMenu.Visible)
+            eventSource.Add ($"Accepting: {_popoverMenu!.Id}");
+            eventLog.MoveDown ();
+            var cbShortcuts = _popoverMenu.Subviews.Where (
+                                                          v =>
+                                                          {
+                                                              if (v is Shortcut sh)
+                                                              {
+                                                                  return sh.CommandView is CheckBox;
+                                                              }
+
+                                                              return false;
+                                                          }).Cast<Shortcut> ();
+
+            foreach (Shortcut sh in cbShortcuts)
             {
-                _popoverMenu.Visible = false;
-            }
-            else
-            {
-                _popoverMenu.Visible = true;
+                eventSource.Add ($"  {sh.Id} - {((CheckBox)sh.CommandView).CheckedState}");
+                eventLog.MoveDown ();
             }
         }
 
@@ -186,9 +196,8 @@ public class Bars : Scenario
         {
             sh.Accepting += (o, args) =>
                          {
-                             eventSource.Add ($"Accepting: {sh!.SuperView.Id} {sh!.CommandView.Text}");
+                             eventSource.Add ($"shortcut.Accepting: {sh!.SuperView.Id} {sh!.CommandView.Text}");
                              eventLog.MoveDown ();
-                             //args.Handled = true;
                          };
         }
 
@@ -261,7 +270,6 @@ public class Bars : Scenario
                                  {
                                      eventSource.Add ($"Accept: {sh!.SuperView.Id} {sh!.CommandView.Text}");
                                      eventLog.MoveDown ();
-                                     //args.Handled = true;
                                  };
                 }
             }
