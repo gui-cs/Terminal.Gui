@@ -358,7 +358,7 @@ public class HotKeyTests
         };
         Application.Top.Add (view);
         view.HandlingHotKey += (s, e) => hotKeyRaised = true;
-        view.Accepted += (s, e) => acceptRaised = true;
+        view.Accepting += (s, e) => acceptRaised = true;
         view.Selecting += (s, e) => selectRaised = true;
 
         Assert.Equal (KeyCode.T, view.HotKey);

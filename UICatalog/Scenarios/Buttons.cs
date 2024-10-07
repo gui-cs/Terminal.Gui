@@ -36,7 +36,7 @@ public class Buttons : Scenario
         main.Add (defaultButton);
 
         // Note we handle Accept on main, not defaultButton
-        main.Accepted += (s, e) => Application.RequestStop ();
+        main.Accepting += (s, e) => Application.RequestStop ();
 
         var swapButton = new Button
         {
@@ -47,14 +47,14 @@ public class Buttons : Scenario
             ColorScheme = Colors.ColorSchemes ["Error"]
         };
 
-        swapButton.Accepted += (s, e) =>
+        swapButton.Accepting += (s, e) =>
                              {
                                  e.Cancel = !swapButton.IsDefault;
                                  defaultButton.IsDefault = !defaultButton.IsDefault;
                                  swapButton.IsDefault = !swapButton.IsDefault;
                              };
 
-        defaultButton.Accepted += (s, e) =>
+        defaultButton.Accepting += (s, e) =>
                                 {
                                     e.Cancel = !defaultButton.IsDefault;
 
@@ -67,7 +67,7 @@ public class Buttons : Scenario
 
         static void DoMessage (Button button, string txt)
         {
-            button.Accepted += (s, e) =>
+            button.Accepting += (s, e) =>
                              {
                                  string btnText = button.Text;
                                  MessageBox.Query ("Message", $"Did you click {txt}?", "Yes", "No");
@@ -111,7 +111,7 @@ public class Buttons : Scenario
         main.Add (
                   button = new () { X = 2, Y = Pos.Bottom (button) + 1, Height = 2, Text = "a Newline\nin the button" }
                  );
-        button.Accepted += (s, e) =>
+        button.Accepting += (s, e) =>
                          {
                              MessageBox.Query ("Message", "Question?", "Yes", "No");
                              e.Cancel = true;
@@ -119,7 +119,7 @@ public class Buttons : Scenario
 
         var textChanger = new Button { X = 2, Y = Pos.Bottom (button) + 1, Text = "Te_xt Changer" };
         main.Add (textChanger);
-        textChanger.Accepted += (s, e) =>
+        textChanger.Accepting += (s, e) =>
                               {
                                   textChanger.Text += "!";
                                   e.Cancel = true;
@@ -133,7 +133,7 @@ public class Buttons : Scenario
                       Text = "Lets see if this will move as \"Text Changer\" grows"
                   }
                  );
-        button.Accepted += (sender, args) => { args.Cancel = true; };
+        button.Accepting += (sender, args) => { args.Cancel = true; };
 
         var removeButton = new Button
         {
@@ -143,7 +143,7 @@ public class Buttons : Scenario
         main.Add (removeButton);
 
         // This in interesting test case because `moveBtn` and below are laid out relative to this one!
-        removeButton.Accepted += (s, e) =>
+        removeButton.Accepting += (s, e) =>
                                {
                                    removeButton.Visible = false;
                                    e.Cancel = true;
@@ -169,7 +169,7 @@ public class Buttons : Scenario
             Text = "Move This \u263b Button v_ia Pos"
         };
 
-        moveBtn.Accepted += (s, e) =>
+        moveBtn.Accepting += (s, e) =>
                           {
                               moveBtn.X = moveBtn.Frame.X + 5;
                               e.Cancel = true;
@@ -186,7 +186,7 @@ public class Buttons : Scenario
             ColorScheme = Colors.ColorSchemes ["Error"],
         };
 
-        sizeBtn.Accepted += (s, e) =>
+        sizeBtn.Accepting += (s, e) =>
                           {
                               sizeBtn.Width = sizeBtn.Frame.Width + 5;
                               e.Cancel = true;
@@ -206,7 +206,7 @@ public class Buttons : Scenario
         // Demonstrates how changing the View.Frame property can move Views
         var moveBtnA = new Button { ColorScheme = Colors.ColorSchemes ["Error"], Text = "Move This Button via Frame" };
 
-        moveBtnA.Accepted += (s, e) =>
+        moveBtnA.Accepting += (s, e) =>
                            {
                                moveBtnA.Frame = new (
                                                      moveBtnA.Frame.X + 5,
@@ -224,7 +224,7 @@ public class Buttons : Scenario
             Y = 2, ColorScheme = Colors.ColorSchemes ["Error"], Text = " ~  s  gui.cs   master ↑_10 = Сохранить"
         };
 
-        sizeBtnA.Accepted += (s, e) =>
+        sizeBtnA.Accepting += (s, e) =>
                            {
                                sizeBtnA.Frame = new (
                                                      sizeBtnA.Frame.X,
@@ -297,7 +297,7 @@ public class Buttons : Scenario
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Text = mhkb
         };
-        moveHotKeyBtn.Accepted += (s, e) =>
+        moveHotKeyBtn.Accepting += (s, e) =>
                                 {
                                     moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text);
                                     e.Cancel = true;
@@ -314,7 +314,7 @@ public class Buttons : Scenario
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Text = muhkb
         };
-        moveUnicodeHotKeyBtn.Accepted += (s, e) =>
+        moveUnicodeHotKeyBtn.Accepting += (s, e) =>
                                        {
                                            moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text);
                                            e.Cancel = true;
@@ -398,7 +398,7 @@ public class Buttons : Scenario
             Title = $"Accept Cou_nt: {noRepeatAcceptCount}",
             WantContinuousButtonPressed = false
         };
-        noRepeatButton.Accepted += (s, e) =>
+        noRepeatButton.Accepting += (s, e) =>
                                  {
                                      noRepeatButton.Title = $"Accept Cou_nt: {++noRepeatAcceptCount}";
                                      e.Cancel = true;
@@ -420,7 +420,7 @@ public class Buttons : Scenario
             Title = $"Accept Co_unt: {acceptCount}",
             WantContinuousButtonPressed = true
         };
-        repeatButton.Accepted += (s, e) =>
+        repeatButton.Accepting += (s, e) =>
                                {
                                    repeatButton.Title = $"Accept Co_unt: {++acceptCount}";
                                    e.Cancel = true;

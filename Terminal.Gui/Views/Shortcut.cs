@@ -12,7 +12,7 @@ namespace Terminal.Gui;
 /// <remarks>
 ///     <para>
 ///         The following user actions will invoke the <see cref="Command.Accept"/>, causing the
-///         <see cref="View.Accepted"/> event to be fired:
+///         <see cref="View.Accepting"/> event to be fired:
 ///         - Clicking on the <see cref="Shortcut"/>.
 ///         - Pressing the key specified by <see cref="Key"/>.
 ///         - Pressing the HotKey specified by <see cref="CommandView"/>.
@@ -344,7 +344,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
         var cancel = false;
 
-        cancel = RaiseAccepted () is true;
+        cancel = RaiseAccepting () is true;
 
         if (cancel)
         {
@@ -372,7 +372,7 @@ public class Shortcut : View, IOrientation, IDesignable
     ///     mouse.
     /// </summary>
     /// <remarks>
-    ///     Note, the <see cref="View.Accepted"/> event is fired first, and if cancelled, the event will not be invoked.
+    ///     Note, the <see cref="View.Accepting"/> event is fired first, and if cancelled, the event will not be invoked.
     /// </remarks>
     public Action? Action { get; set; }
 
@@ -478,7 +478,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
             // Clean up old 
             _commandView.Selecting -= CommandViewOnSelecting;
-            _commandView.Accepted -= CommandViewOnAccepted;
+            _commandView.Accepting -= CommandViewOnAccepted;
             Remove (_commandView);
             _commandView?.Dispose ();
 
@@ -505,7 +505,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
             _commandView.Selecting += CommandViewOnSelecting;
 
-            _commandView.Accepted += CommandViewOnAccepted;
+            _commandView.Accepting += CommandViewOnAccepted;
 
             SetCommandViewDefaultLayout ();
             SetHelpViewDefaultLayout ();

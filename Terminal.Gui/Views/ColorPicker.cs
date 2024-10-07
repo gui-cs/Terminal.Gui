@@ -64,7 +64,7 @@ public class ColorPicker : View
                     Width = textFieldWidth
                 };
                 tfValue.HasFocusChanged += UpdateSingleBarValueFromTextField;
-                tfValue.Accepted += (s, _)=>UpdateSingleBarValueFromTextField(s);
+                tfValue.Accepting += (s, _)=>UpdateSingleBarValueFromTextField(s);
                 _textFields.Add (bar, tfValue);
             }
 
@@ -154,7 +154,7 @@ public class ColorPicker : View
         _tfName.Autocomplete = auto;
 
         _tfName.HasFocusChanged += UpdateValueFromName;
-        _tfName.Accepted += (s, _) => UpdateValueFromName ();
+        _tfName.Accepting += (s, _) => UpdateValueFromName ();
     }
 
     private void CreateTextField ()
@@ -184,7 +184,7 @@ public class ColorPicker : View
         Add (_tfHex);
 
         _tfHex.HasFocusChanged += UpdateValueFromTextField;
-        _tfHex.Accepted += (_,_)=> UpdateValueFromTextField();
+        _tfHex.Accepting += (_,_)=> UpdateValueFromTextField();
     }
 
     private void DisposeOldViews ()

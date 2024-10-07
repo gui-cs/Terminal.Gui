@@ -39,7 +39,7 @@ public partial class View // Keyboard APIs
     ///     <para>
     ///         A HotKey is a keypress that causes a visible UI item to perform an action. For example, in a Dialog,
     ///         with a Button with the text of "_Text" <c>Alt+T</c> will cause the button to gain focus and to raise its
-    ///         <see cref="Accepted"/> event.
+    ///         <see cref="Accepting"/> event.
     ///         Or, in a
     ///         <see cref="Menu"/> with "_File _Edit", <c>Alt+F</c> will select (show) the "_File" menu. If the "_File" menu
     ///         has a

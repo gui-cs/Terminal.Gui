@@ -442,7 +442,7 @@ public class Text : Scenario
 
         win.Add (acceptView);
 
-        win.Accepted += WinOnAccept;
+        win.Accepting += WinOnAccept;
 
         Application.Run (win);
         win.Dispose ();

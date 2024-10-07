@@ -185,7 +185,7 @@ public class Dialogs : Scenario
             X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "_Show Dialog"
         };
 
-        app.Accepted += (s, e) =>
+        app.Accepting += (s, e) =>
                                    {
                                        Dialog dlg = CreateDemoDialog (
                                                                       widthEdit,
@@ -255,7 +255,7 @@ public class Dialogs : Scenario
                     button = new () { Text = NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
                 }
 
-                button.Accepted += (s, e) =>
+                button.Accepting += (s, e) =>
                                  {
                                      clicked = buttonId;
                                      Application.RequestStop ();
@@ -290,7 +290,7 @@ public class Dialogs : Scenario
                 Text = "_Add a button"
             };
 
-            add.Accepted += (s, e) =>
+            add.Accepting += (s, e) =>
                           {
                               int buttonId = buttons.Count;
                               Button button;
@@ -308,7 +308,7 @@ public class Dialogs : Scenario
                                   button = new () { Text = NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
                               }
 
-                              button.Accepted += (s, e) =>
+                              button.Accepting += (s, e) =>
                                                {
                                                    clicked = buttonId;
                                                    Application.RequestStop ();
@@ -330,7 +330,7 @@ public class Dialogs : Scenario
                 Text = $"A_dd a {char.ConvertFromUtf32 (CODE_POINT)} to each button. This text is really long for a reason."
             };
 
-            addChar.Accepted += (s, e) =>
+            addChar.Accepting += (s, e) =>
                               {
                                   foreach (Button button in buttons)
                                   {

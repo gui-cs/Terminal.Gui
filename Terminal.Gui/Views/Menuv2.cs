@@ -76,7 +76,7 @@ public class Menuv2 : Bar
             // TODO: instead, add a property (a style enum?) to Shortcut to control this
             //shortcut.AlignmentModes = AlignmentModes.EndToStart;
 
-            shortcut.Accepted += ShortcutOnAccept;
+            shortcut.Accepting += ShortcutOnAccept;
 
             void ShortcutOnAccept (object sender, CommandEventArgs e)
             {

@@ -168,7 +168,7 @@ public class Bars : Scenario
         };
         popOverMenu.Add (toggleShortcut);
 
-        popOverMenu.Accepted += PopOverMenuOnAccept;
+        popOverMenu.Accepting += PopOverMenuOnAccept;
 
         void PopOverMenuOnAccept (object o, CommandEventArgs args)
         {
@@ -255,7 +255,7 @@ public class Bars : Scenario
             {
                 foreach (Shortcut sh in barView.Subviews.Where (s => s is Shortcut)!)
                 {
-                    sh.Accepted += (o, args) =>
+                    sh.Accepting += (o, args) =>
                                  {
                                      eventSource.Add ($"Accept: {sh!.SuperView.Id} {sh!.CommandView.Text}");
                                      eventLog.MoveDown ();
@@ -522,10 +522,10 @@ public class Bars : Scenario
             Text = "I'll Hide",
             // Visible = false
         };
-        button1.Accepted += Button_Clicked;
+        button1.Accepting += Button_Clicked;
         bar.Add (button1);
 
-        shortcut.Accepted += (s, e) =>
+        shortcut.Accepting += (s, e) =>
                                                     {
                                                         button1.Visible = !button1.Visible;
                                                         button1.Enabled = button1.Visible;
@@ -543,7 +543,7 @@ public class Bars : Scenario
         {
             Text = "Or me!",
         };
-        button2.Accepted += (s, e) => Application.RequestStop ();
+        button2.Accepting += (s, e) => Application.RequestStop ();
 
         bar.Add (button2);
 

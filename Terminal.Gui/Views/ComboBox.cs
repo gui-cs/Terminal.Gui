@@ -36,7 +36,7 @@ public class ComboBox : View, IDesignable
 
         _listview.Y = Pos.Bottom (_search);
         _listview.OpenSelectedItem += (sender, a) => SelectText ();
-        _listview.Accepted += (sender, args) =>
+        _listview.Accepting += (sender, args) =>
                               {
                                   // This prevents Accepted from bubbling up to the combobox
                                   args.Cancel = true;
@@ -401,7 +401,7 @@ public class ComboBox : View, IDesignable
                 return false;
             }
 
-            return RaiseAccepted () == true;
+            return RaiseAccepting () == true;
         }
 
         return false;

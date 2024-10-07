@@ -555,7 +555,7 @@ public class TextFieldTests (ITestOutputHelper output)
         TextField tf = new ();
 
         var acceptedCount = 0;
-        tf.Accepted += (sender, args) => acceptedCount++;
+        tf.Accepting += (sender, args) => acceptedCount++;
 
         Application.Top = new ();
         Application.Top.Add (tf);
@@ -818,7 +818,7 @@ public class TextFieldTests (ITestOutputHelper output)
     {
         var view = new TextField ();
         var accepted = false;
-        view.Accepted += OnAccept;
+        view.Accepting += OnAccept;
         view.InvokeCommand (Command.HotKey);
 
         Assert.False (accepted);
@@ -834,7 +834,7 @@ public class TextFieldTests (ITestOutputHelper output)
         var view = new TextField ();
 
         var accepted = false;
-        view.Accepted += Accept;
+        view.Accepting += Accept;
         view.InvokeCommand (Command.Accept);
         Assert.True (accepted);
 
@@ -867,10 +867,10 @@ public class TextFieldTests (ITestOutputHelper output)
         superView.Add (tf, button);
 
         var buttonAccept = 0;
-        button.Accepted += ButtonAccept;
+        button.Accepting += ButtonAccept;
 
         var textFieldAccept = 0;
-        tf.Accepted += TextFieldAccept;
+        tf.Accepting += TextFieldAccept;
 
         tf.SetFocus ();
         Assert.True (tf.HasFocus);
@@ -917,7 +917,7 @@ public class TextFieldTests (ITestOutputHelper output)
         superView.Add (tf, button);
 
         var buttonAccept = 0;
-        button.Accepted += ButtonAccept;
+        button.Accepting += ButtonAccept;
 
         tf.SetFocus ();
         Assert.True (tf.HasFocus);
@@ -946,13 +946,13 @@ public class TextFieldTests (ITestOutputHelper output)
 
         var tfAcceptedInvoked = false;
         var handle = false;
-        view.Accepted += TextViewAccept;
+        view.Accepting += TextViewAccept;
         Assert.False (view.InvokeCommand (Command.Accept));
         Assert.True (tfAcceptedInvoked);
 
         tfAcceptedInvoked = false;
         handle = true;
-        view.Accepted += TextViewAccept;
+        view.Accepting += TextViewAccept;
         Assert.True (view.InvokeCommand (Command.Accept));
         Assert.True (tfAcceptedInvoked);
 

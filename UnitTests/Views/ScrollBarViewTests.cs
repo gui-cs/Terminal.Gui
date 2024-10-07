@@ -1154,7 +1154,7 @@ This is a test
         var text = "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
         var label = new Label { Width = 14, Height = 5, Text = text };
         var btn = new Button { X = 14, Text = "Click Me!" };
-        btn.Accepted += (s, e) => clicked = true;
+        btn.Accepting += (s, e) => clicked = true;
         var top = new Toplevel ();
         top.Add (label, btn);
 

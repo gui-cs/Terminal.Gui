@@ -94,7 +94,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         rg.Selecting += (s, e) => selectingCount++;
 
         var acceptedCount = 0;
-        rg.Accepted += (s, e) => acceptedCount++;
+        rg.Accepting += (s, e) => acceptedCount++;
 
         // By default the first item is selected
         Assert.Equal (0, rg.SelectedItem);
@@ -223,7 +223,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         rg.Selecting += (s, e) => selectCount++;
 
         var acceptCount = 0;
-        rg.Accepted += (s, e) => acceptCount++;
+        rg.Accepting += (s, e) => acceptCount++;
 
         // By default the first item is selected
         Assert.Equal (0, rg.SelectedItem);
@@ -300,7 +300,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         rg.Selecting += (s, e) => selectCount++;
 
         var acceptCount = 0;
-        rg.Accepted += (s, e) => acceptCount++;
+        rg.Accepting += (s, e) => acceptCount++;
 
         // By default the first item is selected
         Assert.Equal (0, rg.SelectedItem);
@@ -491,7 +491,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         var group = new RadioGroup { RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" } };
         var accepted = false;
 
-        group.Accepted += OnAccept;
+        group.Accepting += OnAccept;
         group.InvokeCommand (Command.HotKey);
 
         Assert.False (accepted);
@@ -507,7 +507,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         var group = new RadioGroup { RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" } };
         var accepted = false;
 
-        group.Accepted += OnAccept;
+        group.Accepting += OnAccept;
         group.InvokeCommand (Command.Accept);
 
         Assert.True (accepted);
@@ -629,7 +629,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         radioGroup.Selecting += (s, e) => selectingCount++;
 
         var acceptedCount = 0;
-        radioGroup.Accepted += (s, e) => acceptedCount++;
+        radioGroup.Accepting += (s, e) => acceptedCount++;
 
         Assert.Equal (Orientation.Vertical, radioGroup.Orientation);
 
@@ -681,7 +681,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         var acceptedCount = 0;
         var handleAccepted = false;
 
-        radioGroup.Accepted += (s, e) =>
+        radioGroup.Accepting += (s, e) =>
                              {
                                  acceptedCount++;
                                  e.Cancel = handleAccepted;
@@ -733,7 +733,7 @@ public class RadioGroupTests (ITestOutputHelper output)
 
         var superViewAcceptCount = 0;
 
-        superView.Accepted += (s, a) =>
+        superView.Accepting += (s, a) =>
                             {
                                 superViewAcceptCount++;
                                 a.Cancel = true;

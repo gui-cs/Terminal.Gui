@@ -275,13 +275,13 @@ public class ListColumns : Scenario
         var accepted = false;
         var ok = new Button { Text = "Ok", IsDefault = true };
 
-        ok.Accepted += (s, e) =>
+        ok.Accepting += (s, e) =>
                      {
                          accepted = true;
                          Application.RequestStop ();
                      };
         var cancel = new Button { Text = "Cancel" };
-        cancel.Accepted += (s, e) => { Application.RequestStop (); };
+        cancel.Accepting += (s, e) => { Application.RequestStop (); };
         var d = new Dialog { Title = prompt, Buttons = [ok, cancel] };
 
         var tf = new TextField { Text = getter (_listColView).ToString (), X = 0, Y = 0, Width = Dim.Fill () };

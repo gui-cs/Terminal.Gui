@@ -14,7 +14,7 @@ public enum Command
     /// <summary>
     ///     Accepts the current state of the View (e.g. list selection, button press, checkbox state, etc.).
     ///     <para>
-    ///         The default implementation in <see cref="View"/> calls <see cref="View.RaiseAccepted"/>. If the event is not handled,
+    ///         The default implementation in <see cref="View"/> calls <see cref="View.RaiseAccepting"/>. If the event is not handled,
     ///         the command is invoked on:
     ///             - Any peer-view that is a <see cref="Button"/> with <see cref="Button.IsDefault"/> set to <see langword="true"/>.
     ///             - The <see cref="View.SuperView"/>. This enables default Accept behavior.

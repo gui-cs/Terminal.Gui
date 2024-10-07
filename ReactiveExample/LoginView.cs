@@ -108,7 +108,7 @@ public class LoginView : Window, IViewFor<LoginViewModel>
 
                 login
                     .Events ()
-                    .Accepted
+                    .Accepting
                     .InvokeCommand (ViewModel, x => x.Login)
                     .DisposeWith (_disposable);
             })
@@ -120,7 +120,7 @@ public class LoginView : Window, IViewFor<LoginViewModel>
 
                 clear
                     .Events ()
-                    .Accepted
+                    .Accepting
                     .InvokeCommand (ViewModel, x => x.ClearCommand)
                     .DisposeWith (_disposable);
             })

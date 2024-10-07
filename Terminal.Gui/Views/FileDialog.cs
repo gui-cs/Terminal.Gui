@@ -78,7 +78,7 @@ public class FileDialog : Dialog
             Y = Pos.AnchorEnd (),
             IsDefault = true, Text = Style.OkButtonText
         };
-        _btnOk.Accepted += (s, e) => Accept (true);
+        _btnOk.Accepting += (s, e) => Accept (true);
 
 
         _btnCancel = new Button
@@ -88,7 +88,7 @@ public class FileDialog : Dialog
             Text = Strings.btnCancel
         };
 
-        _btnCancel.Accepted += (s, e) =>
+        _btnCancel.Accepting += (s, e) =>
         {
             Canceled = true;
             Application.RequestStop ();
@@ -96,15 +96,15 @@ public class FileDialog : Dialog
 
         _btnUp = new Button { X = 0, Y = 1, NoPadding = true };
         _btnUp.Text = GetUpButtonText ();
-        _btnUp.Accepted += (s, e) => _history.Up ();
+        _btnUp.Accepting += (s, e) => _history.Up ();
 
         _btnBack = new Button { X = Pos.Right (_btnUp) + 1, Y = 1, NoPadding = true };
         _btnBack.Text = GetBackButtonText ();
-        _btnBack.Accepted += (s, e) => _history.Back ();
+        _btnBack.Accepting += (s, e) => _history.Back ();
 
         _btnForward = new Button { X = Pos.Right (_btnBack) + 1, Y = 1, NoPadding = true };
         _btnForward.Text = GetForwardButtonText ();
-        _btnForward.Accepted += (s, e) => _history.Forward ();
+        _btnForward.Accepting += (s, e) => _history.Forward ();
 
         _tbPath = new TextField { Width = Dim.Fill (), CaptionColor = new Color (Color.Black) };
 
@@ -182,7 +182,7 @@ public class FileDialog : Dialog
             Y = Pos.AnchorEnd (), Text = GetToggleSplitterText (false)
         };
 
-        _btnToggleSplitterCollapse.Accepted += (s, e) =>
+        _btnToggleSplitterCollapse.Accepting += (s, e) =>
                                               {
                                                   Tile tile = _splitContainer.Tiles.ElementAt (0);
 

@@ -50,7 +50,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                     });
 
         // Accept (Enter key) - Raise Accept event - DO NOT advance state
-        AddCommand (Command.Accept, () => RaiseAccepted ());
+        AddCommand (Command.Accept, () => RaiseAccepting ());
 
         // Hotkey - ctx may indicate a radio item hotkey was pressed. Beahvior depends on HasFocus
         //          If HasFocus and it's this.HotKey invoke Select command - DO NOT raise Accept
@@ -209,7 +209,7 @@ public class RadioGroup : View, IDesignable, IOrientation
     }
 
     /// <summary>
-    ///     Gets or sets whether double clicking on a Radio Item will cause the <see cref="View.Accepted"/> event to be raised.
+    ///     Gets or sets whether double clicking on a Radio Item will cause the <see cref="View.Accepting"/> event to be raised.
     /// </summary>
     /// <remarks>
     ///     <para>

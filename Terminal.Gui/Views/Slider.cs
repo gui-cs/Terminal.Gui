@@ -1789,7 +1789,7 @@ public class Slider<T> : View, IOrientation
     {
         SetFocusedOption ();
 
-        return RaiseAccepted () == true;
+        return RaiseAccepting () == true;
     }
 
     internal bool MovePlus ()

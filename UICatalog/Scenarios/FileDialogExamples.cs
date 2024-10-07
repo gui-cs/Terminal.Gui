@@ -125,7 +125,7 @@ public class FileDialogExamples : Scenario
 
         var btn = new Button { X = 1, Y = 9, IsDefault = true, Text = "Run Dialog" };
 
-        win.Accepted += (s, e) =>
+        win.Accepting += (s, e) =>
                         {
                             try
                             {

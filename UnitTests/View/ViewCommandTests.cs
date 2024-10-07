@@ -42,7 +42,7 @@ public class ViewCommandTests (ITestOutputHelper output)
         var view = new View ();
         var acceptInvoked = false;
 
-        view.Accepted += ViewOnAccept;
+        view.Accepting += ViewOnAccept;
 
         bool? ret = view.InvokeCommand (Command.Accept);
         Assert.True (ret);
@@ -63,7 +63,7 @@ public class ViewCommandTests (ITestOutputHelper output)
         var view = new View ();
         var accepted = false;
 
-        view.Accepted += ViewOnAccept;
+        view.Accepting += ViewOnAccept;
 
         view.InvokeCommand (Command.Accept);
         Assert.True (accepted);
@@ -235,7 +235,7 @@ public class ViewCommandTests (ITestOutputHelper output)
         {
             CanFocus = true;
 
-            Accepted += (s, a) =>
+            Accepting += (s, a) =>
                       {
                           a.Cancel = HandleAccepted;
                           AcceptedCount++;
@@ -260,7 +260,7 @@ public class ViewCommandTests (ITestOutputHelper output)
         public bool HandleOnAccepted { get; set; }
 
         /// <inheritdoc />
-        protected override bool OnAccepted (CommandEventArgs args)
+        protected override bool OnAccepting (CommandEventArgs args)
         {
             OnAcceptedCount++;
 

@@ -422,7 +422,7 @@ public class ShortcutTests
         Application.Top.LayoutSubviews ();
 
         var accepted = 0;
-        shortcut.Accepted += (s, e) => accepted++;
+        shortcut.Accepting += (s, e) => accepted++;
 
         Application.OnMouseEvent (
                                   new ()
@@ -471,12 +471,12 @@ public class ShortcutTests
         };
 
         var commandViewAcceptCount = 0;
-        shortcut.CommandView.Accepted += (s, e) => { commandViewAcceptCount++; };
+        shortcut.CommandView.Accepting += (s, e) => { commandViewAcceptCount++; };
         var commandViewSelectCount = 0;
         shortcut.CommandView.Selecting += (s, e) => { commandViewSelectCount++; };
 
         var shortcutAcceptCount = 0;
-        shortcut.Accepted += (s, e) => { shortcutAcceptCount++; };
+        shortcut.Accepting += (s, e) => { shortcutAcceptCount++; };
         var shortcutSelectCount = 0;
         shortcut.Selecting += (s, e) => { shortcutSelectCount++; };
 
@@ -533,13 +533,13 @@ public class ShortcutTests
             CanFocus = false
         };
         var buttonAccepted = 0;
-        shortcut.CommandView.Accepted += (s, e) => { buttonAccepted++; };
+        shortcut.CommandView.Accepting += (s, e) => { buttonAccepted++; };
         Application.Top.Add (shortcut);
         Application.Top.SetRelativeLayout (new (100, 100));
         Application.Top.LayoutSubviews ();
 
         var accepted = 0;
-        shortcut.Accepted += (s, e) => { accepted++; };
+        shortcut.Accepting += (s, e) => { accepted++; };
 
         Application.OnMouseEvent (
                                   new ()
@@ -587,7 +587,7 @@ public class ShortcutTests
             CanFocus = false
         };
         var checkboxAccepted = 0;
-        shortcut.CommandView.Accepted += (s, e) => { checkboxAccepted++; };
+        shortcut.CommandView.Accepting += (s, e) => { checkboxAccepted++; };
 
         var checkboxSelected = 0;
         shortcut.CommandView.Selecting += (s, e) =>
@@ -610,7 +610,7 @@ public class ShortcutTests
         };
 
         var accepted = 0;
-        shortcut.Accepted += (s, e) =>
+        shortcut.Accepting += (s, e) =>
                              {
                                  accepted++;
                                  e.Cancel = true;
@@ -662,7 +662,7 @@ public class ShortcutTests
         Assert.Equal (canFocus, shortcut.HasFocus);
 
         var accepted = 0;
-        shortcut.Accepted += (s, e) => accepted++;
+        shortcut.Accepting += (s, e) => accepted++;
 
         var selected = 0;
         shortcut.Selecting += (s, e) => selected++;
@@ -710,7 +710,7 @@ public class ShortcutTests
         Assert.Equal (canFocus, shortcut.HasFocus);
 
         var accepted = 0;
-        shortcut.Accepted += (s, e) =>
+        shortcut.Accepting += (s, e) =>
                              {
                                  accepted++;
                                  e.Cancel = true;
@@ -749,7 +749,7 @@ public class ShortcutTests
         Application.Top.SetFocus ();
 
         var accepted = 0;
-        shortcut.Accepted += (s, e) => accepted++;
+        shortcut.Accepting += (s, e) => accepted++;
 
         Application.OnKeyDown (key);
 

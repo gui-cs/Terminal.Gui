@@ -140,7 +140,7 @@ public class ListView : View, IDesignable
         // Accept (Enter key) - Raise Accept event - DO NOT advance state
         AddCommand (Command.Accept, () =>
                                     {
-                                        if (RaiseAccepted () == true)
+                                        if (RaiseAccepting () == true)
                                         {
                                             return true;
                                         }

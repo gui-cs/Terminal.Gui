@@ -198,7 +198,7 @@ public class ASCIICustomButtonTest : Scenario
                     Height = BUTTON_HEIGHT
                 };
                 button.Initialized += Button_Initialized;
-                button.Accepted += Button_Clicked;
+                button.Accepting += Button_Clicked;
                 button.PointerEnter += Button_PointerEnter;
                 button.MouseClick += Button_MouseClick;
                 button.KeyDown += Button_KeyPress;
@@ -216,7 +216,7 @@ public class ASCIICustomButtonTest : Scenario
                 Height = BUTTON_HEIGHT
             };
             closeButton.Initialized += Button_Initialized;
-            closeButton.Accepted += Button_Clicked;
+            closeButton.Accepting += Button_Clicked;
             closeButton.PointerEnter += Button_PointerEnter;
             closeButton.MouseClick += Button_MouseClick;
             closeButton.KeyDown += Button_KeyPress;

@@ -70,7 +70,7 @@ public class ConfigurationEditor : Scenario
             Key = Key.F5.WithShift,
             Title = "Reload",
         };
-        reloadShortcut.Accepted += (s, e) => { Reload (); };
+        reloadShortcut.Accepting += (s, e) => { Reload (); };
 
         var saveShortcut = new Shortcut ()
         {

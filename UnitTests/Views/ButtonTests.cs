@@ -249,7 +249,7 @@ public class ButtonTests (ITestOutputHelper output)
     {
         var clicked = false;
         var btn = new Button { Text = "_Test" };
-        btn.Accepted += (s, e) => clicked = true;
+        btn.Accepting += (s, e) => clicked = true;
 
         Assert.Equal (KeyCode.T, btn.HotKey);
         Assert.False (btn.NewKeyDownEvent (Key.T)); // Button processes, but does not handle
@@ -280,7 +280,7 @@ public class ButtonTests (ITestOutputHelper output)
         button.CanFocus = focused;
 
         int acceptInvoked = 0;
-        button.Accepted += (s, e) => acceptInvoked++;
+        button.Accepting += (s, e) => acceptInvoked++;
 
         superView.Add (button);
         button.SetFocus ();
@@ -308,7 +308,7 @@ public class ButtonTests (ITestOutputHelper output)
         button.CanFocus = focused;
 
         int acceptInvoked = 0;
-        button.Accepted += (s, e) => acceptInvoked++;
+        button.Accepting += (s, e) => acceptInvoked++;
 
         superView.Add (button);
         button.SetFocus ();
@@ -339,7 +339,7 @@ public class ButtonTests (ITestOutputHelper output)
         button.CanFocus = focused;
 
         int acceptInvoked = 0;
-        button.Accepted += (s, e) => acceptInvoked++;
+        button.Accepting += (s, e) => acceptInvoked++;
 
         superView.Add (button);
         button.SetFocus ();
@@ -363,7 +363,7 @@ public class ButtonTests (ITestOutputHelper output)
         var pressed = 0;
         var btn = new Button { Text = "Press Me" };
 
-        btn.Accepted += (s, e) => pressed++;
+        btn.Accepting += (s, e) => pressed++;
 
         // The Button class supports the Default and Accept command
         Assert.Contains (Command.HotKey, btn.GetSupportedCommands ());
@@ -414,7 +414,7 @@ public class ButtonTests (ITestOutputHelper output)
     {
         var clicked = false;
         var btn = new Button { Text = "_Test" };
-        btn.Accepted += (s, e) => clicked = true;
+        btn.Accepting += (s, e) => clicked = true;
         var top = new Toplevel ();
         top.Add (btn);
         Application.Begin (top);
@@ -483,7 +483,7 @@ public class ButtonTests (ITestOutputHelper output)
         var button = new Button ();
         var accepted = false;
 
-        button.Accepted += ButtonOnAccept;
+        button.Accepting += ButtonOnAccept;
         button.InvokeCommand (Command.HotKey);
 
         Assert.True (accepted);
@@ -500,7 +500,7 @@ public class ButtonTests (ITestOutputHelper output)
         var button = new Button ();
         var acceptInvoked = false;
 
-        button.Accepted += ButtonAccept;
+        button.Accepting += ButtonAccept;
 
         bool? ret = button.InvokeCommand (Command.Accept);
         Assert.True (ret);
@@ -612,7 +612,7 @@ public class ButtonTests (ITestOutputHelper output)
 
         button.Selecting += (s, e) => selectingCount++;
         var acceptedCount = 0;
-        button.Accepted += (s, e) =>
+        button.Accepting += (s, e) =>
                            {
                                acceptedCount++;
                                e.Cancel = true;
@@ -657,7 +657,7 @@ public class ButtonTests (ITestOutputHelper output)
 
         var acceptedCount = 0;
 
-        button.Accepted += (s, e) =>
+        button.Accepting += (s, e) =>
                            {
                                acceptedCount++;
                                e.Cancel = true;

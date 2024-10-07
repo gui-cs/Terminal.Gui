@@ -74,7 +74,7 @@ public class LabelTests (ITestOutputHelper output)
         var label = new Label ();
         var accepted = false;
 
-        label.Accepted += LabelOnAccept;
+        label.Accepting += LabelOnAccept;
         label.InvokeCommand (Command.HotKey);
 
         Assert.False (accepted);

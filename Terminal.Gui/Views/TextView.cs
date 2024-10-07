@@ -2517,7 +2517,7 @@ public class TextView : View
     // BUGBUG: AllowsReturn is mis-named. It should be EnterKeyAccepts.
     /// <summary>
     ///     Gets or sets whether pressing ENTER in a <see cref="TextView"/> creates a new line of text
-    ///     in the view or invokes the <see cref="View.Accepted"/> event.
+    ///     in the view or invokes the <see cref="View.Accepting"/> event.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -6054,7 +6054,7 @@ public class TextView : View
         {
             // By Default pressing ENTER should be ignored (OnAccept will return false or null). Only cancel if the
             // event was fired and set Cancel = true.
-            return RaiseAccepted () is null or false;
+            return RaiseAccepting () is null or false;
         }
 
         SetWrapModel ();

@@ -19,13 +19,13 @@ internal partial class LoginView : IRecipient<Message<LoginActions>>
                                      {
                                          ViewModel.Password = passwordInput.Text;
                                      };
-        loginButton.Accepted += (_, _) =>
+        loginButton.Accepting += (_, _) =>
                               {
                                   if (!ViewModel.CanLogin) { return; }
                                   ViewModel.LoginCommand.Execute (null);
                               };
 
-        clearButton.Accepted += (_, _) =>
+        clearButton.Accepting += (_, _) =>
                               {
                                   ViewModel.ClearCommand.Execute (null);
                               };

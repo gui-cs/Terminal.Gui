@@ -414,7 +414,7 @@ Item 6",
         var listView = new ListView ();
         var accepted = false;
 
-        listView.Accepted += OnAccepted;
+        listView.Accepting += OnAccepted;
         listView.InvokeCommand (Command.HotKey);
 
         Assert.False (accepted);
@@ -435,7 +435,7 @@ Item 6",
         var opened = false;
         var selectedValue = string.Empty;
 
-        listView.Accepted += Accepted;
+        listView.Accepting += Accepted;
         listView.OpenSelectedItem += OpenSelectedItem;
 
         listView.InvokeCommand (Command.Accept);
@@ -466,7 +466,7 @@ Item 6",
         var opened = false;
         var selectedValue = string.Empty;
 
-        listView.Accepted += Accepted;
+        listView.Accepting += Accepted;
         listView.OpenSelectedItem += OpenSelectedItem;
 
         listView.InvokeCommand (Command.Accept);

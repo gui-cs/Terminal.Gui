@@ -227,7 +227,7 @@ public class DatePicker : View
             ShadowStyle = ShadowStyle.None
         };
 
-        _previousMonthButton.Accepted += (sender, e) =>
+        _previousMonthButton.Accepting += (sender, e) =>
                                         {
                                             Date = _date.AddMonths (-1);
                                             CreateCalendar ();
@@ -247,7 +247,7 @@ public class DatePicker : View
             ShadowStyle = ShadowStyle.None
         };
 
-        _nextMonthButton.Accepted += (sender, e) =>
+        _nextMonthButton.Accepting += (sender, e) =>
                                     {
                                         Date = _date.AddMonths (1);
                                         CreateCalendar ();

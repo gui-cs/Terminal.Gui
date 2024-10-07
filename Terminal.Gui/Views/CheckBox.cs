@@ -27,7 +27,7 @@ public class CheckBox : View
         AddCommand (Command.HotKey, AdvanceAndSelect);
 
         // Accept (Enter key) - Raise Accept event - DO NOT advance state
-        AddCommand (Command.Accept, RaiseAccepted);
+        AddCommand (Command.Accept, RaiseAccepting);
 
         TitleChanged += Checkbox_TitleChanged;
 

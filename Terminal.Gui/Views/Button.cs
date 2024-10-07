@@ -8,12 +8,12 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     A View that raises the <see cref="View.Accepted"/> event when clicked with the mouse or when the
+///     A View that raises the <see cref="View.Accepting"/> event when clicked with the mouse or when the
 ///     <see cref="View.HotKey"/>, <c>Enter</c>, or <c>Space</c> key is pressed.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Provides a button showing text that raises the <see cref="View.Accepted"/> event when clicked on with a mouse or
+///         Provides a button showing text that raises the <see cref="View.Accepting"/> event when clicked on with a mouse or
 ///         when the user presses <c>Enter</c>, <c>Space</c> or the <see cref="View.HotKey"/>. The hot key is the first
 ///         letter or digit
 ///         following the first underscore ('_') in the button text.
@@ -21,13 +21,13 @@ namespace Terminal.Gui;
 ///     <para>Use <see cref="View.HotKeySpecifier"/> to change the hot key specifier from the default of ('_').</para>
 ///     <para>
 ///         When the button is configured as the default (<see cref="IsDefault"/>) and the user causes the button to be
-///         accepted the <see cref="Button"/>'s <see cref="View.Accepted"/> event will be raised. If the Accept event is not
+///         accepted the <see cref="Button"/>'s <see cref="View.Accepting"/> event will be raised. If the Accept event is not
 ///         handled, the Accept event on the <see cref="View.SuperView"/>. will be raised. This enables default Accept
 ///         behavior.
 ///     </para>
 ///     <para>
 ///         Set <see cref="View.WantContinuousButtonPressed"/> to <see langword="true"/> to have the
-///         <see cref="View.Accepted"/> event
+///         <see cref="View.Accepting"/> event
 ///         invoked repeatedly while the button is pressed.
 ///     </para>
 /// </remarks>
@@ -90,7 +90,7 @@ public class Button : View, IDesignable
             return true;
         }
 
-        bool? handled = RaiseAccepted ();
+        bool? handled = RaiseAccepting ();
 
         if (handled == true)
         {
@@ -170,7 +170,7 @@ public class Button : View, IDesignable
     ///     <see langword="true"/>
     ///     <see cref="Command.Accept"/> will be invoked when the user presses <c>Enter</c> and no other peer-
     ///     <see cref="View"/> processes the key.
-    ///     If <see cref="View.Accepted"/> is not handled, the Gets or sets whether the <see cref="Button"/> will show an
+    ///     If <see cref="View.Accepting"/> is not handled, the Gets or sets whether the <see cref="Button"/> will show an
     ///     indicator indicating it is the default Button. If <see langword="true"/>
     ///     <see cref="Command.Accept"/> command on the <see cref="View.SuperView"/> will be invoked.
     /// </summary>

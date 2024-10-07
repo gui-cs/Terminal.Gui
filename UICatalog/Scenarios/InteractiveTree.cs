@@ -82,13 +82,13 @@ public class InteractiveTree : Scenario
 
         var ok = new Button { Text = "Ok", IsDefault = true };
 
-        ok.Accepted += (s, e) =>
+        ok.Accepting += (s, e) =>
                      {
                          okPressed = true;
                          Application.RequestStop ();
                      };
         var cancel = new Button { Text = "Cancel" };
-        cancel.Accepted += (s, e) => Application.RequestStop ();
+        cancel.Accepting += (s, e) => Application.RequestStop ();
         var d = new Dialog { Title = title, Buttons = [ok, cancel] };
 
         var lbl = new Label { X = 0, Y = 1, Text = label };

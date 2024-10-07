@@ -37,7 +37,7 @@ public class MessageBoxTests
 
                                              Button btn = Application.Navigation!.GetFocused () as Button;
 
-                                             btn.Accepted += (sender, e) => { btnAcceptCount++; };
+                                             btn.Accepting += (sender, e) => { btnAcceptCount++; };
 
                                              // Click
                                              Application.OnKeyDown (Key.Enter);
@@ -120,7 +120,7 @@ public class MessageBoxTests
 
                                              Button btn = Application.Navigation!.GetFocused () as Button;
 
-                                             btn.Accepted += (sender, e) => { btnAcceptCount++; };
+                                             btn.Accepting += (sender, e) => { btnAcceptCount++; };
 
                                              Application.OnKeyDown (Key.Space);
 

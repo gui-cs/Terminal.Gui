@@ -122,7 +122,7 @@ public class WizardAsView : Scenario
             Text = "Press Me to Rename Step", X = Pos.Right (buttonLbl), Y = Pos.Top (buttonLbl)
         };
 
-        button.Accepted += (s, e) =>
+        button.Accepting += (s, e) =>
                           {
                               secondStep.Title = "2nd Step";
 

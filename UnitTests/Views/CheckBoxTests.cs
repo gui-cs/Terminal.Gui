@@ -184,7 +184,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         ckb.Selecting += (s, e) => selectCount++;
 
         int acceptCount = 0;
-        ckb.Accepted += (s, e) => acceptCount++;
+        ckb.Accepting += (s, e) => acceptCount++;
 
         Assert.Equal (CheckState.UnChecked, ckb.CheckedState);
         Assert.Equal (0, checkedStateChangingCount);
@@ -228,7 +228,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         var ckb = new CheckBox ();
         var acceptInvoked = false;
 
-        ckb.Accepted += ViewOnAccept;
+        ckb.Accepting += ViewOnAccept;
 
         bool? ret = ckb.InvokeCommand (Command.Accept);
         Assert.True (ret);
@@ -259,7 +259,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         checkBox.Selecting += (s, e) => selectCount++;
 
         int acceptCount = 0;
-        checkBox.Accepted += (s, e) => acceptCount++;
+        checkBox.Accepting += (s, e) => acceptCount++;
 
         checkBox.HasFocus = true;
         Assert.True (checkBox.HasFocus);
@@ -303,7 +303,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         checkBox.Selecting += (s, e) => selectCount++;
 
         int acceptCount = 0;
-        checkBox.Accepted += (s, e) => acceptCount++;
+        checkBox.Accepting += (s, e) => acceptCount++;
 
         checkBox.HasFocus = true;
         Assert.True (checkBox.HasFocus);
@@ -544,7 +544,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         var cb = new CheckBox ();
         var accepted = false;
 
-        cb.Accepted += CheckBoxOnAccept;
+        cb.Accepting += CheckBoxOnAccept;
         cb.InvokeCommand (Command.HotKey);
 
         Assert.False (accepted);

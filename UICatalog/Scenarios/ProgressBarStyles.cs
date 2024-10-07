@@ -72,7 +72,7 @@ public class ProgressBarStyles : Scenario
         };
         container.Add (fgColorPickerBtn);
 
-        fgColorPickerBtn.Accepted += (s, e) =>
+        fgColorPickerBtn.Accepting += (s, e) =>
                                     {
                                         if (!LineDrawing.PromptForColor (
                                                                          fgColorPickerBtn.Text,
@@ -102,7 +102,7 @@ public class ProgressBarStyles : Scenario
         };
         container.Add (bgColorPickerBtn);
 
-        bgColorPickerBtn.Accepted += (s, e) =>
+        bgColorPickerBtn.Accepting += (s, e) =>
                                     {
                                         if (!LineDrawing.PromptForColor (
                                                                          fgColorPickerBtn.Text,
@@ -172,7 +172,7 @@ public class ProgressBarStyles : Scenario
         };
         container.Add (continuousPB);
 
-        button.Accepted += (s, e) =>
+        button.Accepting += (s, e) =>
                           {
                               if (_fractionTimer == null)
                               {

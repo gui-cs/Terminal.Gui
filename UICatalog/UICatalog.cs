@@ -515,7 +515,7 @@ public class UICatalogApp
                     Title = "Show/Hide Status Bar",
                     CanFocus = false,
                 };
-                statusBarShortcut.Accepted += (sender, args) =>
+                statusBarShortcut.Accepting += (sender, args) =>
                                             {
                                                 StatusBar.Visible = !StatusBar.Visible;
                                                 args.Cancel = true;

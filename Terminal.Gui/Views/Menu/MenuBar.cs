@@ -126,7 +126,7 @@ public class MenuBar : View, IDesignable
                             ProcessMenu (_selected, Menus [_selected]);
                         }
 
-                        return RaiseAccepted ();
+                        return RaiseAccepting ();
                     }
                    );
         AddCommand (Command.Toggle, ctx =>

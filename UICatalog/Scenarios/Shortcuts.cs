@@ -151,7 +151,7 @@ public class Shortcuts : Scenario
             KeyBindingScope = KeyBindingScope.HotKey,
         };
         var button = (Button)vShortcut4.CommandView;
-        vShortcut4.Accepted += Button_Clicked;
+        vShortcut4.Accepting += Button_Clicked;
 
         Application.Top.Add (vShortcut4);
 
@@ -348,7 +348,7 @@ public class Shortcuts : Scenario
             HelpText = "App Scope",
             CanFocus = false
         };
-        hShortcut3.Accepted += (o, args) =>
+        hShortcut3.Accepting += (o, args) =>
         {
             Application.RequestStop ();
         };
@@ -380,7 +380,7 @@ public class Shortcuts : Scenario
                     args.Cancel = true;
                 };
 
-                shortcut.Accepted += (o, args) =>
+                shortcut.Accepting += (o, args) =>
                 {
                     eventSource.Add ($"{shortcut!.Id}.Accepting: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
                     eventLog.MoveDown ();
@@ -388,7 +388,7 @@ public class Shortcuts : Scenario
                     args.Cancel = true;
                 };
 
-                shortcut.CommandView.Accepted += (o, args) =>
+                shortcut.CommandView.Accepting += (o, args) =>
                 {
                     eventSource.Add ($"{shortcut!.Id}.CommandView.Accepting: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
                     eventLog.MoveDown ();

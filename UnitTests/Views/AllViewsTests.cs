@@ -117,7 +117,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         view.Selecting += (s, e) => selectingCount++;
 
         var acceptedCount = 0;
-        view.Accepted += (s, e) =>
+        view.Accepting += (s, e) =>
                          {
                              acceptedCount++;
                          };
@@ -152,7 +152,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         view.Selecting += (s, e) => selectingCount++;
 
         var acceptedCount = 0;
-        view.Accepted += (s, e) =>
+        view.Accepting += (s, e) =>
                          {
                              acceptedCount++;
                          };
@@ -192,7 +192,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         view.Selecting += (s, e) => selectingCount++;
 
         var acceptedCount = 0;
-        view.Accepted += (s, e) =>
+        view.Accepting += (s, e) =>
                          {
                              acceptedCount++;
                          };

@@ -185,7 +185,7 @@ public class GraphViewExample : Scenario
                 CanFocus = false
             }
         };
-        statusBar.Add (diagShortcut).Accepted += DiagShortcut_Accept;
+        statusBar.Add (diagShortcut).Accepting += DiagShortcut_Accept;
 
         _graphs [_currentGraph++ % _graphs.Length] ();
 
