@@ -357,7 +357,7 @@ public class HotKeyTests
             Title = "_Test"
         };
         Application.Top.Add (view);
-        view.HotKeyHandled += (s, e) => hotKeyRaised = true;
+        view.HandlingHotKey += (s, e) => hotKeyRaised = true;
         view.Accepted += (s, e) => acceptRaised = true;
         view.Selecting += (s, e) => selectRaised = true;
 

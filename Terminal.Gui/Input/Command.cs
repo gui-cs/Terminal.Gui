@@ -26,7 +26,7 @@ public enum Command
     ///     Performs a hot key action (e.g. setting focus, accepting, and/or moving focus to the next View).
     ///     <para>
     ///         The default implementation in <see cref="View"/> calls <see cref="View.SetFocus"/> and then
-    ///         <see cref="View.RaiseHotKeyHandled"/>.
+    ///         <see cref="View.RaiseHandlingHotKey"/>.
     ///     </para>
     /// </summary>
     HotKey,

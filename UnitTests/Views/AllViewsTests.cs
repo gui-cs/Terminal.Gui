@@ -168,7 +168,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
-    public void AllViews_Command_HotKey_Raises_HotKeyHandled (Type viewType)
+    public void AllViews_Command_HotKey_Raises_HandlingHotKey (Type viewType)
     {
         var view = (View)CreateInstanceIfNotGeneric (viewType);
 
@@ -198,7 +198,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
                          };
 
         var hotkeyHandledCount = 0;
-        view.HotKeyHandled += (s, e) =>
+        view.HandlingHotKey += (s, e) =>
                          {
                              hotkeyHandledCount++;
                          };

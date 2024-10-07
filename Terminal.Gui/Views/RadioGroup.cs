@@ -100,7 +100,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                                     return false;
                                 }
 
-                                if (RaiseHotKeyHandled () == true)
+                                if (RaiseHandlingHotKey () == true)
                                 {
                                     return true;
                                 };

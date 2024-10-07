@@ -15,11 +15,11 @@ public partial class View // Command APIs
         // Enter - Raise Accepted
         AddCommand (Command.Accept, RaiseAccepted);
 
-        // HotKey - SetFocus and raise HotKeyHandled
+        // HotKey - SetFocus and raise HandlingHotKey
         AddCommand (Command.HotKey,
                     () =>
                     {
-                        if (RaiseHotKeyHandled () is true)
+                        if (RaiseHandlingHotKey () is true)
                         {
                             return true;
                         }
@@ -157,44 +157,44 @@ public partial class View // Command APIs
 
     // TODO: What does this event really do? "Called when the user has pressed the View's hot key or otherwise invoked the View's hot key command.???"
     /// <summary>
-    ///     Called when the View has handled the user pressing the View's <see cref="HotKey"/>. Calls <see cref="OnHotKeyHandled"/> which can be cancelled; if not cancelled raises <see cref="Accepted"/>.
+    ///     Called when the View is handlingthe user pressing the View's <see cref="HotKey"/>s. Calls <see cref="OnHandlingHotKey"/> which can be cancelled; if not cancelled raises <see cref="Accepted"/>.
     ///     event. The default <see cref="Command.HotKey"/> handler calls this method.
     /// </summary>
     /// <returns>
     ///     If <see langword="true"/> the event was handled. If <see langword="false"/> the event was raised but not handled.
     ///     If <see langword="null"/> no event was raised.
     /// </returns>
-    protected bool? RaiseHotKeyHandled ()
+    protected bool? RaiseHandlingHotKey ()
     {
-        HandledEventArgs args = new ();
+        CommandEventArgs args = new ();
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
-        if (OnHotKeyHandled (args) || args.Handled)
+        if (OnHandlingHotKey (args) || args.Cancel)
         {
             return true;
         }
 
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-        HotKeyHandled?.Invoke (this, args);
+        HandlingHotKey?.Invoke (this, args);
 
-        return HotKeyHandled is null ? null : args.Handled;
+        return HandlingHotKey is null ? null : args.Cancel;
     }
 
     /// <summary>
-    ///     Called when the View has handled the user pressing the View's <see cref="HotKey"/>. Set <see cref="HandledEventArgs.Handled"/> to
+    ///     Called when the View has handled the user pressing the View's <see cref="HotKey"/>. Set <see cref="CommandEventArgs.Cancel"/> to
     ///     <see langword="true"/> to stop processing.
     /// </summary>
     /// <param name="args"></param>
     /// <returns><see langword="true"/> to stop processing.</returns>
-    protected virtual bool OnHotKeyHandled (HandledEventArgs args) { return false; }
+    protected virtual bool OnHandlingHotKey (CommandEventArgs args) { return false; }
 
     /// <summary>
     ///     Cancelable event raised when the <see cref="Command.HotKey"/> command is invoked. Set
-    ///     <see cref="HandledEventArgs.Handled"/>
+    ///     <see cref="CommandEventArgs.Cancel"/>
     ///     to cancel the event.
     /// </summary>
-    public event EventHandler<HandledEventArgs>? HotKeyHandled;
+    public event EventHandler<CommandEventArgs>? HandlingHotKey;
 
     #endregion Default Implementation
 

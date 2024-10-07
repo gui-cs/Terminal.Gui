@@ -241,10 +241,10 @@ public class ViewCommandTests (ITestOutputHelper output)
                           AcceptedCount++;
                       };
 
-            HotKeyHandled += (s, a) =>
+            HandlingHotKey += (s, a) =>
                              {
-                                 a.Handled = HandleHotKeyHandled;
-                                 HotKeyHandledCount++;
+                                 a.Cancel = HandleHandlingHotKey;
+                                 HandlingHotKeyCount++;
                              };
 
 
@@ -269,19 +269,19 @@ public class ViewCommandTests (ITestOutputHelper output)
 
         public bool HandleAccepted { get; set; }
 
-        public int OnHotKeyHandledCount { get; set; }
-        public int HotKeyHandledCount { get; set; }
-        public bool HandleOnHotKeyHandled { get; set; }
+        public int OnHandlingHotKeyCount { get; set; }
+        public int HandlingHotKeyCount { get; set; }
+        public bool HandleOnHandlingHotKey { get; set; }
 
         /// <inheritdoc />
-        protected override bool OnHotKeyHandled (HandledEventArgs args)
+        protected override bool OnHandlingHotKey (CommandEventArgs args)
         {
-            OnHotKeyHandledCount++;
+            OnHandlingHotKeyCount++;
 
-            return HandleOnHotKeyHandled;
+            return HandleOnHandlingHotKey;
         }
 
-        public bool HandleHotKeyHandled { get; set; }
+        public bool HandleHandlingHotKey { get; set; }
 
 
         public int OnSelectingCount { get; set; }

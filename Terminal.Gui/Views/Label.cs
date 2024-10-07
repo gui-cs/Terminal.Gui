@@ -62,7 +62,7 @@ public class Label : View, IDesignable
 
     private bool? InvokeHotKeyOnNext (CommandContext context)
     {
-        if (RaiseHotKeyHandled () == true)
+        if (RaiseHandlingHotKey () == true)
         {
             return true;
         }
