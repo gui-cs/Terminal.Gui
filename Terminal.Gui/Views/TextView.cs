@@ -2406,6 +2406,8 @@ public class TextView : View
                     }
                    );
 
+        KeyBindings.Remove (Key.Space);
+
         KeyBindings.Remove (Key.Enter);
         KeyBindings.Add (Key.Enter, Multiline ? Command.NewLine : Command.Accept);
 

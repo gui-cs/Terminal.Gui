@@ -8534,6 +8534,19 @@ line.
         void Accept (object sender, CommandEventArgs e) { accepted++; }
     }
 
+
+    [Fact]
+    public void Space_Key_Types_Space ()
+    {
+        var view = new TextView ()
+        {
+        };
+
+        view.NewKeyDownEvent (Key.Space);
+
+        Assert.Equal (" ", view.Text);
+    }
+
     [Theory]
     [InlineData (false, false, 1, 1)]
     [InlineData (false, true, 1, 0)]
