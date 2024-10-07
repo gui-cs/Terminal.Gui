@@ -38,7 +38,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     [InlineData (false, false, 1)]
     [InlineData (true, false, 1)]
     [InlineData (true, true, 1)]
-    public void MouseClick_Raises_Selected (bool canFocus, bool setFocus, int expectedSelectedCount)
+    public void MouseClick_Raises_Selecting (bool canFocus, bool setFocus, int expectedSelectingCount)
     {
         var superView = new View { CanFocus = true, Height = 1, Width = 15 };
         var focusedView = new View { CanFocus = true, Width = 1, Height = 1 };
@@ -56,12 +56,12 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
             testView.SetFocus ();
         }
 
-        int selectedCount = 0;
-        testView.Selecting += (sender, args) => selectedCount++;
+        int selectingCount = 0;
+        testView.Selecting += (sender, args) => selectingCount++;
 
         testView.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
         Assert.True (superView.HasFocus);
-        Assert.Equal (expectedSelectedCount, selectedCount);
+        Assert.Equal (expectedSelectingCount, selectingCount);
     }
 
 
@@ -267,7 +267,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     [InlineData (MouseFlags.Button2Clicked)]
     [InlineData (MouseFlags.Button3Clicked)]
     [InlineData (MouseFlags.Button4Clicked)]
-    public void WantContinuousButtonPressed_True_Button_Clicked_Raises_Selected (MouseFlags clicked)
+    public void WantContinuousButtonPressed_True_Button_Clicked_Raises_Selecting (MouseFlags clicked)
     {
         var me = new MouseEvent ();
 
@@ -278,13 +278,13 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
             WantContinuousButtonPressed = true
         };
 
-        var selectedCount = 0;
+        var selectingCount = 0;
 
-        view.Selecting += (s, e) => selectedCount++;
+        view.Selecting += (s, e) => selectingCount++;
 
         me.Flags = clicked;
         view.NewMouseEvent (me);
-        Assert.Equal (1, selectedCount);
+        Assert.Equal (1, selectingCount);
 
         view.Dispose ();
     }

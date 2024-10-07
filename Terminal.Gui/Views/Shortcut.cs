@@ -477,7 +477,7 @@ public class Shortcut : View, IOrientation, IDesignable
             }
 
             // Clean up old 
-            _commandView.Selecting -= CommandViewOnSelected;
+            _commandView.Selecting -= CommandViewOnSelecting;
             _commandView.Accepted -= CommandViewOnAccepted;
             Remove (_commandView);
             _commandView?.Dispose ();
@@ -503,7 +503,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
             Title = _commandView.Text;
 
-            _commandView.Selecting += CommandViewOnSelected;
+            _commandView.Selecting += CommandViewOnSelecting;
 
             _commandView.Accepted += CommandViewOnAccepted;
 
@@ -521,7 +521,7 @@ public class Shortcut : View, IOrientation, IDesignable
                 e.Handled = true;
             }
 
-            void CommandViewOnSelected (object? sender, CommandEventArgs e)
+            void CommandViewOnSelecting (object? sender, CommandEventArgs e)
             {
                 if (e.Context.Data != this)
                 {

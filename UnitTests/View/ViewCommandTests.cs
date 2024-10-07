@@ -145,62 +145,62 @@ public class ViewCommandTests (ITestOutputHelper output)
 
         Assert.Equal (canFocus, view.InvokeCommand (Command.Select));
 
-        Assert.Equal (1, view.OnSelectedCount);
+        Assert.Equal (1, view.OnSelectingCount);
 
-        Assert.Equal (1, view.SelectedCount);
+        Assert.Equal (1, view.SelectingCount);
 
         Assert.Equal (canFocus, view.HasFocus);
     }
 
     [Fact]
-    public void Select_Command_Handle_OnSelect_NoEvent ()
+    public void Select_Command_Handle_OnSelecting_NoEvent ()
     {
         var view = new ViewEventTester ();
         Assert.False (view.HasFocus);
 
-        view.HandleOnSelected = true;
+        view.HandleOnSelecting = true;
         Assert.True (view.InvokeCommand (Command.Select));
 
-        Assert.Equal (1, view.OnSelectedCount);
+        Assert.Equal (1, view.OnSelectingCount);
 
-        Assert.Equal (0, view.SelectedCount);
+        Assert.Equal (0, view.SelectingCount);
     }
 
     [Fact]
-    public void Select_Handle_Event_OnSelected_Returns_True ()
+    public void Select_Handle_Event_OnSelecting_Returns_True ()
     {
         var view = new View ();
-        var SelectedInvoked = false;
+        var SelectingInvoked = false;
 
         view.Selecting += ViewOnSelect;
 
         bool? ret = view.InvokeCommand (Command.Select);
         Assert.True (ret);
-        Assert.True (SelectedInvoked);
+        Assert.True (SelectingInvoked);
 
         return;
 
         void ViewOnSelect (object sender, CommandEventArgs e)
         {
-            SelectedInvoked = true;
+            SelectingInvoked = true;
             e.Cancel = true;
         }
     }
 
     [Fact]
-    public void Select_Command_Invokes_Selected_Event ()
+    public void Select_Command_Invokes_Selecting_Event ()
     {
         var view = new View ();
-        var selected = false;
+        var selecting = false;
 
-        view.Selecting += ViewOnSelected;
+        view.Selecting += ViewOnSelecting;
 
         view.InvokeCommand (Command.Select);
-        Assert.True (selected);
+        Assert.True (selecting);
 
         return;
 
-        void ViewOnSelected (object sender, CommandEventArgs e) { selected = true; }
+        void ViewOnSelecting (object sender, CommandEventArgs e) { selecting = true; }
     }
 
     [Fact]
@@ -209,7 +209,7 @@ public class ViewCommandTests (ITestOutputHelper output)
         var view = new ViewEventTester ();
         view.NewMouseEvent (new () { Flags = MouseFlags.Button1Clicked, Position = Point.Empty, View = view });
 
-        Assert.Equal (1, view.OnSelectedCount);
+        Assert.Equal (1, view.OnSelectingCount);
     }
 
     #endregion OnSelect/Select tests
@@ -250,8 +250,8 @@ public class ViewCommandTests (ITestOutputHelper output)
 
             Selecting += (s, a) =>
                              {
-                                 a.Cancel = HandleSelected;
-                                 SelectedCount++;
+                                 a.Cancel = HandleSelecting;
+                                 SelectingCount++;
                              };
         }
 
@@ -284,19 +284,19 @@ public class ViewCommandTests (ITestOutputHelper output)
         public bool HandleHotKeyHandled { get; set; }
 
 
-        public int OnSelectedCount { get; set; }
-        public int SelectedCount { get; set; }
-        public bool HandleOnSelected { get; set; }
+        public int OnSelectingCount { get; set; }
+        public int SelectingCount { get; set; }
+        public bool HandleOnSelecting { get; set; }
 
         /// <inheritdoc />
         protected override bool OnSelecting (CommandEventArgs args)
         {
-            OnSelectedCount++;
+            OnSelectingCount++;
 
-            return HandleOnSelected;
+            return HandleOnSelecting;
         }
 
-        public bool HandleSelected { get; set; }
+        public bool HandleSelecting { get; set; }
 
     }
 }

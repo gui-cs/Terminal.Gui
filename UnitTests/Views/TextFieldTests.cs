@@ -537,15 +537,15 @@ public class TextFieldTests (ITestOutputHelper output)
     {
         TextField tf = new ();
 
-        int selectedCount = 0;
-        tf.Selecting += (sender, args) => selectedCount++;
+        int selectingCount = 0;
+        tf.Selecting += (sender, args) => selectingCount++;
 
         Application.Top = new Toplevel ();
         Application.Top.Add (tf);
         tf.SetFocus ();
         Application.OnKeyDown (Key.Enter);
 
-        Assert.Equal (0, selectedCount);
+        Assert.Equal (0, selectingCount);
 
         Application.Top.Dispose ();
         Application.ResetState (ignoreDisposed: true);

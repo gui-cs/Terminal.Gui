@@ -97,7 +97,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
-    public void AllViews_Command_Select_Raises_Selected (Type viewType)
+    public void AllViews_Command_Select_Raises_Selecting (Type viewType)
     {
         var view = (View)CreateInstanceIfNotGeneric (viewType);
 
@@ -113,8 +113,8 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
             designable.EnableForDesign ();
         }
 
-        var selectedCount = 0;
-        view.Selecting += (s, e) => selectedCount++;
+        var selectingCount = 0;
+        view.Selecting += (s, e) => selectingCount++;
 
         var acceptedCount = 0;
         view.Accepted += (s, e) =>
@@ -125,7 +125,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 
         if (view.InvokeCommand(Command.Select) == true)
         {
-            Assert.Equal(1, selectedCount);
+            Assert.Equal(1, selectingCount);
             Assert.Equal (0, acceptedCount);
         }
     }
@@ -148,8 +148,8 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
             designable.EnableForDesign ();
         }
 
-        var selectedCount = 0;
-        view.Selecting += (s, e) => selectedCount++;
+        var selectingCount = 0;
+        view.Selecting += (s, e) => selectingCount++;
 
         var acceptedCount = 0;
         view.Accepted += (s, e) =>
@@ -160,7 +160,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 
         if (view.InvokeCommand (Command.Accept) == true)
         {
-            Assert.Equal (0, selectedCount);
+            Assert.Equal (0, selectingCount);
             Assert.Equal (1, acceptedCount);
         }
     }
@@ -188,8 +188,8 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
             view.HotKey = Key.T;
         }
 
-        var selectedCount = 0;
-        view.Selecting += (s, e) => selectedCount++;
+        var selectingCount = 0;
+        view.Selecting += (s, e) => selectingCount++;
 
         var acceptedCount = 0;
         view.Accepted += (s, e) =>
@@ -206,7 +206,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         if (view.InvokeCommand (Command.HotKey) == true)
         {
             Assert.Equal (1, hotkeyHandledCount);
-            Assert.Equal (0, selectedCount);
+            Assert.Equal (0, selectingCount);
             Assert.Equal (0, acceptedCount);
         }
     }
