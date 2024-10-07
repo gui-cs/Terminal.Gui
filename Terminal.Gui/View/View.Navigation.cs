@@ -292,6 +292,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// </returns>
     internal bool RestoreFocus ()
     {
+        // Ignore TabStop
         View [] indicies = GetFocusChain (NavigationDirection.Forward, null);
 
         if (Focused is null && _previouslyFocused is { } && indicies.Contains (_previouslyFocused))
@@ -421,7 +422,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <exception cref="InvalidOperationException"></exception>
     private (bool focusSet, bool cancelled) SetHasFocusTrue (View? previousFocusedView, bool traversingUp = false)
     {
-        Debug.Assert (SuperView is null || ApplicationNavigation.IsInHierarchy (SuperView, this));
+        Debug.Assert (SuperView is null || View.IsInHierarchy (SuperView, this));
 
         // Pre-conditions
         if (_hasFocus)
@@ -698,7 +699,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
             if (appFocused is { } || appFocused == this)
             {
-                Application.Navigation.SetFocused (newFocusedView ?? superViewOrParent);
+                Application.Navigation.SetFocused (newFocusedView ?? superViewOrParent ?? Application.Popover);
             }
         }
 

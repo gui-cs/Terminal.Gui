@@ -499,4 +499,112 @@ public class SubviewTests
         superView.MoveSubviewTowardsEnd (subview2);
         Assert.Equal (subview2, superView.Subviews [^1]);
     }
+
+    [Fact]
+    public void IsInHierarchy_ViewIsNull_ReturnsFalse ()
+    {
+        // Arrange
+        var start = new View ();
+
+        // Act
+        var result = View.IsInHierarchy (start, null);
+
+        // Assert
+        Assert.False (result);
+    }
+
+    [Fact]
+    public void IsInHierarchy_StartIsNull_ReturnsFalse ()
+    {
+        // Arrange
+        var view = new View ();
+
+        // Act
+        var result = View.IsInHierarchy (null, view);
+
+        // Assert
+        Assert.False (result);
+    }
+
+    [Fact]
+    public void IsInHierarchy_ViewIsStart_ReturnsTrue ()
+    {
+        // Arrange
+        var start = new View ();
+
+        // Act
+        var result = View.IsInHierarchy (start, start);
+
+        // Assert
+        Assert.True (result);
+    }
+
+    [Fact]
+    public void IsInHierarchy_ViewIsDirectSubview_ReturnsTrue ()
+    {
+        // Arrange
+        var start = new View ();
+        var subview = new View ();
+        start.Add (subview);
+
+        // Act
+        var result = View.IsInHierarchy (start, subview);
+
+        // Assert
+        Assert.True (result);
+    }
+
+    [Fact]
+    public void IsInHierarchy_ViewIsNestedSubview_ReturnsTrue ()
+    {
+        // Arrange
+        var start = new View ();
+        var subview = new View ();
+        var nestedSubview = new View ();
+        start.Add (subview);
+        subview.Add (nestedSubview);
+
+        // Act
+        var result = View.IsInHierarchy (start, nestedSubview);
+
+        // Assert
+        Assert.True (result);
+    }
+
+    [Fact]
+    public void IsInHierarchy_ViewIsNotInHierarchy_ReturnsFalse ()
+    {
+        // Arrange
+        var start = new View ();
+        var subview = new View ();
+
+        // Act
+        var result = View.IsInHierarchy (start, subview);
+
+        // Assert
+        Assert.False (result);
+    }
+
+    [Theory]
+    [CombinatorialData]
+    public void IsInHierarchy_ViewIsInAdornments_ReturnsTrue (bool includeAdornments)
+    {
+        // Arrange
+        var start = new View ()
+        {
+            Id = "start"
+        };
+        var inPadding = new View ()
+        {
+            Id = "inPadding"
+        };
+
+        start.Padding.Add (inPadding);
+
+        // Act
+        var result = View.IsInHierarchy (start, inPadding, includeAdornments: includeAdornments);
+
+        // Assert
+        Assert.Equal(includeAdornments, result);
+    }
 }

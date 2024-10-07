@@ -184,8 +184,8 @@ public class ConfigurationManagerTests
         Assert.True (fired);
 
         Updated -= ConfigurationManager_Updated;
-        Reset ();
         Locations = savedLocations;
+        Reset ();
     }
 
     [Fact]
@@ -227,6 +227,7 @@ public class ConfigurationManagerTests
     [Fact]
     public void Reset_and_ResetLoadWithLibraryResourcesOnly_are_same ()
     {
+        ConfigLocations savedLocations = Locations;
         Locations = ConfigLocations.DefaultOnly;
 
         // arrange
@@ -269,16 +270,20 @@ public class ConfigurationManagerTests
         Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
         Assert.Equal (Key.F6, Application.NextTabGroupKey);
         Assert.Equal (Key.F6.WithShift, Application.PrevTabGroupKey);
+        Locations = savedLocations;
         Reset ();
     }
 
     [Fact]
     public void Reset_Resets ()
     {
+        ConfigLocations savedLocations = Locations;
         Locations = ConfigLocations.DefaultOnly;
         Reset ();
         Assert.NotEmpty (Themes!);
         Assert.Equal ("Default", Themes.Theme);
+        Locations = savedLocations;
+        Reset ();
     }
 
     //[Fact ()]
@@ -426,10 +431,9 @@ public class ConfigurationManagerTests
         Assert.True (scp!.Scope == typeof (ThemeScope));
         Assert.True (scp.OmitClassName);
 
+        Locations = savedLocations;
         Reset ();
         Assert.Equal (pi, Themes! ["Default"] ["ColorSchemes"].PropertyInfo);
-
-        Locations = savedLocations;
     }
 
     [Fact]
@@ -826,9 +830,8 @@ public class ConfigurationManagerTests
 
         Assert.Equal (new Color (Color.White), Colors.ColorSchemes ["Base"].Normal.Foreground);
         Assert.Equal (new Color (Color.Blue), Colors.ColorSchemes ["Base"].Normal.Background);
-        Reset ();
-
         Locations = savedLocations;
+        Reset ();
     }
 
     [Fact]

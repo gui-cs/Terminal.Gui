@@ -50,9 +50,11 @@ public class RuneCellTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
+    [SetupFakeDriver]
     public void RuneCell_LoadRuneCells_InheritsPreviousColorScheme ()
     {
+        // NOTE: This test relies on CM loading the default color schemes. It will not work if the default color schemes are not loaded.
+        // NOTE: SetupFakeDriver DOES setup CM correctly.
         List<RuneCell> runeCells = new ();
 
         foreach (KeyValuePair<string, ColorScheme> color in Colors.ColorSchemes)
@@ -69,9 +71,13 @@ public class RuneCellTests (ITestOutputHelper output)
 
         TextView tv = CreateTextView ();
         tv.Load (runeCells);
-        var top = new Toplevel ();
-        top.Add (tv);
-        RunState rs = Application.Begin (top);
+        Application.Top = new Toplevel ();
+        Application.Top.Add (tv);
+        Application.Top.BeginInit();
+        Application.Top.EndInit();
+
+        Application.Top.Draw ();
+
         Assert.True (tv.InheritsPreviousColorScheme);
 
         var expectedText = @"
@@ -109,7 +115,7 @@ Error   ";
         TestHelpers.AssertDriverAttributesAre (expectedColor, Application.Driver, attributes);
 
         tv.WordWrap = true;
-        Application.Refresh ();
+        Application.Top.Draw ();
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, output);
         TestHelpers.AssertDriverAttributesAre (expectedColor, Application.Driver, attributes);
 
@@ -121,7 +127,8 @@ Error   ";
         tv.Selecting = false;
         tv.CursorPosition = new (2, 4);
         tv.Paste ();
-        Application.Refresh ();
+
+        Application.Top.Draw ();
 
         expectedText = @"
 TopLevel  
@@ -156,7 +163,7 @@ Dialogror ";
         tv.Selecting = false;
         tv.CursorPosition = new (2, 4);
         tv.Paste ();
-        Application.Refresh ();
+        Application.Top.Draw ();
 
         expectedText = @"
 TopLevel  
@@ -180,8 +187,8 @@ ror       ";
 4440000000";
         TestHelpers.AssertDriverAttributesAre (expectedColor, Application.Driver, attributes);
 
-        Application.End (rs);
-        top.Dispose ();
+        Application.Top.Dispose ();
+        Application.ResetState (true);
     }
 
     [Fact]

@@ -35,7 +35,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
         int screenX4 = dimension == Dimension.Width ? Application.Screen.Width * 4 : Application.Screen.Height * 4;
         int autoMax = MaximumContentDim?.GetAnchor (superviewContentSize) ?? screenX4;
 
-        Debug.Assert (autoMin <= autoMax, "MinimumContentDim must be less than or equal to MaximumContentDim.");
+        Debug.WriteLineIf (autoMin > autoMax, "MinimumContentDim must be less than or equal to MaximumContentDim.");
 
         if (Style.FastHasFlags (DimAutoStyle.Text))
         {

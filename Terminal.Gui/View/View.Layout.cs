@@ -46,9 +46,16 @@ public partial class View // Layout APIs
         View? superView;
         statusBar = null!;
 
+        if (Application.Driver is null)
+        {
+            nx = targetX;
+            ny = targetY;
+            return null;
+        }
+
         if (viewToMove is not Toplevel || viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
         {
-            maxDimension = Driver.Cols;
+            maxDimension = Application.Driver.Cols;
             superView = Application.Top;
         }
         else
