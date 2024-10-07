@@ -107,8 +107,6 @@ namespace Terminal.Gui;
 
 public partial class View : Responder, ISupportInitializeNotification
 {
-    #region Constructors and Initialization
-
     /// <summary>Gets or sets arbitrary data for the view.</summary>
     /// <remarks>This property is not used internally.</remarks>
     public object? Data { get; set; }
@@ -117,6 +115,8 @@ public partial class View : Responder, ISupportInitializeNotification
     /// <value>The identifier.</value>
     /// <remarks>The id should be unique across all Views that share a SuperView.</remarks>
     public string Id { get; set; } = "";
+
+    #region Constructors and Initialization
 
     /// <summary>
     ///     Points to the current driver in use by the view, it is a convenience property for simplifying the development

@@ -1,5 +1,6 @@
 ﻿using Xunit.Abstractions;
 using static System.Net.Mime.MediaTypeNames;
+using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui.LayoutTests;
 

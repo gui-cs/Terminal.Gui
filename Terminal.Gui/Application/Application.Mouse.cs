@@ -186,6 +186,21 @@ public static partial class Application // Mouse handling
             _ => null
         };
 
+
+        if (Popover is { Visible: true }
+            && View.IsInHierarchy (Popover, deepestViewUnderMouse, includeAdornments: true) is false
+            && (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
+                || mouseEvent.Flags.HasFlag (MouseFlags.Button2Pressed)
+                || mouseEvent.Flags.HasFlag (MouseFlags.Button3Pressed)))
+        {
+            Popover.Visible = false;
+
+            // Recurse once
+            OnMouseEvent (mouseEvent);
+
+            return;
+        }
+
         // May be null before the prior condition or the condition may set it as null.
         // So, the checking must be outside the prior condition.
         if (deepestViewUnderMouse is null)

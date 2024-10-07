@@ -76,14 +76,14 @@ public class Menuv2 : Bar
             // TODO: instead, add a property (a style enum?) to Shortcut to control this
             //shortcut.AlignmentModes = AlignmentModes.EndToStart;
 
-            shortcut.Accepting += ShortcutOnAccept;
+            shortcut.Accepting += ShortcutOnAccepting;
 
-            void ShortcutOnAccept (object sender, CommandEventArgs e)
+            void ShortcutOnAccepting (object sender, CommandEventArgs e)
             {
                 if (Arrangement.HasFlag (ViewArrangement.Overlapped) && Visible)
                 {
                     Visible = false;
-                    e.Cancel = true;
+//                    e.Cancel = true;
 
                     return;
                 }
