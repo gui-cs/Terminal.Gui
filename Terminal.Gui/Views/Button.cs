@@ -67,36 +67,7 @@ public class Button : View, IDesignable
 
         CanFocus = true;
 
-        // Override default behavior of View
-        AddCommand (
-                    Command.HotKey,
-                    (ctx) =>
-                    {
-                        bool cachedIsDefault = IsDefault; // Supports "Swap Default" in Buttons scenario where IsDefault changes
-
-                        if (RaiseSelected (ctx) is true)
-                        {
-                            return true;
-                        }
-                        bool? handled = RaiseAccepted ();
-
-                        if (handled == true)
-                        {
-                            return true;
-                        }
-
-                        SetFocus ();
-
-                        // TODO: If `IsDefault` were a property on `View` *any* View could work this way. That's theoretical as
-                        // TODO: no use-case has been identified for any View other than Button to act like this.
-                        // If Accept was not handled...
-                        if (cachedIsDefault && SuperView is { })
-                        {
-                            return SuperView.InvokeCommand (Command.Accept);
-                        }
-
-                        return false;
-                    });
+        AddCommand (Command.HotKey, HandleHotKeyCommand);
 
         KeyBindings.Remove (Key.Space);
         KeyBindings.Add (Key.Space, Command.HotKey);
@@ -108,6 +79,35 @@ public class Button : View, IDesignable
 
         ShadowStyle = DefaultShadow;
         HighlightStyle = DefaultHighlightStyle;
+    }
+
+    private bool? HandleHotKeyCommand (CommandContext ctx)
+    {
+        bool cachedIsDefault = IsDefault; // Supports "Swap Default" in Buttons scenario where IsDefault changes
+
+        if (RaiseSelected (ctx) is true)
+        {
+            return true;
+        }
+
+        bool? handled = RaiseAccepted ();
+
+        if (handled == true)
+        {
+            return true;
+        }
+
+        SetFocus ();
+
+        // TODO: If `IsDefault` were a property on `View` *any* View could work this way. That's theoretical as
+        // TODO: no use-case has been identified for any View other than Button to act like this.
+        // If Accept was not handled...
+        if (cachedIsDefault && SuperView is { })
+        {
+            return SuperView.InvokeCommand (Command.Accept);
+        }
+
+        return false;
     }
 
     private bool _wantContinuousButtonPressed;

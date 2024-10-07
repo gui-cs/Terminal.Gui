@@ -103,52 +103,7 @@ public class Shortcut : View, IOrientation, IDesignable
         _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
         _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
 
-        // Accept (Enter key) -
-        AddCommand (Command.Accept, DispatchAcceptCommand);
-
-        // Hotkey -
-        AddCommand (
-                    Command.HotKey,
-                    ctx =>
-                    {
-                        if (ctx.Data != this)
-                        {
-                            ctx.Data = this;
-                            CommandView.InvokeCommand (Command.Select, ctx);
-                        }
-
-                        if (RaiseSelected (ctx) is true)
-                        {
-                            return true;
-                        }
-
-                        // The default HotKey handler sets Focus
-                        SetFocus ();
-
-                        return DispatchAcceptCommand (ctx);
-                    });
-
-        // Select (Space key or click) -
-        AddCommand (
-                    Command.Select,
-                    ctx =>
-                    {
-                        if (ctx.Data != this)
-                        {
-                            ctx.Data = this;
-                            CommandView.InvokeCommand (Command.Select, ctx);
-                        }
-
-                        if (RaiseSelected (ctx) is true)
-                        {
-                            return true;
-                        }
-
-                        // The default HotKey handler sets Focus
-                        SetFocus ();
-
-                        return DispatchAcceptCommand (ctx);
-                    });
+        AddCommands ();
 
         TitleChanged += Shortcut_TitleChanged; // This needs to be set before CommandView is set
 
@@ -208,12 +163,6 @@ public class Shortcut : View, IOrientation, IDesignable
         }
     }
 
-    private readonly View? _targetView; // If set, _command will be invoked
-
-    private readonly Command _command; // Used when _targetView is set
-
-    private readonly OrientationHelper _orientationHelper;
-
     private AlignmentModes _alignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast;
 
     // This is used to calculate the minimum width of the Shortcut when the width is NOT Dim.Auto
@@ -226,16 +175,6 @@ public class Shortcut : View, IOrientation, IDesignable
         {
             HasFocus = true;
         }
-
-        return true;
-    }
-
-    /// <inheritdoc/>
-    public bool EnableForDesign ()
-    {
-        Title = "_Shortcut";
-        HelpText = "Shortcut help";
-        Key = Key.F1;
 
         return true;
     }
@@ -259,30 +198,6 @@ public class Shortcut : View, IOrientation, IDesignable
             SetHelpViewDefaultLayout ();
             SetKeyViewDefaultLayout ();
         }
-    }
-
-    /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
-    {
-        if (disposing)
-        {
-            if (CommandView?.IsAdded == false)
-            {
-                CommandView.Dispose ();
-            }
-
-            if (HelpView?.IsAdded == false)
-            {
-                HelpView.Dispose ();
-            }
-
-            if (KeyView?.IsAdded == false)
-            {
-                KeyView.Dispose ();
-            }
-        }
-
-        base.Dispose (disposing);
     }
 
     // When one of the subviews is "empty" we don't want to show it. So we
@@ -392,7 +307,80 @@ public class Shortcut : View, IOrientation, IDesignable
         }
     }
 
+
+    #region Accept/Select/HotKey Command Handling
+
+    private readonly View? _targetView; // If set, _command will be invoked
+
+    private readonly Command _command; // Used when _targetView is set
+
+    private void AddCommands ()
+    {
+        // Accept (Enter key) -
+        AddCommand (Command.Accept, DispatchCommand);
+        // Hotkey -
+        AddCommand (Command.HotKey, DispatchCommand);
+        // Select (Space key or click) -
+        AddCommand (Command.Select, DispatchCommand);
+    }
+
+    private bool? DispatchCommand (CommandContext ctx)
+    {
+        if (ctx.Data != this)
+        {
+            // Invoke Select on the command view to cause it to change state if it wants to
+            // If this causes CommandView to raise Accept, we eat it
+            ctx.Data = this;
+            CommandView.InvokeCommand (Command.Select, ctx);
+        }
+
+        if (RaiseSelected (ctx) is true)
+        {
+            return true;
+        }
+
+        // The default HotKey handler sets Focus
+        SetFocus ();
+
+        var cancel = false;
+
+        cancel = RaiseAccepted () is true;
+
+        if (cancel)
+        {
+            return true;
+        }
+
+        if (Action is { })
+        {
+            Action.Invoke ();
+
+            // Assume if there's a subscriber to Action, it's handled.
+            cancel = true;
+        }
+
+        if (_targetView is { })
+        {
+            _targetView.InvokeCommand (_command);
+        }
+
+        return cancel;
+    }
+
+    /// <summary>
+    ///     Gets or sets the action to be invoked when the shortcut key is pressed or the shortcut is clicked on with the
+    ///     mouse.
+    /// </summary>
+    /// <remarks>
+    ///     Note, the <see cref="View.Accepted"/> event is fired first, and if cancelled, the event will not be invoked.
+    /// </remarks>
+    public Action? Action { get; set; }
+
+    #endregion Accept/Select/HotKey Command Handling
+
     #region IOrientation members
+
+    private readonly OrientationHelper _orientationHelper;
 
     /// <summary>
     ///     Gets or sets the <see cref="Orientation"/> for this <see cref="Bar"/>. The default is
@@ -746,56 +734,6 @@ public class Shortcut : View, IOrientation, IDesignable
 
     #endregion Key
 
-    #region Accept Handling
-
-    /// <summary>
-    ///     Called when the <see cref="Command.Accept"/> command is received. This
-    ///     occurs
-    ///     - if the user clicks anywhere on the shortcut with the mouse
-    ///     - if the user presses Key
-    ///     - if the user presses the HotKey specified by CommandView
-    ///     - if HasFocus and the user presses Space or Enter (or any other key bound to Command.Accept).
-    /// </summary>
-    internal bool? DispatchAcceptCommand (CommandContext ctx)
-    {
-        // Invoke Select on the command view to cause it to change state if it wants to
-        // If this causes CommandView to raise Accept, we eat it
-        var cancel = false;
-
-        cancel = RaiseAccepted () is true;
-
-        if (cancel)
-        {
-            return true;
-        }
-
-        if (Action is { })
-        {
-            Action.Invoke ();
-
-            // Assume if there's a subscriber to Action, it's handled.
-            cancel = true;
-        }
-
-        if (_targetView is { })
-        {
-            _targetView.InvokeCommand (_command);
-        }
-
-        return cancel;
-    }
-
-    /// <summary>
-    ///     Gets or sets the action to be invoked when the shortcut key is pressed or the shortcut is clicked on with the
-    ///     mouse.
-    /// </summary>
-    /// <remarks>
-    ///     Note, the <see cref="View.Accepted"/> event is fired first, and if cancelled, the event will not be invoked.
-    /// </remarks>
-    public Action? Action { get; set; }
-
-    #endregion Accept Handling
-
     #region Focus
 
     /// <inheritdoc/>
@@ -853,4 +791,41 @@ public class Shortcut : View, IOrientation, IDesignable
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view) { SetColors (); }
 
     #endregion Focus
+
+    /// <inheritdoc/>
+    public bool EnableForDesign ()
+    {
+        Title = "_Shortcut";
+        HelpText = "Shortcut help";
+        Key = Key.F1;
+
+        return true;
+    }
+
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            TitleChanged -= Shortcut_TitleChanged;
+
+            if (CommandView?.IsAdded == false)
+            {
+                CommandView.Dispose ();
+            }
+
+            if (HelpView?.IsAdded == false)
+            {
+                HelpView.Dispose ();
+            }
+
+            if (KeyView?.IsAdded == false)
+            {
+                KeyView.Dispose ();
+            }
+        }
+
+        base.Dispose (disposing);
+    }
 }
