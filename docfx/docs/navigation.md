@@ -484,7 +484,7 @@ The `Dialogs` Scenario is illustrative:
 For the `app` (Window):
 
 ```cs
-        showDialogButton.Accept += (s, e) =>
+        showDialogButton.Accepting += (s, e) =>
                                    {
                                        Dialog dlg = CreateDemoDialog (
                                                                       widthEdit,
@@ -503,7 +503,7 @@ For the `app` (Window):
 Changing this to 
 
 ```cs
-        app.Accept += (s, e) =>
+        app.Accepting += (s, e) =>
                                    {
                                        Dialog dlg = CreateDemoDialog (
                                                                       widthEdit,
@@ -524,7 +524,7 @@ Changing this to
 However, for `Dialog` the `Dialogs` scenario illustrates why a dev might actually want multiple buttons and to have one be `Default`:
 
 ```cs
-                button.Accept += (s, e) =>
+                button.Accepting += (s, e) =>
                                  {
                                      clicked = buttonId;
                                      Application.RequestStop ();
