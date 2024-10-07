@@ -49,7 +49,7 @@ public partial class View // Command APIs
     }
 
     /// <summary>
-    ///     Called when the View's state has been accepted by the user. Calls <see cref="OnAccepted"/> which can be cancelled; if not cancelled raises <see cref="Accepted"/>.
+    ///     Called when the user is accepting the state of the View and the <see cref="Command.Accept"/> has been invoked. Calls <see cref="OnAccepted"/> which can be cancelled; if not cancelled raises <see cref="Accepted"/>.
     ///     event. The default <see cref="Command.Accept"/> handler calls this method.
     /// </summary>
     /// <remarks>
@@ -97,16 +97,16 @@ public partial class View // Command APIs
     }
 
     /// <summary>
-    ///     Called when the View's state has been accepted by the user. Set <see cref="CommandEventArgs.Cancel"/> to
-    ///     <see langword="true"/> to stop processing.
+    ///     Called when the user is accepting the state of the View and the <see cref="Command.Accept"/> has been invoked. Set <see cref="CommandEventArgs.Cancel"/> to
+    ///     <see langword="true"/> and return <see langword="true"/> to stop processing.
     /// </summary>
     /// <param name="args"></param>
     /// <returns><see langword="true"/> to stop processing.</returns>
     protected virtual bool OnAccepted (CommandEventArgs args) { return false; }
 
     /// <summary>
-    ///     Cancelable event raised when the View's state has been accepted by the user. Set
-    ///     <see cref="HandledEventArgs.Handled"/> to cancel the event.
+    ///     Cancelable event raised when the user is accepting the state of the View and the <see cref="Command.Accept"/> has been invoked. Set
+    ///     <see cref="CommandEventArgs.Cancel"/> to cancel the event.
     /// </summary>
     public event EventHandler<CommandEventArgs>? Accepted;
 
@@ -154,9 +154,8 @@ public partial class View // Command APIs
     /// </summary>
     public event EventHandler<CommandEventArgs>? Selecting;
 
-    // TODO: What does this event really do? "Called when the user has pressed the View's hot key or otherwise invoked the View's hot key command.???"
     /// <summary>
-    ///     Called when the View is handlingthe user pressing the View's <see cref="HotKey"/>s. Calls <see cref="OnHandlingHotKey"/> which can be cancelled; if not cancelled raises <see cref="Accepted"/>.
+    ///     Called when the View is handling the user pressing the View's <see cref="HotKey"/>s. Calls <see cref="OnHandlingHotKey"/> which can be cancelled; if not cancelled raises <see cref="Accepted"/>.
     ///     event. The default <see cref="Command.HotKey"/> handler calls this method.
     /// </summary>
     /// <returns>
@@ -181,7 +180,7 @@ public partial class View // Command APIs
     }
 
     /// <summary>
-    ///     Called when the View has handled the user pressing the View's <see cref="HotKey"/>. Set <see cref="CommandEventArgs.Cancel"/> to
+    ///     Called when the View is handling the user pressing the View's <see cref="HotKey"/>. Set <see cref="CommandEventArgs.Cancel"/> to
     ///     <see langword="true"/> to stop processing.
     /// </summary>
     /// <param name="args"></param>
@@ -189,7 +188,7 @@ public partial class View // Command APIs
     protected virtual bool OnHandlingHotKey (CommandEventArgs args) { return false; }
 
     /// <summary>
-    ///     Cancelable event raised when the <see cref="Command.HotKey"/> command is invoked. Set
+    ///     Cancelable event raised when the View is handling the user pressing the View's <see cref="HotKey"/>. Set
     ///     <see cref="CommandEventArgs.Cancel"/>
     ///     to cancel the event.
     /// </summary>
