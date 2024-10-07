@@ -1131,7 +1131,7 @@ internal partial class HistoryText
 
     private readonly List<HistoryTextItemEventArgs> _historyTextItems = [];
     private int _idxHistoryText = -1;
-    private List<List<Cell>> _originalCellsList = [];
+    private readonly List<List<Cell>> _originalCellsList = [];
     public bool HasHistoryChanges => _idxHistoryText > -1;
     public bool IsFromHistory { get; private set; }
 
@@ -1171,7 +1171,7 @@ internal partial class HistoryText
         _historyTextItems.Clear ();
         _idxHistoryText = -1;
         _originalCellsList.Clear ();
-
+        // Save a copy of the original, not the reference
         foreach (List<Cell> cells in cellsList)
         {
             _originalCellsList.Add ([..cells]);
