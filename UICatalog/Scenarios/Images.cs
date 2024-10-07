@@ -164,6 +164,20 @@ public class Images : Scenario
             return;
         }
 
+        if (!_sixelSupportResult.SupportsTransparency)
+        {
+            if (MessageBox.Query (
+                                     "Transparency Not Supported",
+                                     "It looks like your terminal does not support transparent sixel backgrounds. Do you want to try anyway?",
+                                     "Yes",
+                                     "No")
+                != 0)
+            {
+                return;
+            }
+        }
+
+
         _fire = new DoomFire (_win.Frame.Width * _pxX.Value, _win.Frame.Height * _pxY.Value);
         _fireEncoder = new SixelEncoder ();
         _fireEncoder.Quantizer.MaxColors = Math.Min (_fireEncoder.Quantizer.MaxColors, _sixelSupportResult.MaxPaletteColors);
