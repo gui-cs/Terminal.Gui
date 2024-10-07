@@ -54,7 +54,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
     public void CellEventsBackgroundFill ()
     {
         var tv = new TableView { Width = 20, Height = 4 };
@@ -412,7 +412,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
     public void LongColumnTest ()
     {
         var tableView = new TableView ();
@@ -602,7 +602,7 @@ public class TableViewTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
     [Fact]
     public void PageDown_ExcludesHeaders ()
     {
@@ -1000,7 +1000,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
     public void TableView_Activate ()
     {
         string activatedValue = null;
@@ -1566,7 +1566,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
     public void Test_CollectionNavigator ()
     {
         var tv = new TableView ();

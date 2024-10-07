@@ -1,4 +1,5 @@
 #nullable enable
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
@@ -80,6 +81,16 @@ public static partial class Application // Initialization (Init/Shutdown)
         if (driver is { })
         {
             Driver = driver;
+
+            if (driver is FakeDriver)
+            {
+                // We're running unit tests. Disable loading config files other than default
+                if (Locations == ConfigLocations.All)
+                {
+                    Locations = ConfigLocations.DefaultOnly;
+                    Reset ();
+                }
+            }
         }
 
         // Start the process of configuration management.

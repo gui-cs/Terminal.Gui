@@ -65,7 +65,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         _verifyShutdown = verifyShutdown;
     }
 
-    private bool _verifyShutdown;
+    private readonly bool _verifyShutdown;
     private readonly Type _driverType;
 
     public override void After (MethodInfo methodUnderTest)
@@ -114,7 +114,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         Reset();
 
         // Enable subsequent tests that call Init to get all config files (the default).
-        Locations = ConfigLocations.All;
+       //Locations = ConfigLocations.All;
     }
 
     public override void Before (MethodInfo methodUnderTest)
@@ -161,9 +161,6 @@ public class TestRespondersDisposed : BeforeAfterTestAttribute
         Debug.WriteLine ($"After: {methodUnderTest.Name}");
         base.After (methodUnderTest);
 
-        // Reset the to default All
-        Locations = ConfigLocations.All;
-
 #if DEBUG_IDISPOSABLE
         Assert.Empty (Responder.Instances);
 #endif
@@ -172,10 +169,6 @@ public class TestRespondersDisposed : BeforeAfterTestAttribute
     public override void Before (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
-
-        // Force the use of the default config file
-        Locations = ConfigLocations.DefaultOnly;
-        Reset ();
 
         base.Before (methodUnderTest);
 #if DEBUG_IDISPOSABLE
@@ -208,18 +201,11 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
 
         Application.Driver = null;
         base.After (methodUnderTest);
-
-        // Reset the to default All
-        Locations = ConfigLocations.All;
     }
 
     public override void Before (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
-
-        // Force the use of the default config file
-        Locations = ConfigLocations.DefaultOnly;
-        Reset ();
 
         Application.ResetState (true);
         Assert.Null (Application.Driver);

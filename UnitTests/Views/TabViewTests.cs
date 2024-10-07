@@ -1318,6 +1318,9 @@ public class TabViewTests (ITestOutputHelper output)
 
     private void InitFakeDriver ()
     {
+        ConfigurationManager.Locations = ConfigurationManager.ConfigLocations.DefaultOnly;
+        ConfigurationManager.Reset ();
+
         var driver = new FakeDriver ();
         Application.Init (driver);
         driver.Init ();
