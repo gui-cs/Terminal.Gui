@@ -39,7 +39,7 @@ public class ComboBox : View, IDesignable
         _listview.Accepted += (sender, args) =>
                               {
                                   // This prevents Accepted from bubbling up to the combobox
-                                  args.Handled = true;
+                                  args.Cancel = true;
 
                                   // But OpenSelectedItem won't be fired because of that. So do it here.
                                   SelectText ();

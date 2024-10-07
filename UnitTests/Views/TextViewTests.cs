@@ -8471,7 +8471,7 @@ line.
 
         return;
 
-        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
+        void OnAccept (object sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Theory]
@@ -8491,7 +8491,7 @@ line.
 
         return;
 
-        void Accept (object sender, HandledEventArgs e) { acceptedEvents++; }
+        void Accept (object sender, CommandEventArgs e) { acceptedEvents++; }
     }
 
     [Theory]
@@ -8511,7 +8511,7 @@ line.
 
         return;
 
-        void Accept (object sender, HandledEventArgs e) { accepted++; }
+        void Accept (object sender, CommandEventArgs e) { accepted++; }
     }
 
     [Theory]
@@ -8531,7 +8531,7 @@ line.
 
         return;
 
-        void Accept (object sender, HandledEventArgs e) { accepted++; }
+        void Accept (object sender, CommandEventArgs e) { accepted++; }
     }
 
     [Theory]
@@ -8573,13 +8573,13 @@ line.
 
         return;
 
-        void TextViewAccept (object sender, HandledEventArgs e)
+        void TextViewAccept (object sender, CommandEventArgs e)
         {
             textViewAccept++;
-            e.Handled = handleAccept;
+            e.Cancel = handleAccept;
         }
 
-        void ButtonAccept (object sender, HandledEventArgs e)
+        void ButtonAccept (object sender, CommandEventArgs e)
         {
             buttonAccept++;
         }
@@ -8617,7 +8617,7 @@ line.
 
         return;
 
-        void ButtonAccept (object sender, HandledEventArgs e)
+        void ButtonAccept (object sender, CommandEventArgs e)
         {
             buttonAccept++;
         }

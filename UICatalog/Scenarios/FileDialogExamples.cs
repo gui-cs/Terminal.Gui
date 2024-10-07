@@ -137,7 +137,7 @@ public class FileDialogExamples : Scenario
                             }
                             finally
                             {
-                                e.Handled = true;
+                                e.Cancel = true;
                             }
                         };
         win.Add (btn);

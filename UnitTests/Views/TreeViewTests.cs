@@ -1350,7 +1350,7 @@ oot two
         Assert.False (accepted);
 
         return;
-        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
+        void OnAccept (object sender, CommandEventArgs e) { accepted = true; }
     }
 
 
@@ -1381,7 +1381,7 @@ oot two
             activated = true;
             selectedObject = e.ActivatedObject;
         }
-        void Accept (object sender, HandledEventArgs e) { accepted = true; }
+        void Accept (object sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -1410,10 +1410,10 @@ oot two
             selectedObject = e.ActivatedObject;
         }
 
-        void Accept (object sender, HandledEventArgs e)
+        void Accept (object sender, CommandEventArgs e)
         {
             accepted = true;
-            e.Handled = true;
+            e.Cancel = true;
         }
     }
 }

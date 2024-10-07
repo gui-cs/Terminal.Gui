@@ -518,7 +518,7 @@ public class UICatalogApp
                 statusBarShortcut.Accepted += (sender, args) =>
                                             {
                                                 StatusBar.Visible = !StatusBar.Visible;
-                                                args.Handled = true;
+                                                args.Cancel = true;
                                             };
 
                 ShForce16Colors = new ()

@@ -498,7 +498,7 @@ public class RadioGroupTests (ITestOutputHelper output)
 
         return;
 
-        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
+        void OnAccept (object sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -514,7 +514,7 @@ public class RadioGroupTests (ITestOutputHelper output)
 
         return;
 
-        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
+        void OnAccept (object sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -684,7 +684,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         radioGroup.Accepted += (s, e) =>
                              {
                                  acceptedCount++;
-                                 e.Handled = handleAccepted;
+                                 e.Cancel = handleAccepted;
                              };
 
         Assert.True (radioGroup.DoubleClickAccepts);
@@ -736,7 +736,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         superView.Accepted += (s, a) =>
                             {
                                 superViewAcceptCount++;
-                                a.Handled = true;
+                                a.Cancel = true;
                             };
 
         Assert.Equal (0, superViewAcceptCount);

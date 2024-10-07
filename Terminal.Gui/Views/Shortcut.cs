@@ -515,10 +515,10 @@ public class Shortcut : View, IOrientation, IDesignable
 
             return;
 
-            void CommandViewOnAccepted (object? sender, HandledEventArgs e)
+            void CommandViewOnAccepted (object? sender, CommandEventArgs e)
             {
                 // Always eat CommandView.Accept
-                e.Handled = true;
+                e.Cancel = true;
             }
 
             void CommandViewOnSelecting (object? sender, CommandEventArgs e)

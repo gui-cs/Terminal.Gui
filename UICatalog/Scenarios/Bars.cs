@@ -170,7 +170,7 @@ public class Bars : Scenario
 
         popOverMenu.Accepted += PopOverMenuOnAccept;
 
-        void PopOverMenuOnAccept (object o, HandledEventArgs handledEventArgs)
+        void PopOverMenuOnAccept (object o, CommandEventArgs args)
         {
             if (popOverMenu.Visible)
             {
@@ -529,7 +529,7 @@ public class Bars : Scenario
                                                     {
                                                         button1.Visible = !button1.Visible;
                                                         button1.Enabled = button1.Visible;
-                                                        e.Handled = false;
+                                                        e.Cancel = false;
                                                     };
 
         bar.Add (new Label

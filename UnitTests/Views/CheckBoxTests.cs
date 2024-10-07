@@ -236,10 +236,10 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         return;
 
-        void ViewOnAccept (object sender, HandledEventArgs e)
+        void ViewOnAccept (object sender, CommandEventArgs e)
         {
             acceptInvoked = true;
-            e.Handled = true;
+            e.Cancel = true;
         }
     }
 
@@ -551,7 +551,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         return;
 
-        void CheckBoxOnAccept (object sender, HandledEventArgs e) { accepted = true; }
+        void CheckBoxOnAccept (object sender, CommandEventArgs e) { accepted = true; }
     }
 
 

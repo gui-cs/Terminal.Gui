@@ -133,16 +133,16 @@ public class NumericUpDown<T> : View where T : notnull
 
         return;
 
-        void OnDownButtonOnAccept (object? s, HandledEventArgs e)
+        void OnDownButtonOnAccept (object? s, CommandEventArgs e)
         {
             InvokeCommand (Command.ScrollDown);
-            e.Handled = true;
+            e.Cancel = true;
         }
 
-        void OnUpButtonOnAccept (object? s, HandledEventArgs e)
+        void OnUpButtonOnAccept (object? s, CommandEventArgs e)
         {
             InvokeCommand (Command.ScrollUp);
-            e.Handled = true;
+            e.Cancel = true;
         }
     }
 

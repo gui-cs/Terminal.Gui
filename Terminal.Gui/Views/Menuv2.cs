@@ -78,12 +78,12 @@ public class Menuv2 : Bar
 
             shortcut.Accepted += ShortcutOnAccept;
 
-            void ShortcutOnAccept (object sender, HandledEventArgs e)
+            void ShortcutOnAccept (object sender, CommandEventArgs e)
             {
                 if (Arrangement.HasFlag (ViewArrangement.Overlapped) && Visible)
                 {
                     Visible = false;
-                    e.Handled = true;
+                    e.Cancel = true;
 
                     return;
                 }

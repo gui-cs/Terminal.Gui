@@ -50,10 +50,10 @@ public class ViewCommandTests (ITestOutputHelper output)
 
         return;
 
-        void ViewOnAccept (object sender, HandledEventArgs e)
+        void ViewOnAccept (object sender, CommandEventArgs e)
         {
             acceptInvoked = true;
-            e.Handled = true;
+            e.Cancel = true;
         }
     }
 
@@ -70,7 +70,7 @@ public class ViewCommandTests (ITestOutputHelper output)
 
         return;
 
-        void ViewOnAccept (object sender, HandledEventArgs e) { accepted = true; }
+        void ViewOnAccept (object sender, CommandEventArgs e) { accepted = true; }
     }
 
     // Accept on subview should bubble up to parent
@@ -237,7 +237,7 @@ public class ViewCommandTests (ITestOutputHelper output)
 
             Accepted += (s, a) =>
                       {
-                          a.Handled = HandleAccepted;
+                          a.Cancel = HandleAccepted;
                           AcceptedCount++;
                       };
 
@@ -260,7 +260,7 @@ public class ViewCommandTests (ITestOutputHelper output)
         public bool HandleOnAccepted { get; set; }
 
         /// <inheritdoc />
-        protected override bool OnAccepted (HandledEventArgs args)
+        protected override bool OnAccepted (CommandEventArgs args)
         {
             OnAcceptedCount++;
 

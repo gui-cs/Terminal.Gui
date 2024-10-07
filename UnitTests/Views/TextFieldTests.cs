@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Reflection;
 using System.Text;
 using Xunit.Abstractions;
@@ -189,7 +188,6 @@ public class TextFieldTests (ITestOutputHelper output)
         tf.Draw ();
         TestHelpers.AssertDriverContentsAre ("Misérables", output);
         Application.Top.Dispose ();
-
     }
 
     [Theory]
@@ -523,13 +521,13 @@ public class TextFieldTests (ITestOutputHelper output)
 
         tf.Selecting += (sender, args) => Assert.Fail ("Selected should not be raied.");
 
-        Application.Top = new Toplevel ();
+        Application.Top = new ();
         Application.Top.Add (tf);
         tf.SetFocus ();
         Application.OnKeyDown (Key.Space);
 
         Application.Top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
+        Application.ResetState (true);
     }
 
     [Fact]
@@ -537,10 +535,10 @@ public class TextFieldTests (ITestOutputHelper output)
     {
         TextField tf = new ();
 
-        int selectingCount = 0;
+        var selectingCount = 0;
         tf.Selecting += (sender, args) => selectingCount++;
 
-        Application.Top = new Toplevel ();
+        Application.Top = new ();
         Application.Top.Add (tf);
         tf.SetFocus ();
         Application.OnKeyDown (Key.Enter);
@@ -548,7 +546,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.Equal (0, selectingCount);
 
         Application.Top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
+        Application.ResetState (true);
     }
 
     [Fact]
@@ -556,10 +554,10 @@ public class TextFieldTests (ITestOutputHelper output)
     {
         TextField tf = new ();
 
-        int acceptedCount = 0;
+        var acceptedCount = 0;
         tf.Accepted += (sender, args) => acceptedCount++;
 
-        Application.Top = new Toplevel ();
+        Application.Top = new ();
         Application.Top.Add (tf);
         tf.SetFocus ();
         Application.OnKeyDown (Key.Enter);
@@ -567,7 +565,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.Equal (1, acceptedCount);
 
         Application.Top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
+        Application.ResetState (true);
     }
 
     [Fact]
@@ -827,7 +825,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         return;
 
-        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
+        void OnAccept (object sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -842,7 +840,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         return;
 
-        void Accept (object sender, HandledEventArgs e) { accepted = true; }
+        void Accept (object sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Theory]
@@ -850,19 +848,20 @@ public class TextFieldTests (ITestOutputHelper output)
     [InlineData (true, 0)]
     public void Accepted_Handler_Handled_Prevents_Default_Button_Accept (bool handleAccept, int expectedButtonAccepts)
     {
-        var superView = new Window ()
+        var superView = new Window
         {
             Id = "superView"
         };
 
-        var tf = new TextField ()
+        var tf = new TextField
         {
             Id = "tf"
         };
-        var button = new Button ()
+
+        var button = new Button
         {
             Id = "button",
-            IsDefault = true,
+            IsDefault = true
         };
 
         superView.Add (tf, button);
@@ -887,34 +886,32 @@ public class TextFieldTests (ITestOutputHelper output)
 
         return;
 
-        void TextFieldAccept (object sender, HandledEventArgs e)
+        void TextFieldAccept (object sender, CommandEventArgs e)
         {
             textFieldAccept++;
-            e.Handled = handleAccept;
+            e.Cancel = handleAccept;
         }
 
-        void ButtonAccept (object sender, HandledEventArgs e)
-        {
-            buttonAccept++;
-        }
+        void ButtonAccept (object sender, CommandEventArgs e) { buttonAccept++; }
     }
 
     [Fact]
     public void Accepted_No_Handler_Enables_Default_Button_Accept ()
     {
-        var superView = new Window ()
+        var superView = new Window
         {
             Id = "superView"
         };
 
-        var tf = new TextField ()
+        var tf = new TextField
         {
             Id = "tf"
         };
-        var button = new Button ()
+
+        var button = new Button
         {
-            Id="button",
-            IsDefault = true,
+            Id = "button",
+            IsDefault = true
         };
 
         superView.Add (tf, button);
@@ -934,10 +931,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         return;
 
-        void ButtonAccept (object sender, HandledEventArgs e)
-        {
-            buttonAccept++;
-        }
+        void ButtonAccept (object sender, CommandEventArgs e) { buttonAccept++; }
     }
 
     [Fact]
@@ -964,10 +958,10 @@ public class TextFieldTests (ITestOutputHelper output)
 
         return;
 
-        void TextViewAccept (object sender, HandledEventArgs e)
+        void TextViewAccept (object sender, CommandEventArgs e)
         {
             tfAcceptedInvoked = true;
-            e.Handled = handle;
+            e.Cancel = handle;
         }
     }
 
@@ -1263,13 +1257,12 @@ public class TextFieldTests (ITestOutputHelper output)
     [TextFieldTestsAutoInitShutdown]
     public void TextChanged_Event ()
     {
-        bool eventFired = false;
+        var eventFired = false;
         _textField.TextChanged += (s, e) => eventFired = true;
 
         _textField.Text = "changed";
         Assert.True (eventFired);
         Assert.Equal ("changed", _textField.Text);
-
     }
 
     [Fact]
@@ -1977,7 +1970,7 @@ public class TextFieldTests (ITestOutputHelper output)
     public void Words_With_Accents_Incorrect_Order_Will_Result_With_Wrong_Accent_Place ()
     {
         var tf = new TextField { Width = 30, Text = "Les Misérables" };
-        tf.SetRelativeLayout (new Size (100, 100));
+        tf.SetRelativeLayout (new (100, 100));
         tf.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -2059,7 +2052,7 @@ Les Miśerables",
     {
         View superView = new ()
         {
-            CanFocus = true,
+            CanFocus = true
         };
 
         TextField t = new ();
@@ -2073,14 +2066,13 @@ Les Miśerables",
         Assert.Equal (2, superView.Subviews.Count);
     }
 
-
     [Fact]
     public void Autocomplete__Added_To_SuperView_On_Add ()
     {
         View superView = new ()
         {
             CanFocus = true,
-            Id = "superView",
+            Id = "superView"
         };
 
         superView.BeginInit ();
@@ -2097,13 +2089,12 @@ Les Miśerables",
         Assert.Equal (2, superView.Subviews.Count);
     }
 
-
     [Fact]
     public void Autocomplete_Visible_False_By_Default ()
     {
         View superView = new ()
         {
-            CanFocus = true,
+            CanFocus = true
         };
 
         TextField t = new ();

@@ -613,7 +613,7 @@ public class ShortcutTests
         shortcut.Accepted += (s, e) =>
                              {
                                  accepted++;
-                                 e.Handled = true;
+                                 e.Cancel = true;
                              };
 
         Application.OnMouseEvent (
@@ -713,7 +713,7 @@ public class ShortcutTests
         shortcut.Accepted += (s, e) =>
                              {
                                  accepted++;
-                                 e.Handled = true;
+                                 e.Cancel = true;
                              };
 
         var selected = 0;

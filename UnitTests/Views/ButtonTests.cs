@@ -491,7 +491,7 @@ public class ButtonTests (ITestOutputHelper output)
 
         return;
 
-        void ButtonOnAccept (object sender, HandledEventArgs e) { accepted = true; }
+        void ButtonOnAccept (object sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -510,10 +510,10 @@ public class ButtonTests (ITestOutputHelper output)
 
         return;
 
-        void ButtonAccept (object sender, HandledEventArgs e)
+        void ButtonAccept (object sender, CommandEventArgs e)
         {
             acceptInvoked = true;
-            e.Handled = true;
+            e.Cancel = true;
         }
     }
 
@@ -615,7 +615,7 @@ public class ButtonTests (ITestOutputHelper output)
         button.Accepted += (s, e) =>
                            {
                                acceptedCount++;
-                               e.Handled = true;
+                               e.Cancel = true;
                            };
 
         me = new MouseEvent ();
@@ -660,7 +660,7 @@ public class ButtonTests (ITestOutputHelper output)
         button.Accepted += (s, e) =>
                            {
                                acceptedCount++;
-                               e.Handled = true;
+                               e.Cancel = true;
                            };
 
         var selectingCount = 0;

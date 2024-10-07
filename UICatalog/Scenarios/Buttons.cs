@@ -49,16 +49,16 @@ public class Buttons : Scenario
 
         swapButton.Accepted += (s, e) =>
                              {
-                                 e.Handled = !swapButton.IsDefault;
+                                 e.Cancel = !swapButton.IsDefault;
                                  defaultButton.IsDefault = !defaultButton.IsDefault;
                                  swapButton.IsDefault = !swapButton.IsDefault;
                              };
 
         defaultButton.Accepted += (s, e) =>
                                 {
-                                    e.Handled = !defaultButton.IsDefault;
+                                    e.Cancel = !defaultButton.IsDefault;
 
-                                    if (e.Handled)
+                                    if (e.Cancel)
                                     {
                                         MessageBox.ErrorQuery ("Error", "This button is no longer the Quit button; the Swap Default button is.", "_Ok");
                                     }
@@ -71,7 +71,7 @@ public class Buttons : Scenario
                              {
                                  string btnText = button.Text;
                                  MessageBox.Query ("Message", $"Did you click {txt}?", "Yes", "No");
-                                 e.Handled = true;
+                                 e.Cancel = true;
                              };
         }
 
@@ -114,7 +114,7 @@ public class Buttons : Scenario
         button.Accepted += (s, e) =>
                          {
                              MessageBox.Query ("Message", "Question?", "Yes", "No");
-                             e.Handled = true;
+                             e.Cancel = true;
                          };
 
         var textChanger = new Button { X = 2, Y = Pos.Bottom (button) + 1, Text = "Te_xt Changer" };
@@ -122,7 +122,7 @@ public class Buttons : Scenario
         textChanger.Accepted += (s, e) =>
                               {
                                   textChanger.Text += "!";
-                                  e.Handled = true;
+                                  e.Cancel = true;
                               };
 
         main.Add (
@@ -133,7 +133,7 @@ public class Buttons : Scenario
                       Text = "Lets see if this will move as \"Text Changer\" grows"
                   }
                  );
-        button.Accepted += (sender, args) => { args.Handled = true; };
+        button.Accepted += (sender, args) => { args.Cancel = true; };
 
         var removeButton = new Button
         {
@@ -146,7 +146,7 @@ public class Buttons : Scenario
         removeButton.Accepted += (s, e) =>
                                {
                                    removeButton.Visible = false;
-                                   e.Handled = true;
+                                   e.Cancel = true;
                                };
 
         var computedFrame = new FrameView
@@ -172,7 +172,7 @@ public class Buttons : Scenario
         moveBtn.Accepted += (s, e) =>
                           {
                               moveBtn.X = moveBtn.Frame.X + 5;
-                              e.Handled = true;
+                              e.Cancel = true;
                           };
         computedFrame.Add (moveBtn);
 
@@ -189,7 +189,7 @@ public class Buttons : Scenario
         sizeBtn.Accepted += (s, e) =>
                           {
                               sizeBtn.Width = sizeBtn.Frame.Width + 5;
-                              e.Handled = true;
+                              e.Cancel = true;
                           };
         computedFrame.Add (sizeBtn);
 
@@ -214,7 +214,7 @@ public class Buttons : Scenario
                                                      moveBtnA.Frame.Width,
                                                      moveBtnA.Frame.Height
                                                     );
-                               e.Handled = true;
+                               e.Cancel = true;
                            };
         absoluteFrame.Add (moveBtnA);
 
@@ -232,13 +232,13 @@ public class Buttons : Scenario
                                                      sizeBtnA.Frame.Width + 5,
                                                      sizeBtnA.Frame.Height
                                                     );
-                               e.Handled = true;
+                               e.Cancel = true;
                            };
         absoluteFrame.Add (sizeBtnA);
 
         var label = new Label
         {
-            X = 2, Y = Pos.Bottom (computedFrame) + 1, 
+            X = 2, Y = Pos.Bottom (computedFrame) + 1,
             Text = "Text Ali_gnment (changes the four buttons above): "
         };
         main.Add (label);
@@ -251,7 +251,7 @@ public class Buttons : Scenario
             RadioLabels = new [] { "_Start", "_End", "_Center", "_Fill" },
             Title = "_9 RadioGroup",
             BorderStyle = LineStyle.Dotted,
-           // CanFocus = false
+            // CanFocus = false
         };
         main.Add (radioGroup);
 
@@ -300,7 +300,7 @@ public class Buttons : Scenario
         moveHotKeyBtn.Accepted += (s, e) =>
                                 {
                                     moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text);
-                                    e.Handled = true;
+                                    e.Cancel = true;
                                 };
         main.Add (moveHotKeyBtn);
 
@@ -317,7 +317,7 @@ public class Buttons : Scenario
         moveUnicodeHotKeyBtn.Accepted += (s, e) =>
                                        {
                                            moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text);
-                                           e.Handled = true;
+                                           e.Cancel = true;
                                        };
         main.Add (moveUnicodeHotKeyBtn);
 
@@ -401,7 +401,7 @@ public class Buttons : Scenario
         noRepeatButton.Accepted += (s, e) =>
                                  {
                                      noRepeatButton.Title = $"Accept Cou_nt: {++noRepeatAcceptCount}";
-                                     e.Handled = true;
+                                     e.Cancel = true;
                                  };
         main.Add (label, noRepeatButton);
 
@@ -423,7 +423,7 @@ public class Buttons : Scenario
         repeatButton.Accepted += (s, e) =>
                                {
                                    repeatButton.Title = $"Accept Co_unt: {++acceptCount}";
-                                   e.Handled = true;
+                                   e.Cancel = true;
                                };
 
         var enableCB = new CheckBox

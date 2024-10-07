@@ -198,7 +198,7 @@ public class Dialogs : Scenario
                                                                      );
                                        Application.Run (dlg);
                                        dlg.Dispose ();
-                                       e.Handled = true;
+                                       e.Cancel = true;
                                    };
 
         app.Add (showDialogButton);

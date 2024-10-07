@@ -61,13 +61,13 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? RaiseAccepted ()
     {
-        HandledEventArgs args = new ();
+        CommandEventArgs args = new ();
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
-        args.Handled = OnAccepted (args) || args.Handled;
+        args.Cancel = OnAccepted (args) || args.Cancel;
 
-        if (!args.Handled)
+        if (!args.Cancel)
         {
             // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
             Accepted?.Invoke (this, args);
@@ -76,7 +76,7 @@ public partial class View // Command APIs
         // Accept is a special case where if the event is not canceled, the event is
         //  - Invoked on any peer-View with IsDefault == true
         //  - bubbled up the SuperView hierarchy.
-        if (!args.Handled)
+        if (!args.Cancel)
         {
             // If there's an IsDefault peer view in Subviews, try it
             var isDefaultView = SuperView?.Subviews.FirstOrDefault (v => v is Button { IsDefault: true });
@@ -93,23 +93,22 @@ public partial class View // Command APIs
             return SuperView?.InvokeCommand (Command.Accept, ctx: new (Command.Accept, null, null, this)) == true;
         }
 
-        return Accepted is null ? null : args.Handled;
+        return Accepted is null ? null : args.Cancel;
     }
 
-    // TODO: Change this to CancelEventArgs
     /// <summary>
-    ///     Called when the View's state has been accepted by the user. Set <see cref="HandledEventArgs.Handled"/> to
+    ///     Called when the View's state has been accepted by the user. Set <see cref="CommandEventArgs.Cancel"/> to
     ///     <see langword="true"/> to stop processing.
     /// </summary>
     /// <param name="args"></param>
     /// <returns><see langword="true"/> to stop processing.</returns>
-    protected virtual bool OnAccepted (HandledEventArgs args) { return false; }
+    protected virtual bool OnAccepted (CommandEventArgs args) { return false; }
 
     /// <summary>
     ///     Cancelable event raised when the View's state has been accepted by the user. Set
     ///     <see cref="HandledEventArgs.Handled"/> to cancel the event.
     /// </summary>
-    public event EventHandler<HandledEventArgs>? Accepted;
+    public event EventHandler<CommandEventArgs>? Accepted;
 
     /// <summary>
     ///     Called when the user has performed an action (e.g. <see cref="Command.Select"/>) causing the View to change state. Calls <see cref="OnSelecting"/> which can be cancelled; if not cancelled raises <see cref="Accepted"/>.

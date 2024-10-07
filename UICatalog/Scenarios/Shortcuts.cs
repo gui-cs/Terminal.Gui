@@ -365,7 +365,7 @@ public class Shortcuts : Scenario
                     {
                         return;
                     }
-                    eventSource.Add ($"{shortcut!.Id}.Select: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
+                    eventSource.Add ($"{shortcut!.Id}.Selecting: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
                     eventLog.MoveDown ();
                 };
 
@@ -375,22 +375,22 @@ public class Shortcuts : Scenario
                     {
                         return;
                     }
-                    eventSource.Add ($"{shortcut!.Id}.CommandView.Select: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
+                    eventSource.Add ($"{shortcut!.Id}.CommandView.Selecting: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
                     eventLog.MoveDown ();
                     args.Cancel = true;
                 };
 
                 shortcut.Accepted += (o, args) =>
                 {
-                    eventSource.Add ($"{shortcut!.Id}.Accept: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
+                    eventSource.Add ($"{shortcut!.Id}.Accepting: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
                     eventLog.MoveDown ();
                     // We don't want this to exit the Scenario
-                    args.Handled = true;
+                    args.Cancel = true;
                 };
 
                 shortcut.CommandView.Accepted += (o, args) =>
                 {
-                    eventSource.Add ($"{shortcut!.Id}.CommandView.Accept: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
+                    eventSource.Add ($"{shortcut!.Id}.CommandView.Accepting: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
                     eventLog.MoveDown ();
                 };
             }
@@ -399,9 +399,9 @@ public class Shortcuts : Scenario
         //((CheckBox)vShortcut5.CommandView).OnToggle ();
     }
 
-    private void Button_Clicked (object sender, HandledEventArgs e)
+    private void Button_Clicked (object sender, CommandEventArgs e)
     {
-        e.Handled = true;
+        e.Cancel = true;
         View view = sender as View;
         MessageBox.Query ("Hi", $"You clicked {view!.Text}", "_Ok");
     }

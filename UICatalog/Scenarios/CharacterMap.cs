@@ -173,7 +173,7 @@ public class CharacterMap : Scenario
 
         return;
 
-        void JumpEditOnAccept (object sender, HandledEventArgs e)
+        void JumpEditOnAccept (object sender, CommandEventArgs e)
         {
             if (jumpEdit.Text.Length == 0)
             {
@@ -245,7 +245,7 @@ public class CharacterMap : Scenario
 
 
             // Cancel the event to prevent ENTER from being handled elsewhere
-            e.Handled = true;
+            e.Cancel = true;
         }
     }
 
@@ -477,7 +477,7 @@ internal class CharMap : View
             ShadowStyle = ShadowStyle.None,
             CanFocus = false
         };
-        up.Accepted += (sender, args) => { args.Handled = ScrollVertical (-1) == true; };
+        up.Accepted += (sender, args) => { args.Cancel = ScrollVertical (-1) == true; };
 
         var down = new Button
         {

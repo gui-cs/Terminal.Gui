@@ -421,7 +421,7 @@ Item 6",
 
         return;
 
-        void OnAccepted (object sender, HandledEventArgs e) { accepted = true; }
+        void OnAccepted (object sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -452,7 +452,7 @@ Item 6",
             selectedValue = e.Value.ToString ();
         }
 
-        void Accepted (object sender, HandledEventArgs e) { accepted = true; }
+        void Accepted (object sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -483,10 +483,10 @@ Item 6",
             selectedValue = e.Value.ToString ();
         }
 
-        void Accepted (object sender, HandledEventArgs e)
+        void Accepted (object sender, CommandEventArgs e)
         {
             accepted = true;
-            e.Handled = true;
+            e.Cancel = true;
         }
     }
 
