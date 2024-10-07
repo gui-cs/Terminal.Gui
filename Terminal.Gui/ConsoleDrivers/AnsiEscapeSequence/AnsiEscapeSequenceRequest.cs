@@ -57,6 +57,7 @@ public class AnsiEscapeSequenceRequest
         var error = new StringBuilder ();
         var savedIsReportingMouseMoves = false;
         NetDriver? netDriver = null;
+        var values = new string? [] { null };
 
         try
         {
@@ -124,14 +125,20 @@ public class AnsiEscapeSequenceRequest
                 // Append the current key to the response
                 response.Append (keyInfo.KeyChar);
 
-                if (keyInfo.KeyChar == ansiRequest.Terminator [^1]) // Check if the key is terminator (ANSI escape sequence ends)
+                // Read until no key is available if no terminator was specified or
+                // check if the key is terminator (ANSI escape sequence ends)
+                if (!string.IsNullOrEmpty (ansiRequest.Terminator) && keyInfo.KeyChar == ansiRequest.Terminator [^1])
                 {
                     // Break out of the loop when terminator is found
                     break;
                 }
             }
 
-            if (!response.ToString ().EndsWith (ansiRequest.Terminator [^1]))
+            if (string.IsNullOrEmpty (ansiRequest.Terminator))
+            {
+                error.AppendLine ("Terminator request is empty.");
+            }
+            else if (!response.ToString ().EndsWith (ansiRequest.Terminator [^1]))
             {
                 throw new InvalidOperationException ($"Terminator doesn't ends with: '{ansiRequest.Terminator [^1]}'");
             }
@@ -142,6 +149,11 @@ public class AnsiEscapeSequenceRequest
         }
         finally
         {
+            if (string.IsNullOrEmpty (error.ToString ()))
+            {
+                (string? c1Control, string? code, values, string? terminator) = EscSeqUtils.GetEscapeResult (response.ToString ().ToCharArray ());
+            }
+
             if (savedIsReportingMouseMoves)
             {
                 switch (Application.Driver)
@@ -157,13 +169,6 @@ public class AnsiEscapeSequenceRequest
                         break;
                 }
             }
-        }
-
-        var values = new string? [] { null };
-
-        if (string.IsNullOrEmpty (error.ToString ()))
-        {
-            (string? c1Control, string? code, values, string? terminator) = EscSeqUtils.GetEscapeResult (response.ToString ().ToCharArray ());
         }
 
         AnsiEscapeSequenceResponse ansiResponse = new ()
