@@ -298,6 +298,19 @@ public class Bar : View, IOrientation, IDesignable
 
         Add (shortcut);
 
+        shortcut = new Shortcut
+        {
+            Text = "Czech",
+            CommandView = new CheckBox()
+            {
+                Title = "_Check"
+            },
+            Key = Key.F9,
+            CanFocus = false
+        };
+
+        Add (shortcut);
+
         return true;
     }
 }

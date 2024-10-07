@@ -94,7 +94,7 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         Id = "_shortcut";
 
-        // Disabled for now due to bs in highlight handling and mouse clicks - HighlightStyle = HighlightStyle.Pressed;
+        HighlightStyle = HighlightStyle.None;
         CanFocus = true;
         Width = GetWidthDimAuto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
