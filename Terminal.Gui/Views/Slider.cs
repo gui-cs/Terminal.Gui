@@ -1785,7 +1785,7 @@ public class Slider<T> : View, IOrientation
         return SetFocusedOption ();
     }
 
-    internal new bool Accept ()
+    internal bool Accept ()
     {
         SetFocusedOption ();
 
