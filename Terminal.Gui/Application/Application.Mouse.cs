@@ -224,6 +224,8 @@ public static partial class Application // Mouse handling
         {
             // The mouse was outside any View's Viewport.
 
+            Debug.Fail ("This should never happen. If it does please file an Issue!!");
+
             return;
         }
 

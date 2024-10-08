@@ -53,7 +53,16 @@ public partial class View // Command APIs
     ///     event. The default <see cref="Command.Accept"/> handler calls this method.
     /// </summary>
     /// <remarks>
+    /// <para>
     ///     The <see cref="Accepting"/> event should raised after the state of the View has changed (after <see cref="Selecting"/> is raised).
+    /// </para>
+    /// <para>
+    ///    If the Accepting event is not handled, <see cref="Command.Accept"/> will be invoked on the SuperView, enabling default Accept behavior.
+    /// </para>
+    /// <para>
+    ///    If a peer-View raises the Accepting event and the event is not cancelled, the <see cref="Command.Accept"/> will be invoked on the
+    ///    first Button in the SuperView that has <see cref="Button.IsDefault"/> set to <see langword="true"/>.
+    /// </para>
     /// </remarks>
     /// <returns>
     ///     If <see langword="true"/> the event was canceled. If <see langword="false"/> the event was raised but not canceled.
@@ -100,6 +109,11 @@ public partial class View // Command APIs
     ///     Called when the user is accepting the state of the View and the <see cref="Command.Accept"/> has been invoked. Set <see cref="CommandEventArgs.Cancel"/> to
     ///     <see langword="true"/> and return <see langword="true"/> to stop processing.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    ///    See <see cref="View.RaiseAccepting"/> for more information.
+    /// </para>
+    /// </remarks>
     /// <param name="args"></param>
     /// <returns><see langword="true"/> to stop processing.</returns>
     protected virtual bool OnAccepting (CommandEventArgs args) { return false; }
@@ -108,6 +122,11 @@ public partial class View // Command APIs
     ///     Cancelable event raised when the user is accepting the state of the View and the <see cref="Command.Accept"/> has been invoked. Set
     ///     <see cref="CommandEventArgs.Cancel"/> to cancel the event.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    ///    See <see cref="View.RaiseAccepting"/> for more information.
+    /// </para>
+    /// </remarks>
     public event EventHandler<CommandEventArgs>? Accepting;
 
     /// <summary>
