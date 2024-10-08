@@ -443,10 +443,10 @@ public class TreeView<T> : View, ITreeView where T : class
     ///     <para>This method also ensures that the selected object is visible.</para>
     /// </summary>
     /// <returns><see langword="true"/> if <see cref="ObjectActivated"/> was fired.</returns>
-    public bool? ActivateSelectedObjectIfAny ()
+    public bool? ActivateSelectedObjectIfAny (CommandContext ctx)
     {
         // By default, Command.Accept calls OnAccept, so we need to call it here to ensure that the event is fired.
-        if (RaiseAccepting () == true)
+        if (RaiseAccepting (ctx) == true)
         {
             return true;
         }

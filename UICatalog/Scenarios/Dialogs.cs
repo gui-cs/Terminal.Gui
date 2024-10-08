@@ -258,6 +258,7 @@ public class Dialogs : Scenario
                 button.Accepting += (s, e) =>
                                  {
                                      clicked = buttonId;
+                                     e.Cancel = true;
                                      Application.RequestStop ();
                                  };
                 buttons.Add (button);

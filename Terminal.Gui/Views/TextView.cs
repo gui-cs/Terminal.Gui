@@ -2012,7 +2012,7 @@ public class TextView : View
         // Things this view knows how to do
 
         // Note - NewLine is only bound to Enter if Multiline is true
-        AddCommand (Command.NewLine, () => ProcessEnterKey ());
+        AddCommand (Command.NewLine, (ctx) => ProcessEnterKey (ctx));
 
         AddCommand (
                     Command.PageDown,
@@ -6043,7 +6043,7 @@ public class TextView : View
         Paste ();
     }
 
-    private bool ProcessEnterKey ()
+    private bool ProcessEnterKey (CommandContext ctx)
     {
         ResetColumnTrack ();
 
@@ -6056,7 +6056,7 @@ public class TextView : View
         {
             // By Default pressing ENTER should be ignored (OnAccept will return false or null). Only cancel if the
             // event was fired and set Cancel = true.
-            return RaiseAccepting () is null or false;
+            return RaiseAccepting (ctx) is null or false;
         }
 
         SetWrapModel ();

@@ -84,7 +84,7 @@ public class ComboBox : View, IDesignable
                                         {
                                             return null;
                                         }
-                                        return ActivateSelected ();
+                                        return ActivateSelected (ctx);
                                     });
         AddCommand (Command.Toggle, () => ExpandCollapse ());
         AddCommand (Command.Expand, () => Expand ());
@@ -392,7 +392,7 @@ public class ComboBox : View, IDesignable
         }
     }
 
-    private bool ActivateSelected ()
+    private bool ActivateSelected (CommandContext ctx)
     {
         if (HasItems ())
         {
@@ -401,7 +401,7 @@ public class ComboBox : View, IDesignable
                 return false;
             }
 
-            return RaiseAccepting () == true;
+            return RaiseAccepting (ctx) == true;
         }
 
         return false;

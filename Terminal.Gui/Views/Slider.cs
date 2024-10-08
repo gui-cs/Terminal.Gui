@@ -1423,7 +1423,7 @@ public class Slider<T> : View, IOrientation
         AddCommand (Command.RightExtend, () => ExtendPlus ());
         AddCommand (Command.LeftExtend, () => ExtendMinus ());
         AddCommand (Command.Select, () => Select ());
-        AddCommand (Command.Accept, () => Accept ());
+        AddCommand (Command.Accept, (ctx) => Accept (ctx));
 
         SetKeyBindings ();
     }
@@ -1785,11 +1785,11 @@ public class Slider<T> : View, IOrientation
         return SetFocusedOption ();
     }
 
-    internal bool Accept ()
+    internal bool Accept (CommandContext ctx)
     {
         SetFocusedOption ();
 
-        return RaiseAccepting () == true;
+        return RaiseAccepting (ctx) == true;
     }
 
     internal bool MovePlus ()

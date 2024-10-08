@@ -68,9 +68,9 @@ public partial class View // Command APIs
     ///     If <see langword="true"/> the event was canceled. If <see langword="false"/> the event was raised but not canceled.
     ///     If <see langword="null"/> no event was raised.
     /// </returns>
-    protected bool? RaiseAccepting ()
+    protected bool? RaiseAccepting (CommandContext ctx)
     {
-        CommandEventArgs args = new ();
+        CommandEventArgs args = new () { Context = ctx };
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
