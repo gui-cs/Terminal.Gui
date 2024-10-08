@@ -199,14 +199,15 @@ public static class ConfigurationManager
         {
             if (string.IsNullOrEmpty (ThemeManager.SelectedTheme))
             {
+                // First start. Apply settings first. This ensures if a config sets Theme to something other than "Default", it gets used
                 settings = Settings?.Apply () ?? false;
                 themes = !string.IsNullOrEmpty (ThemeManager.SelectedTheme)
                          && (ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false);
             }
             else
             {
-                themes = !string.IsNullOrEmpty (ThemeManager.SelectedTheme)
-                         && (ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false);
+                // Subsequently. Apply Themes first using whatever the SelectedTheme is
+                themes = ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false;
                 settings = Settings?.Apply () ?? false;
             }
             appSettings = AppSettings?.Apply () ?? false;
