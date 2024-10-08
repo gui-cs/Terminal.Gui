@@ -1,29 +1,18 @@
-//
-// Button.cs: Button control
-//
-// Authors:
-//   Miguel de Icaza (miguel@gnome.org)
-//
-
 namespace Terminal.Gui;
 
 /// <summary>
-///     A View that raises the <see cref="View.Accepting"/> event when clicked with the mouse or when the
-///     <see cref="View.HotKey"/>, <c>Enter</c>, or <c>Space</c> key is pressed.
+///     A button View that can be pressed with the mouse or keybaord.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Provides a button showing text that raises the <see cref="View.Accepting"/> event when clicked on with a mouse or
-///         when the user presses <c>Enter</c>, <c>Space</c> or the <see cref="View.HotKey"/>. The hot key is the first
-///         letter or digit
-///         following the first underscore ('_') in the button text.
+///         The Button will raise the <see cref="View.Accepting"/> event when the user presses <see cref="View.HotKey"/>,
+///         <c>Enter</c>, or <c>Space</c>
+///         or clicks on the button with the mouse.
 ///     </para>
 ///     <para>Use <see cref="View.HotKeySpecifier"/> to change the hot key specifier from the default of ('_').</para>
 ///     <para>
-///         When the button is configured as the default (<see cref="IsDefault"/>) and the user causes the button to be
-///         accepted the <see cref="Button"/>'s <see cref="View.Accepting"/> event will be raised. If the Accept event is not
-///         handled, the Accept event on the <see cref="View.SuperView"/>. will be raised. This enables default Accept
-///         behavior.
+///         Button can act as the default <see cref="Command.Accept"/> handler for all peer-Views. See
+///         <see cref="IsDefault"/>.
 ///     </para>
 ///     <para>
 ///         Set <see cref="View.WantContinuousButtonPressed"/> to <see langword="true"/> to have the
@@ -142,7 +131,8 @@ public class Button : View, IDesignable
         {
             return;
         }
-        e.Handled = InvokeCommand (Command.HotKey, ctx: new (Command.HotKey, key: null, data: this)) == true;
+
+        e.Handled = InvokeCommand (Command.HotKey, new (Command.HotKey, null, data: this)) == true;
     }
 
     private void Button_TitleChanged (object sender, EventArgs<string> e)
@@ -166,14 +156,27 @@ public class Button : View, IDesignable
     }
 
     /// <summary>
-    ///     Gets or sets whether the <see cref="Button"/> will show an indicator indicating it is the default Button. If
-    ///     <see langword="true"/>
-    ///     <see cref="Command.Accept"/> will be invoked when the user presses <c>Enter</c> and no other peer-
-    ///     <see cref="View"/> processes the key.
-    ///     If <see cref="View.Accepting"/> is not handled, the Gets or sets whether the <see cref="Button"/> will show an
-    ///     indicator indicating it is the default Button. If <see langword="true"/>
-    ///     <see cref="Command.Accept"/> command on the <see cref="View.SuperView"/> will be invoked.
+    ///     Gets or sets whether the <see cref="Button"/> will act as the default handler for <see cref="Command.Accept"/>
+    ///     commands on the <see cref="View.SuperView"/>.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         If <see langword="true"/>:
+    ///     </para>
+    ///     <para>
+    ///         - the Button will display an indicator that it is the default Button.
+    ///     </para>
+    ///     <para>
+    ///         - when clicked, if the Accepting event is not handled, <see cref="Command.Accept"/> will be
+    ///         invoked on the SuperView.
+    ///     </para>
+    ///     <para>
+    ///         - If a peer-View receives <see cref="Command.Accept"/> and does not handle it, the command will be passed to
+    ///         the
+    ///         first Button in the SuperView that has <see cref="IsDefault"/> set to <see langword="true"/>. See
+    ///         <see cref="View.RaiseAccepting"/> for more information.
+    ///     </para>
+    /// </remarks>
     public bool IsDefault
     {
         get => _isDefault;
@@ -191,10 +194,15 @@ public class Button : View, IDesignable
         }
     }
 
-    /// <summary></summary>
+    /// <summary>
+    ///     Gets or sets whether the Button will show decorations or not. If <see langword="true"/> the glyphs that normally
+    ///     brakcet the Button Title and the <see cref="IsDefault"/> indicator will not be shown.
+    /// </summary>
     public bool NoDecorations { get; set; }
 
-    /// <summary></summary>
+    /// <summary>
+    ///     Gets or sets whether the Button will include padding on each side of the Title.
+    /// </summary>
     public bool NoPadding { get; set; }
 
     /// <inheritdoc/>
