@@ -2894,7 +2894,7 @@ public class TextView : View
     /// </summary>
     public void PromptForColors ()
     {
-        if (!Colors.PromptForColors (
+        if (!ColorPicker.Prompt (
                                      "Colors",
                                      GetSelectedCellAttribute (),
                                      out Attribute newAttribute
