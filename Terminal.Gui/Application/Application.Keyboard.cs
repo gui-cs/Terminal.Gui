@@ -169,7 +169,7 @@ public static partial class Application // Keyboard handling
                                             );
         }
 
-        if (CommandImplementations.TryGetValue (command, out Func<CommandContext, bool?>? implementation))
+        if (CommandImplementations.TryGetValue (command, out View.CommandImplementation? implementation))
         {
             var context = new CommandContext (command, keyEvent, appBinding); // Create the context here
 
@@ -418,7 +418,7 @@ public static partial class Application // Keyboard handling
     /// <summary>
     ///     Commands for Application.
     /// </summary>
-    private static Dictionary<Command, Func<CommandContext, bool?>>? CommandImplementations { get; set; }
+    private static Dictionary<Command, View.CommandImplementation>? CommandImplementations { get; set; }
 
     private static void ReplaceKey (Key oldKey, Key newKey)
     {

@@ -11,6 +11,9 @@ namespace Terminal.Gui;
 ///         use <see cref="View.AddCommand(Command,Func{CommandContext,System.Nullable{bool}})"/>.
 ///     </para>
 /// </remarks>
+/// <seealso cref="Application.KeyBindings"/>
+/// <seealso cref="View.KeyBindings"/>
+/// <seealso cref="Command"/>
 #pragma warning restore CS1574 // XML comment has cref attribute that could not be resolved
 public record struct CommandContext
 {

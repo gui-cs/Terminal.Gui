@@ -47,7 +47,7 @@ public partial class View // Keyboard APIs
     ///         opened.
     ///     </para>
     ///     <para>
-    ///         View subclasses can use <see cref="View.AddCommand(Command,Func{CommandContext,System.Nullable{bool}})"/> to
+    ///         View subclasses can use <see cref="View.AddCommand(Command,CommandImplementation)"/> to
     ///         define the
     ///         behavior of the hot key.
     ///     </para>
@@ -498,7 +498,7 @@ public partial class View // Keyboard APIs
     /// <summary>Gets the key bindings for this view.</summary>
     public KeyBindings KeyBindings { get; internal set; } = null!;
 
-    private Dictionary<Command, Func<CommandContext, bool?>> CommandImplementations { get; } = new ();
+    private Dictionary<Command, CommandImplementation> CommandImplementations { get; } = new ();
 
     /// <summary>
     ///     Low-level API called when a user presses a key; invokes any key bindings set on the view. This is called
@@ -511,8 +511,9 @@ public partial class View // Keyboard APIs
     /// <param name="keyEvent">Contains the details about the key that produced the event.</param>
     /// <param name="scope">The scope.</param>
     /// <returns>
-    ///     <see langword="false"/> if the key press was not handled. <see langword="true"/> if the keypress was handled
-    ///     and no other view should see it.
+    ///     <see langword="null"/> if no event was raised; input proessing should continue.
+    ///     <see langword="false"/> if the event was raised and was not handled (or cancelled); input proessing should continue.
+    ///     <see langword="true"/> if the event was raised and handled (or cancelled); input proessing should stop.
     /// </returns>
     public virtual bool? OnInvokingKeyBindings (Key keyEvent, KeyBindingScope scope)
     {
@@ -676,7 +677,7 @@ public partial class View // Keyboard APIs
     }
 
     /// <summary>
-    ///     Invoked when a key is pressed that may be mapped to a key binding. Set <see cref="Key.Handled"/> to true to
+    ///     Raised when a key is pressed that may be mapped to a key binding. Set <see cref="Key.Handled"/> to true to
     ///     stop the key from being processed by other views.
     /// </summary>
     public event EventHandler<Key>? InvokingKeyBindings;
@@ -688,9 +689,9 @@ public partial class View // Keyboard APIs
     /// <param name="key">The key event passed.</param>
     /// <param name="scope">The scope.</param>
     /// <returns>
-    ///     <see langword="null"/> if no command was bound the <paramref name="key"/>. <see langword="true"/> if
-    ///     commands were invoked and at least one handled the command. <see langword="false"/> if commands were invoked and at
-    ///     none handled the command.
+    ///     <see langword="null"/> if no command was invoked; input proessing should continue.
+    ///     <see langword="false"/> if at least one command was invoked and was not handled (or cancelled); input proessing should continue.
+    ///     <see langword="true"/> if at least one command was invoked and handled (or cancelled); input proessing should stop.
     /// </returns>
     protected bool? InvokeKeyBindings (Key key, KeyBindingScope scope)
     {
@@ -721,6 +722,7 @@ public partial class View // Keyboard APIs
         }
 
 #endif
+        return InvokeCommands (binding.Commands, key, binding);
 
         foreach (Command command in binding.Commands)
         {
