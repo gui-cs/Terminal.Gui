@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -24,7 +25,11 @@ public class LineViewExample : Scenario
         };
         top.Add (menu);
 
-        var appWindow = new Window ();
+        var appWindow = new Window ()
+        {
+            Y = 1,
+            Height = Dim.Fill (1) // BUGBUG: what if StatusBar is taller than 1?
+        };
         appWindow.Add (new Label { Y = 1, Text = "Regular Line" });
 
         // creates a horizontal line
@@ -79,8 +84,8 @@ public class LineViewExample : Scenario
                                            new (Application.QuitKey, "Quit", Quit)
                                        }
                                       );
-        top.Add (statusBar);
         top.Add (appWindow);
+        top.Add (statusBar);
 
         // Run - Start the application.
         Application.Run (top);

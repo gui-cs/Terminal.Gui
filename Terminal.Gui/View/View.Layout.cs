@@ -38,13 +38,14 @@ public partial class View // Layout APIs
         int targetX,
         int targetY,
         out int nx,
-        out int ny,
-        out StatusBar? statusBar
+        out int ny
+       //,
+       // out StatusBar? statusBar
     )
     {
         int maxDimension;
         View? superView;
-        statusBar = null!;
+        //statusBar = null!;
 
         if (viewToMove is not Toplevel || viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
         {
@@ -112,26 +113,26 @@ public partial class View // Layout APIs
 
         ny = Math.Max (targetY, maxDimension);
 
-        if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
-        {
-            statusVisible = Application.Top?.StatusBar?.Visible == true;
-            statusBar = Application.Top?.StatusBar!;
-        }
-        else
-        {
-            View? t = viewToMove!.SuperView;
+        //if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
+        //{
+        //    statusVisible = Application.Top?.StatusBar?.Visible == true;
+        //    statusBar = Application.Top?.StatusBar!;
+        //}
+        //else
+        //{
+        //    View? t = viewToMove!.SuperView;
 
-            while (t is { } and not Toplevel)
-            {
-                t = t.SuperView;
-            }
+        //    while (t is { } and not Toplevel)
+        //    {
+        //        t = t.SuperView;
+        //    }
 
-            if (t is Toplevel topLevel)
-            {
-                statusVisible = topLevel.StatusBar?.Visible == true;
-                statusBar = topLevel.StatusBar!;
-            }
-        }
+        //    if (t is Toplevel topLevel)
+        //    {
+        //        statusVisible = topLevel.StatusBar?.Visible == true;
+        //        statusBar = topLevel.StatusBar!;
+        //    }
+        //}
 
         if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
         {

@@ -464,8 +464,9 @@ public class Border : Adornment
                                                            parentLoc.X - _startGrabPoint.X,
                                                            parentLoc.Y - _startGrabPoint.Y,
                                                            out int nx,
-                                                           out int ny,
-                                                           out _
+                                                           out int ny
+                                                          //,
+                                                          // out _
                                                           );
 
                         Parent.X = parentLoc.X - _startGrabPoint.X;
