@@ -351,7 +351,7 @@ public partial class View // Mouse APIs
         // BUGBUG: This should be named NewMouseClickEvent. Fix this in https://github.com/gui-cs/Terminal.Gui/issues/3029
 
         // Pre-conditions
-        if (!Enabled || !CanFocus)
+        if (!Enabled)
         {
             // QUESTION: Is this right? Should a disabled view eat mouse clicks?
             return args.Handled = false;

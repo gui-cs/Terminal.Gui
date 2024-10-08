@@ -2504,7 +2504,7 @@ public class TextView : View
 
         ContextMenu = CreateContextMenu ();
         KeyBindings.Add (ContextMenu!.Key, KeyBindingScope.HotKey, Command.Context);
-        ContextMenu.KeyChanged += ContextMenu_KeyChanged!;
+        //ContextMenu.KeyChanged += ContextMenu_KeyChanged!;
     }
 
     private void TextView_Added1 (object? sender, SuperViewChangedEventArgs e)
@@ -4137,7 +4137,7 @@ public class TextView : View
     private ContextMenuv2 CreateContextMenu ()
     {
         ContextMenuv2 menu = new (new List<Shortcut> ()
-        {
+                    {
             new (this, Command.SelectAll, Strings.ctxSelectAll),
             new (this, Command.DeleteAll, Strings.ctxDeleteAll),
             new (this, Command.Copy, Strings.ctxCopy),
@@ -6248,15 +6248,6 @@ public class TextView : View
         if (!Equals (_currentCulture, Thread.CurrentThread.CurrentUICulture))
         {
             _currentCulture = Thread.CurrentThread.CurrentUICulture;
-
-            if (ContextMenu is { })
-            {
-                Point currentLoc = ContextMenu.Frame.Location;
-                ContextMenu.Dispose ();
-                ContextMenu = CreateContextMenu ();
-                ContextMenu.X = currentLoc.X;
-                ContextMenu.Y = currentLoc.Y;
-            }
         }
 
         if (keyboard)
@@ -6437,7 +6428,7 @@ public class TextView : View
     /// <inheritdoc />
     protected override void Dispose (bool disposing)
     {
-        if (ContextMenu is { })
+        if (disposing && ContextMenu is { })
         {
             ContextMenu.Visible = false;
             ContextMenu.Dispose ();

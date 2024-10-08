@@ -398,12 +398,11 @@ public class TextField : View
         KeyBindings.Add (Key.R.WithCtrl, Command.DeleteAll);
         KeyBindings.Add (Key.D.WithCtrl.WithShift, Command.DeleteAll);
 
+        KeyBindings.Remove (Key.Space);
+
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
 
-        ContextMenu = CreateContextMenu ();
-        KeyBindings.Add (ContextMenu!.Key, KeyBindingScope.HotKey, Command.Context);
-
-        KeyBindings.Remove (Key.Space);
+        CreateContextMenu ();
     }
 
     /// <summary>
@@ -540,12 +539,12 @@ public class TextField : View
             if (!Secret && !_historyText.IsFromHistory)
             {
                 _historyText.Add (
-                                  new() { TextModel.ToRuneCellList (oldText) },
+                                  new () { TextModel.ToRuneCellList (oldText) },
                                   new (_cursorPosition, 0)
                                  );
 
                 _historyText.Add (
-                                  new() { TextModel.ToRuneCells (_text) },
+                                  new () { TextModel.ToRuneCells (_text) },
                                   new (_cursorPosition, 0),
                                   HistoryText.LineStatus.Replaced
                                  );
@@ -642,7 +641,7 @@ public class TextField : View
         }
 
         _historyText.Add (
-                          new() { TextModel.ToRuneCells (_text) },
+                          new () { TextModel.ToRuneCells (_text) },
                           new (_cursorPosition, 0)
                          );
 
@@ -696,7 +695,7 @@ public class TextField : View
         }
 
         _historyText.Add (
-                          new() { TextModel.ToRuneCells (_text) },
+                          new () { TextModel.ToRuneCells (_text) },
                           new (_cursorPosition, 0)
                          );
 
@@ -904,7 +903,7 @@ public class TextField : View
             ClearAllSelection ();
             PrepareSelection (0, _text.Count);
         }
-        else if (ev.Flags == ContextMenu!.MouseFlags)
+        else if (ev.Flags == ContextMenu?.MouseFlags)
         {
             PositionCursor (ev);
 
@@ -1245,9 +1244,9 @@ public class TextField : View
         }
     }
 
-
-    private ContextMenuv2 CreateContextMenu ()
+    private void CreateContextMenu ()
     {
+        DisposeContextMenu ();
         ContextMenuv2 menu = new (new List<Shortcut> ()
         {
             new (this, Command.SelectAll, Strings.ctxSelectAll),
@@ -1259,12 +1258,17 @@ public class TextField : View
             new (this, Command.Redo, Strings.ctxRedo),
         });
 
+        KeyBindings.Remove (menu.Key);
+        KeyBindings.Add (menu.Key, KeyBindingScope.HotKey, Command.Context);
         menu.KeyChanged += ContextMenu_KeyChanged;
 
-        return menu;
+        ContextMenu = menu;
     }
 
-    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.ReplaceKey (e.OldKey.KeyCode, e.NewKey.KeyCode); }
+    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e)
+    {
+        KeyBindings.ReplaceKey (e.OldKey.KeyCode, e.NewKey.KeyCode);
+    }
 
     private List<Rune> DeleteSelectedText ()
     {
@@ -1343,7 +1347,7 @@ public class TextField : View
     private void InsertText (Key a, bool usePreTextChangedCursorPos)
     {
         _historyText.Add (
-                          new() { TextModel.ToRuneCells (_text) },
+                          new () { TextModel.ToRuneCells (_text) },
                           new (_cursorPosition, 0)
                          );
 
@@ -1794,8 +1798,8 @@ public class TextField : View
             if (ContextMenu is { })
             {
                 Point currentLoc = ContextMenu.Frame.Location;
-                ContextMenu.Dispose ();
-                ContextMenu = CreateContextMenu ();
+
+                CreateContextMenu ();
                 ContextMenu!.X = currentLoc.X;
                 ContextMenu!.Y = currentLoc.Y;
             }
@@ -1838,14 +1842,23 @@ public class TextField : View
         }
     }
 
-    /// <inheritdoc />
-    protected override void Dispose (bool disposing)
+    private void DisposeContextMenu ()
     {
         if (ContextMenu is { })
         {
             ContextMenu.Visible = false;
+            ContextMenu.KeyChanged -= ContextMenu_KeyChanged;
             ContextMenu.Dispose ();
             ContextMenu = null;
+        }
+    }
+
+    /// <inheritdoc />
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            DisposeContextMenu ();
         }
         base.Dispose (disposing);
     }

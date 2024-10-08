@@ -642,7 +642,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
             if (_keyBindingScope == KeyBindingScope.Application)
             {
-                Application.KeyBindings.Remove (Key);
+                Application.KeyBindings.Remove (Key, this);
             }
 
             if (_keyBindingScope is KeyBindingScope.HotKey or KeyBindingScope.Focused)
@@ -713,10 +713,10 @@ public class Shortcut : View, IOrientation, IDesignable
             {
                 if (oldKey != Key.Empty)
                 {
-                    Application.KeyBindings.Remove (oldKey);
+                    Application.KeyBindings.Remove (oldKey, this);
                 }
 
-                Application.KeyBindings.Remove (Key);
+                Application.KeyBindings.Remove (Key, this);
                 Application.KeyBindings.Add (Key, this, Command.HotKey);
             }
             else

@@ -80,10 +80,10 @@ public sealed class KeyBindings : Scenario
         };
         appWindow.Add (appBindingsListView);
 
-        foreach (var appBinding in Application.KeyBindings.Bindings)
+        foreach (var key in Application.KeyBindings.GetBoundKeys())
         {
-            var commands = Application.KeyBindings.GetCommands (appBinding.Key);
-            appBindings.Add ($"{appBinding.Key} -> {appBinding.Value.BoundView?.GetType ().Name} - {commands [0]}");
+            var binding = Application.KeyBindings.Get (key);
+            appBindings.Add ($"{key} -> {binding.BoundView?.GetType ().Name} - {binding.Commands [0]}");
         }
 
         ObservableCollection<string> hotkeyBindings = new ();

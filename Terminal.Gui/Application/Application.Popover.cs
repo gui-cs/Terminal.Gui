@@ -83,7 +83,7 @@ public static partial class Application // Popover handling
                 Top.HasFocus = false;
             }
 
-            Popover.SetFocus ();
+            Popover?.SetFocus ();
         }
     }
 }

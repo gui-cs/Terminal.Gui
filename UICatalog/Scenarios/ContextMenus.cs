@@ -20,6 +20,8 @@ public class ContextMenus : Scenario
 
     private readonly List<CultureInfo> _cultureInfos = Application.SupportedCultures;
 
+    private readonly Key _winContextMenuKey = Key.Space.WithCtrl;
+
     public override void Main ()
     {
         // Init
@@ -31,19 +33,14 @@ public class ContextMenus : Scenario
             Title = GetQuitKeyAndName ()
         };
 
-        _winContextMenu = new ContextMenuv2 ()
-        {
-        };
-
-        ConfigureMenu (_winContextMenu);
-        _winContextMenu.Key = Key.Space.WithCtrl;
-
         var text = "Context Menu";
         var width = 20;
 
+        CreateWinContextMenu ();
+
         var label = new Label
         {
-            X = Pos.Center (), Y = 1, Text = $"Press '{_winContextMenu.Key}' to open the Window context menu."
+            X = Pos.Center (), Y = 1, Text = $"Press '{_winContextMenuKey}' to open the Window context menu."
         };
         appWindow.Add (label);
 
@@ -74,9 +71,9 @@ public class ContextMenus : Scenario
 
         appWindow.KeyDown += (s, e) =>
                              {
-                                 if (e.KeyCode == _winContextMenu.Key)
+                                 if (e.KeyCode == _winContextMenuKey)
                                  {
-                                     ShowContextMenu (Application.GetLastMousePosition ());
+                                     ShowWinContextMenu (Application.GetLastMousePosition ());
                                      e.Handled = true;
                                  }
                              };
@@ -85,71 +82,24 @@ public class ContextMenus : Scenario
                                 {
                                     if (e.MouseEvent.Flags == MouseFlags.Button3Clicked)
                                     {
-                                        ShowContextMenu (e.MouseEvent.ScreenPosition);
+                                        ShowWinContextMenu (e.MouseEvent.ScreenPosition);
                                         e.Handled = true;
                                     }
                                 };
 
+        var originalCulture = Thread.CurrentThread.CurrentUICulture;
         appWindow.Closed += (s, e) =>
                             {
-                                Thread.CurrentThread.CurrentUICulture = new ("en-US");
+                                Thread.CurrentThread.CurrentUICulture = originalCulture;
                             };
-
 
         // Run - Start the application.
         Application.Run (appWindow);
         appWindow.Dispose ();
-        _winContextMenu.Dispose ();
+        _winContextMenu?.Dispose ();
 
         // Shutdown - Calling Application.Shutdown is required.
         Application.Shutdown ();
-    }
-
-    private void ConfigureMenu (Bar bar)
-    {
-
-        var shortcut1 = new Shortcut
-        {
-            Title = "Z_igzag",
-            Key = Key.I.WithCtrl,
-            Text = "Gonna zig zag",
-            HighlightStyle = HighlightStyle.Hover
-        };
-
-        var shortcut2 = new Shortcut
-        {
-            Title = "Za_G",
-            Text = "Gonna zag",
-            Key = Key.G.WithAlt,
-            HighlightStyle = HighlightStyle.Hover
-        };
-
-        var shortcut3 = new Shortcut
-        {
-            Title = "_Three",
-            Text = "The 3rd item",
-            Key = Key.D3.WithAlt,
-            HighlightStyle = HighlightStyle.Hover
-        };
-
-        var line = new Line ()
-        {
-            BorderStyle = LineStyle.Dotted,
-            Orientation = Orientation.Horizontal,
-            CanFocus = false,
-        };
-        // HACK: Bug in Line
-        line.Orientation = Orientation.Vertical;
-        line.Orientation = Orientation.Horizontal;
-
-        var shortcut4 = new Shortcut
-        {
-            Title = "_Four",
-            Text = "Below the line",
-            Key = Key.D3.WithAlt,
-            HighlightStyle = HighlightStyle.Hover
-        };
-        bar.Add (shortcut1, shortcut2, shortcut3, line, shortcut4);
     }
     private Shortcut [] GetSupportedCultures ()
     {
@@ -164,6 +114,7 @@ public class ContextMenus : Scenario
 
             if (index == -1)
             {
+                culture.Id = "_English";
                 culture.Title = "_English";
                 culture.HelpText = "en-US";
                 ((CheckBox)culture.CommandView).CheckedState = Thread.CurrentThread.CurrentUICulture.Name == "en-US" ? CheckState.Checked : CheckState.UnChecked;
@@ -175,6 +126,7 @@ public class ContextMenus : Scenario
                 culture.CommandView = new CheckBox () { CanFocus = false, HighlightStyle = HighlightStyle.None};
             }
 
+            culture.Id= $"_{c.Parent.EnglishName}";
             culture.Title = $"_{c.Parent.EnglishName}";
             culture.HelpText = c.Name;
             ((CheckBox)culture.CommandView).CheckedState = Thread.CurrentThread.CurrentUICulture.Name == culture.HelpText ? CheckState.Checked : CheckState.UnChecked;
@@ -189,17 +141,16 @@ public class ContextMenus : Scenario
             culture.Action += () =>
                               {
                                   Thread.CurrentThread.CurrentUICulture = new (culture.HelpText);
-                                  ((CheckBox)culture.CommandView).CheckedState = CheckState.Checked;
-
+ 
                                   foreach (Shortcut item in cultures)
                                   {
-                                      ((CheckBox)culture.CommandView).CheckedState = Thread.CurrentThread.CurrentUICulture.Name == culture.HelpText ? CheckState.Checked : CheckState.UnChecked;
+                                      ((CheckBox)item.CommandView).CheckedState = Thread.CurrentThread.CurrentUICulture.Name == item.HelpText ? CheckState.Checked : CheckState.UnChecked;
                                   }
                               };
         }
     }
 
-    private void ShowContextMenu (Point screenPosition)
+    private void CreateWinContextMenu ()
     {
         if (_winContextMenu is { })
         {
@@ -212,13 +163,20 @@ public class ContextMenus : Scenario
             _winContextMenu = null;
         }
 
-        _winContextMenu = new (GetSupportedCultures())
+        _winContextMenu = new (GetSupportedCultures ())
         {
+            Key = _winContextMenuKey,
+
             //Position = new (x, y),
             //ForceMinimumPosToZero = _forceMinimumPosToZero,
             //UseSubMenusSingleFrame = _useSubMenusSingleFrame
         };
 
+        //_winContextMenu.KeyBindings.Add (_winContextMenuKey, Command.Context);
+    }
+
+    private void ShowWinContextMenu (Point screenPosition)
+    {
         _winContextMenu.SetPosition(screenPosition);
         Application.Popover = _winContextMenu;
         _winContextMenu.Visible = true;

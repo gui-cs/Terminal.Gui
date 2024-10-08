@@ -703,8 +703,7 @@ public partial class View // Keyboard APIs
 
 #if DEBUG
 
-        // TODO: Determine if App scope bindings should be fired first or last (currently last).
-        if (Application.KeyBindings.TryGet (key, KeyBindingScope.Focused | KeyBindingScope.HotKey, out KeyBinding b))
+        if (Application.KeyBindings.TryGet (key, KeyBindingScope.Focused | KeyBindingScope.HotKey, this, out KeyBinding b))
         {
             //var boundView = views [0];
             //var commandBinding = boundView.KeyBindings.Get (key);

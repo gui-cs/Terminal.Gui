@@ -148,7 +148,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        Application.OnMouseEvent (new () { ScreenScreenPosition = new (8, 2), Flags = MouseFlags.Button3Clicked });
+        Application.OnMouseEvent (new () { ScreenPosition = new (8, 2), Flags = MouseFlags.Button3Clicked });
 
         var firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -231,7 +231,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        Application.OnMouseEvent (new () { ScreenScreenPosition = new (9, 3), Flags = MouseFlags.Button3Clicked });
+        Application.OnMouseEvent (new () { ScreenPosition = new (9, 3), Flags = MouseFlags.Button3Clicked });
 
         var firstIteration = false;
         Application.RunIteration (ref rsDialog, ref firstIteration);
