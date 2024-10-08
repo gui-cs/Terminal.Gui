@@ -428,6 +428,8 @@ public class UICatalogApp
         // doesn't (currently) have CollectionNavigator support built in, we implement it here, within the app.
         public TableView ScenarioList;
 
+        private readonly StatusBar? _statusBar;
+
         private readonly CollectionNavigator _scenarioCollectionNav = new ();
 
         public UICatalogTopLevel ()
@@ -493,77 +495,76 @@ public class UICatalogApp
             };
             Add (menuBar);
 
-            StatusBar statusBar = new ()
+            _statusBar = new ()
             {
                 Visible = ShowStatusBar,
                 AlignmentModes = AlignmentModes.IgnoreFirstOrLast,
                 CanFocus = false
             };
-            Add (statusBar);
+            _statusBar.Height = _statusBar.Visible ? Dim.Auto () : 0;
 
-            if (StatusBar is { })
+            Add (_statusBar);
+
+            ShVersion = new ()
             {
-                ShVersion = new ()
+                Title = "Version Info",
+                CanFocus = false,
+            };
+
+            var statusBarShortcut = new Shortcut
+            {
+                Key = Key.F10,
+                Title = "Show/Hide Status Bar",
+                CanFocus = false,
+            };
+            statusBarShortcut.Accepting += (sender, args) =>
+                                        {
+                                            _statusBar.Visible = !_statusBar.Visible;
+                                            args.Cancel = true;
+                                        };
+
+            ShForce16Colors = new ()
+            {
+                CanFocus = false,
+                CommandView = new CheckBox
                 {
-                    Title = "Version Info",
-                    CanFocus = false,
-                };
+                    Title = "16 color mode",
+                    CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
+                    CanFocus = false
+                },
+                HelpText = "",
+                KeyBindingScope = KeyBindingScope.Application,
+                Key = Key.F7
+            };
 
-                var statusBarShortcut = new Shortcut
-                {
-                    Key = Key.F10,
-                    Title = "Show/Hide Status Bar",
-                    CanFocus = false,
-                };
-                statusBarShortcut.Accepting += (sender, args) =>
-                                            {
-                                                StatusBar.Visible = !StatusBar.Visible;
-                                                args.Cancel = true;
-                                            };
+            ((CheckBox)ShForce16Colors.CommandView).CheckedStateChanging += (sender, args) =>
+                                                              {
+                                                                  Application.Force16Colors = args.NewValue == CheckState.Checked;
+                                                                  MiForce16Colors!.Checked = Application.Force16Colors;
+                                                                  Application.Refresh ();
+                                                              };
 
-                ShForce16Colors = new ()
-                {
-                    CanFocus = false,
-                    CommandView = new CheckBox
-                    {
-                        Title = "16 color mode",
-                        CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
-                        CanFocus = false
-                    },
-                    HelpText = "",
-                    KeyBindingScope = KeyBindingScope.Application,
-                    Key = Key.F7
-                };
+            _statusBar.Add (
+                           new Shortcut
+                           {
+                               CanFocus = false,
+                               Title = "Quit",
+                               Key = Application.QuitKey
+                           },
+                           statusBarShortcut,
+                           ShForce16Colors,
 
-                ((CheckBox)ShForce16Colors.CommandView).CheckedStateChanging += (sender, args) =>
-                                                                  {
-                                                                      Application.Force16Colors = args.NewValue == CheckState.Checked;
-                                                                      MiForce16Colors!.Checked = Application.Force16Colors;
-                                                                      Application.Refresh ();
-                                                                  };
-
-                StatusBar.Add (
-                               new Shortcut
-                               {
-                                   CanFocus = false,
-                                   Title = "Quit",
-                                   Key = Application.QuitKey
-                               },
-                               statusBarShortcut,
-                               ShForce16Colors,
-
-                               //ShDiagnostics,
-                               ShVersion
-                              );
-            }
+                           //ShDiagnostics,
+                           ShVersion
+                          );
 
             // Create the Category list view. This list never changes.
             CategoryList = new ()
             {
                 X = 0,
-                Y = 1,
+                Y = Pos.Bottom (MenuBar),
                 Width = Dim.Auto (),
-                Height = Dim.Fill (Dim.Func (() => IsInitialized ? Subviews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height : 1)),
+                Height = Dim.Fill (Dim.Func (() => _statusBar.Frame.Height)),
                 AllowsMarking = false,
                 CanFocus = true,
                 Title = "_Categories",
@@ -580,10 +581,9 @@ public class UICatalogApp
             ScenarioList = new ()
             {
                 X = Pos.Right (CategoryList) - 1,
-                Y = 1,
+                Y = Pos.Bottom (MenuBar),
                 Width = Dim.Fill (),
-                Height = Dim.Height (CategoryList),
-
+                Height = Dim.Fill (Dim.Func (() => _statusBar.Frame.Height)),
                 //AllowsMarking = false,
                 CanFocus = true,
                 Title = "_Scenarios",
@@ -695,11 +695,8 @@ public class UICatalogApp
 
             MenuBar!.Menus [0].Children! [0]!.ShortcutKey = Application.QuitKey;
 
-            if (StatusBar is { })
-            {
-                ((Shortcut)StatusBar.Subviews [0]).Key = Application.QuitKey;
-                StatusBar.Visible = ShowStatusBar;
-            }
+            ((Shortcut)_statusBar.Subviews [0]).Key = Application.QuitKey;
+            _statusBar.Visible = ShowStatusBar;
 
             MiIsMouseDisabled!.Checked = Application.IsMouseDisabled;
 
@@ -1096,19 +1093,12 @@ public class UICatalogApp
                 ScenarioList.SetFocus ();
             }
 
-            if (StatusBar is { })
+            if (_statusBar is { })
             {
-                StatusBar.VisibleChanged += (s, e) =>
+                _statusBar.VisibleChanged += (s, e) =>
                                             {
-                                                ShowStatusBar = StatusBar.Visible;
-
-                                                int height = StatusBar.Visible ? 1 : 0;
-                                                CategoryList!.Height = Dim.Fill (height);
-                                                ScenarioList.Height = Dim.Fill (height);
-
-                                                // ContentPane.Height = Dim.Fill (height);
-                                                LayoutSubviews ();
-                                                SetSubViewNeedsDisplay ();
+                                                ShowStatusBar = _statusBar.Visible;
+                                                _statusBar.Height = _statusBar.Visible ? Dim.Auto () : 0;
                                             };
             }
 

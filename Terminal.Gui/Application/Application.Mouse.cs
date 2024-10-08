@@ -6,12 +6,12 @@ namespace Terminal.Gui;
 
 public static partial class Application // Mouse handling
 {
-    internal static Point _lastMousePosition = Point.Empty;
+    internal static Point? _lastMousePosition = null;
 
     /// <summary>
     ///     Gets the most recent position of the mouse.
     /// </summary>
-    public static Point GetLastMousePosition () => _lastMousePosition;
+    public static Point? GetLastMousePosition () { return _lastMousePosition; }
 
     /// <summary>Disable or enable the mouse. The mouse is enabled by default.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
