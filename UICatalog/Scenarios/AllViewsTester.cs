@@ -50,7 +50,7 @@ public class AllViewsTester : Scenario
     {
         // Don't create a sub-win (Scenario.Win); just use Application.Top
         Application.Init ();
-        ConfigurationManager.Apply ();
+   //     ConfigurationManager.Apply ();
 
         var app = new Window
         {
@@ -88,18 +88,10 @@ public class AllViewsTester : Scenario
 
         _classListView.SelectedItemChanged += (s, args) =>
                                               {
-                                                  // Remove existing class, if any
-                                                  if (_curView != null)
-                                                  {
-                                                      _curView.LayoutComplete -= LayoutCompleteHandler;
-                                                      _hostPane.Remove (_curView);
-                                                      _curView.Dispose ();
-                                                      _curView = null;
-                                                  }
+                                                  // Dispose existing current View, if any
+                                                  DisposeCurrentView ();
 
-                                                  _curView = CreateClass (_viewClasses.Values.ToArray () [_classListView.SelectedItem]);
-                                                  // Add
-                                                  _hostPane.Add (_curView);
+                                                  CreateCurrentView (_viewClasses.Values.ToArray () [_classListView.SelectedItem]);
 
                                                   // Force ViewToEdit to be the view and not a subview
                                                   if (_adornmentsEditor is { })
@@ -326,6 +318,11 @@ public class AllViewsTester : Scenario
             ColorScheme = Colors.ColorSchemes ["Dialog"]
         };
 
+        _hostPane.LayoutStarted += (sender, args) =>
+                                   {
+
+                                   };
+
         app.Add (_leftPane, _adornmentsEditor, _settingsPane, _hostPane);
 
         _classListView.SelectedItem = 0;
@@ -345,8 +342,10 @@ public class AllViewsTester : Scenario
     private void OnXRadioGroupOnSelectedItemChanged (object s, SelectedItemChangedArgs selected) { DimPosChanged (_curView); }
 
     // TODO: Add Command.HotKey handler (pop a message box?)
-    private View CreateClass (Type type)
+    private void CreateCurrentView (Type type)
     {
+        Debug.Assert(_curView is null);
+
         // If we are to create a generic Type
         if (type.IsGenericType)
         {
@@ -386,9 +385,24 @@ public class AllViewsTester : Scenario
             _orientation.Enabled = false;
         }
 
-        view.Initialized += View_Initialized;
+        view.Initialized += CurrentView_Initialized;
+        view.LayoutComplete += CurrentView_LayoutComplete;
 
-        return view;
+        _curView = view;
+        _hostPane.Add (_curView);
+       // Application.Refresh();
+    }
+
+    private void DisposeCurrentView ()
+    {
+        if (_curView != null)
+        {
+            _curView.Initialized -= CurrentView_Initialized;
+            _curView.LayoutComplete -= CurrentView_LayoutComplete;
+            _hostPane.Remove (_curView);
+            _curView.Dispose ();
+            _curView = null;
+        }
     }
 
     private void DimPosChanged (View view)
@@ -463,7 +477,7 @@ public class AllViewsTester : Scenario
             _hText.Enabled = true;
         }
 
-        UpdateTitle (view);
+        UpdateHostTitle (view);
     }
 
     private List<Type> GetAllViewClassesCollection ()
@@ -484,10 +498,10 @@ public class AllViewsTester : Scenario
         return types;
     }
 
-    private void LayoutCompleteHandler (object sender, LayoutEventArgs args)
+    private void CurrentView_LayoutComplete (object sender, LayoutEventArgs args)
     {
         UpdateSettings (_curView);
-        UpdateTitle (_curView);
+        UpdateHostTitle (_curView);
     }
 
     private void UpdateSettings (View view)
@@ -537,9 +551,9 @@ public class AllViewsTester : Scenario
         }
     }
 
-    private void UpdateTitle (View view) { _hostPane.Title = $"{view.GetType ().Name} - {view.X}, {view.Y}, {view.Width}, {view.Height}"; }
+    private void UpdateHostTitle (View view) { _hostPane.Title = $"_Demo of {view.GetType ().Name}"; }
 
-    private void View_Initialized (object sender, EventArgs e)
+    private void CurrentView_Initialized (object sender, EventArgs e)
     {
         if (sender is not View view)
         {
@@ -566,6 +580,6 @@ public class AllViewsTester : Scenario
         _hRadioGroup.SelectedItemChanged += OnHRadioGroupOnSelectedItemChanged;
         _wRadioGroup.SelectedItemChanged += OnWRadioGroupOnSelectedItemChanged;
 
-        UpdateTitle (view);
+        UpdateHostTitle (view);
     }
 }

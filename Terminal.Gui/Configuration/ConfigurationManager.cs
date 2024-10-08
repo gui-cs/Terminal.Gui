@@ -197,10 +197,18 @@ public static class ConfigurationManager
 
         try
         {
-            settings = Settings?.Apply () ?? false;
-
-            themes = !string.IsNullOrEmpty (ThemeManager.SelectedTheme)
-                     && (ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false);
+            if (string.IsNullOrEmpty (ThemeManager.SelectedTheme))
+            {
+                settings = Settings?.Apply () ?? false;
+                themes = !string.IsNullOrEmpty (ThemeManager.SelectedTheme)
+                         && (ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false);
+            }
+            else
+            {
+                themes = !string.IsNullOrEmpty (ThemeManager.SelectedTheme)
+                         && (ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false);
+                settings = Settings?.Apply () ?? false;
+            }
             appSettings = AppSettings?.Apply () ?? false;
         }
         catch (JsonException e)

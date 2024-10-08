@@ -99,7 +99,12 @@ public static partial class Application // Initialization (Init/Shutdown)
         // valid after a Driver is loaded. In this case we need just
         // `Settings` so we can determine which driver to use.
         // Don't reset, so we can inherit the theme from the previous run.
+        string previousTheme = Themes?.Theme ?? string.Empty;
         Load ();
+        if (Themes is { } && !string.IsNullOrEmpty (previousTheme) && previousTheme != "Default")
+        {
+            ThemeManager.SelectedTheme = previousTheme;
+        }
         Apply ();
 
         AddApplicationKeyBindings ();

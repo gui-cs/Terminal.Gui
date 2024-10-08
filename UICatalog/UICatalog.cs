@@ -317,7 +317,6 @@ public class UICatalogApp
             _selectedScenario = (Scenario)Activator.CreateInstance (_scenarios [item].GetType ())!;
 
             Application.Init (driverName: _forceDriver);
-            _selectedScenario.Theme = _cachedTheme;
             _selectedScenario.TopLevelColorScheme = _topLevelColorScheme;
             _selectedScenario.Main ();
             _selectedScenario.Dispose ();
@@ -335,7 +334,6 @@ public class UICatalogApp
             VerifyObjectsWereDisposed ();
             Themes!.Theme = _cachedTheme!;
             Apply ();
-            scenario.Theme = _cachedTheme;
             scenario.TopLevelColorScheme = _topLevelColorScheme;
 
 #if DEBUG_IDISPOSABLE
