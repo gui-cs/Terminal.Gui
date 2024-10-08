@@ -54,6 +54,8 @@ internal class WindowsConsole
 
     public bool WriteToConsole (Size size, ExtendedCharInfo [] charInfoBuffer, Coord bufferSize, SmallRect window, bool force16Colors)
     {
+        //Debug.WriteLine ("WriteToConsole");
+
         if (_screenBuffer == nint.Zero)
         {
             ReadFromConsoleOutput (size, bufferSize, ref window);
@@ -1297,6 +1299,7 @@ internal class WindowsDriver : ConsoleDriver
             Y = (short)Rows, //Clip.Height
         };
 
+        bool _dirty = false;
         for (var row = 0; row < Rows; row++)
         {
             if (!_dirtyLines [row])
@@ -1320,6 +1323,7 @@ internal class WindowsDriver : ConsoleDriver
                 }
 
                 _outputBuffer [position].Empty = false;
+                _dirty = true;
 
                 if (Contents [row, col].Rune.IsBmp)
                 {

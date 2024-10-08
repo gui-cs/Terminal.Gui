@@ -19,8 +19,8 @@ internal class KeyBindingsDialog : Dialog
     {
         Title = "Keybindings";
 
-        Height = Dim.Percent (80);
-        Width = Dim.Percent (80);
+        //Height = Dim.Percent (80);
+        //Width = Dim.Percent (80);
         if (ViewTracker.Instance == null)
         {
             ViewTracker.Initialize ();

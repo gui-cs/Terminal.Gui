@@ -149,7 +149,7 @@ public class AllViewsTester : Scenario
         var label = new Label { X = 0, Y = 0, Text = "X:" };
         _locationFrame.Add (label);
         _xRadioGroup = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
-        _xRadioGroup.SelectedItemChanged += OnXRadioGroupOnSelectedItemChanged;
+        _xRadioGroup.SelectedItemChanged += OnRadioGroupOnSelectedItemChanged;
         _xText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_xVal}" };
 
         _xText.Accepting += (s, args) =>
@@ -183,7 +183,7 @@ public class AllViewsTester : Scenario
                          };
         _locationFrame.Add (_yText);
         _yRadioGroup = new () { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
-        _yRadioGroup.SelectedItemChanged += OnYRadioGroupOnSelectedItemChanged;
+        _yRadioGroup.SelectedItemChanged += OnRadioGroupOnSelectedItemChanged;
         _locationFrame.Add (_yRadioGroup);
 
         _sizeFrame = new ()
@@ -200,7 +200,7 @@ public class AllViewsTester : Scenario
         label = new () { X = 0, Y = 0, Text = "Width:" };
         _sizeFrame.Add (label);
         _wRadioGroup = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
-        _wRadioGroup.SelectedItemChanged += OnWRadioGroupOnSelectedItemChanged;
+        _wRadioGroup.SelectedItemChanged += OnRadioGroupOnSelectedItemChanged;
         _wText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_wVal}" };
 
         _wText.Accepting += (s, args) =>
@@ -260,7 +260,7 @@ public class AllViewsTester : Scenario
         _sizeFrame.Add (_hText);
 
         _hRadioGroup = new () { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
-        _hRadioGroup.SelectedItemChanged += OnHRadioGroupOnSelectedItemChanged;
+        _hRadioGroup.SelectedItemChanged += OnRadioGroupOnSelectedItemChanged;
         _sizeFrame.Add (_hRadioGroup);
 
         _settingsPane.Add (_sizeFrame);
@@ -333,13 +333,7 @@ public class AllViewsTester : Scenario
         Application.Shutdown ();
     }
 
-    private void OnHRadioGroupOnSelectedItemChanged (object s, SelectedItemChangedArgs selected) { DimPosChanged (_curView); }
-
-    private void OnWRadioGroupOnSelectedItemChanged (object s, SelectedItemChangedArgs selected) { DimPosChanged (_curView); }
-
-    private void OnYRadioGroupOnSelectedItemChanged (object s, SelectedItemChangedArgs selected) { DimPosChanged (_curView); }
-
-    private void OnXRadioGroupOnSelectedItemChanged (object s, SelectedItemChangedArgs selected) { DimPosChanged (_curView); }
+    private void OnRadioGroupOnSelectedItemChanged (object s, SelectedItemChangedArgs selected) { DimPosChanged (_curView); }
 
     // TODO: Add Command.HotKey handler (pop a message box?)
     private void CreateCurrentView (Type type)
@@ -407,7 +401,7 @@ public class AllViewsTester : Scenario
 
     private void DimPosChanged (View view)
     {
-        if (view == null)
+        if (view == null || _updatingSettings)
         {
             return;
         }
@@ -504,8 +498,10 @@ public class AllViewsTester : Scenario
         UpdateHostTitle (_curView);
     }
 
+    private bool _updatingSettings = false;
     private void UpdateSettings (View view)
     {
+        _updatingSettings = true;
         var x = view.X.ToString ();
         var y = view.Y.ToString ();
 
@@ -528,27 +524,29 @@ public class AllViewsTester : Scenario
         _wRadioGroup.SelectedItem = _dimNames.IndexOf (_dimNames.First (s => w.Contains (s)));
         _hRadioGroup.SelectedItem = _dimNames.IndexOf (_dimNames.First (s => h.Contains (s)));
 
-        if (view.Width is DimAuto)
+        if (view.Width.Has<DimAuto> (out _))
         {
             _wText.Text = "Auto";
             _wText.Enabled = false;
         }
         else
         {
-            _wText.Text = "100";
+            _wText.Text = $"{view.Frame.Width}";
             _wText.Enabled = true;
         }
 
-        if (view.Height is DimAuto)
+        if (view.Height.Has<DimAuto> (out _))
         {
             _hText.Text = "Auto";
             _hText.Enabled = false;
         }
         else
         {
-            _hText.Text = "100";
+            _hText.Text = $"{view.Frame.Height}";
             _hText.Enabled = true;
         }
+
+        _updatingSettings = false;
     }
 
     private void UpdateHostTitle (View view) { _hostPane.Title = $"_Demo of {view.GetType ().Name}"; }
@@ -560,25 +558,17 @@ public class AllViewsTester : Scenario
             return;
         }
 
-        if (view.Width is not DimAuto && (view.Width is null || view.Frame.Width == 0))
+        if (!view.Width!.Has<DimAuto> (out _) || (view.Width is null || view.Frame.Width == 0))
         {
             view.Width = Dim.Fill ();
         }
 
-        if (view.Height is not DimAuto && (view.Height is null || view.Frame.Height == 0))
+        if (!view.Height!.Has<DimAuto> (out _) || (view.Height is null || view.Frame.Height == 0))
         {
             view.Height = Dim.Fill ();
         }
 
-        _xRadioGroup.SelectedItemChanged -= OnXRadioGroupOnSelectedItemChanged;
-        _yRadioGroup.SelectedItemChanged -= OnYRadioGroupOnSelectedItemChanged;
-        _hRadioGroup.SelectedItemChanged -= OnHRadioGroupOnSelectedItemChanged;
-        _wRadioGroup.SelectedItemChanged -= OnWRadioGroupOnSelectedItemChanged;
         UpdateSettings (view);
-        _xRadioGroup.SelectedItemChanged += OnXRadioGroupOnSelectedItemChanged;
-        _yRadioGroup.SelectedItemChanged += OnYRadioGroupOnSelectedItemChanged;
-        _hRadioGroup.SelectedItemChanged += OnHRadioGroupOnSelectedItemChanged;
-        _wRadioGroup.SelectedItemChanged += OnWRadioGroupOnSelectedItemChanged;
 
         UpdateHostTitle (view);
     }

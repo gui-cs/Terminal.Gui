@@ -241,6 +241,8 @@ public class ASCIICustomButtonTest : Scenario
             {
                 Add (titleLabel, _scrollView);
             }
+
+            Y = 1;
         }
         private void Button_Initialized (object sender, EventArgs e)
         {
