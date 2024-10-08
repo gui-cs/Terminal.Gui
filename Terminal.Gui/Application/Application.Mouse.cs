@@ -6,7 +6,7 @@ namespace Terminal.Gui;
 
 public static partial class Application // Mouse handling
 {
-    internal static Point? _lastMousePosition = null;
+    internal static Point? _lastMousePosition;
 
     /// <summary>
     ///     Gets the most recent position of the mouse.

@@ -351,7 +351,7 @@ public static class MessageBox
             {
                 var b = new Button
                 {
-                    Text = $"_{s}",
+                    Text = s,
                     Data = count,
                 };
 

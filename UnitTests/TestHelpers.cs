@@ -140,8 +140,6 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     }
 
     private bool AutoInit { get; }
-
-    private List<object> _savedValues;
 }
 
 /// <summary>

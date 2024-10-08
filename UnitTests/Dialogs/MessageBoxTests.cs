@@ -52,8 +52,8 @@ public class MessageBoxTests
                                  };
         Application.Run ().Dispose ();
 
-        Assert.Equal (0, result);
-        Assert.Equal (btnAcceptCount, 1);
+        Assert.Equal (1, result);
+        Assert.Equal (1, btnAcceptCount);
     }
 
     [Fact]
@@ -134,8 +134,8 @@ public class MessageBoxTests
                                  };
         Application.Run ().Dispose ();
 
-        Assert.Equal (0, result);
-        Assert.Equal (btnAcceptCount, 1);
+        Assert.Equal (1, result);
+        Assert.Equal (1, btnAcceptCount);
 
     }
 

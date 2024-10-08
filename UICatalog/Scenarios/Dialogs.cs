@@ -246,13 +246,13 @@ public class Dialogs : Scenario
 
                     button = new ()
                     {
-                        Text = NumberToWords.Convert (buttonId) + " " + char.ConvertFromUtf32 (buttonId + CODE_POINT),
+                        Text = "_" + NumberToWords.Convert (buttonId) + " " + char.ConvertFromUtf32 (buttonId + CODE_POINT),
                         IsDefault = buttonId == 0
                     };
                 }
                 else
                 {
-                    button = new () { Text = NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
+                    button = new () { Text = "_" + NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
                 }
 
                 button.Accepting += (s, e) =>
@@ -270,7 +270,7 @@ public class Dialogs : Scenario
             {
                 Title = titleEdit.Text,
                 Text = "Dialog Text",
-                ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentRadioGroup.RadioLabels [alignmentRadioGroup.SelectedItem].Substring(1)),
+                ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentRadioGroup.RadioLabels [alignmentRadioGroup.SelectedItem].Substring (1)),
 
                 Buttons = buttons.ToArray ()
             };
@@ -300,19 +300,20 @@ public class Dialogs : Scenario
                               {
                                   button = new ()
                                   {
-                                      Text = NumberToWords.Convert (buttonId) + " " + char.ConvertFromUtf32 (buttonId + CODE_POINT),
+                                      Text = "_" + NumberToWords.Convert (buttonId) + " " + char.ConvertFromUtf32 (buttonId + CODE_POINT),
                                       IsDefault = buttonId == 0
                                   };
                               }
                               else
                               {
-                                  button = new () { Text = NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
+                                  button = new () { Text = "_" + NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
                               }
 
                               button.Accepting += (s, e) =>
                                                {
                                                    clicked = buttonId;
                                                    Application.RequestStop ();
+                                                   e.Cancel = true;
                                                };
                               buttons.Add (button);
                               dialog.AddButton (button);
@@ -321,6 +322,7 @@ public class Dialogs : Scenario
                               //{
                               //    button.TabIndex = buttons [buttons.Count - 2].TabIndex + 1;
                               //}
+                              e.Cancel = true;
                           };
             dialog.Add (add);
 
@@ -339,6 +341,7 @@ public class Dialogs : Scenario
                                   }
 
                                   dialog.LayoutSubviews ();
+                                  e.Cancel = true;
                               };
             dialog.Add (addChar);
 

@@ -106,7 +106,7 @@ public partial class View // Command APIs
     }
 
     /// <summary>
-    ///     Called when the user is accepting the state of the View and the <see cref="Command.Accept"/> has been invoked. Set <see cref="CommandEventArgs.Cancel"/> to
+    ///     Called when the user is accepting the state of the View and the <see cref="Command.Accept"/> has been invoked. Set CommandEventArgs.Cancel to
     ///     <see langword="true"/> and return <see langword="true"/> to stop processing.
     /// </summary>
     /// <remarks>
@@ -120,7 +120,7 @@ public partial class View // Command APIs
 
     /// <summary>
     ///     Cancelable event raised when the user is accepting the state of the View and the <see cref="Command.Accept"/> has been invoked. Set
-    ///     <see cref="CommandEventArgs.Cancel"/> to cancel the event.
+    ///     CommandEventArgs.Cancel to cancel the event.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -159,7 +159,7 @@ public partial class View // Command APIs
 
     /// <summary>
     ///     Called when the user has performed an action (e.g. <see cref="Command.Select"/>) causing the View to change state.
-    ///     Set <see cref="CommandEventArgs.Cancel"/> to
+    ///     Set CommandEventArgs.Cancel to
     ///     <see langword="true"/> and return <see langword="true"/> to cancel the state change. The default implementation does nothing.
     /// </summary>
     /// <param name="args">The event arguments.</param>
@@ -168,8 +168,7 @@ public partial class View // Command APIs
 
     /// <summary>
     ///     Cancelable event raised when the user has performed an action (e.g. <see cref="Command.Select"/>) causing the View to change state.
-    ///     Set <see cref="CommandEventArgs.Cancel"/> to
-    ///     <see langword="true"/> to cancel the state change.
+    ///     CommandEventArgs.Cancel to <see langword="true"/> to cancel the state change.
     /// </summary>
     public event EventHandler<CommandEventArgs>? Selecting;
 
@@ -199,7 +198,7 @@ public partial class View // Command APIs
     }
 
     /// <summary>
-    ///     Called when the View is handling the user pressing the View's <see cref="HotKey"/>. Set <see cref="CommandEventArgs.Cancel"/> to
+    ///     Called when the View is handling the user pressing the View's <see cref="HotKey"/>. Set CommandEventArgs.Cancel to
     ///     <see langword="true"/> to stop processing.
     /// </summary>
     /// <param name="args"></param>
@@ -208,8 +207,7 @@ public partial class View // Command APIs
 
     /// <summary>
     ///     Cancelable event raised when the View is handling the user pressing the View's <see cref="HotKey"/>. Set
-    ///     <see cref="CommandEventArgs.Cancel"/>
-    ///     to cancel the event.
+    ///     CommandEventArgs.Cancel to cancel the event.
     /// </summary>
     public event EventHandler<CommandEventArgs>? HandlingHotKey;
 
