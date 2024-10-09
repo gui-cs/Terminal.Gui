@@ -814,28 +814,18 @@ public class HexView : View, IDesignable
         switch (direction)
         {
             case NavigationDirection.Forward:
-                if (_leftSide)
-                {
-                    _leftSide = false;
-                    RedisplayLine (position);
-                    _firstNibble = true;
+                _leftSide = !_leftSide;
+                RedisplayLine (position);
+                _firstNibble = true;
 
-                    return true;
-                }
-
-                break;
+                return true;
 
             case NavigationDirection.Backward:
-                if (!_leftSide)
-                {
-                    _leftSide = true;
-                    RedisplayLine (position);
-                    _firstNibble = true;
+                _leftSide = !_leftSide;
+                RedisplayLine (position);
+                _firstNibble = true;
 
-                    return true;
-                }
-
-                break;
+                return true;
         }
 
         return false;
