@@ -2859,7 +2859,7 @@ public class TextView : View
             }
 
             GetSelectedRegion ();
-            Selecting = false;
+            IsSelecting = false;
 
             _historyText.Add (
                               [.. selectedCellsOriginal],

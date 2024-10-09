@@ -31,10 +31,10 @@ public partial class ColorPicker
             IsDefault = true
         };
 
-        btnOk.Accept += (s, e) =>
+        btnOk.Accepting += (s, e) =>
                         {
                             accept = true;
-                            e.Handled = true;
+                            e.Cancel = true;
                             Application.RequestStop ();
                         };
 
@@ -46,9 +46,9 @@ public partial class ColorPicker
             Width = Dim.Auto ()
         };
 
-        btnCancel.Accept += (s, e) =>
+        btnCancel.Accepting += (s, e) =>
                             {
-                                e.Handled = true;
+                                e.Cancel = true;
                                 Application.RequestStop ();
                             };
 
