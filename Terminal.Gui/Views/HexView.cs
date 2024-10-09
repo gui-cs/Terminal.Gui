@@ -180,7 +180,7 @@ public class HexView : View, IDesignable
         set
         {
             _bpl = value;
-            OnPositionChanged ();
+            RaisePositionChanged ();
         }
     }
 
@@ -197,7 +197,7 @@ public class HexView : View, IDesignable
         set
         {
             _pos = value;
-            OnPositionChanged ();
+            RaisePositionChanged ();
         }
     }
 
@@ -274,6 +274,11 @@ public class HexView : View, IDesignable
     /// <inheritdoc/>
     protected internal override bool OnMouseEvent (MouseEvent me)
     {
+        if (_source is null)
+        {
+            return false;
+        }
+
         if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
             && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
             && !me.Flags.HasFlag (MouseFlags.WheeledDown)
@@ -361,8 +366,13 @@ public class HexView : View, IDesignable
     ///<inheritdoc/>
     public override void OnDrawContent (Rectangle viewport)
     {
+        if (Source is null)
+        {
+            return;
+        }
+
         Attribute currentAttribute;
-        Attribute current = ColorScheme.Focus;
+        Attribute current = GetFocusColor ();
         Driver.SetAttribute (current);
         Move (0, 0);
 
@@ -371,8 +381,8 @@ public class HexView : View, IDesignable
         Source.Position = _displayStart;
         int n = _source.Read (data, 0, data.Length);
 
-        Attribute activeColor = ColorScheme.HotNormal;
-        Attribute trackingColor = ColorScheme.HotFocus;
+        Attribute activeColor = GetHotNormalColor ();
+        Attribute trackingColor = GetHotFocusColor ();
 
         for (var line = 0; line < viewport.Height; line++)
         {
@@ -384,10 +394,10 @@ public class HexView : View, IDesignable
             }
 
             Move (0, line);
-            Driver.SetAttribute (ColorScheme.HotNormal);
+            currentAttribute = GetHotNormalColor ();
+            Driver.SetAttribute (currentAttribute);
             Driver.AddStr ($"{_displayStart + line * nblocks * BSIZE:x8} ");
 
-            currentAttribute = ColorScheme.HotNormal;
             SetAttribute (GetNormalColor ());
 
             for (var block = 0; block < nblocks; block++)
@@ -463,14 +473,12 @@ public class HexView : View, IDesignable
         }
     }
 
-    /// <summary>Method used to invoke the <see cref="Edited"/> event passing the <see cref="KeyValuePair{TKey, TValue}"/>.</summary>
-    /// <param name="e">The key value pair.</param>
+    /// <summary>Raises the <see cref="Edited"/> event.</summary>
     protected void RaiseEdited (HexViewEditEventArgs e)
     {
-        OnEditied(e);
+        OnEditied (e);
         Edited?.Invoke (this, e);
     }
-
 
     /// <summary>Event to be invoked when an edit is made on the <see cref="Stream"/>.</summary>
     public event EventHandler<HexViewEditEventArgs>? Edited;
@@ -481,16 +489,23 @@ public class HexView : View, IDesignable
     /// <param name="e"></param>
     protected virtual void OnEditied (HexViewEditEventArgs e) { }
 
+    /// <summary>Raises the <see cref="PositionChanged"/> event.</summary>
+    protected void RaisePositionChanged ()
+    {
+        HexViewEventArgs args = new (Position, CursorPosition, BytesPerLine);
+        OnPositionChanged (args);
+        PositionChanged?.Invoke (this, args);
+    }
+
     /// <summary>
-    ///     Method used to invoke the <see cref="PositionChanged"/> event passing the <see cref="HexViewEventArgs"/>
-    ///     arguments.
+    ///     Called when <see cref="Position"/> has changed.
     /// </summary>
-    public virtual void OnPositionChanged () { PositionChanged?.Invoke (this, new (Position, CursorPosition, BytesPerLine)); }
+    protected virtual void OnPositionChanged (HexViewEventArgs e) { }
 
     /// <inheritdoc/>
     public override bool OnProcessKeyDown (Key keyEvent)
     {
-        if (!AllowEdits)
+        if (!AllowEdits || _source is null)
         {
             return false;
         }
