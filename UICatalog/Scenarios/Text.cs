@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -433,10 +434,37 @@ public class Text : Scenario
         win.Add (labelAppendAutocomplete);
         win.Add (appendAutocompleteTextField);
 
+        Label acceptView = new ()
+        {
+            X = Pos.Center (),
+            Y = Pos.AnchorEnd (),
+        };
+
+        win.Add (acceptView);
+
+        win.Accepting += WinOnAccept;
+
         Application.Run (win);
         win.Dispose ();
         Application.Shutdown ();
+
+        return;
+
+        void WinOnAccept (object sender, CommandEventArgs e)
+        {
+            e.Cancel = true; // Don't let it close
+
+            acceptView.Text = $"Accept was Invoked via {win.Focused.GetType().Name}";
+
+            // Start a task that will set acceptView.Text to an empty string after 1 second
+            System.Threading.Tasks.Task.Run (async () =>
+            {
+                await System.Threading.Tasks.Task.Delay (1000);
+                Application.Invoke (() => acceptView.Text = "");
+            });
+        }
     }
+
 
     private void TimeChanged (object sender, DateTimeEventArgs<TimeSpan> e) { _labelMirroringTimeField.Text = _timeField.Text; }
 }

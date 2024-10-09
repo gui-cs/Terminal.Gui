@@ -31,27 +31,6 @@ public class Window : Toplevel
         ColorScheme = Colors.ColorSchemes ["Base"]; // TODO: make this a theme property
         BorderStyle = DefaultBorderStyle;
         ShadowStyle = DefaultShadow;
-
-        // This enables the default button to be activated by the Enter key.
-        AddCommand (
-                    Command.Accept,
-                    () =>
-                    {
-                        // TODO: Perhaps all views should support the concept of being default?
-                        // ReSharper disable once InvertIf
-                        if (Subviews.FirstOrDefault (v => v is Button { IsDefault: true, Enabled: true }) is Button
-                            defaultBtn)
-                        {
-                            defaultBtn.InvokeCommand (Command.Accept);
-
-                            return true;
-                        }
-
-                        return OnAccept ();
-                    }
-                   );
-
-        KeyBindings.Add (Key.Enter, Command.Accept);
     }
 
     // TODO: enable this

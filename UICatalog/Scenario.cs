@@ -82,7 +82,6 @@ namespace UICatalog;
 public class Scenario : IDisposable
 {
     private static int _maxScenarioNameLen = 30;
-    public string Theme = "Default";
     public string TopLevelColorScheme = "Base";
     private bool _disposedValue;
 

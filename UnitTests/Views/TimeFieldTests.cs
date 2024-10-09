@@ -36,7 +36,7 @@ public class TimeFieldTests
     }
 
     [Fact]
-    [AutoInitShutdown (useFakeClipboard:true)]
+    [AutoInitShutdown (useFakeClipboard: true)]
     public void Copy_Paste ()
     {
         var tf1 = new TimeField { Time = TimeSpan.Parse ("12:12:19") };

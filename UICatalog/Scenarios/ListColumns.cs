@@ -211,8 +211,6 @@ public class ListColumns : Scenario
             ]
         };
 
-        top.Add (menu);
-
         var statusBar = new StatusBar (
                                        new Shortcut []
                                        {
@@ -222,8 +220,6 @@ public class ListColumns : Scenario
                                            new (Application.QuitKey, "Quit", Quit)
                                        }
                                       );
-        top.Add (statusBar);
-
         appWindow.Add (_listColView);
 
         var selectedCellLabel = new Label
@@ -256,7 +252,9 @@ public class ListColumns : Scenario
 
         _listColView.KeyBindings.ReplaceCommands (Key.Space, Command.Accept);
 
-        top.Add (appWindow);
+        top.Add (menu, appWindow, statusBar);
+        appWindow.Y = 1;
+        appWindow.Height = Dim.Fill(Dim.Func (() => statusBar.Frame.Height));
 
         // Run - Start the application.
         Application.Run (top);
@@ -275,13 +273,13 @@ public class ListColumns : Scenario
         var accepted = false;
         var ok = new Button { Text = "Ok", IsDefault = true };
 
-        ok.Accept += (s, e) =>
+        ok.Accepting += (s, e) =>
                      {
                          accepted = true;
                          Application.RequestStop ();
                      };
         var cancel = new Button { Text = "Cancel" };
-        cancel.Accept += (s, e) => { Application.RequestStop (); };
+        cancel.Accepting += (s, e) => { Application.RequestStop (); };
         var d = new Dialog { Title = prompt, Buttons = [ok, cancel] };
 
         var tf = new TextField { Text = getter (_listColView).ToString (), X = 0, Y = 0, Width = Dim.Fill () };

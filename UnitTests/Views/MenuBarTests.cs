@@ -238,12 +238,12 @@ public class MenuBarTests (ITestOutputHelper output)
 
         var btnClicked = false;
         var btn = new Button { Y = 4, Text = "Test" };
-        btn.Accept += (s, e) => btnClicked = true;
+        btn.Accepting += (s, e) => btnClicked = true;
         var top = new Toplevel ();
         top.Add (menu, btn);
         Application.Begin (top);
 
-        Application.OnMouseEvent (new () { Position = new (0, 4), Flags = MouseFlags.Button1Clicked });
+        Application.OnMouseEvent (new () { ScreenPosition = new (0, 4), Flags = MouseFlags.Button1Clicked });
         Assert.True (btnClicked);
         top.Dispose ();
     }
@@ -613,7 +613,7 @@ public class MenuBarTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        Application.OnMouseEvent (new () { Position = new (20, 5), Flags = MouseFlags.Button1Clicked });
+        Application.OnMouseEvent (new () { ScreenPosition = new (20, 5), Flags = MouseFlags.Button1Clicked });
 
         firstIteration = false;
 
@@ -646,7 +646,7 @@ public class MenuBarTests (ITestOutputHelper output)
         {
             menu.OpenMenu ();
 
-            Application.OnMouseEvent (new () { Position = new (20, 5 + i), Flags = MouseFlags.Button1Clicked });
+            Application.OnMouseEvent (new () { ScreenPosition = new (20, 5 + i), Flags = MouseFlags.Button1Clicked });
 
             firstIteration = false;
             Application.RunIteration (ref rsDialog, ref firstIteration);
@@ -809,7 +809,7 @@ public class MenuBarTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        Application.OnMouseEvent (new () { Position = new (20, 5), Flags = MouseFlags.Button1Clicked });
+        Application.OnMouseEvent (new () { ScreenPosition = new (20, 5), Flags = MouseFlags.Button1Clicked });
 
         firstIteration = false;
 
@@ -831,7 +831,7 @@ public class MenuBarTests (ITestOutputHelper output)
         {
             menu.OpenMenu ();
 
-            Application.OnMouseEvent (new () { Position = new (20, 5 + i), Flags = MouseFlags.Button1Clicked });
+            Application.OnMouseEvent (new () { ScreenPosition = new (20, 5 + i), Flags = MouseFlags.Button1Clicked });
 
             firstIteration = false;
             Application.RunIteration (ref rs, ref firstIteration);

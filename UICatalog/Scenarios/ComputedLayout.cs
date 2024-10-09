@@ -363,7 +363,7 @@ public class ComputedLayout : Scenario
         var anchorButton = new Button { Text = "Button using AnchorEnd", Y = Pos.AnchorEnd () };
         anchorButton.X = Pos.AnchorEnd ();
 
-        anchorButton.Accept += (s, e) =>
+        anchorButton.Accepting += (s, e) =>
                                 {
                                     // This demonstrates how to have a dynamically sized button
                                     // Each time the button is clicked the button's text gets longer
@@ -411,7 +411,7 @@ public class ComputedLayout : Scenario
             Y = Pos.AnchorEnd () - 1
         };
 
-        leftButton.Accept += (s, e) =>
+        leftButton.Accepting += (s, e) =>
                               {
                                   // This demonstrates how to have a dynamically sized button
                                   // Each time the button is clicked the button's text gets longer
@@ -429,7 +429,7 @@ public class ComputedLayout : Scenario
             Y = Pos.AnchorEnd (2),
         };
 
-        centerButton.Accept += (s, e) =>
+        centerButton.Accepting += (s, e) =>
                                 {
                                     // This demonstrates how to have a dynamically sized button
                                     // Each time the button is clicked the button's text gets longer
@@ -447,7 +447,7 @@ public class ComputedLayout : Scenario
             Y = Pos.Y (centerButton)
         };
 
-        rightButton.Accept += (s, e) =>
+        rightButton.Accepting += (s, e) =>
                                {
                                    // This demonstrates how to have a dynamically sized button
                                    // Each time the button is clicked the button's text gets longer

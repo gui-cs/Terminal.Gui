@@ -414,14 +414,14 @@ Item 6",
         var listView = new ListView ();
         var accepted = false;
 
-        listView.Accept += OnAccept;
+        listView.Accepting += OnAccepted;
         listView.InvokeCommand (Command.HotKey);
 
         Assert.False (accepted);
 
         return;
 
-        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
+        void OnAccepted (object sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -435,7 +435,7 @@ Item 6",
         var opened = false;
         var selectedValue = string.Empty;
 
-        listView.Accept += Accept;
+        listView.Accepting += Accepted;
         listView.OpenSelectedItem += OpenSelectedItem;
 
         listView.InvokeCommand (Command.Accept);
@@ -452,7 +452,7 @@ Item 6",
             selectedValue = e.Value.ToString ();
         }
 
-        void Accept (object sender, HandledEventArgs e) { accepted = true; }
+        void Accepted (object sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -466,7 +466,7 @@ Item 6",
         var opened = false;
         var selectedValue = string.Empty;
 
-        listView.Accept += Accept;
+        listView.Accepting += Accepted;
         listView.OpenSelectedItem += OpenSelectedItem;
 
         listView.InvokeCommand (Command.Accept);
@@ -483,10 +483,10 @@ Item 6",
             selectedValue = e.Value.ToString ();
         }
 
-        void Accept (object sender, HandledEventArgs e)
+        void Accepted (object sender, CommandEventArgs e)
         {
             accepted = true;
-            e.Handled = true;
+            e.Cancel = true;
         }
     }
 
@@ -741,14 +741,14 @@ Item 6",
 └─────┘",
                                                       output);
 
-        Application.OnMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
+        Application.OnMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.Button1Clicked });
         Assert.Equal ("", selected);
         Assert.Equal (-1, lv.SelectedItem);
 
         Application.OnMouseEvent (
                                   new ()
                                   {
-                                      Position = new (1, 1), Flags = MouseFlags.Button1Clicked
+                                      ScreenPosition = new (1, 1), Flags = MouseFlags.Button1Clicked
                                   });
         Assert.Equal ("One", selected);
         Assert.Equal (0, lv.SelectedItem);
@@ -756,7 +756,7 @@ Item 6",
         Application.OnMouseEvent (
                                   new ()
                                   {
-                                      Position = new (1, 2), Flags = MouseFlags.Button1Clicked
+                                      ScreenPosition = new (1, 2), Flags = MouseFlags.Button1Clicked
                                   });
         Assert.Equal ("Two", selected);
         Assert.Equal (1, lv.SelectedItem);
@@ -764,7 +764,7 @@ Item 6",
         Application.OnMouseEvent (
                                   new ()
                                   {
-                                      Position = new (1, 3), Flags = MouseFlags.Button1Clicked
+                                      ScreenPosition = new (1, 3), Flags = MouseFlags.Button1Clicked
                                   });
         Assert.Equal ("Three", selected);
         Assert.Equal (2, lv.SelectedItem);
@@ -772,7 +772,7 @@ Item 6",
         Application.OnMouseEvent (
                                   new ()
                                   {
-                                      Position = new (1, 4), Flags = MouseFlags.Button1Clicked
+                                      ScreenPosition = new (1, 4), Flags = MouseFlags.Button1Clicked
                                   });
         Assert.Equal ("Three", selected);
         Assert.Equal (2, lv.SelectedItem);

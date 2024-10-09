@@ -7,7 +7,7 @@ namespace Terminal.Gui;
 #region API Docs
 
 /// <summary>
-///     View is the base class for all views on the screen and represents a visible element that can render itself and
+///     View is the base class all visible elements. View can render itself and
 ///     contains zero or more nested views, called SubViews. View provides basic functionality for layout, positioning, and
 ///     drawing. In addition, View provides keyboard and mouse event handling.
 /// </summary>
@@ -100,20 +100,14 @@ namespace Terminal.Gui;
 ///         <see cref="View"/> inheritance hierarchies to override base class layout code optimally by doing so only on
 ///         first run, instead of on every run.
 ///     </para>
-///     <para>See <see href="../docs/keyboard.md">for an overview of View keyboard handling.</see></para>
-///     ///
+///     <para>See <see href="../docs/keyboard.md"> for an overview of View keyboard handling.</see></para>
 /// </remarks>
 
 #endregion API Docs
 
 public partial class View : Responder, ISupportInitializeNotification
 {
-    /// <summary>
-    ///     Cancelable event fired when the <see cref="Command.Accept"/> command is invoked. Set
-    ///     <see cref="HandledEventArgs.Handled"/>
-    ///     to cancel the event.
-    /// </summary>
-    public event EventHandler<HandledEventArgs>? Accept;
+    #region Constructors and Initialization
 
     /// <summary>Gets or sets arbitrary data for the view.</summary>
     /// <remarks>This property is not used internally.</remarks>
@@ -123,47 +117,6 @@ public partial class View : Responder, ISupportInitializeNotification
     /// <value>The identifier.</value>
     /// <remarks>The id should be unique across all Views that share a SuperView.</remarks>
     public string Id { get; set; } = "";
-
-    /// <summary>Pretty prints the View</summary>
-    /// <returns></returns>
-    public override string ToString () { return $"{GetType ().Name}({Id}){Frame}"; }
-
-    /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
-    {
-        LineCanvas.Dispose ();
-
-        DisposeKeyboard ();
-        DisposeAdornments ();
-
-        for (int i = InternalSubviews.Count - 1; i >= 0; i--)
-        {
-            View subview = InternalSubviews [i];
-            Remove (subview);
-            subview.Dispose ();
-        }
-
-        base.Dispose (disposing);
-        Debug.Assert (InternalSubviews.Count == 0);
-    }
-
-    /// <summary>
-    ///     Called when the <see cref="Command.Accept"/> command is invoked. Raises <see cref="Accept"/>
-    ///     event.
-    /// </summary>
-    /// <returns>
-    ///     If <see langword="true"/> the event was canceled. If <see langword="false"/> the event was raised but not canceled.
-    ///     If <see langword="null"/> no event was raised.
-    /// </returns>
-    protected bool? OnAccept ()
-    {
-        var args = new HandledEventArgs ();
-        Accept?.Invoke (this, args);
-
-        return Accept is null ? null : args.Handled;
-    }
-
-    #region Constructors and Initialization
 
     /// <summary>
     ///     Points to the current driver in use by the view, it is a convenience property for simplifying the development
@@ -181,14 +134,19 @@ public partial class View : Responder, ISupportInitializeNotification
     public View ()
     {
         SetupAdornments ();
+
+        SetupCommands ();
+
         SetupKeyboard ();
 
         //SetupMouse ();
+
         SetupText ();
+
     }
 
     /// <summary>
-    ///     Event called only once when the <see cref="View"/> is being initialized for the first time. Allows
+    ///     Raised once when the <see cref="View"/> is being initialized for the first time. Allows
     ///     configurations and assignments to be performed before the <see cref="View"/> being shown.
     ///     View implements <see cref="ISupportInitializeNotification"/> to allow for more sophisticated initialization.
     /// </summary>
@@ -287,7 +245,7 @@ public partial class View : Responder, ISupportInitializeNotification
         Initialized?.Invoke (this, EventArgs.Empty);
     }
 
-#endregion Constructors and Initialization
+    #endregion Constructors and Initialization
 
     #region Visibility
 
@@ -314,7 +272,10 @@ public partial class View : Responder, ISupportInitializeNotification
                 HasFocus = false;
             }
 
-            if (_enabled && CanFocus && Visible && !HasFocus
+            if (_enabled
+                && CanFocus
+                && Visible
+                && !HasFocus
                 && SuperView is null or { HasFocus: true, Visible: true, Enabled: true, Focused: null })
             {
                 SetFocus ();
@@ -346,21 +307,36 @@ public partial class View : Responder, ISupportInitializeNotification
         }
     }
 
-    /// <summary>Event fired when the <see cref="Enabled"/> value is being changed.</summary>
+    /// <summary>Raised when the <see cref="Enabled"/> value is being changed.</summary>
     public event EventHandler? EnabledChanged;
 
-    /// <summary>Method invoked when the <see cref="Enabled"/> property from a view is changed.</summary>
+    // TODO: Change this event to match the standard TG event model.
+    /// <summary>Invoked when the <see cref="Enabled"/> property from a view is changed.</summary>
     public virtual void OnEnabledChanged () { EnabledChanged?.Invoke (this, EventArgs.Empty); }
 
     private bool _visible = true;
 
-    /// <summary>Gets or sets a value indicating whether this <see cref="Responder"/> and all its child controls are displayed.</summary>
+    // TODO: Remove virtual once Menu/MenuBar are removed. MenuBar is the only override.
+    /// <summary>Gets or sets a value indicating whether this <see cref="View"/> is visible.</summary>
     public virtual bool Visible
     {
         get => _visible;
         set
         {
             if (_visible == value)
+            {
+                return;
+            }
+
+            if (OnVisibleChanging ())
+            {
+                return;
+            }
+
+            CancelEventArgs<bool> args = new (in _visible, ref value);
+            VisibleChanging?.Invoke (this, args);
+
+            if (args.Cancel)
             {
                 return;
             }
@@ -375,29 +351,45 @@ public partial class View : Responder, ISupportInitializeNotification
                 }
             }
 
-            if (_visible && CanFocus && Enabled && !HasFocus
+            if (_visible
+                && CanFocus
+                && Enabled
+                && !HasFocus
                 && SuperView is null or { HasFocus: true, Visible: true, Enabled: true, Focused: null })
             {
                 SetFocus ();
             }
 
             OnVisibleChanged ();
+            VisibleChanged?.Invoke (this, EventArgs.Empty);
+
             SetNeedsDisplay ();
         }
     }
 
-    /// <summary>Method invoked when the <see cref="Visible"/> property from a view is changed.</summary>
-    public virtual void OnVisibleChanged () { VisibleChanged?.Invoke (this, EventArgs.Empty); }
+    /// <summary>Called when <see cref="Visible"/> is changing. Can be cancelled by returning <see langword="true"/>.</summary>
+    protected virtual bool OnVisibleChanging () { return false; }
 
-    /// <summary>Event fired when the <see cref="Visible"/> value is being changed.</summary>
+    /// <summary>
+    ///     Raised when the <see cref="Visible"/> value is being changed. Can be cancelled by setting Cancel to
+    ///     <see langword="true"/>.
+    /// </summary>
+    public event EventHandler<CancelEventArgs<bool>>? VisibleChanging;
+
+    /// <summary>Called when <see cref="Visible"/> has changed.</summary>
+    protected virtual void OnVisibleChanged () { }
+
+    /// <summary>Raised when <see cref="Visible"/> has changed.</summary>
     public event EventHandler? VisibleChanged;
 
-    // TODO: This API is a hack. We should make Visible propogate automatically, no? See https://github.com/gui-cs/Terminal.Gui/issues/3703
     /// <summary>
     ///     INTERNAL Indicates whether all views up the Superview hierarchy are visible.
     /// </summary>
     /// <param name="view">The view to test.</param>
-    /// <returns> <see langword="false"/> if `view.Visible` is  <see langword="false"/> or any Superview is not visible, <see langword="true"/> otherwise.</returns>
+    /// <returns>
+    ///     <see langword="false"/> if `view.Visible` is  <see langword="false"/> or any Superview is not visible,
+    ///     <see langword="true"/> otherwise.
+    /// </returns>
     internal static bool CanBeVisible (View view)
     {
         if (!view.Visible)
@@ -416,7 +408,7 @@ public partial class View : Responder, ISupportInitializeNotification
         return true;
     }
 
-#endregion Visibility
+    #endregion Visibility
 
     #region Title
 
@@ -492,18 +484,16 @@ public partial class View : Responder, ISupportInitializeNotification
     private void SetTitleTextFormatterSize ()
     {
         TitleTextFormatter.ConstrainToSize = new (
-                                       TextFormatter.GetWidestLineLength (TitleTextFormatter.Text)
-                                       - (TitleTextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
-                                              ? Math.Max (HotKeySpecifier.GetColumns (), 0)
-                                              : 0),
-                                       1);
+                                                  TextFormatter.GetWidestLineLength (TitleTextFormatter.Text)
+                                                  - (TitleTextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
+                                                         ? Math.Max (HotKeySpecifier.GetColumns (), 0)
+                                                         : 0),
+                                                  1);
     }
 
+    // TODO: Change this event to match the standard TG event model.
     /// <summary>Called when the <see cref="View.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.</summary>
-    protected void OnTitleChanged ()
-    {
-        TitleChanged?.Invoke (this, new (in _title));
-    }
+    protected void OnTitleChanged () { TitleChanged?.Invoke (this, new (in _title)); }
 
     /// <summary>
     ///     Called before the <see cref="View.Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can
@@ -519,14 +509,37 @@ public partial class View : Responder, ISupportInitializeNotification
         return args.Cancel;
     }
 
-    /// <summary>Event fired after the <see cref="View.Title"/> has been changed.</summary>
+    /// <summary>Raised after the <see cref="View.Title"/> has been changed.</summary>
     public event EventHandler<EventArgs<string>>? TitleChanged;
 
     /// <summary>
-    ///     Event fired when the <see cref="View.Title"/> is changing. Set <see cref="CancelEventArgs.Cancel"/> to `true`
+    ///     Raised when the <see cref="View.Title"/> is changing. Set <see cref="CancelEventArgs.Cancel"/> to `true`
     ///     to cancel the Title change.
     /// </summary>
     public event EventHandler<CancelEventArgs<string>>? TitleChanging;
 
     #endregion
+
+    /// <summary>Pretty prints the View</summary>
+    /// <returns></returns>
+    public override string ToString () { return $"{GetType ().Name}({Id}){Frame}"; }
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        LineCanvas.Dispose ();
+
+        DisposeKeyboard ();
+        DisposeAdornments ();
+
+        for (int i = InternalSubviews.Count - 1; i >= 0; i--)
+        {
+            View subview = InternalSubviews [i];
+            Remove (subview);
+            subview.Dispose ();
+        }
+
+        base.Dispose (disposing);
+        Debug.Assert (InternalSubviews.Count == 0);
+    }
 }

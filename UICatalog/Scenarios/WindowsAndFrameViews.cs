@@ -52,7 +52,7 @@ public class WindowsAndFrameViews : Scenario
             ColorScheme = Colors.ColorSchemes ["Error"],
             Text = $"Padding of container is {padding}"
         };
-        paddingButton.Accept += (s, e) => About ();
+        paddingButton.Accepting += (s, e) => About ();
         win.Add (paddingButton);
 
         win.Add (
@@ -97,7 +97,7 @@ public class WindowsAndFrameViews : Scenario
                 X = Pos.Center (), Y = 0, ColorScheme = Colors.ColorSchemes ["Error"], Text = "Press me! (Y = 0)"
             };
 
-            pressMeButton.Accept += (s, e) =>
+            pressMeButton.Accepting += (s, e) =>
                                         MessageBox.ErrorQuery (loopWin.Title, "Neat?", "Yes", "No");
             loopWin.Add (pressMeButton);
 

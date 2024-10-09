@@ -880,7 +880,7 @@ public class Editor : Scenario
 
             Text = "Find _Next"
         };
-        btnFindNext.Accept += (s, e) => FindNext ();
+        btnFindNext.Accepting += (s, e) => FindNext ();
         d.Add (btnFindNext);
 
         var btnFindPrevious = new Button
@@ -890,7 +890,7 @@ public class Editor : Scenario
             Enabled = !string.IsNullOrEmpty (txtToFind.Text),
             Text = "Find _Previous"
         };
-        btnFindPrevious.Accept += (s, e) => FindPrevious ();
+        btnFindPrevious.Accepting += (s, e) => FindPrevious ();
         d.Add (btnFindPrevious);
 
         txtToFind.TextChanged += (s, e) =>
@@ -1107,7 +1107,7 @@ public class Editor : Scenario
             IsDefault = true,
             Text = "Replace _Next"
         };
-        btnFindNext.Accept += (s, e) => ReplaceNext ();
+        btnFindNext.Accepting += (s, e) => ReplaceNext ();
         d.Add (btnFindNext);
 
         label = new ()
@@ -1137,7 +1137,7 @@ public class Editor : Scenario
             Enabled = !string.IsNullOrEmpty (txtToFind.Text),
             Text = "Replace _Previous"
         };
-        btnFindPrevious.Accept += (s, e) => ReplacePrevious ();
+        btnFindPrevious.Accepting += (s, e) => ReplacePrevious ();
         d.Add (btnFindPrevious);
 
         var btnReplaceAll = new Button
@@ -1147,7 +1147,7 @@ public class Editor : Scenario
             Enabled = !string.IsNullOrEmpty (txtToFind.Text),
             Text = "Replace _All"
         };
-        btnReplaceAll.Accept += (s, e) => ReplaceAll ();
+        btnReplaceAll.Accepting += (s, e) => ReplaceAll ();
         d.Add (btnReplaceAll);
 
         txtToFind.TextChanged += (s, e) =>

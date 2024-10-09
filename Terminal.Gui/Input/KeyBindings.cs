@@ -5,6 +5,9 @@ namespace Terminal.Gui;
 /// <summary>
 ///     Provides a collection of <see cref="KeyBinding"/> objects bound to a <see cref="Key"/>.
 /// </summary>
+/// <seealso cref="Application.KeyBindings"/>
+/// <seealso cref="View.KeyBindings"/>
+/// <seealso cref="Command"/>
 public class KeyBindings
 {
     /// <summary>
@@ -284,12 +287,21 @@ public class KeyBindings
         return Array.Empty<Command> ();
     }
 
-    /// <summary>Gets the Key used by a set of commands.</summary>
-    /// <remarks></remarks>
+    /// <summary>Gets the first Key bound to the set of commands specified by <paramref name="commands"/>.</summary>
     /// <param name="commands">The set of commands to search.</param>
-    /// <returns>The <see cref="Key"/> used by a <see cref="Command"/></returns>
-    /// <exception cref="InvalidOperationException">If no matching set of commands was found.</exception>
-    public Key GetKeyFromCommands (params Command [] commands) { return Bindings.First (a => a.Value.Commands.SequenceEqual (commands)).Key; }
+    /// <returns>The first <see cref="Key"/> bound to the set of commands specified by <paramref name="commands"/>. <see langword="null"/> if the set of caommands was not found.</returns>
+    public Key? GetKeyFromCommands (params Command [] commands)
+    {
+        return Bindings.FirstOrDefault (a => a.Value.Commands.SequenceEqual (commands)).Key;
+    }
+
+    /// <summary>Gets Keys bound to the set of commands specified by <paramref name="commands"/>.</summary>
+    /// <param name="commands">The set of commands to search.</param>
+    /// <returns>The <see cref="Key"/>s bound to the set of commands specified by <paramref name="commands"/>. An empty list if the set of caommands was not found.</returns>
+    public IEnumerable<Key> GetKeysFromCommands (params Command [] commands)
+    {
+        return Bindings.Where (a => a.Value.Commands.SequenceEqual (commands)).Select (a => a.Key);
+    }
 
     /// <summary>Removes a <see cref="KeyBinding"/> from the collection.</summary>
     /// <param name="key"></param>

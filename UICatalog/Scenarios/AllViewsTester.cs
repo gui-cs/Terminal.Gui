@@ -50,7 +50,7 @@ public class AllViewsTester : Scenario
     {
         // Don't create a sub-win (Scenario.Win); just use Application.Top
         Application.Init ();
-        ConfigurationManager.Apply ();
+   //     ConfigurationManager.Apply ();
 
         var app = new Window
         {
@@ -88,18 +88,10 @@ public class AllViewsTester : Scenario
 
         _classListView.SelectedItemChanged += (s, args) =>
                                               {
-                                                  // Remove existing class, if any
-                                                  if (_curView != null)
-                                                  {
-                                                      _curView.LayoutComplete -= LayoutCompleteHandler;
-                                                      _hostPane.Remove (_curView);
-                                                      _curView.Dispose ();
-                                                      _curView = null;
-                                                  }
+                                                  // Dispose existing current View, if any
+                                                  DisposeCurrentView ();
 
-                                                  _curView = CreateClass (_viewClasses.Values.ToArray () [_classListView.SelectedItem]);
-                                                  // Add
-                                                  _hostPane.Add (_curView);
+                                                  CreateCurrentView (_viewClasses.Values.ToArray () [_classListView.SelectedItem]);
 
                                                   // Force ViewToEdit to be the view and not a subview
                                                   if (_adornmentsEditor is { })
@@ -157,10 +149,10 @@ public class AllViewsTester : Scenario
         var label = new Label { X = 0, Y = 0, Text = "X:" };
         _locationFrame.Add (label);
         _xRadioGroup = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
-        _xRadioGroup.SelectedItemChanged += OnXRadioGroupOnSelectedItemChanged;
+        _xRadioGroup.SelectedItemChanged += OnRadioGroupOnSelectedItemChanged;
         _xText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_xVal}" };
 
-        _xText.Accept += (s, args) =>
+        _xText.Accepting += (s, args) =>
                          {
                              try
                              {
@@ -179,7 +171,7 @@ public class AllViewsTester : Scenario
         _locationFrame.Add (label);
         _yText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_yVal}" };
 
-        _yText.Accept += (s, args) =>
+        _yText.Accepting += (s, args) =>
                          {
                              try
                              {
@@ -191,7 +183,7 @@ public class AllViewsTester : Scenario
                          };
         _locationFrame.Add (_yText);
         _yRadioGroup = new () { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
-        _yRadioGroup.SelectedItemChanged += OnYRadioGroupOnSelectedItemChanged;
+        _yRadioGroup.SelectedItemChanged += OnRadioGroupOnSelectedItemChanged;
         _locationFrame.Add (_yRadioGroup);
 
         _sizeFrame = new ()
@@ -208,10 +200,10 @@ public class AllViewsTester : Scenario
         label = new () { X = 0, Y = 0, Text = "Width:" };
         _sizeFrame.Add (label);
         _wRadioGroup = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
-        _wRadioGroup.SelectedItemChanged += OnWRadioGroupOnSelectedItemChanged;
+        _wRadioGroup.SelectedItemChanged += OnRadioGroupOnSelectedItemChanged;
         _wText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_wVal}" };
 
-        _wText.Accept += (s, args) =>
+        _wText.Accepting += (s, args) =>
                          {
                              try
                              {
@@ -242,7 +234,7 @@ public class AllViewsTester : Scenario
         _sizeFrame.Add (label);
         _hText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_hVal}" };
 
-        _hText.Accept += (s, args) =>
+        _hText.Accepting += (s, args) =>
                          {
                              try
                              {
@@ -268,7 +260,7 @@ public class AllViewsTester : Scenario
         _sizeFrame.Add (_hText);
 
         _hRadioGroup = new () { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
-        _hRadioGroup.SelectedItemChanged += OnHRadioGroupOnSelectedItemChanged;
+        _hRadioGroup.SelectedItemChanged += OnRadioGroupOnSelectedItemChanged;
         _sizeFrame.Add (_hRadioGroup);
 
         _settingsPane.Add (_sizeFrame);
@@ -326,6 +318,11 @@ public class AllViewsTester : Scenario
             ColorScheme = Colors.ColorSchemes ["Dialog"]
         };
 
+        _hostPane.LayoutStarted += (sender, args) =>
+                                   {
+
+                                   };
+
         app.Add (_leftPane, _adornmentsEditor, _settingsPane, _hostPane);
 
         _classListView.SelectedItem = 0;
@@ -336,17 +333,13 @@ public class AllViewsTester : Scenario
         Application.Shutdown ();
     }
 
-    private void OnHRadioGroupOnSelectedItemChanged (object s, SelectedItemChangedArgs selected) { DimPosChanged (_curView); }
-
-    private void OnWRadioGroupOnSelectedItemChanged (object s, SelectedItemChangedArgs selected) { DimPosChanged (_curView); }
-
-    private void OnYRadioGroupOnSelectedItemChanged (object s, SelectedItemChangedArgs selected) { DimPosChanged (_curView); }
-
-    private void OnXRadioGroupOnSelectedItemChanged (object s, SelectedItemChangedArgs selected) { DimPosChanged (_curView); }
+    private void OnRadioGroupOnSelectedItemChanged (object s, SelectedItemChangedArgs selected) { DimPosChanged (_curView); }
 
     // TODO: Add Command.HotKey handler (pop a message box?)
-    private View CreateClass (Type type)
+    private void CreateCurrentView (Type type)
     {
+        Debug.Assert(_curView is null);
+
         // If we are to create a generic Type
         if (type.IsGenericType)
         {
@@ -386,14 +379,29 @@ public class AllViewsTester : Scenario
             _orientation.Enabled = false;
         }
 
-        view.Initialized += View_Initialized;
+        view.Initialized += CurrentView_Initialized;
+        view.LayoutComplete += CurrentView_LayoutComplete;
 
-        return view;
+        _curView = view;
+        _hostPane.Add (_curView);
+       // Application.Refresh();
+    }
+
+    private void DisposeCurrentView ()
+    {
+        if (_curView != null)
+        {
+            _curView.Initialized -= CurrentView_Initialized;
+            _curView.LayoutComplete -= CurrentView_LayoutComplete;
+            _hostPane.Remove (_curView);
+            _curView.Dispose ();
+            _curView = null;
+        }
     }
 
     private void DimPosChanged (View view)
     {
-        if (view == null)
+        if (view == null || _updatingSettings)
         {
             return;
         }
@@ -463,7 +471,7 @@ public class AllViewsTester : Scenario
             _hText.Enabled = true;
         }
 
-        UpdateTitle (view);
+        UpdateHostTitle (view);
     }
 
     private List<Type> GetAllViewClassesCollection ()
@@ -484,14 +492,16 @@ public class AllViewsTester : Scenario
         return types;
     }
 
-    private void LayoutCompleteHandler (object sender, LayoutEventArgs args)
+    private void CurrentView_LayoutComplete (object sender, LayoutEventArgs args)
     {
         UpdateSettings (_curView);
-        UpdateTitle (_curView);
+        UpdateHostTitle (_curView);
     }
 
+    private bool _updatingSettings = false;
     private void UpdateSettings (View view)
     {
+        _updatingSettings = true;
         var x = view.X.ToString ();
         var y = view.Y.ToString ();
 
@@ -514,58 +524,52 @@ public class AllViewsTester : Scenario
         _wRadioGroup.SelectedItem = _dimNames.IndexOf (_dimNames.First (s => w.Contains (s)));
         _hRadioGroup.SelectedItem = _dimNames.IndexOf (_dimNames.First (s => h.Contains (s)));
 
-        if (view.Width is DimAuto)
+        if (view.Width.Has<DimAuto> (out _))
         {
             _wText.Text = "Auto";
             _wText.Enabled = false;
         }
         else
         {
-            _wText.Text = "100";
+            _wText.Text = $"{view.Frame.Width}";
             _wText.Enabled = true;
         }
 
-        if (view.Height is DimAuto)
+        if (view.Height.Has<DimAuto> (out _))
         {
             _hText.Text = "Auto";
             _hText.Enabled = false;
         }
         else
         {
-            _hText.Text = "100";
+            _hText.Text = $"{view.Frame.Height}";
             _hText.Enabled = true;
         }
+
+        _updatingSettings = false;
     }
 
-    private void UpdateTitle (View view) { _hostPane.Title = $"{view.GetType ().Name} - {view.X}, {view.Y}, {view.Width}, {view.Height}"; }
+    private void UpdateHostTitle (View view) { _hostPane.Title = $"_Demo of {view.GetType ().Name}"; }
 
-    private void View_Initialized (object sender, EventArgs e)
+    private void CurrentView_Initialized (object sender, EventArgs e)
     {
         if (sender is not View view)
         {
             return;
         }
 
-        if (view.Width is not DimAuto && (view.Width is null || view.Frame.Width == 0))
+        if (!view.Width!.Has<DimAuto> (out _) || (view.Width is null || view.Frame.Width == 0))
         {
             view.Width = Dim.Fill ();
         }
 
-        if (view.Height is not DimAuto && (view.Height is null || view.Frame.Height == 0))
+        if (!view.Height!.Has<DimAuto> (out _) || (view.Height is null || view.Frame.Height == 0))
         {
             view.Height = Dim.Fill ();
         }
 
-        _xRadioGroup.SelectedItemChanged -= OnXRadioGroupOnSelectedItemChanged;
-        _yRadioGroup.SelectedItemChanged -= OnYRadioGroupOnSelectedItemChanged;
-        _hRadioGroup.SelectedItemChanged -= OnHRadioGroupOnSelectedItemChanged;
-        _wRadioGroup.SelectedItemChanged -= OnWRadioGroupOnSelectedItemChanged;
         UpdateSettings (view);
-        _xRadioGroup.SelectedItemChanged += OnXRadioGroupOnSelectedItemChanged;
-        _yRadioGroup.SelectedItemChanged += OnYRadioGroupOnSelectedItemChanged;
-        _hRadioGroup.SelectedItemChanged += OnHRadioGroupOnSelectedItemChanged;
-        _wRadioGroup.SelectedItemChanged += OnWRadioGroupOnSelectedItemChanged;
 
-        UpdateTitle (view);
+        UpdateHostTitle (view);
     }
 }
