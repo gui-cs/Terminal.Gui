@@ -78,8 +78,8 @@ jobs:
   
 
   build_release:
+    # Ensure that RELEASE builds are not broken  
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
