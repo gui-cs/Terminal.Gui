@@ -54,7 +54,7 @@ public class ASCIICustomButtonTest : Scenario
             ]
         };
 
-        _scrollViewTestWindow = new ScrollViewTestWindow ();
+        _scrollViewTestWindow = new ScrollViewTestWindow { Y = Pos.Bottom (menu) };
 
         top.Add (menu, _scrollViewTestWindow);
         Application.Run (top);

@@ -177,6 +177,8 @@ public class Localization : Scenario
         win.Add (wizardButton);
 
         win.Unloaded += (sender, e) => Quit ();
+
+        win.Y = Pos.Bottom (menu);
         top.Add (win);
 
         Application.Run (top);
