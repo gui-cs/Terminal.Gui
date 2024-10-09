@@ -238,24 +238,18 @@ public class TableView : View
                     }
                    );
 
-        AddCommand (
-                    Command.Accept,
-                    () =>
-                    {
-                        // BUGBUG: This should return false if the event is not handled
-                        OnCellActivated (new CellActivatedEventArgs (Table, SelectedColumn, SelectedRow));
-
-                        return true;
-                    }
-                   );
+        AddCommand (Command.Accept, () => OnCellActivated (new CellActivatedEventArgs (Table, SelectedColumn, SelectedRow)));
 
         AddCommand (
                     Command.Select, // was Command.ToggleChecked
-                    () =>
+                    (ctx) =>
                     {
-                        ToggleCurrentCellSelection ();
+                        if (ToggleCurrentCellSelection () is true)
+                        {
+                            return RaiseSelecting (ctx) is true;
+                        }
 
-                        return true;
+                        return false;
                     }
                    );
 
@@ -283,8 +277,8 @@ public class TableView : View
         KeyBindings.Add (Key.End.WithCtrl.WithShift, Command.EndExtend);
 
         KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
+        KeyBindings.Remove (CellActivationKey);
         KeyBindings.Add (CellActivationKey, Command.Accept);
-        KeyBindings.Add (Key.Space, Command.Select);
     }
 
     // TODO: Update to use Key instead of KeyCode
@@ -1250,7 +1244,12 @@ public class TableView : View
 
     /// <summary>Invokes the <see cref="CellActivated"/> event</summary>
     /// <param name="args"></param>
-    protected virtual void OnCellActivated (CellActivatedEventArgs args) { CellActivated?.Invoke (this, args); }
+    /// <returns><see langword="true"/> if the CellActivated event was raised.</returns>
+    protected virtual bool OnCellActivated (CellActivatedEventArgs args)
+    {
+        CellActivated?.Invoke (this, args);
+        return CellActivated is { };
+    }
 
     /// <summary>Invokes the <see cref="CellToggled"/> event</summary>
     /// <param name="args"></param>
@@ -2047,19 +2046,19 @@ public class TableView : View
                                  );
     }
 
-    private void ToggleCurrentCellSelection ()
+    private bool? ToggleCurrentCellSelection ()
     {
         var e = new CellToggledEventArgs (Table, selectedColumn, selectedRow);
         OnCellToggled (e);
 
         if (e.Cancel)
         {
-            return;
+            return false;
         }
 
         if (!MultiSelect)
         {
-            return;
+            return null;
         }
 
         TableSelection [] regions = GetMultiSelectedRegionsContaining (selectedColumn, selectedRow).ToArray ();
@@ -2104,6 +2103,8 @@ public class TableView : View
                                           );
             }
         }
+
+        return true;
     }
 
     /// <summary>

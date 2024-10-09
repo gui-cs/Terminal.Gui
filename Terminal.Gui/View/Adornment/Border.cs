@@ -270,7 +270,10 @@ public class Border : Adornment
         }
 
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/3312
-        if (!_dragPosition.HasValue && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (!_dragPosition.HasValue && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
+                                    // HACK: Prevents Window from being draggable if it's Top
+                                    //&& Parent is Toplevel { Modal: true }
+                                    )
         {
             Parent!.SetFocus ();
 
@@ -464,8 +467,9 @@ public class Border : Adornment
                                                            parentLoc.X - _startGrabPoint.X,
                                                            parentLoc.Y - _startGrabPoint.Y,
                                                            out int nx,
-                                                           out int ny,
-                                                           out _
+                                                           out int ny
+                                                          //,
+                                                          // out _
                                                           );
 
                         Parent.X = parentLoc.X - _startGrabPoint.X;

@@ -296,6 +296,8 @@ public class TreeView<T> : View, ITreeView where T : class
         KeyBindings.Add (Key.Home, Command.Start);
         KeyBindings.Add (Key.End, Command.End);
         KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
+
+        KeyBindings.Remove (ObjectActivationKey);
         KeyBindings.Add (ObjectActivationKey, Command.Select);
     }
 
@@ -441,10 +443,10 @@ public class TreeView<T> : View, ITreeView where T : class
     ///     <para>This method also ensures that the selected object is visible.</para>
     /// </summary>
     /// <returns><see langword="true"/> if <see cref="ObjectActivated"/> was fired.</returns>
-    public bool? ActivateSelectedObjectIfAny ()
+    public bool? ActivateSelectedObjectIfAny (CommandContext ctx)
     {
         // By default, Command.Accept calls OnAccept, so we need to call it here to ensure that the event is fired.
-        if (OnAccept () == true)
+        if (RaiseAccepting (ctx) == true)
         {
             return true;
         }
@@ -1227,7 +1229,7 @@ public class TreeView<T> : View, ITreeView where T : class
             {
                 Move (0, idx - ScrollOffsetVertical);
 
-                return MultiSelect ? new (0, idx - ScrollOffsetVertical) : null ;
+                return MultiSelect ? new (0, idx - ScrollOffsetVertical) : null;
             }
         }
         return base.PositionCursor ();

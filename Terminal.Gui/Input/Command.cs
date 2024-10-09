@@ -3,18 +3,40 @@
 
 namespace Terminal.Gui;
 
-/// <summary>Actions which can be performed by the application or bound to keys in a <see cref="View"/> control.</summary>
+/// <summary>
+///     Actions which can be performed by a <see cref="View"/>. Commands are typically invoked via
+///     <see cref="View.KeyBindings"/> and mouse events.
+/// </summary>
 public enum Command
 {
-    #region Default View Commands
+    #region Base View Commands
 
-    /// <summary>Invoked when the HotKey for the View has been pressed.</summary>
-    HotKey,
-
-    /// <summary>Accepts the current state (e.g. list selection, button press, toggle, etc.).</summary>
+    /// <summary>
+    ///     Accepts the current state of the View (e.g. list selection, button press, checkbox state, etc.).
+    ///     <para>
+    ///         The default implementation in <see cref="View"/> calls <see cref="View.RaiseAccepting"/>. If the event is not handled,
+    ///         the command is invoked on:
+    ///             - Any peer-view that is a <see cref="Button"/> with <see cref="Button.IsDefault"/> set to <see langword="true"/>.
+    ///             - The <see cref="View.SuperView"/>. This enables default Accept behavior.
+    ///     </para>
+    /// </summary>
     Accept,
 
-    /// <summary>Selects an item (e.g. a list item or menu item) without necessarily accepting it.</summary>
+    /// <summary>
+    ///     Performs a hot key action (e.g. setting focus, accepting, and/or moving focus to the next View).
+    ///     <para>
+    ///         The default implementation in <see cref="View"/> calls <see cref="View.SetFocus"/> and then
+    ///         <see cref="View.RaiseHandlingHotKey"/>.
+    ///     </para>
+    /// </summary>
+    HotKey,
+
+    /// <summary>
+    ///     Selects the View or an item in the View (e.g. a list item or menu item) without necessarily accepting it.
+    ///     <para>
+    ///         The default implementation in <see cref="View"/> calls <see cref="View.RaiseSelecting"/>.
+    ///     </para>
+    /// </summary>
     Select,
 
     #endregion

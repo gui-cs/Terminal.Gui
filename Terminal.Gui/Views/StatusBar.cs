@@ -113,14 +113,14 @@ public class StatusBar : Bar, IDesignable
             Text = "I'll Hide",
             // Visible = false
         };
-        button1.Accept += Button_Clicked;
+        button1.Accepting += Button_Clicked;
         Add (button1);
 
-        shortcut.Accept += (s, e) =>
+        shortcut.Accepting += (s, e) =>
                            {
                                button1.Visible = !button1.Visible;
                                button1.Enabled = button1.Visible;
-                               e.Handled = false;
+                               e.Cancel = false;
                            };
 
         Add (new Label
@@ -134,7 +134,7 @@ public class StatusBar : Bar, IDesignable
         {
             Text = "Or me!",
         };
-        button2.Accept += (s, e) => Application.RequestStop ();
+        button2.Accepting += (s, e) => Application.RequestStop ();
 
         Add (button2);
 

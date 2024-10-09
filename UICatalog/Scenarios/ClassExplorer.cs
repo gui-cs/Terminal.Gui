@@ -22,11 +22,6 @@ public class ClassExplorer : Scenario
         Application.Init ();
         var top = new Toplevel ();
 
-        var win = new Window
-        {
-            Title = GetName ()
-        };
-
         var menu = new MenuBar
         {
             Menus =
@@ -60,6 +55,12 @@ public class ClassExplorer : Scenario
             ]
         };
         top.Add (menu);
+
+        var win = new Window
+        {
+            Title = GetName (),
+            Y = Pos.Bottom (menu)
+        };
 
         _treeView = new TreeView<object> { X = 0, Y = 1, Width = Dim.Percent (50), Height = Dim.Fill () };
 

@@ -735,6 +735,27 @@ public class ThicknessTests (ITestOutputHelper output)
         Assert.Equal (expected, result);
     }
 
+
+    [Theory]
+    [InlineData (0, 0, 0, 0, 0, 0, false)]
+    [InlineData (0, 0, 0, 1, 0, 0, false)]
+    [InlineData (0, 0, 1, 0, 0, 0, false)]
+    [InlineData (0, 0, 1, 1, 0, 0, true)]
+
+    [InlineData (1, 1, 0, 0, 0, 0, false)]
+    [InlineData (1, 1, 0, 1, 0, 0, false)]
+    [InlineData (1, 1, 1, 0, 0, 0, false)]
+    [InlineData (1, 1, 1, 0, 0, 1, false)]
+    [InlineData (1, 1, 1, 1, 1, 0, false)]
+    [InlineData (1, 1, 1, 1, 1, 1, true)]
+    public void TestContains_Left_Only (int x, int y, int width, int height, int pointX, int pointY, bool expected)
+    {
+        var outside = new Rectangle (x, y, width, height);
+        var thickness = new Thickness (1, 0, 0, 0);
+        bool result = thickness.Contains (outside, new (pointX, pointY));
+        Assert.Equal (expected, result);
+    }
+
     [Fact]
     public void ToStringTest ()
     {

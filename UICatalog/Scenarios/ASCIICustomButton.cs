@@ -54,7 +54,7 @@ public class ASCIICustomButtonTest : Scenario
             ]
         };
 
-        _scrollViewTestWindow = new ScrollViewTestWindow ();
+        _scrollViewTestWindow = new ScrollViewTestWindow { Y = Pos.Bottom (menu) };
 
         top.Add (menu, _scrollViewTestWindow);
         Application.Run (top);
@@ -198,7 +198,7 @@ public class ASCIICustomButtonTest : Scenario
                     Height = BUTTON_HEIGHT
                 };
                 button.Initialized += Button_Initialized;
-                button.Accept += Button_Clicked;
+                button.Accepting += Button_Clicked;
                 button.PointerEnter += Button_PointerEnter;
                 button.MouseClick += Button_MouseClick;
                 button.KeyDown += Button_KeyPress;
@@ -216,7 +216,7 @@ public class ASCIICustomButtonTest : Scenario
                 Height = BUTTON_HEIGHT
             };
             closeButton.Initialized += Button_Initialized;
-            closeButton.Accept += Button_Clicked;
+            closeButton.Accepting += Button_Clicked;
             closeButton.PointerEnter += Button_PointerEnter;
             closeButton.MouseClick += Button_MouseClick;
             closeButton.KeyDown += Button_KeyPress;
@@ -241,6 +241,8 @@ public class ASCIICustomButtonTest : Scenario
             {
                 Add (titleLabel, _scrollView);
             }
+
+            Y = 1;
         }
         private void Button_Initialized (object sender, EventArgs e)
         {

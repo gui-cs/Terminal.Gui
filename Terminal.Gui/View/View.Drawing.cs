@@ -344,8 +344,8 @@ public partial class View // Drawing APIs
         {
             DrawHotString (
                            text,
-                           Enabled ? GetHotNormalColor () : ColorScheme.Disabled,
-                           Enabled ? GetNormalColor () : ColorScheme.Disabled
+                           Enabled ? GetHotNormalColor () : ColorScheme!.Disabled,
+                           Enabled ? GetNormalColor () : ColorScheme!.Disabled
                           );
         }
     }
@@ -376,13 +376,7 @@ public partial class View // Drawing APIs
     /// </returns>
     public virtual Attribute GetHotFocusColor ()
     {
-        ColorScheme cs = ColorScheme;
-
-
-        if (cs is null)
-        {
-            cs = new ();
-        }
+        ColorScheme? cs = ColorScheme ?? new ();
 
         return Enabled ? GetColor (cs.HotFocus) : cs.Disabled;
     }

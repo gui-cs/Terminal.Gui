@@ -32,8 +32,11 @@ public class Buttons : Scenario
         // This is the default button (IsDefault = true); if user presses ENTER in the TextField
         // the scenario will quit
         var defaultButton = new Button { X = Pos.Center (), Y = Pos.AnchorEnd (), IsDefault = true, Text = "_Quit" };
-        defaultButton.Accept += (s, e) => Application.RequestStop ();
+
         main.Add (defaultButton);
+
+        // Note we handle Accept on main, not defaultButton
+        main.Accepting += (s, e) => Application.RequestStop ();
 
         var swapButton = new Button
         {
@@ -44,19 +47,31 @@ public class Buttons : Scenario
             ColorScheme = Colors.ColorSchemes ["Error"]
         };
 
-        swapButton.Accept += (s, e) =>
+        swapButton.Accepting += (s, e) =>
                              {
+                                 e.Cancel = !swapButton.IsDefault;
                                  defaultButton.IsDefault = !defaultButton.IsDefault;
                                  swapButton.IsDefault = !swapButton.IsDefault;
                              };
+
+        defaultButton.Accepting += (s, e) =>
+                                {
+                                    e.Cancel = !defaultButton.IsDefault;
+
+                                    if (e.Cancel)
+                                    {
+                                        MessageBox.ErrorQuery ("Error", "This button is no longer the Quit button; the Swap Default button is.", "_Ok");
+                                    }
+                                };
         main.Add (swapButton);
 
         static void DoMessage (Button button, string txt)
         {
-            button.Accept += (s, e) =>
+            button.Accepting += (s, e) =>
                              {
                                  string btnText = button.Text;
                                  MessageBox.Query ("Message", $"Did you click {txt}?", "Yes", "No");
+                                 e.Cancel = true;
                              };
         }
 
@@ -96,11 +111,19 @@ public class Buttons : Scenario
         main.Add (
                   button = new () { X = 2, Y = Pos.Bottom (button) + 1, Height = 2, Text = "a Newline\nin the button" }
                  );
-        button.Accept += (s, e) => MessageBox.Query ("Message", "Question?", "Yes", "No");
+        button.Accepting += (s, e) =>
+                         {
+                             MessageBox.Query ("Message", "Question?", "Yes", "No");
+                             e.Cancel = true;
+                         };
 
         var textChanger = new Button { X = 2, Y = Pos.Bottom (button) + 1, Text = "Te_xt Changer" };
         main.Add (textChanger);
-        textChanger.Accept += (s, e) => textChanger.Text += "!";
+        textChanger.Accepting += (s, e) =>
+                              {
+                                  textChanger.Text += "!";
+                                  e.Cancel = true;
+                              };
 
         main.Add (
                   button = new ()
@@ -110,6 +133,7 @@ public class Buttons : Scenario
                       Text = "Lets see if this will move as \"Text Changer\" grows"
                   }
                  );
+        button.Accepting += (sender, args) => { args.Cancel = true; };
 
         var removeButton = new Button
         {
@@ -119,9 +143,10 @@ public class Buttons : Scenario
         main.Add (removeButton);
 
         // This in interesting test case because `moveBtn` and below are laid out relative to this one!
-        removeButton.Accept += (s, e) =>
+        removeButton.Accepting += (s, e) =>
                                {
                                    removeButton.Visible = false;
+                                   e.Cancel = true;
                                };
 
         var computedFrame = new FrameView
@@ -144,9 +169,10 @@ public class Buttons : Scenario
             Text = "Move This \u263b Button v_ia Pos"
         };
 
-        moveBtn.Accept += (s, e) =>
+        moveBtn.Accepting += (s, e) =>
                           {
                               moveBtn.X = moveBtn.Frame.X + 5;
+                              e.Cancel = true;
                           };
         computedFrame.Add (moveBtn);
 
@@ -160,9 +186,10 @@ public class Buttons : Scenario
             ColorScheme = Colors.ColorSchemes ["Error"],
         };
 
-        sizeBtn.Accept += (s, e) =>
+        sizeBtn.Accepting += (s, e) =>
                           {
                               sizeBtn.Width = sizeBtn.Frame.Width + 5;
+                              e.Cancel = true;
                           };
         computedFrame.Add (sizeBtn);
 
@@ -179,7 +206,7 @@ public class Buttons : Scenario
         // Demonstrates how changing the View.Frame property can move Views
         var moveBtnA = new Button { ColorScheme = Colors.ColorSchemes ["Error"], Text = "Move This Button via Frame" };
 
-        moveBtnA.Accept += (s, e) =>
+        moveBtnA.Accepting += (s, e) =>
                            {
                                moveBtnA.Frame = new (
                                                      moveBtnA.Frame.X + 5,
@@ -187,6 +214,7 @@ public class Buttons : Scenario
                                                      moveBtnA.Frame.Width,
                                                      moveBtnA.Frame.Height
                                                     );
+                               e.Cancel = true;
                            };
         absoluteFrame.Add (moveBtnA);
 
@@ -196,7 +224,7 @@ public class Buttons : Scenario
             Y = 2, ColorScheme = Colors.ColorSchemes ["Error"], Text = " ~  s  gui.cs   master ↑_10 = Сохранить"
         };
 
-        sizeBtnA.Accept += (s, e) =>
+        sizeBtnA.Accepting += (s, e) =>
                            {
                                sizeBtnA.Frame = new (
                                                      sizeBtnA.Frame.X,
@@ -204,13 +232,14 @@ public class Buttons : Scenario
                                                      sizeBtnA.Frame.Width + 5,
                                                      sizeBtnA.Frame.Height
                                                     );
+                               e.Cancel = true;
                            };
         absoluteFrame.Add (sizeBtnA);
 
         var label = new Label
         {
-            X = 2, Y = Pos.Bottom (computedFrame) + 1, 
-            Text = "Text Alignment (changes the four buttons above): "
+            X = 2, Y = Pos.Bottom (computedFrame) + 1,
+            Text = "Text Ali_gnment (changes the four buttons above): "
         };
         main.Add (label);
 
@@ -219,7 +248,10 @@ public class Buttons : Scenario
             X = 4,
             Y = Pos.Bottom (label) + 1,
             SelectedItem = 2,
-            RadioLabels = new [] { "Start", "End", "Center", "Fill" }
+            RadioLabels = new [] { "_Start", "_End", "_Center", "_Fill" },
+            Title = "_9 RadioGroup",
+            BorderStyle = LineStyle.Dotted,
+            // CanFocus = false
         };
         main.Add (radioGroup);
 
@@ -265,7 +297,11 @@ public class Buttons : Scenario
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Text = mhkb
         };
-        moveHotKeyBtn.Accept += (s, e) => { moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text); };
+        moveHotKeyBtn.Accepting += (s, e) =>
+                                {
+                                    moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text);
+                                    e.Cancel = true;
+                                };
         main.Add (moveHotKeyBtn);
 
         var muhkb = " ~  s  gui.cs   master ↑10 = Сохранить";
@@ -278,7 +314,11 @@ public class Buttons : Scenario
             ColorScheme = Colors.ColorSchemes ["TopLevel"],
             Text = muhkb
         };
-        moveUnicodeHotKeyBtn.Accept += (s, e) => { moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text); };
+        moveUnicodeHotKeyBtn.Accepting += (s, e) =>
+                                       {
+                                           moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text);
+                                           e.Cancel = true;
+                                       };
         main.Add (moveUnicodeHotKeyBtn);
 
         radioGroup.SelectedItemChanged += (s, args) =>
@@ -358,7 +398,11 @@ public class Buttons : Scenario
             Title = $"Accept Cou_nt: {noRepeatAcceptCount}",
             WantContinuousButtonPressed = false
         };
-        noRepeatButton.Accept += (s, e) => { noRepeatButton.Title = $"Accept Cou_nt: {++noRepeatAcceptCount}"; };
+        noRepeatButton.Accepting += (s, e) =>
+                                 {
+                                     noRepeatButton.Title = $"Accept Cou_nt: {++noRepeatAcceptCount}";
+                                     e.Cancel = true;
+                                 };
         main.Add (label, noRepeatButton);
 
         label = new ()
@@ -376,7 +420,11 @@ public class Buttons : Scenario
             Title = $"Accept Co_unt: {acceptCount}",
             WantContinuousButtonPressed = true
         };
-        repeatButton.Accept += (s, e) => { repeatButton.Title = $"Accept Co_unt: {++acceptCount}"; };
+        repeatButton.Accepting += (s, e) =>
+                               {
+                                   repeatButton.Title = $"Accept Co_unt: {++acceptCount}";
+                                   e.Cancel = true;
+                               };
 
         var enableCB = new CheckBox
         {
@@ -399,10 +447,6 @@ public class Buttons : Scenario
 
         main.Add (decNumericUpDown);
 
-        main.Ready += (s, e) =>
-                      {
-                          radioGroup.Refresh ();
-                      };
         Application.Run (main);
         main.Dispose ();
         Application.Shutdown ();

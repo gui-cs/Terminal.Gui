@@ -135,14 +135,14 @@ public class DefaultFileOperations : IFileOperations
         var confirm = false;
         var btnOk = new Button { IsDefault = true, Text = Strings.btnOk };
 
-        btnOk.Accept += (s, e) =>
+        btnOk.Accepting += (s, e) =>
                          {
                              confirm = true;
                              Application.RequestStop ();
                          };
         var btnCancel = new Button { Text = Strings.btnCancel };
 
-        btnCancel.Accept += (s, e) =>
+        btnCancel.Accepting += (s, e) =>
                              {
                                  confirm = false;
                                  Application.RequestStop ();
