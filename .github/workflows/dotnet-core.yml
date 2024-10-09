@@ -99,32 +99,6 @@ jobs:
         name: local_nuget_package
         path: ./local_packages/*.nupkg
 
-  build_release_consumer:
-    runs-on: ubuntu-latest
-    needs: build_release
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.x
-        dotnet-quality: 'ga'
-
-    - name: Download package artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: local_nuget_package
-        path: ./local_packages
-
-    - name: Restore dependencies using downloaded package
-      run: dotnet restore --configfile nuget.config
-
-    - name: Build Release
-      run: dotnet build --configuration Release
-
 
     # Note: this step is currently not writing to the gist for some reason
     # - name: Create Test Coverage Badge
