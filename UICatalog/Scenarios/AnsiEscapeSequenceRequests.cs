@@ -90,7 +90,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         var lblSuccess = new Label { X = Pos.Center (), Y = Pos.Bottom (btnResponse) + 1 };
         appWindow.Add (lblSuccess);
 
-        btnResponse.Accept += (s, e) =>
+        btnResponse.Accepting += (s, e) =>
                               {
                                   var ansiEscapeSequenceRequest = new AnsiEscapeSequenceRequest
                                   {
