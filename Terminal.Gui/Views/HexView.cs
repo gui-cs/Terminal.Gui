@@ -502,6 +502,9 @@ public class HexView : View, IDesignable
     /// </summary>
     protected virtual void OnPositionChanged (HexViewEventArgs e) { }
 
+    /// <summary>Event to be invoked when the position and cursor position changes.</summary>
+    public event EventHandler<HexViewEventArgs>? PositionChanged;
+
     /// <inheritdoc/>
     public override bool OnProcessKeyDown (Key keyEvent)
     {
@@ -521,15 +524,15 @@ public class HexView : View, IDesignable
             int value;
             var k = (char)keyEvent.KeyCode;
 
-            if (k >= 'A' && k <= 'F')
+            if (k is >= 'A' and <= 'F')
             {
                 value = k - 'A' + 10;
             }
-            else if (k >= 'a' && k <= 'f')
+            else if (k is >= 'a' and <= 'f')
             {
                 value = k - 'a' + 10;
             }
-            else if (k >= '0' && k <= '9')
+            else if (k is >= '0' and <= '9')
             {
                 value = k - '0';
             }
@@ -568,9 +571,6 @@ public class HexView : View, IDesignable
 
         return false;
     }
-
-    /// <summary>Event to be invoked when the position and cursor position changes.</summary>
-    public event EventHandler<HexViewEventArgs>? PositionChanged;
 
     ///<inheritdoc/>
     public override Point? PositionCursor ()
@@ -844,7 +844,7 @@ public class HexView : View, IDesignable
     /// <inheritdoc/>
     bool IDesignable.EnableForDesign ()
     {
-        Source = new MemoryStream (Encoding.UTF8.GetBytes ("HexEditor Unicode that shouldn't 𝔹Aℝ𝔽!"));
+        Source = new MemoryStream (Encoding.UTF8.GetBytes ("HexView data with wide codepoints: 𝔹Aℝ𝔽!"));
 
         return true;
     }
