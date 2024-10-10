@@ -12,6 +12,11 @@ public class PopularityPaletteWithThreshold : IPaletteBuilder
     private readonly IColorDistance _colorDistance;
     private readonly double _mergeThreshold;
 
+    /// <summary>
+    /// Creates a new instance with the given color grouping parameters.
+    /// </summary>
+    /// <param name="colorDistance">Determines which different colors can be considered the same.</param>
+    /// <param name="mergeThreshold">Threshold for merging two colors together.</param>
     public PopularityPaletteWithThreshold (IColorDistance colorDistance, double mergeThreshold)
     {
         _colorDistance = colorDistance;
@@ -62,6 +67,7 @@ public class PopularityPaletteWithThreshold : IPaletteBuilder
     /// Merge colors in the histogram if they are within the threshold distance
     /// </summary>
     /// <param name="colorHistogram"></param>
+    /// <param name="maxColors"></param>
     /// <returns></returns>
     private Dictionary<Color, int> MergeSimilarColors (Dictionary<Color, int> colorHistogram, int maxColors)
     {

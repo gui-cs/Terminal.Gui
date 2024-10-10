@@ -1339,7 +1339,6 @@ internal class NetDriver : ConsoleDriver
     }
 
     private CursorVisibility? _cachedCursorVisibility;
-    private static bool _supportsSixel;
 
     public override void UpdateCursor ()
     {

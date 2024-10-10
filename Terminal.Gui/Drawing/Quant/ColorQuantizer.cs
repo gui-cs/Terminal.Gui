@@ -32,6 +32,11 @@ public class ColorQuantizer
 
     private readonly ConcurrentDictionary<Color, int> _nearestColorCache = new ();
 
+    /// <summary>
+    /// Builds a <see cref="Palette"/> of colors that most represent the colors used in <paramref name="pixels"/> image.
+    /// This is based on the currently configured <see cref="PaletteBuildingAlgorithm"/>.
+    /// </summary>
+    /// <param name="pixels"></param>
     public void BuildPalette (Color [,] pixels)
     {
         List<Color> allColors = new List<Color> ();

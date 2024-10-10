@@ -114,7 +114,6 @@ public class SixelEncoder
         for (int x = 0; x < width; ++x)
         {
             Array.Clear (code, 0, usedColorIdx.Count);
-            bool anyNonTransparentPixel = false;  // Track if any non-transparent pixels are found in this column
 
             // Process each row in the 6-pixel high band
             for (int row = 0; row < bandHeight; ++row)
@@ -126,10 +125,6 @@ public class SixelEncoder
                 if (color.A == 0) // Skip fully transparent pixels
                 {
                     continue;
-                }
-                else
-                {
-                    anyNonTransparentPixel = true;
                 }
 
                 if (slots [colorIndex] == -1)
@@ -146,27 +141,6 @@ public class SixelEncoder
 
                 code [slots [colorIndex]] |= (byte)(1 << row); // Accumulate SIXEL data
             }
-
-            /*
-            // If no non-transparent pixels are found in the entire column, it's fully transparent
-            if (!anyNonTransparentPixel)
-            {
-                // Emit fully transparent pixel data: #0!<width>?$
-                result.Append ($"#0!{width}?");
-
-                // Add the line terminator: use "$-" if it's not the last line, "$" if it's the last line
-                if (x < width - 1)
-                {
-                    result.Append ("$-");
-                }
-                else
-                {
-                    result.Append ("$");
-                }
-
-                // Skip to the next column as we have already handled transparency
-                continue;
-            }*/
 
             // Handle transitions between columns
             for (int j = 0; j < usedColorIdx.Count; ++j)
@@ -209,9 +183,21 @@ public class SixelEncoder
     private static string CodeToSixel (int code, int repeat)
     {
         char c = (char)(code + 63);
-        if (repeat > 3) return "!" + repeat + c;
-        if (repeat == 3) return c.ToString () + c + c;
-        if (repeat == 2) return c.ToString () + c;
+        if (repeat > 3)
+        {
+            return "!" + repeat + c;
+        }
+
+        if (repeat == 3)
+        {
+            return c.ToString () + c + c;
+        }
+
+        if (repeat == 2)
+        {
+            return c.ToString () + c;
+        }
+
         return c.ToString ();
     }
 
