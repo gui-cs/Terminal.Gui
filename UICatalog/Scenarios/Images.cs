@@ -69,8 +69,6 @@ public class Images : Scenario
         var sixelSupportDetector = new AssumeSupportDetector ();
         _sixelSupportResult = sixelSupportDetector.Detect ();
 
-        ConsoleDriver.SupportsSixel = _sixelSupportResult.IsSupported;
-
         Application.Init ();
         _win = new() { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
 
@@ -103,7 +101,7 @@ public class Images : Scenario
         {
             X = Pos.Right (lblDriverName) + 2,
             Y = 1,
-            CheckedState = ConsoleDriver.SupportsSixel
+            CheckedState = _sixelSupportResult.IsSupported
                                ? CheckState.Checked
                                : CheckState.UnChecked,
             Text = "Supports Sixel"
@@ -111,7 +109,7 @@ public class Images : Scenario
 
         cbSupportsSixel.CheckedStateChanging += (s, e) =>
                                                 {
-                                                    ConsoleDriver.SupportsSixel = e.NewValue == CheckState.Checked;
+                                                    _sixelSupportResult.IsSupported = e.NewValue == CheckState.Checked;
                                                     SetupSixelSupported (e.NewValue == CheckState.Checked);
                                                 };
 

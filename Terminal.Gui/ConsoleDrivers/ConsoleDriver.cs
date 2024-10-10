@@ -484,9 +484,6 @@ public abstract class ConsoleDriver
     /// <summary>Gets whether the <see cref="ConsoleDriver"/> supports TrueColor output.</summary>
     public virtual bool SupportsTrueColor => true;
 
-    // TODO: make not static TODO: gets set in mouse logic in net driver :/
-    public static bool SupportsSixel { get; set; }
-
     // TODO: This makes ConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
     // BUGBUG: Application.Force16Colors should be bool? so if SupportsTrueColor and Application.Force16Colors == false, this doesn't override
     /// <summary>

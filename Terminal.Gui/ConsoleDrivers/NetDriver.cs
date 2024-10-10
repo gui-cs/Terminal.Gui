@@ -633,9 +633,6 @@ internal class NetEvents : IDisposable
                 }
 
                 break;
-            case EscSeqUtils.CSI_ReportDeviceAttributes_Terminator:
-                ConsoleDriver.SupportsSixel = values.Any (v => v == "4");
-                break;
             default:
                 EnqueueRequestResponseEvent (c1Control, code, values, terminating);
 
@@ -1024,15 +1021,12 @@ internal class NetDriver : ConsoleDriver
                 Console.Write (output);
             }
 
-            if (ConsoleDriver.SupportsSixel)
+            foreach (var s in Application.Sixel)
             {
-                foreach (var s in Application.Sixel)
+                if (!string.IsNullOrWhiteSpace (s.SixelData))
                 {
-                    if (!string.IsNullOrWhiteSpace (s.SixelData))
-                    {
-                        SetCursorPosition (s.ScreenPosition.X, s.ScreenPosition.Y);
-                        Console.Write (s.SixelData);
-                    }
+                    SetCursorPosition (s.ScreenPosition.X, s.ScreenPosition.Y);
+                    Console.Write (s.SixelData);
                 }
             }
         }
@@ -1141,9 +1135,6 @@ internal class NetDriver : ConsoleDriver
         _mainLoopDriver = new NetMainLoop (this);
         _mainLoopDriver.ProcessInput = ProcessInput;
 
-        _mainLoopDriver._netEvents.EscSeqRequests.Add ("c");
-        // Determine if sixel is supported
-        Console.Out.Write (EscSeqUtils.CSI_SendDeviceAttributes);
 
         return new MainLoop (_mainLoopDriver);
     }

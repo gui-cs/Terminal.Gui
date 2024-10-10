@@ -129,14 +129,10 @@ internal class WindowsConsole
 
             _lastWrite = s;
 
-            if (ConsoleDriver.SupportsSixel)
+            foreach (var sixel in Application.Sixel)
             {
-                foreach (var sixel in Application.Sixel)
-                {
-                    SetCursorPosition (new Coord ((short)sixel.ScreenPosition.X, (short)sixel.ScreenPosition.Y));
-                    WriteConsole (_screenBuffer, sixel.SixelData, (uint)sixel.SixelData.Length, out uint _, nint.Zero);
-
-                }
+                SetCursorPosition (new Coord ((short)sixel.ScreenPosition.X, (short)sixel.ScreenPosition.Y));
+                WriteConsole (_screenBuffer, sixel.SixelData, (uint)sixel.SixelData.Length, out uint _, nint.Zero);
             }
         }
 
