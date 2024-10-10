@@ -15,8 +15,8 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <PackageReference Include="Terminal.Gui" Version="[2.0.0-v2-develop.2189,3)" />
-    <TrimmerRootAssembly Include="Terminal.Gui" />
+	  <ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" />
+	  <TrimmerRootAssembly Include="Terminal.Gui" />
   </ItemGroup>
 
 </Project>
