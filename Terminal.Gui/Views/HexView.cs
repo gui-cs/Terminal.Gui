@@ -349,7 +349,7 @@ public class HexView : View, IDesignable
 
         if (me.Flags == MouseFlags.WheeledDown)
         {
-            DisplayStart = Math.Min (DisplayStart + BytesPerLine, _source.Length);
+            DisplayStart = Math.Min (DisplayStart + BytesPerLine, GetEditedSize());
 
             return true;
         }
@@ -392,11 +392,11 @@ public class HexView : View, IDesignable
 
         if (clickIsOnLeftSide)
         {
-            Address = Math.Min (lineStart + me.Position.X - blocksRightOffset, _source.Length - 1);
+            Address = Math.Min (lineStart + me.Position.X - blocksRightOffset, GetEditedSize ());
         }
         else
         {
-            Address = Math.Min (lineStart + item, _source.Length - 1);
+            Address = Math.Min (lineStart + item, GetEditedSize ());
         }
 
         if (me.Flags == MouseFlags.Button1DoubleClicked)
