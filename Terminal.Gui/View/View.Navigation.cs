@@ -179,6 +179,10 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
             if (!_canFocus && HasFocus)
             {
+                if (Title == "AdornmentsEditor")
+                {
+
+                }
                 // If CanFocus is set to false and this view has focus, make it leave focus
                 // Set traverssingdown so we don't go back up the hierachy...
                 SetHasFocusFalse (null, traversingDown: false);
@@ -381,6 +385,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             {
                 SetHasFocusFalse (null);
 
+                Debug.Assert (!_hasFocus);
                 if (_hasFocus)
                 {
                     // force it.
@@ -502,7 +507,6 @@ public partial class View // Focus and cross-view navigation management (TabStop
             // Restore focus to the previously focused subview, if any
             if (!RestoreFocus ())
             {
-               // Debug.Assert (_previouslyFocused is null);
                 // Couldn't restore focus, so use Advance to navigate to the next focusable subview, if any
                 AdvanceFocus (NavigationDirection.Forward, null);
             }
@@ -656,9 +660,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
             {
                 if (superViewOrParent.AdvanceFocus (NavigationDirection.Forward, TabStop))
                 {
-                    // The above will cause SetHasFocusFalse, so we can return
-                    Debug.Assert (!_hasFocus);
-                    return;
+                    // The above might have SetHasFocusFalse, so we can return
+                    if (!_hasFocus)
+                    {
+                        return;
+                    }
                 }
 
                 if (superViewOrParent is { HasFocus: true, CanFocus: true })
@@ -709,6 +715,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
             // No other focusable view to be found. Just "leave" us...
         }
 
+        Debug.Assert (_hasFocus);
+
         // Before we can leave focus, we need to make sure that all views down the subview-hierarchy have left focus.
         View? mostFocused = MostFocused;
 
@@ -739,10 +747,17 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         bool previousValue = HasFocus;
 
+        Debug.Assert (_hasFocus);
+
         // Note, can't be cancelled.
         NotifyFocusChanging (HasFocus, !HasFocus, this, newFocusedView);
 
-        Debug.Assert (_hasFocus);
+        // Even though the change can't be cancelled, some listener may have changed the focus to another view.
+        if (!_hasFocus)
+        {
+            // Notify caused HasFocus to change to false.
+            return;
+        }
 
         // Get whatever peer has focus, if any so we can update our superview's _previouslyMostFocused
         View? focusedPeer = superViewOrParent?.Focused;
