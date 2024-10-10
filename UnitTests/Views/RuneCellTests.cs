@@ -118,7 +118,7 @@ Error   ";
         tv.SelectionStartRow = 0;
         Assert.Equal ($"TopLevel{Environment.NewLine}Base{Environment.NewLine}Dialog", tv.SelectedText);
         tv.Copy ();
-        tv.Selecting = false;
+        tv.IsSelecting = false;
         tv.CursorPosition = new (2, 4);
         tv.Paste ();
         Application.Refresh ();
@@ -153,7 +153,7 @@ Dialogror ";
                       tv.SelectedText
                      );
         tv.Copy ();
-        tv.Selecting = false;
+        tv.IsSelecting = false;
         tv.CursorPosition = new (2, 4);
         tv.Paste ();
         Application.Refresh ();

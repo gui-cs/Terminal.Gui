@@ -292,7 +292,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// </returns>
     internal bool RestoreFocus ()
     {
-        View [] indicies = GetFocusChain (NavigationDirection.Forward, TabStop);
+        View [] indicies = GetFocusChain (NavigationDirection.Forward, null);
 
         if (Focused is null && _previouslyFocused is { } && indicies.Contains (_previouslyFocused))
         {
@@ -394,6 +394,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///         See the View Navigation Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/navigation.html"/>
     ///     </para>
     /// </remarks>
+    /// <returns><see langword="true"/> if the focus changed; <see langword="true"/> false otherwise.</returns>
     public bool SetFocus ()
     {
         (bool focusSet, bool _) = SetHasFocusTrue (Application.Navigation?.GetFocused ());
@@ -420,7 +421,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <exception cref="InvalidOperationException"></exception>
     private (bool focusSet, bool cancelled) SetHasFocusTrue (View? previousFocusedView, bool traversingUp = false)
     {
-        Debug.Assert (ApplicationNavigation.IsInHierarchy (SuperView, this));
+        Debug.Assert (SuperView is null || ApplicationNavigation.IsInHierarchy (SuperView, this));
 
         // Pre-conditions
         if (_hasFocus)

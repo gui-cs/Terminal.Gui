@@ -338,6 +338,7 @@ public static class MessageBox
         // Create button array for Dialog
         var count = 0;
         List<Button> buttonList = new ();
+        Clicked = -1;
 
         if (buttons is { })
         {
@@ -351,11 +352,27 @@ public static class MessageBox
                 var b = new Button
                 {
                     Text = s,
+                    Data = count,
                 };
 
                 if (count == defaultButton)
                 {
                     b.IsDefault = true;
+                    b.Accepting += (s, e) =>
+                                   {
+                                       // TODO: With https://github.com/gui-cs/Terminal.Gui/issues/3778 we can simplify this
+                                       if (e.Context.Data is Button button)
+                                       {
+                                           Clicked = (int)button.Data!;
+                                       } 
+                                       else if (e.Context.KeyBinding?.BoundView is Button btn)
+                                       {
+                                           Clicked = (int)btn.Data!;
+                                       }
+
+                                       e.Cancel = true;
+                                       Application.RequestStop ();
+                                   };
                 }
 
                 buttonList.Add (b);
@@ -373,7 +390,7 @@ public static class MessageBox
         };
 
         d.Width = Dim.Auto (DimAutoStyle.Auto,
-                            minimumContentDim: Dim.Func (() => (int)((Application.Screen.Width - d.GetAdornmentsThickness ().Horizontal) * (DefaultMinimumWidth / 100f) )),
+                            minimumContentDim: Dim.Func (() => (int)((Application.Screen.Width - d.GetAdornmentsThickness ().Horizontal) * (DefaultMinimumWidth / 100f))),
                             maximumContentDim: Dim.Func (() => (int)((Application.Screen.Width - d.GetAdornmentsThickness ().Horizontal) * 0.9f)));
 
         d.Height = Dim.Auto (DimAutoStyle.Auto,
@@ -399,21 +416,6 @@ public static class MessageBox
         d.VerticalTextAlignment = Alignment.Start;
         d.TextFormatter.WordWrap = wrapMessage;
         d.TextFormatter.MultiLine = !wrapMessage;
-
-        // Setup actions
-        Clicked = -1;
-
-        for (var n = 0; n < buttonList.Count; n++)
-        {
-            int buttonId = n;
-            Button b = buttonList [n];
-
-            b.Accept += (s, e) =>
-                         {
-                             Clicked = buttonId;
-                             Application.RequestStop ();
-                         };
-        }
 
         // Run the modal; do not shut down the mainloop driver when done
         Application.Run (d);

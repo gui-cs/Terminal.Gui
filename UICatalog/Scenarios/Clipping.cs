@@ -70,7 +70,7 @@ public class Clipping : Scenario
         };
 
         var testButton = new Button { X = 2, Y = 2, Text = "click me" };
-        testButton.Accept += (s, e) => { MessageBox.Query (10, 5, "Test", "test message", "Ok"); };
+        testButton.Accepting += (s, e) => { MessageBox.Query (10, 5, "Test", "test message", "Ok"); };
         embedded3.Add (testButton);
         embedded2.Add (embedded3);
 

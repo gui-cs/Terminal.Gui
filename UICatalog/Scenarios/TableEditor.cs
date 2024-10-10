@@ -878,13 +878,13 @@ public class TableEditor : Scenario
 
         var ok = new Button { Text = "Ok", IsDefault = true };
 
-        ok.Accept += (s, e) =>
+        ok.Accepting += (s, e) =>
                      {
                          okPressed = true;
                          Application.RequestStop ();
                      };
         var cancel = new Button { Text = "Cancel" };
-        cancel.Accept += (s, e) => { Application.RequestStop (); };
+        cancel.Accepting += (s, e) => { Application.RequestStop (); };
         var d = new Dialog { Title = title, Buttons = [ok, cancel] };
 
         var lbl = new Label { X = 0, Y = 1, Text = _tableView.Table.ColumnNames [e.Col] };
@@ -1076,13 +1076,13 @@ public class TableEditor : Scenario
         var accepted = false;
         var ok = new Button { Text = "Ok", IsDefault = true };
 
-        ok.Accept += (s, e) =>
+        ok.Accepting += (s, e) =>
                      {
                          accepted = true;
                          Application.RequestStop ();
                      };
         var cancel = new Button { Text = "Cancel" };
-        cancel.Accept += (s, e) => { Application.RequestStop (); };
+        cancel.Accepting += (s, e) => { Application.RequestStop (); };
         var d = new Dialog
         {
             Title = prompt,

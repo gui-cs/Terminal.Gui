@@ -156,7 +156,7 @@ public class DimAutoDemo : Scenario
             Y = Pos.AnchorEnd ()
         };
 
-        resetButton.Accept += (s, e) =>
+        resetButton.Accepting += (s, e) =>
         {
             //movingButton.Y = Pos.Bottom (hlabel);
             //movingButton.X = 0;

@@ -77,7 +77,7 @@ public class CharacterMap : Scenario
         };
         top.Add (_errorLabel);
 
-        jumpEdit.Accept += JumpEditOnAccept;
+        jumpEdit.Accepting += JumpEditOnAccept;
 
         _categoryList = new () { X = Pos.Right (_charMap), Y = Pos.Bottom (jumpLabel), Height = Dim.Fill () };
         _categoryList.FullRowSelect = true;
@@ -173,7 +173,7 @@ public class CharacterMap : Scenario
 
         return;
 
-        void JumpEditOnAccept (object sender, HandledEventArgs e)
+        void JumpEditOnAccept (object sender, CommandEventArgs e)
         {
             if (jumpEdit.Text.Length == 0)
             {
@@ -245,7 +245,7 @@ public class CharacterMap : Scenario
 
 
             // Cancel the event to prevent ENTER from being handled elsewhere
-            e.Handled = true;
+            e.Cancel = true;
         }
     }
 
@@ -449,7 +449,6 @@ internal class CharMap : View
                     }
                    );
 
-        KeyBindings.Add (Key.Enter, Command.Accept);
         KeyBindings.Add (Key.CursorUp, Command.ScrollUp);
         KeyBindings.Add (Key.CursorDown, Command.ScrollDown);
         KeyBindings.Add (Key.CursorLeft, Command.ScrollLeft);
@@ -478,7 +477,7 @@ internal class CharMap : View
             ShadowStyle = ShadowStyle.None,
             CanFocus = false
         };
-        up.Accept += (sender, args) => { args.Handled = ScrollVertical (-1) == true; };
+        up.Accepting += (sender, args) => { args.Cancel = ScrollVertical (-1) == true; };
 
         var down = new Button
         {
@@ -493,7 +492,7 @@ internal class CharMap : View
             ShadowStyle = ShadowStyle.None,
             CanFocus = false
         };
-        down.Accept += (sender, args) => { ScrollVertical (1); };
+        down.Accepting += (sender, args) => { ScrollVertical (1); };
 
         var left = new Button
         {
@@ -508,7 +507,7 @@ internal class CharMap : View
             ShadowStyle = ShadowStyle.None,
             CanFocus = false
         };
-        left.Accept += (sender, args) => { ScrollHorizontal (-1); };
+        left.Accepting += (sender, args) => { ScrollHorizontal (-1); };
 
         var right = new Button
         {
@@ -523,7 +522,7 @@ internal class CharMap : View
             ShadowStyle = ShadowStyle.None,
             CanFocus = false
         };
-        right.Accept += (sender, args) => { ScrollHorizontal (1); };
+        right.Accepting += (sender, args) => { ScrollHorizontal (1); };
 
         Padding.Add (up, down, left, right);
     }
@@ -1016,18 +1015,18 @@ internal class CharMap : View
 
             var dlg = new Dialog { Title = title, Buttons = [copyGlyph, copyCP, cancel] };
 
-            copyGlyph.Accept += (s, a) =>
+            copyGlyph.Accepting += (s, a) =>
                                 {
                                     CopyGlyph ();
                                     dlg.RequestStop ();
                                 };
 
-            copyCP.Accept += (s, a) =>
+            copyCP.Accepting += (s, a) =>
                              {
                                  CopyCodePoint ();
                                  dlg.RequestStop ();
                              };
-            cancel.Accept += (s, a) => dlg.RequestStop ();
+            cancel.Accepting += (s, a) => dlg.RequestStop ();
 
             var rune = (Rune)SelectedCodePoint;
             var label = new Label { Text = "IsAscii: ", X = 0, Y = 0 };

@@ -55,6 +55,8 @@ internal class WindowsConsole
 
     public bool WriteToConsole (Size size, ExtendedCharInfo [] charInfoBuffer, Coord bufferSize, SmallRect window, bool force16Colors)
     {
+        //Debug.WriteLine ("WriteToConsole");
+
         if (_screenBuffer == nint.Zero)
         {
             ReadFromConsoleOutput (size, bufferSize, ref window);
