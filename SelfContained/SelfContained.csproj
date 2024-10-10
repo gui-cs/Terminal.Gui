@@ -12,14 +12,8 @@
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" />
-    <TrimmerRootAssembly Include="Terminal.Gui" />
-  </ItemGroup>
+  <ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" />
+  <TrimmerRootAssembly Include="Terminal.Gui" />
 
-  <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <PackageReference Include="Terminal.Gui" Version="2.0.0" />
-    <TrimmerRootAssembly Include="Terminal.Gui" />
-  </ItemGroup>
 
 </Project>

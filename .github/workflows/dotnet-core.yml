@@ -93,15 +93,16 @@ jobs:
     - name: Create local_packages Directory
       run: mkdir -p local_packages
 
-    - name: Pack Release
-      run: dotnet pack --configuration Release --output ./local_packages
-
-    - name: Restore dependencies
-      run: dotnet restore --source ./local_packages
-
     - name: Build Release
-      run: dotnet build --configuration Release
+      run: cd Terminal.Gui && dotnet build --configuration Release
+    - name: Pack Release
+      run: cd Terminal.Gui && dotnet pack --configuration Release --output ./local_packages
 
+    - name: Build SelfContained
+      run: |
+        cd SelfContained
+        dotnet remove package Terminal.Gui
+        dotnet add package Terminal.Gui --source LocalPackages
 
     # Note: this step is currently not writing to the gist for some reason
     # - name: Create Test Coverage Badge
