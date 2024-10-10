@@ -8,6 +8,9 @@ namespace Terminal.Gui;
 /// <summary>
 /// Provides a collection of <see cref="Command"/> objects that are scoped to <see cref="KeyBindingScope"/>.
 /// </summary>
+/// <seealso cref="Application.KeyBindings"/>
+/// <seealso cref="View.KeyBindings"/>
+/// <seealso cref="Command"/>
 public record struct KeyBinding
 {
     /// <summary>Initializes a new instance.</summary>

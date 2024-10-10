@@ -5,12 +5,10 @@ public static partial class Application // Keyboard handling
 {
     private static Key _nextTabGroupKey = Key.F6; // Resources/config.json overrrides
     private static Key _nextTabKey = Key.Tab; // Resources/config.json overrrides
-
     private static Key _prevTabGroupKey = Key.F6.WithShift; // Resources/config.json overrrides
-
     private static Key _prevTabKey = Key.Tab.WithShift; // Resources/config.json overrrides
-
     private static Key _quitKey = Key.Esc; // Resources/config.json overrrides
+    private static Key _arrangeKey = Key.F5.WithCtrl; // Resources/config.json overrrides
 
     static Application () { AddApplicationKeyBindings (); }
 
@@ -97,7 +95,7 @@ public static partial class Application // Keyboard handling
             return true;
         }
 
-        if (Current is null)
+        if (Top is null)
         {
             foreach (Toplevel topLevel in TopLevels.ToList ())
             {
@@ -114,7 +112,7 @@ public static partial class Application // Keyboard handling
         }
         else
         {
-            if (Current.NewKeyDownEvent (keyEvent))
+            if (Top.NewKeyDownEvent (keyEvent))
             {
                 return true;
             }
@@ -155,7 +153,7 @@ public static partial class Application // Keyboard handling
     }
 
     /// <summary>
-    /// INTENRAL method to invoke one of the commands in <see cref="CommandImplementations"/>
+    ///     INTENRAL method to invoke one of the commands in <see cref="CommandImplementations"/>
     /// </summary>
     /// <param name="command"></param>
     /// <param name="keyEvent"></param>
@@ -171,9 +169,10 @@ public static partial class Application // Keyboard handling
                                             );
         }
 
-        if (CommandImplementations.TryGetValue (command, out Func<CommandContext, bool?>? implementation))
+        if (CommandImplementations.TryGetValue (command, out View.CommandImplementation? implementation))
         {
             var context = new CommandContext (command, keyEvent, appBinding); // Create the context here
+
             return implementation (context);
         }
 
@@ -262,24 +261,31 @@ public static partial class Application // Keyboard handling
         }
     }
 
+    /// <summary>Gets or sets the key to activate arranging views using the keyboard.</summary>
+    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Key ArrangeKey
+    {
+        get => _arrangeKey;
+        set
+        {
+            if (_arrangeKey != value)
+            {
+                ReplaceKey (_arrangeKey, value);
+                _arrangeKey = value;
+            }
+        }
+    }
+
     internal static void AddApplicationKeyBindings ()
     {
         CommandImplementations = new ();
 
         // Things this view knows how to do
         AddCommand (
-                    Command.QuitToplevel, // TODO: IRunnable: Rename to Command.Quit to make more generic.
+                    Command.Quit,
                     static () =>
                     {
-                        if (ApplicationOverlapped.OverlappedTop is { })
-                        {
-                            RequestStop (Current!);
-                        }
-                        else
-                        {
-                            RequestStop ();
-                        }
-
+                        RequestStop ();
                         return true;
                     }
                    );
@@ -295,44 +301,20 @@ public static partial class Application // Keyboard handling
                    );
 
         AddCommand (
-                    Command.NextView,
+                    Command.NextTabStop,
                     static () => Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop));
 
         AddCommand (
-                    Command.PreviousView,
+                    Command.PreviousTabStop,
                     static () => Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop));
 
         AddCommand (
-                    Command.NextViewOrTop,
-                    static () =>
-                    {
-                        // TODO: This OverlapppedTop tomfoolery goes away in addressing #2491
-                        if (ApplicationOverlapped.OverlappedTop is { })
-                        {
-                            ApplicationOverlapped.OverlappedMoveNext ();
-
-                            return true;
-                        }
-
-                        return Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup);
-                    }
-                   );
+                    Command.NextTabGroup,
+                    static () => Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup));
 
         AddCommand (
-                    Command.PreviousViewOrTop,
-                    static () =>
-                    {
-                        // TODO: This OverlapppedTop tomfoolery goes away in addressing #2491
-                        if (ApplicationOverlapped.OverlappedTop is { })
-                        {
-                            ApplicationOverlapped.OverlappedMovePrevious ();
-
-                            return true;
-                        }
-
-                        return Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup);
-                    }
-                   );
+                    Command.PreviousTabGroup,
+                    static () => Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup));
 
         AddCommand (
                     Command.Refresh,
@@ -344,6 +326,26 @@ public static partial class Application // Keyboard handling
                     }
                    );
 
+        AddCommand (
+                    Command.Edit,
+                    static () =>
+                    {
+                        View? viewToArrange = Navigation?.GetFocused ();
+
+                        // Go up the superview hierarchy and find the first that is not ViewArrangement.Fixed
+                        while (viewToArrange is { SuperView: { }, Arrangement: ViewArrangement.Fixed })
+                        {
+                            viewToArrange = viewToArrange.SuperView;
+                        }
+
+                        if (viewToArrange is { })
+                        {
+                            return viewToArrange.Border?.EnterArrangeMode (ViewArrangement.Fixed);
+                        }
+
+                        return false;
+                    });
+
         KeyBindings.Clear ();
 
         // Resources/config.json overrrides
@@ -352,18 +354,21 @@ public static partial class Application // Keyboard handling
         NextTabGroupKey = Key.F6;
         PrevTabGroupKey = Key.F6.WithShift;
         QuitKey = Key.Esc;
+        ArrangeKey = Key.F5.WithCtrl;
 
-        KeyBindings.Add (QuitKey, KeyBindingScope.Application, Command.QuitToplevel);
+        KeyBindings.Add (QuitKey, KeyBindingScope.Application, Command.Quit);
 
-        KeyBindings.Add (Key.CursorRight, KeyBindingScope.Application, Command.NextView);
-        KeyBindings.Add (Key.CursorDown, KeyBindingScope.Application, Command.NextView);
-        KeyBindings.Add (Key.CursorLeft, KeyBindingScope.Application, Command.PreviousView);
-        KeyBindings.Add (Key.CursorUp, KeyBindingScope.Application, Command.PreviousView);
-        KeyBindings.Add (NextTabKey, KeyBindingScope.Application, Command.NextView);
-        KeyBindings.Add (PrevTabKey, KeyBindingScope.Application, Command.PreviousView);
+        KeyBindings.Add (Key.CursorRight, KeyBindingScope.Application, Command.NextTabStop);
+        KeyBindings.Add (Key.CursorDown, KeyBindingScope.Application, Command.NextTabStop);
+        KeyBindings.Add (Key.CursorLeft, KeyBindingScope.Application, Command.PreviousTabStop);
+        KeyBindings.Add (Key.CursorUp, KeyBindingScope.Application, Command.PreviousTabStop);
+        KeyBindings.Add (NextTabKey, KeyBindingScope.Application, Command.NextTabStop);
+        KeyBindings.Add (PrevTabKey, KeyBindingScope.Application, Command.PreviousTabStop);
 
-        KeyBindings.Add (NextTabGroupKey, KeyBindingScope.Application, Command.NextViewOrTop);
-        KeyBindings.Add (PrevTabGroupKey, KeyBindingScope.Application, Command.PreviousViewOrTop);
+        KeyBindings.Add (NextTabGroupKey, KeyBindingScope.Application, Command.NextTabGroup);
+        KeyBindings.Add (PrevTabGroupKey, KeyBindingScope.Application, Command.PreviousTabGroup);
+
+        KeyBindings.Add (ArrangeKey, KeyBindingScope.Application, Command.Edit);
 
         // TODO: Refresh Key should be configurable
         KeyBindings.Add (Key.F5, KeyBindingScope.Application, Command.Refresh);
@@ -413,7 +418,7 @@ public static partial class Application // Keyboard handling
     /// <summary>
     ///     Commands for Application.
     /// </summary>
-    private static Dictionary<Command, Func<CommandContext, bool?>>? CommandImplementations { get; set; }
+    private static Dictionary<Command, View.CommandImplementation>? CommandImplementations { get; set; }
 
     private static void ReplaceKey (Key oldKey, Key newKey)
     {

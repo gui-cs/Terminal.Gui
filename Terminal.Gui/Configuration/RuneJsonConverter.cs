@@ -6,9 +6,17 @@ using System.Text.RegularExpressions;
 namespace Terminal.Gui;
 
 /// <summary>
-///     Json converter for <see cref="Rune"/>. Supports Json converter for <see cref="Rune"/>. Supports A string as
-///     one of: - unicode char (e.g. "☑") - U+hex format (e.g. "U+2611") - \u format (e.g. "\\u2611") A number - The
-///     unicode code in decimal
+///     Json converter for <see cref="Rune"/>.
+///     <para>
+///         If the Rune is printable, it will be serialized as the glyph; otherwise the \u format (e.g. "\\u2611") is used.
+///     </para>
+///     <para>
+///         Supports deserializing as one of:
+///         - unicode glyph in a string (e.g. "☑")
+///         - U+hex format in a string  (e.g. "U+2611")
+///         - \u format in a string (e.g. "\\u2611")
+///         - A decimal number (e.g. 97 for "a")
+///     </para>
 /// </summary>
 internal class RuneJsonConverter : JsonConverter<Rune>
 {
@@ -108,7 +116,7 @@ internal class RuneJsonConverter : JsonConverter<Rune>
                     throw new JsonException ($"Invalid combined Rune ({value})");
                 }
 
-                return new Rune (combined [0]);
+                return new (combined [0]);
             }
             case JsonTokenType.Number:
             {
@@ -116,7 +124,7 @@ internal class RuneJsonConverter : JsonConverter<Rune>
 
                 if (Rune.IsValid (num))
                 {
-                    return new Rune (num);
+                    return new (num);
                 }
 
                 throw new JsonException ($"Invalid Rune (not a scalar Unicode value): {num}.");
@@ -128,18 +136,17 @@ internal class RuneJsonConverter : JsonConverter<Rune>
 
     public override void Write (Utf8JsonWriter writer, Rune value, JsonSerializerOptions options)
     {
-        // HACK: Writes a JSON comment in addition to the glyph to ease debugging.
-        // Technically, JSON comments are not valid, but we use relaxed decoding
-        // (ReadCommentHandling = JsonCommentHandling.Skip)
-        //writer.WriteCommentValue ($"(U+{value.Value:X8})");
-        //var printable = value.MakePrintable ();
-        //if (printable == Rune.ReplacementChar) {
-        //	writer.WriteStringValue (value.ToString ());
-        //} else {
-        //	//writer.WriteRawValue ($"\"{value}\"");
-        //}
-
-        writer.WriteNumberValue (value.Value);
+        Rune printable = value.MakePrintable ();
+        if (printable == Rune.ReplacementChar)
+        {
+            // Write as /u string
+            writer.WriteRawValue ($"\"{value}\"");
+        }
+        else
+        {
+            // Write as the actual glyph
+            writer.WriteStringValue (value.ToString ());
+        }
     }
 }
 #pragma warning restore 1591

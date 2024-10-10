@@ -401,7 +401,7 @@ namespace Terminal.Gui
 
             // Things this view knows how to do
             AddCommand (
-                        Command.LeftHome,
+                        Command.LeftStart,
                         () =>
                         {
                             HomeKeyHandler ();
@@ -461,7 +461,7 @@ namespace Terminal.Gui
                        );
 
             // Default keybindings for this view
-            KeyBindings.Add (Key.Home, Command.LeftHome);
+            KeyBindings.Add (Key.Home, Command.LeftStart);
             KeyBindings.Add (Key.End, Command.RightEnd);
 
             KeyBindings.Add (Key.Delete, Command.DeleteCharRight);

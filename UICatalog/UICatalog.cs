@@ -14,6 +14,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json.Serialization;
 using Terminal.Gui;
+using UICatalog.Scenarios;
 using static Terminal.Gui.ConfigurationManager;
 using Command = Terminal.Gui.Command;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
@@ -31,7 +32,7 @@ namespace UICatalog;
 ///     <para>
 ///         <list type="number">
 ///             <item>
-///                 <description>Be an easy to use showcase for Terminal.Gui concepts and features.</description>
+///                 <description>Be an easy-to-use showcase for Terminal.Gui concepts and features.</description>
 ///             </item>
 ///             <item>
 ///                 <description>Provide sample code that illustrates how to properly implement said concepts & features.</description>
@@ -40,10 +41,6 @@ namespace UICatalog;
 ///                 <description>Make it easy for contributors to add additional samples in a structured way.</description>
 ///             </item>
 ///         </list>
-///     </para>
-///     <para>
-///         See the project README for more details
-///         (https://github.com/gui-cs/Terminal.Gui/tree/master/UICatalog/README.md).
 ///     </para>
 /// </remarks>
 public class UICatalogApp
@@ -320,7 +317,6 @@ public class UICatalogApp
             _selectedScenario = (Scenario)Activator.CreateInstance (_scenarios [item].GetType ())!;
 
             Application.Init (driverName: _forceDriver);
-            _selectedScenario.Theme = _cachedTheme;
             _selectedScenario.TopLevelColorScheme = _topLevelColorScheme;
             _selectedScenario.Main ();
             _selectedScenario.Dispose ();
@@ -338,8 +334,15 @@ public class UICatalogApp
             VerifyObjectsWereDisposed ();
             Themes!.Theme = _cachedTheme!;
             Apply ();
-            scenario.Theme = _cachedTheme;
             scenario.TopLevelColorScheme = _topLevelColorScheme;
+
+#if DEBUG_IDISPOSABLE
+            // Measure how long it takes for the app to shut down
+            var sw = new Stopwatch ();
+            string scenarioName = scenario.GetName ();
+            Application.InitializedChanged += ApplicationOnInitializedChanged;
+#endif
+
             scenario.Main ();
             scenario.Dispose ();
 
@@ -348,10 +351,31 @@ public class UICatalogApp
             // TODO: Throw if shutdown was not called already
             Application.Shutdown ();
             VerifyObjectsWereDisposed ();
+
+#if DEBUG_IDISPOSABLE
+            Application.InitializedChanged -= ApplicationOnInitializedChanged;
+
+            void ApplicationOnInitializedChanged (object? sender, EventArgs<bool> e)
+            {
+                if (e.CurrentValue)
+                {
+                    sw.Start ();
+                }
+                else
+                {
+                    sw.Stop ();
+                    Debug.WriteLine ($"Shutdown of {scenarioName} Scenario took {sw.ElapsedMilliseconds}ms");
+                }
+            }
+#endif
         }
 
         StopConfigFileWatcher ();
         VerifyObjectsWereDisposed ();
+
+        return;
+
+
     }
 
     private static void VerifyObjectsWereDisposed ()
@@ -401,6 +425,8 @@ public class UICatalogApp
         // TableView works. There's no real reason not to use ListView. Because we use TableView, and TableView
         // doesn't (currently) have CollectionNavigator support built in, we implement it here, within the app.
         public TableView ScenarioList;
+
+        private readonly StatusBar? _statusBar;
 
         private readonly CollectionNavigator _scenarioCollectionNav = new ();
 
@@ -467,89 +493,76 @@ public class UICatalogApp
             };
             Add (menuBar);
 
-            StatusBar statusBar = new ()
+            _statusBar = new ()
             {
                 Visible = ShowStatusBar,
                 AlignmentModes = AlignmentModes.IgnoreFirstOrLast,
                 CanFocus = false
             };
-            Add (statusBar);
+            _statusBar.Height = _statusBar.Visible ? Dim.Auto () : 0;
 
-            if (StatusBar is { })
+            Add (_statusBar);
+
+            ShVersion = new ()
             {
-                ShVersion = new ()
+                Title = "Version Info",
+                CanFocus = false,
+            };
+
+            var statusBarShortcut = new Shortcut
+            {
+                Key = Key.F10,
+                Title = "Show/Hide Status Bar",
+                CanFocus = false,
+            };
+            statusBarShortcut.Accepting += (sender, args) =>
+                                        {
+                                            _statusBar.Visible = !_statusBar.Visible;
+                                            args.Cancel = true;
+                                        };
+
+            ShForce16Colors = new ()
+            {
+                CanFocus = false,
+                CommandView = new CheckBox
                 {
-                    Title = "Version Info",
-                    CanFocus = false,
-                };
+                    Title = "16 color mode",
+                    CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
+                    CanFocus = false
+                },
+                HelpText = "",
+                KeyBindingScope = KeyBindingScope.Application,
+                Key = Key.F7
+            };
 
-                var statusBarShortcut = new Shortcut
-                {
-                    Key = Key.F10,
-                    Title = "Show/Hide Status Bar",
-                    CanFocus = false,
-                };
-                statusBarShortcut.Accept += (sender, args) =>
-                                            {
-                                                StatusBar.Visible = !StatusBar.Visible;
-                                                args.Handled = true;
-                                            };
+            ((CheckBox)ShForce16Colors.CommandView).CheckedStateChanging += (sender, args) =>
+                                                              {
+                                                                  Application.Force16Colors = args.NewValue == CheckState.Checked;
+                                                                  MiForce16Colors!.Checked = Application.Force16Colors;
+                                                                  Application.Refresh ();
+                                                              };
 
-                ShForce16Colors = new ()
-                {
-                    CanFocus = false,
-                    CommandView = new CheckBox
-                    {
-                        Title = "16 color mode",
-                        CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
-                        CanFocus = false
-                    },
-                    HelpText = "",
-                    KeyBindingScope = KeyBindingScope.Application,
-                    Key = Key.F7
-                };
+            _statusBar.Add (
+                           new Shortcut
+                           {
+                               CanFocus = false,
+                               Title = "Quit",
+                               Key = Application.QuitKey
+                           },
+                           statusBarShortcut,
+                           ShForce16Colors,
 
-                ((CheckBox)ShForce16Colors.CommandView).CheckedStateChanging += (sender, args) =>
-                                                                  {
-                                                                      Application.Force16Colors = args.NewValue == CheckState.Checked;
-                                                                      MiForce16Colors!.Checked = Application.Force16Colors;
-                                                                      Application.Refresh ();
-                                                                  };
-
-                //ShDiagnostics = new Shortcut ()
-                //{
-                //    HelpText = "Diagnostic flags",
-                //    CommandView = new RadioGroup()
-                //    {
-                //        RadioLabels = ["Off", "Ruler", "Padding", "MouseEnter"],
-
-                //        CanFocus = false,
-                //        Orientation = Orientation.Vertical,
-                //    }
-                //};
-
-                StatusBar.Add (
-                               new Shortcut
-                               {
-                                   CanFocus = false,
-                                   Title = "Quit",
-                                   Key = Application.QuitKey
-                               },
-                               statusBarShortcut,
-                               ShForce16Colors,
-
-                               //ShDiagnostics,
-                               ShVersion
-                              );
-            }
+                           //ShDiagnostics,
+                           ShVersion
+                          );
 
             // Create the Category list view. This list never changes.
             CategoryList = new ()
             {
                 X = 0,
-                Y = 1,
+                Y = Pos.Bottom (MenuBar),
                 Width = Dim.Auto (),
-                Height = Dim.Fill (Dim.Func (() => IsInitialized ? Subviews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height : 1)),
+                Height = Dim.Fill (Dim.Func (() => _statusBar.Frame.Height)),
                 AllowsMarking = false,
                 CanFocus = true,
                 Title = "_Categories",
@@ -566,10 +579,9 @@ public class UICatalogApp
             ScenarioList = new ()
             {
                 X = Pos.Right (CategoryList) - 1,
-                Y = 1,
+                Y = Pos.Bottom (MenuBar),
                 Width = Dim.Fill (),
-                Height = Dim.Height (CategoryList),
-
+                Height = Dim.Fill (Dim.Func (() => _statusBar.Frame.Height)),
                 //AllowsMarking = false,
                 CanFocus = true,
                 Title = "_Scenarios",
@@ -634,9 +646,9 @@ public class UICatalogApp
 
             // TableView typically is a grid where nav keys are biased for moving left/right.
             ScenarioList.KeyBindings.Remove (Key.Home);
-            ScenarioList.KeyBindings.Add (Key.Home, Command.TopHome);
+            ScenarioList.KeyBindings.Add (Key.Home, Command.Start);
             ScenarioList.KeyBindings.Remove (Key.End);
-            ScenarioList.KeyBindings.Add (Key.End, Command.BottomEnd);
+            ScenarioList.KeyBindings.Add (Key.End, Command.End);
 
             // Ideally, TableView.MultiSelect = false would turn off any keybindings for
             // multi-select options. But it currently does not. UI Catalog uses Ctrl-A for
@@ -681,13 +693,12 @@ public class UICatalogApp
 
             MenuBar!.Menus [0].Children! [0]!.ShortcutKey = Application.QuitKey;
 
-            if (StatusBar is { })
-            {
-                ((Shortcut)StatusBar.Subviews [0]).Key = Application.QuitKey;
-                StatusBar.Visible = ShowStatusBar;
-            }
+            ((Shortcut)_statusBar!.Subviews [0]).Key = Application.QuitKey;
+            _statusBar.Visible = ShowStatusBar;
 
             MiIsMouseDisabled!.Checked = Application.IsMouseDisabled;
+
+            ((CheckBox)ShForce16Colors!.CommandView!).CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
 
             Application.Top!.SetNeedsDisplay ();
         }
@@ -792,7 +803,7 @@ public class UICatalogApp
             const string OFF = "View Diagnostics: _Off";
             const string RULER = "View Diagnostics: _Ruler";
             const string PADDING = "View Diagnostics: _Padding";
-            const string MOUSEENTER = "View Diagnostics: _MouseEnter";
+            const string Hover = "View Diagnostics: _Hover";
             var index = 0;
 
             List<MenuItem> menuItems = new ();
@@ -810,7 +821,7 @@ public class UICatalogApp
                 {
                     item.Checked = !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Padding)
                                    && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Ruler)
-                                   && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.MouseEnter);
+                                   && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Hover);
                 }
                 else
                 {
@@ -823,12 +834,12 @@ public class UICatalogApp
 
                                    if (item.Title == t && item.Checked == false)
                                    {
-                                       _diagnosticFlags &= ~(ViewDiagnosticFlags.Padding | ViewDiagnosticFlags.Ruler | ViewDiagnosticFlags.MouseEnter);
+                                       _diagnosticFlags &= ~(ViewDiagnosticFlags.Padding | ViewDiagnosticFlags.Ruler | ViewDiagnosticFlags.Hover);
                                        item.Checked = true;
                                    }
                                    else if (item.Title == t && item.Checked == true)
                                    {
-                                       _diagnosticFlags |= ViewDiagnosticFlags.Padding | ViewDiagnosticFlags.Ruler | ViewDiagnosticFlags.MouseEnter;
+                                       _diagnosticFlags |= ViewDiagnosticFlags.Padding | ViewDiagnosticFlags.Ruler | ViewDiagnosticFlags.Hover;
                                        item.Checked = false;
                                    }
                                    else
@@ -851,7 +862,7 @@ public class UICatalogApp
                                        {
                                            menuItem.Checked = !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Ruler)
                                                               && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Padding)
-                                                              && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.MouseEnter);
+                                                              && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Hover);
                                        }
                                        else if (menuItem.Title != t)
                                        {
@@ -874,7 +885,7 @@ public class UICatalogApp
                     "Off" => OFF,
                     "Ruler" => RULER,
                     "Padding" => PADDING,
-                    "MouseEnter" => MOUSEENTER,
+                    "Hover" => Hover,
                     _ => ""
                 };
             }
@@ -885,7 +896,7 @@ public class UICatalogApp
                 {
                     RULER => ViewDiagnosticFlags.Ruler,
                     PADDING => ViewDiagnosticFlags.Padding,
-                    MOUSEENTER => ViewDiagnosticFlags.MouseEnter,
+                    Hover => ViewDiagnosticFlags.Hover,
                     _ => null!
                 };
             }
@@ -916,14 +927,14 @@ public class UICatalogApp
                         }
 
                         break;
-                    case ViewDiagnosticFlags.MouseEnter:
+                    case ViewDiagnosticFlags.Hover:
                         if (add)
                         {
-                            _diagnosticFlags |= ViewDiagnosticFlags.MouseEnter;
+                            _diagnosticFlags |= ViewDiagnosticFlags.Hover;
                         }
                         else
                         {
-                            _diagnosticFlags &= ~ViewDiagnosticFlags.MouseEnter;
+                            _diagnosticFlags &= ~ViewDiagnosticFlags.Hover;
                         }
 
                         break;
@@ -1080,19 +1091,12 @@ public class UICatalogApp
                 ScenarioList.SetFocus ();
             }
 
-            if (StatusBar is { })
+            if (_statusBar is { })
             {
-                StatusBar.VisibleChanged += (s, e) =>
+                _statusBar.VisibleChanged += (s, e) =>
                                             {
-                                                ShowStatusBar = StatusBar.Visible;
-
-                                                int height = StatusBar.Visible ? 1 : 0;
-                                                CategoryList!.Height = Dim.Fill (height);
-                                                ScenarioList.Height = Dim.Fill (height);
-
-                                                // ContentPane.Height = Dim.Fill (height);
-                                                LayoutSubviews ();
-                                                SetSubViewNeedsDisplay ();
+                                                ShowStatusBar = _statusBar.Visible;
+                                                _statusBar.Height = _statusBar.Visible ? Dim.Auto () : 0;
                                             };
             }
 

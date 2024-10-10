@@ -1,4 +1,5 @@
 #nullable enable
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
@@ -71,7 +72,7 @@ public static partial class Application // Initialization (Init/Shutdown)
         if (!calledViaRunT)
         {
             // Reset all class variables (Application is a singleton).
-            ResetState ();
+            ResetState (ignoreDisposed: true);
         }
 
         Navigation = new ();
@@ -80,6 +81,16 @@ public static partial class Application // Initialization (Init/Shutdown)
         if (driver is { })
         {
             Driver = driver;
+
+            if (driver is FakeDriver)
+            {
+                // We're running unit tests. Disable loading config files other than default
+                if (Locations == ConfigLocations.All)
+                {
+                    Locations = ConfigLocations.DefaultOnly;
+                    Reset ();
+                }
+            }
         }
 
         // Start the process of configuration management.
@@ -88,7 +99,12 @@ public static partial class Application // Initialization (Init/Shutdown)
         // valid after a Driver is loaded. In this case we need just
         // `Settings` so we can determine which driver to use.
         // Don't reset, so we can inherit the theme from the previous run.
+        string previousTheme = Themes?.Theme ?? string.Empty;
         Load ();
+        if (Themes is { } && !string.IsNullOrEmpty (previousTheme) && previousTheme != "Default")
+        {
+            ThemeManager.SelectedTheme = previousTheme;
+        }
         Apply ();
 
         AddApplicationKeyBindings ();
@@ -198,10 +214,16 @@ public static partial class Application // Initialization (Init/Shutdown)
     public static void Shutdown ()
     {
         // TODO: Throw an exception if Init hasn't been called.
+
+        bool wasInitialized = IsInitialized;
         ResetState ();
         PrintJsonErrors ();
-        bool init = IsInitialized;
-        InitializedChanged?.Invoke (null, new (in init));
+
+        if (wasInitialized)
+        {
+            bool init = IsInitialized;
+            InitializedChanged?.Invoke (null, new (in init));
+        }
     }
 
     /// <summary>

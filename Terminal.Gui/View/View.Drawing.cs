@@ -1,13 +1,12 @@
-﻿using System.Drawing;
-
+﻿#nullable enable
 namespace Terminal.Gui;
 
 public partial class View // Drawing APIs
 {
-    private ColorScheme _colorScheme;
+    private ColorScheme? _colorScheme;
 
     /// <summary>The color scheme for this view, if it is not defined, it returns the <see cref="SuperView"/>'s color scheme.</summary>
-    public virtual ColorScheme ColorScheme
+    public virtual ColorScheme? ColorScheme
     {
         get
         {
@@ -23,6 +22,11 @@ public partial class View // Drawing APIs
             if (_colorScheme != value)
             {
                 _colorScheme = value;
+
+                if (Border is { } && Border.LineStyle != LineStyle.None && Border.ColorScheme is { })
+                {
+                    Border.ColorScheme = _colorScheme;
+                }
                 SetNeedsDisplay ();
             }
         }
@@ -56,7 +60,7 @@ public partial class View // Drawing APIs
     public bool SubViewNeedsDisplay { get; private set; }
 
     /// <summary>
-    ///     Gets or sets whether this View will use it's SuperView's <see cref="LineCanvas"/> for rendering any 
+    ///     Gets or sets whether this View will use it's SuperView's <see cref="LineCanvas"/> for rendering any
     ///     lines. If <see langword="true"/> the rendering of any borders drawn by this Frame will be done by its parent's
     ///     SuperView. If <see langword="false"/> (the default) this View's <see cref="OnDrawAdornments"/> method will be
     ///     called to render the borders.
@@ -86,7 +90,8 @@ public partial class View // Drawing APIs
     ///     <para>
     ///         If <see cref="ViewportSettings"/> has <see cref="Gui.ViewportSettings.ClearContentOnly"/> only
     ///         the portion of the content
-    ///         area that is visible within the <see cref="View.Viewport"/> will be cleared. This is useful for views that have a
+    ///         area that is visible within the <see cref="View.Viewport"/> will be cleared. This is useful for views that have
+    ///         a
     ///         content area larger than the Viewport (e.g. when <see cref="ViewportSettings.AllowNegativeLocation"/> is
     ///         enabled) and want
     ///         the area outside the content to be visually distinct.
@@ -143,15 +148,15 @@ public partial class View // Drawing APIs
 
     /// <summary>Sets the <see cref="ConsoleDriver"/>'s clip region to <see cref="Viewport"/>.</summary>
     /// <remarks>
-    /// <para>
-    ///     By default, the clip rectangle is set to the intersection of the current clip region and the
-    ///     <see cref="Viewport"/>. This ensures that drawing is constrained to the viewport, but allows
-    ///     content to be drawn beyond the viewport.
-    /// </para>
-    /// <para>
-    ///     If <see cref="ViewportSettings"/> has <see cref="Gui.ViewportSettings.ClipContentOnly"/> set, clipping will be
-    ///     applied to just the visible content area.
-    /// </para>
+    ///     <para>
+    ///         By default, the clip rectangle is set to the intersection of the current clip region and the
+    ///         <see cref="Viewport"/>. This ensures that drawing is constrained to the viewport, but allows
+    ///         content to be drawn beyond the viewport.
+    ///     </para>
+    ///     <para>
+    ///         If <see cref="ViewportSettings"/> has <see cref="Gui.ViewportSettings.ClipContentOnly"/> set, clipping will be
+    ///         applied to just the visible content area.
+    ///     </para>
     /// </remarks>
     /// <returns>
     ///     The current screen-relative clip region, which can be then re-applied by setting
@@ -182,10 +187,14 @@ public partial class View // Drawing APIs
     }
 
     /// <summary>
-    ///     Draws the view. Causes the following virtual methods to be called (along with their related events):
+    ///     Draws the view if it needs to be drawn. Causes the following virtual methods to be called (along with their related events):
     ///     <see cref="OnDrawContent"/>, <see cref="OnDrawContentComplete"/>.
     /// </summary>
     /// <remarks>
+    ///     <para>
+    ///         The view will only be drawn if it is visible, and has any of <see cref="NeedsDisplay"/>, <see cref="SubViewNeedsDisplay"/>,
+    ///         or <see cref="LayoutNeeded"/> set.
+    ///     </para>
     ///     <para>
     ///         Always use <see cref="Viewport"/> (view-relative) when calling <see cref="OnDrawContent(Rectangle)"/>, NOT
     ///         <see cref="Frame"/> (superview-relative).
@@ -202,6 +211,23 @@ public partial class View // Drawing APIs
     /// </remarks>
     public void Draw ()
     {
+        if (!CanBeVisible (this))
+        {
+            return;
+        }
+
+        // TODO: This ensures overlapped views are drawn correctly. However, this is inefficient.
+        // TODO: The correct fix is to implement non-rectangular clip regions: https://github.com/gui-cs/Terminal.Gui/issues/3413
+        if (Arrangement.HasFlag (ViewArrangement.Overlapped))
+        {
+            SetNeedsDisplay ();
+        }
+
+        if (!NeedsDisplay && !SubViewNeedsDisplay && !LayoutNeeded)
+        {
+            return;
+        }
+
         OnDrawAdornments ();
 
         if (ColorScheme is { })
@@ -257,8 +283,7 @@ public partial class View // Drawing APIs
     ///         <see cref="View"/> .
     ///     </para>
     /// </remarks>
-    [CanBeNull]
-    public event EventHandler<DrawEventArgs> DrawContent;
+    public event EventHandler<DrawEventArgs>? DrawContent;
 
     /// <summary>Event invoked when the content area of the View is completed drawing.</summary>
     /// <remarks>
@@ -268,8 +293,7 @@ public partial class View // Drawing APIs
     ///         <see cref="View"/> .
     ///     </para>
     /// </remarks>
-    [CanBeNull]
-    public event EventHandler<DrawEventArgs> DrawContentComplete;
+    public event EventHandler<DrawEventArgs>? DrawContentComplete;
 
     /// <summary>Utility function to draw strings that contain a hotkey.</summary>
     /// <param name="text">String to display, the hotkey specifier before a letter flags the next letter as the hotkey.</param>
@@ -310,19 +334,18 @@ public partial class View // Drawing APIs
     ///     If set to <see langword="true"/> this uses the focused colors from the color scheme, otherwise
     ///     the regular ones.
     /// </param>
-    /// <param name="scheme">The color scheme to use.</param>
-    public void DrawHotString (string text, bool focused, ColorScheme scheme)
+    public void DrawHotString (string text, bool focused)
     {
         if (focused)
         {
-            DrawHotString (text, scheme.HotFocus, scheme.Focus);
+            DrawHotString (text, GetHotFocusColor (), GetFocusColor ());
         }
         else
         {
             DrawHotString (
                            text,
-                           Enabled ? scheme.HotNormal : scheme.Disabled,
-                           Enabled ? scheme.Normal : scheme.Disabled
+                           Enabled ? GetHotNormalColor () : ColorScheme!.Disabled,
+                           Enabled ? GetNormalColor () : ColorScheme!.Disabled
                           );
         }
     }
@@ -335,13 +358,27 @@ public partial class View // Drawing APIs
     /// </returns>
     public virtual Attribute GetFocusColor ()
     {
-        ColorScheme cs = ColorScheme;
+        ColorScheme? cs = ColorScheme;
+
         if (cs is null)
         {
             cs = new ();
         }
 
-        return Enabled ? cs.Focus : cs.Disabled;
+        return Enabled ? GetColor (cs.Focus) : cs.Disabled;
+    }
+
+    /// <summary>Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.</summary>
+    /// <returns>
+    ///     <see cref="ColorScheme.Focus"/> if <see cref="Enabled"/> is <see langword="true"/> or
+    ///     <see cref="ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>. If it's
+    ///     overridden can return other values.
+    /// </returns>
+    public virtual Attribute GetHotFocusColor ()
+    {
+        ColorScheme? cs = ColorScheme ?? new ();
+
+        return Enabled ? GetColor (cs.HotFocus) : cs.Disabled;
     }
 
     /// <summary>Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.</summary>
@@ -352,14 +389,14 @@ public partial class View // Drawing APIs
     /// </returns>
     public virtual Attribute GetHotNormalColor ()
     {
-        ColorScheme cs = ColorScheme;
+        ColorScheme? cs = ColorScheme;
 
         if (cs is null)
         {
             cs = new ();
         }
 
-        return Enabled ? cs.HotNormal : cs.Disabled;
+        return Enabled ? GetColor (cs.HotNormal) : cs.Disabled;
     }
 
     /// <summary>Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.</summary>
@@ -370,14 +407,30 @@ public partial class View // Drawing APIs
     /// </returns>
     public virtual Attribute GetNormalColor ()
     {
-        ColorScheme cs = ColorScheme;
+        ColorScheme? cs = ColorScheme;
 
         if (cs is null)
         {
             cs = new ();
         }
 
-        return Enabled ? cs.Normal : cs.Disabled;
+        Attribute disabled = new (cs.Disabled.Foreground, cs.Disabled.Background);
+        if (Diagnostics.HasFlag (ViewDiagnosticFlags.Hover) && _hovering)
+        {
+            disabled = new (disabled.Foreground.GetDarkerColor (), disabled.Background.GetDarkerColor ());
+        }
+        return Enabled ? GetColor (cs.Normal) : disabled;
+    }
+
+    private Attribute GetColor (Attribute inputAttribute)
+    {
+        Attribute attr = inputAttribute;
+        if (Diagnostics.HasFlag (ViewDiagnosticFlags.Hover) && _hovering)
+        {
+            attr = new (attr.Foreground.GetDarkerColor (), attr.Background.GetDarkerColor ());
+        }
+
+        return attr;
     }
 
     /// <summary>Moves the drawing cursor to the specified <see cref="Viewport"/>-relative location in the view.</summary>
@@ -403,7 +456,7 @@ public partial class View // Drawing APIs
             return false;
         }
 
-        var screen = ViewportToScreen (new Point (col, row));
+        Point screen = ViewportToScreen (new Point (col, row));
         Driver?.Move (screen.X, screen.Y);
 
         return true;
@@ -442,12 +495,14 @@ public partial class View // Drawing APIs
     ///     </para>
     ///     <para>
     ///         The <see cref="Viewport"/> Location and Size indicate what part of the View's content, defined
-    ///         by <see cref="GetContentSize ()"/>, is visible and should be drawn. The coordinates taken by <see cref="Move"/> and
+    ///         by <see cref="GetContentSize ()"/>, is visible and should be drawn. The coordinates taken by <see cref="Move"/>
+    ///         and
     ///         <see cref="AddRune"/> are relative to <see cref="Viewport"/>, thus if <c>ViewPort.Location.Y</c> is <c>5</c>
     ///         the 6th row of the content should be drawn using <c>MoveTo (x, 5)</c>.
     ///     </para>
     ///     <para>
-    ///         If <see cref="GetContentSize ()"/> is larger than <c>ViewPort.Size</c> drawing code should use <see cref="Viewport"/>
+    ///         If <see cref="GetContentSize ()"/> is larger than <c>ViewPort.Size</c> drawing code should use
+    ///         <see cref="Viewport"/>
     ///         to constrain drawing for better performance.
     ///     </para>
     ///     <para>
@@ -467,14 +522,15 @@ public partial class View // Drawing APIs
     {
         if (NeedsDisplay)
         {
-            if (SuperView is { })
-            {
-                Clear ();
-            }
-
             if (!CanBeVisible (this))
             {
                 return;
+            }
+
+            // BUGBUG: this clears way too frequently. Need to optimize this.
+            if (SuperView is { } || Arrangement.HasFlag (ViewArrangement.Overlapped))
+            {
+                Clear ();
             }
 
             if (!string.IsNullOrEmpty (TextFormatter.Text))
@@ -492,7 +548,7 @@ public partial class View // Drawing APIs
             TextFormatter?.Draw (
                                  drawRect,
                                  HasFocus ? GetFocusColor () : GetNormalColor (),
-                                 HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
+                                 HasFocus ? GetHotFocusColor () : GetHotNormalColor (),
                                  Rectangle.Empty
                                 );
             SetSubViewNeedsDisplay ();
@@ -503,29 +559,26 @@ public partial class View // Drawing APIs
         // TODO: Implement OnDrawSubviews (cancelable);
         if (_subviews is { } && SubViewNeedsDisplay)
         {
-            IEnumerable<View> subviewsNeedingDraw;
-            if (TabStop == TabBehavior.TabGroup && _subviews.Count(v => v.Arrangement.HasFlag (ViewArrangement.Overlapped)) > 0)
-            {
-                // TODO: This is a temporary hack to make overlapped non-Toplevels have a zorder. See also View.SetFocus
-                subviewsNeedingDraw = _subviews.Where (
-                                                       view => view.Visible
-                                                               && (view.NeedsDisplay || view.SubViewNeedsDisplay || view.LayoutNeeded)
-                                                      ).Reverse ();
+            IEnumerable<View> subviewsNeedingDraw = _subviews.Where (
+                                                                     view => view.Visible
+                                                                             && (view.NeedsDisplay
+                                                                                 || view.SubViewNeedsDisplay
+                                                                                 || view.LayoutNeeded
+                                                                                 || view.Arrangement.HasFlag (ViewArrangement.Overlapped)
+                                                                    ));
 
-            }
-            else
-            {
-                subviewsNeedingDraw = _subviews.Where (
-                                                                         view => view.Visible
-                                                                                 && (view.NeedsDisplay || view.SubViewNeedsDisplay || view.LayoutNeeded)
-                                                                        );
-
-            }
             foreach (View view in subviewsNeedingDraw)
             {
                 if (view.LayoutNeeded)
                 {
                     view.LayoutSubviews ();
+                }
+
+                // TODO: This ensures overlapped views are drawn correctly. However, this is inefficient.
+                // TODO: The correct fix is to implement non-rectangular clip regions: https://github.com/gui-cs/Terminal.Gui/issues/3413
+                if (view.Arrangement.HasFlag (ViewArrangement.Overlapped))
+                {
+                    view.SetNeedsDisplay ();
                 }
 
                 view.Draw ();
@@ -564,7 +617,7 @@ public partial class View // Drawing APIs
                 // Get the entire map
                 if (p.Value is { })
                 {
-                    Driver.SetAttribute (p.Value.Value.Attribute ?? ColorScheme.Normal);
+                    Driver.SetAttribute (p.Value.Value.Attribute ?? ColorScheme!.Normal);
                     Driver.Move (p.Key.X, p.Key.Y);
 
                     // TODO: #2616 - Support combining sequences that don't normalize
@@ -589,7 +642,7 @@ public partial class View // Drawing APIs
                 // Get the entire map
                 if (p.Value is { })
                 {
-                    Driver.SetAttribute (p.Value.Value.Attribute ?? ColorScheme.Normal);
+                    Driver.SetAttribute (p.Value.Value.Attribute ?? ColorScheme!.Normal);
                     Driver.Move (p.Key.X, p.Key.Y);
 
                     // TODO: #2616 - Support combining sequences that don't normalize
@@ -608,10 +661,7 @@ public partial class View // Drawing APIs
     ///     If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), this method
     ///     does nothing.
     /// </remarks>
-    public void SetNeedsDisplay ()
-    {
-        SetNeedsDisplay (Viewport);
-    }
+    public void SetNeedsDisplay () { SetNeedsDisplay (Viewport); }
 
     /// <summary>Expands the area of this view needing to be redrawn to include <paramref name="region"/>.</summary>
     /// <remarks>
@@ -671,8 +721,6 @@ public partial class View // Drawing APIs
         if (SuperView is { SubViewNeedsDisplay: false })
         {
             SuperView.SetSubViewNeedsDisplay ();
-
-            return;
         }
     }
 

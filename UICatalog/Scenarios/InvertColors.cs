@@ -20,12 +20,12 @@ public class InvertColors : Scenario
         };
 
         List<Label> labels = new ();
-        ColorName [] foreColors = Enum.GetValues (typeof (ColorName)).Cast<ColorName> ().ToArray ();
+        ColorName16 [] foreColors = Enum.GetValues (typeof (ColorName16)).Cast<ColorName16> ().ToArray ();
 
         for (var y = 0; y < foreColors.Length; y++)
         {
-            ColorName fore = foreColors [y];
-            ColorName back = foreColors [(y + 1) % foreColors.Length];
+            ColorName16 fore = foreColors [y];
+            ColorName16 back = foreColors [(y + 1) % foreColors.Length];
             var color = new Attribute (fore, back);
 
             var label = new Label { ColorScheme = new ColorScheme (), Y = y, Text = $"{fore} on {back}" };
@@ -36,7 +36,7 @@ public class InvertColors : Scenario
 
         var button = new Button { X = Pos.Center (), Y = foreColors.Length + 1, Text = "Invert color!" };
 
-        button.Accept += (s, e) =>
+        button.Accepting += (s, e) =>
                           {
                               foreach (Label label in labels)
                               {

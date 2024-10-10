@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Xunit.Abstractions;
 using Xunit.Sdk;
+using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui;
 
@@ -41,13 +42,15 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     ///     <see cref="ConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
     /// </param>
     /// <param name="configLocation">Determines what config file locations <see cref="ConfigurationManager"/> will load from.</param>
+    /// <param name="verifyShutdown">If true and <see cref="Application.IsInitialized"/> is true, the test will fail.</param>
     public AutoInitShutdownAttribute (
         bool autoInit = true,
         Type consoleDriverType = null,
         bool useFakeClipboard = true,
         bool fakeClipboardAlwaysThrowsNotSupportedException = false,
         bool fakeClipboardIsSupportedAlwaysTrue = false,
-        ConfigurationManager.ConfigLocations configLocation = ConfigurationManager.ConfigLocations.DefaultOnly
+        ConfigLocations configLocation = ConfigLocations.None,
+        bool verifyShutdown = false
     )
     {
         AutoInit = autoInit;
@@ -58,9 +61,11 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         FakeDriver.FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException =
             fakeClipboardAlwaysThrowsNotSupportedException;
         FakeDriver.FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
-        ConfigurationManager.Locations = configLocation;
+        Locations = configLocation;
+        _verifyShutdown = verifyShutdown;
     }
 
+    private readonly bool _verifyShutdown;
     private readonly Type _driverType;
 
     public override void After (MethodInfo methodUnderTest)
@@ -72,26 +77,44 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
         if (AutoInit)
         {
-            // TODO: This Dispose call is here until all unit tests that don't correctly dispose Toplevel's they create are fixed.
-            Application.Top?.Dispose ();
-            Application.Shutdown ();
-#if DEBUG_IDISPOSABLE
-            if (Responder.Instances.Count == 0)
+            // try
             {
-                Assert.Empty (Responder.Instances);
-            }
-            else
-            {
-                Responder.Instances.Clear ();
-            }
-#endif
-            ConfigurationManager.Reset ();
+                if (!_verifyShutdown)
+                {
+                    Application.ResetState (ignoreDisposed: true);
+                }
 
-            if (CM.Locations != CM.ConfigLocations.None)
+                Application.Shutdown ();
+#if DEBUG_IDISPOSABLE
+                if (Responder.Instances.Count == 0)
+                {
+                    Assert.Empty (Responder.Instances);
+                }
+                else
+                {
+                    Responder.Instances.Clear ();
+                }
+#endif
+            }
+            //catch (Exception e)
+            //{
+            //    Assert.Fail ($"Application.Shutdown threw an exception after the test exited: {e}");
+            //}
+            //finally
             {
-                SetCurrentConfig (_savedValues);
+#if DEBUG_IDISPOSABLE
+                Responder.Instances.Clear ();
+                Application.ResetState (true);
+#endif
             }
         }
+
+        // Reset to defaults
+        Locations = ConfigLocations.DefaultOnly;
+        Reset();
+
+        // Enable subsequent tests that call Init to get all config files (the default).
+       //Locations = ConfigLocations.All;
     }
 
     public override void Before (MethodInfo methodUnderTest)
@@ -100,8 +123,6 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
         if (AutoInit)
         {
-            ConfigurationManager.Reset ();
-
 #if DEBUG_IDISPOSABLE
 
             // Clear out any lingering Responder instances from previous tests
@@ -115,79 +136,19 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
             }
 #endif
             Application.Init ((ConsoleDriver)Activator.CreateInstance (_driverType));
-
-            if (CM.Locations != CM.ConfigLocations.None)
-            {
-                _savedValues = GetCurrentConfig ();
-            }
         }
     }
 
     private bool AutoInit { get; }
-
-    private List<object> _savedValues;
-
-    private List<object> GetCurrentConfig ()
-    {
-        CM.Reset ();
-
-        List<object> savedValues =
-        [
-            Dialog.DefaultButtonAlignment,
-            Dialog.DefaultButtonAlignmentModes,
-            MessageBox.DefaultBorderStyle
-        ];
-        CM.Themes! ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue = Alignment.End;
-        CM.Themes! ["Default"] ["Dialog.DefaultButtonAlignmentModes"].PropertyValue = AlignmentModes.AddSpaceBetweenItems;
-        CM.Themes! ["Default"] ["MessageBox.DefaultBorderStyle"].PropertyValue = LineStyle.Double;
-        ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
-
-        return savedValues;
-    }
-
-    private void SetCurrentConfig (List<object> values)
-    {
-        CM.Reset ();
-        bool needApply = false;
-
-        foreach (object value in values)
-        {
-            switch (value)
-            {
-                case Alignment alignment:
-                    if ((Alignment)CM.Themes! ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue! != alignment)
-                    {
-                        needApply = true;
-                        CM.Themes! ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue = alignment;
-                    }
-
-                    break;
-                case AlignmentModes alignmentModes:
-                    if ((AlignmentModes)CM.Themes! ["Default"] ["Dialog.DefaultButtonAlignmentModes"].PropertyValue! != alignmentModes)
-                    {
-                        needApply = true;
-                        CM.Themes! ["Default"] ["Dialog.DefaultButtonAlignmentModes"].PropertyValue = alignmentModes;
-                    }
-
-                    break;
-                case LineStyle lineStyle:
-                    if ((LineStyle)CM.Themes! ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue! != lineStyle)
-                    {
-                        needApply = true;
-                        CM.Themes! ["Default"] ["MessageBox.DefaultBorderStyle"].PropertyValue = lineStyle;
-                    }
-
-                    break;
-            }
-        }
-
-        if (needApply)
-        {
-            ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
-        }
-    }
 }
 
+/// <summary>
+///     Enables test functions annotated with the [TestRespondersDisposed] attribute to ensure all Views are disposed.
+/// </summary>
+/// <remarks>
+///     On Before, sets Configuration.Locations to ConfigLocations.DefaultOnly.
+///     On After, sets Configuration.Locations to ConfigLocations.All.
+/// </remarks>
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
 public class TestRespondersDisposed : BeforeAfterTestAttribute
 {
@@ -206,6 +167,7 @@ public class TestRespondersDisposed : BeforeAfterTestAttribute
     public override void Before (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
+
         base.Before (methodUnderTest);
 #if DEBUG_IDISPOSABLE
 
@@ -217,15 +179,17 @@ public class TestRespondersDisposed : BeforeAfterTestAttribute
 }
 
 // TODO: Make this inherit from TestRespondersDisposed so that all tests that don't dispose Views correctly can be identified and fixed
+/// <summary>
+///     Enables test functions annotated with the [SetupFakeDriver] attribute to set Application.Driver to new
+///     FakeDriver(). The driver is set up with 25 rows and columns.
+/// </summary>
+/// <remarks>
+///     On Before, sets Configuration.Locations to ConfigLocations.DefaultOnly.
+///     On After, sets Configuration.Locations to ConfigLocations.All.
+/// </remarks>
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
 public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
 {
-    /// <summary>
-    ///     Enables test functions annotated with the [SetupFakeDriver] attribute to set Application.Driver to new
-    ///     FakeDriver(). The driver is setup with 25 rows and columns.
-    /// </summary>
-    public SetupFakeDriverAttribute () { }
-
     public override void After (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"After: {methodUnderTest.Name}");
@@ -240,10 +204,13 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
     public override void Before (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
-        Application.ResetState ();
+
+        Application.ResetState (true);
         Assert.Null (Application.Driver);
         Application.Driver = new FakeDriver { Rows = 25, Cols = 25 };
+
         base.Before (methodUnderTest);
+
     }
 }
 
@@ -750,11 +717,11 @@ internal partial class TestHelpers
         string replaced = toReplace;
 
         replaced = Environment.NewLine.Length switch
-                   {
-                       2 when !replaced.Contains ("\r\n") => replaced.Replace ("\n", Environment.NewLine),
-                       1 => replaced.Replace ("\r\n", Environment.NewLine),
-                       var _ => replaced
-                   };
+        {
+            2 when !replaced.Contains ("\r\n") => replaced.Replace ("\n", Environment.NewLine),
+            1 => replaced.Replace ("\r\n", Environment.NewLine),
+            var _ => replaced
+        };
 
         return replaced;
     }
@@ -768,7 +735,7 @@ public class TestsAllViews
     public static IEnumerable<object []> AllViewTypes =>
         typeof (View).Assembly
                      .GetTypes ()
-                     .Where (type => type.IsClass && !type.IsAbstract && type.IsPublic && type.IsSubclassOf (typeof (View)))
+                     .Where (type => type.IsClass && !type.IsAbstract && type.IsPublic && (type.IsSubclassOf (typeof (View)) || type == typeof(View)))
                      .Select (type => new object [] { type });
 
     public static View CreateInstanceIfNotGeneric (Type type)

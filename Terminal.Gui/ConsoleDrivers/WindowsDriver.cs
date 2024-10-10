@@ -54,6 +54,8 @@ internal class WindowsConsole
 
     public bool WriteToConsole (Size size, ExtendedCharInfo [] charInfoBuffer, Coord bufferSize, SmallRect window, bool force16Colors)
     {
+        //Debug.WriteLine ("WriteToConsole");
+
         if (_screenBuffer == nint.Zero)
         {
             ReadFromConsoleOutput (size, bufferSize, ref window);
@@ -72,7 +74,7 @@ internal class WindowsConsole
                 {
                     Char = new CharUnion { UnicodeChar = info.Char },
                     Attributes =
-                        (ushort)((int)info.Attribute.Foreground.GetClosestNamedColor () | ((int)info.Attribute.Background.GetClosestNamedColor () << 4))
+                        (ushort)((int)info.Attribute.Foreground.GetClosestNamedColor16 () | ((int)info.Attribute.Background.GetClosestNamedColor16 () << 4))
                 };
             }
 

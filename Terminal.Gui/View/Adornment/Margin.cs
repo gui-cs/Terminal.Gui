@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui;
 
-/// <summary>The Margin for a <see cref="View"/>.</summary>
+/// <summary>The Margin for a <see cref="View"/>. Accessed via <see cref="View.Margin"/></summary>
 /// <remarks>
 ///     <para>See the <see cref="Adornment"/> class.</para>
 /// </remarks>
@@ -18,7 +18,8 @@ public class Margin : Adornment
     {
         /* Do nothing; View.CreateAdornment requires a constructor that takes a parent */
 
-        HighlightStyle |= HighlightStyle.Pressed;
+        // BUGBUG: We should not set HighlightStyle.Pressed here, but wherever it is actually needed
+       // HighlightStyle |= HighlightStyle.Pressed;
         Highlight += Margin_Highlight;
         LayoutStarted += Margin_LayoutStarted;
 
@@ -69,7 +70,7 @@ public class Margin : Adornment
     ///     The color scheme for the Margin. If set to <see langword="null"/>, gets the <see cref="Adornment.Parent"/>'s
     ///     <see cref="View.SuperView"/> scheme. color scheme.
     /// </summary>
-    public override ColorScheme ColorScheme
+    public override ColorScheme? ColorScheme
     {
         get
         {
@@ -90,17 +91,22 @@ public class Margin : Adornment
     /// <inheritdoc/>
     public override void OnDrawContent (Rectangle viewport)
     {
+        if (!NeedsDisplay)
+        {
+            return;
+        }
+
         Rectangle screen = ViewportToScreen (viewport);
         Attribute normalAttr = GetNormalColor ();
 
         Driver?.SetAttribute (normalAttr);
 
-        // This just draws/clears the thickness, not the insides.
         if (ShadowStyle != ShadowStyle.None)
         {
             screen = Rectangle.Inflate (screen, -1, -1);
         }
 
+        // This just draws/clears the thickness, not the insides.
         Thickness.Draw (screen, ToString ());
 
         if (Subviews.Count > 0)
@@ -170,6 +176,9 @@ public class Margin : Adornment
         set => base.ShadowStyle = SetShadow (value);
     }
 
+    private const int PRESS_MOVE_HORIZONTAL = 1;
+    private const int PRESS_MOVE_VERTICAL = 0;
+
     private void Margin_Highlight (object? sender, CancelEventArgs<HighlightStyle> e)
     {
         if (ShadowStyle != ShadowStyle.None)
@@ -179,7 +188,7 @@ public class Margin : Adornment
                 // If the view is pressed and the highlight is being removed, move the shadow back.
                 // Note, for visual effects reasons, we only move horizontally.
                 // TODO: Add a setting or flag that lets the view move vertically as well.
-                Thickness = new (Thickness.Left - 1, Thickness.Top, Thickness.Right + 1, Thickness.Bottom);
+                Thickness = new (Thickness.Left - PRESS_MOVE_HORIZONTAL, Thickness.Top - PRESS_MOVE_VERTICAL, Thickness.Right + PRESS_MOVE_HORIZONTAL, Thickness.Bottom + PRESS_MOVE_VERTICAL);
 
                 if (_rightShadow is { })
                 {
@@ -201,7 +210,7 @@ public class Margin : Adornment
                 // If the view is not pressed and we want highlight move the shadow
                 // Note, for visual effects reasons, we only move horizontally.
                 // TODO: Add a setting or flag that lets the view move vertically as well.
-                Thickness = new (Thickness.Left + 1, Thickness.Top, Thickness.Right - 1, Thickness.Bottom);
+                Thickness = new (Thickness.Left + PRESS_MOVE_HORIZONTAL, Thickness.Top+ PRESS_MOVE_VERTICAL, Thickness.Right - PRESS_MOVE_HORIZONTAL, Thickness.Bottom - PRESS_MOVE_VERTICAL);
                 _pressed = true;
 
                 if (_rightShadow is { })

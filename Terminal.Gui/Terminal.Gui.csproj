@@ -141,4 +141,5 @@
     <EnableSourceLink>true</EnableSourceLink>
     <Authors>Miguel de Icaza, Tig Kindel (@tig), @BDisp</Authors>
   </PropertyGroup>
+  <ProjectExtensions><VisualStudio><UserProperties resources_4config_1json__JsonSchema="../../docfx/schemas/tui-config-schema.json" /></VisualStudio></ProjectExtensions>
 </Project>

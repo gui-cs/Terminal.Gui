@@ -93,7 +93,7 @@ public class ExampleWindow : Window
         };
 
         // When login button is clicked display a message popup
-        btnLogin.Accept += (s, e) =>
+        btnLogin.Accepting += (s, e) =>
         {
             if (userNameText.Text == "admin" && passwordText.Text == "password")
             {

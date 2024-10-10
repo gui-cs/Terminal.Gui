@@ -54,7 +54,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
     public void CellEventsBackgroundFill ()
     {
         var tv = new TableView { Width = 20, Height = 4 };
@@ -105,6 +105,7 @@ public class TableViewTests (ITestOutputHelper output)
             style.ColorGetter = e => { return scheme; };
         }
 
+        tv.SetNeedsDisplay ();
         tv.Draw ();
 
         expected =
@@ -411,7 +412,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
     public void LongColumnTest ()
     {
         var tableView = new TableView ();
@@ -461,6 +462,7 @@ public class TableViewTests (ITestOutputHelper output)
         style.MaxWidth = 10;
 
         tableView.LayoutSubviews ();
+        tableView.SetNeedsDisplay ();
         tableView.Draw ();
 
         expected =
@@ -481,6 +483,7 @@ public class TableViewTests (ITestOutputHelper output)
         style.RepresentationGetter = s => { return s.ToString ().Length < 15 ? s.ToString () : s.ToString ().Substring (0, 13) + "..."; };
 
         tableView.LayoutSubviews ();
+        tableView.SetNeedsDisplay ();
         tableView.Draw ();
 
         expected =
@@ -508,6 +511,7 @@ public class TableViewTests (ITestOutputHelper output)
         style.MinAcceptableWidth = 5;
 
         tableView.LayoutSubviews ();
+        tableView.SetNeedsDisplay ();
         tableView.Draw ();
 
         expected =
@@ -581,6 +585,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.MinCellWidth = 10;
 
         tableView.LayoutSubviews ();
+        tableView.SetNeedsDisplay ();
         tableView.Draw ();
 
         expected =
@@ -597,7 +602,7 @@ public class TableViewTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
     [Fact]
     public void PageDown_ExcludesHeaders ()
     {
@@ -995,7 +1000,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
     public void TableView_Activate ()
     {
         string activatedValue = null;
@@ -1035,7 +1040,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
     [InlineData (false)]
     [InlineData (true)]
     public void TableView_ColorsTest_ColorGetter (bool focused)
@@ -1101,6 +1106,7 @@ public class TableViewTests (ITestOutputHelper output)
         // the value 2)
         dt.Rows [0] [1] = 5;
 
+        tv.SetNeedsDisplay ();
         tv.Draw ();
 
         expected = @"
@@ -1132,7 +1138,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
     [InlineData (false)]
     [InlineData (true)]
     public void TableView_ColorsTest_RowColorGetter (bool focused)
@@ -1193,6 +1199,7 @@ public class TableViewTests (ITestOutputHelper output)
         // the value 2)
         dt.Rows [0] [1] = 5;
 
+        tv.SetNeedsDisplay ();
         tv.Draw ();
 
         expected = @"
@@ -1223,7 +1230,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
     [InlineData (false)]
     [InlineData (true)]
     public void TableView_ColorTests_FocusedOrNot (bool focused)
@@ -1559,7 +1566,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
     public void Test_CollectionNavigator ()
     {
         var tv = new TableView ();
@@ -1972,7 +1979,9 @@ public class TableViewTests (ITestOutputHelper output)
 │B│C│D│
 ◄─┼─┼─┤
 │2│3│4│";
+        tableView.SetNeedsDisplay ();
         tableView.Draw ();
+
         TestHelpers.AssertDriverContentsAre (expected, output);
 
         // now also A is invisible so we cannot scroll in either direction
@@ -1983,7 +1992,9 @@ public class TableViewTests (ITestOutputHelper output)
 │B│C│D│
 ├─┼─┼─┤
 │2│3│4│";
+        tableView.SetNeedsDisplay ();
         tableView.Draw ();
+
         TestHelpers.AssertDriverContentsAre (expected, output);
     }
 
@@ -1996,6 +2007,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.Style.ShowHorizontalScrollIndicators = true;
         tableView.Style.ShowHorizontalHeaderUnderline = true;
         tableView.LayoutSubviews ();
+        tableView.SetNeedsDisplay ();
         tableView.Draw ();
 
         // normally we should have scroll indicators because DEF are of screen
@@ -2017,6 +2029,7 @@ public class TableViewTests (ITestOutputHelper output)
 │A│B│C│
 ├─┼─┼─┤
 │1│2│3│";
+        tableView.SetNeedsDisplay ();
         tableView.Draw ();
         TestHelpers.AssertDriverContentsAre (expected, output);
     }
@@ -2555,6 +2568,7 @@ A B C
     [SetupFakeDriver]
     public void TestTableViewCheckboxes_ByObject ()
     {
+        Assert.Equal(ConfigurationManager.ConfigLocations.DefaultOnly, ConfigurationManager.Locations);
         TableView tv = GetPetTable (out EnumerableTableSource<PickablePet> source);
         tv.LayoutSubviews ();
         IReadOnlyCollection<PickablePet> pets = source.Data;
@@ -3202,19 +3216,19 @@ A B C
 
         // Pressing left should move us to the first column without changing focus
         Application.OnKeyDown (Key.CursorLeft);
-        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.Same (tableView, Application.Top!.MostFocused);
         Assert.True (tableView.HasFocus);
 
         // Because we are now on the leftmost cell a further left press should move focus
         Application.OnKeyDown (Key.CursorLeft);
 
-        Assert.NotSame (tableView, Application.Current.MostFocused);
+        Assert.NotSame (tableView, Application.Top.MostFocused);
         Assert.False (tableView.HasFocus);
 
-        Assert.Same (tf1, Application.Current.MostFocused);
+        Assert.Same (tf1, Application.Top.MostFocused);
         Assert.True (tf1.HasFocus);
 
-        Application.Current.Dispose ();
+        Application.Top.Dispose ();
     }
 
     [Fact]
@@ -3227,19 +3241,19 @@ A B C
 
         // First press should move us up
         Application.OnKeyDown (Key.CursorUp);
-        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.Same (tableView, Application.Top!.MostFocused);
         Assert.True (tableView.HasFocus);
 
         // Because we are now on the top row a further press should move focus
         Application.OnKeyDown (Key.CursorUp);
 
-        Assert.NotSame (tableView, Application.Current.MostFocused);
+        Assert.NotSame (tableView, Application.Top.MostFocused);
         Assert.False (tableView.HasFocus);
 
-        Assert.Same (tf1, Application.Current.MostFocused);
+        Assert.Same (tf1, Application.Top.MostFocused);
         Assert.True (tf1.HasFocus);
 
-        Application.Current.Dispose ();
+        Application.Top.Dispose ();
     }
     [Fact]
     public void CanTabOutOfTableViewUsingCursor_Right ()
@@ -3251,19 +3265,19 @@ A B C
 
         // First press should move us to the rightmost column without changing focus
         Application.OnKeyDown (Key.CursorRight);
-        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.Same (tableView, Application.Top!.MostFocused);
         Assert.True (tableView.HasFocus);
 
         // Because we are now on the rightmost cell, a further right press should move focus
         Application.OnKeyDown (Key.CursorRight);
 
-        Assert.NotSame (tableView, Application.Current.MostFocused);
+        Assert.NotSame (tableView, Application.Top.MostFocused);
         Assert.False (tableView.HasFocus);
 
-        Assert.Same (tf2, Application.Current.MostFocused);
+        Assert.Same (tf2, Application.Top.MostFocused);
         Assert.True (tf2.HasFocus);
 
-        Application.Current.Dispose ();
+        Application.Top.Dispose ();
     }
 
     [Fact]
@@ -3276,19 +3290,19 @@ A B C
 
         // First press should move us to the bottommost row without changing focus
         Application.OnKeyDown (Key.CursorDown);
-        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.Same (tableView, Application.Top!.MostFocused);
         Assert.True (tableView.HasFocus);
 
         // Because we are now on the bottommost cell, a further down press should move focus
         Application.OnKeyDown (Key.CursorDown);
 
-        Assert.NotSame (tableView, Application.Current.MostFocused);
+        Assert.NotSame (tableView, Application.Top.MostFocused);
         Assert.False (tableView.HasFocus);
 
-        Assert.Same (tf2, Application.Current.MostFocused);
+        Assert.Same (tf2, Application.Top.MostFocused);
         Assert.True (tf2.HasFocus);
 
-        Application.Current.Dispose ();
+        Application.Top.Dispose ();
     }
 
 
@@ -3302,7 +3316,7 @@ A B C
 
         // Pressing shift-left should give us a multi selection
         Application.OnKeyDown (Key.CursorLeft.WithShift);
-        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.Same (tableView, Application.Top!.MostFocused);
         Assert.True (tableView.HasFocus);
         Assert.Equal (2, tableView.GetAllSelectedCells ().Count ());
 
@@ -3313,19 +3327,19 @@ A B C
 
         // Selection 'clears' just to the single cell and we remain focused
         Assert.Single (tableView.GetAllSelectedCells ());
-        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.Same (tableView, Application.Top.MostFocused);
         Assert.True (tableView.HasFocus);
 
         // A further left will switch focus
         Application.OnKeyDown (Key.CursorLeft);
 
-        Assert.NotSame (tableView, Application.Current.MostFocused);
+        Assert.NotSame (tableView, Application.Top.MostFocused);
         Assert.False (tableView.HasFocus);
 
-        Assert.Same (tf1, Application.Current.MostFocused);
+        Assert.Same (tf1, Application.Top.MostFocused);
         Assert.True (tf1.HasFocus);
 
-        Application.Current.Dispose ();
+        Application.Top.Dispose ();
     }
 
     /// <summary>
@@ -3343,16 +3357,16 @@ A B C
         tableView.EndInit ();
 
         Application.Navigation = new ();
-        Application.Current = new ();
+        Application.Top = new ();
         tf1 = new TextField ();
         tf2 = new TextField ();
-        Application.Current.Add (tf1);
-        Application.Current.Add (tableView);
-        Application.Current.Add (tf2);
+        Application.Top.Add (tf1);
+        Application.Top.Add (tableView);
+        Application.Top.Add (tf2);
 
         tableView.SetFocus ();
 
-        Assert.Same (tableView, Application.Current.MostFocused);
+        Assert.Same (tableView, Application.Top.MostFocused);
         Assert.True (tableView.HasFocus);
 
 

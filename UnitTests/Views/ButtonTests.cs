@@ -52,6 +52,9 @@ public class ButtonTests (ITestOutputHelper output)
     [InlineData ("0_12你", 10, 1, 10, 1)]
     public void Button_AbsoluteSize_Text (string text, int width, int height, int expectedWidth, int expectedHeight)
     {
+        // Override CM
+        Button.DefaultShadow = ShadowStyle.None;
+
         var btn1 = new Button
         {
             Text = text,
@@ -76,6 +79,9 @@ public class ButtonTests (ITestOutputHelper output)
     [InlineData (10, 3, 10, 3)]
     public void Button_AbsoluteSize_DefaultText (int width, int height, int expectedWidth, int expectedHeight)
     {
+        // Override CM
+        Button.DefaultShadow = ShadowStyle.None;
+
         var btn1 = new Button ();
         btn1.Width = width;
         btn1.Height = height;
@@ -143,6 +149,9 @@ public class ButtonTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void Constructors_Defaults ()
     {
+        // Override CM
+        Button.DefaultShadow = ShadowStyle.None;
+
         var btn = new Button ();
         Assert.Equal (string.Empty, btn.Text);
         btn.BeginInit ();
@@ -240,19 +249,19 @@ public class ButtonTests (ITestOutputHelper output)
     {
         var clicked = false;
         var btn = new Button { Text = "_Test" };
-        btn.Accept += (s, e) => clicked = true;
+        btn.Accepting += (s, e) => clicked = true;
 
         Assert.Equal (KeyCode.T, btn.HotKey);
-        Assert.True (btn.NewKeyDownEvent (Key.T));
+        Assert.False (btn.NewKeyDownEvent (Key.T)); // Button processes, but does not handle
         Assert.True (clicked);
 
         clicked = false;
-        Assert.True (btn.NewKeyDownEvent (Key.T.WithAlt));
+        Assert.False (btn.NewKeyDownEvent (Key.T.WithAlt)); // Button processes, but does not handle
         Assert.True (clicked);
 
         clicked = false;
         btn.HotKey = KeyCode.E;
-        Assert.True (btn.NewKeyDownEvent (Key.E.WithAlt));
+        Assert.False (btn.NewKeyDownEvent (Key.E.WithAlt)); // Button processes, but does not handle
         Assert.True (clicked);
     }
 
@@ -271,7 +280,7 @@ public class ButtonTests (ITestOutputHelper output)
         button.CanFocus = focused;
 
         int acceptInvoked = 0;
-        button.Accept += (s, e) => acceptInvoked++;
+        button.Accepting += (s, e) => acceptInvoked++;
 
         superView.Add (button);
         button.SetFocus ();
@@ -299,7 +308,7 @@ public class ButtonTests (ITestOutputHelper output)
         button.CanFocus = focused;
 
         int acceptInvoked = 0;
-        button.Accept += (s, e) => acceptInvoked++;
+        button.Accepting += (s, e) => acceptInvoked++;
 
         superView.Add (button);
         button.SetFocus ();
@@ -330,7 +339,7 @@ public class ButtonTests (ITestOutputHelper output)
         button.CanFocus = focused;
 
         int acceptInvoked = 0;
-        button.Accept += (s, e) => acceptInvoked++;
+        button.Accepting += (s, e) => acceptInvoked++;
 
         superView.Add (button);
         button.SetFocus ();
@@ -354,7 +363,7 @@ public class ButtonTests (ITestOutputHelper output)
         var pressed = 0;
         var btn = new Button { Text = "Press Me" };
 
-        btn.Accept += (s, e) => pressed++;
+        btn.Accepting += (s, e) => pressed++;
 
         // The Button class supports the Default and Accept command
         Assert.Contains (Command.HotKey, btn.GetSupportedCommands ());
@@ -405,63 +414,63 @@ public class ButtonTests (ITestOutputHelper output)
     {
         var clicked = false;
         var btn = new Button { Text = "_Test" };
-        btn.Accept += (s, e) => clicked = true;
+        btn.Accepting += (s, e) => clicked = true;
         var top = new Toplevel ();
         top.Add (btn);
         Application.Begin (top);
 
         // Hot key. Both alone and with alt
         Assert.Equal (KeyCode.T, btn.HotKey);
-        Assert.True (btn.NewKeyDownEvent (Key.T));
+        Assert.False (btn.NewKeyDownEvent (Key.T)); // Button processes, but does not handle
         Assert.True (clicked);
         clicked = false;
 
-        Assert.True (btn.NewKeyDownEvent (Key.T.WithAlt));
+        Assert.False (btn.NewKeyDownEvent (Key.T.WithAlt));
         Assert.True (clicked);
         clicked = false;
 
-        Assert.True (btn.NewKeyDownEvent (btn.HotKey));
+        Assert.False (btn.NewKeyDownEvent (btn.HotKey));
         Assert.True (clicked);
         clicked = false;
-        Assert.True (btn.NewKeyDownEvent (btn.HotKey));
+        Assert.False (btn.NewKeyDownEvent (btn.HotKey));
         Assert.True (clicked);
         clicked = false;
 
         // IsDefault = false
         // Space and Enter should work
         Assert.False (btn.IsDefault);
-        Assert.True (btn.NewKeyDownEvent (Key.Enter));
+        Assert.False (btn.NewKeyDownEvent (Key.Enter));
         Assert.True (clicked);
         clicked = false;
 
         // IsDefault = true
         // Space and Enter should work
         btn.IsDefault = true;
-        Assert.True (btn.NewKeyDownEvent (Key.Enter));
+        Assert.False (btn.NewKeyDownEvent (Key.Enter));
         Assert.True (clicked);
         clicked = false;
 
         // Toplevel does not handle Enter, so it should get passed on to button
-        Assert.True (Application.Top.NewKeyDownEvent (Key.Enter));
+        Assert.False (Application.Top.NewKeyDownEvent (Key.Enter));
         Assert.True (clicked);
         clicked = false;
 
         // Direct
-        Assert.True (btn.NewKeyDownEvent (Key.Enter));
+        Assert.False (btn.NewKeyDownEvent (Key.Enter));
         Assert.True (clicked);
         clicked = false;
 
-        Assert.True (btn.NewKeyDownEvent (Key.Space));
+        Assert.False (btn.NewKeyDownEvent (Key.Space));
         Assert.True (clicked);
         clicked = false;
 
-        Assert.True (btn.NewKeyDownEvent (new ((KeyCode)'T')));
+        Assert.False (btn.NewKeyDownEvent (new ((KeyCode)'T')));
         Assert.True (clicked);
         clicked = false;
 
         // Change hotkey:
         btn.Text = "Te_st";
-        Assert.True (btn.NewKeyDownEvent (btn.HotKey));
+        Assert.False (btn.NewKeyDownEvent (btn.HotKey));
         Assert.True (clicked);
         clicked = false;
 
@@ -474,7 +483,7 @@ public class ButtonTests (ITestOutputHelper output)
         var button = new Button ();
         var accepted = false;
 
-        button.Accept += ButtonOnAccept;
+        button.Accepting += ButtonOnAccept;
         button.InvokeCommand (Command.HotKey);
 
         Assert.True (accepted);
@@ -482,7 +491,7 @@ public class ButtonTests (ITestOutputHelper output)
 
         return;
 
-        void ButtonOnAccept (object sender, HandledEventArgs e) { accepted = true; }
+        void ButtonOnAccept (object sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -491,7 +500,7 @@ public class ButtonTests (ITestOutputHelper output)
         var button = new Button ();
         var acceptInvoked = false;
 
-        button.Accept += ButtonAccept;
+        button.Accepting += ButtonAccept;
 
         bool? ret = button.InvokeCommand (Command.Accept);
         Assert.True (ret);
@@ -501,10 +510,10 @@ public class ButtonTests (ITestOutputHelper output)
 
         return;
 
-        void ButtonAccept (object sender, HandledEventArgs e)
+        void ButtonAccept (object sender, CommandEventArgs e)
         {
             acceptInvoked = true;
-            e.Handled = true;
+            e.Cancel = true;
         }
     }
 
@@ -550,42 +559,9 @@ public class ButtonTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
-    public void Update_Only_On_Or_After_Initialize ()
-    {
-        var btn = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
-        var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
-        win.Add (btn);
-        var top = new Toplevel ();
-        top.Add (win);
-
-        Assert.False (btn.IsInitialized);
-
-        Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
-
-        Assert.True (btn.IsInitialized);
-        Assert.Equal ("Say Hello 你", btn.Text);
-        Assert.Equal ($"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
-        Assert.Equal (new (0, 0, 16, 1), btn.Viewport);
-        var btnTxt = $"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}";
-
-        var expected = @$"
-┌────────────────────────────┐
-│                            │
-│      {btnTxt}      │
-│                            │
-└────────────────────────────┘
-";
-
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-        Assert.Equal (new (0, 0, 30, 5), pos);
-        top.Dispose ();
-    }
-
-    [Fact]
-    [AutoInitShutdown]
     public void Update_Parameterless_Only_On_Or_After_Initialize ()
     {
+        Button.DefaultShadow = ShadowStyle.None;
         var btn = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (btn);
@@ -632,21 +608,33 @@ public class ButtonTests (ITestOutputHelper output)
             WantContinuousButtonPressed = true
         };
 
-        var acceptCount = 0;
+        var selectingCount = 0;
 
-        button.Accept += (s, e) => acceptCount++;
+        button.Selecting += (s, e) => selectingCount++;
+        var acceptedCount = 0;
+        button.Accepting += (s, e) =>
+                           {
+                               acceptedCount++;
+                               e.Cancel = true;
+                           };
 
+        me = new MouseEvent ();
         me.Flags = pressed;
         button.NewMouseEvent (me);
-        Assert.Equal (1, acceptCount);
+        Assert.Equal (0, selectingCount);
+        Assert.Equal (0, acceptedCount);
 
+        me = new MouseEvent ();
         me.Flags = released;
         button.NewMouseEvent (me);
-        Assert.Equal (1, acceptCount);
+        Assert.Equal (0, selectingCount);
+        Assert.Equal (0, acceptedCount);
 
+        me = new MouseEvent ();
         me.Flags = clicked;
         button.NewMouseEvent (me);
-        Assert.Equal (1, acceptCount);
+        Assert.Equal (1, selectingCount);
+        Assert.Equal (1, acceptedCount);
 
         button.Dispose ();
     }
@@ -656,7 +644,7 @@ public class ButtonTests (ITestOutputHelper output)
     [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released)]
     [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released)]
     [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released)]
-    public void WantContinuousButtonPressed_True_ButtonPressRelease_Accepts (MouseFlags pressed, MouseFlags released)
+    public void WantContinuousButtonPressed_True_ButtonPressRelease_Does_Not_Raise_Selected_Or_Accepted (MouseFlags pressed, MouseFlags released)
     {
         var me = new MouseEvent ();
 
@@ -667,17 +655,31 @@ public class ButtonTests (ITestOutputHelper output)
             WantContinuousButtonPressed = true
         };
 
-        var acceptCount = 0;
+        var acceptedCount = 0;
 
-        button.Accept += (s, e) => acceptCount++;
+        button.Accepting += (s, e) =>
+                           {
+                               acceptedCount++;
+                               e.Cancel = true;
+                           };
+
+        var selectingCount = 0;
+
+        button.Selecting += (s, e) =>
+                           {
+                               selectingCount++;
+                               e.Cancel = true;
+                           };
 
         me.Flags = pressed;
         button.NewMouseEvent (me);
-        Assert.Equal (1, acceptCount);
+        Assert.Equal (0, acceptedCount);
+        Assert.Equal (0, selectingCount);
 
         me.Flags = released;
         button.NewMouseEvent (me);
-        Assert.Equal (1, acceptCount);
+        Assert.Equal (0, acceptedCount);
+        Assert.Equal (0, selectingCount);
 
         button.Dispose ();
     }

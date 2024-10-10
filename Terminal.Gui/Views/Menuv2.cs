@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Reflection;
 
 namespace Terminal.Gui;
@@ -16,13 +17,30 @@ public class Menuv2 : Bar
         Orientation = Orientation.Vertical;
         Width = Dim.Auto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
-        ColorScheme = Colors.ColorSchemes ["Menu"];
         Initialized += Menuv2_Initialized;
+        VisibleChanged += OnVisibleChanged;
+    }
+
+    private void OnVisibleChanged (object sender, EventArgs e)
+    {
+        if (Visible)
+        {
+            //Application.GrabMouse(this);
+        }
+        else
+        {
+            if (Application.MouseGrabView == this)
+            {
+                //Application.UngrabMouse ();
+            }
+        }
     }
 
     private void Menuv2_Initialized (object sender, EventArgs e)
     {
         Border.Thickness = new Thickness (1, 1, 1, 1);
+        Border.LineStyle = LineStyle.Single;
+        ColorScheme = Colors.ColorSchemes ["Menu"];
     }
 
     // Menuv2 arranges the items horizontally.
@@ -51,12 +69,30 @@ public class Menuv2 : Bar
         if (view is Shortcut shortcut)
         {
             shortcut.CanFocus = true;
-            shortcut.KeyBindingScope = KeyBindingScope.Application;
             shortcut.Orientation = Orientation.Vertical;
+            shortcut.HighlightStyle |= HighlightStyle.Hover;
 
             // TODO: not happy about using AlignmentModes for this. Too implied.
             // TODO: instead, add a property (a style enum?) to Shortcut to control this
             //shortcut.AlignmentModes = AlignmentModes.EndToStart;
+
+            shortcut.Accepting += ShortcutOnAccept;
+
+            void ShortcutOnAccept (object sender, CommandEventArgs e)
+            {
+                if (Arrangement.HasFlag (ViewArrangement.Overlapped) && Visible)
+                {
+                    Visible = false;
+                    e.Cancel = true;
+
+                    return;
+                }
+
+                //if (!e.Handled)
+                //{
+                //    RaiseAcceptEvent ();
+                //}
+            }
         }
 
         return view;

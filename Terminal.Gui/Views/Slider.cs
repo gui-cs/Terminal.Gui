@@ -848,7 +848,7 @@ public class Slider<T> : View, IOrientation
 
         if (IsInitialized)
         {
-            normalAttr = ColorScheme?.Normal ?? Application.Current.ColorScheme.Normal;
+            normalAttr = ColorScheme?.Normal ?? Application.Top.ColorScheme.Normal;
             setAttr = Style.SetChar.Attribute ?? ColorScheme!.HotNormal;
         }
 
@@ -1380,6 +1380,8 @@ public class Slider<T> : View, IOrientation
             SetNeedsDisplay ();
 
             mouseEvent.Handled = true;
+
+            // BUGBUG: OnMouseClick is/should be internal. 
             return OnMouseClick (new (mouseEvent));
         }
 
@@ -1413,15 +1415,15 @@ public class Slider<T> : View, IOrientation
     private void SetCommands ()
     {
         AddCommand (Command.Right, () => MovePlus ());
-        AddCommand (Command.LineDown, () => MovePlus ());
+        AddCommand (Command.Down, () => MovePlus ());
         AddCommand (Command.Left, () => MoveMinus ());
-        AddCommand (Command.LineUp, () => MoveMinus ());
-        AddCommand (Command.LeftHome, () => MoveStart ());
+        AddCommand (Command.Up, () => MoveMinus ());
+        AddCommand (Command.LeftStart, () => MoveStart ());
         AddCommand (Command.RightEnd, () => MoveEnd ());
         AddCommand (Command.RightExtend, () => ExtendPlus ());
         AddCommand (Command.LeftExtend, () => ExtendMinus ());
         AddCommand (Command.Select, () => Select ());
-        AddCommand (Command.Accept, () => Accept ());
+        AddCommand (Command.Accept, (ctx) => Accept (ctx));
 
         SetKeyBindings ();
     }
@@ -1444,9 +1446,9 @@ public class Slider<T> : View, IOrientation
         else
         {
             KeyBindings.Remove (Key.CursorRight);
-            KeyBindings.Add (Key.CursorDown, Command.LineDown);
+            KeyBindings.Add (Key.CursorDown, Command.Down);
             KeyBindings.Remove (Key.CursorLeft);
-            KeyBindings.Add (Key.CursorUp, Command.LineUp);
+            KeyBindings.Add (Key.CursorUp, Command.Up);
 
             KeyBindings.Remove (Key.CursorRight.WithCtrl);
             KeyBindings.Add (Key.CursorDown.WithCtrl, Command.RightExtend);
@@ -1455,7 +1457,7 @@ public class Slider<T> : View, IOrientation
         }
 
         KeyBindings.Remove (Key.Home);
-        KeyBindings.Add (Key.Home, Command.LeftHome);
+        KeyBindings.Add (Key.Home, Command.LeftStart);
         KeyBindings.Remove (Key.End);
         KeyBindings.Add (Key.End, Command.RightEnd);
         KeyBindings.Remove (Key.Enter);
@@ -1466,8 +1468,41 @@ public class Slider<T> : View, IOrientation
 
     private Dictionary<int, SliderOption<T>> GetSetOptionDictionary () { return _setOptions.ToDictionary (e => e, e => _options [e]); }
 
-    private void SetFocusedOption ()
+    /// <summary>
+    /// Sets or unsets <paramref name="optionIndex"/> based on <paramref name="set"/>.
+    /// </summary>
+    /// <param name="optionIndex">The option to change.</param>
+    /// <param name="set">If <see langword="true"/>, sets the option. Unsets it otherwise.</param>
+    public void ChangeOption (int optionIndex, bool set)
     {
+        if (set)
+        {
+            if (!_setOptions.Contains (optionIndex))
+            {
+                _setOptions.Add (optionIndex);
+                _options [optionIndex].OnSet ();
+            }
+        }
+        else
+        {
+            if (_setOptions.Contains (optionIndex))
+            {
+                _setOptions.Remove (optionIndex);
+                _options [optionIndex].OnUnSet ();
+            }
+        }
+
+        // Raise slider changed event.
+        OnOptionsChanged ();
+    }
+
+    private bool SetFocusedOption ()
+    {
+        if (_options.Count == 0)
+        {
+            return false;
+        }
+        bool changed = false;
         switch (_config._type)
         {
             case SliderType.Single:
@@ -1500,6 +1535,7 @@ public class Slider<T> : View, IOrientation
 
                 // Raise slider changed event.
                 OnOptionsChanged ();
+                changed = true;
 
                 break;
             case SliderType.Multiple:
@@ -1520,6 +1556,7 @@ public class Slider<T> : View, IOrientation
                 }
 
                 OnOptionsChanged ();
+                changed = true;
 
                 break;
 
@@ -1653,11 +1690,14 @@ public class Slider<T> : View, IOrientation
 
                 // Raise Slider Option Changed Event.
                 OnOptionsChanged ();
+                changed = true;
 
                 break;
             default:
                 throw new ArgumentOutOfRangeException (_config._type.ToString ());
         }
+
+        return changed;
     }
 
     internal bool ExtendPlus ()
@@ -1742,16 +1782,14 @@ public class Slider<T> : View, IOrientation
 
     internal bool Select ()
     {
-        SetFocusedOption ();
-
-        return true;
+        return SetFocusedOption ();
     }
 
-    internal new bool Accept ()
+    internal bool Accept (CommandContext ctx)
     {
         SetFocusedOption ();
 
-        return OnAccept () == true;
+        return RaiseAccepting (ctx) == true;
     }
 
     internal bool MovePlus ()

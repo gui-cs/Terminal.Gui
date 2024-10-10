@@ -78,7 +78,7 @@ public class Sliders : Scenario
 
         var single = new Slider (singleOptions)
         {
-            Title = "Continuous",
+            Title = "_Continuous",
             X = 0,
             Y = prev == null ? 0 : Pos.Bottom (prev),
             Type = SliderType.Single,
@@ -106,14 +106,14 @@ public class Sliders : Scenario
 
         single.OptionsChanged += (s, e) =>
                                  {
-                                     single.Title = $"Continuous {e.Options.FirstOrDefault ().Key}";
+                                     single.Title = $"_Continuous {e.Options.FirstOrDefault ().Key}";
                                  };
 
         List<object> oneOption = new () { "The Only Option" };
 
         var one = new Slider (oneOption)
         {
-            Title = "One Option",
+            Title = "_One Option",
             X = 0,
             Y = prev == null ? 0 : Pos.Bottom (single),
             Type = SliderType.Single,
@@ -151,7 +151,7 @@ public class Sliders : Scenario
 
         var configView = new FrameView
         {
-            Title = "Configuration",
+            Title = "Confi_guration",
             X = Pos.Percent (50),
             Y = 0,
             Width = Dim.Fill (),
@@ -468,7 +468,7 @@ public class Sliders : Scenario
 
         List<SliderOption<(Color, Color)>> colorOptions = new ();
 
-        foreach (ColorName colorIndex in Enum.GetValues<ColorName> ())
+        foreach (ColorName16 colorIndex in Enum.GetValues<ColorName16> ())
         {
             var colorName = colorIndex.ToString ();
 
@@ -595,11 +595,11 @@ public class Sliders : Scenario
 
         foreach (Slider slider in app.Subviews.Where (v => v is Slider)!)
         {
-            slider.Accept += (o, args) =>
+            slider.Accepting += (o, args) =>
                              {
                                  eventSource.Add ($"Accept: {string.Join(",", slider.GetSetOptions ())}");
                                  eventLog.MoveDown ();
-                                 args.Handled = true;
+                                 args.Cancel = true;
                              };
             slider.OptionsChanged += (o, args) =>
                              {

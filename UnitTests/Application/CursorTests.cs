@@ -31,7 +31,10 @@ public class CursorTests
     [SetupFakeDriver]
     public void PositionCursor_No_Focus_Returns_False ()
     {
-        Assert.False (Application.PositionCursor (null));
+        Application.Navigation = new ();
+        Application.Navigation.SetFocused (null);
+
+        Assert.False (Application.PositionCursor ());
 
         TestView view = new ()
         {
@@ -40,13 +43,14 @@ public class CursorTests
             Height = 1,
         };
         view.TestLocation = new Point (0, 0);
-        Assert.False (Application.PositionCursor (view));
+        Assert.False (Application.PositionCursor ());
     }
 
     [Fact]
     [SetupFakeDriver]
     public void PositionCursor_No_Position_Returns_False ()
     {
+        Application.Navigation = new ();
         TestView view = new ()
         {
             CanFocus = false,
@@ -55,14 +59,15 @@ public class CursorTests
         };
 
         view.CanFocus = true;
-        view.SetFocus();
-        Assert.False (Application.PositionCursor (view));
+        view.SetFocus ();
+        Assert.False (Application.PositionCursor ());
     }
 
     [Fact]
     [SetupFakeDriver]
     public void PositionCursor_No_IntersectSuperView_Returns_False ()
     {
+        Application.Navigation = new ();
         View superView = new ()
         {
             Width = 1,
@@ -73,7 +78,7 @@ public class CursorTests
         {
             CanFocus = false,
             X = 1,
-            Y =1,
+            Y = 1,
             Width = 1,
             Height = 1,
         };
@@ -82,13 +87,14 @@ public class CursorTests
         view.CanFocus = true;
         view.SetFocus ();
         view.TestLocation = new Point (0, 0);
-        Assert.False (Application.PositionCursor (view));
+        Assert.False (Application.PositionCursor ());
     }
 
     [Fact]
     [SetupFakeDriver]
     public void PositionCursor_Position_OutSide_SuperView_Returns_False ()
     {
+        Application.Navigation = new ();
         View superView = new ()
         {
             Width = 1,
@@ -108,13 +114,14 @@ public class CursorTests
         view.CanFocus = true;
         view.SetFocus ();
         view.TestLocation = new Point (1, 1);
-        Assert.False (Application.PositionCursor (view));
+        Assert.False (Application.PositionCursor ());
     }
 
     [Fact]
     [SetupFakeDriver]
     public void PositionCursor_Focused_With_Position_Returns_True ()
     {
+        Application.Navigation = new ();
         TestView view = new ()
         {
             CanFocus = false,
@@ -124,23 +131,24 @@ public class CursorTests
         view.CanFocus = true;
         view.SetFocus ();
         view.TestLocation = new Point (0, 0);
-        Assert.True (Application.PositionCursor (view));
+        Assert.True (Application.PositionCursor ());
     }
 
     [Fact]
     [SetupFakeDriver]
     public void PositionCursor_Defaults_Invisible ()
     {
+        Application.Navigation = new ();
         View view = new ()
         {
             CanFocus = true,
             Width = 1,
             Height = 1,
         };
-        view.SetFocus();
+        view.SetFocus ();
 
         Assert.True (view.HasFocus);
-        Assert.False (Application.PositionCursor (view));
+        Assert.False (Application.PositionCursor ());
 
         if (Application.Driver?.GetCursorVisibility (out CursorVisibility cursor) ?? false)
         {

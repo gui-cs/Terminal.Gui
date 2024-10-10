@@ -1,5 +1,7 @@
 #nullable enable
 
+using System.Diagnostics;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -98,6 +100,6 @@ public class ApplicationNavigation
     /// </returns>
     public bool AdvanceFocus (NavigationDirection direction, TabBehavior? behavior)
     {
-        return Application.Current is { } && Application.Current.AdvanceFocus (direction, behavior);
+        return Application.Top is { } && Application.Top.AdvanceFocus (direction, behavior);
     }
 }

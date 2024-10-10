@@ -1,12 +1,9 @@
-﻿using System.ComponentModel;
-using System.Text.Json.Serialization;
-
-namespace Terminal.Gui;
+﻿namespace Terminal.Gui;
 
 public partial class View // Adornments
 {
     /// <summary>
-    ///    Initializes the Adornments of the View. Called by the constructor.
+    ///     Initializes the Adornments of the View. Called by the constructor.
     /// </summary>
     private void SetupAdornments ()
     {
@@ -49,6 +46,9 @@ public partial class View // Adornments
     /// </summary>
     /// <remarks>
     ///     <para>
+    ///         Enabling <see cref="ShadowStyle"/> will change the Thickness of the Margin to include the shadow.
+    ///     </para>
+    ///     <para>
     ///         The adornments (<see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>) are not part of the
     ///         View's content and are not clipped by the View's Clip Area.
     ///     </para>
@@ -61,8 +61,10 @@ public partial class View // Adornments
     public Margin Margin { get; private set; }
 
     private ShadowStyle _shadowStyle;
+
     /// <summary>
-    ///     Gets or sets whether the View is shown with a shadow effect. The shadow is drawn on the right and bottom sides of the
+    ///     Gets or sets whether the View is shown with a shadow effect. The shadow is drawn on the right and bottom sides of
+    ///     the
     ///     Margin.
     /// </summary>
     /// <remarks>
@@ -78,7 +80,9 @@ public partial class View // Adornments
             {
                 return;
             }
+
             _shadowStyle = value;
+
             if (Margin is { })
             {
                 Margin.ShadowStyle = value;
@@ -88,9 +92,15 @@ public partial class View // Adornments
 
     /// <summary>
     ///     The <see cref="Adornment"/> that offsets the <see cref="Viewport"/> from the <see cref="Margin"/>.
-    ///     The Border provides the space for a visual border (drawn using
-    ///     line-drawing glyphs) and the Title. The Border expands inward; in other words if `Border.Thickness.Top == 2` the
-    ///     border and title will take up the first row and the second row will be filled with spaces.
+    ///     <para>
+    ///         The Border provides the space for a visual border (drawn using
+    ///         line-drawing glyphs) and the Title. The Border expands inward; in other words if `Border.Thickness.Top == 2`
+    ///         the
+    ///         border and title will take up the first row and the second row will be filled with spaces.
+    ///     </para>
+    ///     <para>
+    ///         The Border provides the UI for mouse and keyboard arrangement of the View. See <see cref="Arrangement"/>.
+    ///     </para>
     /// </summary>
     /// <remarks>
     ///     <para><see cref="BorderStyle"/> provides a simple helper for turning a simple border frame on or off.</para>
@@ -124,15 +134,15 @@ public partial class View // Adornments
         get => Border?.LineStyle ?? LineStyle.Single;
         set
         {
-            var old = Border?.LineStyle ?? LineStyle.None;
+            LineStyle old = Border?.LineStyle ?? LineStyle.None;
             CancelEventArgs<LineStyle> e = new (ref old, ref value);
             OnBorderStyleChanging (e);
-
         }
     }
 
     /// <summary>
-    /// Called when the <see cref="BorderStyle"/> is changing. Invokes <see cref="BorderStyleChanging"/>, which allows the event to be cancelled.
+    ///     Called when the <see cref="BorderStyle"/> is changing. Invokes <see cref="BorderStyleChanging"/>, which allows the
+    ///     event to be cancelled.
     /// </summary>
     /// <remarks>
     ///     Override <see cref="SetBorderStyle"/> to prevent the <see cref="BorderStyle"/> from changing.
@@ -146,6 +156,7 @@ public partial class View // Adornments
         }
 
         BorderStyleChanging?.Invoke (this, e);
+
         if (e.Cancel)
         {
             return;
@@ -154,8 +165,6 @@ public partial class View // Adornments
         SetBorderStyle (e.NewValue);
         LayoutAdornments ();
         SetNeedsLayout ();
-
-        return;
     }
 
     /// <summary>
@@ -163,7 +172,8 @@ public partial class View // Adornments
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///          <see cref="BorderStyle"/> is a helper for manipulating the view's <see cref="Border"/>. Setting this property to any value other
+    ///         <see cref="BorderStyle"/> is a helper for manipulating the view's <see cref="Border"/>. Setting this property
+    ///         to any value other
     ///         than <see cref="LineStyle.None"/> is equivalent to setting <see cref="Border"/>'s
     ///         <see cref="Adornment.Thickness"/> to `1` and <see cref="BorderStyle"/> to the value.
     ///     </para>
@@ -218,9 +228,9 @@ public partial class View // Adornments
     ///     <para>Gets the thickness describing the sum of the Adornments' thicknesses.</para>
     /// </summary>
     /// <remarks>
-    /// <para>
-    ///     The <see cref="Viewport"/> is offset from the <see cref="Frame"/> by the thickness returned by this method.
-    /// </para>
+    ///     <para>
+    ///         The <see cref="Viewport"/> is offset from the <see cref="Frame"/> by the thickness returned by this method.
+    ///     </para>
     /// </remarks>
     /// <returns>A thickness that describes the sum of the Adornments' thicknesses.</returns>
     public Thickness GetAdornmentsThickness ()
@@ -229,6 +239,7 @@ public partial class View // Adornments
         {
             return Thickness.Empty;
         }
+
         return Margin.Thickness + Border.Thickness + Padding.Thickness;
     }
 
