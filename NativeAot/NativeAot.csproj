@@ -14,9 +14,9 @@
     <TrimmerRootAssembly Include="Terminal.Gui" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+  <!--<ItemGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 	  <ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" />
 	  <TrimmerRootAssembly Include="Terminal.Gui" />
-  </ItemGroup>
+  </ItemGroup>-->
 
 </Project>
