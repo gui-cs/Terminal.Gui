@@ -101,8 +101,8 @@ jobs:
     - name: Build SelfContained
       run: |
         cd SelfContained
-        dotnet remove package Terminal.Gui
-        dotnet add package Terminal.Gui --source LocalPackages
+        dotnet remove reference "..\Terminal.Gui\Terminal.Gui.csproj"
+        dotnet add package Terminal.Gui
 
     # Note: this step is currently not writing to the gist for some reason
     # - name: Create Test Coverage Badge
