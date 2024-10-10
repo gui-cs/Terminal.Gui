@@ -56,7 +56,7 @@ public class Threading : Scenario
                 };
 
         _btnActionCancel = new Button { X = 1, Y = 1, Text = "Cancelable Load Items" };
-        _btnActionCancel.Accept += (s, e) => Application.Invoke (CallLoadItemsAsync);
+        _btnActionCancel.Accepting += (s, e) => Application.Invoke (CallLoadItemsAsync);
 
         win.Add (new Label { X = Pos.X (_btnActionCancel), Y = Pos.Y (_btnActionCancel) + 4, Text = "Data Items:" });
 
@@ -84,24 +84,24 @@ public class Threading : Scenario
         var text = new TextField { X = 1, Y = 3, Width = 100, Text = "Type anything after press the button" };
 
         var btnAction = new Button { X = 80, Y = 10, Text = "Load Data Action" };
-        btnAction.Accept += (s, e) => _action.Invoke ();
+        btnAction.Accepting += (s, e) => _action.Invoke ();
         var btnLambda = new Button { X = 80, Y = 12, Text = "Load Data Lambda" };
-        btnLambda.Accept += (s, e) => _lambda.Invoke ();
+        btnLambda.Accepting += (s, e) => _lambda.Invoke ();
         var btnHandler = new Button { X = 80, Y = 14, Text = "Load Data Handler" };
-        btnHandler.Accept += (s, e) => _handler.Invoke (null, EventArgs.Empty);
+        btnHandler.Accepting += (s, e) => _handler.Invoke (null, EventArgs.Empty);
         var btnSync = new Button { X = 80, Y = 16, Text = "Load Data Synchronous" };
-        btnSync.Accept += (s, e) => _sync.Invoke ();
+        btnSync.Accepting += (s, e) => _sync.Invoke ();
         var btnMethod = new Button { X = 80, Y = 18, Text = "Load Data Method" };
-        btnMethod.Accept += async (s, e) => await MethodAsync ();
+        btnMethod.Accepting += async (s, e) => await MethodAsync ();
         var btnClearData = new Button { X = 80, Y = 20, Text = "Clear Data" };
 
-        btnClearData.Accept += (s, e) =>
+        btnClearData.Accepting += (s, e) =>
                                 {
                                     _itemsList.Source = null;
                                     LogJob ("Cleaning Data");
                                 };
         var btnQuit = new Button { X = 80, Y = 22, Text = "Quit" };
-        btnQuit.Accept += (s, e) => Application.RequestStop ();
+        btnQuit.Accepting += (s, e) => Application.RequestStop ();
 
         win.Add (
                  _itemsList,

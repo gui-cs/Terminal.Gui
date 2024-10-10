@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel;
 using Xunit.Abstractions;
 
+// ReSharper disable AccessToModifiedClosure
+
 namespace Terminal.Gui.ViewsTests;
 
 public class RadioGroupTests (ITestOutputHelper output)
@@ -50,12 +52,12 @@ public class RadioGroupTests (ITestOutputHelper output)
     public void Initialize_SelectedItem_With_Minus_One ()
     {
         var rg = new RadioGroup { RadioLabels = new [] { "Test" }, SelectedItem = -1 };
-        Application.Top = new Toplevel ();
+        Application.Top = new ();
         Application.Top.Add (rg);
         rg.SetFocus ();
 
         Assert.Equal (-1, rg.SelectedItem);
-        Assert.True (Application.OnKeyDown (Key.Space));
+        Application.OnKeyDown (Key.Space);
         Assert.Equal (0, rg.SelectedItem);
 
         Application.Top.Dispose ();
@@ -76,39 +78,293 @@ public class RadioGroupTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void KeyBindings_Command ()
+    public void Commands_HasFocus ()
     {
         Application.Navigation = new ();
         var rg = new RadioGroup { RadioLabels = new [] { "Test", "New Test" } };
-        Application.Top = new Toplevel ();
+        Application.Top = new ();
         Application.Top.Add (rg);
         rg.SetFocus ();
         Assert.Equal (Orientation.Vertical, rg.Orientation);
+
+        var selectedItemChangedCount = 0;
+        rg.SelectedItemChanged += (s, e) => selectedItemChangedCount++;
+
+        var selectingCount = 0;
+        rg.Selecting += (s, e) => selectingCount++;
+
+        var acceptedCount = 0;
+        rg.Accepting += (s, e) => acceptedCount++;
+
+        // By default the first item is selected
         Assert.Equal (0, rg.SelectedItem);
+        Assert.Equal (0, selectedItemChangedCount);
+        Assert.Equal (0, selectingCount);
+        Assert.Equal (0, acceptedCount);
+        Assert.Equal (Key.Empty, rg.HotKey);
+
+        // With HasFocus
+        // Test up/down without Select
         Assert.False (Application.OnKeyDown (Key.CursorUp)); // Should not change (should focus prev view if there was one, which there isn't)
         Assert.Equal (0, rg.SelectedItem);
+        Assert.Equal (0, rg.Cursor);
+        Assert.Equal (0, selectedItemChangedCount);
+        Assert.Equal (0, selectingCount);
+        Assert.Equal (0, acceptedCount);
+
         Assert.True (Application.OnKeyDown (Key.CursorDown));
+        Assert.Equal (0, rg.SelectedItem); // Cursor changed, but selection didnt
+        Assert.Equal (1, rg.Cursor);
+        Assert.Equal (0, selectedItemChangedCount);
+        Assert.Equal (0, selectingCount);
+        Assert.Equal (0, acceptedCount);
+
+        Assert.False (Application.OnKeyDown (Key.CursorDown)); // Should not change selection (should focus next view if there was one, which there isn't)
+        Assert.Equal (0, rg.SelectedItem);
+        Assert.Equal (1, rg.Cursor);
+        Assert.Equal (0, selectedItemChangedCount);
+        Assert.Equal (0, selectingCount);
+        Assert.Equal (0, acceptedCount);
+
+        // Test Select (Space) when Cursor != SelectedItem - Should select cursor
         Assert.True (Application.OnKeyDown (Key.Space));
         Assert.Equal (1, rg.SelectedItem);
-        Assert.False (Application.OnKeyDown (Key.CursorDown)); // Should not change (should focus prev view if there was one, which there isn't)
-        Assert.True (Application.OnKeyDown (Key.Space));
-        Assert.Equal (1, rg.SelectedItem);
-        Assert.True (Application.OnKeyDown (Key.Home));
+        Assert.Equal (1, rg.Cursor);
+        Assert.Equal (1, selectedItemChangedCount);
+        Assert.Equal (1, selectingCount);
+        Assert.Equal (0, acceptedCount);
+
+        // Test Select (Space) when Cursor == SelectedItem - Should cycle
         Assert.True (Application.OnKeyDown (Key.Space));
         Assert.Equal (0, rg.SelectedItem);
+        Assert.Equal (0, rg.Cursor);
+        Assert.Equal (2, selectedItemChangedCount);
+        Assert.Equal (2, selectingCount);
+        Assert.Equal (0, acceptedCount);
+
+        Assert.True (Application.OnKeyDown (Key.Space));
+        Assert.Equal (1, rg.SelectedItem);
+        Assert.Equal (1, rg.Cursor);
+        Assert.True (Application.OnKeyDown (Key.Space));
+        Assert.Equal (0, rg.SelectedItem);
+        Assert.Equal (0, rg.Cursor);
+        Assert.True (Application.OnKeyDown (Key.Space));
+        Assert.Equal (1, rg.SelectedItem);
+        Assert.Equal (1, rg.Cursor);
+
+        Assert.True (Application.OnKeyDown (Key.Home));
+        Assert.Equal (1, rg.SelectedItem);
+        Assert.Equal (0, rg.Cursor);
+        Assert.True (Application.OnKeyDown (Key.Space));
+        Assert.Equal (0, rg.SelectedItem);
+        Assert.Equal (0, rg.Cursor);
+
         Assert.True (Application.OnKeyDown (Key.End));
+        Assert.Equal (0, rg.SelectedItem);
+        Assert.Equal (1, rg.Cursor);
         Assert.True (Application.OnKeyDown (Key.Space));
         Assert.Equal (1, rg.SelectedItem);
-        Assert.True (Application.OnKeyDown (Key.Space));
+        Assert.Equal (1, rg.Cursor);
+        Assert.Equal (7, selectedItemChangedCount);
+        Assert.Equal (7, selectingCount);
+        Assert.Equal (0, acceptedCount);
+
+        // Test HotKey
+        //    Selected == Cursor (1) - Advance state and raise Select event - DO NOT raise Accept
+
+        rg.HotKey = Key.L;
+        Assert.Equal (Key.L, rg.HotKey);
+        Assert.True (Application.OnKeyDown (rg.HotKey));
+        Assert.Equal (0, rg.SelectedItem);
+        Assert.Equal (0, rg.Cursor);
+        Assert.Equal (8, selectedItemChangedCount);
+        Assert.Equal (8, selectingCount);
+        Assert.Equal (0, acceptedCount);
+
+        //     Make Selected != Cursor
+        Assert.True (Application.OnKeyDown (Key.CursorDown));
+        Assert.Equal (0, rg.SelectedItem);
+        Assert.Equal (1, rg.Cursor);
+
+        //    Selected != Cursor - Raise HotKey event - Since we're focused, this should just advance
+        Assert.True (Application.OnKeyDown (rg.HotKey));
         Assert.Equal (1, rg.SelectedItem);
-        Application.ResetState (ignoreDisposed: true);
+        Assert.Equal (1, rg.Cursor);
+        Assert.Equal (9, selectedItemChangedCount);
+        Assert.Equal (9, selectingCount);
+        Assert.Equal (0, acceptedCount);
+
+        Application.ResetState (true);
     }
 
     [Fact]
-    public void HotKeys_Select_RadioLabels ()
+    public void HotKey_HasFocus_False ()
+    {
+        Application.Navigation = new ();
+        var rg = new RadioGroup { RadioLabels = new [] { "Test", "New Test" } };
+        Application.Top = new ();
+
+        // With !HasFocus
+        View otherView = new () { Id = "otherView", CanFocus = true };
+
+        Label label = new ()
+        {
+            Id = "label",
+            Title = "_R"
+        };
+
+        Application.Top.Add (label, rg, otherView);
+        otherView.SetFocus ();
+
+        var selectedItemChangedCount = 0;
+        rg.SelectedItemChanged += (s, e) => selectedItemChangedCount++;
+
+        var selectCount = 0;
+        rg.Selecting += (s, e) => selectCount++;
+
+        var acceptCount = 0;
+        rg.Accepting += (s, e) => acceptCount++;
+
+        // By default the first item is selected
+        Assert.Equal (0, rg.SelectedItem);
+        Assert.Equal (Orientation.Vertical, rg.Orientation);
+        Assert.Equal (0, selectedItemChangedCount);
+        Assert.Equal (0, selectCount);
+        Assert.Equal (0, acceptCount);
+        Assert.Equal (Key.Empty, rg.HotKey);
+
+        Assert.False (rg.HasFocus);
+
+        // Test HotKey
+        //    Selected (0) == Cursor (0) - SetFocus
+        rg.HotKey = Key.L;
+        Assert.Equal (Key.L, rg.HotKey);
+        Assert.True (Application.OnKeyDown (rg.HotKey));
+        Assert.True (rg.HasFocus);
+        Assert.Equal (0, rg.SelectedItem);
+        Assert.Equal (0, rg.Cursor);
+        Assert.Equal (0, selectedItemChangedCount);
+        Assert.Equal (0, selectCount);
+        Assert.Equal (0, acceptCount);
+
+        //     Make Selected != Cursor
+        Assert.True (Application.OnKeyDown (Key.CursorDown));
+        Assert.Equal (0, rg.SelectedItem);
+        Assert.Equal (1, rg.Cursor);
+
+        otherView.SetFocus ();
+
+        //    Selected != Cursor - SetFocus
+        Assert.True (Application.OnKeyDown (rg.HotKey));
+        Assert.True (rg.HasFocus);
+        Assert.Equal (0, rg.SelectedItem);
+        Assert.Equal (1, rg.Cursor);
+        Assert.Equal (0, selectedItemChangedCount);
+        Assert.Equal (0, selectCount);
+        Assert.Equal (0, acceptCount);
+
+        Assert.True (Application.OnKeyDown (rg.HotKey));
+        Assert.True (rg.HasFocus);
+        Assert.Equal (1, rg.SelectedItem);
+        Assert.Equal (1, rg.Cursor);
+        Assert.Equal (1, selectedItemChangedCount);
+        Assert.Equal (1, selectCount);
+        Assert.Equal (0, acceptCount);
+
+        Application.ResetState (true);
+    }
+
+    [Fact]
+    public void HotKeys_HasFocus_False_Does_Not_SetFocus_Selects ()
+    {
+        Application.Navigation = new ();
+        var rg = new RadioGroup { RadioLabels = new [] { "Item _A", "Item _B" } };
+        Application.Top = new ();
+
+        // With !HasFocus
+        View otherView = new () { Id = "otherView", CanFocus = true };
+
+        Label label = new ()
+        {
+            Id = "label",
+            Title = "_R"
+        };
+
+        Application.Top.Add (label, rg, otherView);
+        otherView.SetFocus ();
+
+        var selectedItemChangedCount = 0;
+        rg.SelectedItemChanged += (s, e) => selectedItemChangedCount++;
+
+        var selectCount = 0;
+        rg.Selecting += (s, e) => selectCount++;
+
+        var acceptCount = 0;
+        rg.Accepting += (s, e) => acceptCount++;
+
+        // By default the first item is selected
+        Assert.Equal (0, rg.SelectedItem);
+        Assert.Equal (Orientation.Vertical, rg.Orientation);
+        Assert.Equal (0, selectedItemChangedCount);
+        Assert.Equal (0, selectCount);
+        Assert.Equal (0, acceptCount);
+        Assert.Equal (Key.Empty, rg.HotKey);
+
+        Assert.False (rg.HasFocus);
+
+        // Test RadioTitem.HotKey - Should never SetFocus
+        //    Selected (0) == Cursor (0) 
+        Assert.True (Application.OnKeyDown (Key.A));
+        Assert.False (rg.HasFocus);
+        Assert.Equal (0, rg.SelectedItem);
+        Assert.Equal (0, rg.Cursor);
+        Assert.Equal (0, selectedItemChangedCount);
+        Assert.Equal (0, selectCount);
+        Assert.Equal (0, acceptCount);
+
+        rg.SetFocus ();
+
+        //     Make Selected != Cursor
+        Assert.True (Application.OnKeyDown (Key.CursorDown));
+        Assert.Equal (0, rg.SelectedItem);
+        Assert.Equal (1, rg.Cursor);
+
+        otherView.SetFocus ();
+
+        //    Selected != Cursor
+        Assert.True (Application.OnKeyDown (Key.A));
+        Assert.False (rg.HasFocus);
+        Assert.Equal (0, rg.SelectedItem);
+        Assert.Equal (1, rg.Cursor);
+        Assert.Equal (0, selectedItemChangedCount);
+        Assert.Equal (0, selectCount);
+        Assert.Equal (0, acceptCount);
+
+        //    Selected != Cursor - Should not set focus
+        Assert.True (Application.OnKeyDown (Key.B));
+        Assert.False (rg.HasFocus);
+        Assert.Equal (1, rg.SelectedItem);
+        Assert.Equal (1, rg.Cursor);
+        Assert.Equal (1, selectedItemChangedCount);
+        Assert.Equal (1, selectCount);
+        Assert.Equal (0, acceptCount);
+
+        Assert.True (Application.OnKeyDown (Key.B));
+        Assert.False (rg.HasFocus);
+        Assert.Equal (1, rg.SelectedItem);
+        Assert.Equal (1, rg.Cursor);
+        Assert.Equal (1, selectedItemChangedCount);
+        Assert.Equal (1, selectCount);
+        Assert.Equal (0, acceptCount);
+
+        Application.ResetState (true);
+    }
+
+    [Fact]
+    public void HotKeys_HasFocus_True_Selects ()
     {
         var rg = new RadioGroup { RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" } };
-        Application.Top = new Toplevel ();
+        Application.Top = new ();
         Application.Top.Add (rg);
         rg.SetFocus ();
 
@@ -116,7 +372,6 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L | KeyCode.ShiftMask));
         Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L | KeyCode.AltMask));
 
-        // BUGBUG: These tests only test that RG works on it's own, not if it's a subview
         Assert.True (Application.OnKeyDown (Key.T));
         Assert.Equal (2, rg.SelectedItem);
         Assert.True (Application.OnKeyDown (Key.L));
@@ -159,7 +414,7 @@ public class RadioGroupTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void HotKey_For_View_SetsFocus ()
+    public void HotKey_SetsFocus ()
     {
         var superView = new View
         {
@@ -184,7 +439,34 @@ public class RadioGroupTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void HotKey_For_Item_SetsFocus ()
+    public void HotKey_No_SelectedItem_Selects_First ()
+    {
+        var superView = new View
+        {
+            CanFocus = true
+        };
+        superView.Add (new View { CanFocus = true });
+
+        var group = new RadioGroup
+        {
+            Title = "Radio_Group",
+            RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" }
+        };
+        group.SelectedItem = -1;
+
+        superView.Add (group);
+
+        Assert.False (group.HasFocus);
+        Assert.Equal (-1, group.SelectedItem);
+
+        group.NewKeyDownEvent (Key.G.WithAlt);
+
+        Assert.Equal (0, group.SelectedItem);
+        Assert.False (group.HasFocus);
+    }
+
+    [Fact]
+    public void HotKeys_Does_Not_SetFocus ()
     {
         var superView = new View
         {
@@ -200,7 +482,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         group.NewKeyDownEvent (Key.R);
 
         Assert.Equal (1, group.SelectedItem);
-        Assert.True (group.HasFocus);
+        Assert.False (group.HasFocus);
     }
 
     [Fact]
@@ -209,14 +491,14 @@ public class RadioGroupTests (ITestOutputHelper output)
         var group = new RadioGroup { RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" } };
         var accepted = false;
 
-        group.Accept += OnAccept;
+        group.Accepting += OnAccept;
         group.InvokeCommand (Command.HotKey);
 
         Assert.False (accepted);
 
         return;
 
-        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
+        void OnAccept (object sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -225,14 +507,14 @@ public class RadioGroupTests (ITestOutputHelper output)
         var group = new RadioGroup { RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" } };
         var accepted = false;
 
-        group.Accept += OnAccept;
+        group.Accepting += OnAccept;
         group.InvokeCommand (Command.Accept);
 
         Assert.True (accepted);
 
         return;
 
-        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
+        void OnAccept (object sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -327,4 +609,161 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (0, previousSelectedItem);
         Assert.Equal (selectedItem, rg.SelectedItem);
     }
+
+    #region Mouse Tests
+
+    [Fact]
+    [SetupFakeDriver]
+    public void Mouse_Click ()
+    {
+        var radioGroup = new RadioGroup
+        {
+            RadioLabels = ["_1", "_2"]
+        };
+        Assert.True (radioGroup.CanFocus);
+
+        var selectedItemChanged = 0;
+        radioGroup.SelectedItemChanged += (s, e) => selectedItemChanged++;
+
+        var selectingCount = 0;
+        radioGroup.Selecting += (s, e) => selectingCount++;
+
+        var acceptedCount = 0;
+        radioGroup.Accepting += (s, e) => acceptedCount++;
+
+        Assert.Equal (Orientation.Vertical, radioGroup.Orientation);
+
+        radioGroup.HasFocus = true;
+        Assert.True (radioGroup.HasFocus);
+        Assert.Equal (0, radioGroup.SelectedItem);
+        Assert.Equal (0, selectedItemChanged);
+        Assert.Equal (0, selectingCount);
+        Assert.Equal (0, acceptedCount);
+
+        // Click on the first item, which is already selected
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked }));
+        Assert.Equal (0, radioGroup.SelectedItem);
+        Assert.Equal (0, selectedItemChanged);
+        Assert.Equal (0, selectingCount);
+        Assert.Equal (0, acceptedCount);
+
+        // Click on the second item
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1Clicked }));
+        Assert.Equal (1, radioGroup.SelectedItem);
+        Assert.Equal (1, selectedItemChanged);
+        Assert.Equal (1, selectingCount);
+        Assert.Equal (0, acceptedCount);
+
+        // Click on the first item
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked }));
+        Assert.Equal (0, radioGroup.SelectedItem);
+        Assert.Equal (2, selectedItemChanged);
+        Assert.Equal (2, selectingCount);
+        Assert.Equal (0, acceptedCount);
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void Mouse_DoubleClick ()
+    {
+        var radioGroup = new RadioGroup
+        {
+            RadioLabels = ["_1", "__2"]
+        };
+        Assert.True (radioGroup.CanFocus);
+
+        var selectedItemChanged = 0;
+        radioGroup.SelectedItemChanged += (s, e) => selectedItemChanged++;
+
+        var selectingCount = 0;
+        radioGroup.Selecting += (s, e) => selectingCount++;
+
+        var acceptedCount = 0;
+        var handleAccepted = false;
+
+        radioGroup.Accepting += (s, e) =>
+                             {
+                                 acceptedCount++;
+                                 e.Cancel = handleAccepted;
+                             };
+
+        Assert.True (radioGroup.DoubleClickAccepts);
+        Assert.Equal (Orientation.Vertical, radioGroup.Orientation);
+
+        radioGroup.HasFocus = true;
+        Assert.True (radioGroup.HasFocus);
+        Assert.Equal (0, radioGroup.SelectedItem);
+        Assert.Equal (0, selectedItemChanged);
+        Assert.Equal (0, selectingCount);
+        Assert.Equal (0, acceptedCount);
+
+        // NOTE: Drivers ALWAYS generate a Button1Clicked event before Button1DoubleClicked
+        // NOTE: We need to do the same
+
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked }));
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked }));
+        Assert.Equal (0, radioGroup.SelectedItem);
+        Assert.Equal (0, selectedItemChanged);
+        Assert.Equal (0, selectingCount);
+        Assert.Equal (1, acceptedCount);
+
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1Clicked }));
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1Clicked }));
+        Assert.Equal (1, radioGroup.SelectedItem);
+        Assert.Equal (1, selectedItemChanged);
+        Assert.Equal (1, selectingCount);
+        Assert.Equal (1, acceptedCount);
+
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1Clicked }));
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1DoubleClicked }));
+        Assert.Equal (1, radioGroup.SelectedItem);
+        Assert.Equal (1, selectedItemChanged);
+        Assert.Equal (1, selectingCount);
+        Assert.Equal (2, acceptedCount);
+
+        View superView = new () { Id = "superView", CanFocus = true };
+        superView.Add (radioGroup);
+        superView.SetFocus ();
+
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked }));
+        Assert.Equal (0, radioGroup.SelectedItem);
+        Assert.Equal (2, selectedItemChanged);
+        Assert.Equal (2, selectingCount);
+        Assert.Equal (2, acceptedCount);
+
+        var superViewAcceptCount = 0;
+
+        superView.Accepting += (s, a) =>
+                            {
+                                superViewAcceptCount++;
+                                a.Cancel = true;
+                            };
+
+        Assert.Equal (0, superViewAcceptCount);
+
+        // By handling the event, we're cancelling it. So the radio group should not change.
+        handleAccepted = true;
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked }));
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked }));
+        Assert.Equal (0, radioGroup.SelectedItem);
+        Assert.Equal (2, selectedItemChanged);
+        Assert.Equal (2, selectingCount);
+        Assert.Equal (3, acceptedCount);
+        Assert.Equal (0, superViewAcceptCount);
+
+        handleAccepted = false;
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked }));
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked }));
+        Assert.Equal (0, radioGroup.SelectedItem);
+        Assert.Equal (2, selectedItemChanged);
+        Assert.Equal (2, selectingCount);
+        Assert.Equal (4, acceptedCount);
+        Assert.Equal (1, superViewAcceptCount); // Accept bubbles up to superview
+
+        radioGroup.DoubleClickAccepts = false;
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1Clicked }));
+        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1DoubleClicked }));
+    }
+
+    #endregion Mouse Tests
 }

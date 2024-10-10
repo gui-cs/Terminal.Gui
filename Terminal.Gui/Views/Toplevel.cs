@@ -72,9 +72,9 @@ public partial class Toplevel : View
     /// <summary>Gets the latest <see cref="MenuBar"/> added into this Toplevel.</summary>
     public MenuBar? MenuBar => (MenuBar?)Subviews?.LastOrDefault (s => s is MenuBar);
 
-    // TODO: Deprecate - Any view can host a statusbar in v2
-    /// <summary>Gets the latest <see cref="StatusBar"/> added into this Toplevel.</summary>
-    public StatusBar? StatusBar => (StatusBar?)Subviews?.LastOrDefault (s => s is StatusBar);
+    //// TODO: Deprecate - Any view can host a statusbar in v2
+    ///// <summary>Gets the latest <see cref="StatusBar"/> added into this Toplevel.</summary>
+    //public StatusBar? StatusBar => (StatusBar?)Subviews?.LastOrDefault (s => s is StatusBar);
 
     #endregion
 
@@ -225,8 +225,9 @@ public partial class Toplevel : View
                                                             top.Frame.X,
                                                             top.Frame.Y,
                                                             out int nx,
-                                                            out int ny,
-                                                            out StatusBar? sb
+                                                            out int ny
+                                                           //,
+                                                           // out StatusBar? sb
                                                            );
 
         if (superView is null)
@@ -260,16 +261,16 @@ public partial class Toplevel : View
             }
         }
 
-        // TODO: v2 - This is a hack to get the StatusBar to be positioned correctly.
-        if (sb != null
-            && !top!.Subviews.Contains (sb)
-            && ny + top.Frame.Height != superView.Frame.Height - (sb.Visible ? 1 : 0)
-            && top.Height is DimFill
-            && -top.Height.GetAnchor (0) < 1)
-        {
-            top.Height = Dim.Fill (sb.Visible ? 1 : 0);
-            layoutSubviews = true;
-        }
+        //// TODO: v2 - This is a hack to get the StatusBar to be positioned correctly.
+        //if (sb != null
+        //    && !top!.Subviews.Contains (sb)
+        //    && ny + top.Frame.Height != superView.Frame.Height - (sb.Visible ? 1 : 0)
+        //    && top.Height is DimFill
+        //    && -top.Height.GetAnchor (0) < 1)
+        //{
+        //    top.Height = Dim.Fill (sb.Visible ? 1 : 0);
+        //    layoutSubviews = true;
+        //}
 
         if (superView.LayoutNeeded || layoutSubviews)
         {

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -12,19 +13,12 @@ public class LineViewExample : Scenario
     public override void Main ()
     {
         Application.Init ();
-        // Setup - Create a top-level application window and configure it.
-        Toplevel top = new ();
 
-        var menu = new MenuBar
+        var appWindow = new Window()
         {
-            Menus =
-            [
-                new ("_File", new MenuItem [] { new ("_Quit", "", () => Quit ()) })
-            ]
+            Title = GetQuitKeyAndName (),
         };
-        top.Add (menu);
 
-        var appWindow = new Window ();
         appWindow.Add (new Label { Y = 1, Text = "Regular Line" });
 
         // creates a horizontal line
@@ -73,22 +67,11 @@ public class LineViewExample : Scenario
 
         appWindow.Add (verticalArrow);
 
-        var statusBar = new StatusBar (
-                                       new Shortcut []
-                                       {
-                                           new (Application.QuitKey, "Quit", Quit)
-                                       }
-                                      );
-        top.Add (statusBar);
-        top.Add (appWindow);
-
         // Run - Start the application.
-        Application.Run (top);
-        top.Dispose ();
+        Application.Run (appWindow);
+        appWindow.Dispose ();
 
         // Shutdown - Calling Application.Shutdown is required.
         Application.Shutdown ();
     }
-
-    private void Quit () { Application.RequestStop (); }
 }

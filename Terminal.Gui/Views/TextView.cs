@@ -2010,6 +2010,10 @@ public class TextView : View
         LayoutComplete += TextView_LayoutComplete;
 
         // Things this view knows how to do
+
+        // Note - NewLine is only bound to Enter if Multiline is true
+        AddCommand (Command.NewLine, (ctx) => ProcessEnterKey (ctx));
+
         AddCommand (
                     Command.PageDown,
                     () =>
@@ -2275,7 +2279,6 @@ public class TextView : View
                         return true;
                     }
                    );
-        AddCommand (Command.NewLine, () => ProcessReturn ());
 
         AddCommand (
                     Command.End,
@@ -2403,14 +2406,17 @@ public class TextView : View
                     }
                    );
 
-        // Default keybindings for this view
+        KeyBindings.Remove (Key.Space);
+
+        KeyBindings.Remove (Key.Enter);
+        KeyBindings.Add (Key.Enter, Multiline ? Command.NewLine : Command.Accept);
+
         KeyBindings.Add (Key.PageDown, Command.PageDown);
         KeyBindings.Add (Key.V.WithCtrl, Command.PageDown);
 
         KeyBindings.Add (Key.PageDown.WithShift, Command.PageDownExtend);
 
         KeyBindings.Add (Key.PageUp, Command.PageUp);
-        KeyBindings.Add (Key.V.WithAlt, Command.PageUp);
 
         KeyBindings.Add (Key.PageUp.WithShift, Command.PageUpExtend);
 
@@ -2453,34 +2459,26 @@ public class TextView : View
 
         KeyBindings.Add (Key.Delete.WithCtrl.WithShift, Command.CutToEndLine); // kill-to-end
 
-        KeyBindings.Add (Key.K.WithAlt, Command.CutToStartLine); // kill-to-start
-
         KeyBindings.Add (Key.Backspace.WithCtrl.WithShift, Command.CutToStartLine); // kill-to-start
 
         KeyBindings.Add (Key.Y.WithCtrl, Command.Paste); // Control-y, yank
         KeyBindings.Add (Key.Space.WithCtrl, Command.ToggleExtend);
 
-        KeyBindings.Add (Key.C.WithAlt, Command.Copy);
         KeyBindings.Add (Key.C.WithCtrl, Command.Copy);
 
-        KeyBindings.Add (Key.W.WithAlt, Command.Cut);
-        KeyBindings.Add (Key.W.WithCtrl, Command.Cut);
-        KeyBindings.Add (Key.X.WithCtrl, Command.Cut);
+        KeyBindings.Add (Key.W.WithCtrl, Command.Cut); // Move to Unix?
+        KeyBindings.Add (Key.X.WithCtrl, Command.Cut); 
 
         KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.WordLeft);
-        KeyBindings.Add (Key.B.WithAlt, Command.WordLeft);
 
         KeyBindings.Add (Key.CursorLeft.WithCtrl.WithShift, Command.WordLeftExtend);
 
         KeyBindings.Add (Key.CursorRight.WithCtrl, Command.WordRight);
-        KeyBindings.Add (Key.F.WithAlt, Command.WordRight);
 
         KeyBindings.Add (Key.CursorRight.WithCtrl.WithShift, Command.WordRightExtend);
         KeyBindings.Add (Key.Delete.WithCtrl, Command.KillWordForwards); // kill-word-forwards
         KeyBindings.Add (Key.Backspace.WithCtrl, Command.KillWordBackwards); // kill-word-backwards
 
-        // BUGBUG: If AllowsReturn is false, Key.Enter should not be bound (so that Toplevel can cause Command.Accept).
-        KeyBindings.Add (Key.Enter, Command.NewLine);
         KeyBindings.Add (Key.End.WithCtrl, Command.End);
         KeyBindings.Add (Key.End.WithCtrl.WithShift, Command.EndExtend);
         KeyBindings.Add (Key.Home.WithCtrl, Command.Start);
@@ -2495,6 +2493,15 @@ public class TextView : View
 
         KeyBindings.Add (Key.G.WithCtrl, Command.DeleteAll);
         KeyBindings.Add (Key.D.WithCtrl.WithShift, Command.DeleteAll);
+
+#if UNIX_KEY_BINDINGS
+        KeyBindings.Add (Key.C.WithAlt, Command.Copy);
+        KeyBindings.Add (Key.B.WithAlt, Command.WordLeft);
+        KeyBindings.Add (Key.W.WithAlt, Command.Cut);
+        KeyBindings.Add (Key.V.WithAlt, Command.PageUp);
+        KeyBindings.Add (Key.F.WithAlt, Command.WordRight);
+        KeyBindings.Add (Key.K.WithAlt, Command.CutToStartLine); // kill-to-start
+#endif
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
 
@@ -2512,7 +2519,7 @@ public class TextView : View
     // BUGBUG: AllowsReturn is mis-named. It should be EnterKeyAccepts.
     /// <summary>
     ///     Gets or sets whether pressing ENTER in a <see cref="TextView"/> creates a new line of text
-    ///     in the view or invokes the <see cref="View.Accept"/> event.
+    ///     in the view or invokes the <see cref="View.Accepting"/> event.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -2700,6 +2707,9 @@ public class TextView : View
                 Height = _savedHeight;
                 SetNeedsDisplay ();
             }
+
+            KeyBindings.Remove (Key.Enter);
+            KeyBindings.Add (Key.Enter, Multiline ? Command.NewLine : Command.Accept);
         }
     }
 
@@ -2729,7 +2739,7 @@ public class TextView : View
     {
         get
         {
-            if (!Selecting || (_model.Count == 1 && _model.GetLine (0).Count == 0))
+            if (!IsSelecting || (_model.Count == 1 && _model.GetLine (0).Count == 0))
             {
                 return string.Empty;
             }
@@ -2739,7 +2749,7 @@ public class TextView : View
     }
 
     /// <summary>Get or sets whether the user is currently selecting text.</summary>
-    public bool Selecting { get; set; }
+    public bool IsSelecting { get; set; }
 
     /// <summary>Start column position of the selected text.</summary>
     public int SelectionStartColumn
@@ -2751,7 +2761,7 @@ public class TextView : View
 
             _selectionStartColumn = value < 0 ? 0 :
                                     value > line.Count ? line.Count : value;
-            Selecting = true;
+            IsSelecting = true;
             SetNeedsDisplay ();
             Adjust ();
         }
@@ -2765,7 +2775,7 @@ public class TextView : View
         {
             _selectionStartRow = value < 0 ? 0 :
                                  value > _model.Count - 1 ? Math.Max (_model.Count - 1, 0) : value;
-            Selecting = true;
+            IsSelecting = true;
             SetNeedsDisplay ();
             Adjust ();
         }
@@ -2897,7 +2907,7 @@ public class TextView : View
     {
         SetWrapModel ();
 
-        if (Selecting)
+        if (IsSelecting)
         {
             SetClipboard (GetRegion ());
             _copyWithoutSelection = false;
@@ -2931,7 +2941,7 @@ public class TextView : View
         }
 
         UpdateWrapModel ();
-        Selecting = false;
+        IsSelecting = false;
         DoNeededAction ();
         OnContentsChanged ();
     }
@@ -2961,7 +2971,7 @@ public class TextView : View
 
         SetWrapModel ();
 
-        if (Selecting)
+        if (IsSelecting)
         {
             _historyText.Add (new () { new (GetCurrentLine ()) }, CursorPosition);
 
@@ -3005,7 +3015,7 @@ public class TextView : View
 
         SetWrapModel ();
 
-        if (Selecting)
+        if (IsSelecting)
         {
             _historyText.Add (new () { new (GetCurrentLine ()) }, CursorPosition);
 
@@ -3339,7 +3349,7 @@ public class TextView : View
             ProcessMouseClick (ev, out List<RuneCell> line);
             PositionCursor ();
 
-            if (_model.Count > 0 && _shiftSelecting && Selecting)
+            if (_model.Count > 0 && _shiftSelecting && IsSelecting)
             {
                 if (CurrentRow - _topRow >= Viewport.Height - 1 && _model.Count > _topRow + CurrentRow)
                 {
@@ -3403,7 +3413,7 @@ public class TextView : View
             ProcessMouseClick (ev, out _);
             PositionCursor ();
 
-            if (!Selecting)
+            if (!IsSelecting)
             {
                 StartSelecting ();
             }
@@ -3425,12 +3435,12 @@ public class TextView : View
         {
             if (ev.Flags.HasFlag (MouseFlags.ButtonShift))
             {
-                if (!Selecting)
+                if (!IsSelecting)
                 {
                     StartSelecting ();
                 }
             }
-            else if (Selecting)
+            else if (IsSelecting)
             {
                 StopSelecting ();
             }
@@ -3449,7 +3459,7 @@ public class TextView : View
                 }
             }
 
-            if (!Selecting)
+            if (!IsSelecting)
             {
                 StartSelecting ();
             }
@@ -3467,7 +3477,7 @@ public class TextView : View
         }
         else if (ev.Flags.HasFlag (MouseFlags.Button1TripleClicked))
         {
-            if (Selecting)
+            if (IsSelecting)
             {
                 StopSelecting ();
             }
@@ -3475,7 +3485,7 @@ public class TextView : View
             ProcessMouseClick (ev, out List<RuneCell> line);
             CurrentColumn = 0;
 
-            if (!Selecting)
+            if (!IsSelecting)
             {
                 StartSelecting ();
             }
@@ -3554,11 +3564,11 @@ public class TextView : View
                 Rune rune = idxCol >= lineRuneCount ? (Rune)' ' : line [idxCol].Rune;
                 int cols = rune.GetColumns ();
 
-                if (idxCol < line.Count && Selecting && PointInSelection (idxCol, idxRow))
+                if (idxCol < line.Count && IsSelecting && PointInSelection (idxCol, idxRow))
                 {
                     OnDrawSelectionColor (line, idxCol, idxRow);
                 }
-                else if (idxCol == CurrentColumn && idxRow == CurrentRow && !Selecting && !Used && HasFocus && idxCol < lineRuneCount)
+                else if (idxCol == CurrentColumn && idxRow == CurrentRow && !IsSelecting && !Used && HasFocus && idxCol < lineRuneCount)
                 {
                     OnDrawUsedColor (line, idxCol, idxRow);
                 }
@@ -3740,7 +3750,7 @@ public class TextView : View
         }
         else
         {
-            if (Selecting)
+            if (IsSelecting)
             {
                 ClearRegion ();
             }
@@ -3748,7 +3758,7 @@ public class TextView : View
             _copyWithoutSelection = false;
             InsertAllText (contents);
 
-            if (Selecting)
+            if (IsSelecting)
             {
                 _historyText.ReplaceLast (
                                           new () { new (GetCurrentLine ()) },
@@ -3761,7 +3771,7 @@ public class TextView : View
         }
 
         UpdateWrapModel ();
-        Selecting = false;
+        IsSelecting = false;
         DoNeededAction ();
     }
 
@@ -3775,7 +3785,7 @@ public class TextView : View
             return null;
         }
 
-        if (Application.MouseGrabView == this && Selecting)
+        if (Application.MouseGrabView == this && IsSelecting)
         {
             // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
             //var minRow = Math.Min (Math.Max (Math.Min (selectionStartRow, currentRow) - topRow, 0), Viewport.Height);
@@ -4293,7 +4303,7 @@ public class TextView : View
         }
 
         UpdateWrapModel ();
-        Selecting = false;
+        IsSelecting = false;
         DoNeededAction ();
     }
 
@@ -4866,7 +4876,7 @@ public class TextView : View
 
         _historyText.Add (new () { new (GetCurrentLine ()) }, CursorPosition);
 
-        if (Selecting)
+        if (IsSelecting)
         {
             ClearSelectedRegion ();
         }
@@ -5266,7 +5276,7 @@ public class TextView : View
     {
         ResetAllTrack ();
 
-        if (_shiftSelecting && Selecting)
+        if (_shiftSelecting && IsSelecting)
         {
             StopSelecting ();
         }
@@ -5466,7 +5476,7 @@ public class TextView : View
     {
         ResetAllTrack ();
 
-        if (_shiftSelecting && Selecting)
+        if (_shiftSelecting && IsSelecting)
         {
             StopSelecting ();
         }
@@ -5813,7 +5823,7 @@ public class TextView : View
     private bool ProcessMoveDown ()
     {
         ResetContinuousFindTrack ();
-        if (_shiftSelecting && Selecting)
+        if (_shiftSelecting && IsSelecting)
         {
             StopSelecting ();
         }
@@ -5832,7 +5842,7 @@ public class TextView : View
     {
         ResetAllTrack ();
 
-        if (_shiftSelecting && Selecting)
+        if (_shiftSelecting && IsSelecting)
         {
             StopSelecting ();
         }
@@ -5858,7 +5868,7 @@ public class TextView : View
 
         ResetAllTrack ();
 
-        if (_shiftSelecting && Selecting)
+        if (_shiftSelecting && IsSelecting)
         {
             StopSelecting ();
         }
@@ -5890,7 +5900,7 @@ public class TextView : View
 
         ResetAllTrack ();
 
-        if (_shiftSelecting && Selecting)
+        if (_shiftSelecting && IsSelecting)
         {
             StopSelecting ();
         }
@@ -5911,7 +5921,7 @@ public class TextView : View
     {
         ResetAllTrack ();
 
-        if (_shiftSelecting && Selecting)
+        if (_shiftSelecting && IsSelecting)
         {
             StopSelecting ();
         }
@@ -5930,7 +5940,7 @@ public class TextView : View
     {
         ResetContinuousFindTrack ();
 
-        if (_shiftSelecting && Selecting)
+        if (_shiftSelecting && IsSelecting)
         {
             StopSelecting ();
         }
@@ -5949,7 +5959,7 @@ public class TextView : View
     {
         ResetAllTrack ();
 
-        if (_shiftSelecting && Selecting)
+        if (_shiftSelecting && IsSelecting)
         {
             StopSelecting ();
         }
@@ -5968,7 +5978,7 @@ public class TextView : View
     {
         ResetAllTrack ();
 
-        if (_shiftSelecting && Selecting)
+        if (_shiftSelecting && IsSelecting)
         {
             StopSelecting ();
         }
@@ -5987,7 +5997,7 @@ public class TextView : View
     {
         ResetColumnTrack ();
 
-        if (_shiftSelecting && Selecting)
+        if (_shiftSelecting && IsSelecting)
         {
             StopSelecting ();
         }
@@ -6006,7 +6016,7 @@ public class TextView : View
     {
         ResetColumnTrack ();
 
-        if (_shiftSelecting && Selecting)
+        if (_shiftSelecting && IsSelecting)
         {
             StopSelecting ();
         }
@@ -6033,7 +6043,7 @@ public class TextView : View
         Paste ();
     }
 
-    private bool ProcessReturn ()
+    private bool ProcessEnterKey (CommandContext ctx)
     {
         ResetColumnTrack ();
 
@@ -6046,7 +6056,7 @@ public class TextView : View
         {
             // By Default pressing ENTER should be ignored (OnAccept will return false or null). Only cancel if the
             // event was fired and set Cancel = true.
-            return OnAccept () == false;
+            return RaiseAccepting (ctx) is null or false;
         }
 
         SetWrapModel ();
@@ -6055,7 +6065,7 @@ public class TextView : View
 
         _historyText.Add (new () { new (currentLine) }, CursorPosition);
 
-        if (Selecting)
+        if (IsSelecting)
         {
             ClearSelectedRegion ();
             currentLine = GetCurrentLine ();
@@ -6164,8 +6174,8 @@ public class TextView : View
     {
         if (!_continuousFind)
         {
-            int col = Selecting ? _selectionStartColumn : CurrentColumn;
-            int row = Selecting ? _selectionStartRow : CurrentRow;
+            int col = IsSelecting ? _selectionStartColumn : CurrentColumn;
+            int row = IsSelecting ? _selectionStartRow : CurrentRow;
             _model.ResetContinuousFind (new (col, row));
         }
     }
@@ -6292,13 +6302,13 @@ public class TextView : View
 
     private void StartSelecting ()
     {
-        if (_shiftSelecting && Selecting)
+        if (_shiftSelecting && IsSelecting)
         {
             return;
         }
 
         _shiftSelecting = true;
-        Selecting = true;
+        IsSelecting = true;
         _selectionStartColumn = CurrentColumn;
         _selectionStartRow = CurrentRow;
     }
@@ -6306,7 +6316,7 @@ public class TextView : View
     private void StopSelecting ()
     {
         _shiftSelecting = false;
-        Selecting = false;
+        IsSelecting = false;
         _isButtonShift = false;
     }
 
@@ -6362,7 +6372,7 @@ public class TextView : View
     private void ToggleSelecting ()
     {
         ResetColumnTrack ();
-        Selecting = !Selecting;
+        IsSelecting = !IsSelecting;
         _selectionStartColumn = CurrentColumn;
         _selectionStartRow = CurrentRow;
     }

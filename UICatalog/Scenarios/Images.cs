@@ -55,7 +55,7 @@ public class Images : Scenario
         };
         win.Add (imageView);
 
-        btnOpenImage.Accept += (_, _) =>
+        btnOpenImage.Accepting += (_, _) =>
                                {
                                    var ofd = new OpenDialog { Title = "Open Image", AllowsMultipleSelection = false };
                                    Application.Run (ofd);

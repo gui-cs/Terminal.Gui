@@ -1344,13 +1344,13 @@ oot two
         var treeView = new TreeView ();
         var accepted = false;
 
-        treeView.Accept += OnAccept;
+        treeView.Accepting += OnAccept;
         treeView.InvokeCommand (Command.HotKey);
 
         Assert.False (accepted);
 
         return;
-        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
+        void OnAccept (object sender, CommandEventArgs e) { accepted = true; }
     }
 
 
@@ -1365,7 +1365,7 @@ oot two
         var activated = false;
         object selectedObject = null;
 
-        treeView.Accept += Accept;
+        treeView.Accepting += Accept;
         treeView.ObjectActivated += ObjectActivated;
 
         treeView.InvokeCommand (Command.Accept);
@@ -1381,7 +1381,7 @@ oot two
             activated = true;
             selectedObject = e.ActivatedObject;
         }
-        void Accept (object sender, HandledEventArgs e) { accepted = true; }
+        void Accept (object sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -1393,7 +1393,7 @@ oot two
         var activated = false;
         object selectedObject = null;
 
-        treeView.Accept += Accept;
+        treeView.Accepting += Accept;
         treeView.ObjectActivated += ObjectActivated;
 
         treeView.InvokeCommand (Command.Accept);
@@ -1410,10 +1410,10 @@ oot two
             selectedObject = e.ActivatedObject;
         }
 
-        void Accept (object sender, HandledEventArgs e)
+        void Accept (object sender, CommandEventArgs e)
         {
             accepted = true;
-            e.Handled = true;
+            e.Cancel = true;
         }
     }
 }

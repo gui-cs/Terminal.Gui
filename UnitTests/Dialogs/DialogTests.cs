@@ -1058,18 +1058,18 @@ public class DialogTests
         Button btn3 = null;
         string expected = null;
 
-        btn1.Accept += (s, e) =>
+        btn1.Accepting += (s, e) =>
                        {
                            btn2 = new () { Text = "Show Sub" };
                            btn3 = new () { Text = "Close" };
-                           btn3.Accept += (s, e) => RequestStop ();
+                           btn3.Accepting += (s, e) => RequestStop ();
 
-                           btn2.Accept += (s, e) =>
+                           btn2.Accepting += (s, e) =>
                                           {
                                               // Don't test MessageBox in Dialog unit tests!
                                               var subBtn = new Button { Text = "Ok", IsDefault = true };
                                               var subDlg = new Dialog { Text = "ya", Width = 20, Height = 5, Buttons = [subBtn] };
-                                              subBtn.Accept += (s, e) => RequestStop (subDlg);
+                                              subBtn.Accepting += (s, e) => RequestStop (subDlg);
                                               Run (subDlg);
                                           };
 
@@ -1095,7 +1095,7 @@ public class DialogTests
 
                          if (iterations == 0)
                          {
-                             Assert.True (btn1.NewKeyDownEvent (Key.Space));
+                             Assert.False (btn1.NewKeyDownEvent (Key.Space));
                          }
                          else if (iterations == 1)
                          {
@@ -1110,7 +1110,7 @@ public class DialogTests
   └───────────────────────┘";
                              TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
-                             Assert.True (btn2.NewKeyDownEvent (Key.Space));
+                             Assert.False (btn2.NewKeyDownEvent (Key.Space));
                          }
                          else if (iterations == 2)
                          {
@@ -1127,13 +1127,13 @@ public class DialogTests
                                                                            _output
                                                                           );
 
-                             Assert.True (Top!.NewKeyDownEvent (Key.Enter));
+                             Assert.False (Top!.NewKeyDownEvent (Key.Enter));
                          }
                          else if (iterations == 3)
                          {
                              TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
-                             Assert.True (btn3.NewKeyDownEvent (Key.Space));
+                             Assert.False (btn3.NewKeyDownEvent (Key.Space));
                          }
                          else if (iterations == 4)
                          {
