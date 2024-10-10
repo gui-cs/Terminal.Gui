@@ -166,6 +166,11 @@ public enum Command
     /// </summary>
     EnableOverwrite,
 
+    /// <summary>
+    ///     Inserts a character.
+    /// </summary>
+    Insert,
+
     /// <summary>Disables overwrite mode (<see cref="EnableOverwrite"/>)</summary>
     DisableOverwrite,
 
