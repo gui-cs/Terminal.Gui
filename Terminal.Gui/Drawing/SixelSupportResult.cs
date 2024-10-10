@@ -1,9 +1,9 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-/// Describes the discovered state of sixel support and ancillary information
-/// e.g. <see cref="Resolution"/>. You can use any <see cref="ISixelSupportDetector"/>
-/// to discover this information.
+///     Describes the discovered state of sixel support and ancillary information
+///     e.g. <see cref="Resolution"/>. You can use any <see cref="ISixelSupportDetector"/>
+///     to discover this information.
 /// </summary>
 public class SixelSupportResult
 {

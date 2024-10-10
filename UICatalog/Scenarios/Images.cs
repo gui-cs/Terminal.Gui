@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -70,7 +69,7 @@ public class Images : Scenario
         _sixelSupportResult = sixelSupportDetector.Detect ();
 
         Application.Init ();
-        _win = new() { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
+        _win = new () { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
 
         bool canTrueColor = Application.Driver?.SupportsTrueColor ?? false;
 
@@ -79,7 +78,7 @@ public class Images : Scenario
             DisplayText = "Basic"
         };
 
-        _tabSixel = new()
+        _tabSixel = new ()
         {
             DisplayText = "Sixel"
         };
@@ -129,7 +128,7 @@ public class Images : Scenario
         var btnOpenImage = new Button { X = Pos.Right (cbUseTrueColor) + 2, Y = 0, Text = "Open Image" };
         _win.Add (btnOpenImage);
 
-        _tabView = new()
+        _tabView = new ()
         {
             Y = Pos.Bottom (btnOpenImage), Width = Dim.Fill (), Height = Dim.Fill ()
         };
@@ -166,19 +165,18 @@ public class Images : Scenario
         if (!_sixelSupportResult.SupportsTransparency)
         {
             if (MessageBox.Query (
-                                     "Transparency Not Supported",
-                                     "It looks like your terminal does not support transparent sixel backgrounds. Do you want to try anyway?",
-                                     "Yes",
-                                     "No")
+                                  "Transparency Not Supported",
+                                  "It looks like your terminal does not support transparent sixel backgrounds. Do you want to try anyway?",
+                                  "Yes",
+                                  "No")
                 != 0)
             {
                 return;
             }
         }
 
-
-        _fire = new DoomFire (_win.Frame.Width * _pxX.Value, _win.Frame.Height * _pxY.Value);
-        _fireEncoder = new SixelEncoder ();
+        _fire = new (_win.Frame.Width * _pxX.Value, _win.Frame.Height * _pxY.Value);
+        _fireEncoder = new ();
         _fireEncoder.Quantizer.MaxColors = Math.Min (_fireEncoder.Quantizer.MaxColors, _sixelSupportResult.MaxPaletteColors);
         _fireEncoder.Quantizer.PaletteBuildingAlgorithm = new ConstPalette (_fire.Palette);
 
@@ -294,14 +292,14 @@ public class Images : Scenario
 
     private void BuildSixelTab ()
     {
-        _sixelSupported = new()
+        _sixelSupported = new ()
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             CanFocus = true
         };
 
-        _sixelNotSupported = new()
+        _sixelNotSupported = new ()
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
@@ -318,7 +316,7 @@ public class Images : Scenario
                                     VerticalTextAlignment = Alignment.Center
                                 });
 
-        _sixelView = new()
+        _sixelView = new ()
         {
             Width = Dim.Percent (50),
             Height = Dim.Fill (),
@@ -345,7 +343,6 @@ public class Images : Scenario
         btnStartFire.Accepting += BtnStartFireOnAccept;
         _sixelSupported.Add (btnStartFire);
 
-
         var lblPxX = new Label
         {
             X = Pos.Right (_sixelView),
@@ -353,7 +350,7 @@ public class Images : Scenario
             Text = "Pixels per Col:"
         };
 
-        _pxX = new()
+        _pxX = new ()
         {
             X = Pos.Right (lblPxX),
             Y = Pos.Bottom (btnStartFire) + 1,
@@ -367,27 +364,27 @@ public class Images : Scenario
             Text = "Pixels per Row:"
         };
 
-        _pxY = new()
+        _pxY = new ()
         {
             X = Pos.Right (lblPxY),
             Y = Pos.Bottom (_pxX),
             Value = _sixelSupportResult.Resolution.Height
         };
 
-        var l1 = new Label ()
+        var l1 = new Label
         {
             Text = "Palette Building Algorithm",
             Width = Dim.Auto (),
             X = Pos.Right (_sixelView),
-            Y = Pos.Bottom (_pxY) + 1,
+            Y = Pos.Bottom (_pxY) + 1
         };
 
-        _rgPaletteBuilder = new RadioGroup
+        _rgPaletteBuilder = new()
         {
             RadioLabels = new []
             {
                 "Popularity",
-                "Median Cut",
+                "Median Cut"
             },
             X = Pos.Right (_sixelView) + 2,
             Y = Pos.Bottom (l1),
@@ -401,21 +398,22 @@ public class Images : Scenario
             Value = 8
         };
 
-        var lblPopThreshold = new Label ()
+        var lblPopThreshold = new Label
         {
             Text = "(threshold)",
             X = Pos.Right (_popularityThreshold),
-            Y = Pos.Top (_popularityThreshold),
+            Y = Pos.Top (_popularityThreshold)
         };
 
-        var l2 = new Label ()
+        var l2 = new Label
         {
             Text = "Color Distance Algorithm",
             Width = Dim.Auto (),
             X = Pos.Right (_sixelView),
-            Y = Pos.Bottom (_rgPaletteBuilder) + 1,
+            Y = Pos.Bottom (_rgPaletteBuilder) + 1
         };
-        _rgDistanceAlgorithm = new RadioGroup ()
+
+        _rgDistanceAlgorithm = new()
         {
             RadioLabels = new []
             {
@@ -423,7 +421,7 @@ public class Images : Scenario
                 "CIE76"
             },
             X = Pos.Right (_sixelView) + 2,
-            Y = Pos.Bottom (l2),
+            Y = Pos.Bottom (l2)
         };
 
         _sixelSupported.Add (lblPxX);
@@ -441,7 +439,7 @@ public class Images : Scenario
         _sixelView.DrawContent += SixelViewOnDrawContent;
     }
 
-    IPaletteBuilder GetPaletteBuilder ()
+    private IPaletteBuilder GetPaletteBuilder ()
     {
         switch (_rgPaletteBuilder.SelectedItem)
         {
@@ -451,7 +449,7 @@ public class Images : Scenario
         }
     }
 
-    IColorDistance GetDistanceAlgorithm ()
+    private IColorDistance GetDistanceAlgorithm ()
     {
         switch (_rgDistanceAlgorithm.SelectedItem)
         {
@@ -466,6 +464,7 @@ public class Images : Scenario
         if (_imageView.FullResImage == null)
         {
             MessageBox.Query ("No Image Loaded", "You must first open an image.  Use the 'Open Image' button above.", "Ok");
+
             return;
         }
 
@@ -493,9 +492,7 @@ public class Images : Scenario
             _sixelImage.SixelData = _encodedSixelData;
         }
 
-        _sixelView.SetNeedsDisplay();
-
-
+        _sixelView.SetNeedsDisplay ();
     }
 
     private void SixelViewOnDrawContent (object sender, DrawEventArgs e)

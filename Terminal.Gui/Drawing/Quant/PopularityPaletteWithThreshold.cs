@@ -2,10 +2,10 @@
 using Color = Terminal.Gui.Color;
 
 /// <summary>
-/// Simple fast palette building algorithm which uses the frequency that a color is seen
-/// to determine whether it will appear in the final palette. Includes a threshold where
-/// by colors will be considered 'the same'. This reduces the chance of under represented
-/// colors being missed completely.
+///     Simple fast palette building algorithm which uses the frequency that a color is seen
+///     to determine whether it will appear in the final palette. Includes a threshold where
+///     by colors will be considered 'the same'. This reduces the chance of under represented
+///     colors being missed completely.
 /// </summary>
 public class PopularityPaletteWithThreshold : IPaletteBuilder
 {
@@ -13,7 +13,7 @@ public class PopularityPaletteWithThreshold : IPaletteBuilder
     private readonly double _mergeThreshold;
 
     /// <summary>
-    /// Creates a new instance with the given color grouping parameters.
+    ///     Creates a new instance with the given color grouping parameters.
     /// </summary>
     /// <param name="colorDistance">Determines which different colors can be considered the same.</param>
     /// <param name="mergeThreshold">Threshold for merging two colors together.</param>
@@ -31,7 +31,7 @@ public class PopularityPaletteWithThreshold : IPaletteBuilder
         }
 
         // Step 1: Build the histogram of colors (count occurrences)
-        Dictionary<Color, int> colorHistogram = new Dictionary<Color, int> ();
+        Dictionary<Color, int> colorHistogram = new ();
 
         foreach (Color color in colors)
         {
@@ -64,14 +64,14 @@ public class PopularityPaletteWithThreshold : IPaletteBuilder
     }
 
     /// <summary>
-    /// Merge colors in the histogram if they are within the threshold distance
+    ///     Merge colors in the histogram if they are within the threshold distance
     /// </summary>
     /// <param name="colorHistogram"></param>
     /// <param name="maxColors"></param>
     /// <returns></returns>
     private Dictionary<Color, int> MergeSimilarColors (Dictionary<Color, int> colorHistogram, int maxColors)
     {
-        Dictionary<Color, int> mergedHistogram = new Dictionary<Color, int> ();
+        Dictionary<Color, int> mergedHistogram = new ();
 
         foreach (KeyValuePair<Color, int> entry in colorHistogram)
         {

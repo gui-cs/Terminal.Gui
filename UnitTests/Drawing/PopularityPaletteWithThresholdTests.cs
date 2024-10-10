@@ -25,7 +25,7 @@ public class PopularityPaletteWithThresholdTests
     {
         // Arrange
         var paletteBuilder = new PopularityPaletteWithThreshold (_colorDistance, 50);
-        List<Color> colors = new() { new (255, 0), new (0, 255) };
+        List<Color> colors = new () { new (255, 0), new (0, 255) };
 
         // Act
         List<Color> result = paletteBuilder.BuildPalette (colors, 0);
@@ -39,7 +39,7 @@ public class PopularityPaletteWithThresholdTests
     {
         // Arrange
         var paletteBuilder = new PopularityPaletteWithThreshold (_colorDistance, 50);
-        List<Color> colors = new() { new (255, 0), new (255, 0) };
+        List<Color> colors = new () { new (255, 0), new (255, 0) };
 
         // Act
         List<Color> result = paletteBuilder.BuildPalette (colors, 256);
@@ -55,7 +55,7 @@ public class PopularityPaletteWithThresholdTests
         // Arrange
         var paletteBuilder = new PopularityPaletteWithThreshold (_colorDistance, 50); // Set merge threshold to 50
 
-        List<Color> colors = new List<Color>
+        List<Color> colors = new()
         {
             new (255, 0), // Red
             new (250, 0), // Very close to Red
@@ -78,7 +78,7 @@ public class PopularityPaletteWithThresholdTests
         // Arrange
         var paletteBuilder = new PopularityPaletteWithThreshold (_colorDistance, 50);
 
-        List<Color> colors = new()
+        List<Color> colors = new ()
         {
             new (255, 0), // Red
             new (0, 255) // Green
@@ -99,7 +99,7 @@ public class PopularityPaletteWithThresholdTests
         // Arrange
         var paletteBuilder = new PopularityPaletteWithThreshold (_colorDistance, 50);
 
-        List<Color> colors = new List<Color>
+        List<Color> colors = new()
         {
             new (255, 0), // Red
             new (254, 0), // Close to Red
