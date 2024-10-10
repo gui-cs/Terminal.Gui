@@ -947,6 +947,11 @@ public class HexView : View, IDesignable
     /// <inheritdoc />
     protected override bool OnAdvancingFocus (NavigationDirection direction, TabBehavior? behavior)
     {
+        if (behavior is { } && behavior != TabStop)
+        {
+            return false;
+        }
+
         if (direction == NavigationDirection.Forward && _leftSideHasFocus)
         {
             _leftSideHasFocus = !_leftSideHasFocus;

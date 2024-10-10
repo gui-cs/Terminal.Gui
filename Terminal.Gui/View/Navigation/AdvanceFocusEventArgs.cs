@@ -15,5 +15,4 @@ public class AdvanceFocusEventArgs : CancelEventArgs<bool>
 
     /// <summary>Gets or sets the view that is gaining focus.</summary>
     public TabBehavior? Behavior { get; set; }
-
 }
