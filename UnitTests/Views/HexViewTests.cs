@@ -12,24 +12,32 @@ public class HexViewTests
     [InlineData (20, 4)]
     [InlineData (24, 4)]
     [InlineData (30, 4)]
-    [InlineData (50, 4)]
-    public void BytesPerLine_Calculates_Correctly (int width, int expectedBPL)
+    [InlineData (31, 4)]
+    [InlineData (32, 4)]
+    [InlineData (33, 4)]
+    [InlineData (34, 4)]
+    [InlineData (35, 4)]
+    [InlineData (36, 4)]
+    [InlineData (37, 4)]
+    [InlineData (50, 8)]
+    [InlineData (51, 8)]
+    public void BytesPerLine_Calculates_Correctly (int width, int expectedBpl)
     {
         var hv = new HexView (LoadStream (null, out long _)) { Width = width, Height = 10 };
         hv.LayoutSubviews ();
 
-        Assert.Equal (expectedBPL, hv.BytesPerLine);
+        Assert.Equal (expectedBpl, hv.BytesPerLine);
     }
 
     [Theory]
     [InlineData ("01234", 20, 4)]
     [InlineData ("012345", 20, 4)]
-    public void xuz (string str, int width, int expectedBPL)
+    public void xuz (string str, int width, int expectedBpl)
     {
         var hv = new HexView (LoadStream (str, out long _)) { Width = width, Height = 10 };
         hv.LayoutSubviews ();
 
-        Assert.Equal (expectedBPL, hv.BytesPerLine);
+        Assert.Equal (expectedBpl, hv.BytesPerLine);
     }
 
 

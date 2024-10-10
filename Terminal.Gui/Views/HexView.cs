@@ -689,7 +689,7 @@ public class HexView : View, IDesignable
         // Small buffers will just show the position, with the bsize field value (4 bytes)
         BytesPerLine = NUM_BYTES_PER_HEX_COLUMN;
 
-        if (Viewport.Width - GetLeftSideStartColumn () > 17)
+        if (Viewport.Width - GetLeftSideStartColumn () >= HEX_COLUMN_WIDTH)
         {
             BytesPerLine = NUM_BYTES_PER_HEX_COLUMN * ((Viewport.Width - GetLeftSideStartColumn ()) / 18);
         }
