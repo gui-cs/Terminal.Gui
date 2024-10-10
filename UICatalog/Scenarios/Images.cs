@@ -65,7 +65,8 @@ public class Images : Scenario
 
     public override void Main ()
     {
-        var sixelSupportDetector = new SixelSupportDetector ();
+        // TODO: Change to the one that uses Ansi Requests later
+        var sixelSupportDetector = new AssumeSupportDetector ();
         _sixelSupportResult = sixelSupportDetector.Detect ();
 
         ConsoleDriver.SupportsSixel = _sixelSupportResult.IsSupported;
@@ -143,7 +144,7 @@ public class Images : Scenario
 
         SetupSixelSupported (cbSupportsSixel.CheckedState == CheckState.Checked);
 
-        btnOpenImage.Accept += OpenImage;
+        btnOpenImage.Accepting += OpenImage;
 
         _win.Add (_tabView);
         Application.Run (_win);
@@ -157,7 +158,7 @@ public class Images : Scenario
         _tabView.SetNeedsDisplay ();
     }
 
-    private void BtnStartFireOnAccept (object sender, HandledEventArgs e)
+    private void BtnStartFireOnAccept (object sender, CommandEventArgs e)
     {
         if (_fire != null)
         {
@@ -233,7 +234,7 @@ public class Images : Scenario
         Application.Sixel.Clear ();
     }
 
-    private void OpenImage (object sender, HandledEventArgs e)
+    private void OpenImage (object sender, CommandEventArgs e)
     {
         var ofd = new OpenDialog { Title = "Open Image", AllowsMultipleSelection = false };
         Application.Run (ofd);
@@ -334,7 +335,7 @@ public class Images : Scenario
             Y = 0,
             Text = "Output Sixel", Width = Dim.Auto ()
         };
-        btnSixel.Accept += OutputSixelButtonClick;
+        btnSixel.Accepting += OutputSixelButtonClick;
         _sixelSupported.Add (btnSixel);
 
         var btnStartFire = new Button
@@ -343,7 +344,7 @@ public class Images : Scenario
             Y = Pos.Bottom (btnSixel),
             Text = "Start Fire"
         };
-        btnStartFire.Accept += BtnStartFireOnAccept;
+        btnStartFire.Accepting += BtnStartFireOnAccept;
         _sixelSupported.Add (btnStartFire);
 
 
@@ -462,7 +463,7 @@ public class Images : Scenario
         }
     }
 
-    private void OutputSixelButtonClick (object sender, HandledEventArgs e)
+    private void OutputSixelButtonClick (object sender, CommandEventArgs e)
     {
         if (_imageView.FullResImage == null)
         {
@@ -555,7 +556,7 @@ public class Images : Scenario
             Text = "Ok"
         };
 
-        btn.Accept += (s, e) => Application.RequestStop ();
+        btn.Accepting += (s, e) => Application.RequestStop ();
         dlg.Add (pv);
         dlg.AddButton (btn);
         Application.Run (dlg);

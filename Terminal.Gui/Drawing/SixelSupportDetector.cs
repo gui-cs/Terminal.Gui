@@ -1,12 +1,12 @@
 ﻿using System.Text.RegularExpressions;
 
 namespace Terminal.Gui;
-
+/* TODO : Depends on https://github.com/gui-cs/Terminal.Gui/pull/3768
 /// <summary>
 ///     Uses Ansi escape sequences to detect whether sixel is supported
 ///     by the terminal.
 /// </summary>
-public class SixelSupportDetector
+public class SixelSupportDetector : ISixelSupportDetector
 {
     /// <summary>
     /// Sends Ansi escape sequences to the console to determine whether
@@ -130,4 +130,4 @@ public class SixelSupportDetector
 
         return false;
     }
-}
+}*/
