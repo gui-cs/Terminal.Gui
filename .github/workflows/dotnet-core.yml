@@ -103,6 +103,14 @@ jobs:
         cd SelfContained
         dotnet remove reference "..\Terminal.Gui\Terminal.Gui.csproj"
         dotnet add package Terminal.Gui
+        dotnet build --configuration Release
+
+    - name: Build NativeAot
+      run: |
+        cd NativeAot
+        dotnet remove package Terminal.Gui
+        dotnet add package Terminal.Gui
+        dotnet build --configuration Release
 
     # Note: this step is currently not writing to the gist for some reason
     # - name: Create Test Coverage Badge
