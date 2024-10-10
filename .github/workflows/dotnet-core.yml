@@ -91,7 +91,7 @@ jobs:
         dotnet-quality: 'ga'
 
     - name: Pack Release
-      run: dotnet pack Terminal.Gui/Terminal.Gui.csproj --configuration Release --output ./local_packages
+      run: cd Terminal.Gui && dotnet pack --configuration Release --output ./local_packages
 
     - name: Build Release
       run: dotnet build --configuration Release
