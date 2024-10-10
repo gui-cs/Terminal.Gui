@@ -34,6 +34,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
             return false;
         }
 
+        if (RaiseAdvancingFocus (direction, behavior))
+        {
+            return true;
+        }
+
         View? focused = Focused;
 
         if (focused is { } && focused.AdvanceFocus (direction, behavior))
@@ -128,6 +133,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
         if (view.HasFocus)
         {
             // We could not advance
+            if (view != this)
+            {
+                // Tell it to try the other way.
+                return view.RaiseAdvancingFocus (direction == NavigationDirection.Forward ? NavigationDirection.Backward : NavigationDirection.Forward, behavior);
+            }
             return view == this;
         }
 
@@ -136,6 +146,52 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         return focusSet;
     }
+
+    private bool RaiseAdvancingFocus (NavigationDirection direction, TabBehavior? behavior)
+    {
+        // Call the virtual method
+        if (OnAdvancingFocus (direction, behavior))
+        {
+            // The event was cancelled
+            return true;
+        }
+
+        var args = new AdvanceFocusEventArgs (direction, behavior);
+        AdvancingFocus?.Invoke (this, args);
+
+        if (args.Cancel)
+        {
+            // The event was cancelled
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    ///     Called when <see cref="View.AdvanceFocus"/> is about to advance focus.
+    /// </summary>
+    /// <remarks>
+    /// </remarks>
+    /// <returns>
+    ///     <see langword="true"/>, if the focus advance is to be cancelled, <see langword="false"/>
+    ///     otherwise.
+    /// </returns>
+    protected virtual bool OnAdvancingFocus (NavigationDirection direction, TabBehavior? behavior) { return false; }
+
+    /// <summary>
+    ///     Raised when <see cref="View.AdvanceFocus"/> is about to advance focus.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Cancel the event to prevent the focus from advancing.
+    ///     </para>
+    ///     <para>
+    ///         Use <see cref="HasFocusChanged"/> to be notified after the focus has changed.
+    ///     </para>
+    /// </remarks>
+    public event EventHandler<AdvanceFocusEventArgs>? AdvancingFocus;
+
 
     /// <summary>Gets or sets a value indicating whether this <see cref="View"/> can be focused.</summary>
     /// <remarks>
@@ -467,7 +523,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         bool previousValue = HasFocus;
 
-        bool cancelled = NotifyFocusChanging (false, true, currentFocusedView, this);
+        bool cancelled = RaiseFocusChanging (false, true, currentFocusedView, this);
 
         if (cancelled)
         {
@@ -529,7 +585,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         }
 
         // Focus work is done. Notify.
-        NotifyFocusChanged (HasFocus, currentFocusedView, this);
+        RaiseFocusChanged (HasFocus, currentFocusedView, this);
 
         SetNeedsDisplay ();
 
@@ -542,7 +598,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         return (true, false);
     }
 
-    private bool NotifyFocusChanging (bool currentHasFocus, bool newHasFocus, View? currentFocused, View? newFocused)
+    private bool RaiseFocusChanging (bool currentHasFocus, bool newHasFocus, View? currentFocused, View? newFocused)
     {
         Debug.Assert (currentFocused is null || currentFocused is { HasFocus: true });
         Debug.Assert (newFocused is null || newFocused is { CanFocus: true });
@@ -750,7 +806,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         Debug.Assert (_hasFocus);
 
         // Note, can't be cancelled.
-        NotifyFocusChanging (HasFocus, !HasFocus, this, newFocusedView);
+        RaiseFocusChanging (HasFocus, !HasFocus, this, newFocusedView);
 
         // Even though the change can't be cancelled, some listener may have changed the focus to another view.
         if (!_hasFocus)
@@ -765,7 +821,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         // Set HasFocus false
         _hasFocus = false;
 
-        NotifyFocusChanged (HasFocus, this, newFocusedView);
+        RaiseFocusChanged (HasFocus, this, newFocusedView);
 
         if (_hasFocus)
         {
@@ -782,7 +838,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         SetNeedsDisplay ();
     }
 
-    private void NotifyFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedVew)
+    private void RaiseFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedVew)
     {
         if (newHasFocus && focusedVew?.Focused is null)
         {

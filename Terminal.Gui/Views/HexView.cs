@@ -66,8 +66,6 @@ public class HexView : View, IDesignable
         AddCommand (Command.Right, () => MoveRight ());
         AddCommand (Command.Down, () => MoveDown (BytesPerLine));
         AddCommand (Command.Up, () => MoveUp (BytesPerLine));
-        AddCommand (Command.Tab, () => Navigate (NavigationDirection.Forward));
-        AddCommand (Command.BackTab, () => Navigate (NavigationDirection.Backward));
         AddCommand (Command.PageUp, () => MoveUp (BytesPerLine * Viewport.Height));
         AddCommand (Command.PageDown, () => MoveDown (BytesPerLine * Viewport.Height));
         AddCommand (Command.Start, () => MoveHome ());
@@ -98,9 +96,6 @@ public class HexView : View, IDesignable
         KeyBindings.Add (Key.CursorRight.WithCtrl, Command.RightEnd);
         KeyBindings.Add (Key.CursorUp.WithCtrl, Command.StartOfPage);
         KeyBindings.Add (Key.CursorDown.WithCtrl, Command.EndOfPage);
-
-        KeyBindings.Add (Key.Tab, Command.Tab);
-        KeyBindings.Add (Key.Tab.WithShift, Command.BackTab);
 
         KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
         KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
@@ -606,7 +601,7 @@ public class HexView : View, IDesignable
             int value;
             var k = (char)keyEvent.KeyCode;
 
-            if (!char.IsAsciiDigit ((char)keyEvent.KeyCode))
+            if (!char.IsAsciiHexDigit ((char)keyEvent.KeyCode))
             {
                 return false;
             }
@@ -949,23 +944,25 @@ public class HexView : View, IDesignable
         SetNeedsDisplay (new (0, line, Viewport.Width, 1));
     }
 
-    private bool Navigate (NavigationDirection direction)
+    /// <inheritdoc />
+    protected override bool OnAdvancingFocus (NavigationDirection direction, TabBehavior? behavior)
     {
-        switch (direction)
+        if (direction == NavigationDirection.Forward && _leftSideHasFocus)
         {
-            case NavigationDirection.Forward:
-                _leftSideHasFocus = !_leftSideHasFocus;
-                RedisplayLine (Address);
-                _firstNibble = true;
+            _leftSideHasFocus = !_leftSideHasFocus;
+            RedisplayLine (Address);
+            _firstNibble = true;
 
-                return true;
+            return true;
+        }
 
-            case NavigationDirection.Backward:
-                _leftSideHasFocus = !_leftSideHasFocus;
-                RedisplayLine (Address);
-                _firstNibble = true;
+        if (direction == NavigationDirection.Backward && !_leftSideHasFocus)
+        {
+            _leftSideHasFocus = !_leftSideHasFocus;
+            RedisplayLine (Address);
+            _firstNibble = true;
 
-                return true;
+            return true;
         }
 
         return false;
