@@ -58,7 +58,7 @@ public class Shortcut : View, IOrientation, IDesignable
     ///     </para>
     /// </remarks>
     /// <param name="targetView">
-    ///     The View that <paramref name="command"/> will be invoked when user does something that causes the Shortcut's Accept
+    ///     The View that <paramref name="command"/> will be invoked on when user does something that causes the Shortcut's Accept
     ///     event to be raised.
     /// </param>
     /// <param name="command">

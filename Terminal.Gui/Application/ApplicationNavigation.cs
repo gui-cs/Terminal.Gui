@@ -77,6 +77,7 @@ public class ApplicationNavigation
         {
             return;
         }
+        Debug.Assert (value is null or { CanFocus: true, HasFocus: true });
 
         _focused = value;
 

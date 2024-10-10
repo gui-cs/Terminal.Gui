@@ -874,7 +874,8 @@ public class ScrollViewTests (ITestOutputHelper output)
             X = 3,
             Y = 3,
             Width = 10,
-            Height = 10
+            Height = 10,
+            TabStop = TabBehavior.TabStop
         };
         sv.SetContentSize (new (50, 50));
 
