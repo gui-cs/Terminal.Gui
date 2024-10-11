@@ -431,10 +431,10 @@ public class HexView : View, IDesignable
         Driver.SetAttribute (current);
         Move (0, 0);
 
-        int nblocks = BytesPerLine / NUM_BYTES_PER_HEX_COLUMN;
-        var data = new byte [nblocks * NUM_BYTES_PER_HEX_COLUMN * viewport.Height];
+        int nBlocks = BytesPerLine / NUM_BYTES_PER_HEX_COLUMN;
+        var data = new byte [nBlocks * NUM_BYTES_PER_HEX_COLUMN * viewport.Height];
         Source.Position = _displayStart;
-        int n = _source.Read (data, 0, data.Length);
+        int n = _source!.Read (data, 0, data.Length);
 
         Attribute activeColor = GetHotNormalColor ();
         Attribute trackingColor = GetHotFocusColor ();
@@ -451,7 +451,7 @@ public class HexView : View, IDesignable
             Move (0, line);
             currentAttribute = GetHotNormalColor ();
             Driver.SetAttribute (currentAttribute);
-            var address = $"{_displayStart + line * nblocks * NUM_BYTES_PER_HEX_COLUMN:x8}";
+            var address = $"{_displayStart + line * nBlocks * NUM_BYTES_PER_HEX_COLUMN:x8}";
             Driver.AddStr ($"{address.Substring (8 - AddressWidth)}");
 
             if (AddressWidth > 0)
@@ -461,11 +461,11 @@ public class HexView : View, IDesignable
 
             SetAttribute (GetNormalColor ());
 
-            for (var block = 0; block < nblocks; block++)
+            for (var block = 0; block < nBlocks; block++)
             {
                 for (var b = 0; b < NUM_BYTES_PER_HEX_COLUMN; b++)
                 {
-                    int offset = line * nblocks * NUM_BYTES_PER_HEX_COLUMN + block * NUM_BYTES_PER_HEX_COLUMN + b;
+                    int offset = line * nBlocks * NUM_BYTES_PER_HEX_COLUMN + block * NUM_BYTES_PER_HEX_COLUMN + b;
                     byte value = GetData (data, offset, out bool edited);
 
                     if (offset + _displayStart == Address || edited)
@@ -482,12 +482,12 @@ public class HexView : View, IDesignable
                     Driver.AddRune (_spaceCharRune);
                 }
 
-                Driver.AddStr (block + 1 == nblocks ? " " : $"{_columnSeparatorRune} ");
+                Driver.AddStr (block + 1 == nBlocks ? " " : $"{_columnSeparatorRune} ");
             }
 
-            for (var bitem = 0; bitem < nblocks * NUM_BYTES_PER_HEX_COLUMN; bitem++)
+            for (var bitem = 0; bitem < nBlocks * NUM_BYTES_PER_HEX_COLUMN; bitem++)
             {
-                int offset = line * nblocks * NUM_BYTES_PER_HEX_COLUMN + bitem;
+                int offset = line * nBlocks * NUM_BYTES_PER_HEX_COLUMN + bitem;
                 byte b = GetData (data, offset, out bool edited);
                 Rune c;
 
