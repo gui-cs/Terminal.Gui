@@ -755,9 +755,9 @@ public class HexView : View, IDesignable
             // We can move down lines cleanly (without extending stream)
             Address += bytes;
         }
-        else if ((bytes == BytesPerLine * Viewport.Height && _source.Length >= DisplayStart + BytesPerLine * Viewport.Height)
+        else if ((bytes == BytesPerLine * Viewport.Height && _source!.Length >= DisplayStart + BytesPerLine * Viewport.Height)
                  || (bytes <= BytesPerLine * Viewport.Height - BytesPerLine
-                     && _source.Length <= DisplayStart + BytesPerLine * Viewport.Height))
+                     && _source!.Length <= DisplayStart + BytesPerLine * Viewport.Height))
         {
             long p = Address;
 
