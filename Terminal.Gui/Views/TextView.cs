@@ -5958,7 +5958,7 @@ public class TextView : View
         // if the user presses Left (without any control keys) and they are at the start of the text
         if (CurrentColumn == 0 && CurrentRow == 0)
         {
-            if (Selecting)
+            if (IsSelecting)
             {
                 StopSelecting ();
                 return true;
@@ -5997,7 +5997,7 @@ public class TextView : View
         if (CurrentColumn == lastCol && CurrentRow == lastRow)
         {
             // Unless they have text selected
-            if (Selecting)
+            if (IsSelecting)
             {
                 // In which case clear
                 StopSelecting ();
