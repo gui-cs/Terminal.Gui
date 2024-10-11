@@ -441,16 +441,14 @@ public class TreeViewFileSystem : Scenario
         {
             if (_iconProvider.UseNerdIcons || _iconProvider.UseUnicodeCharacters)
             {
-                if (e.IndexOfModelText > 0 && e.IndexOfModelText < e.RuneCells.Count)
+                if (e.IndexOfModelText > 0 && e.IndexOfModelText < e.Cells.Count)
                 {
-                    RuneCell cell = e.RuneCells [e.IndexOfModelText];
+                    Cell cell = e.Cells [e.IndexOfModelText];
 
-                    cell.ColorScheme = new ColorScheme (
-                                                        new Attribute (
-                                                                       Color.BrightYellow,
-                                                                       cell.ColorScheme.Normal.Background
-                                                                      )
-                                                       );
+                    cell.Attribute = new Attribute (
+                                                    Color.BrightYellow,
+                                                    cell.Attribute!.Value.Background
+                                                   );
                 }
             }
         }
