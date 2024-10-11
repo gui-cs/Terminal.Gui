@@ -528,24 +528,21 @@ public partial class View // Drawing APIs
             }
 
             // BUGBUG: this clears way too frequently. Need to optimize this.
-            if (SuperView is { } || Arrangement.HasFlag (ViewArrangement.Overlapped))
+            if (SuperView is { } || Arrangement.HasFlag (ViewArrangement.Overlapped) || IsCurrentTop)
             {
                 Clear ();
             }
 
             if (!string.IsNullOrEmpty (TextFormatter.Text))
             {
-                if (TextFormatter is { })
-                {
-                    TextFormatter.NeedsFormat = true;
-                }
+                TextFormatter.NeedsFormat = true;
             }
 
             // This should NOT clear 
             // TODO: If the output is not in the Viewport, do nothing
             var drawRect = new Rectangle (ContentToScreen (Point.Empty), GetContentSize ());
 
-            TextFormatter?.Draw (
+            TextFormatter.Draw (
                                  drawRect,
                                  HasFocus ? GetFocusColor () : GetNormalColor (),
                                  HasFocus ? GetHotFocusColor () : GetHotNormalColor (),

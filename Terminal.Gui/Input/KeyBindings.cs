@@ -323,18 +323,7 @@ public class KeyBindings
     /// <param name="boundViewForAppScope">Optional View for <see cref="KeyBindingScope.Application"/> bindings.</param>
     public void Remove (Key key, View? boundViewForAppScope = null)
     {
-        KeyBindingScope scope = KeyBindingScope.Disabled;
-        if (boundViewForAppScope is null && BoundView is { })
-        {
-            boundViewForAppScope = BoundView;
-            scope = KeyBindingScope.HotKey | KeyBindingScope.Focused;
-        }
-        else
-        {
-            scope = KeyBindingScope.Application;
-        }
-
-        if (!TryGet (key, out KeyBinding binding))
+        if (!TryGet (key, out KeyBinding _))
         {
             return;
         }

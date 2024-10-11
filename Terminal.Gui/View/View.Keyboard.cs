@@ -722,30 +722,6 @@ public partial class View // Keyboard APIs
 
 #endif
         return InvokeCommands (binding.Commands, key, binding);
-
-        foreach (Command command in binding.Commands)
-        {
-            if (!CommandImplementations.ContainsKey (command))
-            {
-                throw new NotSupportedException (
-                                                 @$"A KeyBinding was set up for the command {command} ({key}) but that command is not supported by this View ({GetType ().Name})"
-                                                );
-            }
-
-            // each command has its own return value
-            bool? thisReturn = InvokeCommand (command, key, binding);
-
-            // if we haven't got anything yet, the current command result should be used
-            toReturn ??= thisReturn;
-
-            // if ever see a true then that's what we will return
-            if (thisReturn ?? false)
-            {
-                toReturn = true;
-            }
-        }
-
-        return toReturn;
     }
 
     #endregion Key Bindings

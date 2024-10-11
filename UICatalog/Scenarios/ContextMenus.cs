@@ -68,8 +68,6 @@ public class ContextMenus : Scenario
         _tfBottomRight = new () { Id = "_tfBottomRight", X = Pos.AnchorEnd (width), Y = Pos.AnchorEnd (1), Width = width, Text = text };
         appWindow.Add (_tfBottomRight);
 
-        Point mousePos = default;
-
         appWindow.KeyDown += (s, e) =>
                              {
                                  if (e.KeyCode == _winContextMenuKey)
@@ -124,10 +122,10 @@ public class ContextMenus : Scenario
                 supportedCultures.Add (culture);
                 index++;
                 culture = new ();
-                culture.CommandView = new CheckBox () { CanFocus = false, HighlightStyle = HighlightStyle.None};
+                culture.CommandView = new CheckBox () { CanFocus = false, HighlightStyle = HighlightStyle.None };
             }
 
-            culture.Id= $"_{c.Parent.EnglishName}";
+            culture.Id = $"_{c.Parent.EnglishName}";
             culture.Title = $"_{c.Parent.EnglishName}";
             culture.HelpText = c.Name;
             ((CheckBox)culture.CommandView).CheckedState = Thread.CurrentThread.CurrentUICulture.Name == culture.HelpText ? CheckState.Checked : CheckState.UnChecked;
@@ -142,7 +140,7 @@ public class ContextMenus : Scenario
             culture.Action += () =>
                               {
                                   Thread.CurrentThread.CurrentUICulture = new (culture.HelpText);
- 
+
                                   foreach (Shortcut item in cultures)
                                   {
                                       ((CheckBox)item.CommandView).CheckedState = Thread.CurrentThread.CurrentUICulture.Name == item.HelpText ? CheckState.Checked : CheckState.UnChecked;
@@ -172,13 +170,11 @@ public class ContextMenus : Scenario
             //ForceMinimumPosToZero = _forceMinimumPosToZero,
             //UseSubMenusSingleFrame = _useSubMenusSingleFrame
         };
-
-        //_winContextMenu.KeyBindings.Add (_winContextMenuKey, Command.Context);
     }
 
     private void ShowWinContextMenu (Point? screenPosition)
     {
-        _winContextMenu!.SetPosition(screenPosition);
+        _winContextMenu!.SetPosition (screenPosition);
         Application.Popover = _winContextMenu;
         _winContextMenu.Visible = true;
     }

@@ -1,11 +1,9 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Timers;
 using Terminal.Gui;
 
@@ -29,10 +27,10 @@ public class Shortcuts : Scenario
 
     // Setting everything up in Loaded handler because we change the
     // QuitKey and it only sticks if changed after init
-    private void App_Loaded (object sender, EventArgs e)
+    private void App_Loaded (object? sender, EventArgs e)
     {
         Application.QuitKey = Key.F4.WithCtrl;
-        Application.Top.Title = GetQuitKeyAndName ();
+        Application.Top!.Title = GetQuitKeyAndName ();
 
         ObservableCollection<string> eventSource = new ();
 
@@ -45,7 +43,7 @@ public class Shortcuts : Scenario
             BorderStyle = LineStyle.Double,
             Title = "E_vents"
         };
-        eventLog.Width = Dim.Func (() => Math.Min (Application.Top.Viewport.Width / 2, eventLog?.MaxLength + eventLog.GetAdornmentsThickness ().Horizontal ?? 0));
+        eventLog.Width = Dim.Func (() => Math.Min (Application.Top.Viewport.Width / 2, eventLog?.MaxLength + eventLog!.GetAdornmentsThickness ().Horizontal ?? 0));
         Application.Top.Add (eventLog);
 
         var vShortcut1 = new Shortcut
@@ -80,7 +78,7 @@ public class Shortcuts : Scenario
 
         ((RadioGroup)vShortcut2.CommandView).SelectedItemChanged += (o, args) =>
         {
-            eventSource.Add ($"SelectedItemChanged: {o.GetType ().Name} - {args.SelectedItem}");
+            eventSource.Add ($"SelectedItemChanged: {o?.GetType ().Name} - {args.SelectedItem}");
             eventLog.MoveDown ();
         };
 
@@ -99,11 +97,11 @@ public class Shortcuts : Scenario
             },
             Key = Key.F5.WithCtrl.WithAlt.WithShift,
             HelpText = "Width is Fill",
-            Width = Dim.Fill () - Dim.Width (eventLog),
+            Width = Dim.Fill ()! - Dim.Width (eventLog),
             KeyBindingScope = KeyBindingScope.HotKey,
         };
 
-        ((CheckBox)vShortcut3.CommandView).CheckedStateChanging += (s, e) =>
+        ((CheckBox)vShortcut3.CommandView).CheckedStateChanging += (_, args) =>
         {
             if (vShortcut3.CommandView is CheckBox cb)
             {
@@ -114,18 +112,12 @@ public class Shortcuts : Scenario
                 IEnumerable<View> toAlign = Application.Top.Subviews.Where (v => v is Shortcut { Orientation: Orientation.Vertical, Width: not DimAbsolute });
                 IEnumerable<View> enumerable = toAlign as View [] ?? toAlign.ToArray ();
 
-                if (e.NewValue == CheckState.Checked)
+                if (args.NewValue == CheckState.Checked)
                 {
-                    foreach (var view in enumerable)
-                    {
-                        var peer = (Shortcut)view;
-
-                        // DANGER: KeyView is internal so we can't access it. So we assume this is how it works.
-                        max = Math.Max (max, peer.Key.ToString ().GetColumns ());
-                    }
+                    max = (from Shortcut? peer in enumerable select peer.Key.ToString ().GetColumns ()).Prepend (max).Max ();
                 }
 
-                foreach (var view in enumerable)
+                foreach (View view in enumerable)
                 {
                     var peer = (Shortcut)view;
                     peer.MinimumKeyTextSize = max;
@@ -203,12 +195,12 @@ public class Shortcuts : Scenario
             Key = Key.F5,
         };
 
-        ((Slider<string>)vShortcutSlider.CommandView).Options = new () { new () { Legend = "A" }, new () { Legend = "B" }, new () { Legend = "C" } };
+        ((Slider<string>)vShortcutSlider.CommandView).Options = [new () { Legend = "A" }, new () { Legend = "B" }, new () { Legend = "C" }];
         ((Slider<string>)vShortcutSlider.CommandView).SetOption (0);
 
         ((Slider<string>)vShortcutSlider.CommandView).OptionsChanged += (o, args) =>
         {
-            eventSource.Add ($"OptionsChanged: {o.GetType ().Name} - {string.Join (",", ((Slider<string>)o).GetSetOptions ())}");
+            eventSource.Add ($"OptionsChanged: {o?.GetType ().Name} - {string.Join (",", ((Slider<string>)o!)!.GetSetOptions ())}");
             eventLog.MoveDown ();
         };
 
@@ -330,7 +322,7 @@ public class Shortcuts : Scenario
         {
             Application.Top.ColorScheme = new ColorScheme (Application.Top.ColorScheme)
             {
-                Normal = new Attribute (Application.Top.ColorScheme.Normal.Foreground, args.CurrentValue),
+                Normal = new (Application.Top!.GetNormalColor().Foreground, args.CurrentValue),
             };
         };
         hShortcutBG.CommandView = bgColor;
@@ -399,10 +391,10 @@ public class Shortcuts : Scenario
         //((CheckBox)vShortcut5.CommandView).OnToggle ();
     }
 
-    private void Button_Clicked (object sender, CommandEventArgs e)
+    private void Button_Clicked (object? sender, CommandEventArgs e)
     {
         e.Cancel = true;
-        View view = sender as View;
-        MessageBox.Query ("Hi", $"You clicked {view!.Text}", "_Ok");
+        View? view = sender as View;
+        MessageBox.Query ("Hi", $"You clicked {view?.Text}", "_Ok");
     }
 }

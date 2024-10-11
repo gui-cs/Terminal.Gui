@@ -645,16 +645,20 @@ public partial class View // Mouse APIs
 
         View? start = Application.Top;
 
-        if (Application.Popover?.Visible == true)
-        {
-            if (Application.Top?.Contains (location) ?? false)
-            {
-                viewsUnderMouse.Add (Application.Top);
-            }
+        viewsUnderMouse = GetViewsUnderMouse (Application.Top, location);
 
-            start = Application.Popover;
+        if (Application.Popover is { Visible: true })
+        {
+            viewsUnderMouse.AddRange (GetViewsUnderMouse (Application.Popover, location));
         }
 
+        return viewsUnderMouse;
+
+    }
+
+    internal static List<View?> GetViewsUnderMouse (View? start, in Point location)
+    {
+        List<View?> viewsUnderMouse = new ();
         Point currentLocation = location;
 
         while (start is { Visible: true } && start.Contains (currentLocation))

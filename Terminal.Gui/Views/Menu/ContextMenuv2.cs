@@ -26,16 +26,10 @@ public class ContextMenuv2 : Menuv2
 {
     private Key _key = DefaultKey;
 
-    private MouseFlags _mouseFlags = MouseFlags.Button3Clicked;
-
-    public MouseFlags MouseFlags
-    {
-        get => _mouseFlags;
-        set
-        {
-            _mouseFlags = value;
-        }
-    }
+    /// <summary>
+    ///     The mouse flags that will trigger the context menu. The default is <see cref="MouseFlags.Button3Clicked"/> which is typically the right mouse button.
+    /// </summary>
+    public MouseFlags MouseFlags { get; set; } = MouseFlags.Button3Clicked;
 
     /// <summary>Initializes a context menu with no menu items.</summary>
     public ContextMenuv2 () : this ([]) { }
@@ -46,9 +40,6 @@ public class ContextMenuv2 : Menuv2
         Visible = false;
         VisibleChanged += OnVisibleChanged;
         Key = DefaultKey;
-
-        KeyChanged += OnKeyChanged;
-
         AddCommand (Command.Context,
                     () =>
                     {
@@ -62,18 +53,8 @@ public class ContextMenuv2 : Menuv2
 
                         return true;
                     });
-
-        //Application.KeyBindings.Remove (Key, this);
-        //Application.KeyBindings.Add (Key, this, Command.Context);
-
         return;
 
-        void OnKeyChanged (object? sender, KeyChangedEventArgs e)
-        {
-            //Application.KeyBindings.Remove (e.OldKey, this);
-            //Application.KeyBindings.Remove (e.NewKey, this);
-            //Application.KeyBindings.Add (e.NewKey, this, Command.Context);
-        }
     }
 
     private void OnVisibleChanged (object? sender, EventArgs _)

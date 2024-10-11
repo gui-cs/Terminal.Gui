@@ -4294,7 +4294,7 @@ public class TextView : View
         DoNeededAction ();
     }
 
-    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.ReplaceKey (e.OldKey, e.NewKey); }
+    private void ContextMenu_KeyChanged (object? sender, KeyChangedEventArgs e) { KeyBindings.ReplaceKey (e.OldKey, e.NewKey); }
 
     private bool DeleteTextBackwards ()
     {
