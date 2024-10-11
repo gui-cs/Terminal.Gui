@@ -44,6 +44,7 @@ public class ScrollBarViewTests
         Assert.Equal (1, _scrollBar.OtherScrollBarView.Viewport.Height);
 
         _hostView.Lines = 10;
+        _hostView.SetNeedsDisplay ();
         _hostView.Draw ();
         Assert.False (_scrollBar.ShowScrollIndicator);
         Assert.False (_scrollBar.Visible);
@@ -67,6 +68,7 @@ public class ScrollBarViewTests
         Assert.Equal (1, _scrollBar.OtherScrollBarView.Viewport.Height);
 
         _hostView.Cols = 60;
+        _hostView.SetNeedsDisplay ();
         _hostView.Draw ();
         Assert.False (_scrollBar.ShowScrollIndicator);
         Assert.False (_scrollBar.Visible);
@@ -90,6 +92,7 @@ public class ScrollBarViewTests
         Assert.Equal (1, _scrollBar.OtherScrollBarView.Viewport.Height);
 
         _hostView.Lines = 40;
+        _hostView.SetNeedsDisplay ();
         _hostView.Draw ();
         Assert.True (_scrollBar.ShowScrollIndicator);
         Assert.True (_scrollBar.Visible);
@@ -113,6 +116,7 @@ public class ScrollBarViewTests
         Assert.Equal (1, _scrollBar.OtherScrollBarView.Viewport.Height);
 
         _hostView.Cols = 120;
+        _hostView.SetNeedsDisplay ();
         _hostView.Draw ();
         Assert.True (_scrollBar.ShowScrollIndicator);
         Assert.True (_scrollBar.Visible);
@@ -544,7 +548,7 @@ This is a test
             "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
         var label = new Label { Text = text };
         var top = new Toplevel ();
-       top.Add (label);
+        top.Add (label);
 
         var sbv = new ScrollBarView (label, true) { Size = 100 };
         sbv.OtherScrollBarView.Size = 100;
@@ -680,10 +684,12 @@ This is a test
         AddHandlers ();
 
         _hostView.Top = 3;
+        _hostView.SetNeedsDisplay ();
         _hostView.Draw ();
         Assert.Equal (_scrollBar.Position, _hostView.Top);
 
         _hostView.Left = 6;
+        _hostView.SetNeedsDisplay ();
         _hostView.Draw ();
         Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
         _hostView.SuperView.Dispose ();
@@ -1137,11 +1143,18 @@ This is a test
     [AutoInitShutdown]
     public void ShowScrollIndicator_False_Must_Also_Set_Visible_To_False_To_Not_Respond_To_Events ()
     {
+        // Override CM
+        Window.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultButtonAlignment = Alignment.Center;
+        Dialog.DefaultBorderStyle = LineStyle.Single;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
+
         var clicked = false;
         var text = "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
         var label = new Label { Width = 14, Height = 5, Text = text };
         var btn = new Button { X = 14, Text = "Click Me!" };
-        btn.Accept += (s, e) => clicked = true;
+        btn.Accepting += (s, e) => clicked = true;
         var top = new Toplevel ();
         top.Add (label, btn);
 
@@ -1155,11 +1168,7 @@ This is a test
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @$"
-This is a test{
-    CM.Glyphs.LeftBracket
-} Click Me! {
-    CM.Glyphs.RightBracket
-}
+This is a test{CM.Glyphs.LeftBracket} Click Me! {CM.Glyphs.RightBracket}
 This is a test             
 This is a test             
 This is a test             
@@ -1183,11 +1192,7 @@ This is a test             ",
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @$"
-This is a test{
-    CM.Glyphs.LeftBracket
-} Click Me! {
-    CM.Glyphs.RightBracket
-}
+This is a test{CM.Glyphs.LeftBracket} Click Me! {CM.Glyphs.RightBracket}
 This is a test             
 This is a test             
 This is a test             

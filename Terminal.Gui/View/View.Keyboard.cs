@@ -11,14 +11,12 @@ public partial class View // Keyboard APIs
     private void SetupKeyboard ()
     {
         KeyBindings = new (this);
+        KeyBindings.Add (Key.Space, Command.Select);
+        KeyBindings.Add (Key.Enter, Command.Accept);
+
+        // Note, setting HotKey will bind HotKey to Command.HotKey
         HotKeySpecifier = (Rune)'_';
         TitleTextFormatter.HotKeyChanged += TitleTextFormatter_HotKeyChanged;
-
-        // By default, the HotKey command sets the focus
-        AddCommand (Command.HotKey, OnHotKey);
-
-        // By default, the Accept command raises the Accept event
-        AddCommand (Command.Accept, OnAccept);
     }
 
     /// <summary>
@@ -28,22 +26,6 @@ public partial class View // Keyboard APIs
 
     #region HotKey Support
 
-    /// <summary>
-    ///     Called when the HotKey command (<see cref="Command.HotKey"/>) is invoked. Causes this view to be focused.
-    /// </summary>
-    /// <returns>If <see langword="true"/> the command was canceled.</returns>
-    private bool? OnHotKey ()
-    {
-        if (CanFocus)
-        {
-            SetFocus ();
-
-            return true;
-        }
-
-        return false;
-    }
-
     /// <summary>Invoked when the <see cref="HotKey"/> is changed.</summary>
     public event EventHandler<KeyChangedEventArgs>? HotKeyChanged;
 
@@ -52,16 +34,22 @@ public partial class View // Keyboard APIs
 
     /// <summary>
     ///     Gets or sets the hot key defined for this view. Pressing the hot key on the keyboard while this view has focus will
-    ///     invoke the <see cref="Command.HotKey"/> and <see cref="Command.Accept"/> commands. <see cref="Command.HotKey"/>
-    ///     causes the view to be focused and <see cref="Command.Accept"/> does nothing. By default, the HotKey is
-    ///     automatically set to the first character of <see cref="Text"/> that is prefixed with <see cref="HotKeySpecifier"/>.
+    ///     invoke <see cref="Command.HotKey"/>. By default, the HotKey is set to the first character of <see cref="Text"/>
+    ///     that is prefixed with <see cref="HotKeySpecifier"/>.
     ///     <para>
-    ///         A HotKey is a keypress that selects a visible UI item. For selecting items across <see cref="View"/>`s (e.g.a
-    ///         <see cref="Button"/> in a <see cref="Dialog"/>) the keypress must include the <see cref="Key.WithAlt"/>
-    ///         modifier. For selecting items within a View that are not Views themselves, the keypress can be key without the
-    ///         Alt modifier. For example, in a Dialog, a Button with the text of "_Text" can be selected with Alt-T. Or, in a
-    ///         <see cref="Menu"/> with "_File _Edit", Alt-F will select (show) the "_File" menu. If the "_File" menu has a
-    ///         sub-menu of "_New" `Alt-N` or `N` will ONLY select the "_New" sub-menu if the "_File" menu is already opened.
+    ///         A HotKey is a keypress that causes a visible UI item to perform an action. For example, in a Dialog,
+    ///         with a Button with the text of "_Text" <c>Alt+T</c> will cause the button to gain focus and to raise its
+    ///         <see cref="Accepting"/> event.
+    ///         Or, in a
+    ///         <see cref="Menu"/> with "_File _Edit", <c>Alt+F</c> will select (show) the "_File" menu. If the "_File" menu
+    ///         has a
+    ///         sub-menu of "_New" <c>Alt+N</c> or <c>N</c> will ONLY select the "_New" sub-menu if the "_File" menu is already
+    ///         opened.
+    ///     </para>
+    ///     <para>
+    ///         View subclasses can use <see cref="View.AddCommand(Command,CommandImplementation)"/> to
+    ///         define the
+    ///         behavior of the hot key.
     ///     </para>
     /// </summary>
     /// <remarks>
@@ -510,7 +498,7 @@ public partial class View // Keyboard APIs
     /// <summary>Gets the key bindings for this view.</summary>
     public KeyBindings KeyBindings { get; internal set; } = null!;
 
-    private Dictionary<Command, Func<CommandContext, bool?>> CommandImplementations { get; } = new ();
+    private Dictionary<Command, CommandImplementation> CommandImplementations { get; } = new ();
 
     /// <summary>
     ///     Low-level API called when a user presses a key; invokes any key bindings set on the view. This is called
@@ -523,8 +511,9 @@ public partial class View // Keyboard APIs
     /// <param name="keyEvent">Contains the details about the key that produced the event.</param>
     /// <param name="scope">The scope.</param>
     /// <returns>
-    ///     <see langword="false"/> if the key press was not handled. <see langword="true"/> if the keypress was handled
-    ///     and no other view should see it.
+    ///     <see langword="null"/> if no event was raised; input proessing should continue.
+    ///     <see langword="false"/> if the event was raised and was not handled (or cancelled); input proessing should continue.
+    ///     <see langword="true"/> if the event was raised and handled (or cancelled); input proessing should stop.
     /// </returns>
     public virtual bool? OnInvokingKeyBindings (Key keyEvent, KeyBindingScope scope)
     {
@@ -579,6 +568,13 @@ public partial class View // Keyboard APIs
 
     private bool ProcessAdornmentKeyBindings (Adornment adornment, Key keyEvent, KeyBindingScope scope, ref bool? handled)
     {
+        bool? adornmentHandled = adornment.OnInvokingKeyBindings (keyEvent, scope);
+
+        if (adornmentHandled is true)
+        {
+            return true;
+        }
+
         if (adornment?.Subviews is null)
         {
             return false;
@@ -681,7 +677,7 @@ public partial class View // Keyboard APIs
     }
 
     /// <summary>
-    ///     Invoked when a key is pressed that may be mapped to a key binding. Set <see cref="Key.Handled"/> to true to
+    ///     Raised when a key is pressed that may be mapped to a key binding. Set <see cref="Key.Handled"/> to true to
     ///     stop the key from being processed by other views.
     /// </summary>
     public event EventHandler<Key>? InvokingKeyBindings;
@@ -693,9 +689,9 @@ public partial class View // Keyboard APIs
     /// <param name="key">The key event passed.</param>
     /// <param name="scope">The scope.</param>
     /// <returns>
-    ///     <see langword="null"/> if no command was bound the <paramref name="key"/>. <see langword="true"/> if
-    ///     commands were invoked and at least one handled the command. <see langword="false"/> if commands were invoked and at
-    ///     none handled the command.
+    ///     <see langword="null"/> if no command was invoked; input proessing should continue.
+    ///     <see langword="false"/> if at least one command was invoked and was not handled (or cancelled); input proessing should continue.
+    ///     <see langword="true"/> if at least one command was invoked and handled (or cancelled); input proessing should stop.
     /// </returns>
     protected bool? InvokeKeyBindings (Key key, KeyBindingScope scope)
     {
@@ -726,6 +722,7 @@ public partial class View // Keyboard APIs
         }
 
 #endif
+        return InvokeCommands (binding.Commands, key, binding);
 
         foreach (Command command in binding.Commands)
         {
@@ -751,112 +748,6 @@ public partial class View // Keyboard APIs
 
         return toReturn;
     }
-
-    /// <summary>
-    ///     Invokes the specified commands.
-    /// </summary>
-    /// <param name="commands"></param>
-    /// <param name="key">The key that caused the commands to be invoked, if any.</param>
-    /// <param name="keyBinding"></param>
-    /// <returns>
-    ///     <see langword="null"/> if no command was found.
-    ///     <see langword="true"/> if the command was invoked the command was handled.
-    ///     <see langword="false"/> if the command was invoked and the command was not handled.
-    /// </returns>
-    public bool? InvokeCommands (Command [] commands, Key? key = null, KeyBinding? keyBinding = null)
-    {
-        bool? toReturn = null;
-
-        foreach (Command command in commands)
-        {
-            if (!CommandImplementations.ContainsKey (command))
-            {
-                throw new NotSupportedException (@$"{command} is not supported by ({GetType ().Name}).");
-            }
-
-            // each command has its own return value
-            bool? thisReturn = InvokeCommand (command, key, keyBinding);
-
-            // if we haven't got anything yet, the current command result should be used
-            toReturn ??= thisReturn;
-
-            // if ever see a true then that's what we will return
-            if (thisReturn ?? false)
-            {
-                toReturn = true;
-            }
-        }
-
-        return toReturn;
-    }
-
-    /// <summary>Invokes the specified command.</summary>
-    /// <param name="command">The command to invoke.</param>
-    /// <param name="key">The key that caused the command to be invoked, if any.</param>
-    /// <param name="keyBinding"></param>
-    /// <returns>
-    ///     <see langword="null"/> if no command was found. <see langword="true"/> if the command was invoked, and it
-    ///     handled the command. <see langword="false"/> if the command was invoked, and it did not handle the command.
-    /// </returns>
-    public bool? InvokeCommand (Command command, Key? key = null, KeyBinding? keyBinding = null)
-    {
-        if (CommandImplementations.TryGetValue (command, out Func<CommandContext, bool?>? implementation))
-        {
-            var context = new CommandContext (command, key, keyBinding); // Create the context here
-
-            return implementation (context);
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    ///     <para>
-    ///         Sets the function that will be invoked for a <see cref="Command"/>. Views should call
-    ///         AddCommand for each command they support.
-    ///     </para>
-    ///     <para>
-    ///         If AddCommand has already been called for <paramref name="command"/> <paramref name="f"/> will
-    ///         replace the old one.
-    ///     </para>
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         This version of AddCommand is for commands that require <see cref="CommandContext"/>. Use
-    ///         <see cref="AddCommand(Command,Func{System.Nullable{bool}})"/>
-    ///         in cases where the command does not require a <see cref="CommandContext"/>.
-    ///     </para>
-    /// </remarks>
-    /// <param name="command">The command.</param>
-    /// <param name="f">The function.</param>
-    protected void AddCommand (Command command, Func<CommandContext, bool?> f) { CommandImplementations [command] = f; }
-
-    /// <summary>
-    ///     <para>
-    ///         Sets the function that will be invoked for a <see cref="Command"/>. Views should call
-    ///         AddCommand for each command they support.
-    ///     </para>
-    ///     <para>
-    ///         If AddCommand has already been called for <paramref name="command"/> <paramref name="f"/> will
-    ///         replace the old one.
-    ///     </para>
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         This version of AddCommand is for commands that do not require a <see cref="CommandContext"/>.
-    ///         If the command requires context, use
-    ///         <see cref="AddCommand(Command,Func{CommandContext,System.Nullable{bool}})"/>
-    ///     </para>
-    /// </remarks>
-    /// <param name="command">The command.</param>
-    /// <param name="f">The function.</param>
-    protected void AddCommand (Command command, Func<bool?> f) { CommandImplementations [command] = ctx => f (); }
-
-    /// <summary>Returns all commands that are supported by this <see cref="View"/>.</summary>
-    /// <returns></returns>
-    public IEnumerable<Command> GetSupportedCommands () { return CommandImplementations.Keys; }
-
-    // TODO: Add GetKeysBoundToCommand() - given a Command, return all Keys that would invoke it
 
     #endregion Key Bindings
 }

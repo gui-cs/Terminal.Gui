@@ -66,7 +66,7 @@ public class Dialog : Window
     /// </remarks>
     public Dialog ()
     {
-        Arrangement = ViewArrangement.Movable;
+        Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped;
         ShadowStyle = DefaultShadow;
         BorderStyle = DefaultBorderStyle;
 
@@ -80,17 +80,6 @@ public class Dialog : Window
         Modal = true;
         ButtonAlignment = DefaultButtonAlignment;
         ButtonAlignmentModes = DefaultButtonAlignmentModes;
-
-        AddCommand (
-                    Command.QuitToplevel,
-                    () =>
-                    {
-                        Canceled = true;
-                        RequestStop ();
-
-                        return true;
-                    });
-        KeyBindings.Add (Key.Esc, Command.QuitToplevel);
     }
 
     // BUGBUG: We override GetNormal/FocusColor because "Dialog" ColorScheme is goofy.

@@ -6,7 +6,7 @@ public class ColorPicker16Tests
     public void Constructors ()
     {
         var colorPicker = new ColorPicker16 ();
-        Assert.Equal (ColorName.Black, colorPicker.SelectedColor);
+        Assert.Equal (ColorName16.Black, colorPicker.SelectedColor);
         Assert.Equal (Point.Empty, colorPicker.Cursor);
         Assert.True (colorPicker.CanFocus);
 
@@ -20,25 +20,25 @@ public class ColorPicker16Tests
     public void KeyBindings_Command ()
     {
         var colorPicker = new ColorPicker16 ();
-        Assert.Equal (ColorName.Black, colorPicker.SelectedColor);
+        Assert.Equal (ColorName16.Black, colorPicker.SelectedColor);
 
         Assert.True (colorPicker.NewKeyDownEvent (Key.CursorRight));
-        Assert.Equal (ColorName.Blue, colorPicker.SelectedColor);
+        Assert.Equal (ColorName16.Blue, colorPicker.SelectedColor);
 
         Assert.True (colorPicker.NewKeyDownEvent (Key.CursorDown));
-        Assert.Equal (ColorName.BrightBlue, colorPicker.SelectedColor);
+        Assert.Equal (ColorName16.BrightBlue, colorPicker.SelectedColor);
 
         Assert.True (colorPicker.NewKeyDownEvent (Key.CursorLeft));
-        Assert.Equal (ColorName.DarkGray, colorPicker.SelectedColor);
+        Assert.Equal (ColorName16.DarkGray, colorPicker.SelectedColor);
 
         Assert.True (colorPicker.NewKeyDownEvent (Key.CursorUp));
-        Assert.Equal (ColorName.Black, colorPicker.SelectedColor);
+        Assert.Equal (ColorName16.Black, colorPicker.SelectedColor);
 
         Assert.True (colorPicker.NewKeyDownEvent (Key.CursorLeft));
-        Assert.Equal (ColorName.Black, colorPicker.SelectedColor);
+        Assert.Equal (ColorName16.Black, colorPicker.SelectedColor);
 
         Assert.True (colorPicker.NewKeyDownEvent (Key.CursorUp));
-        Assert.Equal (ColorName.Black, colorPicker.SelectedColor);
+        Assert.Equal (ColorName16.Black, colorPicker.SelectedColor);
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class ColorPicker16Tests
     public void MouseEvents ()
     {
         var colorPicker = new ColorPicker16 { X = 0, Y = 0, Height = 4, Width = 32 };
-        Assert.Equal (ColorName.Black, colorPicker.SelectedColor);
+        Assert.Equal (ColorName16.Black, colorPicker.SelectedColor);
         var top = new Toplevel ();
         top.Add (colorPicker);
         Application.Begin (top);
@@ -54,7 +54,7 @@ public class ColorPicker16Tests
         Assert.False (colorPicker.NewMouseEvent (new ()));
 
         Assert.True (colorPicker.NewMouseEvent (new () { Position = new (4, 1), Flags = MouseFlags.Button1Clicked }));
-        Assert.Equal (ColorName.Blue, colorPicker.SelectedColor);
+        Assert.Equal (ColorName16.Blue, colorPicker.SelectedColor);
         top.Dispose ();
     }
 
@@ -62,7 +62,7 @@ public class ColorPicker16Tests
     public void SelectedColorAndCursor ()
     {
         var colorPicker = new ColorPicker16 ();
-        colorPicker.SelectedColor = ColorName.White;
+        colorPicker.SelectedColor = ColorName16.White;
         Assert.Equal (7, colorPicker.Cursor.X);
         Assert.Equal (1, colorPicker.Cursor.Y);
 
@@ -71,9 +71,9 @@ public class ColorPicker16Tests
         Assert.Equal (0, colorPicker.Cursor.Y);
 
         colorPicker.Cursor = new (7, 1);
-        Assert.Equal (ColorName.White, colorPicker.SelectedColor);
+        Assert.Equal (ColorName16.White, colorPicker.SelectedColor);
 
         colorPicker.Cursor = Point.Empty;
-        Assert.Equal (ColorName.Black, colorPicker.SelectedColor);
+        Assert.Equal (ColorName16.Black, colorPicker.SelectedColor);
     }
 }

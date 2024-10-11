@@ -91,7 +91,7 @@ public class ColorPickerTests
         Assert.Equal (19, r.TrianglePosition);
         Assert.Equal ("#FF0000", hex.Text);
 
-        Application.Current.Dispose ();
+        Application.Top.Dispose ();
     }
 
     [Fact]
@@ -144,7 +144,7 @@ public class ColorPickerTests
         Assert.Equal (4, r.TrianglePosition);
         Assert.Equal ("#1E0000", hex.Text);
 
-        Application.Current?.Dispose ();
+        Application.Top?.Dispose ();
     }
 
 
@@ -198,7 +198,7 @@ public class ColorPickerTests
         Assert.Equal (expectedBTriangle, b.TrianglePosition);
         Assert.Equal (expectedHex, hex.Text);
 
-        Application.Current.Dispose ();
+        Application.Top.Dispose ();
     }
 
     public static IEnumerable<object []> ColorPickerTestData_WithTextFields ()
@@ -257,7 +257,7 @@ public class ColorPickerTests
         Assert.Equal (expectedBValue.ToString (), bTextField.Text);
         Assert.Equal (expectedHex, hex.Text);
 
-        Application.Current?.Dispose ();
+        Application.Top?.Dispose ();
     }
 
     [Fact]
@@ -291,7 +291,7 @@ public class ColorPickerTests
         Assert.Equal (2, b.TrianglePosition);
         Assert.Equal ("#FF0000", hex.Text);
 
-        Application.Current?.Dispose ();
+        Application.Top?.Dispose ();
     }
 
     [Fact]
@@ -325,7 +325,7 @@ public class ColorPickerTests
         Assert.Equal (2, b.TrianglePosition);
         Assert.Equal ("#FF0000", hex.Text);
 
-        Application.Current?.Dispose ();
+        Application.Top?.Dispose ();
     }
 
     [Fact]
@@ -336,7 +336,7 @@ public class ColorPickerTests
 
         View otherView = new View () { CanFocus = true };
 
-        Application.Current?.Add (otherView); // thi sets focus to otherView
+        Application.Top?.Add (otherView); // thi sets focus to otherView
         Assert.True (otherView.HasFocus);
 
         cp.SetFocus ();
@@ -384,7 +384,7 @@ public class ColorPickerTests
         Assert.Equal ("0", bTextField.Text);
         Assert.Equal ("#800000", hex.Text);
 
-        Application.Current?.Dispose ();
+        Application.Top?.Dispose ();
     }
 
     [Fact]
@@ -422,7 +422,7 @@ public class ColorPickerTests
         Assert.Equal (2, b.TrianglePosition);
         Assert.Equal ("#000000", hex.Text);
 
-        Application.Current?.Dispose ();
+        Application.Top?.Dispose ();
     }
 
     [Fact]
@@ -437,7 +437,7 @@ public class ColorPickerTests
         Application.OnMouseEvent (new ()
         {
             Flags = MouseFlags.Button1Pressed,
-            Position = new (0, 1)
+            ScreenPosition = new (0, 1)
         });
         //cp.Subviews.OfType<GBar> ()
         //  .Single ()
@@ -456,7 +456,7 @@ public class ColorPickerTests
         Application.OnMouseEvent (new ()
         {
             Flags = MouseFlags.Button1Pressed,
-            Position = new (0, 2)
+            ScreenPosition = new (0, 2)
         });
         //cp.Subviews.OfType<BBar> ()
         //  .Single ()
@@ -471,7 +471,7 @@ public class ColorPickerTests
 
         Assert.IsAssignableFrom<BBar> (cp.Focused);
 
-        Application.Current?.Dispose ();
+        Application.Top?.Dispose ();
     }
 
     [Fact]
@@ -516,7 +516,7 @@ public class ColorPickerTests
         Assert.Equal (19, v.TrianglePosition);
         Assert.Equal ("#FF0000", hex.Text);
 
-        Application.Current?.Dispose ();
+        Application.Top!.Dispose ();
     }
 
     [Fact]
@@ -552,7 +552,7 @@ public class ColorPickerTests
         Assert.Equal ("0", bTextField.Text);
         Assert.Equal ("#800000", hex.Text);
 
-        Application.Current?.Dispose ();
+        Application.Top?.Dispose ();
     }
 
     enum ColorPickerPart
@@ -694,8 +694,8 @@ public class ColorPickerTests
     {
         var cp = GetColorPicker (ColorModel.RGB, true, true);
         Application.Navigation = new ();
-        Application.Current = new ();
-        Application.Current.Add (cp);
+        Application.Top = new ();
+        Application.Top.Add (cp);
 
         cp.Draw ();
 
@@ -732,8 +732,8 @@ public class ColorPickerTests
 
         Assert.Equal ("#7FFFD4", hex.Text);
 
-        Application.Current?.Dispose ();
-        Application.ResetState ();
+        Application.Top?.Dispose ();
+        Application.ResetState (ignoreDisposed: true);
     }
 
     [Fact]
@@ -742,8 +742,8 @@ public class ColorPickerTests
     {
         var cp = GetColorPicker (ColorModel.RGB, true, true);
         Application.Navigation = new ();
-        Application.Current = new ();
-        Application.Current.Add (cp);
+        Application.Top = new ();
+        Application.Top.Add (cp);
 
         cp.Draw ();
 
@@ -786,8 +786,8 @@ public class ColorPickerTests
         Assert.Equal ("#7FFFD4", hex.Text);
         Assert.Equal ("Aquamarine", name.Text);
 
-        Application.Current?.Dispose ();
-        Application.ResetState ();
+        Application.Top?.Dispose ();
+        Application.ResetState (ignoreDisposed: true);
     }
 
     /// <summary>
@@ -800,8 +800,8 @@ public class ColorPickerTests
     {
         var cp = GetColorPicker (ColorModel.RGB, true, true);
         Application.Navigation = new ();
-        Application.Current = new ();
-        Application.Current.Add (cp);
+        Application.Top = new ();
+        Application.Top.Add (cp);
 
         cp.Draw ();
 
@@ -844,8 +844,8 @@ public class ColorPickerTests
         Assert.Equal ("#7FFFD4", hex.Text);
         Assert.Equal ("Aquamarine", name.Text);
 
-        Application.Current?.Dispose ();
-        Application.ResetState ();
+        Application.Top?.Dispose ();
+        Application.ResetState (ignoreDisposed: true);
     }
 
     [Fact]
@@ -863,11 +863,11 @@ public class ColorPickerTests
         cp.Style.ShowColorName = showName;
         cp.ApplyStyleChanges ();
 
-        Application.Current = new Toplevel () { Width = 20, Height = 5 };
-        Application.Current.Add (cp);
+        Application.Top = new Toplevel () { Width = 20, Height = 5 };
+        Application.Top.Add (cp);
 
-        Application.Current.LayoutSubviews ();
-        Application.Current.SetFocus ();
+        Application.Top.LayoutSubviews ();
+        Application.Top.SetFocus ();
 
         return cp;
     }

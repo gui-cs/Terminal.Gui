@@ -110,7 +110,7 @@ public class ThemeManager : IDictionary<string, ThemeScope>
             string oldTheme = _theme;
             _theme = value;
 
-            if (oldTheme != _theme && Settings! ["Themes"]?.PropertyValue is Dictionary<string, ThemeScope> themes && themes.ContainsKey (_theme))
+            if ((oldTheme != _theme || oldTheme != Settings! ["Theme"].PropertyValue as string) && Settings! ["Themes"]?.PropertyValue is Dictionary<string, ThemeScope> themes && themes.ContainsKey (_theme))
             {
                 Settings! ["Theme"].PropertyValue = _theme;
                 Instance.OnThemeChanged (oldTheme);

@@ -78,7 +78,7 @@ public class FileDialog : Dialog
             Y = Pos.AnchorEnd (),
             IsDefault = true, Text = Style.OkButtonText
         };
-        _btnOk.Accept += (s, e) => Accept (true);
+        _btnOk.Accepting += (s, e) => Accept (true);
 
 
         _btnCancel = new Button
@@ -88,7 +88,7 @@ public class FileDialog : Dialog
             Text = Strings.btnCancel
         };
 
-        _btnCancel.Accept += (s, e) =>
+        _btnCancel.Accepting += (s, e) =>
         {
             Canceled = true;
             Application.RequestStop ();
@@ -96,15 +96,15 @@ public class FileDialog : Dialog
 
         _btnUp = new Button { X = 0, Y = 1, NoPadding = true };
         _btnUp.Text = GetUpButtonText ();
-        _btnUp.Accept += (s, e) => _history.Up ();
+        _btnUp.Accepting += (s, e) => _history.Up ();
 
         _btnBack = new Button { X = Pos.Right (_btnUp) + 1, Y = 1, NoPadding = true };
         _btnBack.Text = GetBackButtonText ();
-        _btnBack.Accept += (s, e) => _history.Back ();
+        _btnBack.Accepting += (s, e) => _history.Back ();
 
         _btnForward = new Button { X = Pos.Right (_btnBack) + 1, Y = 1, NoPadding = true };
         _btnForward.Text = GetForwardButtonText ();
-        _btnForward.Accept += (s, e) => _history.Forward ();
+        _btnForward.Accepting += (s, e) => _history.Forward ();
 
         _tbPath = new TextField { Width = Dim.Fill (), CaptionColor = new Color (Color.Black) };
 
@@ -182,7 +182,7 @@ public class FileDialog : Dialog
             Y = Pos.AnchorEnd (), Text = GetToggleSplitterText (false)
         };
 
-        _btnToggleSplitterCollapse.Accept += (s, e) =>
+        _btnToggleSplitterCollapse.Accepting += (s, e) =>
                                               {
                                                   Tile tile = _splitContainer.Tiles.ElementAt (0);
 
@@ -236,10 +236,10 @@ public class FileDialog : Dialog
         _tableView.KeyUp += (s, k) => k.Handled = TableView_KeyUp (k);
         _tableView.SelectedCellChanged += TableView_SelectedCellChanged;
 
-        _tableView.KeyBindings.ReplaceCommands (Key.Home, Command.TopHome);
-        _tableView.KeyBindings.ReplaceCommands (Key.End, Command.BottomEnd);
-        _tableView.KeyBindings.ReplaceCommands (Key.Home.WithShift, Command.TopHomeExtend);
-        _tableView.KeyBindings.ReplaceCommands (Key.End.WithShift, Command.BottomEndExtend);
+        _tableView.KeyBindings.ReplaceCommands (Key.Home, Command.Start);
+        _tableView.KeyBindings.ReplaceCommands (Key.End, Command.End);
+        _tableView.KeyBindings.ReplaceCommands (Key.Home.WithShift, Command.StartExtend);
+        _tableView.KeyBindings.ReplaceCommands (Key.End.WithShift, Command.EndExtend);
         
         AllowsMultipleSelection = false;
 
@@ -610,7 +610,7 @@ public class FileDialog : Dialog
         ApplySort ();
     }
 
-    private new void Accept (IEnumerable<FileSystemInfoStats> toMultiAccept)
+    private void Accept (IEnumerable<FileSystemInfoStats> toMultiAccept)
     {
         if (!AllowsMultipleSelection)
         {
@@ -629,7 +629,7 @@ public class FileDialog : Dialog
         FinishAccept ();
     }
 
-    private new void Accept (IFileInfo f)
+    private void Accept (IFileInfo f)
     {
         if (!IsCompatibleWithOpenMode (f.FullName, out string reason))
         {
@@ -649,7 +649,7 @@ public class FileDialog : Dialog
         FinishAccept ();
     }
 
-    private new void Accept (bool allowMulti)
+    private void Accept (bool allowMulti)
     {
         if (allowMulti && TryAcceptMulti ())
         {

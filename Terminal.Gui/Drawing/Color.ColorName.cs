@@ -8,10 +8,10 @@ namespace Terminal.Gui;
 ///     <para>These colors match the 16 colors defined for ANSI escape sequences for 4-bit (16) colors.</para>
 ///     <para>
 ///         For terminals that support 24-bit color (TrueColor), the RGB values for each of these colors can be
-///         configured using the <see cref="Color.Colors"/> property.
+///         configured using the <see cref="Color.Colors16"/> property.
 ///     </para>
 /// </remarks>
-public enum ColorName
+public enum ColorName16
 {
     /// <summary>The black color. ANSI escape sequence: <c>\u001b[30m</c>.</summary>
     Black,

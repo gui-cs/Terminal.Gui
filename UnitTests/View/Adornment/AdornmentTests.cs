@@ -381,4 +381,116 @@ public class AdornmentTests (ITestOutputHelper output)
         view.Padding.Thickness = new (2, 2, 2, 2);
         Assert.Throws<InvalidOperationException> (() => view.Padding.Viewport = view.Padding.Viewport with { Location = new (1, 1) });
     }
+
+    // Contains tests
+
+    [Theory]
+    [InlineData (0, 0, 0, 0, 0, 0, false)]
+    [InlineData (0, 0, 0, 1, 0, 0, false)]
+    [InlineData (0, 0, 1, 0, 0, 0, false)]
+    [InlineData (0, 0, 1, 1, 0, 0, true)]
+    [InlineData (0, 0, 1, 2, 0, 0, true)]
+
+    [InlineData (1, 1, 0, 0, 0, 0, false)]
+    [InlineData (1, 1, 0, 1, 0, 0, false)]
+    [InlineData (1, 1, 1, 0, 0, 0, false)]
+    [InlineData (1, 1, 1, 0, 0, 1, false)]
+    [InlineData (1, 1, 1, 1, 1, 0, false)]
+    [InlineData (1, 1, 1, 1, 0, 0, false)]
+    [InlineData (1, 1, 1, 1, 1, 1, true)]
+    [InlineData (1, 1, 1, 2, 1, 1, true)]
+    public void Contains_Left_Only (int x, int y, int width, int height, int pointX, int pointY, bool expected)
+    {
+        Adornment adornment = new () { Id = "adornment" };
+        adornment.Parent = new View () { Id = "parent" };
+        adornment.Parent.Frame = new Rectangle (x, y, width, height);
+        adornment.Thickness = new (1, 0, 0, 0);
+        adornment.Frame = adornment.Parent.Frame with { Location = Point.Empty };
+
+        bool result = adornment.Contains (new (pointX, pointY));
+        Assert.Equal (expected, result);
+    }
+
+    [Theory]
+    [InlineData (0, 0, 0, 0, 0, 0, false)]
+    [InlineData (0, 0, 0, 1, 0, 0, false)]
+    [InlineData (0, 0, 1, 0, 0, 0, false)]
+    [InlineData (0, 0, 1, 1, 0, 0, true)]
+    [InlineData (0, 0, 1, 2, 0, 0, true)]
+
+    [InlineData (1, 1, 0, 0, 0, 0, false)]
+    [InlineData (1, 1, 0, 1, 0, 0, false)]
+    [InlineData (1, 1, 1, 0, 0, 0, false)]
+    [InlineData (1, 1, 1, 0, 0, 1, false)]
+    [InlineData (1, 1, 1, 1, 1, 0, false)]
+    [InlineData (1, 1, 1, 1, 0, 0, false)]
+    [InlineData (1, 1, 1, 1, 1, 1, true)]
+    [InlineData (1, 1, 1, 2, 1, 1, true)]
+    public void Contains_Right_Only (int x, int y, int width, int height, int pointX, int pointY, bool expected)
+    {
+        Adornment adornment = new () { Id = "adornment" };
+        adornment.Parent = new View () { Id = "parent" };
+        adornment.Parent.Frame = new Rectangle (x, y, width, height);
+        adornment.Thickness = new (0, 0, 1, 0);
+        adornment.Frame = adornment.Parent.Frame with { Location = Point.Empty };
+
+        bool result = adornment.Contains (new (pointX, pointY));
+        Assert.Equal (expected, result);
+    }
+
+
+    [Theory]
+    [InlineData (0, 0, 0, 0, 0, 0, false)]
+    [InlineData (0, 0, 0, 1, 0, 0, false)]
+    [InlineData (0, 0, 1, 0, 0, 0, false)]
+    [InlineData (0, 0, 1, 1, 0, 0, true)]
+    [InlineData (0, 0, 1, 2, 0, 0, true)]
+
+    [InlineData (1, 1, 0, 0, 0, 0, false)]
+    [InlineData (1, 1, 0, 1, 0, 0, false)]
+    [InlineData (1, 1, 1, 0, 0, 0, false)]
+    [InlineData (1, 1, 1, 0, 0, 1, false)]
+    [InlineData (1, 1, 1, 1, 1, 0, false)]
+    [InlineData (1, 1, 1, 1, 0, 0, false)]
+    [InlineData (1, 1, 1, 1, 1, 1, true)]
+    [InlineData (1, 1, 1, 2, 1, 1, true)]
+    public void Contains_Top_Only (int x, int y, int width, int height, int pointX, int pointY, bool expected)
+    {
+        Adornment adornment = new () { Id = "adornment" };
+        adornment.Parent = new View () { Id = "parent" };
+        adornment.Parent.Frame = new Rectangle (x, y, width, height);
+        adornment.Thickness = new (0, 1, 0, 0);
+        adornment.Frame = adornment.Parent.Frame with { Location = Point.Empty };
+
+        bool result = adornment.Contains (new (pointX, pointY));
+        Assert.Equal (expected, result);
+    }
+
+
+    [Theory]
+    [InlineData (0, 0, 0, 0, 0, 0, false)]
+    [InlineData (0, 0, 0, 1, 0, 0, false)]
+    [InlineData (0, 0, 1, 0, 0, 0, false)]
+    [InlineData (0, 0, 1, 1, 0, 0, true)]
+    [InlineData (0, 0, 1, 2, 0, 0, true)]
+
+    [InlineData (1, 1, 0, 0, 0, 0, false)]
+    [InlineData (1, 1, 0, 1, 0, 0, false)]
+    [InlineData (1, 1, 1, 0, 0, 0, false)]
+    [InlineData (1, 1, 1, 0, 0, 1, false)]
+    [InlineData (1, 1, 1, 1, 1, 0, false)]
+    [InlineData (1, 1, 1, 1, 0, 0, false)]
+    [InlineData (1, 1, 1, 1, 1, 1, true)]
+    [InlineData (1, 1, 1, 2, 1, 1, true)]
+    public void Contains_TopLeft_Only (int x, int y, int width, int height, int pointX, int pointY, bool expected)
+    {
+        Adornment adornment = new () { Id = "adornment" };
+        adornment.Parent = new View () { Id = "parent" };
+        adornment.Parent.Frame = new Rectangle (x, y, width, height);
+        adornment.Thickness = new (1, 1, 0, 0);
+        adornment.Frame = adornment.Parent.Frame with { Location = Point.Empty };
+
+        bool result = adornment.Contains (new (pointX, pointY));
+        Assert.Equal (expected, result);
+    }
 }

@@ -137,7 +137,7 @@ internal class ShadowView : View
         Rectangle screen = ViewportToScreen (viewport);
 
         // Fill the rest of the rectangle
-        for (int i = screen.Y; i < screen.Y + viewport.Height; i++)
+        for (int i = Math.Max (0, screen.Y); i < screen.Y + viewport.Height; i++)
         {
             Driver.Move (screen.X, i);
 

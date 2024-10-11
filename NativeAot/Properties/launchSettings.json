@@ -3,7 +3,7 @@
     "NativeAot": {
       "commandName": "Project"
     },
-    "WSL : UICatalog": {
+    "WSL : NativeAot": {
       "commandName": "Executable",
       "executablePath": "wsl",
       "commandLineArgs": "dotnet NativeAot.dll",

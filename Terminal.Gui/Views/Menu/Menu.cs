@@ -101,7 +101,7 @@ internal sealed class Menu : View
 
             for (var i = 0; i < _barItems.Children?.Length; i++)
             {
-                if (_barItems.Children [i]!.IsEnabled ())
+                if (_barItems.Children [i]?.IsEnabled () == true)
                 {
                     _currentChild = i;
 
@@ -144,17 +144,17 @@ internal sealed class Menu : View
 
     public Menu ()
     {
-        if (Application.Current is { })
+        if (Application.Top is { })
         {
-            Application.Current.DrawContentComplete += Current_DrawContentComplete;
-            Application.Current.SizeChanging += Current_TerminalResized;
+            Application.Top.DrawContentComplete += Current_DrawContentComplete;
+            Application.Top.SizeChanging += Current_TerminalResized;
         }
 
         Application.MouseEvent += Application_RootMouseEvent;
 
         // Things this view knows how to do
-        AddCommand (Command.LineUp, () => MoveUp ());
-        AddCommand (Command.LineDown, () => MoveDown ());
+        AddCommand (Command.Up, () => MoveUp ());
+        AddCommand (Command.Down, () => MoveDown ());
 
         AddCommand (
                     Command.Left,
@@ -186,16 +186,15 @@ internal sealed class Menu : View
                     }
                    );
         AddCommand (Command.Select, ctx => _host?.SelectItem ((ctx.KeyBinding?.Context as MenuItem)!));
-        AddCommand (Command.ToggleExpandCollapse, ctx => ExpandCollapse ((ctx.KeyBinding?.Context as MenuItem)!));
+        AddCommand (Command.Toggle, ctx => ExpandCollapse ((ctx.KeyBinding?.Context as MenuItem)!));
         AddCommand (Command.HotKey, ctx => _host?.SelectItem ((ctx.KeyBinding?.Context as MenuItem)!));
 
         // Default key bindings for this view
-        KeyBindings.Add (Key.CursorUp, Command.LineUp);
-        KeyBindings.Add (Key.CursorDown, Command.LineDown);
+        KeyBindings.Add (Key.CursorUp, Command.Up);
+        KeyBindings.Add (Key.CursorDown, Command.Down);
         KeyBindings.Add (Key.CursorLeft, Command.Left);
         KeyBindings.Add (Key.CursorRight, Command.Right);
         KeyBindings.Add (Key.Esc, Command.Cancel);
-        KeyBindings.Add (Key.Enter, Command.Accept);
     }
 
     private void AddKeyBindingsHotKey (MenuBarItem? menuBarItem)
@@ -209,7 +208,7 @@ internal sealed class Menu : View
 
         foreach (MenuItem menuItem in menuItems)
         {
-            KeyBinding keyBinding = new ([Command.ToggleExpandCollapse], KeyBindingScope.HotKey, menuItem);
+            KeyBinding keyBinding = new ([Command.Toggle], KeyBindingScope.HotKey, menuItem);
 
             if (menuItem.HotKey != Key.Empty)
             {
@@ -330,7 +329,7 @@ internal sealed class Menu : View
     }
 
     /// <inheritdoc/>
-    public override void OnVisibleChanged ()
+    protected override void OnVisibleChanged ()
     {
         base.OnVisibleChanged ();
 
@@ -386,7 +385,7 @@ internal sealed class Menu : View
             return GetFocusColor ();
         }
 
-        return !item.IsEnabled () ? ColorScheme.Disabled : GetNormalColor ();
+        return !item.IsEnabled () ? ColorScheme!.Disabled : GetNormalColor ();
     }
 
     public override void OnDrawContent (Rectangle viewport)
@@ -518,7 +517,7 @@ internal sealed class Menu : View
 
                 if (!item.IsEnabled ())
                 {
-                    DrawHotString (textToDraw, ColorScheme.Disabled, ColorScheme.Disabled);
+                    DrawHotString (textToDraw, ColorScheme!.Disabled, ColorScheme.Disabled);
                 }
                 else if (i == 0 && _host.UseSubMenusSingleFrame && item.Parent!.Parent is { })
                 {
@@ -533,7 +532,7 @@ internal sealed class Menu : View
                     tf.Draw (
                              ViewportToScreen (new Rectangle (1, i, Frame.Width - 3, 1)),
                              i == _currentChild ? GetFocusColor () : GetNormalColor (),
-                             i == _currentChild ? ColorScheme.HotFocus : ColorScheme.HotNormal,
+                             i == _currentChild ? ColorScheme!.HotFocus : ColorScheme!.HotNormal,
                              SuperView?.ViewportToScreen (SuperView.Viewport) ?? Rectangle.Empty
                             );
                 }
@@ -541,7 +540,7 @@ internal sealed class Menu : View
                 {
                     DrawHotString (
                                    textToDraw,
-                                   i == _currentChild ? ColorScheme.HotFocus : ColorScheme.HotNormal,
+                                   i == _currentChild ? ColorScheme!.HotFocus : ColorScheme!.HotNormal,
                                    i == _currentChild ? GetFocusColor () : GetNormalColor ()
                                   );
                 }
@@ -607,6 +606,7 @@ internal sealed class Menu : View
 
         Application.UngrabMouse ();
         _host.CloseAllMenus ();
+        Application.Driver!.ClearContents ();
         Application.Refresh ();
 
         _host.Run (action);
@@ -952,10 +952,10 @@ internal sealed class Menu : View
     {
         RemoveKeyBindingsHotKey (_barItems);
 
-        if (Application.Current is { })
+        if (Application.Top is { })
         {
-            Application.Current.DrawContentComplete -= Current_DrawContentComplete;
-            Application.Current.SizeChanging -= Current_TerminalResized;
+            Application.Top.DrawContentComplete -= Current_DrawContentComplete;
+            Application.Top.SizeChanging -= Current_TerminalResized;
         }
 
         Application.MouseEvent -= Application_RootMouseEvent;

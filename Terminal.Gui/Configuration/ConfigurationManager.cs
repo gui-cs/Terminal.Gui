@@ -24,7 +24,7 @@ namespace Terminal.Gui;
 ///     </para>
 ///     <para>
 ///         Settings are defined in JSON format, according to this schema:
-///         https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json
+///        https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json
 ///     </para>
 ///     <para>
 ///         Settings that will apply to all applications (global settings) reside in files named <c>config.json</c>.
@@ -197,10 +197,19 @@ public static class ConfigurationManager
 
         try
         {
-            settings = Settings?.Apply () ?? false;
-
-            themes = !string.IsNullOrEmpty (ThemeManager.SelectedTheme)
-                     && (ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false);
+            if (string.IsNullOrEmpty (ThemeManager.SelectedTheme))
+            {
+                // First start. Apply settings first. This ensures if a config sets Theme to something other than "Default", it gets used
+                settings = Settings?.Apply () ?? false;
+                themes = !string.IsNullOrEmpty (ThemeManager.SelectedTheme)
+                         && (ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false);
+            }
+            else
+            {
+                // Subsequently. Apply Themes first using whatever the SelectedTheme is
+                themes = ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false;
+                settings = Settings?.Apply () ?? false;
+            }
             appSettings = AppSettings?.Apply () ?? false;
         }
         catch (JsonException e)

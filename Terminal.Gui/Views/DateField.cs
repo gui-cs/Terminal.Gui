@@ -395,7 +395,7 @@ public class DateField : TextField
                         return true;
                     }
                    );
-        AddCommand (Command.LeftHome, () => MoveHome ());
+        AddCommand (Command.LeftStart, () => MoveHome ());
         AddCommand (Command.Left, () => MoveLeft ());
         AddCommand (Command.RightEnd, () => MoveEnd ());
         AddCommand (Command.Right, () => MoveRight ());
@@ -406,8 +406,8 @@ public class DateField : TextField
 
         KeyBindings.ReplaceCommands (Key.Backspace, Command.DeleteCharLeft);
 
-        KeyBindings.ReplaceCommands (Key.Home, Command.LeftHome);
-        KeyBindings.ReplaceCommands (Key.A.WithCtrl, Command.LeftHome);
+        KeyBindings.ReplaceCommands (Key.Home, Command.LeftStart);
+        KeyBindings.ReplaceCommands (Key.A.WithCtrl, Command.LeftStart);
 
         KeyBindings.ReplaceCommands (Key.CursorLeft, Command.Left);
         KeyBindings.ReplaceCommands (Key.B.WithCtrl, Command.Left);

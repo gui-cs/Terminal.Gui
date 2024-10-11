@@ -8,7 +8,7 @@ public partial class ColorTests
     [Fact]
     [Trait ("Category", "Type Checks")]
     [Trait ("Category", "Change Control")]
-    public void ColorName_Has_Exactly_16_Defined_Values () { Assert.Equal (16, Enum.GetValues<ColorName> ().DistinctBy (static cname => (int)cname).Count ()); }
+    public void ColorName_Has_Exactly_16_Defined_Values () { Assert.Equal (16, Enum.GetValues<ColorName16> ().DistinctBy (static cname => (int)cname).Count ()); }
 
     [Theory]
     [Trait ("Category", "Type Checks")]
@@ -17,7 +17,7 @@ public partial class ColorTests
                     nameof (ColorTestsTheoryDataGenerators.ColorName_HasCorrectOrdinals),
                     MemberType = typeof (ColorTestsTheoryDataGenerators)
                 )]
-    public void ColorName_HasCorrectOrdinals (ColorName cname, int ordinal) { Assert.Equal ((int)cname, ordinal); }
+    public void ColorName_HasCorrectOrdinals (ColorName16 cname, int ordinal) { Assert.Equal ((int)cname, ordinal); }
 
     [Fact]
     [Trait ("Category", "Type Checks")]
@@ -117,26 +117,26 @@ public partial class ColorTests
 
 public static partial class ColorTestsTheoryDataGenerators
 {
-    public static TheoryData<ColorName, int> ColorName_HasCorrectOrdinals ()
+    public static TheoryData<ColorName16, int> ColorName_HasCorrectOrdinals ()
     {
-        TheoryData<ColorName, int> data = []
+        TheoryData<ColorName16, int> data = []
             ;
-        data.Add (ColorName.Black, 0);
-        data.Add (ColorName.Blue, 1);
-        data.Add (ColorName.Green, 2);
-        data.Add (ColorName.Cyan, 3);
-        data.Add (ColorName.Red, 4);
-        data.Add (ColorName.Magenta, 5);
-        data.Add (ColorName.Yellow, 6);
-        data.Add (ColorName.Gray, 7);
-        data.Add (ColorName.DarkGray, 8);
-        data.Add (ColorName.BrightBlue, 9);
-        data.Add (ColorName.BrightGreen, 10);
-        data.Add (ColorName.BrightCyan, 11);
-        data.Add (ColorName.BrightRed, 12);
-        data.Add (ColorName.BrightMagenta, 13);
-        data.Add (ColorName.BrightYellow, 14);
-        data.Add (ColorName.White, 15);
+        data.Add (ColorName16.Black, 0);
+        data.Add (ColorName16.Blue, 1);
+        data.Add (ColorName16.Green, 2);
+        data.Add (ColorName16.Cyan, 3);
+        data.Add (ColorName16.Red, 4);
+        data.Add (ColorName16.Magenta, 5);
+        data.Add (ColorName16.Yellow, 6);
+        data.Add (ColorName16.Gray, 7);
+        data.Add (ColorName16.DarkGray, 8);
+        data.Add (ColorName16.BrightBlue, 9);
+        data.Add (ColorName16.BrightGreen, 10);
+        data.Add (ColorName16.BrightCyan, 11);
+        data.Add (ColorName16.BrightRed, 12);
+        data.Add (ColorName16.BrightMagenta, 13);
+        data.Add (ColorName16.BrightYellow, 14);
+        data.Add (ColorName16.White, 15);
 
         return data;
     }

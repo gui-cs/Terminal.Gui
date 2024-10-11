@@ -36,7 +36,7 @@ public class Adornments : Scenario
 
             // X = Pos.Center (),
             Width = Dim.Percent (60),
-            Height = Dim.Percent (80)
+            Height = Dim.Percent (90)
         };
         app.Add (window);
 
@@ -57,7 +57,7 @@ public class Adornments : Scenario
 
         var button = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Press me!" };
 
-        button.Accept += (s, e) =>
+        button.Accepting += (s, e) =>
                              MessageBox.Query (20, 7, "Hi", $"Am I a {window.GetType ().Name}?", "Yes", "No");
 
         var label = new TextView
@@ -90,6 +90,7 @@ public class Adornments : Scenario
 
         window.Padding.Data = "Padding";
         window.Padding.Thickness = new (3);
+        window.Padding.CanFocus = true;
 
         var longLabel = new Label
         {
@@ -106,12 +107,23 @@ public class Adornments : Scenario
                                   window.Padding.Add (labelInPadding);
 
                                   var textFieldInPadding = new TextField
-                                      { X = Pos.Right (labelInPadding) + 1, Y = Pos.Top (labelInPadding), Width = 15, Text = "some text" };
-                                  textFieldInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "TextField", textFieldInPadding.Text, "Ok");
+                                  {
+                                      X = Pos.Right (labelInPadding) + 1,
+                                      Y = Pos.Top (labelInPadding), Width = 15,
+                                      Text = "some text",
+                                      CanFocus = true
+                                  };
+                                  textFieldInPadding.Accepting += (s, e) => MessageBox.Query (20, 7, "TextField", textFieldInPadding.Text, "Ok");
                                   window.Padding.Add (textFieldInPadding);
 
-                                  var btnButtonInPadding = new Button { X = Pos.Center (), Y = 0, Text = "_Button in Padding" };
-                                  btnButtonInPadding.Accept += (s, e) => MessageBox.Query (20, 7, "Hi", "Button in Padding Pressed!", "Ok");
+                                  var btnButtonInPadding = new Button
+                                  {
+                                      X = Pos.Center (),
+                                      Y = 0,
+                                      Text = "_Button in Padding",
+                                      CanFocus = true
+                                  };
+                                  btnButtonInPadding.Accepting += (s, e) => MessageBox.Query (20, 7, "Hi", "Button in Padding Pressed!", "Ok");
                                   btnButtonInPadding.BorderStyle = LineStyle.Dashed;
                                   btnButtonInPadding.Border.Thickness = new (1, 1, 1, 1);
                                   window.Padding.Add (btnButtonInPadding);

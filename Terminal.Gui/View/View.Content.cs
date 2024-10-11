@@ -12,6 +12,9 @@ public partial class View
     /// </summary>
     /// <remarks>
     ///     <para>
+    ///         See the View Layout Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///     </para>
+    ///     <para>
     ///         Negative sizes are not supported.
     ///     </para>
     ///     <para>
@@ -55,6 +58,9 @@ public partial class View
     /// </summary>
     /// <remarks>a>
     ///     <para>
+    ///         See the View Layout Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///     </para>
+    ///     <para>
     ///         If the content size was not explicitly set by <see cref="SetContentSize"/>, and the View has no visible subviews, <see cref="GetContentSize ()"/> will return the
     ///         size of
     ///         <see cref="Viewport"/>.
@@ -85,6 +91,9 @@ public partial class View
     ///     size or not.
     /// </summary>
     /// <remarks>
+    ///     <para>
+    ///         See the View Layout Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///     </para>
     ///     <list type="bullet">
     ///         <listheader>
     ///             <term>Value</term> <description>Result</description>
@@ -235,6 +244,9 @@ public partial class View
     ///     <see cref="GetContentSize ()"/>.
     /// </value>
     /// <remarks>
+    ///     <para>
+    ///         See the View Layout Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///     </para>
     ///     <para>
     ///         Positive values for the location indicate the visible area is offset into (down-and-right) the View's virtual
     ///         <see cref="GetContentSize ()"/>. This enables scrolling down and to the right (e.g. in a <see cref="ListView"/>

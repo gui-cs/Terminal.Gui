@@ -113,7 +113,7 @@ public class TreeViewTests
 
         tv.SelectAll ();
         tv.CursorVisibility = CursorVisibility.Default;
-        Application.PositionCursor (top);
+        Application.PositionCursor ();
         Application.Driver!.GetCursorVisibility (out CursorVisibility visibility);
         Assert.Equal (CursorVisibility.Default, tv.CursorVisibility);
         Assert.Equal (CursorVisibility.Default, visibility);
@@ -970,10 +970,10 @@ public class TreeViewTests
         Assert.All (eventArgs, ea => Assert.Equal (ea.Tree, tv));
         Assert.All (eventArgs, ea => Assert.False (ea.Handled));
 
-        Assert.Equal ("├-root one", eventArgs [0].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("│ ├─leaf 1", eventArgs [1].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("│ └─leaf 2", eventArgs [2].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("└─root two", eventArgs [3].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("├-root one", eventArgs [0].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("│ ├─leaf 1", eventArgs [1].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("│ └─leaf 2", eventArgs [2].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("└─root two", eventArgs [3].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
 
         Assert.Equal (1, eventArgs [0].IndexOfExpandCollapseSymbol);
         Assert.Equal (3, eventArgs [1].IndexOfExpandCollapseSymbol);
@@ -1083,9 +1083,9 @@ oot two
         Assert.All (eventArgs, ea => Assert.Equal (ea.Tree, tv));
         Assert.All (eventArgs, ea => Assert.False (ea.Handled));
 
-        Assert.Equal ("─leaf 1", eventArgs [0].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("─leaf 2", eventArgs [1].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("oot two", eventArgs [2].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("─leaf 1", eventArgs [0].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("─leaf 2", eventArgs [1].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("oot two", eventArgs [2].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
 
         Assert.Equal (0, eventArgs [0].IndexOfExpandCollapseSymbol);
         Assert.Equal (0, eventArgs [1].IndexOfExpandCollapseSymbol);
@@ -1242,6 +1242,7 @@ oot two
 
         // redraw now that the custom color
         // delegate is registered
+        tv.SetNeedsDisplay ();
         tv.Draw ();
 
         // Same text
@@ -1343,13 +1344,13 @@ oot two
         var treeView = new TreeView ();
         var accepted = false;
 
-        treeView.Accept += OnAccept;
+        treeView.Accepting += OnAccept;
         treeView.InvokeCommand (Command.HotKey);
 
         Assert.False (accepted);
 
         return;
-        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
+        void OnAccept (object sender, CommandEventArgs e) { accepted = true; }
     }
 
 
@@ -1364,7 +1365,7 @@ oot two
         var activated = false;
         object selectedObject = null;
 
-        treeView.Accept += Accept;
+        treeView.Accepting += Accept;
         treeView.ObjectActivated += ObjectActivated;
 
         treeView.InvokeCommand (Command.Accept);
@@ -1380,7 +1381,7 @@ oot two
             activated = true;
             selectedObject = e.ActivatedObject;
         }
-        void Accept (object sender, HandledEventArgs e) { accepted = true; }
+        void Accept (object sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -1392,7 +1393,7 @@ oot two
         var activated = false;
         object selectedObject = null;
 
-        treeView.Accept += Accept;
+        treeView.Accepting += Accept;
         treeView.ObjectActivated += ObjectActivated;
 
         treeView.InvokeCommand (Command.Accept);
@@ -1409,10 +1410,10 @@ oot two
             selectedObject = e.ActivatedObject;
         }
 
-        void Accept (object sender, HandledEventArgs e)
+        void Accept (object sender, CommandEventArgs e)
         {
             accepted = true;
-            e.Handled = true;
+            e.Cancel = true;
         }
     }
 }

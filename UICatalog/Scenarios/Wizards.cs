@@ -109,7 +109,7 @@ public class Wizards : Scenario
             X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "_Show Wizard"
         };
 
-        showWizardButton.Accept += (s, e) =>
+        showWizardButton.Accepting += (s, e) =>
                                    {
                                        try
                                        {
@@ -193,7 +193,7 @@ public class Wizards : Scenario
                                            };
                                            secondStep.Add (radioGroup2);
 
-                                           button.Accept += (s, e) =>
+                                           button.Accepting += (s, e) =>
                                                             {
                                                                 secondStep.Title = "2nd Step";
 
@@ -299,7 +299,7 @@ public class Wizards : Scenario
                                                Y = Pos.AnchorEnd ()
                                            };
 
-                                           hideHelpBtn.Accept += (s, e) =>
+                                           hideHelpBtn.Accepting += (s, e) =>
                                                                  {
                                                                      if (fourthStep.HelpText.Length > 0)
                                                                      {

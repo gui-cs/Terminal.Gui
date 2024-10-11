@@ -1,6 +1,6 @@
 ﻿namespace Terminal.Gui;
 
-/// <summary>The Padding for a <see cref="View"/>.</summary>
+/// <summary>The Padding for a <see cref="View"/>. Accessed via <see cref="View.Padding"/></summary>
 /// <remarks>
 ///     <para>See the <see cref="Adornment"/> class.</para>
 /// </remarks>

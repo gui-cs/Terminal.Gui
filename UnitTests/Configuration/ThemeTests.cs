@@ -11,6 +11,7 @@ public class ThemeTests
     };
 
     [Fact]
+    [AutoInitShutdown (configLocation: ConfigLocations.DefaultOnly)]
     public void TestApply ()
     {
         Reset ();
@@ -32,6 +33,7 @@ public class ThemeTests
     }
 
     [Fact]
+    [AutoInitShutdown (configLocation: ConfigLocations.DefaultOnly)]
     public void TestApply_UpdatesColors ()
     {
         // Arrange

@@ -25,7 +25,8 @@ public class ContextMenus : Scenario
         // Setup - Create a top-level application window and configure it.
         Window appWindow = new ()
         {
-            Title = GetQuitKeyAndName ()
+            Title = GetQuitKeyAndName (),
+            Arrangement = ViewArrangement.Fixed
         };
 
         var text = "Context Menu";
@@ -93,18 +94,8 @@ public class ContextMenus : Scenario
                                 Application.MouseEvent -= ApplicationMouseEvent;
                             };
 
-        var menu = new MenuBar
-        {
-            Menus =
-            [
-                new (
-                     "_File",
-                     new MenuItem [] { new ("_Quit", "", () => Application.RequestStop (), null, null, Application.QuitKey) })
-            ]
-        };
-
         var top = new Toplevel ();
-        top.Add (appWindow, menu);
+        top.Add (appWindow);
 
         // Run - Start the application.
         Application.Run (top);

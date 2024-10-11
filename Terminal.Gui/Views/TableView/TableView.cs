@@ -61,11 +61,11 @@ public class TableView : View
                     () => ChangeSelectionByOffsetWithReturn (-1, 0));
 
         AddCommand (
-                    Command.LineUp,
+                    Command.Up,
                     () => ChangeSelectionByOffsetWithReturn (0, -1));
 
         AddCommand (
-                    Command.LineDown,
+                    Command.Down,
                     () => ChangeSelectionByOffsetWithReturn (0, 1));
 
         AddCommand (
@@ -89,7 +89,7 @@ public class TableView : View
                    );
 
         AddCommand (
-                    Command.LeftHome,
+                    Command.LeftStart,
                     () =>
                     {
                         ChangeSelectionToStartOfRow (false);
@@ -109,7 +109,7 @@ public class TableView : View
                    );
 
         AddCommand (
-                    Command.TopHome,
+                    Command.Start,
                     () =>
                     {
                         ChangeSelectionToStartOfTable (false);
@@ -119,7 +119,7 @@ public class TableView : View
                    );
 
         AddCommand (
-                    Command.BottomEnd,
+                    Command.End,
                     () =>
                     {
                         ChangeSelectionToEndOfTable (false);
@@ -149,7 +149,7 @@ public class TableView : View
                    );
 
         AddCommand (
-                    Command.LineUpExtend,
+                    Command.UpExtend,
                     () =>
                     {
                         ChangeSelectionByOffset (0, -1, true);
@@ -159,7 +159,7 @@ public class TableView : View
                    );
 
         AddCommand (
-                    Command.LineDownExtend,
+                    Command.DownExtend,
                     () =>
                     {
                         ChangeSelectionByOffset (0, 1, true);
@@ -189,7 +189,7 @@ public class TableView : View
                    );
 
         AddCommand (
-                    Command.LeftHomeExtend,
+                    Command.LeftStartExtend,
                     () =>
                     {
                         ChangeSelectionToStartOfRow (true);
@@ -209,7 +209,7 @@ public class TableView : View
                    );
 
         AddCommand (
-                    Command.TopHomeExtend,
+                    Command.StartExtend,
                     () =>
                     {
                         ChangeSelectionToStartOfTable (true);
@@ -219,7 +219,7 @@ public class TableView : View
                    );
 
         AddCommand (
-                    Command.BottomEndExtend,
+                    Command.EndExtend,
                     () =>
                     {
                         ChangeSelectionToEndOfTable (true);
@@ -238,53 +238,47 @@ public class TableView : View
                     }
                    );
 
-        AddCommand (
-                    Command.Accept,
-                    () =>
-                    {
-                        // BUGBUG: This should return false if the event is not handled
-                        OnCellActivated (new CellActivatedEventArgs (Table, SelectedColumn, SelectedRow));
-
-                        return true;
-                    }
-                   );
+        AddCommand (Command.Accept, () => OnCellActivated (new CellActivatedEventArgs (Table, SelectedColumn, SelectedRow)));
 
         AddCommand (
                     Command.Select, // was Command.ToggleChecked
-                    () =>
+                    (ctx) =>
                     {
-                        ToggleCurrentCellSelection ();
+                        if (ToggleCurrentCellSelection () is true)
+                        {
+                            return RaiseSelecting (ctx) is true;
+                        }
 
-                        return true;
+                        return false;
                     }
                    );
 
         // Default keybindings for this view
         KeyBindings.Add (Key.CursorLeft, Command.Left);
         KeyBindings.Add (Key.CursorRight, Command.Right);
-        KeyBindings.Add (Key.CursorUp, Command.LineUp);
-        KeyBindings.Add (Key.CursorDown, Command.LineDown);
+        KeyBindings.Add (Key.CursorUp, Command.Up);
+        KeyBindings.Add (Key.CursorDown, Command.Down);
         KeyBindings.Add (Key.PageUp, Command.PageUp);
         KeyBindings.Add (Key.PageDown, Command.PageDown);
-        KeyBindings.Add (Key.Home, Command.LeftHome);
+        KeyBindings.Add (Key.Home, Command.LeftStart);
         KeyBindings.Add (Key.End, Command.RightEnd);
-        KeyBindings.Add (Key.Home.WithCtrl, Command.TopHome);
-        KeyBindings.Add (Key.End.WithCtrl, Command.BottomEnd);
+        KeyBindings.Add (Key.Home.WithCtrl, Command.Start);
+        KeyBindings.Add (Key.End.WithCtrl, Command.End);
 
         KeyBindings.Add (Key.CursorLeft.WithShift, Command.LeftExtend);
         KeyBindings.Add (Key.CursorRight.WithShift, Command.RightExtend);
-        KeyBindings.Add (Key.CursorUp.WithShift, Command.LineUpExtend);
-        KeyBindings.Add (Key.CursorDown.WithShift, Command.LineDownExtend);
+        KeyBindings.Add (Key.CursorUp.WithShift, Command.UpExtend);
+        KeyBindings.Add (Key.CursorDown.WithShift, Command.DownExtend);
         KeyBindings.Add (Key.PageUp.WithShift, Command.PageUpExtend);
         KeyBindings.Add (Key.PageDown.WithShift, Command.PageDownExtend);
-        KeyBindings.Add (Key.Home.WithShift, Command.LeftHomeExtend);
+        KeyBindings.Add (Key.Home.WithShift, Command.LeftStartExtend);
         KeyBindings.Add (Key.End.WithShift, Command.RightEndExtend);
-        KeyBindings.Add (Key.Home.WithCtrl.WithShift, Command.TopHomeExtend);
-        KeyBindings.Add (Key.End.WithCtrl.WithShift, Command.BottomEndExtend);
+        KeyBindings.Add (Key.Home.WithCtrl.WithShift, Command.StartExtend);
+        KeyBindings.Add (Key.End.WithCtrl.WithShift, Command.EndExtend);
 
         KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
+        KeyBindings.Remove (CellActivationKey);
         KeyBindings.Add (CellActivationKey, Command.Accept);
-        KeyBindings.Add (Key.Space, Command.Select);
     }
 
     // TODO: Update to use Key instead of KeyCode
@@ -323,7 +317,11 @@ public class TableView : View
         get => columnOffset;
 
         //try to prevent this being set to an out of bounds column
-        set => columnOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Columns - 1, value));
+        set
+        {
+            columnOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Columns - 1, value));
+            SetNeedsDisplay ();
+        }
     }
 
     /// <summary>True to select the entire row at once.  False to select individual cells.  Defaults to false</summary>
@@ -1246,7 +1244,12 @@ public class TableView : View
 
     /// <summary>Invokes the <see cref="CellActivated"/> event</summary>
     /// <param name="args"></param>
-    protected virtual void OnCellActivated (CellActivatedEventArgs args) { CellActivated?.Invoke (this, args); }
+    /// <returns><see langword="true"/> if the CellActivated event was raised.</returns>
+    protected virtual bool OnCellActivated (CellActivatedEventArgs args)
+    {
+        CellActivated?.Invoke (this, args);
+        return CellActivated is { };
+    }
 
     /// <summary>Invokes the <see cref="CellToggled"/> event</summary>
     /// <param name="args"></param>
@@ -2043,19 +2046,19 @@ public class TableView : View
                                  );
     }
 
-    private void ToggleCurrentCellSelection ()
+    private bool? ToggleCurrentCellSelection ()
     {
         var e = new CellToggledEventArgs (Table, selectedColumn, selectedRow);
         OnCellToggled (e);
 
         if (e.Cancel)
         {
-            return;
+            return false;
         }
 
         if (!MultiSelect)
         {
-            return;
+            return null;
         }
 
         TableSelection [] regions = GetMultiSelectedRegionsContaining (selectedColumn, selectedRow).ToArray ();
@@ -2100,6 +2103,8 @@ public class TableView : View
                                           );
             }
         }
+
+        return true;
     }
 
     /// <summary>

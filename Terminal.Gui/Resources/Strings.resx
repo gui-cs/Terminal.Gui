@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
-    <!-- 
+  <!-- 
     Microsoft ResX Schema 
     
     Version 2.0
@@ -59,642 +59,666 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-        <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
-        <xsd:element name="root" msdata:IsDataSet="true">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
             <xsd:complexType>
-                <xsd:choice maxOccurs="unbounded">
-                    <xsd:element name="metadata">
-                        <xsd:complexType>
-                            <xsd:sequence>
-                                <xsd:element name="value" type="xsd:string" minOccurs="0" />
-                            </xsd:sequence>
-                            <xsd:attribute name="name" use="required" type="xsd:string" />
-                            <xsd:attribute name="type" type="xsd:string" />
-                            <xsd:attribute name="mimetype" type="xsd:string" />
-                            <xsd:attribute ref="xml:space" />
-                        </xsd:complexType>
-                    </xsd:element>
-                    <xsd:element name="assembly">
-                        <xsd:complexType>
-                            <xsd:attribute name="alias" type="xsd:string" />
-                            <xsd:attribute name="name" type="xsd:string" />
-                        </xsd:complexType>
-                    </xsd:element>
-                    <xsd:element name="data">
-                        <xsd:complexType>
-                            <xsd:sequence>
-                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
-                            </xsd:sequence>
-                            <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-                            <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-                            <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-                            <xsd:attribute ref="xml:space" />
-                        </xsd:complexType>
-                    </xsd:element>
-                    <xsd:element name="resheader">
-                        <xsd:complexType>
-                            <xsd:sequence>
-                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                            </xsd:sequence>
-                            <xsd:attribute name="name" type="xsd:string" use="required" />
-                        </xsd:complexType>
-                    </xsd:element>
-                </xsd:choice>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
-        </xsd:element>
-    </xsd:schema>
-    <resheader name="resmimetype">
-        <value>text/microsoft-resx</value>
-    </resheader>
-    <resheader name="version">
-        <value>2.0</value>
-    </resheader>
-    <resheader name="reader">
-        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-    </resheader>
-    <resheader name="writer">
-        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-    </resheader>
-    <data name="ctxSelectAll" xml:space="preserve">
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ctxSelectAll" xml:space="preserve">
     <value>_Select All</value>
   </data>
-    <data name="ctxDeleteAll" xml:space="preserve">
+  <data name="ctxDeleteAll" xml:space="preserve">
     <value>_Delete All</value>
   </data>
-    <data name="ctxCopy" xml:space="preserve">
+  <data name="ctxCopy" xml:space="preserve">
     <value>_Copy</value>
   </data>
-    <data name="ctxCut" xml:space="preserve">
+  <data name="ctxCut" xml:space="preserve">
     <value>Cu_t</value>
   </data>
-    <data name="ctxPaste" xml:space="preserve">
+  <data name="ctxPaste" xml:space="preserve">
     <value>_Paste</value>
   </data>
-    <data name="ctxUndo" xml:space="preserve">
+  <data name="ctxUndo" xml:space="preserve">
     <value>_Undo</value>
   </data>
-    <data name="ctxRedo" xml:space="preserve">
+  <data name="ctxRedo" xml:space="preserve">
     <value>_Redo</value>
   </data>
-    <data name="fdDirectory" xml:space="preserve">
+  <data name="fdDirectory" xml:space="preserve">
     <value>Directory</value>
   </data>
-    <data name="fdFile" xml:space="preserve">
+  <data name="fdFile" xml:space="preserve">
     <value>File</value>
   </data>
-    <data name="fdSave" xml:space="preserve">
+  <data name="fdSave" xml:space="preserve">
     <value>Save</value>
   </data>
-    <data name="fdSaveAs" xml:space="preserve">
+  <data name="fdSaveAs" xml:space="preserve">
     <value>Save as</value>
   </data>
-    <data name="fdOpen" xml:space="preserve">
+  <data name="fdOpen" xml:space="preserve">
     <value>Open</value>
   </data>
-    <data name="fdSelectFolder" xml:space="preserve">
+  <data name="fdSelectFolder" xml:space="preserve">
     <value>Select folder</value>
   </data>
-    <data name="fdSelectMixed" xml:space="preserve">
+  <data name="fdSelectMixed" xml:space="preserve">
     <value>Select Mixed</value>
   </data>
-    <data name="wzBack" xml:space="preserve">
+  <data name="wzBack" xml:space="preserve">
     <value>_Back</value>
   </data>
-    <data name="wzFinish" xml:space="preserve">
+  <data name="wzFinish" xml:space="preserve">
     <value>Fi_nish</value>
   </data>
-    <data name="wzNext" xml:space="preserve">
+  <data name="wzNext" xml:space="preserve">
     <value>_Next...</value>
   </data>
-    <data name="fdDirectoryAlreadyExistsFeedback" xml:space="preserve">
+  <data name="fdDirectoryAlreadyExistsFeedback" xml:space="preserve">
     <value>Directory already exists with that name</value>
     <comment>When trying to save a file with a name already taken by a directory</comment>
   </data>
-    <data name="fdDirectoryMustExistFeedback" xml:space="preserve">
+  <data name="fdDirectoryMustExistFeedback" xml:space="preserve">
     <value>Must select an existing directory</value>
   </data>
-    <data name="fdFileAlreadyExistsFeedback" xml:space="preserve">
+  <data name="fdFileAlreadyExistsFeedback" xml:space="preserve">
     <value>File already exists with that name</value>
   </data>
-    <data name="fdFileMustExistFeedback" xml:space="preserve">
+  <data name="fdFileMustExistFeedback" xml:space="preserve">
     <value>Must select an existing file</value>
     <comment>When trying to save a directory with a name already used by a file</comment>
   </data>
-    <data name="fdFilename" xml:space="preserve">
+  <data name="fdFilename" xml:space="preserve">
     <value>Filename</value>
   </data>
-    <data name="fdFileOrDirectoryMustExistFeedback" xml:space="preserve">
+  <data name="fdFileOrDirectoryMustExistFeedback" xml:space="preserve">
     <value>Must select an existing file or directory</value>
   </data>
-    <data name="fdModified" xml:space="preserve">
+  <data name="fdModified" xml:space="preserve">
     <value>Modified</value>
   </data>
-    <data name="fdPathCaption" xml:space="preserve">
+  <data name="fdPathCaption" xml:space="preserve">
     <value>Enter Path</value>
   </data>
-    <data name="fdSearchCaption" xml:space="preserve">
+  <data name="fdSearchCaption" xml:space="preserve">
     <value>Enter Search</value>
   </data>
-    <data name="fdSize" xml:space="preserve">
+  <data name="fdSize" xml:space="preserve">
     <value>Size</value>
   </data>
-    <data name="fdType" xml:space="preserve">
+  <data name="fdType" xml:space="preserve">
     <value>Type</value>
   </data>
-    <data name="fdWrongFileTypeFeedback" xml:space="preserve">
+  <data name="fdWrongFileTypeFeedback" xml:space="preserve">
     <value>Wrong file type</value>
     <comment>When trying to open/save a file that does not match the provided filter (e.g. csv)</comment>
   </data>
-    <data name="fdAnyFiles" xml:space="preserve">
+  <data name="fdAnyFiles" xml:space="preserve">
     <value>Any Files</value>
     <comment>Describes an AllowedType that matches anything</comment>
   </data>
-    <data name="fdDeleteBody" xml:space="preserve">
+  <data name="fdDeleteBody" xml:space="preserve">
     <value>Are you sure you want to delete '{0}'? This operation is permanent</value>
   </data>
-    <data name="fdDeleteFailedTitle" xml:space="preserve">
+  <data name="fdDeleteFailedTitle" xml:space="preserve">
     <value>Delete Failed</value>
   </data>
-    <data name="fdDeleteTitle" xml:space="preserve">
+  <data name="fdDeleteTitle" xml:space="preserve">
     <value>Delete {0}</value>
   </data>
-    <data name="fdNewFailed" xml:space="preserve">
+  <data name="fdNewFailed" xml:space="preserve">
     <value>New Failed</value>
   </data>
-    <data name="fdNewTitle" xml:space="preserve">
+  <data name="fdNewTitle" xml:space="preserve">
     <value>New Folder</value>
   </data>
-    <data name="btnNo" xml:space="preserve">
+  <data name="btnNo" xml:space="preserve">
     <value>_No</value>
   </data>
-    <data name="fdRenameFailedTitle" xml:space="preserve">
+  <data name="fdRenameFailedTitle" xml:space="preserve">
     <value>Rename Failed</value>
   </data>
-    <data name="fdRenamePrompt" xml:space="preserve">
+  <data name="fdRenamePrompt" xml:space="preserve">
     <value>Name:</value>
   </data>
-    <data name="fdRenameTitle" xml:space="preserve">
+  <data name="fdRenameTitle" xml:space="preserve">
     <value>Rename</value>
   </data>
-    <data name="btnYes" xml:space="preserve">
+  <data name="btnYes" xml:space="preserve">
     <value>_Yes</value>
   </data>
-    <data name="fdExisting" xml:space="preserve">
+  <data name="fdExisting" xml:space="preserve">
     <value>Existing</value>
   </data>
-    <data name="btnOpen" xml:space="preserve">
+  <data name="btnOpen" xml:space="preserve">
     <value>O_pen</value>
   </data>
-    <data name="btnSave" xml:space="preserve">
+  <data name="btnSave" xml:space="preserve">
     <value>_Save</value>
   </data>
-    <data name="btnSaveAs" xml:space="preserve">
+  <data name="btnSaveAs" xml:space="preserve">
     <value>Save _as</value>
   </data>
-    <data name="btnOk" xml:space="preserve">
+  <data name="btnOk" xml:space="preserve">
     <value>_OK</value>
   </data>
-    <data name="btnCancel" xml:space="preserve">
+  <data name="btnCancel" xml:space="preserve">
     <value>_Cancel</value>
   </data>
-    <data name="fdCtxDelete" xml:space="preserve">
+  <data name="fdCtxDelete" xml:space="preserve">
     <value>_Delete</value>
   </data>
-    <data name="fdCtxHide" xml:space="preserve">
+  <data name="fdCtxHide" xml:space="preserve">
     <value>_Hide {0}</value>
   </data>
-    <data name="fdCtxNew" xml:space="preserve">
+  <data name="fdCtxNew" xml:space="preserve">
     <value>_New</value>
   </data>
-    <data name="fdCtxRename" xml:space="preserve">
+  <data name="fdCtxRename" xml:space="preserve">
     <value>_Rename</value>
   </data>
-    <data name="fdCtxSortAsc" xml:space="preserve">
+  <data name="fdCtxSortAsc" xml:space="preserve">
     <value>_Sort {0} ASC</value>
   </data>
-    <data name="fdCtxSortDesc" xml:space="preserve">
+  <data name="fdCtxSortDesc" xml:space="preserve">
     <value>_Sort {0} DESC</value>
   </data>
-    <data name="dpTitle" xml:space="preserve">
+  <data name="dpTitle" xml:space="preserve">
     <value>Date Picker</value>
   </data>
-    <data name="#F0F8FF" xml:space="preserve">
+  <data name="#F0F8FF" xml:space="preserve">
     <value>AliceBlue</value>
   </data>
-    <data name="#FAEBD7" xml:space="preserve">
+  <data name="#FAEBD7" xml:space="preserve">
     <value>AntiqueWhite</value>
   </data>
-    <data name="#7FFFD4" xml:space="preserve">
+  <data name="#7FFFD4" xml:space="preserve">
     <value>Aquamarine</value>
   </data>
-    <data name="#F0FFFF" xml:space="preserve">
+  <data name="#F0FFFF" xml:space="preserve">
     <value>Azure</value>
   </data>
-    <data name="#F5F5DC" xml:space="preserve">
+  <data name="#F5F5DC" xml:space="preserve">
     <value>Beige</value>
   </data>
-    <data name="#FFE4C4" xml:space="preserve">
+  <data name="#FFE4C4" xml:space="preserve">
     <value>Bisque</value>
   </data>
-    <data name="#000000" xml:space="preserve">
+  <data name="#000000" xml:space="preserve">
     <value>Black</value>
   </data>
-    <data name="#FFEBCD" xml:space="preserve">
+  <data name="#FFEBCD" xml:space="preserve">
     <value>BlanchedAlmond</value>
   </data>
-    <data name="#0000FF" xml:space="preserve">
+  <data name="#0000FF" xml:space="preserve">
     <value>Blue</value>
   </data>
-    <data name="#8A2BE2" xml:space="preserve">
+  <data name="#8A2BE2" xml:space="preserve">
     <value>BlueViolet</value>
   </data>
-    <data name="#A52A2A" xml:space="preserve">
+  <data name="#A52A2A" xml:space="preserve">
     <value>Brown</value>
   </data>
-    <data name="#DEB887" xml:space="preserve">
+  <data name="#DEB887" xml:space="preserve">
     <value>BurlyWood</value>
   </data>
-    <data name="#5F9EA0" xml:space="preserve">
+  <data name="#5F9EA0" xml:space="preserve">
     <value>CadetBlue</value>
   </data>
-    <data name="#7FFF00" xml:space="preserve">
+  <data name="#7FFF00" xml:space="preserve">
     <value>Chartreuse</value>
   </data>
-    <data name="#D2691E" xml:space="preserve">
+  <data name="#D2691E" xml:space="preserve">
     <value>Chocolate</value>
   </data>
-    <data name="#FF7F50" xml:space="preserve">
+  <data name="#FF7F50" xml:space="preserve">
     <value>Coral</value>
   </data>
-    <data name="#6495ED" xml:space="preserve">
+  <data name="#6495ED" xml:space="preserve">
     <value>CornflowerBlue</value>
   </data>
-    <data name="#FFF8DC" xml:space="preserve">
+  <data name="#FFF8DC" xml:space="preserve">
     <value>Cornsilk</value>
   </data>
-    <data name="#DC143C" xml:space="preserve">
+  <data name="#DC143C" xml:space="preserve">
     <value>Crimson</value>
   </data>
-    <data name="#00FFFF" xml:space="preserve">
+  <data name="#00FFFF" xml:space="preserve">
     <value>Cyan</value>
   </data>
-    <data name="#00008B" xml:space="preserve">
+  <data name="#00008B" xml:space="preserve">
     <value>DarkBlue</value>
   </data>
-    <data name="#008B8B" xml:space="preserve">
+  <data name="#008B8B" xml:space="preserve">
     <value>DarkCyan</value>
   </data>
-    <data name="#B8860B" xml:space="preserve">
+  <data name="#B8860B" xml:space="preserve">
     <value>DarkGoldenRod</value>
   </data>
-    <data name="#A9A9A9" xml:space="preserve">
+  <data name="#A9A9A9" xml:space="preserve">
     <value>DarkGrey</value>
   </data>
-    <data name="#006400" xml:space="preserve">
+  <data name="#006400" xml:space="preserve">
     <value>DarkGreen</value>
   </data>
-    <data name="#BDB76B" xml:space="preserve">
+  <data name="#BDB76B" xml:space="preserve">
     <value>DarkKhaki</value>
   </data>
-    <data name="#8B008B" xml:space="preserve">
+  <data name="#8B008B" xml:space="preserve">
     <value>DarkMagenta</value>
   </data>
-    <data name="#556B2F" xml:space="preserve">
+  <data name="#556B2F" xml:space="preserve">
     <value>DarkOliveGreen</value>
   </data>
-    <data name="#FF8C00" xml:space="preserve">
+  <data name="#FF8C00" xml:space="preserve">
     <value>DarkOrange</value>
   </data>
-    <data name="#9932CC" xml:space="preserve">
+  <data name="#9932CC" xml:space="preserve">
     <value>DarkOrchid</value>
   </data>
-    <data name="#8B0000" xml:space="preserve">
+  <data name="#8B0000" xml:space="preserve">
     <value>DarkRed</value>
   </data>
-    <data name="#E9967A" xml:space="preserve">
+  <data name="#E9967A" xml:space="preserve">
     <value>DarkSalmon</value>
   </data>
-    <data name="#8FBC8F" xml:space="preserve">
+  <data name="#8FBC8F" xml:space="preserve">
     <value>DarkSeaGreen</value>
   </data>
-    <data name="#483D8B" xml:space="preserve">
+  <data name="#483D8B" xml:space="preserve">
     <value>DarkSlateBlue</value>
   </data>
-    <data name="#2F4F4F" xml:space="preserve">
+  <data name="#2F4F4F" xml:space="preserve">
     <value>DarkSlateGrey</value>
   </data>
-    <data name="#00CED1" xml:space="preserve">
+  <data name="#00CED1" xml:space="preserve">
     <value>DarkTurquoise</value>
   </data>
-    <data name="#9400D3" xml:space="preserve">
+  <data name="#9400D3" xml:space="preserve">
     <value>DarkViolet</value>
   </data>
-    <data name="#FF1493" xml:space="preserve">
+  <data name="#FF1493" xml:space="preserve">
     <value>DeepPink</value>
   </data>
-    <data name="#00BFFF" xml:space="preserve">
+  <data name="#00BFFF" xml:space="preserve">
     <value>DeepSkyBlue</value>
   </data>
-    <data name="#696969" xml:space="preserve">
+  <data name="#696969" xml:space="preserve">
     <value>DimGray</value>
   </data>
-    <data name="#1E90FF" xml:space="preserve">
+  <data name="#1E90FF" xml:space="preserve">
     <value>DodgerBlue</value>
   </data>
-    <data name="#B22222" xml:space="preserve">
+  <data name="#B22222" xml:space="preserve">
     <value>FireBrick</value>
   </data>
-    <data name="#FFFAF0" xml:space="preserve">
+  <data name="#FFFAF0" xml:space="preserve">
     <value>FloralWhite</value>
   </data>
-    <data name="#228B22" xml:space="preserve">
+  <data name="#228B22" xml:space="preserve">
     <value>ForestGreen</value>
   </data>
-    <data name="#DCDCDC" xml:space="preserve">
+  <data name="#DCDCDC" xml:space="preserve">
     <value>Gainsboro</value>
   </data>
-    <data name="#F8F8FF" xml:space="preserve">
+  <data name="#F8F8FF" xml:space="preserve">
     <value>GhostWhite</value>
   </data>
-    <data name="#FFD700" xml:space="preserve">
+  <data name="#FFD700" xml:space="preserve">
     <value>Gold</value>
   </data>
-    <data name="#DAA520" xml:space="preserve">
+  <data name="#DAA520" xml:space="preserve">
     <value>GoldenRod</value>
   </data>
-    <data name="#808080" xml:space="preserve">
+  <data name="#808080" xml:space="preserve">
     <value>Gray</value>
   </data>
-    <data name="#008000" xml:space="preserve">
+  <data name="#008000" xml:space="preserve">
     <value>Green</value>
   </data>
-    <data name="#ADFF2F" xml:space="preserve">
+  <data name="#ADFF2F" xml:space="preserve">
     <value>GreenYellow</value>
   </data>
-    <data name="#F0FFF0" xml:space="preserve">
+  <data name="#F0FFF0" xml:space="preserve">
     <value>HoneyDew</value>
   </data>
-    <data name="#FF69B4" xml:space="preserve">
+  <data name="#FF69B4" xml:space="preserve">
     <value>HotPink</value>
   </data>
-    <data name="#CD5C5C" xml:space="preserve">
+  <data name="#CD5C5C" xml:space="preserve">
     <value>IndianRed</value>
   </data>
-    <data name="#4B0082" xml:space="preserve">
+  <data name="#4B0082" xml:space="preserve">
     <value>Indigo</value>
   </data>
-    <data name="#FFFFF0" xml:space="preserve">
+  <data name="#FFFFF0" xml:space="preserve">
     <value>Ivory</value>
   </data>
-    <data name="#F0E68C" xml:space="preserve">
+  <data name="#F0E68C" xml:space="preserve">
     <value>Khaki</value>
   </data>
-    <data name="#E6E6FA" xml:space="preserve">
+  <data name="#E6E6FA" xml:space="preserve">
     <value>Lavender</value>
   </data>
-    <data name="#FFF0F5" xml:space="preserve">
+  <data name="#FFF0F5" xml:space="preserve">
     <value>LavenderBlush</value>
   </data>
-    <data name="#7CFC00" xml:space="preserve">
+  <data name="#7CFC00" xml:space="preserve">
     <value>LawnGreen</value>
   </data>
-    <data name="#FFFACD" xml:space="preserve">
+  <data name="#FFFACD" xml:space="preserve">
     <value>LemonChiffon</value>
   </data>
-    <data name="#ADD8E6" xml:space="preserve">
+  <data name="#ADD8E6" xml:space="preserve">
     <value>LightBlue</value>
   </data>
-    <data name="#F08080" xml:space="preserve">
+  <data name="#F08080" xml:space="preserve">
     <value>LightCoral</value>
   </data>
-    <data name="#E0FFFF" xml:space="preserve">
+  <data name="#E0FFFF" xml:space="preserve">
     <value>LightCyan</value>
   </data>
-    <data name="#FAFAD2" xml:space="preserve">
+  <data name="#FAFAD2" xml:space="preserve">
     <value>LightGoldenRodYellow</value>
   </data>
-    <data name="#D3D3D3" xml:space="preserve">
+  <data name="#D3D3D3" xml:space="preserve">
     <value>LightGray</value>
   </data>
-    <data name="#90EE90" xml:space="preserve">
+  <data name="#90EE90" xml:space="preserve">
     <value>LightGreen</value>
   </data>
-    <data name="#FFB6C1" xml:space="preserve">
+  <data name="#FFB6C1" xml:space="preserve">
     <value>LightPink</value>
   </data>
-    <data name="#FFA07A" xml:space="preserve">
+  <data name="#FFA07A" xml:space="preserve">
     <value>LightSalmon</value>
   </data>
-    <data name="#20B2AA" xml:space="preserve">
+  <data name="#20B2AA" xml:space="preserve">
     <value>LightSeaGreen</value>
   </data>
-    <data name="#87CEFA" xml:space="preserve">
+  <data name="#87CEFA" xml:space="preserve">
     <value>LightSkyBlue</value>
   </data>
-    <data name="#778899" xml:space="preserve">
+  <data name="#778899" xml:space="preserve">
     <value>LightSlateGrey</value>
   </data>
-    <data name="#B0C4DE" xml:space="preserve">
+  <data name="#B0C4DE" xml:space="preserve">
     <value>LightSteelBlue</value>
   </data>
-    <data name="#FFFFE0" xml:space="preserve">
+  <data name="#FFFFE0" xml:space="preserve">
     <value>LightYellow</value>
   </data>
-    <data name="#00FF00" xml:space="preserve">
+  <data name="#00FF00" xml:space="preserve">
     <value>Lime</value>
   </data>
-    <data name="#32CD32" xml:space="preserve">
+  <data name="#32CD32" xml:space="preserve">
     <value>LimeGreen</value>
   </data>
-    <data name="#FAF0E6" xml:space="preserve">
+  <data name="#FAF0E6" xml:space="preserve">
     <value>Linen</value>
   </data>
-    <data name="#FF00FF" xml:space="preserve">
+  <data name="#FF00FF" xml:space="preserve">
     <value>Magenta</value>
   </data>
-    <data name="#800000" xml:space="preserve">
+  <data name="#800000" xml:space="preserve">
     <value>Maroon</value>
   </data>
-    <data name="#66CDAA" xml:space="preserve">
+  <data name="#66CDAA" xml:space="preserve">
     <value>MediumAquaMarine</value>
   </data>
-    <data name="#0000CD" xml:space="preserve">
+  <data name="#0000CD" xml:space="preserve">
     <value>MediumBlue</value>
   </data>
-    <data name="#BA55D3" xml:space="preserve">
+  <data name="#BA55D3" xml:space="preserve">
     <value>MediumOrchid</value>
   </data>
-    <data name="#9370DB" xml:space="preserve">
+  <data name="#9370DB" xml:space="preserve">
     <value>MediumPurple</value>
   </data>
-    <data name="#3CB371" xml:space="preserve">
+  <data name="#3CB371" xml:space="preserve">
     <value>MediumSeaGreen</value>
   </data>
-    <data name="#7B68EE" xml:space="preserve">
+  <data name="#7B68EE" xml:space="preserve">
     <value>MediumSlateBlue</value>
   </data>
-    <data name="#00FA9A" xml:space="preserve">
+  <data name="#00FA9A" xml:space="preserve">
     <value>MediumSpringGreen</value>
   </data>
-    <data name="#48D1CC" xml:space="preserve">
+  <data name="#48D1CC" xml:space="preserve">
     <value>MediumTurquoise</value>
   </data>
-    <data name="#C71585" xml:space="preserve">
+  <data name="#C71585" xml:space="preserve">
     <value>MediumVioletRed</value>
   </data>
-    <data name="#191970" xml:space="preserve">
+  <data name="#191970" xml:space="preserve">
     <value>MidnightBlue</value>
   </data>
-    <data name="#F5FFFA" xml:space="preserve">
+  <data name="#F5FFFA" xml:space="preserve">
     <value>MintCream</value>
   </data>
-    <data name="#FFE4E1" xml:space="preserve">
+  <data name="#FFE4E1" xml:space="preserve">
     <value>MistyRose</value>
   </data>
-    <data name="#FFE4B5" xml:space="preserve">
+  <data name="#FFE4B5" xml:space="preserve">
     <value>Moccasin</value>
   </data>
-    <data name="#FFDEAD" xml:space="preserve">
+  <data name="#FFDEAD" xml:space="preserve">
     <value>NavajoWhite</value>
   </data>
-    <data name="#000080" xml:space="preserve">
+  <data name="#000080" xml:space="preserve">
     <value>Navy</value>
   </data>
-    <data name="#FDF5E6" xml:space="preserve">
+  <data name="#FDF5E6" xml:space="preserve">
     <value>OldLace</value>
   </data>
-    <data name="#808000" xml:space="preserve">
+  <data name="#808000" xml:space="preserve">
     <value>Olive</value>
   </data>
-    <data name="#6B8E23" xml:space="preserve">
+  <data name="#6B8E23" xml:space="preserve">
     <value>OliveDrab</value>
   </data>
-    <data name="#FFA500" xml:space="preserve">
+  <data name="#FFA500" xml:space="preserve">
     <value>Orange</value>
   </data>
-    <data name="#FF4500" xml:space="preserve">
+  <data name="#FF4500" xml:space="preserve">
     <value>OrangeRed</value>
   </data>
-    <data name="#DA70D6" xml:space="preserve">
+  <data name="#DA70D6" xml:space="preserve">
     <value>Orchid</value>
   </data>
-    <data name="#EEE8AA" xml:space="preserve">
+  <data name="#EEE8AA" xml:space="preserve">
     <value>PaleGoldenRod</value>
   </data>
-    <data name="#98FB98" xml:space="preserve">
+  <data name="#98FB98" xml:space="preserve">
     <value>PaleGreen</value>
   </data>
-    <data name="#AFEEEE" xml:space="preserve">
+  <data name="#AFEEEE" xml:space="preserve">
     <value>PaleTurquoise</value>
   </data>
-    <data name="#DB7093" xml:space="preserve">
+  <data name="#DB7093" xml:space="preserve">
     <value>PaleVioletRed</value>
   </data>
-    <data name="#FFEFD5" xml:space="preserve">
+  <data name="#FFEFD5" xml:space="preserve">
     <value>PapayaWhip</value>
   </data>
-    <data name="#FFDAB9" xml:space="preserve">
+  <data name="#FFDAB9" xml:space="preserve">
     <value>PeachPuff</value>
   </data>
-    <data name="#CD853F" xml:space="preserve">
+  <data name="#CD853F" xml:space="preserve">
     <value>Peru</value>
   </data>
-    <data name="#FFC0CB" xml:space="preserve">
+  <data name="#FFC0CB" xml:space="preserve">
     <value>Pink</value>
   </data>
-    <data name="#DDA0DD" xml:space="preserve">
+  <data name="#DDA0DD" xml:space="preserve">
     <value>Plum</value>
   </data>
-    <data name="#B0E0E6" xml:space="preserve">
+  <data name="#B0E0E6" xml:space="preserve">
     <value>PowderBlue</value>
   </data>
-    <data name="#800080" xml:space="preserve">
+  <data name="#800080" xml:space="preserve">
     <value>Purple</value>
   </data>
-    <data name="#663399" xml:space="preserve">
+  <data name="#663399" xml:space="preserve">
     <value>RebeccaPurple</value>
   </data>
-    <data name="#FF0000" xml:space="preserve">
+  <data name="#FF0000" xml:space="preserve">
     <value>Red</value>
   </data>
-    <data name="#BC8F8F" xml:space="preserve">
+  <data name="#BC8F8F" xml:space="preserve">
     <value>RosyBrown</value>
   </data>
-    <data name="#4169E1" xml:space="preserve">
+  <data name="#4169E1" xml:space="preserve">
     <value>RoyalBlue</value>
   </data>
-    <data name="#8B4513" xml:space="preserve">
+  <data name="#8B4513" xml:space="preserve">
     <value>SaddleBrown</value>
   </data>
-    <data name="#FA8072" xml:space="preserve">
+  <data name="#FA8072" xml:space="preserve">
     <value>Salmon</value>
   </data>
-    <data name="#F4A460" xml:space="preserve">
+  <data name="#F4A460" xml:space="preserve">
     <value>SandyBrown</value>
   </data>
-    <data name="#2E8B57" xml:space="preserve">
+  <data name="#2E8B57" xml:space="preserve">
     <value>SeaGreen</value>
   </data>
-    <data name="#FFF5EE" xml:space="preserve">
+  <data name="#FFF5EE" xml:space="preserve">
     <value>SeaShell</value>
   </data>
-    <data name="#A0522D" xml:space="preserve">
+  <data name="#A0522D" xml:space="preserve">
     <value>Sienna</value>
   </data>
-    <data name="#C0C0C0" xml:space="preserve">
+  <data name="#C0C0C0" xml:space="preserve">
     <value>Silver</value>
   </data>
-    <data name="#87CEEB" xml:space="preserve">
+  <data name="#87CEEB" xml:space="preserve">
     <value>SkyBlue</value>
   </data>
-    <data name="#6A5ACD" xml:space="preserve">
+  <data name="#6A5ACD" xml:space="preserve">
     <value>SlateBlue</value>
   </data>
-    <data name="#708090" xml:space="preserve">
+  <data name="#708090" xml:space="preserve">
     <value>SlateGray</value>
   </data>
-    <data name="#FFFAFA" xml:space="preserve">
+  <data name="#FFFAFA" xml:space="preserve">
     <value>Snow</value>
   </data>
-    <data name="#00FF7F" xml:space="preserve">
+  <data name="#00FF7F" xml:space="preserve">
     <value>SpringGreen</value>
   </data>
-    <data name="#4682B4" xml:space="preserve">
+  <data name="#4682B4" xml:space="preserve">
     <value>SteelBlue</value>
   </data>
-    <data name="#D2B48C" xml:space="preserve">
+  <data name="#D2B48C" xml:space="preserve">
     <value>Tan</value>
   </data>
-    <data name="#008080" xml:space="preserve">
+  <data name="#008080" xml:space="preserve">
     <value>Teal</value>
   </data>
-    <data name="#D8BFD8" xml:space="preserve">
+  <data name="#D8BFD8" xml:space="preserve">
     <value>Thistle</value>
   </data>
-    <data name="#FF6347" xml:space="preserve">
+  <data name="#FF6347" xml:space="preserve">
     <value>Tomato</value>
   </data>
-    <data name="#40E0D0" xml:space="preserve">
+  <data name="#40E0D0" xml:space="preserve">
     <value>Turquoise</value>
   </data>
-    <data name="#EE82EE" xml:space="preserve">
+  <data name="#EE82EE" xml:space="preserve">
     <value>Violet</value>
   </data>
-    <data name="#F5DEB3" xml:space="preserve">
+  <data name="#F5DEB3" xml:space="preserve">
     <value>Wheat</value>
   </data>
-    <data name="#FFFFFF" xml:space="preserve">
+  <data name="#FFFFFF" xml:space="preserve">
     <value>White</value>
   </data>
-    <data name="#F5F5F5" xml:space="preserve">
+  <data name="#F5F5F5" xml:space="preserve">
     <value>WhiteSmoke</value>
   </data>
-    <data name="#FFFF00" xml:space="preserve">
+  <data name="#FFFF00" xml:space="preserve">
     <value>Yellow</value>
   </data>
-    <data name="#9ACD32" xml:space="preserve">
+  <data name="#9ACD32" xml:space="preserve">
     <value>YellowGreen</value>
+  </data>
+  <data name="#3B78FF" xml:space="preserve">
+    <value>BrightBlue</value>
+  </data>
+  <data name="#61D6D6" xml:space="preserve">
+    <value>BrightCyan</value>
+  </data>
+  <data name="#E74856" xml:space="preserve">
+    <value>BrightRed</value>
+  </data>
+  <data name="#16C60C" xml:space="preserve">
+    <value>BrightGreen</value>
+  </data>
+  <data name="#B4009E" xml:space="preserve">
+    <value>BrightMagenta</value>
+  </data>
+  <data name="#F9F1A5" xml:space="preserve">
+    <value>BrightYellow</value>
+  </data>
+  <data name="#767676" xml:space="preserve">
+    <value>DarkGray</value>
+  </data>
+  <data name="ctxColors" xml:space="preserve">
+    <value>Co_lors</value>
   </data>
 </root>

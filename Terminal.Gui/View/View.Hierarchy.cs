@@ -159,14 +159,17 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
         Rectangle touched = view.Frame;
 
-        // If a view being removed is focused, it should lose focus.
-        if (view.HasFocus)
+        bool hadFocus = view.HasFocus;
+        bool couldFocus = view.CanFocus;
+
+        if (hadFocus)
         {
-            view.HasFocus = false;
+            view.CanFocus = false; // If view had focus, this will ensure it doesn't and it stays that way
         }
+        Debug.Assert (!view.HasFocus);
 
         _subviews.Remove (view);
-        view._superView = null; // Null this AFTER removing focus
+        view._superView = null;
 
         SetNeedsLayout ();
         SetNeedsDisplay ();
@@ -179,9 +182,11 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             }
         }
 
-        if (HasFocus)
+        view.CanFocus = couldFocus; // Restore to previous value
+
+        if (_previouslyFocused == view)
         {
-            FocusDeepest (NavigationDirection.Forward, TabStop);
+            _previouslyFocused = null;
         }
 
         OnRemoved (new (this, view));

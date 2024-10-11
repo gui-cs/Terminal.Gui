@@ -44,7 +44,7 @@ public class TabView : View
         AddCommand (Command.Right, () => SwitchTabBy (1));
 
         AddCommand (
-                    Command.LeftHome,
+                    Command.LeftStart,
                     () =>
                     {
                         TabScrollOffset = 0;
@@ -90,7 +90,7 @@ public class TabView : View
         // Default keybindings for this view
         KeyBindings.Add (Key.CursorLeft, Command.Left);
         KeyBindings.Add (Key.CursorRight, Command.Right);
-        KeyBindings.Add (Key.Home, Command.LeftHome);
+        KeyBindings.Add (Key.Home, Command.LeftStart);
         KeyBindings.Add (Key.End, Command.RightEnd);
         KeyBindings.Add (Key.PageDown, Command.PageDown);
         KeyBindings.Add (Key.PageUp, Command.PageUp);

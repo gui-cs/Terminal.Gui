@@ -1,6 +1,6 @@
 ﻿namespace Terminal.Gui;
 
-/// <summary>Args <see cref="Application.GrabMouse"/> related events.</summary>
+/// <summary>Args GrabMouse related events.</summary>
 public class GrabMouseEventArgs : EventArgs
 {
     /// <summary>Creates a new instance of the <see cref="GrabMouseEventArgs"/> class.</summary>

@@ -39,7 +39,7 @@ internal class CursesDriver : ConsoleDriver
         }
     }
 
-    public override bool SupportsTrueColor => false;
+    public override bool SupportsTrueColor => true;
 
     /// <inheritdoc/>
     public override bool EnsureCursorVisibility () { return false; }
@@ -200,8 +200,12 @@ internal class CursesDriver : ConsoleDriver
         if (!RunningUnitTests)
         {
             Platform.Suspend ();
-            Curses.Window.Standard.redrawwin ();
-            Curses.refresh ();
+
+            if (Force16Colors)
+            {
+                Curses.Window.Standard.redrawwin ();
+                Curses.refresh ();
+            }
         }
 
         StartReportingMouseMoves ();
@@ -214,72 +218,230 @@ internal class CursesDriver : ConsoleDriver
         if (!RunningUnitTests && Col >= 0 && Col < Cols && Row >= 0 && Row < Rows)
         {
             Curses.move (Row, Col);
-            Curses.raw ();
-            Curses.noecho ();
-            Curses.refresh ();
+
+            if (Force16Colors)
+            {
+                Curses.raw ();
+                Curses.noecho ();
+                Curses.refresh ();
+            }
         }
     }
 
-
     public override void UpdateScreen ()
     {
-        for (var row = 0; row < Rows; row++)
+        if (Force16Colors)
         {
-            if (!_dirtyLines [row])
+            for (var row = 0; row < Rows; row++)
             {
-                continue;
-            }
-
-            _dirtyLines [row] = false;
-
-            for (var col = 0; col < Cols; col++)
-            {
-                if (Contents [row, col].IsDirty == false)
+                if (!_dirtyLines [row])
                 {
                     continue;
                 }
 
-                if (RunningUnitTests)
+                _dirtyLines [row] = false;
+
+                for (var col = 0; col < Cols; col++)
                 {
-                    // In unit tests, we don't want to actually write to the screen.
-                    continue;
-                }
-
-                Curses.attrset (Contents [row, col].Attribute.GetValueOrDefault ().PlatformColor);
-
-                Rune rune = Contents [row, col].Rune;
-
-                if (rune.IsBmp)
-                {
-                    // BUGBUG: CursesDriver doesn't render CharMap correctly for wide chars (and other Unicode) - Curses is doing something funky with glyphs that report GetColums() of 1 yet are rendered wide. E.g. 0x2064 (invisible times) is reported as 1 column but is rendered as 2. WindowsDriver & NetDriver correctly render this as 1 column, overlapping the next cell.
-                    if (rune.GetColumns () < 2)
+                    if (Contents [row, col].IsDirty == false)
                     {
-                        Curses.mvaddch (row, col, rune.Value);
+                        continue;
                     }
-                    else /*if (col + 1 < Cols)*/
+
+                    if (RunningUnitTests)
+                    {
+                        // In unit tests, we don't want to actually write to the screen.
+                        continue;
+                    }
+
+                    Curses.attrset (Contents [row, col].Attribute.GetValueOrDefault ().PlatformColor);
+
+                    Rune rune = Contents [row, col].Rune;
+
+                    if (rune.IsBmp)
+                    {
+                        // BUGBUG: CursesDriver doesn't render CharMap correctly for wide chars (and other Unicode) - Curses is doing something funky with glyphs that report GetColums() of 1 yet are rendered wide. E.g. 0x2064 (invisible times) is reported as 1 column but is rendered as 2. WindowsDriver & NetDriver correctly render this as 1 column, overlapping the next cell.
+                        if (rune.GetColumns () < 2)
+                        {
+                            Curses.mvaddch (row, col, rune.Value);
+                        }
+                        else /*if (col + 1 < Cols)*/
+                        {
+                            Curses.mvaddwstr (row, col, rune.ToString ());
+                        }
+                    }
+                    else
                     {
                         Curses.mvaddwstr (row, col, rune.ToString ());
-                    }
-                }
-                else
-                {
-                    Curses.mvaddwstr (row, col, rune.ToString ());
 
-                    if (rune.GetColumns () > 1 && col + 1 < Cols)
-                    {
-                        // TODO: This is a hack to deal with non-BMP and wide characters.
-                        //col++;
-                        Curses.mvaddch (row, ++col, '*');
+                        if (rune.GetColumns () > 1 && col + 1 < Cols)
+                        {
+                            // TODO: This is a hack to deal with non-BMP and wide characters.
+                            //col++;
+                            Curses.mvaddch (row, ++col, '*');
+                        }
                     }
                 }
             }
-        }
 
-        if (!RunningUnitTests)
-        {
-            Curses.move (Row, Col);
-            _window.wrefresh ();
+            if (!RunningUnitTests)
+            {
+                Curses.move (Row, Col);
+                _window.wrefresh ();
+            }
         }
+        else
+        {
+            if (RunningUnitTests
+                || Console.WindowHeight < 1
+                || Contents.Length != Rows * Cols
+                || Rows != Console.WindowHeight)
+            {
+                return;
+            }
+
+            var top = 0;
+            var left = 0;
+            int rows = Rows;
+            int cols = Cols;
+            var output = new StringBuilder ();
+            Attribute? redrawAttr = null;
+            int lastCol = -1;
+
+            CursorVisibility? savedVisibility = _currentCursorVisibility;
+            SetCursorVisibility (CursorVisibility.Invisible);
+
+            for (int row = top; row < rows; row++)
+            {
+                if (Console.WindowHeight < 1)
+                {
+                    return;
+                }
+
+                if (!_dirtyLines [row])
+                {
+                    continue;
+                }
+
+                if (!SetCursorPosition (0, row))
+                {
+                    return;
+                }
+
+                _dirtyLines [row] = false;
+                output.Clear ();
+
+                for (int col = left; col < cols; col++)
+                {
+                    lastCol = -1;
+                    var outputWidth = 0;
+
+                    for (; col < cols; col++)
+                    {
+                        if (!Contents [row, col].IsDirty)
+                        {
+                            if (output.Length > 0)
+                            {
+                                WriteToConsole (output, ref lastCol, row, ref outputWidth);
+                            }
+                            else if (lastCol == -1)
+                            {
+                                lastCol = col;
+                            }
+
+                            if (lastCol + 1 < cols)
+                            {
+                                lastCol++;
+                            }
+
+                            continue;
+                        }
+
+                        if (lastCol == -1)
+                        {
+                            lastCol = col;
+                        }
+
+                        Attribute attr = Contents [row, col].Attribute.Value;
+
+                        // Performance: Only send the escape sequence if the attribute has changed.
+                        if (attr != redrawAttr)
+                        {
+                            redrawAttr = attr;
+
+                            output.Append (
+                                           EscSeqUtils.CSI_SetForegroundColorRGB (
+                                                                                  attr.Foreground.R,
+                                                                                  attr.Foreground.G,
+                                                                                  attr.Foreground.B
+                                                                                 )
+                                          );
+
+                            output.Append (
+                                           EscSeqUtils.CSI_SetBackgroundColorRGB (
+                                                                                  attr.Background.R,
+                                                                                  attr.Background.G,
+                                                                                  attr.Background.B
+                                                                                 )
+                                          );
+                        }
+
+                        outputWidth++;
+                        Rune rune = Contents [row, col].Rune;
+                        output.Append (rune);
+
+                        if (Contents [row, col].CombiningMarks.Count > 0)
+                        {
+                            // AtlasEngine does not support NON-NORMALIZED combining marks in a way
+                            // compatible with the driver architecture. Any CMs (except in the first col)
+                            // are correctly combined with the base char, but are ALSO treated as 1 column
+                            // width codepoints E.g. `echo "[e`u{0301}`u{0301}]"` will output `[é  ]`.
+                            // 
+                            // For now, we just ignore the list of CMs.
+                            //foreach (var combMark in Contents [row, col].CombiningMarks) {
+                            //	output.Append (combMark);
+                            //}
+                            // WriteToConsole (output, ref lastCol, row, ref outputWidth);
+                        }
+                        else if (rune.IsSurrogatePair () && rune.GetColumns () < 2)
+                        {
+                            WriteToConsole (output, ref lastCol, row, ref outputWidth);
+                            SetCursorPosition (col - 1, row);
+                        }
+
+                        Contents [row, col].IsDirty = false;
+                    }
+                }
+
+                if (output.Length > 0)
+                {
+                    SetCursorPosition (lastCol, row);
+                    Console.Write (output);
+                }
+            }
+
+            SetCursorPosition (0, 0);
+
+            _currentCursorVisibility = savedVisibility;
+
+            void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
+            {
+                SetCursorPosition (lastCol, row);
+                Console.Write (output);
+                output.Clear ();
+                lastCol += outputWidth;
+                outputWidth = 0;
+            }
+        }
+    }
+
+    private bool SetCursorPosition (int col, int row)
+    {
+        // + 1 is needed because non-Windows is based on 1 instead of 0 and
+        // Console.CursorTop/CursorLeft isn't reliable.
+        Console.Out.Write (EscSeqUtils.CSI_SetCursorPosition (row + 1, col + 1));
+
+        return true;
     }
 
     internal override void End ()
@@ -374,7 +536,7 @@ internal class CursesDriver : ConsoleDriver
                                                            );
         }
 
-        CurrentAttribute = new Attribute (ColorName.White, ColorName.Black);
+        CurrentAttribute = new Attribute (ColorName16.White, ColorName16.Black);
 
         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
         {
@@ -405,7 +567,11 @@ internal class CursesDriver : ConsoleDriver
         if (!RunningUnitTests)
         {
             Curses.CheckWinChange ();
-            Curses.refresh ();
+
+            if (Force16Colors)
+            {
+                Curses.refresh ();
+            }
         }
 
         return new MainLoop (_mainLoopDriver);
@@ -852,15 +1018,16 @@ internal class CursesDriver : ConsoleDriver
     /// <returns></returns>
     private static Attribute MakeColor (short foreground, short background)
     {
-        var v = (short)((ushort)foreground | (background << 4));
+        //var v = (short)((ushort)foreground | (background << 4));
+        var v = (short)(((ushort)(foreground & 0xffff) << 16) | (background & 0xffff));
 
         // TODO: for TrueColor - Use InitExtendedPair
         Curses.InitColorPair (v, foreground, background);
 
         return new Attribute (
                               Curses.ColorPair (v),
-                              CursesColorNumberToColorName (foreground),
-                              CursesColorNumberToColorName (background)
+                              CursesColorNumberToColorName16 (foreground),
+                              CursesColorNumberToColorName16 (background)
                              );
     }
 
@@ -872,11 +1039,11 @@ internal class CursesDriver : ConsoleDriver
     /// </remarks>
     public override Attribute MakeColor (in Color foreground, in Color background)
     {
-        if (!RunningUnitTests)
+        if (!RunningUnitTests && Force16Colors)
         {
             return MakeColor (
-                              ColorNameToCursesColorNumber (foreground.GetClosestNamedColor ()),
-                              ColorNameToCursesColorNumber (background.GetClosestNamedColor ())
+                              ColorNameToCursesColorNumber (foreground.GetClosestNamedColor16 ()),
+                              ColorNameToCursesColorNumber (background.GetClosestNamedColor16 ())
                              );
         }
 
@@ -887,83 +1054,83 @@ internal class CursesDriver : ConsoleDriver
                              );
     }
 
-    private static short ColorNameToCursesColorNumber (ColorName color)
+    private static short ColorNameToCursesColorNumber (ColorName16 color)
     {
         switch (color)
         {
-            case ColorName.Black:
+            case ColorName16.Black:
                 return Curses.COLOR_BLACK;
-            case ColorName.Blue:
+            case ColorName16.Blue:
                 return Curses.COLOR_BLUE;
-            case ColorName.Green:
+            case ColorName16.Green:
                 return Curses.COLOR_GREEN;
-            case ColorName.Cyan:
+            case ColorName16.Cyan:
                 return Curses.COLOR_CYAN;
-            case ColorName.Red:
+            case ColorName16.Red:
                 return Curses.COLOR_RED;
-            case ColorName.Magenta:
+            case ColorName16.Magenta:
                 return Curses.COLOR_MAGENTA;
-            case ColorName.Yellow:
+            case ColorName16.Yellow:
                 return Curses.COLOR_YELLOW;
-            case ColorName.Gray:
+            case ColorName16.Gray:
                 return Curses.COLOR_WHITE;
-            case ColorName.DarkGray:
+            case ColorName16.DarkGray:
                 return Curses.COLOR_GRAY;
-            case ColorName.BrightBlue:
+            case ColorName16.BrightBlue:
                 return Curses.COLOR_BLUE | Curses.COLOR_GRAY;
-            case ColorName.BrightGreen:
+            case ColorName16.BrightGreen:
                 return Curses.COLOR_GREEN | Curses.COLOR_GRAY;
-            case ColorName.BrightCyan:
+            case ColorName16.BrightCyan:
                 return Curses.COLOR_CYAN | Curses.COLOR_GRAY;
-            case ColorName.BrightRed:
+            case ColorName16.BrightRed:
                 return Curses.COLOR_RED | Curses.COLOR_GRAY;
-            case ColorName.BrightMagenta:
+            case ColorName16.BrightMagenta:
                 return Curses.COLOR_MAGENTA | Curses.COLOR_GRAY;
-            case ColorName.BrightYellow:
+            case ColorName16.BrightYellow:
                 return Curses.COLOR_YELLOW | Curses.COLOR_GRAY;
-            case ColorName.White:
+            case ColorName16.White:
                 return Curses.COLOR_WHITE | Curses.COLOR_GRAY;
         }
 
         throw new ArgumentException ("Invalid color code");
     }
 
-    private static ColorName CursesColorNumberToColorName (short color)
+    private static ColorName16 CursesColorNumberToColorName16 (short color)
     {
         switch (color)
         {
             case Curses.COLOR_BLACK:
-                return ColorName.Black;
+                return ColorName16.Black;
             case Curses.COLOR_BLUE:
-                return ColorName.Blue;
+                return ColorName16.Blue;
             case Curses.COLOR_GREEN:
-                return ColorName.Green;
+                return ColorName16.Green;
             case Curses.COLOR_CYAN:
-                return ColorName.Cyan;
+                return ColorName16.Cyan;
             case Curses.COLOR_RED:
-                return ColorName.Red;
+                return ColorName16.Red;
             case Curses.COLOR_MAGENTA:
-                return ColorName.Magenta;
+                return ColorName16.Magenta;
             case Curses.COLOR_YELLOW:
-                return ColorName.Yellow;
+                return ColorName16.Yellow;
             case Curses.COLOR_WHITE:
-                return ColorName.Gray;
+                return ColorName16.Gray;
             case Curses.COLOR_GRAY:
-                return ColorName.DarkGray;
+                return ColorName16.DarkGray;
             case Curses.COLOR_BLUE | Curses.COLOR_GRAY:
-                return ColorName.BrightBlue;
+                return ColorName16.BrightBlue;
             case Curses.COLOR_GREEN | Curses.COLOR_GRAY:
-                return ColorName.BrightGreen;
+                return ColorName16.BrightGreen;
             case Curses.COLOR_CYAN | Curses.COLOR_GRAY:
-                return ColorName.BrightCyan;
+                return ColorName16.BrightCyan;
             case Curses.COLOR_RED | Curses.COLOR_GRAY:
-                return ColorName.BrightRed;
+                return ColorName16.BrightRed;
             case Curses.COLOR_MAGENTA | Curses.COLOR_GRAY:
-                return ColorName.BrightMagenta;
+                return ColorName16.BrightMagenta;
             case Curses.COLOR_YELLOW | Curses.COLOR_GRAY:
-                return ColorName.BrightYellow;
+                return ColorName16.BrightYellow;
             case Curses.COLOR_WHITE | Curses.COLOR_GRAY:
-                return ColorName.White;
+                return ColorName16.White;
         }
 
         throw new ArgumentException ("Invalid curses color code");

@@ -117,26 +117,26 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ctxSelectAll" xml:space="preserve">
+    <value>_Selecionar Tudo</value>
+  </data>
+  <data name="ctxDeleteAll" xml:space="preserve">
+    <value>_Apagar Tudo</value>
+  </data>
   <data name="ctxCopy" xml:space="preserve">
     <value>_Copiar</value>
   </data>
   <data name="ctxCut" xml:space="preserve">
     <value>Cor_tar</value>
   </data>
-  <data name="ctxDeleteAll" xml:space="preserve">
-    <value>_Apagar Tudo</value>
-  </data>
   <data name="ctxPaste" xml:space="preserve">
     <value>Co_lar</value>
   </data>
-  <data name="ctxRedo" xml:space="preserve">
-    <value>_Refazer</value>
-  </data>
-  <data name="ctxSelectAll" xml:space="preserve">
-    <value>_Selecionar Tudo</value>
-  </data>
   <data name="ctxUndo" xml:space="preserve">
     <value>_Desfazer</value>
+  </data>
+  <data name="ctxRedo" xml:space="preserve">
+    <value>_Refazer</value>
   </data>
   <data name="fdDirectory" xml:space="preserve">
     <value>Diretório</value>
@@ -168,16 +168,19 @@
   <data name="wzNext" xml:space="preserve">
     <value>S_eguir...</value>
   </data>
-  <data name="btnSaveAs" xml:space="preserve">
-    <value>Guardar como</value>
+  <data name="btnOpen" xml:space="preserve">
+    <value>Abrir</value>
   </data>
   <data name="btnSave" xml:space="preserve">
     <value>Guardar</value>
   </data>
-  <data name="btnOpen" xml:space="preserve">
-    <value>Abrir</value>
+  <data name="btnSaveAs" xml:space="preserve">
+    <value>Guardar como</value>
   </data>
   <data name="dpTitle" xml:space="preserve">
     <value>Seletor de Data</value>
+  </data>
+  <data name="ctxColors" xml:space="preserve">
+    <value>Co_res</value>
   </data>
 </root>

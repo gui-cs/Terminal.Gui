@@ -682,7 +682,7 @@ public class MainLoopTests
 
         var btnLaunch = new Button { Text = "Open Window" };
 
-        btnLaunch.Accept += (s, e) => action ();
+        btnLaunch.Accepting += (s, e) => action ();
 
         var top = new Toplevel ();
         top.Add (btnLaunch);
@@ -697,7 +697,7 @@ public class MainLoopTests
                                      {
                                          Assert.Null (btn);
                                          Assert.Equal (zero, total);
-                                         Assert.True (btnLaunch.NewKeyDownEvent (Key.Space));
+                                         Assert.False (btnLaunch.NewKeyDownEvent (Key.Space));
 
                                          if (btn == null)
                                          {
@@ -714,7 +714,7 @@ public class MainLoopTests
                                      {
                                          Assert.Equal (clickMe, btn.Text);
                                          Assert.Equal (zero, total);
-                                         Assert.True (btn.NewKeyDownEvent (Key.Space));
+                                         Assert.False (btn.NewKeyDownEvent (Key.Space));
                                          Assert.Equal (cancel, btn.Text);
                                          Assert.Equal (one, total);
                                      }
@@ -918,11 +918,11 @@ public class MainLoopTests
 
         btn = new Button { Text = "Click Me" };
 
-        btn.Accept += RunAsyncTest;
+        btn.Accepting += RunAsyncTest;
 
         var totalbtn = new Button { X = Pos.Right (btn), Text = "total" };
 
-        totalbtn.Accept += (s, e) => { MessageBox.Query ("Count", $"Count is {total}", "Ok"); };
+        totalbtn.Accepting += (s, e) => { MessageBox.Query ("Count", $"Count is {total}", "Ok"); };
 
         startWindow.Add (btn);
         startWindow.Add (totalbtn);
