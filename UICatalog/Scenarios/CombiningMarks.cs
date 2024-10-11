@@ -9,8 +9,6 @@ public class CombiningMarks : Scenario
     public override void Main ()
     {
         Application.Init ();
-        ConfigurationManager.Themes!.Theme = Theme;
-        ConfigurationManager.Apply ();
         var top = new Toplevel { ColorScheme = Colors.ColorSchemes [TopLevelColorScheme] };
 
         top.DrawContentComplete += (s, e) =>

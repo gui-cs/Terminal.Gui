@@ -80,7 +80,7 @@ public class HasFocusTests () : TestsAllViews
     {
         var wasClicked = false;
         var view = new Button { Text = "Click Me" };
-        view.Accept += (s, e) => wasClicked = !wasClicked;
+        view.Accepting += (s, e) => wasClicked = !wasClicked;
 
         view.NewKeyDownEvent (Key.Space);
         Assert.True (wasClicked);

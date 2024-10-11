@@ -442,7 +442,7 @@ public class Text : Scenario
 
         win.Add (acceptView);
 
-        win.Accept += WinOnAccept;
+        win.Accepting += WinOnAccept;
 
         Application.Run (win);
         win.Dispose ();
@@ -450,9 +450,9 @@ public class Text : Scenario
 
         return;
 
-        void WinOnAccept (object sender, HandledEventArgs e)
+        void WinOnAccept (object sender, CommandEventArgs e)
         {
-            e.Handled = true; // Don't let it close
+            e.Cancel = true; // Don't let it close
 
             acceptView.Text = $"Accept was Invoked via {win.Focused.GetType().Name}";
 

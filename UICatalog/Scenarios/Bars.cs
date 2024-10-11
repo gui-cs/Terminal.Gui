@@ -168,27 +168,36 @@ public class Bars : Scenario
         };
         _popoverMenu.Add (toggleShortcut);
 
-        _popoverMenu.Accept += PopoverMenuOnAccept;
+        _popoverMenu.Accepting += PopoverMenuOnAccepting;
 
-        void PopoverMenuOnAccept (object o, HandledEventArgs handledEventArgs)
+        void PopoverMenuOnAccepting (object o, CommandEventArgs args)
         {
-            if (_popoverMenu.Visible)
+            eventSource.Add ($"Accepting: {_popoverMenu!.Id}");
+            eventLog.MoveDown ();
+            var cbShortcuts = _popoverMenu.Subviews.Where (
+                                                          v =>
+                                                          {
+                                                              if (v is Shortcut sh)
+                                                              {
+                                                                  return sh.CommandView is CheckBox;
+                                                              }
+
+                                                              return false;
+                                                          }).Cast<Shortcut> ();
+
+            foreach (Shortcut sh in cbShortcuts)
             {
-                _popoverMenu.Visible = false;
-            }
-            else
-            {
-                _popoverMenu.Visible = true;
+                eventSource.Add ($"  {sh.Id} - {((CheckBox)sh.CommandView).CheckedState}");
+                eventLog.MoveDown ();
             }
         }
 
         foreach (Shortcut sh in _popoverMenu.Subviews.Where (s => s is Shortcut)!)
         {
-            sh.Accept += (o, args) =>
+            sh.Accepting += (o, args) =>
                          {
-                             eventSource.Add ($"Accept: {sh!.SuperView.Id} {sh!.CommandView.Text}");
+                             eventSource.Add ($"shortcut.Accepting: {sh!.SuperView.Id} {sh!.CommandView.Text}");
                              eventLog.MoveDown ();
-                             //args.Handled = true;
                          };
         }
 
@@ -257,11 +266,10 @@ public class Bars : Scenario
             {
                 foreach (Shortcut sh in barView.Subviews.Where (s => s is Shortcut)!)
                 {
-                    sh.Accept += (o, args) =>
+                    sh.Accepting += (o, args) =>
                                  {
                                      eventSource.Add ($"Accept: {sh!.SuperView.Id} {sh!.CommandView.Text}");
                                      eventLog.MoveDown ();
-                                     //args.Handled = true;
                                  };
                 }
             }
@@ -420,7 +428,7 @@ public class Bars : Scenario
             HighlightStyle = HighlightStyle.Hover
         };
 
-        fileMenuBarItem.Accept += (sender, args) =>
+        fileMenuBarItem.Accepting += (sender, args) =>
                                   {
                                       var fileMenu = new Menuv2
                                       {
@@ -556,14 +564,14 @@ public class Bars : Scenario
             Text = "I'll Hide",
             // Visible = false
         };
-        button1.Accept += Button_Clicked;
+        button1.Accepting += Button_Clicked;
         bar.Add (button1);
 
-        shortcut.Accept += (s, e) =>
+        shortcut.Accepting += (s, e) =>
                                                     {
                                                         button1.Visible = !button1.Visible;
                                                         button1.Enabled = button1.Visible;
-                                                        e.Handled = false;
+                                                        e.Cancel = false;
                                                     };
 
         bar.Add (new Label
@@ -577,7 +585,7 @@ public class Bars : Scenario
         {
             Text = "Or me!",
         };
-        button2.Accept += (s, e) => Application.RequestStop ();
+        button2.Accepting += (s, e) => Application.RequestStop ();
 
         bar.Add (button2);
 

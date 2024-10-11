@@ -61,3 +61,4 @@ demo.*
 *.tui/
 
 *.dotCover
+/local_packages/

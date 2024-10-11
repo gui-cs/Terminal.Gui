@@ -1,33 +1,22 @@
-//
-// Button.cs: Button control
-//
-// Authors:
-//   Miguel de Icaza (miguel@gnome.org)
-//
-
 namespace Terminal.Gui;
 
 /// <summary>
-///     A View that raises the <see cref="View.Accept"/> event when clicked with the mouse or when the
-///     <see cref="View.HotKey"/>, <c>Enter</c>, or <c>Space</c> key is pressed.
+///     A button View that can be pressed with the mouse or keyboard.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Provides a button showing text that raises the <see cref="View.Accept"/> event when clicked on with a mouse or
-///         when the user presses <c>Enter</c>, <c>Space</c> or the <see cref="View.HotKey"/>. The hot key is the first
-///         letter or digit
-///         following the first underscore ('_') in the button text.
+///         The Button will raise the <see cref="View.Accepting"/> event when the user presses <see cref="View.HotKey"/>,
+///         <c>Enter</c>, or <c>Space</c>
+///         or clicks on the button with the mouse.
 ///     </para>
 ///     <para>Use <see cref="View.HotKeySpecifier"/> to change the hot key specifier from the default of ('_').</para>
 ///     <para>
-///         When the button is configured as the default (<see cref="IsDefault"/>) and the user causes the button to be
-///         accepted the <see cref="Button"/>'s <see cref="View.Accept"/> event will be raised. If the Accept event is not
-///         handled, the Accept event on the <see cref="View.SuperView"/>. will be raised. This enables default Accept
-///         behavior.
+///         Button can act as the default <see cref="Command.Accept"/> handler for all peer-Views. See
+///         <see cref="IsDefault"/>.
 ///     </para>
 ///     <para>
 ///         Set <see cref="View.WantContinuousButtonPressed"/> to <see langword="true"/> to have the
-///         <see cref="View.Accept"/> event
+///         <see cref="View.Accepting"/> event
 ///         invoked repeatedly while the button is pressed.
 ///     </para>
 /// </remarks>
@@ -66,33 +55,8 @@ public class Button : View, IDesignable
         Width = Dim.Auto (DimAutoStyle.Text);
 
         CanFocus = true;
-        
-        // Override default behavior of View
-        AddCommand (
-                    Command.HotKey,
-                    () =>
-                    {
-                        bool cachedIsDefault = IsDefault; // Supports "Swap Default" in Buttons scenario where IsDefault changes
 
-                        bool? handled = RaiseAcceptEvent ();
-
-                        if (handled == true)
-                        {
-                            return true;
-                        }
-
-                        SetFocus ();
-
-                        // TODO: If `IsDefault` were a property on `View` *any* View could work this way. That's theoretical as
-                        // TODO: no use-case has been identified for any View other than Button to act like this.
-                        // If Accept was not handled...
-                        if (cachedIsDefault && SuperView is { })
-                        {
-                            return SuperView.InvokeCommand (Command.Accept);
-                        }
-
-                        return false;
-                    });
+        AddCommand (Command.HotKey, HandleHotKeyCommand);
 
         KeyBindings.Remove (Key.Space);
         KeyBindings.Add (Key.Space, Command.HotKey);
@@ -104,6 +68,35 @@ public class Button : View, IDesignable
 
         ShadowStyle = DefaultShadow;
         HighlightStyle = DefaultHighlightStyle;
+    }
+
+    private bool? HandleHotKeyCommand (CommandContext ctx)
+    {
+        bool cachedIsDefault = IsDefault; // Supports "Swap Default" in Buttons scenario where IsDefault changes
+
+        if (RaiseSelecting (ctx) is true)
+        {
+            return true;
+        }
+
+        bool? handled = RaiseAccepting (ctx);
+
+        if (handled == true)
+        {
+            return true;
+        }
+
+        SetFocus ();
+
+        // TODO: If `IsDefault` were a property on `View` *any* View could work this way. That's theoretical as
+        // TODO: no use-case has been identified for any View other than Button to act like this.
+        // If Accept was not handled...
+        if (cachedIsDefault && SuperView is { })
+        {
+            return SuperView.InvokeCommand (Command.Accept);
+        }
+
+        return false;
     }
 
     private bool _wantContinuousButtonPressed;
@@ -132,7 +125,16 @@ public class Button : View, IDesignable
         }
     }
 
-    private void Button_MouseClick (object sender, MouseEventEventArgs e) { e.Handled = InvokeCommand (Command.HotKey) == true; }
+    private void Button_MouseClick (object sender, MouseEventEventArgs e)
+    {
+        if (e.Handled)
+        {
+            return;
+        }
+
+        // TODO: With https://github.com/gui-cs/Terminal.Gui/issues/3778 we won't have to pass data:
+        e.Handled = InvokeCommand (Command.HotKey, new (Command.HotKey, null, data: this)) == true;
+    }
 
     private void Button_TitleChanged (object sender, EventArgs<string> e)
     {
@@ -155,14 +157,27 @@ public class Button : View, IDesignable
     }
 
     /// <summary>
-    ///     Gets or sets whether the <see cref="Button"/> will show an indicator indicating it is the default Button. If
-    ///     <see langword="true"/>
-    ///     <see cref="Command.Accept"/> will be invoked when the user presses <c>Enter</c> and no other peer-
-    ///     <see cref="View"/> processes the key.
-    ///     If <see cref="View.Accept"/> is not handled, the Gets or sets whether the <see cref="Button"/> will show an
-    ///     indicator indicating it is the default Button. If <see langword="true"/>
-    ///     <see cref="Command.Accept"/> command on the <see cref="View.SuperView"/> will be invoked.
+    ///     Gets or sets whether the <see cref="Button"/> will act as the default handler for <see cref="Command.Accept"/>
+    ///     commands on the <see cref="View.SuperView"/>.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         If <see langword="true"/>:
+    ///     </para>
+    ///     <para>
+    ///         - the Button will display an indicator that it is the default Button.
+    ///     </para>
+    ///     <para>
+    ///         - when clicked, if the Accepting event is not handled, <see cref="Command.Accept"/> will be
+    ///         invoked on the SuperView.
+    ///     </para>
+    ///     <para>
+    ///         - If a peer-View receives <see cref="Command.Accept"/> and does not handle it, the command will be passed to
+    ///         the
+    ///         first Button in the SuperView that has <see cref="IsDefault"/> set to <see langword="true"/>. See
+    ///         <see cref="View.RaiseAccepting"/> for more information.
+    ///     </para>
+    /// </remarks>
     public bool IsDefault
     {
         get => _isDefault;
@@ -180,10 +195,15 @@ public class Button : View, IDesignable
         }
     }
 
-    /// <summary></summary>
+    /// <summary>
+    ///     Gets or sets whether the Button will show decorations or not. If <see langword="true"/> the glyphs that normally
+    ///     brakcet the Button Title and the <see cref="IsDefault"/> indicator will not be shown.
+    /// </summary>
     public bool NoDecorations { get; set; }
 
-    /// <summary></summary>
+    /// <summary>
+    ///     Gets or sets whether the Button will include padding on each side of the Title.
+    /// </summary>
     public bool NoPadding { get; set; }
 
     /// <inheritdoc/>

@@ -6,7 +6,6 @@ namespace Terminal.Gui;
 /// <summary>
 ///     Actions which can be performed by a <see cref="View"/>. Commands are typically invoked via
 ///     <see cref="View.KeyBindings"/> and mouse events.
-///     See also <see cref="View.InvokeCommand"/>.
 /// </summary>
 public enum Command
 {
@@ -15,9 +14,8 @@ public enum Command
     /// <summary>
     ///     Accepts the current state of the View (e.g. list selection, button press, checkbox state, etc.).
     ///     <para>
-    ///         The default implementation in <see cref="View"/> calls <see cref="View.RaiseAcceptEvent"/> which raises the
-    ///         <see cref="View.Accept"/> event. If the event is not handled,
-    ///         the command is invoked on
+    ///         The default implementation in <see cref="View"/> calls <see cref="View.RaiseAccepting"/>. If the event is not handled,
+    ///         the command is invoked on:
     ///             - Any peer-view that is a <see cref="Button"/> with <see cref="Button.IsDefault"/> set to <see langword="true"/>.
     ///             - The <see cref="View.SuperView"/>. This enables default Accept behavior.
     ///     </para>
@@ -28,17 +26,15 @@ public enum Command
     ///     Performs a hot key action (e.g. setting focus, accepting, and/or moving focus to the next View).
     ///     <para>
     ///         The default implementation in <see cref="View"/> calls <see cref="View.SetFocus"/> and then
-    ///         <see cref="View.RaiseHotKeyCommandEvent"/> which raises the
-    ///         <see cref="View.HotKeyCommand"/> event.
+    ///         <see cref="View.RaiseHandlingHotKey"/>.
     ///     </para>
     /// </summary>
     HotKey,
 
     /// <summary>
-    ///     Selects an item (e.g. a list item or menu item) without necessarily accepting it.
+    ///     Selects the View or an item in the View (e.g. a list item or menu item) without necessarily accepting it.
     ///     <para>
-    ///         The default implementation in <see cref="View"/> calls <see cref="View.RaiseSelectEvent"/> which raises the
-    ///         <see cref="View.Select"/> event.
+    ///         The default implementation in <see cref="View"/> calls <see cref="View.RaiseSelecting"/>.
     ///     </para>
     /// </summary>
     Select,

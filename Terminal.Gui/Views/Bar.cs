@@ -77,7 +77,11 @@ public class Bar : View, IOrientation, IDesignable
         }
     }
 
-    private void Bar_Initialized (object? sender, EventArgs e) { ColorScheme = Colors.ColorSchemes ["Menu"]; }
+    private void Bar_Initialized (object? sender, EventArgs e)
+    {
+        ColorScheme = Colors.ColorSchemes ["Menu"];
+        LayoutBarItems (GetContentSize ());
+    }
 
     /// <inheritdoc/>
     public override void SetBorderStyle (LineStyle value)
@@ -192,6 +196,11 @@ public class Bar : View, IOrientation, IDesignable
     {
         base.OnLayoutStarted (args);
 
+        LayoutBarItems (args.OldContentSize);
+    }
+
+    private void LayoutBarItems (Size contentSize)
+    {
         View? prevBarItem = null;
 
         switch (Orientation)
@@ -204,8 +213,6 @@ public class Bar : View, IOrientation, IDesignable
                     barItem.ColorScheme = ColorScheme;
                     barItem.X = Pos.Align (Alignment.Start, AlignmentModes);
                     barItem.Y = 0; //Pos.Center ();
-                    // HACK: This should not be needed
-                    barItem.SetRelativeLayout (GetContentSize ());
                 }
                 break;
 
@@ -239,8 +246,6 @@ public class Bar : View, IOrientation, IDesignable
                     if (barItem is Shortcut scBarItem)
                     {
                         scBarItem.MinimumKeyTextSize = minKeyWidth;
-                        // HACK: This should not be needed
-                        scBarItem.SetRelativeLayout (GetContentSize ());
                         maxBarItemWidth = Math.Max (maxBarItemWidth, scBarItem.Frame.Width);
                     }
 
@@ -264,10 +269,6 @@ public class Bar : View, IOrientation, IDesignable
                 foreach (View barItem in Subviews)
                 {
                     barItem.Width = maxBarItemWidth;
-
-                    if (barItem is Line line)
-                    {
-                    }
                 }
 
                 Height = Dim.Auto (DimAutoStyle.Content, totalHeight);
@@ -275,7 +276,6 @@ public class Bar : View, IOrientation, IDesignable
                 break;
         }
     }
-
 
     /// <inheritdoc />
     public bool EnableForDesign ()
@@ -294,6 +294,19 @@ public class Bar : View, IOrientation, IDesignable
             Text = "Help Text",
             Title = "Help",
             Key = Key.F1,
+        };
+
+        Add (shortcut);
+
+        shortcut = new Shortcut
+        {
+            Text = "Czech",
+            CommandView = new CheckBox ()
+            {
+                Title = "_Check"
+            },
+            Key = Key.F9,
+            CanFocus = false
         };
 
         Add (shortcut);

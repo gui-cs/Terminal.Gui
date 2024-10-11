@@ -69,9 +69,7 @@ public static partial class Application // Popover handling
                                                     Popover.Frame.X,
                                                     Popover.Frame.Y,
                                                     out int nx,
-                                                    out int ny,
-                                                    out StatusBar? sb
-                                                   );
+                                                    out int ny);
 
             Popover.X = nx;
             Popover.Y = ny;
@@ -83,7 +81,7 @@ public static partial class Application // Popover handling
                 Top.HasFocus = false;
             }
 
-            Popover.SetFocus ();
+            Popover?.SetFocus ();
         }
     }
 }

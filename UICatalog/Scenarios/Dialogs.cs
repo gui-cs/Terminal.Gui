@@ -185,7 +185,7 @@ public class Dialogs : Scenario
             X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "_Show Dialog"
         };
 
-        app.Accept += (s, e) =>
+        app.Accepting += (s, e) =>
                                    {
                                        Dialog dlg = CreateDemoDialog (
                                                                       widthEdit,
@@ -198,7 +198,7 @@ public class Dialogs : Scenario
                                                                      );
                                        Application.Run (dlg);
                                        dlg.Dispose ();
-                                       e.Handled = true;
+                                       e.Cancel = true;
                                    };
 
         app.Add (showDialogButton);
@@ -246,18 +246,19 @@ public class Dialogs : Scenario
 
                     button = new ()
                     {
-                        Text = NumberToWords.Convert (buttonId) + " " + char.ConvertFromUtf32 (buttonId + CODE_POINT),
+                        Text = "_" + NumberToWords.Convert (buttonId) + " " + char.ConvertFromUtf32 (buttonId + CODE_POINT),
                         IsDefault = buttonId == 0
                     };
                 }
                 else
                 {
-                    button = new () { Text = NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
+                    button = new () { Text = "_" + NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
                 }
 
-                button.Accept += (s, e) =>
+                button.Accepting += (s, e) =>
                                  {
                                      clicked = buttonId;
+                                     e.Cancel = true;
                                      Application.RequestStop ();
                                  };
                 buttons.Add (button);
@@ -269,7 +270,7 @@ public class Dialogs : Scenario
             {
                 Title = titleEdit.Text,
                 Text = "Dialog Text",
-                ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentRadioGroup.RadioLabels [alignmentRadioGroup.SelectedItem].Substring(1)),
+                ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentRadioGroup.RadioLabels [alignmentRadioGroup.SelectedItem].Substring (1)),
 
                 Buttons = buttons.ToArray ()
             };
@@ -290,7 +291,7 @@ public class Dialogs : Scenario
                 Text = "_Add a button"
             };
 
-            add.Accept += (s, e) =>
+            add.Accepting += (s, e) =>
                           {
                               int buttonId = buttons.Count;
                               Button button;
@@ -299,19 +300,20 @@ public class Dialogs : Scenario
                               {
                                   button = new ()
                                   {
-                                      Text = NumberToWords.Convert (buttonId) + " " + char.ConvertFromUtf32 (buttonId + CODE_POINT),
+                                      Text = "_" + NumberToWords.Convert (buttonId) + " " + char.ConvertFromUtf32 (buttonId + CODE_POINT),
                                       IsDefault = buttonId == 0
                                   };
                               }
                               else
                               {
-                                  button = new () { Text = NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
+                                  button = new () { Text = "_" + NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
                               }
 
-                              button.Accept += (s, e) =>
+                              button.Accepting += (s, e) =>
                                                {
                                                    clicked = buttonId;
                                                    Application.RequestStop ();
+                                                   e.Cancel = true;
                                                };
                               buttons.Add (button);
                               dialog.AddButton (button);
@@ -320,6 +322,7 @@ public class Dialogs : Scenario
                               //{
                               //    button.TabIndex = buttons [buttons.Count - 2].TabIndex + 1;
                               //}
+                              e.Cancel = true;
                           };
             dialog.Add (add);
 
@@ -330,7 +333,7 @@ public class Dialogs : Scenario
                 Text = $"A_dd a {char.ConvertFromUtf32 (CODE_POINT)} to each button. This text is really long for a reason."
             };
 
-            addChar.Accept += (s, e) =>
+            addChar.Accepting += (s, e) =>
                               {
                                   foreach (Button button in buttons)
                                   {
@@ -338,6 +341,7 @@ public class Dialogs : Scenario
                                   }
 
                                   dialog.LayoutSubviews ();
+                                  e.Cancel = true;
                               };
             dialog.Add (addChar);
 

@@ -414,14 +414,14 @@ Item 6",
         var listView = new ListView ();
         var accepted = false;
 
-        listView.Accept += OnAccept;
+        listView.Accepting += OnAccepted;
         listView.InvokeCommand (Command.HotKey);
 
         Assert.False (accepted);
 
         return;
 
-        void OnAccept (object sender, HandledEventArgs e) { accepted = true; }
+        void OnAccepted (object sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -435,7 +435,7 @@ Item 6",
         var opened = false;
         var selectedValue = string.Empty;
 
-        listView.Accept += Accept;
+        listView.Accepting += Accepted;
         listView.OpenSelectedItem += OpenSelectedItem;
 
         listView.InvokeCommand (Command.Accept);
@@ -452,7 +452,7 @@ Item 6",
             selectedValue = e.Value.ToString ();
         }
 
-        void Accept (object sender, HandledEventArgs e) { accepted = true; }
+        void Accepted (object sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -466,7 +466,7 @@ Item 6",
         var opened = false;
         var selectedValue = string.Empty;
 
-        listView.Accept += Accept;
+        listView.Accepting += Accepted;
         listView.OpenSelectedItem += OpenSelectedItem;
 
         listView.InvokeCommand (Command.Accept);
@@ -483,10 +483,10 @@ Item 6",
             selectedValue = e.Value.ToString ();
         }
 
-        void Accept (object sender, HandledEventArgs e)
+        void Accepted (object sender, CommandEventArgs e)
         {
             accepted = true;
-            e.Handled = true;
+            e.Cancel = true;
         }
     }
 

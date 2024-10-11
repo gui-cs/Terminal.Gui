@@ -1,4 +1,6 @@
 ﻿#nullable enable
+using System.Diagnostics;
+
 namespace Terminal.Gui;
 
 /// <summary>Displays a group of labels with an idicator of which one is selected.</summary>
@@ -14,7 +16,101 @@ public class RadioGroup : View, IDesignable, IOrientation
         Width = Dim.Auto (DimAutoStyle.Content);
         Height = Dim.Auto (DimAutoStyle.Content);
 
-        // Things this view knows how to do
+
+        // Select (Space key or mouse click) - The default implementation sets focus. RadioGroup does not.
+        AddCommand (
+                    Command.Select,
+                    (ctx) =>
+                    {
+                        bool cursorChanged = false;
+                        if (SelectedItem == Cursor)
+                        {
+                            cursorChanged = MoveDownRight ();
+                            if (!cursorChanged)
+                            {
+                                cursorChanged = MoveHome ();
+                            }
+                        }
+
+                        bool selectedItemChanged = false;
+                        if (SelectedItem != Cursor)
+                        {
+                            selectedItemChanged = ChangeSelectedItem (Cursor);
+                        }
+
+                        if (cursorChanged || selectedItemChanged)
+                        {
+                            if (RaiseSelecting (ctx) == true)
+                            {
+                                return true;
+                            }
+                        }
+
+                        return cursorChanged || selectedItemChanged;
+                    });
+
+        // Accept (Enter key) - Raise Accept event - DO NOT advance state
+        AddCommand (Command.Accept, RaiseAccepting);
+
+        // Hotkey - ctx may indicate a radio item hotkey was pressed. Beahvior depends on HasFocus
+        //          If HasFocus and it's this.HotKey invoke Select command - DO NOT raise Accept
+        //          If it's a radio item HotKey select that item and raise Seelcted event - DO NOT raise Accept
+        //          If nothing is selected, select first and raise Selected event - DO NOT raise Accept
+        AddCommand (Command.HotKey,
+                    ctx =>
+                            {
+                                var item = ctx.KeyBinding?.Context as int?;
+
+                                if (HasFocus)
+                                {
+                                    if (ctx is { KeyBinding: { } } && (ctx.KeyBinding.Value.BoundView != this || HotKey == ctx.Key?.NoAlt.NoCtrl.NoShift))
+                                    {
+                                        // It's this.HotKey OR Another View (Label?) forwarded the hotkey command to us - Act just like `Space` (Select)
+                                        return InvokeCommand (Command.Select, ctx.Key, ctx.KeyBinding);
+                                    }
+                                }
+
+                                if (item is { } && item < _radioLabels.Count)
+                                {
+                                    if (item.Value == SelectedItem)
+                                    {
+                                        return true;
+                                    }
+
+                                    // If a RadioItem.HotKey is pressed we always set the selected item - never SetFocus
+                                    bool selectedItemChanged = ChangeSelectedItem (item.Value);
+
+                                    if (selectedItemChanged)
+                                    {
+                                        // Doesn't matter if it's handled
+                                        RaiseSelecting (ctx);
+                                        return true;
+                                    }
+
+
+                                    return false;
+                                }
+
+                                if (SelectedItem == -1 && ChangeSelectedItem (0))
+                                {
+                                    if (RaiseSelecting (ctx) == true)
+                                    {
+                                        return true;
+                                    }
+                                    return false;
+                                }
+
+                                if (RaiseHandlingHotKey () == true)
+                                {
+                                    return true;
+                                };
+
+                                // Default Command.Hotkey sets focus
+                                SetFocus ();
+
+                                return true;
+                            });
+
         AddCommand (
                     Command.Up,
                     () =>
@@ -70,80 +166,6 @@ public class RadioGroup : View, IDesignable, IOrientation
                         return true;
                     }
                    );
-        AddCommand (
-                    Command.Select,
-                    () =>
-                    {
-                        if (SelectedItem == Cursor)
-                        {
-                            if (!MoveDownRight ())
-                            {
-                                MoveHome ();
-                            }
-                        }
-
-                        SelectedItem = Cursor;
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.Select,
-                    () =>
-                    {
-                        if (SelectedItem == Cursor)
-                        {
-                            if (!MoveDownRight ())
-                            {
-                                MoveHome ();
-                            }
-                        }
-
-                        return ChangeSelectedItem (Cursor) is false or null;
-                    });
-
-        // Accept (Enter key) - Raise Accept event - DO NOT advance state
-        AddCommand (Command.Accept, RaiseAcceptEvent);
-
-        AddCommand (
-                    Command.HotKey,
-                    ctx =>
-                    {
-                        var item = ctx.KeyBinding?.Context as int?;
-
-                        if (HasFocus)
-                        {
-                            if (ctx is { KeyBinding: { } } && (ctx.KeyBinding.Value.BoundView != this || HotKey == ctx.Key?.NoAlt.NoCtrl.NoShift))
-                            {
-                                // It's this.HotKey OR Another View (Label?) forwarded the hotkey command to us - Act just like `Space` (Select)
-                                return InvokeCommand (Command.Select, ctx.Key, ctx.KeyBinding);
-                            }
-                        }
-
-                        if (item is { } && item < _radioLabels.Count)
-                        {
-                            if (item.Value == SelectedItem)
-                            {
-                                return true;
-                            }
-
-                            // If a RadioItem.HotKey is pressed we always set the selected item - never SetFocus
-                            if (ChangeSelectedItem (item.Value) is null or false)
-                            {
-                                return true;
-                            }
-
-                            return false;
-                        }
-
-                        if (SelectedItem == -1 && ChangeSelectedItem (0) == true)
-                        {
-                            return true;
-                        }
-
-                        SetFocus ();
-
-                        return true;
-                    });
 
         // ReSharper disable once UseObjectOrCollectionInitializer
         _orientationHelper = new (this);
@@ -187,7 +209,7 @@ public class RadioGroup : View, IDesignable, IOrientation
     }
 
     /// <summary>
-    ///     Gets or sets whether double clicking on a Radio Item will cause the <see cref="View.Accept"/> event to be raised.
+    ///     Gets or sets whether double clicking on a Radio Item will cause the <see cref="View.Accepting"/> event to be raised.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -219,30 +241,25 @@ public class RadioGroup : View, IDesignable, IOrientation
 
                 if (c > -1)
                 {
-                    if (ChangeSelectedItem (c) == false)
-                    {
-                        Cursor = c;
-                        e.Handled = true;
-                    }
+                    // Just like the user pressing the items' hotkey
+                    e.Handled = InvokeCommand (Command.HotKey, null, new KeyBinding ([Command.HotKey], KeyBindingScope.HotKey, boundView: this, context: c)) == true;
                 }
             }
+
+            return;
         }
 
         if (DoubleClickAccepts && e.MouseEvent.Flags.HasFlag (MouseFlags.Button1DoubleClicked))
         {
-            int savedSelectedItem = SelectedItem;
+            // NOTE: Drivers ALWAYS generate a Button1Clicked event before Button1DoubleClicked
+            // NOTE: So, we've already selected an item.
 
-            if (RaiseAcceptEvent () == true)
-            {
-                e.Handled = false;
-                _selected = savedSelectedItem;
-            }
-
-            if (SuperView?.InvokeCommand (Command.Accept) is false or null)
-            {
-                e.Handled = true;
-            }
+            // Just like the user pressing `Enter`
+            InvokeCommand (Command.Accept);
         }
+
+        // HACK: Always eat so Select is not invoked by base
+        e.Handled = true;
     }
 
     private List<(int pos, int length)>? _horizontal;
@@ -321,19 +338,13 @@ public class RadioGroup : View, IDesignable, IOrientation
     /// </summary>
     /// <param name="value"></param>
     /// <returns>
-    ///     <see langword="true"/> if state change was canceled, <see langword="false"/> if the state changed, and
-    ///     <see langword="null"/> if the state was not changed for some other reason.
+    ///     <see langword="true"/> if the selected item changed.
     /// </returns>
-    private bool? ChangeSelectedItem (int value)
+    private bool ChangeSelectedItem (int value)
     {
         if (_selected == value || value > _radioLabels.Count - 1)
         {
-            return null;
-        }
-
-        if (RaiseSelectEvent () == true)
-        {
-            return true;
+            return false;
         }
 
         int savedSelected = _selected;
@@ -345,7 +356,7 @@ public class RadioGroup : View, IDesignable, IOrientation
 
         SetNeedsDisplay ();
 
-        return false;
+        return true;
     }
 
     /// <inheritdoc/>
@@ -524,7 +535,17 @@ public class RadioGroup : View, IDesignable, IOrientation
 
     private void MoveEnd () { Cursor = Math.Max (_radioLabels.Count - 1, 0); }
 
-    private void MoveHome () { Cursor = 0; }
+    private bool MoveHome ()
+    {
+        if (Cursor != 0)
+        {
+            Cursor = 0;
+
+            return true;
+        }
+
+        return false;
+    }
 
     private bool MoveUpLeft ()
     {

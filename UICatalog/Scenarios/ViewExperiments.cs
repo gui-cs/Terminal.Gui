@@ -74,12 +74,12 @@ public class ViewExperiments : Scenario
             Y = Pos.Center (),
             Title = $"_Close",
         };
-        popoverButton.Accept += (sender, e) => Application.Popover!.Visible = false;
+        popoverButton.Accepting += (sender, e) => Application.Popover!.Visible = false;
         popoverView.Add (popoverButton);
 
-        button.Accept += ButtonAccept;
+        button.Accepting += ButtonAccepting;
 
-        void ButtonAccept (object sender, System.ComponentModel.HandledEventArgs e)
+        void ButtonAccepting (object sender, CommandEventArgs e)
         {
             Application.Popover = popoverView;
             Application.Popover!.Visible = true;

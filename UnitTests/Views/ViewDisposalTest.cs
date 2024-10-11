@@ -32,8 +32,8 @@ public class ViewDisposalTest (ITestOutputHelper output)
     private WeakReference DoTest ()
     {
         GetSpecialParams ();
-        var container = new View ();
-        Toplevel top = new ();
+        var container = new View () { Id = "container" };
+        Toplevel top = new () { Id = "top" };
         List<Type> views = GetViews ();
 
         foreach (Type view in views)
@@ -51,6 +51,7 @@ public class ViewDisposalTest (ITestOutputHelper output)
             }
 
             Assert.NotNull (instance);
+            instance.Id = $"{view.Name}";
             container.Add (instance);
             output.WriteLine ($"Added instance of {view}!");
         }

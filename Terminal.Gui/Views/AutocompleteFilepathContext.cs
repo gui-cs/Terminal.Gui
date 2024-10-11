@@ -6,7 +6,7 @@ namespace Terminal.Gui;
 internal class AutocompleteFilepathContext : AutocompleteContext
 {
     public AutocompleteFilepathContext (string currentLine, int cursorPosition, FileDialogState state)
-        : base (TextModel.ToRuneCellList (currentLine), cursorPosition)
+        : base (Cell.ToCellList (currentLine), cursorPosition)
     {
         State = state;
     }
@@ -30,7 +30,7 @@ internal class FilepathSuggestionGenerator : ISuggestionGenerator
             return Enumerable.Empty<Suggestion> ();
         }
 
-        var path = TextModel.ToString (context.CurrentLine);
+        var path = Cell.ToString (context.CurrentLine);
         int last = path.LastIndexOfAny (FileDialog.Separators);
 
         if (string.IsNullOrWhiteSpace (path) || !Path.IsPathRooted (path))

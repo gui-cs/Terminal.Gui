@@ -156,7 +156,7 @@ public class ApplicationTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [AutoInitShutdown (verifyShutdown: true)]
     public void Begin_Sets_Application_Top_To_Console_Size ()
     {
         Assert.Null (Application.Top);
@@ -320,7 +320,8 @@ public class ApplicationTests
             Assert.Empty (Application.GetViewKeyBindings ());
 
             // Mouse
-            Assert.Equal (Application._lastMousePosition, Point.Empty);
+            Assert.Null (Application._lastMousePosition);
+
 
             // Navigation
             Assert.Null (Application.Navigation);
@@ -522,7 +523,7 @@ public class ApplicationTests
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [AutoInitShutdown (verifyShutdown: true)]
     public void Internal_Properties_Correct ()
     {
         Assert.True (Application.IsInitialized);

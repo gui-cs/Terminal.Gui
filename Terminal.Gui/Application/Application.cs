@@ -199,7 +199,7 @@ public static partial class Application
         IsInitialized = false;
 
         // Mouse
-        _lastMousePosition = Point.Empty;
+        _lastMousePosition = null;
         _cachedViewsUnderMouse.Clear ();
         WantContinuousButtonPressedView = null;
         MouseEvent = null;
@@ -216,9 +216,6 @@ public static partial class Application
         Navigation = null;
 
         AddApplicationKeyBindings ();
-
-        // BUGBUG: This should not be here as it conflics with CM
-        //Colors.Reset ();
 
         // Reset synchronization context to allow the user to run async/await,
         // as the main loop has been ended, the synchronization context from

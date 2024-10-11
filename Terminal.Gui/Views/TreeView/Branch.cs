@@ -75,7 +75,7 @@ internal class Branch<T> where T : class
     /// <param name="availableWidth"></param>
     public virtual void Draw (ConsoleDriver driver, ColorScheme colorScheme, int y, int availableWidth)
     {
-        List<RuneCell> cells = new ();
+        List<Cell> cells = new ();
         int? indexOfExpandCollapseSymbol = null;
         int indexOfModelText;
 
@@ -106,7 +106,7 @@ internal class Branch<T> where T : class
             }
             else
             {
-                cells.Add (NewRuneCell (attr, r));
+                cells.Add (NewCell (attr, r));
                 availableWidth -= r.GetColumns ();
             }
         }
@@ -148,7 +148,7 @@ internal class Branch<T> where T : class
         else
         {
             indexOfExpandCollapseSymbol = cells.Count;
-            cells.Add (NewRuneCell (attr, expansion));
+            cells.Add (NewCell (attr, expansion));
             availableWidth -= expansion.GetColumns ();
         }
 
@@ -211,7 +211,7 @@ internal class Branch<T> where T : class
         }
 
         attr = modelColor;
-        cells.AddRange (lineBody.Select (r => NewRuneCell (attr, new Rune (r))));
+        cells.AddRange (lineBody.Select (r => NewCell (attr, new Rune (r))));
 
         if (availableWidth > 0)
         {
@@ -219,7 +219,7 @@ internal class Branch<T> where T : class
 
             cells.AddRange (
                             Enumerable.Repeat (
-                                               NewRuneCell (attr, new Rune (' ')),
+                                               NewCell (attr, new Rune (' ')),
                                                availableWidth
                                               )
                            );
@@ -229,7 +229,7 @@ internal class Branch<T> where T : class
         {
             Model = Model,
             Y = y,
-            RuneCells = cells,
+            Cells = cells,
             Tree = tree,
             IndexOfExpandCollapseSymbol =
                 indexOfExpandCollapseSymbol,
@@ -239,9 +239,9 @@ internal class Branch<T> where T : class
 
         if (!e.Handled)
         {
-            foreach (RuneCell cell in cells)
+            foreach (Cell cell in cells)
             {
-                driver.SetAttribute (cell.ColorScheme.Normal);
+                driver.SetAttribute ((Attribute)cell.Attribute!);
                 driver.AddRune (cell.Rune);
             }
         }
@@ -529,5 +529,5 @@ internal class Branch<T> where T : class
         return Parent.ChildBranches.Values.LastOrDefault () == this;
     }
 
-    private static RuneCell NewRuneCell (Attribute attr, Rune r) { return new RuneCell { Rune = r, ColorScheme = new ColorScheme (attr) }; }
+    private static Cell NewCell (Attribute attr, Rune r) { return new Cell { Rune = r, Attribute = new (attr) }; }
 }

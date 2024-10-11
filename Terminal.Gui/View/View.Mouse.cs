@@ -57,7 +57,7 @@ public partial class View // Mouse APIs
                 return args.Cancel;
             }
 
-            ColorScheme cs = ColorScheme;
+            ColorScheme? cs = ColorScheme;
 
             if (cs is null)
             {
@@ -66,7 +66,7 @@ public partial class View // Mouse APIs
 
             _savedNonHoverColorScheme = cs;
 
-            ColorScheme = ColorScheme.GetHighlightColorScheme ();
+            ColorScheme = ColorScheme?.GetHighlightColorScheme ();
         }
 
         return false;
@@ -351,7 +351,7 @@ public partial class View // Mouse APIs
         // BUGBUG: This should be named NewMouseClickEvent. Fix this in https://github.com/gui-cs/Terminal.Gui/issues/3029
 
         // Pre-conditions
-        if (!Enabled || !CanFocus)
+        if (!Enabled)
         {
             // QUESTION: Is this right? Should a disabled view eat mouse clicks?
             return args.Handled = false;
@@ -369,11 +369,10 @@ public partial class View // Mouse APIs
         }
 
         // Post-conditions
-        if (!HasFocus && CanFocus)
-        {
-            args.Handled = true;
-            SetFocus ();
-        }
+
+        // Always invoke Select command on MouseClick
+        // By default, this will raise Selecting/OnSelecting - Subclasses can override this via AddCommand (Command.Select ...).
+        args.Handled = InvokeCommand (Command.Select, ctx: new (Command.Select, key: null, data: args.MouseEvent)) == true;
 
         return args.Handled;
     }
@@ -404,13 +403,9 @@ public partial class View // Mouse APIs
             }
 
             // If mouse is still in bounds, generate a click
-            if (!WantContinuousButtonPressed && Viewport.Contains (mouseEvent.Position))
+            if (!WantMousePositionReports && Viewport.Contains (mouseEvent.Position))
             {
-                var meea = new MouseEventEventArgs (mouseEvent);
-
-                // We can ignore the return value of OnMouseClick; if the click is handled
-                // meea.Handled and meea.MouseEvent.Handled will be true
-                OnMouseClick (meea);
+                return OnMouseClick (new (mouseEvent));
             }
 
             return mouseEvent.Handled = true;

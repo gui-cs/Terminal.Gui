@@ -41,11 +41,39 @@ public class ContextMenuv2 : Menuv2
     public ContextMenuv2 () : this ([]) { }
 
     /// <inheritdoc/>
-    public ContextMenuv2 (IEnumerable<Shortcut> shortcuts) : base(shortcuts)
+    public ContextMenuv2 (IEnumerable<Shortcut> shortcuts) : base (shortcuts)
     {
         Visible = false;
         VisibleChanged += OnVisibleChanged;
         Key = DefaultKey;
+
+        KeyChanged += OnKeyChanged;
+
+        AddCommand (Command.Context,
+                    () =>
+                    {
+                        if (!Enabled)
+                        {
+                            return false;
+                        }
+                        Application.Popover = this;
+                        SetPosition (Application.GetLastMousePosition ());
+                        Visible = !Visible;
+
+                        return true;
+                    });
+
+        //Application.KeyBindings.Remove (Key, this);
+        //Application.KeyBindings.Add (Key, this, Command.Context);
+
+        return;
+
+        void OnKeyChanged (object? sender, KeyChangedEventArgs e)
+        {
+            //Application.KeyBindings.Remove (e.OldKey, this);
+            //Application.KeyBindings.Remove (e.NewKey, this);
+            //Application.KeyBindings.Add (e.NewKey, this, Command.Context);
+        }
     }
 
     private void OnVisibleChanged (object? sender, EventArgs _)
@@ -81,12 +109,25 @@ public class ContextMenuv2 : Menuv2
     ///     first Shortcut.
     /// </summary>
     /// <param name="screenPosition"></param>
-    public void SetPosition (Point screenPosition)
+    public void SetPosition (Point? screenPosition)
     {
-        Frame = Frame with
+        if (screenPosition is { })
         {
-            X = screenPosition.X - GetViewportOffsetFromFrame ().X,
-            Y = screenPosition.Y - GetViewportOffsetFromFrame ().Y,
-        };
+            Frame = Frame with
+            {
+                X = screenPosition.Value.X - GetViewportOffsetFromFrame ().X,
+                Y = screenPosition.Value.Y - GetViewportOffsetFromFrame ().Y,
+            };
+        }
+    }
+
+    /// <inheritdoc />
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            Application.KeyBindings.Remove (Key, this);
+        }
+        base.Dispose (disposing);
     }
 }

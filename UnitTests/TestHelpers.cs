@@ -42,13 +42,15 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     ///     <see cref="ConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
     /// </param>
     /// <param name="configLocation">Determines what config file locations <see cref="ConfigurationManager"/> will load from.</param>
+    /// <param name="verifyShutdown">If true and <see cref="Application.IsInitialized"/> is true, the test will fail.</param>
     public AutoInitShutdownAttribute (
         bool autoInit = true,
         Type consoleDriverType = null,
         bool useFakeClipboard = true,
         bool fakeClipboardAlwaysThrowsNotSupportedException = false,
         bool fakeClipboardIsSupportedAlwaysTrue = false,
-        ConfigLocations configLocation = ConfigLocations.None
+        ConfigLocations configLocation = ConfigLocations.None,
+        bool verifyShutdown = false
     )
     {
         AutoInit = autoInit;
@@ -60,8 +62,10 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
             fakeClipboardAlwaysThrowsNotSupportedException;
         FakeDriver.FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
         Locations = configLocation;
+        _verifyShutdown = verifyShutdown;
     }
 
+    private readonly bool _verifyShutdown;
     private readonly Type _driverType;
 
     public override void After (MethodInfo methodUnderTest)
@@ -73,8 +77,13 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
         if (AutoInit)
         {
-           // try
+            // try
             {
+                if (!_verifyShutdown)
+                {
+                    Application.ResetState (ignoreDisposed: true);
+                }
+
                 Application.Shutdown ();
 #if DEBUG_IDISPOSABLE
                 if (Responder.Instances.Count == 0)
@@ -100,8 +109,12 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
             }
         }
 
+        // Reset to defaults
+        Locations = ConfigLocations.DefaultOnly;
+        Reset();
+
         // Enable subsequent tests that call Init to get all config files (the default).
-        Locations = ConfigLocations.All;
+       //Locations = ConfigLocations.All;
     }
 
     public override void Before (MethodInfo methodUnderTest)
@@ -127,8 +140,6 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     }
 
     private bool AutoInit { get; }
-
-    private List<object> _savedValues;
 }
 
 /// <summary>
@@ -148,9 +159,6 @@ public class TestRespondersDisposed : BeforeAfterTestAttribute
         Debug.WriteLine ($"After: {methodUnderTest.Name}");
         base.After (methodUnderTest);
 
-        // Reset the to default All
-        Locations = ConfigLocations.All;
-
 #if DEBUG_IDISPOSABLE
         Assert.Empty (Responder.Instances);
 #endif
@@ -159,10 +167,6 @@ public class TestRespondersDisposed : BeforeAfterTestAttribute
     public override void Before (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
-
-        // Force the use of the default config file
-        Locations = ConfigLocations.DefaultOnly;
-        Reset ();
 
         base.Before (methodUnderTest);
 #if DEBUG_IDISPOSABLE
@@ -195,18 +199,11 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
 
         Application.Driver = null;
         base.After (methodUnderTest);
-
-        // Reset the to default All
-        Locations = ConfigLocations.All;
     }
 
     public override void Before (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
-
-        // Force the use of the default config file
-        Locations = ConfigLocations.DefaultOnly;
-        Reset ();
 
         Application.ResetState (true);
         Assert.Null (Application.Driver);
@@ -738,7 +735,7 @@ public class TestsAllViews
     public static IEnumerable<object []> AllViewTypes =>
         typeof (View).Assembly
                      .GetTypes ()
-                     .Where (type => type.IsClass && !type.IsAbstract && type.IsPublic && type.IsSubclassOf (typeof (View)))
+                     .Where (type => type.IsClass && !type.IsAbstract && type.IsPublic && (type.IsSubclassOf (typeof (View)) || type == typeof(View)))
                      .Select (type => new object [] { type });
 
     public static View CreateInstanceIfNotGeneric (Type type)

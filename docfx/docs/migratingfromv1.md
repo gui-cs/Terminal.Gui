@@ -296,18 +296,18 @@ These keys are all registered as `KeyBindingScope.Application` key bindings by `
 
 ## Button.Clicked Event Renamed
 
-The `Button.Clicked` event has been renamed `Button.Accept`
+The `Button.Clicked` event has been renamed `Button.Accepting`
 
 ## How to Fix
 
-Rename all instances of `Button.Clicked` to `Button.Accept`.  Note the signature change to mouse events below.
+Rename all instances of `Button.Clicked` to `Button.Accepting`.  Note the signature change to mouse events below.
 
 ```diff
 - btnLogin.Clicked 
-+ btnLogin.Accept
++ btnLogin.Accepting
 ```
 
-Alternatively, if you want to have key events as well as mouse events to fire an event, use `Button.Accept`.
+Alternatively, if you want to have key events as well as mouse events to fire an event, use `Button.Accepting`.
 
 ## Events now use `object sender, EventArgs args` signature
 
@@ -341,7 +341,7 @@ If you previously had a lambda expression, you can simply add the extra argument
 
 ```diff
 - btnLogin.Clicked += () => { /*do something*/ };
-+ btnLogin.Accept += (s,e) => { /*do something*/ };
++ btnLogin.Accepting += (s,e) => { /*do something*/ };
 ```
 Note that the event name has also changed as noted above.
 

@@ -15,9 +15,9 @@ public class ViewCommandTests (ITestOutputHelper output)
 
         Assert.False (view.InvokeCommand (Command.Accept)); // false means it was not handled
 
-        Assert.Equal (1, view.OnAcceptCount);
+        Assert.Equal (1, view.OnAcceptedCount);
 
-        Assert.Equal (1, view.AcceptCount);
+        Assert.Equal (1, view.AcceptedCount);
 
         Assert.False (view.HasFocus);
     }
@@ -28,12 +28,12 @@ public class ViewCommandTests (ITestOutputHelper output)
         var view = new ViewEventTester ();
         Assert.False (view.HasFocus);
 
-        view.HandleOnAccept = true;
+        view.HandleOnAccepted = true;
         Assert.True (view.InvokeCommand (Command.Accept));
 
-        Assert.Equal (1, view.OnAcceptCount);
+        Assert.Equal (1, view.OnAcceptedCount);
 
-        Assert.Equal (0, view.AcceptCount);
+        Assert.Equal (0, view.AcceptedCount);
     }
 
     [Fact]
@@ -42,7 +42,7 @@ public class ViewCommandTests (ITestOutputHelper output)
         var view = new View ();
         var acceptInvoked = false;
 
-        view.Accept += ViewOnAccept;
+        view.Accepting += ViewOnAccept;
 
         bool? ret = view.InvokeCommand (Command.Accept);
         Assert.True (ret);
@@ -50,10 +50,10 @@ public class ViewCommandTests (ITestOutputHelper output)
 
         return;
 
-        void ViewOnAccept (object sender, HandledEventArgs e)
+        void ViewOnAccept (object sender, CommandEventArgs e)
         {
             acceptInvoked = true;
-            e.Handled = true;
+            e.Cancel = true;
         }
     }
 
@@ -63,14 +63,14 @@ public class ViewCommandTests (ITestOutputHelper output)
         var view = new View ();
         var accepted = false;
 
-        view.Accept += ViewOnAccept;
+        view.Accepting += ViewOnAccept;
 
         view.InvokeCommand (Command.Accept);
         Assert.True (accepted);
 
         return;
 
-        void ViewOnAccept (object sender, HandledEventArgs e) { accepted = true; }
+        void ViewOnAccept (object sender, CommandEventArgs e) { accepted = true; }
     }
 
     // Accept on subview should bubble up to parent
@@ -82,112 +82,135 @@ public class ViewCommandTests (ITestOutputHelper output)
         view.Add (subview);
 
         subview.InvokeCommand (Command.Accept);
-        Assert.Equal (1, subview.OnAcceptCount);
-        Assert.Equal (1, view.OnAcceptCount);
+        Assert.Equal (1, subview.OnAcceptedCount);
+        Assert.Equal (1, view.OnAcceptedCount);
 
-        subview.HandleOnAccept = true;
+        subview.HandleOnAccepted = true;
         subview.InvokeCommand (Command.Accept);
-        Assert.Equal (2, subview.OnAcceptCount);
-        Assert.Equal (1, view.OnAcceptCount);
+        Assert.Equal (2, subview.OnAcceptedCount);
+        Assert.Equal (1, view.OnAcceptedCount);
 
-        subview.HandleOnAccept = false;
-        subview.HandleAccept = true;
+        subview.HandleOnAccepted = false;
+        subview.HandleAccepted = true;
         subview.InvokeCommand (Command.Accept);
-        Assert.Equal (3, subview.OnAcceptCount);
-        Assert.Equal (1, view.OnAcceptCount);
+        Assert.Equal (3, subview.OnAcceptedCount);
+        Assert.Equal (1, view.OnAcceptedCount);
 
         // Add a super view to test deeper hierarchy
         var superView = new ViewEventTester () { Id = "superView" };
         superView.Add (view);
 
         subview.InvokeCommand (Command.Accept);
-        Assert.Equal (4, subview.OnAcceptCount);
-        Assert.Equal (1, view.OnAcceptCount);
-        Assert.Equal (0, superView.OnAcceptCount);
+        Assert.Equal (4, subview.OnAcceptedCount);
+        Assert.Equal (1, view.OnAcceptedCount);
+        Assert.Equal (0, superView.OnAcceptedCount);
 
-        subview.HandleAccept = false;
+        subview.HandleAccepted = false;
         subview.InvokeCommand (Command.Accept);
-        Assert.Equal (5, subview.OnAcceptCount);
-        Assert.Equal (2, view.OnAcceptCount);
-        Assert.Equal (1, superView.OnAcceptCount);
+        Assert.Equal (5, subview.OnAcceptedCount);
+        Assert.Equal (2, view.OnAcceptedCount);
+        Assert.Equal (1, superView.OnAcceptedCount);
 
-        view.HandleAccept = true;
+        view.HandleAccepted = true;
         subview.InvokeCommand (Command.Accept);
-        Assert.Equal (6, subview.OnAcceptCount);
-        Assert.Equal (3, view.OnAcceptCount);
-        Assert.Equal (1, superView.OnAcceptCount);
+        Assert.Equal (6, subview.OnAcceptedCount);
+        Assert.Equal (3, view.OnAcceptedCount);
+        Assert.Equal (1, superView.OnAcceptedCount);
+    }
 
+    [Fact]
+    public void MouseClick_Does_Not_Invoke_Accept_Command ()
+    {
+        var view = new ViewEventTester ();
+        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Clicked, Position = Point.Empty, View = view });
+
+        Assert.Equal (0, view.OnAcceptedCount);
     }
 
     #endregion OnAccept/Accept tests
 
     #region OnSelect/Select tests
-    [Fact]
-    public void Select_Command_Raises_NoFocus ()
+
+    [Theory]
+    [CombinatorialData]
+    public void Select_Command_Raises_SetsFocus (bool canFocus)
     {
-        var view = new ViewEventTester ();
+        var view = new ViewEventTester ()
+        {
+            CanFocus = canFocus
+        };
+
+        Assert.Equal (canFocus, view.CanFocus);
         Assert.False (view.HasFocus);
 
-        Assert.False (view.InvokeCommand (Command.Select)); // false means it was not handled
+        Assert.Equal (canFocus, view.InvokeCommand (Command.Select));
 
-        Assert.Equal (1, view.OnSelectCount);
+        Assert.Equal (1, view.OnSelectingCount);
 
-        Assert.Equal (1, view.SelectCount);
+        Assert.Equal (1, view.SelectingCount);
 
-        Assert.False (view.HasFocus);
+        Assert.Equal (canFocus, view.HasFocus);
     }
 
     [Fact]
-    public void Select_Command_Handle_OnSelect_NoEvent ()
+    public void Select_Command_Handle_OnSelecting_NoEvent ()
     {
         var view = new ViewEventTester ();
         Assert.False (view.HasFocus);
 
-        view.HandleOnSelect = true;
+        view.HandleOnSelecting = true;
         Assert.True (view.InvokeCommand (Command.Select));
 
-        Assert.Equal (1, view.OnSelectCount);
+        Assert.Equal (1, view.OnSelectingCount);
 
-        Assert.Equal (0, view.SelectCount);
+        Assert.Equal (0, view.SelectingCount);
     }
 
     [Fact]
-    public void Select_Handle_Event_OnSelect_Returns_True ()
+    public void Select_Handle_Event_OnSelecting_Returns_True ()
     {
         var view = new View ();
-        var SelectInvoked = false;
+        var SelectingInvoked = false;
 
-        view.Select += ViewOnSelect;
+        view.Selecting += ViewOnSelect;
 
         bool? ret = view.InvokeCommand (Command.Select);
         Assert.True (ret);
-        Assert.True (SelectInvoked);
+        Assert.True (SelectingInvoked);
 
         return;
 
-        void ViewOnSelect (object sender, HandledEventArgs e)
+        void ViewOnSelect (object sender, CommandEventArgs e)
         {
-            SelectInvoked = true;
-            e.Handled = true;
+            SelectingInvoked = true;
+            e.Cancel = true;
         }
     }
 
     [Fact]
-    public void Select_Command_Invokes_Select_Event ()
+    public void Select_Command_Invokes_Selecting_Event ()
     {
         var view = new View ();
-        var Selected = false;
+        var selecting = false;
 
-        view.Select += ViewOnSelect;
+        view.Selecting += ViewOnSelecting;
 
         view.InvokeCommand (Command.Select);
-        Assert.True (Selected);
+        Assert.True (selecting);
 
         return;
 
-        void ViewOnSelect (object sender, HandledEventArgs e) { Selected = true; }
+        void ViewOnSelecting (object sender, CommandEventArgs e) { selecting = true; }
     }
 
+    [Fact]
+    public void MouseClick_Invokes_Select_Command ()
+    {
+        var view = new ViewEventTester ();
+        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Clicked, Position = Point.Empty, View = view });
+
+        Assert.Equal (1, view.OnSelectingCount);
+    }
 
     #endregion OnSelect/Select tests
 
@@ -212,68 +235,68 @@ public class ViewCommandTests (ITestOutputHelper output)
         {
             CanFocus = true;
 
-            Accept += (s, a) =>
+            Accepting += (s, a) =>
                       {
-                          a.Handled = HandleAccept;
-                          AcceptCount++;
+                          a.Cancel = HandleAccepted;
+                          AcceptedCount++;
                       };
 
-            HotKeyCommand += (s, a) =>
+            HandlingHotKey += (s, a) =>
                              {
-                                 a.Handled = HandleHotKeyCommand;
-                                 HotKeyCommandCount++;
+                                 a.Cancel = HandleHandlingHotKey;
+                                 HandlingHotKeyCount++;
                              };
 
 
-            Select += (s, a) =>
+            Selecting += (s, a) =>
                              {
-                                 a.Handled = HandleSelect;
-                                 SelectCount++;
+                                 a.Cancel = HandleSelecting;
+                                 SelectingCount++;
                              };
         }
 
-        public int OnAcceptCount { get; set; }
-        public int AcceptCount { get; set; }
-        public bool HandleOnAccept { get; set; }
+        public int OnAcceptedCount { get; set; }
+        public int AcceptedCount { get; set; }
+        public bool HandleOnAccepted { get; set; }
 
         /// <inheritdoc />
-        protected override bool OnAccept (HandledEventArgs args)
+        protected override bool OnAccepting (CommandEventArgs args)
         {
-            OnAcceptCount++;
+            OnAcceptedCount++;
 
-            return HandleOnAccept;
+            return HandleOnAccepted;
         }
 
-        public bool HandleAccept { get; set; }
+        public bool HandleAccepted { get; set; }
 
-        public int OnHotKeyCommandCount { get; set; }
-        public int HotKeyCommandCount { get; set; }
-        public bool HandleOnHotKeyCommand { get; set; }
+        public int OnHandlingHotKeyCount { get; set; }
+        public int HandlingHotKeyCount { get; set; }
+        public bool HandleOnHandlingHotKey { get; set; }
 
         /// <inheritdoc />
-        protected override bool OnHotKeyCommand (HandledEventArgs args)
+        protected override bool OnHandlingHotKey (CommandEventArgs args)
         {
-            OnHotKeyCommandCount++;
+            OnHandlingHotKeyCount++;
 
-            return HandleOnHotKeyCommand;
+            return HandleOnHandlingHotKey;
         }
 
-        public bool HandleHotKeyCommand { get; set; }
+        public bool HandleHandlingHotKey { get; set; }
 
 
-        public int OnSelectCount { get; set; }
-        public int SelectCount { get; set; }
-        public bool HandleOnSelect { get; set; }
+        public int OnSelectingCount { get; set; }
+        public int SelectingCount { get; set; }
+        public bool HandleOnSelecting { get; set; }
 
         /// <inheritdoc />
-        protected override bool OnSelect (HandledEventArgs args)
+        protected override bool OnSelecting (CommandEventArgs args)
         {
-            OnSelectCount++;
+            OnSelectingCount++;
 
-            return HandleOnSelect;
+            return HandleOnSelecting;
         }
 
-        public bool HandleSelect { get; set; }
+        public bool HandleSelecting { get; set; }
 
     }
 }

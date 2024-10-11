@@ -126,7 +126,7 @@ public class TimeAndDate : Scenario
             X = Pos.Center (), Y = Pos.Bottom (win) - 5, Text = "Swap Long/Short & Read/Read Only"
         };
 
-        swapButton.Accept += (s, e) =>
+        swapButton.Accepting += (s, e) =>
                              {
                                  longTime.ReadOnly = !longTime.ReadOnly;
                                  shortTime.ReadOnly = !shortTime.ReadOnly;

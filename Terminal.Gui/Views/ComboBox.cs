@@ -7,8 +7,6 @@
 
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Threading.Channels;
 
 namespace Terminal.Gui;
 
@@ -37,17 +35,15 @@ public class ComboBox : View, IDesignable
         _search.TextChanged += Search_Changed;
 
         _listview.Y = Pos.Bottom (_search);
-        _listview.OpenSelectedItem += (sender, a) => Selected ();
+        _listview.OpenSelectedItem += (sender, a) => SelectText ();
+        _listview.Accepting += (sender, args) =>
+                              {
+                                  // This prevents Accepted from bubbling up to the combobox
+                                  args.Cancel = true;
 
-        Add (_search, _listview);
-
-        // BUGBUG: This should not be needed; LayoutComplete will handle
-        Initialized += (s, e) => ProcessLayout ();
-
-        // On resize
-        LayoutComplete += (sender, a) => ProcessLayout ();
-        ;
-
+                                  // But OpenSelectedItem won't be fired because of that. So do it here.
+                                  SelectText ();
+                              };
         _listview.SelectedItemChanged += (sender, e) =>
                                          {
                                              if (!HideDropdownListOnClick && _searchSet.Count > 0)
@@ -55,6 +51,13 @@ public class ComboBox : View, IDesignable
                                                  SetValue (_searchSet [_listview.SelectedItem]);
                                              }
                                          };
+        Add (_search, _listview);
+
+        // BUGBUG: This should not be needed; LayoutComplete will handle
+        Initialized += (s, e) => ProcessLayout ();
+
+        // On resize
+        LayoutComplete += (sender, a) => ProcessLayout ();
 
         Added += (s, e) =>
                  {
@@ -75,7 +78,14 @@ public class ComboBox : View, IDesignable
                  };
 
         // Things this view knows how to do
-        AddCommand (Command.Accept, () => ActivateSelected ());
+        AddCommand (Command.Accept, (ctx) =>
+                                    {
+                                        if (ctx.Data == _search)
+                                        {
+                                            return null;
+                                        }
+                                        return ActivateSelected (ctx);
+                                    });
         AddCommand (Command.Toggle, () => ExpandCollapse ());
         AddCommand (Command.Expand, () => Expand ());
         AddCommand (Command.Collapse, () => Collapse ());
@@ -382,13 +392,16 @@ public class ComboBox : View, IDesignable
         }
     }
 
-    private bool ActivateSelected ()
+    private bool ActivateSelected (CommandContext ctx)
     {
         if (HasItems ())
         {
-            Selected ();
+            if (SelectText ())
+            {
+                return false;
+            }
 
-            return true;
+            return RaiseAccepting (ctx) == true;
         }
 
         return false;
@@ -715,7 +728,7 @@ public class ComboBox : View, IDesignable
         }
     }
 
-    private void Selected ()
+    private bool SelectText ()
     {
         IsShow = false;
         _listview.TabStop = TabBehavior.NoStop;
@@ -726,7 +739,7 @@ public class ComboBox : View, IDesignable
             HideList ();
             IsShow = false;
 
-            return;
+            return false;
         }
 
         SetValue (_listview.SelectedItem > -1 ? _searchSet [_listview.SelectedItem] : _text);
@@ -736,6 +749,8 @@ public class ComboBox : View, IDesignable
         Reset (true);
         HideList ();
         IsShow = false;
+
+        return true;
     }
 
     private void SetSearchSet ()

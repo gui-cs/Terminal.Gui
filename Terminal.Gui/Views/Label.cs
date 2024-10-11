@@ -8,18 +8,15 @@
 /// </summary>
 /// <remarks>
 ///     <para>
-///         <see cref="Label.Title"/> and <see cref="Label.Text"/> are the same property. When <see cref="Label.Title"/> is
-///         set
-///         <see cref="Label.Text"/> is also set. When <see cref="Label.Text"/> is set <see cref="Label.Title"/> is also
-///         set.
+///         Title and Text are the same property. When Title is set Text s also set. When Text is set Title is also set.
 ///     </para>
 ///     <para>
-///         If <see cref="Label.CanFocus"/> is <see langword="false"/> and the use clicks on the Label,
+///         If <see cref="View.CanFocus"/> is <see langword="false"/> and the use clicks on the Label,
 ///         the <see cref="Command.HotKey"/> will be invoked on the next <see cref="View"/> in
 ///         <see cref="View.Subviews"/>."
 ///     </para>
 /// </remarks>
-public class Label : View
+public class Label : View, IDesignable
 {
     /// <inheritdoc/>
     public Label ()
@@ -27,18 +24,19 @@ public class Label : View
         Height = Dim.Auto (DimAutoStyle.Text);
         Width = Dim.Auto (DimAutoStyle.Text);
 
-        // Things this view knows how to do
+        // On HoKey, pass it to the next view
         AddCommand (Command.HotKey, InvokeHotKeyOnNext);
 
         TitleChanged += Label_TitleChanged;
         MouseClick += Label_MouseClick;
     }
 
+    // TODO: base raises Select, but we want to raise HotKey. This can be simplified?
     private void Label_MouseClick (object sender, MouseEventEventArgs e)
     {
         if (!CanFocus)
         {
-            e.Handled = InvokeCommand (Command.HotKey) == true;
+            e.Handled = InvokeCommand (Command.HotKey, ctx: new (Command.HotKey, key: null, data: this)) == true;
         }
     }
 
@@ -64,12 +62,32 @@ public class Label : View
 
     private bool? InvokeHotKeyOnNext (CommandContext context)
     {
+        if (RaiseHandlingHotKey () == true)
+        {
+            return true;
+        }
+
+        if (CanFocus)
+        {
+            SetFocus ();
+
+            return true;
+        }
+
         int me = SuperView?.Subviews.IndexOf (this) ?? -1;
 
         if (me != -1 && me < SuperView?.Subviews.Count - 1)
         {
-            SuperView?.Subviews [me + 1].InvokeCommand (Command.HotKey, context.Key, context.KeyBinding);
+            return SuperView?.Subviews [me + 1].InvokeCommand (Command.HotKey, context.Key, context.KeyBinding) == true;
         }
+
+        return false;
+    }
+
+    /// <inheritdoc/>
+    bool IDesignable.EnableForDesign ()
+    {
+        Text = "_Label";
 
         return true;
     }

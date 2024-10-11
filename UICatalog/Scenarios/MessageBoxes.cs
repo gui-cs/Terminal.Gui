@@ -228,7 +228,7 @@ public class MessageBoxes : Scenario
             X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "_Show MessageBox"
         };
 
-        app.Accept += (s, e) =>
+        app.Accepting += (s, e) =>
                                        {
                                            try
                                            {
@@ -241,7 +241,7 @@ public class MessageBoxes : Scenario
 
                                                for (var i = 0; i < numButtons; i++)
                                                {
-                                                   btns.Add (NumberToWords.Convert (i));
+                                                   btns.Add ($"_{NumberToWords.Convert (i)}");
                                                }
 
                                                if (styleRadioGroup.SelectedItem == 0)
@@ -276,7 +276,7 @@ public class MessageBoxes : Scenario
                                                buttonPressedLabel.Text = "Invalid Options";
                                            }
 
-                                           e.Handled = true;
+                                           e.Cancel = true;
                                        };
         app.Add (showMessageBoxButton);
 
