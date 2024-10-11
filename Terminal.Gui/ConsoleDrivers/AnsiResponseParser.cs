@@ -5,8 +5,7 @@ namespace Terminal.Gui;
 internal class AnsiResponseParser
 {
     private readonly StringBuilder held = new ();
-    private string? currentTerminator;
-    private Action<string>? currentResponse;
+    private readonly List<(string terminator, Action<string> response)> expectedResponses = new ();
 
     private readonly List<Func<string, bool>> _ignorers = new ();
 
@@ -20,7 +19,7 @@ internal class AnsiResponseParser
 
     // Current state of the parser
     private ParserState currentState = ParserState.Normal;
-    private HashSet<string> _knownTerminators = new HashSet<string> ();
+    private readonly HashSet<string> _knownTerminators = new ();
 
     /*
      * ANSI Input Sequences
@@ -58,6 +57,7 @@ internal class AnsiResponseParser
         _knownTerminators.Add ("K");
         _knownTerminators.Add ("L");
         _knownTerminators.Add ("M");
+
         // No - N or O
         _knownTerminators.Add ("P");
         _knownTerminators.Add ("Q");
@@ -81,7 +81,6 @@ internal class AnsiResponseParser
         _knownTerminators.Add ("g");
         _knownTerminators.Add ("h");
         _knownTerminators.Add ("i");
-
 
         _knownTerminators.Add ("l");
         _knownTerminators.Add ("m");
@@ -139,7 +138,7 @@ internal class AnsiResponseParser
                     break;
 
                 case ParserState.ExpectingBracket:
-                    if (currentChar == '[' )
+                    if (currentChar == '[')
                     {
                         // Detected '[' , transition to InResponse state
                         currentState = ParserState.InResponse;
@@ -194,14 +193,17 @@ internal class AnsiResponseParser
     private string HandleHeldContent ()
     {
         var cur = held.ToString ();
-        // If we're expecting a specific terminator, check if the content matches
-        if (currentTerminator != null && cur.EndsWith (currentTerminator))
+
+        // Check for expected responses
+        (string terminator, Action<string> response) matchingResponse = expectedResponses.FirstOrDefault (r => cur.EndsWith (r.terminator));
+
+        if (matchingResponse.response != null)
         {
-            DispatchResponse ();
+            DispatchResponse (matchingResponse.response);
+            expectedResponses.Remove (matchingResponse);
 
             return string.Empty;
         }
-
 
         if (_knownTerminators.Any (cur.EndsWith) && cur.StartsWith (EscSeqUtils.CSI))
         {
@@ -222,12 +224,10 @@ internal class AnsiResponseParser
         return string.Empty;
     }
 
-    private void DispatchResponse ()
+    private void DispatchResponse (Action<string> response)
     {
         // If it matches the expected response, invoke the callback and return nothing for output
-        currentResponse?.Invoke (held.ToString ());
-        currentResponse = null;
-        currentTerminator = null;
+        response?.Invoke (held.ToString ());
         ResetState ();
     }
 
@@ -235,9 +235,5 @@ internal class AnsiResponseParser
     ///     Registers a new expected ANSI response with a specific terminator and a callback for when the response is
     ///     completed.
     /// </summary>
-    public void ExpectResponse (string terminator, Action<string> response)
-    {
-        currentTerminator = terminator;
-        currentResponse = response;
-    }
+    public void ExpectResponse (string terminator, Action<string> response) { expectedResponses.Add ((terminator, response)); }
 }
