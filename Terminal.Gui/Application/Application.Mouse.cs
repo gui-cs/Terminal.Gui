@@ -193,6 +193,7 @@ public static partial class Application // Mouse handling
                 || mouseEvent.Flags.HasFlag (MouseFlags.Button2Pressed)
                 || mouseEvent.Flags.HasFlag (MouseFlags.Button3Pressed)))
         {
+
             Popover.Visible = false;
 
             // Recurse once
@@ -238,9 +239,9 @@ public static partial class Application // Mouse handling
         else
         {
             // The mouse was outside any View's Viewport.
-            Debug.Fail("this should not happen.");
+            Debug.Fail ("this should not happen.");
 
-           // Debug.Fail ("This should never happen. If it does please file an Issue!!");
+            // Debug.Fail ("This should never happen. If it does please file an Issue!!");
 
             return;
         }

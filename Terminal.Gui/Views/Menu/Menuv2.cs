@@ -72,10 +72,6 @@ public class Menuv2 : Bar
             shortcut.Orientation = Orientation.Vertical;
             shortcut.HighlightStyle |= HighlightStyle.Hover;
 
-            // TODO: not happy about using AlignmentModes for this. Too implied.
-            // TODO: instead, add a property (a style enum?) to Shortcut to control this
-            //shortcut.AlignmentModes = AlignmentModes.EndToStart;
-
             shortcut.Accepting += ShortcutOnAccepting;
 
             void ShortcutOnAccepting (object sender, CommandEventArgs e)
@@ -87,11 +83,6 @@ public class Menuv2 : Bar
 
                     return;
                 }
-
-                //if (!e.Handled)
-                //{
-                //    RaiseAcceptEvent ();
-                //}
             }
         }
 

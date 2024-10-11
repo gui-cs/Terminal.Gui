@@ -34,11 +34,6 @@ public class Bar : View, IOrientation, IDesignable
         Initialized += Bar_Initialized;
         MouseEvent += OnMouseEvent;
 
-        if (shortcuts is null)
-        {
-            return;
-        }
-
         foreach (Shortcut shortcut in shortcuts)
         {
             Add (shortcut);

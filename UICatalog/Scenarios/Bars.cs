@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -9,9 +11,10 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Bars", "Illustrates Bar views (e.g. StatusBar)")]
 [ScenarioCategory ("Controls")]
+[ScenarioCategory ("Shortcuts")]
 public class Bars : Scenario
 {
-    private Menuv2 _popoverMenu;
+    private Menuv2? _popoverMenu;
 
     public override void Main ()
     {
@@ -34,7 +37,7 @@ public class Bars : Scenario
 
     // Setting everything up in Loaded handler because we change the
     // QuitKey and it only sticks if changed after init
-    private void App_Loaded (object sender, EventArgs e)
+    private void App_Loaded (object? sender, EventArgs e)
     {
         Application.Top!.Title = GetQuitKeyAndName ();
 
@@ -56,8 +59,8 @@ public class Bars : Scenario
             Title = "MenuBar-Like Examples",
             X = 0,
             Y = 0,
-            Width = Dim.Fill () - Dim.Width (eventLog),
-            Height = Dim.Percent(33),
+            Width = Dim.Fill ()! - Dim.Width (eventLog),
+            Height = Dim.Percent (33),
         };
         Application.Top.Add (menuBarLikeExamples);
 
@@ -69,7 +72,7 @@ public class Bars : Scenario
         };
         menuBarLikeExamples.Add (label);
 
-        Bar bar = new Bar
+        var bar = new Bar
         {
             Id = "menuBar-like",
             X = Pos.Right (label),
@@ -103,7 +106,7 @@ public class Bars : Scenario
             Title = "Menu-Like Examples",
             X = 0,
             Y = Pos.Center (),
-            Width = Dim.Fill () - Dim.Width (eventLog),
+            Width = Dim.Fill ()! - Dim.Width (eventLog),
             Height = Dim.Percent (33),
         };
         Application.Top.Add (menuLikeExamples);
@@ -120,7 +123,7 @@ public class Bars : Scenario
         {
             Id = "menu-like",
             X = 0,
-            Y = Pos.Bottom(label),
+            Y = Pos.Bottom (label),
             //Width = Dim.Percent (40),
             Orientation = Orientation.Vertical,
         };
@@ -131,7 +134,7 @@ public class Bars : Scenario
         label = new Label ()
         {
             Title = "Menu:",
-            X = Pos.Right(bar) + 1,
+            X = Pos.Right (bar) + 1,
             Y = Pos.Top (label),
         };
         menuLikeExamples.Add (label);
@@ -154,9 +157,9 @@ public class Bars : Scenario
         };
         menuLikeExamples.Add (label);
 
-        ConfigureMenu (_popoverMenu);
+        ConfigureMenu (_popoverMenu!);
 
-        _popoverMenu.ColorScheme = Colors.ColorSchemes ["Menu"];
+        _popoverMenu!.ColorScheme = Colors.ColorSchemes ["Menu"];
         _popoverMenu.Visible = false;
 
         var toggleShortcut = new Shortcut
@@ -170,7 +173,7 @@ public class Bars : Scenario
 
         _popoverMenu.Accepting += PopoverMenuOnAccepting;
 
-        void PopoverMenuOnAccepting (object o, CommandEventArgs args)
+        void PopoverMenuOnAccepting (object? o, CommandEventArgs args)
         {
             eventSource.Add ($"Accepting: {_popoverMenu!.Id}");
             eventLog.MoveDown ();
@@ -192,18 +195,20 @@ public class Bars : Scenario
             }
         }
 
-        foreach (Shortcut sh in _popoverMenu.Subviews.Where (s => s is Shortcut)!)
+        foreach (var view in _popoverMenu.Subviews.Where (s => s is Shortcut)!)
         {
+            var sh = (Shortcut)view;
+
             sh.Accepting += (o, args) =>
-                         {
-                             eventSource.Add ($"shortcut.Accepting: {sh!.SuperView.Id} {sh!.CommandView.Text}");
-                             eventLog.MoveDown ();
-                         };
+                            {
+                                eventSource.Add ($"shortcut.Accepting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
+                                eventLog.MoveDown ();
+                            };
         }
 
         menuLikeExamples.MouseClick += MenuLikeExamplesMouseClick;
 
-        void MenuLikeExamplesMouseClick (object sender, MouseEventEventArgs e)
+        void MenuLikeExamplesMouseClick (object? sender, MouseEventEventArgs e)
         {
             if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
             {
@@ -260,17 +265,23 @@ public class Bars : Scenario
         ConfigStatusBar (bar);
         statusBarLikeExamples.Add (bar);
 
-        foreach (FrameView frameView in Application.Top.Subviews.Where (f => f is FrameView)!)
+        foreach (var view in Application.Top.Subviews.Where (f => f is FrameView)!)
         {
-            foreach (Bar barView in frameView.Subviews.Where (b => b is Bar)!)
+            var frameView = (FrameView)view;
+
+            foreach (var view1 in frameView.Subviews.Where (b => b is Bar)!)
             {
-                foreach (Shortcut sh in barView.Subviews.Where (s => s is Shortcut)!)
+                var barView = (Bar)view1;
+
+                foreach (var view2 in barView.Subviews.Where (s => s is Shortcut)!)
                 {
+                    var sh = (Shortcut)view2;
+
                     sh.Accepting += (o, args) =>
-                                 {
-                                     eventSource.Add ($"Accept: {sh!.SuperView.Id} {sh!.CommandView.Text}");
-                                     eventLog.MoveDown ();
-                                 };
+                                    {
+                                        eventSource.Add ($"Accept: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
+                                        eventLog.MoveDown ();
+                                    };
                 }
             }
         }
@@ -420,36 +431,32 @@ public class Bars : Scenario
 
     private void ConfigMenuBar (Bar bar)
     {
-        var fileMenuBarItem = new Shortcut
+        Menuv2? fileMenu = new ContextMenuv2
         {
-            Title = "_File",
-            HelpText = "File Menu",
+            Id = "fileMenu",
+        };
+        ConfigureMenu (fileMenu);
+
+        fileMenu.Accepting += (sender, args) =>
+                              {
+
+                              };
+
+        var fileMenuBarItem = new Shortcut (fileMenu, Command.Copy, "_File", "File Menu")
+        {
             Key = Key.D0.WithAlt,
-            HighlightStyle = HighlightStyle.Hover
         };
 
-        fileMenuBarItem.Accepting += (sender, args) =>
-                                  {
-                                      var fileMenu = new Menuv2
-                                      {
-                                          Id = "fileMenu",
-                                      };
-                                      ConfigureMenu (fileMenu);
-                                      fileMenu.VisibleChanged += (sender, args) =>
-                                                                 {
-                                                                     if (Application.Popover is { Visible: false })
-                                                                     {
-                                                                         Application.Popover?.Dispose ();
-                                                                         Application.Popover = null;
-                                                                     }
-                                                                 };
-                                      Application.Popover = fileMenu;
-                                      Rectangle screen = fileMenuBarItem.FrameToScreen ();
-                                      fileMenu.X = screen.X;
-                                      fileMenu.Y = screen.Y + screen.Height;
-                                      fileMenu.Visible = true;
+        fileMenuBarItem.Disposing += (sender, args) => fileMenu?.Dispose ();
 
-                                  };
+        fileMenuBarItem.Accepting += (sender, args) =>
+                                     {
+                                         Application.Popover = fileMenu;
+                                         Rectangle screen = fileMenuBarItem.FrameToScreen ();
+                                         fileMenu.X = screen.X;
+                                         fileMenu.Y = screen.Y + screen.Height;
+                                         fileMenu.Visible = true;
+                                     };
 
 
 
@@ -591,7 +598,7 @@ public class Bars : Scenario
 
         return;
 
-        void Button_Clicked (object sender, EventArgs e) { MessageBox.Query ("Hi", $"You clicked {sender}"); }
+        void Button_Clicked (object? sender, EventArgs e) { MessageBox.Query ("Hi", $"You clicked {sender}"); }
 
     }
 

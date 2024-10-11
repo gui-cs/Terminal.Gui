@@ -1,7 +1,9 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection.Metadata;
 using Terminal.Gui;
 
 namespace UICatalog;
@@ -114,16 +116,19 @@ public class Scenario : IDisposable
     /// </summary>
     public static ObservableCollection<Scenario> GetScenarios ()
     {
-        List<Scenario> objects = new ();
+        List<Scenario> objects = [];
 
         foreach (Type type in typeof (Scenario).Assembly.ExportedTypes
                                                .Where (
-                                                       myType => myType.IsClass
-                                                                 && !myType.IsAbstract
+                                                       myType => myType is { IsClass: true, IsAbstract: false }
                                                                  && myType.IsSubclassOf (typeof (Scenario))
                                                       ))
         {
-            var scenario = (Scenario)Activator.CreateInstance (type);
+            if (Activator.CreateInstance (type) is not Scenario { } scenario)
+            {
+                continue;
+            }
+
             objects.Add (scenario);
             _maxScenarioNameLen = Math.Max (_maxScenarioNameLen, scenario.GetName ().Length + 1);
         }
@@ -170,8 +175,7 @@ public class Scenario : IDisposable
 
         aCategories = typeof (Scenario).Assembly.GetTypes ()
                                        .Where (
-                                               myType => myType.IsClass
-                                                         && !myType.IsAbstract
+                                               myType => myType is { IsClass: true, IsAbstract: false }
                                                          && myType.IsSubclassOf (typeof (Scenario)))
                                        .Select (type => System.Attribute.GetCustomAttributes (type).ToList ())
                                        .Aggregate (
@@ -210,7 +214,15 @@ public class Scenario : IDisposable
         /// <summary>Static helper function to get the <see cref="Scenario"/> Name given a Type</summary>
         /// <param name="t"></param>
         /// <returns>Name of the category</returns>
-        public static string GetName (Type t) { return ((ScenarioCategory)GetCustomAttributes (t) [0]).Name; }
+        public static string GetName (Type t)
+        {
+            if (GetCustomAttributes (t).FirstOrDefault (a => a is ScenarioMetadata) is ScenarioMetadata { } metadata)
+            {
+                return metadata.Name;
+            }
+
+            return string.Empty;
+        }
 
         /// <summary>Category Name</summary>
         public string Name { get; set; } = name;
@@ -226,12 +238,28 @@ public class Scenario : IDisposable
         /// <summary>Static helper function to get the <see cref="Scenario"/> Description given a Type</summary>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static string GetDescription (Type t) { return ((ScenarioMetadata)GetCustomAttributes (t) [0]).Description; }
+        public static string GetDescription (Type t)
+        {
+            if (GetCustomAttributes (t).FirstOrDefault (a => a is ScenarioMetadata) is ScenarioMetadata { } metadata)
+            {
+                return metadata.Description;
+            }
+
+            return string.Empty;
+        }
 
         /// <summary>Static helper function to get the <see cref="Scenario"/> Name given a Type</summary>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static string GetName (Type t) { return ((ScenarioMetadata)GetCustomAttributes (t) [0]).Name; }
+        public static string GetName (Type t)
+        {
+            if (GetCustomAttributes (t).FirstOrDefault (a => a is ScenarioMetadata) is ScenarioMetadata { } metadata)
+            {
+                return metadata.Name;
+            }
+
+            return string.Empty;
+        }
 
         /// <summary><see cref="Scenario"/> Name</summary>
         public string Name { get; set; } = name;
