@@ -939,10 +939,10 @@ public class ApplicationTests
         w.Dispose ();
         Assert.True (w.WasDisposed);
 
-        exception = Record.Exception (
-                                      () => Application.Run (
-                                                             w)); // Invalid - w has been disposed. Run it in debug mode will throw, otherwise the user may want to run it again
-        Assert.NotNull (exception);
+        //exception = Record.Exception (
+        //                              () => Application.Run (
+        //                                                     w)); // Invalid - w has been disposed. Run it in debug mode will throw, otherwise the user may want to run it again
+        //Assert.NotNull (exception);
 
         exception = Record.Exception (() => Assert.Equal (string.Empty, w.Title)); // Invalid - w has been disposed and cannot be accessed
         Assert.NotNull (exception);

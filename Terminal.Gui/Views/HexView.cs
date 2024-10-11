@@ -436,9 +436,9 @@ public class HexView : View, IDesignable
         Source.Position = _displayStart;
         int n = _source!.Read (data, 0, data.Length);
 
-        Attribute activeColor = GetHotNormalColor ();
-        Attribute trackingColor = GetHotFocusColor ();
-
+        Attribute selectedAttribute = GetHotNormalColor ();
+        Attribute editedAttribute = new Attribute (GetNormalColor ().Foreground.GetHighlightColor (), GetNormalColor ().Background);
+        Attribute editingAttribute = new Attribute (GetFocusColor ().Background, GetFocusColor ().Foreground);
         for (var line = 0; line < viewport.Height; line++)
         {
             Rectangle lineRect = new (0, line, viewport.Width, 1);
@@ -449,7 +449,7 @@ public class HexView : View, IDesignable
             }
 
             Move (0, line);
-            currentAttribute = GetHotNormalColor ();
+            currentAttribute = new Attribute (GetNormalColor ().Foreground.GetHighlightColor (), GetNormalColor ().Background);
             Driver.SetAttribute (currentAttribute);
             var address = $"{_displayStart + line * nBlocks * NUM_BYTES_PER_HEX_COLUMN:x8}";
             Driver.AddStr ($"{address.Substring (8 - AddressWidth)}");
@@ -468,13 +468,14 @@ public class HexView : View, IDesignable
                     int offset = line * nBlocks * NUM_BYTES_PER_HEX_COLUMN + block * NUM_BYTES_PER_HEX_COLUMN + b;
                     byte value = GetData (data, offset, out bool edited);
 
-                    if (offset + _displayStart == Address || edited)
+                    if (offset + _displayStart == Address)
                     {
-                        SetAttribute (_leftSideHasFocus ? activeColor : trackingColor);
+                        // Selected
+                        SetAttribute (_leftSideHasFocus ? editingAttribute : (edited ? editedAttribute : selectedAttribute));
                     }
                     else
                     {
-                        SetAttribute (GetNormalColor ());
+                        SetAttribute (edited ? editedAttribute : GetNormalColor ());
                     }
 
                     Driver.AddStr (offset >= n && !edited ? "  " : $"{value:x2}");
@@ -485,9 +486,9 @@ public class HexView : View, IDesignable
                 Driver.AddStr (block + 1 == nBlocks ? " " : $"{_columnSeparatorRune} ");
             }
 
-            for (var bitem = 0; bitem < nBlocks * NUM_BYTES_PER_HEX_COLUMN; bitem++)
+            for (var byteIndex = 0; byteIndex < nBlocks * NUM_BYTES_PER_HEX_COLUMN; byteIndex++)
             {
-                int offset = line * nBlocks * NUM_BYTES_PER_HEX_COLUMN + bitem;
+                int offset = line * nBlocks * NUM_BYTES_PER_HEX_COLUMN + byteIndex;
                 byte b = GetData (data, offset, out bool edited);
                 Rune c;
 
@@ -525,20 +526,21 @@ public class HexView : View, IDesignable
                     }
                 }
 
-                if (offset + _displayStart == Address || edited)
+                if (offset + _displayStart == Address)
                 {
-                    SetAttribute (_leftSideHasFocus ? trackingColor : activeColor);
+                    // Selected
+                    SetAttribute (_leftSideHasFocus ? editingAttribute : (edited ? editedAttribute : selectedAttribute));
                 }
                 else
                 {
-                    SetAttribute (GetNormalColor ());
+                    SetAttribute (edited ? editedAttribute : GetNormalColor ());
                 }
 
                 Driver.AddRune (c);
 
                 for (var i = 1; i < utf8BytesConsumed; i++)
                 {
-                    bitem++;
+                    byteIndex++;
                     Driver.AddRune (_periodCharRune);
                 }
             }
