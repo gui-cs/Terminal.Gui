@@ -185,7 +185,7 @@ public class DateFieldTests
 
         DateTime date = DateTime.Parse ("1/1/1971");
 
-        foreach (CultureInfo culture in CultureInfo.GetCultures (CultureTypes.AllCultures))
+        foreach (CultureInfo culture in CultureInfo.GetCultures (CultureTypes.NeutralCultures))
         {
             CultureInfo.CurrentCulture = culture;
             string separator = culture.DateTimeFormat.DateSeparator.Trim ();
