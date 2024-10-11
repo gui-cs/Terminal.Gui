@@ -241,7 +241,7 @@ public class Mouse : Scenario
         };
         win.Add (label, winLog);
 
-        clearButton.Accept += (s, e) =>
+        clearButton.Accepting += (s, e) =>
                               {
                                   appLogList.Clear ();
                                   appLog.SetSource (appLogList);

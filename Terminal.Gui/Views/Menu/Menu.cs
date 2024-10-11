@@ -195,7 +195,6 @@ internal sealed class Menu : View
         KeyBindings.Add (Key.CursorLeft, Command.Left);
         KeyBindings.Add (Key.CursorRight, Command.Right);
         KeyBindings.Add (Key.Esc, Command.Cancel);
-        KeyBindings.Add (Key.Enter, Command.Accept);
     }
 
     private void AddKeyBindingsHotKey (MenuBarItem? menuBarItem)
@@ -330,7 +329,7 @@ internal sealed class Menu : View
     }
 
     /// <inheritdoc/>
-    public override void OnVisibleChanged ()
+    protected override void OnVisibleChanged ()
     {
         base.OnVisibleChanged ();
 
@@ -386,7 +385,7 @@ internal sealed class Menu : View
             return GetFocusColor ();
         }
 
-        return !item.IsEnabled () ? ColorScheme.Disabled : GetNormalColor ();
+        return !item.IsEnabled () ? ColorScheme!.Disabled : GetNormalColor ();
     }
 
     public override void OnDrawContent (Rectangle viewport)
@@ -518,7 +517,7 @@ internal sealed class Menu : View
 
                 if (!item.IsEnabled ())
                 {
-                    DrawHotString (textToDraw, ColorScheme.Disabled, ColorScheme.Disabled);
+                    DrawHotString (textToDraw, ColorScheme!.Disabled, ColorScheme.Disabled);
                 }
                 else if (i == 0 && _host.UseSubMenusSingleFrame && item.Parent!.Parent is { })
                 {
@@ -533,7 +532,7 @@ internal sealed class Menu : View
                     tf.Draw (
                              ViewportToScreen (new Rectangle (1, i, Frame.Width - 3, 1)),
                              i == _currentChild ? GetFocusColor () : GetNormalColor (),
-                             i == _currentChild ? ColorScheme.HotFocus : ColorScheme.HotNormal,
+                             i == _currentChild ? ColorScheme!.HotFocus : ColorScheme!.HotNormal,
                              SuperView?.ViewportToScreen (SuperView.Viewport) ?? Rectangle.Empty
                             );
                 }
@@ -541,7 +540,7 @@ internal sealed class Menu : View
                 {
                     DrawHotString (
                                    textToDraw,
-                                   i == _currentChild ? ColorScheme.HotFocus : ColorScheme.HotNormal,
+                                   i == _currentChild ? ColorScheme!.HotFocus : ColorScheme!.HotNormal,
                                    i == _currentChild ? GetFocusColor () : GetNormalColor ()
                                   );
                 }

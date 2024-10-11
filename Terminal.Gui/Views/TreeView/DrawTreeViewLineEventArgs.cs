@@ -12,16 +12,16 @@ public class DrawTreeViewLineEventArgs<T> where T : class
     public bool Handled { get; set; }
 
     /// <summary>
-    ///     If line contains a branch that can be expanded/collapsed then this is the index in <see cref="RuneCells"/> at
+    ///     If line contains a branch that can be expanded/collapsed then this is the index in <see cref="Cells"/> at
     ///     which the symbol is (or null for leaf elements).
     /// </summary>
     public int? IndexOfExpandCollapseSymbol { get; init; }
 
     /// <summary>
-    ///     The notional index in <see cref="RuneCells"/> which contains the first character of the
+    ///     The notional index in <see cref="Cells"/> which contains the first character of the
     ///     <see cref="TreeView{T}.AspectGetter"/> text (i.e. after all branch lines and expansion/collapse symbols).
     /// </summary>
-    /// <remarks>May be negative or outside of bounds of <see cref="RuneCells"/> if the view has been scrolled horizontally.</remarks>
+    /// <remarks>May be negative or outside of bounds of <see cref="Cells"/> if the view has been scrolled horizontally.</remarks>
     public int IndexOfModelText { get; init; }
 
     /// <summary>The object at this line in the tree</summary>
@@ -32,7 +32,7 @@ public class DrawTreeViewLineEventArgs<T> where T : class
     ///     respected.  You can modify these to change what is rendered.
     /// </summary>
     /// <remarks>Changing the length of this collection may result in corrupt rendering</remarks>
-    public List<RuneCell> RuneCells { get; init; }
+    public List<Cell> Cells { get; init; }
 
     /// <summary>The <see cref="TreeView{T}"/> that is performing the rendering.</summary>
     public TreeView<T> Tree { get; init; }

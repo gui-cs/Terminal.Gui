@@ -185,7 +185,7 @@ public class GraphViewExample : Scenario
                 CanFocus = false
             }
         };
-        statusBar.Add (diagShortcut).Accept += DiagShortcut_Accept;
+        statusBar.Add (diagShortcut).Accepting += DiagShortcut_Accept;
 
         _graphs [_currentGraph++ % _graphs.Length] ();
 
@@ -196,7 +196,7 @@ public class GraphViewExample : Scenario
         Application.Shutdown ();
     }
 
-    private void DiagShortcut_Accept (object sender, HandledEventArgs e)
+    private void DiagShortcut_Accept (object sender, CommandEventArgs e)
     {
         ToggleDiagnostics ();
 

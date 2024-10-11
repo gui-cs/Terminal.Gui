@@ -147,13 +147,13 @@ public class ListsAndCombos : Scenario
                                 };
 
         var btnMoveUp = new Button { X = 1, Y = Pos.Bottom (lbListView), Text = "Move _Up" };
-        btnMoveUp.Accept += (s, e) => { listview.MoveUp (); };
+        btnMoveUp.Accepting += (s, e) => { listview.MoveUp (); };
 
         var btnMoveDown = new Button
         {
             X = Pos.Right (btnMoveUp) + 1, Y = Pos.Bottom (lbListView), Text = "Move _Down"
         };
-        btnMoveDown.Accept += (s, e) => { listview.MoveDown (); };
+        btnMoveDown.Accepting += (s, e) => { listview.MoveDown (); };
 
         win.Add (btnMoveUp, btnMoveDown);
 

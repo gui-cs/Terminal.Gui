@@ -60,7 +60,7 @@
     <!-- Enable Nuget Source Link for github -->
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="[8,9)" PrivateAssets="all" />
     <PackageReference Include="System.IO.Abstractions" Version="[21.0.22,22)" />
-    <PackageReference Include="System.Text.Json" Version="[8.0.4,9)" />
+    <PackageReference Include="System.Text.Json" Version="[8.0.5,9)" />
     <PackageReference Include="Wcwidth" Version="[2,3)" />
   </ItemGroup>
   <!-- =================================================================== -->

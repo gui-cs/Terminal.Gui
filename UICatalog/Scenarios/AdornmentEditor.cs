@@ -146,7 +146,7 @@ public class AdornmentEditor : View
             Enabled = false
         };
 
-        copyTop.Accept += (s, e) =>
+        copyTop.Accepting += (s, e) =>
                           {
                               AdornmentToEdit.Thickness = new (_topEdit.Value);
                               _leftEdit.Value = _rightEdit.Value = _bottomEdit.Value = _topEdit.Value;

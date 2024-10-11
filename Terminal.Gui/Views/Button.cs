@@ -1,27 +1,22 @@
-//
-// Button.cs: Button control
-//
-// Authors:
-//   Miguel de Icaza (miguel@gnome.org)
-//
-
 namespace Terminal.Gui;
 
-/// <summary>Button is a <see cref="View"/> that provides an item that invokes raises the <see cref="View.Accept"/> event.</summary>
+/// <summary>
+///     A button View that can be pressed with the mouse or keybaord.
+/// </summary>
 /// <remarks>
 ///     <para>
-///         Provides a button showing text that raises the <see cref="View.Accept"/> event when clicked on with a mouse or
-///         when the user presses SPACE, ENTER, or the <see cref="View.HotKey"/>. The hot key is the first letter or digit
-///         following the first underscore ('_') in the button text.
+///         The Button will raise the <see cref="View.Accepting"/> event when the user presses <see cref="View.HotKey"/>,
+///         <c>Enter</c>, or <c>Space</c>
+///         or clicks on the button with the mouse.
 ///     </para>
 ///     <para>Use <see cref="View.HotKeySpecifier"/> to change the hot key specifier from the default of ('_').</para>
 ///     <para>
-///         When the button is configured as the default (<see cref="IsDefault"/>) and the user presses the ENTER key, if
-///         no other <see cref="View"/> processes the key, the <see cref="Button"/>'s <see cref="View.Accept"/> event will
-///         be fired.
+///         Button can act as the default <see cref="Command.Accept"/> handler for all peer-Views. See
+///         <see cref="IsDefault"/>.
 ///     </para>
 ///     <para>
-///         Set <see cref="View.WantContinuousButtonPressed"/> to <see langword="true"/> to have the <see cref="View.Accept"/> event
+///         Set <see cref="View.WantContinuousButtonPressed"/> to <see langword="true"/> to have the
+///         <see cref="View.Accepting"/> event
 ///         invoked repeatedly while the button is pressed.
 ///     </para>
 /// </remarks>
@@ -34,13 +29,13 @@ public class Button : View, IDesignable
     private bool _isDefault;
 
     /// <summary>
-    /// Gets or sets whether <see cref="Button"/>s are shown with a shadow effect by default.
+    ///     Gets or sets whether <see cref="Button"/>s are shown with a shadow effect by default.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
 
     /// <summary>
-    /// Gets or sets the default Highlight Style.
+    ///     Gets or sets the default Highlight Style.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     public static HighlightStyle DefaultHighlightStyle { get; set; } = HighlightStyle.Pressed | HighlightStyle.Hover;
@@ -61,14 +56,11 @@ public class Button : View, IDesignable
 
         CanFocus = true;
 
-        // Override default behavior of View
-        AddCommand (Command.HotKey, () =>
-        {
-            SetFocus ();
-            return !OnAccept ();
-        });
+        AddCommand (Command.HotKey, HandleHotKeyCommand);
 
+        KeyBindings.Remove (Key.Space);
         KeyBindings.Add (Key.Space, Command.HotKey);
+        KeyBindings.Remove (Key.Enter);
         KeyBindings.Add (Key.Enter, Command.HotKey);
 
         TitleChanged += Button_TitleChanged;
@@ -78,9 +70,38 @@ public class Button : View, IDesignable
         HighlightStyle = DefaultHighlightStyle;
     }
 
+    private bool? HandleHotKeyCommand (CommandContext ctx)
+    {
+        bool cachedIsDefault = IsDefault; // Supports "Swap Default" in Buttons scenario where IsDefault changes
+
+        if (RaiseSelecting (ctx) is true)
+        {
+            return true;
+        }
+
+        bool? handled = RaiseAccepting (ctx);
+
+        if (handled == true)
+        {
+            return true;
+        }
+
+        SetFocus ();
+
+        // TODO: If `IsDefault` were a property on `View` *any* View could work this way. That's theoretical as
+        // TODO: no use-case has been identified for any View other than Button to act like this.
+        // If Accept was not handled...
+        if (cachedIsDefault && SuperView is { })
+        {
+            return SuperView.InvokeCommand (Command.Accept);
+        }
+
+        return false;
+    }
+
     private bool _wantContinuousButtonPressed;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override bool WantContinuousButtonPressed
     {
         get => _wantContinuousButtonPressed;
@@ -106,7 +127,13 @@ public class Button : View, IDesignable
 
     private void Button_MouseClick (object sender, MouseEventEventArgs e)
     {
-        e.Handled = InvokeCommand (Command.HotKey) == true;
+        if (e.Handled)
+        {
+            return;
+        }
+
+        // TODO: With https://github.com/gui-cs/Terminal.Gui/issues/3778 we won't have to pass data:
+        e.Handled = InvokeCommand (Command.HotKey, new (Command.HotKey, null, data: this)) == true;
     }
 
     private void Button_TitleChanged (object sender, EventArgs<string> e)
@@ -115,37 +142,68 @@ public class Button : View, IDesignable
         TextFormatter.HotKeySpecifier = HotKeySpecifier;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override string Text
     {
-        get => base.Title;
-        set => base.Text = base.Title = value;
+        get => Title;
+        set => base.Text = Title = value;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override Rune HotKeySpecifier
     {
         get => base.HotKeySpecifier;
         set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value;
     }
 
-    /// <summary>Gets or sets whether the <see cref="Button"/> is the default action to activate in a dialog.</summary>
-    /// <value><c>true</c> if is default; otherwise, <c>false</c>.</value>
+    /// <summary>
+    ///     Gets or sets whether the <see cref="Button"/> will act as the default handler for <see cref="Command.Accept"/>
+    ///     commands on the <see cref="View.SuperView"/>.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         If <see langword="true"/>:
+    ///     </para>
+    ///     <para>
+    ///         - the Button will display an indicator that it is the default Button.
+    ///     </para>
+    ///     <para>
+    ///         - when clicked, if the Accepting event is not handled, <see cref="Command.Accept"/> will be
+    ///         invoked on the SuperView.
+    ///     </para>
+    ///     <para>
+    ///         - If a peer-View receives <see cref="Command.Accept"/> and does not handle it, the command will be passed to
+    ///         the
+    ///         first Button in the SuperView that has <see cref="IsDefault"/> set to <see langword="true"/>. See
+    ///         <see cref="View.RaiseAccepting"/> for more information.
+    ///     </para>
+    /// </remarks>
     public bool IsDefault
     {
         get => _isDefault;
         set
         {
+            if (_isDefault == value)
+            {
+                return;
+            }
+
             _isDefault = value;
+
             UpdateTextFormatterText ();
             OnResizeNeeded ();
         }
     }
 
-    /// <summary></summary>
+    /// <summary>
+    ///     Gets or sets whether the Button will show decorations or not. If <see langword="true"/> the glyphs that normally
+    ///     brakcet the Button Title and the <see cref="IsDefault"/> indicator will not be shown.
+    /// </summary>
     public bool NoDecorations { get; set; }
 
-    /// <summary></summary>
+    /// <summary>
+    ///     Gets or sets whether the Button will include padding on each side of the Title.
+    /// </summary>
     public bool NoPadding { get; set; }
 
     /// <inheritdoc/>
@@ -158,6 +216,7 @@ public class Button : View, IDesignable
                 if (TextFormatter.Text [i] == Text [0])
                 {
                     Move (i, 0);
+
                     return null; // Don't show the cursor
                 }
             }
@@ -170,6 +229,7 @@ public class Button : View, IDesignable
     protected override void UpdateTextFormatterText ()
     {
         base.UpdateTextFormatterText ();
+
         if (NoDecorations)
         {
             TextFormatter.Text = Text;
@@ -191,7 +251,7 @@ public class Button : View, IDesignable
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public bool EnableForDesign ()
     {
         Title = "_Button";

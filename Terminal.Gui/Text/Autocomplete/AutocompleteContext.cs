@@ -7,7 +7,7 @@ namespace Terminal.Gui;
 public class AutocompleteContext
 {
     /// <summary>Creates a new instance of the <see cref="AutocompleteContext"/> class</summary>
-    public AutocompleteContext (List<RuneCell> currentLine, int cursorPosition, bool canceled = false)
+    public AutocompleteContext (List<Cell> currentLine, int cursorPosition, bool canceled = false)
     {
         CurrentLine = currentLine;
         CursorPosition = cursorPosition;
@@ -18,7 +18,7 @@ public class AutocompleteContext
     public bool Canceled { get; set; }
 
     /// <summary>The text on the current line.</summary>
-    public List<RuneCell> CurrentLine { get; set; }
+    public List<Cell> CurrentLine { get; set; }
 
     /// <summary>The position of the input cursor within the <see cref="CurrentLine"/>.</summary>
     public int CursorPosition { get; set; }
