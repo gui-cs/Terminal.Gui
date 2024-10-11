@@ -1,18 +1,14 @@
 ﻿#nullable enable
 
-using System.Diagnostics;
-using System.Text;
-
 namespace Terminal.Gui;
-class AnsiResponseParser
+
+internal class AnsiResponseParser
 {
-    private bool inResponse = false;
-    private StringBuilder held = new StringBuilder ();
-    private string? currentTerminator = null;
-    private Action<string>? currentResponse = null;
+    private readonly StringBuilder held = new ();
+    private string? currentTerminator;
+    private Action<string>? currentResponse;
 
-
-    private List<Func<string, bool>> _ignorers = new ();
+    private readonly List<Func<string, bool>> _ignorers = new ();
 
     // Enum to manage the parser's state
     private enum ParserState
@@ -24,6 +20,7 @@ class AnsiResponseParser
 
     // Current state of the parser
     private ParserState currentState = ParserState.Normal;
+    private HashSet<string> _knownTerminators = new HashSet<string> ();
 
     /*
      * ANSI Input Sequences
@@ -44,29 +41,79 @@ class AnsiResponseParser
 
     public AnsiResponseParser ()
     {
+        // These all are valid terminators on ansi responses,
+        // see CSI in https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s
+        _knownTerminators.Add ("@");
+        _knownTerminators.Add ("A");
+        _knownTerminators.Add ("B");
+        _knownTerminators.Add ("C");
+        _knownTerminators.Add ("D");
+        _knownTerminators.Add ("E");
+        _knownTerminators.Add ("F");
+        _knownTerminators.Add ("G");
+        _knownTerminators.Add ("G");
+        _knownTerminators.Add ("H");
+        _knownTerminators.Add ("I");
+        _knownTerminators.Add ("J");
+        _knownTerminators.Add ("K");
+        _knownTerminators.Add ("L");
+        _knownTerminators.Add ("M");
+        // No - N or O
+        _knownTerminators.Add ("P");
+        _knownTerminators.Add ("Q");
+        _knownTerminators.Add ("R");
+        _knownTerminators.Add ("S");
+        _knownTerminators.Add ("T");
+        _knownTerminators.Add ("W");
+        _knownTerminators.Add ("X");
+        _knownTerminators.Add ("Z");
+
+        _knownTerminators.Add ("^");
+        _knownTerminators.Add ("`");
+        _knownTerminators.Add ("~");
+
+        _knownTerminators.Add ("a");
+        _knownTerminators.Add ("b");
+        _knownTerminators.Add ("c");
+        _knownTerminators.Add ("d");
+        _knownTerminators.Add ("e");
+        _knownTerminators.Add ("f");
+        _knownTerminators.Add ("g");
+        _knownTerminators.Add ("h");
+        _knownTerminators.Add ("i");
+
+
+        _knownTerminators.Add ("l");
+        _knownTerminators.Add ("m");
+        _knownTerminators.Add ("n");
+
+        _knownTerminators.Add ("p");
+        _knownTerminators.Add ("q");
+        _knownTerminators.Add ("r");
+        _knownTerminators.Add ("s");
+        _knownTerminators.Add ("t");
+        _knownTerminators.Add ("u");
+        _knownTerminators.Add ("v");
+        _knownTerminators.Add ("w");
+        _knownTerminators.Add ("x");
+        _knownTerminators.Add ("y");
+        _knownTerminators.Add ("z");
+
         // Add more common ANSI sequences to be ignored
-        _ignorers.Add (s => s.StartsWith ("\x1B[<") && s.EndsWith ("M"));  // Mouse event
-        _ignorers.Add (s => s.StartsWith ("\x1B[") && s.EndsWith ("A"));   // Up arrow
-        _ignorers.Add (s => s.StartsWith ("\x1B[") && s.EndsWith ("B"));   // Down arrow
-        _ignorers.Add (s => s.StartsWith ("\x1B[") && s.EndsWith ("C"));   // Right arrow
-        _ignorers.Add (s => s.StartsWith ("\x1B[") && s.EndsWith ("D"));   // Left arrow
-        _ignorers.Add (s => s.StartsWith ("\x1B[3~"));                     // Delete
-        _ignorers.Add (s => s.StartsWith ("\x1B[5~"));                     // Page Up
-        _ignorers.Add (s => s.StartsWith ("\x1B[6~"));                     // Page Down
-        _ignorers.Add (s => s.StartsWith ("\x1B[2~"));                     // Insert
+        _ignorers.Add (s => s.StartsWith ("\x1B[<") && s.EndsWith ("M")); // Mouse event
+
         // Add more if necessary
     }
 
-
     /// <summary>
-    /// Processes input which may be a single character or multiple.
-    /// Returns what should be passed on to any downstream input processing
-    /// (i.e., removes expected ANSI responses from the input stream).
+    ///     Processes input which may be a single character or multiple.
+    ///     Returns what should be passed on to any downstream input processing
+    ///     (i.e., removes expected ANSI responses from the input stream).
     /// </summary>
     public string ProcessInput (string input)
     {
-        StringBuilder output = new StringBuilder ();  // Holds characters that should pass through
-        int index = 0;  // Tracks position in the input string
+        var output = new StringBuilder (); // Holds characters that should pass through
+        var index = 0; // Tracks position in the input string
 
         while (index < input.Length)
         {
@@ -79,7 +126,7 @@ class AnsiResponseParser
                     {
                         // Escape character detected, move to ExpectingBracket state
                         currentState = ParserState.ExpectingBracket;
-                        held.Append (currentChar);  // Hold the escape character
+                        held.Append (currentChar); // Hold the escape character
                         index++;
                     }
                     else
@@ -88,48 +135,51 @@ class AnsiResponseParser
                         output.Append (currentChar);
                         index++;
                     }
+
                     break;
 
                 case ParserState.ExpectingBracket:
-                    if (currentChar == '[' || currentChar == ']')
+                    if (currentChar == '[' )
                     {
-                        // Detected '[' or ']', transition to InResponse state
+                        // Detected '[' , transition to InResponse state
                         currentState = ParserState.InResponse;
-                        held.Append (currentChar);  // Hold the '[' or ']'
+                        held.Append (currentChar); // Hold the '['
                         index++;
                     }
                     else
                     {
                         // Invalid sequence, release held characters and reset to Normal
                         output.Append (held.ToString ());
-                        output.Append (currentChar);  // Add current character
+                        output.Append (currentChar); // Add current character
                         ResetState ();
                         index++;
                     }
+
                     break;
 
                 case ParserState.InResponse:
                     held.Append (currentChar);
 
                     // Check if the held content should be released
-                    var handled = HandleHeldContent ();
+                    string handled = HandleHeldContent ();
+
                     if (!string.IsNullOrEmpty (handled))
                     {
                         output.Append (handled);
-                        ResetState ();  // Exit response mode and reset
+                        ResetState (); // Exit response mode and reset
                     }
 
                     index++;
+
                     break;
             }
         }
 
-        return output.ToString ();  // Return all characters that passed through
+        return output.ToString (); // Return all characters that passed through
     }
 
-
     /// <summary>
-    /// Resets the parser's state when a response is handled or finished.
+    ///     Resets the parser's state when a response is handled or finished.
     /// </summary>
     private void ResetState ()
     {
@@ -138,19 +188,29 @@ class AnsiResponseParser
     }
 
     /// <summary>
-    /// Checks the current `held` content to decide whether it should be released, either as an expected or unexpected response.
+    ///     Checks the current `held` content to decide whether it should be released, either as an expected or unexpected
+    ///     response.
     /// </summary>
     private string HandleHeldContent ()
     {
+        var cur = held.ToString ();
         // If we're expecting a specific terminator, check if the content matches
-        if (currentTerminator != null && held.ToString ().EndsWith (currentTerminator))
+        if (currentTerminator != null && cur.EndsWith (currentTerminator))
         {
             DispatchResponse ();
+
             return string.Empty;
         }
 
+
+        if (_knownTerminators.Any (cur.EndsWith) && cur.StartsWith (EscSeqUtils.CSI))
+        {
+            // Detected a response that we were not expecting
+            return held.ToString ();
+        }
+
         // Handle common ANSI sequences (such as mouse input or arrow keys)
-        if (_ignorers.Any(m=>m.Invoke (held.ToString())))
+        if (_ignorers.Any (m => m.Invoke (held.ToString ())))
         {
             // Detected mouse input, release it without triggering the delegate
             return held.ToString ();
@@ -172,12 +232,12 @@ class AnsiResponseParser
     }
 
     /// <summary>
-    /// Registers a new expected ANSI response with a specific terminator and a callback for when the response is completed.
+    ///     Registers a new expected ANSI response with a specific terminator and a callback for when the response is
+    ///     completed.
     /// </summary>
     public void ExpectResponse (string terminator, Action<string> response)
     {
         currentTerminator = terminator;
         currentResponse = response;
     }
-
 }
