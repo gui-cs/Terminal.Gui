@@ -7,8 +7,6 @@ internal class AnsiResponseParser
     private readonly StringBuilder held = new ();
     private readonly List<(string terminator, Action<string> response)> expectedResponses = new ();
 
-    private readonly List<Func<string, bool>> _ignorers = new ();
-
     // Enum to manage the parser's state
     private enum ParserState
     {
@@ -19,7 +17,7 @@ internal class AnsiResponseParser
 
     // Current state of the parser
     private ParserState currentState = ParserState.Normal;
-    private readonly HashSet<string> _knownTerminators = new ();
+    private readonly HashSet<char> _knownTerminators = new ();
 
     /*
      * ANSI Input Sequences
@@ -42,64 +40,61 @@ internal class AnsiResponseParser
     {
         // These all are valid terminators on ansi responses,
         // see CSI in https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s
-        _knownTerminators.Add ("@");
-        _knownTerminators.Add ("A");
-        _knownTerminators.Add ("B");
-        _knownTerminators.Add ("C");
-        _knownTerminators.Add ("D");
-        _knownTerminators.Add ("E");
-        _knownTerminators.Add ("F");
-        _knownTerminators.Add ("G");
-        _knownTerminators.Add ("G");
-        _knownTerminators.Add ("H");
-        _knownTerminators.Add ("I");
-        _knownTerminators.Add ("J");
-        _knownTerminators.Add ("K");
-        _knownTerminators.Add ("L");
-        _knownTerminators.Add ("M");
+        _knownTerminators.Add ('@');
+        _knownTerminators.Add ('A');
+        _knownTerminators.Add ('B');
+        _knownTerminators.Add ('C');
+        _knownTerminators.Add ('D');
+        _knownTerminators.Add ('E');
+        _knownTerminators.Add ('F');
+        _knownTerminators.Add ('G');
+        _knownTerminators.Add ('G');
+        _knownTerminators.Add ('H');
+        _knownTerminators.Add ('I');
+        _knownTerminators.Add ('J');
+        _knownTerminators.Add ('K');
+        _knownTerminators.Add ('L');
+        _knownTerminators.Add ('M');
 
         // No - N or O
-        _knownTerminators.Add ("P");
-        _knownTerminators.Add ("Q");
-        _knownTerminators.Add ("R");
-        _knownTerminators.Add ("S");
-        _knownTerminators.Add ("T");
-        _knownTerminators.Add ("W");
-        _knownTerminators.Add ("X");
-        _knownTerminators.Add ("Z");
+        _knownTerminators.Add ('P');
+        _knownTerminators.Add ('Q');
+        _knownTerminators.Add ('R');
+        _knownTerminators.Add ('S');
+        _knownTerminators.Add ('T');
+        _knownTerminators.Add ('W');
+        _knownTerminators.Add ('X');
+        _knownTerminators.Add ('Z');
 
-        _knownTerminators.Add ("^");
-        _knownTerminators.Add ("`");
-        _knownTerminators.Add ("~");
+        _knownTerminators.Add ('^');
+        _knownTerminators.Add ('`');
+        _knownTerminators.Add ('~');
 
-        _knownTerminators.Add ("a");
-        _knownTerminators.Add ("b");
-        _knownTerminators.Add ("c");
-        _knownTerminators.Add ("d");
-        _knownTerminators.Add ("e");
-        _knownTerminators.Add ("f");
-        _knownTerminators.Add ("g");
-        _knownTerminators.Add ("h");
-        _knownTerminators.Add ("i");
+        _knownTerminators.Add ('a');
+        _knownTerminators.Add ('b');
+        _knownTerminators.Add ('c');
+        _knownTerminators.Add ('d');
+        _knownTerminators.Add ('e');
+        _knownTerminators.Add ('f');
+        _knownTerminators.Add ('g');
+        _knownTerminators.Add ('h');
+        _knownTerminators.Add ('i');
 
-        _knownTerminators.Add ("l");
-        _knownTerminators.Add ("m");
-        _knownTerminators.Add ("n");
+        _knownTerminators.Add ('l');
+        _knownTerminators.Add ('m');
+        _knownTerminators.Add ('n');
 
-        _knownTerminators.Add ("p");
-        _knownTerminators.Add ("q");
-        _knownTerminators.Add ("r");
-        _knownTerminators.Add ("s");
-        _knownTerminators.Add ("t");
-        _knownTerminators.Add ("u");
-        _knownTerminators.Add ("v");
-        _knownTerminators.Add ("w");
-        _knownTerminators.Add ("x");
-        _knownTerminators.Add ("y");
-        _knownTerminators.Add ("z");
-
-        // Add more common ANSI sequences to be ignored
-        _ignorers.Add (s => s.StartsWith ("\x1B[<") && s.EndsWith ("M")); // Mouse event
+        _knownTerminators.Add ('p');
+        _knownTerminators.Add ('q');
+        _knownTerminators.Add ('r');
+        _knownTerminators.Add ('s');
+        _knownTerminators.Add ('t');
+        _knownTerminators.Add ('u');
+        _knownTerminators.Add ('v');
+        _knownTerminators.Add ('w');
+        _knownTerminators.Add ('x');
+        _knownTerminators.Add ('y');
+        _knownTerminators.Add ('z');
 
         // Add more if necessary
     }
@@ -205,17 +200,10 @@ internal class AnsiResponseParser
             return string.Empty;
         }
 
-        if (_knownTerminators.Any (cur.EndsWith) && cur.StartsWith (EscSeqUtils.CSI))
+        if (_knownTerminators.Contains (cur.Last ()) && cur.StartsWith (EscSeqUtils.CSI))
         {
             // Detected a response that we were not expecting
-            return held.ToString ();
-        }
-
-        // Handle common ANSI sequences (such as mouse input or arrow keys)
-        if (_ignorers.Any (m => m.Invoke (held.ToString ())))
-        {
-            // Detected mouse input, release it without triggering the delegate
-            return held.ToString ();
+            return cur;
         }
 
         // Add more cases here for other standard sequences (like arrow keys, function keys, etc.)
