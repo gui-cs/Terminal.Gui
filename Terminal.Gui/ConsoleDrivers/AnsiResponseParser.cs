@@ -135,8 +135,6 @@ class AnsiResponseParser
     {
         currentState = ParserState.Normal;
         held.Clear ();
-        currentTerminator = null;
-        currentResponse = null;
     }
 
     /// <summary>
@@ -147,8 +145,7 @@ class AnsiResponseParser
         // If we're expecting a specific terminator, check if the content matches
         if (currentTerminator != null && held.ToString ().EndsWith (currentTerminator))
         {
-            // If it matches the expected response, invoke the callback and return nothing for output
-            currentResponse?.Invoke (held.ToString ());
+            DispatchResponse ();
             return string.Empty;
         }
 
@@ -165,6 +162,14 @@ class AnsiResponseParser
         return string.Empty;
     }
 
+    private void DispatchResponse ()
+    {
+        // If it matches the expected response, invoke the callback and return nothing for output
+        currentResponse?.Invoke (held.ToString ());
+        currentResponse = null;
+        currentTerminator = null;
+        ResetState ();
+    }
 
     /// <summary>
     /// Registers a new expected ANSI response with a specific terminator and a callback for when the response is completed.
