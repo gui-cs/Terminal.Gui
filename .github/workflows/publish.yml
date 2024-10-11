@@ -43,11 +43,11 @@ jobs:
     - name: Build Release
       run: |
         dotnet-gitversion /updateprojectfiles
-        dotnet build --no-incremental --nologo --force --configuration Release
-        dotnet test --configuration Release
+        dotnet build Terminal.Gui/Terminal.Gui.csproj --no-incremental --nologo --force --configuration Release
+        dotnet test Terminal.Gui/Terminal.Gui.csproj --configuration Release
 
     - name: Pack
-      run: dotnet pack -c Release --include-symbols -p:Version='${{ steps.gitversion.outputs.SemVer }}' 
+      run: dotnet pack Terminal.Gui/Terminal.Gui.csproj -c Release --include-symbols -p:Version='${{ steps.gitversion.outputs.SemVer }}' 
 
     # - name: Test to generate Code Coverage Report
     #   run: |

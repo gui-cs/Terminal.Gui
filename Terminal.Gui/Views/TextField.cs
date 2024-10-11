@@ -459,7 +459,7 @@ public class TextField : View
     ///     Indicates whatever the text was changed or not. <see langword="true"/> if the text was changed
     ///     <see langword="false"/> otherwise.
     /// </summary>
-    public bool IsDirty => _historyText.IsDirty (Text);
+    public bool IsDirty => _historyText.IsDirty ([Cell.StringToCells (Text)]);
 
     /// <summary>If set to true its not allow any changes in the text.</summary>
     public bool ReadOnly { get; set; }
@@ -541,12 +541,12 @@ public class TextField : View
             if (!Secret && !_historyText.IsFromHistory)
             {
                 _historyText.Add (
-                                  new() { TextModel.ToRuneCellList (oldText) },
+                                  new () { Cell.ToCellList (oldText) },
                                   new (_cursorPosition, 0)
                                  );
 
                 _historyText.Add (
-                                  new() { TextModel.ToRuneCells (_text) },
+                                  new () { Cell.ToCells (_text) },
                                   new (_cursorPosition, 0),
                                   HistoryText.LineStatus.Replaced
                                  );
@@ -589,7 +589,7 @@ public class TextField : View
     }
 
     /// <summary>Allows clearing the <see cref="HistoryText.HistoryTextItemEventArgs"/> items updating the original text.</summary>
-    public void ClearHistoryChanges () { _historyText.Clear (Text); }
+    public void ClearHistoryChanges () { _historyText.Clear ([Cell.StringToCells (Text)]); }
 
     /// <summary>Copy the selected text to the clipboard.</summary>
     public virtual void Copy ()
@@ -643,7 +643,7 @@ public class TextField : View
         }
 
         _historyText.Add (
-                          new() { TextModel.ToRuneCells (_text) },
+                          new () { Cell.ToCells (_text) },
                           new (_cursorPosition, 0)
                          );
 
@@ -697,7 +697,7 @@ public class TextField : View
         }
 
         _historyText.Add (
-                          new() { TextModel.ToRuneCells (_text) },
+                          new () { Cell.ToCells (_text) },
                           new (_cursorPosition, 0)
                          );
 
@@ -944,7 +944,7 @@ public class TextField : View
 
         int p = ScrollOffset;
         var col = 0;
-        int width = Frame.Width + OffSetBackground ();
+        int width = Viewport.Width + OffSetBackground ();
         int tcount = _text.Count;
         Attribute roc = GetReadOnlyColor ();
 
@@ -1130,10 +1130,10 @@ public class TextField : View
             }
 
             int cols = _text [idx].GetColumns ();
-            TextModel.SetCol (ref col, Frame.Width - 1, cols);
+            TextModel.SetCol (ref col, Viewport.Width - 1, cols);
         }
 
-        int pos = _cursorPosition - ScrollOffset + Math.Min (Frame.X, 0);
+        int pos = _cursorPosition - ScrollOffset + Math.Min (Viewport.X, 0);
         Move (pos, 0);
 
         return new Point (pos, 0);
@@ -1216,16 +1216,16 @@ public class TextField : View
             ScrollOffset = _cursorPosition;
             need = true;
         }
-        else if (Frame.Width > 0
-                 && (ScrollOffset + _cursorPosition - (Frame.Width + offB) == 0
-                     || TextModel.DisplaySize (_text, ScrollOffset, _cursorPosition).size >= Frame.Width + offB))
+        else if (Viewport.Width > 0
+                 && (ScrollOffset + _cursorPosition - (Viewport.Width + offB) == 0
+                     || TextModel.DisplaySize (_text, ScrollOffset, _cursorPosition).size >= Viewport.Width + offB))
         {
             ScrollOffset = Math.Max (
                                      TextModel.CalculateLeftColumn (
                                                                     _text,
                                                                     ScrollOffset,
                                                                     _cursorPosition,
-                                                                    Frame.Width + offB
+                                                                    Viewport.Width + offB
                                                                    ),
                                      0
                                     );
@@ -1330,7 +1330,7 @@ public class TextField : View
 
     private void GenerateSuggestions ()
     {
-        List<RuneCell> currentLine = TextModel.ToRuneCellList (Text);
+        List<Cell> currentLine = Cell.ToCellList (Text);
         int cursorPosition = Math.Min (CursorPosition, currentLine.Count);
 
         Autocomplete.Context = new (
@@ -1378,7 +1378,7 @@ public class TextField : View
             return;
         }
 
-        Text = TextModel.ToString (obj?.Lines [obj.CursorPosition.Y]);
+        Text = Cell.ToString (obj?.Lines [obj.CursorPosition.Y]);
         CursorPosition = obj.CursorPosition.X;
         Adjust ();
     }
@@ -1386,7 +1386,7 @@ public class TextField : View
     private void InsertText (Key a, bool usePreTextChangedCursorPos)
     {
         _historyText.Add (
-                          new() { TextModel.ToRuneCells (_text) },
+                          new () { Cell.ToCells (_text) },
                           new (_cursorPosition, 0)
                          );
 
