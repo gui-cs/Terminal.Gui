@@ -138,7 +138,7 @@ public class LineCanvas : IDisposable
         int length,
         Orientation orientation,
         LineStyle style,
-        Attribute? attribute = default
+        Attribute? attribute = null
     )
     {
         _cachedViewport = Rectangle.Empty;

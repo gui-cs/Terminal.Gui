@@ -404,6 +404,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         me.Handled = false;
 
         view.Dispose ();
+        Application.ResetState (ignoreDisposed: true);
     }
 
     [Theory]

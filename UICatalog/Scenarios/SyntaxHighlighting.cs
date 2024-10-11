@@ -85,13 +85,13 @@ public class SyntaxHighlighting : Scenario
         "exists"
     };
 
-    private readonly string _path = "RuneCells.rce";
-    private ColorScheme _blue;
-    private ColorScheme _green;
-    private ColorScheme _magenta;
+    private readonly string _path = "Cells.rce";
+    private Attribute _blue;
+    private Attribute _green;
+    private Attribute _magenta;
     private MenuItem _miWrap;
     private TextView _textView;
-    private ColorScheme _white;
+    private Attribute _white;
 
     /// <summary>
     ///     Reads an object instance from an Json file.
@@ -155,12 +155,12 @@ public class SyntaxHighlighting : Scenario
                          new (
                               "_Load Rune Cells",
                               "",
-                              () => ApplyLoadRuneCells ()
+                              () => ApplyLoadCells ()
                              ),
                          new (
                               "_Save Rune Cells",
                               "",
-                              () => SaveRuneCells ()
+                              () => SaveCells ()
                              ),
                          null,
                          new ("_Quit", "", () => Quit ())
@@ -231,11 +231,11 @@ public class SyntaxHighlighting : Scenario
         }
     }
 
-    private void ApplyLoadRuneCells ()
+    private void ApplyLoadCells ()
     {
         ClearAllEvents ();
 
-        List<RuneCell> runeCells = new ();
+        List<Cell> cells = new ();
 
         foreach (KeyValuePair<string, ColorScheme> color in Colors.ColorSchemes)
         {
@@ -243,21 +243,21 @@ public class SyntaxHighlighting : Scenario
 
             foreach (Rune rune in csName.EnumerateRunes ())
             {
-                runeCells.Add (new() { Rune = rune, ColorScheme = color.Value });
+                cells.Add (new() { Rune = rune, Attribute = color.Value.Normal });
             }
 
-            runeCells.Add (new() { Rune = (Rune)'\n', ColorScheme = color.Value });
+            cells.Add (new() { Rune = (Rune)'\n', Attribute = color.Value.Focus });
         }
 
         if (File.Exists (_path))
         {
-            //Reading the file  
-            List<List<RuneCell>> cells = ReadFromJsonFile<List<List<RuneCell>>> (_path);
-            _textView.Load (cells);
+            //Reading the file
+            List<List<Cell>> fileCells = ReadFromJsonFile<List<List<Cell>>> (_path);
+            _textView.Load (fileCells);
         }
         else
         {
-            _textView.Load (runeCells);
+            _textView.Load (cells);
         }
 
         _textView.Autocomplete.SuggestionGenerator = new SingleWordSuggestionGenerator ();
@@ -267,11 +267,11 @@ public class SyntaxHighlighting : Scenario
     {
         ClearAllEvents ();
 
-        _green = new (new Attribute (Color.Green, Color.Black));
-        _blue = new (new Attribute (Color.Blue, Color.Black));
-        _magenta = new (new Attribute (Color.Magenta, Color.Black));
-        _white = new (new Attribute (Color.White, Color.Black));
-        _textView.ColorScheme = _white;
+        _green = new Attribute (Color.Green, Color.Black);
+        _blue = new Attribute (Color.Blue, Color.Black);
+        _magenta = new Attribute (Color.Magenta, Color.Black);
+        _white = new Attribute (Color.White, Color.Black);
+        _textView.ColorScheme = new () { Focus = _white };
 
         _textView.Text =
             "/*Query to select:\nLots of data*/\nSELECT TOP 100 * \nfrom\n MyDb.dbo.Biochemistry where TestCode = 'blah';";
@@ -292,7 +292,7 @@ public class SyntaxHighlighting : Scenario
         _textView.ClearEventHandlers ("DrawContent");
         _textView.ClearEventHandlers ("DrawContentComplete");
 
-        _textView.InheritsPreviousColorScheme = false;
+        _textView.InheritsPreviousAttribute = false;
     }
 
     private bool ContainsPosition (Match m, int pos) { return pos >= m.Index && pos < m.Index + m.Length; }
@@ -317,27 +317,30 @@ public class SyntaxHighlighting : Scenario
 
         for (var y = 0; y < _textView.Lines; y++)
         {
-            List<RuneCell> line = _textView.GetLine (y);
+            List<Cell> line = _textView.GetLine (y);
 
             for (var x = 0; x < line.Count; x++)
             {
+                Cell cell = line [x];
+
                 if (commentMatches.Any (m => ContainsPosition (m, pos)))
                 {
-                    line [x].ColorScheme = _green;
+                    cell.Attribute = _green;
                 }
                 else if (singleQuoteMatches.Any (m => ContainsPosition (m, pos)))
                 {
-                    line [x].ColorScheme = _magenta;
+                    cell.Attribute = _magenta;
                 }
                 else if (keywordMatches.Any (m => ContainsPosition (m, pos)))
                 {
-                    line [x].ColorScheme = _blue;
+                    cell.Attribute = _blue;
                 }
                 else
                 {
-                    line [x].ColorScheme = _white;
+                    cell.Attribute = _white;
                 }
 
+                line [x] = cell;
                 pos++;
             }
 
@@ -384,10 +387,10 @@ public class SyntaxHighlighting : Scenario
 
     private void Quit () { Application.RequestStop (); }
 
-    private void SaveRuneCells ()
+    private void SaveCells ()
     {
         //Writing to file  
-        List<List<RuneCell>> cells = _textView.GetAllLines ();
+        List<List<Cell>> cells = _textView.GetAllLines ();
         WriteToJsonFile (_path, cells);
     }
 
