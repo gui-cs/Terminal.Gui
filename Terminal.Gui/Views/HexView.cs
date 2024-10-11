@@ -349,7 +349,7 @@ public class HexView : View, IDesignable
 
         if (me.Flags == MouseFlags.WheeledDown)
         {
-            DisplayStart = Math.Min (DisplayStart + BytesPerLine, GetEditedSize());
+            DisplayStart = Math.Min (DisplayStart + BytesPerLine, GetEditedSize ());
 
             return true;
         }
@@ -952,16 +952,8 @@ public class HexView : View, IDesignable
             return false;
         }
 
-        if (direction == NavigationDirection.Forward && _leftSideHasFocus)
-        {
-            _leftSideHasFocus = !_leftSideHasFocus;
-            RedisplayLine (Address);
-            _firstNibble = true;
-
-            return true;
-        }
-
-        if (direction == NavigationDirection.Backward && !_leftSideHasFocus)
+        if ((direction == NavigationDirection.Forward && _leftSideHasFocus)
+            || (direction == NavigationDirection.Backward && !_leftSideHasFocus))
         {
             _leftSideHasFocus = !_leftSideHasFocus;
             RedisplayLine (Address);
