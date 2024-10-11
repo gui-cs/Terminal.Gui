@@ -135,22 +135,23 @@ public class LineDrawing : Scenario
         var d = new Dialog
         {
             Title = title,
-            Height = 7
+            Width = Application.Force16Colors ? 35 : Dim.Auto (DimAutoStyle.Auto, Dim.Percent (80), Dim.Percent (90)),
+            Height = 10
         };
 
         var btnOk = new Button
         {
             X = Pos.Center () - 5,
-            Y = 4,
+            Y = Application.Force16Colors ? 6 : 4,
             Text = "Ok",
             Width = Dim.Auto (),
             IsDefault = true
         };
 
-        btnOk.Accept += (s, e) =>
+        btnOk.Accepting += (s, e) =>
                         {
                             accept = true;
-                            e.Handled = true;
+                            e.Cancel = true;
                             Application.RequestStop ();
                         };
 
@@ -162,30 +163,43 @@ public class LineDrawing : Scenario
             Width = Dim.Auto ()
         };
 
-        btnCancel.Accept += (s, e) =>
+        btnCancel.Accepting += (s, e) =>
                             {
-                                e.Handled = true;
+                                e.Cancel = true;
                                 Application.RequestStop ();
                             };
 
         d.Add (btnOk);
         d.Add (btnCancel);
 
-        /* Does not work
         d.AddButton (btnOk);
         d.AddButton (btnCancel);
-        */
-        var cp = new ColorPicker
+
+        View cp;
+        if (Application.Force16Colors)
         {
-            SelectedColor = current,
-            Width = Dim.Fill ()
-        };
+            cp = new ColorPicker16
+            {
+                SelectedColor = current.GetClosestNamedColor16 (),
+                Width = Dim.Fill ()
+            };
+        }
+        else
+        {
+            cp = new ColorPicker
+            {
+                SelectedColor = current,
+                Width = Dim.Fill (),
+                Style = new () { ShowColorName = true, ShowTextFields = true }
+            };
+            ((ColorPicker)cp).ApplyStyleChanges ();
+        }
 
         d.Add (cp);
 
         Application.Run (d);
         d.Dispose ();
-        newColor = cp.SelectedColor;
+        newColor = Application.Force16Colors ? ((ColorPicker16)cp).SelectedColor : ((ColorPicker)cp).SelectedColor;
 
         return accept;
     }
@@ -228,7 +242,7 @@ public class ToolsView : Window
 
         _addLayerBtn = new() { Text = "New Layer", X = Pos.Center (), Y = Pos.Bottom (_stylePicker) };
 
-        _addLayerBtn.Accept += (s, a) => AddLayer?.Invoke ();
+        _addLayerBtn.Accepting += (s, a) => AddLayer?.Invoke ();
         Add (_colors, _stylePicker, _addLayerBtn);
     }
 

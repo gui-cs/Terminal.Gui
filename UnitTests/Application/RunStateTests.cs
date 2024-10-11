@@ -25,10 +25,8 @@ public class RunStateTests
         var top = new Toplevel ();
         RunState rs = Application.Begin (top);
         Assert.NotNull (rs);
-        Assert.Equal (top, Application.Current);
         Application.End (rs);
 
-        Assert.Null (Application.Current);
         Assert.NotNull (Application.Top);
         Assert.NotNull (Application.MainLoop);
         Assert.NotNull (Application.Driver);

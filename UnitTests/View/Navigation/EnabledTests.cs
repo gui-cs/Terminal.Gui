@@ -258,7 +258,7 @@ public class EnabledTests () : TestsAllViews
         var wasClicked = false;
         var button = new Button { Text = "Click Me" };
         button.IsDefault = true;
-        button.Accept += (s, e) => wasClicked = !wasClicked;
+        button.Accepting += (s, e) => wasClicked = !wasClicked;
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (button);
         var top = new Toplevel ();

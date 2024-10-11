@@ -1,5 +1,5 @@
 {
-  "$schema": "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
+  "$schema": "https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json",
   "FileDialog.MaxSearchResults": 10000,
   "FileDialogStyle.DefaultUseColors": false,
   "FileDialogStyle.DefaultUseUnicodeCharacters": false,
@@ -75,7 +75,7 @@
               },
               "HotFocus": {
                 "Foreground": "#FFFF00",
-                "Background": "White"
+                "Background": "Black"
               },
               "Disabled": {
                 "Foreground": "BrightGreen",

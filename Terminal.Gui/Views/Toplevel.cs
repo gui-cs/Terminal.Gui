@@ -30,7 +30,7 @@ public partial class Toplevel : View
     {
         CanFocus = true;
         TabStop = TabBehavior.TabGroup;
-        Arrangement = ViewArrangement.Fixed;
+        Arrangement = ViewArrangement.Overlapped;
         Width = Dim.Fill ();
         Height = Dim.Fill ();
         ColorScheme = Colors.ColorSchemes ["TopLevel"];
@@ -72,32 +72,9 @@ public partial class Toplevel : View
     /// <summary>Gets the latest <see cref="MenuBar"/> added into this Toplevel.</summary>
     public MenuBar? MenuBar => (MenuBar?)Subviews?.LastOrDefault (s => s is MenuBar);
 
-    // TODO: Deprecate - Any view can host a statusbar in v2
-    /// <summary>Gets the latest <see cref="StatusBar"/> added into this Toplevel.</summary>
-    public StatusBar? StatusBar => (StatusBar?)Subviews?.LastOrDefault (s => s is StatusBar);
-
-
-    // TODO: Overlapped - Rename to AllSubviewsClosed - Move to View?
-    /// <summary>
-    ///     Invoked when the last child of the Toplevel <see cref="RunState"/> is closed from by
-    ///     <see cref="Application.End(RunState)"/>.
-    /// </summary>
-    public event EventHandler? AllChildClosed;
-
-    // TODO: Overlapped - Rename to *Subviews* - Move to View?
-    /// <summary>
-    ///     Invoked when a child of the Toplevel <see cref="RunState"/> is closed by
-    ///     <see cref="Application.End(RunState)"/>.
-    /// </summary>
-    public event EventHandler<ToplevelEventArgs>? ChildClosed;
-
-    // TODO: Overlapped - Rename to *Subviews* - Move to View?
-    /// <summary>Invoked when a child Toplevel's <see cref="RunState"/> has been loaded.</summary>
-    public event EventHandler<ToplevelEventArgs>? ChildLoaded;
-
-    // TODO: Overlapped - Rename to *Subviews* - Move to View?
-    /// <summary>Invoked when a cjhild Toplevel's <see cref="RunState"/> has been unloaded.</summary>
-    public event EventHandler<ToplevelEventArgs>? ChildUnloaded;
+    //// TODO: Deprecate - Any view can host a statusbar in v2
+    ///// <summary>Gets the latest <see cref="StatusBar"/> added into this Toplevel.</summary>
+    //public StatusBar? StatusBar => (StatusBar?)Subviews?.LastOrDefault (s => s is StatusBar);
 
     #endregion
 
@@ -116,11 +93,11 @@ public partial class Toplevel : View
     public bool IsLoaded { get; private set; }
 
     // TODO: IRunnable: Re-implement as an event on IRunnable; IRunnable.Activating/Activate
-    /// <summary>Invoked when the Toplevel <see cref="RunState"/> becomes the <see cref="Application.Current"/> Toplevel.</summary>
+    /// <summary>Invoked when the Toplevel <see cref="RunState"/> active.</summary>
     public event EventHandler<ToplevelEventArgs>? Activate;
 
     // TODO: IRunnable: Re-implement as an event on IRunnable; IRunnable.Deactivating/Deactivate?
-    /// <summary>Invoked when the Toplevel<see cref="RunState"/> ceases to be the <see cref="Application.Current"/> Toplevel.</summary>
+    /// <summary>Invoked when the Toplevel<see cref="RunState"/> ceases to be active.</summary>
     public event EventHandler<ToplevelEventArgs>? Deactivate;
 
     /// <summary>Invoked when the Toplevel's <see cref="RunState"/> is closed by <see cref="Application.End(RunState)"/>.</summary>
@@ -175,55 +152,7 @@ public partial class Toplevel : View
     /// </summary>
     public virtual void RequestStop ()
     {
-        if (IsOverlappedContainer
-            && Running
-            && (Application.Current == this
-                || Application.Current?.Modal == false
-                || (Application.Current?.Modal == true && Application.Current?.Running == false)))
-        {
-            foreach (Toplevel child in ApplicationOverlapped.OverlappedChildren!)
-            {
-                var ev = new ToplevelClosingEventArgs (this);
-
-                if (child.OnClosing (ev))
-                {
-                    return;
-                }
-
-                child.Running = false;
-                Application.RequestStop (child);
-            }
-
-            Running = false;
-            Application.RequestStop (this);
-        }
-        else if (IsOverlappedContainer && Running && Application.Current?.Modal == true && Application.Current?.Running == true)
-        {
-            var ev = new ToplevelClosingEventArgs (Application.Current);
-
-            if (OnClosing (ev))
-            {
-                return;
-            }
-
-            Application.RequestStop (Application.Current);
-        }
-        else if (!IsOverlappedContainer && Running && (!Modal || (Modal && Application.Current != this)))
-        {
-            var ev = new ToplevelClosingEventArgs (this);
-
-            if (OnClosing (ev))
-            {
-                return;
-            }
-
-            Running = false;
-            Application.RequestStop (this);
-        }
-        else
-        {
-            Application.RequestStop (Application.Current);
-        }
+        Application.RequestStop (Application.Top);
     }
 
     /// <summary>
@@ -234,28 +163,6 @@ public partial class Toplevel : View
 
     internal virtual void OnActivate (Toplevel deactivated) { Activate?.Invoke (this, new (deactivated)); }
 
-    /// <summary>
-    ///     Stops and closes the <see cref="Toplevel"/> specified by <paramref name="top"/>. If <paramref name="top"/> is
-    ///     the top-most Toplevel, <see cref="Application.RequestStop(Toplevel)"/> will be called, causing the application to
-    ///     exit.
-    /// </summary>
-    /// <param name="top">The Toplevel to request stop.</param>
-    public virtual void RequestStop (Toplevel top) { top.RequestStop (); }
-
-    internal virtual void OnAllChildClosed () { AllChildClosed?.Invoke (this, EventArgs.Empty); }
-
-    internal virtual void OnChildClosed (Toplevel top)
-    {
-        if (IsOverlappedContainer)
-        {
-            SetSubViewNeedsDisplay ();
-        }
-
-        ChildClosed?.Invoke (this, new (top));
-    }
-
-    internal virtual void OnChildLoaded (Toplevel top) { ChildLoaded?.Invoke (this, new (top)); }
-    internal virtual void OnChildUnloaded (Toplevel top) { ChildUnloaded?.Invoke (this, new (top)); }
     internal virtual void OnClosed (Toplevel top) { Closed?.Invoke (this, new (top)); }
 
     internal virtual bool OnClosing (ToplevelClosingEventArgs ev)
@@ -295,92 +202,11 @@ public partial class Toplevel : View
     }
 
     #endregion
-
-    #region Draw
-
-    /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle viewport)
-    {
-        if (!Visible)
-        {
-            return;
-        }
-
-        if (NeedsDisplay || SubViewNeedsDisplay /*|| LayoutNeeded*/)
-        {
-            Clear ();
-
-            //LayoutSubviews ();
-            PositionToplevels ();
-
-            if (this == ApplicationOverlapped.OverlappedTop)
-            {
-                // This enables correct draw behavior when switching between overlapped subviews
-                foreach (Toplevel top in ApplicationOverlapped.OverlappedChildren!.AsEnumerable ().Reverse ())
-                {
-                    if (top.Frame.IntersectsWith (Viewport))
-                    {
-                        if (top != this && !top.IsCurrentTop && !OutsideTopFrame (top) && top.Visible)
-                        {
-                            top.SetNeedsLayout ();
-                            top.SetNeedsDisplay (top.Viewport);
-                            top.Draw ();
-                            top.OnRenderLineCanvas ();
-                        }
-                    }
-                }
-            }
-
-            // BUGBUG: This appears to be a hack to get ScrollBarViews to render correctly.
-            foreach (View view in Subviews)
-            {
-                if (view.Frame.IntersectsWith (Viewport) && !OutsideTopFrame (this))
-                {
-                    //view.SetNeedsLayout ();
-                    view.SetNeedsDisplay ();
-                    view.SetSubViewNeedsDisplay ();
-                }
-            }
-
-            base.OnDrawContent (viewport);
-        }
-    }
-
-    #endregion
-
+    
     #region Size / Position Management
 
     // TODO: Make cancelable?
-    internal virtual void OnSizeChanging (SizeChangedEventArgs size) { SizeChanging?.Invoke (this, size); }
-
-    /// <inheritdoc/>
-    public override Point? PositionCursor ()
-    {
-        if (!IsOverlappedContainer)
-        {
-            return null;
-        }
-
-        // This code path only happens when the Toplevel is an Overlapped container
-
-        if (Focused is null)
-        {
-            // TODO: this is an Overlapped hack
-            foreach (Toplevel top in ApplicationOverlapped.OverlappedChildren!)
-            {
-                if (top != this && top.Visible)
-                {
-                    top.SetFocus ();
-
-                    return null;
-                }
-            }
-        }
-
-        Point? cursor2 = base.PositionCursor ();
-
-        return null;
-    }
+    internal void OnSizeChanging (SizeChangedEventArgs size) { SizeChanging?.Invoke (this, size); }
 
     /// <summary>
     ///     Adjusts the location and size of <paramref name="top"/> within this Toplevel. Virtual method enabling
@@ -399,8 +225,9 @@ public partial class Toplevel : View
                                                             top.Frame.X,
                                                             top.Frame.Y,
                                                             out int nx,
-                                                            out int ny,
-                                                            out StatusBar? sb
+                                                            out int ny
+                                                           //,
+                                                           // out StatusBar? sb
                                                            );
 
         if (superView is null)
@@ -416,8 +243,10 @@ public partial class Toplevel : View
             maxWidth -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
         }
 
-        if ((superView != top || top?.SuperView is { } || (top != Application.Top && top!.Modal) || (top?.SuperView is null && ApplicationOverlapped.IsOverlapped (top)))
+        // BUGBUG: The && true is a temp hack
+        if ((superView != top || top?.SuperView is { } || (top != Application.Top && top!.Modal) || (top == Application.Top && top?.SuperView is null))
             && (top!.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y))
+
         {
             if (top?.X is null or PosAbsolute && top?.Frame.X != nx)
             {
@@ -432,16 +261,16 @@ public partial class Toplevel : View
             }
         }
 
-        // TODO: v2 - This is a hack to get the StatusBar to be positioned correctly.
-        if (sb != null
-            && !top!.Subviews.Contains (sb)
-            && ny + top.Frame.Height != superView.Frame.Height - (sb.Visible ? 1 : 0)
-            && top.Height is DimFill
-            && -top.Height.GetAnchor (0) < 1)
-        {
-            top.Height = Dim.Fill (sb.Visible ? 1 : 0);
-            layoutSubviews = true;
-        }
+        //// TODO: v2 - This is a hack to get the StatusBar to be positioned correctly.
+        //if (sb != null
+        //    && !top!.Subviews.Contains (sb)
+        //    && ny + top.Frame.Height != superView.Frame.Height - (sb.Visible ? 1 : 0)
+        //    && top.Height is DimFill
+        //    && -top.Height.GetAnchor (0) < 1)
+        //{
+        //    top.Height = Dim.Fill (sb.Visible ? 1 : 0);
+        //    layoutSubviews = true;
+        //}
 
         if (superView.LayoutNeeded || layoutSubviews)
         {
@@ -456,30 +285,6 @@ public partial class Toplevel : View
 
     /// <summary>Invoked when the terminal has been resized. The new <see cref="Size"/> of the terminal is provided.</summary>
     public event EventHandler<SizeChangedEventArgs>? SizeChanging;
-
-    private bool OutsideTopFrame (Toplevel top)
-    {
-        if (top.Frame.X > Driver.Cols || top.Frame.Y > Driver.Rows)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    // TODO: v2 - Not sure this is needed anymore.
-    internal void PositionToplevels ()
-    {
-        PositionToplevel (this);
-
-        foreach (View top in Subviews)
-        {
-            if (top is Toplevel)
-            {
-                PositionToplevel ((Toplevel)top);
-            }
-        }
-    }
 
     #endregion
 }
@@ -536,44 +341,5 @@ public class ToplevelEqualityComparer : IEqualityComparer<Toplevel>
         }
 
         return hCode.GetHashCode ();
-    }
-}
-
-/// <summary>
-///     Implements the <see cref="IComparer{T}"/> to sort the <see cref="Toplevel"/> from the
-///     <see cref="ApplicationOverlapped.OverlappedChildren"/> if needed.
-/// </summary>
-public sealed class ToplevelComparer : IComparer<Toplevel>
-{
-    /// <summary>
-    ///     Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the
-    ///     other.
-    /// </summary>
-    /// <param name="x">The first object to compare.</param>
-    /// <param name="y">The second object to compare.</param>
-    /// <returns>
-    ///     A signed integer that indicates the relative values of <paramref name="x"/> and <paramref name="y"/>, as shown
-    ///     in the following table.Value Meaning Less than zero <paramref name="x"/> is less than <paramref name="y"/>.Zero
-    ///     <paramref name="x"/> equals <paramref name="y"/> .Greater than zero <paramref name="x"/> is greater than
-    ///     <paramref name="y"/>.
-    /// </returns>
-    public int Compare (Toplevel? x, Toplevel? y)
-    {
-        if (ReferenceEquals (x, y))
-        {
-            return 0;
-        }
-
-        if (x is null)
-        {
-            return -1;
-        }
-
-        if (y is null)
-        {
-            return 1;
-        }
-
-        return string.CompareOrdinal (x.Id, y.Id);
     }
 }

@@ -1,27 +1,95 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "description": "The JSON schema for the Terminal.Gui Configuration Manager (https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json).",
+  "description": "The JSON schema for the Terminal.Gui Configuration Manager (https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json).",
   "type": "object",
   "properties": {
-    "Application.AlternateForwardKey": {
-      "description": "Alternative key for navigating forwards through views. SCtrl+Tab is the primary key.",
+    "Application.ArrangeKey": {
+      "description": "Key eanable arrange mode (move/size with keyboard).",
       "$ref": "#/definitions/Key"
     },
-    "Application.AlternateBackwardKey": {
-      "description": "Alternative key for navigating backwards through views. Shift+Ctrl+Tab is the primary key.",
+    "Application.Force16Colors": {
+      "description": "Force the application to use 16 colors.",
+      "type": "boolean"
+    },
+    "Application.ForceDriver": {
+      "description": "Force the application to use a specific driver.",
+      "type": "string"
+    },
+    "Application.IsMouseDisabled": {
+      "description": "Disable or enable the mouse. The mouse is enabled by default.",
+      "type": "boolean"
+    },
+    "Application.NextTabGroupKey": {
+      "description": "Key to navigate to the next tab group.",
+      "$ref": "#/definitions/Key"
+    },
+    "Application.NextTabKey": {
+      "description": "Key to navigate to the next tab.",
+      "$ref": "#/definitions/Key"
+    },
+    "Application.PrevTabGroupKey": {
+      "description": "Key to navigate to the previous tab group.",
+      "$ref": "#/definitions/Key"
+    },
+    "Application.PrevTabKey": {
+      "description": "Key to navigate to the previous tab.",
       "$ref": "#/definitions/Key"
     },
     "Application.QuitKey": {
       "description": "The key to quit the application. Esc is the default.",
       "$ref": "#/definitions/Key"
     },
-    "Application.IsMouseDisabled": {
-      "description": "Disable or enable the mouse. The mouse is enabled by default.",
+    "AppSettings": {
+      "description": "Application-specific settings.",
+      "type": "object",
+      "properties": {
+        "ConfigurationEditor.EditorColorScheme": {
+          "description": "Color scheme for the configuration editor.",
+          "$ref": "#/definitions/ColorScheme"
+        },
+        "UICatalog.StatusBar": {
+          "description": "Enable or disable the status bar in the UI catalog.",
+          "type": "boolean"
+        }
+      }
+    },
+    "Colors16": {
+      "description": "Mapping of 16 colors to their names.",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/Color"
+      }
+    },
+    "ConfigurationManager.ThrowOnJsonErrors": {
+      "description": "Throw exceptions on JSON errors.",
       "type": "boolean"
     },
-    "Application.UseSystemConsole": {
-      "description": "If true, forces the use of the System.Console-based (aka NetDriver) driver. The default is false.",
+    "ContextMenu.DefaultKey": {
+      "description": "Default key for the context menu.",
+      "$ref": "#/definitions/Key"
+    },
+    "FileDialog.MaxSearchResults": {
+      "description": "Maximum number of search results in the file dialog.",
+      "type": "integer"
+    },
+    "FileDialogStyle.DefaultUseColors": {
+      "description": "Use colors in the file dialog by default.",
       "type": "boolean"
+    },
+    "FileDialogStyle.DefaultUseUnicodeCharacters": {
+      "description": "Use Unicode characters in the file dialog by default.",
+      "type": "boolean"
+    },
+    "Glyphs": {
+      "description": "Custom glyphs used in the application.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "Key.Separator": {
+      "description": "Separator used in key combinations.",
+      "type": "string"
     },
     "Theme": {
       "description": "The currently selected theme. The default is 'Default'.",
@@ -30,13 +98,8 @@
     "Themes": {
       "description": "An array of Theme objects. Each Theme specifies a set of settings for an application. Set Theme to the name of the active theme.",
       "type": "array",
-      "properties": {
-        "Themes": {
-          "$ref": "#/definitions/Theme"
-        }
-      },
-      "additionalProperties": {
-        "$ref": "#/definitions/ColorScheme"
+      "items": {
+        "$ref": "#/definitions/Theme"
       }
     }
   },
@@ -45,34 +108,81 @@
       "description": "A Theme is a collection of settings that are named.",
       "type": "object",
       "properties": {
+        "Button.DefaultHighlightStyle": {
+          "description": "Default highlight style for buttons.",
+          "type": "string"
+        },
+        "Button.DefaultShadow": {
+          "description": "Default shadow style for buttons.",
+          "type": "string"
+        },
+        "CheckBox.DefaultHighlightStyle": {
+          "description": "Default highlight style for checkboxes.",
+          "type": "string"
+        },
         "ColorSchemes": {
           "description": "The ColorSchemes defined for this Theme.",
-          "$ref": "#/definitions/ColorSchemes"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ColorScheme"
+          }
+        },
+        "Dialog.DefaultBorderStyle": {
+          "description": "Default border style for dialogs.",
+          "type": "string"
+        },
+        "Dialog.DefaultButtonAlignment": {
+          "description": "Default button alignment for dialogs.",
+          "type": "string"
+        },
+        "Dialog.DefaultButtonAlignmentModes": {
+          "description": "Default button alignment modes for dialogs.",
+          "type": "string"
+        },
+        "Dialog.DefaultMinimumHeight": {
+          "description": "Default minimum height for dialogs.",
+          "type": "integer"
+        },
+        "Dialog.DefaultMinimumWidth": {
+          "description": "Default minimum width for dialogs.",
+          "type": "integer"
+        },
+        "Dialog.DefaultShadow": {
+          "description": "Default shadow style for dialogs.",
+          "type": "string"
+        },
+        "FrameView.DefaultBorderStyle": {
+          "description": "Default border style for frame views.",
+          "type": "string"
+        },
+        "MessageBox.DefaultBorderStyle": {
+          "description": "Default border style for message boxes.",
+          "type": "string"
+        },
+        "MessageBox.DefaultButtonAlignment": {
+          "description": "Default button alignment for message boxes.",
+          "type": "string"
+        },
+        "MessageBox.DefaultMinimumHeight": {
+          "description": "Default minimum height for message boxes.",
+          "type": "integer"
+        },
+        "MessageBox.DefaultMinimumWidth": {
+          "description": "Default minimum width for message boxes.",
+          "type": "integer"
+        },
+        "NerdFonts.Enable": {
+          "description": "Enable or disable Nerd Fonts.",
+          "type": "boolean"
+        },
+        "Window.DefaultBorderStyle": {
+          "description": "Default border style for windows.",
+          "type": "string"
+        },
+        "Window.DefaultShadow": {
+          "description": "Default shadow style for windows.",
+          "type": "string"
         }
-      }
-    },
-    "ColorSchemes": {
-      "description": "A list of ColorSchemes. Each ColorScheme specifies a set of Attributes (Foreground & Background).",
-      "type": "array",
-      "properties": {
-        "TopLevel": {
-          "$ref": "#/definitions/ColorScheme"
-        },
-        "Base": {
-          "$ref": "#/definitions/ColorScheme"
-        },
-        "Dialog": {
-          "$ref": "#/definitions/ColorScheme"
-        },
-        "Menu": {
-          "$ref": "#/definitions/ColorScheme"
-        },
-        "Error": {
-          "$ref": "#/definitions/ColorScheme"
-        }
-      },
-      "additionalProperties": {
-        "$ref": "#/definitions/ColorScheme"
       }
     },
     "ColorScheme": {
@@ -96,7 +206,7 @@
           "$ref": "#/definitions/Attribute"
         },
         "Disabled": {
-          "description": "The foreground and background color for text when the view disabled.",
+          "description": "The foreground and background color for text when the view is disabled.",
           "$ref": "#/definitions/Attribute"
         }
       }
@@ -118,175 +228,170 @@
       ]
     },
     "Color": {
-      "description": "One be either one of 16 standard color names or an rgb(r,g,b) tuple.",
+      "description": "One be either one of the W3C standard color names, an rgb(r,g,b) tuple, or a hex color string in the format #RRGGBB.",
       "$schema": "http://json-schema.org/draft-07/schema#",
       "type": "string",
-      "properties": {
-        "color": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Black",
-                "Blue",
-                "Green",
-                "Cyan",
-                "Red",
-                "Magenta",
-                "Brown",
-                "Gray",
-                "DarkGray",
-                "BrightBlue",
-                "BrightGreen",
-                "BrightCyan",
-                "BrightRed",
-                "BrightMagenta",
-                "BrightYellow",
-                "White"
-              ]
-            },
-            {
-              "type": "string",
-              "pattern": "^rgb\\(\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*\\)$"
-            }
-          ]
-        }
-      }
-    },
-    "Key": {
-      "description": "A key pressed on the keyboard.",
-      "type": "object",
-      "properties": {
-        "Key": {
-          "description": "A key name (e.g. A, b, 1, 2, Enter, Esc, F5, etc.) or an integer value (e.g. 65, 66, 67, etc.).",
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Null",
-                "Backspace",
-                "Tab",
-                "Enter",
-                "Clear",
-                "Esc",
-                "Space",
-                "D0",
-                "D1",
-                "D2",
-                "D3",
-                "D4",
-                "D5",
-                "D6",
-                "D7",
-                "D8",
-                "D9",
-                "0",
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
-                "6",
-                "7",
-                "8",
-                "9",
-                "a",
-                "b",
-                "c",
-                "d",
-                "e",
-                "f",
-                "g",
-                "h",
-                "i",
-                "j",
-                "k",
-                "l",
-                "m",
-                "n",
-                "o",
-                "p",
-                "q",
-                "r",
-                "s",
-                "t",
-                "u",
-                "v",
-                "w",
-                "x",
-                "y",
-                "z",
-                "A",
-                "B",
-                "C",
-                "D",
-                "E",
-                "F",
-                "G",
-                "H",
-                "I",
-                "J",
-                "K",
-                "L",
-                "M",
-                "N",
-                "O",
-                "P",
-                "Q",
-                "R",
-                "S",
-                "T",
-                "U",
-                "V",
-                "W",
-                "X",
-                "Y",
-                "Z",
-                "F1",
-                "F2",
-                "F3",
-                "F4",
-                "F5",
-                "F6",
-                "F7",
-                "F8",
-                "F9",
-                "F10",
-                "F11",
-                "F12",
-                "Insert",
-                "Delete",
-                "Home",
-                "End",
-                "PageUp",
-                "PageDown",
-                "Up",
-                "Down",
-                "Left",
-                "Right"
-              ]
-            },
-            {
-              "type": "integer"
-            }
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "AliceBlue",
+            "AntiqueWhite",
+            "Aqua",
+            "Aquamarine",
+            "Azure",
+            "Beige",
+            "Bisque",
+            "Black",
+            "BlanchedAlmond",
+            "Blue",
+            "BlueViolet",
+            "Brown",
+            "BurlyWood",
+            "CadetBlue",
+            "Chartreuse",
+            "Chocolate",
+            "Coral",
+            "CornflowerBlue",
+            "Cornsilk",
+            "Crimson",
+            "Cyan",
+            "DarkBlue",
+            "DarkCyan",
+            "DarkGoldenRod",
+            "DarkGray",
+            "DarkGreen",
+            "DarkKhaki",
+            "DarkMagenta",
+            "DarkOliveGreen",
+            "DarkOrange",
+            "DarkOrchid",
+            "DarkRed",
+            "DarkSalmon",
+            "DarkSeaGreen",
+            "DarkSlateBlue",
+            "DarkSlateGray",
+            "DarkTurquoise",
+            "DarkViolet",
+            "DeepPink",
+            "DeepSkyBlue",
+            "DimGray",
+            "DodgerBlue",
+            "FireBrick",
+            "FloralWhite",
+            "ForestGreen",
+            "Fuchsia",
+            "Gainsboro",
+            "GhostWhite",
+            "Gold",
+            "GoldenRod",
+            "Gray",
+            "Green",
+            "GreenYellow",
+            "HoneyDew",
+            "HotPink",
+            "IndianRed",
+            "Indigo",
+            "Ivory",
+            "Khaki",
+            "Lavender",
+            "LavenderBlush",
+            "LawnGreen",
+            "LemonChiffon",
+            "LightBlue",
+            "LightCoral",
+            "LightCyan",
+            "LightGoldenRodYellow",
+            "LightGray",
+            "LightGreen",
+            "LightPink",
+            "LightSalmon",
+            "LightSeaGreen",
+            "LightSkyBlue",
+            "LightSlateGray",
+            "LightSteelBlue",
+            "LightYellow",
+            "Lime",
+            "LimeGreen",
+            "Linen",
+            "Magenta",
+            "Maroon",
+            "MediumAquaMarine",
+            "MediumBlue",
+            "MediumOrchid",
+            "MediumPurple",
+            "MediumSeaGreen",
+            "MediumSlateBlue",
+            "MediumSpringGreen",
+            "MediumTurquoise",
+            "MediumVioletRed",
+            "MidnightBlue",
+            "MintCream",
+            "MistyRose",
+            "Moccasin",
+            "NavajoWhite",
+            "Navy",
+            "OldLace",
+            "Olive",
+            "OliveDrab",
+            "Orange",
+            "OrangeRed",
+            "Orchid",
+            "PaleGoldenRod",
+            "PaleGreen",
+            "PaleTurquoise",
+            "PaleVioletRed",
+            "PapayaWhip",
+            "PeachPuff",
+            "Peru",
+            "Pink",
+            "Plum",
+            "PowderBlue",
+            "Purple",
+            "RebeccaPurple",
+            "Red",
+            "RosyBrown",
+            "RoyalBlue",
+            "SaddleBrown",
+            "Salmon",
+            "SandyBrown",
+            "SeaGreen",
+            "SeaShell",
+            "Sienna",
+            "Silver",
+            "SkyBlue",
+            "SlateBlue",
+            "SlateGray",
+            "Snow",
+            "SpringGreen",
+            "SteelBlue",
+            "Tan",
+            "Teal",
+            "Thistle",
+            "Tomato",
+            "Turquoise",
+            "Violet",
+            "Wheat",
+            "White",
+            "WhiteSmoke",
+            "Yellow",
+            "YellowGreen"
           ]
         },
-        "Modifiers": {
-          "description": "A keyboard modifier (e.g. Ctrl, Alt, or Shift).",
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "Ctrl",
-              "Alt",
-              "Shift"
-            ]
-          }
+        {
+          "type": "string",
+          "pattern": "^rgb\\(\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*\\)$"
+        },
+        {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
         }
-      },
-      "required": [
-        "Key"
       ]
+    },
+    "Key": {
+      "description": "A key pressed on the keyboard (e.g. \"Ctrl+Q\")",
+      "type": "string"
     }
   }
 }
+

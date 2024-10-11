@@ -16,7 +16,7 @@ public class AttributeTests
     {
         // Arrange & Act
         var foregroundColor = new Color (0, 0, 255);
-        var backgroundColorName = ColorName.Black;
+        var backgroundColorName = ColorName16.Black;
         var attribute = new Attribute (foregroundColor, backgroundColorName);
 
         // Assert
@@ -41,7 +41,7 @@ public class AttributeTests
     public void ColorNamesAndColorConstructor ()
     {
         // Arrange & Act
-        var foregroundColorName = ColorName.BrightYellow;
+        var foregroundColorName = ColorName16.BrightYellow;
         var backgroundColor = new Color (128, 128, 128);
         var attribute = new Attribute (foregroundColorName, backgroundColor);
 
@@ -54,7 +54,7 @@ public class AttributeTests
     public void ColorNamesConstructor ()
     {
         // Arrange & Act
-        var attribute = new Attribute (ColorName.Blue);
+        var attribute = new Attribute (ColorName16.Blue);
 
         // Assert
         Assert.Equal (new Color (Color.Blue), attribute.Foreground);
@@ -278,7 +278,7 @@ public class AttributeTests
     {
         // Arrange
         var foregroundColor = new Color (255, 0);
-        var backgroundColorName = ColorName.White;
+        var backgroundColorName = ColorName16.White;
 
         // Act
         var attribute = new Attribute (foregroundColor, backgroundColorName);
@@ -292,7 +292,7 @@ public class AttributeTests
     public void MakeColorNamesAndColor_ForegroundAndBackgroundShouldMatchInput ()
     {
         // Arrange
-        var foregroundColorName = ColorName.Green;
+        var foregroundColorName = ColorName16.Green;
         var backgroundColor = new Color (128, 128, 128);
 
         // Act
@@ -307,8 +307,8 @@ public class AttributeTests
     public void MakeColorNamesAndColorNames_ForegroundAndBackgroundShouldMatchInput ()
     {
         // Arrange
-        var foregroundColorName = ColorName.BrightYellow;
-        var backgroundColorName = ColorName.Black;
+        var foregroundColorName = ColorName16.BrightYellow;
+        var backgroundColorName = ColorName16.Black;
 
         // Act
         var attribute = new Attribute (foregroundColorName, backgroundColorName);

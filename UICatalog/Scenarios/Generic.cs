@@ -17,8 +17,8 @@ public sealed class MyScenario : Scenario
             Title = GetQuitKeyAndName (),
         };
 
-        var button = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Press me!" };
-        button.Accept += (s, e) => MessageBox.ErrorQuery ("Error", "You pressed the button!", "Ok");
+        var button = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "_Press me!" };
+        button.Accepting += (s, e) => MessageBox.ErrorQuery ("Error", "You pressed the button!", "_Ok");
         appWindow.Add (button);
 
         // Run - Start the application.

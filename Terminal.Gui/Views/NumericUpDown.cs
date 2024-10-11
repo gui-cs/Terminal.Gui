@@ -56,7 +56,7 @@ public class NumericUpDown<T> : View where T : notnull
             Title = $"{Glyphs.DownArrow}",
             WantContinuousButtonPressed = true,
             CanFocus = false,
-            ShadowStyle = ShadowStyle.None
+            ShadowStyle = ShadowStyle.None,
         };
 
         _number = new ()
@@ -81,13 +81,13 @@ public class NumericUpDown<T> : View where T : notnull
             Title = $"{Glyphs.UpArrow}",
             WantContinuousButtonPressed = true,
             CanFocus = false,
-            ShadowStyle = ShadowStyle.None
+            ShadowStyle = ShadowStyle.None,
         };
 
         CanFocus = true;
 
-        _down.Accept += OnDownButtonOnAccept;
-        _up.Accept += OnUpButtonOnAccept;
+        _down.Accepting += OnDownButtonOnAccept;
+        _up.Accepting += OnUpButtonOnAccept;
 
         Add (_down, _number, _up);
 
@@ -133,9 +133,17 @@ public class NumericUpDown<T> : View where T : notnull
 
         return;
 
-        void OnDownButtonOnAccept (object? s, HandledEventArgs e) { InvokeCommand (Command.ScrollDown); }
+        void OnDownButtonOnAccept (object? s, CommandEventArgs e)
+        {
+            InvokeCommand (Command.ScrollDown);
+            e.Cancel = true;
+        }
 
-        void OnUpButtonOnAccept (object? s, HandledEventArgs e) { InvokeCommand (Command.ScrollUp); }
+        void OnUpButtonOnAccept (object? s, CommandEventArgs e)
+        {
+            InvokeCommand (Command.ScrollUp);
+            e.Cancel = true;
+        }
     }
 
     private T _value = default!;

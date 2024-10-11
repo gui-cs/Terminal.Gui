@@ -122,7 +122,7 @@ public class WizardAsView : Scenario
             Text = "Press Me to Rename Step", X = Pos.Right (buttonLbl), Y = Pos.Top (buttonLbl)
         };
 
-        button.Accept += (s, e) =>
+        button.Accepting += (s, e) =>
                           {
                               secondStep.Title = "2nd Step";
 
@@ -147,6 +147,7 @@ public class WizardAsView : Scenario
         lastStep.HelpText =
             "The wizard is complete!\n\nPress the Finish button to continue.\n\nPressing Esc will cancel.";
 
+        wizard.Y = Pos.Bottom (menu);
         topLevel.Add (wizard);
         Application.Run (topLevel);
         topLevel.Dispose ();

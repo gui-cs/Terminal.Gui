@@ -53,11 +53,11 @@ public readonly partial record struct Color
     public static implicit operator Color (uint u) { return new Color (u); }
 
     /// <summary>
-    ///     Implicit conversion from <see cref="GetClosestNamedColor (Color)"/> to <see cref="Color"/> via lookup from
-    ///     <see cref="ColorExtensions.ColorNameToColorMap"/>.
+    ///     Implicit conversion from <see cref="GetClosestNamedColor16(Terminal.Gui.Color)"/> to <see cref="Color"/> via lookup from
+    ///     <see cref="ColorExtensions.ColorName16ToColorMap"/>.
     /// </summary>
     [Pure]
-    public static implicit operator Color (ColorName colorName) { return ColorExtensions.ColorNameToColorMap [colorName]; }
+    public static implicit operator Color (ColorName16 colorName) { return ColorExtensions.ColorName16ToColorMap [colorName]; }
 
     /// <summary>
     ///     Implicit conversion from <see cref="Vector4"/> to <see cref="Color"/>, where (<see cref="Vector4.X"/>,

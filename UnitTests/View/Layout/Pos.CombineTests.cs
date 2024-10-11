@@ -66,7 +66,7 @@ public class PosCombineTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void PosCombine_DimCombine_View_With_SubViews ()
     {
-        Toplevel top = new Toplevel () { Width = 80, Height = 25 };
+        Application.Top = new Toplevel () { Width = 80, Height = 25 };
         var win1 = new Window { Id = "win1", Width = 20, Height = 10 };
         var view1 = new View
         {
@@ -85,18 +85,21 @@ public class PosCombineTests (ITestOutputHelper output)
         view2.Add (view3);
         win2.Add (view2);
         win1.Add (view1, win2);
-        top.Add (win1);
-        top.BeginInit ();
-        top.EndInit ();
+        Application.Top.Add (win1);
+        Application.Top.BeginInit ();
+        Application.Top.EndInit ();
 
-        Assert.Equal (new Rectangle (0, 0, 80, 25), top.Frame);
+        Assert.Equal (new Rectangle (0, 0, 80, 25), Application.Top.Frame);
         Assert.Equal (new Rectangle (0, 0, 5, 1), view1.Frame);
         Assert.Equal (new Rectangle (0, 0, 20, 10), win1.Frame);
         Assert.Equal (new Rectangle (0, 2, 10, 3), win2.Frame);
         Assert.Equal (new Rectangle (0, 0, 8, 1), view2.Frame);
         Assert.Equal (new Rectangle (0, 0, 7, 1), view3.Frame);
-        var foundView = View.FindDeepestView (top, new (9, 4));
+        var foundView = View.GetViewsUnderMouse (new Point(9, 4)).LastOrDefault ();
         Assert.Equal (foundView, view2);
+        Application.Top.Dispose ();
+        Application.ResetState (ignoreDisposed: true);
+
     }
 
     [Fact]
@@ -136,7 +139,7 @@ public class PosCombineTests (ITestOutputHelper output)
 
         Assert.Throws<InvalidOperationException> (() => Application.Run ());
         top.Dispose ();
-        Application.Shutdown ();
+        Application.ResetState (ignoreDisposed: true);
     }
 
 }

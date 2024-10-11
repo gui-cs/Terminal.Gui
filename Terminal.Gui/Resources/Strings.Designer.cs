@@ -196,6 +196,15 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to BrightGreen.
+        /// </summary>
+        internal static string _16C60C {
+            get {
+                return ResourceManager.GetString("#16C60C", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to MidnightBlue.
         /// </summary>
         internal static string _191970 {
@@ -255,6 +264,15 @@ namespace Terminal.Gui.Resources {
         internal static string _32CD32 {
             get {
                 return ResourceManager.GetString("#32CD32", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BrightBlue.
+        /// </summary>
+        internal static string _3B78FF {
+            get {
+                return ResourceManager.GetString("#3B78FF", resourceCulture);
             }
         }
         
@@ -340,6 +358,15 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to BrightCyan.
+        /// </summary>
+        internal static string _61D6D6 {
+            get {
+                return ResourceManager.GetString("#61D6D6", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CornflowerBlue.
         /// </summary>
         internal static string _6495ED {
@@ -399,6 +426,15 @@ namespace Terminal.Gui.Resources {
         internal static string _708090 {
             get {
                 return ResourceManager.GetString("#708090", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DarkGray.
+        /// </summary>
+        internal static string _767676 {
+            get {
+                return ResourceManager.GetString("#767676", resourceCulture);
             }
         }
         
@@ -682,6 +718,15 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to BrightMagenta.
+        /// </summary>
+        internal static string _B4009E {
+            get {
+                return ResourceManager.GetString("#B4009E", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to DarkGoldenRod.
         /// </summary>
         internal static string _B8860B {
@@ -871,6 +916,15 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to BrightRed.
+        /// </summary>
+        internal static string _E74856 {
+            get {
+                return ResourceManager.GetString("#E74856", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to DarkSalmon.
         /// </summary>
         internal static string _E9967A {
@@ -993,6 +1047,15 @@ namespace Terminal.Gui.Resources {
         internal static string _F8F8FF {
             get {
                 return ResourceManager.GetString("#F8F8FF", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BrightYellow.
+        /// </summary>
+        internal static string _F9F1A5 {
+            get {
+                return ResourceManager.GetString("#F9F1A5", resourceCulture);
             }
         }
         
@@ -1371,6 +1434,15 @@ namespace Terminal.Gui.Resources {
         internal static string btnYes {
             get {
                 return ResourceManager.GetString("btnYes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Co_lors.
+        /// </summary>
+        internal static string ctxColors {
+            get {
+                return ResourceManager.GetString("ctxColors", resourceCulture);
             }
         }
         

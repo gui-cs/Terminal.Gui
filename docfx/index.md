@@ -1,10 +1,6 @@
 # Terminal.Gui v2 - Cross Platform Terminal UI toolkit for .NET
 
-**NOTE** 
->v2 is still in development (see the `v2_develop` branch). The current stable version of v1 is in the `develop` branch. 
-
-
-
+> **NOTE** : v2 is still in development (see the `v2_develop` branch). The current stable version of v1 is in the `develop` branch. 
 
 A toolkit for building rich console apps for .NET that run on Windows, the Mac, and Linux.
 
@@ -12,7 +8,7 @@ A toolkit for building rich console apps for .NET that run on Windows, the Mac, 
 
 ## Terminal.Gui API Documentation
 
-* [Conceptual Documentation](~/docs)
+* [Conceptual Documentation](docs/index.md)
 * [API Reference](~/api/Terminal.Gui.yml)
 
 ## UI Catalog

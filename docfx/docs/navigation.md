@@ -6,6 +6,7 @@
 - What are the visual cues that help the user know what keystrokes will change the focus?
 - What are the visual cues that help the user know what keystrokes will cause action in elements of the application that don't currently have focus?
 - What is the order in which UI elements are traversed when using keyboard navigation?
+- What are the default actions for standard key/mouse input (e.g. Hotkey, `Space`, `Enter`, `MouseClick`)?
 
 ## Lexicon & Taxonomy
 
@@ -208,7 +209,18 @@ These could also be named `Gain/Lose`. They could also be combined into a single
 
 QUESTION: Should we retain the same names as in v1 to simplify porting? Or, given the semantics of `Handled` v. `Cancel` are reversed would it be better to rename and/or combine?
 
-## `TabIndex` and `TabIndexes`
+## Built-In Views Interactivity
+
+|                |                         |            |               | **Keyboard** |                       |                              |                           | **Mouse**                    |                              |                              |                |               |
+|----------------|-------------------------|------------|---------------|--------------|-----------------------|------------------------------|---------------------------|------------------------------|------------------------------|------------------------------|----------------|---------------|
+|                | **Number<br>of States** | **Static** | **IsDefault** | **Hotkeys**  | **Select<br>Command** | **Accept<br>Command**        | **Hotkey<br>Command**     | **CanFocus<br>Click**        | **CanFocus<br>DblCLick**     | **!CanFocus<br>Click**       | **RightClick** | **GrabMouse** |
+| **View**       | 1                       | Yes        | No            | 1            | OnSelect              | OnAccept                     | Focus                     | Focus                        |                              |                              |                | No            |
+| **Label**      | 1                       | Yes        | No            | 1            | OnSelect              | OnAccept                     | FocusNext                 | Focus                        |                              | FocusNext                    |                | No            |
+| **Button**     | 1                       | No         | Yes           | 1            | OnSelect              | Focus<br>OnAccept            | Focus<br>OnAccept         | HotKey                       |                              | Select                       |                | No            |
+| **Checkbox**   | 3                       | No         | No            | 1            | OnSelect<br>Advance   | OnAccept                     | OnAccept                  | Select                       |                              | Select                       |                | No            |
+| **RadioGroup** | > 1                     | No         | No            | 2+           | Advance               | Set SelectedItem<br>OnAccept | Focus<br>Set SelectedItem | SetFocus<br>Set _cursor      |                              | SetFocus<br>Set _cursor      |                | No            |
+| **Slider**     | > 1                     | No         | No            | 1            | SetFocusedOption      | SetFocusedOption<br>OnAccept | Focus                     | SetFocus<br>SetFocusedOption |                              | SetFocus<br>SetFocusedOption |                | Yes           |
+| **ListView**   | > 1                     | No         | No            | 1            | MarkUnMarkRow         | OpenSelectedItem<br>OnAccept | OnAccept                  | SetMark<br>OnSelectedChanged | OpenSelectedItem<br>OnAccept |                              |                | No            |
 
 ### v1 Behavior
 
@@ -343,3 +355,321 @@ public class FocusChain {
 }
 ```
 
+
+
+# NOTES
+
+v1 was all over the map for how the built-in Views dealt with common keyboard user-interactions such as pressing `Space`, `Enter`, or the `Hotkey`. Same for mouse interactions such as `Click` and`DoubleClick`.
+
+I fixed a bunch of this a while back in v2 for `Accept` and `Hotkey` as part of making `Shortcut` and the new `StatusBar` work. `Shortcut` is a compbound View that needs to be able to host any view as `CommandView` and translate user-actions of those subviews in a consistent way. 
+
+As I've been working on really making `Bar` support a replacement for `Menu`, `ContextMenu`, and `MenuBar` I've found that my work wasn't quite right and didn't go far enough.
+
+This issue is to document and track what I've learned and lay out the design for addressing this correcxtly.
+
+Related Issues:
+
+- #2975 
+- #3493 
+- #2404 
+- #3631 
+- #3209 
+- #385 
+
+I started fixing this in 
+
+- #3749 
+
+However, I'm going to branch that work off to a new branch derived from `v2_develop` to address this issue separately. 
+
+Here's a deep-dive into the existing built-in Views that indicate the inconsistencies.
+
+|                |                         |            |               | **Keyboard** |                                      |                                                  |                                       | **Mouse**                     |                              |                               |                |               |
+|----------------|-------------------------|------------|---------------|--------------|--------------------------------------|--------------------------------------------------|---------------------------------------|-------------------------------|------------------------------|-------------------------------|----------------|---------------|
+|                | **Number<br>of States** | **Static** | **IsDefault** | **Hotkeys**  | **Select<br>Command<br>`Space`**     | **Accept<br>Command<br>`Enter`**                 | **Hotkey<br>Command**                 | **CanFocus<br>Click**         | **CanFocus<br>DblCLick**     | **!CanFocus<br>Click**        | **RightClick** | **GrabMouse** |
+| **View**       | 1                       | Yes        | No            | 1            |                                      | OnAccept                                         | Focus                                 | Focus                         |                              |                               |                | No            |
+| **Label**      | 1                       | Yes        | No            | 1            |                                      | OnAccept                                         | FocusNext                             | Focus                         |                              | FocusNext                     |                | No            |
+| **Button**     | 1                       | No         | Yes           | 1            | Focus<br>OnAccept                    | Focus<br>OnAccept                                | Focus<br>OnAccept                     | Focus<br>OnAccept             |                              | OnAccept                      |                | No            |
+| **Checkbox**   | 3                       | No         | No            | 1            | AdvanceCheckState<br>OnAccept        | AdvanceCheckState<br>OnAccept                    | AdvanceCheckState<br>OnAccept         | AdvanceCheckState<br>OnAccept |                              | AdvanceCheckState<br>OnAccept |                | No            |
+| **RadioGroup** | > 1                     | No         | No            | 2+           | Set SelectedItem<br>OnAccept         | Set SelectedItem<br>OnAccept                     | Focus<br>Set SelectedItem<br>OnAccept | SetFocus<br>Set _cursor       |                              | SetFocus<br>Set _cursor       |                | No            |
+| **Slider**     | > 1                     | No         | No            | 1            | SetFocusedOption<br>OnOptionsChanged | SetFocusedOption<br>OnOptionsChanged<br>OnAccept | Focus                                 | SetFocus<br>SetFocusedOption  |                              | SetFocus<br>SetFocusedOption  |                | Yes           |
+| **ListView**   | > 1                     | No         | No            | 1            | MarkUnMarkRow                        | OpenSelectedItem<br>OnAccept                     | OnAccept                              | SetMark<br>OnSelectedChanged  | OpenSelectedItem<br>OnAccept |                               |                | No            |
+
+Next, I'll post a table showing the proposed design.
+
+This will involve adding `View.OnSelect` virtual method and a `Select` event to `View`.
+
+## User Interaction Model
+
+Here's what we're really talking about here: What is the correct user interaction model for common actions on Views within a container. See `navigation.md` for the baseline. Here we're going beyond that to focus on:
+
+- What happens when there are bunch of SubViews and the user presses `Enter` with the intention of "accepting the current state".
+- What happens when the user presses `Space` with the intention of changing the selection of the currently focused View. E.g. which list item is selected or the check state?
+- What happens when the user presses `HotKey` with the intention of causing some non-focused View to EITHER "accept the current state" (`Button`), or "change a selection" (`RadioGroup`). 
+
+Same for mouse interaction: 
+
+- What happens when I click on a non-focused View?
+- What if that view has `CanFocus == false`?
+
+This gets really interesting when there's a View like a `Shortcut` that is a composite of several subviews. 
+
+### New Model
+
+|                |                         |            |               | **Keyboard** |                                                                                |                                                  |                                       | **Mouse**                                  |                                                                   |                                 |                |               |
+|----------------|-------------------------|------------|---------------|--------------|--------------------------------------------------------------------------------|--------------------------------------------------|---------------------------------------|--------------------------------------------|-------------------------------------------------------------------|---------------------------------|----------------|---------------|
+|                | **Number<br>of States** | **Static** | **IsDefault** | **Hotkeys**  | **Select<br>Command<br>`Space`**                                               | **Accept<br>Command<br>`Enter`**                 | **Hotkey<br>Command**                 | **CanFocus<br>Click**                      | **CanFocus<br>DblCLick**                                          | **!CanFocus<br>Click**          | **RightClick** | **GrabMouse** |
+| **View**       | 1                       | Yes        | No            | 1            |                                                                                | OnAccept                                         | Focus                                 | SetFocus                                   |                                                                   |                                 |                | No            |
+| **Label**      | 1                       | Yes        | No            | 1            |                                                                                | OnAccept                                         | FocusNext                             | SetFocus                                   |                                                                   | FocusNext                       |                | No            |
+| **Button**     | 1                       | No         | Yes           | 1            | Focus<br>OnAccept                                                              | Focus<br>OnAccept                                | Focus<br>OnAccept                     | SetFocus<br>OnAccept                       |                                                                   | OnAccept                        |                | No            |
+| **Checkbox**   | 3                       | No         | No            | 1            | AdvanceCheckState<br>OnSelect                                                  | OnAccept                                         | AdvanceCheckState<br>OnSelect         | AdvanceCheckState<br>OnSelect              |                                                                   | AdvanceCheckState<br>OnAccept   |                | No            |
+| **RadioGroup** | > 1                     | No         | No            | 2+           | If cursor not selected,<br>select. Else, Advance <br>selected item<br>OnSelect | Set SelectedItem<br>OnSelect<br>OnAccept         | Focus<br>Set SelectedItem<br>OnSelect | Set Cursor<br>Set SelectedItem<br>OnSelect | SetFocus<br>SetCursor<br>Set SelectedItem<br>OnSelect<br>OnAccept | AdvanceSelectedItem<br>OnSelect |                | No            |
+| **Slider**     | > 1                     | No         | No            | 1            | SetFocusedOption<br>OnOptionsChanged                                           | SetFocusedOption<br>OnOptionsChanged<br>OnAccept | Focus                                 | SetFocus<br>SetFocusedOption               |                                                                   | SetFocus<br>SetFocusedOption    |                | Yes           |
+| **ListView**   | > 1                     | No         | No            | 1            | MarkUnMarkRow                                                                  | OpenSelectedItem<br>OnAccept                     | OnAccept                              | SetMark<br>OnSelectedChanged               | OpenSelectedItem<br>OnAccept                                      |                                 |                | No            |
+
+## `View` - base class
+
+### `!HasFocus`
+
+* `Enter` - n/a because no focus
+* `Space` - n/a because no focus
+* `Hotkey` - `Command.Hotkey` which does `OnHotkey/Hotkey`
+* `Click` - If `CanFocus`, sets focus, then invoke `Command.Hotkey`. If `!CanFocus` n/a.
+
+### `HasFocus`
+
+* `Enter` - `Command.Accept` which does `OnAccept/Accept`
+* `Space` - `Command.Select` which does `OnSelect/Select`
+* `Hotkey` - `Command.Hotkey` which does `OnHotkey/Hotkey`
+* `Click` -  `Command.Hotkey`. 
+
+## `Label` - Purpose is to be a "label" for another View. 
+
+Said "label" can contain a Hotkey that will be forward to that other View. 
+
+(Side note, with the `Border` adornment, and the decoupling of `Title` and `Text`, `Label` is not needed if the developer is OK with the Title appearing ABOVE the View... just enable `Border.Thickness.Top`. It is my goal that `Border` will support the `Title` being placed in `Border.Thick.ess.Left` at some point; which will eliminate the need for `Label` in many cases.)
+
+### `!HasFocus`
+
+99% of the time `Label` will be `!HasFocus`.
+
+* `Enter` - n/a because no focus
+* `Space` - n/a because no focus
+* `Hotkey` - `Command.Hotkey` - Invoke the `Hotkey` Command on the next enabled & visible View (note, today AdvanceFocus is called which is not quite rigtht`
+* `Click` - If `CanFocus`, sets focus. If `!CanFocus` Invoke the `Hotkey` Command on the next enabled & visible View (note, today AdvanceFocus is called which is not quite right).
+
+### `HasFocus`
+
+The below is debatable. An alternative is a `Label` with `CanFocus` effectively is a "meld" of the next view and `Enter`, `Space`, `HotKey`, and `Click` all just get forwarded to the next View. 
+
+* `Enter` - `Command.Accept` which does `OnAccept/Accept` 
+* `Space` - `Command.Select` which does `OnSelect/Select`
+* `Hotkey` - `Command.Hotkey` - 
+* `Click` - If `CanFocus`, sets focus. If `!CanFocus` Invoke the `Hotkey` Command on the next enabled & visible View (note, today AdvanceFocus is called which is not quite right).
+
+## `Button` - A View where the user expects some action to happen when pressed.
+
+Note: `Button` has `IsDefault` which does two things: 
+
+1) change how a `Button` appears (adds an indicator indicating it's the default`). 
+2) `Window`'s `Command.Accept` handler searches the subviews for the first `Button` with `IsDefault` and invokes `Command.Accept` on that button. If no such `Button` is found, or none do `Handled=true`, the `Window.OnAccept` is invoked. 
+
+The practical impact of the above is devs have a choice for how to tell if the user "accepts" a superview:
+
+a) Set `IsDefault` on one button, and subscribe to `Accept` on that button.
+b) Subscribe to `Accept` on the superview. 
+
+The `Dialogs` Scenario is illustrative:
+
+For the `app` (Window):
+
+```cs
+        showDialogButton.Accepting += (s, e) =>
+                                   {
+                                       Dialog dlg = CreateDemoDialog (
+                                                                      widthEdit,
+                                                                      heightEdit,
+                                                                      titleEdit,
+                                                                      numButtonsEdit,
+                                                                      glyphsNotWords,
+                                                                      alignmentGroup,
+                                                                      buttonPressedLabel
+                                                                     );
+                                       Application.Run (dlg);
+                                       dlg.Dispose ();
+                                   };
+```
+
+Changing this to 
+
+```cs
+        app.Accepting += (s, e) =>
+                                   {
+                                       Dialog dlg = CreateDemoDialog (
+                                                                      widthEdit,
+                                                                      heightEdit,
+                                                                      titleEdit,
+                                                                      numButtonsEdit,
+                                                                      glyphsNotWords,
+                                                                      alignmentGroup,
+                                                                      buttonPressedLabel
+                                                                     );
+                                       Application.Run (dlg);
+                                       dlg.Dispose ();
+                                   };
+```
+
+... should do exactly the same thing. However, there's a bug in `v2_develop` where the `Command.Accept` handler for `Window` ignores the return value of `defaultBtn.InvokeCommand (Command.Accept)`. Fixing this bug makes this work as I would expect.
+
+However, for `Dialog` the `Dialogs` scenario illustrates why a dev might actually want multiple buttons and to have one be `Default`:
+
+```cs
+                button.Accepting += (s, e) =>
+                                 {
+                                     clicked = buttonId;
+                                     Application.RequestStop ();
+                                 };
+
+...
+
+dialog.Closed += (s, e) => { buttonPressedLabel.Text = $"{clicked}"; };
+```
+
+With this, the `Accept` handler sets `clicked` so the dev can tell what button the user clicked to end the Dialog. 
+
+Removing the code in `Window`'s `Command.Accept` handler that special-cases `IsDefault` changes nothing. Any subview that `Handles = true` `Accept` will, BY DEFINITION be the "default" `Enter` handler. 
+
+If `Enter` is pressed and no Subview handles `Accept` with `Handled = true`, the Superview (e..g `Dialog` or `Window`) will get `Command.Accept`. Thus developers need to do nothing to make it so `Enter` "accepts". 
+
+ANOTHER BUG in v2_develop: This code in `View.Mouse` is incorect as it ignores if an `MouseClick` handler sets `Handled = true`. 
+
+```cs
+           // If mouse is still in bounds, generate a click
+           if (!WantContinuousButtonPressed && Viewport.Contains (mouseEvent.Position))
+           {
+                return OnMouseClick (new (MouseEvent));
+           }
+
+           return mouseEvent.Handled = true;
+```
+
+This is more correct:
+
+```cs
+            // If mouse is still in bounds, generate a click
+            if (!WantContinuousButtonPressed && Viewport.Contains (mouseEvent.Position))
+            {
+                var meea = new MouseEventEventArgs (mouseEvent);
+
+                // We can ignore the return value of OnMouseClick; if the click is handled
+                // meea.Handled and meea.MouseEvent.Handled will be true
+                OnMouseClick (meea);
+            }
+```
+
+AND, `Dialogs` should set `e.Handled = true` in the `Accept` handler. 
+
+Finally, `Button`'s (or any View that wants to be an explicit-"IsDefault" view) `HotKey` handler needs to do this:
+
+```cs
+        AddCommand (
+                    Command.HotKey,
+                    () =>
+                    {
+                        bool cachedIsDefault = IsDefault; // Supports "Swap Default" in Buttons scenario
+
+                        bool? handled = OnAccept ();
+
+                        if (handled == true)
+                        {
+                            return true;
+                        }
+
+                        SetFocus ();
+
+                        // TODO: If `IsDefault` were a property on `View` *any* View could work this way. That's theoretical as 
+                        // TODO: no use-case has been identified for any View other than Button to act like this.
+                        // If Accept was not handled...
+                        if (cachedIsDefault && SuperView is { })
+                        {
+                            return SuperView.InvokeCommand (Command.Accept);
+                        }
+
+                        return false;
+                    });
+```
+
+With these changes, both mouse and keyboard "default accept" handling work without `View`, `Window` or anyone else knowing about `Button.IsDefault`.
+
+## `CheckBox` - An interesting use case because it has potentially 3 states...
+
+Here's what it SHOULD do:
+
+### `!HasFocus`
+
+* `Enter` - n/a because no focus
+* `Space` - n/a because no focus
+* `Hotkey` - `Command.Hotkey` -> does NOT set focus, but advances state
+* `Click` - If `CanFocus`, sets focus AND advances state
+* `Double Click` - Advances state and then raises `Accept` (this is what Office does; it's pretty nice. Windows does nothing).
+
+### `HasFocus`
+
+* `Enter` - `Command.Accept` -> Raises `Accept` 
+* `Space` - `Command.Select` -> Advances state
+* `Hotkey` - `Command.Hotkey` -> Advances state
+* `Click` - Advances state
+* `Double Click` - Advances state and then raises `Accept` (this is what Office does; it's pretty nice. Windows does nothing).
+
+An interesting tid-bit about the above is for `Checkbox` the right thing to do is for Hotkey to NOT set focus. Why? If the user is in a TextField and wants to change a setting via a CheckBox, they should be able to use the hotkey and NOT have to then re-focus back on the TextView. The `TextView` in `Text Input Controls` Scenario is a good example of this.
+
+## `RadioGroup` - Has > 1 state AND multiple hotkeys
+
+In v2_develop it's all kinds of confused. Here's what it SHOULD do:
+
+### `!HasFocus`
+
+* `Enter` - n/a because no focus
+* `Space` - n/a because no focus
+* `Title.Hotkey` - `Command.Hotkey` -> Set focus. Do NOT advance state.
+* `RadioItem.Hotkey` - `Command.Select` -> DO NOT set Focus. Advance State to RadioItem with hotkey.
+* `Click` - `Command.Hotkey` -> If `CanFocus`, sets focus and advances state to clicked RadioItem.
+* `Double Click` - Advances state to clicked RadioItem and then raises `Accept` (this is what Office does; it's pretty nice. Windows does nothing).
+
+### `HasFocus`
+
+* `Enter` - `Command.Accept` -> Advances state to selected RadioItem and Raises `Accept` 
+* `Space` - `Command.Select` -> Advances state
+* `Title.Hotkey` - `Command.Hotkey` -> Advance state
+* `RadioItem.Hotkey` - `Command.Select` -> Advance State to RadioItem with hotkey.
+* `Click` - advances state to clicked RadioItem.
+* `Double Click` - Advances state to clicked RadioItem and then raises `Accept` (this is what Office does; it's pretty nice. Windows does nothing).
+
+Like `Checkbox` the right thing to do is for Hotkey to NOT set focus. Why? If the user is in a TextField and wants to change a setting via a RadioGroup, they should be able to use the hotkey and NOT have to then re-focus back on the TextView. The `TextView` in `Text Input Controls` Scenario is a good example of this.
+
+## `Slider` - Should operate just like RadioGroup
+
+- BUGBUG: Slider should support Hotkey w/in Legends
+
+## `NumericUpDown`
+
+## `ListView`
+
+### `!HasFocus`
+
+* `Enter` - n/a because no focus
+* `Space` - n/a because no focus
+* `Title.Hotkey` - `Command.Hotkey` -> Set focus. Do NOT advance state.
+* `Click` - `Command.Select` -> If `CanFocus`, sets focus and advances state to clicked ListItem.
+* `Double Click` - Sets focus and advances state to clicked ListItem and then raises `Accept`.
+
+### `HasFocus`
+
+* `Enter` - `Command.Accept` -> Raises `Accept` 
+* `Space` - `Command.Select` -> Advances state
+* `Title.Hotkey` - `Command.Hotkey` -> does nothing
+* `RadioItem.Hotkey` - `Command.Select` -> Advance State to RadioItem with hotkey.
+* `Click` - `Command.Select` -> If `CanFocus`, sets focus and advances state to clicked ListItem.
+* `Double Click` - Sets focus and advances state to clicked ListItem and then raises `Accept`.
+
+What about `ListView.MultiSelect` and `ListViews.AllowsMarking`?

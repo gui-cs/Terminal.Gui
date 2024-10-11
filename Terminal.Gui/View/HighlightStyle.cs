@@ -1,30 +1,31 @@
-﻿namespace Terminal.Gui;
+﻿using System.Text.Json.Serialization;
+
+namespace Terminal.Gui;
 
 /// <summary>
-/// Describes the highlight style of a view.
+///     Describes the highlight style of a view when the mouse is over it.
 /// </summary>
+[JsonConverter (typeof (JsonStringEnumConverter<HighlightStyle>))]
 [Flags]
 public enum HighlightStyle
 {
     /// <summary>
-    /// No highlight.
+    ///     No highlight.
     /// </summary>
     None = 0,
 
-#if HOVER
     /// <summary>
-    /// The mouse is hovering over the view.
+    ///     The mouse is hovering over the view (but not pressed). See <see cref="View.MouseEnter"/>.
     /// </summary>
     Hover = 1,
-#endif
 
     /// <summary>
-    /// The mouse is pressed within the <see cref="View.Viewport"/>.
+    ///     The mouse is pressed within the <see cref="View.Viewport"/>.
     /// </summary>
     Pressed = 2,
 
     /// <summary>
-    /// The mouse is pressed but moved outside the <see cref="View.Viewport"/>.
+    ///     The mouse is pressed but moved outside the <see cref="View.Viewport"/>.
     /// </summary>
     PressedOutside = 4
 }

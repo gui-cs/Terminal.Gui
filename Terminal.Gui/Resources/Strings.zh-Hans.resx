@@ -153,9 +153,6 @@
   <data name="fdOpen" xml:space="preserve">
     <value>打开</value>
   </data>
-  <data name="wzNext" xml:space="preserve">
-    <value>下一步 (_N)...</value>
-  </data>
   <data name="fdSelectFolder" xml:space="preserve">
     <value>选择文件夹 (_S)</value>
   </data>
@@ -167,6 +164,9 @@
   </data>
   <data name="wzFinish" xml:space="preserve">
     <value>结束 (_N)</value>
+  </data>
+  <data name="wzNext" xml:space="preserve">
+    <value>下一步 (_N)...</value>
   </data>
   <data name="fdDirectoryAlreadyExistsFeedback" xml:space="preserve">
     <value>已存在相同名称的目录</value>
@@ -240,9 +240,6 @@
   <data name="fdExisting" xml:space="preserve">
     <value>已有</value>
   </data>
-  <data name="btnOk" xml:space="preserve">
-    <value>确定 (_O)</value>
-  </data>
   <data name="btnOpen" xml:space="preserve">
     <value>打开 (_O)</value>
   </data>
@@ -251,6 +248,9 @@
   </data>
   <data name="btnSaveAs" xml:space="preserve">
     <value>另存为 (_S)</value>
+  </data>
+  <data name="btnOk" xml:space="preserve">
+    <value>确定 (_O)</value>
   </data>
   <data name="btnCancel" xml:space="preserve">
     <value>取消 (_C)</value>
@@ -275,5 +275,8 @@
   </data>
   <data name="dpTitle" xml:space="preserve">
     <value>日期选择器</value>
+  </data>
+  <data name="ctxColors" xml:space="preserve">
+    <value>旗帜 (_L)</value>
   </data>
 </root>

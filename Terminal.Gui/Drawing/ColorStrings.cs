@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections;
 using System.Globalization;
+using System.Resources;
 using Terminal.Gui.Resources;
 
 namespace Terminal.Gui;
@@ -10,6 +11,8 @@ namespace Terminal.Gui;
 /// </summary>
 public static class ColorStrings
 {
+    // PERFORMANCE: See https://stackoverflow.com/a/15521524/297526 for why GlobalResources.GetString is fast.
+
     /// <summary>
     ///     Gets the W3C standard string for <paramref name="color"/>.
     /// </summary>
@@ -17,7 +20,6 @@ public static class ColorStrings
     /// <returns><see langword="null"/> if there is no standard color name for the specified color.</returns>
     public static string? GetW3CColorName (Color color)
     {
-        // Fetch the color name from the resource file
         return GlobalResources.GetString ($"#{color.R:X2}{color.G:X2}{color.B:X2}", CultureInfo.CurrentUICulture);
     }
 
@@ -27,18 +29,18 @@ public static class ColorStrings
     /// <returns></returns>
     public static IEnumerable<string> GetW3CColorNames ()
     {
-        foreach (DictionaryEntry entry in GlobalResources.GetResourceSet (
-                                                                          CultureInfo.CurrentUICulture,
-                                                                          true,
-                                                                          true,
-                                                                          e =>
-                                                                          {
-                                                                              string keyName = e.Key.ToString () ?? string.Empty;
-
-                                                                              return e.Value is string && keyName.StartsWith ('#');
-                                                                          })!)
+        ResourceSet? resourceSet = GlobalResources.GetResourceSet (CultureInfo.CurrentUICulture, true, true);
+        if (resourceSet == null)
         {
-            yield return (entry.Value as string)!;
+            yield break;
+        }
+
+        foreach (DictionaryEntry entry in resourceSet)
+        {
+            if (entry is { Value: string colorName, Key: string key } && key.StartsWith ('#'))
+            {
+                yield return colorName;
+            }
         }
     }
 
@@ -50,30 +52,31 @@ public static class ColorStrings
     /// <returns><see langword="true"/> if <paramref name="name"/> was parsed successfully.</returns>
     public static bool TryParseW3CColorName (string name, out Color color)
     {
-        // Iterate through all resource entries to find the matching color name
         foreach (DictionaryEntry entry in GlobalResources.GetResourceSet (CultureInfo.CurrentUICulture, true, true)!)
         {
             if (entry.Value is string colorName && colorName.Equals (name, StringComparison.OrdinalIgnoreCase))
             {
-                // Parse the key to extract the color components
-                string key = entry.Key.ToString () ?? string.Empty;
-
-                if (key.StartsWith ("#") && key.Length == 7)
-                {
-                    if (int.TryParse (key.Substring (1, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int r)
-                        && int.TryParse (key.Substring (3, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int g)
-                        && int.TryParse (key.Substring (5, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int b))
-                    {
-                        color = new (r, g, b);
-
-                        return true;
-                    }
-                }
+                return TryParseColorKey (entry.Key.ToString (), out color);
             }
         }
 
-        color = default (Color);
+        return TryParseColorKey (name, out color);
 
-        return false;
+        bool TryParseColorKey (string? key, out Color color)
+        {
+            if (key != null && key.StartsWith ('#') && key.Length == 7)
+            {
+                if (int.TryParse (key.AsSpan (1, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int r) &&
+                    int.TryParse (key.AsSpan (3, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int g) &&
+                    int.TryParse (key.AsSpan (5, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int b))
+                {
+                    color = new Color (r, g, b);
+                    return true;
+                }
+            }
+
+            color = default (Color);
+            return false;
+        }
     }
 }

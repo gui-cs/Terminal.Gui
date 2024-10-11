@@ -26,9 +26,12 @@
     }
   ],
   "build": {
+    "xref": [
+      "https://learn.microsoft.com/en-us/dotnet/.xrefmap.json"
+    ],
     "template": [
       "default",
-      "templates/modern"
+      "_exported_templates/modern"
     ],
     "output": "_site",
     "content": [
@@ -45,7 +48,8 @@
     "resource": [
       {
         "files": [
-          "images/**"
+          "images/**",
+          "schemas/**.json"
         ]
       }
     ],

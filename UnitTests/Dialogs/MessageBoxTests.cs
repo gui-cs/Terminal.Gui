@@ -11,11 +11,13 @@ public class MessageBoxTests
 
     [Fact]
     [AutoInitShutdown]
-    public void KeyBindings_Enter_Causes_Focused_Button_Click ()
+    public void KeyBindings_Enter_Causes_Focused_Button_Click_No_Accept ()
     {
         int result = -1;
 
         var iteration = 0;
+
+        int btnAcceptCount = 0;
 
         Application.Iteration += (s, a) =>
                                  {
@@ -32,6 +34,12 @@ public class MessageBoxTests
                                          case 2:
                                              // Tab to btn2
                                              Application.OnKeyDown (Key.Tab);
+
+                                             Button btn = Application.Navigation!.GetFocused () as Button;
+
+                                             btn.Accepting += (sender, e) => { btnAcceptCount++; };
+
+                                             // Click
                                              Application.OnKeyDown (Key.Enter);
 
                                              break;
@@ -45,6 +53,7 @@ public class MessageBoxTests
         Application.Run ().Dispose ();
 
         Assert.Equal (1, result);
+        Assert.Equal (1, btnAcceptCount);
     }
 
     [Fact]
@@ -85,11 +94,13 @@ public class MessageBoxTests
 
     [Fact]
     [AutoInitShutdown]
-    public void KeyBindings_Space_Causes_Focused_Button_Click ()
+    public void KeyBindings_Space_Causes_Focused_Button_Click_No_Accept ()
     {
         int result = -1;
 
         var iteration = 0;
+
+        int btnAcceptCount = 0;
 
         Application.Iteration += (s, a) =>
                                  {
@@ -106,6 +117,11 @@ public class MessageBoxTests
                                          case 2:
                                              // Tab to btn2
                                              Application.OnKeyDown (Key.Tab);
+
+                                             Button btn = Application.Navigation!.GetFocused () as Button;
+
+                                             btn.Accepting += (sender, e) => { btnAcceptCount++; };
+
                                              Application.OnKeyDown (Key.Space);
 
                                              break;
@@ -119,6 +135,8 @@ public class MessageBoxTests
         Application.Run ().Dispose ();
 
         Assert.Equal (1, result);
+        Assert.Equal (1, btnAcceptCount);
+
     }
 
     [Theory]
@@ -138,6 +156,8 @@ public class MessageBoxTests
         int iterations = -1;
 
         ((FakeDriver)Application.Driver!).SetBufferSize (15, 15); // 15 x 15 gives us enough room for a button with one char (9x1)
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         Rectangle mbFrame = Rectangle.Empty;
 
@@ -152,7 +172,7 @@ public class MessageBoxTests
                                      }
                                      else if (iterations == 1)
                                      {
-                                         mbFrame = Application.Current.Frame;
+                                         mbFrame = Application.Top!.Frame;
                                          Application.RequestStop ();
                                      }
                                  };
@@ -177,6 +197,8 @@ public class MessageBoxTests
         // Override CM
         MessageBox.DefaultButtonAlignment = Alignment.End;
         MessageBox.DefaultBorderStyle = LineStyle.Double;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         Application.Iteration += (s, a) =>
                                  {
@@ -229,6 +251,7 @@ public class MessageBoxTests
                                  };
 
         Application.Run (top);
+        top.Dispose ();
     }
 
     [Fact]
@@ -246,6 +269,8 @@ public class MessageBoxTests
         // Override CM
         MessageBox.DefaultButtonAlignment = Alignment.End;
         MessageBox.DefaultBorderStyle = LineStyle.Double;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         Application.Iteration += (s, a) =>
                                  {
@@ -338,8 +363,8 @@ public class MessageBoxTests
                                      {
                                          Application.Refresh ();
 
-                                         Assert.IsType<Dialog> (Application.Current);
-                                         Assert.Equal (new (height, width), Application.Current.Frame.Size);
+                                         Assert.IsType<Dialog> (Application.Top);
+                                         Assert.Equal (new (height, width), Application.Top.Frame.Size);
 
                                          Application.RequestStop ();
                                      }
@@ -375,8 +400,8 @@ public class MessageBoxTests
                                      {
                                          Application.Refresh ();
 
-                                         Assert.IsType<Dialog> (Application.Current);
-                                         Assert.Equal (new (height, width), Application.Current.Frame.Size);
+                                         Assert.IsType<Dialog> (Application.Top);
+                                         Assert.Equal (new (height, width), Application.Top.Frame.Size);
 
                                          Application.RequestStop ();
                                      }
@@ -408,8 +433,8 @@ public class MessageBoxTests
                                      {
                                          Application.Refresh ();
 
-                                         Assert.IsType<Dialog> (Application.Current);
-                                         Assert.Equal (new (height, width), Application.Current.Frame.Size);
+                                         Assert.IsType<Dialog> (Application.Top);
+                                         Assert.Equal (new (height, width), Application.Top.Frame.Size);
 
                                          Application.RequestStop ();
                                      }
@@ -426,6 +451,8 @@ public class MessageBoxTests
         // Override CM
         MessageBox.DefaultButtonAlignment = Alignment.End;
         MessageBox.DefaultBorderStyle = LineStyle.Double;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         Application.Iteration += (s, a) =>
                                  {
@@ -473,7 +500,7 @@ public class MessageBoxTests
         var top = new Toplevel ();
         top.BorderStyle = LineStyle.Single;
         Application.Run (top);
-
+        top.Dispose ();
     }
 }
 

@@ -190,12 +190,12 @@ public class KeyBindingsDemo : View
         KeyBindings.Add (Key.F3, Command.New); // same as specifying KeyBindingScope.Focused
         Application.KeyBindings.Add (Key.F4, this, Command.New);
 
-        AddCommand (Command.QuitToplevel, ctx =>
+        AddCommand (Command.Quit, ctx =>
                                          {
                                              MessageBox.Query ($"{ctx.KeyBinding?.Scope}", $"Key: {ctx.Key}\nCommand: {ctx.Command}", buttons: "Ok");
                                              Application.RequestStop ();
                                              return true;
                                          });
-        Application.KeyBindings.Add (Key.Q.WithAlt, this, Command.QuitToplevel);
+        Application.KeyBindings.Add (Key.Q.WithAlt, this, Command.Quit);
     }
 }

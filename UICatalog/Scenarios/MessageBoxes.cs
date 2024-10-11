@@ -30,7 +30,7 @@ public class MessageBoxes : Scenario
         app.Add (frame);
 
         // TODO: Use Pos.Align her to demo aligning labels and fields
-        var label = new Label { X = 0, Y = 0, Width = 15, TextAlignment = Alignment.End, Text = "Width:" };
+        var label = new Label { X = 0, Y = 0, Width = 15, TextAlignment = Alignment.End, Text = "W_idth:" };
         frame.Add (label);
 
         var widthEdit = new TextField
@@ -50,7 +50,7 @@ public class MessageBoxes : Scenario
             Width = Dim.Width (label),
             Height = 1,
             TextAlignment = Alignment.End,
-            Text = "Height:"
+            Text = "_Height:"
         };
         frame.Add (label);
 
@@ -90,7 +90,7 @@ public class MessageBoxes : Scenario
             Width = Dim.Width (label),
             Height = 1,
             TextAlignment = Alignment.End,
-            Text = "Title:"
+            Text = "_Title:"
         };
         frame.Add (label);
 
@@ -100,7 +100,7 @@ public class MessageBoxes : Scenario
             Y = Pos.Top (label),
             Width = Dim.Fill (),
             Height = 1,
-            Text = "Title"
+            Text = "The title"
         };
         frame.Add (titleEdit);
 
@@ -112,7 +112,7 @@ public class MessageBoxes : Scenario
             Width = Dim.Width (label),
             Height = 1,
             TextAlignment = Alignment.End,
-            Text = "Message:"
+            Text = "_Message:"
         };
         frame.Add (label);
 
@@ -134,7 +134,7 @@ public class MessageBoxes : Scenario
             Width = Dim.Width (label),
             Height = 1,
             TextAlignment = Alignment.End,
-            Text = "Num Buttons:"
+            Text = "_Num Buttons:"
         };
         frame.Add (label);
 
@@ -156,7 +156,7 @@ public class MessageBoxes : Scenario
             Width = Dim.Width (label),
             Height = 1,
             TextAlignment = Alignment.End,
-            Text = "Default Button:"
+            Text = "_Default Button:"
         };
         frame.Add (label);
 
@@ -178,7 +178,7 @@ public class MessageBoxes : Scenario
             Width = Dim.Width (label),
             Height = 1,
             TextAlignment = Alignment.End,
-            Text = "Style:"
+            Text = "St_yle:"
         };
         frame.Add (label);
 
@@ -188,11 +188,23 @@ public class MessageBoxes : Scenario
         };
         frame.Add (styleRadioGroup);
 
+        label = new ()
+        {
+            X = 0,
+            Y = Pos.Bottom (styleRadioGroup),
+
+            Width = Dim.Width (label),
+            Height = 1,
+            TextAlignment = Alignment.End,
+            Text = "Wra_p:"
+        };
         var ckbWrapMessage = new CheckBox
         {
-            X = Pos.Right (label) + 1, Y = Pos.Bottom (styleRadioGroup), Text = "_Wrap Message", CheckedState = CheckState.Checked
+            X = Pos.Right (label) + 1, Y = Pos.Bottom (styleRadioGroup),
+            CheckedState = CheckState.Checked,
+            Text = "_Wrap Message",
         };
-        frame.Add (ckbWrapMessage);
+        frame.Add (label, ckbWrapMessage);
 
         frame.ValidatePosDim = true;
 
@@ -216,7 +228,7 @@ public class MessageBoxes : Scenario
             X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "_Show MessageBox"
         };
 
-        showMessageBoxButton.Accept += (s, e) =>
+        app.Accepting += (s, e) =>
                                        {
                                            try
                                            {
@@ -229,7 +241,7 @@ public class MessageBoxes : Scenario
 
                                                for (var i = 0; i < numButtons; i++)
                                                {
-                                                   btns.Add (NumberToWords.Convert (i));
+                                                   btns.Add ($"_{NumberToWords.Convert (i)}");
                                                }
 
                                                if (styleRadioGroup.SelectedItem == 0)
@@ -263,6 +275,8 @@ public class MessageBoxes : Scenario
                                            {
                                                buttonPressedLabel.Text = "Invalid Options";
                                            }
+
+                                           e.Cancel = true;
                                        };
         app.Add (showMessageBoxButton);
 

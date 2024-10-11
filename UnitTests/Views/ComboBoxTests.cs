@@ -492,7 +492,7 @@ public class ComboBoxTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown]
+    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
     public void HideDropdownListOnClick_True_Highlight_Current_Item ()
     {
         var selected = "";
@@ -817,7 +817,6 @@ Three ",
     {
         ObservableCollection<string> source = ["One", "Two", "Three"];
         var cb = new ComboBox { Width = 10 };
-        cb.SetSource (source);
         var top = new Toplevel ();
 
         top.Add (cb);
@@ -826,18 +825,24 @@ Three ",
         top.Add (otherView);
         Application.Begin (top);
 
+        cb.SetSource (source);
+
         Assert.True (cb.HasFocus);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal (string.Empty, cb.Text);
         var opened = false;
+
         cb.OpenSelectedItem += (s, _) => opened = true;
-        Assert.True (Application.OnKeyDown (Key.Enter));
+
+        Assert.False (Application.OnKeyDown (Key.Enter));
         Assert.False (opened);
+
         cb.Text = "Tw";
-        Assert.True (Application.OnKeyDown (Key.Enter));
+        Assert.False (Application.OnKeyDown (Key.Enter));
         Assert.True (opened);
         Assert.Equal ("Tw", cb.Text);
         Assert.False (cb.IsShow);
+
         cb.SetSource<string> (null);
         Assert.False (cb.IsShow);
         Assert.False (Application.OnKeyDown (Key.Enter));
@@ -903,7 +908,7 @@ One
         Assert.True (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
-//        Application.Begin (top);
+        //        Application.Begin (top);
 
         cb.Draw ();
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -990,7 +995,7 @@ Three
         Application.Navigation = new ();
         var cb = new ComboBox ();
         var top = new Toplevel ();
-        Application.Current = top;
+        Application.Top = top;
 
         top.Add (cb);
         top.FocusDeepest (NavigationDirection.Forward, null);
@@ -1028,6 +1033,8 @@ Three
         Assert.Equal (0, cb.Source.Count);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
-        Application.ResetState ();
+
+        Application.Top.Dispose ();
+        Application.ResetState (ignoreDisposed: true);
     }
 }

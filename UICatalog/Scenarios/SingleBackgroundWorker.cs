@@ -57,16 +57,17 @@ public class SingleBackgroundWorker : Scenario
                         )
                 ]
             };
-            Add (menu);
 
             var statusBar = new StatusBar (
                                            [
                                                new (Application.QuitKey, "Quit", () => Application.RequestStop ()),
                                                new (Key.R.WithCtrl, "Run Worker", RunWorker)
                                            ]);
-            Add (statusBar);
 
-            var workerLogTop = new Toplevel { Title = "Worker Log Top" };
+            var workerLogTop = new Toplevel
+            {
+                Title = "Worker Log Top",
+           };
 
             workerLogTop.Add (
                               new Label { X = Pos.Center (), Y = 0, Text = "Worker Log" }
@@ -81,7 +82,11 @@ public class SingleBackgroundWorker : Scenario
                 Source = new ListWrapper<string> (_log)
             };
             workerLogTop.Add (_listLog);
-            Add (workerLogTop);
+
+            workerLogTop.Y = 1;
+            workerLogTop.Height = Dim.Fill (Dim.Func (() => statusBar.Frame.Height));
+
+            Add (menu, workerLogTop, statusBar);
             Title = "MainApp";
         }
 
@@ -91,7 +96,7 @@ public class SingleBackgroundWorker : Scenario
 
             var cancel = new Button { Text = "Cancel Worker" };
 
-            cancel.Accept += (s, e) =>
+            cancel.Accepting += (s, e) =>
                              {
                                  if (_worker == null)
                                  {
@@ -177,7 +182,7 @@ public class SingleBackgroundWorker : Scenario
                                                       new StagingUIController (_startStaging, e.Result as ObservableCollection<string>);
                                                   Toplevel top = Application.Top;
                                                   top.Visible = false;
-                                                  Application.Current.Visible = false;
+                                                  Application.Top.Visible = false;
                                                   builderUI.Load ();
                                                   builderUI.Dispose ();
                                                   top.Visible = true;

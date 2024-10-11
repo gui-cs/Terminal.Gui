@@ -25,7 +25,7 @@ namespace Terminal.Gui;
 ///     </para>
 ///     <para>Control the first byte shown by setting the <see cref="DisplayStart"/> property to an offset in the stream.</para>
 /// </remarks>
-public class HexView : View
+public class HexView : View, IDesignable
 {
     private const int bsize = 4;
     private const int displayWidth = 9;
@@ -33,7 +33,8 @@ public class HexView : View
     private int bpl;
     private long displayStart, pos;
     private SortedDictionary<long, byte> edits = [];
-    private bool firstNibble, leftSide;
+    private bool firstNibble;
+    private bool leftSide;
     private Stream source;
     private static readonly Rune SpaceCharRune = new (' ');
     private static readonly Rune PeriodCharRune = new ('.');
@@ -46,8 +47,7 @@ public class HexView : View
     public HexView (Stream source)
     {
         Source = source;
-        // BUG: This will always call the most-derived definition of CanFocus.
-        // Either seal it or don't set it here.
+
         CanFocus = true;
         CursorVisibility = CursorVisibility.Default;
         leftSide = true;
@@ -59,15 +59,16 @@ public class HexView : View
         // Things this view knows how to do
         AddCommand (Command.Left, () => MoveLeft ());
         AddCommand (Command.Right, () => MoveRight ());
-        AddCommand (Command.LineDown, () => MoveDown (bytesPerLine));
-        AddCommand (Command.LineUp, () => MoveUp (bytesPerLine));
-        AddCommand (Command.Accept, () => ToggleSide ());
+        AddCommand (Command.Down, () => MoveDown (bytesPerLine));
+        AddCommand (Command.Up, () => MoveUp (bytesPerLine));
+        AddCommand (Command.Tab, () => Navigate (NavigationDirection.Forward));
+        AddCommand (Command.BackTab, () => Navigate (NavigationDirection.Backward));
         AddCommand (Command.PageUp, () => MoveUp (bytesPerLine * Frame.Height));
         AddCommand (Command.PageDown, () => MoveDown (bytesPerLine * Frame.Height));
-        AddCommand (Command.TopHome, () => MoveHome ());
-        AddCommand (Command.BottomEnd, () => MoveEnd ());
-        AddCommand (Command.StartOfLine, () => MoveStartOfLine ());
-        AddCommand (Command.EndOfLine, () => MoveEndOfLine ());
+        AddCommand (Command.Start, () => MoveHome ());
+        AddCommand (Command.End, () => MoveEnd ());
+        AddCommand (Command.LeftStart, () => MoveLeftStart ());
+        AddCommand (Command.RightEnd, () => MoveEndOfLine ());
         AddCommand (Command.StartOfPage, () => MoveUp (bytesPerLine * ((int)(position - displayStart) / bytesPerLine)));
 
         AddCommand (
@@ -78,9 +79,8 @@ public class HexView : View
         // Default keybindings for this view
         KeyBindings.Add (Key.CursorLeft, Command.Left);
         KeyBindings.Add (Key.CursorRight, Command.Right);
-        KeyBindings.Add (Key.CursorDown, Command.LineDown);
-        KeyBindings.Add (Key.CursorUp, Command.LineUp);
-        KeyBindings.Add (Key.Enter, Command.Accept);
+        KeyBindings.Add (Key.CursorDown, Command.Down);
+        KeyBindings.Add (Key.CursorUp, Command.Up);
 
         KeyBindings.Add (Key.V.WithAlt, Command.PageUp);
         KeyBindings.Add (Key.PageUp, Command.PageUp);
@@ -88,12 +88,15 @@ public class HexView : View
         KeyBindings.Add (Key.V.WithCtrl, Command.PageDown);
         KeyBindings.Add (Key.PageDown, Command.PageDown);
 
-        KeyBindings.Add (Key.Home, Command.TopHome);
-        KeyBindings.Add (Key.End, Command.BottomEnd);
-        KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.StartOfLine);
-        KeyBindings.Add (Key.CursorRight.WithCtrl, Command.EndOfLine);
+        KeyBindings.Add (Key.Home, Command.Start);
+        KeyBindings.Add (Key.End, Command.End);
+        KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.LeftStart);
+        KeyBindings.Add (Key.CursorRight.WithCtrl, Command.RightEnd);
         KeyBindings.Add (Key.CursorUp.WithCtrl, Command.StartOfPage);
         KeyBindings.Add (Key.CursorDown.WithCtrl, Command.EndOfPage);
+
+        KeyBindings.Add (Key.Tab, Command.Tab);
+        KeyBindings.Add (Key.Tab.WithShift, Command.BackTab);
 
         LayoutComplete += HexView_LayoutComplete;
     }
@@ -247,7 +250,7 @@ public class HexView : View
     public event EventHandler<HexViewEditEventArgs> Edited;
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent me)
+    protected internal override bool OnMouseEvent (MouseEvent me)
     {
         if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
             && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
@@ -529,12 +532,14 @@ public class HexView : View
 
         int x = displayWidth + block * 14 + column + (firstNibble ? 0 : 1);
         int y = line;
+
         if (!leftSide)
         {
             x = displayWidth + bytesPerLine / bsize * 14 + item - 1;
         }
 
         Move (x, y);
+
         return new (x, y);
     }
 
@@ -728,7 +733,7 @@ public class HexView : View
         return true;
     }
 
-    private bool MoveStartOfLine ()
+    private bool MoveLeftStart ()
     {
         position = position / bytesPerLine * bytesPerLine;
         SetNeedsDisplay ();
@@ -764,17 +769,50 @@ public class HexView : View
         {
             return;
         }
+
         var delta = (int)(pos - DisplayStart);
         int line = delta / bytesPerLine;
 
         SetNeedsDisplay (new (0, line, Viewport.Width, 1));
     }
 
-    private bool ToggleSide ()
+    private bool Navigate (NavigationDirection direction)
     {
-        leftSide = !leftSide;
-        RedisplayLine (position);
-        firstNibble = true;
+        switch (direction)
+        {
+            case NavigationDirection.Forward:
+                if (leftSide)
+                {
+                    leftSide = false;
+                    RedisplayLine (position);
+                    firstNibble = true;
+
+                    return true;
+                }
+
+                break;
+
+            case NavigationDirection.Backward:
+                if (!leftSide)
+                {
+                    leftSide = true;
+                    RedisplayLine (position);
+                    firstNibble = true;
+                    return true;
+                }
+
+
+                break;
+        }
+
+        return false;
+    }
+
+
+    /// <inheritdoc />
+    bool IDesignable.EnableForDesign ()
+    {
+        Source = new MemoryStream (Encoding.UTF8.GetBytes ("HexEditor Unicode that shouldn't 𝔹Aℝ𝔽!"));
 
         return true;
     }

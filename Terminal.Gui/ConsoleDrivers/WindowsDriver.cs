@@ -54,6 +54,8 @@ internal class WindowsConsole
 
     public bool WriteToConsole (Size size, ExtendedCharInfo [] charInfoBuffer, Coord bufferSize, SmallRect window, bool force16Colors)
     {
+        //Debug.WriteLine ("WriteToConsole");
+
         if (_screenBuffer == nint.Zero)
         {
             ReadFromConsoleOutput (size, bufferSize, ref window);
@@ -72,7 +74,7 @@ internal class WindowsConsole
                 {
                     Char = new CharUnion { UnicodeChar = info.Char },
                     Attributes =
-                        (ushort)((int)info.Attribute.Foreground.GetClosestNamedColor () | ((int)info.Attribute.Background.GetClosestNamedColor () << 4))
+                        (ushort)((int)info.Attribute.Foreground.GetClosestNamedColor16 () | ((int)info.Attribute.Background.GetClosestNamedColor16 () << 4))
                 };
             }
 
@@ -1811,12 +1813,6 @@ internal class WindowsDriver : ConsoleDriver
         int delay = startDelay;
         while (_isButtonPressed)
         {
-            var me = new MouseEvent
-            {
-                Position = _pointMove,
-                Flags = mouseFlag
-            };
-
             // TODO: This makes ConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
             View view = Application.WantContinuousButtonPressedView;
 
@@ -1830,6 +1826,12 @@ internal class WindowsDriver : ConsoleDriver
                 delay = fastDelay;
             }
             await Task.Delay (delay);
+
+            var me = new MouseEvent
+            {
+                Position = _pointMove,
+                Flags = mouseFlag
+            };
 
             //Debug.WriteLine($"ProcessContinuousButtonPressedAsync: {view}");
             if (_isButtonPressed && (mouseFlag & MouseFlags.ReportMousePosition) == 0)

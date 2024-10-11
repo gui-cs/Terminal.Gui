@@ -32,14 +32,8 @@ namespace UICatalog;
 ///             </item>
 ///             <item>
 ///                 <description>
-///                     Implement the <see cref="Setup"/> override which will be called when a user selects the
+///                     Implement the <see cref="Main"/> override which will be called when a user selects the
 ///                     scenario to run.
-///                 </description>
-///             </item>
-///             <item>
-///                 <description>
-///                     Optionally, implement the <see cref="Init()"/> and/or <see cref="Run"/> overrides to
-///                     provide a custom implementation.
 ///                 </description>
 ///             </item>
 ///         </list>
@@ -54,27 +48,40 @@ namespace UICatalog;
 ///     <code>
 /// using Terminal.Gui;
 /// 
-/// namespace UICatalog {
-/// 	[ScenarioMetadata (Name: "Generic", Description: "Generic sample - A template for creating new Scenarios")]
-/// 	[ScenarioCategory ("Controls")]
-/// 	class MyScenario : Scenario {
-/// 		public override void Setup ()
-/// 		{
-/// 			// Put your scenario code here, e.g.
-/// 			Win.Add (new Button () { Text = "Press me!", 
-/// 				X = Pos.Center (),
-/// 				Y = Pos.Center (),
-/// 				Clicked = () => MessageBox.Query (20, 7, "Hi", "Neat?", "Yes", "No")
-/// 			});
-/// 		}
-/// 	}
+/// namespace UICatalog.Scenarios;
+/// 
+/// [ScenarioMetadata ("Generic", "Generic sample - A template for creating new Scenarios")]
+/// [ScenarioCategory ("Controls")]
+/// public sealed class MyScenario : Scenario
+/// {
+///     public override void Main ()
+///     {
+///         // Init
+///         Application.Init ();
+/// 
+///         // Setup - Create a top-level application window and configure it.
+///         Window appWindow = new ()
+///         {
+///             Title = GetQuitKeyAndName (),
+///         };
+/// 
+///         var button = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Press me!" };
+///         button.Accept += (s, e) => MessageBox.ErrorQuery ("Error", "You pressed the button!", "Ok");
+///         appWindow.Add (button);
+/// 
+///         // Run - Start the application.
+///         Application.Run (appWindow);
+///         appWindow.Dispose ();
+/// 
+///         // Shutdown - Calling Application.Shutdown is required.
+///         Application.Shutdown ();
+///     }
 /// }
-/// </code>
+///  </code>
 /// </example>
 public class Scenario : IDisposable
 {
     private static int _maxScenarioNameLen = 30;
-    public string Theme = "Default";
     public string TopLevelColorScheme = "Base";
     private bool _disposedValue;
 
@@ -93,7 +100,10 @@ public class Scenario : IDisposable
     /// <returns></returns>
     public string GetName () { return ScenarioMetadata.GetName (GetType ()); }
 
-    /// <summary>Helper to get the <see cref="Application.QuitKey"/> and the <see cref="Scenario"/> Name (defined in <see cref="ScenarioMetadata"/>)</summary>
+    /// <summary>
+    ///     Helper to get the <see cref="Application.QuitKey"/> and the <see cref="Scenario"/> Name (defined in
+    ///     <see cref="ScenarioMetadata"/>)
+    /// </summary>
     /// <returns></returns>
     public string GetQuitKeyAndName () { return $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"; }
 
@@ -125,18 +135,7 @@ public class Scenario : IDisposable
     ///     Called by UI Catalog to run the <see cref="Scenario"/>. This is the main entry point for the <see cref="Scenario"/>
     ///     .
     /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         Scenario developers are encouraged to override this method as the primary way of authoring a new
-    ///         scenario.
-    ///     </para>
-    ///     <para>
-    ///         The base implementation calls <see cref="Init"/>, <see cref="Setup"/>, and <see cref="Run"/>.
-    ///     </para>
-    /// </remarks>
-    public virtual void Main ()
-    {
-    }
+    public virtual void Main () { }
 
     /// <summary>Gets the Scenario Name + Description with the Description padded based on the longest known Scenario name.</summary>
     /// <returns></returns>
@@ -156,8 +155,7 @@ public class Scenario : IDisposable
         if (!_disposedValue)
         {
             if (disposing)
-            {
-            }
+            { }
 
             _disposedValue = true;
         }
