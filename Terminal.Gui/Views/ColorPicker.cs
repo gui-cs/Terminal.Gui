@@ -7,7 +7,7 @@ namespace Terminal.Gui;
 /// <summary>
 ///     True color picker using HSL
 /// </summary>
-public class ColorPicker : View
+public partial class ColorPicker : View
 {
     /// <summary>
     ///     Creates a new instance of <see cref="ColorPicker"/>. Use

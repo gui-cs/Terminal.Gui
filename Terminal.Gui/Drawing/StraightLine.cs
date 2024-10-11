@@ -16,7 +16,7 @@ public class StraightLine
         int length,
         Orientation orientation,
         LineStyle style,
-        Attribute? attribute = default
+        Attribute? attribute = null
     )
     {
         Start = start;

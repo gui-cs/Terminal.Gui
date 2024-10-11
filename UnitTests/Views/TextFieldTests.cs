@@ -2108,4 +2108,18 @@ Les Miśerables",
         Assert.True (t.Visible);
         Assert.False (t.Autocomplete.Visible);
     }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Draw_Esc_Rune ()
+    {
+        var tf = new TextField { Width = 5, Text = "\u001b" };
+        tf.BeginInit ();
+        tf.EndInit ();
+        tf.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre ("\u241b", output);
+
+        tf.Dispose ();
+    }
 }
