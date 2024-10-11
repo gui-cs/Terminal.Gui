@@ -32,11 +32,11 @@ public class AnsiResponseParserTests
         // Regular user typing
         for (int c = 0; c < "Hello".Length; c++)
         {
-            AssertIgnored (ansiStream, ref i);
+            AssertIgnored (ansiStream,"Hello"[c], ref i);
         }
 
         // Now we have entered the actual DAR we should be consuming these
-        for (int c = 0; c < "\x1B [0".Length; c++)
+        for (int c = 0; c < "\x1B[0".Length; c++)
         {
             AssertConsumed (ansiStream, ref i);
         }
@@ -48,12 +48,13 @@ public class AnsiResponseParserTests
         Assert.Equal ("\u001b[0c", response);
     }
 
-    private void AssertIgnored (string ansiStream, ref int i)
+    private void AssertIgnored (string ansiStream,char expected, ref int i)
     {
         var c = NextChar (ansiStream, ref i);
 
         // Parser does not grab this key (i.e. driver can continue with regular operations)
         Assert.Equal ( c,_parser.ProcessInput (c));
+        Assert.Equal (expected,c.Single());
     }
     private void AssertConsumed (string ansiStream, ref int i)
     {

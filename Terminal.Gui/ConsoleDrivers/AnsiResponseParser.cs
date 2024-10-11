@@ -14,6 +14,17 @@ class AnsiResponseParser
 
     private List<Func<string, bool>> _ignorers = new ();
 
+    // Enum to manage the parser's state
+    private enum ParserState
+    {
+        Normal,
+        ExpectingBracket,
+        InResponse
+    }
+
+    // Current state of the parser
+    private ParserState currentState = ParserState.Normal;
+
     /*
      * ANSI Input Sequences
      *
@@ -33,9 +44,19 @@ class AnsiResponseParser
 
     public AnsiResponseParser ()
     {
-        // How to spot when you have entered and left an AnsiResponse but not the one we are looking for
-        _ignorers.Add (s=>s.StartsWith ("\x1B[<") && s.EndsWith ("M"));
+        // Add more common ANSI sequences to be ignored
+        _ignorers.Add (s => s.StartsWith ("\x1B[<") && s.EndsWith ("M"));  // Mouse event
+        _ignorers.Add (s => s.StartsWith ("\x1B[") && s.EndsWith ("A"));   // Up arrow
+        _ignorers.Add (s => s.StartsWith ("\x1B[") && s.EndsWith ("B"));   // Down arrow
+        _ignorers.Add (s => s.StartsWith ("\x1B[") && s.EndsWith ("C"));   // Right arrow
+        _ignorers.Add (s => s.StartsWith ("\x1B[") && s.EndsWith ("D"));   // Left arrow
+        _ignorers.Add (s => s.StartsWith ("\x1B[3~"));                     // Delete
+        _ignorers.Add (s => s.StartsWith ("\x1B[5~"));                     // Page Up
+        _ignorers.Add (s => s.StartsWith ("\x1B[6~"));                     // Page Down
+        _ignorers.Add (s => s.StartsWith ("\x1B[2~"));                     // Insert
+        // Add more if necessary
     }
+
 
     /// <summary>
     /// Processes input which may be a single character or multiple.
@@ -51,42 +72,71 @@ class AnsiResponseParser
         {
             char currentChar = input [index];
 
-            if (inResponse)
+            switch (currentState)
             {
-                // If we are in a response, accumulate characters in `held`
-                held.Append (currentChar);
+                case ParserState.Normal:
+                    if (currentChar == '\x1B')
+                    {
+                        // Escape character detected, move to ExpectingBracket state
+                        currentState = ParserState.ExpectingBracket;
+                        held.Append (currentChar);  // Hold the escape character
+                        index++;
+                    }
+                    else
+                    {
+                        // Normal character, append to output
+                        output.Append (currentChar);
+                        index++;
+                    }
+                    break;
 
-                // Handle the current content in `held`
-                var handled = HandleHeldContent ();
-                if (!string.IsNullOrEmpty (handled))
-                {
-                    // If content is ready to be released, append it to output and reset state
-                    output.Append (handled);
-                    inResponse = false;
-                    held.Clear ();
-                }
+                case ParserState.ExpectingBracket:
+                    if (currentChar == '[' || currentChar == ']')
+                    {
+                        // Detected '[' or ']', transition to InResponse state
+                        currentState = ParserState.InResponse;
+                        held.Append (currentChar);  // Hold the '[' or ']'
+                        index++;
+                    }
+                    else
+                    {
+                        // Invalid sequence, release held characters and reset to Normal
+                        output.Append (held.ToString ());
+                        output.Append (currentChar);  // Add current character
+                        ResetState ();
+                        index++;
+                    }
+                    break;
 
-                index++;
-                continue;
+                case ParserState.InResponse:
+                    held.Append (currentChar);
+
+                    // Check if the held content should be released
+                    var handled = HandleHeldContent ();
+                    if (!string.IsNullOrEmpty (handled))
+                    {
+                        output.Append (handled);
+                        ResetState ();  // Exit response mode and reset
+                    }
+
+                    index++;
+                    break;
             }
-
-            // If character is the start of an escape sequence
-            if (currentChar == '\x1B')
-            {
-                // Start capturing the ANSI response sequence
-                inResponse = true;
-                held.Append (currentChar);
-                index++;
-                continue;
-            }
-
-            // If not in an ANSI response, pass the character through as regular input
-            output.Append (currentChar);
-            index++;
         }
 
-        // Return characters that should pass through as regular input
-        return output.ToString ();
+        return output.ToString ();  // Return all characters that passed through
+    }
+
+
+    /// <summary>
+    /// Resets the parser's state when a response is handled or finished.
+    /// </summary>
+    private void ResetState ()
+    {
+        currentState = ParserState.Normal;
+        held.Clear ();
+        currentTerminator = null;
+        currentResponse = null;
     }
 
     /// <summary>
@@ -124,4 +174,5 @@ class AnsiResponseParser
         currentTerminator = terminator;
         currentResponse = response;
     }
+
 }
