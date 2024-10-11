@@ -202,7 +202,15 @@ public class Editor : Scenario
                          CreateWrapChecked (),
                          CreateAutocomplete (),
                          CreateAllowsTabChecked (),
-                         CreateReadOnlyChecked ()
+                         CreateReadOnlyChecked (),
+                         new MenuItem (
+                                       "Colors",
+                                       "",
+                                       () => _textView.PromptForColors (),
+                                       null,
+                                       null,
+                                       KeyCode.CtrlMask | KeyCode.L
+                                      )
                      }
                     ),
                 new (
