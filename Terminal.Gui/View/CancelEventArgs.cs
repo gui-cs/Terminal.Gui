@@ -27,6 +27,8 @@ public class CancelEventArgs<T> : CancelEventArgs where T : notnull
         NewValue = newValue;
     }
 
+    protected CancelEventArgs () { }
+
     /// <summary>The current value of the property.</summary>
     public T CurrentValue { get; }
 

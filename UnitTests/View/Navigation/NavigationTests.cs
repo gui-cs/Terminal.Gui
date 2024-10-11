@@ -60,13 +60,6 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
                 case TabBehavior.NoStop:
                 case TabBehavior.TabGroup:
                     Application.OnKeyDown (key);
-
-                    if (view.HasFocus)
-                    {
-                        // Try once more (HexView)
-                        Application.OnKeyDown (key);
-                    }
-
                     break;
                 default:
                     Application.OnKeyDown (Key.Tab);
@@ -78,12 +71,11 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
             {
                 left = true;
                 _output.WriteLine ($"{view.GetType ().Name} - {key} Left.");
-                view.SetFocus ();
+
+                break;
             }
-            else
-            {
-                _output.WriteLine ($"{view.GetType ().Name} - {key} did not Leave.");
-            }
+
+            _output.WriteLine ($"{view.GetType ().Name} - {key} did not Leave.");
         }
 
         top.Dispose ();

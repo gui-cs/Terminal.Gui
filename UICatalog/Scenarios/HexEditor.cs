@@ -39,7 +39,7 @@ public class HexEditor : Scenario
             Width = Dim.Fill (),
             Height = Dim.Fill (1),
             Title = _fileName ?? "Untitled",
-            BorderStyle = LineStyle.Rounded
+            BorderStyle = LineStyle.Rounded,
         };
         _hexView.Edited += _hexView_Edited;
         _hexView.PositionChanged += _hexView_PositionChanged;
@@ -161,7 +161,7 @@ public class HexEditor : Scenario
         _scInfo.Title =
             $"Bytes: {_hexView.Source!.Length}";
         _scPosition.Title =
-            $"L: {obj.CursorPosition.Y} C: {obj.CursorPosition.X} Per Line: {obj.BytesPerLine}";
+            $"L: {obj.Position.Y} C: {obj.Position.X} Per Line: {obj.BytesPerLine}";
 
         if (_scAddress.CommandView is NumericUpDown<long> addrNumericUpDown)
         {
