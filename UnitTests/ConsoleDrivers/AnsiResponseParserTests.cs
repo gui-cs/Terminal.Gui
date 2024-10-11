@@ -16,7 +16,7 @@ public class AnsiResponseParserTests
         int i = 0;
 
         // Imagine that we are expecting a DAR
-        _parser.ExpectResponse ('c',(s)=> response = s);
+        _parser.ExpectResponse ("c",(s)=> response = s);
 
         // First char is Escape which we must consume incase what follows is the DAR
         AssertConsumed (ansiStream, ref i); // Esc
@@ -50,27 +50,27 @@ public class AnsiResponseParserTests
 
     private void AssertIgnored (string ansiStream, ref int i)
     {
+        var c = NextChar (ansiStream, ref i);
+
         // Parser does not grab this key (i.e. driver can continue with regular operations)
-        Assert.False (_parser.ConsumeInput (NextChar (ansiStream, ref i), out var released));
-        Assert.Null (released);
+        Assert.Equal ( c,_parser.ProcessInput (c));
     }
     private void AssertConsumed (string ansiStream, ref int i)
     {
         // Parser grabs this key
-        Assert.True (_parser.ConsumeInput( NextChar (ansiStream, ref i), out var released));
-        Assert.Null (released);
+        var c = NextChar (ansiStream, ref i);
+        Assert.Empty (_parser.ProcessInput(c));
     }
     private void AssertReleased (string ansiStream, ref int i, string expectedRelease)
     {
+        var c = NextChar (ansiStream, ref i);
+
         // Parser realizes it has grabbed content that does not belong to an outstanding request
         // Parser returns false to indicate to continue
-        Assert.False(_parser.ConsumeInput (NextChar (ansiStream,ref i), out var released));
-
-        // Parser releases all the grabbed content back to the driver
-        Assert.Equal ( released,expectedRelease);
+        Assert.Equal(expectedRelease,_parser.ProcessInput (c));
     }
-    private char NextChar (string ansiStream, ref int i)
+    private string NextChar (string ansiStream, ref int i)
     {
-        return ansiStream [i++];
+        return ansiStream [i++].ToString();
     }
 }

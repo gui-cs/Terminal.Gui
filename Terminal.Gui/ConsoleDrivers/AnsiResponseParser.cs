@@ -1,5 +1,7 @@
 ﻿#nullable enable
 
+using System.Diagnostics;
+
 namespace Terminal.Gui;
 class AnsiResponseParser
 {
@@ -23,18 +25,69 @@ class AnsiResponseParser
 
     private bool inResponse = false;
 
+    private StringBuilder held = new StringBuilder();
 
-    public bool ConsumeInput (char character, out string? released)
+    /// <summary>
+    /// <para>
+    /// Processes input which may be a single character or multiple.
+    /// Returns what should be passed on to any downstream input processing
+    /// (i.e. removes expected Ansi responses from the input stream
+    /// </para>
+    /// <para>
+    /// This method is designed to be called iteratively and as such may
+    /// return more characters than were passed in depending on previous
+    /// calls (e.g. if it was in the middle of an unrelated ANSI response.</para>
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    public string ProcessInput (string input)
     {
+
+        if (inResponse)
+        {
+            if (currentTerminator != null && input.StartsWith (currentTerminator))
+            {
+                // Consume terminator and release the event
+                held.Append (currentTerminator);
+                currentResponse?.Invoke (held.ToString());
+
+                // clear the state
+                held.Clear ();
+                currentResponse = null;
+
+                // recurse
+                return ProcessInput (input.Substring (currentTerminator.Length));
+            }
+
+            // we are in a response but have not reached terminator yet
+            held.Append (input [0]);
+            return ProcessInput (input.Substring (1));
+        }
+
+
         // if character is escape
+        if (input.StartsWith ('\x1B'))
+        {
+            // We shouldn't get an escape in the middle of a response - TODO: figure out how to handle that
+            Debug.Assert (!inResponse);
 
-        // start consuming till we see terminator
 
-        released = null;
-        return false;
+            // consume the escape
+            held.Append (input [0]);
+            inResponse = true;
+            return ProcessInput (input.Substring (1));
+        }
+
+        return input[0] + ProcessInput (input.Substring (1));
     }
 
-    public void ExpectResponse (char terminator, Action<string> response)
+    private string? currentTerminator = null;
+    private Action<string>? currentResponse = null;
+
+    public void ExpectResponse (string terminator, Action<string> response)
     {
+        currentTerminator = terminator;
+        currentResponse = response;
+        
     }
 }
