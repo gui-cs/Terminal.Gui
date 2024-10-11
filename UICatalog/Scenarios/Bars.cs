@@ -279,8 +279,9 @@ public class Bars : Scenario
 
                     sh.Accepting += (o, args) =>
                                     {
-                                        eventSource.Add ($"Accept: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
+                                        eventSource.Add ($"Accepting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
                                         eventLog.MoveDown ();
+                                        args.Cancel = true;
                                     };
                 }
             }
@@ -530,6 +531,9 @@ public class Bars : Scenario
             HighlightStyle = HighlightStyle.None,
             CanFocus = false
         };
+        // This ensures the checkbox state toggles when the hotkey of Title is pressed.
+        shortcut4.Accepting += (sender, args) => args.Cancel = true;
+
         bar.Add (shortcut1, shortcut2, shortcut3, line, shortcut4);
     }
 
@@ -563,6 +567,8 @@ public class Bars : Scenario
                 Text = "_Show/Hide"
             },
         };
+        // This ensures the checkbox state toggles when the hotkey of Title is pressed.
+        shortcut.Accepting += (sender, args) => args.Cancel = true;
 
         bar.Add (shortcut);
 

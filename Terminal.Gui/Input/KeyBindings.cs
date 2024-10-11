@@ -37,7 +37,7 @@ public class KeyBindings
             boundViewForAppScope = BoundView;
         }
 
-        if (TryGet (key, binding.Scope, boundViewForAppScope, out KeyBinding _))
+        if (TryGet (key, out KeyBinding _))
         {
             throw new InvalidOperationException (@$"A key binding for {key} exists ({binding}).");
 
@@ -90,7 +90,7 @@ public class KeyBindings
             throw new ArgumentException (@"At least one command must be specified", nameof (commands));
         }
 
-        if (TryGet (key, scope, boundViewForAppScope, out KeyBinding binding))
+        if (TryGet (key, out KeyBinding binding))
         {
             throw new InvalidOperationException (@$"A key binding for {key} exists ({binding}).");
         }
@@ -138,8 +138,7 @@ public class KeyBindings
             throw new ArgumentException (@"At least one command must be specified", nameof (commands));
         }
 
-        // if BoundView is null, the right thing will happen
-        if (TryGet (key, scope, BoundView, out KeyBinding binding))
+        if (TryGet (key, out KeyBinding binding))
         {
             throw new InvalidOperationException (@$"A key binding for {key} exists ({binding}).");
         }
@@ -325,7 +324,7 @@ public class KeyBindings
     public void Remove (Key key, View? boundViewForAppScope = null)
     {
         KeyBindingScope scope = KeyBindingScope.Disabled;
-        if (boundViewForAppScope is null)
+        if (boundViewForAppScope is null && BoundView is { })
         {
             boundViewForAppScope = BoundView;
             scope = KeyBindingScope.HotKey | KeyBindingScope.Focused;
@@ -334,15 +333,13 @@ public class KeyBindings
         {
             scope = KeyBindingScope.Application;
         }
-        if (!TryGet (key, scope, boundViewForAppScope, out KeyBinding binding))
+
+        if (!TryGet (key, out KeyBinding binding))
         {
             return;
         }
 
-        if (boundViewForAppScope is { } && binding.BoundView == boundViewForAppScope)
-        {
-            Bindings.Remove (key);
-        }
+        Bindings.Remove (key);
     }
 
     /// <summary>Replaces the commands already bound to a key.</summary>
@@ -432,31 +429,6 @@ public class KeyBindings
         if (key.IsValid && Bindings.TryGetValue (key, out binding))
         {
             if (scope.HasFlag (binding.Scope))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /// <summary>Gets the commands bound with the specified Key that are scoped to a particular scope and bound View.</summary>
-    /// <remarks></remarks>
-    /// <param name="key">The key to check.</param>
-    /// <param name="scope">the scope to filter on</param>
-    /// <param name="boundView">The view the binding is bound to</param>
-    /// <param name="binding">
-    ///     When this method returns, contains the commands bound with the specified Key, if the Key is
-    ///     found; otherwise, null. This parameter is passed uninitialized.
-    /// </param>
-    /// <returns><see langword="true"/> if the Key is bound; otherwise <see langword="false"/>.</returns>
-    public bool TryGet (Key key, KeyBindingScope scope, View? boundView, out KeyBinding binding)
-    {
-        binding = new (Array.Empty<Command> (), KeyBindingScope.Disabled, null);
-
-        if (key.IsValid && Bindings.TryGetValue (key, out binding))
-        {
-            if (binding.BoundView == boundView && scope.HasFlag (binding.Scope))
             {
                 return true;
             }

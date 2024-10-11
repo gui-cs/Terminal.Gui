@@ -20,7 +20,7 @@ public class Bar : View, IOrientation, IDesignable
     public Bar () : this ([]) { }
 
     /// <inheritdoc/>
-    public Bar (IEnumerable<Shortcut> shortcuts)
+    public Bar (IEnumerable<Shortcut>? shortcuts)
     {
         CanFocus = true;
 
@@ -34,10 +34,14 @@ public class Bar : View, IOrientation, IDesignable
         Initialized += Bar_Initialized;
         MouseEvent += OnMouseEvent;
 
-        foreach (Shortcut shortcut in shortcuts)
+        if (shortcuts is { })
         {
-            Add (shortcut);
+            foreach (Shortcut shortcut in shortcuts)
+            {
+                Add (shortcut);
+            }
         }
+
     }
 
     private void OnMouseEvent (object? sender, MouseEventEventArgs e)

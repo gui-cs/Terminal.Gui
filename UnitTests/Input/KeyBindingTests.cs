@@ -73,7 +73,7 @@ public class KeyBindingTests
 
     // Add should not allow duplicates
         [Fact]
-    public void Add_With_Bound_View_Throws_If_Exists ()
+    public void Add_With_Throws_If_Exists ()
     {
         var keyBindings = new KeyBindings (new View ());
         keyBindings.Add (Key.A, KeyBindingScope.HotKey, Command.HotKey);

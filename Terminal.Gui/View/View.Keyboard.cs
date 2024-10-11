@@ -704,7 +704,7 @@ public partial class View // Keyboard APIs
 
 #if DEBUG
 
-        if (Application.KeyBindings.TryGet (key, KeyBindingScope.Focused | KeyBindingScope.HotKey, this, out KeyBinding b))
+        if (Application.KeyBindings.TryGet (key, out KeyBinding b))
         {
             //var boundView = views [0];
             //var commandBinding = boundView.KeyBindings.Get (key);

@@ -145,7 +145,7 @@ public static partial class Application // Keyboard handling
             }
             else
             {
-                if (!KeyBindings.TryGet (keyEvent, KeyBindingScope.Application, null, out KeyBinding appBinding))
+                if (!KeyBindings.TryGet (keyEvent, out KeyBinding appBinding))
                 {
                     continue;
                 }
