@@ -344,7 +344,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
         var cancel = false;
 
-        cancel = RaiseAccepting () is true;
+        cancel = RaiseAccepting (ctx) is true;
 
         if (cancel)
         {

@@ -36,7 +36,7 @@ public class Adornments : Scenario
 
             // X = Pos.Center (),
             Width = Dim.Percent (60),
-            Height = Dim.Percent (80)
+            Height = Dim.Percent (90)
         };
         app.Add (window);
 

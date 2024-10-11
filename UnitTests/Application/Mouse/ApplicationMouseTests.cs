@@ -218,7 +218,7 @@ public class ApplicationMouseTests
 
         Application.Top.Add (view);
 
-        var mouseEvent = new MouseEvent { ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Clicked };
+        var mouseEvent = new MouseEvent { Position = new (clickX, clickY), ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Clicked };
 
         view.MouseClick += (s, e) =>
                            {

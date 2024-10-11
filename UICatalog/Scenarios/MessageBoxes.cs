@@ -241,7 +241,7 @@ public class MessageBoxes : Scenario
 
                                                for (var i = 0; i < numButtons; i++)
                                                {
-                                                   btns.Add (NumberToWords.Convert (i));
+                                                   btns.Add ($"_{NumberToWords.Convert (i)}");
                                                }
 
                                                if (styleRadioGroup.SelectedItem == 0)

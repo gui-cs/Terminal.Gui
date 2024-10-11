@@ -1438,6 +1438,15 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Co_lors.
+        /// </summary>
+        internal static string ctxColors {
+            get {
+                return ResourceManager.GetString("ctxColors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Copy.
         /// </summary>
         internal static string ctxCopy {

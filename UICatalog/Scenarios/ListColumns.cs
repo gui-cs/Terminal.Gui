@@ -211,8 +211,6 @@ public class ListColumns : Scenario
             ]
         };
 
-        top.Add (menu);
-
         var statusBar = new StatusBar (
                                        new Shortcut []
                                        {
@@ -222,8 +220,6 @@ public class ListColumns : Scenario
                                            new (Application.QuitKey, "Quit", Quit)
                                        }
                                       );
-        top.Add (statusBar);
-
         appWindow.Add (_listColView);
 
         var selectedCellLabel = new Label
@@ -256,7 +252,9 @@ public class ListColumns : Scenario
 
         _listColView.KeyBindings.ReplaceCommands (Key.Space, Command.Accept);
 
-        top.Add (appWindow);
+        top.Add (menu, appWindow, statusBar);
+        appWindow.Y = 1;
+        appWindow.Height = Dim.Fill(Dim.Func (() => statusBar.Frame.Height));
 
         // Run - Start the application.
         Application.Run (top);

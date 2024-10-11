@@ -35,7 +35,7 @@ public class ProgressBarStyles : Scenario
 
         var editor = new AdornmentsEditor ()
         {
-            AutoSelectViewToEdit = true
+            AutoSelectViewToEdit = false
         };
         app.Add (editor);
 
@@ -264,7 +264,6 @@ public class ProgressBarStyles : Scenario
 
         ckbBidirectional.CheckedStateChanging += (s, e) =>
                                    {
-                                       ckbBidirectional.CheckedState = e.NewValue;
                                        marqueesBlocksPB.BidirectionalMarquee =
                                                                   marqueesContinuousPB.BidirectionalMarquee = e.NewValue == CheckState.Checked;
                                    };

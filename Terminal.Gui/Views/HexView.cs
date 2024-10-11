@@ -34,7 +34,7 @@ public class HexView : View, IDesignable
     private long displayStart, pos;
     private SortedDictionary<long, byte> edits = [];
     private bool firstNibble;
-    private bool leftSide; 
+    private bool leftSide;
     private Stream source;
     private static readonly Rune SpaceCharRune = new (' ');
     private static readonly Rune PeriodCharRune = new ('.');
@@ -800,6 +800,7 @@ public class HexView : View, IDesignable
                     firstNibble = true;
                     return true;
                 }
+
 
                 break;
         }

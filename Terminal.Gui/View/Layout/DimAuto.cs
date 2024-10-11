@@ -408,6 +408,48 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                 }
 
                 #endregion DimView
+
+                #region DimAuto
+                // [ ] DimAuto      - Dimension is internally calculated
+
+                List<View> dimAutoSubViews;
+
+                if (dimension == Dimension.Width && us.GetType ().Name == "Bar" && us.Subviews.Count == 3)
+                {
+
+                }
+
+                if (dimension == Dimension.Width)
+                {
+                    dimAutoSubViews = includedSubviews.Where (v => v.Width is { } && v.Width.Has<DimAuto> (out _)).ToList ();
+                }
+                else
+                {
+                    dimAutoSubViews = includedSubviews.Where (v => v.Height is { } && v.Height.Has<DimAuto> (out _)).ToList ();
+                }
+
+                for (var i = 0; i < dimAutoSubViews.Count; i++)
+                {
+                    View v = dimAutoSubViews [i];
+
+                    if (dimension == Dimension.Width)
+                    {
+                        v.SetRelativeLayout (new (maxCalculatedSize, 0));
+                    }
+                    else
+                    {
+                        v.SetRelativeLayout (new (0, maxCalculatedSize));
+                    }
+
+                    int maxDimAuto= dimension == Dimension.Width ? v.Frame.X + v.Frame.Width : v.Frame.Y + v.Frame.Height;
+
+                    if (maxDimAuto > maxCalculatedSize)
+                    {
+                        maxCalculatedSize = maxDimAuto;
+                    }
+                }
+
+                #endregion
             }
         }
 

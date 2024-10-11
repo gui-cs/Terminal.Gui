@@ -320,7 +320,7 @@ public class ApplicationTests
             Assert.Empty (Application.GetViewKeyBindings ());
 
             // Mouse
-            Assert.Equal (Point.Empty, Application._lastMousePosition);
+            Assert.Null (Application._lastMousePosition);
 
 
             // Navigation

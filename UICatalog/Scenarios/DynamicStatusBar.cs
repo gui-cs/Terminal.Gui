@@ -390,17 +390,17 @@ public class DynamicStatusBar : Scenario
 
             _btnAdd.Accepting += (s, e) =>
                                {
-                                   if (StatusBar == null)
-                                   {
-                                       MessageBox.ErrorQuery (
-                                                              "StatusBar Bar Error",
-                                                              "Must add a StatusBar first!",
-                                                              "Ok"
-                                                             );
-                                       _btnAddStatusBar.SetFocus ();
+                                   //if (StatusBar == null)
+                                   //{
+                                   //    MessageBox.ErrorQuery (
+                                   //                           "StatusBar Bar Error",
+                                   //                           "Must add a StatusBar first!",
+                                   //                           "Ok"
+                                   //                          );
+                                   //    _btnAddStatusBar.SetFocus ();
 
-                                       return;
-                                   }
+                                   //    return;
+                                   //}
 
                                    var frameDetails = new DynamicStatusBarDetails ();
                                    DynamicStatusItem item = frameDetails.EnterStatusItem ();

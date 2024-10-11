@@ -119,14 +119,14 @@ public class MenuBar : View, IDesignable
 
         AddCommand (
                     Command.Accept,
-                    () =>
+                    (ctx) =>
                     {
                         if (Menus.Length > 0)
                         {
                             ProcessMenu (_selected, Menus [_selected]);
                         }
 
-                        return RaiseAccepting ();
+                        return RaiseAccepting (ctx);
                     }
                    );
         AddCommand (Command.Toggle, ctx =>

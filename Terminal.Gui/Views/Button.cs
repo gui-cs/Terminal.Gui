@@ -1,7 +1,7 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     A button View that can be pressed with the mouse or keybaord.
+///     A button View that can be pressed with the mouse or keyboard.
 /// </summary>
 /// <remarks>
 ///     <para>
@@ -79,7 +79,7 @@ public class Button : View, IDesignable
             return true;
         }
 
-        bool? handled = RaiseAccepting ();
+        bool? handled = RaiseAccepting (ctx);
 
         if (handled == true)
         {
@@ -132,6 +132,7 @@ public class Button : View, IDesignable
             return;
         }
 
+        // TODO: With https://github.com/gui-cs/Terminal.Gui/issues/3778 we won't have to pass data:
         e.Handled = InvokeCommand (Command.HotKey, new (Command.HotKey, null, data: this)) == true;
     }
 

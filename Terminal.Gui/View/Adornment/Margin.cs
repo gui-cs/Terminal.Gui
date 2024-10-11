@@ -91,17 +91,22 @@ public class Margin : Adornment
     /// <inheritdoc/>
     public override void OnDrawContent (Rectangle viewport)
     {
+        if (!NeedsDisplay)
+        {
+            return;
+        }
+
         Rectangle screen = ViewportToScreen (viewport);
         Attribute normalAttr = GetNormalColor ();
 
         Driver?.SetAttribute (normalAttr);
 
-        // This just draws/clears the thickness, not the insides.
         if (ShadowStyle != ShadowStyle.None)
         {
             screen = Rectangle.Inflate (screen, -1, -1);
         }
 
+        // This just draws/clears the thickness, not the insides.
         Thickness.Draw (screen, ToString ());
 
         if (Subviews.Count > 0)

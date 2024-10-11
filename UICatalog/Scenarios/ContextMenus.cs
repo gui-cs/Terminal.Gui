@@ -30,7 +30,8 @@ public class ContextMenus : Scenario
         // Setup - Create a top-level application window and configure it.
         Window appWindow = new ()
         {
-            Title = GetQuitKeyAndName ()
+            Title = GetQuitKeyAndName (),
+            Arrangement = ViewArrangement.Fixed
         };
 
         var text = "Context Menu";
@@ -175,9 +176,9 @@ public class ContextMenus : Scenario
         //_winContextMenu.KeyBindings.Add (_winContextMenuKey, Command.Context);
     }
 
-    private void ShowWinContextMenu (Point screenPosition)
+    private void ShowWinContextMenu (Point? screenPosition)
     {
-        _winContextMenu.SetPosition(screenPosition);
+        _winContextMenu!.SetPosition(screenPosition);
         Application.Popover = _winContextMenu;
         _winContextMenu.Visible = true;
     }

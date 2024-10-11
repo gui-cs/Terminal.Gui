@@ -138,9 +138,9 @@ public class ListView : View, IDesignable
         AddCommand (Command.ScrollRight, () => ScrollHorizontal (1));
 
         // Accept (Enter key) - Raise Accept event - DO NOT advance state
-        AddCommand (Command.Accept, () =>
+        AddCommand (Command.Accept, (ctx) =>
                                     {
-                                        if (RaiseAccepting () == true)
+                                        if (RaiseAccepting (ctx) == true)
                                         {
                                             return true;
                                         }

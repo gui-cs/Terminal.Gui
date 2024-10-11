@@ -109,13 +109,16 @@ public class ContextMenuv2 : Menuv2
     ///     first Shortcut.
     /// </summary>
     /// <param name="screenPosition"></param>
-    public void SetPosition (Point screenPosition)
+    public void SetPosition (Point? screenPosition)
     {
-        Frame = Frame with
+        if (screenPosition is { })
         {
-            X = screenPosition.X - GetViewportOffsetFromFrame ().X,
-            Y = screenPosition.Y - GetViewportOffsetFromFrame ().Y,
-        };
+            Frame = Frame with
+            {
+                X = screenPosition.Value.X - GetViewportOffsetFromFrame ().X,
+                Y = screenPosition.Value.Y - GetViewportOffsetFromFrame ().Y,
+            };
+        }
     }
 
     /// <inheritdoc />
