@@ -2090,6 +2090,53 @@ Les Miśerables",
     }
 
     [Fact]
+    public void Right_CursorAtEnd_WithSelection_ShouldClearSelection ()
+    {
+        var tf = new TextField
+        {
+            Text = "Hello",
+        };
+        tf.SetFocus ();
+        tf.SelectAll ();
+        tf.CursorPosition = 5;
+
+        // When there is selected text and the cursor is at the end of the text field
+        Assert.Equal ("Hello",tf.SelectedText);
+
+        // Pressing right should not move focus, instead it should clear selection
+        Assert.True(tf.NewKeyDownEvent (Key.CursorRight));
+        Assert.Null (tf.SelectedText);
+
+        // Now that the selection is cleared another right keypress should move focus
+        Assert.False (tf.NewKeyDownEvent (Key.CursorRight));
+    }
+    [Fact]
+    public void Left_CursorAtStart_WithSelection_ShouldClearSelection ()
+    {
+        var tf = new TextField
+        {
+            Text = "Hello",
+        };
+        tf.SetFocus ();
+
+        tf.CursorPosition = 2;
+        Assert.True (tf.NewKeyDownEvent (Key.CursorLeft.WithShift));
+        Assert.True (tf.NewKeyDownEvent (Key.CursorLeft.WithShift));
+
+        // When there is selected text and the cursor is at the start of the text field
+        Assert.Equal ("He", tf.SelectedText);
+
+        // Pressing left should not move focus, instead it should clear selection
+        Assert.True (tf.NewKeyDownEvent (Key.CursorLeft));
+        Assert.Null (tf.SelectedText);
+
+        // When clearing selected text with left the cursor should be at the start of the selection
+        Assert.Equal (0,tf.CursorPosition);
+
+        // Now that the selection is cleared another left keypress should move focus
+        Assert.False (tf.NewKeyDownEvent (Key.CursorLeft));
+    }
+    [Fact]
     public void Autocomplete_Visible_False_By_Default ()
     {
         View superView = new ()
