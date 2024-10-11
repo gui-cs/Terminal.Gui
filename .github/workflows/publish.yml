@@ -47,7 +47,7 @@ jobs:
         dotnet test Terminal.Gui/Terminal.Gui.csproj --configuration Release
 
     - name: Pack
-      run: dotnet pack -c Release --include-symbols -p:Version='${{ steps.gitversion.outputs.SemVer }}' 
+      run: dotnet pack Terminal.Gui/Terminal.Gui.csproj -c Release --include-symbols -p:Version='${{ steps.gitversion.outputs.SemVer }}' 
 
     # - name: Test to generate Code Coverage Report
     #   run: |
