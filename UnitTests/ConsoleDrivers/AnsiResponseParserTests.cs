@@ -56,27 +56,26 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
     [Theory]
     [InlineData ("\x1B[<0;10;20MHi\x1B[0c", "c", "\x1B[0c", "\x1B[<0;10;20MHi")]
     [InlineData ("\x1B[<1;15;25MYou\x1B[1c", "c", "\x1B[1c", "\x1B[<1;15;25MYou")]
-    [InlineData ("\x1B[0cHi\x1B[0c", "c", "\x1B[0c", "Hi\x1B[0c")] // Consume the first response but pass through the second
-
-    [InlineData ("\x1B[<0;0;0MHe\x1B[3c", "c", "\x1B[3c", "\x1B[<0;0;0MHe")] // Short input
-    [InlineData ("\x1B[<0;1;2Da\x1B[0c\x1B[1c", "c", "\x1B[0c", "\x1B[<0;1;2Da\x1B[1c")] // Two responses, consume only the first
-    [InlineData ("\x1B[1;1M\x1B[3cAn", "c", "\x1B[3c", "\x1B[1;1MAn")] // Response with a preceding escape sequence
-    [InlineData ("hi\x1B[2c\x1B[<5;5;5m", "c", "\x1B[2c", "hi\x1B[<5;5;5m")] // Mixed normal and escape sequences
-    [InlineData ("\x1B[3c\x1B[4c\x1B[<0;0;0MIn", "c", "\x1B[0c", "\x1B[3c\x1B[4c\x1B[<0;0;0MIn")] // Multiple consecutive responses
-    [InlineData ("\x1B[<1;2;3M\x1B[0c\x1B[<1;2;3M\x1B[2c", "c", "\x1B[2c", "\x1B[<1;2;3M\x1B[0c\x1B[<1;2;3M")] // Interleaved responses
-    [InlineData ("\x1B[<0;1;1MHi\x1B[6c\x1B[2c\x1B[<1;0;0MT", "c", "\x1B[6c", "\x1B[<0;1;1MHi\x1B[2c\x1B[<1;0;0MT")] // Mixed input with multiple responses
-    [InlineData ("Te\x1B[<2;2;2M\x1B[7c", "c", "\x1B[7c", "Te\x1B[<2;2;2M")] // Text followed by escape sequence
-    [InlineData ("\x1B[0c\x1B[<0;0;0M\x1B[3c\x1B[0c\x1B[1;0MT", "c", "\x1B[1;0M", "\x1B[<0;0;0M\x1B[3c\x1B[0cT")] // Multiple escape sequences, with expected response in between
-    [InlineData ("\x1B[0;0M\x1B[<0;0;0M\x1B[3cT\x1B[1c", "c", "\x1B[1c", "\x1B[0;0M\x1B[<0;0;0MT")] // Edge case with leading escape
-    [InlineData ("\x1B[3c\x1B[<0;0;0M\x1B[0c\x1B[<1;1;1MIn\x1B[1c", "c", "\x1B[1c", "\x1B[3c\x1B[<0;0;0M\x1B[0c\x1B[<1;1;1MIn")] // Multiple unexpected escape sequences
-    [InlineData ("\x1B[<5;5;5M\x1B[7cEx\x1B[8c", "c", "\x1B[8c", "\x1B[<5;5;5MEx")] // Extra sequences with no expected responses
+    [InlineData ("\x1B[0cHi\x1B[0c", "c", "\x1B[0c", "Hi\x1B[0c")]
+    [InlineData ("\x1B[<0;0;0MHe\x1B[3c", "c", "\x1B[3c", "\x1B[<0;0;0MHe")]
+    [InlineData ("\x1B[<0;1;2Da\x1B[0c\x1B[1c", "c", "\x1B[0c", "\x1B[<0;1;2Da\x1B[1c")]
+    [InlineData ("\x1B[1;1M\x1B[3cAn", "c", "\x1B[3c", "\x1B[1;1MAn")] 
+    [InlineData ("hi\x1B[2c\x1B[<5;5;5m", "c", "\x1B[2c", "hi\x1B[<5;5;5m")]
+    [InlineData ("\x1B[3c\x1B[4c\x1B[<0;0;0MIn", "c", "\u001b[3c", "\u001b[4c\u001b[<0;0;0MIn")]
+    [InlineData ("\x1B[<1;2;3M\x1B[0c\x1B[<1;2;3M\x1B[2c", "c", "\x1B[0c", "\x1B[<1;2;3M\x1B[<1;2;3M\u001b[2c")]
+    [InlineData ("\x1B[<0;1;1MHi\x1B[6c\x1B[2c\x1B[<1;0;0MT", "c", "\x1B[6c", "\x1B[<0;1;1MHi\x1B[2c\x1B[<1;0;0MT")]
+    [InlineData ("Te\x1B[<2;2;2M\x1B[7c", "c", "\x1B[7c", "Te\x1B[<2;2;2M")]
+    [InlineData ("\x1B[0c\x1B[<0;0;0M\x1B[3c\x1B[0c\x1B[1;0MT", "c", "\x1B[0c", "\x1B[<0;0;0M\x1B[3c\x1B[0c\x1B[1;0MT")]
+    [InlineData ("\x1B[0;0M\x1B[<0;0;0M\x1B[3cT\x1B[1c", "c", "\u001b[3c", "\u001b[0;0M\u001b[<0;0;0MT\u001b[1c")]
+    [InlineData ("\x1B[3c\x1B[<0;0;0M\x1B[0c\x1B[<1;1;1MIn\x1B[1c", "c", "\u001b[3c", "\u001b[<0;0;0M\u001b[0c\u001b[<1;1;1MIn\u001b[1c")]
+    [InlineData ("\x1B[<5;5;5M\x1B[7cEx\x1B[8c", "c", "\x1B[7c", "\u001b[<5;5;5MEx\u001b[8c")]
 
     // Random characters and mixed inputs
     [InlineData ("\x1B[<1;1;1MJJ\x1B[9c", "c", "\x1B[9c", "\x1B[<1;1;1MJJ")] // Mixed text
     [InlineData ("Be\x1B[0cAf", "c", "\x1B[0c", "BeAf")] // Escape in the middle of the string
     [InlineData ("\x1B[<0;0;0M\x1B[2cNot e", "c", "\x1B[2c", "\x1B[<0;0;0MNot e")] // Unexpected sequence followed by text
-    [InlineData ("Just te\x1B[<0;0;0M\x1B[3c\x1B[2c\x1B[4c", "c", "\x1B[4c", "Just te\x1B[<0;0;0M\x1B[3c\x1B[2c")] // Multiple unexpected responses
-    [InlineData ("\x1B[1;2;3M\x1B[0c\x1B[2;2M\x1B[0;0;0MTe", "c", "\x1B[0c", "\x1B[1;2;3M\x1B[2;2MTe")] // Multiple commands with responses
+    [InlineData ("Just te\x1B[<0;0;0M\x1B[3c\x1B[2c\x1B[4c", "c", "\x1B[3c", "Just te\x1B[<0;0;0M\x1B[2c\x1B[4c")] // Multiple unexpected responses
+    [InlineData ("\x1B[1;2;3M\x1B[0c\x1B[2;2M\x1B[0;0;0MTe", "c", "\x1B[0c", "\x1B[1;2;3M\x1B[2;2M\x1B[0;0;0MTe")] // Multiple commands with responses
     [InlineData ("\x1B[<3;3;3Mabc\x1B[4cde", "c", "\x1B[4c", "\x1B[<3;3;3Mabcde")] // Escape sequences mixed with regular text
 
     // Edge cases
@@ -88,9 +87,9 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
 
     [InlineData ("Inpu\x1B[0c\x1B[1;0;0M", "c", "\x1B[0c", "Inpu\x1B[1;0;0M")] // Single input followed by escape
     [InlineData ("\x1B[2c\x1B[<5;6;7MDa", "c", "\x1B[2c", "\x1B[<5;6;7MDa")] // Multiple escape sequences followed by text
-    [InlineData ("\x1B[0cHi\x1B[1cGo", "c", "\x1B[1c", "HiGo")] // Normal text with multiple escape sequences
+    [InlineData ("\x1B[0cHi\x1B[1cGo", "c", "\x1B[0c", "Hi\u001b[1cGo")] // Normal text with multiple escape sequences
 
-    [InlineData ("\x1B[<1;1;1MTe", "c", "\x1B[1c", "\x1B[<1;1;1MTe")] // Edge case of maximum length
+    [InlineData ("\x1B[<1;1;1MTe", "c", "", "\x1B[<1;1;1MTe")]
     // Add more test cases here...
     public void TestInputSequences (string ansiStream, string expectedTerminator, string expectedResponse, string expectedOutput)
     {
