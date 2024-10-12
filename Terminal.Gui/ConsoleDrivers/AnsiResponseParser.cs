@@ -204,7 +204,6 @@ internal class AnsiResponseParser<T> : AnsiResponseParserBase
                     held.Add (currentChar);
 
                     // Check if the held content should be released
-
                     if (ShouldReleaseHeldContent ())
                     {
                         output.AddRange (held);
@@ -238,5 +237,104 @@ internal class AnsiResponseParser<T> : AnsiResponseParserBase
     protected override string HeldToString ()
     {
         return new string (held.Select (h => h.Item1).ToArray ());
+    }
+}
+
+
+
+
+internal class AnsiResponseParser : AnsiResponseParserBase
+{
+    private readonly StringBuilder held = new ();
+
+    /// <summary>
+    ///     Processes input which may be a single character or multiple.
+    ///     Returns what should be passed on to any downstream input processing
+    ///     (i.e., removes expected ANSI responses from the input stream).
+    /// </summary>
+    public string ProcessInput (string input)
+    {
+        var output = new StringBuilder (); // Holds characters that should pass through
+        var index = 0; // Tracks position in the input string
+
+        while (index < input.Length)
+        {
+            var currentChar = input [index];
+
+            switch (State)
+            {
+                case ParserState.Normal:
+                    if (currentChar == '\x1B')
+                    {
+                        // Escape character detected, move to ExpectingBracket state
+                        State = ParserState.ExpectingBracket;
+                        held.Append (currentChar); // Hold the escape character
+                        index++;
+                    }
+                    else
+                    {
+                        // Normal character, append to output
+                        output.Append (currentChar);
+                        index++;
+                    }
+
+                    break;
+
+                case ParserState.ExpectingBracket:
+                    if (currentChar == '[')
+                    {
+                        // Detected '[' , transition to InResponse state
+                        State = ParserState.InResponse;
+                        held.Append (currentChar); // Hold the '['
+                        index++;
+                    }
+                    else
+                    {
+                        // Invalid sequence, release held characters and reset to Normal
+                        output.Append (held);
+                        output.Append (currentChar); // Add current character
+                        ResetState ();
+                        index++;
+                    }
+
+                    break;
+
+                case ParserState.InResponse:
+                    held.Append (currentChar);
+
+                    // Check if the held content should be released
+                    if (ShouldReleaseHeldContent ())
+                    {
+                        output.Append (held);
+                        ResetState (); // Exit response mode and reset
+                    }
+
+                    index++;
+
+                    break;
+            }
+        }
+
+        return output.ToString(); // Return all characters that passed through
+    }
+
+    /// <summary>
+    ///     Resets the parser's state when a response is handled or finished.
+    /// </summary>
+    private void ResetState ()
+    {
+        State = ParserState.Normal;
+        held.Clear ();
+    }
+
+    /// <inheritdoc />
+    public override void ClearHeld ()
+    {
+        held.Clear ();
+    }
+
+    protected override string HeldToString ()
+    {
+        return held.ToString ();
     }
 }
