@@ -180,8 +180,9 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         AssertReleased (input, ref i, "\x1B",0);
 
         // Assume 50ms or something has passed, lets force release as no new content
+
         // It should be the second escape that gets released (i.e. index 1)
-        AssertManualReleaseIs (input,1);
+        AssertManualReleaseIs ("\x1B",1);
     }
 
     private Tuple<char, int> [] StringToBatch (string batch)
