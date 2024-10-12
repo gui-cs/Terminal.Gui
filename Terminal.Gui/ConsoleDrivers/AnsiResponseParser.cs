@@ -2,9 +2,9 @@
 
 namespace Terminal.Gui;
 
-internal class AnsiResponseParser
+internal class AnsiResponseParser<T>
 {
-    private readonly StringBuilder held = new ();
+    private readonly List<Tuple<char,T>> held = new ();
     private readonly List<(string terminator, Action<string> response)> expectedResponses = new ();
 
     // Enum to manage the parser's state
@@ -104,47 +104,47 @@ internal class AnsiResponseParser
     ///     Returns what should be passed on to any downstream input processing
     ///     (i.e., removes expected ANSI responses from the input stream).
     /// </summary>
-    public string ProcessInput (string input)
+    public IEnumerable<Tuple<char,T>> ProcessInput (params Tuple<char,T>[] input)
     {
-        var output = new StringBuilder (); // Holds characters that should pass through
+        var output = new List<Tuple<char, T>> (); // Holds characters that should pass through
         var index = 0; // Tracks position in the input string
 
         while (index < input.Length)
         {
-            char currentChar = input [index];
+            var currentChar = input [index];
 
             switch (currentState)
             {
                 case ParserState.Normal:
-                    if (currentChar == '\x1B')
+                    if (currentChar.Item1 == '\x1B')
                     {
                         // Escape character detected, move to ExpectingBracket state
                         currentState = ParserState.ExpectingBracket;
-                        held.Append (currentChar); // Hold the escape character
+                        held.Add (currentChar); // Hold the escape character
                         index++;
                     }
                     else
                     {
                         // Normal character, append to output
-                        output.Append (currentChar);
+                        output.Add (currentChar);
                         index++;
                     }
 
                     break;
 
                 case ParserState.ExpectingBracket:
-                    if (currentChar == '[')
+                    if (currentChar.Item1 == '[')
                     {
                         // Detected '[' , transition to InResponse state
                         currentState = ParserState.InResponse;
-                        held.Append (currentChar); // Hold the '['
+                        held.Add (currentChar); // Hold the '['
                         index++;
                     }
                     else
                     {
                         // Invalid sequence, release held characters and reset to Normal
-                        output.Append (held.ToString ());
-                        output.Append (currentChar); // Add current character
+                        output.AddRange (held);
+                        output.Add (currentChar); // Add current character
                         ResetState ();
                         index++;
                     }
@@ -152,14 +152,14 @@ internal class AnsiResponseParser
                     break;
 
                 case ParserState.InResponse:
-                    held.Append (currentChar);
+                    held.Add (currentChar);
 
                     // Check if the held content should be released
-                    string handled = HandleHeldContent ();
+                    var handled = HandleHeldContent ();
 
-                    if (!string.IsNullOrEmpty (handled))
+                    if (handled != null)
                     {
-                        output.Append (handled);
+                        output.AddRange (handled);
                         ResetState (); // Exit response mode and reset
                     }
 
@@ -169,7 +169,7 @@ internal class AnsiResponseParser
             }
         }
 
-        return output.ToString (); // Return all characters that passed through
+        return output; // Return all characters that passed through
     }
 
     /// <summary>
@@ -185,9 +185,9 @@ internal class AnsiResponseParser
     ///     Checks the current `held` content to decide whether it should be released, either as an expected or unexpected
     ///     response.
     /// </summary>
-    private string HandleHeldContent ()
+    private IEnumerable<Tuple<char,T>>? HandleHeldContent ()
     {
-        var cur = held.ToString ();
+        string cur = HeldToString ();
 
         // Check for expected responses
         (string terminator, Action<string> response) matchingResponse = expectedResponses.FirstOrDefault (r => cur.EndsWith (r.terminator));
@@ -197,25 +197,30 @@ internal class AnsiResponseParser
             DispatchResponse (matchingResponse.response);
             expectedResponses.Remove (matchingResponse);
 
-            return string.Empty;
+            return null;
         }
 
         if (_knownTerminators.Contains (cur.Last ()) && cur.StartsWith (EscSeqUtils.CSI))
         {
             // Detected a response that we were not expecting
-            return cur;
+            return held;
         }
 
         // Add more cases here for other standard sequences (like arrow keys, function keys, etc.)
 
         // If no match, continue accumulating characters
-        return string.Empty;
+        return null;
+    }
+
+    private string HeldToString ()
+    {
+        return new string (held.Select (h => h.Item1).ToArray ());
     }
 
     private void DispatchResponse (Action<string> response)
     {
         // If it matches the expected response, invoke the callback and return nothing for output
-        response?.Invoke (held.ToString ());
+        response?.Invoke (HeldToString ());
         ResetState ();
     }
 

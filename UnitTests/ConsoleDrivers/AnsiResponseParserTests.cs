@@ -6,7 +6,7 @@ using Xunit.Abstractions;
 namespace UnitTests.ConsoleDrivers;
 public class AnsiResponseParserTests (ITestOutputHelper output)
 {
-    AnsiResponseParser _parser = new AnsiResponseParser ();
+    AnsiResponseParser<int> _parser = new AnsiResponseParser<int> ();
 
     [Fact]
     public void TestInputProcessing ()
@@ -114,7 +114,8 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
 
             foreach (var batch in batchSet)
             {
-                actualOutput.Append (_parser.ProcessInput (batch));
+                var output = _parser.ProcessInput (StringToBatch (batch));
+                actualOutput.Append (BatchToString (output));
             }
 
             // Assert the final output minus the expected response
@@ -124,6 +125,11 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         }
 
         output.WriteLine ($"Tested {tests} in {swRunTest.ElapsedMilliseconds} ms (gen batches took {swGenBatches.ElapsedMilliseconds} ms)" );
+    }
+
+    private Tuple<char, int> [] StringToBatch (string batch)
+    {
+        return batch.Select ((k, i) => Tuple.Create (k, i)).ToArray ();
     }
 
     public static IEnumerable<string []> GetBatchPermutations (string input, int maxDepth = 3)
@@ -173,7 +179,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
 
         // Parser does not grab this key (i.e. driver can continue with regular operations)
         Assert.Equal ( c,_parser.ProcessInput (c));
-        Assert.Equal (expected,c.Single());
+        Assert.Equal (expected,c.Single().Item1);
     }
     private void AssertConsumed (string ansiStream, ref int i)
     {
@@ -187,10 +193,16 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
 
         // Parser realizes it has grabbed content that does not belong to an outstanding request
         // Parser returns false to indicate to continue
-        Assert.Equal(expectedRelease,_parser.ProcessInput (c));
+        Assert.Equal(expectedRelease,BatchToString(_parser.ProcessInput (c)));
     }
-    private string NextChar (string ansiStream, ref int i)
+
+    private string BatchToString (IEnumerable<Tuple<char, int>> processInput)
     {
-        return ansiStream [i++].ToString();
+        return new string(processInput.Select (a=>a.Item1).ToArray ());
+    }
+
+    private Tuple<char,int>[] NextChar (string ansiStream, ref int i)
+    {
+        return  StringToBatch(ansiStream [i++].ToString());
     }
 }

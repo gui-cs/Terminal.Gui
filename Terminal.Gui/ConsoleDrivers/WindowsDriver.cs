@@ -1443,11 +1443,30 @@ internal class WindowsDriver : ConsoleDriver
 #endif
 
         WinConsole?.SetInitialCursorVisibility ();
+
+
+        // Send DAR
+        WinConsole?.WriteANSI (EscSeqUtils.CSI_SendDeviceAttributes);
+        Parser.ExpectResponse (EscSeqUtils.CSI_ReportDeviceAttributes_Terminator,
+                                               (e) =>
+                                               {
+                                                   // TODO: do something with this
+                                               });
+
         return new MainLoop (_mainLoopDriver);
     }
 
+    private bool firstTime = true;
+    public AnsiResponseParser<WindowsConsole.InputRecord> Parser { get; set; } = new ();
+
     internal void ProcessInput (WindowsConsole.InputRecord inputEvent)
     {
+        if (firstTime)
+        {
+            WinConsole?.WriteANSI (EscSeqUtils.CSI_SendDeviceAttributes);
+
+        }
+
         switch (inputEvent.EventType)
         {
             case WindowsConsole.EventType.Key:
@@ -1469,6 +1488,7 @@ internal class WindowsDriver : ConsoleDriver
                 {
                     break;
                 }
+
 
                 if (inputEvent.KeyEvent.bKeyDown)
                 {
