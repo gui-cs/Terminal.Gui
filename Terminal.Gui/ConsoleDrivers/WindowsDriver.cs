@@ -15,6 +15,7 @@
 
 #define HACK_CHECK_WINCHANGED
 
+using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -1446,7 +1447,6 @@ internal class WindowsDriver : ConsoleDriver
 
 
         // Send DAR
-        WinConsole?.WriteANSI (EscSeqUtils.CSI_SendDeviceAttributes);
         Parser.ExpectResponse (EscSeqUtils.CSI_ReportDeviceAttributes_Terminator,
                                                (e) =>
                                                {
@@ -1464,8 +1464,17 @@ internal class WindowsDriver : ConsoleDriver
         if (firstTime)
         {
             WinConsole?.WriteANSI (EscSeqUtils.CSI_SendDeviceAttributes);
-
+            firstTime = false;
         }
+
+        foreach (var e in Parse (inputEvent))
+        {
+            ProcessInputAfterParsing (e);
+        }
+    }
+
+    internal void ProcessInputAfterParsing (WindowsConsole.InputRecord inputEvent)
+    {
 
         switch (inputEvent.EventType)
         {
@@ -1488,7 +1497,6 @@ internal class WindowsDriver : ConsoleDriver
                 {
                     break;
                 }
-
 
                 if (inputEvent.KeyEvent.bKeyDown)
                 {
@@ -1537,6 +1545,31 @@ internal class WindowsDriver : ConsoleDriver
 			TerminalResized.Invoke ();
 			break;
 #endif
+        }
+    }
+
+    private IEnumerable<WindowsConsole.InputRecord> Parse (WindowsConsole.InputRecord inputEvent)
+    {
+        if (inputEvent.EventType != WindowsConsole.EventType.Key)
+        {
+            yield return inputEvent;
+            yield break;
+        }
+
+        // TODO: For now ignore key up events completely
+        if (!inputEvent.KeyEvent.bKeyDown)
+        {
+            yield break;
+        }
+
+        // TODO: Esc on its own is a problem - need a minute delay i.e. if you get Esc but nothing after release it.
+
+        // TODO: keydown/keyup badness
+
+        foreach (Tuple<char, WindowsConsole.InputRecord> output in
+                 Parser.ProcessInput (Tuple.Create(inputEvent.KeyEvent.UnicodeChar,inputEvent)))
+        {
+            yield return output.Item2;
         }
     }
 
