@@ -2,42 +2,40 @@
 
 namespace Terminal.Gui;
 
-internal class AnsiResponseParser<T>
-{
-    private readonly List<Tuple<char,T>> held = new ();
-    private readonly List<(string terminator, Action<string> response)> expectedResponses = new ();
-
-    // Enum to manage the parser's state
-    private enum ParserState
+  // Enum to manage the parser's state
+    internal enum ParserState
     {
         Normal,
         ExpectingBracket,
         InResponse
     }
 
+internal abstract class AnsiResponseParserBase
+{
+    protected readonly List<(string terminator, Action<string> response)> expectedResponses = new ();
+
     // Current state of the parser
-    private ParserState currentState = ParserState.Normal;
-    private readonly HashSet<char> _knownTerminators = new ();
-
-    /*
-     * ANSI Input Sequences
-     *
-     * \x1B[A   // Up Arrow key pressed
-     * \x1B[B   // Down Arrow key pressed
-     * \x1B[C   // Right Arrow key pressed
-     * \x1B[D   // Left Arrow key pressed
-     * \x1B[3~  // Delete key pressed
-     * \x1B[2~  // Insert key pressed
-     * \x1B[5~  // Page Up key pressed
-     * \x1B[6~  // Page Down key pressed
-     * \x1B[1;5D // Ctrl + Left Arrow
-     * \x1B[1;5C // Ctrl + Right Arrow
-     * \x1B[0;10;20M // Mouse button pressed at position (10, 20)
-     * \x1B[0c  // Device Attributes Response (e.g., terminal identification)
-     */
-
-    public AnsiResponseParser ()
+    private ParserState _state = ParserState.Normal;
+    public ParserState State
     {
+        get => _state;
+        protected set
+        {
+            StateChangedAt = DateTime.Now;
+            _state = value;
+        }
+    }
+
+    /// <summary>
+    /// When <see cref="State"/> was last changed.
+    /// </summary>
+    public DateTime StateChangedAt { get; private set; } = DateTime.Now;
+
+    protected readonly HashSet<char> _knownTerminators = new ();
+
+    public AnsiResponseParserBase ()
+    {
+
         // These all are valid terminators on ansi responses,
         // see CSI in https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s
         _knownTerminators.Add ('@');
@@ -95,9 +93,60 @@ internal class AnsiResponseParser<T>
         _knownTerminators.Add ('x');
         _knownTerminators.Add ('y');
         _knownTerminators.Add ('z');
-
-        // Add more if necessary
     }
+
+    // Reset the parser's state
+    protected void ResetState ()
+    {
+        State = ParserState.Normal;
+        ClearHeld ();
+    }
+
+    public abstract void ClearHeld ();
+
+    protected abstract string HeldToString ();
+
+    protected void DispatchResponse (Action<string> response)
+    {
+        response?.Invoke (HeldToString ());
+        ResetState ();
+    }
+
+    // Common response handler logic
+    protected bool ShouldReleaseHeldContent ()
+    {
+        string cur = HeldToString ();
+
+        // Check for expected responses
+        (string terminator, Action<string> response) matchingResponse = expectedResponses.FirstOrDefault (r => cur.EndsWith (r.terminator));
+
+        if (matchingResponse.response != null)
+        {
+            DispatchResponse (matchingResponse.response);
+            expectedResponses.Remove (matchingResponse);
+            return false;
+        }
+
+        if (_knownTerminators.Contains (cur.Last ()) && cur.StartsWith (EscSeqUtils.CSI))
+        {
+            // Detected a response that was not expected
+            return true;
+        }
+
+        return false; // Continue accumulating
+    }
+
+    /// <summary>
+    ///     Registers a new expected ANSI response with a specific terminator and a callback for when the response is
+    ///     completed.
+    /// </summary>
+    public void ExpectResponse (string terminator, Action<string> response) { expectedResponses.Add ((terminator, response)); }
+}
+
+
+internal class AnsiResponseParser<T> : AnsiResponseParserBase
+{
+    private readonly List<Tuple<char,T>> held = new ();
 
     /// <summary>
     ///     Processes input which may be a single character or multiple.
@@ -113,13 +162,13 @@ internal class AnsiResponseParser<T>
         {
             var currentChar = input [index];
 
-            switch (currentState)
+            switch (State)
             {
                 case ParserState.Normal:
                     if (currentChar.Item1 == '\x1B')
                     {
                         // Escape character detected, move to ExpectingBracket state
-                        currentState = ParserState.ExpectingBracket;
+                        State = ParserState.ExpectingBracket;
                         held.Add (currentChar); // Hold the escape character
                         index++;
                     }
@@ -136,7 +185,7 @@ internal class AnsiResponseParser<T>
                     if (currentChar.Item1 == '[')
                     {
                         // Detected '[' , transition to InResponse state
-                        currentState = ParserState.InResponse;
+                        State = ParserState.InResponse;
                         held.Add (currentChar); // Hold the '['
                         index++;
                     }
@@ -155,11 +204,10 @@ internal class AnsiResponseParser<T>
                     held.Add (currentChar);
 
                     // Check if the held content should be released
-                    var handled = HandleHeldContent ();
 
-                    if (handled != null)
+                    if (ShouldReleaseHeldContent ())
                     {
-                        output.AddRange (handled);
+                        output.AddRange (held);
                         ResetState (); // Exit response mode and reset
                     }
 
@@ -177,56 +225,18 @@ internal class AnsiResponseParser<T>
     /// </summary>
     private void ResetState ()
     {
-        currentState = ParserState.Normal;
+        State = ParserState.Normal;
         held.Clear ();
     }
 
-    /// <summary>
-    ///     Checks the current `held` content to decide whether it should be released, either as an expected or unexpected
-    ///     response.
-    /// </summary>
-    private IEnumerable<Tuple<char,T>>? HandleHeldContent ()
+    /// <inheritdoc />
+    public override void ClearHeld ()
     {
-        string cur = HeldToString ();
-
-        // Check for expected responses
-        (string terminator, Action<string> response) matchingResponse = expectedResponses.FirstOrDefault (r => cur.EndsWith (r.terminator));
-
-        if (matchingResponse.response != null)
-        {
-            DispatchResponse (matchingResponse.response);
-            expectedResponses.Remove (matchingResponse);
-
-            return null;
-        }
-
-        if (_knownTerminators.Contains (cur.Last ()) && cur.StartsWith (EscSeqUtils.CSI))
-        {
-            // Detected a response that we were not expecting
-            return held;
-        }
-
-        // Add more cases here for other standard sequences (like arrow keys, function keys, etc.)
-
-        // If no match, continue accumulating characters
-        return null;
+        held.Clear ();
     }
 
-    private string HeldToString ()
+    protected override string HeldToString ()
     {
         return new string (held.Select (h => h.Item1).ToArray ());
     }
-
-    private void DispatchResponse (Action<string> response)
-    {
-        // If it matches the expected response, invoke the callback and return nothing for output
-        response?.Invoke (HeldToString ());
-        ResetState ();
-    }
-
-    /// <summary>
-    ///     Registers a new expected ANSI response with a specific terminator and a callback for when the response is
-    ///     completed.
-    /// </summary>
-    public void ExpectResponse (string terminator, Action<string> response) { expectedResponses.Add ((terminator, response)); }
 }
