@@ -8,6 +8,11 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
     AnsiResponseParser<int> _parser1 = new AnsiResponseParser<int> ();
     AnsiResponseParser _parser2 = new AnsiResponseParser ();
 
+    /// <summary>
+    /// Used for the T value in batches that are passed to the  AnsiResponseParser&lt;int&gt;  (parser1)
+    /// </summary>
+    private int tIndex = 0;
+
     [Fact]
     public void TestInputProcessing ()
     {
@@ -109,6 +114,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
 
         foreach (var batchSet in permutations)
         {
+            tIndex = 0;
             string response1 = string.Empty;
             string response2 = string.Empty;
 
@@ -140,9 +146,47 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         output.WriteLine ($"Tested {tests} in {swRunTest.ElapsedMilliseconds} ms (gen batches took {swGenBatches.ElapsedMilliseconds} ms)" );
     }
 
+    [Fact]
+    public void ReleasesEscapeAfterTimeout ()
+    {
+        string input = "\x1B";
+        int i = 0;
+
+        // Esc on its own looks like it might be an esc sequence so should be consumed
+        AssertConsumed (input,ref i);
+
+        // We should know when the state changed
+        Assert.Equal (ParserState.ExpectingBracket, _parser1.State);
+        Assert.Equal (ParserState.ExpectingBracket, _parser2.State);
+
+        Assert.Equal (DateTime.Now.Date, _parser1.StateChangedAt.Date);
+        Assert.Equal (DateTime.Now.Date, _parser2.StateChangedAt.Date);
+
+        AssertManualReleaseIs (input);
+    }
+
+
+    [Fact]
+    public void TwoExcapesInARow ()
+    {
+        // Example user presses Esc key then a DAR comes in
+        string input = "\x1B\x1B";
+        int i = 0;
+
+        // First Esc gets grabbed
+        AssertConsumed (input, ref i);
+
+        // Upon getting the second Esc we should release the first
+        AssertReleased (input, ref i, "\x1B",0);
+
+        // Assume 50ms or something has passed, lets force release as no new content
+        // It should be the second escape that gets released (i.e. index 1)
+        AssertManualReleaseIs (input,1);
+    }
+
     private Tuple<char, int> [] StringToBatch (string batch)
     {
-        return batch.Select ((k, i) => Tuple.Create (k, i)).ToArray ();
+        return batch.Select ((k) => Tuple.Create (k, tIndex++)).ToArray ();
     }
 
     public static IEnumerable<string []> GetBatchPermutations (string input, int maxDepth = 3)
@@ -207,15 +251,21 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         Assert.Empty (_parser1.ProcessInput(c1));
         Assert.Empty (_parser2.ProcessInput (c2.ToString()));
     }
-    private void AssertReleased (string ansiStream, ref int i, string expectedRelease)
+
+    private void AssertReleased (string ansiStream, ref int i, string expectedRelease, params int[] expectedTValues)
     {
         var c2 = ansiStream [i];
         var c1 = NextChar (ansiStream, ref i);
 
         // Parser realizes it has grabbed content that does not belong to an outstanding request
         // Parser returns false to indicate to continue
-        Assert.Equal(expectedRelease,BatchToString(_parser1.ProcessInput (c1)));
+        var released1 = _parser1.ProcessInput (c1).ToArray ();
+        Assert.Equal (expectedRelease, BatchToString (released1));
 
+        if (expectedTValues.Length > 0)
+        {
+            Assert.True (expectedTValues.SequenceEqual (released1.Select (kv=>kv.Item2)));
+        }
 
         Assert.Equal (expectedRelease, _parser2.ProcessInput (c2.ToString ()));
     }
@@ -228,5 +278,22 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
     private Tuple<char,int>[] NextChar (string ansiStream, ref int i)
     {
         return  StringToBatch(ansiStream [i++].ToString());
+    }
+    private void AssertManualReleaseIs (string expectedRelease, params int [] expectedTValues)
+    {
+
+        // Consumer is responsible for determining this based on  e.g. after 50ms
+        var released1 = _parser1.Release ().ToArray ();
+        Assert.Equal (expectedRelease, BatchToString (released1));
+
+        if (expectedTValues.Length > 0)
+        {
+            Assert.True (expectedTValues.SequenceEqual (released1.Select (kv => kv.Item2)));
+        }
+
+        Assert.Equal (expectedRelease, _parser2.Release ());
+
+        Assert.Equal (ParserState.Normal, _parser1.State);
+        Assert.Equal (ParserState.Normal, _parser2.State);
     }
 }

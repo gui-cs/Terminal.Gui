@@ -103,57 +103,70 @@ namespace Terminal.Gui;
 
         public abstract void ClearHeld ();
         protected abstract string HeldToString ();
-        protected abstract void AddToHeld (char c);
+        protected abstract IEnumerable<object> HeldToObjects ();
+        protected abstract void AddToHeld (object o);
 
         // Base method for processing input
-        public void ProcessInputBase (Func<int, char> getCharAtIndex, Action<char> appendOutput, int inputLength)
+        public void ProcessInputBase (
+            Func<int, char> getCharAtIndex,
+            Func<int, object> getObjectAtIndex,
+            Action<object> appendOutput,
+            int inputLength)
         {
             var index = 0; // Tracks position in the input string
 
             while (index < inputLength)
             {
                 var currentChar = getCharAtIndex (index);
+                var currentObj = getObjectAtIndex (index);
+
+                bool isEscape = currentChar == '\x1B';
 
                 switch (State)
                 {
                     case ParserState.Normal:
-                        if (currentChar == '\x1B')
+                        if (isEscape)
                         {
                             // Escape character detected, move to ExpectingBracket state
                             State = ParserState.ExpectingBracket;
-                            AddToHeld (currentChar); // Hold the escape character
+                            AddToHeld (currentObj); // Hold the escape character
                         }
                         else
                         {
                             // Normal character, append to output
-                            appendOutput (currentChar);
+                            appendOutput (currentObj);
                         }
                         break;
 
                     case ParserState.ExpectingBracket:
+                        if (isEscape)
+                        {
+                            // Second escape so we must release first
+                            ReleaseHeld (appendOutput, ParserState.ExpectingBracket);
+                            AddToHeld (currentObj); // Hold the new escape
+                        }
+                        else
                         if (currentChar == '[')
                         {
                             // Detected '[', transition to InResponse state
                             State = ParserState.InResponse;
-                            AddToHeld (currentChar); // Hold the '['
+                            AddToHeld (currentObj); // Hold the '['
                         }
                         else
                         {
                             // Invalid sequence, release held characters and reset to Normal
                             ReleaseHeld (appendOutput);
-                            appendOutput (currentChar); // Add current character
-                            ResetState ();
+                            appendOutput (currentObj); // Add current character
                         }
                         break;
 
                     case ParserState.InResponse:
-                        AddToHeld (currentChar);
+                        AddToHeld (currentObj);
 
                         // Check if the held content should be released
                         if (ShouldReleaseHeldContent ())
                         {
                             ReleaseHeld (appendOutput);
-                            ResetState (); // Exit response mode and reset
                         }
                         break;
                 }
@@ -162,13 +175,17 @@ namespace Terminal.Gui;
             }
         }
 
-        private void ReleaseHeld (Action<char> appendOutput)
+
+        private void ReleaseHeld (Action<object> appendOutput, ParserState newState = ParserState.Normal)
         {
-            foreach (var c in HeldToString ())
+            foreach (var o in HeldToObjects ())
             {
-                appendOutput (c);
+                appendOutput (o);
             }
-        }
+
+            State = newState;
+            ClearHeld ();
+    }
 
         // Common response handler logic
         protected bool ShouldReleaseHeldContent ()
@@ -214,7 +231,11 @@ namespace Terminal.Gui;
         public IEnumerable<Tuple<char, T>> ProcessInput (params Tuple<char, T> [] input)
         {
             var output = new List<Tuple<char, T>> ();
-            ProcessInputBase (i => input [i].Item1, c => output.Add (new Tuple<char, T> (c, input [0].Item2)), input.Length);
+            ProcessInputBase (
+                              i => input [i].Item1,
+                              i => input [i],
+                              c => output.Add ((Tuple<char, T>)c),
+                              input.Length);
             return output;
         }
 
@@ -231,7 +252,9 @@ namespace Terminal.Gui;
 
         protected override string HeldToString () => new string (held.Select (h => h.Item1).ToArray ());
 
-        protected override void AddToHeld (char c) => held.Add (new Tuple<char, T> (c, default!));
+        protected override IEnumerable<object> HeldToObjects () => held;
+
+        protected override void AddToHeld (object o) => held.Add ((Tuple<char, T>)o);
 
 
 }
@@ -243,7 +266,11 @@ namespace Terminal.Gui;
         public string ProcessInput (string input)
         {
             var output = new StringBuilder ();
-            ProcessInputBase (i => input [i], c => output.Append (c), input.Length);
+            ProcessInputBase (
+                              i => input [i],
+                              i => input [i], // For string there is no T so object is same as char
+                              c => output.Append ((char)c),
+                              input.Length);
             return output.ToString ();
         }
         public string Release ()
@@ -257,5 +284,6 @@ namespace Terminal.Gui;
 
         protected override string HeldToString () => held.ToString ();
 
-        protected override void AddToHeld (char c) => held.Append (c);
+        protected override IEnumerable<object> HeldToObjects () => held.ToString().Select(c => (object) c).ToArray ();
+        protected override void AddToHeld (object o) => held.Append ((char)o);
     }
