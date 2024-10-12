@@ -1457,6 +1457,11 @@ internal class WindowsDriver : ConsoleDriver
     }
 
     private bool firstTime = true;
+
+    /// <summary>
+    /// How long after Esc has been pressed before we give up on getting an Ansi escape sequence
+    /// </summary>
+    private TimeSpan _escTimeout = TimeSpan.FromMilliseconds (50);
     public AnsiResponseParser<WindowsConsole.InputRecord> Parser { get; set; } = new ();
 
     internal void ProcessInput (WindowsConsole.InputRecord inputEvent)
@@ -1566,10 +1571,28 @@ internal class WindowsDriver : ConsoleDriver
 
         // TODO: keydown/keyup badness
 
+        foreach (var i in ShouldRelease ())
+        {
+            yield return i;
+        }
+
         foreach (Tuple<char, WindowsConsole.InputRecord> output in
                  Parser.ProcessInput (Tuple.Create(inputEvent.KeyEvent.UnicodeChar,inputEvent)))
         {
             yield return output.Item2;
+        }
+    }
+
+    public IEnumerable<WindowsConsole.InputRecord> ShouldRelease ()
+    {
+
+        if (Parser.State == ParserState.ExpectingBracket &&
+            DateTime.Now - Parser.StateChangedAt > _escTimeout)
+        {
+            foreach (Tuple<char, WindowsConsole.InputRecord> output in Parser.Release ())
+            {
+                yield return output.Item2;
+            }
         }
     }
 
@@ -2276,6 +2299,11 @@ internal class WindowsMainLoop : IMainLoopDriver
 
     void IMainLoopDriver.Iteration ()
     {
+        foreach(var i in ((WindowsDriver)_consoleDriver).ShouldRelease())
+        {
+            ((WindowsDriver)_consoleDriver).ProcessInput (i);
+        }
+
         while (_resultQueue.Count > 0)
         {
             WindowsConsole.InputRecord [] inputRecords = _resultQueue.Dequeue ();

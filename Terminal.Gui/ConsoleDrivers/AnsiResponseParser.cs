@@ -218,12 +218,23 @@ namespace Terminal.Gui;
             return output;
         }
 
+        public IEnumerable<Tuple<char, T>> Release ()
+        {
+            foreach (var h in held)
+            {
+                yield return h;
+            }
+            ResetState ();
+        }
+
         public override void ClearHeld () => held.Clear ();
 
         protected override string HeldToString () => new string (held.Select (h => h.Item1).ToArray ());
 
         protected override void AddToHeld (char c) => held.Add (new Tuple<char, T> (c, default!));
-    }
+
+
+}
 
     internal class AnsiResponseParser : AnsiResponseParserBase
     {
@@ -235,7 +246,13 @@ namespace Terminal.Gui;
             ProcessInputBase (i => input [i], c => output.Append (c), input.Length);
             return output.ToString ();
         }
+        public string Release ()
+        {
+            var output = held.ToString ();
+            ResetState ();
 
+            return output;
+        }
         public override void ClearHeld () => held.Clear ();
 
         protected override string HeldToString () => held.ToString ();

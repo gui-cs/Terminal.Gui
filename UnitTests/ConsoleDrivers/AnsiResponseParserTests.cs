@@ -1,7 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Text;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
-using Terminal.Gui;
 using Xunit.Abstractions;
 
 namespace UnitTests.ConsoleDrivers;
