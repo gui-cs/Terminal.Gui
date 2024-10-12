@@ -20,6 +20,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
+using Terminal.Gui.ConsoleDrivers;
 using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
 using static Terminal.Gui.SpinnerStyle;
 
@@ -1462,7 +1463,7 @@ internal class WindowsDriver : ConsoleDriver
     /// How long after Esc has been pressed before we give up on getting an Ansi escape sequence
     /// </summary>
     private TimeSpan _escTimeout = TimeSpan.FromMilliseconds (50);
-    public AnsiResponseParser<WindowsConsole.InputRecord> Parser { get; set; } = new ();
+    public AnsiResponseParser<WindowsConsole.InputRecord []> Parser { get; set; } = new ();
 
     internal void ProcessInput (WindowsConsole.InputRecord inputEvent)
     {
@@ -1553,6 +1554,7 @@ internal class WindowsDriver : ConsoleDriver
         }
     }
 
+    private WindowsDriverKeyPairer pairer = new WindowsDriverKeyPairer ();
     private IEnumerable<WindowsConsole.InputRecord> Parse (WindowsConsole.InputRecord inputEvent)
     {
         if (inputEvent.EventType != WindowsConsole.EventType.Key)
@@ -1561,26 +1563,36 @@ internal class WindowsDriver : ConsoleDriver
             yield break;
         }
 
-        // TODO: For now ignore key up events completely
-        if (!inputEvent.KeyEvent.bKeyDown)
-        {
-            yield break;
-        }
-
-        // TODO: Esc on its own is a problem - need a minute delay i.e. if you get Esc but nothing after release it.
-
-        // TODO: keydown/keyup badness
+        var pair = pairer.ProcessInput (inputEvent).ToArray ();
 
         foreach (var i in ShouldRelease ())
         {
             yield return i;
         }
 
-        foreach (Tuple<char, WindowsConsole.InputRecord> output in
-                 Parser.ProcessInput (Tuple.Create(inputEvent.KeyEvent.UnicodeChar,inputEvent)))
+        foreach (var p in pair)
         {
-            yield return output.Item2;
+            // may be down/up
+            if (p.Length == 2)
+            {
+                var c = p [0].KeyEvent.UnicodeChar;
+                foreach (Tuple<char, WindowsConsole.InputRecord []> output in
+                         Parser.ProcessInput (Tuple.Create(c,p)))
+                {
+                    foreach (var r in output.Item2)
+                    {
+                        yield return r;
+                    }
+                }
+            }
+            else
+            {
+                // environment doesn't support down/up
+
+                // TODO: what we do in this situation?
+            }
         }
+
     }
 
     public IEnumerable<WindowsConsole.InputRecord> ShouldRelease ()
@@ -1589,11 +1601,10 @@ internal class WindowsDriver : ConsoleDriver
         if (Parser.State == ParserState.ExpectingBracket &&
             DateTime.Now - Parser.StateChangedAt > _escTimeout)
         {
-            foreach (Tuple<char, WindowsConsole.InputRecord> output in Parser.Release ())
-            {
-                yield return output.Item2;
-            }
+            return Parser.Release ().SelectMany (o => o.Item2);
         }
+
+        return [];
     }
 
 #if HACK_CHECK_WINCHANGED
