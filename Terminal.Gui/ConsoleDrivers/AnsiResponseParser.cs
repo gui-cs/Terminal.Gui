@@ -10,7 +10,12 @@ namespace Terminal.Gui;
         InResponse
     }
 
-    internal abstract class AnsiResponseParserBase
+    public interface IAnsiResponseParser
+    {
+        void ExpectResponse (string terminator, Action<string> response);
+    }
+
+    internal abstract class AnsiResponseParserBase : IAnsiResponseParser
     {
         protected readonly List<(string terminator, Action<string> response)> expectedResponses = new ();
         private ParserState _state = ParserState.Normal;

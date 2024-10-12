@@ -1164,6 +1164,11 @@ internal class WindowsDriver : ConsoleDriver
         }
     }
 
+    /// <inheritdoc />
+    public override IAnsiResponseParser GetParser () => Parser;
+
+    /// <inheritdoc />
+    public override void RawWrite (string str) => WinConsole?.WriteANSI (str);
 
     #region Not Implemented
 
@@ -1446,18 +1451,8 @@ internal class WindowsDriver : ConsoleDriver
 
         WinConsole?.SetInitialCursorVisibility ();
 
-
-        // Send DAR
-        Parser.ExpectResponse (EscSeqUtils.CSI_ReportDeviceAttributes_Terminator,
-                                               (e) =>
-                                               {
-                                                   // TODO: do something with this
-                                               });
-
         return new MainLoop (_mainLoopDriver);
     }
-
-    private bool firstTime = true;
 
     /// <summary>
     /// How long after Esc has been pressed before we give up on getting an Ansi escape sequence
@@ -1467,12 +1462,6 @@ internal class WindowsDriver : ConsoleDriver
 
     internal void ProcessInput (WindowsConsole.InputRecord inputEvent)
     {
-        if (firstTime)
-        {
-            WinConsole?.WriteANSI (EscSeqUtils.CSI_SendDeviceAttributes);
-            firstTime = false;
-        }
-
         foreach (var e in Parse (inputEvent))
         {
             ProcessInputAfterParsing (e);
