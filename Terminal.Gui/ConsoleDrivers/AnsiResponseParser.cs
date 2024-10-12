@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui;
 
-  // Enum to manage the parser's state
+    // Enum to manage the parser's state
     internal enum ParserState
     {
         Normal,
@@ -10,31 +10,31 @@ namespace Terminal.Gui;
         InResponse
     }
 
-internal abstract class AnsiResponseParserBase
-{
-    protected readonly List<(string terminator, Action<string> response)> expectedResponses = new ();
-
-    // Current state of the parser
-    private ParserState _state = ParserState.Normal;
-    public ParserState State
+    internal abstract class AnsiResponseParserBase
     {
-        get => _state;
-        protected set
+        protected readonly List<(string terminator, Action<string> response)> expectedResponses = new ();
+        private ParserState _state = ParserState.Normal;
+
+        // Current state of the parser
+        public ParserState State
         {
-            StateChangedAt = DateTime.Now;
-            _state = value;
+            get => _state;
+            protected set
+            {
+                StateChangedAt = DateTime.Now;
+                _state = value;
+            }
         }
-    }
 
-    /// <summary>
-    /// When <see cref="State"/> was last changed.
-    /// </summary>
-    public DateTime StateChangedAt { get; private set; } = DateTime.Now;
+        /// <summary>
+        /// When <see cref="State"/> was last changed.
+        /// </summary>
+        public DateTime StateChangedAt { get; private set; } = DateTime.Now;
 
-    protected readonly HashSet<char> _knownTerminators = new ();
+        protected readonly HashSet<char> _knownTerminators = new ();
 
-    public AnsiResponseParserBase ()
-    {
+        public AnsiResponseParserBase ()
+        {
 
         // These all are valid terminators on ansi responses,
         // see CSI in https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s
@@ -93,248 +93,152 @@ internal abstract class AnsiResponseParserBase
         _knownTerminators.Add ('x');
         _knownTerminators.Add ('y');
         _knownTerminators.Add ('z');
-    }
-
-    // Reset the parser's state
-    protected void ResetState ()
-    {
-        State = ParserState.Normal;
-        ClearHeld ();
-    }
-
-    public abstract void ClearHeld ();
-
-    protected abstract string HeldToString ();
-
-    protected void DispatchResponse (Action<string> response)
-    {
-        response?.Invoke (HeldToString ());
-        ResetState ();
-    }
-
-    // Common response handler logic
-    protected bool ShouldReleaseHeldContent ()
-    {
-        string cur = HeldToString ();
-
-        // Check for expected responses
-        (string terminator, Action<string> response) matchingResponse = expectedResponses.FirstOrDefault (r => cur.EndsWith (r.terminator));
-
-        if (matchingResponse.response != null)
-        {
-            DispatchResponse (matchingResponse.response);
-            expectedResponses.Remove (matchingResponse);
-            return false;
         }
 
-        if (_knownTerminators.Contains (cur.Last ()) && cur.StartsWith (EscSeqUtils.CSI))
+        protected void ResetState ()
         {
-            // Detected a response that was not expected
-            return true;
+            State = ParserState.Normal;
+            ClearHeld ();
         }
 
-        return false; // Continue accumulating
-    }
+        public abstract void ClearHeld ();
+        protected abstract string HeldToString ();
+        protected abstract void AddToHeld (char c);
 
-    /// <summary>
-    ///     Registers a new expected ANSI response with a specific terminator and a callback for when the response is
-    ///     completed.
-    /// </summary>
-    public void ExpectResponse (string terminator, Action<string> response) { expectedResponses.Add ((terminator, response)); }
-}
-
-
-internal class AnsiResponseParser<T> : AnsiResponseParserBase
-{
-    private readonly List<Tuple<char,T>> held = new ();
-
-    /// <summary>
-    ///     Processes input which may be a single character or multiple.
-    ///     Returns what should be passed on to any downstream input processing
-    ///     (i.e., removes expected ANSI responses from the input stream).
-    /// </summary>
-    public IEnumerable<Tuple<char,T>> ProcessInput (params Tuple<char,T>[] input)
-    {
-        var output = new List<Tuple<char, T>> (); // Holds characters that should pass through
-        var index = 0; // Tracks position in the input string
-
-        while (index < input.Length)
+        // Base method for processing input
+        public void ProcessInputBase (Func<int, char> getCharAtIndex, Action<char> appendOutput, int inputLength)
         {
-            var currentChar = input [index];
+            var index = 0; // Tracks position in the input string
 
-            switch (State)
+            while (index < inputLength)
             {
-                case ParserState.Normal:
-                    if (currentChar.Item1 == '\x1B')
-                    {
-                        // Escape character detected, move to ExpectingBracket state
-                        State = ParserState.ExpectingBracket;
-                        held.Add (currentChar); // Hold the escape character
-                        index++;
-                    }
-                    else
-                    {
-                        // Normal character, append to output
-                        output.Add (currentChar);
-                        index++;
-                    }
+                var currentChar = getCharAtIndex (index);
 
-                    break;
+                switch (State)
+                {
+                    case ParserState.Normal:
+                        if (currentChar == '\x1B')
+                        {
+                            // Escape character detected, move to ExpectingBracket state
+                            State = ParserState.ExpectingBracket;
+                            AddToHeld (currentChar); // Hold the escape character
+                        }
+                        else
+                        {
+                            // Normal character, append to output
+                            appendOutput (currentChar);
+                        }
+                        break;
 
-                case ParserState.ExpectingBracket:
-                    if (currentChar.Item1 == '[')
-                    {
-                        // Detected '[' , transition to InResponse state
-                        State = ParserState.InResponse;
-                        held.Add (currentChar); // Hold the '['
-                        index++;
-                    }
-                    else
-                    {
-                        // Invalid sequence, release held characters and reset to Normal
-                        output.AddRange (held);
-                        output.Add (currentChar); // Add current character
-                        ResetState ();
-                        index++;
-                    }
+                    case ParserState.ExpectingBracket:
+                        if (currentChar == '[')
+                        {
+                            // Detected '[', transition to InResponse state
+                            State = ParserState.InResponse;
+                            AddToHeld (currentChar); // Hold the '['
+                        }
+                        else
+                        {
+                            // Invalid sequence, release held characters and reset to Normal
+                            ReleaseHeld (appendOutput);
+                            appendOutput (currentChar); // Add current character
+                            ResetState ();
+                        }
+                        break;
 
-                    break;
+                    case ParserState.InResponse:
+                        AddToHeld (currentChar);
 
-                case ParserState.InResponse:
-                    held.Add (currentChar);
+                        // Check if the held content should be released
+                        if (ShouldReleaseHeldContent ())
+                        {
+                            ReleaseHeld (appendOutput);
+                            ResetState (); // Exit response mode and reset
+                        }
+                        break;
+                }
 
-                    // Check if the held content should be released
-                    if (ShouldReleaseHeldContent ())
-                    {
-                        output.AddRange (held);
-                        ResetState (); // Exit response mode and reset
-                    }
-
-                    index++;
-
-                    break;
+                index++;
             }
         }
 
-        return output; // Return all characters that passed through
-    }
-
-    /// <summary>
-    ///     Resets the parser's state when a response is handled or finished.
-    /// </summary>
-    private void ResetState ()
-    {
-        State = ParserState.Normal;
-        held.Clear ();
-    }
-
-    /// <inheritdoc />
-    public override void ClearHeld ()
-    {
-        held.Clear ();
-    }
-
-    protected override string HeldToString ()
-    {
-        return new string (held.Select (h => h.Item1).ToArray ());
-    }
-}
-
-
-
-
-internal class AnsiResponseParser : AnsiResponseParserBase
-{
-    private readonly StringBuilder held = new ();
-
-    /// <summary>
-    ///     Processes input which may be a single character or multiple.
-    ///     Returns what should be passed on to any downstream input processing
-    ///     (i.e., removes expected ANSI responses from the input stream).
-    /// </summary>
-    public string ProcessInput (string input)
-    {
-        var output = new StringBuilder (); // Holds characters that should pass through
-        var index = 0; // Tracks position in the input string
-
-        while (index < input.Length)
+        private void ReleaseHeld (Action<char> appendOutput)
         {
-            var currentChar = input [index];
-
-            switch (State)
+            foreach (var c in HeldToString ())
             {
-                case ParserState.Normal:
-                    if (currentChar == '\x1B')
-                    {
-                        // Escape character detected, move to ExpectingBracket state
-                        State = ParserState.ExpectingBracket;
-                        held.Append (currentChar); // Hold the escape character
-                        index++;
-                    }
-                    else
-                    {
-                        // Normal character, append to output
-                        output.Append (currentChar);
-                        index++;
-                    }
-
-                    break;
-
-                case ParserState.ExpectingBracket:
-                    if (currentChar == '[')
-                    {
-                        // Detected '[' , transition to InResponse state
-                        State = ParserState.InResponse;
-                        held.Append (currentChar); // Hold the '['
-                        index++;
-                    }
-                    else
-                    {
-                        // Invalid sequence, release held characters and reset to Normal
-                        output.Append (held);
-                        output.Append (currentChar); // Add current character
-                        ResetState ();
-                        index++;
-                    }
-
-                    break;
-
-                case ParserState.InResponse:
-                    held.Append (currentChar);
-
-                    // Check if the held content should be released
-                    if (ShouldReleaseHeldContent ())
-                    {
-                        output.Append (held);
-                        ResetState (); // Exit response mode and reset
-                    }
-
-                    index++;
-
-                    break;
+                appendOutput (c);
             }
         }
 
-        return output.ToString(); // Return all characters that passed through
+        // Common response handler logic
+        protected bool ShouldReleaseHeldContent ()
+        {
+            string cur = HeldToString ();
+
+            // Check for expected responses
+            (string terminator, Action<string> response) matchingResponse = expectedResponses.FirstOrDefault (r => cur.EndsWith (r.terminator));
+
+            if (matchingResponse.response != null)
+            {
+                DispatchResponse (matchingResponse.response);
+                expectedResponses.Remove (matchingResponse);
+                return false;
+            }
+
+            if (_knownTerminators.Contains (cur.Last ()) && cur.StartsWith (EscSeqUtils.CSI))
+            {
+                // Detected a response that was not expected
+                return true;
+            }
+
+            return false; // Continue accumulating
+        }
+
+
+        protected void DispatchResponse (Action<string> response)
+        {
+            response?.Invoke (HeldToString ());
+            ResetState ();
+        }
+
+        /// <summary>
+        ///     Registers a new expected ANSI response with a specific terminator and a callback for when the response is completed.
+        /// </summary>
+        public void ExpectResponse (string terminator, Action<string> response) => expectedResponses.Add ((terminator, response));
     }
 
-    /// <summary>
-    ///     Resets the parser's state when a response is handled or finished.
-    /// </summary>
-    private void ResetState ()
+    internal class AnsiResponseParser<T> : AnsiResponseParserBase
     {
-        State = ParserState.Normal;
-        held.Clear ();
+        private readonly List<Tuple<char, T>> held = new ();
+
+        public IEnumerable<Tuple<char, T>> ProcessInput (params Tuple<char, T> [] input)
+        {
+            var output = new List<Tuple<char, T>> ();
+            ProcessInputBase (i => input [i].Item1, c => output.Add (new Tuple<char, T> (c, input [0].Item2)), input.Length);
+            return output;
+        }
+
+        public override void ClearHeld () => held.Clear ();
+
+        protected override string HeldToString () => new string (held.Select (h => h.Item1).ToArray ());
+
+        protected override void AddToHeld (char c) => held.Add (new Tuple<char, T> (c, default!));
     }
 
-    /// <inheritdoc />
-    public override void ClearHeld ()
+    internal class AnsiResponseParser : AnsiResponseParserBase
     {
-        held.Clear ();
-    }
+        private readonly StringBuilder held = new ();
 
-    protected override string HeldToString ()
-    {
-        return held.ToString ();
+        public string ProcessInput (string input)
+        {
+            var output = new StringBuilder ();
+            ProcessInputBase (i => input [i], c => output.Append (c), input.Length);
+            return output.ToString ();
+        }
+
+        public override void ClearHeld () => held.Clear ();
+
+        protected override string HeldToString () => held.ToString ();
+
+        protected override void AddToHeld (char c) => held.Append (c);
     }
-}

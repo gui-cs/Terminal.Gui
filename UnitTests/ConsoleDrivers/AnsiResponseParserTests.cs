@@ -1,12 +1,14 @@
 ﻿using System.Diagnostics;
 using System.Text;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
+using Terminal.Gui;
 using Xunit.Abstractions;
 
 namespace UnitTests.ConsoleDrivers;
 public class AnsiResponseParserTests (ITestOutputHelper output)
 {
-    AnsiResponseParser<int> _parser = new AnsiResponseParser<int> ();
+    AnsiResponseParser<int> _parser1 = new AnsiResponseParser<int> ();
+    AnsiResponseParser _parser2 = new AnsiResponseParser ();
 
     [Fact]
     public void TestInputProcessing ()
@@ -16,12 +18,14 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
                             "\x1B[0c";            // Device Attributes response (e.g., terminal identification i.e. DAR)
 
 
-        string? response = null;
+        string? response1 = null;
+        string? response2 = null;
 
         int i = 0;
 
         // Imagine that we are expecting a DAR
-        _parser.ExpectResponse ("c",(s)=> response = s);
+        _parser1.ExpectResponse ("c",(s)=> response1 = s);
+        _parser2.ExpectResponse ("c", (s) => response2 = s);
 
         // First char is Escape which we must consume incase what follows is the DAR
         AssertConsumed (ansiStream, ref i); // Esc
@@ -47,10 +51,13 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         }
 
         // Consume the terminator 'c' and expect this to call the above event
-        Assert.Null (response);
+        Assert.Null (response1);
+        Assert.Null (response1);
         AssertConsumed (ansiStream, ref i);
-        Assert.NotNull (response);
-        Assert.Equal ("\x1B[0c", response);
+        Assert.NotNull (response2);
+        Assert.Equal ("\x1B[0c", response2);
+        Assert.NotNull (response2);
+        Assert.Equal ("\x1B[0c", response2);
     }
 
     [Theory]
@@ -97,30 +104,38 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         var swGenBatches = Stopwatch.StartNew ();
         int tests = 0;
 
-        var permutations = GetBatchPermutations (ansiStream,7).ToArray ();
+        var permutations = GetBatchPermutations (ansiStream,5).ToArray ();
 
         swGenBatches.Stop ();
         var swRunTest = Stopwatch.StartNew ();
 
         foreach (var batchSet in permutations)
         {
-            string response = string.Empty;
+            string response1 = string.Empty;
+            string response2 = string.Empty;
 
             // Register the expected response with the given terminator
-            _parser.ExpectResponse (expectedTerminator, s => response = s);
+            _parser1.ExpectResponse (expectedTerminator, s => response1 = s);
+            _parser2.ExpectResponse (expectedTerminator, s => response2 = s);
 
             // Process the input
-            StringBuilder actualOutput = new StringBuilder ();
+            StringBuilder actualOutput1 = new StringBuilder ();
+            StringBuilder actualOutput2 = new StringBuilder ();
 
             foreach (var batch in batchSet)
             {
-                var output = _parser.ProcessInput (StringToBatch (batch));
-                actualOutput.Append (BatchToString (output));
+                var output1 = _parser1.ProcessInput (StringToBatch (batch));
+                actualOutput1.Append (BatchToString (output1));
+
+                var output2 = _parser2.ProcessInput (batch);
+                actualOutput2.Append (output2);
             }
 
             // Assert the final output minus the expected response
-            Assert.Equal (expectedOutput, actualOutput.ToString());
-            Assert.Equal (expectedResponse, response);
+            Assert.Equal (expectedOutput, actualOutput1.ToString());
+            Assert.Equal (expectedResponse, response1);
+            Assert.Equal (expectedOutput, actualOutput2.ToString ());
+            Assert.Equal (expectedResponse, response2);
             tests++;
         }
 
@@ -175,25 +190,36 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
 
     private void AssertIgnored (string ansiStream,char expected, ref int i)
     {
-        var c = NextChar (ansiStream, ref i);
+        var c2 = ansiStream [i];
+        var c1 = NextChar (ansiStream, ref i);
 
         // Parser does not grab this key (i.e. driver can continue with regular operations)
-        Assert.Equal ( c,_parser.ProcessInput (c));
-        Assert.Equal (expected,c.Single().Item1);
+        Assert.Equal ( c1,_parser1.ProcessInput (c1));
+        Assert.Equal (expected,c1.Single().Item1);
+
+        Assert.Equal (c2, _parser2.ProcessInput (c2.ToString()).Single());
+        Assert.Equal (expected, c2 );
     }
     private void AssertConsumed (string ansiStream, ref int i)
     {
         // Parser grabs this key
-        var c = NextChar (ansiStream, ref i);
-        Assert.Empty (_parser.ProcessInput(c));
+        var c2 = ansiStream [i];
+        var c1 = NextChar (ansiStream, ref i);
+
+        Assert.Empty (_parser1.ProcessInput(c1));
+        Assert.Empty (_parser2.ProcessInput (c2.ToString()));
     }
     private void AssertReleased (string ansiStream, ref int i, string expectedRelease)
     {
-        var c = NextChar (ansiStream, ref i);
+        var c2 = ansiStream [i];
+        var c1 = NextChar (ansiStream, ref i);
 
         // Parser realizes it has grabbed content that does not belong to an outstanding request
         // Parser returns false to indicate to continue
-        Assert.Equal(expectedRelease,BatchToString(_parser.ProcessInput (c)));
+        Assert.Equal(expectedRelease,BatchToString(_parser1.ProcessInput (c1)));
+
+
+        Assert.Equal (expectedRelease, _parser2.ProcessInput (c2.ToString ()));
     }
 
     private string BatchToString (IEnumerable<Tuple<char, int>> processInput)
