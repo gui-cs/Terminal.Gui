@@ -357,7 +357,7 @@ public class Snake : Scenario
         }
 
         // BUGBUG: Should (can) this use key bindings instead.
-        public override bool OnKeyDown (Key keyEvent)
+        protected override bool OnKeyDown (Key keyEvent)
         {
             if (keyEvent.KeyCode == KeyCode.CursorUp)
             {

@@ -121,7 +121,7 @@ public class LineDrawing : Scenario
         tools.CurrentColor = canvas.GetNormalColor ();
         canvas.CurrentAttribute = tools.CurrentColor;
 
-        win.KeyDown += (s, e) => { e.Handled = canvas.OnKeyDown (e); };
+        win.KeyDown += (s, e) => { e.Handled = canvas.NewKeyDownEvent (e); };
 
         Application.Run (win);
         win.Dispose ();
@@ -290,7 +290,7 @@ public class DrawingArea : View
     }
 
     //// BUGBUG: Why is this not handled by a key binding???
-    public override bool OnKeyDown (Key e)
+    protected override bool OnKeyDown (Key e)
     {
         // BUGBUG: These should be implemented with key bindings
         if (e.KeyCode == (KeyCode.Z | KeyCode.CtrlMask))

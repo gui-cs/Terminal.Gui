@@ -388,7 +388,7 @@ public class ScrollView : View
     }
 
     /// <inheritdoc/>
-    public override bool OnKeyDown (Key a)
+    protected override bool OnKeyDown (Key a)
     {
         if (base.OnKeyDown (a))
         {

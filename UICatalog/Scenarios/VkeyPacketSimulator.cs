@@ -112,7 +112,7 @@ public class VkeyPacketSimulator : Scenario
 
                                     if (handled == null || handled == false)
                                     {
-                                        if (!tvOutput.OnProcessKeyDown (e))
+                                        if (!tvOutput.NewKeyDownEvent (e))
                                         {
                                             Application.Invoke (
                                                                 () => MessageBox.Query (

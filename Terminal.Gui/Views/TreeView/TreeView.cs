@@ -1182,7 +1182,7 @@ public class TreeView<T> : View, ITreeView where T : class
     }
 
     /// <inheritdoc/>
-    public override bool OnKeyDown (Key keyEvent)
+    protected override bool OnKeyDown (Key keyEvent)
     {
         if (!Enabled)
         {

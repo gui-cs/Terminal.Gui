@@ -463,7 +463,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
             return CancelVirtualMethods;
         }
 
-        public override bool OnKeyDown (Key keyEvent)
+        protected override bool OnKeyDown (Key keyEvent)
         {
             OnKeyDownCalled = true;
 
@@ -477,7 +477,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
             return CancelVirtualMethods;
         }
 
-        public override bool OnProcessKeyDown (Key keyEvent)
+        protected override bool OnProcessKeyDown (Key keyEvent)
         {
             if (base.OnProcessKeyDown (keyEvent))
             {

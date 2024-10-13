@@ -233,7 +233,7 @@ public class FileDialog : Dialog
         _tbPath.TextChanged += (s, e) => PathChanged ();
 
         _tableView.CellActivated += CellActivate;
-        _tableView.KeyUp += (s, k) => k.Handled = TableView_KeyUp (k);
+        _tableView.KeyDown += (s, k) => k.Handled = TableView_KeyUp (k);
         _tableView.SelectedCellChanged += TableView_SelectedCellChanged;
 
         _tableView.KeyBindings.ReplaceCommands (Key.Home, Command.Start);

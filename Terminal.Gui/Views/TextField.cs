@@ -1055,7 +1055,7 @@ public class TextField : View
     /// </summary>
     /// <param name="a"></param>
     /// <returns></returns>
-    public override bool OnProcessKeyDown (Key a)
+    protected override bool OnProcessKeyDown (Key a)
     {
         // Remember the cursor position because the new calculated cursor position is needed
         // to be set BEFORE the TextChanged event is triggered.

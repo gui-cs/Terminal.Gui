@@ -988,7 +988,7 @@ public class TableView : View
     }
 
     /// <inheritdoc/>
-    public override bool OnKeyDown (Key key)
+    protected override bool OnKeyDown (Key key)
     {
         if (TableIsNullOrInvisible ())
         {

@@ -386,7 +386,7 @@ public class Wizard : Dialog
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public override bool OnProcessKeyDown (Key key)
+    protected override bool OnProcessKeyDown (Key key)
     {
         //// BUGBUG: Why is this not handled by a key binding???
         if (!Modal)

@@ -803,7 +803,7 @@ public class ListView : View, IDesignable
     }
 
     /// <inheritdoc/>
-    public override bool OnKeyDown (Key a)
+    protected override bool OnKeyDown (Key a)
     {
         // Enable user to find & select an item by typing text
         if (CollectionNavigatorBase.IsCompatibleKey (a) && (!AllowsMarking && a == Key.Space))

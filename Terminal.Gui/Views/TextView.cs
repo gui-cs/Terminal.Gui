@@ -3703,7 +3703,7 @@ public class TextView : View
     }
 
     /// <inheritdoc/>
-    public override bool OnProcessKeyDown (Key a)
+    protected override bool OnProcessKeyDown (Key a)
     {
         if (!CanFocus)
         {

@@ -597,7 +597,7 @@ namespace Terminal.Gui
         }
 
         /// <inheritdoc/>
-        public override bool OnProcessKeyDown (Key a)
+        protected override bool OnProcessKeyDown (Key a)
         {
             if (_provider is null)
             {

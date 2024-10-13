@@ -268,62 +268,83 @@ public partial class View // Keyboard APIs
             return false;
         }
 
-        // By default the KeyBindingScope is View
-
+        // If there's a Focused subview, give it a chance (this recurses down the hierarchy)
         if (Focused?.NewKeyDownEvent (key) == true)
         {
             return true;
         }
 
+        // Before (fire the cancellable event)
         if (RaiseKeyDown (key) || key.Handled)
         {
             return true;
         }
 
         // During (this is what can be cancelled)
-        InvokingKeyBindings?.Invoke (this, key);
 
-        if (key.Handled)
+        if (RaiseInvokingKeyBindings (key) || key.Handled)
         {
             return true;
         }
 
-        // TODO: NewKeyDownEvent returns bool. It should be bool? so state of InvokeCommand can be reflected up stack
-
-        bool? handled = OnInvokingKeyBindings (key, KeyBindingScope.HotKey | KeyBindingScope.Focused);
-
-        if (handled is { } && (bool)handled)
-        {
-            return true;
-        }
-
-        // TODO: The below is not right. OnXXX handlers are supposed to fire the events.
-        // TODO: But I've moved it outside of the v-function to test something.
-        // After (fire the cancellable event)
-        // fire event
-        ProcessKeyDown?.Invoke (this, key);
-
-        if (!key.Handled && OnProcessKeyDown (key))
+        if (RaiseProcessKeyDown(key) || key.Handled)
         {
             return true;
         }
 
         return key.Handled;
-    }
 
-    private bool RaiseKeyDown (Key key)
-    {
-        // Before (fire the cancellable event)
-        if (OnKeyDown (key) || key.Handled)
+        bool RaiseKeyDown (Key key)
         {
-            return true;
+            // Before (fire the cancellable event)
+            if (OnKeyDown (key) || key.Handled)
+            {
+                return true;
+            }
+
+            // fire event
+            KeyDown?.Invoke (this, key);
+
+            return key.Handled;
         }
 
-        // fire event
-        KeyDown?.Invoke (this, key);
+        bool RaiseInvokingKeyBindings (Key key)
+        {
+            // BUGBUG: The proper pattern is for the v-method (OnInvokingKeyBindings) to be called first, then the event
+            InvokingKeyBindings?.Invoke (this, key);
 
-        return key.Handled;
+            if (key.Handled)
+            {
+                return true;
+            }
+
+            // TODO: NewKeyDownEvent returns bool. It should be bool? so state of InvokeCommand can be reflected up stack
+
+            bool? handled = OnInvokingKeyBindings (key, KeyBindingScope.HotKey | KeyBindingScope.Focused);
+
+            if (handled is { } && (bool)handled)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        bool RaiseProcessKeyDown (Key key)
+        {
+            // BUGBUG: The proper pattern is for the v-method (OnProcessKeyDown) to be called first, then the event
+            ProcessKeyDown?.Invoke (this, key);
+
+            if (!key.Handled && OnProcessKeyDown (key))
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
+
+
 
     /// <summary>
     ///     Low-level API called when the user presses a key, allowing a view to pre-process the key down event. This is
@@ -341,7 +362,7 @@ public partial class View // Keyboard APIs
     ///     </para>
     ///     <para>Fires the <see cref="KeyDown"/> event.</para>
     /// </remarks>
-    public virtual bool OnKeyDown (Key keyEvent)
+    protected virtual bool OnKeyDown (Key keyEvent)
     {
         return false;
     }
@@ -384,9 +405,8 @@ public partial class View // Keyboard APIs
     ///         KeyUp events.
     ///     </para>
     /// </remarks>
-    public virtual bool OnProcessKeyDown (Key keyEvent)
+    protected virtual bool OnProcessKeyDown (Key keyEvent)
     {
-        //ProcessKeyDown?.Invoke (this, keyEvent);
         return keyEvent.Handled;
     }
 
@@ -446,20 +466,20 @@ public partial class View // Keyboard APIs
         }
 
         return false;
-    }
 
-    private bool RaiseKeyUp (Key key)
-    {
-        // Before (fire the cancellable event)
-        if (OnKeyUp (key) || key.Handled)
+        bool RaiseKeyUp (Key key)
         {
-            return true;
+            // Before (fire the cancellable event)
+            if (OnKeyUp (key) || key.Handled)
+            {
+                return true;
+            }
+
+            // fire event
+            KeyUp?.Invoke (this, key);
+
+            return key.Handled;
         }
-
-        // fire event
-        KeyUp?.Invoke (this, key);
-
-        return key.Handled;
     }
 
 
