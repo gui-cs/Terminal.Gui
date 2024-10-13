@@ -259,9 +259,9 @@ public partial class View // Keyboard APIs
     ///     </para>
     ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
     /// </remarks>
-    /// <param name="keyEvent"></param>
+    /// <param name="key"></param>
     /// <returns><see langword="true"/> if the event was handled.</returns>
-    public bool NewKeyDownEvent (Key keyEvent)
+    public bool NewKeyDownEvent (Key key)
     {
         if (!Enabled)
         {
@@ -270,28 +270,27 @@ public partial class View // Keyboard APIs
 
         // By default the KeyBindingScope is View
 
-        if (Focused?.NewKeyDownEvent (keyEvent) == true)
+        if (Focused?.NewKeyDownEvent (key) == true)
         {
             return true;
         }
 
-        // Before (fire the cancellable event)
-        if (OnKeyDown (keyEvent))
+        if (RaiseKeyDown (key) || key.Handled)
         {
             return true;
         }
 
         // During (this is what can be cancelled)
-        InvokingKeyBindings?.Invoke (this, keyEvent);
+        InvokingKeyBindings?.Invoke (this, key);
 
-        if (keyEvent.Handled)
+        if (key.Handled)
         {
             return true;
         }
 
         // TODO: NewKeyDownEvent returns bool. It should be bool? so state of InvokeCommand can be reflected up stack
 
-        bool? handled = OnInvokingKeyBindings (keyEvent, KeyBindingScope.HotKey | KeyBindingScope.Focused);
+        bool? handled = OnInvokingKeyBindings (key, KeyBindingScope.HotKey | KeyBindingScope.Focused);
 
         if (handled is { } && (bool)handled)
         {
@@ -302,14 +301,28 @@ public partial class View // Keyboard APIs
         // TODO: But I've moved it outside of the v-function to test something.
         // After (fire the cancellable event)
         // fire event
-        ProcessKeyDown?.Invoke (this, keyEvent);
+        ProcessKeyDown?.Invoke (this, key);
 
-        if (!keyEvent.Handled && OnProcessKeyDown (keyEvent))
+        if (!key.Handled && OnProcessKeyDown (key))
         {
             return true;
         }
 
-        return keyEvent.Handled;
+        return key.Handled;
+    }
+
+    private bool RaiseKeyDown (Key key)
+    {
+        // Before (fire the cancellable event)
+        if (OnKeyDown (key) || key.Handled)
+        {
+            return true;
+        }
+
+        // fire event
+        KeyDown?.Invoke (this, key);
+
+        return key.Handled;
     }
 
     /// <summary>
@@ -330,10 +343,7 @@ public partial class View // Keyboard APIs
     /// </remarks>
     public virtual bool OnKeyDown (Key keyEvent)
     {
-        // fire event
-        KeyDown?.Invoke (this, keyEvent);
-
-        return keyEvent.Handled;
+        return false;
     }
 
     /// <summary>
@@ -421,34 +431,37 @@ public partial class View // Keyboard APIs
     ///     </para>
     ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
     /// </remarks>
-    /// <param name="keyEvent"></param>
+    /// <param name="key"></param>
     /// <returns><see langword="true"/> if the event was handled.</returns>
-    public bool NewKeyUpEvent (Key keyEvent)
+    public bool NewKeyUpEvent (Key key)
     {
         if (!Enabled)
         {
             return false;
         }
 
-        if (Focused?.NewKeyUpEvent (keyEvent) == true)
+        if (RaiseKeyUp (key) || key.Handled)
         {
             return true;
         }
-
-        // Before (fire the cancellable event)
-        if (OnKeyUp (keyEvent))
-        {
-            return true;
-        }
-
-        // During (this is what can be cancelled)
-        // TODO: Until there's a clear use-case, we will not define 'during' event (e.g. OnDuringKeyUp). 
-
-        // After (fire the cancellable event InvokingKeyBindings)
-        // TODO: Until there's a clear use-case, we will not define an 'after' event (e.g. OnAfterKeyUp). 
 
         return false;
     }
+
+    private bool RaiseKeyUp (Key key)
+    {
+        // Before (fire the cancellable event)
+        if (OnKeyUp (key) || key.Handled)
+        {
+            return true;
+        }
+
+        // fire event
+        KeyUp?.Invoke (this, key);
+
+        return key.Handled;
+    }
+
 
     /// <summary>Method invoked when a key is released. This method is called from <see cref="NewKeyUpEvent"/>.</summary>
     /// <param name="keyEvent">Contains the details about the key that produced the event.</param>
@@ -467,14 +480,6 @@ public partial class View // Keyboard APIs
     /// </remarks>
     public virtual bool OnKeyUp (Key keyEvent)
     {
-        // fire event
-        KeyUp?.Invoke (this, keyEvent);
-
-        if (keyEvent.Handled)
-        {
-            return true;
-        }
-
         return false;
     }
 

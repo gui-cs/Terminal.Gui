@@ -3688,7 +3688,7 @@ public class TextView : View
             return true;
         }
 
-        return base.OnKeyUp (key);
+        return false;
     }
 
     /// <inheritdoc/>

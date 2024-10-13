@@ -108,7 +108,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                             Assert.Equal (alt, e.IsAlt);
                             Assert.Equal (control, e.IsCtrl);
                             Assert.False (keyDown);
-                            Assert.False (view.OnKeyDownContinued);
+                            Assert.True (view.OnKeyDownCalled);
                             keyDown = true;
                         };
         view.ProcessKeyDown += (s, e) => { keyPressed = true; };
@@ -120,7 +120,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                           Assert.Equal (alt, e.IsAlt);
                           Assert.Equal (control, e.IsCtrl);
                           Assert.False (keyUp);
-                          Assert.False (view.OnKeyUpContinued);
+                          Assert.True (view.OnKeyUpCalled);
                           keyUp = true;
                       };
 
@@ -138,7 +138,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                                   )
                              );
         Assert.True (keyPressed);
-        Assert.True (view.OnKeyDownContinued);
+        Assert.True (view.OnKeyDownCalled);
         Assert.True (view.OnKeyPressedContinued);
 
         view.NewKeyUpEvent (
@@ -150,7 +150,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                                 )
                            );
         Assert.True (keyUp);
-        Assert.True (view.OnKeyUpContinued);
+        Assert.True (view.OnKeyUpCalled);
     }
 
     [Fact]
@@ -215,7 +215,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                         {
                             Assert.Equal (KeyCode.A, e.KeyCode);
                             Assert.False (keyDown);
-                            Assert.False (view.OnKeyDownContinued);
+                            Assert.True (view.OnKeyDownCalled);
                             e.Handled = false;
                             keyDown = true;
                         };
@@ -243,7 +243,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
         Assert.True (invokingKeyBindings);
         Assert.False (keyPressed);
 
-        Assert.True (view.OnKeyDownContinued);
+        Assert.True (view.OnKeyDownCalled);
         Assert.False (view.OnInvokingKeyBindingsContinued);
         Assert.False (view.OnKeyPressedContinued);
     }
@@ -263,7 +263,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                         {
                             Assert.Equal (KeyCode.A, e.KeyCode);
                             Assert.False (keyDown);
-                            Assert.False (view.OnKeyDownContinued);
+                            Assert.True (view.OnKeyDownCalled);
                             e.Handled = true;
                             keyDown = true;
                         };
@@ -291,7 +291,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
         Assert.False (invokingKeyBindings);
         Assert.False (keyPressed);
 
-        Assert.False (view.OnKeyDownContinued);
+        Assert.True (view.OnKeyDownCalled);
         Assert.False (view.OnInvokingKeyBindingsContinued);
         Assert.False (view.OnKeyPressedContinued);
     }
@@ -352,7 +352,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                         {
                             Assert.Equal (KeyCode.A, e.KeyCode);
                             Assert.False (keyDown);
-                            Assert.False (view.OnKeyDownContinued);
+                            Assert.True (view.OnKeyDownCalled);
                             e.Handled = false;
                             keyDown = true;
                         };
@@ -380,7 +380,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
         Assert.True (invokingKeyBindings);
         Assert.True (keyPressed);
 
-        Assert.True (view.OnKeyDownContinued);
+        Assert.True (view.OnKeyDownCalled);
         Assert.True (view.OnInvokingKeyBindingsContinued);
         Assert.False (view.OnKeyPressedContinued);
     }
@@ -406,8 +406,8 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
         view.NewKeyUpEvent (Key.A);
         Assert.True (keyUp);
 
-        Assert.False (view.OnKeyUpContinued);
-        Assert.False (view.OnKeyDownContinued);
+        Assert.True (view.OnKeyUpCalled);
+        Assert.False (view.OnKeyDownCalled);
         Assert.False (view.OnInvokingKeyBindingsContinued);
         Assert.False (view.OnKeyPressedContinued);
     }
@@ -444,9 +444,9 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
         public OnKeyTestView () { CanFocus = true; }
         public bool CancelVirtualMethods { set; private get; }
         public bool OnInvokingKeyBindingsContinued { get; set; }
-        public bool OnKeyDownContinued { get; set; }
+        public bool OnKeyDownCalled { get; set; }
         public bool OnKeyPressedContinued { get; set; }
-        public bool OnKeyUpContinued { get; set; }
+        public bool OnKeyUpCalled { get; set; }
         public override string Text { get; set; }
 
         public override bool? OnInvokingKeyBindings (Key keyEvent, KeyBindingScope scope)
@@ -465,24 +465,14 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
 
         public override bool OnKeyDown (Key keyEvent)
         {
-            if (base.OnKeyDown (keyEvent))
-            {
-                return true;
-            }
-
-            OnKeyDownContinued = true;
+            OnKeyDownCalled = true;
 
             return CancelVirtualMethods;
         }
 
         public override bool OnKeyUp (Key keyEvent)
         {
-            if (base.OnKeyUp (keyEvent))
-            {
-                return true;
-            }
-
-            OnKeyUpContinued = true;
+            OnKeyUpCalled = true;
 
             return CancelVirtualMethods;
         }

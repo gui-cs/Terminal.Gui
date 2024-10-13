@@ -539,10 +539,10 @@ Item 6",
 
         lv.KeyBindings.Add (Key.Space.WithShift, Command.Select, Command.Down);
 
-        Key ev = Key.Space.WithShift;
+        Key key = Key.Space.WithShift;
 
         // view should indicate that it has accepted and consumed the event
-        Assert.True (lv.NewKeyDownEvent (ev));
+        Assert.True (lv.NewKeyDownEvent (key));
 
         // first item should now be selected
         Assert.Equal (0, lv.SelectedItem);
@@ -553,7 +553,7 @@ Item 6",
         Assert.False (lv.Source.IsMarked (2));
 
         // Press key combo again
-        Assert.True (lv.NewKeyDownEvent (ev));
+        Assert.True (lv.NewKeyDownEvent (key));
 
         // second item should now be selected
         Assert.Equal (1, lv.SelectedItem);
@@ -564,21 +564,21 @@ Item 6",
         Assert.False (lv.Source.IsMarked (2));
 
         // Press key combo again
-        Assert.True (lv.NewKeyDownEvent (ev));
+        Assert.True (lv.NewKeyDownEvent (key));
         Assert.Equal (2, lv.SelectedItem);
         Assert.True (lv.Source.IsMarked (0));
         Assert.True (lv.Source.IsMarked (1));
         Assert.False (lv.Source.IsMarked (2));
 
         // Press key combo again
-        Assert.True (lv.NewKeyDownEvent (ev));
+        Assert.True (lv.NewKeyDownEvent (key));
         Assert.Equal (2, lv.SelectedItem); // cannot move down any further
         Assert.True (lv.Source.IsMarked (0));
         Assert.True (lv.Source.IsMarked (1));
         Assert.True (lv.Source.IsMarked (2)); // but can toggle marked
 
         // Press key combo again 
-        Assert.True (lv.NewKeyDownEvent (ev));
+        Assert.True (lv.NewKeyDownEvent (key));
         Assert.Equal (2, lv.SelectedItem); // cannot move down any further
         Assert.True (lv.Source.IsMarked (0));
         Assert.True (lv.Source.IsMarked (1));
