@@ -204,6 +204,14 @@ internal class CursesDriver : ConsoleDriver
             Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
 
             IsReportingMouseMoves = false;
+
+            Thread.Sleep (100); // Allow time for mouse stopping and to flush the input buffer
+
+            // Flush the input buffer to avoid reading stale input
+            while (Console.KeyAvailable)
+            {
+                Console.ReadKey (true);
+            }
         }
     }
 
