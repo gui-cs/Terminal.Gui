@@ -583,10 +583,11 @@ internal class CursesDriver : ConsoleDriver
         return new MainLoop (_mainLoopDriver);
     }
 
-    private AnsiResponseParser<KeyCode> Parser { get; set; } = new ();
+    private AnsiResponseParser Parser { get; set; } = new ();
     /// <inheritdoc />
     public override IAnsiResponseParser GetParser () => Parser;
 
+    private List<int> seen = new List<int> ();
     internal void ProcessInput ()
     {
         int wch;
@@ -599,6 +600,8 @@ internal class CursesDriver : ConsoleDriver
         }
 
         var k = KeyCode.Null;
+
+        seen.Add (wch);
 
         if (code == Curses.KEY_CODE_YES)
         {
@@ -885,6 +888,14 @@ internal class CursesDriver : ConsoleDriver
                 }
                 else
                 {
+                    if (cki != null)
+                    {
+                        foreach (var c in cki)
+                        {
+                            Parser.ProcessInput (c.KeyChar.ToString());
+                        }
+                    }
+
                     k = ConsoleKeyMapping.MapConsoleKeyInfoToKeyCode (consoleKeyInfo);
                     keyEventArgs = new Key (k);
                     OnKeyDown (keyEventArgs);
