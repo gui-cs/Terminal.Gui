@@ -41,7 +41,6 @@ public class Bar : View, IOrientation, IDesignable
                 Add (shortcut);
             }
         }
-
     }
 
     private void OnMouseEvent (object? sender, MouseEventEventArgs e)

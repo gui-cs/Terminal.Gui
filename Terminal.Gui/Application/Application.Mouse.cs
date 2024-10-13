@@ -172,21 +172,6 @@ public static partial class Application // Mouse handling
             return;
         }
 
-        if (HandleMouseGrab (deepestViewUnderMouse, mouseEvent))
-        {
-            return;
-        }
-
-        // We can combine this into the switch expression to reduce cognitive complexity even more and likely
-        // avoid one or two of these checks in the process, as well.
-
-        WantContinuousButtonPressedView = deepestViewUnderMouse switch
-        {
-            { WantContinuousButtonPressed: true } => deepestViewUnderMouse,
-            _ => null
-        };
-
-
         if (Popover is { Visible: true }
             && View.IsInHierarchy (Popover, deepestViewUnderMouse, includeAdornments: true) is false
             && (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
@@ -201,6 +186,20 @@ public static partial class Application // Mouse handling
 
             return;
         }
+
+        if (HandleMouseGrab (deepestViewUnderMouse, mouseEvent))
+        {
+            return;
+        }
+
+        // We can combine this into the switch expression to reduce cognitive complexity even more and likely
+        // avoid one or two of these checks in the process, as well.
+
+        WantContinuousButtonPressedView = deepestViewUnderMouse switch
+                                          {
+                                              { WantContinuousButtonPressed: true } => deepestViewUnderMouse,
+                                              _ => null
+                                          };
 
         // May be null before the prior condition or the condition may set it as null.
         // So, the checking must be outside the prior condition.

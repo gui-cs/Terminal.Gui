@@ -53,6 +53,15 @@ public class ContextMenuv2 : Menuv2
 
                         return true;
                     });
+
+        foreach (var sc in shortcuts)
+        {
+            AddCommand(Command.Accept,
+                       (ctx) =>
+                       {
+                           return sc.TargetView?.InvokeCommand (sc.Command, ctx);
+                       });
+        }
         return;
 
     }

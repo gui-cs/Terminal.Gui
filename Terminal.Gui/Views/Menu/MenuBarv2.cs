@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Reflection;
 
 namespace Terminal.Gui;
@@ -22,15 +23,35 @@ public class MenuBarv2 : Bar
         ColorScheme = Colors.ColorSchemes ["Menu"];
         Orientation = Orientation.Horizontal;
 
-        LayoutStarted += MenuBarv2_LayoutStarted;
+        AddCommand (Command.Context,
+                   (ctx) =>
+                   {
+                       if (ctx.Data is Shortcut shortcut)
+                       {
+                           Rectangle screen = shortcut.FrameToScreen ();
+                           Application.Popover = shortcut.TargetView;
+                           shortcut.TargetView.X = screen.X;
+                           shortcut.TargetView.Y = screen.Y + screen.Height;
+                           shortcut.TargetView.Visible = true;
+
+                           return true;
+                       }
+
+                       return false;
+                   });
     }
 
-    // MenuBarv2 arranges the items horizontally.
-    // The first item has no left border, the last item has no right border.
-    // The Shortcuts are configured with the command, help, and key views aligned in reverse order (EndToStart).
-    private void MenuBarv2_LayoutStarted (object sender, LayoutEventArgs e)
+    /// <inheritdoc />
+    protected override bool OnHighlight (CancelEventArgs<HighlightStyle> args)
     {
-       
+        if (args.NewValue.HasFlag (HighlightStyle.Hover))
+        {
+            if (Application.Popover is { Visible: true } && View.IsInHierarchy (this, Application.Popover))
+            {
+
+            }
+        }
+        return base.OnHighlight (args);
     }
 
     /// <inheritdoc/>
@@ -43,12 +64,18 @@ public class MenuBarv2 : Bar
 
         if (view is Shortcut shortcut)
         {
-            // TODO: not happy about using AlignmentModes for this. Too implied.
-            // TODO: instead, add a property (a style enum?) to Shortcut to control this
-            //shortcut.AlignmentModes = AlignmentModes.EndToStart;
-
             shortcut.KeyView.Visible = false;
             shortcut.HelpView.Visible = false;
+
+            shortcut.Selecting += (sender, args) =>
+                                  {
+                                      args.Cancel = InvokeCommand (Command.Context, args.Context) == true;
+                                  };
+
+            shortcut.Accepting += (sender, args) =>
+                                  {
+                                      args.Cancel = InvokeCommand (Command.Context, args.Context) == true;
+                                  };
         }
 
         return view;

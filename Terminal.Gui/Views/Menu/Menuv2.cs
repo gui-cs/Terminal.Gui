@@ -74,6 +74,12 @@ public class Menuv2 : Bar
 
             shortcut.Accepting += ShortcutOnAccepting;
 
+            AddCommand (shortcut.Command, (ctx) =>
+                                          {
+                                              return RaiseShortcutCommandInvoked (ctx);
+                                          });
+
+
             void ShortcutOnAccepting (object sender, CommandEventArgs e)
             {
                 if (Arrangement.HasFlag (ViewArrangement.Overlapped) && Visible)
@@ -88,4 +94,46 @@ public class Menuv2 : Bar
 
         return view;
     }
+
+
+    protected bool? RaiseShortcutCommandInvoked (CommandContext ctx)
+    {
+        CommandEventArgs args = new () { Context = ctx };
+
+        // Best practice is to invoke the virtual method first.
+        // This allows derived classes to handle the event and potentially cancel it.
+        args.Cancel = OnShortcutCommandInvoked (args) || args.Cancel;
+
+        if (!args.Cancel)
+        {
+            // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
+            ShortcutCommandInvoked?.Invoke (this, args);
+        }
+
+        return ShortcutCommandInvoked is null ? null : args.Cancel;
+    }
+
+    /// <summary>
+    ///     Called when the user is accepting the state of the View and the <see cref="Command.Accept"/> has been invoked. Set CommandEventArgs.Cancel to
+    ///     <see langword="true"/> and return <see langword="true"/> to stop processing.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///    See <see cref="ShortcutCommandInvoked"/> for more information.
+    /// </para>
+    /// </remarks>
+    /// <param name="args"></param>
+    /// <returns><see langword="true"/> to stop processing.</returns>
+    protected virtual bool OnShortcutCommandInvoked (CommandEventArgs args) { return false; }
+
+    /// <summary>
+    ///     Cancelable event raised when the user is accepting the state of the View and the <see cref="Command.Accept"/> has been invoked. Set
+    ///     CommandEventArgs.Cancel to cancel the event.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///    See <see cref="RaiseShortcutCommandInvoked"/> for more information.
+    /// </para>
+    /// </remarks>
+    public event EventHandler<CommandEventArgs>? ShortcutCommandInvoked;
 }

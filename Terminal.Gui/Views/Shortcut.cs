@@ -75,7 +75,7 @@ public class Shortcut : View, IOrientation, IDesignable
                 helpText)
     {
         _targetView = targetView;
-        _command = command;
+        Command = command;
     }
 
     /// <summary>
@@ -92,7 +92,7 @@ public class Shortcut : View, IOrientation, IDesignable
     /// <param name="helpText">The help text to display.</param>
     public Shortcut (Key key, string? commandText, Action? action, string? helpText = null)
     {
-        Id = "_shortcut";
+        Id = $"shortcut:{commandText}";
 
         HighlightStyle = HighlightStyle.None;
         CanFocus = true;
@@ -312,7 +312,9 @@ public class Shortcut : View, IOrientation, IDesignable
 
     private readonly View? _targetView; // If set, _command will be invoked
 
-    private readonly Command _command; // Used when _targetView is set
+    public View? TargetView => _targetView;
+
+    public Command Command { get; }
 
     private void AddCommands ()
     {
@@ -351,6 +353,11 @@ public class Shortcut : View, IOrientation, IDesignable
             return true;
         }
 
+        if (ctx.Command != Command.Accept)
+        {
+           // return false;
+        }
+
         if (Action is { })
         {
             Action.Invoke ();
@@ -361,7 +368,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
         if (_targetView is { })
         {
-            _targetView.InvokeCommand (_command);
+            _targetView.InvokeCommand (Command);
         }
 
         return cancel;
@@ -526,10 +533,12 @@ public class Shortcut : View, IOrientation, IDesignable
                 if (e.Context.Data != this)
                 {
                     // Forward command to ourselves
-                    InvokeCommand (Command.Select, new (Command.Select, null, null, this));
+                    e.Cancel = InvokeCommand (Command.Select, new (Command.Select, null, null, this)) == true;
                 }
-
-                e.Cancel = true;
+                else
+                {
+                    e.Cancel = true;
+                }
             }
         }
     }
