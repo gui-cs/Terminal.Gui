@@ -988,7 +988,7 @@ public class TableView : View
     }
 
     /// <inheritdoc/>
-    public override bool OnProcessKeyDown (Key keyEvent)
+    public override bool OnKeyDown (Key keyEvent)
     {
         if (TableIsNullOrInvisible ())
         {
