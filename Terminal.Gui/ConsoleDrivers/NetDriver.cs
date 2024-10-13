@@ -1405,7 +1405,7 @@ internal class NetDriver : ConsoleDriver
             IsReportingMouseMoves = false;
         }
 
-        while (_mainLoopDriver is { _netEvents: { }} && Console.KeyAvailable)
+        while (_mainLoopDriver is { _netEvents: { } } && Console.KeyAvailable)
         {
             _mainLoopDriver._netEvents._waitForStart.Set ();
             _mainLoopDriver._netEvents._waitForStart.Reset ();
