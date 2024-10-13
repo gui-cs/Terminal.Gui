@@ -111,8 +111,17 @@ namespace Terminal.Gui;
         protected abstract IEnumerable<object> HeldToObjects ();
         protected abstract void AddToHeld (object o);
 
-        // Base method for processing input
-        public void ProcessInputBase (
+        /// <summary>
+        /// Processes an input collection of objects <paramref name="inputLength"/> long.
+        /// You must provide the indexers to return the objects and the action to append
+        /// to output stream.
+        /// </summary>
+        /// <param name="getCharAtIndex">The character representation of element i of your input collection</param>
+        /// <param name="getObjectAtIndex">The actual element in the collection (e.g. char or Tuple&lt;char,T&gt;)</param>
+        /// <param name="appendOutput">Action to invoke when parser confirms an element of the current collection or a previous
+        /// call's collection should be appended to the current output (i.e. append to your output List/StringBuilder).</param>
+        /// <param name="inputLength">The total number of elements in your collection</param>
+        protected void ProcessInputBase (
             Func<int, char> getCharAtIndex,
             Func<int, object> getObjectAtIndex,
             Action<object> appendOutput,
