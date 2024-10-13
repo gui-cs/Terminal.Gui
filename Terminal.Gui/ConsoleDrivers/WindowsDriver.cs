@@ -1035,6 +1035,20 @@ internal class WindowsDriver : ConsoleDriver
 
     public override bool SupportsTrueColor => RunningUnitTests || (Environment.OSVersion.Version.Build >= 14931 && _isWindowsTerminal);
 
+    /// <inheritdoc />
+    public override bool IsReportingMouseMoves
+    {
+        get => _isReportingMouseMoves;
+        internal set => _isReportingMouseMoves = value;
+    }
+
+    /// <inheritdoc />
+    public override bool IsSuspendRead
+    {
+        get => _isSuspendRead;
+        internal set => _isSuspendRead = value;
+    }
+
     public WindowsConsole WinConsole { get; private set; }
 
     public WindowsConsole.KeyEventRecord FromVKPacketToKeyEventRecord (WindowsConsole.KeyEventRecord keyEvent)
@@ -1162,6 +1176,11 @@ internal class WindowsDriver : ConsoleDriver
         }
     }
 
+    /// <inheritdoc />
+    public override void StartReportingMouseMoves () { throw new NotImplementedException (); }
+
+    /// <inheritdoc />
+    public override void StopReportingMouseMoves () { throw new NotImplementedException (); }
 
     #region Not Implemented
 
@@ -1188,6 +1207,8 @@ internal class WindowsDriver : ConsoleDriver
     #region Cursor Handling
 
     private CursorVisibility? _cachedCursorVisibility;
+    private bool _isReportingMouseMoves;
+    private bool _isSuspendRead;
 
     public override void UpdateCursor ()
     {

@@ -1328,6 +1328,7 @@ internal class NetDriver : ConsoleDriver
     }
 
     private CursorVisibility? _cachedCursorVisibility;
+    private bool _isSuspendRead;
 
     public override void UpdateCursor ()
     {
@@ -1376,9 +1377,16 @@ internal class NetDriver : ConsoleDriver
 
     #region Mouse Handling
 
-    public bool IsReportingMouseMoves { get; private set; }
+    public override bool IsReportingMouseMoves { get; internal set; }
 
-    public void StartReportingMouseMoves ()
+    /// <inheritdoc />
+    public override bool IsSuspendRead
+    {
+        get => _isSuspendRead;
+        internal set => _isSuspendRead = _suspendRead = value;
+    }
+
+    public override void StartReportingMouseMoves ()
     {
         if (!RunningUnitTests)
         {
@@ -1388,13 +1396,26 @@ internal class NetDriver : ConsoleDriver
         }
     }
 
-    public void StopReportingMouseMoves ()
+    public override void StopReportingMouseMoves ()
     {
         if (!RunningUnitTests)
         {
             Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
 
             IsReportingMouseMoves = false;
+        }
+
+        while (_mainLoopDriver is { _netEvents: { }} && Console.KeyAvailable)
+        {
+            _mainLoopDriver._netEvents._waitForStart.Set ();
+            _mainLoopDriver._netEvents._waitForStart.Reset ();
+
+            _mainLoopDriver._netEvents._forceRead = true;
+        }
+
+        if (_mainLoopDriver is { _netEvents: { } })
+        {
+            _mainLoopDriver._netEvents._forceRead = false;
         }
     }
 

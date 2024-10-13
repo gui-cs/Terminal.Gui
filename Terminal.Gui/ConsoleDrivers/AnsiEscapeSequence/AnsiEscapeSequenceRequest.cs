@@ -56,58 +56,21 @@ public class AnsiEscapeSequenceRequest
         var response = new StringBuilder ();
         var error = new StringBuilder ();
         var savedIsReportingMouseMoves = false;
-        NetDriver? netDriver = null;
+        ConsoleDriver? driver = null;
         var values = new string? [] { null };
 
         try
         {
-            switch (Application.Driver)
+            driver = Application.Driver;
+
+            savedIsReportingMouseMoves = driver!.IsReportingMouseMoves;
+
+            if (savedIsReportingMouseMoves)
             {
-                case NetDriver:
-                    netDriver = Application.Driver as NetDriver;
-                    savedIsReportingMouseMoves = netDriver!.IsReportingMouseMoves;
-
-                    if (savedIsReportingMouseMoves)
-                    {
-                        netDriver.StopReportingMouseMoves ();
-                    }
-
-                    while (Console.KeyAvailable)
-                    {
-                        netDriver._mainLoopDriver._netEvents._waitForStart.Set ();
-                        netDriver._mainLoopDriver._netEvents._waitForStart.Reset ();
-
-                        netDriver._mainLoopDriver._netEvents._forceRead = true;
-                    }
-
-                    netDriver._mainLoopDriver._netEvents._forceRead = false;
-
-                    break;
-                case CursesDriver cursesDriver:
-                    savedIsReportingMouseMoves = cursesDriver.IsReportingMouseMoves;
-
-                    if (savedIsReportingMouseMoves)
-                    {
-                        cursesDriver.StopReportingMouseMoves ();
-                    }
-
-                    break;
+                driver.StopReportingMouseMoves ();
             }
 
-            if (netDriver is { })
-            {
-                NetEvents._suspendRead = true;
-            }
-            else
-            {
-                Thread.Sleep (100); // Allow time for mouse stopping and to flush the input buffer
-
-                // Flush the input buffer to avoid reading stale input
-                while (Console.KeyAvailable)
-                {
-                    Console.ReadKey (true);
-                }
-            }
+            driver!.IsSuspendRead = true;
 
             // Send the ANSI escape sequence
             Console.Write (ansiRequest.Request);
@@ -156,18 +119,8 @@ public class AnsiEscapeSequenceRequest
 
             if (savedIsReportingMouseMoves)
             {
-                switch (Application.Driver)
-                {
-                    case NetDriver:
-                        NetEvents._suspendRead = false;
-                        netDriver!.StartReportingMouseMoves ();
-
-                        break;
-                    case CursesDriver cursesDriver:
-                        cursesDriver.StartReportingMouseMoves ();
-
-                        break;
-                }
+                driver!.IsSuspendRead = false;
+                driver.StartReportingMouseMoves ();
             }
         }
 

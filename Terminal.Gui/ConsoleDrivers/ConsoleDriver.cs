@@ -562,6 +562,16 @@ public abstract class ConsoleDriver
 
     #region Mouse and Keyboard
 
+    /// <summary>
+    /// Gets whether the mouse is reporting move events.
+    /// </summary>
+    public abstract bool IsReportingMouseMoves { get; internal set; }
+
+    /// <summary>
+    /// Gets whether the terminal is reading input.
+    /// </summary>
+    public abstract bool IsSuspendRead { get; internal set; }
+
     /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="KeyUp"/>.</summary>
     public event EventHandler<Key>? KeyDown;
 
@@ -607,6 +617,16 @@ public abstract class ConsoleDriver
     /// <param name="alt">If <see langword="true"/> simulates the Alt key being pressed.</param>
     /// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
     public abstract void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
+
+    /// <summary>
+    /// Provide handling for the terminal start reporting mouse events.
+    /// </summary>
+    public abstract void StartReportingMouseMoves ();
+
+    /// <summary>
+    /// Provide handling for the terminal stop reporting mouse events.
+    /// </summary>
+    public abstract void StopReportingMouseMoves ();
 
     #endregion
 }

@@ -18,6 +18,7 @@ internal class CursesDriver : ConsoleDriver
     private MouseFlags _lastMouseFlags;
     private UnixMainLoop _mainLoopDriver;
     private object _processInputToken;
+    private bool _isSuspendRead;
 
     public override int Cols
     {
@@ -177,9 +178,16 @@ internal class CursesDriver : ConsoleDriver
         return true;
     }
 
-    public bool IsReportingMouseMoves { get; private set; }
+    public override bool IsReportingMouseMoves { get; internal set; }
 
-    public void StartReportingMouseMoves ()
+    /// <inheritdoc />
+    public override bool IsSuspendRead
+    {
+        get => _isSuspendRead;
+        internal set => _isSuspendRead = value;
+    }
+
+    public override void StartReportingMouseMoves ()
     {
         if (!RunningUnitTests)
         {
@@ -189,7 +197,7 @@ internal class CursesDriver : ConsoleDriver
         }
     }
 
-    public void StopReportingMouseMoves ()
+    public override void StopReportingMouseMoves ()
     {
         if (!RunningUnitTests)
         {

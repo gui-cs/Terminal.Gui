@@ -40,6 +40,20 @@ public class FakeDriver : ConsoleDriver
     public static Behaviors FakeBehaviors = new ();
     public override bool SupportsTrueColor => false;
 
+    /// <inheritdoc />
+    public override bool IsReportingMouseMoves
+    {
+        get => _isReportingMouseMoves;
+        internal set => _isReportingMouseMoves = value;
+    }
+
+    /// <inheritdoc />
+    public override bool IsSuspendRead
+    {
+        get => _isSuspendRead;
+        internal set => _isSuspendRead = value;
+    }
+
     public FakeDriver ()
     {
         Cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;
@@ -337,6 +351,8 @@ public class FakeDriver : ConsoleDriver
     }
 
     private CursorVisibility _savedCursorVisibility;
+    private bool _isReportingMouseMoves;
+    private bool _isSuspendRead;
 
     private void MockKeyPressedHandler (ConsoleKeyInfo consoleKeyInfo)
     {
@@ -391,6 +407,12 @@ public class FakeDriver : ConsoleDriver
     {
         MockKeyPressedHandler (new ConsoleKeyInfo (keyChar, key, shift, alt, control));
     }
+
+    /// <inheritdoc />
+    public override void StartReportingMouseMoves () { throw new NotImplementedException (); }
+
+    /// <inheritdoc />
+    public override void StopReportingMouseMoves () { throw new NotImplementedException (); }
 
     public void SetBufferSize (int width, int height)
     {
