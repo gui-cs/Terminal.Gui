@@ -226,12 +226,12 @@ public class Editor : Scenario
                                                          "",
                                                          () =>
                                                          {
-                                                             _miForceMinimumPosToZero.Checked =
-                                                                 _forceMinimumPosToZero =
-                                                                     !_forceMinimumPosToZero;
+                                                             //_miForceMinimumPosToZero.Checked =
+                                                             //    _forceMinimumPosToZero =
+                                                             //        !_forceMinimumPosToZero;
 
-                                                             _textView.ContextMenu.ForceMinimumPosToZero =
-                                                                 _forceMinimumPosToZero;
+                                                             //_textView.ContextMenu.ForceMinimumPosToZero =
+                                                             //    _forceMinimumPosToZero;
                                                          }
                                                         )
                          {

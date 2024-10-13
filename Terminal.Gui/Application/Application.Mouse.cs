@@ -172,6 +172,21 @@ public static partial class Application // Mouse handling
             return;
         }
 
+        if (Popover is { Visible: true }
+            && View.IsInHierarchy (Popover, deepestViewUnderMouse, includeAdornments: true) is false
+            && (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
+                || mouseEvent.Flags.HasFlag (MouseFlags.Button2Pressed)
+                || mouseEvent.Flags.HasFlag (MouseFlags.Button3Pressed)))
+        {
+
+            Popover.Visible = false;
+
+            // Recurse once
+            OnMouseEvent (mouseEvent);
+
+            return;
+        }
+
         if (HandleMouseGrab (deepestViewUnderMouse, mouseEvent))
         {
             return;
@@ -181,10 +196,10 @@ public static partial class Application // Mouse handling
         // avoid one or two of these checks in the process, as well.
 
         WantContinuousButtonPressedView = deepestViewUnderMouse switch
-        {
-            { WantContinuousButtonPressed: true } => deepestViewUnderMouse,
-            _ => null
-        };
+                                          {
+                                              { WantContinuousButtonPressed: true } => deepestViewUnderMouse,
+                                              _ => null
+                                          };
 
         // May be null before the prior condition or the condition may set it as null.
         // So, the checking must be outside the prior condition.
@@ -208,7 +223,7 @@ public static partial class Application // Mouse handling
                 View = deepestViewUnderMouse
             };
         }
-        else if (deepestViewUnderMouse.ViewportToScreen (Rectangle.Empty with { Size = deepestViewUnderMouse.Viewport.Size }).Contains (mouseEvent.Position))
+        else if (deepestViewUnderMouse.ViewportToScreen (Rectangle.Empty with { Size = deepestViewUnderMouse.Viewport.Size }).Contains (mouseEvent.ScreenPosition))
         {
             Point viewportLocation = deepestViewUnderMouse.ScreenToViewport (mouseEvent.ScreenPosition);
 
@@ -223,8 +238,9 @@ public static partial class Application // Mouse handling
         else
         {
             // The mouse was outside any View's Viewport.
+            Debug.Fail ("this should not happen.");
 
-           // Debug.Fail ("This should never happen. If it does please file an Issue!!");
+            // Debug.Fail ("This should never happen. If it does please file an Issue!!");
 
             return;
         }

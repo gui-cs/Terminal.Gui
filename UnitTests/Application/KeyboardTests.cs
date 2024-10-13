@@ -159,16 +159,14 @@ public class KeyboardTests
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void KeyBinding_OnKeyDown ()
     {
+        Application.Top = new Toplevel ();
         var view = new ScopedKeyBindingView ();
         var invoked = false;
         view.InvokingKeyBindings += (s, e) => invoked = true;
 
-        var top = new Toplevel ();
-        top.Add (view);
-        Application.Begin (top);
+        Application.Top.Add (view);
 
         Application.OnKeyDown (Key.A);
         Assert.False (invoked);
@@ -176,7 +174,7 @@ public class KeyboardTests
 
         invoked = false;
         view.ApplicationCommand = false;
-        Application.KeyBindings.Remove (KeyCode.A);
+        Application.KeyBindings.Remove (Key.A);
         Application.OnKeyDown (Key.A); // old
         Assert.False (invoked);
         Assert.False (view.ApplicationCommand);
@@ -200,7 +198,8 @@ public class KeyboardTests
         Assert.True (view.ApplicationCommand);
         Assert.True (view.HotKeyCommand);
         Assert.False (view.FocusedCommand);
-        top.Dispose ();
+        Application.Top.Dispose ();
+        Application.ResetState (true);
     }
 
     [Fact]

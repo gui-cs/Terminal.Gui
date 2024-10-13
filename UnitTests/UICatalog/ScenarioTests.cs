@@ -31,7 +31,6 @@ public class ScenarioTests : TestsAllViews
         _timeoutLock = new ();
 
         // Disable any UIConfig settings
-        ConfigurationManager.ConfigLocations savedConfigLocations = ConfigurationManager.Locations;
         ConfigurationManager.Locations = ConfigurationManager.ConfigLocations.DefaultOnly;
 
         // If a previous test failed, this will ensure that the Application is in a clean state
@@ -77,7 +76,7 @@ public class ScenarioTests : TestsAllViews
         }
 
         // Restore the configuration locations
-        ConfigurationManager.Locations = savedConfigLocations;
+        ConfigurationManager.Locations = ConfigurationManager.ConfigLocations.DefaultOnly;
         ConfigurationManager.Reset ();
         return;
 
@@ -117,7 +116,7 @@ public class ScenarioTests : TestsAllViews
                          $"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms and {iterationCount} iterations. Force quit.");
 
             // Restore the configuration locations
-            ConfigurationManager.Locations = savedConfigLocations;
+            ConfigurationManager.Locations = ConfigurationManager.ConfigLocations.DefaultOnly;
             ConfigurationManager.Reset ();
 
             Application.ResetState (true);

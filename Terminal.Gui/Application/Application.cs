@@ -167,6 +167,8 @@ public static partial class Application
         Top = null;
         _cachedRunStateToplevel = null;
 
+        Popover = null;
+
         // MainLoop stuff
         MainLoop?.Dispose ();
         MainLoop = null;

@@ -33,7 +33,7 @@ public class SyncrhonizationContextTests
         Task.Run (
                   () =>
                   {
-                      Thread.Sleep (1_000);
+                      Thread.Sleep (500);
 
                       // non blocking
                       context.Post (
@@ -68,7 +68,7 @@ public class SyncrhonizationContextTests
         Task.Run (
                   () =>
                   {
-                      Thread.Sleep (1_000);
+                      Thread.Sleep (500);
 
                       // blocking
                       context.Send (

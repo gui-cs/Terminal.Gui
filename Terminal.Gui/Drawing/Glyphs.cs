@@ -20,6 +20,11 @@
 /// </remarks>
 public class GlyphDefinitions
 {
+    // IMPORTANT: If you change these, make sure to update the ./Resources/config.json file as
+    // IMPORTANT: it is the source of truth for the default glyphs at runtime.
+    // IMPORTANT: Configuration Manager test SaveDefaults uses this class to generate the default config file
+    // IMPORTANT: in ./UnitTests/bin/Debug/netX.0/config.json
+
     /// <summary>File icon.  Defaults to ☰ (Trigram For Heaven)</summary>
     public Rune File { get; set; } = (Rune)'☰';
 

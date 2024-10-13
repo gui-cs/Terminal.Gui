@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using Terminal.Gui.EnumExtensions;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.InputTests;
 
@@ -10,9 +11,17 @@ public class KeyBindingTests
     [Fact]
     public void Add_Invalid_Key_Throws ()
     {
-        var keyBindings = new KeyBindings ();
+        var keyBindings = new KeyBindings (new View ());
         List<Command> commands = new ();
         Assert.Throws<ArgumentException> (() => keyBindings.Add (Key.Empty, KeyBindingScope.HotKey, Command.Accept));
+    }
+
+    [Fact]
+    public void Add_BoundView_Null_Non_AppScope_Throws ()
+    {
+        var keyBindings = new KeyBindings ();
+        List<Command> commands = new ();
+        Assert.Throws<InvalidOperationException> (() => keyBindings.Add (Key.Empty, KeyBindingScope.HotKey, Command.Accept));
     }
 
     [Fact]
@@ -53,32 +62,41 @@ public class KeyBindingTests
         Assert.Contains (Command.HotKey, resultCommands);
     }
 
+
     // Add should not allow duplicates
     [Fact]
-    public void Add_Throws_If_Exists ()
+    public void Add_With_Bound_View_Throws_If_App_Scope ()
     {
-        var keyBindings = new KeyBindings ();
-        keyBindings.Add (Key.A, KeyBindingScope.Application, Command.HotKey);
+        var keyBindings = new KeyBindings (new View ());
         Assert.Throws<InvalidOperationException> (() => keyBindings.Add (Key.A, KeyBindingScope.Application, Command.Accept));
+    }
+
+    // Add should not allow duplicates
+        [Fact]
+    public void Add_With_Throws_If_Exists ()
+    {
+        var keyBindings = new KeyBindings (new View ());
+        keyBindings.Add (Key.A, KeyBindingScope.HotKey, Command.HotKey);
+        Assert.Throws<InvalidOperationException> (() => keyBindings.Add (Key.A, KeyBindingScope.HotKey, Command.Accept));
 
         Command [] resultCommands = keyBindings.GetCommands (Key.A);
         Assert.Contains (Command.HotKey, resultCommands);
 
-        keyBindings = new ();
+        keyBindings = new (new View ());
         keyBindings.Add (Key.A, KeyBindingScope.Focused, Command.HotKey);
         Assert.Throws<InvalidOperationException> (() => keyBindings.Add (Key.A, KeyBindingScope.Focused, Command.Accept));
 
         resultCommands = keyBindings.GetCommands (Key.A);
         Assert.Contains (Command.HotKey, resultCommands);
 
-        keyBindings = new ();
+        keyBindings = new (new View ());
         keyBindings.Add (Key.A, KeyBindingScope.HotKey, Command.HotKey);
-        Assert.Throws<InvalidOperationException> (() => keyBindings.Add (Key.A, KeyBindingScope.Focused, Command.Accept));
+        Assert.Throws<InvalidOperationException> (() => keyBindings.Add (Key.A, KeyBindingScope.HotKey, Command.Accept));
 
         resultCommands = keyBindings.GetCommands (Key.A);
         Assert.Contains (Command.HotKey, resultCommands);
 
-        keyBindings = new ();
+        keyBindings = new (new View ());
         keyBindings.Add (Key.A, new KeyBinding (new [] { Command.HotKey }, KeyBindingScope.HotKey));
         Assert.Throws<InvalidOperationException> (() => keyBindings.Add (Key.A, new KeyBinding (new [] { Command.Accept }, KeyBindingScope.HotKey)));
 
@@ -207,11 +225,11 @@ public class KeyBindingTests
     [Fact]
     public void ReplaceKey_Replaces ()
     {
-        var keyBindings = new KeyBindings ();
-        keyBindings.Add (Key.A, KeyBindingScope.Application, Command.HotKey);
-        keyBindings.Add (Key.B, KeyBindingScope.Application, Command.HotKey);
-        keyBindings.Add (Key.C, KeyBindingScope.Application, Command.HotKey);
-        keyBindings.Add (Key.D, KeyBindingScope.Application, Command.HotKey);
+        var keyBindings = new KeyBindings (new ());
+        keyBindings.Add (Key.A, KeyBindingScope.Focused, Command.HotKey);
+        keyBindings.Add (Key.B, KeyBindingScope.Focused, Command.HotKey);
+        keyBindings.Add (Key.C, KeyBindingScope.Focused, Command.HotKey);
+        keyBindings.Add (Key.D, KeyBindingScope.Focused, Command.HotKey);
 
         keyBindings.ReplaceKey (Key.A, Key.E);
         Assert.Empty (keyBindings.GetCommands (Key.A));
@@ -233,9 +251,9 @@ public class KeyBindingTests
     [Fact]
     public void ReplaceKey_Replaces_Leaves_Old_Binding ()
     {
-        var keyBindings = new KeyBindings ();
-        keyBindings.Add (Key.A, KeyBindingScope.Application, Command.Accept);
-        keyBindings.Add (Key.B, KeyBindingScope.Application, Command.HotKey);
+        var keyBindings = new KeyBindings (new ());
+        keyBindings.Add (Key.A, KeyBindingScope.Focused, Command.Accept);
+        keyBindings.Add (Key.B, KeyBindingScope.Focused, Command.HotKey);
 
         keyBindings.ReplaceKey (keyBindings.GetKeyFromCommands (Command.Accept), Key.C);
         Assert.Empty (keyBindings.GetCommands (Key.A));
@@ -264,7 +282,7 @@ public class KeyBindingTests
     [InlineData (KeyBindingScope.Application)]
     public void Scope_Add_Adds (KeyBindingScope scope)
     {
-        var keyBindings = new KeyBindings ();
+        var keyBindings = new KeyBindings (scope.FastHasFlags(KeyBindingScope.Application) ? null : new ());
         Command [] commands = { Command.Right, Command.Left };
 
         var key = new Key (Key.A);
@@ -288,7 +306,7 @@ public class KeyBindingTests
     [InlineData (KeyBindingScope.Application)]
     public void Scope_Get_Filters (KeyBindingScope scope)
     {
-        var keyBindings = new KeyBindings ();
+        var keyBindings = new KeyBindings (scope.FastHasFlags (KeyBindingScope.Application) ? null : new ());
         Command [] commands = { Command.Right, Command.Left };
 
         var key = new Key (Key.A);
@@ -308,7 +326,7 @@ public class KeyBindingTests
     [InlineData (KeyBindingScope.Application)]
     public void Scope_TryGet_Filters (KeyBindingScope scope)
     {
-        var keyBindings = new KeyBindings ();
+        var keyBindings = new KeyBindings (scope.FastHasFlags (KeyBindingScope.Application) ? null : new ());
         Command [] commands = { Command.Right, Command.Left };
 
         var key = new Key (Key.A);
