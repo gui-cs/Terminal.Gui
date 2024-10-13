@@ -587,7 +587,6 @@ internal class CursesDriver : ConsoleDriver
     /// <inheritdoc />
     public override IAnsiResponseParser GetParser () => Parser;
 
-    private List<int> seen = new List<int> ();
     internal void ProcessInput ()
     {
         int wch;
@@ -600,8 +599,6 @@ internal class CursesDriver : ConsoleDriver
         }
 
         var k = KeyCode.Null;
-
-        seen.Add (wch);
 
         if (code == Curses.KEY_CODE_YES)
         {
