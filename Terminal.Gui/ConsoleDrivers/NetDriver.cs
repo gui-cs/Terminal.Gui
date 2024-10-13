@@ -1403,19 +1403,19 @@ internal class NetDriver : ConsoleDriver
             Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
 
             IsReportingMouseMoves = false;
-        }
 
-        while (_mainLoopDriver is { _netEvents: { } } && Console.KeyAvailable)
-        {
-            _mainLoopDriver._netEvents._waitForStart.Set ();
-            _mainLoopDriver._netEvents._waitForStart.Reset ();
+            while (_mainLoopDriver is { _netEvents: { } } && Console.KeyAvailable)
+            {
+                _mainLoopDriver._netEvents._waitForStart.Set ();
+                _mainLoopDriver._netEvents._waitForStart.Reset ();
 
-            _mainLoopDriver._netEvents._forceRead = true;
-        }
+                _mainLoopDriver._netEvents._forceRead = true;
+            }
 
-        if (_mainLoopDriver is { _netEvents: { } })
-        {
-            _mainLoopDriver._netEvents._forceRead = false;
+            if (_mainLoopDriver is { _netEvents: { } })
+            {
+                _mainLoopDriver._netEvents._forceRead = false;
+            }
         }
     }
 
