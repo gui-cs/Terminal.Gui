@@ -246,7 +246,7 @@ namespace Terminal.Gui;
 
         public IEnumerable<Tuple<char, T>> Release ()
         {
-            foreach (var h in held)
+            foreach (var h in held.ToArray ())
             {
                 yield return h;
             }
