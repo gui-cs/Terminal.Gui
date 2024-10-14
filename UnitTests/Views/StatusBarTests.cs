@@ -104,7 +104,7 @@ public class StatusBarTests
                                      if (iteration == 0)
                                      {
                                          Assert.Equal ("", msg);
-                                         Application.OnKeyDown (Application.QuitKey);
+                                         Application.RaiseKeyDownEvent (Application.QuitKey);
                                      }
                                      else if (iteration == 1)
                                      {

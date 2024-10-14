@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System.Diagnostics;
-using Microsoft.CodeAnalysis.FlowAnalysis;
 
 namespace Terminal.Gui;
 
@@ -266,7 +265,7 @@ public partial class View // Keyboard APIs
     ///     <para>
     ///         Calling this method for a key bound to the view via an Application-scoped keybinding will have no effect.
     ///         Instead,
-    ///         use <see cref="Application.OnKeyDown"/>.
+    ///         use <see cref="Application.NewKeyDown"/>.
     ///     </para>
     ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
     /// </remarks>
@@ -337,7 +336,8 @@ public partial class View // Keyboard APIs
 
     /// <summary>
     ///     Called when the user presses a key, allowing subscribers to pre-process the key down event. Called
-    ///     before <see cref="InvokingKeyBindings"/> and <see cref="KeyDownNotHandled"/> are raised. Set <see cref="Key.Handled"/>
+    ///     before <see cref="InvokingKeyBindings"/> and <see cref="KeyDownNotHandled"/> are raised. Set
+    ///     <see cref="Key.Handled"/>
     ///     to true to
     ///     stop the key from being processed further.
     /// </summary>
@@ -357,7 +357,8 @@ public partial class View // Keyboard APIs
 
     /// <summary>
     ///     Raised when the user presses a key, allowing subscribers to pre-process the key down event. Called
-    ///     before <see cref="InvokingKeyBindings"/> and <see cref="KeyDownNotHandled"/> are raised. Set <see cref="Key.Handled"/>
+    ///     before <see cref="InvokingKeyBindings"/> and <see cref="KeyDownNotHandled"/> are raised. Set
+    ///     <see cref="Key.Handled"/>
     ///     to true to
     ///     stop the key from being processed further.
     /// </summary>
@@ -507,14 +508,17 @@ public partial class View // Keyboard APIs
     private Dictionary<Command, CommandImplementation> CommandImplementations { get; } = new ();
 
     /// <summary>
-    ///     INTERNAL API: Raises the <see cref="InvokingKeyBindings"/> event and invokes the commands bound to <paramref name="key"/>.
+    ///     INTERNAL API: Raises the <see cref="InvokingKeyBindings"/> event and invokes the commands bound to
+    ///     <paramref name="key"/>.
     /// </summary>
     /// <param name="key"></param>
     /// <returns>
-    ///     <see langword="null"/> if no command was invoked or there was no matching key binding; input processing should continue.
+    ///     <see langword="null"/> if no command was invoked or there was no matching key binding; input processing should
+    ///     continue.
     ///     <see langword="false"/> if a command was invoked and was not handled (or cancelled); input processing should
     ///     continue.
-    ///     <see langword="true"/> if <see cref="InvokingKeyBindings"/> was handled or a command was invoked and handled (or cancelled); input processing should stop.
+    ///     <see langword="true"/> if <see cref="InvokingKeyBindings"/> was handled or a command was invoked and handled (or
+    ///     cancelled); input processing should stop.
     /// </returns>
     internal bool? RaiseInvokingKeyBindingsAndInvokeCommands (Key key)
     {
@@ -590,10 +594,7 @@ public partial class View // Keyboard APIs
     ///     continue.
     ///     <see langword="true"/> if the event was raised and handled (or cancelled); input processing should stop.
     /// </returns>
-    protected virtual bool OnInvokingKeyBindings (Key key, KeyBindingScope scope)
-    {
-        return false;
-    }
+    protected virtual bool OnInvokingKeyBindings (Key key, KeyBindingScope scope) { return false; }
 
     // TODO: This does not carry KeyBindingScope, but OnInvokingKeyBindings does
     /// <summary>
@@ -722,7 +723,8 @@ public partial class View // Keyboard APIs
     ///     <see langword="null"/> if no command was invoked; input processing should continue.
     ///     <see langword="false"/> if at least one command was invoked and was not handled (or cancelled); input processing
     ///     should continue.
-    ///     <see langword="true"/> if at least one command was invoked and handled (or cancelled); input processing should stop.
+    ///     <see langword="true"/> if at least one command was invoked and handled (or cancelled); input processing should
+    ///     stop.
     /// </returns>
     protected bool? InvokeCommands (Key key, KeyBindingScope scope)
     {

@@ -3215,12 +3215,12 @@ A B C
         tableView.SelectedColumn = 1;
 
         // Pressing left should move us to the first column without changing focus
-        Application.OnKeyDown (Key.CursorLeft);
+        Application.RaiseKeyDownEvent (Key.CursorLeft);
         Assert.Same (tableView, Application.Top!.MostFocused);
         Assert.True (tableView.HasFocus);
 
         // Because we are now on the leftmost cell a further left press should move focus
-        Application.OnKeyDown (Key.CursorLeft);
+        Application.RaiseKeyDownEvent (Key.CursorLeft);
 
         Assert.NotSame (tableView, Application.Top.MostFocused);
         Assert.False (tableView.HasFocus);
@@ -3240,12 +3240,12 @@ A B C
         tableView.SelectedRow = 1;
 
         // First press should move us up
-        Application.OnKeyDown (Key.CursorUp);
+        Application.RaiseKeyDownEvent (Key.CursorUp);
         Assert.Same (tableView, Application.Top!.MostFocused);
         Assert.True (tableView.HasFocus);
 
         // Because we are now on the top row a further press should move focus
-        Application.OnKeyDown (Key.CursorUp);
+        Application.RaiseKeyDownEvent (Key.CursorUp);
 
         Assert.NotSame (tableView, Application.Top.MostFocused);
         Assert.False (tableView.HasFocus);
@@ -3264,12 +3264,12 @@ A B C
         tableView.SelectedColumn = tableView.Table.Columns - 2;
 
         // First press should move us to the rightmost column without changing focus
-        Application.OnKeyDown (Key.CursorRight);
+        Application.RaiseKeyDownEvent (Key.CursorRight);
         Assert.Same (tableView, Application.Top!.MostFocused);
         Assert.True (tableView.HasFocus);
 
         // Because we are now on the rightmost cell, a further right press should move focus
-        Application.OnKeyDown (Key.CursorRight);
+        Application.RaiseKeyDownEvent (Key.CursorRight);
 
         Assert.NotSame (tableView, Application.Top.MostFocused);
         Assert.False (tableView.HasFocus);
@@ -3289,12 +3289,12 @@ A B C
         tableView.SelectedRow = tableView.Table.Rows - 2;
 
         // First press should move us to the bottommost row without changing focus
-        Application.OnKeyDown (Key.CursorDown);
+        Application.RaiseKeyDownEvent (Key.CursorDown);
         Assert.Same (tableView, Application.Top!.MostFocused);
         Assert.True (tableView.HasFocus);
 
         // Because we are now on the bottommost cell, a further down press should move focus
-        Application.OnKeyDown (Key.CursorDown);
+        Application.RaiseKeyDownEvent (Key.CursorDown);
 
         Assert.NotSame (tableView, Application.Top.MostFocused);
         Assert.False (tableView.HasFocus);
@@ -3315,7 +3315,7 @@ A B C
         tableView.SelectedColumn = 1;
 
         // Pressing shift-left should give us a multi selection
-        Application.OnKeyDown (Key.CursorLeft.WithShift);
+        Application.RaiseKeyDownEvent (Key.CursorLeft.WithShift);
         Assert.Same (tableView, Application.Top!.MostFocused);
         Assert.True (tableView.HasFocus);
         Assert.Equal (2, tableView.GetAllSelectedCells ().Count ());
@@ -3323,7 +3323,7 @@ A B C
         // Because we are now on the leftmost cell a further left press would normally move focus
         // However there is an ongoing selection so instead the operation clears the selection and
         // gets swallowed (not resulting in a focus change)
-        Application.OnKeyDown (Key.CursorLeft);
+        Application.RaiseKeyDownEvent (Key.CursorLeft);
 
         // Selection 'clears' just to the single cell and we remain focused
         Assert.Single (tableView.GetAllSelectedCells ());
@@ -3331,7 +3331,7 @@ A B C
         Assert.True (tableView.HasFocus);
 
         // A further left will switch focus
-        Application.OnKeyDown (Key.CursorLeft);
+        Application.RaiseKeyDownEvent (Key.CursorLeft);
 
         Assert.NotSame (tableView, Application.Top.MostFocused);
         Assert.False (tableView.HasFocus);

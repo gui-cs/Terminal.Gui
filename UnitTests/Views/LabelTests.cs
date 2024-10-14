@@ -1341,7 +1341,7 @@ e
         Application.Top.SetFocus ();
         Assert.True (otherView.HasFocus);
 
-        Assert.True (Application.OnKeyDown (label.HotKey));
+        Assert.True (Application.RaiseKeyDownEvent (label.HotKey));
         Assert.False (otherView.HasFocus);
         Assert.False (label.HasFocus);
         Assert.True (nextView.HasFocus);
@@ -1396,7 +1396,7 @@ e
         Assert.True (view.HasFocus);
 
         // No focused view accepts Tab, and there's no other view to focus, so OnKeyDown returns false
-        Assert.True (Application.OnKeyDown (label.HotKey));
+        Assert.True (Application.RaiseKeyDownEvent (label.HotKey));
         Assert.True (label.HasFocus);
         Assert.False (view.HasFocus);
 

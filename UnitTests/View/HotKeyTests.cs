@@ -362,20 +362,20 @@ public class HotKeyTests
         view.Selecting += (s, e) => selectRaised = true;
 
         Assert.Equal (KeyCode.T, view.HotKey);
-        Assert.True (Application.OnKeyDown (Key.T)); 
+        Assert.True (Application.RaiseKeyDownEvent (Key.T)); 
         Assert.True (hotKeyRaised);
         Assert.False (acceptRaised);
         Assert.False (selectRaised);
 
         hotKeyRaised = false;
-        Assert.True (Application.OnKeyDown (Key.T.WithAlt));
+        Assert.True (Application.RaiseKeyDownEvent (Key.T.WithAlt));
         Assert.True (hotKeyRaised);
         Assert.False (acceptRaised);
         Assert.False (selectRaised);
 
         hotKeyRaised = false;
         view.HotKey = KeyCode.E;
-        Assert.True (Application.OnKeyDown (Key.E.WithAlt));
+        Assert.True (Application.RaiseKeyDownEvent (Key.E.WithAlt));
         Assert.True (hotKeyRaised);
         Assert.False (acceptRaised);
         Assert.False (selectRaised);

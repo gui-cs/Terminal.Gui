@@ -64,14 +64,14 @@ public class ColorPickerTests
 
         cp.Draw ();
 
-        Application.OnKeyDown (Key.CursorRight);
+        Application.RaiseKeyDownEvent (Key.CursorRight);
 
         cp.Draw ();
 
         Assert.Equal (3, r.TrianglePosition);
         Assert.Equal ("#0F0000", hex.Text);
 
-        Application.OnKeyDown (Key.CursorRight);
+        Application.RaiseKeyDownEvent (Key.CursorRight);
 
         cp.Draw ();
 
@@ -81,7 +81,7 @@ public class ColorPickerTests
         // Use cursor to move the triangle all the way to the right
         for (int i = 0; i < 1000; i++)
         {
-            Application.OnKeyDown (Key.CursorRight);
+            Application.RaiseKeyDownEvent (Key.CursorRight);
         }
 
         cp.Draw ();
@@ -713,19 +713,19 @@ public class ColorPickerTests
         name.Text = "";
         Assert.Empty (name.Text);
 
-        Application.OnKeyDown (Key.A);
-        Application.OnKeyDown (Key.Q);
+        Application.RaiseKeyDownEvent (Key.A);
+        Application.RaiseKeyDownEvent (Key.Q);
 
         Assert.Equal ("aq", name.Text);
 
 
         // Auto complete the color name
-        Application.OnKeyDown (Key.Tab);
+        Application.RaiseKeyDownEvent (Key.Tab);
 
         Assert.Equal ("Aquamarine", name.Text);
 
         // Tab out of the text field
-        Application.OnKeyDown (Key.Tab);
+        Application.RaiseKeyDownEvent (Key.Tab);
 
         Assert.False (name.HasFocus);
         Assert.NotSame (name, cp.Focused);
@@ -761,24 +761,24 @@ public class ColorPickerTests
         Assert.Empty (hex.Text);
         Assert.Empty (name.Text);
 
-        Application.OnKeyDown ('#');
+        Application.RaiseKeyDownEvent ('#');
         Assert.Empty (name.Text);
         //7FFFD4
 
         Assert.Equal ("#", hex.Text);
-        Application.OnKeyDown ('7');
-        Application.OnKeyDown ('F');
-        Application.OnKeyDown ('F');
-        Application.OnKeyDown ('F');
-        Application.OnKeyDown ('D');
+        Application.RaiseKeyDownEvent ('7');
+        Application.RaiseKeyDownEvent ('F');
+        Application.RaiseKeyDownEvent ('F');
+        Application.RaiseKeyDownEvent ('F');
+        Application.RaiseKeyDownEvent ('D');
         Assert.Empty (name.Text);
 
-        Application.OnKeyDown ('4');
+        Application.RaiseKeyDownEvent ('4');
 
         Assert.True (hex.HasFocus);
 
         // Tab out of the hex field - should wrap to first focusable subview 
-        Application.OnKeyDown (Key.Tab);
+        Application.RaiseKeyDownEvent (Key.Tab);
         Assert.False (hex.HasFocus);
         Assert.NotSame (hex, cp.Focused);
 
@@ -819,24 +819,24 @@ public class ColorPickerTests
         Assert.Empty (hex.Text);
         Assert.Empty (name.Text);
 
-        Application.OnKeyDown ('#');
+        Application.RaiseKeyDownEvent ('#');
         Assert.Empty (name.Text);
         //7FFFD4
 
         Assert.Equal ("#", hex.Text);
-        Application.OnKeyDown ('7');
-        Application.OnKeyDown ('F');
-        Application.OnKeyDown ('F');
-        Application.OnKeyDown ('F');
-        Application.OnKeyDown ('D');
+        Application.RaiseKeyDownEvent ('7');
+        Application.RaiseKeyDownEvent ('F');
+        Application.RaiseKeyDownEvent ('F');
+        Application.RaiseKeyDownEvent ('F');
+        Application.RaiseKeyDownEvent ('D');
         Assert.Empty (name.Text);
 
-        Application.OnKeyDown ('4');
+        Application.RaiseKeyDownEvent ('4');
 
         Assert.True (hex.HasFocus);
 
         // Should stay in the hex field (because accept not tab)
-        Application.OnKeyDown (Key.Enter);
+        Application.RaiseKeyDownEvent (Key.Enter);
         Assert.True (hex.HasFocus);
         Assert.Same (hex, cp.Focused);
 

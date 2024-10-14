@@ -178,7 +178,7 @@ public static partial class Application // Initialization (Init/Shutdown)
     }
 
     private static void Driver_SizeChanged (object? sender, SizeChangedEventArgs e) { OnSizeChanging (e); }
-    private static void Driver_KeyDown (object? sender, Key e) { OnKeyDown (e); }
+    private static void Driver_KeyDown (object? sender, Key e) { RaiseKeyDownEvent (e); }
     private static void Driver_KeyUp (object? sender, Key e) { OnKeyUp (e); }
     private static void Driver_MouseEvent (object? sender, MouseEvent e) { OnMouseEvent (e); }
 

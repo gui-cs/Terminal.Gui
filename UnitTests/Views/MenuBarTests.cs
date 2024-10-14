@@ -2666,7 +2666,7 @@ Edit
         top.Draw ();
         TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
 
-        Assert.True (Application.OnKeyDown (menu.Key));
+        Assert.True (Application.NewKeyDown (menu.Key));
         Assert.False (menu.IsMenuOpen);
         Assert.True (tf.HasFocus);
         top.Draw ();
@@ -2949,7 +2949,7 @@ Edit
         top.Add (menu);
         Application.Begin (top);
 
-        Application.OnKeyDown (Key.S.WithCtrl);
+        Application.NewKeyDown (Key.S.WithCtrl);
         Application.MainLoop.RunIteration ();
 
         Assert.True (saveAction);
