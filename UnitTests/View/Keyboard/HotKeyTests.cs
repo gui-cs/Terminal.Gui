@@ -95,7 +95,7 @@ public class HotKeyTests
     {
         var view = new View ();
         view.KeyBindings.Add (Key.A, Command.HotKey); // implies KeyBindingScope.Focused - so this should not be invoked
-        view.InvokingKeyBindings += (s, e) => { Assert.Fail (); };
+        view.KeyDownNotHandled += (s, e) => { Assert.Fail (); };
 
         var superView = new View ();
         superView.Add (view);
@@ -109,8 +109,11 @@ public class HotKeyTests
     {
         var view = new View ();
         view.KeyBindings.Add (Key.A, KeyBindingScope.HotKey, Command.HotKey);
-        bool invoked = false;
-        view.InvokingKeyBindings += (s, e) => { invoked = true; };
+        bool hotKeyInvoked = false;
+        view.HandlingHotKey += (s, e) => { hotKeyInvoked = true; };
+
+        bool notHandled = false;
+        view.KeyDownNotHandled += (s, e) => { notHandled = true; };
 
         var superView = new View ();
         superView.Add (view);
@@ -118,7 +121,8 @@ public class HotKeyTests
         var ke = Key.A;
         superView.NewKeyDownEvent (ke);
 
-        Assert.True (invoked);
+        Assert.False (notHandled);
+        Assert.True (hotKeyInvoked);
     }
 
 

@@ -148,7 +148,7 @@ public class VkeyPacketSimulator : Scenario
                                }
                            };
 
-        tvInput.InvokingKeyBindings += (s, e) =>
+        tvInput.KeyDownNotHandled += (s, e) =>
                                        {
                                            Key ev = e;
 

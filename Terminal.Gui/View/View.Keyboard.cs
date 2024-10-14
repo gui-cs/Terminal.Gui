@@ -255,9 +255,7 @@ public partial class View // Keyboard APIs
     ///     <para>
     ///         If a more focused subview does not handle the key press, this method raises <see cref="OnKeyDown"/>/
     ///         <see cref="KeyDown"/> to allow the
-    ///         view to pre-process the key press. If <see cref="OnKeyDown"/>/<see cref="KeyDown"/> is not handled
-    ///         <see cref="InvokingKeyBindings"/>/<see cref="OnInvokingKeyBindings"/>  will be raised to invoke any key
-    ///         bindings.
+    ///         view to pre-process the key press. If <see cref="OnKeyDown"/>/<see cref="KeyDown"/> is not handled any commands bound to the key will be invoked.
     ///         Then, only if no key bindings are
     ///         handled, <see cref="OnKeyDownNotHandled"/>/<see cref="KeyDownNotHandled"/> will be raised allowing the view to
     ///         process the key press.
@@ -292,8 +290,8 @@ public partial class View // Keyboard APIs
 
         // During (this is what can be cancelled)
 
-        // TODO: NewKeyDownEvent returns bool. It should be bool? so state of RaiseInvokingKeyBindingsAndInvokeCommands can be reflected up stack
-        if (RaiseInvokingKeyBindingsAndInvokeCommands (key) is true || key.Handled)
+        // TODO: NewKeyDownEvent returns bool. It should be bool? so state of InvokeCommands can be reflected up stack
+        if (InvokeCommandsBoundToKey (key) is true || key.Handled)
         {
             return true;
         }
@@ -336,7 +334,7 @@ public partial class View // Keyboard APIs
 
     /// <summary>
     ///     Called when the user presses a key, allowing subscribers to pre-process the key down event. Called
-    ///     before <see cref="InvokingKeyBindings"/> and <see cref="KeyDownNotHandled"/> are raised. Set
+    ///     before key bindings are invoked and <see cref="KeyDownNotHandled"/> is raised. Set
     ///     <see cref="Key.Handled"/>
     ///     to true to
     ///     stop the key from being processed further.
@@ -357,7 +355,7 @@ public partial class View // Keyboard APIs
 
     /// <summary>
     ///     Raised when the user presses a key, allowing subscribers to pre-process the key down event. Called
-    ///     before <see cref="InvokingKeyBindings"/> and <see cref="KeyDownNotHandled"/> are raised. Set
+    ///     before key bindings are invoked and <see cref="KeyDownNotHandled"/> is raised. Set
     ///     <see cref="Key.Handled"/>
     ///     to true to
     ///     stop the key from being processed further.
@@ -508,8 +506,7 @@ public partial class View // Keyboard APIs
     private Dictionary<Command, CommandImplementation> CommandImplementations { get; } = new ();
 
     /// <summary>
-    ///     INTERNAL API: Raises the <see cref="InvokingKeyBindings"/> event and invokes the commands bound to
-    ///     <paramref name="key"/>.
+    ///     INTERNAL API: Invokes any commands bound to <paramref name="key"/> on this view, adornments, and subviews.
     /// </summary>
     /// <param name="key"></param>
     /// <returns>
@@ -517,27 +514,12 @@ public partial class View // Keyboard APIs
     ///     continue.
     ///     <see langword="false"/> if a command was invoked and was not handled (or cancelled); input processing should
     ///     continue.
-    ///     <see langword="true"/> if <see cref="InvokingKeyBindings"/> was handled or a command was invoked and handled (or
+    ///     <see langword="true"/> if at least one command was invoked and handled (or
     ///     cancelled); input processing should stop.
     /// </returns>
-    internal bool? RaiseInvokingKeyBindingsAndInvokeCommands (Key key)
+    internal bool? InvokeCommandsBoundToKey (Key key)
     {
         KeyBindingScope scope = KeyBindingScope.Focused | KeyBindingScope.HotKey;
-
-        // During
-        if (OnInvokingKeyBindings (key, scope))
-        {
-            return true;
-        }
-
-        InvokingKeyBindings?.Invoke (this, key);
-
-        if (key.Handled)
-        {
-            return true;
-        }
-
-        // After
 
         // * If no key binding was found, `InvokeKeyBindings` returns `null`.
         //   Continue passing the event (return `false` from `OnInvokeKeyBindings`).
@@ -547,29 +529,29 @@ public partial class View // Keyboard APIs
         //   `InvokeKeyBindings` returns `true`. Continue passing the event (return `false` from `OnInvokeKeyBindings`).
         bool?  handled = InvokeCommands (key, scope);
 
-        if (handled is { } && (bool)handled)
+        if (handled is true)
         {
             // Stop processing if any key binding handled the key.
             // DO NOT stop processing if there are no matching key bindings or none of the key bindings handled the key
             return handled;
         }
 
-        if (Margin is { } && ProcessAdornmentKeyBindings (Margin, key, scope, ref handled))
+        if (Margin is { } && InvokeCommandsBoundToKeyOnAdornment (Margin, key, scope, ref handled))
         {
             return true;
         }
 
-        if (Padding is { } && ProcessAdornmentKeyBindings (Padding, key, scope, ref handled))
+        if (Padding is { } && InvokeCommandsBoundToKeyOnAdornment (Padding, key, scope, ref handled))
         {
             return true;
         }
 
-        if (Border is { } && ProcessAdornmentKeyBindings (Border, key, scope, ref handled))
+        if (Border is { } && InvokeCommandsBoundToKeyOnAdornment (Border, key, scope, ref handled))
         {
             return true;
         }
 
-        if (ProcessSubViewKeyBindings (key, scope, ref handled))
+        if (InvokeCommandsBoundToKeyOnSubviews (key, scope, ref handled))
         {
             return true;
         }
@@ -577,32 +559,9 @@ public partial class View // Keyboard APIs
         return handled;
     }
 
-    /// <summary>
-    ///     Called when a key is pressed that may be mapped to a key binding. Set <see cref="Key.Handled"/> to true to
-    ///     stop the key from being processed by other views.
-    /// </summary>
-    /// <remarks>
-    ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
-    /// </remarks>
-    /// <param name="key">Contains the details about the key that produced the event.</param>
-    /// <param name="scope">The scope.</param>
-    /// <returns>
-    ///     <see langword="false"/> if the event was raised and was not handled (or cancelled); input processing should
-    ///     continue.
-    ///     <see langword="true"/> if the event was raised and handled (or cancelled); input processing should stop.
-    /// </returns>
-    protected virtual bool OnInvokingKeyBindings (Key key, KeyBindingScope scope) { return false; }
-
-    // TODO: This does not carry KeyBindingScope, but OnInvokingKeyBindings does
-    /// <summary>
-    ///     Raised when a key is pressed that may be mapped to a key binding. Set <see cref="Key.Handled"/> to true to
-    ///     stop the key from being processed by other views.
-    /// </summary>
-    public event EventHandler<Key>? InvokingKeyBindings;
-
-    private bool ProcessAdornmentKeyBindings (Adornment adornment, Key key, KeyBindingScope scope, ref bool? handled)
+    private static bool InvokeCommandsBoundToKeyOnAdornment (Adornment adornment, Key key, KeyBindingScope scope, ref bool? handled)
     {
-        bool? adornmentHandled = adornment.RaiseInvokingKeyBindingsAndInvokeCommands (key);
+        bool? adornmentHandled = adornment.InvokeCommandsBoundToKey (key);
 
         if (adornmentHandled is true)
         {
@@ -616,7 +575,7 @@ public partial class View // Keyboard APIs
 
         foreach (View subview in adornment.Subviews)
         {
-            bool? subViewHandled = subview.RaiseInvokingKeyBindingsAndInvokeCommands (key);
+            bool? subViewHandled = subview.InvokeCommandsBoundToKey (key);
 
             if (subViewHandled is { })
             {
@@ -632,7 +591,7 @@ public partial class View // Keyboard APIs
         return false;
     }
 
-    private bool ProcessSubViewKeyBindings (Key key, KeyBindingScope scope, ref bool? handled, bool invoke = true)
+    private bool InvokeCommandsBoundToKeyOnSubviews (Key key, KeyBindingScope scope, ref bool? handled, bool invoke = true)
     {
         // Now, process any key bindings in the subviews that are tagged to KeyBindingScope.HotKey.
         foreach (View subview in Subviews)
@@ -654,7 +613,7 @@ public partial class View // Keyboard APIs
                     return true;
                 }
 
-                bool? subViewHandled = subview.RaiseInvokingKeyBindingsAndInvokeCommands (key);
+                bool? subViewHandled = subview.InvokeCommandsBoundToKey (key);
 
                 if (subViewHandled is { })
                 {
@@ -667,7 +626,7 @@ public partial class View // Keyboard APIs
                 }
             }
 
-            bool recurse = subview.ProcessSubViewKeyBindings (key, scope, ref handled, invoke);
+            bool recurse = subview.InvokeCommandsBoundToKeyOnSubviews (key, scope, ref handled, invoke);
 
             if (recurse || (handled is { } && (bool)handled))
             {

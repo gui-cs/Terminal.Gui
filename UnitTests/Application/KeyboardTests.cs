@@ -163,39 +163,39 @@ public class KeyboardTests
     public void KeyBinding_OnKeyDown ()
     {
         var view = new ScopedKeyBindingView ();
-        var invoked = false;
-        view.InvokingKeyBindings += (s, e) => invoked = true;
+        var keyWasHandled = false;
+        view.KeyDownNotHandled += (s, e) => keyWasHandled = true;
 
         var top = new Toplevel ();
         top.Add (view);
         Application.Begin (top);
 
         Application.RaiseKeyDownEvent (Key.A);
-        Assert.False (invoked);
+        Assert.False (keyWasHandled);
         Assert.True (view.ApplicationCommand);
 
-        invoked = false;
+        keyWasHandled = false;
         view.ApplicationCommand = false;
         Application.KeyBindings.Remove (KeyCode.A);
         Application.RaiseKeyDownEvent (Key.A); // old
-        Assert.False (invoked);
+        Assert.False (keyWasHandled);
         Assert.False (view.ApplicationCommand);
         Application.KeyBindings.Add (Key.A.WithCtrl, view, Command.Save);
         Application.RaiseKeyDownEvent (Key.A); // old
-        Assert.False (invoked);
+        Assert.False (keyWasHandled);
         Assert.False (view.ApplicationCommand);
         Application.RaiseKeyDownEvent (Key.A.WithCtrl); // new
-        Assert.False (invoked);
+        Assert.False (keyWasHandled);
         Assert.True (view.ApplicationCommand);
 
-        invoked = false;
+        keyWasHandled = false;
         Application.RaiseKeyDownEvent (Key.H);
-        Assert.True (invoked);
+        Assert.False (keyWasHandled);
 
-        invoked = false;
+        keyWasHandled = false;
         Assert.False (view.HasFocus);
         Application.RaiseKeyDownEvent (Key.F);
-        Assert.False (invoked);
+        Assert.False (keyWasHandled);
 
         Assert.True (view.ApplicationCommand);
         Assert.True (view.HotKeyCommand);
@@ -208,23 +208,23 @@ public class KeyboardTests
     public void KeyBinding_OnKeyDown_Negative ()
     {
         var view = new ScopedKeyBindingView ();
-        var invoked = false;
-        view.InvokingKeyBindings += (s, e) => invoked = true;
+        var keyWasHandled = false;
+        view.KeyDownNotHandled += (s, e) => keyWasHandled = true;
 
         var top = new Toplevel ();
         top.Add (view);
         Application.Begin (top);
 
         Application.RaiseKeyDownEvent (Key.A.WithCtrl);
-        Assert.False (invoked);
+        Assert.False (keyWasHandled);
         Assert.False (view.ApplicationCommand);
         Assert.False (view.HotKeyCommand);
         Assert.False (view.FocusedCommand);
 
-        invoked = false;
+        keyWasHandled = false;
         Assert.False (view.HasFocus);
         Application.RaiseKeyDownEvent (Key.Z);
-        Assert.False (invoked);
+        Assert.False (keyWasHandled);
         Assert.False (view.ApplicationCommand);
         Assert.False (view.HotKeyCommand);
         Assert.False (view.FocusedCommand);

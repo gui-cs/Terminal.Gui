@@ -309,7 +309,7 @@ internal sealed class Menu : View
     protected override bool OnKeyDownNotHandled (Key keyEvent)
     {
         // We didn't handle the key, pass it on to host
-        return _host.RaiseInvokingKeyBindingsAndInvokeCommands (keyEvent) == true;
+        return _host.InvokeCommandsBoundToKey (keyEvent) == true;
     }
 
     private void Current_TerminalResized (object? sender, SizeChangedEventArgs e)
