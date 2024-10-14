@@ -1189,15 +1189,12 @@ public class TreeView<T> : View, ITreeView where T : class
             return false;
         }
 
-        // BUGBUG: this should move to OnInvokingKeyBindings
         // If not a keybinding, is the key a searchable key press?
         if (CollectionNavigatorBase.IsCompatibleKey (keyEvent) && AllowLetterBasedNavigation)
         {
-            IReadOnlyCollection<Branch<T>> map;
-
             // If there has been a call to InvalidateMap since the last time
             // we need a new one to reflect the new exposed tree state
-            map = BuildLineMap ();
+            IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
 
             // Find the current selected object within the tree
             int current = map.IndexOf (b => b.Model == SelectedObject);

@@ -1014,18 +1014,6 @@ public class TextField : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnInvokingKeyBindings (Key a, KeyBindingScope scope)
-    {
-        // Give autocomplete first opportunity to respond to key presses
-        if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (a))
-        {
-            return true;
-        }
-
-        return base.OnInvokingKeyBindings (a, scope);
-    }
-
-    /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View previousFocusedView, View view)
     {
         if (Application.MouseGrabView is { } && Application.MouseGrabView == this)
@@ -1035,6 +1023,18 @@ public class TextField : View
 
         //if (SelectedLength != 0 && !(Application.MouseGrabView is MenuBar))
         //	ClearAllSelection ();
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnKeyDown (Key key)
+    {
+        // Give autocomplete first opportunity to respond to key presses
+        if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (key))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     /// <inheritdoc />

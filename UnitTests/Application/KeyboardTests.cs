@@ -64,14 +64,14 @@ public class KeyboardTests
         Assert.True (win2.HasFocus);
         Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
 
-        Application.NewKeyDown (Key.F6);
+        Application.RaiseKeyDownEvent (Key.F6);
         Assert.True (win2.CanFocus);
         Assert.False (win.HasFocus);
         Assert.True (win2.CanFocus);
         Assert.True (win2.HasFocus);
         Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
 
-        Application.NewKeyDown (Key.F6);
+        Application.RaiseKeyDownEvent (Key.F6);
         Assert.False (win.CanFocus);
         Assert.False (win.HasFocus);
         Assert.True (win2.CanFocus);
@@ -117,14 +117,14 @@ public class KeyboardTests
         Assert.False (win2.HasFocus);
         Assert.Equal ("win", ((Window)top.Subviews [^1]).Title);
 
-        Application.NewKeyDown (Key.F6);
+        Application.RaiseKeyDownEvent (Key.F6);
         Assert.True (win.CanFocus);
         Assert.False (win.HasFocus);
         Assert.True (win2.CanFocus);
         Assert.True (win2.HasFocus);
         Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
 
-        Application.NewKeyDown (Key.F6);
+        Application.RaiseKeyDownEvent (Key.F6);
         Assert.True (win.CanFocus);
         Assert.True (win.HasFocus);
         Assert.True (win2.CanFocus);
@@ -170,31 +170,31 @@ public class KeyboardTests
         top.Add (view);
         Application.Begin (top);
 
-        Application.NewKeyDown (Key.A);
+        Application.RaiseKeyDownEvent (Key.A);
         Assert.False (invoked);
         Assert.True (view.ApplicationCommand);
 
         invoked = false;
         view.ApplicationCommand = false;
         Application.KeyBindings.Remove (KeyCode.A);
-        Application.NewKeyDown (Key.A); // old
+        Application.RaiseKeyDownEvent (Key.A); // old
         Assert.False (invoked);
         Assert.False (view.ApplicationCommand);
         Application.KeyBindings.Add (Key.A.WithCtrl, view, Command.Save);
-        Application.NewKeyDown (Key.A); // old
+        Application.RaiseKeyDownEvent (Key.A); // old
         Assert.False (invoked);
         Assert.False (view.ApplicationCommand);
-        Application.NewKeyDown (Key.A.WithCtrl); // new
+        Application.RaiseKeyDownEvent (Key.A.WithCtrl); // new
         Assert.False (invoked);
         Assert.True (view.ApplicationCommand);
 
         invoked = false;
-        Application.NewKeyDown (Key.H);
+        Application.RaiseKeyDownEvent (Key.H);
         Assert.True (invoked);
 
         invoked = false;
         Assert.False (view.HasFocus);
-        Application.NewKeyDown (Key.F);
+        Application.RaiseKeyDownEvent (Key.F);
         Assert.False (invoked);
 
         Assert.True (view.ApplicationCommand);
@@ -215,7 +215,7 @@ public class KeyboardTests
         top.Add (view);
         Application.Begin (top);
 
-        Application.NewKeyDown (Key.A.WithCtrl);
+        Application.RaiseKeyDownEvent (Key.A.WithCtrl);
         Assert.False (invoked);
         Assert.False (view.ApplicationCommand);
         Assert.False (view.HotKeyCommand);
@@ -223,7 +223,7 @@ public class KeyboardTests
 
         invoked = false;
         Assert.False (view.HasFocus);
-        Application.NewKeyDown (Key.Z);
+        Application.RaiseKeyDownEvent (Key.Z);
         Assert.False (invoked);
         Assert.False (view.ApplicationCommand);
         Assert.False (view.HotKeyCommand);
@@ -399,7 +399,7 @@ public class KeyboardTests
         Assert.True (subView1.HasFocus);
 
         // Act
-        Application.NewKeyDown (Application.NextTabGroupKey);
+        Application.RaiseKeyDownEvent (Application.NextTabGroupKey);
 
         // Assert
         Assert.True (view2.HasFocus);
@@ -432,24 +432,24 @@ public class KeyboardTests
                                      Assert.True (v1.HasFocus);
 
                                      // Across TabGroups
-                                     Application.NewKeyDown (Key.F6);
+                                     Application.RaiseKeyDownEvent (Key.F6);
                                      Assert.True (v3.HasFocus);
-                                     Application.NewKeyDown (Key.F6);
+                                     Application.RaiseKeyDownEvent (Key.F6);
                                      Assert.True (v1.HasFocus);
 
-                                     Application.NewKeyDown (Key.F6.WithShift);
+                                     Application.RaiseKeyDownEvent (Key.F6.WithShift);
                                      Assert.True (v3.HasFocus);
-                                     Application.NewKeyDown (Key.F6.WithShift);
+                                     Application.RaiseKeyDownEvent (Key.F6.WithShift);
                                      Assert.True (v1.HasFocus);
 
                                      // Restore?
-                                     Application.NewKeyDown (Key.Tab);
+                                     Application.RaiseKeyDownEvent (Key.Tab);
                                      Assert.True (v2.HasFocus);
 
-                                     Application.NewKeyDown (Key.F6);
+                                     Application.RaiseKeyDownEvent (Key.F6);
                                      Assert.True (v3.HasFocus);
 
-                                     Application.NewKeyDown (Key.F6);
+                                     Application.RaiseKeyDownEvent (Key.F6);
                                      Assert.True (v1.HasFocus);
 
                                      Application.RequestStop ();
@@ -485,7 +485,7 @@ public class KeyboardTests
         view1.SetFocus ();
 
         // Act
-        Application.NewKeyDown (Application.NextTabKey);
+        Application.RaiseKeyDownEvent (Application.NextTabKey);
 
         // Assert
         Assert.True (view2.HasFocus);
@@ -539,7 +539,7 @@ public class KeyboardTests
         Assert.True (subView1.HasFocus);
 
         // Act
-        Application.NewKeyDown (Application.PrevTabGroupKey);
+        Application.RaiseKeyDownEvent (Application.PrevTabGroupKey);
 
         // Assert
         Assert.True (view2.HasFocus);
@@ -562,7 +562,7 @@ public class KeyboardTests
         view1.SetFocus ();
 
         // Act
-        Application.NewKeyDown (Application.NextTabKey);
+        Application.RaiseKeyDownEvent (Application.NextTabKey);
 
         // Assert
         Assert.True (view2.HasFocus);
@@ -605,21 +605,21 @@ public class KeyboardTests
 
         Key prevKey = Application.QuitKey;
 
-        Application.NewKeyDown (Application.QuitKey);
+        Application.RaiseKeyDownEvent (Application.QuitKey);
         Assert.True (isQuiting);
 
         isQuiting = false;
-        Application.NewKeyDown (Application.QuitKey);
+        Application.RaiseKeyDownEvent (Application.QuitKey);
         Assert.True (isQuiting);
 
         isQuiting = false;
         Application.QuitKey = Key.C.WithCtrl;
-        Application.NewKeyDown (prevKey); // Should not quit
+        Application.RaiseKeyDownEvent (prevKey); // Should not quit
         Assert.False (isQuiting);
-        Application.NewKeyDown (Key.Q.WithCtrl); // Should not quit
+        Application.RaiseKeyDownEvent (Key.Q.WithCtrl); // Should not quit
         Assert.False (isQuiting);
 
-        Application.NewKeyDown (Application.QuitKey);
+        Application.RaiseKeyDownEvent (Application.QuitKey);
         Assert.True (isQuiting);
 
         // Reset the QuitKey to avoid throws errors on another tests
@@ -728,7 +728,7 @@ public class KeyboardTests
             if (Application.IsInitialized)
             {
                 _output.WriteLine ("  Pressing QuitKey");
-                Application.NewKeyDown (Application.QuitKey);
+                Application.RaiseKeyDownEvent (Application.QuitKey);
             }
         }
     }
