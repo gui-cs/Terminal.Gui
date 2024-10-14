@@ -44,6 +44,11 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
 
         cbRequests.SelectedItemChanged += (s, e) =>
                                           {
+                                              if (cbRequests.SelectedItem == -1)
+                                              {
+                                                  return;
+                                              }
+
                                               var selAnsiEscapeSequenceRequestName = scrRequests [cbRequests.SelectedItem];
                                               AnsiEscapeSequenceRequest selAnsiEscapeSequenceRequest = null;
                                               switch (selAnsiEscapeSequenceRequestName)
