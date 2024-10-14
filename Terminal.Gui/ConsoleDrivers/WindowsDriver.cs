@@ -30,7 +30,7 @@ internal class WindowsConsole
     public const int STD_INPUT_HANDLE = -10;
 
     private readonly nint _inputHandle;
-    private readonly nint _outputHandle;
+    private nint _outputHandle;
     private nint _screenBuffer;
     private readonly uint _originalConsoleMode;
     private CursorVisibility? _initialCursorVisibility;
@@ -285,6 +285,14 @@ internal class WindowsConsole
         SetConsoleOutputWindow (out _);
 
         ConsoleMode = _originalConsoleMode;
+
+        _outputHandle = CreateConsoleScreenBuffer (
+                                                   DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
+                                                   ShareMode.FileShareRead | ShareMode.FileShareWrite,
+                                                   nint.Zero,
+                                                   1,
+                                                   nint.Zero
+                                                  );
 
         if (!SetConsoleActiveScreenBuffer (_outputHandle))
         {
