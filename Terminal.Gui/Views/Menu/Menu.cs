@@ -306,7 +306,7 @@ internal sealed class Menu : View
     }
 
     /// <inheritdoc/>
-    public override bool? OnInvokingKeyBindings (Key keyEvent, KeyBindingScope scope)
+    protected override bool? OnInvokingKeyBindings (Key keyEvent, KeyBindingScope scope)
     {
         bool? handled = base.OnInvokingKeyBindings (keyEvent, scope);
 
@@ -317,7 +317,7 @@ internal sealed class Menu : View
 
         // TODO: Determine if there's a cleaner way to handle this.
         // This supports the case where the menu bar is a context menu
-        return _host.OnInvokingKeyBindings (keyEvent, scope);
+        return _host.RaiseInvokingKeyBindingsAndInvokeCommands (keyEvent);
     }
 
     private void Current_TerminalResized (object? sender, SizeChangedEventArgs e)

@@ -395,7 +395,7 @@ public class ScrollView : View
             return true;
         }
 
-        bool? result = InvokeKeyBindings (a, KeyBindingScope.HotKey | KeyBindingScope.Focused);
+        bool? result = InvokeCommands (a, KeyBindingScope.HotKey | KeyBindingScope.Focused);
 
         if (result is { })
         {

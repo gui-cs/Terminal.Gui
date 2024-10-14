@@ -292,16 +292,17 @@ public partial class View // Keyboard APIs
 
         // During (this is what can be cancelled)
 
-        if (RaiseInvokingKeyBindings (key) || key.Handled)
+        if (RaiseInvokingKeyBindingsAndInvokeCommands (key) is not false || key.Handled)
+        {
+            return true;
+        }
+
+        if (RaiseProcessKeyDown (key) || key.Handled)
         {
             return true;
         }
 
         // After
-        if (RaiseProcessKeyDown (key) || key.Handled)
-        {
-            return true;
-        }
 
         return key.Handled;
 
@@ -317,28 +318,6 @@ public partial class View // Keyboard APIs
             KeyDown?.Invoke (this, key);
 
             return key.Handled;
-        }
-
-        bool RaiseInvokingKeyBindings (Key key)
-        {
-            // BUGBUG: The proper pattern is for the v-method (OnInvokingKeyBindings) to be called first, then the event
-            InvokingKeyBindings?.Invoke (this, key);
-
-            if (key.Handled)
-            {
-                return true;
-            }
-
-            // TODO: NewKeyDownEvent returns bool. It should be bool? so state of InvokeCommand can be reflected up stack
-
-            bool? handled = OnInvokingKeyBindings (key, KeyBindingScope.HotKey | KeyBindingScope.Focused);
-
-            if (handled is { } && (bool)handled)
-            {
-                return true;
-            }
-
-            return false;
         }
 
         bool RaiseProcessKeyDown (Key key)
@@ -529,33 +508,40 @@ public partial class View // Keyboard APIs
     private Dictionary<Command, CommandImplementation> CommandImplementations { get; } = new ();
 
     /// <summary>
-    ///     Low-level API called when a user presses a key; invokes any key bindings set on the view. This is called
-    ///     during <see cref="NewKeyDownEvent"/> after <see cref="OnKeyDown"/> has returned.
+    /// 
     /// </summary>
-    /// <remarks>
-    ///     <para>Fires the <see cref="InvokingKeyBindings"/> event.</para>
-    ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
-    /// </remarks>
-    /// <param name="keyEvent">Contains the details about the key that produced the event.</param>
-    /// <param name="scope">The scope.</param>
-    /// <returns>
-    ///     <see langword="null"/> if no event was raised; input proessing should continue.
-    ///     <see langword="false"/> if the event was raised and was not handled (or cancelled); input proessing should
-    ///     continue.
-    ///     <see langword="true"/> if the event was raised and handled (or cancelled); input proessing should stop.
-    /// </returns>
-    public virtual bool? OnInvokingKeyBindings (Key keyEvent, KeyBindingScope scope)
+    /// <param name="key"></param>
+    /// <param name="scope"></param>
+    /// <returns></returns>
+    internal bool? RaiseInvokingKeyBindingsAndInvokeCommands (Key key)
     {
+        // Before
         // fire event only if there's a hotkey binding for the key
-        if (KeyBindings.TryGet (keyEvent, scope, out KeyBinding kb))
+        if (!KeyBindings.TryGet (key, KeyBindingScope.Focused | KeyBindingScope.HotKey, out KeyBinding kb))
         {
-            InvokingKeyBindings?.Invoke (this, keyEvent);
-
-            if (keyEvent.Handled)
-            {
-                return true;
-            }
+            return null;
         }
+
+        KeyBindingScope scope = kb.Scope;
+
+        // During
+        // BUGBUG: The proper pattern is for the v-method (OnInvokingKeyBindings) to be called first, then the event
+        InvokingKeyBindings?.Invoke (this, key);
+
+        if (key.Handled)
+        {
+            return true;
+        }
+
+        // TODO: NewKeyDownEvent returns bool. It should be bool? so state of InvokeCommand can be reflected up stac
+        bool? handled = OnInvokingKeyBindings (key, scope);
+
+        if (handled is { } && (bool)handled)
+        {
+            return true;
+        }
+
+        // After
 
         // * If no key binding was found, `InvokeKeyBindings` returns `null`.
         //   Continue passing the event (return `false` from `OnInvokeKeyBindings`).
@@ -563,36 +549,37 @@ public partial class View // Keyboard APIs
         //   `InvokeKeyBindings` returns `false`. Continue passing the event (return `false` from `OnInvokeKeyBindings`)..
         // * If key bindings were found, and any handled the key (at least one `Command` returned `true`),
         //   `InvokeKeyBindings` returns `true`. Continue passing the event (return `false` from `OnInvokeKeyBindings`).
-        bool? handled = InvokeKeyBindings (keyEvent, scope);
+        handled = InvokeCommands (key, scope);
 
         if (handled is { } && (bool)handled)
         {
             // Stop processing if any key binding handled the key.
             // DO NOT stop processing if there are no matching key bindings or none of the key bindings handled the key
-            return true;
+            return handled;
         }
 
-        if (Margin is { } && ProcessAdornmentKeyBindings (Margin, keyEvent, scope, ref handled))
+        if (Margin is { } && ProcessAdornmentKeyBindings (Margin, key, scope, ref handled))
         {
             return true;
         }
 
-        if (Padding is { } && ProcessAdornmentKeyBindings (Padding, keyEvent, scope, ref handled))
+        if (Padding is { } && ProcessAdornmentKeyBindings (Padding, key, scope, ref handled))
         {
             return true;
         }
 
-        if (Border is { } && ProcessAdornmentKeyBindings (Border, keyEvent, scope, ref handled))
+        if (Border is { } && ProcessAdornmentKeyBindings (Border, key, scope, ref handled))
         {
             return true;
         }
 
-        if (ProcessSubViewKeyBindings (keyEvent, scope, ref handled))
+        if (ProcessSubViewKeyBindings (key, scope, ref handled))
         {
             return true;
         }
 
         return handled;
+
     }
 
     private bool ProcessAdornmentKeyBindings (Adornment adornment, Key keyEvent, KeyBindingScope scope, ref bool? handled)
@@ -705,6 +692,28 @@ public partial class View // Keyboard APIs
         return false;
     }
 
+
+    /// <summary>
+    ///     Low-level API called when a user presses a key; invokes any key bindings set on the view. This is called
+    ///     during <see cref="NewKeyDownEvent"/> after <see cref="OnKeyDown"/> has returned.
+    /// </summary>
+    /// <remarks>
+    ///     <para>Fires the <see cref="InvokingKeyBindings"/> event.</para>
+    ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
+    /// </remarks>
+    /// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+    /// <param name="scope">The scope.</param>
+    /// <returns>
+    ///     <see langword="null"/> if no event was raised; input proessing should continue.
+    ///     <see langword="false"/> if the event was raised and was not handled (or cancelled); input proessing should
+    ///     continue.
+    ///     <see langword="true"/> if the event was raised and handled (or cancelled); input proessing should stop.
+    /// </returns>
+    protected virtual bool? OnInvokingKeyBindings (Key keyEvent, KeyBindingScope scope)
+    {
+        return false;
+    }
+
     /// <summary>
     ///     Raised when a key is pressed that may be mapped to a key binding. Set <see cref="Key.Handled"/> to true to
     ///     stop the key from being processed by other views.
@@ -712,7 +721,7 @@ public partial class View // Keyboard APIs
     public event EventHandler<Key>? InvokingKeyBindings;
 
     /// <summary>
-    ///     Invokes any binding that is registered on this <see cref="View"/> and matches the <paramref name="key"/>
+    ///     Invokes the Commands bound to <paramref name="key"/>.
     ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
     /// </summary>
     /// <param name="key">The key event passed.</param>
@@ -723,7 +732,7 @@ public partial class View // Keyboard APIs
     ///     should continue.
     ///     <see langword="true"/> if at least one command was invoked and handled (or cancelled); input proessing should stop.
     /// </returns>
-    protected bool? InvokeKeyBindings (Key key, KeyBindingScope scope)
+    protected bool? InvokeCommands (Key key, KeyBindingScope scope)
     {
         bool? toReturn = null;
 
@@ -753,30 +762,6 @@ public partial class View // Keyboard APIs
 
 #endif
         return InvokeCommands (binding.Commands, key, binding);
-
-        foreach (Command command in binding.Commands)
-        {
-            if (!CommandImplementations.ContainsKey (command))
-            {
-                throw new NotSupportedException (
-                                                 @$"A KeyBinding was set up for the command {command} ({key}) but that command is not supported by this View ({GetType ().Name})"
-                                                );
-            }
-
-            // each command has its own return value
-            bool? thisReturn = InvokeCommand (command, key, binding);
-
-            // if we haven't got anything yet, the current command result should be used
-            toReturn ??= thisReturn;
-
-            // if ever see a true then that's what we will return
-            if (thisReturn ?? false)
-            {
-                toReturn = true;
-            }
-        }
-
-        return toReturn;
     }
 
     #endregion Key Bindings

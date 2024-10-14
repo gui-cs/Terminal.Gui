@@ -3664,7 +3664,7 @@ public class TextView : View
     }
 
     /// <inheritdoc/>
-    public override bool? OnInvokingKeyBindings (Key a, KeyBindingScope scope)
+    protected override bool? OnInvokingKeyBindings (Key a, KeyBindingScope scope)
     {
         if (!a.IsValid)
         {
