@@ -134,7 +134,7 @@ internal class WindowsConsole
         return result;
     }
 
-    public bool WriteANSI (string ansi)
+    internal bool WriteANSI (string ansi)
     {
         return WriteConsole (_screenBuffer, ansi, (uint)ansi.Length, out uint _, nint.Zero);
     }
@@ -1177,12 +1177,16 @@ internal class WindowsDriver : ConsoleDriver
     }
 
     /// <inheritdoc />
-    public override void StartReportingMouseMoves () { throw new NotImplementedException (); }
-
-    /// <inheritdoc />
-    public override void StopReportingMouseMoves () { throw new NotImplementedException (); }
+    public override bool WriteAnsi (string ansi)
+    {
+        return WinConsole?.WriteANSI (ansi) ?? false;
+    }
 
     #region Not Implemented
+
+    public override void StartReportingMouseMoves () { throw new NotImplementedException (); }
+
+    public override void StopReportingMouseMoves () { throw new NotImplementedException (); }
 
     public override void Suspend () { throw new NotImplementedException (); }
 
@@ -1235,7 +1239,7 @@ internal class WindowsDriver : ConsoleDriver
         {
             var sb = new StringBuilder ();
             sb.Append (EscSeqUtils.CSI_SetCursorPosition (position.Y + 1, position.X + 1));
-            WinConsole?.WriteANSI (sb.ToString ());
+            WriteAnsi (sb.ToString ());
         }
 
         if (_cachedCursorVisibility is { })
@@ -1271,7 +1275,8 @@ internal class WindowsDriver : ConsoleDriver
         {
             var sb = new StringBuilder ();
             sb.Append (visibility != CursorVisibility.Invisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
-            return WinConsole?.WriteANSI (sb.ToString ()) ?? false;
+
+            return WriteAnsi (sb.ToString ());
         }
     }
 
@@ -1286,7 +1291,8 @@ internal class WindowsDriver : ConsoleDriver
         {
             var sb = new StringBuilder ();
             sb.Append (_cachedCursorVisibility != CursorVisibility.Invisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
-            return WinConsole?.WriteANSI (sb.ToString ()) ?? false;
+
+            return WriteAnsi (sb.ToString ());
         }
 
         //if (!(Col >= 0 && Row >= 0 && Col < Cols && Row < Rows))

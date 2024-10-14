@@ -628,6 +628,13 @@ public abstract class ConsoleDriver
     /// </summary>
     public abstract void StopReportingMouseMoves ();
 
+    /// <summary>
+    /// Provide handling for the terminal write ANSI escape sequence.
+    /// </summary>
+    /// <param name="ansi">The ANSI escape sequence.</param>
+    /// <returns></returns>
+    public abstract bool WriteAnsi (string ansi);
+
     #endregion
 }
 

@@ -1419,7 +1419,22 @@ internal class NetDriver : ConsoleDriver
         }
     }
 
-    private MouseEventArgs ToDriverMouse (NetEvents.MouseEvent me)
+    /// <inheritdoc />
+    public override bool WriteAnsi (string ansi)
+    {
+        try
+        {
+            Console.Out.Write (ansi);
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private MouseEvent ToDriverMouse (NetEvents.MouseEvent me)
     {
        //System.Diagnostics.Debug.WriteLine ($"X: {me.Position.X}; Y: {me.Position.Y}; ButtonState: {me.ButtonState}");
 

@@ -73,7 +73,7 @@ public class AnsiEscapeSequenceRequest
             driver!.IsSuspendRead = true;
 
             // Send the ANSI escape sequence
-            Console.Write (ansiRequest.Request);
+            driver.WriteAnsi (ansiRequest.Request);
             Console.Out.Flush (); // Ensure the request is sent
 
             // Read the response from stdin (response should come back as input)
