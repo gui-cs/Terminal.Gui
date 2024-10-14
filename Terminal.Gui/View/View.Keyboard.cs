@@ -73,7 +73,7 @@ public partial class View // Keyboard APIs
     ///     <para>If the hot key is changed, the <see cref="HotKeyChanged"/> event is fired.</para>
     ///     <para>Set to <see cref="Key.Empty"/> to disable the hot key.</para>
     /// </remarks>
-    public virtual Key HotKey
+    public Key HotKey
     {
         get => _hotKey;
         set
@@ -684,8 +684,6 @@ public partial class View // Keyboard APIs
     /// </returns>
     protected bool? InvokeCommands (Key key, KeyBindingScope scope)
     {
-        bool? toReturn = null;
-
         if (!KeyBindings.TryGet (key, scope, out KeyBinding binding))
         {
             return null;

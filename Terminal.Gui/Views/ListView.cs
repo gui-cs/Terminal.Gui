@@ -806,7 +806,7 @@ public class ListView : View, IDesignable
     protected override bool OnKeyDown (Key a)
     {
         // Enable user to find & select an item by typing text
-        if (CollectionNavigatorBase.IsCompatibleKey (a) && (!AllowsMarking && a == Key.Space))
+        if (CollectionNavigatorBase.IsCompatibleKey (a) || (!AllowsMarking && a == Key.Space))
         {
             int? newItem = KeystrokeNavigator?.GetNextMatchingItem (SelectedItem, (char)a);
 

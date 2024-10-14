@@ -94,10 +94,7 @@ public class Keys : Scenario
 
         edit.KeyDownNotHandled += (s, a) =>
                                   {
-                                      if (edit.KeyBindings.TryGet (a, out KeyBinding binding))
-                                      {
-                                          keyDownNotHandledList.Add ($"{a}: {string.Join (",", binding.Commands)}");
-                                      }
+                                      keyDownNotHandledList.Add ($"{a}");
                                   };
 
         // KeyDown
