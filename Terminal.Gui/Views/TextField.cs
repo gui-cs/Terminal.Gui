@@ -1014,7 +1014,7 @@ public class TextField : View
     }
 
     /// <inheritdoc/>
-    protected override bool? OnInvokingKeyBindings (Key a, KeyBindingScope scope)
+    protected override bool OnInvokingKeyBindings (Key a, KeyBindingScope scope)
     {
         // Give autocomplete first opportunity to respond to key presses
         if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (a))

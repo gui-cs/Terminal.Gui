@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Diagnostics;
+using Microsoft.CodeAnalysis.FlowAnalysis;
 
 namespace Terminal.Gui;
 
@@ -292,17 +293,20 @@ public partial class View // Keyboard APIs
 
         // During (this is what can be cancelled)
 
-        if (RaiseInvokingKeyBindingsAndInvokeCommands (key) is not false || key.Handled)
-        {
-            return true;
-        }
+        // TODO: NewKeyDownEvent returns bool. It should be bool? so state of RaiseInvokingKeyBindingsAndInvokeCommands can be reflected up stack
 
-        if (RaiseProcessKeyDown (key) || key.Handled)
+
+        if (RaiseInvokingKeyBindingsAndInvokeCommands (key) is true || key.Handled)
         {
             return true;
         }
 
         // After
+        // TODO: Is ProcessKeyDown really the right name?
+        if (RaiseProcessKeyDown (key) || key.Handled)
+        {
+            return true;
+        }
 
         return key.Handled;
 
@@ -322,13 +326,12 @@ public partial class View // Keyboard APIs
 
         bool RaiseProcessKeyDown (Key key)
         {
-            // BUGBUG: The proper pattern is for the v-method (OnProcessKeyDown) to be called first, then the event
-            ProcessKeyDown?.Invoke (this, key);
-
-            if (!key.Handled && OnProcessKeyDown (key))
+            if (OnProcessKeyDown (key) || key.Handled)
             {
                 return true;
             }
+
+            ProcessKeyDown?.Invoke (this, key);
 
             return false;
         }
@@ -512,17 +515,22 @@ public partial class View // Keyboard APIs
     /// </summary>
     /// <param name="key"></param>
     /// <param name="scope"></param>
-    /// <returns></returns>
+    /// <returns>
+    ///     <see langword="null"/> if no command was invoked or there was no matching key binding; input processing should continue.
+    ///     <see langword="false"/> if a command was invoked and was not handled (or cancelled); input processing should
+    ///     continue.
+    ///     <see langword="true"/> if <see cref="InvokingKeyBindings"/> was handled or a command was invoked and handled (or cancelled); input processing should stop.
+    /// </returns>
     internal bool? RaiseInvokingKeyBindingsAndInvokeCommands (Key key)
     {
-        // Before
-        // fire event only if there's a hotkey binding for the key
-        if (!KeyBindings.TryGet (key, KeyBindingScope.Focused | KeyBindingScope.HotKey, out KeyBinding kb))
-        {
-            return null;
-        }
+        //// Before
+        //// fire event only if there's a hotkey binding for the key
+        //if (!KeyBindings.TryGet (key, KeyBindingScope.Focused | KeyBindingScope.HotKey, out KeyBinding kb))
+        //{
+        //    return null;
+        //}
 
-        KeyBindingScope scope = kb.Scope;
+        KeyBindingScope scope = KeyBindingScope.Focused | KeyBindingScope.HotKey;
 
         // During
         // BUGBUG: The proper pattern is for the v-method (OnInvokingKeyBindings) to be called first, then the event
@@ -533,13 +541,12 @@ public partial class View // Keyboard APIs
             return true;
         }
 
-        // TODO: NewKeyDownEvent returns bool. It should be bool? so state of InvokeCommand can be reflected up stac
-        bool? handled = OnInvokingKeyBindings (key, scope);
-
-        if (handled is { } && (bool)handled)
+        if (OnInvokingKeyBindings (key, scope))
         {
             return true;
         }
+
+        bool? handled;
 
         // After
 
@@ -636,7 +643,7 @@ public partial class View // Keyboard APIs
                     return true;
                 }
 
-                bool? subViewHandled = subview.OnInvokingKeyBindings (keyEvent, scope);
+                bool? subViewHandled = subview.RaiseInvokingKeyBindingsAndInvokeCommands (keyEvent);
 
                 if (subViewHandled is { })
                 {
@@ -694,26 +701,25 @@ public partial class View // Keyboard APIs
 
 
     /// <summary>
-    ///     Low-level API called when a user presses a key; invokes any key bindings set on the view. This is called
-    ///     during <see cref="NewKeyDownEvent"/> after <see cref="OnKeyDown"/> has returned.
+    ///     Called when a key is pressed that may be mapped to a key binding. Set <see cref="Key.Handled"/> to true to
+    ///     stop the key from being processed by other views.
     /// </summary>
     /// <remarks>
-    ///     <para>Fires the <see cref="InvokingKeyBindings"/> event.</para>
     ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
     /// </remarks>
     /// <param name="keyEvent">Contains the details about the key that produced the event.</param>
     /// <param name="scope">The scope.</param>
     /// <returns>
-    ///     <see langword="null"/> if no event was raised; input proessing should continue.
-    ///     <see langword="false"/> if the event was raised and was not handled (or cancelled); input proessing should
+    ///     <see langword="false"/> if the event was raised and was not handled (or cancelled); input processing should
     ///     continue.
-    ///     <see langword="true"/> if the event was raised and handled (or cancelled); input proessing should stop.
+    ///     <see langword="true"/> if the event was raised and handled (or cancelled); input processing should stop.
     /// </returns>
-    protected virtual bool? OnInvokingKeyBindings (Key keyEvent, KeyBindingScope scope)
+    protected virtual bool OnInvokingKeyBindings (Key keyEvent, KeyBindingScope scope)
     {
         return false;
     }
 
+    // TODO: This does not carry KeyBindingScope, but OnInvokingKeyBindings does
     /// <summary>
     ///     Raised when a key is pressed that may be mapped to a key binding. Set <see cref="Key.Handled"/> to true to
     ///     stop the key from being processed by other views.
@@ -727,10 +733,10 @@ public partial class View // Keyboard APIs
     /// <param name="key">The key event passed.</param>
     /// <param name="scope">The scope.</param>
     /// <returns>
-    ///     <see langword="null"/> if no command was invoked; input proessing should continue.
-    ///     <see langword="false"/> if at least one command was invoked and was not handled (or cancelled); input proessing
+    ///     <see langword="null"/> if no command was invoked; input processing should continue.
+    ///     <see langword="false"/> if at least one command was invoked and was not handled (or cancelled); input processing
     ///     should continue.
-    ///     <see langword="true"/> if at least one command was invoked and handled (or cancelled); input proessing should stop.
+    ///     <see langword="true"/> if at least one command was invoked and handled (or cancelled); input processing should stop.
     /// </returns>
     protected bool? InvokeCommands (Key key, KeyBindingScope scope)
     {

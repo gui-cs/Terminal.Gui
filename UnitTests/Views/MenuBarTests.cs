@@ -1384,7 +1384,7 @@ wo
 
         foreach (Key key in keys)
         {
-            top.NewKeyDownEvent (new (key));
+            top.NewKeyDownEvent (key);
             Application.MainLoop.RunIteration ();
         }
 
