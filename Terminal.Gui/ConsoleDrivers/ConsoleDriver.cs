@@ -635,6 +635,20 @@ public abstract class ConsoleDriver
     /// <returns></returns>
     public abstract bool WriteAnsi (string ansi);
 
+    internal bool WriteAnsiDefault (string ansi)
+    {
+        try
+        {
+            Console.Out.Write (ansi);
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     #endregion
 }
 

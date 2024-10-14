@@ -417,16 +417,7 @@ public class FakeDriver : ConsoleDriver
     /// <inheritdoc />
     public override bool WriteAnsi (string ansi)
     {
-        try
-        {
-            Console.Out.Write (ansi);
-        }
-        catch (Exception)
-        {
-            return false;
-        }
-
-        return true;
+        return WriteAnsiDefault (ansi);
     }
 
     public void SetBufferSize (int width, int height)

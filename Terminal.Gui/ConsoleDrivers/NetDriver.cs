@@ -1422,16 +1422,7 @@ internal class NetDriver : ConsoleDriver
     /// <inheritdoc />
     public override bool WriteAnsi (string ansi)
     {
-        try
-        {
-            Console.Out.Write (ansi);
-        }
-        catch (Exception)
-        {
-            return false;
-        }
-
-        return true;
+        return WriteAnsiDefault (ansi);
     }
 
     private MouseEvent ToDriverMouse (NetEvents.MouseEvent me)
