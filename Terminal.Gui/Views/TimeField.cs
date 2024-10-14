@@ -177,7 +177,7 @@ public class TimeField : TextField
     }
 
     /// <inheritdoc/>
-    protected override bool OnProcessKeyDown (Key a)
+    protected override bool OnKeyDownNotHandled (Key a)
     {
         // Ignore non-numeric characters.
         if (a.KeyCode is >= (KeyCode)(int)KeyCode.D0 and <= (KeyCode)(int)KeyCode.D9)

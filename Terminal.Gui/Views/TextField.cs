@@ -1037,25 +1037,8 @@ public class TextField : View
         //	ClearAllSelection ();
     }
 
-    /// TODO: Flush out these docs
-    /// <summary>
-    ///     Processes key presses for the <see cref="TextField"/>.
-    ///     <remarks>
-    ///         The <see cref="TextField"/> control responds to the following keys:
-    ///         <list type="table">
-    ///             <listheader>
-    ///                 <term>Keys</term> <description>Function</description>
-    ///             </listheader>
-    ///             <item>
-    ///                 <term><see cref="Key.Delete"/>, <see cref="Key.Backspace"/></term>
-    ///                 <description>Deletes the character before cursor.</description>
-    ///             </item>
-    ///         </list>
-    ///     </remarks>
-    /// </summary>
-    /// <param name="a"></param>
-    /// <returns></returns>
-    protected override bool OnProcessKeyDown (Key a)
+    /// <inheritdoc />
+    protected override bool OnKeyDownNotHandled (Key a)
     {
         // Remember the cursor position because the new calculated cursor position is needed
         // to be set BEFORE the TextChanged event is triggered.

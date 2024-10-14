@@ -43,7 +43,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
 
         var keyDownProcessed = false;
 
-        view.ProcessKeyDown += (s, a) =>
+        view.KeyDownNotHandled += (s, a) =>
                                {
                                    a.Handled = true;
                                    keyDownProcessed = true;
@@ -112,7 +112,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                             Assert.True (view.OnKeyDownCalled);
                             keyDown = true;
                         };
-        view.ProcessKeyDown += (s, e) => { keyPressed = true; };
+        view.KeyDownNotHandled += (s, e) => { keyPressed = true; };
 
         view.KeyUp += (s, e) =>
                       {
@@ -178,7 +178,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                                         Assert.Equal (KeyCode.N, e.KeyCode);
                                     };
 
-        view.ProcessKeyDown += (s, e) =>
+        view.KeyDownNotHandled += (s, e) =>
                                {
                                    processKeyPressInvoked = true;
                                    processKeyPressInvoked = true;
@@ -230,7 +230,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                                         invokingKeyBindings = true;
                                     };
 
-        view.ProcessKeyDown += (s, e) =>
+        view.KeyDownNotHandled += (s, e) =>
                                {
                                    Assert.Equal (KeyCode.A, e.KeyCode);
                                    Assert.False (keyPressed);
@@ -278,7 +278,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                                         invokingKeyBindings = true;
                                     };
 
-        view.ProcessKeyDown += (s, e) =>
+        view.KeyDownNotHandled += (s, e) =>
                                {
                                    Assert.Equal (KeyCode.A, e.KeyCode);
                                    Assert.False (keyPressed);
@@ -319,7 +319,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                                         Assert.Equal (KeyCode.N, e.KeyCode);
                                     };
 
-        view.ProcessKeyDown += (s, e) =>
+        view.KeyDownNotHandled += (s, e) =>
                                {
                                    processKeyPressInvoked = true;
                                    Assert.False (e.Handled);
@@ -367,7 +367,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                                         invokingKeyBindings = true;
                                     };
 
-        view.ProcessKeyDown += (s, e) =>
+        view.KeyDownNotHandled += (s, e) =>
                                {
                                    Assert.Equal (KeyCode.A, e.KeyCode);
                                    Assert.False (processKeyDown);
@@ -472,7 +472,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
             return CancelVirtualMethods;
         }
 
-        protected override bool OnProcessKeyDown (Key keyEvent)
+        protected override bool OnKeyDownNotHandled (Key keyEvent)
         {
             OnProcessKeyDownCalled = true;
 

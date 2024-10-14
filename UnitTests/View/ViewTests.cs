@@ -1146,7 +1146,7 @@ At 0,0
             return true;
         }
 
-        protected override bool OnProcessKeyDown (Key keyEvent)
+        protected override bool OnKeyDownNotHandled (Key keyEvent)
         {
             IsKeyPress = true;
 

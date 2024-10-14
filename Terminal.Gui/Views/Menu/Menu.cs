@@ -306,7 +306,7 @@ internal sealed class Menu : View
     }
 
     /// <inheritdoc />
-    protected override bool OnProcessKeyDown (Key keyEvent)
+    protected override bool OnKeyDownNotHandled (Key keyEvent)
     {
         // We didn't handle the key, pass it on to host
         return _host.RaiseInvokingKeyBindingsAndInvokeCommands (keyEvent) == true;

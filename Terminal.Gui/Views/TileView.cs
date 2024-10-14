@@ -286,7 +286,7 @@ public class TileView : View
 
     //// BUGBUG: Why is this not handled by a key binding???
     /// <inheritdoc/>
-    protected override bool OnProcessKeyDown (Key keyEvent)
+    protected override bool OnKeyDownNotHandled (Key keyEvent)
     {
         var focusMoved = false;
 

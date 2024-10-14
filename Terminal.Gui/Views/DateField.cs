@@ -131,7 +131,7 @@ public class DateField : TextField
     public virtual void OnDateChanged (DateTimeEventArgs<DateTime> args) { DateChanged?.Invoke (this, args); }
 
     /// <inheritdoc/>
-    protected override bool OnProcessKeyDown (Key a)
+    protected override bool OnKeyDownNotHandled (Key a)
     {
         // Ignore non-numeric characters.
         if (a >= Key.D0 && a <= Key.D9)
