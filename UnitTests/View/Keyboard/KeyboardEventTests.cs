@@ -225,7 +225,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                                     {
                                         Assert.Equal (KeyCode.A, e.KeyCode);
                                         Assert.False (keyPressed);
-                                        Assert.False (view.OnInvokingKeyBindingsCalled);
+                                        Assert.True (view.OnInvokingKeyBindingsCalled);
                                         e.Handled = true;
                                         invokingKeyBindings = true;
                                     };
@@ -245,7 +245,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
         Assert.False (keyPressed);
 
         Assert.True (view.OnKeyDownCalled);
-        Assert.False (view.OnInvokingKeyBindingsCalled);
+        Assert.True (view.OnInvokingKeyBindingsCalled);
         Assert.False (view.OnProcessKeyDownCalled);
     }
 
@@ -362,7 +362,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                                     {
                                         Assert.Equal (KeyCode.A, e.KeyCode);
                                         Assert.False (processKeyDown);
-                                        Assert.False (view.OnInvokingKeyBindingsCalled);
+                                        Assert.True (view.OnInvokingKeyBindingsCalled);
                                         e.Handled = false;
                                         invokingKeyBindings = true;
                                     };

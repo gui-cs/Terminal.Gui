@@ -71,56 +71,56 @@ A cancellable event is really two events and some activity that takes place betw
 The `OrientationHelper` class supporting `IOrientation` and a `View` having an `Orientation` property illustrates the preferred TG pattern for cancelable events.
 
 ```cs
-    /// <summary>
-    ///     Gets or sets the orientation of the View.
-    /// </summary>
-    public Orientation Orientation
-    {
-        get => _orientation;
-        set
-        {
-            if (_orientation == value)
-            {
-                return;
-            }
+   /// <summary>
+   ///     Gets or sets the orientation of the View.
+   /// </summary>
+   public Orientation Orientation
+   {
+       get => _orientation;
+       set
+       {
+           if (_orientation == value)
+           {
+               return;
+           }
 
-            // Best practice is to invoke the virtual method first.
-            // This allows derived classes to handle the event and potentially cancel it.
-            if (_owner?.OnOrientationChanging (value, _orientation) ?? false)
-            {
-                return;
-            }
+           // Best practice is to call the virtual method first.
+           // This allows derived classes to handle the event and potentially cancel it.
+           if (_owner?.OnOrientationChanging (value, _orientation) ?? false)
+           {
+               return;
+           }
 
-            // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-            CancelEventArgs<Orientation> args = new (in _orientation, ref value);
-            OrientationChanging?.Invoke (_owner, args);
+           // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
+           CancelEventArgs<Orientation> args = new (in _orientation, ref value);
+           OrientationChanging?.Invoke (_owner, args);
 
-            if (args.Cancel)
-            {
-                return;
-            }
+           if (args.Cancel)
+           {
+               return;
+           }
 
-            // If the event is not canceled, update the value.
-            Orientation old = _orientation;
+           // If the event is not canceled, update the value.
+           Orientation old = _orientation;
 
-            if (_orientation != value)
-            {
-                _orientation = value;
+           if (_orientation != value)
+           {
+               _orientation = value;
 
-                if (_owner is { })
-                {
-                    _owner.Orientation = value;
-                }
-            }
+               if (_owner is { })
+               {
+                   _owner.Orientation = value;
+               }
+           }
 
-            // Best practice is to invoke the virtual method first.
-            _owner?.OnOrientationChanged (_orientation);
-
-            // Even though Changed is not cancelable, it is still a good practice to raise the event after.
-            OrientationChanged?.Invoke (_owner, new (in _orientation));
-        }
-    }
+           // Best practice is to call the virtual method first, then raise the event.
+           _owner?.OnOrientationChanged (_orientation);
+           OrientationChanged?.Invoke (_owner, new (in _orientation));
+       }
+   }
 ```
+
+ ## `bool` or `bool?` 
 
  
 
