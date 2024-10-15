@@ -1,6 +1,6 @@
 namespace Terminal.Gui;
 
-/// <summary>Mouse flags reported in <see cref="Terminal.Gui.MouseEventArgs"/>.</summary>
+/// <summary>Mouse flags reported in <see cref="MouseEventArgs"/>.</summary>
 /// <remarks>They just happen to map to the ncurses ones.</remarks>
 [Flags]
 public enum MouseFlags

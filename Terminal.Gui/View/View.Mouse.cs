@@ -469,10 +469,7 @@ public partial class View // Mouse APIs
     {
         mouseEvent.Handled = false;
 
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button2Pressed)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button3Pressed)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button4Pressed))
+        if (mouseEvent.IsPressed)
         {
             // The first time we get pressed event, grab the mouse and set focus
             if (Application.MouseGrabView != this)
