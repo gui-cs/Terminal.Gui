@@ -1,6 +1,5 @@
 #nullable enable
 using System.ComponentModel;
-using System.Diagnostics;
 
 namespace Terminal.Gui;
 
@@ -45,12 +44,12 @@ public static partial class Application // Mouse handling
     /// <param name="view">View that will receive all mouse events until <see cref="UngrabMouse"/> is invoked.</param>
     public static void GrabMouse (View? view)
     {
-        if (view is null || OnGrabbingMouse (view))
+        if (view is null || RaiseGrabbingMouseEvent (view))
         {
             return;
         }
 
-        OnGrabbedMouse (view);
+        RaiseGrabbedMouseEvent (view);
         MouseGrabView = view;
     }
 
@@ -66,16 +65,16 @@ public static partial class Application // Mouse handling
         ObjectDisposedException.ThrowIf (MouseGrabView.WasDisposed, MouseGrabView);
 #endif
 
-        if (!OnUnGrabbingMouse (MouseGrabView))
+        if (!RaiseUnGrabbingMouseEvent (MouseGrabView))
         {
             View view = MouseGrabView;
             MouseGrabView = null;
-            OnUnGrabbedMouse (view);
+            RaiseUnGrabbedMouseEvent (view);
         }
     }
 
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-    private static bool OnGrabbingMouse (View? view)
+    private static bool RaiseGrabbingMouseEvent (View? view)
     {
         if (view is null)
         {
@@ -89,7 +88,7 @@ public static partial class Application // Mouse handling
     }
 
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-    private static bool OnUnGrabbingMouse (View? view)
+    private static bool RaiseUnGrabbingMouseEvent (View? view)
     {
         if (view is null)
         {
@@ -103,7 +102,7 @@ public static partial class Application // Mouse handling
     }
 
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-    private static void OnGrabbedMouse (View? view)
+    private static void RaiseGrabbedMouseEvent (View? view)
     {
         if (view is null)
         {
@@ -114,7 +113,7 @@ public static partial class Application // Mouse handling
     }
 
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-    private static void OnUnGrabbedMouse (View? view)
+    private static void RaiseUnGrabbedMouseEvent (View? view)
     {
         if (view is null)
         {
@@ -124,20 +123,14 @@ public static partial class Application // Mouse handling
         UnGrabbedMouse?.Invoke (view, new (view));
     }
 
-    /// <summary>Event fired when a mouse move or click occurs. Coordinates are screen relative.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         Use this event to receive mouse events in screen coordinates. Use <see cref="MouseEvent"/> to
-    ///         receive mouse events relative to a <see cref="View.Viewport"/>.
-    ///     </para>
-    ///     <para>The <see cref="MouseEvent.View"/> will contain the <see cref="View"/> that contains the mouse coordinates.</para>
-    /// </remarks>
-    public static event EventHandler<MouseEvent>? MouseEvent;
 
-    /// <summary>Called when a mouse event is raised by the driver.</summary>
+    /// <summary>
+    ///     INTERNAL API: Called when a mouse event is raised by the driver. Determines the view under the mouse and
+    ///     calls the appropriate View mouse event handlers.
+    /// </summary>
     /// <remarks>This method can be used to simulate a mouse event, e.g. in unit tests.</remarks>
     /// <param name="mouseEvent">The mouse event with coordinates relative to the screen.</param>
-    internal static void OnMouseEvent (MouseEvent mouseEvent)
+    internal static void RaiseMouseEvent (MouseEvent mouseEvent)
     {
         _lastMousePosition = mouseEvent.ScreenPosition;
 
@@ -224,7 +217,7 @@ public static partial class Application // Mouse handling
         {
             // The mouse was outside any View's Viewport.
 
-           // Debug.Fail ("This should never happen. If it does please file an Issue!!");
+            // Debug.Fail ("This should never happen. If it does please file an Issue!!");
 
             return;
         }
@@ -260,6 +253,25 @@ public static partial class Application // Mouse handling
             };
         }
     }
+
+    /// <summary>
+    /// Raised when a mouse event occurs. Can be cancelled by setting <see cref="MouseEvent.Handled"/> to <see langword="true"/>.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         <see cref="MouseEvent.ScreenPosition"/> coordinates are screen-relative.
+    ///     </para>
+    ///     <para>
+    ///         <see cref="MouseEvent.View"/> will be the deepest view under the under the mouse.
+    ///     </para>
+    ///     <para>
+    ///         <see cref="MouseEvent.Position"/> coordinates are view-relative.
+    ///     </para>
+    ///     <para>
+    ///         Use this evento to handle mouse events at the application level, before View-specific handling.
+    ///     </para>
+    /// </remarks>
+    public static event EventHandler<MouseEvent>? MouseEvent;
 
     internal static bool HandleMouseGrab (View? deepestViewUnderMouse, MouseEvent mouseEvent)
     {
@@ -303,7 +315,6 @@ public static partial class Application // Mouse handling
 
     internal static readonly List<View?> _cachedViewsUnderMouse = new ();
 
-    // TODO: Refactor MouseEnter/LeaveEvents to not take MouseEvent param.
     /// <summary>
     ///     INTERNAL: Raises the MouseEnter and MouseLeave events for the views that are under the mouse.
     /// </summary>
