@@ -670,11 +670,11 @@ public class FileDialog : Dialog
         FinishAccept ();
     }
 
-    private void AcceptIf (Key keyEvent, KeyCode isKey)
+    private void AcceptIf (Key key, KeyCode isKey)
     {
-        if (!keyEvent.Handled && keyEvent.KeyCode == isKey)
+        if (!key.Handled && key.KeyCode == isKey)
         {
-            keyEvent.Handled = true;
+            key.Handled = true;
 
             // User hit Enter in text box so probably wants the
             // contents of the text box as their selection not
