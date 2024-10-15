@@ -416,6 +416,8 @@ public partial class View // Mouse APIs
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
     internal bool WhenGrabbedHandleClicked (MouseEventArgs mouseEvent)
     {
+        mouseEvent.Handled = false;
+
         if (Application.MouseGrabView == this
             && (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)
                 || mouseEvent.Flags.HasFlag (MouseFlags.Button2Clicked)
@@ -453,6 +455,8 @@ public partial class View // Mouse APIs
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
     internal bool WhenGrabbedHandleReleased (MouseEventArgs mouseEvent)
     {
+        mouseEvent.Handled = false;
+
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released)
             || mouseEvent.Flags.HasFlag (MouseFlags.Button2Released)
             || mouseEvent.Flags.HasFlag (MouseFlags.Button3Released)
@@ -482,6 +486,8 @@ public partial class View // Mouse APIs
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
     private bool WhenGrabbedHandlePressed (MouseEventArgs mouseEvent)
     {
+        mouseEvent.Handled = false;
+
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
             || mouseEvent.Flags.HasFlag (MouseFlags.Button2Pressed)
             || mouseEvent.Flags.HasFlag (MouseFlags.Button3Pressed)
@@ -497,8 +503,6 @@ public partial class View // Mouse APIs
                     // Set the focus, but don't invoke Accept
                     SetFocus ();
                 }
-
-                mouseEvent.Handled = true;
             }
 
             if (Viewport.Contains (mouseEvent.Position))
