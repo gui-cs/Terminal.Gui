@@ -840,6 +840,14 @@ public class ComboBox : View, IDesignable
         {
             bool isMousePositionValid = IsMousePositionValid (me);
 
+            var res = false;
+
+            if (isMousePositionValid)
+            {
+                // We're derived from ListView and it overrides OnMouseEvent, so we need to call it
+                res = base.OnMouseEvent (me);
+            }
+
             if (HideDropdownListOnClick && me.Flags == MouseFlags.Button1Clicked)
             {
                 if (!isMousePositionValid && !_isFocusing)
@@ -872,7 +880,7 @@ public class ComboBox : View, IDesignable
                 return true;
             }
 
-            return false;
+            return res;
         }
 
         public override void OnDrawContent (Rectangle viewport)
