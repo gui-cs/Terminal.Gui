@@ -119,7 +119,7 @@ public class Bar : View, IOrientation, IDesignable
     /// <param name="newOrientation"></param>
     public void OnOrientationChanged (Orientation newOrientation)
     {
-        SetNeedsLayout ();
+        SetLayoutNeeded ();
     }
     #endregion
 
@@ -135,7 +135,7 @@ public class Bar : View, IOrientation, IDesignable
         set
         {
             _alignmentModes = value;
-            SetNeedsLayout ();
+            SetLayoutNeeded ();
         }
     }
 

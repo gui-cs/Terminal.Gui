@@ -272,12 +272,12 @@ public partial class Toplevel : View
         //    layoutSubviews = true;
         //}
 
-        if (superView.LayoutNeeded || layoutSubviews)
+        if (superView.IsLayoutNeeded () || layoutSubviews)
         {
             superView.LayoutSubviews ();
         }
 
-        if (LayoutNeeded)
+        if (IsLayoutNeeded ())
         {
             LayoutSubviews ();
         }

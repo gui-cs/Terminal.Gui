@@ -55,16 +55,9 @@ public class Adornment : View
 
             if (current != _thickness)
             {
-                if (Parent?.IsInitialized == false)
-                {
-                    // When initialized Parent.LayoutSubViews will cause a LayoutAdornments
-                    Parent?.LayoutAdornments ();
-                }
-                else
-                {
-                    Parent?.SetNeedsLayout ();
-                    Parent?.LayoutSubviews ();
-                }
+                Parent?.SetAdornmentFrames ();
+                Parent?.SetLayoutNeeded ();
+                //Parent?.LayoutSubviews ();
 
                 OnThicknessChanged ();
             }
@@ -101,10 +94,10 @@ public class Adornment : View
     //    return null;
     //}
 
-    internal override void LayoutAdornments ()
-    {
-        /* Do nothing - Adornments do not have Adornments */
-    }
+    //internal override void LayoutAdornments ()
+    //{
+    //    /* Do nothing - Adornments do not have Adornments */
+    //}
 
     /// <summary>
     ///     Gets the rectangle that describes the area of the Adornment. The Location is always (0,0).
@@ -182,10 +175,9 @@ public class Adornment : View
 
         if (Driver is { })
         {
-           Driver.Clip = prevClip;
+            Driver.Clip = prevClip;
         }
 
-        ClearLayoutNeeded ();
         ClearNeedsDisplay ();
     }
 
@@ -199,7 +191,7 @@ public class Adornment : View
     /// </summary>
     public override bool SuperViewRendersLineCanvas
     {
-        get => false; 
+        get => false;
         set => throw new InvalidOperationException (@"Adornment can only render to their Parent or Parent's Superview.");
     }
 

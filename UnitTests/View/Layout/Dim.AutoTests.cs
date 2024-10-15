@@ -314,6 +314,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
         view.SetRelativeLayout (Application.Screen.Size);
         lastSize = view.Frame.Size;
         view.Text = "*ABCD";
+        view.SetRelativeLayout (Application.Screen.Size);
         Assert.NotEqual (lastSize, view.Frame.Size);
     }
 

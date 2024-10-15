@@ -251,7 +251,7 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
         }
 
         var newDim = new DimCombine (AddOrSubtract.Add, left, right);
-        (left as DimView)?.Target?.SetNeedsLayout ();
+        (left as DimView)?.Target?.SetLayoutNeeded ();
 
         return newDim;
     }
@@ -276,7 +276,7 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
         }
 
         var newDim = new DimCombine (AddOrSubtract.Subtract, left, right);
-        (left as DimView)?.Target?.SetNeedsLayout ();
+        (left as DimView)?.Target?.SetLayoutNeeded ();
 
         return newDim;
     }

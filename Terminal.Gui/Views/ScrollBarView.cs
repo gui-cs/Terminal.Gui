@@ -225,7 +225,7 @@ public class ScrollBarView : View
 
             if (IsInitialized)
             {
-                SetNeedsLayout ();
+                SetLayoutNeeded ();
 
                 if (value)
                 {

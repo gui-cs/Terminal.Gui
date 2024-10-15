@@ -153,7 +153,7 @@ public class CheckBox : View
 
         _checkedState = value;
         UpdateTextFormatterText ();
-        OnResizeNeeded ();
+        SetLayoutNeeded ();
 
         EventArgs<CheckState> args = new (in _checkedState);
         OnCheckedStateChanged (args);

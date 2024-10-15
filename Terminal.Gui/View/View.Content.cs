@@ -151,10 +151,7 @@ public partial class View
 
         if (e.Cancel != true)
         {
-            OnResizeNeeded ();
-
-            //SetNeedsLayout ();
-            //SetNeedsDisplay ();
+            SetLayoutNeeded ();
         }
 
         return e.Cancel;
@@ -311,7 +308,7 @@ public partial class View
             if (_viewportLocation != viewport.Location)
             {
                 _viewportLocation = viewport.Location;
-                SetNeedsLayout ();
+                SetLayoutNeeded ();
             }
 
             OnViewportChanged (new (IsInitialized ? Viewport : Rectangle.Empty, oldViewport));

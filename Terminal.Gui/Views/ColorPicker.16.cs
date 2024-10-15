@@ -28,7 +28,7 @@ public class ColorPicker16 : View
                 Width = Dim.Auto (minimumContentDim: _boxWidth * _cols);
                 Height = Dim.Auto (minimumContentDim: _boxHeight * _rows);
                 SetContentSize (new (_boxWidth * _cols, _boxHeight * _rows));
-                SetNeedsLayout ();
+                SetLayoutNeeded ();
             }
         }
     }
@@ -45,7 +45,7 @@ public class ColorPicker16 : View
                 Width = Dim.Auto (minimumContentDim: _boxWidth * _cols);
                 Height = Dim.Auto (minimumContentDim: _boxHeight * _rows);
                 SetContentSize (new (_boxWidth * _cols, _boxHeight * _rows));
-                SetNeedsLayout ();
+                SetLayoutNeeded ();
             }
         }
     }

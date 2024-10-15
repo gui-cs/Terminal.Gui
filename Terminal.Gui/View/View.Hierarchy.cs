@@ -86,8 +86,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         }
 
         CheckDimAuto ();
-        SetNeedsLayout ();
-        SetNeedsDisplay ();
+        view.SetRelativeLayout(GetContentSize());
 
         return view;
     }
@@ -126,7 +125,6 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     {
         View view = e.SubView;
         view.IsAdded = true;
-        view.OnResizeNeeded ();
         view.Added?.Invoke (this, e);
     }
 
@@ -178,7 +176,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         }
         view._superView = null;
 
-        SetNeedsLayout ();
+        SetLayoutNeeded ();
         SetNeedsDisplay ();
 
         foreach (View v in _subviews)

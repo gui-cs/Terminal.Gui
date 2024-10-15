@@ -1128,7 +1128,6 @@ At 0,0
                 }
             }
 
-            ClearLayoutNeeded ();
             ClearNeedsDisplay ();
         }
 

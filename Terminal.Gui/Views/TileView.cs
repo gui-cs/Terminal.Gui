@@ -155,6 +155,7 @@ public class TileView : View
     /// <returns></returns>
     public bool IsRootTileView () { return _parentTileView == null; }
 
+    // TODO: Use OnLayoutStarted instead
     /// <inheritdoc/>
     public override void LayoutSubviews ()
     {

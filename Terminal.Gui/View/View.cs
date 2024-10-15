@@ -122,7 +122,7 @@ public partial class View : Responder, ISupportInitializeNotification
     ///     Points to the current driver in use by the view, it is a convenience property for simplifying the development
     ///     of new views.
     /// </summary>
-    public static ConsoleDriver Driver => Application.Driver!;
+    public static ConsoleDriver? Driver => Application.Driver;
 
     /// <summary>Initializes a new instance of <see cref="View"/>.</summary>
     /// <remarks>
@@ -229,7 +229,7 @@ public partial class View : Responder, ISupportInitializeNotification
         // These calls were moved from BeginInit as they access Viewport which is indeterminate until EndInit is called.
         UpdateTextDirection (TextDirection);
         UpdateTextFormatterText ();
-        OnResizeNeeded ();
+        SetLayoutNeeded ();
 
         if (_subviews is { })
         {

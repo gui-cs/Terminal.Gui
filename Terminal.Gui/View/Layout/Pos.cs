@@ -366,7 +366,7 @@ public abstract record Pos
 
         if (left is PosView view)
         {
-            view.Target?.SetNeedsLayout ();
+            view.Target?.SetLayoutNeeded ();
         }
 
         return newPos;
@@ -395,7 +395,7 @@ public abstract record Pos
 
         if (left is PosView view)
         {
-            view.Target?.SetNeedsLayout ();
+            view.Target?.SetLayoutNeeded ();
         }
 
         return newPos;

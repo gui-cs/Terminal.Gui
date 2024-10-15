@@ -412,7 +412,7 @@ public class Shortcut : View, IOrientation, IDesignable
     public void OnOrientationChanged (Orientation newOrientation)
     {
         // TODO: Determine what, if anything, is opinionated about the orientation.
-        SetNeedsLayout ();
+        SetLayoutNeeded ();
     }
 
     #endregion
@@ -679,9 +679,9 @@ public class Shortcut : View, IOrientation, IDesignable
 
             _minimumKeyTextSize = value;
             SetKeyViewDefaultLayout ();
-            CommandView.SetNeedsLayout ();
-            HelpView.SetNeedsLayout ();
-            KeyView.SetNeedsLayout ();
+            CommandView.SetLayoutNeeded ();
+            HelpView.SetLayoutNeeded ();
+            KeyView.SetLayoutNeeded ();
             SetSubViewNeedsDisplay ();
         }
     }

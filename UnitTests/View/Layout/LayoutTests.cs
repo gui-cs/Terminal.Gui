@@ -35,6 +35,67 @@ public class LayoutTests (ITestOutputHelper output)
     }
 
     [Fact]
+    public void Add_Does_Not_Call_LayoutSubviews ()
+    {
+        var superView = new View { Id = "superView" };
+        var view = new View { Id = "view" };
+        bool layoutStartedRaised = false;
+        bool layoutCompleteRaised = false;
+        superView.LayoutStarted += (sender, e) => layoutStartedRaised = true;
+        superView.LayoutComplete += (sender, e) => layoutCompleteRaised = true;
+
+        superView.Add (view);
+
+        Assert.False (layoutStartedRaised);
+        Assert.False (layoutCompleteRaised);
+
+        superView.Remove(view);
+
+        superView.BeginInit();
+        superView.EndInit ();
+
+        superView.Add (view);
+
+        Assert.False (layoutStartedRaised);
+        Assert.False (layoutCompleteRaised);
+
+    }
+
+    [Fact]
+    public void BeginEndInit_Do_Not_Call_LayoutSubviews ()
+    {
+        var superView = new View { Id = "superView" };
+        bool layoutStartedRaised = false;
+        bool layoutCompleteRaised = false;
+        superView.LayoutStarted += (sender, e) => layoutStartedRaised = true;
+        superView.LayoutComplete += (sender, e) => layoutCompleteRaised = true;
+        superView.BeginInit ();
+        superView.EndInit ();
+        Assert.False (layoutStartedRaised);
+        Assert.False (layoutCompleteRaised);
+    }
+
+    [Fact]
+    public void LayoutSubViews_Raises_LayoutStarted_LayoutComplete ()
+    {
+        var superView = new View { Id = "superView" };
+        int layoutStartedRaised = 0;
+        int layoutCompleteRaised = 0;
+        superView.LayoutStarted += (sender, e) => layoutStartedRaised++;
+        superView.LayoutComplete += (sender, e) => layoutCompleteRaised++;
+
+        superView.LayoutSubviews ();
+        Assert.Equal (1, layoutStartedRaised);
+        Assert.Equal (1, layoutCompleteRaised);
+
+        superView.BeginInit ();
+        superView.EndInit ();
+        superView.LayoutSubviews ();
+        Assert.Equal (2, layoutStartedRaised);
+        Assert.Equal (2, layoutCompleteRaised);
+    }
+
+    [Fact]
     public void LayoutSubviews_RootHas_SuperView ()
     {
         var top = new View ();

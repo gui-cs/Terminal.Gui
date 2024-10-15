@@ -749,7 +749,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
 
         Application.RaiseMouseEvent (new () { ScreenPosition = new (9, 9), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
         Assert.Equal (win.Border, Application.MouseGrabView);
-        top.SetNeedsLayout ();
+        top.SetLayoutNeeded ();
         top.LayoutSubviews ();
         Assert.Equal (new (6, 6, 191, 91), win.Frame);
         Application.Refresh ();
@@ -760,7 +760,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
                                       ScreenPosition = new (5, 5), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
                                   });
         Assert.Equal (win.Border, Application.MouseGrabView);
-        top.SetNeedsLayout ();
+        top.SetLayoutNeeded ();
         top.LayoutSubviews ();
         Assert.Equal (new (2, 2, 195, 95), win.Frame);
         Application.Refresh ();

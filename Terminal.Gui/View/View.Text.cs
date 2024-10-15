@@ -62,7 +62,7 @@ public partial class View // Text Property APIs
             _text = value;
 
             UpdateTextFormatterText ();
-            OnResizeNeeded ();
+            SetLayoutNeeded ();
 #if DEBUG
             if (_text is { } && string.IsNullOrEmpty (Id))
             {
@@ -92,7 +92,7 @@ public partial class View // Text Property APIs
         {
             TextFormatter.Alignment = value;
             UpdateTextFormatterText ();
-            OnResizeNeeded ();
+            SetLayoutNeeded ();
         }
     }
 
@@ -229,7 +229,7 @@ public partial class View // Text Property APIs
         {
             TextFormatter.ConstrainToWidth = null;
             TextFormatter.ConstrainToHeight = null;
-            OnResizeNeeded ();
+            SetLayoutNeeded ();
         }
 
         SetNeedsDisplay ();

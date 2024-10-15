@@ -1,4 +1,6 @@
 ﻿#nullable enable
+using System.Diagnostics;
+
 namespace Terminal.Gui;
 
 public partial class View // Drawing APIs
@@ -223,7 +225,7 @@ public partial class View // Drawing APIs
             SetNeedsDisplay ();
         }
 
-        if (!NeedsDisplay && !SubViewNeedsDisplay && !LayoutNeeded)
+        if (!NeedsDisplay && !SubViewNeedsDisplay && !IsLayoutNeeded ())
         {
             return;
         }
@@ -270,8 +272,6 @@ public partial class View // Drawing APIs
         // Invoke DrawContentCompleteEvent
         OnDrawContentComplete (Viewport);
 
-        // BUGBUG: v2 - We should be able to use View.SetClip here and not have to resort to knowing Driver details.
-        ClearLayoutNeeded ();
         ClearNeedsDisplay ();
     }
 
@@ -520,39 +520,34 @@ public partial class View // Drawing APIs
     /// </param>
     public virtual void OnDrawContent (Rectangle viewport)
     {
-        if (NeedsDisplay)
+        if (!CanBeVisible (this))
         {
-            if (!CanBeVisible (this))
-            {
-                return;
-            }
-
-            // BUGBUG: this clears way too frequently. Need to optimize this.
-            if (SuperView is { } || Arrangement.HasFlag (ViewArrangement.Overlapped))
-            {
-                Clear ();
-            }
-
-            if (!string.IsNullOrEmpty (TextFormatter.Text))
-            {
-                if (TextFormatter is { })
-                {
-                    TextFormatter.NeedsFormat = true;
-                }
-            }
-
-            // This should NOT clear 
-            // TODO: If the output is not in the Viewport, do nothing
-            var drawRect = new Rectangle (ContentToScreen (Point.Empty), GetContentSize ());
-
-            TextFormatter?.Draw (
-                                 drawRect,
-                                 HasFocus ? GetFocusColor () : GetNormalColor (),
-                                 HasFocus ? GetHotFocusColor () : GetHotNormalColor (),
-                                 Rectangle.Empty
-                                );
-            SetSubViewNeedsDisplay ();
+            return;
         }
+
+        // BUGBUG: this clears way too frequently. Need to optimize this.
+        if (SuperView is { } || Arrangement.HasFlag (ViewArrangement.Overlapped))
+        {
+            Clear ();
+        }
+
+        if (!string.IsNullOrEmpty (TextFormatter.Text))
+        {
+            TextFormatter.NeedsFormat = true;
+        }
+
+        // This should NOT clear 
+        // TODO: If the output is not in the Viewport, do nothing
+        var drawRect = new Rectangle (ContentToScreen (Point.Empty), GetContentSize ());
+
+        TextFormatter?.Draw (
+                             drawRect,
+                             HasFocus ? GetFocusColor () : GetNormalColor (),
+                             HasFocus ? GetHotFocusColor () : GetHotNormalColor (),
+                             Rectangle.Empty
+                            );
+        SetSubViewNeedsDisplay ();
+
 
         // TODO: Move drawing of subviews to a separate OnDrawSubviews virtual method
         // Draw subviews
@@ -563,14 +558,15 @@ public partial class View // Drawing APIs
                                                                      view => view.Visible
                                                                              && (view.NeedsDisplay
                                                                                  || view.SubViewNeedsDisplay
-                                                                                 || view.LayoutNeeded
+                                                                                 || view.IsLayoutNeeded ()
                                                                                  || view.Arrangement.HasFlag (ViewArrangement.Overlapped)
-                                                                    ));
+                                                                                ));
 
             foreach (View view in subviewsNeedingDraw)
             {
-                if (view.LayoutNeeded)
+                if (view.IsLayoutNeeded ())
                 {
+                    Debug.WriteLine ("Layout should be de-coupled from drawing");
                     view.LayoutSubviews ();
                 }
 
@@ -583,6 +579,7 @@ public partial class View // Drawing APIs
 
                 view.Draw ();
             }
+
         }
     }
 

@@ -92,7 +92,7 @@ public class Wizard : Dialog
         Closing += Wizard_Closing;
         TitleChanged += Wizard_TitleChanged;
 
-        SetNeedsLayout ();
+        SetLayoutNeeded ();
     }
 
     /// <summary>
@@ -545,7 +545,7 @@ public class Wizard : Dialog
 
         SizeStep (CurrentStep);
 
-        SetNeedsLayout ();
+        SetLayoutNeeded ();
         LayoutSubviews ();
 
         //Draw ();
