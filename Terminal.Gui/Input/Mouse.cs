@@ -129,7 +129,7 @@ public class MouseEvent
     ///         mouse has moved.
     ///     </para>
     ///     <para>
-    ///         Calculated and processed in <see cref="Application.OnMouseEvent(MouseEvent)"/>.
+    ///         Calculated and processed in <see cref="Application.RaiseMouseEvent"/>.
     ///     </para>
     /// </remarks>
     public Point ScreenPosition { get; set; }

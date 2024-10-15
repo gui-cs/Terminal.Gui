@@ -440,7 +440,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
                                          Assert.Null (Application.MouseGrabView);
 
                                          // Grab the mouse
-                                         Application.OnMouseEvent (new () { ScreenPosition = new (3, 2), Flags = MouseFlags.Button1Pressed });
+                                         Application.RaiseMouseEvent (new () { ScreenPosition = new (3, 2), Flags = MouseFlags.Button1Pressed });
 
                                          Assert.Equal (Application.Top!.Border, Application.MouseGrabView);
                                          Assert.Equal (new (2, 2, 10, 3), Application.Top.Frame);
@@ -450,7 +450,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
                                          Assert.Equal (Application.Top!.Border, Application.MouseGrabView);
 
                                          // Drag to left
-                                         Application.OnMouseEvent (
+                                         Application.RaiseMouseEvent (
                                                                    new ()
                                                                    {
                                                                        ScreenPosition = new (2, 2), Flags = MouseFlags.Button1Pressed
@@ -473,7 +473,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
                                          Assert.Equal (Application.Top!.Border, Application.MouseGrabView);
 
                                          // Drag up
-                                         Application.OnMouseEvent (
+                                         Application.RaiseMouseEvent (
                                                                    new ()
                                                                    {
                                                                        ScreenPosition = new (2, 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
@@ -496,7 +496,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
                                          Assert.Equal (Application.Top!.Border, Application.MouseGrabView);
 
                                          // Ungrab the mouse
-                                         Application.OnMouseEvent (new () { ScreenPosition = new (2, 1), Flags = MouseFlags.Button1Released });
+                                         Application.RaiseMouseEvent (new () { ScreenPosition = new (2, 1), Flags = MouseFlags.Button1Released });
                                          Application.Refresh ();
 
                                          Assert.Null (Application.MouseGrabView);
@@ -545,7 +545,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
                                          Assert.Null (Application.MouseGrabView);
 
                                          // Grab the mouse
-                                         Application.OnMouseEvent (
+                                         Application.RaiseMouseEvent (
                                                                    new ()
                                                                    {
                                                                        ScreenPosition = new (win.Frame.X, win.Frame.Y), Flags = MouseFlags.Button1Pressed
@@ -561,7 +561,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
                                          movex = 1;
                                          movey = 0;
 
-                                         Application.OnMouseEvent (
+                                         Application.RaiseMouseEvent (
                                                                    new ()
                                                                    {
                                                                        ScreenPosition = new (win.Frame.X + movex, win.Frame.Y + movey), Flags =
@@ -586,7 +586,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
                                          movex = 0;
                                          movey = -1;
 
-                                         Application.OnMouseEvent (
+                                         Application.RaiseMouseEvent (
                                                                    new ()
                                                                    {
                                                                        ScreenPosition = new (win.Frame.X + movex, win.Frame.Y + movey), Flags =
@@ -611,7 +611,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
                                          movex = 0;
                                          movey = 0;
 
-                                         Application.OnMouseEvent (
+                                         Application.RaiseMouseEvent (
                                                                    new ()
                                                                    {
                                                                        ScreenPosition = new (win.Frame.X + movex, win.Frame.Y + movey),
@@ -743,18 +743,18 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 200, 100), scrollView.Subviews [0].Frame);
         Assert.Equal (new (3, 3, 194, 94), win.Frame);
 
-        Application.OnMouseEvent (new () { ScreenPosition = new (6, 6), Flags = MouseFlags.Button1Pressed });
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (6, 6), Flags = MouseFlags.Button1Pressed });
         Assert.Equal (win.Border, Application.MouseGrabView);
         Assert.Equal (new (3, 3, 194, 94), win.Frame);
 
-        Application.OnMouseEvent (new () { ScreenPosition = new (9, 9), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (9, 9), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
         Assert.Equal (win.Border, Application.MouseGrabView);
         top.SetNeedsLayout ();
         top.LayoutSubviews ();
         Assert.Equal (new (6, 6, 191, 91), win.Frame);
         Application.Refresh ();
 
-        Application.OnMouseEvent (
+        Application.RaiseMouseEvent (
                                   new ()
                                   {
                                       ScreenPosition = new (5, 5), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
@@ -765,12 +765,12 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (new (2, 2, 195, 95), win.Frame);
         Application.Refresh ();
 
-        Application.OnMouseEvent (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.Button1Released });
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.Button1Released });
 
         // ScrollView always grab the mouse when the container's subview OnMouseEnter don't want grab the mouse
         Assert.Equal (scrollView, Application.MouseGrabView);
 
-        Application.OnMouseEvent (new () { ScreenPosition = new (4, 4), Flags = MouseFlags.ReportMousePosition });
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (4, 4), Flags = MouseFlags.ReportMousePosition });
         Assert.Equal (scrollView, Application.MouseGrabView);
         top.Dispose ();
     }
@@ -790,11 +790,11 @@ public partial class ToplevelTests (ITestOutputHelper output)
 
         Assert.Null (Application.MouseGrabView);
 
-        Application.OnMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.Button1Pressed });
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.Button1Pressed });
 
         Assert.Equal (window.Border, Application.MouseGrabView);
 
-        Application.OnMouseEvent (
+        Application.RaiseMouseEvent (
                                   new ()
                                   {
                                       ScreenPosition = new (-11, -4), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
@@ -807,7 +807,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         // Changes Top size to same size as Dialog more menu and scroll bar
         ((FakeDriver)Application.Driver!).SetBufferSize (20, 3);
 
-        Application.OnMouseEvent (
+        Application.RaiseMouseEvent (
                                   new ()
                                   {
                                       ScreenPosition = new (-1, -1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
@@ -820,7 +820,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         // Changes Top size smaller than Dialog size
         ((FakeDriver)Application.Driver!).SetBufferSize (19, 2);
 
-        Application.OnMouseEvent (
+        Application.RaiseMouseEvent (
                                   new ()
                                   {
                                       ScreenPosition = new (-1, -1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
@@ -830,7 +830,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 19, 2), top.Frame);
         Assert.Equal (new (-1, -1, 20, 3), window.Frame);
 
-        Application.OnMouseEvent (
+        Application.RaiseMouseEvent (
                                   new ()
                                   {
                                       ScreenPosition = new (18, 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
@@ -841,7 +841,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Equal (new (18, 1, 20, 3), window.Frame);
 
         // On a real app we can't go beyond the SuperView bounds
-        Application.OnMouseEvent (
+        Application.RaiseMouseEvent (
                                   new ()
                                   {
                                       ScreenPosition = new (19, 2), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
@@ -882,7 +882,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Assert.Null (Application.MouseGrabView);
         Assert.Equal (new (0, 0, 10, 3), window.Frame);
 
-        Application.OnMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.Button1Pressed });
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.Button1Pressed });
 
         var firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -890,7 +890,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
 
         Assert.Equal (new (0, 0, 10, 3), window.Frame);
 
-        Application.OnMouseEvent (
+        Application.RaiseMouseEvent (
                                   new ()
                                   {
                                       ScreenPosition = new (1, 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
@@ -984,7 +984,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
 
         Assert.Equal (new (2, 1, 15, 10), testWindow.Frame);
 
-        Application.OnMouseEvent (new () { ScreenPosition = new (5, 2), Flags = MouseFlags.Button1Clicked });
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (5, 2), Flags = MouseFlags.Button1Clicked });
 
         Application.Refresh ();
 

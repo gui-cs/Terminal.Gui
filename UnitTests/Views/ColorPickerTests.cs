@@ -434,7 +434,7 @@ public class ColorPickerTests
         cp.Draw ();
 
         // Click on Green bar
-        Application.OnMouseEvent (new ()
+        Application.RaiseMouseEvent (new ()
         {
             Flags = MouseFlags.Button1Pressed,
             ScreenPosition = new (0, 1)
@@ -453,7 +453,7 @@ public class ColorPickerTests
         Assert.IsAssignableFrom<GBar> (cp.Focused);
 
         // Click on Blue bar
-        Application.OnMouseEvent (new ()
+        Application.RaiseMouseEvent (new ()
         {
             Flags = MouseFlags.Button1Pressed,
             ScreenPosition = new (0, 2)

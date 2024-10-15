@@ -11,7 +11,7 @@ public partial class View // Mouse APIs
     private ColorScheme? _savedNonHoverColorScheme;
 
     /// <summary>
-    ///     INTERNAL Called by <see cref="Application.OnMouseEvent"/> when the mouse moves over the View's <see cref="Frame"/>.
+    ///     INTERNAL Called by <see cref="Application.RaiseMouseEvent"/> when the mouse moves over the View's <see cref="Frame"/>.
     ///     <see cref="MouseLeave"/> will
     ///     be raised when the mouse is no longer over the <see cref="Frame"/>. If another View occludes this View, the
     ///     that View will also receive MouseEnter/Leave events.
@@ -126,7 +126,7 @@ public partial class View // Mouse APIs
     public event EventHandler<CancelEventArgs>? MouseEnter;
 
     /// <summary>
-    ///     INTERNAL Called by <see cref="Application.OnMouseEvent"/> when the mouse leaves <see cref="Frame"/>, or is occluded
+    ///     INTERNAL Called by <see cref="Application.RaiseMouseEvent"/> when the mouse leaves <see cref="Frame"/>, or is occluded
     ///     by another non-SubView.
     /// </summary>
     /// <remarks>
@@ -196,16 +196,15 @@ public partial class View // Mouse APIs
 
     #region Low Level Mouse Events
 
-    /// <summary>Event fired when a mouse event occurs.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         The coordinates are relative to <see cref="View.Viewport"/>.
-    ///     </para>
-    /// </remarks>
-    public event EventHandler<MouseEventEventArgs>? MouseEvent;
+    /// <summary>Gets or sets whether the <see cref="View"/> wants continuous button pressed events.</summary>
+    public virtual bool WantContinuousButtonPressed { get; set; }
+
+    /// <summary>Gets or sets whether the <see cref="View"/> wants mouse position reports.</summary>
+    /// <value><see langword="true"/> if mouse position reports are wanted; otherwise, <see langword="false"/>.</value>
+    public virtual bool WantMousePositionReports { get; set; }
 
     /// <summary>
-    ///     Processes a <see cref="MouseEvent"/>. This method is called by <see cref="Application.OnMouseEvent"/> when a mouse
+    ///     Processes a new <see cref="MouseEvent"/>. This method is called by <see cref="Application.RaiseMouseEvent"/> when a mouse
     ///     event occurs.
     /// </summary>
     /// <remarks>
@@ -213,15 +212,15 @@ public partial class View // Mouse APIs
     ///         A view must be both enabled and visible to receive mouse events.
     ///     </para>
     ///     <para>
-    ///         This method calls <see cref="OnMouseEvent"/> to process the event. If the event is not handled, and one of the
-    ///         mouse buttons was clicked, it calls <see cref="OnMouseClick"/> to process the click.
+    ///         This method raises <see cref="OnMouseEvent"/>/<see cref="MouseEvent"/>; if not handled, and one of the
+    ///         mouse buttons was clicked, the <see cref="OnMouseClick"/>/<see cref="MouseClick"/> event will be raised
     ///     </para>
     ///     <para>
     ///         See <see cref="SetPressedHighlight"/> for more information.
     ///     </para>
     ///     <para>
-    ///         If <see cref="WantContinuousButtonPressed"/> is <see langword="true"/>, the <see cref="OnMouseClick"/> event
-    ///         will be invoked repeatedly while the button is pressed.
+    ///         If <see cref="WantContinuousButtonPressed"/> is <see langword="true"/>, the <see cref="OnMouseEvent"/>/<see cref="MouseEvent"/> event
+    ///         will be raised on any new mouse event where <see cref="MouseEvent.Flags"/> indicates a button is pressed.
     ///     </para>
     /// </remarks>
     /// <param name="mouseEvent"></param>
@@ -297,13 +296,6 @@ public partial class View // Mouse APIs
         return false;
     }
 
-    /// <summary>Gets or sets whether the <see cref="View"/> wants continuous button pressed events.</summary>
-    public virtual bool WantContinuousButtonPressed { get; set; }
-
-    /// <summary>Gets or sets whether the <see cref="View"/> wants mouse position reports.</summary>
-    /// <value><see langword="true"/> if mouse position reports are wanted; otherwise, <see langword="false"/>.</value>
-    public virtual bool WantMousePositionReports { get; set; }
-
     /// <summary>Called when a mouse event occurs within the view's <see cref="Viewport"/>.</summary>
     /// <remarks>
     ///     <para>
@@ -312,7 +304,7 @@ public partial class View // Mouse APIs
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    protected internal virtual bool OnMouseEvent (MouseEvent mouseEvent)
+    protected virtual bool OnMouseEvent (MouseEvent mouseEvent)
     {
         var args = new MouseEventEventArgs (mouseEvent);
 
@@ -321,11 +313,19 @@ public partial class View // Mouse APIs
         return args.Handled;
     }
 
+    /// <summary>Raised when a mouse event occurs.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         The coordinates are relative to <see cref="View.Viewport"/>.
+    ///     </para>
+    /// </remarks>
+    public event EventHandler<MouseEventEventArgs>? MouseEvent;
+
     #endregion Low Level Mouse Events
 
     #region Mouse Click Events
 
-    /// <summary>Event fired when a mouse click occurs.</summary>
+    /// <summary>Raised when a mouse click occurs.</summary>
     /// 
     /// <remarks>
     ///     <para>

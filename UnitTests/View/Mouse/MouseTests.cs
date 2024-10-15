@@ -106,9 +106,9 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         Application.Begin (top);
 
         Assert.Equal (new Point (4, 4), testView.Frame.Location);
-        Application.OnMouseEvent (new () { ScreenPosition = new (xy, xy), Flags = MouseFlags.Button1Pressed });
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (xy, xy), Flags = MouseFlags.Button1Pressed });
 
-        Application.OnMouseEvent (new () { ScreenPosition = new (xy + 1, xy + 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (xy + 1, xy + 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
 
         Assert.Equal (expectedMoved, new Point (5, 5) == testView.Frame.Location);
         top.Dispose ();
