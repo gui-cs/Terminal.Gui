@@ -892,7 +892,6 @@ public class TableView : View
                 }
 
                 Update ();
-                me.Handled = true;
             }
         }
 
