@@ -63,7 +63,7 @@ public class MouseEnterLeaveTests
             Visible = true
         };
 
-        var mouseEvent = new MouseEvent ();
+        var mouseEvent = new MouseEventArgs ();
 
         var eventArgs = new CancelEventArgs ();
 
@@ -136,7 +136,7 @@ public class MouseEnterLeaveTests
             Enabled = true, Visible = true
         };
 
-        var mouseEvent = new MouseEvent ();
+        var mouseEvent = new MouseEventArgs ();
 
         // Act
         view.NewMouseLeaveEvent ();
@@ -159,7 +159,7 @@ public class MouseEnterLeaveTests
             Visible = false
         };
 
-        var mouseEvent = new MouseEvent ();
+        var mouseEvent = new MouseEventArgs ();
 
         // Act
         view.NewMouseLeaveEvent ();
@@ -256,7 +256,7 @@ public class MouseEnterLeaveTests
             Visible = true
         };
 
-        var mouseEvent = new MouseEvent ();
+        var mouseEvent = new MouseEventArgs ();
 
         // Act
         view.NewMouseLeaveEvent ();
@@ -279,7 +279,7 @@ public class MouseEnterLeaveTests
             Visible = false
         };
 
-        var mouseEvent = new MouseEvent ();
+        var mouseEvent = new MouseEventArgs ();
 
         // Act
         view.NewMouseLeaveEvent ();

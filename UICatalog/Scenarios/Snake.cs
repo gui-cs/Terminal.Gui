@@ -357,30 +357,30 @@ public class Snake : Scenario
         }
 
         // BUGBUG: Should (can) this use key bindings instead.
-        public override bool OnKeyDown (Key keyEvent)
+        protected override bool OnKeyDown (Key key)
         {
-            if (keyEvent.KeyCode == KeyCode.CursorUp)
+            if (key.KeyCode == KeyCode.CursorUp)
             {
                 State.PlannedDirection = Direction.Up;
 
                 return true;
             }
 
-            if (keyEvent.KeyCode == KeyCode.CursorDown)
+            if (key.KeyCode == KeyCode.CursorDown)
             {
                 State.PlannedDirection = Direction.Down;
 
                 return true;
             }
 
-            if (keyEvent.KeyCode == KeyCode.CursorLeft)
+            if (key.KeyCode == KeyCode.CursorLeft)
             {
                 State.PlannedDirection = Direction.Left;
 
                 return true;
             }
 
-            if (keyEvent.KeyCode == KeyCode.CursorRight)
+            if (key.KeyCode == KeyCode.CursorRight)
             {
                 State.PlannedDirection = Direction.Right;
 

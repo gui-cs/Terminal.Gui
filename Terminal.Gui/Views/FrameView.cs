@@ -22,7 +22,7 @@ public class FrameView : View
         MouseClick += FrameView_MouseClick;
     }
 
-    private void FrameView_MouseClick (object sender, MouseEventEventArgs e)
+    private void FrameView_MouseClick (object sender, MouseEventArgs e)
     {
         // base sets focus on HotKey
         e.Handled = InvokeCommand (Command.HotKey, ctx: new (Command.HotKey, key: null, data: this)) == true;

@@ -11,7 +11,7 @@ public partial class View // Mouse APIs
     private ColorScheme? _savedNonHoverColorScheme;
 
     /// <summary>
-    ///     INTERNAL Called by <see cref="Application.OnMouseEvent"/> when the mouse moves over the View's <see cref="Frame"/>.
+    ///     INTERNAL Called by <see cref="Application.RaiseMouseEvent"/> when the mouse moves over the View's <see cref="Frame"/>.
     ///     <see cref="MouseLeave"/> will
     ///     be raised when the mouse is no longer over the <see cref="Frame"/>. If another View occludes this View, the
     ///     that View will also receive MouseEnter/Leave events.
@@ -126,7 +126,7 @@ public partial class View // Mouse APIs
     public event EventHandler<CancelEventArgs>? MouseEnter;
 
     /// <summary>
-    ///     INTERNAL Called by <see cref="Application.OnMouseEvent"/> when the mouse leaves <see cref="Frame"/>, or is occluded
+    ///     INTERNAL Called by <see cref="Application.RaiseMouseEvent"/> when the mouse leaves <see cref="Frame"/>, or is occluded
     ///     by another non-SubView.
     /// </summary>
     /// <remarks>
@@ -196,16 +196,15 @@ public partial class View // Mouse APIs
 
     #region Low Level Mouse Events
 
-    /// <summary>Event fired when a mouse event occurs.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         The coordinates are relative to <see cref="View.Viewport"/>.
-    ///     </para>
-    /// </remarks>
-    public event EventHandler<MouseEventEventArgs>? MouseEvent;
+    /// <summary>Gets or sets whether the <see cref="View"/> wants continuous button pressed events.</summary>
+    public virtual bool WantContinuousButtonPressed { get; set; }
+
+    /// <summary>Gets or sets whether the <see cref="View"/> wants mouse position reports.</summary>
+    /// <value><see langword="true"/> if mouse position reports are wanted; otherwise, <see langword="false"/>.</value>
+    public bool WantMousePositionReports { get; set; }
 
     /// <summary>
-    ///     Processes a <see cref="MouseEvent"/>. This method is called by <see cref="Application.OnMouseEvent"/> when a mouse
+    ///     Processes a new <see cref="MouseEvent"/>. This method is called by <see cref="Application.RaiseMouseEvent"/> when a mouse
     ///     event occurs.
     /// </summary>
     /// <remarks>
@@ -213,20 +212,20 @@ public partial class View // Mouse APIs
     ///         A view must be both enabled and visible to receive mouse events.
     ///     </para>
     ///     <para>
-    ///         This method calls <see cref="OnMouseEvent"/> to process the event. If the event is not handled, and one of the
-    ///         mouse buttons was clicked, it calls <see cref="OnMouseClick"/> to process the click.
+    ///         This method raises <see cref="RaiseMouseEvent"/>/<see cref="MouseEvent"/>; if not handled, and one of the
+    ///         mouse buttons was clicked, the <see cref="RaiseMouseClickEvent"/>/<see cref="MouseClick"/> event will be raised
     ///     </para>
     ///     <para>
     ///         See <see cref="SetPressedHighlight"/> for more information.
     ///     </para>
     ///     <para>
-    ///         If <see cref="WantContinuousButtonPressed"/> is <see langword="true"/>, the <see cref="OnMouseClick"/> event
-    ///         will be invoked repeatedly while the button is pressed.
+    ///         If <see cref="WantContinuousButtonPressed"/> is <see langword="true"/>, the <see cref="RaiseMouseEvent"/>/<see cref="MouseEvent"/> event
+    ///         will be raised on any new mouse event where <see cref="Terminal.Gui.MouseEventArgs.Flags"/> indicates a button is pressed.
     ///     </para>
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/> if the event was handled, <see langword="false"/> otherwise.</returns>
-    public bool? NewMouseEvent (MouseEvent mouseEvent)
+    public bool? NewMouseEvent (MouseEventArgs mouseEvent)
     {
         // Pre-conditions
         if (!Enabled)
@@ -246,17 +245,13 @@ public partial class View // Mouse APIs
         }
 
         // Cancellable event
-        if (OnMouseEvent (mouseEvent))
+        if (RaiseMouseEvent (mouseEvent) || mouseEvent.Handled)
         {
-            // Technically mouseEvent.Handled should already be true if implementers of OnMouseEvent
-            // follow the rules. But we'll update it just in case.
-            return mouseEvent.Handled = true;
+            return true;
         }
 
-        // BUGBUG: MouseEvent should be fired from here. Fix this in https://github.com/gui-cs/Terminal.Gui/issues/3029
-
         // Post-Conditions
-        if (HighlightStyle != HighlightStyle.None || (WantContinuousButtonPressed && WantMousePositionReports))
+        if (HighlightStyle != HighlightStyle.None || WantContinuousButtonPressed)
         {
             if (WhenGrabbedHandlePressed (mouseEvent))
             {
@@ -274,35 +269,33 @@ public partial class View // Mouse APIs
             }
         }
 
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button2Clicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button4Clicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button2DoubleClicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button3DoubleClicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button4DoubleClicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button1TripleClicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button2TripleClicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button3TripleClicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button4TripleClicked)
-           )
+        if (mouseEvent.IsSingleDoubleOrTripleClicked)
         {
             // If it's a click, and we didn't handle it, then we need to generate a click event
             // We get here if the view did not handle the mouse event via OnMouseEvent/MouseEvent and
             // it did not handle the press/release/clicked events via HandlePress/HandleRelease/HandleClicked
-            return OnMouseClick (new (mouseEvent));
+            return RaiseMouseClickEvent (mouseEvent);
         }
 
         return false;
     }
 
-    /// <summary>Gets or sets whether the <see cref="View"/> wants continuous button pressed events.</summary>
-    public virtual bool WantContinuousButtonPressed { get; set; }
+    /// <summary>
+    ///     Raises the <see cref="RaiseMouseEvent"/>/<see cref="MouseEvent"/> event.
+    /// </summary>
+    /// <param name="mouseEvent"></param>
+    /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
+    public bool RaiseMouseEvent (MouseEventArgs mouseEvent)
+    {
+        if (OnMouseEvent (mouseEvent) || mouseEvent.Handled == true)
+        {
+            return true;
+        }
 
-    /// <summary>Gets or sets whether the <see cref="View"/> wants mouse position reports.</summary>
-    /// <value><see langword="true"/> if mouse position reports are wanted; otherwise, <see langword="false"/>.</value>
-    public virtual bool WantMousePositionReports { get; set; }
+        MouseEvent?.Invoke (this, mouseEvent);
+
+        return mouseEvent.Handled;
+    }
 
     /// <summary>Called when a mouse event occurs within the view's <see cref="Viewport"/>.</summary>
     /// <remarks>
@@ -312,44 +305,36 @@ public partial class View // Mouse APIs
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    protected internal virtual bool OnMouseEvent (MouseEvent mouseEvent)
+    protected virtual bool OnMouseEvent (MouseEventArgs mouseEvent)
     {
-        var args = new MouseEventEventArgs (mouseEvent);
-
-        MouseEvent?.Invoke (this, args);
-
-        return args.Handled;
+        return false;
     }
+
+    /// <summary>Raised when a mouse event occurs.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         The coordinates are relative to <see cref="View.Viewport"/>.
+    ///     </para>
+    /// </remarks>
+    public event EventHandler<MouseEventArgs>? MouseEvent;
 
     #endregion Low Level Mouse Events
 
     #region Mouse Click Events
 
-    /// <summary>Event fired when a mouse click occurs.</summary>
-    /// 
+    /// <summary>Raises the <see cref="OnMouseClick"/>/<see cref="MouseClick"/> event.</summary>
     /// <remarks>
     ///     <para>
-    ///         Fired when the mouse is either clicked or double-clicked. Check
-    ///         <see cref="MouseEvent.Flags"/> to see which button was clicked.
+    ///         Called when the mouse is either clicked or double-clicked.
     ///     </para>
     ///     <para>
-    ///         The coordinates are relative to <see cref="View.Viewport"/>.
-    ///     </para>
-    /// </remarks>
-    public event EventHandler<MouseEventEventArgs>? MouseClick;
-
-    /// <summary>Invokes the MouseClick event.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         Called when the mouse is either clicked or double-clicked. Check
-    ///         <see cref="MouseEvent.Flags"/> to see which button was clicked.
+    ///         If <see cref="WantContinuousButtonPressed"/> is <see langword="true"/>, will be invoked on every mouse event where
+    ///         the mouse button is pressed.
     ///     </para>
     /// </remarks>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    protected bool OnMouseClick (MouseEventEventArgs args)
+    protected bool RaiseMouseClickEvent (MouseEventArgs args)
     {
-        // BUGBUG: This should be named NewMouseClickEvent. Fix this in https://github.com/gui-cs/Terminal.Gui/issues/3029
-
         // Pre-conditions
         if (!Enabled)
         {
@@ -359,7 +344,10 @@ public partial class View // Mouse APIs
 
         // Cancellable event
 
-        // BUGBUG: There should be a call to a protected virtual OnMouseClick here. Fix this in https://github.com/gui-cs/Terminal.Gui/issues/3029
+        if (OnMouseClick (args) || args.Handled)
+        {
+            return args.Handled;
+        }
 
         MouseClick?.Invoke (this, args);
 
@@ -372,10 +360,38 @@ public partial class View // Mouse APIs
 
         // Always invoke Select command on MouseClick
         // By default, this will raise Selecting/OnSelecting - Subclasses can override this via AddCommand (Command.Select ...).
-        args.Handled = InvokeCommand (Command.Select, ctx: new (Command.Select, key: null, data: args.MouseEvent)) == true;
+        args.Handled = InvokeCommand (Command.Select, ctx: new (Command.Select, key: null, data: args)) == true;
 
         return args.Handled;
     }
+
+    /// <summary>
+    ///     Called when a mouse click occurs. Check <see cref="MouseEventArgs.Flags"/> to see which button was clicked.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Called when the mouse is either clicked or double-clicked.
+    ///     </para>
+    ///     <para>
+    ///         If <see cref="WantContinuousButtonPressed"/> is <see langword="true"/>, will be called on every mouse event where
+    ///         the mouse button is pressed.
+    ///     </para>
+    /// </remarks>
+    /// <param name="args"></param>
+    /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
+    protected virtual bool OnMouseClick (MouseEventArgs args) { return false; }
+
+    /// <summary>Raised when a mouse click occurs.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         Raised when the mouse is either clicked or double-clicked.
+    ///     </para>
+    ///     <para>
+    ///         If <see cref="WantContinuousButtonPressed"/> is <see langword="true"/>, will be raised on every mouse event where
+    ///         the mouse button is pressed.
+    ///     </para>
+    /// </remarks>
+    public event EventHandler<MouseEventArgs>? MouseClick;
 
     /// <summary>
     ///     INTERNAL For cases where the view is grabbed and the mouse is clicked, this method handles the click event (typically
@@ -386,13 +402,11 @@ public partial class View // Mouse APIs
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    internal bool WhenGrabbedHandleClicked (MouseEvent mouseEvent)
+    internal bool WhenGrabbedHandleClicked (MouseEventArgs mouseEvent)
     {
-        if (Application.MouseGrabView == this
-            && (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)
-                || mouseEvent.Flags.HasFlag (MouseFlags.Button2Clicked)
-                || mouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)
-                || mouseEvent.Flags.HasFlag (MouseFlags.Button4Clicked)))
+        mouseEvent.Handled = false;
+
+        if (Application.MouseGrabView == this && mouseEvent.IsSingleClicked)
         {
             // We're grabbed. Clicked event comes after the last Release. This is our signal to ungrab
             Application.UngrabMouse ();
@@ -405,7 +419,7 @@ public partial class View // Mouse APIs
             // If mouse is still in bounds, generate a click
             if (!WantMousePositionReports && Viewport.Contains (mouseEvent.Position))
             {
-                return OnMouseClick (new (mouseEvent));
+                return RaiseMouseClickEvent (mouseEvent);
             }
 
             return mouseEvent.Handled = true;
@@ -423,12 +437,11 @@ public partial class View // Mouse APIs
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    internal bool WhenGrabbedHandleReleased (MouseEvent mouseEvent)
+    internal bool WhenGrabbedHandleReleased (MouseEventArgs mouseEvent)
     {
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button2Released)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button3Released)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button4Released))
+        mouseEvent.Handled = false;
+
+        if (mouseEvent.IsReleased)
         {
             if (Application.MouseGrabView == this)
             {
@@ -452,12 +465,11 @@ public partial class View // Mouse APIs
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    private bool WhenGrabbedHandlePressed (MouseEvent mouseEvent)
+    private bool WhenGrabbedHandlePressed (MouseEventArgs mouseEvent)
     {
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button2Pressed)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button3Pressed)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button4Pressed))
+        mouseEvent.Handled = false;
+
+        if (mouseEvent.IsPressed)
         {
             // The first time we get pressed event, grab the mouse and set focus
             if (Application.MouseGrabView != this)
@@ -493,8 +505,7 @@ public partial class View // Mouse APIs
 
             if (WantContinuousButtonPressed && Application.MouseGrabView == this)
             {
-                // If this is not the first pressed event, generate a click
-                return OnMouseClick (new (mouseEvent));
+                return RaiseMouseClickEvent (mouseEvent);
             }
 
             return mouseEvent.Handled = true;

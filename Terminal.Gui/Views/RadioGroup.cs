@@ -220,12 +220,12 @@ public class RadioGroup : View, IDesignable, IOrientation
     /// </remarks>
     public bool DoubleClickAccepts { get; set; } = true;
 
-    private void RadioGroup_MouseClick (object? sender, MouseEventEventArgs e)
+    private void RadioGroup_MouseClick (object? sender, MouseEventArgs e)
     {
-        if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
+        if (e.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
-            int viewportX = e.MouseEvent.Position.X;
-            int viewportY = e.MouseEvent.Position.Y;
+            int viewportX = e.Position.X;
+            int viewportY = e.Position.Y;
 
             int pos = Orientation == Orientation.Horizontal ? viewportX : viewportY;
 
@@ -249,7 +249,7 @@ public class RadioGroup : View, IDesignable, IOrientation
             return;
         }
 
-        if (DoubleClickAccepts && e.MouseEvent.Flags.HasFlag (MouseFlags.Button1DoubleClicked))
+        if (DoubleClickAccepts && e.Flags.HasFlag (MouseFlags.Button1DoubleClicked))
         {
             // NOTE: Drivers ALWAYS generate a Button1Clicked event before Button1DoubleClicked
             // NOTE: So, we've already selected an item.

@@ -327,7 +327,7 @@ public class HexView : View, IDesignable
     public void DiscardEdits () { _edits = new (); }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent (MouseEvent me)
+    protected override bool OnMouseEvent (MouseEventArgs me)
     {
         if (_source is null)
         {
@@ -591,7 +591,7 @@ public class HexView : View, IDesignable
     public event EventHandler<HexViewEventArgs>? PositionChanged;
 
     /// <inheritdoc/>
-    public override bool OnProcessKeyDown (Key keyEvent)
+    protected override bool OnKeyDownNotHandled (Key keyEvent)
     {
         if (!AllowEdits || _source is null)
         {

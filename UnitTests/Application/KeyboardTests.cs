@@ -64,14 +64,14 @@ public class KeyboardTests
         Assert.True (win2.HasFocus);
         Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
 
-        Application.OnKeyDown (Key.F6);
+        Application.RaiseKeyDownEvent (Key.F6);
         Assert.True (win2.CanFocus);
         Assert.False (win.HasFocus);
         Assert.True (win2.CanFocus);
         Assert.True (win2.HasFocus);
         Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
 
-        Application.OnKeyDown (Key.F6);
+        Application.RaiseKeyDownEvent (Key.F6);
         Assert.False (win.CanFocus);
         Assert.False (win.HasFocus);
         Assert.True (win2.CanFocus);
@@ -117,14 +117,14 @@ public class KeyboardTests
         Assert.False (win2.HasFocus);
         Assert.Equal ("win", ((Window)top.Subviews [^1]).Title);
 
-        Application.OnKeyDown (Key.F6);
+        Application.RaiseKeyDownEvent (Key.F6);
         Assert.True (win.CanFocus);
         Assert.False (win.HasFocus);
         Assert.True (win2.CanFocus);
         Assert.True (win2.HasFocus);
         Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
 
-        Application.OnKeyDown (Key.F6);
+        Application.RaiseKeyDownEvent (Key.F6);
         Assert.True (win.CanFocus);
         Assert.True (win.HasFocus);
         Assert.True (win2.CanFocus);
@@ -163,39 +163,39 @@ public class KeyboardTests
     public void KeyBinding_OnKeyDown ()
     {
         var view = new ScopedKeyBindingView ();
-        var invoked = false;
-        view.InvokingKeyBindings += (s, e) => invoked = true;
+        var keyWasHandled = false;
+        view.KeyDownNotHandled += (s, e) => keyWasHandled = true;
 
         var top = new Toplevel ();
         top.Add (view);
         Application.Begin (top);
 
-        Application.OnKeyDown (Key.A);
-        Assert.False (invoked);
+        Application.RaiseKeyDownEvent (Key.A);
+        Assert.False (keyWasHandled);
         Assert.True (view.ApplicationCommand);
 
-        invoked = false;
+        keyWasHandled = false;
         view.ApplicationCommand = false;
         Application.KeyBindings.Remove (KeyCode.A);
-        Application.OnKeyDown (Key.A); // old
-        Assert.False (invoked);
+        Application.RaiseKeyDownEvent (Key.A); // old
+        Assert.False (keyWasHandled);
         Assert.False (view.ApplicationCommand);
         Application.KeyBindings.Add (Key.A.WithCtrl, view, Command.Save);
-        Application.OnKeyDown (Key.A); // old
-        Assert.False (invoked);
+        Application.RaiseKeyDownEvent (Key.A); // old
+        Assert.False (keyWasHandled);
         Assert.False (view.ApplicationCommand);
-        Application.OnKeyDown (Key.A.WithCtrl); // new
-        Assert.False (invoked);
+        Application.RaiseKeyDownEvent (Key.A.WithCtrl); // new
+        Assert.False (keyWasHandled);
         Assert.True (view.ApplicationCommand);
 
-        invoked = false;
-        Application.OnKeyDown (Key.H);
-        Assert.True (invoked);
+        keyWasHandled = false;
+        Application.RaiseKeyDownEvent (Key.H);
+        Assert.False (keyWasHandled);
 
-        invoked = false;
+        keyWasHandled = false;
         Assert.False (view.HasFocus);
-        Application.OnKeyDown (Key.F);
-        Assert.False (invoked);
+        Application.RaiseKeyDownEvent (Key.F);
+        Assert.False (keyWasHandled);
 
         Assert.True (view.ApplicationCommand);
         Assert.True (view.HotKeyCommand);
@@ -208,23 +208,23 @@ public class KeyboardTests
     public void KeyBinding_OnKeyDown_Negative ()
     {
         var view = new ScopedKeyBindingView ();
-        var invoked = false;
-        view.InvokingKeyBindings += (s, e) => invoked = true;
+        var keyWasHandled = false;
+        view.KeyDownNotHandled += (s, e) => keyWasHandled = true;
 
         var top = new Toplevel ();
         top.Add (view);
         Application.Begin (top);
 
-        Application.OnKeyDown (Key.A.WithCtrl);
-        Assert.False (invoked);
+        Application.RaiseKeyDownEvent (Key.A.WithCtrl);
+        Assert.False (keyWasHandled);
         Assert.False (view.ApplicationCommand);
         Assert.False (view.HotKeyCommand);
         Assert.False (view.FocusedCommand);
 
-        invoked = false;
+        keyWasHandled = false;
         Assert.False (view.HasFocus);
-        Application.OnKeyDown (Key.Z);
-        Assert.False (invoked);
+        Application.RaiseKeyDownEvent (Key.Z);
+        Assert.False (keyWasHandled);
         Assert.False (view.ApplicationCommand);
         Assert.False (view.HotKeyCommand);
         Assert.False (view.FocusedCommand);
@@ -399,7 +399,7 @@ public class KeyboardTests
         Assert.True (subView1.HasFocus);
 
         // Act
-        Application.OnKeyDown (Application.NextTabGroupKey);
+        Application.RaiseKeyDownEvent (Application.NextTabGroupKey);
 
         // Assert
         Assert.True (view2.HasFocus);
@@ -432,24 +432,24 @@ public class KeyboardTests
                                      Assert.True (v1.HasFocus);
 
                                      // Across TabGroups
-                                     Application.OnKeyDown (Key.F6);
+                                     Application.RaiseKeyDownEvent (Key.F6);
                                      Assert.True (v3.HasFocus);
-                                     Application.OnKeyDown (Key.F6);
+                                     Application.RaiseKeyDownEvent (Key.F6);
                                      Assert.True (v1.HasFocus);
 
-                                     Application.OnKeyDown (Key.F6.WithShift);
+                                     Application.RaiseKeyDownEvent (Key.F6.WithShift);
                                      Assert.True (v3.HasFocus);
-                                     Application.OnKeyDown (Key.F6.WithShift);
+                                     Application.RaiseKeyDownEvent (Key.F6.WithShift);
                                      Assert.True (v1.HasFocus);
 
                                      // Restore?
-                                     Application.OnKeyDown (Key.Tab);
+                                     Application.RaiseKeyDownEvent (Key.Tab);
                                      Assert.True (v2.HasFocus);
 
-                                     Application.OnKeyDown (Key.F6);
+                                     Application.RaiseKeyDownEvent (Key.F6);
                                      Assert.True (v3.HasFocus);
 
-                                     Application.OnKeyDown (Key.F6);
+                                     Application.RaiseKeyDownEvent (Key.F6);
                                      Assert.True (v1.HasFocus);
 
                                      Application.RequestStop ();
@@ -485,7 +485,7 @@ public class KeyboardTests
         view1.SetFocus ();
 
         // Act
-        Application.OnKeyDown (Application.NextTabKey);
+        Application.RaiseKeyDownEvent (Application.NextTabKey);
 
         // Assert
         Assert.True (view2.HasFocus);
@@ -539,7 +539,7 @@ public class KeyboardTests
         Assert.True (subView1.HasFocus);
 
         // Act
-        Application.OnKeyDown (Application.PrevTabGroupKey);
+        Application.RaiseKeyDownEvent (Application.PrevTabGroupKey);
 
         // Assert
         Assert.True (view2.HasFocus);
@@ -562,7 +562,7 @@ public class KeyboardTests
         view1.SetFocus ();
 
         // Act
-        Application.OnKeyDown (Application.NextTabKey);
+        Application.RaiseKeyDownEvent (Application.NextTabKey);
 
         // Assert
         Assert.True (view2.HasFocus);
@@ -605,21 +605,21 @@ public class KeyboardTests
 
         Key prevKey = Application.QuitKey;
 
-        Application.OnKeyDown (Application.QuitKey);
+        Application.RaiseKeyDownEvent (Application.QuitKey);
         Assert.True (isQuiting);
 
         isQuiting = false;
-        Application.OnKeyDown (Application.QuitKey);
+        Application.RaiseKeyDownEvent (Application.QuitKey);
         Assert.True (isQuiting);
 
         isQuiting = false;
         Application.QuitKey = Key.C.WithCtrl;
-        Application.OnKeyDown (prevKey); // Should not quit
+        Application.RaiseKeyDownEvent (prevKey); // Should not quit
         Assert.False (isQuiting);
-        Application.OnKeyDown (Key.Q.WithCtrl); // Should not quit
+        Application.RaiseKeyDownEvent (Key.Q.WithCtrl); // Should not quit
         Assert.False (isQuiting);
 
-        Application.OnKeyDown (Application.QuitKey);
+        Application.RaiseKeyDownEvent (Application.QuitKey);
         Assert.True (isQuiting);
 
         // Reset the QuitKey to avoid throws errors on another tests
@@ -728,7 +728,7 @@ public class KeyboardTests
             if (Application.IsInitialized)
             {
                 _output.WriteLine ("  Pressing QuitKey");
-                Application.OnKeyDown (Application.QuitKey);
+                Application.RaiseKeyDownEvent (Application.QuitKey);
             }
         }
     }

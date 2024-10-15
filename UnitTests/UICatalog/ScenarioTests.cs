@@ -132,7 +132,7 @@ public class ScenarioTests : TestsAllViews
             {
                 // Press QuitKey 
                 //_output.WriteLine ($"Forcing Quit with {Application.QuitKey}");
-                Application.OnKeyDown (Application.QuitKey);
+                Application.RaiseKeyDownEvent (Application.QuitKey);
             }
         }
     }
