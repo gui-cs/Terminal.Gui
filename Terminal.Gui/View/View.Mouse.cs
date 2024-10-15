@@ -503,6 +503,8 @@ public partial class View // Mouse APIs
                     // Set the focus, but don't invoke Accept
                     SetFocus ();
                 }
+
+                mouseEvent.Handled = true;
             }
 
             if (Viewport.Contains (mouseEvent.Position))
