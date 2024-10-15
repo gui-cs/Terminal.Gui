@@ -39,27 +39,27 @@ public class HexViewTests
         // Needed because HexView relies on LayoutComplete to calc sizes
         hv.LayoutSubviews ();
 
-        Assert.True (Application.OnKeyDown (Key.Tab)); // Move to left side
+        Assert.True (Application.RaiseKeyDownEvent (Key.Tab)); // Move to left side
 
         Assert.Empty (hv.Edits);
         hv.AllowEdits = false;
-        Assert.True (Application.OnKeyDown (Key.Home));
-        Assert.False (Application.OnKeyDown (Key.A));
+        Assert.True (Application.RaiseKeyDownEvent (Key.Home));
+        Assert.False (Application.RaiseKeyDownEvent (Key.A));
         Assert.Empty (hv.Edits);
         Assert.Equal (126, hv.Source!.Length);
 
         hv.AllowEdits = true;
-        Assert.True (Application.OnKeyDown (Key.D4));
-        Assert.True (Application.OnKeyDown (Key.D1));
+        Assert.True (Application.RaiseKeyDownEvent (Key.D4));
+        Assert.True (Application.RaiseKeyDownEvent (Key.D1));
         Assert.Single (hv.Edits);
         Assert.Equal (65, hv.Edits.ToList () [0].Value);
         Assert.Equal ('A', (char)hv.Edits.ToList () [0].Value);
         Assert.Equal (126, hv.Source.Length);
 
         // Appends byte
-        Assert.True (Application.OnKeyDown (Key.End));
-        Assert.True (Application.OnKeyDown (Key.D4));
-        Assert.True (Application.OnKeyDown (Key.D2));
+        Assert.True (Application.RaiseKeyDownEvent (Key.End));
+        Assert.True (Application.RaiseKeyDownEvent (Key.D4));
+        Assert.True (Application.RaiseKeyDownEvent (Key.D2));
         Assert.Equal (2, hv.Edits.Count);
         Assert.Equal (66, hv.Edits.ToList () [1].Value);
         Assert.Equal ('B', (char)hv.Edits.ToList () [1].Value);
@@ -100,15 +100,15 @@ public class HexViewTests
         hv.Source.Read (readBuffer);
         Assert.Equal ("Fest", Encoding.Default.GetString (readBuffer));
 
-        Assert.True (Application.OnKeyDown (Key.Tab)); // Move to left side
-        Assert.True (Application.OnKeyDown (Key.D5));
-        Assert.True (Application.OnKeyDown (Key.D4));
+        Assert.True (Application.RaiseKeyDownEvent (Key.Tab)); // Move to left side
+        Assert.True (Application.RaiseKeyDownEvent (Key.D5));
+        Assert.True (Application.RaiseKeyDownEvent (Key.D4));
         readBuffer [hv.Edits.ToList () [0].Key] = hv.Edits.ToList () [0].Value;
         Assert.Equal ("Test", Encoding.Default.GetString (readBuffer));
 
-        Assert.True (Application.OnKeyDown (Key.Tab)); // Move to right side
-        Assert.True (Application.OnKeyDown (Key.CursorLeft)); 
-        Assert.True (Application.OnKeyDown (Key.Z.WithShift));
+        Assert.True (Application.RaiseKeyDownEvent (Key.Tab)); // Move to right side
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorLeft)); 
+        Assert.True (Application.RaiseKeyDownEvent (Key.Z.WithShift));
         readBuffer [hv.Edits.ToList () [0].Key] = hv.Edits.ToList () [0].Value;
         Assert.Equal ("Zest", Encoding.Default.GetString (readBuffer));
 
@@ -157,21 +157,21 @@ public class HexViewTests
 
         Assert.Equal (new (0, 0), hv.Position);
 
-        Assert.True (Application.OnKeyDown (Key.Tab));
+        Assert.True (Application.RaiseKeyDownEvent (Key.Tab));
         Assert.Equal (new (0, 0), hv.Position);
 
-        Assert.True (Application.OnKeyDown (Key.CursorRight.WithCtrl));
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorRight.WithCtrl));
         Assert.Equal (hv.BytesPerLine - 1, hv.Position.X);
 
-        Assert.True (Application.OnKeyDown (Key.Home));
+        Assert.True (Application.RaiseKeyDownEvent (Key.Home));
 
-        Assert.True (Application.OnKeyDown (Key.CursorRight));
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorRight));
         Assert.Equal (new (1, 0), hv.Position);
 
-        Assert.True (Application.OnKeyDown (Key.CursorDown));
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown));
         Assert.Equal (new (1, 1), hv.Position);
 
-        Assert.True (Application.OnKeyDown (Key.End));
+        Assert.True (Application.RaiseKeyDownEvent (Key.End));
         Assert.Equal (new (3, 3), hv.Position);
 
         Assert.Equal (hv.Source!.Length, hv.Address);
@@ -195,20 +195,20 @@ public class HexViewTests
 
         Assert.Equal (new (0, 0), hv.Position);
 
-        Assert.True (Application.OnKeyDown (Key.Tab));
+        Assert.True (Application.RaiseKeyDownEvent (Key.Tab));
 
-        Assert.True (Application.OnKeyDown (Key.CursorRight.WithCtrl));
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorRight.WithCtrl));
         Assert.Equal (hv.BytesPerLine - 1, hv.Position.X);
 
-        Assert.True (Application.OnKeyDown (Key.Home));
+        Assert.True (Application.RaiseKeyDownEvent (Key.Home));
 
-        Assert.True (Application.OnKeyDown (Key.CursorRight));
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorRight));
         Assert.Equal (new (1, 0), hv.Position);
 
-        Assert.True (Application.OnKeyDown (Key.CursorDown));
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown));
         Assert.Equal (new (1, 1), hv.Position);
 
-        Assert.True (Application.OnKeyDown (Key.End));
+        Assert.True (Application.RaiseKeyDownEvent (Key.End));
         Assert.Equal (new (6, 6), hv.Position);
 
         Assert.Equal (hv.Source!.Length, hv.Address);
@@ -297,42 +297,42 @@ public class HexViewTests
         Assert.Equal (4, hv.BytesPerLine);
 
         // Default internal focus is on right side. Move back to left.
-        Assert.True (Application.OnKeyDown (Key.Tab.WithShift));
+        Assert.True (Application.RaiseKeyDownEvent (Key.Tab.WithShift));
 
-        Assert.True (Application.OnKeyDown (Key.CursorRight));
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorRight));
         Assert.Equal (1, hv.Address);
 
-        Assert.True (Application.OnKeyDown (Key.CursorLeft));
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorLeft));
         Assert.Equal (0, hv.Address);
 
-        Assert.True (Application.OnKeyDown (Key.CursorDown));
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown));
         Assert.Equal (4, hv.Address);
 
-        Assert.True (Application.OnKeyDown (Key.CursorUp));
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorUp));
         Assert.Equal (0, hv.Address);
 
-        Assert.True (Application.OnKeyDown (Key.PageDown));
+        Assert.True (Application.RaiseKeyDownEvent (Key.PageDown));
         Assert.Equal (40, hv.Address);
 
-        Assert.True (Application.OnKeyDown (Key.PageUp));
+        Assert.True (Application.RaiseKeyDownEvent (Key.PageUp));
         Assert.Equal (0, hv.Address);
 
-        Assert.True (Application.OnKeyDown (Key.End));
+        Assert.True (Application.RaiseKeyDownEvent (Key.End));
         Assert.Equal (MEM_STRING_LENGTH, hv.Address);
 
-        Assert.True (Application.OnKeyDown (Key.Home));
+        Assert.True (Application.RaiseKeyDownEvent (Key.Home));
         Assert.Equal (0, hv.Address);
 
-        Assert.True (Application.OnKeyDown (Key.CursorRight.WithCtrl));
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorRight.WithCtrl));
         Assert.Equal (3, hv.Address);
 
-        Assert.True (Application.OnKeyDown (Key.CursorLeft.WithCtrl));
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorLeft.WithCtrl));
         Assert.Equal (0, hv.Address);
 
-        Assert.True (Application.OnKeyDown (Key.CursorDown.WithCtrl));
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown.WithCtrl));
         Assert.Equal (36, hv.Address);
 
-        Assert.True (Application.OnKeyDown (Key.CursorUp.WithCtrl));
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorUp.WithCtrl));
         Assert.Equal (0, hv.Address);
         Application.Top.Dispose ();
         Application.ResetState (true);
