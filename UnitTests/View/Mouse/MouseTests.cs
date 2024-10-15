@@ -312,7 +312,13 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
 
         me.Flags = pressed;
         view.NewMouseEvent (me);
+        Assert.Equal (0, clickedCount);
+        me.Handled = false;
+
+        me.Flags = pressed;
+        view.NewMouseEvent (me);
         Assert.Equal (1, clickedCount);
+        me.Handled = false;
 
         me.Flags = released;
         view.NewMouseEvent (me);
@@ -344,22 +350,22 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
 
         me.Flags = pressed;
         view.NewMouseEvent (me);
-        Assert.Equal (1, clickedCount);
+        Assert.Equal (0, clickedCount);
         me.Handled = false;
 
         me.Flags = pressed;
         view.NewMouseEvent (me);
-        Assert.Equal (2, clickedCount);
+        Assert.Equal (1, clickedCount);
         me.Handled = false;
 
         me.Flags = released;
         view.NewMouseEvent (me);
-        Assert.Equal (2, clickedCount);
+        Assert.Equal (1, clickedCount);
         me.Handled = false;
 
         me.Flags = clicked;
         view.NewMouseEvent (me);
-        Assert.Equal (2, clickedCount);
+        Assert.Equal (1, clickedCount);
 
         view.Dispose ();
         Application.ResetState (ignoreDisposed: true);
@@ -386,21 +392,21 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         me.Flags = MouseFlags.Button1Pressed;
         me.Position = me.Position with { X = 0 };
         view.NewMouseEvent (me);
-        Assert.Equal (1, clickedCount);
+        Assert.Equal (0, clickedCount);
         me.Handled = false;
 
         // Move out of Viewport
         me.Flags = MouseFlags.Button1Pressed;
         me.Position = me.Position with { X = 1 };
         view.NewMouseEvent (me);
-        Assert.Equal (2, clickedCount);
+        Assert.Equal (1, clickedCount);
         me.Handled = false;
 
         // Move into Viewport
         me.Flags = MouseFlags.Button1Pressed;
         me.Position = me.Position with { X = 0 };
         view.NewMouseEvent (me);
-        Assert.Equal (3, clickedCount);
+        Assert.Equal (2, clickedCount);
         me.Handled = false;
 
         view.Dispose ();

@@ -251,7 +251,7 @@ public partial class View // Mouse APIs
         }
 
         // Post-Conditions
-        if (HighlightStyle != HighlightStyle.None || (WantContinuousButtonPressed && WantMousePositionReports))
+        if (HighlightStyle != HighlightStyle.None || WantContinuousButtonPressed)
         {
             if (WhenGrabbedHandlePressed (mouseEvent))
             {
@@ -527,7 +527,6 @@ public partial class View // Mouse APIs
 
             if (WantContinuousButtonPressed && Application.MouseGrabView == this)
             {
-                // If this is not the first pressed event, generate a click
                 return RaiseMouseClickEvent (mouseEvent);
             }
 
