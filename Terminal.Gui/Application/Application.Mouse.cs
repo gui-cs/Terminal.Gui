@@ -251,6 +251,8 @@ public static partial class Application // Mouse handling
         }
     }
 
+
+#pragma warning disable CS1574 // XML comment has cref attribute that could not be resolved
     /// <summary>
     /// Raised when a mouse event occurs. Can be cancelled by setting <see cref="MouseEventArgs.Handled"/> to <see langword="true"/>.
     /// </summary>
@@ -269,6 +271,7 @@ public static partial class Application // Mouse handling
     ///     </para>
     /// </remarks>
     public static event EventHandler<MouseEventArgs>? MouseEvent;
+#pragma warning restore CS1574 // XML comment has cref attribute that could not be resolved
 
     internal static bool HandleMouseGrab (View? deepestViewUnderMouse, MouseEventArgs mouseEvent)
     {

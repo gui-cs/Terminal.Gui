@@ -993,12 +993,8 @@ public class TreeView<T> : View, ITreeView where T : class
     protected override bool OnMouseEvent (MouseEventArgs me)
     {
         // If it is not an event we care about
-        if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
-            && !me.Flags.HasFlag (ObjectActivationButton ?? MouseFlags.Button1DoubleClicked)
-            && !me.Flags.HasFlag (MouseFlags.WheeledDown)
-            && !me.Flags.HasFlag (MouseFlags.WheeledUp)
-            && !me.Flags.HasFlag (MouseFlags.WheeledRight)
-            && !me.Flags.HasFlag (MouseFlags.WheeledLeft))
+        if (me is { IsSingleClicked: false, IsPressed: false, IsReleased: false, IsWheel: false }
+            && !me.Flags.HasFlag (ObjectActivationButton ?? MouseFlags.Button1DoubleClicked))
         {
             // do nothing
             return false;

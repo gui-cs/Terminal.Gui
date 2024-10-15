@@ -800,9 +800,8 @@ public class TextField : View
     /// <inheritdoc/>
     protected override bool OnMouseEvent (MouseEventArgs ev)
     {
-        if (!ev.Flags.HasFlag (MouseFlags.Button1Pressed)
+        if (ev is { IsPressed: false, IsReleased: false }
             && !ev.Flags.HasFlag (MouseFlags.ReportMousePosition)
-            && !ev.Flags.HasFlag (MouseFlags.Button1Released)
             && !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
             && !ev.Flags.HasFlag (MouseFlags.Button1TripleClicked)
             && !ev.Flags.HasFlag (ContextMenu.MouseFlags))

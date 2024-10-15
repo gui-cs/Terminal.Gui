@@ -573,11 +573,7 @@ public class TabView : View
         {
             Tab hit = me.View is Tab ? (Tab)me.View : null;
 
-            bool isClick = me.Flags.HasFlag (MouseFlags.Button1Clicked)
-                           || me.Flags.HasFlag (MouseFlags.Button2Clicked)
-                           || me.Flags.HasFlag (MouseFlags.Button3Clicked);
-
-            if (isClick)
+            if (me.IsSingleClicked)
             {
                 _host.OnTabClicked (new TabMouseEventArgs (hit, me));
 
@@ -588,9 +584,7 @@ public class TabView : View
                 }
             }
 
-            if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
-                && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
-                && !me.Flags.HasFlag (MouseFlags.Button1TripleClicked))
+            if (!me.IsSingleDoubleOrTripleClicked)
             {
                 return false;
             }
@@ -600,9 +594,7 @@ public class TabView : View
                 SetFocus ();
             }
 
-            if (me.Flags.HasFlag (MouseFlags.Button1Clicked)
-                || me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
-                || me.Flags.HasFlag (MouseFlags.Button1TripleClicked))
+            if (me.IsSingleDoubleOrTripleClicked)
             {
                 var scrollIndicatorHit = 0;
 

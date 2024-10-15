@@ -269,19 +269,7 @@ public partial class View // Mouse APIs
             }
         }
 
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button2Clicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button4Clicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button2DoubleClicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button3DoubleClicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button4DoubleClicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button1TripleClicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button2TripleClicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button3TripleClicked)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button4TripleClicked)
-           )
+        if (mouseEvent.IsSingleDoubleOrTripleClicked)
         {
             // If it's a click, and we didn't handle it, then we need to generate a click event
             // We get here if the view did not handle the mouse event via OnMouseEvent/MouseEvent and
@@ -418,11 +406,7 @@ public partial class View // Mouse APIs
     {
         mouseEvent.Handled = false;
 
-        if (Application.MouseGrabView == this
-            && (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)
-                || mouseEvent.Flags.HasFlag (MouseFlags.Button2Clicked)
-                || mouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)
-                || mouseEvent.Flags.HasFlag (MouseFlags.Button4Clicked)))
+        if (Application.MouseGrabView == this && mouseEvent.IsSingleClicked)
         {
             // We're grabbed. Clicked event comes after the last Release. This is our signal to ungrab
             Application.UngrabMouse ();
@@ -457,10 +441,7 @@ public partial class View // Mouse APIs
     {
         mouseEvent.Handled = false;
 
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button2Released)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button3Released)
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button4Released))
+        if (mouseEvent.IsReleased)
         {
             if (Application.MouseGrabView == this)
             {
