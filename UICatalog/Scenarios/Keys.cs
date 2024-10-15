@@ -10,120 +10,142 @@ public class Keys : Scenario
     public override void Main ()
     {
         Application.Init ();
-        ObservableCollection<string> keyPressedList = [];
-        ObservableCollection<string> invokingKeyBindingsList = new ();
+        ObservableCollection<string> keyDownList = [];
+        ObservableCollection<string> keyDownNotHandledList = new ();
 
         var win = new Window { Title = GetQuitKeyAndName () };
-        var editLabel = new Label { X = 0, Y = 0, Text = "Type text here:" };
-        win.Add (editLabel);
 
-        var edit = new TextField { X = Pos.Right (editLabel) + 1, Y = Pos.Top (editLabel), Width = Dim.Fill (2) };
+        var label = new Label
+        {
+            X = 0,
+            Y = 0,
+            Text = "_Type text here:"
+        };
+        win.Add (label);
+
+        var edit = new TextField
+        {
+            X = Pos.Right (label) + 1,
+            Y = Pos.Top (label),
+            Width = Dim.Fill (2),
+            Height = 1,
+        };
         win.Add (edit);
 
-        edit.KeyDown += (s, a) => { keyPressedList.Add (a.ToString ()); };
-
-        edit.InvokingKeyBindings += (s, a) =>
-                                    {
-                                        if (edit.KeyBindings.TryGet (a, out KeyBinding binding))
-                                        {
-                                            invokingKeyBindingsList.Add ($"{a}: {string.Join (",", binding.Commands)}");
-                                        }
-                                    };
-
-        // Last KeyPress: ______
-        var keyPressedLabel = new Label
+        label = new Label
         {
-            X = Pos.Left (editLabel), Y = Pos.Top (editLabel) + 1, Text = "Last TextView.KeyPressed:"
+            X = 0,
+            Y = Pos.Bottom (label),
+            Text = "Last _Application.KeyDown:"
         };
-        win.Add (keyPressedLabel);
-        var labelTextViewKeypress = new Label { X = Pos.Right (keyPressedLabel) + 1, Y = Pos.Top (keyPressedLabel) };
-        win.Add (labelTextViewKeypress);
-
-        edit.KeyDown += (s, e) => labelTextViewKeypress.Text = e.ToString ();
-
-        keyPressedLabel = new Label
+        win.Add (label);
+        var labelAppKeypress = new Label
         {
-            X = Pos.Left (keyPressedLabel), Y = Pos.Bottom (keyPressedLabel), Text = "Last Application.KeyDown:"
+            X = Pos.Right (label) + 1,
+            Y = Pos.Top (label)
         };
-        win.Add (keyPressedLabel);
-        var labelAppKeypress = new Label { X = Pos.Right (keyPressedLabel) + 1, Y = Pos.Top (keyPressedLabel) };
         win.Add (labelAppKeypress);
 
         Application.KeyDown += (s, e) => labelAppKeypress.Text = e.ToString ();
 
-        // Key stroke log:
-        var keyLogLabel = new Label
-        {
-            X = Pos.Left (editLabel), Y = Pos.Top (editLabel) + 4, Text = "Application Key Events:"
-        };
-        win.Add (keyLogLabel);
-        int maxKeyString = Key.CursorRight.WithAlt.WithCtrl.WithShift.ToString ().Length;
-        var yOffset = 1;
-        ObservableCollection<string> keyEventlist = new ();
-
-        var keyEventListView = new ListView
+        label = new ()
         {
             X = 0,
-            Y = Pos.Top (keyLogLabel) + yOffset,
-            Width = "Key Down:".Length + maxKeyString,
+            Y = Pos.Bottom (label),
+            Text = "_Last TextField.KeyDown:"
+        };
+        win.Add (label);
+
+        var lastTextFieldKeyDownLabel = new Label
+        {
+            X = Pos.Right (label) + 1,
+            Y = Pos.Top (label),
+            Height = 1,
+        };
+        win.Add (lastTextFieldKeyDownLabel);
+
+        edit.KeyDown += (s, e) => lastTextFieldKeyDownLabel.Text = e.ToString ();
+
+        // Application key event log:
+        label = new Label
+        {
+            X = 0,
+            Y = Pos.Bottom (label) + 1,
+            Text = "Application Key Events:"
+        };
+        win.Add (label);
+        int maxKeyString = Key.CursorRight.WithAlt.WithCtrl.WithShift.ToString ().Length;
+
+        ObservableCollection<string> keyList = new ();
+
+        var appKeyListView = new ListView
+        {
+            X = 0,
+            Y = Pos.Bottom (label),
+            Width = "KeyDown:".Length + maxKeyString,
             Height = Dim.Fill (),
-            Source = new ListWrapper<string> (keyEventlist)
+            Source = new ListWrapper<string> (keyList)
         };
-        keyEventListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
-        win.Add (keyEventListView);
+        appKeyListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        win.Add (appKeyListView);
 
-        // OnKeyPressed
-        var onKeyPressedLabel = new Label
+        // View key events...
+        edit.KeyDown += (s, a) => { keyDownList.Add (a.ToString ()); };
+
+        edit.KeyDownNotHandled += (s, a) =>
+                                  {
+                                      keyDownNotHandledList.Add ($"{a}");
+                                  };
+
+        // KeyDown
+        label = new Label
         {
-            X = Pos.Right (keyEventListView) + 1, Y = Pos.Top (editLabel) + 4, Text = "TextView KeyDown:"
+            X = Pos.Right (appKeyListView) + 1,
+            Y = Pos.Top (label),
+            Text = "TextView Key Down:"
         };
-        win.Add (onKeyPressedLabel);
+        win.Add (label);
 
-        yOffset = 1;
-
-        var onKeyPressedListView = new ListView
+        var onKeyDownListView = new ListView
         {
-            X = Pos.Left (onKeyPressedLabel),
-            Y = Pos.Top (onKeyPressedLabel) + yOffset,
+            X = Pos.Left (label),
+            Y = Pos.Bottom (label),
             Width = maxKeyString,
             Height = Dim.Fill (),
-            Source = new ListWrapper<string> (keyPressedList)
+            Source = new ListWrapper<string> (keyDownList)
         };
-        onKeyPressedListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
-        win.Add (onKeyPressedListView);
+        onKeyDownListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        win.Add (onKeyDownListView);
 
-        // OnInvokeKeyBindings
-        var onInvokingKeyBindingsLabel = new Label
+        // KeyDownNotHandled
+        label = new Label
         {
-            X = Pos.Right (onKeyPressedListView) + 1,
-            Y = Pos.Top (editLabel) + 4,
-            Text = "TextView InvokingKeyBindings:"
+            X = Pos.Right (onKeyDownListView) + 1,
+            Y = Pos.Top (label),
+            Text = "TextView KeyDownNotHandled:"
         };
-        win.Add (onInvokingKeyBindingsLabel);
+        win.Add (label);
 
-        var onInvokingKeyBindingsListView = new ListView
+        var onKeyDownNotHandledListView = new ListView
         {
-            X = Pos.Left (onInvokingKeyBindingsLabel),
-            Y = Pos.Top (onInvokingKeyBindingsLabel) + yOffset,
-            Width = Dim.Fill (1),
+            X = Pos.Left (label),
+            Y = Pos.Bottom (label),
+            Width = maxKeyString,
             Height = Dim.Fill (),
-            Source = new ListWrapper<string> (invokingKeyBindingsList)
+            Source = new ListWrapper<string> (keyDownNotHandledList)
         };
-        onInvokingKeyBindingsListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
-        win.Add (onInvokingKeyBindingsListView);
+        onKeyDownNotHandledListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        win.Add (onKeyDownNotHandledListView);
 
-        //Application.KeyDown += (s, a) => KeyDownPressUp (a, "Down");
         Application.KeyDown += (s, a) => KeyDownPressUp (a, "Down");
         Application.KeyUp += (s, a) => KeyDownPressUp (a, "Up");
 
         void KeyDownPressUp (Key args, string updown)
         {
-            // BUGBUG: KeyEvent.ToString is badly broken
             var msg = $"Key{updown,-7}: {args}";
-            keyEventlist.Add (msg);
-            keyEventListView.MoveDown ();
-            onKeyPressedListView.MoveDown ();
-            onInvokingKeyBindingsListView.MoveDown ();
+            keyList.Add (msg);
+            appKeyListView.MoveDown ();
+            onKeyDownNotHandledListView.MoveDown ();
         }
 
         Application.Run (win);

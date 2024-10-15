@@ -28,7 +28,6 @@ public partial class View // Layout APIs
     /// <param name="targetY">The target y location.</param>
     /// <param name="nx">The new x location that will ensure <paramref name="viewToMove"/> will be fully visible.</param>
     /// <param name="ny">The new y location that will ensure <paramref name="viewToMove"/> will be fully visible.</param>
-    /// <param name="statusBar">The new top most statusBar</param>
     /// <returns>
     ///     Either <see cref="Application.Top"/> (if <paramref name="viewToMove"/> does not have a Super View) or
     ///     <paramref name="viewToMove"/>'s SuperView. This can be used to ensure LayoutSubviews is called on the correct View.

@@ -59,17 +59,17 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
                 case TabBehavior.TabStop:
                 case TabBehavior.NoStop:
                 case TabBehavior.TabGroup:
-                    Application.OnKeyDown (key);
+                    Application.RaiseKeyDownEvent (key);
 
                     if (view.HasFocus)
                     {
                         // Try once more (HexView)
-                        Application.OnKeyDown (key);
+                        Application.RaiseKeyDownEvent (key);
                     }
 
                     break;
                 default:
-                    Application.OnKeyDown (Key.Tab);
+                    Application.RaiseKeyDownEvent (Key.Tab);
 
                     break;
             }
@@ -178,18 +178,18 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
                 case null:
                 case TabBehavior.NoStop:
                 case TabBehavior.TabStop:
-                    if (Application.OnKeyDown (Key.Tab))
+                    if (Application.RaiseKeyDownEvent (Key.Tab))
                     {
                         if (view.HasFocus)
                         {
                             // Try another nav key (e.g. for TextView that eats Tab)
-                            Application.OnKeyDown (Key.CursorDown);
+                            Application.RaiseKeyDownEvent (Key.CursorDown);
                         }
                     };
                     break;
 
                 case TabBehavior.TabGroup:
-                    Application.OnKeyDown (Key.F6);
+                    Application.RaiseKeyDownEvent (Key.F6);
 
                     break;
                 default:
@@ -211,18 +211,18 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
 
                 break;
             case TabBehavior.TabStop:
-                Application.OnKeyDown (Key.Tab);
+                Application.RaiseKeyDownEvent (Key.Tab);
 
                 break;
             case TabBehavior.TabGroup:
-                if (!Application.OnKeyDown (Key.F6))
+                if (!Application.RaiseKeyDownEvent (Key.F6))
                 {
                     view.SetFocus ();
                 }
 
                 break;
             case null:
-                Application.OnKeyDown (Key.Tab);
+                Application.RaiseKeyDownEvent (Key.Tab);
 
                 break;
             default:
@@ -308,12 +308,12 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         Assert.Equal (0, hasFocusChangingCount);
         Assert.Equal (0, hasFocusChangedCount);
 
-        Application.OnKeyDown (Key.Tab);
+        Application.RaiseKeyDownEvent (Key.Tab);
 
         Assert.Equal (0, hasFocusChangingCount);
         Assert.Equal (0, hasFocusChangedCount);
 
-        Application.OnKeyDown (Key.F6);
+        Application.RaiseKeyDownEvent (Key.F6);
 
         Assert.Equal (0, hasFocusChangingCount);
         Assert.Equal (0, hasFocusChangedCount);

@@ -988,7 +988,7 @@ public class TableView : View
     }
 
     /// <inheritdoc/>
-    public override bool OnProcessKeyDown (Key keyEvent)
+    protected override bool OnKeyDown (Key key)
     {
         if (TableIsNullOrInvisible ())
         {
@@ -998,12 +998,14 @@ public class TableView : View
         if (CollectionNavigator != null
             && HasFocus
             && Table.Rows != 0
-            && CollectionNavigatorBase.IsCompatibleKey (keyEvent)
-            && !keyEvent.KeyCode.HasFlag (KeyCode.CtrlMask)
-            && !keyEvent.KeyCode.HasFlag (KeyCode.AltMask)
-            && Rune.IsLetterOrDigit ((Rune)keyEvent))
+            && key != KeyBindings.GetKeyFromCommands (Command.Accept)
+            && key != CellActivationKey
+            && CollectionNavigatorBase.IsCompatibleKey (key)
+            && !key.KeyCode.HasFlag (KeyCode.CtrlMask)
+            && !key.KeyCode.HasFlag (KeyCode.AltMask)
+            && Rune.IsLetterOrDigit ((Rune)key))
         {
-            return CycleToNextTableEntryBeginningWith (keyEvent);
+            return CycleToNextTableEntryBeginningWith (key);
         }
 
         return false;
@@ -1561,7 +1563,7 @@ public class TableView : View
     /// <returns></returns>
     private TableSelection CreateTableSelection (int x, int y) { return CreateTableSelection (x, y, x, y); }
 
-    private bool CycleToNextTableEntryBeginningWith (Key keyEvent)
+    private bool CycleToNextTableEntryBeginningWith (Key key)
     {
         int row = SelectedRow;
 
@@ -1571,7 +1573,7 @@ public class TableView : View
             return false;
         }
 
-        int match = CollectionNavigator.GetNextMatchingItem (row, (char)keyEvent);
+        int match = CollectionNavigator.GetNextMatchingItem (row, (char)key);
 
         if (match != -1)
         {

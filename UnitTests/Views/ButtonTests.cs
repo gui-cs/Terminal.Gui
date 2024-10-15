@@ -376,7 +376,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.True (btn.HasFocus);
 
         // default keybinding is Space which results in Command.Accept (when focused)
-        Application.OnKeyDown (new ((KeyCode)' '));
+        Application.RaiseKeyDownEvent (new ((KeyCode)' '));
         Assert.Equal (1, pressed);
 
         // remove the default keybinding (Space)
@@ -384,26 +384,26 @@ public class ButtonTests (ITestOutputHelper output)
         btn.KeyBindings.Clear (Command.Accept);
 
         // After clearing the default keystroke the Space button no longer does anything for the Button
-        Application.OnKeyDown (new ((KeyCode)' '));
+        Application.RaiseKeyDownEvent (new ((KeyCode)' '));
         Assert.Equal (1, pressed);
 
         // Set a new binding of b for the click (Accept) event
         btn.KeyBindings.Add (Key.B, Command.HotKey); // b will now trigger the Accept command (when focused or not)
 
         // now pressing B should call the button click event
-        Application.OnKeyDown (Key.B);
+        Application.RaiseKeyDownEvent (Key.B);
         Assert.Equal (2, pressed);
 
         // now pressing Shift-B should NOT call the button click event
-        Application.OnKeyDown (Key.B.WithShift);
+        Application.RaiseKeyDownEvent (Key.B.WithShift);
         Assert.Equal (2, pressed);
 
         // now pressing Alt-B should NOT call the button click event
-        Application.OnKeyDown (Key.B.WithAlt);
+        Application.RaiseKeyDownEvent (Key.B.WithAlt);
         Assert.Equal (2, pressed);
 
         // now pressing Shift-Alt-B should NOT call the button click event
-        Application.OnKeyDown (Key.B.WithAlt.WithShift);
+        Application.RaiseKeyDownEvent (Key.B.WithAlt.WithShift);
         Assert.Equal (2, pressed);
         top.Dispose ();
     }

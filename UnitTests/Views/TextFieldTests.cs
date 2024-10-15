@@ -524,7 +524,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Application.Top = new ();
         Application.Top.Add (tf);
         tf.SetFocus ();
-        Application.OnKeyDown (Key.Space);
+        Application.RaiseKeyDownEvent (Key.Space);
 
         Application.Top.Dispose ();
         Application.ResetState (true);
@@ -541,7 +541,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Application.Top = new ();
         Application.Top.Add (tf);
         tf.SetFocus ();
-        Application.OnKeyDown (Key.Enter);
+        Application.RaiseKeyDownEvent (Key.Enter);
 
         Assert.Equal (0, selectingCount);
 
@@ -560,7 +560,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Application.Top = new ();
         Application.Top.Add (tf);
         tf.SetFocus ();
-        Application.OnKeyDown (Key.Enter);
+        Application.RaiseKeyDownEvent (Key.Enter);
 
         Assert.Equal (1, acceptedCount);
 

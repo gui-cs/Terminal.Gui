@@ -452,7 +452,7 @@ public class HexView : View, IDesignable
     public virtual void OnPositionChanged () { PositionChanged?.Invoke (this, new HexViewEventArgs (Position, CursorPosition, BytesPerLine)); }
 
     /// <inheritdoc/>
-    public override bool OnProcessKeyDown (Key keyEvent)
+    protected override bool OnKeyDownNotHandled (Key keyEvent)
     {
         if (!AllowEdits)
         {

@@ -1384,7 +1384,7 @@ wo
 
         foreach (Key key in keys)
         {
-            top.NewKeyDownEvent (new (key));
+            top.NewKeyDownEvent (key);
             Application.MainLoop.RunIteration ();
         }
 
@@ -2666,7 +2666,7 @@ Edit
         top.Draw ();
         TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
 
-        Assert.True (Application.OnKeyDown (menu.Key));
+        Assert.True (Application.RaiseKeyDownEvent (menu.Key));
         Assert.False (menu.IsMenuOpen);
         Assert.True (tf.HasFocus);
         top.Draw ();
@@ -2949,7 +2949,7 @@ Edit
         top.Add (menu);
         Application.Begin (top);
 
-        Application.OnKeyDown (Key.S.WithCtrl);
+        Application.RaiseKeyDownEvent (Key.S.WithCtrl);
         Application.MainLoop.RunIteration ();
 
         Assert.True (saveAction);
