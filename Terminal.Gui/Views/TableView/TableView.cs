@@ -801,7 +801,7 @@ public class TableView : View
     }
 
     ///<inheritdoc/>
-    protected internal override bool OnMouseEvent (MouseEvent me)
+    protected override bool OnMouseEvent (MouseEventArgs me)
     {
         if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
             && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
@@ -902,11 +902,11 @@ public class TableView : View
 
             if (hit is { })
             {
-                OnCellActivated (new CellActivatedEventArgs (Table, hit.Value.X, hit.Value.Y));
+                return OnCellActivated (new CellActivatedEventArgs (Table, hit.Value.X, hit.Value.Y));
             }
         }
 
-        return base.OnMouseEvent (me);
+        return me.Handled;
     }
 
     ///<inheritdoc/>
@@ -1646,7 +1646,7 @@ public class TableView : View
         return colStyle is { } ? colStyle.GetRepresentation (value) : value.ToString ();
     }
 
-    private bool HasControlOrAlt (MouseEvent me) { return me.Flags.HasFlag (MouseFlags.ButtonAlt) || me.Flags.HasFlag (MouseFlags.ButtonCtrl); }
+    private bool HasControlOrAlt (MouseEventArgs me) { return me.Flags.HasFlag (MouseFlags.ButtonAlt) || me.Flags.HasFlag (MouseFlags.ButtonCtrl); }
 
     /// <summary>
     ///     Returns true if the given <paramref name="columnIndex"/> indexes a visible column otherwise false.  Returns

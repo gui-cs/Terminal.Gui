@@ -599,7 +599,7 @@ public class ButtonTests (ITestOutputHelper output)
     [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
     public void WantContinuousButtonPressed_True_ButtonClick_Accepts (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
     {
-        var me = new MouseEvent ();
+        var me = new MouseEventArgs ();
 
         var button = new Button ()
         {
@@ -618,19 +618,19 @@ public class ButtonTests (ITestOutputHelper output)
                                e.Cancel = true;
                            };
 
-        me = new MouseEvent ();
+        me = new MouseEventArgs ();
         me.Flags = pressed;
         button.NewMouseEvent (me);
         Assert.Equal (0, selectingCount);
         Assert.Equal (0, acceptedCount);
 
-        me = new MouseEvent ();
+        me = new MouseEventArgs ();
         me.Flags = released;
         button.NewMouseEvent (me);
         Assert.Equal (0, selectingCount);
         Assert.Equal (0, acceptedCount);
 
-        me = new MouseEvent ();
+        me = new MouseEventArgs ();
         me.Flags = clicked;
         button.NewMouseEvent (me);
         Assert.Equal (1, selectingCount);
@@ -646,7 +646,7 @@ public class ButtonTests (ITestOutputHelper output)
     [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released)]
     public void WantContinuousButtonPressed_True_ButtonPressRelease_Does_Not_Raise_Selected_Or_Accepted (MouseFlags pressed, MouseFlags released)
     {
-        var me = new MouseEvent ();
+        var me = new MouseEventArgs ();
 
         var button = new Button ()
         {

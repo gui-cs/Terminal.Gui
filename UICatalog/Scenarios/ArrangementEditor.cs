@@ -147,7 +147,7 @@ public sealed class ArrangementEditor : View
         }
     }
 
-    private void ApplicationOnMouseEvent (object? sender, MouseEvent e)
+    private void ApplicationOnMouseEvent (object? sender, MouseEventArgs e)
     {
         if (e.Flags != MouseFlags.Button1Clicked || !AutoSelectViewToEdit)
         {

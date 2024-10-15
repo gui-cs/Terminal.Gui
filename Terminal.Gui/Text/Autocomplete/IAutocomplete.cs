@@ -45,7 +45,7 @@ public interface IAutocomplete
     /// <param name="me">The mouse event.</param>
     /// <param name="fromHost">If was called from the popup or from the host.</param>
     /// <returns><c>true</c>if the mouse can be handled <c>false</c>otherwise.</returns>
-    bool OnMouseEvent (MouseEvent me, bool fromHost = false);
+    bool OnMouseEvent (MouseEventArgs me, bool fromHost = false);
 
     /// <summary>Gets or sets where the popup will be displayed.</summary>
     bool PopupInsideContainer { get; set; }

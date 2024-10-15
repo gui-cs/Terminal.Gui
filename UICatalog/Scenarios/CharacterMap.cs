@@ -98,9 +98,9 @@ public class CharacterMap : Scenario
         // if user clicks the mouse in TableView
         _categoryList.MouseClick += (s, e) =>
                                     {
-                                        _categoryList.ScreenToCell (e.MouseEvent.Position, out int? clickedCol);
+                                        _categoryList.ScreenToCell (e.Position, out int? clickedCol);
 
-                                        if (clickedCol != null && e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
+                                        if (clickedCol != null && e.Flags.HasFlag (MouseFlags.Button1Clicked))
                                         {
                                             EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
                                             string prevSelection = table.Data.ElementAt (_categoryList.SelectedRow).Category;
@@ -527,9 +527,9 @@ internal class CharMap : View
         Padding.Add (up, down, left, right);
     }
 
-    private void Handle_MouseEvent (object sender, MouseEventEventArgs e)
+    private void Handle_MouseEvent (object sender, MouseEventArgs e)
     {
-        if (e.MouseEvent.Flags == MouseFlags.WheeledDown)
+        if (e.Flags == MouseFlags.WheeledDown)
         {
             ScrollVertical (1);
             e.Handled = true;
@@ -537,7 +537,7 @@ internal class CharMap : View
             return;
         }
 
-        if (e.MouseEvent.Flags == MouseFlags.WheeledUp)
+        if (e.Flags == MouseFlags.WheeledUp)
         {
             ScrollVertical (-1);
             e.Handled = true;
@@ -545,7 +545,7 @@ internal class CharMap : View
             return;
         }
 
-        if (e.MouseEvent.Flags == MouseFlags.WheeledRight)
+        if (e.Flags == MouseFlags.WheeledRight)
         {
             ScrollHorizontal (1);
             e.Handled = true;
@@ -553,7 +553,7 @@ internal class CharMap : View
             return;
         }
 
-        if (e.MouseEvent.Flags == MouseFlags.WheeledLeft)
+        if (e.Flags == MouseFlags.WheeledLeft)
         {
             ScrollHorizontal (-1);
             e.Handled = true;
@@ -839,10 +839,8 @@ internal class CharMap : View
     private void CopyCodePoint () { Clipboard.Contents = $"U+{SelectedCodePoint:x5}"; }
     private void CopyGlyph () { Clipboard.Contents = $"{new Rune (SelectedCodePoint)}"; }
 
-    private void Handle_MouseClick (object sender, MouseEventEventArgs args)
+    private void Handle_MouseClick (object sender, MouseEventArgs me)
     {
-        MouseEvent me = args.MouseEvent;
-
         if (me.Flags != MouseFlags.ReportMousePosition && me.Flags != MouseFlags.Button1Clicked && me.Flags != MouseFlags.Button1DoubleClicked)
         {
             return;
@@ -883,7 +881,7 @@ internal class CharMap : View
             SetFocus ();
         }
 
-        args.Handled = true;
+        me.Handled = true;
 
         if (me.Flags == MouseFlags.Button1Clicked)
         {

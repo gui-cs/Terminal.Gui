@@ -8,7 +8,7 @@ namespace UICatalog.Scenarios;
 
 public interface ITool
 {
-    void OnMouseEvent (DrawingArea area, MouseEvent mouseEvent);
+    void OnMouseEvent (DrawingArea area, MouseEventArgs mouseEvent);
 }
 
 internal class DrawLineTool : ITool
@@ -17,7 +17,7 @@ internal class DrawLineTool : ITool
     public LineStyle LineStyle { get; set; } = LineStyle.Single;
 
     /// <inheritdoc/>
-    public void OnMouseEvent (DrawingArea area, MouseEvent mouseEvent)
+    public void OnMouseEvent (DrawingArea area, MouseEventArgs mouseEvent)
     {
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
@@ -96,6 +96,8 @@ internal class DrawLineTool : ITool
                 area.SetNeedsDisplay ();
             }
         }
+
+        mouseEvent.Handled = true;
     }
 }
 
@@ -321,11 +323,11 @@ public class DrawingArea : View
         return false;
     }
 
-    protected override bool OnMouseEvent (MouseEvent mouseEvent)
+    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
     {
         CurrentTool.OnMouseEvent (this, mouseEvent);
 
-        return base.OnMouseEvent (mouseEvent);
+        return mouseEvent.Handled;
     }
 
     internal void AddLayer ()
@@ -429,7 +431,7 @@ public class AttributeView : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEvent mouseEvent)
+    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
     {
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
@@ -441,9 +443,11 @@ public class AttributeView : View
             {
                 ClickedInBackground ();
             }
+
+            mouseEvent.Handled = true;
         }
 
-        return base.OnMouseEvent (mouseEvent);
+        return mouseEvent.Handled;
     }
 
     private bool IsForegroundPoint (int x, int y) { return ForegroundPoints.Contains ((x, y)); }

@@ -138,27 +138,27 @@ public class TabViewTests (ITestOutputHelper output)
         top.Add (tv);
         Application.Begin (top);
 
-        MouseEvent args;
+        MouseEventArgs args;
 
         // Waving mouse around does not trigger click
         for (var i = 0; i < 100; i++)
         {
             args = new () { ScreenPosition = new (i, 1), Flags = MouseFlags.ReportMousePosition };
-            Application.OnMouseEvent (args);
+            Application.RaiseMouseEvent (args);
             Application.Refresh ();
             Assert.Null (clicked);
             Assert.Equal (tab1, tv.SelectedTab);
         }
 
         args = new () { ScreenPosition = new (3, 1), Flags = MouseFlags.Button1Clicked };
-        Application.OnMouseEvent (args);
+        Application.RaiseMouseEvent (args);
         Application.Refresh ();
         Assert.Equal (tab1, clicked);
         Assert.Equal (tab1, tv.SelectedTab);
 
         // Click to tab2
         args = new () { ScreenPosition = new (6, 1), Flags = MouseFlags.Button1Clicked };
-        Application.OnMouseEvent (args);
+        Application.RaiseMouseEvent (args);
         Application.Refresh ();
         Assert.Equal (tab2, clicked);
         Assert.Equal (tab2, tv.SelectedTab);
@@ -171,7 +171,7 @@ public class TabViewTests (ITestOutputHelper output)
                          };
 
         args = new () { ScreenPosition = new (3, 1), Flags = MouseFlags.Button1Clicked };
-        Application.OnMouseEvent (args);
+        Application.RaiseMouseEvent (args);
         Application.Refresh ();
 
         // Tab 1 was clicked but event handler blocked navigation
@@ -179,7 +179,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tab2, tv.SelectedTab);
 
         args = new () { ScreenPosition = new (12, 1), Flags = MouseFlags.Button1Clicked };
-        Application.OnMouseEvent (args);
+        Application.RaiseMouseEvent (args);
         Application.Refresh ();
 
         // Clicking beyond last tab should raise event with null Tab
@@ -233,8 +233,8 @@ public class TabViewTests (ITestOutputHelper output)
         Application.Begin (top);
 
         // Click the right arrow
-        var args = new MouseEvent { ScreenPosition = new (6, 2), Flags = MouseFlags.Button1Clicked };
-        Application.OnMouseEvent (args);
+        var args = new MouseEventArgs { ScreenPosition = new (6, 2), Flags = MouseFlags.Button1Clicked };
+        Application.RaiseMouseEvent (args);
         Application.Refresh ();
         Assert.Null (clicked);
         Assert.Equal (tab1, oldChanged);
@@ -254,7 +254,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         // Click the left arrow
         args = new () { ScreenPosition = new (0, 2), Flags = MouseFlags.Button1Clicked };
-        Application.OnMouseEvent (args);
+        Application.RaiseMouseEvent (args);
         Application.Refresh ();
         Assert.Null (clicked);
         Assert.Equal (tab2, oldChanged);
@@ -324,8 +324,8 @@ public class TabViewTests (ITestOutputHelper output)
         Application.Begin (top);
 
         // Click the right arrow
-        var args = new MouseEvent { ScreenPosition = new (7, 3), Flags = MouseFlags.Button1Clicked };
-        Application.OnMouseEvent (args);
+        var args = new MouseEventArgs { ScreenPosition = new (7, 3), Flags = MouseFlags.Button1Clicked };
+        Application.RaiseMouseEvent (args);
         Application.Refresh ();
         Assert.Null (clicked);
         Assert.Equal (tab1, oldChanged);
@@ -347,7 +347,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         // Click the left arrow
         args = new () { ScreenPosition = new (1, 3), Flags = MouseFlags.Button1Clicked };
-        Application.OnMouseEvent (args);
+        Application.RaiseMouseEvent (args);
         Application.Refresh ();
         Assert.Null (clicked);
         Assert.Equal (tab2, oldChanged);

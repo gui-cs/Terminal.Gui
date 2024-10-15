@@ -1364,7 +1364,7 @@ e
         Application.Top.SetFocus ();
 
         // click on label
-        Application.OnMouseEvent (new () { ScreenPosition = label.Frame.Location, Flags = MouseFlags.Button1Clicked });
+        Application.RaiseMouseEvent (new () { ScreenPosition = label.Frame.Location, Flags = MouseFlags.Button1Clicked });
         Assert.False (label.HasFocus);
         Assert.True (nextView.HasFocus);
 
@@ -1442,12 +1442,12 @@ e
         Assert.True (otherView.HasFocus);
 
         // label can focus, so clicking on it set focus
-        Application.OnMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.Button1Clicked });
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.Button1Clicked });
         Assert.True (label.HasFocus);
         Assert.False (otherView.HasFocus);
 
         // click on view
-        Application.OnMouseEvent (new () { ScreenPosition = new (0, 1), Flags = MouseFlags.Button1Clicked });
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (0, 1), Flags = MouseFlags.Button1Clicked });
         Assert.False (label.HasFocus);
         Assert.True (otherView.HasFocus);
 

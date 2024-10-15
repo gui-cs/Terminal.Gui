@@ -1,5 +1,7 @@
 #nullable enable
 
+using static System.Formats.Asn1.AsnWriter;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -335,7 +337,7 @@ internal sealed class Menu : View
         }
     }
 
-    private void Application_RootMouseEvent (object? sender, MouseEvent a)
+    private void Application_RootMouseEvent (object? sender, MouseEventArgs a)
     {
         if (a.View is { } and (MenuBar or not Menu))
         {
@@ -351,7 +353,7 @@ internal sealed class Menu : View
 
         Point boundsPoint = view.ScreenToViewport (new (a.Position.X, a.Position.Y));
 
-        var me = new MouseEvent
+        var me = new MouseEventArgs
         {
             Position = boundsPoint,
             Flags = a.Flags,
@@ -806,7 +808,7 @@ internal sealed class Menu : View
         _host.SetNeedsDisplay ();
     }
 
-    protected internal override bool OnMouseEvent (MouseEvent me)
+    protected override bool OnMouseEvent (MouseEventArgs me)
     {
         if (!_host._handled && !_host.HandleGrabView (me, this))
         {

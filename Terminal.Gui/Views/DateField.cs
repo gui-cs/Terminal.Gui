@@ -114,16 +114,19 @@ public class DateField : TextField
     }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent ev)
+    protected override bool OnMouseEvent  (MouseEventArgs ev)
     {
-        bool result = base.OnMouseEvent (ev);
+        if (base.OnMouseEvent (ev) || ev.Handled)
+        {
+            return true;
+        }
 
-        if (result && SelectedLength == 0 && ev.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (SelectedLength == 0 && ev.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
             AdjCursorPosition (ev.Position.X);
         }
 
-        return result;
+        return ev.Handled;
     }
 
     /// <summary>Event firing method for the <see cref="DateChanged"/> event.</summary>
@@ -169,7 +172,7 @@ public class DateField : TextField
             CursorPosition = newPoint;
         }
 
-        while (Text [CursorPosition].ToString () == _separator)
+        while (CursorPosition < Text.GetColumns () - 1 && Text [CursorPosition].ToString () == _separator)
         {
             if (increment)
             {

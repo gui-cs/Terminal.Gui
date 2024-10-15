@@ -125,7 +125,7 @@ public class Button : View, IDesignable
         }
     }
 
-    private void Button_MouseClick (object sender, MouseEventEventArgs e)
+    private void Button_MouseClick (object sender, MouseEventArgs e)
     {
         if (e.Handled)
         {

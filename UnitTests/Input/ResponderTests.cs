@@ -234,7 +234,7 @@ public class ResponderTests
         //Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
         Assert.False (r.NewKeyDownEvent (new Key { KeyCode = KeyCode.Null }));
         Assert.False (r.NewKeyDownEvent (new Key { KeyCode = KeyCode.Null }));
-        Assert.False (r.NewMouseEvent (new MouseEvent { Flags = MouseFlags.AllEvents }));
+        Assert.False (r.NewMouseEvent (new MouseEventArgs { Flags = MouseFlags.AllEvents }));
 
         var v = new View ();
         //Assert.False (r.OnEnter (v));

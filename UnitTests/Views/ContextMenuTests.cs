@@ -115,11 +115,11 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (ContextMenu.IsShow);
         Assert.Equal (cm.MenuBar, Application.MouseGrabView);
         Assert.False (menu.IsMenuOpen);
-        Assert.False (menu.NewMouseEvent (new MouseEvent { Position = new (1, 0), Flags = MouseFlags.ReportMousePosition, View = menu }));
+        Assert.False (menu.NewMouseEvent (new MouseEventArgs { Position = new (1, 0), Flags = MouseFlags.ReportMousePosition, View = menu }));
         Assert.True (ContextMenu.IsShow);
         Assert.Equal (cm.MenuBar, Application.MouseGrabView);
         Assert.False (menu.IsMenuOpen);
-        Assert.True (menu.NewMouseEvent (new MouseEvent { Position = new (1, 0), Flags = MouseFlags.Button1Clicked, View = menu }));
+        Assert.True (menu.NewMouseEvent (new MouseEventArgs { Position = new (1, 0), Flags = MouseFlags.Button1Clicked, View = menu }));
         Assert.False (ContextMenu.IsShow);
         Assert.Equal (menu, Application.MouseGrabView);
         Assert.True (menu.IsMenuOpen);
@@ -148,7 +148,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { ScreenPosition = new (8, 2), Flags = MouseFlags.Button3Clicked });
+        Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (8, 2), Flags = MouseFlags.Button3Clicked });
 
         var firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -231,7 +231,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { ScreenPosition = new (9, 3), Flags = MouseFlags.Button3Clicked });
+        Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (9, 3), Flags = MouseFlags.Button3Clicked });
 
         var firstIteration = false;
         Application.RunIteration (ref rsDialog, ref firstIteration);
@@ -287,7 +287,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { ScreenPosition = new (9, 3), Flags = MouseFlags.Button3Clicked });
+        Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (9, 3), Flags = MouseFlags.Button3Clicked });
 
         var firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -532,7 +532,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (
                      top.Subviews [0]
                         .NewMouseEvent (
-                                        new MouseEvent { Position = new (0, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                        new MouseEventArgs { Position = new (0, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                        )
                     );
         Application.Refresh ();
@@ -580,7 +580,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (
                      top.Subviews [0]
                         .NewMouseEvent (
-                                        new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                        new MouseEventArgs { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                        )
                     );
         Application.Refresh ();
@@ -627,7 +627,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (
                      top.Subviews [0]
                         .NewMouseEvent (
-                                        new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                        new MouseEventArgs { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                        )
                     );
         Application.Refresh ();
@@ -671,7 +671,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (
                      top.Subviews [0]
                         .NewMouseEvent (
-                                        new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                        new MouseEventArgs { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                        )
                     );
         Application.Refresh ();
@@ -715,7 +715,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (
                      top.Subviews [0]
                         .NewMouseEvent (
-                                        new MouseEvent { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                        new MouseEventArgs { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                        )
                     );
         Application.Refresh ();
@@ -747,7 +747,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         lbl.MouseClick += (s, e) =>
                           {
-                              if (e.MouseEvent.Flags == cm.MouseFlags)
+                              if (e.Flags == cm.MouseFlags)
                               {
                                   lbl.Text = "Replaced";
                                   e.Handled = true;
@@ -758,12 +758,12 @@ public class ContextMenuTests (ITestOutputHelper output)
         top.Add (lbl);
         Application.Begin (top);
 
-        Assert.True (lbl.NewMouseEvent (new MouseEvent { Flags = cm.MouseFlags }));
+        Assert.True (lbl.NewMouseEvent (new MouseEventArgs { Flags = cm.MouseFlags }));
         Assert.Equal ("Replaced", lbl.Text);
 
         lbl.Text = "Original";
         cm.MouseFlags = MouseFlags.Button2Clicked;
-        Assert.True (lbl.NewMouseEvent (new MouseEvent { Flags = cm.MouseFlags }));
+        Assert.True (lbl.NewMouseEvent (new MouseEventArgs { Flags = cm.MouseFlags }));
         Assert.Equal ("Replaced", lbl.Text);
         top.Dispose ();
     }
@@ -1235,7 +1235,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                      );
 
         // X=5 is the border and so need to use at least one more
-        Application.OnMouseEvent (new MouseEvent { ScreenPosition = new (6, 13), Flags = MouseFlags.Button1Clicked });
+        Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (6, 13), Flags = MouseFlags.Button1Clicked });
 
         var firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -1253,7 +1253,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { ScreenPosition = new (6, 12), Flags = MouseFlags.Button1Clicked });
+        Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (6, 12), Flags = MouseFlags.Button1Clicked });
 
         firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -1327,7 +1327,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { ScreenPosition = new (6, 13), Flags = MouseFlags.ReportMousePosition });
+        Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (6, 13), Flags = MouseFlags.ReportMousePosition });
 
         var firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -1344,7 +1344,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { ScreenPosition = new (6, 14), Flags = MouseFlags.ReportMousePosition });
+        Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (6, 14), Flags = MouseFlags.ReportMousePosition });
 
         firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -1362,7 +1362,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { ScreenPosition = new (6, 13), Flags = MouseFlags.ReportMousePosition });
+        Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (6, 13), Flags = MouseFlags.ReportMousePosition });
 
         firstIteration = false;
         Application.RunIteration (ref rs, ref firstIteration);
@@ -1399,7 +1399,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.Empty (Application._cachedViewsUnderMouse);
 
         // Right click on tf2 to open context menu
-        Application.OnMouseEvent (new () { ScreenPosition = new (1, 3), Flags = MouseFlags.Button3Clicked });
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (1, 3), Flags = MouseFlags.Button3Clicked });
         Assert.False (tf1.HasFocus);
         Assert.False (tf2.HasFocus);
         Assert.Equal (5, win.Subviews.Count);
@@ -1409,7 +1409,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.Equal (tf2, Application._cachedViewsUnderMouse.LastOrDefault ());
 
         // Click on tf1 to focus it, which cause context menu being closed
-        Application.OnMouseEvent (new () { ScreenPosition = new (1, 1), Flags = MouseFlags.Button1Clicked });
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (1, 1), Flags = MouseFlags.Button1Clicked });
         Assert.True (tf1.HasFocus);
         Assert.False (tf2.HasFocus);
         Assert.Equal (4, win.Subviews.Count);
@@ -1421,7 +1421,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.Equal (tf1, Application._cachedViewsUnderMouse.LastOrDefault ());
 
         // Click on tf2 to focus it
-        Application.OnMouseEvent (new () { ScreenPosition = new (1, 3), Flags = MouseFlags.Button1Clicked });
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (1, 3), Flags = MouseFlags.Button1Clicked });
         Assert.False (tf1.HasFocus);
         Assert.True (tf2.HasFocus);
         Assert.Equal (4, win.Subviews.Count);

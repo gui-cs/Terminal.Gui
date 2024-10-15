@@ -424,7 +424,7 @@ public class ShortcutTests
         var accepted = 0;
         shortcut.Accepting += (s, e) => accepted++;
 
-        Application.OnMouseEvent (
+        Application.RaiseMouseEvent (
                                   new ()
                                   {
                                       ScreenPosition = new (x, 0),
@@ -484,7 +484,7 @@ public class ShortcutTests
         Application.Top.SetRelativeLayout (new (100, 100));
         Application.Top.LayoutSubviews ();
 
-        Application.OnMouseEvent (
+        Application.RaiseMouseEvent (
                                   new ()
                                   {
                                       ScreenPosition = new (mouseX, 0),
@@ -541,7 +541,7 @@ public class ShortcutTests
         var accepted = 0;
         shortcut.Accepting += (s, e) => { accepted++; };
 
-        Application.OnMouseEvent (
+        Application.RaiseMouseEvent (
                                   new ()
                                   {
                                       ScreenPosition = new (mouseX, 0),
@@ -616,7 +616,7 @@ public class ShortcutTests
                                  e.Cancel = true;
                              };
 
-        Application.OnMouseEvent (
+        Application.RaiseMouseEvent (
                                   new ()
                                   {
                                       ScreenPosition = new (mouseX, 0),

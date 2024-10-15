@@ -3274,21 +3274,15 @@ public class TextView : View
     }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent (MouseEvent ev)
+    protected override bool OnMouseEvent (MouseEventArgs ev)
     {
-        if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked)
-            && !ev.Flags.HasFlag (MouseFlags.Button1Pressed)
+        if (ev is { IsSingleDoubleOrTripleClicked: false, IsPressed: false, IsReleased: false, IsWheel: false }
             && !ev.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)
-            && !ev.Flags.HasFlag (MouseFlags.Button1Released)
             && !ev.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ButtonShift)
-            && !ev.Flags.HasFlag (MouseFlags.WheeledDown)
-            && !ev.Flags.HasFlag (MouseFlags.WheeledUp)
-            && !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
             && !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked | MouseFlags.ButtonShift)
-            && !ev.Flags.HasFlag (MouseFlags.Button1TripleClicked)
             && !ev.Flags.HasFlag (ContextMenu!.MouseFlags))
         {
-            return base.OnMouseEvent (ev);
+            return false;
         }
 
         if (!CanFocus)
@@ -5875,7 +5869,7 @@ public class TextView : View
         KillWordForward ();
     }
 
-    private void ProcessMouseClick (MouseEvent ev, out List<Cell> line)
+    private void ProcessMouseClick (MouseEventArgs ev, out List<Cell> line)
     {
         List<Cell>? r = null;
 

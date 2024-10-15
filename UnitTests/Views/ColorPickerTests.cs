@@ -120,7 +120,7 @@ public class ColorPickerTests
 
         Assert.IsAssignableFrom<IColorBar> (cp.Focused);
 
-        cp.Focused.OnMouseEvent (
+        cp.Focused.RaiseMouseEvent (
                                  new ()
                                  {
                                      Flags = MouseFlags.Button1Pressed,
@@ -132,7 +132,7 @@ public class ColorPickerTests
         Assert.Equal (3, r.TrianglePosition);
         Assert.Equal ("#0F0000", hex.Text);
 
-        cp.Focused.OnMouseEvent (
+        cp.Focused.RaiseMouseEvent (
                                   new ()
                                   {
                                       Flags = MouseFlags.Button1Pressed,
@@ -269,7 +269,7 @@ public class ColorPickerTests
         cp.Draw ();
 
         // Click at the end of the Red bar
-        cp.Focused.OnMouseEvent (
+        cp.Focused.RaiseMouseEvent (
                                  new ()
                                  {
                                      Flags = MouseFlags.Button1Pressed,
@@ -303,7 +303,7 @@ public class ColorPickerTests
         cp.Draw ();
 
         // Click beyond the bar
-        cp.Focused.OnMouseEvent (
+        cp.Focused.RaiseMouseEvent (
                                  new ()
                                  {
                                      Flags = MouseFlags.Button1Pressed,
@@ -434,7 +434,7 @@ public class ColorPickerTests
         cp.Draw ();
 
         // Click on Green bar
-        Application.OnMouseEvent (new ()
+        Application.RaiseMouseEvent (new ()
         {
             Flags = MouseFlags.Button1Pressed,
             ScreenPosition = new (0, 1)
@@ -453,7 +453,7 @@ public class ColorPickerTests
         Assert.IsAssignableFrom<GBar> (cp.Focused);
 
         // Click on Blue bar
-        Application.OnMouseEvent (new ()
+        Application.RaiseMouseEvent (new ()
         {
             Flags = MouseFlags.Button1Pressed,
             ScreenPosition = new (0, 2)

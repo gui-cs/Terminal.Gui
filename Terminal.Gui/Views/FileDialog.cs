@@ -1007,18 +1007,18 @@ public class FileDialog : Dialog
         }
     }
 
-    private void OnTableViewMouseClick (object sender, MouseEventEventArgs e)
+    private void OnTableViewMouseClick (object sender, MouseEventArgs e)
     {
-        Point? clickedCell = _tableView.ScreenToCell (e.MouseEvent.Position.X, e.MouseEvent.Position.Y, out int? clickedCol);
+        Point? clickedCell = _tableView.ScreenToCell (e.Position.X, e.Position.Y, out int? clickedCol);
 
         if (clickedCol is { })
         {
-            if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
+            if (e.Flags.HasFlag (MouseFlags.Button1Clicked))
             {
                 // left click in a header
                 SortColumn (clickedCol.Value);
             }
-            else if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
+            else if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
             {
                 // right click in a header
                 ShowHeaderContextMenu (clickedCol.Value, e);
@@ -1026,7 +1026,7 @@ public class FileDialog : Dialog
         }
         else
         {
-            if (clickedCell is { } && e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
+            if (clickedCell is { } && e.Flags.HasFlag (MouseFlags.Button3Clicked))
             {
                 // right click in rest of table
                 ShowCellContextMenu (clickedCell, e);
@@ -1198,7 +1198,7 @@ public class FileDialog : Dialog
 
     private FileSystemInfoStats RowToStats (int rowIndex) { return State?.Children [rowIndex]; }
 
-    private void ShowCellContextMenu (Point? clickedCell, MouseEventEventArgs e)
+    private void ShowCellContextMenu (Point? clickedCell, MouseEventArgs e)
     {
         if (clickedCell is null)
         {
@@ -1207,7 +1207,7 @@ public class FileDialog : Dialog
 
         var contextMenu = new ContextMenu
         {
-            Position = new Point (e.MouseEvent.Position.X + 1, e.MouseEvent.Position.Y + 1)
+            Position = new Point (e.Position.X + 1, e.Position.Y + 1)
         };
 
         var menuItems = new MenuBarItem (
@@ -1222,13 +1222,13 @@ public class FileDialog : Dialog
         contextMenu.Show (menuItems);
     }
 
-    private void ShowHeaderContextMenu (int clickedCol, MouseEventEventArgs e)
+    private void ShowHeaderContextMenu (int clickedCol, MouseEventArgs e)
     {
         string sort = GetProposedNewSortOrder (clickedCol, out bool isAsc);
 
         var contextMenu = new ContextMenu
         {
-            Position = new Point (e.MouseEvent.Position.X + 1, e.MouseEvent.Position.Y + 1)
+            Position = new Point (e.Position.X + 1, e.Position.Y + 1)
         };
 
         var menuItems = new MenuBarItem (

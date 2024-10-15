@@ -196,7 +196,7 @@ In v1, the `Command` enum had duplicate entries and inconsistent naming. In v2 i
 
 The API for mouse input is now internally consistent and easier to use.
 
-* The @Terminal.Gui.MouseEvent class replaces `MouseEventEventArgs`.
+* The @Terminal.Gui.MouseEventArgs class replaces `MouseEventEventArgs`.
 * More granular APIs are provided to ease handling specific mouse actions. See [Mouse API](mouse.md).
 * Views can use the @Terminal.Gui.View.Highlight event to have the view be visibly highlighted on various mouse events.
 * Views can set `View.WantContinousButtonPresses = true` to have their @Terminal.Gui.Command.Accept command be invoked repeatedly as the user holds a mouse button down on the view.
@@ -213,7 +213,7 @@ The API for mouse input is now internally consistent and easier to use.
 
 ```diff
 - Application.RootMouseEvent(KeyEvent arg)
-+ Application.MouseEvent(object? sender, MouseEvent mouseEvent)
++ Application.MouseEvent(object? sender, MouseEventArgs mouseEvent)
 ```
 
 ## Navigation - `Cursor`, `Focus`, `TabStop` etc... 

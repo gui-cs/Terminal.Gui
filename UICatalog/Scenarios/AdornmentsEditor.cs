@@ -108,7 +108,7 @@ public class AdornmentsEditor : View
         ViewToEdit = Application.Navigation!.GetFocused ();
     }
 
-    private void ApplicationOnMouseEvent (object? sender, MouseEvent e)
+    private void ApplicationOnMouseEvent (object? sender, MouseEventArgs e)
     {
         if (e.Flags != MouseFlags.Button1Clicked || !AutoSelectViewToEdit)
         {
