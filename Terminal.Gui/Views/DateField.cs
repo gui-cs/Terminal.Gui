@@ -162,12 +162,12 @@ public class DateField : TextField
             newPoint = 1;
         }
 
-        if (newPoint != point)
+        //if (newPoint != point)
         {
             CursorPosition = newPoint;
         }
 
-        while (Text [CursorPosition].ToString () == _separator)
+        while (CursorPosition < Text.GetColumns () - 1 && Text [CursorPosition].ToString () == _separator)
         {
             if (increment)
             {

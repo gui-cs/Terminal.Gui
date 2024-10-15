@@ -220,12 +220,12 @@ public class TimeField : TextField
             newPoint = 1;
         }
 
-        if (newPoint != point)
+        //if (newPoint != point)
         {
             CursorPosition = newPoint;
         }
 
-        while (Text [CursorPosition] == _sepChar [0])
+        while (CursorPosition < Text.GetColumns() -1 && Text [CursorPosition] == _sepChar [0])
         {
             if (increment)
             {
