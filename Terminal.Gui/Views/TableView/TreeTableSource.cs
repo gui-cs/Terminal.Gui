@@ -166,7 +166,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
         }
     }
 
-    private void Table_MouseClick (object sender, MouseEventEventArgs e)
+    private void Table_MouseClick (object sender, MouseEventArgs e)
     {
         Point? hit = _tableView.ScreenToCell (e.MouseEvent.Position.X, e.MouseEvent.Position.Y, out int? headerIfAny, out int? offsetX);
 

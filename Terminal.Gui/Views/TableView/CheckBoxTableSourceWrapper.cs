@@ -150,7 +150,7 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
         tableView.SetNeedsDisplay ();
     }
 
-    private void TableView_MouseClick (object sender, MouseEventEventArgs e)
+    private void TableView_MouseClick (object sender, MouseEventArgs e)
     {
         // we only care about clicks (not movements)
         if (!e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))

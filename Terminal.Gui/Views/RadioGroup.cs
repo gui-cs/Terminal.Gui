@@ -220,7 +220,7 @@ public class RadioGroup : View, IDesignable, IOrientation
     /// </remarks>
     public bool DoubleClickAccepts { get; set; } = true;
 
-    private void RadioGroup_MouseClick (object? sender, MouseEventEventArgs e)
+    private void RadioGroup_MouseClick (object? sender, MouseEventArgs e)
     {
         if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
         {

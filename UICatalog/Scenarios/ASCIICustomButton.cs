@@ -127,7 +127,7 @@ public class ASCIICustomButtonTest : Scenario
         }
 
         public event Action<ASCIICustomButton> PointerEnter;
-        private void This_MouseClick (object sender, MouseEventEventArgs obj) { NewMouseEvent (obj.MouseEvent); }
+        private void This_MouseClick (object sender, MouseEventArgs obj) { NewMouseEvent (obj.MouseEvent); }
     }
 
     public class ScrollViewTestWindow : Window
@@ -310,7 +310,7 @@ public class ASCIICustomButtonTest : Scenario
             }
         }
 
-        private void Button_MouseClick (object sender, MouseEventEventArgs obj)
+        private void Button_MouseClick (object sender, MouseEventArgs obj)
         {
             if (obj.MouseEvent.Flags == MouseFlags.WheeledDown)
             {

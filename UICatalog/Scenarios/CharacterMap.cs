@@ -527,7 +527,7 @@ internal class CharMap : View
         Padding.Add (up, down, left, right);
     }
 
-    private void Handle_MouseEvent (object sender, MouseEventEventArgs e)
+    private void Handle_MouseEvent (object sender, MouseEventArgs e)
     {
         if (e.MouseEvent.Flags == MouseFlags.WheeledDown)
         {
@@ -839,7 +839,7 @@ internal class CharMap : View
     private void CopyCodePoint () { Clipboard.Contents = $"U+{SelectedCodePoint:x5}"; }
     private void CopyGlyph () { Clipboard.Contents = $"{new Rune (SelectedCodePoint)}"; }
 
-    private void Handle_MouseClick (object sender, MouseEventEventArgs args)
+    private void Handle_MouseClick (object sender, MouseEventArgs args)
     {
         MouseEvent me = args.MouseEvent;
 

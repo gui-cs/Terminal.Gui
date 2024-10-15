@@ -52,7 +52,7 @@ public class ContentScrolling : Scenario
             MouseEvent += VirtualDemoView_MouseEvent;
         }
 
-        private void VirtualDemoView_MouseEvent (object sender, MouseEventEventArgs e)
+        private void VirtualDemoView_MouseEvent (object sender, MouseEventArgs e)
         {
             if (e.MouseEvent.Flags == MouseFlags.WheeledDown)
             {

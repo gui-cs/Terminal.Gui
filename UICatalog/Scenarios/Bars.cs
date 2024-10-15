@@ -187,7 +187,7 @@ public class Bars : Scenario
 
         menuLikeExamples.MouseClick += MenuLikeExamplesMouseClick;
 
-        void MenuLikeExamplesMouseClick (object sender, MouseEventEventArgs e)
+        void MenuLikeExamplesMouseClick (object sender, MouseEventArgs e)
         {
             if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
             {

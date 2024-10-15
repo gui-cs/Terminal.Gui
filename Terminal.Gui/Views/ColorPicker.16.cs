@@ -181,7 +181,7 @@ public class ColorPicker16 : View
 
     // TODO: Decouple Cursor from SelectedColor so that mouse press-and-hold can show the color under the cursor.
 
-    private void ColorPicker_MouseClick (object sender, MouseEventEventArgs me)
+    private void ColorPicker_MouseClick (object sender, MouseEventArgs me)
     {
         // if (CanFocus)
         {

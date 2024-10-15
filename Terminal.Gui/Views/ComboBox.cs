@@ -836,16 +836,9 @@ public class ComboBox : View, IDesignable
             set => _hideDropdownListOnClick = WantContinuousButtonPressed = value;
         }
 
-        // BUGBUG: OnMouseEvent is internal!
         protected override bool OnMouseEvent (MouseEvent me)
         {
-            var res = false;
             bool isMousePositionValid = IsMousePositionValid (me);
-
-            if (isMousePositionValid)
-            {
-                res = base.OnMouseEvent (me);
-            }
 
             if (HideDropdownListOnClick && me.Flags == MouseFlags.Button1Clicked)
             {
@@ -879,7 +872,7 @@ public class ComboBox : View, IDesignable
                 return true;
             }
 
-            return res;
+            return false;
         }
 
         public override void OnDrawContent (Rectangle viewport)

@@ -484,7 +484,7 @@ public class TreeViewFileSystem : Scenario
         }
     }
 
-    private void TreeViewFiles_MouseClick (object sender, MouseEventEventArgs obj)
+    private void TreeViewFiles_MouseClick (object sender, MouseEventArgs obj)
     {
         // if user right clicks
         if (obj.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))

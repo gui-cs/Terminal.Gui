@@ -245,14 +245,10 @@ public partial class View // Mouse APIs
         }
 
         // Cancellable event
-        if (RaiseMouseEvent (mouseEvent))
+        if (RaiseMouseEvent (mouseEvent) || mouseEvent.Handled)
         {
-            // Technically mouseEvent.Handled should already be true if implementers of OnMouseEvent
-            // follow the rules. But we'll update it just in case.
-            return mouseEvent.Handled = true;
+            return true;
         }
-
-        // BUGBUG: MouseEvent should be fired from here. Fix this in https://github.com/gui-cs/Terminal.Gui/issues/3029
 
         // Post-Conditions
         if (HighlightStyle != HighlightStyle.None || (WantContinuousButtonPressed && WantMousePositionReports))
@@ -303,7 +299,7 @@ public partial class View // Mouse APIs
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
     public bool RaiseMouseEvent (MouseEvent mouseEvent)
     {
-        var args = new MouseEventEventArgs (mouseEvent);
+        var args = new MouseEventArgs (mouseEvent);
 
         if (OnMouseEvent (mouseEvent) || mouseEvent.Handled == true)
         {
@@ -334,7 +330,7 @@ public partial class View // Mouse APIs
     ///         The coordinates are relative to <see cref="View.Viewport"/>.
     ///     </para>
     /// </remarks>
-    public event EventHandler<MouseEventEventArgs>? MouseEvent;
+    public event EventHandler<MouseEventArgs>? MouseEvent;
 
     #endregion Low Level Mouse Events
 
@@ -351,7 +347,7 @@ public partial class View // Mouse APIs
     ///         The coordinates are relative to <see cref="View.Viewport"/>.
     ///     </para>
     /// </remarks>
-    public event EventHandler<MouseEventEventArgs>? MouseClick;
+    public event EventHandler<MouseEventArgs>? MouseClick;
 
     /// <summary>Invokes the MouseClick event.</summary>
     /// <remarks>
@@ -361,7 +357,7 @@ public partial class View // Mouse APIs
     ///     </para>
     /// </remarks>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    protected bool OnMouseClick (MouseEventEventArgs args)
+    protected bool OnMouseClick (MouseEventArgs args)
     {
         // BUGBUG: This should be named NewMouseClickEvent. Fix this in https://github.com/gui-cs/Terminal.Gui/issues/3029
 

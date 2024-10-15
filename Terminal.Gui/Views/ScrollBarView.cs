@@ -777,7 +777,7 @@ public class ScrollBarView : View
     //	}
     //}
 
-    private void ContentBottomRightCorner_MouseClick (object sender, MouseEventEventArgs me)
+    private void ContentBottomRightCorner_MouseClick (object sender, MouseEventArgs me)
     {
         if (me.MouseEvent.Flags == MouseFlags.WheeledDown
             || me.MouseEvent.Flags == MouseFlags.WheeledUp

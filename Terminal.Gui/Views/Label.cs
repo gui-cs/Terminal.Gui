@@ -32,7 +32,7 @@ public class Label : View, IDesignable
     }
 
     // TODO: base raises Select, but we want to raise HotKey. This can be simplified?
-    private void Label_MouseClick (object sender, MouseEventEventArgs e)
+    private void Label_MouseClick (object sender, MouseEventArgs e)
     {
         if (!CanFocus)
         {

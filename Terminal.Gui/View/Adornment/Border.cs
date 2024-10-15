@@ -264,11 +264,6 @@ public class Border : Adornment
     /// <inheritdoc/>
     protected override bool OnMouseEvent (MouseEvent mouseEvent)
     {
-        if (base.RaiseMouseEvent (mouseEvent))
-        {
-            return true;
-        }
-
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/3312
         if (!_dragPosition.HasValue && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
                                     // HACK: Prevents Window from being draggable if it's Top

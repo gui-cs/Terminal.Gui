@@ -116,14 +116,12 @@ public class DateField : TextField
     /// <inheritdoc/>
     protected override bool OnMouseEvent  (MouseEvent ev)
     {
-        bool result = base.OnMouseEvent (ev);
-
-        if (result && SelectedLength == 0 && ev.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (SelectedLength == 0 && ev.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
             AdjCursorPosition (ev.Position.X);
         }
 
-        return result;
+        return ev.Handled;
     }
 
     /// <summary>Event firing method for the <see cref="DateChanged"/> event.</summary>

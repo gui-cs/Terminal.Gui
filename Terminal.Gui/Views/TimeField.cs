@@ -165,15 +165,13 @@ public class TimeField : TextField
     /// <inheritdoc/>
     protected override bool OnMouseEvent  (MouseEvent ev)
     {
-        bool result = base.OnMouseEvent (ev);
-
-        if (result && SelectedLength == 0 && ev.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (SelectedLength == 0 && ev.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
             int point = ev.Position.X;
             AdjCursorPosition (point);
         }
 
-        return result;
+        return ev.Handled;
     }
 
     /// <inheritdoc/>

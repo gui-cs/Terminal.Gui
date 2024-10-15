@@ -1007,7 +1007,7 @@ public class FileDialog : Dialog
         }
     }
 
-    private void OnTableViewMouseClick (object sender, MouseEventEventArgs e)
+    private void OnTableViewMouseClick (object sender, MouseEventArgs e)
     {
         Point? clickedCell = _tableView.ScreenToCell (e.MouseEvent.Position.X, e.MouseEvent.Position.Y, out int? clickedCol);
 
@@ -1198,7 +1198,7 @@ public class FileDialog : Dialog
 
     private FileSystemInfoStats RowToStats (int rowIndex) { return State?.Children [rowIndex]; }
 
-    private void ShowCellContextMenu (Point? clickedCell, MouseEventEventArgs e)
+    private void ShowCellContextMenu (Point? clickedCell, MouseEventArgs e)
     {
         if (clickedCell is null)
         {
@@ -1222,7 +1222,7 @@ public class FileDialog : Dialog
         contextMenu.Show (menuItems);
     }
 
-    private void ShowHeaderContextMenu (int clickedCol, MouseEventEventArgs e)
+    private void ShowHeaderContextMenu (int clickedCol, MouseEventArgs e)
     {
         string sort = GetProposedNewSortOrder (clickedCol, out bool isAsc);
 
