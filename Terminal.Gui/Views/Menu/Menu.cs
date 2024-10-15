@@ -1,5 +1,7 @@
 #nullable enable
 
+using static System.Formats.Asn1.AsnWriter;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -305,19 +307,11 @@ internal sealed class Menu : View
         return true;
     }
 
-    /// <inheritdoc/>
-    public override bool? OnInvokingKeyBindings (Key keyEvent, KeyBindingScope scope)
+    /// <inheritdoc />
+    protected override bool OnKeyDownNotHandled (Key keyEvent)
     {
-        bool? handled = base.OnInvokingKeyBindings (keyEvent, scope);
-
-        if (handled is { } && (bool)handled)
-        {
-            return true;
-        }
-
-        // TODO: Determine if there's a cleaner way to handle this.
-        // This supports the case where the menu bar is a context menu
-        return _host.OnInvokingKeyBindings (keyEvent, scope);
+        // We didn't handle the key, pass it on to host
+        return _host.InvokeCommandsBoundToKey (keyEvent) == true;
     }
 
     private void Current_TerminalResized (object? sender, SizeChangedEventArgs e)
@@ -343,7 +337,7 @@ internal sealed class Menu : View
         }
     }
 
-    private void Application_RootMouseEvent (object? sender, MouseEvent a)
+    private void Application_RootMouseEvent (object? sender, MouseEventArgs a)
     {
         if (a.View is { } and (MenuBar or not Menu))
         {
@@ -359,7 +353,7 @@ internal sealed class Menu : View
 
         Point boundsPoint = view.ScreenToViewport (new (a.Position.X, a.Position.Y));
 
-        var me = new MouseEvent
+        var me = new MouseEventArgs
         {
             Position = boundsPoint,
             Flags = a.Flags,
@@ -814,7 +808,7 @@ internal sealed class Menu : View
         _host.SetNeedsDisplay ();
     }
 
-    protected internal override bool OnMouseEvent (MouseEvent me)
+    protected override bool OnMouseEvent (MouseEventArgs me)
     {
         if (!_host._handled && !_host.HandleGrabView (me, this))
         {

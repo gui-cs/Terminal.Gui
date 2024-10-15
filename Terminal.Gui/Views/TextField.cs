@@ -798,16 +798,15 @@ public class TextField : View
     }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent (MouseEvent ev)
+    protected override bool OnMouseEvent (MouseEventArgs ev)
     {
-        if (!ev.Flags.HasFlag (MouseFlags.Button1Pressed)
+        if (ev is { IsPressed: false, IsReleased: false }
             && !ev.Flags.HasFlag (MouseFlags.ReportMousePosition)
-            && !ev.Flags.HasFlag (MouseFlags.Button1Released)
             && !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
             && !ev.Flags.HasFlag (MouseFlags.Button1TripleClicked)
             && !ev.Flags.HasFlag (ContextMenu.MouseFlags))
         {
-            return base.OnMouseEvent (ev);
+            return false;
         }
 
         if (!CanFocus)
@@ -1014,18 +1013,6 @@ public class TextField : View
     }
 
     /// <inheritdoc/>
-    public override bool? OnInvokingKeyBindings (Key a, KeyBindingScope scope)
-    {
-        // Give autocomplete first opportunity to respond to key presses
-        if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (a))
-        {
-            return true;
-        }
-
-        return base.OnInvokingKeyBindings (a, scope);
-    }
-
-    /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View previousFocusedView, View view)
     {
         if (Application.MouseGrabView is { } && Application.MouseGrabView == this)
@@ -1037,25 +1024,20 @@ public class TextField : View
         //	ClearAllSelection ();
     }
 
-    /// TODO: Flush out these docs
-    /// <summary>
-    ///     Processes key presses for the <see cref="TextField"/>.
-    ///     <remarks>
-    ///         The <see cref="TextField"/> control responds to the following keys:
-    ///         <list type="table">
-    ///             <listheader>
-    ///                 <term>Keys</term> <description>Function</description>
-    ///             </listheader>
-    ///             <item>
-    ///                 <term><see cref="Key.Delete"/>, <see cref="Key.Backspace"/></term>
-    ///                 <description>Deletes the character before cursor.</description>
-    ///             </item>
-    ///         </list>
-    ///     </remarks>
-    /// </summary>
-    /// <param name="a"></param>
-    /// <returns></returns>
-    public override bool OnProcessKeyDown (Key a)
+    /// <inheritdoc/>
+    protected override bool OnKeyDown (Key key)
+    {
+        // Give autocomplete first opportunity to respond to key presses
+        if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (key))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected override bool OnKeyDownNotHandled (Key a)
     {
         // Remember the cursor position because the new calculated cursor position is needed
         // to be set BEFORE the TextChanged event is triggered.
@@ -1662,7 +1644,7 @@ public class TextField : View
         return 0; //offB;
     }
 
-    private int PositionCursor (MouseEvent ev) { return PositionCursor (TextModel.GetColFromX (_text, ScrollOffset, ev.Position.X), false); }
+    private int PositionCursor (MouseEventArgs ev) { return PositionCursor (TextModel.GetColFromX (_text, ScrollOffset, ev.Position.X), false); }
 
     private int PositionCursor (int x, bool getX = true)
     {

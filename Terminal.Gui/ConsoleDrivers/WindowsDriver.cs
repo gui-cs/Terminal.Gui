@@ -1498,7 +1498,7 @@ internal class WindowsDriver : ConsoleDriver
                 break;
 
             case WindowsConsole.EventType.Mouse:
-                MouseEvent me = ToDriverMouse (inputEvent.MouseEvent);
+                MouseEventArgs me = ToDriverMouse (inputEvent.MouseEvent);
 
                 if (me is null || me.Flags == MouseFlags.None)
                 {
@@ -1842,9 +1842,9 @@ internal class WindowsDriver : ConsoleDriver
             }
             await Task.Delay (delay);
 
-            var me = new MouseEvent
+            var me = new MouseEventArgs
             {
-                Position = _pointMove,
+                ScreenPosition = _pointMove,
                 Flags = mouseFlag
             };
 
@@ -1898,7 +1898,7 @@ internal class WindowsDriver : ConsoleDriver
     }
 
     [CanBeNull]
-    private MouseEvent ToDriverMouse (WindowsConsole.MouseEventRecord mouseEvent)
+    private MouseEventArgs ToDriverMouse (WindowsConsole.MouseEventRecord mouseEvent)
     {
         var mouseFlag = MouseFlags.AllEvents;
 
@@ -2142,7 +2142,7 @@ internal class WindowsDriver : ConsoleDriver
         //System.Diagnostics.Debug.WriteLine (
         //	$"point.X:{(point is { } ? ((Point)point).X : -1)};point.Y:{(point is { } ? ((Point)point).Y : -1)}");
 
-        return new MouseEvent
+        return new MouseEventArgs
         {
             Position = new (mouseEvent.MousePosition.X, mouseEvent.MousePosition.Y),
             Flags = mouseFlag

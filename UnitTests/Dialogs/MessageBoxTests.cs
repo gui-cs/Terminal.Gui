@@ -33,14 +33,14 @@ public class MessageBoxTests
 
                                          case 2:
                                              // Tab to btn2
-                                             Application.OnKeyDown (Key.Tab);
+                                             Application.RaiseKeyDownEvent (Key.Tab);
 
                                              Button btn = Application.Navigation!.GetFocused () as Button;
 
                                              btn.Accepting += (sender, e) => { btnAcceptCount++; };
 
                                              // Click
-                                             Application.OnKeyDown (Key.Enter);
+                                             Application.RaiseKeyDownEvent (Key.Enter);
 
                                              break;
 
@@ -77,7 +77,7 @@ public class MessageBoxTests
                                              break;
 
                                          case 2:
-                                             Application.OnKeyDown (Key.Esc);
+                                             Application.RaiseKeyDownEvent (Key.Esc);
 
                                              break;
 
@@ -116,13 +116,13 @@ public class MessageBoxTests
 
                                          case 2:
                                              // Tab to btn2
-                                             Application.OnKeyDown (Key.Tab);
+                                             Application.RaiseKeyDownEvent (Key.Tab);
 
                                              Button btn = Application.Navigation!.GetFocused () as Button;
 
                                              btn.Accepting += (sender, e) => { btnAcceptCount++; };
 
-                                             Application.OnKeyDown (Key.Space);
+                                             Application.RaiseKeyDownEvent (Key.Space);
 
                                              break;
 

@@ -25,6 +25,6 @@ public abstract partial class PopupAutocomplete
             _autoComplete.RenderOverlay (_autoComplete.LastPopupPos.Value);
         }
 
-        protected internal override bool OnMouseEvent (MouseEvent mouseEvent) { return _autoComplete.OnMouseEvent (mouseEvent); }
+        protected override bool OnMouseEvent (MouseEventArgs mouseEvent) { return _autoComplete.OnMouseEvent (mouseEvent); }
     }
 }

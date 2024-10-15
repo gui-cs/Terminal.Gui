@@ -59,22 +59,25 @@ The Command can be invoked even if the `View` that defines them is not focused o
 
 ### **Handling Keyboard Events**
 
-Keyboard events are retrieved from [Console Drivers](drivers.md) and passed on 
-to the [Application](~/api/Terminal.Gui.Application.yml) class by the [Main Loop](mainloop.md). 
+Keyboard events are retrieved from [Console Drivers](drivers.md) each iteration of the [Application](~/api/Terminal.Gui.Application.yml) [Main Loop](mainloop.md). The console driver raises the @Terminal.Gui.ConsoleDriver.KeyDown and @Terminal.Gui.ConsoleDriver.KeyUp events which invoke @Terminal.Gui.Application.RaiseKeyDown(Terminal.Gui.Key) and @Terminal.Gui.Application.RaiseKeyUp(Terminal.Gui.Key) respectively.
 
-[Application](~/api/Terminal.Gui.Application.yml) then determines the current [Toplevel](~/api/Terminal.Gui.Toplevel.yml) view
-(either the default created by calling @Terminal.Gui.Application.Init(Terminal.Gui.ConsoleDriver,System.String), or the one set by calling `Application.Run`). The mouse event, using [Viewport-relative coordinates](xref:Terminal.Gui.View.Viewport) is then passed to the @Terminal.Gui.View.NewKeyDownEvent(Terminal.Gui.Key) method of the current [Toplevel](~/api/Terminal.Gui.Toplevel.yml) view. 
+    NOTE: Not all drivers/platforms support sensing distinct KeyUp events. These drivers will simulate KeyUp events by raising @Terminal.Gui.ConsoleDriver.KeyUp after @Terminal.Gui.ConsoleDriver.KeyDown.
 
-If the view is enabled, the @Terminal.Gui.View.NewKeyDownEvent(Terminal.Gui.Key) method will do the following: 
+@Terminal.Gui.Application.RaiseKeyDown(Terminal.Gui.Key) raises @Terminal.Gui.Application.KeyDown and then calls @Terminal.Gui.View.NewKeyDownEvent(Terminal.Gui.Key) on all toplevel Views. If no View handles the key event, any Application-scoped key bindings will be invoked.
 
-1) If the view has a subview that has focus, 'ProcessKeyDown' on the focused view will be called. If the focused view handles the key press, processing stops.
-2) If there is no focused sub-view, or the focused sub-view does not handle the key press, @Terminal.Gui.View.OnKeyDown(Terminal.Gui.Key) will be called. If the view handles the key press, processing stops.
-3) If the view does not handle the key press, @Terminal.Gui.TextField.OnInvokingKeyBindings(Terminal.Gui.Key,Terminal.Gui.KeyBindingScope) will be called. This method calls @Terminal.Gui.View.InvokeKeyBindings(Terminal.Gui.Key,Terminal.Gui.KeyBindingScope) to invoke any keys bound to commands. If the key is bound and any of it's command handlers return true, processing stops.
-4) If the key is not bound, or the bound command handlers do not return true, @Terminal.Gui.View.OnProcessKeyDown(Terminal.Gui.Key) is called. If the view handles the key press, processing stops.
+@Terminal.Gui.Application.RaiseKeyDown(Terminal.Gui.Key) raises @Terminal.Gui.Application.KeyDown and then calls @Terminal.Gui.View.NewKeyUpEvent(Terminal.Gui.Key) on all toplevel Views.
+
+If a view is enabled, the @Terminal.Gui.View.NewKeyDownEvent(Terminal.Gui.Key) method will do the following: 
+
+1) If the view has a subview that has focus, 'NewKeyDown' on the focused view will be called. This is recursive. If the most-focused view handles the key press, processing stops.
+2) If there is no most-focused sub-view, or a most-focused sub-view does not handle the key press, @Terminal.Gui.View.OnKeyDown(Terminal.Gui.Key) will be called. If the view handles the key press, processing stops.
+3) If @Terminal.Gui.View.OnKeyDown(Terminal.Gui.Key) does not handle the event. @Terminal.Gui.View.KeyDown will be raised.
+4) If the view does not handle the key down event, any bindings for the key will be invoked (see @Terminal.Gui.View.KeyBindings). If the key is bound and any of it's command handlers return true, processing stops.
+5) If the key is not bound, or the bound command handlers do not return true, @Terminal.Gui.View.OnKeyDownNotHandled(Terminal.Gui.Key) is called. 
 
 ## **Application Key Handling**
 
-To define application key handling logic for an entire application in cases where the methods listed above are not suitable, use the `Application.OnKeyDown` event. 
+To define application key handling logic for an entire application in cases where the methods listed above are not suitable, use the @Terminal.Gui.Application.KeyDown event. 
 
 ## **Key Down/Up Events**
 
@@ -90,17 +93,14 @@ To define application key handling logic for an entire application in cases wher
     - `NewKeyDownEvent` is called on the most-focused SubView (if any) that has focus. If that call returns true, the method returns.
     - Calls `OnKeyDown`.
   - **During**
-    - Assuming `OnKeyDown` call returns false (indicating the key wasn't handled)
-       - `OnInvokingKeyBindings` is called to invoke any bound commands.
-       - `OnInvokingKeyBindings` fires the `InvokingKeyBindings` event
+    - Assuming `OnKeyDown` call returns false (indicating the key wasn't handled) any commands bound to the key will be invoked.
   - **After**
-    - Assuming `OnInvokingKeyBindings` returns false (indicating the key wasn't handled)
-       - `OnProcessKeyDown` is called to process the key.
-       - `OnProcessKeyDown` fires the `ProcessKeyDown` event
+    - Assuming no keybinding was found or all invoked commands were not handled:
+       - `OnKeyDownNotHandled` is called to process the key.
+       - `KeyDownNotHandled` is raised.
 
-- Subclasses of `View` can (rarely) override `OnKeyDown` to see keys before they are processed by `OnInvokingKeyBindings` and `OnProcessKeyDown
-- Subclasses of `View` can (rarely) override `OnInvokingKeyBindings` to see keys before they are processed by `OnProcessKeyDown`
-- Subclasses of `View` can (often) override `OnProcessKeyDown` to do normal key processing.
+- Subclasses of `View` can (rarely) override `OnKeyDown` (or subscribe to `KeyDown`) to see keys before they are processed 
+- Subclasses of `View` can (often) override `OnKeyDownNotHandled` to do key processing for keys that were not previously handled. `TextField` and `TextView` are examples.
 
 ## ConsoleDriver
 

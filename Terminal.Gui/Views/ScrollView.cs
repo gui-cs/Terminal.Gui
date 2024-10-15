@@ -388,14 +388,14 @@ public class ScrollView : View
     }
 
     /// <inheritdoc/>
-    public override bool OnKeyDown (Key a)
+    protected override bool OnKeyDown (Key a)
     {
         if (base.OnKeyDown (a))
         {
             return true;
         }
 
-        bool? result = InvokeKeyBindings (a, KeyBindingScope.HotKey | KeyBindingScope.Focused);
+        bool? result = InvokeCommands (a, KeyBindingScope.HotKey | KeyBindingScope.Focused);
 
         if (result is { })
         {
@@ -406,7 +406,7 @@ public class ScrollView : View
     }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent (MouseEvent me)
+    protected override bool OnMouseEvent (MouseEventArgs me)
     {
         if (!Enabled)
         {
@@ -416,19 +416,19 @@ public class ScrollView : View
 
         if (me.Flags == MouseFlags.WheeledDown && ShowVerticalScrollIndicator)
         {
-            ScrollDown (1);
+            return ScrollDown (1);
         }
         else if (me.Flags == MouseFlags.WheeledUp && ShowVerticalScrollIndicator)
         {
-            ScrollUp (1);
+            return ScrollUp (1);
         }
         else if (me.Flags == MouseFlags.WheeledRight && _showHorizontalScrollIndicator)
         {
-            ScrollRight (1);
+            return ScrollRight (1);
         }
         else if (me.Flags == MouseFlags.WheeledLeft && ShowVerticalScrollIndicator)
         {
-            ScrollLeft (1);
+            return ScrollLeft (1);
         }
         else if (me.Position.X == _vertical.Frame.X && ShowVerticalScrollIndicator)
         {
@@ -443,7 +443,7 @@ public class ScrollView : View
             Application.UngrabMouse ();
         }
 
-        return base.OnMouseEvent (me);
+        return me.Handled;
     }
 
     /// <inheritdoc/>

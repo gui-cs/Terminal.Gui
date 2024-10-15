@@ -163,21 +163,24 @@ public class TimeField : TextField
     }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent ev)
+    protected override bool OnMouseEvent  (MouseEventArgs ev)
     {
-        bool result = base.OnMouseEvent (ev);
+        if (base.OnMouseEvent (ev) || ev.Handled)
+        {
+            return true;
+        }
 
-        if (result && SelectedLength == 0 && ev.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (SelectedLength == 0 && ev.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
             int point = ev.Position.X;
             AdjCursorPosition (point);
         }
 
-        return result;
+        return ev.Handled;
     }
 
     /// <inheritdoc/>
-    public override bool OnProcessKeyDown (Key a)
+    protected override bool OnKeyDownNotHandled (Key a)
     {
         // Ignore non-numeric characters.
         if (a.KeyCode is >= (KeyCode)(int)KeyCode.D0 and <= (KeyCode)(int)KeyCode.D9)
@@ -227,7 +230,7 @@ public class TimeField : TextField
             CursorPosition = newPoint;
         }
 
-        while (Text [CursorPosition] == _sepChar [0])
+        while (CursorPosition < Text.GetColumns() -1 && Text [CursorPosition] == _sepChar [0])
         {
             if (increment)
             {

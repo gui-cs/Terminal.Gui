@@ -354,7 +354,7 @@ public class CanFocusTests () : TestsAllViews
         Assert.False (label.HasFocus);
         Assert.True (view.HasFocus);
 
-        Assert.True (Application.OnKeyDown (Key.Tab));
+        Assert.True (Application.RaiseKeyDownEvent (Key.Tab));
         Assert.True (label.HasFocus);
         Assert.False (view.HasFocus);
 

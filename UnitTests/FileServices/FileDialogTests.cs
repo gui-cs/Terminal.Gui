@@ -140,7 +140,7 @@ public class FileDialogTests ()
         AssertIsTheStartingDirectory (dlg.Path);
 
         Assert.IsType<TextField> (dlg.MostFocused);
-        Send ('v', ConsoleKey.DownArrow);
+        Application.RaiseKeyDownEvent (Key.CursorDown);
 
         var tv = GetTableView(dlg);
         tv.SetFocus ();
@@ -152,15 +152,17 @@ public class FileDialogTests ()
         AssertIsTheStartingDirectory (dlg.Path);
 
         // Accept navigation up a directory
-        Send ('\n', ConsoleKey.Enter);
+        Application.RaiseKeyDownEvent (Key.Enter);
 
         AssertIsTheRootDirectory (dlg.Path);
 
         Assert.True (dlg.Canceled);
         Assert.False (selected);
 
-        // Now press the back button (in table view)
-        Send ('<', ConsoleKey.Backspace);
+        Assert.IsType<TableView> (dlg.MostFocused);
+
+        // Now press Backspace (in table view)
+        Application.RaiseKeyDownEvent (Key.Backspace);
 
         // Should move us back to the root
         AssertIsTheStartingDirectory (dlg.Path);

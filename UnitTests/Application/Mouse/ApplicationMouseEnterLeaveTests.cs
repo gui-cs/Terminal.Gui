@@ -47,7 +47,7 @@ public class ApplicationMouseEnterLeaveTests
         var mousePosition = new Point (1, 1);
         List<View> currentViewsUnderMouse = new () { view };
 
-        var mouseEvent = new MouseEvent
+        var mouseEvent = new MouseEventArgs
         {
             Position = mousePosition,
             ScreenPosition = mousePosition
@@ -80,7 +80,7 @@ public class ApplicationMouseEnterLeaveTests
         Application.Top.Add (view);
         var mousePosition = new Point (0, 0);
         List<View> currentViewsUnderMouse = new ();
-        var mouseEvent = new MouseEvent ();
+        var mouseEvent = new MouseEventArgs ();
 
         Application._cachedViewsUnderMouse.Clear ();
         Application._cachedViewsUnderMouse.Add (view);
@@ -203,7 +203,7 @@ public class ApplicationMouseEnterLeaveTests
         Application.Top.Add (view);
         var mousePosition = new Point (0, 0);
         List<View> currentViewsUnderMouse = new ();
-        var mouseEvent = new MouseEvent ();
+        var mouseEvent = new MouseEventArgs ();
 
         Application._cachedViewsUnderMouse.Clear ();
 

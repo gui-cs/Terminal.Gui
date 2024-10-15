@@ -1341,7 +1341,7 @@ e
         Application.Top.SetFocus ();
         Assert.True (otherView.HasFocus);
 
-        Assert.True (Application.OnKeyDown (label.HotKey));
+        Assert.True (Application.RaiseKeyDownEvent (label.HotKey));
         Assert.False (otherView.HasFocus);
         Assert.False (label.HasFocus);
         Assert.True (nextView.HasFocus);
@@ -1364,7 +1364,7 @@ e
         Application.Top.SetFocus ();
 
         // click on label
-        Application.OnMouseEvent (new () { ScreenPosition = label.Frame.Location, Flags = MouseFlags.Button1Clicked });
+        Application.RaiseMouseEvent (new () { ScreenPosition = label.Frame.Location, Flags = MouseFlags.Button1Clicked });
         Assert.False (label.HasFocus);
         Assert.True (nextView.HasFocus);
 
@@ -1396,7 +1396,7 @@ e
         Assert.True (view.HasFocus);
 
         // No focused view accepts Tab, and there's no other view to focus, so OnKeyDown returns false
-        Assert.True (Application.OnKeyDown (label.HotKey));
+        Assert.True (Application.RaiseKeyDownEvent (label.HotKey));
         Assert.True (label.HasFocus);
         Assert.False (view.HasFocus);
 
@@ -1442,12 +1442,12 @@ e
         Assert.True (otherView.HasFocus);
 
         // label can focus, so clicking on it set focus
-        Application.OnMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.Button1Clicked });
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.Button1Clicked });
         Assert.True (label.HasFocus);
         Assert.False (otherView.HasFocus);
 
         // click on view
-        Application.OnMouseEvent (new () { ScreenPosition = new (0, 1), Flags = MouseFlags.Button1Clicked });
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (0, 1), Flags = MouseFlags.Button1Clicked });
         Assert.False (label.HasFocus);
         Assert.True (otherView.HasFocus);
 

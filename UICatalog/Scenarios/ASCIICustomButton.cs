@@ -127,7 +127,7 @@ public class ASCIICustomButtonTest : Scenario
         }
 
         public event Action<ASCIICustomButton> PointerEnter;
-        private void This_MouseClick (object sender, MouseEventEventArgs obj) { NewMouseEvent (obj.MouseEvent); }
+        private void This_MouseClick (object sender, MouseEventArgs obj) { NewMouseEvent (obj); }
     }
 
     public class ScrollViewTestWindow : Window
@@ -310,9 +310,9 @@ public class ASCIICustomButtonTest : Scenario
             }
         }
 
-        private void Button_MouseClick (object sender, MouseEventEventArgs obj)
+        private void Button_MouseClick (object sender, MouseEventArgs obj)
         {
-            if (obj.MouseEvent.Flags == MouseFlags.WheeledDown)
+            if (obj.Flags == MouseFlags.WheeledDown)
             {
                 _scrollView.ContentOffset = new Point (
                                                        _scrollView.ContentOffset.X,
@@ -320,7 +320,7 @@ public class ASCIICustomButtonTest : Scenario
                                                       );
                 obj.Handled = true;
             }
-            else if (obj.MouseEvent.Flags == MouseFlags.WheeledUp)
+            else if (obj.Flags == MouseFlags.WheeledUp)
             {
                 _scrollView.ContentOffset = new Point (
                                                        _scrollView.ContentOffset.X,

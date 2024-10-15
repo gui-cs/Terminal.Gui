@@ -57,7 +57,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         rg.SetFocus ();
 
         Assert.Equal (-1, rg.SelectedItem);
-        Application.OnKeyDown (Key.Space);
+        Application.RaiseKeyDownEvent (Key.Space);
         Assert.Equal (0, rg.SelectedItem);
 
         Application.Top.Dispose ();
@@ -105,21 +105,21 @@ public class RadioGroupTests (ITestOutputHelper output)
 
         // With HasFocus
         // Test up/down without Select
-        Assert.False (Application.OnKeyDown (Key.CursorUp)); // Should not change (should focus prev view if there was one, which there isn't)
+        Assert.False (Application.RaiseKeyDownEvent (Key.CursorUp)); // Should not change (should focus prev view if there was one, which there isn't)
         Assert.Equal (0, rg.SelectedItem);
         Assert.Equal (0, rg.Cursor);
         Assert.Equal (0, selectedItemChangedCount);
         Assert.Equal (0, selectingCount);
         Assert.Equal (0, acceptedCount);
 
-        Assert.True (Application.OnKeyDown (Key.CursorDown));
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown));
         Assert.Equal (0, rg.SelectedItem); // Cursor changed, but selection didnt
         Assert.Equal (1, rg.Cursor);
         Assert.Equal (0, selectedItemChangedCount);
         Assert.Equal (0, selectingCount);
         Assert.Equal (0, acceptedCount);
 
-        Assert.False (Application.OnKeyDown (Key.CursorDown)); // Should not change selection (should focus next view if there was one, which there isn't)
+        Assert.False (Application.RaiseKeyDownEvent (Key.CursorDown)); // Should not change selection (should focus next view if there was one, which there isn't)
         Assert.Equal (0, rg.SelectedItem);
         Assert.Equal (1, rg.Cursor);
         Assert.Equal (0, selectedItemChangedCount);
@@ -127,7 +127,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (0, acceptedCount);
 
         // Test Select (Space) when Cursor != SelectedItem - Should select cursor
-        Assert.True (Application.OnKeyDown (Key.Space));
+        Assert.True (Application.RaiseKeyDownEvent (Key.Space));
         Assert.Equal (1, rg.SelectedItem);
         Assert.Equal (1, rg.Cursor);
         Assert.Equal (1, selectedItemChangedCount);
@@ -135,34 +135,34 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (0, acceptedCount);
 
         // Test Select (Space) when Cursor == SelectedItem - Should cycle
-        Assert.True (Application.OnKeyDown (Key.Space));
+        Assert.True (Application.RaiseKeyDownEvent (Key.Space));
         Assert.Equal (0, rg.SelectedItem);
         Assert.Equal (0, rg.Cursor);
         Assert.Equal (2, selectedItemChangedCount);
         Assert.Equal (2, selectingCount);
         Assert.Equal (0, acceptedCount);
 
-        Assert.True (Application.OnKeyDown (Key.Space));
+        Assert.True (Application.RaiseKeyDownEvent (Key.Space));
         Assert.Equal (1, rg.SelectedItem);
         Assert.Equal (1, rg.Cursor);
-        Assert.True (Application.OnKeyDown (Key.Space));
+        Assert.True (Application.RaiseKeyDownEvent (Key.Space));
         Assert.Equal (0, rg.SelectedItem);
         Assert.Equal (0, rg.Cursor);
-        Assert.True (Application.OnKeyDown (Key.Space));
+        Assert.True (Application.RaiseKeyDownEvent (Key.Space));
         Assert.Equal (1, rg.SelectedItem);
         Assert.Equal (1, rg.Cursor);
 
-        Assert.True (Application.OnKeyDown (Key.Home));
+        Assert.True (Application.RaiseKeyDownEvent (Key.Home));
         Assert.Equal (1, rg.SelectedItem);
         Assert.Equal (0, rg.Cursor);
-        Assert.True (Application.OnKeyDown (Key.Space));
+        Assert.True (Application.RaiseKeyDownEvent (Key.Space));
         Assert.Equal (0, rg.SelectedItem);
         Assert.Equal (0, rg.Cursor);
 
-        Assert.True (Application.OnKeyDown (Key.End));
+        Assert.True (Application.RaiseKeyDownEvent (Key.End));
         Assert.Equal (0, rg.SelectedItem);
         Assert.Equal (1, rg.Cursor);
-        Assert.True (Application.OnKeyDown (Key.Space));
+        Assert.True (Application.RaiseKeyDownEvent (Key.Space));
         Assert.Equal (1, rg.SelectedItem);
         Assert.Equal (1, rg.Cursor);
         Assert.Equal (7, selectedItemChangedCount);
@@ -174,7 +174,7 @@ public class RadioGroupTests (ITestOutputHelper output)
 
         rg.HotKey = Key.L;
         Assert.Equal (Key.L, rg.HotKey);
-        Assert.True (Application.OnKeyDown (rg.HotKey));
+        Assert.True (Application.RaiseKeyDownEvent (rg.HotKey));
         Assert.Equal (0, rg.SelectedItem);
         Assert.Equal (0, rg.Cursor);
         Assert.Equal (8, selectedItemChangedCount);
@@ -182,12 +182,12 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (0, acceptedCount);
 
         //     Make Selected != Cursor
-        Assert.True (Application.OnKeyDown (Key.CursorDown));
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown));
         Assert.Equal (0, rg.SelectedItem);
         Assert.Equal (1, rg.Cursor);
 
         //    Selected != Cursor - Raise HotKey event - Since we're focused, this should just advance
-        Assert.True (Application.OnKeyDown (rg.HotKey));
+        Assert.True (Application.RaiseKeyDownEvent (rg.HotKey));
         Assert.Equal (1, rg.SelectedItem);
         Assert.Equal (1, rg.Cursor);
         Assert.Equal (9, selectedItemChangedCount);
@@ -239,7 +239,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         //    Selected (0) == Cursor (0) - SetFocus
         rg.HotKey = Key.L;
         Assert.Equal (Key.L, rg.HotKey);
-        Assert.True (Application.OnKeyDown (rg.HotKey));
+        Assert.True (Application.RaiseKeyDownEvent (rg.HotKey));
         Assert.True (rg.HasFocus);
         Assert.Equal (0, rg.SelectedItem);
         Assert.Equal (0, rg.Cursor);
@@ -248,14 +248,14 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (0, acceptCount);
 
         //     Make Selected != Cursor
-        Assert.True (Application.OnKeyDown (Key.CursorDown));
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown));
         Assert.Equal (0, rg.SelectedItem);
         Assert.Equal (1, rg.Cursor);
 
         otherView.SetFocus ();
 
         //    Selected != Cursor - SetFocus
-        Assert.True (Application.OnKeyDown (rg.HotKey));
+        Assert.True (Application.RaiseKeyDownEvent (rg.HotKey));
         Assert.True (rg.HasFocus);
         Assert.Equal (0, rg.SelectedItem);
         Assert.Equal (1, rg.Cursor);
@@ -263,7 +263,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (0, selectCount);
         Assert.Equal (0, acceptCount);
 
-        Assert.True (Application.OnKeyDown (rg.HotKey));
+        Assert.True (Application.RaiseKeyDownEvent (rg.HotKey));
         Assert.True (rg.HasFocus);
         Assert.Equal (1, rg.SelectedItem);
         Assert.Equal (1, rg.Cursor);
@@ -314,7 +314,7 @@ public class RadioGroupTests (ITestOutputHelper output)
 
         // Test RadioTitem.HotKey - Should never SetFocus
         //    Selected (0) == Cursor (0) 
-        Assert.True (Application.OnKeyDown (Key.A));
+        Assert.True (Application.RaiseKeyDownEvent (Key.A));
         Assert.False (rg.HasFocus);
         Assert.Equal (0, rg.SelectedItem);
         Assert.Equal (0, rg.Cursor);
@@ -325,14 +325,14 @@ public class RadioGroupTests (ITestOutputHelper output)
         rg.SetFocus ();
 
         //     Make Selected != Cursor
-        Assert.True (Application.OnKeyDown (Key.CursorDown));
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown));
         Assert.Equal (0, rg.SelectedItem);
         Assert.Equal (1, rg.Cursor);
 
         otherView.SetFocus ();
 
         //    Selected != Cursor
-        Assert.True (Application.OnKeyDown (Key.A));
+        Assert.True (Application.RaiseKeyDownEvent (Key.A));
         Assert.False (rg.HasFocus);
         Assert.Equal (0, rg.SelectedItem);
         Assert.Equal (1, rg.Cursor);
@@ -341,7 +341,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (0, acceptCount);
 
         //    Selected != Cursor - Should not set focus
-        Assert.True (Application.OnKeyDown (Key.B));
+        Assert.True (Application.RaiseKeyDownEvent (Key.B));
         Assert.False (rg.HasFocus);
         Assert.Equal (1, rg.SelectedItem);
         Assert.Equal (1, rg.Cursor);
@@ -349,7 +349,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (1, selectCount);
         Assert.Equal (0, acceptCount);
 
-        Assert.True (Application.OnKeyDown (Key.B));
+        Assert.True (Application.RaiseKeyDownEvent (Key.B));
         Assert.False (rg.HasFocus);
         Assert.Equal (1, rg.SelectedItem);
         Assert.Equal (1, rg.Cursor);
@@ -372,22 +372,22 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L | KeyCode.ShiftMask));
         Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L | KeyCode.AltMask));
 
-        Assert.True (Application.OnKeyDown (Key.T));
+        Assert.True (Application.RaiseKeyDownEvent (Key.T));
         Assert.Equal (2, rg.SelectedItem);
-        Assert.True (Application.OnKeyDown (Key.L));
+        Assert.True (Application.RaiseKeyDownEvent (Key.L));
         Assert.Equal (0, rg.SelectedItem);
-        Assert.True (Application.OnKeyDown (Key.J));
+        Assert.True (Application.RaiseKeyDownEvent (Key.J));
         Assert.Equal (3, rg.SelectedItem);
-        Assert.True (Application.OnKeyDown (Key.R));
+        Assert.True (Application.RaiseKeyDownEvent (Key.R));
         Assert.Equal (1, rg.SelectedItem);
 
-        Assert.True (Application.OnKeyDown (Key.T.WithAlt));
+        Assert.True (Application.RaiseKeyDownEvent (Key.T.WithAlt));
         Assert.Equal (2, rg.SelectedItem);
-        Assert.True (Application.OnKeyDown (Key.L.WithAlt));
+        Assert.True (Application.RaiseKeyDownEvent (Key.L.WithAlt));
         Assert.Equal (0, rg.SelectedItem);
-        Assert.True (Application.OnKeyDown (Key.J.WithAlt));
+        Assert.True (Application.RaiseKeyDownEvent (Key.J.WithAlt));
         Assert.Equal (3, rg.SelectedItem);
-        Assert.True (Application.OnKeyDown (Key.R.WithAlt));
+        Assert.True (Application.RaiseKeyDownEvent (Key.R.WithAlt));
         Assert.Equal (1, rg.SelectedItem);
 
         var superView = new View ();

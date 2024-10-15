@@ -69,7 +69,7 @@ public class OrientationHelper
                 return;
             }
 
-            // Best practice is to invoke the virtual method first.
+            // Best practice is to call the virtual method first.
             // This allows derived classes to handle the event and potentially cancel it.
             if (_owner?.OnOrientationChanging (value, _orientation) ?? false)
             {
@@ -98,10 +98,8 @@ public class OrientationHelper
                 }
             }
 
-            // Best practice is to invoke the virtual method first.
+            // Best practice is to call the virtual method first, then raise the event.
             _owner?.OnOrientationChanged (_orientation);
-
-            // Even though Changed is not cancelable, it is still a good practice to raise the event after.
             OrientationChanged?.Invoke (_owner, new (in _orientation));
         }
     }

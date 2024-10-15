@@ -588,11 +588,11 @@ public abstract class ConsoleDriver
     public void OnKeyUp (Key a) { KeyUp?.Invoke (this, a); }
 
     /// <summary>Event fired when a mouse event occurs.</summary>
-    public event EventHandler<MouseEvent>? MouseEvent;
+    public event EventHandler<MouseEventArgs>? MouseEvent;
 
     /// <summary>Called when a mouse event occurs. Fires the <see cref="MouseEvent"/> event.</summary>
     /// <param name="a"></param>
-    public void OnMouseEvent (MouseEvent a)
+    public void OnMouseEvent (MouseEventArgs a)
     {
         // Ensure ScreenPosition is set
         a.ScreenPosition = a.Position;

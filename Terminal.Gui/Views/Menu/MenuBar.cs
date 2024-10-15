@@ -137,7 +137,7 @@ public class MenuBar : View, IDesignable
                                                   });
         AddCommand (Command.Select, ctx =>
                                     {
-                                        if (ctx.Data is MouseEvent)
+                                        if (ctx.Data is MouseEventArgs)
                                         {
                                             // HACK: Work around the fact that View.MouseClick always invokes Select
                                             return false;
@@ -1400,7 +1400,7 @@ public class MenuBar : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent (MouseEvent me)
+    protected override bool OnMouseEvent (MouseEventArgs me)
     {
         if (!_handled && !HandleGrabView (me, this))
         {
@@ -1513,7 +1513,7 @@ public class MenuBar : View, IDesignable
     internal bool _isContextMenuLoading;
     private MenuBarItem [] _menus = [];
 
-    internal bool HandleGrabView (MouseEvent me, View current)
+    internal bool HandleGrabView (MouseEventArgs me, View current)
     {
         if (Application.MouseGrabView is { })
         {
@@ -1541,7 +1541,7 @@ public class MenuBar : View, IDesignable
                     Application.UngrabMouse ();
                     View v = me.View;
                     Application.GrabMouse (v);
-                    MouseEvent nme;
+                    MouseEventArgs nme;
 
                     if (me.Position.Y > -1)
                     {

@@ -270,7 +270,7 @@ public class ScrollBarView : View
     public event EventHandler ChangedPosition;
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
+    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
     {
         if (mouseEvent.Flags != MouseFlags.Button1Pressed
             && mouseEvent.Flags != MouseFlags.Button1DoubleClicked
@@ -777,16 +777,16 @@ public class ScrollBarView : View
     //	}
     //}
 
-    private void ContentBottomRightCorner_MouseClick (object sender, MouseEventEventArgs me)
+    private void ContentBottomRightCorner_MouseClick (object sender, MouseEventArgs me)
     {
-        if (me.MouseEvent.Flags == MouseFlags.WheeledDown
-            || me.MouseEvent.Flags == MouseFlags.WheeledUp
-            || me.MouseEvent.Flags == MouseFlags.WheeledRight
-            || me.MouseEvent.Flags == MouseFlags.WheeledLeft)
+        if (me.Flags == MouseFlags.WheeledDown
+            || me.Flags == MouseFlags.WheeledUp
+            || me.Flags == MouseFlags.WheeledRight
+            || me.Flags == MouseFlags.WheeledLeft)
         {
-            NewMouseEvent (me.MouseEvent);
+            NewMouseEvent (me);
         }
-        else if (me.MouseEvent.Flags == MouseFlags.Button1Clicked)
+        else if (me.Flags == MouseFlags.Button1Clicked)
         {
             Host.SetFocus ();
         }
