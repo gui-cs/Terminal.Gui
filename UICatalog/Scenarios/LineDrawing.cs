@@ -96,6 +96,8 @@ internal class DrawLineTool : ITool
                 area.SetNeedsDisplay ();
             }
         }
+
+        mouseEvent.Handled = true;
     }
 }
 
@@ -325,7 +327,7 @@ public class DrawingArea : View
     {
         CurrentTool.OnMouseEvent (this, mouseEvent);
 
-        return base.OnMouseEvent (mouseEvent);
+        return mouseEvent.Handled;
     }
 
     internal void AddLayer ()
@@ -441,9 +443,11 @@ public class AttributeView : View
             {
                 ClickedInBackground ();
             }
+
+            mouseEvent.Handled = true;
         }
 
-        return base.OnMouseEvent (mouseEvent);
+        return mouseEvent.Handled;
     }
 
     private bool IsForegroundPoint (int x, int y) { return ForegroundPoints.Contains ((x, y)); }

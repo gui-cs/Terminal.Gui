@@ -262,9 +262,9 @@ public class Border : Adornment
     private Point _startGrabPoint;
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
+    protected override bool OnMouseEvent (MouseEvent mouseEvent)
     {
-        if (base.OnMouseEvent (mouseEvent))
+        if (base.RaiseMouseEvent (mouseEvent))
         {
             return true;
         }

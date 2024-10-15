@@ -801,7 +801,7 @@ public class TableView : View
     }
 
     ///<inheritdoc/>
-    protected internal override bool OnMouseEvent (MouseEvent me)
+    protected override bool OnMouseEvent (MouseEvent me)
     {
         if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
             && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
@@ -892,6 +892,7 @@ public class TableView : View
                 }
 
                 Update ();
+                me.Handled = true;
             }
         }
 
@@ -902,11 +903,11 @@ public class TableView : View
 
             if (hit is { })
             {
-                OnCellActivated (new CellActivatedEventArgs (Table, hit.Value.X, hit.Value.Y));
+                return OnCellActivated (new CellActivatedEventArgs (Table, hit.Value.X, hit.Value.Y));
             }
         }
 
-        return base.OnMouseEvent (me);
+        return me.Handled;
     }
 
     ///<inheritdoc/>

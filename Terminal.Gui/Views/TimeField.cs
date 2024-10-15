@@ -163,7 +163,7 @@ public class TimeField : TextField
     }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent ev)
+    protected override bool OnMouseEvent  (MouseEvent ev)
     {
         bool result = base.OnMouseEvent (ev);
 

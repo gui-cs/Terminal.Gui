@@ -990,7 +990,7 @@ public class TreeView<T> : View, ITreeView where T : class
 
     // BUGBUG: OnMouseEvent is internal. TreeView should not be overriding.
     ///<inheritdoc/>
-    protected internal override bool OnMouseEvent (MouseEvent me)
+    protected override bool OnMouseEvent (MouseEvent me)
     {
         // If it is not an event we care about
         if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
@@ -1001,7 +1001,7 @@ public class TreeView<T> : View, ITreeView where T : class
             && !me.Flags.HasFlag (MouseFlags.WheeledLeft))
         {
             // do nothing
-            return base.OnMouseEvent (me);
+            return false;
         }
 
         if (!HasFocus && CanFocus)

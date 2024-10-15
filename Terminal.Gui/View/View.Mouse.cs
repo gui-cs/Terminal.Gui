@@ -212,14 +212,14 @@ public partial class View // Mouse APIs
     ///         A view must be both enabled and visible to receive mouse events.
     ///     </para>
     ///     <para>
-    ///         This method raises <see cref="OnMouseEvent"/>/<see cref="MouseEvent"/>; if not handled, and one of the
+    ///         This method raises <see cref="RaiseMouseEvent"/>/<see cref="MouseEvent"/>; if not handled, and one of the
     ///         mouse buttons was clicked, the <see cref="OnMouseClick"/>/<see cref="MouseClick"/> event will be raised
     ///     </para>
     ///     <para>
     ///         See <see cref="SetPressedHighlight"/> for more information.
     ///     </para>
     ///     <para>
-    ///         If <see cref="WantContinuousButtonPressed"/> is <see langword="true"/>, the <see cref="OnMouseEvent"/>/<see cref="MouseEvent"/> event
+    ///         If <see cref="WantContinuousButtonPressed"/> is <see langword="true"/>, the <see cref="RaiseMouseEvent"/>/<see cref="MouseEvent"/> event
     ///         will be raised on any new mouse event where <see cref="MouseEvent.Flags"/> indicates a button is pressed.
     ///     </para>
     /// </remarks>
@@ -245,7 +245,7 @@ public partial class View // Mouse APIs
         }
 
         // Cancellable event
-        if (OnMouseEvent (mouseEvent))
+        if (RaiseMouseEvent (mouseEvent))
         {
             // Technically mouseEvent.Handled should already be true if implementers of OnMouseEvent
             // follow the rules. But we'll update it just in case.
@@ -296,6 +296,25 @@ public partial class View // Mouse APIs
         return false;
     }
 
+    /// <summary>
+    ///     Raises the <see cref="RaiseMouseEvent"/>/<see cref="MouseEvent"/> event.
+    /// </summary>
+    /// <param name="mouseEvent"></param>
+    /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
+    public bool RaiseMouseEvent (MouseEvent mouseEvent)
+    {
+        var args = new MouseEventEventArgs (mouseEvent);
+
+        if (OnMouseEvent (mouseEvent) || mouseEvent.Handled == true)
+        {
+            return true;
+        }
+
+        MouseEvent?.Invoke (this, args);
+
+        return args.Handled;
+    }
+
     /// <summary>Called when a mouse event occurs within the view's <see cref="Viewport"/>.</summary>
     /// <remarks>
     ///     <para>
@@ -306,11 +325,7 @@ public partial class View // Mouse APIs
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
     protected virtual bool OnMouseEvent (MouseEvent mouseEvent)
     {
-        var args = new MouseEventEventArgs (mouseEvent);
-
-        MouseEvent?.Invoke (this, args);
-
-        return args.Handled;
+        return false;
     }
 
     /// <summary>Raised when a mouse event occurs.</summary>

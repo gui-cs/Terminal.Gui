@@ -806,7 +806,7 @@ internal sealed class Menu : View
         _host.SetNeedsDisplay ();
     }
 
-    protected internal override bool OnMouseEvent (MouseEvent me)
+    protected override bool OnMouseEvent (MouseEvent me)
     {
         if (!_host._handled && !_host.HandleGrabView (me, this))
         {

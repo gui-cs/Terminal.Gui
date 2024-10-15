@@ -253,7 +253,7 @@ public class ComboBox : View, IDesignable
     public event EventHandler Expanded;
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent (MouseEvent me)
+    protected override bool OnMouseEvent (MouseEvent me)
     {
         if (me.Position.X == Viewport.Right - 1
             && me.Position.Y == Viewport.Top
@@ -837,7 +837,7 @@ public class ComboBox : View, IDesignable
         }
 
         // BUGBUG: OnMouseEvent is internal!
-        protected internal override bool OnMouseEvent (MouseEvent me)
+        protected override bool OnMouseEvent (MouseEvent me)
         {
             var res = false;
             bool isMousePositionValid = IsMousePositionValid (me);

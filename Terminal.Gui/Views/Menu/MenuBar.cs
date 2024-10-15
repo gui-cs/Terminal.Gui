@@ -1400,7 +1400,7 @@ public class MenuBar : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent (MouseEvent me)
+    protected bool OnMouseEvent (MouseEvent me)
     {
         if (!_handled && !HandleGrabView (me, this))
         {
