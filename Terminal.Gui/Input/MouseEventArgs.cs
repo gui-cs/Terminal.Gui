@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿#nullable enable
+using System.ComponentModel;
 
 namespace Terminal.Gui;
 
@@ -20,12 +21,12 @@ public class MouseEventArgs : HandledEventArgs
     public Point ScreenPosition { get; set; }
 
     /// <summary>The deepest View who's <see cref="View.Frame"/> contains <see cref="ScreenPosition"/>.</summary>
-    public View View { get; set; }
+    public View? View { get; set; }
 
     /// <summary>The position of the mouse in <see cref="View"/>'s Viewport-relative coordinates. Only valid if <see cref="View"/> is set.</summary>
     public Point Position { get; set; }
 
     /// <summary>Returns a <see cref="T:System.String"/> that represents the current <see cref="Terminal.Gui.MouseEventArgs"/>.</summary>
     /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="Terminal.Gui.MouseEventArgs"/>.</returns>
-    public override string ToString () { return $"({ScreenPosition}):{Flags}:{View.Id}:{Position}"; }
+    public override string ToString () { return $"({ScreenPosition}):{Flags}:{View?.Id}:{Position}"; }
 }
