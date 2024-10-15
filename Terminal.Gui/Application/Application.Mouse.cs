@@ -170,9 +170,6 @@ public static partial class Application // Mouse handling
             return;
         }
 
-        // We can combine this into the switch expression to reduce cognitive complexity even more and likely
-        // avoid one or two of these checks in the process, as well.
-
         WantContinuousButtonPressedView = deepestViewUnderMouse switch
         {
             { WantContinuousButtonPressed: true } => deepestViewUnderMouse,

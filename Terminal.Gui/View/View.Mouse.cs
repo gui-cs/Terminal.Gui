@@ -201,7 +201,7 @@ public partial class View // Mouse APIs
 
     /// <summary>Gets or sets whether the <see cref="View"/> wants mouse position reports.</summary>
     /// <value><see langword="true"/> if mouse position reports are wanted; otherwise, <see langword="false"/>.</value>
-    public virtual bool WantMousePositionReports { get; set; }
+    public bool WantMousePositionReports { get; set; }
 
     /// <summary>
     ///     Processes a new <see cref="MouseEvent"/>. This method is called by <see cref="Application.RaiseMouseEvent"/> when a mouse
@@ -487,11 +487,9 @@ public partial class View // Mouse APIs
             || mouseEvent.Flags.HasFlag (MouseFlags.Button3Pressed)
             || mouseEvent.Flags.HasFlag (MouseFlags.Button4Pressed))
         {
-            bool firstPress = true;
             // The first time we get pressed event, grab the mouse and set focus
             if (Application.MouseGrabView != this)
             {
-                firstPress = true;
                 Application.GrabMouse (this);
 
                 if (!HasFocus && CanFocus)
@@ -499,6 +497,8 @@ public partial class View // Mouse APIs
                     // Set the focus, but don't invoke Accept
                     SetFocus ();
                 }
+
+                mouseEvent.Handled = true;
             }
 
             if (Viewport.Contains (mouseEvent.Position))
@@ -519,7 +519,7 @@ public partial class View // Mouse APIs
                 }
             }
 
-            if (!firstPress && WantContinuousButtonPressed && Application.MouseGrabView == this)
+            if (WantContinuousButtonPressed && Application.MouseGrabView == this)
             {
                 // If this is not the first pressed event, generate a click
                 return RaiseMouseClickEvent (mouseEvent);

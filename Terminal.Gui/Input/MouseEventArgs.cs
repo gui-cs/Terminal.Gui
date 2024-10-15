@@ -26,6 +26,25 @@ public class MouseEventArgs : HandledEventArgs
     /// <summary>The position of the mouse in <see cref="View"/>'s Viewport-relative coordinates. Only valid if <see cref="View"/> is set.</summary>
     public Point Position { get; set; }
 
+    public bool IsButtonEvent
+    {
+        get
+        {
+            return  Flags.HasFlag (MouseFlags.Button1Clicked)
+                   || Flags.HasFlag (MouseFlags.Button2Clicked)
+                   || Flags.HasFlag (MouseFlags.Button3Clicked)
+                   || Flags.HasFlag (MouseFlags.Button4Clicked)
+                   || Flags.HasFlag (MouseFlags.Button1DoubleClicked)
+                   || Flags.HasFlag (MouseFlags.Button2DoubleClicked)
+                   || Flags.HasFlag (MouseFlags.Button3DoubleClicked)
+                   || Flags.HasFlag (MouseFlags.Button4DoubleClicked)
+                   || Flags.HasFlag (MouseFlags.Button1TripleClicked)
+                   || Flags.HasFlag (MouseFlags.Button2TripleClicked)
+                   || Flags.HasFlag (MouseFlags.Button3TripleClicked)
+                   || Flags.HasFlag (MouseFlags.Button4TripleClicked);
+        }
+    }
+
     /// <summary>Returns a <see cref="T:System.String"/> that represents the current <see cref="Terminal.Gui.MouseEventArgs"/>.</summary>
     /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="Terminal.Gui.MouseEventArgs"/>.</returns>
     public override string ToString () { return $"({ScreenPosition}):{Flags}:{View?.Id}:{Position}"; }
