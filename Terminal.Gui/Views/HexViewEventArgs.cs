@@ -12,41 +12,41 @@ namespace Terminal.Gui;
 public class HexViewEventArgs : EventArgs
 {
     /// <summary>Initializes a new instance of <see cref="HexViewEventArgs"/></summary>
-    /// <param name="pos">The character position.</param>
-    /// <param name="cursor">The cursor position.</param>
+    /// <param name="address">The byte position in the steam.</param>
+    /// <param name="position">The edit position.</param>
     /// <param name="lineLength">Line bytes length.</param>
-    public HexViewEventArgs (long pos, Point cursor, int lineLength)
+    public HexViewEventArgs (long address, Point position, int lineLength)
     {
-        Position = pos;
-        CursorPosition = cursor;
+        Address = address;
+        Position = position;
         BytesPerLine = lineLength;
     }
 
     /// <summary>The bytes length per line.</summary>
     public int BytesPerLine { get; private set; }
 
-    /// <summary>Gets the current cursor position starting at one for both, line and column.</summary>
-    public Point CursorPosition { get; private set; }
+    /// <summary>Gets the current edit position.</summary>
+    public Point Position { get; private set; }
 
-    /// <summary>Gets the current character position starting at one, related to the <see cref="Stream"/>.</summary>
-    public long Position { get; private set; }
+    /// <summary>Gets the byte position in the <see cref="Stream"/>.</summary>
+    public long Address { get; private set; }
 }
 
 /// <summary>Defines the event arguments for <see cref="HexView.Edited"/> event.</summary>
 public class HexViewEditEventArgs : EventArgs
 {
     /// <summary>Creates a new instance of the <see cref="HexViewEditEventArgs"/> class.</summary>
-    /// <param name="position"></param>
+    /// <param name="address"></param>
     /// <param name="newValue"></param>
-    public HexViewEditEventArgs (long position, byte newValue)
+    public HexViewEditEventArgs (long address, byte newValue)
     {
-        Position = position;
+        Address = address;
         NewValue = newValue;
     }
 
-    /// <summary>Gets the new value for that <see cref="Position"/>.</summary>
+    /// <summary>Gets the new value for that <see cref="Address"/>.</summary>
     public byte NewValue { get; }
 
-    /// <summary>Gets the location of the edit.</summary>
-    public long Position { get; }
+    /// <summary>Gets the address of the edit in the stream.</summary>
+    public long Address { get; }
 }

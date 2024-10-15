@@ -27,6 +27,17 @@ public class CancelEventArgs<T> : CancelEventArgs where T : notnull
         NewValue = newValue;
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="CancelEventArgs{T}"/> class.
+    /// </summary>
+    /// <param name="currentValue">The current (old) value of the property.</param>
+    /// <param name="newValue">The value the property will be set to if the event is not cancelled.</param>
+    protected CancelEventArgs (T currentValue, T newValue)
+    {
+        CurrentValue = currentValue;
+        NewValue = newValue;
+    }
+
     /// <summary>The current value of the property.</summary>
     public T CurrentValue { get; }
 

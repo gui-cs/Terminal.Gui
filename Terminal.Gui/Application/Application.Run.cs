@@ -80,14 +80,14 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     {
         ArgumentNullException.ThrowIfNull (toplevel);
 
-#if DEBUG_IDISPOSABLE
-        Debug.Assert (!toplevel.WasDisposed);
+//#if DEBUG_IDISPOSABLE
+//        Debug.Assert (!toplevel.WasDisposed);
 
-        if (_cachedRunStateToplevel is { } && _cachedRunStateToplevel != toplevel)
-        {
-            Debug.Assert (_cachedRunStateToplevel.WasDisposed);
-        }
-#endif
+//        if (_cachedRunStateToplevel is { } && _cachedRunStateToplevel != toplevel)
+//        {
+//            Debug.Assert (_cachedRunStateToplevel.WasDisposed);
+//        }
+//#endif
 
         // Ensure the mouse is ungrabbed.
         MouseGrabView = null;

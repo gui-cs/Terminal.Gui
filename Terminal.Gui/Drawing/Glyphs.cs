@@ -97,6 +97,9 @@ public class GlyphDefinitions
     /// <summary>Dot. Default is (U+2219) - ∙.</summary>
     public Rune Dot { get; set; } = (Rune)'∙';
 
+    /// <summary>Dotted Square - ⬚ U+02b1a┝</summary>
+    public Rune DottedSquare { get; set; } = (Rune)'⬚';
+
     /// <summary>Black Circle . Default is (U+025cf) - ●.</summary>
     public Rune BlackCircle { get; set; } = (Rune)'●'; // Black Circle - ● U+025cf
 

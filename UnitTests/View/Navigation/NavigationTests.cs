@@ -66,7 +66,6 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
                         // Try once more (HexView)
                         Application.RaiseKeyDownEvent (key);
                     }
-
                     break;
                 default:
                     Application.RaiseKeyDownEvent (Key.Tab);
@@ -78,12 +77,11 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
             {
                 left = true;
                 _output.WriteLine ($"{view.GetType ().Name} - {key} Left.");
-                view.SetFocus ();
+
+                break;
             }
-            else
-            {
-                _output.WriteLine ($"{view.GetType ().Name} - {key} did not Leave.");
-            }
+
+            _output.WriteLine ($"{view.GetType ().Name} - {key} did not Leave.");
         }
 
         top.Dispose ();
