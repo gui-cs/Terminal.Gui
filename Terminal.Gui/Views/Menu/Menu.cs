@@ -1,5 +1,7 @@
 #nullable enable
 
+using static System.Formats.Asn1.AsnWriter;
+
 namespace Terminal.Gui;
 
 /// <summary>
