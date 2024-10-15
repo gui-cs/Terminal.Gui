@@ -407,6 +407,8 @@ internal class NetEvents : IDisposable
         return true;
     }
 
+    public AnsiResponseParser Parser { get; private set; } = new ();
+
     // Process a CSI sequence received by the driver (key pressed, mouse event, or request/response event)
     private void ProcessRequestResponse (
         ref ConsoleKeyInfo newConsoleKeyInfo,
@@ -415,6 +417,16 @@ internal class NetEvents : IDisposable
         ref ConsoleModifiers mod
     )
     {
+        if (cki != null)
+        {
+            // If the response is fully consumed by parser
+            if(cki.Length > 1 && string.IsNullOrEmpty(Parser.ProcessInput (new string(cki.Select (k=>k.KeyChar).ToArray ()))))
+            {
+                // Lets not double process
+                return;
+            }
+        }
+
         // isMouse is true if it's CSI<, false otherwise
         EscSeqUtils.DecodeEscSeq (
                                   EscSeqRequests,
@@ -1034,6 +1046,15 @@ internal class NetDriver : ConsoleDriver
             lastCol += outputWidth;
             outputWidth = 0;
         }
+    }
+
+    /// <inheritdoc />
+    public override IAnsiResponseParser GetParser () => _mainLoopDriver._netEvents.Parser;
+
+    /// <inheritdoc />
+    public override void RawWrite (string str)
+    {
+        Console.Write (str);
     }
 
     internal override void End ()

@@ -193,6 +193,12 @@ internal class CursesDriver : ConsoleDriver
         }
     }
 
+    /// <inheritdoc />
+    public override void RawWrite (string str)
+    {
+        Console.Out.Write (str);
+    }
+
     public override void Suspend ()
     {
         StopReportingMouseMoves ();
@@ -577,6 +583,10 @@ internal class CursesDriver : ConsoleDriver
         return new MainLoop (_mainLoopDriver);
     }
 
+    private AnsiResponseParser Parser { get; set; } = new ();
+    /// <inheritdoc />
+    public override IAnsiResponseParser GetParser () => Parser;
+
     internal void ProcessInput ()
     {
         int wch;
@@ -875,6 +885,14 @@ internal class CursesDriver : ConsoleDriver
                 }
                 else
                 {
+                    if (cki != null)
+                    {
+                        foreach (var c in cki)
+                        {
+                            Parser.ProcessInput (c.KeyChar.ToString());
+                        }
+                    }
+
                     k = ConsoleKeyMapping.MapConsoleKeyInfoToKeyCode (consoleKeyInfo);
                     keyEventArgs = new Key (k);
                     OnKeyDown (keyEventArgs);

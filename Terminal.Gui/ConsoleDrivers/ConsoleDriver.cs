@@ -13,7 +13,7 @@ namespace Terminal.Gui;
 ///     <see cref="WindowsDriver"/> - <see cref="NetDriver"/> that uses the .NET Console API - <see cref="FakeConsole"/>
 ///     for unit testing.
 /// </remarks>
-public abstract class ConsoleDriver
+public abstract class ConsoleDriver : IConsoleDriver
 {
     // As performance is a concern, we keep track of the dirty lines and only refresh those.
     // This is in addition to the dirty flag on each cell.
@@ -609,6 +609,20 @@ public abstract class ConsoleDriver
     public abstract void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
 
     #endregion
+
+    /// <inheritdoc />
+    public virtual IAnsiResponseParser GetParser ()
+    {
+        // TODO: implement in other drivers
+        throw new NotSupportedException ();
+    }
+
+    /// <inheritdoc />
+    public virtual void RawWrite (string str)
+    {
+        // TODO: implement in other drivers
+        throw new NotSupportedException ();
+    }
 }
 
 /// <summary>

@@ -15,10 +15,12 @@
 
 #define HACK_CHECK_WINCHANGED
 
+using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
+using Terminal.Gui.ConsoleDrivers;
 using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
 using static Terminal.Gui.SpinnerStyle;
 
@@ -1162,6 +1164,11 @@ internal class WindowsDriver : ConsoleDriver
         }
     }
 
+    /// <inheritdoc />
+    public override IAnsiResponseParser GetParser () => Parser;
+
+    /// <inheritdoc />
+    public override void RawWrite (string str) => WinConsole?.WriteANSI (str);
 
     #region Not Implemented
 
@@ -1443,11 +1450,27 @@ internal class WindowsDriver : ConsoleDriver
 #endif
 
         WinConsole?.SetInitialCursorVisibility ();
+
         return new MainLoop (_mainLoopDriver);
     }
 
+    /// <summary>
+    /// How long after Esc has been pressed before we give up on getting an Ansi escape sequence
+    /// </summary>
+    private TimeSpan _escTimeout = TimeSpan.FromMilliseconds (50);
+    public AnsiResponseParser<WindowsConsole.InputRecord> Parser { get; set; } = new ();
+
     internal void ProcessInput (WindowsConsole.InputRecord inputEvent)
     {
+        foreach (var e in Parse (inputEvent))
+        {
+            ProcessInputAfterParsing (e);
+        }
+    }
+
+    internal void ProcessInputAfterParsing (WindowsConsole.InputRecord inputEvent)
+    {
+
         switch (inputEvent.EventType)
         {
             case WindowsConsole.EventType.Key:
@@ -1470,15 +1493,9 @@ internal class WindowsDriver : ConsoleDriver
                     break;
                 }
 
-                if (inputEvent.KeyEvent.bKeyDown)
-                {
-                    // Avoid sending repeat key down events
-                    OnKeyDown (new Key (map));
-                }
-                else
-                {
-                    OnKeyUp (new Key (map));
-                }
+                // This follows convention in NetDriver
+                OnKeyDown (new Key (map));
+                OnKeyUp (new Key (map));
 
                 break;
 
@@ -1518,6 +1535,44 @@ internal class WindowsDriver : ConsoleDriver
 			break;
 #endif
         }
+    }
+
+    private IEnumerable<WindowsConsole.InputRecord> Parse (WindowsConsole.InputRecord inputEvent)
+    {
+        if (inputEvent.EventType != WindowsConsole.EventType.Key)
+        {
+            yield return inputEvent;
+            yield break;
+        }
+
+        // Swallow key up events - they are unreliable
+        if (!inputEvent.KeyEvent.bKeyDown)
+        {
+            yield break;
+        }
+
+        foreach (var i in ShouldRelease ())
+        {
+            yield return i;
+        }
+
+        foreach (Tuple<char, WindowsConsole.InputRecord> output in
+                 Parser.ProcessInput (Tuple.Create (inputEvent.KeyEvent.UnicodeChar, inputEvent)))
+        {
+                yield return output.Item2;
+        }
+    }
+
+    public IEnumerable<WindowsConsole.InputRecord> ShouldRelease ()
+    {
+
+        if (Parser.State == ParserState.ExpectingBracket &&
+            DateTime.Now - Parser.StateChangedAt > _escTimeout)
+        {
+            return Parser.Release ().Select (o => o.Item2);
+        }
+
+        return [];
     }
 
 #if HACK_CHECK_WINCHANGED
@@ -2223,6 +2278,11 @@ internal class WindowsMainLoop : IMainLoopDriver
 
     void IMainLoopDriver.Iteration ()
     {
+        foreach(var i in ((WindowsDriver)_consoleDriver).ShouldRelease())
+        {
+            ((WindowsDriver)_consoleDriver).ProcessInput (i);
+        }
+
         while (_resultQueue.Count > 0)
         {
             WindowsConsole.InputRecord [] inputRecords = _resultQueue.Dequeue ();
