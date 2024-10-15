@@ -880,7 +880,7 @@ public class ComboBox : View, IDesignable
                 return true;
             }
 
-            return res;
+            return false;
         }
 
         public override void OnDrawContent (Rectangle viewport)
