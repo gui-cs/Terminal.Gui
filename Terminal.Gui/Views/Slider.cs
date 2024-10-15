@@ -1381,11 +1381,9 @@ public class Slider<T> : View, IOrientation
 
             mouseEvent.Handled = true;
 
-            // BUGBUG: OnMouseClick is/should be internal. 
-            return OnMouseClick (mouseEvent);
         }
 
-        return false;
+        return mouseEvent.Handled;
 
         Point ClampMovePosition (Point position)
         {
