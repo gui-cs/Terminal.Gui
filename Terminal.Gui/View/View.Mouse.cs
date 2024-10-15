@@ -318,14 +318,6 @@ public partial class View // Mouse APIs
     /// </remarks>
     public event EventHandler<MouseEventArgs>? MouseEvent;
 
-    /// <summary>Raised when a mouse event occurs.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         The coordinates are relative to <see cref="View.Viewport"/>.
-    ///     </para>
-    /// </remarks>
-    public event EventHandler<MouseEventEventArgs>? MouseEvent;
-
     #endregion Low Level Mouse Events
 
     #region Mouse Click Events
