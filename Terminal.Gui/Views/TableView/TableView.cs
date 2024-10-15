@@ -1563,7 +1563,7 @@ public class TableView : View
     /// <returns></returns>
     private TableSelection CreateTableSelection (int x, int y) { return CreateTableSelection (x, y, x, y); }
 
-    private bool CycleToNextTableEntryBeginningWith (Key keyEvent)
+    private bool CycleToNextTableEntryBeginningWith (Key key)
     {
         int row = SelectedRow;
 
@@ -1573,7 +1573,7 @@ public class TableView : View
             return false;
         }
 
-        int match = CollectionNavigator.GetNextMatchingItem (row, (char)keyEvent);
+        int match = CollectionNavigator.GetNextMatchingItem (row, (char)key);
 
         if (match != -1)
         {

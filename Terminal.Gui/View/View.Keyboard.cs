@@ -297,7 +297,6 @@ public partial class View // Keyboard APIs
         }
 
         // After
-        // TODO: Is ProcessKeyDown really the right name?
         if (RaiseKeyDownNotHandled (key) || key.Handled)
         {
             return true;
@@ -426,7 +425,7 @@ public partial class View // Keyboard APIs
     ///     <para>
     ///         If the focused sub view does not handle the key press, this method raises <see cref="OnKeyUp"/>/
     ///         <see cref="KeyUp"/> to allow the
-    ///         view to pre-process the key press. If <see cref="OnKeyUp"/>/<see cref="KeyUp"/>.
+    ///         view to pre-process the key press.
     ///     </para>
     ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
     /// </remarks>

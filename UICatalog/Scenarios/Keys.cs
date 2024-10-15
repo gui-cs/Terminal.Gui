@@ -76,18 +76,18 @@ public class Keys : Scenario
         win.Add (label);
         int maxKeyString = Key.CursorRight.WithAlt.WithCtrl.WithShift.ToString ().Length;
 
-        ObservableCollection<string> keyEventList = new ();
+        ObservableCollection<string> keyList = new ();
 
-        var appKeyEventListView = new ListView
+        var appKeyListView = new ListView
         {
             X = 0,
             Y = Pos.Bottom (label),
             Width = "KeyDown:".Length + maxKeyString,
             Height = Dim.Fill (),
-            Source = new ListWrapper<string> (keyEventList)
+            Source = new ListWrapper<string> (keyList)
         };
-        appKeyEventListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
-        win.Add (appKeyEventListView);
+        appKeyListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        win.Add (appKeyListView);
 
         // View key events...
         edit.KeyDown += (s, a) => { keyDownList.Add (a.ToString ()); };
@@ -100,7 +100,7 @@ public class Keys : Scenario
         // KeyDown
         label = new Label
         {
-            X = Pos.Right (appKeyEventListView) + 1,
+            X = Pos.Right (appKeyListView) + 1,
             Y = Pos.Top (label),
             Text = "TextView Key Down:"
         };
@@ -142,10 +142,9 @@ public class Keys : Scenario
 
         void KeyDownPressUp (Key args, string updown)
         {
-            // BUGBUG: KeyEvent.ToString is badly broken
             var msg = $"Key{updown,-7}: {args}";
-            keyEventList.Add (msg);
-            appKeyEventListView.MoveDown ();
+            keyList.Add (msg);
+            appKeyListView.MoveDown ();
             onKeyDownNotHandledListView.MoveDown ();
         }
 

@@ -5,17 +5,17 @@ public static partial class Application // Keyboard handling
 {
     /// <summary>
     ///     Called when the user presses a key (by the <see cref="ConsoleDriver"/>). Raises the cancelable
-    ///     <see cref="KeyDown"/> event
-    ///     then calls <see cref="View.NewKeyDownEvent"/> on all top level views. Called before <see cref="RaiseKeyUpEvent"/>.
+    ///     <see cref="KeyDown"/> event, then calls <see cref="View.NewKeyDownEvent"/> on all top level views, and finally
+    ///     if the key was not handled, invokes any Application-scoped <see cref="KeyBindings"/>.
     /// </summary>
     /// <remarks>Can be used to simulate key press events.</remarks>
-    /// <param name="keyEvent"></param>
+    /// <param name="key"></param>
     /// <returns><see langword="true"/> if the key was handled.</returns>
-    public static bool RaiseKeyDownEvent (Key keyEvent)
+    public static bool RaiseKeyDownEvent (Key key)
     {
-        KeyDown?.Invoke (null, keyEvent);
+        KeyDown?.Invoke (null, key);
 
-        if (keyEvent.Handled)
+        if (key.Handled)
         {
             return true;
         }
@@ -24,7 +24,7 @@ public static partial class Application // Keyboard handling
         {
             foreach (Toplevel topLevel in TopLevels.ToList ())
             {
-                if (topLevel.NewKeyDownEvent (keyEvent))
+                if (topLevel.NewKeyDownEvent (key))
                 {
                     return true;
                 }
@@ -37,7 +37,7 @@ public static partial class Application // Keyboard handling
         }
         else
         {
-            if (Top.NewKeyDownEvent (keyEvent))
+            if (Top.NewKeyDownEvent (key))
             {
                 return true;
             }
@@ -45,7 +45,7 @@ public static partial class Application // Keyboard handling
 
         // Invoke any Application-scoped KeyBindings.
         // The first view that handles the key will stop the loop.
-        foreach (KeyValuePair<Key, KeyBinding> binding in KeyBindings.Bindings.Where (b => b.Key == keyEvent.KeyCode))
+        foreach (KeyValuePair<Key, KeyBinding> binding in KeyBindings.Bindings.Where (b => b.Key == key.KeyCode))
         {
             if (binding.Value.BoundView is { })
             {
@@ -58,7 +58,7 @@ public static partial class Application // Keyboard handling
             }
             else
             {
-                if (!KeyBindings.TryGet (keyEvent, KeyBindingScope.Application, out KeyBinding appBinding))
+                if (!KeyBindings.TryGet (key, KeyBindingScope.Application, out KeyBinding appBinding))
                 {
                     continue;
                 }
@@ -67,7 +67,7 @@ public static partial class Application // Keyboard handling
 
                 foreach (Command command in appBinding.Commands)
                 {
-                    toReturn = InvokeCommand (command, keyEvent, appBinding);
+                    toReturn = InvokeCommand (command, key, appBinding);
                 }
 
                 return toReturn ?? true;
@@ -76,18 +76,18 @@ public static partial class Application // Keyboard handling
 
         return false;
 
-        static bool? InvokeCommand (Command command, Key keyEvent, KeyBinding appBinding)
+        static bool? InvokeCommand (Command command, Key key, KeyBinding appBinding)
         {
             if (!CommandImplementations!.ContainsKey (command))
             {
                 throw new NotSupportedException (
-                                                 @$"A KeyBinding was set up for the command {command} ({keyEvent}) but that command is not supported by Application."
+                                                 @$"A KeyBinding was set up for the command {command} ({key}) but that command is not supported by Application."
                                                 );
             }
 
             if (CommandImplementations.TryGetValue (command, out View.CommandImplementation? implementation))
             {
-                var context = new CommandContext (command, keyEvent, appBinding); // Create the context here
+                var context = new CommandContext (command, key, appBinding); // Create the context here
 
                 return implementation (context);
             }
@@ -116,25 +116,25 @@ public static partial class Application // Keyboard handling
     ///     then calls <see cref="View.NewKeyUpEvent"/> on all top level views. Called after <see cref="RaiseKeyDownEvent"/>.
     /// </summary>
     /// <remarks>Can be used to simulate key release events.</remarks>
-    /// <param name="a"></param>
+    /// <param name="key"></param>
     /// <returns><see langword="true"/> if the key was handled.</returns>
-    public static bool RaiseKeyUpEvent (Key a)
+    public static bool RaiseKeyUpEvent (Key key)
     {
         if (!IsInitialized)
         {
             return true;
         }
 
-        KeyUp?.Invoke (null, a);
+        KeyUp?.Invoke (null, key);
 
-        if (a.Handled)
+        if (key.Handled)
         {
             return true;
         }
 
         foreach (Toplevel topLevel in TopLevels.ToList ())
         {
-            if (topLevel.NewKeyUpEvent (a))
+            if (topLevel.NewKeyUpEvent (key))
             {
                 return true;
             }
