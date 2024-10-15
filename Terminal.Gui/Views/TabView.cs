@@ -510,7 +510,7 @@ public class TabView : View
 
     private void Tab_MouseClick (object sender, MouseEventArgs e)
     {
-        e.Handled = _tabsBar.NewMouseEvent (e.MouseEvent) == true;
+        e.Handled = _tabsBar.NewMouseEvent (e) == true;
     }
 
     private void UnSetCurrentTabs ()
@@ -569,7 +569,7 @@ public class TabView : View
             Add (_rightScrollIndicator, _leftScrollIndicator);
         }
 
-        protected override bool OnMouseEvent (MouseEvent me)
+        protected override bool OnMouseEvent (MouseEventArgs me)
         {
             Tab hit = me.View is Tab ? (Tab)me.View : null;
 

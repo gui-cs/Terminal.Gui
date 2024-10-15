@@ -185,7 +185,7 @@ public class ColorPicker16 : View
     {
         // if (CanFocus)
         {
-            Cursor = new (me.MouseEvent.Position.X / _boxWidth, me.MouseEvent.Position.Y / _boxHeight);
+            Cursor = new (me.Position.X / _boxWidth, me.Position.Y / _boxHeight);
             SetFocus ();
             me.Handled = true;
         }

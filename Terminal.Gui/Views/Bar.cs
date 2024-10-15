@@ -49,23 +49,23 @@ public class Bar : View, IOrientation, IDesignable
     {
         NavigationDirection direction = NavigationDirection.Backward;
 
-        if (e.MouseEvent.Flags == MouseFlags.WheeledDown)
+        if (e.Flags == MouseFlags.WheeledDown)
         {
             e.Handled = true;
         }
 
-        if (e.MouseEvent.Flags == MouseFlags.WheeledUp)
+        if (e.Flags == MouseFlags.WheeledUp)
         {
             direction = NavigationDirection.Forward;
             e.Handled = true;
         }
 
-        if (e.MouseEvent.Flags == MouseFlags.WheeledRight)
+        if (e.Flags == MouseFlags.WheeledRight)
         {
             e.Handled = true;
         }
 
-        if (e.MouseEvent.Flags == MouseFlags.WheeledLeft)
+        if (e.Flags == MouseFlags.WheeledLeft)
         {
             direction = NavigationDirection.Forward;
             e.Handled = true;

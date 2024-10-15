@@ -251,18 +251,18 @@ public class Mouse : Scenario
 
         win.MouseEvent += (sender, a) =>
                           {
-                              int i = filterSlider.Options.FindIndex (o => o.Data == a.MouseEvent.Flags);
+                              int i = filterSlider.Options.FindIndex (o => o.Data == a.Flags);
 
                               if (filterSlider.GetSetOptions ().Contains (i))
                               {
-                                  winLogList.Add ($"MouseEvent: ({a.MouseEvent.Position}) - {a.MouseEvent.Flags} {count++}");
+                                  winLogList.Add ($"MouseEvent: ({a.Position}) - {a.Flags} {count++}");
                                   winLog.MoveDown ();
                               }
                           };
 
         win.MouseClick += (sender, a) =>
                           {
-                              winLogList.Add ($"MouseClick: ({a.MouseEvent.Position}) - {a.MouseEvent.Flags} {count++}");
+                              winLogList.Add ($"MouseClick: ({a.Position}) - {a.Flags} {count++}");
                               winLog.MoveDown ();
                           };
 

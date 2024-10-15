@@ -138,7 +138,7 @@ public class TabViewTests (ITestOutputHelper output)
         top.Add (tv);
         Application.Begin (top);
 
-        MouseEvent args;
+        MouseEventArgs args;
 
         // Waving mouse around does not trigger click
         for (var i = 0; i < 100; i++)
@@ -233,7 +233,7 @@ public class TabViewTests (ITestOutputHelper output)
         Application.Begin (top);
 
         // Click the right arrow
-        var args = new MouseEvent { ScreenPosition = new (6, 2), Flags = MouseFlags.Button1Clicked };
+        var args = new MouseEventArgs { ScreenPosition = new (6, 2), Flags = MouseFlags.Button1Clicked };
         Application.RaiseMouseEvent (args);
         Application.Refresh ();
         Assert.Null (clicked);
@@ -324,7 +324,7 @@ public class TabViewTests (ITestOutputHelper output)
         Application.Begin (top);
 
         // Click the right arrow
-        var args = new MouseEvent { ScreenPosition = new (7, 3), Flags = MouseFlags.Button1Clicked };
+        var args = new MouseEventArgs { ScreenPosition = new (7, 3), Flags = MouseFlags.Button1Clicked };
         Application.RaiseMouseEvent (args);
         Application.Refresh ();
         Assert.Null (clicked);

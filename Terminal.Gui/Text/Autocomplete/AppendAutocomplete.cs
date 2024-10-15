@@ -59,7 +59,7 @@ public class AppendAutocomplete : AutocompleteBase
     }
 
     /// <inheritdoc/>
-    public override bool OnMouseEvent (MouseEvent me, bool fromHost = false) { return false; }
+    public override bool OnMouseEvent (MouseEventArgs me, bool fromHost = false) { return false; }
 
     /// <inheritdoc/>
     public override bool ProcessKey (Key a)

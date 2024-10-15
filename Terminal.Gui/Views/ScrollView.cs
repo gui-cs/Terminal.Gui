@@ -406,7 +406,7 @@ public class ScrollView : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEvent me)
+    protected override bool OnMouseEvent (MouseEventArgs me)
     {
         if (!Enabled)
         {

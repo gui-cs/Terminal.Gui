@@ -250,7 +250,7 @@ public class HexView : View, IDesignable
     public event EventHandler<HexViewEditEventArgs> Edited;
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEvent me)
+    protected override bool OnMouseEvent (MouseEventArgs me)
     {
         if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
             && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)

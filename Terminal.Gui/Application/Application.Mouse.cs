@@ -130,7 +130,7 @@ public static partial class Application // Mouse handling
     /// </summary>
     /// <remarks>This method can be used to simulate a mouse event, e.g. in unit tests.</remarks>
     /// <param name="mouseEvent">The mouse event with coordinates relative to the screen.</param>
-    internal static void RaiseMouseEvent (MouseEvent mouseEvent)
+    internal static void RaiseMouseEvent (MouseEventArgs mouseEvent)
     {
         _lastMousePosition = mouseEvent.ScreenPosition;
 
@@ -187,7 +187,7 @@ public static partial class Application // Mouse handling
         }
 
         // Create a view-relative mouse event to send to the view that is under the mouse.
-        MouseEvent? viewMouseEvent;
+        MouseEventArgs? viewMouseEvent;
 
         if (deepestViewUnderMouse is Adornment adornment)
         {
@@ -255,25 +255,25 @@ public static partial class Application // Mouse handling
     }
 
     /// <summary>
-    /// Raised when a mouse event occurs. Can be cancelled by setting <see cref="MouseEvent.Handled"/> to <see langword="true"/>.
+    /// Raised when a mouse event occurs. Can be cancelled by setting <see cref="Terminal.Gui.MouseEventArgs.Handled"/> to <see langword="true"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         <see cref="MouseEvent.ScreenPosition"/> coordinates are screen-relative.
+    ///         <see cref="Terminal.Gui.MouseEventArgs.ScreenPosition"/> coordinates are screen-relative.
     ///     </para>
     ///     <para>
-    ///         <see cref="MouseEvent.View"/> will be the deepest view under the under the mouse.
+    ///         <see cref="Terminal.Gui.MouseEventArgs.View"/> will be the deepest view under the under the mouse.
     ///     </para>
     ///     <para>
-    ///         <see cref="MouseEvent.Position"/> coordinates are view-relative.
+    ///         <see cref="Terminal.Gui.MouseEventArgs.Position"/> coordinates are view-relative.
     ///     </para>
     ///     <para>
     ///         Use this evento to handle mouse events at the application level, before View-specific handling.
     ///     </para>
     /// </remarks>
-    public static event EventHandler<MouseEvent>? MouseEvent;
+    public static event EventHandler<MouseEventArgs>? MouseEvent;
 
-    internal static bool HandleMouseGrab (View? deepestViewUnderMouse, MouseEvent mouseEvent)
+    internal static bool HandleMouseGrab (View? deepestViewUnderMouse, MouseEventArgs mouseEvent)
     {
         if (MouseGrabView is { })
         {
@@ -288,7 +288,7 @@ public static partial class Application // Mouse handling
             // The coordinates are relative to the Bounds of the view that grabbed the mouse.
             Point frameLoc = MouseGrabView.ScreenToViewport (mouseEvent.ScreenPosition);
 
-            var viewRelativeMouseEvent = new MouseEvent
+            var viewRelativeMouseEvent = new MouseEventArgs
             {
                 Position = frameLoc,
                 Flags = mouseEvent.Flags,

@@ -42,10 +42,10 @@ public class ApplicationMouseTests
         bool expectedClicked
     )
     {
-        var mouseEvent = new MouseEvent { ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Pressed };
+        var mouseEvent = new MouseEventArgs { ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Pressed };
         var clicked = false;
 
-        void OnApplicationOnMouseEvent (object s, MouseEvent e)
+        void OnApplicationOnMouseEvent (object s, MouseEventArgs e)
         {
             Assert.Equal (expectedX, e.ScreenPosition.X);
             Assert.Equal (expectedY, e.ScreenPosition.Y);
@@ -116,12 +116,12 @@ public class ApplicationMouseTests
             Height = size.Height
         };
 
-        var mouseEvent = new MouseEvent { ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Clicked };
+        var mouseEvent = new MouseEventArgs { ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Clicked };
 
         view.MouseClick += (s, e) =>
                            {
-                               Assert.Equal (expectedX, e.MouseEvent.Position.X);
-                               Assert.Equal (expectedY, e.MouseEvent.Position.Y);
+                               Assert.Equal (expectedX, e.Position.X);
+                               Assert.Equal (expectedY, e.Position.Y);
                                clicked = true;
                            };
 
@@ -218,12 +218,12 @@ public class ApplicationMouseTests
 
         Application.Top.Add (view);
 
-        var mouseEvent = new MouseEvent { Position = new (clickX, clickY), ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Clicked };
+        var mouseEvent = new MouseEventArgs { Position = new (clickX, clickY), ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Clicked };
 
         view.MouseClick += (s, e) =>
                            {
-                               Assert.Equal (expectedX, e.MouseEvent.Position.X);
-                               Assert.Equal (expectedY, e.MouseEvent.Position.Y);
+                               Assert.Equal (expectedX, e.Position.X);
+                               Assert.Equal (expectedY, e.Position.Y);
                                clicked = true;
                            };
 

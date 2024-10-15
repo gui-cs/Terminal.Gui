@@ -798,7 +798,7 @@ public class TextField : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEvent ev)
+    protected override bool OnMouseEvent (MouseEventArgs ev)
     {
         if (!ev.Flags.HasFlag (MouseFlags.Button1Pressed)
             && !ev.Flags.HasFlag (MouseFlags.ReportMousePosition)
@@ -1645,7 +1645,7 @@ public class TextField : View
         return 0; //offB;
     }
 
-    private int PositionCursor (MouseEvent ev) { return PositionCursor (TextModel.GetColFromX (_text, ScrollOffset, ev.Position.X), false); }
+    private int PositionCursor (MouseEventArgs ev) { return PositionCursor (TextModel.GetColFromX (_text, ScrollOffset, ev.Position.X), false); }
 
     private int PositionCursor (int x, bool getX = true)
     {

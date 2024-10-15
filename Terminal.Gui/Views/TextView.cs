@@ -3274,7 +3274,7 @@ public class TextView : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEvent ev)
+    protected override bool OnMouseEvent (MouseEventArgs ev)
     {
         if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked)
             && !ev.Flags.HasFlag (MouseFlags.Button1Pressed)
@@ -5875,7 +5875,7 @@ public class TextView : View
         KillWordForward ();
     }
 
-    private void ProcessMouseClick (MouseEvent ev, out List<Cell> line)
+    private void ProcessMouseClick (MouseEventArgs ev, out List<Cell> line)
     {
         List<Cell>? r = null;
 

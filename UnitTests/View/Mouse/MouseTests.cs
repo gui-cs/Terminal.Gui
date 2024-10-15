@@ -121,9 +121,9 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     {
         MouseFlags mouseFlagsFromEvent = MouseFlags.None;
         var view = new View ();
-        view.MouseEvent += (s, e) => mouseFlagsFromEvent = e.MouseEvent.Flags;
+        view.MouseEvent += (s, e) => mouseFlagsFromEvent = e.Flags;
 
-        view.NewMouseEvent (new MouseEvent () { Flags = mouseFlags });
+        view.NewMouseEvent (new MouseEventArgs () { Flags = mouseFlags });
         Assert.Equal (mouseFlagsFromEvent, expectedMouseFlagsFromEvent);
     }
 
@@ -142,7 +142,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
                                e.Handled = true;
                            };
 
-        MouseEvent me = new ();
+        MouseEventArgs me = new ();
         view.NewMouseEvent (me);
         Assert.True (mouseEventInvoked);
         Assert.True (me.Handled);
@@ -163,7 +163,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         }
 
         view.Enabled = false;
-        var me = new MouseEvent ();
+        var me = new MouseEventArgs ();
         view.NewMouseEvent (me);
         Assert.False (me.Handled);
         view.Dispose ();
@@ -182,7 +182,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         }
 
         view.Enabled = false;
-        var me = new MouseEvent ()
+        var me = new MouseEventArgs ()
         {
             Flags = MouseFlags.Button1Clicked
         };
@@ -198,7 +198,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
     public void WantContinuousButtonPressed_False_Button_Press_Release_DoesNotClick (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
     {
-        var me = new MouseEvent ();
+        var me = new MouseEventArgs ();
 
         var view = new View ()
         {
@@ -241,7 +241,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     [InlineData (MouseFlags.Button4Clicked)]
     public void WantContinuousButtonPressed_True_Button_Clicked_Raises_MouseClick (MouseFlags clicked)
     {
-        var me = new MouseEvent ();
+        var me = new MouseEventArgs ();
 
         var view = new View ()
         {
@@ -269,7 +269,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     [InlineData (MouseFlags.Button4Clicked)]
     public void WantContinuousButtonPressed_True_Button_Clicked_Raises_Selecting (MouseFlags clicked)
     {
-        var me = new MouseEvent ();
+        var me = new MouseEventArgs ();
 
         var view = new View ()
         {
@@ -296,7 +296,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released)]
     public void WantContinuousButtonPressed_True_And_WantMousePositionReports_True_Button_Press_Release_Clicks (MouseFlags pressed, MouseFlags released)
     {
-        var me = new MouseEvent ();
+        var me = new MouseEventArgs ();
 
         var view = new View ()
         {
@@ -328,7 +328,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
     public void WantContinuousButtonPressed_True_And_WantMousePositionReports_True_Button_Press_Release_Clicks_Repeatedly (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
     {
-        var me = new MouseEvent ();
+        var me = new MouseEventArgs ();
 
         var view = new View ()
         {
@@ -368,7 +368,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     [Fact]
     public void WantContinuousButtonPressed_True_And_WantMousePositionReports_True_Move_InViewport_OutOfViewport_Keeps_Counting ()
     {
-        var me = new MouseEvent ();
+        var me = new MouseEventArgs ();
 
         var view = new View ()
         {

@@ -1178,7 +1178,7 @@ public class TextFieldTests (ITestOutputHelper output)
         top.Add (tf);
         Application.Begin (top);
 
-        var mouseEvent = new MouseEvent { Flags = MouseFlags.Button1Clicked, View = tf };
+        var mouseEvent = new MouseEventArgs { Flags = MouseFlags.Button1Clicked, View = tf };
 
         Application.RaiseMouseEvent (mouseEvent);
         Assert.Equal (1, clickCounter);
@@ -1205,7 +1205,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         return;
 
-        void HandleRightClick (object sender, MouseEvent arg)
+        void HandleRightClick (object sender, MouseEventArgs arg)
         {
             if (arg.Flags.HasFlag (MouseFlags.Button3Clicked))
             {
@@ -1293,7 +1293,7 @@ public class TextFieldTests (ITestOutputHelper output)
     {
         var tf = new TextField { Width = 10, Text = " " };
 
-        var ev = new MouseEvent { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked };
+        var ev = new MouseEventArgs { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked };
 
         tf.NewMouseEvent (ev);
         Assert.Equal (1, tf.SelectedLength);

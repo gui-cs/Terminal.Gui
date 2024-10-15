@@ -8,7 +8,7 @@ namespace UICatalog.Scenarios;
 
 public interface ITool
 {
-    void OnMouseEvent (DrawingArea area, MouseEvent mouseEvent);
+    void OnMouseEvent (DrawingArea area, MouseEventArgs mouseEvent);
 }
 
 internal class DrawLineTool : ITool
@@ -17,7 +17,7 @@ internal class DrawLineTool : ITool
     public LineStyle LineStyle { get; set; } = LineStyle.Single;
 
     /// <inheritdoc/>
-    public void OnMouseEvent (DrawingArea area, MouseEvent mouseEvent)
+    public void OnMouseEvent (DrawingArea area, MouseEventArgs mouseEvent)
     {
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
@@ -323,7 +323,7 @@ public class DrawingArea : View
         return false;
     }
 
-    protected override bool OnMouseEvent (MouseEvent mouseEvent)
+    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
     {
         CurrentTool.OnMouseEvent (this, mouseEvent);
 
@@ -431,7 +431,7 @@ public class AttributeView : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEvent mouseEvent)
+    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
     {
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
