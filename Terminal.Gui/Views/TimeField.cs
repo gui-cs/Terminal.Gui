@@ -225,7 +225,7 @@ public class TimeField : TextField
             newPoint = 1;
         }
 
-        //if (newPoint != point)
+        if (newPoint != point)
         {
             CursorPosition = newPoint;
         }
