@@ -459,7 +459,7 @@ public class TextField : View
     ///     Indicates whatever the text was changed or not. <see langword="true"/> if the text was changed
     ///     <see langword="false"/> otherwise.
     /// </summary>
-    public bool IsDirty => _historyText.IsDirty (Text);
+    public bool IsDirty => _historyText.IsDirty ([Cell.StringToCells (Text)]);
 
     /// <summary>If set to true its not allow any changes in the text.</summary>
     public bool ReadOnly { get; set; }
@@ -541,12 +541,12 @@ public class TextField : View
             if (!Secret && !_historyText.IsFromHistory)
             {
                 _historyText.Add (
-                                  new() { TextModel.ToRuneCellList (oldText) },
+                                  new () { Cell.ToCellList (oldText) },
                                   new (_cursorPosition, 0)
                                  );
 
                 _historyText.Add (
-                                  new() { TextModel.ToRuneCells (_text) },
+                                  new () { Cell.ToCells (_text) },
                                   new (_cursorPosition, 0),
                                   HistoryText.LineStatus.Replaced
                                  );
@@ -589,7 +589,7 @@ public class TextField : View
     }
 
     /// <summary>Allows clearing the <see cref="HistoryText.HistoryTextItemEventArgs"/> items updating the original text.</summary>
-    public void ClearHistoryChanges () { _historyText.Clear (Text); }
+    public void ClearHistoryChanges () { _historyText.Clear ([Cell.StringToCells (Text)]); }
 
     /// <summary>Copy the selected text to the clipboard.</summary>
     public virtual void Copy ()
@@ -643,7 +643,7 @@ public class TextField : View
         }
 
         _historyText.Add (
-                          new() { TextModel.ToRuneCells (_text) },
+                          new () { Cell.ToCells (_text) },
                           new (_cursorPosition, 0)
                          );
 
@@ -697,7 +697,7 @@ public class TextField : View
         }
 
         _historyText.Add (
-                          new() { TextModel.ToRuneCells (_text) },
+                          new () { Cell.ToCells (_text) },
                           new (_cursorPosition, 0)
                          );
 
@@ -798,16 +798,15 @@ public class TextField : View
     }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent (MouseEvent ev)
+    protected override bool OnMouseEvent (MouseEventArgs ev)
     {
-        if (!ev.Flags.HasFlag (MouseFlags.Button1Pressed)
+        if (ev is { IsPressed: false, IsReleased: false }
             && !ev.Flags.HasFlag (MouseFlags.ReportMousePosition)
-            && !ev.Flags.HasFlag (MouseFlags.Button1Released)
             && !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
             && !ev.Flags.HasFlag (MouseFlags.Button1TripleClicked)
             && !ev.Flags.HasFlag (ContextMenu.MouseFlags))
         {
-            return base.OnMouseEvent (ev);
+            return false;
         }
 
         if (!CanFocus)
@@ -944,7 +943,7 @@ public class TextField : View
 
         int p = ScrollOffset;
         var col = 0;
-        int width = Frame.Width + OffSetBackground ();
+        int width = Viewport.Width + OffSetBackground ();
         int tcount = _text.Count;
         Attribute roc = GetReadOnlyColor ();
 
@@ -1014,18 +1013,6 @@ public class TextField : View
     }
 
     /// <inheritdoc/>
-    public override bool? OnInvokingKeyBindings (Key a, KeyBindingScope scope)
-    {
-        // Give autocomplete first opportunity to respond to key presses
-        if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (a))
-        {
-            return true;
-        }
-
-        return base.OnInvokingKeyBindings (a, scope);
-    }
-
-    /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View previousFocusedView, View view)
     {
         if (Application.MouseGrabView is { } && Application.MouseGrabView == this)
@@ -1037,25 +1024,20 @@ public class TextField : View
         //	ClearAllSelection ();
     }
 
-    /// TODO: Flush out these docs
-    /// <summary>
-    ///     Processes key presses for the <see cref="TextField"/>.
-    ///     <remarks>
-    ///         The <see cref="TextField"/> control responds to the following keys:
-    ///         <list type="table">
-    ///             <listheader>
-    ///                 <term>Keys</term> <description>Function</description>
-    ///             </listheader>
-    ///             <item>
-    ///                 <term><see cref="Key.Delete"/>, <see cref="Key.Backspace"/></term>
-    ///                 <description>Deletes the character before cursor.</description>
-    ///             </item>
-    ///         </list>
-    ///     </remarks>
-    /// </summary>
-    /// <param name="a"></param>
-    /// <returns></returns>
-    public override bool OnProcessKeyDown (Key a)
+    /// <inheritdoc/>
+    protected override bool OnKeyDown (Key key)
+    {
+        // Give autocomplete first opportunity to respond to key presses
+        if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (key))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected override bool OnKeyDownNotHandled (Key a)
     {
         // Remember the cursor position because the new calculated cursor position is needed
         // to be set BEFORE the TextChanged event is triggered.
@@ -1130,10 +1112,10 @@ public class TextField : View
             }
 
             int cols = _text [idx].GetColumns ();
-            TextModel.SetCol (ref col, Frame.Width - 1, cols);
+            TextModel.SetCol (ref col, Viewport.Width - 1, cols);
         }
 
-        int pos = _cursorPosition - ScrollOffset + Math.Min (Frame.X, 0);
+        int pos = _cursorPosition - ScrollOffset + Math.Min (Viewport.X, 0);
         Move (pos, 0);
 
         return new Point (pos, 0);
@@ -1216,16 +1198,16 @@ public class TextField : View
             ScrollOffset = _cursorPosition;
             need = true;
         }
-        else if (Frame.Width > 0
-                 && (ScrollOffset + _cursorPosition - (Frame.Width + offB) == 0
-                     || TextModel.DisplaySize (_text, ScrollOffset, _cursorPosition).size >= Frame.Width + offB))
+        else if (Viewport.Width > 0
+                 && (ScrollOffset + _cursorPosition - (Viewport.Width + offB) == 0
+                     || TextModel.DisplaySize (_text, ScrollOffset, _cursorPosition).size >= Viewport.Width + offB))
         {
             ScrollOffset = Math.Max (
                                      TextModel.CalculateLeftColumn (
                                                                     _text,
                                                                     ScrollOffset,
                                                                     _cursorPosition,
-                                                                    Frame.Width + offB
+                                                                    Viewport.Width + offB
                                                                    ),
                                      0
                                     );
@@ -1330,7 +1312,7 @@ public class TextField : View
 
     private void GenerateSuggestions ()
     {
-        List<RuneCell> currentLine = TextModel.ToRuneCellList (Text);
+        List<Cell> currentLine = Cell.ToCellList (Text);
         int cursorPosition = Math.Min (CursorPosition, currentLine.Count);
 
         Autocomplete.Context = new (
@@ -1378,7 +1360,7 @@ public class TextField : View
             return;
         }
 
-        Text = TextModel.ToString (obj?.Lines [obj.CursorPosition.Y]);
+        Text = Cell.ToString (obj?.Lines [obj.CursorPosition.Y]);
         CursorPosition = obj.CursorPosition.X;
         Adjust ();
     }
@@ -1386,7 +1368,7 @@ public class TextField : View
     private void InsertText (Key a, bool usePreTextChangedCursorPos)
     {
         _historyText.Add (
-                          new() { TextModel.ToRuneCells (_text) },
+                          new () { Cell.ToCells (_text) },
                           new (_cursorPosition, 0)
                          );
 
@@ -1519,18 +1501,28 @@ public class TextField : View
         }
     }
 
+    /// <summary>
+    /// Moves the cursor +/- the given <paramref name="distance"/>, clearing
+    /// any selection and returning true if any meaningful changes were made.
+    /// </summary>
+    /// <param name="distance">Distance to move the cursor, will be clamped to
+    /// text length. Positive for right, Negative for left.</param>
+    /// <returns></returns>
+    private bool Move (int distance)
+    {
+        var oldCursorPosition = _cursorPosition;
+        var hadSelection = _selectedText != null && _selectedText.Length > 0;
+
+        _cursorPosition = Math.Min (_text.Count, Math.Max (0, _cursorPosition + distance));
+        ClearAllSelection ();
+        Adjust ();
+
+        return _cursorPosition != oldCursorPosition || hadSelection;
+    }
+
     private bool MoveLeft ()
     {
-        if (_cursorPosition > 0)
-        {
-            ClearAllSelection ();
-            _cursorPosition--;
-            Adjust ();
-
-            return true;
-        }
-
-        return false;
+        return Move (-1);
     }
 
     private void MoveLeftExtend ()
@@ -1543,17 +1535,7 @@ public class TextField : View
 
     private bool MoveRight ()
     {
-        if (_cursorPosition == _text.Count)
-        {
-            return false;
-        }
-
-        ClearAllSelection ();
-
-        _cursorPosition++;
-        Adjust ();
-
-        return true;
+        return Move (1);
     }
 
     private void MoveRightExtend ()
@@ -1662,7 +1644,7 @@ public class TextField : View
         return 0; //offB;
     }
 
-    private int PositionCursor (MouseEvent ev) { return PositionCursor (TextModel.GetColFromX (_text, ScrollOffset, ev.Position.X), false); }
+    private int PositionCursor (MouseEventArgs ev) { return PositionCursor (TextModel.GetColFromX (_text, ScrollOffset, ev.Position.X), false); }
 
     private int PositionCursor (int x, bool getX = true)
     {

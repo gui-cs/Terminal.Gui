@@ -110,7 +110,7 @@ internal abstract class ColorBar : View, IColorBar
     public event EventHandler<EventArgs<int>>? ValueChanged;
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
+    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
     {
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
@@ -123,10 +123,9 @@ internal abstract class ColorBar : View, IColorBar
             mouseEvent.Handled = true;
             SetFocus ();
 
-            return true;
         }
 
-        return base.OnMouseEvent (mouseEvent);
+        return mouseEvent.Handled;
     }
 
     /// <summary>

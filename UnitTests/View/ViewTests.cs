@@ -870,10 +870,10 @@ At 0,0
     {
         var r = new View ();
 
-        Assert.False (r.OnKeyDown (new () { KeyCode = KeyCode.Null }));
+        Assert.False (r.NewKeyDownEvent (Key.Empty));
 
         //Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
-        Assert.False (r.OnKeyUp (new () { KeyCode = KeyCode.Null }));
+        Assert.False (r.NewKeyUpEvent (Key.Empty));
         Assert.False (r.NewMouseEvent (new () { Flags = MouseFlags.AllEvents }));
 
         r.Dispose ();
@@ -1132,7 +1132,7 @@ At 0,0
             ClearNeedsDisplay ();
         }
 
-        public override bool OnKeyDown (Key keyEvent)
+        protected override bool OnKeyDown (Key keyEvent)
         {
             IsKeyDown = true;
 
@@ -1146,7 +1146,7 @@ At 0,0
             return true;
         }
 
-        public override bool OnProcessKeyDown (Key keyEvent)
+        protected override bool OnKeyDownNotHandled (Key keyEvent)
         {
             IsKeyPress = true;
 

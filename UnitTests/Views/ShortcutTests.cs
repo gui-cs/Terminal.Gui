@@ -424,7 +424,7 @@ public class ShortcutTests
         var accepted = 0;
         shortcut.Accepting += (s, e) => accepted++;
 
-        Application.OnMouseEvent (
+        Application.RaiseMouseEvent (
                                   new ()
                                   {
                                       ScreenPosition = new (x, 0),
@@ -484,7 +484,7 @@ public class ShortcutTests
         Application.Top.SetRelativeLayout (new (100, 100));
         Application.Top.LayoutSubviews ();
 
-        Application.OnMouseEvent (
+        Application.RaiseMouseEvent (
                                   new ()
                                   {
                                       ScreenPosition = new (mouseX, 0),
@@ -541,7 +541,7 @@ public class ShortcutTests
         var accepted = 0;
         shortcut.Accepting += (s, e) => { accepted++; };
 
-        Application.OnMouseEvent (
+        Application.RaiseMouseEvent (
                                   new ()
                                   {
                                       ScreenPosition = new (mouseX, 0),
@@ -616,7 +616,7 @@ public class ShortcutTests
                                  e.Cancel = true;
                              };
 
-        Application.OnMouseEvent (
+        Application.RaiseMouseEvent (
                                   new ()
                                   {
                                       ScreenPosition = new (mouseX, 0),
@@ -667,7 +667,7 @@ public class ShortcutTests
         var selected = 0;
         shortcut.Selecting += (s, e) => selected++;
 
-        Application.OnKeyDown (key);
+        Application.RaiseKeyDownEvent (key);
 
         Assert.Equal (expectedAccept, accepted);
         Assert.Equal (expectedSelect, selected);
@@ -719,7 +719,7 @@ public class ShortcutTests
         var selected = 0;
         shortcut.Selecting += (s, e) => selected++;
 
-        Application.OnKeyDown (key);
+        Application.RaiseKeyDownEvent (key);
 
         Assert.Equal (expectedAccept, accepted);
         Assert.Equal (expectedSelect, selected);
@@ -751,7 +751,7 @@ public class ShortcutTests
         var accepted = 0;
         shortcut.Accepting += (s, e) => accepted++;
 
-        Application.OnKeyDown (key);
+        Application.RaiseKeyDownEvent (key);
 
         Assert.Equal (expectedAccept, accepted);
 
@@ -792,7 +792,7 @@ public class ShortcutTests
         var action = 0;
         shortcut.Action += () => action++;
 
-        Application.OnKeyDown (key);
+        Application.RaiseKeyDownEvent (key);
 
         Assert.Equal (expectedAction, action);
 
@@ -831,7 +831,7 @@ public class ShortcutTests
         var action = 0;
         shortcut.Action += () => action++;
 
-        Application.OnKeyDown (key);
+        Application.RaiseKeyDownEvent (key);
 
         Assert.Equal (expectedAction, action);
 

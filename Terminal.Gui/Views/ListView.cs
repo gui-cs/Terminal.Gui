@@ -147,7 +147,7 @@ public class ListView : View, IDesignable
 
                                         if (OnOpenSelectedItem ())
                                         {
-                                                return true;
+                                            return true;
                                         }
 
                                         return false;
@@ -189,6 +189,7 @@ public class ListView : View, IDesignable
                                         return !SetFocus ();
                                     });
 
+        AddCommand (Command.SelectAll, (ctx) => MarkAll((bool)ctx.KeyBinding?.Context!));
 
         // Default keybindings for all ListViews
         KeyBindings.Add (Key.CursorUp, Command.Up);
@@ -205,6 +206,13 @@ public class ListView : View, IDesignable
         KeyBindings.Add (Key.Home, Command.Start);
 
         KeyBindings.Add (Key.End, Command.End);
+
+        // Key.Space is already bound to Command.Select; this gives us select then move down
+        KeyBindings.Add (Key.Space.WithShift, [Command.Select, Command.Down]);
+
+        // Use the form of Add that lets us pass context to the handler
+        KeyBindings.Add (Key.A.WithCtrl, new KeyBinding ([Command.SelectAll], KeyBindingScope.Focused, true));
+        KeyBindings.Add (Key.U.WithCtrl, new KeyBinding ([Command.SelectAll], KeyBindingScope.Focused, false));
     }
 
     /// <summary>Gets or sets whether this <see cref="ListView"/> allows items to be marked.</summary>
@@ -372,6 +380,31 @@ public class ListView : View, IDesignable
 
     /// <summary>
     ///     If <see cref="AllowsMarking"/> and <see cref="AllowsMultipleSelection"/> are both <see langword="true"/>,
+    ///     marks all items.
+    /// </summary>
+    /// <param name="mark"><see langword="true"/> marks all items; otherwise unmarks all items.</param>
+    /// <returns><see langword="true"/> if marking was successful.</returns>
+    public bool MarkAll (bool mark)
+    {
+        if (!_allowsMarking)
+        {
+            return false;
+        }
+
+        if (AllowsMultipleSelection)
+        {
+            for (var i = 0; i < Source.Count; i++)
+            {
+                Source.SetMark (i, mark);
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    ///     If <see cref="AllowsMarking"/> and <see cref="AllowsMultipleSelection"/> are both <see langword="true"/>,
     ///     unmarks all marked items other than <see cref="SelectedItem"/>.
     /// </summary>
     /// <returns><see langword="true"/> if unmarking was successful.</returns>
@@ -439,7 +472,7 @@ public class ListView : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent (MouseEvent me)
+    protected override bool OnMouseEvent (MouseEventArgs me)
     {
         if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
             && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
@@ -784,7 +817,6 @@ public class ListView : View, IDesignable
         }
     }
 
-    // TODO: This should be cancelable
     /// <summary>Invokes the <see cref="OpenSelectedItem"/> event if it is defined.</summary>
     /// <returns><see langword="true"/> if the <see cref="OpenSelectedItem"/> event was fired.</returns>
     public bool OnOpenSelectedItem ()
@@ -803,8 +835,28 @@ public class ListView : View, IDesignable
     }
 
     /// <inheritdoc/>
-    public override bool OnProcessKeyDown (Key a)
+    protected override bool OnKeyDown (Key a)
     {
+        // If marking is enabled and the user presses the space key don't let CollectionNavigator
+        // at it
+        if (AllowsMarking)
+        {
+            var keys = KeyBindings.GetKeysFromCommands (Command.Select);
+
+            if (keys.Contains (a))
+            {
+                return false;
+            }
+
+            keys = KeyBindings.GetKeysFromCommands ([Command.Select, Command.Down]);
+
+            if (keys.Contains (a))
+            {
+                return false;
+            }
+
+        }
+
         // Enable user to find & select an item by typing text
         if (CollectionNavigatorBase.IsCompatibleKey (a))
         {

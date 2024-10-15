@@ -243,7 +243,7 @@ public class MenuBarTests (ITestOutputHelper output)
         top.Add (menu, btn);
         Application.Begin (top);
 
-        Application.OnMouseEvent (new () { ScreenPosition = new (0, 4), Flags = MouseFlags.Button1Clicked });
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (0, 4), Flags = MouseFlags.Button1Clicked });
         Assert.True (btnClicked);
         top.Dispose ();
     }
@@ -613,7 +613,7 @@ public class MenuBarTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        Application.OnMouseEvent (new () { ScreenPosition = new (20, 5), Flags = MouseFlags.Button1Clicked });
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (20, 5), Flags = MouseFlags.Button1Clicked });
 
         firstIteration = false;
 
@@ -646,7 +646,7 @@ public class MenuBarTests (ITestOutputHelper output)
         {
             menu.OpenMenu ();
 
-            Application.OnMouseEvent (new () { ScreenPosition = new (20, 5 + i), Flags = MouseFlags.Button1Clicked });
+            Application.RaiseMouseEvent (new () { ScreenPosition = new (20, 5 + i), Flags = MouseFlags.Button1Clicked });
 
             firstIteration = false;
             Application.RunIteration (ref rsDialog, ref firstIteration);
@@ -809,7 +809,7 @@ public class MenuBarTests (ITestOutputHelper output)
                                                       output
                                                      );
 
-        Application.OnMouseEvent (new () { ScreenPosition = new (20, 5), Flags = MouseFlags.Button1Clicked });
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (20, 5), Flags = MouseFlags.Button1Clicked });
 
         firstIteration = false;
 
@@ -831,7 +831,7 @@ public class MenuBarTests (ITestOutputHelper output)
         {
             menu.OpenMenu ();
 
-            Application.OnMouseEvent (new () { ScreenPosition = new (20, 5 + i), Flags = MouseFlags.Button1Clicked });
+            Application.RaiseMouseEvent (new () { ScreenPosition = new (20, 5 + i), Flags = MouseFlags.Button1Clicked });
 
             firstIteration = false;
             Application.RunIteration (ref rs, ref firstIteration);
@@ -1384,7 +1384,7 @@ wo
 
         foreach (Key key in keys)
         {
-            top.NewKeyDownEvent (new (key));
+            top.NewKeyDownEvent (key);
             Application.MainLoop.RunIteration ();
         }
 
@@ -2666,7 +2666,7 @@ Edit
         top.Draw ();
         TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
 
-        Assert.True (Application.OnKeyDown (menu.Key));
+        Assert.True (Application.RaiseKeyDownEvent (menu.Key));
         Assert.False (menu.IsMenuOpen);
         Assert.True (tf.HasFocus);
         top.Draw ();
@@ -2949,7 +2949,7 @@ Edit
         top.Add (menu);
         Application.Begin (top);
 
-        Application.OnKeyDown (Key.S.WithCtrl);
+        Application.RaiseKeyDownEvent (Key.S.WithCtrl);
         Application.MainLoop.RunIteration ();
 
         Assert.True (saveAction);

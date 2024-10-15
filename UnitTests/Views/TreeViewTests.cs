@@ -438,7 +438,7 @@ public class TreeViewTests
         Assert.False (called);
 
         // double click triggers activation
-        tree.NewMouseEvent (new MouseEvent { Flags = MouseFlags.Button1DoubleClicked });
+        tree.NewMouseEvent (new MouseEventArgs { Flags = MouseFlags.Button1DoubleClicked });
 
         Assert.True (called);
         Assert.Same (f, activated);
@@ -467,12 +467,12 @@ public class TreeViewTests
         Assert.False (called);
 
         // double click does nothing because we changed button binding to right click
-        tree.NewMouseEvent (new MouseEvent { Position = new (0, 1), Flags = MouseFlags.Button1DoubleClicked });
+        tree.NewMouseEvent (new MouseEventArgs { Position = new (0, 1), Flags = MouseFlags.Button1DoubleClicked });
 
         Assert.Null (activated);
         Assert.False (called);
 
-        tree.NewMouseEvent (new MouseEvent { Position = new (0, 1), Flags = MouseFlags.Button2Clicked });
+        tree.NewMouseEvent (new MouseEventArgs { Position = new (0, 1), Flags = MouseFlags.Button2Clicked });
 
         Assert.True (called);
         Assert.Same (car1, activated);
@@ -506,7 +506,7 @@ public class TreeViewTests
 
 
         // double click does nothing because we changed button to null
-        tree.NewMouseEvent (new MouseEvent { Flags = MouseFlags.Button1DoubleClicked });
+        tree.NewMouseEvent (new MouseEventArgs { Flags = MouseFlags.Button1DoubleClicked });
 
         Assert.False (called);
         Assert.Null (activated);
@@ -970,10 +970,10 @@ public class TreeViewTests
         Assert.All (eventArgs, ea => Assert.Equal (ea.Tree, tv));
         Assert.All (eventArgs, ea => Assert.False (ea.Handled));
 
-        Assert.Equal ("├-root one", eventArgs [0].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("│ ├─leaf 1", eventArgs [1].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("│ └─leaf 2", eventArgs [2].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("└─root two", eventArgs [3].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("├-root one", eventArgs [0].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("│ ├─leaf 1", eventArgs [1].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("│ └─leaf 2", eventArgs [2].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("└─root two", eventArgs [3].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
 
         Assert.Equal (1, eventArgs [0].IndexOfExpandCollapseSymbol);
         Assert.Equal (3, eventArgs [1].IndexOfExpandCollapseSymbol);
@@ -1083,9 +1083,9 @@ oot two
         Assert.All (eventArgs, ea => Assert.Equal (ea.Tree, tv));
         Assert.All (eventArgs, ea => Assert.False (ea.Handled));
 
-        Assert.Equal ("─leaf 1", eventArgs [0].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("─leaf 2", eventArgs [1].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("oot two", eventArgs [2].RuneCells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("─leaf 1", eventArgs [0].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("─leaf 2", eventArgs [1].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("oot two", eventArgs [2].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
 
         Assert.Equal (0, eventArgs [0].IndexOfExpandCollapseSymbol);
         Assert.Equal (0, eventArgs [1].IndexOfExpandCollapseSymbol);

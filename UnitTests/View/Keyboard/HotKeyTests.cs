@@ -95,7 +95,7 @@ public class HotKeyTests
     {
         var view = new View ();
         view.KeyBindings.Add (Key.A, Command.HotKey); // implies KeyBindingScope.Focused - so this should not be invoked
-        view.InvokingKeyBindings += (s, e) => { Assert.Fail (); };
+        view.KeyDownNotHandled += (s, e) => { Assert.Fail (); };
 
         var superView = new View ();
         superView.Add (view);
@@ -109,8 +109,11 @@ public class HotKeyTests
     {
         var view = new View ();
         view.KeyBindings.Add (Key.A, KeyBindingScope.HotKey, Command.HotKey);
-        bool invoked = false;
-        view.InvokingKeyBindings += (s, e) => { invoked = true; };
+        bool hotKeyInvoked = false;
+        view.HandlingHotKey += (s, e) => { hotKeyInvoked = true; };
+
+        bool notHandled = false;
+        view.KeyDownNotHandled += (s, e) => { notHandled = true; };
 
         var superView = new View ();
         superView.Add (view);
@@ -118,7 +121,8 @@ public class HotKeyTests
         var ke = Key.A;
         superView.NewKeyDownEvent (ke);
 
-        Assert.True (invoked);
+        Assert.False (notHandled);
+        Assert.True (hotKeyInvoked);
     }
 
 
@@ -362,20 +366,20 @@ public class HotKeyTests
         view.Selecting += (s, e) => selectRaised = true;
 
         Assert.Equal (KeyCode.T, view.HotKey);
-        Assert.True (Application.OnKeyDown (Key.T)); 
+        Assert.True (Application.RaiseKeyDownEvent (Key.T)); 
         Assert.True (hotKeyRaised);
         Assert.False (acceptRaised);
         Assert.False (selectRaised);
 
         hotKeyRaised = false;
-        Assert.True (Application.OnKeyDown (Key.T.WithAlt));
+        Assert.True (Application.RaiseKeyDownEvent (Key.T.WithAlt));
         Assert.True (hotKeyRaised);
         Assert.False (acceptRaised);
         Assert.False (selectRaised);
 
         hotKeyRaised = false;
         view.HotKey = KeyCode.E;
-        Assert.True (Application.OnKeyDown (Key.E.WithAlt));
+        Assert.True (Application.RaiseKeyDownEvent (Key.E.WithAlt));
         Assert.True (hotKeyRaised);
         Assert.False (acceptRaised);
         Assert.False (selectRaised);

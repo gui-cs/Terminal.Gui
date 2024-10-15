@@ -52,30 +52,30 @@ public class ContentScrolling : Scenario
             MouseEvent += VirtualDemoView_MouseEvent;
         }
 
-        private void VirtualDemoView_MouseEvent (object sender, MouseEventEventArgs e)
+        private void VirtualDemoView_MouseEvent (object sender, MouseEventArgs e)
         {
-            if (e.MouseEvent.Flags == MouseFlags.WheeledDown)
+            if (e.Flags == MouseFlags.WheeledDown)
             {
                 ScrollVertical (1);
 
                 return;
             }
 
-            if (e.MouseEvent.Flags == MouseFlags.WheeledUp)
+            if (e.Flags == MouseFlags.WheeledUp)
             {
                 ScrollVertical (-1);
 
                 return;
             }
 
-            if (e.MouseEvent.Flags == MouseFlags.WheeledRight)
+            if (e.Flags == MouseFlags.WheeledRight)
             {
                 ScrollHorizontal (1);
 
                 return;
             }
 
-            if (e.MouseEvent.Flags == MouseFlags.WheeledLeft)
+            if (e.Flags == MouseFlags.WheeledLeft)
             {
                 ScrollHorizontal (-1);
             }

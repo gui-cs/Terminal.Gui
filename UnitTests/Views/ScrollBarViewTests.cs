@@ -1176,7 +1176,7 @@ This is a test             ",
                                                       _output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { Position = new (15, 0), Flags = MouseFlags.Button1Clicked });
+        Application.RaiseMouseEvent (new MouseEventArgs { Position = new (15, 0), Flags = MouseFlags.Button1Clicked });
 
         Assert.Null (Application.MouseGrabView);
         Assert.True (clicked);
@@ -1200,7 +1200,7 @@ This is a test             ",
                                                       _output
                                                      );
 
-        Application.OnMouseEvent (new MouseEvent { Position = new (15, 0), Flags = MouseFlags.Button1Clicked });
+        Application.RaiseMouseEvent (new MouseEventArgs { Position = new (15, 0), Flags = MouseFlags.Button1Clicked });
 
         Assert.Null (Application.MouseGrabView);
         Assert.True (clicked);

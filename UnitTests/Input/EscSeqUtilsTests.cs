@@ -696,7 +696,7 @@ public class EscSeqUtilsTests
         top.Add (view);
         Application.Begin (top);
 
-        Application.OnMouseEvent (new() { Position = new (0, 0), Flags = 0 });
+        Application.RaiseMouseEvent (new() { Position = new (0, 0), Flags = 0 });
 
         ClearAll ();
 
@@ -753,7 +753,7 @@ public class EscSeqUtilsTests
                                          // set Application.WantContinuousButtonPressedView to null
                                          view.WantContinuousButtonPressed = false;
 
-                                         Application.OnMouseEvent (new() { Position = new (0, 0), Flags = 0 });
+                                         Application.RaiseMouseEvent (new() { Position = new (0, 0), Flags = 0 });
 
                                          Application.RequestStop ();
                                      }

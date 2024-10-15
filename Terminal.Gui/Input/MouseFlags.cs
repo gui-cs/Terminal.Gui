@@ -1,12 +1,12 @@
 namespace Terminal.Gui;
 
-/// <summary>Mouse flags reported in <see cref="MouseEvent"/>.</summary>
+/// <summary>Mouse flags reported in <see cref="MouseEventArgs"/>.</summary>
 /// <remarks>They just happen to map to the ncurses ones.</remarks>
 [Flags]
 public enum MouseFlags
 {
     /// <summary>
-    ///    No mouse event. This is the default value for <see cref="MouseEvent.Flags"/> when no mouse event is being reported.
+    ///    No mouse event. This is the default value for <see cref="Terminal.Gui.MouseEventArgs.Flags"/> when no mouse event is being reported.
     /// </summary>
     None = 0,
 
@@ -96,51 +96,4 @@ public enum MouseFlags
 
     /// <summary>Mask that captures all the events.</summary>
     AllEvents = 0x7ffffff
-}
-
-// TODO: Merge MouseEvent and MouseEventEventArgs into a single class.
-
-/// <summary>
-///     Conveys the details of mouse events, such as coordinates and button state, from
-///     ConsoleDrivers up to <see cref="Application"/> and Views.
-/// </summary>
-/// <remarks>
-///     The <see cref="Application"/> class includes the <see cref="Application.MouseEvent"/> event which takes a
-///     MouseEvent argument.
-/// </remarks>
-public class MouseEvent
-{
-    /// <summary>Flags indicating the kind of mouse event that is being posted.</summary>
-    public MouseFlags Flags { get; set; }
-
-    /// <summary>The View at the location for the mouse event.</summary>
-    public View View { get; set; }
-
-    /// <summary>The position of the mouse in <see cref="Gui.View.Viewport"/>-relative coordinates.</summary>
-    public Point Position { get; set; }
-
-    /// <summary>
-    ///     The screen-relative mouse position.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         <see cref="Position"/> is <see cref="Gui.View.Viewport"/>-relative. When the mouse is grabbed by a view,
-    ///         <see cref="ScreenPosition"/> provides the mouse position screen-relative coordinates, enabling the grabbed view to know how much the
-    ///         mouse has moved.
-    ///     </para>
-    ///     <para>
-    ///         Calculated and processed in <see cref="Application.OnMouseEvent(MouseEvent)"/>.
-    ///     </para>
-    /// </remarks>
-    public Point ScreenPosition { get; set; }
-
-    /// <summary>
-    ///     Indicates if the current mouse event has been processed. Set this value to <see langword="true"/> to indicate the mouse
-    ///     event was handled.
-    /// </summary>
-    public bool Handled { get; set; }
-
-    /// <summary>Returns a <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</summary>
-    /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</returns>
-    public override string ToString () { return $"({Position}):{Flags}"; }
 }

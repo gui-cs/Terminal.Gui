@@ -111,7 +111,7 @@ public class TreeTableSourceTests : IDisposable
         Assert.Equal (0, tv.SelectedRow);
         Assert.Equal (0, tv.SelectedColumn);
 
-        Assert.True (tv.NewMouseEvent (new MouseEvent { Position = new (2, 2), Flags = MouseFlags.Button1Clicked }));
+        Assert.True (tv.NewMouseEvent (new MouseEventArgs { Position = new (2, 2), Flags = MouseFlags.Button1Clicked }));
 
         tv.Draw ();
 
@@ -128,15 +128,15 @@ public class TreeTableSourceTests : IDisposable
         TestHelpers.AssertDriverContentsAre (expected, _output);
 
         // Clicking to the right/left of the expand/collapse does nothing
-        tv.NewMouseEvent (new MouseEvent { Position = new (3, 2), Flags = MouseFlags.Button1Clicked });
+        tv.NewMouseEvent (new MouseEventArgs { Position = new (3, 2), Flags = MouseFlags.Button1Clicked });
         tv.Draw ();
         TestHelpers.AssertDriverContentsAre (expected, _output);
-        tv.NewMouseEvent (new MouseEvent { Position = new (1, 2), Flags = MouseFlags.Button1Clicked });
+        tv.NewMouseEvent (new MouseEventArgs { Position = new (1, 2), Flags = MouseFlags.Button1Clicked });
         tv.Draw ();
         TestHelpers.AssertDriverContentsAre (expected, _output);
 
         // Clicking on the + again should collapse
-        tv.NewMouseEvent (new MouseEvent { Position = new (2, 2), Flags = MouseFlags.Button1Clicked });
+        tv.NewMouseEvent (new MouseEventArgs { Position = new (2, 2), Flags = MouseFlags.Button1Clicked });
         tv.Draw ();
 
         expected =
@@ -187,7 +187,7 @@ public class TreeTableSourceTests : IDisposable
         Assert.Equal (0, tv.SelectedRow);
         Assert.Equal (1, tv.SelectedColumn);
 
-        Application.OnKeyDown (Key.CursorRight);
+        Application.RaiseKeyDownEvent (Key.CursorRight);
 
         tv.Draw ();
 

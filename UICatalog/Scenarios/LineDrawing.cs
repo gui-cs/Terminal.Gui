@@ -8,7 +8,7 @@ namespace UICatalog.Scenarios;
 
 public interface ITool
 {
-    void OnMouseEvent (DrawingArea area, MouseEvent mouseEvent);
+    void OnMouseEvent (DrawingArea area, MouseEventArgs mouseEvent);
 }
 
 internal class DrawLineTool : ITool
@@ -17,7 +17,7 @@ internal class DrawLineTool : ITool
     public LineStyle LineStyle { get; set; } = LineStyle.Single;
 
     /// <inheritdoc/>
-    public void OnMouseEvent (DrawingArea area, MouseEvent mouseEvent)
+    public void OnMouseEvent (DrawingArea area, MouseEventArgs mouseEvent)
     {
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
@@ -96,6 +96,8 @@ internal class DrawLineTool : ITool
                 area.SetNeedsDisplay ();
             }
         }
+
+        mouseEvent.Handled = true;
     }
 }
 
@@ -121,7 +123,7 @@ public class LineDrawing : Scenario
         tools.CurrentColor = canvas.GetNormalColor ();
         canvas.CurrentAttribute = tools.CurrentColor;
 
-        win.KeyDown += (s, e) => { e.Handled = canvas.OnKeyDown (e); };
+        win.KeyDown += (s, e) => { e.Handled = canvas.NewKeyDownEvent (e); };
 
         Application.Run (win);
         win.Dispose ();
@@ -135,13 +137,14 @@ public class LineDrawing : Scenario
         var d = new Dialog
         {
             Title = title,
-            Height = 7
+            Width = Application.Force16Colors ? 35 : Dim.Auto (DimAutoStyle.Auto, Dim.Percent (80), Dim.Percent (90)),
+            Height = 10
         };
 
         var btnOk = new Button
         {
             X = Pos.Center () - 5,
-            Y = 4,
+            Y = Application.Force16Colors ? 6 : 4,
             Text = "Ok",
             Width = Dim.Auto (),
             IsDefault = true
@@ -171,21 +174,34 @@ public class LineDrawing : Scenario
         d.Add (btnOk);
         d.Add (btnCancel);
 
-        /* Does not work
         d.AddButton (btnOk);
         d.AddButton (btnCancel);
-        */
-        var cp = new ColorPicker
+
+        View cp;
+        if (Application.Force16Colors)
         {
-            SelectedColor = current,
-            Width = Dim.Fill ()
-        };
+            cp = new ColorPicker16
+            {
+                SelectedColor = current.GetClosestNamedColor16 (),
+                Width = Dim.Fill ()
+            };
+        }
+        else
+        {
+            cp = new ColorPicker
+            {
+                SelectedColor = current,
+                Width = Dim.Fill (),
+                Style = new () { ShowColorName = true, ShowTextFields = true }
+            };
+            ((ColorPicker)cp).ApplyStyleChanges ();
+        }
 
         d.Add (cp);
 
         Application.Run (d);
         d.Dispose ();
-        newColor = cp.SelectedColor;
+        newColor = Application.Force16Colors ? ((ColorPicker16)cp).SelectedColor : ((ColorPicker)cp).SelectedColor;
 
         return accept;
     }
@@ -276,7 +292,7 @@ public class DrawingArea : View
     }
 
     //// BUGBUG: Why is this not handled by a key binding???
-    public override bool OnKeyDown (Key e)
+    protected override bool OnKeyDown (Key e)
     {
         // BUGBUG: These should be implemented with key bindings
         if (e.KeyCode == (KeyCode.Z | KeyCode.CtrlMask))
@@ -307,11 +323,11 @@ public class DrawingArea : View
         return false;
     }
 
-    protected override bool OnMouseEvent (MouseEvent mouseEvent)
+    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
     {
         CurrentTool.OnMouseEvent (this, mouseEvent);
 
-        return base.OnMouseEvent (mouseEvent);
+        return mouseEvent.Handled;
     }
 
     internal void AddLayer ()
@@ -415,7 +431,7 @@ public class AttributeView : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEvent mouseEvent)
+    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
     {
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
@@ -427,9 +443,11 @@ public class AttributeView : View
             {
                 ClickedInBackground ();
             }
+
+            mouseEvent.Handled = true;
         }
 
-        return base.OnMouseEvent (mouseEvent);
+        return mouseEvent.Handled;
     }
 
     private bool IsForegroundPoint (int x, int y) { return ForegroundPoints.Contains ((x, y)); }

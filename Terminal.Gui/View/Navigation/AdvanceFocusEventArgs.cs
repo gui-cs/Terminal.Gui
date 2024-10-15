@@ -4,7 +4,7 @@
 public class AdvanceFocusEventArgs : CancelEventArgs<bool>
 {
     /// <summary>Initializes a new instance.</summary>
-    public AdvanceFocusEventArgs (NavigationDirection direction, TabBehavior? behavior)
+    public AdvanceFocusEventArgs (NavigationDirection direction, TabBehavior? behavior) : base (false, false)
     {
         Direction = direction;
         Behavior = behavior;

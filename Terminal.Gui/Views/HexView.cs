@@ -327,7 +327,7 @@ public class HexView : View, IDesignable
     public void DiscardEdits () { _edits = new (); }
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent (MouseEvent me)
+    protected override bool OnMouseEvent (MouseEventArgs me)
     {
         if (_source is null)
         {
@@ -349,7 +349,7 @@ public class HexView : View, IDesignable
 
         if (me.Flags == MouseFlags.WheeledDown)
         {
-            DisplayStart = Math.Min (DisplayStart + BytesPerLine, GetEditedSize());
+            DisplayStart = Math.Min (DisplayStart + BytesPerLine, GetEditedSize ());
 
             return true;
         }
@@ -431,14 +431,14 @@ public class HexView : View, IDesignable
         Driver.SetAttribute (current);
         Move (0, 0);
 
-        int nblocks = BytesPerLine / NUM_BYTES_PER_HEX_COLUMN;
-        var data = new byte [nblocks * NUM_BYTES_PER_HEX_COLUMN * viewport.Height];
+        int nBlocks = BytesPerLine / NUM_BYTES_PER_HEX_COLUMN;
+        var data = new byte [nBlocks * NUM_BYTES_PER_HEX_COLUMN * viewport.Height];
         Source.Position = _displayStart;
-        int n = _source.Read (data, 0, data.Length);
+        int n = _source!.Read (data, 0, data.Length);
 
-        Attribute activeColor = GetHotNormalColor ();
-        Attribute trackingColor = GetHotFocusColor ();
-
+        Attribute selectedAttribute = GetHotNormalColor ();
+        Attribute editedAttribute = new Attribute (GetNormalColor ().Foreground.GetHighlightColor (), GetNormalColor ().Background);
+        Attribute editingAttribute = new Attribute (GetFocusColor ().Background, GetFocusColor ().Foreground);
         for (var line = 0; line < viewport.Height; line++)
         {
             Rectangle lineRect = new (0, line, viewport.Width, 1);
@@ -449,9 +449,9 @@ public class HexView : View, IDesignable
             }
 
             Move (0, line);
-            currentAttribute = GetHotNormalColor ();
+            currentAttribute = new Attribute (GetNormalColor ().Foreground.GetHighlightColor (), GetNormalColor ().Background);
             Driver.SetAttribute (currentAttribute);
-            var address = $"{_displayStart + line * nblocks * NUM_BYTES_PER_HEX_COLUMN:x8}";
+            var address = $"{_displayStart + line * nBlocks * NUM_BYTES_PER_HEX_COLUMN:x8}";
             Driver.AddStr ($"{address.Substring (8 - AddressWidth)}");
 
             if (AddressWidth > 0)
@@ -461,20 +461,21 @@ public class HexView : View, IDesignable
 
             SetAttribute (GetNormalColor ());
 
-            for (var block = 0; block < nblocks; block++)
+            for (var block = 0; block < nBlocks; block++)
             {
                 for (var b = 0; b < NUM_BYTES_PER_HEX_COLUMN; b++)
                 {
-                    int offset = line * nblocks * NUM_BYTES_PER_HEX_COLUMN + block * NUM_BYTES_PER_HEX_COLUMN + b;
+                    int offset = line * nBlocks * NUM_BYTES_PER_HEX_COLUMN + block * NUM_BYTES_PER_HEX_COLUMN + b;
                     byte value = GetData (data, offset, out bool edited);
 
-                    if (offset + _displayStart == Address || edited)
+                    if (offset + _displayStart == Address)
                     {
-                        SetAttribute (_leftSideHasFocus ? activeColor : trackingColor);
+                        // Selected
+                        SetAttribute (_leftSideHasFocus ? editingAttribute : (edited ? editedAttribute : selectedAttribute));
                     }
                     else
                     {
-                        SetAttribute (GetNormalColor ());
+                        SetAttribute (edited ? editedAttribute : GetNormalColor ());
                     }
 
                     Driver.AddStr (offset >= n && !edited ? "  " : $"{value:x2}");
@@ -482,12 +483,12 @@ public class HexView : View, IDesignable
                     Driver.AddRune (_spaceCharRune);
                 }
 
-                Driver.AddStr (block + 1 == nblocks ? " " : $"{_columnSeparatorRune} ");
+                Driver.AddStr (block + 1 == nBlocks ? " " : $"{_columnSeparatorRune} ");
             }
 
-            for (var bitem = 0; bitem < nblocks * NUM_BYTES_PER_HEX_COLUMN; bitem++)
+            for (var byteIndex = 0; byteIndex < nBlocks * NUM_BYTES_PER_HEX_COLUMN; byteIndex++)
             {
-                int offset = line * nblocks * NUM_BYTES_PER_HEX_COLUMN + bitem;
+                int offset = line * nBlocks * NUM_BYTES_PER_HEX_COLUMN + byteIndex;
                 byte b = GetData (data, offset, out bool edited);
                 Rune c;
 
@@ -525,20 +526,21 @@ public class HexView : View, IDesignable
                     }
                 }
 
-                if (offset + _displayStart == Address || edited)
+                if (offset + _displayStart == Address)
                 {
-                    SetAttribute (_leftSideHasFocus ? trackingColor : activeColor);
+                    // Selected
+                    SetAttribute (_leftSideHasFocus ? editingAttribute : (edited ? editedAttribute : selectedAttribute));
                 }
                 else
                 {
-                    SetAttribute (GetNormalColor ());
+                    SetAttribute (edited ? editedAttribute : GetNormalColor ());
                 }
 
                 Driver.AddRune (c);
 
                 for (var i = 1; i < utf8BytesConsumed; i++)
                 {
-                    bitem++;
+                    byteIndex++;
                     Driver.AddRune (_periodCharRune);
                 }
             }
@@ -589,7 +591,7 @@ public class HexView : View, IDesignable
     public event EventHandler<HexViewEventArgs>? PositionChanged;
 
     /// <inheritdoc/>
-    public override bool OnProcessKeyDown (Key keyEvent)
+    protected override bool OnKeyDownNotHandled (Key keyEvent)
     {
         if (!AllowEdits || _source is null)
         {
@@ -755,9 +757,9 @@ public class HexView : View, IDesignable
             // We can move down lines cleanly (without extending stream)
             Address += bytes;
         }
-        else if ((bytes == BytesPerLine * Viewport.Height && _source.Length >= DisplayStart + BytesPerLine * Viewport.Height)
+        else if ((bytes == BytesPerLine * Viewport.Height && _source!.Length >= DisplayStart + BytesPerLine * Viewport.Height)
                  || (bytes <= BytesPerLine * Viewport.Height - BytesPerLine
-                     && _source.Length <= DisplayStart + BytesPerLine * Viewport.Height))
+                     && _source!.Length <= DisplayStart + BytesPerLine * Viewport.Height))
         {
             long p = Address;
 
@@ -952,16 +954,8 @@ public class HexView : View, IDesignable
             return false;
         }
 
-        if (direction == NavigationDirection.Forward && _leftSideHasFocus)
-        {
-            _leftSideHasFocus = !_leftSideHasFocus;
-            RedisplayLine (Address);
-            _firstNibble = true;
-
-            return true;
-        }
-
-        if (direction == NavigationDirection.Backward && !_leftSideHasFocus)
+        if ((direction == NavigationDirection.Forward && _leftSideHasFocus)
+            || (direction == NavigationDirection.Backward && !_leftSideHasFocus))
         {
             _leftSideHasFocus = !_leftSideHasFocus;
             RedisplayLine (Address);

@@ -441,16 +441,14 @@ public class TreeViewFileSystem : Scenario
         {
             if (_iconProvider.UseNerdIcons || _iconProvider.UseUnicodeCharacters)
             {
-                if (e.IndexOfModelText > 0 && e.IndexOfModelText < e.RuneCells.Count)
+                if (e.IndexOfModelText > 0 && e.IndexOfModelText < e.Cells.Count)
                 {
-                    RuneCell cell = e.RuneCells [e.IndexOfModelText];
+                    Cell cell = e.Cells [e.IndexOfModelText];
 
-                    cell.ColorScheme = new ColorScheme (
-                                                        new Attribute (
-                                                                       Color.BrightYellow,
-                                                                       cell.ColorScheme.Normal.Background
-                                                                      )
-                                                       );
+                    cell.Attribute = new Attribute (
+                                                    Color.BrightYellow,
+                                                    cell.Attribute!.Value.Background
+                                                   );
                 }
             }
         }
@@ -486,12 +484,12 @@ public class TreeViewFileSystem : Scenario
         }
     }
 
-    private void TreeViewFiles_MouseClick (object sender, MouseEventEventArgs obj)
+    private void TreeViewFiles_MouseClick (object sender, MouseEventArgs obj)
     {
         // if user right clicks
-        if (obj.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
+        if (obj.Flags.HasFlag (MouseFlags.Button3Clicked))
         {
-            IFileSystemInfo rightClicked = _treeViewFiles.GetObjectOnRow (obj.MouseEvent.Position.Y);
+            IFileSystemInfo rightClicked = _treeViewFiles.GetObjectOnRow (obj.Position.Y);
 
             // nothing was clicked
             if (rightClicked == null)
@@ -501,8 +499,8 @@ public class TreeViewFileSystem : Scenario
 
             ShowContextMenu (
                              new Point (
-                                        obj.MouseEvent.Position.X + _treeViewFiles.Frame.X,
-                                        obj.MouseEvent.Position.Y + _treeViewFiles.Frame.Y + 2
+                                        obj.Position.X + _treeViewFiles.Frame.X,
+                                        obj.Position.Y + _treeViewFiles.Frame.Y + 2
                                        ),
                              rightClicked
                             );

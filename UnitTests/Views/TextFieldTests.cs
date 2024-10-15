@@ -524,7 +524,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Application.Top = new ();
         Application.Top.Add (tf);
         tf.SetFocus ();
-        Application.OnKeyDown (Key.Space);
+        Application.RaiseKeyDownEvent (Key.Space);
 
         Application.Top.Dispose ();
         Application.ResetState (true);
@@ -541,7 +541,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Application.Top = new ();
         Application.Top.Add (tf);
         tf.SetFocus ();
-        Application.OnKeyDown (Key.Enter);
+        Application.RaiseKeyDownEvent (Key.Enter);
 
         Assert.Equal (0, selectingCount);
 
@@ -560,7 +560,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Application.Top = new ();
         Application.Top.Add (tf);
         tf.SetFocus ();
-        Application.OnKeyDown (Key.Enter);
+        Application.RaiseKeyDownEvent (Key.Enter);
 
         Assert.Equal (1, acceptedCount);
 
@@ -1178,15 +1178,15 @@ public class TextFieldTests (ITestOutputHelper output)
         top.Add (tf);
         Application.Begin (top);
 
-        var mouseEvent = new MouseEvent { Flags = MouseFlags.Button1Clicked, View = tf };
+        var mouseEvent = new MouseEventArgs { Flags = MouseFlags.Button1Clicked, View = tf };
 
-        Application.OnMouseEvent (mouseEvent);
+        Application.RaiseMouseEvent (mouseEvent);
         Assert.Equal (1, clickCounter);
 
         // Get a fresh instance that represents a right click.
         // Should be ignored because of SuppressRightClick callback
         mouseEvent = new () { Flags = MouseFlags.Button3Clicked, View = tf };
-        Application.OnMouseEvent (mouseEvent);
+        Application.RaiseMouseEvent (mouseEvent);
         Assert.Equal (1, clickCounter);
 
         Application.MouseEvent -= HandleRightClick;
@@ -1199,13 +1199,13 @@ public class TextFieldTests (ITestOutputHelper output)
         // This call causes the context menu to pop, and MouseEvent() returns true.
         // Thus, the clickCounter is NOT incremented.
         // Which is correct, because the user did NOT click with the left mouse button.
-        Application.OnMouseEvent (mouseEvent);
+        Application.RaiseMouseEvent (mouseEvent);
         Assert.Equal (1, clickCounter);
         top.Dispose ();
 
         return;
 
-        void HandleRightClick (object sender, MouseEvent arg)
+        void HandleRightClick (object sender, MouseEventArgs arg)
         {
             if (arg.Flags.HasFlag (MouseFlags.Button3Clicked))
             {
@@ -1293,7 +1293,7 @@ public class TextFieldTests (ITestOutputHelper output)
     {
         var tf = new TextField { Width = 10, Text = " " };
 
-        var ev = new MouseEvent { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked };
+        var ev = new MouseEventArgs { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked };
 
         tf.NewMouseEvent (ev);
         Assert.Equal (1, tf.SelectedLength);
@@ -2090,6 +2090,53 @@ Les Miśerables",
     }
 
     [Fact]
+    public void Right_CursorAtEnd_WithSelection_ShouldClearSelection ()
+    {
+        var tf = new TextField
+        {
+            Text = "Hello",
+        };
+        tf.SetFocus ();
+        tf.SelectAll ();
+        tf.CursorPosition = 5;
+
+        // When there is selected text and the cursor is at the end of the text field
+        Assert.Equal ("Hello",tf.SelectedText);
+
+        // Pressing right should not move focus, instead it should clear selection
+        Assert.True(tf.NewKeyDownEvent (Key.CursorRight));
+        Assert.Null (tf.SelectedText);
+
+        // Now that the selection is cleared another right keypress should move focus
+        Assert.False (tf.NewKeyDownEvent (Key.CursorRight));
+    }
+    [Fact]
+    public void Left_CursorAtStart_WithSelection_ShouldClearSelection ()
+    {
+        var tf = new TextField
+        {
+            Text = "Hello",
+        };
+        tf.SetFocus ();
+
+        tf.CursorPosition = 2;
+        Assert.True (tf.NewKeyDownEvent (Key.CursorLeft.WithShift));
+        Assert.True (tf.NewKeyDownEvent (Key.CursorLeft.WithShift));
+
+        // When there is selected text and the cursor is at the start of the text field
+        Assert.Equal ("He", tf.SelectedText);
+
+        // Pressing left should not move focus, instead it should clear selection
+        Assert.True (tf.NewKeyDownEvent (Key.CursorLeft));
+        Assert.Null (tf.SelectedText);
+
+        // When clearing selected text with left the cursor should be at the start of the selection
+        Assert.Equal (0,tf.CursorPosition);
+
+        // Now that the selection is cleared another left keypress should move focus
+        Assert.False (tf.NewKeyDownEvent (Key.CursorLeft));
+    }
+    [Fact]
     public void Autocomplete_Visible_False_By_Default ()
     {
         View superView = new ()
@@ -2107,5 +2154,19 @@ Les Miśerables",
 
         Assert.True (t.Visible);
         Assert.False (t.Autocomplete.Visible);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Draw_Esc_Rune ()
+    {
+        var tf = new TextField { Width = 5, Text = "\u001b" };
+        tf.BeginInit ();
+        tf.EndInit ();
+        tf.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre ("\u241b", output);
+
+        tf.Dispose ();
     }
 }
