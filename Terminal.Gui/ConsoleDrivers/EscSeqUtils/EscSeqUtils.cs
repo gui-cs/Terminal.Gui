@@ -1,3 +1,4 @@
+#nullable enable
 namespace Terminal.Gui;
 
 /// <summary>
@@ -170,7 +171,7 @@ public static class EscSeqUtils
     /// <param name="isMouse">Indicates if the escape sequence is a mouse event.</param>
     /// <param name="buttonState">The <see cref="MouseFlags"/> button state.</param>
     /// <param name="pos">The <see cref="MouseFlags"/> position.</param>
-    /// <param name="isResponse">Indicates if the escape sequence is a response to a request.</param>
+    /// <param name="seqReqStatus">The <see cref="EscSeqReqStatus"/> object.</param>
     /// <param name="continuousButtonPressedHandler">The handler that will process the event.</param>
     public static void DecodeEscSeq (
         EscSeqRequests escSeqRequests,
@@ -185,7 +186,7 @@ public static class EscSeqUtils
         out bool isMouse,
         out List<MouseFlags> buttonState,
         out Point pos,
-        out bool isResponse,
+        out EscSeqReqStatus? seqReqStatus,
         Action<MouseFlags, Point> continuousButtonPressedHandler
     )
     {
@@ -194,7 +195,7 @@ public static class EscSeqUtils
         isMouse = false;
         buttonState = new List<MouseFlags> { 0 };
         pos = default (Point);
-        isResponse = false;
+        seqReqStatus = null;
         char keyChar = '\0';
 
         switch (c1Control)
@@ -262,10 +263,9 @@ public static class EscSeqUtils
                     return;
                 }
 
-                if (escSeqRequests is { } && escSeqRequests.HasResponse (terminator))
+                if (escSeqRequests is { } && escSeqRequests.HasResponse (terminator, out seqReqStatus))
                 {
-                    isResponse = true;
-                    escSeqRequests.Remove (terminator);
+                    escSeqRequests.Remove (seqReqStatus);
 
                     return;
                 }

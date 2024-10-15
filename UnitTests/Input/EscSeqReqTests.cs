@@ -6,30 +6,31 @@ public class EscSeqReqTests
     public void Add_Tests ()
     {
         var escSeqReq = new EscSeqRequests ();
-        escSeqReq.Add ("t");
+        escSeqReq.Add (new () { Request = "", Terminator = "t" });
         Assert.Single (escSeqReq.Statuses);
-        Assert.Equal ("t", escSeqReq.Statuses [^1].Terminator);
+        Assert.Equal ("t", escSeqReq.Statuses [^1].AnsiRequest.Terminator);
         Assert.Equal (1, escSeqReq.Statuses [^1].NumRequests);
         Assert.Equal (1, escSeqReq.Statuses [^1].NumOutstanding);
 
-        escSeqReq.Add ("t", 2);
+        escSeqReq.Add (new () { Request = "", Terminator = "t" });
         Assert.Single (escSeqReq.Statuses);
-        Assert.Equal ("t", escSeqReq.Statuses [^1].Terminator);
-        Assert.Equal (1, escSeqReq.Statuses [^1].NumRequests);
-        Assert.Equal (1, escSeqReq.Statuses [^1].NumOutstanding);
-
-        escSeqReq = new EscSeqRequests ();
-        escSeqReq.Add ("t", 2);
-        Assert.Single (escSeqReq.Statuses);
-        Assert.Equal ("t", escSeqReq.Statuses [^1].Terminator);
+        Assert.Equal ("t", escSeqReq.Statuses [^1].AnsiRequest.Terminator);
         Assert.Equal (2, escSeqReq.Statuses [^1].NumRequests);
         Assert.Equal (2, escSeqReq.Statuses [^1].NumOutstanding);
 
-        escSeqReq.Add ("t", 3);
+        escSeqReq = new ();
+        escSeqReq.Add (new () { Request = "", Terminator = "t" });
+        escSeqReq.Add (new () { Request = "", Terminator = "t" });
         Assert.Single (escSeqReq.Statuses);
-        Assert.Equal ("t", escSeqReq.Statuses [^1].Terminator);
+        Assert.Equal ("t", escSeqReq.Statuses [^1].AnsiRequest.Terminator);
         Assert.Equal (2, escSeqReq.Statuses [^1].NumRequests);
         Assert.Equal (2, escSeqReq.Statuses [^1].NumOutstanding);
+
+        escSeqReq.Add (new () { Request = "", Terminator = "t" });
+        Assert.Single (escSeqReq.Statuses);
+        Assert.Equal ("t", escSeqReq.Statuses [^1].AnsiRequest.Terminator);
+        Assert.Equal (3, escSeqReq.Statuses [^1].NumRequests);
+        Assert.Equal (3, escSeqReq.Statuses [^1].NumOutstanding);
     }
 
     [Fact]
@@ -44,18 +45,22 @@ public class EscSeqReqTests
     public void Remove_Tests ()
     {
         var escSeqReq = new EscSeqRequests ();
-        escSeqReq.Add ("t");
-        escSeqReq.Remove ("t");
+        escSeqReq.Add (new () { Request = "", Terminator = "t" });
+        escSeqReq.HasResponse ("t", out EscSeqReqStatus seqReqStatus);
+        escSeqReq.Remove (seqReqStatus);
         Assert.Empty (escSeqReq.Statuses);
 
-        escSeqReq.Add ("t", 2);
-        escSeqReq.Remove ("t");
+        escSeqReq.Add (new () { Request = "", Terminator = "t" });
+        escSeqReq.Add (new () { Request = "", Terminator = "t" });
+        escSeqReq.HasResponse ("t", out seqReqStatus);
+        escSeqReq.Remove (seqReqStatus);
         Assert.Single (escSeqReq.Statuses);
-        Assert.Equal ("t", escSeqReq.Statuses [^1].Terminator);
+        Assert.Equal ("t", escSeqReq.Statuses [^1].AnsiRequest.Terminator);
         Assert.Equal (2, escSeqReq.Statuses [^1].NumRequests);
         Assert.Equal (1, escSeqReq.Statuses [^1].NumOutstanding);
 
-        escSeqReq.Remove ("t");
+        escSeqReq.HasResponse ("t", out seqReqStatus);
+        escSeqReq.Remove (seqReqStatus);
         Assert.Empty (escSeqReq.Statuses);
     }
 
@@ -63,10 +68,13 @@ public class EscSeqReqTests
     public void Requested_Tests ()
     {
         var escSeqReq = new EscSeqRequests ();
-        Assert.False (escSeqReq.HasResponse ("t"));
+        Assert.False (escSeqReq.HasResponse ("t", out EscSeqReqStatus seqReqStatus));
+        Assert.Null (seqReqStatus);
 
-        escSeqReq.Add ("t");
-        Assert.False (escSeqReq.HasResponse ("r"));
-        Assert.True (escSeqReq.HasResponse ("t"));
+        escSeqReq.Add (new () { Request = "", Terminator = "t" });
+        Assert.False (escSeqReq.HasResponse ("r", out seqReqStatus));
+        Assert.Null (seqReqStatus);
+        Assert.True (escSeqReq.HasResponse ("t", out seqReqStatus));
+        Assert.NotNull (seqReqStatus);
     }
 }

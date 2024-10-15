@@ -2,7 +2,6 @@
 // NetDriver.cs: The System.Console-based .NET driver, works on Windows and Unix, but is not particularly efficient.
 //
 
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
@@ -202,7 +201,7 @@ internal class NetEvents : IDisposable
     {
         // if there is a key available, return it without waiting
         //  (or dispatching work to the thread queue)
-        if (Console.KeyAvailable && !_suspendRead)
+        if (Console.KeyAvailable)
         {
             return Console.ReadKey (intercept);
         }
@@ -211,7 +210,7 @@ internal class NetEvents : IDisposable
         {
             Task.Delay (100, cancellationToken).Wait (cancellationToken);
 
-            if (Console.KeyAvailable && !_suspendRead)
+            if (Console.KeyAvailable)
             {
                 return Console.ReadKey (intercept);
             }
@@ -223,7 +222,6 @@ internal class NetEvents : IDisposable
     }
 
     internal bool _forceRead;
-    internal static bool _suspendRead;
 
     private void ProcessInputQueue ()
     {
@@ -432,7 +430,7 @@ internal class NetEvents : IDisposable
                                   out bool isMouse,
                                   out List<MouseFlags> mouseFlags,
                                   out Point pos,
-                                  out bool isReq,
+                                  out EscSeqReqStatus seqReqStatus,
                                   (f, p) => HandleMouseEvent (MapMouseFlags (f), p)
                                  );
 
@@ -446,7 +444,7 @@ internal class NetEvents : IDisposable
             return;
         }
 
-        if (isReq)
+        if (seqReqStatus is { })
         {
             HandleRequestResponseEvent (c1Control, code, values, terminating);
 
@@ -1383,7 +1381,7 @@ internal class NetDriver : ConsoleDriver
     public override bool IsSuspendRead
     {
         get => _isSuspendRead;
-        internal set => _isSuspendRead = _suspendRead = value;
+        internal set => _isSuspendRead = value;
     }
 
     public override void StartReportingMouseMoves ()
