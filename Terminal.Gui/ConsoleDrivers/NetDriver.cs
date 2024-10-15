@@ -1423,7 +1423,7 @@ internal class NetDriver : ConsoleDriver
         return WriteAnsiDefault (ansi);
     }
 
-    private MouseEvent ToDriverMouse (NetEvents.MouseEvent me)
+    private MouseEventArgs ToDriverMouse (NetEvents.MouseEvent me)
     {
        //System.Diagnostics.Debug.WriteLine ($"X: {me.Position.X}; Y: {me.Position.Y}; ButtonState: {me.ButtonState}");
 
