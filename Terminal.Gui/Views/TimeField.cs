@@ -165,6 +165,11 @@ public class TimeField : TextField
     /// <inheritdoc/>
     protected override bool OnMouseEvent  (MouseEventArgs ev)
     {
+        if (base.OnMouseEvent (ev) || ev.Handled)
+        {
+            return true;
+        }
+
         if (SelectedLength == 0 && ev.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
             int point = ev.Position.X;
@@ -220,7 +225,7 @@ public class TimeField : TextField
             newPoint = 1;
         }
 
-        //if (newPoint != point)
+        if (newPoint != point)
         {
             CursorPosition = newPoint;
         }
