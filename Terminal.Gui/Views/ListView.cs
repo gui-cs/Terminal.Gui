@@ -817,7 +817,6 @@ public class ListView : View, IDesignable
         }
     }
 
-    // TODO: This should be cancelable
     /// <summary>Invokes the <see cref="OpenSelectedItem"/> event if it is defined.</summary>
     /// <returns><see langword="true"/> if the <see cref="OpenSelectedItem"/> event was fired.</returns>
     public bool OnOpenSelectedItem ()

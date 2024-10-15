@@ -297,7 +297,6 @@ public partial class View // Keyboard APIs
         }
 
         // After
-        // TODO: Is ProcessKeyDown really the right name?
         if (RaiseKeyDownNotHandled (key) || key.Handled)
         {
             return true;
