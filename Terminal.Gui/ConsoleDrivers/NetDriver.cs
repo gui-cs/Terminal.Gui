@@ -1020,6 +1020,15 @@ internal class NetDriver : ConsoleDriver
                 SetCursorPosition (lastCol, row);
                 Console.Write (output);
             }
+
+            foreach (var s in Application.Sixel)
+            {
+                if (!string.IsNullOrWhiteSpace (s.SixelData))
+                {
+                    SetCursorPosition (s.ScreenPosition.X, s.ScreenPosition.Y);
+                    Console.Write (s.SixelData);
+                }
+            }
         }
 
         SetCursorPosition (0, 0);
@@ -1126,9 +1135,10 @@ internal class NetDriver : ConsoleDriver
         _mainLoopDriver = new NetMainLoop (this);
         _mainLoopDriver.ProcessInput = ProcessInput;
 
+
         return new MainLoop (_mainLoopDriver);
     }
-
+    
     private void ProcessInput (InputResult inputEvent)
     {
         switch (inputEvent.EventType)
