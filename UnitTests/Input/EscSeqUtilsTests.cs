@@ -841,7 +841,7 @@ public class EscSeqUtilsTests
         };
         expectedCki = default (ConsoleKeyInfo);
         Assert.Single (_escSeqReqProc.Statuses);
-        Assert.Equal ("t", _escSeqReqProc.Statuses [^1].AnsiRequest.Terminator);
+        Assert.Equal ("t", _escSeqReqProc.Statuses.ToArray () [^1].AnsiRequest.Terminator);
 
         EscSeqUtils.DecodeEscSeq (
                                   _escSeqReqProc,

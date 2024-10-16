@@ -174,7 +174,7 @@ public static class EscSeqUtils
     /// <param name="seqReqStatus">The <see cref="EscSeqReqStatus"/> object.</param>
     /// <param name="continuousButtonPressedHandler">The handler that will process the event.</param>
     public static void DecodeEscSeq (
-        EscSeqRequests escSeqRequests,
+        EscSeqRequests? escSeqRequests,
         ref ConsoleKeyInfo newConsoleKeyInfo,
         ref ConsoleKey key,
         ConsoleKeyInfo [] cki,
@@ -497,7 +497,7 @@ public static class EscSeqUtils
     // PERF: This is expensive
     public static char [] GetKeyCharArray (ConsoleKeyInfo [] cki)
     {
-        char [] kChar = { };
+        char [] kChar = [];
         var length = 0;
 
         foreach (ConsoleKeyInfo kc in cki)

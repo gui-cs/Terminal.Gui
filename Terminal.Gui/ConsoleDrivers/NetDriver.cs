@@ -446,7 +446,17 @@ internal class NetEvents : IDisposable
 
         if (seqReqStatus is { })
         {
-            HandleRequestResponseEvent (c1Control, code, values, terminating);
+            //HandleRequestResponseEvent (c1Control, code, values, terminating);
+            StringBuilder sb = new ();
+
+            foreach (ConsoleKeyInfo keyChar in cki)
+            {
+                sb.Append (keyChar.KeyChar);
+            }
+
+            seqReqStatus.AnsiRequest.Response = sb.ToString ();
+
+            ((NetDriver)_consoleDriver)._waitAnsiResponse.Set ();
 
             return;
         }
@@ -590,64 +600,64 @@ internal class NetEvents : IDisposable
 
     private Point _lastCursorPosition;
 
-    private void HandleRequestResponseEvent (string c1Control, string code, string [] values, string terminating)
-    {
-        if (terminating ==
+    //private void HandleRequestResponseEvent (string c1Control, string code, string [] values, string terminating)
+    //{
+    //    if (terminating ==
 
-            // BUGBUG: I can't find where we send a request for cursor position (ESC[?6n), so I'm not sure if this is needed.
-            // The observation is correct because the response isn't immediate and this is useless
-            EscSeqUtils.CSI_RequestCursorPositionReport.Terminator)
-        {
-            var point = new Point { X = int.Parse (values [1]) - 1, Y = int.Parse (values [0]) - 1 };
+    //        // BUGBUG: I can't find where we send a request for cursor position (ESC[?6n), so I'm not sure if this is needed.
+    //        // The observation is correct because the response isn't immediate and this is useless
+    //        EscSeqUtils.CSI_RequestCursorPositionReport.Terminator)
+    //    {
+    //        var point = new Point { X = int.Parse (values [1]) - 1, Y = int.Parse (values [0]) - 1 };
 
-            if (_lastCursorPosition.Y != point.Y)
-            {
-                _lastCursorPosition = point;
-                var eventType = EventType.WindowPosition;
-                var winPositionEv = new WindowPositionEvent { CursorPosition = point };
+    //        if (_lastCursorPosition.Y != point.Y)
+    //        {
+    //            _lastCursorPosition = point;
+    //            var eventType = EventType.WindowPosition;
+    //            var winPositionEv = new WindowPositionEvent { CursorPosition = point };
 
-                _inputQueue.Enqueue (
-                                     new InputResult { EventType = eventType, WindowPositionEvent = winPositionEv }
-                                    );
-            }
-            else
-            {
-                return;
-            }
-        }
-        else if (terminating == EscSeqUtils.CSI_ReportTerminalSizeInChars.Terminator)
-        {
-            if (values [0] == EscSeqUtils.CSI_ReportTerminalSizeInChars.Value)
-            {
-                EnqueueWindowSizeEvent (
-                                        Math.Max (int.Parse (values [1]), 0),
-                                        Math.Max (int.Parse (values [2]), 0),
-                                        Math.Max (int.Parse (values [1]), 0),
-                                        Math.Max (int.Parse (values [2]), 0)
-                                       );
-            }
-            else
-            {
-                EnqueueRequestResponseEvent (c1Control, code, values, terminating);
-            }
-        }
-        else
-        {
-            EnqueueRequestResponseEvent (c1Control, code, values, terminating);
-        }
+    //            _inputQueue.Enqueue (
+    //                                 new InputResult { EventType = eventType, WindowPositionEvent = winPositionEv }
+    //                                );
+    //        }
+    //        else
+    //        {
+    //            return;
+    //        }
+    //    }
+    //    else if (terminating == EscSeqUtils.CSI_ReportTerminalSizeInChars.Terminator)
+    //    {
+    //        if (values [0] == EscSeqUtils.CSI_ReportTerminalSizeInChars.Value)
+    //        {
+    //            EnqueueWindowSizeEvent (
+    //                                    Math.Max (int.Parse (values [1]), 0),
+    //                                    Math.Max (int.Parse (values [2]), 0),
+    //                                    Math.Max (int.Parse (values [1]), 0),
+    //                                    Math.Max (int.Parse (values [2]), 0)
+    //                                   );
+    //        }
+    //        else
+    //        {
+    //            EnqueueRequestResponseEvent (c1Control, code, values, terminating);
+    //        }
+    //    }
+    //    else
+    //    {
+    //        EnqueueRequestResponseEvent (c1Control, code, values, terminating);
+    //    }
 
-        _inputReady.Set ();
-    }
+    //    _inputReady.Set ();
+    //}
 
-    private void EnqueueRequestResponseEvent (string c1Control, string code, string [] values, string terminating)
-    {
-        var eventType = EventType.RequestResponse;
-        var requestRespEv = new RequestResponseEvent { ResultTuple = (c1Control, code, values, terminating) };
+    //private void EnqueueRequestResponseEvent (string c1Control, string code, string [] values, string terminating)
+    //{
+    //    var eventType = EventType.RequestResponse;
+    //    var requestRespEv = new RequestResponseEvent { ResultTuple = (c1Control, code, values, terminating) };
 
-        _inputQueue.Enqueue (
-                             new InputResult { EventType = eventType, RequestResponseEvent = requestRespEv }
-                            );
-    }
+    //    _inputQueue.Enqueue (
+    //                         new InputResult { EventType = eventType, RequestResponseEvent = requestRespEv }
+    //                        );
+    //}
 
     private void HandleMouseEvent (MouseButtonState buttonState, Point pos)
     {
@@ -1042,6 +1052,11 @@ internal class NetDriver : ConsoleDriver
 
         StopReportingMouseMoves ();
 
+        _ansiResponseTokenSource?.Cancel ();
+        _ansiResponseTokenSource?.Dispose ();
+
+        _waitAnsiResponse?.Dispose ();
+
         if (!RunningUnitTests)
         {
             Console.ResetColor ();
@@ -1417,10 +1432,37 @@ internal class NetDriver : ConsoleDriver
         }
     }
 
+    internal ManualResetEventSlim _waitAnsiResponse = new (false);
+    private readonly CancellationTokenSource _ansiResponseTokenSource = new ();
+
     /// <inheritdoc />
-    public override bool WriteAnsi (string ansi)
+    public override string WriteAnsi (AnsiEscapeSequenceRequest ansiRequest)
     {
-        return WriteAnsiDefault (ansi);
+        _mainLoopDriver._netEvents.EscSeqRequests.Add (ansiRequest);
+
+        try
+        {
+            if (!_ansiResponseTokenSource.IsCancellationRequested && Console.KeyAvailable)
+            {
+                _mainLoopDriver._netEvents._forceRead = true;
+
+                _mainLoopDriver._netEvents._waitForStart.Set ();
+
+                _waitAnsiResponse.Wait (_ansiResponseTokenSource.Token);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            return string.Empty;
+        }
+        finally
+        {
+            _waitAnsiResponse.Reset ();
+        }
+
+        _mainLoopDriver._netEvents._forceRead = false;
+
+        return ansiRequest.Response;
     }
 
     private MouseEventArgs ToDriverMouse (NetEvents.MouseEvent me)

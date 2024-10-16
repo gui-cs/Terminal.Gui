@@ -11,17 +11,7 @@ public class EscSeqReqStatus
 {
     /// <summary>Creates a new state of escape sequence request.</summary>
     /// <param name="ansiRequest">The <see cref="AnsiEscapeSequenceRequest"/> object.</param>
-    public EscSeqReqStatus (AnsiEscapeSequenceRequest ansiRequest)
-    {
-        AnsiRequest = ansiRequest;
-        NumRequests = NumOutstanding = 1;
-    }
-
-    /// <summary>Gets the number of unfinished requests.</summary>
-    public int NumOutstanding { get; set; }
-
-    /// <summary>Gets the number of requests.</summary>
-    public int NumRequests { get; set; }
+    public EscSeqReqStatus (AnsiEscapeSequenceRequest ansiRequest) { AnsiRequest = ansiRequest; }
 
     /// <summary>Gets the Escape Sequence Terminator (e.g. ESC[8t ... t is the terminator).</summary>
     public AnsiEscapeSequenceRequest AnsiRequest { get; }
@@ -34,9 +24,6 @@ public class EscSeqReqStatus
 /// </summary>
 public class EscSeqRequests
 {
-    /// <summary>Gets the <see cref="EscSeqReqStatus"/> list.</summary>
-    public List<EscSeqReqStatus> Statuses { get; } = new ();
-
     /// <summary>
     ///     Adds a new request for the ANSI Escape Sequence defined by <paramref name="ansiRequest"/>. Adds a
     ///     <see cref="EscSeqReqStatus"/> instance to <see cref="Statuses"/> list.
@@ -46,21 +33,10 @@ public class EscSeqRequests
     {
         lock (Statuses)
         {
-            EscSeqReqStatus? found = Statuses.Find (x => x.AnsiRequest.Terminator == ansiRequest.Terminator);
-
-            if (found is null)
-            {
-                Statuses.Add (new (ansiRequest));
-            }
-            else if (found.NumOutstanding < found.NumRequests)
-            {
-                found.NumOutstanding = Math.Min (found.NumOutstanding + 1, found.NumRequests);
-            }
-            else
-            {
-                found.NumRequests++;
-                found.NumOutstanding++;
-            }
+            Statuses.Enqueue (new (ansiRequest));
+            Console.Out.Write (ansiRequest.Request);
+            Console.Out.Flush ();
+            Thread.Sleep (100); // Allow time for the terminal to respond
         }
     }
 
@@ -75,10 +51,18 @@ public class EscSeqRequests
     {
         lock (Statuses)
         {
-            EscSeqReqStatus? found = Statuses.Find (x => x.AnsiRequest.Terminator == terminator);
-            seqReqStatus = found;
+            Statuses.TryPeek (out seqReqStatus);
 
-            return found is { NumOutstanding: > 0 };
+            var result = seqReqStatus?.AnsiRequest.Terminator == terminator;
+
+            if (result)
+            {
+                return true;
+            }
+
+            seqReqStatus = null;
+
+            return false;
         }
     }
 
@@ -93,26 +77,10 @@ public class EscSeqRequests
     {
         lock (Statuses)
         {
-            EscSeqReqStatus? found = Statuses.Find (x => x == seqReqStatus);
-
-            if (found is null)
-            {
-                return;
-            }
-
-            if (found is { NumOutstanding: 0 })
-            {
-                Statuses.Remove (found);
-            }
-            else if (found is { NumOutstanding: > 0 })
-            {
-                found.NumOutstanding--;
-
-                if (found.NumOutstanding == 0)
-                {
-                    Statuses.Remove (found);
-                }
-            }
+            Statuses.Dequeue ();
         }
     }
+
+    /// <summary>Gets the <see cref="EscSeqReqStatus"/> list.</summary>
+    public Queue<EscSeqReqStatus> Statuses { get; } = new ();
 }

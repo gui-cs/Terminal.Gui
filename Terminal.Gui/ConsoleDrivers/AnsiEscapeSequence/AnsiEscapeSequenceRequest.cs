@@ -17,6 +17,11 @@ public class AnsiEscapeSequenceRequest
     public required string Request { get; init; }
 
     /// <summary>
+    ///     Response received from the request.
+    /// </summary>
+    public string Response { get; internal set; } = string.Empty;
+
+    /// <summary>
     ///     Invoked when the console responds with an ANSI response code that matches the
     ///     <see cref="Terminator"/>
     /// </summary>
@@ -53,7 +58,6 @@ public class AnsiEscapeSequenceRequest
     /// <returns>A <see cref="AnsiEscapeSequenceResponse"/> with the response, error, terminator and value.</returns>
     public static bool TryExecuteAnsiRequest (AnsiEscapeSequenceRequest ansiRequest, out AnsiEscapeSequenceResponse result)
     {
-        var response = new StringBuilder ();
         var error = new StringBuilder ();
         var savedIsReportingMouseMoves = false;
         ConsoleDriver? driver = null;
@@ -73,35 +77,13 @@ public class AnsiEscapeSequenceRequest
             driver!.IsSuspendRead = true;
 
             // Send the ANSI escape sequence
-            driver.WriteAnsi (ansiRequest.Request);
-            Console.Out.Flush (); // Ensure the request is sent
-
-            // Read the response from stdin (response should come back as input)
-            Thread.Sleep (100); // Allow time for the terminal to respond
-
-            // Read input until no more characters are available or the terminator is encountered
-            while (Console.KeyAvailable)
-            {
-                // Peek the next key
-                ConsoleKeyInfo keyInfo = Console.ReadKey (true); // true to not display on the console
-
-                // Append the current key to the response
-                response.Append (keyInfo.KeyChar);
-
-                // Read until no key is available if no terminator was specified or
-                // check if the key is terminator (ANSI escape sequence ends)
-                if (!string.IsNullOrEmpty (ansiRequest.Terminator) && keyInfo.KeyChar == ansiRequest.Terminator [^1])
-                {
-                    // Break out of the loop when terminator is found
-                    break;
-                }
-            }
+            ansiRequest.Response = driver.WriteAnsi (ansiRequest);
 
             if (string.IsNullOrEmpty (ansiRequest.Terminator))
             {
                 error.AppendLine ("Terminator request is empty.");
             }
-            else if (!response.ToString ().EndsWith (ansiRequest.Terminator [^1]))
+            else if (!ansiRequest.Response.EndsWith (ansiRequest.Terminator [^1]))
             {
                 throw new InvalidOperationException ($"Terminator doesn't ends with: '{ansiRequest.Terminator [^1]}'");
             }
@@ -114,7 +96,7 @@ public class AnsiEscapeSequenceRequest
         {
             if (string.IsNullOrEmpty (error.ToString ()))
             {
-                (string? c1Control, string? code, values, string? terminator) = EscSeqUtils.GetEscapeResult (response.ToString ().ToCharArray ());
+                (string? c1Control, string? code, values, string? terminator) = EscSeqUtils.GetEscapeResult (ansiRequest.Response.ToCharArray ());
             }
 
             if (savedIsReportingMouseMoves)
@@ -126,8 +108,8 @@ public class AnsiEscapeSequenceRequest
 
         AnsiEscapeSequenceResponse ansiResponse = new ()
         {
-            Response = response.ToString (), Error = error.ToString (),
-            Terminator = string.IsNullOrEmpty (response.ToString ()) ? "" : response.ToString () [^1].ToString (), Value = values [0]
+            Response = ansiRequest.Response, Error = error.ToString (),
+            Terminator = string.IsNullOrEmpty (ansiRequest.Response) ? "" : ansiRequest.Response [^1].ToString (), Value = values [0]
         };
 
         // Invoke the event if it's subscribed

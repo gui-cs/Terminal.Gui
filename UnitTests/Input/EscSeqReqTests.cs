@@ -8,29 +8,21 @@ public class EscSeqReqTests
         var escSeqReq = new EscSeqRequests ();
         escSeqReq.Add (new () { Request = "", Terminator = "t" });
         Assert.Single (escSeqReq.Statuses);
-        Assert.Equal ("t", escSeqReq.Statuses [^1].AnsiRequest.Terminator);
-        Assert.Equal (1, escSeqReq.Statuses [^1].NumRequests);
-        Assert.Equal (1, escSeqReq.Statuses [^1].NumOutstanding);
+        Assert.Equal ("t", escSeqReq.Statuses.ToArray () [^1].AnsiRequest.Terminator);
 
         escSeqReq.Add (new () { Request = "", Terminator = "t" });
-        Assert.Single (escSeqReq.Statuses);
-        Assert.Equal ("t", escSeqReq.Statuses [^1].AnsiRequest.Terminator);
-        Assert.Equal (2, escSeqReq.Statuses [^1].NumRequests);
-        Assert.Equal (2, escSeqReq.Statuses [^1].NumOutstanding);
+        Assert.Equal (2, escSeqReq.Statuses.Count);
+        Assert.Equal ("t", escSeqReq.Statuses.ToArray () [^1].AnsiRequest.Terminator);
 
         escSeqReq = new ();
         escSeqReq.Add (new () { Request = "", Terminator = "t" });
         escSeqReq.Add (new () { Request = "", Terminator = "t" });
-        Assert.Single (escSeqReq.Statuses);
-        Assert.Equal ("t", escSeqReq.Statuses [^1].AnsiRequest.Terminator);
-        Assert.Equal (2, escSeqReq.Statuses [^1].NumRequests);
-        Assert.Equal (2, escSeqReq.Statuses [^1].NumOutstanding);
+        Assert.Equal (2, escSeqReq.Statuses.Count);
+        Assert.Equal ("t", escSeqReq.Statuses.ToArray () [^1].AnsiRequest.Terminator);
 
         escSeqReq.Add (new () { Request = "", Terminator = "t" });
-        Assert.Single (escSeqReq.Statuses);
-        Assert.Equal ("t", escSeqReq.Statuses [^1].AnsiRequest.Terminator);
-        Assert.Equal (3, escSeqReq.Statuses [^1].NumRequests);
-        Assert.Equal (3, escSeqReq.Statuses [^1].NumOutstanding);
+        Assert.Equal (3, escSeqReq.Statuses.Count);
+        Assert.Equal ("t", escSeqReq.Statuses.ToArray () [^1].AnsiRequest.Terminator);
     }
 
     [Fact]
@@ -55,9 +47,7 @@ public class EscSeqReqTests
         escSeqReq.HasResponse ("t", out seqReqStatus);
         escSeqReq.Remove (seqReqStatus);
         Assert.Single (escSeqReq.Statuses);
-        Assert.Equal ("t", escSeqReq.Statuses [^1].AnsiRequest.Terminator);
-        Assert.Equal (2, escSeqReq.Statuses [^1].NumRequests);
-        Assert.Equal (1, escSeqReq.Statuses [^1].NumOutstanding);
+        Assert.Equal ("t", escSeqReq.Statuses.ToArray () [^1].AnsiRequest.Terminator);
 
         escSeqReq.HasResponse ("t", out seqReqStatus);
         escSeqReq.Remove (seqReqStatus);

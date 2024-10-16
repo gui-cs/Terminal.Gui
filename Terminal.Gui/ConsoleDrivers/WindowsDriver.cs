@@ -1185,9 +1185,14 @@ internal class WindowsDriver : ConsoleDriver
     }
 
     /// <inheritdoc />
-    public override bool WriteAnsi (string ansi)
+    public override string WriteAnsi (AnsiEscapeSequenceRequest ansiRequest)
     {
-        return WinConsole?.WriteANSI (ansi) ?? false;
+        if (WinConsole?.WriteANSI (ansiRequest.Request) == true)
+        {
+            return ReadAnsiDefault (ansiRequest);
+        }
+
+        return string.Empty;
     }
 
     #region Not Implemented
@@ -1247,7 +1252,7 @@ internal class WindowsDriver : ConsoleDriver
         {
             var sb = new StringBuilder ();
             sb.Append (EscSeqUtils.CSI_SetCursorPosition (position.Y + 1, position.X + 1));
-            WriteAnsi (sb.ToString ());
+            WinConsole?.WriteANSI (sb.ToString ());
         }
 
         if (_cachedCursorVisibility is { })
@@ -1283,8 +1288,7 @@ internal class WindowsDriver : ConsoleDriver
         {
             var sb = new StringBuilder ();
             sb.Append (visibility != CursorVisibility.Invisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
-
-            return WriteAnsi (sb.ToString ());
+            return WinConsole?.WriteANSI (sb.ToString ()) ?? false;
         }
     }
 
@@ -1299,8 +1303,7 @@ internal class WindowsDriver : ConsoleDriver
         {
             var sb = new StringBuilder ();
             sb.Append (_cachedCursorVisibility != CursorVisibility.Invisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
-
-            return WriteAnsi (sb.ToString ());
+            return WinConsole?.WriteANSI (sb.ToString ()) ?? false;
         }
 
         //if (!(Col >= 0 && Row >= 0 && Col < Cols && Row < Rows))

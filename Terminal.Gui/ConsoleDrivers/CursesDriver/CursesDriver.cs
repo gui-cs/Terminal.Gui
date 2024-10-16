@@ -216,9 +216,14 @@ internal class CursesDriver : ConsoleDriver
     }
 
     /// <inheritdoc />
-    public override bool WriteAnsi (string ansi)
+    public override string WriteAnsi (AnsiEscapeSequenceRequest ansiRequest)
     {
-        return WriteAnsiDefault (ansi);
+        if (WriteAnsiDefault (ansiRequest.Request))
+        {
+            return ReadAnsiDefault (ansiRequest);
+        }
+
+        return string.Empty;
     }
 
     public override void Suspend ()
