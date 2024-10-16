@@ -1435,7 +1435,7 @@ internal class NetDriver : ConsoleDriver
     internal ManualResetEventSlim _waitAnsiResponse = new (false);
     private readonly CancellationTokenSource _ansiResponseTokenSource = new ();
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override string WriteAnsiRequest (AnsiEscapeSequenceRequest ansiRequest)
     {
         _mainLoopDriver._netEvents.EscSeqRequests.Add (ansiRequest);
@@ -1457,10 +1457,20 @@ internal class NetDriver : ConsoleDriver
         }
         finally
         {
+            if (_mainLoopDriver is { })
+            {
+                _mainLoopDriver._netEvents._forceRead = false;
+            }
+
+            if (_mainLoopDriver._netEvents.EscSeqRequests.Statuses.Count > 0
+                && string.IsNullOrEmpty (_mainLoopDriver._netEvents.EscSeqRequests.Statuses.Peek ().AnsiRequest.Response))
+            {
+                // Bad request or no response at all
+                _mainLoopDriver._netEvents.EscSeqRequests.Statuses.Dequeue ();
+            }
+
             _waitAnsiResponse.Reset ();
         }
-
-        _mainLoopDriver._netEvents._forceRead = false;
 
         return ansiRequest.Response;
     }
