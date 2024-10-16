@@ -380,9 +380,9 @@ public partial class Curses
 
     private static void LoadMethods ()
     {
-        string [] libs = UnmanagedLibrary.IsMacOSPlatform
-                             ? new [] { "libncurses.dylib" }
-                             : new [] { "libncursesw.so.6", "libncursesw.so.5" };
+        string [] libs = OperatingSystem.IsMacOS()
+                             ? ["libncurses.dylib"]
+                             : ["libncursesw.so.6", "libncursesw.so.5"];
         var attempts = 1;
 
         while (true)
