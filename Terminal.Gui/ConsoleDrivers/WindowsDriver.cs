@@ -781,6 +781,9 @@ internal class WindowsConsole
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool CloseHandle (nint handle);
 
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    public static extern bool PeekConsoleInput (nint hConsoleInput, out InputRecord lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
+
     [DllImport ("kernel32.dll", EntryPoint = "ReadConsoleInputW", CharSet = CharSet.Unicode)]
     public static extern bool ReadConsoleInput (
         nint hConsoleInput,
@@ -888,14 +891,19 @@ internal class WindowsConsole
     {
         const int bufferSize = 1;
         nint pRecord = Marshal.AllocHGlobal (Marshal.SizeOf<InputRecord> () * bufferSize);
+        uint numberEventsRead = 0;
 
         try
         {
-            ReadConsoleInput (
-                              _inputHandle,
-                              pRecord,
-                              bufferSize,
-                              out uint numberEventsRead);
+
+            if (PeekConsoleInput (_inputHandle, out InputRecord inputRecord, 1, out uint eventsRead) && eventsRead > 0)
+            {
+                ReadConsoleInput (
+                                  _inputHandle,
+                                  pRecord,
+                                  bufferSize,
+                                  out numberEventsRead);
+            }
 
             return numberEventsRead == 0
                        ? null
@@ -1187,9 +1195,38 @@ internal class WindowsDriver : ConsoleDriver
     /// <inheritdoc />
     public override string WriteAnsiRequest (AnsiEscapeSequenceRequest ansiRequest)
     {
-        if (WinConsole?.WriteANSI (ansiRequest.Request) == true)
+        while (_mainLoopDriver is { } && Console.KeyAvailable)
         {
-            return ReadAnsiResponseDefault (ansiRequest);
+            _mainLoopDriver._waitForProbe.Set ();
+            _mainLoopDriver._waitForProbe.Reset ();
+
+            _mainLoopDriver._forceRead = true;
+        }
+
+        if (_mainLoopDriver is { })
+        {
+            _mainLoopDriver._forceRead = false;
+        }
+
+        _mainLoopDriver._suspendRead = true;
+
+        try
+        {
+            if (WinConsole?.WriteANSI (ansiRequest.Request) == true)
+            {
+                Thread.Sleep (100); // Allow time for the terminal to respond
+
+                return ReadAnsiResponseDefault (ansiRequest);
+            }
+        }
+        catch (Exception e)
+        {
+            return string.Empty;
+        }
+        finally
+        {
+            _mainLoopDriver._suspendRead = false;
+
         }
 
         return string.Empty;
@@ -2192,7 +2229,7 @@ internal class WindowsMainLoop : IMainLoopDriver
 
     // The records that we keep fetching
     private readonly Queue<WindowsConsole.InputRecord []> _resultQueue = new ();
-    private readonly ManualResetEventSlim _waitForProbe = new (false);
+    internal readonly ManualResetEventSlim _waitForProbe = new (false);
     private readonly WindowsConsole _winConsole;
     private CancellationTokenSource _eventReadyTokenSource = new ();
     private readonly CancellationTokenSource _inputHandlerTokenSource = new ();
@@ -2310,6 +2347,9 @@ internal class WindowsMainLoop : IMainLoopDriver
         _mainLoop = null;
     }
 
+    internal bool _forceRead;
+    internal bool _suspendRead;
+
     private void WindowsInputHandler ()
     {
         while (_mainLoop is { })
@@ -2325,6 +2365,7 @@ internal class WindowsMainLoop : IMainLoopDriver
             {
                 // Wakes the _waitForProbe if it's waiting
                 _waitForProbe.Set ();
+
                 return;
             }
             finally
@@ -2337,9 +2378,27 @@ internal class WindowsMainLoop : IMainLoopDriver
                 }
             }
 
-            if (_resultQueue?.Count == 0)
+            if (_resultQueue?.Count == 0 || _forceRead)
             {
-                _resultQueue.Enqueue (_winConsole.ReadConsoleInput ());
+                while (!_inputHandlerTokenSource.IsCancellationRequested)
+                {
+                    if (!_suspendRead)
+                    {
+                        WindowsConsole.InputRecord[] inpRec = _winConsole.ReadConsoleInput ();
+
+                        if (inpRec is { })
+                        {
+                            _resultQueue!.Enqueue (inpRec);
+
+                            break;
+                        }
+                    }
+
+                    if (!_forceRead)
+                    {
+                        Task.Delay (100, _inputHandlerTokenSource.Token).Wait (_inputHandlerTokenSource.Token);
+                    }
+                }
             }
 
             _eventReady.Set ();

@@ -79,11 +79,17 @@ public class AnsiEscapeSequenceRequest
             // Send the ANSI escape sequence
             ansiRequest.Response = driver.WriteAnsiRequest (ansiRequest);
 
+            if (!string.IsNullOrEmpty (ansiRequest.Response) && !ansiRequest.Response.StartsWith (EscSeqUtils.KeyEsc))
+            {
+                throw new InvalidOperationException ("Invalid escape character!");
+            }
+
             if (string.IsNullOrEmpty (ansiRequest.Terminator))
             {
-                error.AppendLine ("Terminator request is empty.");
+                throw new InvalidOperationException ("Terminator request is empty.");
             }
-            else if (!ansiRequest.Response.EndsWith (ansiRequest.Terminator [^1]))
+
+            if (!ansiRequest.Response.EndsWith (ansiRequest.Terminator [^1]))
             {
                 throw new InvalidOperationException ($"Terminator doesn't ends with: '{ansiRequest.Terminator [^1]}'");
             }
