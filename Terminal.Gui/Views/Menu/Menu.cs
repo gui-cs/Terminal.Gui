@@ -70,7 +70,9 @@ internal sealed class Menu : View
     {
         base.BeginInit ();
 
-        Frame = MakeFrame (Frame.X, Frame.Y, _barItems!.Children!, Parent);
+        var frame = MakeFrame (Frame.X, Frame.Y, _barItems!.Children!, Parent);
+        Width = frame.Width;
+        Height = frame.Height;
 
         if (_barItems.Children is { })
         {

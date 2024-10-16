@@ -363,7 +363,10 @@ public partial class View : Responder, ISupportInitializeNotification
             OnVisibleChanged ();
             VisibleChanged?.Invoke (this, EventArgs.Empty);
 
+            SetLayoutNeeded ();
+            SuperView?.SetLayoutNeeded();
             SetNeedsDisplay ();
+            SuperView?.SetNeedsDisplay();
         }
     }
 

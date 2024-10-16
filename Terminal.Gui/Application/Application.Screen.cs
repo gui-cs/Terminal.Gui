@@ -35,8 +35,10 @@ public static partial class Application // Screen related stuff
 
         foreach (Toplevel t in TopLevels)
         {
-            t.SetRelativeLayout (args.Size.Value);
-            t.LayoutSubviews ();
+            if (t.SetRelativeLayout (args.Size.Value))
+            {
+                t.LayoutSubviews ();
+            }
             t.OnSizeChanging (new (args.Size));
         }
 

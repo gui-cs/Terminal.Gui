@@ -565,7 +565,8 @@ public class Border : Adornment
 
                         break;
                 }
-                Application.Refresh ();
+
+                //Application.Refresh ();
 
                 return true;
             }

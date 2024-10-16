@@ -197,7 +197,14 @@ public partial class View // Layout APIs
     /// </remarks>
     public Rectangle Frame
     {
-        get => _frame;
+        get
+        {
+            if (_layoutNeeded)
+            {
+                //Debug.WriteLine("Frame_get with _layoutNeeded");
+            }
+            return _frame;
+        }
         set
         {
             if (_frame == value)
@@ -346,7 +353,7 @@ public partial class View // Layout APIs
             if (!IsInitialized)
             {
                 // Supports Unit Tests that don't call Begin/EndInit
-                SetRelativeLayout (GetBestGuessSuperViewContentSize ());
+                //SetRelativeLayout (GetBestGuessSuperViewContentSize ());
             }
 
             SetLayoutNeeded ();
@@ -395,7 +402,7 @@ public partial class View // Layout APIs
             if (!IsInitialized)
             {
                 // Supports Unit Tests that don't call Begin/EndInit
-                SetRelativeLayout (GetBestGuessSuperViewContentSize ());
+                //SetRelativeLayout (GetBestGuessSuperViewContentSize ());
             }
 
             SetLayoutNeeded ();
@@ -454,7 +461,7 @@ public partial class View // Layout APIs
             if (!IsInitialized)
             {
                 // Supports Unit Tests that don't call Begin/EndInit
-                SetRelativeLayout (GetBestGuessSuperViewContentSize ());
+                //SetRelativeLayout (GetBestGuessSuperViewContentSize ());
             }
 
             SetLayoutNeeded ();
@@ -513,7 +520,7 @@ public partial class View // Layout APIs
             if (!IsInitialized)
             {
                 // Supports Unit Tests that don't call Begin/EndInit
-                SetRelativeLayout (GetBestGuessSuperViewContentSize ());
+                //SetRelativeLayout (GetBestGuessSuperViewContentSize ());
             }
 
             SetLayoutNeeded ();
@@ -562,7 +569,8 @@ public partial class View // Layout APIs
     /// <param name="superviewContentSize">
     ///     The size of the SuperView's content (nominally the same as <c>this.SuperView.GetContentSize ()</c>).
     /// </param>
-    internal void SetRelativeLayout (Size superviewContentSize)
+    /// <returns><see langword="true"/> if successful. <see langword="false"/> means a dependent View still needs layout.</returns>
+    public bool SetRelativeLayout (Size superviewContentSize)
     {
         Debug.Assert (_x is { });
         Debug.Assert (_y is { });
@@ -571,31 +579,49 @@ public partial class View // Layout APIs
 
         CheckDimAuto ();
         SetTextFormatterSize ();
-
         int newX, newW, newY, newH;
 
-        // Calculate the new X, Y, Width, and Height
-        // If the Width or Height is Dim.Auto, calculate the Width or Height first. Otherwise, calculate the X or Y first.
-        if (_width is DimAuto)
+        try
         {
-            newW = _width.Calculate (0, superviewContentSize.Width, this, Dimension.Width);
-            newX = _x.Calculate (superviewContentSize.Width, newW, this, Dimension.Width);
-        }
-        else
-        {
-            newX = _x.Calculate (superviewContentSize.Width, _width, this, Dimension.Width);
-            newW = _width.Calculate (newX, superviewContentSize.Width, this, Dimension.Width);
-        }
+            // Calculate the new X, Y, Width, and Height
+            // If the Width or Height is Dim.Auto, calculate the Width or Height first. Otherwise, calculate the X or Y first.
+            if (_width.Has<DimAuto> (out _))
+            {
+                newW = _width.Calculate (0, superviewContentSize.Width, this, Dimension.Width);
+                newX = _x.Calculate (superviewContentSize.Width, newW, this, Dimension.Width);
+                if (newW != Frame.Width)
+                {
+                    // Pos.Calculate gave us a new position. We need to redo dimension
+                    newW = _width.Calculate (newX, superviewContentSize.Width, this, Dimension.Width);
+                }
+            }
+            else
+            {
+                newX = _x.Calculate (superviewContentSize.Width, _width, this, Dimension.Width);
+                newW = _width.Calculate (newX, superviewContentSize.Width, this, Dimension.Width);
+            }
 
-        if (_height is DimAuto)
-        {
-            newH = _height.Calculate (0, superviewContentSize.Height, this, Dimension.Height);
-            newY = _y.Calculate (superviewContentSize.Height, newH, this, Dimension.Height);
+            if (_height.Has<DimAuto> (out _))
+            {
+                newH = _height.Calculate (0, superviewContentSize.Height, this, Dimension.Height);
+                newY = _y.Calculate (superviewContentSize.Height, newH, this, Dimension.Height);
+                if (newH != Frame.Height)
+                {
+                    // Pos.Calculate gave us a new position. We need to redo dimension
+                    newH = _height.Calculate (newY, superviewContentSize.Height, this, Dimension.Height);
+                }
+            }
+            else
+            {
+                newY = _y.Calculate (superviewContentSize.Height, _height, this, Dimension.Height);
+                newH = _height.Calculate (newY, superviewContentSize.Height, this, Dimension.Height);
+            }
+
         }
-        else
+        catch (Exception e)
         {
-            newY = _y.Calculate (superviewContentSize.Height, _height, this, Dimension.Height);
-            newH = _height.Calculate (newY, superviewContentSize.Height, this, Dimension.Height);
+            // A Dim/PosFunc threw indicating it could not calculate (typically because a dependent View was not laid out).
+            return false;
         }
 
         Rectangle newFrame = new (newX, newY, newW, newH);
@@ -630,6 +656,9 @@ public partial class View // Layout APIs
             {
                 SetTitleTextFormatterSize ();
             }
+
+            SetNeedsDisplay ();
+            SuperView?.SetNeedsDisplay ();
         }
 
         if (TextFormatter.ConstrainToWidth is null)
@@ -641,6 +670,8 @@ public partial class View // Layout APIs
         {
             TextFormatter.ConstrainToHeight = GetContentSize ().Height;
         }
+
+        return true;
     }
 
     // TODO: remove virtual from this
@@ -686,9 +717,22 @@ public partial class View // Layout APIs
         CollectAll (this, ref nodes, ref edges);
         List<View> ordered = TopologicalSort (SuperView!, nodes, edges);
 
+        List<View> redo = new ();
         foreach (View v in ordered)
         {
-            LayoutSubview (v, contentSize);
+            if (!LayoutSubview (v, contentSize))
+            {
+                redo.Add (v);
+            }
+        }
+
+        bool layoutStillNeeded = false;
+        foreach (View v in redo)
+        {
+            if (!LayoutSubview (v, contentSize))
+            {
+                layoutStillNeeded = true;
+            }
         }
 
         // If the 'to' is rooted to 'from' it's a special-case.
@@ -697,20 +741,33 @@ public partial class View // Layout APIs
         {
             foreach ((View from, View to) in edges)
             {
+                Debug.Fail ("This is dead code?");
                 LayoutSubview (to, from.GetContentSize ());
             }
         }
 
-        _layoutNeeded = false;
+        _layoutNeeded = layoutStillNeeded;
 
         OnLayoutComplete (new (contentSize));
     }
 
-    private void LayoutSubview (View v, Size contentSize)
+    /// <summary>
+    ///     Lays out <see cref="subView"/>. 
+    /// </summary>
+    /// <param name="subView"></param>
+    /// <param name="contentSize"></param>
+    /// <returns><see langword="false"/>If the view could not be laid out (typically because a dependencies was not ready). </returns>
+    private bool LayoutSubview (View subView, Size contentSize)
     {
         // Note, SetRelativeLayout calls SetTextFormatterSize
-        v.SetRelativeLayout (contentSize);
-        v.LayoutSubviews ();
+        if (subView.SetRelativeLayout (contentSize))
+        {
+            subView.LayoutSubviews ();
+
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -735,13 +792,13 @@ public partial class View // Layout APIs
     ///     layout.
     /// </summary>
     /// <returns></returns>
-    internal bool IsLayoutNeeded () => _layoutNeeded;
+    public bool IsLayoutNeeded () => _layoutNeeded;
 
     /// <summary>
     ///     INTERNAL API - Sets <see cref="_layoutNeeded"/> for this View and all of it's subviews and it's SuperView.
     ///     The main loop will call SetRelativeLayout and LayoutSubviews for any view with <see cref="IsLayoutNeeded"/> set.
     /// </summary>
-    internal void SetLayoutNeeded ()
+    public void SetLayoutNeeded ()
     {
         if (IsLayoutNeeded ())
         {
@@ -750,6 +807,10 @@ public partial class View // Layout APIs
         }
 
         _layoutNeeded = true;
+
+        Margin?.SetLayoutNeeded ();
+        Border?.SetLayoutNeeded ();
+        Padding?.SetLayoutNeeded ();
 
         // Use a stack to avoid recursion
         Stack<View> stack = new Stack<View> (Subviews);
@@ -769,13 +830,12 @@ public partial class View // Layout APIs
 
         TextFormatter.NeedsFormat = true;
 
-        // Use a loop to avoid recursion for superview hierarchy
-        View? superView = SuperView;
-        while (superView != null && !superView.IsLayoutNeeded ())
+        if (this is Adornment adornment)
         {
-            superView._layoutNeeded = true;
-            superView = superView.SuperView;
+            adornment.Parent?.SetLayoutNeeded ();
         }
+
+        SuperView?.SetLayoutNeeded ();
     }
 
     /// <summary>
@@ -827,25 +887,25 @@ public partial class View // Layout APIs
     /// </param>
     internal void CollectDim (Dim? dim, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
     {
-        switch (dim)
+        if (dim!.Has<DimView> (out var dv))
         {
-            case DimView dv:
-                // See #2461
-                //if (!from.InternalSubviews.Contains (dv.Target)) {
-                //	throw new InvalidOperationException ($"View {dv.Target} is not a subview of {from}");
-                //}
-                if (dv.Target != this)
-                {
-                    nEdges.Add ((dv.Target!, from));
-                }
-
-                return;
-            case DimCombine dc:
-                CollectDim (dc.Left, from, ref nNodes, ref nEdges);
-                CollectDim (dc.Right, from, ref nNodes, ref nEdges);
-
-                break;
+            if (dv.Target != this)
+            {
+                nEdges.Add ((dv.Target!, from));
+            }
         }
+
+        if (dim!.Has<DimCombine> (out var dc))
+        {
+            CollectDim (dc.Left, from, ref nNodes, ref nEdges);
+            CollectDim (dc.Right, from, ref nNodes, ref nEdges);
+        }
+
+        if (dim!.Has<DimFunc> (out var df))
+        {
+
+        }
+
     }
 
     /// <summary>
@@ -863,10 +923,7 @@ public partial class View // Layout APIs
         switch (pos)
         {
             case PosView pv:
-                // See #2461
-                //if (!from.InternalSubviews.Contains (pv.Target)) {
-                //	throw new InvalidOperationException ($"View {pv.Target} is not a subview of {from}");
-                //}
+                Debug.Assert (pv.Target is { });
                 if (pv.Target != this)
                 {
                     nEdges.Add ((pv.Target!, from));

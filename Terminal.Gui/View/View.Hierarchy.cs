@@ -85,8 +85,15 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             view.EndInit ();
         }
 
-        CheckDimAuto ();
-        view.SetRelativeLayout(GetContentSize());
+
+        SetLayoutNeeded();
+        //CheckDimAuto ();
+       // view.SetRelativeLayout(Application.Screen.Size);
+
+        //if (view.Visible)
+        //{
+        //    SetNeedsDisplay();
+        //};
 
         return view;
     }

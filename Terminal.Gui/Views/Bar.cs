@@ -31,7 +31,7 @@ public class Bar : View, IOrientation, IDesignable
         _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
         _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
 
-        Initialized += Bar_Initialized;
+       // Initialized += Bar_Initialized;
         MouseEvent += OnMouseEvent;
 
         if (shortcuts is null)
@@ -77,8 +77,10 @@ public class Bar : View, IOrientation, IDesignable
         }
     }
 
-    private void Bar_Initialized (object? sender, EventArgs e)
+    /// <inheritdoc />
+    public override void EndInit ()
     {
+        base.EndInit ();
         ColorScheme = Colors.ColorSchemes ["Menu"];
         LayoutBarItems (GetContentSize ());
     }
@@ -199,6 +201,9 @@ public class Bar : View, IOrientation, IDesignable
         LayoutBarItems (args.OldContentSize);
     }
 
+    // This is used to calculate the minimum width of the Bar when the width is NOT Dim.Auto
+    private int? _minimumDimAutoWidth;
+
     private void LayoutBarItems (Size contentSize)
     {
         View? prevBarItem = null;
@@ -229,7 +234,7 @@ public class Bar : View, IOrientation, IDesignable
                     minKeyWidth = int.Max (minKeyWidth, shortcut.KeyView.Text.GetColumns ());
                 }
 
-                var maxBarItemWidth = 0;
+                var _maxBarItemWidth = 0;
                 var totalHeight = 0;
 
                 for (var index = 0; index < Subviews.Count; index++)
@@ -246,7 +251,8 @@ public class Bar : View, IOrientation, IDesignable
                     if (barItem is Shortcut scBarItem)
                     {
                         scBarItem.MinimumKeyTextSize = minKeyWidth;
-                        maxBarItemWidth = Math.Max (maxBarItemWidth, scBarItem.Frame.Width);
+
+                        _maxBarItemWidth = Math.Max (_maxBarItemWidth, scBarItem.Frame.Width);
                     }
 
                     if (prevBarItem == null)
@@ -268,7 +274,7 @@ public class Bar : View, IOrientation, IDesignable
 
                 foreach (View barItem in Subviews)
                 {
-                    barItem.Width = maxBarItemWidth;
+                    barItem.Width = _maxBarItemWidth;
                 }
 
                 Height = Dim.Auto (DimAutoStyle.Content, totalHeight);

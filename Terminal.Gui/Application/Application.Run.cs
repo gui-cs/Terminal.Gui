@@ -94,13 +94,6 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         var rs = new RunState (toplevel);
 
-        // View implements ISupportInitializeNotification which is derived from ISupportInitialize
-        if (!toplevel.IsInitialized)
-        {
-            toplevel.BeginInit ();
-            toplevel.EndInit ();
-        }
-
 #if DEBUG_IDISPOSABLE
         if (Top is { } && toplevel != Top && !TopLevels.Contains (Top))
         {
@@ -184,8 +177,19 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             }
         }
 
-        toplevel.SetRelativeLayout (Driver!.Screen.Size);
-        toplevel.LayoutSubviews ();
+        // View implements ISupportInitializeNotification which is derived from ISupportInitialize
+        if (!toplevel.IsInitialized)
+        {
+            toplevel.BeginInit ();
+            toplevel.EndInit ();
+
+            if (toplevel.SetRelativeLayout (Driver!.Screen.Size))
+            {
+                toplevel.LayoutSubviews ();
+            }
+
+            // toplevel.SetLayoutNeeded();
+        }
 
         // Try to set initial focus to any TabStop
         if (!toplevel.HasFocus)
@@ -194,8 +198,6 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         }
 
         toplevel.OnLoaded ();
-
-        Refresh ();
 
         if (PositionCursor ())
         {
@@ -489,9 +491,31 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// <summary>Triggers a refresh of the entire display.</summary>
     public static void Refresh ()
     {
+        bool clear = false;
         foreach (Toplevel tl in TopLevels.Reverse ())
         {
-            tl.LayoutSubviews ();
+            if (tl.IsLayoutNeeded ())
+            {
+                clear = true;
+
+                if (tl.SetRelativeLayout (Screen.Size))
+                {
+                    tl.LayoutSubviews ();
+                }
+            }
+        }
+
+        if (clear)
+        {
+            Driver!.ClearContents ();
+        }
+
+        foreach (Toplevel tl in TopLevels.Reverse ())
+        {
+            if (clear)
+            {
+                tl.SetNeedsDisplay();
+            }
             tl.Draw ();
         }
 
