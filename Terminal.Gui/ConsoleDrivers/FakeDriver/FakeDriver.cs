@@ -415,11 +415,11 @@ public class FakeDriver : ConsoleDriver
     public override void StopReportingMouseMoves () { throw new NotImplementedException (); }
 
     /// <inheritdoc />
-    public override string WriteAnsi (AnsiEscapeSequenceRequest ansiRequest)
+    public override string WriteAnsiRequest (AnsiEscapeSequenceRequest ansiRequest)
     {
-        if (WriteAnsiDefault (ansiRequest.Request))
+        if (WriteAnsiRequestDefault (ansiRequest.Request))
         {
-            return ReadAnsiDefault (ansiRequest);
+            return ReadAnsiResponseDefault (ansiRequest);
         }
 
         return string.Empty;

@@ -632,10 +632,10 @@ public abstract class ConsoleDriver
     /// Provide handling for the terminal write ANSI escape sequence request.
     /// </summary>
     /// <param name="ansiRequest">The <see cref="AnsiEscapeSequenceRequest"/> object.</param>
-    /// <returns></returns>
-    public abstract string WriteAnsi (AnsiEscapeSequenceRequest ansiRequest);
+    /// <returns>The request response.</returns>
+    public abstract string WriteAnsiRequest (AnsiEscapeSequenceRequest ansiRequest);
 
-    internal bool WriteAnsiDefault (string ansi)
+    internal bool WriteAnsiRequestDefault (string ansi)
     {
         try
         {
@@ -654,7 +654,7 @@ public abstract class ConsoleDriver
         return true;
     }
 
-    internal string ReadAnsiDefault (AnsiEscapeSequenceRequest ansiRequest)
+    internal string ReadAnsiResponseDefault (AnsiEscapeSequenceRequest ansiRequest)
     {
         var response = new StringBuilder ();
 

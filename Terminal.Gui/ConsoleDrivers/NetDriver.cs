@@ -1436,7 +1436,7 @@ internal class NetDriver : ConsoleDriver
     private readonly CancellationTokenSource _ansiResponseTokenSource = new ();
 
     /// <inheritdoc />
-    public override string WriteAnsi (AnsiEscapeSequenceRequest ansiRequest)
+    public override string WriteAnsiRequest (AnsiEscapeSequenceRequest ansiRequest)
     {
         _mainLoopDriver._netEvents.EscSeqRequests.Add (ansiRequest);
 

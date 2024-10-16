@@ -1185,11 +1185,11 @@ internal class WindowsDriver : ConsoleDriver
     }
 
     /// <inheritdoc />
-    public override string WriteAnsi (AnsiEscapeSequenceRequest ansiRequest)
+    public override string WriteAnsiRequest (AnsiEscapeSequenceRequest ansiRequest)
     {
         if (WinConsole?.WriteANSI (ansiRequest.Request) == true)
         {
-            return ReadAnsiDefault (ansiRequest);
+            return ReadAnsiResponseDefault (ansiRequest);
         }
 
         return string.Empty;

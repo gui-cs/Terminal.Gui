@@ -77,7 +77,7 @@ public class AnsiEscapeSequenceRequest
             driver!.IsSuspendRead = true;
 
             // Send the ANSI escape sequence
-            ansiRequest.Response = driver.WriteAnsi (ansiRequest);
+            ansiRequest.Response = driver.WriteAnsiRequest (ansiRequest);
 
             if (string.IsNullOrEmpty (ansiRequest.Terminator))
             {
