@@ -229,6 +229,7 @@ public partial class View : Responder, ISupportInitializeNotification
         // These calls were moved from BeginInit as they access Viewport which is indeterminate until EndInit is called.
         UpdateTextDirection (TextDirection);
         UpdateTextFormatterText ();
+
         SetLayoutNeeded ();
 
         if (_subviews is { })
@@ -241,6 +242,9 @@ public partial class View : Responder, ISupportInitializeNotification
                 }
             }
         }
+
+        // TOOD: Figure out how to move this out of here and just depend on IsLayoutNeeded in Mainloop
+        LayoutSubviews();
 
         Initialized?.Invoke (this, EventArgs.Empty);
     }

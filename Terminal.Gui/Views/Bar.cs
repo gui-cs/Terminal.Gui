@@ -82,7 +82,6 @@ public class Bar : View, IOrientation, IDesignable
     {
         base.EndInit ();
         ColorScheme = Colors.ColorSchemes ["Menu"];
-        LayoutBarItems (GetContentSize ());
     }
 
     /// <inheritdoc/>
@@ -121,7 +120,7 @@ public class Bar : View, IOrientation, IDesignable
     /// <param name="newOrientation"></param>
     public void OnOrientationChanged (Orientation newOrientation)
     {
-        SetLayoutNeeded ();
+        LayoutBarItems (SuperView?.GetContentSize() ?? Application.Screen.Size);
     }
     #endregion
 

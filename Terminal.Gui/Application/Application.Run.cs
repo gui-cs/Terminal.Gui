@@ -514,7 +514,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         {
             if (clear)
             {
-                tl.SetNeedsDisplay();
+                tl.SetNeedsDisplay(Screen);
             }
             tl.Draw ();
         }

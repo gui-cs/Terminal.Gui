@@ -657,7 +657,7 @@ public partial class View // Layout APIs
                 SetTitleTextFormatterSize ();
             }
 
-            SetNeedsDisplay ();
+            //SetNeedsDisplay ();
             SuperView?.SetNeedsDisplay ();
         }
 
@@ -821,6 +821,10 @@ public partial class View // Layout APIs
             if (!current.IsLayoutNeeded ())
             {
                 current._layoutNeeded = true;
+                current.Margin?.SetLayoutNeeded ();
+                current.Border?.SetLayoutNeeded ();
+                current.Padding?.SetLayoutNeeded ();
+
                 foreach (View subview in current.Subviews)
                 {
                     stack.Push (subview);

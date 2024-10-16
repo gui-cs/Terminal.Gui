@@ -220,7 +220,7 @@ public partial class View // Drawing APIs
 
         if (IsLayoutNeeded ())
         {
-            Debug.WriteLine ($"Layout should be de-coupled from drawing: {this}");
+            //Debug.WriteLine ($"Layout should be de-coupled from drawing: {this}");
         }
 
         //// TODO: This ensures overlapped views are drawn correctly. However, this is inefficient.
@@ -573,7 +573,7 @@ public partial class View // Drawing APIs
             {
                 if (view.IsLayoutNeeded ())
                 {
-                    Debug.WriteLine ($"Layout should be de-coupled from drawing: {view}");
+                    //Debug.WriteLine ($"Layout should be de-coupled from drawing: {view}");
                     //view.LayoutSubviews ();
                 }
 
