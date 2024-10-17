@@ -34,9 +34,6 @@ _ReSharper.**
 ~$*
 *~
 
-# NuGet Stuff
-*.nupkg
-*.snupkg
 # Exclude everything in packages directory except the packages/build directory
 **/[Pp]ackages/*
 !**/[Pp]ackages/build/
@@ -61,4 +58,3 @@ demo.*
 *.tui/
 
 *.dotCover
-/local_packages/
