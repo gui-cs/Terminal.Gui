@@ -822,12 +822,12 @@ public partial class View // Layout APIs
 
         TextFormatter.NeedsFormat = true;
 
+        SuperView?.SetLayoutNeeded ();
+
         if (this is Adornment adornment)
         {
             adornment.Parent?.SetLayoutNeeded ();
         }
-
-        SuperView?.SetLayoutNeeded ();
     }
 
     /// <summary>

@@ -700,6 +700,11 @@ public partial class View // Drawing APIs
 
         SuperView?.SetSubViewNeedsDisplay ();
 
+        if (this is Adornment adornment)
+        {
+            adornment.Parent?.SetSubViewNeedsDisplay ();
+        }
+
         foreach (View subview in Subviews)
         {
             if (subview.Frame.IntersectsWith (region))

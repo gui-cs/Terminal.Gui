@@ -43,27 +43,6 @@ public class Margin : Adornment
         }
 
         ShadowStyle = base.ShadowStyle;
-
-        Add (
-             _rightShadow = new ()
-             {
-                 X = Pos.AnchorEnd (1),
-                 Y = 0,
-                 Width = 1,
-                 Height = Dim.Fill (),
-                 ShadowStyle = ShadowStyle,
-                 Orientation = Orientation.Vertical
-             },
-             _bottomShadow = new ()
-             {
-                 X = 0,
-                 Y = Pos.AnchorEnd (1),
-                 Width = Dim.Fill (),
-                 Height = 1,
-                 ShadowStyle = ShadowStyle,
-                 Orientation = Orientation.Horizontal
-             }
-            );
     }
 
     /// <summary>
@@ -135,9 +114,18 @@ public class Margin : Adornment
     /// </summary>
     public ShadowStyle SetShadow (ShadowStyle style)
     {
-        if (ShadowStyle == style)
+        if (_rightShadow is { })
         {
-            // return style;
+            Remove (_rightShadow);
+            _rightShadow.Dispose ();
+            _rightShadow = null;
+        }
+
+        if (_bottomShadow is { })
+        {
+            Remove (_bottomShadow);
+            _bottomShadow.Dispose ();
+            _bottomShadow = null;
         }
 
         if (ShadowStyle != ShadowStyle.None)
@@ -152,14 +140,28 @@ public class Margin : Adornment
             Thickness = new (Thickness.Left, Thickness.Top, Thickness.Right + 1, Thickness.Bottom + 1);
         }
 
-        if (_rightShadow is { })
+        if (style != ShadowStyle.None)
         {
-            _rightShadow.ShadowStyle = style;
-        }
+            _rightShadow = new ()
+            {
+                X = Pos.AnchorEnd (1),
+                Y = 0,
+                Width = 1,
+                Height = Dim.Fill (),
+                ShadowStyle = style,
+                Orientation = Orientation.Vertical
+            };
 
-        if (_bottomShadow is { })
-        {
-            _bottomShadow.ShadowStyle = style;
+            _bottomShadow = new ()
+            {
+                X = 0,
+                Y = Pos.AnchorEnd (1),
+                Width = Dim.Fill (),
+                Height = 1,
+                ShadowStyle = style,
+                Orientation = Orientation.Horizontal
+            };
+            Add (_rightShadow, _bottomShadow);
         }
 
         return style;
@@ -169,7 +171,11 @@ public class Margin : Adornment
     public override ShadowStyle ShadowStyle
     {
         get => base.ShadowStyle;
-        set => base.ShadowStyle = SetShadow (value);
+        set
+        {
+            base.ShadowStyle = SetShadow (value);
+
+        }
     }
 
     private const int PRESS_MOVE_HORIZONTAL = 1;
