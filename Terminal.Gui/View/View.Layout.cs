@@ -20,8 +20,7 @@ public partial class View // Layout APIs
     /// </summary>
     /// <remarks>
     ///     If <paramref name="viewToMove"/> does not have a <see cref="View.SuperView"/> or it's SuperView is not
-    ///     <see cref="Application.Top"/> the position will be bound by the <see cref="ConsoleDriver.Cols"/> and
-    ///     <see cref="ConsoleDriver.Rows"/>.
+    ///     <see cref="Application.Top"/> the position will be bound by  <see cref="Application.Screen"/>.
     /// </remarks>
     /// <param name="viewToMove">The View that is to be moved.</param>
     /// <param name="targetX">The target x location.</param>
@@ -48,7 +47,7 @@ public partial class View // Layout APIs
 
         if (viewToMove is not Toplevel || viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
         {
-            maxDimension = Driver.Cols;
+            maxDimension = Application.Screen.Width;
             superView = Application.Top;
         }
         else
@@ -135,7 +134,7 @@ public partial class View // Layout APIs
 
         if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
         {
-            maxDimension = statusVisible ? Driver.Rows - 1 : Driver.Rows;
+            maxDimension = statusVisible ? Application.Screen.Height - 1 : Application.Screen.Height;
         }
         else
         {
@@ -591,7 +590,7 @@ public partial class View // Layout APIs
             }
 
         }
-        catch (Exception e)
+        catch (Exception _)
         {
             // A Dim/PosFunc threw indicating it could not calculate (typically because a dependent View was not laid out).
             return false;

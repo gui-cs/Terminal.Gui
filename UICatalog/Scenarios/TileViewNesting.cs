@@ -12,7 +12,6 @@ public class TileViewNesting : Scenario
     private CheckBox _cbHorizontal;
     private CheckBox _cbTitles;
     private CheckBox _cbUseLabels;
-    private bool _loaded;
     private TextField _textField;
     private int _viewsCreated;
     private int _viewsToCreate;
@@ -69,8 +68,6 @@ public class TileViewNesting : Scenario
         var top = new Toplevel ();
         top.Add (menu);
         top.Add (win);
-
-        top.Loaded += (s, e) => _loaded = true;
 
         Application.Run (top);
         top.Dispose ();

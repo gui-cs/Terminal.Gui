@@ -256,23 +256,12 @@ public class PosViewTests (ITestOutputHelper output)
     [Fact]
     public void PosView_Side_SetToNull_Throws ()
     {
-        Pos pos = Left (null);
-        Assert.Throws<NullReferenceException> (() => pos.ToString ());
-
-        pos = X (null);
-        Assert.Throws<NullReferenceException> (() => pos.ToString ());
-
-        pos = Top (null);
-        Assert.Throws<NullReferenceException> (() => pos.ToString ());
-
-        pos = Y (null);
-        Assert.Throws<NullReferenceException> (() => pos.ToString ());
-
-        pos = Bottom (null);
-        Assert.Throws<NullReferenceException> (() => pos.ToString ());
-
-        pos = Right (null);
-        Assert.Throws<NullReferenceException> (() => pos.ToString ());
+        Assert.Throws<ArgumentNullException> (() => X (null));
+        Assert.Throws<ArgumentNullException> (() => Y (null));
+        Assert.Throws<ArgumentNullException> (() => Left (null));
+        Assert.Throws<ArgumentNullException> (() => Right (null));
+        Assert.Throws<ArgumentNullException> (() => Bottom (null));
+        Assert.Throws<ArgumentNullException> (() => Top (null));
     }
 
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved

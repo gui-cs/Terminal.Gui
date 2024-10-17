@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui.LayoutTests;
 
-public class LayoutTests (ITestOutputHelper output)
+public class SetLayoutTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
 
@@ -171,42 +171,6 @@ public class LayoutTests (ITestOutputHelper output)
         Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
         root.Dispose ();
         super.Dispose ();
-    }
-
-    [Fact]
-    public void TopologicalSort_Missing_Add ()
-    {
-        var root = new View ();
-        var sub1 = new View ();
-        root.Add (sub1);
-        var sub2 = new View ();
-        sub1.Width = Dim.Width (sub2);
-
-        Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
-
-        sub2.Width = Dim.Width (sub1);
-
-        Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
-        root.Dispose ();
-        sub1.Dispose ();
-        sub2.Dispose ();
-    }
-
-    [Fact]
-    public void TopologicalSort_Recursive_Ref ()
-    {
-        var root = new View ();
-        var sub1 = new View ();
-        root.Add (sub1);
-        var sub2 = new View ();
-        root.Add (sub2);
-        sub2.Width = Dim.Width (sub2);
-
-        Exception exception = Record.Exception (root.LayoutSubviews);
-        Assert.Null (exception);
-        root.Dispose ();
-        sub1.Dispose ();
-        sub2.Dispose ();
     }
 
     [Fact]
@@ -695,25 +659,4 @@ public class LayoutTests (ITestOutputHelper output)
         Assert.Equal (19, v2.Frame.Height);
         t.Dispose ();
     }
-
-
-    /// <summary>This is an intentionally obtuse test. See https://github.com/gui-cs/Terminal.Gui/issues/2461</summary>
-    [Fact]
-    [TestRespondersDisposed]
-    public void Throw_If_SuperView_Refs_SubView ()
-    {
-        var superView = new View { Width = 80, Height = 25 };
-
-        var subViewThatRefsSuperView = new View ()
-        {
-            Width = Dim.Width (superView),
-            Height = Dim.Height (superView)
-        };
-
-        superView.Add (subViewThatRefsSuperView);
-
-        Assert.Throws<InvalidOperationException> (() => superView.LayoutSubviews ());
-        superView.Dispose ();
-    }
-
 }

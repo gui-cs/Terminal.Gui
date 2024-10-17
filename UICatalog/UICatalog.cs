@@ -1068,7 +1068,7 @@ public class UICatalogApp
 
             if (ShVersion is { })
             {
-                ShVersion.Title = $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {Driver.GetVersionInfo ()}";
+                ShVersion.Title = $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {Driver!.GetVersionInfo ()}";
             }
 
             if (_selectedScenario != null)

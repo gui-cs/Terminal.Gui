@@ -202,7 +202,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         if (PositionCursor ())
         {
-            Driver.UpdateCursor ();
+            Driver?.UpdateCursor ();
         }
 
         NotifyNewRunState?.Invoke (toplevel, new (rs));

@@ -83,7 +83,7 @@ public partial class View // Drawing APIs
     {
         if (Move (col, row))
         {
-            Driver.AddRune (rune);
+            Driver?.AddRune (rune);
         }
     }
 
@@ -195,7 +195,7 @@ public partial class View // Drawing APIs
     /// <remarks>
     ///     <para>
     ///         The view will only be drawn if it is visible, and has any of <see cref="NeedsDisplay"/>, <see cref="SubViewNeedsDisplay"/>,
-    ///         or <see cref="LayoutNeeded"/> set.
+    ///         or <see cref="IsLayoutNeeded"/> set.
     ///     </para>
     ///     <para>
     ///         Always use <see cref="Viewport"/> (view-relative) when calling <see cref="OnDrawContent(Rectangle)"/>, NOT
