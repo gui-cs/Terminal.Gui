@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui.InputTests;
+﻿using JetBrains.Annotations;
+
+namespace Terminal.Gui.InputTests;
 
 public class EscSeqUtilsTests
 {
@@ -9,7 +11,8 @@ public class EscSeqUtilsTests
     private ConsoleKeyInfo [] _cki;
     private EscSeqRequests _escSeqReqProc;
     private bool _isKeyMouse;
-    private bool _isReq;
+    [CanBeNull]
+    private EscSeqReqStatus _seqReqStatus;
     private ConsoleKey _key;
     private ConsoleModifiers _mod;
     private List<MouseFlags> _mouseFlags;
@@ -38,7 +41,7 @@ public class EscSeqUtilsTests
                                   out _isKeyMouse,
                                   out _mouseFlags,
                                   out _pos,
-                                  out _isReq,
+                                  out _seqReqStatus,
                                   ProcessContinuousButtonPressed
                                  );
         Assert.Null (_escSeqReqProc);
@@ -50,9 +53,9 @@ public class EscSeqUtilsTests
         Assert.Null (_values);
         Assert.Null (_terminating);
         Assert.False (_isKeyMouse);
-        Assert.Equal (new() { 0 }, _mouseFlags);
+        Assert.Equal (new () { 0 }, _mouseFlags);
         Assert.Equal (Point.Empty, _pos);
-        Assert.False (_isReq);
+        Assert.Null (_seqReqStatus);
         Assert.Equal (0, (int)_arg1);
         Assert.Equal (Point.Empty, _arg2);
 
@@ -73,7 +76,7 @@ public class EscSeqUtilsTests
                                   out _isKeyMouse,
                                   out _mouseFlags,
                                   out _pos,
-                                  out _isReq,
+                                  out _seqReqStatus,
                                   ProcessContinuousButtonPressed
                                  );
         Assert.Null (_escSeqReqProc);
@@ -85,9 +88,9 @@ public class EscSeqUtilsTests
         Assert.Null (_values);
         Assert.Equal ("\u0012", _terminating);
         Assert.False (_isKeyMouse);
-        Assert.Equal (new() { 0 }, _mouseFlags);
+        Assert.Equal (new () { 0 }, _mouseFlags);
         Assert.Equal (Point.Empty, _pos);
-        Assert.False (_isReq);
+        Assert.Null (_seqReqStatus);
         Assert.Equal (0, (int)_arg1);
         Assert.Equal (Point.Empty, _arg2);
 
@@ -108,7 +111,7 @@ public class EscSeqUtilsTests
                                   out _isKeyMouse,
                                   out _mouseFlags,
                                   out _pos,
-                                  out _isReq,
+                                  out _seqReqStatus,
                                   ProcessContinuousButtonPressed
                                  );
         Assert.Null (_escSeqReqProc);
@@ -120,9 +123,9 @@ public class EscSeqUtilsTests
         Assert.Null (_values);
         Assert.Equal ("r", _terminating);
         Assert.False (_isKeyMouse);
-        Assert.Equal (new() { 0 }, _mouseFlags);
+        Assert.Equal (new () { 0 }, _mouseFlags);
         Assert.Equal (Point.Empty, _pos);
-        Assert.False (_isReq);
+        Assert.Null (_seqReqStatus);
         Assert.Equal (0, (int)_arg1);
         Assert.Equal (Point.Empty, _arg2);
 
@@ -148,7 +151,7 @@ public class EscSeqUtilsTests
                                   out _isKeyMouse,
                                   out _mouseFlags,
                                   out _pos,
-                                  out _isReq,
+                                  out _seqReqStatus,
                                   ProcessContinuousButtonPressed
                                  );
         Assert.Null (_escSeqReqProc);
@@ -161,9 +164,9 @@ public class EscSeqUtilsTests
         Assert.Null (_values [0]);
         Assert.Equal ("R", _terminating);
         Assert.False (_isKeyMouse);
-        Assert.Equal (new() { 0 }, _mouseFlags);
+        Assert.Equal (new () { 0 }, _mouseFlags);
         Assert.Equal (Point.Empty, _pos);
-        Assert.False (_isReq);
+        Assert.Null (_seqReqStatus);
         Assert.Equal (0, (int)_arg1);
         Assert.Equal (Point.Empty, _arg2);
 
@@ -194,7 +197,7 @@ public class EscSeqUtilsTests
                                   out _isKeyMouse,
                                   out _mouseFlags,
                                   out _pos,
-                                  out _isReq,
+                                  out _seqReqStatus,
                                   ProcessContinuousButtonPressed
                                  );
         Assert.Null (_escSeqReqProc);
@@ -208,9 +211,9 @@ public class EscSeqUtilsTests
         Assert.Equal ("2", _values [^1]);
         Assert.Equal ("R", _terminating);
         Assert.False (_isKeyMouse);
-        Assert.Equal (new() { 0 }, _mouseFlags);
+        Assert.Equal (new () { 0 }, _mouseFlags);
         Assert.Equal (Point.Empty, _pos);
-        Assert.False (_isReq);
+        Assert.Null (_seqReqStatus);
         Assert.Equal (0, (int)_arg1);
         Assert.Equal (Point.Empty, _arg2);
 
@@ -240,7 +243,7 @@ public class EscSeqUtilsTests
                                   out _isKeyMouse,
                                   out _mouseFlags,
                                   out _pos,
-                                  out _isReq,
+                                  out _seqReqStatus,
                                   ProcessContinuousButtonPressed
                                  );
         Assert.Null (_escSeqReqProc);
@@ -254,9 +257,9 @@ public class EscSeqUtilsTests
         Assert.Equal ("3", _values [^1]);
         Assert.Equal ("R", _terminating);
         Assert.False (_isKeyMouse);
-        Assert.Equal (new() { 0 }, _mouseFlags);
+        Assert.Equal (new () { 0 }, _mouseFlags);
         Assert.Equal (Point.Empty, _pos);
-        Assert.False (_isReq);
+        Assert.Null (_seqReqStatus);
         Assert.Equal (0, (int)_arg1);
         Assert.Equal (Point.Empty, _arg2);
 
@@ -286,7 +289,7 @@ public class EscSeqUtilsTests
                                   out _isKeyMouse,
                                   out _mouseFlags,
                                   out _pos,
-                                  out _isReq,
+                                  out _seqReqStatus,
                                   ProcessContinuousButtonPressed
                                  );
         Assert.Null (_escSeqReqProc);
@@ -300,9 +303,9 @@ public class EscSeqUtilsTests
         Assert.Equal ("4", _values [^1]);
         Assert.Equal ("R", _terminating);
         Assert.False (_isKeyMouse);
-        Assert.Equal (new() { 0 }, _mouseFlags);
+        Assert.Equal (new () { 0 }, _mouseFlags);
         Assert.Equal (Point.Empty, _pos);
-        Assert.False (_isReq);
+        Assert.Null (_seqReqStatus);
         Assert.Equal (0, (int)_arg1);
         Assert.Equal (Point.Empty, _arg2);
 
@@ -332,7 +335,7 @@ public class EscSeqUtilsTests
                                   out _isKeyMouse,
                                   out _mouseFlags,
                                   out _pos,
-                                  out _isReq,
+                                  out _seqReqStatus,
                                   ProcessContinuousButtonPressed
                                  );
         Assert.Null (_escSeqReqProc);
@@ -346,9 +349,9 @@ public class EscSeqUtilsTests
         Assert.Equal ("5", _values [^1]);
         Assert.Equal ("R", _terminating);
         Assert.False (_isKeyMouse);
-        Assert.Equal (new() { 0 }, _mouseFlags);
+        Assert.Equal (new () { 0 }, _mouseFlags);
         Assert.Equal (Point.Empty, _pos);
-        Assert.False (_isReq);
+        Assert.Null (_seqReqStatus);
         Assert.Equal (0, (int)_arg1);
         Assert.Equal (Point.Empty, _arg2);
 
@@ -378,7 +381,7 @@ public class EscSeqUtilsTests
                                   out _isKeyMouse,
                                   out _mouseFlags,
                                   out _pos,
-                                  out _isReq,
+                                  out _seqReqStatus,
                                   ProcessContinuousButtonPressed
                                  );
         Assert.Null (_escSeqReqProc);
@@ -392,9 +395,9 @@ public class EscSeqUtilsTests
         Assert.Equal ("6", _values [^1]);
         Assert.Equal ("R", _terminating);
         Assert.False (_isKeyMouse);
-        Assert.Equal (new() { 0 }, _mouseFlags);
+        Assert.Equal (new () { 0 }, _mouseFlags);
         Assert.Equal (Point.Empty, _pos);
-        Assert.False (_isReq);
+        Assert.Null (_seqReqStatus);
         Assert.Equal (0, (int)_arg1);
         Assert.Equal (Point.Empty, _arg2);
 
@@ -424,7 +427,7 @@ public class EscSeqUtilsTests
                                   out _isKeyMouse,
                                   out _mouseFlags,
                                   out _pos,
-                                  out _isReq,
+                                  out _seqReqStatus,
                                   ProcessContinuousButtonPressed
                                  );
         Assert.Null (_escSeqReqProc);
@@ -438,9 +441,9 @@ public class EscSeqUtilsTests
         Assert.Equal ("7", _values [^1]);
         Assert.Equal ("R", _terminating);
         Assert.False (_isKeyMouse);
-        Assert.Equal (new() { 0 }, _mouseFlags);
+        Assert.Equal (new () { 0 }, _mouseFlags);
         Assert.Equal (Point.Empty, _pos);
-        Assert.False (_isReq);
+        Assert.Null (_seqReqStatus);
         Assert.Equal (0, (int)_arg1);
         Assert.Equal (Point.Empty, _arg2);
 
@@ -470,7 +473,7 @@ public class EscSeqUtilsTests
                                   out _isKeyMouse,
                                   out _mouseFlags,
                                   out _pos,
-                                  out _isReq,
+                                  out _seqReqStatus,
                                   ProcessContinuousButtonPressed
                                  );
         Assert.Null (_escSeqReqProc);
@@ -484,9 +487,9 @@ public class EscSeqUtilsTests
         Assert.Equal ("8", _values [^1]);
         Assert.Equal ("R", _terminating);
         Assert.False (_isKeyMouse);
-        Assert.Equal (new() { 0 }, _mouseFlags);
+        Assert.Equal (new () { 0 }, _mouseFlags);
         Assert.Equal (Point.Empty, _pos);
-        Assert.False (_isReq);
+        Assert.Null (_seqReqStatus);
         Assert.Equal (0, (int)_arg1);
         Assert.Equal (Point.Empty, _arg2);
 
@@ -519,7 +522,7 @@ public class EscSeqUtilsTests
                                   out _isKeyMouse,
                                   out _mouseFlags,
                                   out _pos,
-                                  out _isReq,
+                                  out _seqReqStatus,
                                   ProcessContinuousButtonPressed
                                  );
         Assert.Null (_escSeqReqProc);
@@ -534,9 +537,9 @@ public class EscSeqUtilsTests
         Assert.Equal ("3", _values [^1]);
         Assert.Equal ("M", _terminating);
         Assert.True (_isKeyMouse);
-        Assert.Equal (new() { MouseFlags.Button1Pressed }, _mouseFlags);
+        Assert.Equal (new () { MouseFlags.Button1Pressed }, _mouseFlags);
         Assert.Equal (new (1, 2), _pos);
-        Assert.False (_isReq);
+        Assert.Null (_seqReqStatus);
         Assert.Equal (0, (int)_arg1);
         Assert.Equal (Point.Empty, _arg2);
 
@@ -569,7 +572,7 @@ public class EscSeqUtilsTests
                                   out _isKeyMouse,
                                   out _mouseFlags,
                                   out _pos,
-                                  out _isReq,
+                                  out _seqReqStatus,
                                   ProcessContinuousButtonPressed
                                  );
         Assert.Null (_escSeqReqProc);
@@ -587,11 +590,11 @@ public class EscSeqUtilsTests
         Assert.Equal (2, _mouseFlags.Count);
 
         Assert.Equal (
-                      new() { MouseFlags.Button1Released, MouseFlags.Button1Clicked },
+                      new () { MouseFlags.Button1Released, MouseFlags.Button1Clicked },
                       _mouseFlags
                      );
         Assert.Equal (new (1, 2), _pos);
-        Assert.False (_isReq);
+        Assert.Null (_seqReqStatus);
         Assert.Equal (0, (int)_arg1);
         Assert.Equal (Point.Empty, _arg2);
 
@@ -624,7 +627,7 @@ public class EscSeqUtilsTests
                                   out _isKeyMouse,
                                   out _mouseFlags,
                                   out _pos,
-                                  out _isReq,
+                                  out _seqReqStatus,
                                   ProcessContinuousButtonPressed
                                  );
         Assert.Null (_escSeqReqProc);
@@ -639,9 +642,9 @@ public class EscSeqUtilsTests
         Assert.Equal ("3", _values [^1]);
         Assert.Equal ("M", _terminating);
         Assert.True (_isKeyMouse);
-        Assert.Equal (new() { MouseFlags.Button1DoubleClicked }, _mouseFlags);
+        Assert.Equal (new () { MouseFlags.Button1DoubleClicked }, _mouseFlags);
         Assert.Equal (new (1, 2), _pos);
-        Assert.False (_isReq);
+        Assert.Null (_seqReqStatus);
 
         ClearAll ();
 
@@ -672,7 +675,7 @@ public class EscSeqUtilsTests
                                   out _isKeyMouse,
                                   out _mouseFlags,
                                   out _pos,
-                                  out _isReq,
+                                  out _seqReqStatus,
                                   ProcessContinuousButtonPressed
                                  );
         Assert.Null (_escSeqReqProc);
@@ -687,9 +690,9 @@ public class EscSeqUtilsTests
         Assert.Equal ("3", _values [^1]);
         Assert.Equal ("M", _terminating);
         Assert.True (_isKeyMouse);
-        Assert.Equal (new() { MouseFlags.Button1TripleClicked }, _mouseFlags);
+        Assert.Equal (new () { MouseFlags.Button1TripleClicked }, _mouseFlags);
         Assert.Equal (new (1, 2), _pos);
-        Assert.False (_isReq);
+        Assert.Null (_seqReqStatus);
 
         var view = new View { Width = Dim.Fill (), Height = Dim.Fill (), WantContinuousButtonPressed = true };
         var top = new Toplevel ();
@@ -727,7 +730,7 @@ public class EscSeqUtilsTests
                                   out _isKeyMouse,
                                   out _mouseFlags,
                                   out _pos,
-                                  out _isReq,
+                                  out _seqReqStatus,
                                   ProcessContinuousButtonPressed
                                  );
         Assert.Null (_escSeqReqProc);
@@ -742,9 +745,9 @@ public class EscSeqUtilsTests
         Assert.Equal ("3", _values [^1]);
         Assert.Equal ("M", _terminating);
         Assert.True (_isKeyMouse);
-        Assert.Equal (new() { MouseFlags.Button1Pressed }, _mouseFlags);
+        Assert.Equal (new () { MouseFlags.Button1Pressed }, _mouseFlags);
         Assert.Equal (new (1, 2), _pos);
-        Assert.False (_isReq);
+        Assert.Null (_seqReqStatus);
 
         Application.Iteration += (s, a) =>
                                  {
@@ -796,7 +799,7 @@ public class EscSeqUtilsTests
                                   out _isKeyMouse,
                                   out _mouseFlags,
                                   out _pos,
-                                  out _isReq,
+                                  out _seqReqStatus,
                                   ProcessContinuousButtonPressed
                                  );
         Assert.Null (_escSeqReqProc);
@@ -811,9 +814,9 @@ public class EscSeqUtilsTests
         Assert.Equal ("3", _values [^1]);
         Assert.Equal ("m", _terminating);
         Assert.True (_isKeyMouse);
-        Assert.Equal (new() { MouseFlags.Button1Released }, _mouseFlags);
+        Assert.Equal (new () { MouseFlags.Button1Released }, _mouseFlags);
         Assert.Equal (new (1, 2), _pos);
-        Assert.False (_isReq);
+        Assert.Null (_seqReqStatus);
         Assert.Equal (0, (int)_arg1);
         Assert.Equal (Point.Empty, _arg2);
 
@@ -821,7 +824,7 @@ public class EscSeqUtilsTests
 
         Assert.Null (_escSeqReqProc);
         _escSeqReqProc = new ();
-        _escSeqReqProc.Add ("t");
+        _escSeqReqProc.Add (new () { Request = "", Terminator = "t" });
 
         _cki = new ConsoleKeyInfo []
         {
@@ -838,7 +841,7 @@ public class EscSeqUtilsTests
         };
         expectedCki = default (ConsoleKeyInfo);
         Assert.Single (_escSeqReqProc.Statuses);
-        Assert.Equal ("t", _escSeqReqProc.Statuses [^1].Terminator);
+        Assert.Equal ("t", _escSeqReqProc.Statuses.ToArray () [^1].AnsiRequest.Terminator);
 
         EscSeqUtils.DecodeEscSeq (
                                   _escSeqReqProc,
@@ -853,7 +856,7 @@ public class EscSeqUtilsTests
                                   out _isKeyMouse,
                                   out _mouseFlags,
                                   out _pos,
-                                  out _isReq,
+                                  out _seqReqStatus,
                                   ProcessContinuousButtonPressed
                                  );
         Assert.Empty (_escSeqReqProc.Statuses);
@@ -868,9 +871,9 @@ public class EscSeqUtilsTests
         Assert.Equal ("20", _values [^1]);
         Assert.Equal ("t", _terminating);
         Assert.False (_isKeyMouse);
-        Assert.Equal (new() { 0 }, _mouseFlags);
+        Assert.Equal (new () { 0 }, _mouseFlags);
         Assert.Equal (Point.Empty, _pos);
-        Assert.True (_isReq);
+        Assert.NotNull (_seqReqStatus);
         Assert.Equal (0, (int)_arg1);
         Assert.Equal (Point.Empty, _arg2);
     }
@@ -1073,7 +1076,7 @@ public class EscSeqUtilsTests
             new ('M', 0, false, false, false)
         };
         EscSeqUtils.GetMouse (cki, out List<MouseFlags> mouseFlags, out Point pos, ProcessContinuousButtonPressed);
-        Assert.Equal (new() { MouseFlags.Button1Pressed }, mouseFlags);
+        Assert.Equal (new () { MouseFlags.Button1Pressed }, mouseFlags);
         Assert.Equal (new (1, 2), pos);
 
         cki = new ConsoleKeyInfo []
@@ -1092,7 +1095,7 @@ public class EscSeqUtilsTests
         Assert.Equal (2, mouseFlags.Count);
 
         Assert.Equal (
-                      new() { MouseFlags.Button1Released, MouseFlags.Button1Clicked },
+                      new () { MouseFlags.Button1Released, MouseFlags.Button1Clicked },
                       mouseFlags
                      );
         Assert.Equal (new (1, 2), pos);
@@ -1110,7 +1113,7 @@ public class EscSeqUtilsTests
             new ('M', 0, false, false, false)
         };
         EscSeqUtils.GetMouse (cki, out mouseFlags, out pos, ProcessContinuousButtonPressed);
-        Assert.Equal (new() { MouseFlags.Button1DoubleClicked }, mouseFlags);
+        Assert.Equal (new () { MouseFlags.Button1DoubleClicked }, mouseFlags);
         Assert.Equal (new (1, 2), pos);
 
         cki = new ConsoleKeyInfo []
@@ -1126,7 +1129,7 @@ public class EscSeqUtilsTests
             new ('M', 0, false, false, false)
         };
         EscSeqUtils.GetMouse (cki, out mouseFlags, out pos, ProcessContinuousButtonPressed);
-        Assert.Equal (new() { MouseFlags.Button1TripleClicked }, mouseFlags);
+        Assert.Equal (new () { MouseFlags.Button1TripleClicked }, mouseFlags);
         Assert.Equal (new (1, 2), pos);
 
         cki = new ConsoleKeyInfo []
@@ -1142,7 +1145,7 @@ public class EscSeqUtilsTests
             new ('m', 0, false, false, false)
         };
         EscSeqUtils.GetMouse (cki, out mouseFlags, out pos, ProcessContinuousButtonPressed);
-        Assert.Equal (new() { MouseFlags.Button1Released }, mouseFlags);
+        Assert.Equal (new () { MouseFlags.Button1Released }, mouseFlags);
         Assert.Equal (new (1, 2), pos);
     }
 
@@ -1168,7 +1171,7 @@ public class EscSeqUtilsTests
         _terminating = default (string);
         _values = default (string []);
         _isKeyMouse = default (bool);
-        _isReq = default (bool);
+        _seqReqStatus = null;
         _mouseFlags = default (List<MouseFlags>);
         _pos = default (Point);
         _arg1 = default (MouseFlags);
