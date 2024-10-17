@@ -384,7 +384,6 @@ public class AllViewsTester : Scenario
 
         _curView = view;
         _hostPane.Add (_curView);
-       // Application.Refresh();
     }
 
     private void DisposeCurrentView ()
@@ -558,12 +557,12 @@ public class AllViewsTester : Scenario
             return;
         }
 
-        if (!view.Width!.Has<DimAuto> (out _) || (view.Width is null || view.Frame.Width == 0))
+        if (!view.Width!.Has<DimAuto> (out _) || (view.Width is null))
         {
             view.Width = Dim.Fill ();
         }
 
-        if (!view.Height!.Has<DimAuto> (out _) || (view.Height is null || view.Frame.Height == 0))
+        if (!view.Height!.Has<DimAuto> (out _) || (view.Height is null))
         {
             view.Height = Dim.Fill ();
         }

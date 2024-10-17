@@ -28,6 +28,7 @@ public class MarginTests (ITestOutputHelper output)
         superView.BeginInit ();
         superView.EndInit ();
         View.Diagnostics = ViewDiagnosticFlags.Padding;
+        view.SetNeedsDisplay();
         view.Draw ();
         View.Diagnostics = ViewDiagnosticFlags.Off;
 
@@ -38,6 +39,6 @@ M M
 MMM",
                                              output
                                             );
-        TestHelpers.AssertDriverAttributesAre ("0", null, superView.GetNormalColor ());
+        TestHelpers.AssertDriverAttributesAre ("0", output, null, superView.GetNormalColor ());
     }
 }

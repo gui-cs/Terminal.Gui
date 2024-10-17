@@ -151,7 +151,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (8, 2), Flags = MouseFlags.Button3Clicked });
 
         var firstIteration = false;
-        Application.RunIteration (ref rs, ref firstIteration);
+        Application.RunIteration (ref rs, firstIteration);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -234,7 +234,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (9, 3), Flags = MouseFlags.Button3Clicked });
 
         var firstIteration = false;
-        Application.RunIteration (ref rsDialog, ref firstIteration);
+        Application.RunIteration (ref rsDialog, firstIteration);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -290,7 +290,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (9, 3), Flags = MouseFlags.Button3Clicked });
 
         var firstIteration = false;
-        Application.RunIteration (ref rs, ref firstIteration);
+        Application.RunIteration (ref rs, firstIteration);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1238,7 +1238,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (6, 13), Flags = MouseFlags.Button1Clicked });
 
         var firstIteration = false;
-        Application.RunIteration (ref rs, ref firstIteration);
+        Application.RunIteration (ref rs, firstIteration);
         Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
         Assert.Equal (new Rectangle (5, 11, 15, 6), Application.Top.Subviews [1].Frame);
 
@@ -1256,7 +1256,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (6, 12), Flags = MouseFlags.Button1Clicked });
 
         firstIteration = false;
-        Application.RunIteration (ref rs, ref firstIteration);
+        Application.RunIteration (ref rs, firstIteration);
         Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -1330,7 +1330,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (6, 13), Flags = MouseFlags.ReportMousePosition });
 
         var firstIteration = false;
-        Application.RunIteration (ref rs, ref firstIteration);
+        Application.RunIteration (ref rs, firstIteration);
         Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -1347,7 +1347,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (6, 14), Flags = MouseFlags.ReportMousePosition });
 
         firstIteration = false;
-        Application.RunIteration (ref rs, ref firstIteration);
+        Application.RunIteration (ref rs, firstIteration);
         Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -1365,7 +1365,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (6, 13), Flags = MouseFlags.ReportMousePosition });
 
         firstIteration = false;
-        Application.RunIteration (ref rs, ref firstIteration);
+        Application.RunIteration (ref rs, firstIteration);
         Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
 
         TestHelpers.AssertDriverContentsWithFrameAre (

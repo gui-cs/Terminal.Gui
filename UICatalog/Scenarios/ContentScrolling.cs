@@ -47,7 +47,7 @@ public class ContentScrolling : Scenario
             // Add a status label to the border that shows Viewport and ContentSize values. Bit of a hack.
             // TODO: Move to Padding with controls
             Border.Add (new Label { X = 20 });
-            LayoutComplete += VirtualDemoView_LayoutComplete;
+            ViewportChanged += VirtualDemoView_LayoutComplete;
 
             MouseEvent += VirtualDemoView_MouseEvent;
         }
@@ -81,18 +81,14 @@ public class ContentScrolling : Scenario
             }
         }
 
-        private void VirtualDemoView_LayoutComplete (object sender, LayoutEventArgs e)
+        private void VirtualDemoView_LayoutComplete (object sender, DrawEventArgs drawEventArgs)
         {
-            Label status = Border.Subviews.OfType<Label> ().FirstOrDefault ();
+            Label frameLabel = Padding.Subviews.OfType<Label> ().FirstOrDefault ();
 
-            if (status is { })
+            if (frameLabel is { })
             {
-                status.Title = $"Frame: {Frame}\n\nViewport: {Viewport}, ContentSize = {GetContentSize ()}";
-                status.Width = Border.Frame.Width - status.Frame.X - Border.Thickness.Right;
-                status.Height = Border.Thickness.Top;
+                frameLabel.Text = $"Viewport: {Viewport}\nFrame: {Frame}";
             }
-
-            SetNeedsDisplay ();
         }
     }
 
@@ -126,14 +122,22 @@ public class ContentScrolling : Scenario
         app.Add (view);
 
         // Add Scroll Setting UI to Padding
-        view.Padding.Thickness = new (0, 3, 0, 0);
+        view.Padding.Thickness = new (0, 5, 0, 0);
         view.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
         view.Padding.CanFocus = true;
+
+        Label frameLabel = new ()
+        {
+            Text = "Frame\nContent",
+            Id = "frameLabel",
+            Y = 0
+        };
+        view.Padding.Add (frameLabel);
 
         var cbAllowNegativeX = new CheckBox
         {
             Title = "Allow _X < 0",
-            Y = 0,
+            Y = Pos.Bottom(frameLabel),
             CanFocus = true
         };
         cbAllowNegativeX.CheckedState = view.ViewportSettings.HasFlag(ViewportSettings.AllowNegativeX) ? CheckState.Checked : CheckState.UnChecked;
@@ -157,7 +161,7 @@ public class ContentScrolling : Scenario
         {
             Title = "Allow _Y < 0",
             X = Pos.Right (cbAllowNegativeX) + 1,
-            Y = 0,
+            Y = Pos.Bottom (frameLabel),
             CanFocus = true
         };
         cbAllowNegativeY.CheckedState = view.ViewportSettings.HasFlag(ViewportSettings.AllowNegativeY) ? CheckState.Checked : CheckState.UnChecked;
@@ -413,6 +417,7 @@ public class ContentScrolling : Scenario
         editor.AutoSelectSuperView = view;
         editor.AutoSelectAdornments = false;
 
+        view.SetFocus ();
         Application.Run (app);
         app.Dispose ();
         Application.Shutdown ();

@@ -57,6 +57,7 @@ public class Navigation : Scenario
             Y = 0,
             Title = $"TopButton _{GetNextHotKey ()}"
         };
+        button.Accepting += (sender, args) => MessageBox.Query ("hi", button.Title, "_Ok");
 
         testFrame.Add (button);
 
@@ -98,9 +99,10 @@ public class Navigation : Scenario
 
                              progressBar.Fraction += 0.01f;
 
-                             Application.Wakeup ();
+                             //Application.Wakeup ();
 
-                             progressBar.SetNeedsDisplay ();
+                             Application.Invoke (() => progressBar.SetNeedsDisplay ());
+                            ;
                          };
         timer.Start ();
 

@@ -111,10 +111,10 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
         // Reset to defaults
         Locations = ConfigLocations.DefaultOnly;
-        Reset();
+        Reset ();
 
         // Enable subsequent tests that call Init to get all config files (the default).
-       //Locations = ConfigLocations.All;
+        //Locations = ConfigLocations.All;
     }
 
     public override void Before (MethodInfo methodUnderTest)
@@ -244,10 +244,12 @@ internal partial class TestHelpers
     ///     Numbers between 0 and 9 for each row/col of the console.  Must be valid indexes into
     ///     <paramref name="expectedAttributes"/>.
     /// </param>
+    /// <param name="output"></param>
     /// <param name="driver">The ConsoleDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
     /// <param name="expectedAttributes"></param>
     public static void AssertDriverAttributesAre (
         string expectedLook,
+        ITestOutputHelper output,
         ConsoleDriver driver = null,
         params Attribute [] expectedAttributes
     )
@@ -277,12 +279,14 @@ internal partial class TestHelpers
                 switch (match.Count)
                 {
                     case 0:
-                        throw new (
-                                   $"{Application.ToString (driver)}\n"
-                                   + $"Expected Attribute {val} (PlatformColor = {val.Value.PlatformColor}) at Contents[{line},{c}] {contents [line, c]} ((PlatformColor = {contents [line, c].Attribute.Value.PlatformColor}) was not found.\n"
-                                   + $"  Expected: {string.Join (",", expectedAttributes.Select (c => c))}\n"
-                                   + $"  But Was: <not found>"
-                                  );
+                        output.WriteLine (
+                                     $"{Application.ToString (driver)}\n"
+                                     + $"Expected Attribute {val} (PlatformColor = {val.Value.PlatformColor}) at Contents[{line},{c}] {contents [line, c]} ((PlatformColor = {contents [line, c].Attribute.Value.PlatformColor}) was not found.\n"
+                                     + $" Expected: {string.Join (",", expectedAttributes.Select (c => c))}\n"
+                                     + $"  But Was: <not found>"
+                                    );
+                        Assert.Empty (match);
+                        return;
                     case > 1:
                         throw new ArgumentException (
                                                      $"Bad value for expectedColors, {match.Count} Attributes had the same Value"
@@ -294,12 +298,12 @@ internal partial class TestHelpers
 
                 if (colorUsed != userExpected)
                 {
-                    throw new (
-                               $"{Application.ToString (driver)}\n"
-                               + $"Unexpected Attribute at Contents[{line},{c}] {contents [line, c]}.\n"
-                               + $"  Expected: {userExpected} ({expectedAttributes [int.Parse (userExpected.ToString ())]})\n"
-                               + $"  But Was:   {colorUsed} ({val})\n"
-                              );
+                    output.WriteLine ($"{Application.ToString (driver)}");
+                    output.WriteLine ($"Unexpected Attribute at Contents[{line},{c}] {contents [line, c]}.");
+                    output.WriteLine ($" Expected: {userExpected} ({expectedAttributes [int.Parse (userExpected.ToString ())]})");
+                    output.WriteLine ($"  But Was:   {colorUsed} ({val})");
+                    Assert.Equal (userExpected, colorUsed);
+                    return;
                 }
             }
 
@@ -735,7 +739,7 @@ public class TestsAllViews
     public static IEnumerable<object []> AllViewTypes =>
         typeof (View).Assembly
                      .GetTypes ()
-                     .Where (type => type.IsClass && !type.IsAbstract && type.IsPublic && (type.IsSubclassOf (typeof (View)) || type == typeof(View)))
+                     .Where (type => type.IsClass && !type.IsAbstract && type.IsPublic && (type.IsSubclassOf (typeof (View)) || type == typeof (View)))
                      .Select (type => new object [] { type });
 
     public static View CreateInstanceIfNotGeneric (Type type)

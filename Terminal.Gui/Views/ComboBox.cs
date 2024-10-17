@@ -72,7 +72,7 @@ public class ComboBox : View, IDesignable
                          }
                      }
 
-                     SetNeedsLayout ();
+                     SetLayoutNeeded ();
                      SetNeedsDisplay ();
                      ShowHideList (Text);
                  };

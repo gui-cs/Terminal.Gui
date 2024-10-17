@@ -861,6 +861,7 @@ public class MenuBar : View, IDesignable
                 if (Application.Top is { })
                 {
                     Application.Top.Add (_openMenu);
+                   // _openMenu.SetRelativeLayout (Application.Screen.Size);
                 }
                 else
                 {

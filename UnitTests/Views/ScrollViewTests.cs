@@ -239,6 +239,7 @@ public class ScrollViewTests (ITestOutputHelper output)
 00000000000000000000000
 00000000000000000000000
 00000000000000000000000",
+                                               output,
                                                null,
                                                attributes
                                               );
@@ -286,6 +287,7 @@ public class ScrollViewTests (ITestOutputHelper output)
 00000000000000000000000
 00000000000000000000000
 00000000000000000000000",
+                                               output,
                                                null,
                                                attributes
                                               );
@@ -332,6 +334,7 @@ public class ScrollViewTests (ITestOutputHelper output)
 00000000000000000000000
 00000000000000000000000
 00000000000000000000000",
+                                               output,
                                                null,
                                                attributes
                                               );
@@ -432,6 +435,7 @@ public class ScrollViewTests (ITestOutputHelper output)
 022222222210
 011111111110
 000000000000",
+                                               output,
                                                null,
                                                attrs
                                               );

@@ -387,7 +387,7 @@ public class UICatalogApp
         // 'app' closed cleanly.
         foreach (Responder? inst in Responder.Instances)
         {
-            
+
             Debug.Assert (inst.WasDisposed);
         }
 
@@ -492,7 +492,6 @@ public class UICatalogApp
                         )
                 ]
             };
-            Add (menuBar);
 
             _statusBar = new ()
             {
@@ -500,9 +499,7 @@ public class UICatalogApp
                 AlignmentModes = AlignmentModes.IgnoreFirstOrLast,
                 CanFocus = false
             };
-            _statusBar.Height = _statusBar.Visible ? Dim.Auto () : 0;
-
-            Add (_statusBar);
+            _statusBar.Height = Dim.Auto (DimAutoStyle.Auto, minimumContentDim: Dim.Func (() => _statusBar.Visible ? 1 : 0), maximumContentDim: Dim.Func (() => _statusBar.Visible ? 1 : 0));
 
             ShVersion = new ()
             {
@@ -561,9 +558,16 @@ public class UICatalogApp
             CategoryList = new ()
             {
                 X = 0,
-                Y = Pos.Bottom (MenuBar),
+                Y = Pos.Bottom (menuBar),
                 Width = Dim.Auto (),
-                Height = Dim.Fill (Dim.Func (() => _statusBar.Frame.Height)),
+                Height = Dim.Fill (Dim.Func (() =>
+                                             {
+                                                 if (_statusBar.IsLayoutNeeded ())
+                                                 {
+                                                    // throw new Exception ("DimFunc.Fn aborted because dependent View needs layout.");
+                                                 }
+                                                 return _statusBar.Frame.Height;
+                                             })),
                 AllowsMarking = false,
                 CanFocus = true,
                 Title = "_Categories",
@@ -580,9 +584,16 @@ public class UICatalogApp
             ScenarioList = new ()
             {
                 X = Pos.Right (CategoryList) - 1,
-                Y = Pos.Bottom (MenuBar),
+                Y = Pos.Bottom (menuBar),
                 Width = Dim.Fill (),
-                Height = Dim.Fill (Dim.Func (() => _statusBar.Frame.Height)),
+                Height = Dim.Fill (Dim.Func (() =>
+                                             {
+                                                 if (_statusBar.IsLayoutNeeded ())
+                                                 {
+                                                    // throw new Exception ("DimFunc.Fn aborted because dependent View needs layout.");
+                                                 }
+                                                 return _statusBar.Frame.Height;
+                                             })),
                 //AllowsMarking = false,
                 CanFocus = true,
                 Title = "_Scenarios",
@@ -620,29 +631,6 @@ public class UICatalogApp
                                                  new () { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName }
                                                 );
             ScenarioList.Style.ColumnStyles.Add (1, new () { MaxWidth = 1 });
-
-            //// Enable user to find & select a scenario by typing text
-            //// TableView does not (currently) have built-in CollectionNavigator support (the ability for the 
-            //// user to type and the items that match get selected). We implement it in the app instead. 
-            //ScenarioList.KeyDown += (s, a) =>
-            //                        {
-            //                            if (CollectionNavigatorBase.IsCompatibleKey (a))
-            //                            {
-            //                                int? newItem =
-            //                                    _scenarioCollectionNav?.GetNextMatchingItem (
-            //                                                                                 ScenarioList.SelectedRow,
-            //                                                                                 (char)a
-            //                                                                                );
-
-            //                                if (newItem is int v && newItem != -1)
-            //                                {
-            //                                    ScenarioList.SelectedRow = v;
-            //                                    ScenarioList.EnsureSelectedCellIsVisible ();
-            //                                    ScenarioList.SetNeedsDisplay ();
-            //                                    a.Handled = true;
-            //                                }
-            //                            }
-            //                        };
             ScenarioList.CellActivated += ScenarioView_OpenSelectedItem;
 
             // TableView typically is a grid where nav keys are biased for moving left/right.
@@ -657,8 +645,10 @@ public class UICatalogApp
             ScenarioList.MultiSelect = false;
             ScenarioList.KeyBindings.Remove (Key.A.WithCtrl);
 
+            Add (menuBar);
             Add (CategoryList);
             Add (ScenarioList);
+            Add (_statusBar);
 
             Loaded += LoadedHandler;
             Unloaded += UnloadedHandler;
@@ -1078,7 +1068,7 @@ public class UICatalogApp
 
             if (ShVersion is { })
             {
-                ShVersion.Title = $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {Driver.GetVersionInfo ()}";
+                ShVersion.Title = $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {Driver!.GetVersionInfo ()}";
             }
 
             if (_selectedScenario != null)
@@ -1097,7 +1087,6 @@ public class UICatalogApp
                 _statusBar.VisibleChanged += (s, e) =>
                                             {
                                                 ShowStatusBar = _statusBar.Visible;
-                                                _statusBar.Height = _statusBar.Visible ? Dim.Auto () : 0;
                                             };
             }
 

@@ -90,10 +90,7 @@ public partial class ColorPicker : View
         CreateTextField ();
         SelectedColor = oldValue;
 
-        if (IsInitialized)
-        {
-            LayoutSubviews ();
-        }
+        SetLayoutNeeded ();
     }
 
     /// <summary>
@@ -275,6 +272,8 @@ public partial class ColorPicker : View
         {
             _tfHex.Text = colorHex;
         }
+
+        SetLayoutNeeded ();
     }
 
     private void UpdateSingleBarValueFromTextField (object? sender, HasFocusEventArgs e)

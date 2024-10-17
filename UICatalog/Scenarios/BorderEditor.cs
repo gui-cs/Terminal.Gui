@@ -29,7 +29,7 @@ public class BorderEditor : AdornmentEditor
     {
         List<LineStyle> borderStyleEnum = Enum.GetValues (typeof (LineStyle)).Cast<LineStyle> ().ToList ();
 
-        _rbBorderStyle = new()
+        _rbBorderStyle = new ()
         {
             X = 0,
 
@@ -46,7 +46,7 @@ public class BorderEditor : AdornmentEditor
 
         _rbBorderStyle.SelectedItemChanged += OnRbBorderStyleOnSelectedItemChanged;
 
-        _ckbTitle = new()
+        _ckbTitle = new ()
         {
             X = 0,
             Y = Pos.Bottom (_rbBorderStyle),
@@ -91,7 +91,7 @@ public class BorderEditor : AdornmentEditor
             }
 
             ((Border)AdornmentToEdit).SetNeedsDisplay ();
-            LayoutSubviews ();
+            SetLayoutNeeded ();
         }
 
         void OnCkbTitleOnToggle (object sender, CancelEventArgs<CheckState> args)

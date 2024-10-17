@@ -51,8 +51,8 @@ public class DialogTests
         // Now add a second button
         buttonRow = $"{CM.Glyphs.VLine} {btn1} {btn2} {CM.Glyphs.VLine}";
         dlg.AddButton (new () { Text = btn2Text });
-        var first = false;
-        RunIteration (ref runstate, ref first);
+        
+        RunIteration (ref runstate);
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -76,8 +76,7 @@ public class DialogTests
         // Now add a second button
         buttonRow = $"{CM.Glyphs.VLine}{btn1}   {btn2}{CM.Glyphs.VLine}";
         dlg.AddButton (new () { Text = btn2Text });
-        first = false;
-        RunIteration (ref runstate, ref first);
+        RunIteration (ref runstate);
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -101,8 +100,8 @@ public class DialogTests
         // Now add a second button
         buttonRow = $"{CM.Glyphs.VLine}  {btn1} {btn2}{CM.Glyphs.VLine}";
         dlg.AddButton (new () { Text = btn2Text });
-        first = false;
-        RunIteration (ref runstate, ref first);
+
+        RunIteration (ref runstate);
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -126,8 +125,8 @@ public class DialogTests
         // Now add a second button
         buttonRow = $"{CM.Glyphs.VLine}{btn1} {btn2}  {CM.Glyphs.VLine}";
         dlg.AddButton (new () { Text = btn2Text });
-        first = false;
-        RunIteration (ref runstate, ref first);
+
+        RunIteration (ref runstate);
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -849,7 +848,7 @@ public class DialogTests
         button2 = new Button { Text = btn2Text };
         (runstate, dlg) = RunButtonTestDialog (title, width, Alignment.Center, button1, button2);
         button1.Visible = false;
-        RunIteration (ref runstate, ref firstIteration);
+        RunIteration (ref runstate, firstIteration);
         buttonRow = $@"{CM.Glyphs.VLine}         {btn2} {CM.Glyphs.VLine}";
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
@@ -861,7 +860,7 @@ public class DialogTests
         button2 = new Button { Text = btn2Text };
         (runstate, dlg) = RunButtonTestDialog (title, width, Alignment.Fill, button1, button2);
         button1.Visible = false;
-        RunIteration (ref runstate, ref firstIteration);
+        RunIteration (ref runstate, firstIteration);
         buttonRow = $@"{CM.Glyphs.VLine}          {btn2}{CM.Glyphs.VLine}";
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
@@ -873,7 +872,7 @@ public class DialogTests
         button2 = new Button { Text = btn2Text };
         (runstate, dlg) = RunButtonTestDialog (title, width, Alignment.End, button1, button2);
         button1.Visible = false;
-        RunIteration (ref runstate, ref firstIteration);
+        RunIteration (ref runstate, firstIteration);
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -884,7 +883,7 @@ public class DialogTests
         button2 = new Button { Text = btn2Text };
         (runstate, dlg) = RunButtonTestDialog (title, width, Alignment.Start, button1, button2);
         button1.Visible = false;
-        RunIteration (ref runstate, ref firstIteration);
+        RunIteration (ref runstate, firstIteration);
         buttonRow = $@"{CM.Glyphs.VLine}        {btn2}  {CM.Glyphs.VLine}";
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);

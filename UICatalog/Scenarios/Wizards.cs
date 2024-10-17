@@ -336,9 +336,6 @@ public class Wizards : Scenario
                                                                            scrollBar.OtherScrollBarView.Size = someText.Maxlength;
                                                                            scrollBar.OtherScrollBarView.Position = someText.LeftColumn;
                                                                        }
-
-                                                                       scrollBar.LayoutSubviews ();
-                                                                       scrollBar.Refresh ();
                                                                    };
                                            fourthStep.Add (scrollBar);
 

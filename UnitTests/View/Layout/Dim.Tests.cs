@@ -185,7 +185,7 @@ public class DimTests
         testValview.Dispose ();
 
         testVal = new (1, 2, 3, 4);
-        testValview = new() { Frame = testVal };
+        testValview = new () { Frame = testVal };
         dim = Height (testValview);
         Assert.Equal ($"View(Height,View(){testVal})", dim.ToString ());
         testValview.Dispose ();
@@ -369,7 +369,7 @@ public class DimTests
                        Assert.Equal (18, v6.Frame.Height); // 89*20%=18
 
                        w.Width = 200;
-                       Assert.True (t.LayoutNeeded);
+                       Assert.True (t.IsLayoutNeeded ());
                        w.Height = 200;
                        t.LayoutSubviews ();
 
@@ -582,7 +582,7 @@ public class DimTests
         Assert.NotEqual (dim1, dim2);
 
         testRect1 = new (0, 1, 2, 3);
-        view1 = new() { Frame = testRect1 };
+        view1 = new () { Frame = testRect1 };
         testRect2 = new (0, 1, 2, 3);
         dim1 = Width (view1);
         dim2 = Width (view1);
@@ -591,7 +591,7 @@ public class DimTests
         Assert.Equal (dim1, dim2);
 
         testRect1 = new (0, -1, 2, 3);
-        view1 = new() { Frame = testRect1 };
+        view1 = new () { Frame = testRect1 };
         testRect2 = new (0, -1, 2, 3);
         dim1 = Width (view1);
         dim2 = Width (view1);
@@ -600,9 +600,9 @@ public class DimTests
         Assert.Equal (dim1, dim2);
 
         testRect1 = new (0, -1, 2, 3);
-        view1 = new() { Frame = testRect1 };
+        view1 = new () { Frame = testRect1 };
         testRect2 = Rectangle.Empty;
-        view2 = new() { Frame = testRect2 };
+        view2 = new () { Frame = testRect2 };
         dim1 = Width (view1);
         dim2 = Width (view2);
         Assert.NotEqual (dim1, dim2);
@@ -632,7 +632,7 @@ public class DimTests
         testValView.Dispose ();
 
         testVal = new (1, 2, 3, 4);
-        testValView = new() { Frame = testVal };
+        testValView = new () { Frame = testVal };
         dim = Width (testValView);
         Assert.Equal ($"View(Width,View(){testVal})", dim.ToString ());
         testValView.Dispose ();

@@ -304,7 +304,6 @@ public class Progress : Scenario
                                 {
                                     Spinner.Visible = true;
                                     ActivityProgressBar.Width = Dim.Fill () - Spinner.Width;
-                                    LayoutSubviews ();
                                 }
                                );
         }
@@ -319,7 +318,6 @@ public class Progress : Scenario
                                 {
                                     Spinner.Visible = false;
                                     ActivityProgressBar.Width = Dim.Fill () - Spinner.Width;
-                                    LayoutSubviews ();
                                 }
                                );
         }

@@ -109,6 +109,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
         CommandView = new ()
         {
+            Id = "CommandView",
             Width = Dim.Auto (),
             Height = Dim.Auto (DimAutoStyle.Auto, 1)
         };
@@ -116,14 +117,11 @@ public class Shortcut : View, IOrientation, IDesignable
         HelpView.Id = "_helpView";
         HelpView.CanFocus = false;
         HelpView.Text = helpText ?? string.Empty;
-        Add (HelpView);
 
         KeyView.Id = "_keyView";
         KeyView.CanFocus = false;
-        Add (KeyView);
 
         LayoutStarted += OnLayoutStarted;
-        Initialized += OnInitialized;
 
         key ??= Key.Empty;
         Key = key;
@@ -132,41 +130,58 @@ public class Shortcut : View, IOrientation, IDesignable
 
         return;
 
-        void OnInitialized (object? sender, EventArgs e)
-        {
-            SuperViewRendersLineCanvas = true;
-            Border.Settings &= ~BorderSettings.Title;
+    }
 
-            ShowHide ();
+    // Helper to set Width consistently
+    private Dim GetWidthDimAuto ()
+    {
+        // TODO: PosAlign.CalculateMinDimension is a hack. Need to figure out a better way of doing this.
+        return Dim.Auto (
+                         DimAutoStyle.Content,
+                         Dim.Func (() =>
+                                   {
+                                       if (Subviews [0].IsLayoutNeeded ())
+                                       {
+                                           // throw new Exception ();
+                                       }
+                                       return PosAlign.CalculateMinDimension (0, Subviews, Dimension.Width);
+                                   }),
+                         Dim.Func (() =>
+                                   {
+                                       return PosAlign.CalculateMinDimension (0, Subviews, Dimension.Width);
+                                   }))!;
+    }
 
-            // Force Width to DimAuto to calculate natural width and then set it back
-            Dim savedDim = Width;
-            Width = GetWidthDimAuto ();
-            _minimumDimAutoWidth = Frame.Width;
-            Width = savedDim;
+    /// <inheritdoc />
+    public override void EndInit ()
+    {
+        base.EndInit ();
 
-            SetCommandViewDefaultLayout ();
-            SetHelpViewDefaultLayout ();
-            SetKeyViewDefaultLayout ();
+        SuperViewRendersLineCanvas = true;
+        Border.Settings &= ~BorderSettings.Title;
 
-            SetColors ();
-        }
+        ShowHide ();
 
-        // Helper to set Width consistently
-        Dim GetWidthDimAuto ()
-        {
-            // TODO: PosAlign.CalculateMinDimension is a hack. Need to figure out a better way of doing this.
-            return Dim.Auto (
-                             DimAutoStyle.Content,
-                             Dim.Func (() => PosAlign.CalculateMinDimension (0, Subviews, Dimension.Width)),
-                             Dim.Func (() => PosAlign.CalculateMinDimension (0, Subviews, Dimension.Width)))!;
-        }
+        // Force Width to DimAuto to calculate natural width and then set it back
+        Dim? savedDim = Width;
+        Width = GetWidthDimAuto ();
+        // Force a SRL)
+        SetRelativeLayout (Application.Screen.Size);
+        _minimumNatrualWidth = Frame.Width;
+        Width = savedDim;
+
+        SetCommandViewDefaultLayout ();
+        SetHelpViewDefaultLayout ();
+        SetKeyViewDefaultLayout ();
+
+        SetColors ();
     }
 
     private AlignmentModes _alignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast;
 
     // This is used to calculate the minimum width of the Shortcut when the width is NOT Dim.Auto
-    private int? _minimumDimAutoWidth;
+    // It is calculated by setting Width to DimAuto temporarily and forcing layout
+    private int? _minimumNatrualWidth;
 
     /// <inheritdoc/>
     protected override bool OnHighlight (CancelEventArgs<HighlightStyle> args)
@@ -238,7 +253,7 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         if (Width is DimAuto widthAuto)
         {
-            _minimumDimAutoWidth = Frame.Width;
+            _minimumNatrualWidth = Frame.Width;
         }
         else
         {
@@ -256,9 +271,9 @@ public class Shortcut : View, IOrientation, IDesignable
             // When Vertical, Command is first, then Help, then Key.
             // BUGBUG: This does not do what the above says.
             // TODO: Add Unit tests for this.
-            if (currentWidth < _minimumDimAutoWidth)
+            if (currentWidth < _minimumNatrualWidth)
             {
-                int delta = _minimumDimAutoWidth.Value - currentWidth;
+                int delta = _minimumNatrualWidth.Value - currentWidth;
                 int maxHelpWidth = int.Max (0, HelpView.Text.GetColumns () + Margin.Thickness.Horizontal - delta);
 
                 switch (maxHelpWidth)
@@ -412,7 +427,7 @@ public class Shortcut : View, IOrientation, IDesignable
     public void OnOrientationChanged (Orientation newOrientation)
     {
         // TODO: Determine what, if anything, is opinionated about the orientation.
-        SetNeedsLayout ();
+        SetLayoutNeeded ();
     }
 
     #endregion
@@ -679,9 +694,9 @@ public class Shortcut : View, IOrientation, IDesignable
 
             _minimumKeyTextSize = value;
             SetKeyViewDefaultLayout ();
-            CommandView.SetNeedsLayout ();
-            HelpView.SetNeedsLayout ();
-            KeyView.SetNeedsLayout ();
+            CommandView.SetLayoutNeeded ();
+            HelpView.SetLayoutNeeded ();
+            KeyView.SetLayoutNeeded ();
             SetSubViewNeedsDisplay ();
         }
     }

@@ -287,7 +287,7 @@ public class ScrollView : View
             if (value != _showHorizontalScrollIndicator)
             {
                 _showHorizontalScrollIndicator = value;
-                SetNeedsLayout ();
+                SetLayoutNeeded ();
 
                 if (value)
                 {
@@ -322,7 +322,7 @@ public class ScrollView : View
             if (value != _showVerticalScrollIndicator)
             {
                 _showVerticalScrollIndicator = value;
-                SetNeedsLayout ();
+                SetLayoutNeeded ();
 
                 if (value)
                 {
@@ -367,7 +367,7 @@ public class ScrollView : View
             _contentView.Add (view);
         }
 
-        SetNeedsLayout ();
+        SetLayoutNeeded ();
         return view;
     }
 

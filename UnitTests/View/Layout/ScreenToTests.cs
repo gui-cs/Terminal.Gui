@@ -31,6 +31,7 @@ public class ScreenToTests
             Height = 10,
             BorderStyle = LineStyle.Single
         };
+        view.Layout ();
 
         Point actual = view.ScreenToViewport (new (x, y));
         Assert.Equal (expectedX, actual.X);
@@ -53,6 +54,7 @@ public class ScreenToTests
     public void ScreenToViewport_NoSuper_NoAdornments (int viewX, int viewY, int x, int y, int expectedX, int expectedY)
     {
         var view = new View { X = viewX, Y = viewY, Width = 10, Height = 10 };
+        view.Layout ();
 
         Point actual = view.ScreenToViewport (new (x, y));
         Assert.Equal (expectedX, actual.X);
@@ -81,6 +83,7 @@ public class ScreenToTests
         };
         var view = new View { X = viewX, Y = viewY, Width = 5, Height = 5 };
         super.Add (view);
+        super.Layout ();
 
         Point actual = view.ScreenToViewport (new (x, y));
         Assert.Equal (expectedX, actual.X);
@@ -110,6 +113,7 @@ public class ScreenToTests
         var view = new View { X = viewX, Y = viewY, Width = 5, Height = 5 };
         view.SetContentSize (new (6, 6));
         super.Add (view);
+        super.Layout ();
 
         view.Viewport = new (1, 1, 5, 5);
 
@@ -133,6 +137,7 @@ public class ScreenToTests
         var super = new View { X = 0, Y = 0, Width = 10, Height = 10 };
         var view = new View { X = viewX, Y = viewY, Width = 5, Height = 5 };
         super.Add (view);
+        super.Layout ();
 
         Point actual = view.ScreenToViewport (new (x, y));
         Assert.Equal (expectedX, actual.X);
@@ -166,6 +171,7 @@ public class ScreenToTests
         };
         view.SetContentSize (new (10, 10));
         super.Add (view);
+        super.Layout ();
 
         view.Viewport = view.Viewport with { Location = new (1, 1) };
 
@@ -197,6 +203,7 @@ public class ScreenToTests
             Height = 10,
             BorderStyle = LineStyle.Single
         };
+        view.Layout ();
 
         Point actual = view.ScreenToFrame (new (x, y));
         Assert.Equal (expectedX, actual.X);
@@ -219,6 +226,7 @@ public class ScreenToTests
     public void ScreenToFrame_NoSuper_NoAdornments (int viewX, int viewY, int x, int y, int expectedX, int expectedY)
     {
         var view = new View { X = viewX, Y = viewY, Width = 10, Height = 10 };
+        view.Layout ();
 
         Point actual = view.ScreenToFrame (new (x, y));
         Assert.Equal (expectedX, actual.X);
@@ -247,6 +255,7 @@ public class ScreenToTests
         };
         var view = new View { X = viewX, Y = viewY, Width = 5, Height = 5 };
         super.Add (view);
+        super.Layout ();
 
         Point actual = view.ScreenToFrame (new (x, y));
         Assert.Equal (expectedX, actual.X);
@@ -268,6 +277,7 @@ public class ScreenToTests
         var super = new View { X = 0, Y = 0, Width = 10, Height = 10 };
         var view = new View { X = viewX, Y = viewY, Width = 5, Height = 5 };
         super.Add (view);
+        super.Layout ();
 
         Point actual = view.ScreenToFrame (new (x, y));
         Assert.Equal (expectedX, actual.X);

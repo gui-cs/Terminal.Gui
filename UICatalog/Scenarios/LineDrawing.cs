@@ -253,12 +253,8 @@ public class ToolsView : Window
 
     private void ToolsView_Initialized (object sender, EventArgs e)
     {
-        LayoutSubviews ();
-
         Width = Math.Max (_colors.Frame.Width, _stylePicker.Frame.Width) + GetAdornmentsThickness ().Horizontal;
-
         Height = _colors.Frame.Height + _stylePicker.Frame.Height + _addLayerBtn.Frame.Height + GetAdornmentsThickness ().Vertical;
-        SuperView.LayoutSubviews ();
     }
 }
 
@@ -289,6 +285,9 @@ public class DrawingArea : View
                 }
             }
         }
+
+        // TODO: This is a hack to work around overlapped views not drawing correctly.
+        SuperView?.SetLayoutNeeded();
     }
 
     //// BUGBUG: Why is this not handled by a key binding???

@@ -154,8 +154,6 @@ public class ConfigurationEditor : Scenario
         {
             _tileView.Tiles.ToArray () [1].ContentView.SetFocus ();
         }
-
-        Application.Top.LayoutSubviews ();
     }
 
     private void Quit ()

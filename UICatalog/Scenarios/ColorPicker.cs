@@ -218,7 +218,6 @@ public class ColorPickers : Scenario
         // Set default colors.
         foregroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Foreground.GetClosestNamedColor16 ();
         backgroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Background.GetClosestNamedColor16 ();
-        app.Initialized += (s, e) => app.LayoutSubviews ();
 
         Application.Run (app);
         app.Dispose ();

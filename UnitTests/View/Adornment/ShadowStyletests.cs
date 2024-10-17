@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class ShadowStyleTests (ITestOutputHelper _output)
+public class ShadowStyleTests (ITestOutputHelper output)
 {
     [Fact]
     public void Default_None ()
@@ -150,7 +150,7 @@ public class ShadowStyleTests (ITestOutputHelper _output)
         superView.EndInit ();
 
         superView.Draw ();
-        TestHelpers.AssertDriverAttributesAre (expectedAttrs, Application.Driver, attributes);
+        TestHelpers.AssertDriverAttributesAre (expectedAttrs, output, Application.Driver, attributes);
     }
 
     [Theory]
@@ -218,7 +218,7 @@ public class ShadowStyleTests (ITestOutputHelper _output)
         superView.EndInit ();
         superView.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         view.Dispose ();
     }
 }

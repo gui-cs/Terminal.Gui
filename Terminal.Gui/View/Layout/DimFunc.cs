@@ -8,7 +8,7 @@ namespace Terminal.Gui;
 ///     This is a low-level API that is typically used internally by the layout system. Use the various static
 ///     methods on the <see cref="Gui.Dim"/> class to create <see cref="Gui.Dim"/> objects instead.
 /// </remarks>
-/// <param name="Fn">The function that computes the dimension.</param>
+/// <param name="Fn">The function that computes the dimension. If this function throws <see cref="Exception"/> </param>
 public record DimFunc (Func<int> Fn) : Dim
 {
     /// <summary>

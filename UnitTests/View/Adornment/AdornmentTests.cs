@@ -335,13 +335,16 @@ public class AdornmentTests (ITestOutputHelper output)
     [Fact]
     public void Setting_Thickness_Causes_Parent_Layout ()
     {
-        var view = new View ();
+        var parent = new View ();
         var raised = false;
-        view.BeginInit ();
-        view.EndInit ();
+        parent.BeginInit ();
+        parent.EndInit ();
 
-        view.LayoutStarted += LayoutStarted;
-        view.Margin.Thickness = new Thickness (1, 2, 3, 4);
+        parent.LayoutStarted += LayoutStarted;
+        parent.Margin.Thickness = new Thickness (1, 2, 3, 4);
+        Assert.True (parent.IsLayoutNeeded());
+        Assert.True (parent.Margin.IsLayoutNeeded ());
+        parent.Layout ();
         Assert.True (raised);
 
         return;
@@ -355,13 +358,16 @@ public class AdornmentTests (ITestOutputHelper output)
     [Fact]
     public void Setting_Thickness_Causes_Adornment_Layout ()
     {
-        var view = new View ();
+        var parent = new View ();
         var raised = false;
-        view.BeginInit ();
-        view.EndInit ();
+        parent.BeginInit ();
+        parent.EndInit ();
 
-        view.Margin.LayoutStarted += LayoutStarted;
-        view.Margin.Thickness = new Thickness (1, 2, 3, 4);
+        parent.Margin.LayoutStarted += LayoutStarted;
+        parent.Margin.Thickness = new Thickness (1, 2, 3, 4);
+        Assert.True (parent.IsLayoutNeeded ());
+        Assert.True (parent.Margin.IsLayoutNeeded ());
+        parent.Layout ();
         Assert.True (raised);
 
         return;

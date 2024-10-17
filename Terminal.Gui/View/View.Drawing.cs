@@ -1,4 +1,6 @@
 ﻿#nullable enable
+using System.Diagnostics;
+
 namespace Terminal.Gui;
 
 public partial class View // Drawing APIs
@@ -81,7 +83,7 @@ public partial class View // Drawing APIs
     {
         if (Move (col, row))
         {
-            Driver.AddRune (rune);
+            Driver?.AddRune (rune);
         }
     }
 
@@ -193,7 +195,7 @@ public partial class View // Drawing APIs
     /// <remarks>
     ///     <para>
     ///         The view will only be drawn if it is visible, and has any of <see cref="NeedsDisplay"/>, <see cref="SubViewNeedsDisplay"/>,
-    ///         or <see cref="LayoutNeeded"/> set.
+    ///         or <see cref="IsLayoutNeeded"/> set.
     ///     </para>
     ///     <para>
     ///         Always use <see cref="Viewport"/> (view-relative) when calling <see cref="OnDrawContent(Rectangle)"/>, NOT
@@ -216,14 +218,19 @@ public partial class View // Drawing APIs
             return;
         }
 
-        // TODO: This ensures overlapped views are drawn correctly. However, this is inefficient.
-        // TODO: The correct fix is to implement non-rectangular clip regions: https://github.com/gui-cs/Terminal.Gui/issues/3413
-        if (Arrangement.HasFlag (ViewArrangement.Overlapped))
+        if (IsLayoutNeeded ())
         {
-            SetNeedsDisplay ();
+            //Debug.WriteLine ($"Layout should be de-coupled from drawing: {this}");
         }
 
-        if (!NeedsDisplay && !SubViewNeedsDisplay && !LayoutNeeded)
+        //// TODO: This ensures overlapped views are drawn correctly. However, this is inefficient.
+        //// TODO: The correct fix is to implement non-rectangular clip regions: https://github.com/gui-cs/Terminal.Gui/issues/3413
+        //if ((this != Application.Top || this is Toplevel { Modal: true }) && Arrangement.HasFlag (ViewArrangement.Overlapped))
+        //{
+        //    SetNeedsDisplay ();
+        //}
+
+        if (!NeedsDisplay && !SubViewNeedsDisplay)
         {
             return;
         }
@@ -270,8 +277,6 @@ public partial class View // Drawing APIs
         // Invoke DrawContentCompleteEvent
         OnDrawContentComplete (Viewport);
 
-        // BUGBUG: v2 - We should be able to use View.SetClip here and not have to resort to knowing Driver details.
-        ClearLayoutNeeded ();
         ClearNeedsDisplay ();
     }
 
@@ -478,6 +483,7 @@ public partial class View // Drawing APIs
 
         // Each of these renders lines to either this View's LineCanvas 
         // Those lines will be finally rendered in OnRenderLineCanvas
+        // QUESTION: Why are we not calling Draw here?
         Margin?.OnDrawContent (Margin.Viewport);
         Border?.OnDrawContent (Border.Viewport);
         Padding?.OnDrawContent (Padding.Viewport);
@@ -520,39 +526,34 @@ public partial class View // Drawing APIs
     /// </param>
     public virtual void OnDrawContent (Rectangle viewport)
     {
-        if (NeedsDisplay)
+        if (!CanBeVisible (this))
         {
-            if (!CanBeVisible (this))
-            {
-                return;
-            }
-
-            // BUGBUG: this clears way too frequently. Need to optimize this.
-            if (SuperView is { } || Arrangement.HasFlag (ViewArrangement.Overlapped))
-            {
-                Clear ();
-            }
-
-            if (!string.IsNullOrEmpty (TextFormatter.Text))
-            {
-                if (TextFormatter is { })
-                {
-                    TextFormatter.NeedsFormat = true;
-                }
-            }
-
-            // This should NOT clear 
-            // TODO: If the output is not in the Viewport, do nothing
-            var drawRect = new Rectangle (ContentToScreen (Point.Empty), GetContentSize ());
-
-            TextFormatter?.Draw (
-                                 drawRect,
-                                 HasFocus ? GetFocusColor () : GetNormalColor (),
-                                 HasFocus ? GetHotFocusColor () : GetHotNormalColor (),
-                                 Rectangle.Empty
-                                );
-            SetSubViewNeedsDisplay ();
+            return;
         }
+
+        // BUGBUG: this clears way too frequently. Need to optimize this.
+        if (NeedsDisplay/* || Arrangement.HasFlag (ViewArrangement.Overlapped)*/)
+        {
+            Clear ();
+        }
+
+        if (!string.IsNullOrEmpty (TextFormatter.Text))
+        {
+            TextFormatter.NeedsFormat = true;
+        }
+
+        // This should NOT clear 
+        // TODO: If the output is not in the Viewport, do nothing
+        var drawRect = new Rectangle (ContentToScreen (Point.Empty), GetContentSize ());
+
+        TextFormatter?.Draw (
+                             drawRect,
+                             HasFocus ? GetFocusColor () : GetNormalColor (),
+                             HasFocus ? GetHotFocusColor () : GetHotNormalColor (),
+                             Rectangle.Empty
+                            );
+        SetSubViewNeedsDisplay ();
+
 
         // TODO: Move drawing of subviews to a separate OnDrawSubviews virtual method
         // Draw subviews
@@ -563,26 +564,27 @@ public partial class View // Drawing APIs
                                                                      view => view.Visible
                                                                              && (view.NeedsDisplay
                                                                                  || view.SubViewNeedsDisplay
-                                                                                 || view.LayoutNeeded
-                                                                                 || view.Arrangement.HasFlag (ViewArrangement.Overlapped)
-                                                                    ));
+                                                                                // || view.Arrangement.HasFlag (ViewArrangement.Overlapped)
+                                                                                ));
 
             foreach (View view in subviewsNeedingDraw)
             {
-                if (view.LayoutNeeded)
+                if (view.IsLayoutNeeded ())
                 {
-                    view.LayoutSubviews ();
+                    //Debug.WriteLine ($"Layout should be de-coupled from drawing: {view}");
+                    //view.LayoutSubviews ();
                 }
 
                 // TODO: This ensures overlapped views are drawn correctly. However, this is inefficient.
                 // TODO: The correct fix is to implement non-rectangular clip regions: https://github.com/gui-cs/Terminal.Gui/issues/3413
                 if (view.Arrangement.HasFlag (ViewArrangement.Overlapped))
                 {
-                    view.SetNeedsDisplay ();
+                    // view.SetNeedsDisplay ();
                 }
 
                 view.Draw ();
             }
+
         }
     }
 
@@ -695,6 +697,11 @@ public partial class View // Drawing APIs
         Padding?.SetNeedsDisplay ();
 
         SuperView?.SetSubViewNeedsDisplay ();
+
+        if (this is Adornment adornment)
+        {
+            adornment.Parent?.SetSubViewNeedsDisplay ();
+        }
 
         foreach (View subview in Subviews)
         {

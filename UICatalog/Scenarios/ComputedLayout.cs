@@ -370,7 +370,6 @@ public class ComputedLayout : Scenario
                                     // The call to app.LayoutSubviews causes the Computed layout to
                                     // get updated. 
                                     anchorButton.Text += "!";
-                                    app.LayoutSubviews ();
                                 };
         app.Add (anchorButton);
 
@@ -415,10 +414,7 @@ public class ComputedLayout : Scenario
                               {
                                   // This demonstrates how to have a dynamically sized button
                                   // Each time the button is clicked the button's text gets longer
-                                  // The call to app.LayoutSubviews causes the Computed layout to
-                                  // get updated. 
                                   leftButton.Text += "!";
-                                  app.LayoutSubviews ();
                               };
 
         // show positioning vertically using Pos.AnchorEnd
@@ -433,10 +429,7 @@ public class ComputedLayout : Scenario
                                 {
                                     // This demonstrates how to have a dynamically sized button
                                     // Each time the button is clicked the button's text gets longer
-                                    // The call to app.LayoutSubviews causes the Computed layout to
-                                    // get updated. 
                                     centerButton.Text += "!";
-                                    app.LayoutSubviews ();
                                 };
 
         // show positioning vertically using another window and Pos.Bottom
@@ -451,10 +444,7 @@ public class ComputedLayout : Scenario
                                {
                                    // This demonstrates how to have a dynamically sized button
                                    // Each time the button is clicked the button's text gets longer
-                                   // The call to app.LayoutSubviews causes the Computed layout to
-                                   // get updated. 
                                    rightButton.Text += "!";
-                                   app.LayoutSubviews ();
                                };
 
         View [] buttons = { leftButton, centerButton, rightButton };

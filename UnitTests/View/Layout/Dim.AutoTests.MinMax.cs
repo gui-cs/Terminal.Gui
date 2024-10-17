@@ -51,8 +51,8 @@ public partial class DimAutoTests
             BorderStyle = LineStyle.Single, // a 1 thick adornment
             ValidatePosDim = true
         };
-
         view.SetContentSize (new (contentSize, 0));
+        view.Layout ();
 
         Assert.Equal (expected, view.Frame.Width);
     }

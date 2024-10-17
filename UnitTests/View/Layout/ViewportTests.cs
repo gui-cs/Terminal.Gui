@@ -160,6 +160,7 @@ public class ViewportTests (ITestOutputHelper output)
             Height = 10,
             ViewportSettings = ViewportSettings.AllowNegativeLocation
         };
+        view.Layout ();
 
         Assert.Equal (new Rectangle (0, 0, 10, 10), view.Frame);
 
@@ -237,6 +238,7 @@ public class ViewportTests (ITestOutputHelper output)
             Width = viewWidth,
             Height = viewHeight,
         };
+        view.Layout ();
         var newViewport = new Rectangle (viewportX, viewportY, viewWidth, viewHeight);
 
         // Act

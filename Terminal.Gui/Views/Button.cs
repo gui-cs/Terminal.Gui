@@ -191,7 +191,7 @@ public class Button : View, IDesignable
             _isDefault = value;
 
             UpdateTextFormatterText ();
-            OnResizeNeeded ();
+            SetLayoutNeeded ();
         }
     }
 

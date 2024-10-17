@@ -168,6 +168,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                     {
                         int width = v.Width!.Calculate (0, superviewContentSize, v, dimension);
                         size = v.X.GetAnchor (0) + width;
+
                     }
                     else
                     {
@@ -414,11 +415,6 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                 List<View> dimAutoSubViews;
 
-                if (dimension == Dimension.Width && us.GetType ().Name == "Bar" && us.Subviews.Count == 3)
-                {
-
-                }
-
                 if (dimension == Dimension.Width)
                 {
                     dimAutoSubViews = includedSubviews.Where (v => v.Width is { } && v.Width.Has<DimAuto> (out _)).ToList ();
@@ -448,6 +444,44 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                         maxCalculatedSize = maxDimAuto;
                     }
                 }
+
+                #endregion
+
+
+                #region DimFill
+                //// [ ] DimFill      - Dimension is internally calculated
+
+                //List<View> DimFillSubViews;
+
+                //if (dimension == Dimension.Width)
+                //{
+                //    DimFillSubViews = includedSubviews.Where (v => v.Width is { } && v.Width.Has<DimFill> (out _)).ToList ();
+                //}
+                //else
+                //{
+                //    DimFillSubViews = includedSubviews.Where (v => v.Height is { } && v.Height.Has<DimFill> (out _)).ToList ();
+                //}
+
+                //for (var i = 0; i < DimFillSubViews.Count; i++)
+                //{
+                //    View v = DimFillSubViews [i];
+
+                //    if (dimension == Dimension.Width)
+                //    {
+                //        v.SetRelativeLayout (new (maxCalculatedSize, 0));
+                //    }
+                //    else
+                //    {
+                //        v.SetRelativeLayout (new (0, maxCalculatedSize));
+                //    }
+
+                //    int maxDimFill = dimension == Dimension.Width ? v.Frame.X + v.Frame.Width : v.Frame.Y + v.Frame.Height;
+
+                //    if (maxDimFill > maxCalculatedSize)
+                //    {
+                //        maxCalculatedSize = maxDimFill;
+                //    }
+                //}
 
                 #endregion
             }

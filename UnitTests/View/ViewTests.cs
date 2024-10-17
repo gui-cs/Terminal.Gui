@@ -187,6 +187,7 @@ cccccccccccccccccccc",
                                                    @"
 111111111111111111110
 111111111111111111110",
+                                                   output,
                                                    Application.Driver,
                                                    attributes
                                                   );
@@ -197,6 +198,7 @@ cccccccccccccccccccc",
                                                    @"
 222222222222222222220
 111111111111111111110",
+                                                   output,
                                                    Application.Driver,
                                                    attributes
                                                   );
@@ -215,6 +217,7 @@ cccccccccccccccccccc",
                                                    @"
 222222222222222222220
 111111111111111111110",
+                                                   output,
                                                    Application.Driver,
                                                    attributes
                                                   );
@@ -1025,7 +1028,7 @@ At 0,0
         view.Visible = false;
 
         var firstIteration = false;
-        Application.RunIteration (ref rs, ref firstIteration);
+        Application.RunIteration (ref rs, firstIteration);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1128,7 +1131,6 @@ At 0,0
                 }
             }
 
-            ClearLayoutNeeded ();
             ClearNeedsDisplay ();
         }
 

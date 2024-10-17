@@ -115,7 +115,7 @@ public class TableViewTests (ITestOutputHelper output)
 00000000000000000000
 01111101101111111110
 ";
-        TestHelpers.AssertDriverAttributesAre (expected, Application.Driver, tv.ColorScheme.Normal, color);
+        TestHelpers.AssertDriverAttributesAre (expected, output, Application.Driver, tv.ColorScheme.Normal, color);
         top.Dispose ();
     }
 
@@ -1094,6 +1094,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverAttributesAre (
                                                expectedColors,
+                                               output,
                                                Application.Driver,
                                                tv.ColorScheme.Normal,
                                                focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal,
@@ -1129,6 +1130,7 @@ public class TableViewTests (ITestOutputHelper output)
         // (now that the cell value is 5 - which does not match the conditional)
         TestHelpers.AssertDriverAttributesAre (
                                                expectedColors,
+                                               output,
                                                Application.Driver,
                                                tv.ColorScheme.Normal,
                                                focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal
@@ -1187,6 +1189,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverAttributesAre (
                                                expectedColors,
+                                               output,
                                                Application.Driver,
                                                tv.ColorScheme.Normal,
                                                focused ? rowHighlight.Focus : rowHighlight.HotNormal,
@@ -1222,6 +1225,7 @@ public class TableViewTests (ITestOutputHelper output)
         // (now that the cell value is 5 - which does not match the conditional)
         TestHelpers.AssertDriverAttributesAre (
                                                expectedColors,
+                                               output,
                                                Application.Driver,
                                                tv.ColorScheme.Normal,
                                                focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal
@@ -1267,6 +1271,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverAttributesAre (
                                                expectedColors,
+                                               output,
                                                Application.Driver,
                                                tv.ColorScheme.Normal,
                                                focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal
@@ -1312,6 +1317,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverAttributesAre (
                                                expectedColors,
+                                               output,
                                                Application.Driver,
                                                tv.ColorScheme.Normal,
                                                focused ? invertFocus : invertHotNormal
@@ -2291,7 +2297,7 @@ public class TableViewTests (ITestOutputHelper output)
 0101010
 0000000";
 
-        TestHelpers.AssertDriverAttributesAre (expected, Application.Driver, normal, focus);
+        TestHelpers.AssertDriverAttributesAre (expected, output, Application.Driver, normal, focus);
     }
 
     [Fact]
@@ -2344,7 +2350,7 @@ A B C
 000000
 111111";
 
-        TestHelpers.AssertDriverAttributesAre (expected, Application.Driver, normal, focus);
+        TestHelpers.AssertDriverAttributesAre (expected, output, Application.Driver, normal, focus);
     }
 
     [Fact]
@@ -2400,7 +2406,7 @@ A B C
 0111110
 0000000";
 
-        TestHelpers.AssertDriverAttributesAre (expected, Application.Driver, normal, focus);
+        TestHelpers.AssertDriverAttributesAre (expected, output, Application.Driver, normal, focus);
     }
 
     [Theory]
