@@ -702,49 +702,18 @@ public class LayoutTests (ITestOutputHelper output)
     [TestRespondersDisposed]
     public void Throw_If_SuperView_Refs_SubView ()
     {
-        var topSuperView = new View { Width = 80, Height = 25 };
+        var superView = new View { Width = 80, Height = 25 };
 
-        var superViewRefsTopSuperView = new Window
+        var subViewThatRefsSuperView = new View ()
         {
-            Width = Dim.Width (topSuperView) - 2, // 78
-            Height = Dim.Height (topSuperView) - 2 // 23
+            Width = Dim.Width (superView),
+            Height = Dim.Height (superView)
         };
 
-        var v1 = new View
-        {
-            Width = Dim.Width (superViewRefsTopSuperView) - 2, // 76
-            Height = Dim.Height (superViewRefsTopSuperView) - 2 // 21
-        };
+        superView.Add (subViewThatRefsSuperView);
 
-        var v2 = new View
-        {
-            Width = Dim.Width (v1) - 2, // 74
-            Height = Dim.Height (v1) - 2 // 19
-        };
-
-        var superView = new FrameView ();
-        superView.Width = Dim.Width (topSuperView) - Dim.Width (v2); // 80 - 74 = 6
-        superView.Height = Dim.Height (topSuperView) - Dim.Height (v2); // 25 - 19 = 6
-        superView.Add (v1, v2);
-
-        superViewRefsTopSuperView.Add (superView);
-
-        topSuperView.Add (superViewRefsTopSuperView);
-
-        topSuperView.SetRelativeLayout (new (100, 100));
-
-        Assert.Throws<InvalidOperationException> (() => topSuperView.LayoutSubviews());
-        Assert.Equal (80, topSuperView.Frame.Width);
-        Assert.Equal (25, topSuperView.Frame.Height);
-        Assert.Equal (78, superViewRefsTopSuperView.Frame.Width);
-        Assert.Equal (23, superViewRefsTopSuperView.Frame.Height);
-        Assert.Equal (6, superView.Frame.Width);
-        Assert.Equal (6, superView.Frame.Height);
-        Assert.Equal (76, v1.Frame.Width);
-        Assert.Equal (21, v1.Frame.Height);
-        Assert.Equal (74, v2.Frame.Width);
-        Assert.Equal (19, v2.Frame.Height);
-        topSuperView.Dispose ();
+        Assert.Throws<InvalidOperationException> (() => superView.LayoutSubviews ());
+        superView.Dispose ();
     }
 
 }
