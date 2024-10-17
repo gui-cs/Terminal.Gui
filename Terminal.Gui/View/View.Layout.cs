@@ -190,7 +190,7 @@ public partial class View // Layout APIs
     ///     </para>
     ///     <para>
     ///         Altering the Frame will eventually (when the view hierarchy is next laid out via  see
-    ///         cref="LayoutSubviews"/>) cause <see cref="LayoutSubview(View, Size)"/> and
+    ///         cref="LayoutSubviews"/>) cause <see cref="Layout"/> and
     ///         <see cref="OnDrawContent(Rectangle)"/>
     ///         methods to be called.
     ///     </para>
@@ -207,21 +207,15 @@ public partial class View // Layout APIs
         }
         set
         {
-            if (_frame == value)
-            {
-                return;
-            }
-
             // This will set _frame, call SetsNeedsLayout, and raise OnViewportChanged/ViewportChanged
-            SetFrame (value with { Width = Math.Max (value.Width, 0), Height = Math.Max (value.Height, 0) });
-
-            // If Frame gets set, set all Pos/Dim to Absolute values.
-            _x = _frame.X;
-            _y = _frame.Y;
-            _width = _frame.Width;
-            _height = _frame.Height;
-
-            SetLayoutNeeded ();
+            if (SetFrame (value with { Width = Math.Max (value.Width, 0), Height = Math.Max (value.Height, 0) }))
+            {
+                // If Frame gets set, set all Pos/Dim to Absolute values.
+                _x = _frame.X;
+                _y = _frame.Y;
+                _width = _frame.Width;
+                _height = _frame.Height;
+            }
         }
     }
 
@@ -229,11 +223,12 @@ public partial class View // Layout APIs
     ///     INTERNAL API - Sets _frame, calls SetsNeedsLayout, and raises OnViewportChanged/ViewportChanged
     /// </summary>
     /// <param name="frame"></param>
-    private void SetFrame (in Rectangle frame)
+    /// <returns><see langword="true"/> if the frame was changed.</returns>
+    private bool SetFrame (in Rectangle frame)
     {
         if (_frame == frame)
         {
-            return;
+            return false;
         }
 
         var oldViewport = Rectangle.Empty;
@@ -252,6 +247,8 @@ public partial class View // Layout APIs
 
         // BUGBUG: When SetFrame is called from Frame_set, this event gets raised BEFORE OnResizeNeeded. Is that OK?
         OnViewportChanged (new (IsInitialized ? Viewport : Rectangle.Empty, oldViewport));
+
+        return true;
     }
 
     /// <summary>Gets the <see cref="Frame"/> with a screen-relative location.</summary>
@@ -331,7 +328,7 @@ public partial class View // Layout APIs
     ///     </para>
     ///     <para>
     ///         Changing this property will eventually (when the view is next drawn) cause the
-    ///         <see cref="LayoutSubview(View, Size)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
+    ///         <see cref="Layout"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated.
@@ -349,12 +346,6 @@ public partial class View // Layout APIs
             }
 
             _x = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (X)} cannot be null");
-
-            if (!IsInitialized)
-            {
-                // Supports Unit Tests that don't call Begin/EndInit
-                //SetRelativeLayout (GetBestGuessSuperViewContentSize ());
-            }
 
             SetLayoutNeeded ();
         }
@@ -380,7 +371,7 @@ public partial class View // Layout APIs
     ///     </para>
     ///     <para>
     ///         Changing this property will eventually (when the view is next drawn) cause the
-    ///         <see cref="LayoutSubview(View, Size)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
+    ///         <see cref="Layout"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated.
@@ -398,12 +389,6 @@ public partial class View // Layout APIs
             }
 
             _y = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Y)} cannot be null");
-
-            if (!IsInitialized)
-            {
-                // Supports Unit Tests that don't call Begin/EndInit
-                //SetRelativeLayout (GetBestGuessSuperViewContentSize ());
-            }
 
             SetLayoutNeeded ();
         }
@@ -430,7 +415,7 @@ public partial class View // Layout APIs
     ///     </para>
     ///     <para>
     ///         Changing this property will eventually (when the view is next drawn) cause the
-    ///         <see cref="LayoutSubview(View, Size)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
+    ///         <see cref="Layout"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated.
@@ -458,12 +443,6 @@ public partial class View // Layout APIs
             // Reset TextFormatter - Will be recalculated in SetTextFormatterSize
             TextFormatter.ConstrainToHeight = null;
 
-            if (!IsInitialized)
-            {
-                // Supports Unit Tests that don't call Begin/EndInit
-                //SetRelativeLayout (GetBestGuessSuperViewContentSize ());
-            }
-
             SetLayoutNeeded ();
         }
     }
@@ -489,7 +468,7 @@ public partial class View // Layout APIs
     ///     </para>
     ///     <para>
     ///         Changing this property will eventually (when the view is next drawn) cause the
-    ///         <see cref="LayoutSubview(View, Size)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
+    ///         <see cref="Layout"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
     ///     </para>
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated.
@@ -516,12 +495,6 @@ public partial class View // Layout APIs
 
             // Reset TextFormatter - Will be recalculated in SetTextFormatterSize
             TextFormatter.ConstrainToWidth = null;
-
-            if (!IsInitialized)
-            {
-                // Supports Unit Tests that don't call Begin/EndInit
-                //SetRelativeLayout (GetBestGuessSuperViewContentSize ());
-            }
 
             SetLayoutNeeded ();
         }
@@ -559,7 +532,7 @@ public partial class View // Layout APIs
     ///     </para>
     ///     <para>
     ///         If any of the view's subviews have a position or dimension dependent on either <see cref="GetContentSize"/> or
-    ///         other subviews, <see cref="LayoutSubview"/> on
+    ///         other subviews, <see cref="Layout"/> on
     ///         will be called for that subview.
     ///     </para>
     ///     <para>
@@ -657,7 +630,6 @@ public partial class View // Layout APIs
                 SetTitleTextFormatterSize ();
             }
 
-            //SetNeedsDisplay ();
             SuperView?.SetNeedsDisplay ();
         }
 
@@ -674,10 +646,8 @@ public partial class View // Layout APIs
         return true;
     }
 
-    // TODO: remove virtual from this
     /// <summary>
-    ///     Invoked when the dimensions of the view have changed, for example in response to the container view or terminal
-    ///     resizing.
+    ///    INTERNAL API - Causes the view's subviews and adornments to be laid out within the view's content areas. Assumes the view's relative layout has been set via <see cref="SetRelativeLayout"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -690,7 +660,7 @@ public partial class View // Layout APIs
     ///     </para>
     ///     <para>Raises the <see cref="LayoutComplete"/> event before it returns.</para>
     /// </remarks>
-    public virtual void LayoutSubviews ()
+    internal void LayoutSubviews ()
     {
         if (!IsInitialized)
         {
@@ -707,6 +677,7 @@ public partial class View // Layout APIs
         Size contentSize = GetContentSize ();
         OnLayoutStarted (new (contentSize));
 
+        // The Adornments already have their Frame's set by SetRelativeLayout so we call LayoutSubViews vs. Layout here.
         Margin?.LayoutSubviews ();
         Border?.LayoutSubviews ();
         Padding?.LayoutSubviews ();
@@ -720,7 +691,7 @@ public partial class View // Layout APIs
         List<View> redo = new ();
         foreach (View v in ordered)
         {
-            if (!LayoutSubview (v, contentSize))
+            if (!v.Layout (contentSize))
             {
                 redo.Add (v);
             }
@@ -729,7 +700,7 @@ public partial class View // Layout APIs
         bool layoutStillNeeded = false;
         foreach (View v in redo)
         {
-            if (!LayoutSubview (v, contentSize))
+            if (!v.Layout (contentSize))
             {
                 layoutStillNeeded = true;
             }
@@ -742,7 +713,7 @@ public partial class View // Layout APIs
             foreach ((View from, View to) in edges)
             {
                 Debug.Fail ("This is dead code?");
-                LayoutSubview (to, from.GetContentSize ());
+                to.Layout (from.GetContentSize ());
             }
         }
 
@@ -752,22 +723,30 @@ public partial class View // Layout APIs
     }
 
     /// <summary>
-    ///     Lays out <see cref="subView"/>. 
+    ///     Performs layout of the view and its subviews within the specified content size.
     /// </summary>
-    /// <param name="subView"></param>
     /// <param name="contentSize"></param>
     /// <returns><see langword="false"/>If the view could not be laid out (typically because a dependencies was not ready). </returns>
-    private bool LayoutSubview (View subView, Size contentSize)
+    public bool Layout (Size contentSize)
     {
         // Note, SetRelativeLayout calls SetTextFormatterSize
-        if (subView.SetRelativeLayout (contentSize))
+        if (SetRelativeLayout (contentSize))
         {
-            subView.LayoutSubviews ();
+            LayoutSubviews ();
 
             return true;
         }
 
         return false;
+    }
+
+    /// <summary>
+    ///     Performs layout of the view and its subviews using the content size of either the <see cref="SuperView"/> or <see cref="Application.Screen"/>.
+    /// </summary>
+    /// <returns><see langword="false"/>If the view could not be laid out (typically because a dependencies was not ready). </returns>
+    public bool Layout ()
+    {
+        return Layout (GetBestGuessSuperViewContentSize ());
     }
 
     /// <summary>
@@ -787,17 +766,26 @@ public partial class View // Layout APIs
     private bool _layoutNeeded = true;
 
     /// <summary>
-    ///     Indicates the View's Frame or the relative layout of the View's subviews (including Adornments) have
-    ///     changed since the last time the View was laid out. Used to prevent <see cref="LayoutSubviews"/> from needlessly computing
-    ///     layout.
+    ///     Indicates the View's Frame or the layout of the View's subviews (including Adornments) have
+    ///     changed since the last time the View was laid out. 
     /// </summary>
-    /// <returns></returns>
-    public bool IsLayoutNeeded () => _layoutNeeded;
+    /// <remarks>
+    /// <para>Used to prevent <see cref="Layout()"/> from needlessly computing
+    ///     layout.
+    /// </para>
+    /// </remarks>
+    /// <returns><see langword="true"/> if layout is needed.</returns>
+    public bool IsLayoutNeeded () { return _layoutNeeded; }
 
     /// <summary>
-    ///     INTERNAL API - Sets <see cref="_layoutNeeded"/> for this View and all of it's subviews and it's SuperView.
-    ///     The main loop will call SetRelativeLayout and LayoutSubviews for any view with <see cref="IsLayoutNeeded"/> set.
+    ///     Sets <see cref="IsLayoutNeeded"/> to return <see langword="true"/>, indicating this View and all of it's subviews (including adornments) need to be laid out in the next Application iteration.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The <see cref="MainLoop"/> will cause <see cref="Layout()"/> to be called on the next <see cref="Application.Iteration"/> so there is normally no reason to call see <see cref="Layout()"/>.
+    ///     </para>
+    /// </remarks>
+
     public void SetLayoutNeeded ()
     {
         if (IsLayoutNeeded ())
@@ -880,7 +868,7 @@ public partial class View // Layout APIs
     }
 
     /// <summary>
-    ///     Collects dimension (where Width or Height is `DimView`) dependencies for a given view.
+    ///      INTERNAL API - Collects dimension (where Width or Height is `DimView`) dependencies for a given view.
     /// </summary>
     /// <param name="dim">The dimension (width or height) to collect dependencies for.</param>
     /// <param name="from">The view for which to collect dimension dependencies.</param>
@@ -891,7 +879,7 @@ public partial class View // Layout APIs
     /// </param>
     internal void CollectDim (Dim? dim, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
     {
-        if (dim!.Has<DimView> (out var dv))
+        if (dim!.Has<DimView> (out DimView dv))
         {
             if (dv.Target != this)
             {
@@ -899,21 +887,15 @@ public partial class View // Layout APIs
             }
         }
 
-        if (dim!.Has<DimCombine> (out var dc))
+        if (dim!.Has<DimCombine> (out DimCombine dc))
         {
             CollectDim (dc.Left, from, ref nNodes, ref nEdges);
             CollectDim (dc.Right, from, ref nNodes, ref nEdges);
         }
-
-        if (dim!.Has<DimFunc> (out var df))
-        {
-
-        }
-
     }
 
     /// <summary>
-    ///     Collects position (where X or Y is `PosView`) dependencies for a given view.
+    ///     INTERNAL API - Collects position (where X or Y is `PosView`) dependencies for a given view.
     /// </summary>
     /// <param name="pos">The position (X or Y) to collect dependencies for.</param>
     /// <param name="from">The view for which to collect position dependencies.</param>
@@ -924,6 +906,7 @@ public partial class View // Layout APIs
     /// </param>
     internal void CollectPos (Pos pos, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
     {
+        // TODO: Use Pos.Has<T> instead.
         switch (pos)
         {
             case PosView pv:

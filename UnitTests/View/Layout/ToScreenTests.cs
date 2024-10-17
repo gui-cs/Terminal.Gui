@@ -960,7 +960,7 @@ public class ToScreenTests (ITestOutputHelper output)
         };
         Application.Top.Add (view);
 
-        Application.Begin (Application.Top);
+        var rs = Application.Begin (Application.Top);
 
         Assert.Equal (new (0, 0, 80, 25), new Rectangle (0, 0, View.Driver.Cols, View.Driver.Rows));
         Assert.Equal (new (0, 0, View.Driver.Cols, View.Driver.Rows), Application.Top.Frame);
@@ -969,6 +969,7 @@ public class ToScreenTests (ITestOutputHelper output)
         ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
         Assert.Equal (new (0, 0, View.Driver.Cols, View.Driver.Rows), Application.Top.Frame);
         Assert.Equal (new (0, 0, 20, 10), Application.Top.Frame);
+
 
         _ = TestHelpers.AssertDriverContentsWithFrameAre (
                                                           @"

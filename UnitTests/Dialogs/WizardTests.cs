@@ -31,10 +31,10 @@ public class WizardTests ()
 
         RunState runstate = Application.Begin (wizard);
         var firstIteration = true;
-        Application.RunIteration (ref runstate, ref firstIteration);
+        Application.RunIteration (ref runstate, firstIteration);
 
         wizard.NextFinishButton.InvokeCommand (Command.Accept);
-        Application.RunIteration (ref runstate, ref firstIteration);
+        Application.RunIteration (ref runstate, firstIteration);
         Application.End (runstate);
         Assert.True (finishedFired);
         Assert.True (closedFired);
@@ -56,7 +56,7 @@ public class WizardTests ()
         wizard.Closed += (s, e) => { closedFired = true; };
 
         runstate = Application.Begin (wizard);
-        Application.RunIteration (ref runstate, ref firstIteration);
+        Application.RunIteration (ref runstate, firstIteration);
 
         Assert.Equal (step1.Title, wizard.CurrentStep.Title);
         wizard.NextFinishButton.InvokeCommand (Command.Accept);
@@ -90,7 +90,7 @@ public class WizardTests ()
         wizard.Closed += (s, e) => { closedFired = true; };
 
         runstate = Application.Begin (wizard);
-        Application.RunIteration (ref runstate, ref firstIteration);
+        Application.RunIteration (ref runstate, firstIteration);
 
         Assert.Equal (step2.Title, wizard.CurrentStep.Title);
         Assert.Equal (wizard.GetLastStep ().Title, wizard.CurrentStep.Title);
@@ -464,7 +464,7 @@ public class WizardTests ()
         //wizard.LayoutSubviews ();
         var firstIteration = false;
         RunState runstate = Application.Begin (wizard);
-        Application.RunIteration (ref runstate, ref firstIteration);
+        Application.RunIteration (ref runstate, firstIteration);
 
         // TODO: Disabled until Dim.Auto is used in Dialog
         //TestHelpers.AssertDriverContentsWithFrameAre (

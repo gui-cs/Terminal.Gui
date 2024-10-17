@@ -54,7 +54,7 @@ public partial class View // Adornments
     ///     </para>
     ///     <para>
     ///         Changing the size of an adornment (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will
-    ///         change the size of <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the
+    ///         change the size of <see cref="Frame"/> which will call <see cref="SetLayoutNeeded"/> to update the layout of the
     ///         <see cref="SuperView"/> and its <see cref="Subviews"/>.
     ///     </para>
     /// </remarks>
@@ -109,8 +109,8 @@ public partial class View // Adornments
     ///         View's content and are not clipped by the View's Clip Area.
     ///     </para>
     ///     <para>
-    ///         Changing the size of a frame (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will
-    ///         change the size of the <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the
+    ///         Changing the size of an adornment (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will
+    ///         change the size of <see cref="Frame"/> which will call <see cref="SetLayoutNeeded"/> to update the layout of the
     ///         <see cref="SuperView"/> and its <see cref="Subviews"/>.
     ///     </para>
     /// </remarks>
@@ -217,8 +217,8 @@ public partial class View // Adornments
     ///         View's content and are not clipped by the View's Clip Area.
     ///     </para>
     ///     <para>
-    ///         Changing the size of a frame (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will
-    ///         change the size of the <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the
+    ///         Changing the size of an adornment (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will
+    ///         change the size of <see cref="Frame"/> which will call <see cref="SetLayoutNeeded"/> to update the layout of the
     ///         <see cref="SuperView"/> and its <see cref="Subviews"/>.
     ///     </para>
     /// </remarks>

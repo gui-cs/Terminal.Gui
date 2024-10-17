@@ -152,18 +152,15 @@ public class Adornment : View
 
         Rectangle screen = ViewportToScreen (viewport);
         Attribute normalAttr = GetNormalColor ();
-        Driver.SetAttribute (normalAttr);
+        Driver?.SetAttribute (normalAttr);
 
         // This just draws/clears the thickness, not the insides.
         Thickness.Draw (screen, ToString ());
 
         if (!string.IsNullOrEmpty (TextFormatter.Text))
         {
-            if (TextFormatter is { })
-            {
-                TextFormatter.ConstrainToSize = Frame.Size;
-                TextFormatter.NeedsFormat = true;
-            }
+            TextFormatter.ConstrainToSize = Frame.Size;
+            TextFormatter.NeedsFormat = true;
         }
 
         TextFormatter?.Draw (screen, normalAttr, normalAttr, Rectangle.Empty);

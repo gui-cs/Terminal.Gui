@@ -885,7 +885,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
         Application.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.Button1Pressed });
 
         var firstIteration = false;
-        Application.RunIteration (ref rs, ref firstIteration);
+        Application.RunIteration (ref rs, firstIteration);
         Assert.Equal (window.Border, Application.MouseGrabView);
 
         Assert.Equal (new (0, 0, 10, 3), window.Frame);
@@ -897,7 +897,7 @@ public partial class ToplevelTests (ITestOutputHelper output)
                                   });
 
         firstIteration = false;
-        Application.RunIteration (ref rs, ref firstIteration);
+        Application.RunIteration (ref rs, firstIteration);
         Assert.Equal (window.Border, Application.MouseGrabView);
         Assert.Equal (new (1, 1, 10, 3), window.Frame);
 

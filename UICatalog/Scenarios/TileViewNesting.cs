@@ -35,16 +35,16 @@ public class TileViewNesting : Scenario
         _textField.TextChanged += (s, e) => SetupTileView ();
 
         _cbHorizontal = new() { X = Pos.Right (_textField) + 1, Text = "Horizontal" };
-        _cbHorizontal.CheckedStateChanging += (s, e) => SetupTileView ();
+        _cbHorizontal.CheckedStateChanged += (s, e) => SetupTileView ();
 
         _cbBorder = new() { X = Pos.Right (_cbHorizontal) + 1, Text = "Border" };
-        _cbBorder.CheckedStateChanging += (s, e) => SetupTileView ();
+        _cbBorder.CheckedStateChanged += (s, e) => SetupTileView ();
 
         _cbTitles = new() { X = Pos.Right (_cbBorder) + 1, Text = "Titles" };
-        _cbTitles.CheckedStateChanging += (s, e) => SetupTileView ();
+        _cbTitles.CheckedStateChanged += (s, e) => SetupTileView ();
 
         _cbUseLabels = new() { X = Pos.Right (_cbTitles) + 1, Text = "Use Labels" };
-        _cbUseLabels.CheckedStateChanging += (s, e) => SetupTileView ();
+        _cbUseLabels.CheckedStateChanged += (s, e) => SetupTileView ();
 
         _workArea = new() { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill () };
 
@@ -195,11 +195,6 @@ public class TileViewNesting : Scenario
             _viewsCreated = 2;
             _viewsToCreate = numberOfViews;
             AddMoreViews (root);
-        }
-
-        if (_loaded)
-        {
-            _workArea.LayoutSubviews ();
         }
     }
 

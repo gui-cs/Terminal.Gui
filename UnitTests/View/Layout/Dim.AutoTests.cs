@@ -4,12 +4,11 @@ using static Terminal.Gui.Dim;
 
 namespace Terminal.Gui.LayoutTests;
 
-[Trait("Category", "Layout")]
+[Trait ("Category", "Layout")]
 public partial class DimAutoTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
 
-    [SetupFakeDriver]
     [Fact]
     public void Change_To_Non_Auto_Resets_ContentSize ()
     {
@@ -26,6 +25,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
         // Change text to a longer string
         view.Text = "0123456789";
 
+        view.Layout (new (100, 100));
         Assert.Equal (new (0, 0, 10, 1), view.Frame);
         Assert.Equal (new (10, 1), view.GetContentSize ());
 
@@ -33,6 +33,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
         view.Width = 5;
         view.Height = 1;
 
+        view.SetRelativeLayout (new (100, 100));
         Assert.Equal (new (5, 1), view.GetContentSize ());
     }
 
@@ -216,7 +217,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
                              Style: DimAutoStyle.Auto
                             );
 
-        var c = new DimAuto(
+        var c = new DimAuto (
                              MaximumContentDim: 2,
                              MinimumContentDim: 1,
                              Style: DimAutoStyle.Auto
@@ -966,9 +967,9 @@ public partial class DimAutoTests (ITestOutputHelper output)
     [Fact]
     public void DimAutoStyle_Content_UsesLargestSubview_WhenContentSizeNotSet ()
     {
-        var view = new View ();
-        view.Add (new View { Frame = new (0, 0, 5, 5) }); // Smaller subview
-        view.Add (new View { Frame = new (0, 0, 10, 10) }); // Larger subview
+        var view = new View { Id = "view" };
+        view.Add (new View { Id = "smaller", Frame = new (0, 0, 5, 5) }); // Smaller subview
+        view.Add (new View { Id = "larger", Frame = new (0, 0, 10, 10) }); // Larger subview
 
         Dim dim = Auto (DimAutoStyle.Content);
 
@@ -990,6 +991,8 @@ public partial class DimAutoTests (ITestOutputHelper output)
     [Fact]
     public void DimAutoStyle_Content_Pos_AnchorEnd_Locates_Correctly ()
     {
+        Application.SetScreenSize (new Size (10, 10));
+
         DimAutoTestView view = new (Auto (DimAutoStyle.Content), Auto (DimAutoStyle.Content));
 
         View subView = new ()
@@ -999,24 +1002,23 @@ public partial class DimAutoTests (ITestOutputHelper output)
         };
         view.Add (subView);
 
-        view.SetRelativeLayout (new (10, 10));
+        view.Layout ();
         Assert.Equal (new (5, 1), view.Frame.Size);
         Assert.Equal (new (0, 0), view.Frame.Location);
 
         view.X = 0;
-
         view.Y = Pos.AnchorEnd (1);
-        view.SetRelativeLayout (new (10, 10));
+        view.Layout ();
         Assert.Equal (new (5, 1), view.Frame.Size);
         Assert.Equal (new (0, 9), view.Frame.Location);
 
         view.Y = Pos.AnchorEnd ();
-        view.SetRelativeLayout (new (10, 10));
+        view.Layout ();
         Assert.Equal (new (5, 1), view.Frame.Size);
         Assert.Equal (new (0, 9), view.Frame.Location);
 
         view.Y = Pos.AnchorEnd () - 1;
-        view.SetRelativeLayout (new (10, 10));
+        view.Layout ();
         Assert.Equal (new (5, 1), view.Frame.Size);
         Assert.Equal (new (0, 8), view.Frame.Location);
     }

@@ -183,12 +183,8 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             toplevel.BeginInit ();
             toplevel.EndInit ();
 
-            if (toplevel.SetRelativeLayout (Driver!.Screen.Size))
-            {
-                toplevel.LayoutSubviews ();
-            }
-
-            // toplevel.SetLayoutNeeded();
+            // Force a layout - normally this is done each iteration of the main loop but we prime it here.
+            toplevel.Layout (Screen.Size);
         }
 
         // Try to set initial focus to any TabStop
@@ -196,6 +192,11 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         {
             toplevel.SetFocus ();
         }
+
+        // DEBATE: Should Begin call Refresh (or Draw) here? It previously did.
+        //   FOR: the screen has something on it after Begin is called.
+        //   AGAINST: the screen is cleared and then redrawn in RunLoop. We don't want to draw twice.
+        Refresh();
 
         toplevel.OnLoaded ();
 
@@ -227,11 +228,12 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         // If the view is not visible or enabled, don't position the cursor
         if (mostFocused is null || !mostFocused.Visible || !mostFocused.Enabled)
         {
-            Driver!.GetCursorVisibility (out CursorVisibility current);
+            CursorVisibility current = CursorVisibility.Invisible;
+            Driver?.GetCursorVisibility (out  current);
 
             if (current != CursorVisibility.Invisible)
             {
-                Driver.SetCursorVisibility (CursorVisibility.Invisible);
+                Driver?.SetCursorVisibility (CursorVisibility.Invisible);
             }
 
             return false;
@@ -497,11 +499,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             if (tl.IsLayoutNeeded ())
             {
                 clear = true;
-
-                if (tl.SetRelativeLayout (Screen.Size))
-                {
-                    tl.LayoutSubviews ();
-                }
+                tl.Layout (Screen.Size);
             }
         }
 
@@ -554,23 +552,23 @@ public static partial class Application // Run (Begin, Run, End, Stop)
                 return;
             }
 
-            RunIteration (ref state, ref firstIteration);
+            firstIteration = RunIteration (ref state, firstIteration);
         }
 
         MainLoop!.Running = false;
 
         // Run one last iteration to consume any outstanding input events from Driver
         // This is important for remaining OnKeyUp events.
-        RunIteration (ref state, ref firstIteration);
+        RunIteration (ref state, firstIteration);
     }
 
     /// <summary>Run one application iteration.</summary>
     /// <param name="state">The state returned by <see cref="Begin(Toplevel)"/>.</param>
     /// <param name="firstIteration">
-    ///     Set to <see langword="true"/> if this is the first run loop iteration. Upon return, it
-    ///     will be set to <see langword="false"/> if at least one iteration happened.
+    ///     Set to <see langword="true"/> if this is the first run loop iteration.
     /// </param>
-    public static void RunIteration (ref RunState state, ref bool firstIteration)
+    /// <returns><see langword="false"/> if at least one iteration happened.</returns>
+    public static bool RunIteration (ref RunState state, bool firstIteration = false)
     {
         if (MainLoop!.Running && MainLoop.EventsPending ())
         {
@@ -588,7 +586,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         if (Top is null)
         {
-            return;
+            return firstIteration;
         }
 
         Refresh ();
@@ -598,6 +596,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             Driver!.UpdateCursor ();
         }
 
+        return firstIteration;
     }
 
     /// <summary>Stops the provided <see cref="Toplevel"/>, causing or the <paramref name="top"/> if provided.</summary>

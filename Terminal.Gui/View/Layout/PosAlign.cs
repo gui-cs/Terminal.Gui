@@ -10,7 +10,7 @@ namespace Terminal.Gui;
 /// <remarks>
 ///     <para>
 ///         Updating the properties of <see cref="Aligner"/> is supported, but will not automatically cause re-layout to
-///         happen. <see cref="View.LayoutSubviews"/>
+///         happen. <see cref="View.Layout()"/>
 ///         must be called on the SuperView.
 ///     </para>
 ///     <para>

@@ -74,7 +74,9 @@ namespace Terminal.Gui;
 ///         To flag the entire view for redraw call <see cref="SetNeedsDisplay()"/>.
 ///     </para>
 ///     <para>
-///         The <see cref="LayoutSubviews"/> method is invoked when the size or layout of a view has changed.
+///         The <see cref="SetLayoutNeeded"/> method is called when the size or layout of a view has changed. The <see cref="MainLoop"/> will
+///         cause <see cref="Layout()"/> to be called on the next <see cref="Application.Iteration"/> so there is normally no reason to direclty call
+///         see <see cref="Layout()"/>.
 ///     </para>
 ///     <para>
 ///         Views have a <see cref="ColorScheme"/> property that defines the default colors that subviews should use for
@@ -243,8 +245,8 @@ public partial class View : Responder, ISupportInitializeNotification
             }
         }
 
-        // TOOD: Figure out how to move this out of here and just depend on IsLayoutNeeded in Mainloop
-        LayoutSubviews();
+        // TODO: Figure out how to move this out of here and just depend on IsLayoutNeeded in Mainloop
+        Layout ();
 
         Initialized?.Invoke (this, EventArgs.Empty);
     }

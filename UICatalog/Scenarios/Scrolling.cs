@@ -134,10 +134,8 @@ public class Scrolling : Scenario
                                {
                                    // This demonstrates how to have a dynamically sized button
                                    // Each time the button is clicked the button's text gets longer
-                                   // The call to Win.LayoutSubviews causes the Computed layout to
-                                   // get updated. 
                                    anchorButton.Text += "!";
-                                   app.LayoutSubviews ();
+
                                };
         scrollView.Add (anchorButton);
 

@@ -546,9 +546,6 @@ public class Wizard : Dialog
         SizeStep (CurrentStep);
 
         SetLayoutNeeded ();
-        LayoutSubviews ();
-
-        //Draw ();
     }
 
     private void Wizard_Closing (object sender, ToplevelClosingEventArgs obj)

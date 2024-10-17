@@ -23,6 +23,23 @@ public class TileView : View
     {
         CanFocus = true;
         RebuildForTileCount (tiles);
+
+        LayoutStarted += (_, _) =>
+                         {
+                             Rectangle viewport = Viewport;
+
+                             if (HasBorder ())
+                             {
+                                 viewport = new (
+                                                 viewport.X + 1,
+                                                 viewport.Y + 1,
+                                                 Math.Max (0, viewport.Width - 2),
+                                                 Math.Max (0, viewport.Height - 2)
+                                                );
+                             }
+
+                             Setup (viewport);
+                         };
     }
 
     /// <summary>The line style to use when drawing the splitter lines.</summary>
@@ -34,12 +51,14 @@ public class TileView : View
         get => _orientation;
         set
         {
+            if (_orientation == value)
+            {
+                return;
+            }
+
             _orientation = value;
 
-            if (IsInitialized)
-            {
-                LayoutSubviews ();
-            }
+            SetLayoutNeeded ();
         }
     }
 
@@ -131,13 +150,7 @@ public class TileView : View
             }
         }
 
-        SetNeedsDisplay ();
-
-        if (IsInitialized)
-        {
-            LayoutSubviews ();
-        }
-
+        SetLayoutNeeded ();
         return toReturn;
     }
 
@@ -154,31 +167,6 @@ public class TileView : View
     /// </remarks>
     /// <returns></returns>
     public bool IsRootTileView () { return _parentTileView == null; }
-
-    // TODO: Use OnLayoutStarted instead
-    /// <inheritdoc/>
-    public override void LayoutSubviews ()
-    {
-        if (!IsInitialized)
-        {
-            return;
-        }
-
-        Rectangle viewport = Viewport;
-
-        if (HasBorder ())
-        {
-            viewport = new (
-                            viewport.X + 1,
-                            viewport.Y + 1,
-                            Math.Max (0, viewport.Width - 2),
-                            Math.Max (0, viewport.Height - 2)
-                           );
-        }
-
-        Setup (viewport);
-        base.LayoutSubviews ();
-    }
 
     // BUG: v2 fix this hack
     // QUESTION: Does this need to be fixed before events are refactored?
@@ -364,12 +352,8 @@ public class TileView : View
             _tiles.Add (tile);
             tile.ContentView.Id = $"Tile.ContentView {i}";
             Add (tile.ContentView);
-            tile.TitleChanged += (s, e) => SetNeedsDisplay ();
-        }
-
-        if (IsInitialized)
-        {
-            LayoutSubviews ();
+            // BUGBUG: This should not be needed:
+            tile.TitleChanged += (s, e) => SetLayoutNeeded ();
         }
     }
 
@@ -407,9 +391,6 @@ public class TileView : View
             Add (_tiles [i].ContentView);
         }
 
-        SetNeedsDisplay ();
-        LayoutSubviews ();
-
         return removed;
     }
 
@@ -441,7 +422,6 @@ public class TileView : View
         }
 
         _splitterDistances [idx] = value;
-        GetRootTileView ().LayoutSubviews ();
         OnSplitterMoved (idx);
 
         return true;
@@ -957,7 +937,7 @@ public class TileView : View
                     moveRuneRenderLocation = new Point (0, Math.Max (1, Math.Min (Viewport.Height - 2, mouseEvent.Position.Y)));
                 }
 
-                Parent.SetNeedsDisplay ();
+                Parent.SetLayoutNeeded ();
 
                 return true;
             }

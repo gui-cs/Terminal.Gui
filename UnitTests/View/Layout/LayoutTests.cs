@@ -6,6 +6,56 @@ public class LayoutTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
 
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Screen_Size_Change_Causes_Layout ()
+    {
+        Application.Top = new ();
+
+        var view = new View
+        {
+            X = 3,
+            Y = 2,
+            Width = 10,
+            Height = 1,
+            Text = "0123456789"
+        };
+        Application.Top.Add (view);
+
+        var rs = Application.Begin (Application.Top);
+
+        Assert.Equal (new (0, 0, 80, 25), new Rectangle (0, 0, View.Driver.Cols, View.Driver.Rows));
+        Assert.Equal (new (0, 0, View.Driver.Cols, View.Driver.Rows), Application.Top.Frame);
+        Assert.Equal (new (0, 0, 80, 25), Application.Top.Frame);
+
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
+        Assert.Equal (new (0, 0, View.Driver.Cols, View.Driver.Rows), Application.Top.Frame);
+
+        Assert.Equal (new (0, 0, 20, 10), Application.Top.Frame);
+
+        Application.End (rs);
+
+    }
+
+    [Fact]
+    [TestRespondersDisposed]
+    public void LayoutSubviews ()
+    {
+        var superRect = new Rectangle (0, 0, 100, 100);
+        var super = new View { Frame = superRect, Text = "super" };
+        var v1 = new View { X = 0, Y = 0, Width = 10, Height = 10 };
+
+        var v2 = new View { X = 10, Y = 10, Width = 10, Height = 10 };
+
+        super.Add (v1, v2);
+
+        super.LayoutSubviews ();
+        Assert.Equal (new (0, 0, 10, 10), v1.Frame);
+        Assert.Equal (new (10, 10, 10, 10), v2.Frame);
+        super.Dispose ();
+    }
+
     [Fact]
     public void LayoutSubviews_No_SuperView ()
     {
@@ -35,7 +85,7 @@ public class LayoutTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Add_Does_Not_Call_LayoutSubviews ()
+    public void Add_Does_Not_Call_Layout ()
     {
         var superView = new View { Id = "superView" };
         var view = new View { Id = "view" };
@@ -49,30 +99,13 @@ public class LayoutTests (ITestOutputHelper output)
         Assert.False (layoutStartedRaised);
         Assert.False (layoutCompleteRaised);
 
-        superView.Remove(view);
-
-        superView.BeginInit();
-        superView.EndInit ();
+        superView.Remove (view);
 
         superView.Add (view);
 
         Assert.False (layoutStartedRaised);
         Assert.False (layoutCompleteRaised);
 
-    }
-
-    [Fact]
-    public void BeginEndInit_Do_Not_Call_LayoutSubviews ()
-    {
-        var superView = new View { Id = "superView" };
-        bool layoutStartedRaised = false;
-        bool layoutCompleteRaised = false;
-        superView.LayoutStarted += (sender, e) => layoutStartedRaised = true;
-        superView.LayoutComplete += (sender, e) => layoutCompleteRaised = true;
-        superView.BeginInit ();
-        superView.EndInit ();
-        Assert.False (layoutStartedRaised);
-        Assert.False (layoutCompleteRaised);
     }
 
     [Fact]
@@ -203,38 +236,376 @@ public class LayoutTests (ITestOutputHelper output)
     {
         var superView = new View ();
         var view = new View ();
+
+        var layoutStartedCount = 0;
+        var layoutCompleteCount = 0;
+
+        var borderLayoutStartedCount = 0;
+        var borderLayoutCompleteCount = 0;
+
+        view.LayoutStarted += (sender, e) => layoutStartedCount++;
+        view.LayoutComplete += (sender, e) => layoutCompleteCount++;
+
+        view.Border.LayoutStarted += (sender, e) => borderLayoutStartedCount++;
+        view.Border.LayoutComplete += (sender, e) => borderLayoutCompleteCount++;
+
+
         superView.Add (view);
+        Assert.Equal (0, borderLayoutStartedCount);
+        Assert.Equal (0, borderLayoutCompleteCount);
+        Assert.Equal (0, layoutStartedCount);
+        Assert.Equal (0, layoutCompleteCount);
+
         superView.BeginInit ();
+        Assert.Equal (0, borderLayoutStartedCount);
+        Assert.Equal (0, borderLayoutCompleteCount);
+        Assert.Equal (0, layoutStartedCount);
+        Assert.Equal (0, layoutCompleteCount);
+
         superView.EndInit ();
-
-        var layoutStarted = false;
-        var layoutComplete = false;
-
-        var borderLayoutStarted = false;
-        var borderLayoutComplete = false;
-
-        view.LayoutStarted += (sender, e) => layoutStarted = true;
-        view.LayoutComplete += (sender, e) => layoutComplete = true;
-
-        view.Border.LayoutStarted += (sender, e) =>
-                                     {
-                                         Assert.True (layoutStarted);
-                                         borderLayoutStarted = true;
-                                     };
-        view.Border.LayoutComplete += (sender, e) =>
-                                      {
-                                          Assert.True (layoutStarted);
-                                          Assert.False (layoutComplete);
-                                          borderLayoutComplete = true;
-                                      };
+        Assert.Equal (1, borderLayoutStartedCount);
+        Assert.Equal (1, borderLayoutCompleteCount);
+        Assert.Equal (1, layoutStartedCount);
+        Assert.Equal (1, layoutCompleteCount);
 
         superView.LayoutSubviews ();
+        Assert.Equal (1, borderLayoutStartedCount);
+        Assert.Equal (1, borderLayoutCompleteCount);
+        Assert.Equal (1, layoutStartedCount);
+        Assert.Equal (1, layoutCompleteCount);
 
-        Assert.True (borderLayoutStarted);
-        Assert.True (borderLayoutComplete);
+        superView.SetLayoutNeeded ();
+        superView.LayoutSubviews ();
+        Assert.Equal (2, borderLayoutStartedCount);
+        Assert.Equal (2, borderLayoutCompleteCount);
+        Assert.Equal (2, layoutStartedCount);
+        Assert.Equal (2, layoutCompleteCount);
 
-        Assert.True (layoutStarted);
-        Assert.True (layoutComplete);
         superView.Dispose ();
     }
+
+    [Fact]
+    public void LayoutSubviews__Honors_IsLayoutNeeded ()
+    {
+        var superView = new View ();
+        var view = new View ();
+
+        var layoutStartedCount = 0;
+        var layoutCompleteCount = 0;
+
+        var borderLayoutStartedCount = 0;
+        var borderLayoutCompleteCount = 0;
+
+        view.LayoutStarted += (sender, e) => layoutStartedCount++;
+        view.LayoutComplete += (sender, e) => layoutCompleteCount++;
+
+        view.Border.LayoutStarted += (sender, e) => borderLayoutStartedCount++;
+        view.Border.LayoutComplete += (sender, e) => borderLayoutCompleteCount++;
+
+
+        superView.Add (view);
+
+        superView.LayoutSubviews ();
+        Assert.Equal (1, borderLayoutStartedCount);
+        Assert.Equal (1, borderLayoutCompleteCount);
+        Assert.Equal (1, layoutStartedCount);
+        Assert.Equal (1, layoutCompleteCount);
+
+        superView.LayoutSubviews ();
+        Assert.Equal (1, borderLayoutStartedCount);
+        Assert.Equal (1, borderLayoutCompleteCount);
+        Assert.Equal (1, layoutStartedCount);
+        Assert.Equal (1, layoutCompleteCount);
+
+        superView.SetLayoutNeeded ();
+        superView.LayoutSubviews ();
+        Assert.Equal (2, borderLayoutStartedCount);
+        Assert.Equal (2, borderLayoutCompleteCount);
+        Assert.Equal (2, layoutStartedCount);
+        Assert.Equal (2, layoutCompleteCount);
+
+        superView.Dispose ();
+    }
+
+    [Fact]
+    public void Set_X_Does_Not_Change_Frame_Until_Layout ()
+    {
+        var v = new View ();
+        Assert.Equal (0, v.Frame.X);
+
+        v.Layout ();
+        Assert.Equal (0, v.Frame.X);
+
+        v.X = 1;
+        Assert.Equal (0, v.Frame.X);
+
+        v.Layout ();
+        Assert.Equal (1, v.Frame.X);
+
+        v.X = 2;
+        Assert.Equal (1, v.Frame.X);
+
+        v.Layout ();
+        Assert.Equal (2, v.Frame.X);
+    }
+
+
+    [Fact]
+    public void Set_Y_Does_Not_Change_Frame_Until_Layout ()
+    {
+        var v = new View ();
+        Assert.Equal (0, v.Frame.Y);
+
+        v.Layout ();
+        Assert.Equal (0, v.Frame.Y);
+
+        v.Y = 1;
+        Assert.Equal (0, v.Frame.Y);
+
+        v.Layout ();
+        Assert.Equal (1, v.Frame.Y);
+
+        v.Y = 2;
+        Assert.Equal (1, v.Frame.Y);
+
+        v.Layout ();
+        Assert.Equal (2, v.Frame.Y);
+    }
+
+
+    [Fact]
+    public void Set_Width_Does_Not_Change_Frame_Until_Layout ()
+    {
+        var v = new View ();
+        Assert.Equal (0, v.Frame.Width);
+
+        v.Layout ();
+        Assert.Equal (0, v.Frame.Width);
+
+        v.Width = 1;
+        Assert.Equal (0, v.Frame.Width);
+
+        v.Layout ();
+        Assert.Equal (1, v.Frame.Width);
+
+        v.Width = 2;
+        Assert.Equal (1, v.Frame.Width);
+
+        v.Layout ();
+        Assert.Equal (2, v.Frame.Width);
+    }
+
+
+    [Fact]
+    public void Set_Height_Does_Not_Change_Frame_Until_Layout ()
+    {
+        var v = new View ();
+        Assert.Equal (0, v.Frame.Height);
+
+        v.Layout ();
+        Assert.Equal (0, v.Frame.Height);
+
+        v.Height = 1;
+        Assert.Equal (0, v.Frame.Height);
+
+        v.Layout ();
+        Assert.Equal (1, v.Frame.Height);
+
+        v.Height = 2;
+        Assert.Equal (1, v.Frame.Height);
+
+        v.Layout ();
+        Assert.Equal (2, v.Frame.Height);
+    }
+
+    [Fact]
+    [TestRespondersDisposed]
+    public void Change_Height_or_Width_MakesComputed ()
+    {
+        var v = new View { Frame = Rectangle.Empty };
+        v.Height = Dim.Fill ();
+        v.Width = Dim.Fill ();
+        v.Dispose ();
+    }
+
+    [Fact]
+    [TestRespondersDisposed]
+    public void Change_X_or_Y_Absolute ()
+    {
+        var frame = new Rectangle (1, 2, 3, 4);
+        var newFrame = new Rectangle (10, 20, 3, 4);
+
+        var v = new View { Frame = frame };
+        v.X = newFrame.X;
+        v.Y = newFrame.Y;
+        v.Layout ();
+        Assert.Equal (newFrame, v.Frame);
+
+        Assert.Equal (
+                      new (0, 0, newFrame.Width, newFrame.Height),
+                      v.Viewport
+                     ); // With Absolute Viewport *is* deterministic before Layout
+        Assert.Equal ($"Absolute({newFrame.X})", v.X.ToString ());
+        Assert.Equal ($"Absolute({newFrame.Y})", v.Y.ToString ());
+        Assert.Equal (Dim.Absolute (3), v.Width);
+        Assert.Equal (Dim.Absolute (4), v.Height);
+        v.Dispose ();
+    }
+
+    [Fact]
+    [TestRespondersDisposed]
+    public void Change_X_or_Y_MakesComputed ()
+    {
+        var v = new View { Frame = Rectangle.Empty };
+        v.X = Pos.Center ();
+        v.Y = Pos.Center ();
+        v.Dispose ();
+    }
+
+    [Fact]
+    [TestRespondersDisposed]
+    public void Change_X_Y_Height_Width_Absolute ()
+    {
+        var v = new View { Frame = Rectangle.Empty };
+        v.X = 1;
+        v.Y = 2;
+        v.Height = 3;
+        v.Width = 4;
+        v.Dispose ();
+
+        v = new () { Frame = Rectangle.Empty };
+        v.X = Pos.Center ();
+        v.Y = Pos.Center ();
+        v.Width = Dim.Fill ();
+        v.Height = Dim.Fill ();
+        v.Dispose ();
+
+        v = new () { Frame = Rectangle.Empty };
+        v.X = Pos.Center ();
+        v.Y = Pos.Center ();
+        v.Width = Dim.Fill ();
+        v.Height = Dim.Fill ();
+
+        v.X = 1;
+        v.Dispose ();
+
+        v = new () { Frame = Rectangle.Empty };
+        v.X = Pos.Center ();
+        v.Y = Pos.Center ();
+        v.Width = Dim.Fill ();
+        v.Height = Dim.Fill ();
+
+        v.Y = 2;
+        v.Dispose ();
+
+        v = new () { Frame = Rectangle.Empty };
+        v.X = Pos.Center ();
+        v.Y = Pos.Center ();
+        v.Width = Dim.Fill ();
+        v.Height = Dim.Fill ();
+
+        v.Width = 3;
+        v.Dispose ();
+
+        v = new () { Frame = Rectangle.Empty };
+        v.X = Pos.Center ();
+        v.Y = Pos.Center ();
+        v.Width = Dim.Fill ();
+        v.Height = Dim.Fill ();
+
+        v.Height = 3;
+        v.Dispose ();
+
+        v = new () { Frame = Rectangle.Empty };
+        v.X = Pos.Center ();
+        v.Y = Pos.Center ();
+        v.Width = Dim.Fill ();
+        v.Height = Dim.Fill ();
+
+        v.X = 1;
+        v.Y = 2;
+        v.Height = 3;
+        v.Width = 4;
+        v.Dispose ();
+    }
+
+    [Fact]
+    public void Constructor ()
+    {
+        var v = new View ();
+        v.Dispose ();
+
+        var frame = Rectangle.Empty;
+        v = new () { Frame = frame };
+        v.Layout ();
+        Assert.Equal (frame, v.Frame);
+
+        Assert.Equal (
+                      new (0, 0, frame.Width, frame.Height),
+                      v.Viewport
+                     ); // With Absolute Viewport *is* deterministic before Layout
+        Assert.Equal (Pos.Absolute (0), v.X);
+        Assert.Equal (Pos.Absolute (0), v.Y);
+        Assert.Equal (Dim.Absolute (0), v.Width);
+        Assert.Equal (Dim.Absolute (0), v.Height);
+        v.Dispose ();
+
+        frame = new (1, 2, 3, 4);
+        v = new () { Frame = frame };
+        v.Layout ();
+        Assert.Equal (frame, v.Frame);
+        Assert.Equal (
+                      new (0, 0, frame.Width, frame.Height),
+                      v.Viewport
+                     ); // With Absolute Viewport *is* deterministic before Layout
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
+        Assert.Equal (Dim.Absolute (3), v.Width);
+        Assert.Equal (Dim.Absolute (4), v.Height);
+        v.Dispose ();
+
+        v = new () { Frame = frame, Text = "v" };
+        v.Layout ();
+        Assert.Equal (frame, v.Frame);
+        Assert.Equal (
+                      new (0, 0, frame.Width, frame.Height),
+                      v.Viewport
+                     ); // With Absolute Viewport *is* deterministic before Layout
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
+        Assert.Equal (Dim.Absolute (3), v.Width);
+        Assert.Equal (Dim.Absolute (4), v.Height);
+        v.Dispose ();
+
+        v = new () { X = frame.X, Y = frame.Y, Text = "v" };
+        v.Layout ();
+        Assert.Equal (new (frame.X, frame.Y, 0, 0), v.Frame);
+        Assert.Equal (new (0, 0, 0, 0), v.Viewport); // With Absolute Viewport *is* deterministic before Layout
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
+        Assert.Equal (Dim.Absolute (0), v.Width);
+        Assert.Equal (Dim.Absolute (0), v.Height);
+        v.Dispose ();
+
+        v = new ();
+        v.Layout ();
+        Assert.Equal (new (0, 0, 0, 0), v.Frame);
+        Assert.Equal (new (0, 0, 0, 0), v.Viewport); // With Absolute Viewport *is* deterministic before Layout
+        Assert.Equal (Pos.Absolute (0), v.X);
+        Assert.Equal (Pos.Absolute (0), v.Y);
+        Assert.Equal (Dim.Absolute (0), v.Width);
+        Assert.Equal (Dim.Absolute (0), v.Height);
+        v.Dispose ();
+
+        v = new () { X = frame.X, Y = frame.Y, Width = frame.Width, Height = frame.Height };
+        v.Layout ();
+        Assert.Equal (new (frame.X, frame.Y, 3, 4), v.Frame);
+        Assert.Equal (new (0, 0, 3, 4), v.Viewport); // With Absolute Viewport *is* deterministic before Layout
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
+        Assert.Equal (Dim.Absolute (3), v.Width);
+        Assert.Equal (Dim.Absolute (4), v.Height);
+        v.Dispose ();
+    }
+
 }

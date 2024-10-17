@@ -94,7 +94,7 @@ public class PosCenterTests (ITestOutputHelper output)
         var firstIteration = false;
 
         ((FakeDriver)Application.Driver!).SetBufferSize (20, height);
-        Application.RunIteration (ref rs, ref firstIteration);
+        Application.RunIteration (ref rs, firstIteration);
         var expected = string.Empty;
 
         switch (height)
@@ -241,7 +241,7 @@ public class PosCenterTests (ITestOutputHelper output)
         var firstIteration = false;
 
         ((FakeDriver)Application.Driver!).SetBufferSize (width, 7);
-        Application.RunIteration (ref rs, ref firstIteration);
+        Application.RunIteration (ref rs, firstIteration);
         var expected = string.Empty;
 
         switch (width)

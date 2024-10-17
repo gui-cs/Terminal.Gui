@@ -6364,8 +6364,7 @@ This is the second line.
 
         _textView.NewKeyDownEvent (Key.CursorRight.WithCtrl.WithShift);
 
-        var first = true;
-        Application.RunIteration (ref rs, ref first);
+        Application.RunIteration (ref rs, true);
         Assert.Equal (new Point (4, 0), _textView.CursorPosition);
 
         //                                             TAB to jump between text fields.

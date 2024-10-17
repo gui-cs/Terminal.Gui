@@ -117,16 +117,12 @@ public class Margin : Adornment
             {
                 IEnumerable<View> subviewsNeedingDraw = Subviews.Where (
                                                                         view => view.Visible
-                                                                                && (view.NeedsDisplay || view.SubViewNeedsDisplay || view.IsLayoutNeeded ())
+                                                                                && (view.NeedsDisplay || view.SubViewNeedsDisplay)
                                                                        );
 
                 foreach (View view in subviewsNeedingDraw)
                 {
-                    if (view.IsLayoutNeeded ())
-                    {
-                        view.LayoutSubviews ();
-                    }
-
+                    //view.Layout ();
                     view.Draw ();
                 }
             }

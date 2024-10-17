@@ -1025,7 +1025,7 @@ At 0,0
         view.Visible = false;
 
         var firstIteration = false;
-        Application.RunIteration (ref rs, ref firstIteration);
+        Application.RunIteration (ref rs, firstIteration);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
