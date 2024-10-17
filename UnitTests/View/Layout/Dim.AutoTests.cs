@@ -89,6 +89,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
             Width = Auto (),
             Height = 1
         };
+        view.Layout ();
         Assert.Equal (4, view.TextFormatter.ConstrainToWidth);
         Assert.Equal (1, view.TextFormatter.ConstrainToHeight);
 
@@ -100,6 +101,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
             Width = 1,
             Height = Auto ()
         };
+        view.Layout ();
         Assert.Equal (1, view.TextFormatter.ConstrainToWidth);
         Assert.Equal (4, view.TextFormatter.ConstrainToHeight);
     }
@@ -114,6 +116,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
             Height = 1,
             Width = Auto ()
         };
+        view.Layout ();
         Assert.Equal (4, view.TextFormatter.ConstrainToWidth);
         Assert.Equal (1, view.TextFormatter.ConstrainToHeight);
     }
@@ -272,10 +275,11 @@ public partial class DimAutoTests (ITestOutputHelper output)
             Text = "_1234",
             Width = Auto ()
         };
+        view.Layout ();
         Assert.Equal (new (4, 0), view.Frame.Size);
 
         view.Height = 1;
-        view.SetRelativeLayout (Application.Screen.Size);
+        view.Layout ();
         Assert.Equal (new (4, 1), view.Frame.Size);
         Size lastSize = view.Frame.Size;
 
@@ -288,8 +292,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
             Width = Auto (),
             Height = 1
         };
-        view.SetRelativeLayout (Application.Screen.Size);
-
+        view.Layout ();
         lastSize = view.Frame.Size;
         view.VerticalTextAlignment = Alignment.Center;
         Assert.Equal (lastSize, view.Frame.Size);
@@ -783,13 +786,14 @@ public partial class DimAutoTests (ITestOutputHelper output)
         };
 
         super.Add (view);
+        super.Layout ();
 
         Rectangle expectedViewport = new (0, 0, 8, 1);
         Assert.Equal (expectedViewport.Size, view.GetContentSize ());
         Assert.Equal (expectedViewport, view.Frame);
         Assert.Equal (expectedViewport, view.Viewport);
 
-        super.LayoutSubviews ();
+        super.Layout ();
         Assert.Equal (expectedViewport, view.Viewport);
 
         super.Dispose ();
@@ -845,6 +849,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
         view.Width = Auto (DimAutoStyle.Text, maximumContentDim: maxWidth);
         view.Height = Auto (DimAutoStyle.Text);
         view.Text = text;
+        view.Layout ();
 
         Assert.Equal (new (expectedW, expectedH), view.Frame.Size);
     }
@@ -862,7 +867,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
         view.Height = Auto (DimAutoStyle.Text);
         view.SetContentSize (new (1, 1));
         view.Text = text;
-        view.SetRelativeLayout (Application.Screen.Size);
+        view.Layout ();
         Assert.Equal (new (expectedW, expectedH), view.Frame.Size);
     }
 
@@ -886,7 +891,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
         view.Text = text;
         superView.Add (view);
 
-        superView.SetRelativeLayout (Application.Screen.Size);
+        superView.Layout ();
         Assert.Equal (new (expectedW, expectedH), view.Frame.Size);
     }
 

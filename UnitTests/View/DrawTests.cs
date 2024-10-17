@@ -525,6 +525,7 @@ public class DrawTests (ITestOutputHelper _output)
                                                0
                                                0
                                                """,
+                                               _output,
                                                Application.Driver,
                                                Colors.ColorSchemes ["Base"]!.Normal
                                               );

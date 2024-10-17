@@ -380,6 +380,7 @@ public class MenuBarTests (ITestOutputHelper output)
         TestHelpers.AssertDriverAttributesAre (
                                                @"
 00000000000000",
+                                               output,
                                                Application.Driver,
                                                attributes
                                               );
@@ -400,6 +401,7 @@ public class MenuBarTests (ITestOutputHelper output)
 00000000000000
 00000000000000
 00000000000000",
+                                               output,
                                                Application.Driver,
                                                attributes
                                               );
@@ -421,6 +423,7 @@ public class MenuBarTests (ITestOutputHelper output)
 00000000000000
 00000000000000
 00000000000000",
+                                               output,
                                                Application.Driver,
                                                attributes
                                               );
@@ -442,6 +445,7 @@ public class MenuBarTests (ITestOutputHelper output)
 00000000000000
 00000000000000
 00000000000000",
+                                               output,
                                                Application.Driver,
                                                attributes
                                               );

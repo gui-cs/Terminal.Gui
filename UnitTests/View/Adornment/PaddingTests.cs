@@ -33,6 +33,6 @@ P P
 PPP",
                                              output
                                             );
-        TestHelpers.AssertDriverAttributesAre ("0", null, view.GetNormalColor ());
+        TestHelpers.AssertDriverAttributesAre ("0", output, null, view.GetNormalColor ());
     }
 }

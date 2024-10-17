@@ -707,12 +707,13 @@ public partial class View // Layout APIs
         }
 
         // If the 'to' is rooted to 'from' it's a special-case.
-        // Use LayoutSubview with the Frame of the 'from'.
-        if (SuperView is { } && GetTopSuperView () is { } && IsLayoutNeeded () && edges.Count > 0)
+        // Use Layout with the ContentSize of the 'from'.
+        // See the Nested_SubViews_Ref_Topmost_SuperView unit test
+        if (edges.Count > 0 && GetTopSuperView () is { })
         {
             foreach ((View from, View to) in edges)
             {
-                Debug.Fail ("This is dead code?");
+                // QUESTION: Do we test this with adornments well enough?
                 to.Layout (from.GetContentSize ());
             }
         }

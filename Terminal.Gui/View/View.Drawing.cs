@@ -235,10 +235,7 @@ public partial class View // Drawing APIs
             return;
         }
 
-        if (NeedsDisplay)
-        {
-            OnDrawAdornments ();
-        }
+        OnDrawAdornments ();
 
         if (ColorScheme is { })
         {
@@ -486,6 +483,7 @@ public partial class View // Drawing APIs
 
         // Each of these renders lines to either this View's LineCanvas 
         // Those lines will be finally rendered in OnRenderLineCanvas
+        // QUESTION: Why are we not calling Draw here?
         Margin?.OnDrawContent (Margin.Viewport);
         Border?.OnDrawContent (Border.Viewport);
         Padding?.OnDrawContent (Padding.Viewport);

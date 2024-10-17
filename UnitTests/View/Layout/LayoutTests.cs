@@ -608,4 +608,143 @@ public class LayoutTests (ITestOutputHelper output)
         v.Dispose ();
     }
 
+    /// <summary>
+    /// This tests the special case in LayoutSubviews. See https://github.com/gui-cs/Terminal.Gui/issues/2461</summary>
+    [Fact]
+    public void Nested_SubViews_Ref_Topmost_SuperView ()
+    {
+        var superView = new View { Width = 80, Height = 25, Text = "superView" };
+
+        var subView1 = new View
+        {
+            Id = "subView1 - refs superView",
+            Width = Dim.Width (superView) - 2, // 78
+            Height = Dim.Height (superView) - 2 // 23
+        };
+        superView.Add (subView1);
+
+        var subView1OfSubView1 = new View ()
+        {
+            Id = "subView1OfSubView1 - refs superView",
+            Width = Dim.Width (superView) - 4, // 76
+            Height = Dim.Height (superView) - 4 // 21
+        };
+        subView1.Add (subView1OfSubView1);
+
+        superView.Layout ();
+
+        Assert.Equal (80, superView.Frame.Width);
+        Assert.Equal (25, superView.Frame.Height);
+        Assert.Equal (78, subView1.Frame.Width);
+        Assert.Equal (23, subView1.Frame.Height);
+        //Assert.Equal (76, subView2.Frame.Width);
+        //Assert.Equal (21, subView2.Frame.Height);
+
+        Assert.Equal (76, subView1OfSubView1.Frame.Width);
+        Assert.Equal (21, subView1OfSubView1.Frame.Height);
+
+        superView.Dispose ();
+    }
+
+    /// <summary>This is an intentionally obtuse test. See https://github.com/gui-cs/Terminal.Gui/issues/2461</summary>
+    [Fact]
+    public void Does_Not_Throw_If_Nested_SubViews_Ref_Topmost_SuperView ()
+    {
+        var t = new View { Width = 80, Height = 25, Text = "top" };
+
+        var w = new Window
+        {
+            Width = Dim.Width (t) - 2, // 78
+            Height = Dim.Height (t) - 2 // 23
+        };
+        var f = new FrameView ();
+
+        var v1 = new View
+        {
+            Width = Dim.Width (w) - 2, // 76
+            Height = Dim.Height (w) - 2 // 21
+        };
+
+        var v2 = new View
+        {
+            Width = Dim.Width (v1) - 2, // 74
+            Height = Dim.Height (v1) - 2 // 19
+        };
+
+        f.Width = Dim.Width (t) - Dim.Width (w) + 4; // 80 - 74 = 6
+        f.Height = Dim.Height (t) - Dim.Height (w) + 4; // 25 - 19 = 6
+
+        f.Add (v1, v2);
+        w.Add (f);
+        t.Add (w);
+        t.BeginInit ();
+        t.EndInit ();
+
+        // f references t and w here; t is f's super-superview and w is f's superview. This is supported!
+        Exception exception = Record.Exception (() => t.Layout ());
+        Assert.Null (exception);
+        Assert.Equal (80, t.Frame.Width);
+        Assert.Equal (25, t.Frame.Height);
+        Assert.Equal (78, w.Frame.Width);
+        Assert.Equal (23, w.Frame.Height);
+        Assert.Equal (6, f.Frame.Width);
+        Assert.Equal (6, f.Frame.Height);
+        Assert.Equal (76, v1.Frame.Width);
+        Assert.Equal (21, v1.Frame.Height);
+        Assert.Equal (74, v2.Frame.Width);
+        Assert.Equal (19, v2.Frame.Height);
+        t.Dispose ();
+    }
+
+
+    /// <summary>This is an intentionally obtuse test. See https://github.com/gui-cs/Terminal.Gui/issues/2461</summary>
+    [Fact]
+    [TestRespondersDisposed]
+    public void Throw_If_SuperView_Refs_SubView ()
+    {
+        var topSuperView = new View { Width = 80, Height = 25 };
+
+        var superViewRefsTopSuperView = new Window
+        {
+            Width = Dim.Width (topSuperView) - 2, // 78
+            Height = Dim.Height (topSuperView) - 2 // 23
+        };
+
+        var v1 = new View
+        {
+            Width = Dim.Width (superViewRefsTopSuperView) - 2, // 76
+            Height = Dim.Height (superViewRefsTopSuperView) - 2 // 21
+        };
+
+        var v2 = new View
+        {
+            Width = Dim.Width (v1) - 2, // 74
+            Height = Dim.Height (v1) - 2 // 19
+        };
+
+        var superView = new FrameView ();
+        superView.Width = Dim.Width (topSuperView) - Dim.Width (v2); // 80 - 74 = 6
+        superView.Height = Dim.Height (topSuperView) - Dim.Height (v2); // 25 - 19 = 6
+        superView.Add (v1, v2);
+
+        superViewRefsTopSuperView.Add (superView);
+
+        topSuperView.Add (superViewRefsTopSuperView);
+
+        topSuperView.SetRelativeLayout (new (100, 100));
+
+        Assert.Throws<InvalidOperationException> (() => topSuperView.LayoutSubviews());
+        Assert.Equal (80, topSuperView.Frame.Width);
+        Assert.Equal (25, topSuperView.Frame.Height);
+        Assert.Equal (78, superViewRefsTopSuperView.Frame.Width);
+        Assert.Equal (23, superViewRefsTopSuperView.Frame.Height);
+        Assert.Equal (6, superView.Frame.Width);
+        Assert.Equal (6, superView.Frame.Height);
+        Assert.Equal (76, v1.Frame.Width);
+        Assert.Equal (21, v1.Frame.Height);
+        Assert.Equal (74, v2.Frame.Width);
+        Assert.Equal (19, v2.Frame.Height);
+        topSuperView.Dispose ();
+    }
+
 }

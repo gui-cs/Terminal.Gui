@@ -1074,7 +1074,7 @@ public class TextFieldTests (ITestOutputHelper output)
         };
 
         //                                             TAB to jump between text fields.
-        TestHelpers.AssertDriverAttributesAre ("0000000", Application.Driver, attributes);
+        TestHelpers.AssertDriverAttributesAre ("0000000", output, Application.Driver, attributes);
 
         // Cursor is at the end
         Assert.Equal (32, _textField.CursorPosition);
@@ -1085,7 +1085,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.Equal (4, _textField.CursorPosition);
 
         //                                             TAB to jump between text fields.
-        TestHelpers.AssertDriverAttributesAre ("1111000", Application.Driver, attributes);
+        TestHelpers.AssertDriverAttributesAre ("1111000", output, Application.Driver, attributes);
         top.Dispose ();
     }
 

@@ -30,6 +30,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
         };
         subView.Margin.Thickness = new Thickness (subViewMargin);
         Application.Top.Margin.Add (subView);
+        Application.Top.Layout ();
 
         var foundView = View.GetViewsUnderMouse (new Point(0, 0)).LastOrDefault ();
 
@@ -58,6 +59,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
             Visible = false
         };
         Application.Top.Padding.Add (subView);
+        Application.Top.Layout ();
 
         Assert.Equal (Application.Top.Padding, View.GetViewsUnderMouse (new Point(0, 0)).LastOrDefault ());
         Application.Top?.Dispose ();
@@ -76,6 +78,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
 
         subView.LayoutStarted += LayoutStarted;
         view.Margin.Thickness = new Thickness (1, 2, 3, 4);
+        view.Layout ();
         Assert.True (raised);
 
         return;
