@@ -376,7 +376,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.True (btn.HasFocus);
 
         // default keybinding is Space which results in Command.Accept (when focused)
-        Application.OnKeyDown (new ((KeyCode)' '));
+        Application.RaiseKeyDownEvent (new ((KeyCode)' '));
         Assert.Equal (1, pressed);
 
         // remove the default keybinding (Space)
@@ -384,26 +384,26 @@ public class ButtonTests (ITestOutputHelper output)
         btn.KeyBindings.Clear (Command.Accept);
 
         // After clearing the default keystroke the Space button no longer does anything for the Button
-        Application.OnKeyDown (new ((KeyCode)' '));
+        Application.RaiseKeyDownEvent (new ((KeyCode)' '));
         Assert.Equal (1, pressed);
 
         // Set a new binding of b for the click (Accept) event
         btn.KeyBindings.Add (Key.B, Command.HotKey); // b will now trigger the Accept command (when focused or not)
 
         // now pressing B should call the button click event
-        Application.OnKeyDown (Key.B);
+        Application.RaiseKeyDownEvent (Key.B);
         Assert.Equal (2, pressed);
 
         // now pressing Shift-B should NOT call the button click event
-        Application.OnKeyDown (Key.B.WithShift);
+        Application.RaiseKeyDownEvent (Key.B.WithShift);
         Assert.Equal (2, pressed);
 
         // now pressing Alt-B should NOT call the button click event
-        Application.OnKeyDown (Key.B.WithAlt);
+        Application.RaiseKeyDownEvent (Key.B.WithAlt);
         Assert.Equal (2, pressed);
 
         // now pressing Shift-Alt-B should NOT call the button click event
-        Application.OnKeyDown (Key.B.WithAlt.WithShift);
+        Application.RaiseKeyDownEvent (Key.B.WithAlt.WithShift);
         Assert.Equal (2, pressed);
         top.Dispose ();
     }
@@ -599,7 +599,7 @@ public class ButtonTests (ITestOutputHelper output)
     [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
     public void WantContinuousButtonPressed_True_ButtonClick_Accepts (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
     {
-        var me = new MouseEvent ();
+        var me = new MouseEventArgs ();
 
         var button = new Button ()
         {
@@ -618,19 +618,19 @@ public class ButtonTests (ITestOutputHelper output)
                                e.Cancel = true;
                            };
 
-        me = new MouseEvent ();
+        me = new MouseEventArgs ();
         me.Flags = pressed;
         button.NewMouseEvent (me);
         Assert.Equal (0, selectingCount);
         Assert.Equal (0, acceptedCount);
 
-        me = new MouseEvent ();
+        me = new MouseEventArgs ();
         me.Flags = released;
         button.NewMouseEvent (me);
         Assert.Equal (0, selectingCount);
         Assert.Equal (0, acceptedCount);
 
-        me = new MouseEvent ();
+        me = new MouseEventArgs ();
         me.Flags = clicked;
         button.NewMouseEvent (me);
         Assert.Equal (1, selectingCount);
@@ -646,7 +646,7 @@ public class ButtonTests (ITestOutputHelper output)
     [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released)]
     public void WantContinuousButtonPressed_True_ButtonPressRelease_Does_Not_Raise_Selected_Or_Accepted (MouseFlags pressed, MouseFlags released)
     {
-        var me = new MouseEvent ();
+        var me = new MouseEventArgs ();
 
         var button = new Button ()
         {

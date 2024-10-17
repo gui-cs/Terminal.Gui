@@ -387,6 +387,7 @@ public class UICatalogApp
         // 'app' closed cleanly.
         foreach (Responder? inst in Responder.Instances)
         {
+            
             Debug.Assert (inst.WasDisposed);
         }
 
@@ -620,28 +621,28 @@ public class UICatalogApp
                                                 );
             ScenarioList.Style.ColumnStyles.Add (1, new () { MaxWidth = 1 });
 
-            // Enable user to find & select a scenario by typing text
-            // TableView does not (currently) have built-in CollectionNavigator support (the ability for the 
-            // user to type and the items that match get selected). We implement it in the app instead. 
-            ScenarioList.KeyDown += (s, a) =>
-                                    {
-                                        if (CollectionNavigatorBase.IsCompatibleKey (a))
-                                        {
-                                            int? newItem =
-                                                _scenarioCollectionNav?.GetNextMatchingItem (
-                                                                                             ScenarioList.SelectedRow,
-                                                                                             (char)a
-                                                                                            );
+            //// Enable user to find & select a scenario by typing text
+            //// TableView does not (currently) have built-in CollectionNavigator support (the ability for the 
+            //// user to type and the items that match get selected). We implement it in the app instead. 
+            //ScenarioList.KeyDown += (s, a) =>
+            //                        {
+            //                            if (CollectionNavigatorBase.IsCompatibleKey (a))
+            //                            {
+            //                                int? newItem =
+            //                                    _scenarioCollectionNav?.GetNextMatchingItem (
+            //                                                                                 ScenarioList.SelectedRow,
+            //                                                                                 (char)a
+            //                                                                                );
 
-                                            if (newItem is int v && newItem != -1)
-                                            {
-                                                ScenarioList.SelectedRow = v;
-                                                ScenarioList.EnsureSelectedCellIsVisible ();
-                                                ScenarioList.SetNeedsDisplay ();
-                                                a.Handled = true;
-                                            }
-                                        }
-                                    };
+            //                                if (newItem is int v && newItem != -1)
+            //                                {
+            //                                    ScenarioList.SelectedRow = v;
+            //                                    ScenarioList.EnsureSelectedCellIsVisible ();
+            //                                    ScenarioList.SetNeedsDisplay ();
+            //                                    a.Handled = true;
+            //                                }
+            //                            }
+            //                        };
             ScenarioList.CellActivated += ScenarioView_OpenSelectedItem;
 
             // TableView typically is a grid where nav keys are biased for moving left/right.

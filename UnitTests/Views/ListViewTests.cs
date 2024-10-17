@@ -522,7 +522,7 @@ Item 6",
     }
 
     [Fact]
-    public void ListViewSelectThenDown ()
+    public void AllowsMarking_True_SpaceWithShift_SelectsThenDown ()
     {
         var lv = new ListView { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
         lv.AllowsMarking = true;
@@ -537,12 +537,8 @@ Item 6",
         Assert.False (lv.Source.IsMarked (1));
         Assert.False (lv.Source.IsMarked (2));
 
-        lv.KeyBindings.Add (Key.Space.WithShift, Command.Select, Command.Down);
-
-        Key ev = Key.Space.WithShift;
-
         // view should indicate that it has accepted and consumed the event
-        Assert.True (lv.NewKeyDownEvent (ev));
+        Assert.True (lv.NewKeyDownEvent (Key.Space.WithShift));
 
         // first item should now be selected
         Assert.Equal (0, lv.SelectedItem);
@@ -553,7 +549,7 @@ Item 6",
         Assert.False (lv.Source.IsMarked (2));
 
         // Press key combo again
-        Assert.True (lv.NewKeyDownEvent (ev));
+        Assert.True (lv.NewKeyDownEvent (Key.Space.WithShift));
 
         // second item should now be selected
         Assert.Equal (1, lv.SelectedItem);
@@ -564,21 +560,21 @@ Item 6",
         Assert.False (lv.Source.IsMarked (2));
 
         // Press key combo again
-        Assert.True (lv.NewKeyDownEvent (ev));
+        Assert.True (lv.NewKeyDownEvent (Key.Space.WithShift));
         Assert.Equal (2, lv.SelectedItem);
         Assert.True (lv.Source.IsMarked (0));
         Assert.True (lv.Source.IsMarked (1));
         Assert.False (lv.Source.IsMarked (2));
 
         // Press key combo again
-        Assert.True (lv.NewKeyDownEvent (ev));
+        Assert.True (lv.NewKeyDownEvent (Key.Space.WithShift));
         Assert.Equal (2, lv.SelectedItem); // cannot move down any further
         Assert.True (lv.Source.IsMarked (0));
         Assert.True (lv.Source.IsMarked (1));
         Assert.True (lv.Source.IsMarked (2)); // but can toggle marked
 
         // Press key combo again 
-        Assert.True (lv.NewKeyDownEvent (ev));
+        Assert.True (lv.NewKeyDownEvent (Key.Space.WithShift));
         Assert.Equal (2, lv.SelectedItem); // cannot move down any further
         Assert.True (lv.Source.IsMarked (0));
         Assert.True (lv.Source.IsMarked (1));
@@ -741,11 +737,11 @@ Item 6",
 └─────┘",
                                                       output);
 
-        Application.OnMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.Button1Clicked });
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.Button1Clicked });
         Assert.Equal ("", selected);
         Assert.Equal (-1, lv.SelectedItem);
 
-        Application.OnMouseEvent (
+        Application.RaiseMouseEvent (
                                   new ()
                                   {
                                       ScreenPosition = new (1, 1), Flags = MouseFlags.Button1Clicked
@@ -753,7 +749,7 @@ Item 6",
         Assert.Equal ("One", selected);
         Assert.Equal (0, lv.SelectedItem);
 
-        Application.OnMouseEvent (
+        Application.RaiseMouseEvent (
                                   new ()
                                   {
                                       ScreenPosition = new (1, 2), Flags = MouseFlags.Button1Clicked
@@ -761,7 +757,7 @@ Item 6",
         Assert.Equal ("Two", selected);
         Assert.Equal (1, lv.SelectedItem);
 
-        Application.OnMouseEvent (
+        Application.RaiseMouseEvent (
                                   new ()
                                   {
                                       ScreenPosition = new (1, 3), Flags = MouseFlags.Button1Clicked
@@ -769,7 +765,7 @@ Item 6",
         Assert.Equal ("Three", selected);
         Assert.Equal (2, lv.SelectedItem);
 
-        Application.OnMouseEvent (
+        Application.RaiseMouseEvent (
                                   new ()
                                   {
                                       ScreenPosition = new (1, 4), Flags = MouseFlags.Button1Clicked

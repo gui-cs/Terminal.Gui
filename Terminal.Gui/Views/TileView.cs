@@ -286,11 +286,11 @@ public class TileView : View
 
     //// BUGBUG: Why is this not handled by a key binding???
     /// <inheritdoc/>
-    public override bool OnProcessKeyDown (Key keyEvent)
+    protected override bool OnKeyDownNotHandled (Key key)
     {
         var focusMoved = false;
 
-        if (keyEvent.KeyCode == ToggleResizable)
+        if (key.KeyCode == ToggleResizable)
         {
             foreach (TileViewLineView l in _splitterLines)
             {
@@ -910,7 +910,7 @@ public class TileView : View
             }
         }
 
-        protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
+        protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
         {
             if (!dragPosition.HasValue && mouseEvent.Flags == MouseFlags.Button1Pressed)
             {

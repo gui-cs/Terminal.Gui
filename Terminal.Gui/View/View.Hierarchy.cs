@@ -169,6 +169,13 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         Debug.Assert (!view.HasFocus);
 
         _subviews.Remove (view);
+
+        // Clean up focus stuff
+        _previouslyFocused = null;
+        if (view._superView is { } && view._superView._previouslyFocused == this)
+        {
+            view._superView._previouslyFocused = null;
+        }
         view._superView = null;
 
         SetNeedsLayout ();

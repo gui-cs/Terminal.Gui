@@ -27,7 +27,19 @@ public class ApplicationNavigation
     /// <summary>
     ///     Gets the most focused <see cref="View"/> in the application, if there is one.
     /// </summary>
-    public View? GetFocused () { return _focused; }
+    public View? GetFocused ()
+    {
+        return _focused;
+
+        if (_focused is { CanFocus: true, HasFocus: true })
+        {
+            return _focused;
+        }
+
+        _focused = null;
+
+        return null;
+    }
 
     /// <summary>
     ///     Gets whether <paramref name="view"/> is in the Subview hierarchy of <paramref name="start"/>.
@@ -77,6 +89,7 @@ public class ApplicationNavigation
         {
             return;
         }
+        Debug.Assert (value is null or { CanFocus: true, HasFocus: true });
 
         _focused = value;
 

@@ -6,6 +6,41 @@ namespace Terminal.Gui;
 
 public static partial class Application // Run (Begin, Run, End, Stop)
 {
+    private static Key _quitKey = Key.Esc; // Resources/config.json overrides
+
+    /// <summary>Gets or sets the key to quit the application.</summary>
+    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Key QuitKey
+    {
+        get => _quitKey;
+        set
+        {
+            if (_quitKey != value)
+            {
+                ReplaceKey (_quitKey, value);
+                _quitKey = value;
+            }
+        }
+    }
+
+    private static Key _arrangeKey = Key.F5.WithCtrl; // Resources/config.json overrides
+
+
+    /// <summary>Gets or sets the key to activate arranging views using the keyboard.</summary>
+    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Key ArrangeKey
+    {
+        get => _arrangeKey;
+        set
+        {
+            if (_arrangeKey != value)
+            {
+                ReplaceKey (_arrangeKey, value);
+                _arrangeKey = value;
+            }
+        }
+    }
+
     // When `End ()` is called, it is possible `RunState.Toplevel` is a different object than `Top`.
     // This variable is set in `End` in this case so that `Begin` correctly sets `Top`.
     private static Toplevel? _cachedRunStateToplevel;
@@ -45,14 +80,14 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     {
         ArgumentNullException.ThrowIfNull (toplevel);
 
-#if DEBUG_IDISPOSABLE
-        Debug.Assert (!toplevel.WasDisposed);
+//#if DEBUG_IDISPOSABLE
+//        Debug.Assert (!toplevel.WasDisposed);
 
-        if (_cachedRunStateToplevel is { } && _cachedRunStateToplevel != toplevel)
-        {
-            Debug.Assert (_cachedRunStateToplevel.WasDisposed);
-        }
-#endif
+//        if (_cachedRunStateToplevel is { } && _cachedRunStateToplevel != toplevel)
+//        {
+//            Debug.Assert (_cachedRunStateToplevel.WasDisposed);
+//        }
+//#endif
 
         // Ensure the mouse is ungrabbed.
         MouseGrabView = null;

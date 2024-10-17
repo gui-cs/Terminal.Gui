@@ -990,18 +990,14 @@ public class TreeView<T> : View, ITreeView where T : class
 
     // BUGBUG: OnMouseEvent is internal. TreeView should not be overriding.
     ///<inheritdoc/>
-    protected internal override bool OnMouseEvent (MouseEvent me)
+    protected override bool OnMouseEvent (MouseEventArgs me)
     {
         // If it is not an event we care about
-        if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
-            && !me.Flags.HasFlag (ObjectActivationButton ?? MouseFlags.Button1DoubleClicked)
-            && !me.Flags.HasFlag (MouseFlags.WheeledDown)
-            && !me.Flags.HasFlag (MouseFlags.WheeledUp)
-            && !me.Flags.HasFlag (MouseFlags.WheeledRight)
-            && !me.Flags.HasFlag (MouseFlags.WheeledLeft))
+        if (me is { IsSingleClicked: false, IsPressed: false, IsReleased: false, IsWheel: false }
+            && !me.Flags.HasFlag (ObjectActivationButton ?? MouseFlags.Button1DoubleClicked))
         {
             // do nothing
-            return base.OnMouseEvent (me);
+            return false;
         }
 
         if (!HasFocus && CanFocus)
@@ -1182,26 +1178,23 @@ public class TreeView<T> : View, ITreeView where T : class
     }
 
     /// <inheritdoc/>
-    public override bool OnProcessKeyDown (Key keyEvent)
+    protected override bool OnKeyDown (Key key)
     {
         if (!Enabled)
         {
             return false;
         }
 
-        // BUGBUG: this should move to OnInvokingKeyBindings
         // If not a keybinding, is the key a searchable key press?
-        if (CollectionNavigatorBase.IsCompatibleKey (keyEvent) && AllowLetterBasedNavigation)
+        if (CollectionNavigatorBase.IsCompatibleKey (key) && AllowLetterBasedNavigation)
         {
-            IReadOnlyCollection<Branch<T>> map;
-
             // If there has been a call to InvalidateMap since the last time
             // we need a new one to reflect the new exposed tree state
-            map = BuildLineMap ();
+            IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
 
             // Find the current selected object within the tree
             int current = map.IndexOf (b => b.Model == SelectedObject);
-            int? newIndex = KeystrokeNavigator?.GetNextMatchingItem (current, (char)keyEvent);
+            int? newIndex = KeystrokeNavigator?.GetNextMatchingItem (current, (char)key);
 
             if (newIndex is int && newIndex != -1)
             {

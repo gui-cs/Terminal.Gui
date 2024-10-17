@@ -62,7 +62,7 @@ public partial class Toplevel : View
     /// </summary>
     public bool Modal { get; set; }
 
-    private void Toplevel_MouseClick (object? sender, MouseEventEventArgs e) { e.Handled = InvokeCommand (Command.HotKey) == true; }
+    private void Toplevel_MouseClick (object? sender, MouseEventArgs e) { e.Handled = InvokeCommand (Command.HotKey) == true; }
 
     #endregion
 

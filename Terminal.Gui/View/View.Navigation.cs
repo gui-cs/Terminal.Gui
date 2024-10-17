@@ -1,6 +1,5 @@
 #nullable enable
 using System.Diagnostics;
-using System.Reflection.PortableExecutable;
 
 namespace Terminal.Gui;
 
@@ -18,7 +17,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///         If there is no next/previous view to advance to, the focus is set to the view itself.
     ///     </para>
     ///     <para>
-    ///         See the View Navigation Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/navigation.html"/>
+    ///         See the View Navigation Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/navigation.html"/>
     ///     </para>
     /// </remarks>
     /// <param name="direction"></param>
@@ -32,6 +32,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
         if (!CanBeVisible (this)) // TODO: is this check needed?
         {
             return false;
+        }
+
+        if (RaiseAdvancingFocus (direction, behavior))
+        {
+            return true;
         }
 
         View? focused = Focused;
@@ -128,6 +133,14 @@ public partial class View // Focus and cross-view navigation management (TabStop
         if (view.HasFocus)
         {
             // We could not advance
+            if (view != this)
+            {
+                // Tell it to try the other way.
+                return view.RaiseAdvancingFocus (
+                                                 direction == NavigationDirection.Forward ? NavigationDirection.Backward : NavigationDirection.Forward,
+                                                 behavior);
+            }
+
             return view == this;
         }
 
@@ -137,10 +150,61 @@ public partial class View // Focus and cross-view navigation management (TabStop
         return focusSet;
     }
 
+    private bool RaiseAdvancingFocus (NavigationDirection direction, TabBehavior? behavior)
+    {
+        // Call the virtual method
+        if (OnAdvancingFocus (direction, behavior))
+        {
+            // The event was cancelled
+            return true;
+        }
+
+        var args = new AdvanceFocusEventArgs (direction, behavior);
+        AdvancingFocus?.Invoke (this, args);
+
+        if (args.Cancel)
+        {
+            // The event was cancelled
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    ///     Called when <see cref="View.AdvanceFocus"/> is about to advance focus.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         If a view cancels the event and the focus could not otherwise advance, the Navigation direction will be
+    ///         reversed and the event will be raised again.
+    ///     </para>
+    /// </remarks>
+    /// <returns>
+    ///     <see langword="true"/>, if the focus advance is to be cancelled, <see langword="false"/>
+    ///     otherwise.
+    /// </returns>
+    protected virtual bool OnAdvancingFocus (NavigationDirection direction, TabBehavior? behavior) { return false; }
+
+    /// <summary>
+    ///     Raised when <see cref="View.AdvanceFocus"/> is about to advance focus.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Cancel the event to prevent the focus from advancing.
+    ///     </para>
+    ///     <para>
+    ///         If a view cancels the event and the focus could not otherwise advance, the Navigation direction will be
+    ///         reversed and the event will be raised again.
+    ///     </para>
+    /// </remarks>
+    public event EventHandler<AdvanceFocusEventArgs>? AdvancingFocus;
+
     /// <summary>Gets or sets a value indicating whether this <see cref="View"/> can be focused.</summary>
     /// <remarks>
     ///     <para>
-    ///         See the View Navigation Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/navigation.html"/>
+    ///         See the View Navigation Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/navigation.html"/>
     ///     </para>
     ///     <para>
     ///         <see cref="SuperView"/> must also have <see cref="CanFocus"/> set to <see langword="true"/>.
@@ -180,7 +244,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
             if (!_canFocus && HasFocus)
             {
                 // If CanFocus is set to false and this view has focus, make it leave focus
-                HasFocus = false;
+                // Set transversing down so we don't go back up the hierarchy...
+                SetHasFocusFalse (null, false);
             }
 
             if (_canFocus && !HasFocus && Visible && SuperView is { Focused: null })
@@ -296,7 +361,12 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         if (Focused is null && _previouslyFocused is { } && indicies.Contains (_previouslyFocused))
         {
-            return _previouslyFocused.SetFocus ();
+            if (_previouslyFocused.SetFocus ())
+            {
+                return true;
+            }
+
+            _previouslyFocused = null;
         }
 
         return false;
@@ -324,7 +394,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         See the View Navigation Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/navigation.html"/>
+    ///         See the View Navigation Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/navigation.html"/>
     ///     </para>
     ///     <para>
     ///         Only Views that are visible, enabled, and have <see cref="CanFocus"/> set to <see langword="true"/> are
@@ -375,6 +446,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
             {
                 SetHasFocusFalse (null);
 
+                Debug.Assert (!_hasFocus);
+
                 if (_hasFocus)
                 {
                     // force it.
@@ -391,7 +464,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         See the View Navigation Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/navigation.html"/>
+    ///         See the View Navigation Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/navigation.html"/>
     ///     </para>
     /// </remarks>
     /// <returns><see langword="true"/> if the focus changed; <see langword="true"/> false otherwise.</returns>
@@ -412,14 +486,14 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     other methods that
     ///     set or remove focus from a view.
     /// </summary>
-    /// <param name="previousFocusedView">
-    ///     The previously focused view. If <see langword="null"/> there is no previously focused
+    /// <param name="currentFocusedView">
+    ///     The currently focused view. If <see langword="null"/> there is no previously focused
     ///     view.
     /// </param>
     /// <param name="traversingUp"></param>
     /// <returns><see langword="true"/> if <see cref="HasFocus"/> was changed to <see langword="true"/>.</returns>
     /// <exception cref="InvalidOperationException"></exception>
-    private (bool focusSet, bool cancelled) SetHasFocusTrue (View? previousFocusedView, bool traversingUp = false)
+    private (bool focusSet, bool cancelled) SetHasFocusTrue (View? currentFocusedView, bool traversingUp = false)
     {
         Debug.Assert (SuperView is null || ApplicationNavigation.IsInHierarchy (SuperView, this));
 
@@ -427,6 +501,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
         if (_hasFocus)
         {
             return (false, false);
+        }
+
+        if (currentFocusedView is { HasFocus: false })
+        {
+            throw new ArgumentException ("SetHasFocusTrue: currentFocusedView must HasFocus.");
         }
 
         var thisAsAdornment = this as Adornment;
@@ -451,7 +530,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         bool previousValue = HasFocus;
 
-        bool cancelled = NotifyFocusChanging (false, true, previousFocusedView, this);
+        bool cancelled = RaiseFocusChanging (false, true, currentFocusedView, this);
 
         if (cancelled)
         {
@@ -462,7 +541,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         // Any of them may cancel gaining focus. In which case we need to back out.
         if (superViewOrParent is { HasFocus: false } sv)
         {
-            (bool focusSet, bool svCancelled) = sv.SetHasFocusTrue (previousFocusedView, true);
+            (bool focusSet, bool svCancelled) = sv.SetHasFocusTrue (currentFocusedView, true);
 
             if (!focusSet)
             {
@@ -488,31 +567,32 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         if (!traversingUp)
         {
-            // Restore focus to the previously focused subview 
+            // Restore focus to the previously focused subview, if any
             if (!RestoreFocus ())
             {
-                // Couldn't restore focus, so use Advance to navigate to the next focusable subview
-                if (!AdvanceFocus (NavigationDirection.Forward, null))
-                {
-                    // Couldn't advance, so we're the most focused view in the application
-                    Application.Navigation?.SetFocused (this);
-                }
+                // Couldn't restore focus, so use Advance to navigate to the next focusable subview, if any
+                AdvanceFocus (NavigationDirection.Forward, null);
             }
         }
 
-        if (previousFocusedView is { HasFocus: true } && GetFocusChain (NavigationDirection.Forward, TabStop).Contains (previousFocusedView))
+        // Now make sure the old focused view loses focus
+        if (currentFocusedView is { HasFocus: true } && GetFocusChain (NavigationDirection.Forward, TabStop).Contains (currentFocusedView))
         {
-            previousFocusedView.SetHasFocusFalse (this);
+            currentFocusedView.SetHasFocusFalse (this);
         }
 
-        _previouslyFocused = null;
+        if (_previouslyFocused is { })
+        {
+            _previouslyFocused = null;
+        }
 
         if (Arrangement.HasFlag (ViewArrangement.Overlapped))
         {
             SuperView?.MoveSubviewToEnd (this);
         }
 
-        NotifyFocusChanged (HasFocus, previousFocusedView, this);
+        // Focus work is done. Notify.
+        RaiseFocusChanged (HasFocus, currentFocusedView, this);
 
         SetNeedsDisplay ();
 
@@ -525,8 +605,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
         return (true, false);
     }
 
-    private bool NotifyFocusChanging (bool currentHasFocus, bool newHasFocus, View? currentFocused, View? newFocused)
+    private bool RaiseFocusChanging (bool currentHasFocus, bool newHasFocus, View? currentFocused, View? newFocused)
     {
+        Debug.Assert (currentFocused is null || currentFocused is { HasFocus: true });
+        Debug.Assert (newFocused is null || newFocused is { CanFocus: true });
+
         // Call the virtual method
         if (OnHasFocusChanging (currentHasFocus, newHasFocus, currentFocused, newFocused))
         {
@@ -541,6 +624,20 @@ public partial class View // Focus and cross-view navigation management (TabStop
         {
             // The event was cancelled
             return true;
+        }
+
+        View? appFocused = Application.Navigation?.GetFocused ();
+
+        if (appFocused == currentFocused)
+        {
+            if (newFocused is { HasFocus: true })
+            {
+                Application.Navigation?.SetFocused (newFocused);
+            }
+            else
+            {
+                Application.Navigation?.SetFocused (null);
+            }
         }
 
         return false;
@@ -586,8 +683,9 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     focused.
     /// </param>
     /// <param name="traversingDown">
-    ///     Set to true to indicate method is being called recurively, traversing down the focus
-    ///     chain.
+    ///     Set to true to traverse down the focus
+    ///     chain only. If false, the method will attempt to AdvanceFocus on the superview or restorefocus on
+    ///     Application.Navigation.GetFocused().
     /// </param>
     /// <exception cref="InvalidOperationException"></exception>
     private void SetHasFocusFalse (View? newFocusedView, bool traversingDown = false)
@@ -598,45 +696,86 @@ public partial class View // Focus and cross-view navigation management (TabStop
             throw new InvalidOperationException ("SetHasFocusFalse should not be called if the view does not have focus.");
         }
 
+        if (newFocusedView is { HasFocus: false })
+        {
+            throw new InvalidOperationException ("SetHasFocusFalse new focused view does not have focus.");
+        }
+
         var thisAsAdornment = this as Adornment;
         View? superViewOrParent = thisAsAdornment?.Parent ?? SuperView;
 
         // If newFocusedVew is null, we need to find the view that should get focus, and SetFocus on it.
         if (!traversingDown && newFocusedView is null)
         {
-            if (superViewOrParent?._previouslyFocused is { })
+            // Restore focus?
+            if (superViewOrParent?._previouslyFocused is { CanFocus: true })
             {
-                if (superViewOrParent._previouslyFocused != this)
+                // TODO: Why don't we call RestoreFocus here?
+                if (superViewOrParent._previouslyFocused != this && superViewOrParent._previouslyFocused.SetFocus ())
                 {
-                    superViewOrParent?._previouslyFocused?.SetFocus ();
-
                     // The above will cause SetHasFocusFalse, so we can return
+                    Debug.Assert (!_hasFocus);
+
                     return;
                 }
             }
 
-            if (superViewOrParent is { })
+            // AdvanceFocus?
+            if (superViewOrParent is { CanFocus: true })
             {
                 if (superViewOrParent.AdvanceFocus (NavigationDirection.Forward, TabStop))
                 {
-                    // The above will cause SetHasFocusFalse, so we can return
-                    return;
+                    // The above might have SetHasFocusFalse, so we can return
+                    if (!_hasFocus)
+                    {
+                        return;
+                    }
                 }
 
-                newFocusedView = superViewOrParent;
+                if (superViewOrParent is { HasFocus: true, CanFocus: true })
+                {
+                    newFocusedView = superViewOrParent;
+                }
             }
 
-            if (Application.Navigation is { } && Application.Top is { })
+            // Application.Navigation.GetFocused?
+            View? applicationFocused = Application.Navigation?.GetFocused ();
+
+            if (newFocusedView is null && applicationFocused != this && applicationFocused is { CanFocus: true })
             {
                 // Temporarily ensure this view can't get focus
                 bool prevCanFocus = _canFocus;
                 _canFocus = false;
-                bool restoredFocus = Application.Top!.RestoreFocus ();
+                bool restoredFocus = applicationFocused!.RestoreFocus ();
                 _canFocus = prevCanFocus;
 
                 if (restoredFocus)
                 {
                     // The above caused SetHasFocusFalse, so we can return
+                    Debug.Assert (!_hasFocus);
+
+                    return;
+                }
+            }
+
+            // Application.Top?
+            if (newFocusedView is null && Application.Top is { CanFocus: true, HasFocus: false })
+            {
+                // Temporarily ensure this view can't get focus
+                bool prevCanFocus = _canFocus;
+                _canFocus = false;
+                bool restoredFocus = Application.Top.RestoreFocus ();
+                _canFocus = prevCanFocus;
+
+                if (Application.Top is { CanFocus: true, HasFocus: true })
+                {
+                    newFocusedView = Application.Top;
+                }
+                else if (restoredFocus)
+                {
+                    // The above caused SetHasFocusFalse, so we can return
+                    Debug.Assert (!_hasFocus);
+
                     return;
                 }
             }
@@ -644,6 +783,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             // No other focusable view to be found. Just "leave" us...
         }
 
+        Debug.Assert (_hasFocus);
 
         // Before we can leave focus, we need to make sure that all views down the subview-hierarchy have left focus.
         View? mostFocused = MostFocused;
@@ -665,15 +805,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 bottom = bottom.SuperView;
             }
 
-            if (bottom == this && bottom.SuperView is Adornment a)
-            {
-                //a.SetHasFocusFalse (newFocusedView, true);
-
-                Debug.Assert (_hasFocus);
-            }
-
             Debug.Assert (_hasFocus);
-
         }
 
         if (superViewOrParent is { })
@@ -683,8 +815,17 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         bool previousValue = HasFocus;
 
+        Debug.Assert (_hasFocus);
+
         // Note, can't be cancelled.
-        NotifyFocusChanging (HasFocus, !HasFocus, newFocusedView, this);
+        RaiseFocusChanging (HasFocus, !HasFocus, this, newFocusedView);
+
+        // Even though the change can't be cancelled, some listener may have changed the focus to another view.
+        if (!_hasFocus)
+        {
+            // Notify caused HasFocus to change to false.
+            return;
+        }
 
         // Get whatever peer has focus, if any so we can update our superview's _previouslyMostFocused
         View? focusedPeer = superViewOrParent?.Focused;
@@ -692,17 +833,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         // Set HasFocus false
         _hasFocus = false;
 
-        if (Application.Navigation is { })
-        {
-            View? appFocused = Application.Navigation.GetFocused ();
-
-            if (appFocused is { } || appFocused == this)
-            {
-                Application.Navigation.SetFocused (newFocusedView ?? superViewOrParent);
-            }
-        }
-
-        NotifyFocusChanged (HasFocus, this, newFocusedView);
+        RaiseFocusChanged (HasFocus, this, newFocusedView);
 
         if (_hasFocus)
         {
@@ -719,8 +850,13 @@ public partial class View // Focus and cross-view navigation management (TabStop
         SetNeedsDisplay ();
     }
 
-    private void NotifyFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedVew)
+    private void RaiseFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedVew)
     {
+        if (newHasFocus && focusedVew?.Focused is null)
+        {
+            Application.Navigation?.SetFocused (focusedVew);
+        }
+
         // Call the virtual method
         OnHasFocusChanged (newHasFocus, previousFocusedView, focusedVew);
 
@@ -756,7 +892,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
     #region Tab/Focus Handling
 
     /// <summary>
-    ///     Gets the subviews and Adornments of this view that are scoped to the specified behavior and direction. If behavior is null, all focusable subviews and
+    ///     Gets the subviews and Adornments of this view that are scoped to the specified behavior and direction. If behavior
+    ///     is null, all focusable subviews and
     ///     Adornments are returned.
     /// </summary>
     /// <param name="direction"></param>
@@ -774,7 +911,6 @@ public partial class View // Focus and cross-view navigation management (TabStop
         {
             filteredSubviews = _subviews?.Where (v => v is { CanFocus: true, Visible: true, Enabled: true });
         }
-
 
         // How about in Adornments? 
         if (Padding is { CanFocus: true, Visible: true, Enabled: true } && Padding.TabStop == behavior)
@@ -806,11 +942,14 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     Gets or sets the behavior of <see cref="AdvanceFocus"/> for keyboard navigation.
     /// </summary>
     /// <remarks>
-    /// <remarks>
+    ///     <remarks>
+    ///         <para>
+    ///             See the View Navigation Deep Dive for more information:
+    ///             <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/navigation.html"/>
+    ///         </para>
+    ///     </remarks>
+    ///     ///
     ///     <para>
-    ///         See the View Navigation Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/navigation.html"/>
-    ///     </para>
-    /// </remarks>    ///     <para>
     ///         If <see langword="null"/> the tab stop has not been set and setting <see cref="CanFocus"/> to true will set it
     ///         to
     ///         <see cref="TabBehavior.TabStop"/>.

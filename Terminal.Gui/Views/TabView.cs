@@ -508,9 +508,9 @@ public class TabView : View
         return Style.ShowTopLine ? 3 : 2;
     }
 
-    private void Tab_MouseClick (object sender, MouseEventEventArgs e)
+    private void Tab_MouseClick (object sender, MouseEventArgs e)
     {
-        e.Handled = _tabsBar.NewMouseEvent (e.MouseEvent) == true;
+        e.Handled = _tabsBar.NewMouseEvent (e) == true;
     }
 
     private void UnSetCurrentTabs ()
@@ -569,15 +569,11 @@ public class TabView : View
             Add (_rightScrollIndicator, _leftScrollIndicator);
         }
 
-        protected internal override bool OnMouseEvent (MouseEvent me)
+        protected override bool OnMouseEvent (MouseEventArgs me)
         {
             Tab hit = me.View is Tab ? (Tab)me.View : null;
 
-            bool isClick = me.Flags.HasFlag (MouseFlags.Button1Clicked)
-                           || me.Flags.HasFlag (MouseFlags.Button2Clicked)
-                           || me.Flags.HasFlag (MouseFlags.Button3Clicked);
-
-            if (isClick)
+            if (me.IsSingleClicked)
             {
                 _host.OnTabClicked (new TabMouseEventArgs (hit, me));
 
@@ -588,9 +584,7 @@ public class TabView : View
                 }
             }
 
-            if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
-                && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
-                && !me.Flags.HasFlag (MouseFlags.Button1TripleClicked))
+            if (!me.IsSingleDoubleOrTripleClicked)
             {
                 return false;
             }
@@ -600,9 +594,7 @@ public class TabView : View
                 SetFocus ();
             }
 
-            if (me.Flags.HasFlag (MouseFlags.Button1Clicked)
-                || me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
-                || me.Flags.HasFlag (MouseFlags.Button1TripleClicked))
+            if (me.IsSingleDoubleOrTripleClicked)
             {
                 var scrollIndicatorHit = 0;
 

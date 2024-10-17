@@ -205,11 +205,11 @@ public class ResponderTests
         var r = new View ();
         var args = new Key { KeyCode = KeyCode.Null };
 
-        Assert.False (r.OnKeyDown (args));
+        Assert.False (r.NewKeyDownEvent (args));
         Assert.False (args.Handled);
 
         r.KeyDown += (s, a) => a.Handled = true;
-        Assert.True (r.OnKeyDown (args));
+        Assert.True (r.NewKeyDownEvent (args));
         Assert.True (args.Handled);
 
         r.Dispose ();
@@ -232,9 +232,9 @@ public class ResponderTests
         var r = new View ();
 
         //Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
-        Assert.False (r.OnKeyDown (new Key { KeyCode = KeyCode.Null }));
-        Assert.False (r.OnKeyUp (new Key { KeyCode = KeyCode.Null }));
-        Assert.False (r.NewMouseEvent (new MouseEvent { Flags = MouseFlags.AllEvents }));
+        Assert.False (r.NewKeyDownEvent (new Key { KeyCode = KeyCode.Null }));
+        Assert.False (r.NewKeyDownEvent (new Key { KeyCode = KeyCode.Null }));
+        Assert.False (r.NewMouseEvent (new MouseEventArgs { Flags = MouseFlags.AllEvents }));
 
         var v = new View ();
         //Assert.False (r.OnEnter (v));
@@ -293,6 +293,6 @@ public class ResponderTests
 
     public class DerivedView : View
     {
-        public override bool OnKeyDown (Key keyEvent) { return true; }
+        protected override bool OnKeyDown (Key keyEvent) { return true; }
     }
 }

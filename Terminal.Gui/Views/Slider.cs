@@ -1282,7 +1282,7 @@ public class Slider<T> : View, IOrientation
     private Point? _moveRenderPosition;
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
+    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
     {
         // Note(jmperricone): Maybe we click to focus the cursor, and on next click we set the option.
         //                    That will make OptionFocused Event more relevant.
@@ -1381,11 +1381,9 @@ public class Slider<T> : View, IOrientation
 
             mouseEvent.Handled = true;
 
-            // BUGBUG: OnMouseClick is/should be internal. 
-            return OnMouseClick (new (mouseEvent));
         }
 
-        return false;
+        return mouseEvent.Handled;
 
         Point ClampMovePosition (Point position)
         {

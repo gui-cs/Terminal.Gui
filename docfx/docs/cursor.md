@@ -4,19 +4,19 @@ See end for list of issues this design addresses.
 
 ## Tenets for Cursor Support (Unless you know better ones...)
 
-1. **More GUI than Command Line**. The concept of a cursor on the command line of a terminal is intrinsically tied to enabling the user to know where keybaord import is going to impact text editing. TUI apps have many more modalities than text editing where the keyboard is used (e.g. scrolling through a `ColorPicker`). Terminal.Gui's cursor system is biased towards the broader TUI experiences.
+1. **More GUI than Command Line**. The concept of a cursor on the command line of a terminal is intrinsically tied to enabling the user to know where keyboard import is going to impact text editing. TUI apps have many more modalities than text editing where the keyboard is used (e.g. scrolling through a `ColorPicker`). Terminal.Gui's cursor system is biased towards the broader TUI experiences.
 
 2. **Be Consistent With the User's Platform** - Users get to choose the platform they run *Terminal.Gui* apps on and the cursor should behave in a way consistent with the terminal.
 
 ## Lexicon & Taxonomy
 
 - Navigation - Refers to the user-experience for moving Focus between views in the application view-hierarchy. See [Navigation](navigation.md) for a deep-dive.
-- Focus - Indicates which View in the view-hierarchy is currently the one receiving keyboard input. Only one view-heirachy in an applicstion can have focus (`view.HasFocus == true`), and there is only one View in a focused heirarchy that is the most-focused; the one recieving keyboard input. See [Navigation](navigation.md) for a deep-dive.
-- Cursor - A visual indicator to the user where keyboard input will have an impact. There is one Cursor per terminal sesssion.
+- Focus - Indicates which View in the view-hierarchy is currently the one receiving keyboard input. Only one view-hexarchy in an application can have focus (`view.HasFocus == true`), and there is only one View in a focused hierarchy that is the most-focused; the one receiving keyboard input. See [Navigation](navigation.md) for a deep-dive.
+- Cursor - A visual indicator to the user where keyboard input will have an impact. There is one Cursor per terminal session.
 - Cursor Location - The top-left corner of the Cursor. In text entry scenarios, new text will be inserted to the left/top of the Cursor Location. 
 - Cursor Size - The width and height of the cursor. Currently the size is limited to 1x1.
 - Cursor Style - How the cursor renders. Some terminals support various cursor styles such as Block and Underline.
-- Cursor Visibilty - Whether the cursor is visible to the user or not. NOTE: Some ConsoleDrivers overload Cursor Style and Cursor Visibility, making "invisible" a style. Terminal.Gui HIDES this from developers and changing the visibilty of the cursor does NOT change the style.
+- Cursor Visibility - Whether the cursor is visible to the user or not. NOTE: Some ConsoleDrivers overload Cursor Style and Cursor Visibility, making "invisible" a style. Terminal.Gui HIDES this from developers and changing the visibility of the cursor does NOT change the style.
 - Caret - Visual indicator that  where text entry will occur. 
 - Selection - A visual indicator to the user that something is selected. It is common for the Selection and Cursor to be the same. It is also common for the Selection and Cursor to be distinct. In a `ListView` the Cursor and Selection (`SelectedItem`) are the same, but the `Cursor` is not visible. In a `TextView` with text selected, the `Cursor` is at either the start or end of the `Selection`. A `TableView' supports mutliple things being selected at once.
 

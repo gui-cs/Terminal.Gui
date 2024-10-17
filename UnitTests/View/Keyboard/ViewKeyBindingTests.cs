@@ -11,37 +11,38 @@ public class ViewKeyBindingTests (ITestOutputHelper output)
     public void Focus_KeyBinding ()
     {
         var view = new ScopedKeyBindingView ();
-        var invoked = false;
-        view.InvokingKeyBindings += (s, e) => invoked = true;
+        var keyWasHandled = false;
+        view.KeyDownNotHandled += (s, e) => keyWasHandled = true;
 
         var top = new Toplevel ();
         top.Add (view);
         Application.Begin (top);
 
-        Application.OnKeyDown (Key.A);
-        Assert.False (invoked);
+        Application.RaiseKeyDownEvent (Key.A);
+        Assert.False (keyWasHandled);
         Assert.True (view.ApplicationCommand);
 
-        invoked = false;
-        Application.OnKeyDown (Key.H);
-        Assert.True (invoked);
+        keyWasHandled = false;
+        Application.RaiseKeyDownEvent (Key.H);
+        Assert.True (view.HotKeyCommand);
+        Assert.False (keyWasHandled);
 
-        invoked = false;
+        keyWasHandled = false;
         Assert.False (view.HasFocus);
-        Application.OnKeyDown (Key.F);
-        Assert.False (invoked);
+        Application.RaiseKeyDownEvent (Key.F);
+        Assert.False (keyWasHandled);
         Assert.False (view.FocusedCommand);
 
-        invoked = false;
+        keyWasHandled = false;
         view.CanFocus = true;
         view.SetFocus ();
         Assert.True (view.HasFocus);
-        Application.OnKeyDown (Key.F);
-        Assert.True (invoked);
+        Application.RaiseKeyDownEvent (Key.F);
+        Assert.True (view.FocusedCommand);
+        Assert.False (keyWasHandled); // Command was invoked, but wasn't handled
 
         Assert.True (view.ApplicationCommand);
         Assert.True (view.HotKeyCommand);
-        Assert.True (view.FocusedCommand);
         top.Dispose ();
     }
 
@@ -50,23 +51,23 @@ public class ViewKeyBindingTests (ITestOutputHelper output)
     public void Focus_KeyBinding_Negative ()
     {
         var view = new ScopedKeyBindingView ();
-        var invoked = false;
-        view.InvokingKeyBindings += (s, e) => invoked = true;
+        var keyWasHandled = false;
+        view.KeyDownNotHandled += (s, e) => keyWasHandled = true;
 
         var top = new Toplevel ();
         top.Add (view);
         Application.Begin (top);
 
-        Application.OnKeyDown (Key.Z);
-        Assert.False (invoked);
+        Application.RaiseKeyDownEvent (Key.Z);
+        Assert.False (keyWasHandled);
         Assert.False (view.ApplicationCommand);
         Assert.False (view.HotKeyCommand);
         Assert.False (view.FocusedCommand);
 
-        invoked = false;
+        keyWasHandled = false;
         Assert.False (view.HasFocus);
-        Application.OnKeyDown (Key.F);
-        Assert.False (invoked);
+        Application.RaiseKeyDownEvent (Key.F);
+        Assert.False (keyWasHandled);
         Assert.False (view.ApplicationCommand);
         Assert.False (view.HotKeyCommand);
         Assert.False (view.FocusedCommand);
@@ -78,28 +79,29 @@ public class ViewKeyBindingTests (ITestOutputHelper output)
     public void HotKey_KeyBinding ()
     {
         var view = new ScopedKeyBindingView ();
-        var invoked = false;
-        view.InvokingKeyBindings += (s, e) => invoked = true;
+        var keyWasHandled = false;
+        view.KeyDownNotHandled += (s, e) => keyWasHandled = true;
 
         var top = new Toplevel ();
         top.Add (view);
         Application.Begin (top);
 
-        invoked = false;
-        Application.OnKeyDown (Key.H);
-        Assert.True (invoked);
+        keyWasHandled = false;
+        Application.RaiseKeyDownEvent (Key.H);
         Assert.True (view.HotKeyCommand);
+        Assert.False (keyWasHandled);
 
         view.HotKey = KeyCode.Z;
-        invoked = false;
+        keyWasHandled = false;
         view.HotKeyCommand = false;
-        Application.OnKeyDown (Key.H); // old hot key
-        Assert.False (invoked);
+        Application.RaiseKeyDownEvent (Key.H); // old hot key
+        Assert.False (keyWasHandled);
         Assert.False (view.HotKeyCommand);
 
-        Application.OnKeyDown (Key.Z); // new hot key
-        Assert.True (invoked);
+        Application.RaiseKeyDownEvent (Key.Z); // new hot key
         Assert.True (view.HotKeyCommand);
+        Assert.False (keyWasHandled);
+
         top.Dispose ();
     }
 
@@ -108,19 +110,19 @@ public class ViewKeyBindingTests (ITestOutputHelper output)
     public void HotKey_KeyBinding_Negative ()
     {
         var view = new ScopedKeyBindingView ();
-        var invoked = false;
-        view.InvokingKeyBindings += (s, e) => invoked = true;
+        var keyWasHandled = false;
+        view.KeyDownNotHandled += (s, e) => keyWasHandled = true;
 
         var top = new Toplevel ();
         top.Add (view);
         Application.Begin (top);
 
-        Application.OnKeyDown (Key.Z);
-        Assert.False (invoked);
+        Application.RaiseKeyDownEvent (Key.Z);
+        Assert.False (keyWasHandled);
         Assert.False (view.HotKeyCommand);
 
-        invoked = false;
-        Application.OnKeyDown (Key.F);
+        keyWasHandled = false;
+        Application.RaiseKeyDownEvent (Key.F);
         Assert.False (view.HotKeyCommand);
         top.Dispose ();
     }

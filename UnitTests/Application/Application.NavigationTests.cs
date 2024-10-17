@@ -68,7 +68,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
 
         Application.Navigation.FocusedChanged += ApplicationNavigationOnFocusedChanged;
 
-        Application.Navigation.SetFocused (new ());
+        Application.Navigation.SetFocused (new () { CanFocus = true, HasFocus = true });
 
         Assert.True (raised);
 
@@ -89,7 +89,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
     {
         Application.Navigation = new ();
 
-        Application.Top = new()
+        Application.Top = new ()
         {
             Id = "top",
             CanFocus = true
@@ -125,7 +125,7 @@ public class ApplicationNavigationTests (ITestOutputHelper output)
     {
         Application.Navigation = new ();
 
-        Application.Top = new()
+        Application.Top = new ()
         {
             Id = "top",
             CanFocus = true
