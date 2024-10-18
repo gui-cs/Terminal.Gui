@@ -1,3 +1,4 @@
+#nullable enable
 namespace Terminal.Gui;
 
 /// <summary>
@@ -170,10 +171,10 @@ public static class EscSeqUtils
     /// <param name="isMouse">Indicates if the escape sequence is a mouse event.</param>
     /// <param name="buttonState">The <see cref="MouseFlags"/> button state.</param>
     /// <param name="pos">The <see cref="MouseFlags"/> position.</param>
-    /// <param name="isResponse">Indicates if the escape sequence is a response to a request.</param>
+    /// <param name="seqReqStatus">The <see cref="EscSeqReqStatus"/> object.</param>
     /// <param name="continuousButtonPressedHandler">The handler that will process the event.</param>
     public static void DecodeEscSeq (
-        EscSeqRequests escSeqRequests,
+        EscSeqRequests? escSeqRequests,
         ref ConsoleKeyInfo newConsoleKeyInfo,
         ref ConsoleKey key,
         ConsoleKeyInfo [] cki,
@@ -185,7 +186,7 @@ public static class EscSeqUtils
         out bool isMouse,
         out List<MouseFlags> buttonState,
         out Point pos,
-        out bool isResponse,
+        out EscSeqReqStatus? seqReqStatus,
         Action<MouseFlags, Point> continuousButtonPressedHandler
     )
     {
@@ -194,7 +195,7 @@ public static class EscSeqUtils
         isMouse = false;
         buttonState = new List<MouseFlags> { 0 };
         pos = default (Point);
-        isResponse = false;
+        seqReqStatus = null;
         char keyChar = '\0';
 
         switch (c1Control)
@@ -262,10 +263,9 @@ public static class EscSeqUtils
                     return;
                 }
 
-                if (escSeqRequests is { } && escSeqRequests.HasResponse (terminator))
+                if (escSeqRequests is { } && escSeqRequests.HasResponse (terminator, out seqReqStatus))
                 {
-                    isResponse = true;
-                    escSeqRequests.Remove (terminator);
+                    escSeqRequests.Remove (seqReqStatus);
 
                     return;
                 }
@@ -497,7 +497,7 @@ public static class EscSeqUtils
     // PERF: This is expensive
     public static char [] GetKeyCharArray (ConsoleKeyInfo [] cki)
     {
-        char [] kChar = { };
+        char [] kChar = [];
         var length = 0;
 
         foreach (ConsoleKeyInfo kc in cki)
@@ -1316,13 +1316,9 @@ public static class EscSeqUtils
     /// <summary>
     ///     ESC [ ? 6 n - Request Cursor Position Report (?) (DECXCPR)
     ///     https://terminalguide.namepad.de/seq/csi_sn__p-6/
+    ///     The terminal reply to <see cref="CSI_RequestCursorPositionReport"/>. ESC [ ? (y) ; (x) ; 1 R
     /// </summary>
-    public static readonly string CSI_RequestCursorPositionReport = CSI + "?6n";
-
-    /// <summary>
-    ///     The terminal reply to <see cref="CSI_RequestCursorPositionReport"/>. ESC [ ? (y) ; (x) R
-    /// </summary>
-    public const string CSI_RequestCursorPositionReport_Terminator = "R";
+    public static readonly AnsiEscapeSequenceRequest CSI_RequestCursorPositionReport = new () { Request = CSI + "?6n", Terminator = "R" };
 
     /// <summary>
     ///     ESC [ 0 c - Send Device Attributes (Primary DA)
@@ -1341,37 +1337,25 @@ public static class EscSeqUtils
     ///     28 = Rectangular area operations
     ///     32 = Text macros
     ///     42 = ISO Latin-2 character set
+    ///     The terminator indicating a reply to <see cref="CSI_SendDeviceAttributes"/> or
+    ///     <see cref="CSI_SendDeviceAttributes2"/>
     /// </summary>
-    public static readonly string CSI_SendDeviceAttributes = CSI + "0c";
+    public static readonly AnsiEscapeSequenceRequest CSI_SendDeviceAttributes = new () { Request = CSI + "0c", Terminator = "c" };
 
     /// <summary>
     ///     ESC [ > 0 c - Send Device Attributes (Secondary DA)
     ///     Windows Terminal v1.18+ emits: "\x1b[>0;10;1c" (vt100, firmware version 1.0, vt220)
-    /// </summary>
-    public static readonly string CSI_SendDeviceAttributes2 = CSI + ">0c";
-
-    /// <summary>
     ///     The terminator indicating a reply to <see cref="CSI_SendDeviceAttributes"/> or
     ///     <see cref="CSI_SendDeviceAttributes2"/>
     /// </summary>
-    public const string CSI_ReportDeviceAttributes_Terminator = "c";
+    public static readonly AnsiEscapeSequenceRequest CSI_SendDeviceAttributes2 = new () { Request = CSI + ">0c", Terminator = "c" };
 
     /// <summary>
     ///     CSI 1 8 t  | yes | yes |  yes  | report window size in chars
     ///     https://terminalguide.namepad.de/seq/csi_st-18/
-    /// </summary>
-    public static readonly string CSI_ReportTerminalSizeInChars = CSI + "18t";
-
-    /// <summary>
     ///     The terminator indicating a reply to <see cref="CSI_ReportTerminalSizeInChars"/> : ESC [ 8 ; height ; width t
     /// </summary>
-    public const string CSI_ReportTerminalSizeInChars_Terminator = "t";
-
-    /// <summary>
-    ///     The value of the response to <see cref="CSI_ReportTerminalSizeInChars"/> indicating value 1 and 2 are the terminal
-    ///     size in chars.
-    /// </summary>
-    public const string CSI_ReportTerminalSizeInChars_ResponseValue = "8";
+    public static readonly AnsiEscapeSequenceRequest CSI_ReportTerminalSizeInChars = new () { Request = CSI + "18t", Terminator = "t", Value = "8" };
 
     #endregion
 }

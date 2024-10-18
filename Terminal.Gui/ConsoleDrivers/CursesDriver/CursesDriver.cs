@@ -177,20 +177,45 @@ internal class CursesDriver : ConsoleDriver
         return true;
     }
 
-    public void StartReportingMouseMoves ()
+    public override bool IsReportingMouseMoves { get; internal set; }
+
+    public override void StartReportingMouseMoves ()
     {
         if (!RunningUnitTests)
         {
             Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
+
+            IsReportingMouseMoves = true;
         }
     }
 
-    public void StopReportingMouseMoves ()
+    public override void StopReportingMouseMoves ()
     {
         if (!RunningUnitTests)
         {
             Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
+
+            IsReportingMouseMoves = false;
+
+            Thread.Sleep (100); // Allow time for mouse stopping and to flush the input buffer
+
+            // Flush the input buffer to avoid reading stale input
+            while (Console.KeyAvailable)
+            {
+                Console.ReadKey (true);
+            }
         }
+    }
+
+    /// <inheritdoc />
+    public override string WriteAnsiRequest (AnsiEscapeSequenceRequest ansiRequest)
+    {
+        if (WriteAnsiRequestDefault (ansiRequest.Request))
+        {
+            return ReadAnsiResponseDefault (ansiRequest);
+        }
+
+        return string.Empty;
     }
 
     public override void Suspend ()

@@ -562,6 +562,11 @@ public abstract class ConsoleDriver
 
     #region Mouse and Keyboard
 
+    /// <summary>
+    /// Gets whether the mouse is reporting move events.
+    /// </summary>
+    public abstract bool IsReportingMouseMoves { get; internal set; }
+
     /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="KeyUp"/>.</summary>
     public event EventHandler<Key>? KeyDown;
 
@@ -607,6 +612,66 @@ public abstract class ConsoleDriver
     /// <param name="alt">If <see langword="true"/> simulates the Alt key being pressed.</param>
     /// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
     public abstract void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
+
+    /// <summary>
+    ///     Provide handling for the terminal start reporting mouse events.
+    /// </summary>
+    public abstract void StartReportingMouseMoves ();
+
+    /// <summary>
+    ///     Provide handling for the terminal stop reporting mouse events.
+    /// </summary>
+    public abstract void StopReportingMouseMoves ();
+
+    /// <summary>
+    ///     Provide handling for the terminal write ANSI escape sequence request.
+    /// </summary>
+    /// <param name="ansiRequest">The <see cref="AnsiEscapeSequenceRequest"/> object.</param>
+    /// <returns>The request response.</returns>
+    public abstract string WriteAnsiRequest (AnsiEscapeSequenceRequest ansiRequest);
+
+    internal bool WriteAnsiRequestDefault (string ansi)
+    {
+        try
+        {
+            Console.Out.Write (ansi);
+            Console.Out.Flush (); // Ensure the request is sent
+
+            // Read the response from stdin (response should come back as input)
+            Thread.Sleep (100); // Allow time for the terminal to respond
+
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    internal string ReadAnsiResponseDefault (AnsiEscapeSequenceRequest ansiRequest)
+    {
+        var response = new StringBuilder ();
+
+        while (Console.KeyAvailable)
+        {
+            // Peek the next key
+            ConsoleKeyInfo keyInfo = Console.ReadKey (true); // true to not display on the console
+
+            // Append the current key to the response
+            response.Append (keyInfo.KeyChar);
+
+            // Read until no key is available if no terminator was specified or
+            // check if the key is terminator (ANSI escape sequence ends)
+            if (!string.IsNullOrEmpty (ansiRequest.Terminator) && keyInfo.KeyChar == ansiRequest.Terminator [^1])
+            {
+                // Break out of the loop when terminator is found
+                break;
+            }
+        }
+
+        return response.ToString ();
+    }
 
     #endregion
 }

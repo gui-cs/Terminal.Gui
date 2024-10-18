@@ -136,7 +136,7 @@ internal class NetEvents : IDisposable
 {
     private readonly ManualResetEventSlim _inputReady = new (false);
     private CancellationTokenSource _inputReadyCancellationTokenSource;
-    private readonly ManualResetEventSlim _waitForStart = new (false);
+    internal readonly ManualResetEventSlim _waitForStart = new (false);
 
     //CancellationTokenSource _waitForStartCancellationTokenSource;
     private readonly ManualResetEventSlim _winChange = new (false);
@@ -222,6 +222,8 @@ internal class NetEvents : IDisposable
         return default (ConsoleKeyInfo);
     }
 
+    internal bool _forceRead;
+
     private void ProcessInputQueue ()
     {
         while (_inputReadyCancellationTokenSource is { IsCancellationRequested: false })
@@ -237,7 +239,7 @@ internal class NetEvents : IDisposable
 
             _waitForStart.Reset ();
 
-            if (_inputQueue.Count == 0)
+            if (_inputQueue.Count == 0 || _forceRead)
             {
                 ConsoleKey key = 0;
                 ConsoleModifiers mod = 0;
@@ -274,17 +276,29 @@ internal class NetEvents : IDisposable
                         }
 
                         _isEscSeq = true;
-                        newConsoleKeyInfo = consoleKeyInfo;
-                        _cki = EscSeqUtils.ResizeArray (consoleKeyInfo, _cki);
 
-                        if (Console.KeyAvailable)
+                        if (consoleKeyInfo.KeyChar != Key.Esc && consoleKeyInfo.KeyChar <= Key.Space)
                         {
-                            continue;
-                        }
+                            ProcessRequestResponse (ref newConsoleKeyInfo, ref key, _cki, ref mod);
+                            _cki = null;
+                            _isEscSeq = false;
 
-                        ProcessRequestResponse (ref newConsoleKeyInfo, ref key, _cki, ref mod);
-                        _cki = null;
-                        _isEscSeq = false;
+                            ProcessMapConsoleKeyInfo (consoleKeyInfo);
+                        }
+                        else
+                        {
+                            newConsoleKeyInfo = consoleKeyInfo;
+                            _cki = EscSeqUtils.ResizeArray (consoleKeyInfo, _cki);
+
+                            if (Console.KeyAvailable)
+                            {
+                                continue;
+                            }
+
+                            ProcessRequestResponse (ref newConsoleKeyInfo, ref key, _cki, ref mod);
+                            _cki = null;
+                            _isEscSeq = false;
+                        }
 
                         break;
                     }
@@ -429,7 +443,7 @@ internal class NetEvents : IDisposable
                                   out bool isMouse,
                                   out List<MouseFlags> mouseFlags,
                                   out Point pos,
-                                  out bool isReq,
+                                  out EscSeqReqStatus seqReqStatus,
                                   (f, p) => HandleMouseEvent (MapMouseFlags (f), p)
                                  );
 
@@ -443,9 +457,21 @@ internal class NetEvents : IDisposable
             return;
         }
 
-        if (isReq)
+        if (seqReqStatus is { })
         {
-            HandleRequestResponseEvent (c1Control, code, values, terminating);
+            //HandleRequestResponseEvent (c1Control, code, values, terminating);
+            StringBuilder sb = new ();
+
+            foreach (ConsoleKeyInfo keyChar in cki)
+            {
+                sb.Append (keyChar.KeyChar);
+            }
+
+            lock (seqReqStatus.AnsiRequest._responseLock)
+            {
+                seqReqStatus.AnsiRequest.Response = sb.ToString ();
+                seqReqStatus.AnsiRequest.RaiseResponseFromInput (seqReqStatus.AnsiRequest, sb.ToString ());
+            }
 
             return;
         }
@@ -589,68 +615,64 @@ internal class NetEvents : IDisposable
 
     private Point _lastCursorPosition;
 
-    private void HandleRequestResponseEvent (string c1Control, string code, string [] values, string terminating)
-    {
-        switch (terminating)
-        {
-            // BUGBUG: I can't find where we send a request for cursor position (ESC[?6n), so I'm not sure if this is needed.
-            case EscSeqUtils.CSI_RequestCursorPositionReport_Terminator:
-                var point = new Point { X = int.Parse (values [1]) - 1, Y = int.Parse (values [0]) - 1 };
+    //private void HandleRequestResponseEvent (string c1Control, string code, string [] values, string terminating)
+    //{
+    //    if (terminating ==
 
-                if (_lastCursorPosition.Y != point.Y)
-                {
-                    _lastCursorPosition = point;
-                    var eventType = EventType.WindowPosition;
-                    var winPositionEv = new WindowPositionEvent { CursorPosition = point };
+    //        // BUGBUG: I can't find where we send a request for cursor position (ESC[?6n), so I'm not sure if this is needed.
+    //        // The observation is correct because the response isn't immediate and this is useless
+    //        EscSeqUtils.CSI_RequestCursorPositionReport.Terminator)
+    //    {
+    //        var point = new Point { X = int.Parse (values [1]) - 1, Y = int.Parse (values [0]) - 1 };
 
-                    _inputQueue.Enqueue (
-                                         new InputResult { EventType = eventType, WindowPositionEvent = winPositionEv }
-                                        );
-                }
-                else
-                {
-                    return;
-                }
+    //        if (_lastCursorPosition.Y != point.Y)
+    //        {
+    //            _lastCursorPosition = point;
+    //            var eventType = EventType.WindowPosition;
+    //            var winPositionEv = new WindowPositionEvent { CursorPosition = point };
 
-                break;
+    //            _inputQueue.Enqueue (
+    //                                 new InputResult { EventType = eventType, WindowPositionEvent = winPositionEv }
+    //                                );
+    //        }
+    //        else
+    //        {
+    //            return;
+    //        }
+    //    }
+    //    else if (terminating == EscSeqUtils.CSI_ReportTerminalSizeInChars.Terminator)
+    //    {
+    //        if (values [0] == EscSeqUtils.CSI_ReportTerminalSizeInChars.Value)
+    //        {
+    //            EnqueueWindowSizeEvent (
+    //                                    Math.Max (int.Parse (values [1]), 0),
+    //                                    Math.Max (int.Parse (values [2]), 0),
+    //                                    Math.Max (int.Parse (values [1]), 0),
+    //                                    Math.Max (int.Parse (values [2]), 0)
+    //                                   );
+    //        }
+    //        else
+    //        {
+    //            EnqueueRequestResponseEvent (c1Control, code, values, terminating);
+    //        }
+    //    }
+    //    else
+    //    {
+    //        EnqueueRequestResponseEvent (c1Control, code, values, terminating);
+    //    }
 
-            case EscSeqUtils.CSI_ReportTerminalSizeInChars_Terminator:
-                switch (values [0])
-                {
-                    case EscSeqUtils.CSI_ReportTerminalSizeInChars_ResponseValue:
-                        EnqueueWindowSizeEvent (
-                                                Math.Max (int.Parse (values [1]), 0),
-                                                Math.Max (int.Parse (values [2]), 0),
-                                                Math.Max (int.Parse (values [1]), 0),
-                                                Math.Max (int.Parse (values [2]), 0)
-                                               );
+    //    _inputReady.Set ();
+    //}
 
-                        break;
-                    default:
-                        EnqueueRequestResponseEvent (c1Control, code, values, terminating);
+    //private void EnqueueRequestResponseEvent (string c1Control, string code, string [] values, string terminating)
+    //{
+    //    var eventType = EventType.RequestResponse;
+    //    var requestRespEv = new RequestResponseEvent { ResultTuple = (c1Control, code, values, terminating) };
 
-                        break;
-                }
-
-                break;
-            default:
-                EnqueueRequestResponseEvent (c1Control, code, values, terminating);
-
-                break;
-        }
-
-        _inputReady.Set ();
-    }
-
-    private void EnqueueRequestResponseEvent (string c1Control, string code, string [] values, string terminating)
-    {
-        var eventType = EventType.RequestResponse;
-        var requestRespEv = new RequestResponseEvent { ResultTuple = (c1Control, code, values, terminating) };
-
-        _inputQueue.Enqueue (
-                             new InputResult { EventType = eventType, RequestResponseEvent = requestRespEv }
-                            );
-    }
+    //    _inputQueue.Enqueue (
+    //                         new InputResult { EventType = eventType, RequestResponseEvent = requestRespEv }
+    //                        );
+    //}
 
     private void HandleMouseEvent (MouseButtonState buttonState, Point pos)
     {
@@ -816,7 +838,7 @@ internal class NetDriver : ConsoleDriver
     private const int COLOR_RED = 31;
     private const int COLOR_WHITE = 37;
     private const int COLOR_YELLOW = 33;
-    private NetMainLoop _mainLoopDriver;
+    internal NetMainLoop _mainLoopDriver;
     public bool IsWinPlatform { get; private set; }
     public NetWinVTConsole NetWinConsole { get; private set; }
 
@@ -1044,6 +1066,11 @@ internal class NetDriver : ConsoleDriver
         }
 
         StopReportingMouseMoves ();
+
+        _ansiResponseTokenSource?.Cancel ();
+        _ansiResponseTokenSource?.Dispose ();
+
+        _waitAnsiResponse?.Dispose ();
 
         if (!RunningUnitTests)
         {
@@ -1377,20 +1404,104 @@ internal class NetDriver : ConsoleDriver
 
     #region Mouse Handling
 
-    public void StartReportingMouseMoves ()
+    public override bool IsReportingMouseMoves { get; internal set; }
+
+    public override void StartReportingMouseMoves ()
     {
         if (!RunningUnitTests)
         {
             Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
+
+            IsReportingMouseMoves = true;
         }
     }
 
-    public void StopReportingMouseMoves ()
+    public override void StopReportingMouseMoves ()
     {
         if (!RunningUnitTests)
         {
             Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
+
+            IsReportingMouseMoves = false;
+
+            while (_mainLoopDriver is { _netEvents: { } } && Console.KeyAvailable)
+            {
+                _mainLoopDriver._netEvents._waitForStart.Set ();
+                _mainLoopDriver._netEvents._waitForStart.Reset ();
+
+                _mainLoopDriver._netEvents._forceRead = true;
+            }
+
+            if (_mainLoopDriver is { _netEvents: { } })
+            {
+                _mainLoopDriver._netEvents._forceRead = false;
+            }
         }
+    }
+
+    private readonly ManualResetEventSlim _waitAnsiResponse = new (false);
+    private readonly CancellationTokenSource _ansiResponseTokenSource = new ();
+
+    /// <inheritdoc/>
+    public override string WriteAnsiRequest (AnsiEscapeSequenceRequest ansiRequest)
+    {
+        var response = string.Empty;
+
+        try
+        {
+            lock (ansiRequest._responseLock)
+            {
+                ansiRequest.ResponseFromInput += (s, e) =>
+                                                 {
+                                                     Debug.Assert (s == ansiRequest);
+
+                                                     ansiRequest.Response = response = e;
+
+                                                     _waitAnsiResponse.Set ();
+                                                 };
+
+                _mainLoopDriver._netEvents.EscSeqRequests.Add (ansiRequest);
+            }
+
+            if (!_ansiResponseTokenSource.IsCancellationRequested && Console.KeyAvailable)
+            {
+                _mainLoopDriver._netEvents._forceRead = true;
+
+                _mainLoopDriver._netEvents._waitForStart.Set ();
+
+                if (!_mainLoopDriver._waitForProbe.IsSet)
+                {
+                    _mainLoopDriver._waitForProbe.Set ();
+                }
+
+                _waitAnsiResponse.Wait (_ansiResponseTokenSource.Token);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            return string.Empty;
+        }
+        finally
+        {
+            if (_mainLoopDriver is { })
+            {
+                _mainLoopDriver._netEvents._forceRead = false;
+            }
+
+            if (_mainLoopDriver._netEvents.EscSeqRequests.Statuses.TryPeek (out EscSeqReqStatus request))
+            {
+                if (_mainLoopDriver._netEvents.EscSeqRequests.Statuses.Count > 0
+                    && string.IsNullOrEmpty (request.AnsiRequest.Response))
+                {
+                    // Bad request or no response at all
+                    _mainLoopDriver._netEvents.EscSeqRequests.Statuses.TryDequeue (out _);
+                }
+            }
+
+            _waitAnsiResponse.Reset ();
+        }
+
+        return response;
     }
 
     private MouseEventArgs ToDriverMouse (NetEvents.MouseEvent me)
@@ -1682,7 +1793,7 @@ internal class NetMainLoop : IMainLoopDriver
     private readonly ManualResetEventSlim _eventReady = new (false);
     private readonly CancellationTokenSource _inputHandlerTokenSource = new ();
     private readonly Queue<InputResult?> _resultQueue = new ();
-    private readonly ManualResetEventSlim _waitForProbe = new (false);
+    internal readonly ManualResetEventSlim _waitForProbe = new (false);
     private readonly CancellationTokenSource _eventReadyTokenSource = new ();
     private MainLoop _mainLoop;
 
@@ -1749,7 +1860,13 @@ internal class NetMainLoop : IMainLoopDriver
     {
         while (_resultQueue.Count > 0)
         {
-            ProcessInput?.Invoke (_resultQueue.Dequeue ().Value);
+            // Always dequeue even if it's null and invoke if isn't null
+            InputResult? dequeueResult = _resultQueue.Dequeue ();
+
+            if (dequeueResult is { })
+            {
+                ProcessInput?.Invoke (dequeueResult.Value);
+            }
         }
     }
 
@@ -1776,7 +1893,7 @@ internal class NetMainLoop : IMainLoopDriver
         {
             try
             {
-                if (!_inputHandlerTokenSource.IsCancellationRequested)
+                if (!_netEvents._forceRead && !_inputHandlerTokenSource.IsCancellationRequested)
                 {
                     _waitForProbe.Wait (_inputHandlerTokenSource.Token);
                 }
@@ -1805,10 +1922,16 @@ internal class NetMainLoop : IMainLoopDriver
                 _resultQueue.Enqueue (_netEvents.DequeueInput ());
             }
 
-            while (_resultQueue.Count > 0 && _resultQueue.Peek () is null)
+            try
             {
-                _resultQueue.Dequeue ();
+                while (_resultQueue.Count > 0 && _resultQueue.Peek () is null)
+                {
+                    // Dequeue null values
+                    _resultQueue.Dequeue ();
+                }
             }
+            catch (InvalidOperationException) // Peek can raise an exception
+            { }
 
             if (_resultQueue.Count > 0)
             {
