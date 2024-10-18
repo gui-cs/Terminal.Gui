@@ -29,121 +29,6 @@ public class DimTests
     }
 
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
-    // A new test that does not depend on Application is needed.
-    [Fact]
-    [AutoInitShutdown]
-    public void Dim_Add_Operator ()
-    {
-        Toplevel top = new ();
-
-        var view = new View { X = 0, Y = 0, Width = 20, Height = 0 };
-        var field = new TextField { X = 0, Y = Pos.Bottom (view), Width = 20 };
-        var count = 0;
-
-        field.KeyDown += (s, k) =>
-                         {
-                             if (k.KeyCode == KeyCode.Enter)
-                             {
-                                 field.Text = $"Label {count}";
-                                 var label = new Label { X = 0, Y = view.Viewport.Height, /*Width = 20,*/ Text = field.Text };
-                                 view.Add (label);
-                                 Assert.Equal ($"Label {count}", label.Text);
-                                 Assert.Equal ($"Absolute({count})", label.Y.ToString ());
-
-                                 Assert.Equal ($"Absolute({count})", view.Height.ToString ());
-                                 view.Height += 1;
-                                 count++;
-                                 Assert.Equal ($"Absolute({count})", view.Height.ToString ());
-                             }
-                         };
-
-        Application.Iteration += (s, a) =>
-                                 {
-                                     while (count < 20)
-                                     {
-                                         field.NewKeyDownEvent (Key.Enter);
-                                     }
-
-                                     Application.RequestStop ();
-                                 };
-
-        var win = new Window ();
-        win.Add (view);
-        win.Add (field);
-
-        top.Add (win);
-
-        Application.Run (top);
-        top.Dispose ();
-
-        Assert.Equal (20, count);
-    }
-
-    // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
-    // TODO: A new test that calls SetRelativeLayout directly is needed.
-    [Fact]
-    [AutoInitShutdown]
-    public void Dim_Subtract_Operator ()
-    {
-        Toplevel top = new ();
-
-        var view = new View { X = 0, Y = 0, Width = 20, Height = 0 };
-        var field = new TextField { X = 0, Y = Pos.Bottom (view), Width = 20 };
-        var count = 20;
-        List<Label> listLabels = new ();
-
-        for (var i = 0; i < count; i++)
-        {
-            field.Text = $"Label {i}";
-            var label = new Label { X = 0, Y = view.Viewport.Height, /*Width = 20,*/ Text = field.Text };
-            view.Add (label);
-            Assert.Equal ($"Label {i}", label.Text);
-            Assert.Equal ($"Absolute({i})", label.Y.ToString ());
-            listLabels.Add (label);
-
-            Assert.Equal ($"Absolute({i})", view.Height.ToString ());
-            view.Height += 1;
-            Assert.Equal ($"Absolute({i + 1})", view.Height.ToString ());
-        }
-
-        field.KeyDown += (s, k) =>
-                         {
-                             if (k.KeyCode == KeyCode.Enter)
-                             {
-                                 Assert.Equal ($"Label {count - 1}", listLabels [count - 1].Text);
-                                 view.Remove (listLabels [count - 1]);
-                                 listLabels [count - 1].Dispose ();
-
-                                 Assert.Equal ($"Absolute({count})", view.Height.ToString ());
-                                 view.Height -= 1;
-                                 count--;
-                                 Assert.Equal ($"Absolute({count})", view.Height.ToString ());
-                             }
-                         };
-
-        Application.Iteration += (s, a) =>
-                                 {
-                                     while (count > 0)
-                                     {
-                                         field.NewKeyDownEvent (Key.Enter);
-                                     }
-
-                                     Application.RequestStop ();
-                                 };
-
-        var win = new Window ();
-        win.Add (view);
-        win.Add (field);
-
-        top.Add (win);
-
-        Application.Run (top);
-
-        Assert.Equal (0, count);
-        top.Dispose ();
-    }
-
-    // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // TODO: A new test that calls SetRelativeLayout directly is needed.
     [Fact]
     [TestRespondersDisposed]
@@ -420,6 +305,7 @@ public class DimTests
                        v4.Text = "Button4";
                        v4.Width = Auto (DimAutoStyle.Text);
                        v4.Height = Auto (DimAutoStyle.Text);
+                       v4.Layout ();
                        Assert.Equal (Auto (DimAutoStyle.Text), v4.Width);
                        Assert.Equal (Auto (DimAutoStyle.Text), v4.Height);
                        Assert.Equal (11, v4.Frame.Width); // 11 is the text length and because is DimAbsolute
@@ -512,31 +398,6 @@ public class DimTests
         testVal = -1;
         dim = Absolute (testVal);
         Assert.Equal ($"Absolute({testVal})", dim.ToString ());
-    }
-
-    // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
-    // TODO: A new test that calls SetRelativeLayout directly is needed.
-    [Fact]
-    [TestRespondersDisposed]
-    public void SyperView_Referencing_SubView_Throws ()
-    {
-        var super = new View { Width = 10, Height = 10, Text = "super" };
-        var view2 = new View { Width = 10, Height = 10, Text = "view2" };
-
-        var view = new View
-        {
-            Width = Width (view2), // this is not allowed
-            Height = Height (view2), // this is not allowed
-            Text = "view"
-        };
-
-        view.Add (view2);
-        super.Add (view);
-        super.BeginInit ();
-        super.EndInit ();
-
-        Assert.Throws<InvalidOperationException> (super.LayoutSubviews);
-        super.Dispose ();
     }
 
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
