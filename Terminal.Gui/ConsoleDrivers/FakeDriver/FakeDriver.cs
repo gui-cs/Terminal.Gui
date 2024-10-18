@@ -340,7 +340,6 @@ public class FakeDriver : ConsoleDriver
     }
 
     private CursorVisibility _savedCursorVisibility;
-    private bool _isSuspendRead;
 
     private void MockKeyPressedHandler (ConsoleKeyInfo consoleKeyInfo)
     {

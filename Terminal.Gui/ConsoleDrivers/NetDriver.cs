@@ -1341,7 +1341,6 @@ internal class NetDriver : ConsoleDriver
     }
 
     private CursorVisibility? _cachedCursorVisibility;
-    private bool _isSuspendRead;
 
     public override void UpdateCursor ()
     {

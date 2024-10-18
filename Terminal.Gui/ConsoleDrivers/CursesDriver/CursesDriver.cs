@@ -18,7 +18,6 @@ internal class CursesDriver : ConsoleDriver
     private MouseFlags _lastMouseFlags;
     private UnixMainLoop _mainLoopDriver;
     private object _processInputToken;
-    private bool _isSuspendRead;
 
     public override int Cols
     {

@@ -1250,7 +1250,6 @@ internal class WindowsDriver : ConsoleDriver
     #region Cursor Handling
 
     private CursorVisibility? _cachedCursorVisibility;
-    private bool _isSuspendRead;
 
     public override void UpdateCursor ()
     {
