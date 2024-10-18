@@ -320,7 +320,7 @@ public class ToScreenTests (ITestOutputHelper output)
         view.Frame = frame;
 
         superView.Add (view);
-        superView.LayoutSubviews ();
+        superSuperView.Layout ();
 
         // Act
         var screen = view.FrameToScreen ();
@@ -884,7 +884,7 @@ public class ToScreenTests (ITestOutputHelper output)
         view.Frame = frame;
 
         superView.Add (view);
-        superView.LayoutSubviews ();
+        superView.Layout ();
 
         // Act
         var screen = view.ViewportToScreen (new Point (viewportX, 0));

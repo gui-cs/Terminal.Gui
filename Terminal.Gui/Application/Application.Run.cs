@@ -181,10 +181,11 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         if (!toplevel.IsInitialized)
         {
             toplevel.BeginInit ();
-            toplevel.EndInit ();
+            toplevel.EndInit (); // Calls Layout
 
-            // Force a layout - normally this is done each iteration of the main loop but we prime it here.
-            toplevel.Layout (Screen.Size);
+            //// Force a layout - normally this is done each iteration of the main loop but we prime it here.
+            //toplevel.SetLayoutNeeded ();
+            //toplevel.Layout (Screen.Size);
         }
 
         // Try to set initial focus to any TabStop
@@ -196,7 +197,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         // DEBATE: Should Begin call Refresh (or Draw) here? It previously did.
         //   FOR: the screen has something on it after Begin is called.
         //   AGAINST: the screen is cleared and then redrawn in RunLoop. We don't want to draw twice.
-        Refresh();
+        Refresh ();
 
         toplevel.OnLoaded ();
 
@@ -229,7 +230,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         if (mostFocused is null || !mostFocused.Visible || !mostFocused.Enabled)
         {
             CursorVisibility current = CursorVisibility.Invisible;
-            Driver?.GetCursorVisibility (out  current);
+            Driver?.GetCursorVisibility (out current);
 
             if (current != CursorVisibility.Invisible)
             {
@@ -490,8 +491,12 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// <summary>Wakes up the running application that might be waiting on input.</summary>
     public static void Wakeup () { MainLoop?.Wakeup (); }
 
-    /// <summary>Triggers a refresh of the entire display.</summary>
-    public static void Refresh ()
+    /// <summary>
+    /// Refreshes layout and the display. Only Views that need to be laid out (see <see cref="View.IsLayoutNeeded()"/>) will be laid out.
+    /// Only Views that need to be drawn (see <see cref="View.NeedsDisplay"/>) will be drawn.
+    /// </summary>
+    /// <param name="forceRedraw">If <see langword="true"/> the entire View hierarchy will be redrawn. The default is <see langword="false"/> and should only be overriden for testing.</param>
+    public static void Refresh (bool forceRedraw = false)
     {
         bool clear = false;
         foreach (Toplevel tl in TopLevels.Reverse ())
@@ -503,21 +508,21 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             }
         }
 
-        if (clear)
+        if (clear || forceRedraw)
         {
-            Driver!.ClearContents ();
+            Driver?.ClearContents ();
         }
 
         foreach (Toplevel tl in TopLevels.Reverse ())
         {
-            if (clear)
+            if (clear || forceRedraw)
             {
-                tl.SetNeedsDisplay(Screen);
+                tl.SetNeedsDisplay ();
             }
             tl.Draw ();
         }
 
-        Driver!.Refresh ();
+        Driver?.Refresh ();
     }
 
     /// <summary>This event is raised on each iteration of the main loop.</summary>

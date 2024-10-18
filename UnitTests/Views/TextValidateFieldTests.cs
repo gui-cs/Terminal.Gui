@@ -70,7 +70,7 @@ public class TextValidateField_NET_Provider_Tests
         // | Disable a previous shift up or shift down.
         // A-Alphanumeric, required. a-Alphanumeric, optional.
         var field = new TextValidateField { Provider = new NetMaskedTextProvider ("999 000 LLL >LLL |AAA aaa") };
-
+        field.Layout ();
         Assert.Equal (field.Viewport.Width, field.Provider.DisplayText.Length);
         Assert.NotEqual (field.Provider.DisplayText.Length, field.Provider.Text.Length);
         Assert.Equal (new string (' ', field.Text.Length), field.Provider.Text);

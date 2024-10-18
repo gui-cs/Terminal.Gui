@@ -38,29 +38,6 @@ public partial class View // Drawing APIs
     /// <remarks><see cref="Border"/> adds border lines to this LineCanvas.</remarks>
     public LineCanvas LineCanvas { get; } = new ();
 
-    // The view-relative region that needs to be redrawn. Marked internal for unit tests.
-    internal Rectangle _needsDisplayRect = Rectangle.Empty;
-
-    /// <summary>Gets or sets whether the view needs to be redrawn.</summary>
-    public bool NeedsDisplay
-    {
-        get => _needsDisplayRect != Rectangle.Empty;
-        set
-        {
-            if (value)
-            {
-                SetNeedsDisplay ();
-            }
-            else
-            {
-                ClearNeedsDisplay ();
-            }
-        }
-    }
-
-    /// <summary>Gets whether any Subviews need to be redrawn.</summary>
-    public bool SubViewNeedsDisplay { get; private set; }
-
     /// <summary>
     ///     Gets or sets whether this View will use it's SuperView's <see cref="LineCanvas"/> for rendering any
     ///     lines. If <see langword="true"/> the rendering of any borders drawn by this Frame will be done by its parent's
@@ -476,11 +453,6 @@ public partial class View // Drawing APIs
     /// <returns></returns>
     public virtual bool OnDrawAdornments ()
     {
-        if (!IsInitialized)
-        {
-            return false;
-        }
-
         // Each of these renders lines to either this View's LineCanvas 
         // Those lines will be finally rendered in OnRenderLineCanvas
         // QUESTION: Why are we not calling Draw here?
@@ -606,7 +578,7 @@ public partial class View // Drawing APIs
     /// <returns></returns>
     public virtual bool OnRenderLineCanvas ()
     {
-        if (!IsInitialized || Driver is null)
+        if (Driver is null)
         {
             return false;
         }
@@ -658,37 +630,72 @@ public partial class View // Drawing APIs
         return true;
     }
 
-    /// <summary>Sets the area of this view needing to be redrawn to <see cref="Viewport"/>.</summary>
+    #region NeedsDisplay
+
+    // The viewport-relative region that needs to be redrawn. Marked internal for unit tests.
+    internal Rectangle _needsDisplayRect = Rectangle.Empty;
+
+    /// <summary>Gets or sets whether the view needs to be redrawn.</summary>
+    public bool NeedsDisplay
+    {
+        get => _needsDisplayRect != Rectangle.Empty || IsLayoutNeeded ();
+        set
+        {
+            if (value)
+            {
+                SetNeedsDisplay ();
+            }
+            else
+            {
+                ClearNeedsDisplay ();
+            }
+        }
+    }
+
+    /// <summary>Gets whether any Subviews need to be redrawn.</summary>
+    public bool SubViewNeedsDisplay { get; private set; }
+
+    /// <summary>Sets that the <see cref="Viewport"/> of this View needs to be redrawn.</summary>
     /// <remarks>
     ///     If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), this method
     ///     does nothing.
     /// </remarks>
-    public void SetNeedsDisplay () { SetNeedsDisplay (Viewport); }
+    public void SetNeedsDisplay ()
+    {
+        Rectangle viewport = Viewport;
 
-    /// <summary>Expands the area of this view needing to be redrawn to include <paramref name="region"/>.</summary>
+        if (_needsDisplayRect != Rectangle.Empty && viewport.IsEmpty)
+        {
+            // This handles the case where the view has not been initialized yet
+            return;
+        }
+
+        SetNeedsDisplay (viewport);
+    }
+
+    /// <summary>Expands the area of this view needing to be redrawn to include <paramref name="viewPortRelativeRegion"/>.</summary>
     /// <remarks>
     ///     <para>
-    ///         The location of <paramref name="region"/> is relative to the View's content, bound by <c>Size.Empty</c> and
-    ///         <see cref="GetContentSize ()"/>.
+    ///         The location of <paramref name="viewPortRelativeRegion"/> is relative to the View's <see cref="Viewport"/>.
     ///     </para>
     ///     <para>
     ///         If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), the area to be
-    ///         redrawn will be the <paramref name="region"/>.
+    ///         redrawn will be the <paramref name="viewPortRelativeRegion"/>.
     ///     </para>
     /// </remarks>
-    /// <param name="region">The content-relative region that needs to be redrawn.</param>
-    public void SetNeedsDisplay (Rectangle region)
+    /// <param name="viewPortRelativeRegion">The <see cref="Viewport"/>relative region that needs to be redrawn.</param>
+    public void SetNeedsDisplay (Rectangle viewPortRelativeRegion)
     {
         if (_needsDisplayRect.IsEmpty)
         {
-            _needsDisplayRect = region;
+            _needsDisplayRect = viewPortRelativeRegion;
         }
         else
         {
-            int x = Math.Min (_needsDisplayRect.X, region.X);
-            int y = Math.Min (_needsDisplayRect.Y, region.Y);
-            int w = Math.Max (_needsDisplayRect.Width, region.Width);
-            int h = Math.Max (_needsDisplayRect.Height, region.Height);
+            int x = Math.Min (Viewport.X, viewPortRelativeRegion.X);
+            int y = Math.Min (Viewport.Y, viewPortRelativeRegion.Y);
+            int w = Math.Max (Viewport.Width, viewPortRelativeRegion.Width);
+            int h = Math.Max (Viewport.Height, viewPortRelativeRegion.Height);
             _needsDisplayRect = new (x, y, w, h);
         }
 
@@ -705,9 +712,9 @@ public partial class View // Drawing APIs
 
         foreach (View subview in Subviews)
         {
-            if (subview.Frame.IntersectsWith (region))
+            if (subview.Frame.IntersectsWith (viewPortRelativeRegion))
             {
-                Rectangle subviewRegion = Rectangle.Intersect (subview.Frame, region);
+                Rectangle subviewRegion = Rectangle.Intersect (subview.Frame, viewPortRelativeRegion);
                 subviewRegion.X -= subview.Frame.X;
                 subviewRegion.Y -= subview.Frame.Y;
                 subview.SetNeedsDisplay (subviewRegion);
@@ -746,4 +753,6 @@ public partial class View // Drawing APIs
             subview.ClearNeedsDisplay ();
         }
     }
+    #endregion NeedsDisplay
+
 }

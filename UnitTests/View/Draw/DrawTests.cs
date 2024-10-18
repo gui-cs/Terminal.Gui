@@ -7,138 +7,6 @@ namespace Terminal.Gui.ViewTests;
 [Trait ("Category", "Output")]
 public class DrawTests (ITestOutputHelper _output)
 {
-    [Fact]
-    public void NeedsDisplay_True_After_Constructor ()
-    {
-        var view = new View { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
-        Assert.True (view.NeedsDisplay);
-    }
-
-    [Fact]
-    public void NeedsDisplay_False_After_BeginInit ()
-    {
-        var view = new View { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
-        Assert.True (view.NeedsDisplay);
-
-        view.BeginInit ();
-        Assert.True (view.NeedsDisplay);
-
-        view.NeedsDisplay = false;
-
-        view.BeginInit ();
-        Assert.False (view.NeedsDisplay);
-    }
-
-    [Fact]
-    public void NeedsDisplay_False_After_EndInit ()
-    {
-        var view = new View { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
-        Assert.True (view.NeedsDisplay);
-
-        view.BeginInit ();
-        Assert.True (view.NeedsDisplay);
-
-        view.EndInit ();
-        Assert.True (view.NeedsDisplay);
-
-        view = new View { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
-        view.BeginInit ();
-        view.NeedsDisplay = false;
-        view.EndInit ();
-        Assert.False (view.NeedsDisplay);
-    }
-
-    [Fact]
-    public void NeedsDisplay_False_After_SetRelativeLayout ()
-    {
-        var view = new View { Width = 2, Height = 2 };
-        Assert.True (view.NeedsDisplay);
-
-        view.BeginInit ();
-        Assert.True (view.NeedsDisplay);
-
-        view.EndInit ();
-        Assert.True (view.NeedsDisplay);
-
-        view.SetRelativeLayout (Application.Screen.Size);
-        Assert.True (view.NeedsDisplay);
-
-        view.NeedsDisplay = false;
-        view.SetRelativeLayout (new (10, 10));
-        Assert.False (view.NeedsDisplay);
-
-        view = new View { Width = Dim.Percent(50), Height = Dim.Percent(50) };
-        View superView = new ()
-        {
-            Id = "superView",
-            Width = Dim.Fill(),
-            Height = Dim.Fill()
-        };
-        superView.Add (view);
-
-        superView.BeginInit ();
-        Assert.True (view.NeedsDisplay);
-        Assert.True (superView.NeedsDisplay);
-
-        superView.EndInit ();
-        Assert.True (view.NeedsDisplay);
-        Assert.True (superView.NeedsDisplay);
-
-        superView.SetRelativeLayout (Application.Screen.Size);
-        Assert.True (view.NeedsDisplay);
-        Assert.True (superView.NeedsDisplay);
-
-        superView.NeedsDisplay = false;
-        superView.SetRelativeLayout (new (10, 10));
-        Assert.False (superView.NeedsDisplay);
-        Assert.False (view.NeedsDisplay);
-
-        view.SetRelativeLayout (new (11, 11));
-        Assert.True (superView.NeedsDisplay);
-        Assert.True (view.NeedsDisplay);
-
-    }
-
-    [Fact]
-    public void NeedsDisplay_True_After_LayoutSubviews ()
-    {
-        var view = new View { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
-        Assert.True (view.NeedsDisplay);
-
-        view.BeginInit ();
-        Assert.True (view.NeedsDisplay);
-
-        view.EndInit ();
-        Assert.True (view.NeedsDisplay);
-
-        view.SetRelativeLayout (Application.Screen.Size);
-        Assert.True (view.NeedsDisplay);
-
-        view.LayoutSubviews ();
-        Assert.True (view.NeedsDisplay);
-    }
-
-    [Fact]
-    public void NeedsDisplay_False_After_Draw ()
-    {
-        var view = new View { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
-        Assert.True (view.NeedsDisplay);
-
-        view.BeginInit ();
-        Assert.True (view.NeedsDisplay);
-
-        view.EndInit ();
-        Assert.True (view.NeedsDisplay);
-
-        view.SetRelativeLayout (Application.Screen.Size);
-        Assert.True (view.NeedsDisplay);
-
-        view.LayoutSubviews ();
-        Assert.True (view.NeedsDisplay);
-
-        view.Draw ();
-        Assert.False (view.NeedsDisplay);
-    }
 
     [Fact]
     [SetupFakeDriver]
@@ -537,25 +405,14 @@ public class DrawTests (ITestOutputHelper _output)
     public void Draw_Minimum_Full_Border_With_Empty_Viewport ()
     {
         var view = new View { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
+        Assert.True (view.IsLayoutNeeded());
         Assert.True (view.NeedsDisplay);
-
-        view.BeginInit ();
-        Assert.True (view.NeedsDisplay);
-
-        view.EndInit ();
-        Assert.True (view.NeedsDisplay);
-
-        view.SetRelativeLayout (Application.Screen.Size);
-        Assert.True (view.NeedsDisplay);
-
-        view.LayoutSubviews ();
-        Assert.True (view.NeedsDisplay);
+        view.Layout ();
 
         Assert.Equal (new (0, 0, 2, 2), view.Frame);
         Assert.Equal (Rectangle.Empty, view.Viewport);
 
         Assert.True (view.NeedsDisplay);
-
         view.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (

@@ -18,6 +18,7 @@ public class TextTests (ITestOutputHelper output)
     {
         var view = new View ();
         view.Text = text;
+        view.Layout ();
         Assert.Equal (new (expectedW, expectedH), view.TextFormatter.ConstrainToSize);
     }
 
@@ -31,6 +32,7 @@ public class TextTests (ITestOutputHelper output)
         var view = new View ();
         view.SetContentSize (new (1, 1));
         view.Text = text;
+        view.Layout ();
         Assert.Equal (new (expectedW, expectedH), view.TextFormatter.ConstrainToSize);
     }
 
@@ -45,8 +47,7 @@ public class TextTests (ITestOutputHelper output)
         var viewY = new View { Text = "Y", Y = Pos.Bottom (label), Width = 1, Height = 1 };
 
         top.Add (label, viewX, viewY);
-        top.BeginInit ();
-        top.EndInit ();
+        top.Layout ();
 
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
 
@@ -94,7 +95,7 @@ Y
         RunState rs = Application.Begin (top);
 
         label.Text = "Hello";
-        Application.Refresh ();
+        Application.RunIteration (ref rs);
 
         Assert.Equal (new (0, 0, 1, 5), label.Frame);
 
@@ -111,7 +112,7 @@ Y
 
         label.Width = 2;
         label.Height = 10;
-        Application.Refresh ();
+        Application.RunIteration (ref rs);
 
         Assert.Equal (new (0, 0, 2, 10), label.Frame);
 
@@ -184,9 +185,7 @@ Y
         view.Text = "Hello World";
         view.Width = 11;
         view.Height = 1;
-        win.LayoutSubviews ();
-        Application.Refresh ();
-
+        Application.RunIteration (ref rs);
         Assert.Equal (new (0, 0, 11, 1), view.Frame);
         Assert.Equal ("Absolute(0)", view.X.ToString ());
         Assert.Equal ("Absolute(0)", view.Y.ToString ());
@@ -215,9 +214,8 @@ Y
 
         view.Width = Dim.Auto ();
         view.Height = Dim.Auto ();
-
         view.Text = "Hello Worlds";
-        Application.Refresh ();
+        Application.RunIteration (ref rs);
         int len = "Hello Worlds".Length;
         Assert.Equal (12, len);
         Assert.Equal (new (0, 0, len, 1), view.Frame);
@@ -243,8 +241,7 @@ Y
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
         view.TextDirection = TextDirection.TopBottom_LeftRight;
-        Application.Refresh ();
-
+        Application.RunIteration (ref rs);
         Assert.Equal (new (0, 0, 1, 12), view.Frame);
         Assert.Equal (new (0, 0, 1, 12), view.Frame);
 
@@ -271,22 +268,23 @@ Y
         // Setting to false causes Width and Height to be set to the current ContentSize
         view.Width = 1;
         view.Height = 12;
-
+        Application.RunIteration (ref rs);
         Assert.Equal (new (0, 0, 1, 12), view.Frame);
 
         view.Width = 12;
         view.Height = 1;
         view.TextFormatter.ConstrainToSize = new (12, 1);
-        win.LayoutSubviews ();
+        Application.RunIteration (ref rs);
         Assert.Equal (new (12, 1), view.TextFormatter.ConstrainToSize);
         Assert.Equal (new (0, 0, 12, 1), view.Frame);
+
         top.Clear ();
+        view.SetNeedsDisplay ();
         view.Draw ();
         expected = @" HelloWorlds";
-
         TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-        Application.Refresh ();
+        Application.RunIteration (ref rs);
 
         // TextDirection.TopBottom_LeftRight - Height of 1 and Width of 12 means 
         // that the text will be spread "vertically" across 1 line.
@@ -312,7 +310,7 @@ Y
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
         view.PreserveTrailingSpaces = true;
-        Application.Refresh ();
+        Application.RunIteration (ref rs);
 
         Assert.Equal (new (0, 0, 12, 1), view.Frame);
 
@@ -341,7 +339,7 @@ Y
         view.Width = f.Height;
         view.Height = f.Width;
         view.TextDirection = TextDirection.TopBottom_LeftRight;
-        Application.Refresh ();
+        Application.RunIteration (ref rs);
 
         Assert.Equal (new (0, 0, 1, 12), view.Frame);
 
@@ -368,7 +366,7 @@ Y
         view.Width = Dim.Auto ();
         view.Height = Dim.Auto ();
 
-        Application.Refresh ();
+        Application.RunIteration (ref rs);
 
         Assert.Equal (new (0, 0, 1, 12), view.Frame);
 
@@ -414,7 +412,7 @@ Y
         win.Add (view);
         var top = new Toplevel ();
         top.Add (win);
-        Application.Begin (top);
+        RunState rs = Application.Begin (top);
         ((FakeDriver)Application.Driver!).SetBufferSize (4, 10);
 
         Assert.Equal (5, text.Length);
@@ -445,7 +443,7 @@ Y
         Assert.Equal (10, text.Length);
 
         //view.Height = Dim.Fill () - text.Length;
-        Application.Refresh ();
+        Application.RunIteration (ref rs);
 
         Assert.Equal (new (0, 0, 1, 5), view.Frame);
         Assert.Equal (new (1, 5), view.TextFormatter.ConstrainToSize);
@@ -571,7 +569,7 @@ w ";
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
         verticalView.Text = $"最初の行{Environment.NewLine}二行目";
-        Application.Top.Draw ();
+        Application.RunIteration (ref rs);
         Assert.Equal (new (0, 3, 4, 4), verticalView.Frame);
 
         expected = @"
@@ -664,7 +662,7 @@ w ";
         Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
         verticalView.Text = "最初の行二行目";
-        Application.Top.Draw ();
+        Application.RunIteration (ref rs);
 
         // height was initialized with 8 and can only grow or keep initial value
         Assert.Equal (new (0, 3, 2, 7), verticalView.Frame);
@@ -707,16 +705,19 @@ w ";
         var top = new Toplevel ();
         top.Add (lbl);
         RunState rs = Application.Begin (top);
+        Assert.Equal (new (0, 0, 3, 1), lbl.Frame);
 
         Assert.Equal ("123 ", GetContents ());
 
         lbl.Text = "12";
+        lbl.Layout ();
 
         Assert.Equal (new (0, 0, 2, 1), lbl.Frame);
-        Assert.Equal (new (0, 0, 3, 1), lbl._needsDisplayRect);
-        Assert.Equal (new (0, 0, 0, 0), lbl.SuperView._needsDisplayRect);
+        Assert.Equal (new (0, 0, 2, 1), lbl._needsDisplayRect);
+        Assert.Equal (new (0, 0, 80, 25), lbl.SuperView._needsDisplayRect);
         Assert.True (lbl.SuperView.IsLayoutNeeded ());
-        Application.Refresh();
+        Application.RunIteration (ref rs);
+
         Assert.Equal ("12  ", GetContents ());
 
         string GetContents ()
@@ -1126,6 +1127,8 @@ w ";
             Width = Dim.Auto (DimAutoStyle.Text),
             Height = Dim.Auto (DimAutoStyle.Text)
         };
+        Assert.True (view.IsLayoutNeeded ());
+        view.Layout ();
         Assert.Equal (new (0, 0, 5, 1), view.Frame);
         Assert.Equal (new (0, 0, 5, 1), view.Viewport);
 
@@ -1166,12 +1169,7 @@ w ";
             Width = Dim.Auto (DimAutoStyle.Text),
             Height = Dim.Auto (DimAutoStyle.Text)
         };
-        Assert.Equal (new (0, 0, 1, 5), view.Frame);
-        Assert.Equal (new (0, 0, 1, 5), view.Viewport);
-
-        view.BeginInit ();
-        Assert.Equal (new (0, 0, 1, 5), view.Frame);
-        view.EndInit ();
+        view.Layout ();
         Assert.Equal (new (0, 0, 1, 5), view.Frame);
         Assert.Equal (new (0, 0, 1, 5), view.Viewport);
     }

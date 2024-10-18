@@ -4,21 +4,20 @@ namespace Terminal.Gui;
 
 public partial class View // Text Property APIs
 {
-    private string _text = null!;
+    private string _text = string.Empty;
 
     /// <summary>
     ///     Called when the <see cref="Text"/> has changed. Fires the <see cref="TextChanged"/> event.
     /// </summary>
     public void OnTextChanged () { TextChanged?.Invoke (this, EventArgs.Empty); }
 
-    // TODO: Make this non-virtual. Nobody overrides it.
     /// <summary>
     ///     Gets or sets whether trailing spaces at the end of word-wrapped lines are preserved
     ///     or not when <see cref="TextFormatter.WordWrap"/> is enabled.
     ///     If <see langword="true"/> trailing spaces at the end of wrapped lines will be removed when
     ///     <see cref="Text"/> is formatted for display. The default is <see langword="false"/>.
     /// </summary>
-    public virtual bool PreserveTrailingSpaces
+    public bool PreserveTrailingSpaces
     {
         get => TextFormatter.PreserveTrailingSpaces;
         set
@@ -27,6 +26,7 @@ public partial class View // Text Property APIs
             {
                 TextFormatter.PreserveTrailingSpaces = value;
                 TextFormatter.NeedsFormat = true;
+                SetLayoutNeeded ();
             }
         }
     }
@@ -58,6 +58,11 @@ public partial class View // Text Property APIs
         get => _text;
         set
         {
+            if (_text == value)
+            {
+                return;
+            }
+
             string old = _text;
             _text = value;
 

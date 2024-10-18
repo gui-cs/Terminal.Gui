@@ -85,7 +85,8 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             view.EndInit ();
         }
 
-        SetLayoutNeeded();
+        SetNeedsDisplay ();
+        SetLayoutNeeded ();
 
         return view;
     }

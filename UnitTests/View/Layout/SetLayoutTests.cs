@@ -117,6 +117,7 @@ public class SetLayoutTests (ITestOutputHelper output)
         superView.LayoutStarted += (sender, e) => layoutStartedRaised++;
         superView.LayoutComplete += (sender, e) => layoutCompleteRaised++;
 
+        superView.SetLayoutNeeded ();
         superView.LayoutSubviews ();
         Assert.Equal (1, layoutStartedRaised);
         Assert.Equal (1, layoutCompleteRaised);
@@ -290,96 +291,243 @@ public class SetLayoutTests (ITestOutputHelper output)
 
         superView.Dispose ();
     }
-
+    
     [Fact]
-    public void Set_X_Does_Not_Change_Frame_Until_Layout ()
+    public void Set_X_PosAbsolute_Layout_Is_Implicit ()
     {
         var v = new View ();
-        Assert.Equal (0, v.Frame.X);
-
-        v.Layout ();
+        Assert.False (v.IsLayoutNeeded ());
         Assert.Equal (0, v.Frame.X);
 
         v.X = 1;
-        Assert.Equal (0, v.Frame.X);
-
-        v.Layout ();
+        Assert.False (v.IsLayoutNeeded ());
         Assert.Equal (1, v.Frame.X);
 
         v.X = 2;
-        Assert.Equal (1, v.Frame.X);
-
-        v.Layout ();
+        Assert.False (v.IsLayoutNeeded ());
         Assert.Equal (2, v.Frame.X);
+
+        v.X = Pos.Absolute (3);
+        Assert.False (v.IsLayoutNeeded ());
+        Assert.Equal (3, v.Frame.X);
+
+        v.X = Pos.Absolute (3) + 1;
+        Assert.False (v.IsLayoutNeeded ());
+        Assert.Equal (4, v.Frame.X);
+
+        v.X = 1 + Pos.Absolute (1) + 1;
+        Assert.False (v.IsLayoutNeeded ());
+        Assert.Equal (3, v.Frame.X);
+
+    }
+
+    [Fact]
+    public void Set_X_Non_PosAbsolute_Explicit_Layout_Required ()
+    {
+        var v = new View ();
+        Assert.False (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.X);
+
+        v.X = Pos.Center ();
+        Assert.True (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.X);
+
+        v.X = Pos.Percent (50);
+        Assert.True (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.X);
+
+        v.X = Pos.Align (Alignment.Center);
+        Assert.True (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.X);
+
+        v.X = Pos.Func (() => 10);
+        Assert.True (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.X);
+
+        v.X = Pos.AnchorEnd ();
+        Assert.True (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.X);
+
+        v.X = Pos.Top (new View ());
+        Assert.True (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.X);
     }
 
 
     [Fact]
-    public void Set_Y_Does_Not_Change_Frame_Until_Layout ()
+    public void Set_Y_PosAbsolute_Layout_Is_Implicit ()
     {
         var v = new View ();
-        Assert.Equal (0, v.Frame.Y);
-
-        v.Layout ();
+        Assert.False (v.IsLayoutNeeded ());
         Assert.Equal (0, v.Frame.Y);
 
         v.Y = 1;
-        Assert.Equal (0, v.Frame.Y);
-
-        v.Layout ();
+        Assert.False (v.IsLayoutNeeded ());
         Assert.Equal (1, v.Frame.Y);
 
         v.Y = 2;
-        Assert.Equal (1, v.Frame.Y);
-
-        v.Layout ();
+        Assert.False (v.IsLayoutNeeded ());
         Assert.Equal (2, v.Frame.Y);
+
+        v.Y = Pos.Absolute (3);
+        Assert.False (v.IsLayoutNeeded ());
+        Assert.Equal (3, v.Frame.Y);
+
+        v.Y = Pos.Absolute (3) + 1;
+        Assert.False (v.IsLayoutNeeded ());
+        Assert.Equal (4, v.Frame.Y);
+
+        v.Y = 1 + Pos.Absolute (1) + 1;
+        Assert.False (v.IsLayoutNeeded ());
+        Assert.Equal (3, v.Frame.Y);
+
+    }
+
+    [Fact]
+    public void Set_Y_Non_PosAbsolute_Explicit_Layout_Required ()
+    {
+        var v = new View ();
+        Assert.False (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.Y);
+
+        v.Y = Pos.Center ();
+        Assert.True (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.Y);
+
+        v.Y = Pos.Percent (50);
+        Assert.True (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.Y);
+
+        v.Y = Pos.Align (Alignment.Center);
+        Assert.True (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.Y);
+
+        v.Y = Pos.Func (() => 10);
+        Assert.True (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.Y);
+
+        v.Y = Pos.AnchorEnd ();
+        Assert.True (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.Y);
+
+        v.Y = Pos.Top (new View ());
+        Assert.True (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.Y);
     }
 
 
     [Fact]
-    public void Set_Width_Does_Not_Change_Frame_Until_Layout ()
+    public void Set_Width_DimAbsolute_Layout_Is_Implicit ()
     {
         var v = new View ();
-        Assert.Equal (0, v.Frame.Width);
-
-        v.Layout ();
+        Assert.False (v.IsLayoutNeeded ());
         Assert.Equal (0, v.Frame.Width);
 
         v.Width = 1;
-        Assert.Equal (0, v.Frame.Width);
-
-        v.Layout ();
+        Assert.False (v.IsLayoutNeeded ());
         Assert.Equal (1, v.Frame.Width);
 
         v.Width = 2;
-        Assert.Equal (1, v.Frame.Width);
-
-        v.Layout ();
+        Assert.False (v.IsLayoutNeeded ());
         Assert.Equal (2, v.Frame.Width);
+
+        v.Width = Dim.Absolute (3);
+        Assert.False (v.IsLayoutNeeded ());
+        Assert.Equal (3, v.Frame.Width);
+
+        v.Width = Dim.Absolute (3) + 1;
+        Assert.False (v.IsLayoutNeeded ());
+        Assert.Equal (4, v.Frame.Width);
+
+        v.Width = 1 + Dim.Absolute (1) + 1;
+        Assert.False (v.IsLayoutNeeded ());
+        Assert.Equal (3, v.Frame.Width);
+
     }
 
-
     [Fact]
-    public void Set_Height_Does_Not_Change_Frame_Until_Layout ()
+    public void Set_Width_Non_DimAbsolute_Explicit_Layout_Required ()
     {
         var v = new View ();
-        Assert.Equal (0, v.Frame.Height);
+        Assert.False (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.Width);
 
-        v.Layout ();
+        v.Width = Dim.Auto();
+        Assert.True (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.Width);
+
+        v.Width = Dim.Percent (50);
+        Assert.True (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.Width);
+
+        v.Width = Dim.Fill ();
+        Assert.True (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.Width);
+
+        v.Width = Dim.Func (() => 10);
+        Assert.True (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.Width);
+
+        v.Width = Dim.Width(new View ());
+        Assert.True (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.Width);
+    }
+
+    [Fact]
+    public void Set_Height_DimAbsolute_Layout_Is_Implicit ()
+    {
+        var v = new View ();
+        Assert.False (v.IsLayoutNeeded ());
         Assert.Equal (0, v.Frame.Height);
 
         v.Height = 1;
-        Assert.Equal (0, v.Frame.Height);
-
-        v.Layout ();
+        Assert.False (v.IsLayoutNeeded ());
         Assert.Equal (1, v.Frame.Height);
 
         v.Height = 2;
-        Assert.Equal (1, v.Frame.Height);
-
-        v.Layout ();
+        Assert.False (v.IsLayoutNeeded ());
         Assert.Equal (2, v.Frame.Height);
+
+        v.Height = Dim.Absolute (3);
+        Assert.False (v.IsLayoutNeeded ());
+        Assert.Equal (3, v.Frame.Height);
+
+        v.Height = Dim.Absolute (3) + 1;
+        Assert.False (v.IsLayoutNeeded ());
+        Assert.Equal (4, v.Frame.Height);
+
+        v.Height = 1 + Dim.Absolute (1) + 1;
+        Assert.False (v.IsLayoutNeeded ());
+        Assert.Equal (3, v.Frame.Height);
+
+    }
+
+    [Fact]
+    public void Set_Height_Non_DimAbsolute_Explicit_Layout_Required ()
+    {
+        var v = new View ();
+        Assert.False (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.Height);
+
+        v.Height = Dim.Auto ();
+        Assert.True (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.Height);
+
+        v.Height = Dim.Percent (50);
+        Assert.True (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.Height);
+
+        v.Height = Dim.Fill ();
+        Assert.True (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.Height);
+
+        v.Height = Dim.Func (() => 10);
+        Assert.True (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.Height);
+
+        v.Height = Dim.Height (new View ());
+        Assert.True (v.IsLayoutNeeded ());
+        Assert.Equal (0, v.Frame.Height);
     }
 
     [Fact]

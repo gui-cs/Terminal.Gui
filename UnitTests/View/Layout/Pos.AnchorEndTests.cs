@@ -47,14 +47,14 @@ public class PosAnchorEndTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void  PosAnchorEnd_CreatesCorrectInstance ()
+    public void PosAnchorEnd_CreatesCorrectInstance ()
     {
         var pos = Pos.AnchorEnd (10);
         Assert.IsType<PosAnchorEnd> (pos);
     }
 
     [Fact]
-    public void  PosAnchorEnd_Negative_Throws ()
+    public void PosAnchorEnd_Negative_Throws ()
     {
         Pos pos;
         int n = -1;
@@ -64,7 +64,7 @@ public class PosAnchorEndTests (ITestOutputHelper output)
     [Theory]
     [InlineData (0)]
     [InlineData (1)]
-    public void  PosAnchorEnd_SetsValue_GetAnchor_Is_Negative (int offset)
+    public void PosAnchorEnd_SetsValue_GetAnchor_Is_Negative (int offset)
     {
         Pos pos = Pos.AnchorEnd (offset);
         Assert.Equal (offset, -pos.GetAnchor (0));
@@ -78,7 +78,7 @@ public class PosAnchorEndTests (ITestOutputHelper output)
     [InlineData (20, 10, 5)]
     [InlineData (25, 10, 0)]
     [InlineData (26, 10, -1)]
-    public void  PosAnchorEnd_With_Offset_PositionsViewOffsetFromRight (int offset, int width, int expectedXPosition)
+    public void PosAnchorEnd_With_Offset_PositionsViewOffsetFromRight (int offset, int width, int expectedXPosition)
     {
         // Arrange
         var superView = new View { Width = 25, Height = 25 };
@@ -102,7 +102,7 @@ public class PosAnchorEndTests (ITestOutputHelper output)
     // UseDimForOffset tests
 
     [Fact]
-    public void  PosAnchorEnd_UseDimForOffset_CreatesCorrectInstance ()
+    public void PosAnchorEnd_UseDimForOffset_CreatesCorrectInstance ()
     {
         var pos = Pos.AnchorEnd ();
         Assert.IsType<PosAnchorEnd> (pos);
@@ -110,7 +110,7 @@ public class PosAnchorEndTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void  PosAnchorEnd_UseDimForOffset_SetsValue_GetAnchor_Is_Negative ()
+    public void PosAnchorEnd_UseDimForOffset_SetsValue_GetAnchor_Is_Negative ()
     {
         Pos pos = Pos.AnchorEnd ();
         Assert.Equal (-10, -pos.GetAnchor (10));
@@ -123,7 +123,7 @@ public class PosAnchorEndTests (ITestOutputHelper output)
     [InlineData (11, 14)]
     [InlineData (25, 0)]
     [InlineData (26, -1)]
-    public void  PosAnchorEnd_UseDimForOffset_PositionsViewOffsetByDim (int dim, int expectedXPosition)
+    public void PosAnchorEnd_UseDimForOffset_PositionsViewOffsetByDim (int dim, int expectedXPosition)
     {
         // Arrange
         var superView = new View { Width = 25, Height = 25 };
@@ -149,14 +149,14 @@ public class PosAnchorEndTests (ITestOutputHelper output)
     [InlineData (10, 23)]
     [InlineData (50, 13)]
     [InlineData (100, 0)]
-    public void  PosAnchorEnd_UseDimForOffset_DimPercent_PositionsViewOffsetByDim (int percent, int expectedXPosition)
+    public void PosAnchorEnd_UseDimForOffset_DimPercent_PositionsViewOffsetByDim (int percent, int expectedXPosition)
     {
         // Arrange
         var superView = new View { Width = 25, Height = 25 };
         var view = new View
         {
             X = Pos.AnchorEnd (),
-            Width = Dim.Percent ( percent),
+            Width = Dim.Percent (percent),
             Height = 1
         };
         superView.Add (view);
@@ -173,13 +173,13 @@ public class PosAnchorEndTests (ITestOutputHelper output)
     // This test used to be Dialog_In_Window_With_TextField_And_Button_AnchorEnd in DialogTests.
     [Fact]
     [SetupFakeDriver]
-    public void  PosAnchorEnd_View_And_Button ()
+    public void PosAnchorEnd_View_And_Button ()
     {
         ((FakeDriver)Application.Driver!).SetBufferSize (20, 5);
 
         // Override CM
         Button.DefaultShadow = ShadowStyle.None;
-        
+
         var b = $"{CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket}";
 
         var frame = new FrameView { Width = 18, Height = 3 };
@@ -203,9 +203,9 @@ public class PosAnchorEndTests (ITestOutputHelper output)
         };
 
         frame.Add (btn, view);
-        frame.BeginInit ();
-        frame.EndInit ();
-        frame.Draw ();
+        frame.BeginInit(); // Needed to enable Border
+        frame.EndInit();
+        frame.Layout ();
 
         Assert.Equal (6, btn.Viewport.Width);
         Assert.Equal (10, btn.Frame.X); // frame.Viewport.Width (16) - btn.Frame.Width (6) = 10
@@ -219,6 +219,7 @@ public class PosAnchorEndTests (ITestOutputHelper output)
         Assert.Equal (9, view.Frame.Width);
         Assert.Equal (1, view.Frame.Height);
 
+        frame.Draw ();
         var expected = $@"
 ┌────────────────┐
 │012345678 {b}│
@@ -232,7 +233,7 @@ public class PosAnchorEndTests (ITestOutputHelper output)
     // TODO: A new test that calls SetRelativeLayout directly is needed.
     [Fact]
     [AutoInitShutdown]
-    public void  PosAnchorEnd_Equal_Inside_Window ()
+    public void PosAnchorEnd_Equal_Inside_Window ()
     {
         var viewWidth = 10;
         var viewHeight = 1;

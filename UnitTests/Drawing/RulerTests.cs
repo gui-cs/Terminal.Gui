@@ -67,6 +67,7 @@ public class RulerTests
                                                      );
 
         // Postive offset
+        top.SetNeedsDisplay ();
         Application.Refresh ();
         r.Draw (new (1, 1));
 
@@ -81,6 +82,7 @@ public class RulerTests
                                                      );
 
         // Negative offset
+        top.SetNeedsDisplay ();
         Application.Refresh ();
         r.Draw (new (-1, 1));
 
@@ -95,6 +97,7 @@ public class RulerTests
                                                      );
 
         // Clip
+        top.SetNeedsDisplay ();
         Application.Refresh ();
         r.Draw (new (10, 1));
 
@@ -140,7 +143,7 @@ public class RulerTests
                                                       _output
                                                      );
 
-        Application.Refresh ();
+        Application.Refresh (true);
         r.Length = len;
         r.Draw (new (1, 0), 1);
 
@@ -202,7 +205,7 @@ public class RulerTests
                                                      );
 
         // Postive offset
-        Application.Refresh ();
+        Application.Refresh (true);
         r.Draw (new (1, 1));
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -231,7 +234,7 @@ public class RulerTests
                                                      );
 
         // Negative offset
-        Application.Refresh ();
+        Application.Refresh (true);
         r.Draw (new (1, -1));
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -260,7 +263,7 @@ public class RulerTests
                                                      );
 
         // Clip
-        Application.Refresh ();
+        Application.Refresh (true);
         r.Draw (new (1, 10));
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -335,7 +338,7 @@ public class RulerTests
                                                       _output
                                                      );
 
-        Application.Refresh ();
+        Application.Refresh (true);
         r.Length = len;
         r.Draw (new (0, 1), 1);
 

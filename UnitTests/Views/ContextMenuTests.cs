@@ -205,11 +205,11 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                      );
 
         // Don't use Dialog here as it has more layout logic. Use Window instead.
-        var dialog = new Window { X = 2, Y = 2, Width = 15, Height = 4 };
-        dialog.Add (new TextField { X = Pos.Center (), Width = 10, Text = "Test" });
-        RunState rsDialog = Application.Begin (dialog);
+        var testWindow = new Window { X = 2, Y = 2, Width = 15, Height = 4 };
+        testWindow.Add (new TextField { X = Pos.Center (), Width = 10, Text = "Test" });
+        RunState rsDialog = Application.Begin (testWindow);
 
-        Assert.Equal (new Rectangle (2, 2, 15, 4), dialog.Frame);
+        Assert.Equal (new Rectangle (2, 2, 15, 4), testWindow.Frame);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -233,8 +233,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (9, 3), Flags = MouseFlags.Button3Clicked });
 
-        var firstIteration = false;
-        Application.RunIteration (ref rsDialog, firstIteration);
+        Application.RunIteration (ref rsDialog);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -508,10 +507,10 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.Equal (new Point (-1, -2), cm.Position);
 
         Toplevel top = new ();
-        Application.Begin (top);
+        RunState rs = Application.Begin (top);
 
         cm.Show (menuItems);
-        Application.Refresh ();
+        Application.RunIteration (ref rs);
 
         Assert.Equal (new Point (-1, -2), cm.Position);
 
@@ -535,7 +534,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                         new MouseEventArgs { Position = new (0, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                        )
                     );
-        Application.Refresh ();
+        Application.RunIteration (ref rs);
         Assert.Equal (new Point (-1, -2), cm.Position);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -560,7 +559,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         ((FakeDriver)Application.Driver!).SetBufferSize (40, 20);
         cm.Position = new Point (41, -2);
         cm.Show (menuItems);
-        Application.Refresh ();
+        Application.RunIteration (ref rs);
         Assert.Equal (new Point (41, -2), cm.Position);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -583,7 +582,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                         new MouseEventArgs { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                        )
                     );
-        Application.Refresh ();
+        Application.RunIteration (ref rs);
         Assert.Equal (new Point (41, -2), cm.Position);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -607,7 +606,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         cm.Position = new Point (41, 9);
         cm.Show (menuItems);
-        Application.Refresh ();
+        Application.RunIteration (ref rs);
         Assert.Equal (new Point (41, 9), cm.Position);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -630,7 +629,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                         new MouseEventArgs { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                        )
                     );
-        Application.Refresh ();
+        Application.RunIteration (ref rs);
         Assert.Equal (new Point (41, 9), cm.Position);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -651,7 +650,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         cm.Position = new Point (41, 22);
         cm.Show (menuItems);
-        Application.Refresh ();
+        Application.RunIteration (ref rs);
         Assert.Equal (new Point (41, 22), cm.Position);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -674,7 +673,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                         new MouseEventArgs { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                        )
                     );
-        Application.Refresh ();
+        Application.RunIteration (ref rs);
         Assert.Equal (new Point (41, 22), cm.Position);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -695,7 +694,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         ((FakeDriver)Application.Driver!).SetBufferSize (18, 8);
         cm.Position = new Point (19, 10);
         cm.Show (menuItems);
-        Application.Refresh ();
+        Application.RunIteration (ref rs);
         Assert.Equal (new Point (19, 10), cm.Position);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -718,7 +717,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                         new MouseEventArgs { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
                                        )
                     );
-        Application.Refresh ();
+        Application.RunIteration (ref rs);
         Assert.Equal (new Point (19, 10), cm.Position);
 
         TestHelpers.AssertDriverContentsWithFrameAre (

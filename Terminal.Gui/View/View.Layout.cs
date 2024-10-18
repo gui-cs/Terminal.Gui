@@ -214,6 +214,9 @@ public partial class View // Layout APIs
                 _y = _frame.Y;
                 _width = _frame.Width;
                 _height = _frame.Height;
+
+                // Implicit layout is ok here because we are setting the Frame directly.
+                Layout ();
             }
         }
     }
@@ -242,6 +245,7 @@ public partial class View // Layout APIs
 
         SetAdornmentFrames ();
 
+        SetNeedsDisplay ();
         SetLayoutNeeded ();
 
         // BUGBUG: When SetFrame is called from Frame_set, this event gets raised BEFORE OnResizeNeeded. Is that OK?
@@ -347,7 +351,18 @@ public partial class View // Layout APIs
             _x = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (X)} cannot be null");
 
             SetLayoutNeeded ();
+
+            if (IsAbsoluteLayout())
+            {
+                // Implicit layout is ok here because all Pos/Dim are Absolute values.
+                Layout ();
+            }
         }
+    }
+
+    private bool IsAbsoluteLayout ()
+    {
+        return _x is PosAbsolute && _y is PosAbsolute && _width is DimAbsolute && _height is DimAbsolute;
     }
 
     private Pos _y = Pos.Absolute (0);
@@ -390,6 +405,12 @@ public partial class View // Layout APIs
             _y = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Y)} cannot be null");
 
             SetLayoutNeeded ();
+
+            if (IsAbsoluteLayout ())
+            {
+                // Implicit layout is ok here because all Pos/Dim are Absolute values.
+                Layout ();
+            }
         }
     }
 
@@ -443,6 +464,12 @@ public partial class View // Layout APIs
             TextFormatter.ConstrainToHeight = null;
 
             SetLayoutNeeded ();
+
+            if (IsAbsoluteLayout ())
+            {
+                // Implicit layout is ok here because all Pos/Dim are Absolute values.
+                Layout ();
+            }
         }
     }
 
@@ -496,6 +523,12 @@ public partial class View // Layout APIs
             TextFormatter.ConstrainToWidth = null;
 
             SetLayoutNeeded ();
+
+            if (IsAbsoluteLayout ())
+            {
+                // Implicit layout is ok here because all Pos/Dim are Absolute values.
+                Layout ();
+            }
         }
     }
 
@@ -743,7 +776,7 @@ public partial class View // Layout APIs
     /// <summary>
     ///     Performs layout of the view and its subviews using the content size of either the <see cref="SuperView"/> or <see cref="Application.Screen"/>.
     /// </summary>
-    /// <returns><see langword="false"/>If the view could not be laid out (typically because a dependencies was not ready). </returns>
+    /// <returns><see langword="false"/>If the view could not be laid out (typically because dependency was not ready). </returns>
     public bool Layout ()
     {
         return Layout (GetBestGuessSuperViewContentSize ());
@@ -763,7 +796,7 @@ public partial class View // Layout APIs
 
 
     // We expose no setter for this to ensure that the ONLY place it's changed is in SetNeedsLayout
-    private bool _layoutNeeded = true;
+    private bool _layoutNeeded = false;
 
     /// <summary>
     ///     Indicates the View's Frame or the layout of the View's subviews (including Adornments) have

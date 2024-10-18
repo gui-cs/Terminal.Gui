@@ -57,7 +57,6 @@ public class Adornment : View
             {
                 Parent?.SetAdornmentFrames ();
                 Parent?.SetLayoutNeeded ();
-                //Parent?.LayoutSubviews ();
 
                 OnThicknessChanged ();
             }

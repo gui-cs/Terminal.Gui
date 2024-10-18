@@ -308,7 +308,7 @@ At 0,0
         view.Height = 1;
         Assert.Equal (new (3, 3, 10, 1), view.Frame);
         Assert.Equal (new (0, 0, 10, 1), view.Viewport);
-        Assert.Equal (new (0, 0, 30, 2), view._needsDisplayRect);
+        Assert.Equal (new (0, 0, 10, 1), view._needsDisplayRect);
         top.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -340,8 +340,6 @@ At 0,0
         Toplevel top = new ();
         top.Add (label, view);
         RunState runState = Application.Begin (top);
-
-        top.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -403,7 +401,7 @@ At 0,0
         view.Height = 1;
         Assert.Equal (new (1, 1, 10, 1), view.Frame);
         Assert.Equal (new (0, 0, 10, 1), view.Viewport);
-        Assert.Equal (new (0, 0, 30, 2), view._needsDisplayRect);
+        Assert.Equal (new (0, 0, 10, 1), view._needsDisplayRect);
         top.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -557,8 +555,6 @@ At 0,0
         top.Add (label, view);
         RunState runState = Application.Begin (top);
 
-        view.Draw ();
-
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 At 0,0                       
@@ -620,7 +616,7 @@ At 0,0
         view.Height = 1;
         Assert.Equal (new (3, 3, 10, 1), view.Frame);
         Assert.Equal (new (0, 0, 10, 1), view.Viewport);
-        Assert.Equal (new (0, 0, 30, 2), view._needsDisplayRect);
+        Assert.Equal (new (0, 0, 10, 1), view._needsDisplayRect);
         view.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -652,8 +648,6 @@ At 0,0
         Toplevel top = new ();
         top.Add (label, view);
         RunState runState = Application.Begin (top);
-
-        view.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -717,7 +711,7 @@ At 0,0
         view.Height = 1;
         Assert.Equal (new (1, 1, 10, 1), view.Frame);
         Assert.Equal (new (0, 0, 10, 1), view.Viewport);
-        Assert.Equal (new (0, 0, 30, 2), view._needsDisplayRect);
+        Assert.Equal (new (0, 0, 10, 1), view._needsDisplayRect);
         view.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -1010,6 +1004,7 @@ At 0,0
 
         view.Width = Dim.Auto ();
         view.Height = Dim.Auto ();
+        Application.RunIteration (ref rs);
         Assert.Equal ("Testing visibility.".Length, view.Frame.Width);
         Assert.True (view.Visible);
         ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);

@@ -86,8 +86,7 @@ public class PosCombineTests (ITestOutputHelper output)
         win2.Add (view2);
         win1.Add (view1, win2);
         Application.Top.Add (win1);
-        Application.Top.BeginInit ();
-        Application.Top.EndInit ();
+        Application.Top.Layout ();
 
         Assert.Equal (new Rectangle (0, 0, 80, 25), Application.Top.Frame);
         Assert.Equal (new Rectangle (0, 0, 5, 1), view1.Frame);

@@ -144,7 +144,6 @@ public partial class View : Responder, ISupportInitializeNotification
         //SetupMouse ();
 
         SetupText ();
-
     }
 
     /// <summary>

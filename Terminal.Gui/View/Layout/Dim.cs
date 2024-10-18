@@ -22,6 +22,14 @@ using System.Numerics;
 ///             </listheader>
 ///             <item>
 ///                 <term>
+///                     <see cref="Dim.Absolute"/>
+///                 </term>
+///                 <description>
+///                     Creates a <see cref="Dim"/> that is a fixed size.
+///                 </description>
+///             </item>
+///             <item>
+///                 <term>
 ///                     <see cref="Dim.Auto"/>
 ///                 </term>
 ///                 <description>

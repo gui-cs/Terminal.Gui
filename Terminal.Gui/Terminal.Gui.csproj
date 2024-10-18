@@ -109,6 +109,9 @@
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Views\Scroll\" />
+  </ItemGroup>
   <!-- =================================================================== -->
   <!-- Nuget  -->
   <!-- =================================================================== -->
@@ -143,9 +146,7 @@
   </PropertyGroup>
   <ProjectExtensions><VisualStudio><UserProperties resources_4config_1json__JsonSchema="../../docfx/schemas/tui-config-schema.json" /></VisualStudio></ProjectExtensions>
 
-  <Target Name="CopyNuGetPackagesToLocalPackagesFolder"
-          AfterTargets="Pack"
-          Condition="'$(Configuration)' == 'Release'">
+  <Target Name="CopyNuGetPackagesToLocalPackagesFolder" AfterTargets="Pack" Condition="'$(Configuration)' == 'Release'">
       <PropertyGroup>
           <!-- Define the path for local_packages relative to the project directory -->
           <LocalPackagesPath>$(MSBuildThisFileDirectory)..\local_packages\</LocalPackagesPath>
@@ -166,10 +167,7 @@
       <Message Text="Found packages: @(NuGetPackages)" Importance="high" />
 
       <!-- Copy files only if found -->
-      <Copy SourceFiles="@(NuGetPackages)"
-            DestinationFolder="$(LocalPackagesPath)"
-            SkipUnchangedFiles="false"
-            Condition="@(NuGetPackages) != ''" />
+      <Copy SourceFiles="@(NuGetPackages)" DestinationFolder="$(LocalPackagesPath)" SkipUnchangedFiles="false" Condition="@(NuGetPackages) != ''" />
 
       <!-- Log success -->
       <Message Text="Copy completed successfully." Importance="high" />

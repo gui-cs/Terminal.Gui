@@ -134,9 +134,23 @@ public partial class View // Adornments
         get => Border?.LineStyle ?? LineStyle.Single;
         set
         {
+            if (Border is null)
+            {
+                return;
+            }
+
             LineStyle old = Border?.LineStyle ?? LineStyle.None;
             CancelEventArgs<LineStyle> e = new (ref old, ref value);
-            OnBorderStyleChanging (e);
+
+            if (OnBorderStyleChanging (e)|| e.Cancel)
+            {
+                return;
+            }
+
+            SetBorderStyle (e.NewValue);
+            SetAdornmentFrames ();
+            SetLayoutNeeded ();
+
         }
     }
 
@@ -148,23 +162,16 @@ public partial class View // Adornments
     ///     Override <see cref="SetBorderStyle"/> to prevent the <see cref="BorderStyle"/> from changing.
     /// </remarks>
     /// <param name="e"></param>
-    protected void OnBorderStyleChanging (CancelEventArgs<LineStyle> e)
+    protected virtual bool OnBorderStyleChanging (CancelEventArgs<LineStyle> e)
     {
         if (Border is null)
         {
-            return;
+            return false;
         }
 
         BorderStyleChanging?.Invoke (this, e);
 
-        if (e.Cancel)
-        {
-            return;
-        }
-
-        SetBorderStyle (e.NewValue);
-        SetAdornmentFrames ();
-        SetLayoutNeeded ();
+        return e.Cancel;
     }
 
     /// <summary>
@@ -257,8 +264,8 @@ public partial class View // Adornments
             return; // CreateAdornments () has not been called yet
         }
 
-        Margin.SetFrame (Rectangle.Empty with { Size = Frame.Size });
-        Border.SetFrame (Margin.Thickness.GetInside (Margin.Frame));
-        Padding.SetFrame (Border.Thickness.GetInside (Border.Frame));
+        Margin.Frame = Rectangle.Empty with { Size = Frame.Size };
+        Border.Frame = Margin.Thickness.GetInside (Margin.Frame);
+        Padding.Frame = Border.Thickness.GetInside (Border.Frame);
     }
 }

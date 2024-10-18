@@ -110,6 +110,18 @@ public class AdornmentTests (ITestOutputHelper output)
     }
 
     [Fact]
+    public void SetAdornmentFrames_Sets_Frames_Correctly ()
+    {
+        var parent = new View { X = 1, Y = 2, Width = 10, Height = 20 };
+        parent.SetAdornmentFrames();
+
+        Assert.Equal (new Rectangle (1, 2, 10, 20), parent.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 20), parent.Viewport);
+        Assert.Equal (new Rectangle (0, 0, 10, 20), parent.Margin.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 20), parent.Margin.Viewport);
+    }
+
+    [Fact]
     public void Frames_are_Parent_SuperView_Relative ()
     {
         var view = new View
