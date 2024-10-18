@@ -567,11 +567,6 @@ public abstract class ConsoleDriver
     /// </summary>
     public abstract bool IsReportingMouseMoves { get; internal set; }
 
-    /// <summary>
-    /// Gets whether the terminal is reading input.
-    /// </summary>
-    public abstract bool IsSuspendRead { get; internal set; }
-
     /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="KeyUp"/>.</summary>
     public event EventHandler<Key>? KeyDown;
 
@@ -619,17 +614,17 @@ public abstract class ConsoleDriver
     public abstract void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
 
     /// <summary>
-    /// Provide handling for the terminal start reporting mouse events.
+    ///     Provide handling for the terminal start reporting mouse events.
     /// </summary>
     public abstract void StartReportingMouseMoves ();
 
     /// <summary>
-    /// Provide handling for the terminal stop reporting mouse events.
+    ///     Provide handling for the terminal stop reporting mouse events.
     /// </summary>
     public abstract void StopReportingMouseMoves ();
 
     /// <summary>
-    /// Provide handling for the terminal write ANSI escape sequence request.
+    ///     Provide handling for the terminal write ANSI escape sequence request.
     /// </summary>
     /// <param name="ansiRequest">The <see cref="AnsiEscapeSequenceRequest"/> object.</param>
     /// <returns>The request response.</returns>

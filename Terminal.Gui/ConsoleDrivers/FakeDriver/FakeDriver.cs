@@ -41,18 +41,7 @@ public class FakeDriver : ConsoleDriver
     public override bool SupportsTrueColor => false;
 
     /// <inheritdoc />
-    public override bool IsReportingMouseMoves
-    {
-        get => _isReportingMouseMoves;
-        internal set => _isReportingMouseMoves = value;
-    }
-
-    /// <inheritdoc />
-    public override bool IsSuspendRead
-    {
-        get => _isSuspendRead;
-        internal set => _isSuspendRead = value;
-    }
+    public override bool IsReportingMouseMoves { get; internal set; }
 
     public FakeDriver ()
     {
@@ -351,7 +340,6 @@ public class FakeDriver : ConsoleDriver
     }
 
     private CursorVisibility _savedCursorVisibility;
-    private bool _isReportingMouseMoves;
     private bool _isSuspendRead;
 
     private void MockKeyPressedHandler (ConsoleKeyInfo consoleKeyInfo)

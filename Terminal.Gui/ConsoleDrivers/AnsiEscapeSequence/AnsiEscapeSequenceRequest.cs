@@ -74,8 +74,6 @@ public class AnsiEscapeSequenceRequest
                 driver.StopReportingMouseMoves ();
             }
 
-            driver!.IsSuspendRead = true;
-
             // Send the ANSI escape sequence
             ansiRequest.Response = driver.WriteAnsiRequest (ansiRequest);
 
@@ -107,7 +105,6 @@ public class AnsiEscapeSequenceRequest
 
             if (savedIsReportingMouseMoves)
             {
-                driver!.IsSuspendRead = false;
                 driver.StartReportingMouseMoves ();
             }
         }

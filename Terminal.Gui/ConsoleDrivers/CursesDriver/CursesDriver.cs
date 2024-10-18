@@ -180,13 +180,6 @@ internal class CursesDriver : ConsoleDriver
 
     public override bool IsReportingMouseMoves { get; internal set; }
 
-    /// <inheritdoc />
-    public override bool IsSuspendRead
-    {
-        get => _isSuspendRead;
-        internal set => _isSuspendRead = value;
-    }
-
     public override void StartReportingMouseMoves ()
     {
         if (!RunningUnitTests)
