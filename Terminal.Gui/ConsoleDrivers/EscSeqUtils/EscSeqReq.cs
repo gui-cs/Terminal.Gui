@@ -77,7 +77,12 @@ public class EscSeqRequests
     {
         lock (Statuses)
         {
-            Statuses.Dequeue ();
+            Statuses.TryDequeue (out var request);
+
+            if (request != seqReqStatus)
+            {
+                throw new InvalidOperationException ("Both EscSeqReqStatus objects aren't equals.");
+            }
         }
     }
 

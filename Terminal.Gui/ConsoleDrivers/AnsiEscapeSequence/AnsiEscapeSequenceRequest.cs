@@ -8,6 +8,8 @@ namespace Terminal.Gui;
 /// </summary>
 public class AnsiEscapeSequenceRequest
 {
+    internal readonly object _responseLock = new (); // Per-instance lock
+
     /// <summary>
     ///     Request to send e.g. see
     ///     <see>
@@ -89,12 +91,14 @@ public class AnsiEscapeSequenceRequest
 
             if (!ansiRequest.Response.EndsWith (ansiRequest.Terminator [^1]))
             {
-                throw new InvalidOperationException ($"Terminator doesn't ends with: '{ansiRequest.Terminator [^1]}'");
+                char resp = string.IsNullOrEmpty (ansiRequest.Response) ? ' ' : ansiRequest.Response.Last ();
+
+                throw new InvalidOperationException ($"Terminator ends with '{resp}'\nand doesn't end with: '{ansiRequest.Terminator [^1]}'");
             }
         }
         catch (Exception ex)
         {
-            error.AppendLine ($"Error executing ANSI request: {ex.Message}");
+            error.AppendLine ($"Error executing ANSI request:\n{ansiRequest.Response}\n{ex.Message}");
         }
         finally
         {
@@ -105,7 +109,7 @@ public class AnsiEscapeSequenceRequest
 
             if (savedIsReportingMouseMoves)
             {
-                driver.StartReportingMouseMoves ();
+                driver?.StartReportingMouseMoves ();
             }
         }
 
@@ -132,4 +136,8 @@ public class AnsiEscapeSequenceRequest
     ///     different value.
     /// </summary>
     public string? Value { get; init; }
+
+    internal void RaiseResponseFromInput (AnsiEscapeSequenceRequest ansiRequest, string response) { ResponseFromInput?.Invoke (ansiRequest, response); }
+
+    internal event EventHandler<string>? ResponseFromInput;
 }

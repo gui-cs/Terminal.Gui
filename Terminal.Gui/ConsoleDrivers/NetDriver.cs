@@ -2,6 +2,7 @@
 // NetDriver.cs: The System.Console-based .NET driver, works on Windows and Unix, but is not particularly efficient.
 //
 
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
@@ -275,17 +276,29 @@ internal class NetEvents : IDisposable
                         }
 
                         _isEscSeq = true;
-                        newConsoleKeyInfo = consoleKeyInfo;
-                        _cki = EscSeqUtils.ResizeArray (consoleKeyInfo, _cki);
 
-                        if (Console.KeyAvailable)
+                        if (consoleKeyInfo.KeyChar != Key.Esc && consoleKeyInfo.KeyChar <= Key.Space)
                         {
-                            continue;
-                        }
+                            ProcessRequestResponse (ref newConsoleKeyInfo, ref key, _cki, ref mod);
+                            _cki = null;
+                            _isEscSeq = false;
 
-                        ProcessRequestResponse (ref newConsoleKeyInfo, ref key, _cki, ref mod);
-                        _cki = null;
-                        _isEscSeq = false;
+                            ProcessMapConsoleKeyInfo (consoleKeyInfo);
+                        }
+                        else
+                        {
+                            newConsoleKeyInfo = consoleKeyInfo;
+                            _cki = EscSeqUtils.ResizeArray (consoleKeyInfo, _cki);
+
+                            if (Console.KeyAvailable)
+                            {
+                                continue;
+                            }
+
+                            ProcessRequestResponse (ref newConsoleKeyInfo, ref key, _cki, ref mod);
+                            _cki = null;
+                            _isEscSeq = false;
+                        }
 
                         break;
                     }
@@ -454,9 +467,11 @@ internal class NetEvents : IDisposable
                 sb.Append (keyChar.KeyChar);
             }
 
-            seqReqStatus.AnsiRequest.Response = sb.ToString ();
-
-            ((NetDriver)_consoleDriver)._waitAnsiResponse.Set ();
+            lock (seqReqStatus.AnsiRequest._responseLock)
+            {
+                seqReqStatus.AnsiRequest.Response = sb.ToString ();
+                seqReqStatus.AnsiRequest.RaiseResponseFromInput (seqReqStatus.AnsiRequest, sb.ToString ());
+            }
 
             return;
         }
@@ -1424,21 +1439,40 @@ internal class NetDriver : ConsoleDriver
         }
     }
 
-    internal ManualResetEventSlim _waitAnsiResponse = new (false);
+    private readonly ManualResetEventSlim _waitAnsiResponse = new (false);
     private readonly CancellationTokenSource _ansiResponseTokenSource = new ();
 
     /// <inheritdoc/>
     public override string WriteAnsiRequest (AnsiEscapeSequenceRequest ansiRequest)
     {
-        _mainLoopDriver._netEvents.EscSeqRequests.Add (ansiRequest);
+        var response = string.Empty;
 
         try
         {
+            lock (ansiRequest._responseLock)
+            {
+                ansiRequest.ResponseFromInput += (s, e) =>
+                                                 {
+                                                     Debug.Assert (s == ansiRequest);
+
+                                                     ansiRequest.Response = response = e;
+
+                                                     _waitAnsiResponse.Set ();
+                                                 };
+
+                _mainLoopDriver._netEvents.EscSeqRequests.Add (ansiRequest);
+            }
+
             if (!_ansiResponseTokenSource.IsCancellationRequested && Console.KeyAvailable)
             {
                 _mainLoopDriver._netEvents._forceRead = true;
 
                 _mainLoopDriver._netEvents._waitForStart.Set ();
+
+                if (!_mainLoopDriver._waitForProbe.IsSet)
+                {
+                    _mainLoopDriver._waitForProbe.Set ();
+                }
 
                 _waitAnsiResponse.Wait (_ansiResponseTokenSource.Token);
             }
@@ -1454,17 +1488,20 @@ internal class NetDriver : ConsoleDriver
                 _mainLoopDriver._netEvents._forceRead = false;
             }
 
-            if (_mainLoopDriver._netEvents.EscSeqRequests.Statuses.Count > 0
-                && string.IsNullOrEmpty (_mainLoopDriver._netEvents.EscSeqRequests.Statuses.Peek ().AnsiRequest.Response))
+            if (_mainLoopDriver._netEvents.EscSeqRequests.Statuses.TryPeek (out EscSeqReqStatus request))
             {
-                // Bad request or no response at all
-                _mainLoopDriver._netEvents.EscSeqRequests.Statuses.Dequeue ();
+                if (_mainLoopDriver._netEvents.EscSeqRequests.Statuses.Count > 0
+                    && string.IsNullOrEmpty (request.AnsiRequest.Response))
+                {
+                    // Bad request or no response at all
+                    _mainLoopDriver._netEvents.EscSeqRequests.Statuses.TryDequeue (out _);
+                }
             }
 
             _waitAnsiResponse.Reset ();
         }
 
-        return ansiRequest.Response;
+        return response;
     }
 
     private MouseEventArgs ToDriverMouse (NetEvents.MouseEvent me)
@@ -1756,7 +1793,7 @@ internal class NetMainLoop : IMainLoopDriver
     private readonly ManualResetEventSlim _eventReady = new (false);
     private readonly CancellationTokenSource _inputHandlerTokenSource = new ();
     private readonly Queue<InputResult?> _resultQueue = new ();
-    private readonly ManualResetEventSlim _waitForProbe = new (false);
+    internal readonly ManualResetEventSlim _waitForProbe = new (false);
     private readonly CancellationTokenSource _eventReadyTokenSource = new ();
     private MainLoop _mainLoop;
 
@@ -1856,7 +1893,7 @@ internal class NetMainLoop : IMainLoopDriver
         {
             try
             {
-                if (!_inputHandlerTokenSource.IsCancellationRequested)
+                if (!_netEvents._forceRead && !_inputHandlerTokenSource.IsCancellationRequested)
                 {
                     _waitForProbe.Wait (_inputHandlerTokenSource.Token);
                 }
