@@ -1,4 +1,6 @@
 ﻿#nullable enable
+using System.Diagnostics;
+
 namespace Terminal.Gui;
 
 public partial class View // Drawing APIs
@@ -36,29 +38,6 @@ public partial class View // Drawing APIs
     /// <remarks><see cref="Border"/> adds border lines to this LineCanvas.</remarks>
     public LineCanvas LineCanvas { get; } = new ();
 
-    // The view-relative region that needs to be redrawn. Marked internal for unit tests.
-    internal Rectangle _needsDisplayRect = Rectangle.Empty;
-
-    /// <summary>Gets or sets whether the view needs to be redrawn.</summary>
-    public bool NeedsDisplay
-    {
-        get => _needsDisplayRect != Rectangle.Empty;
-        set
-        {
-            if (value)
-            {
-                SetNeedsDisplay ();
-            }
-            else
-            {
-                ClearNeedsDisplay ();
-            }
-        }
-    }
-
-    /// <summary>Gets whether any Subviews need to be redrawn.</summary>
-    public bool SubViewNeedsDisplay { get; private set; }
-
     /// <summary>
     ///     Gets or sets whether this View will use it's SuperView's <see cref="LineCanvas"/> for rendering any
     ///     lines. If <see langword="true"/> the rendering of any borders drawn by this Frame will be done by its parent's
@@ -81,7 +60,7 @@ public partial class View // Drawing APIs
     {
         if (Move (col, row))
         {
-            Driver.AddRune (rune);
+            Driver?.AddRune (rune);
         }
     }
 
@@ -193,7 +172,7 @@ public partial class View // Drawing APIs
     /// <remarks>
     ///     <para>
     ///         The view will only be drawn if it is visible, and has any of <see cref="NeedsDisplay"/>, <see cref="SubViewNeedsDisplay"/>,
-    ///         or <see cref="LayoutNeeded"/> set.
+    ///         or <see cref="IsLayoutNeeded"/> set.
     ///     </para>
     ///     <para>
     ///         Always use <see cref="Viewport"/> (view-relative) when calling <see cref="OnDrawContent(Rectangle)"/>, NOT
@@ -216,14 +195,19 @@ public partial class View // Drawing APIs
             return;
         }
 
-        // TODO: This ensures overlapped views are drawn correctly. However, this is inefficient.
-        // TODO: The correct fix is to implement non-rectangular clip regions: https://github.com/gui-cs/Terminal.Gui/issues/3413
-        if (Arrangement.HasFlag (ViewArrangement.Overlapped))
+        if (IsLayoutNeeded ())
         {
-            SetNeedsDisplay ();
+            //Debug.WriteLine ($"Layout should be de-coupled from drawing: {this}");
         }
 
-        if (!NeedsDisplay && !SubViewNeedsDisplay && !LayoutNeeded)
+        //// TODO: This ensures overlapped views are drawn correctly. However, this is inefficient.
+        //// TODO: The correct fix is to implement non-rectangular clip regions: https://github.com/gui-cs/Terminal.Gui/issues/3413
+        //if ((this != Application.Top || this is Toplevel { Modal: true }) && Arrangement.HasFlag (ViewArrangement.Overlapped))
+        //{
+        //    SetNeedsDisplay ();
+        //}
+
+        if (!NeedsDisplay && !SubViewNeedsDisplay)
         {
             return;
         }
@@ -270,8 +254,6 @@ public partial class View // Drawing APIs
         // Invoke DrawContentCompleteEvent
         OnDrawContentComplete (Viewport);
 
-        // BUGBUG: v2 - We should be able to use View.SetClip here and not have to resort to knowing Driver details.
-        ClearLayoutNeeded ();
         ClearNeedsDisplay ();
     }
 
@@ -471,13 +453,9 @@ public partial class View // Drawing APIs
     /// <returns></returns>
     public virtual bool OnDrawAdornments ()
     {
-        if (!IsInitialized)
-        {
-            return false;
-        }
-
         // Each of these renders lines to either this View's LineCanvas 
         // Those lines will be finally rendered in OnRenderLineCanvas
+        // QUESTION: Why are we not calling Draw here?
         Margin?.OnDrawContent (Margin.Viewport);
         Border?.OnDrawContent (Border.Viewport);
         Padding?.OnDrawContent (Padding.Viewport);
@@ -520,39 +498,34 @@ public partial class View // Drawing APIs
     /// </param>
     public virtual void OnDrawContent (Rectangle viewport)
     {
-        if (NeedsDisplay)
+        if (!CanBeVisible (this))
         {
-            if (!CanBeVisible (this))
-            {
-                return;
-            }
-
-            // BUGBUG: this clears way too frequently. Need to optimize this.
-            if (SuperView is { } || Arrangement.HasFlag (ViewArrangement.Overlapped))
-            {
-                Clear ();
-            }
-
-            if (!string.IsNullOrEmpty (TextFormatter.Text))
-            {
-                if (TextFormatter is { })
-                {
-                    TextFormatter.NeedsFormat = true;
-                }
-            }
-
-            // This should NOT clear 
-            // TODO: If the output is not in the Viewport, do nothing
-            var drawRect = new Rectangle (ContentToScreen (Point.Empty), GetContentSize ());
-
-            TextFormatter?.Draw (
-                                 drawRect,
-                                 HasFocus ? GetFocusColor () : GetNormalColor (),
-                                 HasFocus ? GetHotFocusColor () : GetHotNormalColor (),
-                                 Rectangle.Empty
-                                );
-            SetSubViewNeedsDisplay ();
+            return;
         }
+
+        // BUGBUG: this clears way too frequently. Need to optimize this.
+        if (NeedsDisplay/* || Arrangement.HasFlag (ViewArrangement.Overlapped)*/)
+        {
+            Clear ();
+        }
+
+        if (!string.IsNullOrEmpty (TextFormatter.Text))
+        {
+            TextFormatter.NeedsFormat = true;
+        }
+
+        // This should NOT clear 
+        // TODO: If the output is not in the Viewport, do nothing
+        var drawRect = new Rectangle (ContentToScreen (Point.Empty), GetContentSize ());
+
+        TextFormatter?.Draw (
+                             drawRect,
+                             HasFocus ? GetFocusColor () : GetNormalColor (),
+                             HasFocus ? GetHotFocusColor () : GetHotNormalColor (),
+                             Rectangle.Empty
+                            );
+        SetSubViewNeedsDisplay ();
+
 
         // TODO: Move drawing of subviews to a separate OnDrawSubviews virtual method
         // Draw subviews
@@ -563,26 +536,27 @@ public partial class View // Drawing APIs
                                                                      view => view.Visible
                                                                              && (view.NeedsDisplay
                                                                                  || view.SubViewNeedsDisplay
-                                                                                 || view.LayoutNeeded
-                                                                                 || view.Arrangement.HasFlag (ViewArrangement.Overlapped)
-                                                                    ));
+                                                                                // || view.Arrangement.HasFlag (ViewArrangement.Overlapped)
+                                                                                ));
 
             foreach (View view in subviewsNeedingDraw)
             {
-                if (view.LayoutNeeded)
+                if (view.IsLayoutNeeded ())
                 {
-                    view.LayoutSubviews ();
+                    //Debug.WriteLine ($"Layout should be de-coupled from drawing: {view}");
+                    //view.LayoutSubviews ();
                 }
 
                 // TODO: This ensures overlapped views are drawn correctly. However, this is inefficient.
                 // TODO: The correct fix is to implement non-rectangular clip regions: https://github.com/gui-cs/Terminal.Gui/issues/3413
                 if (view.Arrangement.HasFlag (ViewArrangement.Overlapped))
                 {
-                    view.SetNeedsDisplay ();
+                    // view.SetNeedsDisplay ();
                 }
 
                 view.Draw ();
             }
+
         }
     }
 
@@ -604,7 +578,7 @@ public partial class View // Drawing APIs
     /// <returns></returns>
     public virtual bool OnRenderLineCanvas ()
     {
-        if (!IsInitialized || Driver is null)
+        if (Driver is null)
         {
             return false;
         }
@@ -656,37 +630,72 @@ public partial class View // Drawing APIs
         return true;
     }
 
-    /// <summary>Sets the area of this view needing to be redrawn to <see cref="Viewport"/>.</summary>
+    #region NeedsDisplay
+
+    // The viewport-relative region that needs to be redrawn. Marked internal for unit tests.
+    internal Rectangle _needsDisplayRect = Rectangle.Empty;
+
+    /// <summary>Gets or sets whether the view needs to be redrawn.</summary>
+    public bool NeedsDisplay
+    {
+        get => _needsDisplayRect != Rectangle.Empty || IsLayoutNeeded ();
+        set
+        {
+            if (value)
+            {
+                SetNeedsDisplay ();
+            }
+            else
+            {
+                ClearNeedsDisplay ();
+            }
+        }
+    }
+
+    /// <summary>Gets whether any Subviews need to be redrawn.</summary>
+    public bool SubViewNeedsDisplay { get; private set; }
+
+    /// <summary>Sets that the <see cref="Viewport"/> of this View needs to be redrawn.</summary>
     /// <remarks>
     ///     If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), this method
     ///     does nothing.
     /// </remarks>
-    public void SetNeedsDisplay () { SetNeedsDisplay (Viewport); }
+    public void SetNeedsDisplay ()
+    {
+        Rectangle viewport = Viewport;
 
-    /// <summary>Expands the area of this view needing to be redrawn to include <paramref name="region"/>.</summary>
+        if (_needsDisplayRect != Rectangle.Empty && viewport.IsEmpty)
+        {
+            // This handles the case where the view has not been initialized yet
+            return;
+        }
+
+        SetNeedsDisplay (viewport);
+    }
+
+    /// <summary>Expands the area of this view needing to be redrawn to include <paramref name="viewPortRelativeRegion"/>.</summary>
     /// <remarks>
     ///     <para>
-    ///         The location of <paramref name="region"/> is relative to the View's content, bound by <c>Size.Empty</c> and
-    ///         <see cref="GetContentSize ()"/>.
+    ///         The location of <paramref name="viewPortRelativeRegion"/> is relative to the View's <see cref="Viewport"/>.
     ///     </para>
     ///     <para>
     ///         If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), the area to be
-    ///         redrawn will be the <paramref name="region"/>.
+    ///         redrawn will be the <paramref name="viewPortRelativeRegion"/>.
     ///     </para>
     /// </remarks>
-    /// <param name="region">The content-relative region that needs to be redrawn.</param>
-    public void SetNeedsDisplay (Rectangle region)
+    /// <param name="viewPortRelativeRegion">The <see cref="Viewport"/>relative region that needs to be redrawn.</param>
+    public void SetNeedsDisplay (Rectangle viewPortRelativeRegion)
     {
         if (_needsDisplayRect.IsEmpty)
         {
-            _needsDisplayRect = region;
+            _needsDisplayRect = viewPortRelativeRegion;
         }
         else
         {
-            int x = Math.Min (_needsDisplayRect.X, region.X);
-            int y = Math.Min (_needsDisplayRect.Y, region.Y);
-            int w = Math.Max (_needsDisplayRect.Width, region.Width);
-            int h = Math.Max (_needsDisplayRect.Height, region.Height);
+            int x = Math.Min (Viewport.X, viewPortRelativeRegion.X);
+            int y = Math.Min (Viewport.Y, viewPortRelativeRegion.Y);
+            int w = Math.Max (Viewport.Width, viewPortRelativeRegion.Width);
+            int h = Math.Max (Viewport.Height, viewPortRelativeRegion.Height);
             _needsDisplayRect = new (x, y, w, h);
         }
 
@@ -696,11 +705,16 @@ public partial class View // Drawing APIs
 
         SuperView?.SetSubViewNeedsDisplay ();
 
+        if (this is Adornment adornment)
+        {
+            adornment.Parent?.SetSubViewNeedsDisplay ();
+        }
+
         foreach (View subview in Subviews)
         {
-            if (subview.Frame.IntersectsWith (region))
+            if (subview.Frame.IntersectsWith (viewPortRelativeRegion))
             {
-                Rectangle subviewRegion = Rectangle.Intersect (subview.Frame, region);
+                Rectangle subviewRegion = Rectangle.Intersect (subview.Frame, viewPortRelativeRegion);
                 subviewRegion.X -= subview.Frame.X;
                 subviewRegion.Y -= subview.Frame.Y;
                 subview.SetNeedsDisplay (subviewRegion);
@@ -739,4 +753,6 @@ public partial class View // Drawing APIs
             subview.ClearNeedsDisplay ();
         }
     }
+    #endregion NeedsDisplay
+
 }

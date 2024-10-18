@@ -172,12 +172,13 @@ public class ThicknessTests (ITestOutputHelper output)
 
         var top = new Toplevel ();
         top.Add (f);
-        Application.Begin (top);
+        RunState rs = Application.Begin (top);
 
         ((FakeDriver)Application.Driver!).SetBufferSize (45, 20);
         var t = new Thickness (0, 0, 0, 0);
         var r = new Rectangle (2, 2, 40, 15);
-        Application.Refresh ();
+        Application.RunIteration (ref rs);
+
         View.Diagnostics |= ViewDiagnosticFlags.Ruler;
         t.Draw (r, "Test");
         View.Diagnostics = ViewDiagnosticFlags.Off;
@@ -209,7 +210,8 @@ public class ThicknessTests (ITestOutputHelper output)
 
         t = new Thickness (1, 1, 1, 1);
         r = new Rectangle (1, 1, 40, 15);
-        Application.Refresh ();
+        top.SetNeedsDisplay ();
+        Application.RunIteration (ref rs);
         View.Diagnostics |= ViewDiagnosticFlags.Ruler;
         t.Draw (r, "Test");
         View.Diagnostics = ViewDiagnosticFlags.Off;
@@ -241,7 +243,8 @@ public class ThicknessTests (ITestOutputHelper output)
 
         t = new Thickness (1, 2, 3, 4);
         r = new Rectangle (2, 2, 40, 15);
-        Application.Refresh ();
+        top.SetNeedsDisplay ();
+        Application.RunIteration (ref rs);
         View.Diagnostics |= ViewDiagnosticFlags.Ruler;
         t.Draw (r, "Test");
         View.Diagnostics = ViewDiagnosticFlags.Off;
@@ -273,7 +276,8 @@ public class ThicknessTests (ITestOutputHelper output)
 
         t = new Thickness (-1, 1, 1, 1);
         r = new Rectangle (5, 5, 40, 15);
-        Application.Refresh ();
+        top.SetNeedsDisplay ();
+        Application.RunIteration (ref rs);
         View.Diagnostics |= ViewDiagnosticFlags.Ruler;
         t.Draw (r, "Test");
         View.Diagnostics = ViewDiagnosticFlags.Off;

@@ -91,8 +91,8 @@ internal abstract class ColorBar : View, IColorBar
         if (!string.IsNullOrWhiteSpace (Text))
         {
             Move (0, 0);
-            Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
-            Driver.AddStr (Text);
+            Driver?.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
+            Driver?.AddStr (Text);
 
             // TODO: is there a better method than this? this is what it is in TableView
             xOffset = Text.EnumerateRunes ().Sum (c => c.GetColumns ());

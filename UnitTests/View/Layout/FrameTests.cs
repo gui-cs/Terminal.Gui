@@ -40,9 +40,11 @@ public class FrameTests (ITestOutputHelper output)
         var newFrame = new Rectangle (1, 2, 30, 40);
 
         var v = new View ();
+        Assert.Equal (Rectangle.Empty, v.Frame);
         v.Dispose ();
 
         v = new View { Frame = frame };
+        Assert.Equal (frame, v.Frame);
 
         v.Frame = newFrame;
         Assert.Equal (newFrame, v.Frame);

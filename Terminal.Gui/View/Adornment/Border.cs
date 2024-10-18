@@ -565,7 +565,8 @@ public class Border : Adornment
 
                         break;
                 }
-                Application.Refresh ();
+
+                //Application.Refresh ();
 
                 return true;
             }
@@ -702,15 +703,15 @@ public class Border : Adornment
             bool drawBottom = Thickness.Bottom > 0 && Frame.Width > 1 && Frame.Height > 1;
             bool drawRight = Thickness.Right > 0 && (Frame.Height > 1 || Thickness.Top == 0);
 
-            Attribute prevAttr = Driver.GetAttribute ();
+            Attribute prevAttr = Driver?.GetAttribute () ?? Attribute.Default;
 
             if (ColorScheme is { })
             {
-                Driver.SetAttribute (GetNormalColor ());
+                Driver?.SetAttribute (GetNormalColor ());
             }
             else
             {
-                Driver.SetAttribute (Parent!.GetNormalColor ());
+                Driver?.SetAttribute (Parent!.GetNormalColor ());
             }
 
             if (drawTop)
@@ -725,7 +726,7 @@ public class Border : Adornment
                                  borderBounds.Width,
                                  Orientation.Horizontal,
                                  lineStyle,
-                                 Driver.GetAttribute ()
+                                 Driver?.GetAttribute ()
                                 );
                 }
                 else
@@ -740,7 +741,7 @@ public class Border : Adornment
                                      Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                      Orientation.Horizontal,
                                      lineStyle,
-                                     Driver.GetAttribute ()
+                                     Driver?.GetAttribute ()
                                     );
                     }
 
@@ -754,7 +755,7 @@ public class Border : Adornment
                                      Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                      Orientation.Horizontal,
                                      lineStyle,
-                                     Driver.GetAttribute ()
+                                     Driver?.GetAttribute ()
                                     );
 
                         lc?.AddLine (
@@ -762,7 +763,7 @@ public class Border : Adornment
                                      Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                      Orientation.Horizontal,
                                      lineStyle,
-                                     Driver.GetAttribute ()
+                                     Driver?.GetAttribute ()
                                     );
                     }
 
@@ -773,7 +774,7 @@ public class Border : Adornment
                                  2,
                                  Orientation.Horizontal,
                                  lineStyle,
-                                 Driver.GetAttribute ()
+                                 Driver?.GetAttribute ()
                                 );
 
                     // Add a vert line for ╔╡
@@ -782,7 +783,7 @@ public class Border : Adornment
                                  titleBarsLength,
                                  Orientation.Vertical,
                                  LineStyle.Single,
-                                 Driver.GetAttribute ()
+                                 Driver?.GetAttribute ()
                                 );
 
                     // Add a vert line for ╞
@@ -797,7 +798,7 @@ public class Border : Adornment
                                  titleBarsLength,
                                  Orientation.Vertical,
                                  LineStyle.Single,
-                                 Driver.GetAttribute ()
+                                 Driver?.GetAttribute ()
                                 );
 
                     // Add the right hand line for ╞═════╗
@@ -812,7 +813,7 @@ public class Border : Adornment
                                  borderBounds.Width - Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                  Orientation.Horizontal,
                                  lineStyle,
-                                 Driver.GetAttribute ()
+                                 Driver?.GetAttribute ()
                                 );
                 }
             }
@@ -826,7 +827,7 @@ public class Border : Adornment
                              sideLineLength,
                              Orientation.Vertical,
                              lineStyle,
-                             Driver.GetAttribute ()
+                             Driver?.GetAttribute ()
                             );
             }
 #endif
@@ -838,7 +839,7 @@ public class Border : Adornment
                              borderBounds.Width,
                              Orientation.Horizontal,
                              lineStyle,
-                             Driver.GetAttribute ()
+                             Driver?.GetAttribute ()
                             );
             }
 
@@ -849,11 +850,11 @@ public class Border : Adornment
                              sideLineLength,
                              Orientation.Vertical,
                              lineStyle,
-                             Driver.GetAttribute ()
+                             Driver?.GetAttribute ()
                             );
             }
 
-            Driver.SetAttribute (prevAttr);
+            Driver?.SetAttribute (prevAttr);
 
             // TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler
             if (Diagnostics.HasFlag (ViewDiagnosticFlags.Ruler))

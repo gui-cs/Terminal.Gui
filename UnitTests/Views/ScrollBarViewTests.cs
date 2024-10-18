@@ -756,7 +756,7 @@ This is a test
         RemoveHandlers ();
 
         _scrollBar = new ScrollBarView (_hostView, true);
-        Application.Begin (_hostView.SuperView as Toplevel);
+        RunState rs = Application.Begin (_hostView.SuperView as Toplevel);
 
         Assert.True (_scrollBar.IsVertical);
         Assert.False (_scrollBar.OtherScrollBarView.IsVertical);
@@ -767,8 +767,7 @@ This is a test
         Assert.NotEqual (_scrollBar.OtherScrollBarView.Size, _hostView.Cols);
 
         AddHandlers ();
-        _hostView.SuperView.LayoutSubviews ();
-        _hostView.Draw ();
+        Application.RunIteration (ref rs);
 
         Assert.Equal (_scrollBar.Position, _hostView.Top);
         Assert.Equal (_scrollBar.Size, _hostView.Lines);
@@ -827,14 +826,11 @@ This is a test
                                            scrollBar.OtherScrollBarView.Size = textView.Maxlength;
                                            scrollBar.OtherScrollBarView.Position = textView.LeftColumn;
                                        }
-
-                                       scrollBar.LayoutSubviews ();
-                                       scrollBar.Refresh ();
                                    };
         var top = new Toplevel ();
         top.Add (win);
 
-        Application.Begin (top);
+        RunState rs = Application.Begin (top);
         ((FakeDriver)Application.Driver!).SetBufferSize (45, 20);
 
         Assert.True (scrollBar.AutoHideScrollBars);
@@ -874,7 +870,7 @@ This is a test
 
         textView.WordWrap = true;
         ((FakeDriver)Application.Driver!).SetBufferSize (26, 20);
-        Application.Refresh ();
+        Application.RunIteration (ref rs);
 
         Assert.True (textView.WordWrap);
         Assert.True (scrollBar.AutoHideScrollBars);
@@ -911,7 +907,7 @@ This is a test
         Assert.Equal (new Rectangle (0, 0, 26, 20), pos);
 
         ((FakeDriver)Application.Driver!).SetBufferSize (10, 10);
-        Application.Refresh ();
+        Application.RunIteration (ref rs);
 
         Assert.True (textView.WordWrap);
         Assert.True (scrollBar.AutoHideScrollBars);
@@ -976,6 +972,7 @@ This is a test
     public void Internal_Tests ()
     {
         Toplevel top = new ();
+        top.Layout ();
         Assert.Equal (new Rectangle (0, 0, 80, 25), top.Viewport);
         var view = new View { Width = Dim.Fill (), Height = Dim.Fill () };
         top.Add (view);
@@ -986,6 +983,7 @@ This is a test
         sbv.Position = 0;
         sbv.OtherScrollBarView.Size = 100;
         sbv.OtherScrollBarView.Position = 0;
+        top.Layout ();
 
         // Host bounds is not empty.
         Assert.True (sbv.CanScroll (10, out int max, sbv.IsVertical));
@@ -1029,11 +1027,10 @@ This is a test
     public void KeepContentAlwaysInViewport_False ()
     {
         _scrollBar = new ScrollBarView (_hostView, true);
-        Application.Begin (_hostView.SuperView as Toplevel);
+        RunState rs = Application.Begin (_hostView.SuperView as Toplevel);
 
         AddHandlers ();
-        _hostView.SuperView.LayoutSubviews ();
-        _hostView.Draw ();
+        Application.RunIteration (ref rs);
 
         _scrollBar.KeepContentAlwaysInViewport = false;
         _scrollBar.Position = 50;
@@ -1056,11 +1053,11 @@ This is a test
     public void KeepContentAlwaysInViewport_True ()
     {
         _scrollBar = new ScrollBarView (_hostView, true);
-        Application.Begin (_hostView.SuperView as Toplevel);
+        RunState rs = Application.Begin (_hostView.SuperView as Toplevel);
 
         AddHandlers ();
-        _hostView.SuperView.LayoutSubviews ();
-        _hostView.Draw ();
+        Application.RunIteration (ref rs);
+
         Assert.Equal (80, _hostView.Viewport.Width);
         Assert.Equal (25, _hostView.Viewport.Height);
         Assert.Equal (79, _scrollBar.OtherScrollBarView.Viewport.Width);
@@ -1128,11 +1125,10 @@ This is a test
     public void ShowScrollIndicator_Check ()
     {
         _scrollBar = new ScrollBarView (_hostView, true);
-        Application.Begin (_hostView.SuperView as Toplevel);
+        RunState rs = Application.Begin (_hostView.SuperView as Toplevel);
 
         AddHandlers ();
-        _hostView.SuperView.LayoutSubviews ();
-        _hostView.Draw ();
+        Application.RunIteration (ref rs);
 
         Assert.True (_scrollBar.ShowScrollIndicator);
         Assert.True (_scrollBar.OtherScrollBarView.ShowScrollIndicator);

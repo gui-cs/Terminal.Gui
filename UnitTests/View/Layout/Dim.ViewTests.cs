@@ -29,6 +29,7 @@ public class DimViewTests (ITestOutputHelper output)
     public void DimView_Calculate_ReturnsCorrectValue ()
     {
         var view = new View { Width = 10 };
+        view.Layout ();
         var dim = new DimView (view, Dimension.Width);
         var result = dim.Calculate (0, 100, null, Dimension.None);
         Assert.Equal (10, result);
@@ -57,31 +58,4 @@ public class DimViewTests (ITestOutputHelper output)
         Assert.Null (exception);
         super.Dispose ();
     }
-
-
-    // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
-    // TODO: A new test that calls SetRelativeLayout directly is needed.
-    [Fact]
-    [TestRespondersDisposed]
-    public void Dim_SuperView_Referencing_SubView_Throws ()
-    {
-        var super = new View { Width = 10, Height = 10, Text = "super" };
-        var view2 = new View { Width = 10, Height = 10, Text = "view2" };
-
-        var view = new View
-        {
-            Width = Dim.Width (view2), // this is not allowed
-            Height = Dim.Height (view2), // this is not allowed
-            Text = "view"
-        };
-
-        view.Add (view2);
-        super.Add (view);
-        super.BeginInit ();
-        super.EndInit ();
-
-        Assert.Throws<InvalidOperationException> (super.LayoutSubviews);
-        super.Dispose ();
-    }
-
 }

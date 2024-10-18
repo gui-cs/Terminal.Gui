@@ -381,7 +381,7 @@ public class MenuBar : View, IDesignable
                 mi = parent?.Children?.Length > 0 ? parent.Children [_openMenu!._currentChild] : null;
             }
         }
-
+        
         MenuOpened?.Invoke (this, new (parent, mi));
     }
 
@@ -861,6 +861,7 @@ public class MenuBar : View, IDesignable
                 if (Application.Top is { })
                 {
                     Application.Top.Add (_openMenu);
+                   // _openMenu.SetRelativeLayout (Application.Screen.Size);
                 }
                 else
                 {

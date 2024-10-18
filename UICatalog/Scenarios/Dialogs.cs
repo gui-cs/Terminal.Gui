@@ -340,7 +340,6 @@ public class Dialogs : Scenario
                                       button.Text += char.ConvertFromUtf32 (CODE_POINT);
                                   }
 
-                                  dialog.LayoutSubviews ();
                                   e.Cancel = true;
                               };
             dialog.Add (addChar);

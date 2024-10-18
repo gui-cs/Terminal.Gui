@@ -306,9 +306,6 @@ public class Editor : Scenario
                                          _scrollBar.OtherScrollBarView.Size = _textView.Maxlength;
                                          _scrollBar.OtherScrollBarView.Position = _textView.LeftColumn;
                                      }
-
-                                     _scrollBar.LayoutSubviews ();
-                                     _scrollBar.Refresh ();
                                  };
 
 

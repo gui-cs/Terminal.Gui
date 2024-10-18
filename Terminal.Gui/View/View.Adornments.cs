@@ -54,7 +54,7 @@ public partial class View // Adornments
     ///     </para>
     ///     <para>
     ///         Changing the size of an adornment (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will
-    ///         change the size of <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the
+    ///         change the size of <see cref="Frame"/> which will call <see cref="SetLayoutNeeded"/> to update the layout of the
     ///         <see cref="SuperView"/> and its <see cref="Subviews"/>.
     ///     </para>
     /// </remarks>
@@ -109,8 +109,8 @@ public partial class View // Adornments
     ///         View's content and are not clipped by the View's Clip Area.
     ///     </para>
     ///     <para>
-    ///         Changing the size of a frame (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will
-    ///         change the size of the <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the
+    ///         Changing the size of an adornment (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will
+    ///         change the size of <see cref="Frame"/> which will call <see cref="SetLayoutNeeded"/> to update the layout of the
     ///         <see cref="SuperView"/> and its <see cref="Subviews"/>.
     ///     </para>
     /// </remarks>
@@ -134,9 +134,23 @@ public partial class View // Adornments
         get => Border?.LineStyle ?? LineStyle.Single;
         set
         {
+            if (Border is null)
+            {
+                return;
+            }
+
             LineStyle old = Border?.LineStyle ?? LineStyle.None;
             CancelEventArgs<LineStyle> e = new (ref old, ref value);
-            OnBorderStyleChanging (e);
+
+            if (OnBorderStyleChanging (e)|| e.Cancel)
+            {
+                return;
+            }
+
+            SetBorderStyle (e.NewValue);
+            SetAdornmentFrames ();
+            SetLayoutNeeded ();
+
         }
     }
 
@@ -148,23 +162,16 @@ public partial class View // Adornments
     ///     Override <see cref="SetBorderStyle"/> to prevent the <see cref="BorderStyle"/> from changing.
     /// </remarks>
     /// <param name="e"></param>
-    protected void OnBorderStyleChanging (CancelEventArgs<LineStyle> e)
+    protected virtual bool OnBorderStyleChanging (CancelEventArgs<LineStyle> e)
     {
         if (Border is null)
         {
-            return;
+            return false;
         }
 
         BorderStyleChanging?.Invoke (this, e);
 
-        if (e.Cancel)
-        {
-            return;
-        }
-
-        SetBorderStyle (e.NewValue);
-        LayoutAdornments ();
-        SetNeedsLayout ();
+        return e.Cancel;
     }
 
     /// <summary>
@@ -217,8 +224,8 @@ public partial class View // Adornments
     ///         View's content and are not clipped by the View's Clip Area.
     ///     </para>
     ///     <para>
-    ///         Changing the size of a frame (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will
-    ///         change the size of the <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the
+    ///         Changing the size of an adornment (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will
+    ///         change the size of <see cref="Frame"/> which will call <see cref="SetLayoutNeeded"/> to update the layout of the
     ///         <see cref="SuperView"/> and its <see cref="Subviews"/>.
     ///     </para>
     /// </remarks>
@@ -243,70 +250,22 @@ public partial class View // Adornments
         return Margin.Thickness + Border.Thickness + Padding.Thickness;
     }
 
-    /// <summary>Lays out the Adornments of the View.</summary>
-    /// <remarks>
-    ///     Overriden by <see cref="Adornment"/> to do nothing, as <see cref="Adornment"/> does not have adornments.
-    /// </remarks>
-    internal virtual void LayoutAdornments ()
+    /// <summary>Sets the Frame's of the Margin, Border, and Padding.</summary>
+    internal void SetAdornmentFrames ()
     {
+        if (this is Adornment)
+        {
+            // Adornments do not have Adornments
+            return;
+        }
+
         if (Margin is null)
         {
             return; // CreateAdornments () has not been called yet
         }
 
-        if (Margin.Frame.Size != Frame.Size)
-        {
-            Margin.SetFrame (Rectangle.Empty with { Size = Frame.Size });
-            Margin.X = 0;
-            Margin.Y = 0;
-            Margin.Width = Frame.Size.Width;
-            Margin.Height = Frame.Size.Height;
-        }
-
-        Margin.SetNeedsLayout ();
-        Margin.SetNeedsDisplay ();
-
-        if (IsInitialized)
-        {
-            Margin.LayoutSubviews ();
-        }
-
-        Rectangle border = Margin.Thickness.GetInside (Margin.Frame);
-
-        if (border != Border.Frame)
-        {
-            Border.SetFrame (border);
-            Border.X = border.Location.X;
-            Border.Y = border.Location.Y;
-            Border.Width = border.Size.Width;
-            Border.Height = border.Size.Height;
-        }
-
-        Border.SetNeedsLayout ();
-        Border.SetNeedsDisplay ();
-
-        if (IsInitialized)
-        {
-            Border.LayoutSubviews ();
-        }
-
-        Rectangle padding = Border.Thickness.GetInside (Border.Frame);
-
-        if (padding != Padding.Frame)
-        {
-            Padding.SetFrame (padding);
-            Padding.X = padding.Location.X;
-            Padding.Y = padding.Location.Y;
-            Padding.Width = padding.Size.Width;
-            Padding.Height = padding.Size.Height;
-        }
-
-        Padding.SetNeedsLayout ();
-        Padding.SetNeedsDisplay ();
-
-        if (IsInitialized)
-        {
-            Padding.LayoutSubviews ();
-        }
+        Margin.Frame = Rectangle.Empty with { Size = Frame.Size };
+        Border.Frame = Margin.Thickness.GetInside (Margin.Frame);
+        Padding.Frame = Border.Thickness.GetInside (Border.Frame);
     }
 }

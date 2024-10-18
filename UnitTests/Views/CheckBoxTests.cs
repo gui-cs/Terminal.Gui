@@ -36,6 +36,7 @@ public class CheckBoxTests (ITestOutputHelper output)
             Height = height,
             Text = text
         };
+        checkBox.Layout ();
 
         Assert.Equal (new (expectedWidth, expectedHeight), checkBox.Frame.Size);
         Assert.Equal (new (expectedWidth, expectedHeight), checkBox.Viewport.Size);
@@ -99,6 +100,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         var ckb = new CheckBox ();
         Assert.True (ckb.Width is DimAuto);
         Assert.True (ckb.Height is DimAuto);
+        ckb.Layout ();
         Assert.Equal (CheckState.UnChecked, ckb.CheckedState);
         Assert.False (ckb.AllowCheckStateNone);
         Assert.Equal (string.Empty, ckb.Text);
@@ -109,6 +111,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         ckb = new () { Text = "Test", CheckedState = CheckState.Checked };
         Assert.True (ckb.Width is DimAuto);
         Assert.True (ckb.Height is DimAuto);
+        ckb.Layout ();
         Assert.Equal (CheckState.Checked, ckb.CheckedState);
         Assert.False (ckb.AllowCheckStateNone);
         Assert.Equal ("Test", ckb.Text);
@@ -119,6 +122,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         ckb = new () { Text = "Test", X = 1, Y = 2 };
         Assert.True (ckb.Width is DimAuto);
         Assert.True (ckb.Height is DimAuto);
+        ckb.Layout ();
         Assert.Equal (CheckState.UnChecked, ckb.CheckedState);
         Assert.False (ckb.AllowCheckStateNone);
         Assert.Equal ("Test", ckb.Text);
@@ -129,6 +133,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         ckb = new () { Text = "Test", X = 3, Y = 4, CheckedState = CheckState.Checked };
         Assert.True (ckb.Width is DimAuto);
         Assert.True (ckb.Height is DimAuto);
+        ckb.Layout ();
         Assert.Equal (CheckState.Checked, ckb.CheckedState);
         Assert.False (ckb.AllowCheckStateNone);
         Assert.Equal ("Test", ckb.Text);
@@ -395,7 +400,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         var top = new Toplevel ();
         top.Add (win);
 
-        Application.Begin (top);
+        RunState rs = Application.Begin (top);
         ((FakeDriver)Application.Driver!).SetBufferSize (30, 6);
 
         Assert.Equal (Alignment.Fill, checkBox1.TextAlignment);
@@ -416,9 +421,12 @@ public class CheckBoxTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 30, 6), pos);
 
         checkBox1.CheckedState = CheckState.Checked;
+        Application.RunIteration (ref rs);
         Assert.Equal (new (1, 1, 25, 1), checkBox1.Frame);
         Assert.Equal (_size25x1, checkBox1.TextFormatter.ConstrainToSize);
+
         checkBox2.CheckedState = CheckState.Checked;
+        Application.RunIteration (ref rs);
         Assert.Equal (new (1, 2, 25, 1), checkBox2.Frame);
         Assert.Equal (_size25x1, checkBox2.TextFormatter.ConstrainToSize);
         Application.Refresh ();

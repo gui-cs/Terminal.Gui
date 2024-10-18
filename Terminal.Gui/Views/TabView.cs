@@ -147,12 +147,27 @@ public class TabView : View
 
                 OnSelectedTabChanged (old, value);
             }
+            SetLayoutNeeded ();
         }
     }
 
+    private TabStyle _style = new ();
+
     /// <summary>Render choices for how to display tabs.  After making changes, call <see cref="ApplyStyleChanges()"/>.</summary>
     /// <value></value>
-    public TabStyle Style { get; set; } = new ();
+    public TabStyle Style
+    {
+        get => _style;
+        set
+        {
+            if (_style == value)
+            {
+                return;
+            }
+            _style = value;
+            SetLayoutNeeded();
+        }
+    }
 
     /// <summary>All tabs currently hosted by the control.</summary>
     /// <value></value>
@@ -163,7 +178,11 @@ public class TabView : View
     public int TabScrollOffset
     {
         get => _tabScrollOffset;
-        set => _tabScrollOffset = EnsureValidScrollOffsets (value);
+        set
+        {
+            _tabScrollOffset = EnsureValidScrollOffsets (value);
+            SetLayoutNeeded ();
+        }
     }
 
     /// <summary>Adds the given <paramref name="tab"/> to <see cref="Tabs"/>.</summary>
@@ -188,7 +207,7 @@ public class TabView : View
             tab.View?.SetFocus ();
         }
 
-        SetNeedsDisplay ();
+        SetLayoutNeeded ();
     }
 
     /// <summary>
@@ -245,12 +264,7 @@ public class TabView : View
             // Should be able to just use 0 but switching between top/bottom tabs repeatedly breaks in ValidatePosDim if just using the absolute value 0
         }
 
-        if (IsInitialized)
-        {
-            LayoutSubviews ();
-        }
-
-        SetNeedsDisplay ();
+        SetLayoutNeeded();
     }
 
     /// <summary>Updates <see cref="TabScrollOffset"/> to ensure that <see cref="SelectedTab"/> is visible.</summary>
@@ -327,7 +341,7 @@ public class TabView : View
         }
 
         EnsureSelectedTabIsVisible ();
-        SetNeedsDisplay ();
+        SetLayoutNeeded ();
     }
 
     /// <summary>Event for when <see cref="SelectedTab"/> changes.</summary>
@@ -349,7 +363,6 @@ public class TabView : View
         if (Tabs.Count == 1 || SelectedTab is null)
         {
             SelectedTab = Tabs.ElementAt (0);
-            SetNeedsDisplay ();
 
             return SelectedTab is { };
         }
@@ -359,9 +372,7 @@ public class TabView : View
         // Currently selected tab has vanished!
         if (currentIdx == -1)
         {
-            SelectedTab = Tabs.ElementAt (0);
-            SetNeedsDisplay ();
-
+            SelectedTab = Tabs.ElementAt (0); 
             return true;
         }
 
@@ -373,7 +384,6 @@ public class TabView : View
         }
 
         SelectedTab = _tabs [newIdx];
-        SetNeedsDisplay ();
 
         EnsureSelectedTabIsVisible ();
 
@@ -611,7 +621,7 @@ public class TabView : View
                 {
                     _host.SwitchTabBy (scrollIndicatorHit);
 
-                    SetNeedsDisplay ();
+                    SetLayoutNeeded ();
 
                     return true;
                 }
@@ -619,7 +629,7 @@ public class TabView : View
                 if (hit is { })
                 {
                     _host.SelectedTab = hit;
-                    SetNeedsDisplay ();
+                    SetLayoutNeeded ();
 
                     return true;
                 }
@@ -1256,7 +1266,8 @@ public class TabView : View
 
                 tab.Text = toRender.TextToRender;
 
-                LayoutSubviews ();
+                // BUGBUG: Layout should only be called from Mainloop iteration!
+                Layout ();
 
                 tab.OnDrawAdornments ();
 

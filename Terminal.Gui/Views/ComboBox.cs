@@ -72,7 +72,7 @@ public class ComboBox : View, IDesignable
                          }
                      }
 
-                     SetNeedsLayout ();
+                     SetLayoutNeeded ();
                      SetNeedsDisplay ();
                      ShowHideList (Text);
                  };
@@ -507,6 +507,8 @@ public class ComboBox : View, IDesignable
         _listview.Clear ();
         _listview.TabStop = TabBehavior.NoStop;
         SuperView?.MoveSubviewToStart (this);
+
+        // BUGBUG: SetNeedsDisplay takes Viewport relative coordinates, not Screen
         Rectangle rect = _listview.ViewportToScreen (_listview.IsInitialized ? _listview.Viewport : Rectangle.Empty);
         SuperView?.SetNeedsDisplay (rect);
         OnCollapsed ();

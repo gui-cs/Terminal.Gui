@@ -74,7 +74,9 @@ namespace Terminal.Gui;
 ///         To flag the entire view for redraw call <see cref="SetNeedsDisplay()"/>.
 ///     </para>
 ///     <para>
-///         The <see cref="LayoutSubviews"/> method is invoked when the size or layout of a view has changed.
+///         The <see cref="SetLayoutNeeded"/> method is called when the size or layout of a view has changed. The <see cref="MainLoop"/> will
+///         cause <see cref="Layout()"/> to be called on the next <see cref="Application.Iteration"/> so there is normally no reason to direclty call
+///         see <see cref="Layout()"/>.
 ///     </para>
 ///     <para>
 ///         Views have a <see cref="ColorScheme"/> property that defines the default colors that subviews should use for
@@ -122,7 +124,7 @@ public partial class View : Responder, ISupportInitializeNotification
     ///     Points to the current driver in use by the view, it is a convenience property for simplifying the development
     ///     of new views.
     /// </summary>
-    public static ConsoleDriver Driver => Application.Driver!;
+    public static ConsoleDriver? Driver => Application.Driver;
 
     /// <summary>Initializes a new instance of <see cref="View"/>.</summary>
     /// <remarks>
@@ -142,7 +144,6 @@ public partial class View : Responder, ISupportInitializeNotification
         //SetupMouse ();
 
         SetupText ();
-
     }
 
     /// <summary>
@@ -229,7 +230,8 @@ public partial class View : Responder, ISupportInitializeNotification
         // These calls were moved from BeginInit as they access Viewport which is indeterminate until EndInit is called.
         UpdateTextDirection (TextDirection);
         UpdateTextFormatterText ();
-        OnResizeNeeded ();
+
+        SetLayoutNeeded ();
 
         if (_subviews is { })
         {
@@ -241,6 +243,9 @@ public partial class View : Responder, ISupportInitializeNotification
                 }
             }
         }
+
+        // TODO: Figure out how to move this out of here and just depend on IsLayoutNeeded in Mainloop
+        Layout ();
 
         Initialized?.Invoke (this, EventArgs.Empty);
     }
@@ -363,7 +368,10 @@ public partial class View : Responder, ISupportInitializeNotification
             OnVisibleChanged ();
             VisibleChanged?.Invoke (this, EventArgs.Empty);
 
+            SetLayoutNeeded ();
+            SuperView?.SetLayoutNeeded();
             SetNeedsDisplay ();
+            SuperView?.SetNeedsDisplay();
         }
     }
 

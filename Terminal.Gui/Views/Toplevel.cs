@@ -235,7 +235,7 @@ public partial class Toplevel : View
             return;
         }
 
-        var layoutSubviews = false;
+        //var layoutSubviews = false;
         var maxWidth = 0;
 
         if (superView.Margin is { } && superView == top.SuperView)
@@ -251,36 +251,26 @@ public partial class Toplevel : View
             if (top?.X is null or PosAbsolute && top?.Frame.X != nx)
             {
                 top!.X = nx;
-                layoutSubviews = true;
+                //layoutSubviews = true;
             }
 
             if (top?.Y is null or PosAbsolute && top?.Frame.Y != ny)
             {
                 top!.Y = ny;
-                layoutSubviews = true;
+                //layoutSubviews = true;
             }
         }
 
-        //// TODO: v2 - This is a hack to get the StatusBar to be positioned correctly.
-        //if (sb != null
-        //    && !top!.Subviews.Contains (sb)
-        //    && ny + top.Frame.Height != superView.Frame.Height - (sb.Visible ? 1 : 0)
-        //    && top.Height is DimFill
-        //    && -top.Height.GetAnchor (0) < 1)
+
+        //if (superView.IsLayoutNeeded () || layoutSubviews)
         //{
-        //    top.Height = Dim.Fill (sb.Visible ? 1 : 0);
-        //    layoutSubviews = true;
+        //    superView.LayoutSubviews ();
         //}
 
-        if (superView.LayoutNeeded || layoutSubviews)
-        {
-            superView.LayoutSubviews ();
-        }
-
-        if (LayoutNeeded)
-        {
-            LayoutSubviews ();
-        }
+        //if (IsLayoutNeeded ())
+        //{
+        //    LayoutSubviews ();
+        //}
     }
 
     /// <summary>Invoked when the terminal has been resized. The new <see cref="Size"/> of the terminal is provided.</summary>

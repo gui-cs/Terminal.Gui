@@ -185,6 +185,7 @@ public class ButtonTests (ITestOutputHelper output)
         btn.Dispose ();
 
         btn = new () { Text = "_Test", IsDefault = true };
+        btn.Layout ();
         Assert.Equal (new (10, 1), btn.TextFormatter.ConstrainToSize);
 
 

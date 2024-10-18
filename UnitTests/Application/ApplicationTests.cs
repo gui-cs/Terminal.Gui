@@ -546,7 +546,7 @@ public class ApplicationTests
         var actionCalled = 0;
         Application.Invoke (() => { actionCalled++; });
         Application.MainLoop.Running = true;
-        Application.RunIteration (ref rs, ref firstIteration);
+        Application.RunIteration (ref rs, firstIteration);
         Assert.Equal (1, actionCalled);
         top.Dispose ();
         Application.Shutdown ();
@@ -859,10 +859,10 @@ public class ApplicationTests
                                          Application.RaiseMouseEvent (new () { Flags = MouseFlags.ReportMousePosition });
                                          Assert.False (top.NeedsDisplay);
                                          Assert.False (top.SubViewNeedsDisplay);
-                                         Assert.False (top.LayoutNeeded);
+                                         Assert.False (top.IsLayoutNeeded ());
                                          Assert.False (d.NeedsDisplay);
                                          Assert.False (d.SubViewNeedsDisplay);
-                                         Assert.False (d.LayoutNeeded);
+                                         Assert.False (d.IsLayoutNeeded ());
                                      }
                                      else
                                      {

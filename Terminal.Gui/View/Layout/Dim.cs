@@ -22,6 +22,14 @@ using System.Numerics;
 ///             </listheader>
 ///             <item>
 ///                 <term>
+///                     <see cref="Dim.Absolute"/>
+///                 </term>
+///                 <description>
+///                     Creates a <see cref="Dim"/> that is a fixed size.
+///                 </description>
+///             </item>
+///             <item>
+///                 <term>
 ///                     <see cref="Dim.Auto"/>
 ///                 </term>
 ///                 <description>
@@ -182,9 +190,9 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     /// </summary>
     /// <param name="dim">A reference to this <see cref="Dim"/> instance.</param>
     /// <returns></returns>
-    public bool Has<T> (out Dim dim) where T : Dim
+    public bool Has<T> (out T dim) where T : Dim
     {
-        dim = this;
+        dim = (this as T)!;
 
         return this switch
                {
@@ -251,7 +259,7 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
         }
 
         var newDim = new DimCombine (AddOrSubtract.Add, left, right);
-        (left as DimView)?.Target?.SetNeedsLayout ();
+        (left as DimView)?.Target?.SetLayoutNeeded ();
 
         return newDim;
     }
@@ -276,7 +284,7 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
         }
 
         var newDim = new DimCombine (AddOrSubtract.Subtract, left, right);
-        (left as DimView)?.Target?.SetNeedsLayout ();
+        (left as DimView)?.Target?.SetLayoutNeeded ();
 
         return newDim;
     }

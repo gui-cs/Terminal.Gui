@@ -246,6 +246,7 @@ public class SetRelativeLayoutTests
             Height = 1
         };
         superView.Add (testView);
+        superView.Layout ();
         testView.SetRelativeLayout (superView.Frame.Size);
         Assert.Equal (4, testView.Frame.X);
         Assert.Equal (4, testView.Frame.Y);
@@ -428,4 +429,7 @@ public class SetRelativeLayoutTests
         Assert.Equal (26, tf.Frame.Width);
         Assert.Equal (1, tf.Frame.Height);
     }
+
+
+
 }

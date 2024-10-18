@@ -23,6 +23,8 @@ public class ToScreenTests (ITestOutputHelper output)
     public void FrameToScreen_NoSuperView (int frameX, int frameY, int expectedScreenX, int expectedScreenY)
     {
         var view = new View { X = frameX, Y = frameY, Width = 10, Height = 10 };
+        view.Layout ();
+
         var expected = new Rectangle (expectedScreenX, expectedScreenY, 10, 10);
         Rectangle actual = view.FrameToScreen ();
         Assert.Equal (expected, actual);
@@ -48,6 +50,8 @@ public class ToScreenTests (ITestOutputHelper output)
 
         var view = new View { X = frameX, Y = frameY, Width = 10, Height = 10 };
         super.Add (view);
+        super.Layout ();
+
         var expected = new Rectangle (expectedScreenX, expectedScreenY, 10, 10);
         Rectangle actual = view.FrameToScreen ();
         Assert.Equal (expected, actual);
@@ -316,7 +320,7 @@ public class ToScreenTests (ITestOutputHelper output)
         view.Frame = frame;
 
         superView.Add (view);
-        superView.LayoutSubviews ();
+        superSuperView.Layout ();
 
         // Act
         var screen = view.FrameToScreen ();
@@ -337,6 +341,7 @@ public class ToScreenTests (ITestOutputHelper output)
             Width = 10,
             Height = 10
         };
+        view.Layout ();
         view.SetContentSize (new (20, 20));
 
         Point testPoint = new (0, 0);
@@ -633,10 +638,12 @@ public class ToScreenTests (ITestOutputHelper output)
             Height = 10,
             ViewportSettings = ViewportSettings.AllowNegativeLocation
         };
+        view.Layout ();
 
         Rectangle testRect = new Rectangle (0, 0, 1, 1);
         Assert.Equal (new Point (0, 0), view.ViewportToScreen (testRect).Location);
         view.Viewport = view.Viewport with { Location = new Point (1, 1) };
+
         Assert.Equal (new Rectangle (1, 1, 10, 10), view.Viewport);
         Assert.Equal (new Point (0, 0), view.ViewportToScreen (testRect).Location);
     }
@@ -654,6 +661,7 @@ public class ToScreenTests (ITestOutputHelper output)
 
         var view = new View ();
         view.Frame = frame;
+        view.Layout ();
 
         // Act
         var screen = view.ViewportToScreen (new Point (viewportX, 0));
@@ -876,7 +884,7 @@ public class ToScreenTests (ITestOutputHelper output)
         view.Frame = frame;
 
         superView.Add (view);
-        superView.LayoutSubviews ();
+        superView.Layout ();
 
         // Act
         var screen = view.ViewportToScreen (new Point (viewportX, 0));
@@ -960,7 +968,7 @@ public class ToScreenTests (ITestOutputHelper output)
         };
         Application.Top.Add (view);
 
-        Application.Begin (Application.Top);
+        var rs = Application.Begin (Application.Top);
 
         Assert.Equal (new (0, 0, 80, 25), new Rectangle (0, 0, View.Driver.Cols, View.Driver.Rows));
         Assert.Equal (new (0, 0, View.Driver.Cols, View.Driver.Rows), Application.Top.Frame);
@@ -969,6 +977,7 @@ public class ToScreenTests (ITestOutputHelper output)
         ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
         Assert.Equal (new (0, 0, View.Driver.Cols, View.Driver.Rows), Application.Top.Frame);
         Assert.Equal (new (0, 0, 20, 10), Application.Top.Frame);
+
 
         _ = TestHelpers.AssertDriverContentsWithFrameAre (
                                                           @"

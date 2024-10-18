@@ -335,8 +335,6 @@ public sealed class PosAlignDemo : Scenario
                 }
             }
         }
-
-        superView.LayoutSubviews ();
     }
 
     /// <summary>

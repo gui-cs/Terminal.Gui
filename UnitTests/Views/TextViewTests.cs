@@ -6359,17 +6359,16 @@ This is the second line.
         };
 
         //                                             TAB to jump between text fields.
-        TestHelpers.AssertDriverAttributesAre ("0000000", Application.Driver, attributes);
+        TestHelpers.AssertDriverAttributesAre ("0000000", _output, Application.Driver, attributes);
         Assert.Empty (_textView.SelectedCellsList);
 
         _textView.NewKeyDownEvent (Key.CursorRight.WithCtrl.WithShift);
 
-        var first = true;
-        Application.RunIteration (ref rs, ref first);
+        Application.RunIteration (ref rs, true);
         Assert.Equal (new Point (4, 0), _textView.CursorPosition);
 
         //                                             TAB to jump between text fields.
-        TestHelpers.AssertDriverAttributesAre ("1111000", Application.Driver, attributes);
+        TestHelpers.AssertDriverAttributesAre ("1111000", _output, Application.Driver, attributes);
         Assert.Equal ("TAB ", Cell.ToString (_textView.SelectedCellsList [^1]));
         top.Dispose ();
     }
@@ -8994,12 +8993,12 @@ Error   ";
 2222225555
 3333555555
 4444455555";
-        TestHelpers.AssertDriverAttributesAre (expectedColor, Application.Driver, attributes);
+        TestHelpers.AssertDriverAttributesAre (expectedColor, _output, Application.Driver, attributes);
 
         tv.WordWrap = true;
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
-        TestHelpers.AssertDriverAttributesAre (expectedColor, Application.Driver, attributes);
+        TestHelpers.AssertDriverAttributesAre (expectedColor, _output, Application.Driver, attributes);
 
         tv.CursorPosition = new (6, 2);
         tv.SelectionStartColumn = 0;
@@ -9029,7 +9028,7 @@ Dialogror ";
 4400000000
 1111555555
 2222224445";
-        TestHelpers.AssertDriverAttributesAre (expectedColor, Application.Driver, attributes);
+        TestHelpers.AssertDriverAttributesAre (expectedColor, _output, Application.Driver, attributes);
 
         tv.Undo ();
         tv.CursorPosition = new (0, 3);
@@ -9066,7 +9065,7 @@ ror       ";
 1111555555
 2222225555
 4445555555";
-        TestHelpers.AssertDriverAttributesAre (expectedColor, Application.Driver, attributes);
+        TestHelpers.AssertDriverAttributesAre (expectedColor, _output, Application.Driver, attributes);
 
         Application.End (rs);
         top.Dispose ();

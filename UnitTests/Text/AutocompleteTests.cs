@@ -19,12 +19,13 @@ public class AutocompleteTests (ITestOutputHelper output)
                                 .ToList ();
         Toplevel top = new ();
         top.Add (tv);
-        Application.Begin (top);
+        RunState rs = Application.Begin (top);
 
         for (var i = 0; i < 7; i++)
         {
             Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
-            Application.Refresh ();
+            top.SetNeedsDisplay();
+            Application.RunIteration (ref rs);
 
             if (i < 4 || i > 5)
             {
@@ -51,7 +52,8 @@ This a long line and against TextView.
                                        new() { Position = new (6, 0), Flags = MouseFlags.Button1Pressed }
                                       )
                     );
-        Application.Refresh ();
+        top.SetNeedsDisplay ();
+        Application.RunIteration (ref rs);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -62,7 +64,8 @@ This a long line and against TextView.
                                                      );
 
         Assert.True (tv.NewKeyDownEvent (Key.G));
-        Application.Refresh ();
+        top.SetNeedsDisplay ();
+        Application.RunIteration (ref rs);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -72,7 +75,8 @@ This ag long line and against TextView.
                                                      );
 
         Assert.True (tv.NewKeyDownEvent (Key.CursorLeft));
-        Application.Refresh ();
+        top.SetNeedsDisplay ();
+        Application.RunIteration (ref rs);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -82,7 +86,8 @@ This ag long line and against TextView.
                                                      );
 
         Assert.True (tv.NewKeyDownEvent (Key.CursorLeft));
-        Application.Refresh ();
+        top.SetNeedsDisplay ();
+        Application.RunIteration (ref rs);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -92,7 +97,8 @@ This ag long line and against TextView.
                                                      );
 
         Assert.True (tv.NewKeyDownEvent (Key.CursorLeft));
-        Application.Refresh ();
+        top.SetNeedsDisplay ();
+        Application.RunIteration (ref rs);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -103,7 +109,8 @@ This ag long line and against TextView.",
         for (var i = 0; i < 3; i++)
         {
             Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
-            Application.Refresh ();
+            top.SetNeedsDisplay ();
+            Application.RunIteration (ref rs);
 
             TestHelpers.AssertDriverContentsWithFrameAre (
                                                           @"
@@ -114,7 +121,8 @@ This ag long line and against TextView.
         }
 
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
-        Application.Refresh ();
+        top.SetNeedsDisplay ();
+        Application.RunIteration (ref rs);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -125,7 +133,8 @@ This a long line and against TextView.
                                                      );
 
         Assert.True (tv.NewKeyDownEvent (Key.N));
-        Application.Refresh ();
+        top.SetNeedsDisplay ();
+        Application.RunIteration (ref rs);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -135,7 +144,8 @@ This an long line and against TextView.
                                                      );
 
         Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
-        Application.Refresh ();
+        top.SetNeedsDisplay ();
+        Application.RunIteration (ref rs);
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"

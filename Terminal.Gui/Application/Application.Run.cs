@@ -80,26 +80,19 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     {
         ArgumentNullException.ThrowIfNull (toplevel);
 
-//#if DEBUG_IDISPOSABLE
-//        Debug.Assert (!toplevel.WasDisposed);
+        //#if DEBUG_IDISPOSABLE
+        //        Debug.Assert (!toplevel.WasDisposed);
 
-//        if (_cachedRunStateToplevel is { } && _cachedRunStateToplevel != toplevel)
-//        {
-//            Debug.Assert (_cachedRunStateToplevel.WasDisposed);
-//        }
-//#endif
+        //        if (_cachedRunStateToplevel is { } && _cachedRunStateToplevel != toplevel)
+        //        {
+        //            Debug.Assert (_cachedRunStateToplevel.WasDisposed);
+        //        }
+        //#endif
 
         // Ensure the mouse is ungrabbed.
         MouseGrabView = null;
 
         var rs = new RunState (toplevel);
-
-        // View implements ISupportInitializeNotification which is derived from ISupportInitialize
-        if (!toplevel.IsInitialized)
-        {
-            toplevel.BeginInit ();
-            toplevel.EndInit ();
-        }
 
 #if DEBUG_IDISPOSABLE
         if (Top is { } && toplevel != Top && !TopLevels.Contains (Top))
@@ -184,8 +177,16 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             }
         }
 
-        toplevel.SetRelativeLayout (Driver!.Screen.Size);
-        toplevel.LayoutSubviews ();
+        // View implements ISupportInitializeNotification which is derived from ISupportInitialize
+        if (!toplevel.IsInitialized)
+        {
+            toplevel.BeginInit ();
+            toplevel.EndInit (); // Calls Layout
+
+            //// Force a layout - normally this is done each iteration of the main loop but we prime it here.
+            //toplevel.SetLayoutNeeded ();
+            //toplevel.Layout (Screen.Size);
+        }
 
         // Try to set initial focus to any TabStop
         if (!toplevel.HasFocus)
@@ -193,13 +194,16 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             toplevel.SetFocus ();
         }
 
-        toplevel.OnLoaded ();
-
+        // DEBATE: Should Begin call Refresh (or Draw) here? It previously did.
+        //   FOR: the screen has something on it after Begin is called.
+        //   AGAINST: the screen is cleared and then redrawn in RunLoop. We don't want to draw twice.
         Refresh ();
+
+        toplevel.OnLoaded ();
 
         if (PositionCursor ())
         {
-            Driver.UpdateCursor ();
+            Driver?.UpdateCursor ();
         }
 
         NotifyNewRunState?.Invoke (toplevel, new (rs));
@@ -225,11 +229,12 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         // If the view is not visible or enabled, don't position the cursor
         if (mostFocused is null || !mostFocused.Visible || !mostFocused.Enabled)
         {
-            Driver!.GetCursorVisibility (out CursorVisibility current);
+            CursorVisibility current = CursorVisibility.Invisible;
+            Driver?.GetCursorVisibility (out current);
 
             if (current != CursorVisibility.Invisible)
             {
-                Driver.SetCursorVisibility (CursorVisibility.Invisible);
+                Driver?.SetCursorVisibility (CursorVisibility.Invisible);
             }
 
             return false;
@@ -486,20 +491,38 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// <summary>Wakes up the running application that might be waiting on input.</summary>
     public static void Wakeup () { MainLoop?.Wakeup (); }
 
-    /// <summary>Triggers a refresh of the entire display.</summary>
-    public static void Refresh ()
+    /// <summary>
+    /// Refreshes layout and the display. Only Views that need to be laid out (see <see cref="View.IsLayoutNeeded()"/>) will be laid out.
+    /// Only Views that need to be drawn (see <see cref="View.NeedsDisplay"/>) will be drawn.
+    /// </summary>
+    /// <param name="forceRedraw">If <see langword="true"/> the entire View hierarchy will be redrawn. The default is <see langword="false"/> and should only be overriden for testing.</param>
+    public static void Refresh (bool forceRedraw = false)
     {
+        bool clear = false;
         foreach (Toplevel tl in TopLevels.Reverse ())
         {
-            if (tl.LayoutNeeded)
+            if (tl.IsLayoutNeeded ())
             {
-                tl.LayoutSubviews ();
+                clear = true;
+                tl.Layout (Screen.Size);
             }
+        }
 
+        if (clear || forceRedraw)
+        {
+            Driver?.ClearContents ();
+        }
+
+        foreach (Toplevel tl in TopLevels.Reverse ())
+        {
+            if (clear || forceRedraw)
+            {
+                tl.SetNeedsDisplay ();
+            }
             tl.Draw ();
         }
 
-        Driver!.Refresh ();
+        Driver?.Refresh ();
     }
 
     /// <summary>This event is raised on each iteration of the main loop.</summary>
@@ -534,23 +557,23 @@ public static partial class Application // Run (Begin, Run, End, Stop)
                 return;
             }
 
-            RunIteration (ref state, ref firstIteration);
+            firstIteration = RunIteration (ref state, firstIteration);
         }
 
         MainLoop!.Running = false;
 
         // Run one last iteration to consume any outstanding input events from Driver
         // This is important for remaining OnKeyUp events.
-        RunIteration (ref state, ref firstIteration);
+        RunIteration (ref state, firstIteration);
     }
 
     /// <summary>Run one application iteration.</summary>
     /// <param name="state">The state returned by <see cref="Begin(Toplevel)"/>.</param>
     /// <param name="firstIteration">
-    ///     Set to <see langword="true"/> if this is the first run loop iteration. Upon return, it
-    ///     will be set to <see langword="false"/> if at least one iteration happened.
+    ///     Set to <see langword="true"/> if this is the first run loop iteration.
     /// </param>
-    public static void RunIteration (ref RunState state, ref bool firstIteration)
+    /// <returns><see langword="false"/> if at least one iteration happened.</returns>
+    public static bool RunIteration (ref RunState state, bool firstIteration = false)
     {
         if (MainLoop!.Running && MainLoop.EventsPending ())
         {
@@ -568,7 +591,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         if (Top is null)
         {
-            return;
+            return firstIteration;
         }
 
         Refresh ();
@@ -578,6 +601,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             Driver!.UpdateCursor ();
         }
 
+        return firstIteration;
     }
 
     /// <summary>Stops the provided <see cref="Toplevel"/>, causing or the <paramref name="top"/> if provided.</summary>

@@ -5,6 +5,8 @@
 //   Miguel de Icaza (miguel@gnome.org)
 //
 
+using System.Diagnostics;
+
 namespace Terminal.Gui;
 
 /// <summary>ScrollBarViews are views that display a 1-character scrollbar, either horizontal or vertical</summary>
@@ -225,7 +227,7 @@ public class ScrollBarView : View
 
             if (IsInitialized)
             {
-                SetNeedsLayout ();
+                SetLayoutNeeded ();
 
                 if (value)
                 {
@@ -259,7 +261,7 @@ public class ScrollBarView : View
             {
                 SetRelativeLayout (SuperView?.Frame.Size ?? Host.Frame.Size);
                 ShowHideScrollBars (false);
-                SetNeedsDisplay ();
+                SetLayoutNeeded ();
             }
         }
     }
