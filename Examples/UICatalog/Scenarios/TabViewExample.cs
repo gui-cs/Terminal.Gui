@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace UICatalog.Scenarios;
@@ -11,7 +13,8 @@ public class TabViewExample : Scenario
     private MenuItem _miShowBorder;
     private MenuItem _miShowTabViewBorder;
     private MenuItem _miShowTopLine;
-    private MenuItem _miTabsOnBottom;
+    private MenuItem [] _miTabsSide;
+    private MenuItem _cachedTabsSide;
     private TabView _tabView;
 
     public override void Main ()
@@ -21,6 +24,8 @@ public class TabViewExample : Scenario
 
         // Setup - Create a top-level application window and configure it.
         Toplevel appWindow = new ();
+
+        _miTabsSide = SetTabsSide ();
 
         var menu = new MenuBar
         {
@@ -53,11 +58,12 @@ public class TabViewExample : Scenario
                              {
                                  Checked = true, CheckType = MenuItemCheckStyle.Checked
                              },
-                         _miTabsOnBottom =
-                             new ("_Tabs On Bottom", "", SetTabsOnBottom)
-                             {
-                                 Checked = false, CheckType = MenuItemCheckStyle.Checked
-                             },
+                         null,
+                         _miTabsSide [0],
+                         _miTabsSide [1],
+                         _miTabsSide [2],
+                         _miTabsSide [3],
+                         null,
                          _miShowTabViewBorder =
                              new (
                                   "_Show TabView Border",
@@ -240,12 +246,41 @@ public class TabViewExample : Scenario
 
     private void Quit () { Application.RequestStop (); }
 
-    private void SetTabsOnBottom ()
+    private MenuItem [] SetTabsSide ()
     {
-        _miTabsOnBottom.Checked = !_miTabsOnBottom.Checked;
+        List<MenuItem> menuItems = [];
 
-        _tabView.Style.TabsOnBottom = (bool)_miTabsOnBottom.Checked;
-        _tabView.ApplyStyleChanges ();
+        foreach (TabSide side in Enum.GetValues (typeof (TabSide)))
+        {
+            string sideName = Enum.GetName (typeof (TabSide), side);
+            var item = new MenuItem { Title = $"_{sideName}", Data = side };
+            item.CheckType |= MenuItemCheckStyle.Radio;
+
+            item.Action += () =>
+                           {
+                               if (_cachedTabsSide == item)
+                               {
+                                   return;
+                               }
+
+                               _cachedTabsSide.Checked = false;
+                               item.Checked = true;
+                               _cachedTabsSide = item;
+                               _tabView.Style.TabsSide = (TabSide)item.Data;
+                               _tabView.ApplyStyleChanges ();
+                           };
+            item.ShortcutKey = ((Key)sideName! [0].ToString ().ToLower ()).WithCtrl;
+
+            if (sideName == "Top")
+            {
+                item.Checked = true;
+                _cachedTabsSide = item;
+            }
+
+            menuItems.Add (item);
+        }
+
+        return menuItems.ToArray ();
     }
 
     private void ShowBorder ()

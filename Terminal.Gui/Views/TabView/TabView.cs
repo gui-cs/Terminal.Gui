@@ -321,48 +321,59 @@ public class TabView : View
         _containerView.BorderStyle = Style.ShowBorder ? LineStyle.Single : LineStyle.None;
         _containerView.Width = Dim.Fill ();
 
-        if (Style.TabsOnBottom)
+        int tabHeight;
+
+        switch (Style.TabsSide)
         {
-            // Tabs are along the bottom so just dodge the border
-            if (Style.ShowBorder)
-            {
-                _containerView.Border!.Thickness = new Thickness (1, 1, 1, 0);
-            }
+            case TabSide.Top:
+                // Tabs are along the top
+                if (Style.ShowBorder)
+                {
+                    _containerView.Border!.Thickness = new Thickness (1, 0, 1, 1);
+                }
 
-            _containerView.Y = 0;
+                _tabsBar.Y = 0;
 
-            int tabHeight = GetTabHeight (false);
+                tabHeight = GetTabHeight (true);
 
-            // Fill client area leaving space at bottom for tabs
-            _containerView.Height = Dim.Fill (tabHeight);
+                //move content down to make space for tabs
+                _containerView.Y = Pos.Bottom (_tabsBar);
 
-            _tabsBar.Height = tabHeight;
+                // Fill client area leaving space at bottom for border
+                _containerView.Height = Dim.Fill ();
 
-            _tabsBar.Y = Pos.Bottom (_containerView);
-        }
-        else
-        {
-            // Tabs are along the top
-            if (Style.ShowBorder)
-            {
-                _containerView.Border!.Thickness = new Thickness (1, 0, 1, 1);
-            }
+                // The top tab should be 2 or 3 rows high and on the top
 
-            _tabsBar.Y = 0;
+                _tabsBar.Height = tabHeight;
 
-            int tabHeight = GetTabHeight (true);
+                // Should be able to just use 0 but switching between top/bottom tabs repeatedly breaks in ValidatePosDim if just using the absolute value 0
 
-            //move content down to make space for tabs
-            _containerView.Y = Pos.Bottom (_tabsBar);
+                break;
+            case TabSide.Bottom:
+                // Tabs are along the bottom so just dodge the border
+                if (Style.ShowBorder)
+                {
+                    _containerView.Border!.Thickness = new Thickness (1, 1, 1, 0);
+                }
 
-            // Fill client area leaving space at bottom for border
-            _containerView.Height = Dim.Fill ();
+                _containerView.Y = 0;
 
-            // The top tab should be 2 or 3 rows high and on the top
+                tabHeight = GetTabHeight (false);
 
-            _tabsBar.Height = tabHeight;
+                // Fill client area leaving space at bottom for tabs
+                _containerView.Height = Dim.Fill (tabHeight);
 
-            // Should be able to just use 0 but switching between top/bottom tabs repeatedly breaks in ValidatePosDim if just using the absolute value 0
+                _tabsBar.Height = tabHeight;
+
+                _tabsBar.Y = Pos.Bottom (_containerView);
+
+                break;
+            case TabSide.Left:
+                break;
+            case TabSide.Right:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException ();
         }
 
         SetNeedsLayout ();
@@ -615,19 +626,19 @@ public class TabView : View
 
     /// <summary>
     ///     Returns the number of rows occupied by rendering the tabs, this depends on <see cref="TabStyle.ShowTopLine"/>
-    ///     and can be 0 (e.g. if <see cref="TabStyle.TabsOnBottom"/> and you ask for <paramref name="top"/>).
+    ///     and can be 0 (e.g. if <see cref="TabStyle.TabsSide"/> and you ask for <paramref name="top"/>).
     /// </summary>
     /// <param name="top">True to measure the space required at the top of the control, false to measure space at the bottom.</param>
     /// .
     /// <returns></returns>
     private int GetTabHeight (bool top)
     {
-        if (top && Style.TabsOnBottom)
+        if (top && Style.TabsSide == TabSide.Bottom)
         {
             return 0;
         }
 
-        if (!top && !Style.TabsOnBottom)
+        if (!top && Style.TabsSide == TabSide.Top)
         {
             return 0;
         }

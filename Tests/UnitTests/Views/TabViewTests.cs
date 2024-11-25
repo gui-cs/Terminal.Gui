@@ -737,7 +737,7 @@ public class TabViewTests (ITestOutputHelper output)
         TabView tv = GetTabView (out _, out _);
         tv.Width = 3;
         tv.Height = 5;
-        tv.Style = new () { ShowTopLine = false, TabsOnBottom = true };
+        tv.Style = new () { ShowTopLine = false, TabsSide = TabSide.Bottom };
         tv.ApplyStyleChanges ();
         tv.Layout ();
 
@@ -761,7 +761,7 @@ public class TabViewTests (ITestOutputHelper output)
         TabView tv = GetTabView (out _, out _);
         tv.Width = 4;
         tv.Height = 5;
-        tv.Style = new () { ShowTopLine = false, TabsOnBottom = true };
+        tv.Style = new () { ShowTopLine = false, TabsSide = TabSide.Bottom };
         tv.ApplyStyleChanges ();
         tv.Layout ();
 
@@ -785,7 +785,7 @@ public class TabViewTests (ITestOutputHelper output)
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
         tv.Width = 10;
         tv.Height = 5;
-        tv.Style = new () { ShowTopLine = false, TabsOnBottom = true };
+        tv.Style = new () { ShowTopLine = false, TabsSide = TabSide.Bottom };
         tv.ApplyStyleChanges ();
         tv.Layout ();
 
@@ -1070,7 +1070,7 @@ public class TabViewTests (ITestOutputHelper output)
         TabView tv = GetTabView (out _, out _);
         tv.Width = 3;
         tv.Height = 5;
-        tv.Style = new () { TabsOnBottom = true };
+        tv.Style = new () { TabsSide = TabSide.Bottom };
         tv.ApplyStyleChanges ();
         tv.Layout ();
 
@@ -1094,7 +1094,7 @@ public class TabViewTests (ITestOutputHelper output)
         TabView tv = GetTabView (out _, out _);
         tv.Width = 4;
         tv.Height = 5;
-        tv.Style = new () { TabsOnBottom = true };
+        tv.Style = new () { TabsSide = TabSide.Bottom };
         tv.ApplyStyleChanges ();
         tv.Layout ();
 
@@ -1118,7 +1118,7 @@ public class TabViewTests (ITestOutputHelper output)
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
         tv.Width = 10;
         tv.Height = 5;
-        tv.Style = new () { TabsOnBottom = true };
+        tv.Style = new () { TabsSide = TabSide.Bottom };
         tv.ApplyStyleChanges ();
         tv.Layout ();
 
@@ -1200,7 +1200,7 @@ public class TabViewTests (ITestOutputHelper output)
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
         tv.Width = 20;
         tv.Height = 5;
-        tv.Style = new () { TabsOnBottom = true };
+        tv.Style = new () { TabsSide = TabSide.Bottom };
         tv.ApplyStyleChanges ();
 
         tab1.DisplayText = "Tab0";
@@ -1382,7 +1382,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         tv.Width = 20;
         tv.Height = 5;
-        tv.Style = new () { TabsOnBottom = true };
+        tv.Style = new () { TabsSide = TabSide.Bottom };
         tv.ApplyStyleChanges ();
 
         tv.Layout ();

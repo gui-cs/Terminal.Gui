@@ -9,10 +9,10 @@ public class TabStyle
     /// <summary>
     ///     True to show the top lip of tabs.  False to directly begin with tab text during rendering.  When true header
     ///     line occupies 3 rows, when false only 2. Defaults to true.
-    ///     <para>When <see cref="TabsOnBottom"/> is enabled this instead applies to the bottommost line of the control</para>
+    ///     <para>When <see cref="TabsSide"/> is enabled this instead applies to the bottommost line of the control</para>
     /// </summary>
     public bool ShowTopLine { get; set; } = true;
 
-    /// <summary>True to render tabs at the bottom of the view instead of the top</summary>
-    public bool TabsOnBottom { get; set; } = false;
+    /// <summary>Gets or sets the tabs side to render.</summary>
+    public TabSide TabsSide { get; set; }
 }
