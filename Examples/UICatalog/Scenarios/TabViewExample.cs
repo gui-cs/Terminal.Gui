@@ -305,7 +305,7 @@ public class TabViewExample : Scenario
     {
         _miShowTopLine.Checked = !_miShowTopLine.Checked;
 
-        _tabView.Style.ShowTopLine = (bool)_miShowTopLine.Checked;
+        _tabView.Style.ShowInitialLine = (bool)_miShowTopLine.Checked;
         _tabView.ApplyStyleChanges ();
     }
 }

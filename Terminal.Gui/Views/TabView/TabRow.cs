@@ -150,7 +150,7 @@ internal class TabRow : View
         {
             View tab = tabLocations [i];
             Rectangle vts = tab.ViewportToScreen (tab.Viewport);
-            int selectedOffset = _host.Style.ShowTopLine && tabLocations [i] == _host.SelectedTab ? 0 : 1;
+            int selectedOffset = _host.Style.ShowInitialLine && tabLocations [i] == _host.SelectedTab ? 0 : 1;
 
             if (tabLocations [i] == _host.SelectedTab)
             {
@@ -234,7 +234,7 @@ internal class TabRow : View
                             throw new ArgumentOutOfRangeException ();
                     }
 
-                    if (_host.Style.ShowTopLine)
+                    if (_host.Style.ShowInitialLine)
                     {
                         switch (_host.Style.TabsSide)
                         {
@@ -284,7 +284,7 @@ internal class TabRow : View
 
                 if (i < tabLocations.Length - 1)
                 {
-                    if (_host.Style.ShowTopLine)
+                    if (_host.Style.ShowInitialLine)
                     {
                         switch (_host.Style.TabsSide)
                         {
@@ -383,7 +383,7 @@ internal class TabRow : View
                     switch (_host.Style.TabsSide)
                     {
                         case TabSide.Top:
-                            if (_host.Style.ShowTopLine)
+                            if (_host.Style.ShowInitialLine)
                             {
                                 // ULCorner
                                 lc.AddLine (
@@ -418,7 +418,7 @@ internal class TabRow : View
 
                             break;
                         case TabSide.Bottom:
-                            if (_host.Style.ShowTopLine)
+                            if (_host.Style.ShowInitialLine)
                             {
                                 // LLCorner
                                 lc.AddLine (
@@ -462,7 +462,7 @@ internal class TabRow : View
                 }
                 else if (i > 0)
                 {
-                    if (_host.Style.ShowTopLine || _host.Style.TabsSide == TabSide.Bottom)
+                    if (_host.Style.ShowInitialLine || _host.Style.TabsSide == TabSide.Bottom)
                     {
                         // Upper left tee
                         lc.AddLine (
@@ -498,7 +498,7 @@ internal class TabRow : View
             }
             else if (i < tabLocations.Length - 1)
             {
-                if (_host.Style.ShowTopLine)
+                if (_host.Style.ShowInitialLine)
                 {
                     // Upper right tee
                     lc.AddLine (
@@ -516,7 +516,7 @@ internal class TabRow : View
                                );
                 }
 
-                if (_host.Style.ShowTopLine || _host.Style.TabsSide == TabSide.Top)
+                if (_host.Style.ShowInitialLine || _host.Style.TabsSide == TabSide.Top)
                 {
                     // Lower right tee
                     lc.AddLine (
@@ -650,7 +650,7 @@ internal class TabRow : View
             {
                 var arrowOffset = 1;
 
-                int lastSelectedTab = !_host.Style.ShowTopLine && i == selectedTab ? 1 :
+                int lastSelectedTab = !_host.Style.ShowInitialLine && i == selectedTab ? 1 :
                                       _host.Style.TabsSide == TabSide.Bottom ? 1 : 0;
                 Rectangle tabsBarVts = ViewportToScreen (Viewport);
                 int lineLength = tabsBarVts.Right - vts.Right;
@@ -775,7 +775,7 @@ internal class TabRow : View
             return 0;
         }
 
-        return _host.Style.ShowTopLine ? 2 : 1;
+        return _host.Style.ShowInitialLine ? 2 : 1;
     }
 
     /// <summary>Renders the line with the tab names in it.</summary>
@@ -787,7 +787,7 @@ internal class TabRow : View
         }
 
         View? selected = null;
-        int topLine = _host.Style.ShowTopLine ? 1 : 0;
+        int topLine = _host.Style.ShowInitialLine ? 1 : 0;
 
         foreach (Tab toRender in _host._tabLocations)
         {

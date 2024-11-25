@@ -567,7 +567,7 @@ public class TabView : View
             long maxWidth = Math.Max (0, Math.Min (bounds.Width - 3, MaxTabTextWidth));
 
             tab.Width = 2;
-            tab.Height = Style.ShowTopLine ? 3 : 2;
+            tab.Height = Style.ShowInitialLine ? 3 : 2;
 
             // if tab view is width <= 3 don't render any tabs
             if (maxWidth == 0)
@@ -592,7 +592,7 @@ public class TabView : View
             }
 
             tab.Width = Math.Max (tabTextWidth + 2, 1);
-            tab.Height = Style.ShowTopLine ? 3 : 2;
+            tab.Height = Style.ShowInitialLine ? 3 : 2;
 
             // if there is not enough space for this tab
             if (i + tabTextWidth >= bounds.Width)
@@ -625,7 +625,7 @@ public class TabView : View
     }
 
     /// <summary>
-    ///     Returns the number of rows occupied by rendering the tabs, this depends on <see cref="TabStyle.ShowTopLine"/>
+    ///     Returns the number of rows occupied by rendering the tabs, this depends on <see cref="TabStyle.ShowInitialLine"/>
     ///     and can be 0 (e.g. if <see cref="TabStyle.TabsSide"/> and you ask for <paramref name="top"/>).
     /// </summary>
     /// <param name="top">True to measure the space required at the top of the control, false to measure space at the bottom.</param>
@@ -643,7 +643,7 @@ public class TabView : View
             return 0;
         }
 
-        return Style.ShowTopLine ? 3 : 2;
+        return Style.ShowInitialLine ? 3 : 2;
     }
 
     internal void Tab_MouseClick (object sender, MouseEventArgs e)
