@@ -118,7 +118,7 @@ internal class TabRow : View
     /// <inheritdoc/>
     protected override void OnSubViewLayout (LayoutEventArgs args)
     {
-        _host._tabLocations = _host.CalculateViewport (Viewport).ToArray ();
+        _host._tabLocations = _host.CalculateViewport (_host.Viewport).ToArray ();
 
         RenderTabLine ();
 
