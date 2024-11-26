@@ -732,7 +732,7 @@ public class TabViewTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void ShowInitialLine_False_TabsOnBottom_True_TestTabView_Width3 ()
+    public void ShowInitialLine_False_TabsSide_Bottom_TestTabView_Width3 ()
     {
         TabView tv = GetTabView (out _, out _);
         tv.Width = 3;
@@ -756,7 +756,7 @@ public class TabViewTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void ShowInitialLine_False_TabsOnBottom_True_TestTabView_Width4 ()
+    public void ShowInitialLine_False_TabsSide_Bottom_TestTabView_Width4 ()
     {
         TabView tv = GetTabView (out _, out _);
         tv.Width = 4;
@@ -780,7 +780,7 @@ public class TabViewTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void ShowInitialLine_False_TabsOnBottom_True_TestThinTabView_WithLongNames ()
+    public void ShowInitialLine_False_TabsSide_Bottom_TestThinTabView_WithLongNames ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
         tv.Width = 10;
@@ -1065,7 +1065,7 @@ public class TabViewTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void ShowInitialLine_True_TabsOnBottom_True_TestTabView_Width3 ()
+    public void ShowInitialLine_True_TabsSide_Bottom_TestTabView_Width3 ()
     {
         TabView tv = GetTabView (out _, out _);
         tv.Width = 3;
@@ -1089,7 +1089,7 @@ public class TabViewTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void ShowInitialLine_True_TabsOnBottom_True_TestTabView_Width4 ()
+    public void ShowInitialLine_True_TabsSide_Bottom_TestTabView_Width4 ()
     {
         TabView tv = GetTabView (out _, out _);
         tv.Width = 4;
@@ -1113,7 +1113,7 @@ public class TabViewTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void ShowInitialLine_True_TabsOnBottom_True_TestThinTabView_WithLongNames ()
+    public void ShowInitialLine_True_TabsSide_Bottom_TestThinTabView_WithLongNames ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
         tv.Width = 10;
@@ -1195,7 +1195,7 @@ public class TabViewTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void ShowInitialLine_True_TabsOnBottom_True_With_Unicode ()
+    public void ShowInitialLine_True_TabsSide_Bottom_With_Unicode ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
         tv.Width = 20;
