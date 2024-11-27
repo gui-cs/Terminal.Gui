@@ -379,8 +379,8 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
         Assert.Equal (tv.SelectedTab.View, top.Focused.MostFocused);
 
-        // Press the cursor up key to focus the selected tab
-        Assert.True (Application.RaiseKeyDownEvent (Key.CursorUp));
+        // Press F6 key to focus the selected tab
+        Assert.True (Application.RaiseKeyDownEvent (Key.F6));
         Application.LayoutAndDraw ();
 
         // Is the selected tab focused
