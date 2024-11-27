@@ -23,6 +23,7 @@ public class Tab : View
         set
         {
             _displayText = value;
+            DisplayTextChanged?.Invoke (this, EventArgs.Empty);
             SetNeedsLayout ();
         }
     }
@@ -30,4 +31,9 @@ public class Tab : View
     /// <summary>The control to display when the tab is selected.</summary>
     /// <value></value>
     public View? View { get; set; }
+
+    /// <summary>
+    /// Raised when <see cref="DisplayText"/> changed.
+    /// </summary>
+    public event EventHandler? DisplayTextChanged;
 }
