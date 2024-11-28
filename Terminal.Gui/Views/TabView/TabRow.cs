@@ -177,7 +177,7 @@ internal class TabRow : View
                         case TabSide.Top:
                             // Lower left vertical line
                             lc.AddLine (
-                                        new Point (vts.X - 1, vts.Bottom - selectedOffset),
+                                        new (vts.X - 1, vts.Bottom - selectedOffset),
                                         -1,
                                         Orientation.Vertical,
                                         tab.BorderStyle
@@ -187,7 +187,7 @@ internal class TabRow : View
                         case TabSide.Bottom:
                             // Upper left vertical line
                             lc.AddLine (
-                                        new Point (vts.X - 1, vts.Y - 1),
+                                        new (vts.X - 1, vts.Y - 1),
                                         -1,
                                         Orientation.Vertical,
                                         tab.BorderStyle
@@ -209,14 +209,14 @@ internal class TabRow : View
                         case TabSide.Top:
                             // LRCorner
                             lc.AddLine (
-                                        new Point (vts.X - 1, vts.Bottom - selectedOffset),
+                                        new (vts.X - 1, vts.Bottom - selectedOffset),
                                         -1,
                                         Orientation.Vertical,
                                         tab.BorderStyle
                                        );
 
                             lc.AddLine (
-                                        new Point (vts.X - 1, vts.Bottom - selectedOffset),
+                                        new (vts.X - 1, vts.Bottom - selectedOffset),
                                         -1,
                                         Orientation.Horizontal,
                                         tab.BorderStyle
@@ -226,14 +226,14 @@ internal class TabRow : View
                         case TabSide.Bottom:
                             // URCorner
                             lc.AddLine (
-                                        new Point (vts.X - 1, vts.Y - 1),
+                                        new (vts.X - 1, vts.Y - 1),
                                         1,
                                         Orientation.Vertical,
                                         tab.BorderStyle
                                        );
 
                             lc.AddLine (
-                                        new Point (vts.X - 1, vts.Y - 1),
+                                        new (vts.X - 1, vts.Y - 1),
                                         -1,
                                         Orientation.Horizontal,
                                         tab.BorderStyle
@@ -255,14 +255,14 @@ internal class TabRow : View
                             case TabSide.Top:
                                 // Upper left tee
                                 lc.AddLine (
-                                            new Point (vts.X - 1, vts.Y - 1),
+                                            new (vts.X - 1, vts.Y - 1),
                                             1,
                                             Orientation.Vertical,
                                             tab.BorderStyle
                                            );
 
                                 lc.AddLine (
-                                            new Point (vts.X - 1, vts.Y - 1),
+                                            new (vts.X - 1, vts.Y - 1),
                                             0,
                                             Orientation.Horizontal,
                                             tab.BorderStyle
@@ -272,14 +272,14 @@ internal class TabRow : View
                             case TabSide.Bottom:
                                 // Lower left tee
                                 lc.AddLine (
-                                            new Point (vts.X - 1, vts.Bottom),
+                                            new (vts.X - 1, vts.Bottom),
                                             -1,
                                             Orientation.Vertical,
                                             tab.BorderStyle
                                            );
 
                                 lc.AddLine (
-                                            new Point (vts.X - 1, vts.Bottom),
+                                            new (vts.X - 1, vts.Bottom),
                                             0,
                                             Orientation.Horizontal,
                                             tab.BorderStyle
@@ -305,14 +305,14 @@ internal class TabRow : View
                             case TabSide.Top:
                                 // Upper right tee
                                 lc.AddLine (
-                                            new Point (vts.Right, vts.Y - 1),
+                                            new (vts.Right, vts.Y - 1),
                                             1,
                                             Orientation.Vertical,
                                             tab.BorderStyle
                                            );
 
                                 lc.AddLine (
-                                            new Point (vts.Right, vts.Y - 1),
+                                            new (vts.Right, vts.Y - 1),
                                             0,
                                             Orientation.Horizontal,
                                             tab.BorderStyle
@@ -322,14 +322,14 @@ internal class TabRow : View
                             case TabSide.Bottom:
                                 // Lower right tee
                                 lc.AddLine (
-                                            new Point (vts.Right, vts.Bottom),
+                                            new (vts.Right, vts.Bottom),
                                             -1,
                                             Orientation.Vertical,
                                             tab.BorderStyle
                                            );
 
                                 lc.AddLine (
-                                            new Point (vts.Right, vts.Bottom),
+                                            new (vts.Right, vts.Bottom),
                                             0,
                                             Orientation.Horizontal,
                                             tab.BorderStyle
@@ -351,14 +351,14 @@ internal class TabRow : View
                     case TabSide.Top:
                         //LLCorner
                         lc.AddLine (
-                                    new Point (vts.Right, vts.Bottom - selectedOffset),
+                                    new (vts.Right, vts.Bottom - selectedOffset),
                                     -1,
                                     Orientation.Vertical,
                                     tab.BorderStyle
                                    );
 
                         lc.AddLine (
-                                    new Point (vts.Right, vts.Bottom - selectedOffset),
+                                    new (vts.Right, vts.Bottom - selectedOffset),
                                     1,
                                     Orientation.Horizontal,
                                     tab.BorderStyle
@@ -368,14 +368,14 @@ internal class TabRow : View
                     case TabSide.Bottom:
                         //URCorner
                         lc.AddLine (
-                                    new Point (vts.Right, vts.Y - 1),
+                                    new (vts.Right, vts.Y - 1),
                                     1,
                                     Orientation.Vertical,
                                     tab.BorderStyle
                                    );
 
                         lc.AddLine (
-                                    new Point (vts.Right, vts.Y - 1),
+                                    new (vts.Right, vts.Y - 1),
                                     1,
                                     Orientation.Horizontal,
                                     tab.BorderStyle
@@ -401,14 +401,14 @@ internal class TabRow : View
                             {
                                 // ULCorner
                                 lc.AddLine (
-                                            new Point (vts.X - 1, vts.Y - 1),
+                                            new (vts.X - 1, vts.Y - 1),
                                             1,
                                             Orientation.Vertical,
                                             tab.BorderStyle
                                            );
 
                                 lc.AddLine (
-                                            new Point (vts.X - 1, vts.Y - 1),
+                                            new (vts.X - 1, vts.Y - 1),
                                             1,
                                             Orientation.Horizontal,
                                             tab.BorderStyle
@@ -417,14 +417,14 @@ internal class TabRow : View
 
                             // LLCorner
                             lc.AddLine (
-                                        new Point (vts.X - 1, vts.Bottom),
+                                        new (vts.X - 1, vts.Bottom),
                                         -1,
                                         Orientation.Vertical,
                                         tab.BorderStyle
                                        );
 
                             lc.AddLine (
-                                        new Point (vts.X - 1, vts.Bottom),
+                                        new (vts.X - 1, vts.Bottom),
                                         1,
                                         Orientation.Horizontal,
                                         tab.BorderStyle
@@ -436,14 +436,14 @@ internal class TabRow : View
                             {
                                 // LLCorner
                                 lc.AddLine (
-                                            new Point (vts.X - 1, vts.Bottom),
+                                            new (vts.X - 1, vts.Bottom),
                                             -1,
                                             Orientation.Vertical,
                                             tab.BorderStyle
                                            );
 
                                 lc.AddLine (
-                                            new Point (vts.X - 1, vts.Bottom),
+                                            new (vts.X - 1, vts.Bottom),
                                             1,
                                             Orientation.Horizontal,
                                             tab.BorderStyle
@@ -452,14 +452,14 @@ internal class TabRow : View
 
                             // ULCorner
                             lc.AddLine (
-                                        new Point (vts.X - 1, vts.Y - 1),
+                                        new (vts.X - 1, vts.Y - 1),
                                         1,
                                         Orientation.Vertical,
                                         tab.BorderStyle
                                        );
 
                             lc.AddLine (
-                                        new Point (vts.X - 1, vts.Y - 1),
+                                        new (vts.X - 1, vts.Y - 1),
                                         1,
                                         Orientation.Horizontal,
                                         tab.BorderStyle
@@ -480,14 +480,14 @@ internal class TabRow : View
                     {
                         // Upper left tee
                         lc.AddLine (
-                                    new Point (vts.X - 1, vts.Y - 1),
+                                    new (vts.X - 1, vts.Y - 1),
                                     1,
                                     Orientation.Vertical,
                                     tab.BorderStyle
                                    );
 
                         lc.AddLine (
-                                    new Point (vts.X - 1, vts.Y - 1),
+                                    new (vts.X - 1, vts.Y - 1),
                                     0,
                                     Orientation.Horizontal,
                                     tab.BorderStyle
@@ -496,14 +496,14 @@ internal class TabRow : View
 
                     // Lower left tee
                     lc.AddLine (
-                                new Point (vts.X - 1, vts.Bottom),
+                                new (vts.X - 1, vts.Bottom),
                                 -1,
                                 Orientation.Vertical,
                                 tab.BorderStyle
                                );
 
                     lc.AddLine (
-                                new Point (vts.X - 1, vts.Bottom),
+                                new (vts.X - 1, vts.Bottom),
                                 0,
                                 Orientation.Horizontal,
                                 tab.BorderStyle
@@ -516,14 +516,14 @@ internal class TabRow : View
                 {
                     // Upper right tee
                     lc.AddLine (
-                                new Point (vts.Right, vts.Y - 1),
+                                new (vts.Right, vts.Y - 1),
                                 1,
                                 Orientation.Vertical,
                                 tab.BorderStyle
                                );
 
                     lc.AddLine (
-                                new Point (vts.Right, vts.Y - 1),
+                                new (vts.Right, vts.Y - 1),
                                 0,
                                 Orientation.Horizontal,
                                 tab.BorderStyle
@@ -534,14 +534,14 @@ internal class TabRow : View
                 {
                     // Lower right tee
                     lc.AddLine (
-                                new Point (vts.Right, vts.Bottom),
+                                new (vts.Right, vts.Bottom),
                                 -1,
                                 Orientation.Vertical,
                                 tab.BorderStyle
                                );
 
                     lc.AddLine (
-                                new Point (vts.Right, vts.Bottom),
+                                new (vts.Right, vts.Bottom),
                                 0,
                                 Orientation.Horizontal,
                                 tab.BorderStyle
@@ -551,14 +551,14 @@ internal class TabRow : View
                 {
                     // Upper right tee
                     lc.AddLine (
-                                new Point (vts.Right, vts.Y - 1),
+                                new (vts.Right, vts.Y - 1),
                                 1,
                                 Orientation.Vertical,
                                 tab.BorderStyle
                                );
 
                     lc.AddLine (
-                                new Point (vts.Right, vts.Y - 1),
+                                new (vts.Right, vts.Y - 1),
                                 0,
                                 Orientation.Horizontal,
                                 tab.BorderStyle
@@ -573,14 +573,14 @@ internal class TabRow : View
                     case TabSide.Top:
                         // Lower left vertical line
                         lc.AddLine (
-                                    new Point (vts.X - 1, vts.Bottom),
+                                    new (vts.X - 1, vts.Bottom),
                                     0,
                                     Orientation.Vertical,
                                     tab.BorderStyle
                                    );
 
                         lc.AddLine (
-                                    new Point (vts.X - 1, vts.Bottom),
+                                    new (vts.X - 1, vts.Bottom),
                                     1,
                                     Orientation.Horizontal,
                                     tab.BorderStyle
@@ -590,14 +590,14 @@ internal class TabRow : View
                     case TabSide.Bottom:
                         // Upper left vertical line
                         lc.AddLine (
-                                    new Point (vts.X - 1, vts.Y - 1),
+                                    new (vts.X - 1, vts.Y - 1),
                                     0,
                                     Orientation.Vertical,
                                     tab.BorderStyle
                                    );
 
                         lc.AddLine (
-                                    new Point (vts.X - 1, vts.Y - 1),
+                                    new (vts.X - 1, vts.Y - 1),
                                     1,
                                     Orientation.Horizontal,
                                     tab.BorderStyle
@@ -620,14 +620,14 @@ internal class TabRow : View
                     case TabSide.Top:
                         // Lower right tee
                         lc.AddLine (
-                                    new Point (vts.Right, vts.Bottom),
+                                    new (vts.Right, vts.Bottom),
                                     -1,
                                     Orientation.Vertical,
                                     tab.BorderStyle
                                    );
 
                         lc.AddLine (
-                                    new Point (vts.Right, vts.Bottom),
+                                    new (vts.Right, vts.Bottom),
                                     0,
                                     Orientation.Horizontal,
                                     tab.BorderStyle
@@ -637,14 +637,14 @@ internal class TabRow : View
                     case TabSide.Bottom:
                         // Upper right tee
                         lc.AddLine (
-                                    new Point (vts.Right, vts.Y - 1),
+                                    new (vts.Right, vts.Y - 1),
                                     1,
                                     Orientation.Vertical,
                                     tab.BorderStyle
                                    );
 
                         lc.AddLine (
-                                    new Point (vts.Right, vts.Y - 1),
+                                    new (vts.Right, vts.Y - 1),
                                     0,
                                     Orientation.Horizontal,
                                     tab.BorderStyle
@@ -678,7 +678,7 @@ internal class TabRow : View
                         {
                             case TabSide.Top:
                                 lc.AddLine (
-                                            new Point (
+                                            new (
                                                        vts.Right,
                                                        vts.Bottom - lastSelectedTab
                                                       ),
@@ -690,7 +690,7 @@ internal class TabRow : View
                                 break;
                             case TabSide.Bottom:
                                 lc.AddLine (
-                                            new Point (vts.Right, vts.Y - lastSelectedTab),
+                                            new (vts.Right, vts.Y - lastSelectedTab),
                                             lineLength - arrowOffset,
                                             Orientation.Horizontal,
                                             tab.BorderStyle
@@ -713,7 +713,7 @@ internal class TabRow : View
                     {
                         case TabSide.Top:
                             lc.AddLine (
-                                        new Point (vts.Right, vts.Bottom - lastSelectedTab),
+                                        new (vts.Right, vts.Bottom - lastSelectedTab),
                                         lineLength,
                                         Orientation.Horizontal,
                                         tab.BorderStyle
@@ -722,7 +722,7 @@ internal class TabRow : View
                             break;
                         case TabSide.Bottom:
                             lc.AddLine (
-                                        new Point (vts.Right, vts.Y - lastSelectedTab),
+                                        new (vts.Right, vts.Y - lastSelectedTab),
                                         lineLength,
                                         Orientation.Horizontal,
                                         tab.BorderStyle
@@ -744,7 +744,7 @@ internal class TabRow : View
                             case TabSide.Top:
                                 // More URCorner
                                 lc.AddLine (
-                                            new Point (
+                                            new (
                                                        tabsBarVts.Right - 1,
                                                        vts.Bottom - lastSelectedTab
                                                       ),
@@ -757,7 +757,7 @@ internal class TabRow : View
                             case TabSide.Bottom:
                                 // More LRCorner
                                 lc.AddLine (
-                                            new Point (
+                                            new (
                                                        tabsBarVts.Right - 1,
                                                        vts.Y - lastSelectedTab
                                                       ),
