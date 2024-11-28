@@ -5,8 +5,8 @@ namespace Terminal.Gui.Views;
 internal class TabRow : View
 {
     private readonly TabView _host;
-    private readonly View _leftScrollIndicator;
-    private readonly View _rightScrollIndicator;
+    private readonly View _leftUpScrollIndicator;
+    private readonly View _rightDownScrollIndicator;
 
     public TabRow (TabView host)
     {
@@ -18,27 +18,25 @@ internal class TabRow : View
         TabStop = TabBehavior.TabGroup;
         Width = Dim.Fill ();
 
-        _rightScrollIndicator = new View
+        _rightDownScrollIndicator = new View
         {
-            Id = "rightScrollIndicator",
+            Id = "rightDownScrollIndicator",
             Width = 1,
             Height = 1,
-            Visible = false,
-            Text = Glyphs.RightArrow.ToString ()
+            Visible = false
         };
-        _rightScrollIndicator.MouseClick += _host.Tab_MouseClick!;
+        _rightDownScrollIndicator.MouseClick += _host.Tab_MouseClick!;
 
-        _leftScrollIndicator = new View
+        _leftUpScrollIndicator = new View
         {
-            Id = "leftScrollIndicator",
+            Id = "leftUpScrollIndicator",
             Width = 1,
             Height = 1,
-            Visible = false,
-            Text = Glyphs.LeftArrow.ToString ()
+            Visible = false
         };
-        _leftScrollIndicator.MouseClick += _host.Tab_MouseClick!;
+        _leftUpScrollIndicator.MouseClick += _host.Tab_MouseClick!;
 
-        Add (_rightScrollIndicator, _leftScrollIndicator);
+        Add (_rightDownScrollIndicator, _leftUpScrollIndicator);
     }
 
     /// <inheritdoc />
@@ -84,11 +82,11 @@ internal class TabRow : View
         {
             var scrollIndicatorHit = 0;
 
-            if (me.View is { Id: "rightScrollIndicator" } || me.Flags.HasFlag (MouseFlags.WheeledDown) || me.Flags.HasFlag (MouseFlags.WheeledRight))
+            if (me.View is { Id: "rightDownScrollIndicator" } || me.Flags.HasFlag (MouseFlags.WheeledDown) || me.Flags.HasFlag (MouseFlags.WheeledRight))
             {
                 scrollIndicatorHit = 1;
             }
-            else if (me.View is { Id: "leftScrollIndicator" } || me.Flags.HasFlag (MouseFlags.WheeledUp) || me.Flags.HasFlag (MouseFlags.WheeledLeft))
+            else if (me.View is { Id: "leftUpScrollIndicator" } || me.Flags.HasFlag (MouseFlags.WheeledUp) || me.Flags.HasFlag (MouseFlags.WheeledLeft))
             {
                 scrollIndicatorHit = -1;
             }
@@ -672,7 +670,7 @@ internal class TabRow : View
                 int lineLength = tabsBarVts.Right - vts.Right;
 
                 // Right horizontal line
-                if (ShouldDrawRightScrollIndicator ())
+                if (ShouldDrawRightDownScrollIndicator ())
                 {
                     if (lineLength - arrowOffset > 0)
                     {
@@ -784,20 +782,30 @@ internal class TabRow : View
         LineCanvas.Merge (lc);
     }
 
-    private int GetUnderlineYPosition ()
+    private int GetUnderlineXOrYPosition ()
     {
-        if (_host.Style.TabsSide == TabSide.Bottom)
+        switch (_host.Style.TabsSide)
         {
-            return 0;
-        }
+            case TabSide.Top:
 
-        return _host.Style.ShowInitialLine ? 2 : 1;
+                return _host.Style.ShowInitialLine ? 2 : 1;
+            case TabSide.Bottom:
+
+                return 0;
+            case TabSide.Left:
+
+                return _host.Style.ShowInitialLine ? Frame.Right - 1 : Frame.Right;
+            case TabSide.Right:
+                return 0;
+            default:
+                throw new ArgumentOutOfRangeException ();
+        }
     }
 
     /// <summary>Renders the line of the tab that adjoins the content of the tab.</summary>
     private void RenderUnderline ()
     {
-        int y = GetUnderlineYPosition ();
+        int xOrY = GetUnderlineXOrYPosition ();
 
         Tab? selected = _host._tabLocations?.FirstOrDefault (t => t == _host.SelectedTab);
 
@@ -806,42 +814,91 @@ internal class TabRow : View
             return;
         }
 
-        // draw scroll indicators
+        // Set the correct glyphs for scroll indicators
+        switch (_host.Style.TabsSide)
+        {
+            case TabSide.Top:
+            case TabSide.Bottom:
+                _rightDownScrollIndicator.Text = Glyphs.RightArrow.ToString ();
+                _leftUpScrollIndicator.Text = Glyphs.LeftArrow.ToString ();
+
+                break;
+            case TabSide.Left:
+            case TabSide.Right:
+                _rightDownScrollIndicator.Text = Glyphs.DownArrow.ToString ();
+                _leftUpScrollIndicator.Text = Glyphs.UpArrow.ToString ();
+
+                break;
+            default:
+                throw new ArgumentOutOfRangeException ();
+        }
+
+        // position scroll indicators
 
         // if there are more tabs to the left not visible
         if (_host.TabScrollOffset > 0)
         {
-            _leftScrollIndicator.X = 0;
-            _leftScrollIndicator.Y = y;
+            switch (_host.Style.TabsSide)
+            {
+                case TabSide.Top:
+                case TabSide.Bottom:
+                    _leftUpScrollIndicator.X = 0;
+                    _leftUpScrollIndicator.Y = xOrY;
+
+                    break;
+                case TabSide.Left:
+                case TabSide.Right:
+                    _leftUpScrollIndicator.X = xOrY;
+                    _leftUpScrollIndicator.Y = 0;
+
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException ();
+            }
 
             // indicate that
-            _leftScrollIndicator.Visible = true;
+            _leftUpScrollIndicator.Visible = true;
 
             // Ensures this is clicked instead of the first tab
-            MoveSubViewToEnd (_leftScrollIndicator);
+            MoveSubViewToEnd (_leftUpScrollIndicator);
         }
         else
         {
-            _leftScrollIndicator.Visible = false;
+            _leftUpScrollIndicator.Visible = false;
         }
 
         // if there are more tabs to the right not visible
-        if (ShouldDrawRightScrollIndicator ())
+        if (ShouldDrawRightDownScrollIndicator ())
         {
-            _rightScrollIndicator.X = Viewport.Width - 1;
-            _rightScrollIndicator.Y = y;
+            switch (_host.Style.TabsSide)
+            {
+                case TabSide.Top:
+                case TabSide.Bottom:
+                    _rightDownScrollIndicator.X = Viewport.Width - 1;
+                    _rightDownScrollIndicator.Y = xOrY;
+
+                    break;
+                case TabSide.Left:
+                case TabSide.Right:
+                    _rightDownScrollIndicator.X = xOrY;
+                    _rightDownScrollIndicator.Y = Viewport.Height - 1;
+
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException ();
+            }
 
             // indicate that
-            _rightScrollIndicator.Visible = true;
+            _rightDownScrollIndicator.Visible = true;
 
             // Ensures this is clicked instead of the last tab if under this
-            MoveSubViewToStart (_rightScrollIndicator);
+            MoveSubViewToStart (_rightDownScrollIndicator);
         }
         else
         {
-            _rightScrollIndicator.Visible = false;
+            _rightDownScrollIndicator.Visible = false;
         }
     }
 
-    private bool ShouldDrawRightScrollIndicator () { return _host._tabLocations!.LastOrDefault () != _host.Tabs.LastOrDefault (); }
+    private bool ShouldDrawRightDownScrollIndicator () { return _host._tabLocations!.LastOrDefault () != _host.Tabs.LastOrDefault (); }
 }
