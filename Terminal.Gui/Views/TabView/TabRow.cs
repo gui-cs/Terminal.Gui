@@ -14,6 +14,7 @@ internal class TabRow : View
         Id = "tabRow";
 
         CanFocus = true;
+        // Because TabRow has focusable subviews, it must be a TabGroup
         TabStop = TabBehavior.TabGroup;
         Width = Dim.Fill ();
 

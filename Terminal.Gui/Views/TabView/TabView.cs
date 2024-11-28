@@ -28,8 +28,8 @@ public class TabView : View
     public TabView ()
     {
         CanFocus = true;
-        TabStop = TabBehavior.TabStop; // Because TabView has focusable subviews, it must be a TabGroup
-        _tabsBar = new TabRow (this);
+        TabStop = TabBehavior.TabStop;
+        _tabsBar = new (this);
         _containerView = new ();
         ApplyStyleChanges ();
 
@@ -37,9 +37,45 @@ public class TabView : View
         base.Add (_containerView);
 
         // Things this view knows how to do
-        AddCommand (Command.Left, () => SwitchTabBy (-1));
+        AddCommand (Command.Left, () =>
+                                  {
+                                      if (Style.TabsSide is TabSide.Top or TabSide.Bottom)
+                                      {
+                                          return SwitchTabBy (-1);
+                                      }
 
-        AddCommand (Command.Right, () => SwitchTabBy (1));
+                                      return false;
+                                  });
+
+        AddCommand (Command.Right, () =>
+                                   {
+                                       if (Style.TabsSide is TabSide.Top or TabSide.Bottom)
+                                       {
+                                           return SwitchTabBy (1);
+                                       }
+
+                                       return false;
+                                   });
+
+        AddCommand (Command.Up, () =>
+                                  {
+                                      if (Style.TabsSide is TabSide.Left or TabSide.Right)
+                                      {
+                                          return SwitchTabBy (-1);
+                                      }
+
+                                      return false;
+                                  });
+
+        AddCommand (Command.Down, () =>
+                                   {
+                                       if (Style.TabsSide is TabSide.Left or TabSide.Right)
+                                       {
+                                           return SwitchTabBy (1);
+                                       }
+
+                                       return false;
+                                   });
 
         AddCommand (
                     Command.LeftStart,
@@ -174,6 +210,8 @@ public class TabView : View
         // Default keybindings for this view
         KeyBindings.Add (Key.CursorLeft, Command.Left);
         KeyBindings.Add (Key.CursorRight, Command.Right);
+        KeyBindings.Add (Key.CursorUp, Command.Up);
+        KeyBindings.Add (Key.CursorDown, Command.Down);
         KeyBindings.Add (Key.Home, Command.LeftStart);
         KeyBindings.Add (Key.End, Command.RightEnd);
         KeyBindings.Add (Key.PageDown, Command.PageDown);
