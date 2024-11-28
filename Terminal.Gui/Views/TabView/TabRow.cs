@@ -41,6 +41,14 @@ internal class TabRow : View
         Add (_rightScrollIndicator, _leftScrollIndicator);
     }
 
+    /// <inheritdoc />
+    public override void EndInit ()
+    {
+        _host._tabLocations = _host.CalculateViewport (Viewport);
+
+        base.EndInit ();
+    }
+
     protected override bool OnMouseEvent (MouseEventArgs me)
     {
         View? parent = me.View is Adornment adornment ? adornment.Parent : me.View;
@@ -119,9 +127,16 @@ internal class TabRow : View
     /// <inheritdoc/>
     protected override void OnSubViewLayout (LayoutEventArgs args)
     {
-        _host._tabLocations = _host.CalculateViewport (_host.Viewport).ToArray ();
+        if (_host._tabLocations is null)
+        {
+            return;
+        }
 
-        RenderTabLine ();
+        if (_host is { SelectedTab: { }, _tabLocations: { } } && !_host._tabLocations!.Contains (_host.SelectedTab))
+        {
+            _host.SelectedTab = _host._tabLocations [0];
+            Application.Invoke (() => _host.SetNeedsLayout ());
+        }
 
         RenderUnderline ();
 
@@ -766,7 +781,7 @@ internal class TabRow : View
             }
         }
 
-        _host.LineCanvas.Merge (lc);
+        LineCanvas.Merge (lc);
     }
 
     private int GetUnderlineYPosition ()
@@ -777,96 +792,6 @@ internal class TabRow : View
         }
 
         return _host.Style.ShowInitialLine ? 2 : 1;
-    }
-
-    /// <summary>Renders the line with the tab names in it.</summary>
-    private void RenderTabLine ()
-    {
-        if (_host._tabLocations is null)
-        {
-            return;
-        }
-
-        View? selected = null;
-        int topLine = _host.Style.ShowInitialLine ? 1 : 0;
-
-        foreach (Tab toRender in _host._tabLocations)
-        {
-            Tab tab = toRender;
-
-            if (toRender == _host.SelectedTab)
-            {
-                selected = tab;
-
-                switch (_host.Style.TabsSide)
-                {
-                    case TabSide.Top:
-                        tab.Border!.Thickness = new (1, topLine, 1, 0);
-                        tab.Margin!.Thickness = new (0, 0, 0, topLine);
-
-                        break;
-                    case TabSide.Bottom:
-                        tab.Border!.Thickness = new (1, 0, 1, topLine);
-                        tab.Margin!.Thickness = new (0, 1, 0, 0);
-
-                        break;
-                    case TabSide.Left:
-                        break;
-                    case TabSide.Right:
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException ();
-                }
-            }
-            else if (selected is null)
-            {
-                switch (_host.Style.TabsSide)
-                {
-                    case TabSide.Top:
-                        tab.Border!.Thickness = new (1, topLine, 1, 1);
-                        tab.Margin!.Thickness = new (0, 0, 0, 0);
-
-                        break;
-                    case TabSide.Bottom:
-                        tab.Border!.Thickness = new (1, 1, 1, topLine);
-                        tab.Margin!.Thickness = new (0, 0, 0, 0);
-
-                        break;
-                    case TabSide.Left:
-                        break;
-                    case TabSide.Right:
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException ();
-                }
-            }
-            else
-            {
-                switch (_host.Style.TabsSide)
-                {
-                    case TabSide.Top:
-                        tab.Border!.Thickness = new (1, topLine, 1, 1);
-                        tab.Margin!.Thickness = new (0, 0, 0, 0);
-
-                        break;
-                    case TabSide.Bottom:
-                        tab.Border!.Thickness = new (1, 1, 1, topLine);
-                        tab.Margin!.Thickness = new (0, 0, 0, 0);
-
-                        break;
-                    case TabSide.Left:
-                        break;
-                    case TabSide.Right:
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException ();
-                }
-            }
-
-            // Ensures updating TextFormatter constrains
-            tab.TextFormatter.ConstrainToWidth = tab.GetContentSize ().Width;
-            tab.TextFormatter.ConstrainToHeight = tab.GetContentSize ().Height;
-        }
     }
 
     /// <summary>Renders the line of the tab that adjoins the content of the tab.</summary>
