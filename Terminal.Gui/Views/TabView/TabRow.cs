@@ -14,11 +14,12 @@ internal class TabRow : View
         Id = "tabRow";
 
         CanFocus = true;
+
         // Because TabRow has focusable subviews, it must be a TabGroup
         TabStop = TabBehavior.TabGroup;
         Width = Dim.Fill ();
 
-        _rightDownScrollIndicator = new View
+        _rightDownScrollIndicator = new ()
         {
             Id = "rightDownScrollIndicator",
             Width = 1,
@@ -27,7 +28,7 @@ internal class TabRow : View
         };
         _rightDownScrollIndicator.MouseClick += _host.Tab_MouseClick!;
 
-        _leftUpScrollIndicator = new View
+        _leftUpScrollIndicator = new ()
         {
             Id = "leftUpScrollIndicator",
             Width = 1,
@@ -39,7 +40,7 @@ internal class TabRow : View
         Add (_rightDownScrollIndicator, _leftUpScrollIndicator);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void EndInit ()
     {
         _host._tabLocations = _host.CalculateViewport (Viewport);
@@ -50,11 +51,11 @@ internal class TabRow : View
     protected override bool OnMouseEvent (MouseEventArgs me)
     {
         View? parent = me.View is Adornment adornment ? adornment.Parent : me.View;
-        Tab? hit = parent as Tab;
+        var hit = parent as Tab;
 
         if (me.IsSingleClicked)
         {
-            _host.OnTabClicked (new TabMouseEventArgs (hit!, me));
+            _host.OnTabClicked (new (hit!, me));
 
             // user canceled click
             if (me.Handled)
@@ -109,7 +110,7 @@ internal class TabRow : View
         return false;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
     {
         if (_host.SelectedTab is { HasFocus: false, CanFocus: true } && focusedView == this)
@@ -141,7 +142,7 @@ internal class TabRow : View
         base.OnSubViewLayout (args);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnRenderingLineCanvas ()
     {
         RenderTabLineCanvas ();
@@ -164,7 +165,6 @@ internal class TabRow : View
         {
             View tab = tabLocations [i];
             Rectangle vts = tab.ViewportToScreen (tab.Viewport);
-            int selectedOffset = _host.Style.ShowInitialLine && tabLocations [i] == _host.SelectedTab ? 0 : 1;
 
             if (tabLocations [i] == _host.SelectedTab)
             {
@@ -177,7 +177,7 @@ internal class TabRow : View
                         case TabSide.Top:
                             // Lower left vertical line
                             lc.AddLine (
-                                        new (vts.X - 1, vts.Bottom - selectedOffset),
+                                        new (vts.X - 1, vts.Bottom),
                                         -1,
                                         Orientation.Vertical,
                                         tab.BorderStyle
@@ -195,6 +195,14 @@ internal class TabRow : View
 
                             break;
                         case TabSide.Left:
+                            // Upper horizontal line
+                            lc.AddLine (
+                                        new (vts.Right, vts.Y - 1),
+                                        -1,
+                                        Orientation.Horizontal,
+                                        tab.BorderStyle
+                                       );
+
                             break;
                         case TabSide.Right:
                             break;
@@ -209,14 +217,14 @@ internal class TabRow : View
                         case TabSide.Top:
                             // LRCorner
                             lc.AddLine (
-                                        new (vts.X - 1, vts.Bottom - selectedOffset),
+                                        new (vts.X - 1, vts.Bottom),
                                         -1,
                                         Orientation.Vertical,
                                         tab.BorderStyle
                                        );
 
                             lc.AddLine (
-                                        new (vts.X - 1, vts.Bottom - selectedOffset),
+                                        new (vts.X - 1, vts.Bottom),
                                         -1,
                                         Orientation.Horizontal,
                                         tab.BorderStyle
@@ -241,6 +249,24 @@ internal class TabRow : View
 
                             break;
                         case TabSide.Left:
+                            if (Frame.Bottom > tab.Frame.Bottom)
+                            {
+                                // LRCorner
+                                lc.AddLine (
+                                            new (vts.Right, vts.Bottom),
+                                            1,
+                                            Orientation.Vertical,
+                                            tab.BorderStyle
+                                           );
+
+                                lc.AddLine (
+                                            new (vts.Right, vts.Bottom),
+                                            -1,
+                                            Orientation.Horizontal,
+                                            tab.BorderStyle
+                                           );
+                            }
+
                             break;
                         case TabSide.Right:
                             break;
@@ -287,6 +313,21 @@ internal class TabRow : View
 
                                 break;
                             case TabSide.Left:
+                                // Upper left tee
+                                lc.AddLine (
+                                            new (vts.X - 1, vts.Y - 1),
+                                            0,
+                                            Orientation.Vertical,
+                                            tab.BorderStyle
+                                           );
+
+                                lc.AddLine (
+                                            new (vts.X - 1, vts.Y - 1),
+                                            1,
+                                            Orientation.Horizontal,
+                                            tab.BorderStyle
+                                           );
+
                                 break;
                             case TabSide.Right:
                                 break;
@@ -337,6 +378,21 @@ internal class TabRow : View
 
                                 break;
                             case TabSide.Left:
+                                // Upper right tee
+                                lc.AddLine (
+                                            new (vts.X - 1, vts.Bottom),
+                                            0,
+                                            Orientation.Vertical,
+                                            tab.BorderStyle
+                                           );
+
+                                lc.AddLine (
+                                            new (vts.X - 1, vts.Bottom),
+                                            1,
+                                            Orientation.Horizontal,
+                                            tab.BorderStyle
+                                           );
+
                                 break;
                             case TabSide.Right:
                                 break;
@@ -349,16 +405,16 @@ internal class TabRow : View
                 switch (_host.Style.TabsSide)
                 {
                     case TabSide.Top:
-                        //LLCorner
+                        //LRCorner
                         lc.AddLine (
-                                    new (vts.Right, vts.Bottom - selectedOffset),
+                                    new (vts.Right, vts.Bottom),
                                     -1,
                                     Orientation.Vertical,
                                     tab.BorderStyle
                                    );
 
                         lc.AddLine (
-                                    new (vts.Right, vts.Bottom - selectedOffset),
+                                    new (vts.Right, vts.Bottom),
                                     1,
                                     Orientation.Horizontal,
                                     tab.BorderStyle
@@ -383,6 +439,24 @@ internal class TabRow : View
 
                         break;
                     case TabSide.Left:
+                        if (Frame.Bottom > tab.Frame.Bottom)
+                        {
+                            //LRCorner
+                            lc.AddLine (
+                                        new (vts.Right, vts.Bottom),
+                                        1,
+                                        Orientation.Vertical,
+                                        tab.BorderStyle
+                                       );
+
+                            lc.AddLine (
+                                        new (vts.Right, vts.Bottom),
+                                        -1,
+                                        Orientation.Horizontal,
+                                        tab.BorderStyle
+                                       );
+                        }
+
                         break;
                     case TabSide.Right:
                         break;
@@ -467,6 +541,39 @@ internal class TabRow : View
 
                             break;
                         case TabSide.Left:
+                            if (_host.Style.ShowInitialLine)
+                            {
+                                // ULCorner
+                                lc.AddLine (
+                                            new (vts.X - 1, vts.Y - 1),
+                                            1,
+                                            Orientation.Vertical,
+                                            tab.BorderStyle
+                                           );
+
+                                lc.AddLine (
+                                            new (vts.X - 1, vts.Y - 1),
+                                            1,
+                                            Orientation.Horizontal,
+                                            tab.BorderStyle
+                                           );
+                            }
+
+                            // LLCorner
+                            lc.AddLine (
+                                        new (vts.X - 1, vts.Bottom),
+                                        -1,
+                                        Orientation.Vertical,
+                                        tab.BorderStyle
+                                       );
+
+                            lc.AddLine (
+                                        new (vts.X - 1, vts.Bottom),
+                                        1,
+                                        Orientation.Horizontal,
+                                        tab.BorderStyle
+                                       );
+
                             break;
                         case TabSide.Right:
                             break;
@@ -476,93 +583,239 @@ internal class TabRow : View
                 }
                 else if (i > 0)
                 {
-                    if (_host.Style.ShowInitialLine || _host.Style.TabsSide == TabSide.Bottom)
+                    switch (_host.Style.TabsSide)
                     {
-                        // Upper left tee
-                        lc.AddLine (
-                                    new (vts.X - 1, vts.Y - 1),
-                                    1,
-                                    Orientation.Vertical,
-                                    tab.BorderStyle
-                                   );
+                        case TabSide.Top:
+                        case TabSide.Bottom:
+                            if (_host.Style.ShowInitialLine || _host.Style.TabsSide == TabSide.Bottom)
+                            {
+                                // Upper left tee
+                                lc.AddLine (
+                                            new (vts.X - 1, vts.Y - 1),
+                                            1,
+                                            Orientation.Vertical,
+                                            tab.BorderStyle
+                                           );
 
-                        lc.AddLine (
-                                    new (vts.X - 1, vts.Y - 1),
-                                    0,
-                                    Orientation.Horizontal,
-                                    tab.BorderStyle
-                                   );
+                                lc.AddLine (
+                                            new (vts.X - 1, vts.Y - 1),
+                                            0,
+                                            Orientation.Horizontal,
+                                            tab.BorderStyle
+                                           );
+                            }
+
+                            // Lower left tee
+                            lc.AddLine (
+                                        new (vts.X - 1, vts.Bottom),
+                                        -1,
+                                        Orientation.Vertical,
+                                        tab.BorderStyle
+                                       );
+
+                            lc.AddLine (
+                                        new (vts.X - 1, vts.Bottom),
+                                        0,
+                                        Orientation.Horizontal,
+                                        tab.BorderStyle
+                                       );
+
+                            break;
+                        case TabSide.Left:
+                            if (_host.Style.ShowInitialLine || _host.Style.TabsSide == TabSide.Right)
+                            {
+                                // Upper left tee
+                                lc.AddLine (
+                                            new (vts.X - 1, vts.Y - 1),
+                                            0,
+                                            Orientation.Vertical,
+                                            tab.BorderStyle
+                                           );
+
+                                lc.AddLine (
+                                            new (vts.X - 1, vts.Y - 1),
+                                            1,
+                                            Orientation.Horizontal,
+                                            tab.BorderStyle
+                                           );
+                            }
+
+                            // Lower left tee
+                            lc.AddLine (
+                                        new (vts.Right, vts.Y - 1),
+                                        0,
+                                        Orientation.Vertical,
+                                        tab.BorderStyle
+                                       );
+
+                            lc.AddLine (
+                                        new (vts.Right, vts.Y - 1),
+                                        -1,
+                                        Orientation.Horizontal,
+                                        tab.BorderStyle
+                                       );
+
+                            break;
+                        case TabSide.Right:
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException ();
                     }
-
-                    // Lower left tee
-                    lc.AddLine (
-                                new (vts.X - 1, vts.Bottom),
-                                -1,
-                                Orientation.Vertical,
-                                tab.BorderStyle
-                               );
-
-                    lc.AddLine (
-                                new (vts.X - 1, vts.Bottom),
-                                0,
-                                Orientation.Horizontal,
-                                tab.BorderStyle
-                               );
                 }
             }
             else if (i < tabLocations.Length - 1)
             {
                 if (_host.Style.ShowInitialLine)
                 {
-                    // Upper right tee
-                    lc.AddLine (
-                                new (vts.Right, vts.Y - 1),
-                                1,
-                                Orientation.Vertical,
-                                tab.BorderStyle
-                               );
+                    switch (_host.Style.TabsSide)
+                    {
+                        case TabSide.Top:
+                        case TabSide.Bottom:
+                            // Upper right tee
+                            lc.AddLine (
+                                        new (vts.Right, vts.Y - 1),
+                                        1,
+                                        Orientation.Vertical,
+                                        tab.BorderStyle
+                                       );
 
-                    lc.AddLine (
-                                new (vts.Right, vts.Y - 1),
-                                0,
-                                Orientation.Horizontal,
-                                tab.BorderStyle
-                               );
+                            lc.AddLine (
+                                        new (vts.Right, vts.Y - 1),
+                                        0,
+                                        Orientation.Horizontal,
+                                        tab.BorderStyle
+                                       );
+
+                            break;
+                        case TabSide.Left:
+                            // Upper right tee
+                            lc.AddLine (
+                                        new (vts.X - 1, vts.Bottom),
+                                        0,
+                                        Orientation.Vertical,
+                                        tab.BorderStyle
+                                       );
+
+                            lc.AddLine (
+                                        new (vts.X - 1, vts.Bottom),
+                                        1,
+                                        Orientation.Horizontal,
+                                        tab.BorderStyle
+                                       );
+
+                            break;
+                        case TabSide.Right:
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException ();
+                    }
                 }
 
-                if (_host.Style.ShowInitialLine || _host.Style.TabsSide == TabSide.Top)
+                if (_host.Style.ShowInitialLine)
                 {
-                    // Lower right tee
-                    lc.AddLine (
-                                new (vts.Right, vts.Bottom),
-                                -1,
-                                Orientation.Vertical,
-                                tab.BorderStyle
-                               );
+                    switch (_host.Style.TabsSide)
+                    {
+                        case TabSide.Top:
+                        case TabSide.Bottom:
+                            // Lower right tee
+                            lc.AddLine (
+                                        new (vts.Right, vts.Bottom),
+                                        -1,
+                                        Orientation.Vertical,
+                                        tab.BorderStyle
+                                       );
 
-                    lc.AddLine (
-                                new (vts.Right, vts.Bottom),
-                                0,
-                                Orientation.Horizontal,
-                                tab.BorderStyle
-                               );
+                            lc.AddLine (
+                                        new (vts.Right, vts.Bottom),
+                                        0,
+                                        Orientation.Horizontal,
+                                        tab.BorderStyle
+                                       );
+
+                            break;
+                        case TabSide.Left:
+                            // Lower right tee
+                            lc.AddLine (
+                                        new (vts.Right, vts.Bottom),
+                                        0,
+                                        Orientation.Vertical,
+                                        tab.BorderStyle
+                                       );
+
+                            lc.AddLine (
+                                        new (vts.Right, vts.Bottom),
+                                        -1,
+                                        Orientation.Horizontal,
+                                        tab.BorderStyle
+                                       );
+
+                            break;
+                        case TabSide.Right:
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException ();
+                    }
                 }
                 else
                 {
-                    // Upper right tee
-                    lc.AddLine (
-                                new (vts.Right, vts.Y - 1),
-                                1,
-                                Orientation.Vertical,
-                                tab.BorderStyle
-                               );
+                    switch (_host.Style.TabsSide)
+                    {
+                        case TabSide.Top:
+                            // Lower right tee
+                            lc.AddLine (
+                                        new (vts.Right, vts.Bottom),
+                                        -1,
+                                        Orientation.Vertical,
+                                        tab.BorderStyle
+                                       );
 
-                    lc.AddLine (
-                                new (vts.Right, vts.Y - 1),
-                                0,
-                                Orientation.Horizontal,
-                                tab.BorderStyle
-                               );
+                            lc.AddLine (
+                                        new (vts.Right, vts.Bottom),
+                                        0,
+                                        Orientation.Horizontal,
+                                        tab.BorderStyle
+                                       );
+
+                            break;
+                        case TabSide.Bottom:
+                            // Upper right tee
+                            lc.AddLine (
+                                        new (vts.Right, vts.Y - 1),
+                                        1,
+                                        Orientation.Vertical,
+                                        tab.BorderStyle
+                                       );
+
+                            lc.AddLine (
+                                        new (vts.Right, vts.Y - 1),
+                                        0,
+                                        Orientation.Horizontal,
+                                        tab.BorderStyle
+                                       );
+
+                            break;
+                        case TabSide.Left:
+                            // Lower right tee
+                            lc.AddLine (
+                                        new (vts.Right, vts.Bottom),
+                                        0,
+                                        Orientation.Vertical,
+                                        tab.BorderStyle
+                                       );
+
+                            lc.AddLine (
+                                        new (vts.Right, vts.Bottom),
+                                        -1,
+                                        Orientation.Horizontal,
+                                        tab.BorderStyle
+                                       );
+
+                            break;
+                        case TabSide.Right:
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException ();
+                    }
                 }
             }
 
@@ -605,6 +858,21 @@ internal class TabRow : View
 
                         break;
                     case TabSide.Left:
+                        // Upper horizontal line
+                        lc.AddLine (
+                                    new (vts.Right, vts.Y - 1),
+                                    1,
+                                    Orientation.Vertical,
+                                    tab.BorderStyle
+                                   );
+
+                        lc.AddLine (
+                                    new (vts.Right, vts.Y - 1),
+                                    0,
+                                    Orientation.Horizontal,
+                                    tab.BorderStyle
+                                   );
+
                         break;
                     case TabSide.Right:
                         break;
@@ -652,6 +920,24 @@ internal class TabRow : View
 
                         break;
                     case TabSide.Left:
+                        if (Frame.Bottom > tab.Frame.Bottom)
+                        {
+                            // Lower right tee
+                            lc.AddLine (
+                                        new (vts.Right, vts.Bottom),
+                                        0,
+                                        Orientation.Vertical,
+                                        tab.BorderStyle
+                                       );
+
+                            lc.AddLine (
+                                        new (vts.Right, vts.Bottom),
+                                        -1,
+                                        Orientation.Horizontal,
+                                        tab.BorderStyle
+                                       );
+                        }
+
                         break;
                     case TabSide.Right:
                         break;
@@ -664,12 +950,26 @@ internal class TabRow : View
             {
                 var arrowOffset = 1;
 
-                int lastSelectedTab = !_host.Style.ShowInitialLine && i == selectedTab ? 1 :
-                                      _host.Style.TabsSide == TabSide.Bottom ? 1 : 0;
                 Rectangle tabsBarVts = ViewportToScreen (Viewport);
-                int lineLength = tabsBarVts.Right - vts.Right;
+                int lineLength;
 
-                // Right horizontal line
+                switch (_host.Style.TabsSide)
+                {
+                    case TabSide.Top:
+                    case TabSide.Bottom:
+                        lineLength = tabsBarVts.Right - vts.Right;
+
+                        break;
+                    case TabSide.Left:
+                    case TabSide.Right:
+                        lineLength = tabsBarVts.Bottom - vts.Bottom;
+
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException ();
+                }
+
+                // Right horizontal/vertical line
                 if (ShouldDrawRightDownScrollIndicator ())
                 {
                     if (lineLength - arrowOffset > 0)
@@ -679,9 +979,9 @@ internal class TabRow : View
                             case TabSide.Top:
                                 lc.AddLine (
                                             new (
-                                                       vts.Right,
-                                                       vts.Bottom - lastSelectedTab
-                                                      ),
+                                                 vts.Right,
+                                                 vts.Bottom
+                                                ),
                                             lineLength - arrowOffset,
                                             Orientation.Horizontal,
                                             tab.BorderStyle
@@ -690,7 +990,8 @@ internal class TabRow : View
                                 break;
                             case TabSide.Bottom:
                                 lc.AddLine (
-                                            new (vts.Right, vts.Y - lastSelectedTab),
+
+                                            new (vts.Right, vts.Y - 1),
                                             lineLength - arrowOffset,
                                             Orientation.Horizontal,
                                             tab.BorderStyle
@@ -698,6 +999,16 @@ internal class TabRow : View
 
                                 break;
                             case TabSide.Left:
+                                lc.AddLine (
+                                            new (
+                                                 vts.Right,
+                                                 vts.Bottom
+                                                ),
+                                            lineLength - arrowOffset,
+                                            Orientation.Vertical,
+                                            tab.BorderStyle
+                                           );
+
                                 break;
                             case TabSide.Right:
                                 break;
@@ -713,7 +1024,7 @@ internal class TabRow : View
                     {
                         case TabSide.Top:
                             lc.AddLine (
-                                        new (vts.Right, vts.Bottom - lastSelectedTab),
+                                        new (vts.Right, vts.Bottom),
                                         lineLength,
                                         Orientation.Horizontal,
                                         tab.BorderStyle
@@ -722,7 +1033,8 @@ internal class TabRow : View
                             break;
                         case TabSide.Bottom:
                             lc.AddLine (
-                                        new (vts.Right, vts.Y - lastSelectedTab),
+
+                                        new (vts.Right, vts.Y - 1),
                                         lineLength,
                                         Orientation.Horizontal,
                                         tab.BorderStyle
@@ -730,6 +1042,65 @@ internal class TabRow : View
 
                             break;
                         case TabSide.Left:
+                            if (i == selectedTab)
+                            {
+                                if (Frame.Bottom == tab.Frame.Bottom)
+                                {
+                                    // Lower right horizontal line
+                                    lc.AddLine (
+                                                new (vts.Right, vts.Bottom),
+                                                0,
+                                                Orientation.Horizontal,
+                                                tab.BorderStyle
+                                               );
+                                }
+                                else
+                                {
+                                    lc.AddLine (
+                                                new (vts.Right, vts.Bottom),
+                                                lineLength,
+                                                Orientation.Vertical,
+                                                tab.BorderStyle
+                                               );
+                                }
+                            }
+                            else
+                            {
+                                if (Frame.Bottom == tab.Frame.Bottom)
+                                {
+                                    lc.AddLine (
+                                                new (vts.Right, vts.Bottom),
+                                                -1,
+                                                Orientation.Vertical,
+                                                tab.BorderStyle
+                                               );
+
+                                    lc.AddLine (
+                                                new (vts.Right, vts.Bottom),
+                                                0,
+                                                Orientation.Horizontal,
+                                                tab.BorderStyle
+                                               );
+
+                                }
+                                else
+                                {
+                                    lc.AddLine (
+                                                new (vts.Right, vts.Bottom),
+                                                lineLength,
+                                                Orientation.Vertical,
+                                                tab.BorderStyle
+                                               );
+
+                                    lc.AddLine (
+                                                new (vts.Right, tabsBarVts.Bottom),
+                                                1,
+                                                Orientation.Horizontal,
+                                                tab.BorderStyle
+                                               );
+                                }
+                            }
+
                             break;
                         case TabSide.Right:
                             break;
@@ -745,9 +1116,9 @@ internal class TabRow : View
                                 // More URCorner
                                 lc.AddLine (
                                             new (
-                                                       tabsBarVts.Right - 1,
-                                                       vts.Bottom - lastSelectedTab
-                                                      ),
+                                                 tabsBarVts.Right - 1,
+                                                 vts.Bottom
+                                                ),
                                             1,
                                             Orientation.Vertical,
                                             tab.BorderStyle
@@ -758,9 +1129,9 @@ internal class TabRow : View
                                 // More LRCorner
                                 lc.AddLine (
                                             new (
-                                                       tabsBarVts.Right - 1,
-                                                       vts.Y - lastSelectedTab
-                                                      ),
+                                                 tabsBarVts.Right - 1,
+                                                 vts.Y - 1
+                                                ),
                                             -1,
                                             Orientation.Vertical,
                                             tab.BorderStyle
@@ -768,6 +1139,20 @@ internal class TabRow : View
 
                                 break;
                             case TabSide.Left:
+                                if (Frame.Bottom > tab.Frame.Bottom)
+                                {
+                                    // More URCorner
+                                    lc.AddLine (
+                                                new (
+                                                     vts.Right,
+                                                     tabsBarVts.Bottom - 1
+                                                    ),
+                                                1,
+                                                Orientation.Horizontal,
+                                                tab.BorderStyle
+                                               );
+                                }
+
                                 break;
                             case TabSide.Right:
                                 break;
@@ -782,31 +1167,9 @@ internal class TabRow : View
         LineCanvas.Merge (lc);
     }
 
-    private int GetUnderlineXOrYPosition ()
-    {
-        switch (_host.Style.TabsSide)
-        {
-            case TabSide.Top:
-
-                return _host.Style.ShowInitialLine ? 2 : 1;
-            case TabSide.Bottom:
-
-                return 0;
-            case TabSide.Left:
-
-                return _host.Style.ShowInitialLine ? Frame.Right - 1 : Frame.Right;
-            case TabSide.Right:
-                return 0;
-            default:
-                throw new ArgumentOutOfRangeException ();
-        }
-    }
-
     /// <summary>Renders the line of the tab that adjoins the content of the tab.</summary>
     private void RenderUnderline ()
     {
-        int xOrY = GetUnderlineXOrYPosition ();
-
         Tab? selected = _host._tabLocations?.FirstOrDefault (t => t == _host.SelectedTab);
 
         if (selected is null)
@@ -841,16 +1204,21 @@ internal class TabRow : View
             switch (_host.Style.TabsSide)
             {
                 case TabSide.Top:
+                    _leftUpScrollIndicator.X = 0;
+                    _leftUpScrollIndicator.Y = Pos.AnchorEnd (1);
+
+                    break;
                 case TabSide.Bottom:
                     _leftUpScrollIndicator.X = 0;
-                    _leftUpScrollIndicator.Y = xOrY;
+                    _leftUpScrollIndicator.Y = 0;
 
                     break;
                 case TabSide.Left:
-                case TabSide.Right:
-                    _leftUpScrollIndicator.X = xOrY;
+                    _leftUpScrollIndicator.X = Pos.AnchorEnd (1);
                     _leftUpScrollIndicator.Y = 0;
 
+                    break;
+                case TabSide.Right:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException ();
@@ -873,16 +1241,17 @@ internal class TabRow : View
             switch (_host.Style.TabsSide)
             {
                 case TabSide.Top:
-                case TabSide.Bottom:
-                    _rightDownScrollIndicator.X = Viewport.Width - 1;
-                    _rightDownScrollIndicator.Y = xOrY;
+                case TabSide.Left:
+                    _rightDownScrollIndicator.X = Pos.AnchorEnd (1);
+                    _rightDownScrollIndicator.Y = Pos.AnchorEnd (1);
 
                     break;
-                case TabSide.Left:
-                case TabSide.Right:
-                    _rightDownScrollIndicator.X = xOrY;
-                    _rightDownScrollIndicator.Y = Viewport.Height - 1;
+                case TabSide.Bottom:
+                    _rightDownScrollIndicator.X = Pos.AnchorEnd (1);
+                    _rightDownScrollIndicator.Y = 0;
 
+                    break;
+                case TabSide.Right:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException ();
