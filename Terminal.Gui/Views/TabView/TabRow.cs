@@ -949,6 +949,21 @@ internal class TabRow : View
 
                             break;
                         case TabSide.Right:
+                            // Lower right tee
+                            lc.AddLine (
+                                        new (vts.X - 1, vts.Bottom),
+                                        0,
+                                        Orientation.Vertical,
+                                        tab.BorderStyle
+                                       );
+
+                            lc.AddLine (
+                                        new (vts.X - 1, vts.Bottom),
+                                        1,
+                                        Orientation.Horizontal,
+                                        tab.BorderStyle
+                                       );
+
                             break;
                         default:
                             throw new ArgumentOutOfRangeException ();
