@@ -19,4 +19,9 @@ public class TabStyle
 
     /// <summary>Gets or sets the tabs side to render.</summary>
     public TabSide TabsSide { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the tabs text alignments.
+    /// </summary>
+    public Alignment TabsTextAlignment { get; set; }
 }

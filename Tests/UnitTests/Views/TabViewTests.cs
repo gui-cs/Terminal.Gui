@@ -3279,6 +3279,451 @@ Tab3               │
         top.Dispose ();
     }
 
+    [Fact]
+    [SetupFakeDriver]
+    public void Tabs_Alignments ()
+    {
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
+        tv.Width = 20;
+        tv.Height = 5;
+
+        tab1.DisplayText = "Tab 1";
+        tab2.DisplayText = "Long Text";
+
+        tv.Layout ();
+        tv.Draw ();
+
+        string top = @"
+╭─────┬─────────╮   
+│Tab 1│Long Text│   
+│     ╰─────────┴──╮
+│hi                │
+└──────────────────┘
+";
+
+        TestHelpers.AssertDriverContentsWithFrameAre (top, output);
+
+        tv.Style = new () { TabsSide = TabSide.Bottom };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        string bottom = @"
+┌──────────────────┐
+│hi                │
+│     ╭─────────┬──╯
+│Tab 1│Long Text│   
+╰─────┴─────────╯   
+";
+
+        TestHelpers.AssertDriverContentsWithFrameAre (bottom, output);
+
+        tv.Style = new () { TabsSide = TabSide.Left };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭──────────────────┐
+│Tab 1     hi      │
+├─────────╮        │
+│Long Text│        │
+╰─────────┴────────┘
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Right };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌──────────────────╮
+│hi       Tab 1    │
+│        ╭─────────┤
+│        │Long Text│
+└────────┴─────────╯
+",
+                                                      output
+                                                     );
+
+        Assert.Equal (Alignment.Start, tv.Style.TabsTextAlignment);
+
+        tv.Style = new () { TabsSide = TabSide.Top, TabsTextAlignment = Alignment.End };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (top, output);
+
+        tv.Style = new () { TabsSide = TabSide.Bottom, TabsTextAlignment = Alignment.End };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (bottom, output);
+
+        tv.Style = new () { TabsSide = TabSide.Left, TabsTextAlignment = Alignment.End };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭──────────────────┐
+│    Tab 1 hi      │
+├─────────╮        │
+│Long Text│        │
+╰─────────┴────────┘
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Right, TabsTextAlignment = Alignment.End };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌──────────────────╮
+│hi           Tab 1│
+│        ╭─────────┤
+│        │Long Text│
+└────────┴─────────╯
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Top, TabsTextAlignment = Alignment.Center };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (top, output);
+
+        tv.Style = new () { TabsSide = TabSide.Bottom, TabsTextAlignment = Alignment.Center };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (bottom, output);
+
+        tv.Style = new () { TabsSide = TabSide.Left, TabsTextAlignment = Alignment.Center };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭──────────────────┐
+│  Tab 1   hi      │
+├─────────╮        │
+│Long Text│        │
+╰─────────┴────────┘
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Right, TabsTextAlignment = Alignment.Center };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌──────────────────╮
+│hi         Tab 1  │
+│        ╭─────────┤
+│        │Long Text│
+└────────┴─────────╯
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Top, TabsTextAlignment = Alignment.Fill };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (top, output);
+
+        tv.Style = new () { TabsSide = TabSide.Bottom, TabsTextAlignment = Alignment.Fill };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (bottom, output);
+
+        tv.Style = new () { TabsSide = TabSide.Left, TabsTextAlignment = Alignment.Fill };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭──────────────────┐
+│Tab     1 hi      │
+├─────────╮        │
+│Long Text│        │
+╰─────────┴────────┘
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Right, TabsTextAlignment = Alignment.Fill };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌──────────────────╮
+│hi       Tab     1│
+│        ╭─────────┤
+│        │Long Text│
+└────────┴─────────╯
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Top, ShowInitialLine = false, TabsTextAlignment = Alignment.Start };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        top = @"
+│Tab 1│Long Text│   
+│     ╰─────────┴──╮
+│hi                │
+│                  │
+└──────────────────┘
+";
+
+        TestHelpers.AssertDriverContentsWithFrameAre (top, output);
+
+        // ShowInitialLine false
+
+        tv.Style = new () { TabsSide = TabSide.Bottom, ShowInitialLine = false, TabsTextAlignment = Alignment.Start };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        bottom = @"
+┌──────────────────┐
+│hi                │
+│                  │
+│     ╭─────────┬──╯
+│Tab 1│Long Text│   
+";
+
+        TestHelpers.AssertDriverContentsWithFrameAre (bottom, output);
+
+        tv.Style = new () { TabsSide = TabSide.Left, ShowInitialLine = false, TabsTextAlignment = Alignment.Start };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+───────────────────┐
+Tab 1     hi       │
+─────────╮         │
+Long Text│         │
+─────────┴─────────┘
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Right, ShowInitialLine = false, TabsTextAlignment = Alignment.Start };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌───────────────────
+│hi        Tab 1    
+│         ╭─────────
+│         │Long Text
+└─────────┴─────────
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Top, ShowInitialLine = false, TabsTextAlignment = Alignment.End };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (top, output);
+
+        tv.Style = new () { TabsSide = TabSide.Bottom, ShowInitialLine = false, TabsTextAlignment = Alignment.End };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (bottom, output);
+
+        tv.Style = new () { TabsSide = TabSide.Left, ShowInitialLine = false, TabsTextAlignment = Alignment.End };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+───────────────────┐
+    Tab 1 hi       │
+─────────╮         │
+Long Text│         │
+─────────┴─────────┘
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Right, ShowInitialLine = false, TabsTextAlignment = Alignment.End };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌───────────────────
+│hi            Tab 1
+│         ╭─────────
+│         │Long Text
+└─────────┴─────────
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Top, ShowInitialLine = false, TabsTextAlignment = Alignment.Center };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (top, output);
+
+        tv.Style = new () { TabsSide = TabSide.Bottom, ShowInitialLine = false, TabsTextAlignment = Alignment.Center };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (bottom, output);
+
+        tv.Style = new () { TabsSide = TabSide.Left, ShowInitialLine = false, TabsTextAlignment = Alignment.Center };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+───────────────────┐
+  Tab 1   hi       │
+─────────╮         │
+Long Text│         │
+─────────┴─────────┘
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Right, ShowInitialLine = false, TabsTextAlignment = Alignment.Center };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌───────────────────
+│hi          Tab 1  
+│         ╭─────────
+│         │Long Text
+└─────────┴─────────
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Top, ShowInitialLine = false, TabsTextAlignment = Alignment.Fill };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (top, output);
+
+        tv.Style = new () { TabsSide = TabSide.Bottom, ShowInitialLine = false, TabsTextAlignment = Alignment.Fill };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (bottom, output);
+
+        tv.Style = new () { TabsSide = TabSide.Left, ShowInitialLine = false, TabsTextAlignment = Alignment.Fill };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+───────────────────┐
+Tab     1 hi       │
+─────────╮         │
+Long Text│         │
+─────────┴─────────┘
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Right, ShowInitialLine = false, TabsTextAlignment = Alignment.Fill };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌───────────────────
+│hi        Tab     1
+│         ╭─────────
+│         │Long Text
+└─────────┴─────────
+",
+                                                      output
+                                                     );
+    }
+
     private TabView GetTabView () { return GetTabView (out _, out _); }
 
     private TabView GetTabView (out Tab tab1, out Tab tab2)

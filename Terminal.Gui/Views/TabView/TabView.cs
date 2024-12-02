@@ -738,6 +738,7 @@ public class TabView : View
                     int maxHeight = Math.Max (0, Math.Min (bounds.Height - 2, 2));
 
                     tab.Height = 2;
+                    tab.TextAlignment = Style.TabsTextAlignment;
 
                     // if tab view is height <= 3 don't render any tabs
                     if (maxHeight == 0)
