@@ -1531,7 +1531,7 @@ internal class TabRow : View
             _rightDownScrollIndicator.Visible = true;
 
             // Ensures this is clicked instead of the last tab if under this
-            MoveSubViewToStart (_rightDownScrollIndicator);
+            MoveSubViewToEnd (_rightDownScrollIndicator);
         }
         else
         {
