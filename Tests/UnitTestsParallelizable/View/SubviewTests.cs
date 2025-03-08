@@ -3,7 +3,7 @@
 public class SubViewTests
 {
     [Fact]
-    public void IsAddedChanged_Raised_On_Add ()
+    public void SuperViewChanged_Raised_On_Add ()
     {
         var super = new View { };
         var sub = new View ();
@@ -11,13 +11,13 @@ public class SubViewTests
         int superRaisedCount = 0;
         int subRaisedCount = 0;
 
-        super.IsAddedChanged += (s, e) =>
+        super.SuperViewChanged += (s, e) =>
                               {
                                     superRaisedCount++;
                               };
-        sub.IsAddedChanged += (s, e) =>
+        sub.SuperViewChanged += (s, e) =>
                                 {
-                                    if (e.CurrentValue)
+                                    if (e.SuperView is {})
                                     {
                                         subRaisedCount++;
                                     }
@@ -25,13 +25,13 @@ public class SubViewTests
 
         super.Add (sub);
         Assert.True (super.SubViews.Count == 1);
-        Assert.True (sub.IsAdded);
+        Assert.Equal (super, sub.SuperView);
         Assert.Equal (0, superRaisedCount);
         Assert.Equal (1, subRaisedCount);
     }
 
     [Fact]
-    public void IsAddedChanged_Raised_On_Remove ()
+    public void SuperViewChanged_Raised_On_Remove ()
     {
         var super = new View { };
         var sub = new View ();
@@ -39,13 +39,13 @@ public class SubViewTests
         int superRaisedCount = 0;
         int subRaisedCount = 0;
 
-        super.IsAddedChanged += (s, e) =>
+        super.SuperViewChanged += (s, e) =>
                                 {
                                     superRaisedCount++;
                                 };
-        sub.IsAddedChanged += (s, e) =>
+        sub.SuperViewChanged += (s, e) =>
                               {
-                                  if (!e.CurrentValue)
+                                  if (e.SuperView is null)
                                   {
                                       subRaisedCount++;
                                   }
@@ -53,27 +53,27 @@ public class SubViewTests
 
         super.Add (sub);
         Assert.True (super.SubViews.Count == 1);
-        Assert.True (sub.IsAdded);
+        Assert.Equal (super, sub.SuperView);
         Assert.Equal (0, superRaisedCount);
         Assert.Equal (0, subRaisedCount);
 
         super.Remove (sub);
         Assert.Empty (super.SubViews);
-        Assert.False (sub.IsAdded);
+        Assert.NotEqual (super, sub.SuperView);
         Assert.Equal (0, superRaisedCount);
         Assert.Equal (1, subRaisedCount);
     }
 
     [Fact]
-    public void IsAdded_Added_Removed ()
+    public void SuperView_Set_On_Add_Remove ()
     {
-        var top = new Toplevel ();
+        var superView = new View ();
         var view = new View ();
-        Assert.False (view.IsAdded);
-        top.Add (view);
-        Assert.True (view.IsAdded);
-        top.Remove (view);
-        Assert.False (view.IsAdded);
+        Assert.Null (view.SuperView);
+        superView.Add (view);
+        Assert.Equal (superView, view.SuperView);
+        superView.Remove (view);
+        Assert.Null (view.SuperView);
     }
 
     // TODO: Consider a feature that will change the ContentSize to fit the subviews.
@@ -351,6 +351,35 @@ public class SubViewTests
     }
 
     [Fact]
+    public void SuperView_Set_Raises_SuperViewChangedEvents ()
+    {
+        // Arrange
+        var view = new View ();
+        var superView = new View ();
+
+        int superViewChangedCount = 0;
+        //int superViewChangingCount = 0;
+
+        view.SuperViewChanged += (s, e) =>
+        {
+            superViewChangedCount++;
+        };
+
+        //view.SuperViewChanging += (s, e) =>
+        //{
+        //    superViewChangingCount++;
+        //};
+
+        // Act
+        superView.Add (view);
+
+        // Assert
+        //Assert.Equal (1, superViewChangingCount);
+        Assert.Equal (1, superViewChangedCount);
+
+    }
+
+    [Fact]
     public void GetTopSuperView_Test ()
     {
         var v1 = new View ();
@@ -527,7 +556,7 @@ public class SubViewTests
     }
 
     [Fact]
-    public void IsAdded_IsAddedChanged_SubViewAdded_SubViewRemoved ()
+    public void SuperViewChanged_Raised_On_SubViewAdded_SubViewRemoved ()
     {
         var isAdded = false;
 
@@ -537,7 +566,7 @@ public class SubViewTests
         superView.SubViewAdded += (s, e) =>
                                   {
                                       Assert.True (isAdded);
-                                      Assert.True (subView.IsAdded);
+                                      Assert.Equal (superView, subView.SuperView);
                                       Assert.Equal (subView, e.SubView);
                                       Assert.Equal (superView, e.SuperView);
                                   };
@@ -545,21 +574,21 @@ public class SubViewTests
         superView.SubViewRemoved += (s, e) =>
                                     {
                                         Assert.False (isAdded);
-                                        Assert.False (subView.IsAdded);
+                                        Assert.NotEqual (superView, subView.SuperView);
                                         Assert.Equal (subView, e.SubView);
                                         Assert.Equal (superView, e.SuperView);
                                     };
 
-        subView.IsAddedChanged += (s, e) => { isAdded = e.CurrentValue; };
+        subView.SuperViewChanged += (s, e) => { isAdded = subView.SuperView == superView; };
 
         superView.Add (subView);
         Assert.True (isAdded);
-        Assert.True (subView.IsAdded);
+        Assert.Equal (superView, subView.SuperView);
         Assert.Single (superView.SubViews);
 
         superView.Remove (subView);
         Assert.False (isAdded);
-        Assert.False (subView.IsAdded);
+        Assert.NotEqual (superView, subView.SuperView);
         Assert.Empty (superView.SubViews);
     }
 }

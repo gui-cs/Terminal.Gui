@@ -824,17 +824,17 @@ public class Shortcut : View, IOrientation, IDesignable
         {
             TitleChanged -= Shortcut_TitleChanged;
 
-            if (CommandView?.IsAdded == false)
+            if (CommandView.SuperView is null)
             {
                 CommandView.Dispose ();
             }
 
-            if (HelpView?.IsAdded == false)
+            if (HelpView.SuperView is null)
             {
                 HelpView.Dispose ();
             }
 
-            if (KeyView?.IsAdded == false)
+            if (KeyView.SuperView is null)
             {
                 KeyView.Dispose ();
             }

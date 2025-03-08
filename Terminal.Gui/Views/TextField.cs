@@ -45,7 +45,7 @@ public class TextField : View
 
         Initialized += TextField_Initialized;
 
-        IsAddedChanged += TextField_IsAddedChanged;
+        SuperViewChanged += TextField_SuperViewChanged;
 
         // Things this view knows how to do
         AddCommand (
@@ -1180,7 +1180,7 @@ public class TextField : View
 
     private void Adjust ()
     {
-        if (!IsAdded)
+        if (SuperView is null)
         {
             return;
         }
@@ -1818,9 +1818,9 @@ public class TextField : View
         ContextMenu.Show (BuildContextMenuBarItem ());
     }
 
-    private void TextField_IsAddedChanged (object sender, EventArgs<bool> e)
+    private void TextField_SuperViewChanged (object sender, SuperViewChangedEventArgs e)
     {
-        if (e.CurrentValue)
+        if (e.SuperView is {})
         {
             if (Autocomplete.HostControl is null)
             {

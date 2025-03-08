@@ -294,13 +294,6 @@ public class AdornmentTests
     }
 
     [Fact]
-    public void Setting_SuperView_Throws ()
-    {
-        var adornment = new Adornment (null);
-        Assert.Throws<InvalidOperationException> (() => adornment.SuperView = new ());
-    }
-
-    [Fact]
     public void Setting_SuperViewRendersLineCanvas_Throws ()
     {
         var adornment = new Adornment (null);

@@ -394,6 +394,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.True (Application.RaiseKeyDownEvent (Key.R.WithAlt));
         Assert.Equal (1, rg.SelectedItem);
 
+        Application.Top.Remove (rg);
         var superView = new View ();
         superView.Add (rg);
         Assert.True (superView.NewKeyDownEvent (Key.T));

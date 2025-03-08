@@ -780,6 +780,7 @@ public class TileViewTests (ITestOutputHelper output)
         tv.InsertTile (2);
 
         // but I still want my view in the first tile
+        // BUGBUG: Adding a view twice is not legit
         tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
 
         Assert.Multiple (
@@ -807,6 +808,7 @@ public class TileViewTests (ITestOutputHelper output)
         tv.RebuildForTileCount (3);
 
         // but I still want my view in the first tile
+        // BUGBUG: Adding a view twice is not legit
         tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
 
         Assert.Multiple (
@@ -835,6 +837,7 @@ public class TileViewTests (ITestOutputHelper output)
         tv.RemoveTile (idx);
 
         // but I still want my view in the first tile
+        // BUGBUG: Adding a view twice is not legit
         tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
 
         Assert.Multiple (
@@ -2332,19 +2335,24 @@ public class TileViewTests (ITestOutputHelper output)
 
     private TileView GetTileView (int width, int height, bool withBorder = false)
     {
-        var container = new TileView { Width = width, Height = height };
+        var container = new TileView
+        {
+            Id = "container",
+            Width = width, Height = height
+        };
 
         container.LineStyle = withBorder ? LineStyle.Single : LineStyle.None;
 
         container.Tiles.ElementAt (0)
                  .ContentView.Add (
-                                   new Label { Width = Dim.Fill (), Height = 1, Text = new ('1', 100) }
+                                   new Label { Id = "label1", Width = Dim.Fill (), Height = 1, Text = new ('1', 100) }
                                   );
 
         container.Tiles.ElementAt (0)
                  .ContentView.Add (
                                    new Label
                                    {
+                                       Id = "label2",
                                        Width = Dim.Fill (),
                                        Height = 1,
                                        Y = 1,
@@ -2354,13 +2362,14 @@ public class TileViewTests (ITestOutputHelper output)
 
         container.Tiles.ElementAt (1)
                  .ContentView.Add (
-                                   new Label { Width = Dim.Fill (), Height = 1, Text = new ('2', 100) }
+                                   new Label { Id = "label3", Width = Dim.Fill (), Height = 1, Text = new ('2', 100) }
                                   );
 
         container.Tiles.ElementAt (1)
                  .ContentView.Add (
                                    new Label
                                    {
+                                       Id = "label4",
                                        Width = Dim.Fill (),
                                        Height = 1,
                                        Y = 1,

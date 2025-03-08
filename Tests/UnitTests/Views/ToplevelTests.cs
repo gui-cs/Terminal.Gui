@@ -249,12 +249,12 @@ public class ToplevelTests
     }
 
     [Fact]
-    public void IsAddedChanged_Should_Not_Be_Used_To_Initialize_Toplevel_Events ()
+    public void SuperViewChanged_Should_Not_Be_Used_To_Initialize_Toplevel_Events ()
     {
         var wasAdded = false;
 
         var view = new View ();
-        view.IsAddedChanged += ViewIsAddedChanged;
+        view.SuperViewChanged += SuperViewChanged;
 
         var win = new Window ();
         win.Add (view);
@@ -268,11 +268,11 @@ public class ToplevelTests
 
         return;
 
-        void ViewIsAddedChanged (object sender, EventArgs<bool> _)
+        void SuperViewChanged (object sender, SuperViewChangedEventArgs _)
         {
             Assert.False (wasAdded);
             wasAdded = true;
-            view.IsAddedChanged -= ViewIsAddedChanged;
+            view.SuperViewChanged -= SuperViewChanged;
         }
     }
 

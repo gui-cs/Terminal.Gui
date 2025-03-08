@@ -1899,7 +1899,7 @@ public class TextView : View
 
         Initialized += TextView_Initialized!;
 
-        IsAddedChanged += TextView_IsAddedChanged!;
+        SuperViewChanged += TextView_SuperViewChanged!;
 
         SubViewsLaidOut += TextView_LayoutComplete;
 
@@ -6442,9 +6442,9 @@ public class TextView : View
         return StringExtensions.ToString (encoded);
     }
 
-    private void TextView_IsAddedChanged (object sender, EventArgs<bool> e)
+    private void TextView_SuperViewChanged (object sender, SuperViewChangedEventArgs e)
     {
-        if (e.CurrentValue)
+        if (e.SuperView is {})
         {
             if (Autocomplete.HostControl is null)
             {

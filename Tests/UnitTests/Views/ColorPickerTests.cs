@@ -308,9 +308,6 @@ public class ColorPickerTests
     public void ColorPicker_EnterHexFor_ColorName ()
     {
         ColorPicker cp = GetColorPicker (ColorModel.RGB, true, true);
-        Application.Navigation = new ();
-        Application.Top = new ();
-        Application.Top.Add (cp);
 
         cp.Draw ();
 
@@ -367,9 +364,6 @@ public class ColorPickerTests
     public void ColorPicker_EnterHexFor_ColorName_AcceptVariation ()
     {
         ColorPicker cp = GetColorPicker (ColorModel.RGB, true, true);
-        Application.Navigation = new ();
-        Application.Top = new ();
-        Application.Top.Add (cp);
 
         cp.Draw ();
 
@@ -730,9 +724,6 @@ public class ColorPickerTests
     public void ColorPicker_TabCompleteColorName ()
     {
         ColorPicker cp = GetColorPicker (ColorModel.RGB, true, true);
-        Application.Navigation = new ();
-        Application.Top = new ();
-        Application.Top.Add (cp);
 
         cp.Draw ();
 
@@ -851,6 +842,8 @@ public class ColorPickerTests
         cp.Style.ShowTextFields = showTextFields;
         cp.Style.ShowColorName = showName;
         cp.ApplyStyleChanges ();
+
+        Application.Navigation = new ();
 
         Application.Top = new() { Width = 20, Height = 5 };
         Application.Top.Add (cp);

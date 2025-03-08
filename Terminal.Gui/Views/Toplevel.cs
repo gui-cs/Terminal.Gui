@@ -33,7 +33,7 @@ public partial class Toplevel : View
         Arrangement = ViewArrangement.Overlapped;
         Width = Dim.Fill ();
         Height = Dim.Fill ();
-        ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        base.ColorScheme = Colors.ColorSchemes ["TopLevel"];
         MouseClick += Toplevel_MouseClick;
     }
 
@@ -202,7 +202,7 @@ public partial class Toplevel : View
     }
 
     #endregion
-    
+
     #region Size / Position Management
 
     // TODO: Make cancelable?

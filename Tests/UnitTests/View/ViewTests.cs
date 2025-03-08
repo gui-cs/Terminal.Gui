@@ -52,6 +52,7 @@ public class ViewTests
 
         var container2 = new View { Id = "Container2" };
 
+        // BUGBUG: It's not legit to add a View to two SuperViews
         container2.Add (view);
         Assert.Equal (container2, view.SuperView);
         Assert.Equal (container1.SubViews.Count, container2.SubViews.Count);
@@ -98,6 +99,7 @@ public class ViewTests
         var count = 0;
 
         view.Disposing += View_Disposing;
+        // BUGBUG: It's not legit to add a View to two SuperViews
         container2.Add (view);
         Assert.Equal (container2, view.SuperView);
 
@@ -140,6 +142,7 @@ public class ViewTests
 
         var container2 = new View { Id = "Container2" };
 
+        // BUGBUG: It's not legit to add a View to two SuperViews
         container2.Add (view);
         Assert.Equal (container2, view.SuperView);
         Assert.Equal (container1.SubViews.Count, container2.SubViews.Count);

@@ -84,7 +84,7 @@ public class MenuBar : View, IDesignable
         WantMousePositionReports = true;
         IsMenuOpen = false;
 
-        IsAddedChanged += MenuBar_IsAddedChanged;
+        SuperViewChanged += MenuBar_SuperViewChanged;
 
         // Things this view knows how to do
         AddCommand (
@@ -1157,10 +1157,10 @@ public class MenuBar : View, IDesignable
         return new (-2, 0);
     }
 
-    private void MenuBar_IsAddedChanged (object? sender, EventArgs<bool> e)
+    private void MenuBar_SuperViewChanged (object? sender, SuperViewChangedEventArgs _)
     {
         _initialCanFocus = CanFocus;
-        IsAddedChanged -= MenuBar_IsAddedChanged;
+        SuperViewChanged -= MenuBar_SuperViewChanged;
     }
 
     private void MoveLeft ()

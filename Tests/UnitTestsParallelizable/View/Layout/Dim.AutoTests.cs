@@ -350,7 +350,6 @@ public partial class DimAutoTests (ITestOutputHelper output)
         superView.Add (subView);
 
         subView.Width = 10;
-        superView.Add (subView);
         superView.SetRelativeLayout (new (10, 10));
         superView.LayoutSubViews (); // no throw
 

@@ -30,44 +30,38 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     public View? SuperView
     {
         get => _superView!;
-        set => throw new InvalidOperationException (@"SuperView cannot be set.");
+        private set => SetSuperView (value);
     }
+
+    private void SetSuperView (View? value)
+    {
+        if (_superView == value)
+        {
+            return;
+        }
+
+        _superView = value;
+        RaiseSuperViewChanged ();
+    }
+
+    private void RaiseSuperViewChanged ()
+    {
+        SuperViewChangedEventArgs args = new (SuperView, this);
+        OnSuperViewChanged (args);
+
+        SuperViewChanged?.Invoke (this, args);
+    }
+
+    /// <summary>
+    ///     Called when the SuperView of this View has changed.
+    /// </summary>
+    /// <param name="e"></param>
+    protected virtual void OnSuperViewChanged (SuperViewChangedEventArgs e) { }
+
+    /// <summary>Raised when the SuperView of this View has changed.</summary>
+    public event EventHandler<SuperViewChangedEventArgs>? SuperViewChanged;
 
     #region AddRemove
-
-    private bool _isAdded;
-
-    /// <summary>Indicates whether the view was added to <see cref="SuperView"/>.</summary>
-    public bool IsAdded
-    {
-        get => _isAdded;
-        private set
-        {
-            if (_isAdded == value)
-            {
-                return;
-            }
-
-            _isAdded = value;
-            RaiseIsAddedChanged ();
-        }
-    }
-
-    internal void RaiseIsAddedChanged ()
-    {
-        // Tell subclasses that a subview has been added
-        EventArgs<bool> args = new (IsAdded);
-        OnIsAddedChanged (args);
-
-        IsAddedChanged?.Invoke (this, args);
-    }
-
-    /// <summary>Raised when this View has been added to a SuperView.</summary>
-    public event EventHandler<EventArgs<bool>>? IsAddedChanged;
-
-    /// <summary>Method invoked when a SubView has been added to this view.</summary>
-    /// <param name="newValue">The new value of IsAdded</param>
-    protected virtual void OnIsAddedChanged (EventArgs<bool> newValue) { }
 
     /// <summary>Adds a SubView (child) to this view.</summary>
     /// <remarks>
@@ -92,14 +86,16 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             return null;
         }
 
-        if (view.IsAdded)
+        //Debug.Assert (view.SuperView is null, $"{view} already has a SuperView: {view.SuperView}.");
+        if (view.SuperView is {})
         {
-            Logging.Warning ($"{view} already has IsAdded == true.");
+            Logging.Warning ($"{view} already has a SuperView: {view.SuperView}.");
         }
 
+        //Debug.Assert (!InternalSubViews.Contains (view), $"{view} has already been Added to {this}.");
         if (InternalSubViews.Contains (view))
         {
-            Logging.Warning ($"{view} has already been added to {this}.");
+            Logging.Warning ($"{view} has already been Added to {this}.");
         }
 
         // TileView likes to add views that were previously added and have HasFocus = true. No bueno.
@@ -107,10 +103,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
         // TODO: Make this thread safe
         InternalSubViews.Add (view);
-        view._superView = this;
-
-        // This causes IsAddedChanged to be raised on view
-        view.IsAdded = true;
+        view.SuperView = this;
 
         if (view is { Enabled: true, Visible: true, CanFocus: true })
         {
@@ -211,17 +204,22 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
         if (InternalSubViews.Count == 0)
         {
-            return view;
+           return view;
         }
 
-        if (!view.IsAdded)
+        if (view.SuperView is null)
         {
-            Logging.Warning ($"{view} has IsAdded == false.");
+            Logging.Warning ($"{view} cannot be Removed. SuperView is null.");
+        }
+
+        if (view.SuperView != this)
+        {
+            Logging.Warning ($"{view} cannot be Removed. SuperView is not this ({view.SuperView}.");
         }
 
         if (!InternalSubViews.Contains (view))
         {
-            Logging.Warning ($"{view} has not been added to {this}.");
+            Logging.Warning ($"{view} cannot be Removed. It has not been added to {this}.");
         }
 
         Rectangle touched = view.Frame;
@@ -241,15 +239,12 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         // Clean up focus stuff
         _previouslyFocused = null;
 
-        if (view._superView is { } && view._superView._previouslyFocused == this)
+        if (view.SuperView is { } && view.SuperView._previouslyFocused == this)
         {
-            view._superView._previouslyFocused = null;
+            view.SuperView._previouslyFocused = null;
         }
 
-        view._superView = null;
-
-        // This causes IsAddedChanged to be raised on view
-        view.IsAdded = false;
+        view.SuperView = null;
 
         SetNeedsLayout ();
         SetNeedsDraw ();
