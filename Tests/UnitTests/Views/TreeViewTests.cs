@@ -1,17 +1,12 @@
-﻿using System.ComponentModel;
-using System.Text;
-using UnitTests;
+﻿using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class TreeViewTests
+public class TreeViewTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public TreeViewTests (ITestOutputHelper output) { _output = output; }
-
-    /// <summary>Tests that <see cref="TreeView.Expand(object)"/> results in a correct content height</summary>
+    /// <summary>Tests that TreeView.Expand(object) results in a correct content height</summary>
     [Fact]
     public void ContentHeight_BiggerAfterExpand ()
     {
@@ -712,14 +707,14 @@ public class TreeViewTests
         tv.AddObject ("1");
         tv.ColorScheme = new ColorScheme ();
 
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         tv.Draw ();
 
         // Nothing expanded
         DriverAssert.AssertDriverContentsAre (
                                              @"└+1
 ",
-                                             _output
+                                             output
                                             );
         tv.MaxDepth = 3;
         tv.ExpandAll ();
@@ -734,7 +729,7 @@ public class TreeViewTests
     └-3
       └─4
 ",
-                                             _output
+                                             output
                                             );
     }
 
@@ -751,14 +746,14 @@ public class TreeViewTests
         tv.AddObject ("1");
         tv.ColorScheme = new ColorScheme ();
 
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         tv.Draw ();
 
         // Nothing expanded
         DriverAssert.AssertDriverContentsAre (
                                              @"└+1
 ",
-                                             _output
+                                             output
                                             );
         tv.MaxDepth = 5;
         tv.ExpandAll ();
@@ -776,7 +771,7 @@ public class TreeViewTests
         └-5
           └─6
 ",
-                                             _output
+                                             output
                                             );
         Assert.False (tv.CanExpand ("6"));
         Assert.False (tv.IsExpanded ("6"));
@@ -803,7 +798,7 @@ public class TreeViewTests
       └-4
         └+5
 ",
-                                             _output
+                                             output
                                             );
     }
 
@@ -826,7 +821,7 @@ public class TreeViewTests
         tv.Expand (n1);
 
         tv.ColorScheme = new ColorScheme ();
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsAre (
@@ -835,7 +830,7 @@ public class TreeViewTests
 │ └─normal
 └─pink
 ",
-                                             _output
+                                             output
                                             );
 
         Assert.Same (n1, tv.GetObjectOnRow (0));
@@ -853,7 +848,7 @@ public class TreeViewTests
                                              @"├+normal
 └─pink
 ",
-                                             _output
+                                             output
                                             );
 
         Assert.Same (n1, tv.GetObjectOnRow (0));
@@ -881,7 +876,7 @@ public class TreeViewTests
         tv.Expand (n1);
 
         tv.ColorScheme = new ColorScheme ();
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         View.SetClipToScreen ();
         tv.Draw ();
 
@@ -891,7 +886,7 @@ public class TreeViewTests
 │ └─normal
 └─pink
 ",
-                                             _output
+                                             output
                                             );
 
         Assert.Equal (0, tv.GetObjectRow (n1));
@@ -901,7 +896,7 @@ public class TreeViewTests
 
         tv.Collapse (n1);
 
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         View.SetClipToScreen ();
         tv.Draw ();
 
@@ -909,7 +904,7 @@ public class TreeViewTests
                                              @"├+normal
 └─pink
 ",
-                                             _output
+                                             output
                                             );
         Assert.Equal (0, tv.GetObjectRow (n1));
         Assert.Null (tv.GetObjectRow (n1_1));
@@ -919,14 +914,14 @@ public class TreeViewTests
         // scroll down 1
         tv.ScrollOffsetVertical = 1;
 
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         View.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsAre (
                                              @"└─pink
 ",
-                                             _output
+                                             output
                                             );
         Assert.Equal (-1, tv.GetObjectRow (n1));
         Assert.Null (tv.GetObjectRow (n1_1));
@@ -956,7 +951,7 @@ public class TreeViewTests
         tv.Expand (n1);
 
         tv.ColorScheme = new ColorScheme ();
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         View.SetClipToScreen ();
         tv.Draw ();
 
@@ -968,7 +963,7 @@ public class TreeViewTests
 │ └─leaf 2
 └─root two
 ",
-                                             _output
+                                             output
                                             );
         Assert.Equal (4, eventArgs.Count ());
 
@@ -1032,7 +1027,7 @@ public class TreeViewTests
         tv.Expand (n1);
 
         tv.ColorScheme = new ColorScheme ();
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         tv.Draw ();
 
         // Normal drawing of the tree view
@@ -1043,7 +1038,7 @@ FFFFFFFFFF
 │ └─leaf 2
 └─root two
 ",
-                                             _output
+                                             output
                                             );
     }
 
@@ -1072,7 +1067,7 @@ FFFFFFFFFF
         tv.Expand (n1);
 
         tv.ColorScheme = new ColorScheme ();
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         tv.Draw ();
 
         // Normal drawing of the tree view
@@ -1082,7 +1077,7 @@ FFFFFFFFFF
 ─leaf 2
 oot two
 ",
-                                             _output
+                                             output
                                             );
         Assert.Equal (3, eventArgs.Count ());
 
@@ -1128,7 +1123,7 @@ oot two
         tv.Expand (n1);
 
         tv.ColorScheme = new ColorScheme ();
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         tv.Draw ();
 
         // Normal drawing of the tree view
@@ -1139,7 +1134,7 @@ oot two
 │ └─leaf 2
 └─root two
 ",
-                                             _output
+                                             output
                                             );
         TreeViewTextFilter<ITreeNode> filter = new (tv);
         tv.Filter = filter;
@@ -1152,7 +1147,7 @@ oot two
         // Normal drawing of the tree view
         DriverAssert.AssertDriverContentsAre (
                                              @"",
-                                             _output
+                                             output
                                             );
 
         // Matches everything
@@ -1167,7 +1162,7 @@ oot two
 │ └─leaf 2
 └─root two
 ",
-                                             _output
+                                             output
                                             );
 
         // Matches 2 leaf nodes
@@ -1181,7 +1176,7 @@ oot two
 │ ├─leaf 1
 │ └─leaf 2
 ",
-                                             _output
+                                             output
                                             );
 
         // Matches 1 leaf nodes
@@ -1194,7 +1189,7 @@ oot two
 ├-root one
 │ ├─leaf 1
 ",
-                                             _output
+                                             output
                                             );
     }
 
@@ -1217,7 +1212,7 @@ oot two
         tv.Expand (n1);
 
         tv.ColorScheme = new ColorScheme ();
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         tv.Draw ();
 
         // create a new color scheme
@@ -1232,7 +1227,7 @@ oot two
 │ └─normal
 └─pink
 ",
-                                             _output
+                                             output
                                             );
 
         // Should all be the same color
@@ -1243,7 +1238,7 @@ oot two
 0000000000
 0000000000
 ",
-                                               _output,
+                                               output,
                                                Application.Driver,
                                                tv.ColorScheme.Normal,
                                                pink
@@ -1269,7 +1264,7 @@ oot two
 │ └─normal
 └─pink
 ",
-                                             _output
+                                             output
                                             );
 
         // but now the item (only not lines) appear
@@ -1281,7 +1276,7 @@ oot two
 0000000000
 001111
 ",
-                                               _output,
+                                               output,
                                                Application.Driver,
                                                tv.ColorScheme.Normal,
                                                pink

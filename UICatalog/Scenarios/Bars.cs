@@ -250,11 +250,11 @@ public class Bars : Scenario
         ConfigStatusBar (bar);
         statusBarLikeExamples.Add (bar);
 
-        foreach (FrameView frameView in Application.Top.Subviews.Where (f => f is FrameView)!)
+        foreach (FrameView frameView in Application.Top.SubViews.Where (f => f is FrameView)!)
         {
-            foreach (Bar barView in frameView.Subviews.Where (b => b is Bar)!)
+            foreach (Bar barView in frameView.SubViews.Where (b => b is Bar)!)
             {
-                foreach (Shortcut sh in barView.Subviews.Where (s => s is Shortcut)!)
+                foreach (Shortcut sh in barView.SubViews.Where (s => s is Shortcut)!)
                 {
                     sh.Accepting += (o, args) =>
                                  {

@@ -1,5 +1,4 @@
 ﻿using UnitTests;
-using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.DrawingTests;
@@ -51,33 +50,33 @@ public class RulerTests
         r.Draw (Point.Empty);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
 |123456789|1234",
-                                                      _output
-                                                     );
+                                                       _output
+                                                      );
 
         // Postive offset
         r.Draw (new (1, 1));
 
         DriverAssert.AssertDriverContentsAre (
-                                                      @"
+                                              @"
 |123456789|1234
  |123456789|1234
 ",
-                                                      _output
-                                                     );
+                                              _output
+                                             );
 
         // Negative offset
         r.Draw (new (-1, 3));
 
         DriverAssert.AssertDriverContentsAre (
-                                             @"
+                                              @"
 |123456789|1234
  |123456789|1234
 123456789|1234
 ",
-                                             _output
-                                            );
+                                              _output
+                                             );
     }
 
     [Fact]
@@ -92,7 +91,7 @@ public class RulerTests
         r.Draw (Point.Empty);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
 -
 1
 2
@@ -108,13 +107,13 @@ public class RulerTests
 2
 3
 4",
-                                                      _output
-                                                     );
+                                                       _output
+                                                      );
 
         r.Draw (new (1, 1));
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
 - 
 1-
 21
@@ -131,14 +130,14 @@ public class RulerTests
 32
 43
  4",
-                                                      _output
-                                                     );
+                                                       _output
+                                                      );
 
         // Negative offset
         r.Draw (new (2, -1));
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
 - 1
 1-2
 213
@@ -155,9 +154,8 @@ public class RulerTests
 324
 43 
  4 ",
-                                                      _output
-                                                     );
-
+                                                       _output
+                                                      );
     }
 
     [Fact]

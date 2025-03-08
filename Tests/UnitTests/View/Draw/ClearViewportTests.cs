@@ -1,38 +1,36 @@
 ﻿#nullable enable
 using Moq;
 using UnitTests;
-using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
 [Trait ("Category", "Output")]
-public class ClearViewportTests (ITestOutputHelper _output)
+public class ClearViewportTests (ITestOutputHelper output)
 {
     public class TestableView : View
     {
         public bool TestOnClearingViewport () { return OnClearingViewport (); }
 
-        public int OnClearingViewportCalled { get; set; } = 0;
-        public bool CancelOnClearingViewport { get; set;  }
+        public int OnClearingViewportCalled { get; set; }
+        public bool CancelOnClearingViewport { get; set; }
+
         protected override bool OnClearingViewport ()
         {
             OnClearingViewportCalled++;
+
             return CancelOnClearingViewport;
         }
 
-        public int OnClearedViewportCalled { get; set; } = 0;
-        protected override void OnClearedViewport ()
-        {
-            OnClearedViewportCalled++;
-        }
+        public int OnClearedViewportCalled { get; set; }
+        protected override void OnClearedViewport () { OnClearedViewportCalled++; }
     }
 
     [Fact]
     public void DoClearViewport_ViewportIsTransparent_DoesNotClear ()
     {
         // Arrange
-        Mock<TestableView> view = new Mock<TestableView> { CallBase = true };
+        Mock<TestableView> view = new () { CallBase = true };
         view.Object.ViewportSettings = ViewportSettings.Transparent;
 
         // Act
@@ -47,7 +45,7 @@ public class ClearViewportTests (ITestOutputHelper _output)
     public void DoClearViewport_OnClearingViewportReturnsTrue_DoesNotClear ()
     {
         // Arrange
-        Mock<TestableView> view = new Mock<TestableView> { CallBase = true };
+        Mock<TestableView> view = new () { CallBase = true };
         view.Object.CancelOnClearingViewport = true;
 
         // Act
@@ -61,7 +59,7 @@ public class ClearViewportTests (ITestOutputHelper _output)
     public void DoClearViewport_ClearingViewportEventCancelled_DoesNotClear ()
     {
         // Arrange
-        Mock<TestableView> view = new Mock<TestableView> { CallBase = true };
+        Mock<TestableView> view = new () { CallBase = true };
         view.Object.ClearingViewport += (sender, e) => e.Cancel = true;
 
         // Act
@@ -75,7 +73,7 @@ public class ClearViewportTests (ITestOutputHelper _output)
     public void DoClearViewport_ClearsViewport ()
     {
         // Arrange
-        Mock<TestableView> view = new Mock<TestableView> { CallBase = true };
+        Mock<TestableView> view = new () { CallBase = true };
 
         // Act
         view.Object.DoClearViewport ();
@@ -88,7 +86,7 @@ public class ClearViewportTests (ITestOutputHelper _output)
     public void DoClearViewport_RaisesClearingViewportEvent ()
     {
         // Arrange
-        Mock<TestableView> view = new Mock<TestableView> { CallBase = true };
+        Mock<TestableView> view = new () { CallBase = true };
         var eventRaised = false;
         view.Object.ClearingViewport += (sender, e) => eventRaised = true;
 
@@ -115,37 +113,37 @@ public class ClearViewportTests (ITestOutputHelper _output)
         superView.Add (view);
         superView.BeginInit ();
         superView.EndInit ();
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
 
         superView.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
  ┌─┐
  │X│
  └─┘",
-                                                      _output);
+                                                       output);
 
         // On Draw exit the view is excluded from the clip, so this will do nothing.
         view.ClearViewport ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
  ┌─┐
  │X│
  └─┘",
-                                                      _output);
+                                                       output);
 
         View.SetClipToScreen ();
 
         view.ClearViewport ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
  ┌─┐
  │ │
  └─┘",
-                                                      _output);
+                                                       output);
     }
 
     [Fact]
@@ -165,25 +163,25 @@ public class ClearViewportTests (ITestOutputHelper _output)
         superView.Add (view);
         superView.BeginInit ();
         superView.EndInit ();
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
 
         superView.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
  ┌─┐
  │X│
  └─┘",
-                                                      _output);
+                                                       output);
         View.SetClipToScreen ();
         view.ClearViewport ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
  ┌─┐
  │ │
  └─┘",
-                                                      _output);
+                                                       output);
     }
 
     [Fact]
@@ -194,7 +192,7 @@ public class ClearViewportTests (ITestOutputHelper _output)
 
         view.DrawingContent += (s, e) =>
                                {
-                                   Region savedClip = view.AddViewportToClip ();
+                                   Region? savedClip = view.AddViewportToClip ();
 
                                    for (var row = 0; row < view.Viewport.Height; row++)
                                    {
@@ -228,7 +226,7 @@ public class ClearViewportTests (ITestOutputHelper _output)
 "
             ;
 
-        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, _output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 20, 10), pos);
 
         view.FillRect (view.Viewport);
@@ -247,7 +245,7 @@ public class ClearViewportTests (ITestOutputHelper _output)
 "
             ;
 
-        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, _output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         top.Dispose ();
     }
 
@@ -259,7 +257,7 @@ public class ClearViewportTests (ITestOutputHelper _output)
 
         view.DrawingContent += (s, e) =>
                                {
-                                   Region savedClip = view.AddViewportToClip ();
+                                   Region? savedClip = view.AddViewportToClip ();
 
                                    for (var row = 0; row < view.Viewport.Height; row++)
                                    {
@@ -293,7 +291,7 @@ public class ClearViewportTests (ITestOutputHelper _output)
 "
             ;
 
-        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, _output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 20, 10), pos);
 
         view.FillRect (view.Viewport);
@@ -311,7 +309,7 @@ public class ClearViewportTests (ITestOutputHelper _output)
 └──────────────────┘
 ";
 
-        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, _output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         top.Dispose ();
     }
@@ -353,39 +351,39 @@ public class ClearViewportTests (ITestOutputHelper _output)
         }
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
 cccccccccccccccccccc",
-                                                      _output
-                                                     );
+                                                       output
+                                                      );
 
         Attribute [] attributes =
         {
-            Colors.ColorSchemes ["TopLevel"].Normal,
-            Colors.ColorSchemes ["Base"].Normal,
-            Colors.ColorSchemes ["Base"].Focus
+            Colors.ColorSchemes ["TopLevel"]!.Normal,
+            Colors.ColorSchemes ["Base"]!.Normal,
+            Colors.ColorSchemes ["Base"]!.Focus
         };
 
         if (label)
         {
             DriverAssert.AssertDriverAttributesAre (
-                                                   @"
+                                                    @"
 111111111111111111110
 111111111111111111110",
-                                                   _output,
-                                                   Application.Driver,
-                                                   attributes
-                                                  );
+                                                    output,
+                                                    Application.Driver,
+                                                    attributes
+                                                   );
         }
         else
         {
             DriverAssert.AssertDriverAttributesAre (
-                                                   @"
+                                                    @"
 222222222222222222220
 111111111111111111110",
-                                                   _output,
-                                                   Application.Driver,
-                                                   attributes
-                                                  );
+                                                    output,
+                                                    Application.Driver,
+                                                    attributes
+                                                   );
         }
 
         if (label)
@@ -398,13 +396,13 @@ cccccccccccccccccccc",
             Application.LayoutAndDraw ();
 
             DriverAssert.AssertDriverAttributesAre (
-                                                   @"
+                                                    @"
 222222222222222222220
 111111111111111111110",
-                                                   _output,
-                                                   Application.Driver,
-                                                   attributes
-                                                  );
+                                                    output,
+                                                    Application.Driver,
+                                                    attributes
+                                                   );
         }
 
         Application.End (runState);

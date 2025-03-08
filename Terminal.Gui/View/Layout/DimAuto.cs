@@ -72,7 +72,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
         {
             maxCalculatedSize = textSize;
 
-            if (us is { ContentSizeTracksViewport: false, Subviews.Count: 0 })
+            if (us is { ContentSizeTracksViewport: false, InternalSubViews.Count: 0 })
             {
                 // ContentSize was explicitly set. Use `us.ContentSize` to determine size.
                 maxCalculatedSize = dimension == Dimension.Width ? us.GetContentSize ().Width : us.GetContentSize ().Height;
@@ -81,12 +81,12 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
             {
                 // TOOD: All the below is a naive implementation. It may be possible to optimize this.
 
-                List<View> includedSubviews = us.Subviews.ToList ();
+                List<View> includedSubViews = us.InternalSubViews.ToList ();
 
                 // If [x] it can cause `us.ContentSize` to change.
                 // If [ ] it doesn't need special processing for us to determine `us.ContentSize`.
 
-                // -------------------- Pos types that are dependent on `us.Subviews`
+                // -------------------- Pos types that are dependent on `us.SubViews`
                 // [ ] PosAlign     - Position is dependent on other views with `GroupId` AND `us.ContentSize`
                 // [x] PosView      - Position is dependent on `subview.Target` - it can cause a change in `us.ContentSize`
                 // [x] PosCombine   - Position is dependent if `Pos.Has [one of the above]` - it can cause a change in `us.ContentSize`
@@ -98,11 +98,11 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                 // [ ] PosPercent   - Position is dependent `us.ContentSize` - Will always be 0 if there is no other content that makes the superview have a size.
                 // [x] PosCombine   - Position is dependent if `Pos.Has [one of the above]` - it can cause a change in `us.ContentSize`
 
-                // -------------------- Pos types that are not dependent on either `us.Subviews` or `us.ContentSize`
+                // -------------------- Pos types that are not dependent on either `us.SubViews` or `us.ContentSize`
                 // [ ] PosAbsolute  - Position is fixed.
                 // [ ] PosFunc      - Position is internally calculated.
 
-                // -------------------- Dim types that are dependent on `us.Subviews`
+                // -------------------- Dim types that are dependent on `us.SubViews`
                 // [x] DimView      - Dimension is dependent on `subview.Target`
                 // [x] DimCombine   - Dimension is dependent if `Dim.Has [one of the above]` - it can cause a change in `us.ContentSize`
 
@@ -111,7 +111,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                 // [ ] DimPercent   - Dimension is dependent on `us.ContentSize` - Will always be 0 if there is no other content that makes the superview have a size.
                 // [ ] DimCombine   - Dimension is dependent if `Dim.Has [one of the above]`
 
-                // -------------------- Dim types that are not dependent on either `us.Subviews` or `us.ContentSize`
+                // -------------------- Dim types that are not dependent on either `us.SubViews` or `us.ContentSize`
                 // [ ] DimAuto      - Dimension is internally calculated
                 // [ ] DimAbsolute  - Dimension is fixed
                 // [ ] DimFunc      - Dimension is internally calculated
@@ -128,7 +128,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                 if (dimension == Dimension.Width)
                 {
-                    notDependentSubViews = includedSubviews.Where (
+                    notDependentSubViews = includedSubViews.Where (
                                                                    v => v.Width is { }
                                                                         && (v.X is PosAbsolute or PosFunc
                                                                             || v.Width is DimAuto
@@ -144,7 +144,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                 }
                 else
                 {
-                    notDependentSubViews = includedSubviews.Where (
+                    notDependentSubViews = includedSubViews.Where (
                                                                    v => v.Height is { }
                                                                         && (v.Y is PosAbsolute or PosFunc
                                                                             || v.Height is DimAuto
@@ -197,11 +197,11 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                 if (dimension == Dimension.Width)
                 {
-                    centeredSubViews = us.Subviews.Where (v => v.X.Has<PosCenter> (out _)).ToList ();
+                    centeredSubViews = us.InternalSubViews.Where (v => v.X.Has<PosCenter> (out _)).ToList ();
                 }
                 else
                 {
-                    centeredSubViews = us.Subviews.Where (v => v.Y.Has<PosCenter> (out _)).ToList ();
+                    centeredSubViews = us.InternalSubViews.Where (v => v.Y.Has<PosCenter> (out _)).ToList ();
                 }
 
                 viewsNeedingLayout.AddRange (centeredSubViews);
@@ -241,7 +241,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                 var maxAlign = 0;
 
                 // Use Linq to get a list of distinct GroupIds from the subviews
-                List<int> groupIds = includedSubviews.Select (
+                List<int> groupIds = includedSubViews.Select (
                                                               v =>
                                                               {
                                                                   return dimension switch
@@ -259,7 +259,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                 foreach (int groupId in groupIds.Where (g => g != -1))
                 {
                     // PERF: If this proves a perf issue, consider caching a ref to this list in each item
-                    List<PosAlign?> posAlignsInGroup = includedSubviews.Where (v => PosAlign.HasGroupId (v, dimension, groupId))
+                    List<PosAlign?> posAlignsInGroup = includedSubViews.Where (v => PosAlign.HasGroupId (v, dimension, groupId))
                                                                        .Select (v => dimension == Dimension.Width ? v.X as PosAlign : v.Y as PosAlign)
                                                                        .ToList ();
 
@@ -268,7 +268,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                         continue;
                     }
 
-                    maxAlign = PosAlign.CalculateMinDimension (groupId, includedSubviews, dimension);
+                    maxAlign = PosAlign.CalculateMinDimension (groupId, includedSubViews, dimension);
                 }
 
                 maxCalculatedSize = int.Max (maxCalculatedSize, maxAlign);
@@ -282,11 +282,11 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                 if (dimension == Dimension.Width)
                 {
-                    anchoredSubViews = includedSubviews.Where (v => v.X.Has<PosAnchorEnd> (out _)).ToList ();
+                    anchoredSubViews = includedSubViews.Where (v => v.X.Has<PosAnchorEnd> (out _)).ToList ();
                 }
                 else
                 {
-                    anchoredSubViews = includedSubviews.Where (v => v.Y.Has<PosAnchorEnd> (out _)).ToList ();
+                    anchoredSubViews = includedSubViews.Where (v => v.Y.Has<PosAnchorEnd> (out _)).ToList ();
                 }
 
                 viewsNeedingLayout.AddRange (anchoredSubViews);
@@ -324,11 +324,11 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                 if (dimension == Dimension.Width)
                 {
-                    posViewSubViews = includedSubviews.Where (v => v.X.Has<PosView> (out _)).ToList ();
+                    posViewSubViews = includedSubViews.Where (v => v.X.Has<PosView> (out _)).ToList ();
                 }
                 else
                 {
-                    posViewSubViews = includedSubviews.Where (v => v.Y.Has<PosView> (out _)).ToList ();
+                    posViewSubViews = includedSubViews.Where (v => v.Y.Has<PosView> (out _)).ToList ();
                 }
 
                 for (var i = 0; i < posViewSubViews.Count; i++)
@@ -358,11 +358,11 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                 if (dimension == Dimension.Width)
                 {
-                    dimViewSubViews = includedSubviews.Where (v => v.Width is { } && v.Width.Has<DimView> (out _)).ToList ();
+                    dimViewSubViews = includedSubViews.Where (v => v.Width is { } && v.Width.Has<DimView> (out _)).ToList ();
                 }
                 else
                 {
-                    dimViewSubViews = includedSubviews.Where (v => v.Height is { } && v.Height.Has<DimView> (out _)).ToList ();
+                    dimViewSubViews = includedSubViews.Where (v => v.Height is { } && v.Height.Has<DimView> (out _)).ToList ();
                 }
 
                 for (var i = 0; i < dimViewSubViews.Count; i++)
@@ -391,11 +391,11 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                 if (dimension == Dimension.Width)
                 {
-                    dimAutoSubViews = includedSubviews.Where (v => v.Width is { } && v.Width.Has<DimAuto> (out _)).ToList ();
+                    dimAutoSubViews = includedSubViews.Where (v => v.Width is { } && v.Width.Has<DimAuto> (out _)).ToList ();
                 }
                 else
                 {
-                    dimAutoSubViews = includedSubviews.Where (v => v.Height is { } && v.Height.Has<DimAuto> (out _)).ToList ();
+                    dimAutoSubViews = includedSubViews.Where (v => v.Height is { } && v.Height.Has<DimAuto> (out _)).ToList ();
                 }
 
                 for (var i = 0; i < dimAutoSubViews.Count; i++)
@@ -423,11 +423,11 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                 //if (dimension == Dimension.Width)
                 //{
-                //    DimFillSubViews = includedSubviews.Where (v => v.Width is { } && v.Width.Has<DimFill> (out _)).ToList ();
+                //    DimFillSubViews = includedSubViews.Where (v => v.Width is { } && v.Width.Has<DimFill> (out _)).ToList ();
                 //}
                 //else
                 //{
-                //    DimFillSubViews = includedSubviews.Where (v => v.Height is { } && v.Height.Has<DimFill> (out _)).ToList ();
+                //    DimFillSubViews = includedSubViews.Where (v => v.Height is { } && v.Height.Has<DimFill> (out _)).ToList ();
                 //}
 
                 //for (var i = 0; i < DimFillSubViews.Count; i++)

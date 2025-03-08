@@ -471,7 +471,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
 
     [Fact]
-    public void HasFocusChanging_SetFocus_On_Subview_If_SubView_Cancels ()
+    public void HasFocusChanging_SetFocus_On_SubView_If_SubView_Cancels ()
     {
         var hasFocusTrueCount = 0;
         var hasFocusFalseCount = 0;
@@ -982,7 +982,7 @@ public class HasFocusChangeEventTests () : TestsAllViews
 
 
     [Fact]
-    public void HasFocusChanged_NewValue_False_Hide_Subview ()
+    public void HasFocusChanged_NewValue_False_Hide_SubView ()
     {
         var subView1 = new View
         {

@@ -60,7 +60,7 @@ public partial class View // Adornments
     ///     <para>
     ///         Changing the size of an adornment (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will
     ///         change the size of <see cref="Frame"/> which will call <see cref="SetNeedsLayout"/> to update the layout of the
-    ///         <see cref="SuperView"/> and its <see cref="Subviews"/>.
+    ///         <see cref="SuperView"/> and its <see cref="SubViews"/>.
     ///     </para>
     /// </remarks>
     public Margin? Margin { get; private set; }
@@ -116,7 +116,7 @@ public partial class View // Adornments
     ///     <para>
     ///         Changing the size of an adornment (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will
     ///         change the size of <see cref="Frame"/> which will call <see cref="SetNeedsLayout"/> to update the layout of the
-    ///         <see cref="SuperView"/> and its <see cref="Subviews"/>.
+    ///         <see cref="SuperView"/> and its <see cref="SubViews"/>.
     ///     </para>
     /// </remarks>
     public Border? Border { get; private set; }
@@ -233,7 +233,7 @@ public partial class View // Adornments
     ///     <para>
     ///         Changing the size of an adornment (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will
     ///         change the size of <see cref="Frame"/> which will call <see cref="SetNeedsLayout"/> to update the layout of the
-    ///         <see cref="SuperView"/> and its <see cref="Subviews"/>.
+    ///         <see cref="SuperView"/> and its <see cref="SubViews"/>.
     ///     </para>
     /// </remarks>
     public Padding? Padding { get; private set; }

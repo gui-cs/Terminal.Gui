@@ -142,9 +142,9 @@ public enum ViewportSettings
 
     /// <summary>
     ///     If set the View will be transparent: The <see cref="View.Viewport"/> will not be cleared when the View is drawn and the clip region
-    ///     will be set to clip the View's <see cref="View.Text"/> and <see cref="View.Subviews"/>.
+    ///     will be set to clip the View's <see cref="View.Text"/> and <see cref="View.SubViews"/>.
     ///     <para>
-    ///         Only the topmost View in a Subview Hierarchy can be transparent. Any subviews of the topmost transparent view
+    ///         Only the topmost View in a SubView Hierarchy can be transparent. Any subviews of the topmost transparent view
     ///         will have indeterminate draw behavior.
     ///     </para>
     ///     <para>
@@ -154,7 +154,7 @@ public enum ViewportSettings
     Transparent = 0b_0001_0000_0000,
 
     /// <summary>
-    ///     If set the View will be transparent to mouse events: Any mouse event that occurs over the View (and it's Subviews) will be passed to the
+    ///     If set the View will be transparent to mouse events: Any mouse event that occurs over the View (and it's SubViews) will be passed to the
     ///     Views below it.
     ///     <para>
     ///         Combine this with <see cref="Transparent"/> to get a view that is both visually transparent and transparent to the mouse.

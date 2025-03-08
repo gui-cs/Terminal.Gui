@@ -144,12 +144,12 @@ public class Bar : View, IOrientation, IDesignable
     }
 
     // TODO: Move this to View
-    /// <summary>Inserts a <see cref="Shortcut"/> in the specified index of <see cref="View.Subviews"/>.</summary>
+    /// <summary>Inserts a <see cref="Shortcut"/> in the specified index of <see cref="View.SubViews"/>.</summary>
     /// <param name="index">The zero-based index at which item should be inserted.</param>
     /// <param name="item">The item to insert.</param>
     public void AddShortcutAt (int index, Shortcut item)
     {
-        List<View> savedSubViewList = Subviews.ToList ();
+        List<View> savedSubViewList = SubViews.ToList ();
         int count = savedSubViewList.Count;
         RemoveAll ();
 
@@ -172,18 +172,18 @@ public class Bar : View, IOrientation, IDesignable
 
     // TODO: Move this to View
 
-    /// <summary>Removes a <see cref="Shortcut"/> at specified index of <see cref="View.Subviews"/>.</summary>
+    /// <summary>Removes a <see cref="Shortcut"/> at specified index of <see cref="View.SubViews"/>.</summary>
     /// <param name="index">The zero-based index of the item to remove.</param>
     /// <returns>The <see cref="Shortcut"/> removed.</returns>
     public Shortcut? RemoveShortcut (int index)
     {
         View? toRemove = null;
 
-        for (var i = 0; i < Subviews.Count; i++)
+        for (var i = 0; i < SubViews.Count; i++)
         {
             if (i == index)
             {
-                toRemove = Subviews [i];
+                toRemove = SubViews.ElementAt (i);
             }
         }
 
@@ -198,7 +198,7 @@ public class Bar : View, IOrientation, IDesignable
     }
 
     /// <inheritdoc />
-    protected override void OnSubviewLayout (LayoutEventArgs args)
+    protected override void OnSubViewLayout (LayoutEventArgs args)
     {
         LayoutBarItems (args.OldContentSize);
     }
@@ -210,9 +210,9 @@ public class Bar : View, IOrientation, IDesignable
         switch (Orientation)
         {
             case Orientation.Horizontal:
-                for (var index = 0; index < Subviews.Count; index++)
+                for (var index = 0; index < SubViews.Count; index++)
                 {
-                    View barItem = Subviews [index];
+                    View barItem = SubViews.ElementAt (index);
 
                     barItem.ColorScheme = ColorScheme;
                     barItem.X = Pos.Align (Alignment.Start, AlignmentModes);
@@ -227,7 +227,7 @@ public class Bar : View, IOrientation, IDesignable
 
                     var minKeyWidth = 0;
 
-                    List<Shortcut> shortcuts = Subviews.Where (s => s is Shortcut && s.Visible).Cast<Shortcut> ().ToList ();
+                    List<Shortcut> shortcuts = SubViews.Where (s => s is Shortcut && s.Visible).Cast<Shortcut> ().ToList ();
 
                     foreach (Shortcut shortcut in shortcuts)
                     {
@@ -235,11 +235,11 @@ public class Bar : View, IOrientation, IDesignable
                         minKeyWidth = int.Max (minKeyWidth, shortcut.KeyView.Text.GetColumns ());
                     }
 
-                    var _maxBarItemWidth = 0;
+                    var maxBarItemWidth = 0;
 
-                    for (var index = 0; index < Subviews.Count; index++)
+                    for (var index = 0; index < SubViews.Count; index++)
                     {
-                        View barItem = Subviews [index];
+                        View barItem = SubViews.ElementAt (index);
 
 
                         barItem.ColorScheme = ColorScheme;
@@ -255,7 +255,7 @@ public class Bar : View, IOrientation, IDesignable
                             scBarItem.MinimumKeyTextSize = minKeyWidth;
                             scBarItem.Width = scBarItem.GetWidthDimAuto ();
                             barItem.Layout (Application.Screen.Size);
-                            _maxBarItemWidth = Math.Max (_maxBarItemWidth, barItem.Frame.Width);
+                            maxBarItemWidth = Math.Max (maxBarItemWidth, barItem.Frame.Width);
                         }
 
                         if (prevBarItem == null)
@@ -274,17 +274,17 @@ public class Bar : View, IOrientation, IDesignable
 
                     }
 
-                    foreach (var subView in Subviews)
+                    foreach (var subView in SubViews)
                     {
                         if (subView is not Line)
                         {
-                            subView.Width = Dim.Auto (DimAutoStyle.Auto, minimumContentDim: _maxBarItemWidth);
+                            subView.Width = Dim.Auto (DimAutoStyle.Auto, minimumContentDim: maxBarItemWidth);
                         }
                     }
                 }
                 else
                 {
-                    foreach (var subView in Subviews)
+                    foreach (var subView in SubViews)
                     {
                         if (subView is not Line)
                         {

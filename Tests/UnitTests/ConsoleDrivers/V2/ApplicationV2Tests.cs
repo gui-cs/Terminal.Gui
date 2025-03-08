@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿#nullable enable
+using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -298,7 +299,7 @@ public class ApplicationV2Tests
 
         v2.Shutdown ();
         v2.Shutdown ();
-        outputMock.Verify(o=>o.Dispose (),Times.Once);
+        outputMock!.Verify(o=>o.Dispose (),Times.Once);
     }
     [Fact]
     public void TestRepeatedInitCalls_WarnsAndIgnores ()
@@ -322,7 +323,7 @@ public class ApplicationV2Tests
                                     It.IsAny<EventId> (),
                                     It.Is<It.IsAnyType> ((v, t) => v.ToString () == "Init called multiple times without shutdown, ignoring."),
                                     It.IsAny<Exception> (),
-                                    It.IsAny<Func<It.IsAnyType, Exception, string>> ())
+                                    It.IsAny<Func<It.IsAnyType, Exception, string>> ()!)
                           ,Times.Exactly (2));
 
         v2.Shutdown ();

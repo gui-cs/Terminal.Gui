@@ -88,7 +88,7 @@ public class WizardStep : View
         //		scrollBar.OtherScrollBarView.Size = helpTextView.Maxlength;
         //		scrollBar.OtherScrollBarView.Position = helpTextView.LeftColumn;
         //	}
-        //	scrollBar.LayoutSubviews ();
+        //	scrollBar.LayoutSubViews ();
         //	scrollBar.Refresh ();
         //};
         //base.Add (scrollBar);
@@ -151,7 +151,7 @@ public class WizardStep : View
             container?.Remove (view);
         }
 
-        if (_contentView.InternalSubviews.Count < 1)
+        if (_contentView.InternalSubViews.Count < 1)
         {
             CanFocus = false;
         }
@@ -176,7 +176,7 @@ public class WizardStep : View
         _helpTextView.Height = Dim.Height(_contentView);
         _helpTextView.Width = Dim.Fill ();
 
-        if (_contentView.InternalSubviews?.Count > 0)
+        if (_contentView.InternalSubViews?.Count > 0)
         {
             if (_helpTextView.Text.Length > 0)
             {
@@ -199,7 +199,7 @@ public class WizardStep : View
             // Error - no pane shown
         }
 
-        _contentView.Visible = _contentView.InternalSubviews?.Count > 0;
+        _contentView.Visible = _contentView.InternalSubViews?.Count > 0;
         _helpTextView.Visible = _helpTextView.Text.Length > 0;
     }
 } // end of WizardStep class

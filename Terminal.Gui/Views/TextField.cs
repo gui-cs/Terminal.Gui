@@ -45,9 +45,7 @@ public class TextField : View
 
         Initialized += TextField_Initialized;
 
-        Added += TextField_Added;
-
-        Removed += TextField_Removed;
+        SuperViewChanged += TextField_SuperViewChanged;
 
         // Things this view knows how to do
         AddCommand (
@@ -1182,7 +1180,7 @@ public class TextField : View
 
     private void Adjust ()
     {
-        if (!IsAdded)
+        if (SuperView is null)
         {
             return;
         }
@@ -1820,16 +1818,21 @@ public class TextField : View
         ContextMenu.Show (BuildContextMenuBarItem ());
     }
 
-    private void TextField_Added (object sender, SuperViewChangedEventArgs e)
+    private void TextField_SuperViewChanged (object sender, SuperViewChangedEventArgs e)
     {
-        if (Autocomplete.HostControl is null)
+        if (e.SuperView is {})
         {
-            Autocomplete.HostControl = this;
-            Autocomplete.PopupInsideContainer = false;
+            if (Autocomplete.HostControl is null)
+            {
+                Autocomplete.HostControl = this;
+                Autocomplete.PopupInsideContainer = false;
+            }
+        }
+        else
+        {
+            Autocomplete.HostControl = null;
         }
     }
-
-    private void TextField_Removed (object sender, SuperViewChangedEventArgs e) { Autocomplete.HostControl = null; }
 
     private void TextField_Initialized (object sender, EventArgs e)
     {

@@ -102,7 +102,7 @@ public sealed class KeyBindings : Scenario
         };
         appWindow.Add (hotkeyBindingsListView);
 
-        foreach (var subview in appWindow.Subviews)
+        foreach (var subview in appWindow.SubViews)
         {
             foreach (KeyValuePair<Key, KeyBinding> binding in subview.HotKeyBindings.GetBindings ())
             {

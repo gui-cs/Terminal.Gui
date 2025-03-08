@@ -562,12 +562,12 @@ public partial class View // Keyboard APIs
             return true;
         }
 
-        if (adornment?.Subviews is null)
+        if (adornment?.InternalSubViews is null)
         {
             return false;
         }
 
-        foreach (View subview in adornment.Subviews)
+        foreach (View subview in adornment.InternalSubViews)
         {
             bool? subViewHandled = subview.InvokeCommands (key);
 
@@ -604,7 +604,7 @@ public partial class View // Keyboard APIs
         }
 
         // Now, process any HotKey bindings in the subviews
-        foreach (View subview in Subviews)
+        foreach (View subview in InternalSubViews)
         {
             if (subview == Focused)
             {

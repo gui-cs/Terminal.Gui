@@ -86,7 +86,7 @@ public class Sliders : Scenario
             AllowEmpty = false
         };
 
-        single.SubviewLayout += (s, e) =>
+        single.SubViewLayout += (s, e) =>
                                 {
                                     if (single.Orientation == Orientation.Horizontal)
                                     {
@@ -189,7 +189,7 @@ public class Sliders : Scenario
 
         optionsSlider.OptionsChanged += (sender, e) =>
                                  {
-                                     foreach (Slider s in app.Subviews.OfType<Slider> ())
+                                     foreach (Slider s in app.SubViews.OfType<Slider> ())
                                      {
                                          s.ShowLegends = e.Options.ContainsKey (0);
                                          s.RangeAllowSingle = e.Options.ContainsKey (1);
@@ -233,7 +233,7 @@ public class Sliders : Scenario
 
         dimAutoUsesMin.CheckedStateChanging += (sender, e) =>
                                   {
-                                      foreach (Slider s in app.Subviews.OfType<Slider> ())
+                                      foreach (Slider s in app.SubViews.OfType<Slider> ())
                                       {
                                           s.UseMinimumSize = !s.UseMinimumSize;
                                       }
@@ -258,7 +258,7 @@ public class Sliders : Scenario
                                                     {
                                                         View prev = null;
 
-                                                        foreach (Slider s in app.Subviews.OfType<Slider> ())
+                                                        foreach (Slider s in app.SubViews.OfType<Slider> ())
                                                         {
                                                             if (e.Options.ContainsKey (0))
                                                             {
@@ -341,7 +341,7 @@ public class Sliders : Scenario
 
         legendsOrientationSlider.OptionsChanged += (sender, e) =>
                                                      {
-                                                         foreach (Slider s in app.Subviews.OfType<Slider> ())
+                                                         foreach (Slider s in app.SubViews.OfType<Slider> ())
                                                          {
                                                              if (e.Options.ContainsKey (0))
                                                              {
@@ -404,7 +404,7 @@ public class Sliders : Scenario
             X = Pos.Right (label) + 1
         };
 
-        innerSpacingUpDown.Value = app.Subviews.OfType<Slider> ().First ().MinimumInnerSpacing;
+        innerSpacingUpDown.Value = app.SubViews.OfType<Slider> ().First ().MinimumInnerSpacing;
 
         innerSpacingUpDown.ValueChanging += (sender, e) =>
                                             {
@@ -415,7 +415,7 @@ public class Sliders : Scenario
                                                     return;
                                                 }
 
-                                                foreach (Slider s in app.Subviews.OfType<Slider> ())
+                                                foreach (Slider s in app.SubViews.OfType<Slider> ())
                                                 {
                                                     s.MinimumInnerSpacing = e.NewValue;
                                                 }
@@ -430,7 +430,7 @@ public class Sliders : Scenario
 
         #region Color Slider
 
-        foreach (Slider s in app.Subviews.OfType<Slider> ())
+        foreach (Slider s in app.SubViews.OfType<Slider> ())
         {
             s.Style.OptionChar = s.Style.OptionChar with { Attribute = app.GetNormalColor () };
             s.Style.SetChar = s.Style.SetChar with { Attribute = app.GetNormalColor () };
@@ -485,7 +485,7 @@ public class Sliders : Scenario
                                             {
                                                 (Color, Color) data = e.Options.First ().Value.Data;
 
-                                                foreach (Slider s in app.Subviews.OfType<Slider> ())
+                                                foreach (Slider s in app.SubViews.OfType<Slider> ())
                                                 {
                                                     s.ColorScheme = new ColorScheme (s.ColorScheme);
 
@@ -555,7 +555,7 @@ public class Sliders : Scenario
                                             {
                                                 (Color, Color) data = e.Options.First ().Value.Data;
 
-                                                foreach (Slider s in app.Subviews.OfType<Slider> ())
+                                                foreach (Slider s in app.SubViews.OfType<Slider> ())
                                                 {
                                                     s.ColorScheme = new ColorScheme (s.ColorScheme)
                                                     {
@@ -585,7 +585,7 @@ public class Sliders : Scenario
         configView.Add (eventLog);
 
 
-        foreach (Slider slider in app.Subviews.Where (v => v is Slider)!)
+        foreach (Slider slider in app.SubViews.Where (v => v is Slider)!)
         {
             slider.Accepting += (o, args) =>
                              {

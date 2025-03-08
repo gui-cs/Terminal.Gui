@@ -1,15 +1,9 @@
 ﻿using UnitTests;
-using UnitTests;
-using Xunit.Abstractions;
-using static Terminal.Gui.Dim;
-using static Terminal.Gui.Pos;
 
 namespace Terminal.Gui.LayoutTests;
 
-public class PosAnchorEndTests (ITestOutputHelper output)
+public class PosAnchorEndTests ()
 {
-    
-
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // TODO: A new test that calls SetRelativeLayout directly is needed.
     [Fact]
@@ -72,5 +66,4 @@ public class PosAnchorEndTests (ITestOutputHelper output)
     //    Application.End (rs);
     //    top.Dispose ();
     //}
-
 }

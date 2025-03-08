@@ -521,7 +521,7 @@ public class SliderTests
 
         view.SetContentSize (new (1, 1));
 
-        view.LayoutSubviews ();
+        view.LayoutSubViews ();
         slider.SetRelativeLayout (view.Viewport.Size);
 
         Assert.Equal (expectedSize, slider.Frame.Size);
@@ -554,7 +554,7 @@ public class SliderTests
 
         view.SetContentSize (new (1, 1));
 
-        view.LayoutSubviews ();
+        view.LayoutSubViews ();
         slider.SetRelativeLayout (view.Viewport.Size);
 
         Assert.Equal (expectedSize, slider.Frame.Size);
@@ -587,7 +587,7 @@ public class SliderTests
 
         view.SetContentSize (new (1, 1));
 
-        view.LayoutSubviews ();
+        view.LayoutSubViews ();
         slider.SetRelativeLayout (view.Viewport.Size);
 
         Assert.Equal (expectedSize, slider.Frame.Size);

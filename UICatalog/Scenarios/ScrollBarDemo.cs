@@ -56,7 +56,7 @@ public class ScrollBarDemo : Scenario
 
         int GetMaxLabelWidth (int groupId)
         {
-            return demoFrame.Subviews.Max (
+            return demoFrame.SubViews.Max (
                                            v =>
                                            {
                                                if (v.Y.Has<PosAlign> (out var pos) && pos.GroupId == groupId)
@@ -329,7 +329,7 @@ public class ScrollBarDemo : Scenario
         };
         demoFrame.Add (lblScrollContentSize);
 
-        scrollBar.SubviewsLaidOut += (s, e) =>
+        scrollBar.SubViewsLaidOut += (s, e) =>
                                      {
                                          lblScrollFrame.Text = $"Scroll Frame: {scrollBar.Frame.ToString ()}";
                                          lblScrollViewport.Text = $"Scroll Viewport: {scrollBar.Viewport.ToString ()}";

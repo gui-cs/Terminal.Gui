@@ -62,7 +62,7 @@ public enum ViewArrangement
     Resizable = LeftResizable | RightResizable | TopResizable | BottomResizable,
 
     /// <summary>
-    ///     The view overlaps other views (the order of <see cref="View.Subviews"/> dicates the Z-order). If this flag is not
+    ///     The view overlaps other views (the order of <see cref="View.SubViews"/> dicates the Z-order). If this flag is not
     ///     set the view will operate in tiled mode.
     ///     <para>
     ///         When set, Tab and Shift-Tab will be constrained to the subviews of the view (normally, they will navigate to

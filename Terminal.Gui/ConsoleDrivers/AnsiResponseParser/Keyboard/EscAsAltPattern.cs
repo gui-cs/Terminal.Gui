@@ -7,13 +7,15 @@ internal class EscAsAltPattern : AnsiKeyboardParserPattern
 {
     public EscAsAltPattern () { IsLastMinute = true; }
 
+#pragma warning disable IDE1006 // Naming Styles
     private static readonly Regex _pattern = new (@"^\u001b([a-zA-Z0-9_])$");
+#pragma warning restore IDE1006 // Naming Styles
 
-    public override bool IsMatch (string input) { return _pattern.IsMatch (input); }
+    public override bool IsMatch (string? input) { return _pattern.IsMatch (input!); }
 
-    protected override Key? GetKeyImpl (string input)
+    protected override Key? GetKeyImpl (string? input)
     {
-        Match match = _pattern.Match (input);
+        Match match = _pattern.Match (input!);
 
         if (!match.Success)
         {

@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using UnitTests;
-using UnitTests;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
@@ -9,12 +8,12 @@ namespace Terminal.Gui.DriverTests;
 
 public class ContentsTests
 {
-    private readonly ITestOutputHelper output;
+    private readonly ITestOutputHelper _output;
 
     public ContentsTests (ITestOutputHelper output)
     {
         ConsoleDriver.RunningUnitTests = true;
-        this.output = output;
+        _output = output;
     }
 
     [Theory]
@@ -27,10 +26,10 @@ public class ContentsTests
     public void AddStr_Combining_Character_1st_Column (Type driverType)
     {
         var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
-        driver.Init ();
+        driver!.Init ();
         var expected = "\u0301!";
         driver.AddStr ("\u0301!"); // acute accent + exclamation mark
-        DriverAssert.AssertDriverContentsAre (expected, output, driver);
+        DriverAssert.AssertDriverContentsAre (expected, _output, driver);
 
         driver.End ();
     }
@@ -45,48 +44,48 @@ public class ContentsTests
     public void AddStr_With_Combining_Characters (Type driverType)
     {
         var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
-        driver.Init ();
+        driver!.Init ();
 
-        var acuteaccent = new Rune (0x0301); // Combining acute accent (é)
-        string combined = "e" + acuteaccent;
+        var acuteAccent = new Rune (0x0301); // Combining acute accent (é)
+        string combined = "e" + acuteAccent;
         var expected = "é";
 
         driver.AddStr (combined);
-        DriverAssert.AssertDriverContentsAre (expected, output, driver);
+        DriverAssert.AssertDriverContentsAre (expected, _output, driver);
 
         // 3 char combine
         // a + ogonek + acute = <U+0061, U+0328, U+0301> ( ą́ )
-        var ogonek = new Rune (0x0328); // Combining ogonek (a small hook or comma shape)
-        combined = "a" + ogonek + acuteaccent;
-        expected = ("a" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
+        var oGonek = new Rune (0x0328); // Combining ogonek (a small hook or comma shape)
+        combined = "a" + oGonek + acuteAccent;
+        expected = ("a" + oGonek).Normalize (NormalizationForm.FormC); // See Issue #2616
 
         driver.Move (0, 0);
         driver.AddStr (combined);
-        DriverAssert.AssertDriverContentsAre (expected, output, driver);
+        DriverAssert.AssertDriverContentsAre (expected, _output, driver);
 
         // e + ogonek + acute = <U+0061, U+0328, U+0301> ( ę́́ )
-        combined = "e" + ogonek + acuteaccent;
-        expected = ("e" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
+        combined = "e" + oGonek + acuteAccent;
+        expected = ("e" + oGonek).Normalize (NormalizationForm.FormC); // See Issue #2616
 
         driver.Move (0, 0);
         driver.AddStr (combined);
-        DriverAssert.AssertDriverContentsAre (expected, output, driver);
+        DriverAssert.AssertDriverContentsAre (expected, _output, driver);
 
         // i + ogonek + acute = <U+0061, U+0328, U+0301> ( į́́́ )
-        combined = "i" + ogonek + acuteaccent;
-        expected = ("i" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
+        combined = "i" + oGonek + acuteAccent;
+        expected = ("i" + oGonek).Normalize (NormalizationForm.FormC); // See Issue #2616
 
         driver.Move (0, 0);
         driver.AddStr (combined);
-        DriverAssert.AssertDriverContentsAre (expected, output, driver);
+        DriverAssert.AssertDriverContentsAre (expected, _output, driver);
 
         // u + ogonek + acute = <U+0061, U+0328, U+0301> ( ų́́́́ )
-        combined = "u" + ogonek + acuteaccent;
-        expected = ("u" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
+        combined = "u" + oGonek + acuteAccent;
+        expected = ("u" + oGonek).Normalize (NormalizationForm.FormC); // See Issue #2616
 
         driver.Move (0, 0);
         driver.AddStr (combined);
-        DriverAssert.AssertDriverContentsAre (expected, output, driver);
+        DriverAssert.AssertDriverContentsAre (expected, _output, driver);
 
         driver.End ();
     }

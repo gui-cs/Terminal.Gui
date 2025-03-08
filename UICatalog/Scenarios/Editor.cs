@@ -741,7 +741,7 @@ public class Editor : Scenario
     private void ShowFindReplace (bool isFind = true)
     {
         _findReplaceWindow.Visible = true;
-        _findReplaceWindow.SuperView.MoveSubviewToStart (_findReplaceWindow);
+        _findReplaceWindow.SuperView.MoveSubViewToStart (_findReplaceWindow);
         _tabView.SetFocus ();
         _tabView.SelectedTab = isFind ? _tabView.Tabs.ToArray () [0] : _tabView.Tabs.ToArray () [1];
         _tabView.SelectedTab.View.FocusDeepest (NavigationDirection.Forward, null);

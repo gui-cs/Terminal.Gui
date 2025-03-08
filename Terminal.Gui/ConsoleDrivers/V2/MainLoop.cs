@@ -122,7 +122,7 @@ public class MainLoop<T> : IMainLoop<T>
 
         if (Application.Top != null)
         {
-            bool needsDrawOrLayout = AnySubviewsNeedDrawn (Application.Top);
+            bool needsDrawOrLayout = AnySubViewsNeedDrawn (Application.Top);
 
             bool sizeChanged = WindowSizeMonitor.Poll ();
 
@@ -174,7 +174,7 @@ public class MainLoop<T> : IMainLoop<T>
         }
     }
 
-    private bool AnySubviewsNeedDrawn (View v)
+    private bool AnySubViewsNeedDrawn (View v)
     {
         if (v.NeedsDraw || v.NeedsLayout)
         {
@@ -183,9 +183,9 @@ public class MainLoop<T> : IMainLoop<T>
             return true;
         }
 
-        foreach (View subview in v.Subviews)
+        foreach (View subview in v.SubViews)
         {
-            if (AnySubviewsNeedDrawn (subview))
+            if (AnySubViewsNeedDrawn (subview))
             {
                 return true;
             }

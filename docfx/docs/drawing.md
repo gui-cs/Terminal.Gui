@@ -29,18 +29,18 @@ Line drawing is accomplished using the @Terminal.Gui.LineCanvas API:
 
 The @Terminal.Gui.Application MainLoop will iterate over all Views in the view hierarchy, starting with @Terminal.Gui.Application.Toplevels. The @Terminal.Gui.View.Draw method will be called which, in turn:
 
-0) Determines if @Terminal.Gui.View.NeedsDraw or @Terminal.Gui.View.SubviewNeedsDraw are set. If neither is set, processing stops.
+0) Determines if @Terminal.Gui.View.NeedsDraw or @Terminal.Gui.View.SubViewNeedsDraw are set. If neither is set, processing stops.
 1) Sets the clip to the view's Frame.
 2) Draws the @Terminal.Gui.View.Border and @Terminal.Gui.View.Padding (but NOT the Margin).
 3) Sets the clip to the view's Viewport.
 4) Sets the Normal color scheme.
-5) Calls Draw on any @Terminal.Gui.View.Subviews.
+5) Calls Draw on any @Terminal.Gui.View.SubViews.
 6) Draws @Terminal.Gui.View.Text.
 7) Draws any non-text content (the base View does nothing.)
 8) Sets the clip back to the view's Frame.
 9) Draws @Terminal.Gui.View.LineCanvas (which may have been added to by any of the steps above).
-10) Draws the @Terminal.Gui.View.Border and @Terminal.Gui.View.Padding Subviews (just the subviews). (but NOT the Margin).
-11) The Clip at this point excludes all Subviews NOT INCLUDING their Margins. This clip is cached so @Terminal.Gui.View.Margin can be rendered later.
+10) Draws the @Terminal.Gui.View.Border and @Terminal.Gui.View.Padding SubViews (just the subviews). (but NOT the Margin).
+11) The Clip at this point excludes all SubViews NOT INCLUDING their Margins. This clip is cached so @Terminal.Gui.View.Margin can be rendered later.
 12) DrawComplete is raised.
 13) The current View's Frame NOT INCLUDING the Margin is excluded from the current Clip region.
 

@@ -2,7 +2,7 @@
 
 public partial class DimAutoTests
 {
-    // Tests all the Dim Types in Subview scenarios to ensure DimAutoStyle.Content is calculated correctly
+    // Tests all the Dim Types in SubView scenarios to ensure DimAutoStyle.Content is calculated correctly
 
     #region DimAbsolute
 
@@ -10,7 +10,7 @@ public partial class DimAutoTests
     [InlineData (0, 15, 15)]
     [InlineData (1, 15, 16)]
     [InlineData (-1, 15, 14)]
-    public void With_Subview_Using_DimAbsolute (int subViewOffset, int dimAbsoluteSize, int expectedSize)
+    public void With_SubView_Using_DimAbsolute (int subViewOffset, int dimAbsoluteSize, int expectedSize)
     {
         var view = new View ();
 
@@ -41,7 +41,7 @@ public partial class DimAutoTests
     [InlineData (0, 50, 0, 0, 0, 0, 0, 0)]
     [InlineData (0, 0, 100, 100, 100, 100, 100, 100)]
     [InlineData (0, 50, 100, 100, 100, 100, 100, 100)]
-    public void With_Subview_Using_DimPercent (
+    public void With_SubView_Using_DimPercent (
         int subViewOffset,
         int percent,
         int minWidth,
@@ -79,7 +79,7 @@ public partial class DimAutoTests
         Assert.Equal (subViewOffset, calculatedY);
 
         view.SetRelativeLayout (new (100, 100));
-        view.LayoutSubviews ();
+        view.LayoutSubViews ();
 
         Assert.Equal (expectedWidth * (percent / 100f), subview.Viewport.Width);
         Assert.Equal (expectedHeight * (percent / 100f), subview.Viewport.Height);
@@ -95,7 +95,7 @@ public partial class DimAutoTests
     [InlineData (0, 21, 0, 11, 0, 0)]
     [InlineData (1, 21, 1, 11, 1, 1)]
     [InlineData (21, 21, 11, 11, 21, 11)]
-    public void With_Subview_Using_DimFill (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    public void With_SubView_Using_DimFill (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
     {
         var view = new View
         {
@@ -132,7 +132,7 @@ public partial class DimAutoTests
     [InlineData (0, 21, 0, 11, 2, 4)]
     [InlineData (1, 21, 1, 11, 2, 4)]
     [InlineData (21, 21, 11, 11, 21, 11)]
-    public void With_Subview_Using_DimFill_And_Another_Subview (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    public void With_SubView_Using_DimFill_And_Another_SubView (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
     {
         var view = new View
         {
@@ -176,7 +176,7 @@ public partial class DimAutoTests
     #region DimFunc
 
     [Fact]
-    public void With_Subview_Using_DimFunc ()
+    public void With_SubView_Using_DimFunc ()
     {
         var view = new View ();
         var subview = new View { Width = Dim.Func (() => 20), Height = Dim.Func (() => 25) };
@@ -198,13 +198,13 @@ public partial class DimAutoTests
     #region DimView
 
     [Fact]
-    public void With_Subview_Using_DimView ()
+    public void With_SubView_Using_DimView ()
     {
         var view = new View ();
         var subview = new View { Width = 30, Height = 40 };
-        var subSubview = new View { Width = Dim.Width (subview), Height = Dim.Height (subview) };
+        var subSubView = new View { Width = Dim.Width (subview), Height = Dim.Height (subview) };
         view.Add (subview);
-        view.Add (subSubview);
+        view.Add (subSubView);
 
         subview.SetRelativeLayout (new (100, 100));
 

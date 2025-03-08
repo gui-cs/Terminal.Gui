@@ -13,7 +13,13 @@ public class ApplicationStressTests : TestsAllViews
     }
 
     private static volatile int _tbCounter;
+#pragma warning disable IDE1006 // Naming Styles
     private static readonly ManualResetEventSlim _wakeUp = new (false);
+#pragma warning restore IDE1006 // Naming Styles
+
+    private const int NUM_PASSES = 50;
+    private const int NUM_INCREMENTS = 500;
+    private const int POLL_MS = 100;
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
@@ -30,9 +36,6 @@ public class ApplicationStressTests : TestsAllViews
         var top = new Toplevel ();
         top.Add (tf);
 
-        const int NUM_PASSES = 50;
-        const int NUM_INCREMENTS = 500;
-        const int POLL_MS = 100;
         _tbCounter = 0;
 
         Task task = Task.Run (() => RunTest (r, tf, NUM_PASSES, NUM_INCREMENTS, POLL_MS));

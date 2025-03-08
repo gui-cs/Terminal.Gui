@@ -159,7 +159,7 @@ public class TileViewNesting : Scenario
         CheckState border = _cbBorder.CheckedState;
         CheckState startHorizontal = _cbHorizontal.CheckedState;
 
-        foreach (View sub in _workArea.Subviews)
+        foreach (View sub in _workArea.SubViews)
         {
             sub.Dispose ();
         }

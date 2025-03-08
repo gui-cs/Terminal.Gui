@@ -72,7 +72,7 @@ Mouse-based navigation is straightforward in comparison to keyboard: If a view i
 
 The answer to both questions is:
 
-If the View was previously focused, the system keeps a record of the Subview that was previously most-focused and restores focus to that Subview (`RestoreFocus()`).
+If the View was previously focused, the system keeps a record of the SubView that was previously most-focused and restores focus to that SubView (`RestoreFocus()`).
 
 If the View was not previously focused, `AdvanceFocus()` is called.
 
@@ -116,13 +116,13 @@ For keyboard navigation, the `TabStop` property is a filter for which views are 
 
 * `null` - This View is still being initialized; acts as a signal to `set_CanFocus` to set `TabStop` to `TabBehavior.TabStop` as convince for the most common use-case. Equivalent to `TabBehavior.NoStop` when determining if a view is focusable by the keyboard or not.
 * `TabBehavior.NoStop` - Prevents the user from using keyboard navigation to cause view (and by definition it's subviews) to gain focus. Note: The view can still be focused using code or the mouse.
-* `TabBehavior.TabStop` - Indicates a View is a focusable view with no focusable subviews. `Application.Next/PrevTabStopKey` will advance ONLY through the peer-Views (`SuperView.Subviews`).
+* `TabBehavior.TabStop` - Indicates a View is a focusable view with no focusable subviews. `Application.Next/PrevTabStopKey` will advance ONLY through the peer-Views (`SuperView.SubViews`).
 
 * `TabBehavior.GroupStop` - Indicates a View is a focusable container for other focusable views and enables keyboard navigation across these containers. This applies to both tiled and overlapped views. For example, `FrameView` is a simple view designed to be a visible container of other views tiled scenarios. It has `TabStop` set to `TabBehavior.GroupStop` (and `Arrangement` set to `ViewArrangement.Fixed`). Likewise, `Window` is a simple view designed to be a visible container of other views in overlapped scenarios. It has `TabStop` set to `TabBehavior.GroupStop` (and `Arrangement` set to `ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped`). `Application.Next/PrevGroupStopKey` will advance across all `GroupStop` views in the application (unless blocked by a `NoStop` SuperView).
 
 ## How To Tell if a View has focus? And which view is the most-focused?
 
-`View.HasFocus` indicates whether the `View` is focused or not. It is the definitive signal. If the view has no focusable Subviews then this property also indicates the view is the most-focused view in the application. 
+`View.HasFocus` indicates whether the `View` is focused or not. It is the definitive signal. If the view has no focusable SubViews then this property also indicates the view is the most-focused view in the application. 
 
 Setting this property to `true` has the same effect as calling `View.SetFocus ()`, which also means the focus may not change as a result.
 

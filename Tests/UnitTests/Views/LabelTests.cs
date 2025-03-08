@@ -1,7 +1,4 @@
-﻿using System.ComponentModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using UnitTests;
-using UnitTests;
+﻿using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -35,45 +32,45 @@ public class LabelTests (ITestOutputHelper output)
 
     [Theory]
     [CombinatorialData]
-    public void HotKey_Command_SetsFocus_OnNextSubview (bool hasHotKey)
+    public void HotKey_Command_SetsFocus_OnNextSubView (bool hasHotKey)
     {
         var superView = new View { CanFocus = true };
         var label = new Label ();
         label.HotKey = hasHotKey ? Key.A.WithAlt : Key.Empty;
-        var nextSubview = new View { CanFocus = true };
-        superView.Add (label, nextSubview);
+        var nextSubView = new View { CanFocus = true };
+        superView.Add (label, nextSubView);
         superView.BeginInit ();
         superView.EndInit ();
 
         Assert.False (label.HasFocus);
-        Assert.False (nextSubview.HasFocus);
+        Assert.False (nextSubView.HasFocus);
 
         label.InvokeCommand (Command.HotKey);
         Assert.False (label.HasFocus);
-        Assert.Equal (hasHotKey, nextSubview.HasFocus);
+        Assert.Equal (hasHotKey, nextSubView.HasFocus);
     }
 
     [Theory]
     [CombinatorialData]
-    public void MouseClick_SetsFocus_OnNextSubview (bool hasHotKey)
+    public void MouseClick_SetsFocus_OnNextSubView (bool hasHotKey)
     {
         var superView = new View { CanFocus = true, Height = 1, Width = 15 };
         var focusedView = new View { CanFocus = true, Width = 1, Height = 1 };
         var label = new Label { X = 2 };
         label.HotKey = hasHotKey ? Key.X.WithAlt : Key.Empty;
 
-        var nextSubview = new View { CanFocus = true, X = 4, Width = 4, Height = 1 };
-        superView.Add (focusedView, label, nextSubview);
+        var nextSubView = new View { CanFocus = true, X = 4, Width = 4, Height = 1 };
+        superView.Add (focusedView, label, nextSubView);
         superView.BeginInit ();
         superView.EndInit ();
 
         Assert.False (focusedView.HasFocus);
         Assert.False (label.HasFocus);
-        Assert.False (nextSubview.HasFocus);
+        Assert.False (nextSubView.HasFocus);
 
         label.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
         Assert.False (label.HasFocus);
-        Assert.Equal (hasHotKey, nextSubview.HasFocus);
+        Assert.Equal (hasHotKey, nextSubView.HasFocus);
     }
 
     [Fact]
@@ -212,12 +209,12 @@ public class LabelTests (ITestOutputHelper output)
         tf2.Draw (new (new (0, 2), tfSize), label.GetNormalColor (), label.ColorScheme.HotNormal);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
 This label needs to be cleared before rewritten.                       
 This TextFormatter (tf1) without fill will not be cleared on rewritten.
 This TextFormatter (tf2) with fill will be cleared on rewritten.       ",
-                                                      output
-                                                     );
+                                                       output
+                                                      );
 
         Assert.False (label.NeedsDraw);
         Assert.False (label.NeedsLayout);
@@ -225,6 +222,7 @@ This TextFormatter (tf2) with fill will be cleared on rewritten.       ",
         label.Text = "This label is rewritten.";
         Assert.True (label.NeedsDraw);
         Assert.True (label.NeedsLayout);
+
         //Assert.False (label.SubViewNeedsDraw);
         label.Draw ();
 
@@ -235,12 +233,12 @@ This TextFormatter (tf2) with fill will be cleared on rewritten.       ",
         tf2.Draw (new (new (0, 2), tfSize), label.GetNormalColor (), label.ColorScheme.HotNormal);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
 This label is rewritten.                                               
 This TextFormatter (tf1) is rewritten.will not be cleared on rewritten.
 This TextFormatter (tf2) is rewritten.                                 ",
-                                                      output
-                                                     );
+                                                       output
+                                                      );
         top.Dispose ();
     }
 
@@ -461,12 +459,12 @@ e
         label.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
 ┌┤Te├┐
 │Test│
 └────┘",
-                                                      output
-                                                     );
+                                                       output
+                                                      );
         label.Dispose ();
     }
 
@@ -487,11 +485,11 @@ e
         Application.Begin (top);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
 │Test│
 └────┘",
-                                                      output
-                                                     );
+                                                       output
+                                                      );
         top.Dispose ();
     }
 
@@ -510,16 +508,16 @@ e
         Application.Begin (top);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
 │Test│
 └────┘",
-                                                      output
-                                                     );
+                                                       output
+                                                      );
         top.Dispose ();
     }
 
     // These tests were formally in AutoSizetrue.cs. They are (poor) Label tests.
-    private readonly string [] expecteds = new string [21]
+    private readonly string [] _expecteds = new string [21]
     {
         @"
 ┌────────────────────┐
@@ -838,8 +836,6 @@ e
 └────────────────────┘"
     };
 
-    private static readonly Size _size1x1 = new (1, 1);
-
     // TODO: This is a Label test. Move to label tests if there's not already a test for this.
     [Fact]
     [AutoInitShutdown]
@@ -984,7 +980,7 @@ e
                              if (k.KeyCode == KeyCode.Enter)
                              {
                                  ((FakeDriver)Application.Driver!).SetBufferSize (22, count + 4);
-                                 Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expecteds [count], output);
+                                 Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (_expecteds [count], output);
                                  Assert.Equal (new (0, 0, 22, count + 4), pos);
 
                                  if (count > 0)
@@ -1061,7 +1057,7 @@ e
         win.Add (label);
         win.BeginInit ();
         win.EndInit ();
-        win.LayoutSubviews ();
+        win.LayoutSubViews ();
         win.Draw ();
 
         Assert.Equal (5, text.Length);
@@ -1084,7 +1080,7 @@ e
         text = "0123456789";
         Assert.Equal (10, text.Length);
         label.Width = Dim.Fill () - text.Length;
-        win.LayoutSubviews ();
+        win.LayoutSubViews ();
         win.ClearViewport ();
         win.Draw ();
 
@@ -1135,7 +1131,7 @@ e
                              if (k.KeyCode == KeyCode.Enter)
                              {
                                  ((FakeDriver)Application.Driver!).SetBufferSize (22, count + 4);
-                                 Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expecteds [count], output);
+                                 Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (_expecteds [count], output);
                                  Assert.Equal (new (0, 0, 22, count + 4), pos);
 
                                  if (count < 20)
@@ -1321,13 +1317,12 @@ e
 
         label.Text = "New text";
         super.Add (label);
-        super.LayoutSubviews ();
+        super.LayoutSubViews ();
 
         Rectangle expectedLabelBounds = new (0, 0, 8, 1);
         Assert.Equal (expectedLabelBounds, label.Viewport);
         super.Dispose ();
     }
-
 
     [Fact]
     public void CanFocus_False_HotKey_SetsFocus_Next ()
@@ -1337,10 +1332,12 @@ e
             Text = "otherView",
             CanFocus = true
         };
+
         Label label = new ()
         {
             Text = "_label"
         };
+
         View nextView = new ()
         {
             Text = "nextView",
@@ -1361,7 +1358,6 @@ e
         Application.Top.Dispose ();
         Application.ResetState ();
     }
-
 
     [Fact]
     public void CanFocus_False_MouseClick_SetsFocus_Next ()
@@ -1393,6 +1389,7 @@ e
             Text = "_label",
             CanFocus = true
         };
+
         View view = new ()
         {
             Text = "view",
@@ -1417,11 +1414,11 @@ e
         Application.ResetState ();
     }
 
-
     [Fact]
     public void CanFocus_True_MouseClick_Focuses ()
     {
         Application.Navigation = new ();
+
         Label label = new ()
         {
             Text = "label",
@@ -1429,6 +1426,7 @@ e
             Y = 0,
             CanFocus = true
         };
+
         View otherView = new ()
         {
             Text = "view",
@@ -1438,6 +1436,7 @@ e
             Height = 1,
             CanFocus = true
         };
+
         Application.Top = new ()
         {
             Width = 10,
@@ -1474,7 +1473,7 @@ e
     [SetupFakeDriver]
     public void TestLabelUnderscoreMinus ()
     {
-        var lbl = new Label ()
+        var lbl = new Label
         {
             Text = "TextView with some more test_- text. Unicode shouldn't 𝔹Aℝ𝔽!"
         };

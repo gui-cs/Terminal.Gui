@@ -1,6 +1,6 @@
 ﻿namespace Terminal.Gui;
 
-/// <summary>Event arguments for the <see cref="View.SubviewsLaidOut"/> event.</summary>
+/// <summary>Event arguments for the <see cref="View.SubViewsLaidOut"/> event.</summary>
 public class LayoutEventArgs : EventArgs
 {
     /// <summary>Creates a new instance of the <see cref="Terminal.Gui.LayoutEventArgs"/> class.</summary>

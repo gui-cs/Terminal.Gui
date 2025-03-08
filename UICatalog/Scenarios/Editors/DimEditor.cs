@@ -27,7 +27,7 @@ public class DimEditor : EditorBase
     {
         if (ViewToEdit is { })
         {
-            ViewToEdit.SubviewsLaidOut += (_, _) => { OnUpdateSettings (); };
+            ViewToEdit.SubViewsLaidOut += (_, _) => { OnUpdateSettings (); };
         }
     }
 

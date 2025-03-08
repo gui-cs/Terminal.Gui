@@ -20,7 +20,7 @@ public class AnsiKeyboardParser
     /// <param name="input"></param>
     /// <param name="isLastMinute"></param>
     /// <returns></returns>
-    public AnsiKeyboardParserPattern? IsKeyboard (string input, bool isLastMinute = false)
+    public AnsiKeyboardParserPattern? IsKeyboard (string? input, bool isLastMinute = false)
     {
         return _patterns.FirstOrDefault (pattern => pattern.IsLastMinute == isLastMinute && pattern.IsMatch (input));
     }

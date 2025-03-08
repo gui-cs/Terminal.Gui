@@ -22,7 +22,7 @@ public class MenuBarv2 : Bar
         ColorScheme = Colors.ColorSchemes ["Menu"];
         Orientation = Orientation.Horizontal;
 
-        SubviewLayout += MenuBarv2_LayoutStarted;
+        SubViewLayout += MenuBarv2_LayoutStarted;
     }
 
     // MenuBarv2 arranges the items horizontally.
@@ -34,14 +34,11 @@ public class MenuBarv2 : Bar
     }
 
     /// <inheritdoc/>
-    public override View Add (View view)
+    protected override void OnSubViewAdded (View subView)
     {
-        // Call base first, because otherwise it resets CanFocus to true
-        base.Add (view);
+        subView.CanFocus = false;
 
-        view.CanFocus = true;
-
-        if (view is Shortcut shortcut)
+        if (subView is Shortcut shortcut)
         {
             // TODO: not happy about using AlignmentModes for this. Too implied.
             // TODO: instead, add a property (a style enum?) to Shortcut to control this
@@ -50,7 +47,5 @@ public class MenuBarv2 : Bar
             shortcut.KeyView.Visible = false;
             shortcut.HelpView.Visible = false;
         }
-
-        return view;
     }
 }

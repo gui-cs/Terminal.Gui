@@ -10,7 +10,7 @@ internal class StringHeld : IHeld
 
     public void ClearHeld () { _held.Clear (); }
 
-    public string HeldToString () { return _held.ToString (); }
+    public string? HeldToString () { return _held.ToString (); }
 
     public IEnumerable<object> HeldToObjects () { return _held.ToString ().Select (c => (object)c); }
 

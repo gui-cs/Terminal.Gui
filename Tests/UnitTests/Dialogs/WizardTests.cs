@@ -462,7 +462,7 @@ public class WizardTests ()
         var wizard = new Wizard { Title = title, Width = width, Height = height };
         wizard.AddStep (new() { Title = stepTitle });
 
-        //wizard.LayoutSubviews ();
+        //wizard.LayoutSubViews ();
         var firstIteration = false;
         RunState runstate = Application.Begin (wizard);
         Application.RunIteration (ref runstate, firstIteration);

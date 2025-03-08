@@ -101,7 +101,7 @@ public class ToScreenTests ()
     [InlineData (1, 2)]
     [InlineData (-1, 0)]
     [InlineData (11, 12)]
-    public void FrameToScreen_NoSuperView_WithAdornment_WithSubview (int x, int expectedX)
+    public void FrameToScreen_NoSuperView_WithAdornment_WithSubView (int x, int expectedX)
     {
         // We test with only X because Y is equivalent. Height/Width are irrelevant.
         // Arrange
@@ -135,7 +135,7 @@ public class ToScreenTests ()
     [InlineData (1, 4)]
     [InlineData (-1, 2)]
     [InlineData (11, 14)]
-    public void FrameToScreen_Adornment_WithSubview_WithSubview (int topX, int expectedX)
+    public void FrameToScreen_Adornment_WithSubView_WithSubView (int topX, int expectedX)
     {
         // We test with only X because Y is equivalent. Height/Width are irrelevant.
         // Arrange
@@ -154,22 +154,22 @@ public class ToScreenTests ()
             Height = 1
         };
 
-        var subviewOfSubview = new View
+        var subviewOfSubView = new View
         {
-            Id = "subviewOfSubview",
+            Id = "subviewOfSubView",
             X = 2, // screen should be 3 (the subviewOfAdornment location is 1)
             Y = 0,
             Width = 1,
             Height = 1
         };
-        subviewOfAdornment.Add (subviewOfSubview);
+        subviewOfAdornment.Add (subviewOfSubView);
 
         adornment.Add (subviewOfAdornment);
         adornment.BeginInit ();
         adornment.EndInit ();
 
         // Act
-        Rectangle screen = subviewOfSubview.FrameToScreen ();
+        Rectangle screen = subviewOfSubView.FrameToScreen ();
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -198,7 +198,7 @@ public class ToScreenTests ()
         view.Frame = frame;
 
         superView.Add (view);
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
 
         // Act
         Rectangle screen = view.FrameToScreen ();
@@ -231,7 +231,7 @@ public class ToScreenTests ()
         view.Frame = frame;
 
         superView.Add (view);
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
 
         // Act
         Rectangle screen = view.FrameToScreen ();
@@ -273,7 +273,7 @@ public class ToScreenTests ()
         view.Frame = frame;
 
         superView.Add (view);
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
 
         // Act
         Rectangle screen = view.FrameToScreen ();
@@ -405,7 +405,7 @@ public class ToScreenTests ()
         view.SetContentSize (new (20, 20));
 
         superView.Add (view);
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
 
         // Act
         Point screen = view.ContentToScreen (new (contentX, 0));
@@ -448,7 +448,7 @@ public class ToScreenTests ()
     //    view.Frame = frame;
 
     //    superView.Add (view);
-    //    superView.LayoutSubviews ();
+    //    superView.LayoutSubViews ();
 
     //    // Act
     //    var screen = view.ContentToScreen (new (ContentX, 0, 0, 0));
@@ -500,7 +500,7 @@ public class ToScreenTests ()
     //    view.Frame = frame;
 
     //    superView.Add (view);
-    //    superView.LayoutSubviews ();
+    //    superView.LayoutSubViews ();
 
     //    // Act
     //    var screen = view.ContentToScreen (new (ContentX, 0, 0, 0));
@@ -554,7 +554,7 @@ public class ToScreenTests ()
     //    view.Frame = frame;
 
     //    superView.Add (view);
-    //    superView.LayoutSubviews ();
+    //    superView.LayoutSubViews ();
 
     //    // Act
     //    var screen = view.ContentToScreen (new (ContentX, 0, 0, 0));
@@ -610,7 +610,7 @@ public class ToScreenTests ()
     //    view.Content = view.Content with { Location = new (1, 1) };
 
     //    superView.Add (view);
-    //    superView.LayoutSubviews ();
+    //    superView.LayoutSubViews ();
 
     //    // Act
     //    var screen = view.ContentToScreen (new (testX, 0, 0, 0));
@@ -723,7 +723,7 @@ public class ToScreenTests ()
         view.Frame = frame;
 
         superView.Add (view);
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
 
         // Act
         Point screen = view.ViewportToScreen (new Point (viewportX, 0));
@@ -764,7 +764,7 @@ public class ToScreenTests ()
         view.Frame = frame;
 
         superView.Add (view);
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
 
         // Act
         Point screen = view.ViewportToScreen (new Point (viewportX, 0));
@@ -814,7 +814,7 @@ public class ToScreenTests ()
         view.Frame = frame;
 
         superView.Add (view);
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
 
         // Act
         Point screen = view.ViewportToScreen (new Point (viewportX, 0));
@@ -920,7 +920,7 @@ public class ToScreenTests ()
         view.Viewport = view.Viewport with { Location = new (1, 1) };
 
         superView.Add (view);
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
 
         // Act
         Point screen = view.ViewportToScreen (new Point (testX, 0));

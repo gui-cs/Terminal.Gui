@@ -110,7 +110,7 @@ public class DimPercentTests
         super.Add (view);
         super.BeginInit ();
         super.EndInit ();
-        super.LayoutSubviews ();
+        super.LayoutSubViews ();
 
         Assert.Equal (25, super.Frame.Width);
         Assert.Equal (25, super.Frame.Height);
@@ -147,7 +147,7 @@ public class DimPercentTests
         super.Add (view);
         super.BeginInit ();
         super.EndInit ();
-        super.LayoutSubviews ();
+        super.LayoutSubViews ();
 
         Assert.Equal (100, super.Frame.Width);
         Assert.Equal (100, super.Frame.Height);

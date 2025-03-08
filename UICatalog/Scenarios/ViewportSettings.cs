@@ -85,7 +85,7 @@ public class ViewportSettings : Scenario
 
         private void VirtualDemoView_LayoutComplete (object sender, DrawEventArgs drawEventArgs)
         {
-            Label frameLabel = Padding?.Subviews.OfType<Label> ().FirstOrDefault ();
+            Label frameLabel = Padding?.SubViews.OfType<Label> ().FirstOrDefault ();
 
             if (frameLabel is { })
             {

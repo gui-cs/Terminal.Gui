@@ -22,7 +22,7 @@ public class BarTests
     public void Constructor_InitializesEmpty_WhenNoShortcutsProvided ()
     {
         var bar = new Bar ();
-        Assert.Empty (bar.Subviews);
+        Assert.Empty (bar.SubViews);
     }
 
     [Fact]
@@ -36,10 +36,10 @@ public class BarTests
 
         var bar = new Bar (shortcuts);
 
-        Assert.Equal (shortcuts.Count, bar.Subviews.Count);
+        Assert.Equal (shortcuts.Count, bar.SubViews.Count);
         for (int i = 0; i < shortcuts.Count; i++)
         {
-            Assert.Same (shortcuts [i], bar.Subviews [i]);
+            Assert.Same (shortcuts [i], bar.SubViews.ElementAt (i));
         }
     }
 
@@ -70,7 +70,7 @@ public class BarTests
         var shortcut = new Shortcut (Key.Empty, "Command", null, null);
         bar.AddShortcutAt (0, shortcut);
 
-        Assert.Contains (shortcut, bar.Subviews);
+        Assert.Contains (shortcut, bar.SubViews);
     }
 
     [Fact]
@@ -83,8 +83,8 @@ public class BarTests
         var removedShortcut = bar.RemoveShortcut (0);
 
         Assert.Same (shortcut1, removedShortcut);
-        Assert.DoesNotContain (shortcut1, bar.Subviews);
-        Assert.Contains (shortcut2, bar.Subviews);
+        Assert.DoesNotContain (shortcut1, bar.SubViews);
+        Assert.Contains (shortcut2, bar.SubViews);
     }
 
     [Fact]
@@ -95,11 +95,11 @@ public class BarTests
         var bar = new Bar (new List<Shortcut> { shortcut1, shortcut2 });
 
         bar.Orientation = Orientation.Horizontal;
-        bar.LayoutSubviews ();
+        bar.LayoutSubViews ();
         // TODO: Assert specific layout expectations for horizontal orientation
 
         bar.Orientation = Orientation.Vertical;
-        bar.LayoutSubviews ();
+        bar.LayoutSubViews ();
         // TODO: Assert specific layout expectations for vertical orientation
     }
 }

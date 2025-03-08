@@ -41,7 +41,7 @@ public class CsiKeyPattern : AnsiKeyboardParserPattern
     private readonly Regex _pattern;
 
     /// <inheritdoc/>
-    public override bool IsMatch (string input) { return _pattern.IsMatch (input); }
+    public override bool IsMatch (string? input) { return _pattern.IsMatch (input!); }
 
     /// <summary>
     ///     Creates a new instance of the <see cref="CsiKeyPattern"/> class.
@@ -57,9 +57,9 @@ public class CsiKeyPattern : AnsiKeyboardParserPattern
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    protected override Key? GetKeyImpl (string input)
+    protected override Key? GetKeyImpl (string? input)
     {
-        Match match = _pattern.Match (input);
+        Match match = _pattern.Match (input!);
 
         if (!match.Success)
         {

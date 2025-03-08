@@ -49,7 +49,7 @@ public class ComputedLayout : Scenario
             Text = vrule
         };
 
-        app.SubviewsLaidOut += (s, a) =>
+        app.SubViewsLaidOut += (s, a) =>
                                {
                                    if (horizontalRuler.Viewport.Width == 0 || horizontalRuler.Viewport.Height == 0)
                                    {
@@ -372,7 +372,7 @@ public class ComputedLayout : Scenario
                                   {
                                       // This demonstrates how to have a dynamically sized button
                                       // Each time the button is clicked the button's text gets longer
-                                      // The call to app.LayoutSubviews causes the Computed layout to
+                                      // The call to app.LayoutSubViews causes the Computed layout to
                                       // get updated. 
                                       anchorButton.Text += "!";
                                   };

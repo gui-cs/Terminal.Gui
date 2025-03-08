@@ -25,7 +25,7 @@ public partial class View
     ///     <para>
     ///         If not explicitly set, and the View has visible subviews, <see cref="GetContentSize ()"/> will return the
     ///         maximum
-    ///         position + dimension of the Subviews, supporting <see cref="Dim.Auto"/> with the
+    ///         position + dimension of the SubViews, supporting <see cref="Dim.Auto"/> with the
     ///         <see cref="DimAutoStyle.Content"/> flag set.
     ///     </para>
     ///     <para>
@@ -68,7 +68,7 @@ public partial class View
     ///     <para>
     ///         If the content size was not explicitly set by <see cref="SetContentSize"/>, and the View has visible subviews, <see cref="GetContentSize ()"/> will return the
     ///         maximum
-    ///         position + dimension of the Subviews, supporting <see cref="Dim.Auto"/> with the
+    ///         position + dimension of the SubViews, supporting <see cref="Dim.Auto"/> with the
     ///         <see cref="DimAutoStyle.Content"/> flag set.
     ///     </para>
     ///     <para>
@@ -109,7 +109,7 @@ public partial class View
     ///                     disabled.
     ///                 </para>
     ///                 <para>
-    ///                     The behavior of <see cref="DimAutoStyle.Content"/> will be to use position and size of the Subviews
+    ///                     The behavior of <see cref="DimAutoStyle.Content"/> will be to use position and size of the SubViews
     ///                     to
     ///                     determine the size of the view, ignoring <see cref="GetContentSize ()"/>.
     ///                 </para>
@@ -128,7 +128,7 @@ public partial class View
     ///                     The behavior of <see cref="DimAutoStyle.Content"/> will be to use <see cref="GetContentSize ()"/>
     ///                     to
     ///                     determine the
-    ///                     size of the view, ignoring the position and size of the Subviews.
+    ///                     size of the view, ignoring the position and size of the SubViews.
     ///                 </para>
     ///             </description>
     ///         </item>

@@ -416,7 +416,7 @@ public partial class View // Layout APIs
     {
         if (SetRelativeLayout (contentSize))
         {
-            LayoutSubviews ();
+            LayoutSubViews ();
 
             // Debug.Assert(!NeedsLayout);
             return true;
@@ -475,7 +475,7 @@ public partial class View // Layout APIs
 
         CheckDimAuto ();
 
-        // TODO: Should move to View.LayoutSubviews?
+        // TODO: Should move to View.LayoutSubViews?
         SetTextFormatterSize ();
 
         int newX, newW, newY, newH;
@@ -594,9 +594,9 @@ public partial class View // Layout APIs
     ///         The position and dimensions of the view are indeterminate until the view has been initialized. Therefore, the
     ///         behavior of this method is indeterminate if <see cref="IsInitialized"/> is <see langword="false"/>.
     ///     </para>
-    ///     <para>Raises the <see cref="SubviewsLaidOut"/> event before it returns.</para>
+    ///     <para>Raises the <see cref="SubViewsLaidOut"/> event before it returns.</para>
     /// </remarks>
-    internal void LayoutSubviews ()
+    internal void LayoutSubViews ()
     {
         if (!NeedsLayout)
         {
@@ -607,23 +607,23 @@ public partial class View // Layout APIs
 
         Size contentSize = GetContentSize ();
 
-        OnSubviewLayout (new (contentSize));
-        SubviewLayout?.Invoke (this, new (contentSize));
+        OnSubViewLayout (new (contentSize));
+        SubViewLayout?.Invoke (this, new (contentSize));
 
         // The Adornments already have their Frame's set by SetRelativeLayout so we call LayoutSubViews vs. Layout here.
-        if (Margin is { Subviews.Count: > 0 })
+        if (Margin is { SubViews.Count: > 0 })
         {
-            Margin.LayoutSubviews ();
+            Margin.LayoutSubViews ();
         }
 
-        if (Border is { Subviews.Count: > 0 })
+        if (Border is { SubViews.Count: > 0 })
         {
-            Border.LayoutSubviews ();
+            Border.LayoutSubViews ();
         }
 
-        if (Padding is { Subviews.Count: > 0 })
+        if (Padding is { SubViews.Count: > 0 })
         {
-            Padding.LayoutSubviews ();
+            Padding.LayoutSubViews ();
         }
 
         // Sort out the dependencies of the X, Y, Width, Height properties
@@ -669,44 +669,44 @@ public partial class View // Layout APIs
 
         NeedsLayout = layoutStillNeeded;
 
-        OnSubviewsLaidOut (new (contentSize));
-        SubviewsLaidOut?.Invoke (this, new (contentSize));
+        OnSubViewsLaidOut (new (contentSize));
+        SubViewsLaidOut?.Invoke (this, new (contentSize));
     }
 
     /// <summary>
-    ///     Called from <see cref="LayoutSubviews"/> before any subviews
+    ///     Called from <see cref="LayoutSubViews"/> before any subviews
     ///     have been laid out.
     /// </summary>
     /// <remarks>
     ///     Override to perform tasks when the layout is changing.
     /// </remarks>
-    protected virtual void OnSubviewLayout (LayoutEventArgs args) { }
+    protected virtual void OnSubViewLayout (LayoutEventArgs args) { }
 
     /// <summary>
-    ///     Raised by <see cref="LayoutSubviews"/> before any subviews
+    ///     Raised by <see cref="LayoutSubViews"/> before any subviews
     ///     have been laid out.
     /// </summary>
     /// <remarks>
     ///     Subscribe to this event to perform tasks when the layout is changing.
     /// </remarks>
-    public event EventHandler<LayoutEventArgs>? SubviewLayout;
+    public event EventHandler<LayoutEventArgs>? SubViewLayout;
 
     /// <summary>
-    ///     Called from <see cref="LayoutSubviews"/> after all sub-views
+    ///     Called from <see cref="LayoutSubViews"/> after all sub-views
     ///     have been laid out.
     /// </summary>
     /// <remarks>
     ///     Override to perform tasks after the <see cref="View"/> has been resized or the layout has
     ///     otherwise changed.
     /// </remarks>
-    protected virtual void OnSubviewsLaidOut (LayoutEventArgs args) { }
+    protected virtual void OnSubViewsLaidOut (LayoutEventArgs args) { }
 
     /// <summary>Raised after all sub-views have been laid out.</summary>
     /// <remarks>
     ///     Subscribe to this event to perform tasks after the <see cref="View"/> has been resized or the layout has
     ///     otherwise changed.
     /// </remarks>
-    public event EventHandler<LayoutEventArgs>? SubviewsLaidOut;
+    public event EventHandler<LayoutEventArgs>? SubViewsLaidOut;
 
     #endregion Core Layout API
 
@@ -743,23 +743,23 @@ public partial class View // Layout APIs
     {
         NeedsLayout = true;
 
-        if (Margin is { Subviews.Count: > 0 })
+        if (Margin is { SubViews.Count: > 0 })
         {
             Margin.SetNeedsLayout ();
         }
 
-        if (Border is { Subviews.Count: > 0 })
+        if (Border is { SubViews.Count: > 0 })
         {
             Border.SetNeedsLayout ();
         }
 
-        if (Padding is { Subviews.Count: > 0 })
+        if (Padding is { SubViews.Count: > 0 })
         {
             Padding.SetNeedsLayout ();
         }
 
         // Use a stack to avoid recursion
-        Stack<View> stack = new (Subviews);
+        Stack<View> stack = new (SubViews);
 
         while (stack.Count > 0)
         {
@@ -769,22 +769,22 @@ public partial class View // Layout APIs
             {
                 current.NeedsLayout = true;
 
-                if (current.Margin is { Subviews.Count: > 0 })
+                if (current.Margin is { SubViews.Count: > 0 })
                 {
                     current.Margin.SetNeedsLayout ();
                 }
 
-                if (current.Border is { Subviews.Count: > 0 })
+                if (current.Border is { SubViews.Count: > 0 })
                 {
                     current.Border.SetNeedsLayout ();
                 }
 
-                if (current.Padding is { Subviews.Count: > 0 })
+                if (current.Padding is { SubViews.Count: > 0 })
                 {
                     current.Padding.SetNeedsLayout ();
                 }
 
-                foreach (View subview in current.Subviews)
+                foreach (View subview in current.SubViews)
                 {
                     stack.Push (subview);
                 }
@@ -833,7 +833,7 @@ public partial class View // Layout APIs
     /// </param>
     internal void CollectAll (View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
     {
-        foreach (View? v in from.InternalSubviews)
+        foreach (View? v in from.InternalSubViews)
         {
             nNodes.Add (v);
             CollectPos (v.X, v, ref nNodes, ref nEdges);
@@ -1035,7 +1035,7 @@ public partial class View // Layout APIs
     /// <param name="ny">The new y location that will ensure <paramref name="viewToMove"/> will be fully visible.</param>
     /// <returns>
     ///     Either <see cref="Application.Top"/> (if <paramref name="viewToMove"/> does not have a Super View) or
-    ///     <paramref name="viewToMove"/>'s SuperView. This can be used to ensure LayoutSubviews is called on the correct View.
+    ///     <paramref name="viewToMove"/>'s SuperView. This can be used to ensure LayoutSubViews is called on the correct View.
     /// </returns>
     internal static View? GetLocationEnsuringFullVisibility (
         View viewToMove,
@@ -1184,7 +1184,7 @@ public partial class View // Layout APIs
     /// <summary>Gets or sets whether validation of <see cref="Pos"/> and <see cref="Dim"/> occurs.</summary>
     /// <remarks>
     ///     Setting this to <see langword="true"/> will enable validation of <see cref="X"/>, <see cref="Y"/>,
-    ///     <see cref="Width"/>, and <see cref="Height"/> during set operations and in <see cref="LayoutSubviews"/>. If invalid
+    ///     <see cref="Width"/>, and <see cref="Height"/> during set operations and in <see cref="LayoutSubViews"/>. If invalid
     ///     settings are discovered exceptions will be thrown indicating the error. This will impose a performance penalty and
     ///     thus should only be used for debugging.
     /// </remarks>
@@ -1207,7 +1207,7 @@ public partial class View // Layout APIs
         var heightAuto = Height as DimAuto;
 
         // Verify none of the subviews are using Dim objects that depend on the SuperView's dimensions.
-        foreach (View view in Subviews)
+        foreach (View view in SubViews)
         {
             if (widthAuto is { } && widthAuto.Style.FastHasFlags (DimAutoStyle.Content) && ContentSizeTracksViewport)
             {

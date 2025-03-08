@@ -80,7 +80,7 @@ public class ColorPickerTests
         Assert.Equal ("#000000", hex.Text);
 
         // Change value using text field
-        TextField rBarTextField = cp.Subviews.OfType<TextField> ().First (tf => tf.Text == "0");
+        TextField rBarTextField = cp.SubViews.OfType<TextField> ().First (tf => tf.Text == "0");
 
         rBarTextField.SetFocus ();
         rBarTextField.Text = "128";
@@ -188,7 +188,7 @@ public class ColorPickerTests
                                          ScreenPosition = new (0, 1)
                                      });
 
-        //cp.Subviews.OfType<GBar> ()
+        //cp.SubViews.OfType<GBar> ()
         //  .Single ()
         //  .OnMouseEvent (
         //                 new ()
@@ -209,7 +209,7 @@ public class ColorPickerTests
                                          ScreenPosition = new (0, 2)
                                      });
 
-        //cp.Subviews.OfType<BBar> ()
+        //cp.SubViews.OfType<BBar> ()
         //  .Single ()
         //  .OnMouseEvent (
         //                 new ()
@@ -232,7 +232,7 @@ public class ColorPickerTests
         ColorPicker cp = GetColorPicker (ColorModel.HSV, false);
 
         // Should be only a single text field (Hex) because ShowTextFields is false
-        Assert.Single (cp.Subviews.OfType<TextField> ());
+        Assert.Single (cp.SubViews.OfType<TextField> ());
 
         cp.Draw ();
 
@@ -308,9 +308,6 @@ public class ColorPickerTests
     public void ColorPicker_EnterHexFor_ColorName ()
     {
         ColorPicker cp = GetColorPicker (ColorModel.RGB, true, true);
-        Application.Navigation = new ();
-        Application.Top = new ();
-        Application.Top.Add (cp);
 
         cp.Draw ();
 
@@ -367,9 +364,6 @@ public class ColorPickerTests
     public void ColorPicker_EnterHexFor_ColorName_AcceptVariation ()
     {
         ColorPicker cp = GetColorPicker (ColorModel.RGB, true, true);
-        Application.Navigation = new ();
-        Application.Top = new ();
-        Application.Top.Add (cp);
 
         cp.Draw ();
 
@@ -426,7 +420,7 @@ public class ColorPickerTests
         cp.Draw ();
 
         // Enter invalid hex value
-        TextField hexField = cp.Subviews.OfType<TextField> ().First (tf => tf.Text == "#000000");
+        TextField hexField = cp.SubViews.OfType<TextField> ().First (tf => tf.Text == "#000000");
         hexField.SetFocus ();
         hexField.Text = "#ZZZZZZ";
         Assert.True (hexField.HasFocus);
@@ -698,7 +692,7 @@ public class ColorPickerTests
         cp.Draw ();
 
         // Change value using the bar
-        RBar rBar = cp.Subviews.OfType<RBar> ().First ();
+        RBar rBar = cp.SubViews.OfType<RBar> ().First ();
         rBar.Value = 128;
 
         cp.Draw ();
@@ -730,9 +724,6 @@ public class ColorPickerTests
     public void ColorPicker_TabCompleteColorName ()
     {
         ColorPicker cp = GetColorPicker (ColorModel.RGB, true, true);
-        Application.Navigation = new ();
-        Application.Top = new ();
-        Application.Top.Add (cp);
 
         cp.Draw ();
 
@@ -838,7 +829,7 @@ public class ColorPickerTests
     {
         if (toGet <= ColorPickerPart.Bar3)
         {
-            return cp.Subviews.OfType<ColorBar> ().ElementAt ((int)toGet);
+            return cp.SubViews.OfType<ColorBar> ().ElementAt ((int)toGet);
         }
 
         throw new NotSupportedException ("ColorPickerPart must be a bar");
@@ -852,10 +843,12 @@ public class ColorPickerTests
         cp.Style.ShowColorName = showName;
         cp.ApplyStyleChanges ();
 
+        Application.Navigation = new ();
+
         Application.Top = new() { Width = 20, Height = 5 };
         Application.Top.Add (cp);
 
-        Application.Top.LayoutSubviews ();
+        Application.Top.LayoutSubViews ();
         Application.Top.SetFocus ();
 
         return cp;
@@ -876,20 +869,20 @@ public class ColorPickerTests
                     throw new NotSupportedException ("Corresponding Style option is not enabled");
                 }
 
-                return cp.Subviews.OfType<TextField> ().ElementAt ((int)toGet);
+                return cp.SubViews.OfType<TextField> ().ElementAt ((int)toGet);
             case ColorPickerPart.ColorName:
                 if (!hasColorNameTextField)
                 {
                     throw new NotSupportedException ("Corresponding Style option is not enabled");
                 }
 
-                return cp.Subviews.OfType<TextField> ().ElementAt (hasBarValueTextFields ? (int)toGet : (int)toGet - 3);
+                return cp.SubViews.OfType<TextField> ().ElementAt (hasBarValueTextFields ? (int)toGet : (int)toGet - 3);
             case ColorPickerPart.Hex:
 
                 int offset = hasBarValueTextFields ? 0 : 3;
                 offset += hasColorNameTextField ? 0 : 1;
 
-                return cp.Subviews.OfType<TextField> ().ElementAt ((int)toGet - offset);
+                return cp.SubViews.OfType<TextField> ().ElementAt ((int)toGet - offset);
             default:
                 throw new ArgumentOutOfRangeException (nameof (toGet), toGet, null);
         }

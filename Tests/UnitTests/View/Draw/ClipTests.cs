@@ -79,7 +79,7 @@ public class ClipTests (ITestOutputHelper _output)
         superView.Add (view);
         superView.BeginInit ();
         superView.EndInit ();
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
 
         superView.Draw ();
 

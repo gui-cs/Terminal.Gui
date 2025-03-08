@@ -92,14 +92,14 @@ public abstract class EditorBase : View
 
             if (value is null && _viewToEdit is { })
             {
-                _viewToEdit.SubviewsLaidOut -= View_LayoutComplete;
+                _viewToEdit.SubViewsLaidOut -= View_LayoutComplete;
             }
 
             _viewToEdit = value;
 
             if (_viewToEdit is { })
             {
-                _viewToEdit.SubviewsLaidOut += View_LayoutComplete;
+                _viewToEdit.SubViewsLaidOut += View_LayoutComplete;
             }
 
             OnViewToEditChanged ();

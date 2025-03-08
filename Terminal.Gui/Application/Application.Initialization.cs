@@ -7,7 +7,7 @@ namespace Terminal.Gui;
 
 public static partial class Application // Initialization (Init/Shutdown)
 {
-    /// <summary>Initializes a new instance of <see cref="Terminal.Gui"/> Application.</summary>
+    /// <summary>Initializes a new instance of a Terminal.Gui Application. <see cref="Shutdown"/> must be called when the application is closing.</summary>
     /// <para>Call this method once per instance (or after <see cref="Shutdown"/> has been called).</para>
     /// <para>
     ///     This function loads the right <see cref="IConsoleDriver"/> for the platform, Creates a <see cref="Toplevel"/>. and

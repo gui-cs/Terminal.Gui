@@ -25,7 +25,7 @@ public class ViewDisposalTest (ITestOutputHelper output)
         if (reference.IsAlive)
         {
             Assert.True (((View)reference.Target).WasDisposed);
-            Assert.Fail ($"Some Views didnt get Garbage Collected: {((View)reference.Target).Subviews}");
+            Assert.Fail ($"Some Views didnt get Garbage Collected: {((View)reference.Target).SubViews}");
         }
 #endif
     }
