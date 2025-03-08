@@ -494,7 +494,7 @@ internal sealed class Menu : View
 
     private void Application_RootMouseEvent (object? sender, MouseEventArgs a)
     {
-        if (a.View is { } and (MenuBar or not Menu))
+        if (!_host._handled && !_host.HandleGrabView (a, this))
         {
             return;
         }
