@@ -583,13 +583,13 @@ public partial class View // Drawing APIs
     /// <param name="context">The draw context to report drawn areas to, or null if not tracking.</param>
     public void DrawSubViews (DrawContext? context = null)
     {
-        if (_subviews is null)
+        if (InternalSubViews.Count == 0)
         {
             return;
         }
 
         // Draw the subviews in reverse order to leverage clipping.
-        foreach (View view in _subviews.Where (view => view.Visible).Reverse ())
+        foreach (View view in InternalSubViews.Where (view => view.Visible).Reverse ())
         {
             // TODO: HACK - This forcing of SetNeedsDraw with SuperViewRendersLineCanvas enables auto line join to work, but is brute force.
             if (view.SuperViewRendersLineCanvas || view.ViewportSettings.HasFlag (ViewportSettings.Transparent))

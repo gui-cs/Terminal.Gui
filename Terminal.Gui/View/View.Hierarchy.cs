@@ -9,7 +9,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     private static readonly IReadOnlyCollection<View> _empty = [];
 
-    private List<View>? _subviews; // This is null, and allocated on demand.
+    private readonly List<View>? _subviews = [];
 
     // Internally, we use InternalSubViews rather than subviews, as we do not expect us
     // to make the same mistakes our users make when they poke at the SubViews.
@@ -19,7 +19,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <remarks>
     ///     Use <see cref="Add(Terminal.Gui.View?)"/> and <see cref="Remove(Terminal.Gui.View?)"/> to add or remove subviews.
     /// </remarks>
-    public IReadOnlyCollection<View> SubViews => _subviews?.AsReadOnly () ?? _empty;
+    public IReadOnlyCollection<View> SubViews => InternalSubViews?.AsReadOnly () ?? _empty;
 
     private View? _superView;
 
@@ -92,14 +92,12 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             return null;
         }
 
-        _subviews ??= [];
-
         if (view.IsAdded)
         {
             Logging.Warning ($"{view} already has IsAdded == true.");
         }
 
-        if (_subviews.Contains (view))
+        if (InternalSubViews.Contains (view))
         {
             Logging.Warning ($"{view} has already been added to {this}.");
         }
@@ -108,7 +106,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         view.HasFocus = false;
 
         // TODO: Make this thread safe
-        _subviews.Add (view);
+        InternalSubViews.Add (view);
         view._superView = this;
 
         // This causes IsAddedChanged to be raised on view
@@ -211,7 +209,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             return null;
         }
 
-        if (_subviews is null)
+        if (InternalSubViews.Count == 0)
         {
             return view;
         }
@@ -221,7 +219,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             Logging.Warning ($"{view} has IsAdded == false.");
         }
 
-        if (!_subviews.Contains (view))
+        if (!InternalSubViews.Contains (view))
         {
             Logging.Warning ($"{view} has not been added to {this}.");
         }
@@ -238,7 +236,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
         Debug.Assert (!view.HasFocus);
 
-        _subviews.Remove (view);
+        InternalSubViews.Remove (view);
 
         // Clean up focus stuff
         _previouslyFocused = null;
@@ -256,7 +254,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         SetNeedsLayout ();
         SetNeedsDraw ();
 
-        foreach (View v in _subviews)
+        foreach (View v in InternalSubViews)
         {
             if (v.Frame.IntersectsWith (touched))
             {
@@ -304,14 +302,9 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// </remarks>
     public virtual void RemoveAll ()
     {
-        if (_subviews is null)
+        while (InternalSubViews.Count > 0)
         {
-            return;
-        }
-
-        while (_subviews.Count > 0)
-        {
-            Remove (_subviews [0]);
+            Remove (InternalSubViews [0]);
         }
     }
 
@@ -415,12 +408,12 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
                                  subview,
                                  x =>
                                  {
-                                     int idx = _subviews!.IndexOf (x);
+                                     int idx = InternalSubViews!.IndexOf (x);
 
-                                     if (idx + 1 < _subviews.Count)
+                                     if (idx + 1 < InternalSubViews.Count)
                                      {
-                                         _subviews.Remove (x);
-                                         _subviews.Insert (idx + 1, x);
+                                         InternalSubViews.Remove (x);
+                                         InternalSubViews.Insert (idx + 1, x);
                                      }
                                  }
                                 );
@@ -436,8 +429,8 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
                                  subview,
                                  x =>
                                  {
-                                     _subviews!.Remove (x);
-                                     _subviews.Add (x);
+                                     InternalSubViews!.Remove (x);
+                                     InternalSubViews.Add (x);
                                  }
                                 );
     }
@@ -452,12 +445,12 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
                                  subview,
                                  x =>
                                  {
-                                     int idx = _subviews!.IndexOf (x);
+                                     int idx = InternalSubViews!.IndexOf (x);
 
                                      if (idx > 0)
                                      {
-                                         _subviews.Remove (x);
-                                         _subviews.Insert (idx - 1, x);
+                                         InternalSubViews.Remove (x);
+                                         InternalSubViews.Insert (idx - 1, x);
                                      }
                                  }
                                 );
@@ -473,8 +466,8 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
                                  subview,
                                  x =>
                                  {
-                                     _subviews!.Remove (x);
-                                     _subviews.Insert (0, subview);
+                                     InternalSubViews!.Remove (x);
+                                     InternalSubViews.Insert (0, subview);
                                  }
                                 );
     }
@@ -486,7 +479,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <param name="action"></param>
     private void PerformActionForSubView (View subview, Action<View> action)
     {
-        if (_subviews!.Contains (subview))
+        if (InternalSubViews.Contains (subview))
         {
             action (subview);
         }

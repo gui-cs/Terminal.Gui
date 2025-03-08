@@ -196,9 +196,9 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
         BeginInitAdornments ();
 
-        if (_subviews?.Count > 0)
+        if (InternalSubViews?.Count > 0)
         {
-            foreach (View view in _subviews)
+            foreach (View view in InternalSubViews)
             {
                 if (!view.IsInitialized)
                 {
@@ -232,14 +232,11 @@ public partial class View : IDisposable, ISupportInitializeNotification
         UpdateTextDirection (TextDirection);
         UpdateTextFormatterText ();
 
-        if (_subviews is { })
+        foreach (View view in InternalSubViews)
         {
-            foreach (View view in _subviews)
+            if (!view.IsInitialized)
             {
-                if (!view.IsInitialized)
-                {
-                    view.EndInit ();
-                }
+                view.EndInit ();
             }
         }
 
@@ -295,12 +292,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
                 Border.Enabled = _enabled;
             }
 
-            if (_subviews is null)
-            {
-                return;
-            }
-
-            foreach (View view in _subviews)
+            foreach (View view in InternalSubViews)
             {
                 view.Enabled = Enabled;
             }
