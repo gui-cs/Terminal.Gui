@@ -27,6 +27,8 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     ///     Gets this Views SuperView (the View's container), or <see langword="null"/> if this view has not been added as a
     ///     SubView.
     /// </summary>
+    /// <seealso cref="OnSuperViewChanged"/>
+    /// <seealso cref="SuperViewChanged"/>
     public View? SuperView
     {
         get => _superView!;
@@ -66,8 +68,10 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <summary>Adds a SubView (child) to this view.</summary>
     /// <remarks>
     ///     <para>
-    ///         The Views that have been added to this view can be retrieved via the <see cref="SubViews"/> property. See also
-    ///         <seealso cref="Remove(View)"/> <seealso cref="RemoveAll"/>
+    ///         The Views that have been added to this view can be retrieved via the <see cref="SubViews"/> property. 
+    ///     </para>
+    ///     <para>
+    ///         To check if a View has been added to this View, compare it's <see cref="SuperView"/> property to this View.
     ///     </para>
     ///     <para>
     ///         SubViews will be disposed when this View is disposed. In other-words, calling this method causes
@@ -76,9 +80,17 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     ///     <para>
     ///         Calls/Raises the <see cref="OnSubViewAdded"/>/<see cref="SubViewAdded"/> event.
     ///     </para>
+    ///     <para>
+    ///         The <see cref="OnSuperViewChanged"/>/<see cref="SuperViewChanged"/> event will be raised on the added View.
+    ///     </para>
     /// </remarks>
     /// <param name="view">The view to add.</param>
     /// <returns>The view that was added.</returns>
+    /// <seealso cref="Remove(View)"/>
+    /// <seealso cref="RemoveAll"/>
+    /// <seealso cref="OnSubViewAdded"/>
+    /// <seealso cref="SubViewAdded"/>
+
     public virtual View? Add (View? view)
     {
         if (view is null)
@@ -191,10 +203,15 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     ///     <para>
     ///         Calls/Raises the <see cref="OnSubViewRemoved"/>/<see cref="SubViewRemoved"/> event.
     ///     </para>
+    ///     <para>
+    ///         The <see cref="OnSuperViewChanged"/>/<see cref="SuperViewChanged"/> event will be raised on the removed View.
+    ///     </para>
     /// </remarks>
     /// <returns>
     ///     The removed View. <see langword="null"/> if the View could not be removed.
     /// </returns>
+    /// <seealso cref="OnSubViewRemoved"/>
+    /// <seealso cref="SubViewRemoved"/>"/>
     public virtual View? Remove (View? view)
     {
         if (view is null)
