@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class ScrollBarTests (ITestOutputHelper output)
+public class ScrollBarTests
 {
     [Fact]
     public void Constructor_Defaults ()
