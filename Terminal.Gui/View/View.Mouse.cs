@@ -113,7 +113,7 @@ public partial class View // Mouse APIs
     }
 
     /// <summary>
-    ///     Called when the mouse moves over the View's <see cref="Frame"/> and no other non-Subview occludes it.
+    ///     Called when the mouse moves over the View's <see cref="Frame"/> and no other non-SubView occludes it.
     ///     <see cref="MouseLeave"/> will
     ///     be raised when the mouse is no longer over the <see cref="Frame"/>.
     /// </summary>
@@ -808,13 +808,13 @@ public partial class View // Mouse APIs
 
             View? subview = null;
 
-            for (int i = start.InternalSubviews.Count - 1; i >= 0; i--)
+            for (int i = start.InternalSubViews.Count - 1; i >= 0; i--)
             {
-                if (start.InternalSubviews [i].Visible
-                    && start.InternalSubviews [i].Contains (new (startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y))
-                    && (!ignoreTransparent || !start.InternalSubviews [i].ViewportSettings.HasFlag (ViewportSettings.TransparentMouse)))
+                if (start.InternalSubViews [i].Visible
+                    && start.InternalSubViews [i].Contains (new (startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y))
+                    && (!ignoreTransparent || !start.InternalSubViews [i].ViewportSettings.HasFlag (ViewportSettings.TransparentMouse)))
                 {
-                    subview = start.InternalSubviews [i];
+                    subview = start.InternalSubViews [i];
                     currentLocation.X = startOffsetX + start.Viewport.X;
                     currentLocation.Y = startOffsetY + start.Viewport.Y;
 

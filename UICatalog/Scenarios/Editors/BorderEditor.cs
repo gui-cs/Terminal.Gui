@@ -34,7 +34,7 @@ public class BorderEditor : AdornmentEditor
         {
             X = 0,
 
-            Y = Pos.Bottom (Subviews [^1]),
+            Y = Pos.Bottom (SubViews.ToArray() [^1]),
             Width = Dim.Fill (),
             SelectedItem = (int)(((Border)AdornmentToEdit!)?.LineStyle ?? LineStyle.None),
             BorderStyle = LineStyle.Single,

@@ -70,7 +70,7 @@ The @Terminal.Gui.View.Frame property of a `View` is a rectangle that describes 
 
 ## The Content Area
 
- The content area is the area where the view's content is drawn. Content can be any combination of the @Terminal.Gui.View.Text property, `Subviews`, and other content drawn by the View. The @Terminal.Gui.View.GetContentSize method gets the size of the content area of the view. *Content Area* refers to the rectangle with a location of `0,0` with the size returned by @Terminal.Gui.View.GetContentSize.
+ The content area is the area where the view's content is drawn. Content can be any combination of the @Terminal.Gui.View.Text property, `SubViews`, and other content drawn by the View. The @Terminal.Gui.View.GetContentSize method gets the size of the content area of the view. *Content Area* refers to the rectangle with a location of `0,0` with the size returned by @Terminal.Gui.View.GetContentSize.
 
  The Content Area size tracks the size of the @Terminal.Gui.View.Viewport by default. If the content size is set via @Terminal.Gui.View.SetContentSize, the content area is the provided size. If the content size is larger than the @Terminal.Gui.View.Viewport, scrolling is enabled. 
 
@@ -86,7 +86,7 @@ The @Terminal.Gui.View.ViewportSettings property controls how the Viewport is co
 
 The default `ViewportSettings` also constrains the Viewport to the size of the content, ensuring the right-most column or bottom-most row of the content will always be visible (in v1 the equivalent concept was `ScrollBarView.AlwaysKeepContentInViewport`). To allow the Viewport to be smaller than the content, set `ViewportSettings.AllowXGreaterThanContentWidth` and/or `ViewportSettings.AllowXGreaterThanContentHeight`.
 
-* *@Terminal.Gui.View.GetContentSize()* - The content area is the area where the view's content is drawn. Content can be any combination of the @Terminal.Gui.View.Text property, `Subviews`, and other content drawn by the View. The @Terminal.Gui.View.GetContentSize method gets the size of the content area of the view. *Content Area* refers to the rectangle with a location of `0,0` with the size returned by @Terminal.Gui.View.GetContentSize. The [Layout Deep Dive](layout.md) has more details on the Content Area.
+* *@Terminal.Gui.View.GetContentSize()* - The content area is the area where the view's content is drawn. Content can be any combination of the @Terminal.Gui.View.Text property, `SubViews`, and other content drawn by the View. The @Terminal.Gui.View.GetContentSize method gets the size of the content area of the view. *Content Area* refers to the rectangle with a location of `0,0` with the size returned by @Terminal.Gui.View.GetContentSize. The [Layout Deep Dive](layout.md) has more details on the Content Area.
 
 * *@Terminal.Gui.View.Viewport* A rectangle describing the portion of the *Content Area* that is currently visible to the user. It is a "portal" into the content. The `Viewport.Location` is relative to the top-left corner of the inner rectangle of `View.Padding`. If `Viewport.Size` is the same as `View.GetContentSize()`, `Viewport.Location` will be `0,0`. 
   
@@ -139,7 +139,7 @@ myView.Y = Pos.Bottom (anotherView) + 5;
 
 The @Terminal.Gui.Dim is the type of `View.Width` and `View.Height` and supports the following sub-types:
 
-* Automatic size based on the View's content (either Subviews or Text) - @Terminal.Gui.Dim.Auto(Terminal.Gui.DimAutoStyle,Terminal.Gui.Dim,Terminal.Gui.Dim) - See [Dim.Auto Deep Dive](dimauto.md).
+* Automatic size based on the View's content (either SubViews or Text) - @Terminal.Gui.Dim.Auto(Terminal.Gui.DimAutoStyle,Terminal.Gui.Dim,Terminal.Gui.Dim) - See [Dim.Auto Deep Dive](dimauto.md).
 * Absolute size, by passing an integer - @Terminal.Gui.Dim.Absolute(System.Int32).
 * Percentage of the SuperView's Content Area  - @Terminal.Gui.Dim.Percent(System.Int32).
 * Fill to the end of the SuperView's Content Area - @Terminal.Gui.Dim.Fill.

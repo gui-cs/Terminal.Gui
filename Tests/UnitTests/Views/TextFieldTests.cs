@@ -2,7 +2,6 @@
 using System.Reflection;
 using System.Text;
 using UnitTests;
-using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -354,7 +353,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         Assert.Equal (
                       "TextField with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!",
-                      Application.Driver?.Clipboard.GetClipboardData ()
+                      Application.Driver?.Clipboard!.GetClipboardData ()
                      );
         Assert.Equal (string.Empty, _textField.Text);
         _textField.Paste ();
@@ -368,9 +367,9 @@ public class TextFieldTests (ITestOutputHelper output)
         _textField.BeginInit ();
         _textField.EndInit ();
 
-        _textField.TextChanging += _textField_TextChanging;
+        _textField.TextChanging += TextFieldTextChanging;
 
-        void _textField_TextChanging (object sender, CancelEventArgs<string> e)
+        void TextFieldTextChanging (object sender, CancelEventArgs<string> e)
         {
             if (e.NewValue.GetRuneCount () > 11)
             {
@@ -381,14 +380,14 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.Equal (32, _textField.CursorPosition);
         _textField.SelectAll ();
         _textField.Cut ();
-        Assert.Equal ("TAB to jump between text fields.", Application.Driver?.Clipboard.GetClipboardData ());
+        Assert.Equal ("TAB to jump between text fields.", Application.Driver?.Clipboard!.GetClipboardData ());
         Assert.Equal (string.Empty, _textField.Text);
         Assert.Equal (0, _textField.CursorPosition);
         _textField.Paste ();
         Assert.Equal ("TAB to jump", _textField.Text);
         Assert.Equal (11, _textField.CursorPosition);
 
-        _textField.TextChanging -= _textField_TextChanging;
+        _textField.TextChanging -= TextFieldTextChanging;
     }
 
     [Fact]
@@ -2068,12 +2067,12 @@ Les Miśerables",
         TextField t = new ();
 
         superView.Add (t);
-        Assert.Single (superView.Subviews);
+        Assert.Single (superView.SubViews);
 
         superView.BeginInit ();
         superView.EndInit ();
 
-        Assert.Equal (2, superView.Subviews.Count);
+        Assert.Equal (2, superView.SubViews.Count);
     }
 
     [Fact]
@@ -2087,7 +2086,7 @@ Les Miśerables",
 
         superView.BeginInit ();
         superView.EndInit ();
-        Assert.Empty (superView.Subviews);
+        Assert.Empty (superView.SubViews);
 
         TextField t = new ()
         {
@@ -2096,7 +2095,7 @@ Les Miśerables",
 
         superView.Add (t);
 
-        Assert.Equal (2, superView.Subviews.Count);
+        Assert.Equal (2, superView.SubViews.Count);
     }
 
     [Fact]
@@ -2160,7 +2159,7 @@ Les Miśerables",
         superView.BeginInit ();
         superView.EndInit ();
 
-        Assert.Equal (2, superView.Subviews.Count);
+        Assert.Equal (2, superView.SubViews.Count);
 
         Assert.True (t.Visible);
         Assert.False (t.Autocomplete.Visible);

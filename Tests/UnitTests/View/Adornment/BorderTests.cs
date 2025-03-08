@@ -1,5 +1,4 @@
 ﻿using UnitTests;
-using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
@@ -17,7 +16,7 @@ public class BorderTests (ITestOutputHelper output)
         var view = new View { Title = "A", Height = 2, Width = 5 };
         superView.Add (view);
 
-        view.Border.Thickness = new (0, 1, 0, 0);
+        view.Border!.Thickness = new (0, 1, 0, 0);
         view.Border.LineStyle = LineStyle.Single;
 
         view.ColorScheme = new ()
@@ -838,7 +837,7 @@ public class BorderTests (ITestOutputHelper output)
 │ ┊ ┊
 └─┴┄┘")]
     [SetupFakeDriver]
-    public void SuperViewRendersLineCanvas_No_Subviews_AutoJoinsLines (bool superViewRendersLineCanvas, string expected)
+    public void SuperViewRendersLineCanvas_No_SubViews_AutoJoinsLines (bool superViewRendersLineCanvas, string expected)
     {
         View superView = new View ()
         {

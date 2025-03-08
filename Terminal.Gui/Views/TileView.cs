@@ -23,7 +23,7 @@ public class TileView : View
         CanFocus = true;
         RebuildForTileCount (tiles);
 
-        SubviewLayout += (_, _) =>
+        SubViewLayout += (_, _) =>
                          {
                              Rectangle viewport = Viewport;
 
@@ -100,14 +100,14 @@ public class TileView : View
                 return i;
             }
 
-            if (v.Subviews.Contains (toFind))
+            if (v.SubViews.Contains (toFind))
             {
                 return i;
             }
 
             if (recursive)
             {
-                if (RecursiveContains (v.Subviews, toFind))
+                if (RecursiveContains (v.SubViews, toFind))
                 {
                     return i;
                 }
@@ -485,7 +485,7 @@ public class TileView : View
         };
 
         // Take everything out of the View we are moving
-        View [] childViews = toMove!.Subviews.ToArray ();
+        View [] childViews = toMove!.SubViews.ToArray ();
         toMove.RemoveAll ();
 
         // Remove the view itself and replace it with the new TileView
@@ -533,7 +533,7 @@ public class TileView : View
     {
         List<TileViewLineView> lines = new ();
 
-        foreach (View sub in v.Subviews)
+        foreach (View sub in v.SubViews)
         {
             if (sub is TileViewLineView s)
             {
@@ -756,7 +756,7 @@ public class TileView : View
                 return true;
             }
 
-            if (RecursiveContains (v.Subviews, needle))
+            if (RecursiveContains (v.SubViews, needle))
             {
                 return true;
             }

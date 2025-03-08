@@ -2,7 +2,7 @@
 
 public partial class DimAutoTests
 {
-    // Tests all the Pos Types in Subview scenarios to ensure DimAutoStyle.Content is calculated correctly
+    // Tests all the Pos Types in SubView scenarios to ensure DimAutoStyle.Content is calculated correctly
 
     #region PosAbsolute
 
@@ -13,7 +13,7 @@ public partial class DimAutoTests
     [InlineData (0, 21, 0, 11, 21, 11)]
     [InlineData (1, 21, 1, 11, 21, 11)]
     [InlineData (21, 21, 11, 11, 21, 11)]
-    public void With_Subview_Using_PosAbsolute (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    public void With_SubView_Using_PosAbsolute (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
     {
         var view = new View
         {
@@ -54,7 +54,7 @@ public partial class DimAutoTests
     //[InlineData (0, 21, 0, 11, 20, 10)]
     //[InlineData (1, 21, 1, 11, 20, 10)]
     //[InlineData (21, 21, 11, 11, 21, 11)]
-    //public void With_Subview_Using_PosAlign (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    //public void With_SubView_Using_PosAlign (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
     //{
     //    var view = new View
     //    {
@@ -95,7 +95,7 @@ public partial class DimAutoTests
     [InlineData (0, 21, 0, 11, 20, 10)]
     [InlineData (1, 21, 1, 11, 20, 10)]
     [InlineData (21, 21, 11, 11, 21, 11)]
-    public void With_Subview_Using_PosPercent (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    public void With_SubView_Using_PosPercent (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
     {
         var view = new View
         {
@@ -139,7 +139,7 @@ public partial class DimAutoTests
     [InlineData (0, 21, 0, 11, 21, 11)]
     [InlineData (1, 21, 1, 11, 21, 11)]
     [InlineData (21, 21, 11, 11, 21, 11)]
-    public void With_Subview_Using_PosPercent_Combine (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    public void With_SubView_Using_PosPercent_Combine (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
     {
         var view = new View
         {
@@ -187,7 +187,7 @@ public partial class DimAutoTests
     [InlineData (0, 21, 0, 11, 20, 10)]
     [InlineData (1, 21, 1, 11, 20, 10)]
     [InlineData (21, 21, 11, 11, 21, 11)]
-    public void With_Subview_Using_PosCenter (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    public void With_SubView_Using_PosCenter (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
     {
         var view = new View
         {
@@ -232,7 +232,7 @@ public partial class DimAutoTests
     [InlineData (0, 21, 0, 11, 21, 11)]
     [InlineData (1, 21, 1, 11, 21, 11)]
     [InlineData (21, 21, 11, 11, 21, 11)]
-    public void With_Subview_Using_PosCenter_Combine (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    public void With_SubView_Using_PosCenter_Combine (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
     {
         var view = new View
         {
@@ -276,7 +276,7 @@ public partial class DimAutoTests
     // TODO: Need PosView tests
 
     [Fact]
-    public void With_Subview_Using_PosView ()
+    public void With_SubView_Using_PosView ()
     {
         var view = new View ()
         {
@@ -307,7 +307,7 @@ public partial class DimAutoTests
     [InlineData (0, 21, 0, 11, 20, 10)]
     [InlineData (1, 21, 1, 11, 20, 10)]
     [InlineData (21, 21, 11, 11, 21, 11)]
-    public void With_Subview_Using_PosAnchorEnd (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    public void With_SubView_Using_PosAnchorEnd (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
     {
         var view = new View
         {
@@ -354,7 +354,7 @@ public partial class DimAutoTests
     [InlineData (1, 21, 1, 11, 21, 11)]
     [InlineData (21, 21, 11, 11, 21, 11)]
     [InlineData (0, 30, 0, 20, 25, 15)]
-    public void With_Subview_And_Subview_Using_PosAnchorEnd (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    public void With_SubView_And_SubView_Using_PosAnchorEnd (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
     {
         var view = new View
         {
@@ -407,7 +407,7 @@ public partial class DimAutoTests
     [InlineData (1, 21, 1, 11, 21, 11)]
     [InlineData (21, 21, 11, 11, 21, 11)]
     [InlineData (0, 30, 0, 20, 25, 15)]
-    public void With_DimAutoSubview_And_Subview_Using_PosAnchorEnd (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    public void With_DimAutoSubView_And_SubView_Using_PosAnchorEnd (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
     {
         var view = new View
         {
@@ -461,7 +461,7 @@ public partial class DimAutoTests
     [InlineData (1, 21, 1, 11, 21, 11)]
     [InlineData (21, 21, 11, 11, 21, 11)]
     [InlineData (0, 30, 0, 20, 26, 16)]
-    public void With_PosViewSubview_And_Subview_Using_PosAnchorEnd (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    public void With_PosViewSubView_And_SubView_Using_PosAnchorEnd (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
     {
         var view = new View
         {
@@ -524,7 +524,7 @@ public partial class DimAutoTests
     [InlineData (1, 21, 1, 11, 21, 11)]
     [InlineData (21, 21, 11, 11, 21, 11)]
     [InlineData (0, 30, 0, 20, 22, 12)]
-    public void With_DimViewSubview_And_Subview_Using_PosAnchorEnd (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    public void With_DimViewSubView_And_SubView_Using_PosAnchorEnd (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
     {
         var view = new View
         {
@@ -585,7 +585,7 @@ public partial class DimAutoTests
     //[InlineData (0, 21, 0, 11, 21, 11)]
     //[InlineData (1, 21, 1, 11, 21, 11)]
     //[InlineData (21, 21, 11, 11, 21, 11)]
-    public void With_Text_And_Subview_Using_PosAnchorEnd (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    public void With_Text_And_SubView_Using_PosAnchorEnd (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
     {
         var view = new View
         {
@@ -631,7 +631,7 @@ public partial class DimAutoTests
     #region PosFunc
 
     [Fact]
-    public void With_Subview_Using_PosFunc ()
+    public void With_SubView_Using_PosFunc ()
     {
         var view = new View ()
         {

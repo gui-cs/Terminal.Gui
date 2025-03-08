@@ -287,7 +287,7 @@ public class VkeyPacketSimulator : Scenario
                      ..outputVerticalRuler.Viewport.Height];
         }
 
-        win.SubviewsLaidOut += Win_LayoutComplete;
+        win.SubViewsLaidOut += Win_LayoutComplete;
 
         Application.Run (win);
         win.Dispose ();

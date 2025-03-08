@@ -711,7 +711,7 @@ public class Border : Adornment
         {
             Attribute focus = Parent.GetNormalColor ();
 
-            if (Parent.SuperView is { } && Parent.SuperView?.Subviews!.Count (s => s.CanFocus) > 1)
+            if (Parent.SuperView is { } && Parent.SuperView?.SubViews!.Count (s => s.CanFocus) > 1)
             {
                 // Only use focus color if there are multiple focusable views
                 focus = GetFocusColor ();

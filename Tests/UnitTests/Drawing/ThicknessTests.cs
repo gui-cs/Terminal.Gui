@@ -1,9 +1,9 @@
 ﻿using System.Text;
 using UnitTests;
-using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.DrawingTests;
+
 public class ThicknessTests (ITestOutputHelper output)
 {
     [Fact]
@@ -15,28 +15,28 @@ public class ThicknessTests (ITestOutputHelper output)
         var r = new Rectangle (5, 5, 40, 15);
 
         Application.Driver?.FillRect (
-                                     new Rectangle (0, 0, Application.Driver!.Cols, Application.Driver!.Rows),
-                                     (Rune)' '
-                                    );
+                                      new (0, 0, Application.Driver!.Cols, Application.Driver!.Rows),
+                                      (Rune)' '
+                                     );
         t.Draw (r, ViewDiagnosticFlags.Thickness, "Test");
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
        Test (Left=0,Top=0,Right=0,Bottom=0)",
-                                                      output
-                                                     );
+                                                       output
+                                                      );
 
-        t = new Thickness (1, 1, 1, 1);
-        r = new Rectangle (5, 5, 40, 15);
+        t = new (1, 1, 1, 1);
+        r = new (5, 5, 40, 15);
 
         Application.Driver?.FillRect (
-                                     new Rectangle (0, 0, Application.Driver!.Cols, Application.Driver!.Rows),
-                                     (Rune)' '
-                                    );
+                                      new (0, 0, Application.Driver!.Cols, Application.Driver!.Rows),
+                                      (Rune)' '
+                                     );
         t.Draw (r, ViewDiagnosticFlags.Thickness, "Test");
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
      TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
      T                                      T
      T                                      T
@@ -52,20 +52,20 @@ public class ThicknessTests (ITestOutputHelper output)
      T                                      T
      T                                      T
      TTTest (Left=1,Top=1,Right=1,Bottom=1)TT",
-                                                      output
-                                                     );
+                                                       output
+                                                      );
 
-        t = new Thickness (1, 2, 3, 4);
-        r = new Rectangle (5, 5, 40, 15);
+        t = new (1, 2, 3, 4);
+        r = new (5, 5, 40, 15);
 
         Application.Driver?.FillRect (
-                                     new Rectangle (0, 0, Application.Driver!.Cols, Application.Driver!.Rows),
-                                     (Rune)' '
-                                    );
+                                      new (0, 0, Application.Driver!.Cols, Application.Driver!.Rows),
+                                      (Rune)' '
+                                     );
         t.Draw (r, ViewDiagnosticFlags.Thickness, "Test");
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
      TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
      TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
      T                                    TTT
@@ -81,20 +81,20 @@ public class ThicknessTests (ITestOutputHelper output)
      TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
      TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
      TTTest (Left=1,Top=2,Right=3,Bottom=4)TT",
-                                                      output
-                                                     );
+                                                       output
+                                                      );
 
-        t = new Thickness (-1, 1, 1, 1);
-        r = new Rectangle (5, 5, 40, 15);
+        t = new (-1, 1, 1, 1);
+        r = new (5, 5, 40, 15);
 
         Application.Driver?.FillRect (
-                                     new Rectangle (0, 0, Application.Driver!.Cols, Application.Driver!.Rows),
-                                     (Rune)' '
-                                    );
+                                      new (0, 0, Application.Driver!.Cols, Application.Driver!.Rows),
+                                      (Rune)' '
+                                     );
         t.Draw (r, ViewDiagnosticFlags.Thickness, "Test");
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
      TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
                                             T
                                             T
@@ -110,8 +110,8 @@ public class ThicknessTests (ITestOutputHelper output)
                                             T
                                             T
      TTest (Left=-1,Top=1,Right=1,Bottom=1)TT",
-                                                      output
-                                                     );
+                                                       output
+                                                      );
     }
 
     [Fact]
@@ -133,7 +133,7 @@ public class ThicknessTests (ITestOutputHelper output)
         t.Draw (r, ViewDiagnosticFlags.Ruler, "Test");
 
         DriverAssert.AssertDriverContentsAre (
-                                             @"
+                                              @"
 ┌───────────────────────────────────────────┐
 │                                           │
 │                                           │
@@ -154,17 +154,17 @@ public class ThicknessTests (ITestOutputHelper output)
 │                                           │
 │                                           │
 └───────────────────────────────────────────┘",
-                                             output
-                                            );
+                                              output
+                                             );
 
-        t = new Thickness (1, 1, 1, 1);
-        r = new Rectangle (1, 1, 40, 15);
+        t = new (1, 1, 1, 1);
+        r = new (1, 1, 40, 15);
         top.SetNeedsDraw ();
         Application.RunIteration (ref rs);
-        t.Draw (r, ViewDiagnosticFlags.Ruler,  "Test");
+        t.Draw (r, ViewDiagnosticFlags.Ruler, "Test");
 
         DriverAssert.AssertDriverContentsAre (
-                                             @"
+                                              @"
 ┌───────────────────────────────────────────┐
 │|123456789|123456789|123456789|123456789   │
 │1                                      1   │
@@ -185,17 +185,17 @@ public class ThicknessTests (ITestOutputHelper output)
 │                                           │
 │                                           │
 └───────────────────────────────────────────┘",
-                                             output
-                                            );
+                                              output
+                                             );
 
-        t = new Thickness (1, 2, 3, 4);
-        r = new Rectangle (2, 2, 40, 15);
+        t = new (1, 2, 3, 4);
+        r = new (2, 2, 40, 15);
         top.SetNeedsDraw ();
         Application.RunIteration (ref rs);
-        t.Draw (r, ViewDiagnosticFlags.Ruler,  "Test");
+        t.Draw (r, ViewDiagnosticFlags.Ruler, "Test");
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
 ┌───────────────────────────────────────────┐
 │                                           │
 │ |123456789|123456789|123456789|123456789  │
@@ -216,17 +216,17 @@ public class ThicknessTests (ITestOutputHelper output)
 │                                           │
 │                                           │
 └───────────────────────────────────────────┘",
-                                                      output
-                                                     );
+                                                       output
+                                                      );
 
-        t = new Thickness (-1, 1, 1, 1);
-        r = new Rectangle (5, 5, 40, 15);
+        t = new (-1, 1, 1, 1);
+        r = new (5, 5, 40, 15);
         top.SetNeedsDraw ();
         Application.RunIteration (ref rs);
         t.Draw (r, ViewDiagnosticFlags.Ruler, "Test");
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
 ┌───────────────────────────────────────────┐
 │                                           │
 │                                           │
@@ -247,9 +247,8 @@ public class ThicknessTests (ITestOutputHelper output)
 │                                           2
 │                                           3
 └────|123456789|123456789|123456789|123456789",
-                                                      output
-                                                     );
+                                                       output
+                                                      );
         top.Dispose ();
     }
-
 }

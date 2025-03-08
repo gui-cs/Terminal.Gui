@@ -97,30 +97,30 @@ public class DynamicStatusBar : Scenario
 
         public DynamicStatusBarDetails ()
         {
-            var _lblTitle = new Label { Y = 1, Text = "Title:" };
-            Add (_lblTitle);
+            var lblTitle = new Label { Y = 1, Text = "Title:" };
+            base.Add (lblTitle);
 
-            TextTitle = new TextField { X = Pos.Right (_lblTitle) + 4, Y = Pos.Top (_lblTitle), Width = Dim.Fill () };
-            Add (TextTitle);
+            TextTitle = new TextField { X = Pos.Right (lblTitle) + 4, Y = Pos.Top (lblTitle), Width = Dim.Fill () };
+            base.Add (TextTitle);
 
-            var _lblAction = new Label { X = Pos.Left (_lblTitle), Y = Pos.Bottom (_lblTitle) + 1, Text = "Action:" };
-            Add (_lblAction);
+            var lblAction = new Label { X = Pos.Left (lblTitle), Y = Pos.Bottom (lblTitle) + 1, Text = "Action:" };
+            base.Add (lblAction);
 
             TextAction = new TextView
             {
-                X = Pos.Left (TextTitle), Y = Pos.Top (_lblAction), Width = Dim.Fill (), Height = 5
+                X = Pos.Left (TextTitle), Y = Pos.Top (lblAction), Width = Dim.Fill (), Height = 5
             };
-            Add (TextAction);
+            base.Add (TextAction);
 
-            var _lblShortcut = new Label
+            var lblShortcut = new Label
             {
-                X = Pos.Left (_lblTitle), Y = Pos.Bottom (TextAction) + 1, Text = "Shortcut:"
+                X = Pos.Left (lblTitle), Y = Pos.Bottom (TextAction) + 1, Text = "Shortcut:"
             };
-            Add (_lblShortcut);
+            base.Add (lblShortcut);
 
             TextShortcut = new TextField
             {
-                X = Pos.X (TextAction), Y = Pos.Y (_lblShortcut), Width = Dim.Fill (), ReadOnly = true
+                X = Pos.X (TextAction), Y = Pos.Y (lblShortcut), Width = Dim.Fill (), ReadOnly = true
             };
 
             TextShortcut.KeyDown += (s, e) =>
@@ -128,14 +128,14 @@ public class DynamicStatusBar : Scenario
                                         TextShortcut.Text = e.ToString ();
 
                                     };
-            Add (TextShortcut);
+            base.Add (TextShortcut);
 
-            var _btnShortcut = new Button
+            var btnShortcut = new Button
             {
-                X = Pos.X (_lblShortcut), Y = Pos.Bottom (TextShortcut) + 1, Text = "Clear Shortcut"
+                X = Pos.X (lblShortcut), Y = Pos.Bottom (TextShortcut) + 1, Text = "Clear Shortcut"
             };
-            _btnShortcut.Accepting += (s, e) => { TextShortcut.Text = ""; };
-            Add (_btnShortcut);
+            btnShortcut.Accepting += (s, e) => { TextShortcut.Text = ""; };
+            base.Add (btnShortcut);
         }
 
         public TextView TextAction { get; }
@@ -263,62 +263,62 @@ public class DynamicStatusBar : Scenario
 
             Title = $"{Application.QuitKey} to Quit - Scenario: Dynamic StatusBar";
 
-            var _frmStatusBar = new FrameView
+            var frmStatusBar = new FrameView
             {
                 Y = 5, Width = Dim.Percent (50), Height = Dim.Fill (2), Title = "Items:"
             };
 
-            var _btnAddStatusBar = new Button { Y = 1, Text = "Add a StatusBar" };
-            _frmStatusBar.Add (_btnAddStatusBar);
+            var btnAddStatusBar = new Button { Y = 1, Text = "Add a StatusBar" };
+            frmStatusBar.Add (btnAddStatusBar);
 
-            var _btnRemoveStatusBar = new Button { Y = 1, Text = "Remove a StatusBar" };
+            var btnRemoveStatusBar = new Button { Y = 1, Text = "Remove a StatusBar" };
 
-            _btnRemoveStatusBar.X = Pos.AnchorEnd ();
-            _frmStatusBar.Add (_btnRemoveStatusBar);
+            btnRemoveStatusBar.X = Pos.AnchorEnd ();
+            frmStatusBar.Add (btnRemoveStatusBar);
 
-            var _btnAdd = new Button { Y = Pos.Top (_btnRemoveStatusBar) + 2, Text = " Add  " };
-            _btnAdd.X = Pos.AnchorEnd ();
-            _frmStatusBar.Add (_btnAdd);
+            var btnAdd = new Button { Y = Pos.Top (btnRemoveStatusBar) + 2, Text = " Add  " };
+            btnAdd.X = Pos.AnchorEnd ();
+            frmStatusBar.Add (btnAdd);
 
             _lstItems = new ListView
             {
                 ColorScheme = Colors.ColorSchemes ["Dialog"],
-                Y = Pos.Top (_btnAddStatusBar) + 2,
-                Width = Dim.Fill () - Dim.Width (_btnAdd) - 1,
+                Y = Pos.Top (btnAddStatusBar) + 2,
+                Width = Dim.Fill () - Dim.Width (btnAdd) - 1,
                 Height = Dim.Fill (),
                 Source = new ListWrapper<DynamicStatusItemList> ([])
             };
-            _frmStatusBar.Add (_lstItems);
+            frmStatusBar.Add (_lstItems);
 
-            var _btnRemove = new Button { X = Pos.Left (_btnAdd), Y = Pos.Top (_btnAdd) + 1, Text = "Remove" };
-            _frmStatusBar.Add (_btnRemove);
+            var btnRemove = new Button { X = Pos.Left (btnAdd), Y = Pos.Top (btnAdd) + 1, Text = "Remove" };
+            frmStatusBar.Add (btnRemove);
 
-            var _btnUp = new Button { X = Pos.Right (_lstItems) + 2, Y = Pos.Top (_btnRemove) + 2, Text = Glyphs.UpArrow.ToString () };
-            _frmStatusBar.Add (_btnUp);
+            var btnUp = new Button { X = Pos.Right (_lstItems) + 2, Y = Pos.Top (btnRemove) + 2, Text = Glyphs.UpArrow.ToString () };
+            frmStatusBar.Add (btnUp);
 
-            var _btnDown = new Button { X = Pos.Right (_lstItems) + 2, Y = Pos.Top (_btnUp) + 1, Text = Glyphs.DownArrow.ToString () };
-            _frmStatusBar.Add (_btnDown);
+            var btnDown = new Button { X = Pos.Right (_lstItems) + 2, Y = Pos.Top (btnUp) + 1, Text = Glyphs.DownArrow.ToString () };
+            frmStatusBar.Add (btnDown);
 
-            Add (_frmStatusBar);
+            Add (frmStatusBar);
 
-            var _frmStatusBarDetails = new DynamicStatusBarDetails
+            var frmStatusBarDetails = new DynamicStatusBarDetails
             {
-                X = Pos.Right (_frmStatusBar),
-                Y = Pos.Top (_frmStatusBar),
+                X = Pos.Right (frmStatusBar),
+                Y = Pos.Top (frmStatusBar),
                 Width = Dim.Fill (),
                 Height = Dim.Fill (4),
                 Title = "Shortcut Details:"
             };
-            Add (_frmStatusBarDetails);
+            Add (frmStatusBarDetails);
 
-            _btnUp.Accepting += (s, e) =>
+            btnUp.Accepting += (s, e) =>
                               {
                                   int i = _lstItems.SelectedItem;
                                   Shortcut statusItem = DataContext.Items.Count > 0 ? DataContext.Items [i].Shortcut : null;
 
                                   if (statusItem != null)
                                   {
-                                      Shortcut [] items = _statusBar.Subviews.Cast<Shortcut> ().ToArray ();
+                                      Shortcut [] items = _statusBar.SubViews.Cast<Shortcut> ().ToArray ();
 
                                       if (i > 0)
                                       {
@@ -334,14 +334,14 @@ public class DynamicStatusBar : Scenario
                                   }
                               };
 
-            _btnDown.Accepting += (s, e) =>
+            btnDown.Accepting += (s, e) =>
                                 {
                                     int i = _lstItems.SelectedItem;
                                     Shortcut statusItem = DataContext.Items.Count > 0 ? DataContext.Items [i].Shortcut : null;
 
                                     if (statusItem != null)
                                     {
-                                        Shortcut [] items = _statusBar.Subviews.Cast<Shortcut> ().ToArray ();
+                                        Shortcut [] items = _statusBar.SubViews.Cast<Shortcut> ().ToArray ();
 
                                         if (i < items.Length - 1)
                                         {
@@ -357,21 +357,21 @@ public class DynamicStatusBar : Scenario
                                     }
                                 };
 
-            var _btnOk = new Button
+            var btnOk = new Button
             {
-                X = Pos.Right (_frmStatusBar) + 20, Y = Pos.Bottom (_frmStatusBarDetails), Text = "Ok"
+                X = Pos.Right (frmStatusBar) + 20, Y = Pos.Bottom (frmStatusBarDetails), Text = "Ok"
             };
-            Add (_btnOk);
+            Add (btnOk);
 
-            var _btnCancel = new Button { X = Pos.Right (_btnOk) + 3, Y = Pos.Top (_btnOk), Text = "Cancel" };
-            _btnCancel.Accepting += (s, e) => { SetFrameDetails (_currentEditStatusItem); };
-            Add (_btnCancel);
+            var btnCancel = new Button { X = Pos.Right (btnOk) + 3, Y = Pos.Top (btnOk), Text = "Cancel" };
+            btnCancel.Accepting += (s, e) => { SetFrameDetails (_currentEditStatusItem); };
+            Add (btnCancel);
 
             _lstItems.SelectedItemChanged += (s, e) => { SetFrameDetails (); };
 
-            _btnOk.Accepting += (s, e) =>
+            btnOk.Accepting += (s, e) =>
                               {
-                                  if (string.IsNullOrEmpty (_frmStatusBarDetails.TextTitle.Text) && _currentEditStatusItem != null)
+                                  if (string.IsNullOrEmpty (frmStatusBarDetails.TextTitle.Text) && _currentEditStatusItem != null)
                                   {
                                       MessageBox.ErrorQuery ("Invalid title", "Must enter a valid title!.", "Ok");
                                   }
@@ -380,15 +380,15 @@ public class DynamicStatusBar : Scenario
 
                                       var statusItem = new DynamicStatusItem
                                       {
-                                          Title = _frmStatusBarDetails.TextTitle.Text,
-                                          Action = _frmStatusBarDetails.TextAction.Text,
-                                          Shortcut = _frmStatusBarDetails.TextShortcut.Text
+                                          Title = frmStatusBarDetails.TextTitle.Text,
+                                          Action = frmStatusBarDetails.TextAction.Text,
+                                          Shortcut = frmStatusBarDetails.TextShortcut.Text
                                       };
                                       UpdateStatusItem (_currentEditStatusItem, statusItem, _lstItems.SelectedItem);
                                   }
                               };
 
-            _btnAdd.Accepting += (s, e) =>
+            btnAdd.Accepting += (s, e) =>
                                {
                                    //if (StatusBar == null)
                                    //{
@@ -418,7 +418,7 @@ public class DynamicStatusBar : Scenario
                                    SetFrameDetails ();
                                };
 
-            _btnRemove.Accepting += (s, e) =>
+            btnRemove.Accepting += (s, e) =>
                                   {
                                       Shortcut statusItem = DataContext.Items.Count > 0
                                                                   ? DataContext.Items [_lstItems.SelectedItem].Shortcut
@@ -448,7 +448,7 @@ public class DynamicStatusBar : Scenario
                                    SetFrameDetails (statusItem);
                                };
 
-            _btnAddStatusBar.Accepting += (s, e) =>
+            btnAddStatusBar.Accepting += (s, e) =>
                                         {
                                             if (_statusBar != null)
                                             {
@@ -459,7 +459,7 @@ public class DynamicStatusBar : Scenario
                                             Add (_statusBar);
                                         };
 
-            _btnRemoveStatusBar.Accepting += (s, e) =>
+            btnRemoveStatusBar.Accepting += (s, e) =>
                                            {
                                                if (_statusBar == null)
                                                {
@@ -499,20 +499,20 @@ public class DynamicStatusBar : Scenario
                 }
 
                 _currentEditStatusItem = newStatusItem;
-                _frmStatusBarDetails.EditStatusItem (newStatusItem);
-                bool f = _btnOk.Enabled == _frmStatusBarDetails.Enabled;
+                frmStatusBarDetails.EditStatusItem (newStatusItem);
+                bool f = btnOk.Enabled == frmStatusBarDetails.Enabled;
 
                 if (!f)
                 {
-                    _btnOk.Enabled = _frmStatusBarDetails.Enabled;
-                    _btnCancel.Enabled = _frmStatusBarDetails.Enabled;
+                    btnOk.Enabled = frmStatusBarDetails.Enabled;
+                    btnCancel.Enabled = frmStatusBarDetails.Enabled;
                 }
             }
 
-            void SetListViewSource (Shortcut _currentStatusItem, bool fill = false)
+            void SetListViewSource (Shortcut currentStatusItem, bool fill = false)
             {
                 DataContext.Items = [];
-                Shortcut statusItem = _currentStatusItem;
+                Shortcut statusItem = currentStatusItem;
 
                 if (!fill)
                 {
@@ -521,7 +521,7 @@ public class DynamicStatusBar : Scenario
 
                 if (statusItem != null)
                 {
-                    foreach (Shortcut si in _statusBar.Subviews.Cast<Shortcut> ())
+                    foreach (Shortcut si in _statusBar.SubViews.Cast<Shortcut> ())
                     {
                         DataContext.Items.Add (new DynamicStatusItemList (si.Title, si));
                     }
@@ -530,36 +530,36 @@ public class DynamicStatusBar : Scenario
 
             Shortcut CreateNewStatusBar (DynamicStatusItem item)
             {
-                var newStatusItem = new Shortcut (item.Shortcut, item.Title, _frmStatusBarDetails.CreateAction (item));
+                var newStatusItem = new Shortcut (item.Shortcut, item.Title, frmStatusBarDetails.CreateAction (item));
 
                 return newStatusItem;
             }
 
             void UpdateStatusItem (
-                Shortcut _currentEditStatusItem,
+                Shortcut currentEditStatusItem,
                 DynamicStatusItem statusItem,
                 int index
             )
             {
-                _statusBar.Subviews [index].Title = statusItem.Title;
-                ((Shortcut)_statusBar.Subviews [index]).Action = _frmStatusBarDetails.CreateAction (statusItem);
-                ((Shortcut)_statusBar.Subviews [index]).Key = statusItem.Shortcut;
+                _statusBar.SubViews.ElementAt (index).Title = statusItem.Title;
+                ((Shortcut)_statusBar.SubViews.ElementAt (index)).Action = frmStatusBarDetails.CreateAction (statusItem);
+                ((Shortcut)_statusBar.SubViews.ElementAt (index)).Key = statusItem.Shortcut;
 
                 if (DataContext.Items.Count == 0)
                 {
                     DataContext.Items.Add (
                                            new DynamicStatusItemList (
-                                                                      _currentEditStatusItem.Title,
-                                                                      _currentEditStatusItem
+                                                                      currentEditStatusItem.Title,
+                                                                      currentEditStatusItem
                                                                      )
                                           );
                 }
 
                 DataContext.Items [index] = new DynamicStatusItemList (
-                                                                       _currentEditStatusItem.Title,
-                                                                       _currentEditStatusItem
+                                                                       currentEditStatusItem.Title,
+                                                                       currentEditStatusItem
                                                                       );
-                SetFrameDetails (_currentEditStatusItem);
+                SetFrameDetails (currentEditStatusItem);
             }
 
             //_frmStatusBarDetails.Initialized += (s, e) => _frmStatusBarDetails.Enabled = false;

@@ -59,7 +59,7 @@ public class Slider<T> : View, IOrientation
         // BUGBUG: This should not be needed - Need to ensure SetRelativeLayout gets called during EndInit
         Initialized += (s, e) => { SetContentSize (); };
 
-        SubviewLayout += (s, e) => { SetContentSize (); };
+        SubViewLayout += (s, e) => { SetContentSize (); };
     }
 
     // TODO: Make configurable via ConfigurationManager

@@ -147,7 +147,7 @@ public class Mouse : Scenario
                                                            demo.HighlightStyle = HighlightStyle.None;
                                                        }
 
-                                                       foreach (View subview in demo.Subviews)
+                                                       foreach (View subview in demo.SubViews)
                                                        {
                                                            if (e.NewValue == CheckState.Checked)
                                                            {
@@ -159,7 +159,7 @@ public class Mouse : Scenario
                                                            }
                                                        }
 
-                                                       foreach (View subview in demo.Padding.Subviews)
+                                                       foreach (View subview in demo.Padding.SubViews)
                                                        {
                                                            if (e.NewValue == CheckState.Checked)
                                                            {
@@ -177,12 +177,12 @@ public class Mouse : Scenario
                                                         {
                                                             demo.WantContinuousButtonPressed = !demo.WantContinuousButtonPressed;
 
-                                                            foreach (View subview in demo.Subviews)
+                                                            foreach (View subview in demo.SubViews)
                                                             {
                                                                 subview.WantContinuousButtonPressed = demo.WantContinuousButtonPressed;
                                                             }
 
-                                                            foreach (View subview in demo.Padding.Subviews)
+                                                            foreach (View subview in demo.Padding.SubViews)
                                                             {
                                                                 subview.WantContinuousButtonPressed = demo.WantContinuousButtonPressed;
                                                             }

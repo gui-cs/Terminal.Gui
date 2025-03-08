@@ -29,7 +29,7 @@ public partial class DimAutoTests
         superView.EndInit ();
 
         superView.SetRelativeLayout (new (10, 10));
-        superView.LayoutSubviews (); // no throw
+        superView.LayoutSubViews (); // no throw
 
         Assert.Equal (10, superView.Frame.Width);
         Assert.Equal (10, superView.Frame.Height);
@@ -99,7 +99,7 @@ public partial class DimAutoTests
     }
 
     [Fact]
-    public void Min_Resets_If_Subview_Moves_Negative ()
+    public void Min_Resets_If_SubView_Moves_Negative ()
     {
         var superView = new View
         {
@@ -123,7 +123,7 @@ public partial class DimAutoTests
         superView.EndInit ();
 
         superView.SetRelativeLayout (new (10, 10));
-        superView.LayoutSubviews (); // no throw
+        superView.LayoutSubViews (); // no throw
 
         Assert.Equal (10, superView.Frame.Width);
         Assert.Equal (10, superView.Frame.Height);
@@ -131,7 +131,7 @@ public partial class DimAutoTests
         subView.X = -1;
         subView.Y = -1;
         superView.SetRelativeLayout (new (10, 10));
-        superView.LayoutSubviews (); // no throw
+        superView.LayoutSubViews (); // no throw
 
         Assert.Equal (5, subView.Frame.Width);
         Assert.Equal (5, subView.Frame.Height);
@@ -141,7 +141,7 @@ public partial class DimAutoTests
     }
 
     [Fact]
-    public void Min_Resets_If_Subview_Shrinks ()
+    public void Min_Resets_If_SubView_Shrinks ()
     {
         var superView = new View
         {
@@ -165,7 +165,7 @@ public partial class DimAutoTests
         superView.EndInit ();
 
         superView.SetRelativeLayout (new (10, 10));
-        superView.LayoutSubviews (); // no throw
+        superView.LayoutSubViews (); // no throw
 
         Assert.Equal (10, superView.Frame.Width);
         Assert.Equal (10, superView.Frame.Height);
@@ -173,7 +173,7 @@ public partial class DimAutoTests
         subView.Width = 3;
         subView.Height = 3;
         superView.SetRelativeLayout (new (10, 10));
-        superView.LayoutSubviews (); // no throw
+        superView.LayoutSubViews (); // no throw
 
         Assert.Equal (3, subView.Frame.Width);
         Assert.Equal (3, subView.Frame.Height);

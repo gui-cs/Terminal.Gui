@@ -42,7 +42,7 @@ public class RadioGroup : View, IDesignable, IOrientation
         // By default, single click is already bound to Command.Select
         MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Accept);
 
-        SubviewLayout += RadioGroup_LayoutStarted;
+        SubViewLayout += RadioGroup_LayoutStarted;
 
         HighlightStyle = HighlightStyle.PressedOutside | HighlightStyle.Pressed;
     }

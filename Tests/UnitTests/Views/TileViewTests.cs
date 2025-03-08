@@ -1,14 +1,10 @@
 ﻿using UnitTests;
-using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class TileViewTests
+public class TileViewTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public TileViewTests (ITestOutputHelper output) { _output = output; }
-
     [Fact]
     [AutoInitShutdown]
     public void Test_SplitTop_WholeBottom ()
@@ -20,13 +16,13 @@ public class TileViewTests
 
         Assert.True (tileView.TrySplitTile (0, 2, out TileView top));
 
-        top.Tiles.ElementAt (0).ContentView.Add (new Label { Text = "bleh" });
-        top.Tiles.ElementAt (1).ContentView.Add (new Label { Text = "blah" });
+        top.Tiles.ElementAt (0).ContentView!.Add (new Label { Text = "bleh" });
+        top.Tiles.ElementAt (1).ContentView!.Add (new Label { Text = "blah" });
         top.Layout ();
 
-        tileView.Tiles.ElementAt (1).ContentView.Add (new Label { Text = "Hello" });
-        tileView.ColorScheme = new ColorScheme ();
-        top.ColorScheme = new ColorScheme ();
+        tileView.Tiles.ElementAt (1).ContentView!.Add (new Label { Text = "Hello" });
+        tileView.ColorScheme = new ();
+        top.ColorScheme = new ();
 
         top.Layout ();
         tileView.Layout ();
@@ -45,7 +41,7 @@ public class TileViewTests
 │                  │
 └──────────────────┘";
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -58,7 +54,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         var looksLike =
             @"
 ┌────┬────┬────┬────┬───┐
@@ -66,7 +61,7 @@ public class TileViewTests
 │    │    │    │    │   │
 └────┴────┴────┴────┴───┘
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         for (var x = 0; x <= 5; x++)
         {
@@ -88,6 +83,7 @@ public class TileViewTests
             // the second splitter so are not allowed
             Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
         }
+
         Application.LayoutAndDraw ();
 
         looksLike =
@@ -97,7 +93,7 @@ public class TileViewTests
 │        ││    │    │   │
 └────────┴┴────┴────┴───┘
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -110,7 +106,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         var looksLike =
             @"
 11111│2222│3333│4444│5555
@@ -118,7 +113,7 @@ public class TileViewTests
      │    │    │    │
      │    │    │    │
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         for (var x = 0; x <= 5; x++)
         {
@@ -151,7 +146,7 @@ public class TileViewTests
          ││    │    │
 
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -165,7 +160,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         var looksLike =
             @"
 ┌────┬────┬────┬────┬───┐
@@ -173,7 +167,7 @@ public class TileViewTests
 │    │    │    │    │   │
 └────┴────┴────┴────┴───┘
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         for (var x = 10; x > 7; x--)
         {
@@ -187,7 +181,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         looksLike =
             @"
 ┌────┬──┬──────┬────┬───┐
@@ -195,7 +188,7 @@ public class TileViewTests
 │    │  │      │    │   │
 └────┴──┴──────┴────┴───┘
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         for (var x = 10; x < 12; x++)
         {
@@ -217,7 +210,7 @@ public class TileViewTests
 │    │     │   │    │   │
 └────┴─────┴───┴────┴───┘
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -230,7 +223,6 @@ public class TileViewTests
         tv.Tiles.ElementAt (2).MinSize = 3;
         Application.LayoutAndDraw ();
 
-
         var looksLike =
             @"
 11111│2222│3333│4444│5555
@@ -238,7 +230,7 @@ public class TileViewTests
      │    │    │    │
      │    │    │    │
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         for (var x = 10; x > 7; x--)
         {
@@ -252,7 +244,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         looksLike =
             @"
 
@@ -262,7 +253,7 @@ public class TileViewTests
      │  │      │    │
 
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         for (var x = 10; x < 12; x++)
         {
@@ -276,7 +267,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         looksLike =
             @"  
 11111│22222│333│4444│5555
@@ -285,7 +275,7 @@ public class TileViewTests
      │     │   │    │
 
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -299,7 +289,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         var looksLike =
             @"
 ┌────┬────┬────┬────┬───┐
@@ -307,7 +296,7 @@ public class TileViewTests
 │    │    │    │    │   │
 └────┴────┴────┴────┴───┘
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         for (var x = 20; x > 17; x--)
         {
@@ -321,7 +310,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         looksLike =
             @"
 ┌────┬────┬────┬──┬─────┐
@@ -330,7 +318,7 @@ public class TileViewTests
 └────┴────┴────┴──┴─────┘
 
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         for (var x = 20; x < 23; x++)
         {
@@ -344,7 +332,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         looksLike =
             @"
 ┌────┬────┬────┬──────┬─┐
@@ -352,7 +339,7 @@ public class TileViewTests
 │    │    │    │      │ │
 └────┴────┴────┴──────┴─┘
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -366,7 +353,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         var looksLike =
             @"
 11111│2222│3333│4444│5555
@@ -374,7 +360,7 @@ public class TileViewTests
      │    │    │    │
      │    │    │    │
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         for (var x = 20; x > 17; x--)
         {
@@ -388,7 +374,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         looksLike =
             @"   
 11111│2222│3333│44│555555
@@ -396,7 +381,7 @@ public class TileViewTests
      │    │    │  │
      │    │    │  │
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         for (var x = 20; x < 24; x++)
         {
@@ -410,7 +395,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         looksLike =
             @"
 11111│2222│3333│4444444│5
@@ -418,7 +402,7 @@ public class TileViewTests
      │    │    │       │
      │    │    │       │
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -429,7 +413,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         var looksLike =
             @"
 ┌────┬────┬────┬────┬───┐
@@ -437,7 +420,7 @@ public class TileViewTests
 │    │    │    │    │   │
 └────┴────┴────┴────┴───┘
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         for (var x = 5; x > 0; x--)
         {
@@ -448,7 +431,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         looksLike =
             @"
 ┌┬────────┬────┬────┬───┐
@@ -456,7 +438,7 @@ public class TileViewTests
 ││        │    │    │   │
 └┴────────┴────┴────┴───┘
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         for (var x = 6; x < 10; x++)
         {
@@ -472,7 +454,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         looksLike =
             @"
 ┌────────┬┬────┬────┬───┐
@@ -480,7 +461,7 @@ public class TileViewTests
 │        ││    │    │   │
 └────────┴┴────┴────┴───┘
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -491,7 +472,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         var looksLike =
             @"
 11111│2222│3333│4444│5555
@@ -499,7 +479,7 @@ public class TileViewTests
      │    │    │    │
      │    │    │    │
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         for (var x = 5; x >= 0; x--)
         {
@@ -508,7 +488,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         looksLike =
             @"
 │222222222│3333│4444│5555
@@ -516,7 +495,7 @@ public class TileViewTests
 │         │    │    │
 │         │    │    │
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         for (var x = 6; x < 10; x++)
         {
@@ -529,8 +508,8 @@ public class TileViewTests
             // the second splitter so are not allowed
             Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
         }
-        Application.LayoutAndDraw ();
 
+        Application.LayoutAndDraw ();
 
         looksLike =
             @"
@@ -540,7 +519,7 @@ public class TileViewTests
          ││    │    │
 
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -558,7 +537,7 @@ public class TileViewTests
 │    │    │    │    │   │
 └────┴────┴────┴────┴───┘
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         for (var x = 10; x > 5; x--)
         {
@@ -579,7 +558,7 @@ public class TileViewTests
 │    ││        │    │   │
 └────┴┴────────┴────┴───┘
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         for (var x = 10; x < 15; x++)
         {
@@ -593,7 +572,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         looksLike =
             @"
 ┌────┬────────┬┬────┬───┐
@@ -601,7 +579,7 @@ public class TileViewTests
 │    │        ││    │   │
 └────┴────────┴┴────┴───┘
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -612,7 +590,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         var looksLike =
             @"
 11111│2222│3333│4444│5555
@@ -620,7 +597,7 @@ public class TileViewTests
      │    │    │    │
      │    │    │    │
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         for (var x = 10; x > 5; x--)
         {
@@ -631,8 +608,8 @@ public class TileViewTests
         {
             Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
         }
-        Application.LayoutAndDraw ();
 
+        Application.LayoutAndDraw ();
 
         looksLike =
             @"
@@ -642,7 +619,7 @@ public class TileViewTests
      ││        │    │
 
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         for (var x = 10; x < 15; x++)
         {
@@ -656,7 +633,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         looksLike =
             @"
 11111│22222222││4444│5555
@@ -664,7 +640,7 @@ public class TileViewTests
      │        ││    │
      │        ││    │
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -675,7 +651,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         var looksLike =
             @"
 ┌────┬────┬────┬────┬───┐
@@ -683,7 +658,7 @@ public class TileViewTests
 │    │    │    │    │   │
 └────┴────┴────┴────┴───┘
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         for (var x = 20; x > 15; x--)
         {
@@ -697,7 +672,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         looksLike =
             @"
 ┌────┬────┬────┬┬───────┐
@@ -705,7 +679,7 @@ public class TileViewTests
 │    │    │    ││       │
 └────┴────┴────┴┴───────┘
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         for (var x = 20; x < 24; x++)
         {
@@ -719,7 +693,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         looksLike =
             @"
 ┌────┬────┬────┬───────┬┐
@@ -727,7 +700,7 @@ public class TileViewTests
 │    │    │    │       ││
 └────┴────┴────┴───────┴┘
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -738,7 +711,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         var looksLike =
             @"   
 11111│2222│3333│4444│5555
@@ -746,7 +718,7 @@ public class TileViewTests
      │    │    │    │
      │    │    │    │
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         for (var x = 20; x > 15; x--)
         {
@@ -760,7 +732,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         looksLike =
             @"  
 11111│2222│3333││55555555
@@ -769,7 +740,7 @@ public class TileViewTests
      │    │    ││
 
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         for (var x = 20; x < 25; x++)
         {
@@ -783,7 +754,6 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         looksLike =
             @"
 11111│2222│3333│44444444│
@@ -791,7 +761,7 @@ public class TileViewTests
      │    │    │        │
      │    │    │        │
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -810,6 +780,7 @@ public class TileViewTests
         tv.InsertTile (2);
 
         // but I still want my view in the first tile
+        // BUGBUG: Adding a view twice is not legit
         tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
 
         Assert.Multiple (
@@ -837,6 +808,7 @@ public class TileViewTests
         tv.RebuildForTileCount (3);
 
         // but I still want my view in the first tile
+        // BUGBUG: Adding a view twice is not legit
         tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
 
         Assert.Multiple (
@@ -865,6 +837,7 @@ public class TileViewTests
         tv.RemoveTile (idx);
 
         // but I still want my view in the first tile
+        // BUGBUG: Adding a view twice is not legit
         tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
 
         Assert.Multiple (
@@ -891,11 +864,11 @@ public class TileViewTests
         var left = (TileView)tileView.Tiles.ElementAt (0).ContentView;
         Assert.Same (left.SuperView, tileView);
 
-        Assert.Equal (2, left.Tiles.ElementAt (0).ContentView.Subviews.Count);
-        Assert.IsType<Label> (left.Tiles.ElementAt (0).ContentView.Subviews [0]);
-        Assert.IsType<Label> (left.Tiles.ElementAt (0).ContentView.Subviews [1]);
-        var onesTop = (Label)left.Tiles.ElementAt (0).ContentView.Subviews [0];
-        var onesBottom = (Label)left.Tiles.ElementAt (0).ContentView.Subviews [1];
+        Assert.Equal (2, left.Tiles.ElementAt (0).ContentView.SubViews.Count);
+        Assert.IsType<Label> (left.Tiles.ElementAt (0).ContentView.SubViews.ElementAt (0));
+        Assert.IsType<Label> (left.Tiles.ElementAt (0).ContentView.SubViews.ElementAt (1));
+        var onesTop = (Label)left.Tiles.ElementAt (0).ContentView.SubViews.ElementAt (0);
+        var onesBottom = (Label)left.Tiles.ElementAt (0).ContentView.SubViews.ElementAt (1);
 
         Assert.Same (left.Tiles.ElementAt (0).ContentView, onesTop.SuperView);
         Assert.Same (left.Tiles.ElementAt (0).ContentView, onesBottom.SuperView);
@@ -917,7 +890,7 @@ public class TileViewTests
           │
           │
           │";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -941,13 +914,13 @@ public class TileViewTests
 111111│222222│444444
 111111│222222│444444
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // It looks good but lets double check the measurements incase
         // anything is sticking out but drawn over
 
         // 3 panels + 2 splitters
-        Assert.Equal (5, tileView.Subviews.Count);
+        Assert.Equal (5, tileView.SubViews.Count);
 
         // Check X and Widths of Tiles
         Assert.Equal (0, tileView.Tiles.ElementAt (0).ContentView.Frame.X);
@@ -975,13 +948,15 @@ public class TileViewTests
         Assert.Equal (6, subSplit.Tiles.ElementAt (0).ContentView.Frame.Width);
         Assert.Equal (0, subSplit.Tiles.ElementAt (0).ContentView.Frame.Y);
         Assert.Equal (5, subSplit.Tiles.ElementAt (0).ContentView.Frame.Height);
-        //Assert.IsType<TextView> (subSplit.Tiles.ElementAt (0).ContentView.Subviews.Single ());
+
+        //Assert.IsType<TextView> (subSplit.Tiles.ElementAt (0).ContentView.SubViews.Single ());
 
         Assert.Equal (0, subSplit.Tiles.ElementAt (1).ContentView.Frame.X);
         Assert.Equal (6, subSplit.Tiles.ElementAt (1).ContentView.Frame.Width);
         Assert.Equal (6, subSplit.Tiles.ElementAt (1).ContentView.Frame.Y);
         Assert.Equal (4, subSplit.Tiles.ElementAt (1).ContentView.Frame.Height);
-        //Assert.IsType<TextView> (subSplit.Tiles.ElementAt (1).ContentView.Subviews.Single ());
+
+        //Assert.IsType<TextView> (subSplit.Tiles.ElementAt (1).ContentView.SubViews.Single ());
     }
 
     [Fact]
@@ -991,7 +966,6 @@ public class TileViewTests
         TileView tileView = GetNestedContainer3Right1Down (true);
 
         Application.LayoutAndDraw ();
-
 
         var looksLike =
             @"
@@ -1006,7 +980,7 @@ public class TileViewTests
 │11111│222222│44444│
 └─────┴──────┴─────┘";
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         tileView.Tiles.ElementAt (0).ContentView.Visible = false;
         tileView.Tiles.ElementAt (1).ContentView.Visible = true;
@@ -1027,7 +1001,7 @@ public class TileViewTests
 │222222222222│44444│
 └────────────┴─────┘";
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         tileView.Tiles.ElementAt (0).ContentView.Visible = true;
         tileView.Tiles.ElementAt (1).ContentView.Visible = false;
@@ -1046,7 +1020,7 @@ public class TileViewTests
 │111111111111│44444│
 └────────────┴─────┘";
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         tileView.Tiles.ElementAt (0).ContentView.Visible = true;
         tileView.Tiles.ElementAt (1).ContentView.Visible = true;
@@ -1066,14 +1040,13 @@ public class TileViewTests
 │11111│222222222222│
 └─────┴────────────┘";
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         tileView.Tiles.ElementAt (0).ContentView.Visible = true;
         tileView.Tiles.ElementAt (1).ContentView.Visible = false;
         tileView.Tiles.ElementAt (2).ContentView.Visible = false;
         Application.LayoutAndDraw ();
 
-
         looksLike =
             @"
 ┌──────────────────┐
@@ -1087,14 +1060,13 @@ public class TileViewTests
 │111111111111111111│
 └──────────────────┘";
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         tileView.Tiles.ElementAt (0).ContentView.Visible = false;
         tileView.Tiles.ElementAt (1).ContentView.Visible = true;
         tileView.Tiles.ElementAt (2).ContentView.Visible = false;
         Application.LayoutAndDraw ();
 
-
         looksLike =
             @"
 ┌──────────────────┐
@@ -1108,13 +1080,12 @@ public class TileViewTests
 │222222222222222222│
 └──────────────────┘";
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         tileView.Tiles.ElementAt (0).ContentView.Visible = false;
         tileView.Tiles.ElementAt (1).ContentView.Visible = false;
         tileView.Tiles.ElementAt (2).ContentView.Visible = true;
         Application.LayoutAndDraw ();
-
 
         looksLike =
             @"
@@ -1129,15 +1100,14 @@ public class TileViewTests
 │444444444444444444│
 └──────────────────┘";
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         tileView.Tiles.ElementAt (0).ContentView.Visible = false;
         tileView.Tiles.ElementAt (1).ContentView.Visible = false;
         tileView.Tiles.ElementAt (2).ContentView.Visible = false;
         Application.LayoutAndDraw ();
-
 
         looksLike =
             @"
@@ -1152,7 +1122,7 @@ public class TileViewTests
 │                  │
 └──────────────────┘";
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -1161,7 +1131,6 @@ public class TileViewTests
     {
         TileView tileView = GetNestedContainer3Right1Down (false);
         Application.LayoutAndDraw ();
-
 
         var looksLike =
             @"
@@ -1176,13 +1145,12 @@ public class TileViewTests
 111111│222222│444444
 111111│222222│444444";
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         tileView.Tiles.ElementAt (0).ContentView.Visible = false;
         tileView.Tiles.ElementAt (1).ContentView.Visible = true;
         tileView.Tiles.ElementAt (2).ContentView.Visible = true;
         Application.LayoutAndDraw ();
-
 
         looksLike =
             @"
@@ -1197,13 +1165,12 @@ public class TileViewTests
 2222222222222│444444
 2222222222222│444444";
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         tileView.Tiles.ElementAt (0).ContentView.Visible = true;
         tileView.Tiles.ElementAt (1).ContentView.Visible = false;
         tileView.Tiles.ElementAt (2).ContentView.Visible = true;
         Application.LayoutAndDraw ();
-
 
         looksLike =
             @"
@@ -1218,13 +1185,12 @@ public class TileViewTests
 1111111111111│444444
 1111111111111│444444";
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         tileView.Tiles.ElementAt (0).ContentView.Visible = true;
         tileView.Tiles.ElementAt (1).ContentView.Visible = true;
         tileView.Tiles.ElementAt (2).ContentView.Visible = false;
         Application.LayoutAndDraw ();
-
 
         looksLike =
             @"
@@ -1239,13 +1205,12 @@ public class TileViewTests
 111111│2222222222222
 111111│2222222222222";
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         tileView.Tiles.ElementAt (0).ContentView.Visible = true;
         tileView.Tiles.ElementAt (1).ContentView.Visible = false;
         tileView.Tiles.ElementAt (2).ContentView.Visible = false;
         Application.LayoutAndDraw ();
-
 
         looksLike =
             @"
@@ -1260,13 +1225,12 @@ public class TileViewTests
 11111111111111111111
 11111111111111111111";
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         tileView.Tiles.ElementAt (0).ContentView.Visible = false;
         tileView.Tiles.ElementAt (1).ContentView.Visible = true;
         tileView.Tiles.ElementAt (2).ContentView.Visible = false;
         Application.LayoutAndDraw ();
-
 
         looksLike =
             @"
@@ -1281,13 +1245,12 @@ public class TileViewTests
 22222222222222222222
 22222222222222222222";
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         tileView.Tiles.ElementAt (0).ContentView.Visible = false;
         tileView.Tiles.ElementAt (1).ContentView.Visible = false;
         tileView.Tiles.ElementAt (2).ContentView.Visible = true;
         Application.LayoutAndDraw ();
-
 
         looksLike =
             @"
@@ -1302,21 +1265,20 @@ public class TileViewTests
 44444444444444444444
 44444444444444444444";
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         tileView.Tiles.ElementAt (0).ContentView.Visible = false;
         tileView.Tiles.ElementAt (1).ContentView.Visible = false;
         tileView.Tiles.ElementAt (2).ContentView.Visible = false;
         Application.LayoutAndDraw ();
 
-
         looksLike =
             @"
 			 ";
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -1325,7 +1287,6 @@ public class TileViewTests
     {
         TileView tileView = GetNestedContainer3Right1Down (true, true, 1);
         Application.LayoutAndDraw ();
-
 
         var looksLike =
             @"
@@ -1340,7 +1301,7 @@ public class TileViewTests
 │11111│444444│22222│
 └─────┴──────┴─────┘";
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -1349,14 +1310,13 @@ public class TileViewTests
     {
         TileView tileView = GetNestedContainer3Right1Down (true, true, 1);
 
-        tileView.Tiles.ElementAt (0).Title = new string ('x', 100);
+        tileView.Tiles.ElementAt (0).Title = new ('x', 100);
 
         ((TileView)tileView.Tiles.ElementAt (1).ContentView)
             .Tiles.ElementAt (1)
-            .Title = new string ('y', 100);
+            .Title = new ('y', 100);
 
         Application.LayoutAndDraw ();
-
 
         var looksLike =
             @"
@@ -1371,7 +1331,7 @@ public class TileViewTests
 │11111│444444│22222│
 └─────┴──────┴─────┘";
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -1381,7 +1341,6 @@ public class TileViewTests
         TileView tileView = GetNestedContainer3Right1Down (true);
 
         Application.LayoutAndDraw ();
-
 
         var looksLike =
             @"
@@ -1395,14 +1354,13 @@ public class TileViewTests
 │11111│222222│44444│
 │11111│222222│44444│
 └─────┴──────┴─────┘";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         Tile toRemove = tileView.Tiles.ElementAt (1);
         Tile removed = tileView.RemoveTile (1);
         Assert.Same (toRemove, removed);
         Assert.DoesNotContain (removed, tileView.Tiles);
         Application.LayoutAndDraw ();
-
 
         looksLike =
             @"
@@ -1416,13 +1374,12 @@ public class TileViewTests
 │111111111│44444444│
 │111111111│44444444│
 └─────────┴────────┘";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // cannot remove at this index because there is only one horizontal tile left
         Assert.Null (tileView.RemoveTile (2));
         tileView.RemoveTile (0);
         Application.LayoutAndDraw ();
-
 
         looksLike =
             @"
@@ -1436,11 +1393,10 @@ public class TileViewTests
 │444444444444444444│
 │444444444444444444│
 └──────────────────┘";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         Assert.NotNull (tileView.RemoveTile (0));
         Application.LayoutAndDraw ();
-
 
         looksLike =
             @"
@@ -1454,7 +1410,7 @@ public class TileViewTests
 │                  │
 │                  │
 └──────────────────┘";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // cannot remove
         Assert.Null (tileView.RemoveTile (0));
@@ -1466,7 +1422,6 @@ public class TileViewTests
     {
         TileView tileView = GetNestedContainer3Right1Down (true);
         Application.LayoutAndDraw ();
-
 
         var looksLike =
             @"
@@ -1480,13 +1435,13 @@ public class TileViewTests
 │11111│222222│44444│
 │11111│222222│44444│
 └─────┴──────┴─────┘";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // It looks good but lets double check the measurements incase
         // anything is sticking out but drawn over
 
         // 3 panels + 2 splitters
-        Assert.Equal (5, tileView.Subviews.Count);
+        Assert.Equal (5, tileView.SubViews.Count);
 
         // Check X and Widths of Tiles
         Assert.Equal (1, tileView.Tiles.ElementAt (0).ContentView.Frame.X);
@@ -1514,13 +1469,15 @@ public class TileViewTests
         Assert.Equal (5, subSplit.Tiles.ElementAt (0).ContentView.Frame.Width);
         Assert.Equal (0, subSplit.Tiles.ElementAt (0).ContentView.Frame.Y);
         Assert.Equal (4, subSplit.Tiles.ElementAt (0).ContentView.Frame.Height);
-        //Assert.IsType<TextView> (subSplit.Tiles.ElementAt (0).ContentView.Subviews.Single ());
+
+        //Assert.IsType<TextView> (subSplit.Tiles.ElementAt (0).ContentView.SubViews.Single ());
 
         Assert.Equal (0, subSplit.Tiles.ElementAt (1).ContentView.Frame.X);
         Assert.Equal (5, subSplit.Tiles.ElementAt (1).ContentView.Frame.Width);
         Assert.Equal (5, subSplit.Tiles.ElementAt (1).ContentView.Frame.Y);
         Assert.Equal (3, subSplit.Tiles.ElementAt (1).ContentView.Frame.Height);
-        //Assert.IsType<TextView> (subSplit.Tiles.ElementAt (1).ContentView.Subviews.Single ());
+
+        //Assert.IsType<TextView> (subSplit.Tiles.ElementAt (1).ContentView.SubViews.Single ());
     }
 
     [Fact]
@@ -1543,7 +1500,7 @@ public class TileViewTests
 │11111│222222│44444│
 │11111│222222│44444│
 └─────┴──────┴─────┘";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -1552,11 +1509,11 @@ public class TileViewTests
     {
         var tv = new TileView
         {
-            Width = 10, Height = 5, ColorScheme = new ColorScheme (), LineStyle = LineStyle.Single
+            Width = 10, Height = 5, ColorScheme = new (), LineStyle = LineStyle.Single
         };
 
         tv.TrySplitTile (1, 2, out TileView tv2);
-        tv2.ColorScheme = new ColorScheme ();
+        tv2.ColorScheme = new ();
         tv2.LineStyle = LineStyle.Single;
         tv2.Orientation = Orientation.Horizontal;
 
@@ -1566,11 +1523,11 @@ public class TileViewTests
         top.Add (tv);
         tv.BeginInit ();
         tv.EndInit ();
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
 
-        tv.LayoutSubviews ();
-        tv.Tiles.ElementAt (1).ContentView.LayoutSubviews ();
-        tv2.LayoutSubviews ();
+        tv.LayoutSubViews ();
+        tv.Tiles.ElementAt (1).ContentView.LayoutSubViews ();
+        tv2.LayoutSubViews ();
 
         // tv2 is not considered a root because 
         // it was created via TrySplitTile so it
@@ -1588,7 +1545,7 @@ public class TileViewTests
 │    │   │
 └────┴───┘
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -1597,14 +1554,14 @@ public class TileViewTests
     {
         var tv = new TileView
         {
-            Width = 10, Height = 5, ColorScheme = new ColorScheme (), LineStyle = LineStyle.Single
+            Width = 10, Height = 5, ColorScheme = new (), LineStyle = LineStyle.Single
         };
 
         var tv2 = new TileView
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            ColorScheme = new ColorScheme (),
+            ColorScheme = new (),
             LineStyle = LineStyle.Single,
             Orientation = Orientation.Horizontal
         };
@@ -1616,11 +1573,11 @@ public class TileViewTests
         top.Add (tv);
         tv.BeginInit ();
         tv.EndInit ();
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
 
-        tv.LayoutSubviews ();
-        tv.Tiles.ElementAt (1).ContentView.LayoutSubviews ();
-        tv2.LayoutSubviews ();
+        tv.LayoutSubViews ();
+        tv.Tiles.ElementAt (1).ContentView.LayoutSubViews ();
+        tv2.LayoutSubViews ();
 
         // tv2 is still considered a root because 
         // it was manually created by API user. That
@@ -1638,7 +1595,7 @@ public class TileViewTests
 │    │└─┘│
 └────┴───┘
 ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -1676,14 +1633,14 @@ public class TileViewTests
 11111111111
 ───────────
 22222222222";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // Keyboard movement on splitter should have no effect if it is not focused
         bool handled = tileView.NewKeyDownEvent (Key.CursorDown);
         Assert.False (handled);
         tileView.SetNeedsDraw ();
         tileView.Draw ();
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -1693,47 +1650,43 @@ public class TileViewTests
         TileView tileView = Get11By3TileView (out LineView line);
 
         tileView.Orientation = Orientation.Horizontal;
-        tileView.NewKeyDownEvent (new Key (tileView.ToggleResizable));
+        tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
 
         Assert.True (line.HasFocus);
         Application.LayoutAndDraw ();
-
 
         var looksLike =
             @"    
 11111111111
 ─────◊─────
 22222222222";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // Now move splitter line down
         tileView.NewKeyDownEvent (Key.CursorDown);
 
         Application.LayoutAndDraw ();
 
-
         looksLike =
             @"    
 11111111111
 11111111111
 ─────◊─────";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // And 2 up
         line.NewKeyDownEvent (Key.CursorUp);
         Application.LayoutAndDraw ();
 
-
         line.NewKeyDownEvent (Key.CursorUp);
         Application.LayoutAndDraw ();
-
 
         looksLike =
             @"    
 ─────◊─────
 22222222222
 22222222222";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -1741,7 +1694,7 @@ public class TileViewTests
     public void TestTileView_Horizontal_View1MinSize_Absolute ()
     {
         TileView tileView = Get11By3TileView (out LineView line);
-        tileView.NewKeyDownEvent (new Key (tileView.ToggleResizable));
+        tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
 
         tileView.Orientation = Orientation.Horizontal;
         tileView.Tiles.ElementAt (0).MinSize = 1;
@@ -1753,25 +1706,23 @@ public class TileViewTests
         Assert.Equal (Pos.Percent (50), tileView.SplitterDistances.ElementAt (0));
         Application.LayoutAndDraw ();
 
-
         var looksLike =
             @"    
 11111111111
 ─────◊─────
 22222222222";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // Now move splitter line down (allowed
         line.NewKeyDownEvent (Key.CursorDown);
         Application.LayoutAndDraw ();
-
 
         looksLike =
             @"    
 11111111111
 11111111111
 ─────◊─────";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // And up 2 (only 1 is allowed because of minimum size of 1 on view1)
         line.NewKeyDownEvent (Key.CursorUp);
@@ -1780,13 +1731,12 @@ public class TileViewTests
         tileView.SetNeedsDraw ();
         Application.LayoutAndDraw ();
 
-
         looksLike =
             @"    
 11111111111
 ─────◊─────
 22222222222";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Theory]
@@ -1810,7 +1760,7 @@ public class TileViewTests
         Assert.Equal (0, tv.IndexOf (tv.Tiles.ElementAt (0).ContentView, recursive));
         Assert.Equal (1, tv.IndexOf (tv.Tiles.ElementAt (1).ContentView, recursive));
 
-        // IndexOf supports looking for Tile.View.Subviews
+        // IndexOf supports looking for Tile.View.SubViews
         tv.Tiles.ElementAt (0).ContentView.Add (lbl1);
         Assert.Equal (0, tv.IndexOf (lbl1, recursive));
 
@@ -1847,7 +1797,7 @@ public class TileViewTests
 ┌──┬───┬──┐
 │11│222│  │
 └──┴───┴──┘";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -1866,7 +1816,7 @@ public class TileViewTests
 ┌──┬───┬──┐
 │  │111│22│
 └──┴───┴──┘";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -1885,7 +1835,7 @@ public class TileViewTests
 ┌──┬───┬──┐
 │11│   │22│
 └──┴───┴──┘";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -1902,13 +1852,13 @@ public class TileViewTests
 11111│22222
 11111│22222
      │     ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // Keyboard movement on splitter should have no effect if it is not focused
         tileView.NewKeyDownEvent (Key.CursorRight);
         tileView.SetNeedsDraw ();
         tileView.Draw ();
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -1916,29 +1866,27 @@ public class TileViewTests
     public void TestTileView_Vertical_Focused ()
     {
         TileView tileView = Get11By3TileView (out LineView line);
-        tileView.NewKeyDownEvent (new Key (tileView.ToggleResizable));
+        tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
 
         Application.LayoutAndDraw ();
-
 
         var looksLike =
             @"
 11111│22222
 11111◊22222
      │     ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // Now while focused move the splitter 1 unit right
         line.NewKeyDownEvent (Key.CursorRight);
         Application.LayoutAndDraw ();
-
 
         looksLike =
             @"
 111111│2222
 111111◊2222
       │     ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // and 2 to the left
         line.NewKeyDownEvent (Key.CursorLeft);
@@ -1946,13 +1894,12 @@ public class TileViewTests
         line.NewKeyDownEvent (Key.CursorLeft);
         Application.LayoutAndDraw ();
 
-
         looksLike =
             @"
 1111│222222
 1111◊222222
     │     ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -1962,28 +1909,26 @@ public class TileViewTests
         TileView tileView = Get11By3TileView (out LineView line);
         tileView.SetSplitterPos (0, Pos.Percent (50));
         Assert.IsType<PosPercent> (tileView.SplitterDistances.ElementAt (0));
-        tileView.NewKeyDownEvent (new Key (tileView.ToggleResizable));
+        tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
         Application.LayoutAndDraw ();
-
 
         var looksLike =
             @"
 11111│22222
 11111◊22222
      │     ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // Now while focused move the splitter 1 unit right
         line.NewKeyDownEvent (Key.CursorRight);
         Application.LayoutAndDraw ();
-
 
         looksLike =
             @"
 111111│2222
 111111◊2222
       │     ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // Even when moving the splitter location it should stay a Percentage based one
         Assert.IsType<PosPercent> (tileView.SplitterDistances.ElementAt (0));
@@ -1994,13 +1939,12 @@ public class TileViewTests
         line.NewKeyDownEvent (Key.CursorLeft);
         Application.LayoutAndDraw ();
 
-
         looksLike =
             @"
 1111│222222
 1111◊222222
     │     ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // Even when moving the splitter location it should stay a Percentage based one
         Assert.IsType<PosPercent> (tileView.SplitterDistances.ElementAt (0));
@@ -2011,28 +1955,26 @@ public class TileViewTests
     public void TestTileView_Vertical_Focused_WithBorder ()
     {
         TileView tileView = Get11By3TileView (out LineView line, true);
-        tileView.NewKeyDownEvent (new Key (tileView.ToggleResizable));
+        tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
         Application.LayoutAndDraw ();
-
 
         var looksLike =
             @"
 ┌────┬────┐
 │1111◊2222│
 └────┴────┘";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // Now while focused move the splitter 1 unit right
         line.NewKeyDownEvent (Key.CursorRight);
         Application.LayoutAndDraw ();
-
 
         looksLike =
             @"
 ┌─────┬───┐
 │11111◊222│
 └─────┴───┘";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // and 2 to the left
         line.NewKeyDownEvent (Key.CursorLeft);
@@ -2040,13 +1982,12 @@ public class TileViewTests
         line.NewKeyDownEvent (Key.CursorLeft);
         Application.LayoutAndDraw ();
 
-
         looksLike =
             @"
 ┌───┬─────┐
 │111◊22222│
 └───┴─────┘";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -2054,7 +1995,7 @@ public class TileViewTests
     public void TestTileView_Vertical_View1MinSize_Absolute ()
     {
         TileView tileView = Get11By3TileView (out LineView line);
-        tileView.NewKeyDownEvent (new Key (tileView.ToggleResizable));
+        tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
         tileView.Tiles.ElementAt (0).MinSize = 6;
 
         // distance is too small (below 6)
@@ -2064,21 +2005,20 @@ public class TileViewTests
         Assert.Equal (Pos.Percent (50), tileView.SplitterDistances.ElementAt (0));
         Application.LayoutAndDraw ();
 
-
         // so should ignore the 2 distance and stick to 6
         var looksLike =
             @"
 11111│22222
 11111◊22222
      │     ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // Keyboard movement on splitter should have no effect because it
         // would take us below the minimum splitter size
         line.NewKeyDownEvent (Key.CursorLeft);
         Application.LayoutAndDraw ();
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // but we can continue to move the splitter right if we want
         line.NewKeyDownEvent (Key.CursorRight);
@@ -2090,7 +2030,7 @@ public class TileViewTests
 111111◊2222
       │     ";
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -2098,7 +2038,7 @@ public class TileViewTests
     public void TestTileView_Vertical_View1MinSize_Absolute_WithBorder ()
     {
         TileView tileView = Get11By3TileView (out LineView line, true);
-        tileView.NewKeyDownEvent (new Key (tileView.ToggleResizable));
+        tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
         tileView.Tiles.ElementAt (0).MinSize = 5;
 
         // distance is too small (below 5)
@@ -2108,26 +2048,24 @@ public class TileViewTests
         Assert.Equal (Pos.Percent (50), tileView.SplitterDistances.ElementAt (0));
         Application.LayoutAndDraw ();
 
-
         // so should ignore the 2 distance and stick to 5
         var looksLike =
             @"
 ┌────┬────┐
 │1111◊2222│
 └────┴────┘";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // Keyboard movement on splitter should have no effect because it
         // would take us below the minimum splitter size
         line.NewKeyDownEvent (Key.CursorLeft);
         Application.LayoutAndDraw ();
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // but we can continue to move the splitter right if we want
         line.NewKeyDownEvent (Key.CursorRight);
         Application.LayoutAndDraw ();
-
 
         looksLike =
             @"
@@ -2135,7 +2073,7 @@ public class TileViewTests
 │11111◊222│
 └─────┴───┘";
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -2143,7 +2081,7 @@ public class TileViewTests
     public void TestTileView_Vertical_View2MinSize_Absolute ()
     {
         TileView tileView = Get11By3TileView (out LineView line);
-        tileView.NewKeyDownEvent (new Key (tileView.ToggleResizable));
+        tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
         tileView.Tiles.ElementAt (1).MinSize = 6;
         Application.LayoutAndDraw ();
 
@@ -2155,26 +2093,24 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         // so should ignore the 2 distance and stick to 6
         var looksLike =
             @"
 11111│22222
 11111◊22222
      │     ";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // Keyboard movement on splitter should have no effect because it
         // would take us below the minimum splitter size
         line.NewKeyDownEvent (Key.CursorRight);
         Application.LayoutAndDraw ();
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // but we can continue to move the splitter left if we want
         line.NewKeyDownEvent (Key.CursorLeft);
         Application.LayoutAndDraw ();
-
 
         looksLike =
             @"
@@ -2182,7 +2118,7 @@ public class TileViewTests
 1111◊222222
     │    ";
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -2190,19 +2126,17 @@ public class TileViewTests
     public void TestTileView_Vertical_View2MinSize_Absolute_WithBorder ()
     {
         TileView tileView = Get11By3TileView (out LineView line, true);
-        tileView.NewKeyDownEvent (new Key (tileView.ToggleResizable));
+        tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
         tileView.Tiles.ElementAt (1).MinSize = 5;
 
         // distance leaves too little space for view2 (less than 5 would remain)
         Assert.False (tileView.SetSplitterPos (0, 8));
         Application.LayoutAndDraw ();
 
-
         //  Should stay where it was originally at (50%)
         Assert.Equal (Pos.Percent (50), tileView.SplitterDistances.ElementAt (0));
 
         Application.LayoutAndDraw ();
-
 
         // so should ignore the 2 distance and stick to 6
         var looksLike =
@@ -2210,19 +2144,18 @@ public class TileViewTests
 ┌────┬────┐
 │1111◊2222│
 └────┴────┘";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // Keyboard movement on splitter should have no effect because it
         // would take us below the minimum splitter size
         line.NewKeyDownEvent (Key.CursorRight);
         Application.LayoutAndDraw ();
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // but we can continue to move the splitter left if we want
         line.NewKeyDownEvent (Key.CursorLeft);
         Application.LayoutAndDraw ();
-
 
         looksLike =
             @"
@@ -2230,7 +2163,7 @@ public class TileViewTests
 │111◊22222│
 └───┴─────┘";
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -2241,19 +2174,18 @@ public class TileViewTests
 
         Application.LayoutAndDraw ();
 
-
         var looksLike =
             @"
 ┌────┬────┐
 │1111│2222│
 └────┴────┘";
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
 
         // Keyboard movement on splitter should have no effect if it is not focused
         tileView.NewKeyDownEvent (Key.CursorRight);
         Application.LayoutAndDraw ();
 
-        DriverAssert.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
     }
 
     [Fact]
@@ -2285,7 +2217,7 @@ public class TileViewTests
     {
         var tv = new TileView (5)
         {
-            Width = 25, Height = 4, ColorScheme = new ColorScheme (), LineStyle = LineStyle.Single
+            Width = 25, Height = 4, ColorScheme = new (), LineStyle = LineStyle.Single
         };
 
         if (!border)
@@ -2295,30 +2227,30 @@ public class TileViewTests
 
         tv.Tiles.ElementAt (0)
           .ContentView.Add (
-                            new Label { Width = Dim.Fill (), Height = 1, Text = new string ('1', 100) }
+                            new Label { Width = Dim.Fill (), Height = 1, Text = new ('1', 100) }
                            );
 
         tv.Tiles.ElementAt (1)
           .ContentView.Add (
-                            new Label { Width = Dim.Fill (), Height = 1, Text = new string ('2', 100) }
+                            new Label { Width = Dim.Fill (), Height = 1, Text = new ('2', 100) }
                            );
 
         tv.Tiles.ElementAt (2)
           .ContentView.Add (
-                            new Label { Width = Dim.Fill (), Height = 1, Text = new string ('3', 100) }
+                            new Label { Width = Dim.Fill (), Height = 1, Text = new ('3', 100) }
                            );
 
         tv.Tiles.ElementAt (3)
           .ContentView.Add (
-                            new Label { Width = Dim.Fill (), Height = 1, Text = new string ('4', 100) }
+                            new Label { Width = Dim.Fill (), Height = 1, Text = new ('4', 100) }
                            );
 
         tv.Tiles.ElementAt (4)
           .ContentView.Add (
-                            new Label { Width = Dim.Fill (), Height = 1, Text = new string ('5', 100) }
+                            new Label { Width = Dim.Fill (), Height = 1, Text = new ('5', 100) }
                            );
 
-        Application.Top = new Toplevel ();
+        Application.Top = new ();
         Application.Top.Add (tv);
 
         Application.Begin (Application.Top);
@@ -2326,7 +2258,7 @@ public class TileViewTests
         return tv;
     }
 
-    private LineView GetLine (TileView tileView) { return tileView.Subviews.OfType<LineView> ().Single (); }
+    private LineView GetLine (TileView tileView) { return tileView.SubViews.OfType<LineView> ().Single (); }
 
     /// <summary>Creates a vertical orientation root container with left pane split into two (with horizontal splitter line).</summary>
     /// <param name="withBorder"></param>
@@ -2337,10 +2269,10 @@ public class TileViewTests
         Assert.True (container.TrySplitTile (0, 2, out TileView newContainer));
 
         newContainer.Orientation = Orientation.Horizontal;
-        newContainer.ColorScheme = new ColorScheme ();
-        container.ColorScheme = new ColorScheme ();
+        newContainer.ColorScheme = new ();
+        container.ColorScheme = new ();
 
-        container.LayoutSubviews ();
+        container.LayoutSubViews ();
 
         return container;
     }
@@ -2350,7 +2282,7 @@ public class TileViewTests
     /// <returns></returns>
     private TileView GetNestedContainer3Right1Down (bool withBorder, bool withTitles = false, int split = 2)
     {
-        Application.Top = new Toplevel ();
+        Application.Top = new ();
         var container = new TileView (3) { Width = 20, Height = 10 };
         container.LineStyle = withBorder ? LineStyle.Single : LineStyle.None;
 
@@ -2393,8 +2325,8 @@ public class TileViewTests
                                  );
         }
 
-        newContainer.ColorScheme = new ColorScheme ();
-        container.ColorScheme = new ColorScheme ();
+        newContainer.ColorScheme = new ();
+        container.ColorScheme = new ();
         Application.Top.Add (container);
         Application.Begin (Application.Top);
 
@@ -2403,48 +2335,54 @@ public class TileViewTests
 
     private TileView GetTileView (int width, int height, bool withBorder = false)
     {
-        var container = new TileView { Width = width, Height = height };
+        var container = new TileView
+        {
+            Id = "container",
+            Width = width, Height = height
+        };
 
         container.LineStyle = withBorder ? LineStyle.Single : LineStyle.None;
 
         container.Tiles.ElementAt (0)
                  .ContentView.Add (
-                                   new Label { Width = Dim.Fill (), Height = 1, Text = new string ('1', 100) }
+                                   new Label { Id = "label1", Width = Dim.Fill (), Height = 1, Text = new ('1', 100) }
                                   );
 
         container.Tiles.ElementAt (0)
                  .ContentView.Add (
                                    new Label
                                    {
+                                       Id = "label2",
                                        Width = Dim.Fill (),
                                        Height = 1,
                                        Y = 1,
-                                       Text = new string ('1', 100)
+                                       Text = new ('1', 100)
                                    }
                                   );
 
         container.Tiles.ElementAt (1)
                  .ContentView.Add (
-                                   new Label { Width = Dim.Fill (), Height = 1, Text = new string ('2', 100) }
+                                   new Label { Id = "label3", Width = Dim.Fill (), Height = 1, Text = new ('2', 100) }
                                   );
 
         container.Tiles.ElementAt (1)
                  .ContentView.Add (
                                    new Label
                                    {
+                                       Id = "label4",
                                        Width = Dim.Fill (),
                                        Height = 1,
                                        Y = 1,
-                                       Text = new string ('2', 100)
+                                       Text = new ('2', 100)
                                    }
                                   );
 
         container.Tiles.ElementAt (0).MinSize = 0;
         container.Tiles.ElementAt (1).MinSize = 0;
 
-        Application.Top = new Toplevel ();
+        Application.Top = new ();
         Application.Top.Add (container);
-        container.ColorScheme = new ColorScheme ();
+        container.ColorScheme = new ();
 
         Application.Begin (Application.Top);
 

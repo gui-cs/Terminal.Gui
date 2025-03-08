@@ -284,7 +284,7 @@ public class Wizards : Scenario
                                            someText.Height = Dim.Fill (
                                                                        Dim.Func (
                                                                                  () => someText.SuperView is { IsInitialized: true }
-                                                                                           ? someText.SuperView.Subviews
+                                                                                           ? someText.SuperView.SubViews
                                                                                                      .First (view => view.Y.Has<PosAnchorEnd> (out _))
                                                                                                      .Frame.Height
                                                                                            : 1));

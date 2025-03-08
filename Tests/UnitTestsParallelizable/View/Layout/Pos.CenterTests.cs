@@ -59,7 +59,7 @@ public class PosCenterTests (ITestOutputHelper output)
         var superView = new View { Width = 10, Height = 10 };
         var view = new View { X = Center (), Y = Center (), Width = 20, Height = 20 };
         superView.Add (view);
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
 
         Assert.Equal (-5, view.Frame.Left);
         Assert.Equal (-5, view.Frame.Top);

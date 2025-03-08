@@ -90,8 +90,8 @@ public partial class View // Command APIs
         //  - bubbled up the SuperView hierarchy.
         if (!args.Cancel)
         {
-            // If there's an IsDefault peer view in Subviews, try it
-            var isDefaultView = SuperView?.Subviews.FirstOrDefault (v => v is Button { IsDefault: true });
+            // If there's an IsDefault peer view in SubViews, try it
+            var isDefaultView = SuperView?.InternalSubViews.FirstOrDefault (v => v is Button { IsDefault: true });
 
             if (isDefaultView != this && isDefaultView is Button { IsDefault: true } button)
             {

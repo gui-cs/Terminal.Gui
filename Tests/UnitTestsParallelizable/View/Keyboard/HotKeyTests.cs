@@ -1,14 +1,10 @@
 ﻿using System.Text;
-using UICatalog.Scenarios;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
 public class HotKeyTests
 {
-    private readonly ITestOutputHelper _output;
-    public HotKeyTests (ITestOutputHelper output) { _output = output; }
-
     [Theory]
     [InlineData (KeyCode.A)]
     [InlineData (KeyCode.A | KeyCode.ShiftMask)]

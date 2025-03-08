@@ -33,7 +33,7 @@ public class DimTests
             Title = "w"
         };
         t.Add (w);
-        t.LayoutSubviews ();
+        t.LayoutSubViews ();
 
         Assert.Equal (3, w.Width = 3);
         Assert.Equal (4, w.Height = 4);
@@ -107,7 +107,7 @@ public class DimTests
         super.BeginInit ();
         super.EndInit ();
 
-        Exception exception = Record.Exception (super.LayoutSubviews);
+        Exception exception = Record.Exception (super.LayoutSubViews);
         Assert.Null (exception);
         super.Dispose ();
     }
@@ -169,7 +169,7 @@ public class DimTests
             Title = "w"
         };
         t.Add (w);
-        t.LayoutSubviews ();
+        t.LayoutSubViews ();
 
         Assert.Equal (3, w.Width = 3);
         Assert.Equal (4, w.Height = 4);

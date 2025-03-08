@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-using UnitTests;
-using UnitTests;
+﻿using UnitTests;
 using Xunit.Abstractions;
 
 // ReSharper disable AccessToModifiedClosure
@@ -42,7 +40,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         view.Add (rg);
         view.BeginInit ();
         view.EndInit ();
-        view.LayoutSubviews ();
+        view.LayoutSubViews ();
 
         Assert.True (rg.CanFocus);
         Assert.Single (rg.RadioLabels);
@@ -396,6 +394,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.True (Application.RaiseKeyDownEvent (Key.R.WithAlt));
         Assert.Equal (1, rg.SelectedItem);
 
+        Application.Top.Remove (rg);
         var superView = new View ();
         superView.Add (rg);
         Assert.True (superView.NewKeyDownEvent (Key.T));

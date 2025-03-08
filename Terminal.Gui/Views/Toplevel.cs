@@ -33,7 +33,7 @@ public partial class Toplevel : View
         Arrangement = ViewArrangement.Overlapped;
         Width = Dim.Fill ();
         Height = Dim.Fill ();
-        ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        base.ColorScheme = Colors.ColorSchemes ["TopLevel"];
         MouseClick += Toplevel_MouseClick;
     }
 
@@ -66,15 +66,15 @@ public partial class Toplevel : View
 
     #endregion
 
-    #region Subviews
+    #region SubViews
 
     // TODO: Deprecate - Any view can host a menubar in v2
     /// <summary>Gets the latest <see cref="MenuBar"/> added into this Toplevel.</summary>
-    public MenuBar? MenuBar => (MenuBar?)Subviews?.LastOrDefault (s => s is MenuBar);
+    public MenuBar? MenuBar => (MenuBar?)SubViews?.LastOrDefault (s => s is MenuBar);
 
     //// TODO: Deprecate - Any view can host a statusbar in v2
     ///// <summary>Gets the latest <see cref="StatusBar"/> added into this Toplevel.</summary>
-    //public StatusBar? StatusBar => (StatusBar?)Subviews?.LastOrDefault (s => s is StatusBar);
+    //public StatusBar? StatusBar => (StatusBar?)SubViews?.LastOrDefault (s => s is StatusBar);
 
     #endregion
 
@@ -127,7 +127,7 @@ public partial class Toplevel : View
     {
         IsLoaded = true;
 
-        foreach (var view in Subviews.Where (v => v is Toplevel))
+        foreach (var view in SubViews.Where (v => v is Toplevel))
         {
             var tl = (Toplevel)view;
             tl.OnLoaded ();
@@ -180,7 +180,7 @@ public partial class Toplevel : View
     /// </summary>
     internal virtual void OnReady ()
     {
-        foreach (var view in Subviews.Where (v => v is Toplevel))
+        foreach (var view in SubViews.Where (v => v is Toplevel))
         {
             var tl = (Toplevel)view;
             tl.OnReady ();
@@ -192,7 +192,7 @@ public partial class Toplevel : View
     /// <summary>Called from <see cref="Application.End(RunState)"/> before the <see cref="Toplevel"/> is disposed.</summary>
     internal virtual void OnUnloaded ()
     {
-        foreach (var view in Subviews.Where (v => v is Toplevel))
+        foreach (var view in SubViews.Where (v => v is Toplevel))
         {
             var tl = (Toplevel)view;
             tl.OnUnloaded ();
@@ -202,7 +202,7 @@ public partial class Toplevel : View
     }
 
     #endregion
-    
+
     #region Size / Position Management
 
     // TODO: Make cancelable?
@@ -235,7 +235,7 @@ public partial class Toplevel : View
             return;
         }
 
-        //var layoutSubviews = false;
+        //var layoutSubViews = false;
         var maxWidth = 0;
 
         if (superView.Margin is { } && superView == top.SuperView)
@@ -251,25 +251,25 @@ public partial class Toplevel : View
             if (top?.X is null or PosAbsolute && top?.Frame.X != nx)
             {
                 top!.X = nx;
-                //layoutSubviews = true;
+                //layoutSubViews = true;
             }
 
             if (top?.Y is null or PosAbsolute && top?.Frame.Y != ny)
             {
                 top!.Y = ny;
-                //layoutSubviews = true;
+                //layoutSubViews = true;
             }
         }
 
 
-        //if (superView.IsLayoutNeeded () || layoutSubviews)
+        //if (superView.IsLayoutNeeded () || layoutSubViews)
         //{
-        //    superView.LayoutSubviews ();
+        //    superView.LayoutSubViews ();
         //}
 
         //if (IsLayoutNeeded ())
         //{
-        //    LayoutSubviews ();
+        //    LayoutSubViews ();
         //}
     }
 

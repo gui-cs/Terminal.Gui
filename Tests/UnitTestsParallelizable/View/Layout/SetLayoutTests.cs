@@ -9,8 +9,8 @@ public class SetLayoutTests
         var view = new View { Id = "view" };
         var layoutStartedRaised = false;
         var layoutCompleteRaised = false;
-        superView.SubviewLayout += (sender, e) => layoutStartedRaised = true;
-        superView.SubviewsLaidOut += (sender, e) => layoutCompleteRaised = true;
+        superView.SubViewLayout += (sender, e) => layoutStartedRaised = true;
+        superView.SubViewsLaidOut += (sender, e) => layoutCompleteRaised = true;
 
         superView.Add (view);
 
@@ -264,7 +264,7 @@ public class SetLayoutTests
     }
 
     [Fact]
-    public void LayoutSubviews ()
+    public void LayoutSubViews ()
     {
         var superRect = new Rectangle (0, 0, 100, 100);
         var super = new View { Frame = superRect, Text = "super" };
@@ -274,14 +274,14 @@ public class SetLayoutTests
 
         super.Add (v1, v2);
 
-        super.LayoutSubviews ();
+        super.LayoutSubViews ();
         Assert.Equal (new (0, 0, 10, 10), v1.Frame);
         Assert.Equal (new (10, 10, 10, 10), v2.Frame);
         super.Dispose ();
     }
 
     [Fact]
-    public void LayoutSubviews_Honors_IsLayoutNeeded ()
+    public void LayoutSubViews_Honors_IsLayoutNeeded ()
     {
         // No adornment subviews
         var superView = new View ();
@@ -293,28 +293,28 @@ public class SetLayoutTests
         var borderLayoutStartedCount = 0;
         var borderLayoutCompleteCount = 0;
 
-        view.SubviewLayout += (sender, e) => layoutStartedCount++;
-        view.SubviewsLaidOut += (sender, e) => layoutCompleteCount++;
+        view.SubViewLayout += (sender, e) => layoutStartedCount++;
+        view.SubViewsLaidOut += (sender, e) => layoutCompleteCount++;
 
-        view.Border.SubviewLayout += (sender, e) => borderLayoutStartedCount++;
-        view.Border.SubviewsLaidOut += (sender, e) => borderLayoutCompleteCount++;
+        view.Border.SubViewLayout += (sender, e) => borderLayoutStartedCount++;
+        view.Border.SubViewsLaidOut += (sender, e) => borderLayoutCompleteCount++;
 
         superView.Add (view);
 
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
         Assert.Equal (0, borderLayoutStartedCount);
         Assert.Equal (0, borderLayoutCompleteCount);
         Assert.Equal (1, layoutStartedCount);
         Assert.Equal (1, layoutCompleteCount);
 
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
         Assert.Equal (0, borderLayoutStartedCount);
         Assert.Equal (0, borderLayoutCompleteCount);
         Assert.Equal (1, layoutStartedCount);
         Assert.Equal (1, layoutCompleteCount);
 
         superView.SetNeedsLayout ();
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
         Assert.Equal (0, borderLayoutStartedCount);
         Assert.Equal (0, borderLayoutCompleteCount);
         Assert.Equal (2, layoutStartedCount);
@@ -322,20 +322,20 @@ public class SetLayoutTests
 
         // With Border subview
         view.Border.Add (new View ());
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
         Assert.Equal (1, borderLayoutStartedCount);
         Assert.Equal (1, borderLayoutCompleteCount);
         Assert.Equal (3, layoutStartedCount);
         Assert.Equal (3, layoutCompleteCount);
 
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
         Assert.Equal (1, borderLayoutStartedCount);
         Assert.Equal (1, borderLayoutCompleteCount);
         Assert.Equal (3, layoutStartedCount);
         Assert.Equal (3, layoutCompleteCount);
 
         superView.SetNeedsLayout ();
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
         Assert.Equal (2, borderLayoutStartedCount);
         Assert.Equal (2, borderLayoutCompleteCount);
         Assert.Equal (4, layoutStartedCount);
@@ -345,7 +345,7 @@ public class SetLayoutTests
 
     // Test OnLayoutStarted/OnLayoutComplete - ensure that they are called at right times
     [Fact]
-    public void LayoutSubviews_LayoutStarted_Complete ()
+    public void LayoutSubViews_LayoutStarted_Complete ()
     {
         var superView = new View ();
         var view = new View ();
@@ -356,11 +356,11 @@ public class SetLayoutTests
         var borderLayoutStartedCount = 0;
         var borderLayoutCompleteCount = 0;
 
-        view.SubviewLayout += (sender, e) => layoutStartedCount++;
-        view.SubviewsLaidOut += (sender, e) => layoutCompleteCount++;
+        view.SubViewLayout += (sender, e) => layoutStartedCount++;
+        view.SubViewsLaidOut += (sender, e) => layoutCompleteCount++;
 
-        view.Border.SubviewLayout += (sender, e) => borderLayoutStartedCount++;
-        view.Border.SubviewsLaidOut += (sender, e) => borderLayoutCompleteCount++;
+        view.Border.SubViewLayout += (sender, e) => borderLayoutStartedCount++;
+        view.Border.SubViewsLaidOut += (sender, e) => borderLayoutCompleteCount++;
 
         superView.Add (view);
         Assert.Equal (0, borderLayoutStartedCount);
@@ -380,14 +380,14 @@ public class SetLayoutTests
         Assert.Equal (2, layoutStartedCount);
         Assert.Equal (2, layoutCompleteCount);
 
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
         Assert.Equal (1, borderLayoutStartedCount);
         Assert.Equal (1, borderLayoutCompleteCount);
         Assert.Equal (3, layoutStartedCount);
         Assert.Equal (3, layoutCompleteCount);
 
         superView.SetNeedsLayout ();
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
         Assert.Equal (1, borderLayoutStartedCount);
         Assert.Equal (1, borderLayoutCompleteCount);
         Assert.Equal (4, layoutStartedCount);
@@ -397,7 +397,7 @@ public class SetLayoutTests
     }
 
     [Fact]
-    public void LayoutSubviews_No_SuperView ()
+    public void LayoutSubViews_No_SuperView ()
     {
         var root = new View ();
 
@@ -416,7 +416,7 @@ public class SetLayoutTests
 
         second.X = Pos.Right (first) + 1;
 
-        root.LayoutSubviews ();
+        root.LayoutSubViews ();
 
         Assert.Equal (6, second.Frame.X);
         root.Dispose ();
@@ -430,23 +430,23 @@ public class SetLayoutTests
         var superView = new View { Id = "superView" };
         var layoutStartedRaised = 0;
         var layoutCompleteRaised = 0;
-        superView.SubviewLayout += (sender, e) => layoutStartedRaised++;
-        superView.SubviewsLaidOut += (sender, e) => layoutCompleteRaised++;
+        superView.SubViewLayout += (sender, e) => layoutStartedRaised++;
+        superView.SubViewsLaidOut += (sender, e) => layoutCompleteRaised++;
 
         superView.SetNeedsLayout ();
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
         Assert.Equal (1, layoutStartedRaised);
         Assert.Equal (1, layoutCompleteRaised);
 
         superView.BeginInit ();
         superView.EndInit ();
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
         Assert.Equal (3, layoutStartedRaised);
         Assert.Equal (3, layoutCompleteRaised);
     }
 
     [Fact]
-    public void LayoutSubviews_RootHas_SuperView ()
+    public void LayoutSubViews_RootHas_SuperView ()
     {
         var top = new View ();
         var root = new View ();
@@ -467,7 +467,7 @@ public class SetLayoutTests
 
         second.X = Pos.Right (first) + 1;
 
-        root.LayoutSubviews ();
+        root.LayoutSubViews ();
 
         Assert.Equal (6, second.Frame.X);
         root.Dispose ();
@@ -477,7 +477,7 @@ public class SetLayoutTests
     }
 
     [Fact]
-    public void LayoutSubviews_Uses_ContentSize ()
+    public void LayoutSubViews_Uses_ContentSize ()
     {
         var superView = new View
         {
@@ -492,14 +492,14 @@ public class SetLayoutTests
         };
         superView.Add (view);
 
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
 
         Assert.Equal (5, view.Frame.X);
         superView.Dispose ();
     }
 
     [Fact]
-    public void LayoutSubviews_ViewThatRefsSubView_Throws ()
+    public void LayoutSubViews_ViewThatRefsSubView_Throws ()
     {
         var root = new View ();
         var super = new View ();
@@ -513,7 +513,7 @@ public class SetLayoutTests
     }
 
     /// <summary>
-    ///     This tests the special case in LayoutSubviews. See https://github.com/gui-cs/Terminal.Gui/issues/2461
+    ///     This tests the special case in LayoutSubViews. See https://github.com/gui-cs/Terminal.Gui/issues/2461
     /// </summary>
     [Fact]
     public void Nested_SubViews_Ref_Topmost_SuperView ()

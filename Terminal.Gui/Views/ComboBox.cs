@@ -57,14 +57,14 @@ public class ComboBox : View, IDesignable
         Initialized += (s, e) => ProcessLayout ();
 
         // On resize
-        SubviewsLaidOut += (sender, a) => ProcessLayout ();
+        SubViewsLaidOut += (sender, a) => ProcessLayout ();
 
-        Added += (s, e) =>
+        SuperViewChanged += (s, e) =>
                  {
                      // Determine if this view is hosted inside a dialog and is the only control
                      for (View view = SuperView; view != null; view = view.SuperView)
                      {
-                         if (view is Dialog && SuperView is { } && SuperView.Subviews.Count == 1 && SuperView.Subviews [0] == this)
+                         if (view is Dialog && SuperView is { } && SuperView.SubViews.Count == 1 && SuperView.SubViews.ElementAt (0) == this)
                          {
                              _autoHide = false;
 
@@ -199,7 +199,7 @@ public class ComboBox : View, IDesignable
             _source = value;
 
             // Only need to refresh list if its been added to a container view
-            if (SuperView is { } && SuperView.Subviews.Contains (this))
+            if (SuperView is { } && SuperView.SubViews.Contains (this))
             {
                 Text = string.Empty;
                 SetNeedsDraw ();
@@ -513,7 +513,7 @@ public class ComboBox : View, IDesignable
         Reset (true);
         _listview.ClearViewport ();
         _listview.TabStop = TabBehavior.NoStop;
-        SuperView?.MoveSubviewToStart (this);
+        SuperView?.MoveSubViewToStart (this);
 
         // BUGBUG: SetNeedsDraw takes Viewport relative coordinates, not Screen
         Rectangle rect = _listview.ViewportToScreen (_listview.IsInitialized ? _listview.Viewport : Rectangle.Empty);
@@ -658,7 +658,7 @@ public class ComboBox : View, IDesignable
         _listview.SetSource (_searchSet);
         _listview.Height = CalculateHeight ();
 
-        if (Subviews.Count > 0 && HasFocus)
+        if (SubViews.Count > 0 && HasFocus)
         {
             _search.SetFocus ();
         }
@@ -814,7 +814,7 @@ public class ComboBox : View, IDesignable
 
         _listview.ClearViewport ();
         _listview.Height = CalculateHeight ();
-        SuperView?.MoveSubviewToStart (this);
+        SuperView?.MoveSubViewToStart (this);
     }
 
     private bool UnixEmulation ()

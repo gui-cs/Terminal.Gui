@@ -26,7 +26,7 @@ public class StatusBar : Bar, IDesignable
         BorderStyle = LineStyle.Dashed;
         ColorScheme = Colors.ColorSchemes ["Menu"];
 
-        SubviewLayout += StatusBar_LayoutStarted;
+        SubViewLayout += StatusBar_LayoutStarted;
     }
 
     // StatusBar arranges the items horizontally.
@@ -34,13 +34,13 @@ public class StatusBar : Bar, IDesignable
     // The Shortcuts are configured with the command, help, and key views aligned in reverse order (EndToStart).
     private void StatusBar_LayoutStarted (object sender, LayoutEventArgs e)
     {
-        for (int index = 0; index < Subviews.Count; index++)
+        for (int index = 0; index < SubViews.Count; index++)
         {
-            View barItem = Subviews [index];
+            View barItem = SubViews.ElementAt (index);
 
             barItem.BorderStyle = BorderStyle;
 
-            if (index == Subviews.Count - 1)
+            if (index == SubViews.Count - 1)
             {
                 barItem.Border.Thickness = new Thickness (0, 0, 0, 0);
             }
@@ -57,21 +57,16 @@ public class StatusBar : Bar, IDesignable
     }
 
     /// <inheritdoc/>
-    public override View Add (View view)
+    protected override void OnSubViewAdded (View subView)
     {
-        // Call base first, because otherwise it resets CanFocus to true
-        base.Add (view);
+        subView.CanFocus = false;
 
-        view.CanFocus = false;
-
-        if (view is Shortcut shortcut)
+        if (subView is Shortcut shortcut)
         {
             // TODO: not happy about using AlignmentModes for this. Too implied.
             // TODO: instead, add a property (a style enum?) to Shortcut to control this
             shortcut.AlignmentModes = AlignmentModes.EndToStart;
         }
-
-        return view;
     }
 
     /// <inheritdoc />

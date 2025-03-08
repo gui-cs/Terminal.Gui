@@ -41,7 +41,7 @@ public class PosPercentTests (ITestOutputHelper output)
         container.Add (view);
         var top = new Toplevel ();
         top.Add (container);
-        top.LayoutSubviews ();
+        top.LayoutSubViews ();
 
         Assert.Equal (100, container.Frame.Width);
         Assert.Equal (100, container.Frame.Height);

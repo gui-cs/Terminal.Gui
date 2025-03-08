@@ -12,7 +12,7 @@ public class AnsiEscapeSequenceRequest : AnsiEscapeSequence
     ///     Invoked when the console responds with an ANSI response code that matches the
     ///     <see cref="AnsiEscapeSequence.Terminator"/>
     /// </summary>
-    public required Action<string> ResponseReceived { get; init; }
+    public required Action<string?> ResponseReceived { get; init; }
 
     /// <summary>
     ///     Invoked if the console fails to responds to the ANSI response code

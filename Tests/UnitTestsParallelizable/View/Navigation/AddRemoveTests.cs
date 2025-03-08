@@ -6,7 +6,7 @@ namespace Terminal.Gui.ViewTests;
 public class AddRemoveNavigationTests () : TestsAllViews
 {
     [Fact]
-    public void Add_First_Subview_Gets_Focus ()
+    public void Add_First_SubView_Gets_Focus ()
     {
         View top = new View ()
         {
@@ -31,7 +31,7 @@ public class AddRemoveNavigationTests () : TestsAllViews
     }
 
     [Fact]
-    public void Add_Subsequent_Subview_Gets_Focus ()
+    public void Add_Subsequent_SubView_Gets_Focus ()
     {
         View top = new View ()
         {
@@ -66,7 +66,7 @@ public class AddRemoveNavigationTests () : TestsAllViews
     }
 
     [Fact]
-    public void Add_Nested_Subviews_Deepest_Gets_Focus ()
+    public void Add_Nested_SubViews_Deepest_Gets_Focus ()
     {
         View top = new View ()
         {
@@ -101,7 +101,7 @@ public class AddRemoveNavigationTests () : TestsAllViews
 
 
     [Fact]
-    public void Remove_Subview_Raises_HasFocusChanged ()
+    public void Remove_SubView_Raises_HasFocusChanged ()
     {
         var top = new View
         {
@@ -177,7 +177,7 @@ public class AddRemoveNavigationTests () : TestsAllViews
 
 
     [Fact]
-    public void Remove_Focused_Subview_Keeps_Focus_And_SubView_Looses_Focus ()
+    public void Remove_Focused_SubView_Keeps_Focus_And_SubView_Looses_Focus ()
     {
         View top = new View ()
         {
@@ -205,7 +205,7 @@ public class AddRemoveNavigationTests () : TestsAllViews
     }
 
     [Fact]
-    public void Remove_Focused_Subview_Keeps_Focus_And_SubView_Looses_Focus_And_Next_Gets_Focus ()
+    public void Remove_Focused_SubView_Keeps_Focus_And_SubView_Looses_Focus_And_Next_Gets_Focus ()
     {
         View top = new View ()
         {

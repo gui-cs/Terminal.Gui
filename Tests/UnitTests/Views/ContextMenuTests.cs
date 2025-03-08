@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-using UnitTests;
-using UnitTests;
+﻿using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -533,9 +531,9 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                      );
 
         Assert.True (
-                     top.Subviews [0]
+                     top.SubViews.ElementAt (0)
                         .NewMouseEvent (
-                                        new MouseEventArgs { Position = new (0, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                        new MouseEventArgs { Position = new (0, 3), Flags = MouseFlags.ReportMousePosition, View = top.SubViews.ElementAt (0) }
                                        )
                     );
         Application.RunIteration (ref rs);
@@ -581,9 +579,9 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                      );
 
         Assert.True (
-                     top.Subviews [0]
+                     top.SubViews.ElementAt (0)
                         .NewMouseEvent (
-                                        new MouseEventArgs { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                        new MouseEventArgs { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.SubViews.ElementAt (0) }
                                        )
                     );
         Application.RunIteration (ref rs);
@@ -628,9 +626,9 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                      );
 
         Assert.True (
-                     top.Subviews [0]
+                     top.SubViews.ElementAt (0)
                         .NewMouseEvent (
-                                        new MouseEventArgs { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                        new MouseEventArgs { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.SubViews.ElementAt (0) }
                                        )
                     );
         Application.RunIteration (ref rs);
@@ -672,9 +670,9 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                      );
 
         Assert.True (
-                     top.Subviews [0]
+                     top.SubViews.ElementAt (0)
                         .NewMouseEvent (
-                                        new MouseEventArgs { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                        new MouseEventArgs { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.SubViews.ElementAt (0) }
                                        )
                     );
         Application.RunIteration (ref rs);
@@ -716,9 +714,9 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                      );
 
         Assert.True (
-                     top.Subviews [0]
+                     top.SubViews.ElementAt (0)
                         .NewMouseEvent (
-                                        new MouseEventArgs { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.Subviews [0] }
+                                        new MouseEventArgs { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.SubViews.ElementAt (0) }
                                        )
                     );
         Application.RunIteration (ref rs);
@@ -1225,7 +1223,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Toplevel top = new ();
         RunState rs = Application.Begin (top);
         cm.Show (menuItems);
-        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top!.Subviews [0].Frame);
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top!.SubViews.ElementAt (0).Frame);
         Application.LayoutAndDraw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1243,8 +1241,8 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         var firstIteration = false;
         Application.RunIteration (ref rs, firstIteration);
-        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
-        Assert.Equal (new Rectangle (5, 11, 15, 6), Application.Top.Subviews [1].Frame);
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.SubViews.ElementAt (0).Frame);
+        Assert.Equal (new Rectangle (5, 11, 15, 6), Application.Top.SubViews.ElementAt (1).Frame);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1261,7 +1259,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         firstIteration = false;
         Application.RunIteration (ref rs, firstIteration);
-        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.SubViews.ElementAt (0).Frame);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1318,7 +1316,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         RunState rs = Application.Begin (top);
         cm.Show (menuItems);
 
-        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.SubViews.ElementAt (0).Frame);
         Application.LayoutAndDraw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1335,7 +1333,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         var firstIteration = false;
         Application.RunIteration (ref rs, firstIteration);
-        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.SubViews.ElementAt (0).Frame);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1352,7 +1350,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         firstIteration = false;
         Application.RunIteration (ref rs, firstIteration);
-        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.SubViews.ElementAt (0).Frame);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1370,7 +1368,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         firstIteration = false;
         Application.RunIteration (ref rs, firstIteration);
-        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.SubViews.ElementAt (0).Frame);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1399,14 +1397,14 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         Assert.True (tf1.HasFocus);
         Assert.False (tf2.HasFocus);
-        Assert.Equal (4, win.Subviews.Count); // TF & TV add autocomplete popup's to their superviews.
+        Assert.Equal (4, win.SubViews.Count); // TF & TV add autocomplete popup's to their superviews.
         Assert.Empty (Application._cachedViewsUnderMouse);
 
         // Right click on tf2 to open context menu
         Application.RaiseMouseEvent (new () { ScreenPosition = new (1, 3), Flags = MouseFlags.Button3Clicked });
         Assert.False (tf1.HasFocus);
         Assert.False (tf2.HasFocus);
-        Assert.Equal (5, win.Subviews.Count);
+        Assert.Equal (5, win.SubViews.Count);
         Assert.True (tf2.ContextMenu.MenuBar.IsMenuOpen);
         Assert.True (win.Focused is Menu);
         Assert.True (Application.MouseGrabView is MenuBar);
@@ -1416,7 +1414,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.RaiseMouseEvent (new () { ScreenPosition = new (1, 1), Flags = MouseFlags.Button1Clicked });
         Assert.True (tf1.HasFocus);
         Assert.False (tf2.HasFocus);
-        Assert.Equal (4, win.Subviews.Count);
+        Assert.Equal (4, win.SubViews.Count);
 
         // The last context menu bar opened is always preserved
         Assert.NotNull (tf2.ContextMenu.MenuBar);
@@ -1428,7 +1426,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.RaiseMouseEvent (new () { ScreenPosition = new (1, 3), Flags = MouseFlags.Button1Clicked });
         Assert.False (tf1.HasFocus);
         Assert.True (tf2.HasFocus);
-        Assert.Equal (4, win.Subviews.Count);
+        Assert.Equal (4, win.SubViews.Count);
 
         // The last context menu bar opened is always preserved
         Assert.NotNull (tf2.ContextMenu.MenuBar);
@@ -1712,8 +1710,8 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.False (cm.MenuBar.HotKeyBindings.TryGet (Key.R.NoShift, out _));
         Assert.False (cm.MenuBar.HotKeyBindings.TryGet (Key.D.WithAlt, out _));
         Assert.False (cm.MenuBar.HotKeyBindings.TryGet (Key.D.NoShift, out _));
-        Assert.Single (Application.Top!.Subviews);
-        View [] menus = Application.Top!.Subviews.Where (v => v is Menu m && m.Host == cm.MenuBar).ToArray ();
+        Assert.Single (Application.Top!.SubViews);
+        View [] menus = Application.Top!.SubViews.Where (v => v is Menu m && m.Host == cm.MenuBar).ToArray ();
         Assert.True (menus [0].HotKeyBindings.TryGet (Key.N.WithAlt, out _));
         Assert.True (menus [0].HotKeyBindings.TryGet (Key.N.NoShift, out _));
         Assert.True (menus [0].HotKeyBindings.TryGet (Key.R.WithAlt, out _));
@@ -1801,14 +1799,14 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.True (menuBar.HotKeyBindings.TryGet (Key.F.WithAlt, out _));
         Assert.False (menuBar.HotKeyBindings.TryGet (Key.N.WithAlt, out _));
         Assert.False (menuBar.HotKeyBindings.TryGet (Key.R.WithAlt, out _));
-        View [] menus = Application.Top!.Subviews.Where (v => v is Menu m && m.Host == menuBar).ToArray ();
+        View [] menus = Application.Top!.SubViews.Where (v => v is Menu m && m.Host == menuBar).ToArray ();
         Assert.Empty (menus);
         Assert.Null (cm.MenuBar);
 
         Assert.True (Application.RaiseKeyDownEvent (Key.F.WithAlt));
         Assert.True (menuBar.IsMenuOpen);
-        Assert.Equal (2, Application.Top!.Subviews.Count);
-        menus = Application.Top!.Subviews.Where (v => v is Menu m && m.Host == menuBar).ToArray ();
+        Assert.Equal (2, Application.Top!.SubViews.Count);
+        menus = Application.Top!.SubViews.Where (v => v is Menu m && m.Host == menuBar).ToArray ();
         Assert.True (menus [0].HotKeyBindings.TryGet (Key.N.WithAlt, out _));
         Assert.True (Application.RaiseKeyDownEvent (Key.N.WithAlt));
         Assert.False (menuBar.IsMenuOpen);
@@ -1837,8 +1835,8 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.False (cm.MenuBar!.HotKeyBindings.TryGet (Key.E.NoShift, out _));
         Assert.False (cm.MenuBar.HotKeyBindings.TryGet (Key.R.WithAlt, out _));
         Assert.False (cm.MenuBar.HotKeyBindings.TryGet (Key.R.NoShift, out _));
-        Assert.Equal (3, Application.Top!.Subviews.Count);
-        menus = Application.Top!.Subviews.Where (v => v is Menu m && m.Host == cm.MenuBar).ToArray ();
+        Assert.Equal (3, Application.Top!.SubViews.Count);
+        menus = Application.Top!.SubViews.Where (v => v is Menu m && m.Host == cm.MenuBar).ToArray ();
         Assert.True (menus [0].HotKeyBindings.TryGet (Key.E.WithAlt, out _));
         Assert.True (menus [0].HotKeyBindings.TryGet (Key.E.NoShift, out _));
         Assert.True (menus [1].HotKeyBindings.TryGet (Key.R.WithAlt, out _));
@@ -1852,8 +1850,8 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         cm.Show (menuItems);
         Assert.True (cm.MenuBar.IsMenuOpen);
-        Assert.Equal (3, Application.Top!.Subviews.Count);
-        menus = Application.Top!.Subviews.Where (v => v is Menu m && m.Host == cm.MenuBar).ToArray ();
+        Assert.Equal (3, Application.Top!.SubViews.Count);
+        menus = Application.Top!.SubViews.Where (v => v is Menu m && m.Host == cm.MenuBar).ToArray ();
         Assert.True (menus [0].HotKeyBindings.TryGet (Key.E.WithAlt, out _));
         Assert.True (menus [0].HotKeyBindings.TryGet (Key.E.NoShift, out _));
         Assert.False (menus [0].HotKeyBindings.TryGet (Key.R.WithAlt, out _));
@@ -1868,7 +1866,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.MainLoop!.RunIteration ();
         Assert.True (renameFile);
 
-        Assert.Single (Application.Top!.Subviews);
+        Assert.Single (Application.Top!.SubViews);
         Assert.True (menuBar.HotKeyBindings.TryGet (Key.F.WithAlt, out _));
         Assert.True (menuBar.HotKeyBindings.TryGet (Key.F.NoShift, out _));
         Assert.False (menuBar.HotKeyBindings.TryGet (Key.N.WithAlt, out _));

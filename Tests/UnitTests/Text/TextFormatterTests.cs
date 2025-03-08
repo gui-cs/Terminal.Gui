@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using UnitTests;
 using UICatalog;
 using UnitTests;
 using Xunit.Abstractions;
@@ -12,7 +11,6 @@ public class TextFormatterTests
 {
     public TextFormatterTests (ITestOutputHelper output) { _output = output; }
     private readonly ITestOutputHelper _output;
-
 
     public static IEnumerable<object []> CMGlyphs =>
         new List<object []> { new object [] { $"{Glyphs.LeftBracket} Say Hello 你 {Glyphs.RightBracket}", 16, 15 } };
@@ -3954,22 +3952,22 @@ ssb
         Assert.False (tf.FillRemaining);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
  Test          
  Test long     
  Test long long",
-                                                      _output);
+                                                       _output);
 
         DriverAssert.AssertDriverAttributesAre (
-                                               @"
+                                                @"
 000000000000000000000
 011110000000000000000
 011111111100000000000
 011111111111111000000
 000000000000000000000",
-                                               _output,
-                                               null,
-                                               attrs);
+                                                _output,
+                                                null,
+                                                attrs);
 
         tf.FillRemaining = true;
 
@@ -3979,15 +3977,15 @@ ssb
                  attrs [2]);
 
         DriverAssert.AssertDriverAttributesAre (
-                                               @"
+                                                @"
 000000000000000000000
 011111111111111111110
 011111111111111111110
 011111111111111111110
 000000000000000000000",
-                                               _output,
-                                               null,
-                                               attrs);
+                                                _output,
+                                                null,
+                                                attrs);
     }
 
     [SetupFakeDriver]

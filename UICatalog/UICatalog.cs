@@ -1016,7 +1016,7 @@ public class UICatalogApp
 
             MenuBar!.Menus [0].Children! [0]!.ShortcutKey = Application.QuitKey;
 
-            ((Shortcut)_statusBar!.Subviews [0]).Key = Application.QuitKey;
+            ((Shortcut)_statusBar!.SubViews.ElementAt (0)).Key = Application.QuitKey;
             _statusBar.Visible = ShowStatusBar;
 
             MiIsMouseDisabled!.Checked = Application.IsMouseDisabled;

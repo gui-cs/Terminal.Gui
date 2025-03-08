@@ -2,7 +2,7 @@
 
 /// <summary>
 ///     Args for events where the <see cref="View.SuperView"/> of a <see cref="View"/> is changed (e.g.
-///     <see cref="View.Removed"/> / <see cref="View.Added"/> events).
+///     <see cref="View.Removed"/> / <see cref="View.IsAddedChanged"/> events).
 /// </summary>
 public class SuperViewChangedEventArgs : EventArgs
 {
@@ -20,7 +20,7 @@ public class SuperViewChangedEventArgs : EventArgs
 
     /// <summary>
     ///     The parent.  For <see cref="View.Removed"/> this is the old parent (new parent now being null).  For
-    ///     <see cref="View.Added"/> it is the new parent to whom view now belongs.
+    ///     <see cref="View.IsAddedChanged"/> it is the new parent to whom view now belongs.
     /// </summary>
     public View SuperView { get; }
 }

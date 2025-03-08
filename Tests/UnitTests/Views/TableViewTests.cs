@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Data;
 using System.Globalization;
-using System.Reflection;
-using UnitTests;
 using UnitTests;
 using Xunit.Abstractions;
 
@@ -441,7 +439,7 @@ public class TableViewTests (ITestOutputHelper output)
         dt.Rows.Add (1, 2, "aaa");
 
         tableView.Table = new DataTableSource (dt);
-        tableView.LayoutSubviews ();
+        tableView.LayoutSubViews ();
         tableView.Draw ();
 
         // default behaviour of TableView is not to render
@@ -764,7 +762,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.EndInit ();
 
         tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
-        tableView.LayoutSubviews ();
+        tableView.LayoutSubViews ();
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -1042,7 +1040,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         TableView tv = SetUpMiniTable (out DataTable dt);
 
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
 
         // width exactly matches the max col widths
         tv.Viewport = new (0, 0, 5, 4);
@@ -1142,7 +1140,7 @@ public class TableViewTests (ITestOutputHelper output)
     public void TableView_ColorsTest_RowColorGetter (bool focused)
     {
         TableView tv = SetUpMiniTable (out DataTable dt);
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
 
         // width exactly matches the max col widths
         tv.Viewport = new (0, 0, 5, 4);
@@ -1236,7 +1234,7 @@ public class TableViewTests (ITestOutputHelper output)
     public void TableView_ColorTests_FocusedOrNot (bool focused)
     {
         TableView tv = SetUpMiniTable ();
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
 
         // width exactly matches the max col widths
         tv.Viewport = new (0, 0, 5, 4);
@@ -1283,7 +1281,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         TableView tv = SetUpMiniTable ();
         tv.Style.InvertSelectedCellFirstCharacter = true;
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
 
         // width exactly matches the max col widths
         tv.Viewport = new (0, 0, 5, 4);
@@ -1547,7 +1545,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         TableView tv = SetUpMiniTable (out DataTable dt);
         dt.Rows.Add (1, 2); // add another row (brings us to 2 rows)
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
 
         tv.MultiSelect = true;
         tv.SelectedColumn = 1;
@@ -1580,7 +1578,7 @@ public class TableViewTests (ITestOutputHelper output)
                                                       new () { { "Name", t => t }, { "EndsWith", t => t.Last () } }
                                                      );
 
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
 
         tv.Draw ();
 
@@ -1661,7 +1659,7 @@ public class TableViewTests (ITestOutputHelper output)
         TableView tableView = GetTwoRowSixColumnTable ();
         tableView.BeginInit ();
         tableView.EndInit ();
-        tableView.LayoutSubviews ();
+        tableView.LayoutSubViews ();
 
         tableView.Draw ();
 
@@ -1739,7 +1737,7 @@ public class TableViewTests (ITestOutputHelper output)
     public void Test_ScreenToCell_DataColumnOverload ()
     {
         TableView tableView = GetTwoRowSixColumnTable ();
-        tableView.LayoutSubviews ();
+        tableView.LayoutSubViews ();
 
         tableView.Draw ();
 
@@ -1856,7 +1854,7 @@ public class TableViewTests (ITestOutputHelper output)
             tableView.Style.GetOrCreateColumnStyle (i).Visible = false;
         }
 
-        tableView.LayoutSubviews ();
+        tableView.LayoutSubViews ();
 
         // expect nothing to be rendered when all columns are invisible
         var expected =
@@ -1880,7 +1878,7 @@ public class TableViewTests (ITestOutputHelper output)
     public void TestColumnStyle_FirstColumnVisibleFalse_CursorStaysAt1 (bool useHome)
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
-        tableView.LayoutSubviews ();
+        tableView.LayoutSubViews ();
 
         tableView.Style.GetOrCreateColumnStyle (0).Visible = false;
         tableView.SelectedColumn = 0;
@@ -1909,7 +1907,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.Style.ShowHorizontalHeaderUnderline = true;
         tableView.Style.GetOrCreateColumnStyle (0).Visible = false;
 
-        tableView.LayoutSubviews ();
+        tableView.LayoutSubViews ();
         tableView.Draw ();
 
         var expected =
@@ -1928,7 +1926,7 @@ public class TableViewTests (ITestOutputHelper output)
     public void TestColumnStyle_LastColumnVisibleFalse_CursorStaysAt2 (bool useEnd)
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
-        tableView.LayoutSubviews ();
+        tableView.LayoutSubViews ();
 
         // select D 
         tableView.SelectedColumn = 3;
@@ -1960,7 +1958,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.Style.ShowHorizontalHeaderUnderline = true;
 
         tableView.ColumnOffset = 1;
-        tableView.LayoutSubviews ();
+        tableView.LayoutSubViews ();
         tableView.Draw ();
 
         // normally we should have scroll indicators because A,E and F are of screen
@@ -2010,7 +2008,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         tableView.Style.ShowHorizontalScrollIndicators = true;
         tableView.Style.ShowHorizontalHeaderUnderline = true;
-        tableView.LayoutSubviews ();
+        tableView.LayoutSubViews ();
         tableView.SetNeedsDraw ();
         View.SetClipToScreen ();
         tableView.Draw ();
@@ -2045,7 +2043,7 @@ public class TableViewTests (ITestOutputHelper output)
     public void TestColumnStyle_VisibleFalse_CursorStepsOverInvisibleColumns ()
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
-        tableView.LayoutSubviews ();
+        tableView.LayoutSubViews ();
 
         tableView.Style.GetOrCreateColumnStyle (1).Visible = false;
         tableView.SelectedColumn = 0;
@@ -2073,7 +2071,7 @@ public class TableViewTests (ITestOutputHelper output)
     )
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
-        tableView.LayoutSubviews ();
+        tableView.LayoutSubViews ();
         tableView.Style.SmoothHorizontalScrolling = smooth;
 
         if (invisibleCol)
@@ -2109,7 +2107,7 @@ public class TableViewTests (ITestOutputHelper output)
         TableView tableView = GetABCDEFTableView (out _);
 
         tableView.Style.GetOrCreateColumnStyle (1).Visible = false;
-        tableView.LayoutSubviews ();
+        tableView.LayoutSubViews ();
         tableView.Draw ();
 
         var expected =
@@ -2125,7 +2123,7 @@ public class TableViewTests (ITestOutputHelper output)
     public void TestColumnStyle_VisibleFalse_MultiSelected ()
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
-        tableView.LayoutSubviews ();
+        tableView.LayoutSubViews ();
 
         // user has rectangular selection 
         tableView.MultiSelectedRegions.Push (
@@ -2159,7 +2157,7 @@ public class TableViewTests (ITestOutputHelper output)
     public void TestColumnStyle_VisibleFalse_MultiSelectingStepsOverInvisibleColumns ()
     {
         TableView tableView = GetABCDEFTableView (out _);
-        tableView.LayoutSubviews ();
+        tableView.LayoutSubViews ();
 
         // if middle column is invisible
         tableView.Style.GetOrCreateColumnStyle (1).Visible = false;
@@ -2182,7 +2180,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         TableView tv = GetTwoRowSixColumnTable (out DataTable dt);
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
 
         tv.MultiSelect = true;
 
@@ -2228,7 +2226,7 @@ public class TableViewTests (ITestOutputHelper output)
                                                     }
                                                    );
 
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
 
         tv.Draw ();
 
@@ -2253,7 +2251,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         tv.Viewport = new (0, 0, 7, 6);
         tv.Frame = new (0, 0, 7, 6);
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
 
         tv.FullRowSelect = true;
         tv.Style.ShowHorizontalBottomline = true;
@@ -2306,7 +2304,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         TableView tv = GetTwoRowSixColumnTable (out DataTable dt);
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
 
         tv.Viewport = new (0, 0, 7, 6);
 
@@ -2362,7 +2360,7 @@ A B C
 
         tv.Viewport = new (0, 0, 7, 6);
         tv.Frame = new (0, 0, 7, 6);
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
 
         tv.FullRowSelect = true;
         tv.Style.ShowHorizontalBottomline = true;
@@ -2433,7 +2431,7 @@ A B C
 
         tv.Table = new ListTableSource (list, tv, listStyle);
 
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
 
         tv.Draw ();
 
@@ -2500,7 +2498,7 @@ A B C
     public void TestMoveStartEnd_WithFullRowSelect (bool withFullRowSelect)
     {
         TableView tableView = GetTwoRowSixColumnTable ();
-        tableView.LayoutSubviews ();
+        tableView.LayoutSubViews ();
         tableView.FullRowSelect = withFullRowSelect;
 
         tableView.SelectedRow = 1;
@@ -2544,7 +2542,7 @@ A B C
     public void TestShiftClick_MultiSelect_TwoRowTable_FullRowSelect ()
     {
         TableView tv = GetTwoRowSixColumnTable ();
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
 
         tv.MultiSelect = true;
 
@@ -2578,7 +2576,7 @@ A B C
         ConfigurationManager.Reset();
 
         TableView tv = GetPetTable (out EnumerableTableSource<PickablePet> source);
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         IReadOnlyCollection<PickablePet> pets = source.Data;
 
         CheckBoxTableSourceWrapperByObject<PickablePet> wrapper = new (
@@ -2672,7 +2670,7 @@ A B C
     {
         TableView tv = GetTwoRowSixColumnTable (out DataTable dt);
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
 
         var wrapper = new CheckBoxTableSourceWrapperByIndex (tv, tv.Table);
         tv.Table = wrapper;
@@ -2739,7 +2737,7 @@ A B C
     {
         TableView tv = GetTwoRowSixColumnTable (out DataTable dt);
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
 
         var wrapper = new CheckBoxTableSourceWrapperByIndex (tv, tv.Table);
         tv.Table = wrapper;
@@ -2789,7 +2787,7 @@ A B C
     public void TestTableViewCheckboxes_SelectAllToggle_ByObject ()
     {
         TableView tv = GetPetTable (out EnumerableTableSource<PickablePet> source);
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         IReadOnlyCollection<PickablePet> pets = source.Data;
 
         CheckBoxTableSourceWrapperByObject<PickablePet> wrapper = new (
@@ -2851,7 +2849,7 @@ A B C
     {
         TableView tv = GetTwoRowSixColumnTable (out DataTable dt);
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
 
         var wrapper = new CheckBoxTableSourceWrapperByIndex (tv, tv.Table);
         tv.Table = wrapper;
@@ -2934,7 +2932,7 @@ A B C
     public void TestTableViewRadioBoxes_Simple_ByObject ()
     {
         TableView tv = GetPetTable (out EnumerableTableSource<PickablePet> source);
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         IReadOnlyCollection<PickablePet> pets = source.Data;
 
         CheckBoxTableSourceWrapperByObject<PickablePet> wrapper = new (
@@ -3032,7 +3030,7 @@ A B C
     {
         // 2 row table
         TableView tableView = GetABCDEFTableView (out DataTable dt);
-        tableView.LayoutSubviews ();
+        tableView.LayoutSubViews ();
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
 
         tableView.MultiSelect = true;
@@ -3104,7 +3102,7 @@ A B C
     {
         // 2 row table
         TableView tableView = GetABCDEFTableView (out DataTable dt);
-        tableView.LayoutSubviews ();
+        tableView.LayoutSubViews ();
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         tableView.FullRowSelect = true;
         tableView.MultiSelect = true;
@@ -3142,7 +3140,7 @@ A B C
     {
         // 3 row table
         TableView tableView = GetABCDEFTableView (out DataTable dt);
-        tableView.LayoutSubviews ();
+        tableView.LayoutSubViews ();
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         tableView.MultiSelect = true;
@@ -3180,7 +3178,7 @@ A B C
     {
         // 6 row table
         TableView tableView = GetABCDEFTableView (out DataTable dt);
-        tableView.LayoutSubviews ();
+        tableView.LayoutSubViews ();
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
@@ -3471,7 +3469,7 @@ A B C
                                  }
                                 );
 
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
 
         return tv;
     }

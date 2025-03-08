@@ -19,7 +19,7 @@ public sealed class ViewportSettingsEditor : EditorBase
 
     protected override void OnUpdateSettings ()
     {
-        foreach (View subview in Subviews)
+        foreach (View subview in SubViews)
         {
             subview.Enabled = ViewToEdit is not Adornment;
         }

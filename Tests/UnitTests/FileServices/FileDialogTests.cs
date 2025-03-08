@@ -33,7 +33,7 @@ public class FileDialogTests ()
     public void DirectTyping_Allowed ()
     {
         FileDialog dlg = GetInitializedFileDialog ();
-        TextField tf = dlg.Subviews.OfType<TextField> ().First (t => t.HasFocus);
+        TextField tf = dlg.SubViews.OfType<TextField> ().First (t => t.HasFocus);
         tf.ClearAllSelection ();
         tf.CursorPosition = tf.Text.Length;
         Assert.True (tf.HasFocus);
@@ -321,7 +321,7 @@ public class FileDialogTests ()
     {
         FileDialog dlg = GetInitializedFileDialog ();
 
-        View tf = dlg.Subviews.FirstOrDefault (t => t.HasFocus);
+        View tf = dlg.SubViews.FirstOrDefault (t => t.HasFocus);
         Assert.NotNull (tf);
         Assert.IsType<TextField> (tf);
         dlg.Dispose ();
@@ -793,9 +793,9 @@ public class FileDialogTests ()
         switch (part)
         {
             case FileDialogPart.Path:
-                return dlg.Subviews.OfType<TextField> ().ElementAt (0);
+                return dlg.SubViews.OfType<TextField> ().ElementAt (0);
             case FileDialogPart.SearchField:
-                return dlg.Subviews.OfType<TextField> ().ElementAt (1);
+                return dlg.SubViews.OfType<TextField> ().ElementAt (1);
             default:
                 throw new ArgumentOutOfRangeException (nameof (part), part, null);
         }
@@ -803,8 +803,8 @@ public class FileDialogTests ()
 
     private TableView GetTableView (FileDialog dlg)
     {
-        var tile = dlg.Subviews.OfType<TileView> ().Single ();
-        return (TableView)tile.Tiles.ElementAt (1).ContentView.Subviews.ElementAt(0);
+        var tile = dlg.SubViews.OfType<TileView> ().Single ();
+        return (TableView)tile.Tiles.ElementAt (1).ContentView.SubViews.ElementAt(0);
     }
 
     private enum FileDialogPart

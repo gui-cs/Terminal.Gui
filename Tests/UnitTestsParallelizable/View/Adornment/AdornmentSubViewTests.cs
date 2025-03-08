@@ -14,7 +14,7 @@ public class AdornmentSubViewTests ()
         view.EndInit ();
         var raised = false;
 
-        subView.SubviewLayout += LayoutStarted;
+        subView.SubViewLayout += LayoutStarted;
         view.Margin.Thickness = new Thickness (1, 2, 3, 4);
         view.Layout ();
         Assert.True (raised);

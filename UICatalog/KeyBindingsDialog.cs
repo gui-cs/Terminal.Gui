@@ -32,7 +32,7 @@ internal class KeyBindingsDialog : Dialog
         _commandsListView = new ListView
         {
             Width = Dim.Percent (50),
-            Height = Dim.Fill (Dim.Func (() => IsInitialized ? Subviews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height : 1)),
+            Height = Dim.Fill (Dim.Func (() => IsInitialized ? SubViews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height : 1)),
             Source = new ListWrapper<Command> (_commands),
             SelectedItem = 0
         };
@@ -200,16 +200,12 @@ internal class KeyBindingsDialog : Dialog
 
             // may already have subviews that were added to it
             // before we got to it
-            foreach (View sub in view.Subviews)
+            foreach (View sub in view.SubViews)
             {
                 RecordView (sub);
             }
 
-            // TODO: BUG: Based on my new understanding of Added event I think this is wrong
-            // (and always was wrong). Parents don't get to be told when new views are added
-            // to them
-
-            view.Added += (s, e) => RecordView (e.SubView);
+            view.SubViewAdded += (s, e) => RecordView (e.SubView);
         }
     }
 }

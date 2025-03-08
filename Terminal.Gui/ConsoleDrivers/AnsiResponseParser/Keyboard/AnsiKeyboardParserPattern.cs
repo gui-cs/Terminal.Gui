@@ -23,7 +23,7 @@ public abstract class AnsiKeyboardParserPattern
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    public abstract bool IsMatch (string input);
+    public abstract bool IsMatch (string? input);
 
     private readonly string _name;
 
@@ -37,7 +37,7 @@ public abstract class AnsiKeyboardParserPattern
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    public Key? GetKey (string input)
+    public Key? GetKey (string? input)
     {
         Key? key = GetKeyImpl (input);
         Logging.Trace ($"{nameof (AnsiKeyboardParser)} interpreted {input} as {key} using {_name}");
@@ -51,5 +51,5 @@ public abstract class AnsiKeyboardParserPattern
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    protected abstract Key? GetKeyImpl (string input);
+    protected abstract Key? GetKeyImpl (string? input);
 }

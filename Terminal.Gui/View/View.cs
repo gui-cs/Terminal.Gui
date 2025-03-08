@@ -81,9 +81,9 @@ public partial class View : IDisposable, ISupportInitializeNotification
         DisposeAdornments ();
         DisposeScrollBars ();
 
-        for (int i = InternalSubviews.Count - 1; i >= 0; i--)
+        for (int i = InternalSubViews.Count - 1; i >= 0; i--)
         {
-            View subview = InternalSubviews [i];
+            View subview = InternalSubViews [i];
             Remove (subview);
             subview.Dispose ();
         }
@@ -98,7 +98,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
             _disposedValue = true;
         }
 
-        Debug.Assert (InternalSubviews.Count == 0);
+        Debug.Assert (InternalSubViews.Count == 0);
     }
 
     #region Constructors and Initialization
@@ -196,9 +196,9 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
         BeginInitAdornments ();
 
-        if (_subviews?.Count > 0)
+        if (InternalSubViews?.Count > 0)
         {
-            foreach (View view in _subviews)
+            foreach (View view in InternalSubViews)
             {
                 if (!view.IsInitialized)
                 {
@@ -213,7 +213,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
     /// <summary>Signals the View that initialization is ending. See <see cref="ISupportInitialize"/>.</summary>
     /// <remarks>
-    ///     <para>Initializes all Subviews and Invokes the <see cref="Initialized"/> event.</para>
+    ///     <para>Initializes all SubViews and Invokes the <see cref="Initialized"/> event.</para>
     /// </remarks>
     public virtual void EndInit ()
     {
@@ -232,14 +232,11 @@ public partial class View : IDisposable, ISupportInitializeNotification
         UpdateTextDirection (TextDirection);
         UpdateTextFormatterText ();
 
-        if (_subviews is { })
+        foreach (View view in InternalSubViews)
         {
-            foreach (View view in _subviews)
+            if (!view.IsInitialized)
             {
-                if (!view.IsInitialized)
-                {
-                    view.EndInit ();
-                }
+                view.EndInit ();
             }
         }
 
@@ -295,12 +292,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
                 Border.Enabled = _enabled;
             }
 
-            if (_subviews is null)
-            {
-                return;
-            }
-
-            foreach (View view in _subviews)
+            foreach (View view in InternalSubViews)
             {
                 view.Enabled = Enabled;
             }

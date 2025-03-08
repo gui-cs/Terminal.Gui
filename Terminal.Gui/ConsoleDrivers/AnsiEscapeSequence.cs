@@ -33,7 +33,7 @@ public class AnsiEscapeSequence
     ///         to the oldest outstanding request.
     ///     </para>
     /// </summary>
-    public required string Terminator { get; init; }
+    public required string? Terminator { get; init; }
 
 
 

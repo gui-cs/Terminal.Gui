@@ -113,7 +113,7 @@ public class ScrollBar : View, IOrientation, IDesignable
         _slider.Position = _sliderPosition.Value;
     }
 
-    private void PositionSubviews ()
+    private void PositionSubViews ()
     {
         if (Orientation == Orientation.Vertical)
         {
@@ -180,7 +180,7 @@ public class ScrollBar : View, IOrientation, IDesignable
         TextAlignment = Alignment.Center;
         VerticalTextAlignment = Alignment.Center;
         _slider.Orientation = newOrientation;
-        PositionSubviews ();
+        PositionSubViews ();
 
         OrientationChanged?.Invoke (this, new (newOrientation));
     }

@@ -1,11 +1,9 @@
-﻿using JetBrains.Annotations;
-using UnitTests;
-using UnitTests;
+﻿using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
-public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
+public class NavigationTests (ITestOutputHelper output) : TestsAllViews
 {
     [Theory]
     [MemberData (nameof (AllViewTypes))]
@@ -16,22 +14,21 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
 
         if (view == null)
         {
-            _output.WriteLine ($"Ignoring {viewType} - It's a Generic");
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
 
             return;
         }
 
         if (!view.CanFocus)
         {
-            _output.WriteLine ($"Ignoring {viewType} - It can't focus.");
+            output.WriteLine ($"Ignoring {viewType} - It can't focus.");
 
             return;
         }
 
-
         Toplevel top = new ();
         Application.Top = top;
-        Application.Navigation = new ApplicationNavigation ();
+        Application.Navigation = new ();
 
         View otherView = new ()
         {
@@ -68,6 +65,7 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
                         // Try once more (HexView)
                         Application.RaiseKeyDownEvent (key);
                     }
+
                     break;
                 default:
                     Application.RaiseKeyDownEvent (Key.Tab);
@@ -78,12 +76,12 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
             if (!view.HasFocus)
             {
                 left = true;
-                _output.WriteLine ($"{view.GetType ().Name} - {key} Left.");
+                output.WriteLine ($"{view.GetType ().Name} - {key} Left.");
 
                 break;
             }
 
-            _output.WriteLine ($"{view.GetType ().Name} - {key} did not Leave.");
+            output.WriteLine ($"{view.GetType ().Name} - {key} did not Leave.");
         }
 
         top.Dispose ();
@@ -101,28 +99,28 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
 
         if (view == null)
         {
-            _output.WriteLine ($"Ignoring {viewType} - It's a Generic");
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
 
             return;
         }
 
         if (!view.CanFocus)
         {
-            _output.WriteLine ($"Ignoring {viewType} - It can't focus.");
+            output.WriteLine ($"Ignoring {viewType} - It can't focus.");
 
             return;
         }
 
         if (view is Toplevel && ((Toplevel)view).Modal)
         {
-            _output.WriteLine ($"Ignoring {viewType} - It's a Modal Toplevel");
+            output.WriteLine ($"Ignoring {viewType} - It's a Modal Toplevel");
 
             return;
         }
 
         Toplevel top = new ();
         Application.Top = top;
-        Application.Navigation = new ApplicationNavigation ();
+        Application.Navigation = new ();
 
         View otherView = new ()
         {
@@ -135,16 +133,16 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         var hasFocusFalse = 0;
 
         view.HasFocusChanged += (s, e) =>
-        {
-            if (e.NewValue)
-            {
-                hasFocusTrue++;
-            }
-            else
-            {
-                hasFocusFalse++;
-            }
-        };
+                                {
+                                    if (e.NewValue)
+                                    {
+                                        hasFocusTrue++;
+                                    }
+                                    else
+                                    {
+                                        hasFocusFalse++;
+                                    }
+                                };
 
         top.Add (view, otherView);
         Assert.False (view.HasFocus);
@@ -185,7 +183,10 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
                             // Try another nav key (e.g. for TextView that eats Tab)
                             Application.RaiseKeyDownEvent (Key.CursorDown);
                         }
-                    };
+                    }
+
+                    ;
+
                     break;
 
                 case TabBehavior.TabGroup:
@@ -263,21 +264,21 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
 
         if (view == null)
         {
-            _output.WriteLine ($"Ignoring {viewType} - It's a Generic");
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
 
             return;
         }
 
         if (!view.CanFocus)
         {
-            _output.WriteLine ($"Ignoring {viewType} - It can't focus.");
+            output.WriteLine ($"Ignoring {viewType} - It can't focus.");
 
             return;
         }
 
         if (view is Toplevel && ((Toplevel)view).Modal)
         {
-            _output.WriteLine ($"Ignoring {viewType} - It's a Modal Toplevel");
+            output.WriteLine ($"Ignoring {viewType} - It's a Modal Toplevel");
 
             return;
         }
@@ -285,7 +286,7 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         Toplevel top = new ();
 
         Application.Top = top;
-        Application.Navigation = new ApplicationNavigation ();
+        Application.Navigation = new ();
 
         View otherView = new ()
         {
@@ -321,66 +322,8 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         top.Dispose ();
 
         Application.ResetState ();
-
     }
 
-    // View.Focused & View.MostFocused tests
-
-    // View.Focused - No subviews
-    [Fact]
-    public void Focused_NoSubviews ()
-    {
-        var view = new View ();
-        Assert.Null (view.Focused);
-
-        view.CanFocus = true;
-        view.SetFocus ();
-    }
-
-    [Fact]
-    public void GetMostFocused_NoSubviews_Returns_Null ()
-    {
-        var view = new View ();
-        Assert.Null (view.Focused);
-
-        view.CanFocus = true;
-        Assert.False (view.HasFocus);
-        view.SetFocus ();
-        Assert.True (view.HasFocus);
-        Assert.Null (view.MostFocused);
-    }
-
-    [Fact]
-    public void GetMostFocused_Returns_Most ()
-    {
-        var view = new View ()
-        {
-            Id = "view",
-            CanFocus = true
-        };
-
-        var subview = new View ()
-        {
-            Id = "subview",
-            CanFocus = true
-        };
-
-        view.Add (subview);
-
-        view.SetFocus ();
-        Assert.True (view.HasFocus);
-        Assert.True (subview.HasFocus);
-        Assert.Equal (subview, view.MostFocused);
-
-        var subview2 = new View ()
-        {
-            Id = "subview2",
-            CanFocus = true
-        };
-
-        view.Add (subview2);
-        Assert.Equal (subview2, view.MostFocused);
-    }
 
     [Fact]
     [SetupFakeDriver]
@@ -402,7 +345,6 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
         top.Dispose ();
         Application.Shutdown ();
     }
-
 
     [Fact]
     [AutoInitShutdown]
