@@ -298,9 +298,10 @@ internal partial class WindowsOutput : IConsoleOutput
     /// <inheritdoc/>
     public void SetCursorVisibility (CursorVisibility visibility)
     {
-        var sb = new StringBuilder ();
-        sb.Append (visibility != CursorVisibility.Invisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
-        Write (sb.ToString ());
+        string cursorVisibilitySequence = visibility != CursorVisibility.Invisible
+            ? EscSeqUtils.CSI_ShowCursor
+            : EscSeqUtils.CSI_HideCursor;
+        Write (cursorVisibilitySequence);
     }
 
     private Point _lastCursorPosition;
