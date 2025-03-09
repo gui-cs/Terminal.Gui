@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Buffers;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
@@ -184,7 +185,6 @@ internal partial class WindowsOutput : IConsoleOutput
 
     public bool WriteToConsole (Size size, ExtendedCharInfo [] charInfoBuffer, Coord bufferSize, SmallRect window, bool force16Colors)
     {
-        var stringBuilder = new StringBuilder ();
 
         //Debug.WriteLine ("WriteToConsole");
 
@@ -214,7 +214,7 @@ internal partial class WindowsOutput : IConsoleOutput
         }
         else
         {
-            stringBuilder.Clear ();
+            StringBuilder stringBuilder = new();
 
             stringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
             EscSeqUtils.CSI_AppendCursorPosition (stringBuilder, 0, 0);
@@ -248,14 +248,20 @@ internal partial class WindowsOutput : IConsoleOutput
             stringBuilder.Append (EscSeqUtils.CSI_RestoreCursorPosition);
             stringBuilder.Append (EscSeqUtils.CSI_HideCursor);
 
-            var s = stringBuilder.ToString ();
+            // TODO: Potentially could stackalloc whenever reasonably small (<= 8 kB?) write buffer is needed.
+            char [] rentedWriteArray = ArrayPool<char>.Shared.Rent (minimumLength: stringBuilder.Length);
+            try
+            {
+                Span<char> writeBuffer = rentedWriteArray.AsSpan(0, stringBuilder.Length);
+                stringBuilder.CopyTo (0, writeBuffer, stringBuilder.Length);
 
-            // TODO: requires extensive testing if we go down this route
-            // If console output has changed
-            //if (s != _lastWrite)
-            //{
-            // supply console with the new content
-            result = WriteConsole (_screenBuffer, s, (uint)s.Length, out uint _, nint.Zero);
+                // Supply console with the new content.
+                result = WriteConsole (_screenBuffer, writeBuffer, (uint)writeBuffer.Length, out uint _, nint.Zero);
+            }
+            finally
+            {
+                ArrayPool<char>.Shared.Return (rentedWriteArray);
+            }
 
             foreach (SixelToRender sixel in Application.Sixel)
             {
