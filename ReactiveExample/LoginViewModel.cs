@@ -40,7 +40,6 @@ public partial class LoginViewModel : ReactiveObject
 
     public LoginViewModel ()
     {
-        InitializeCommands ();
         IObservable<bool> canLogin = this.WhenAnyValue
             (
                 x => x.Username,
