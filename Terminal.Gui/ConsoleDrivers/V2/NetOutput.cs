@@ -188,7 +188,7 @@ public class NetOutput : IConsoleOutput
     private void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
     {
         SetCursorPositionImpl (lastCol, row);
-        Console.Write (output);
+        Console.Out.Write (output);
         output.Clear ();
         lastCol += outputWidth;
         outputWidth = 0;
