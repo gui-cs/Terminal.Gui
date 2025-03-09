@@ -163,7 +163,7 @@ public class NetOutput : IConsoleOutput
             if (output.Length > 0)
             {
                 SetCursorPositionImpl (lastCol, row);
-                Console.Write (output);
+                Console.Out.Write (output);
             }
         }
 
@@ -172,7 +172,7 @@ public class NetOutput : IConsoleOutput
             if (!string.IsNullOrWhiteSpace (s.SixelData))
             {
                 SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
-                Console.Write (s.SixelData);
+                Console.Out.Write (s.SixelData);
             }
         }
 
