@@ -1,14 +1,10 @@
 ﻿using UnitTests;
-using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class SpinnerViewTests
+public class SpinnerViewTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper output;
-    public SpinnerViewTests (ITestOutputHelper output) { this.output = output; }
-
     [Theory]
     [AutoInitShutdown]
     [InlineData (true)]

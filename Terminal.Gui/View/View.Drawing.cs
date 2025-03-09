@@ -78,11 +78,11 @@ public partial class View // Drawing APIs
             DoClearViewport ();
 
             // ------------------------------------
-            // Draw the subviews first (order matters: Subviews, Text, Content)
+            // Draw the subviews first (order matters: SubViews, Text, Content)
             if (SubViewNeedsDraw)
             {
                 DoSetAttribute ();
-                DoDrawSubviews (context);
+                DoDrawSubViews (context);
             }
 
             // ------------------------------------
@@ -133,10 +133,10 @@ public partial class View // Drawing APIs
 
     private void DoDrawBorderAndPaddingSubViews ()
     {
-        if (Border?.Subviews is { } && Border.Thickness != Thickness.Empty)
+        if (Border?.SubViews is { } && Border.Thickness != Thickness.Empty)
         {
             // PERFORMANCE: Get the check for DrawIndicator out of this somehow.
-            foreach (View subview in Border.Subviews.Where (v => v.Visible || v.Id == "DrawIndicator"))
+            foreach (View subview in Border.SubViews.Where (v => v.Visible || v.Id == "DrawIndicator"))
             {
                 if (subview.Id != "DrawIndicator")
                 {
@@ -147,19 +147,19 @@ public partial class View // Drawing APIs
             }
 
             Region? saved = Border?.AddFrameToClip ();
-            Border?.DoDrawSubviews ();
+            Border?.DoDrawSubViews ();
             SetClip (saved);
         }
 
-        if (Padding?.Subviews is { } && Padding.Thickness != Thickness.Empty)
+        if (Padding?.SubViews is { } && Padding.Thickness != Thickness.Empty)
         {
-            foreach (View subview in Padding.Subviews)
+            foreach (View subview in Padding.SubViews)
             {
                 subview.SetNeedsDraw ();
             }
 
             Region? saved = Padding?.AddFrameToClip ();
-            Padding?.DoDrawSubviews ();
+            Padding?.DoDrawSubViews ();
             SetClip (saved);
         }
     }
@@ -191,7 +191,7 @@ public partial class View // Drawing APIs
 
         if (SubViewNeedsDraw)
         {
-            // A Subview may add to the LineCanvas. This ensures any Adornment LineCanvas updates happen.
+            // A SubView may add to the LineCanvas. This ensures any Adornment LineCanvas updates happen.
             Border?.SetNeedsDraw ();
             Padding?.SetNeedsDraw ();
         }
@@ -525,22 +525,22 @@ public partial class View // Drawing APIs
 
     #endregion DrawContent
 
-    #region DrawSubviews
+    #region DrawSubViews
 
-    private void DoDrawSubviews (DrawContext? context = null)
+    private void DoDrawSubViews (DrawContext? context = null)
     {
-        if (OnDrawingSubviews (context))
+        if (OnDrawingSubViews (context))
         {
             return;
         }
 
-        if (OnDrawingSubviews ())
+        if (OnDrawingSubViews ())
         {
             return;
         }
 
         var dev = new DrawEventArgs (Viewport, Rectangle.Empty, context);
-        DrawingSubviews?.Invoke (this, dev);
+        DrawingSubViews?.Invoke (this, dev);
 
         if (dev.Cancel)
         {
@@ -552,44 +552,44 @@ public partial class View // Drawing APIs
             return;
         }
 
-        DrawSubviews (context);
+        DrawSubViews (context);
     }
 
     /// <summary>
-    ///     Called when the <see cref="Subviews"/> are to be drawn.
+    ///     Called when the <see cref="SubViews"/> are to be drawn.
     /// </summary>
     /// <param name="context">The draw context to report drawn areas to, or null if not tracking.</param>
-    /// <returns><see langword="true"/> to stop further drawing of <see cref="Subviews"/>.</returns>
-    protected virtual bool OnDrawingSubviews (DrawContext? context) { return false; }
+    /// <returns><see langword="true"/> to stop further drawing of <see cref="SubViews"/>.</returns>
+    protected virtual bool OnDrawingSubViews (DrawContext? context) { return false; }
 
     /// <summary>
-    ///     Called when the <see cref="Subviews"/> are to be drawn.
+    ///     Called when the <see cref="SubViews"/> are to be drawn.
     /// </summary>
-    /// <returns><see langword="true"/> to stop further drawing of <see cref="Subviews"/>.</returns>
-    protected virtual bool OnDrawingSubviews () { return false; }
+    /// <returns><see langword="true"/> to stop further drawing of <see cref="SubViews"/>.</returns>
+    protected virtual bool OnDrawingSubViews () { return false; }
 
-    /// <summary>Raised when the <see cref="Subviews"/> are to be drawn.</summary>
+    /// <summary>Raised when the <see cref="SubViews"/> are to be drawn.</summary>
     /// <remarks>
     /// </remarks>
     /// <returns>
     ///     Set <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/> to stop further drawing of
-    ///     <see cref="Subviews"/>.
+    ///     <see cref="SubViews"/>.
     /// </returns>
-    public event EventHandler<DrawEventArgs>? DrawingSubviews;
+    public event EventHandler<DrawEventArgs>? DrawingSubViews;
 
     /// <summary>
-    ///     Draws the <see cref="Subviews"/>.
+    ///     Draws the <see cref="SubViews"/>.
     /// </summary>
     /// <param name="context">The draw context to report drawn areas to, or null if not tracking.</param>
-    public void DrawSubviews (DrawContext? context = null)
+    public void DrawSubViews (DrawContext? context = null)
     {
-        if (_subviews is null)
+        if (InternalSubViews.Count == 0)
         {
             return;
         }
 
         // Draw the subviews in reverse order to leverage clipping.
-        foreach (View view in _subviews.Where (view => view.Visible).Reverse ())
+        foreach (View view in InternalSubViews.Where (view => view.Visible).Reverse ())
         {
             // TODO: HACK - This forcing of SetNeedsDraw with SuperViewRendersLineCanvas enables auto line join to work, but is brute force.
             if (view.SuperViewRendersLineCanvas || view.ViewportSettings.HasFlag (ViewportSettings.Transparent))
@@ -606,7 +606,7 @@ public partial class View // Drawing APIs
         }
     }
 
-    #endregion DrawSubviews
+    #endregion DrawSubViews
 
     #region DrawLineCanvas
 
@@ -772,7 +772,7 @@ public partial class View // Drawing APIs
         }
     }
 
-    /// <summary>Gets whether any Subviews need to be redrawn.</summary>
+    /// <summary>Gets whether any SubViews need to be redrawn.</summary>
     public bool SubViewNeedsDraw { get; private set; }
 
     /// <summary>Sets that the <see cref="Viewport"/> of this View needs to be redrawn.</summary>
@@ -844,7 +844,7 @@ public partial class View // Drawing APIs
         }
 
         // There was multiple enumeration error here, so calling ToArray - probably a stop gap
-        foreach (View subview in Subviews.ToArray ())
+        foreach (View subview in SubViews.ToArray ())
         {
             if (subview.Frame.IntersectsWith (viewPortRelativeRegion))
             {
@@ -898,7 +898,7 @@ public partial class View // Drawing APIs
             Padding?.ClearNeedsDraw ();
         }
 
-        foreach (View subview in Subviews)
+        foreach (View subview in SubViews)
         {
             subview.ClearNeedsDraw ();
         }

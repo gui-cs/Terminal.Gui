@@ -505,7 +505,7 @@ public class FileDialog : Dialog, IDesignable
         {
             _btnCancel.X = Pos.Func (CalculateOkButtonPosX);
             _btnOk.X = Pos.Right (_btnCancel) + 1;
-            MoveSubviewTowardsStart (_btnCancel);
+            MoveSubViewTowardsStart (_btnCancel);
         }
 
         SetNeedsDraw ();

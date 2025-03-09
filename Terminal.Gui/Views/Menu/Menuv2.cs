@@ -62,9 +62,9 @@ public class Menuv2 : Bar
             shortcut.Accepting += ShortcutOnAccepting;
 
             AddCommand (shortcut.Command, (ctx) =>
-                                          {
-                                              return RaiseShortcutCommandInvoked (ctx);
-                                          });
+            {
+                return RaiseShortcutCommandInvoked (ctx);
+            });
 
 
             void ShortcutOnAccepting (object? sender, CommandEventArgs e)
@@ -72,7 +72,7 @@ public class Menuv2 : Bar
                 if (Arrangement.HasFlag (ViewArrangement.Overlapped) && Visible)
                 {
                     Visible = false;
-//                    e.Cancel = true;
+                    //                    e.Cancel = true;
 
                     return;
                 }

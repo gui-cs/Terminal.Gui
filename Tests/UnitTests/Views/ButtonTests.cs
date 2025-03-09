@@ -1,5 +1,3 @@
-using System.ComponentModel;
-using UnitTests;
 using UnitTests;
 using Xunit.Abstractions;
 
@@ -61,12 +59,12 @@ public class ButtonTests (ITestOutputHelper output)
         {
             Text = text,
             Width = width,
-            Height = height,
+            Height = height
         };
 
-        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Frame.Size);
-        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Viewport.Size);
-        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.GetContentSize ());
+        Assert.Equal (new (expectedWidth, expectedHeight), btn1.Frame.Size);
+        Assert.Equal (new (expectedWidth, expectedHeight), btn1.Viewport.Size);
+        Assert.Equal (new (expectedWidth, expectedHeight), btn1.GetContentSize ());
         Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.TextFormatter.ConstrainToSize);
 
         btn1.Dispose ();
@@ -88,8 +86,8 @@ public class ButtonTests (ITestOutputHelper output)
         btn1.Width = width;
         btn1.Height = height;
 
-        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Frame.Size);
-        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Viewport.Size);
+        Assert.Equal (new (expectedWidth, expectedHeight), btn1.Frame.Size);
+        Assert.Equal (new (expectedWidth, expectedHeight), btn1.Viewport.Size);
         Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.TextFormatter.ConstrainToSize);
 
         btn1.Dispose ();
@@ -190,8 +188,6 @@ public class ButtonTests (ITestOutputHelper output)
         btn.Layout ();
         Assert.Equal (new (10, 1), btn.TextFormatter.ConstrainToSize);
 
-
-
         btn.BeginInit ();
         btn.EndInit ();
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
@@ -207,6 +203,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.True (btn.CanFocus);
 
         btn.SetRelativeLayout (new (100, 100));
+
         // 0123456789012345678901234567890123456789
         // [* Test *]
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
@@ -273,16 +270,16 @@ public class ButtonTests (ITestOutputHelper output)
     [InlineData (true, 1)]
     public void Space_Fires_Accept (bool focused, int expected)
     {
-        View superView = new View ()
+        var superView = new View
         {
-            CanFocus = true,
+            CanFocus = true
         };
 
         Button button = new ();
 
         button.CanFocus = focused;
 
-        int acceptInvoked = 0;
+        var acceptInvoked = 0;
         button.Accepting += (s, e) => acceptInvoked++;
 
         superView.Add (button);
@@ -301,16 +298,16 @@ public class ButtonTests (ITestOutputHelper output)
     [InlineData (true, 1)]
     public void Enter_Fires_Accept (bool focused, int expected)
     {
-        View superView = new View ()
+        var superView = new View
         {
-            CanFocus = true,
+            CanFocus = true
         };
 
         Button button = new ();
 
         button.CanFocus = focused;
 
-        int acceptInvoked = 0;
+        var acceptInvoked = 0;
         button.Accepting += (s, e) => acceptInvoked++;
 
         superView.Add (button);
@@ -329,9 +326,9 @@ public class ButtonTests (ITestOutputHelper output)
     [InlineData (true, 1)]
     public void HotKey_Fires_Accept (bool focused, int expected)
     {
-        View superView = new View ()
+        var superView = new View
         {
-            CanFocus = true,
+            CanFocus = true
         };
 
         Button button = new ()
@@ -341,7 +338,7 @@ public class ButtonTests (ITestOutputHelper output)
 
         button.CanFocus = focused;
 
-        int acceptInvoked = 0;
+        var acceptInvoked = 0;
         button.Accepting += (s, e) => acceptInvoked++;
 
         superView.Add (button);
@@ -604,7 +601,7 @@ public class ButtonTests (ITestOutputHelper output)
     {
         var me = new MouseEventArgs ();
 
-        var button = new Button ()
+        var button = new Button
         {
             Width = 1,
             Height = 1,
@@ -615,25 +612,26 @@ public class ButtonTests (ITestOutputHelper output)
 
         button.Selecting += (s, e) => selectingCount++;
         var acceptedCount = 0;
-        button.Accepting += (s, e) =>
-                           {
-                               acceptedCount++;
-                               e.Cancel = true;
-                           };
 
-        me = new MouseEventArgs ();
+        button.Accepting += (s, e) =>
+                            {
+                                acceptedCount++;
+                                e.Cancel = true;
+                            };
+
+        me = new ();
         me.Flags = pressed;
         button.NewMouseEvent (me);
         Assert.Equal (0, selectingCount);
         Assert.Equal (0, acceptedCount);
 
-        me = new MouseEventArgs ();
+        me = new ();
         me.Flags = released;
         button.NewMouseEvent (me);
         Assert.Equal (0, selectingCount);
         Assert.Equal (0, acceptedCount);
 
-        me = new MouseEventArgs ();
+        me = new ();
         me.Flags = clicked;
         button.NewMouseEvent (me);
         Assert.Equal (1, selectingCount);
@@ -651,7 +649,7 @@ public class ButtonTests (ITestOutputHelper output)
     {
         var me = new MouseEventArgs ();
 
-        var button = new Button ()
+        var button = new Button
         {
             Width = 1,
             Height = 1,
@@ -661,18 +659,18 @@ public class ButtonTests (ITestOutputHelper output)
         var acceptedCount = 0;
 
         button.Accepting += (s, e) =>
-                           {
-                               acceptedCount++;
-                               e.Cancel = true;
-                           };
+                            {
+                                acceptedCount++;
+                                e.Cancel = true;
+                            };
 
         var selectingCount = 0;
 
         button.Selecting += (s, e) =>
-                           {
-                               selectingCount++;
-                               e.Cancel = true;
-                           };
+                            {
+                                selectingCount++;
+                                e.Cancel = true;
+                            };
 
         me.Flags = pressed;
         button.NewMouseEvent (me);
@@ -686,5 +684,4 @@ public class ButtonTests (ITestOutputHelper output)
 
         button.Dispose ();
     }
-
 }

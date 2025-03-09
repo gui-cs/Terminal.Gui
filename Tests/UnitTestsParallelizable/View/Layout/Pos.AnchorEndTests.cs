@@ -92,7 +92,7 @@ public class PosAnchorEndTests ()
         superView.EndInit ();
 
         // Act
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
 
         // Assert
         Assert.Equal (expectedXPosition, view.Frame.X);
@@ -137,7 +137,7 @@ public class PosAnchorEndTests ()
         superView.EndInit ();
 
         // Act
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
 
         // Assert
         Assert.Equal (expectedXPosition, view.Frame.X);
@@ -163,7 +163,7 @@ public class PosAnchorEndTests ()
         superView.EndInit ();
 
         // Act
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
 
         // Assert
         Assert.Equal (expectedXPosition, view.Frame.X);

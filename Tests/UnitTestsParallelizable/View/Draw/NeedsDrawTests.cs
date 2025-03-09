@@ -187,7 +187,7 @@ public class NeedsDrawTests
     }
 
     [Fact]
-    public void NeedsDraw_True_After_LayoutSubviews ()
+    public void NeedsDraw_True_After_LayoutSubViews ()
     {
         var view = new View { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
         Assert.True (view.NeedsDraw);
@@ -201,7 +201,7 @@ public class NeedsDrawTests
         view.SetRelativeLayout (Application.Screen.Size);
         Assert.True (view.NeedsDraw);
 
-        view.LayoutSubviews ();
+        view.LayoutSubViews ();
         Assert.True (view.NeedsDraw);
     }
 
@@ -220,7 +220,7 @@ public class NeedsDrawTests
         view.SetRelativeLayout (Application.Screen.Size);
         Assert.True (view.NeedsDraw);
 
-        view.LayoutSubviews ();
+        view.LayoutSubViews ();
         Assert.True (view.NeedsDraw);
 
         view.Draw ();

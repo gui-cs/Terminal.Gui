@@ -175,7 +175,7 @@ public class DimTests
                        w.Width = 200;
                        Assert.True (t.NeedsLayout);
                        w.Height = 200;
-                       t.LayoutSubviews ();
+                       t.LayoutSubViews ();
 
                        Assert.Equal ("Absolute(200)", w.Width.ToString ());
                        Assert.Equal ("Absolute(200)", w.Height.ToString ());

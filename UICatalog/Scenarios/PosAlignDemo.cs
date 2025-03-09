@@ -303,7 +303,7 @@ public sealed class PosAlignDemo : Scenario
 
     private void UpdatePosAlignObjects (View superView, Dimension dimension, Aligner aligner)
     {
-        foreach (View view in superView.Subviews.Where (v => dimension == Dimension.Width ? v.X is PosAlign : v.Y is PosAlign))
+        foreach (View view in superView.SubViews.Where (v => dimension == Dimension.Width ? v.X is PosAlign : v.Y is PosAlign))
         {
             if (dimension == Dimension.Width ? view.X is PosAlign : view.Y is PosAlign)
             {

@@ -43,10 +43,12 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
             throw new ArgumentException (@"Invalid newEventArgs", nameof (eventArgs));
         }
 
+#pragma warning disable CS8601 // Possible null reference assignment.
         if (TryGet (eventArgs, out TBinding _))
         {
             throw new InvalidOperationException (@$"A binding for {eventArgs} exists ({binding}).");
         }
+#pragma warning restore CS8601 // Possible null reference assignment.
 
         // IMPORTANT: Add a COPY of the eventArgs. This is needed because ConfigurationManager.Apply uses DeepMemberWiseCopy 
         // IMPORTANT: update the memory referenced by the key, and Dictionary uses caching for performance, and thus 
@@ -208,6 +210,7 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
     /// <param name="newCommands">The set of commands to replace the old ones with.</param>
     public void ReplaceCommands (TEvent eventArgs, params Command [] newCommands)
     {
+#pragma warning disable CS8601 // Possible null reference assignment.
         if (TryGet (eventArgs, out TBinding _))
         {
             Remove (eventArgs);
@@ -217,6 +220,7 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
         {
             Add (eventArgs, newCommands);
         }
+#pragma warning restore CS8601 // Possible null reference assignment.
     }
 
     /// <summary>Removes a <typeparamref name="TEvent"/> from the collection.</summary>

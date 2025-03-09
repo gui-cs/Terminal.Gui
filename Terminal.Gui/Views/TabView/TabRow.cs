@@ -115,7 +115,7 @@ internal class TabRow : View
     }
 
     /// <inheritdoc/>
-    protected override void OnSubviewLayout (LayoutEventArgs args)
+    protected override void OnSubViewLayout (LayoutEventArgs args)
     {
         _host._tabLocations = _host.CalculateViewport (Viewport).ToArray ();
 
@@ -123,7 +123,7 @@ internal class TabRow : View
 
         RenderUnderline ();
 
-        base.OnSubviewLayout (args);
+        base.OnSubViewLayout (args);
     }
 
     /// <inheritdoc />
@@ -765,7 +765,7 @@ internal class TabRow : View
             _leftScrollIndicator.Visible = true;
 
             // Ensures this is clicked instead of the first tab
-            MoveSubviewToEnd (_leftScrollIndicator);
+            MoveSubViewToEnd (_leftScrollIndicator);
         }
         else
         {
@@ -782,7 +782,7 @@ internal class TabRow : View
             _rightScrollIndicator.Visible = true;
 
             // Ensures this is clicked instead of the last tab if under this
-            MoveSubviewToStart (_rightScrollIndicator);
+            MoveSubViewToStart (_rightScrollIndicator);
         }
         else
         {

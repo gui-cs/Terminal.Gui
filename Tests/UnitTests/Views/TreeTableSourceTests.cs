@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using UnitTests;
-using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -294,7 +293,7 @@ public class TreeTableSourceTests : IDisposable
 
         tableView.BeginInit ();
         tableView.EndInit ();
-        tableView.LayoutSubviews ();
+        tableView.LayoutSubViews ();
 
         var top = new Toplevel ();
         top.Add (tableView);

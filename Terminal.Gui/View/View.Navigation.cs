@@ -265,7 +265,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     public event EventHandler? CanFocusChanged;
 
     /// <summary>
-    ///     Focuses the deepest focusable Subview if one exists. If there are no focusable Subviews then the focus is set to
+    ///     Focuses the deepest focusable SubView if one exists. If there are no focusable SubViews then the focus is set to
     ///     the view itself.
     /// </summary>
     /// <param name="direction"></param>
@@ -283,12 +283,12 @@ public partial class View // Focus and cross-view navigation management (TabStop
         return SetFocus ();
     }
 
-    /// <summary>Gets the currently focused Subview or Adornment of this view, or <see langword="null"/> if nothing is focused.</summary>
+    /// <summary>Gets the currently focused SubView or Adornment of this view, or <see langword="null"/> if nothing is focused.</summary>
     public View? Focused
     {
         get
         {
-            View? focused = Subviews.FirstOrDefault (v => v.HasFocus);
+            View? focused = SubViews.FirstOrDefault (v => v.HasFocus);
 
             if (focused is { })
             {
@@ -319,9 +319,9 @@ public partial class View // Focus and cross-view navigation management (TabStop
     public bool IsCurrentTop => Application.Top == this;
 
     /// <summary>
-    ///     Returns the most focused Subview down the subview-hierarchy.
+    ///     Returns the most focused SubView down the subview-hierarchy.
     /// </summary>
-    /// <value>The most focused Subview, or <see langword="null"/> if no Subview is focused.</value>
+    /// <value>The most focused SubView, or <see langword="null"/> if no SubView is focused.</value>
     public View? MostFocused
     {
         get
@@ -589,7 +589,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         if (Arrangement.HasFlag (ViewArrangement.Overlapped))
         {
-            SuperView?.MoveSubviewToEnd (this);
+            SuperView?.MoveSubViewToEnd (this);
         }
 
         // Focus work is done. Notify.
@@ -902,39 +902,39 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <returns></returns>
     internal View [] GetFocusChain (NavigationDirection direction, TabBehavior? behavior)
     {
-        IEnumerable<View>? filteredSubviews;
+        IEnumerable<View>? filteredSubViews;
 
         if (behavior.HasValue)
         {
-            filteredSubviews = _subviews?.Where (v => v.TabStop == behavior && v is { CanFocus: true, Visible: true, Enabled: true });
+            filteredSubViews = InternalSubViews?.Where (v => v.TabStop == behavior && v is { CanFocus: true, Visible: true, Enabled: true });
         }
         else
         {
-            filteredSubviews = _subviews?.Where (v => v is { CanFocus: true, Visible: true, Enabled: true });
+            filteredSubViews = InternalSubViews?.Where (v => v is { CanFocus: true, Visible: true, Enabled: true });
         }
 
         // How about in Adornments? 
         if (Padding is { CanFocus: true, Visible: true, Enabled: true } && Padding.TabStop == behavior)
         {
-            filteredSubviews = filteredSubviews?.Append (Padding);
+            filteredSubViews = filteredSubViews?.Append (Padding);
         }
 
         if (Border is { CanFocus: true, Visible: true, Enabled: true } && Border.TabStop == behavior)
         {
-            filteredSubviews = filteredSubviews?.Append (Border);
+            filteredSubViews = filteredSubViews?.Append (Border);
         }
 
         if (Margin is { CanFocus: true, Visible: true, Enabled: true } && Margin.TabStop == behavior)
         {
-            filteredSubviews = filteredSubviews?.Append (Margin);
+            filteredSubViews = filteredSubViews?.Append (Margin);
         }
 
         if (direction == NavigationDirection.Backward)
         {
-            filteredSubviews = filteredSubviews?.Reverse ();
+            filteredSubViews = filteredSubViews?.Reverse ();
         }
 
-        return filteredSubviews?.ToArray () ?? Array.Empty<View> ();
+        return filteredSubViews?.ToArray () ?? Array.Empty<View> ();
     }
 
     private TabBehavior? _tabStop;

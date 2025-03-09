@@ -182,7 +182,7 @@ public class Bars : Scenario
         {
             eventSource.Add ($"Accepting: {_popoverMenu!.Id}");
             eventLog.MoveDown ();
-            var cbShortcuts = _popoverMenu.Subviews.Where (
+            var cbShortcuts = _popoverMenu.SubViews.Where (
                                                           v =>
                                                           {
                                                               if (v is Shortcut sh)
@@ -200,7 +200,7 @@ public class Bars : Scenario
             }
         }
 
-        foreach (var view in _popoverMenu.Subviews.Where (s => s is Shortcut)!)
+        foreach (var view in _popoverMenu.SubViews.Where (s => s is Shortcut)!)
         {
             var sh = (Shortcut)view;
 
@@ -273,7 +273,7 @@ public class Bars : Scenario
         ConfigStatusBar (bar);
         statusBarLikeExamples.Add (bar);
 
-        foreach (var view in Application.Top.Subviews.Where (f => f is FrameView)!)
+        foreach (var view in Application.Top.SubViews.Where (f => f is FrameView)!)
         {
             var frameView = (FrameView)view;
             frameView.Accepting += (o, args) =>
@@ -283,7 +283,7 @@ public class Bars : Scenario
                                        args.Cancel = true;
                                    };
 
-            foreach (var view1 in frameView.Subviews.Where (b => b is Bar || b is MenuBarv2 || b is Menuv2)!)
+            foreach (var view1 in frameView.SubViews.Where (b => b is Bar || b is MenuBarv2 || b is Menuv2)!)
             {
                 var barView = (Bar)view1;
                 barView.Accepting += (o, args) =>
@@ -307,7 +307,7 @@ public class Bars : Scenario
 
                 }
 
-                foreach (var view2 in barView.Subviews.Where (s => s is Shortcut)!)
+                foreach (var view2 in barView.SubViews.Where (s => s is Shortcut)!)
                 {
                     var sh = (Shortcut)view2;
 

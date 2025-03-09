@@ -357,7 +357,7 @@ public class Wizard : Dialog
         UpdateButtonsAndTitle ();
 
         // Set focus on the contentview
-        newStep?.Subviews.ToArray () [0].SetFocus ();
+        newStep?.SubViews.ToArray () [0].SetFocus ();
 
         if (OnStepChanged (oldStep, _currentStep))
         {
@@ -501,7 +501,7 @@ public class Wizard : Dialog
             step.Height = Dim.Fill (
                                     Dim.Func (
                                               () => IsInitialized
-                                                        ? Subviews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height + 1
+                                                        ? SubViews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height + 1
                                                         : 1)); // for button frame (+1 for lineView)
             step.Width = Dim.Fill ();
         }
@@ -513,7 +513,7 @@ public class Wizard : Dialog
             step.Height = Dim.Fill (
                                     Dim.Func (
                                               () => IsInitialized
-                                                        ? Subviews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height + 1
+                                                        ? SubViews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height + 1
                                                         : 2)); // for button frame (+1 for lineView)
             step.Width = Dim.Fill ();
         }

@@ -38,7 +38,7 @@ public class HexViewTests
         Application.Top.SetFocus ();
 
         // Needed because HexView relies on LayoutComplete to calc sizes
-        hv.LayoutSubviews ();
+        hv.LayoutSubViews ();
 
         Assert.True (Application.RaiseKeyDownEvent (Key.Tab)); // Move to left side
 
@@ -94,7 +94,7 @@ public class HexViewTests
         Application.Top.SetFocus ();
 
         // Needed because HexView relies on LayoutComplete to calc sizes
-        hv.LayoutSubviews ();
+        hv.LayoutSubViews ();
 
         var readBuffer = new byte [hv.Source!.Length];
         hv.Source.Position = 0;
@@ -151,7 +151,7 @@ public class HexViewTests
         Application.Top = new Toplevel ();
         Application.Top.Add (hv);
 
-        Application.Top.LayoutSubviews ();
+        Application.Top.LayoutSubViews ();
 
         Assert.Equal (63, hv.Source!.Length);
         Assert.Equal (20, hv.BytesPerLine);
@@ -189,7 +189,7 @@ public class HexViewTests
         Application.Top = new Toplevel ();
         Application.Top.Add (hv);
 
-        hv.LayoutSubviews ();
+        hv.LayoutSubViews ();
 
         Assert.Equal (126, hv.Source!.Length);
         Assert.Equal (20, hv.BytesPerLine);
@@ -223,7 +223,7 @@ public class HexViewTests
         var hv = new HexView (LoadStream (null, out _, true)) { Width = 20, Height = 20 };
 
         // Needed because HexView relies on LayoutComplete to calc sizes
-        hv.LayoutSubviews ();
+        hv.LayoutSubViews ();
 
         Assert.True (hv.NewKeyDownEvent (Key.D4));
         Assert.True (hv.NewKeyDownEvent (Key.D1));
@@ -242,7 +242,7 @@ public class HexViewTests
         var hv = new HexView (LoadStream (null, out _, true)) { Width = 20, Height = 20 };
 
         // Needed because HexView relies on LayoutComplete to calc sizes
-        hv.LayoutSubviews ();
+        hv.LayoutSubViews ();
 
         KeyValuePair<long, byte> keyValuePair = default;
         hv.Edited += (s, e) => keyValuePair = new (e.Address, e.NewValue);
@@ -270,7 +270,7 @@ public class HexViewTests
         var hv = new HexView (LoadStream (null, out _)) { Width = 20, Height = 10 };
         Application.Top.Add (hv);
 
-        hv.LayoutSubviews ();
+        hv.LayoutSubViews ();
 
         Assert.Equal (MEM_STRING_LENGTH, hv.Source!.Length);
         Assert.Equal (0, hv.Address);
@@ -325,7 +325,7 @@ public class HexViewTests
         Application.Top = new Toplevel ();
         Application.Top.Add (hv);
 
-        Application.Top.LayoutSubviews ();
+        Application.Top.LayoutSubViews ();
 
         HexViewEventArgs hexViewEventArgs = null!;
         hv.PositionChanged += (s, e) => hexViewEventArgs = e;

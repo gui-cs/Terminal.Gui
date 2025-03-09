@@ -350,9 +350,8 @@ public partial class DimAutoTests (ITestOutputHelper output)
         superView.Add (subView);
 
         subView.Width = 10;
-        superView.Add (subView);
         superView.SetRelativeLayout (new (10, 10));
-        superView.LayoutSubviews (); // no throw
+        superView.LayoutSubViews (); // no throw
 
         subView.Width = Fill ();
         superView.SetRelativeLayout (new (0, 0));
@@ -379,7 +378,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
         subView.X = 0;
         subView.Y = 0;
         superView.SetRelativeLayout (new (0, 0));
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
     }
 
     // Test validation
@@ -415,7 +414,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
         superView.BeginInit ();
         superView.EndInit ();
         superView.SetRelativeLayout (new (0, 0));
-        superView.LayoutSubviews (); // no throw
+        superView.LayoutSubViews (); // no throw
 
         subView.Height = Fill () + 3;
         superView.SetRelativeLayout (new (0, 0));
@@ -470,15 +469,15 @@ public partial class DimAutoTests (ITestOutputHelper output)
         superView.BeginInit ();
         superView.EndInit ();
         superView.SetRelativeLayout (new (0, 0));
-        superView.LayoutSubviews (); // no throw
+        superView.LayoutSubViews (); // no throw
 
         subView.X = Pos.Right (subView2);
         superView.SetRelativeLayout (new (0, 0));
-        superView.LayoutSubviews (); // no throw
+        superView.LayoutSubViews (); // no throw
 
         subView.X = Pos.Right (subView2) + 3;
         superView.SetRelativeLayout (new (0, 0)); // no throw
-        superView.LayoutSubviews (); // no throw
+        superView.LayoutSubViews (); // no throw
 
         subView.X = new PosCombine (AddOrSubtract.Add, Pos.Right (subView2), new PosCombine (AddOrSubtract.Add, 7, 9));
         superView.SetRelativeLayout (new (0, 0)); // no throw
@@ -584,7 +583,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
     [InlineData (1, 10, 10)]
     [InlineData (9, 10, 10)]
     [InlineData (10, 10, 10)]
-    public void Width_Auto_Subviews_Does_Not_Constrain_To_SuperView (int subX, int subSubViewWidth, int expectedSubWidth)
+    public void Width_Auto_SubViews_Does_Not_Constrain_To_SuperView (int subX, int subSubViewWidth, int expectedSubWidth)
     {
         var superView = new View
         {
@@ -620,7 +619,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
         superView.EndInit ();
         superView.SetRelativeLayout (superView.GetContentSize ());
 
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
         Assert.Equal (expectedSubWidth, subView.Frame.Width);
     }
 
@@ -660,7 +659,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
         superView.EndInit ();
         superView.SetRelativeLayout (superView.GetContentSize ());
 
-        superView.LayoutSubviews ();
+        superView.LayoutSubViews ();
         Assert.Equal (expectedSubWidth, subView.Frame.Width);
     }
 
@@ -942,7 +941,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void DimAutoStyle_Content_IgnoresSubviews_When_ContentSize_Is_Set ()
+    public void DimAutoStyle_Content_IgnoresSubViews_When_ContentSize_Is_Set ()
     {
         var view = new View ();
 
@@ -967,11 +966,11 @@ public partial class DimAutoTests (ITestOutputHelper output)
 
         int calculatedWidth = dim.Calculate (0, 100, view, Dimension.Width);
 
-        Assert.Equal (0, calculatedWidth); // Assuming 0 is the default when no ContentSize or Subviews are set
+        Assert.Equal (0, calculatedWidth); // Assuming 0 is the default when no ContentSize or SubViews are set
     }
 
     [Fact]
-    public void DimAutoStyle_Content_UsesLargestSubview_WhenContentSizeNotSet ()
+    public void DimAutoStyle_Content_UsesLargestSubView_WhenContentSizeNotSet ()
     {
         var view = new View { Id = "view" };
         view.Add (new View { Id = "smaller", Frame = new (0, 0, 5, 5) }); // Smaller subview
@@ -985,7 +984,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void DimAutoStyle_Content_UsesContentSize_If_No_Subviews ()
+    public void DimAutoStyle_Content_UsesContentSize_If_No_SubViews ()
     {
         DimAutoTestView view = new (Auto (DimAutoStyle.Content), Auto (DimAutoStyle.Content));
         view.SetContentSize (new (5, 5));

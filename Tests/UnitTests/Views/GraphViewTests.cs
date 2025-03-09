@@ -1,7 +1,5 @@
 ﻿using System.Text;
 using UnitTests;
-using Terminal.Gui.ViewMouseTests;
-using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -466,7 +464,7 @@ public class SeriesTests
                                     );
         gv.Series.Add (series);
 
-        gv.LayoutSubviews ();
+        gv.LayoutSubViews ();
         gv.Draw ();
         Assert.Equal (new RectangleF (0, 0, 50, 30), fullGraphBounds);
         Assert.Equal (new Rectangle (0, 0, 50, 30), graphScreenBounds);
@@ -479,7 +477,7 @@ public class SeriesTests
 
         // Even with a margin the graph should be drawn from 
         // the origin, we just get less visible width/height
-        gv.LayoutSubviews ();
+        gv.LayoutSubViews ();
         gv.SetNeedsDraw ();
         gv.Draw ();
         Assert.Equal (new RectangleF (0, 0, 45, 28), fullGraphBounds);
@@ -523,7 +521,7 @@ public class SeriesTests
 
         gv.Series.Add (series);
 
-        gv.LayoutSubviews ();
+        gv.LayoutSubViews ();
         gv.Draw ();
 
         // Since each cell of the console is 2x5 of graph space the graph
@@ -538,7 +536,7 @@ public class SeriesTests
 
         // Even with a margin the graph should be drawn from 
         // the origin, we just get less visible width/height
-        gv.LayoutSubviews ();
+        gv.LayoutSubViews ();
         gv.SetNeedsDraw ();
         gv.Draw ();
         Assert.Equal (new RectangleF (0, 0, 90, 140), fullGraphBounds);
@@ -668,7 +666,7 @@ public class MultiBarSeriesTests
         gv.AxisX = fakeXAxis = new FakeHAxis { Increment = 0 };
         gv.AxisY = new FakeVAxis { Increment = 0 };
 
-        gv.LayoutSubviews ();
+        gv.LayoutSubViews ();
         gv.Draw ();
 
         // Since bar series has no bars yet no labels should be displayed
@@ -676,7 +674,7 @@ public class MultiBarSeriesTests
 
         multibarSeries.AddBars ("hey", (Rune)'M', 0.5001f, 0.5001f);
         fakeXAxis.LabelPoints.Clear ();
-        gv.LayoutSubviews ();
+        gv.LayoutSubViews ();
         gv.SetNeedsDraw ();
         gv.Draw ();
 
@@ -685,7 +683,7 @@ public class MultiBarSeriesTests
         multibarSeries.AddBars ("there", (Rune)'M', 0.24999f, 0.74999f);
         multibarSeries.AddBars ("bob", (Rune)'M', 1, 2);
         fakeXAxis.LabelPoints.Clear ();
-        gv.LayoutSubviews ();
+        gv.LayoutSubViews ();
         gv.SetNeedsDraw ();
         View.SetClipToScreen ();
         gv.Draw ();
@@ -945,7 +943,7 @@ public class AxisTests
     public void TestHAxisLocation_NoMargin ()
     {
         GraphView gv = GetGraph (out FakeHAxis axis);
-        gv.LayoutSubviews ();
+        gv.LayoutSubViews ();
         gv.Draw ();
 
         Assert.DoesNotContain (new Point (-1, 29), axis.DrawAxisLinePoints);
@@ -969,7 +967,7 @@ public class AxisTests
         GraphView gv = GetGraph (out FakeHAxis axis);
 
         gv.MarginBottom = 10;
-        gv.LayoutSubviews ();
+        gv.LayoutSubViews ();
         gv.Draw ();
 
         Assert.DoesNotContain (new Point (-1, 19), axis.DrawAxisLinePoints);
@@ -993,7 +991,7 @@ public class AxisTests
         GraphView gv = GetGraph (out FakeHAxis axis);
 
         gv.MarginLeft = 5;
-        gv.LayoutSubviews ();
+        gv.LayoutSubViews ();
         gv.Draw ();
 
         Assert.DoesNotContain (new Point (4, 29), axis.DrawAxisLinePoints);
@@ -1022,7 +1020,7 @@ public class AxisTests
     {
         GraphView gv = GetGraph (out FakeVAxis axis);
 
-        gv.LayoutSubviews ();
+        gv.LayoutSubViews ();
         gv.Draw ();
 
         Assert.DoesNotContain (new Point (0, -1), axis.DrawAxisLinePoints);
@@ -1046,7 +1044,7 @@ public class AxisTests
         GraphView gv = GetGraph (out FakeVAxis axis);
 
         gv.MarginBottom = 10;
-        gv.LayoutSubviews ();
+        gv.LayoutSubViews ();
         gv.Draw ();
 
         Assert.DoesNotContain (new Point (0, -1), axis.DrawAxisLinePoints);
@@ -1071,7 +1069,7 @@ public class AxisTests
         GraphView gv = GetGraph (out FakeVAxis axis);
 
         gv.MarginLeft = 5;
-        gv.LayoutSubviews ();
+        gv.LayoutSubViews ();
         gv.Draw ();
 
         Assert.DoesNotContain (new Point (5, -1), axis.DrawAxisLinePoints);
@@ -1114,7 +1112,7 @@ public class TextAnnotationTests
         var points = new ScatterSeries ();
         points.Points.Add (new PointF (7, 2));
         gv.Series.Add (points);
-        gv.LayoutSubviews ();
+        gv.LayoutSubViews ();
         gv.Draw ();
 
         var expected =
@@ -1140,7 +1138,7 @@ public class TextAnnotationTests
                             new TextAnnotation { Text = "hey!", GraphPosition = new PointF (2, 2) }
                            );
 
-        gv.LayoutSubviews ();
+        gv.LayoutSubViews ();
         gv.Draw ();
 
         var expected =
@@ -1189,7 +1187,7 @@ public class TextAnnotationTests
                             }
                            );
 
-        gv.LayoutSubviews ();
+        gv.LayoutSubViews ();
         gv.SetNeedsDraw ();
         gv.Draw ();
 
@@ -1223,7 +1221,7 @@ public class TextAnnotationTests
                             }
                            );
 
-        gv.LayoutSubviews ();
+        gv.LayoutSubViews ();
         gv.Draw ();
 
         // Text is off the screen (graph x axis runs to 8 not 9)
@@ -1249,7 +1247,7 @@ public class TextAnnotationTests
         gv.Annotations.Add (
                             new TextAnnotation { Text = "hey!", ScreenPosition = new Point (3, 1) }
                            );
-        gv.LayoutSubviews ();
+        gv.LayoutSubViews ();
         View.SetClipToScreen ();
         gv.Draw ();
 
@@ -1403,7 +1401,7 @@ public class PathAnnotationTests
                        new ScatterSeries { Points = { new PointF (1, 1), new PointF (5, 0) } }
                       );
 
-        gv.LayoutSubviews ();
+        gv.LayoutSubViews ();
         gv.Draw ();
 
         var expected =
@@ -1428,7 +1426,7 @@ public class PathAnnotationTests
                        new ScatterSeries { Points = { new PointF (1, 1), new PointF (5, 0) } }
                       );
 
-        gv.LayoutSubviews ();
+        gv.LayoutSubViews ();
         gv.Draw ();
 
         var expected =
@@ -1458,7 +1456,7 @@ public class PathAnnotationTests
         path.Points.Add (new PointF (1, 1));
 
         gv.Annotations.Add (path);
-        gv.LayoutSubviews ();
+        gv.LayoutSubViews ();
         gv.Draw ();
 
         var expected =
@@ -1491,7 +1489,7 @@ public class PathAnnotationTests
 
         gv.Annotations.Add (path);
 
-        gv.LayoutSubviews ();
+        gv.LayoutSubViews ();
         gv.Draw ();
 
         var expected =
@@ -1586,7 +1584,7 @@ public class PathAnnotationTests
         gv.MarginLeft = 3;
         gv.MarginBottom = 1;
 
-        gv.LayoutSubviews ();
+        gv.LayoutSubViews ();
         gv.SetNeedsDraw ();
         gv.Draw ();
 
@@ -1625,7 +1623,7 @@ public class PathAnnotationTests
         gv.MarginBottom = 3;
         gv.MarginLeft = 1;
 
-        gv.LayoutSubviews ();
+        gv.LayoutSubViews ();
         gv.SetNeedsDraw ();
         gv.Draw ();
 

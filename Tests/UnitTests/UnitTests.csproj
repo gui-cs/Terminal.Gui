@@ -60,7 +60,6 @@
 	<ItemGroup>
 		<Folder Include="Input\Keyboard\" />
 		<Folder Include="Input\Mouse\" />
-		<Folder Include="View\Orientation\" />
 	</ItemGroup>
 	<PropertyGroup Label="FineCodeCoverage">
 		<Enabled>

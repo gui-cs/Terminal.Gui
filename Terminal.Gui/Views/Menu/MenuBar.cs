@@ -84,7 +84,7 @@ public class MenuBar : View, IDesignable
         WantMousePositionReports = true;
         IsMenuOpen = false;
 
-        Added += MenuBar_Added;
+        SuperViewChanged += MenuBar_SuperViewChanged;
 
         // Things this view knows how to do
         AddCommand (
@@ -559,7 +559,7 @@ public class MenuBar : View, IDesignable
         if (Application.Top is { })
         {
             // Close others menu bar opened
-            Menu? menu = Application.Top.Subviews.FirstOrDefault (v => v is Menu m && m.Host != this && m.Host.IsMenuOpen) as Menu;
+            Menu? menu = Application.Top.SubViews.FirstOrDefault (v => v is Menu m && m.Host != this && m.Host.IsMenuOpen) as Menu;
             menu?.Host.CleanUp ();
         }
     }
@@ -1157,10 +1157,10 @@ public class MenuBar : View, IDesignable
         return new (-2, 0);
     }
 
-    private void MenuBar_Added (object? sender, SuperViewChangedEventArgs e)
+    private void MenuBar_SuperViewChanged (object? sender, SuperViewChangedEventArgs _)
     {
         _initialCanFocus = CanFocus;
-        Added -= MenuBar_Added;
+        SuperViewChanged -= MenuBar_SuperViewChanged;
     }
 
     private void MoveLeft ()

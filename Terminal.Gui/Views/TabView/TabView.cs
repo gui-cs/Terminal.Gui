@@ -160,7 +160,7 @@ public class TabView : View
 
     private void ContainerViewCanFocus (object sender, EventArgs eventArgs)
     {
-        _containerView.CanFocus = _containerView.Subviews.Count (v => v.CanFocus) > 0;
+        _containerView.CanFocus = _containerView.SubViews.Count (v => v.CanFocus) > 0;
     }
 
     private TabStyle _style = new ();

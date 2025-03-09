@@ -250,7 +250,7 @@ public class ExpanderButton : Button
             }
         }
 
-        foreach (View subview in superView.Subviews)
+        foreach (View subview in superView.SubViews)
         {
             subview.Visible = !Collapsed;
         }

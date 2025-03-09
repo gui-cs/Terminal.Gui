@@ -241,14 +241,14 @@ public class ProgressBarStyles : Scenario
 
         _pbList.SetSource (
                           new ObservableCollection<string> (
-                                                            container.Subviews.Where (v => v.GetType () == typeof (ProgressBar))
+                                                            container.SubViews.Where (v => v.GetType () == typeof (ProgressBar))
                                                                      .Select (v => v.Title)
                                                                      .ToList ())
                          );
 
         _pbList.SelectedItemChanged += (sender, e) =>
                                       {
-                                          editor.ViewToEdit = container.Subviews.First (
+                                          editor.ViewToEdit = container.SubViews.First (
                                                                                         v =>
                                                                                             v.GetType () == typeof (ProgressBar)
                                                                                             && v.Title == (string)e.Value

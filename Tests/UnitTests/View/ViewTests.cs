@@ -1,6 +1,3 @@
-using System.ComponentModel;
-using System.Text;
-using UnitTests;
 using UnitTests;
 using Xunit.Abstractions;
 
@@ -8,11 +5,11 @@ namespace Terminal.Gui.ViewTests;
 
 public class ViewTests
 {
-    private ITestOutputHelper _output;
+    private readonly ITestOutputHelper _output;
 
     public ViewTests (ITestOutputHelper output)
     {
-        output = output;
+        _output = output;
 #if DEBUG_IDISPOSABLE
         View.DebugIDisposable = true;
 #endif
@@ -38,6 +35,7 @@ public class ViewTests
     public void Disposing_Event_Notify_All_Subscribers_On_The_First_Container ()
     {
 #if DEBUG_IDISPOSABLE
+
         // Only clear before because need to test after assert
         View.Instances.Clear ();
 #endif
@@ -46,28 +44,22 @@ public class ViewTests
         var count = 0;
 
         var view = new View { Id = "View" };
-        view.Disposing += View_Disposing;
+        view.Disposing += ViewDisposing;
         container1.Add (view);
         Assert.Equal (container1, view.SuperView);
 
-        void View_Disposing (object sender, EventArgs e)
-        {
-            count++;
-            Assert.Equal (view, sender);
-            container1.Remove ((View)sender);
-        }
-
-        Assert.Single (container1.Subviews);
+        Assert.Single (container1.SubViews);
 
         var container2 = new View { Id = "Container2" };
 
+        // BUGBUG: It's not legit to add a View to two SuperViews
         container2.Add (view);
         Assert.Equal (container2, view.SuperView);
-        Assert.Equal (container1.Subviews.Count, container2.Subviews.Count);
+        Assert.Equal (container1.SubViews.Count, container2.SubViews.Count);
         container2.Dispose ();
 
-        Assert.Empty (container1.Subviews);
-        Assert.Empty (container2.Subviews);
+        Assert.Empty (container1.SubViews);
+        Assert.Empty (container2.SubViews);
         Assert.Equal (1, count);
         Assert.Null (view.SuperView);
 
@@ -76,12 +68,22 @@ public class ViewTests
 #if DEBUG_IDISPOSABLE
         Assert.Empty (View.Instances);
 #endif
+
+        return;
+
+        void ViewDisposing (object sender, EventArgs e)
+        {
+            count++;
+            Assert.Equal (view, sender);
+            container1.Remove ((View)sender);
+        }
     }
 
     [Fact]
     public void Disposing_Event_Notify_All_Subscribers_On_The_Second_Container ()
     {
 #if DEBUG_IDISPOSABLE
+
         // Only clear before because need to test after assert
         View.Instances.Clear ();
 #endif
@@ -91,12 +93,13 @@ public class ViewTests
         var view = new View { Id = "View" };
         container1.Add (view);
         Assert.Equal (container1, view.SuperView);
-        Assert.Single (container1.Subviews);
+        Assert.Single (container1.SubViews);
 
         var container2 = new View { Id = "Container2" };
         var count = 0;
 
         view.Disposing += View_Disposing;
+        // BUGBUG: It's not legit to add a View to two SuperViews
         container2.Add (view);
         Assert.Equal (container2, view.SuperView);
 
@@ -107,11 +110,11 @@ public class ViewTests
             container2.Remove ((View)sender);
         }
 
-        Assert.Equal (container1.Subviews.Count, container2.Subviews.Count);
+        Assert.Equal (container1.SubViews.Count, container2.SubViews.Count);
         container1.Dispose ();
 
-        Assert.Empty (container1.Subviews);
-        Assert.Empty (container2.Subviews);
+        Assert.Empty (container1.SubViews);
+        Assert.Empty (container2.SubViews);
         Assert.Equal (1, count);
         Assert.Null (view.SuperView);
 
@@ -121,7 +124,6 @@ public class ViewTests
         Assert.Empty (View.Instances);
 #endif
     }
-
 
     [Fact]
     public void Not_Notifying_Dispose ()
@@ -136,28 +138,29 @@ public class ViewTests
         container1.Add (view);
         Assert.Equal (container1, view.SuperView);
 
-        Assert.Single (container1.Subviews);
+        Assert.Single (container1.SubViews);
 
         var container2 = new View { Id = "Container2" };
 
+        // BUGBUG: It's not legit to add a View to two SuperViews
         container2.Add (view);
         Assert.Equal (container2, view.SuperView);
-        Assert.Equal (container1.Subviews.Count, container2.Subviews.Count);
+        Assert.Equal (container1.SubViews.Count, container2.SubViews.Count);
         container1.Dispose ();
 
-        Assert.Empty (container1.Subviews);
-        Assert.NotEmpty (container2.Subviews);
-        Assert.Single (container2.Subviews);
+        Assert.Empty (container1.SubViews);
+        Assert.NotEmpty (container2.SubViews);
+        Assert.Single (container2.SubViews);
         Assert.Null (view.SuperView);
 
         // Trying access disposed properties
 #if DEBUG_IDISPOSABLE
-        Assert.True (container2.Subviews [0].WasDisposed);
+        Assert.True (container2.SubViews.ElementAt (0).WasDisposed);
 #endif
-        Assert.False (container2.Subviews [0].CanFocus);
-        Assert.Null (container2.Subviews [0].Margin);
-        Assert.Null (container2.Subviews [0].Border);
-        Assert.Null (container2.Subviews [0].Padding);
+        Assert.False (container2.SubViews.ElementAt (0).CanFocus);
+        Assert.Null (container2.SubViews.ElementAt (0).Margin);
+        Assert.Null (container2.SubViews.ElementAt (0).Border);
+        Assert.Null (container2.SubViews.ElementAt (0).Padding);
         Assert.Null (view.SuperView);
 
         container2.Dispose ();
@@ -185,15 +188,13 @@ public class ViewTests
         Assert.Null (view.Border);
         Assert.Null (view.Padding);
     }
-    
+
     [Fact]
     public void Internal_Tests ()
     {
         var rect = new Rectangle (1, 1, 10, 1);
         var view = new View { Frame = rect };
     }
-
-
 
     [Fact]
     [TestRespondersDisposed]
@@ -218,7 +219,7 @@ public class ViewTests
         Assert.Equal (0, r.Y);
         Assert.False (r.IsCurrentTop);
         Assert.Empty (r.Id);
-        Assert.Empty (r.Subviews);
+        Assert.Empty (r.SubViews);
         Assert.False (r.WantContinuousButtonPressed);
         Assert.False (r.WantMousePositionReports);
         Assert.Null (r.SuperView);
@@ -242,7 +243,7 @@ public class ViewTests
         Assert.Equal (0, r.Y);
         Assert.False (r.IsCurrentTop);
         Assert.Empty (r.Id);
-        Assert.Empty (r.Subviews);
+        Assert.Empty (r.SubViews);
         Assert.False (r.WantContinuousButtonPressed);
         Assert.False (r.WantMousePositionReports);
         Assert.Null (r.SuperView);
@@ -266,7 +267,7 @@ public class ViewTests
         Assert.Equal (2, r.Y);
         Assert.False (r.IsCurrentTop);
         Assert.Empty (r.Id);
-        Assert.Empty (r.Subviews);
+        Assert.Empty (r.SubViews);
         Assert.False (r.WantContinuousButtonPressed);
         Assert.False (r.WantMousePositionReports);
         Assert.Null (r.SuperView);
@@ -299,7 +300,7 @@ public class ViewTests
 #else
         Assert.Equal (string.Empty, r.Id);
 #endif
-        Assert.Empty (r.Subviews);
+        Assert.Empty (r.SubViews);
         Assert.False (r.WantContinuousButtonPressed);
         Assert.False (r.WantMousePositionReports);
         Assert.Null (r.SuperView);
@@ -342,7 +343,7 @@ public class ViewTests
 
         v.BeginInit ();
         v.EndInit ();
-        v.LayoutSubviews ();
+        v.LayoutSubViews ();
         v.Draw ();
 
         var looksLike =
@@ -368,7 +369,7 @@ public class ViewTests
         super.Add (view);
         super.BeginInit ();
         super.EndInit ();
-        super.LayoutSubviews ();
+        super.LayoutSubViews ();
 
         Assert.Equal (1, view.X);
         Assert.Equal (2, view.Y);
@@ -379,7 +380,7 @@ public class ViewTests
         Assert.False (view.Viewport.IsEmpty);
         Assert.Equal (new (0, 0, 3, 4), view.Viewport);
 
-        view.LayoutSubviews ();
+        view.LayoutSubViews ();
 
         Assert.Equal (1, view.X);
         Assert.Equal (2, view.Y);
@@ -423,7 +424,7 @@ public class ViewTests
         super.Add (view);
         super.BeginInit ();
         super.EndInit ();
-        super.LayoutSubviews ();
+        super.LayoutSubViews ();
         Assert.Equal (1, view.X);
         Assert.Equal (2, view.Y);
         Assert.Equal (3, view.Width);
@@ -457,15 +458,15 @@ public class ViewTests
         ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
 ┌────────────────────────────┐
 │Testing visibility.         │
 │                            │
 │                            │
 └────────────────────────────┘
 ",
-                                                      _output
-                                                     );
+                                                       _output
+                                                      );
 
         view.Visible = false;
 
@@ -473,22 +474,22 @@ public class ViewTests
         Application.RunIteration (ref rs, firstIteration);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
 ┌────────────────────────────┐
 │                            │
 │                            │
 │                            │
 └────────────────────────────┘
 ",
-                                                      _output
-                                                     );
+                                                       _output
+                                                      );
         Application.End (rs);
         top.Dispose ();
     }
 
     [Fact]
     [AutoInitShutdown]
-    public void Visible_Sets_Also_Sets_Subviews ()
+    public void Visible_Sets_Also_Sets_SubViews ()
     {
         var button = new Button { Text = "Click Me" };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };

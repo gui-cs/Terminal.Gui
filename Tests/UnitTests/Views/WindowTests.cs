@@ -1,14 +1,10 @@
 using UnitTests;
-using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class WindowTests
+public class WindowTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-    public WindowTests (ITestOutputHelper output) { _output = output; }
-
     [Fact]
     [AutoInitShutdown]
     public void Activating_MenuBar_By_Alt_Key_Does_Not_Throw ()
@@ -69,7 +65,7 @@ public class WindowTests
 │└────────────────┘│
 │                  │
 └──────────────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         ((FakeDriver)Application.Driver!).SetBufferSize (40, 20);
@@ -96,7 +92,7 @@ public class WindowTests
 │└────────────────────────────────────┘│
 │                                      │
 └──────────────────────────────────────┘",
-                                                      _output
+                                                      output
                                                      );
 
         ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
@@ -113,7 +109,7 @@ public class WindowTests
 │└────────────────┘│
 │                  │
 └──────────────────┘",
-                                                      _output
+                                                      output
                                                      );
         top.Dispose ();
     }

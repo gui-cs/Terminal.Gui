@@ -311,7 +311,7 @@ public class AllViewsTester : Scenario
         }
 
         view.Initialized += CurrentView_Initialized;
-        view.SubviewsLaidOut += CurrentView_LayoutComplete;
+        view.SubViewsLaidOut += CurrentView_LayoutComplete;
 
         view.Id = "_curView";
         _curView = view;
@@ -329,7 +329,7 @@ public class AllViewsTester : Scenario
         if (_curView != null)
         {
             _curView.Initialized -= CurrentView_Initialized;
-            _curView.SubviewsLaidOut -= CurrentView_LayoutComplete;
+            _curView.SubViewsLaidOut -= CurrentView_LayoutComplete;
             _hostPane!.Remove (_curView);
             _layoutEditor!.ViewToEdit = null;
             _viewportSettingsEditor!.ViewToEdit = null;

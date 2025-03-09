@@ -33,7 +33,7 @@ public class ApplicationNavigation
     }
 
     /// <summary>
-    ///     Gets whether <paramref name="view"/> is in the Subview hierarchy of <paramref name="start"/>.
+    ///     Gets whether <paramref name="view"/> is in the SubView hierarchy of <paramref name="start"/>.
     /// </summary>
     /// <param name="start"></param>
     /// <param name="view"></param>
@@ -50,7 +50,7 @@ public class ApplicationNavigation
             return true;
         }
 
-        foreach (View subView in start.Subviews)
+        foreach (View subView in start.SubViews)
         {
             if (view == subView)
             {

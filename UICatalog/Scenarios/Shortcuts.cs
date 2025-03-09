@@ -75,7 +75,7 @@ public class Shortcuts : Scenario
                 eventLog.MoveDown ();
 
                 var max = 0;
-                IEnumerable<View> toAlign = Application.Top.Subviews.Where (v => v is Shortcut { Width: not DimAbsolute });
+                IEnumerable<View> toAlign = Application.Top.SubViews.Where (v => v is Shortcut { Width: not DimAbsolute });
                 IEnumerable<View> enumerable = toAlign as View [] ?? toAlign.ToArray ();
 
                 if (e.NewValue == CheckState.Checked)
@@ -122,7 +122,7 @@ public class Shortcuts : Scenario
                                                                                  eventSource.Add ($"{commandFirstShortcut.Id}.CommandView.CheckedStateChanging: {cb.Text}");
                                                                                  eventLog.MoveDown ();
 
-                                                                                 IEnumerable<View> toAlign = Application.Top.Subviews.Where (v => v is Shortcut { Width: not DimAbsolute });
+                                                                                 IEnumerable<View> toAlign = Application.Top.SubViews.Where (v => v is Shortcut { Width: not DimAbsolute });
                                                                                  IEnumerable<View> enumerable = toAlign as View [] ?? toAlign.ToArray ();
 
                                                                                  foreach (var view in enumerable)
@@ -161,7 +161,7 @@ public class Shortcuts : Scenario
                 eventLog.MoveDown ();
                 //cb.CanFocus = e.NewValue == CheckState.Checked;
 
-                foreach (Shortcut peer in Application.Top.Subviews.Where (v => v is Shortcut)!)
+                foreach (Shortcut peer in Application.Top.SubViews.Where (v => v is Shortcut)!)
                 {
                     if (peer.CanFocus)
                     {
@@ -463,7 +463,7 @@ public class Shortcuts : Scenario
 
         Application.Top.Add (appQuitShortcut);
 
-        foreach (View sh in Application.Top.Subviews.Where (v => v is Shortcut)!)
+        foreach (View sh in Application.Top.SubViews.Where (v => v is Shortcut)!)
         {
             if (sh is Shortcut shortcut)
             {

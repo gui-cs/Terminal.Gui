@@ -1,10 +1,10 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     The Label <see cref="View"/> displays text that describes the View next in the <see cref="View.Subviews"/>. When
+///     The Label <see cref="View"/> displays text that describes the View next in the <see cref="View.SubViews"/>. When
 ///     Label
 ///     receives a <see cref="Command.HotKey"/> command it will pass it to the next <see cref="View"/> in
-///     <see cref="View.Subviews"/>.
+///     <see cref="View.SubViews"/>.
 /// </summary>
 /// <remarks>
 ///     <para>
@@ -13,7 +13,7 @@
 ///     <para>
 ///         If <see cref="View.CanFocus"/> is <see langword="false"/> and the use clicks on the Label,
 ///         the <see cref="Command.HotKey"/> will be invoked on the next <see cref="View"/> in
-///         <see cref="View.Subviews"/>.
+///         <see cref="View.SubViews"/>.
 ///     </para>
 /// </remarks>
 public class Label : View, IDesignable
@@ -75,12 +75,12 @@ public class Label : View, IDesignable
 
         if (HotKey.IsValid)
         {
-            int me = SuperView?.Subviews.IndexOf (this) ?? -1;
+            int me = SuperView?.SubViews.IndexOf (this) ?? -1;
 
-            if (me != -1 && me < SuperView?.Subviews.Count - 1)
+            if (me != -1 && me < SuperView?.SubViews.Count - 1)
             {
 
-                return SuperView?.Subviews [me + 1].InvokeCommand (Command.HotKey) == true;
+                return SuperView?.SubViews.ElementAt (me + 1).InvokeCommand (Command.HotKey) == true;
             }
         }
 

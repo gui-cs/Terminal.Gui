@@ -79,7 +79,7 @@ public class ViewportTests (ITestOutputHelper output)
         superView.Add (view);
         superSuperView.BeginInit ();
         superSuperView.EndInit ();
-        superSuperView.LayoutSubviews ();
+        superSuperView.LayoutSubViews ();
 
         // Act
         var bounds = view.Viewport;
@@ -138,7 +138,7 @@ public class ViewportTests (ITestOutputHelper output)
         superView.Add (view);
         superSuperView.BeginInit ();
         superSuperView.EndInit ();
-        superSuperView.LayoutSubviews ();
+        superSuperView.LayoutSubViews ();
 
         // Act
         var bounds = view.Viewport;

@@ -1,12 +1,11 @@
 ﻿using UnitTests;
-using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
-public class VisibleTests () : TestsAllViews
+public class EnabledTests : TestsAllViews
 {
     [Fact]
-    public void Visible_False_Leaves ()
+    public void Enabled_False_Leaves ()
     {
         var view = new View
         {
@@ -17,12 +16,12 @@ public class VisibleTests () : TestsAllViews
         view.SetFocus ();
         Assert.True (view.HasFocus);
 
-        view.Visible = false;
+        view.Enabled = false;
         Assert.False (view.HasFocus);
     }
 
     [Fact]
-    public void Visible_False_Leaves_Subview ()
+    public void Enabled_False_Leaves_SubView ()
     {
         var view = new View
         {
@@ -43,13 +42,13 @@ public class VisibleTests () : TestsAllViews
         Assert.True (subView.HasFocus);
         Assert.Equal (subView, view.Focused);
 
-        view.Visible = false;
+        view.Enabled = false;
         Assert.False (view.HasFocus);
         Assert.False (subView.HasFocus);
     }
 
     [Fact]
-    public void Visible_False_Leaves_Subview2 ()
+    public void Enabled_False_Leaves_SubView2 ()
     {
         var view = new Window
         {
@@ -70,13 +69,13 @@ public class VisibleTests () : TestsAllViews
         Assert.True (subView.HasFocus);
         Assert.Equal (subView, view.Focused);
 
-        view.Visible = false;
+        view.Enabled = false;
         Assert.False (view.HasFocus);
         Assert.False (subView.HasFocus);
     }
 
     [Fact]
-    public void Visible_False_On_Subview_Leaves_Just_Subview ()
+    public void Enabled_False_On_SubView_Leaves_Just_SubView ()
     {
         var view = new View
         {
@@ -97,13 +96,13 @@ public class VisibleTests () : TestsAllViews
         Assert.True (subView.HasFocus);
         Assert.Equal (subView, view.Focused);
 
-        subView.Visible = false;
+        subView.Enabled = false;
         Assert.True (view.HasFocus);
         Assert.False (subView.HasFocus);
     }
 
     [Fact]
-    public void Visible_False_Focuses_Deepest_Focusable_Subview ()
+    public void Enabled_False_Focuses_Deepest_Focusable_SubView ()
     {
         var view = new View
         {
@@ -143,7 +142,7 @@ public class VisibleTests () : TestsAllViews
         Assert.Equal (subView, view.Focused);
         Assert.Equal (subViewSubView2, subView.Focused);
 
-        subViewSubView2.Visible = false;
+        subViewSubView2.Enabled = false;
         Assert.True (subView.HasFocus);
         Assert.Equal (subView, view.Focused);
         Assert.Equal (subViewSubView3, subView.Focused);
@@ -151,13 +150,13 @@ public class VisibleTests () : TestsAllViews
     }
 
     [Fact]
-    public void Visible_True_Subview_Focuses_SubView ()
+    public void Enabled_True_SubView_Focuses_SubView ()
     {
         var view = new View
         {
             Id = "view",
             CanFocus = true,
-            Visible = false
+            Enabled = false
         };
 
         var subView = new View
@@ -172,13 +171,13 @@ public class VisibleTests () : TestsAllViews
         Assert.False (view.HasFocus);
         Assert.False (subView.HasFocus);
 
-        view.Visible = true;
+        view.Enabled = true;
         Assert.True (view.HasFocus);
         Assert.True (subView.HasFocus);
     }
 
     [Fact]
-    public void Visible_True_On_Subview_Focuses ()
+    public void Enabled_True_On_SubView_Focuses ()
     {
         var view = new View
         {
@@ -190,7 +189,7 @@ public class VisibleTests () : TestsAllViews
         {
             Id = "subView",
             CanFocus = true,
-            Visible = false
+            Enabled = false
         };
 
         view.Add (subView);
@@ -199,13 +198,13 @@ public class VisibleTests () : TestsAllViews
         Assert.True (view.HasFocus);
         Assert.False (subView.HasFocus);
 
-        subView.Visible = true;
+        subView.Enabled = true;
         Assert.True (view.HasFocus);
         Assert.True (subView.HasFocus);
     }
 
     [Fact]
-    public void Visible_True_Focuses_Deepest_Focusable_Subview ()
+    public void Enabled_True_Focuses_Deepest_Focusable_SubView ()
     {
         var view = new View
         {
@@ -217,7 +216,7 @@ public class VisibleTests () : TestsAllViews
         {
             Id = "subView",
             CanFocus = true,
-            Visible = false
+            Enabled = false
         };
 
         var subViewSubView1 = new View
@@ -245,7 +244,7 @@ public class VisibleTests () : TestsAllViews
         Assert.False (subView.HasFocus);
         Assert.False (subViewSubView2.HasFocus);
 
-        subView.Visible = true;
+        subView.Enabled = true;
         Assert.True (subView.HasFocus);
         Assert.Equal (subView, view.Focused);
         Assert.Equal (subViewSubView2, subView.Focused);

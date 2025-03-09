@@ -15,11 +15,11 @@ public class TopologicalSortTests (ITestOutputHelper output)
         var sub2 = new View ();
         sub1.Width = Dim.Width (sub2);
 
-        Assert.Throws<LayoutException> (() => root.LayoutSubviews ());
+        Assert.Throws<LayoutException> (() => root.LayoutSubViews ());
 
         sub2.Width = Dim.Width (sub1);
 
-        Assert.Throws<LayoutException> (() => root.LayoutSubviews ());
+        Assert.Throws<LayoutException> (() => root.LayoutSubViews ());
         root.Dispose ();
         sub1.Dispose ();
         sub2.Dispose ();
@@ -35,7 +35,7 @@ public class TopologicalSortTests (ITestOutputHelper output)
         root.Add (sub2);
         sub2.Width = Dim.Width (sub2);
 
-        Exception exception = Record.Exception (root.LayoutSubviews);
+        Exception exception = Record.Exception (root.LayoutSubViews);
         Assert.Null (exception);
         root.Dispose ();
         sub1.Dispose ();
@@ -54,7 +54,7 @@ public class TopologicalSortTests (ITestOutputHelper output)
         superView.Y = Pos.Top (subView);
         superView.Add (subView);
 
-        Assert.Throws<LayoutException> (() => top.LayoutSubviews ());
+        Assert.Throws<LayoutException> (() => top.LayoutSubViews ());
         superView.Dispose ();
     }
 

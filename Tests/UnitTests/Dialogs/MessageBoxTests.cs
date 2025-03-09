@@ -1,6 +1,5 @@
 ﻿using System.Text;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-using UnitTests;
+using UICatalog;
 using UnitTests;
 using Xunit.Abstractions;
 
@@ -19,7 +18,7 @@ public class MessageBoxTests
 
         var iteration = 0;
 
-        int btnAcceptCount = 0;
+        var btnAcceptCount = 0;
 
         Application.Iteration += (s, a) =>
                                  {
@@ -37,7 +36,7 @@ public class MessageBoxTests
                                              // Tab to btn2
                                              Application.RaiseKeyDownEvent (Key.Tab);
 
-                                             Button btn = Application.Navigation!.GetFocused () as Button;
+                                             var btn = Application.Navigation!.GetFocused () as Button;
 
                                              btn.Accepting += (sender, e) => { btnAcceptCount++; };
 
@@ -102,7 +101,7 @@ public class MessageBoxTests
 
         var iteration = 0;
 
-        int btnAcceptCount = 0;
+        var btnAcceptCount = 0;
 
         Application.Iteration += (s, a) =>
                                  {
@@ -120,7 +119,7 @@ public class MessageBoxTests
                                              // Tab to btn2
                                              Application.RaiseKeyDownEvent (Key.Tab);
 
-                                             Button btn = Application.Navigation!.GetFocused () as Button;
+                                             var btn = Application.Navigation!.GetFocused () as Button;
 
                                              btn.Accepting += (sender, e) => { btnAcceptCount++; };
 
@@ -138,7 +137,6 @@ public class MessageBoxTests
 
         Assert.Equal (1, result);
         Assert.Equal (1, btnAcceptCount);
-
     }
 
     [Theory]
@@ -161,7 +159,7 @@ public class MessageBoxTests
         Dialog.DefaultShadow = ShadowStyle.None;
         Button.DefaultShadow = ShadowStyle.None;
 
-        Rectangle mbFrame = Rectangle.Empty;
+        var mbFrame = Rectangle.Empty;
 
         Application.Iteration += (s, a) =>
                                  {
@@ -224,30 +222,30 @@ public class MessageBoxTests
                                          Application.LayoutAndDraw ();
 
                                          DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                       @"
+                                                                                        @"
  ╔════════════════╗
  ║ ff ff ff ff ff ║
  ║       ⟦► btn ◄⟧║
  ╚════════════════╝",
-                                                                                       _output
-                                                                                      );
+                                                                                        _output
+                                                                                       );
                                          Application.RequestStop ();
 
                                          // Really long text
-                                         MessageBox.Query (string.Empty, new string ('f', 500), 0, false, "btn");
+                                         MessageBox.Query (string.Empty, new ('f', 500), 0, false, "btn");
                                      }
                                      else if (iterations == 2)
                                      {
                                          Application.LayoutAndDraw ();
 
                                          DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                       @"
+                                                                                        @"
  ╔════════════════╗
  ║ffffffffffffffff║
  ║       ⟦► btn ◄⟧║
  ╚════════════════╝",
-                                                                                       _output
-                                                                                      );
+                                                                                        _output
+                                                                                       );
                                          Application.RequestStop ();
                                      }
                                  };
@@ -296,7 +294,7 @@ public class MessageBoxTests
                                          Application.LayoutAndDraw ();
 
                                          DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                       @"
+                                                                                        @"
   ╔══════════════╗
   ║ff ff ff ff ff║
   ║ff ff ff ff ff║
@@ -304,19 +302,19 @@ public class MessageBoxTests
   ║    ff ff     ║
   ║     ⟦► btn ◄⟧║
   ╚══════════════╝",
-                                                                                       _output
-                                                                                      );
+                                                                                        _output
+                                                                                       );
                                          Application.RequestStop ();
 
                                          // Really long text
-                                         MessageBox.Query (string.Empty, new string ('f', 500), 0, true, "btn");
+                                         MessageBox.Query (string.Empty, new ('f', 500), 0, true, "btn");
                                      }
                                      else if (iterations == 2)
                                      {
                                          Application.LayoutAndDraw ();
 
                                          DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                                       @$"
+                                                                                        @"
  ╔════════════════╗
  ║ffffffffffffffff║
  ║ffffffffffffffff║
@@ -326,8 +324,8 @@ public class MessageBoxTests
  ║ffffffffffffffff║
  ║fffffff⟦► btn ◄⟧║
  ╚════════════════╝",
-                                                                                       _output
-                                                                                      );
+                                                                                        _output
+                                                                                       );
                                          Application.RequestStop ();
                                      }
                                  };
@@ -463,8 +461,8 @@ public class MessageBoxTests
                                      if (iterations == 0)
                                      {
                                          MessageBox.Query (
-                                                           title: "",
-                                                           message: UICatalog.UICatalogApp.GetAboutBoxMessage (),
+                                                           "",
+                                                           UICatalogApp.GetAboutBoxMessage (),
                                                            wrapMessage: false,
                                                            buttons: "_Ok"
                                                           );
@@ -475,23 +473,23 @@ public class MessageBoxTests
                                      {
                                          Application.LayoutAndDraw ();
 
-                                         string expectedText = """
-                                                               ┌────────────────────────────────────────────────────────────────────┐
-                                                               │   ╔═══════════════════════════════════════════════════════════╗    │
-                                                               │   ║UI Catalog: A comprehensive sample library and test app for║    │
-                                                               │   ║                                                           ║    │
-                                                               │   ║ _______                  _             _   _____       _  ║    │
-                                                               │   ║|__   __|                (_)           | | / ____|     (_) ║    │
-                                                               │   ║   | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _  ║    │
-                                                               │   ║   | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | | ║    │
-                                                               │   ║   | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | | ║    │
-                                                               │   ║   |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_| ║    │
-                                                               │   ║                                                           ║    │
-                                                               │   ║                      v2 - Pre-Alpha                       ║    │
-                                                               │   ║                                                   ⟦► Ok ◄⟧║    │
-                                                               │   ╚═══════════════════════════════════════════════════════════╝    │
-                                                               └────────────────────────────────────────────────────────────────────┘
-                                                               """;
+                                         var expectedText = """
+                                                            ┌────────────────────────────────────────────────────────────────────┐
+                                                            │   ╔═══════════════════════════════════════════════════════════╗    │
+                                                            │   ║UI Catalog: A comprehensive sample library and test app for║    │
+                                                            │   ║                                                           ║    │
+                                                            │   ║ _______                  _             _   _____       _  ║    │
+                                                            │   ║|__   __|                (_)           | | / ____|     (_) ║    │
+                                                            │   ║   | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _  ║    │
+                                                            │   ║   | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | | ║    │
+                                                            │   ║   | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | | ║    │
+                                                            │   ║   |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_| ║    │
+                                                            │   ║                                                           ║    │
+                                                            │   ║                      v2 - Pre-Alpha                       ║    │
+                                                            │   ║                                                   ⟦► Ok ◄⟧║    │
+                                                            │   ╚═══════════════════════════════════════════════════════════╝    │
+                                                            └────────────────────────────────────────────────────────────────────┘
+                                                            """;
 
                                          DriverAssert.AssertDriverContentsAre (expectedText, _output);
 
@@ -506,11 +504,10 @@ public class MessageBoxTests
     }
 
     [Theory]
-    [SetupFakeDriver]
     [MemberData (nameof (AcceptingKeys))]
     public void Button_IsDefault_True_Return_His_Index_On_Accepting (Key key)
     {
-        Application.Init ();
+        Application.Init (new FakeDriver ());
 
         Application.Iteration += (_, _) => Assert.True (Application.RaiseKeyDownEvent (key));
         int res = MessageBox.Query ("hey", "IsDefault", "Yes", "No");

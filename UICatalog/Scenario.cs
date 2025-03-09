@@ -180,7 +180,7 @@ public class Scenario : IDisposable
     }
 
     private List<Key>? _demoKeys;
-    private int _currentDemoKey = 0;
+    private int _currentDemoKey;
 
     private void OnApplicationOnInitializedChanged (object? s, EventArgs<bool> a)
     {
@@ -231,9 +231,8 @@ public class Scenario : IDisposable
 
     private void OnApplicationNotifyNewRunState (object? sender, RunStateEventArgs e)
     {
-        SubscribeAllSubviews (Application.Top!);
+        SubscribeAllSubViews (Application.Top!);
 
-        _currentDemoKey = 0;
         _demoKeys = GetDemoKeyStrokes ();
 
         Application.AddTimeout (
@@ -254,13 +253,13 @@ public class Scenario : IDisposable
 
         // Get a list of all subviews under Application.Top (and their subviews, etc.)
         // and subscribe to their DrawComplete event
-        void SubscribeAllSubviews (View view)
+        void SubscribeAllSubViews (View view)
         {
             view.DrawComplete += (s, a) => BenchmarkResults.DrawCompleteCount++;
-            view.SubviewsLaidOut += (s, a) => BenchmarkResults.LaidOutCount++;
-            foreach (View subview in view.Subviews)
+            view.SubViewsLaidOut += (s, a) => BenchmarkResults.LaidOutCount++;
+            foreach (View subview in view.SubViews)
             {
-                SubscribeAllSubviews (subview);
+                SubscribeAllSubViews (subview);
             }
         }
     }

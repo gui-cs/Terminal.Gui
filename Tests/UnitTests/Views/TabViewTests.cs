@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using UnitTests;
-using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -102,7 +101,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         tv.Draw ();
 
-        View tabRow = tv.Subviews [0];
+        View tabRow = tv.SubViews.ElementAt (0);
         Assert.Equal ("TabRow", tabRow.GetType ().Name);
 
         DriverAssert.AssertDriverContentsAre (
@@ -185,7 +184,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         tv.Draw ();
 
-        View tabRow = tv.Subviews [0];
+        View tabRow = tv.SubViews.ElementAt (0);
         Assert.Equal ("TabRow", tabRow.GetType ().Name);
 
         DriverAssert.AssertDriverContentsAre (
@@ -273,7 +272,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         tv.Draw ();
 
-        View tabRow = tv.Subviews [0];
+        View tabRow = tv.SubViews.ElementAt (0);
         Assert.Equal ("TabRow", tabRow.GetType ().Name);
 
         DriverAssert.AssertDriverContentsAre (
@@ -416,7 +415,7 @@ public class TabViewTests (ITestOutputHelper output)
         var btnSubView = new View ()
         {
             Id = "btnSubView",
-            Title = "_Subview",
+            Title = "_SubView",
             CanFocus = true
         };
         tv.SelectedTab.View.Add (btnSubView);
@@ -662,7 +661,7 @@ public class TabViewTests (ITestOutputHelper output)
                                                      );
 
         tv.SelectedTab = tab2;
-        Assert.Equal (tab2, tv.Subviews.First (v => v.Id.Contains ("tabRow")).MostFocused);
+        Assert.Equal (tab2, tv.SubViews.First (v => v.Id.Contains ("tabRow")).MostFocused);
 
         tv.Layout ();
         View.SetClipToScreen ();
@@ -808,7 +807,7 @@ public class TabViewTests (ITestOutputHelper output)
                                                      );
 
         tv.SelectedTab = tab2;
-        Assert.Equal (tab2, tv.Subviews.First (v => v.Id.Contains ("tabRow")).MostFocused);
+        Assert.Equal (tab2, tv.SubViews.First (v => v.Id.Contains ("tabRow")).MostFocused);
 
         tv.Layout ();
         View.SetClipToScreen ();

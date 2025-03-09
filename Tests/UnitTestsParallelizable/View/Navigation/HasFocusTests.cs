@@ -48,7 +48,7 @@ public class HasFocusTests () : TestsAllViews
     }
 
     [Fact]
-    public void HasFocus_False_WithSubview_Leaves_All ()
+    public void HasFocus_False_WithSubView_Leaves_All ()
     {
         var view = new View ()
         {
@@ -158,7 +158,7 @@ public class HasFocusTests () : TestsAllViews
     }
 
     [Fact]
-    public void HasFocus_False_Subview_Raises_HasFocusChanged ()
+    public void HasFocus_False_SubView_Raises_HasFocusChanged ()
     {
         var top = new View
         {

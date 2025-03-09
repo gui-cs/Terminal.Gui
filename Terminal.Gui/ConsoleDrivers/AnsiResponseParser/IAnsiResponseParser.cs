@@ -30,7 +30,7 @@ public interface IAnsiResponseParser
     ///     that already has one.
     ///     exists.
     /// </exception>
-    void ExpectResponse (string terminator, Action<string> response, Action? abandoned, bool persistent);
+    void ExpectResponse (string? terminator, Action<string?> response, Action? abandoned, bool persistent);
 
     /// <summary>
     ///     Returns true if there is an existing expectation (i.e. we are waiting a response
@@ -38,7 +38,7 @@ public interface IAnsiResponseParser
     /// </summary>
     /// <param name="terminator"></param>
     /// <returns></returns>
-    bool IsExpecting (string terminator);
+    bool IsExpecting (string? terminator);
 
     /// <summary>
     ///     Removes callback and expectation that we will get a response for the
@@ -50,5 +50,5 @@ public interface IAnsiResponseParser
     ///     <see langword="true"/> if you want to remove a persistent
     ///     request listener.
     /// </param>
-    void StopExpecting (string requestTerminator, bool persistent);
+    void StopExpecting (string? requestTerminator, bool persistent);
 }

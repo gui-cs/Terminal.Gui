@@ -1,7 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using System.Text;
-using UnitTests;
-using UnitTests;
+﻿using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
@@ -11,7 +8,6 @@ namespace Terminal.Gui.ViewTests;
 /// </summary>
 public class TextTests (ITestOutputHelper output)
 {
-
     [Fact]
     [SetupFakeDriver]
     public void Setting_With_Height_Horizontal ()
@@ -27,7 +23,7 @@ public class TextTests (ITestOutputHelper output)
 
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
 
-        top.LayoutSubviews ();
+        top.LayoutSubViews ();
         top.Draw ();
 
         var expected = @"
@@ -42,7 +38,7 @@ Y
 
         Assert.Equal (new (0, 0, 10, 2), label.Frame);
 
-        top.LayoutSubviews ();
+        top.LayoutSubViews ();
         View.SetClipToScreen ();
         top.Draw ();
 
@@ -459,7 +455,7 @@ Y
             Height = Dim.Auto ()
         };
 
-        view.SetRelativeLayout (new Size (4, 10));
+        view.SetRelativeLayout (new (4, 10));
 
         Assert.Equal (5, text.Length);
 
@@ -714,6 +710,7 @@ w ";
         Application.End (rs);
         top.Dispose ();
     }
+
     [Theory]
     [AutoInitShutdown]
     [InlineData (true)]
@@ -996,7 +993,6 @@ w ";
         Assert.Equal (new (0, 0, 9, height + 2), pos);
         top.Dispose ();
     }
-
 
     [Fact]
     [SetupFakeDriver]

@@ -106,10 +106,10 @@ public class HexView : View, IDesignable
         MouseBindings.Add (MouseFlags.WheeledUp, Command.ScrollUp);
         MouseBindings.Add (MouseFlags.WheeledDown, Command.ScrollDown);
 
-        SubviewsLaidOut += HexViewSubviewsLaidOut;
+        SubViewsLaidOut += HexViewSubViewsLaidOut;
     }
 
-    private void HexViewSubviewsLaidOut (object? sender, LayoutEventArgs e)
+    private void HexViewSubViewsLaidOut (object? sender, LayoutEventArgs e)
     {
         SetBytesPerLine ();
         SetContentSize (new (GetLeftSideStartColumn () + BytesPerLine / NUM_BYTES_PER_HEX_COLUMN * HEX_COLUMN_WIDTH + BytesPerLine - 1, (int)((GetEditedSize ()) / BytesPerLine) + 1));

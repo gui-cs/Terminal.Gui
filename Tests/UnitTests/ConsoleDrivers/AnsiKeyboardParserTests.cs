@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿#nullable enable
 namespace UnitTests.ConsoleDrivers;
+
 public class AnsiKeyboardParserTests
 {
     private readonly AnsiKeyboardParser _parser = new ();
 
-    public static IEnumerable<object []> GetKeyboardTestData ()
+    public static IEnumerable<object? []> GetKeyboardTestData ()
     {
         // Test data for various ANSI escape sequences and their expected Key values
         yield return new object [] { "\u001b[A", Key.CursorUp };
@@ -50,19 +46,18 @@ public class AnsiKeyboardParserTests
         yield return new object [] { "\u001b[1;7D", Key.CursorLeft.WithCtrl.WithAlt };
         yield return new object [] { "\u001b[1;8D", Key.CursorLeft.WithCtrl.WithAlt.WithShift };
 
-
         // Invalid inputs
-        yield return new object [] { "\u001b[Z", null };
-        yield return new object [] { "\u001b[invalid", null };
-        yield return new object [] { "\u001b[1", null };
-        yield return new object [] { "\u001b[AB", null };
-        yield return new object [] { "\u001b[;A", null };
+        yield return new object [] { "\u001b[Z", null! };
+        yield return new object [] { "\u001b[invalid", null! };
+        yield return new object [] { "\u001b[1", null! };
+        yield return new object [] { "\u001b[AB", null! };
+        yield return new object [] { "\u001b[;A", null! };
     }
 
     // Consolidated test for all keyboard events (e.g., arrow keys)
     [Theory]
     [MemberData (nameof (GetKeyboardTestData))]
-    public void ProcessKeyboardInput_ReturnsCorrectKey (string input, Key? expectedKey)
+    public void ProcessKeyboardInput_ReturnsCorrectKey (string? input, Key? expectedKey)
     {
         // Act
         Key? result = _parser.IsKeyboard (input)?.GetKey (input);

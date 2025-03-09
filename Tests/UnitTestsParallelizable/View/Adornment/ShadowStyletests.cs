@@ -25,38 +25,6 @@ public class ShadowStyleTests
         view.Dispose ();
     }
 
-    [Theory]
-    [InlineData (ShadowStyle.None, 0, 0, 0, 0)]
-    [InlineData (ShadowStyle.Opaque, 1, 0, 0, 1)]
-    [InlineData (ShadowStyle.Transparent, 1, 0, 0, 1)]
-    public void ShadowStyle_Button1Pressed_Causes_Movement (ShadowStyle style, int expectedLeft, int expectedTop, int expectedRight, int expectedBottom)
-    {
-        var superView = new View
-        {
-            Height = 10, Width = 10
-        };
-
-        View view = new ()
-        {
-            Width = Dim.Auto (),
-            Height = Dim.Auto (),
-            Text = "0123",
-            HighlightStyle = HighlightStyle.Pressed,
-            ShadowStyle = style,
-            CanFocus = true
-        };
-
-        superView.Add (view);
-        superView.BeginInit ();
-        superView.EndInit ();
-
-        Thickness origThickness = view.Margin!.Thickness;
-        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed, Position = new (0, 0) });
-        Assert.Equal (new (expectedLeft, expectedTop, expectedRight, expectedBottom), view.Margin.Thickness);
-
-        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Released, Position = new (0, 0) });
-        Assert.Equal (origThickness, view.Margin.Thickness);
-    }
 
     [Theory]
     [InlineData (ShadowStyle.None, 0, 0, 0, 0)]

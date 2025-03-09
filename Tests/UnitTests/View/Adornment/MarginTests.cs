@@ -1,5 +1,4 @@
 ﻿using UnitTests;
-using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
@@ -13,7 +12,7 @@ public class MarginTests (ITestOutputHelper output)
         ((FakeDriver)Application.Driver!).SetBufferSize (5, 5);
 
         var view = new View { Height = 3, Width = 3 };
-        view.Margin.Diagnostics = ViewDiagnosticFlags.Thickness;
+        view.Margin!.Diagnostics = ViewDiagnosticFlags.Thickness;
         view.Margin.Thickness = new (1);
 
         Application.Top = new Toplevel ();

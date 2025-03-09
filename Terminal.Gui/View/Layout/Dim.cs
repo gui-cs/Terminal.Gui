@@ -96,7 +96,7 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     public static Dim? Absolute (int size) { return new DimAbsolute (size); }
 
     /// <summary>
-    ///     Creates a <see cref="Dim"/> object that automatically sizes the view to fit all the view's Content, Subviews, and/or Text.
+    ///     Creates a <see cref="Dim"/> object that automatically sizes the view to fit all the view's Content, SubViews, and/or Text.
     /// </summary>
     /// <remarks>
     ///     <para>

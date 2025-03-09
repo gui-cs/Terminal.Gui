@@ -17,6 +17,7 @@ internal sealed class Menu : View
         }
 
         Application.MouseEvent += Application_RootMouseEvent;
+        Application.UnGrabbedMouse += Application_UnGrabbedMouse;
 
         // Things this view knows how to do
         AddCommand (Command.Up, () => MoveUp ());
@@ -235,6 +236,7 @@ internal sealed class Menu : View
         }
 
         Application.MouseEvent -= Application_RootMouseEvent;
+        Application.UnGrabbedMouse -= Application_UnGrabbedMouse;
         base.Dispose (disposing);
     }
 
@@ -519,6 +521,14 @@ internal sealed class Menu : View
         if (view.NewMouseEvent (me) == true || a.Flags == MouseFlags.Button1Pressed || a.Flags == MouseFlags.Button1Released)
         {
             a.Handled = true;
+        }
+    }
+
+    private void Application_UnGrabbedMouse (object? sender, ViewEventArgs a)
+    {
+        if (_host.IsMenuOpen)
+        {
+            _host.CloseAllMenus ();
         }
     }
 

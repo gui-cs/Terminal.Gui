@@ -16,22 +16,22 @@ public class StatusBarTests
 
         sb.AddShortcutAt (2, new (Key.C.WithCtrl, "Close", null));
 
-        Assert.Equal ("Open", sb.Subviews [0].Title);
-        Assert.Equal ("Save", sb.Subviews [1].Title);
-        Assert.Equal ("Close", sb.Subviews [2].Title);
-        Assert.Equal ("Quit", sb.Subviews [^1].Title);
+        Assert.Equal ("Open", sb.SubViews.ElementAt (0).Title);
+        Assert.Equal ("Save", sb.SubViews.ElementAt (1).Title);
+        Assert.Equal ("Close", sb.SubViews.ElementAt (2).Title);
+        Assert.Equal ("Quit", sb.SubViews.ToArray() [^1].Title);
 
         Assert.Equal ("Save", sb.RemoveShortcut (1).Title);
 
-        Assert.Equal ("Open", sb.Subviews [0].Title);
-        Assert.Equal ("Close", sb.Subviews [1].Title);
-        Assert.Equal ("Quit", sb.Subviews [^1].Title);
+        Assert.Equal ("Open", sb.SubViews.ElementAt (0).Title);
+        Assert.Equal ("Close", sb.SubViews.ElementAt (1).Title);
+        Assert.Equal ("Quit", sb.SubViews.ToArray () [^1].Title);
 
         sb.AddShortcutAt (1, new Shortcut (Key.A.WithCtrl, "Save As", null));
 
-        Assert.Equal ("Open", sb.Subviews [0].Title);
-        Assert.Equal ("Save As", sb.Subviews [1].Title);
-        Assert.Equal ("Quit", sb.Subviews [^1].Title);
+        Assert.Equal ("Open", sb.SubViews.ElementAt (0).Title);
+        Assert.Equal ("Save As", sb.SubViews.ElementAt (1).Title);
+        Assert.Equal ("Quit", sb.SubViews.ToArray () [^1].Title);
     }
 
     //[Fact]
@@ -131,7 +131,7 @@ public class StatusBarTests
     {
         var sb = new StatusBar ();
         
-        Assert.Empty (sb.Subviews);
+        Assert.Empty (sb.SubViews);
         Assert.True (sb.CanFocus);
         Assert.Equal (Colors.ColorSchemes ["Menu"], sb.ColorScheme);
         Assert.Equal (0, sb.X);
@@ -174,7 +174,7 @@ public class StatusBarTests
     //    w.Add (statusBar2);
     //    Assert.Equal (w.StatusBar, statusBar2);
 
-    //    var menuBars = w.Subviews.OfType<StatusBar> ().ToArray ();
+    //    var menuBars = w.SubViews.OfType<StatusBar> ().ToArray ();
     //    Assert.Equal (2, menuBars.Length);
 
     //    Assert.Equal (Dim.Fill (0), menuBars [0].Width);

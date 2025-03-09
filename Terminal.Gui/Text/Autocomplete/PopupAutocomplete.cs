@@ -75,11 +75,6 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         }
     }
 
-    private void _top_Added (object sender, SuperViewChangedEventArgs e)
-    {
-        throw new NotImplementedException ();
-    }
-
     /// <inheritdoc/>
     public override void EnsureSelectedIdxIsValid ()
     {
@@ -559,7 +554,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
 
     private void RemovePopupFromTop ()
     {
-        if (_popup is { } && _top.Subviews.Contains (_popup))
+        if (_popup is { } && _top.SubViews.Contains (_popup))
         {
             _top?.Remove (_popup);
             _popup.Dispose ();

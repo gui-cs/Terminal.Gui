@@ -11,7 +11,7 @@ internal class GenericHeld<T> : IHeld
 
     public void ClearHeld () { held.Clear (); }
 
-    public string HeldToString () { return new (held.Select (h => h.Item1).ToArray ()); }
+    public string? HeldToString () { return new (held.Select (h => h.Item1).ToArray ()); }
 
     public IEnumerable<object> HeldToObjects () { return held; }
 

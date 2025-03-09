@@ -156,7 +156,7 @@ public class Progress : Scenario
 
     protected override void Dispose (bool disposing)
     {
-        foreach (ProgressDemo v in win.Subviews.OfType<ProgressDemo> ())
+        foreach (ProgressDemo v in win.SubViews.OfType<ProgressDemo> ())
         {
             v?.StopBtnClick ();
         }

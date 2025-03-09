@@ -150,19 +150,19 @@ public class ScenariosStressTests : TestsAllViews
         {
             // Get a list of all subviews under Application.Top (and their subviews, etc.)
             // and subscribe to their DrawComplete event
-            void SubscribeAllSubviews (View view)
+            void SubscribeAllSubViews (View view)
             {
                 view.DrawComplete += (s, a) => drawCompleteCount++;
-                view.SubviewsLaidOut += (s, a) => laidOutCount++;
-                view.Added += (s, a) => addedCount++;
+                view.SubViewsLaidOut += (s, a) => laidOutCount++;
+                view.SuperViewChanged += (s, a) => addedCount++;
 
-                foreach (View subview in view.Subviews)
+                foreach (View subview in view.SubViews)
                 {
-                    SubscribeAllSubviews (subview);
+                    SubscribeAllSubViews (subview);
                 }
             }
 
-            SubscribeAllSubviews (Application.Top!);
+            SubscribeAllSubViews (Application.Top!);
         }
 
         // If the scenario doesn't close within the abort time, this will force it to quit

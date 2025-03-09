@@ -262,7 +262,7 @@ See also [Keyboard](keyboard.md) where HotKey is covered more deeply...
   - `public bool FocusDeepest (NavigationDirection direction, TabBehavior? behavior)` 
 * In v1, the `View.OnEnter/Enter` and `View.OnLeave/Leave` virtual methods/events could be used to notify that a view had gained or lost focus, but had confusing semantics around what it mean to override (requiring calling `base`) and bug-ridden behavior on what the return values signified. The "Enter" and "Leave" terminology was confusing. In v2, `View.OnHasFocusChanging/HasFocusChanging` and `View.OnHasFocusChanged/HasFocusChanged` replace `View.OnEnter/Enter` and `View.OnLeave/Leave`. These virtual methods/events follow standard Terminal.Gui event patterns. The `View.OnHasFocusChanging/HasFocusChanging` event supports being cancelled.
 * In v1, the concept of `Mdi` views included a large amount of complex code (in `Toplevel` and `Application`) for dealing with navigation across overlapped Views. This has all been radically simplified in v2. Any View can work in an "overlapped" or "tiled" way. See [navigation.md](navigation.md) for more details.
-* The `View.TabIndex` and `View.TabIndexes` have been removed. Change the order of the views in `View.Subviews` to change the navigation order (using, for example `View.MoveSubviewTowardsStart()`).
+* The `View.TabIndex` and `View.TabIndexes` have been removed. Change the order of the views in `View.SubViews` to change the navigation order (using, for example `View.MoveSubViewTowardsStart()`).
 
 ### How to Fix (Focus API)
 
@@ -276,7 +276,7 @@ In v2, `HotKey`s can be used to navigate across the entire application view-hier
 
 In v2, unlike v1, multiple Views in an application (even within the same SuperView) can have the same `HotKey`. Each press of the `HotKey` will invoke the next `HotKey` across the View hierarchy (NOT IMPLEMENTED YET)*
 
-In v1, the keys used for navigation were both hard-coded and configurable, but in an inconsistent way. `Tab` and `Shift+Tab` worked consistently for navigating between Subviews, but were not configurable. `Ctrl+Tab` and `Ctrl+Shift+Tab` navigated across `Overlapped` views and had configurable "alternate" versions (`Ctrl+PageDown` and `Ctrl+PageUp`).
+In v1, the keys used for navigation were both hard-coded and configurable, but in an inconsistent way. `Tab` and `Shift+Tab` worked consistently for navigating between SubViews, but were not configurable. `Ctrl+Tab` and `Ctrl+Shift+Tab` navigated across `Overlapped` views and had configurable "alternate" versions (`Ctrl+PageDown` and `Ctrl+PageUp`).
 
 In v2, this is made consistent and configurable:
 
@@ -447,16 +447,16 @@ In v1, you could add timeouts via `Application.MainLoop.AddTimeout` among other 
 + Application.AddTimeout (TimeSpan time, Func<bool> callback)
 ```
 
-## `SendSubviewXXX` renamed and corrected
+## `SendSubViewXXX` renamed and corrected
 
-In v1, the `View` methods to move Subviews within the Subviews list were poorly named and actually operated in reverse of what their names suggested.
+In v1, the `View` methods to move SubViews within the SubViews list were poorly named and actually operated in reverse of what their names suggested.
 
 In v2, these methods have been named correctly.
 
-- `SendSubViewToBack` -> `MoveSubviewToStart` - Moves the specified subview to the start of the list.
-- `SendSubViewBackward` -> `MoveSubviewTowardsStart` - Moves the specified subview one position towards the start of the list.
-- `SendSubViewToFront` -> `MoveSubviewToEnd` - Moves the specified subview to the end of the list.
-- `SendSubViewForward` -> `MoveSubviewTowardsEnd` - Moves the specified subview one position towards the end of the list.
+- `SendSubViewToBack` -> `MoveSubViewToStart` - Moves the specified subview to the start of the list.
+- `SendSubViewBackward` -> `MoveSubViewTowardsStart` - Moves the specified subview one position towards the start of the list.
+- `SendSubViewToFront` -> `MoveSubViewToEnd` - Moves the specified subview to the end of the list.
+- `SendSubViewForward` -> `MoveSubViewTowardsEnd` - Moves the specified subview one position towards the end of the list.
 
 ## `Mdi` Replaced by `ViewArrangement.Overlapped`
 
@@ -474,7 +474,7 @@ v1 conflated the concepts of
 
 * `View` and all subclasses support `IDisposable` and must be disposed (by calling `view.Dispose ()`) by whatever code owns the instance when the instance is longer needed. 
 
-* To simplify programming, any `View` added as a Subview another `View` will have it's lifecycle owned by the Superview; when a `View` is disposed, it will call `Dispose` on all the items in the `Subviews` property. Note this behavior is the same as it was in v1, just clarified.
+* To simplify programming, any `View` added as a SubView another `View` will have it's lifecycle owned by the Superview; when a `View` is disposed, it will call `Dispose` on all the items in the `SubViews` property. Note this behavior is the same as it was in v1, just clarified.
 
 * In v1, `Application.End` called `Dispose ()` on @Terminal.Gui.Application.Top (via `Runstate.Toplevel`). This was incorrect as it meant that after `Application.Run` returned, `Application.Top` had been disposed, and any code that wanted to interrogate the results of `Run` by accessing `Application.Top` only worked by accident. This is because GC had not actually happened; if it had the application would have crashed. In v2 `Application.End` does NOT call `Dispose`, and it is the caller to `Application.Run` who is responsible for disposing the `Toplevel` that was either passed to `Application.Run (View)` or created by `Application.Run<T> ()`.
 

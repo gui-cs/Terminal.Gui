@@ -70,9 +70,9 @@ public class ContextMenuv2 : Menuv2, IDesignable
 
     private void OnVisibleChanged (object? sender, EventArgs _)
     {
-        if (Visible && Subviews.Count > 0)
+        if (Visible && SubViews.Count > 0)
         {
-            Subviews [0].SetFocus ();
+            SubViews.ElementAt (0).SetFocus ();
         }
     }
 

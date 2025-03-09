@@ -49,7 +49,7 @@ public class DimViewTests
         super.BeginInit ();
         super.EndInit ();
 
-        Exception exception = Record.Exception (super.LayoutSubviews);
+        Exception exception = Record.Exception (super.LayoutSubViews);
         Assert.Null (exception);
         super.Dispose ();
     }

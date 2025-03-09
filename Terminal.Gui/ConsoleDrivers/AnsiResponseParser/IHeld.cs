@@ -16,7 +16,7 @@ internal interface IHeld
     ///     Returns string representation of the held objects
     /// </summary>
     /// <returns></returns>
-    string HeldToString ();
+    string? HeldToString ();
 
     /// <summary>
     ///     Returns the collection objects directly e.g. <see langword="char"/>

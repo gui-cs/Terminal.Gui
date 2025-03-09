@@ -1,5 +1,4 @@
 using UnitTests;
-using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.TextTests;

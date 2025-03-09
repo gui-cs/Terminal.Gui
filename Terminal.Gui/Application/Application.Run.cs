@@ -71,7 +71,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// <param name="toplevel">The <see cref="Toplevel"/> to prepare execution for.</param>
     /// <remarks>
     ///     This method prepares the provided <see cref="Toplevel"/> for running with the focus, it adds this to the list
-    ///     of <see cref="Toplevel"/>s, lays out the Subviews, focuses the first element, and draws the <see cref="Toplevel"/>
+    ///     of <see cref="Toplevel"/>s, lays out the SubViews, focuses the first element, and draws the <see cref="Toplevel"/>
     ///     in the screen. This is usually followed by executing the <see cref="RunLoop"/> method, and then the
     ///     <see cref="End(RunState)"/> method upon termination which will undo these changes.
     /// </remarks>
@@ -89,7 +89,11 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         //#endif
 
         // Ensure the mouse is ungrabbed.
-        MouseGrabView = null;
+        if (MouseGrabView is { })
+        {
+            UngrabMouse ();
+            MouseGrabView = null;
+        }
 
         var rs = new RunState (toplevel);
 

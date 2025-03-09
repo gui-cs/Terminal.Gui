@@ -24,7 +24,7 @@ public class PosCombineTests (ITestOutputHelper output)
         super.BeginInit ();
         super.EndInit ();
 
-        Exception exception = Record.Exception (super.LayoutSubviews);
+        Exception exception = Record.Exception (super.LayoutSubViews);
         Assert.Null (exception);
         Assert.Equal (new (0, 0, 10, 10), super.Frame);
         Assert.Equal (new (0, 0, 2, 2), view1.Frame);

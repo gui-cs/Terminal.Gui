@@ -294,13 +294,6 @@ public class AdornmentTests
     }
 
     [Fact]
-    public void Setting_SuperView_Throws ()
-    {
-        var adornment = new Adornment (null);
-        Assert.Throws<InvalidOperationException> (() => adornment.SuperView = new ());
-    }
-
-    [Fact]
     public void Setting_SuperViewRendersLineCanvas_Throws ()
     {
         var adornment = new Adornment (null);
@@ -346,7 +339,7 @@ public class AdornmentTests
         parent.BeginInit ();
         parent.EndInit ();
 
-        parent.SubviewLayout += LayoutStarted;
+        parent.SubViewLayout += LayoutStarted;
         parent.Margin.Thickness = new (1, 2, 3, 4);
         Assert.True (parent.NeedsLayout);
         Assert.True (parent.Margin.NeedsLayout);
@@ -366,7 +359,7 @@ public class AdornmentTests
         parent.BeginInit ();
         parent.EndInit ();
 
-        parent.Margin.SubviewLayout += LayoutStarted;
+        parent.Margin.SubViewLayout += LayoutStarted;
         parent.Margin.Thickness = new (1, 2, 3, 4);
         Assert.True (parent.NeedsLayout);
         Assert.True (parent.Margin.NeedsLayout);
