@@ -118,21 +118,19 @@ public class NetOutput : IConsoleOutput
                     {
                         redrawAttr = attr;
 
-                        output.Append (
-                                       EscSeqUtils.CSI_SetForegroundColorRGB (
-                                                                              attr.Foreground.R,
-                                                                              attr.Foreground.G,
-                                                                              attr.Foreground.B
-                                                                             )
-                                      );
+                        EscSeqUtils.CSI_AppendForegroundColorRGB (
+                            output,
+                            attr.Foreground.R,
+                            attr.Foreground.G,
+                            attr.Foreground.B
+                        );
 
-                        output.Append (
-                                       EscSeqUtils.CSI_SetBackgroundColorRGB (
-                                                                              attr.Background.R,
-                                                                              attr.Background.G,
-                                                                              attr.Background.B
-                                                                             )
-                                      );
+                        EscSeqUtils.CSI_AppendBackgroundColorRGB (
+                            output,
+                            attr.Background.R,
+                            attr.Background.G,
+                            attr.Background.B
+                        );
                     }
 
                     outputWidth++;

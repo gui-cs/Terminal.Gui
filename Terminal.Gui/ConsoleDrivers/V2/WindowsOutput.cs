@@ -217,7 +217,7 @@ internal partial class WindowsOutput : IConsoleOutput
             stringBuilder.Clear ();
 
             stringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
-            stringBuilder.Append (EscSeqUtils.CSI_SetCursorPosition (0, 0));
+            EscSeqUtils.CSI_AppendCursorPosition (stringBuilder, 0, 0);
 
             Attribute? prev = null;
 
@@ -228,8 +228,8 @@ internal partial class WindowsOutput : IConsoleOutput
                 if (attr != prev)
                 {
                     prev = attr;
-                    stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.Foreground.R, attr.Foreground.G, attr.Foreground.B));
-                    stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.Background.R, attr.Background.G, attr.Background.B));
+                    EscSeqUtils.CSI_AppendForegroundColorRGB (stringBuilder, attr.Foreground.R, attr.Foreground.G, attr.Foreground.B);
+                    EscSeqUtils.CSI_AppendBackgroundColorRGB (stringBuilder, attr.Background.R, attr.Background.G, attr.Background.B);
                 }
 
                 if (info.Char != '\x1b')
