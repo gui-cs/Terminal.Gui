@@ -225,7 +225,7 @@ public class NetOutput : IConsoleOutput
 
         // + 1 is needed because non-Windows is based on 1 instead of 0 and
         // Console.CursorTop/CursorLeft isn't reliable.
-        Console.Out.Write (EscSeqUtils.CSI_SetCursorPosition (row + 1, col + 1));
+        EscSeqUtils.CSI_WriteCursorPosition (Console.Out, row + 1, col + 1);
 
         return true;
     }
