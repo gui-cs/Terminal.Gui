@@ -2562,47 +2562,30 @@ Edit
         Assert.Equal ("_Edit", miCurrent.Parent.Title);
         Assert.Equal ("_Paste", miCurrent.Title);
 
-        for (var i = 2; i >= -1; i--)
+        for (var i = 4; i >= -1; i--)
         {
-            if (i == -1)
-            {
-                // Edit menu is open. Click on the menu at Y = -1, which is outside the menu.
-                Assert.False (
-                              mCurrent.NewMouseEvent (
-                                                      new () { Position = new (10, i), Flags = MouseFlags.ReportMousePosition, View = menu }
-                                                     )
-                             );
-            }
-            else
-            {
-                // Edit menu is open. Click on the menu at Y = i.
-                Assert.True (
-                             mCurrent.NewMouseEvent (
-                                                     new () { Position = new (10, i), Flags = MouseFlags.ReportMousePosition, View = mCurrent }
-                                                    )
-                            );
-            }
+            Application.RaiseMouseEvent (
+                                         new () { ScreenPosition = new (10, i), Flags = MouseFlags.ReportMousePosition }
+                                        );
 
             Assert.True (menu.IsMenuOpen);
+            Assert.Equal (menu, Application.MouseGrabView);
+            Assert.Equal ("_Edit", miCurrent.Parent.Title);
 
-            if (i == 2)
+            if (i == 4)
             {
-                Assert.Equal ("_Edit", miCurrent.Parent.Title);
                 Assert.Equal ("_Paste", miCurrent.Title);
             }
-            else if (i == 1)
+            else if (i == 3)
             {
-                Assert.Equal ("_Edit", miCurrent.Parent.Title);
                 Assert.Equal ("C_ut", miCurrent.Title);
             }
-            else if (i == 0)
+            else if (i == 2)
             {
-                Assert.Equal ("_Edit", miCurrent.Parent.Title);
                 Assert.Equal ("_Copy", miCurrent.Title);
             }
             else
             {
-                Assert.Equal ("_Edit", miCurrent.Parent.Title);
                 Assert.Equal ("_Copy", miCurrent.Title);
             }
         }

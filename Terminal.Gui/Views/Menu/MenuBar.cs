@@ -1578,21 +1578,16 @@ public class MenuBar : View, IDesignable
                      && me.Flags != MouseFlags.ReportMousePosition
                      && me.Flags != 0)
             {
-                var parent = me.View is Adornment adornment ? adornment.Parent : me.View;
-
-                if (GetTopSuperView () == parent?.GetTopSuperView ())
-                {
                     Application.UngrabMouse ();
 
                     if (IsMenuOpen)
                     {
                         CloseAllMenus ();
                     }
-                }
 
-                _handled = false;
+                    _handled = false;
 
-                return false;
+                    return false;
             }
             else
             {
