@@ -154,13 +154,13 @@ public static class EscSeqUtils
     /// <summary>
     ///     Control sequence for disabling mouse events.
     /// </summary>
-    public static string CSI_DisableMouseEvents { get; set; } =
+    public static readonly string CSI_DisableMouseEvents =
         CSI_DisableAnyEventMouse + CSI_DisableUrxvtExtModeMouse + CSI_DisableSgrExtModeMouse;
 
     /// <summary>
     ///     Control sequence for enabling mouse events.
     /// </summary>
-    public static string CSI_EnableMouseEvents { get; set; } =
+    public static readonly string CSI_EnableMouseEvents =
         CSI_EnableAnyEventMouse + CSI_EnableUrxvtExtModeMouse + CSI_EnableSgrExtModeMouse;
 
     /// <summary>
