@@ -560,7 +560,7 @@ public partial class View // Mouse APIs
             if (!WantMousePositionReports && Viewport.Contains (mouseEvent.Position))
             {
 
-               return RaiseMouseClickEvent (mouseEvent);
+                return RaiseMouseClickEvent (mouseEvent);
             }
 
             return mouseEvent.Handled = true;
@@ -770,6 +770,11 @@ public partial class View // Mouse APIs
 
         View? start = Application.Top;
 
+        if (Application.PopoverHost?.Visible == true)
+        {
+            start = Application.PopoverHost;
+        }
+
         Point currentLocation = location;
 
         while (start is { Visible: true } && start.Contains (currentLocation))
@@ -830,8 +835,8 @@ public partial class View // Mouse APIs
                     viewsUnderMouse.AddRange (View.GetViewsUnderMouse (location, true));
 
                     // De-dupe viewsUnderMouse
-                    HashSet<View?> dedupe = [..viewsUnderMouse];
-                    viewsUnderMouse = [..dedupe];
+                    HashSet<View?> dedupe = [.. viewsUnderMouse];
+                    viewsUnderMouse = [.. dedupe];
                 }
 
                 // No subview was found that's under the mouse, so we're done

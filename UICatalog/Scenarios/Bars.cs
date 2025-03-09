@@ -24,18 +24,9 @@ public class Bars : Scenario
 
         app.Loaded += App_Loaded;
 
-        _popoverMenu = new Menuv2
-        {
-            Id = "popoverMenu",
-            Arrangement = ViewArrangement.Popover
-        };
-
-        Application.PopoverHost.Add (_popoverMenu);
-
         Application.Run (app);
-        Application.PopoverHost.Remove(_popoverMenu);
-        _popoverMenu.Dispose ();
         app.Dispose ();
+        _popoverMenu?.Dispose ();
         Application.Shutdown ();
     }
 
@@ -162,10 +153,18 @@ public class Bars : Scenario
         };
         menuLikeExamples.Add (label);
 
+        _popoverMenu = new Menuv2
+        {
+            Id = "popoverMenu",
+            Arrangement = ViewArrangement.Popover
+        };
+
         ConfigureMenu (_popoverMenu!);
 
         _popoverMenu!.ColorScheme = Colors.ColorSchemes ["Menu"];
         _popoverMenu.Visible = false;
+
+        Application.PopoverHost.Add (_popoverMenu);
 
         var toggleShortcut = new Shortcut
         {
@@ -217,7 +216,6 @@ public class Bars : Scenario
         {
             if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
             {
-                //Application.Popover = _popoverMenu;
                 _popoverMenu.Arrangement = ViewArrangement.Overlapped;
 
                 _popoverMenu.X = e.ScreenPosition.X;

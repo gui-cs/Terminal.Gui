@@ -1,64 +1,18 @@
 #nullable enable
+using System.Diagnostics;
 using static Unix.Terminal.Curses;
 
 namespace Terminal.Gui;
 
 public static partial class Application // Popover handling
 {
-    private static PopoverHost? _popoverHost;
-
-    /// <summary>Gets or sets the Application Popover View.</summary>
+    /// <summary>Gets or sets the Application Popover Host.</summary>
     /// <remarks>
     ///     <para>
-    ///         To show or hide the Popover, set it's <see cref="View.Visible"/> property.
+    ///         To show or hide a Popover, set it's <see cref="View.Visible"/> property.
     ///     </para>
     /// </remarks>
-    public static PopoverHost? PopoverHost
-    {
-        get
-        {
-            if (_popoverHost is null)
-            {
-                _popoverHost = new PopoverHost ();
-            }
-            return _popoverHost;
-        }
-        internal set => _popoverHost = value;
-        //{
-        //    if (_popoverHost == value)
-        //    {
-        //        return;
-        //    }
-
-        //    if (_popoverHost is { })
-        //    {
-        //        _popoverHost.Visible = false;
-        //        _popoverHost.VisibleChanging -= PopoverVisibleChanging;
-        //    }
-
-        //    _popoverHost = value;
-
-        //    if (_popoverHost is { })
-        //    {
-        //        if (!_popoverHost.IsInitialized)
-        //        {
-        //            _popoverHost.BeginInit ();
-        //            _popoverHost.EndInit ();
-        //        }
-
-        //        _popoverHost.Arrangement |= ViewArrangement.Overlapped;
-
-        //        if (_popoverHost.ColorScheme is null)
-        //        {
-        //            _popoverHost.ColorScheme = Top?.ColorScheme;
-        //        }
-
-        //        _popoverHost.SetRelativeLayout (Screen.Size);
-
-        //        _popoverHost.VisibleChanging += PopoverVisibleChanging;
-        //    }
-        //}
-    }
+    public static PopoverHost? PopoverHost { get; internal set; }
 
     private static void PopoverVisibleChanging (object? sender, CancelEventArgs<bool> e)
     {
@@ -100,14 +54,38 @@ public static partial class Application // Popover handling
     }
 }
 
+/// <summary>
+///     
+/// </summary>
 public class PopoverHost : View
 {
-    public PopoverHost()
+    public static void Init ()
+    {
+        // Setup PopoverHost
+        Debug.Assert (Application.PopoverHost is null);
+        Application.PopoverHost = new PopoverHost ();
+        Application.PopoverHost.BeginInit ();
+        Application.PopoverHost.EndInit ();
+    }
+
+    public static void Cleanup ()
+    {
+        Application.PopoverHost?.Dispose ();
+        Application.PopoverHost = null;
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public PopoverHost ()
     {
         Id = "popoverHost";
+        CanFocus = true;
+        ViewportSettings = ViewportSettings.Transparent | ViewportSettings.TransparentMouse;
         Width = Dim.Fill ();
         Height = Dim.Fill ();
-        Visible = false;
+        base.Visible = false;
     }
 
     /// <inheritdoc />
@@ -118,12 +96,21 @@ public class PopoverHost : View
     {
         if (!Visible)
         {
-            ColorScheme ??= Application.Top?.ColorScheme;
-            Frame = Application.Screen;
+            //ColorScheme ??= Application.Top?.ColorScheme;
+            //Frame = Application.Screen;
 
             SetRelativeLayout (Application.Screen.Size);
         }
 
         return false;
+    }
+
+    /// <inheritdoc />
+    protected override void OnVisibleChanged ()
+    {
+        if (Visible)
+        {
+            SetFocus ();
+        }
     }
 }

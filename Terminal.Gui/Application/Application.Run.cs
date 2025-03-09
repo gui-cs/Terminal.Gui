@@ -561,12 +561,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     public static void End (RunState runState)
     {
         ArgumentNullException.ThrowIfNull (runState);
-
-        if (PopoverHost is { })
-        {
-            PopoverHost?.Dispose ();
-            PopoverHost = null;
-        }
+        PopoverHost.Cleanup();
 
         runState.Toplevel.OnUnloaded ();
 
