@@ -60,6 +60,9 @@ public class NetOutput : IConsoleOutput
         CursorVisibility? savedVisibility = _cachedCursorVisibility;
         SetCursorVisibility (CursorVisibility.Invisible);
 
+        const int maxCharsPerRune = 2;
+        Span<char> runeBuffer = stackalloc char[maxCharsPerRune];
+
         for (int row = top; row < rows; row++)
         {
             if (Console.WindowHeight < 1)
@@ -134,8 +137,12 @@ public class NetOutput : IConsoleOutput
                     }
 
                     outputWidth++;
+
+                    // Avoid Rune.ToString() by appending the rune chars.
                     Rune rune = buffer.Contents [row, col].Rune;
-                    output.Append (rune);
+                    int runeCharsWritten = rune.EncodeToUtf16 (runeBuffer);
+                    ReadOnlySpan<char> runeChars = runeBuffer[..runeCharsWritten];
+                    output.Append (runeChars);
 
                     if (buffer.Contents [row, col].CombiningMarks.Count > 0)
                     {
