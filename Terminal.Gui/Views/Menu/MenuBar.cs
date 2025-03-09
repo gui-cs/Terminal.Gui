@@ -1578,16 +1578,16 @@ public class MenuBar : View, IDesignable
                      && me.Flags != MouseFlags.ReportMousePosition
                      && me.Flags != 0)
             {
-                    Application.UngrabMouse ();
+                Application.UngrabMouse ();
 
-                    if (IsMenuOpen)
-                    {
-                        CloseAllMenus ();
-                    }
+                if (IsMenuOpen)
+                {
+                    CloseAllMenus ();
+                }
 
-                    _handled = false;
+                _handled = false;
 
-                    return false;
+                return false;
             }
             else
             {
