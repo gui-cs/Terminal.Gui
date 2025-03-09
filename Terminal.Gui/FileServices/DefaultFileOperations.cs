@@ -139,6 +139,8 @@ public class DefaultFileOperations : IFileOperations
                          {
                              confirm = true;
                              Application.RequestStop ();
+                             // Anytime Accepting is handled, make sure to set e.Cancel to false.
+                             e.Cancel = false;
                          };
         var btnCancel = new Button { Text = Strings.btnCancel };
 
@@ -146,6 +148,8 @@ public class DefaultFileOperations : IFileOperations
                              {
                                  confirm = false;
                                  Application.RequestStop ();
+                                 // Anytime Accepting is handled, make sure to set e.Cancel to false.
+                                 e.Cancel = false;
                              };
 
         var lbl = new Label { Text = Strings.fdRenamePrompt };

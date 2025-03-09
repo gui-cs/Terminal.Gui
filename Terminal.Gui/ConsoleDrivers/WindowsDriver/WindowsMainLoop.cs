@@ -68,7 +68,7 @@ internal class WindowsMainLoop : IMainLoopDriver
 #if HACK_CHECK_WINCHANGED
         _winChange.Set ();
 #endif
-        if (_resultQueue.Count > 0 || _mainLoop!.CheckTimersAndIdleHandlers (out int waitTimeout))
+        if (_resultQueue.Count > 0 || _mainLoop!.TimedEvents.CheckTimersAndIdleHandlers (out int waitTimeout))
         {
             return true;
         }
@@ -97,9 +97,9 @@ internal class WindowsMainLoop : IMainLoopDriver
         if (!_eventReadyTokenSource.IsCancellationRequested)
         {
 #if HACK_CHECK_WINCHANGED
-            return _resultQueue.Count > 0 || _mainLoop.CheckTimersAndIdleHandlers (out _) || _winChanged;
+            return _resultQueue.Count > 0 || _mainLoop.TimedEvents.CheckTimersAndIdleHandlers (out _) || _winChanged;
 #else
-            return _resultQueue.Count > 0 || _mainLoop.CheckTimersAndIdleHandlers (out _);
+            return _resultQueue.Count > 0 || _mainLoop.TimedEvents.CheckTimersAndIdleHandlers (out _);
 #endif
         }
 

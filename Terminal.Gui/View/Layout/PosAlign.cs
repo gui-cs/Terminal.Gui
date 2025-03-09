@@ -1,7 +1,6 @@
 #nullable enable
 
 using System.ComponentModel;
-using System.Text.RegularExpressions;
 
 namespace Terminal.Gui;
 
@@ -61,33 +60,27 @@ public record PosAlign : Pos
     /// <returns></returns>
     public static int CalculateMinDimension (int groupId, IList<View> views, Dimension dimension)
     {
-        List<int> dimensionsList = new ();
-
-        // PERF: If this proves a perf issue, consider caching a ref to this list in each item
-        List<View> viewsInGroup = views.Where (v => HasGroupId (v, dimension, groupId)).ToList ();
-
-        if (viewsInGroup.Count == 0)
+        int dimensionsSum = 0;
+        foreach (var view in views)
         {
-            return 0;
-        }
+            if (!HasGroupId (view, dimension, groupId)) {
+                continue;
+            }
 
-        // PERF: We iterate over viewsInGroup multiple times here.
-
-        // Update the dimensionList with the sizes of the views
-        for (var index = 0; index < viewsInGroup.Count; index++)
-        {
-            View view = viewsInGroup [index];
-
-            PosAlign? posAlign = dimension == Dimension.Width ? view.X as PosAlign : view.Y as PosAlign;
+            PosAlign? posAlign = dimension == Dimension.Width
+                ? view.X as PosAlign
+                : view.Y as PosAlign;
 
             if (posAlign is { })
             {
-                dimensionsList.Add (dimension == Dimension.Width ? view.Frame.Width : view.Frame.Height);
+                dimensionsSum += dimension == Dimension.Width
+                    ? view.Frame.Width
+                    : view.Frame.Height;
             }
         }
 
         // Align
-        return dimensionsList.Sum ();
+        return dimensionsSum;
     }
 
     internal static bool HasGroupId (View v, Dimension dimension, int groupId)

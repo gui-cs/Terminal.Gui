@@ -1,5 +1,8 @@
 # Proposed Design for a modern Cursor system in v2
 
+> [!IMPORTANT]
+> This document is a work in progress and does not represent the final design or even the current implementation.
+
 See end for list of issues this design addresses.
 
 ## Tenets for Cursor Support (Unless you know better ones...)

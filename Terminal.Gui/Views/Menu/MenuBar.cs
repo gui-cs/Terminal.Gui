@@ -1031,7 +1031,7 @@ public class MenuBar : View, IDesignable
             return false;
         }
 
-        Application.MainLoop!.AddIdle (
+        Application.AddIdle (
                                        () =>
                                        {
                                            action ();

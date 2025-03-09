@@ -1,5 +1,5 @@
 ﻿//
-// FakeDriver.cs: A fake ConsoleDriver for unit tests. 
+// FakeDriver.cs: A fake IConsoleDriver for unit tests. 
 //
 
 using System.Diagnostics;
@@ -10,7 +10,7 @@ using Terminal.Gui.ConsoleDrivers;
 
 namespace Terminal.Gui;
 
-/// <summary>Implements a mock ConsoleDriver for unit testing</summary>
+/// <summary>Implements a mock IConsoleDriver for unit testing</summary>
 public class FakeDriver : ConsoleDriver
 {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member

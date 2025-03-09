@@ -1,0 +1,51 @@
+name: Run StressTests (for 15 minutes)
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs every day at midnight UTC
+  push:
+    branches: [ v2_release, v2_develop ]
+    paths-ignore:
+      - '**.md'
+      
+jobs:
+  run_stress_tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest ]
+
+    timeout-minutes: 70 # Allow some buffer time beyond the 1-hour test duration
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.x
+          dotnet-quality: 'ga'
+
+      - name: Install dependencies
+        run: dotnet restore
+
+      - name: Build StressTests
+        run: dotnet build Tests/StressTests --configuration Debug --no-restore
+
+      - name: Run StressTests for 15 minutes
+        run: |
+          end=$((SECONDS+900))
+          while [ $SECONDS -lt $end ]; do
+            dotnet test Tests/StressTests --no-build --verbosity normal --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
+          done
+
+      - name: Upload Test Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stress-test-logs-${{ runner.os }}
+          path: |
+            logs/
+            TestResults/StressTests
+

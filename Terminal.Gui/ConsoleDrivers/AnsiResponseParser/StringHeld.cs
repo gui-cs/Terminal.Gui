@@ -15,4 +15,7 @@ internal class StringHeld : IHeld
     public IEnumerable<object> HeldToObjects () { return _held.ToString ().Select (c => (object)c); }
 
     public void AddToHeld (object o) { _held.Append ((char)o); }
+
+    /// <inheritdoc/>
+    public int Length => _held.Length;
 }

@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
-using static Terminal.Gui.Dialog;
 
 namespace UICatalog.Scenarios;
 
 /// <summary>
-///     This Scenario demonstrates how to use Terminal.Gui's Dim and Pos Layout System. 
+///     This Scenario demonstrates how to use Terminal.Gui's Dim and Pos Layout System.
 /// </summary>
 [ScenarioMetadata ("Computed Layout", "Demonstrates the Computed (Dim and Pos) Layout System.")]
 [ScenarioCategory ("Layout")]
@@ -19,7 +18,7 @@ public class ComputedLayout : Scenario
 
         Window app = new ()
         {
-            Title = GetQuitKeyAndName (),
+            Title = GetQuitKeyAndName ()
         };
 
         // Demonstrate using Dim to create a horizontal ruler that always measures the parent window's width
@@ -51,19 +50,20 @@ public class ComputedLayout : Scenario
         };
 
         app.SubviewsLaidOut += (s, a) =>
-                                          {
-                                              if (horizontalRuler.Viewport.Width == 0 || horizontalRuler.Viewport.Height == 0)
-                                              {
-                                                  return;
-                                              }
-                                              horizontalRuler.Text =
-                                                  rule.Repeat ((int)Math.Ceiling (horizontalRuler.Viewport.Width / (double)rule.Length)) [
-                                                   ..horizontalRuler.Viewport.Width];
+                               {
+                                   if (horizontalRuler.Viewport.Width == 0 || horizontalRuler.Viewport.Height == 0)
+                                   {
+                                       return;
+                                   }
 
-                                              verticalRuler.Text =
-                                                  vrule.Repeat ((int)Math.Ceiling (verticalRuler.Viewport.Height * 2 / (double)rule.Length))
-                                                      [..(verticalRuler.Viewport.Height * 2)];
-                                          };
+                                   horizontalRuler.Text =
+                                       rule.Repeat ((int)Math.Ceiling (horizontalRuler.Viewport.Width / (double)rule.Length)) [
+                                        ..horizontalRuler.Viewport.Width];
+
+                                   verticalRuler.Text =
+                                       vrule.Repeat ((int)Math.Ceiling (verticalRuler.Viewport.Height * 2 / (double)rule.Length))
+                                           [..(verticalRuler.Viewport.Height * 2)];
+                               };
 
         app.Add (verticalRuler);
 
@@ -77,7 +77,12 @@ public class ComputedLayout : Scenario
 
         // Demonstrate using Dim to create a window that fills the parent with a margin
         var margin = 10;
-        var subWin = new Window { X = Pos.Center (), Y = 2, Width = Dim.Fill (margin), Height = 7 };
+
+        var subWin = new Window
+        {
+            X = Pos.Center (), Y = 2, Width = Dim.Fill (margin), Height = 7,
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped
+        };
 
         subWin.Initialized += (s, a) =>
                               {
@@ -89,10 +94,10 @@ public class ComputedLayout : Scenario
         var i = 1;
         var txt = "Resize the terminal to see computed layout in action.";
         List<Label> labelList = new ();
-        labelList.Add (new Label { Text = "The lines below show different alignment" });
+        labelList.Add (new() { Text = "The lines below show different alignment" });
 
         labelList.Add (
-                       new Label
+                       new()
                        {
                            TextAlignment = Alignment.Start,
                            Width = Dim.Fill (),
@@ -104,7 +109,7 @@ public class ComputedLayout : Scenario
                       );
 
         labelList.Add (
-                       new Label
+                       new()
                        {
                            TextAlignment = Alignment.End,
                            Width = Dim.Fill (),
@@ -116,7 +121,7 @@ public class ComputedLayout : Scenario
                       );
 
         labelList.Add (
-                       new Label
+                       new()
                        {
                            TextAlignment = Alignment.Center,
                            Width = Dim.Fill (),
@@ -128,7 +133,7 @@ public class ComputedLayout : Scenario
                       );
 
         labelList.Add (
-                       new Label
+                       new()
                        {
                            TextAlignment = Alignment.Fill,
                            Width = Dim.Fill (),
@@ -150,11 +155,11 @@ public class ComputedLayout : Scenario
                                          $"{frameView.GetType ().Name} {{X={fv.X},Y={fv.Y},Width={fv.Width},Height={fv.Height}}}";
                                  };
         i = 1;
-        labelList = new List<Label> ();
-        labelList.Add (new Label { Text = "The lines below show different alignment" });
+        labelList = new ();
+        labelList.Add (new() { Text = "The lines below show different alignment" });
 
         labelList.Add (
-                       new Label
+                       new()
                        {
                            TextAlignment = Alignment.Start,
                            Width = Dim.Fill (),
@@ -166,7 +171,7 @@ public class ComputedLayout : Scenario
                       );
 
         labelList.Add (
-                       new Label
+                       new()
                        {
                            TextAlignment = Alignment.End,
                            Width = Dim.Fill (),
@@ -178,7 +183,7 @@ public class ComputedLayout : Scenario
                       );
 
         labelList.Add (
-                       new Label
+                       new()
                        {
                            TextAlignment = Alignment.Center,
                            Width = Dim.Fill (),
@@ -190,7 +195,7 @@ public class ComputedLayout : Scenario
                       );
 
         labelList.Add (
-                       new Label
+                       new()
                        {
                            TextAlignment = Alignment.Fill,
                            Width = Dim.Fill (),
@@ -203,7 +208,7 @@ public class ComputedLayout : Scenario
         frameView.Add (labelList.ToArray ());
         app.Add (frameView);
 
-        frameView = new FrameView
+        frameView = new()
         {
             X = Pos.Right (frameView), Y = Pos.Top (frameView), Width = Dim.Fill (), Height = 7
         };
@@ -216,11 +221,11 @@ public class ComputedLayout : Scenario
                                          $"{frameView.GetType ().Name} {{X={fv.X},Y={fv.Y},Width={fv.Width},Height={fv.Height}}}";
                                  };
 
-        labelList = new List<Label> ();
-        labelList.Add (new Label { Text = "The lines below show different alignment" });
+        labelList = new ();
+        labelList.Add (new() { Text = "The lines below show different alignment" });
 
         labelList.Add (
-                       new Label
+                       new()
                        {
                            TextAlignment = Alignment.Start,
                            Width = Dim.Fill (),
@@ -232,7 +237,7 @@ public class ComputedLayout : Scenario
                       );
 
         labelList.Add (
-                       new Label
+                       new()
                        {
                            TextAlignment = Alignment.End,
                            Width = Dim.Fill (),
@@ -244,7 +249,7 @@ public class ComputedLayout : Scenario
                       );
 
         labelList.Add (
-                       new Label
+                       new()
                        {
                            TextAlignment = Alignment.Center,
                            Width = Dim.Fill (),
@@ -256,7 +261,7 @@ public class ComputedLayout : Scenario
                       );
 
         labelList.Add (
-                       new Label
+                       new()
                        {
                            TextAlignment = Alignment.Fill,
                            Width = Dim.Fill (),
@@ -296,24 +301,24 @@ public class ComputedLayout : Scenario
         // Demonstrate odd-ball Combine scenarios
         // Until https://github.com/gui-cs/Terminal.Gui/issues/2358 is fixed these won't work right
 
-        oddballButton = new Button { Text = "Center + 0", X = Pos.Center () + 0, Y = Pos.Bottom (oddballButton) };
+        oddballButton = new() { Text = "Center + 0", X = Pos.Center () + 0, Y = Pos.Bottom (oddballButton) };
         app.Add (oddballButton);
 
-        oddballButton = new Button { Text = "Center + 1", X = Pos.Center () + 1, Y = Pos.Bottom (oddballButton) };
+        oddballButton = new() { Text = "Center + 1", X = Pos.Center () + 1, Y = Pos.Bottom (oddballButton) };
         app.Add (oddballButton);
 
-        oddballButton = new Button { Text = "0 + Center", X = 0 + Pos.Center (), Y = Pos.Bottom (oddballButton) };
+        oddballButton = new() { Text = "0 + Center", X = 0 + Pos.Center (), Y = Pos.Bottom (oddballButton) };
         app.Add (oddballButton);
 
-        oddballButton = new Button { Text = "1 + Center", X = 1 + Pos.Center (), Y = Pos.Bottom (oddballButton) };
+        oddballButton = new() { Text = "1 + Center", X = 1 + Pos.Center (), Y = Pos.Bottom (oddballButton) };
         app.Add (oddballButton);
 
-        oddballButton = new Button { Text = "Center - 1", X = Pos.Center () - 1, Y = Pos.Bottom (oddballButton) };
+        oddballButton = new() { Text = "Center - 1", X = Pos.Center () - 1, Y = Pos.Bottom (oddballButton) };
         app.Add (oddballButton);
 
         // This demonstrates nonsense: it the same as using Pos.AnchorEnd (100/2=50 + 100/2=50 = 100 - 50)
         // The `- Pos.Percent(5)` is there so at least something is visible
-        oddballButton = new Button
+        oddballButton = new()
         {
             Text = "Center + Center - Percent(50)",
             X = Pos.Center () + Pos.Center () - Pos.Percent (50),
@@ -323,7 +328,7 @@ public class ComputedLayout : Scenario
 
         // This demonstrates nonsense: it the same as using Pos.AnchorEnd (100/2=50 + 100/2=50 = 100 - 50)
         // The `- Pos.Percent(5)` is there so at least something is visible
-        oddballButton = new Button
+        oddballButton = new()
         {
             Text = "Percent(50) + Center - Percent(50)",
             X = Pos.Percent (50) + Pos.Center () - Pos.Percent (50),
@@ -333,7 +338,7 @@ public class ComputedLayout : Scenario
 
         // This demonstrates nonsense: it the same as using Pos.AnchorEnd (100/2=50 + 100/2=50 = 100 - 50)
         // The `- Pos.Percent(5)` is there so at least something is visible
-        oddballButton = new Button
+        oddballButton = new()
         {
             Text = "Center + Percent(50) - Percent(50)",
             X = Pos.Center () + Pos.Percent (50) - Pos.Percent (50),
@@ -344,7 +349,7 @@ public class ComputedLayout : Scenario
         #endregion
 
         // This demonstrates nonsense: Same as At(0)
-        oddballButton = new Button
+        oddballButton = new()
         {
             Text = "Center - Center - Percent(50)",
             X = Pos.Center () + Pos.Center () - Pos.Percent (50),
@@ -353,7 +358,7 @@ public class ComputedLayout : Scenario
         app.Add (oddballButton);
 
         // This demonstrates combining Percents)
-        oddballButton = new Button
+        oddballButton = new()
         {
             Text = "Percent(40) + Percent(10)", X = Pos.Percent (40) + Pos.Percent (10), Y = Pos.Bottom (oddballButton)
         };
@@ -364,13 +369,13 @@ public class ComputedLayout : Scenario
         anchorButton.X = Pos.AnchorEnd ();
 
         anchorButton.Accepting += (s, e) =>
-                                {
-                                    // This demonstrates how to have a dynamically sized button
-                                    // Each time the button is clicked the button's text gets longer
-                                    // The call to app.LayoutSubviews causes the Computed layout to
-                                    // get updated. 
-                                    anchorButton.Text += "!";
-                                };
+                                  {
+                                      // This demonstrates how to have a dynamically sized button
+                                      // Each time the button is clicked the button's text gets longer
+                                      // The call to app.LayoutSubviews causes the Computed layout to
+                                      // get updated. 
+                                      anchorButton.Text += "!";
+                                  };
         app.Add (anchorButton);
 
         // Demonstrate AnchorEnd(n) 
@@ -411,26 +416,26 @@ public class ComputedLayout : Scenario
         };
 
         leftButton.Accepting += (s, e) =>
-                              {
-                                  // This demonstrates how to have a dynamically sized button
-                                  // Each time the button is clicked the button's text gets longer
-                                  leftButton.Text += "!";
-                              };
+                                {
+                                    // This demonstrates how to have a dynamically sized button
+                                    // Each time the button is clicked the button's text gets longer
+                                    leftButton.Text += "!";
+                                };
 
         // show positioning vertically using Pos.AnchorEnd
         var centerButton = new Button
         {
             Text = "Center",
             X = Pos.Align (Alignment.Center),
-            Y = Pos.AnchorEnd (2),
+            Y = Pos.AnchorEnd (2)
         };
 
         centerButton.Accepting += (s, e) =>
-                                {
-                                    // This demonstrates how to have a dynamically sized button
-                                    // Each time the button is clicked the button's text gets longer
-                                    centerButton.Text += "!";
-                                };
+                                  {
+                                      // This demonstrates how to have a dynamically sized button
+                                      // Each time the button is clicked the button's text gets longer
+                                      centerButton.Text += "!";
+                                  };
 
         // show positioning vertically using another window and Pos.Bottom
         var rightButton = new Button
@@ -441,11 +446,11 @@ public class ComputedLayout : Scenario
         };
 
         rightButton.Accepting += (s, e) =>
-                               {
-                                   // This demonstrates how to have a dynamically sized button
-                                   // Each time the button is clicked the button's text gets longer
-                                   rightButton.Text += "!";
-                               };
+                                 {
+                                     // This demonstrates how to have a dynamically sized button
+                                     // Each time the button is clicked the button's text gets longer
+                                     rightButton.Text += "!";
+                                 };
 
         View [] buttons = { leftButton, centerButton, rightButton };
         app.Add (leftButton);

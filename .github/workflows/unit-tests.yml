@@ -1,0 +1,116 @@
+name: Build & Run Unit Tests
+
+on:
+  push:
+    branches: [ v2_release, v2_develop ]
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    branches: [ v2_release, v2_develop ]
+    paths-ignore:
+      - '**.md'
+      
+jobs:
+  non_parallel_unittests:
+    name: Non-Parallel Unit Tests  
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # Turn off fail-fast to let all runners run even if there are errors
+      fail-fast: true
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+
+    timeout-minutes: 10
+    steps:
+
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.x
+        dotnet-quality: 'ga'
+
+    - name: Install dependencies
+      run: |
+        dotnet restore
+
+    - name: Build Solution Debug
+      run: dotnet build --configuration Debug --no-restore
+
+# Test
+    # Note: The --blame and VSTEST_DUMP_PATH stuff is needed to diagnose the test runner crashing on ubuntu/mac
+    # See https://github.com/microsoft/vstest/issues/2952 for why the --blame stuff below is needed.
+    # Without it, the test runner crashes on ubuntu (but not Windows or mac)
+
+    - name: Set VSTEST_DUMP_PATH
+      shell: bash
+      run: echo "{VSTEST_DUMP_PATH}={logs/UnitTests/${{ runner.os }}/}" >> $GITHUB_ENV
+
+    - name: Run UnitTests
+      run: |
+       dotnet test Tests/UnitTests --no-build --verbosity normal --collect:"XPlat Code Coverage" --settings Tests/UnitTests/coverlet.runsettings --diag:logs/UnitTests/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
+     
+       # mv -v Tests/UnitTests/TestResults/*/*.* TestResults/UnitTests/
+
+    - name: Upload Test Logs
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: non_parallel_unittests-logs-${{ runner.os }}
+        path: |
+          logs/UnitTests    
+          TestResults/UnitTests/
+  
+  parallel_unittests:
+    name: Parallel Unit Tests  
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # Turn off fail-fast to let all runners run even if there are errors
+      fail-fast: true
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+
+    timeout-minutes: 10
+    steps:
+
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.x
+        dotnet-quality: 'ga'
+
+    - name: Install dependencies
+      run: |
+        dotnet restore
+
+    - name: Build Solution Debug
+      run: dotnet build --configuration Debug --no-restore
+
+# Test
+    # Note: The --blame and VSTEST_DUMP_PATH stuff is needed to diagnose the test runner crashing on ubuntu/mac
+    # See https://github.com/microsoft/vstest/issues/2952 for why the --blame stuff below is needed.
+    # Without it, the test runner crashes on ubuntu (but not Windows or mac)
+
+    - name: Set VSTEST_DUMP_PATH
+      shell: bash
+      run: echo "{VSTEST_DUMP_PATH}={logs/UnitTestsParallelizable/${{ runner.os }}/}" >> $GITHUB_ENV
+
+    - name: Run UnitTestsParallelizable
+      run: |
+       dotnet test Tests/UnitTestsParallelizable --no-build --verbosity normal --collect:"XPlat Code Coverage" --settings Tests/UnitTestsParallelizable/coverlet.runsettings --diag:logs/UnitTestsParallelizable/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
+     
+       # mv -v Tests/UnitTestsParallelizable/TestResults/*/*.* TestResults/UnitTestsParallelizable/
+
+    - name: Upload UnitTestsParallelizable Logs
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: parallel_unittests-logs-${{ runner.os }}
+        path: |
+          logs/UnitTestsParallelizable/
+          TestResults/UnitTestsParallelizable/

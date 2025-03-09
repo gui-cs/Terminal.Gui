@@ -293,10 +293,10 @@ public class DynamicStatusBar : Scenario
             var _btnRemove = new Button { X = Pos.Left (_btnAdd), Y = Pos.Top (_btnAdd) + 1, Text = "Remove" };
             _frmStatusBar.Add (_btnRemove);
 
-            var _btnUp = new Button { X = Pos.Right (_lstItems) + 2, Y = Pos.Top (_btnRemove) + 2, Text = CM.Glyphs.UpArrow.ToString () };
+            var _btnUp = new Button { X = Pos.Right (_lstItems) + 2, Y = Pos.Top (_btnRemove) + 2, Text = Glyphs.UpArrow.ToString () };
             _frmStatusBar.Add (_btnUp);
 
-            var _btnDown = new Button { X = Pos.Right (_lstItems) + 2, Y = Pos.Top (_btnUp) + 1, Text = CM.Glyphs.DownArrow.ToString () };
+            var _btnDown = new Button { X = Pos.Right (_lstItems) + 2, Y = Pos.Top (_btnUp) + 1, Text = Glyphs.DownArrow.ToString () };
             _frmStatusBar.Add (_btnDown);
 
             Add (_frmStatusBar);

@@ -34,7 +34,7 @@ public class Adornments : Scenario
         var window = new Window
         {
             Title = "The _Window",
-            Arrangement = ViewArrangement.Movable,
+            Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable,
 
             Width = Dim.Fill (Dim.Func (() => editor.Frame.Width )),
             Height = Dim.Fill ()

@@ -5,7 +5,7 @@ namespace Terminal.Gui;
 /// <summary>
 ///     Provides context for a <see cref="Command"/> invocation.
 /// </summary>
-/// <seealso cref="View.Invoke(Command)"/>.
+/// <seealso cref="View.InvokeCommand"/>.
 #pragma warning restore CS1574 // XML comment has cref attribute that could not be resolved
 public record struct CommandContext<TBinding> : ICommandContext
 {

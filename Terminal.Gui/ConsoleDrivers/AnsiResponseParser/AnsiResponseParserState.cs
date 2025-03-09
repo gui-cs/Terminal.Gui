@@ -12,9 +12,10 @@ public enum AnsiResponseParserState
 
     /// <summary>
     ///     Parser has encountered an Esc and is waiting to see if next
-    ///     key(s) continue to form an Ansi escape sequence
+    ///     key(s) continue to form an Ansi escape sequence (typically '[' but
+    ///     also other characters e.g. O for SS3).
     /// </summary>
-    ExpectingBracket,
+    ExpectingEscapeSequence,
 
     /// <summary>
     ///     Parser has encountered Esc[ and considers that it is in the process

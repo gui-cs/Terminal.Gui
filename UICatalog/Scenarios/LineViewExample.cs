@@ -45,7 +45,7 @@ public class LineViewExample : Scenario
         // creates a horizontal line
         var arrowLine = new LineView
         {
-            Y = 8, Width = 10, StartingAnchor = CM.Glyphs.LeftTee, EndingAnchor = (Rune)'>'
+            Y = 8, Width = 10, StartingAnchor = Glyphs.LeftTee, EndingAnchor = (Rune)'>'
         };
 
         appWindow.Add (arrowLine);
@@ -62,7 +62,7 @@ public class LineViewExample : Scenario
         // creates a horizontal line
         var verticalArrow = new LineView (Orientation.Vertical)
         {
-            X = 27, StartingAnchor = CM.Glyphs.TopTee, EndingAnchor = (Rune)'V'
+            X = 27, StartingAnchor = Glyphs.TopTee, EndingAnchor = (Rune)'V'
         };
 
         appWindow.Add (verticalArrow);

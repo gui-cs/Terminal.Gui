@@ -3,7 +3,7 @@
 /// <summary>
 ///     The Label <see cref="View"/> displays text that describes the View next in the <see cref="View.Subviews"/>. When
 ///     Label
-///     recieves a <see cref="Command.HotKey"/> command it will pass it to the next <see cref="View"/> in
+///     receives a <see cref="Command.HotKey"/> command it will pass it to the next <see cref="View"/> in
 ///     <see cref="View.Subviews"/>.
 /// </summary>
 /// <remarks>
@@ -13,7 +13,7 @@
 ///     <para>
 ///         If <see cref="View.CanFocus"/> is <see langword="false"/> and the use clicks on the Label,
 ///         the <see cref="Command.HotKey"/> will be invoked on the next <see cref="View"/> in
-///         <see cref="View.Subviews"/>."
+///         <see cref="View.Subviews"/>.
 ///     </para>
 /// </remarks>
 public class Label : View, IDesignable
@@ -31,7 +31,6 @@ public class Label : View, IDesignable
         MouseClick += Label_MouseClick;
     }
 
-    // TODO: base raises Select, but we want to raise HotKey. This can be simplified?
     private void Label_MouseClick (object sender, MouseEventArgs e)
     {
         if (!CanFocus)
@@ -74,12 +73,15 @@ public class Label : View, IDesignable
             return true;
         }
 
-        int me = SuperView?.Subviews.IndexOf (this) ?? -1;
-
-        if (me != -1 && me < SuperView?.Subviews.Count - 1)
+        if (HotKey.IsValid)
         {
+            int me = SuperView?.Subviews.IndexOf (this) ?? -1;
 
-            return SuperView?.Subviews [me + 1].InvokeCommand (Command.HotKey) == true;
+            if (me != -1 && me < SuperView?.Subviews.Count - 1)
+            {
+
+                return SuperView?.Subviews [me + 1].InvokeCommand (Command.HotKey) == true;
+            }
         }
 
         return false;

@@ -107,7 +107,7 @@ public class Dialog : Window
         get
         {
 #if DEBUG_IDISPOSABLE
-            if (WasDisposed)
+            if (View.DebugIDisposable && WasDisposed)
             {
                 throw new ObjectDisposedException (GetType ().FullName);
             }
@@ -117,7 +117,7 @@ public class Dialog : Window
         set
         {
 #if DEBUG_IDISPOSABLE
-            if (WasDisposed)
+            if (View.DebugIDisposable && WasDisposed)
             {
                 throw new ObjectDisposedException (GetType ().FullName);
             }

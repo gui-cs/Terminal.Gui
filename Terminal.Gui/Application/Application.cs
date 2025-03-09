@@ -24,7 +24,7 @@ namespace Terminal.Gui;
 public static partial class Application
 {
     /// <summary>Gets all cultures supported by the application without the invariant language.</summary>
-    public static List<CultureInfo>? SupportedCultures { get; private set; }
+    public static List<CultureInfo>? SupportedCultures { get; private set; } = GetSupportedCultures ();
 
     /// <summary>
     ///     Gets a string representation of the Application as rendered by <see cref="Driver"/>.
@@ -63,7 +63,7 @@ public static partial class Application
             {
                 Rune rune = contents [r, c].Rune;
 
-                if (rune.DecodeSurrogatePair (out char [] sp))
+                if (rune.DecodeSurrogatePair (out char []? sp))
                 {
                     sb.Append (sp);
                 }
@@ -159,7 +159,7 @@ public static partial class Application
 #if DEBUG_IDISPOSABLE
 
         // Don't dispose the Top. It's up to caller dispose it
-        if (!ignoreDisposed && Top is { })
+        if (View.DebugIDisposable && !ignoreDisposed && Top is { })
         {
             Debug.Assert (Top.WasDisposed);
 
@@ -180,6 +180,7 @@ public static partial class Application
         MainThreadId = -1;
         Iteration = null;
         EndAfterFirstIteration = false;
+        ClearScreenNextIteration = false;
 
         // Driver stuff
         if (Driver is { })
@@ -219,7 +220,6 @@ public static partial class Application
 
         Navigation = null;
 
-        ClearScreenNextIteration = false;
 
         KeyBindings.Clear ();
         AddKeyBindings ();
@@ -231,5 +231,10 @@ public static partial class Application
         SynchronizationContext.SetSynchronizationContext (null);
     }
 
-    // Only return true if the Current has changed.
+
+    /// <summary>
+    ///     Adds specified idle handler function to main iteration processing. The handler function will be called
+    ///     once per iteration of the main loop after other events have been handled.
+    /// </summary>
+    public static void AddIdle (Func<bool> func) => ApplicationImpl.Instance.AddIdle (func);
 }

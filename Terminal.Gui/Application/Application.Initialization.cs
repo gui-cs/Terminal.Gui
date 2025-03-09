@@ -37,7 +37,15 @@ public static partial class Application // Initialization (Init/Shutdown)
     /// </param>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public static void Init (IConsoleDriver? driver = null, string? driverName = null) { InternalInit (driver, driverName); }
+    public static void Init (IConsoleDriver? driver = null, string? driverName = null)
+    {
+        if (driverName?.StartsWith ("v2") ?? false)
+        {
+            ApplicationImpl.ChangeInstance (new ApplicationV2 ());
+        }
+
+        ApplicationImpl.Instance.Init (driver, driverName);
+    }
 
     internal static int MainThreadId { get; set; } = -1;
 
@@ -94,19 +102,7 @@ public static partial class Application // Initialization (Init/Shutdown)
 
         AddKeyBindings ();
 
-        // Start the process of configuration management.
-        // Note that we end up calling LoadConfigurationFromAllSources
-        // multiple times. We need to do this because some settings are only
-        // valid after a Driver is loaded. In this case we need just
-        // `Settings` so we can determine which driver to use.
-        // Don't reset, so we can inherit the theme from the previous run.
-        string previousTheme = Themes?.Theme ?? string.Empty;
-        Load ();
-        if (Themes is { } && !string.IsNullOrEmpty (previousTheme) && previousTheme != "Default")
-        {
-            ThemeManager.SelectedTheme = previousTheme;
-        }
-        Apply ();
+        InitializeConfigurationManagement ();
 
         // Ignore Configuration for ForceDriver if driverName is specified
         if (!string.IsNullOrEmpty (driverName))
@@ -166,10 +162,28 @@ public static partial class Application // Initialization (Init/Shutdown)
 
         SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext ());
 
-        SupportedCultures = GetSupportedCultures ();
         MainThreadId = Thread.CurrentThread.ManagedThreadId;
         bool init = Initialized = true;
         InitializedChanged?.Invoke (null, new (init));
+    }
+
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
+    internal static void InitializeConfigurationManagement ()
+    {
+        // Start the process of configuration management.
+        // Note that we end up calling LoadConfigurationFromAllSources
+        // multiple times. We need to do this because some settings are only
+        // valid after a Driver is loaded. In this case we need just
+        // `Settings` so we can determine which driver to use.
+        // Don't reset, so we can inherit the theme from the previous run.
+        string previousTheme = Themes?.Theme ?? string.Empty;
+        Load ();
+        if (Themes is { } && !string.IsNullOrEmpty (previousTheme) && previousTheme != "Default")
+        {
+            ThemeManager.SelectedTheme = previousTheme;
+        }
+        Apply ();
     }
 
     internal static void SubscribeDriverEvents ()
@@ -226,20 +240,7 @@ public static partial class Application // Initialization (Init/Shutdown)
     ///     up (Disposed)
     ///     and terminal settings are restored.
     /// </remarks>
-    public static void Shutdown ()
-    {
-        // TODO: Throw an exception if Init hasn't been called.
-
-        bool wasInitialized = Initialized;
-        ResetState ();
-        PrintJsonErrors ();
-
-        if (wasInitialized)
-        {
-            bool init = Initialized;
-            InitializedChanged?.Invoke (null, new (in init));
-        }
-    }
+    public static void Shutdown () => ApplicationImpl.Instance.Shutdown ();
 
     /// <summary>
     ///     Gets whether the application has been initialized with <see cref="Init"/> and not yet shutdown with <see cref="Shutdown"/>.
@@ -258,4 +259,12 @@ public static partial class Application // Initialization (Init/Shutdown)
     ///     Intended to support unit tests that need to know when the application has been initialized.
     /// </remarks>
     public static event EventHandler<EventArgs<bool>>? InitializedChanged;
+
+    /// <summary>
+    ///  Raises the <see cref="InitializedChanged"/> event.
+    /// </summary>
+    internal static void OnInitializedChanged (object sender, EventArgs<bool> e)
+    {
+        Application.InitializedChanged?.Invoke (sender,e);
+    }
 }

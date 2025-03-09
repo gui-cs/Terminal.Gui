@@ -59,7 +59,7 @@ internal class ColorSchemeJsonConverter : JsonConverter<ColorScheme>
 
             string propertyName = reader.GetString ();
             reader.Read ();
-            var attribute = JsonSerializer.Deserialize (ref reader, _serializerContext.Attribute);
+            var attribute = JsonSerializer.Deserialize (ref reader, SerializerContext.Attribute);
 
             switch (propertyName.ToLower ())
             {

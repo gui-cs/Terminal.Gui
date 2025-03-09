@@ -22,7 +22,10 @@ public class RunState : IDisposable
         Dispose (true);
         GC.SuppressFinalize (this);
 #if DEBUG_IDISPOSABLE
-        WasDisposed = true;
+        if (View.DebugIDisposable)
+        {
+            WasDisposed = true;
+        }
 #endif
     }
 
@@ -52,6 +55,12 @@ public class RunState : IDisposable
     public static List<RunState> Instances = new ();
 
     /// <summary>Creates a new RunState object.</summary>
-    public RunState () { Instances.Add (this); }
+    public RunState ()
+    {
+        if (View.DebugIDisposable)
+        {
+            Instances.Add (this);
+        }
+    }
 #endif
 }

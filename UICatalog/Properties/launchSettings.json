@@ -11,6 +11,14 @@
       "commandName": "Project",
       "commandLineArgs": "--driver WindowsDriver"
     },
+    "UICatalog --driver v2win": {
+      "commandName": "Project",
+      "commandLineArgs": "--driver v2win"
+    },
+    "UICatalog --driver v2net": {
+      "commandName": "Project",
+      "commandLineArgs": "--driver v2net"
+    },
     "WSL: UICatalog": {
       "commandName": "Executable",
       "executablePath": "wsl",
@@ -30,6 +38,14 @@
     "Benchmark All --driver NetDriver": {
       "commandName": "Project",
       "commandLineArgs": "--driver NetDriver --benchmark"
+    },
+    "Benchmark All --driver v2win": {
+      "commandName": "Project",
+      "commandLineArgs": "--driver v2win --benchmark"
+    },
+    "Benchmark All --driver v2net": {
+      "commandName": "Project",
+      "commandLineArgs": "--driver v2net --benchmark"
     },
     "WSL: Benchmark All": {
       "commandName": "Executable",

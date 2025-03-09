@@ -264,7 +264,7 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         Altering the Viewport Size will eventually (when the view is next laid out) cause the
-    ///         <see cref="Layout()"/> and <see cref="OnDrawingContent"/> methods to be called.
+    ///         <see cref="Layout()"/> and <see cref="OnDrawingContent()"/> methods to be called.
     ///     </para>
     /// </remarks>
     public virtual Rectangle Viewport
@@ -385,7 +385,7 @@ public partial class View
 
     private void RaiseViewportChangedEvent (Rectangle oldViewport)
     {
-        var args = new DrawEventArgs (IsInitialized ? Viewport : Rectangle.Empty, oldViewport);
+        var args = new DrawEventArgs (IsInitialized ? Viewport : Rectangle.Empty, oldViewport, null);
         OnViewportChanged (args);
         ViewportChanged?.Invoke (this, args);
     }
@@ -428,6 +428,20 @@ public partial class View
         screen.Offset (viewportOffset.X + viewportLocation.X, viewportOffset.Y + viewportLocation.Y);
 
         return screen.Location;
+    }
+
+    /// <summary>
+    ///     Gets the Viewport rectangle with a screen-relative location.
+    /// </summary>
+    /// <returns>Screen-relative location and size.</returns>
+    public Rectangle ViewportToScreen ()
+    {
+        // Translate bounds to Frame (our SuperView's Viewport-relative coordinates)
+        Rectangle screen = FrameToScreen ();
+        Point viewportOffset = GetViewportOffsetFromFrame ();
+        screen.Offset (viewportOffset.X, viewportOffset.Y);
+
+        return screen;
     }
 
     /// <summary>Converts a screen-relative coordinate to a Viewport-relative coordinate.</summary>

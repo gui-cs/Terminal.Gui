@@ -90,17 +90,17 @@ public class Sliders : Scenario
                                 {
                                     if (single.Orientation == Orientation.Horizontal)
                                     {
-                                        single.Style.SpaceChar = new Cell { Rune = CM.Glyphs.HLine };
-                                        single.Style.OptionChar = new Cell { Rune = CM.Glyphs.HLine };
+                                        single.Style.SpaceChar = new Cell { Rune = Glyphs.HLine };
+                                        single.Style.OptionChar = new Cell { Rune = Glyphs.HLine };
                                     }
                                     else
                                     {
-                                        single.Style.SpaceChar = new Cell { Rune = CM.Glyphs.VLine };
-                                        single.Style.OptionChar = new Cell { Rune = CM.Glyphs.VLine };
+                                        single.Style.SpaceChar = new Cell { Rune = Glyphs.VLine };
+                                        single.Style.OptionChar = new Cell { Rune = Glyphs.VLine };
                                     }
                                 };
-        single.Style.SetChar = new Cell { Rune = CM.Glyphs.ContinuousMeterSegment };
-        single.Style.DragChar = new Cell { Rune = CM.Glyphs.ContinuousMeterSegment };
+        single.Style.SetChar = new Cell { Rune = Glyphs.ContinuousMeterSegment };
+        single.Style.DragChar = new Cell { Rune = Glyphs.ContinuousMeterSegment };
 
         v.Add (single);
 
@@ -264,7 +264,7 @@ public class Sliders : Scenario
                                                             {
                                                                 s.Orientation = Orientation.Horizontal;
 
-                                                                s.Style.SpaceChar = new Cell { Rune = CM.Glyphs.HLine };
+                                                                s.Style.SpaceChar = new Cell { Rune = Glyphs.HLine };
 
                                                                 if (prev == null)
                                                                 {
@@ -282,7 +282,7 @@ public class Sliders : Scenario
                                                             {
                                                                 s.Orientation = Orientation.Vertical;
 
-                                                                s.Style.SpaceChar = new Cell { Rune = CM.Glyphs.VLine };
+                                                                s.Style.SpaceChar = new Cell { Rune = Glyphs.VLine };
 
                                                                 if (prev == null)
                                                                 {

@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Timers;
 using Terminal.Gui;
+using Timer = System.Timers.Timer;
 
 namespace UICatalog.Scenarios;
 

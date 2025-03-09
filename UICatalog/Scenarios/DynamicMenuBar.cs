@@ -567,10 +567,10 @@ public class DynamicMenuBar : Scenario
             var btnAddMenuBar = new Button { Y = 1, Text = "Add a MenuBar" };
             frmMenu.Add (btnAddMenuBar);
 
-            var btnMenuBarUp = new Button { X = Pos.Center (), Text = CM.Glyphs.UpArrow.ToString () };
+            var btnMenuBarUp = new Button { X = Pos.Center (), Text = Glyphs.UpArrow.ToString () };
             frmMenu.Add (btnMenuBarUp);
 
-            var btnMenuBarDown = new Button { X = Pos.Center (), Y = Pos.Bottom (btnMenuBarUp), Text = CM.Glyphs.DownArrow.ToString () };
+            var btnMenuBarDown = new Button { X = Pos.Center (), Y = Pos.Bottom (btnMenuBarUp), Text = Glyphs.DownArrow.ToString () };
             frmMenu.Add (btnMenuBarDown);
 
             var btnRemoveMenuBar = new Button { Y = 1, Text = "Remove a MenuBar" };
@@ -580,7 +580,7 @@ public class DynamicMenuBar : Scenario
 
             var btnPrevious = new Button
             {
-                X = Pos.Left (btnAddMenuBar), Y = Pos.Top (btnAddMenuBar) + 2, Text = CM.Glyphs.LeftArrow.ToString ()
+                X = Pos.Left (btnAddMenuBar), Y = Pos.Top (btnAddMenuBar) + 2, Text = Glyphs.LeftArrow.ToString ()
             };
             frmMenu.Add (btnPrevious);
 
@@ -588,7 +588,7 @@ public class DynamicMenuBar : Scenario
             btnAdd.X = Pos.AnchorEnd ();
             frmMenu.Add (btnAdd);
 
-            var btnNext = new Button { X = Pos.X (btnAdd), Y = Pos.Top (btnPrevious), Text = CM.Glyphs.RightArrow.ToString () };
+            var btnNext = new Button { X = Pos.X (btnAdd), Y = Pos.Top (btnPrevious), Text = Glyphs.RightArrow.ToString () };
             frmMenu.Add (btnNext);
 
             var lblMenuBar = new Label
@@ -648,10 +648,10 @@ public class DynamicMenuBar : Scenario
             var btnRemove = new Button { X = Pos.Left (btnAdd), Y = Pos.Top (btnAdd) + 1, Text = "Remove" };
             frmMenu.Add (btnRemove);
 
-            var btnUp = new Button { X = Pos.Right (_lstMenus) + 2, Y = Pos.Top (btnRemove) + 2, Text = CM.Glyphs.UpArrow.ToString () };
+            var btnUp = new Button { X = Pos.Right (_lstMenus) + 2, Y = Pos.Top (btnRemove) + 2, Text = Glyphs.UpArrow.ToString () };
             frmMenu.Add (btnUp);
 
-            var btnDown = new Button { X = Pos.Right (_lstMenus) + 2, Y = Pos.Top (btnUp) + 1, Text = CM.Glyphs.DownArrow.ToString () };
+            var btnDown = new Button { X = Pos.Right (_lstMenus) + 2, Y = Pos.Top (btnUp) + 1, Text = Glyphs.DownArrow.ToString () };
             frmMenu.Add (btnDown);
 
             Add (frmMenu);

@@ -1,12 +1,39 @@
 ﻿#nullable enable
 
+using Microsoft.Extensions.Logging;
+
 namespace Terminal.Gui;
 
 internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 {
+    private const char Escape = '\x1B';
+    private readonly AnsiMouseParser _mouseParser = new ();
+    protected readonly AnsiKeyboardParser _keyboardParser = new ();
     protected object _lockExpectedResponses = new ();
 
     protected object _lockState = new ();
+
+    /// <summary>
+    ///     Event raised when mouse events are detected - requires setting <see cref="HandleMouse"/> to true
+    /// </summary>
+    public event EventHandler<MouseEventArgs>? Mouse;
+
+    /// <summary>
+    ///     Event raised when keyboard event is detected (e.g. cursors) - requires setting <see cref="HandleKeyboard"/>
+    /// </summary>
+    public event EventHandler<Key>? Keyboard;
+
+    /// <summary>
+    ///     True to explicitly handle mouse escape sequences by passing them to <see cref="Mouse"/> event.
+    ///     Defaults to <see langword="false"/>
+    /// </summary>
+    public bool HandleMouse { get; set; } = false;
+
+    /// <summary>
+    ///     True to explicitly handle keyboard escape sequences (such as cursor keys) by passing them to <see cref="Keyboard"/>
+    ///     event
+    /// </summary>
+    public bool HandleKeyboard { get; set; } = false;
 
     /// <summary>
     ///     Responses we are expecting to come in.
@@ -110,7 +137,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
             char currentChar = getCharAtIndex (index);
             object currentObj = getObjectAtIndex (index);
 
-            bool isEscape = currentChar == '\x1B';
+            bool isEscape = currentChar == Escape;
 
             switch (State)
             {
@@ -118,7 +145,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
                     if (isEscape)
                     {
                         // Escape character detected, move to ExpectingBracket state
-                        State = AnsiResponseParserState.ExpectingBracket;
+                        State = AnsiResponseParserState.ExpectingEscapeSequence;
                         _heldContent.AddToHeld (currentObj); // Hold the escape character
                     }
                     else
@@ -129,18 +156,22 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 
                     break;
 
-                case AnsiResponseParserState.ExpectingBracket:
+                case AnsiResponseParserState.ExpectingEscapeSequence:
                     if (isEscape)
                     {
                         // Second escape so we must release first
-                        ReleaseHeld (appendOutput, AnsiResponseParserState.ExpectingBracket);
+                        ReleaseHeld (appendOutput, AnsiResponseParserState.ExpectingEscapeSequence);
                         _heldContent.AddToHeld (currentObj); // Hold the new escape
                     }
-                    else if (currentChar == '[')
+                    else if (_heldContent.Length == 1)
                     {
-                        // Detected '[', transition to InResponse state
+                        //We need O for SS3 mode F1-F4 e.g. "<esc>OP" => F1
+                        //We need any letter or digit for Alt+Letter (see EscAsAltPattern)
+                        //In fact lets just always see what comes after esc
+
+                        // Detected '[' or 'O', transition to InResponse state
                         State = AnsiResponseParserState.InResponse;
-                        _heldContent.AddToHeld (currentObj); // Hold the '['
+                        _heldContent.AddToHeld (currentObj); // Hold the letter
                     }
                     else
                     {
@@ -152,12 +183,24 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
                     break;
 
                 case AnsiResponseParserState.InResponse:
-                    _heldContent.AddToHeld (currentObj);
 
-                    // Check if the held content should be released
-                    if (ShouldReleaseHeldContent ())
+                    // if seeing another esc, we must resolve the current one first
+                    if (isEscape)
                     {
                         ReleaseHeld (appendOutput);
+                        State = AnsiResponseParserState.ExpectingEscapeSequence;
+                        _heldContent.AddToHeld (currentObj);
+                    }
+                    else
+                    {
+                        // Non esc, so continue to build sequence
+                        _heldContent.AddToHeld (currentObj);
+
+                        // Check if the held content should be released
+                        if (ShouldReleaseHeldContent ())
+                        {
+                            ReleaseHeld (appendOutput);
+                        }
                     }
 
                     break;
@@ -169,6 +212,8 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 
     private void ReleaseHeld (Action<object> appendOutput, AnsiResponseParserState newState = AnsiResponseParserState.Normal)
     {
+        TryLastMinuteSequences ();
+
         foreach (object o in _heldContent.HeldToObjects ())
         {
             appendOutput (o);
@@ -178,12 +223,75 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
         _heldContent.ClearHeld ();
     }
 
+    /// <summary>
+    ///     Checks current held chars against any sequences that have
+    ///     conflicts with longer sequences e.g. Esc as Alt sequences
+    ///     which can conflict if resolved earlier e.g. with EscOP ss3
+    ///     sequences.
+    /// </summary>
+    protected void TryLastMinuteSequences ()
+    {
+        lock (_lockState)
+        {
+            string cur = _heldContent.HeldToString ();
+
+            if (HandleKeyboard)
+            {
+                AnsiKeyboardParserPattern? pattern = _keyboardParser.IsKeyboard (cur, true);
+
+                if (pattern != null)
+                {
+                    RaiseKeyboardEvent (pattern, cur);
+                    _heldContent.ClearHeld ();
+
+                    return;
+                }
+            }
+
+            // We have something totally unexpected, not a CSI and
+            // still Esc+<something>. So give last minute swallow chance
+            if (cur.Length >= 2 && cur [0] == Escape)
+            {
+                // Maybe swallow anyway if user has custom delegate
+                bool swallow = ShouldSwallowUnexpectedResponse ();
+
+                if (swallow)
+                {
+                    _heldContent.ClearHeld ();
+
+                    Logging.Trace ($"AnsiResponseParser last minute swallowed '{cur}'");
+                }
+            }
+        }
+    }
+
     // Common response handler logic
     protected bool ShouldReleaseHeldContent ()
     {
         lock (_lockState)
         {
             string cur = _heldContent.HeldToString ();
+
+            if (HandleMouse && IsMouse (cur))
+            {
+                RaiseMouseEvent (cur);
+                ResetState ();
+
+                return false;
+            }
+
+            if (HandleKeyboard)
+            {
+                AnsiKeyboardParserPattern? pattern = _keyboardParser.IsKeyboard (cur);
+
+                if (pattern != null)
+                {
+                    RaiseKeyboardEvent (pattern, cur);
+                    ResetState ();
+
+                    return false;
+                }
+            }
 
             lock (_lockExpectedResponses)
             {
@@ -232,6 +340,8 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
                 {
                     _heldContent.ClearHeld ();
 
+                    Logging.Trace ($"AnsiResponseParser swallowed '{cur}'");
+
                     // Do not send back to input stream
                     return false;
                 }
@@ -242,6 +352,32 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
         }
 
         return false; // Continue accumulating
+    }
+
+    private void RaiseMouseEvent (string cur)
+    {
+        MouseEventArgs? ev = _mouseParser.ProcessMouseInput (cur);
+
+        if (ev != null)
+        {
+            Mouse?.Invoke (this, ev);
+        }
+    }
+
+    private bool IsMouse (string cur) { return _mouseParser.IsMouse (cur); }
+
+    protected void RaiseKeyboardEvent (AnsiKeyboardParserPattern pattern, string cur)
+    {
+        Key? k = pattern.GetKey (cur);
+
+        if (k is null)
+        {
+            Logging.Logger.LogError ($"Failed to determine a Key for given Keyboard escape sequence '{cur}'");
+        }
+        else
+        {
+            Keyboard?.Invoke (this, k);
+        }
     }
 
     /// <summary>
@@ -265,6 +401,8 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 
         if (matchingResponse?.Response != null)
         {
+            Logging.Trace ($"AnsiResponseParser processed '{cur}'");
+
             if (invokeCallback)
             {
                 matchingResponse.Response.Invoke (_heldContent);
@@ -339,8 +477,10 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
     }
 }
 
-internal class AnsiResponseParser<T> () : AnsiResponseParserBase (new GenericHeld<T> ())
+internal class AnsiResponseParser<T> : AnsiResponseParserBase
 {
+    public AnsiResponseParser () : base (new GenericHeld<T> ()) { }
+
     /// <inheritdoc cref="AnsiResponseParser.UnknownResponseHandler"/>
     public Func<IEnumerable<Tuple<char, T>>, bool> UnexpectedResponseHandler { get; set; } = _ => false;
 
@@ -351,10 +491,18 @@ internal class AnsiResponseParser<T> () : AnsiResponseParserBase (new GenericHel
         ProcessInputBase (
                           i => input [i].Item1,
                           i => input [i],
-                          c => output.Add ((Tuple<char, T>)c),
+                          c => AppendOutput (output, c),
                           input.Length);
 
         return output;
+    }
+
+    private void AppendOutput (List<Tuple<char, T>> output, object c)
+    {
+        Tuple<char, T> tuple = (Tuple<char, T>)c;
+
+        Logging.Trace ($"AnsiResponseParser releasing '{tuple.Item1}'");
+        output.Add (tuple);
     }
 
     public Tuple<char, T> [] Release ()
@@ -362,6 +510,8 @@ internal class AnsiResponseParser<T> () : AnsiResponseParserBase (new GenericHel
         // Lock in case Release is called from different Thread from parse
         lock (_lockState)
         {
+            TryLastMinuteSequences ();
+
             Tuple<char, T> [] result = HeldToEnumerable ().ToArray ();
 
             ResetState ();
@@ -421,16 +571,24 @@ internal class AnsiResponseParser () : AnsiResponseParserBase (new StringHeld ()
         ProcessInputBase (
                           i => input [i],
                           i => input [i], // For string there is no T so object is same as char
-                          c => output.Append ((char)c),
+                          c => AppendOutput (output, (char)c),
                           input.Length);
 
         return output.ToString ();
+    }
+
+    private void AppendOutput (StringBuilder output, char c)
+    {
+        Logging.Trace ($"AnsiResponseParser releasing '{c}'");
+        output.Append (c);
     }
 
     public string Release ()
     {
         lock (_lockState)
         {
+            TryLastMinuteSequences ();
+
             string output = _heldContent.HeldToString ();
             ResetState ();
 

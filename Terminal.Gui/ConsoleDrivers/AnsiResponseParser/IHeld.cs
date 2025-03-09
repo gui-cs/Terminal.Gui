@@ -30,4 +30,6 @@ internal interface IHeld
     /// </summary>
     /// <param name="o"></param>
     void AddToHeld (object o);
+
+    int Length { get; }
 }

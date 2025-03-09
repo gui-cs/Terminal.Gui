@@ -13,14 +13,14 @@ Tenets higher in the list have precedence over tenets lower in the list.
 *Terminal.Gui* provides the following APIs for handling mouse input:
 
 * **MouseEventArgs** - @Terminal.Gui.MouseEventArgs provides a platform-independent abstraction for common mouse operations. It is used for processing mouse input and raising mouse events.
-* **Mouse Bindings** - Mouse Bindings provide a declarative method for handling mouse input in View implementations. The View calls @Terminal.Gui.AddCommand to declare it supports a particular command and then uses @Terminal.Gui.MouseBindings to indicate which mouse events will invoke the command. 
+* **Mouse Bindings** - Mouse Bindings provide a declarative method for handling mouse input in View implementations. The View calls Terminal.Gui.View.AddCommand(Terminal.Gui.Command,System.Func{System.Nullable{System.Boolean}}) to declare it supports a particular command and then uses @Terminal.Gui.MouseBindings to indicate which mouse events will invoke the command. 
 * **Mouse Events** - The Mouse Bindings API is rich enough to support the  majority of use-cases. However, in some cases subscribing directly to key events is needed (e.g. drag & drop). Use @Terminal.Gui.View.MouseEvent and related events in these cases.
 
 Each of these APIs are described more fully below.
 
 ## Mouse Bindings
 
-Mouse Bindings is the preferred way of handling mouse input in View implementations. The View calls @Terminal.Gui.AddCommand to declare it supports a particular command and then uses @Terminal.Gui.MouseBindings to indicate which mouse events will invoke the command. For example, if a View wants to respond to the user using the mouse wheel to scroll up, it would do this:
+Mouse Bindings is the preferred way of handling mouse input in View implementations. The View calls Terminal.Gui.View.AddCommand(Terminal.Gui.Command,System.Func{System.Nullable{System.Boolean}}) to declare it supports a particular command and then uses @Terminal.Gui.MouseBindings to indicate which mouse events will invoke the command. For example, if a View wants to respond to the user using the mouse wheel to scroll up, it would do this:
 
 ```cs
 public MyView : View

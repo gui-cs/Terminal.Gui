@@ -33,11 +33,13 @@ public class Line : View, IOrientation
         set => _orientationHelper.Orientation = value;
     }
 
+#pragma warning disable CS0067 // The event is never used
     /// <inheritdoc/>
     public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
 
     /// <inheritdoc/>
     public event EventHandler<EventArgs<Orientation>> OrientationChanged;
+#pragma warning restore CS0067 // The event is never used
 
     /// <summary>Called when <see cref="Orientation"/> has changed.</summary>
     /// <param name="newOrientation"></param>

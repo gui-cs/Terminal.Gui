@@ -251,7 +251,7 @@ public class GraphViewExample : Scenario
 
         var series = new MultiBarSeries (3, 1, 0.25f, new [] { magenta, cyan, red });
 
-        Rune stiple = CM.Glyphs.Stipple;
+        Rune stiple = Glyphs.Stipple;
 
         series.AddBars ("'96", stiple, 5900, 9000, 14000);
         series.AddBars ("'97", stiple, 6100, 9200, 14800);
@@ -817,7 +817,7 @@ public class GraphViewExample : Scenario
         _graphView.AxisY.ShowLabelsEvery = 0;
         _graphView.AxisY.Minimum = 0;
 
-        var stiple = new GraphCellToRender (CM.Glyphs.Stipple);
+        var stiple = new GraphCellToRender (Glyphs.Stipple);
 
         // Bars in 2 directions
 

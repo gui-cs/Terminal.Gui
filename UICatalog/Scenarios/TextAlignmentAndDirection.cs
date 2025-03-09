@@ -10,6 +10,16 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Text and Formatting")]
 public class TextAlignmentAndDirection : Scenario
 {
+
+    internal class AlignmentAndDirectionView : View
+    {
+        public AlignmentAndDirectionView()
+        {
+            ViewportSettings = Terminal.Gui.ViewportSettings.Transparent;
+            BorderStyle = LineStyle.Dotted;
+        }
+    }
+
     public override void Main ()
     {
         Application.Init ();
@@ -24,8 +34,8 @@ public class TextAlignmentAndDirection : Scenario
         var color1 = new ColorScheme { Normal = new (Color.Black, Color.Gray) };
         var color2 = new ColorScheme { Normal = new (Color.Black, Color.DarkGray) };
 
-        List<Label> singleLineLabels = new (); // single line
-        List<Label> multiLineLabels = new (); // multi line
+        List<View> singleLineLabels = new (); // single line
+        List<View> multiLineLabels = new (); // multi line
 
         // Horizontal Single-Line 
 
@@ -37,7 +47,7 @@ public class TextAlignmentAndDirection : Scenario
             Height = 1,
             TextAlignment = Alignment.End,
             ColorScheme = Colors.ColorSchemes ["Dialog"],
-            Text = "Start"
+            Text = "Start",
         };
 
         var labelHC = new Label
@@ -73,7 +83,7 @@ public class TextAlignmentAndDirection : Scenario
             Text = "Fill"
         };
 
-        var txtLabelHL = new Label
+        var txtLabelHL = new View
         {
             X = Pos.Right (labelHL) + 1,
             Y = Pos.Y (labelHL),
@@ -81,10 +91,11 @@ public class TextAlignmentAndDirection : Scenario
             Height = 1,
             ColorScheme = color1,
             TextAlignment = Alignment.Start,
-            Text = txt
+            Text = txt,
+            ViewportSettings = Terminal.Gui.ViewportSettings.Transparent
         };
 
-        var txtLabelHC = new Label
+        var txtLabelHC = new View
         {
             X = Pos.Right (labelHC) + 1,
             Y = Pos.Y (labelHC),
@@ -92,10 +103,11 @@ public class TextAlignmentAndDirection : Scenario
             Height = 1,
             ColorScheme = color2,
             TextAlignment = Alignment.Center,
-            Text = txt
+            Text = txt,
+            ViewportSettings = Terminal.Gui.ViewportSettings.Transparent
         };
 
-        var txtLabelHR = new Label
+        var txtLabelHR = new View
         {
             X = Pos.Right (labelHR) + 1,
             Y = Pos.Y (labelHR),
@@ -103,10 +115,11 @@ public class TextAlignmentAndDirection : Scenario
             Height = 1,
             ColorScheme = color1,
             TextAlignment = Alignment.End,
-            Text = txt
+            Text = txt,
+            ViewportSettings = Terminal.Gui.ViewportSettings.Transparent
         };
 
-        var txtLabelHJ = new Label
+        var txtLabelHJ = new View
         {
             X = Pos.Right (labelHJ) + 1,
             Y = Pos.Y (labelHJ),
@@ -114,7 +127,8 @@ public class TextAlignmentAndDirection : Scenario
             Height = 1,
             ColorScheme = color2,
             TextAlignment = Alignment.Fill,
-            Text = txt
+            Text = txt,
+            ViewportSettings = Terminal.Gui.ViewportSettings.Transparent
         };
 
         singleLineLabels.Add (txtLabelHL);
@@ -185,7 +199,7 @@ public class TextAlignmentAndDirection : Scenario
         };
         labelVJ.TextFormatter.WordWrap = false;
 
-        var txtLabelVT = new Label
+        var txtLabelVT = new View
         {
             X = Pos.X (labelVT),
             Y = Pos.Bottom (labelVT) + 1,
@@ -194,11 +208,12 @@ public class TextAlignmentAndDirection : Scenario
             ColorScheme = color1,
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.Start,
-            Text = txt
+            Text = txt,
+            ViewportSettings = Terminal.Gui.ViewportSettings.Transparent
         };
         txtLabelVT.TextFormatter.WordWrap = false;
 
-        var txtLabelVM = new Label
+        var txtLabelVM = new View
         {
             X = Pos.X (labelVM),
             Y = Pos.Bottom (labelVM) + 1,
@@ -207,11 +222,12 @@ public class TextAlignmentAndDirection : Scenario
             ColorScheme = color2,
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.Center,
-            Text = txt
+            Text = txt,
+            ViewportSettings = Terminal.Gui.ViewportSettings.Transparent
         };
         txtLabelVM.TextFormatter.WordWrap = false;
 
-        var txtLabelVB = new Label
+        var txtLabelVB = new View
         {
             X = Pos.X (labelVB),
             Y = Pos.Bottom (labelVB) + 1,
@@ -220,11 +236,12 @@ public class TextAlignmentAndDirection : Scenario
             ColorScheme = color1,
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.End,
-            Text = txt
+            Text = txt,
+            ViewportSettings = Terminal.Gui.ViewportSettings.Transparent
         };
         txtLabelVB.TextFormatter.WordWrap = false;
 
-        var txtLabelVJ = new Label
+        var txtLabelVJ = new View
         {
             X = Pos.X (labelVJ),
             Y = Pos.Bottom (labelVJ) + 1,
@@ -233,7 +250,8 @@ public class TextAlignmentAndDirection : Scenario
             ColorScheme = color2,
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.Fill,
-            Text = txt
+            Text = txt,
+            ViewportSettings = Terminal.Gui.ViewportSettings.Transparent
         };
         txtLabelVJ.TextFormatter.WordWrap = false;
 
@@ -263,120 +281,120 @@ public class TextAlignmentAndDirection : Scenario
             //ColorScheme = color2
         };
 
-        var txtLabelTL = new Label
+        var txtLabelTL = new AlignmentAndDirectionView
         {
-            X = 0 /*                    */,
+            X = 0,
             Y = 1,
             Width = Dim.Percent (100 / 3),
             Height = Dim.Percent (100 / 3),
             TextAlignment = Alignment.Start,
             VerticalTextAlignment = Alignment.Start,
             ColorScheme = color1,
-            Text = txt
+            Text = txt,
         };
         txtLabelTL.TextFormatter.MultiLine = true;
 
-        var txtLabelTC = new Label
+        var txtLabelTC = new AlignmentAndDirectionView
         {
-            X = Pos.Right (txtLabelTL) + 2,
+            X = Pos.Right (txtLabelTL),
             Y = 1,
-            Width = Dim.Percent (33),
-            Height = Dim.Percent (33),
+            Width = Dim.Percent (100 / 3),
+            Height = Dim.Percent (100 / 3),
             TextAlignment = Alignment.Center,
             VerticalTextAlignment = Alignment.Start,
             ColorScheme = color1,
-            Text = txt
+            Text = txt,
         };
         txtLabelTC.TextFormatter.MultiLine = true;
 
-        var txtLabelTR = new Label
+        var txtLabelTR = new AlignmentAndDirectionView
         {
-            X = Pos.Right (txtLabelTC) + 2,
+            X = Pos.Right (txtLabelTC),
             Y = 1,
             Width = Dim.Percent (100, DimPercentMode.Position),
-            Height = Dim.Percent (33),
+            Height = Dim.Percent (100 / 3),
             TextAlignment = Alignment.End,
             VerticalTextAlignment = Alignment.Start,
             ColorScheme = color1,
-            Text = txt
+            Text = txt,
         };
         txtLabelTR.TextFormatter.MultiLine = true;
 
-        var txtLabelML = new Label
+        var txtLabelML = new AlignmentAndDirectionView
         {
             X = Pos.X (txtLabelTL),
-            Y = Pos.Bottom (txtLabelTL) + 1,
+            Y = Pos.Bottom (txtLabelTL),
             Width = Dim.Width (txtLabelTL),
-            Height = Dim.Percent (33),
+            Height = Dim.Percent (100 / 3),
             TextAlignment = Alignment.Start,
             VerticalTextAlignment = Alignment.Center,
             ColorScheme = color1,
-            Text = txt
+            Text = txt,
         };
         txtLabelML.TextFormatter.MultiLine = true;
 
-        var txtLabelMC = new Label
+        var txtLabelMC = new AlignmentAndDirectionView
         {
             X = Pos.X (txtLabelTC),
-            Y = Pos.Bottom (txtLabelTC) + 1,
+            Y = Pos.Bottom (txtLabelTC),
             Width = Dim.Width (txtLabelTC),
-            Height = Dim.Percent (33),
+            Height = Dim.Percent (100 / 3),
             TextAlignment = Alignment.Center,
             VerticalTextAlignment = Alignment.Center,
             ColorScheme = color1,
-            Text = txt
+            Text = txt,
         };
         txtLabelMC.TextFormatter.MultiLine = true;
 
-        var txtLabelMR = new Label
+        var txtLabelMR = new AlignmentAndDirectionView
         {
             X = Pos.X (txtLabelTR),
-            Y = Pos.Bottom (txtLabelTR) + 1,
+            Y = Pos.Bottom (txtLabelTR),
             Width = Dim.Percent (100, DimPercentMode.Position),
-            Height = Dim.Percent (33),
+            Height = Dim.Percent (100 / 3),
             TextAlignment = Alignment.End,
             VerticalTextAlignment = Alignment.Center,
             ColorScheme = color1,
-            Text = txt
+            Text = txt,
         };
         txtLabelMR.TextFormatter.MultiLine = true;
 
-        var txtLabelBL = new Label
+        var txtLabelBL = new AlignmentAndDirectionView
         {
             X = Pos.X (txtLabelML),
-            Y = Pos.Bottom (txtLabelML) + 1,
+            Y = Pos.Bottom (txtLabelML),
             Width = Dim.Width (txtLabelML),
             Height = Dim.Percent (100, DimPercentMode.Position),
             TextAlignment = Alignment.Start,
             VerticalTextAlignment = Alignment.End,
             ColorScheme = color1,
-            Text = txt
+            Text = txt,
         };
         txtLabelBL.TextFormatter.MultiLine = true;
 
-        var txtLabelBC = new Label
+        var txtLabelBC = new AlignmentAndDirectionView
         {
             X = Pos.X (txtLabelMC),
-            Y = Pos.Bottom (txtLabelMC) + 1,
+            Y = Pos.Bottom (txtLabelMC),
             Width = Dim.Width (txtLabelMC),
             Height = Dim.Percent (100, DimPercentMode.Position),
             TextAlignment = Alignment.Center,
             VerticalTextAlignment = Alignment.End,
             ColorScheme = color1,
-            Text = txt
+            Text = txt,
         };
         txtLabelBC.TextFormatter.MultiLine = true;
 
-        var txtLabelBR = new Label
+        var txtLabelBR = new AlignmentAndDirectionView
         {
             X = Pos.X (txtLabelMR),
-            Y = Pos.Bottom (txtLabelMR) + 1,
+            Y = Pos.Bottom(txtLabelMR),
             Width = Dim.Percent (100, DimPercentMode.Position),
             Height = Dim.Percent (100, DimPercentMode.Position),
             TextAlignment = Alignment.End,
             VerticalTextAlignment = Alignment.End,
             ColorScheme = color1,
-            Text = txt
+            Text = txt,
         };
         txtLabelBR.TextFormatter.MultiLine = true;
 
@@ -391,7 +409,7 @@ public class TextAlignmentAndDirection : Scenario
         multiLineLabels.Add (txtLabelBR);
 
         // Save Alignment in Data
-        foreach (Label t in multiLineLabels)
+        foreach (View t in multiLineLabels)
         {
             t.Data = new { h = t.TextAlignment, v = t.VerticalTextAlignment };
         }
@@ -432,12 +450,12 @@ public class TextAlignmentAndDirection : Scenario
 
         editText.MouseClick += (s, m) =>
                                {
-                                   foreach (Label v in singleLineLabels)
+                                   foreach (View v in singleLineLabels)
                                    {
                                        v.Text = editText.Text;
                                    }
 
-                                   foreach (Label v in multiLineLabels)
+                                   foreach (View v in multiLineLabels)
                                    {
                                        v.Text = editText.Text;
                                    }
@@ -445,12 +463,12 @@ public class TextAlignmentAndDirection : Scenario
 
         app.KeyUp += (s, m) =>
                      {
-                         foreach (Label v in singleLineLabels)
+                         foreach (View v in singleLineLabels)
                          {
                              v.Text = editText.Text;
                          }
 
-                         foreach (Label v in multiLineLabels)
+                         foreach (View v in multiLineLabels)
                          {
                              v.Text = editText.Text;
                          }
@@ -506,14 +524,14 @@ public class TextAlignmentAndDirection : Scenario
                                 {
                                     if (e.CurrentValue == CheckState.Checked)
                                     {
-                                        foreach (Label t in multiLineLabels)
+                                        foreach (View t in multiLineLabels)
                                         {
                                             t.TextFormatter.WordWrap = false;
                                         }
                                     }
                                     else
                                     {
-                                        foreach (Label t in multiLineLabels)
+                                        foreach (View t in multiLineLabels)
                                         {
                                             t.TextFormatter.WordWrap = true;
                                         }
@@ -543,7 +561,7 @@ public class TextAlignmentAndDirection : Scenario
                                                         ToggleJustify (true);
                                                     }
 
-                                                    foreach (Label v in multiLineLabels)
+                                                    foreach (View v in multiLineLabels)
                                                     {
                                                         v.TextDirection = (TextDirection)ev.SelectedItem;
                                                     }
@@ -569,7 +587,7 @@ public class TextAlignmentAndDirection : Scenario
                     justifyOptions.Enabled = false;
                 }
 
-                foreach (Label t in multiLineLabels)
+                foreach (View t in multiLineLabels)
                 {
                     t.TextAlignment = (Alignment)((dynamic)t.Data).h;
                     t.VerticalTextAlignment = (Alignment)((dynamic)t.Data).v;
@@ -577,7 +595,7 @@ public class TextAlignmentAndDirection : Scenario
             }
             else
             {
-                foreach (Label t in multiLineLabels)
+                foreach (View t in multiLineLabels)
                 {
                     if (!wasJustOptions)
                     {

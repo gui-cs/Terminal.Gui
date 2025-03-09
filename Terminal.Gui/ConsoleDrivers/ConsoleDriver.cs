@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace Terminal.Gui;
 
-/// <summary>Base class for Terminal.Gui ConsoleDriver implementations.</summary>
+/// <summary>Base class for Terminal.Gui IConsoleDriver implementations.</summary>
 /// <remarks>
 ///     There are currently four implementations: - <see cref="CursesDriver"/> (for Unix and Mac) -
 ///     <see cref="WindowsDriver"/> - <see cref="NetDriver"/> that uses the .NET Console API - <see cref="FakeConsole"/>
@@ -558,19 +558,19 @@ public abstract class ConsoleDriver : IConsoleDriver
 
     #region Color Handling
 
-    /// <summary>Gets whether the <see cref="ConsoleDriver"/> supports TrueColor output.</summary>
+    /// <summary>Gets whether the <see cref="IConsoleDriver"/> supports TrueColor output.</summary>
     public virtual bool SupportsTrueColor => true;
 
-    // TODO: This makes ConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
+    // TODO: This makes IConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
     // BUGBUG: Application.Force16Colors should be bool? so if SupportsTrueColor and Application.Force16Colors == false, this doesn't override
     /// <summary>
-    ///     Gets or sets whether the <see cref="ConsoleDriver"/> should use 16 colors instead of the default TrueColors.
+    ///     Gets or sets whether the <see cref="IConsoleDriver"/> should use 16 colors instead of the default TrueColors.
     ///     See <see cref="Application.Force16Colors"/> to change this setting via <see cref="ConfigurationManager"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Will be forced to <see langword="true"/> if <see cref="ConsoleDriver.SupportsTrueColor"/> is
-    ///         <see langword="false"/>, indicating that the <see cref="ConsoleDriver"/> cannot support TrueColor.
+    ///         Will be forced to <see langword="true"/> if <see cref="IConsoleDriver.SupportsTrueColor"/> is
+    ///         <see langword="false"/>, indicating that the <see cref="IConsoleDriver"/> cannot support TrueColor.
     ///     </para>
     /// </remarks>
     public virtual bool Force16Colors
@@ -592,7 +592,7 @@ public abstract class ConsoleDriver : IConsoleDriver
         get => _currentAttribute;
         set
         {
-            // TODO: This makes ConsoleDriver dependent on Application, which is not ideal. Once Attribute.PlatformColor is removed, this can be fixed.
+            // TODO: This makes IConsoleDriver dependent on Application, which is not ideal. Once Attribute.PlatformColor is removed, this can be fixed.
             if (Application.Driver is { })
             {
                 _currentAttribute = new (value.Foreground, value.Background);

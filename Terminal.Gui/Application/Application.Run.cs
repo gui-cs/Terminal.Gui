@@ -1,8 +1,6 @@
 #nullable enable
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
-using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Terminal.Gui;
 
@@ -26,7 +24,6 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     }
 
     private static Key _arrangeKey = Key.F5.WithCtrl; // Resources/config.json overrides
-
 
     /// <summary>Gets or sets the key to activate arranging views using the keyboard.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
@@ -97,7 +94,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         var rs = new RunState (toplevel);
 
 #if DEBUG_IDISPOSABLE
-        if (Top is { } && toplevel != Top && !TopLevels.Contains (Top))
+        if (View.DebugIDisposable && Top is { } && toplevel != Top && !TopLevels.Contains (Top))
         {
             // This assertion confirm if the Top was already disposed
             Debug.Assert (Top.WasDisposed);
@@ -174,7 +171,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
                 // Force leave events for any entered views in the old Top
                 if (GetLastMousePosition () is { })
                 {
-                    RaiseMouseEnterLeaveEvents (GetLastMousePosition ()!.Value, new List<View?> ());
+                    RaiseMouseEnterLeaveEvents (GetLastMousePosition ()!.Value, new ());
                 }
 
                 Top?.OnDeactivate (toplevel);
@@ -208,7 +205,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         NotifyNewRunState?.Invoke (toplevel, new (rs));
 
         // Force an Idle event so that an Iteration (and Refresh) happen.
-        Application.Invoke (() => { });
+        Invoke (() => { });
 
         return rs;
     }
@@ -231,7 +228,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         // If the view is not visible or enabled, don't position the cursor
         if (mostFocused is null || !mostFocused.Visible || !mostFocused.Enabled)
         {
-            CursorVisibility current = CursorVisibility.Invisible;
+            var current = CursorVisibility.Invisible;
             Driver?.GetCursorVisibility (out current);
 
             if (current != CursorVisibility.Invisible)
@@ -244,7 +241,9 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         // If the view is not visible within it's superview, don't position the cursor
         Rectangle mostFocusedViewport = mostFocused.ViewportToScreen (mostFocused.Viewport with { Location = Point.Empty });
-        Rectangle superViewViewport = mostFocused.SuperView?.ViewportToScreen (mostFocused.SuperView.Viewport with { Location = Point.Empty }) ?? Driver!.Screen;
+
+        Rectangle superViewViewport =
+            mostFocused.SuperView?.ViewportToScreen (mostFocused.SuperView.Viewport with { Location = Point.Empty }) ?? Driver!.Screen;
 
         if (!superViewViewport.IntersectsWith (mostFocusedViewport))
         {
@@ -305,7 +304,10 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// <returns>The created <see cref="Toplevel"/> object. The caller is responsible for disposing this object.</returns>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public static Toplevel Run (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null) { return Run<Toplevel> (errorHandler, driver); }
+    public static Toplevel Run (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
+    {
+        return ApplicationImpl.Instance.Run (errorHandler, driver);
+    }
 
     /// <summary>
     ///     Runs the application by creating a <see cref="Toplevel"/>-derived object of type <c>T</c> and calling
@@ -331,19 +333,9 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public static T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
-        where T : Toplevel, new()
+        where T : Toplevel, new ()
     {
-        if (!Initialized)
-        {
-            // Init() has NOT been called.
-            InternalInit (driver, null, true);
-        }
-
-        var top = new T ();
-
-        Run (top, errorHandler);
-
-        return top;
+        return ApplicationImpl.Instance.Run<T> (errorHandler, driver);
     }
 
     /// <summary>Runs the Application using the provided <see cref="Toplevel"/> view.</summary>
@@ -368,7 +360,8 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     ///         <see cref="RunLoop(RunState)"/> method will only process any pending events, timers, idle handlers and then
     ///         return control immediately.
     ///     </para>
-    ///     <para>When using <see cref="Run{T}"/> or
+    ///     <para>
+    ///         When using <see cref="Run{T}"/> or
     ///         <see cref="Run(System.Func{System.Exception,bool},Terminal.Gui.IConsoleDriver)"/>
     ///         <see cref="Init"/> will be called automatically.
     ///     </para>
@@ -384,74 +377,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     ///     RELEASE builds only: Handler for any unhandled exceptions (resumes when returns true,
     ///     rethrows when null).
     /// </param>
-    public static void Run (Toplevel view, Func<Exception, bool>? errorHandler = null)
-    {
-        ArgumentNullException.ThrowIfNull (view);
-
-        if (Initialized)
-        {
-            if (Driver is null)
-            {
-                // Disposing before throwing
-                view.Dispose ();
-
-                // This code path should be impossible because Init(null, null) will select the platform default driver
-                throw new InvalidOperationException (
-                                                     "Init() completed without a driver being set (this should be impossible); Run<T>() cannot be called."
-                                                    );
-            }
-        }
-        else
-        {
-            // Init() has NOT been called.
-            throw new InvalidOperationException (
-                                                 "Init() has not been called. Only Run() or Run<T>() can be used without calling Init()."
-                                                );
-        }
-
-        var resume = true;
-
-        while (resume)
-        {
-#if !DEBUG
-            try
-            {
-#endif
-            resume = false;
-            RunState runState = Begin (view);
-
-            // If EndAfterFirstIteration is true then the user must dispose of the runToken
-            // by using NotifyStopRunState event.
-            RunLoop (runState);
-
-            if (runState.Toplevel is null)
-            {
-#if DEBUG_IDISPOSABLE
-                Debug.Assert (TopLevels.Count == 0);
-#endif
-                runState.Dispose ();
-
-                return;
-            }
-
-            if (!EndAfterFirstIteration)
-            {
-                End (runState);
-            }
-#if !DEBUG
-            }
-            catch (Exception error)
-            {
-                if (errorHandler is null)
-                {
-                    throw;
-                }
-
-                resume = errorHandler (error);
-            }
-#endif
-        }
-    }
+    public static void Run (Toplevel view, Func<Exception, bool>? errorHandler = null) { ApplicationImpl.Instance.Run (view, errorHandler); }
 
     /// <summary>Adds a timeout to the application.</summary>
     /// <remarks>
@@ -459,36 +385,23 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     ///     reset, repeating the invocation. If it returns false, the timeout will stop and be removed. The returned value is a
     ///     token that can be used to stop the timeout by calling <see cref="RemoveTimeout(object)"/>.
     /// </remarks>
-    public static object? AddTimeout (TimeSpan time, Func<bool> callback)
-    {
-        return MainLoop?.AddTimeout (time, callback) ?? null;
-    }
+    public static object? AddTimeout (TimeSpan time, Func<bool> callback) { return ApplicationImpl.Instance.AddTimeout (time, callback); }
 
     /// <summary>Removes a previously scheduled timeout</summary>
     /// <remarks>The token parameter is the value returned by <see cref="AddTimeout"/>.</remarks>
     /// Returns
-    /// <c>true</c>
+    /// <see langword="true"/>
     /// if the timeout is successfully removed; otherwise,
-    /// <c>false</c>
+    /// <see langword="false"/>
     /// .
     /// This method also returns
-    /// <c>false</c>
+    /// <see langword="false"/>
     /// if the timeout is not found.
-    public static bool RemoveTimeout (object token) { return MainLoop?.RemoveTimeout (token) ?? false; }
+    public static bool RemoveTimeout (object token) { return ApplicationImpl.Instance.RemoveTimeout (token); }
 
     /// <summary>Runs <paramref name="action"/> on the thread that is processing events</summary>
     /// <param name="action">the action to be invoked on the main processing thread.</param>
-    public static void Invoke (Action action)
-    {
-        MainLoop?.AddIdle (
-                           () =>
-                           {
-                               action ();
-
-                               return false;
-                           }
-                          );
-    }
+    public static void Invoke (Action action) { ApplicationImpl.Instance.Invoke (action); }
 
     // TODO: Determine if this is really needed. The only code that calls WakeUp I can find
     // is ProgressBarStyles, and it's not clear it needs to.
@@ -497,11 +410,17 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     public static void Wakeup () { MainLoop?.Wakeup (); }
 
     /// <summary>
-    /// Causes any Toplevels that need layout to be laid out. Then draws any Toplevels that need display. Only Views that need to be laid out (see <see cref="View.NeedsLayout"/>) will be laid out.
-    /// Only Views that need to be drawn (see <see cref="View.NeedsDraw"/>) will be drawn.
+    ///     Causes any Toplevels that need layout to be laid out. Then draws any Toplevels that need display. Only Views that
+    ///     need to be laid out (see <see cref="View.NeedsLayout"/>) will be laid out.
+    ///     Only Views that need to be drawn (see <see cref="View.NeedsDraw"/>) will be drawn.
     /// </summary>
-    /// <param name="forceDraw">If <see langword="true"/> the entire View hierarchy will be redrawn. The default is <see langword="false"/> and should only be overriden for testing.</param>
-    public static void LayoutAndDraw (bool forceDraw = false)
+    /// <param name="forceDraw">
+    ///     If <see langword="true"/> the entire View hierarchy will be redrawn. The default is <see langword="false"/> and
+    ///     should only be overriden for testing.
+    /// </param>
+    public static void LayoutAndDraw (bool forceDraw = false) { ApplicationImpl.Instance.LayoutAndDraw (forceDraw); }
+
+    internal static void LayoutAndDrawImpl (bool forceDraw = false)
     {
         List<View> tops = new (TopLevels);
 
@@ -517,6 +436,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             forceDraw = true;
             ClearScreenNextIteration = false;
         }
+
         if (forceDraw)
         {
             Driver?.ClearContents ();
@@ -525,7 +445,6 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         View.SetClipToScreen ();
         View.Draw (tops, neededLayout || forceDraw);
         View.SetClipToScreen ();
-
         Driver?.Refresh ();
     }
 
@@ -535,7 +454,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
     /// <summary>The <see cref="MainLoop"/> driver for the application</summary>
     /// <value>The main loop.</value>
-    internal static MainLoop? MainLoop { get; private set; }
+    internal static MainLoop? MainLoop { get; set; }
 
     /// <summary>
     ///     Set to true to cause <see cref="End"/> to be called after the first iteration. Set to false (the default) to
@@ -615,35 +534,14 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// <remarks>
     ///     <para>This will cause <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> to return.</para>
     ///     <para>
-    ///         Calling <see cref="RequestStop(Terminal.Gui.Toplevel)"/> is equivalent to setting the <see cref="Toplevel.Running"/>
+    ///         Calling <see cref="RequestStop(Terminal.Gui.Toplevel)"/> is equivalent to setting the
+    ///         <see cref="Toplevel.Running"/>
     ///         property on the currently running <see cref="Toplevel"/> to false.
     ///     </para>
     /// </remarks>
-    public static void RequestStop (Toplevel? top = null)
-    {
-        if (top is null)
-        {
-            top = Top;
-        }
+    public static void RequestStop (Toplevel? top = null) { ApplicationImpl.Instance.RequestStop (top); }
 
-        if (!top!.Running)
-        {
-            return;
-        }
-
-        var ev = new ToplevelClosingEventArgs (top);
-        top.OnClosing (ev);
-
-        if (ev.Cancel)
-        {
-            return;
-        }
-
-        top.Running = false;
-        OnNotifyStopRunState (top);
-    }
-
-    private static void OnNotifyStopRunState (Toplevel top)
+    internal static void OnNotifyStopRunState (Toplevel top)
     {
         if (EndAfterFirstIteration)
         {

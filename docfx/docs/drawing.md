@@ -6,30 +6,30 @@ Color is supported on all platforms, including Windows, Mac, and Linux. The defa
 
 ## View Drawing API
 
-Terminal.Gui apps draw using the @Terminal.Gui.View.Move and @Terminal.Gui.View.AddRune APIs. @Terminal.Gui.View.Move selects the column and row of the @Terminal.Gui.Cell and @Terminal.Gui.AddRune places the specified glyph in that cell using the @Terminal.Gui.Attribute that was most recently set via @Terminal.Gui.SetAttribute. The @Terminal.Gui.ConsoleDriver caches all changed Cells and efficiently outputs them to the terminal each iteration of the Application. In other words, Terminal.Gui uses deferred rendering. 
+Terminal.Gui apps draw using the @Terminal.Gui.View.Move(System.Int32,System.Int32) and @Terminal.Gui.View.AddRune(System.Text.Rune) APIs. Move selects the column and row of the cell and AddRune places the specified glyph in that cell using the @Terminal.Gui.Attribute that was most recently set via @Terminal.Gui.View.SetAttribute(Terminal.Gui.Attribute). The @Terminal.Gui.ConsoleDriver caches all changed Cells and efficiently outputs them to the terminal each iteration of the Application. In other words, Terminal.Gui uses deferred rendering. 
 
 Outputting unformatted text involves:
 
-a) Moving the draw cursor using @Terminal.Gui.View.Move.
-b) Setting the attributes using @Terminal.Gui.View.SetAttribute.
-c) Outputting glyphs by calling @Terminal.Gui.View.AddRune or @Terminal.Gui.View.AddStr.
+1) Moving the draw cursor using @Terminal.Gui.View.Move(System.Int32,System.Int32).
+2) Setting the attributes using @Terminal.Gui.View.SetAttribute(Terminal.Gui.Attribute).
+3) Outputting glyphs by calling @Terminal.Gui.View.AddRune(System.Text.Rune) or @Terminal.Gui.View.AddStr(System.String) .
 
 Outputting formatted text involves:
 
-a) Adding the text to a @Terminal.Gui.TextFormatter object.
-b) Setting formatting options, such as @Terminal.Gui.TextFormatter.TextAlignment.
-c) Calling @Terminal.Gui.TextFormatter.Draw.
+1) Adding the text to a @Terminal.Gui.TextFormatter object.
+2) Setting formatting options, such as @Terminal.Gui.TextFormatter.Alignment.
+3) Calling @Terminal.Gui.TextFormatter.Draw(System.Drawing.Rectangle,Terminal.Gui.Attribute,Terminal.Gui.Attribute,System.Drawing.Rectangle,Terminal.Gui.IConsoleDriver).
 
 Line drawing is accomplished using the @Terminal.Gui.LineCanvas API:
 
-a) Add the lines via @Terminal.Gui.LineCanvas.Add.
-b) Either render the line canvas via @Terminal.Gui.LineCanvas.GetMap() or let the @Terminal.Gui.View do so automatically (which enables automatic line joining across Views).
+1) Add the lines via @Terminal.Gui.LineCanvas.AddLine(System.Drawing.Point,System.Int32,Terminal.Gui.Orientation,Terminal.Gui.LineStyle,System.Nullable{Terminal.Gui.Attribute}).
+2) Either render the line canvas via @Terminal.Gui.LineCanvas.GetMap or let the @Terminal.Gui.View do so automatically (which enables automatic line joining across Views).
 
 ### Drawing occurs each MainLoop Iteration
 
 The @Terminal.Gui.Application MainLoop will iterate over all Views in the view hierarchy, starting with @Terminal.Gui.Application.Toplevels. The @Terminal.Gui.View.Draw method will be called which, in turn:
 
-0) Determines if @Terminal.Gui.View.NeedsDraw or @Terminal.Gui.View.SubviewsNeedsDraw are set. If neither is set, processing stops.
+0) Determines if @Terminal.Gui.View.NeedsDraw or @Terminal.Gui.View.SubviewNeedsDraw are set. If neither is set, processing stops.
 1) Sets the clip to the view's Frame.
 2) Draws the @Terminal.Gui.View.Border and @Terminal.Gui.View.Padding (but NOT the Margin).
 3) Sets the clip to the view's Viewport.
@@ -55,7 +55,11 @@ If a View need to redraw because something changed within it's Content Area it c
 
 ### Clipping
 
-Clipping enables better performance by ensuring on regions of the terminal that need to be drawn actually get drawn by the @Terminal.Gui.ConsoleDriver. Terminal.Gui supports non-rectangular clip regions with @Terminal.Gui.Region. @Terminal.Gui.ConsoleDriver.Clip is the application managed clip region and is managed by @Terminal.Gui.Application. Developers cannot change this directly, but can use @Terminal.Gui.Application.ClipToScreen, @Terminal.Gui.Application.SetClip(Region), @Terminal.Gui.View.ClipToFrame, and @Terminal.Gui.ClipToViewPort.
+> [!IMPORTANT]
+> Clipping is still under development and the API is subject to change.
+
+
+Clipping enables better performance and features like transparent margins by ensuring regions of the terminal that need to be drawn actually get drawn by the @Terminal.Gui.ConsoleDriver. Terminal.Gui supports non-rectangular clip regions with @Terminal.Gui.Region. @Terminal.Gui.ConsoleDriver.Clip is the application managed clip region and is managed by @Terminal.Gui.Application. Developers cannot change this directly, but can use @Terminal.Gui.View.ClipToScreen, @Terminal.Gui.View.SetClip(Region), @Terminal.Gui.View.ClipToFrame, and @Terminal.Gui.ClipToViewPort.
 
 ## Coordinate System for Drawing
 
@@ -110,7 +114,7 @@ Terminal.Gui supports text formatting using @Terminal.Gui.View.TextFormatter. @T
 
 ## Glyphs
 
-Terminal.Gui supports rendering glyphs using the @Terminal.Gui.Glyph class. The @Terminal.Gui.Glyph class represents a single glyph. It contains a character and an attribute. The character is of type `Rune` and the attribute is of type @Terminal.Gui.Attribute. A set of static properties are provided for the standard glyphs used for standard views (e.g. the default indicator for @Terminal.Gui.Button) and line drawing (e.g. @Terminal.Gui.LineCanvas).
+The @Terminal.Gui.Glyphs class defines the common set of glyphs used to draw checkboxes, lines, borders, etc... The default glyphs can be changed per-ThemeScope via @Terminal.Gui.ConfigurationManager. 
 
 ## Line Drawing
 
@@ -124,4 +128,4 @@ See [View Deep Dive](View.md) for details.
 
 ## Diagnostics
 
-The @Terminal.Gui.ViewDiagnostics.DisplayIndicator flag can be set on @Terminal.Gui.View.Diagnostics to cause an animated glyph to appear in the `Border` of each View. The glyph will animate each time that View's `Draw` method is called where either @Terminal.Gui.View.NeedsDraw or @Terminal.Gui.View.SubviewNeedsDraw is set. 
+The @Terminal.Gui.ViewDiagnostics.DisplayIndicator flag can be set on @Terminal.Gui.View.Diagnostics to cause an animated glyph to appear in the `Border` of each View. The glyph will animate each time that View's `Draw` method is called where either @Terminal.Gui.View.NeedsDraw or @Terminal.Gui.View.SubViewNeedsDraw is set. 

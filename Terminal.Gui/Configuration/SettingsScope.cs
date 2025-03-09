@@ -45,9 +45,9 @@ public class SettingsScope : Scope<SettingsScope>
         // Update the existing settings with the new settings.
         try
         {
-            Update ((SettingsScope)JsonSerializer.Deserialize (stream, typeof (SettingsScope), _serializerOptions)!);
+            Update ((SettingsScope)JsonSerializer.Deserialize (stream, typeof (SettingsScope), SerializerOptions)!);
             OnUpdated ();
-            Debug.WriteLine ($"ConfigurationManager: Read configuration from \"{source}\"");
+            Logging.Trace ($"Read from \"{source}\"");
             if (!Sources.ContainsValue (source))
             {
                 Sources.Add (location, source);
@@ -79,7 +79,7 @@ public class SettingsScope : Scope<SettingsScope>
 
         if (!File.Exists (realPath))
         {
-            Debug.WriteLine ($"ConfigurationManager: Configuration file \"{realPath}\" does not exist.");
+            Logging.Warning ($"\"{realPath}\" does not exist.");
             if (!Sources.ContainsValue (filePath))
             {
                 Sources.Add (location, filePath);
@@ -105,7 +105,7 @@ public class SettingsScope : Scope<SettingsScope>
             }
             catch (IOException ioe)
             {
-                Debug.WriteLine ($"Couldn't open {filePath}. Retrying...: {ioe}");
+                Logging.Warning ($"Couldn't open {filePath}. Retrying...: {ioe}");
                 Task.Delay (100);
                 retryCount++;
             }

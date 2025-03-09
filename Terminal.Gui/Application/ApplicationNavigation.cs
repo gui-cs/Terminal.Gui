@@ -76,10 +76,6 @@ public class ApplicationNavigation
     /// </remarks>
     internal void SetFocused (View? value)
     {
-        if (value is null)
-        {
-
-        }
         if (_focused == value)
         {
             return;
@@ -108,10 +104,6 @@ public class ApplicationNavigation
     /// </returns>
     public bool AdvanceFocus (NavigationDirection direction, TabBehavior? behavior)
     {
-        //if (Application.Popover is { Visible: true })
-        //{
-        //    return Application.Popover.AdvanceFocus (direction, behavior);
-        //}
         return Application.Top is { } && Application.Top.AdvanceFocus (direction, behavior);
     }
 }

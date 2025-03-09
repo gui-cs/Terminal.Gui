@@ -49,11 +49,14 @@ public class Arrangement : Scenario
         FrameView testFrame = new ()
         {
             Title = "_1 Test Frame",
+            Text = "This is the text of the Test Frame.\nLine 2.\nLine 3.",
             X = Pos.Right (arrangementEditor),
             Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill ()
         };
+        testFrame.TextAlignment = Alignment.Center;
+        testFrame.VerticalTextAlignment = Alignment.Center;
 
         app.Add (testFrame);
 
@@ -64,16 +67,15 @@ public class Arrangement : Scenario
         tiledView3.Height = Dim.Height (tiledView1);
         View tiledView4 = CreateTiledView (3, Pos.Left (tiledView1), Pos.Bottom (tiledView1) - 1);
         tiledView4.Width = Dim.Func (() => tiledView3.Frame.Width + tiledView2.Frame.Width + tiledView1.Frame.Width - 2);
-        testFrame.Add (tiledView4, tiledView3, tiledView2, tiledView1);
 
-        View overlappedView1 = CreateOverlappedView (2, 0, 13);
-        overlappedView1.Title = "Movable _& Sizable";
+        View movableSizeableWithProgress = CreateOverlappedView (2, 10, 8);
+        movableSizeableWithProgress.Title = "Movable _& Sizable";
         View tiledSubView = CreateTiledView (4, 0, 2);
         tiledSubView.Arrangement = ViewArrangement.Fixed;
-        overlappedView1.Add (tiledSubView);
+        movableSizeableWithProgress.Add (tiledSubView);
         tiledSubView = CreateTiledView (5, Pos.Right (tiledSubView), Pos.Top (tiledSubView));
         tiledSubView.Arrangement = ViewArrangement.Fixed;
-        overlappedView1.Add (tiledSubView);
+        movableSizeableWithProgress.Add (tiledSubView);
 
         ProgressBar progressBar = new ()
         {
@@ -81,7 +83,7 @@ public class Arrangement : Scenario
             Width = Dim.Fill (),
             Id = "progressBar"
         };
-        overlappedView1.Add (progressBar);
+        movableSizeableWithProgress.Add (progressBar);
 
         Timer timer = new (10)
         {
@@ -168,9 +170,6 @@ public class Arrangement : Scenario
         overlappedView2.Add (colorPicker);
         overlappedView2.Width = 50;
 
-        testFrame.Add (overlappedView1);
-        testFrame.Add (overlappedView2);
-
         DatePicker datePicker = new ()
         {
             X = 30,
@@ -183,7 +182,21 @@ public class Arrangement : Scenario
             TabStop = TabBehavior.TabGroup,
             Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped
         };
+
+        TransparentView transparentView = new ()
+        {
+            Id = "transparentView",
+            X = 30,
+            Y = 5,
+            Width = 35,
+            Height = 15
+        };
+
+        testFrame.Add (tiledView4, tiledView3, tiledView2, tiledView1);
+        testFrame.Add (overlappedView2);
         testFrame.Add (datePicker);
+        testFrame.Add (movableSizeableWithProgress);
+        testFrame.Add (transparentView);
 
 
         testFrame.Add (new TransparentView ());
@@ -192,6 +205,7 @@ public class Arrangement : Scenario
         arrangementEditor.AutoSelectSuperView = testFrame;
 
         testFrame.SetFocus ();
+
         Application.Run (app);
         timer.Close ();
         app.Dispose ();
@@ -326,4 +340,58 @@ public class Arrangement : Scenario
                  });
         }
     }
+}
+
+public class TransparentView : FrameView
+{
+    public TransparentView ()
+    {
+        Title = "Transparent View";
+        base.Text = "View.Text.\nThis should be opaque.\nNote how clipping works?";
+        TextFormatter.Alignment = Alignment.Center;
+        TextFormatter.VerticalAlignment = Alignment.Center;
+        Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
+        ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent | Terminal.Gui.ViewportSettings.TransparentMouse;
+        BorderStyle = LineStyle.RoundedDotted;
+        base.ColorScheme = Colors.ColorSchemes ["Menu"];
+
+        var transparentSubView = new View ()
+        {
+            Text = "Sizable/Movable View with border. Should be opaque. The shadow should be semi-opaque.",
+            Id = "transparentSubView",
+            X = 4,
+            Y = 8,
+            Width = 20,
+            Height = 8,
+            BorderStyle = LineStyle.Dashed,
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
+            ShadowStyle = ShadowStyle.Transparent,
+            //ViewportSettings = Terminal.Gui.ViewportSettings.Transparent
+        };
+        transparentSubView.Border.Thickness = new (1, 1, 1, 1);
+        transparentSubView.ColorScheme = Colors.ColorSchemes ["Dialog"];
+
+        Button button = new Button ()
+        {
+            Title = "_Opaque Shadows No Worky",
+            X = Pos.Center (),
+            Y = 4,
+            ColorScheme = Colors.ColorSchemes ["Dialog"],
+        };
+
+        button.ClearingViewport += (sender, args) =>
+                                   {
+                                       args.Cancel = true;
+                                   };
+
+
+        base.Add (button);
+        base.Add (transparentSubView);
+    }
+
+    /// <inheritdoc />
+    protected override bool OnClearingViewport () { return false; }
+
+    /// <inheritdoc />
+    protected override bool OnMouseEvent (MouseEventArgs mouseEvent) { return false; }
 }

@@ -411,25 +411,25 @@ public static class EscSeqUtils
     {
         // These control characters are used in the vtXXX emulation.
         return c switch
-               {
-                   'D' => "IND", // Index
-                   'E' => "NEL", // Next Line
-                   'H' => "HTS", // Tab Set
-                   'M' => "RI", // Reverse Index
-                   'N' => "SS2", // Single Shift Select of G2 Character Set: affects next character only
-                   'O' => "SS3", // Single Shift Select of G3 Character Set: affects next character only
-                   'P' => "DCS", // Device Control String
-                   'V' => "SPA", // Start of Guarded Area
-                   'W' => "EPA", // End of Guarded Area
-                   'X' => "SOS", // Start of String
-                   'Z' => "DECID", // Return Terminal ID Obsolete form of CSI c (DA)
-                   '[' => "CSI", // Control Sequence Introducer
-                   '\\' => "ST", // String Terminator
-                   ']' => "OSC", // Operating System Command
-                   '^' => "PM", // Privacy Message
-                   '_' => "APC", // Application Program Command
-                   _ => string.Empty
-               };
+        {
+            'D' => "IND", // Index
+            'E' => "NEL", // Next Line
+            'H' => "HTS", // Tab Set
+            'M' => "RI", // Reverse Index
+            'N' => "SS2", // Single Shift Select of G2 Character Set: affects next character only
+            'O' => "SS3", // Single Shift Select of G3 Character Set: affects next character only
+            'P' => "DCS", // Device Control String
+            'V' => "SPA", // Start of Guarded Area
+            'W' => "EPA", // End of Guarded Area
+            'X' => "SOS", // Start of String
+            'Z' => "DECID", // Return Terminal ID Obsolete form of CSI c (DA)
+            '[' => "CSI", // Control Sequence Introducer
+            '\\' => "ST", // String Terminator
+            ']' => "OSC", // Operating System Command
+            '^' => "PM", // Privacy Message
+            '_' => "APC", // Application Program Command
+            _ => string.Empty
+        };
     }
 
 
@@ -462,46 +462,46 @@ public static class EscSeqUtils
         }
 
         return (terminator, value) switch
-               {
-                   ('A', _) => ConsoleKey.UpArrow,
-                   ('B', _) => ConsoleKey.DownArrow,
-                   ('C', _) => ConsoleKey.RightArrow,
-                   ('D', _) => ConsoleKey.LeftArrow,
-                   ('E', _) => ConsoleKey.Clear,
-                   ('F', _) => ConsoleKey.End,
-                   ('H', _) => ConsoleKey.Home,
-                   ('P', _) => ConsoleKey.F1,
-                   ('Q', _) => ConsoleKey.F2,
-                   ('R', _) => ConsoleKey.F3,
-                   ('S', _) => ConsoleKey.F4,
-                   ('Z', _) => ConsoleKey.Tab,
-                   ('~', "2") => ConsoleKey.Insert,
-                   ('~', "3") => ConsoleKey.Delete,
-                   ('~', "5") => ConsoleKey.PageUp,
-                   ('~', "6") => ConsoleKey.PageDown,
-                   ('~', "15") => ConsoleKey.F5,
-                   ('~', "17") => ConsoleKey.F6,
-                   ('~', "18") => ConsoleKey.F7,
-                   ('~', "19") => ConsoleKey.F8,
-                   ('~', "20") => ConsoleKey.F9,
-                   ('~', "21") => ConsoleKey.F10,
-                   ('~', "23") => ConsoleKey.F11,
-                   ('~', "24") => ConsoleKey.F12,
-                   // These terminators are used by macOS on a numeric keypad without keys modifiers
-                   ('l', null) => ConsoleKey.Add,
-                   ('m', null) => ConsoleKey.Subtract,
-                   ('p', null) => ConsoleKey.Insert,
-                   ('q', null) => ConsoleKey.End,
-                   ('r', null) => ConsoleKey.DownArrow,
-                   ('s', null) => ConsoleKey.PageDown,
-                   ('t', null) => ConsoleKey.LeftArrow,
-                   ('u', null) => ConsoleKey.Clear,
-                   ('v', null) => ConsoleKey.RightArrow,
-                   ('w', null) => ConsoleKey.Home,
-                   ('x', null) => ConsoleKey.UpArrow,
-                   ('y', null) => ConsoleKey.PageUp,
-                   (_, _) => 0
-               };
+        {
+            ('A', _) => ConsoleKey.UpArrow,
+            ('B', _) => ConsoleKey.DownArrow,
+            ('C', _) => ConsoleKey.RightArrow,
+            ('D', _) => ConsoleKey.LeftArrow,
+            ('E', _) => ConsoleKey.Clear,
+            ('F', _) => ConsoleKey.End,
+            ('H', _) => ConsoleKey.Home,
+            ('P', _) => ConsoleKey.F1,
+            ('Q', _) => ConsoleKey.F2,
+            ('R', _) => ConsoleKey.F3,
+            ('S', _) => ConsoleKey.F4,
+            ('Z', _) => ConsoleKey.Tab,
+            ('~', "2") => ConsoleKey.Insert,
+            ('~', "3") => ConsoleKey.Delete,
+            ('~', "5") => ConsoleKey.PageUp,
+            ('~', "6") => ConsoleKey.PageDown,
+            ('~', "15") => ConsoleKey.F5,
+            ('~', "17") => ConsoleKey.F6,
+            ('~', "18") => ConsoleKey.F7,
+            ('~', "19") => ConsoleKey.F8,
+            ('~', "20") => ConsoleKey.F9,
+            ('~', "21") => ConsoleKey.F10,
+            ('~', "23") => ConsoleKey.F11,
+            ('~', "24") => ConsoleKey.F12,
+            // These terminators are used by macOS on a numeric keypad without keys modifiers
+            ('l', null) => ConsoleKey.Add,
+            ('m', null) => ConsoleKey.Subtract,
+            ('p', null) => ConsoleKey.Insert,
+            ('q', null) => ConsoleKey.End,
+            ('r', null) => ConsoleKey.DownArrow,
+            ('s', null) => ConsoleKey.PageDown,
+            ('t', null) => ConsoleKey.LeftArrow,
+            ('u', null) => ConsoleKey.Clear,
+            ('v', null) => ConsoleKey.RightArrow,
+            ('w', null) => ConsoleKey.Home,
+            ('x', null) => ConsoleKey.UpArrow,
+            ('y', null) => ConsoleKey.PageUp,
+            (_, _) => 0
+        };
     }
 
     /// <summary>
@@ -512,18 +512,18 @@ public static class EscSeqUtils
     public static ConsoleModifiers GetConsoleModifiers (string? value)
     {
         return value switch
-               {
-                   "2" => ConsoleModifiers.Shift,
-                   "3" => ConsoleModifiers.Alt,
-                   "4" => ConsoleModifiers.Shift | ConsoleModifiers.Alt,
-                   "5" => ConsoleModifiers.Control,
-                   "6" => ConsoleModifiers.Shift | ConsoleModifiers.Control,
-                   "7" => ConsoleModifiers.Alt | ConsoleModifiers.Control,
-                   "8" => ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control,
-                   _ => 0
-               };
+        {
+            "2" => ConsoleModifiers.Shift,
+            "3" => ConsoleModifiers.Alt,
+            "4" => ConsoleModifiers.Shift | ConsoleModifiers.Alt,
+            "5" => ConsoleModifiers.Control,
+            "6" => ConsoleModifiers.Shift | ConsoleModifiers.Control,
+            "7" => ConsoleModifiers.Alt | ConsoleModifiers.Control,
+            "8" => ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control,
+            _ => 0
+        };
     }
-    #nullable restore
+#nullable restore
 
     /// <summary>
     ///     Gets all the needed information about an escape sequence.
@@ -1675,6 +1675,19 @@ public static class EscSeqUtils
     /// <returns></returns>
     public static string CSI_SetCursorPosition (int row, int col) { return $"{CSI}{row};{col}H"; }
 
+    /// <summary>
+    ///     ESC [ y ; x H - CUP Cursor Position - Cursor moves to x ; y coordinate within the viewport, where x is the column
+    ///     of the y line
+    /// </summary>
+    /// <param name="builder">StringBuilder where to append the cursor position sequence.</param>
+    /// <param name="row">Origin is (1,1).</param>
+    /// <param name="col">Origin is (1,1).</param>
+    public static void CSI_AppendCursorPosition (StringBuilder builder, int row, int col)
+    {
+        // InterpolatedStringHandler is composed in stack, skipping the string allocation.
+        builder.Append ($"{CSI}{row};{col}H");
+    }
+
     //ESC [ <y> ; <x> f - HVP     Horizontal Vertical Position* Cursor moves to<x>; <y> coordinate within the viewport, where <x> is the column of the<y> line
     //ESC [ s - ANSISYSSC       Save Cursor – Ansi.sys emulation	**With no parameters, performs a save cursor operation like DECSC
     //ESC [ u - ANSISYSRC       Restore Cursor – Ansi.sys emulation	**With no parameters, performs a restore cursor operation like DECRC
@@ -1786,9 +1799,27 @@ public static class EscSeqUtils
     public static string CSI_SetForegroundColorRGB (int r, int g, int b) { return $"{CSI}38;2;{r};{g};{b}m"; }
 
     /// <summary>
+    ///     ESC[38;2;{r};{g};{b}m	Append foreground color as RGB to StringBuilder.
+    /// </summary>
+    public static void CSI_AppendForegroundColorRGB (StringBuilder builder, int r, int g, int b)
+    {
+        // InterpolatedStringHandler is composed in stack, skipping the string allocation.
+        builder.Append ($"{CSI}38;2;{r};{g};{b}m");
+    }
+
+    /// <summary>
     ///     ESC[48;2;{r};{g};{b}m	Set background color as RGB.
     /// </summary>
     public static string CSI_SetBackgroundColorRGB (int r, int g, int b) { return $"{CSI}48;2;{r};{g};{b}m"; }
+
+    /// <summary>
+    ///     ESC[48;2;{r};{g};{b}m	Append background color as RGB to StringBuilder.
+    /// </summary>
+    public static void CSI_AppendBackgroundColorRGB (StringBuilder builder, int r, int g, int b)
+    {
+        // InterpolatedStringHandler is composed in stack, skipping the string allocation.
+        builder.Append ($"{CSI}48;2;{r};{g};{b}m");
+    }
 
     #endregion
 

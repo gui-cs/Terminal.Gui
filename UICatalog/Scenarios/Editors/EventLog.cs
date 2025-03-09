@@ -10,7 +10,6 @@ namespace UICatalog.Scenarios;
 /// </summary>
 /// <remarks>
 /// </remarks>
-/// </example>
 public class EventLog : ListView
 {
     public EventLog ()

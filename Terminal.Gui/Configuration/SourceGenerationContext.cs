@@ -10,7 +10,7 @@ namespace Terminal.Gui;
 [JsonSerializable (typeof (AppScope))]
 [JsonSerializable (typeof (SettingsScope))]
 [JsonSerializable (typeof (Key))]
-[JsonSerializable (typeof (GlyphDefinitions))]
+[JsonSerializable (typeof (Glyphs))]
 [JsonSerializable (typeof (Alignment))]
 [JsonSerializable (typeof (AlignmentModes))]
 [JsonSerializable (typeof (LineStyle))]

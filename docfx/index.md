@@ -8,7 +8,7 @@ A toolkit for building rich console apps for .NET that run on Windows, the Mac, 
 
 ## Terminal.Gui API Documentation
 
-* [Conceptual Documentation](docs/index.md)
+* [Conceptual Docs & Deep Dives](docs/index.md)
 * [API Reference](~/api/Terminal.Gui.yml)
 
 ## UI Catalog

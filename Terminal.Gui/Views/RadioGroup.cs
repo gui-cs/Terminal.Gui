@@ -403,11 +403,15 @@ public class RadioGroup : View, IDesignable, IOrientation
 
     private readonly OrientationHelper _orientationHelper;
 
+#pragma warning disable CS0067 // The event is never used
     /// <inheritdoc/>
     public event EventHandler<CancelEventArgs<Orientation>>? OrientationChanging;
 
     /// <inheritdoc/>
     public event EventHandler<EventArgs<Orientation>>? OrientationChanged;
+#pragma warning restore CS0067 // The event is never used
+
+#pragma warning restore CS0067
 
     /// <summary>Called when <see cref="Orientation"/> has changed.</summary>
     /// <param name="newOrientation"></param>

@@ -6,32 +6,36 @@
   href: newinv2.md
 - name: v1 To v2 Migration
   href: migratingfromv1.md  
-- name: View Deep Dive
-  href: View.md  
-- name: List of Views
-  href: views.md
-- name: Layout Engine
-  href: layout.md
 - name: Arrangement
   href: arrangement.md
-- name: Navigation
-  href: navigation.md
-- name: Scrolling
-  href: scrolling.md
-- name: Keyboard
-  href: keyboard.md
-- name: Mouse
-  href: mouse.md
 - name: Configuration
   href: config.md
+- name: Cursor
+  href: cursor.md
+- name: Dim.Auto Deep Dive
+  href: dimauto.md
 - name: Drawing
   href: drawing.md
 - name: Drivers
   href: drivers.md
+- name: Events Deep Dive
+  href: events.md
+- name: Keyboard
+  href: keyboard.md
+- name: Layout Engine
+  href: layout.md
+- name: Mouse
+  href: mouse.md
 - name: Multi-Tasking
   href: mainloop.md
-- name: Dim.Auto Deep Dive
-  href: dimauto.md
+- name: Navigation
+  href: navigation.md
+- name: View Deep Dive
+  href: View.md  
+- name: View List
+  href: views.md
+- name: Scrolling
+  href: scrolling.md
 - name: TableView Deep Dive
   href: tableview.md
 - name: TreeView Deep Dive

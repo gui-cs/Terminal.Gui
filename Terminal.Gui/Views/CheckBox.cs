@@ -114,15 +114,15 @@ public class CheckBox : View
     ///     <para>
     ///         If <see cref="AllowCheckStateNone"/> is <see langword="true"/> and <see cref="CheckState.None"/>, the
     ///         <see cref="CheckBox"/>
-    ///         will display the <c>ConfigurationManager.Glyphs.CheckStateNone</c> character (☒).
+    ///         will display the <c>Glyphs.CheckStateNone</c> character (☒).
     ///     </para>
     ///     <para>
     ///         If <see cref="CheckState.UnChecked"/>, the <see cref="CheckBox"/>
-    ///         will display the <c>ConfigurationManager.Glyphs.CheckStateUnChecked</c> character (☐).
+    ///         will display the <c>Glyphs.CheckStateUnChecked</c> character (☐).
     ///     </para>
     ///     <para>
     ///         If <see cref="CheckState.Checked"/>, the <see cref="CheckBox"/>
-    ///         will display the <c>ConfigurationManager.Glyphs.CheckStateChecked</c> character (☑).
+    ///         will display the <c>Glyphs.CheckStateChecked</c> character (☑).
     ///     </para>
     /// </remarks>
     public CheckState CheckedState

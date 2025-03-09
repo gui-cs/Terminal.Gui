@@ -12,6 +12,7 @@ public class Keys : Scenario
         Application.Init ();
         ObservableCollection<string> keyDownList = [];
         ObservableCollection<string> keyDownNotHandledList = new ();
+        ObservableCollection<string> swallowedList = new ();
 
         var win = new Window { Title = GetQuitKeyAndName () };
 
@@ -136,6 +137,32 @@ public class Keys : Scenario
         };
         onKeyDownNotHandledListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
         win.Add (onKeyDownNotHandledListView);
+
+
+        // Swallowed
+        label = new Label
+        {
+            X = Pos.Right (onKeyDownNotHandledListView) + 1,
+            Y = Pos.Top (label),
+            Text = "Swallowed:"
+        };
+        win.Add (label);
+
+        var onSwallowedListView = new ListView
+        {
+            X = Pos.Left (label),
+            Y = Pos.Bottom (label),
+            Width = maxKeyString,
+            Height = Dim.Fill (),
+            Source = new ListWrapper<string> (swallowedList)
+        };
+        onSwallowedListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        win.Add (onSwallowedListView);
+
+        if (Application.Driver is IConsoleDriverFacade fac)
+        {
+            fac.InputProcessor.AnsiSequenceSwallowed += (s, e) => { swallowedList.Add (e.Replace ("\x1b","Esc")); };
+        }
 
         Application.KeyDown += (s, a) => KeyDownPressUp (a, "Down");
         Application.KeyUp += (s, a) => KeyDownPressUp (a, "Up");

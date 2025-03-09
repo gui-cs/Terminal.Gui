@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PublishTrimmed>true</PublishTrimmed>
     <TrimMode>Link</TrimMode>
@@ -18,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <PackageReference Include="Terminal.Gui" Version="2.0.0" />
+    <PackageReference Include="Terminal.Gui" />
     <TrimmerRootAssembly Include="Terminal.Gui" />
   </ItemGroup>
 

@@ -26,13 +26,14 @@ Settings are applied using the following precedence (higher precedence settings 
 
 7. @Terminal.Gui.ConfigLocations.GlobalCurrent - Global settings in the directory the app was launched from (`./.tui/config.json`) --- Hightest precedence.
 
-The `UI Catalog` application provides an example of how to use the [`ConfigurationManager`](~/api/Terminal.Gui.ConfigurationManager.yml) class to load and save configuration files. The `Configuration Editor` scenario provides an editor that allows users to edit the configuration files. UI Catalog also uses a file system watcher to detect changes to the configuration files to tell [`ConfigurationManager`](~/api/Terminal.Gui.ConfigurationManager.yml) to reload them; allowing users to change settings without having to restart the application.
+The `UICatalog` application provides an example of how to use the [`ConfigurationManager`](~/api/Terminal.Gui.ConfigurationManager.yml) class to load and save configuration files. The `Configuration Editor` scenario provides an editor that allows users to edit the configuration files. UI Catalog also uses a file system watcher to detect changes to the configuration files to tell [`ConfigurationManager`](~/api/Terminal.Gui.ConfigurationManager.yml) to reload them; allowing users to change settings without having to restart the application.
 
 # What Can Be Configured
 
 ## Settings
 
-(Note, this list may not be complete; search the source code for `SerializableConfigurationProperty` to find all settings that can be configured.)
+> [!IMPORTANT]
+> This list is not complete; search the source code for `SerializableConfigurationProperty` to find all settings that can be configured.
 
   * @Terminal.Gui.Application.QuitKey
   * @Terminal.Gui.Application.NextTabKey
@@ -44,9 +45,14 @@ The `UI Catalog` application provides an example of how to use the [`Configurati
   * @Terminal.Gui.Application.Force16Colors
   * @Terminal.Gui.Application.IsMouseDisabled
   
-## Glyphs
 
-The standard set of glyphs used for standard views (e.g. the default indicator for [Button](~/api/Terminal.Gui.Button.yml)) and line drawing (e.g. [LineCanvas](~/api/Terminal.Gui.LineCanvas.yml)) can be configured.
+## Themes
+
+A Theme is a named collection of settings that impact the visual style of Terminal.Gui applications. The default theme is named "Default". The built-in configuration within the Terminal.Gui library defines two more themes: "Dark", and "Light". Additional themes can be defined in the configuration files. The JSON property `Theme` defines the name of the theme that will be used. If the theme is not found, the default theme will be used.
+
+Themes support defining ColorSchemes as well as various default settings for Views. Both the default color schemes and user-defined color schemes can be configured. See [ColorSchemes](~/api/Terminal.Gui.Colors.yml) for more information.
+
+Themes support changing the standard set of glyphs used by views (e.g. the default indicator for [Button](~/api/Terminal.Gui.Button.yml)) and line drawing (e.g. [LineCanvas](~/api/Terminal.Gui.LineCanvas.yml)).
 
 The value can be either a decimal number or a string. The string may be:
 
@@ -55,22 +61,18 @@ The value can be either a decimal number or a string. The string may be:
 - A hex value in UTF-16 format (e.g. "\\u2611")
 
 ```json
-  "Glyphs": {
-    "RightArrow": "►",
-    "LeftArrow": "U+25C4",
-    "DownArrow": "\\u25BC",
-    "UpArrow": 965010
-  }
+  "Glyphs.RightArrow": "►",
+  "Glyphs.LeftArrow": "U+25C4",
+  "Glyphs.DownArrow": "\\u25BC",
+  "Glyphs.UpArrow": 965010
 ```
 
-## Themes
-
-A Theme is a named collection of settings that impact the visual style of Terminal.Gui applications. The default theme is named "Default". The built-in configuration within the Terminal.Gui library defines two more themes: "Dark", and "Light". Additional themes can be defined in the configuration files. The JSON property `Theme` defines the name of the theme that will be used. If the theme is not found, the default theme will be used.
-
-Themes support defining ColorSchemes as well as various default settings for Views. Both the default color schemes and user-defined color schemes can be configured. See [ColorSchemes](~/api/Terminal.Gui.Colors.yml) for more information.
-
+The `UI Catalog` application defines a `UICatlog` Theme. Look at the UI Catalog's `./Resources/config.json` file to see how to define a theme.
 
 # Key Bindings
+
+> [!WARNING]
+>  Configuration Manager support for key bindings is not yet implemented.
 
 Key bindings are defined in the `KeyBindings` property of the configuration file. The value is an array of objects, each object defining a key binding. The key binding object has the following properties:
 

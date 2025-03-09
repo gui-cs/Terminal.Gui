@@ -16,8 +16,7 @@
 * [MessageBox](~/api/Terminal.Gui.MessageBox.yml) - Displays a modal (pup-up) message to the user, with a title, a message and a series of options that the user can choose from. 
 * [ProgressBar](~/api/Terminal.Gui.ProgressBar.yml) - Displays a progress Bar indicating progress of an activity.
 * [RadioGroup](~/api/Terminal.Gui.RadioGroup.yml) - Displays a group of labels each with a selected indicator. Only one of those can be selected at a given time
-* [ScrollView](~/api/Terminal.Gui.ScrollView.yml) - Present a window into a virtual space where subviews are added. Similar to the iOS UIScrollView.
-* [ScrollBarView](~/api/Terminal.Gui.ScrollBarView.yml) - display a 1-character scrollbar, either horizontal or vertical.
+* [ScrollBarView](~/api/Terminal.Gui.ScrollBar.yml) - A scrollbar, either horizontal or vertical.
 * [StatusBar](~/api/Terminal.Gui.StatusBar.yml) - A View that snaps to the bottom of a Toplevel displaying set of status items. Includes support for global app keyboard shortcuts.
 * [TableView](~/api/Terminal.Gui.TableView.yml) - A View for tabular data based on a System.Data.DataTable. 
 * [TimeField](~/api/Terminal.Gui.TimeField.yml) & [DateField](~/api/Terminal.Gui.TimeField.yml) - Enables structured editing of dates and times.

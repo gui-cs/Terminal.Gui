@@ -11,7 +11,7 @@ public class TableCollectionNavigator : CollectionNavigatorBase
     /// <inheritdoc/>
     protected override object ElementAt (int idx)
     {
-        int col = tableView.SelectedColumn;
+        int col = tableView.FullRowSelect ? 0 : tableView.SelectedColumn;
         object rawValue = tableView.Table [idx, col];
 
         ColumnStyle style = tableView.Style.GetColumnStyleIfAny (col);

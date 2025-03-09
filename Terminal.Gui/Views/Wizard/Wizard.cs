@@ -1,4 +1,5 @@
-﻿using Terminal.Gui.Resources;
+﻿#nullable enable
+using Terminal.Gui.Resources;
 
 namespace Terminal.Gui;
 
@@ -52,7 +53,7 @@ namespace Terminal.Gui;
 public class Wizard : Dialog
 {
     private readonly LinkedList<WizardStep> _steps = new ();
-    private WizardStep _currentStep;
+    private WizardStep? _currentStep;
     private bool _finishedPressed;
     private string _wizardTitle = string.Empty;
 
@@ -81,12 +82,12 @@ public class Wizard : Dialog
         //// Add a horiz separator
         var separator = new LineView (Orientation.Horizontal) { Y = Pos.Top (BackButton) - 1 };
 
-        Add (separator);
+        base.Add (separator);
         AddButton (BackButton);
         AddButton (NextFinishButton);
 
-        BackButton.Accepting += BackBtn_Clicked;
-        NextFinishButton.Accepting += NextfinishBtn_Clicked;
+        BackButton.Accepting += BackBtn_Accepting;
+        NextFinishButton.Accepting += NextFinishBtn_Accepting;
 
         Loaded += Wizard_Loaded;
         Closing += Wizard_Closing;
@@ -103,7 +104,7 @@ public class Wizard : Dialog
     public Button BackButton { get; }
 
     /// <summary>Gets or sets the currently active <see cref="WizardStep"/>.</summary>
-    public WizardStep CurrentStep
+    public WizardStep? CurrentStep
     {
         get => _currentStep;
         set => GoToStep (value);
@@ -197,7 +198,7 @@ public class Wizard : Dialog
     ///     <see cref="Wizard.Modal"/> is <c>true</c>) Wizard from closing, cancel the event by setting
     ///     <see cref="WizardButtonEventArgs.Cancel"/> to <c>true</c> before returning from the event handler.
     /// </summary>
-    public event EventHandler<WizardButtonEventArgs> Cancelled;
+    public event EventHandler<WizardButtonEventArgs>? Cancelled;
 
     /// <summary>
     ///     Raised when the Next/Finish button in the <see cref="Wizard"/> is clicked. The Next/Finish button is always
@@ -205,15 +206,15 @@ public class Wizard : Dialog
     ///     raised if the <see cref="CurrentStep"/> is the last Step in the Wizard flow (otherwise the <see cref="Finished"/>
     ///     event is raised).
     /// </summary>
-    public event EventHandler<WizardButtonEventArgs> Finished;
+    public event EventHandler<WizardButtonEventArgs>? Finished;
 
     /// <summary>Returns the first enabled step in the Wizard</summary>
     /// <returns>The last enabled step</returns>
-    public WizardStep GetFirstStep () { return _steps.FirstOrDefault (s => s.Enabled); }
+    public WizardStep? GetFirstStep () { return _steps.FirstOrDefault (s => s.Enabled); }
 
     /// <summary>Returns the last enabled step in the Wizard</summary>
     /// <returns>The last enabled step</returns>
-    public WizardStep GetLastStep () { return _steps.LastOrDefault (s => s.Enabled); }
+    public WizardStep? GetLastStep () { return _steps.LastOrDefault (s => s.Enabled); }
 
     /// <summary>
     ///     Returns the next enabled <see cref="WizardStep"/> after the current step. Takes into account steps which are
@@ -223,9 +224,9 @@ public class Wizard : Dialog
     ///     The next step after the current step, if there is one; otherwise returns <c>null</c>, which indicates either
     ///     there are no enabled steps or the current step is the last enabled step.
     /// </returns>
-    public WizardStep GetNextStep ()
+    public WizardStep? GetNextStep ()
     {
-        LinkedListNode<WizardStep> step = null;
+        LinkedListNode<WizardStep>? step = null;
 
         if (CurrentStep is null)
         {
@@ -265,9 +266,9 @@ public class Wizard : Dialog
     ///     The first step ahead of the current step, if there is one; otherwise returns <c>null</c>, which indicates
     ///     either there are no enabled steps or the current step is the first enabled step.
     /// </returns>
-    public WizardStep GetPreviousStep ()
+    public WizardStep? GetPreviousStep ()
     {
-        LinkedListNode<WizardStep> step = null;
+        LinkedListNode<WizardStep>? step = null;
 
         if (CurrentStep is null)
         {
@@ -303,36 +304,42 @@ public class Wizard : Dialog
     ///     Causes the wizard to move to the previous enabled step (or first step if <see cref="CurrentStep"/> is not set).
     ///     If there is no previous step, does nothing.
     /// </summary>
-    public void GoBack ()
+    /// <returns><see langword="true"/> if the transition to the step succeeded. <see langword="false"/> if the step was not found or the operation was cancelled.</returns>
+    public bool GoBack ()
     {
-        WizardStep previous = GetPreviousStep ();
+        WizardStep? previous = GetPreviousStep ();
 
         if (previous is { })
         {
-            GoToStep (previous);
+           return GoToStep (previous);
         }
+
+        return false;
     }
 
     /// <summary>
     ///     Causes the wizard to move to the next enabled step (or last step if <see cref="CurrentStep"/> is not set). If
     ///     there is no previous step, does nothing.
     /// </summary>
-    public void GoNext ()
+    /// <returns><see langword="true"/> if the transition to the step succeeded. <see langword="false"/> if the step was not found or the operation was cancelled.</returns>
+    public bool GoNext ()
     {
-        WizardStep nextStep = GetNextStep ();
+        WizardStep? nextStep = GetNextStep ();
 
         if (nextStep is { })
         {
-            GoToStep (nextStep);
+            return GoToStep (nextStep);
         }
+
+        return false;
     }
 
     /// <summary>Changes to the specified <see cref="WizardStep"/>.</summary>
     /// <param name="newStep">The step to go to.</param>
-    /// <returns>True if the transition to the step succeeded. False if the step was not found or the operation was cancelled.</returns>
-    public bool GoToStep (WizardStep newStep)
+    /// <returns><see langword="true"/> if the transition to the step succeeded. <see langword="false"/> if the step was not found or the operation was cancelled.</returns>
+    public bool GoToStep (WizardStep? newStep)
     {
-        if (OnStepChanging (_currentStep, newStep) || (newStep is { } && !newStep.Enabled))
+        if (OnStepChanging (_currentStep, newStep) || newStep is { Enabled: false })
         {
             return false;
         }
@@ -344,20 +351,17 @@ public class Wizard : Dialog
             step.ShowHide ();
         }
 
-        WizardStep oldStep = _currentStep;
+        WizardStep? oldStep = _currentStep;
         _currentStep = newStep;
 
         UpdateButtonsAndTitle ();
 
         // Set focus on the contentview
-        if (newStep is { })
-        {
-            newStep.Subviews.ToArray () [0].SetFocus ();
-        }
+        newStep?.Subviews.ToArray () [0].SetFocus ();
 
         if (OnStepChanged (oldStep, _currentStep))
         {
-            // For correctness we do this, but it's meaningless because there's nothing to cancel
+            // For correctness, we do this, but it's meaningless because there's nothing to cancel
             return false;
         }
 
@@ -368,7 +372,7 @@ public class Wizard : Dialog
     ///     Raised when the Back button in the <see cref="Wizard"/> is clicked. The Back button is always the first button
     ///     in the array of Buttons passed to the <see cref="Wizard"/> constructor, if any.
     /// </summary>
-    public event EventHandler<WizardButtonEventArgs> MovingBack;
+    public event EventHandler<WizardButtonEventArgs>? MovingBack;
 
     /// <summary>
     ///     Raised when the Next/Finish button in the <see cref="Wizard"/> is clicked (or the user presses Enter). The
@@ -376,7 +380,7 @@ public class Wizard : Dialog
     ///     constructor, if any. This event is only raised if the <see cref="CurrentStep"/> is the last Step in the Wizard flow
     ///     (otherwise the <see cref="Finished"/> event is raised).
     /// </summary>
-    public event EventHandler<WizardButtonEventArgs> MovingNext;
+    public event EventHandler<WizardButtonEventArgs>? MovingNext;
 
     /// <summary>
     ///     <see cref="Wizard"/> is derived from <see cref="Dialog"/> and Dialog causes <c>Esc</c> to call
@@ -410,7 +414,7 @@ public class Wizard : Dialog
     /// <param name="oldStep">The step the Wizard changed from</param>
     /// <param name="newStep">The step the Wizard has changed to</param>
     /// <returns>True if the change is to be cancelled.</returns>
-    public virtual bool OnStepChanged (WizardStep oldStep, WizardStep newStep)
+    public virtual bool OnStepChanged (WizardStep? oldStep, WizardStep? newStep)
     {
         var args = new StepChangeEventArgs (oldStep, newStep);
         StepChanged?.Invoke (this, args);
@@ -425,7 +429,7 @@ public class Wizard : Dialog
     /// <param name="oldStep">The step the Wizard is about to change from</param>
     /// <param name="newStep">The step the Wizard is about to change to</param>
     /// <returns>True if the change is to be cancelled.</returns>
-    public virtual bool OnStepChanging (WizardStep oldStep, WizardStep newStep)
+    public virtual bool OnStepChanging (WizardStep? oldStep, WizardStep? newStep)
     {
         var args = new StepChangeEventArgs (oldStep, newStep);
         StepChanging?.Invoke (this, args);
@@ -434,26 +438,26 @@ public class Wizard : Dialog
     }
 
     /// <summary>This event is raised after the <see cref="Wizard"/> has changed the <see cref="CurrentStep"/>.</summary>
-    public event EventHandler<StepChangeEventArgs> StepChanged;
+    public event EventHandler<StepChangeEventArgs>? StepChanged;
 
     /// <summary>
     ///     This event is raised when the current <see cref="CurrentStep"/>) is about to change. Use
     ///     <see cref="StepChangeEventArgs.Cancel"/> to abort the transition.
     /// </summary>
-    public event EventHandler<StepChangeEventArgs> StepChanging;
+    public event EventHandler<StepChangeEventArgs>? StepChanging;
 
-    private void BackBtn_Clicked (object sender, EventArgs e)
+    private void BackBtn_Accepting (object? sender, CommandEventArgs e)
     {
         var args = new WizardButtonEventArgs ();
         MovingBack?.Invoke (this, args);
 
         if (!args.Cancel)
         {
-            GoBack ();
+            e.Cancel = GoBack ();
         }
     }
 
-    private void NextfinishBtn_Clicked (object sender, EventArgs e)
+    private void NextFinishBtn_Accepting (object? sender, CommandEventArgs e)
     {
         if (CurrentStep == GetLastStep ())
         {
@@ -467,6 +471,7 @@ public class Wizard : Dialog
                 if (IsCurrentTop)
                 {
                     Application.RequestStop (this);
+                    e.Cancel = true;
                 }
 
                 // Wizard was created as a non-modal (just added to another View). 
@@ -480,7 +485,7 @@ public class Wizard : Dialog
 
             if (!args.Cancel)
             {
-                GoNext ();
+                e.Cancel = GoNext ();
             }
         }
     }
@@ -548,7 +553,7 @@ public class Wizard : Dialog
         SetNeedsLayout ();
     }
 
-    private void Wizard_Closing (object sender, ToplevelClosingEventArgs obj)
+    private void Wizard_Closing (object? sender, ToplevelClosingEventArgs obj)
     {
         if (!_finishedPressed)
         {
@@ -557,14 +562,14 @@ public class Wizard : Dialog
         }
     }
 
-    private void Wizard_Loaded (object sender, EventArgs args)
+    private void Wizard_Loaded (object? sender, EventArgs args)
     {
         CurrentStep = GetFirstStep ();
 
         // gets the first step if CurrentStep == null
     }
 
-    private void Wizard_TitleChanged (object sender, EventArgs<string> e)
+    private void Wizard_TitleChanged (object? sender, EventArgs<string> e)
     {
         if (string.IsNullOrEmpty (_wizardTitle))
         {

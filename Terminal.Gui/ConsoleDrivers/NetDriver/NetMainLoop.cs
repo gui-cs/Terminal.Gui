@@ -55,7 +55,7 @@ internal class NetMainLoop : IMainLoopDriver
 
         _waitForProbe.Set ();
 
-        if (_resultQueue.Count > 0 || _mainLoop!.CheckTimersAndIdleHandlers (out int waitTimeout))
+        if (_resultQueue.Count > 0 || _mainLoop!.TimedEvents.CheckTimersAndIdleHandlers (out int waitTimeout))
         {
             return true;
         }
@@ -82,7 +82,7 @@ internal class NetMainLoop : IMainLoopDriver
 
         if (!_eventReadyTokenSource.IsCancellationRequested)
         {
-            return _resultQueue.Count > 0 || _mainLoop.CheckTimersAndIdleHandlers (out _);
+            return _resultQueue.Count > 0 || _mainLoop.TimedEvents.CheckTimersAndIdleHandlers (out _);
         }
 
         // If cancellation was requested then always return true

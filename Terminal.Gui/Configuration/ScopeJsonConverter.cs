@@ -89,11 +89,11 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                     try
                     {
                         scope! [propertyName].PropertyValue =
-                            JsonSerializer.Deserialize (ref reader, propertyType!, _serializerContext);
+                            JsonSerializer.Deserialize (ref reader, propertyType!, SerializerContext);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
-                        Debug.WriteLine ($"scopeT Read: {ex}");
+                       // Logging.Trace ($"scopeT Read: {ex}");
                     }
                 }
             }
@@ -137,7 +137,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                 if (property is { })
                 {
                     PropertyInfo prop = scope.GetType ().GetProperty (propertyName!)!;
-                    prop.SetValue (scope, JsonSerializer.Deserialize (ref reader, prop.PropertyType, _serializerContext));
+                    prop.SetValue (scope, JsonSerializer.Deserialize (ref reader, prop.PropertyType, SerializerContext));
                 }
                 else
                 {
@@ -165,7 +165,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
         {
             writer.WritePropertyName (ConfigProperty.GetJsonPropertyName (p));
             object? prop = scope.GetType ().GetProperty (p.Name)?.GetValue (scope);
-            JsonSerializer.Serialize (writer, prop, prop!.GetType (), _serializerContext);
+            JsonSerializer.Serialize (writer, prop, prop!.GetType (), SerializerContext);
         }
 
         foreach (KeyValuePair<string, ConfigProperty> p in from p in scope
@@ -211,7 +211,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
             else
             {
                 object? prop = p.Value.PropertyValue;
-                JsonSerializer.Serialize (writer, prop, prop!.GetType (), _serializerContext);
+                JsonSerializer.Serialize (writer, prop, prop!.GetType (), SerializerContext);
             }
         }
 

@@ -20,14 +20,7 @@ public static partial class Application // Keyboard handling
             return true;
         }
 
-        View? top = Top;
-
-        //if (Popover is { Visible: true })
-        //{
-        //    top = Popover;
-        //}
-
-        if (top is null)
+        if (Top is null)
         {
             foreach (Toplevel topLevel in TopLevels.ToList ())
             {
@@ -44,7 +37,7 @@ public static partial class Application // Keyboard handling
         }
         else
         {
-            if (top.NewKeyDownEvent (key))
+            if (Top.NewKeyDownEvent (key))
             {
                 return true;
             }
@@ -179,18 +172,11 @@ public static partial class Application // Keyboard handling
                     Command.Quit,
                     static () =>
                     {
-                        //if (Popover is {Visible: true})
-                        //{
-                        //    Popover.Visible = false;
-
-                        //    return true;
-                        //}
                         RequestStop ();
 
                         return true;
                     }
                    );
-
         AddCommand (
                     Command.Suspend,
                     static () =>
@@ -200,7 +186,6 @@ public static partial class Application // Keyboard handling
                         return true;
                     }
                    );
-
         AddCommand (
                     Command.NextTabStop,
                     static () => Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop));

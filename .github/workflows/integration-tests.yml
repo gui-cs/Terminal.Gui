@@ -1,0 +1,60 @@
+name: Build & Run Integration Tests
+
+on:
+  push:
+    branches: [ v2_release, v2_develop ]
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    branches: [ v2_release, v2_develop ]
+    paths-ignore:
+      - '**.md'
+      
+jobs:
+  build_and_test_debug:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # Turn off fail-fast to let all runners run even if there are errors
+      fail-fast: true
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+
+    timeout-minutes: 10
+    steps:
+
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.x
+        dotnet-quality: 'ga'
+
+    - name: Install dependencies
+      run: |
+        dotnet restore
+
+    - name: Build IntegrationTests
+      run: dotnet build Tests/IntegrationTests --configuration Debug --no-restore
+
+    - name: Set VSTEST_DUMP_PATH
+      shell: bash
+      run: echo "{VSTEST_DUMP_PATH}={logs/${{ runner.os }}/}" >> $GITHUB_ENV
+
+    - name: Run IntegrationTests
+      run: |
+       dotnet test Tests/IntegrationTests --no-build --verbosity normal --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
+     
+       # mv -v Tests/IntegrationTests/TestResults/*/*.* TestResults/IntegrationTests/
+
+    - name: Upload Test Logs
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: integration-test-logs-${{ runner.os }}
+        path: |
+          logs/    
+          TestResults/IntegrationTests/
+

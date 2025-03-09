@@ -22,6 +22,7 @@ public interface IConsoleDriver
     /// <value>The rectangle describing the of <see cref="Clip"/> region.</value>
     Region? Clip { get; set; }
 
+
     /// <summary>
     ///     Gets the column last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
     ///     <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
@@ -33,8 +34,7 @@ public interface IConsoleDriver
 
     // BUGBUG: This should not be publicly settable.
     /// <summary>
-    ///     Gets or sets the contents of the application output. The driver outputs this buffer to the terminal when
-    ///     <see cref="UpdateScreen"/> is called.
+    ///     Gets or sets the contents of the application output. The driver outputs this buffer to the terminal.
     ///     <remarks>The format of the array is rows, columns. The first index is the row, the second index is the column.</remarks>
     /// </summary>
     Cell [,]? Contents { get; set; }
@@ -92,17 +92,6 @@ public interface IConsoleDriver
     ///     support displaying this rune.
     /// </returns>
     bool IsRuneSupported (Rune rune);
-
-    // BUGBUG: This is not referenced. Can it be removed?
-    /// <summary>Tests whether the specified coordinate are valid for drawing.</summary>
-    /// <param name="col">The column.</param>
-    /// <param name="row">The row.</param>
-    /// <returns>
-    ///     <see langword="false"/> if the coordinate is outside the screen bounds or outside of
-    ///     <see cref="ConsoleDriver.Clip"/>.
-    ///     <see langword="true"/> otherwise.
-    /// </returns>
-    bool IsValidLocation (int col, int row);
 
     /// <summary>Tests whether the specified coordinate are valid for drawing the specified Rune.</summary>
     /// <param name="rune">Used to determine if one or two columns are required.</param>
@@ -173,9 +162,15 @@ public interface IConsoleDriver
     /// <param name="str">String.</param>
     void AddStr (string str);
 
+    /// <summary>Clears the <see cref="ConsoleDriver.Contents"/> of the driver.</summary>
+    void ClearContents ();
+
     /// <summary>
     ///     Fills the specified rectangle with the specified rune, using <see cref="ConsoleDriver.CurrentAttribute"/>
     /// </summary>
+    event EventHandler<EventArgs> ClearedContents;
+
+    /// <summary>Fills the specified rectangle with the specified rune, using <see cref="ConsoleDriver.CurrentAttribute"/></summary>
     /// <remarks>
     ///     The value of <see cref="ConsoleDriver.Clip"/> is honored. Any parts of the rectangle not in the clip will not be
     ///     drawn.
@@ -192,30 +187,14 @@ public interface IConsoleDriver
     /// <param name="c"></param>
     void FillRect (Rectangle rect, char c);
 
-    /// <summary>Clears the <see cref="ConsoleDriver.Contents"/> of the driver.</summary>
-    void ClearContents ();
-
-    /// <summary>
-    ///     Raised each time <see cref="ConsoleDriver.ClearContents"/> is called. For benchmarking.
-    /// </summary>
-    event EventHandler<EventArgs>? ClearedContents;
 
     /// <summary>Gets the terminal cursor visibility.</summary>
     /// <param name="visibility">The current <see cref="CursorVisibility"/></param>
     /// <returns><see langword="true"/> upon success</returns>
     bool GetCursorVisibility (out CursorVisibility visibility);
 
-    /// <summary>Called when the terminal size changes. Fires the <see cref="ConsoleDriver.SizeChanged"/> event.</summary>
-    /// <param name="args"></param>
-    void OnSizeChanged (SizeChangedEventArgs args);
-
     /// <summary>Updates the screen to reflect all the changes that have been done to the display buffer</summary>
     void Refresh ();
-
-    /// <summary>
-    ///     Raised each time <see cref="ConsoleDriver.Refresh"/> is called. For benchmarking.
-    /// </summary>
-    event EventHandler<EventArgs<bool>>? Refreshed;
 
     /// <summary>Sets the terminal cursor visibility.</summary>
     /// <param name="visibility">The wished <see cref="CursorVisibility"/></param>
@@ -234,10 +213,6 @@ public interface IConsoleDriver
     ///     <see cref="ConsoleDriver.Row"/>.
     /// </summary>
     void UpdateCursor ();
-
-    /// <summary>Redraws the physical screen with the contents that have been queued up via any of the printing commands.</summary>
-    /// <returns><see langword="true"/> if any updates to the screen were made.</returns>
-    bool UpdateScreen ();
 
     /// <summary>Initializes the driver</summary>
     /// <returns>Returns an instance of <see cref="MainLoop"/> using the <see cref="IMainLoopDriver"/> for the driver.</returns>
@@ -264,20 +239,8 @@ public interface IConsoleDriver
     /// <summary>Event fired when a mouse event occurs.</summary>
     event EventHandler<MouseEventArgs>? MouseEvent;
 
-    /// <summary>Called when a mouse event occurs. Fires the <see cref="ConsoleDriver.MouseEvent"/> event.</summary>
-    /// <param name="a"></param>
-    void OnMouseEvent (MouseEventArgs a);
-
     /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="ConsoleDriver.KeyUp"/>.</summary>
     event EventHandler<Key>? KeyDown;
-
-    // BUGBUG: This is not referenced. Can it be removed?
-    /// <summary>
-    ///     Called when a key is pressed down. Fires the <see cref="ConsoleDriver.KeyDown"/> event. This is a precursor to
-    ///     <see cref="ConsoleDriver.OnKeyUp"/>.
-    /// </summary>
-    /// <param name="a"></param>
-    void OnKeyDown (Key a);
 
     /// <summary>Event fired when a key is released.</summary>
     /// <remarks>
@@ -287,16 +250,6 @@ public interface IConsoleDriver
     /// </remarks>
     event EventHandler<Key>? KeyUp;
 
-    // BUGBUG: This is not referenced. Can it be removed?
-    /// <summary>Called when a key is released. Fires the <see cref="ConsoleDriver.KeyUp"/> event.</summary>
-    /// <remarks>
-    ///     Drivers that do not support key release events will call this method after <see cref="ConsoleDriver.OnKeyDown"/>
-    ///     processing
-    ///     is complete.
-    /// </remarks>
-    /// <param name="a"></param>
-    void OnKeyUp (Key a);
-
     /// <summary>Simulates a key press.</summary>
     /// <param name="keyChar">The key character.</param>
     /// <param name="key">The key.</param>
@@ -304,11 +257,6 @@ public interface IConsoleDriver
     /// <param name="alt">If <see langword="true"/> simulates the Alt key being pressed.</param>
     /// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
     void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
-
-    /// <summary>
-    ///     How long after Esc has been pressed before we give up on getting an Ansi escape sequence
-    /// </summary>
-    public TimeSpan EscTimeout { get; }
 
     /// <summary>
     ///     Queues the given <paramref name="request"/> for execution

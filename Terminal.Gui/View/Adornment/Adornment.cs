@@ -1,6 +1,6 @@
 ﻿#nullable enable
-using Terminal.Gui;
-using Attribute = Terminal.Gui.Attribute;
+namespace Terminal.Gui;
+
 
 /// <summary>
 ///     Adornments are a special form of <see cref="View"/> that appear outside the <see cref="View.Viewport"/>:
@@ -182,6 +182,7 @@ public class Adornment : View, IDesignable
     /// <inheritdoc/>
     protected override bool OnDrawingSubviews () { return Thickness == Thickness.Empty; }
 
+
     /// <summary>Does nothing for Adornment</summary>
     /// <returns></returns>
     protected override bool OnRenderingLineCanvas () { return true; }
@@ -195,9 +196,6 @@ public class Adornment : View, IDesignable
         get => false;
         set => throw new InvalidOperationException (@"Adornment can only render to their Parent or Parent's Superview.");
     }
-
-    /// <inheritdoc/>
-    protected override void OnDrawComplete () { }
 
     /// <summary>
     ///     Indicates whether the specified Parent's SuperView-relative coordinates are within the Adornment's Thickness.
@@ -231,6 +229,7 @@ public class Adornment : View, IDesignable
 
         return Thickness.Contains (outside, location);
     }
+
     #endregion View Overrides
 
     /// <inheritdoc/>

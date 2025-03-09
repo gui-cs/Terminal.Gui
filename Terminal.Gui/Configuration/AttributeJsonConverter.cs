@@ -57,11 +57,11 @@ internal class AttributeJsonConverter : JsonConverter<Attribute>
             switch (propertyName?.ToLower ())
             {
                 case "foreground":
-                    foreground = JsonSerializer.Deserialize (color, _serializerContext.Color);
+                    foreground = JsonSerializer.Deserialize (color, SerializerContext.Color);
 
                     break;
                 case "background":
-                    background = JsonSerializer.Deserialize (color, _serializerContext.Color);
+                    background = JsonSerializer.Deserialize (color, SerializerContext.Color);
 
                     break;
 

@@ -165,10 +165,10 @@ public class Button : View, IDesignable
     ///         If <see langword="true"/>:
     ///     </para>
     ///     <para>
-    ///         - the Button will display an indicator that it is the default Button.
+    ///         - The Button will display an indicator that it is the default Button.
     ///     </para>
     ///     <para>
-    ///         - when clicked, if the Accepting event is not handled, <see cref="Command.Accept"/> will be
+    ///         - When clicked, if the Accepting event is not handled, <see cref="Command.Accept"/> will be
     ///         invoked on the SuperView.
     ///     </para>
     ///     <para>
@@ -197,7 +197,7 @@ public class Button : View, IDesignable
 
     /// <summary>
     ///     Gets or sets whether the Button will show decorations or not. If <see langword="true"/> the glyphs that normally
-    ///     brakcet the Button Title and the <see cref="IsDefault"/> indicator will not be shown.
+    ///     bracket the Button Title and the <see cref="IsDefault"/> indicator will not be shown.
     /// </summary>
     public bool NoDecorations { get; set; }
 

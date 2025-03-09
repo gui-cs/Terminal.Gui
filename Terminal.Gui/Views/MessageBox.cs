@@ -374,6 +374,10 @@ public static class MessageBox
                                        {
                                            Clicked = (int)btn.Data!;
                                        }
+                                       else
+                                       {
+                                           Clicked = defaultButton;
+                                       }
 
                                        e.Cancel = true;
                                        Application.RequestStop ();

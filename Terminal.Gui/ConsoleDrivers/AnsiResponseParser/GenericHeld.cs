@@ -16,4 +16,7 @@ internal class GenericHeld<T> : IHeld
     public IEnumerable<object> HeldToObjects () { return held; }
 
     public void AddToHeld (object o) { held.Add ((Tuple<char, T>)o); }
+
+    /// <inheritdoc/>
+    public int Length => held.Count;
 }

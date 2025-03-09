@@ -1,9 +1,21 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+namespace Terminal.Gui;
 
 // TODO: FrameView is mis-named, really. It's far more about it being a TabGroup than a frame. 
+
 /// <summary>
-///     The FrameView is a container View with a border around it. 
+///     A non-overlapped container for other views with a border and optional title.
 /// </summary>
+/// <remarks>
+///     <para>
+///         FrameView has <see cref="View.BorderStyle"/> set to <see cref="LineStyle.Single"/> and
+///         inherits it's color scheme from the <see cref="View.SuperView"/>.
+///     </para>
+///     <para>
+///         
+///     </para>
+/// </remarks>
+/// <seealso cref="Window"/>
 public class FrameView : View
 {
     /// <summary>
@@ -14,20 +26,8 @@ public class FrameView : View
     {
         CanFocus = true;
         TabStop = TabBehavior.TabGroup;
-        Border.Thickness = new Thickness (1);
-        Border.LineStyle = DefaultBorderStyle;
-
-        //Border.ColorScheme = ColorScheme;
-        Border.Data = "Border";
-        MouseClick += FrameView_MouseClick;
+        BorderStyle = DefaultBorderStyle;
     }
-
-    private void FrameView_MouseClick (object sender, MouseEventArgs e)
-    {
-        // base sets focus on HotKey
-        e.Handled = InvokeCommand<KeyBinding> (Command.HotKey, new ([Command.HotKey], this, this)) == true;
-    }
-
 
     /// <summary>
     ///     The default <see cref="LineStyle"/> for <see cref="FrameView"/>'s border. The default is

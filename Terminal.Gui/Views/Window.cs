@@ -1,25 +1,22 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+namespace Terminal.Gui;
 
 /// <summary>
-///     A <see cref="Toplevel"/> <see cref="View"/> with <see cref="View.BorderStyle"/> set to
-///     <see cref="LineStyle.Single"/>. Provides a container for other views.
+///     An overlapped container for other views with a border and optional title.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         If any subview is a button and the <see cref="Button.IsDefault"/> property is set to true, the Enter key will
-///         invoke the <see cref="Command.Accept"/> command on that subview.
+///         Window has <see cref="View.BorderStyle"/> set to <see cref="LineStyle.Single"/>, <see cref="View.Arrangement"/>
+///         set to <see cref="ViewArrangement.Overlapped"/>, and
+///         uses the Base <see cref="Colors.ColorSchemes"/> color scheme by default.
+///     </para>
+///     <para>
+///         To enable Window to be sized and moved by the user, adjust <see cref="View.Arrangement"/>.
 ///     </para>
 /// </remarks>
+/// <seealso cref="FrameView"/>
 public class Window : Toplevel
 {
-
-    /// <summary>
-    /// Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
-    /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
-
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="Window"/> class.
     /// </summary>
@@ -27,11 +24,17 @@ public class Window : Toplevel
     {
         CanFocus = true;
         TabStop = TabBehavior.TabGroup;
-        Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped | ViewArrangement.Resizable;
-        ColorScheme = Colors.ColorSchemes ["Base"]; // TODO: make this a theme property
+        Arrangement = ViewArrangement.Overlapped;
+        base.ColorScheme = Colors.ColorSchemes ["Base"]; // TODO: make this a theme property
         BorderStyle = DefaultBorderStyle;
-        ShadowStyle = DefaultShadow;
+        base.ShadowStyle = DefaultShadow;
     }
+
+    /// <summary>
+    ///     Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
+    /// </summary>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
 
     // TODO: enable this
     ///// <summary>

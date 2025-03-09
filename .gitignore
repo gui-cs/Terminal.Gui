@@ -58,3 +58,13 @@ demo.*
 *.tui/
 
 *.dotCover
+
+logs/
+
+BenchmarkDotNet.Artifacts/
+
+*.log
+
+*.log.*
+
+log.*

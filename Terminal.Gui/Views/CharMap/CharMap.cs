@@ -10,7 +10,7 @@ namespace Terminal.Gui;
 ///     A scrollable map of the Unicode codepoints.
 /// </summary>
 /// <remarks>
-///     See <see href="CharacterMap/README.md"/> for details.
+///     See <see href="../docs/CharacterMap.md"/> for details.
 /// </remarks>
 public class CharMap : View, IDesignable
 {
@@ -19,7 +19,6 @@ public class CharMap : View, IDesignable
     private int _rowHeight = 1; // Height of each row of 16 glyphs - changing this is not tested
 
     private ContextMenu _contextMenu = new ();
-
 
     /// <summary>
     ///     Initializes a new instance.
@@ -62,7 +61,7 @@ public class CharMap : View, IDesignable
         KeyBindings.Add (ContextMenu.DefaultKey, Command.Context);
 
         MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Accept);
-        MouseBindings.ReplaceCommands(MouseFlags.Button3Clicked, Command.Context);
+        MouseBindings.ReplaceCommands (MouseFlags.Button3Clicked, Command.Context);
         MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl, Command.Context);
         MouseBindings.Add (MouseFlags.WheeledDown, Command.ScrollDown);
         MouseBindings.Add (MouseFlags.WheeledUp, Command.ScrollUp);
@@ -98,7 +97,7 @@ public class CharMap : View, IDesignable
 
         // Set up the vertical scrollbar. Turn off AutoShow since it's always visible.
         VerticalScrollBar.AutoShow = true;
-        VerticalScrollBar.Visible = false; // Force always visible
+        VerticalScrollBar.Visible = false;
         VerticalScrollBar.X = Pos.AnchorEnd ();
         VerticalScrollBar.Y = HEADER_HEIGHT; // Header
     }
@@ -460,7 +459,6 @@ public class CharMap : View, IDesignable
 
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-
     private bool? HandleAcceptCommand (ICommandContext? commandContext)
     {
         if (RaiseAccepting (commandContext) is true)
@@ -570,6 +568,7 @@ public class CharMap : View, IDesignable
             // Some unit tests invoke Accept without Init
             return;
         }
+
         UcdApiClient? client = new ();
         var decResponse = string.Empty;
         var getCodePointError = string.Empty;

@@ -33,24 +33,24 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
     }
 
     /// <summary>
-    ///     Gets or sets the character to use for checked entries. Defaults to <see cref="GlyphDefinitions.CheckStateChecked"/>
+    ///     Gets or sets the character to use for checked entries. Defaults to <see cref="Glyphs.CheckStateChecked"/>
     /// </summary>
     public Rune CheckedRune { get; set; } = Glyphs.CheckStateChecked;
 
     /// <summary>
     ///     Gets or sets the character to use for checked entry when <see cref="UseRadioButtons"/> is true. Defaults to
-    ///     <see cref="GlyphDefinitions.Selected"/>
+    ///     <see cref="Glyphs.Selected"/>
     /// </summary>
     public Rune RadioCheckedRune { get; set; } = Glyphs.Selected;
 
     /// <summary>
     ///     Gets or sets the character to use for unchecked entries when <see cref="UseRadioButtons"/> is true. Defaults
-    ///     to <see cref="GlyphDefinitions.UnSelected"/>
+    ///     to <see cref="Glyphs.UnSelected"/>
     /// </summary>
     public Rune RadioUnCheckedRune { get; set; } = Glyphs.UnSelected;
 
     /// <summary>
-    ///     Gets or sets the character to use for UnChecked entries. Defaults to <see cref="GlyphDefinitions.CheckStateUnChecked"/>
+    ///     Gets or sets the character to use for UnChecked entries. Defaults to <see cref="Glyphs.CheckStateUnChecked"/>
     /// </summary>
     public Rune UnCheckedRune { get; set; } = Glyphs.CheckStateUnChecked;
 

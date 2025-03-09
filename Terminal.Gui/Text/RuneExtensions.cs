@@ -1,4 +1,6 @@
-﻿using System.Globalization;
+﻿#nullable enable
+
+using System.Globalization;
 using Wcwidth;
 
 namespace Terminal.Gui;
@@ -7,7 +9,7 @@ namespace Terminal.Gui;
 public static class RuneExtensions
 {
     /// <summary>Maximum Unicode code point.</summary>
-    public static int MaxUnicodeCodePoint = 0x10FFFF;
+    public static readonly int MaxUnicodeCodePoint = 0x10FFFF;
 
     /// <summary>Reports if the provided array of bytes can be encoded as UTF-8.</summary>
     /// <param name="buffer">The byte array to probe.</param>
@@ -32,17 +34,25 @@ public static class RuneExtensions
     /// <param name="rune">The rune to decode.</param>
     /// <param name="chars">The chars if the rune is a surrogate pair. Null otherwise.</param>
     /// <returns><see langword="true"/> if the rune is a valid surrogate pair; <see langword="false"/> otherwise.</returns>
-    public static bool DecodeSurrogatePair (this Rune rune, out char [] chars)
+    public static bool DecodeSurrogatePair (this Rune rune, out char []? chars)
     {
-        if (rune.IsSurrogatePair ())
+        bool isSingleUtf16CodeUnit = rune.IsBmp;
+        if (isSingleUtf16CodeUnit)
         {
-            chars = rune.ToString ().ToCharArray ();
+            chars = null;
+            return false;
+        }
 
+        const int maxCharsPerRune = 2;
+        Span<char> charBuffer = stackalloc char[maxCharsPerRune];
+        int charsWritten = rune.EncodeToUtf16 (charBuffer);
+        if (charsWritten >= 2 && char.IsSurrogatePair (charBuffer [0], charBuffer [1]))
+        {
+            chars = charBuffer [..charsWritten].ToArray ();
             return true;
         }
 
         chars = null;
-
         return false;
     }
 
@@ -55,21 +65,24 @@ public static class RuneExtensions
     /// <returns>he number of bytes written into the destination buffer.</returns>
     public static int Encode (this Rune rune, byte [] dest, int start = 0, int count = -1)
     {
-        byte [] bytes = Encoding.UTF8.GetBytes (rune.ToString ());
-        var length = 0;
+        const int maxUtf8BytesPerRune = 4;
+        Span<byte> bytes = stackalloc byte[maxUtf8BytesPerRune];
+        int writtenBytes = rune.EncodeToUtf8 (bytes);
 
-        for (var i = 0; i < (count == -1 ? bytes.Length : count); i++)
+        int bytesToCopy = count == -1
+            ? writtenBytes
+            : Math.Min (count, writtenBytes);
+        int bytesWritten = 0;
+        for (int i = 0; i < bytesToCopy; i++)
         {
-            if (bytes [i] == 0)
+            if (bytes [i] == '\0')
             {
                 break;
             }
-
             dest [start + i] = bytes [i];
-            length++;
+            bytesWritten++;
         }
-
-        return length;
+        return bytesWritten;
     }
 
     /// <summary>Attempts to encode (as UTF-16) a surrogate pair.</summary>
@@ -105,18 +118,26 @@ public static class RuneExtensions
     /// <param name="rune">The rune to probe.</param>
     /// <param name="encoding">The encoding used; the default is UTF8.</param>
     /// <returns>The number of bytes required.</returns>
-    public static int GetEncodingLength (this Rune rune, Encoding encoding = null)
+    public static int GetEncodingLength (this Rune rune, Encoding? encoding = null)
     {
         encoding ??= Encoding.UTF8;
-        byte [] bytes = encoding.GetBytes (rune.ToString ().ToCharArray ());
-        var offset = 0;
 
-        if (bytes [^1] == 0)
+        const int maxCharsPerRune = 2;
+        // Get characters with UTF16 to keep that part independent of selected encoding.
+        Span<char> charBuffer = stackalloc char[maxCharsPerRune];
+        int charsWritten = rune.EncodeToUtf16(charBuffer);
+        Span<char> chars = charBuffer[..charsWritten];
+
+        int maxEncodedLength = encoding.GetMaxByteCount (charsWritten);
+        Span<byte> byteBuffer = stackalloc byte[maxEncodedLength];
+        int bytesEncoded = encoding.GetBytes (chars, byteBuffer);
+        ReadOnlySpan<byte> encodedBytes = byteBuffer[..bytesEncoded];
+
+        if (encodedBytes [^1] == '\0')
         {
-            offset++;
+            return encodedBytes.Length - 1;
         }
-
-        return bytes.Length - offset;
+        return encodedBytes.Length;
     }
 
     /// <summary>Returns <see langword="true"/> if the rune is a combining character.</summary>
@@ -127,7 +148,7 @@ public static class RuneExtensions
     {
         UnicodeCategory category = Rune.GetUnicodeCategory (rune);
 
-        return Rune.GetUnicodeCategory (rune) == UnicodeCategory.NonSpacingMark
+        return category == UnicodeCategory.NonSpacingMark
                || category == UnicodeCategory.SpacingCombiningMark
                || category == UnicodeCategory.EnclosingMark;
     }
@@ -136,7 +157,19 @@ public static class RuneExtensions
     /// <remarks>This is a Terminal.Gui extension method to <see cref="System.Text.Rune"/> to support TUI text manipulation.</remarks>
     /// <param name="rune">The rune to probe.</param>
     /// <returns><see langword="true"/> if the rune is a surrogate code point; <see langword="false"/> otherwise.</returns>
-    public static bool IsSurrogatePair (this Rune rune) { return char.IsSurrogatePair (rune.ToString (), 0); }
+    public static bool IsSurrogatePair (this Rune rune)
+    {
+        bool isSingleUtf16CodeUnit = rune.IsBmp;
+        if (isSingleUtf16CodeUnit)
+        {
+            return false;
+        }
+
+        const int maxCharsPerRune = 2;
+        Span<char> charBuffer = stackalloc char[maxCharsPerRune];
+        int charsWritten = rune.EncodeToUtf16 (charBuffer);
+        return charsWritten >= 2 && char.IsSurrogatePair (charBuffer [0], charBuffer [1]);
+    }
 
     /// <summary>
     ///     Ensures the rune is not a control character and can be displayed by translating characters below 0x20 to

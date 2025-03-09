@@ -179,7 +179,7 @@ public sealed class ViewportSettingsEditor : EditorBase
             }
         }
 
-        _cbAllowNegativeX.X = Pos.Left (_cbAllowYGreaterThanContentHeight);
+        _cbAllowNegativeY.X = Pos.Left (_cbAllowYGreaterThanContentHeight);
 
         var labelContentSize = new Label
         {
@@ -239,8 +239,8 @@ public sealed class ViewportSettingsEditor : EditorBase
         _cbClearContentOnly = new()
         {
             Title = "ClearContentOnly",
-            X = Pos.Right (_contentSizeHeight) + 1,
-            Y = Pos.Top (labelContentSize),
+            X = 0,
+            Y = Pos.Bottom (labelContentSize),
             CanFocus = true
         };
         _cbClearContentOnly.CheckedStateChanging += ClearContentOnlyToggle;
@@ -261,7 +261,7 @@ public sealed class ViewportSettingsEditor : EditorBase
         {
             Title = "ClipContentOnly",
             X = Pos.Right (_cbClearContentOnly) + 1,
-            Y = Pos.Top (labelContentSize),
+            Y = Pos.Bottom (labelContentSize),
             CanFocus = true
         };
         _cbClipContentOnly.CheckedStateChanging += ClipContentOnlyToggle;
@@ -282,7 +282,7 @@ public sealed class ViewportSettingsEditor : EditorBase
         {
             Title = "Transparent",
             X = Pos.Right (_cbClipContentOnly) + 1,
-            Y = Pos.Top (labelContentSize),
+            Y = Pos.Bottom (labelContentSize),
             CanFocus = true
         };
         _cbTransparent.CheckedStateChanging += TransparentToggle;
@@ -301,9 +301,9 @@ public sealed class ViewportSettingsEditor : EditorBase
 
         _cbVerticalScrollBar = new()
         {
-            Title = "VerticalScrollBar.Visible",
+            Title = "VerticalScrollBar",
             X = 0,
-            Y = Pos.Bottom (labelContentSize),
+            Y = Pos.Bottom (_cbClearContentOnly),
             CanFocus = false
         };
         _cbVerticalScrollBar.CheckedStateChanging += VerticalScrollBarToggle;
@@ -315,7 +315,7 @@ public sealed class ViewportSettingsEditor : EditorBase
 
         _cbAutoShowVerticalScrollBar = new()
         {
-            Title = "VerticalScrollBar.AutoShow",
+            Title = "AutoShow",
             X = Pos.Right (_cbVerticalScrollBar) + 1,
             Y = Pos.Top (_cbVerticalScrollBar),
             CanFocus = false
@@ -329,7 +329,7 @@ public sealed class ViewportSettingsEditor : EditorBase
 
         _cbHorizontalScrollBar = new()
         {
-            Title = "HorizontalScrollBar.Visible",
+            Title = "HorizontalScrollBar",
             X = 0,
             Y = Pos.Bottom (_cbVerticalScrollBar),
             CanFocus = false
@@ -343,7 +343,7 @@ public sealed class ViewportSettingsEditor : EditorBase
 
         _cbAutoShowHorizontalScrollBar = new()
         {
-            Title = "HorizontalScrollBar.AutoShow ",
+            Title = "AutoShow ",
             X = Pos.Right (_cbHorizontalScrollBar) + 1,
             Y = Pos.Top (_cbHorizontalScrollBar),
             CanFocus = false

@@ -171,8 +171,6 @@ public class TileView : View
     /// <returns></returns>
     public bool IsRootTileView () { return _parentTileView == null; }
 
-    // BUG: v2 fix this hack
-    // QUESTION: Does this need to be fixed before events are refactored?
     /// <summary>Overridden so no Frames get drawn</summary>
     /// <returns></returns>
     protected override bool OnDrawingBorderAndPadding () { return true; }
@@ -181,7 +179,7 @@ public class TileView : View
     protected override bool OnRenderingLineCanvas () { return false; }
 
     /// <inheritdoc/>
-    protected override void OnDrawComplete ()
+    protected override void OnDrawComplete (DrawContext? context)
     {
         if (ColorScheme is { })
         {

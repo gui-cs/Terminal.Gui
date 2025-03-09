@@ -19,14 +19,14 @@ Tenets higher in the list have precedence over tenets lower in the list.
 *Terminal.Gui* provides the following APIs for handling keyboard input:
 
 * **Key** - @Terminal.Gui.Key provides a platform-independent abstraction for common keyboard operations. It is used for processing keyboard input and raising keyboard events. This class provides a high-level abstraction with helper methods and properties for common keyboard operations. Use this class instead of the low-level `KeyCode` enum when possible.
-* **Key Bindings** - Key Bindings provide a declarative method for handling keyboard input in View implementations. The View calls @Terminal.Gui.AddCommand to declare it supports a particular command and then uses @Terminal.Gui.KeyBindings to indicate which key presses will invoke the command. 
+* **Key Bindings** - Key Bindings provide a declarative method for handling keyboard input in View implementations. The View calls Terminal.Gui.View.AddCommand(Terminal.Gui.Command,System.Func{System.Nullable{System.Boolean}}) to declare it supports a particular command and then uses @Terminal.Gui.KeyBindings to indicate which key presses will invoke the command. 
 * **Key Events** - The Key Bindings API is rich enough to support the vast majority of use-cases. However, in some cases subscribing directly to key events is needed (e.g. when capturing arbitrary typing by a user). Use @Terminal.Gui.View.KeyDown and related events in these cases.
 
 Each of these APIs are described more fully below.
 
 ### **[Key Bindings](~/api/Terminal.Gui.KeyBindings.yml)**
 
-Key Bindings is the preferred way of handling keyboard input in View implementations. The View calls @Terminal.Gui.AddCommand to declare it supports a particular command and then uses @Terminal.Gui.KeyBindings to indicate which key presses will invoke the command. For example, if a View wants to respond to the user pressing the up arrow key to scroll up it would do this
+Key Bindings is the preferred way of handling keyboard input in View implementations. The View calls @Terminal.Gui.View.AddCommand(Terminal.Gui.Command,System.Func{System.Nullable{System.Boolean}}) to declare it supports a particular command and then uses @Terminal.Gui.KeyBindings to indicate which key presses will invoke the command. For example, if a View wants to respond to the user pressing the up arrow key to scroll up it would do this
 
 ```cs
 public MyView : View
@@ -54,7 +54,7 @@ Key Bindings can be added at the `Application` or `View` level.
 
 For **Application-scoped Key Bindings** there are two categories of Application-scoped Key Bindings:
 
-1) **Application Command Key Bindings** - Bindings for `Command`s supported by @Terminal.Gui.Application. For example, @Terminal.Gui.Application.QuitKey, which is bound to `Command.Quit` and results in @Terminal.Gui.Application.RequestStop being called.
+1) **Application Command Key Bindings** - Bindings for `Command`s supported by @Terminal.Gui.Application. For example, @Terminal.Gui.Application.QuitKey, which is bound to `Command.Quit` and results in @Terminal.Gui.Application.RequestStop(Terminal.Gui.Toplevel) being called.
 2) **Application Key Bindings** - Bindings for `Command`s supported on arbitrary `Views` that are meant to be invoked regardless of which part of the application is visible/active. 
 
 Use @Terminal.Gui.Application.KeyBindings to add or modify Application-scoped Key Bindings.
@@ -84,20 +84,20 @@ The Command can be invoked even if the `View` that defines them is not focused o
 
 ### **Key Events**
 
-Keyboard events are retrieved from [Console Drivers](drivers.md) each iteration of the [Application](~/api/Terminal.Gui.Application.yml) [Main Loop](mainloop.md). The console driver raises the @Terminal.Gui.ConsoleDriver.KeyDown and @Terminal.Gui.ConsoleDriver.KeyUp events which invoke @Terminal.Gui.Application.RaiseKeyDown(Terminal.Gui.Key) and @Terminal.Gui.Application.RaiseKeyUp(Terminal.Gui.Key) respectively.
+Keyboard events are retrieved from [Console Drivers](drivers.md) each iteration of the [Application](~/api/Terminal.Gui.Application.yml) [Main Loop](mainloop.md). The console driver raises the @Terminal.Gui.ConsoleDriver.KeyDown and @Terminal.Gui.ConsoleDriver.KeyUp events which invoke @Terminal.Gui.Application.RaiseKeyDownEvent(Terminal.Gui.Key) and @Terminal.Gui.Application.RaiseKeyUpEvent(Terminal.Gui.Key) respectively.
 
-    NOTE: Not all drivers/platforms support sensing distinct KeyUp events. These drivers will simulate KeyUp events by raising @Terminal.Gui.ConsoleDriver.KeyUp after @Terminal.Gui.ConsoleDriver.KeyDown.
+> [!NOTE]
+> Not all drivers/platforms support sensing distinct KeyUp events. These drivers will simulate KeyUp events by raising KeyUp after KeyDown.
+ 
 
-@Terminal.Gui.Application.RaiseKeyDown(Terminal.Gui.Key) raises @Terminal.Gui.Application.KeyDown and then calls @Terminal.Gui.View.NewKeyDownEvent(Terminal.Gui.Key) on all toplevel Views. If no View handles the key event, any Application-scoped key bindings will be invoked.
-
-@Terminal.Gui.Application.RaiseKeyDown(Terminal.Gui.Key) raises @Terminal.Gui.Application.KeyDown and then calls @Terminal.Gui.View.NewKeyUpEvent(Terminal.Gui.Key) on all toplevel Views.
+@Terminal.Gui.Application.RaiseKeyDownEvent(Terminal.Gui.Key) raises @Terminal.Gui.Application.KeyDown and then calls @Terminal.Gui.View.NewKeyDownEvent(Terminal.Gui.Key) on all toplevel Views. If no View handles the key event, any Application-scoped key bindings will be invoked.
 
 If a view is enabled, the @Terminal.Gui.View.NewKeyDownEvent(Terminal.Gui.Key) method will do the following: 
 
 1) If the view has a subview that has focus, 'NewKeyDown' on the focused view will be called. This is recursive. If the most-focused view handles the key press, processing stops.
 2) If there is no most-focused sub-view, or a most-focused sub-view does not handle the key press, @Terminal.Gui.View.OnKeyDown(Terminal.Gui.Key) will be called. If the view handles the key press, processing stops.
 3) If @Terminal.Gui.View.OnKeyDown(Terminal.Gui.Key) does not handle the event. @Terminal.Gui.View.KeyDown will be raised.
-4) If the view does not handle the key down event, any bindings for the key will be invoked (see @Terminal.Gui.View.KeyBindings). If the key is bound and any of it's command handlers return true, processing stops.
+4) If the view does not handle the key down event, any bindings for the key will be invoked (see the @Terminal.Gui.View.KeyBindings property). If the key is bound and any of it's command handlers return true, processing stops.
 5) If the key is not bound, or the bound command handlers do not return true, @Terminal.Gui.View.OnKeyDownNotHandled(Terminal.Gui.Key) is called. 
 
 ## **Application Key Handling**

@@ -1,0 +1,569 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Comment CommentText="Thread 1 - Input thread, populates input buffer.  This thread is hidden, nobody gets to interact directly with these classes)">
+    <Position X="11" Y="0.5" Height="0.5" Width="5.325" />
+  </Comment>
+  <Comment CommentText="Thread 2 - Main Loop which does everything else including output.  Deals with input exclusively through the input buffer. Is accessible externally e.g. to Application">
+    <Position X="11.083" Y="3.813" Height="0.479" Width="5.325" />
+  </Comment>
+  <Comment CommentText="Orchestrates the 2 main threads in Terminal.Gui">
+    <Position X="6.5" Y="1.25" Height="0.291" Width="2.929" />
+  </Comment>
+  <Comment CommentText="Allows Views to work with new architecture without having to be rewritten.">
+    <Position X="4.666" Y="7.834" Height="0.75" Width="1.7" />
+  </Comment>
+  <Comment CommentText="Ansi Escape Sequence - Request / Response">
+    <Position X="19.208" Y="3.562" Height="0.396" Width="2.825" />
+  </Comment>
+  <Comment CommentText="Mouse interpretation subsystem">
+    <Position X="13.271" Y="9.896" Height="0.396" Width="2.075" />
+  </Comment>
+  <Comment CommentText="In Terminal.Gui views get things done almost exclusively by calling static methods on Application e.g. RequestStop, Run, Refresh etc">
+    <Position X="0.5" Y="3.75" Height="1.146" Width="1.7" />
+  </Comment>
+  <Comment CommentText="Static record of system state and static gateway API for everything you ever need.">
+    <Position X="0.5" Y="1.417" Height="0.875" Width="1.7" />
+  </Comment>
+  <Comment CommentText="Forwarded subset of gateway functionality. These exist to allow ''subclassing' Application.  Note that most methods 'ping pong' a lot back to main gateway submethods e.g. to manipulate TopLevel etc">
+    <Position X="2.895" Y="5.417" Height="1.063" Width="2.992" />
+  </Comment>
+  <Class Name="Terminal.Gui.WindowsInput" Collapsed="true">
+    <Position X="11.5" Y="3" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>QIAACAAAACAEAAAAAAAAAAAkAAAAAAAAAwAAAAAAABA=</HashCode>
+      <FileName>ConsoleDrivers\V2\WindowsInput.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Terminal.Gui.NetInput" Collapsed="true">
+    <Position X="13.25" Y="3" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAEAAAAQAAAAAAgAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\NetInput.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Terminal.Gui.ConsoleInput&lt;T&gt;" Collapsed="true">
+    <Position X="12.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAEAQAAAAAAAAAgACAAAAAAAAAAAAAAAAo=</HashCode>
+      <FileName>ConsoleDrivers\V2\ConsoleInput.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Terminal.Gui.MainLoop&lt;T&gt;" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="11" Y="4.75" Width="1.5" />
+    <AssociationLine Name="TimedEvents" Type="Terminal.Gui.ITimedEvents" ManuallyRouted="true">
+      <Path>
+        <Point X="11.312" Y="5.312" />
+        <Point X="11.312" Y="6.292" />
+        <Point X="10" Y="6.292" />
+        <Point X="10" Y="7.25" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-1.015" Y="1.019" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="OutputBuffer" Type="Terminal.Gui.IOutputBuffer" ManuallyRouted="true">
+      <Path>
+        <Point X="11.718" Y="5.312" />
+        <Point X="11.718" Y="7.25" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.027" Y="0.102" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="Out" Type="Terminal.Gui.IConsoleOutput" ManuallyRouted="true">
+      <Path>
+        <Point X="12.5" Y="5.125" />
+        <Point X="12.5" Y="5.792" />
+        <Point X="13.031" Y="5.792" />
+        <Point X="13.031" Y="7.846" />
+        <Point X="14" Y="7.846" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="AnsiRequestScheduler" Type="Terminal.Gui.AnsiRequestScheduler" ManuallyRouted="true">
+      <Path>
+        <Point X="11.75" Y="4.75" />
+        <Point X="11.75" Y="4.39" />
+        <Point X="20.375" Y="4.39" />
+        <Point X="20.375" Y="4.5" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.11" Y="0.143" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="WindowSizeMonitor" Type="Terminal.Gui.IWindowSizeMonitor" ManuallyRouted="true">
+      <Path>
+        <Point X="12.125" Y="5.312" />
+        <Point X="12.125" Y="7" />
+        <Point X="12.844" Y="7" />
+        <Point X="12.844" Y="13.281" />
+        <Point X="13.25" Y="13.281" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.047" Y="-0.336" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="ToplevelTransitionManager" Type="Terminal.Gui.IToplevelTransitionManager" ManuallyRouted="true">
+      <Path>
+        <Point X="11" Y="5.031" />
+        <Point X="11" Y="5.406" />
+        <Point X="9.021" Y="5.406" />
+        <Point X="9.021" Y="11.5" />
+        <Point X="10.375" Y="11.5" />
+        <Point X="10.375" Y="12" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-0.671" Y="0.529" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>QQQAAAAQACABJQQAABAAAQAAACAAAAACAAEAAACAEgg=</HashCode>
+      <FileName>ConsoleDrivers\V2\MainLoop.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="ToplevelTransitionManager" />
+      <Property Name="TimedEvents" />
+      <Property Name="InputProcessor" />
+      <Property Name="OutputBuffer" />
+      <Property Name="Out" />
+      <Property Name="AnsiRequestScheduler" />
+      <Property Name="WindowSizeMonitor" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Terminal.Gui.MainLoopCoordinator&lt;T&gt;">
+    <Position X="6.5" Y="2" Width="2" />
+    <TypeIdentifier>
+      <HashCode>IAAAIAEiCAIABAAAABQAAAAAABAAAQQAIQIABAAACgg=</HashCode>
+      <FileName>ConsoleDrivers\V2\MainLoopCoordinator.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_loop" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Terminal.Gui.AnsiResponseParser&lt;T&gt;" Collapsed="true">
+    <Position X="19.5" Y="10" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAACIAAAAAAAAAAAAAgAABAAAAACBAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\AnsiResponseParser\AnsiResponseParser.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.OutputBuffer">
+    <Position X="11" Y="8.25" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AwAAAAAAAIAAAECIBgAEQIAAAAEMRgAACAAAKABAgAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\OutputBuffer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Terminal.Gui.NetOutput" Collapsed="true">
+    <Position X="14.75" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAACAAAAAAAAAAAAAAAAAAQAAAMACAAAEAgAk=</HashCode>
+      <FileName>ConsoleDrivers\V2\NetOutput.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Terminal.Gui.WindowsOutput" Collapsed="true">
+    <Position X="13.25" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAABACACAAhAAAAAAAACCAAAgAQAAIMAAAAAEAgAQ=</HashCode>
+      <FileName>ConsoleDrivers\V2\WindowsOutput.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Terminal.Gui.InputProcessor&lt;T&gt;" Collapsed="true">
+    <Position X="16.5" Y="4.75" Width="2" />
+    <AssociationLine Name="_mouseInterpreter" Type="Terminal.Gui.MouseInterpreter" ManuallyRouted="true">
+      <Path>
+        <Point X="17.75" Y="5.312" />
+        <Point X="17.75" Y="10.031" />
+        <Point X="15.99" Y="10.031" />
+        <Point X="15.99" Y="10.605" />
+        <Point X="15" Y="10.605" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AQAkEAAAAASAiAAEAgwgAAAABAIAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\InputProcessor.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_mouseInterpreter" />
+      <Property Name="Parser" />
+      <Property Name="KeyConverter" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.1" />
+  </Class>
+  <Class Name="Terminal.Gui.NetInputProcessor" Collapsed="true">
+    <Position X="17.75" Y="5.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAACBAAAgAAAEAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\NetInputProcessor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.WindowsInputProcessor" Collapsed="true">
+    <Position X="15.75" Y="5.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAACAAAAgAAAAAAAgAEAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\WindowsInputProcessor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.AnsiMouseParser">
+    <Position X="23.5" Y="9.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAgAAAAAAAAAAAAAIAAAAAAAQAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\AnsiResponseParser\AnsiMouseParser.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.ConsoleDriverFacade&lt;T&gt;">
+    <Position X="6.5" Y="7.75" Width="2" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AQcgAAAAAKBAgFEIBBgAQJEAAjkaQiIAGQADKABDgAQ=</HashCode>
+      <FileName>ConsoleDrivers\V2\ConsoleDriverFacade.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="InputProcessor" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Terminal.Gui.AnsiRequestScheduler" Collapsed="true">
+    <Position X="19.5" Y="4.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAQAACAAIAAAIAACAESQAAQAACGAAAAAAAAAAAAAQQA=</HashCode>
+      <FileName>ConsoleDrivers\AnsiResponseParser\AnsiRequestScheduler.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="QueuedRequests" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Terminal.Gui.AnsiResponseParserBase" Collapsed="true">
+    <Position X="20.25" Y="9" Width="2" />
+    <AssociationLine Name="_mouseParser" Type="Terminal.Gui.AnsiMouseParser" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="22.25" Y="9.438" />
+        <Point X="24.375" Y="9.438" />
+        <Point X="24.375" Y="9.75" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="_keyboardParser" Type="Terminal.Gui.AnsiKeyboardParser" FixedFromPoint="true">
+      <Path>
+        <Point X="22.25" Y="9.375" />
+        <Point X="25.5" Y="9.375" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>UAiASAAAEICQALAAQAAAKAAAoAIAAABAAQIAJiAQASQ=</HashCode>
+      <FileName>ConsoleDrivers\AnsiResponseParser\AnsiResponseParser.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_mouseParser" />
+      <Field Name="_keyboardParser" />
+      <Field Name="_heldContent" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Terminal.Gui.MouseInterpreter">
+    <Position X="13.25" Y="10.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAAAAAAAgAAAAAAACAAAAAAAAUAAAAIAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\MouseInterpreter.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="_buttonStates" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Terminal.Gui.MouseButtonStateEx">
+    <Position X="16.5" Y="10.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAMwAIAAAAAAAAAAAABCAAAAAAAAABAAEAAg=</HashCode>
+      <FileName>ConsoleDrivers\V2\MouseButtonStateEx.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.StringHeld" Collapsed="true">
+    <Position X="21.5" Y="11" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAIAACAAAAAAAIBAAAAAAACAAAAAAAgAAAA=</HashCode>
+      <FileName>ConsoleDrivers\AnsiResponseParser\StringHeld.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Terminal.Gui.GenericHeld&lt;T&gt;" Collapsed="true">
+    <Position X="19.75" Y="11" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAIAACAAAAAAAIBAAAAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\AnsiResponseParser\GenericHeld.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Terminal.Gui.AnsiEscapeSequenceRequest">
+    <Position X="23" Y="4.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAAAEAAAAACAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\AnsiEscapeSequenceRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.AnsiEscapeSequence" Collapsed="true">
+    <Position X="23" Y="3.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAgAAEAAAA=</HashCode>
+      <FileName>ConsoleDrivers\AnsiEscapeSequence.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.AnsiResponseParser" Collapsed="true">
+    <Position X="21.5" Y="10" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAgACBAAAAACBAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\AnsiResponseParser\AnsiResponseParser.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.Application" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>hEK4FAgAqARIspQeBwoUgTGgACNL0AIAESLKoggBSw8=</HashCode>
+      <FileName>Application\Application.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.ApplicationImpl" Collapsed="true">
+    <Position X="2.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAIAAIAgQQAAAAAQAAAAAAAAAAQAAKgAAAAAI=</HashCode>
+      <FileName>Application\ApplicationImpl.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Instance" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Terminal.Gui.ApplicationV2" Collapsed="true">
+    <Position X="4.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAgABAEIBgAQAAAAAQBAAAAAgAEAAAAKgIAAAgI=</HashCode>
+      <FileName>ConsoleDrivers\V2\ApplicationV2.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_coordinator" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Terminal.Gui.View" Collapsed="true">
+    <Position X="0.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>3/v2dzPLvbb/5+LOHuv1x0dem3Y57v/8c6afz2/e/Y8=</HashCode>
+      <FileName>View\View.Adornments.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Terminal.Gui.WindowsKeyConverter" Collapsed="true">
+    <Position X="16" Y="7.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\WindowsKeyConverter.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Terminal.Gui.NetKeyConverter" Collapsed="true">
+    <Position X="17.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\NetKeyConverter.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Terminal.Gui.AnsiKeyboardParser">
+    <Position X="25.5" Y="9.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAE=</HashCode>
+      <FileName>ConsoleDrivers\AnsiResponseParser\Keyboard\AnsiKeyboardParser.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="_patterns" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Terminal.Gui.ToplevelTransitionManager" Collapsed="true">
+    <Position X="9.25" Y="13.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAEAAAAAAAAAAEIAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\ToplevelTransitionManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Terminal.Gui.Logging" Collapsed="true">
+    <Position X="0.5" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAIgAAAAAAEQAAAAAAAAABAAgAAAAAAAEAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\Logging.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.WindowSizeMonitor" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="13.25" Y="14" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAAAAAEAAAAABAAAAAACAAAAAAAAAAAACA=</HashCode>
+      <FileName>ConsoleDrivers\V2\WindowSizeMonitor.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Terminal.Gui.AnsiKeyboardParserPattern" Collapsed="true">
+    <Position X="28.5" Y="9.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAACIAAAAAAAAAAAAAAAAAQQAAAAAAAAAAAAAAAACAA=</HashCode>
+      <FileName>ConsoleDrivers\AnsiResponseParser\Keyboard\AnsiKeyboardParserPattern.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.CsiKeyPattern" Collapsed="true">
+    <Position X="25.5" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAABAAAAAAAAAQAACAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\AnsiResponseParser\Keyboard\CsiKeyPattern.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.EscAsAltPattern" Collapsed="true">
+    <Position X="27.75" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAQAACAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\AnsiResponseParser\Keyboard\EscAsAltPattern.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.Ss3Pattern" Collapsed="true">
+    <Position X="29.5" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAQAACAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\AnsiResponseParser\Keyboard\Ss3Pattern.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="Terminal.Gui.IConsoleInput&lt;T&gt;" Collapsed="true">
+    <Position X="12.5" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
+      <FileName>ConsoleDrivers\V2\IConsoleInput.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Terminal.Gui.IMainLoop&lt;T&gt;" Collapsed="true">
+    <Position X="9.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAQAAAAAAAABIQQAAAAAAAAAAAAAAAACAAAAAAAAEAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\IMainLoop.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Terminal.Gui.IConsoleOutput" Collapsed="true">
+    <Position X="14" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAMAAAAAEAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\IConsoleOutput.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Terminal.Gui.IOutputBuffer" Collapsed="true">
+    <Position X="11" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAIAAAEAIAAAAQIAAAAEMRgAACAAAKABAgAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\IOutputBuffer.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Terminal.Gui.IInputProcessor">
+    <Position X="14" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAkAAAAAACAgAAAAAggAAAABAIAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\IInputProcessor.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Terminal.Gui.IHeld">
+    <Position X="23.75" Y="6.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAIAACAAAAAAAIBAAAAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\AnsiResponseParser\IHeld.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Terminal.Gui.IAnsiResponseParser">
+    <Position X="20.25" Y="5.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAJAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\AnsiResponseParser\IAnsiResponseParser.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="State" />
+    </ShowAsAssociation>
+  </Interface>
+  <Interface Name="Terminal.Gui.IApplication">
+    <Position X="3" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAgQQAAAAAQAAAAAAAAAAAAAKgAAAAAI=</HashCode>
+      <FileName>Application\IApplication.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Terminal.Gui.IMainLoopCoordinator" Collapsed="true">
+    <Position X="6.5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIQIAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\IMainLoopCoordinator.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Terminal.Gui.IWindowSizeMonitor" Collapsed="true">
+    <Position X="13.25" Y="13" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAACAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\IWindowSizeMonitor.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Terminal.Gui.ITimedEvents">
+    <Position X="9.25" Y="7.25" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>BAAAIAAAAQAAAAAQACAAAIBAAQAAAAAAAAAIgAAAAAA=</HashCode>
+      <FileName>Application\ITimedEvents.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Terminal.Gui.IKeyConverter&lt;T&gt;" Collapsed="true">
+    <Position X="17" Y="6.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\IKeyConverter.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Terminal.Gui.IToplevelTransitionManager">
+    <Position X="9.25" Y="12" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\IToplevelTransitionManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Terminal.Gui.IConsoleDriverFacade">
+    <Position X="4.5" Y="8.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\IConsoleDriverFacade.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Terminal.Gui.INetInput" Collapsed="true">
+    <Position X="14.25" Y="2" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\INetInput.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Terminal.Gui.IWindowsInput" Collapsed="true">
+    <Position X="10.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\V2\IWindowsInput.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="Terminal.Gui.AnsiResponseParserState">
+    <Position X="20.25" Y="7.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAACAAAAAAIAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>ConsoleDrivers\AnsiResponseParser\AnsiResponseParserState.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

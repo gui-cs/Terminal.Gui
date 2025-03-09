@@ -127,7 +127,7 @@ public class ThemeManager : IDictionary<string, ThemeScope>
     [RequiresDynamicCode ("Calls Terminal.Gui.ThemeManager.Themes")]
     internal static void GetHardCodedDefaults ()
     {
-        //Debug.WriteLine ("Themes.GetHardCodedDefaults()");
+        //Logging.Trace ("Themes.GetHardCodedDefaults()");
         var theme = new ThemeScope ();
         theme.RetrieveValues ();
 
@@ -141,7 +141,7 @@ public class ThemeManager : IDictionary<string, ThemeScope>
     /// <summary>Called when the selected theme has changed. Fires the <see cref="ThemeChanged"/> event.</summary>
     internal void OnThemeChanged (string theme)
     {
-        //Debug.WriteLine ($"Themes.OnThemeChanged({theme}) -> {Theme}");
+        //Logging.Trace ($"Themes.OnThemeChanged({theme}) -> {Theme}");
         ThemeChanged?.Invoke (this, new ThemeManagerEventArgs (theme));
     }
 
@@ -149,7 +149,7 @@ public class ThemeManager : IDictionary<string, ThemeScope>
     [RequiresDynamicCode ("Calls Terminal.Gui.ThemeManager.Themes")]
     internal static void Reset ()
     {
-        Debug.WriteLine ("Themes.Reset()");
+        //Logging.Trace ("Themes.Reset()");
         Colors.Reset ();
         Themes?.Clear ();
         SelectedTheme = string.Empty;

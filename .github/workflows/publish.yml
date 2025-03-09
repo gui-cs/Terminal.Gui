@@ -18,17 +18,16 @@ jobs:
       with:
         fetch-depth: 0 # fetch-depth is needed for GitVersion
 
-    - name: Install GitVersion 
-      uses: gittools/actions/gitversion/setup@v3
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v3.1.11
       with:
-          versionSpec: '5.x'
-          includePrerelease: true
+        versionSpec: '6.0.x'
 
     - name: Determine Version
-      uses: gittools/actions/gitversion/execute@v3
+      uses: gittools/actions/gitversion/execute@v3.1.11
       with:
         useConfigFile: true
-        #additionalArguments: /b develop
+        updateAssemblyInfo: true
       id: gitversion # step id used as reference for output values
 
     - name: Setup dotnet
@@ -42,7 +41,6 @@ jobs:
 
     - name: Build Release
       run: |
-        dotnet-gitversion /updateprojectfiles
         dotnet build Terminal.Gui/Terminal.Gui.csproj --no-incremental --nologo --force --configuration Release
         dotnet test Terminal.Gui/Terminal.Gui.csproj --configuration Release
 

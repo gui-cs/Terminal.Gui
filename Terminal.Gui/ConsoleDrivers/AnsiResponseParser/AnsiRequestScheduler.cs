@@ -68,7 +68,7 @@ public class AnsiRequestScheduler
 
     /// <summary>
     ///     Sends the <paramref name="request"/> immediately or queues it if there is already
-    ///     an outstanding request for the given <see cref="AnsiEscapeSequenceRequest.Terminator"/>.
+    ///     an outstanding request for the given <see cref="AnsiEscapeSequence.Terminator"/>.
     /// </summary>
     /// <param name="request"></param>
     /// <returns><see langword="true"/> if request was sent immediately. <see langword="false"/> if it was queued.</returns>

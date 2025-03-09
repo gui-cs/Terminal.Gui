@@ -292,11 +292,11 @@ public class Snake : Scenario
 
         public SnakeView (SnakeState state)
         {
-            _appleRune = CM.Glyphs.Apple;
+            _appleRune = Glyphs.Apple;
 
             if (!Driver.IsRuneSupported (_appleRune))
             {
-                _appleRune = CM.Glyphs.AppleBMP;
+                _appleRune = Glyphs.AppleBMP;
             }
 
             State = state;

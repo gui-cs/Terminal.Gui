@@ -10,7 +10,7 @@ public enum LineStyle
     /// <summary>No border is drawn.</summary>
     None,
 
-    /// <summary>The border is drawn using thin line CM.Glyphs.</summary>
+    /// <summary>The border is drawn using thin line Glyphs.</summary>
     Single,
 
     /// <summary>The border is drawn using thin line glyphs with dashed (double and triple) straight lines.</summary>
@@ -19,10 +19,10 @@ public enum LineStyle
     /// <summary>The border is drawn using thin line glyphs with short dashed (triple and quadruple) straight lines.</summary>
     Dotted,
 
-    /// <summary>The border is drawn using thin double line CM.Glyphs.</summary>
+    /// <summary>The border is drawn using thin double line Glyphs.</summary>
     Double,
 
-    /// <summary>The border is drawn using heavy line CM.Glyphs.</summary>
+    /// <summary>The border is drawn using heavy line Glyphs.</summary>
     Heavy,
 
     /// <summary>The border is drawn using heavy line glyphs with dashed (double and triple) straight lines.</summary>

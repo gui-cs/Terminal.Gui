@@ -40,7 +40,8 @@ public class WindowsAndFrameViews : Scenario
             Y = 1,
             Width = Dim.Fill (15),
             Height = 10,
-            ColorScheme = Colors.ColorSchemes ["Dialog"]
+            ColorScheme = Colors.ColorSchemes ["Dialog"],
+            Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable | ViewArrangement.Resizable
         };
         win.Padding.Thickness = new (padding);
         win.Margin.Thickness = new (margin);
@@ -86,7 +87,8 @@ public class WindowsAndFrameViews : Scenario
                 X = margin,
                 Y = Pos.Bottom (listWin.Last ()) + margin,
                 Width = Dim.Fill (margin),
-                Height = contentHeight + pad * 2 + 2
+                Height = contentHeight + pad * 2 + 2,
+                Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable | ViewArrangement.Resizable
             };
             loopWin.Padding.Thickness = new (pad);
 
@@ -94,7 +96,7 @@ public class WindowsAndFrameViews : Scenario
 
             var pressMeButton = new Button
             {
-                X = Pos.Center (), Y = 0, ColorScheme = Colors.ColorSchemes ["Error"], Text = "Press me! (Y = 0)"
+                X = Pos.Center (), Y = 0, ColorScheme = Colors.ColorSchemes ["Error"], Text = "Press me! (Y = 0)",
             };
 
             pressMeButton.Accepting += (s, e) =>
@@ -109,7 +111,9 @@ public class WindowsAndFrameViews : Scenario
                 Width = Dim.Percent (50),
                 Height = 5,
                 ColorScheme = Colors.ColorSchemes ["Base"],
-                Text = "The Text in the Window"
+                Text = "The Text in the Window",
+                Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable | ViewArrangement.Resizable
+
             };
 
             subWin.Add (
@@ -164,7 +168,9 @@ public class WindowsAndFrameViews : Scenario
             Width = Dim.Percent (50),
             Height = Dim.Fill () - 1,
             ColorScheme = Colors.ColorSchemes ["Base"],
-            Text = "The Text in the Window"
+            Text = "The Text in the Window",
+            Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable | ViewArrangement.Resizable
+
         };
 
         subWinofFV.Add (

@@ -20,7 +20,13 @@ public sealed class Generic : Scenario
 
         var button = new Button { Id = "button", X = Pos.Center (), Y = 1, Text = "_Press me!" };
 
-        button.Accepting += (s, e) => MessageBox.ErrorQuery ("Error", "You pressed the button!", "_Ok");
+        button.Accepting += (s, e) =>
+                            {
+                                // Anytime Accepting is handled, make sure to set e.Cancel to false.
+                                e.Cancel = true;
+                                MessageBox.ErrorQuery ("Error", "You pressed the button!", "_Ok");
+                            };
+
         appWindow.Add (button);
 
         // Run - Start the application.

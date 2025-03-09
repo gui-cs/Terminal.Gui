@@ -164,11 +164,14 @@ public class ScrollBar : View, IOrientation, IDesignable
         set => _orientationHelper.Orientation = value;
     }
 
+#pragma warning disable CS0067 // The event is never used
     /// <inheritdoc/>
     public event EventHandler<CancelEventArgs<Orientation>>? OrientationChanging;
+#pragma warning restore CS0067 // The event is never used
 
     /// <inheritdoc/>
     public event EventHandler<EventArgs<Orientation>>? OrientationChanged;
+#pragma warning restore CS0067 // The event is never used
 
     /// <inheritdoc/>
     public void OnOrientationChanged (Orientation newOrientation)

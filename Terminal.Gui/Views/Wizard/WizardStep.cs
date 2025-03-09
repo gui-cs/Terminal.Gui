@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable 
+namespace Terminal.Gui;
 
 /// <summary>
 ///     Represents a basic step that is displayed in a <see cref="Wizard"/>. The <see cref="WizardStep"/> view is
@@ -15,26 +16,6 @@
 /// </remarks>
 public class WizardStep : View
 {
-    ///// <summary>
-    ///// The title of the <see cref="WizardStep"/>. 
-    ///// </summary>
-    ///// <remarks>The Title is only displayed when the <see cref="Wizard"/> is used as a modal pop-up (see <see cref="Wizard.Modal"/>.</remarks>
-    //public new string Title {
-    //	// BUGBUG: v2 - No need for this as View now has Title w/ notifications.
-    //	get => title;
-    //	set {
-    //		if (!OnTitleChanging (title, value)) {
-    //			var old = title;
-    //			title = value;
-    //			OnTitleChanged (old, title);
-    //		}
-    //		base.Title = value;
-    //		SetNeedsDraw ();
-    //	}
-    //}
-
-    //private string title = string.Empty;
-
     // The contentView works like the ContentView in FrameView.
     private readonly View _contentView = new ()
     {
@@ -140,11 +121,11 @@ public class WizardStep : View
 
     /// <summary>Add the specified <see cref="View"/> to the <see cref="WizardStep"/>.</summary>
     /// <param name="view"><see cref="View"/> to add to this container</param>
-    public override View Add (View view)
+    public override View Add (View? view)
     {
         _contentView.Add (view);
 
-        if (view.CanFocus)
+        if (view!.CanFocus)
         {
             CanFocus = true;
         }
@@ -156,10 +137,10 @@ public class WizardStep : View
 
     /// <summary>Removes a <see cref="View"/> from <see cref="WizardStep"/>.</summary>
     /// <remarks></remarks>
-    public override View Remove (View view)
+    public override View? Remove (View? view)
     {
         SetNeedsDraw ();
-        View container = view?.SuperView;
+        View? container = view?.SuperView;
 
         if (container == this)
         {

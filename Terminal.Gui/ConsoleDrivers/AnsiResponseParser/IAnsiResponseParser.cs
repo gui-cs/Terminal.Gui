@@ -3,7 +3,7 @@ namespace Terminal.Gui;
 
 /// <summary>
 ///     When implemented in a derived class, allows watching an input stream of characters
-///     (i.e. console input) for ANSI response sequences.
+///     (i.e. console input) for ANSI response sequences (mouse input, cursor, query responses etc.).
 /// </summary>
 public interface IAnsiResponseParser
 {

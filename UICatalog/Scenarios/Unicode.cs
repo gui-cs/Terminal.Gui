@@ -17,15 +17,15 @@ public class UnicodeInMenu : Scenario
 
         var gitString =
             $"gui.cs 糊 (hú) {
-                CM.Glyphs.IdenticalTo
+                Glyphs.IdenticalTo
             } {
-                CM.Glyphs.DownArrow
+                Glyphs.DownArrow
             }18 {
-                CM.Glyphs.UpArrow
+                Glyphs.UpArrow
             }10 {
-                CM.Glyphs.VerticalFourDots
+                Glyphs.VerticalFourDots
             }1 {
-                CM.Glyphs.HorizontalEllipsis
+                Glyphs.HorizontalEllipsis
             }";
 
         // Init

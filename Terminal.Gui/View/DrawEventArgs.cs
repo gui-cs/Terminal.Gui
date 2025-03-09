@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿#nullable enable
+using System.ComponentModel;
 
 namespace Terminal.Gui;
 
@@ -14,10 +15,16 @@ public class DrawEventArgs : CancelEventArgs
     ///     The Content-relative rectangle describing the old visible viewport into the
     ///     <see cref="View"/>.
     /// </param>
-    public DrawEventArgs (Rectangle newViewport, Rectangle oldViewport)
+    /// <param name="drawContext">
+    ///     Add any regions that have been drawn to during <see cref="View.Draw(DrawContext?)"/> operations to this context. This is
+    ///     primarily
+    ///     in support of <see cref="ViewportSettings.Transparent"/>.
+    /// </param>
+    public DrawEventArgs (Rectangle newViewport, Rectangle oldViewport, DrawContext? drawContext)
     {
         NewViewport = newViewport;
         OldViewport = oldViewport;
+        DrawContext = drawContext;
     }
 
     /// <summary>Gets the Content-relative rectangle describing the old visible viewport into the <see cref="View"/>.</summary>
@@ -25,4 +32,11 @@ public class DrawEventArgs : CancelEventArgs
 
     /// <summary>Gets the Content-relative rectangle describing the currently visible viewport into the <see cref="View"/>.</summary>
     public Rectangle NewViewport { get; }
+
+    /// <summary>
+    ///     Add any regions that have been drawn to during <see cref="View.Draw(DrawContext?)"/> operations to this context. This is
+    ///     primarily
+    ///     in support of <see cref="ViewportSettings.Transparent"/>.
+    /// </summary>
+    public DrawContext? DrawContext { get; }
 }

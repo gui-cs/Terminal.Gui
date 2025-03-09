@@ -14,9 +14,6 @@ namespace UICatalog.Scenarios;
 ///     "Character Map" application (like Windows' charmap.exe). - Helps test unicode character rendering in Terminal.Gui -
 ///     Illustrates how to do infinite scrolling
 /// </summary>
-/// <remarks>
-///     See <see href="CharacterMap/README.md"/>.
-/// </remarks>
 [ScenarioMetadata ("Character Map", "Unicode viewer. Demos infinite content drawing and scrolling.")]
 [ScenarioCategory ("Text and Formatting")]
 [ScenarioCategory ("Drawing")]
@@ -270,7 +267,7 @@ public class CharacterMap : Scenario
         var startSort = string.Empty;
         var endSort = string.Empty;
 
-        string sortIndicator = descending ? CM.Glyphs.DownArrow.ToString () : CM.Glyphs.UpArrow.ToString ();
+        string sortIndicator = descending ? Glyphs.DownArrow.ToString () : Glyphs.UpArrow.ToString ();
 
         switch (sortByColumn)
         {

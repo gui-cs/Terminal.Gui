@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Terminal.Gui.Application">
+    <Position X="2.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>hEI4FAgAqARIspQfBQo0gTGiACNL0AICESJKoggBSg8=</HashCode>
+      <FileName>Application\Application.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.ApplicationNavigation" Collapsed="true">
+    <Position X="13.75" Y="1.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAABCAAAAAAAAAAAAAAAAIgIAAAAAAAAAAAA=</HashCode>
+      <FileName>Application\ApplicationNavigation.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.IterationEventArgs" Collapsed="true">
+    <Position X="16" Y="2" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Application\IterationEventArgs.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.MainLoop" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="10.25" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAIAAAASAAAQAQAAAAAIBADQAAEAAYIgIIwAAAAAI=</HashCode>
+      <FileName>Application\MainLoop.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Terminal.Gui.MainLoopSyncContext" Collapsed="true">
+    <Position X="12" Y="2.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAAAAAAAAEAAAAAACAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Application\MainLoopSyncContext.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.RunState" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="14.25" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACACAgAAAAAAAAAAAAAAAAACQAAAAAAAAAA=</HashCode>
+      <FileName>Application\RunState.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Terminal.Gui.RunStateEventArgs" Collapsed="true">
+    <Position X="16" Y="3" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Application\RunStateEventArgs.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.Timeout" Collapsed="true">
+    <Position X="10.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAQAA=</HashCode>
+      <FileName>Application\Timeout.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.TimeoutEventArgs" Collapsed="true">
+    <Position X="12" Y="3.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAACAIAAAAAAAAAAAA=</HashCode>
+      <FileName>Application\TimeoutEventArgs.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Terminal.Gui.ApplicationImpl" BaseTypeListCollapsed="true">
+    <Position X="5.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAQAACAACAAAI=</HashCode>
+      <FileName>Application\ApplicationImpl.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Interface Name="Terminal.Gui.IMainLoopDriver" Collapsed="true">
+    <Position X="12" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAAAAAQAAAAABAAAAAAAEAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Application\MainLoop.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Terminal.Gui.IApplication">
+    <Position X="4" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAACAAAAAAI=</HashCode>
+      <FileName>Application\IApplication.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

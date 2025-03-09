@@ -1278,14 +1278,14 @@ public class TableEditor : Scenario
             // add a new one if this the one that is being sorted
             if (col.Ordinal == clickedCol)
             {
-                col.ColumnName += isAsc ? CM.Glyphs.UpArrow : CM.Glyphs.DownArrow;
+                col.ColumnName += isAsc ? Glyphs.UpArrow : Glyphs.DownArrow;
             }
         }
 
         _tableView.Update ();
     }
 
-    private string StripArrows (string columnName) { return columnName.Replace ($"{CM.Glyphs.DownArrow}", "").Replace ($"{CM.Glyphs.UpArrow}", ""); }
+    private string StripArrows (string columnName) { return columnName.Replace ($"{Glyphs.DownArrow}", "").Replace ($"{Glyphs.UpArrow}", ""); }
 
     private void TableViewKeyPress (object sender, Key e)
     {
@@ -1528,8 +1528,8 @@ public class TableEditor : Scenario
     private string TrimArrows (string columnName)
     {
         return columnName.TrimEnd (
-                                   (char)CM.Glyphs.UpArrow.Value,
-                                   (char)CM.Glyphs.DownArrow.Value
+                                   (char)Glyphs.UpArrow.Value,
+                                   (char)Glyphs.DownArrow.Value
                                   );
     }
 
