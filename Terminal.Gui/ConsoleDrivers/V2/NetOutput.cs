@@ -34,7 +34,10 @@ public class NetOutput : IConsoleOutput
     }
 
     /// <inheritdoc/>
-    public void Write (string text) { Console.Write (text); }
+    public void Write (ReadOnlySpan<char> text)
+    {
+        Console.Out.Write (text);
+    }
 
     /// <inheritdoc/>
     public void Write (IOutputBuffer buffer)

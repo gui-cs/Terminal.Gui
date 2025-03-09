@@ -6,12 +6,13 @@ using static Terminal.Gui.WindowsConsole;
 
 namespace Terminal.Gui;
 
-internal class WindowsOutput : IConsoleOutput
+internal partial class WindowsOutput : IConsoleOutput
 {
-    [DllImport ("kernel32.dll", EntryPoint = "WriteConsole", SetLastError = true, CharSet = CharSet.Unicode)]
-    private static extern bool WriteConsole (
+    [LibraryImport ("kernel32.dll", EntryPoint = "WriteConsoleW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+    [return: MarshalAs (UnmanagedType.Bool)]
+    private static partial bool WriteConsole (
         nint hConsoleOutput,
-        string lpbufer,
+        ReadOnlySpan<char> lpbufer,
         uint numberOfCharsToWriten,
         out uint lpNumberOfCharsWritten,
         nint lpReserved
@@ -84,7 +85,7 @@ internal class WindowsOutput : IConsoleOutput
         }
     }
 
-    public void Write (string str)
+    public void Write (ReadOnlySpan<char> str)
     {
         if (!WriteConsole (_screenBuffer, str, (uint)str.Length, out uint _, nint.Zero))
         {
