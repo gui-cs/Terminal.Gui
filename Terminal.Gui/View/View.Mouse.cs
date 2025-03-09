@@ -773,6 +773,8 @@ public partial class View // Mouse APIs
         if (Application.PopoverHost?.Visible == true)
         {
             start = Application.PopoverHost;
+
+            viewsUnderMouse.Add (Application.Top);
         }
 
         Point currentLocation = location;
@@ -830,13 +832,14 @@ public partial class View // Mouse APIs
 
             if (subview is null)
             {
-                if (start.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
+                // In the case start is transparent, recursively add all it's subviews etc...
+                if (start.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse) && !viewsUnderMouse.Contains(start))
                 {
                     viewsUnderMouse.AddRange (View.GetViewsUnderMouse (location, true));
 
                     // De-dupe viewsUnderMouse
-                    HashSet<View?> dedupe = [.. viewsUnderMouse];
-                    viewsUnderMouse = [.. dedupe];
+                    HashSet<View?> hashSet = [.. viewsUnderMouse];
+                    viewsUnderMouse = [.. hashSet];
                 }
 
                 // No subview was found that's under the mouse, so we're done
