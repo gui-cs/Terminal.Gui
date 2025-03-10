@@ -161,9 +161,22 @@ public class Bars : Scenario
         ConfigureMenu (_popoverMenu!);
 
         _popoverMenu!.ColorScheme = Colors.ColorSchemes ["Menu"];
+
+        _popoverMenu.HasFocusChanged += (o, args) =>
+                                        {
+                                            _popoverMenu.Visible = args.NewValue;
+                                        };
         _popoverMenu.Visible = false;
 
+
         Application.PopoverHost!.Add (_popoverMenu);
+        Application.PopoverHost.VisibleChanged += (sender, args) =>
+                                                  {
+                                                      if (!Application.PopoverHost.Visible)
+                                                      {
+                                                          _popoverMenu.Visible = false;
+                                                      }
+                                                  };
 
         var toggleShortcut = new Shortcut
         {
@@ -290,6 +303,13 @@ public class Bars : Scenario
                                          args.Cancel = true;
                                      };
 
+                barView.Selecting += (o, args) =>
+                                     {
+                                         eventSource.Add ($"Selecting: {barView!.Id} {args.Context.Command}");
+                                         eventLog.MoveDown ();
+                                         args.Cancel = false;
+                                     };
+
                 if (barView is Menuv2 menuv2)
                 {
                     menuv2.ShortcutCommandInvoked += (o, args) =>
@@ -313,6 +333,13 @@ public class Bars : Scenario
                                         eventSource.Add ($"Accepting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
                                         eventLog.MoveDown ();
                                         args.Cancel = true;
+                                    };
+
+                    sh.Selecting += (o, args) =>
+                                    {
+                                        eventSource.Add ($"Selecting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
+                                        eventLog.MoveDown ();
+                                        args.Cancel = false;
                                     };
                 }
             }
@@ -476,19 +503,38 @@ public class Bars : Scenario
         {
             Id = "fileMenuBarItem",
             Key = Key.D0.WithAlt,
-            HighlightStyle = HighlightStyle.Hover
+            HighlightStyle = HighlightStyle.Hover,
         };
+        fileMenu.Visible = false;
+        Application.PopoverHost.Add (fileMenu);
+
+        Application.PopoverHost.VisibleChanged += (sender, args) =>
+                                                  {
+                                                      if (!Application.PopoverHost.Visible)
+                                                      {
+                                                          fileMenu.Visible = false;
+                                                      }
+                                                  };
+
+        fileMenuBarItem.HasFocusChanged += (sender, args) =>
+                                    {
+                                        Rectangle screen = fileMenuBarItem.FrameToScreen ();
+                                        fileMenu.X = screen.X;
+                                        fileMenu.Y = screen.Y + screen.Height;
+                                        fileMenu.Visible = args.NewValue;
+                                    };
+
 
         fileMenuBarItem.Disposing += (sender, args) => fileMenu?.Dispose ();
 
-        //fileMenuBarItem.Accepting += (sender, args) =>
-        //                             {
-        //                                 Application.Popover = fileMenu;
-        //                                 Rectangle screen = fileMenuBarItem.FrameToScreen ();
-        //                                 fileMenu.X = screen.X;
-        //                                 fileMenu.Y = screen.Y + screen.Height;
-        //                                 fileMenu.Visible = true;
-        //                             };
+        fileMenuBarItem.Accepting += (sender, args) =>
+                                     {
+                                         Rectangle screen = fileMenuBarItem.FrameToScreen ();
+                                         fileMenu.X = screen.X;
+                                         fileMenu.Y = screen.Y + screen.Height;
+                                         fileMenu.Visible = true;
+                                         Application.PopoverHost.Visible = true;
+                                     };
 
 
         Menuv2? editMenu = new ContextMenuv2
@@ -502,16 +548,35 @@ public class Bars : Scenario
             Title = "_Edit",
             HighlightStyle = HighlightStyle.Hover
         };
+        editMenu.Visible = false;
+        Application.PopoverHost.Add (editMenu);
+
+        Application.PopoverHost.VisibleChanged += (sender, args) =>
+                                                  {
+                                                      if (!Application.PopoverHost.Visible)
+                                                      {
+                                                          editMenu.Visible = false;
+                                                      }
+                                                  };
+
+        editMenuBarItem.HasFocusChanged += (sender, args) =>
+                                           {
+                                               Rectangle screen = editMenuBarItem.FrameToScreen ();
+                                               editMenu.X = screen.X;
+                                               editMenu.Y = screen.Y + screen.Height;
+                                               editMenu.Visible = args.NewValue;
+                                           };
+
 
         editMenuBarItem.Disposing += (sender, args) => editMenu?.Dispose ();
 
         editMenuBarItem.Accepting += (sender, args) =>
                                      {
-                                         //Application.Popover = editMenu;
                                          Rectangle screen = editMenuBarItem.FrameToScreen ();
                                          editMenu.X = screen.X;
                                          editMenu.Y = screen.Y + screen.Height;
                                          editMenu.Visible = true;
+                                         Application.PopoverHost.Visible = true;
                                      };
 
 
@@ -556,7 +621,7 @@ public class Bars : Scenario
         var line = new Line ()
         {
             X = -1,
-            Width = Dim.Fill()! + 1
+            Width = Dim.Fill ()! + 1
         };
 
         var shortcut4 = new Shortcut

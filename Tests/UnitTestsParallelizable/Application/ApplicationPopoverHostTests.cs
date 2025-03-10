@@ -12,4 +12,20 @@ public class ApplicationPopoverHostTests
         Assert.True (host.Width!.Has<DimFill> (out _));
         Assert.True (host.Height!.Has<DimFill> (out _));
     }
+
+    [Fact]
+    public void PopoverHost_Visible_True_SetsFocus ()
+    {
+        var host = new PopoverHost ();
+
+        Assert.False (host.HasFocus);
+
+        Assert.False (host.Visible);
+
+        host.Visible = true;
+
+        Assert.True (host.HasFocus);
+    }
+
+
 }

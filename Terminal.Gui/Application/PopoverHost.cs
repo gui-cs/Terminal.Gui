@@ -1,5 +1,7 @@
 #nullable enable
 using System.Diagnostics;
+using System.Net.Mime;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Terminal.Gui;
 
@@ -26,6 +28,12 @@ public sealed class PopoverHost : View
         }
 
         Application.PopoverHost = new PopoverHost ();
+
+        // TODO: Add a diagnostic setting for this?
+        Application.PopoverHost.TextFormatter.VerticalAlignment = Alignment.End;
+        Application.PopoverHost.TextFormatter.Alignment = Alignment.End;
+        Application.PopoverHost.Text = "popoverHost";
+
         Application.PopoverHost.BeginInit ();
         Application.PopoverHost.EndInit ();
     }
@@ -51,6 +59,23 @@ public sealed class PopoverHost : View
         Width = Dim.Fill ();
         Height = Dim.Fill ();
         base.Visible = false;
+
+
+        AddCommand (Command.Quit, Quit);
+
+        bool? Quit (ICommandContext? ctx)
+        {
+            if (Visible)
+            {
+                Visible = false;
+
+                return true;
+            }
+
+            return null;
+        }
+
+        KeyBindings.Add (Application.QuitKey, Command.Quit);
     }
 
     /// <inheritdoc />

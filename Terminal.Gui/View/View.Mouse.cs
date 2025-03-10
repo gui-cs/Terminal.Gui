@@ -783,7 +783,10 @@ public partial class View // Mouse APIs
 
         while (start is { Visible: true } && start.Contains (currentLocation))
         {
-            viewsUnderMouse.Add (start);
+            if (!start.ViewportSettings.HasFlag(ViewportSettings.TransparentMouse))
+            {
+                viewsUnderMouse.Add (start);
+            }
 
             Adornment? found = null;
 

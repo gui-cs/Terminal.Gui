@@ -103,6 +103,7 @@ public static partial class Application
                        .ToList ();
     }
 
+    // BUGBUG: This does not return en-US even though it's supported by default
     internal static List<CultureInfo> GetSupportedCultures ()
     {
         CultureInfo [] cultures = CultureInfo.GetCultures (CultureTypes.AllCultures);

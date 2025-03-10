@@ -113,13 +113,14 @@ public class ContextMenus : Scenario
 
             if (index == -1)
             {
+                // Create English because GetSupportedCutures doesn't include it
                 culture.Id = "_English";
                 culture.Title = "_English";
                 culture.HelpText = "en-US";
                 ((CheckBox)culture.CommandView).CheckedState = Thread.CurrentThread.CurrentUICulture.Name == "en-US" ? CheckState.Checked : CheckState.UnChecked;
-
                 CreateAction (supportedCultures, culture);
                 supportedCultures.Add (culture);
+
                 index++;
                 culture = new ();
                 culture.CommandView = new CheckBox () { CanFocus = false, HighlightStyle = HighlightStyle.None };
@@ -153,16 +154,22 @@ public class ContextMenus : Scenario
     {
         if (_winContextMenu is { })
         {
-            //if (Application.Popover == _winContextMenu)
-            //{
-            //    Application.Popover = null;
-            //}
-
+            Application.PopoverHost?.Remove (_winContextMenu);
             _winContextMenu.Dispose ();
             _winContextMenu = null;
         }
 
-        _winContextMenu = new (GetSupportedCultures ())
+        var cultureShortcuts = GetSupportedCultures ();
+        foreach (Shortcut shortcut in cultureShortcuts)
+        {
+            shortcut.Accepting += (sender, args) =>
+                                  {
+                                      Application.PopoverHost.Visible = false;
+                                      _winContextMenu.Visible = false;
+                                      args.Cancel = false;
+                                  };
+        }
+        _winContextMenu = new (cultureShortcuts)
         {
             Key = _winContextMenuKey,
 
@@ -170,13 +177,15 @@ public class ContextMenus : Scenario
             //ForceMinimumPosToZero = _forceMinimumPosToZero,
             //UseSubMenusSingleFrame = _useSubMenusSingleFrame
         };
+
+        Application.PopoverHost.Add (_winContextMenu);
     }
 
     private void ShowWinContextMenu (Point? screenPosition)
     {
         _winContextMenu!.SetPosition (screenPosition);
-        //Application.Popover = _winContextMenu;
         _winContextMenu.Visible = true;
+        Application.PopoverHost.Visible = true;
     }
 
     //    MenuBarItem menuItems = new (

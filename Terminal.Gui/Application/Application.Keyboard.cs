@@ -20,6 +20,14 @@ public static partial class Application // Keyboard handling
             return true;
         }
 
+        if (PopoverHost is { Visible: true })
+        {
+            if (PopoverHost.NewKeyDownEvent (key))
+            {
+                return true;
+            }
+        }
+        
         if (Top is null)
         {
             foreach (Toplevel topLevel in TopLevels.ToList ())
