@@ -42,8 +42,8 @@ public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, Ru
     /// </remarks>
     internal IReadOnlyList<Rune> CombiningMarks
     {
-        // PERFORMANCE: Downside of the interface return type that List<T> struct enumerator cannot be utilized, i.e. enumerator is allocated.
-        // If enumeration is heavily used in the future then might be better to expose the List<T> Enumerator directly via separate mechanism.
+        // PERFORMANCE: Downside of the interface return type is that List<T> struct enumerator cannot be utilized, i.e. enumerator is allocated.
+        // If enumeration is used heavily in the future then might be better to expose the List<T> Enumerator directly via separate mechanism.
         get
         {
             // Avoid unnecessary list allocation.
