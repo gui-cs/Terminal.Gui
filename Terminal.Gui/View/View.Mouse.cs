@@ -770,7 +770,7 @@ public partial class View // Mouse APIs
 
         View? start = Application.Top;
 
-        if (Application.PopoverHost?.Visible == true)
+        if (Application.PopoverHost?.Visible is true && !ignoreTransparent)
         {
             start = Application.PopoverHost;
 
@@ -833,7 +833,7 @@ public partial class View // Mouse APIs
             if (subview is null)
             {
                 // In the case start is transparent, recursively add all it's subviews etc...
-                if (start.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse) && !viewsUnderMouse.Contains(start))
+                if (start.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
                 {
                     viewsUnderMouse.AddRange (View.GetViewsUnderMouse (location, true));
 
