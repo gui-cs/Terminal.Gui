@@ -1,28 +1,76 @@
-﻿using System.ComponentModel;
-using Xunit.Abstractions;
+﻿namespace Terminal.Gui.ApplicationTests;
 
-namespace Terminal.Gui.ApplicationTests;
-
-using System;
-using Terminal.Gui;
-using Xunit;
-
-public class ApplicationPopoverTests
+public class ApplicationPopoverHostTests
 {
-    //[Fact]
-    //public void Popover_SetAndGet ()
-    //{
-    //    // Arrange
-    //    var popover = new View ();
+    [Fact]
+    public void PopoverHost_ApplicationInit_Inits ()
+    {
+        // Arrange
+        Assert.Null (Application.PopoverHost);
+        Application.Init (new FakeDriver ());
 
-    //    // Act
-    //    Application.PopoverHost = popover;
+        // Act
+        Assert.NotNull (Application.PopoverHost);
 
-    //    // Assert
-    //    Assert.Equal (popover, Application.PopoverHost);
+        Application.ResetState (true);
+    }
 
-    //    Application.ResetState (ignoreDisposed: true);
-    //}
+    [Fact]
+    public void PopoverHost_ApplicationShutdown_CleansUp ()
+    {
+        // Arrange
+        Assert.Null (Application.PopoverHost);
+        Application.Init (new FakeDriver ());
+
+        // Act
+        Assert.NotNull (Application.PopoverHost);
+
+        Application.Shutdown ();
+
+        // Test
+        Assert.Null (Application.PopoverHost);
+    }
+
+    [Fact]
+    public void PopoverHost_CleanUp_CleansUp ()
+    {
+        // Arrange
+        Assert.Null (Application.PopoverHost);
+        PopoverHost.Init ();
+
+        // Act
+        PopoverHost.Cleanup ();
+
+        // Test
+        Assert.Null (Application.PopoverHost);
+
+        Application.ResetState (true);
+    }
+
+    [Fact]
+    public void PopoverHost_Init_Inits ()
+    {
+        // Arrange
+        Assert.Null (Application.PopoverHost);
+
+        // Act
+        PopoverHost.Init ();
+        Assert.NotNull (Application.PopoverHost);
+
+        Application.ResetState (true);
+    }
+
+    [Fact]
+    public void PopoverHost_Init_WithoutCleanup_Throws ()
+    {
+        // Arrange
+        PopoverHost.Init ();
+
+        // Act
+        Assert.Throws<InvalidOperationException> (PopoverHost.Init);
+
+        Application.ResetState (true);
+    }
 
     //[Fact]
     //public void Popover_SetToNull ()
@@ -189,7 +237,6 @@ public class ApplicationPopoverTests
 
     //    Application.ResetState (ignoreDisposed: true);
     //}
-
 
     //[Fact]
     //public void Popover_MouseClick_Outside_Hides_Passes_Event_On ()

@@ -71,9 +71,4 @@ public enum ViewArrangement
     ///     </para>
     /// </summary>
     Overlapped = 32,
-
-    /// <summary>
-    ///     The view overlaps other views and prevents any subviews without this flag set to gain input.
-    /// </summary>
-    Popover = 64,
 }

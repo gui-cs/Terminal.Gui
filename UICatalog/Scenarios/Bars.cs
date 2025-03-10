@@ -156,7 +156,6 @@ public class Bars : Scenario
         _popoverMenu = new Menuv2
         {
             Id = "popoverMenu",
-            Arrangement = ViewArrangement.Popover
         };
 
         ConfigureMenu (_popoverMenu!);
@@ -164,7 +163,7 @@ public class Bars : Scenario
         _popoverMenu!.ColorScheme = Colors.ColorSchemes ["Menu"];
         _popoverMenu.Visible = false;
 
-        Application.PopoverHost.Add (_popoverMenu);
+        Application.PopoverHost!.Add (_popoverMenu);
 
         var toggleShortcut = new Shortcut
         {
