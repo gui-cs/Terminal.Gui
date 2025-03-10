@@ -100,14 +100,14 @@ public class ContextMenus : Scenario
         // Shutdown - Calling Application.Shutdown is required.
         Application.Shutdown ();
     }
-    private Shortcut [] GetSupportedCultures ()
+    private MenuItemv2 [] GetSupportedCultures ()
     {
-        List<Shortcut> supportedCultures = new ();
+        List<MenuItemv2> supportedCultures = new ();
         int index = -1;
 
         foreach (CultureInfo c in _cultureInfos)
         {
-            Shortcut culture = new ();
+            MenuItemv2 culture = new ();
 
             culture.CommandView = new CheckBox () { CanFocus = false, HighlightStyle = HighlightStyle.None };
 
@@ -136,13 +136,13 @@ public class ContextMenus : Scenario
 
         return supportedCultures.ToArray ();
 
-        void CreateAction (List<Shortcut> cultures, Shortcut culture)
+        void CreateAction (List<MenuItemv2> cultures, MenuItemv2 culture)
         {
             culture.Action += () =>
             {
                 Thread.CurrentThread.CurrentUICulture = new (culture.HelpText);
 
-                foreach (Shortcut item in cultures)
+                foreach (MenuItemv2 item in cultures)
                 {
                     ((CheckBox)item.CommandView).CheckedState = Thread.CurrentThread.CurrentUICulture.Name == item.HelpText ? CheckState.Checked : CheckState.UnChecked;
                 }
@@ -159,17 +159,17 @@ public class ContextMenus : Scenario
             _winContextMenu = null;
         }
 
-        var cultureShortcuts = GetSupportedCultures ();
-        foreach (Shortcut shortcut in cultureShortcuts)
+        var cultureMenuItems = GetSupportedCultures ();
+        foreach (MenuItemv2 menuItem in cultureMenuItems)
         {
-            shortcut.Accepting += (sender, args) =>
+            menuItem.Accepting += (sender, args) =>
                                   {
                                       Application.PopoverHost.Visible = false;
                                       _winContextMenu.Visible = false;
                                       args.Cancel = false;
                                   };
         }
-        _winContextMenu = new (cultureShortcuts)
+        _winContextMenu = new (cultureMenuItems)
         {
             Key = _winContextMenuKey,
 

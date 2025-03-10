@@ -47,37 +47,6 @@ public class Shortcut : View, IOrientation, IDesignable
     public Shortcut () : this (Key.Empty, null, null, null) { }
 
     /// <summary>
-    ///     Creates a new instance of <see cref="Shortcut"/>, binding it to <paramref name="targetView"/> and
-    ///     <paramref name="command"/>. The Key <paramref name="targetView"/>
-    ///     has bound to <paramref name="command"/> will be used as <see cref="Key"/>.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         This is a helper API that simplifies creation of multiple Shortcuts when adding them to <see cref="Bar"/>-based
-    ///         objects, like <see cref="MenuBarv2"/>.
-    ///     </para>
-    /// </remarks>
-    /// <param name="targetView">
-    ///     The View that <paramref name="command"/> will be invoked on when user does something that causes the Shortcut's Accept
-    ///     event to be raised.
-    /// </param>
-    /// <param name="command">
-    ///     The Command to invoke on <paramref name="targetView"/>. The Key <paramref name="targetView"/>
-    ///     has bound to <paramref name="command"/> will be used as <see cref="Key"/>
-    /// </param>
-    /// <param name="commandText">The text to display for the command.</param>
-    /// <param name="helpText">The help text to display.</param>
-    public Shortcut (View targetView, Command command, string commandText, string? helpText = null)
-        : this (
-                targetView?.HotKeyBindings.GetFirstFromCommands (command)!,
-                commandText,
-                null,
-                helpText)
-    {
-        _targetView = targetView;
-        Command = command;
-    }
-
     /// <summary>
     ///     Creates a new instance of <see cref="Shortcut"/>.
     /// </summary>
@@ -158,10 +127,11 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         if (args.NewValue.HasFlag (HighlightStyle.Hover))
         {
-            HasFocus = true;
+            SetFocus ();
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /// <summary>
@@ -204,7 +174,7 @@ public class Shortcut : View, IOrientation, IDesignable
             SetHelpViewDefaultLayout ();
         }
 
-        if (KeyView.Visible && Key != Key.Empty)
+        if (KeyView.Visible && (Key != Key.Empty || KeyView.Text != string.Empty))
         {
             Add (KeyView);
             SetKeyViewDefaultLayout ();
@@ -278,18 +248,6 @@ public class Shortcut : View, IOrientation, IDesignable
 
     #region Accept/Select/HotKey Command Handling
 
-    private readonly View? _targetView; // If set, _command will be invoked
-
-    /// <summary>
-    ///     Gets the target <see cref="View"/> that the <see cref="Command"/> will be invoked on.
-    /// </summary>
-    public View? TargetView => _targetView;
-
-    /// <summary>
-    ///     Gets the <see cref="Command"/> that will be invoked on <see cref="TargetView"/> when the Shortcut is activated.
-    /// </summary>
-    public Command Command { get; }
-
     private void AddCommands ()
     {
         // Accept (Enter key) -
@@ -300,7 +258,7 @@ public class Shortcut : View, IOrientation, IDesignable
         AddCommand (Command.Select, DispatchCommand);
     }
 
-    private bool? DispatchCommand (ICommandContext? commandContext)
+    internal virtual bool? DispatchCommand (ICommandContext? commandContext)
     {
         CommandContext<KeyBinding>? keyCommandContext = commandContext is CommandContext<KeyBinding> ? (CommandContext<KeyBinding>)commandContext : default;
 
@@ -342,10 +300,6 @@ public class Shortcut : View, IOrientation, IDesignable
             cancel = true;
         }
 
-        if (_targetView is { })
-        {
-            _targetView.InvokeCommand (Command, commandContext);
-        }
 
         return cancel;
     }

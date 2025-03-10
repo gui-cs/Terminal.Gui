@@ -53,21 +53,21 @@ public class Menuv2 : Bar
     {
         base.Add (view);
 
-        if (view is Shortcut shortcut)
+        if (view is MenuItemv2 menuItem)
         {
-            shortcut.CanFocus = true;
-            shortcut.Orientation = Orientation.Vertical;
-            shortcut.HighlightStyle |= HighlightStyle.Hover;
+            menuItem.CanFocus = true;
+            menuItem.Orientation = Orientation.Vertical;
+            menuItem.HighlightStyle |= HighlightStyle.Hover;
 
-            shortcut.Accepting += ShortcutOnAccepting;
+            menuItem.Accepting += MenuItemtOnAccepting;
 
-            AddCommand (shortcut.Command, (ctx) =>
+            AddCommand (menuItem.Command, (ctx) =>
             {
-                return RaiseShortcutCommandInvoked (ctx);
+                return RaiseMenuItemCommandInvoked (ctx);
             });
 
 
-            void ShortcutOnAccepting (object? sender, CommandEventArgs e)
+            void MenuItemtOnAccepting (object? sender, CommandEventArgs e)
             {
                 if (Arrangement.HasFlag (ViewArrangement.Overlapped) && Visible)
                 {
@@ -88,7 +88,7 @@ public class Menuv2 : Bar
     /// </summary>
     /// <param name="ctx"></param>
     /// <returns></returns>
-    protected bool? RaiseShortcutCommandInvoked (ICommandContext? ctx)
+    protected bool? RaiseMenuItemCommandInvoked (ICommandContext? ctx)
     {
         CommandEventArgs args = new () { Context = ctx };
 
@@ -99,10 +99,10 @@ public class Menuv2 : Bar
         if (!args.Cancel)
         {
             // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-            ShortcutCommandInvoked?.Invoke (this, args);
+            MenuItemCommandInvoked?.Invoke (this, args);
         }
 
-        return ShortcutCommandInvoked is null ? null : args.Cancel;
+        return MenuItemCommandInvoked is null ? null : args.Cancel;
     }
 
     /// <summary>
@@ -111,7 +111,7 @@ public class Menuv2 : Bar
     /// </summary>
     /// <remarks>
     /// <para>
-    ///    See <see cref="ShortcutCommandInvoked"/> for more information.
+    ///    See <see cref="MenuItemCommandInvoked"/> for more information.
     /// </para>
     /// </remarks>
     /// <param name="args"></param>
@@ -124,8 +124,8 @@ public class Menuv2 : Bar
     /// </summary>
     /// <remarks>
     /// <para>
-    ///    See <see cref="RaiseShortcutCommandInvoked"/> for more information.
+    ///    See <see cref="RaiseMenuItemCommandInvoked"/> for more information.
     /// </para>
     /// </remarks>
-    public event EventHandler<CommandEventArgs>? ShortcutCommandInvoked;
+    public event EventHandler<CommandEventArgs>? MenuItemCommandInvoked;
 }

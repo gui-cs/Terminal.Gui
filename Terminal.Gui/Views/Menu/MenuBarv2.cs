@@ -26,7 +26,7 @@ public class MenuBarv2 : Bar
         AddCommand (Command.Context,
                    (ctx) =>
                    {
-                       if (ctx is CommandContext<KeyBinding> commandContext && commandContext.Binding.Data is Shortcut { TargetView: { } } shortcut)
+                       if (ctx is CommandContext<KeyBinding> commandContext && commandContext.Binding.Data is MenuItemv2 { TargetView: { } } shortcut)
                        {
                            //MenuBarv2? clone = MemberwiseClone () as MenuBarv2;
                            //clone!.SuperView = null;
@@ -65,7 +65,8 @@ public class MenuBarv2 : Bar
 
             }
         }
-        return base.OnHighlight (args);
+
+        return false;
     }
 
     /// <inheritdoc/>
@@ -80,7 +81,7 @@ public class MenuBarv2 : Bar
         }
         view.CanFocus = true;
 
-        if (view is Shortcut shortcut)
+        if (view is MenuItemv2 shortcut)
         {
             shortcut.KeyView.Visible = false;
             shortcut.HelpView.Visible = false;

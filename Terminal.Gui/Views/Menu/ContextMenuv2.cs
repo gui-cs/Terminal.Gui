@@ -35,7 +35,7 @@ public class ContextMenuv2 : Menuv2, IDesignable
     public ContextMenuv2 () : this ([]) { }
 
     /// <inheritdoc/>
-    public ContextMenuv2 (IEnumerable<Shortcut> shortcuts) : base (shortcuts)
+    public ContextMenuv2 (IEnumerable<MenuItemv2> menuItems) : base (menuItems)
     {
         Visible = false;
         VisibleChanged += OnVisibleChanged;
@@ -54,9 +54,9 @@ public class ContextMenuv2 : Menuv2, IDesignable
                         return true;
                     });
 
-        if (shortcuts is { })
+        if (menuItems is { })
         {
-            foreach (var sc in shortcuts)
+            foreach (var sc in menuItems)
             {
                 AddCommand (
                             Command.Accept,

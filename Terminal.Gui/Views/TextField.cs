@@ -1229,7 +1229,7 @@ public class TextField : View
     private void CreateContextMenu ()
     {
         DisposeContextMenu ();
-        ContextMenuv2 menu = new (new List<Shortcut> ()
+        ContextMenuv2 menu = new (new List<MenuItemv2> ()
         {
             new (this, Command.SelectAll, Strings.ctxSelectAll),
             new (this, Command.DeleteAll, Strings.ctxDeleteAll),

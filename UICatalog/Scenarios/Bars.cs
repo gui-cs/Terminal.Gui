@@ -141,6 +141,15 @@ public class Bars : Scenario
             Y = Pos.Bottom (label),
         };
         ConfigureMenu (bar);
+
+        var cascadeShortcut = new Shortcut
+        {
+            Title = "_Cascade",
+            Text = "Cascade...",
+            HighlightStyle = HighlightStyle.Hover
+        };
+        bar.Add (cascadeShortcut);
+
         bar.Arrangement = ViewArrangement.RightResizable;
 
         menuLikeExamples.Add (bar);
@@ -312,7 +321,7 @@ public class Bars : Scenario
 
                 if (barView is Menuv2 menuv2)
                 {
-                    menuv2.ShortcutCommandInvoked += (o, args) =>
+                    menuv2.MenuItemCommandInvoked += (o, args) =>
                                                      {
                                                          if (args.Context is CommandContext<KeyBinding> { Binding.Data: Shortcut { } sc })
                                                          {
@@ -499,7 +508,7 @@ public class Bars : Scenario
 
         //ConfigureMenu (fileMenu);
 
-        var fileMenuBarItem = new Shortcut (fileMenu, Command.Context, "_File", "File Menu")
+        var fileMenuBarItem = new MenuItemv2 (fileMenu, Command.Context, "_File", "File Menu")
         {
             Id = "fileMenuBarItem",
             Key = Key.D0.WithAlt,
@@ -543,7 +552,7 @@ public class Bars : Scenario
         };
         ConfigureMenu (editMenu);
 
-        var editMenuBarItem = new Shortcut (editMenu, Command.Edit, "_Edit", "Edit Menu")
+        var editMenuBarItem = new MenuItemv2 (editMenu, Command.Edit, "_Edit", "Edit Menu")
         {
             Title = "_Edit",
             HighlightStyle = HighlightStyle.Hover
