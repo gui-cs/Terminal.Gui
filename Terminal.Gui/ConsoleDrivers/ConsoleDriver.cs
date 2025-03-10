@@ -217,7 +217,7 @@ public abstract class ConsoleDriver : IConsoleDriver
                         if (Contents [Row, Col - 1].CombiningMarks.Count > 0)
                         {
                             // Just add this mark to the list
-                            Contents [Row, Col - 1].CombiningMarks.Add (rune);
+                            Contents [Row, Col - 1].AddCombiningMark (rune);
 
                             // Ignore. Don't move to next column (let the driver figure out what to do).
                         }
@@ -240,7 +240,7 @@ public abstract class ConsoleDriver : IConsoleDriver
                             else
                             {
                                 // It didn't normalize. Add it to the Cell to left's CM list
-                                Contents [Row, Col - 1].CombiningMarks.Add (rune);
+                                Contents [Row, Col - 1].AddCombiningMark (rune);
 
                                 // Ignore. Don't move to next column (let the driver figure out what to do).
                             }
@@ -298,7 +298,7 @@ public abstract class ConsoleDriver : IConsoleDriver
                         else if (!Clip.Contains (Col, Row))
                         {
                             // Our 1st column is outside the clip, so we can't display a wide character.
-                            Contents [Row, Col+1].Rune = Rune.ReplacementChar;
+                            Contents [Row, Col + 1].Rune = Rune.ReplacementChar;
                         }
                         else
                         {
