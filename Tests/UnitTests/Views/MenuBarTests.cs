@@ -3734,6 +3734,34 @@ Edit
         top.Dispose ();
     }
 
+    [Fact]
+    [AutoInitShutdown]
+    public void CanFocus_True_Key_Esc_Exit_Toplevel_If_IsMenuOpen_False ()
+    {
+        var menu = new MenuBar
+        {
+            Menus =
+            [
+                new ("File", new MenuItem [] { new ("New", "", null) })
+            ],
+            CanFocus = true
+        };
+        var top = new Toplevel ();
+        top.Add (menu);
+        Application.Begin (top);
+
+        Assert.True (menu.CanFocus);
+        Assert.True (menu.NewKeyDownEvent (menu.Key));
+        Assert.True (menu.IsMenuOpen);
+
+        Assert.True (menu.NewKeyDownEvent (Key.Esc));
+        Assert.False (menu.IsMenuOpen);
+
+        Assert.False (menu.NewKeyDownEvent (Key.Esc));
+        Assert.False (menu.IsMenuOpen);
+        top.Dispose ();
+    }
+
     // Defines the expected strings for a Menu. Currently supports 
     //   - MenuBar with any number of MenuItems 
     //   - Each top-level MenuItem can have a SINGLE sub-menu

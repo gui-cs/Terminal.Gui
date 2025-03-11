@@ -111,9 +111,14 @@ public class MenuBar : View, IDesignable
                     Command.Cancel,
                     () =>
                     {
-                        CloseMenuBar ();
+                        if (IsMenuOpen)
+                        {
+                            CloseMenuBar ();
 
-                        return true;
+                            return true;
+                        }
+
+                        return false;
                     }
                    );
 
