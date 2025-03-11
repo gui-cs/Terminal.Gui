@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Resources;
 using Terminal.Gui.Resources;
@@ -11,6 +12,10 @@ namespace Terminal.Gui;
 /// </summary>
 public static class ColorStrings
 {
+    // Concurrent dictionary is used instead of mutex lock because at worst case there is just extra parsing when a color is missing from the cache,
+    // i.e. prioritize throughput over cache hit accuracy.
+    private static readonly ConcurrentDictionary<string, Color> CachedParsedColors = new(StringComparer.OrdinalIgnoreCase);
+
     // PERFORMANCE: See https://stackoverflow.com/a/15521524/297526 for why GlobalResources.GetString is fast.
 
     /// <summary>
@@ -52,17 +57,47 @@ public static class ColorStrings
     /// <returns><see langword="true"/> if <paramref name="name"/> was parsed successfully.</returns>
     public static bool TryParseW3CColorName (string name, out Color color)
     {
-        foreach (DictionaryEntry entry in GlobalResources.GetResourceSet (CultureInfo.CurrentUICulture, true, true)!)
+        // Try to avoid looping through and parsing the same repeatedly requested colors.
+        if (CachedParsedColors.TryGetValue (name, out Color cachedColor))
         {
-            if (entry.Value is string colorName && colorName.Equals (name, StringComparison.OrdinalIgnoreCase))
+            color = cachedColor;
+            return true;
+        }
+
+        // TODO: Should the cache be purged if UI culture changes?
+        ResourceSet? resourceSet = GlobalResources.GetResourceSet (CultureInfo.CurrentUICulture, true, true);
+        if (resourceSet != null)
+        {
+            // Not very efficient.
+            // DictionaryEntry is struct which is boxed because ResourceSet uses archaic non-generic interfaces.
+            foreach (DictionaryEntry entry in resourceSet)
             {
-                return TryParseColorKey (entry.Key.ToString (), out color);
+                if (entry.Value is string colorName && colorName.Equals (name, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (TryParseColorKey (entry.Key.ToString (), out Color parsedEntryColor))
+                    {
+                        // The add failing is not critical.
+                        // It just means that multiple threads parsed the same value and tried adding it. 
+                        _ = CachedParsedColors.TryAdd (name, parsedEntryColor);
+                        color = parsedEntryColor;
+                        return true;
+                    }
+                    color = default;
+                    return false;
+                }
             }
         }
 
-        return TryParseColorKey (name, out color);
+        if (TryParseColorKey (name, out Color parsedRgbColor))
+        {
+            _ = CachedParsedColors.TryAdd (name, parsedRgbColor);
+            color = parsedRgbColor;
+            return true;
+        }
+        color = default;
+        return false;
 
-        bool TryParseColorKey (string? key, out Color color)
+        static bool TryParseColorKey (string? key, out Color color)
         {
             if (key != null && key.StartsWith ('#') && key.Length == 7)
             {
