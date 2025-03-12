@@ -2188,4 +2188,22 @@ Les Miśerables",
         tf.InsertText ("aA,;\ud83d\udcc4\U0001F4C4\udcc4\ud83d");
         Assert.Equal ("aA,;📄📄��", tf.Text);
     }
+
+    [Fact]
+    public void PositionCursor_Respect_GetColumns ()
+    {
+        var tf = new TextField () { Width = 5 };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        tf.NewKeyDownEvent (new ("📄"));
+        Assert.Equal (1, tf.CursorPosition);
+        Assert.Equal (new (2, 0), tf.PositionCursor ());
+        Assert.Equal ("📄", tf.Text);
+
+        tf.NewKeyDownEvent (new (KeyCode.A));
+        Assert.Equal (2, tf.CursorPosition);
+        Assert.Equal (new (3, 0), tf.PositionCursor ());
+        Assert.Equal ("📄a", tf.Text);
+    }
 }
