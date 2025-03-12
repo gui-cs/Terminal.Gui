@@ -2178,4 +2178,14 @@ Les Miśerables",
 
         tf.Dispose ();
     }
+
+    [Fact]
+    public void InsertText_Bmp_SurrogatePair_Non_Bmp_Invalid_SurrogatePair ()
+    {
+        var tf = new TextField ();
+        //📄 == \ud83d\udcc4 == \U0001F4C4
+        // � == Rune.ReplacementChar
+        tf.InsertText ("aA,;\ud83d\udcc4\U0001F4C4\udcc4\ud83d");
+        Assert.Equal ("aA,;📄📄��", tf.Text);
+    }
 }

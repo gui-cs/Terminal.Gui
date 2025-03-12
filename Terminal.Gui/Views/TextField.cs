@@ -730,21 +730,11 @@ public class TextField : View
     /// <param name="useOldCursorPos">Use the previous cursor position.</param>
     public void InsertText (string toAdd, bool useOldCursorPos = true)
     {
-        foreach (char ch in toAdd)
+        foreach (Rune rune in toAdd.EnumerateRunes ())
         {
-            Key key;
-
-            try
-            {
-                key = ch;
-            }
-            catch (Exception)
-            {
-                throw new ArgumentException (
-                                             $"Cannot insert character '{ch}' because it does not map to a Key"
-                                            );
-            }
-
+            // All rune can be mapped to a Key and no exception will throw here because
+            // EnumerateRunes will replace a surrogate char with the Rune.ReplacementChar
+            Key key = rune.Value;
             InsertText (key, useOldCursorPos);
         }
     }
