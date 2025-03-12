@@ -2183,6 +2183,7 @@ Les Miśerables",
     public void InsertText_Bmp_SurrogatePair_Non_Bmp_Invalid_SurrogatePair ()
     {
         var tf = new TextField ();
+
         //📄 == \ud83d\udcc4 == \U0001F4C4
         // � == Rune.ReplacementChar
         tf.InsertText ("aA,;\ud83d\udcc4\U0001F4C4\udcc4\ud83d");
@@ -2192,7 +2193,7 @@ Les Miśerables",
     [Fact]
     public void PositionCursor_Respect_GetColumns ()
     {
-        var tf = new TextField () { Width = 5 };
+        var tf = new TextField { Width = 5 };
         tf.BeginInit ();
         tf.EndInit ();
 
