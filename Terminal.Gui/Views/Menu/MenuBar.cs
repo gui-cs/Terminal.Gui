@@ -1536,8 +1536,14 @@ public class MenuBar : View, IDesignable
 
                 if (me.View != current)
                 {
+                    View v = current;
                     Application.UngrabMouse ();
-                    View v = me.View;
+
+                    if (((Menu)me.View).Host.SuperView is { } && ((Menu)me.View).Host.SuperView!.InternalSubViews.Contains(me.View))
+                    {
+                        v = me.View;
+                    }
+
                     Application.GrabMouse (v);
                     MouseEventArgs nme;
 
