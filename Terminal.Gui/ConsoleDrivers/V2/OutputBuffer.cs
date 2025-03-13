@@ -164,7 +164,7 @@ public class OutputBuffer : IOutputBuffer
                         if (Contents [Row, Col - 1].CombiningMarks.Count > 0)
                         {
                             // Just add this mark to the list
-                            Contents [Row, Col - 1].CombiningMarks.Add (rune);
+                            Contents [Row, Col - 1].AddCombiningMark (rune);
 
                             // Ignore. Don't move to next column (let the driver figure out what to do).
                         }
@@ -187,7 +187,7 @@ public class OutputBuffer : IOutputBuffer
                             else
                             {
                                 // It didn't normalize. Add it to the Cell to left's CM list
-                                Contents [Row, Col - 1].CombiningMarks.Add (rune);
+                                Contents [Row, Col - 1].AddCombiningMark (rune);
 
                                 // Ignore. Don't move to next column (let the driver figure out what to do).
                             }

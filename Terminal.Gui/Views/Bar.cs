@@ -332,7 +332,7 @@ public class Bar : View, IOrientation, IDesignable
                     {
                         if (subView is not Line)
                         {
-                            subView.Width = Dim.Auto (DimAutoStyle.Auto, minimumContentDim: maxBarItemWidth);
+                            subView.Width = Dim.Auto (DimAutoStyle.Auto, minimumContentDim: maxBarItemWidth, maximumContentDim: maxBarItemWidth);
                         }
                     }
                 }

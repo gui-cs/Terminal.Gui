@@ -1,5 +1,5 @@
 #nullable enable
-using Terminal.Gui.ConsoleDrivers;
+using System.Globalization;
 using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
 
 namespace Terminal.Gui;
@@ -154,13 +154,13 @@ public static class EscSeqUtils
     /// <summary>
     ///     Control sequence for disabling mouse events.
     /// </summary>
-    public static string CSI_DisableMouseEvents { get; set; } =
+    public static readonly string CSI_DisableMouseEvents =
         CSI_DisableAnyEventMouse + CSI_DisableUrxvtExtModeMouse + CSI_DisableSgrExtModeMouse;
 
     /// <summary>
     ///     Control sequence for enabling mouse events.
     /// </summary>
-    public static string CSI_EnableMouseEvents { get; set; } =
+    public static readonly string CSI_EnableMouseEvents =
         CSI_EnableAnyEventMouse + CSI_EnableUrxvtExtModeMouse + CSI_EnableSgrExtModeMouse;
 
     /// <summary>
@@ -1686,6 +1686,32 @@ public static class EscSeqUtils
     {
         // InterpolatedStringHandler is composed in stack, skipping the string allocation.
         builder.Append ($"{CSI}{row};{col}H");
+    }
+
+    /// <summary>
+    ///     ESC [ y ; x H - CUP Cursor Position - Cursor moves to x ; y coordinate within the viewport, where x is the column
+    ///     of the y line
+    /// </summary>
+    /// <param name="writer">TextWriter where to write the cursor position sequence.</param>
+    /// <param name="row">Origin is (1,1).</param>
+    /// <param name="col">Origin is (1,1).</param>
+    public static void CSI_WriteCursorPosition (TextWriter writer, int row, int col)
+    {
+        const int maxInputBufferSize =
+            // CSI (2) + ';' + 'H'
+            4 +
+            // row + col (2x int sign + int max value)
+            2 + 20;
+        Span<char> buffer = stackalloc char[maxInputBufferSize];
+        if (!buffer.TryWrite (CultureInfo.InvariantCulture, $"{CSI}{row};{col}H", out int charsWritten))
+        {
+            string tooLongCursorPositionSequence = $"{CSI}{row};{col}H";
+            throw new InvalidOperationException (
+                $"{nameof(CSI_WriteCursorPosition)} buffer (len: {buffer.Length}) is too short for cursor position sequence '{tooLongCursorPositionSequence}' (len: {tooLongCursorPositionSequence.Length}).");
+        }
+
+        ReadOnlySpan<char> cursorPositionSequence = buffer[..charsWritten];
+        writer.Write (cursorPositionSequence);
     }
 
     //ESC [ <y> ; <x> f - HVP     Horizontal Vertical Position* Cursor moves to<x>; <y> coordinate within the viewport, where <x> is the column of the<y> line

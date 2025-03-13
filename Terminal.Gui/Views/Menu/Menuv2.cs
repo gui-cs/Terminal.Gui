@@ -65,20 +65,6 @@ public class Menuv2 : Bar
 
             menuItem.Accepting += MenuItemtOnAccepting;
 
-            //menuItem.ActivateSubMenu += MenuItemOnActivateSubMenu;
-            //void MenuItemOnActivateSubMenu (object? sender, EventArgs<Menuv2> e)
-            //{
-            //    Logging.Trace ($"MenuItemOnActivateSubMenu: {e}");
-
-            //    if (e.CurrentValue is { })
-            //    {
-            //        SuperView.Add (e.CurrentValue);
-            //        e.CurrentValue.X = Frame.X + Frame.Width;
-            //        e.CurrentValue.Y = Frame.Y + menuItem.Frame.Y;
-            //        e.CurrentValue.Visible = true;
-            //    }
-            //}
-
             void MenuItemtOnAccepting (object? sender, CommandEventArgs e)
             {
                 //Logging.Trace($"MenuItemtOnAccepting: {e.Context}");

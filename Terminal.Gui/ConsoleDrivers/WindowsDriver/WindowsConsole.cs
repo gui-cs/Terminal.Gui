@@ -6,7 +6,7 @@ using Terminal.Gui.ConsoleDrivers;
 
 namespace Terminal.Gui;
 
-internal class WindowsConsole
+internal partial class WindowsConsole
 {
     private CancellationTokenSource? _inputReadyCancellationTokenSource;
     private readonly BlockingCollection<InputRecord> _inputQueue = new (new ConcurrentQueue<InputRecord> ());
@@ -926,10 +926,11 @@ internal class WindowsConsole
         ref SmallRect lpWriteRegion
     );
 
-    [DllImport ("kernel32.dll", EntryPoint = "WriteConsole", SetLastError = true, CharSet = CharSet.Unicode)]
-    private static extern bool WriteConsole (
+    [LibraryImport ("kernel32.dll", EntryPoint = "WriteConsoleW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+    [return: MarshalAs (UnmanagedType.Bool)]
+    private static partial bool WriteConsole (
         nint hConsoleOutput,
-        string lpbufer,
+        ReadOnlySpan<char> lpbufer,
         uint NumberOfCharsToWriten,
         out uint lpNumberOfCharsWritten,
         nint lpReserved

@@ -431,6 +431,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         if (PopoverHost is { Visible: true })
         {
             //PopoverHost.SetNeedsDraw();
+            //PopoverHost.SetNeedsLayout ();
             tops.Insert (0, PopoverHost);
         }
 
