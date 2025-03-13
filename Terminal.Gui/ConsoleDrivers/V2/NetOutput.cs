@@ -34,7 +34,10 @@ public class NetOutput : IConsoleOutput
     }
 
     /// <inheritdoc/>
-    public void Write (string text) { Console.Write (text); }
+    public void Write (ReadOnlySpan<char> text)
+    {
+        Console.Out.Write (text);
+    }
 
     /// <inheritdoc/>
     public void Write (IOutputBuffer buffer)
@@ -56,6 +59,9 @@ public class NetOutput : IConsoleOutput
 
         CursorVisibility? savedVisibility = _cachedCursorVisibility;
         SetCursorVisibility (CursorVisibility.Invisible);
+
+        const int maxCharsPerRune = 2;
+        Span<char> runeBuffer = stackalloc char[maxCharsPerRune];
 
         for (int row = top; row < rows; row++)
         {
@@ -115,26 +121,28 @@ public class NetOutput : IConsoleOutput
                     {
                         redrawAttr = attr;
 
-                        output.Append (
-                                       EscSeqUtils.CSI_SetForegroundColorRGB (
-                                                                              attr.Foreground.R,
-                                                                              attr.Foreground.G,
-                                                                              attr.Foreground.B
-                                                                             )
-                                      );
+                        EscSeqUtils.CSI_AppendForegroundColorRGB (
+                            output,
+                            attr.Foreground.R,
+                            attr.Foreground.G,
+                            attr.Foreground.B
+                        );
 
-                        output.Append (
-                                       EscSeqUtils.CSI_SetBackgroundColorRGB (
-                                                                              attr.Background.R,
-                                                                              attr.Background.G,
-                                                                              attr.Background.B
-                                                                             )
-                                      );
+                        EscSeqUtils.CSI_AppendBackgroundColorRGB (
+                            output,
+                            attr.Background.R,
+                            attr.Background.G,
+                            attr.Background.B
+                        );
                     }
 
                     outputWidth++;
+
+                    // Avoid Rune.ToString() by appending the rune chars.
                     Rune rune = buffer.Contents [row, col].Rune;
-                    output.Append (rune);
+                    int runeCharsWritten = rune.EncodeToUtf16 (runeBuffer);
+                    ReadOnlySpan<char> runeChars = runeBuffer[..runeCharsWritten];
+                    output.Append (runeChars);
 
                     if (buffer.Contents [row, col].CombiningMarks.Count > 0)
                     {
@@ -162,7 +170,7 @@ public class NetOutput : IConsoleOutput
             if (output.Length > 0)
             {
                 SetCursorPositionImpl (lastCol, row);
-                Console.Write (output);
+                Console.Out.Write (output);
             }
         }
 
@@ -171,7 +179,7 @@ public class NetOutput : IConsoleOutput
             if (!string.IsNullOrWhiteSpace (s.SixelData))
             {
                 SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
-                Console.Write (s.SixelData);
+                Console.Out.Write (s.SixelData);
             }
         }
 
@@ -185,7 +193,7 @@ public class NetOutput : IConsoleOutput
     private void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
     {
         SetCursorPositionImpl (lastCol, row);
-        Console.Write (output);
+        Console.Out.Write (output);
         output.Clear ();
         lastCol += outputWidth;
         outputWidth = 0;
@@ -222,7 +230,7 @@ public class NetOutput : IConsoleOutput
 
         // + 1 is needed because non-Windows is based on 1 instead of 0 and
         // Console.CursorTop/CursorLeft isn't reliable.
-        Console.Out.Write (EscSeqUtils.CSI_SetCursorPosition (row + 1, col + 1));
+        EscSeqUtils.CSI_WriteCursorPosition (Console.Out, row + 1, col + 1);
 
         return true;
     }

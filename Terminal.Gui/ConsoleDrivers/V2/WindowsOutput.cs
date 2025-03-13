@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Buffers;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
@@ -6,12 +7,13 @@ using static Terminal.Gui.WindowsConsole;
 
 namespace Terminal.Gui;
 
-internal class WindowsOutput : IConsoleOutput
+internal partial class WindowsOutput : IConsoleOutput
 {
-    [DllImport ("kernel32.dll", EntryPoint = "WriteConsole", SetLastError = true, CharSet = CharSet.Unicode)]
-    private static extern bool WriteConsole (
+    [LibraryImport ("kernel32.dll", EntryPoint = "WriteConsoleW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+    [return: MarshalAs (UnmanagedType.Bool)]
+    private static partial bool WriteConsole (
         nint hConsoleOutput,
-        string lpbufer,
+        ReadOnlySpan<char> lpbufer,
         uint numberOfCharsToWriten,
         out uint lpNumberOfCharsWritten,
         nint lpReserved
@@ -84,7 +86,7 @@ internal class WindowsOutput : IConsoleOutput
         }
     }
 
-    public void Write (string str)
+    public void Write (ReadOnlySpan<char> str)
     {
         if (!WriteConsole (_screenBuffer, str, (uint)str.Length, out uint _, nint.Zero))
         {
@@ -183,7 +185,6 @@ internal class WindowsOutput : IConsoleOutput
 
     public bool WriteToConsole (Size size, ExtendedCharInfo [] charInfoBuffer, Coord bufferSize, SmallRect window, bool force16Colors)
     {
-        var stringBuilder = new StringBuilder ();
 
         //Debug.WriteLine ("WriteToConsole");
 
@@ -213,10 +214,10 @@ internal class WindowsOutput : IConsoleOutput
         }
         else
         {
-            stringBuilder.Clear ();
+            StringBuilder stringBuilder = new();
 
             stringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
-            stringBuilder.Append (EscSeqUtils.CSI_SetCursorPosition (0, 0));
+            EscSeqUtils.CSI_AppendCursorPosition (stringBuilder, 0, 0);
 
             Attribute? prev = null;
 
@@ -227,8 +228,8 @@ internal class WindowsOutput : IConsoleOutput
                 if (attr != prev)
                 {
                     prev = attr;
-                    stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.Foreground.R, attr.Foreground.G, attr.Foreground.B));
-                    stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.Background.R, attr.Background.G, attr.Background.B));
+                    EscSeqUtils.CSI_AppendForegroundColorRGB (stringBuilder, attr.Foreground.R, attr.Foreground.G, attr.Foreground.B);
+                    EscSeqUtils.CSI_AppendBackgroundColorRGB (stringBuilder, attr.Background.R, attr.Background.G, attr.Background.B);
                 }
 
                 if (info.Char != '\x1b')
@@ -247,14 +248,20 @@ internal class WindowsOutput : IConsoleOutput
             stringBuilder.Append (EscSeqUtils.CSI_RestoreCursorPosition);
             stringBuilder.Append (EscSeqUtils.CSI_HideCursor);
 
-            var s = stringBuilder.ToString ();
+            // TODO: Potentially could stackalloc whenever reasonably small (<= 8 kB?) write buffer is needed.
+            char [] rentedWriteArray = ArrayPool<char>.Shared.Rent (minimumLength: stringBuilder.Length);
+            try
+            {
+                Span<char> writeBuffer = rentedWriteArray.AsSpan(0, stringBuilder.Length);
+                stringBuilder.CopyTo (0, writeBuffer, stringBuilder.Length);
 
-            // TODO: requires extensive testing if we go down this route
-            // If console output has changed
-            //if (s != _lastWrite)
-            //{
-            // supply console with the new content
-            result = WriteConsole (_screenBuffer, s, (uint)s.Length, out uint _, nint.Zero);
+                // Supply console with the new content.
+                result = WriteConsole (_screenBuffer, writeBuffer, (uint)writeBuffer.Length, out uint _, nint.Zero);
+            }
+            finally
+            {
+                ArrayPool<char>.Shared.Return (rentedWriteArray);
+            }
 
             foreach (SixelToRender sixel in Application.Sixel)
             {
@@ -297,9 +304,10 @@ internal class WindowsOutput : IConsoleOutput
     /// <inheritdoc/>
     public void SetCursorVisibility (CursorVisibility visibility)
     {
-        var sb = new StringBuilder ();
-        sb.Append (visibility != CursorVisibility.Invisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
-        Write (sb.ToString ());
+        string cursorVisibilitySequence = visibility != CursorVisibility.Invisible
+            ? EscSeqUtils.CSI_ShowCursor
+            : EscSeqUtils.CSI_HideCursor;
+        Write (cursorVisibilitySequence);
     }
 
     private Point _lastCursorPosition;
