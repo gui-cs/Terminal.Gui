@@ -52,7 +52,7 @@ public class AnsiMouseParser
                 Flags = GetFlags (buttonCode, terminator)
             };
 
-            Logging.Trace ($"{nameof (AnsiMouseParser)} handled as {input} mouse {m.Flags} at {m.Position}");
+            //Logging.Trace ($"{nameof (AnsiMouseParser)} handled as {input} mouse {m.Flags} at {m.Position}");
 
             return m;
         }

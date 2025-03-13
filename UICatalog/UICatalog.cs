@@ -74,7 +74,7 @@ public class UICatalogApp
     private static Options _options;
     private static ObservableCollection<Scenario>? _scenarios;
 
-    private const string LOGFILE_LOCATION = "./logs";
+    private const string LOGFILE_LOCATION = "logs";
     private static string _logFilePath = string.Empty;
     private static readonly LoggingLevelSwitch _logLevelSwitch = new ();
 
@@ -171,7 +171,7 @@ public class UICatalogApp
         resultsFile.AddAlias ("--f");
 
         // what's the app name?
-        _logFilePath = $"{LOGFILE_LOCATION}/{Assembly.GetExecutingAssembly ().GetName ().Name}.log";
+        _logFilePath = $"{LOGFILE_LOCATION}/{Assembly.GetExecutingAssembly ().GetName ().Name}";
         Option<string> debugLogLevel = new Option<string> ("--debug-log-level", $"The level to use for logging (debug console and {_logFilePath})").FromAmong (
              Enum.GetNames<LogLevel> ()
             );
@@ -1354,11 +1354,14 @@ public class UICatalogApp
             menuItems.Add (null!);
 
             menuItems.Add (
-                           new ()
-                           {
-                               Title = $"Log file: {_logFilePath}"
-                               //CanExecute = () => false
-                           });
+                           new (
+                                $"_Open Log Folder",
+                                "",
+                                () => OpenUrl (LOGFILE_LOCATION),
+                                null,
+                                null,
+                                null
+                               ));
 
             return menuItems.ToArray ()!;
         }
