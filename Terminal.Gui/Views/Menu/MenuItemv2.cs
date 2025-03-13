@@ -37,43 +37,114 @@ public class MenuItemv2 : Shortcut
     /// </param>
     /// <param name="commandText">The text to display for the command.</param>
     /// <param name="helpText">The help text to display.</param>
-    public MenuItemv2 (View targetView, Command command, string commandText, string? helpText = null)
+    /// <param name="subMenu"></param>
+    public MenuItemv2 (View targetView, Command command, string commandText, string? helpText = null, Menuv2? subMenu = null)
         : base (
                 targetView?.HotKeyBindings.GetFirstFromCommands (command)!,
                 commandText,
                 null,
                 helpText)
     {
-        _targetView = targetView;
+        TargetView = targetView;
         Command = command;
 
-        if (Command == Command.Context)
+        if (subMenu is { })
         {
+            // TODO: This is a temporary hack - add a flag or something instead
             KeyView.Text = $"{Glyphs.RightArrow}";
         }
-    }
 
-    private readonly View? _targetView; // If set, _command will be invoked
+        SubMenu = subMenu;
+    }
 
     /// <summary>
     ///     Gets the target <see cref="View"/> that the <see cref="Command"/> will be invoked on.
     /// </summary>
-    public View? TargetView => _targetView;
+    public View? TargetView { get; set; }
 
     /// <summary>
     ///     Gets the <see cref="Command"/> that will be invoked on <see cref="TargetView"/> when the Shortcut is activated.
     /// </summary>
-    public Command Command { get; }
+    public Command Command { get; set; }
 
     internal override bool? DispatchCommand (ICommandContext? commandContext)
     {
         bool? ret = base.DispatchCommand (commandContext);
 
-        if (_targetView is { })
+        if (TargetView is { })
         {
-            _targetView.InvokeCommand (Command, commandContext);
+            ret = TargetView.InvokeCommand (Command, commandContext);
+        }
+
+        if (SubMenu is { })
+        {
+            RaiseActivateSubMenu ();
         }
 
         return ret;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public Menuv2? SubMenu { get; set; }
+
+    /// <inheritdoc />
+    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view)
+    {
+        base.OnHasFocusChanged(newHasFocus, previousFocusedView, view);
+        if (SubMenu is null || view == SubMenu)
+        {
+            return;
+        }
+
+        if (newHasFocus)
+        {
+            if (!SubMenu.Visible)
+            {
+                RaiseActivateSubMenu ();
+            }
+        }
+        else
+        {
+            SubMenu.Visible = false;
+        }
+    }
+
+    /// <summary>
+    /// </summary>
+    /// <remarks>
+    /// </remarks>
+    protected void RaiseActivateSubMenu ()
+    {
+        if (SubMenu is null)
+        {
+            return;
+        }
+
+        OnActivateSubMenu ();
+
+        // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
+        var args = new EventArgs<Menuv2> (SubMenu);
+        ActivateSubMenu?.Invoke (this, args);
+    }
+
+    /// <summary>
+    /// </summary>
+    protected virtual void OnActivateSubMenu () { }
+
+    /// <summary>
+    /// </summary>
+    public event EventHandler<EventArgs<Menuv2>>? ActivateSubMenu;
+
+    /// <inheritdoc />
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            SubMenu?.Dispose ();
+            SubMenu = null;
+        }
+        base.Dispose (disposing);
     }
 }

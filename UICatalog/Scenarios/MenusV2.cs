@@ -1,7 +1,12 @@
 #nullable enable
 
 using System.Collections.ObjectModel;
+using Microsoft.Extensions.Logging;
 using Terminal.Gui;
+using Serilog;
+using Serilog.Core;
+using Serilog.Events;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace UICatalog.Scenarios;
 
@@ -12,6 +17,8 @@ public class MenusV2 : Scenario
 {
     public override void Main ()
     {
+        Logging.Logger = CreateLogger ();
+
         Application.Init ();
         Toplevel app = new ();
         app.Title = GetQuitKeyAndName ();
@@ -31,153 +38,189 @@ public class MenusV2 : Scenario
 
         FrameView frame = new ()
         {
+            Id = "frame",
             Title = "Cascading Menu...",
-            X = 0,
-            Y = 0,
             Width = Dim.Fill ()! - Dim.Width (eventLog),
             Height = Dim.Fill ()
         };
         app.Add (frame);
 
-        var menu = new Menuv2
+        var rootMenu = new Menuv2 ()
         {
-            Id = "menu",
-            X = 10,
-            Y = 5
+            Id = "rootMenu",
         };
-
-        menu.MenuItemCommandInvoked += (o, args) =>
-                                       {
-                                           if (args.Context is CommandContext<KeyBinding> { Binding.Data: MenuItemv2 { } sc })
-                                           {
-                                               eventSource.Add ($"Invoked: {sc.Id} {args.Context.Command}");
-                                           }
-
-                                           eventLog.MoveDown ();
-                                       };
-
-        frame.Add (menu);
-        ConfigureMenu (menu);
+        ConfigureRootMenu (frame, rootMenu);
 
         var subMenu = new Menuv2
         {
-            Id = "menu",
-            X = 0,
-            Y = 0,
+            Id = "subMenu",
             Visible = false
         };
-        ConfigureMenu (subMenu);
-        frame.Add (subMenu);
+        ConfigureSubMenu1 (frame, subMenu);
 
-        var cascadeShortcut = new MenuItemv2 (frame, Command.Context, "_Cascade", "Sub menu...");
+        var cascadeShortcut = new MenuItemv2 (frame, Command.Accept, "_Options", "File options", subMenu);
+        rootMenu.Add (cascadeShortcut);
 
-        //cascadeShortcut.Accepting += (o, args) =>
-        //                             {
-        //                                 Point loc = cascadeShortcut.Frame.Location;
-        //                                 subMenu.X = loc.X + menu.Frame.Width - 1;
-        //                                 subMenu.Y = loc.Y;
-        //                                 subMenu.Visible = !subMenu.Visible;
-        //                             };
+        var popoverMenu = new PopoverMenu (rootMenu)
+        {
+            Id = "popOverMenu",
+            Visible = true,
+            X =1, Y = 1
+        };
 
-        //cascadeShortcut.Highlight += (o, args) =>
-        //                                   {
+        //Application.PopoverHost.Add (popoverMenu);
+        //Application.PopoverHost.Visible = true;
 
-        //                                       {
-        //                                           Point loc = cascadeShortcut.Frame.Location;
-        //                                           subMenu.X = loc.X + menu.Frame.Width - 1;
-        //                                           subMenu.Y = loc.Y;
-        //                                           subMenu.Visible = args.NewValue.HasFlag(HighlightStyle.Hover);
-        //                                       }
-        //                                   };
-
-        //subMenu.HasFocusChanged += (o, args) =>
-        //                           {
-        //                               if (!args.NewValue)
-        //                               {
-        //                                   subMenu.Visible = false;
-        //                               }
-        //                           };
-
-        menu.Add (cascadeShortcut);
-
-        menu.SubViews.ElementAt (0).SetFocus ();
+        rootMenu.SubViews.ElementAt (0).SetFocus ();
 
         FrameView frameView = frame;
+        frameView.Add (popoverMenu);
 
-        frameView.Accepting += (o, args) =>
+        frameView.UnboundCommand += (o, args) =>
                                {
-                                   eventSource.Add ($"Accepting: {frameView?.Id}");
+                                   eventSource.Add ($"{args.Context!.Command}: {frameView?.Id}");
                                    eventLog.MoveDown ();
                                    args.Cancel = true;
                                };
 
-        foreach (View view1 in frameView.SubViews.Where (b => b is Bar || b is MenuBarv2 || b is Menuv2)!)
+        frameView.Accepting += (o, args) =>
+                               {
+                                   eventSource.Add ($"{args.Context!.Command}: {frameView?.Id}");
+                                   eventLog.MoveDown ();
+                                  // args.Cancel = true;
+                               };
+
+        var menu = popoverMenu;
+
+        menu.Accepting += (o, args) =>
+                             {
+                                 //Logging.Trace($"Accepting: {menu!.Id} {args.Context.Command}");
+                                 //eventSource.Add ($"Accepting: {menu!.Id} {args.Context.Command}");
+                                 //eventLog.MoveDown ();
+                                 //args.Cancel = true;
+                             };
+
+        menu.Selecting += (o, args) =>
+                             {
+                                 //Logging.Trace ($"Selecting: {menu!.Id} {args.Context.Command}");
+                                 //eventSource.Add ($"Selecting: {menu!.Id} {args.Context.Command}");
+                                 //eventLog.MoveDown ();
+                                 //args.Cancel = false;
+                             };
+
+        popoverMenu.Root.MenuItemCommandInvoked += (o, args) =>
+                                              {
+                                                  if (args.Context is CommandContext<KeyBinding> { Binding.Data: MenuItemv2 { } sc })
+                                                  {
+                                                      Logging.Trace($"Invoked: {sc.Title} {args.Context.Command}");
+                                                      eventSource.Add ($"Invoked: {sc.Title} {args.Context.Command}");
+                                                      //args.Cancel = true;
+                                                  }
+
+                                                  eventLog.MoveDown ();
+                                              };
+
+
+        foreach (View view2 in popoverMenu.Root.SubViews.Where (s => s is MenuItemv2)!)
         {
-            var barView = (Bar)view1;
+            var sh = (MenuItemv2)view2;
 
-            barView.Accepting += (o, args) =>
-                                 {
-                                     eventSource.Add ($"Accepting: {barView!.Id} {args.Context.Command}");
-                                     eventLog.MoveDown ();
-                                     args.Cancel = true;
-                                 };
+            sh.Accepting += (o, args) =>
+                            {
+                                //Logging.Trace($"Accepting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
+                                //eventSource.Add ($"Accepting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
+                                //eventLog.MoveDown ();
+                                //args.Cancel = true;
+                            };
 
-            barView.Selecting += (o, args) =>
-                                 {
-                                     eventSource.Add ($"Selecting: {barView!.Id} {args.Context.Command}");
-                                     eventLog.MoveDown ();
-                                     args.Cancel = false;
-                                 };
-
-            if (barView is Menuv2 menuv2)
-            {
-                menuv2.MenuItemCommandInvoked += (o, args) =>
-                                                 {
-                                                     if (args.Context is CommandContext<KeyBinding> { Binding.Data: MenuItemv2 { } sc })
-                                                     {
-                                                         eventSource.Add ($"Invoked: {sc.Id} {args.Context.Command}");
-                                                     }
-
-                                                     eventLog.MoveDown ();
-                                                 };
-            }
-
-            foreach (View view2 in barView.SubViews.Where (s => s is Shortcut)!)
-            {
-                var sh = (Shortcut)view2;
-
-                sh.Accepting += (o, args) =>
-                                {
-                                    eventSource.Add ($"Accepting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
-                                    eventLog.MoveDown ();
-                                    args.Cancel = true;
-                                };
-
-                sh.Selecting += (o, args) =>
-                                {
-                                    eventSource.Add ($"Selecting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
-                                    eventLog.MoveDown ();
-                                    args.Cancel = false;
-                                };
-            }
+            sh.Selecting += (o, args) =>
+                            {
+                                //Logging.Trace ($"Selecting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
+                                //eventSource.Add ($"Selecting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
+                                //eventLog.MoveDown ();
+                                //args.Cancel = false;
+                            };
         }
 
         app.Add (eventLog);
 
         Application.Run (app);
         app.Dispose ();
+        popoverMenu.Dispose ();
         Application.Shutdown ();
     }
 
-    private void ConfigureMenu (Menuv2 menu)
+    private void ConfigureRootMenu (View targetView, Menuv2 menu)
     {
         var shortcut1 = new MenuItemv2
         {
-            Title = "Z_igzag",
-            Key = Key.I.WithCtrl,
-            Text = "Gonna zig zag"
+            Title = "_New",
+            Key = Key.N.WithCtrl,
+            Text = "New File",
+            Command = Command.New,
+            TargetView = targetView
         };
 
+        var shortcut2 = new MenuItemv2
+        {
+            Title = "_Open...",
+            Text = "Open File",
+            Key = Key.O.WithCtrl,
+            Command = Command.Open,
+            TargetView = targetView
+        };
+
+        var shortcut3 = new MenuItemv2
+        {
+            Title = "_Save",
+            Text = "Save file",
+            Key = Key.S.WithCtrl,
+            Command = Command.Save,
+            TargetView = targetView
+        };
+
+        var shortcut4 = new MenuItemv2
+        {
+            Title = "Sa_ve As...",
+            Text = "Save file as",
+            Key = Key.V.WithCtrl,
+            Command = Command.SaveAs,
+            TargetView = targetView
+
+        };
+
+
+        var shortcut5 = new MenuItemv2
+        {
+            Title = "_Auto Save",
+            Text = "Automatically save",
+            Key = Key.A.WithCtrl,
+            TargetView = targetView
+        };
+
+        shortcut5.CommandView = new CheckBox
+        {
+            Title = shortcut5.Title,
+            HighlightStyle = HighlightStyle.None,
+            CanFocus = false
+        };
+
+        var line = new Line
+        {
+            X = -1,
+            Width = Dim.Fill ()! + 1
+        };
+
+
+        // This ensures the checkbox state toggles when the hotkey of Title is pressed.
+        //shortcut4.Accepting += (sender, args) => args.Cancel = true;
+
+        menu.Add (shortcut1, shortcut2, shortcut3, shortcut4, line, shortcut5);
+    }
+
+
+    private void ConfigureSubMenu1 (View targetView, Menuv2 menu)
+    {
         var shortcut2 = new MenuItemv2
         {
             Title = "Za_G",
@@ -213,8 +256,38 @@ public class MenusV2 : Scenario
         };
 
         // This ensures the checkbox state toggles when the hotkey of Title is pressed.
-        shortcut4.Accepting += (sender, args) => args.Cancel = true;
+        //shortcut4.Accepting += (sender, args) => args.Cancel = true;
 
-        menu.Add (shortcut1, shortcut2, shortcut3, line, shortcut4);
+        menu.Add (shortcut2, shortcut3, line, shortcut4);
+    }
+    private const string LOGFILE_LOCATION = "./logs";
+    private static string _logFilePath = string.Empty;
+    private static readonly LoggingLevelSwitch _logLevelSwitch = new ();
+
+    private static ILogger CreateLogger ()
+    {
+        // Configure Serilog to write logs to a file
+        _logLevelSwitch.MinimumLevel = LogEventLevel.Verbose;
+        Log.Logger = new LoggerConfiguration ()
+                     .MinimumLevel.ControlledBy (_logLevelSwitch)
+                     .Enrich.FromLogContext () // Enables dynamic enrichment
+                     .WriteTo.Debug ()
+                     .WriteTo.File (
+                                    _logFilePath,
+                                    rollingInterval: RollingInterval.Day,
+                                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+                     .CreateLogger ();
+
+        // Create a logger factory compatible with Microsoft.Extensions.Logging
+        using ILoggerFactory loggerFactory = LoggerFactory.Create (
+                                                                   builder =>
+                                                                   {
+                                                                       builder
+                                                                           .AddSerilog (dispose: true) // Integrate Serilog with ILogger
+                                                                           .SetMinimumLevel (LogLevel.Trace); // Set minimum log level
+                                                                   });
+
+        // Get an ILogger instance
+        return loggerFactory.CreateLogger ("Global Logger");
     }
 }

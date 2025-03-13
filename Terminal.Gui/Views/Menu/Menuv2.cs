@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System;
 using System.ComponentModel;
+using System.Net.Http.Headers;
 using System.Reflection;
 
 namespace Terminal.Gui;
@@ -59,23 +60,27 @@ public class Menuv2 : Bar
             menuItem.Orientation = Orientation.Vertical;
             menuItem.HighlightStyle |= HighlightStyle.Hover;
 
+            AddCommand (menuItem.Command, RaiseMenuItemCommandInvoked);
+
             menuItem.Accepting += MenuItemtOnAccepting;
 
-            AddCommand (menuItem.Command, (ctx) =>
+            menuItem.ActivateSubMenu += MenuItemOnActivateSubMenu;
+            void MenuItemOnActivateSubMenu (object? sender, EventArgs<Menuv2> e)
             {
-                return RaiseMenuItemCommandInvoked (ctx);
-            });
+                Logging.Trace ($"MenuItemOnActivateSubMenu: {e}");
 
+                if (e.CurrentValue is { })
+                {
+                    SuperView.Add (e.CurrentValue);
+                    e.CurrentValue.X = Frame.X + Frame.Width;
+                    e.CurrentValue.Y = Frame.Y + menuItem.Frame.Y;
+                    e.CurrentValue.Visible = true;
+                }
+            }
 
             void MenuItemtOnAccepting (object? sender, CommandEventArgs e)
             {
-                if (Arrangement.HasFlag (ViewArrangement.Overlapped) && Visible)
-                {
-                    Visible = false;
-                    //                    e.Cancel = true;
-
-                    return;
-                }
+                //Logging.Trace($"MenuItemtOnAccepting: {e.Context}");
             }
         }
 
@@ -90,11 +95,12 @@ public class Menuv2 : Bar
     /// <returns></returns>
     protected bool? RaiseMenuItemCommandInvoked (ICommandContext? ctx)
     {
+        Logging.Trace($"RaiseMenuItemCommandInvoked: {ctx}");
         CommandEventArgs args = new () { Context = ctx };
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
-        args.Cancel = OnShortcutCommandInvoked (args) || args.Cancel;
+        args.Cancel = OnMenuItemCommandInvoked (args) || args.Cancel;
 
         if (!args.Cancel)
         {
@@ -116,7 +122,7 @@ public class Menuv2 : Bar
     /// </remarks>
     /// <param name="args"></param>
     /// <returns><see langword="true"/> to stop processing.</returns>
-    protected virtual bool OnShortcutCommandInvoked (CommandEventArgs args) { return false; }
+    protected virtual bool OnMenuItemCommandInvoked (CommandEventArgs args) { return false; }
 
     /// <summary>
     ///     Cancelable event raised when the user is accepting the state of the View and the <see cref="Command.Accept"/> has been invoked. Set
