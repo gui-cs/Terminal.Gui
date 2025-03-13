@@ -173,7 +173,7 @@ public class TileView : View
 
     /// <summary>Overridden so no Frames get drawn</summary>
     /// <returns></returns>
-    protected override bool OnDrawingBorderAndPadding () { return true; }
+    protected override bool OnDrawingAdornments () { return true; }
 
     /// <inheritdoc/>
     protected override bool OnRenderingLineCanvas () { return false; }

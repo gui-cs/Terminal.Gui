@@ -22,7 +22,7 @@ public class PopoverMenu : View
         CanFocus = true;
         Width = Dim.Fill ();
         Height = Dim.Fill ();
-        //ViewportSettings = ViewportSettings.Transparent | ViewportSettings.TransparentMouse;
+        ViewportSettings = ViewportSettings.Transparent | ViewportSettings.TransparentMouse;
         //base.Visible = false;
         base.ColorScheme = Colors.ColorSchemes ["Menu"];
 
