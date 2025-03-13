@@ -27,6 +27,7 @@ public partial class View // Drawing APIs
             view.Draw (context);
         }
 
+        // Draw the margins (those whith Shadows) last to ensure they are drawn on top of the content.
         Margin.DrawMargins (viewsArray);
     }
 
@@ -57,9 +58,9 @@ public partial class View // Drawing APIs
         {
             // ------------------------------------
             // Draw the Border and Padding.
-            // Note Margin is special-cased and drawn in a separate pass to support
+            // Note Margin with a Shadow is special-cased and drawn in a separate pass to support
             // transparent shadows.
-            DoDrawBorderAndPadding (originalClip);
+            DoDrawAdornments (originalClip);
             SetClip (originalClip);
 
             // ------------------------------------
@@ -106,7 +107,7 @@ public partial class View // Drawing APIs
             // ------------------------------------
             // Re-draw the border and padding subviews
             // HACK: This is a hack to ensure that the border and padding subviews are drawn after the line canvas.
-            DoDrawBorderAndPaddingSubViews ();
+            DoDrawAdornmentsSubViews ();
 
             // ------------------------------------
             // Advance the diagnostics draw indicator
@@ -116,8 +117,8 @@ public partial class View // Drawing APIs
         }
 
         // ------------------------------------
-        // This causes the Margin to be drawn in a second pass
-        // PERFORMANCE: If there is a Margin, it will be redrawn each iteration of the main loop.
+        // This causes the Margin to be drawn in a second pass if it has a ShadowStyle
+        // PERFORMANCE: If there is a Margin w/ Shadow, it will be redrawn each iteration of the main loop.
         Margin?.CacheClip ();
 
         // ------------------------------------
@@ -131,8 +132,11 @@ public partial class View // Drawing APIs
 
     #region DrawAdornments
 
-    private void DoDrawBorderAndPaddingSubViews ()
+    private void DoDrawAdornmentsSubViews ()
     {
+
+        // NOTE: We do not support subviews of Margin?
+
         if (Border?.SubViews is { } && Border.Thickness != Thickness.Empty)
         {
             // PERFORMANCE: Get the check for DrawIndicator out of this somehow.
@@ -164,7 +168,7 @@ public partial class View // Drawing APIs
         }
     }
 
-    private void DoDrawBorderAndPadding (Region? originalClip)
+    private void DoDrawAdornments (Region? originalClip)
     {
         if (this is Adornment)
         {
@@ -194,27 +198,28 @@ public partial class View // Drawing APIs
             // A SubView may add to the LineCanvas. This ensures any Adornment LineCanvas updates happen.
             Border?.SetNeedsDraw ();
             Padding?.SetNeedsDraw ();
+            Margin?.SetNeedsDraw ();
         }
 
-        if (OnDrawingBorderAndPadding ())
+        if (OnDrawingAdornments ())
         {
             return;
         }
 
         // TODO: add event.
 
-        DrawBorderAndPadding ();
+        DrawAdornments ();
     }
 
     /// <summary>
-    ///     Causes <see cref="Border"/> and <see cref="Padding"/> to be drawn.
+    ///     Causes <see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/> to be drawn.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         <see cref="Margin"/> is drawn in a separate pass.
+    ///         <see cref="Margin"/> is drawn in a separate pass if <see cref="ShadowStyle"/> is set.
     ///     </para>
     /// </remarks>
-    public void DrawBorderAndPadding ()
+    public void DrawAdornments ()
     {
         // We do not attempt to draw Margin. It is drawn in a separate pass.
 
@@ -230,6 +235,11 @@ public partial class View // Drawing APIs
             Padding?.Draw ();
         }
 
+
+        if (Margin is { } && Margin.Thickness != Thickness.Empty && Margin.ShadowStyle == ShadowStyle.None)
+        {
+            Margin?.Draw ();
+        }
     }
 
     private void ClearFrame ()
@@ -255,7 +265,7 @@ public partial class View // Drawing APIs
     ///     false (the default), this method will cause the <see cref="LineCanvas"/> be prepared to be rendered.
     /// </summary>
     /// <returns><see langword="true"/> to stop further drawing of the Adornments.</returns>
-    protected virtual bool OnDrawingBorderAndPadding () { return false; }
+    protected virtual bool OnDrawingAdornments () { return false; }
 
     #endregion DrawAdornments
 
@@ -635,7 +645,7 @@ public partial class View // Drawing APIs
     /// <summary>
     ///     Gets or sets whether this View will use it's SuperView's <see cref="LineCanvas"/> for rendering any
     ///     lines. If <see langword="true"/> the rendering of any borders drawn by this Frame will be done by its parent's
-    ///     SuperView. If <see langword="false"/> (the default) this View's <see cref="OnDrawingBorderAndPadding"/> method will
+    ///     SuperView. If <see langword="false"/> (the default) this View's <see cref="OnDrawingAdornments"/> method will
     ///     be
     ///     called to render the borders.
     /// </summary>

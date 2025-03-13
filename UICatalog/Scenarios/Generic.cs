@@ -18,7 +18,21 @@ public sealed class Generic : Scenario
             Title = GetQuitKeyAndName (),
         };
 
-        var button = new Button { Id = "button", X = Pos.Center (), Y = 1, Text = "_Press me!" };
+        FrameView frame = new ()
+        {
+            Height = Dim.Fill (),
+            Width = Dim.Fill (),
+            Title = "Frame"
+        };
+        appWindow.Add (frame);
+
+        var button = new Shortcut ()
+        {
+            Id = "button", 
+            X = Pos.Center (), 
+            Y = 1, 
+            Text = "_Press me!"
+        };
 
         button.Accepting += (s, e) =>
                             {
@@ -27,7 +41,7 @@ public sealed class Generic : Scenario
                                 MessageBox.ErrorQuery ("Error", "You pressed the button!", "_Ok");
                             };
 
-        appWindow.Add (button);
+        frame.Add (button);
 
         // Run - Start the application.
         Application.Run (appWindow);

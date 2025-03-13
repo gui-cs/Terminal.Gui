@@ -831,7 +831,7 @@ internal sealed class Menu : View
             return;
         }
 
-        DrawBorderAndPadding ();
+        DrawAdornments ();
         RenderLineCanvas ();
 
         // BUGBUG: Views should not change the clip. Doing so is an indcation of poor design or a bug in the framework.
