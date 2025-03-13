@@ -315,6 +315,22 @@ public partial class View // Focus and cross-view navigation management (TabStop
         }
     }
 
+    internal void RaiseFocusedChanged (View? previousFocused, View? focused)
+    {
+        //Logging.Trace($"RaiseFocusedChanged: {focused.Title}");
+        OnFocusedChanged (previousFocused, focused);
+        FocusedChanged?.Invoke (this, new HasFocusEventArgs (true, true, previousFocused, focused));
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="previousFocused"></param>
+    /// <param name="focused"></param>
+    protected virtual void OnFocusedChanged (View? previousFocused, View? focused) { }
+
+    public event EventHandler<HasFocusEventArgs>? FocusedChanged;
+
     /// <summary>Returns a value indicating if this View is currently on Top (Active)</summary>
     public bool IsCurrentTop => Application.Top == this;
 
@@ -853,6 +869,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
     private void RaiseFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
     {
+        // If we are the most focused view, we need to set the focused view in Application.Navigation
         if (newHasFocus && focusedView?.Focused is null)
         {
             Application.Navigation?.SetFocused (focusedView);
@@ -864,6 +881,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
         // Raise the event
         var args = new HasFocusEventArgs (newHasFocus, newHasFocus, previousFocusedView, focusedView);
         HasFocusChanged?.Invoke (this, args);
+
+        if (newHasFocus)
+        {
+            SuperView?.RaiseFocusedChanged (previousFocusedView, focusedView);
+        }
     }
 
     /// <summary>

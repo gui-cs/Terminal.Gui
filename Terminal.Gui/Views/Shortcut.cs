@@ -694,12 +694,25 @@ public class Shortcut : View, IOrientation, IDesignable
         }
     }
 
+    private bool _forceFocusColors;
+
+    public bool ForceFocusColors
+    {
+        get => _forceFocusColors;
+        set
+        {
+            _forceFocusColors = value;
+            SetColors (value);
+            //SetNeedsDraw();
+        }
+    }
+
     private ColorScheme? _nonFocusColorScheme;
     /// <summary>
     /// </summary>
     internal void SetColors (bool highlight = false)
     {
-        if (HasFocus || highlight)
+        if (HasFocus || highlight || ForceFocusColors)
         {
             if (_nonFocusColorScheme is null)
             {
@@ -711,10 +724,10 @@ public class Shortcut : View, IOrientation, IDesignable
             // When we have focus, we invert the colors
             base.ColorScheme = new (base.ColorScheme)
             {
-                Normal = base.ColorScheme.Focus,
-                HotNormal = base.ColorScheme.HotFocus,
-                HotFocus = base.ColorScheme.HotNormal,
-                Focus = base.ColorScheme.Normal
+                Normal = GetFocusColor(),
+                HotNormal = GetHotFocusColor(),
+                HotFocus = GetHotNormalColor(),
+                Focus = GetNormalColor(),
             };
         }
         else
@@ -735,8 +748,8 @@ public class Shortcut : View, IOrientation, IDesignable
         {
             var cs = new ColorScheme (base.ColorScheme)
             {
-                Normal = base.ColorScheme.HotNormal,
-                HotNormal = base.ColorScheme.Normal
+                Normal = GetHotNormalColor(),
+                HotNormal = GetNormalColor()
             };
             KeyView.ColorScheme = cs;
         }

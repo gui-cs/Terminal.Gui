@@ -1,5 +1,7 @@
 #nullable enable
 
+using System.ComponentModel;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -13,7 +15,6 @@ public class MenuItemv2 : Shortcut
     /// </summary>
     public MenuItemv2 () : base (Key.Empty, null, null, null)
     {
-        //HighlightStyle = HighlightStyle.Hover;
     }
 
     /// <summary>
@@ -78,7 +79,7 @@ public class MenuItemv2 : Shortcut
 
         if (SubMenu is { })
         {
-            RaiseActivateSubMenu ();
+            // RaiseActivateSubMenu ();
         }
 
         return ret;
@@ -90,25 +91,34 @@ public class MenuItemv2 : Shortcut
     public Menuv2? SubMenu { get; set; }
 
     /// <inheritdoc />
+    protected override bool OnMouseEnter (CancelEventArgs eventArgs)
+    {
+        // Logging.Trace($"OnEnter {Title}");
+        SetFocus ();
+        return base.OnMouseEnter (eventArgs);
+    }
+
+    /// <inheritdoc />
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view)
     {
-        base.OnHasFocusChanged(newHasFocus, previousFocusedView, view);
-        if (SubMenu is null || view == SubMenu)
-        {
-            return;
-        }
+        //SetNeedsDraw();
+        base.OnHasFocusChanged (newHasFocus, previousFocusedView, view);
+        //if (SubMenu is null || view == SubMenu)
+        //{
+        //    return;
+        //}
 
-        if (newHasFocus)
-        {
-            if (!SubMenu.Visible)
-            {
-                RaiseActivateSubMenu ();
-            }
-        }
-        else
-        {
-            SubMenu.Visible = false;
-        }
+        //if (newHasFocus)
+        //{
+        //    if (!SubMenu.Visible)
+        //    {
+        //        RaiseActivateSubMenu ();
+        //    }
+        //}
+        //else
+        //{
+        //    SubMenu.Visible = false;
+        //}
     }
 
     /// <summary>
@@ -136,6 +146,30 @@ public class MenuItemv2 : Shortcut
     /// <summary>
     /// </summary>
     public event EventHandler<EventArgs<Menuv2>>? ActivateSubMenu;
+    
+    ///// <inheritdoc />
+    //public override Attribute GetNormalColor ()
+    //{
+    //    if (HasFocus || SubMenu is { Visible: true })
+    //    {
+    //        return base.GetFocusColor ();
+    //    }
+
+    //    return base.GetNormalColor ();
+
+    //}
+
+    ///// <inheritdoc />
+    //public override Attribute GetHotNormalColor ()
+    //{
+    //    if (HasFocus || SubMenu is { Visible: true })
+    //    {
+    //        return base.GetHotFocusColor ();
+    //    }
+
+    //    return base.GetHotNormalColor ();
+
+    //}
 
     /// <inheritdoc />
     protected override void Dispose (bool disposing)

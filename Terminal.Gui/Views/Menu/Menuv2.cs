@@ -27,6 +27,8 @@ public class Menuv2 : Bar
     {
         if (Visible)
         {
+            SelectedMenuItem = SubViews.Where (mi => mi is MenuItemv2).ElementAtOrDefault (0) as MenuItemv2;
+
             //Application.GrabMouse(this);
         }
         else
@@ -49,42 +51,39 @@ public class Menuv2 : Bar
         ColorScheme = Colors.ColorSchemes ["Menu"];
     }
 
-    /// <inheritdoc/>
-    public override View? Add (View? view)
+    /// <inheritdoc />
+    protected override void OnSubViewAdded (View view)
     {
-        base.Add (view);
+        base.OnSubViewAdded (view);
 
         if (view is MenuItemv2 menuItem)
         {
             menuItem.CanFocus = true;
             menuItem.Orientation = Orientation.Vertical;
-            menuItem.HighlightStyle |= HighlightStyle.Hover;
 
             AddCommand (menuItem.Command, RaiseMenuItemCommandInvoked);
 
             menuItem.Accepting += MenuItemtOnAccepting;
 
-            menuItem.ActivateSubMenu += MenuItemOnActivateSubMenu;
-            void MenuItemOnActivateSubMenu (object? sender, EventArgs<Menuv2> e)
-            {
-                Logging.Trace ($"MenuItemOnActivateSubMenu: {e}");
+            //menuItem.ActivateSubMenu += MenuItemOnActivateSubMenu;
+            //void MenuItemOnActivateSubMenu (object? sender, EventArgs<Menuv2> e)
+            //{
+            //    Logging.Trace ($"MenuItemOnActivateSubMenu: {e}");
 
-                if (e.CurrentValue is { })
-                {
-                    SuperView.Add (e.CurrentValue);
-                    e.CurrentValue.X = Frame.X + Frame.Width;
-                    e.CurrentValue.Y = Frame.Y + menuItem.Frame.Y;
-                    e.CurrentValue.Visible = true;
-                }
-            }
+            //    if (e.CurrentValue is { })
+            //    {
+            //        SuperView.Add (e.CurrentValue);
+            //        e.CurrentValue.X = Frame.X + Frame.Width;
+            //        e.CurrentValue.Y = Frame.Y + menuItem.Frame.Y;
+            //        e.CurrentValue.Visible = true;
+            //    }
+            //}
 
             void MenuItemtOnAccepting (object? sender, CommandEventArgs e)
             {
                 //Logging.Trace($"MenuItemtOnAccepting: {e.Context}");
             }
         }
-
-        return view;
     }
 
 
@@ -95,7 +94,7 @@ public class Menuv2 : Bar
     /// <returns></returns>
     protected bool? RaiseMenuItemCommandInvoked (ICommandContext? ctx)
     {
-        Logging.Trace($"RaiseMenuItemCommandInvoked: {ctx}");
+        Logging.Trace ($"RaiseMenuItemCommandInvoked: {ctx}");
         CommandEventArgs args = new () { Context = ctx };
 
         // Best practice is to invoke the virtual method first.
@@ -134,4 +133,73 @@ public class Menuv2 : Bar
     /// </para>
     /// </remarks>
     public event EventHandler<CommandEventArgs>? MenuItemCommandInvoked;
+
+    /// <inheritdoc />
+    protected override void OnFocusedChanged (View? previousFocused, View? focused)
+    {
+        base.OnFocusedChanged (previousFocused, focused);
+        SelectedMenuItem = focused as MenuItemv2;
+        RaiseSelectedMenuItemChanged (SelectedMenuItem);
+
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public MenuItemv2? SelectedMenuItem
+    {
+        get => Focused as MenuItemv2;
+        set
+        {
+            if (value == Focused)
+            {
+                return;
+            }
+
+            //value?.SetFocus ();
+        }
+    }
+
+    internal void RaiseSelectedMenuItemChanged (MenuItemv2? selected)
+    {
+        //Logging.Trace ($"RaiseSelectedMenuItemChanged: {selected?.Title}");
+
+        ShowSubMenu (selected);
+        OnSelectedMenuItemChanged (selected);
+
+        SelectedMenuItemChanged?.Invoke (this, selected);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="selected"></param>
+    protected virtual void OnSelectedMenuItemChanged (MenuItemv2? selected)
+    {
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public event EventHandler<MenuItemv2?>? SelectedMenuItemChanged;
+
+    public void ShowSubMenu (MenuItemv2? menuItem)
+    {
+        // Hide any other submenus that might be visible
+        foreach (MenuItemv2 mi in SubViews.Where (v => v is MenuItemv2 { SubMenu.Visible: true }).Cast<MenuItemv2> ())
+        {
+            mi.ForceFocusColors = false;
+            mi.SubMenu!.Visible = false;
+            SuperView?.Remove (mi.SubMenu);
+        }
+
+        if (menuItem is { SubMenu: {} })
+        {
+            SuperView?.Add (menuItem.SubMenu);
+            menuItem.SubMenu.X = Frame.X + Frame.Width;
+            menuItem.SubMenu.Y = Frame.Y + menuItem.Frame.Y;
+            menuItem.SubMenu.Visible = true;
+            menuItem.ForceFocusColors = true;
+        }
+    }
 }

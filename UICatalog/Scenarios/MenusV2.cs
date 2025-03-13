@@ -23,130 +23,143 @@ public class MenusV2 : Scenario
         Toplevel app = new ();
         app.Title = GetQuitKeyAndName ();
 
-        ObservableCollection<string> eventSource = new ();
+        //ObservableCollection<string> eventSource = new ();
 
-        var eventLog = new ListView
-        {
-            Title = "Event Log",
-            X = Pos.AnchorEnd (),
-            Width = Dim.Auto (),
-            Height = Dim.Fill (), // Make room for some wide things
-            ColorScheme = Colors.ColorSchemes ["Toplevel"],
-            Source = new ListWrapper<string> (eventSource)
-        };
-        eventLog.Border!.Thickness = new (0, 1, 0, 0);
+        //var eventLog = new ListView
+        //{
+        //    Title = "Event Log",
+        //    X = Pos.AnchorEnd (),
+        //    Width = Dim.Auto (),
+        //    Height = Dim.Fill (), // Make room for some wide things
+        //    ColorScheme = Colors.ColorSchemes ["Toplevel"],
+        //    Source = new ListWrapper<string> (eventSource)
+        //};
+        //eventLog.Border!.Thickness = new (0, 1, 0, 0);
 
-        FrameView frame = new ()
+        View frame = new ()
         {
             Id = "frame",
             Title = "Cascading Menu...",
-            Width = Dim.Fill ()! - Dim.Width (eventLog),
-            Height = Dim.Fill ()
+
+            Width = Dim.Fill (),//! - Dim.Width (eventLog),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
         };
         app.Add (frame);
 
-        var rootMenu = new Menuv2 ()
-        {
-            Id = "rootMenu",
-        };
-        ConfigureRootMenu (frame, rootMenu);
+        //var rootMenu = new Menuv2 ()
+        //{
+        //    Id = "rootMenu",
+        //};
+        //ConfigureRootMenu (frame, rootMenu);
 
-        var subMenu = new Menuv2
-        {
-            Id = "subMenu",
-            Visible = false
-        };
-        ConfigureSubMenu1 (frame, subMenu);
+        //var subMenu = new Menuv2
+        //{
+        //    Id = "subMenu",
+        //    Visible = false
+        //};
+        //ConfigureSubMenu1 (frame, subMenu);
 
-        var cascadeShortcut = new MenuItemv2 (frame, Command.Accept, "_Options", "File options", subMenu);
-        rootMenu.Add (cascadeShortcut);
+        //var cascadeShortcut = new MenuItemv2 (frame, Command.Accept, "_Options", "File options", subMenu);
+        //rootMenu.Add (cascadeShortcut);
 
-        var popoverMenu = new PopoverMenu (rootMenu)
-        {
-            Id = "popOverMenu",
-            Visible = true,
-            X =1, Y = 1
-        };
+        //var popoverMenu = new PopoverMenu (rootMenu)
+        //{
+        //    Id = "popOverMenu",
+        //    Visible = true,
+        //    X =1, Y = 1
+        //};
 
-        //Application.PopoverHost.Add (popoverMenu);
+        ////Application.PopoverHost.Add (popoverMenu);
         //Application.PopoverHost.Visible = true;
 
-        rootMenu.SubViews.ElementAt (0).SetFocus ();
+        //rootMenu.SubViews.ElementAt (0).SetFocus ();
 
-        FrameView frameView = frame;
-        frameView.Add (popoverMenu);
-
-        frameView.CommandNotBound += (o, args) =>
-                               {
-                                   eventSource.Add ($"{args.Context!.Command}: {frameView?.Id}");
-                                   eventLog.MoveDown ();
-                                   args.Cancel = true;
-                               };
-
-        frameView.Accepting += (o, args) =>
-                               {
-                                   eventSource.Add ($"{args.Context!.Command}: {frameView?.Id}");
-                                   eventLog.MoveDown ();
-                                  // args.Cancel = true;
-                               };
-
-        var menu = popoverMenu;
-
-        menu.Accepting += (o, args) =>
-                             {
-                                 //Logging.Trace($"Accepting: {menu!.Id} {args.Context.Command}");
-                                 //eventSource.Add ($"Accepting: {menu!.Id} {args.Context.Command}");
-                                 //eventLog.MoveDown ();
-                                 //args.Cancel = true;
-                             };
-
-        menu.Selecting += (o, args) =>
-                             {
-                                 //Logging.Trace ($"Selecting: {menu!.Id} {args.Context.Command}");
-                                 //eventSource.Add ($"Selecting: {menu!.Id} {args.Context.Command}");
-                                 //eventLog.MoveDown ();
-                                 //args.Cancel = false;
-                             };
-
-        popoverMenu.Root.MenuItemCommandInvoked += (o, args) =>
-                                              {
-                                                  if (args.Context is CommandContext<KeyBinding> { Binding.Data: MenuItemv2 { } sc })
-                                                  {
-                                                      Logging.Trace($"Invoked: {sc.Title} {args.Context.Command}");
-                                                      eventSource.Add ($"Invoked: {sc.Title} {args.Context.Command}");
-                                                      //args.Cancel = true;
-                                                  }
-
-                                                  eventLog.MoveDown ();
-                                              };
+        //frame.Add (popoverMenu);
 
 
-        foreach (View view2 in popoverMenu.Root.SubViews.Where (s => s is MenuItemv2)!)
+        var shortcut1 = new Button()
         {
-            var sh = (MenuItemv2)view2;
+            //Title = "_New",
+            //Key = Key.N.WithCtrl,
+            Text = "New File",
+            //Command = Command.New,
+            //TargetView = targetView,
+            BorderStyle = LineStyle.Double
+        };
 
-            sh.Accepting += (o, args) =>
-                            {
-                                //Logging.Trace($"Accepting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
-                                //eventSource.Add ($"Accepting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
-                                //eventLog.MoveDown ();
-                                //args.Cancel = true;
-                            };
+        frame.Add (shortcut1);
 
-            sh.Selecting += (o, args) =>
-                            {
-                                //Logging.Trace ($"Selecting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
-                                //eventSource.Add ($"Selecting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
-                                //eventLog.MoveDown ();
-                                //args.Cancel = false;
-                            };
-        }
+        //frame.CommandNotBound += (o, args) =>
+        //                       {
+        //                           eventSource.Add ($"{args.Context!.Command}: {frame?.Id}");
+        //                           eventLog.MoveDown ();
+        //                           args.Cancel = true;
+        //                       };
 
-        app.Add (eventLog);
+        //frame.Accepting += (o, args) =>
+        //                       {
+        //                           eventSource.Add ($"{args.Context!.Command}: {frame?.Id}");
+        //                           eventLog.MoveDown ();
+        //                          // args.Cancel = true;
+        //                       };
+
+        //popoverMenu.Accepting += (o, args) =>
+        //                         {
+        //                             Logging.Trace($"Accepting: {popoverMenu!.Id} {args.Context.Command}");
+        //                             //eventSource.Add ($"Accepting: {menu!.Id} {args.Context.Command}");
+        //                             //eventLog.MoveDown ();
+        //                             //args.Cancel = true;
+        //                         };
+
+        //popoverMenu.Selecting += (o, args) =>
+        //                         {
+        //                             Logging.Trace ($"Selecting: {popoverMenu!.Id} {args.Context.Command}");
+        //                             //eventSource.Add ($"Selecting: {menu!.Id} {args.Context.Command}");
+        //                             //eventLog.MoveDown ();
+        //                             //args.Cancel = false;
+        //                         };
+
+        ////popoverMenu.Root.MenuItemCommandInvoked += (o, args) =>
+        ////                                      {
+        ////                                          Logging.Trace ($"MenuItemCommandInvoked");
+        ////                                          if (args.Context is CommandContext<KeyBinding> { Binding.Data: MenuItemv2 { } sc })
+        ////                                          {
+        ////                                              Logging.Trace($"Invoked: {sc.Title} {args.Context.Command}");
+        ////                                              eventSource.Add ($"Invoked: {sc.Title} {args.Context.Command}");
+        ////                                              //args.Cancel = true;
+        ////                                          }
+
+        ////                                          eventLog.MoveDown ();
+        ////                                      };
+
+
+        //foreach (View view2 in popoverMenu.Root.SubViews.Where (s => s is MenuItemv2)!)
+        //{
+        //    var sh = (MenuItemv2)view2;
+
+        //    sh.Accepting += (o, args) =>
+        //                    {
+        //                        Logging.Trace($"Accepting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
+        //                        //eventSource.Add ($"Accepting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
+        //                        //eventLog.MoveDown ();
+        //                        //args.Cancel = true;
+        //                    };
+
+        //    sh.Selecting += (o, args) =>
+        //                    {
+        //                        Logging.Trace ($"Selecting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
+        //                        //eventSource.Add ($"Selecting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
+        //                        //eventLog.MoveDown ();
+        //                        //args.Cancel = false;
+        //                    };
+        //}
+
+        //app.Add (eventLog);
 
         Application.Run (app);
         app.Dispose ();
-        popoverMenu.Dispose ();
+        //popoverMenu.Dispose ();
         Application.Shutdown ();
     }
 
@@ -161,61 +174,61 @@ public class MenusV2 : Scenario
             TargetView = targetView
         };
 
-        var shortcut2 = new MenuItemv2
-        {
-            Title = "_Open...",
-            Text = "Open File",
-            Key = Key.O.WithCtrl,
-            Command = Command.Open,
-            TargetView = targetView
-        };
+        //var shortcut2 = new MenuItemv2
+        //{
+        //    Title = "_Open...",
+        //    Text = "Open File",
+        //    Key = Key.O.WithCtrl,
+        //    Command = Command.Open,
+        //    TargetView = targetView
+        //};
 
-        var shortcut3 = new MenuItemv2
-        {
-            Title = "_Save",
-            Text = "Save file",
-            Key = Key.S.WithCtrl,
-            Command = Command.Save,
-            TargetView = targetView
-        };
+        //var shortcut3 = new MenuItemv2
+        //{
+        //    Title = "_Save",
+        //    Text = "Save file",
+        //    Key = Key.S.WithCtrl,
+        //    Command = Command.Save,
+        //    TargetView = targetView
+        //};
 
-        var shortcut4 = new MenuItemv2
-        {
-            Title = "Sa_ve As...",
-            Text = "Save file as",
-            Key = Key.V.WithCtrl,
-            Command = Command.SaveAs,
-            TargetView = targetView
+        //var shortcut4 = new MenuItemv2
+        //{
+        //    Title = "Sa_ve As...",
+        //    Text = "Save file as",
+        //    Key = Key.V.WithCtrl,
+        //    Command = Command.SaveAs,
+        //    TargetView = targetView
 
-        };
-
-
-        var shortcut5 = new MenuItemv2
-        {
-            Title = "_Auto Save",
-            Text = "Automatically save",
-            Key = Key.A.WithCtrl,
-            TargetView = targetView
-        };
-
-        shortcut5.CommandView = new CheckBox
-        {
-            Title = shortcut5.Title,
-            HighlightStyle = HighlightStyle.None,
-            CanFocus = false
-        };
-
-        var line = new Line
-        {
-            X = -1,
-            Width = Dim.Fill ()! + 1
-        };
+        //};
 
 
-        // This ensures the checkbox state toggles when the hotkey of Title is pressed.
-        //shortcut4.Accepting += (sender, args) => args.Cancel = true;
+        //var shortcut5 = new MenuItemv2
+        //{
+        //    Title = "_Auto Save",
+        //    Text = "Automatically save",
+        //    Key = Key.A.WithCtrl,
+        //    TargetView = targetView
+        //};
 
-        menu.Add (shortcut1, shortcut2, shortcut3, shortcut4, line, shortcut5);
+        //shortcut5.CommandView = new CheckBox
+        //{
+        //    Title = shortcut5.Title,
+        //    HighlightStyle = HighlightStyle.None,
+        //    CanFocus = false
+        //};
+
+        //var line = new Line
+        //{
+        //    X = -1,
+        //    Width = Dim.Fill ()! + 1
+        //};
+
+
+        //// This ensures the checkbox state toggles when the hotkey of Title is pressed.
+        ////shortcut4.Accepting += (sender, args) => args.Cancel = true;
+
+        menu.Add (shortcut1);//, shortcut2, shortcut3, shortcut4, line, shortcut5);
     }
 
 
