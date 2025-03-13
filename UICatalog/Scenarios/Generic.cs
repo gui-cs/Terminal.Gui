@@ -26,7 +26,13 @@ public sealed class Generic : Scenario
         };
         appWindow.Add (frame);
 
-        var button = new Button { Id = "button", X = Pos.Center (), Y = 1, Text = "_Press me!" };
+        var button = new Shortcut ()
+        {
+            Id = "button", 
+            X = Pos.Center (), 
+            Y = 1, 
+            Text = "_Press me!"
+        };
 
         button.Accepting += (s, e) =>
                             {
