@@ -708,8 +708,16 @@ public abstract class ConsoleDriver : IConsoleDriver
         {
             result = (KeyCode)new Rune (_highSurrogate, (char)keyCode).Value;
             _highSurrogate = '\0';
+
+            return true;
         }
-        else if (_highSurrogate > 0)
+
+        if (char.IsSurrogate ((char)keyCode))
+        {
+            return false;
+        }
+
+        if (_highSurrogate > 0)
         {
             _highSurrogate = '\0';
         }
