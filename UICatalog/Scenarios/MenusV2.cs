@@ -76,7 +76,7 @@ public class MenusV2 : Scenario
         FrameView frameView = frame;
         frameView.Add (popoverMenu);
 
-        frameView.UnboundCommand += (o, args) =>
+        frameView.CommandNotBound += (o, args) =>
                                {
                                    eventSource.Add ($"{args.Context!.Command}: {frameView?.Id}");
                                    eventLog.MoveDown ();

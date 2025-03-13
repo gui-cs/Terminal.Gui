@@ -15,7 +15,7 @@ namespace Terminal.Gui;
 public enum Command
 {
     /// <summary>
-    ///     Indicates the command is not bound or invalid. Will call <see cref="View.RaiseUnboundCommand"/>.
+    ///     Indicates the command is not bound or invalid. Will call <see cref="View.RaiseCommandNotBound"/>.
     /// </summary>
     NotBound = 0,
 

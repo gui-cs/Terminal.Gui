@@ -15,7 +15,7 @@ public partial class View // Command APIs
     private void SetupCommands ()
     {
         // NotBound - Invoked if no handler is bound
-        AddCommand (Command.NotBound, RaiseUnboundCommand);
+        AddCommand (Command.NotBound, RaiseCommandNotBound);
 
         // Enter - Raise Accepted
         AddCommand (Command.Accept, RaiseAccepting);
@@ -61,21 +61,21 @@ public partial class View // Command APIs
     ///     <see langword="false"/> if the event was raised and was not handled (or cancelled); input processing should continue.
     ///     <see langword="true"/> if the event was raised and handled (or cancelled); input processing should stop.
     /// </returns>
-    protected bool? RaiseUnboundCommand (ICommandContext? ctx)
+    protected bool? RaiseCommandNotBound (ICommandContext? ctx)
     {
         CommandEventArgs args = new () { Context = ctx };
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
-        if (OnUnboundCommand (args) || args.Cancel)
+        if (OnCommandNotBound (args) || args.Cancel)
         {
             return true;
         }
 
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-        UnboundCommand?.Invoke (this, args);
+        CommandNotBound?.Invoke (this, args);
 
-        return UnboundCommand is null ? null : args.Cancel;
+        return CommandNotBound is null ? null : args.Cancel;
     }
 
     /// <summary>
@@ -85,12 +85,12 @@ public partial class View // Command APIs
     /// </summary>
     /// <param name="args">The event arguments.</param>
     /// <returns><see langword="true"/> to stop processing.</returns>
-    protected virtual bool OnUnboundCommand (CommandEventArgs args) { return false; }
+    protected virtual bool OnCommandNotBound (CommandEventArgs args) { return false; }
 
     /// <summary>
     ///     Cancelable event raised when a command that has not been bound is invoked.
     /// </summary>
-    public event EventHandler<CommandEventArgs>? UnboundCommand;
+    public event EventHandler<CommandEventArgs>? CommandNotBound;
 
     /// <summary>
     ///     Called when the user is accepting the state of the View and the <see cref="Command.Accept"/> has been invoked. Calls <see cref="OnAccepting"/> which can be cancelled; if not cancelled raises <see cref="Accepting"/>.

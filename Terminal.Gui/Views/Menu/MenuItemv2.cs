@@ -13,7 +13,7 @@ public class MenuItemv2 : Shortcut
     /// </summary>
     public MenuItemv2 () : base (Key.Empty, null, null, null)
     {
-        HighlightStyle = HighlightStyle.Hover;
+        //HighlightStyle = HighlightStyle.Hover;
     }
 
     /// <summary>
