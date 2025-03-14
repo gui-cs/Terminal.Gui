@@ -11,7 +11,7 @@ namespace Terminal.Gui;
 public class TextFormatter
 {
     // Utilized in CRLF related helper methods for faster newline char index search.
-    private static readonly SearchValues<char> NewLineSearchValues = SearchValues.Create(['\r', '\n']);
+    private static readonly SearchValues<char> NewlineSearchValues = SearchValues.Create(['\r', '\n']);
 
     private Key _hotKey = new ();
     private int _hotKeyPos = -1;
@@ -1191,31 +1191,39 @@ public class TextFormatter
     // TODO: Move to StringExtensions?
     internal static string StripCRLF (string str, bool keepNewLine = false)
     {
-        StringBuilder stringBuilder = new();
-
         ReadOnlySpan<char> remaining = str.AsSpan ();
+        int firstNewlineCharIndex = remaining.IndexOfAny (NewlineSearchValues);
+        // Early exit to avoid StringBuilder allocation if there are no newline characters.
+        if (firstNewlineCharIndex < 0)
+        {
+            return str;
+        }
+
+        StringBuilder stringBuilder = new();
+        ReadOnlySpan<char> firstSegment = remaining[..firstNewlineCharIndex];
+        stringBuilder.Append (firstSegment);
+
+        // The first newline is not yet skipped because the "keepNewLine" condition has not been evaluated.
+        // This means there will be 1 extra iteration because the same newline index is checked again in the loop.
+        remaining = remaining [firstNewlineCharIndex..];
+
         while (remaining.Length > 0)
         {
-            int nextLineBreakIndex = remaining.IndexOfAny (NewLineSearchValues);
-            if (nextLineBreakIndex == -1)
+            int newlineCharIndex = remaining.IndexOfAny (NewlineSearchValues);
+            if (newlineCharIndex == -1)
             {
-                if (str.Length == remaining.Length)
-                {
-                    return str;
-                }
-                stringBuilder.Append (remaining);
                 break;
             }
 
-            ReadOnlySpan<char> slice = remaining.Slice (0, nextLineBreakIndex);
-            stringBuilder.Append (slice);
+            ReadOnlySpan<char> segment = remaining[..newlineCharIndex];
+            stringBuilder.Append (segment);
 
+            int stride = segment.Length;
             // Evaluate how many line break characters to preserve.
-            int stride;
-            char lineBreakChar = remaining [nextLineBreakIndex];
-            if (lineBreakChar == '\n')
+            char newlineChar = remaining [newlineCharIndex];
+            if (newlineChar == '\n')
             {
-                stride = 1;
+                stride++;
                 if (keepNewLine)
                 {
                     stringBuilder.Append ('\n');
@@ -1223,10 +1231,11 @@ public class TextFormatter
             }
             else // '\r'
             {
-                bool crlf = (nextLineBreakIndex + 1) < remaining.Length && remaining [nextLineBreakIndex + 1] == '\n';
+                int nextCharIndex = newlineCharIndex + 1;
+                bool crlf = nextCharIndex < remaining.Length && remaining [nextCharIndex] == '\n';
                 if (crlf)
                 {
-                    stride = 2;
+                    stride += 2;
                     if (keepNewLine)
                     {
                         stringBuilder.Append ('\n');
@@ -1234,15 +1243,16 @@ public class TextFormatter
                 }
                 else
                 {
-                    stride = 1;
+                    stride++;
                     if (keepNewLine)
                     {
                         stringBuilder.Append ('\r');
                     }
                 }
             }
-            remaining = remaining.Slice (slice.Length + stride);
+            remaining = remaining [stride..];
         }
+        stringBuilder.Append (remaining);
         return stringBuilder.ToString ();
     }
 

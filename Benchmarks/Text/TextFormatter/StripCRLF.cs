@@ -4,6 +4,9 @@ using Tui = Terminal.Gui;
 
 namespace Terminal.Gui.Benchmarks.Text.TextFormatter;
 
+/// <summary>
+/// Benchmarks for <see cref="Tui.TextFormatter.StripCRLF"/> performance fine-tuning.
+/// </summary>
 [MemoryDiagnoser]
 public class StripCRLF
 {
@@ -31,7 +34,7 @@ public class StripCRLF
     }
 
     /// <summary>
-    /// Previous implementation with intermediate list allocation.
+    /// Previous implementation with intermediate rune list.
     /// </summary>
     private static string RuneListToString (string str, bool keepNewLine = false)
     {
@@ -98,7 +101,7 @@ public class StripCRLF
             "Nullam semper tempor mi, nec semper quam fringilla eu. Aenean sit amet pretium augue, in posuere ante. Aenean convallis porttitor purus, et posuere velit dictum eu."
         ];
 
-        bool[] newLinePermutations = { true, false };
+        bool[] newLinePermutations = [true, false];
 
         foreach (string text in textPermutations)
         {
