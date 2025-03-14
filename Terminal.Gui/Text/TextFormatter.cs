@@ -1185,7 +1185,7 @@ public class TextFormatter
     }
 
     // TODO: Move to StringExtensions?
-    private static string StripCRLF (string str, bool keepNewLine = false)
+    internal static string StripCRLF (string str, bool keepNewLine = false)
     {
         List<Rune> runes = str.ToRuneList ();
 
@@ -1229,7 +1229,7 @@ public class TextFormatter
     }
 
     // TODO: Move to StringExtensions?
-    private static string ReplaceCRLFWithSpace (string str)
+    internal static string ReplaceCRLFWithSpace (string str)
     {
         List<Rune> runes = str.ToRuneList ();
 
