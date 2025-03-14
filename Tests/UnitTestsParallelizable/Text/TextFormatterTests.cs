@@ -2895,9 +2895,9 @@ public class TextFormatterTests
     [InlineData ("This has crlf\r\nin the middle", "This has crlfin the middle")]
     [InlineData ("This has crlf in the end\r\n", "This has crlf in the end")]
     // LFCR
-    [InlineData ("\n\rThis has lfcr in the beginning", "\rThis has lfcr in the beginning")]
-    [InlineData ("This has lfcr\n\rin the middle", "This has lfcr\rin the middle")]
-    [InlineData ("This has lfcr in the end\n\r", "This has lfcr in the end\r")]
+    [InlineData ("\n\rThis has lfcr in the beginning", "This has lfcr in the beginning")]
+    [InlineData ("This has lfcr\n\rin the middle", "This has lfcrin the middle")]
+    [InlineData ("This has lfcr in the end\n\r", "This has lfcr in the end")]
     // CR
     [InlineData ("\rThis has cr in the beginning", "This has cr in the beginning")]
     [InlineData ("This has cr\rin the middle", "This has crin the middle")]

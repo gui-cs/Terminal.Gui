@@ -1,4 +1,5 @@
 #nullable enable
+using System.Buffers;
 using System.Diagnostics;
 
 namespace Terminal.Gui;
@@ -9,6 +10,9 @@ namespace Terminal.Gui;
 /// </summary>
 public class TextFormatter
 {
+    // Utilized in CRLF related helper methods for faster newline char index search.
+    private static readonly SearchValues<char> NewLineSearchValues = SearchValues.Create(['\r', '\n']);
+
     private Key _hotKey = new ();
     private int _hotKeyPos = -1;
     private List<string> _lines = new ();
@@ -1187,45 +1191,59 @@ public class TextFormatter
     // TODO: Move to StringExtensions?
     internal static string StripCRLF (string str, bool keepNewLine = false)
     {
-        List<Rune> runes = str.ToRuneList ();
+        StringBuilder stringBuilder = new();
 
-        for (var i = 0; i < runes.Count; i++)
+        ReadOnlySpan<char> remaining = str.AsSpan ();
+        while (remaining.Length > 0)
         {
-            switch ((char)runes [i].Value)
+            int nextLineBreakIndex = remaining.IndexOfAny (NewLineSearchValues);
+            if (nextLineBreakIndex == -1)
             {
-                case '\n':
-                    if (!keepNewLine)
-                    {
-                        runes.RemoveAt (i);
-                    }
-
-                    break;
-
-                case '\r':
-                    if (i + 1 < runes.Count && runes [i + 1].Value == '\n')
-                    {
-                        runes.RemoveAt (i);
-
-                        if (!keepNewLine)
-                        {
-                            runes.RemoveAt (i);
-                        }
-
-                        i++;
-                    }
-                    else
-                    {
-                        if (!keepNewLine)
-                        {
-                            runes.RemoveAt (i);
-                        }
-                    }
-
-                    break;
+                if (str.Length == remaining.Length)
+                {
+                    return str;
+                }
+                stringBuilder.Append (remaining);
+                break;
             }
-        }
 
-        return StringExtensions.ToString (runes);
+            ReadOnlySpan<char> slice = remaining.Slice (0, nextLineBreakIndex);
+            stringBuilder.Append (slice);
+
+            // Evaluate how many line break characters to preserve.
+            int stride;
+            char lineBreakChar = remaining [nextLineBreakIndex];
+            if (lineBreakChar == '\n')
+            {
+                stride = 1;
+                if (keepNewLine)
+                {
+                    stringBuilder.Append ('\n');
+                }
+            }
+            else // '\r'
+            {
+                bool crlf = (nextLineBreakIndex + 1) < remaining.Length && remaining [nextLineBreakIndex + 1] == '\n';
+                if (crlf)
+                {
+                    stride = 2;
+                    if (keepNewLine)
+                    {
+                        stringBuilder.Append ('\n');
+                    }
+                }
+                else
+                {
+                    stride = 1;
+                    if (keepNewLine)
+                    {
+                        stringBuilder.Append ('\r');
+                    }
+                }
+            }
+            remaining = remaining.Slice (slice.Length + stride);
+        }
+        return stringBuilder.ToString ();
     }
 
     // TODO: Move to StringExtensions?
