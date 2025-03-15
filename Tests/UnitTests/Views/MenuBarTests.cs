@@ -2518,7 +2518,7 @@ Edit
         MenuItem miCurrent = null;
         Menu mCurrent = null;
 
-        var menu = new MenuBar
+        var menuBar = new MenuBar
         {
             Menus =
             [
@@ -2533,22 +2533,22 @@ Edit
             ]
         };
 
-        menu.MenuOpened += (s, e) =>
+        menuBar.MenuOpened += (s, e) =>
                            {
                                miCurrent = e.MenuItem;
-                               mCurrent = menu.OpenCurrentMenu;
+                               mCurrent = menuBar.OpenCurrentMenu;
                            };
         var top = new Toplevel ();
-        top.Add (menu);
+        top.Add (menuBar);
         Application.Begin (top);
 
         // Click on Edit
         Assert.True (
-                     menu.NewMouseEvent (
-                                         new () { Position = new (10, 0), Flags = MouseFlags.Button1Pressed, View = menu }
+                     menuBar.NewMouseEvent (
+                                         new () { Position = new (10, 0), Flags = MouseFlags.Button1Pressed, View = menuBar }
                                         )
                     );
-        Assert.True (menu.IsMenuOpen);
+        Assert.True (menuBar.IsMenuOpen);
         Assert.Equal ("_Edit", miCurrent.Parent.Title);
         Assert.Equal ("_Copy", miCurrent.Title);
 
@@ -2558,7 +2558,7 @@ Edit
                                              new () { Position = new (10, 2), Flags = MouseFlags.ReportMousePosition, View = mCurrent }
                                             )
                     );
-        Assert.True (menu.IsMenuOpen);
+        Assert.True (menuBar.IsMenuOpen);
         Assert.Equal ("_Edit", miCurrent.Parent.Title);
         Assert.Equal ("_Paste", miCurrent.Title);
 
@@ -2568,8 +2568,18 @@ Edit
                                          new () { ScreenPosition = new (10, i), Flags = MouseFlags.ReportMousePosition }
                                         );
 
-            Assert.True (menu.IsMenuOpen);
-            Assert.Equal (menu, Application.MouseGrabView);
+            Assert.True (menuBar.IsMenuOpen);
+            Menu menu = (Menu)top.SubViews.First (v => v is Menu);
+
+            if (i is < 0 or > 0)
+            {
+                Assert.Equal (menu, Application.MouseGrabView);
+            }
+            else
+            {
+                Assert.Equal (menuBar, Application.MouseGrabView);
+            }
+
             Assert.Equal ("_Edit", miCurrent.Parent.Title);
 
             if (i == 4)

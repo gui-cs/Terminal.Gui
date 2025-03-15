@@ -76,7 +76,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                          ]
                                         );
 
-        var menu = new MenuBar
+        var menuBar = new MenuBar
         {
             Menus =
             [
@@ -86,24 +86,26 @@ public class ContextMenuTests (ITestOutputHelper output)
         };
 
         var top = new Toplevel ();
-        top.Add (menu);
+        top.Add (menuBar);
         Application.Begin (top);
 
         Assert.Null (Application.MouseGrabView);
 
         cm.Show (menuItems);
         Assert.True (ContextMenu.IsShow);
-        Assert.Equal (cm.MenuBar, Application.MouseGrabView);
-        Assert.False (menu.IsMenuOpen);
-        Assert.True (menu.NewKeyDownEvent (menu.Key));
-        Assert.False (ContextMenu.IsShow);
+        Menu menu = (Menu)top.SubViews.First (v => v is Menu);
         Assert.Equal (menu, Application.MouseGrabView);
-        Assert.True (menu.IsMenuOpen);
+        Assert.False (menuBar.IsMenuOpen);
+        Assert.True (menuBar.NewKeyDownEvent (menuBar.Key));
+        Assert.False (ContextMenu.IsShow);
+        Assert.Equal (menuBar, Application.MouseGrabView);
+        Assert.True (menuBar.IsMenuOpen);
 
         cm.Show (menuItems);
         Assert.True (ContextMenu.IsShow);
-        Assert.Equal (cm.MenuBar, Application.MouseGrabView);
-        Assert.False (menu.IsMenuOpen);
+        menu = (Menu)top.SubViews.First (v => v is Menu);
+        Assert.Equal (menu, Application.MouseGrabView);
+        Assert.False (menuBar.IsMenuOpen);
 #if SUPPORT_ALT_TO_ACTIVATE_MENU
         Assert.True (Application.Top.ProcessKeyUp (new (Key.AltMask)));
         Assert.False (ContextMenu.IsShow);
@@ -113,16 +115,17 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         cm.Show (menuItems);
         Assert.True (ContextMenu.IsShow);
-        Assert.Equal (cm.MenuBar, Application.MouseGrabView);
-        Assert.False (menu.IsMenuOpen);
-        Assert.False (menu.NewMouseEvent (new MouseEventArgs { Position = new (1, 0), Flags = MouseFlags.ReportMousePosition, View = menu }));
-        Assert.True (ContextMenu.IsShow);
-        Assert.Equal (cm.MenuBar, Application.MouseGrabView);
-        Assert.False (menu.IsMenuOpen);
-        Assert.True (menu.NewMouseEvent (new MouseEventArgs { Position = new (1, 0), Flags = MouseFlags.Button1Clicked, View = menu }));
-        Assert.False (ContextMenu.IsShow);
+        menu = (Menu)top.SubViews.First (v => v is Menu);
         Assert.Equal (menu, Application.MouseGrabView);
-        Assert.True (menu.IsMenuOpen);
+        Assert.False (menuBar.IsMenuOpen);
+        Assert.False (menuBar.NewMouseEvent (new MouseEventArgs { Position = new (1, 0), Flags = MouseFlags.ReportMousePosition, View = menuBar }));
+        Assert.True (ContextMenu.IsShow);
+        Assert.Equal (menu, Application.MouseGrabView);
+        Assert.False (menuBar.IsMenuOpen);
+        Assert.True (menuBar.NewMouseEvent (new MouseEventArgs { Position = new (1, 0), Flags = MouseFlags.Button1Clicked, View = menuBar }));
+        Assert.False (ContextMenu.IsShow);
+        Assert.Equal (menuBar, Application.MouseGrabView);
+        Assert.True (menuBar.IsMenuOpen);
         top.Dispose ();
     }
 
@@ -1423,7 +1426,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.Equal (6, win.SubViews.Count);
         Assert.True (tf2.ContextMenu.MenuBar.IsMenuOpen);
         Assert.True (win.Focused is Menu);
-        Assert.True (Application.MouseGrabView is MenuBar);
+        Assert.True (Application.MouseGrabView is Menu);
         Assert.Equal (tf2, Application._cachedViewsUnderMouse.LastOrDefault ());
 
         // Click on tf1 to focus it, which cause context menu being closed
@@ -2026,15 +2029,15 @@ public class ContextMenuTests (ITestOutputHelper output)
             // Right Button
             case 3:
                 Application.RaiseMouseEvent (new () { ScreenPosition = new (1, 2), Flags = MouseFlags.Button3Pressed });
-                Assert.False (menuBar.IsMenuOpen);
+                Assert.True (menuBar.IsMenuOpen);
                 Application.MainLoop.RunIteration ();
                 Assert.False (actionRaised);
                 Application.RaiseMouseEvent (new () { ScreenPosition = new (1, 2), Flags = MouseFlags.Button3Released });
-                Assert.False (menuBar.IsMenuOpen);
+                Assert.True (menuBar.IsMenuOpen);
                 Application.MainLoop.RunIteration ();
                 Assert.False (actionRaised);
                 Application.RaiseMouseEvent (new () { ScreenPosition = new (1, 2), Flags = MouseFlags.Button3Clicked });
-                Assert.False (menuBar.IsMenuOpen);
+                Assert.True (menuBar.IsMenuOpen);
                 Application.MainLoop.RunIteration ();
                 Assert.False (actionRaised);
 
@@ -2042,7 +2045,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         }
 
         // ContextMenu
-        Application.RaiseMouseEvent (new () { ScreenPosition = new (0, 2), Flags = cm.MouseFlags });
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (0, 4), Flags = cm.MouseFlags });
         Assert.False (menuBar.IsMenuOpen);
         Assert.True (cm.MenuBar!.IsMenuOpen);
 
@@ -2050,15 +2053,15 @@ public class ContextMenuTests (ITestOutputHelper output)
         {
             // Left Button
             case 1:
-                Application.RaiseMouseEvent (new () { ScreenPosition = new (1, 4), Flags = MouseFlags.Button1Pressed });
+                Application.RaiseMouseEvent (new () { ScreenPosition = new (1, 6), Flags = MouseFlags.Button1Pressed });
                 Assert.True (cm.MenuBar!.IsMenuOpen);
                 Application.MainLoop.RunIteration ();
                 Assert.False (actionRaised);
-                Application.RaiseMouseEvent (new () { ScreenPosition = new (1, 4), Flags = MouseFlags.Button1Released });
+                Application.RaiseMouseEvent (new () { ScreenPosition = new (1, 6), Flags = MouseFlags.Button1Released });
                 Assert.True (cm.MenuBar!.IsMenuOpen);
                 Application.MainLoop.RunIteration ();
                 Assert.False (actionRaised);
-                Application.RaiseMouseEvent (new () { ScreenPosition = new (1, 4), Flags = MouseFlags.Button1Clicked });
+                Application.RaiseMouseEvent (new () { ScreenPosition = new (1, 6), Flags = MouseFlags.Button1Clicked });
                 Assert.False (cm.MenuBar!.IsMenuOpen);
                 Application.MainLoop.RunIteration ();
                 Assert.True (actionRaised);
