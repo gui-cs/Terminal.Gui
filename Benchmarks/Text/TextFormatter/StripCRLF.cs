@@ -8,6 +8,7 @@ namespace Terminal.Gui.Benchmarks.Text.TextFormatter;
 /// Benchmarks for <see cref="Tui.TextFormatter.StripCRLF"/> performance fine-tuning.
 /// </summary>
 [MemoryDiagnoser]
+[BenchmarkCategory (nameof (Tui.TextFormatter))]
 public class StripCRLF
 {
     /// <summary>
