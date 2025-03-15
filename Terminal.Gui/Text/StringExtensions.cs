@@ -125,10 +125,8 @@ public static class StringExtensions
     public static string ToString (IEnumerable<Rune> runes)
     {
         const int maxCharsPerRune = 2;
-        // Max stackalloc ~2 kB
-        const int maxStackallocTextBufferSize = 1048;
+        const int maxStackallocTextBufferSize = 1048; // ~2 kB
 
-        Span<char> runeBuffer = stackalloc char[maxCharsPerRune];
         // Use stackalloc buffer if rune count is easily available and the count is reasonable.
         if (runes.TryGetNonEnumeratedCount (out int count))
         {
@@ -144,10 +142,8 @@ public static class StringExtensions
                 Span<char> remainingBuffer = textBuffer;
                 foreach (Rune rune in runes)
                 {
-                    int charsWritten = rune.EncodeToUtf16 (runeBuffer);
-                    ReadOnlySpan<char> runeChars = runeBuffer [..charsWritten];
-                    runeChars.CopyTo (remainingBuffer);
-                    remainingBuffer = remainingBuffer [runeChars.Length..];
+                    int charsWritten = rune.EncodeToUtf16 (remainingBuffer);
+                    remainingBuffer = remainingBuffer [charsWritten..];
                 }
 
                 ReadOnlySpan<char> text = textBuffer[..^remainingBuffer.Length];
@@ -157,6 +153,7 @@ public static class StringExtensions
 
         // Fallback to StringBuilder append.
         StringBuilder stringBuilder = new();
+        Span<char> runeBuffer = stackalloc char[maxCharsPerRune];
         foreach (Rune rune in runes)
         {
             int charsWritten = rune.EncodeToUtf16 (runeBuffer);
