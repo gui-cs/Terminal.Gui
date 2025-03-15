@@ -124,14 +124,16 @@ public static class StringExtensions
     /// <returns></returns>
     public static string ToString (IEnumerable<Rune> runes)
     {
-        var str = string.Empty;
-
+        StringBuilder stringBuilder = new();
+        const int maxCharsPerRune = 2;
+        Span<char> charBuffer = stackalloc char[maxCharsPerRune];
         foreach (Rune rune in runes)
         {
-            str += rune.ToString ();
+            int charsWritten = rune.EncodeToUtf16 (charBuffer);
+            ReadOnlySpan<char> runeChars = charBuffer [..charsWritten];
+            stringBuilder.Append (runeChars);
         }
-
-        return str;
+        return stringBuilder.ToString ();
     }
 
     /// <summary>Converts a byte generic collection into a string in the provided encoding (default is UTF8)</summary>

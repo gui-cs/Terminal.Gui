@@ -77,7 +77,7 @@ public class StripCRLF
             }
         }
 
-        return StringExtensions.ToString (runes);
+        return Tui.StringExtensions.ToString (runes);
     }
 
     public IEnumerable<object []> DataSource ()
