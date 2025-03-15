@@ -124,13 +124,43 @@ public static class StringExtensions
     /// <returns></returns>
     public static string ToString (IEnumerable<Rune> runes)
     {
-        StringBuilder stringBuilder = new();
         const int maxCharsPerRune = 2;
-        Span<char> charBuffer = stackalloc char[maxCharsPerRune];
+        // Max stackalloc ~2 kB
+        const int maxStackallocTextBufferSize = 1048;
+
+        Span<char> runeBuffer = stackalloc char[maxCharsPerRune];
+        // Use stackalloc buffer if rune count is easily available and the count is reasonable.
+        if (runes.TryGetNonEnumeratedCount (out int count))
+        {
+            if (count == 0)
+            {
+                return string.Empty;
+            }
+
+            int maxRequiredTextBufferSize = count * maxCharsPerRune;
+            if (maxRequiredTextBufferSize <= maxStackallocTextBufferSize)
+            {
+                Span<char> textBuffer = stackalloc char[maxRequiredTextBufferSize];
+                Span<char> remainingBuffer = textBuffer;
+                foreach (Rune rune in runes)
+                {
+                    int charsWritten = rune.EncodeToUtf16 (runeBuffer);
+                    ReadOnlySpan<char> runeChars = runeBuffer [..charsWritten];
+                    runeChars.CopyTo (remainingBuffer);
+                    remainingBuffer = remainingBuffer [runeChars.Length..];
+                }
+
+                ReadOnlySpan<char> text = textBuffer[..^remainingBuffer.Length];
+                return text.ToString ();
+            }
+        }
+
+        // Fallback to StringBuilder append.
+        StringBuilder stringBuilder = new();
         foreach (Rune rune in runes)
         {
-            int charsWritten = rune.EncodeToUtf16 (charBuffer);
-            ReadOnlySpan<char> runeChars = charBuffer [..charsWritten];
+            int charsWritten = rune.EncodeToUtf16 (runeBuffer);
+            ReadOnlySpan<char> runeChars = runeBuffer [..charsWritten];
             stringBuilder.Append (runeChars);
         }
         return stringBuilder.ToString ();
