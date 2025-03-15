@@ -2444,24 +2444,44 @@ public class TextFormatter
             return text;
         }
 
-        // Scan 
-        var start = string.Empty;
-        var i = 0;
-
-        foreach (Rune c in text.EnumerateRunes ())
+        const int maxStackallocCharBufferSize = 512; // ~1 kiB
+        char[]? rentedBufferArray = null;
+        try
         {
-            if (c == hotKeySpecifier && i == hotPos)
-            {
-                i++;
+            Span<char> buffer = text.Length <= maxStackallocCharBufferSize
+                ? stackalloc char[text.Length]
+                : (rentedBufferArray = ArrayPool<char>.Shared.Rent(text.Length));
 
-                continue;
+            int i = 0;
+            var remainingBuffer = buffer;
+            foreach (Rune c in text.EnumerateRunes ())
+            {
+                if (c == hotKeySpecifier && i == hotPos)
+                {
+                    i++;
+                    continue;
+                }
+                int charsWritten = c.EncodeToUtf16 (remainingBuffer);
+                remainingBuffer = remainingBuffer [charsWritten..];
+                i++;
             }
 
-            start += c;
-            i++;
-        }
+            ReadOnlySpan<char> newText = buffer [..^remainingBuffer.Length];
+            // If the resulting string would be the same as original then just return the original.
+            if (newText.Equals(text, StringComparison.Ordinal))
+            {
+                return text;
+            }
 
-        return start;
+            return new string (newText);
+        }
+        finally
+        {
+            if (rentedBufferArray != null)
+            {
+                ArrayPool<char>.Shared.Return (rentedBufferArray);
+            }
+        }
     }
 
     #endregion // Static Members
