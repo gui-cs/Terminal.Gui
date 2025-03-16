@@ -219,8 +219,7 @@ Edit
 				View = mCurrent
 			}));
 			Assert.True (menu.IsMenuOpen);
-			Assert.Equal ("_File", miCurrent.Parent.Title);
-			Assert.Equal ("_New", miCurrent.Title);
+			Assert.Null (miCurrent);
 
 			Assert.True (mCurrent.MouseEvent (new MouseEvent () {
 				X = 1,
@@ -229,8 +228,7 @@ Edit
 				View = mCurrent
 			}));
 			Assert.True (menu.IsMenuOpen);
-			Assert.Equal ("_File", miCurrent.Parent.Title);
-			Assert.Equal ("_New", miCurrent.Title);
+			Assert.Null (miCurrent);
 
 			Assert.True (mCurrent.MouseEvent (new MouseEvent () {
 				X = 1,
@@ -239,8 +237,7 @@ Edit
 				View = mCurrent
 			}));
 			Assert.True (menu.IsMenuOpen);
-			Assert.Equal ("_File", miCurrent.Parent.Title);
-			Assert.Equal ("_Save", miCurrent.Title);
+			Assert.Null (miCurrent);
 
 			// close the menu
 			Assert.True (menu.MouseEvent (new MouseEvent () {
@@ -265,8 +262,7 @@ Edit
 
 			Assert.True (mCurrent.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ())));
 			Assert.True (menu.IsMenuOpen);
-			Assert.Equal ("_File", miCurrent.Parent.Title);
-			Assert.Equal ("_New", miCurrent.Title);
+			Assert.Null (miCurrent);
 
 			// close the menu
 			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
