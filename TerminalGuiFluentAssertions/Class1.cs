@@ -8,8 +8,18 @@ using static Unix.Terminal.Curses;
 
 namespace TerminalGuiFluentAssertions;
 
-class FakeInput<T>(CancellationToken hardStopToken)  : IConsoleInput<T>
+class FakeInput<T> : IConsoleInput<T>
 {
+    private readonly CancellationToken _hardStopToken;
+
+    private readonly CancellationTokenSource _timeoutCts;
+    public FakeInput (CancellationToken hardStopToken)
+    {
+        _hardStopToken = hardStopToken;
+
+        // Create a timeout-based cancellation token too to prevent tests ever fully hanging
+        _timeoutCts = new (With.Timeout);
+    }
     /// <inheritdoc />
     public void Dispose () { }
 
@@ -22,7 +32,7 @@ class FakeInput<T>(CancellationToken hardStopToken)  : IConsoleInput<T>
     public void Run (CancellationToken token)
     {
         // Blocks until either the token or the hardStopToken is cancelled.
-        WaitHandle.WaitAny (new [] { token.WaitHandle, hardStopToken.WaitHandle });
+        WaitHandle.WaitAny (new [] { token.WaitHandle, _hardStopToken.WaitHandle, _timeoutCts.Token.WaitHandle });
     }
 }
 
@@ -92,13 +102,18 @@ public static class With
     /// <returns></returns>
     public static GuiTestContext<T> A<T> (int width, int height) where T : Toplevel, new ()
     {
-        return new GuiTestContext<T> (width,height);
+        return new (width,height);
     }
+
+    /// <summary>
+    /// The global timeout to allow for any given application to run for before shutting down.
+    /// </summary>
+    public static TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds (30);
 }
 public class GuiTestContext<T> : IDisposable where T : Toplevel, new()
 {
     private readonly CancellationTokenSource _cts = new ();
-    private readonly CancellationTokenSource _hardStop = new ();
+    private readonly CancellationTokenSource _hardStop = new (With.Timeout);
     private readonly Task _runTask;
     private Exception _ex;
     private readonly FakeOutput _output = new ();
@@ -120,6 +135,7 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new()
                                     () => winInput,
                                     () => _output);
 
+        var booting = new SemaphoreSlim (0, 1);
 
         // Start the application in a background thread
         _runTask = Task.Run (() =>
@@ -129,6 +145,8 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new()
                                      ApplicationImpl.ChangeInstance (v2);
 
                                      v2.Init (null,"v2win");
+
+                                     booting.Release ();
 
                                      Application.Run<T> (); // This will block, but it's on a background thread now
 
@@ -145,6 +163,12 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new()
                                      ApplicationImpl.ChangeInstance (origApp);
                                  }
                              }, _cts.Token);
+
+        // Wait for booting to complete with a timeout to avoid hangs
+        if (!booting.WaitAsync (TimeSpan.FromSeconds (5)).Result)
+        {
+            throw new TimeoutException ("Application failed to start within the allotted time.");
+        }
 
         WaitIteration ();
     }
@@ -183,6 +207,12 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new()
     public void Dispose ()
     {
         Stop ();
+
+        if (_hardStop.IsCancellationRequested)
+        {
+            throw new Exception (
+                                 "Application was hard stopped, typically this means it timed out or did not shutdown gracefully. Ensure you call Stop in your test");
+        }
         _hardStop.Cancel();
     }
 

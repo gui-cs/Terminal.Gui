@@ -77,11 +77,7 @@ public class BasicFluentAssertionTests
                           .RightClick(1,1)
                           .ScreenShot ("After open menu",_out)
                           .LeftClick (3, 3)
-                          /*.Assert (Application.Top.Focused.Should ().BeAssignableTo(typeof(MenuBarItem)))
-                          .Down()
-                          .Enter()*/
                           .Stop ();
         Assert.True (clicked);
-
     }
 }
