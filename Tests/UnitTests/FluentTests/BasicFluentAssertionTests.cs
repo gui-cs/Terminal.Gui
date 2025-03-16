@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FluentAssertions;
 using TerminalGuiFluentAssertions;
 
 namespace UnitTests.FluentTests;
@@ -11,25 +12,31 @@ public class BasicFluentAssertionTests
     [Fact]
     public void GuiTestContext_StartsAndStopsWithoutError ()
     {
-        var context = With.A<Window> (40, 10);
+        using var context = With.A<Window> (40, 10);
 
         // No actual assertions are needed — if no exceptions are thrown, it's working
         context.Stop ();
     }
 
     [Fact]
-    public void Test ()
+    public void GuiTestContext_ForgotToStop ()
     {
-        var myView = new TextField () { Width = 10 };
+        using var context = With.A<Window> (40, 10);
+    }
 
+    [Fact]
+    public void TestWindowsResize ()
+    {
+        var lbl = new Label ()
+                                {
+                                    Width = Dim.Fill ()
+                                };
+        using var c = With.A<Window> (40, 10)
+                          .Add (lbl )
+                          .Assert (lbl.Frame.Width.Should().Be(40))
+                          .ResizeConsole (20,20)
+                          .Assert (lbl.Frame.Width.Should ().Be (20))
+                          .Stop ();
 
-
-        /*
-        using var ctx = With.A<Window> (20, 10)
-                            .Add (myView, 3, 2)
-                            .Focus (myView)
-                            .Type ("Hello");
-
-        Assert.Equal ("Hello", myView.Text);*/
     }
 }

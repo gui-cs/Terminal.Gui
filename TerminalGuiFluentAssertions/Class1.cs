@@ -1,10 +1,12 @@
 ﻿using System.Collections.Concurrent;
 using System.Drawing;
+using FluentAssertions;
+using FluentAssertions.Numeric;
 using Terminal.Gui;
 
 namespace TerminalGuiFluentAssertions;
 
-class FakeInput<T> : IConsoleInput<T>
+class FakeInput<T>(CancellationToken hardStopToken)  : IConsoleInput<T>
 {
     /// <inheritdoc />
     public void Dispose () { }
@@ -15,17 +17,17 @@ class FakeInput<T> : IConsoleInput<T>
     /// <inheritdoc />
     public void Run (CancellationToken token)
     {
-        // Simulate an infinite loop that checks for cancellation
-        token.WaitHandle.WaitOne (); // Blocks until the token is cancelled
+        // Blocks until either the token or the hardStopToken is cancelled.
+        WaitHandle.WaitAny (new [] { token.WaitHandle, hardStopToken.WaitHandle });
     }
 }
 
-class FakeNetInput : FakeInput<ConsoleKeyInfo>, INetInput
+class FakeNetInput (CancellationToken hardStopToken) : FakeInput<ConsoleKeyInfo> (hardStopToken), INetInput
 {
 
 }
 
-class FakeWindowsInput : FakeInput<WindowsConsole.InputRecord>, IWindowsInput
+class FakeWindowsInput (CancellationToken hardStopToken) : FakeInput<WindowsConsole.InputRecord> (hardStopToken), IWindowsInput
 {
 
 }
@@ -87,29 +89,29 @@ public static class With
         return new GuiTestContext<T> (width,height);
     }
 }
-public class GuiTestContext<T> where T : Toplevel, new()
+public class GuiTestContext<T> : IDisposable where T : Toplevel, new()
 {
-    private readonly CancellationTokenSource _cts;
+    private readonly CancellationTokenSource _cts = new ();
+    private readonly CancellationTokenSource _hardStop = new ();
     private readonly Task _runTask;
+    private Exception _ex;
+    private readonly FakeOutput _output = new ();
 
     internal GuiTestContext (int width, int height)
     {
         IApplication origApp = ApplicationImpl.Instance;
 
-        var netInput = new FakeNetInput ();
-        var winInput = new FakeWindowsInput ();
-        var output = new FakeOutput ();
+        var netInput = new FakeNetInput (_cts.Token);
+        var winInput = new FakeWindowsInput (_cts.Token);
 
-        output.Size = new (width, height);
+        _output.Size = new (width, height);
 
         var v2 = new ApplicationV2(
                                     () => netInput,
-                                    ()=>output,
+                                    ()=>_output,
                                     () => winInput,
-                                    () => output);
+                                    () => _output);
 
-        // Create a cancellation token
-        _cts = new ();
 
         // Start the application in a background thread
         _runTask = Task.Run (() =>
@@ -125,31 +127,90 @@ public class GuiTestContext<T> where T : Toplevel, new()
                                      Application.Shutdown ();
                                  }
                                  catch (OperationCanceledException)
+                                 { }
+                                 catch (Exception ex)
                                  {
-
+                                     _ex = ex;
                                  }
                                  finally
                                  {
                                      ApplicationImpl.ChangeInstance (origApp);
                                  }
                              }, _cts.Token);
-
-        Application.Shutdown ();
     }
 
     /// <summary>
     /// Stops the application and waits for the background thread to exit.
     /// </summary>
-    public void Stop ()
+    public GuiTestContext<T> Stop ()
     {
+        if (_runTask.IsCompleted)
+        {
+            return this;
+        }
+
+        Application.Invoke (()=> Application.RequestStop ());
+
+        // Wait for the application to stop, but give it a 1-second timeout
+        if (!_runTask.Wait (TimeSpan.FromMilliseconds (1000)))
+        {
+            _cts.Cancel ();
+            // Timeout occurred, force the task to stop
+            _hardStop.Cancel ();
+            throw new TimeoutException ("Application failed to stop within the allotted time.");
+        }
         _cts.Cancel ();
-        Application.Invoke (()=>Application.RequestStop());
-        _runTask.Wait (); // Ensure the background thread exits
+
+        if (_ex != null)
+        {
+            throw _ex; // Propagate any exception that happened in the background task
+        }
+
+        return this;
     }
 
     // Cleanup to avoid state bleed between tests
     public void Dispose ()
     {
+        Stop ();
+        _hardStop.Cancel();
+    }
+
+    /// <summary>
+    /// Adds the given <paramref name="v"/> to the current top level view
+    /// and performs layout.
+    /// </summary>
+    /// <param name="v"></param>
+    /// <returns></returns>
+    public GuiTestContext<T> Add (View v)
+    {
+        Application.Invoke (
+                            () =>
+                            {
+                                var top = Application.Top ?? throw new Exception("Top was null so could not add view");
+                                top.Add (v);
+                                top.Layout ();
+                            });
+
+        return this;
+    }
+
+    public GuiTestContext<T> ResizeConsole (int width, int height)
+    {
+        _output.Size = new Size (width,height);
+
+        return WaitIteration ();
+    }
+    public GuiTestContext<T> WaitIteration ()
+    {
+        Application.Invoke (() => { });
+
+        return this;
+    }
+
+    public GuiTestContext<T> Assert<T2> (AndConstraint<T2> be)
+    {
+        return this;
     }
 }
 
