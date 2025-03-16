@@ -49,9 +49,9 @@ public class BasicFluentAssertionTests
                                 };
         using var c = With.A<Window> (40, 10)
                           .Add (lbl )
-                          .Then (()=>Assert.Same(lbl.Frame.Width,38)) // Window has 2 border
+                          .Then (()=>Assert.Equal(lbl.Frame.Width,38)) // Window has 2 border
                           .ResizeConsole (20,20)
-                          .Then (() => Assert.Same (lbl.Frame.Width, 18))
+                          .Then (() => Assert.Equal(lbl.Frame.Width, 18))
                           .Stop ();
     }
 
