@@ -1,4 +1,4 @@
-name: Publish Terminal.Gui
+name: Publish Terminal.Gui v1
 
 on:
   push:
