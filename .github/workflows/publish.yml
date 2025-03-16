@@ -2,7 +2,7 @@ name: Publish Terminal.Gui
 
 on:
   push:
-    branches: [ v1_release, v1_develop, v2_release, v2_develop ]
+    branches: [ v1_release, v1_develop ]
     tags:
       - v*
     paths-ignore:
@@ -18,17 +18,16 @@ jobs:
       with:
         fetch-depth: 0 # fetch-depth is needed for GitVersion
 
-    - name: Install GitVersion 
-      uses: gittools/actions/gitversion/setup@v1
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v3.1.11
       with:
-          versionSpec: '5.x'
-          includePrerelease: true
+        versionSpec: '6.0.x'
 
     - name: Determine Version
-      uses: gittools/actions/gitversion/execute@v1
+      uses: gittools/actions/gitversion/execute@v3.1.11
       with:
         useConfigFile: true
-        #additionalArguments: /b develop
+        updateAssemblyInfo: true
       id: gitversion # step id used as reference for output values
 
     - name: Setup dotnet
@@ -42,11 +41,11 @@ jobs:
 
     - name: Build Release
       run: |
-        dotnet-gitversion /updateprojectfiles
-        dotnet build --no-restore -c Release
+        dotnet build Terminal.Gui/Terminal.Gui.csproj --no-incremental --nologo --force --configuration Release
+        dotnet test Terminal.Gui/Terminal.Gui.csproj --configuration Release
 
     - name: Pack
-      run: dotnet pack -c Release --include-symbols -p:Version='${{ steps.gitversion.outputs.SemVer }}' 
+      run: dotnet pack Terminal.Gui/Terminal.Gui.csproj -c Release --include-symbols -p:Version='${{ steps.gitversion.outputs.SemVer }}' 
 
     # - name: Test to generate Code Coverage Report
     #   run: |
