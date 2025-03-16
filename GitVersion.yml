@@ -32,7 +32,7 @@ branches:
     # Matches the v1_release branch
     regex: ^v1_release$
     # Uses 'prealpha' as pre-release label before official release
-    label: 1.0.0-prealpha.1
+    label: ''
     # Increments patch version (x.y.z+1) on commits
     increment: Patch
     # Specifies v1_develop as the source branch
