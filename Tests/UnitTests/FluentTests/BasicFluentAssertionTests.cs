@@ -33,9 +33,9 @@ public class BasicFluentAssertionTests
                                 };
         using var c = With.A<Window> (40, 10)
                           .Add (lbl )
-                          .Assert (lbl.Frame.Width.Should().Be(40))
+                          .Assert (lbl.Frame.Width.Should().Be(38)) // Window has 2 border
                           .ResizeConsole (20,20)
-                          .Assert (lbl.Frame.Width.Should ().Be (20))
+                          .Assert (lbl.Frame.Width.Should ().Be (18))
                           .Stop ();
 
     }

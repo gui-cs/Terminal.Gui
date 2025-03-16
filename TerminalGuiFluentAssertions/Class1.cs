@@ -184,13 +184,13 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new()
     /// <returns></returns>
     public GuiTestContext<T> Add (View v)
     {
-        Application.Invoke (
-                            () =>
-                            {
-                                var top = Application.Top ?? throw new Exception("Top was null so could not add view");
-                                top.Add (v);
-                                top.Layout ();
-                            });
+        WaitIteration (
+                       () =>
+                       {
+                           var top = Application.Top ?? throw new Exception("Top was null so could not add view");
+                           top.Add (v);
+                           top.Layout ();
+                       });
 
         return this;
     }
@@ -201,10 +201,25 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new()
 
         return WaitIteration ();
     }
-    public GuiTestContext<T> WaitIteration ()
+    public GuiTestContext<T> WaitIteration (Action? a = null)
     {
-        Application.Invoke (() => { });
+        a ??= () => { };
+        var ctsLocal = new CancellationTokenSource ();
 
+
+        Application.Invoke (()=>
+                            {
+                                a();
+                                ctsLocal.Cancel ();
+                            });
+
+        // Blocks until either the token or the hardStopToken is cancelled.
+        WaitHandle.WaitAny (new []
+        {
+            _cts.Token.WaitHandle,
+            _hardStop.Token.WaitHandle,
+            ctsLocal.Token.WaitHandle
+        });
         return this;
     }
 
