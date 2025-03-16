@@ -97,7 +97,7 @@ namespace Terminal.Gui {
 			this.mainLoop = mainLoop;
 			pipe (wakeupPipes);
 			AddWatch (wakeupPipes [0], Condition.PollIn, ml => {
-				read (wakeupPipes [1], ignore, (IntPtr)1);
+				read (wakeupPipes [0], ignore, (IntPtr)1);
 				return true;
 			});
 		}
