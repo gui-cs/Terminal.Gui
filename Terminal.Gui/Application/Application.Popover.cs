@@ -17,5 +17,5 @@ public static partial class Application // Popover handling
     ///         If the user clicks anywhere not occulded by a SubView of the PopoverHost, the PopoverHost will be hidden.
     ///     </para>
     /// </remarks>
-    public static PopoverHost? PopoverHost { get; internal set; }
+    public static PopoverHost? PopoverHost { get; set; }
 }

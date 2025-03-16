@@ -53,6 +53,7 @@ public class MenuItemv2 : Shortcut
         {
             // TODO: This is a temporary hack - add a flag or something instead
             KeyView.Text = $"{Glyphs.RightArrow}";
+            subMenu.SuperMenuItem = this;
         }
 
         SubMenu = subMenu;

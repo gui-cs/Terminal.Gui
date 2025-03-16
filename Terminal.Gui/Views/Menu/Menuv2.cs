@@ -21,7 +21,10 @@ public class Menuv2 : Bar
         Height = Dim.Auto (DimAutoStyle.Content, 1);
         Initialized += Menuv2_Initialized;
         VisibleChanged += OnVisibleChanged;
+
     }
+
+    public MenuItemv2 SuperMenuItem { get; set; }
 
     private void OnVisibleChanged (object? sender, EventArgs e)
     {
@@ -150,7 +153,7 @@ public class Menuv2 : Bar
     {
         //Logging.Trace ($"RaiseSelectedMenuItemChanged: {selected?.Title}");
 
-        ShowSubMenu (selected);
+        //ShowSubMenu (selected);
         OnSelectedMenuItemChanged (selected);
 
         SelectedMenuItemChanged?.Invoke (this, selected);
@@ -169,23 +172,4 @@ public class Menuv2 : Bar
     /// </summary>
     public event EventHandler<MenuItemv2?>? SelectedMenuItemChanged;
 
-    public void ShowSubMenu (MenuItemv2? menuItem)
-    {
-        // Hide any other submenus that might be visible
-        foreach (MenuItemv2 mi in SubViews.Where (v => v is MenuItemv2 { SubMenu.Visible: true }).Cast<MenuItemv2> ())
-        {
-            mi.ForceFocusColors = false;
-            mi.SubMenu!.Visible = false;
-            SuperView?.Remove (mi.SubMenu);
-        }
-
-        if (menuItem is { SubMenu: {} })
-        {
-            SuperView?.Add (menuItem.SubMenu);
-            menuItem.SubMenu.X = Frame.X + Frame.Width;
-            menuItem.SubMenu.Y = Frame.Y + menuItem.Frame.Y;
-            menuItem.SubMenu.Visible = true;
-            menuItem.ForceFocusColors = true;
-        }
-    }
 }

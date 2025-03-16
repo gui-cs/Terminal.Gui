@@ -604,7 +604,7 @@ public partial class View // Keyboard APIs
         }
 
         // Now, process any HotKey bindings in the subviews
-        foreach (View subview in InternalSubViews)
+        foreach (View subview in InternalSubViews.ToList())
         {
             if (subview == Focused)
             {

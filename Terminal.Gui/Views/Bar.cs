@@ -32,58 +32,6 @@ public class Bar : View, IOrientation, IDesignable
         // Initialized += Bar_Initialized;
         MouseEvent += OnMouseEvent;
 
-        AddCommand (Command.Right, MoveRight);
-
-        bool? MoveRight (ICommandContext? ctx)
-        {
-            if (Orientation == Orientation.Vertical)
-            {
-                return false;
-            }
-
-            return AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
-        }
-
-        AddCommand (Command.Left, MoveLeft);
-
-        bool? MoveLeft (ICommandContext? ctx)
-        {
-            if (Orientation == Orientation.Vertical)
-            {
-                return false;
-            }
-
-            return AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
-        }
-
-        AddCommand (Command.Down, MoveDown);
-
-        bool? MoveDown (ICommandContext? ctx)
-        {
-            if (Orientation == Orientation.Horizontal)
-            {
-                return false;
-            }
-
-            return AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
-        }
-
-        AddCommand (Command.Up, MoveUp);
-
-        bool? MoveUp (ICommandContext? ctx)
-        {
-            if (Orientation == Orientation.Horizontal)
-            {
-                return false;
-            }
-
-            return AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
-        }
-
-        KeyBindings.Add (Key.CursorRight, Command.Right);
-        KeyBindings.Add (Key.CursorDown, Command.Down);
-        KeyBindings.Add (Key.CursorLeft, Command.Left);
-        KeyBindings.Add (Key.CursorUp, Command.Up);
 
         if (shortcuts is { })
         {

@@ -1048,7 +1048,7 @@ public partial class View // Layout APIs
         int maxDimension;
         View? superView;
 
-        if (viewToMove is not Toplevel || viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
+        if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
         {
             maxDimension = Application.Screen.Width;
             superView = Application.Top;
@@ -1077,7 +1077,7 @@ public partial class View // Layout APIs
         }
         else
         {
-            nx = targetX;
+            nx = 0;//targetX;
         }
 
         //System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
@@ -1141,10 +1141,14 @@ public partial class View // Layout APIs
                 ny = Math.Max (viewToMove.Frame.Bottom, 0);
             }
         }
+        else
+        {
+            ny = 0;
+        }
 
-        //System.Diagnostics.Debug.WriteLine ($"ny:{ny}, rHeight:{rHeight}");
+            //System.Diagnostics.Debug.WriteLine ($"ny:{ny}, rHeight:{rHeight}");
 
-        return superView!;
+            return superView!;
     }
 
     #endregion Utilities

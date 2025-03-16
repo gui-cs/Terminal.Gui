@@ -1,4 +1,6 @@
 ﻿#nullable enable
+using Microsoft.CodeAnalysis;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -28,6 +30,63 @@ public class PopoverMenu : View
 
         Root = root;
 
+        AddCommand (Command.Right, MoveRight);
+        bool? MoveRight (ICommandContext? ctx)
+        {
+            MenuItemv2? focused = MostFocused as MenuItemv2;
+
+            if (focused is { SubMenu.Visible: true })
+            {
+                focused.SubMenu.SetFocus ();
+
+                return true;
+            }
+
+            return AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        }
+        KeyBindings.Add (Key.CursorRight, Command.Right);
+
+        AddCommand (Command.Left, MoveLeft);
+        bool? MoveLeft (ICommandContext? ctx)
+        {
+            if (MostFocused is MenuItemv2 { SuperView: Menuv2 focusedMenu })
+            {
+                focusedMenu.SuperMenuItem?.SetFocus ();
+
+                return true;
+            }
+            return AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
+        }
+        KeyBindings.Add (Key.CursorLeft, Command.Left);
+
+        //AddCommand (Command.Down, MoveDown);
+
+        //bool? MoveDown (ICommandContext? ctx)
+        //{
+        //    if (Orientation == Orientation.Horizontal)
+        //    {
+        //        return false;
+        //    }
+
+        //    return AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        //}
+
+        //AddCommand (Command.Up, MoveUp);
+
+        //bool? MoveUp (ICommandContext? ctx)
+        //{
+        //    if (Orientation == Orientation.Horizontal)
+        //    {
+        //        return false;
+        //    }
+
+        //    return AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
+        //}
+
+
+        //KeyBindings.Add (Key.CursorDown, Command.Down);
+        //KeyBindings.Add (Key.CursorUp, Command.Up);
+
     }
 
     private Menuv2? _root;
@@ -50,6 +109,7 @@ public class PopoverMenu : View
                 base.Remove (_root);
                 _root.Accepting -= RootOnAccepting;
                 _root.MenuItemCommandInvoked -= RootOnMenuItemCommandInvoked;
+                _root.SelectedMenuItemChanged -= RootOnSelectedMenuItemChanged;
             }
 
             _root = value;
@@ -59,6 +119,9 @@ public class PopoverMenu : View
                 base.Add (_root);
                 _root.Accepting += RootOnAccepting;
                 _root.MenuItemCommandInvoked += RootOnMenuItemCommandInvoked;
+                _root.SelectedMenuItemChanged += RootOnSelectedMenuItemChanged;
+
+
             }
 
             return;
@@ -72,6 +135,55 @@ public class PopoverMenu : View
             {
                 Logging.Trace ($"RootOnAccepting: {e.Context}");
             }
+
+            void RootOnSelectedMenuItemChanged (object? sender, MenuItemv2? e)
+            {
+                Logging.Trace ($"RootOnSelectedMenuItemChanged: {e.Title}");
+                ShowSubMenu (e);
+            }
+
         }
     }
+    public void ShowSubMenu (MenuItemv2? menuItem)
+    {
+        // Hide any other submenus that might be visible
+        foreach (MenuItemv2 mi in menuItem.SuperView.SubViews.Where (v => v is MenuItemv2 { SubMenu.Visible: true }).Cast<MenuItemv2> ())
+        {
+            mi.ForceFocusColors = false;
+            mi.SubMenu!.Visible = false;
+            Remove (mi.SubMenu);
+        }
+
+        if (menuItem is { SubMenu: { Visible: false } })
+        {
+            Add (menuItem.SubMenu);
+            Point pos =  GetMostVisibleLocationForSubMenu (menuItem);
+            menuItem.SubMenu.X = pos.X;
+            menuItem.SubMenu.Y = pos.Y;
+
+            menuItem.SubMenu.Visible = true;
+            menuItem.ForceFocusColors = true;
+        }
+    }
+
+    /// <summary>
+    ///     Given a <see cref="MenuItemv2"/>, returns the most visible location for the submenu.
+    ///     The location is relative to the Frame.
+    /// </summary>
+    /// <param name="menuItem"></param>
+    /// <returns></returns>
+    internal Point GetMostVisibleLocationForSubMenu (MenuItemv2 menuItem)
+    {
+        Point pos = Point.Empty;
+
+        // Calculate the initial position to the right of the menu item
+        pos.X = menuItem.SuperView!.Frame.X + menuItem.Frame.Width;
+        pos.Y = menuItem.SuperView.Frame.Y + menuItem.Frame.Y;
+
+        GetLocationEnsuringFullVisibility (menuItem.SubMenu, pos.X, pos.Y, out int nx, out int ny);
+
+
+        return new (nx,ny);
+    }
+
 }

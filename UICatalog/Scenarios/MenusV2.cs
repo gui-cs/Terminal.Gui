@@ -41,8 +41,10 @@ public class MenusV2 : Scenario
             Id = "frame",
             Title = "Cascading Menu...",
 
-            Width = Dim.Fill ()! - Dim.Width (eventLog),
-            Height = Dim.Fill (),
+            X = 4,
+            Y = 4,
+            Width = Dim.Fill (8)! - Dim.Width (eventLog),
+            Height = Dim.Fill (8),
             BorderStyle = LineStyle.Dotted
         };
         app.Add (frame);
@@ -53,15 +55,25 @@ public class MenusV2 : Scenario
         };
         ConfigureRootMenu (frame, rootMenu);
 
-        var subMenu = new Menuv2
+        var optionsSubMenu = new Menuv2
         {
-            Id = "subMenu",
+            Id = "optionsSubMenu",
             Visible = false
         };
-        ConfigureSubMenu1 (frame, subMenu);
+        ConfigureOptionsSubMenu (frame, optionsSubMenu);
 
-        var cascadeShortcut = new MenuItemv2 (frame, Command.Accept, "_Options", "File options", subMenu);
-        rootMenu.Add (cascadeShortcut);
+        var optionsSubMenuItem = new MenuItemv2 (frame, Command.Accept, "O_ptions", "File options", optionsSubMenu);
+        rootMenu.Add (optionsSubMenuItem);
+
+        var detailsSubMenu = new Menuv2
+        {
+            Id = "detailsSubMenu",
+            Visible = false
+        };
+        ConfigureDetialsSubMenu (frame, detailsSubMenu);
+
+        var detailsSubMenuItem = new MenuItemv2 (frame, Command.Accept, "_Details", "File details", detailsSubMenu);
+        rootMenu.Add (detailsSubMenuItem);
 
         var popoverMenu = new PopoverMenu (rootMenu)
         {
@@ -219,12 +231,54 @@ public class MenusV2 : Scenario
     }
 
 
-    private void ConfigureSubMenu1 (View targetView, Menuv2 menu)
+    private void ConfigureOptionsSubMenu (View targetView, Menuv2 menu)
     {
         var shortcut2 = new MenuItemv2
         {
-            Title = "Za_G",
-            Text = "Gonna zag",
+            Title = "_Option 1",
+            Text = "Some option #1",
+            Key = Key.G.WithAlt
+        };
+
+        var shortcut3 = new MenuItemv2
+        {
+            Title = "_Three",
+            Text = "The 3rd item",
+            Key = Key.T.WithAlt
+        };
+
+        var line = new Line
+        {
+            X = -1,
+            Width = Dim.Fill ()! + 1
+        };
+
+        var shortcut4 = new MenuItemv2
+        {
+            Title = "_Four",
+            Text = "Below the line",
+            Key = Key.D7.WithAlt
+        };
+
+        shortcut4.CommandView = new CheckBox
+        {
+            Title = shortcut4.Title,
+            HighlightStyle = HighlightStyle.None,
+            CanFocus = false
+        };
+
+        // This ensures the checkbox state toggles when the hotkey of Title is pressed.
+        //shortcut4.Accepting += (sender, args) => args.Cancel = true;
+
+        menu.Add (shortcut2, shortcut3, line, shortcut4);
+    }
+
+    private void ConfigureDetialsSubMenu (View targetView, Menuv2 menu)
+    {
+        var shortcut2 = new MenuItemv2
+        {
+            Title = "_Detail 1",
+            Text = "Some detail #1",
             Key = Key.G.WithAlt
         };
 
@@ -245,7 +299,7 @@ public class MenusV2 : Scenario
         {
             Title = "_Four",
             Text = "Below the line",
-            Key = Key.D3.WithAlt
+            Key = Key.D8.WithAlt
         };
 
         shortcut4.CommandView = new CheckBox
