@@ -9,27 +9,34 @@ on:
     branches: [ v1_release, v1_develop ]
     paths-ignore:
       - '**.md'
-      
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  non_parallel_unittests:
+    name: Non-Parallel Unit Tests  
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # Turn off fail-fast to let all runners run even if there are errors
+      fail-fast: true
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+
     timeout-minutes: 10
     steps:
-    - uses: actions/checkout@v4
+
+    - name: Checkout code
+      uses: actions/checkout@v4
 
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 7.0
+        dotnet-version: 8.x
         dotnet-quality: 'ga'
 
     - name: Install dependencies
       run: |
         dotnet restore
 
-    - name: Build Debug
-      run: |
-        dotnet build --configuration Debug --no-restore
+    - name: Build Solution Debug
+      run: dotnet build --configuration Debug --no-restore
         
     - name: Test
       run: |
