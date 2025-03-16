@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
-using TerminalGuiFluentAssertions;
+using TerminalGuiFluentTesting;
 using Xunit.Abstractions;
 
 namespace UnitTests.FluentTests;
