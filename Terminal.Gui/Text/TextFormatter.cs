@@ -2444,7 +2444,7 @@ public class TextFormatter
             return text;
         }
 
-        const int maxStackallocCharBufferSize = 512; // ~1 kiB
+        const int maxStackallocCharBufferSize = 512; // ~1 kB
         char[]? rentedBufferArray = null;
         try
         {
