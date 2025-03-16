@@ -743,6 +743,11 @@ public class MenuBar : View, IDesignable
                     return;
                 }
 
+                if (_selected == -1)
+                {
+                    return;
+                }
+
                 OpenMenu (_selected);
 
                 SelectEnabledItem (
@@ -980,6 +985,11 @@ public class MenuBar : View, IDesignable
                 }
 
                 if (_selected > -1 && !CloseMenu (true, false, ignoreUseSubMenusSingleFrame))
+                {
+                    return;
+                }
+
+                if (_selected == -1)
                 {
                     return;
                 }

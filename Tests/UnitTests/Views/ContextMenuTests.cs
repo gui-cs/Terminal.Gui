@@ -2105,4 +2105,34 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         top.Dispose ();
     }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Menu_Without_SubMenu_Is_Closed_When_Pressing_Key_Right_Or_Key_Left ()
+    {
+        var cm = new ContextMenu ();
+
+        var menuItems = new MenuBarItem (
+                                         [
+                                             new ("_New", string.Empty, null),
+                                             new ("_Save", string.Empty, null)
+                                         ]
+                                        );
+        var top = new Toplevel ();
+        Application.Begin (top);
+
+        cm.Show (menuItems);
+        Assert.True (cm.MenuBar!.IsMenuOpen);
+
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorRight));
+        Assert.False (cm.MenuBar!.IsMenuOpen);
+
+        cm.Show (menuItems);
+        Assert.True (cm.MenuBar!.IsMenuOpen);
+
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorLeft));
+        Assert.False (cm.MenuBar!.IsMenuOpen);
+
+        top.Dispose ();
+    }
 }
