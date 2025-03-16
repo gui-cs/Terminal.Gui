@@ -37,6 +37,30 @@ public class BasicFluentAssertionTests
                           .ResizeConsole (20,20)
                           .Assert (lbl.Frame.Width.Should ().Be (18))
                           .Stop ();
+    }
+
+    [Fact]
+    public void ContextMenu_CrashesOnRight ()
+    {
+        var clicked = false;
+
+        var ctx = new ContextMenu ();
+        var menuItems = new MenuBarItem (
+                                         [
+                                             new ("_New File", string.Empty, () => { clicked = true; })
+                                         ]
+                                        );
+
+        using var c = With.A<Window> (40, 10)
+                          .WithContextMenu(ctx,menuItems)
+                          // Click in main area inside border
+                          .RightClick(1,1)
+                          .LeftClick (2, 2)
+                          /*.Assert (Application.Top.Focused.Should ().BeAssignableTo(typeof(MenuBarItem)))
+                          .Down()
+                          .Enter()*/
+                          .Stop ();
+        Assert.True (clicked);
 
     }
 }

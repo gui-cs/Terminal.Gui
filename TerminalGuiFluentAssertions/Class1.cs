@@ -3,6 +3,8 @@ using System.Drawing;
 using FluentAssertions;
 using FluentAssertions.Numeric;
 using Terminal.Gui;
+using Terminal.Gui.ConsoleDrivers;
+using static Unix.Terminal.Curses;
 
 namespace TerminalGuiFluentAssertions;
 
@@ -12,7 +14,9 @@ class FakeInput<T>(CancellationToken hardStopToken)  : IConsoleInput<T>
     public void Dispose () { }
 
     /// <inheritdoc />
-    public void Initialize (ConcurrentQueue<T> inputBuffer) { }
+    public void Initialize (ConcurrentQueue<T> inputBuffer) { InputBuffer = inputBuffer;}
+
+    public ConcurrentQueue<T> InputBuffer { get; set; }
 
     /// <inheritdoc />
     public void Run (CancellationToken token)
@@ -96,13 +100,15 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new()
     private readonly Task _runTask;
     private Exception _ex;
     private readonly FakeOutput _output = new ();
+    private readonly FakeWindowsInput winInput;
+    private View _lastView;
 
     internal GuiTestContext (int width, int height)
     {
         IApplication origApp = ApplicationImpl.Instance;
 
         var netInput = new FakeNetInput (_cts.Token);
-        var winInput = new FakeWindowsInput (_cts.Token);
+        winInput = new FakeWindowsInput (_cts.Token);
 
         _output.Size = new (width, height);
 
@@ -120,7 +126,7 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new()
                                  {
                                      ApplicationImpl.ChangeInstance (v2);
 
-                                     v2.Init ();
+                                     v2.Init (null,"v2win");
 
                                      Application.Run<T> (); // This will block, but it's on a background thread now
 
@@ -137,6 +143,8 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new()
                                      ApplicationImpl.ChangeInstance (origApp);
                                  }
                              }, _cts.Token);
+
+        WaitIteration ();
     }
 
     /// <summary>
@@ -190,6 +198,7 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new()
                            var top = Application.Top ?? throw new Exception("Top was null so could not add view");
                            top.Add (v);
                            top.Layout ();
+                           _lastView = v;
                        });
 
         return this;
@@ -227,5 +236,128 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new()
     {
         return this;
     }
+
+    public GuiTestContext<T> RightClick (int screenX, int screenY)
+    {
+        return Click (WindowsConsole.ButtonState.Button3Pressed,screenX, screenY);
+    }
+
+    public GuiTestContext<T> LeftClick (int screenX, int screenY)
+    {
+        return Click (WindowsConsole.ButtonState.Button1Pressed, screenX, screenY);
+    }
+
+    private GuiTestContext<T> Click (WindowsConsole.ButtonState btn, int screenX, int screenY)
+    {
+        winInput.InputBuffer.Enqueue (new WindowsConsole.InputRecord ()
+        {
+            EventType = WindowsConsole.EventType.Mouse,
+            MouseEvent = new WindowsConsole.MouseEventRecord ()
+            {
+                ButtonState = btn,
+                MousePosition = new WindowsConsole.Coord ((short)screenX, (short)screenY)
+            }
+        });
+
+        winInput.InputBuffer.Enqueue (new WindowsConsole.InputRecord ()
+        {
+            EventType = WindowsConsole.EventType.Mouse,
+            MouseEvent = new WindowsConsole.MouseEventRecord ()
+            {
+                ButtonState = WindowsConsole.ButtonState.NoButtonPressed,
+                MousePosition = new WindowsConsole.Coord ((short)screenX, (short)screenY)
+            }
+        });
+
+        WaitIteration ();
+
+        return this;
+    }
+
+    public GuiTestContext<T> Down ()
+    {
+        winInput.InputBuffer.Enqueue (new WindowsConsole.InputRecord ()
+        {
+            EventType = WindowsConsole.EventType.Key,
+            KeyEvent = new WindowsConsole.KeyEventRecord
+            {
+                bKeyDown = true,
+                wRepeatCount = 0,
+                wVirtualKeyCode = ConsoleKeyMapping.VK.DOWN,
+                wVirtualScanCode = 0,
+                UnicodeChar = '\0',
+                dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed
+            }
+        });
+
+        winInput.InputBuffer.Enqueue (new WindowsConsole.InputRecord ()
+        {
+            EventType = WindowsConsole.EventType.Key,
+            KeyEvent = new WindowsConsole.KeyEventRecord
+            {
+                bKeyDown = false,
+                wRepeatCount = 0,
+                wVirtualKeyCode = ConsoleKeyMapping.VK.DOWN,
+                wVirtualScanCode = 0,
+                UnicodeChar = '\0',
+                dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed
+            }
+        });
+
+
+        WaitIteration ();
+
+        return this;
+    }
+    public GuiTestContext<T> Enter ()
+    {
+        winInput.InputBuffer.Enqueue (new WindowsConsole.InputRecord ()
+        {
+            EventType = WindowsConsole.EventType.Key,
+            KeyEvent = new WindowsConsole.KeyEventRecord
+            {
+                bKeyDown = true,
+                wRepeatCount = 0,
+                wVirtualKeyCode = ConsoleKeyMapping.VK.RETURN,
+                wVirtualScanCode = 0,
+                UnicodeChar = '\0',
+                dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed
+            }
+        });
+
+        winInput.InputBuffer.Enqueue (new WindowsConsole.InputRecord ()
+        {
+            EventType = WindowsConsole.EventType.Key,
+            KeyEvent = new WindowsConsole.KeyEventRecord
+            {
+                bKeyDown = false,
+                wRepeatCount = 0,
+                wVirtualKeyCode = ConsoleKeyMapping.VK.RETURN,
+                wVirtualScanCode = 0,
+                UnicodeChar = '\0',
+                dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed
+            }
+        });
+
+        WaitIteration ();
+
+        return this;
+    }
+    public GuiTestContext<T> WithContextMenu (ContextMenu ctx, MenuBarItem menuItems)
+    {
+        LastView.MouseEvent += (s, e) =>
+                               {
+                                   if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
+                                   {
+                                       ctx.Show (menuItems);
+                                   }
+                               };
+
+        return this;
+    }
+
+    public View LastView  => _lastView ?? Application.Top ?? throw new Exception ("Could not determine which view to add to");
+
+
 }
 
