@@ -214,7 +214,7 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new()
     }
     public GuiTestContext<T> ScreenShot (string title, TextWriter writer)
     {
-        writer.WriteLine(title);
+        writer.WriteLine(title +":");
         var text = Application.ToString ();
 
         writer.WriteLine(text);

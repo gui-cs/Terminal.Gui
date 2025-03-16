@@ -75,7 +75,7 @@ public class BasicFluentAssertionTests
                           .WithContextMenu(ctx,menuItems)
                           // Click in main area inside border
                           .RightClick(1,1)
-                          .ScreenShot ("After open menu:",_out)
+                          .ScreenShot ("After open menu",_out)
                           .LeftClick (3, 3)
                           /*.Assert (Application.Top.Focused.Should ().BeAssignableTo(typeof(MenuBarItem)))
                           .Down()
