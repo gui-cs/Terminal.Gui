@@ -8,7 +8,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="TerminalGuiFluentTesting.FakeInput&lt;T&gt;" Collapsed="true">
-    <Position X="7.5" Y="1.5" Width="1.5" />
+    <Position X="7" Y="1.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AQAAAAAAACAAAQEAAAAgAAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
       <FileName>FakeInput.cs</FileName>
@@ -16,7 +16,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="TerminalGuiFluentTesting.FakeNetInput" Collapsed="true">
-    <Position X="8.75" Y="2.75" Width="1.5" />
+    <Position X="8.25" Y="2.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>FakeNetInput.cs</FileName>
@@ -24,7 +24,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="TerminalGuiFluentTesting.FakeWindowsInput" Collapsed="true">
-    <Position X="6.5" Y="2.75" Width="1.5" />
+    <Position X="6" Y="2.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>FakeWindowsInput.cs</FileName>
@@ -32,7 +32,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="TerminalGuiFluentTesting.FakeOutput" Collapsed="true" BaseTypeListCollapsed="true">
-    <Position X="6" Y="0.5" Width="1.5" />
+    <Position X="5.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAgCAAgAAAAAAAAAAAAAAAQAAAMAAAAAEAAAA=</HashCode>
       <FileName>FakeOutput.cs</FileName>
@@ -40,12 +40,12 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="TerminalGuiFluentTesting.GuiTestContext&lt;T&gt;" BaseTypeListCollapsed="true">
-    <Position X="2.75" Y="0.5" Width="2.25" />
+    <Position X="2.25" Y="0.5" Width="2.25" />
     <Compartments>
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>ABJAAAIAACBAAQAAgIAAAAAgABIEgAQAIAAIBACAIgA=</HashCode>
+      <HashCode>ABJAAAIAACBAAQAAgYAAAAAgABIEgAQAIAAIBACAIgA=</HashCode>
       <FileName>GuiTestContext.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
