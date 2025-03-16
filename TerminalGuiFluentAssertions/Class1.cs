@@ -38,6 +38,7 @@ class FakeWindowsInput (CancellationToken hardStopToken) : FakeInput<WindowsCons
 
 class FakeOutput : IConsoleOutput
 {
+    public IOutputBuffer LastBuffer { get; set; }
     public Size Size { get; set; }
 
     /// <inheritdoc />
@@ -55,8 +56,9 @@ class FakeOutput : IConsoleOutput
     /// <inheritdoc />
     public void Write (IOutputBuffer buffer)
     {
-
+        LastBuffer = buffer;
     }
+
 
     /// <inheritdoc />
     public Size GetWindowSize ()
@@ -207,6 +209,15 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new()
     public GuiTestContext<T> ResizeConsole (int width, int height)
     {
         _output.Size = new Size (width,height);
+
+        return WaitIteration ();
+    }
+    public GuiTestContext<T> ScreenShot (string title, TextWriter writer)
+    {
+        writer.WriteLine(title);
+        var text = Application.ToString ();
+
+        writer.WriteLine(text);
 
         return WaitIteration ();
     }

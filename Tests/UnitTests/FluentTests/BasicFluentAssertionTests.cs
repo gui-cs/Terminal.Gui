@@ -5,10 +5,30 @@ using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using TerminalGuiFluentAssertions;
+using Xunit.Abstractions;
 
 namespace UnitTests.FluentTests;
 public class BasicFluentAssertionTests
 {
+    private readonly TextWriter _out;
+    public class TestOutputWriter : TextWriter
+    {
+        private readonly ITestOutputHelper _output;
+
+        public TestOutputWriter (ITestOutputHelper output)
+        {
+            _output = output;
+        }
+
+        public override void WriteLine (string? value)
+        {
+            _output.WriteLine (value ?? string.Empty);
+        }
+
+        public override Encoding Encoding => Encoding.UTF8;
+    }
+
+    public BasicFluentAssertionTests (ITestOutputHelper outputHelper) { _out = new TestOutputWriter(outputHelper); }
     [Fact]
     public void GuiTestContext_StartsAndStopsWithoutError ()
     {
@@ -55,7 +75,8 @@ public class BasicFluentAssertionTests
                           .WithContextMenu(ctx,menuItems)
                           // Click in main area inside border
                           .RightClick(1,1)
-                          .LeftClick (2, 2)
+                          .ScreenShot ("After open menu:",_out)
+                          .LeftClick (3, 3)
                           /*.Assert (Application.Top.Focused.Should ().BeAssignableTo(typeof(MenuBarItem)))
                           .Down()
                           .Enter()*/
