@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using System.Text;
+using Terminal.Gui;
 using TerminalGuiFluentTesting;
 using Xunit.Abstractions;
 
-namespace UnitTests.FluentTests;
+namespace IntegrationTests.FluentTests;
 public class BasicFluentAssertionTests
 {
     private readonly TextWriter _out;
@@ -53,9 +49,9 @@ public class BasicFluentAssertionTests
                                 };
         using var c = With.A<Window> (40, 10)
                           .Add (lbl )
-                          .Assert (lbl.Frame.Width.Should().Be(38)) // Window has 2 border
+                          .Then (()=>Assert.Same(lbl.Frame.Width,38)) // Window has 2 border
                           .ResizeConsole (20,20)
-                          .Assert (lbl.Frame.Width.Should ().Be (18))
+                          .Then (() => Assert.Same (lbl.Frame.Width, 18))
                           .Stop ();
     }
 

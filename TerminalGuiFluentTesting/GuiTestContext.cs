@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿
 using Terminal.Gui;
 using Terminal.Gui.ConsoleDrivers;
 
@@ -178,7 +178,11 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new ()
         return this;
     }
 
-    public GuiTestContext<T> Assert<T2> (AndConstraint<T2> be) { return this; }
+    public GuiTestContext<T> Then (Action doAction)
+    {
+        doAction ();
+        return this;
+    }
 
     public GuiTestContext<T> RightClick (int screenX, int screenY) { return Click (WindowsConsole.ButtonState.Button3Pressed, screenX, screenY); }
 

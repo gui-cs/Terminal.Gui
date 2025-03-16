@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32427.441
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -62,8 +62,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StressTests", "Tests\Stress
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.Parallelizable", "Tests\UnitTestsParallelizable\UnitTests.Parallelizable.csproj", "{DE780834-190A-8277-51FD-750CC666E82D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerminalGuiFluentTesting", "TerminalGuiFluentAssertions\TerminalGuiFluentTesting.csproj", "{7C610F03-9E38-409F-9B21-A02D5569E16A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -118,10 +116,6 @@ Global
 		{DE780834-190A-8277-51FD-750CC666E82D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE780834-190A-8277-51FD-750CC666E82D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE780834-190A-8277-51FD-750CC666E82D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7C610F03-9E38-409F-9B21-A02D5569E16A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7C610F03-9E38-409F-9B21-A02D5569E16A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7C610F03-9E38-409F-9B21-A02D5569E16A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7C610F03-9E38-409F-9B21-A02D5569E16A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
