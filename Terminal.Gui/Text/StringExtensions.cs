@@ -127,7 +127,7 @@ public static class StringExtensions
         const int maxCharsPerRune = 2;
         const int maxStackallocTextBufferSize = 1048; // ~2 kB
 
-        // Use stackalloc buffer if rune count is easily available and the count is reasonable.
+        // If rune count is easily available use stackalloc buffer or alternatively rented array.
         if (runes.TryGetNonEnumeratedCount (out int count))
         {
             if (count == 0)
@@ -135,10 +135,14 @@ public static class StringExtensions
                 return string.Empty;
             }
 
-            int maxRequiredTextBufferSize = count * maxCharsPerRune;
-            if (maxRequiredTextBufferSize <= maxStackallocTextBufferSize)
+            char[]? rentedBufferArray = null;
+            try
             {
-                Span<char> textBuffer = stackalloc char[maxRequiredTextBufferSize];
+                int maxRequiredTextBufferSize = count * maxCharsPerRune;
+                Span<char> textBuffer = maxRequiredTextBufferSize <= maxStackallocTextBufferSize
+                    ? stackalloc char[maxRequiredTextBufferSize]
+                    : (rentedBufferArray = ArrayPool<char>.Shared.Rent(maxRequiredTextBufferSize));
+
                 Span<char> remainingBuffer = textBuffer;
                 foreach (Rune rune in runes)
                 {
@@ -148,6 +152,13 @@ public static class StringExtensions
 
                 ReadOnlySpan<char> text = textBuffer[..^remainingBuffer.Length];
                 return text.ToString ();
+            }
+            finally
+            {
+                if (rentedBufferArray != null)
+                {
+                    ArrayPool<char>.Shared.Return (rentedBufferArray);
+                }
             }
         }
 

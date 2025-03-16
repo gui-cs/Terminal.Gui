@@ -22,7 +22,7 @@ public class ToStringEnumerable
     }
 
     /// <summary>
-    /// Benchmark for current implementation with stackalloc char buffer and
+    /// Benchmark for current implementation with char buffer and
     /// fallback to rune chars appending to StringBuilder.
     /// </summary>
     /// <param name="runes"></param>
