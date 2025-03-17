@@ -2886,4 +2886,77 @@ public class TextFormatterTests
         Assert.Equal (resultLines, wrappedLines);
     }
 
+
+
+    [Theory]
+    [InlineData ("No crlf", "No crlf")]
+    // CRLF
+    [InlineData ("\r\nThis has crlf in the beginning", "This has crlf in the beginning")]
+    [InlineData ("This has crlf\r\nin the middle", "This has crlfin the middle")]
+    [InlineData ("This has crlf in the end\r\n", "This has crlf in the end")]
+    // LFCR
+    [InlineData ("\n\rThis has lfcr in the beginning", "This has lfcr in the beginning")]
+    [InlineData ("This has lfcr\n\rin the middle", "This has lfcrin the middle")]
+    [InlineData ("This has lfcr in the end\n\r", "This has lfcr in the end")]
+    // CR
+    [InlineData ("\rThis has cr in the beginning", "This has cr in the beginning")]
+    [InlineData ("This has cr\rin the middle", "This has crin the middle")]
+    [InlineData ("This has cr in the end\r", "This has cr in the end")]
+    // LF
+    [InlineData ("\nThis has lf in the beginning", "This has lf in the beginning")]
+    [InlineData ("This has lf\nin the middle", "This has lfin the middle")]
+    [InlineData ("This has lf in the end\n", "This has lf in the end")]
+    public void StripCRLF_RemovesCrLf (string input, string expected)
+    {
+        string actual = TextFormatter.StripCRLF(input, keepNewLine: false);
+        Assert.Equal (expected, actual);
+    }
+
+    [Theory]
+    [InlineData ("No crlf", "No crlf")]
+    // CRLF
+    [InlineData ("\r\nThis has crlf in the beginning", "\nThis has crlf in the beginning")]
+    [InlineData ("This has crlf\r\nin the middle", "This has crlf\nin the middle")]
+    [InlineData ("This has crlf in the end\r\n", "This has crlf in the end\n")]
+    // LFCR
+    [InlineData ("\n\rThis has lfcr in the beginning", "\n\rThis has lfcr in the beginning")]
+    [InlineData ("This has lfcr\n\rin the middle", "This has lfcr\n\rin the middle")]
+    [InlineData ("This has lfcr in the end\n\r", "This has lfcr in the end\n\r")]
+    // CR
+    [InlineData ("\rThis has cr in the beginning", "\rThis has cr in the beginning")]
+    [InlineData ("This has cr\rin the middle", "This has cr\rin the middle")]
+    [InlineData ("This has cr in the end\r", "This has cr in the end\r")]
+    // LF
+    [InlineData ("\nThis has lf in the beginning", "\nThis has lf in the beginning")]
+    [InlineData ("This has lf\nin the middle", "This has lf\nin the middle")]
+    [InlineData ("This has lf in the end\n", "This has lf in the end\n")]
+    public void StripCRLF_KeepNewLine_RemovesCarriageReturnFromCrLf (string input, string expected)
+    {
+        string actual = TextFormatter.StripCRLF(input, keepNewLine: true);
+        Assert.Equal (expected, actual);
+    }
+
+    [Theory]
+    [InlineData ("No crlf", "No crlf")]
+    // CRLF
+    [InlineData ("\r\nThis has crlf in the beginning", " This has crlf in the beginning")]
+    [InlineData ("This has crlf\r\nin the middle", "This has crlf in the middle")]
+    [InlineData ("This has crlf in the end\r\n", "This has crlf in the end ")]
+    // LFCR
+    [InlineData ("\n\rThis has lfcr in the beginning", "  This has lfcr in the beginning")]
+    [InlineData ("This has lfcr\n\rin the middle", "This has lfcr  in the middle")]
+    [InlineData ("This has lfcr in the end\n\r", "This has lfcr in the end  ")]
+    // CR
+    [InlineData ("\rThis has cr in the beginning", " This has cr in the beginning")]
+    [InlineData ("This has cr\rin the middle", "This has cr in the middle")]
+    [InlineData ("This has cr in the end\r", "This has cr in the end ")]
+    // LF
+    [InlineData ("\nThis has lf in the beginning", " This has lf in the beginning")]
+    [InlineData ("This has lf\nin the middle", "This has lf in the middle")]
+    [InlineData ("This has lf in the end\n", "This has lf in the end ")]
+    public void ReplaceCRLFWithSpace_ReplacesCrLfWithSpace (string input, string expected)
+    {
+        string actual = TextFormatter.ReplaceCRLFWithSpace(input);
+        Assert.Equal (expected, actual);
+    }
 }
