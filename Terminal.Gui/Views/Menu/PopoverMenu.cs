@@ -157,6 +157,7 @@ public class PopoverMenu : View
         if (menuItem is { SubMenu: { Visible: false } })
         {
             Add (menuItem.SubMenu);
+            menuItem.SubMenu.Layout ();
             Point pos =  GetMostVisibleLocationForSubMenu (menuItem);
             menuItem.SubMenu.X = pos.X;
             menuItem.SubMenu.Y = pos.Y;
