@@ -24,6 +24,9 @@ public class Menuv2 : Bar
 
     }
 
+    /// <summary>
+    ///     Gets or sets the menu item that opened this menu as a sub-menu.
+    /// </summary>
     public MenuItemv2 SuperMenuItem { get; set; }
 
     private void OnVisibleChanged (object? sender, EventArgs e)
@@ -31,15 +34,6 @@ public class Menuv2 : Bar
         if (Visible)
         {
             SelectedMenuItem = SubViews.Where (mi => mi is MenuItemv2).ElementAtOrDefault (0) as MenuItemv2;
-
-            //Application.GrabMouse(this);
-        }
-        else
-        {
-            if (Application.MouseGrabView == this)
-            {
-                //Application.UngrabMouse ();
-            }
         }
     }
 

@@ -185,6 +185,7 @@ public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Color
         }
     }
 
+    /// <inheritdoc />
     public void CopyTo (KeyValuePair<string, ColorScheme?> [] array, int arrayIndex)
     {
         lock (_lock)

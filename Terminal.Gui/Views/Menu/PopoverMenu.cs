@@ -144,6 +144,11 @@ public class PopoverMenu : View
 
         }
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="menuItem"></param>
     public void ShowSubMenu (MenuItemv2? menuItem)
     {
         // Hide any other submenus that might be visible
