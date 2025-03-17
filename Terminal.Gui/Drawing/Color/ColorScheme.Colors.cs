@@ -194,6 +194,7 @@ public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Color
         }
     }
 
+    /// <inheritdoc />
     public IEnumerator<KeyValuePair<string, ColorScheme?>> GetEnumerator ()
     {
         lock (_lock)
@@ -207,6 +208,7 @@ public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Color
         return GetEnumerator ();
     }
 
+    /// <inheritdoc />
     public bool Remove (KeyValuePair<string, ColorScheme?> item)
     {
         lock (_lock)
@@ -220,6 +222,7 @@ public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Color
         }
     }
 
+    /// <inheritdoc />
     public bool Remove (string key)
     {
         lock (_lock)

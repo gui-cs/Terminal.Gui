@@ -27,7 +27,7 @@ public class Menuv2 : Bar
     /// <summary>
     ///     Gets or sets the menu item that opened this menu as a sub-menu.
     /// </summary>
-    public MenuItemv2 SuperMenuItem { get; set; }
+    public MenuItemv2? SuperMenuItem { get; set; }
 
     private void OnVisibleChanged (object? sender, EventArgs e)
     {
