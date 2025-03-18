@@ -434,9 +434,8 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (btnSubView, top.MostFocused);
 
         Assert.True (Application.RaiseKeyDownEvent (Key.CursorUp));
-        // TabRow now has TabGroup which only F6 is allowed
-        Assert.NotEqual (tab2, top.MostFocused);
-        Assert.Equal (btn, top.MostFocused);
+        Assert.Equal (tab2, top.MostFocused);
+        Assert.NotEqual (btn, top.MostFocused);
 
         Assert.True (Application.RaiseKeyDownEvent (Key.CursorUp));
         Assert.Equal (btnSubView, top.MostFocused);
@@ -459,7 +458,8 @@ public class TabViewTests (ITestOutputHelper output)
         // Press the cursor up key to focus the selected tab which it's the only way to do that
         Assert.True (Application.RaiseKeyDownEvent (Key.CursorUp));
         Assert.Equal (tab2, tv.SelectedTab);
-        Assert.Equal (btn, top.Focused);
+        Assert.False (tab2.View.HasFocus);
+        Assert.Equal (tv, top.Focused);
 
         Assert.True (Application.RaiseKeyDownEvent (Key.CursorUp));
         Assert.Equal (tv, top.Focused);

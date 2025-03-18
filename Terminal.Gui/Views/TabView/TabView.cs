@@ -84,6 +84,94 @@ public class TabView : View
                     }
                    );
 
+        AddCommand (
+                    Command.Up,
+                    () =>
+                    {
+                        if (_style.TabsOnBottom)
+                        {
+                            if (_tabsBar is { HasFocus: true } && _containerView.CanFocus)
+                            {
+                                _containerView.SetFocus ();
+
+                                return true;
+                            }
+                        }
+                        else
+                        {
+                            if (_containerView is { HasFocus: true })
+                            {
+                                var mostFocused = _containerView.MostFocused;
+
+                                if (mostFocused is { })
+                                {
+                                    for (int? i = mostFocused.SuperView?.InternalSubViews.IndexOf (mostFocused) - 1; i > -1; i--)
+                                    {
+                                        var view = mostFocused.SuperView?.InternalSubViews [(int)i];
+
+                                        if (view is { CanFocus: true, Enabled: true, Visible: true })
+                                        {
+                                            view.SetFocus ();
+
+                                            return true;
+                                        }
+                                    }
+                                }
+
+                                SelectedTab?.SetFocus ();
+
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    }
+                   );
+
+        AddCommand (
+                    Command.Down,
+                    () =>
+                    {
+                        if (_style.TabsOnBottom)
+                        {
+                            if (_containerView is { HasFocus: true })
+                            {
+                                var mostFocused = _containerView.MostFocused;
+
+                                if (mostFocused is { })
+                                {
+                                    for (int? i = mostFocused.SuperView?.InternalSubViews.IndexOf (mostFocused) + 1; i < mostFocused.SuperView?.InternalSubViews.Count; i++)
+                                    {
+                                        var view = mostFocused.SuperView?.InternalSubViews [(int)i];
+
+                                        if (view is { CanFocus: true, Enabled: true, Visible: true })
+                                        {
+                                            view.SetFocus ();
+
+                                            return true;
+                                        }
+                                    }
+                                }
+
+                                SelectedTab?.SetFocus ();
+
+                                return true;
+                            }
+                        }
+                        else
+                        {
+                            if (_tabsBar is { HasFocus: true } && _containerView.CanFocus)
+                            {
+                                _containerView.SetFocus ();
+
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    }
+                   );
+
         // Default keybindings for this view
         KeyBindings.Add (Key.CursorLeft, Command.Left);
         KeyBindings.Add (Key.CursorRight, Command.Right);
@@ -91,6 +179,8 @@ public class TabView : View
         KeyBindings.Add (Key.End, Command.RightEnd);
         KeyBindings.Add (Key.PageDown, Command.PageDown);
         KeyBindings.Add (Key.PageUp, Command.PageUp);
+        KeyBindings.Add (Key.CursorUp, Command.Up);
+        KeyBindings.Add (Key.CursorDown, Command.Down);
     }
 
     /// <summary>
@@ -155,7 +245,7 @@ public class TabView : View
 
     private bool TabCanSetFocus ()
     {
-        return IsInitialized && SelectedTab is { } && (_selectedTabHasFocus || !_containerView.CanFocus);
+        return IsInitialized && SelectedTab is { } && (HasFocus || (bool)_containerView?.HasFocus) && (_selectedTabHasFocus || !_containerView.CanFocus);
     }
 
     private void ContainerViewCanFocus (object sender, EventArgs eventArgs)
@@ -518,7 +608,7 @@ public class TabView : View
         {
             SelectedTab?.SetFocus ();
         }
-        else
+        else if (HasFocus)
         {
             SelectedTab?.View?.SetFocus ();
         }
