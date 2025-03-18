@@ -105,15 +105,14 @@ public class TabView : View
 
                                 if (mostFocused is { })
                                 {
-                                    for (int? i = mostFocused.SuperView?.InternalSubViews.IndexOf (mostFocused) - 1; i > -1; i--)
+                                    for (int? i = mostFocused.SuperView?.SubViews.IndexOf (mostFocused) - 1; i > -1; i--)
                                     {
-                                        var view = mostFocused.SuperView?.InternalSubViews [(int)i];
+                                        var view = mostFocused.SuperView?.SubViews.ElementAt ((int)i);
 
                                         if (view is { CanFocus: true, Enabled: true, Visible: true })
                                         {
-                                            view.SetFocus ();
-
-                                            return true;
+                                            // Let toplevel handle it
+                                            return false;
                                         }
                                     }
                                 }
@@ -140,15 +139,14 @@ public class TabView : View
 
                                 if (mostFocused is { })
                                 {
-                                    for (int? i = mostFocused.SuperView?.InternalSubViews.IndexOf (mostFocused) + 1; i < mostFocused.SuperView?.InternalSubViews.Count; i++)
+                                    for (int? i = mostFocused.SuperView?.SubViews.IndexOf (mostFocused) + 1; i < mostFocused.SuperView?.SubViews.Count; i++)
                                     {
-                                        var view = mostFocused.SuperView?.InternalSubViews [(int)i];
+                                        var view = mostFocused.SuperView?.SubViews.ElementAt ((int)i);
 
                                         if (view is { CanFocus: true, Enabled: true, Visible: true })
                                         {
-                                            view.SetFocus ();
-
-                                            return true;
+                                            // Let toplevel handle it
+                                            return false;
                                         }
                                     }
                                 }
