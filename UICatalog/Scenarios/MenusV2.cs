@@ -75,6 +75,16 @@ public class MenusV2 : Scenario
         var detailsSubMenuItem = new MenuItemv2 (frame, Command.Accept, "_Details", "File details", detailsSubMenu);
         rootMenu.Add (detailsSubMenuItem);
 
+        var moreDetailsSubMenu = new Menuv2
+        {
+            Id = "moreDetailsSubMenu",
+            Visible = false
+        };
+        ConfigureMoreDetailsSubMenu (frame, moreDetailsSubMenu);
+
+        var moreDetailsSubMenuItem = new MenuItemv2 (frame, Command.Accept, "_More Details", "More details", moreDetailsSubMenu);
+        detailsSubMenu.Add (moreDetailsSubMenuItem);
+
         var popoverMenu = new PopoverMenu (rootMenu)
         {
             Id = "popOverMenu",
@@ -314,6 +324,37 @@ public class MenusV2 : Scenario
 
         menu.Add (shortcut2, shortcut3, line, shortcut4);
     }
+
+
+    private void ConfigureMoreDetailsSubMenu (View targetView, Menuv2 menu)
+    {
+        var shortcut2 = new MenuItemv2
+        {
+            Title = "_Deeper Detail",
+            Text = "Deeper Detail",
+            Key = Key.V.WithAlt
+        };
+
+        var line = new Line
+        {
+            X = -1,
+            Width = Dim.Fill ()! + 1
+        };
+
+        var shortcut4 = new MenuItemv2
+        {
+            Title = "_Third",
+            Text = "Below the line",
+            Key = Key.D3.WithAlt
+        };
+
+        // This ensures the checkbox state toggles when the hotkey of Title is pressed.
+        //shortcut4.Accepting += (sender, args) => args.Cancel = true;
+
+        menu.Add (shortcut2, line, shortcut4);
+    }
+
+
     private const string LOGFILE_LOCATION = "./logs";
     private static string _logFilePath = string.Empty;
     private static readonly LoggingLevelSwitch _logLevelSwitch = new ();

@@ -123,7 +123,6 @@ public class Menuv2 : Bar
         base.OnFocusedChanged (previousFocused, focused);
         SelectedMenuItem = focused as MenuItemv2;
         RaiseSelectedMenuItemChanged (SelectedMenuItem);
-
     }
 
     /// <summary>

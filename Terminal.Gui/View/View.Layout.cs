@@ -1136,10 +1136,10 @@ public partial class View // Layout APIs
                      ? Math.Max (maxDimension - viewToMove.Frame.Height, menuVisible ? 1 : 0)
                      : ny;
 
-            if (ny > viewToMove.Frame.Y + viewToMove.Frame.Height)
-            {
-                ny = Math.Max (viewToMove.Frame.Bottom, 0);
-            }
+            //if (ny > viewToMove.Frame.Y + viewToMove.Frame.Height)
+            //{
+            //    ny = Math.Max (viewToMove.Frame.Bottom, 0);
+            //}
         }
         else
         {
