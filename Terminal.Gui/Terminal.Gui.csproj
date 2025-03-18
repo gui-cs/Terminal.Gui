@@ -78,9 +78,10 @@
         <Using Include="Terminal.Gui.EnumExtensions" />
     </ItemGroup>
     <!-- =================================================================== -->
-    <!-- Assembliy names for which internal items are visible -->
+    <!-- Assembly names for which internal items are visible -->
     <!-- =================================================================== -->
     <ItemGroup>
+        <InternalsVisibleTo Include="Benchmarks"/>
         <InternalsVisibleTo Include="UnitTests" />
         <InternalsVisibleTo Include="UnitTests.Parallelizable" />
         <InternalsVisibleTo Include="StressTests" />
