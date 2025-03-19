@@ -1,26 +1,9 @@
-﻿
-using System.Text;
+﻿using System.Text;
 using Microsoft.Extensions.Logging;
 using Terminal.Gui;
 using Terminal.Gui.ConsoleDrivers;
 
 namespace TerminalGuiFluentTesting;
-
-
-class TextWriterLoggerProvider (TextWriter writer) : ILoggerProvider
-{
-    public ILogger CreateLogger (string category) => new TextWriterLogger (writer);
-    public void Dispose () => writer.Dispose ();
-}
-
-class TextWriterLogger (TextWriter writer) : ILogger
-{
-    public IDisposable? BeginScope<TState> (TState state) => null;
-    public bool IsEnabled (LogLevel logLevel) => true;
-    public void Log<TState> (LogLevel logLevel, EventId eventId, TState state,
-                             Exception? ex, Func<TState, Exception?, string> formatter) =>
-        writer.WriteLine (formatter (state, ex));
-}
 
 public class GuiTestContext : IDisposable
 {
@@ -34,11 +17,11 @@ public class GuiTestContext : IDisposable
     private View? _lastView;
     private readonly StringBuilder _logsSb;
 
-    internal GuiTestContext(Func<Toplevel> topLevelBuilder, int width, int height)
+    internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height)
     {
         IApplication origApp = ApplicationImpl.Instance;
-        var origLogger = Logging.Logger;
-        _logsSb = new StringBuilder ();
+        ILogger? origLogger = Logging.Logger;
+        _logsSb = new ();
 
         _netInput = new (_cts.Token);
         _winInput = new (_cts.Token);
@@ -61,19 +44,20 @@ public class GuiTestContext : IDisposable
                                  {
                                      ApplicationImpl.ChangeInstance (v2);
 
-                                     var logger = LoggerFactory.Create (builder =>
-                                                                            builder.SetMinimumLevel (LogLevel.Trace)
-                                                                                   .AddProvider (new TextWriterLoggerProvider (new StringWriter (_logsSb))))
-                                                               .CreateLogger ("Test Logging");
+                                     ILogger logger = LoggerFactory.Create (
+                                                                            builder =>
+                                                                                builder.SetMinimumLevel (LogLevel.Trace)
+                                                                                       .AddProvider (new TextWriterLoggerProvider (new StringWriter (_logsSb))))
+                                                                   .CreateLogger ("Test Logging");
                                      Logging.Logger = logger;
 
                                      v2.Init (null, "v2win");
 
                                      booting.Release ();
 
-                                     var t = topLevelBuilder ();
+                                     Toplevel t = topLevelBuilder ();
 
-                                     Application.Run(t); // This will block, but it's on a background thread now
+                                     Application.Run (t); // This will block, but it's on a background thread now
 
                                      Application.Shutdown ();
                                  }
@@ -186,7 +170,8 @@ public class GuiTestContext : IDisposable
 
     public GuiTestContext WriteOutLogs (TextWriter writer)
     {
-        writer.WriteLine (_logsSb.ToString());
+        writer.WriteLine (_logsSb.ToString ());
+
         return WaitIteration ();
     }
 
@@ -217,6 +202,7 @@ public class GuiTestContext : IDisposable
     public GuiTestContext Then (Action doAction)
     {
         doAction ();
+
         return this;
     }
 
@@ -227,10 +213,10 @@ public class GuiTestContext : IDisposable
     private GuiTestContext Click (WindowsConsole.ButtonState btn, int screenX, int screenY)
     {
         _winInput.InputBuffer.Enqueue (
-                                       new()
+                                       new ()
                                        {
                                            EventType = WindowsConsole.EventType.Mouse,
-                                           MouseEvent = new()
+                                           MouseEvent = new ()
                                            {
                                                ButtonState = btn,
                                                MousePosition = new ((short)screenX, (short)screenY)
@@ -238,10 +224,10 @@ public class GuiTestContext : IDisposable
                                        });
 
         _winInput.InputBuffer.Enqueue (
-                                       new()
+                                       new ()
                                        {
                                            EventType = WindowsConsole.EventType.Mouse,
-                                           MouseEvent = new()
+                                           MouseEvent = new ()
                                            {
                                                ButtonState = WindowsConsole.ButtonState.NoButtonPressed,
                                                MousePosition = new ((short)screenX, (short)screenY)
@@ -256,27 +242,35 @@ public class GuiTestContext : IDisposable
     public GuiTestContext Down ()
     {
         SendWindowsKey (ConsoleKeyMapping.VK.DOWN);
+
         return this;
     }
+
     public GuiTestContext Right ()
     {
         SendWindowsKey (ConsoleKeyMapping.VK.RIGHT);
+
         return this;
     }
+
     public GuiTestContext Left ()
     {
         SendWindowsKey (ConsoleKeyMapping.VK.LEFT);
+
         return this;
     }
+
     public GuiTestContext Up ()
     {
         SendWindowsKey (ConsoleKeyMapping.VK.UP);
+
         return this;
     }
+
     public GuiTestContext Enter ()
     {
         SendWindowsKey (
-                        new WindowsConsole.KeyEventRecord ()
+                        new WindowsConsole.KeyEventRecord
                         {
                             UnicodeChar = '\r',
                             dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed,
@@ -289,17 +283,16 @@ public class GuiTestContext : IDisposable
     }
 
     /// <summary>
-    /// Send a full windows OS key including both down and up.
+    ///     Send a full windows OS key including both down and up.
     /// </summary>
     /// <param name="fullKey"></param>
     private void SendWindowsKey (WindowsConsole.KeyEventRecord fullKey)
     {
-        var down = fullKey;
-        var up = fullKey; // because struct this is new copy
+        WindowsConsole.KeyEventRecord down = fullKey;
+        WindowsConsole.KeyEventRecord up = fullKey; // because struct this is new copy
 
         down.bKeyDown = true;
         up.bKeyDown = false;
-
 
         _winInput.InputBuffer.Enqueue (
                                        new ()
@@ -319,12 +312,11 @@ public class GuiTestContext : IDisposable
     }
 
     /// <summary>
-    /// Sends a special key e.g. cursor key that does not map to a specific character
+    ///     Sends a special key e.g. cursor key that does not map to a specific character
     /// </summary>
     /// <param name="specialKey"></param>
     private void SendWindowsKey (ConsoleKeyMapping.VK specialKey)
     {
-
         _winInput.InputBuffer.Enqueue (
                                        new ()
                                        {
@@ -357,7 +349,6 @@ public class GuiTestContext : IDisposable
 
         WaitIteration ();
     }
-
 
     public GuiTestContext WithContextMenu (ContextMenu ctx, MenuBarItem menuItems)
     {
