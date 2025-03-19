@@ -16,12 +16,14 @@ public class GuiTestContext : IDisposable
     private readonly FakeNetInput _netInput;
     private View? _lastView;
     private readonly StringBuilder _logsSb;
+    private readonly V2TestDriver _driver;
 
-    internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height)
+    internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, V2TestDriver driver)
     {
         IApplication origApp = ApplicationImpl.Instance;
         ILogger? origLogger = Logging.Logger;
         _logsSb = new ();
+        _driver = driver;
 
         _netInput = new (_cts.Token);
         _winInput = new (_cts.Token);
@@ -51,7 +53,7 @@ public class GuiTestContext : IDisposable
                                                                    .CreateLogger ("Test Logging");
                                      Logging.Logger = logger;
 
-                                     v2.Init (null, "v2win");
+                                     v2.Init (null, GetDriverName());
 
                                      booting.Release ();
 
@@ -82,6 +84,17 @@ public class GuiTestContext : IDisposable
         }
 
         WaitIteration ();
+    }
+
+    private string GetDriverName ()
+    {
+        return _driver switch
+               {
+                   V2TestDriver.V2Win => "v2win",
+                   V2TestDriver.V2Net => "v2net",
+                   _ =>
+                       throw new ArgumentOutOfRangeException ()
+               };
     }
 
     /// <summary>
@@ -212,6 +225,8 @@ public class GuiTestContext : IDisposable
 
     private GuiTestContext Click (WindowsConsole.ButtonState btn, int screenX, int screenY)
     {
+        // TODO: Support net style ansi escape sequence generation for arrow keys
+
         _winInput.InputBuffer.Enqueue (
                                        new ()
                                        {
@@ -241,10 +256,24 @@ public class GuiTestContext : IDisposable
 
     public GuiTestContext Down ()
     {
-        SendWindowsKey (ConsoleKeyMapping.VK.DOWN);
+        switch (_driver)
+        {
+            case V2TestDriver.V2Win:
+                SendWindowsKey (ConsoleKeyMapping.VK.DOWN);
+                break;
+            case V2TestDriver.V2Net:
+                // TODO: Support ansi sequence
+
+                throw new NotImplementedException ("Coming soon");
+                break;
+            default:
+                throw new ArgumentOutOfRangeException ();
+        }
+
 
         return this;
     }
+
 
     public GuiTestContext Right ()
     {
@@ -269,15 +298,25 @@ public class GuiTestContext : IDisposable
 
     public GuiTestContext Enter ()
     {
-        SendWindowsKey (
-                        new WindowsConsole.KeyEventRecord
-                        {
-                            UnicodeChar = '\r',
-                            dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed,
-                            wRepeatCount = 1,
-                            wVirtualKeyCode = ConsoleKeyMapping.VK.RETURN,
-                            wVirtualScanCode = 28
-                        });
+        switch (_driver)
+        {
+            case V2TestDriver.V2Win:
+                SendWindowsKey (
+                                new WindowsConsole.KeyEventRecord
+                                {
+                                    UnicodeChar = '\r',
+                                    dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed,
+                                    wRepeatCount = 1,
+                                    wVirtualKeyCode = ConsoleKeyMapping.VK.RETURN,
+                                    wVirtualScanCode = 28
+                                });
+                break;
+            case V2TestDriver.V2Net:
+                SendNetKey (new ('\r', ConsoleKey.Enter, false, false, false));
+                break;
+            default:
+                throw new ArgumentOutOfRangeException ();
+        }
 
         return this;
     }
@@ -308,6 +347,13 @@ public class GuiTestContext : IDisposable
                                            KeyEvent = up
                                        });
 
+        WaitIteration ();
+    }
+
+
+    private void SendNetKey (ConsoleKeyInfo consoleKeyInfo)
+    {
+        _netInput.InputBuffer.Enqueue (consoleKeyInfo);
         WaitIteration ();
     }
 

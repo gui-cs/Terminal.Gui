@@ -79,8 +79,10 @@ public class BasicFluentAssertionTests
         Assert.True (clicked);
     }
 
-    [Fact]
-    public void ContextMenu_OpenSubmenu ()
+    [Theory]
+    [InlineData(V2TestDriver.V2Win)]
+    //[InlineData (V2TestDriver.V2Net)] // TODO
+    public void ContextMenu_OpenSubmenu (V2TestDriver v2TestDriver)
     {
         var clicked = false;
 
@@ -110,7 +112,7 @@ public class BasicFluentAssertionTests
                                          ]
                                         );
 
-        using GuiTestContext c = With.A<Window> (40, 10)
+        using GuiTestContext c = With.A<Window> (40, 10,v2TestDriver)
                                      .WithContextMenu (ctx, menuItems)
                                      .ScreenShot ("Before open menu", _out)
 

@@ -24,7 +24,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="TerminalGuiFluentTesting.FakeWindowsInput" Collapsed="true">
-    <Position X="6" Y="2.75" Width="1.5" />
+    <Position X="6" Y="2.75" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>FakeWindowsInput.cs</FileName>
@@ -39,13 +39,13 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="TerminalGuiFluentTesting.GuiTestContext&lt;T&gt;" BaseTypeListCollapsed="true">
+  <Class Name="TerminalGuiFluentTesting.GuiTestContext" BaseTypeListCollapsed="true">
     <Position X="2.25" Y="0.5" Width="2.25" />
     <Compartments>
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>ABJAAAIAACBAAQAAgYAAAAAgABIEgAQAIAAIBACAIgA=</HashCode>
+      <HashCode>ABJAAAIAACBACQAAg4AAAAAgAJIEgAQAKACIBACAIgI=</HashCode>
       <FileName>GuiTestContext.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -53,6 +53,22 @@
       <Field Name="_winInput" />
       <Field Name="_netInput" />
     </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="TerminalGuiFluentTesting.TextWriterLoggerProvider" Collapsed="true">
+    <Position X="10" Y="2.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>TextWriterLoggerProvider.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="TerminalGuiFluentTesting.TextWriterLogger" Collapsed="true">
+    <Position X="10" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAEAAAAAAAgAAAAAAAAIAAAAAAA=</HashCode>
+      <FileName>TextWriterLogger.cs</FileName>
+    </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Font Name="Segoe UI" Size="9" />

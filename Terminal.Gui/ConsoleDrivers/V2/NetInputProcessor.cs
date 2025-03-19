@@ -16,7 +16,7 @@ public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
     ///         to input stream.
     ///     </remarks>
     /// </summary>
-    public static bool GenerateTestCasesForKeyPresses = false;
+    public static bool GenerateTestCasesForKeyPresses = true;
 #pragma warning restore CA2211
 
     /// <inheritdoc/>
