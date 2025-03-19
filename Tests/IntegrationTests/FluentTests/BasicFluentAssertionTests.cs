@@ -73,7 +73,8 @@ public class BasicFluentAssertionTests
                           .RightClick(1,1)
                           .ScreenShot ("After open menu",_out)
                           .LeftClick (3, 3)
-                          .Stop ();
+                          .Stop ()
+                          .WriteOutLogs (_out);
         Assert.True (clicked);
     }
 }

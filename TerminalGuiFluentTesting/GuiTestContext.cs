@@ -1,10 +1,28 @@
 ﻿
+using System.Text;
+using Microsoft.Extensions.Logging;
 using Terminal.Gui;
 using Terminal.Gui.ConsoleDrivers;
 
 namespace TerminalGuiFluentTesting;
 
-public class GuiTestContext<T> : IDisposable where T : Toplevel, new ()
+
+class TextWriterLoggerProvider (TextWriter writer) : ILoggerProvider
+{
+    public ILogger CreateLogger (string category) => new TextWriterLogger (writer);
+    public void Dispose () => writer.Dispose ();
+}
+
+class TextWriterLogger (TextWriter writer) : ILogger
+{
+    public IDisposable? BeginScope<TState> (TState state) => null;
+    public bool IsEnabled (LogLevel logLevel) => true;
+    public void Log<TState> (LogLevel logLevel, EventId eventId, TState state,
+                             Exception? ex, Func<TState, Exception?, string> formatter) =>
+        writer.WriteLine (formatter (state, ex));
+}
+
+public class GuiTestContext : IDisposable
 {
     private readonly CancellationTokenSource _cts = new ();
     private readonly CancellationTokenSource _hardStop = new (With.Timeout);
@@ -13,11 +31,14 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new ()
     private readonly FakeOutput _output = new ();
     private readonly FakeWindowsInput _winInput;
     private readonly FakeNetInput _netInput;
-    private View _lastView;
+    private View? _lastView;
+    private readonly StringBuilder _logsSb;
 
-    internal GuiTestContext (int width, int height)
+    internal GuiTestContext(Func<Toplevel> topLevelBuilder, int width, int height)
     {
         IApplication origApp = ApplicationImpl.Instance;
+        var origLogger = Logging.Logger;
+        _logsSb = new StringBuilder ();
 
         _netInput = new (_cts.Token);
         _winInput = new (_cts.Token);
@@ -40,11 +61,18 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new ()
                                  {
                                      ApplicationImpl.ChangeInstance (v2);
 
+                                     var logger = LoggerFactory.Create (builder =>
+                                                                            builder.AddProvider (new TextWriterLoggerProvider (new StringWriter (_logsSb))))
+                                                               .CreateLogger ("Test Logging");
+                                     Logging.Logger = logger;
+
                                      v2.Init (null, "v2win");
 
                                      booting.Release ();
 
-                                     Application.Run<T> (); // This will block, but it's on a background thread now
+                                     var t = topLevelBuilder ();
+
+                                     Application.Run(t); // This will block, but it's on a background thread now
 
                                      Application.Shutdown ();
                                  }
@@ -57,6 +85,7 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new ()
                                  finally
                                  {
                                      ApplicationImpl.ChangeInstance (origApp);
+                                     Logging.Logger = origLogger;
                                  }
                              },
                              _cts.Token);
@@ -73,7 +102,7 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new ()
     /// <summary>
     ///     Stops the application and waits for the background thread to exit.
     /// </summary>
-    public GuiTestContext<T> Stop ()
+    public GuiTestContext Stop ()
     {
         if (_runTask.IsCompleted)
         {
@@ -123,7 +152,7 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new ()
     /// </summary>
     /// <param name="v"></param>
     /// <returns></returns>
-    public GuiTestContext<T> Add (View v)
+    public GuiTestContext Add (View v)
     {
         WaitIteration (
                        () =>
@@ -137,14 +166,14 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new ()
         return this;
     }
 
-    public GuiTestContext<T> ResizeConsole (int width, int height)
+    public GuiTestContext ResizeConsole (int width, int height)
     {
         _output.Size = new (width, height);
 
         return WaitIteration ();
     }
 
-    public GuiTestContext<T> ScreenShot (string title, TextWriter writer)
+    public GuiTestContext ScreenShot (string title, TextWriter writer)
     {
         writer.WriteLine (title + ":");
         var text = Application.ToString ();
@@ -154,7 +183,13 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new ()
         return WaitIteration ();
     }
 
-    public GuiTestContext<T> WaitIteration (Action? a = null)
+    public GuiTestContext WriteOutLogs (TextWriter writer)
+    {
+        writer.WriteLine (_logsSb.ToString());
+        return WaitIteration ();
+    }
+
+    public GuiTestContext WaitIteration (Action? a = null)
     {
         a ??= () => { };
         var ctsLocal = new CancellationTokenSource ();
@@ -178,17 +213,17 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new ()
         return this;
     }
 
-    public GuiTestContext<T> Then (Action doAction)
+    public GuiTestContext Then (Action doAction)
     {
         doAction ();
         return this;
     }
 
-    public GuiTestContext<T> RightClick (int screenX, int screenY) { return Click (WindowsConsole.ButtonState.Button3Pressed, screenX, screenY); }
+    public GuiTestContext RightClick (int screenX, int screenY) { return Click (WindowsConsole.ButtonState.Button3Pressed, screenX, screenY); }
 
-    public GuiTestContext<T> LeftClick (int screenX, int screenY) { return Click (WindowsConsole.ButtonState.Button1Pressed, screenX, screenY); }
+    public GuiTestContext LeftClick (int screenX, int screenY) { return Click (WindowsConsole.ButtonState.Button1Pressed, screenX, screenY); }
 
-    private GuiTestContext<T> Click (WindowsConsole.ButtonState btn, int screenX, int screenY)
+    private GuiTestContext Click (WindowsConsole.ButtonState btn, int screenX, int screenY)
     {
         _winInput.InputBuffer.Enqueue (
                                        new()
@@ -217,7 +252,7 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new ()
         return this;
     }
 
-    public GuiTestContext<T> Down ()
+    public GuiTestContext Down ()
     {
         _winInput.InputBuffer.Enqueue (
                                        new()
@@ -254,7 +289,7 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new ()
         return this;
     }
 
-    public GuiTestContext<T> Enter ()
+    public GuiTestContext Enter ()
     {
         _winInput.InputBuffer.Enqueue (
                                        new()
@@ -291,7 +326,7 @@ public class GuiTestContext<T> : IDisposable where T : Toplevel, new ()
         return this;
     }
 
-    public GuiTestContext<T> WithContextMenu (ContextMenu ctx, MenuBarItem menuItems)
+    public GuiTestContext WithContextMenu (ContextMenu ctx, MenuBarItem menuItems)
     {
         LastView.MouseEvent += (s, e) =>
                                {
