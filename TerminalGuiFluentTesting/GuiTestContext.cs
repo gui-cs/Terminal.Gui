@@ -62,7 +62,8 @@ public class GuiTestContext : IDisposable
                                      ApplicationImpl.ChangeInstance (v2);
 
                                      var logger = LoggerFactory.Create (builder =>
-                                                                            builder.AddProvider (new TextWriterLoggerProvider (new StringWriter (_logsSb))))
+                                                                            builder.SetMinimumLevel (LogLevel.Trace)
+                                                                                   .AddProvider (new TextWriterLoggerProvider (new StringWriter (_logsSb))))
                                                                .CreateLogger ("Test Logging");
                                      Logging.Logger = logger;
 
@@ -254,52 +255,85 @@ public class GuiTestContext : IDisposable
 
     public GuiTestContext Down ()
     {
-        _winInput.InputBuffer.Enqueue (
-                                       new()
-                                       {
-                                           EventType = WindowsConsole.EventType.Key,
-                                           KeyEvent = new()
-                                           {
-                                               bKeyDown = true,
-                                               wRepeatCount = 0,
-                                               wVirtualKeyCode = ConsoleKeyMapping.VK.DOWN,
-                                               wVirtualScanCode = 0,
-                                               UnicodeChar = '\0',
-                                               dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed
-                                           }
-                                       });
-
-        _winInput.InputBuffer.Enqueue (
-                                       new()
-                                       {
-                                           EventType = WindowsConsole.EventType.Key,
-                                           KeyEvent = new()
-                                           {
-                                               bKeyDown = false,
-                                               wRepeatCount = 0,
-                                               wVirtualKeyCode = ConsoleKeyMapping.VK.DOWN,
-                                               wVirtualScanCode = 0,
-                                               UnicodeChar = '\0',
-                                               dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed
-                                           }
-                                       });
-
-        WaitIteration ();
-
+        SendWindowsKey (ConsoleKeyMapping.VK.DOWN);
         return this;
     }
-
+    public GuiTestContext Right ()
+    {
+        SendWindowsKey (ConsoleKeyMapping.VK.RIGHT);
+        return this;
+    }
+    public GuiTestContext Left ()
+    {
+        SendWindowsKey (ConsoleKeyMapping.VK.LEFT);
+        return this;
+    }
+    public GuiTestContext Up ()
+    {
+        SendWindowsKey (ConsoleKeyMapping.VK.UP);
+        return this;
+    }
     public GuiTestContext Enter ()
     {
+        SendWindowsKey (
+                        new WindowsConsole.KeyEventRecord ()
+                        {
+                            UnicodeChar = '\r',
+                            dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed,
+                            wRepeatCount = 1,
+                            wVirtualKeyCode = ConsoleKeyMapping.VK.RETURN,
+                            wVirtualScanCode = 28
+                        });
+
+        return this;
+    }
+
+    /// <summary>
+    /// Send a full windows OS key including both down and up.
+    /// </summary>
+    /// <param name="fullKey"></param>
+    private void SendWindowsKey (WindowsConsole.KeyEventRecord fullKey)
+    {
+        var down = fullKey;
+        var up = fullKey; // because struct this is new copy
+
+        down.bKeyDown = true;
+        up.bKeyDown = false;
+
+
         _winInput.InputBuffer.Enqueue (
-                                       new()
+                                       new ()
                                        {
                                            EventType = WindowsConsole.EventType.Key,
-                                           KeyEvent = new()
+                                           KeyEvent = down
+                                       });
+
+        _winInput.InputBuffer.Enqueue (
+                                       new ()
+                                       {
+                                           EventType = WindowsConsole.EventType.Key,
+                                           KeyEvent = up
+                                       });
+
+        WaitIteration ();
+    }
+
+    /// <summary>
+    /// Sends a special key e.g. cursor key that does not map to a specific character
+    /// </summary>
+    /// <param name="specialKey"></param>
+    private void SendWindowsKey (ConsoleKeyMapping.VK specialKey)
+    {
+
+        _winInput.InputBuffer.Enqueue (
+                                       new ()
+                                       {
+                                           EventType = WindowsConsole.EventType.Key,
+                                           KeyEvent = new ()
                                            {
                                                bKeyDown = true,
                                                wRepeatCount = 0,
-                                               wVirtualKeyCode = ConsoleKeyMapping.VK.RETURN,
+                                               wVirtualKeyCode = specialKey,
                                                wVirtualScanCode = 0,
                                                UnicodeChar = '\0',
                                                dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed
@@ -307,14 +341,14 @@ public class GuiTestContext : IDisposable
                                        });
 
         _winInput.InputBuffer.Enqueue (
-                                       new()
+                                       new ()
                                        {
                                            EventType = WindowsConsole.EventType.Key,
-                                           KeyEvent = new()
+                                           KeyEvent = new ()
                                            {
                                                bKeyDown = false,
                                                wRepeatCount = 0,
-                                               wVirtualKeyCode = ConsoleKeyMapping.VK.RETURN,
+                                               wVirtualKeyCode = specialKey,
                                                wVirtualScanCode = 0,
                                                UnicodeChar = '\0',
                                                dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed
@@ -322,9 +356,8 @@ public class GuiTestContext : IDisposable
                                        });
 
         WaitIteration ();
-
-        return this;
     }
+
 
     public GuiTestContext WithContextMenu (ContextMenu ctx, MenuBarItem menuItems)
     {
