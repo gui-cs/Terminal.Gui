@@ -69,6 +69,7 @@ public class BasicFluentAssertionTests
 
         using var c = With.A<Window> (40, 10)
                           .WithContextMenu(ctx,menuItems)
+                          .ScreenShot ("Before open menu", _out)
                           // Click in main area inside border
                           .RightClick(1,1)
                           .ScreenShot ("After open menu",_out)
