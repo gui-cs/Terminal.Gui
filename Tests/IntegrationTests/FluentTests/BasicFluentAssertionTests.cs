@@ -22,30 +22,33 @@ public class BasicFluentAssertionTests
 
     public BasicFluentAssertionTests (ITestOutputHelper outputHelper) { _out = new TestOutputWriter (outputHelper); }
 
-    [Fact]
-    public void GuiTestContext_StartsAndStopsWithoutError ()
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void GuiTestContext_StartsAndStopsWithoutError (V2TestDriver d)
     {
-        using GuiTestContext context = With.A<Window> (40, 10);
+        using GuiTestContext context = With.A<Window> (40, 10,d);
 
         // No actual assertions are needed — if no exceptions are thrown, it's working
         context.Stop ();
     }
 
-    [Fact]
-    public void GuiTestContext_ForgotToStop ()
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void GuiTestContext_ForgotToStop (V2TestDriver d)
     {
-        using GuiTestContext context = With.A<Window> (40, 10);
+        using GuiTestContext context = With.A<Window> (40, 10, d);
     }
 
-    [Fact]
-    public void TestWindowsResize ()
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void TestWindowsResize (V2TestDriver d)
     {
         var lbl = new Label
         {
             Width = Dim.Fill ()
         };
 
-        using GuiTestContext c = With.A<Window> (40, 10)
+        using GuiTestContext c = With.A<Window> (40, 10, d)
                                      .Add (lbl)
                                      .Then (() => Assert.Equal (lbl.Frame.Width, 38)) // Window has 2 border
                                      .ResizeConsole (20, 20)
@@ -53,8 +56,9 @@ public class BasicFluentAssertionTests
                                      .Stop ();
     }
 
-    [Fact]
-    public void ContextMenu_CrashesOnRight ()
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void ContextMenu_CrashesOnRight (V2TestDriver d)
     {
         var clicked = false;
 
@@ -66,7 +70,7 @@ public class BasicFluentAssertionTests
                                          ]
                                         );
 
-        using GuiTestContext c = With.A<Window> (40, 10)
+        using GuiTestContext c = With.A<Window> (40, 10, d)
                                      .WithContextMenu (ctx, menuItems)
                                      .ScreenShot ("Before open menu", _out)
 
@@ -80,9 +84,8 @@ public class BasicFluentAssertionTests
     }
 
     [Theory]
-    [InlineData(V2TestDriver.V2Win)]
-    [InlineData (V2TestDriver.V2Net)]
-    public void ContextMenu_OpenSubmenu (V2TestDriver v2TestDriver)
+    [ClassData (typeof (V2TestDrivers))]
+    public void ContextMenu_OpenSubmenu (V2TestDriver d)
     {
         var clicked = false;
 
@@ -112,7 +115,7 @@ public class BasicFluentAssertionTests
                                          ]
                                         );
 
-        using GuiTestContext c = With.A<Window> (40, 10,v2TestDriver)
+        using GuiTestContext c = With.A<Window> (40, 10,d)
                                      .WithContextMenu (ctx, menuItems)
                                      .ScreenShot ("Before open menu", _out)
 
