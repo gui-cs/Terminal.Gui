@@ -5,6 +5,10 @@ using Terminal.Gui.ConsoleDrivers;
 
 namespace TerminalGuiFluentTesting;
 
+/// <summary>
+/// Fluent API context for testing a Terminal.Gui application. Create
+/// an instance using <see cref="With"/> static class.
+/// </summary>
 public class GuiTestContext : IDisposable
 {
     private readonly CancellationTokenSource _cts = new ();
@@ -130,7 +134,9 @@ public class GuiTestContext : IDisposable
         return this;
     }
 
-    // Cleanup to avoid state bleed between tests
+    /// <summary>
+    /// Cleanup to avoid state bleed between tests
+    /// </summary>
     public void Dispose ()
     {
         Stop ();
@@ -164,6 +170,12 @@ public class GuiTestContext : IDisposable
         return this;
     }
 
+    /// <summary>
+    /// Simulates changing the console size e.g. by resizing window in your operating system
+    /// </summary>
+    /// <param name="width">new Width for the console.</param>
+    /// <param name="height">new Height for the console.</param>
+    /// <returns></returns>
     public GuiTestContext ResizeConsole (int width, int height)
     {
         _output.Size = new (width, height);
@@ -181,6 +193,11 @@ public class GuiTestContext : IDisposable
         return WaitIteration ();
     }
 
+    /// <summary>
+    /// Writes all Terminal.Gui engine logs collected so far to the <paramref name="writer"/>
+    /// </summary>
+    /// <param name="writer"></param>
+    /// <returns></returns>
     public GuiTestContext WriteOutLogs (TextWriter writer)
     {
         writer.WriteLine (_logsSb.ToString ());
@@ -188,6 +205,12 @@ public class GuiTestContext : IDisposable
         return WaitIteration ();
     }
 
+    /// <summary>
+    /// Waits until the end of the current iteration of the main loop. Optionally
+    /// running a given <paramref name="a"/> action on the UI thread at that time.
+    /// </summary>
+    /// <param name="a"></param>
+    /// <returns></returns>
     public GuiTestContext WaitIteration (Action? a = null)
     {
         a ??= () => { };
@@ -212,6 +235,12 @@ public class GuiTestContext : IDisposable
         return this;
     }
 
+    /// <summary>
+    /// Performs the supplied <paramref name="doAction"/> immediately.
+    /// Enables running commands without breaking the Fluent API calls.
+    /// </summary>
+    /// <param name="doAction"></param>
+    /// <returns></returns>
     public GuiTestContext Then (Action doAction)
     {
         doAction ();
@@ -219,8 +248,24 @@ public class GuiTestContext : IDisposable
         return this;
     }
 
+    /// <summary>
+    /// Simulates a right click at the given screen coordinates on the current driver.
+    /// This is a raw input event that goes through entire processing pipeline as though
+    /// user had pressed the mouse button physically.
+    /// </summary>
+    /// <param name="screenX">0 indexed screen coordinates</param>
+    /// <param name="screenY">0 indexed screen coordinates</param>
+    /// <returns></returns>
     public GuiTestContext RightClick (int screenX, int screenY) { return Click (WindowsConsole.ButtonState.Button3Pressed, screenX, screenY); }
 
+    /// <summary>
+    /// Simulates a left click at the given screen coordinates on the current driver.
+    /// This is a raw input event that goes through entire processing pipeline as though
+    /// user had pressed the mouse button physically.
+    /// </summary>
+    /// <param name="screenX">0 indexed screen coordinates</param>
+    /// <param name="screenY">0 indexed screen coordinates</param>
+    /// <returns></returns>
     public GuiTestContext LeftClick (int screenX, int screenY) { return Click (WindowsConsole.ButtonState.Button1Pressed, screenX, screenY); }
 
     private GuiTestContext Click (WindowsConsole.ButtonState btn, int screenX, int screenY)
@@ -297,7 +342,11 @@ public class GuiTestContext : IDisposable
         return this;
     }
 
-
+    /// <summary>
+    /// Simulates the Right cursor key
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public GuiTestContext Right ()
     {
         switch (_driver)
@@ -319,6 +368,11 @@ public class GuiTestContext : IDisposable
         return this;
     }
 
+    /// <summary>
+    /// Simulates the Left cursor key
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public GuiTestContext Left ()
     {
         switch (_driver)
@@ -340,6 +394,11 @@ public class GuiTestContext : IDisposable
         return this;
     }
 
+    /// <summary>
+    /// Simulates the up cursor key
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public GuiTestContext Up ()
     {
         switch (_driver)
@@ -361,6 +420,11 @@ public class GuiTestContext : IDisposable
         return this;
     }
 
+    /// <summary>
+    /// Simulates pressing the Return/Enter (newline) key.
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public GuiTestContext Enter ()
     {
         switch (_driver)
@@ -385,6 +449,31 @@ public class GuiTestContext : IDisposable
 
         return this;
     }
+
+    /// <summary>
+    /// Registers a right click handler on the <see cref="LastView"/> added view (or root view) that
+    /// will open the supplied <paramref name="menuItems"/>.
+    /// </summary>
+    /// <param name="ctx"></param>
+    /// <param name="menuItems"></param>
+    /// <returns></returns>
+    public GuiTestContext WithContextMenu (ContextMenu ctx, MenuBarItem menuItems)
+    {
+        LastView.MouseEvent += (s, e) =>
+                               {
+                                   if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
+                                   {
+                                       ctx.Show (menuItems);
+                                   }
+                               };
+
+        return this;
+    }
+
+    /// <summary>
+    /// The last view added (e.g. with <see cref="Add"/>) or the root/current top.
+    /// </summary>
+    public View LastView => _lastView ?? Application.Top ?? throw new ("Could not determine which view to add to");
 
     /// <summary>
     ///     Send a full windows OS key including both down and up.
@@ -459,19 +548,4 @@ public class GuiTestContext : IDisposable
 
         WaitIteration ();
     }
-
-    public GuiTestContext WithContextMenu (ContextMenu ctx, MenuBarItem menuItems)
-    {
-        LastView.MouseEvent += (s, e) =>
-                               {
-                                   if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
-                                   {
-                                       ctx.Show (menuItems);
-                                   }
-                               };
-
-        return this;
-    }
-
-    public View LastView => _lastView ?? Application.Top ?? throw new ("Could not determine which view to add to");
 }

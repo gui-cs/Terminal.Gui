@@ -50,9 +50,10 @@ public class BasicFluentAssertionTests
 
         using GuiTestContext c = With.A<Window> (40, 10, d)
                                      .Add (lbl)
-                                     .Then (() => Assert.Equal (lbl.Frame.Width, 38)) // Window has 2 border
+                                     .Then (() => Assert.Equal (38, lbl.Frame.Width)) // Window has 2 border
                                      .ResizeConsole (20, 20)
-                                     .Then (() => Assert.Equal (lbl.Frame.Width, 18))
+                                     .Then (() => Assert.Equal (18, lbl.Frame.Width))
+                                     .WriteOutLogs (_out)
                                      .Stop ();
     }
 
