@@ -81,7 +81,7 @@ public class BasicFluentAssertionTests
 
     [Theory]
     [InlineData(V2TestDriver.V2Win)]
-    //[InlineData (V2TestDriver.V2Net)] // TODO
+    [InlineData (V2TestDriver.V2Net)]
     public void ContextMenu_OpenSubmenu (V2TestDriver v2TestDriver)
     {
         var clicked = false;

@@ -225,29 +225,50 @@ public class GuiTestContext : IDisposable
 
     private GuiTestContext Click (WindowsConsole.ButtonState btn, int screenX, int screenY)
     {
-        // TODO: Support net style ansi escape sequence generation for arrow keys
+        switch (_driver)
+        {
+            case V2TestDriver.V2Win:
 
-        _winInput.InputBuffer.Enqueue (
-                                       new ()
-                                       {
-                                           EventType = WindowsConsole.EventType.Mouse,
-                                           MouseEvent = new ()
-                                           {
-                                               ButtonState = btn,
-                                               MousePosition = new ((short)screenX, (short)screenY)
-                                           }
-                                       });
+                _winInput.InputBuffer.Enqueue (
+                                               new ()
+                                               {
+                                                   EventType = WindowsConsole.EventType.Mouse,
+                                                   MouseEvent = new ()
+                                                   {
+                                                       ButtonState = btn,
+                                                       MousePosition = new ((short)screenX, (short)screenY)
+                                                   }
+                                               });
 
-        _winInput.InputBuffer.Enqueue (
-                                       new ()
-                                       {
-                                           EventType = WindowsConsole.EventType.Mouse,
-                                           MouseEvent = new ()
-                                           {
-                                               ButtonState = WindowsConsole.ButtonState.NoButtonPressed,
-                                               MousePosition = new ((short)screenX, (short)screenY)
-                                           }
-                                       });
+                _winInput.InputBuffer.Enqueue (
+                                               new ()
+                                               {
+                                                   EventType = WindowsConsole.EventType.Mouse,
+                                                   MouseEvent = new ()
+                                                   {
+                                                       ButtonState = WindowsConsole.ButtonState.NoButtonPressed,
+                                                       MousePosition = new ((short)screenX, (short)screenY)
+                                                   }
+                                               });
+                break;
+            case V2TestDriver.V2Net:
+
+                int netButton = btn switch
+                                {
+                                    WindowsConsole.ButtonState.Button1Pressed => 0,
+                                    WindowsConsole.ButtonState.Button2Pressed => 1,
+                                    WindowsConsole.ButtonState.Button3Pressed => 2,
+                                    WindowsConsole.ButtonState.RightmostButtonPressed => 2,
+                                    _ => throw new ArgumentOutOfRangeException(nameof(btn))
+                                };
+                foreach (var k in NetSequences.Click(netButton,screenX,screenY))
+                {
+                    SendNetKey (k);
+                }
+                break;
+            default:
+                throw new ArgumentOutOfRangeException ();
+        }
 
         WaitIteration ();
 
@@ -260,11 +281,13 @@ public class GuiTestContext : IDisposable
         {
             case V2TestDriver.V2Win:
                 SendWindowsKey (ConsoleKeyMapping.VK.DOWN);
+                WaitIteration ();
                 break;
             case V2TestDriver.V2Net:
-                // TODO: Support ansi sequence
-
-                throw new NotImplementedException ("Coming soon");
+                foreach (var k in NetSequences.Down)
+                {
+                    SendNetKey (k);
+                }
                 break;
             default:
                 throw new ArgumentOutOfRangeException ();
@@ -277,21 +300,63 @@ public class GuiTestContext : IDisposable
 
     public GuiTestContext Right ()
     {
-        SendWindowsKey (ConsoleKeyMapping.VK.RIGHT);
+        switch (_driver)
+        {
+            case V2TestDriver.V2Win:
+                SendWindowsKey (ConsoleKeyMapping.VK.RIGHT);
+                WaitIteration ();
+                break;
+            case V2TestDriver.V2Net:
+                foreach (var k in NetSequences.Right)
+                {
+                    SendNetKey (k);
+                }
+                break;
+            default:
+                throw new ArgumentOutOfRangeException ();
+        }
 
         return this;
     }
 
     public GuiTestContext Left ()
     {
-        SendWindowsKey (ConsoleKeyMapping.VK.LEFT);
+        switch (_driver)
+        {
+            case V2TestDriver.V2Win:
+                SendWindowsKey (ConsoleKeyMapping.VK.LEFT);
+                WaitIteration ();
+                break;
+            case V2TestDriver.V2Net:
+                foreach (var k in NetSequences.Left)
+                {
+                    SendNetKey (k);
+                }
+                break;
+            default:
+                throw new ArgumentOutOfRangeException ();
+        }
 
         return this;
     }
 
     public GuiTestContext Up ()
     {
-        SendWindowsKey (ConsoleKeyMapping.VK.UP);
+        switch (_driver)
+        {
+            case V2TestDriver.V2Win:
+                SendWindowsKey (ConsoleKeyMapping.VK.UP);
+                WaitIteration ();
+                break;
+            case V2TestDriver.V2Net:
+                foreach (var k in NetSequences.Up)
+                {
+                    SendNetKey (k);
+                }
+                break;
+            default:
+                throw new ArgumentOutOfRangeException ();
+        }
 
         return this;
     }
@@ -354,7 +419,6 @@ public class GuiTestContext : IDisposable
     private void SendNetKey (ConsoleKeyInfo consoleKeyInfo)
     {
         _netInput.InputBuffer.Enqueue (consoleKeyInfo);
-        WaitIteration ();
     }
 
     /// <summary>
