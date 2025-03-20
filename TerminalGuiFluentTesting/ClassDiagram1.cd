@@ -45,7 +45,7 @@
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>ABJAAAIAACBACQAAg4AAAAAgAJIEgAQAKACIBACAIgI=</HashCode>
+      <HashCode>ABJAAAIAACBACRAAg4IAAAAgAJIEgQQAKACIBACAIgI=</HashCode>
       <FileName>GuiTestContext.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -71,5 +71,19 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
+  <Class Name="TerminalGuiFluentTesting.NetSequences">
+    <Position X="11" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAACACAAAAAAgI=</HashCode>
+      <FileName>NetSequences.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="TerminalGuiFluentTesting.V2TestDriver">
+    <Position X="9.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAACAAA=</HashCode>
+      <FileName>V2TestDriver.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>
