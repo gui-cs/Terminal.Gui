@@ -69,19 +69,28 @@ public class MenuItemv2 : Shortcut
     /// </summary>
     public Command Command { get; set; }
 
+
+
     internal override bool? DispatchCommand (ICommandContext? commandContext)
     {
-        bool? ret = base.DispatchCommand (commandContext);
+        bool? ret = null;
 
         if (TargetView is { })
         {
+            if (commandContext is null)
+            {
+                commandContext = new CommandContext<KeyBinding> ();
+            }
+            commandContext.Command = Command;
             ret = TargetView.InvokeCommand (Command, commandContext);
         }
 
-        if (SubMenu is { })
+        if (ret is true)
         {
-            // RaiseActivateSubMenu ();
+            return ret;
         }
+
+        ret = base.DispatchCommand (commandContext);
 
         return ret;
     }
@@ -147,7 +156,7 @@ public class MenuItemv2 : Shortcut
     /// <summary>
     /// </summary>
     public event EventHandler<EventArgs<Menuv2>>? ActivateSubMenu;
-    
+
     ///// <inheritdoc />
     //public override Attribute GetNormalColor ()
     //{

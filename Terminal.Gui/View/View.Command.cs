@@ -137,7 +137,9 @@ public partial class View // Command APIs
 
             if (isDefaultView != this && isDefaultView is Button { IsDefault: true } button)
             {
-                bool? handled = isDefaultView.InvokeCommand<KeyBinding> (Command.Accept, new ([Command.Accept], null, this));
+                // TODO: It's a bit of a hack that this uses KeyBinding. There should be an InvokeCommmand that 
+                // TODO: is generic?
+                bool? handled = isDefaultView.InvokeCommand (Command.Accept, ctx);
                 if (handled == true)
                 {
                     return true;
@@ -146,7 +148,7 @@ public partial class View // Command APIs
 
             if (SuperView is { })
             {
-                return SuperView?.InvokeCommand<KeyBinding> (Command.Accept, new ([Command.Accept], null, this)) is true;
+                return SuperView?.InvokeCommand (Command.Accept, ctx) is true;
             }
         }
 
@@ -374,8 +376,29 @@ public partial class View // Command APIs
         return implementation! (new CommandContext<TBindingType> ()
         {
             Command = command,
+            Source = this,
             Binding = binding,
         });
+    }
+
+
+    /// <summary>
+    /// Invokes the specified command.
+    /// </summary>
+    /// <param name="command">The command to invoke.</param>
+    /// <param name="ctx">The context to pass with the command.</param>
+    /// <returns>
+    ///     <see langword="null"/> if no command was found; input processing should continue.
+    ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should continue.
+    ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should stop.
+    /// </returns>
+    public bool? InvokeCommand (Command command, ICommandContext? ctx)
+    {
+        if (!_commandImplementations.TryGetValue (command, out CommandImplementation? implementation))
+        {
+            _commandImplementations.TryGetValue (Command.NotBound, out implementation);
+        }
+        return implementation! (ctx);
     }
 
     /// <summary>

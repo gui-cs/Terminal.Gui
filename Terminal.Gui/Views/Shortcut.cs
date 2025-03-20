@@ -47,7 +47,6 @@ public class Shortcut : View, IOrientation, IDesignable
     public Shortcut () : this (Key.Empty, null, null, null) { }
 
     /// <summary>
-    /// <summary>
     ///     Creates a new instance of <see cref="Shortcut"/>.
     /// </summary>
     /// <remarks>
@@ -258,18 +257,24 @@ public class Shortcut : View, IOrientation, IDesignable
         AddCommand (Command.Select, DispatchCommand);
     }
 
+    /// <summary>
+    ///     Called when a Command has been invoked on this Shortcut.
+    /// </summary>
+    /// <param name="commandContext"></param>
+    /// <returns></returns>
     internal virtual bool? DispatchCommand (ICommandContext? commandContext)
     {
-        CommandContext<KeyBinding>? keyCommandContext = commandContext is CommandContext<KeyBinding> ? (CommandContext<KeyBinding>)commandContext : default;
+        CommandContext<KeyBinding>? keyCommandContext = commandContext as CommandContext<KeyBinding>? ?? default (CommandContext<KeyBinding>);
 
         if (keyCommandContext?.Binding.Data != this)
         {
-            // Invoke Select on the command view to cause it to change state if it wants to
+            // Invoke Select on the CommandView to cause it to change state if it wants to
             // If this causes CommandView to raise Accept, we eat it
             keyCommandContext = keyCommandContext!.Value with { Binding = keyCommandContext.Value.Binding with { Data = this } };
             CommandView.InvokeCommand (Command.Select, keyCommandContext);
         }
 
+        // BUGBUG: Why does this use keyCommandContext and not commandContext?
         if (RaiseSelecting (keyCommandContext) is true)
         {
             return true;
@@ -280,6 +285,10 @@ public class Shortcut : View, IOrientation, IDesignable
 
         var cancel = false;
 
+        if (commandContext is { })
+        {
+            commandContext.Source = this;
+        }
         cancel = RaiseAccepting (commandContext) is true;
 
         if (cancel)

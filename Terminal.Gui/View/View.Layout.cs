@@ -1070,10 +1070,10 @@ public partial class View // Layout APIs
             nx = Math.Max (targetX, 0);
             nx = nx + viewToMove.Frame.Width > maxDimension ? Math.Max (maxDimension - viewToMove.Frame.Width, 0) : nx;
 
-            if (nx > viewToMove.Frame.X + viewToMove.Frame.Width)
-            {
-                nx = Math.Max (viewToMove.Frame.Right, 0);
-            }
+            //if (nx > viewToMove.Frame.X + viewToMove.Frame.Width)
+            //{
+            //    nx = Math.Max (viewToMove.Frame.Right, 0);
+            //}
         }
         else
         {

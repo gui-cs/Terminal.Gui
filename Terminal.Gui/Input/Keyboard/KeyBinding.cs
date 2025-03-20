@@ -36,6 +36,9 @@ public record struct KeyBinding : IInputBinding
     /// <summary>The commands this key binding will invoke.</summary>
     public Command [] Commands { get; set; }
 
+    /// <inheritdoc />
+    public object? Data { get; set; }
+
     /// <summary>
     ///     The Key that is bound to the <see cref="Commands"/>.
     /// </summary>
@@ -43,9 +46,4 @@ public record struct KeyBinding : IInputBinding
 
     /// <summary>The view the key binding is bound to.</summary>
     public View? Target { get; set; }
-
-    /// <summary>
-    ///     Arbitrary context that can be associated with this key binding.
-    /// </summary>
-    public object? Data { get; set; }
 }

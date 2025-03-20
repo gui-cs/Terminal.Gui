@@ -62,7 +62,7 @@ public class MenusV2 : Scenario
         };
         ConfigureOptionsSubMenu (frame, optionsSubMenu);
 
-        var optionsSubMenuItem = new MenuItemv2 (frame, Command.Accept, "O_ptions", "File options", optionsSubMenu);
+        var optionsSubMenuItem = new MenuItemv2 (frame, Command.NotBound, "O_ptions", "File options", optionsSubMenu);
         rootMenu.Add (optionsSubMenuItem);
 
         var detailsSubMenu = new Menuv2
@@ -72,7 +72,7 @@ public class MenusV2 : Scenario
         };
         ConfigureDetialsSubMenu (frame, detailsSubMenu);
 
-        var detailsSubMenuItem = new MenuItemv2 (frame, Command.Accept, "_Details", "File details", detailsSubMenu);
+        var detailsSubMenuItem = new MenuItemv2 (frame, Command.NotBound, "_Details", "File details", detailsSubMenu);
         rootMenu.Add (detailsSubMenuItem);
 
         var moreDetailsSubMenu = new Menuv2
@@ -82,7 +82,7 @@ public class MenusV2 : Scenario
         };
         ConfigureMoreDetailsSubMenu (frame, moreDetailsSubMenu);
 
-        var moreDetailsSubMenuItem = new MenuItemv2 (frame, Command.Accept, "_More Details", "More details", moreDetailsSubMenu);
+        var moreDetailsSubMenuItem = new MenuItemv2 (frame, Command.NotBound, "_More Details", "More details", moreDetailsSubMenu);
         detailsSubMenu.Add (moreDetailsSubMenuItem);
 
         var popoverMenu = new PopoverMenu (rootMenu)
@@ -101,29 +101,32 @@ public class MenusV2 : Scenario
 
         frame.CommandNotBound += (o, args) =>
                                {
-                                   eventSource.Add ($"{args.Context!.Command}: {frame?.Id}");
+                                   Logging.Trace ($"frame CommandNotBound: {args.Context.Command}");
+                                   eventSource.Add ($"frame CommandNotBound: {args.Context.Command}");
                                    eventLog.MoveDown ();
                                    args.Cancel = true;
                                };
 
         frame.Accepting += (o, args) =>
                                {
-                                   eventSource.Add ($"{args.Context!.Command}: {frame?.Id}");
+                                   Logging.Trace ($"frame CommandNotBound: {args?.Context?.Source?.Title}");
+                                   eventSource.Add ($"frame Accepting: {args?.Context?.Source?.Title}: ");
                                    eventLog.MoveDown ();
                                    // args.Cancel = true;
                                };
 
         popoverMenu.Accepting += (o, args) =>
                                  {
-                                     Logging.Trace ($"Accepting: {popoverMenu!.Id} {args.Context.Command}");
-                                     //eventSource.Add ($"Accepting: {menu!.Id} {args.Context.Command}");
-                                     //eventLog.MoveDown ();
+
+                                     Logging.Trace ($"{popoverMenu!.Id} Accepting: {args?.Context?.Source?.Title}");
+                                     eventSource.Add ($"{popoverMenu!.Id} Accepting: {args?.Context?.Source?.Title}");
+                                     eventLog.MoveDown ();
                                      //args.Cancel = true;
                                  };
 
         popoverMenu.Selecting += (o, args) =>
                                  {
-                                     Logging.Trace ($"Selecting: {popoverMenu!.Id} {args.Context.Command}");
+                                     Logging.Trace ($"{popoverMenu!.Id} Selecting: {args.Context}");
                                      //eventSource.Add ($"Selecting: {menu!.Id} {args.Context.Command}");
                                      //eventLog.MoveDown ();
                                      //args.Cancel = false;
@@ -149,7 +152,7 @@ public class MenusV2 : Scenario
 
             sh.Accepting += (o, args) =>
                             {
-                                Logging.Trace ($"Accepting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
+                                Logging.Trace ($"sh Accepting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
                                 //eventSource.Add ($"Accepting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
                                 //eventLog.MoveDown ();
                                 //args.Cancel = true;
@@ -157,7 +160,7 @@ public class MenusV2 : Scenario
 
             sh.Selecting += (o, args) =>
                             {
-                                Logging.Trace ($"Selecting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
+                                Logging.Trace ($"sh Selecting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
                                 //eventSource.Add ($"Selecting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
                                 //eventLog.MoveDown ();
                                 //args.Cancel = false;
@@ -177,7 +180,8 @@ public class MenusV2 : Scenario
         var shortcut1 = new MenuItemv2
         {
             Title = "_New",
-            Key = Key.N.WithCtrl,
+            Key = Key.N.WithAlt,
+            BindKeyToApplication = true,
             Text = "New File",
             Command = Command.New,
             TargetView = targetView
@@ -187,7 +191,8 @@ public class MenusV2 : Scenario
         {
             Title = "_Open...",
             Text = "Open File",
-            Key = Key.O.WithCtrl,
+            Key = Key.O.WithAlt,
+            BindKeyToApplication = true,
             Command = Command.Open,
             TargetView = targetView
         };
@@ -196,7 +201,8 @@ public class MenusV2 : Scenario
         {
             Title = "_Save",
             Text = "Save file",
-            Key = Key.S.WithCtrl,
+            Key = Key.S.WithAlt,
+            BindKeyToApplication = true,
             Command = Command.Save,
             TargetView = targetView
         };
@@ -205,7 +211,8 @@ public class MenusV2 : Scenario
         {
             Title = "Sa_ve As...",
             Text = "Save file as",
-            Key = Key.V.WithCtrl,
+            Key = Key.V.WithAlt,
+            BindKeyToApplication = true,
             Command = Command.SaveAs,
             TargetView = targetView
 
@@ -216,26 +223,27 @@ public class MenusV2 : Scenario
         {
             Title = "_Auto Save",
             Text = "Automatically save",
-            Key = Key.A.WithCtrl,
-            TargetView = targetView
+            Key = Key.A.WithAlt,
+            BindKeyToApplication = true,
+
         };
 
-        shortcut5.CommandView = new CheckBox
-        {
-            Title = shortcut5.Title,
-            HighlightStyle = HighlightStyle.None,
-            CanFocus = false
-        };
+        //shortcut5.CommandView = new CheckBox
+        //{
+        //    Title = shortcut5.Title,
+        //    HighlightStyle = HighlightStyle.None,
+        //    CanFocus = false
+        //};
 
         var line = new Line
         {
-            X = -1,
+            X = -1, 
             Width = Dim.Fill ()! + 1
         };
 
 
-        //// This ensures the checkbox state toggles when the hotkey of Title is pressed.
-        ////shortcut4.Accepting += (sender, args) => args.Cancel = true;
+        // This ensures the checkbox state toggles when the hotkey of Title is pressed.
+        //shortcut4.Accepting += (sender, args) => args.Cancel = true;
 
         menu.Add (shortcut1, shortcut2, shortcut3, shortcut4, line, shortcut5);
     }
@@ -245,16 +253,20 @@ public class MenusV2 : Scenario
     {
         var shortcut2 = new MenuItemv2
         {
-            Title = "_Option 1",
-            Text = "Some option #1",
-            Key = Key.G.WithAlt
+            Title = "_Enable Overwrite",
+            Text = "Overwrite",
+            Key = Key.O.WithAlt,
+            BindKeyToApplication = true,
+            Command = Command.EnableOverwrite,
+            TargetView = targetView
         };
 
         var shortcut3 = new MenuItemv2
         {
             Title = "_Three",
             Text = "The 3rd item",
-            Key = Key.T.WithAlt
+            Key = Key.T.WithAlt,
+            BindKeyToApplication = true,
         };
 
         var line = new Line
@@ -267,7 +279,8 @@ public class MenusV2 : Scenario
         {
             Title = "_Four",
             Text = "Below the line",
-            Key = Key.D7.WithAlt
+            Key = Key.D7.WithAlt,
+            BindKeyToApplication = true,
         };
 
         shortcut4.CommandView = new CheckBox
@@ -278,7 +291,7 @@ public class MenusV2 : Scenario
         };
 
         // This ensures the checkbox state toggles when the hotkey of Title is pressed.
-        //shortcut4.Accepting += (sender, args) => args.Cancel = true;
+       // shortcut4.Accepting += (sender, args) => args.Cancel = true;
 
         menu.Add (shortcut2, shortcut3, line, shortcut4);
     }
@@ -289,14 +302,16 @@ public class MenusV2 : Scenario
         {
             Title = "_Detail 1",
             Text = "Some detail #1",
-            Key = Key.G.WithAlt
+            Key = Key.G.WithAlt,
+            BindKeyToApplication = true,
         };
 
         var shortcut3 = new MenuItemv2
         {
             Title = "_Three",
             Text = "The 3rd item",
-            Key = Key.D3.WithAlt
+            Key = Key.D9.WithAlt,
+            BindKeyToApplication = true,
         };
 
         var line = new Line
@@ -309,7 +324,9 @@ public class MenusV2 : Scenario
         {
             Title = "_Four",
             Text = "Below the line",
-            Key = Key.D8.WithAlt
+            Key = Key.D8.WithAlt,
+            BindKeyToApplication = true,
+
         };
 
         shortcut4.CommandView = new CheckBox
@@ -332,7 +349,8 @@ public class MenusV2 : Scenario
         {
             Title = "_Deeper Detail",
             Text = "Deeper Detail",
-            Key = Key.V.WithAlt
+            Key = Key.D.WithAlt,
+            BindKeyToApplication = true,
         };
 
         var line = new Line
@@ -345,7 +363,9 @@ public class MenusV2 : Scenario
         {
             Title = "_Third",
             Text = "Below the line",
-            Key = Key.D3.WithAlt
+            Key = Key.D5.WithAlt,
+            BindKeyToApplication = true,
+
         };
 
         // This ensures the checkbox state toggles when the hotkey of Title is pressed.

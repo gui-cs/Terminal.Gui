@@ -58,6 +58,14 @@ public class PopoverMenu : View
         }
 
         KeyBindings.Add (Key.CursorLeft, Command.Left);
+
+        AddCommand (Command.NotBound,
+                   ctx =>
+                   {
+                       Logging.Trace ($"popoverMenu NotBound: {ctx}");
+
+                       return false;
+                   });
     }
 
     private Menuv2? _root;
@@ -75,10 +83,19 @@ public class PopoverMenu : View
                 return;
             }
 
+            if (_root is { })
+            {
+                _root.Accepting -= MenuOnAccepting;
+            }
+
             HideAndRemoveSubMenu (_root);
 
             _root = value;
 
+            if (_root is { })
+            {
+                _root.Accepting += MenuOnAccepting;
+            }
             AddAndShowSubMenu (_root);
         }
     }
@@ -92,8 +109,8 @@ public class PopoverMenu : View
         var menu = menuItem?.SuperView as Menuv2;
 
         // If there's a visible peer, remove / hide it
-        
-        Debug.Assert(menu is null || menu?.SubViews.Count(v => v is MenuItemv2 { SubMenu.Visible: true }) < 2);
+
+        Debug.Assert (menu is null || menu?.SubViews.Count (v => v is MenuItemv2 { SubMenu.Visible: true }) < 2);
         if (menu?.SubViews.FirstOrDefault (v => v is MenuItemv2 { SubMenu.Visible: true }) is MenuItemv2 visiblePeer)
         {
             HideAndRemoveSubMenu (visiblePeer.SubMenu);
@@ -168,7 +185,10 @@ public class PopoverMenu : View
         }
     }
 
-    private void MenuOnAccepting (object? sender, CommandEventArgs e) { Logging.Trace ($"MenuOnSelectedMenuItemChanged: {e.Context}"); }
+    private void MenuOnAccepting (object? sender, CommandEventArgs e)
+    {
+        Logging.Trace ($"MenuOnAccepting: {e.Context?.Source?.Title}");
+    }
 
     private void MenuOnMenuItemCommandInvoked (object? sender, CommandEventArgs e) { Logging.Trace ($"MenuOnMenuItemCommandInvoked: {e.Context}"); }
 

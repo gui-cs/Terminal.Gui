@@ -102,7 +102,7 @@ public static partial class Application // Keyboard handling
 
             if (_commandImplementations.TryGetValue (command, out View.CommandImplementation? implementation))
             {
-                CommandContext<KeyBinding> context = new (command, binding); // Create the context here
+                CommandContext<KeyBinding> context = new (command, null, binding); // Create the context here
 
                 return implementation (context);
             }

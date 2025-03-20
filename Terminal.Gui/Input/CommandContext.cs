@@ -14,14 +14,18 @@ public record struct CommandContext<TBinding> : ICommandContext
     /// </summary>
     /// <param name="command"></param>
     /// <param name="binding"></param>
-    public CommandContext (Command command, TBinding? binding)
+    public CommandContext (Command command, View? source, TBinding? binding)
     {
         Command = command;
         Binding = binding;
+        Source = source;
     }
 
     /// <inheritdoc />
     public Command Command { get; set; }
+
+    /// <inheritdoc />
+    public View? Source { get; set; }
 
     /// <summary>
     /// The keyboard or mouse minding that was used to invoke the <see cref="Command"/>, if any.

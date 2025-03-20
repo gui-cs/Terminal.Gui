@@ -63,8 +63,8 @@ public class Menuv2 : Bar
             menuItem.Accepting += MenuItemtOnAccepting;
 
             void MenuItemtOnAccepting (object? sender, CommandEventArgs e)
-            {
-                //Logging.Trace($"MenuItemtOnAccepting: {e.Context}");
+            { 
+                Logging.Trace ($"MenuItemOnAccepting: {e.Context?.Source?.Title}");
             }
         }
     }
