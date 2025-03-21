@@ -6,7 +6,7 @@ using Moq;
 namespace UnitTests.ConsoleDrivers.V2;
 public class ApplicationV2Tests
 {
-
+    
     private ApplicationV2 NewApplicationV2 ()
     {
         var netInput = new Mock<INetInput> ();

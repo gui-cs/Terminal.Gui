@@ -104,6 +104,7 @@ public sealed class ContextMenu : IDisposable
         if (_menuBar is { })
         {
             _menuBar.MenuAllClosed -= MenuBar_MenuAllClosed;
+            _container?.Remove (_menuBar);
         }
         Application.UngrabMouse ();
         _menuBar?.Dispose ();
@@ -177,16 +178,16 @@ public sealed class ContextMenu : IDisposable
         }
 
         MenuItems = menuItems;
-        _container = Application.Top;
+        _container = GetTopSuperView (Host);
         _container!.Closing += Container_Closing;
         _container.Deactivate += Container_Deactivate;
         _container.Disposing += Container_Disposing;
-        Rectangle frame = Application.Screen;
+        Rectangle viewport = _container.Viewport;
         Point position = Position;
 
         if (Host is { })
         {
-            Point pos = Host.ViewportToScreen (frame).Location;
+            Point pos = Host.Frame.Location;
             pos.Y += Host.Frame.Height > 0 ? Host.Frame.Height - 1 : 0;
 
             if (position != pos)
@@ -197,11 +198,11 @@ public sealed class ContextMenu : IDisposable
 
         Rectangle rect = Menu.MakeFrame (position.X, position.Y, MenuItems.Children);
 
-        if (rect.Right >= frame.Right)
+        if (rect.Right >= viewport.Right)
         {
-            if (frame.Right - rect.Width >= 0 || !ForceMinimumPosToZero)
+            if (viewport.Right - rect.Width >= 0 || !ForceMinimumPosToZero)
             {
-                position.X = frame.Right - rect.Width;
+                position.X = viewport.Right - rect.Width;
             }
             else if (ForceMinimumPosToZero)
             {
@@ -213,17 +214,17 @@ public sealed class ContextMenu : IDisposable
             position.X = 0;
         }
 
-        if (rect.Bottom >= frame.Bottom)
+        if (rect.Bottom >= viewport.Bottom)
         {
-            if (frame.Bottom - rect.Height - 1 >= 0 || !ForceMinimumPosToZero)
+            if (viewport.Bottom - rect.Height - 1 >= 0 || !ForceMinimumPosToZero)
             {
                 if (Host is null)
                 {
-                    position.Y = frame.Bottom - rect.Height - 1;
+                    position.Y = viewport.Bottom - rect.Height - 1;
                 }
                 else
                 {
-                    Point pos = Host.ViewportToScreen (frame).Location;
+                    Point pos = Host.Frame.Location;
                     position.Y = pos.Y - rect.Height - 1;
                 }
             }
@@ -251,10 +252,27 @@ public sealed class ContextMenu : IDisposable
         _menuBar._isContextMenuLoading = true;
         _menuBar.MenuAllClosed += MenuBar_MenuAllClosed;
 
-        _menuBar.BeginInit ();
-        _menuBar.EndInit ();
+        _container.Add (_menuBar);
         IsShow = true;
         _menuBar.OpenMenu ();
+    }
+
+    internal static Toplevel? GetTopSuperView (View? view)
+    {
+        if (view is Toplevel toplevel)
+        {
+            return toplevel;
+        }
+
+        for (View? sv = view?.SuperView; sv != null; sv = sv.SuperView)
+        {
+            if (sv is Toplevel top)
+            {
+                return top;
+            }
+        }
+
+        return (Toplevel?)view?.SuperView ?? Application.Top;
     }
 
     private void Container_Closing (object? sender, ToplevelClosingEventArgs obj) { Hide (); }

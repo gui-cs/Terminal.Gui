@@ -2,7 +2,7 @@ name: Publish Terminal.Gui
 
 on:
   push:
-    branches: [ v1_release, v1_develop, v2_release, v2_develop ]
+    branches: [ v2_release, v2_develop ]
     tags:
       - v*
     paths-ignore:

@@ -17,7 +17,7 @@
     },
     "UICatalog --driver v2net": {
       "commandName": "Project",
-      "commandLineArgs": "--driver v2net"
+      "commandLineArgs": "--driver v2net -dl Trace"
     },
     "WSL: UICatalog": {
       "commandName": "Executable",

@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+﻿using System.Text;
 using UnitTests;
 
 // ReSharper disable HeuristicUnreachableCode
@@ -685,7 +685,7 @@ public class EscSeqUtilsTests
         top.Add (view);
         Application.Begin (top);
 
-        Application.RaiseMouseEvent (new() { Position = new (0, 0), Flags = 0 });
+        Application.RaiseMouseEvent (new () { Position = new (0, 0), Flags = 0 });
 
         ClearAll ();
 
@@ -741,7 +741,7 @@ public class EscSeqUtilsTests
                                          // set Application.WantContinuousButtonPressedView to null
                                          view.WantContinuousButtonPressed = false;
 
-                                         Application.RaiseMouseEvent (new() { Position = new (0, 0), Flags = 0 });
+                                         Application.RaiseMouseEvent (new () { Position = new (0, 0), Flags = 0 });
 
                                          Application.RequestStop ();
                                      }
@@ -1546,6 +1546,21 @@ public class EscSeqUtilsTests
         }
 
         Assert.Equal (result, cki);
+    }
+
+    [Theory]
+    [InlineData (0, 0, $"{EscSeqUtils.CSI}0;0H")]
+    [InlineData (int.MaxValue, int.MaxValue, $"{EscSeqUtils.CSI}2147483647;2147483647H")]
+    [InlineData (int.MinValue, int.MinValue, $"{EscSeqUtils.CSI}-2147483648;-2147483648H")]
+    public void CSI_WriteCursorPosition_ReturnsCorrectEscSeq (int row, int col, string expected)
+    {
+        StringBuilder builder = new();
+        using StringWriter writer = new(builder);
+
+        EscSeqUtils.CSI_WriteCursorPosition (writer, row, col);
+
+        string actual = builder.ToString();
+        Assert.Equal (expected, actual);
     }
 
     private void ClearAll ()

@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+
+namespace Terminal.Gui;
 
 /// <summary>
 ///     Represents a single row/column in a Terminal.Gui rendering surface (e.g. <see cref="LineCanvas"/> and
@@ -23,12 +25,12 @@ public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, Ru
         get => _rune;
         set
         {
-            CombiningMarks.Clear ();
+            _combiningMarks?.Clear ();
             _rune = value;
         }
     }
 
-    private List<Rune> _combiningMarks;
+    private List<Rune>? _combiningMarks;
 
     /// <summary>
     ///     The combining marks for <see cref="Rune"/> that when combined makes this Cell a combining sequence. If
@@ -38,10 +40,37 @@ public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, Ru
     ///     Only valid in the rare case where <see cref="Rune"/> is a combining sequence that could not be normalized to a
     ///     single Rune.
     /// </remarks>
-    internal List<Rune> CombiningMarks
+    internal IReadOnlyList<Rune> CombiningMarks
     {
-        get => _combiningMarks ?? [];
-        private set => _combiningMarks = value ?? [];
+        // PERFORMANCE: Downside of the interface return type is that List<T> struct enumerator cannot be utilized, i.e. enumerator is allocated.
+        // If enumeration is used heavily in the future then might be better to expose the List<T> Enumerator directly via separate mechanism.
+        get
+        {
+            // Avoid unnecessary list allocation.
+            if (_combiningMarks == null)
+            {
+                return Array.Empty<Rune> ();
+            }
+            return _combiningMarks;
+        }
+    }
+
+    /// <summary>
+    ///     Adds combining mark to the cell.
+    /// </summary>
+    /// <param name="combiningMark">The combining mark to add to the cell.</param>
+    internal void AddCombiningMark (Rune combiningMark)
+    {
+        _combiningMarks ??= [];
+        _combiningMarks.Add (combiningMark);
+    }
+
+    /// <summary>
+    ///     Clears combining marks of the cell.
+    /// </summary>
+    internal void ClearCombiningMarks ()
+    {
+        _combiningMarks?.Clear ();
     }
 
     /// <inheritdoc/>
