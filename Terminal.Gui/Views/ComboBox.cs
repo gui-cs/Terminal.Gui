@@ -80,11 +80,7 @@ public class ComboBox : View, IDesignable
         // Things this view knows how to do
         AddCommand (Command.Accept, (ctx) =>
                                     {
-                                        if (ctx is not CommandContext<KeyBinding> keyCommandContext)
-                                        {
-                                            return false;
-                                        }
-                                        if (keyCommandContext.Binding.Data == _search)
+                                        if (ctx?.Source == _search)
                                         {
                                             return null;
                                         }
@@ -93,8 +89,8 @@ public class ComboBox : View, IDesignable
         AddCommand (Command.Toggle, () => ExpandCollapse ());
         AddCommand (Command.Expand, () => Expand ());
         AddCommand (Command.Collapse, () => Collapse ());
-        AddCommand (Command.Down, () => MoveDown ());
-        AddCommand (Command.Up, () => MoveUp ());
+        AddCommand (Command.Down, MoveDown);
+        AddCommand (Command.Up, MoveUp);
         AddCommand (Command.PageDown, () => PageDown ());
         AddCommand (Command.PageUp, () => PageUp ());
         AddCommand (Command.Start, () => MoveHome ());
