@@ -36,10 +36,10 @@ public class MenusV2 : Scenario
         };
         eventLog.Border!.Thickness = new (0, 1, 0, 0);
 
-        FrameView frame = new ()
+        FrameView targetView = new ()
         {
-            Id = "frame",
-            Title = "Cascading Menu...",
+            Id = "targetView",
+            Title = "Target View",
 
             X = 4,
             Y = 4,
@@ -47,22 +47,22 @@ public class MenusV2 : Scenario
             Height = Dim.Fill (8),
             BorderStyle = LineStyle.Dotted
         };
-        app.Add (frame);
+        app.Add (targetView);
 
         var rootMenu = new Menuv2 ()
         {
             Id = "rootMenu",
         };
-        ConfigureRootMenu (frame, rootMenu);
+        ConfigureRootMenu (targetView, rootMenu);
 
         var optionsSubMenu = new Menuv2
         {
             Id = "optionsSubMenu",
             Visible = false
         };
-        ConfigureOptionsSubMenu (frame, optionsSubMenu);
+        ConfigureOptionsSubMenu (targetView, optionsSubMenu);
 
-        var optionsSubMenuItem = new MenuItemv2 (frame, Command.NotBound, "O_ptions", "File options", optionsSubMenu);
+        var optionsSubMenuItem = new MenuItemv2 (targetView, Command.NotBound, "O_ptions", "File options", optionsSubMenu);
         rootMenu.Add (optionsSubMenuItem);
 
         var detailsSubMenu = new Menuv2
@@ -70,9 +70,9 @@ public class MenusV2 : Scenario
             Id = "detailsSubMenu",
             Visible = false
         };
-        ConfigureDetialsSubMenu (frame, detailsSubMenu);
+        ConfigureDetialsSubMenu (targetView, detailsSubMenu);
 
-        var detailsSubMenuItem = new MenuItemv2 (frame, Command.NotBound, "_Details", "File details", detailsSubMenu);
+        var detailsSubMenuItem = new MenuItemv2 (targetView, Command.NotBound, "_Details", "File details", detailsSubMenu);
         rootMenu.Add (detailsSubMenuItem);
 
         var moreDetailsSubMenu = new Menuv2
@@ -80,9 +80,9 @@ public class MenusV2 : Scenario
             Id = "moreDetailsSubMenu",
             Visible = false
         };
-        ConfigureMoreDetailsSubMenu (frame, moreDetailsSubMenu);
+        ConfigureMoreDetailsSubMenu (targetView, moreDetailsSubMenu);
 
-        var moreDetailsSubMenuItem = new MenuItemv2 (frame, Command.NotBound, "_More Details", "More details", moreDetailsSubMenu);
+        var moreDetailsSubMenuItem = new MenuItemv2 (targetView, Command.NotBound, "_More Details", "More details", moreDetailsSubMenu);
         detailsSubMenu.Add (moreDetailsSubMenuItem);
 
         var popoverMenu = new PopoverMenu (rootMenu)
@@ -97,36 +97,36 @@ public class MenusV2 : Scenario
 
         //rootMenu.SubViews.ElementAt (0).SetFocus ();
 
-        frame.Add (popoverMenu);
+        targetView.Add (popoverMenu);
 
-        frame.CommandNotBound += (o, args) =>
+        targetView.CommandNotBound += (o, args) =>
                                {
-                                   Logging.Trace ($"frame CommandNotBound: {args.Context.Command}");
-                                   eventSource.Add ($"frame CommandNotBound: {args.Context.Command}");
+                                   Logging.Trace ($"targetView CommandNotBound: {args.Context.Command}");
+                                   eventSource.Add ($"targetView CommandNotBound: {args.Context.Command}");
                                    eventLog.MoveDown ();
                                    args.Cancel = true;
                                };
 
-        frame.Accepting += (o, args) =>
+        targetView.Accepting += (o, args) =>
                                {
-                                   Logging.Trace ($"frame CommandNotBound: {args?.Context?.Source?.Title}");
-                                   eventSource.Add ($"frame Accepting: {args?.Context?.Source?.Title}: ");
+                                   Logging.Trace ($"targetView CommandNotBound: {args?.Context?.Source?.Title}");
+                                   eventSource.Add ($"targetView Accepting: {args?.Context?.Source?.Title}: ");
                                    eventLog.MoveDown ();
-                                   // args.Cancel = true;
+                                   args.Cancel = true;
                                };
 
         popoverMenu.Accepting += (o, args) =>
                                  {
 
-                                     Logging.Trace ($"{popoverMenu!.Id} Accepting: {args?.Context?.Source?.Title}");
-                                     eventSource.Add ($"{popoverMenu!.Id} Accepting: {args?.Context?.Source?.Title}");
-                                     eventLog.MoveDown ();
+                                     //Logging.Trace ($"{popoverMenu!.Id} Accepting: {args?.Context?.Source?.Title}");
+                                     //eventSource.Add ($"{popoverMenu!.Id} Accepting: {args?.Context?.Source?.Title}");
+                                     //eventLog.MoveDown ();
                                      //args.Cancel = true;
                                  };
 
         popoverMenu.Selecting += (o, args) =>
                                  {
-                                     Logging.Trace ($"{popoverMenu!.Id} Selecting: {args.Context}");
+                                     //Logging.Trace ($"{popoverMenu!.Id} Selecting: {args.Context}");
                                      //eventSource.Add ($"Selecting: {menu!.Id} {args.Context.Command}");
                                      //eventLog.MoveDown ();
                                      //args.Cancel = false;
@@ -152,7 +152,7 @@ public class MenusV2 : Scenario
 
             sh.Accepting += (o, args) =>
                             {
-                                Logging.Trace ($"sh Accepting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
+                                //Logging.Trace ($"sh Accepting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
                                 //eventSource.Add ($"Accepting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
                                 //eventLog.MoveDown ();
                                 //args.Cancel = true;
@@ -160,7 +160,7 @@ public class MenusV2 : Scenario
 
             sh.Selecting += (o, args) =>
                             {
-                                Logging.Trace ($"sh Selecting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
+                                //Logging.Trace ($"sh Selecting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
                                 //eventSource.Add ($"Selecting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
                                 //eventLog.MoveDown ();
                                 //args.Cancel = false;
@@ -228,12 +228,12 @@ public class MenusV2 : Scenario
 
         };
 
-        //shortcut5.CommandView = new CheckBox
-        //{
-        //    Title = shortcut5.Title,
-        //    HighlightStyle = HighlightStyle.None,
-        //    CanFocus = false
-        //};
+        shortcut5.CommandView = new CheckBox
+        {
+            Title = shortcut5.Title,
+            HighlightStyle = HighlightStyle.None,
+            CanFocus = false
+        };
 
         var line = new Line
         {
@@ -253,9 +253,9 @@ public class MenusV2 : Scenario
     {
         var shortcut2 = new MenuItemv2
         {
-            Title = "_Enable Overwrite",
+            Title = "Enable Over_write",
             Text = "Overwrite",
-            Key = Key.O.WithAlt,
+            Key = Key.W.WithAlt,
             BindKeyToApplication = true,
             Command = Command.EnableOverwrite,
             TargetView = targetView

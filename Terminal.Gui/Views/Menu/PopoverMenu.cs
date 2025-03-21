@@ -95,8 +95,51 @@ public class PopoverMenu : View
                 _root.Accepting += MenuOnAccepting;
             }
             AddAndShowSubMenu (_root);
+
+            // TODO: This needs to be done whenever any MenuItem in the menu tree changes to support dynamic menus
+            // TODO: And it needs to clear them first
+            IEnumerable<MenuItemv2> all = GetMenuItemsOfAllSubMenus ();
+            foreach (MenuItemv2 menu in all)
+            {
+                if (menu.Key.IsValid)
+                {
+                    Logging.Trace ($"{menu.Key}->{menu.Command}");
+                    KeyBindings.Add (menu.Key, menu.Command);
+                }
+            }
         }
     }
+
+    internal IEnumerable<MenuItemv2> GetMenuItemsOfAllSubMenus ()
+    {
+        List<MenuItemv2> result = [];
+        if (Root == null)
+        {
+            return result;
+        }
+
+        Stack<Menuv2> stack = new ();
+        stack.Push (Root);
+
+        while (stack.Count > 0)
+        {
+            Menuv2 currentMenu = stack.Pop ();
+            foreach (View subView in currentMenu.SubViews)
+            {
+                if (subView is MenuItemv2 menuItem)
+                {
+                    result.Add (menuItem);
+                    if (menuItem.SubMenu != null)
+                    {
+                        stack.Push (menuItem.SubMenu);
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
 
     /// <summary>
     ///     Pops up the submenu of the specified MenuItem, if there is one.
