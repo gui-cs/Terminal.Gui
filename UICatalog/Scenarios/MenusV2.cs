@@ -36,7 +36,7 @@ public class MenusV2 : Scenario
         };
         eventLog.Border!.Thickness = new (0, 1, 0, 0);
 
-        FrameView targetView = new ()
+        TargetView targetView = new ()
         {
             Id = "targetView",
             Title = "Target View",
@@ -123,6 +123,15 @@ public class MenusV2 : Scenario
                                      //eventLog.MoveDown ();
                                      //args.Cancel = true;
                                  };
+
+        popoverMenu.Accepted += (o, args) =>
+                                {
+                                    Logging.Trace ($"{popoverMenu!.Id} Accepted: {args?.Context?.Source?.Title}");
+                                    eventSource.Add ($"{popoverMenu!.Id} Accepted: {args?.Context?.Source?.Title}");
+                                    eventLog.MoveDown ();
+
+                                    popoverMenu.Visible = false;
+                                };
 
         popoverMenu.Selecting += (o, args) =>
                                  {
@@ -237,7 +246,7 @@ public class MenusV2 : Scenario
 
         var line = new Line
         {
-            X = -1, 
+            X = -1,
             Width = Dim.Fill ()! + 1
         };
 
@@ -291,7 +300,7 @@ public class MenusV2 : Scenario
         };
 
         // This ensures the checkbox state toggles when the hotkey of Title is pressed.
-       // shortcut4.Accepting += (sender, args) => args.Cancel = true;
+        // shortcut4.Accepting += (sender, args) => args.Cancel = true;
 
         menu.Add (shortcut2, shortcut3, line, shortcut4);
     }
@@ -372,6 +381,25 @@ public class MenusV2 : Scenario
         //shortcut4.Accepting += (sender, args) => args.Cancel = true;
 
         menu.Add (shortcut2, line, shortcut4);
+    }
+
+    public class TargetView : FrameView
+    {
+        public TargetView ()
+        {
+            AddCommand (Command.Context,
+                       ctx =>
+                       {
+                           if (SubViews.FirstOrDefault (v => v is PopoverMenu) is PopoverMenu { } popoverMenu)
+                           {
+                               popoverMenu.Visible = true;
+                           }
+
+                           return true;
+                       });
+
+            KeyBindings.Add (PopoverMenu.DefaultKey, Command.Context);
+        }
     }
 
 

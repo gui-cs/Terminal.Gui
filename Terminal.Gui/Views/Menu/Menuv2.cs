@@ -58,64 +58,65 @@ public class Menuv2 : Bar
             menuItem.CanFocus = true;
             menuItem.Orientation = Orientation.Vertical;
 
-            AddCommand (menuItem.Command, RaiseMenuItemCommandInvoked);
+            AddCommand (menuItem.Command, RaiseAccepted);
 
-            menuItem.Accepting += MenuItemtOnAccepting;
+            menuItem.Selecting += MenuItemOnSelecting;
+            menuItem.Accepting += MenuItemOnAccepting;
+            menuItem.Accepted += MenuItemOnAccepted;
 
-            void MenuItemtOnAccepting (object? sender, CommandEventArgs e)
-            { 
-                Logging.Trace ($"MenuItemOnAccepting: {e.Context?.Source?.Title}");
+            void MenuItemOnSelecting (object? sender, CommandEventArgs e)
+            {
+                //Logging.Trace ($"MenuItemOnSelecting: {e.Context?.Source?.Title}");
+            }
+
+            void MenuItemOnAccepting (object? sender, CommandEventArgs e)
+            {
+                // Logging.Trace ($"MenuItemOnAccepting: {e.Context?.Source?.Title}");
+            }
+
+            void MenuItemOnAccepted (object? sender, CommandEventArgs e)
+            {
+                Logging.Trace ($"MenuItemOnAccepted: {e.Context?.Source?.Title}");
+                RaiseAccepted (e.Context);
             }
         }
     }
 
 
     /// <summary>
-    /// 
+    ///     Riases the <see cref="OnAccepted"/>/<see cref="Accepted"/> event indicating an item in this menu (or submenu)
+    ///     was accepted. This is used to determine when to hide the menu.
     /// </summary>
     /// <param name="ctx"></param>
     /// <returns></returns>
-    protected bool? RaiseMenuItemCommandInvoked (ICommandContext? ctx)
+    protected bool? RaiseAccepted (ICommandContext? ctx)
     {
-        Logging.Trace ($"RaiseMenuItemCommandInvoked: {ctx}");
+        Logging.Trace ($"RaiseAccepted: {ctx}");
         CommandEventArgs args = new () { Context = ctx };
 
-        // Best practice is to invoke the virtual method first.
-        // This allows derived classes to handle the event and potentially cancel it.
-        args.Cancel = OnMenuItemCommandInvoked (args) || args.Cancel;
+        OnAccepted (args);
+        Accepted?.Invoke (this, args);
 
-        if (!args.Cancel)
-        {
-            // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-            MenuItemCommandInvoked?.Invoke (this, args);
-        }
-
-        return MenuItemCommandInvoked is null ? null : args.Cancel;
+        return true;
     }
 
     /// <summary>
-    ///     Called when the user is accepting the state of the View and the <see cref="Command.Accept"/> has been invoked. Set CommandEventArgs.Cancel to
-    ///     <see langword="true"/> and return <see langword="true"/> to stop processing.
+    ///     Called when the user has accepted an item in this menu (or submenu. This is used to determine when to hide the menu.
     /// </summary>
     /// <remarks>
-    /// <para>
-    ///    See <see cref="MenuItemCommandInvoked"/> for more information.
-    /// </para>
     /// </remarks>
     /// <param name="args"></param>
-    /// <returns><see langword="true"/> to stop processing.</returns>
-    protected virtual bool OnMenuItemCommandInvoked (CommandEventArgs args) { return false; }
+    protected virtual void OnAccepted (CommandEventArgs args) { }
 
     /// <summary>
-    ///     Cancelable event raised when the user is accepting the state of the View and the <see cref="Command.Accept"/> has been invoked. Set
-    ///     CommandEventArgs.Cancel to cancel the event.
+    ///     Raised when the user has accepted an item in this menu (or submenu. This is used to determine when to hide the menu.
     /// </summary>
     /// <remarks>
     /// <para>
-    ///    See <see cref="RaiseMenuItemCommandInvoked"/> for more information.
+    ///    See <see cref="RaiseAccepted"/> for more information.
     /// </para>
     /// </remarks>
-    public event EventHandler<CommandEventArgs>? MenuItemCommandInvoked;
+    public event EventHandler<CommandEventArgs>? Accepted;
 
     /// <inheritdoc />
     protected override void OnFocusedChanged (View? previousFocused, View? focused)

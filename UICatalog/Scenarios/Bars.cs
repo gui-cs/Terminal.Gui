@@ -321,11 +321,11 @@ public class Bars : Scenario
 
                 if (barView is Menuv2 menuv2)
                 {
-                    menuv2.MenuItemCommandInvoked += (o, args) =>
+                    menuv2.Accepted += (o, args) =>
                                                      {
                                                          if (args.Context is CommandContext<KeyBinding> { Binding.Data: MenuItemv2 { } sc })
                                                          {
-                                                             eventSource.Add ($"Invoked: {sc.Id} {args.Context.Command}");
+                                                             eventSource.Add ($"Accepted: {sc.Id} {args.Context.Command}");
                                                          }
 
                                                          eventLog.MoveDown ();

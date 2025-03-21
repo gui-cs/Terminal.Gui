@@ -85,12 +85,14 @@ public class MenuItemv2 : Shortcut
             ret = TargetView.InvokeCommand (Command, commandContext);
         }
 
-        if (ret is true)
+        if (ret is not true)
         {
-            return ret;
+            ret = base.DispatchCommand (commandContext);
         }
 
-        ret = base.DispatchCommand (commandContext);
+        Logging.Trace ($"{commandContext?.Source?.Title}");
+
+        RaiseAccepted (commandContext);
 
         return ret;
     }
@@ -108,54 +110,43 @@ public class MenuItemv2 : Shortcut
         return base.OnMouseEnter (eventArgs);
     }
 
-    /// <inheritdoc />
-    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view)
-    {
-        //SetNeedsDraw();
-        base.OnHasFocusChanged (newHasFocus, previousFocusedView, view);
-        //if (SubMenu is null || view == SubMenu)
-        //{
-        //    return;
-        //}
 
-        //if (newHasFocus)
-        //{
-        //    if (!SubMenu.Visible)
-        //    {
-        //        RaiseActivateSubMenu ();
-        //    }
-        //}
-        //else
-        //{
-        //    SubMenu.Visible = false;
-        //}
+    /// <summary>
+    ///     Riases the <see cref="OnAccepted"/>/<see cref="Accepted"/> event indicating this item (or submenu)
+    ///     was accepted. This is used to determine when to hide the menu.
+    /// </summary>
+    /// <param name="ctx"></param>
+    /// <returns></returns>
+    protected bool? RaiseAccepted (ICommandContext? ctx)
+    {
+        Logging.Trace ($"RaiseAccepted: {ctx}");
+        CommandEventArgs args = new () { Context = ctx };
+
+        OnAccepted (args);
+        Accepted?.Invoke (this, args);
+
+        return true;
     }
 
     /// <summary>
+    ///     Called when the user has accepted an item in this menu (or submenu. This is used to determine when to hide the menu.
     /// </summary>
     /// <remarks>
     /// </remarks>
-    protected void RaiseActivateSubMenu ()
-    {
-        if (SubMenu is null)
-        {
-            return;
-        }
-
-        OnActivateSubMenu ();
-
-        // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-        var args = new EventArgs<Menuv2> (SubMenu);
-        ActivateSubMenu?.Invoke (this, args);
-    }
+    /// <param name="args"></param>
+    protected virtual void OnAccepted (CommandEventArgs args) { }
 
     /// <summary>
+    ///     Raised when the user has accepted an item in this menu (or submenu. This is used to determine when to hide the menu.
     /// </summary>
-    protected virtual void OnActivateSubMenu () { }
+    /// <remarks>
+    /// <para>
+    ///    See <see cref="RaiseAccepted"/> for more information.
+    /// </para>
+    /// </remarks>
+    public event EventHandler<CommandEventArgs>? Accepted;
 
-    /// <summary>
-    /// </summary>
-    public event EventHandler<EventArgs<Menuv2>>? ActivateSubMenu;
+
 
     ///// <inheritdoc />
     //public override Attribute GetNormalColor ()

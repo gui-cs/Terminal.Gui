@@ -64,6 +64,55 @@ public class PopoverMenu : View
 
                        return false;
                    });
+
+        KeyBindings.Add (DefaultKey, Command.Quit);
+        KeyBindings.Add (Application.QuitKey, Command.Quit);
+
+        AddCommand (Command.Quit, ctx =>
+                                  {
+                                      Visible = false;
+                                      return RaiseAccepted (ctx);
+                                  });
+    }
+
+    /// <summary>
+    ///     The mouse flags that will cause the popover menu to be visible. The default is <see cref="MouseFlags.Button3Clicked"/> which is typically the right mouse button.
+    /// </summary>
+    public MouseFlags MouseFlags { get; set; } = MouseFlags.Button3Clicked;
+
+    /// <summary>The default key for activating the popover menu.</summary>
+    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Key DefaultKey { get; set; } = Key.F10.WithShift;
+
+    /// <summary>
+    ///     Sets the position of the Popover Menu. The actual position of the menu will be adjusted to
+    ///     ensure the menu fully fits on the screen, and the mouse cursor is over the first cell of the
+    ///     first MenuItem.
+    /// </summary>
+    /// <param name="screenPosition"></param>
+    public void SetPosition (Point? screenPosition)
+    {
+        screenPosition ??= Application.GetLastMousePosition ();
+
+        if (screenPosition is { })
+        {
+            X = screenPosition.Value.X - GetViewportOffsetFromFrame ().X;
+            Y = screenPosition.Value.Y - GetViewportOffsetFromFrame ().Y;
+        }
+    }
+
+    /// <inheritdoc />
+    protected override void OnVisibleChanged ()
+    {
+        base.OnVisibleChanged ();
+        if (Visible)
+        {
+            AddAndShowSubMenu (_root);
+        }
+        else
+        {
+            HideAndRemoveSubMenu (_root);
+        }
     }
 
     private Menuv2? _root;
@@ -194,33 +243,32 @@ public class PopoverMenu : View
 
     private void AddAndShowSubMenu (Menuv2? menu)
     {
-        if (menu is { })
+        if (menu is { SuperView: null })
         {
             base.Add (menu);
-
+            menu.Visible = true;
             menu.Layout ();
 
             menu.Accepting += MenuOnAccepting;
-            menu.MenuItemCommandInvoked += MenuOnMenuItemCommandInvoked;
+            menu.Accepted += MenuAccepted;
             menu.SelectedMenuItemChanged += MenuOnSelectedMenuItemChanged;
         }
     }
     private void HideAndRemoveSubMenu (Menuv2? menu)
     {
-        Debug.Assert (menu is null || menu is { Visible: true });
         if (menu is { Visible: true })
         {
             // If there's a visible submenu, remove / hide it
-            Debug.Assert (menu.SubViews.Count (v => v is MenuItemv2 { SubMenu.Visible: true }) < 2);
-            if (menu.SubViews.FirstOrDefault (v => v is MenuItemv2 { SubMenu.Visible: true }) is MenuItemv2 mi)
+            Debug.Assert (menu.SubViews.Count (v => v is MenuItemv2 { SubMenu.Visible: true }) <= 1);
+            if (menu.SubViews.FirstOrDefault (v => v is MenuItemv2 { SubMenu.Visible: true }) is MenuItemv2 visiblePeer)
             {
-                HideAndRemoveSubMenu (mi.SubMenu);
-                mi.ForceFocusColors = false;
+                HideAndRemoveSubMenu (visiblePeer.SubMenu);
+                visiblePeer.ForceFocusColors = false;
             }
 
             menu.Visible = false;
             menu.Accepting -= MenuOnAccepting;
-            menu.MenuItemCommandInvoked -= MenuOnMenuItemCommandInvoked;
+            menu.Accepted -= MenuAccepted;
             menu.SelectedMenuItemChanged -= MenuOnSelectedMenuItemChanged;
             base.Remove (menu);
         }
@@ -228,16 +276,72 @@ public class PopoverMenu : View
 
     private void MenuOnAccepting (object? sender, CommandEventArgs e)
     {
-        Logging.Trace ($"MenuOnAccepting: {e.Context?.Source?.Title}");
+        //Logging.Trace ($"{e.Context?.Source?.Title}");
     }
 
-    private void MenuOnMenuItemCommandInvoked (object? sender, CommandEventArgs e) { Logging.Trace ($"MenuOnMenuItemCommandInvoked: {e.Context}"); }
+    private void MenuAccepted (object? sender, CommandEventArgs e)
+    {
+        Logging.Trace ($"{e.Context?.Source?.Title}");
+
+        if (e.Context?.Source is MenuItemv2 { SubMenu: null })
+        {
+            HideAndRemoveSubMenu (_root);
+        }
+
+        RaiseAccepted (e.Context);
+    }
+
+    /// <summary>
+    ///     Riases the <see cref="OnAccepted"/>/<see cref="Accepted"/> event indicating a menu (or submenu)
+    ///     was accepted and the Menus in the PopoverMenu were hidden. Use this to determine when to hide the PopoverMenu.
+    /// </summary>
+    /// <param name="ctx"></param>
+    /// <returns></returns>
+    protected bool? RaiseAccepted (ICommandContext? ctx)
+    {
+        Logging.Trace ($"RaiseAccepted: {ctx}");
+        CommandEventArgs args = new () { Context = ctx };
+
+        OnAccepted (args);
+        Accepted?.Invoke (this, args);
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Called when the user has accepted an item in this menu (or submenu. This is used to determine when to hide the menu.
+    /// </summary>
+    /// <remarks>
+    /// </remarks>
+    /// <param name="args"></param>
+    protected virtual void OnAccepted (CommandEventArgs args) { }
+
+    /// <summary>
+    ///     Raised when the user has accepted an item in this menu (or submenu. This is used to determine when to hide the menu.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///    See <see cref="RaiseAccepted"/> for more information.
+    /// </para>
+    /// </remarks>
+    public event EventHandler<CommandEventArgs>? Accepted;
+
 
     private void MenuOnSelectedMenuItemChanged (object? sender, MenuItemv2? e)
     {
-        Logging.Trace ($"MenuOnSelectedMenuItemChanged: {e}");
+        //Logging.Trace ($"{e}");
         ShowSubMenu (e);
     }
 
+    /// <inheritdoc />
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            _root?.Dispose ();
+            _root = null;
+        }
+        base.Dispose (disposing);
+    }
 
 }
