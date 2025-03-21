@@ -29,9 +29,7 @@ public class PopoverMenu : View
 
         bool? MoveRight (ICommandContext? ctx)
         {
-            var focused = MostFocused as MenuItemv2;
-
-            if (focused is { SubMenu.Visible: true })
+            if (MostFocused is MenuItemv2 { SubMenu.Visible: true } focused)
             {
                 focused.SubMenu.SetFocus ();
 
@@ -170,8 +168,8 @@ public class PopoverMenu : View
         if (menu is { Visible: true })
         {
             // If there's a visible submenu, remove / hide it
-            Debug.Assert (menu?.SubViews.Count (v => v is MenuItemv2 { SubMenu.Visible: true }) < 2);
-            if (menu?.SubViews.FirstOrDefault (v => v is MenuItemv2 { SubMenu.Visible: true }) is MenuItemv2 mi)
+            Debug.Assert (menu.SubViews.Count (v => v is MenuItemv2 { SubMenu.Visible: true }) < 2);
+            if (menu.SubViews.FirstOrDefault (v => v is MenuItemv2 { SubMenu.Visible: true }) is MenuItemv2 mi)
             {
                 HideAndRemoveSubMenu (mi.SubMenu);
                 mi.ForceFocusColors = false;
