@@ -57,54 +57,78 @@ public class PopoverMenu : View
 
         KeyBindings.Add (Key.CursorLeft, Command.Left);
 
-        AddCommand (Command.NotBound,
-                   ctx =>
-                   {
-                       Logging.Trace ($"popoverMenu NotBound: {ctx}");
+        AddCommand (
+                    Command.NotBound,
+                    ctx =>
+                    {
+                        Logging.Trace ($"popoverMenu NotBound: {ctx}");
 
-                       return false;
-                   });
+                        return false;
+                    });
 
         KeyBindings.Add (DefaultKey, Command.Quit);
         KeyBindings.Add (Application.QuitKey, Command.Quit);
 
-        AddCommand (Command.Quit, ctx =>
-                                  {
-                                      Visible = false;
-                                      return RaiseAccepted (ctx);
-                                  });
+        AddCommand (
+                    Command.Quit,
+                    ctx =>
+                    {
+                        Visible = false;
+
+                        return RaiseAccepted (ctx);
+                    });
     }
 
     /// <summary>
-    ///     The mouse flags that will cause the popover menu to be visible. The default is <see cref="MouseFlags.Button3Clicked"/> which is typically the right mouse button.
+    ///     The mouse flags that will cause the popover menu to be visible. The default is
+    ///     <see cref="MouseFlags.Button3Clicked"/> which is typically the right mouse button.
     /// </summary>
-    public MouseFlags MouseFlags { get; set; } = MouseFlags.Button3Clicked;
+    public static MouseFlags MouseFlags { get; set; } = MouseFlags.Button3Clicked;
 
     /// <summary>The default key for activating the popover menu.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key DefaultKey { get; set; } = Key.F10.WithShift;
 
     /// <summary>
-    ///     Sets the position of the Popover Menu. The actual position of the menu will be adjusted to
+    ///     Makes the menu visible and locates it at <paramref name="idealScreenPosition"/>. The actual position of the menu
+    ///     will be adjusted to
     ///     ensure the menu fully fits on the screen, and the mouse cursor is over the first cell of the
     ///     first MenuItem.
     /// </summary>
-    /// <param name="screenPosition"></param>
-    public void SetPosition (Point? screenPosition)
+    /// <param name="idealScreenPosition">If <see langword="null"/>, the current mouse position will be used.</param>
+    public void MakeVisible (Point? idealScreenPosition = null)
     {
-        screenPosition ??= Application.GetLastMousePosition ();
+        Visible = true;
+        SetPosition (idealScreenPosition);
+    }
 
-        if (screenPosition is { })
+    /// <summary>
+    ///     Locates the menu at <paramref name="idealScreenPosition"/>. The actual position of the menu will be adjusted to
+    ///     ensure the menu fully fits on the screen, and the mouse cursor is over the first cell of the
+    ///     first MenuItem (if possible).
+    /// </summary>
+    /// <param name="idealScreenPosition">If <see langword="null"/>, the current mouse position will be used.</param>
+    public void SetPosition (Point? idealScreenPosition = null)
+    {
+        idealScreenPosition ??= Application.GetLastMousePosition ();
+
+        if (idealScreenPosition is { } && Root is { })
         {
-            X = screenPosition.Value.X - GetViewportOffsetFromFrame ().X;
-            Y = screenPosition.Value.Y - GetViewportOffsetFromFrame ().Y;
+            Point pos = idealScreenPosition.Value;
+            pos.Offset (-Root.GetAdornmentsThickness ().Left, -Root.GetAdornmentsThickness ().Top);
+
+            pos = GetMostVisibleLocationForSubMenu (Root, ScreenToViewport (pos));
+
+            Root.X = pos.X;
+            Root.Y = pos.Y;
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnVisibleChanged ()
     {
         base.OnVisibleChanged ();
+
         if (Visible)
         {
             AddAndShowSubMenu (_root);
@@ -143,11 +167,13 @@ public class PopoverMenu : View
             {
                 _root.Accepting += MenuOnAccepting;
             }
+
             AddAndShowSubMenu (_root);
 
             // TODO: This needs to be done whenever any MenuItem in the menu tree changes to support dynamic menus
             // TODO: And it needs to clear them first
             IEnumerable<MenuItemv2> all = GetMenuItemsOfAllSubMenus ();
+
             foreach (MenuItemv2 menu in all)
             {
                 if (menu.Key.IsValid)
@@ -162,6 +188,7 @@ public class PopoverMenu : View
     internal IEnumerable<MenuItemv2> GetMenuItemsOfAllSubMenus ()
     {
         List<MenuItemv2> result = [];
+
         if (Root == null)
         {
             return result;
@@ -173,11 +200,13 @@ public class PopoverMenu : View
         while (stack.Count > 0)
         {
             Menuv2 currentMenu = stack.Pop ();
+
             foreach (View subView in currentMenu.SubViews)
             {
                 if (subView is MenuItemv2 menuItem)
                 {
                     result.Add (menuItem);
+
                     if (menuItem.SubMenu != null)
                     {
                         stack.Push (menuItem.SubMenu);
@@ -189,18 +218,18 @@ public class PopoverMenu : View
         return result;
     }
 
-
     /// <summary>
     ///     Pops up the submenu of the specified MenuItem, if there is one.
     /// </summary>
     /// <param name="menuItem"></param>
-    public void ShowSubMenu (MenuItemv2? menuItem)
+    internal void ShowSubMenu (MenuItemv2? menuItem)
     {
         var menu = menuItem?.SuperView as Menuv2;
 
         // If there's a visible peer, remove / hide it
 
         Debug.Assert (menu is null || menu?.SubViews.Count (v => v is MenuItemv2 { SubMenu.Visible: true }) < 2);
+
         if (menu?.SubViews.FirstOrDefault (v => v is MenuItemv2 { SubMenu.Visible: true }) is MenuItemv2 visiblePeer)
         {
             HideAndRemoveSubMenu (visiblePeer.SubMenu);
@@ -211,7 +240,12 @@ public class PopoverMenu : View
         {
             AddAndShowSubMenu (menuItem.SubMenu);
 
-            Point pos = GetMostVisibleLocationForSubMenu (menuItem);
+            Point idealLocation = ScreenToViewport (
+                                                    new (
+                                                         menuItem.FrameToScreen ().Right - menuItem.SubMenu.GetAdornmentsThickness ().Left,
+                                                         menuItem.FrameToScreen ().Top - menuItem.SubMenu.GetAdornmentsThickness ().Top));
+
+            Point pos = GetMostVisibleLocationForSubMenu (menuItem.SubMenu, idealLocation);
             menuItem.SubMenu.X = pos.X;
             menuItem.SubMenu.Y = pos.Y;
 
@@ -221,20 +255,20 @@ public class PopoverMenu : View
     }
 
     /// <summary>
-    ///     Given a <see cref="MenuItemv2"/>, returns the most visible location for the submenu.
-    ///     The location is relative to the Frame.
+    ///     Gets the most visible screen-relative location for <paramref name="menu"/>.
     /// </summary>
-    /// <param name="menuItem"></param>
+    /// <param name="menu">The menu to locate.</param>
+    /// <param name="idealLocation">Ideal screen-relative location.</param>
     /// <returns></returns>
-    internal Point GetMostVisibleLocationForSubMenu (MenuItemv2 menuItem)
+    internal Point GetMostVisibleLocationForSubMenu (Menuv2 menu, Point idealLocation)
     {
         var pos = Point.Empty;
 
         // Calculate the initial position to the right of the menu item
         GetLocationEnsuringFullVisibility (
-                                           menuItem.SubMenu!,
-                                           menuItem.SuperView!.Frame.X + menuItem.Frame.Width,
-                                           menuItem.SuperView.Frame.Y + menuItem.Frame.Y,
+                                           menu,
+                                           idealLocation.X,
+                                           idealLocation.Y,
                                            out int nx,
                                            out int ny);
 
@@ -252,14 +286,18 @@ public class PopoverMenu : View
             menu.Accepting += MenuOnAccepting;
             menu.Accepted += MenuAccepted;
             menu.SelectedMenuItemChanged += MenuOnSelectedMenuItemChanged;
+
+            // TODO: Find the menu item below the mouse, if any, and select it
         }
     }
+
     private void HideAndRemoveSubMenu (Menuv2? menu)
     {
         if (menu is { Visible: true })
         {
             // If there's a visible submenu, remove / hide it
             Debug.Assert (menu.SubViews.Count (v => v is MenuItemv2 { SubMenu.Visible: true }) <= 1);
+
             if (menu.SubViews.FirstOrDefault (v => v is MenuItemv2 { SubMenu.Visible: true }) is MenuItemv2 visiblePeer)
             {
                 HideAndRemoveSubMenu (visiblePeer.SubMenu);
@@ -286,9 +324,8 @@ public class PopoverMenu : View
         if (e.Context?.Source is MenuItemv2 { SubMenu: null })
         {
             HideAndRemoveSubMenu (_root);
+            RaiseAccepted (e.Context);
         }
-
-        RaiseAccepted (e.Context);
     }
 
     /// <summary>
@@ -309,7 +346,8 @@ public class PopoverMenu : View
     }
 
     /// <summary>
-    ///     Called when the user has accepted an item in this menu (or submenu. This is used to determine when to hide the menu.
+    ///     Called when the user has accepted an item in this menu (or submenu. This is used to determine when to hide the
+    ///     menu.
     /// </summary>
     /// <remarks>
     /// </remarks>
@@ -317,15 +355,15 @@ public class PopoverMenu : View
     protected virtual void OnAccepted (CommandEventArgs args) { }
 
     /// <summary>
-    ///     Raised when the user has accepted an item in this menu (or submenu. This is used to determine when to hide the menu.
+    ///     Raised when the user has accepted an item in this menu (or submenu. This is used to determine when to hide the
+    ///     menu.
     /// </summary>
     /// <remarks>
-    /// <para>
-    ///    See <see cref="RaiseAccepted"/> for more information.
-    /// </para>
+    ///     <para>
+    ///         See <see cref="RaiseAccepted"/> for more information.
+    ///     </para>
     /// </remarks>
     public event EventHandler<CommandEventArgs>? Accepted;
-
 
     private void MenuOnSelectedMenuItemChanged (object? sender, MenuItemv2? e)
     {
@@ -333,7 +371,7 @@ public class PopoverMenu : View
         ShowSubMenu (e);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
         if (disposing)
@@ -341,7 +379,7 @@ public class PopoverMenu : View
             _root?.Dispose ();
             _root = null;
         }
+
         base.Dispose (disposing);
     }
-
 }

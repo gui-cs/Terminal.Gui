@@ -41,10 +41,10 @@ public class MenusV2 : Scenario
             Id = "targetView",
             Title = "Target View",
 
-            X = 4,
-            Y = 4,
-            Width = Dim.Fill (8)! - Dim.Width (eventLog),
-            Height = Dim.Fill (8),
+            X = 1,
+            Y = 1,
+            Width = Dim.Fill (2)! - Dim.Width (eventLog),
+            Height = Dim.Fill (2),
             BorderStyle = LineStyle.Dotted
         };
         app.Add (targetView);
@@ -89,7 +89,6 @@ public class MenusV2 : Scenario
         {
             Id = "popOverMenu",
             Visible = true,
-            X = 1, Y = 1
         };
 
         ////Application.PopoverHost.Add (popoverMenu);
@@ -392,13 +391,29 @@ public class MenusV2 : Scenario
                        {
                            if (SubViews.FirstOrDefault (v => v is PopoverMenu) is PopoverMenu { } popoverMenu)
                            {
-                               popoverMenu.Visible = true;
+                               popoverMenu.MakeVisible ();
                            }
 
                            return true;
                        });
 
             KeyBindings.Add (PopoverMenu.DefaultKey, Command.Context);
+
+            MouseBindings.ReplaceCommands (PopoverMenu.MouseFlags, Command.Context);
+
+            AddCommand (Command.Cancel,
+                        ctx =>
+                        {
+                            if (SubViews.FirstOrDefault (v => v is PopoverMenu) is PopoverMenu { } popoverMenu)
+                            {
+                                popoverMenu.Visible = false;
+                            }
+
+                            return true;
+                        });
+
+            MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked, Command.Cancel);
+
         }
     }
 
