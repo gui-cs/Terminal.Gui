@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using ColorHelper;
 
 namespace Terminal.Gui;
 
@@ -40,11 +39,18 @@ internal class ColorJsonConverter : JsonConverter<Color>
             // Get the color string
             ReadOnlySpan<char> colorString = reader.GetString ();
 
+            // TODO: Mechanism to choose/prioritize between ANSI and W3C colors.
+            // Backwards compatibility: Color 16 RGB values were previously used as main colors.
+            if (ColorStrings.TryParseColor16(colorString, out Color color16))
+            {
+                return new (color16);
+            }
+
             // Check if the color string is a color name
-            if (ColorStrings.TryParseW3CColorName (colorString.ToString (), out Color color1))
+            if (ColorStrings.TryParseW3CColorName (colorString, out Color w3cColor))
             {
                 // Return the parsed color
-                return new (color1);
+                return new (w3cColor);
             }
 
             if (Color.TryParse (colorString, null, out Color parsedColor))

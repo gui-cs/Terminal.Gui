@@ -267,90 +267,82 @@ public readonly partial record struct Color
         return text switch
         {
             // Null string or empty span provided
-            { IsEmpty: true } when formatProvider is null => throw new ColorParseException (
-                                                                                            in text,
-                                                                                            "The text provided was null or empty.",
-                                                                                            in text
-                                                                                           ),
+            { IsEmpty: true } when formatProvider is null =>
+                throw new ColorParseException (in text, "The text provided was null or empty.", in text),
 
             // A valid ICustomColorFormatter was specified and the text wasn't null or empty
             { IsEmpty: false } when formatProvider is ICustomColorFormatter f => f.Parse (text),
 
             // Input string is only whitespace
-            { Length: > 0 } when text.IsWhiteSpace () => throw new ColorParseException (
-                                                                                        in text,
-                                                                                        "The text provided consisted of only whitespace characters.",
-                                                                                        in text
-                                                                                       ),
+            { Length: > 0 } when text.IsWhiteSpace () =>
+                throw new ColorParseException (in text, "The text provided consisted of only whitespace characters.", in text),
 
             // Any string too short to possibly be any supported format.
-            { Length: > 0 and < 3 } => throw new ColorParseException (
-                                                                      in text,
-                                                                      "Text was too short to be any possible supported format.",
-                                                                      in text
-                                                                     ),
+            { Length: > 0 and < 3 } =>
+                throw new ColorParseException (in text, "Text was too short to be any possible supported format.", in text),
 
-                                                                     // The various hexadecimal cases
-                                                                     ['#', ..] hexString => hexString switch
-                                                                     {
-                                                                     // #RGB
-                                                                     ['#', var rChar, var gChar, var bChar] chars when chars [1..]
-                                                                                    .IsAllAsciiHexDigits () =>
-                                                                                new Color (
-                                                                                           byte.Parse ([rChar, rChar], NumberStyles.HexNumber),
-                                                                                           byte.Parse ([gChar, gChar], NumberStyles.HexNumber),
-                                                                                           byte.Parse ([bChar, bChar], NumberStyles.HexNumber)
-                                                                                          ),
+            // The various hexadecimal cases
+            ['#', ..] hexString => hexString switch
+            {
+                // #RGB
+                ['#', var rChar, var gChar, var bChar] chars when chars [1..]
+                    .IsAllAsciiHexDigits () =>
+                        new Color (
+                            byte.Parse ([rChar, rChar], NumberStyles.HexNumber),
+                            byte.Parse ([gChar, gChar], NumberStyles.HexNumber),
+                            byte.Parse ([bChar, bChar], NumberStyles.HexNumber)
+                        ),
 
-                                                                                          // #ARGB
-                                                                                          ['#', var aChar, var rChar, var gChar, var bChar] chars when chars [1..]
-                                                                                                         .IsAllAsciiHexDigits () =>
-                                                                                                     new Color (
-                                                                                                                byte.Parse ([rChar, rChar], NumberStyles.HexNumber),
-                                                                                                                byte.Parse ([gChar, gChar], NumberStyles.HexNumber),
-                                                                                                                byte.Parse ([bChar, bChar], NumberStyles.HexNumber),
-                                                                                                                byte.Parse ([aChar, aChar], NumberStyles.HexNumber)
-                                                                                                               ),
+                // #ARGB
+                ['#', var aChar, var rChar, var gChar, var bChar] chars when chars [1..]
+                    .IsAllAsciiHexDigits () =>
+                        new Color (
+                            byte.Parse ([rChar, rChar], NumberStyles.HexNumber),
+                            byte.Parse ([gChar, gChar], NumberStyles.HexNumber),
+                            byte.Parse ([bChar, bChar], NumberStyles.HexNumber),
+                            byte.Parse ([aChar, aChar], NumberStyles.HexNumber)
+                        ),
 
-                                                                                                               // #RRGGBB
-                                                                                                               [
-                                                                                         '#', var r1Char, var r2Char, var g1Char, var g2Char, var b1Char,
-                                                                                         var b2Char
-                                                                                     ] chars when chars [1..].IsAllAsciiHexDigits () =>
-                                                                                     new Color (
-                                                                                                byte.Parse ([r1Char, r2Char], NumberStyles.HexNumber),
-                                                                                                byte.Parse ([g1Char, g2Char], NumberStyles.HexNumber),
-                                                                                                byte.Parse ([b1Char, b2Char], NumberStyles.HexNumber)
-                                                                                               ),
+                // #RRGGBB
+                [
+                '#', var r1Char, var r2Char, var g1Char, var g2Char, var b1Char, var b2Char
+                ] chars when chars [1..].IsAllAsciiHexDigits () =>
+                    new Color (
+                        byte.Parse ([r1Char, r2Char], NumberStyles.HexNumber),
+                        byte.Parse ([g1Char, g2Char], NumberStyles.HexNumber),
+                        byte.Parse ([b1Char, b2Char], NumberStyles.HexNumber)
+                    ),
 
-                                                                                               // #AARRGGBB
-                                                                                               [
-                                                                                         '#', var a1Char, var a2Char, var r1Char, var r2Char, var g1Char,
-                                                                                         var g2Char, var b1Char, var b2Char
-                                                                                     ] chars when chars [1..].IsAllAsciiHexDigits () =>
-                                                                                     new Color (
-                                                                                                byte.Parse ([r1Char, r2Char], NumberStyles.HexNumber),
-                                                                                                byte.Parse ([g1Char, g2Char], NumberStyles.HexNumber),
-                                                                                                byte.Parse ([b1Char, b2Char], NumberStyles.HexNumber),
-                                                                                                byte.Parse ([a1Char, a2Char], NumberStyles.HexNumber)
-                                                                                               ),
-                                                                         _ => throw new ColorParseException (
-                                                                                                                    in hexString,
-                                                                                                                    $"Color hex string {hexString} was not in a supported format",
-                                                                                                                    in hexString
-                                                                                                                   )
-                                                                     },
+                // #AARRGGBB
+                [
+                    '#', var a1Char, var a2Char,
+                    var r1Char, var r2Char,
+                    var g1Char, var g2Char,
+                    var b1Char, var b2Char
+                ] chars when chars [1..].IsAllAsciiHexDigits () =>
+                    new Color (
+                        byte.Parse ([r1Char, r2Char], NumberStyles.HexNumber),
+                        byte.Parse ([g1Char, g2Char], NumberStyles.HexNumber),
+                        byte.Parse ([b1Char, b2Char], NumberStyles.HexNumber),
+                        byte.Parse ([a1Char, a2Char], NumberStyles.HexNumber)
+                    ),
+                _ => throw new ColorParseException (
+                        in hexString,
+                        $"Color hex string {hexString} was not in a supported format",
+                        in hexString
+                    )
+            },
 
-                                                                     // rgb(r,g,b) or rgb(r,g,b,a)
-                                                                     ['r', 'g', 'b', '(', .., ')'] => ParseRgbaFormat (in text, 4),
+            // rgb(r,g,b) or rgb(r,g,b,a)
+            ['r', 'g', 'b', '(', .., ')'] => ParseRgbaFormat (in text, 4),
 
-                                                                     // rgba(r,g,b,a) or rgba(r,g,b)
-                                                                     ['r', 'g', 'b', 'a', '(', .., ')'] => ParseRgbaFormat (in text, 5),
-
-            // Attempt to parse as a named color from the ColorStrings resources
-            { } when char.IsLetter (text [0]) && ColorStrings.TryParseW3CColorName (text.ToString (), out Color color) =>
-                new Color (color),
-
+            // rgba(r,g,b,a) or rgba(r,g,b)
+            ['r', 'g', 'b', 'a', '(', .., ')'] => ParseRgbaFormat (in text, 5),
+            // Attempt named colors
+            // TODO: Mechanism to choose/prioritize between ANSI and W3C colors.
+            // Backwards compatibility: Color 16 RGB values were previously used as main colors.
+            { } when char.IsLetter (text [0]) && ColorStrings.TryParseColor16 (text, out Color color16) => color16,
+            { } when char.IsLetter (text [0]) && ColorStrings.TryParseW3CColorName (text, out Color w3cColor) => w3cColor,
             // Any other input
             _ => throw new ColorParseException (in text, "Text did not match any expected format.", in text, [])
         };
@@ -585,11 +577,16 @@ public readonly partial record struct Color
     [SkipLocalsInit]
     public override string ToString ()
     {
-        string? name = ColorStrings.GetW3CColorName (this);
-
-        if (name is { })
+        // TODO: Mechanism to choose/prioritize between ANSI and W3C colors.
+        // Backwards compatibility: Color 16 RGB values were previously used as main colors.
+        if (ColorStrings.GetANSIColor16Name (this) is string ansiName)
         {
-            return name;
+            return ansiName;
+        }
+
+        if (ColorStrings.GetW3CColorName (this) is string w3cName)
+        {
+            return w3cName;
         }
 
         return $"#{R:X2}{G:X2}{B:X2}";
