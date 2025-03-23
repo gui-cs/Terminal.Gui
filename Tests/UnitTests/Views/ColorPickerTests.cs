@@ -820,7 +820,7 @@ public class ColorPickerTests
     [Fact]
     public void TestColorNames ()
     {
-        var colors = new W3CColors ();
+        var colors = new W3cColorNameResolver();
         Assert.Contains ("Aquamarine", colors.GetColorNames ());
         Assert.DoesNotContain ("Save as", colors.GetColorNames ());
     }
@@ -845,7 +845,7 @@ public class ColorPickerTests
 
         Application.Navigation = new ();
 
-        Application.Top = new() { Width = 20, Height = 5 };
+        Application.Top = new () { Width = 20, Height = 5 };
         Application.Top.Add (cp);
 
         Application.Top.LayoutSubViews ();

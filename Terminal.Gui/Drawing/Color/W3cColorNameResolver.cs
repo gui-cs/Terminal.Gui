@@ -7,28 +7,24 @@ using System.Diagnostics.CodeAnalysis;
 namespace Terminal.Gui;
 
 /// <summary>
-///     Helper class that resolves w3c color names to their hex values
-///     Based on https://www.w3schools.com/colors/color_tryit.asp
+/// W3C color name resolver.
 /// </summary>
-[Obsolete ("Superseded by W3cColors")]
-public class W3CColors : IColorNameResolver
+/// <remarks>
+/// Color name resolver interface wrapper for <see cref="W3cColors"/>.
+/// </remarks>
+public class W3cColorNameResolver : IColorNameResolver
 {
     /// <inheritdoc/>
-    [Obsolete ("Prefer W3cColors.GetColorNames()")]
-    public IEnumerable<string> GetColorNames () { return ColorStrings.GetW3CColorNames (); }
+    public IEnumerable<string> GetColorNames () =>
+        W3cColors.GetColorNames ();
 
     /// <inheritdoc/>
-    public bool TryParseColor (string name, out Color color) { return ColorStrings.TryParseW3CColorName (name, out color); }
+    public bool TryParseColor (ReadOnlySpan<char> name, out Color color) =>
+        W3cColors.TryParseColor (name, out color);
 
     /// <inheritdoc/>
-    public bool TryNameColor (Color color, out string name)
-    {
-        string? answer = ColorStrings.GetW3CColorName (color);
-
-        name = answer ?? string.Empty;
-
-        return answer != null;
-    }
+    public bool TryNameColor (Color color, [NotNullWhen (true)] out string? name) =>
+        W3cColors.TryNameColor (color, out name);
 }
 
 /// <summary>
@@ -41,7 +37,8 @@ public static class W3cColors
 
     static W3cColors ()
     {
-        // Populate based on names because enums with same name are not otherwise distinguishable from each other.
+        // Populate based on names because enums with same numerical value
+        // are not otherwise distinguishable from each other.
         string[] w3cNames = Enum.GetNames<W3cColor> ().Order().ToArray();
 
         Dictionary<int, string> map = new(w3cNames.Length);
@@ -66,14 +63,16 @@ public static class W3cColors
     }
 
     /// <summary>
-    /// Tries to parse W3C color from the given name.
+    /// Converts the given W3C color name to equivalent color value.
     /// </summary>
-    /// <param name="name"></param>
-    /// <param name="color">Contains the successfully parsed <see cref="W3cColor"/> value.</param>
-    /// <returns>True if parsed successfully; otherwise false.</returns>
+    /// <param name="name">W3C color name.</param>
+    /// <param name="color">The successfully converted W3C color value.</param>
+    /// <returns>True if the conversion succeeded; otherwise false.</returns>
     public static bool TryParseColor (ReadOnlySpan<char> name, out Color color)
     {
-        if (!Enum.TryParse (name, ignoreCase: true, out W3cColor w3cColor))
+        if (!Enum.TryParse (name, ignoreCase: true, out W3cColor w3cColor) ||
+            // Any numerical value converts to undefined enum value.
+            !Enum.IsDefined(w3cColor))
         {
             color = default;
             return false;
@@ -85,11 +84,11 @@ public static class W3cColors
     }
 
     /// <summary>
-    /// Tries to match the given color RGB value to a W3C color and returns the name.
+    /// Converts the given color value to a W3C color name.
     /// </summary>
-    /// <param name="color">Color to match W3C RGB value.</param>
-    /// <param name="name">Contains name of matching W3C color.</param>
-    /// <returns>True if match; otherwise false.</returns>
+    /// <param name="color">Color value to match W3C color.</param>
+    /// <param name="name">The successfully converted W3C color name.</param>
+    /// <returns>True if conversion succeeded; otherwise false.</returns>
     public static bool TryNameColor (Color color, [NotNullWhen (true)] out string? name)
     {
         int rgb = GetRgb (color.R, color.G, color.B);

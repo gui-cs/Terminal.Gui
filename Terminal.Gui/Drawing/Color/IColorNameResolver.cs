@@ -34,5 +34,5 @@ public interface IColorNameResolver
     /// <param name="name"></param>
     /// <param name="color"></param>
     /// <returns></returns>
-    bool TryParseColor (string name, out Color color);
+    bool TryParseColor (ReadOnlySpan<char> name, out Color color);
 }
