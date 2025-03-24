@@ -22,65 +22,108 @@ public class AnsiColorNameResolverTests
     }
 
     [Theory]
-    [InlineData (0, 0, 0, true, nameof (ColorName16.Black))]
-    [InlineData (0, 0, 255, true, nameof (ColorName16.Blue))]
-    [InlineData (59, 120, 255, true, nameof (ColorName16.BrightBlue))]
-    [InlineData (97, 214, 214, true, nameof (ColorName16.BrightCyan))]
-    [InlineData (22, 198, 12, true, nameof (ColorName16.BrightGreen))]
-    [InlineData (180, 0, 158, true, nameof (ColorName16.BrightMagenta))]
-    [InlineData (231, 72, 86, true, nameof (ColorName16.BrightRed))]
-    [InlineData (249, 241, 165, true, nameof (ColorName16.BrightYellow))]
-    [InlineData (0, 255, 255, true, nameof (ColorName16.Cyan))]
-    [InlineData (118, 118, 118, true, nameof (ColorName16.DarkGray))]
-    [InlineData (128, 128, 128, true, nameof (ColorName16.Gray))]
-    [InlineData (0, 128, 0, true, nameof (ColorName16.Green))]
-    [InlineData (255, 0, 255, true, nameof (ColorName16.Magenta))]
-    [InlineData (255, 0, 0, true, nameof (ColorName16.Red))]
-    [InlineData (255, 255, 255, true, nameof (ColorName16.White))]
-    [InlineData (255, 255, 0, true, nameof (ColorName16.Yellow))]
-    // Fail
-    [InlineData (1, 2, 3, false, null)]
-    public void TryNameColor_ReturnsExpectedColorName (byte r, byte g, byte b, bool expectedSuccess, string? expectedName)
+    [InlineData (0, 0, 0, nameof (ColorName16.Black))]
+    [InlineData (0, 0, 255, nameof (ColorName16.Blue))]
+    [InlineData (59, 120, 255, nameof (ColorName16.BrightBlue))]
+    [InlineData (97, 214, 214, nameof (ColorName16.BrightCyan))]
+    [InlineData (22, 198, 12, nameof (ColorName16.BrightGreen))]
+    [InlineData (180, 0, 158, nameof (ColorName16.BrightMagenta))]
+    [InlineData (231, 72, 86, nameof (ColorName16.BrightRed))]
+    [InlineData (249, 241, 165, nameof (ColorName16.BrightYellow))]
+    [InlineData (0, 255, 255, nameof (ColorName16.Cyan))]
+    [InlineData (118, 118, 118, nameof (ColorName16.DarkGray))]
+    [InlineData (128, 128, 128, nameof (ColorName16.Gray))]
+    [InlineData (0, 128, 0, nameof (ColorName16.Green))]
+    [InlineData (255, 0, 255, nameof (ColorName16.Magenta))]
+    [InlineData (255, 0, 0, nameof (ColorName16.Red))]
+    [InlineData (255, 255, 255, nameof (ColorName16.White))]
+    [InlineData (255, 255, 0, nameof (ColorName16.Yellow))]
+    public void TryNameColor_ReturnsExpectedColorName (byte r, byte g, byte b, string expectedName)
     {
-        bool actualSuccess = _candidate.TryNameColor(new Color(r, g, b), out string? actualName);
+        var expected = (true, expectedName);
 
-        Assert.Equal ((expectedSuccess, expectedName), (actualSuccess, actualName));
+        bool actualSuccess = _candidate.TryNameColor(new Color(r, g, b), out string? actualName);
+        var actual = (actualSuccess, actualName);
+
+        Assert.Equal (expected, actual);
+    }
+
+    [Fact]
+    public void TryNameColor_NoMatchFails ()
+    {
+        (bool, string?) expected = (false, null);
+
+        bool actualSuccess = _candidate.TryNameColor (new Color (1, 2, 3), out string? actualName);
+        var actual = (actualSuccess, actualName);
+
+        Assert.Equal (expected, actual);
     }
 
     [Theory]
-    [InlineData (nameof (ColorName16.Black), true, 0, 0, 0)]
-    [InlineData (nameof (ColorName16.Blue), true, 0, 0, 255)]
-    [InlineData (nameof (ColorName16.BrightBlue), true, 59, 120, 255)]
-    [InlineData (nameof(ColorName16.BrightCyan), true, 97, 214, 214)]
-    [InlineData (nameof(ColorName16.BrightGreen), true, 22, 198, 12)]
-    [InlineData (nameof(ColorName16.BrightMagenta), true, 180, 0, 158)]
-    [InlineData (nameof(ColorName16.BrightRed), true, 231, 72, 86)]
-    [InlineData (nameof(ColorName16.BrightYellow), true, 249, 241, 165)]
-    [InlineData (nameof(ColorName16.Cyan), true, 0, 255, 255)]
-    [InlineData (nameof(ColorName16.DarkGray), true, 118, 118, 118)]
-    [InlineData (nameof(ColorName16.Gray), true, 128, 128, 128)]
-    [InlineData (nameof(ColorName16.Green), true, 0, 128, 0)]
-    [InlineData (nameof(ColorName16.Magenta), true, 255, 0, 255)]
-    [InlineData (nameof(ColorName16.Red), true, 255, 0, 0)]
-    [InlineData (nameof(ColorName16.White), true, 255, 255, 255)]
-    [InlineData (nameof(ColorName16.Yellow), true, 255, 255, 0)]
+    [InlineData (nameof (ColorName16.Black), 0, 0, 0)]
+    [InlineData (nameof (ColorName16.Blue), 0, 0, 255)]
+    [InlineData (nameof (ColorName16.BrightBlue), 59, 120, 255)]
+    [InlineData (nameof (ColorName16.BrightCyan), 97, 214, 214)]
+    [InlineData (nameof (ColorName16.BrightGreen), 22, 198, 12)]
+    [InlineData (nameof (ColorName16.BrightMagenta), 180, 0, 158)]
+    [InlineData (nameof (ColorName16.BrightRed), 231, 72, 86)]
+    [InlineData (nameof (ColorName16.BrightYellow), 249, 241, 165)]
+    [InlineData (nameof (ColorName16.Cyan), 0, 255, 255)]
+    [InlineData (nameof (ColorName16.DarkGray), 118, 118, 118)]
+    [InlineData (nameof (ColorName16.Gray), 128, 128, 128)]
+    [InlineData (nameof (ColorName16.Green), 0, 128, 0)]
+    [InlineData (nameof (ColorName16.Magenta), 255, 0, 255)]
+    [InlineData (nameof (ColorName16.Red), 255, 0, 0)]
+    [InlineData (nameof (ColorName16.White), 255, 255, 255)]
+    [InlineData (nameof (ColorName16.Yellow), 255, 255, 0)]
     // Case-insensitive
-    [InlineData ("BRIGHTBLUE", true, 59, 120, 255)]
-    [InlineData ("brightblue", true, 59, 120, 255)]
-    // Fail
-    [InlineData ("brightlight", false, 0, 0, 0)]
-    // Existing enum numeric
-    [InlineData ("12", true, 231, 72, 86)] // ColorName16.BrightRed
-    // Non-existing enum numeric
-    [InlineData ("-12", false, 0, 0, 0)]
-    public void TryParseColor_ReturnsExpectedColor (string inputName, bool expectedSuccess, byte r, byte g, byte b)
+    [InlineData ("BRIGHTBLUE", 59, 120, 255)]
+    [InlineData ("brightblue", 59, 120, 255)]
+    public void TryParseColor_ReturnsExpectedColor (string inputName, byte r, byte g, byte b)
     {
-        Color expectedColor = expectedSuccess
-            ? new(r, g, b)
-            : default;
+        var expected = (true, new Color(r, g, b));
 
         bool actualSuccess = _candidate.TryParseColor (inputName, out Color actualColor);
+        var actual = (actualSuccess, actualColor);
 
-        Assert.Equal((expectedSuccess, expectedColor), (actualSuccess, actualColor));
+        Assert.Equal (expected, actual);
+    }
+
+    [Theory]
+    [InlineData ("12", 231, 72, 86)] // ColorName16.BrightRed
+    public void TryParseColor_ResolvesValidEnumNumber (string inputName, byte r, byte g, byte b)
+    {
+        var expected = (true, new Color(r, g, b));
+
+        bool actualSuccess = _candidate.TryParseColor (inputName, out Color actualColor);
+        var actual = (actualSuccess, actualColor);
+
+        Assert.Equal (expected, actual);
+    }
+
+    [Theory]
+    [InlineData (null)]
+    [InlineData ("")]
+    [InlineData ("brightlight")]
+    public void TryParseColor_FailsOnInvalidColorName (string? invalidName)
+    {
+        var expected = (false, default(Color));
+
+        bool actualSuccess = _candidate.TryParseColor (invalidName, out Color actualColor);
+        var actual = (actualSuccess, actualColor);
+
+        Assert.Equal (expected, actual);
+    }
+
+    [Theory]
+    [InlineData ("-12")]
+    public void TryParseColor_FailsOnInvalidEnumNumber (string invalidName)
+    {
+        var expected = (false, default(Color));
+
+        bool actualSuccess = _candidate.TryParseColor (invalidName, out Color actualColor);
+        var actual = (actualSuccess, actualColor);
+
+        Assert.Equal (expected, actual);
     }
 }
