@@ -234,9 +234,10 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
         return ColorExtensions.ColorToName16Map.MinBy (pair => CalculateColorDistance (inputColor, pair.Key)).Value;
     }
 
-    /// <summary>Gets the exact named color to this <see cref="Color"/> value.</summary>
+    /// <summary>Converts the given color value to exact named color represented by <see cref="ColorName16"/>.</summary>
     /// <param name="inputColor"></param>
-    /// <returns></returns>
+    /// <param name="colorName16">Successfully converted named color.</param>
+    /// <returns>True if conversion succeeded; otherwise false.</returns>
     internal static bool TryGetExactNamedColor16 (Color inputColor, out ColorName16 colorName16)
     {
         return ColorExtensions.ColorToName16Map.TryGetValue (inputColor, out colorName16);

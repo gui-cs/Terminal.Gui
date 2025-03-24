@@ -32,7 +32,7 @@ public partial class ColorPicker : View
     private Color _selectedColor = Color.Black;
 
     // TODO: Add interface
-    private readonly IColorNameResolver _colorNameResolver = new W3cColorNameResolver ();
+    private readonly IColorNameResolver _colorNameResolver = new MultiStandardColorNameResolver ();
 
     private List<IColorBar> _bars = new ();
 

@@ -69,6 +69,10 @@ public class AnsiColorNameResolverTests
     [InlineData ("brightblue", true, 59, 120, 255)]
     // Fail
     [InlineData ("brightlight", false, 0, 0, 0)]
+    // Existing enum numeric
+    [InlineData ("12", true, 231, 72, 86)] // ColorName16.BrightRed
+    // Non-existing enum numeric
+    [InlineData ("-12", false, 0, 0, 0)]
     public void TryParseColor_ReturnsExpectedColor (string inputName, bool expectedSuccess, byte r, byte g, byte b)
     {
         Color expectedColor = expectedSuccess

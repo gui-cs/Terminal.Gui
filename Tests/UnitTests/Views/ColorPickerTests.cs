@@ -817,14 +817,6 @@ public class ColorPickerTests
         };
     }
 
-    [Fact]
-    public void TestColorNames ()
-    {
-        var colors = new W3cColorNameResolver();
-        Assert.Contains ("Aquamarine", colors.GetColorNames ());
-        Assert.DoesNotContain ("Save as", colors.GetColorNames ());
-    }
-
     private ColorBar GetColorBar (ColorPicker cp, ColorPickerPart toGet)
     {
         if (toGet <= ColorPickerPart.Bar3)

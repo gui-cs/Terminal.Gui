@@ -1,6 +1,5 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 
@@ -339,10 +338,7 @@ public readonly partial record struct Color
             // rgba(r,g,b,a) or rgba(r,g,b)
             ['r', 'g', 'b', 'a', '(', .., ')'] => ParseRgbaFormat (in text, 5),
             // Attempt named colors
-            // TODO: Mechanism to choose/prioritize between ANSI and W3C colors.
-            // Backwards compatibility: Color 16 RGB values were previously used as main colors.
-            { } when char.IsLetter (text [0]) && ColorStrings.TryParseColor16 (text, out Color color16) => color16,
-            { } when char.IsLetter (text [0]) && ColorStrings.TryParseW3CColorName (text, out Color w3cColor) => w3cColor,
+            { } when char.IsLetter (text [0]) && ColorStrings.TryParseNamedColor (text, out Color color) => color,
             // Any other input
             _ => throw new ColorParseException (in text, "Text did not match any expected format.", in text, [])
         };
@@ -577,16 +573,9 @@ public readonly partial record struct Color
     [SkipLocalsInit]
     public override string ToString ()
     {
-        // TODO: Mechanism to choose/prioritize between ANSI and W3C colors.
-        // Backwards compatibility: Color 16 RGB values were previously used as main colors.
-        if (ColorStrings.GetANSIColor16Name (this) is string ansiName)
+        if (ColorStrings.GetColorName (this) is string colorName)
         {
-            return ansiName;
-        }
-
-        if (ColorStrings.GetW3CColorName (this) is string w3cName)
-        {
-            return w3cName;
+            return colorName;
         }
 
         return $"#{R:X2}{G:X2}{B:X2}";
