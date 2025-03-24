@@ -83,6 +83,7 @@ public static partial class Application // Initialization (Init/Shutdown)
         }
 
         Navigation = new ();
+        Popover = new ();
 
         // For UnitTests
         if (driver is { })
@@ -162,7 +163,11 @@ public static partial class Application // Initialization (Init/Shutdown)
 
         SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext ());
 
-        PopoverHost.Init ();
+        // TODO: This si probably not needed
+        if (Popover.GetPopover () is View popover)
+        {
+            popover.Visible = false;
+        }
 
         MainThreadId = Thread.CurrentThread.ManagedThreadId;
         bool init = Initialized = true;
@@ -267,6 +272,6 @@ public static partial class Application // Initialization (Init/Shutdown)
     /// </summary>
     internal static void OnInitializedChanged (object sender, EventArgs<bool> e)
     {
-        Application.InitializedChanged?.Invoke (sender,e);
+        Application.InitializedChanged?.Invoke (sender, e);
     }
 }

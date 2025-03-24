@@ -149,7 +149,11 @@ public static partial class Application
             t!.Running = false;
         }
 
-        PopoverHost.Cleanup ();
+        if (Popover?.GetPopover () is View popover)
+        {
+            popover.Visible = false;
+            Popover = null;
+        }
 
         TopLevels.Clear ();
 #if DEBUG_IDISPOSABLE
@@ -200,7 +204,7 @@ public static partial class Application
         Initialized = false;
 
         // Mouse
-        _lastMousePosition = null;
+        //_lastMousePosition = null;
         _cachedViewsUnderMouse.Clear ();
         WantContinuousButtonPressedView = null;
         MouseEvent = null;

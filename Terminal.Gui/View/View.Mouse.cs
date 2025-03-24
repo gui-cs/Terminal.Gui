@@ -771,9 +771,9 @@ public partial class View // Mouse APIs
         View? start = Application.Top;
 
         // PopoverHost - If visible, start with it instead of Top
-        if (Application.PopoverHost?.Visible is true && !ignoreTransparent)
+        if (Application.Popover?.GetPopover () is View {Visible: true } visiblePopover && !ignoreTransparent)
         {
-            start = Application.PopoverHost;
+            start = visiblePopover;
 
             // Put Top on stack next
             viewsUnderMouse.Add (Application.Top);

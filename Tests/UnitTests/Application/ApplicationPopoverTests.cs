@@ -1,89 +1,50 @@
 ﻿namespace Terminal.Gui.ApplicationTests;
 
-public class ApplicationPopoverHostTests
+public class ApplicationPopoverTests
 {
     [Fact]
-    public void PopoverHost_ApplicationInit_Inits ()
+    public void Popover_ApplicationInit_Inits ()
     {
         // Arrange
-        Assert.Null (Application.PopoverHost);
+        Assert.Null (Application.Popover);
         Application.Init (new FakeDriver ());
 
         // Act
-        Assert.NotNull (Application.PopoverHost);
+        Assert.NotNull (Application.Popover);
 
         Application.ResetState (true);
     }
 
     [Fact]
-    public void PopoverHost_ApplicationShutdown_CleansUp ()
+    public void Popover_ApplicationShutdown_CleansUp ()
     {
         // Arrange
-        Assert.Null (Application.PopoverHost);
+        Assert.Null (Application.Popover);
         Application.Init (new FakeDriver ());
 
         // Act
-        Assert.NotNull (Application.PopoverHost);
+        Assert.NotNull (Application.Popover);
 
         Application.Shutdown ();
 
         // Test
-        Assert.Null (Application.PopoverHost);
+        Assert.Null (Application.Popover);
     }
 
-    [Fact]
-    public void PopoverHost_CleanUp_CleansUp ()
-    {
-        // Arrange
-        Assert.Null (Application.PopoverHost);
-        PopoverHost.Init ();
-
-        // Act
-        PopoverHost.Cleanup ();
-
-        // Test
-        Assert.Null (Application.PopoverHost);
-
-        Application.ResetState (true);
-    }
-
-    [Fact]
-    public void PopoverHost_Init_Inits ()
-    {
-        // Arrange
-        Assert.Null (Application.PopoverHost);
-
-        // Act
-        PopoverHost.Init ();
-        Assert.NotNull (Application.PopoverHost);
-
-        Application.ResetState (true);
-    }
-
-    [Fact]
-    public void PopoverHost_Init_WithoutCleanup_Throws ()
-    {
-        // Arrange
-        PopoverHost.Init ();
-
-        // Act
-        Assert.Throws<InvalidOperationException> (PopoverHost.Init);
-
-        Application.ResetState (true);
-    }
+    
 
     //[Fact]
     //public void Popover_SetToNull ()
     //{
     //    // Arrange
     //    var popover = new View ();
-    //    Application.PopoverHost = popover;
+    //    Application.Popover = popover;
 
     //    // Act
-    //    Application.PopoverHost = null;
+    //    Application.Popover = null;
 
     //    // Assert
-    //    Assert.Null (Application.PopoverHost);
+    //    Assert.Null (Application.Popover);
 
     //    Application.ResetState (ignoreDisposed: true);
     //}
@@ -96,7 +57,7 @@ public class ApplicationPopoverHostTests
     //    {
     //        Visible = false
     //    };
-    //    Application.PopoverHost = popover;
+    //    Application.Popover = popover;
     //    bool eventTriggered = false;
 
     //    popover.VisibleChanged += (sender, e) => eventTriggered = true;
@@ -117,7 +78,7 @@ public class ApplicationPopoverHostTests
     //    var popover = new View ();
 
     //    // Act
-    //    Application.PopoverHost = popover;
+    //    Application.Popover = popover;
 
     //    // Assert
     //    Assert.True (popover.IsInitialized);
@@ -134,7 +95,7 @@ public class ApplicationPopoverHostTests
     //    Application.Top = new Toplevel { ColorScheme = topColorScheme };
 
     //    // Act
-    //    Application.PopoverHost = popover;
+    //    Application.Popover = popover;
 
     //    // Assert
     //    Assert.Equal (topColorScheme, popover.ColorScheme);
@@ -151,7 +112,7 @@ public class ApplicationPopoverHostTests
     //        Visible = false,
     //        CanFocus = true
     //    };
-    //    Application.PopoverHost = popover;
+    //    Application.Popover = popover;
 
     //    // Act
     //    popover.Visible = true;
@@ -180,7 +141,7 @@ public class ApplicationPopoverHostTests
     //        Width = 1,
     //        Height = 1
     //    };
-    //    Application.PopoverHost = popover;
+    //    Application.Popover = popover;
 
     //    // Act
     //    popover.Visible = true;
@@ -201,7 +162,7 @@ public class ApplicationPopoverHostTests
     //        Visible = false,
     //        CanFocus = true
     //    };
-    //    Application.PopoverHost = popover;
+    //    Application.Popover = popover;
     //    popover.Visible = true;
 
     //    // Act
@@ -223,7 +184,7 @@ public class ApplicationPopoverHostTests
     //        Visible = false,
     //        CanFocus = true
     //    };
-    //    Application.PopoverHost = popover;
+    //    Application.Popover = popover;
     //    popover.Visible = true;
     //    Assert.True (popover.Visible);
     //    Assert.True (popover.HasFocus);
@@ -277,7 +238,7 @@ public class ApplicationPopoverHostTests
     //        CanFocus = true
     //    };
 
-    //    Application.PopoverHost = popover;
+    //    Application.Popover = popover;
     //    popover.Visible = true;
     //    Assert.True (popover.Visible);
     //    Assert.True (popover.HasFocus);
@@ -324,7 +285,7 @@ public class ApplicationPopoverHostTests
     //        CanFocus = true
     //    };
 
-    //    Application.PopoverHost = popover;
+    //    Application.Popover = popover;
     //    popover.Visible = true;
     //    Assert.True (popover.Visible);
     //    Assert.True (popover.HasFocus);
@@ -346,10 +307,10 @@ public class ApplicationPopoverHostTests
     //    var view = new View ();
 
     //    // Act
-    //    Application.PopoverHost = view;
+    //    Application.Popover = view;
 
     //    // Assert
-    //    Assert.Equal (view, Application.PopoverHost);
+    //    Assert.Equal (view, Application.Popover);
 
     //    Application.ResetState (ignoreDisposed: true);
     //}
@@ -359,14 +320,14 @@ public class ApplicationPopoverHostTests
     //{
     //    // Arrange
     //    var view = new View { Visible = true };
-    //    Application.PopoverHost = view;
+    //    Application.Popover = view;
 
     //    // Act
-    //    Application.PopoverHost = null;
+    //    Application.Popover = null;
 
     //    // Assert
     //    Assert.False (view.Visible);
-    //    Assert.Null (Application.PopoverHost);
+    //    Assert.Null (Application.Popover);
 
     //    Application.ResetState (ignoreDisposed: true);
     //}
@@ -377,14 +338,14 @@ public class ApplicationPopoverHostTests
     //    // Arrange
     //    var oldView = new View { Visible = true };
     //    var newView = new View ();
-    //    Application.PopoverHost = oldView;
+    //    Application.Popover = oldView;
 
     //    // Act
-    //    Application.PopoverHost = newView;
+    //    Application.Popover = newView;
 
     //    // Assert
     //    Assert.False (oldView.Visible);
-    //    Assert.Equal (newView, Application.PopoverHost);
+    //    Assert.Equal (newView, Application.Popover);
 
     //    Application.ResetState (ignoreDisposed: true);
     //}
@@ -396,7 +357,7 @@ public class ApplicationPopoverHostTests
     //    var view = new View ();
 
     //    // Act
-    //    Application.PopoverHost = view;
+    //    Application.Popover = view;
 
     //    // Assert
     //    Assert.True (view.IsInitialized);

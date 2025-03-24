@@ -60,7 +60,7 @@ public class MenuBarv2 : Bar
     {
         if (args.NewValue.HasFlag (HighlightStyle.Hover))
         {
-            if (Application.PopoverHost is { Visible: true } && View.IsInHierarchy (this, Application.PopoverHost))
+            if (Application.Popover?.GetPopover () is View { Visible: true } visiblePopover && View.IsInHierarchy (this, visiblePopover))
             {
 
             }

@@ -1,11 +1,7 @@
 #nullable enable
 
-using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
 using System.Text;
-using System.Threading;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -68,33 +64,33 @@ public class Bars : Scenario
         };
         menuBarLikeExamples.Add (label);
 
-        var bar = new Bar
-        {
-            Id = "menuBar-like",
-            X = Pos.Right (label),
-            Y = Pos.Top (label),
-            Width = Dim.Fill (),
-        };
-        menuBarLikeExamples.Add (bar);
-        ConfigMenuBar (bar);
+        //var bar = new Bar
+        //{
+        //    Id = "menuBar-like",
+        //    X = Pos.Right (label),
+        //    Y = Pos.Top (label),
+        //    Width = Dim.Fill (),
+        //};
+        //menuBarLikeExamples.Add (bar);
+        //ConfigMenuBar (bar);
 
-        label = new Label ()
-        {
-            Title = "  MenuBar:",
-            X = 0,
-            Y = Pos.Bottom (bar) + 1
-        };
-        menuBarLikeExamples.Add (label);
+        //label = new Label ()
+        //{
+        //    Title = "  MenuBar:",
+        //    X = 0,
+        //    Y = Pos.Bottom (bar) + 1
+        //};
+        //menuBarLikeExamples.Add (label);
 
-        bar = new MenuBarv2
-        {
-            Id = "menuBar",
-            X = Pos.Right (label),
-            Y = Pos.Top (label),
-        };
+        //bar = new MenuBarv2
+        //{
+        //    Id = "menuBar",
+        //    X = Pos.Right (label),
+        //    Y = Pos.Top (label),
+        //};
 
-        menuBarLikeExamples.Add (bar);
-        ConfigMenuBar (bar);
+        //menuBarLikeExamples.Add (bar);
+        //ConfigMenuBar (bar);
 
         FrameView menuLikeExamples = new ()
         {
@@ -114,7 +110,7 @@ public class Bars : Scenario
         };
         menuLikeExamples.Add (label);
 
-        bar = new Bar
+        Bar bar = new Bar
         {
             Id = "menu-like",
             X = 0,
@@ -167,85 +163,85 @@ public class Bars : Scenario
             Id = "popoverMenu",
         };
 
-        ConfigureMenu (_popoverMenu!);
+        //ConfigureMenu (_popoverMenu!);
 
-        _popoverMenu!.ColorScheme = Colors.ColorSchemes ["Menu"];
+        //_popoverMenu!.ColorScheme = Colors.ColorSchemes ["Menu"];
 
-        _popoverMenu.HasFocusChanged += (o, args) =>
-                                        {
-                                            _popoverMenu.Visible = args.NewValue;
-                                        };
-        _popoverMenu.Visible = false;
+        //_popoverMenu.HasFocusChanged += (o, args) =>
+        //                                {
+        //                                    _popoverMenu.Visible = args.NewValue;
+        //                                };
+        //_popoverMenu.Visible = false;
 
 
-        Application.PopoverHost!.Add (_popoverMenu);
-        Application.PopoverHost.VisibleChanged += (sender, args) =>
-                                                  {
-                                                      if (!Application.PopoverHost.Visible)
-                                                      {
-                                                          _popoverMenu.Visible = false;
-                                                      }
-                                                  };
+        //Application.Popover = _popoverMenu;
+        //_popoverMenu.VisibleChanged += (sender, args) =>
+        //{
+        //    if (Application.Popover is View { Visible: false } invisiblePopover)
+        //    {
+        //        invisiblePopover = false;
+        //    }
+        //};
 
-        var toggleShortcut = new Shortcut
-        {
-            Title = "Toggle Hide",
-            Text = "App",
-            BindKeyToApplication = true,
-            Key = Key.F4.WithCtrl,
-        };
-        _popoverMenu.Add (toggleShortcut);
+        //var toggleShortcut = new Shortcut
+        //{
+        //    Title = "Toggle Hide",
+        //    Text = "App",
+        //    BindKeyToApplication = true,
+        //    Key = Key.F4.WithCtrl,
+        //};
+        //_popoverMenu.Add (toggleShortcut);
 
-        _popoverMenu.Accepting += PopoverMenuOnAccepting;
+        //_popoverMenu.Accepting += PopoverMenuOnAccepting;
 
-        void PopoverMenuOnAccepting (object? o, CommandEventArgs args)
-        {
-            eventSource.Add ($"Accepting: {_popoverMenu!.Id}");
-            eventLog.MoveDown ();
-            var cbShortcuts = _popoverMenu.SubViews.Where (
-                                                          v =>
-                                                          {
-                                                              if (v is Shortcut sh)
-                                                              {
-                                                                  return sh.CommandView is CheckBox;
-                                                              }
+        //void PopoverMenuOnAccepting (object? o, CommandEventArgs args)
+        //{
+        //    eventSource.Add ($"Accepting: {_popoverMenu!.Id}");
+        //    eventLog.MoveDown ();
+        //    var cbShortcuts = _popoverMenu.SubViews.Where (
+        //                                                  v =>
+        //                                                  {
+        //                                                      if (v is Shortcut sh)
+        //                                                      {
+        //                                                          return sh.CommandView is CheckBox;
+        //                                                      }
 
-                                                              return false;
-                                                          }).Cast<Shortcut> ();
+        //                                                      return false;
+        //                                                  }).Cast<Shortcut> ();
 
-            foreach (Shortcut sh in cbShortcuts)
-            {
-                eventSource.Add ($"  {sh.Id} - {((CheckBox)sh.CommandView).CheckedState}");
-                eventLog.MoveDown ();
-            }
-        }
+        //    foreach (Shortcut sh in cbShortcuts)
+        //    {
+        //        eventSource.Add ($"  {sh.Id} - {((CheckBox)sh.CommandView).CheckedState}");
+        //        eventLog.MoveDown ();
+        //    }
+        //}
 
-        foreach (var view in _popoverMenu.SubViews.Where (s => s is Shortcut)!)
-        {
-            var sh = (Shortcut)view;
+        //foreach (var view in _popoverMenu.SubViews.Where (s => s is Shortcut)!)
+        //{
+        //    var sh = (Shortcut)view;
 
-            sh.Accepting += (o, args) =>
-                            {
-                                eventSource.Add ($"shortcut.Accepting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
-                                eventLog.MoveDown ();
-                            };
-        }
+        //    sh.Accepting += (o, args) =>
+        //                    {
+        //                        eventSource.Add ($"shortcut.Accepting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
+        //                        eventLog.MoveDown ();
+        //                    };
+        //}
 
-        menuLikeExamples.MouseClick += MenuLikeExamplesMouseClick;
+        //menuLikeExamples.MouseClick += MenuLikeExamplesMouseClick;
 
-        void MenuLikeExamplesMouseClick (object? sender, MouseEventArgs e)
-        {
-            if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
-            {
-                _popoverMenu.Arrangement = ViewArrangement.Overlapped;
+        //void MenuLikeExamplesMouseClick (object? sender, MouseEventArgs e)
+        //{
+        //    if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
+        //    {
+        //        _popoverMenu.Arrangement = ViewArrangement.Overlapped;
 
-                _popoverMenu.X = e.ScreenPosition.X;
-                _popoverMenu.Y = e.ScreenPosition.Y;
-                _popoverMenu.Visible = true;
+        //        _popoverMenu.X = e.ScreenPosition.X;
+        //        _popoverMenu.Y = e.ScreenPosition.Y;
+        //        _popoverMenu.Visible = true;
 
-                Application.PopoverHost.Visible = true;
-            }
-        }
+        //        Application.Popover.Visible = true;
+        //    }
+        //}
 
         FrameView statusBarLikeExamples = new ()
         {
@@ -497,108 +493,108 @@ public class Bars : Scenario
     //}
 
 
-    private void ConfigMenuBar (Bar bar)
-    {
-        Menuv2? fileMenu = new ContextMenuv2 ([
-                                                  new (bar, Command.Open, "_Open...", "Open a file")
-            ])
-        {
-            Id = "fileMenu",
-        };
+    //private void ConfigMenuBar (Bar bar)
+    //{
+    //    Menuv2? fileMenu = new ContextMenuv2 ([
+    //                                              new (bar, Command.Open, "_Open...", "Open a file")
+    //        ])
+    //    {
+    //        Id = "fileMenu",
+    //    };
 
-        //ConfigureMenu (fileMenu);
+    //    //ConfigureMenu (fileMenu);
 
-        var fileMenuBarItem = new MenuItemv2 (fileMenu, Command.Context, "_File", "File Menu")
-        {
-            Id = "fileMenuBarItem",
-            Key = Key.D0.WithAlt,
-            HighlightStyle = HighlightStyle.Hover,
-        };
-        fileMenu.Visible = false;
-        Application.PopoverHost.Add (fileMenu);
+    //    var fileMenuBarItem = new MenuItemv2 (fileMenu, Command.Context, "_File", "File Menu")
+    //    {
+    //        Id = "fileMenuBarItem",
+    //        Key = Key.D0.WithAlt,
+    //        HighlightStyle = HighlightStyle.Hover,
+    //    };
+    //    fileMenu.Visible = false;
+    //    Application.Popover.Add (fileMenu);
 
-        Application.PopoverHost.VisibleChanged += (sender, args) =>
-                                                  {
-                                                      if (!Application.PopoverHost.Visible)
-                                                      {
-                                                          fileMenu.Visible = false;
-                                                      }
-                                                  };
+    //    Application.Popover.VisibleChanged += (sender, args) =>
+    //                                              {
+    //                                                  if (!Application.Popover.Visible)
+    //                                                  {
+    //                                                      fileMenu.Visible = false;
+    //                                                  }
+    //                                              };
 
-        fileMenuBarItem.HasFocusChanged += (sender, args) =>
-                                    {
-                                        Rectangle screen = fileMenuBarItem.FrameToScreen ();
-                                        fileMenu.X = screen.X;
-                                        fileMenu.Y = screen.Y + screen.Height;
-                                        fileMenu.Visible = args.NewValue;
-                                    };
-
-
-        fileMenuBarItem.Disposing += (sender, args) => fileMenu?.Dispose ();
-
-        fileMenuBarItem.Accepting += (sender, args) =>
-                                     {
-                                         Rectangle screen = fileMenuBarItem.FrameToScreen ();
-                                         fileMenu.X = screen.X;
-                                         fileMenu.Y = screen.Y + screen.Height;
-                                         fileMenu.Visible = true;
-                                         Application.PopoverHost.Visible = true;
-                                     };
+    //    fileMenuBarItem.HasFocusChanged += (sender, args) =>
+    //                                {
+    //                                    Rectangle screen = fileMenuBarItem.FrameToScreen ();
+    //                                    fileMenu.X = screen.X;
+    //                                    fileMenu.Y = screen.Y + screen.Height;
+    //                                    fileMenu.Visible = args.NewValue;
+    //                                };
 
 
-        Menuv2? editMenu = new ContextMenuv2
-        {
-            Id = "editMenu",
-        };
-        ConfigureMenu (editMenu);
+    //    fileMenuBarItem.Disposing += (sender, args) => fileMenu?.Dispose ();
 
-        var editMenuBarItem = new MenuItemv2 (editMenu, Command.Edit, "_Edit", "Edit Menu")
-        {
-            Title = "_Edit",
-            HighlightStyle = HighlightStyle.Hover
-        };
-        editMenu.Visible = false;
-        Application.PopoverHost.Add (editMenu);
-
-        Application.PopoverHost.VisibleChanged += (sender, args) =>
-                                                  {
-                                                      if (!Application.PopoverHost.Visible)
-                                                      {
-                                                          editMenu.Visible = false;
-                                                      }
-                                                  };
-
-        editMenuBarItem.HasFocusChanged += (sender, args) =>
-                                           {
-                                               Rectangle screen = editMenuBarItem.FrameToScreen ();
-                                               editMenu.X = screen.X;
-                                               editMenu.Y = screen.Y + screen.Height;
-                                               editMenu.Visible = args.NewValue;
-                                           };
+    //    fileMenuBarItem.Accepting += (sender, args) =>
+    //                                 {
+    //                                     Rectangle screen = fileMenuBarItem.FrameToScreen ();
+    //                                     fileMenu.X = screen.X;
+    //                                     fileMenu.Y = screen.Y + screen.Height;
+    //                                     fileMenu.Visible = true;
+    //                                     Application.Popover.Visible = true;
+    //                                 };
 
 
-        editMenuBarItem.Disposing += (sender, args) => editMenu?.Dispose ();
+    //    Menuv2? editMenu = new ContextMenuv2
+    //    {
+    //        Id = "editMenu",
+    //    };
+    //    ConfigureMenu (editMenu);
 
-        editMenuBarItem.Accepting += (sender, args) =>
-                                     {
-                                         Rectangle screen = editMenuBarItem.FrameToScreen ();
-                                         editMenu.X = screen.X;
-                                         editMenu.Y = screen.Y + screen.Height;
-                                         editMenu.Visible = true;
-                                         Application.PopoverHost.Visible = true;
-                                     };
+    //    var editMenuBarItem = new MenuItemv2 (editMenu, Command.Edit, "_Edit", "Edit Menu")
+    //    {
+    //        Title = "_Edit",
+    //        HighlightStyle = HighlightStyle.Hover
+    //    };
+    //    editMenu.Visible = false;
+    //    Application.Popover.Add (editMenu);
+
+    //    Application.Popover.VisibleChanged += (sender, args) =>
+    //                                              {
+    //                                                  if (!Application.Popover.Visible)
+    //                                                  {
+    //                                                      editMenu.Visible = false;
+    //                                                  }
+    //                                              };
+
+    //    editMenuBarItem.HasFocusChanged += (sender, args) =>
+    //                                       {
+    //                                           Rectangle screen = editMenuBarItem.FrameToScreen ();
+    //                                           editMenu.X = screen.X;
+    //                                           editMenu.Y = screen.Y + screen.Height;
+    //                                           editMenu.Visible = args.NewValue;
+    //                                       };
 
 
-        var helpMenuBarItem = new Shortcut
-        {
-            Title = "_Help",
-            HelpText = "Halp Menu",
-            Key = Key.D2.WithAlt,
-            HighlightStyle = HighlightStyle.Hover
-        };
+    //    editMenuBarItem.Disposing += (sender, args) => editMenu?.Dispose ();
 
-        bar.Add (fileMenuBarItem, editMenuBarItem, helpMenuBarItem);
-    }
+    //    editMenuBarItem.Accepting += (sender, args) =>
+    //                                 {
+    //                                     Rectangle screen = editMenuBarItem.FrameToScreen ();
+    //                                     editMenu.X = screen.X;
+    //                                     editMenu.Y = screen.Y + screen.Height;
+    //                                     editMenu.Visible = true;
+    //                                     Application.Popover.Visible = true;
+    //                                 };
+
+
+    //    var helpMenuBarItem = new Shortcut
+    //    {
+    //        Title = "_Help",
+    //        HelpText = "Halp Menu",
+    //        Key = Key.D2.WithAlt,
+    //        HighlightStyle = HighlightStyle.Hover
+    //    };
+
+    //    bar.Add (fileMenuBarItem, editMenuBarItem, helpMenuBarItem);
+    //}
 
     private void ConfigureMenu (Bar bar)
     {

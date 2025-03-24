@@ -19,6 +19,7 @@ public class Menuv2 : Bar
         Orientation = Orientation.Vertical;
         Width = Dim.Auto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
+
         Initialized += Menuv2_Initialized;
         VisibleChanged += OnVisibleChanged;
 

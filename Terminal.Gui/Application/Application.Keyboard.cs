@@ -20,14 +20,14 @@ public static partial class Application // Keyboard handling
             return true;
         }
 
-        if (PopoverHost is { Visible: true })
+        if (Popover?.GetPopover () as View is { Visible: true } visiblePopover)
         {
-            if (PopoverHost.NewKeyDownEvent (key))
+            if (visiblePopover.NewKeyDownEvent (key))
             {
                 return true;
             }
         }
-        
+
         if (Top is null)
         {
             foreach (Toplevel topLevel in TopLevels.ToList ())

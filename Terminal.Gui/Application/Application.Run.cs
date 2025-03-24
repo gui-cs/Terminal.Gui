@@ -337,7 +337,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public static T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
-        where T : Toplevel, new ()
+        where T : Toplevel, new()
     {
         return ApplicationImpl.Instance.Run<T> (errorHandler, driver);
     }
@@ -428,11 +428,11 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     {
         List<View> tops = new (TopLevels);
 
-        if (PopoverHost is { Visible: true })
+        if (Popover?.GetPopover () as View is { Visible: true } visiblePopover)
         {
-            //PopoverHost.SetNeedsDraw();
-            //PopoverHost.SetNeedsLayout ();
-            tops.Insert (0, PopoverHost);
+            visiblePopover.SetNeedsDraw ();
+            visiblePopover.SetNeedsLayout ();
+            tops.Insert (0, visiblePopover);
         }
 
         bool neededLayout = View.Layout (tops.ToArray ().Reverse (), Screen.Size);
@@ -563,7 +563,12 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     public static void End (RunState runState)
     {
         ArgumentNullException.ThrowIfNull (runState);
-        PopoverHost.Cleanup();
+
+        if (Popover?.GetPopover () is View popover)
+        {
+            popover.Visible = false;
+            Popover = null;
+        }
 
         runState.Toplevel.OnUnloaded ();
 

@@ -154,7 +154,7 @@ public class ContextMenus : Scenario
     {
         if (_winContextMenu is { })
         {
-            Application.PopoverHost?.Remove (_winContextMenu);
+           // Application.Popover?.Remove (_winContextMenu);
             _winContextMenu.Dispose ();
             _winContextMenu = null;
         }
@@ -164,7 +164,7 @@ public class ContextMenus : Scenario
         {
             menuItem.Accepting += (sender, args) =>
                                   {
-                                      Application.PopoverHost.Visible = false;
+                                     // Application.Popover.Visible = false;
                                       _winContextMenu.Visible = false;
                                       args.Cancel = false;
                                   };
@@ -178,14 +178,14 @@ public class ContextMenus : Scenario
             //UseSubMenusSingleFrame = _useSubMenusSingleFrame
         };
 
-        Application.PopoverHost.Add (_winContextMenu);
+        //Application.Popover.Add (_winContextMenu);
     }
 
     private void ShowWinContextMenu (Point? screenPosition)
     {
         _winContextMenu!.SetPosition (screenPosition);
         _winContextMenu.Visible = true;
-        Application.PopoverHost.Visible = true;
+      //  Application.Popover.Visible = true;
     }
 
     //    MenuBarItem menuItems = new (

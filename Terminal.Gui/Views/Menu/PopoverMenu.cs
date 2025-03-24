@@ -5,7 +5,7 @@ namespace Terminal.Gui;
 
 /// <summary>
 /// </summary>
-public class PopoverMenu : View
+public class PopoverMenu : PopoverBaseImpl
 {
     /// <summary>
     /// </summary>
@@ -15,12 +15,7 @@ public class PopoverMenu : View
     /// </summary>
     public PopoverMenu (Menuv2? root)
     {
-        CanFocus = true;
-        Width = Dim.Fill ();
-        Height = Dim.Fill ();
-        ViewportSettings = ViewportSettings.Transparent | ViewportSettings.TransparentMouse;
-
-        //base.Visible = false;
+        base.Visible = false;
         base.ColorScheme = Colors.ColorSchemes ["Menu"];
 
         Root = root;
@@ -67,7 +62,7 @@ public class PopoverMenu : View
                     });
 
         KeyBindings.Add (DefaultKey, Command.Quit);
-        KeyBindings.Add (Application.QuitKey, Command.Quit);
+        KeyBindings.ReplaceCommands (Application.QuitKey, Command.Quit);
 
         AddCommand (
                     Command.Quit,
@@ -168,7 +163,7 @@ public class PopoverMenu : View
                 _root.Accepting += MenuOnAccepting;
             }
 
-            AddAndShowSubMenu (_root);
+            //AddAndShowSubMenu (_root);
 
             // TODO: This needs to be done whenever any MenuItem in the menu tree changes to support dynamic menus
             // TODO: And it needs to clear them first

@@ -104,9 +104,9 @@ public class ApplicationNavigation
     /// </returns>
     public bool AdvanceFocus (NavigationDirection direction, TabBehavior? behavior)
     {
-        if (Application.PopoverHost is { Visible: true })
+        if (Application.Popover?.GetPopover () as View is { Visible: true } visiblePopover)
         {
-            return Application.PopoverHost.AdvanceFocus (direction, behavior);
+            return visiblePopover.AdvanceFocus (direction, behavior);
         }
         return Application.Top is { } && Application.Top.AdvanceFocus (direction, behavior);
     }

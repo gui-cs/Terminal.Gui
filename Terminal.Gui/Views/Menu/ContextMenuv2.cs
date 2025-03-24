@@ -7,7 +7,7 @@ namespace Terminal.Gui;
 /// <summary>
 ///     ContextMenuv2 provides a Popover menu that can be positioned anywhere within a <see cref="View"/>.
 ///     <para>
-///         To show the ContextMenu, set <see cref="Application.PopoverHost"/> to the ContextMenu object and set
+///         To show the ContextMenu, set <see cref="Application.Popover"/> to the ContextMenu object and set
 ///         <see cref="View.Visible"/> property to <see langword="true"/>.
 ///     </para>
 ///     <para>

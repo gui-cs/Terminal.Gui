@@ -7,6 +7,7 @@ using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
+using static UICatalog.Scenarios.MenusV2;
 
 namespace UICatalog.Scenarios;
 
@@ -49,349 +50,51 @@ public class MenusV2 : Scenario
         };
         app.Add (targetView);
 
-        var rootMenu = new Menuv2 ()
-        {
-            Id = "rootMenu",
-        };
-        ConfigureRootMenu (targetView, rootMenu);
-
-        var optionsSubMenu = new Menuv2
-        {
-            Id = "optionsSubMenu",
-            Visible = false
-        };
-        ConfigureOptionsSubMenu (targetView, optionsSubMenu);
-
-        var optionsSubMenuItem = new MenuItemv2 (targetView, Command.NotBound, "O_ptions", "File options", optionsSubMenu);
-        rootMenu.Add (optionsSubMenuItem);
-
-        var detailsSubMenu = new Menuv2
-        {
-            Id = "detailsSubMenu",
-            Visible = false
-        };
-        ConfigureDetialsSubMenu (targetView, detailsSubMenu);
-
-        var detailsSubMenuItem = new MenuItemv2 (targetView, Command.NotBound, "_Details", "File details", detailsSubMenu);
-        rootMenu.Add (detailsSubMenuItem);
-
-        var moreDetailsSubMenu = new Menuv2
-        {
-            Id = "moreDetailsSubMenu",
-            Visible = false
-        };
-        ConfigureMoreDetailsSubMenu (targetView, moreDetailsSubMenu);
-
-        var moreDetailsSubMenuItem = new MenuItemv2 (targetView, Command.NotBound, "_More Details", "More details", moreDetailsSubMenu);
-        detailsSubMenu.Add (moreDetailsSubMenuItem);
-
-        var popoverMenu = new PopoverMenu (rootMenu)
-        {
-            Id = "popOverMenu",
-            Visible = true,
-        };
-
-        ////Application.PopoverHost.Add (popoverMenu);
-        //Application.PopoverHost.Visible = true;
-
-        //rootMenu.SubViews.ElementAt (0).SetFocus ();
-
-        targetView.Add (popoverMenu);
-
         targetView.CommandNotBound += (o, args) =>
                                {
-                                   Logging.Trace ($"targetView CommandNotBound: {args.Context.Command}");
-                                   eventSource.Add ($"targetView CommandNotBound: {args.Context.Command}");
+                                   Logging.Trace ($"targetView CommandNotBound: {args?.Context?.Command}");
+                                   eventSource.Add ($"targetView CommandNotBound: {args?.Context?.Command}");
                                    eventLog.MoveDown ();
                                    args.Cancel = true;
                                };
 
         targetView.Accepting += (o, args) =>
                                {
-                                   Logging.Trace ($"targetView CommandNotBound: {args?.Context?.Source?.Title}");
+                                   Logging.Trace ($"targetView Accepting: {args?.Context?.Source?.Title}");
                                    eventSource.Add ($"targetView Accepting: {args?.Context?.Source?.Title}: ");
                                    eventLog.MoveDown ();
                                    args.Cancel = true;
                                };
 
-        popoverMenu.Accepting += (o, args) =>
-                                 {
-
-                                     //Logging.Trace ($"{popoverMenu!.Id} Accepting: {args?.Context?.Source?.Title}");
-                                     //eventSource.Add ($"{popoverMenu!.Id} Accepting: {args?.Context?.Source?.Title}");
-                                     //eventLog.MoveDown ();
-                                     //args.Cancel = true;
-                                 };
-
-        popoverMenu.Accepted += (o, args) =>
-                                {
-                                    Logging.Trace ($"{popoverMenu!.Id} Accepted: {args?.Context?.Source?.Title}");
-                                    eventSource.Add ($"{popoverMenu!.Id} Accepted: {args?.Context?.Source?.Title}");
-                                    eventLog.MoveDown ();
-
-                                    popoverMenu.Visible = false;
-                                };
-
-        popoverMenu.Selecting += (o, args) =>
-                                 {
-                                     //Logging.Trace ($"{popoverMenu!.Id} Selecting: {args.Context}");
-                                     //eventSource.Add ($"Selecting: {menu!.Id} {args.Context.Command}");
-                                     //eventLog.MoveDown ();
-                                     //args.Cancel = false;
-                                 };
-
-        ////popoverMenu.Root.MenuItemCommandInvoked += (o, args) =>
-        ////                                      {
-        ////                                          Logging.Trace ($"MenuItemCommandInvoked");
-        ////                                          if (args.Context is CommandContext<KeyBinding> { Binding.Data: MenuItemv2 { } sc })
-        ////                                          {
-        ////                                              Logging.Trace($"Invoked: {sc.Title} {args.Context.Command}");
-        ////                                              eventSource.Add ($"Invoked: {sc.Title} {args.Context.Command}");
-        ////                                              //args.Cancel = true;
-        ////                                          }
-
-        ////                                          eventLog.MoveDown ();
-        ////                                      };
-
-
-        foreach (View view2 in popoverMenu.Root.SubViews.Where (s => s is MenuItemv2)!)
-        {
-            var sh = (MenuItemv2)view2;
-
-            sh.Accepting += (o, args) =>
-                            {
-                                //Logging.Trace ($"sh Accepting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
-                                //eventSource.Add ($"Accepting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
-                                //eventLog.MoveDown ();
-                                //args.Cancel = true;
-                            };
-
-            sh.Selecting += (o, args) =>
-                            {
-                                //Logging.Trace ($"sh Selecting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
-                                //eventSource.Add ($"Selecting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
-                                //eventLog.MoveDown ();
-                                //args.Cancel = false;
-                            };
-        }
+        targetView.PopoverMenu!.Accepted += (o, args) =>
+                                           {
+                                               Logging.Trace ($"PopoverMenu Accepted: {args?.Context?.Source?.Title}");
+                                               eventSource.Add ($"PopoverMenu Accepted: {args?.Context?.Source?.Title}: ");
+                                               eventLog.MoveDown ();
+                                           };
 
         app.Add (eventLog);
 
         Application.Run (app);
         app.Dispose ();
-        //popoverMenu.Dispose ();
         Application.Shutdown ();
     }
 
-    private void ConfigureRootMenu (View targetView, Menuv2 menu)
+    public class TargetView : View
     {
-        var shortcut1 = new MenuItemv2
-        {
-            Title = "_New",
-            Key = Key.N.WithAlt,
-            BindKeyToApplication = true,
-            Text = "New File",
-            Command = Command.New,
-            TargetView = targetView
-        };
+        internal PopoverMenu? PopoverMenu { get; private set; }
 
-        var shortcut2 = new MenuItemv2
-        {
-            Title = "_Open...",
-            Text = "Open File",
-            Key = Key.O.WithAlt,
-            BindKeyToApplication = true,
-            Command = Command.Open,
-            TargetView = targetView
-        };
-
-        var shortcut3 = new MenuItemv2
-        {
-            Title = "_Save",
-            Text = "Save file",
-            Key = Key.S.WithAlt,
-            BindKeyToApplication = true,
-            Command = Command.Save,
-            TargetView = targetView
-        };
-
-        var shortcut4 = new MenuItemv2
-        {
-            Title = "Sa_ve As...",
-            Text = "Save file as",
-            Key = Key.V.WithAlt,
-            BindKeyToApplication = true,
-            Command = Command.SaveAs,
-            TargetView = targetView
-
-        };
-
-
-        var shortcut5 = new MenuItemv2
-        {
-            Title = "_Auto Save",
-            Text = "Automatically save",
-            Key = Key.A.WithAlt,
-            BindKeyToApplication = true,
-
-        };
-
-        shortcut5.CommandView = new CheckBox
-        {
-            Title = shortcut5.Title,
-            HighlightStyle = HighlightStyle.None,
-            CanFocus = false
-        };
-
-        var line = new Line
-        {
-            X = -1,
-            Width = Dim.Fill ()! + 1
-        };
-
-
-        // This ensures the checkbox state toggles when the hotkey of Title is pressed.
-        //shortcut4.Accepting += (sender, args) => args.Cancel = true;
-
-        menu.Add (shortcut1, shortcut2, shortcut3, shortcut4, line, shortcut5);
-    }
-
-
-    private void ConfigureOptionsSubMenu (View targetView, Menuv2 menu)
-    {
-        var shortcut2 = new MenuItemv2
-        {
-            Title = "Enable Over_write",
-            Text = "Overwrite",
-            Key = Key.W.WithAlt,
-            BindKeyToApplication = true,
-            Command = Command.EnableOverwrite,
-            TargetView = targetView
-        };
-
-        var shortcut3 = new MenuItemv2
-        {
-            Title = "_Three",
-            Text = "The 3rd item",
-            Key = Key.T.WithAlt,
-            BindKeyToApplication = true,
-        };
-
-        var line = new Line
-        {
-            X = -1,
-            Width = Dim.Fill ()! + 1
-        };
-
-        var shortcut4 = new MenuItemv2
-        {
-            Title = "_Four",
-            Text = "Below the line",
-            Key = Key.D7.WithAlt,
-            BindKeyToApplication = true,
-        };
-
-        shortcut4.CommandView = new CheckBox
-        {
-            Title = shortcut4.Title,
-            HighlightStyle = HighlightStyle.None,
-            CanFocus = false
-        };
-
-        // This ensures the checkbox state toggles when the hotkey of Title is pressed.
-        // shortcut4.Accepting += (sender, args) => args.Cancel = true;
-
-        menu.Add (shortcut2, shortcut3, line, shortcut4);
-    }
-
-    private void ConfigureDetialsSubMenu (View targetView, Menuv2 menu)
-    {
-        var shortcut2 = new MenuItemv2
-        {
-            Title = "_Detail 1",
-            Text = "Some detail #1",
-            Key = Key.G.WithAlt,
-            BindKeyToApplication = true,
-        };
-
-        var shortcut3 = new MenuItemv2
-        {
-            Title = "_Three",
-            Text = "The 3rd item",
-            Key = Key.D9.WithAlt,
-            BindKeyToApplication = true,
-        };
-
-        var line = new Line
-        {
-            X = -1,
-            Width = Dim.Fill ()! + 1
-        };
-
-        var shortcut4 = new MenuItemv2
-        {
-            Title = "_Four",
-            Text = "Below the line",
-            Key = Key.D8.WithAlt,
-            BindKeyToApplication = true,
-
-        };
-
-        shortcut4.CommandView = new CheckBox
-        {
-            Title = shortcut4.Title,
-            HighlightStyle = HighlightStyle.None,
-            CanFocus = false
-        };
-
-        // This ensures the checkbox state toggles when the hotkey of Title is pressed.
-        //shortcut4.Accepting += (sender, args) => args.Cancel = true;
-
-        menu.Add (shortcut2, shortcut3, line, shortcut4);
-    }
-
-
-    private void ConfigureMoreDetailsSubMenu (View targetView, Menuv2 menu)
-    {
-        var shortcut2 = new MenuItemv2
-        {
-            Title = "_Deeper Detail",
-            Text = "Deeper Detail",
-            Key = Key.D.WithAlt,
-            BindKeyToApplication = true,
-        };
-
-        var line = new Line
-        {
-            X = -1,
-            Width = Dim.Fill ()! + 1
-        };
-
-        var shortcut4 = new MenuItemv2
-        {
-            Title = "_Third",
-            Text = "Below the line",
-            Key = Key.D5.WithAlt,
-            BindKeyToApplication = true,
-
-        };
-
-        // This ensures the checkbox state toggles when the hotkey of Title is pressed.
-        //shortcut4.Accepting += (sender, args) => args.Cancel = true;
-
-        menu.Add (shortcut2, line, shortcut4);
-    }
-
-    public class TargetView : FrameView
-    {
         public TargetView ()
         {
+            CanFocus = true;
+            Text = "TargetView";
+            BorderStyle = LineStyle.Dashed;
             AddCommand (Command.Context,
                        ctx =>
                        {
-                           if (SubViews.FirstOrDefault (v => v is PopoverMenu) is PopoverMenu { } popoverMenu)
+                           if (Application.Popover?.GetPopover () as PopoverMenu is { Visible: false } visiblePopover)
                            {
-                               popoverMenu.MakeVisible ();
+                               visiblePopover.MakeVisible ();
                            }
 
                            return true;
@@ -404,9 +107,9 @@ public class MenusV2 : Scenario
             AddCommand (Command.Cancel,
                         ctx =>
                         {
-                            if (SubViews.FirstOrDefault (v => v is PopoverMenu) is PopoverMenu { } popoverMenu)
+                            if (Application.Popover?.GetPopover () as PopoverMenu is { Visible: true } visiblePopover)
                             {
-                                popoverMenu.Visible = false;
+                                visiblePopover.Visible = false;
                             }
 
                             return true;
@@ -414,8 +117,278 @@ public class MenusV2 : Scenario
 
             MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked, Command.Cancel);
 
+            Add (
+                 new Button ()
+                 {
+                     Title = "_Button",
+                     X = Pos.Center (),
+                     Y = Pos.Center ()
+                 });
+
+
+            var rootMenu = new Menuv2 ()
+            {
+                Id = "rootMenu",
+            };
+            ConfigureRootMenu (rootMenu);
+
+            var optionsSubMenu = new Menuv2
+            {
+                Id = "optionsSubMenu",
+                Visible = false
+            };
+            ConfigureOptionsSubMenu (optionsSubMenu);
+
+            var optionsSubMenuItem = new MenuItemv2 (this, Command.NotBound, "O_ptions", "File options", optionsSubMenu);
+            rootMenu.Add (optionsSubMenuItem);
+
+            var detailsSubMenu = new Menuv2
+            {
+                Id = "detailsSubMenu",
+                Visible = false
+            };
+            ConfigureDetialsSubMenu (detailsSubMenu);
+
+            var detailsSubMenuItem = new MenuItemv2 (this, Command.NotBound, "_Details", "File details", detailsSubMenu);
+            rootMenu.Add (detailsSubMenuItem);
+
+            var moreDetailsSubMenu = new Menuv2
+            {
+                Id = "moreDetailsSubMenu",
+                Visible = false
+            };
+            ConfigureMoreDetailsSubMenu (moreDetailsSubMenu);
+
+            var moreDetailsSubMenuItem = new MenuItemv2 (this, Command.NotBound, "_More Details", "More details", moreDetailsSubMenu);
+            detailsSubMenu.Add (moreDetailsSubMenuItem);
+
+
+            PopoverMenu = new PopoverMenu (rootMenu)
+            {
+                Id = "popoverMenu",
+            };
+
+            Initialized += (sender, args) =>
+                           {
+                               Application.Popover?.ShowPopover(PopoverMenu);
+                               PopoverMenu?.BeginInit ();
+                               PopoverMenu?.EndInit ();
+                               PopoverMenu?.MakeVisible ();
+                           };
+
+
+        }
+
+
+        private void ConfigureRootMenu (Menuv2 menu)
+        {
+            var shortcut1 = new MenuItemv2
+            {
+                Title = "_New",
+                Key = Key.N.WithAlt,
+                BindKeyToApplication = true,
+                Text = "New File",
+                Command = Command.New,
+                TargetView = this
+            };
+
+            var shortcut2 = new MenuItemv2
+            {
+                Title = "_Open...",
+                Text = "Open File",
+                Key = Key.O.WithAlt,
+                BindKeyToApplication = true,
+                Command = Command.Open,
+                TargetView = this
+            };
+
+            var shortcut3 = new MenuItemv2
+            {
+                Title = "_Save",
+                Text = "Save file",
+                Key = Key.S.WithAlt,
+                BindKeyToApplication = true,
+                Command = Command.Save,
+                TargetView = this
+            };
+
+            var shortcut4 = new MenuItemv2
+            {
+                Title = "Sa_ve As...",
+                Text = "Save file as",
+                Key = Key.V.WithAlt,
+                BindKeyToApplication = true,
+                Command = Command.SaveAs,
+                TargetView = this
+
+            };
+
+
+            var shortcut5 = new MenuItemv2
+            {
+                Title = "_Auto Save",
+                Text = "Automatically save",
+                Key = Key.A.WithAlt,
+                BindKeyToApplication = true,
+
+            };
+
+            shortcut5.CommandView = new CheckBox
+            {
+                Title = shortcut5.Title,
+                HighlightStyle = HighlightStyle.None,
+                CanFocus = false
+            };
+
+            var line = new Line
+            {
+                X = -1,
+                Width = Dim.Fill ()! + 1
+            };
+
+
+            // This ensures the checkbox state toggles when the hotkey of Title is pressed.
+            //shortcut4.Accepting += (sender, args) => args.Cancel = true;
+
+            menu.Add (shortcut1, shortcut2, shortcut3, shortcut4, line, shortcut5);
+        }
+
+
+        private void ConfigureOptionsSubMenu (Menuv2 menu)
+        {
+            var shortcut2 = new MenuItemv2
+            {
+                Title = "Enable Over_write",
+                Text = "Overwrite",
+                Key = Key.W.WithAlt,
+                BindKeyToApplication = true,
+                Command = Command.EnableOverwrite,
+                TargetView = this
+            };
+
+            var shortcut3 = new MenuItemv2
+            {
+                Title = "_Three",
+                Text = "The 3rd item",
+                Key = Key.T.WithAlt,
+                BindKeyToApplication = true,
+            };
+
+            var line = new Line
+            {
+                X = -1,
+                Width = Dim.Fill ()! + 1
+            };
+
+            var shortcut4 = new MenuItemv2
+            {
+                Title = "_Four",
+                Text = "Below the line",
+                Key = Key.D7.WithAlt,
+                BindKeyToApplication = true,
+            };
+
+            shortcut4.CommandView = new CheckBox
+            {
+                Title = shortcut4.Title,
+                HighlightStyle = HighlightStyle.None,
+                CanFocus = false
+            };
+
+            // This ensures the checkbox state toggles when the hotkey of Title is pressed.
+            // shortcut4.Accepting += (sender, args) => args.Cancel = true;
+
+            menu.Add (shortcut2, shortcut3, line, shortcut4);
+        }
+
+        private void ConfigureDetialsSubMenu (Menuv2 menu)
+        {
+            var shortcut2 = new MenuItemv2
+            {
+                Title = "_Detail 1",
+                Text = "Some detail #1",
+                Key = Key.G.WithAlt,
+                BindKeyToApplication = true,
+            };
+
+            var shortcut3 = new MenuItemv2
+            {
+                Title = "_Three",
+                Text = "The 3rd item",
+                Key = Key.D9.WithAlt,
+                BindKeyToApplication = true,
+            };
+
+            var line = new Line
+            {
+                X = -1,
+                Width = Dim.Fill ()! + 1
+            };
+
+            var shortcut4 = new MenuItemv2
+            {
+                Title = "_Four",
+                Text = "Below the line",
+                Key = Key.D8.WithAlt,
+                BindKeyToApplication = true,
+
+            };
+
+            shortcut4.CommandView = new CheckBox
+            {
+                Title = shortcut4.Title,
+                HighlightStyle = HighlightStyle.None,
+                CanFocus = false
+            };
+
+            // This ensures the checkbox state toggles when the hotkey of Title is pressed.
+            //shortcut4.Accepting += (sender, args) => args.Cancel = true;
+
+            menu.Add (shortcut2, shortcut3, line, shortcut4);
+        }
+
+
+        private void ConfigureMoreDetailsSubMenu (Menuv2 menu)
+        {
+            var shortcut2 = new MenuItemv2
+            {
+                Title = "_Deeper Detail",
+                Text = "Deeper Detail",
+                Key = Key.D.WithAlt,
+                BindKeyToApplication = true,
+            };
+
+            var line = new Line
+            {
+                X = -1,
+                Width = Dim.Fill ()! + 1
+            };
+
+            var shortcut4 = new MenuItemv2
+            {
+                Title = "_Third",
+                Text = "Below the line",
+                Key = Key.D5.WithAlt,
+                BindKeyToApplication = true,
+            };
+
+            // This ensures the checkbox state toggles when the hotkey of Title is pressed.
+            //shortcut4.Accepting += (sender, args) => args.Cancel = true;
+
+            menu.Add (shortcut2, line, shortcut4);
+        }
+
+        /// <inheritdoc />
+        protected override void Dispose (bool disposing)
+        {
+            if (disposing)
+            {
+                PopoverMenu?.Dispose ();
+                PopoverMenu = null;
+            }
         }
     }
+
 
 
     private const string LOGFILE_LOCATION = "./logs";
