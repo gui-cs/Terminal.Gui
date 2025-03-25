@@ -4,12 +4,7 @@ namespace Terminal.Gui.DrawingTests;
 
 public class MultiStandardColorNameResolverTests
 {
-    private readonly MultiStandardColorNameResolver _candidate;
-
-    public MultiStandardColorNameResolverTests ()
-    {
-        _candidate = new MultiStandardColorNameResolver ();
-    }
+    private readonly MultiStandardColorNameResolver _candidate = new();
 
     [Theory]
     // ANSI color names.
@@ -212,9 +207,9 @@ public class MultiStandardColorNameResolverTests
     }
 
     [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("brightlight")]
+    [InlineData (null)]
+    [InlineData ("")]
+    [InlineData ("brightlight")]
     public void TryParseColor_FailsOnInvalidColorName (string? invalidName)
     {
         var expected = (false, default(Color));

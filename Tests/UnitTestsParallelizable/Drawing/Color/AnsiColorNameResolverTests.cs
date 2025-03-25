@@ -4,12 +4,7 @@ namespace Terminal.Gui.DrawingTests;
 
 public class AnsiColorNameResolverTests
 {
-    private readonly AnsiColorNameResolver _candidate;
-
-    public AnsiColorNameResolverTests ()
-    {
-        _candidate = new AnsiColorNameResolver ();
-    }
+    private readonly AnsiColorNameResolver _candidate = new();
 
     [Fact]
     public void GetNames_Returns16ColorNames ()

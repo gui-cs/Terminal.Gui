@@ -2,14 +2,16 @@
 
 namespace Terminal.Gui.DrawingTests;
 
-public class W3cColorsTests
+public class W3cColorNameResolverTests
 {
+    private readonly W3cColorNameResolver _candidate = new();
+
     [Fact]
     public void GetColorNames_NamesAreInAlphabeticalOrder ()
     {
-        List<string> alphabeticallyOrderedNames = Enum.GetNames<W3cColor> ().Order ().ToList ();
+        string[] alphabeticallyOrderedNames = Enum.GetNames<W3cColor> ().Order ().ToArray ();
 
-        Assert.Equal (alphabeticallyOrderedNames, W3cColors.GetColorNames ());
+        Assert.Equal (alphabeticallyOrderedNames, _candidate.GetColorNames ());
     }
 
     [Theory]
@@ -31,7 +33,7 @@ public class W3cColorsTests
     [InlineData (nameof (W3cColor.SlateGrey))]
     public void GetColorNames_IncludesNamesWithSameValues (string name)
     {
-        IReadOnlyList<string> names = W3cColors.GetColorNames ();
+        string[] names = _candidate.GetColorNames ().ToArray();
 
         Assert.True (names.Contains (name), $"W3C color names is missing '{name}'.");
     }
@@ -51,7 +53,7 @@ public class W3cColorsTests
         var expected = (true, expectedName);
 
         Color inputColor = new(r, g, b);
-        bool actualSuccess = W3cColors.TryNameColor (inputColor, out string? actualName);
+        bool actualSuccess = _candidate.TryNameColor (inputColor, out string? actualName);
         var actual = (actualSuccess, actualName);
 
         Assert.Equal (expected, actual);
@@ -62,7 +64,7 @@ public class W3cColorsTests
     {
         (bool, string?) expected = (false, null);
 
-        bool actualSuccess = W3cColors.TryNameColor (new Color (1, 2, 3), out string? actualName);
+        bool actualSuccess = _candidate.TryNameColor (new Color (1, 2, 3), out string? actualName);
         var actual = (actualSuccess, actualName);
 
         Assert.Equal (expected, actual);
@@ -102,7 +104,7 @@ public class W3cColorsTests
     {
         var expected = (true, new Color(r, g, b));
 
-        bool actualSuccess = W3cColors.TryParseColor (inputName, out Color actualColor);
+        bool actualSuccess = _candidate.TryParseColor (inputName, out Color actualColor);
         var actual = (actualSuccess, actualColor);
 
         Assert.Equal (expected, actual);
@@ -114,7 +116,7 @@ public class W3cColorsTests
     {
         var expected = (true, new Color(r, g, b));
 
-        bool actualSuccess = W3cColors.TryParseColor (inputName, out Color actualColor);
+        bool actualSuccess = _candidate.TryParseColor (inputName, out Color actualColor);
         var actual = (actualSuccess, actualColor);
 
         Assert.Equal (expected, actual);
@@ -128,7 +130,7 @@ public class W3cColorsTests
     {
         var expected = (false, default(Color));
 
-        bool actualSuccess = W3cColors.TryParseColor (invalidName, out Color actualColor);
+        bool actualSuccess = _candidate.TryParseColor (invalidName, out Color actualColor);
         var actual = (actualSuccess, actualColor);
 
         Assert.Equal (expected, actual);
@@ -140,7 +142,7 @@ public class W3cColorsTests
     {
         var expected = (false, default(Color));
 
-        bool actualSuccess = W3cColors.TryParseColor (invalidName, out Color actualColor);
+        bool actualSuccess = _candidate.TryParseColor (invalidName, out Color actualColor);
         var actual = (actualSuccess, actualColor);
 
         Assert.Equal (expected, actual);
