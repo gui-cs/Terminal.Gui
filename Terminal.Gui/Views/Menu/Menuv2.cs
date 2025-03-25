@@ -67,17 +67,22 @@ public class Menuv2 : Bar
 
             void MenuItemOnSelecting (object? sender, CommandEventArgs e)
             {
-                //Logging.Trace ($"MenuItemOnSelecting: {e.Context?.Source?.Title}");
+                Logging.Trace ($"Selecting: {e.Context?.Source?.Title}");
+
+                if (e.Context.Command == Command.HotKey)
+                {
+
+                }
             }
 
             void MenuItemOnAccepting (object? sender, CommandEventArgs e)
             {
-                // Logging.Trace ($"MenuItemOnAccepting: {e.Context?.Source?.Title}");
+                Logging.Trace ($"Accepting: {e.Context?.Source?.Title}");
             }
 
             void MenuItemOnAccepted (object? sender, CommandEventArgs e)
             {
-                Logging.Trace ($"MenuItemOnAccepted: {e.Context?.Source?.Title}");
+                Logging.Trace ($"Accepted: {e.Context?.Source?.Title}");
                 RaiseAccepted (e.Context);
             }
         }

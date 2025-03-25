@@ -70,19 +70,22 @@ public class MenuItemv2 : Shortcut
     public Command Command { get; set; }
 
 
-
     internal override bool? DispatchCommand (ICommandContext? commandContext)
     {
         bool? ret = null;
 
-        if (TargetView is { })
+        if (commandContext is { Command: not Command.HotKey })
         {
-            if (commandContext is null)
+
+            if (TargetView is { })
             {
-                commandContext = new CommandContext<KeyBinding> ();
+                if (commandContext is null)
+                {
+                    commandContext = new CommandContext<KeyBinding> ();
+                }
+                commandContext.Command = Command;
+                ret = TargetView.InvokeCommand (Command, commandContext);
             }
-            commandContext.Command = Command;
-            ret = TargetView.InvokeCommand (Command, commandContext);
         }
 
         if (ret is not true)

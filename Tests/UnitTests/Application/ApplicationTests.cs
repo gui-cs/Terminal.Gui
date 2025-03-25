@@ -331,7 +331,8 @@ public class ApplicationTests
             Assert.Empty (Application._cachedViewsUnderMouse);
 
             // Mouse
-            Assert.Null (Application._lastMousePosition);
+            // Do not reset _lastMousePosition
+            //Assert.Null (Application._lastMousePosition);
 
             // Navigation
             Assert.Null (Application.Navigation);

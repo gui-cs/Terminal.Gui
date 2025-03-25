@@ -52,22 +52,32 @@ public class MenusV2 : Scenario
 
         targetView.CommandNotBound += (o, args) =>
                                {
+                                   if (args.Cancel)
+                                   {
+                                       return;
+                                   }
                                    Logging.Trace ($"targetView CommandNotBound: {args?.Context?.Command}");
                                    eventSource.Add ($"targetView CommandNotBound: {args?.Context?.Command}");
                                    eventLog.MoveDown ();
-                                   args.Cancel = true;
                                };
 
         targetView.Accepting += (o, args) =>
                                {
+                                   if (args.Cancel)
+                                   {
+                                       return;
+                                   }
                                    Logging.Trace ($"targetView Accepting: {args?.Context?.Source?.Title}");
                                    eventSource.Add ($"targetView Accepting: {args?.Context?.Source?.Title}: ");
-                                   eventLog.MoveDown ();
-                                   args.Cancel = true;
+                                   eventLog.MoveDown (); 
                                };
 
         targetView.PopoverMenu!.Accepted += (o, args) =>
                                            {
+                                               if (args.Cancel)
+                                               {
+                                                   return;
+                                               }
                                                Logging.Trace ($"PopoverMenu Accepted: {args?.Context?.Source?.Title}");
                                                eventSource.Add ($"PopoverMenu Accepted: {args?.Context?.Source?.Title}: ");
                                                eventLog.MoveDown ();
@@ -84,6 +94,9 @@ public class MenusV2 : Scenario
     {
         internal PopoverMenu? PopoverMenu { get; private set; }
 
+        private CheckBox? _enableOverwriteCb;
+        private CheckBox? _autoSaveCb;
+
         public TargetView ()
         {
             CanFocus = true;
@@ -92,10 +105,8 @@ public class MenusV2 : Scenario
             AddCommand (Command.Context,
                        ctx =>
                        {
-                           if (Application.Popover?.GetPopover () as PopoverMenu is { Visible: false } visiblePopover)
-                           {
-                               visiblePopover.MakeVisible ();
-                           }
+
+                           PopoverMenu?.MakeVisible ();
 
                            return true;
                        });
@@ -107,7 +118,7 @@ public class MenusV2 : Scenario
             AddCommand (Command.Cancel,
                         ctx =>
                         {
-                            if (Application.Popover?.GetPopover () as PopoverMenu is { Visible: true } visiblePopover)
+                            if (Application.Popover?.GetActivePopover () as PopoverMenu is { Visible: true } visiblePopover)
                             {
                                 visiblePopover.Visible = false;
                             }
@@ -117,13 +128,35 @@ public class MenusV2 : Scenario
 
             MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked, Command.Cancel);
 
-            Add (
-                 new Button ()
-                 {
-                     Title = "_Button",
-                     X = Pos.Center (),
-                     Y = Pos.Center ()
-                 });
+            Label lastCommandLabel = new ()
+            {
+                Title = "_Last Command:",
+            };
+
+            View lastCommandText = new ()
+            {
+                X = Pos.Right (lastCommandLabel) + 1,
+                Y = Pos.Top (lastCommandLabel),
+                Height = Dim.Auto (),
+                Width = Dim.Auto ()
+
+            };
+
+            Add (lastCommandLabel, lastCommandText);
+
+            AddCommand (Command.New, HandleCommand);
+            HotKeyBindings.Add (Key.N.WithAlt, Command.New);
+
+            AddCommand (Command.Open, HandleCommand);
+            HotKeyBindings.Add (Key.O.WithAlt, Command.Open);
+
+            AddCommand (Command.Save, HandleCommand);
+            HotKeyBindings.Add (Key.S.WithAlt, Command.Save);
+
+            AddCommand (Command.SaveAs, HandleCommand);
+            HotKeyBindings.Add (Key.A.WithAlt, Command.SaveAs);
+
+            HotKeyBindings.Add (Key.W.WithAlt, Command.EnableOverwrite);
 
 
             var rootMenu = new Menuv2 ()
@@ -170,74 +203,130 @@ public class MenusV2 : Scenario
 
             Initialized += (sender, args) =>
                            {
-                               Application.Popover?.ShowPopover(PopoverMenu);
                                PopoverMenu?.BeginInit ();
                                PopoverMenu?.EndInit ();
                                PopoverMenu?.MakeVisible ();
                            };
 
+            Label lastAcceptedLabel = new ()
+            {
+                Title = "Last Accepted:",
+                Y = Pos.Bottom(lastCommandLabel)
+            };
 
+            View lastAcceptedText = new ()
+            {
+                X = Pos.Right (lastAcceptedLabel) + 1,
+                Y = Pos.Top (lastAcceptedLabel),
+                Height = Dim.Auto(),
+                Width = Dim.Auto ()
+            };
+
+            Add (lastAcceptedLabel, lastAcceptedText);
+
+            CheckBox autoSaveStatusCb = new ()
+            {
+                Title = "AutoSave",
+                Y = Pos.Bottom (lastAcceptedLabel),
+            };
+
+            autoSaveStatusCb.CheckedStateChanged += (sender, args) =>
+                                                    {
+                                                        _autoSaveCb.CheckedState = autoSaveStatusCb.CheckedState;
+                                                    };
+
+            Add (autoSaveStatusCb);
+
+            CheckBox enableOverwriteStatusCb = new ()
+            {
+                Title = "Enable Overwrite",
+                Y = Pos.Bottom (autoSaveStatusCb),
+            };
+            enableOverwriteStatusCb.CheckedStateChanged += (sender, args) =>
+                                                           {
+                                                               _enableOverwriteCb!.CheckedState = enableOverwriteStatusCb.CheckedState;
+                                                           };
+            Add (enableOverwriteStatusCb);
+
+            AddCommand (Command.EnableOverwrite, ctx =>
+                                                 {
+                                                     enableOverwriteStatusCb.CheckedState = enableOverwriteStatusCb.CheckedState == CheckState.UnChecked ? CheckState.Checked : CheckState.UnChecked;
+                                                     return HandleCommand (ctx);
+                                                 });
+
+            PopoverMenu!.Accepted += (o, args) =>
+                                     {
+                                         lastAcceptedText.Text = args?.Context?.Source?.Title!;
+
+                                         if (args.Context.Source is MenuItemv2 mi && mi.CommandView == _autoSaveCb)
+                                         {
+                                             autoSaveStatusCb.CheckedState = _autoSaveCb.CheckedState;
+                                         }
+
+                                         args.Cancel = true;
+                                     };
+
+            PopoverMenu!.VisibleChanged += (sender, args) =>
+                                           {
+                                               if (PopoverMenu!.Visible)
+                                               {
+                                                   lastCommandText.Text = string.Empty;
+                                               }
+                                           };
+
+            Add (
+                 new Button ()
+                 {
+                     Title = "_Button",
+                     X = Pos.Center (),
+                     Y = Pos.Center ()
+                 });
+
+
+            return;
+
+            // Add the commands supported by this View
+            bool? HandleCommand (ICommandContext? ctx)
+            {
+                lastCommandText.Text = ctx?.Command.ToString ();
+
+                return true;
+            }
         }
 
 
         private void ConfigureRootMenu (Menuv2 menu)
         {
-            var shortcut1 = new MenuItemv2
+            var newFile = new MenuItemv2
             {
                 Title = "_New",
-                Key = Key.N.WithAlt,
-                BindKeyToApplication = true,
                 Text = "New File",
                 Command = Command.New,
                 TargetView = this
             };
 
-            var shortcut2 = new MenuItemv2
+            var openFile = new MenuItemv2
             {
                 Title = "_Open...",
                 Text = "Open File",
-                Key = Key.O.WithAlt,
-                BindKeyToApplication = true,
                 Command = Command.Open,
                 TargetView = this
             };
 
-            var shortcut3 = new MenuItemv2
+            var saveFile = new MenuItemv2
             {
                 Title = "_Save",
                 Text = "Save file",
-                Key = Key.S.WithAlt,
-                BindKeyToApplication = true,
                 Command = Command.Save,
                 TargetView = this
             };
 
-            var shortcut4 = new MenuItemv2
+            var saveFileAs = new MenuItemv2
             {
-                Title = "Sa_ve As...",
+                Title = "Save _As...",
                 Text = "Save file as",
-                Key = Key.V.WithAlt,
-                BindKeyToApplication = true,
                 Command = Command.SaveAs,
                 TargetView = this
-
-            };
-
-
-            var shortcut5 = new MenuItemv2
-            {
-                Title = "_Auto Save",
-                Text = "Automatically save",
-                Key = Key.A.WithAlt,
-                BindKeyToApplication = true,
-
-            };
-
-            shortcut5.CommandView = new CheckBox
-            {
-                Title = shortcut5.Title,
-                HighlightStyle = HighlightStyle.None,
-                CanFocus = false
             };
 
             var line = new Line
@@ -246,33 +335,51 @@ public class MenusV2 : Scenario
                 Width = Dim.Fill ()! + 1
             };
 
+            menu.Add (newFile, openFile, saveFile, saveFileAs, line);
 
-            // This ensures the checkbox state toggles when the hotkey of Title is pressed.
-            //shortcut4.Accepting += (sender, args) => args.Cancel = true;
 
-            menu.Add (shortcut1, shortcut2, shortcut3, shortcut4, line, shortcut5);
         }
-
 
         private void ConfigureOptionsSubMenu (Menuv2 menu)
         {
-            var shortcut2 = new MenuItemv2
+            // This is an example of a menu item with a checkbox that is NOT
+            // bound to a Command. The PopoverMenu will raise Accepted when Alt-U is pressed.
+            // The checkbox state will automatically toggle each time Alt-U is pressed beacuse
+            // the MenuItem actaully gets the key events.
+            var autoSave = new MenuItemv2
             {
-                Title = "Enable Over_write",
+                Title = "_Auto Save",
+                Text = "(no Command)",
+                Key = Key.F10,
+            };
+
+            autoSave.CommandView = _autoSaveCb = new CheckBox
+            {
+                Title = autoSave.Title,
+                HighlightStyle = HighlightStyle.None,
+                CanFocus = false
+            };
+
+            // This is an example of a MenuItem with a checkbox that is bound to a command.
+            // When the key bound to Command.EntableOverwrite is pressed, InvokeCommand will invoke it 
+            // on targetview, and thus the MenuItem will never see the key event. 
+            // Because of this, the check box will not automatically track the state.
+            var enableOverwrite = new MenuItemv2
+            {
+                Title = "Enable _Overwrite",
                 Text = "Overwrite",
-                Key = Key.W.WithAlt,
-                BindKeyToApplication = true,
                 Command = Command.EnableOverwrite,
                 TargetView = this
             };
 
-            var shortcut3 = new MenuItemv2
+            enableOverwrite.CommandView = _enableOverwriteCb = new CheckBox
             {
-                Title = "_Three",
-                Text = "The 3rd item",
-                Key = Key.T.WithAlt,
-                BindKeyToApplication = true,
+                Title = enableOverwrite.Title,
+                HighlightStyle = HighlightStyle.None,
+                CanFocus = false,
             };
+
+            _enableOverwriteCb.Accepting += (sender, args) => args.Cancel = true;
 
             var line = new Line
             {
@@ -280,25 +387,25 @@ public class MenusV2 : Scenario
                 Width = Dim.Fill ()! + 1
             };
 
-            var shortcut4 = new MenuItemv2
+
+            var thirdItem = new MenuItemv2
             {
-                Title = "_Four",
-                Text = "Below the line",
-                Key = Key.D7.WithAlt,
-                BindKeyToApplication = true,
+                Title = "_Three",
+                Text = "TBelow the line",
+                Key = Key.T.WithAlt,
             };
 
-            shortcut4.CommandView = new CheckBox
+            var forthItem = new MenuItemv2
             {
-                Title = shortcut4.Title,
-                HighlightStyle = HighlightStyle.None,
-                CanFocus = false
+                Title = "_Four",
+                Text = "Bottom",
             };
+
 
             // This ensures the checkbox state toggles when the hotkey of Title is pressed.
             // shortcut4.Accepting += (sender, args) => args.Cancel = true;
 
-            menu.Add (shortcut2, shortcut3, line, shortcut4);
+            menu.Add (autoSave, enableOverwrite, line, thirdItem, forthItem);
         }
 
         private void ConfigureDetialsSubMenu (Menuv2 menu)
@@ -307,16 +414,12 @@ public class MenusV2 : Scenario
             {
                 Title = "_Detail 1",
                 Text = "Some detail #1",
-                Key = Key.G.WithAlt,
-                BindKeyToApplication = true,
             };
 
             var shortcut3 = new MenuItemv2
             {
                 Title = "_Three",
                 Text = "The 3rd item",
-                Key = Key.D9.WithAlt,
-                BindKeyToApplication = true,
             };
 
             var line = new Line
@@ -327,8 +430,8 @@ public class MenusV2 : Scenario
 
             var shortcut4 = new MenuItemv2
             {
-                Title = "_Four",
-                Text = "Below the line",
+                Title = "_App Binding",
+                Text = "App Binding",
                 Key = Key.D8.WithAlt,
                 BindKeyToApplication = true,
 
@@ -350,12 +453,14 @@ public class MenusV2 : Scenario
 
         private void ConfigureMoreDetailsSubMenu (Menuv2 menu)
         {
-            var shortcut2 = new MenuItemv2
+            var deeperDetail = new MenuItemv2
             {
                 Title = "_Deeper Detail",
                 Text = "Deeper Detail",
-                Key = Key.D.WithAlt,
-                BindKeyToApplication = true,
+                Action = () =>
+                         {
+                             MessageBox.Query ("Deeper Detail", "Lots of details", "_Ok");
+                         }
             };
 
             var line = new Line
@@ -368,14 +473,12 @@ public class MenusV2 : Scenario
             {
                 Title = "_Third",
                 Text = "Below the line",
-                Key = Key.D5.WithAlt,
-                BindKeyToApplication = true,
             };
 
             // This ensures the checkbox state toggles when the hotkey of Title is pressed.
             //shortcut4.Accepting += (sender, args) => args.Cancel = true;
 
-            menu.Add (shortcut2, line, shortcut4);
+            menu.Add (deeperDetail, line, shortcut4);
         }
 
         /// <inheritdoc />
@@ -383,9 +486,14 @@ public class MenusV2 : Scenario
         {
             if (disposing)
             {
-                PopoverMenu?.Dispose ();
-                PopoverMenu = null;
+                if (PopoverMenu is { })
+                {
+                    PopoverMenu.Visible = false;
+                    PopoverMenu?.Dispose ();
+                    PopoverMenu = null;
+                }
             }
+            base.Dispose (disposing);
         }
     }
 

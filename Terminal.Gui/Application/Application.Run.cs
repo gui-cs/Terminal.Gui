@@ -428,7 +428,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     {
         List<View> tops = new (TopLevels);
 
-        if (Popover?.GetPopover () as View is { Visible: true } visiblePopover)
+        if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
         {
             visiblePopover.SetNeedsDraw ();
             visiblePopover.SetNeedsLayout ();
@@ -564,7 +564,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     {
         ArgumentNullException.ThrowIfNull (runState);
 
-        if (Popover?.GetPopover () is View popover)
+        if (Popover?.GetActivePopover () is View popover)
         {
             popover.Visible = false;
             Popover = null;

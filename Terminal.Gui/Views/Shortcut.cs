@@ -100,8 +100,6 @@ public class Shortcut : View, IOrientation, IDesignable
 
         Action = action;
 
-        SubViewLayout += OnLayoutStarted;
-
         ShowHide ();
     }
 
@@ -203,8 +201,11 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     // When layout starts, we need to adjust the layout of the HelpView and KeyView
-    private void OnLayoutStarted (object? sender, LayoutEventArgs e)
+    /// <inheritdoc />
+    protected override void OnSubViewLayout (LayoutEventArgs e)
     {
+        base.OnSubViewLayout (e);
+
         ShowHide ();
         ForceCalculateNaturalWidth ();
 
@@ -465,7 +466,6 @@ public class Shortcut : View, IOrientation, IDesignable
                     InvokeCommand<KeyBinding> (Command.Select, new ([Command.Select], null, this));
                 }
 
-                // BUGBUG: This prevents NumericUpDown on statusbar in HexEditor from working
                 e.Cancel = true;
             }
         }
@@ -663,28 +663,30 @@ public class Shortcut : View, IOrientation, IDesignable
 
     private void UpdateKeyBindings (Key oldKey)
     {
-        if (Key.IsValid)
+        if (!Key.IsValid)
         {
-            if (BindKeyToApplication)
-            {
-                if (oldKey != Key.Empty)
-                {
-                    Application.KeyBindings.Remove (oldKey);
-                }
+            return;
+        }
 
-                Application.KeyBindings.Remove (Key);
-                Application.KeyBindings.Add (Key, this, Command.HotKey);
-            }
-            else
+        if (BindKeyToApplication)
+        {
+            if (oldKey != Key.Empty)
             {
-                if (oldKey != Key.Empty)
-                {
-                    HotKeyBindings.Remove (oldKey);
-                }
-
-                HotKeyBindings.Remove (Key);
-                HotKeyBindings.Add (Key,  Command.HotKey);
+                Application.KeyBindings.Remove (oldKey);
             }
+
+            Application.KeyBindings.Remove (Key);
+            Application.KeyBindings.Add (Key, this, Command.HotKey);
+        }
+        else
+        {
+            if (oldKey != Key.Empty)
+            {
+                HotKeyBindings.Remove (oldKey);
+            }
+
+            HotKeyBindings.Remove (Key);
+            HotKeyBindings.Add (Key, Command.HotKey);
         }
     }
 
@@ -733,10 +735,10 @@ public class Shortcut : View, IOrientation, IDesignable
             // When we have focus, we invert the colors
             base.ColorScheme = new (base.ColorScheme)
             {
-                Normal = GetFocusColor(),
-                HotNormal = GetHotFocusColor(),
-                HotFocus = GetHotNormalColor(),
-                Focus = GetNormalColor(),
+                Normal = GetFocusColor (),
+                HotNormal = GetHotFocusColor (),
+                HotFocus = GetHotNormalColor (),
+                Focus = GetNormalColor (),
             };
         }
         else
@@ -757,8 +759,8 @@ public class Shortcut : View, IOrientation, IDesignable
         {
             var cs = new ColorScheme (base.ColorScheme)
             {
-                Normal = GetHotNormalColor(),
-                HotNormal = GetNormalColor()
+                Normal = GetHotNormalColor (),
+                HotNormal = GetNormalColor ()
             };
             KeyView.ColorScheme = cs;
         }

@@ -149,11 +149,11 @@ public static partial class Application
             t!.Running = false;
         }
 
-        if (Popover?.GetPopover () is View popover)
+        if (Popover?.GetActivePopover () is View popover)
         {
             popover.Visible = false;
-            Popover = null;
         }
+        Popover = null;
 
         TopLevels.Clear ();
 #if DEBUG_IDISPOSABLE

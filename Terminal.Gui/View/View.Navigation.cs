@@ -389,6 +389,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
         return false;
     }
 
+    public void ClearFocus ()
+    {
+        _previouslyFocused = null;
+    }
+
     private View? FindDeepestFocusableView (NavigationDirection direction, TabBehavior? behavior)
     {
         View [] indicies = GetFocusChain (direction, behavior);

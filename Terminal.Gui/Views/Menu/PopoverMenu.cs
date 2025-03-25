@@ -4,14 +4,17 @@ using System.Diagnostics;
 namespace Terminal.Gui;
 
 /// <summary>
+///     Provides a cascading popover menu that can be shown at the current mouse position or at a specified position.
 /// </summary>
 public class PopoverMenu : PopoverBaseImpl
 {
     /// <summary>
+    ///     Initializes a new instance of the <see cref="PopoverMenu"/> class.
     /// </summary>
     public PopoverMenu () : this (null) { }
 
     /// <summary>
+    ///     Initializes a new instance of the <see cref="PopoverMenu"/> class with the specified root menu.
     /// </summary>
     public PopoverMenu (Menuv2? root)
     {
@@ -21,22 +24,38 @@ public class PopoverMenu : PopoverBaseImpl
         Root = root;
 
         AddCommand (Command.Right, MoveRight);
-
-        bool? MoveRight (ICommandContext? ctx)
-        {
-            if (MostFocused is MenuItemv2 { SubMenu.Visible: true } focused)
-            {
-                focused.SubMenu.SetFocus ();
-
-                return true;
-            }
-
-            return AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
-        }
-
         KeyBindings.Add (Key.CursorRight, Command.Right);
 
         AddCommand (Command.Left, MoveLeft);
+        KeyBindings.Add (Key.CursorLeft, Command.Left);
+
+        // TODO: Remove; for debugging for now
+        AddCommand (
+                    Command.NotBound,
+                    ctx =>
+                    {
+                        Logging.Trace ($"popoverMenu NotBound: {ctx}");
+
+                        return false;
+                    });
+
+        KeyBindings.Add (DefaultKey, Command.Quit);
+        KeyBindings.ReplaceCommands (Application.QuitKey, Command.Quit);
+        AddCommand (
+                    Command.Quit,
+                    ctx =>
+                    {
+                        if (!Visible)
+                        {
+                            return false;
+                        }
+
+                        Visible = false;
+
+                        return RaiseAccepted (ctx);
+                    });
+
+        return;
 
         bool? MoveLeft (ICommandContext? ctx)
         {
@@ -50,28 +69,17 @@ public class PopoverMenu : PopoverBaseImpl
             return AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
         }
 
-        KeyBindings.Add (Key.CursorLeft, Command.Left);
+        bool? MoveRight (ICommandContext? ctx)
+        {
+            if (MostFocused is MenuItemv2 { SubMenu.Visible: true } focused)
+            {
+                focused.SubMenu.SetFocus ();
 
-        AddCommand (
-                    Command.NotBound,
-                    ctx =>
-                    {
-                        Logging.Trace ($"popoverMenu NotBound: {ctx}");
+                return true;
+            }
 
-                        return false;
-                    });
-
-        KeyBindings.Add (DefaultKey, Command.Quit);
-        KeyBindings.ReplaceCommands (Application.QuitKey, Command.Quit);
-
-        AddCommand (
-                    Command.Quit,
-                    ctx =>
-                    {
-                        Visible = false;
-
-                        return RaiseAccepted (ctx);
-                    });
+            return AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        }
     }
 
     /// <summary>
@@ -93,7 +101,7 @@ public class PopoverMenu : PopoverBaseImpl
     /// <param name="idealScreenPosition">If <see langword="null"/>, the current mouse position will be used.</param>
     public void MakeVisible (Point? idealScreenPosition = null)
     {
-        Visible = true;
+        Application.Popover?.ShowPopover (this);
         SetPosition (idealScreenPosition);
     }
 
@@ -131,6 +139,7 @@ public class PopoverMenu : PopoverBaseImpl
         else
         {
             HideAndRemoveSubMenu (_root);
+            Application.Popover?.HidePopover (this);
         }
     }
 
@@ -163,26 +172,66 @@ public class PopoverMenu : PopoverBaseImpl
                 _root.Accepting += MenuOnAccepting;
             }
 
-            //AddAndShowSubMenu (_root);
-
             // TODO: This needs to be done whenever any MenuItem in the menu tree changes to support dynamic menus
             // TODO: And it needs to clear them first
             IEnumerable<MenuItemv2> all = GetMenuItemsOfAllSubMenus ();
 
-            foreach (MenuItemv2 menu in all)
+            foreach (MenuItemv2 menuItem in all)
             {
-                if (menu.Key.IsValid)
+                if (menuItem.TargetView is { } && menuItem.Command != Command.NotBound)
                 {
-                    Logging.Trace ($"{menu.Key}->{menu.Command}");
-                    KeyBindings.Add (menu.Key, menu.Command);
+                    // Automatically set MenuItem.Key
+                    Key? key = menuItem.TargetView.HotKeyBindings.GetFirstFromCommands (menuItem.Command);
+
+                    if (key is { IsValid: true })
+                    {
+                        if (menuItem.Key.IsValid)
+                        {
+                            Logging.Warning ("Do not specify a Key for MenuItems where a Command is specified. Key will be determined automatically.");
+                        }
+
+                        menuItem.Key = key;
+                        Logging.Trace ($"{menuItem.Key}->{menuItem.Command}");
+                    }
                 }
+            }
+
+            IEnumerable<Menuv2> allMenus = GetAllSubMenus ();
+
+            foreach (Menuv2 menu in allMenus)
+
+            {
+                menu.Accepting += MenuOnAccepting;
+                menu.Accepted += MenuAccepted;
+                menu.SelectedMenuItemChanged += MenuOnSelectedMenuItemChanged;
             }
         }
     }
 
-    internal IEnumerable<MenuItemv2> GetMenuItemsOfAllSubMenus ()
+    /// <inheritdoc/>
+    protected override bool OnKeyDownNotHandled (Key key)
     {
-        List<MenuItemv2> result = [];
+        // See if any of our MenuItems have this key as Key
+        IEnumerable<MenuItemv2> all = GetMenuItemsOfAllSubMenus ();
+
+        foreach (MenuItemv2 menuItem in all)
+        {
+            if (menuItem.Key == key)
+            {
+                return menuItem.NewKeyDownEvent (key);
+            }
+        }
+
+        return base.OnKeyDownNotHandled (key);
+    }
+
+    /// <summary>
+    ///    Gets all the submenus in the PopoverMenu.
+    /// </summary>
+    /// <returns></returns>
+    internal IEnumerable<Menuv2> GetAllSubMenus ()
+    {
+        List<Menuv2> result = new ();
 
         if (Root == null)
         {
@@ -195,17 +244,35 @@ public class PopoverMenu : PopoverBaseImpl
         while (stack.Count > 0)
         {
             Menuv2 currentMenu = stack.Pop ();
+            result.Add (currentMenu);
 
             foreach (View subView in currentMenu.SubViews)
+            {
+                if (subView is MenuItemv2 menuItem && menuItem.SubMenu != null)
+                {
+                    stack.Push (menuItem.SubMenu);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    ///    Gets all the MenuItems in the PopoverMenu.
+    /// </summary>
+    /// <returns></returns>
+    internal IEnumerable<MenuItemv2> GetMenuItemsOfAllSubMenus ()
+    {
+        List<MenuItemv2> result = new ();
+
+        foreach (Menuv2 menu in GetAllSubMenus ())
+        {
+            foreach (View subView in menu.SubViews)
             {
                 if (subView is MenuItemv2 menuItem)
                 {
                     result.Add (menuItem);
-
-                    if (menuItem.SubMenu != null)
-                    {
-                        stack.Push (menuItem.SubMenu);
-                    }
                 }
             }
         }
@@ -244,7 +311,6 @@ public class PopoverMenu : PopoverBaseImpl
             menuItem.SubMenu.X = pos.X;
             menuItem.SubMenu.Y = pos.Y;
 
-            menuItem.SubMenu.Visible = true;
             menuItem.ForceFocusColors = true;
         }
     }
@@ -274,15 +340,15 @@ public class PopoverMenu : PopoverBaseImpl
     {
         if (menu is { SuperView: null })
         {
-            base.Add (menu);
-            menu.Visible = true;
-            menu.Layout ();
-
-            menu.Accepting += MenuOnAccepting;
-            menu.Accepted += MenuAccepted;
-            menu.SelectedMenuItemChanged += MenuOnSelectedMenuItemChanged;
-
             // TODO: Find the menu item below the mouse, if any, and select it
+            menu.ClearFocus ();
+            base.Add (menu);
+
+            // IMPORTANT: This must be done after adding the menu to the super view or Add will try
+            // to set focus to it.
+            menu.Visible = true;
+
+            menu.Layout ();
         }
     }
 
@@ -300,16 +366,28 @@ public class PopoverMenu : PopoverBaseImpl
             }
 
             menu.Visible = false;
-            menu.Accepting -= MenuOnAccepting;
-            menu.Accepted -= MenuAccepted;
-            menu.SelectedMenuItemChanged -= MenuOnSelectedMenuItemChanged;
             base.Remove (menu);
+
+            if (menu == Root)
+            {
+                Visible = false;
+            }
         }
     }
 
     private void MenuOnAccepting (object? sender, CommandEventArgs e)
     {
-        //Logging.Trace ($"{e.Context?.Source?.Title}");
+        if (e.Context?.Command != Command.HotKey)
+        {
+            Visible = false;
+        }
+        else
+        {
+            // This supports the case when a hotkey of a menuitem with a submenu is pressed
+            e.Cancel = true;
+        }
+
+        Logging.Trace ($"{e.Context?.Source?.Title}");
     }
 
     private void MenuAccepted (object? sender, CommandEventArgs e)
@@ -320,6 +398,10 @@ public class PopoverMenu : PopoverBaseImpl
         {
             HideAndRemoveSubMenu (_root);
             RaiseAccepted (e.Context);
+        }
+        else if (e.Context?.Source is MenuItemv2 { SubMenu: { } } menuItemWithSubMenu)
+        {
+            ShowSubMenu (menuItemWithSubMenu);
         }
     }
 
@@ -371,6 +453,15 @@ public class PopoverMenu : PopoverBaseImpl
     {
         if (disposing)
         {
+            IEnumerable<Menuv2> allMenus = GetAllSubMenus ();
+
+            foreach (Menuv2 menu in allMenus)
+            {
+                menu.Accepting -= MenuOnAccepting;
+                menu.Accepted -= MenuAccepted;
+                menu.SelectedMenuItemChanged -= MenuOnSelectedMenuItemChanged;
+            }
+
             _root?.Dispose ();
             _root = null;
         }

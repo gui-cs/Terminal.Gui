@@ -13,6 +13,7 @@ public static partial class Application // Keyboard handling
     /// <returns><see langword="true"/> if the key was handled.</returns>
     public static bool RaiseKeyDownEvent (Key key)
     {
+        // TODO: This should match standard event patterns
         KeyDown?.Invoke (null, key);
 
         if (key.Handled)
@@ -20,12 +21,9 @@ public static partial class Application // Keyboard handling
             return true;
         }
 
-        if (Popover?.GetPopover () as View is { Visible: true } visiblePopover)
+        if (Popover?.NewKeyDownEvent (key) is true)
         {
-            if (visiblePopover.NewKeyDownEvent (key))
-            {
-                return true;
-            }
+            return true;
         }
 
         if (Top is null)
