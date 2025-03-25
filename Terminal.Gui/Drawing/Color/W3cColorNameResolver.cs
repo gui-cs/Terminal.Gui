@@ -30,7 +30,7 @@ public class W3cColorNameResolver : IColorNameResolver
 internal static class W3cColors
 {
     private static readonly ImmutableArray<string> Names;
-    private static readonly FrozenDictionary<int, string> RgbNameMap;
+    private static readonly FrozenDictionary<uint, string> ArgbNameMap;
 
     static W3cColors ()
     {
@@ -38,17 +38,17 @@ internal static class W3cColors
         // are not otherwise distinguishable from each other.
         string[] w3cNames = Enum.GetNames<W3cColor> ().Order().ToArray();
 
-        Dictionary<int, string> map = new(w3cNames.Length);
+        Dictionary<uint, string> map = new(w3cNames.Length);
         foreach (string name in w3cNames)
         {
             W3cColor w3c = Enum.Parse<W3cColor>(name);
-            int rgb = (int)w3c;
+            uint argb = GetArgb(w3c);
             // TODO: Collect aliases?
-            _ = map.TryAdd (rgb, name);
+            _ = map.TryAdd (argb, name);
         }
 
         Names = ImmutableArray.Create (w3cNames);
-        RgbNameMap = map.ToFrozenDictionary ();
+        ArgbNameMap = map.ToFrozenDictionary ();
     }
 
     /// <summary>
@@ -75,8 +75,8 @@ internal static class W3cColors
             return false;
         }
 
-        (byte red, byte green, byte blue) = GetRgbComponents (w3cColor);
-        color = new Color (red, green, blue);
+        uint argb = GetArgb (w3cColor);
+        color = new Color (argb);
         return true;
     }
 
@@ -88,8 +88,7 @@ internal static class W3cColors
     /// <returns>True if conversion succeeded; otherwise false.</returns>
     public static bool TryNameColor (Color color, [NotNullWhen (true)] out string? name)
     {
-        int rgb = GetRgb (color.R, color.G, color.B);
-        if (RgbNameMap.TryGetValue (rgb, out name))
+        if (ArgbNameMap.TryGetValue (color.Argb, out name))
         {
             return true;
         }
@@ -98,24 +97,14 @@ internal static class W3cColors
         return false;
     }
 
-    private const int RgbRedShift = 16;
-    private const int RgbGreenShift = 8;
-    private const int RgbBlueShift = 0;
-    private const int RgbRedMask = 0xFF << RgbRedShift;
-    private const int RgbGreenMask = 0xFF << RgbGreenShift;
-    private const int RgbBlueMask = 0xFF << RgbBlueShift;
-
-    private static (byte Red, byte Green, byte Blue) GetRgbComponents (W3cColor w3cColor)
+    private static uint GetArgb (W3cColor w3cColor)
     {
-        int rgb = (int)w3cColor;
-        byte red = (byte)((rgb & RgbRedMask) >> RgbRedShift);
-        byte green = (byte)((rgb & RgbGreenMask) >> RgbGreenShift);
-        byte blue = (byte)((rgb & RgbBlueMask) >> RgbBlueShift);
-        return (red, green, blue);
-    }
+        const int alphaShift = 24;
+        const uint alphaMask = 0xFFU << alphaShift;
 
-    private static int GetRgb (byte red, byte green, byte blue) =>
-        red << RgbRedShift |
-        green << RgbGreenShift |
-        blue << RgbBlueShift;
+        int rgb = (int)w3cColor;
+
+        uint argb = (uint)rgb | alphaMask;
+        return argb;
+    }
 }
