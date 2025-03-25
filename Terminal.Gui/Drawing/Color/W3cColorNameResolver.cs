@@ -9,9 +9,6 @@ namespace Terminal.Gui;
 /// <summary>
 /// W3C color name resolver.
 /// </summary>
-/// <remarks>
-/// Color name resolver interface wrapper for <see cref="W3cColors"/>.
-/// </remarks>
 public class W3cColorNameResolver : IColorNameResolver
 {
     /// <inheritdoc/>
@@ -30,7 +27,7 @@ public class W3cColorNameResolver : IColorNameResolver
 /// <summary>
 /// Helper class for transforming to and from <see cref="W3cColor"/> enum.
 /// </summary>
-public static class W3cColors
+internal static class W3cColors
 {
     private static readonly ImmutableArray<string> Names;
     private static readonly FrozenDictionary<int, string> RgbNameMap;
@@ -72,7 +69,7 @@ public static class W3cColors
     {
         if (!Enum.TryParse (name, ignoreCase: true, out W3cColor w3cColor) ||
             // Any numerical value converts to undefined enum value.
-            !Enum.IsDefined(w3cColor))
+            !Enum.IsDefined (w3cColor))
         {
             color = default;
             return false;
