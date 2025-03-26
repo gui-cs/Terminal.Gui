@@ -707,6 +707,9 @@ public class Shortcut : View, IOrientation, IDesignable
 
     private bool _forceFocusColors;
 
+    /// <summary>
+    ///     TODO: IS this needed?
+    /// </summary>
     public bool ForceFocusColors
     {
         get => _forceFocusColors;

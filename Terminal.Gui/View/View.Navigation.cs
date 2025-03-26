@@ -323,12 +323,15 @@ public partial class View // Focus and cross-view navigation management (TabStop
     }
 
     /// <summary>
-    /// 
+    ///     Called when the focused view has changed.
     /// </summary>
     /// <param name="previousFocused"></param>
     /// <param name="focused"></param>
     protected virtual void OnFocusedChanged (View? previousFocused, View? focused) { }
 
+    /// <summary>
+    ///     Raised when the focused view has changed.
+    /// </summary>
     public event EventHandler<HasFocusEventArgs>? FocusedChanged;
 
     /// <summary>Returns a value indicating if this View is currently on Top (Active)</summary>
@@ -389,6 +392,9 @@ public partial class View // Focus and cross-view navigation management (TabStop
         return false;
     }
 
+    /// <summary>
+    ///     Clears any focus state (e.g. the previously focused subview) from this view.
+    /// </summary>
     public void ClearFocus ()
     {
         _previouslyFocused = null;

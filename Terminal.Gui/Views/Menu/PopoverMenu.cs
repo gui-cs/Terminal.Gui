@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace Terminal.Gui;
 
 /// <summary>
-///     Provides a cascading popover menu that can be shown at the current mouse position or at a specified position.
+///     Provides a cascading popover menu.
 /// </summary>
 public class PopoverMenu : PopoverBaseImpl
 {
@@ -14,7 +14,7 @@ public class PopoverMenu : PopoverBaseImpl
     public PopoverMenu () : this (null) { }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="PopoverMenu"/> class with the specified root menu.
+    ///     Initializes a new instance of the <see cref="PopoverMenu"/> class with the specified root <see cref="Menuv2"/>.
     /// </summary>
     public PopoverMenu (Menuv2? root)
     {
@@ -41,6 +41,7 @@ public class PopoverMenu : PopoverBaseImpl
 
         KeyBindings.Add (DefaultKey, Command.Quit);
         KeyBindings.ReplaceCommands (Application.QuitKey, Command.Quit);
+
         AddCommand (
                     Command.Quit,
                     ctx =>
@@ -63,14 +64,13 @@ public class PopoverMenu : PopoverBaseImpl
             {
                 return false;
             }
+
             if (MostFocused is MenuItemv2 { SuperView: Menuv2 focusedMenu })
             {
                 focusedMenu.SuperMenuItem?.SetFocus ();
 
                 return true;
             }
-
-
 
             return AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
         }
@@ -89,7 +89,6 @@ public class PopoverMenu : PopoverBaseImpl
                 return true;
             }
 
-  
             return AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         }
     }
@@ -100,12 +99,12 @@ public class PopoverMenu : PopoverBaseImpl
     /// </summary>
     public static MouseFlags MouseFlags { get; set; } = MouseFlags.Button3Clicked;
 
-    /// <summary>The default key for activating the popover menu.</summary>
+    /// <summary>The default key for activating popover menus.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key DefaultKey { get; set; } = Key.F10.WithShift;
 
     /// <summary>
-    ///     Makes the menu visible and locates it at <paramref name="idealScreenPosition"/>. The actual position of the menu
+    ///     Makes the popover menu visible and locates it at <paramref name="idealScreenPosition"/>. The actual position of the menu
     ///     will be adjusted to
     ///     ensure the menu fully fits on the screen, and the mouse cursor is over the first cell of the
     ///     first MenuItem.
@@ -118,7 +117,7 @@ public class PopoverMenu : PopoverBaseImpl
     }
 
     /// <summary>
-    ///     Locates the menu at <paramref name="idealScreenPosition"/>. The actual position of the menu will be adjusted to
+    ///     Locates the popover menu at <paramref name="idealScreenPosition"/>. The actual position of the menu will be adjusted to
     ///     ensure the menu fully fits on the screen, and the mouse cursor is over the first cell of the
     ///     first MenuItem (if possible).
     /// </summary>
@@ -130,7 +129,6 @@ public class PopoverMenu : PopoverBaseImpl
         if (idealScreenPosition is { } && Root is { })
         {
             Point pos = idealScreenPosition.Value;
-
 
             pos = GetMostVisibleLocationForSubMenu (Root, ScreenToViewport (pos));
 
@@ -158,7 +156,7 @@ public class PopoverMenu : PopoverBaseImpl
     private Menuv2? _root;
 
     /// <summary>
-    ///     Gets or sets the <seealso cref="Menuv2"/> that is the root of the Popover Menu.
+    ///     Gets or sets the <see cref="Menuv2"/> that is the root of the Popover Menu.
     /// </summary>
     public Menuv2? Root
     {
@@ -238,12 +236,12 @@ public class PopoverMenu : PopoverBaseImpl
     }
 
     /// <summary>
-    ///    Gets all the submenus in the PopoverMenu.
+    ///     Gets all the submenus in the PopoverMenu.
     /// </summary>
     /// <returns></returns>
     internal IEnumerable<Menuv2> GetAllSubMenus ()
     {
-        List<Menuv2> result = new ();
+        List<Menuv2> result = [];
 
         if (Root == null)
         {
@@ -271,12 +269,12 @@ public class PopoverMenu : PopoverBaseImpl
     }
 
     /// <summary>
-    ///    Gets all the MenuItems in the PopoverMenu.
+    ///     Gets all the MenuItems in the PopoverMenu.
     /// </summary>
     /// <returns></returns>
     internal IEnumerable<MenuItemv2> GetMenuItemsOfAllSubMenus ()
     {
-        List<MenuItemv2> result = new ();
+        List<MenuItemv2> result = [];
 
         foreach (Menuv2 menu in GetAllSubMenus ())
         {

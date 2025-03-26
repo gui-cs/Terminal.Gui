@@ -2,6 +2,7 @@
 namespace Terminal.Gui;
 
 /// <summary>
+///     A <see cref="Bar"/>-derived object to be used as a verticaly-oriented menu. Each subview is a <see cref="MenuItemv2"/>.
 /// </summary>
 public class Menuv2 : Bar
 {
@@ -50,7 +51,6 @@ public class Menuv2 : Bar
         if (view is MenuItemv2 menuItem)
         {
             menuItem.CanFocus = true;
-            //            menuItem.Orientation = Orientation.Vertical;
 
             AddCommand (menuItem.Command, RaiseAccepted);
 
@@ -61,11 +61,6 @@ public class Menuv2 : Bar
             void MenuItemOnSelecting (object? sender, CommandEventArgs e)
             {
                 Logging.Trace ($"Selecting: {e.Context?.Source?.Title}");
-
-                if (e.Context?.Command == Command.HotKey)
-                {
-
-                }
             }
 
             void MenuItemOnAccepting (object? sender, CommandEventArgs e)
@@ -81,6 +76,7 @@ public class Menuv2 : Bar
         }
     }
 
+    // TODO: Consider moving Accepted to Bar?
 
     /// <summary>
     ///     Riases the <see cref="OnAccepted"/>/<see cref="Accepted"/> event indicating an item in this menu (or submenu)
@@ -126,7 +122,8 @@ public class Menuv2 : Bar
     }
 
     /// <summary>
-    /// 
+    ///     Gets or set the currently selected menu item. This is a helper that
+    ///     tracks <see cref="View.Focused"/>.
     /// </summary>
     public MenuItemv2? SelectedMenuItem
     {
@@ -138,7 +135,7 @@ public class Menuv2 : Bar
                 return;
             }
 
-            //value?.SetFocus ();
+            // Note we DO NOT set focus here; This property tracks Focused
         }
     }
 
@@ -146,14 +143,12 @@ public class Menuv2 : Bar
     {
         //Logging.Trace ($"RaiseSelectedMenuItemChanged: {selected?.Title}");
 
-        //ShowSubMenu (selected);
         OnSelectedMenuItemChanged (selected);
-
         SelectedMenuItemChanged?.Invoke (this, selected);
     }
 
     /// <summary>
-    /// 
+    ///     Called when the the selected menu item has changed.
     /// </summary>
     /// <param name="selected"></param>
     protected virtual void OnSelectedMenuItemChanged (MenuItemv2? selected)
@@ -161,7 +156,7 @@ public class Menuv2 : Bar
     }
 
     /// <summary>
-    /// 
+    ///     Raised when the selected menu item has changed.
     /// </summary>
     public event EventHandler<MenuItemv2?>? SelectedMenuItemChanged;
 

@@ -1,18 +1,19 @@
 ﻿#nullable enable
 namespace Terminal.Gui;
 
-#pragma warning disable CS1574 // XML comment has cref attribute that could not be resolved
+#pragma warning disable CS1574, CS0419 // XML comment has cref attribute that could not be resolved
 /// <summary>
 ///     Provides context for a <see cref="Command"/> invocation.
 /// </summary>
 /// <seealso cref="View.InvokeCommand"/>.
-#pragma warning restore CS1574 // XML comment has cref attribute that could not be resolved
+#pragma warning restore CS1574, CS0419 // XML comment has cref attribute that could not be resolved
 public record struct CommandContext<TBinding> : ICommandContext
 {
     /// <summary>
     ///     Initializes a new instance with the specified <see cref="Command"/>,
     /// </summary>
     /// <param name="command"></param>
+    /// <param name="source"></param>
     /// <param name="binding"></param>
     public CommandContext (Command command, View? source, TBinding? binding)
     {

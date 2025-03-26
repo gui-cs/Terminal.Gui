@@ -5,7 +5,7 @@ using System.ComponentModel;
 namespace Terminal.Gui;
 
 /// <summary>
-///     A <see cref="MenuBarItemv2"/> has title, an associated help text, and an action to execute on activation.
+///     A <see cref="MenuBarItemv2"/> has title, an associated help text, a hotkey, and an action to execute on activation.
 /// </summary>
 public class MenuBarItemv2 : MenuItemv2
 {
@@ -22,10 +22,6 @@ public class MenuBarItemv2 : MenuItemv2
     ///     has bound to <paramref name="command"/> will be used as <see cref="Key"/>.
     /// </summary>
     /// <remarks>
-    ///     <para>
-    ///         This is a helper API that simplifies creation of multiple Shortcuts when adding them to <see cref="Bar"/>-based
-    ///         objects, like <see cref="MenuBarv2"/>.
-    ///     </para>
     /// </remarks>
     /// <param name="targetView">
     ///     The View that <paramref name="command"/> will be invoked on when user does something that causes the Shortcut's Accept
@@ -37,7 +33,7 @@ public class MenuBarItemv2 : MenuItemv2
     /// </param>
     /// <param name="commandText">The text to display for the command.</param>
     /// <param name="helpText">The help text to display.</param>
-    /// <param name="popoverMenu"></param>
+    /// <param name="popoverMenu">The Popover Menu that will be displayed when this item is selected.</param>
     public MenuBarItemv2 (View? targetView, Command command, string commandText, string? helpText = null, PopoverMenu? popoverMenu = null)
         : base (
                 targetView,
@@ -50,8 +46,10 @@ public class MenuBarItemv2 : MenuItemv2
         PopoverMenu = popoverMenu;
     }
 
+    // TODO: Hide base.SubMenu?
+
     /// <summary>
-    /// 
+    ///     The Popover Menu that will be displayed when this item is selected.
     /// </summary>
     public PopoverMenu? PopoverMenu { get; set; }
 

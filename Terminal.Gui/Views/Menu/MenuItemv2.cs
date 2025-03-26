@@ -5,8 +5,7 @@ using System.ComponentModel;
 namespace Terminal.Gui;
 
 /// <summary>
-///     A <see cref="MenuItemv2"/> has title, an associated help text, and an action to execute on activation. MenuItems
-///     can also have a checked indicator (see <see cref="Checked"/>).
+///     A <see cref="Shortcut"/>-dervied object to be used as a menu item in a <see cref="Menuv2"/>. Has title, an associated help text, and an action to execute on activation.
 /// </summary>
 public class MenuItemv2 : Shortcut
 {
@@ -18,15 +17,11 @@ public class MenuItemv2 : Shortcut
     }
 
     /// <summary>
-    ///     Creates a new instance of <see cref="Shortcut"/>, binding it to <paramref name="targetView"/> and
+    ///     Creates a new instance of <see cref="MenuItemv2"/>, binding it to <paramref name="targetView"/> and
     ///     <paramref name="command"/>. The Key <paramref name="targetView"/>
     ///     has bound to <paramref name="command"/> will be used as <see cref="Key"/>.
     /// </summary>
     /// <remarks>
-    ///     <para>
-    ///         This is a helper API that simplifies creation of multiple Shortcuts when adding them to <see cref="Bar"/>-based
-    ///         objects, like <see cref="MenuBarv2"/>.
-    ///     </para>
     /// </remarks>
     /// <param name="targetView">
     ///     The View that <paramref name="command"/> will be invoked on when user does something that causes the Shortcut's Accept
@@ -38,7 +33,7 @@ public class MenuItemv2 : Shortcut
     /// </param>
     /// <param name="commandText">The text to display for the command.</param>
     /// <param name="helpText">The help text to display.</param>
-    /// <param name="subMenu"></param>
+    /// <param name="subMenu">The submenu to display when the user selects this menu item.</param>
     public MenuItemv2 (View? targetView, Command command, string commandText, string? helpText = null, Menuv2? subMenu = null)
         : base (
                 targetView?.HotKeyBindings.GetFirstFromCommands (command)!,
@@ -59,13 +54,15 @@ public class MenuItemv2 : Shortcut
         SubMenu = subMenu;
     }
 
+    // TODO: Consider moving TargetView and Command to Shortcut?
+
     /// <summary>
     ///     Gets the target <see cref="View"/> that the <see cref="Command"/> will be invoked on.
     /// </summary>
     public View? TargetView { get; set; }
 
     /// <summary>
-    ///     Gets the <see cref="Command"/> that will be invoked on <see cref="TargetView"/> when the Shortcut is activated.
+    ///     Gets the <see cref="Command"/> that will be invoked on <see cref="TargetView"/> when the MenuItem is selected.
     /// </summary>
     public Command Command { get; set; }
 
@@ -79,10 +76,6 @@ public class MenuItemv2 : Shortcut
 
             if (TargetView is { })
             {
-                if (commandContext is null)
-                {
-                    commandContext = new CommandContext<KeyBinding> ();
-                }
                 commandContext.Command = Command;
                 ret = TargetView.InvokeCommand (Command, commandContext);
             }
@@ -101,7 +94,7 @@ public class MenuItemv2 : Shortcut
     }
 
     /// <summary>
-    /// 
+    ///     The submenu to display when the user selects this menu item.
     /// </summary>
     public Menuv2? SubMenu { get; set; }
 
@@ -113,6 +106,7 @@ public class MenuItemv2 : Shortcut
         return base.OnMouseEnter (eventArgs);
     }
 
+    // TODO: Consider moving Accepted to Shortcut?
 
     /// <summary>
     ///     Riases the <see cref="OnAccepted"/>/<see cref="Accepted"/> event indicating this item (or submenu)

@@ -1,15 +1,15 @@
 ﻿#nullable enable
-using System;
-using System.Reflection;
-
 namespace Terminal.Gui;
 
 /// <summary>
-///     A menu bar is a <see cref="View"/> that snaps to the top of a <see cref="Toplevel"/> displaying set of
-///     <see cref="Shortcut"/>s.
+///     A menu bar is a horizontal list of <see cref="MenuBarItemv2"/>s. Each <see cref="MenuBarItemv2"/> can have a
+///     <see cref="PopoverMenu"/> that is shown when the <see cref="MenuBarItemv2"/> is selected.
 /// </summary>
 public class MenuBarv2 : Menuv2, IDesignable
 {
+    /// <inheritdoc/>
+    public MenuBarv2 () : this ([]) { }
+
     /// <inheritdoc/>
     public MenuBarv2 (IEnumerable<MenuBarItemv2> menuBarItems) : base (menuBarItems)
     {
@@ -26,60 +26,40 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         return;
 
-        bool? MoveLeft (ICommandContext? ctx)
-        {
-            //if (MostFocused is MenuItemv2 { SuperView: Menuv2 focusedMenu })
-            //{
-            //    focusedMenu.SuperMenuItem?.SetFocus ();
+        bool? MoveLeft (ICommandContext? ctx) { return AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop); }
 
-            //    return true;
-            //}
-
-            return AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
-        }
-
-        bool? MoveRight (ICommandContext? ctx)
-        {
-            //if (MostFocused is MenuItemv2 { SubMenu.Visible: true } focused)
-            //{
-            //    focused.SubMenu.SetFocus ();
-
-            //    return true;
-            //}
-
-            return AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
-        }
+        bool? MoveRight (ICommandContext? ctx) { return AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop); }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnSelectedMenuItemChanged (MenuItemv2? selected)
     {
-        if (selected is MenuBarItemv2 { } selectedMenuBarItem )
+        if (selected is MenuBarItemv2 { } selectedMenuBarItem)
         {
             ShowPopover (selectedMenuBarItem);
         }
     }
 
-
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void EndInit ()
     {
         base.EndInit ();
 
         if (Border is { })
         {
-            Border.Thickness = new Thickness (0);
+            Border.Thickness = new (0);
             Border.LineStyle = LineStyle.None;
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnAccepting (CommandEventArgs args)
     {
         if (args.Context?.Source is MenuBarItemv2 { PopoverMenu: { } } menuBarItem)
         {
             ShowPopover (menuBarItem);
         }
+
         return base.OnAccepting (args);
     }
 
@@ -91,7 +71,9 @@ public class MenuBarv2 : Menuv2, IDesignable
             menuBarItem.PopoverMenu.EndInit ();
         }
 
-        if (menuBarItem?.PopoverMenu is null && Application.Popover!.GetActivePopover () is PopoverMenu popoverMenu && popoverMenu.Root.SuperMenuItem.SuperView == this)
+        if (menuBarItem?.PopoverMenu is null
+            && Application.Popover!.GetActivePopover () is PopoverMenu popoverMenu
+            && popoverMenu?.Root?.SuperMenuItem?.SuperView == this)
         {
             Application.Popover?.HidePopover (popoverMenu);
         }
@@ -104,7 +86,7 @@ public class MenuBarv2 : Menuv2, IDesignable
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public bool EnableForDesign<TContext> (ref readonly TContext context) where TContext : notnull
     {
         //        if (context is not Func<string, bool> actionFn)
@@ -113,7 +95,6 @@ public class MenuBarv2 : Menuv2, IDesignable
         //        }
 
         //        View? targetView = context as View;
-
 
         //        Add (new MenuItemv2 (targetView,
         //                             Command.NotBound,
