@@ -8,89 +8,275 @@ namespace Terminal.Gui;
 ///     A menu bar is a <see cref="View"/> that snaps to the top of a <see cref="Toplevel"/> displaying set of
 ///     <see cref="Shortcut"/>s.
 /// </summary>
-public class MenuBarv2 : Bar
+public class MenuBarv2 : Menuv2, IDesignable
 {
     /// <inheritdoc/>
-    public MenuBarv2 () : this ([]) { }
-
-    /// <inheritdoc/>
-    public MenuBarv2 (IEnumerable<Shortcut> shortcuts) : base (shortcuts)
+    public MenuBarv2 (IEnumerable<MenuBarItemv2> menuBarItems) : base (menuBarItems)
     {
+        TabStop = TabBehavior.TabGroup;
         Y = 0;
         Width = Dim.Fill ();
-        Height = Dim.Auto (DimAutoStyle.Content, 1);
-        BorderStyle = LineStyle.Dashed;
-        base.ColorScheme = Colors.ColorSchemes ["Menu"];
         Orientation = Orientation.Horizontal;
 
-        AddCommand (Command.Context,
-                   (ctx) =>
-                   {
-                       if (ctx is CommandContext<KeyBinding> commandContext && commandContext.Binding.Data is MenuItemv2 { TargetView: { } } shortcut)
-                       {
-                           //MenuBarv2? clone = MemberwiseClone () as MenuBarv2;
-                           //clone!.SuperView = null;
-                           //clone.Visible = false;
+        AddCommand (Command.Right, MoveRight);
+        KeyBindings.Add (Key.CursorRight, Command.Right);
 
-                           //Rectangle screen = FrameToScreen ();
-                           //Application.Popover = clone;
-                           //clone.X = screen.X;
-                           //clone.Y = screen.Y;
-                           //clone.Width = Dim.Fill (1);
+        AddCommand (Command.Left, MoveLeft);
+        KeyBindings.Add (Key.CursorLeft, Command.Left);
 
-                           //clone.Visible = true;
-                           //clone.SetSubViewNeedsDraw ();
+        return;
 
+        bool? MoveLeft (ICommandContext? ctx)
+        {
+            //if (MostFocused is MenuItemv2 { SuperView: Menuv2 focusedMenu })
+            //{
+            //    focusedMenu.SuperMenuItem?.SetFocus ();
 
-                           Rectangle screen = shortcut.FrameToScreen ();
-                           //Application.Popover = shortcut.TargetView;
-                           shortcut.TargetView.X = screen.X;
-                           shortcut.TargetView.Y = screen.Y + screen.Height;
-                           shortcut.TargetView.Visible = true;
+            //    return true;
+            //}
 
-                           return true;
-                       }
+            return AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
+        }
 
-                       return false;
-                   });
+        bool? MoveRight (ICommandContext? ctx)
+        {
+            //if (MostFocused is MenuItemv2 { SubMenu.Visible: true } focused)
+            //{
+            //    focused.SubMenu.SetFocus ();
+
+            //    return true;
+            //}
+
+            return AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        }
     }
 
     /// <inheritdoc />
-    protected override bool OnHighlight (CancelEventArgs<HighlightStyle> args)
+    protected override void OnSelectedMenuItemChanged (MenuItemv2? selected)
     {
-        if (args.NewValue.HasFlag (HighlightStyle.Hover))
+        if (selected is MenuBarItemv2 { } selectedMenuBarItem )
         {
-            if (Application.Popover?.GetActivePopover () is View { Visible: true } visiblePopover && View.IsInHierarchy (this, visiblePopover))
-            {
-
-            }
+            ShowPopover (selectedMenuBarItem);
         }
-
-        return false;
     }
 
-    /// <inheritdoc/>
-    public override View? Add (View? view)
+
+    /// <inheritdoc />
+    public override void EndInit ()
     {
-        // Call base first, because otherwise it resets CanFocus to true
-        base.Add (view);
+        base.EndInit ();
 
-        if (view is null)
+        if (Border is { })
         {
-            return null;
+            Border.Thickness = new Thickness (0);
+            Border.LineStyle = LineStyle.None;
         }
-        view.CanFocus = true;
+    }
 
-        if (view is MenuItemv2 shortcut)
+    /// <inheritdoc />
+    protected override bool OnAccepting (CommandEventArgs args)
+    {
+        if (args.Context?.Source is MenuBarItemv2 { PopoverMenu: { } } menuBarItem)
         {
-            shortcut.KeyView.Visible = false;
-            shortcut.HelpView.Visible = false;
+            ShowPopover (menuBarItem);
+        }
+        return base.OnAccepting (args);
+    }
 
-            shortcut.Selecting += (sender, args) => { args.Cancel = InvokeCommand (Command.Context, args.Context) == true; };
-
-            shortcut.Accepting += (sender, args) => { args.Cancel = InvokeCommand (Command.Context, args.Context) == true; };
+    private void ShowPopover (MenuBarItemv2? menuBarItem)
+    {
+        if (menuBarItem?.PopoverMenu is { IsInitialized: false })
+        {
+            menuBarItem.PopoverMenu.BeginInit ();
+            menuBarItem.PopoverMenu.EndInit ();
         }
 
-        return view;
+        if (menuBarItem?.PopoverMenu is null && Application.Popover!.GetActivePopover () is PopoverMenu popoverMenu && popoverMenu.Root.SuperMenuItem.SuperView == this)
+        {
+            Application.Popover?.HidePopover (popoverMenu);
+        }
+
+        menuBarItem?.PopoverMenu?.MakeVisible (new Point (menuBarItem.FrameToScreen ().X, menuBarItem.FrameToScreen ().Bottom));
+
+        if (menuBarItem?.PopoverMenu?.Root is { })
+        {
+            menuBarItem.PopoverMenu.Root.SuperMenuItem = menuBarItem;
+        }
+    }
+
+    /// <inheritdoc />
+    public bool EnableForDesign<TContext> (ref readonly TContext context) where TContext : notnull
+    {
+        //        if (context is not Func<string, bool> actionFn)
+        //        {
+        //            actionFn = (_) => true;
+        //        }
+
+        //        View? targetView = context as View;
+
+
+        //        Add (new MenuItemv2 (targetView,
+        //                             Command.NotBound,
+        //                             "_File",
+        //                             new MenuItem []
+        //                             {
+        //                                 new (
+        //                                      "_New",
+        //                                      "",
+        //                                      () => actionFn ("New"),
+        //                                      null,
+        //                                      null,
+        //                                      KeyCode.CtrlMask | KeyCode.N
+        //                                     ),
+        //                                 new (
+        //                                      "_Open",
+        //                                      "",
+        //                                      () => actionFn ("Open"),
+        //                                      null,
+        //                                      null,
+        //                                      KeyCode.CtrlMask | KeyCode.O
+        //                                     ),
+        //                                 new (
+        //                                      "_Save",
+        //                                      "",
+        //                                      () => actionFn ("Save"),
+        //                                      null,
+        //                                      null,
+        //                                      KeyCode.CtrlMask | KeyCode.S
+        //                                     ),
+        //#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
+        //                                 null,
+        //#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
+
+        //                                 // Don't use Application.Quit so we can disambiguate between quitting and closing the toplevel
+        //                                 new (
+        //                                      "_Quit",
+        //                                      "",
+        //                                      () => actionFn ("Quit"),
+        //                                      null,
+        //                                      null,
+        //                                      KeyCode.CtrlMask | KeyCode.Q
+        //                                     )
+        //                             }
+        //                            ),
+        //            new MenuBarItem (
+        //                             "_Edit",
+        //                             new MenuItem []
+        //                             {
+        //                                 new (
+        //                                      "_Copy",
+        //                                      "",
+        //                                      () => actionFn ("Copy"),
+        //                                      null,
+        //                                      null,
+        //                                      KeyCode.CtrlMask | KeyCode.C
+        //                                     ),
+        //                                 new (
+        //                                      "C_ut",
+        //                                      "",
+        //                                      () => actionFn ("Cut"),
+        //                                      null,
+        //                                      null,
+        //                                      KeyCode.CtrlMask | KeyCode.X
+        //                                     ),
+        //                                 new (
+        //                                      "_Paste",
+        //                                      "",
+        //                                      () => actionFn ("Paste"),
+        //                                      null,
+        //                                      null,
+        //                                      KeyCode.CtrlMask | KeyCode.V
+        //                                     ),
+        //                                 new MenuBarItem (
+        //                                                  "_Find and Replace",
+        //                                                  new MenuItem []
+        //                                                  {
+        //                                                      new (
+        //                                                           "F_ind",
+        //                                                           "",
+        //                                                           () => actionFn ("Find"),
+        //                                                           null,
+        //                                                           null,
+        //                                                           KeyCode.CtrlMask | KeyCode.F
+        //                                                          ),
+        //                                                      new (
+        //                                                           "_Replace",
+        //                                                           "",
+        //                                                           () => actionFn ("Replace"),
+        //                                                           null,
+        //                                                           null,
+        //                                                           KeyCode.CtrlMask | KeyCode.H
+        //                                                          ),
+        //                                                      new MenuBarItem (
+        //                                                                       "_3rd Level",
+        //                                                                       new MenuItem []
+        //                                                                       {
+        //                                                                           new (
+        //                                                                                "_1st",
+        //                                                                                "",
+        //                                                                                () => actionFn (
+        //                                                                                                "1"
+        //                                                                                               ),
+        //                                                                                null,
+        //                                                                                null,
+        //                                                                                KeyCode.F1
+        //                                                                               ),
+        //                                                                           new (
+        //                                                                                "_2nd",
+        //                                                                                "",
+        //                                                                                () => actionFn (
+        //                                                                                                "2"
+        //                                                                                               ),
+        //                                                                                null,
+        //                                                                                null,
+        //                                                                                KeyCode.F2
+        //                                                                               )
+        //                                                                       }
+        //                                                                      ),
+        //                                                      new MenuBarItem (
+        //                                                                       "_4th Level",
+        //                                                                       new MenuItem []
+        //                                                                       {
+        //                                                                           new (
+        //                                                                                "_5th",
+        //                                                                                "",
+        //                                                                                () => actionFn (
+        //                                                                                                "5"
+        //                                                                                               ),
+        //                                                                                null,
+        //                                                                                null,
+        //                                                                                KeyCode.CtrlMask
+        //                                                                                | KeyCode.D5
+        //                                                                               ),
+        //                                                                           new (
+        //                                                                                "_6th",
+        //                                                                                "",
+        //                                                                                () => actionFn (
+        //                                                                                                "6"
+        //                                                                                               ),
+        //                                                                                null,
+        //                                                                                null,
+        //                                                                                KeyCode.CtrlMask
+        //                                                                                | KeyCode.D6
+        //                                                                               )
+        //                                                                       }
+        //                                                                      )
+        //                                                  }
+        //                                                 ),
+        //                                 new (
+        //                                      "_Select All",
+        //                                      "",
+        //                                      () => actionFn ("Select All"),
+        //                                      null,
+        //                                      null,
+        //                                      KeyCode.CtrlMask
+        //                                      | KeyCode.ShiftMask
+        //                                      | KeyCode.S
+        //                                     )
+        //                             }
+        //                            ),
+        //            new MenuBarItem ("_About", "Top-Level", () => actionFn ("About"))
+        //        ];
+        return false;
     }
 }

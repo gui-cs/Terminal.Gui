@@ -40,14 +40,14 @@ public abstract class PopoverBaseImpl : View, IPopover
 
         bool? Quit (ICommandContext? ctx)
         {
-            if (Visible)
+            if (!Visible)
             {
-                Visible = false;
-
-                return true;
+                return null;
             }
 
-            return null;
+            Visible = false;
+
+            return true;
         }
     }
 

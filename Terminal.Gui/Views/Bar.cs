@@ -218,6 +218,11 @@ public class Bar : View, IOrientation, IDesignable
                     barItem.ColorScheme = ColorScheme;
                     barItem.X = Pos.Align (Alignment.Start, AlignmentModes);
                     barItem.Y = 0; //Pos.Center ();
+
+                    if (barItem is Shortcut sc)
+                    {
+                        sc.Width = sc.GetWidthDimAuto ();
+                    }
                 }
 
                 break;

@@ -22,7 +22,8 @@ public class ApplicationPopover
     public IReadOnlyCollection<IPopover> Popovers => _popovers.AsReadOnly ();
 
     /// <summary>
-    /// 
+    ///     Registers <paramref name="popover"/> with the application.
+    ///     This enables the popover to receive keyboard events even when when it is not active.
     /// </summary>
     /// <param name="popover"></param>
     public void Register (IPopover? popover)
@@ -34,7 +35,8 @@ public class ApplicationPopover
     }
 
     /// <summary>
-    /// 
+    ///     De-registers <paramref name="popover"/> with the application. Use this to remove the popover and it's
+    ///     keyboard bindings from the application.
     /// </summary>
     /// <param name="popover"></param>
     /// <returns></returns>
@@ -68,6 +70,13 @@ public class ApplicationPopover
     ///     Shows <paramref name="popover"/>. IPopover implementations should use OnVisibleChnaged/VisibleChanged to be
     ///     notified when the user has done something to cause the popover to be hidden.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Note, this API calls <see cref="Register"/>. To disable the popover from processing keyboard events,
+    ///         either call <see cref="DeRegister"/> to
+    ///         remove the popover from the application or set <see cref="View.Enabled"/> to <see langword="false"/>.
+    ///     </para>
+    /// </remarks>
     /// <param name="popover"></param>
     public void ShowPopover (IPopover? popover)
     {
@@ -82,14 +91,20 @@ public class ApplicationPopover
         {
             Register (popover);
             _activePopover = newPopover as IPopover;
+            newPopover.Enabled = true;
             newPopover.Visible = true;
         }
     }
 
+    /// <summary>
+    ///     Causes the specified popover to be hidden.
+    ///     If the popover is dervied from <see cref="PopoverBaseImpl"/>, this is the same as setting <see cref="View.Visible"/> to <see langword="false"/>.
+    /// </summary>
+    /// <param name="popover"></param>
     public void HidePopover (IPopover? popover)
     {
         // If there's an existing popover, hide it.
-        if (_activePopover is View popoverView)
+        if (_activePopover is View popoverView && popoverView == popover)
         {
             popoverView.Visible = false;
             _activePopover = null;
@@ -115,17 +130,14 @@ public class ApplicationPopover
 
         foreach (IPopover popover in _popovers)
         {
-            if (GetActivePopover () == popover)
+            if (GetActivePopover () == popover || popover is not View popoverView)
             {
                 continue;
             }
 
-            if (popover is View popoverView)
+            if (popoverView.NewKeyDownEvent (key))
             {
-                if (popoverView.NewKeyDownEvent (key))
-                {
-                    return true;
-                }
+                return true;
             }
         }
 

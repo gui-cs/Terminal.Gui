@@ -59,6 +59,10 @@ public class PopoverMenu : PopoverBaseImpl
 
         bool? MoveLeft (ICommandContext? ctx)
         {
+            if (Focused == Root)
+            {
+                return false;
+            }
             if (MostFocused is MenuItemv2 { SuperView: Menuv2 focusedMenu })
             {
                 focusedMenu.SuperMenuItem?.SetFocus ();
@@ -66,11 +70,18 @@ public class PopoverMenu : PopoverBaseImpl
                 return true;
             }
 
+
+
             return AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
         }
 
         bool? MoveRight (ICommandContext? ctx)
         {
+            if (Focused == Root)
+            {
+                return false;
+            }
+
             if (MostFocused is MenuItemv2 { SubMenu.Visible: true } focused)
             {
                 focused.SubMenu.SetFocus ();
@@ -78,6 +89,7 @@ public class PopoverMenu : PopoverBaseImpl
                 return true;
             }
 
+  
             return AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         }
     }
@@ -118,7 +130,7 @@ public class PopoverMenu : PopoverBaseImpl
         if (idealScreenPosition is { } && Root is { })
         {
             Point pos = idealScreenPosition.Value;
-            pos.Offset (-Root.GetAdornmentsThickness ().Left, -Root.GetAdornmentsThickness ().Top);
+
 
             pos = GetMostVisibleLocationForSubMenu (Root, ScreenToViewport (pos));
 
@@ -366,6 +378,7 @@ public class PopoverMenu : PopoverBaseImpl
             }
 
             menu.Visible = false;
+            menu.ClearFocus ();
             base.Remove (menu);
 
             if (menu == Root)

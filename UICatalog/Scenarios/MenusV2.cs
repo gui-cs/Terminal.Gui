@@ -42,8 +42,8 @@ public class MenusV2 : Scenario
             Id = "targetView",
             Title = "Target View",
 
-            X = 1,
-            Y = 1,
+            X = 5,
+            Y = 5,
             Width = Dim.Fill (2)! - Dim.Width (eventLog),
             Height = Dim.Fill (2),
             BorderStyle = LineStyle.Dotted
@@ -69,10 +69,10 @@ public class MenusV2 : Scenario
                                    }
                                    Logging.Trace ($"targetView Accepting: {args?.Context?.Source?.Title}");
                                    eventSource.Add ($"targetView Accepting: {args?.Context?.Source?.Title}: ");
-                                   eventLog.MoveDown (); 
+                                   eventLog.MoveDown ();
                                };
 
-        targetView.PopoverMenu!.Accepted += (o, args) =>
+        targetView.FilePopoverMenu!.Accepted += (o, args) =>
                                            {
                                                if (args.Cancel)
                                                {
@@ -92,7 +92,8 @@ public class MenusV2 : Scenario
 
     public class TargetView : View
     {
-        internal PopoverMenu? PopoverMenu { get; private set; }
+        internal PopoverMenu? FilePopoverMenu { get; private set; }
+        internal PopoverMenu? EditPopoverMenu { get; private set; }
 
         private CheckBox? _enableOverwriteCb;
         private CheckBox? _autoSaveCb;
@@ -106,7 +107,7 @@ public class MenusV2 : Scenario
                        ctx =>
                        {
 
-                           PopoverMenu?.MakeVisible ();
+                           FilePopoverMenu?.MakeVisible ();
 
                            return true;
                        });
@@ -131,6 +132,7 @@ public class MenusV2 : Scenario
             Label lastCommandLabel = new ()
             {
                 Title = "_Last Command:",
+                Y = 2,
             };
 
             View lastCommandText = new ()
@@ -158,12 +160,11 @@ public class MenusV2 : Scenario
 
             HotKeyBindings.Add (Key.W.WithAlt, Command.EnableOverwrite);
 
-
-            var rootMenu = new Menuv2 ()
+            var fileMenu = new Menuv2 ()
             {
-                Id = "rootMenu",
+                Id = "fileMenu",
             };
-            ConfigureRootMenu (rootMenu);
+            ConfigureFileMenu (fileMenu);
 
             var optionsSubMenu = new Menuv2
             {
@@ -173,7 +174,7 @@ public class MenusV2 : Scenario
             ConfigureOptionsSubMenu (optionsSubMenu);
 
             var optionsSubMenuItem = new MenuItemv2 (this, Command.NotBound, "O_ptions", "File options", optionsSubMenu);
-            rootMenu.Add (optionsSubMenuItem);
+            fileMenu.Add (optionsSubMenuItem);
 
             var detailsSubMenu = new Menuv2
             {
@@ -183,7 +184,7 @@ public class MenusV2 : Scenario
             ConfigureDetialsSubMenu (detailsSubMenu);
 
             var detailsSubMenuItem = new MenuItemv2 (this, Command.NotBound, "_Details", "File details", detailsSubMenu);
-            rootMenu.Add (detailsSubMenuItem);
+            fileMenu.Add (detailsSubMenuItem);
 
             var moreDetailsSubMenu = new Menuv2
             {
@@ -195,30 +196,67 @@ public class MenusV2 : Scenario
             var moreDetailsSubMenuItem = new MenuItemv2 (this, Command.NotBound, "_More Details", "More details", moreDetailsSubMenu);
             detailsSubMenu.Add (moreDetailsSubMenuItem);
 
-
-            PopoverMenu = new PopoverMenu (rootMenu)
+            FilePopoverMenu = new PopoverMenu (fileMenu)
             {
-                Id = "popoverMenu",
+                Id = "FilePopoverMenu",
             };
 
-            Initialized += (sender, args) =>
-                           {
-                               PopoverMenu?.BeginInit ();
-                               PopoverMenu?.EndInit ();
-                               PopoverMenu?.MakeVisible ();
-                           };
+            MenuBarItemv2 fileMenuRootItem = new (this, Command.NotBound, "_File", null, FilePopoverMenu)
+            {
+            };
+
+            AddCommand (Command.Cut, HandleCommand);
+            HotKeyBindings.Add (Key.X.WithCtrl, Command.Cut);
+
+            AddCommand (Command.Copy, HandleCommand);
+            HotKeyBindings.Add (Key.C.WithCtrl, Command.Copy);
+
+            AddCommand (Command.Paste, HandleCommand);
+            HotKeyBindings.Add (Key.V.WithCtrl, Command.Paste);
+
+            var editMenu = new Menuv2 ()
+            {
+                Id = "editMenu",
+            };
+            ConfigureEditMenu (editMenu);
+
+            EditPopoverMenu = new PopoverMenu (editMenu)
+            {
+                Id = "EditPopoverMenu",
+            };
+
+            MenuBarItemv2 editMenuRootItem = new (this, Command.NotBound, "_Edit", null, EditPopoverMenu)
+            {
+                Id = "editMenuRootItem",
+            };
+
+            MenuBarItemv2 helpMenuRootItem = new (this, Command.NotBound, "_Help", "Show Help", null)
+            {
+                Id = "helpMenuRootItem",
+                Key = Key.F1,
+                Action = () => { MessageBox.Query ("Help", "This is the help...", "_Ok");}
+            };
+
+            MenuBarv2 menuBar = new ([fileMenuRootItem, editMenuRootItem, helpMenuRootItem])
+            {
+                Id = "rootMenu",
+            };
+
+
+            Add (menuBar);
+
 
             Label lastAcceptedLabel = new ()
             {
                 Title = "Last Accepted:",
-                Y = Pos.Bottom(lastCommandLabel)
+                Y = Pos.Bottom (lastCommandLabel)
             };
 
             View lastAcceptedText = new ()
             {
                 X = Pos.Right (lastAcceptedLabel) + 1,
                 Y = Pos.Top (lastAcceptedLabel),
-                Height = Dim.Auto(),
+                Height = Dim.Auto (),
                 Width = Dim.Auto ()
             };
 
@@ -254,7 +292,7 @@ public class MenusV2 : Scenario
                                                      return HandleCommand (ctx);
                                                  });
 
-            PopoverMenu!.Accepted += (o, args) =>
+            FilePopoverMenu!.Accepted += (o, args) =>
                                      {
                                          lastAcceptedText.Text = args?.Context?.Source?.Title!;
 
@@ -262,13 +300,11 @@ public class MenusV2 : Scenario
                                          {
                                              autoSaveStatusCb.CheckedState = _autoSaveCb.CheckedState;
                                          }
-
-                                         args.Cancel = true;
                                      };
 
-            PopoverMenu!.VisibleChanged += (sender, args) =>
+            FilePopoverMenu!.VisibleChanged += (sender, args) =>
                                            {
-                                               if (PopoverMenu!.Visible)
+                                               if (FilePopoverMenu!.Visible)
                                                {
                                                    lastCommandText.Text = string.Empty;
                                                }
@@ -282,7 +318,7 @@ public class MenusV2 : Scenario
                      Y = Pos.Center ()
                  });
 
-
+            autoSaveStatusCb.SetFocus ();
             return;
 
             // Add the commands supported by this View
@@ -295,7 +331,8 @@ public class MenusV2 : Scenario
         }
 
 
-        private void ConfigureRootMenu (Menuv2 menu)
+
+        private void ConfigureFileMenu (Menuv2 menu)
         {
             var newFile = new MenuItemv2
             {
@@ -481,17 +518,48 @@ public class MenusV2 : Scenario
             menu.Add (deeperDetail, line, shortcut4);
         }
 
+
+        private void ConfigureEditMenu (Menuv2 menu)
+        {
+            var cut = new MenuItemv2
+            {
+                Title = "_Cut",
+                Command = Command.Cut,
+                TargetView = this
+            };
+
+            var copy = new MenuItemv2
+            {
+                Title = "C_opy",
+                Command = Command.Copy,
+                TargetView = this
+            };
+
+            var paste = new MenuItemv2
+            {
+                Title = "_Paste",
+                Command = Command.Paste,
+                TargetView = this
+            };
+
+
+            menu.Add (cut, copy, paste);
+
+
+        }
+
+
         /// <inheritdoc />
         protected override void Dispose (bool disposing)
         {
             if (disposing)
             {
-                if (PopoverMenu is { })
-                {
-                    PopoverMenu.Visible = false;
-                    PopoverMenu?.Dispose ();
-                    PopoverMenu = null;
-                }
+            //    if (FilePopoverMenu is { })
+            //    {
+            //        FilePopoverMenu.Visible = false;
+            //        FilePopoverMenu?.Dispose ();
+            //        FilePopoverMenu = null;
+            //    }
             }
             base.Dispose (disposing);
         }

@@ -1,9 +1,4 @@
 ﻿#nullable enable
-using System;
-using System.ComponentModel;
-using System.Net.Http.Headers;
-using System.Reflection;
-
 namespace Terminal.Gui;
 
 /// <summary>
@@ -19,10 +14,6 @@ public class Menuv2 : Bar
         Orientation = Orientation.Vertical;
         Width = Dim.Auto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
-
-        Initialized += Menuv2_Initialized;
-        VisibleChanged += OnVisibleChanged;
-
     }
 
     /// <summary>
@@ -30,7 +21,8 @@ public class Menuv2 : Bar
     /// </summary>
     public MenuItemv2? SuperMenuItem { get; set; }
 
-    private void OnVisibleChanged (object? sender, EventArgs e)
+    /// <inheritdoc />
+    protected override void OnVisibleChanged ()
     {
         if (Visible)
         {
@@ -38,15 +30,16 @@ public class Menuv2 : Bar
         }
     }
 
-    private void Menuv2_Initialized (object? sender, EventArgs e)
+    /// <inheritdoc />
+    public override void EndInit ()
     {
+        base.EndInit ();
+
         if (Border is { })
         {
             Border.Thickness = new Thickness (1, 1, 1, 1);
             Border.LineStyle = LineStyle.Single;
         }
-
-        ColorScheme = Colors.ColorSchemes ["Menu"];
     }
 
     /// <inheritdoc />
@@ -57,7 +50,7 @@ public class Menuv2 : Bar
         if (view is MenuItemv2 menuItem)
         {
             menuItem.CanFocus = true;
-            menuItem.Orientation = Orientation.Vertical;
+            //            menuItem.Orientation = Orientation.Vertical;
 
             AddCommand (menuItem.Command, RaiseAccepted);
 
@@ -69,7 +62,7 @@ public class Menuv2 : Bar
             {
                 Logging.Trace ($"Selecting: {e.Context?.Source?.Title}");
 
-                if (e.Context.Command == Command.HotKey)
+                if (e.Context?.Command == Command.HotKey)
                 {
 
                 }

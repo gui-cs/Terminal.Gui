@@ -1,6 +1,8 @@
-#nullable enable
-
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
 using System.Text;
 using Terminal.Gui;
 
@@ -8,11 +10,8 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Bars", "Illustrates Bar views (e.g. StatusBar)")]
 [ScenarioCategory ("Controls")]
-[ScenarioCategory ("Shortcuts")]
 public class Bars : Scenario
 {
-    private Menuv2? _popoverMenu;
-
     public override void Main ()
     {
         Application.Init ();
@@ -22,14 +21,13 @@ public class Bars : Scenario
 
         Application.Run (app);
         app.Dispose ();
-        _popoverMenu?.Dispose ();
         Application.Shutdown ();
     }
 
 
     // Setting everything up in Loaded handler because we change the
     // QuitKey and it only sticks if changed after init
-    private void App_Loaded (object? sender, EventArgs e)
+    private void App_Loaded (object sender, EventArgs e)
     {
         Application.Top!.Title = GetQuitKeyAndName ();
 
@@ -43,7 +41,7 @@ public class Bars : Scenario
             ColorScheme = Colors.ColorSchemes ["Toplevel"],
             Source = new ListWrapper<string> (eventSource)
         };
-        eventLog.Border!.Thickness = new (0, 1, 0, 0);
+        eventLog.Border.Thickness = new (0, 1, 0, 0);
         Application.Top.Add (eventLog);
 
         FrameView menuBarLikeExamples = new ()
@@ -51,8 +49,8 @@ public class Bars : Scenario
             Title = "MenuBar-Like Examples",
             X = 0,
             Y = 0,
-            Width = Dim.Fill ()! - Dim.Width (eventLog),
-            Height = Dim.Percent (33),
+            Width = Dim.Fill () - Dim.Width (eventLog),
+            Height = Dim.Percent(33),
         };
         Application.Top.Add (menuBarLikeExamples);
 
@@ -64,23 +62,24 @@ public class Bars : Scenario
         };
         menuBarLikeExamples.Add (label);
 
-        //var bar = new Bar
-        //{
-        //    Id = "menuBar-like",
-        //    X = Pos.Right (label),
-        //    Y = Pos.Top (label),
-        //    Width = Dim.Fill (),
-        //};
-        //menuBarLikeExamples.Add (bar);
-        //ConfigMenuBar (bar);
+        Bar bar = new Bar
+        {
+            Id = "menuBar-like",
+            X = Pos.Right (label),
+            Y = Pos.Top (label),
+            Width = Dim.Fill (),
+        };
 
-        //label = new Label ()
-        //{
-        //    Title = "  MenuBar:",
-        //    X = 0,
-        //    Y = Pos.Bottom (bar) + 1
-        //};
-        //menuBarLikeExamples.Add (label);
+        ConfigMenuBar (bar);
+        menuBarLikeExamples.Add (bar);
+
+        label = new Label ()
+        {
+            Title = "  MenuBar:",
+            X = 0,
+            Y = Pos.Bottom (bar) + 1
+        };
+        menuBarLikeExamples.Add (label);
 
         //bar = new MenuBarv2
         //{
@@ -89,15 +88,15 @@ public class Bars : Scenario
         //    Y = Pos.Top (label),
         //};
 
-        //menuBarLikeExamples.Add (bar);
         //ConfigMenuBar (bar);
+        //menuBarLikeExamples.Add (bar);
 
         FrameView menuLikeExamples = new ()
         {
             Title = "Menu-Like Examples",
             X = 0,
             Y = Pos.Center (),
-            Width = Dim.Fill ()! - Dim.Width (eventLog),
+            Width = Dim.Fill () - Dim.Width (eventLog),
             Height = Dim.Percent (33),
         };
         Application.Top.Add (menuLikeExamples);
@@ -110,11 +109,11 @@ public class Bars : Scenario
         };
         menuLikeExamples.Add (label);
 
-        Bar bar = new Bar
+        bar = new Bar
         {
             Id = "menu-like",
             X = 0,
-            Y = Pos.Bottom (label),
+            Y = Pos.Bottom(label),
             //Width = Dim.Percent (40),
             Orientation = Orientation.Vertical,
         };
@@ -125,7 +124,7 @@ public class Bars : Scenario
         label = new Label ()
         {
             Title = "Menu:",
-            X = Pos.Right (bar) + 1,
+            X = Pos.Right(bar) + 1,
             Y = Pos.Top (label),
         };
         menuLikeExamples.Add (label);
@@ -137,111 +136,74 @@ public class Bars : Scenario
             Y = Pos.Bottom (label),
         };
         ConfigureMenu (bar);
-
-        var cascadeShortcut = new Shortcut
-        {
-            Title = "_Cascade",
-            Text = "Cascade...",
-            HighlightStyle = HighlightStyle.Hover
-        };
-        bar.Add (cascadeShortcut);
-
         bar.Arrangement = ViewArrangement.RightResizable;
 
         menuLikeExamples.Add (bar);
 
         label = new Label ()
         {
-            Title = "Popover Menu (Right click to show):",
+            Title = "PopOver Menu (Right click to show):",
             X = Pos.Right (bar) + 1,
             Y = Pos.Top (label),
         };
         menuLikeExamples.Add (label);
 
-        _popoverMenu = new Menuv2
+        Menuv2 popOverMenu  = new Menuv2
         {
-            Id = "popoverMenu",
+            Id = "popupMenu",
+            X = Pos.Left (label),
+            Y = Pos.Bottom (label),
         };
+        ConfigureMenu (popOverMenu);
 
-        //ConfigureMenu (_popoverMenu!);
+        popOverMenu.Arrangement = ViewArrangement.Overlapped;
+        popOverMenu.Visible = false;
+        //popOverMenu.Enabled = false;
 
-        //_popoverMenu!.ColorScheme = Colors.ColorSchemes ["Menu"];
+        var toggleShortcut = new Shortcut
+        {
+            Title = "Toggle Hide",
+            Text = "App",
+            BindKeyToApplication = true,
+            Key = Key.F4.WithCtrl,
+        };
+        popOverMenu.Add (toggleShortcut);
 
-        //_popoverMenu.HasFocusChanged += (o, args) =>
-        //                                {
-        //                                    _popoverMenu.Visible = args.NewValue;
-        //                                };
-        //_popoverMenu.Visible = false;
+        popOverMenu.Accepting += PopOverMenuOnAccept;
 
+        void PopOverMenuOnAccept (object o, CommandEventArgs args)
+        {
+            if (popOverMenu.Visible)
+            {
+                popOverMenu.Visible = false;
+            }
+            else
+            {
+                popOverMenu.Visible = true;
+                popOverMenu.SetFocus ();
+            }
+        }
 
-        //Application.Popover = _popoverMenu;
-        //_popoverMenu.VisibleChanged += (sender, args) =>
-        //{
-        //    if (Application.Popover is View { Visible: false } invisiblePopover)
-        //    {
-        //        invisiblePopover = false;
-        //    }
-        //};
+        menuLikeExamples.Add (popOverMenu);
 
-        //var toggleShortcut = new Shortcut
-        //{
-        //    Title = "Toggle Hide",
-        //    Text = "App",
-        //    BindKeyToApplication = true,
-        //    Key = Key.F4.WithCtrl,
-        //};
-        //_popoverMenu.Add (toggleShortcut);
+        menuLikeExamples.MouseClick += MenuLikeExamplesMouseClick;
 
-        //_popoverMenu.Accepting += PopoverMenuOnAccepting;
-
-        //void PopoverMenuOnAccepting (object? o, CommandEventArgs args)
-        //{
-        //    eventSource.Add ($"Accepting: {_popoverMenu!.Id}");
-        //    eventLog.MoveDown ();
-        //    var cbShortcuts = _popoverMenu.SubViews.Where (
-        //                                                  v =>
-        //                                                  {
-        //                                                      if (v is Shortcut sh)
-        //                                                      {
-        //                                                          return sh.CommandView is CheckBox;
-        //                                                      }
-
-        //                                                      return false;
-        //                                                  }).Cast<Shortcut> ();
-
-        //    foreach (Shortcut sh in cbShortcuts)
-        //    {
-        //        eventSource.Add ($"  {sh.Id} - {((CheckBox)sh.CommandView).CheckedState}");
-        //        eventLog.MoveDown ();
-        //    }
-        //}
-
-        //foreach (var view in _popoverMenu.SubViews.Where (s => s is Shortcut)!)
-        //{
-        //    var sh = (Shortcut)view;
-
-        //    sh.Accepting += (o, args) =>
-        //                    {
-        //                        eventSource.Add ($"shortcut.Accepting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
-        //                        eventLog.MoveDown ();
-        //                    };
-        //}
-
-        //menuLikeExamples.MouseClick += MenuLikeExamplesMouseClick;
-
-        //void MenuLikeExamplesMouseClick (object? sender, MouseEventArgs e)
-        //{
-        //    if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
-        //    {
-        //        _popoverMenu.Arrangement = ViewArrangement.Overlapped;
-
-        //        _popoverMenu.X = e.ScreenPosition.X;
-        //        _popoverMenu.Y = e.ScreenPosition.Y;
-        //        _popoverMenu.Visible = true;
-
-        //        Application.Popover.Visible = true;
-        //    }
-        //}
+        void MenuLikeExamplesMouseClick (object sender, MouseEventArgs e)
+        {
+            if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
+            {
+                popOverMenu.X = e.Position.X;
+                popOverMenu.Y = e.Position.Y;
+                popOverMenu.Visible = true;
+                //popOverMenu.Enabled = popOverMenu.Visible;
+                popOverMenu.SetFocus ();
+            }
+            else
+            {
+                popOverMenu.Visible = false;
+                //popOverMenu.Enabled = popOverMenu.Visible;
+            }
+        }
 
         FrameView statusBarLikeExamples = new ()
         {
@@ -288,64 +250,18 @@ public class Bars : Scenario
         ConfigStatusBar (bar);
         statusBarLikeExamples.Add (bar);
 
-        foreach (var view in Application.Top.SubViews.Where (f => f is FrameView)!)
+        foreach (FrameView frameView in Application.Top.SubViews.Where (f => f is FrameView)!)
         {
-            var frameView = (FrameView)view;
-            frameView.Accepting += (o, args) =>
-                                   {
-                                       eventSource.Add ($"Accepting: {frameView?.Id}");
-                                       eventLog.MoveDown ();
-                                       args.Cancel = true;
-                                   };
-
-            foreach (var view1 in frameView.SubViews.Where (b => b is Bar || b is MenuBarv2 || b is Menuv2)!)
+            foreach (Bar barView in frameView.SubViews.Where (b => b is Bar)!)
             {
-                var barView = (Bar)view1;
-                barView.Accepting += (o, args) =>
-                                     {
-                                         eventSource.Add ($"Accepting: {barView!.Id} {args.Context.Command}");
-                                         eventLog.MoveDown ();
-                                         args.Cancel = true;
-                                     };
-
-                barView.Selecting += (o, args) =>
-                                     {
-                                         eventSource.Add ($"Selecting: {barView!.Id} {args.Context.Command}");
-                                         eventLog.MoveDown ();
-                                         args.Cancel = false;
-                                     };
-
-                if (barView is Menuv2 menuv2)
+                foreach (Shortcut sh in barView.SubViews.Where (s => s is Shortcut)!)
                 {
-                    menuv2.Accepted += (o, args) =>
-                                                     {
-                                                         if (args.Context is CommandContext<KeyBinding> { Binding.Data: MenuItemv2 { } sc })
-                                                         {
-                                                             eventSource.Add ($"Accepted: {sc.Id} {args.Context.Command}");
-                                                         }
-
-                                                         eventLog.MoveDown ();
-                                                     };
-
-                }
-
-                foreach (var view2 in barView.SubViews.Where (s => s is Shortcut)!)
-                {
-                    var sh = (Shortcut)view2;
-
                     sh.Accepting += (o, args) =>
-                                    {
-                                        eventSource.Add ($"Accepting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
-                                        eventLog.MoveDown ();
-                                        args.Cancel = true;
-                                    };
-
-                    sh.Selecting += (o, args) =>
-                                    {
-                                        eventSource.Add ($"Selecting: {sh!.SuperView?.Id} {sh!.CommandView.Text}");
-                                        eventLog.MoveDown ();
-                                        args.Cancel = false;
-                                    };
+                                 {
+                                     eventSource.Add ($"Accept: {sh!.SuperView.Id} {sh!.CommandView.Text}");
+                                     eventLog.MoveDown ();
+                                     //args.Handled = true;
+                                 };
                 }
             }
         }
@@ -493,108 +409,34 @@ public class Bars : Scenario
     //}
 
 
-    //private void ConfigMenuBar (Bar bar)
-    //{
-    //    Menuv2? fileMenu = new ContextMenuv2 ([
-    //                                              new (bar, Command.Open, "_Open...", "Open a file")
-    //        ])
-    //    {
-    //        Id = "fileMenu",
-    //    };
+    private void ConfigMenuBar (Bar bar)
+    {
+        var fileMenuBarItem = new Shortcut
+        {
+            Title = "_File",
+            HelpText = "File Menu",
+            Key = Key.D0.WithAlt,
+            HighlightStyle = HighlightStyle.Hover
+        };
 
-    //    //ConfigureMenu (fileMenu);
+        var editMenuBarItem = new Shortcut
+        {
+            Title = "_Edit",
+            HelpText = "Edit Menu",
+            Key = Key.D1.WithAlt,
+            HighlightStyle = HighlightStyle.Hover
+        };
 
-    //    var fileMenuBarItem = new MenuItemv2 (fileMenu, Command.Context, "_File", "File Menu")
-    //    {
-    //        Id = "fileMenuBarItem",
-    //        Key = Key.D0.WithAlt,
-    //        HighlightStyle = HighlightStyle.Hover,
-    //    };
-    //    fileMenu.Visible = false;
-    //    Application.Popover.Add (fileMenu);
+        var helpMenuBarItem = new Shortcut
+        {
+            Title = "_Help",
+            HelpText = "Halp Menu",
+            Key = Key.D2.WithAlt,
+            HighlightStyle = HighlightStyle.Hover
+        };
 
-    //    Application.Popover.VisibleChanged += (sender, args) =>
-    //                                              {
-    //                                                  if (!Application.Popover.Visible)
-    //                                                  {
-    //                                                      fileMenu.Visible = false;
-    //                                                  }
-    //                                              };
-
-    //    fileMenuBarItem.HasFocusChanged += (sender, args) =>
-    //                                {
-    //                                    Rectangle screen = fileMenuBarItem.FrameToScreen ();
-    //                                    fileMenu.X = screen.X;
-    //                                    fileMenu.Y = screen.Y + screen.Height;
-    //                                    fileMenu.Visible = args.NewValue;
-    //                                };
-
-
-    //    fileMenuBarItem.Disposing += (sender, args) => fileMenu?.Dispose ();
-
-    //    fileMenuBarItem.Accepting += (sender, args) =>
-    //                                 {
-    //                                     Rectangle screen = fileMenuBarItem.FrameToScreen ();
-    //                                     fileMenu.X = screen.X;
-    //                                     fileMenu.Y = screen.Y + screen.Height;
-    //                                     fileMenu.Visible = true;
-    //                                     Application.Popover.Visible = true;
-    //                                 };
-
-
-    //    Menuv2? editMenu = new ContextMenuv2
-    //    {
-    //        Id = "editMenu",
-    //    };
-    //    ConfigureMenu (editMenu);
-
-    //    var editMenuBarItem = new MenuItemv2 (editMenu, Command.Edit, "_Edit", "Edit Menu")
-    //    {
-    //        Title = "_Edit",
-    //        HighlightStyle = HighlightStyle.Hover
-    //    };
-    //    editMenu.Visible = false;
-    //    Application.Popover.Add (editMenu);
-
-    //    Application.Popover.VisibleChanged += (sender, args) =>
-    //                                              {
-    //                                                  if (!Application.Popover.Visible)
-    //                                                  {
-    //                                                      editMenu.Visible = false;
-    //                                                  }
-    //                                              };
-
-    //    editMenuBarItem.HasFocusChanged += (sender, args) =>
-    //                                       {
-    //                                           Rectangle screen = editMenuBarItem.FrameToScreen ();
-    //                                           editMenu.X = screen.X;
-    //                                           editMenu.Y = screen.Y + screen.Height;
-    //                                           editMenu.Visible = args.NewValue;
-    //                                       };
-
-
-    //    editMenuBarItem.Disposing += (sender, args) => editMenu?.Dispose ();
-
-    //    editMenuBarItem.Accepting += (sender, args) =>
-    //                                 {
-    //                                     Rectangle screen = editMenuBarItem.FrameToScreen ();
-    //                                     editMenu.X = screen.X;
-    //                                     editMenu.Y = screen.Y + screen.Height;
-    //                                     editMenu.Visible = true;
-    //                                     Application.Popover.Visible = true;
-    //                                 };
-
-
-    //    var helpMenuBarItem = new Shortcut
-    //    {
-    //        Title = "_Help",
-    //        HelpText = "Halp Menu",
-    //        Key = Key.D2.WithAlt,
-    //        HighlightStyle = HighlightStyle.Hover
-    //    };
-
-    //    bar.Add (fileMenuBarItem, editMenuBarItem, helpMenuBarItem);
-    //}
+        bar.Add (fileMenuBarItem, editMenuBarItem, helpMenuBarItem);
+    }
 
     private void ConfigureMenu (Bar bar)
     {
@@ -679,8 +521,6 @@ public class Bars : Scenario
                 Text = "_Show/Hide"
             },
         };
-        // This ensures the checkbox state toggles when the hotkey of Title is pressed.
-        shortcut.Accepting += (sender, args) => args.Cancel = true;
 
         bar.Add (shortcut);
 
@@ -716,7 +556,7 @@ public class Bars : Scenario
 
         return;
 
-        void Button_Clicked (object? sender, EventArgs e) { MessageBox.Query ("Hi", $"You clicked {sender}"); }
+        void Button_Clicked (object sender, EventArgs e) { MessageBox.Query ("Hi", $"You clicked {sender}"); }
 
     }
 

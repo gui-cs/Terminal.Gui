@@ -39,7 +39,7 @@ public class MenuItemv2 : Shortcut
     /// <param name="commandText">The text to display for the command.</param>
     /// <param name="helpText">The help text to display.</param>
     /// <param name="subMenu"></param>
-    public MenuItemv2 (View targetView, Command command, string commandText, string? helpText = null, Menuv2? subMenu = null)
+    public MenuItemv2 (View? targetView, Command command, string commandText, string? helpText = null, Menuv2? subMenu = null)
         : base (
                 targetView?.HotKeyBindings.GetFirstFromCommands (command)!,
                 commandText,
@@ -148,32 +148,6 @@ public class MenuItemv2 : Shortcut
     /// </para>
     /// </remarks>
     public event EventHandler<CommandEventArgs>? Accepted;
-
-
-
-    ///// <inheritdoc />
-    //public override Attribute GetNormalColor ()
-    //{
-    //    if (HasFocus || SubMenu is { Visible: true })
-    //    {
-    //        return base.GetFocusColor ();
-    //    }
-
-    //    return base.GetNormalColor ();
-
-    //}
-
-    ///// <inheritdoc />
-    //public override Attribute GetHotNormalColor ()
-    //{
-    //    if (HasFocus || SubMenu is { Visible: true })
-    //    {
-    //        return base.GetHotFocusColor ();
-    //    }
-
-    //    return base.GetHotNormalColor ();
-
-    //}
 
     /// <inheritdoc />
     protected override void Dispose (bool disposing)
