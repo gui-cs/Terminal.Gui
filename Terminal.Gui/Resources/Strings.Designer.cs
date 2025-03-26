@@ -1474,6 +1474,150 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to _Copy.
+        /// </summary>
+        internal static string cmd_Copy {
+            get {
+                return ResourceManager.GetString("cmd.Copy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy to clipboard.
+        /// </summary>
+        internal static string cmd_Copy_Help {
+            get {
+                return ResourceManager.GetString("cmd.Copy.Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cu_t.
+        /// </summary>
+        internal static string cmd_Cut {
+            get {
+                return ResourceManager.GetString("cmd.Cut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cut to clipboard.
+        /// </summary>
+        internal static string cmd_Cut_Help {
+            get {
+                return ResourceManager.GetString("cmd.Cut.Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _New file.
+        /// </summary>
+        internal static string cmd_New {
+            get {
+                return ResourceManager.GetString("cmd.New", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New file.
+        /// </summary>
+        internal static string cmd_New_Help {
+            get {
+                return ResourceManager.GetString("cmd.New.Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Open....
+        /// </summary>
+        internal static string cmd_Open {
+            get {
+                return ResourceManager.GetString("cmd.Open", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open a file.
+        /// </summary>
+        internal static string cmd_Open_Help {
+            get {
+                return ResourceManager.GetString("cmd.Open.Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Paste.
+        /// </summary>
+        internal static string cmd_Paste {
+            get {
+                return ResourceManager.GetString("cmd.Paste", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Paste from clipboard.
+        /// </summary>
+        internal static string cmd_Paste_Help {
+            get {
+                return ResourceManager.GetString("cmd.Paste.Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Save.
+        /// </summary>
+        internal static string cmd_Save {
+            get {
+                return ResourceManager.GetString("cmd.Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        internal static string cmd_Save_Help {
+            get {
+                return ResourceManager.GetString("cmd.Save.Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save _As....
+        /// </summary>
+        internal static string cmd_SaveAs {
+            get {
+                return ResourceManager.GetString("cmd.SaveAs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save file as.
+        /// </summary>
+        internal static string cmd_SaveAs_Help {
+            get {
+                return ResourceManager.GetString("cmd.SaveAs.Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selec_t all.
+        /// </summary>
+        internal static string cmd_SelectAll {
+            get {
+                return ResourceManager.GetString("cmd.SelectAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select all.
+        /// </summary>
+        internal static string cmd_SelectAll_Help {
+            get {
+                return ResourceManager.GetString("cmd.SelectAll.Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Co_lors.
         /// </summary>
         internal static string ctxColors {

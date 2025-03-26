@@ -739,4 +739,52 @@
   <data name="failedGetting" xml:space="preserve">
     <value>failed getting</value>
   </data>
+  <data name="cmd.Open" xml:space="preserve">
+    <value>_Open...</value>
+  </data>
+  <data name="cmd.Save" xml:space="preserve">
+    <value>_Save</value>
+  </data>
+  <data name="cmd.SaveAs" xml:space="preserve">
+    <value>Save _As...</value>
+  </data>
+  <data name="cmd.Cut" xml:space="preserve">
+    <value>Cu_t</value>
+  </data>
+  <data name="cmd.Copy" xml:space="preserve">
+    <value>_Copy</value>
+  </data>
+  <data name="cmd.Paste" xml:space="preserve">
+    <value>_Paste</value>
+  </data>
+  <data name="cmd.SelectAll" xml:space="preserve">
+    <value>Selec_t all</value>
+  </data>
+  <data name="cmd.New" xml:space="preserve">
+    <value>_New file</value>
+  </data>
+  <data name="cmd.Open.Help" xml:space="preserve">
+    <value>Open a file</value>
+  </data>
+  <data name="cmd.Save.Help" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="cmd.SaveAs.Help" xml:space="preserve">
+    <value>Save file as</value>
+  </data>
+  <data name="cmd.Cut.Help" xml:space="preserve">
+    <value>Cut to clipboard</value>
+  </data>
+  <data name="cmd.Copy.Help" xml:space="preserve">
+    <value>Copy to clipboard</value>
+  </data>
+  <data name="cmd.Paste.Help" xml:space="preserve">
+    <value>Paste from clipboard</value>
+  </data>
+  <data name="cmd.SelectAll.Help" xml:space="preserve">
+    <value>Select all</value>
+  </data>
+  <data name="cmd.New.Help" xml:space="preserve">
+    <value>New file</value>
+  </data>
 </root>

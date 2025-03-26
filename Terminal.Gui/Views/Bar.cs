@@ -20,7 +20,7 @@ public class Bar : View, IOrientation, IDesignable
     public Bar () : this ([]) { }
 
     /// <inheritdoc/>
-    public Bar (IEnumerable<Shortcut>? shortcuts)
+    public Bar (IEnumerable<View>? shortcuts)
     {
         CanFocus = true;
 
@@ -35,7 +35,7 @@ public class Bar : View, IOrientation, IDesignable
 
         if (shortcuts is { })
         {
-            foreach (Shortcut shortcut in shortcuts)
+            foreach (View shortcut in shortcuts)
             {
                 Add (shortcut);
             }

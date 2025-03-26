@@ -10,7 +10,7 @@ public class Menuv2 : Bar
     public Menuv2 () : this ([]) { }
 
     /// <inheritdoc/>
-    public Menuv2 (IEnumerable<Shortcut> shortcuts) : base (shortcuts)
+    public Menuv2 (IEnumerable<View> shortcuts) : base (shortcuts)
     {
         Orientation = Orientation.Vertical;
         Width = Dim.Auto ();
@@ -73,6 +73,13 @@ public class Menuv2 : Bar
                 Logging.Trace ($"Accepted: {e.Context?.Source?.Title}");
                 RaiseAccepted (e.Context);
             }
+        }
+
+        if (view is Line line)
+        {
+            // Grow line so we get autojoin line
+            line.X = Pos.Func (() => -Border!.Thickness.Left);
+            line.Width = Dim.Fill ()! + Dim.Func (() => Border!.Thickness.Right);
         }
     }
 

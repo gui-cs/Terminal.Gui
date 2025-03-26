@@ -95,7 +95,6 @@ public class MenusV2 : Scenario
     public class TargetView : View
     {
         internal PopoverMenu? FilePopoverMenu { get; }
-        internal PopoverMenu? EditPopoverMenu { get; }
 
         private CheckBox? _enableOverwriteCb;
         private CheckBox? _autoSaveCb;
@@ -150,18 +149,18 @@ public class MenusV2 : Scenario
             Add (lastCommandLabel, lastCommandText);
 
             AddCommand (Command.New, HandleCommand);
-            HotKeyBindings.Add (Key.N.WithAlt, Command.New);
+            HotKeyBindings.Add (Key.N.WithCtrl, Command.New);
 
             AddCommand (Command.Open, HandleCommand);
-            HotKeyBindings.Add (Key.O.WithAlt, Command.Open);
+            HotKeyBindings.Add (Key.O.WithCtrl, Command.Open);
 
             AddCommand (Command.Save, HandleCommand);
-            HotKeyBindings.Add (Key.S.WithAlt, Command.Save);
+            HotKeyBindings.Add (Key.S.WithCtrl, Command.Save);
 
             AddCommand (Command.SaveAs, HandleCommand);
-            HotKeyBindings.Add (Key.A.WithAlt, Command.SaveAs);
+            HotKeyBindings.Add (Key.A.WithCtrl, Command.SaveAs);
 
-            HotKeyBindings.Add (Key.W.WithAlt, Command.EnableOverwrite);
+            HotKeyBindings.Add (Key.W.WithCtrl, Command.EnableOverwrite);
 
             var fileMenu = new Menuv2
             {
@@ -215,30 +214,29 @@ public class MenusV2 : Scenario
             AddCommand (Command.Paste, HandleCommand);
             HotKeyBindings.Add (Key.V.WithCtrl, Command.Paste);
 
-            var editMenu = new Menuv2
-            {
-                Id = "editMenu"
-            };
-            ConfigureEditMenu (editMenu);
+            AddCommand (Command.SelectAll, HandleCommand);
+            HotKeyBindings.Add (Key.T.WithCtrl, Command.SelectAll);
 
-            EditPopoverMenu = new (editMenu)
-            {
-                Id = "EditPopoverMenu"
-            };
-
-            MenuBarItemv2 editMenuRootItem = new (this, Command.NotBound, "_Edit", null, EditPopoverMenu)
-            {
-                Id = "editMenuRootItem"
-            };
-
-            MenuBarItemv2 helpMenuRootItem = new (this, Command.NotBound, "_Help", "Show Help")
-            {
-                Id = "helpMenuRootItem",
-                Key = Key.F1,
-                Action = () => { MessageBox.Query ("Help", "This is the help...", "_Ok"); }
-            };
-
-            MenuBarv2 menuBar = new ([fileMenuRootItem, editMenuRootItem, helpMenuRootItem])
+            MenuBarv2 menuBar = new (
+                                     [
+                                         fileMenuRootItem,
+                                         new MenuBarItemv2 (
+                                                              "_Edit",
+                                                              [
+                                                                  new MenuItemv2 (this, Command.Cut),
+                                                                  new MenuItemv2 (this, Command.Copy),
+                                                                  new MenuItemv2 (this, Command.Paste),
+                                                                  new Line (),
+                                                                  new MenuItemv2 (this, Command.SelectAll)
+                                                              ]
+                                                             ),
+                                         new MenuBarItemv2 (this, Command.NotBound, "_Help", "Show Help")
+                                         {
+                                             Key = Key.F1,
+                                             Action = () => { MessageBox.Query ("Help", "This is the help...", "_Ok"); }
+                                         }
+                                     ]
+                                    )
             {
                 Id = "rootMenu"
             };
@@ -332,43 +330,25 @@ public class MenusV2 : Scenario
         {
             var newFile = new MenuItemv2
             {
-                Title = "_New",
-                Text = "New File",
                 Command = Command.New,
                 TargetView = this
             };
 
             var openFile = new MenuItemv2
             {
-                Title = "_Open...",
-                Text = "Open File",
                 Command = Command.Open,
                 TargetView = this
             };
 
             var saveFile = new MenuItemv2
             {
-                Title = "_Save",
-                Text = "Save file",
                 Command = Command.Save,
                 TargetView = this
             };
 
-            var saveFileAs = new MenuItemv2
-            {
-                Title = "Save _As...",
-                Text = "Save file as",
-                Command = Command.SaveAs,
-                TargetView = this
-            };
+            var saveFileAs = new MenuItemv2 (this, Command.SaveAs);
 
-            var line = new Line
-            {
-                X = -1,
-                Width = Dim.Fill ()! + 1
-            };
-
-            menu.Add (newFile, openFile, saveFile, saveFileAs, line);
+            menu.Add (newFile, openFile, saveFile, saveFileAs, new Line ());
         }
 
         private void ConfigureOptionsSubMenu (Menuv2 menu)
@@ -384,7 +364,7 @@ public class MenusV2 : Scenario
                 Key = Key.F10
             };
 
-            autoSave.CommandView = _autoSaveCb = new()
+            autoSave.CommandView = _autoSaveCb = new ()
             {
                 Title = autoSave.Title,
                 HighlightStyle = HighlightStyle.None,
@@ -403,7 +383,7 @@ public class MenusV2 : Scenario
                 TargetView = this
             };
 
-            enableOverwrite.CommandView = _enableOverwriteCb = new()
+            enableOverwrite.CommandView = _enableOverwriteCb = new ()
             {
                 Title = enableOverwrite.Title,
                 HighlightStyle = HighlightStyle.None,
@@ -411,12 +391,6 @@ public class MenusV2 : Scenario
             };
 
             _enableOverwriteCb.Accepting += (sender, args) => args.Cancel = true;
-
-            var line = new Line
-            {
-                X = -1,
-                Width = Dim.Fill ()! + 1
-            };
 
             var thirdItem = new MenuItemv2
             {
@@ -434,7 +408,7 @@ public class MenusV2 : Scenario
             // This ensures the checkbox state toggles when the hotkey of Title is pressed.
             // shortcut4.Accepting += (sender, args) => args.Cancel = true;
 
-            menu.Add (autoSave, enableOverwrite, line, thirdItem, forthItem);
+            menu.Add (autoSave, enableOverwrite, new Line (), thirdItem, forthItem);
         }
 
         private void ConfigureDetialsSubMenu (Menuv2 menu)
@@ -449,12 +423,6 @@ public class MenusV2 : Scenario
             {
                 Title = "_Three",
                 Text = "The 3rd item"
-            };
-
-            var line = new Line
-            {
-                X = -1,
-                Width = Dim.Fill ()! + 1
             };
 
             var shortcut4 = new MenuItemv2
@@ -475,7 +443,7 @@ public class MenusV2 : Scenario
             // This ensures the checkbox state toggles when the hotkey of Title is pressed.
             //shortcut4.Accepting += (sender, args) => args.Cancel = true;
 
-            menu.Add (shortcut2, shortcut3, line, shortcut4);
+            menu.Add (shortcut2, shortcut3, new Line (), shortcut4);
         }
 
         private void ConfigureMoreDetailsSubMenu (Menuv2 menu)
@@ -487,12 +455,6 @@ public class MenusV2 : Scenario
                 Action = () => { MessageBox.Query ("Deeper Detail", "Lots of details", "_Ok"); }
             };
 
-            var line = new Line
-            {
-                X = -1,
-                Width = Dim.Fill ()! + 1
-            };
-
             var shortcut4 = new MenuItemv2
             {
                 Title = "_Third",
@@ -502,33 +464,7 @@ public class MenusV2 : Scenario
             // This ensures the checkbox state toggles when the hotkey of Title is pressed.
             //shortcut4.Accepting += (sender, args) => args.Cancel = true;
 
-            menu.Add (deeperDetail, line, shortcut4);
-        }
-
-        private void ConfigureEditMenu (Menuv2 menu)
-        {
-            var cut = new MenuItemv2
-            {
-                Title = "_Cut",
-                Command = Command.Cut,
-                TargetView = this
-            };
-
-            var copy = new MenuItemv2
-            {
-                Title = "C_opy",
-                Command = Command.Copy,
-                TargetView = this
-            };
-
-            var paste = new MenuItemv2
-            {
-                Title = "_Paste",
-                Command = Command.Paste,
-                TargetView = this
-            };
-
-            menu.Add (cut, copy, paste);
+            menu.Add (deeperDetail, new Line (), shortcut4);
         }
 
         /// <inheritdoc/>

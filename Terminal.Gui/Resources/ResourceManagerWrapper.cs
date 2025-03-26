@@ -80,7 +80,7 @@ internal class ResourceManagerWrapper (ResourceManager resourceManager)
         // If the string is empty or null, fall back to the invariant culture
         if (string.IsNullOrEmpty (value))
         {
-            value = _resourceManager.GetString (name, CultureInfo.InvariantCulture)!;
+            value = _resourceManager.GetString (name, CultureInfo.InvariantCulture) ?? string.Empty;
         }
 
         return value;

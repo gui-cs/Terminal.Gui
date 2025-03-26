@@ -1,6 +1,8 @@
 #nullable enable
 
 using System.ComponentModel;
+using Microsoft.VisualBasic;
+using Terminal.Gui.Resources;
 
 namespace Terminal.Gui;
 
@@ -34,12 +36,13 @@ public class MenuItemv2 : Shortcut
     /// <param name="commandText">The text to display for the command.</param>
     /// <param name="helpText">The help text to display.</param>
     /// <param name="subMenu">The submenu to display when the user selects this menu item.</param>
-    public MenuItemv2 (View? targetView, Command command, string commandText, string? helpText = null, Menuv2? subMenu = null)
+    public MenuItemv2 (View? targetView, Command command, string? commandText = null, string? helpText = null, Menuv2? subMenu = null)
         : base (
                 targetView?.HotKeyBindings.GetFirstFromCommands (command)!,
-                commandText,
+                string.IsNullOrEmpty (commandText) ? GlobalResources.GetString($"cmd.{command}") : commandText,
                 null,
-                helpText)
+                string.IsNullOrEmpty (helpText) ? GlobalResources.GetString ($"cmd.{command}.Help") : helpText
+               )
     {
         TargetView = targetView;
         Command = command;
@@ -61,11 +64,33 @@ public class MenuItemv2 : Shortcut
     /// </summary>
     public View? TargetView { get; set; }
 
+    private Command _command;
+
     /// <summary>
     ///     Gets the <see cref="Command"/> that will be invoked on <see cref="TargetView"/> when the MenuItem is selected.
     /// </summary>
-    public Command Command { get; set; }
+    public Command Command
+    {
+        get => _command;
+        set
+        {
+            if (_command == value)
+            {
+                return;
+            }
+            _command = value;
 
+            if (string.IsNullOrEmpty (Title))
+            {
+                Title = GlobalResources.GetString ($"cmd.{_command}");
+            }
+
+            if (string.IsNullOrEmpty (HelpText))
+            {
+                HelpText = GlobalResources.GetString ($"cmd.{_command}.Help");
+            }
+        }
+    }
 
     internal override bool? DispatchCommand (ICommandContext? commandContext)
     {

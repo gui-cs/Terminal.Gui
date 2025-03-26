@@ -34,17 +34,52 @@ public class MenuBarItemv2 : MenuItemv2
     /// <param name="commandText">The text to display for the command.</param>
     /// <param name="helpText">The help text to display.</param>
     /// <param name="popoverMenu">The Popover Menu that will be displayed when this item is selected.</param>
-    public MenuBarItemv2 (View? targetView, Command command, string commandText, string? helpText = null, PopoverMenu? popoverMenu = null)
+    public MenuBarItemv2 (View? targetView, Command command, string? commandText, string? helpText = null, PopoverMenu? popoverMenu = null)
         : base (
                 targetView,
                 command,
-                commandText, null,
+                commandText, 
+                null,
                 null)
     {
         TargetView = targetView;
         Command = command;
         PopoverMenu = popoverMenu;
     }
+
+
+    /// <summary>
+    ///     Creates a new instance of <see cref="MenuBarItemv2"/>
+    /// </summary>
+    /// <remarks>
+    /// </remarks>
+    /// <param name="commandText">The text to display for the command.</param>
+    /// <param name="popoverMenu">The Popover Menu that will be displayed when this item is selected.</param>
+    public MenuBarItemv2 (string commandText, PopoverMenu? popoverMenu = null)
+        : this (
+                null,
+                Command.NotBound,
+                commandText,
+                null,
+                popoverMenu)
+    { }
+
+
+    /// <summary>
+    ///     Creates a new instance of <see cref="MenuBarItemv2"/>
+    /// </summary>
+    /// <remarks>
+    /// </remarks>
+    /// <param name="commandText">The text to display for the command.</param>
+    /// <param name="menuItems">The menu items that will be added to the Popover Menu that will be displayed when this item is selected.</param>
+    public MenuBarItemv2 (string commandText, IEnumerable<View> menuItems)
+        : this (
+                null,
+                Command.NotBound,
+                commandText,
+                null,
+                new PopoverMenu(new Menuv2(menuItems)))
+    { }
 
     // TODO: Hide base.SubMenu?
 
