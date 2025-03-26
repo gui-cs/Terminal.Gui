@@ -184,25 +184,25 @@
     <value>Cou_leurs</value>
   </data>
   <data name="cmd.Open" xml:space="preserve">
-    <value />
+    <value>_Ouvrir</value>
   </data>
   <data name="cmd.Save" xml:space="preserve">
-    <value />
+    <value>_Enregistrer</value>
   </data>
   <data name="cmd.SaveAs" xml:space="preserve">
-    <value />
+    <value>E_nregistrer sous</value>
   </data>
   <data name="cmd.Cut" xml:space="preserve">
-    <value />
+    <value>Co_uper</value>
   </data>
   <data name="cmd.Copy" xml:space="preserve">
-    <value />
+    <value>_Copier</value>
   </data>
   <data name="cmd.Paste" xml:space="preserve">
-    <value />
+    <value>C_oller</value>
   </data>
   <data name="cmd.SelectAll" xml:space="preserve">
-    <value />
+    <value>Tout _sélectionner</value>
   </data>
   <data name="cmd.New" xml:space="preserve">
     <value />

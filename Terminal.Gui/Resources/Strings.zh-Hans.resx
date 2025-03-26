@@ -280,28 +280,28 @@
     <value>旗帜 (_L)</value>
   </data>
   <data name="cmd.Open" xml:space="preserve">
-    <value />
+    <value>打开 (_O)</value>
   </data>
   <data name="cmd.Save" xml:space="preserve">
-    <value />
+    <value>保存 (_S)</value>
   </data>
   <data name="cmd.SaveAs" xml:space="preserve">
-    <value />
+    <value>另存为 (_A)</value>
   </data>
   <data name="cmd.Cut" xml:space="preserve">
-    <value />
+    <value>剪切 (_T)</value>
   </data>
   <data name="cmd.Copy" xml:space="preserve">
-    <value />
+    <value>复制 (_C)</value>
   </data>
   <data name="cmd.Paste" xml:space="preserve">
-    <value />
+    <value>粘贴 (_P)</value>
   </data>
   <data name="cmd.SelectAll" xml:space="preserve">
-    <value />
+    <value>全选 (_S)</value>
   </data>
   <data name="cmd.New" xml:space="preserve">
-    <value />
+    <value>新建 (_N)</value>
   </data>
   <data name="cmd.Open.Help" xml:space="preserve">
     <value />

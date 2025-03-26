@@ -184,25 +184,25 @@
     <value>Co_res</value>
   </data>
   <data name="cmd.Open" xml:space="preserve">
-    <value />
+    <value>_Abrir</value>
   </data>
   <data name="cmd.Save" xml:space="preserve">
-    <value />
+    <value>_Guardar</value>
   </data>
   <data name="cmd.SaveAs" xml:space="preserve">
-    <value />
+    <value>Guardar _como</value>
   </data>
   <data name="cmd.Cut" xml:space="preserve">
-    <value />
+    <value>Cor_tar</value>
   </data>
   <data name="cmd.Copy" xml:space="preserve">
-    <value />
+    <value>_Copiar</value>
   </data>
   <data name="cmd.Paste" xml:space="preserve">
-    <value />
+    <value>Co_lar</value>
   </data>
   <data name="cmd.SelectAll" xml:space="preserve">
-    <value />
+    <value>_Selecionar Tudo</value>
   </data>
   <data name="cmd.New" xml:space="preserve">
     <value />

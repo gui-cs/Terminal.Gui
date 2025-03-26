@@ -20,7 +20,13 @@ public static class ColorStrings
     /// <returns><see langword="null"/> if there is no standard color name for the specified color.</returns>
     public static string? GetW3CColorName (Color color)
     {
-        return GlobalResources.GetString ($"#{color.R:X2}{color.G:X2}{color.B:X2}", CultureInfo.CurrentUICulture);
+        var str = GlobalResources.GetString ($"#{color.R:X2}{color.G:X2}{color.B:X2}", CultureInfo.CurrentUICulture);
+
+        if (string.IsNullOrWhiteSpace (str))
+        {
+            return null;
+        }
+        return str;
     }
 
     /// <summary>

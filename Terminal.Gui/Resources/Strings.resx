@@ -758,7 +758,7 @@
     <value>_Paste</value>
   </data>
   <data name="cmd.SelectAll" xml:space="preserve">
-    <value>Selec_t all</value>
+    <value>_Select all</value>
   </data>
   <data name="cmd.New" xml:space="preserve">
     <value>_New file</value>

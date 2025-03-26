@@ -112,7 +112,10 @@ public class ResourceManagerTests
     }
 
     [Fact]
-    public void GetString_Does_Not_Overflows_If_Key_Does_Not_Exist () { Assert.Null (GlobalResources.GetString (NO_EXISTENT_KEY, CultureInfo.CurrentCulture)); }
+    public void GetString_Does_Not_Overflows_If_Key_Does_Not_Exist ()
+    {
+        Assert.Null (GlobalResources.GetString (NO_EXISTENT_KEY, CultureInfo.CurrentCulture));
+    }
 
     [Fact]
     public void GetString_FallBack_To_Default_For_No_Existent_Culture_File ()

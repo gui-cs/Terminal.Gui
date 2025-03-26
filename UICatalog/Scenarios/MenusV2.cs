@@ -217,31 +217,27 @@ public class MenusV2 : Scenario
             AddCommand (Command.SelectAll, HandleCommand);
             HotKeyBindings.Add (Key.T.WithCtrl, Command.SelectAll);
 
-            MenuBarv2 menuBar = new (
-                                     [
-                                         fileMenuRootItem,
-                                         new MenuBarItemv2 (
-                                                              "_Edit",
-                                                              [
-                                                                  new MenuItemv2 (this, Command.Cut),
-                                                                  new MenuItemv2 (this, Command.Copy),
-                                                                  new MenuItemv2 (this, Command.Paste),
-                                                                  new Line (),
-                                                                  new MenuItemv2 (this, Command.SelectAll)
-                                                              ]
-                                                             ),
-                                         new MenuBarItemv2 (this, Command.NotBound, "_Help", "Show Help")
-                                         {
-                                             Key = Key.F1,
-                                             Action = () => { MessageBox.Query ("Help", "This is the help...", "_Ok"); }
-                                         }
-                                     ]
-                                    )
-            {
-                Id = "rootMenu"
-            };
-
-            Add (menuBar);
+            Add (new MenuBarv2 (
+                                [
+                                    fileMenuRootItem,
+                                    new MenuBarItemv2 (
+                                                       "_Edit",
+                                                       [
+                                                           new MenuItemv2 (this, Command.Cut),
+                                                           new MenuItemv2 (this, Command.Copy),
+                                                           new MenuItemv2 (this, Command.Paste),
+                                                           new Line (),
+                                                           new MenuItemv2 (this, Command.SelectAll)
+                                                       ]
+                                                      ),
+                                    new MenuBarItemv2 (this, Command.NotBound, "_Help", "Show Help")
+                                    {
+                                        Key = Key.F1,
+                                        Action = () => { MessageBox.Query ("Help", "This is the help...", "_Ok"); }
+                                    }
+                                ]
+                               )
+                 );
 
             Label lastAcceptedLabel = new ()
             {

@@ -280,28 +280,28 @@
     <value>絵の具 (_L)</value>
   </data>
   <data name="cmd.Open" xml:space="preserve">
-    <value />
+    <value>開く (_O)</value>
   </data>
   <data name="cmd.Save" xml:space="preserve">
-    <value />
+    <value>保存 (_S)</value>
   </data>
   <data name="cmd.SaveAs" xml:space="preserve">
-    <value />
+    <value>名前を付けて保存(_A)</value>
   </data>
   <data name="cmd.Cut" xml:space="preserve">
-    <value />
+    <value>切り取り (_T)</value>
   </data>
   <data name="cmd.Copy" xml:space="preserve">
-    <value />
+    <value>コピー (_C)</value>
   </data>
   <data name="cmd.Paste" xml:space="preserve">
     <value />
   </data>
   <data name="cmd.SelectAll" xml:space="preserve">
-    <value />
+    <value>全て選択 (_S)</value>
   </data>
   <data name="cmd.New" xml:space="preserve">
-    <value />
+    <value>新規 (_N)</value>
   </data>
   <data name="cmd.Open.Help" xml:space="preserve">
     <value />

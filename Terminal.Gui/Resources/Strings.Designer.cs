@@ -1600,7 +1600,7 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Selec_t all.
+        ///   Looks up a localized string similar to _Select all.
         /// </summary>
         internal static string cmd_SelectAll {
             get {
