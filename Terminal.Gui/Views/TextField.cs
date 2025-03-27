@@ -903,9 +903,6 @@ public class TextField : View
         else if (ev.Flags == PopoverMenu.MouseFlags)
         {
             PositionCursor (ev);
-
-            ContextMenu!.X = ev.ScreenPosition.X;
-            ContextMenu!.Y = ev.ScreenPosition.Y + 1;
             ShowContextMenu (false);
         }
 

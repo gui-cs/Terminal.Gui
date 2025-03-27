@@ -130,7 +130,13 @@ public class PopoverMenu : PopoverBaseImpl
         {
             Point pos = idealScreenPosition.Value;
 
-            pos = GetMostVisibleLocationForSubMenu (Root, ScreenToViewport (pos));
+            if (!Root.IsInitialized)
+            {
+                Root.BeginInit();
+                Root.EndInit ();
+                Root.Layout ();
+            }
+            pos = GetMostVisibleLocationForSubMenu (Root, pos);
 
             Root.X = pos.X;
             Root.Y = pos.Y;
