@@ -112,7 +112,6 @@ public class ContextMenus : Scenario
                                    new MenuItemv2
                                    {
                                        Title = "C_ultures",
-                                       Id = "cultures",
                                        SubMenu = new (GetSupportedCultures ())
                                    },
                                    new Line (),
@@ -120,7 +119,6 @@ public class ContextMenus : Scenario
                                    {
                                        Title = "_Configuration...",
                                        HelpText = "Show configuration",
-                                       Id = "config",
                                        Action = () => MessageBox.Query (
                                                                         50,
                                                                         10,
@@ -132,14 +130,12 @@ public class ContextMenus : Scenario
                                    new MenuItemv2
                                    {
                                        Title = "M_ore options",
-                                       Id = "more",
                                        SubMenu = new (
                                                       [
                                                           new MenuItemv2
                                                           {
                                                               Title = "_Setup...",
                                                               HelpText = "Perform setup",
-                                                              Id = "setup",
                                                               Action = () => MessageBox
                                                                            .Query (
                                                                                    50,
@@ -154,7 +150,6 @@ public class ContextMenus : Scenario
                                                           {
                                                               Title = "_Maintenance...",
                                                               HelpText = "Maintenance mode",
-                                                              Id = "maintenence",
                                                               Action = () => MessageBox
                                                                            .Query (
                                                                                    50,
