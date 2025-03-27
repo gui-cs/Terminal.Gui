@@ -31,6 +31,7 @@ public class ApplicationPopover
         if (popover is { } && !_popovers.Contains (popover))
         {
             _popovers.Add (popover);
+
         }
     }
 
@@ -90,6 +91,12 @@ public class ApplicationPopover
         if (popover is View newPopover)
         {
             Register (popover);
+
+            if (!newPopover.IsInitialized)
+            {
+                newPopover.BeginInit();
+                newPopover.EndInit();
+            }
             _activePopover = newPopover as IPopover;
             newPopover.Enabled = true;
             newPopover.Visible = true;

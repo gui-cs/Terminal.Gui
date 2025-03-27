@@ -10,7 +10,7 @@ public class Menuv2 : Bar
     public Menuv2 () : this ([]) { }
 
     /// <inheritdoc/>
-    public Menuv2 (IEnumerable<View> shortcuts) : base (shortcuts)
+    public Menuv2 (IEnumerable<View>? shortcuts) : base (shortcuts)
     {
         Orientation = Orientation.Vertical;
         Width = Dim.Auto ();

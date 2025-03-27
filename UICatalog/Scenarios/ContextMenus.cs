@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
-using System.Threading;
+﻿using System.Globalization;
 using JetBrains.Annotations;
 using Terminal.Gui;
 
@@ -13,6 +10,7 @@ public class ContextMenus : Scenario
 {
     [CanBeNull]
     private ContextMenuv2 _winContextMenu;
+
     private bool _forceMinimumPosToZero = true;
     private MenuItem _miForceMinimumPosToZero;
     private TextField _tfTopLeft, _tfTopRight, _tfMiddle, _tfBottomLeft, _tfBottomRight;
@@ -69,28 +67,25 @@ public class ContextMenus : Scenario
         appWindow.Add (_tfBottomRight);
 
         appWindow.KeyDown += (s, e) =>
-        {
-            if (e.KeyCode == _winContextMenuKey)
-            {
-                ShowWinContextMenu (Application.GetLastMousePosition ());
-                e.Handled = true;
-            }
-        };
+                             {
+                                 if (e.KeyCode == _winContextMenuKey)
+                                 {
+                                     _winContextMenu?.MakeVisible ();
+                                     e.Handled = true;
+                                 }
+                             };
 
         appWindow.MouseClick += (s, e) =>
-        {
-            if (e.Flags == MouseFlags.Button3Clicked)
-            {
-                ShowWinContextMenu (e.ScreenPosition);
-                e.Handled = true;
-            }
-        };
+                                {
+                                    if (e.Flags == MouseFlags.Button3Clicked)
+                                    {
+                                        _winContextMenu?.MakeVisible (e.ScreenPosition);
+                                        e.Handled = true;
+                                    }
+                                };
 
-        var originalCulture = Thread.CurrentThread.CurrentUICulture;
-        appWindow.Closed += (s, e) =>
-        {
-            Thread.CurrentThread.CurrentUICulture = originalCulture;
-        };
+        CultureInfo originalCulture = Thread.CurrentThread.CurrentUICulture;
+        appWindow.Closed += (s, e) => { Thread.CurrentThread.CurrentUICulture = originalCulture; };
 
         // Run - Start the application.
         Application.Run (appWindow);
@@ -100,6 +95,7 @@ public class ContextMenus : Scenario
         // Shutdown - Calling Application.Shutdown is required.
         Application.Shutdown ();
     }
+
     private MenuItemv2 [] GetSupportedCultures ()
     {
         List<MenuItemv2> supportedCultures = new ();
@@ -109,7 +105,7 @@ public class ContextMenus : Scenario
         {
             MenuItemv2 culture = new ();
 
-            culture.CommandView = new CheckBox () { CanFocus = false, HighlightStyle = HighlightStyle.None };
+            culture.CommandView = new CheckBox { CanFocus = false, HighlightStyle = HighlightStyle.None };
 
             if (index == -1)
             {
@@ -117,19 +113,23 @@ public class ContextMenus : Scenario
                 culture.Id = "_English";
                 culture.Title = "_English";
                 culture.HelpText = "en-US";
-                ((CheckBox)culture.CommandView).CheckedState = Thread.CurrentThread.CurrentUICulture.Name == "en-US" ? CheckState.Checked : CheckState.UnChecked;
+
+                ((CheckBox)culture.CommandView).CheckedState =
+                    Thread.CurrentThread.CurrentUICulture.Name == "en-US" ? CheckState.Checked : CheckState.UnChecked;
                 CreateAction (supportedCultures, culture);
                 supportedCultures.Add (culture);
 
                 index++;
                 culture = new ();
-                culture.CommandView = new CheckBox () { CanFocus = false, HighlightStyle = HighlightStyle.None };
+                culture.CommandView = new CheckBox { CanFocus = false, HighlightStyle = HighlightStyle.None };
             }
 
             culture.Id = $"_{c.Parent.EnglishName}";
             culture.Title = $"_{c.Parent.EnglishName}";
             culture.HelpText = c.Name;
-            ((CheckBox)culture.CommandView).CheckedState = Thread.CurrentThread.CurrentUICulture.Name == culture.HelpText ? CheckState.Checked : CheckState.UnChecked;
+
+            ((CheckBox)culture.CommandView).CheckedState =
+                Thread.CurrentThread.CurrentUICulture.Name == culture.HelpText ? CheckState.Checked : CheckState.UnChecked;
             CreateAction (supportedCultures, culture);
             supportedCultures.Add (culture);
         }
@@ -139,14 +139,15 @@ public class ContextMenus : Scenario
         void CreateAction (List<MenuItemv2> cultures, MenuItemv2 culture)
         {
             culture.Action += () =>
-            {
-                Thread.CurrentThread.CurrentUICulture = new (culture.HelpText);
+                              {
+                                  Thread.CurrentThread.CurrentUICulture = new (culture.HelpText);
 
-                foreach (MenuItemv2 item in cultures)
-                {
-                    ((CheckBox)item.CommandView).CheckedState = Thread.CurrentThread.CurrentUICulture.Name == item.HelpText ? CheckState.Checked : CheckState.UnChecked;
-                }
-            };
+                                  foreach (MenuItemv2 item in cultures)
+                                  {
+                                      ((CheckBox)item.CommandView).CheckedState =
+                                          Thread.CurrentThread.CurrentUICulture.Name == item.HelpText ? CheckState.Checked : CheckState.UnChecked;
+                                  }
+                              };
         }
     }
 
@@ -154,38 +155,77 @@ public class ContextMenus : Scenario
     {
         if (_winContextMenu is { })
         {
-           // Application.Popover?.Remove (_winContextMenu);
             _winContextMenu.Dispose ();
             _winContextMenu = null;
         }
 
-        var cultureMenuItems = GetSupportedCultures ();
-        foreach (MenuItemv2 menuItem in cultureMenuItems)
-        {
-            menuItem.Accepting += (sender, args) =>
-                                  {
-                                     // Application.Popover.Visible = false;
-                                      _winContextMenu.Visible = false;
-                                      args.Cancel = false;
-                                  };
-        }
-        _winContextMenu = new (cultureMenuItems)
+        _winContextMenu = new (
+                               [
+                                   new MenuItemv2
+                                   {
+                                       Title = "C_ultures",
+                                       Id = "cultures",
+                                       SubMenu = new (GetSupportedCultures ()),
+                                   },
+                                   new Line (),
+                                   new MenuItemv2
+                                   {
+                                       Title = "_Configuration...",
+                                       HelpText = "Show configuration",
+                                       Id = "config",
+                                       Action = () => MessageBox.Query (
+                                                                        50,
+                                                                        10,
+                                                                        "Configuration",
+                                                                        "This would be a configuration dialog",
+                                                                        "Ok"
+                                                                       )
+                                   },
+                                   new MenuItemv2
+                                   {
+                                       Title = "M_ore options",
+                                       Id = "more",
+                                       SubMenu = new (
+                                                      [
+                                                          new MenuItemv2
+                                                          {
+                                                              Title = "_Setup...",
+                                                              HelpText = "Perform setup",
+                                                              Id = "setup",
+                                                              Action = () => MessageBox
+                                                                           .Query (
+                                                                                   50,
+                                                                                   10,
+                                                                                   "Setup",
+                                                                                   "This would be a setup dialog",
+                                                                                   "Ok"
+                                                                                  ),
+                                                              Key = Key.T.WithCtrl
+                                                          },
+                                                          new MenuItemv2
+                                                          {
+                                                              Title = "_Maintenance...",
+                                                              HelpText = "Maintenance mode",
+                                                              Id = "maintenence",
+                                                              Action = () => MessageBox
+                                                                           .Query (
+                                                                                   50,
+                                                                                   10,
+                                                                                   "Maintenance",
+                                                                                   "This would be a maintenance dialog",
+                                                                                   "Ok"
+                                                                                  )
+                                                          }
+                                                      ])
+                                   }
+                               ])
         {
             Key = _winContextMenuKey,
+            Id = "winContextMenu"
 
-            //Position = new (x, y),
             //ForceMinimumPosToZero = _forceMinimumPosToZero,
             //UseSubMenusSingleFrame = _useSubMenusSingleFrame
         };
-
-        //Application.Popover.Add (_winContextMenu);
-    }
-
-    private void ShowWinContextMenu (Point? screenPosition)
-    {
-        _winContextMenu!.SetPosition (screenPosition);
-        _winContextMenu.Visible = true;
-      //  Application.Popover.Visible = true;
     }
 
     //    MenuBarItem menuItems = new (
@@ -314,10 +354,9 @@ public class ContextMenus : Scenario
     //    _contextMenu.Show (menuItems);
     //}
 
-
     public override List<Key> GetDemoKeyStrokes ()
     {
-        var keys = new List<Key> ();
+        List<Key> keys = new ();
 
         keys.Add (Key.F10.WithShift);
         keys.Add (Key.Esc);

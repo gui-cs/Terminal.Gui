@@ -22,9 +22,8 @@ namespace Terminal.Gui;
 ///     </para>
 ///     <para>The menu will be displayed at the current mouse coordinates.</para>
 /// </summary>
-public class ContextMenuv2 : Menuv2, IDesignable
+public class ContextMenuv2 : PopoverMenu, IDesignable
 {
-    private Key _key = DefaultKey;
 
     /// <summary>
     ///     The mouse flags that will trigger the context menu. The default is <see cref="MouseFlags.Button3Clicked"/> which is typically the right mouse button.
@@ -35,50 +34,12 @@ public class ContextMenuv2 : Menuv2, IDesignable
     public ContextMenuv2 () : this ([]) { }
 
     /// <inheritdoc/>
-    public ContextMenuv2 (IEnumerable<MenuItemv2> menuItems) : base (menuItems)
+    public ContextMenuv2 (IEnumerable<View>? menuItems) : base (new Menuv2 (menuItems))
     {
-        Visible = false;
-        VisibleChanged += OnVisibleChanged;
         Key = DefaultKey;
-        AddCommand (Command.Context,
-                    () =>
-                    {
-                        if (!Enabled)
-                        {
-                            return false;
-                        }
-                        //Application.Popover = this;
-                        SetPosition (Application.GetLastMousePosition ());
-                        Visible = !Visible;
-
-                        return true;
-                    });
-
-        if (menuItems is { })
-        {
-            foreach (var sc in menuItems)
-            {
-                AddCommand (
-                            Command.Accept,
-                            (ctx) => { return sc.TargetView?.InvokeCommand (sc.Command, ctx); });
-            }
-        }
-
-        return;
-
     }
 
-    private void OnVisibleChanged (object? sender, EventArgs _)
-    {
-        if (Visible && SubViews.Count > 0)
-        {
-            SubViews.ElementAt (0).SetFocus ();
-        }
-    }
-
-    /// <summary>The default key for activating the context menu.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key DefaultKey { get; set; } = Key.F10.WithShift;
+    private Key _key = DefaultKey;
 
     /// <summary>Specifies the key that will activate the context menu.</summary>
     public Key Key
@@ -95,34 +56,8 @@ public class ContextMenuv2 : Menuv2, IDesignable
     /// <summary>Event raised when the <see cref="ContextMenu.Key"/> is changed.</summary>
     public event EventHandler<KeyChangedEventArgs>? KeyChanged;
 
-    /// <summary>
-    ///     Sets the position of the ContextMenu. The actual position of the menu will be adjusted to
-    ///     ensure the menu fully fits on the screen, and the mouse cursor is over the first call of the
-    ///     first Shortcut.
-    /// </summary>
-    /// <param name="screenPosition"></param>
-    public void SetPosition (Point? screenPosition)
-    {
-        if (screenPosition is { })
-        {
-            X = screenPosition.Value.X - GetViewportOffsetFromFrame ().X;
-            Y = screenPosition.Value.Y - GetViewportOffsetFromFrame ().Y;
-        }
-    }
-
     /// <inheritdoc />
-    protected override void Dispose (bool disposing)
-    {
-        if (disposing)
-        {
-            Application.KeyBindings.Remove (Key);
-        }
-        base.Dispose (disposing);
-    }
-
-
-    /// <inheritdoc />
-    public override bool EnableForDesign ()
+    public bool EnableForDesign ()
     {
         var shortcut = new Shortcut
         {

@@ -47,13 +47,6 @@ public class MenuItemv2 : Shortcut
         TargetView = targetView;
         Command = command;
 
-        if (subMenu is { })
-        {
-            // TODO: This is a temporary hack - add a flag or something instead
-            KeyView.Text = $"{Glyphs.RightArrow}";
-            subMenu.SuperMenuItem = this;
-        }
-
         SubMenu = subMenu;
     }
 
@@ -118,10 +111,27 @@ public class MenuItemv2 : Shortcut
         return ret;
     }
 
+    private Menuv2? _subMenu;
+
     /// <summary>
     ///     The submenu to display when the user selects this menu item.
     /// </summary>
-    public Menuv2? SubMenu { get; set; }
+    public Menuv2? SubMenu
+    {
+        get => _subMenu;
+        set
+        {
+            _subMenu = value;
+
+            if (_subMenu is { })
+            {
+                // TODO: This is a temporary hack - add a flag or something instead
+                KeyView.Text = $"{Glyphs.RightArrow}";
+                _subMenu.SuperMenuItem = this;
+            }
+
+        }
+    }
 
     /// <inheritdoc />
     protected override bool OnMouseEnter (CancelEventArgs eventArgs)

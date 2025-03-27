@@ -800,7 +800,7 @@ public class TextField : View
             && !ev.Flags.HasFlag (MouseFlags.ReportMousePosition)
             && !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
             && !ev.Flags.HasFlag (MouseFlags.Button1TripleClicked)
-            && !ev.Flags.HasFlag (ContextMenu!.MouseFlags))
+            && !ev.Flags.HasFlag (PopoverMenu.MouseFlags))
         {
             return false;
         }
@@ -900,7 +900,7 @@ public class TextField : View
             ClearAllSelection ();
             PrepareSelection (0, _text.Count);
         }
-        else if (ev.Flags == ContextMenu?.MouseFlags)
+        else if (ev.Flags == PopoverMenu.MouseFlags)
         {
             PositionCursor (ev);
 
@@ -1779,22 +1779,18 @@ public class TextField : View
 
             if (ContextMenu is { })
             {
-                Point currentLoc = ContextMenu.Frame.Location;
-
                 CreateContextMenu ();
-                ContextMenu!.X = currentLoc.X;
-                ContextMenu!.Y = currentLoc.Y;
             }
         }
 
         if (keyboard)
         {
-            Point loc = ViewportToScreen (new Point (_cursorPosition - ScrollOffset, 1));
-            ContextMenu!.X = loc.X;
-            ContextMenu!.Y = loc.Y;
+            ContextMenu?.MakeVisible(ViewportToScreen (new Point (_cursorPosition - ScrollOffset, 1)));
         }
-        //Application.Popover = ContextMenu;
-        ContextMenu!.Visible = true;
+        else
+        {
+            ContextMenu?.MakeVisible ();
+        }
     }
 
     private void TextField_SuperViewChanged (object sender, SuperViewChangedEventArgs e)

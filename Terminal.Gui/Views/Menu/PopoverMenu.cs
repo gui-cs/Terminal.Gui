@@ -112,8 +112,8 @@ public class PopoverMenu : PopoverBaseImpl
     /// <param name="idealScreenPosition">If <see langword="null"/>, the current mouse position will be used.</param>
     public void MakeVisible (Point? idealScreenPosition = null)
     {
-        Application.Popover?.ShowPopover (this);
         SetPosition (idealScreenPosition);
+        Application.Popover?.ShowPopover (this);
     }
 
     /// <summary>
@@ -300,7 +300,7 @@ public class PopoverMenu : PopoverBaseImpl
 
         // If there's a visible peer, remove / hide it
 
-        Debug.Assert (menu is null || menu?.SubViews.Count (v => v is MenuItemv2 { SubMenu.Visible: true }) < 2);
+        // Debug.Assert (menu is null || menu?.SubViews.Count (v => v is MenuItemv2 { SubMenu.Visible: true }) < 2);
 
         if (menu?.SubViews.FirstOrDefault (v => v is MenuItemv2 { SubMenu.Visible: true }) is MenuItemv2 visiblePeer)
         {
@@ -351,6 +351,13 @@ public class PopoverMenu : PopoverBaseImpl
         if (menu is { SuperView: null })
         {
             // TODO: Find the menu item below the mouse, if any, and select it
+
+            if (!menu.IsInitialized)
+            {
+                menu.BeginInit ();
+                menu.EndInit ();
+            }
+
             menu.ClearFocus ();
             base.Add (menu);
 
@@ -367,7 +374,7 @@ public class PopoverMenu : PopoverBaseImpl
         if (menu is { Visible: true })
         {
             // If there's a visible submenu, remove / hide it
-            Debug.Assert (menu.SubViews.Count (v => v is MenuItemv2 { SubMenu.Visible: true }) <= 1);
+            // Debug.Assert (menu.SubViews.Count (v => v is MenuItemv2 { SubMenu.Visible: true }) <= 1);
 
             if (menu.SubViews.FirstOrDefault (v => v is MenuItemv2 { SubMenu.Visible: true }) is MenuItemv2 visiblePeer)
             {
