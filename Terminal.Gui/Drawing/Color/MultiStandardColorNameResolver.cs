@@ -1,8 +1,8 @@
-﻿using System.Collections.Frozen;
+﻿#nullable enable
+
+using System.Collections.Frozen;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-
-#nullable enable
 
 namespace Terminal.Gui;
 
@@ -13,16 +13,16 @@ public class MultiStandardColorNameResolver : IColorNameResolver
 {
     private static readonly AnsiColorNameResolver Ansi = new();
     private static readonly W3cColorNameResolver W3c = new();
-    private static readonly FrozenDictionary<int, string> W3cBlockedColorNameHashMap;
     private static readonly FrozenSet<Color> W3cBlockedColors;
     private static readonly ImmutableArray<string> CombinedColorNames;
+    private static readonly FrozenDictionary<int, (string Name, Color Color)> W3cSubstituteColors;
 
     static MultiStandardColorNameResolver ()
     {
         HashSet<string> combinedNames = new(Ansi.GetColorNames());
 
-        HashSet<string> w3cInconsistentColorNames = new(StringComparer.OrdinalIgnoreCase);
         HashSet<Color> w3cInconsistentColors = new();
+        Dictionary<string, Color> w3cSubstituteColors = new(StringComparer.OrdinalIgnoreCase);
 
         IEnumerable<string> enumerableW3cNames = W3c.GetColorNames ();
         IReadOnlyList<string> w3cNames =  enumerableW3cNames is IReadOnlyList<string> alreadyReadOnlyList
@@ -41,61 +41,66 @@ public class MultiStandardColorNameResolver : IColorNameResolver
             .Where(g => g.Count() > 1)
             .ToDictionary(g => g.Key, g => g.ToHashSet());
 
-        // Gather inconsistencies between ANSI and W3C, filter out problematic W3C names and
-        // create additional blocklists for W3C names and colors.
+        // Gather inconsistencies between ANSI and W3C, filter out or substitute problematic W3C colors and names,
+        // and create additional blocklist for W3C colors.
         // Blocking and filtering is only applied to W3C because this resolver prioritizes ANSI for backwards compatibility.
         // It would be a lot simpler to just prioritize W3C colors and names.
         foreach (string w3cName in w3cNames)
         {
-            if (w3cInconsistentColorNames.Contains (w3cName))
+            if (w3cSubstituteColors.ContainsKey (w3cName))
             {
-                // Already blocked, most likely through alternative name.
+                // Already dealt with alternative name.
                 continue;
             }
 
             if (!W3c.TryParseColor (w3cName, out Color w3cColor))
             {
                 // This condition is just inverted to reduce indentation.
-                // This should practically never happen if the W3C color name resolver is properly implemented.
+                // Also it should practically never happen if the W3C color name resolver is properly implemented.
                 throw new InvalidOperationException ($"W3C color name '{w3cName}' does not resolve to any color.");
             }
 
             if (w3cColorsWithAlternativeNames.TryGetValue (w3cColor, out var names))
             {
-                bool blocked = false;
+                bool substituted = false;
                 // Alternative names cause issues with ColorPicker etc. when combined with ANSI and prioritizing ANSI resolver.
                 // For example Aqua is not in ColorName16 but the actual color value resolves to ANSI Cyan
                 // so autocomplete for Aqua suddenly changes to Cyan because they happen to have same color value in both color scheme.
                 // Also DarkGrey would cause inconsistencies because the alternative DarkGray exists in ANSI and has different color value.
                 foreach (string name in names)
                 {
-                    if (Ansi.TryParseColor (name, out _))
+                    if (Ansi.TryParseColor (name, out Color substituteColor))
                     {
-                        w3cInconsistentColors.Add (w3cColor);
-                        // Block all if one is inconsistent.
-                        foreach (string inconsistentName in names)
+                        // Block the W3C color when it is inconsistent with the substitute color
+                        // so there is no situation where W3C color -> color name -> ANSI color.
+                        if (w3cColor != substituteColor)
                         {
-                            w3cInconsistentColorNames.Add (inconsistentName);
+                            w3cInconsistentColors.Add (w3cColor);
                         }
-                        blocked = true;
+
+                        // Substitute all W3C alternatives to match with the ANSI color to keep colors consistent.
+                        foreach (string alternativeName in names)
+                        {
+                            w3cSubstituteColors.Add (alternativeName, substituteColor);
+                            combinedNames.Add (alternativeName);
+                        }
+                        substituted = true;
                         break;
                     }
                 }
 
-                if (blocked)
+                if (substituted)
                 {
-                    // Already blocked continue to next W3C color name.
+                    // Already dealt with, continue to next W3C color name.
                     continue;
                 }
             }
 
-            // Just in case check.
             // Same name, different ANSI value.
             // For example both #767676 (ColorName16) and #A9A9A9 (W3C) resolve to DarkGray,
-            // although a bad example because it is already filtered due to also having alternative names.
+            // although a bad example because it is already substituted due to also having alternative names.
             if (Ansi.TryParseColor (w3cName, out Color ansiColor) && w3cColor != ansiColor)
             {
-                w3cInconsistentColorNames.Add (w3cName);
                 w3cInconsistentColors.Add (w3cColor);
                 continue;
             }
@@ -104,12 +109,11 @@ public class MultiStandardColorNameResolver : IColorNameResolver
         }
 
         // TODO: Utilize .NET 9 and later alternative lookup for matching ReadOnlySpan<char> with string.
-        W3cBlockedColorNameHashMap = w3cInconsistentColorNames.ToFrozenDictionary (
+        W3cSubstituteColors = w3cSubstituteColors.ToFrozenDictionary (
             // Workaround for alternative lookup not being available in .NET 8 by matching ReadOnlySpan<char> hash code to string hash code.
-            keySelector: x => string.GetHashCode (x, StringComparison.OrdinalIgnoreCase),
-            // String element is just for verifying hash code collision, e.g. same hash code but the name was different.
-            // Quite unlikely due to small data set, but still possible.
-            elementSelector: x => x);
+            keySelector: kvp => string.GetHashCode (kvp.Key, StringComparison.OrdinalIgnoreCase),
+            // The string element is for detecting hash collision.
+            elementSelector: kvp => (kvp.Key, kvp.Value));
         W3cBlockedColors = w3cInconsistentColors.ToFrozenSet ();
         CombinedColorNames = combinedNames.Order ().ToImmutableArray ();
     }
@@ -130,8 +134,7 @@ public class MultiStandardColorNameResolver : IColorNameResolver
         }
 
         if (!IsBlockedW3cColor (color) &&
-            W3c.TryNameColor (color, out string? w3cName) &&
-            !IsBlockedW3cName (w3cName))
+            W3c.TryNameColor (color, out string? w3cName))
         {
             name = w3cName;
             return true;
@@ -149,8 +152,12 @@ public class MultiStandardColorNameResolver : IColorNameResolver
             return true;
         }
 
-        if (!IsBlockedW3cName (name) &&
-            W3c.TryParseColor (name, out color) &&
+        if (GetSubstituteW3cColor (name, out color))
+        {
+            return true;
+        }
+
+        if (W3c.TryParseColor (name, out color) &&
             !IsBlockedW3cColor (color))
         {
             return true;
@@ -160,14 +167,21 @@ public class MultiStandardColorNameResolver : IColorNameResolver
         return false;
     }
 
-    private bool IsBlockedW3cName (ReadOnlySpan<char> name)
+    private static bool GetSubstituteW3cColor (ReadOnlySpan<char> name, out Color substituteColor)
     {
         int nameHashCode = string.GetHashCode(name, StringComparison.OrdinalIgnoreCase);
-        return W3cBlockedColorNameHashMap.TryGetValue (nameHashCode, out string? inconsistentColorName) &&
-            name.Equals (inconsistentColorName, StringComparison.OrdinalIgnoreCase);
+        if (W3cSubstituteColors.TryGetValue (nameHashCode, out var match) &&
+            match is (string matchName, Color matchColor) &&
+            name.Equals (matchName, StringComparison.OrdinalIgnoreCase))
+        {
+            substituteColor = matchColor;
+            return true;
+        }
+        substituteColor = default;
+        return false;
     }
 
-    private bool IsBlockedW3cColor (Color color)
+    private static bool IsBlockedW3cColor (Color color)
     {
         return W3cBlockedColors.Contains (color);
     }

@@ -39,7 +39,11 @@ public class MultiStandardColorNameResolverTests
     [InlineData (nameof (W3cColor.Violet))]
     [InlineData (nameof (W3cColor.WhiteSmoke))]
     [InlineData (nameof (W3cColor.YellowGreen))]
-    // W3C color names that do not clash with ANSI color names.
+    // W3C alternatives.
+    [InlineData (nameof (W3cColor.Grey))]
+    [InlineData (nameof (W3cColor.DarkGrey))]
+    [InlineData (nameof (W3cColor.Aqua))]
+    [InlineData (nameof (W3cColor.Fuchsia))]
     [InlineData (nameof (W3cColor.DarkSlateGray))]
     [InlineData (nameof (W3cColor.DarkSlateGrey))]
     [InlineData (nameof (W3cColor.DimGray))]
@@ -48,22 +52,10 @@ public class MultiStandardColorNameResolverTests
     [InlineData (nameof (W3cColor.LightGrey))]
     [InlineData (nameof (W3cColor.SlateGray))]
     [InlineData (nameof (W3cColor.SlateGrey))]
-
     public void GetNames_ContainsCombinationOfAnsiAndW3cNames (string name)
     {
         string[] names = _candidate.GetColorNames ().ToArray();
         Assert.Contains (name, names);
-    }
-
-    [Theory]
-    [InlineData (nameof (W3cColor.Grey))]
-    [InlineData (nameof (W3cColor.DarkGrey))]
-    [InlineData (nameof (W3cColor.Aqua))]
-    [InlineData (nameof (W3cColor.Fuchsia))]
-    public void GetNames_OmitsBlockedW3cAlternativeNames (string name)
-    {
-        string[] names = _candidate.GetColorNames ().ToArray();
-        Assert.DoesNotContain (name, names);
     }
 
     [Theory]
@@ -156,6 +148,11 @@ public class MultiStandardColorNameResolverTests
     [InlineData (nameof (ColorName16.Red), 255, 0, 0)]
     [InlineData (nameof (ColorName16.White), 255, 255, 255)]
     [InlineData (nameof (ColorName16.Yellow), 255, 255, 0)]
+    // W3C color name => substituted ANSI color
+    [InlineData (nameof (W3cColor.Fuchsia), 255, 0, 255)] // ANSI Magenta
+    [InlineData (nameof (W3cColor.DarkGrey), 118, 118, 118)] // ANSI Dark Gray
+    [InlineData (nameof (W3cColor.Grey), 128, 128, 128)] // ANSI Gray
+    [InlineData (nameof (W3cColor.Aqua), 0, 255, 255)] // ANSI Cyan
     // W3C colors
     [InlineData (nameof (W3cColor.AliceBlue), 240, 248, 255)]
     [InlineData (nameof (W3cColor.BlanchedAlmond), 255, 235, 205)]
