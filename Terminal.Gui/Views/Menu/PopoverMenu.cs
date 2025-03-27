@@ -298,6 +298,10 @@ public class PopoverMenu : PopoverBaseImpl
     {
         var menu = menuItem?.SuperView as Menuv2;
 
+        if (menu is { })
+        {
+            menu.Layout ();
+        }
         // If there's a visible peer, remove / hide it
 
         // Debug.Assert (menu is null || menu?.SubViews.Count (v => v is MenuItemv2 { SubMenu.Visible: true }) < 2);

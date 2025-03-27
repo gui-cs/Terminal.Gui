@@ -10,14 +10,8 @@ public class ContextMenus : Scenario
 {
     [CanBeNull]
     private ContextMenuv2 _winContextMenu;
-
-    private bool _forceMinimumPosToZero = true;
-    private MenuItem _miForceMinimumPosToZero;
     private TextField _tfTopLeft, _tfTopRight, _tfMiddle, _tfBottomLeft, _tfBottomRight;
-    private bool _useSubMenusSingleFrame;
-
     private readonly List<CultureInfo> _cultureInfos = Application.SupportedCultures;
-
     private readonly Key _winContextMenuKey = Key.Space.WithCtrl;
 
     public override void Main ()
@@ -66,23 +60,8 @@ public class ContextMenus : Scenario
         _tfBottomRight = new () { Id = "_tfBottomRight", X = Pos.AnchorEnd (width), Y = Pos.AnchorEnd (1), Width = width, Text = text };
         appWindow.Add (_tfBottomRight);
 
-        appWindow.KeyDown += (s, e) =>
-                             {
-                                 if (e.KeyCode == _winContextMenuKey)
-                                 {
-                                     _winContextMenu?.MakeVisible ();
-                                     e.Handled = true;
-                                 }
-                             };
-
-        appWindow.MouseClick += (s, e) =>
-                                {
-                                    if (e.Flags == MouseFlags.Button3Clicked)
-                                    {
-                                        _winContextMenu?.MakeVisible (e.ScreenPosition);
-                                        e.Handled = true;
-                                    }
-                                };
+        appWindow.KeyDown += OnAppWindowOnKeyDown;
+        appWindow.MouseClick += OnAppWindowOnMouseClick;
 
         CultureInfo originalCulture = Thread.CurrentThread.CurrentUICulture;
         appWindow.Closed += (s, e) => { Thread.CurrentThread.CurrentUICulture = originalCulture; };
@@ -90,64 +69,33 @@ public class ContextMenus : Scenario
         // Run - Start the application.
         Application.Run (appWindow);
         appWindow.Dispose ();
+        appWindow.KeyDown -= OnAppWindowOnKeyDown;
+        appWindow.MouseClick -= OnAppWindowOnMouseClick;
         _winContextMenu?.Dispose ();
 
         // Shutdown - Calling Application.Shutdown is required.
         Application.Shutdown ();
-    }
 
-    private MenuItemv2 [] GetSupportedCultures ()
-    {
-        List<MenuItemv2> supportedCultures = new ();
-        int index = -1;
+        return;
 
-        foreach (CultureInfo c in _cultureInfos)
+        void OnAppWindowOnMouseClick (object s, MouseEventArgs e)
         {
-            MenuItemv2 culture = new ();
-
-            culture.CommandView = new CheckBox { CanFocus = false, HighlightStyle = HighlightStyle.None };
-
-            if (index == -1)
+            if (e.Flags == MouseFlags.Button3Clicked)
             {
-                // Create English because GetSupportedCutures doesn't include it
-                culture.Id = "_English";
-                culture.Title = "_English";
-                culture.HelpText = "en-US";
-
-                ((CheckBox)culture.CommandView).CheckedState =
-                    Thread.CurrentThread.CurrentUICulture.Name == "en-US" ? CheckState.Checked : CheckState.UnChecked;
-                CreateAction (supportedCultures, culture);
-                supportedCultures.Add (culture);
-
-                index++;
-                culture = new ();
-                culture.CommandView = new CheckBox { CanFocus = false, HighlightStyle = HighlightStyle.None };
+                // ReSharper disable once AccessToDisposedClosure
+                _winContextMenu?.MakeVisible (e.ScreenPosition);
+                e.Handled = true;
             }
-
-            culture.Id = $"_{c.Parent.EnglishName}";
-            culture.Title = $"_{c.Parent.EnglishName}";
-            culture.HelpText = c.Name;
-
-            ((CheckBox)culture.CommandView).CheckedState =
-                Thread.CurrentThread.CurrentUICulture.Name == culture.HelpText ? CheckState.Checked : CheckState.UnChecked;
-            CreateAction (supportedCultures, culture);
-            supportedCultures.Add (culture);
         }
 
-        return supportedCultures.ToArray ();
-
-        void CreateAction (List<MenuItemv2> cultures, MenuItemv2 culture)
+        void OnAppWindowOnKeyDown (object s, Key e)
         {
-            culture.Action += () =>
-                              {
-                                  Thread.CurrentThread.CurrentUICulture = new (culture.HelpText);
-
-                                  foreach (MenuItemv2 item in cultures)
-                                  {
-                                      ((CheckBox)item.CommandView).CheckedState =
-                                          Thread.CurrentThread.CurrentUICulture.Name == item.HelpText ? CheckState.Checked : CheckState.UnChecked;
-                                  }
-                              };
+            if (e.KeyCode == _winContextMenuKey)
+            {
+                // ReSharper disable once AccessToDisposedClosure
+                _winContextMenu?.MakeVisible ();
+                e.Handled = true;
+            }
         }
     }
 
@@ -165,7 +113,7 @@ public class ContextMenus : Scenario
                                    {
                                        Title = "C_ultures",
                                        Id = "cultures",
-                                       SubMenu = new (GetSupportedCultures ()),
+                                       SubMenu = new (GetSupportedCultures ())
                                    },
                                    new Line (),
                                    new MenuItemv2
@@ -217,142 +165,73 @@ public class ContextMenus : Scenario
                                                                                   )
                                                           }
                                                       ])
+                                   },
+                                   new Line (),
+                                   new MenuItemv2
+                                   {
+                                       Title = "_Quit",
+                                       Action = () => Application.RequestStop ()
                                    }
                                ])
         {
-            Key = _winContextMenuKey,
-            Id = "winContextMenu"
-
-            //ForceMinimumPosToZero = _forceMinimumPosToZero,
-            //UseSubMenusSingleFrame = _useSubMenusSingleFrame
+            Key = _winContextMenuKey
         };
     }
 
-    //    MenuBarItem menuItems = new (
-    //                                 new []
-    //                                 {
-    //                                     new MenuBarItem (
-    //                                                      "_Languages",
-    //                                                      GetSupportedCultures ()
-    //                                                     ),
-    //                                     new (
-    //                                          "_Configuration",
-    //                                          "Show configuration",
-    //                                          () => MessageBox.Query (
-    //                                                                  50,
-    //                                                                  5,
-    //                                                                  "Info",
-    //                                                                  "This would open settings dialog",
-    //                                                                  "Ok"
-    //                                                                 )
-    //                                         ),
-    //                                     new MenuBarItem (
-    //                                                      "M_ore options",
-    //                                                      new MenuItem []
-    //                                                      {
-    //                                                          new (
-    //                                                               "_Setup",
-    //                                                               "Change settings",
-    //                                                               () => MessageBox
-    //                                                                   .Query (
-    //                                                                           50,
-    //                                                                           5,
-    //                                                                           "Info",
-    //                                                                           "This would open setup dialog",
-    //                                                                           "Ok"
-    //                                                                          ),
-    //                                                               shortcutKey: KeyCode.T
-    //                                                                            | KeyCode
-    //                                                                                .CtrlMask
-    //                                                              ),
-    //                                                          new (
-    //                                                               "_Maintenance",
-    //                                                               "Maintenance mode",
-    //                                                               () => MessageBox
-    //                                                                   .Query (
-    //                                                                           50,
-    //                                                                           5,
-    //                                                                           "Info",
-    //                                                                           "This would open maintenance dialog",
-    //                                                                           "Ok"
-    //                                                                          )
-    //                                                              )
-    //                                                      }
-    //                                                     ),
-    //                                     _miForceMinimumPosToZero =
-    //                                         new (
-    //                                              "Fo_rceMinimumPosToZero",
-    //                                              "",
-    //                                              () =>
-    //                                              {
-    //                                                  _miForceMinimumPosToZero
-    //                                                          .Checked =
-    //                                                      _forceMinimumPosToZero =
-    //                                                          !_forceMinimumPosToZero;
+    private MenuItemv2 [] GetSupportedCultures ()
+    {
+        List<MenuItemv2> supportedCultures = [];
+        int index = -1;
 
-    //                                                  _tfTopLeft.ContextMenu
-    //                                                            .ForceMinimumPosToZero =
-    //                                                      _forceMinimumPosToZero;
+        foreach (CultureInfo c in _cultureInfos)
+        {
+            MenuItemv2 culture = new ();
 
-    //                                                  _tfTopRight.ContextMenu
-    //                                                             .ForceMinimumPosToZero =
-    //                                                      _forceMinimumPosToZero;
+            culture.CommandView = new CheckBox { CanFocus = false, HighlightStyle = HighlightStyle.None };
 
-    //                                                  _tfMiddle.ContextMenu
-    //                                                           .ForceMinimumPosToZero =
-    //                                                      _forceMinimumPosToZero;
+            if (index == -1)
+            {
+                // Create English because GetSupportedCutures doesn't include it
+                culture.Id = "_English";
+                culture.Title = "_English";
+                culture.HelpText = "en-US";
 
-    //                                                  _tfBottomLeft.ContextMenu
-    //                                                               .ForceMinimumPosToZero =
-    //                                                      _forceMinimumPosToZero;
+                ((CheckBox)culture.CommandView).CheckedState =
+                    Thread.CurrentThread.CurrentUICulture.Name == "en-US" ? CheckState.Checked : CheckState.UnChecked;
+                CreateAction (supportedCultures, culture);
+                supportedCultures.Add (culture);
 
-    //                                                  _tfBottomRight
-    //                                                          .ContextMenu
-    //                                                          .ForceMinimumPosToZero =
-    //                                                      _forceMinimumPosToZero;
-    //                                              }
-    //                                             )
-    //                                         {
-    //                                             CheckType =
-    //                                                 MenuItemCheckStyle
-    //                                                     .Checked,
-    //                                             Checked =
-    //                                                 _forceMinimumPosToZero
-    //                                         },
-    //                                     _miUseSubMenusSingleFrame =
-    //                                         new (
-    //                                              "Use_SubMenusSingleFrame",
-    //                                              "",
-    //                                              () => _contextMenu
-    //                                                            .UseSubMenusSingleFrame =
-    //                                                        (bool)
-    //                                                        (_miUseSubMenusSingleFrame
-    //                                                                 .Checked =
-    //                                                             _useSubMenusSingleFrame =
-    //                                                                 !_useSubMenusSingleFrame)
-    //                                             )
-    //                                         {
-    //                                             CheckType = MenuItemCheckStyle
-    //                                                 .Checked,
-    //                                             Checked =
-    //                                                 _useSubMenusSingleFrame
-    //                                         },
-    //                                     null,
-    //                                     new (
-    //                                          "_Quit",
-    //                                          "",
-    //                                          () => Application.RequestStop ()
-    //                                         )
-    //                                 }
-    //                                );
-    //    _tfTopLeft.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
-    //    _tfTopRight.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
-    //    _tfMiddle.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
-    //    _tfBottomLeft.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
-    //    _tfBottomRight.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
+                index++;
+                culture = new ();
+                culture.CommandView = new CheckBox { CanFocus = false, HighlightStyle = HighlightStyle.None };
+            }
 
-    //    _contextMenu.Show (menuItems);
-    //}
+            culture.Id = $"_{c.Parent.EnglishName}";
+            culture.Title = $"_{c.Parent.EnglishName}";
+            culture.HelpText = c.Name;
+
+            ((CheckBox)culture.CommandView).CheckedState =
+                Thread.CurrentThread.CurrentUICulture.Name == culture.HelpText ? CheckState.Checked : CheckState.UnChecked;
+            CreateAction (supportedCultures, culture);
+            supportedCultures.Add (culture);
+        }
+
+        return supportedCultures.ToArray ();
+
+        void CreateAction (List<MenuItemv2> cultures, MenuItemv2 culture)
+        {
+            culture.Action += () =>
+                              {
+                                  Thread.CurrentThread.CurrentUICulture = new (culture.HelpText);
+
+                                  foreach (MenuItemv2 item in cultures)
+                                  {
+                                      ((CheckBox)item.CommandView).CheckedState =
+                                          Thread.CurrentThread.CurrentUICulture.Name == item.HelpText ? CheckState.Checked : CheckState.UnChecked;
+                                  }
+                              };
+        }
+    }
 
     public override List<Key> GetDemoKeyStrokes ()
     {
