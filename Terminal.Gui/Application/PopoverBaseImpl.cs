@@ -27,12 +27,11 @@ public abstract class PopoverBaseImpl : View, IPopover
         Width = Dim.Fill ();
         Height = Dim.Fill ();
         ViewportSettings = ViewportSettings.Transparent | ViewportSettings.TransparentMouse;
-        //ColorScheme = Colors.ColorSchemes ["Error"];
 
-        // TODO: Add a diagnostic setting for this?
-        TextFormatter.VerticalAlignment = Alignment.End;
-        TextFormatter.Alignment = Alignment.End;
-        base.Text = "popover";
+        //// TODO: Add a diagnostic setting for this?
+        //TextFormatter.VerticalAlignment = Alignment.End;
+        //TextFormatter.Alignment = Alignment.End;
+        //base.Text = "popover";
 
         AddCommand (Command.Quit, Quit);
         KeyBindings.Add (Application.QuitKey, Command.Quit);
