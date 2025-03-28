@@ -76,7 +76,7 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         // If the active popover is a PopoverMenu and part of this MenuBar...
         if (menuBarItem?.PopoverMenu is null
-            && Application.Popover!.GetActivePopover () is PopoverMenu popoverMenu
+            && Application.Popover?.GetActivePopover () is PopoverMenu popoverMenu
             && popoverMenu?.Root?.SuperMenuItem?.SuperView == this)
         {
             Application.Popover?.HidePopover (popoverMenu);

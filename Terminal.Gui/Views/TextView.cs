@@ -2290,7 +2290,6 @@ public class TextView : View
                     Command.Context,
                     () =>
                     {
-                        ContextMenu!.SetPosition (new (CursorPosition.X - _leftColumn + 2, CursorPosition.Y - _topRow + 2));
                         ShowContextMenu (true);
 
                         return true;
@@ -6338,15 +6337,7 @@ public class TextView : View
             _currentCulture = Thread.CurrentThread.CurrentUICulture;
         }
 
-        if (keyboard)
-        {
-            Point loc = new Point (CursorPosition.X - _leftColumn, CursorPosition.Y - _topRow + 2);
-            ContextMenu!.X = loc.X;
-            ContextMenu!.Y = loc.Y;
-        }
-
-        //Application.Popover = ContextMenu;
-        ContextMenu!.Visible = true;
+        ContextMenu?.MakeVisible(ViewportToScreen(new Point (CursorPosition.X, CursorPosition.Y)));
     }
 
     private void StartSelecting ()
