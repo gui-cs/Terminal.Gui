@@ -1020,6 +1020,7 @@ public partial class View // Layout APIs
 
     // BUGBUG: This method interferes with Dialog/MessageBox default min/max size.
     // TODO: Get rid of MenuBar coupling as part of https://github.com/gui-cs/Terminal.Gui/issues/2975
+    // TODO: Refactor / rewrite this - It's a mess
     /// <summary>
     ///     Gets a new location of the <see cref="View"/> that is within the Viewport of the <paramref name="viewToMove"/>'s
     ///     <see cref="View.SuperView"/> (e.g. for dragging a Window). The `out` parameters are the new X and Y coordinates.

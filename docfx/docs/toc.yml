@@ -30,6 +30,8 @@
   href: mainloop.md
 - name: Navigation
   href: navigation.md
+- name: Popovers
+  href: Popovers.md
 - name: View Deep Dive
   href: View.md  
 - name: View List

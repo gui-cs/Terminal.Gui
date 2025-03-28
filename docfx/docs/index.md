@@ -33,6 +33,7 @@ See [What's New in V2 For more](newinv2.md).
 * [Mouse API](mouse.md)
 * [Multi-tasking and the Application Main Loop](mainloop.md)
 * [Navigation](navigation.md)
+* [Popovers](Popovers.md)
 * [View Deep Dive](View.md)
 * [Views](views.md)
 * [Scrolling Deep Dive](scrolling.md)
