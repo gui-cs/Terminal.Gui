@@ -1,8 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿#nullable enable
+
+using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui;
-
-#nullable enable
 
 /// <summary>
 ///     When implemented by a class, allows mapping <see cref="Color"/> to
