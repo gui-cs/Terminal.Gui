@@ -565,7 +565,6 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         ArgumentNullException.ThrowIfNull (runState);
 
         Popover?.HidePopover (Popover?.GetActivePopover());
-        Popover = null;
 
         runState.Toplevel.OnUnloaded ();
 

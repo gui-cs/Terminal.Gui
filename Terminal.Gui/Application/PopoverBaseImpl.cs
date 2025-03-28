@@ -58,23 +58,22 @@ public abstract class PopoverBaseImpl : View, IPopover
         bool ret = base.OnVisibleChanging ();
         if (!ret & !Visible)
         {
-            //ColorScheme ??= Application.Top?.ColorScheme;
-            //Frame = Application.Screen;
-
-            SetRelativeLayout (Application.Screen.Size);
+            // Whenvver visible is changing to true, we need to resize;
+            // it's our only chance because we don't get laid out until we're visible
+            Layout (Application.Screen.Size);
         }
 
         return ret;
     }
 
-
-    /// <inheritdoc />
-    protected override void OnVisibleChanged ()
-    {
-        base.OnVisibleChanged ();
-        if (Visible)
-        {
-            SetFocus ();
-        }
-    }
+    // TODO: Pretty sure this is not needed. set_Visible SetFocus already
+    ///// <inheritdoc />
+    //protected override void OnVisibleChanged ()
+    //{
+    //    base.OnVisibleChanged ();
+    //    if (Visible)
+    //    {
+    //        //SetFocus ();
+    //    }
+    //}
 }

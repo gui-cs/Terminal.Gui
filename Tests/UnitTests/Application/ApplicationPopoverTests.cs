@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui.ApplicationTests;
+﻿using static System.Net.Mime.MediaTypeNames;
+
+namespace Terminal.Gui.ApplicationTests;
 
 public class ApplicationPopoverTests
 {
@@ -31,8 +33,76 @@ public class ApplicationPopoverTests
         Assert.Null (Application.Popover);
     }
 
-    
+    [Fact]
+    public void Popover_NotCleanedUp_On_End ()
+    {
+        // Arrange
+        Assert.Null (Application.Popover);
+        Application.Init (new FakeDriver ());
+        Assert.NotNull (Application.Popover);
+        Application.Iteration += (s, a) => Application.RequestStop ();
 
+        RunState rs = Application.Begin (new Toplevel ());
+
+        // Act
+        Application.End (rs);
+
+        // Test
+        Assert.NotNull (Application.Popover);
+
+        Application.Shutdown ();
+    }
+
+    [Fact]
+    public void Popover_Active_Hidden_On_End ()
+    {
+        // Arrange
+        Assert.Null (Application.Popover);
+        Application.Init (new FakeDriver ());
+        Application.Iteration += (s, a) => Application.RequestStop ();
+
+        RunState rs = Application.Begin (new Toplevel ());
+
+        IPopoverTestClass popover = new ();
+
+        Application.Popover?.ShowPopover (popover);
+        Assert.True (popover.Visible);
+
+        // Act
+        Application.End (rs);
+
+        // Test
+        Assert.False (popover.Visible);
+        Assert.NotNull (Application.Popover);
+
+        Application.Shutdown ();
+    }
+
+    public class IPopoverTestClass : View, IPopover
+    {
+        public List<Key> HandledKeys { get; } = new List<Key> ();
+        public int NewCommandInvokeCount { get; private set; }
+
+        public IPopoverTestClass ()
+        {
+            CanFocus = true;
+            AddCommand (Command.New, NewCommandHandler);
+            HotKeyBindings.Add (Key.N.WithCtrl, Command.New);
+
+            bool? NewCommandHandler (ICommandContext ctx)
+            {
+                NewCommandInvokeCount++;
+
+                return false;
+            }
+        }
+
+        protected override bool OnKeyDown (Key key)
+        {
+            HandledKeys.Add (key);
+            return false;
+        }
+    }
     //[Fact]
     //public void Popover_SetToNull ()
     //{
