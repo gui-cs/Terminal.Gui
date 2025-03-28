@@ -103,6 +103,9 @@ public class Shortcut : View, IOrientation, IDesignable
         ShowHide ();
     }
 
+    /// <inheritdoc />
+    protected override bool OnClearingViewport () { return base.OnClearingViewport (); }
+
     // Helper to set Width consistently
     internal Dim GetWidthDimAuto ()
     {
@@ -631,12 +634,6 @@ public class Shortcut : View, IOrientation, IDesignable
 
             _minimumKeyTextSize = value;
             SetKeyViewDefaultLayout ();
-
-            //// TODO: Prob not needed
-            //CommandView.SetNeedsLayout ();
-            //HelpView.SetNeedsLayout ();
-            //KeyView.SetNeedsLayout ();
-            //SetSubViewNeedsDraw ();
         }
     }
 

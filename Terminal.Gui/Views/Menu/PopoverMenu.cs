@@ -19,7 +19,7 @@ public class PopoverMenu : PopoverBaseImpl
     public PopoverMenu (Menuv2? root)
     {
         base.Visible = false;
-        base.ColorScheme = Colors.ColorSchemes ["Menu"];
+        //base.ColorScheme = Colors.ColorSchemes ["Menu"];
 
         Root = root;
 
@@ -112,6 +112,7 @@ public class PopoverMenu : PopoverBaseImpl
     /// <param name="idealScreenPosition">If <see langword="null"/>, the current mouse position will be used.</param>
     public void MakeVisible (Point? idealScreenPosition = null)
     {
+        UpdateKeyBindings ();
         SetPosition (idealScreenPosition);
         Application.Popover?.ShowPopover (this);
     }
@@ -188,29 +189,7 @@ public class PopoverMenu : PopoverBaseImpl
                 _root.Accepting += MenuOnAccepting;
             }
 
-            // TODO: This needs to be done whenever any MenuItem in the menu tree changes to support dynamic menus
-            // TODO: And it needs to clear them first
-            IEnumerable<MenuItemv2> all = GetMenuItemsOfAllSubMenus ();
-
-            foreach (MenuItemv2 menuItem in all)
-            {
-                if (menuItem.TargetView is { } && menuItem.Command != Command.NotBound)
-                {
-                    // Automatically set MenuItem.Key
-                    Key? key = menuItem.TargetView.HotKeyBindings.GetFirstFromCommands (menuItem.Command);
-
-                    if (key is { IsValid: true })
-                    {
-                        if (menuItem.Key.IsValid)
-                        {
-                            Logging.Warning ("Do not specify a Key for MenuItems where a Command is specified. Key will be determined automatically.");
-                        }
-
-                        menuItem.Key = key;
-                        Logging.Trace ($"{menuItem.Key}->{menuItem.Command}");
-                    }
-                }
-            }
+            UpdateKeyBindings ();
 
             IEnumerable<Menuv2> allMenus = GetAllSubMenus ();
 
@@ -220,6 +199,50 @@ public class PopoverMenu : PopoverBaseImpl
                 menu.Accepting += MenuOnAccepting;
                 menu.Accepted += MenuAccepted;
                 menu.SelectedMenuItemChanged += MenuOnSelectedMenuItemChanged;
+            }
+        }
+    }
+
+    private void UpdateKeyBindings ()
+    {
+        // TODO: This needs to be done whenever any MenuItem in the menu tree changes to support dynamic menus
+        // TODO: And it needs to clear them first
+        IEnumerable<MenuItemv2> all = GetMenuItemsOfAllSubMenus ();
+
+        foreach (MenuItemv2 menuItem in all.Where(mi => mi.Command != Command.NotBound))
+        {
+            if (menuItem.TargetView is { })
+            {
+                // A TargetView implies HotKey
+                // Automatically set MenuItem.Key
+                Key? key = menuItem.TargetView.HotKeyBindings.GetFirstFromCommands (menuItem.Command);
+
+                if (key is { IsValid: true })
+                {
+                    if (menuItem.Key.IsValid)
+                    {
+                        //Logging.Warning ("Do not specify a Key for MenuItems where a Command is specified. Key will be determined automatically.");
+                    }
+
+                    menuItem.Key = key;
+                    Logging.Trace ($"HotKey: {menuItem.Key}->{menuItem.Command}");
+                }
+            }
+            else
+            {
+                // No TargetView implies Application HotKey
+                Key? key = Application.KeyBindings.GetFirstFromCommands (menuItem.Command);
+
+                if (key is { IsValid: true })
+                {
+                    if (menuItem.Key.IsValid)
+                    {
+                        // Logging.Warning ("App HotKey: Do not specify a Key for MenuItems where a Command is specified. Key will be determined automatically.");
+                    }
+
+                    menuItem.Key = key;
+                    Logging.Trace ($"App HotKey: {menuItem.Key}->{menuItem.Command}");
+                }
             }
         }
     }
@@ -362,6 +385,10 @@ public class PopoverMenu : PopoverBaseImpl
         {
             // TODO: Find the menu item below the mouse, if any, and select it
 
+            // TODO: Enable No Border menu style
+            menu.Border.LineStyle = LineStyle.Single;
+            menu.Border.Thickness = new (1);
+
             if (!menu.IsInitialized)
             {
                 menu.BeginInit ();
@@ -370,6 +397,7 @@ public class PopoverMenu : PopoverBaseImpl
 
             menu.ClearFocus ();
             base.Add (menu);
+
 
             // IMPORTANT: This must be done after adding the menu to the super view or Add will try
             // to set focus to it.

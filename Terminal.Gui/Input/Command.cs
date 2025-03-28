@@ -275,6 +275,9 @@ public enum Command
     /// <summary>Tabs back to the previous item.</summary>
     BackTab,
 
+    /// <summary>Enables arrange mode.</summary>
+    Arrange,
+
     #endregion
 
     #region Action Commands

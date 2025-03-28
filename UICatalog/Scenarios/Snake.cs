@@ -317,7 +317,7 @@ public class Snake : Scenario
         protected override bool OnDrawingContent ()
         {
             SetAttribute (white);
-            ClearViewport ();
+            ClearViewport (null);
 
             var canvas = new LineCanvas ();
 

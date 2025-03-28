@@ -34,9 +34,14 @@ public class ContextMenuv2 : PopoverMenu, IDesignable
     public ContextMenuv2 () : this ([]) { }
 
     /// <inheritdoc/>
-    public ContextMenuv2 (IEnumerable<View>? menuItems) : base (new Menuv2 (menuItems))
+    public ContextMenuv2 (Menuv2? menu) : base (menu)
     {
         Key = DefaultKey;
+    }
+
+    /// <inheritdoc/>
+    public ContextMenuv2 (IEnumerable<View>? menuItems) : this (new Menuv2 (menuItems))
+    {
     }
 
     private Key _key = DefaultKey;

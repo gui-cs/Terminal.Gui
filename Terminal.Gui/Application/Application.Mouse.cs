@@ -169,17 +169,15 @@ public static partial class Application // Mouse handling
             return;
         }
 
-        // Dismiss the Popover if the user clicked outside of it
-        if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover
-            && View.IsInHierarchy (visiblePopover, deepestViewUnderMouse, includeAdornments: true) is false
-            && (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
-                || mouseEvent.Flags.HasFlag (MouseFlags.Button2Pressed)
-                || mouseEvent.Flags.HasFlag (MouseFlags.Button3Pressed)))
+        // Dismiss the Popover if the user presses mouse outside of it
+        if (mouseEvent.IsPressed
+            && Popover?.GetActivePopover () as View is { Visible: true } visiblePopover
+            && View.IsInHierarchy (visiblePopover, deepestViewUnderMouse, includeAdornments: true) is false)
         {
 
             visiblePopover.Visible = false;
 
-            // Recurse once
+            // Recurse once so the event can be handled below the popover
             RaiseMouseEvent (mouseEvent);
 
             return;

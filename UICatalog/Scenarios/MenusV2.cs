@@ -98,6 +98,7 @@ public class MenusV2 : Scenario
 
         private CheckBox? _enableOverwriteCb;
         private CheckBox? _autoSaveCb;
+        private CheckBox? _editModeCb;
 
         public TargetView ()
         {
@@ -135,7 +136,8 @@ public class MenusV2 : Scenario
             Label lastCommandLabel = new ()
             {
                 Title = "_Last Command:",
-                Y = 2
+                X = 15,
+                Y = 10,
             };
 
             View lastCommandText = new ()
@@ -149,13 +151,13 @@ public class MenusV2 : Scenario
             Add (lastCommandLabel, lastCommandText);
 
             AddCommand (Command.New, HandleCommand);
-            HotKeyBindings.Add (Key.N.WithCtrl, Command.New);
+            HotKeyBindings.Add (Key.F2, Command.New);
 
             AddCommand (Command.Open, HandleCommand);
-            HotKeyBindings.Add (Key.O.WithCtrl, Command.Open);
+            HotKeyBindings.Add (Key.F3, Command.Open);
 
             AddCommand (Command.Save, HandleCommand);
-            HotKeyBindings.Add (Key.S.WithCtrl, Command.Save);
+            HotKeyBindings.Add (Key.F4, Command.Save);
 
             AddCommand (Command.SaveAs, HandleCommand);
             HotKeyBindings.Add (Key.A.WithCtrl, Command.SaveAs);
@@ -203,7 +205,7 @@ public class MenusV2 : Scenario
                 Id = "FilePopoverMenu"
             };
 
-            MenuBarItemv2 fileMenuRootItem = new (this, Command.NotBound, "_File", null, FilePopoverMenu);
+            MenuBarItemv2 fileMenuRootItem = new ("_File", FilePopoverMenu);
 
             AddCommand (Command.Cut, HandleCommand);
             HotKeyBindings.Add (Key.X.WithCtrl, Command.Cut);
@@ -230,7 +232,7 @@ public class MenusV2 : Scenario
                                                            new MenuItemv2 (this, Command.SelectAll)
                                                        ]
                                                       ),
-                                    new MenuBarItemv2 (this, Command.NotBound, "_Help", "Show Help")
+                                    new MenuBarItemv2 (this, Command.NotBound, "_Help")
                                     {
                                         Key = Key.F1,
                                         Action = () => { MessageBox.Query ("Help", "This is the help...", "_Ok"); }
@@ -242,6 +244,7 @@ public class MenusV2 : Scenario
             Label lastAcceptedLabel = new ()
             {
                 Title = "Last Accepted:",
+                X = Pos.Left (lastCommandLabel),
                 Y = Pos.Bottom (lastCommandLabel)
             };
 
@@ -258,6 +261,7 @@ public class MenusV2 : Scenario
             CheckBox autoSaveStatusCb = new ()
             {
                 Title = "AutoSave",
+                X = Pos.Left (lastAcceptedLabel),
                 Y = Pos.Bottom (lastAcceptedLabel)
             };
 
@@ -268,10 +272,12 @@ public class MenusV2 : Scenario
             CheckBox enableOverwriteStatusCb = new ()
             {
                 Title = "Enable Overwrite",
+                X = Pos.Left (autoSaveStatusCb),
                 Y = Pos.Bottom (autoSaveStatusCb)
             };
             enableOverwriteStatusCb.CheckedStateChanged += (sender, args) => { _enableOverwriteCb!.CheckedState = enableOverwriteStatusCb.CheckedState; };
             Add (enableOverwriteStatusCb);
+
 
             AddCommand (
                         Command.EnableOverwrite,
@@ -282,6 +288,28 @@ public class MenusV2 : Scenario
 
                             return HandleCommand (ctx);
                         });
+
+
+
+            CheckBox editModeStatusCb = new ()
+            {
+                Title = "EditMode (App binding)",
+                X = Pos.Left (enableOverwriteStatusCb),
+                Y = Pos.Bottom (enableOverwriteStatusCb)
+            };
+            editModeStatusCb.CheckedStateChanged += (sender, args) => { _editModeCb!.CheckedState = editModeStatusCb.CheckedState; };
+            Add (editModeStatusCb);
+
+            AddCommand (Command.Edit, ctx =>
+                                      {
+                                          editModeStatusCb.CheckedState =
+                                              editModeStatusCb.CheckedState == CheckState.UnChecked ? CheckState.Checked : CheckState.UnChecked;
+
+                                          return HandleCommand (ctx);
+                                      });
+
+            Application.KeyBindings.Add (Key.F9, this, Command.Edit);
+
 
             FilePopoverMenu!.Accepted += (o, args) =>
                                          {
@@ -421,17 +449,16 @@ public class MenusV2 : Scenario
                 Text = "The 3rd item"
             };
 
-            var shortcut4 = new MenuItemv2
+            var editMode = new MenuItemv2
             {
-                Title = "_App Binding",
-                Text = "App Binding",
-                Key = Key.D8.WithAlt,
-                BindKeyToApplication = true
+                Title = "E_dit Mode",
+                Text = "App binding to Command.Edit",
+                Command = Command.Edit,
             };
 
-            shortcut4.CommandView = new CheckBox
+            editMode.CommandView = _editModeCb = new CheckBox
             {
-                Title = shortcut4.Title,
+                Title = editMode.Title,
                 HighlightStyle = HighlightStyle.None,
                 CanFocus = false
             };
@@ -439,7 +466,7 @@ public class MenusV2 : Scenario
             // This ensures the checkbox state toggles when the hotkey of Title is pressed.
             //shortcut4.Accepting += (sender, args) => args.Cancel = true;
 
-            menu.Add (shortcut2, shortcut3, new Line (), shortcut4);
+            menu.Add (shortcut2, shortcut3, new Line (), editMode);
         }
 
         private void ConfigureMoreDetailsSubMenu (Menuv2 menu)

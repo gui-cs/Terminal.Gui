@@ -2,9 +2,12 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     A menu bar is a horizontal list of <see cref="MenuBarItemv2"/>s. Each <see cref="MenuBarItemv2"/> can have a
+///     A horizontal list of <see cref="MenuBarItemv2"/>s. Each <see cref="MenuBarItemv2"/> can have a
 ///     <see cref="PopoverMenu"/> that is shown when the <see cref="MenuBarItemv2"/> is selected.
 /// </summary>
+/// <remarks>
+///     MenuBars may be hosted by any View and will, by default, be positioned the full width across the top of the View's Viewport.
+/// </remarks>
 public class MenuBarv2 : Menuv2, IDesignable
 {
     /// <inheritdoc/>
@@ -71,6 +74,7 @@ public class MenuBarv2 : Menuv2, IDesignable
             menuBarItem.PopoverMenu.EndInit ();
         }
 
+        // If the active popover is a PopoverMenu and part of this MenuBar...
         if (menuBarItem?.PopoverMenu is null
             && Application.Popover!.GetActivePopover () is PopoverMenu popoverMenu
             && popoverMenu?.Root?.SuperMenuItem?.SuperView == this)

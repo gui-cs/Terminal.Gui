@@ -203,10 +203,10 @@ public partial class View // Adornments
     ///     </para>
     ///     <para>For more advanced customization of the view's border, manipulate see <see cref="Border"/> directly.</para>
     /// </remarks>
-    /// <param name="value"></param>
-    public virtual void SetBorderStyle (LineStyle value)
+    /// <param name="style"></param>
+    public virtual void SetBorderStyle (LineStyle style)
     {
-        if (value != LineStyle.None)
+        if (style != LineStyle.None)
         {
             if (Border!.Thickness == Thickness.Empty)
             {
@@ -218,7 +218,7 @@ public partial class View // Adornments
             Border!.Thickness = new (0);
         }
 
-        Border.LineStyle = value;
+        Border.LineStyle = style;
     }
 
     /// <summary>

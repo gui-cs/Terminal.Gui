@@ -15,6 +15,10 @@ public class Menuv2 : Bar
         Orientation = Orientation.Vertical;
         Width = Dim.Auto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
+
+        Border!.Thickness = new Thickness (1, 1, 1, 1);
+        Border.LineStyle = LineStyle.Single;
+
     }
 
     /// <summary>
@@ -38,8 +42,6 @@ public class Menuv2 : Bar
 
         if (Border is { })
         {
-            Border.Thickness = new Thickness (1, 1, 1, 1);
-            Border.LineStyle = LineStyle.Single;
         }
     }
 

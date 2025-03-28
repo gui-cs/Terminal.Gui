@@ -12,9 +12,7 @@ public class ApplicationPopover
     /// <summary>
     ///     Initializes a new instance of the <see cref="ApplicationPopover"/> class.
     /// </summary>
-    public ApplicationPopover ()
-    {
-    }
+    public ApplicationPopover () { }
 
     private readonly List<IPopover> _popovers = [];
 
@@ -49,10 +47,12 @@ public class ApplicationPopover
             {
                 _activePopover = null;
             }
+
             _popovers.Remove (popover);
 
             return true;
         }
+
         return false;
     }
 
@@ -62,10 +62,7 @@ public class ApplicationPopover
     ///     Gets the active popover, if any.
     /// </summary>
     /// <returns></returns>
-    public IPopover? GetActivePopover ()
-    {
-        return _activePopover;
-    }
+    public IPopover? GetActivePopover () { return _activePopover; }
 
     /// <summary>
     ///     Shows <paramref name="popover"/>. IPopover implementations should use OnVisibleChnaged/VisibleChanged to be
@@ -94,9 +91,10 @@ public class ApplicationPopover
 
             if (!newPopover.IsInitialized)
             {
-                newPopover.BeginInit();
-                newPopover.EndInit();
+                newPopover.BeginInit ();
+                newPopover.EndInit ();
             }
+
             _activePopover = newPopover as IPopover;
             newPopover.Enabled = true;
             newPopover.Visible = true;
@@ -120,13 +118,14 @@ public class ApplicationPopover
 
 
     /// <summary>
-    ///     Called when the user presses 
+    ///     Called when the user presses a key. Dispatches the key to the active popover, if any,
+    ///     otherwise to the popovers in the order they were registered. Inactive popovers only get hotkeys.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    internal bool NewKeyDownEvent (Key key)
+    internal bool DispatchKeyDown (Key key)
     {
-        // Do active first
+        // Do active first - Active gets all key down events.
         if (GetActivePopover () as View is { Visible: true } visiblePopover)
         {
             if (visiblePopover.NewKeyDownEvent (key))
@@ -135,6 +134,10 @@ public class ApplicationPopover
             }
         }
 
+        // If the active popover didn't handle the key, try the inactive ones.
+        // Inactive only get hotkeys
+        bool? hotKeyHandled = null;
+
         foreach (IPopover popover in _popovers)
         {
             if (GetActivePopover () == popover || popover is not View popoverView)
@@ -142,13 +145,14 @@ public class ApplicationPopover
                 continue;
             }
 
-            if (popoverView.NewKeyDownEvent (key))
+            hotKeyHandled = popoverView.InvokeCommandsBoundToHotKey (key);
+
+            if (hotKeyHandled is true)
             {
                 return true;
             }
         }
 
-        return false;
+        return hotKeyHandled is true;
     }
-
 }

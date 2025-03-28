@@ -82,13 +82,14 @@ public class Bar : View, IOrientation, IDesignable
     }
 
     /// <inheritdoc/>
-    public override void SetBorderStyle (LineStyle value)
+    public override void SetBorderStyle (LineStyle lineStyle)
     {
         if (Border is { })
         {
             // The default changes the thickness. We don't want that. We just set the style.
-            Border.LineStyle = value;
+           Border.LineStyle = lineStyle;
         }
+        //base.SetBorderStyle(lineStyle);
     }
 
     #region IOrientation members

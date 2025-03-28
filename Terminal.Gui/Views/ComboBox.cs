@@ -507,7 +507,7 @@ public class ComboBox : View, IDesignable
         }
 
         Reset (true);
-        _listview.ClearViewport ();
+        _listview.ClearViewport (null);
         _listview.TabStop = TabBehavior.NoStop;
         SuperView?.MoveSubViewToStart (this);
 
@@ -808,7 +808,7 @@ public class ComboBox : View, IDesignable
         _listview.SetSource (_searchSet);
         _listview.ResumeSuspendCollectionChangedEvent ();
 
-        _listview.ClearViewport ();
+        _listview.ClearViewport (null);
         _listview.Height = CalculateHeight ();
         SuperView?.MoveSubViewToStart (this);
     }

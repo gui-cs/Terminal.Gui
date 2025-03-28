@@ -23,7 +23,8 @@ public class ContextMenus : Scenario
         Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
-            Arrangement = ViewArrangement.Fixed
+            Arrangement = ViewArrangement.Fixed,
+            ColorScheme = Colors.ColorSchemes ["Toplevel"]
         };
 
         var text = "Context Menu";
@@ -112,7 +113,7 @@ public class ContextMenus : Scenario
                                    new MenuItemv2
                                    {
                                        Title = "C_ultures",
-                                       SubMenu = new (GetSupportedCultures ())
+                                       SubMenu = GetSupportedCultureMenu (),
                                    },
                                    new Line (),
                                    new MenuItemv2
@@ -173,7 +174,7 @@ public class ContextMenus : Scenario
         };
     }
 
-    private MenuItemv2 [] GetSupportedCultures ()
+    private Menuv2 GetSupportedCultureMenu ()
     {
         List<MenuItemv2> supportedCultures = [];
         int index = -1;
@@ -211,7 +212,13 @@ public class ContextMenus : Scenario
             supportedCultures.Add (culture);
         }
 
-        return supportedCultures.ToArray ();
+        Menuv2 menu = new (supportedCultures.ToArray ());
+        menu.Border.LineStyle = LineStyle.None;
+        menu.Border.Thickness = new (0,0,0,0);
+
+       // menu.Padding.Thickness = new (1);
+
+        return menu;
 
         void CreateAction (List<MenuItemv2> cultures, MenuItemv2 culture)
         {

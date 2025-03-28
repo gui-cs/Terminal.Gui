@@ -1,22 +1,20 @@
 #nullable enable
 
 using System.ComponentModel;
-using Microsoft.VisualBasic;
 using Terminal.Gui.Resources;
 
 namespace Terminal.Gui;
 
 /// <summary>
-///     A <see cref="Shortcut"/>-dervied object to be used as a menu item in a <see cref="Menuv2"/>. Has title, an associated help text, and an action to execute on activation.
+///     A <see cref="Shortcut"/>-dervied object to be used as a menu item in a <see cref="Menuv2"/>. Has title, an
+///     associated help text, and an action to execute on activation.
 /// </summary>
 public class MenuItemv2 : Shortcut
 {
     /// <summary>
     ///     Creates a new instance of <see cref="MenuItemv2"/>.
     /// </summary>
-    public MenuItemv2 () : base (Key.Empty, null, null, null)
-    {
-    }
+    public MenuItemv2 () : base (Key.Empty, null, null) { }
 
     /// <summary>
     ///     Creates a new instance of <see cref="MenuItemv2"/>, binding it to <paramref name="targetView"/> and
@@ -26,7 +24,8 @@ public class MenuItemv2 : Shortcut
     /// <remarks>
     /// </remarks>
     /// <param name="targetView">
-    ///     The View that <paramref name="command"/> will be invoked on when user does something that causes the Shortcut's Accept
+    ///     The View that <paramref name="command"/> will be invoked on when user does something that causes the Shortcut's
+    ///     Accept
     ///     event to be raised.
     /// </param>
     /// <param name="command">
@@ -39,7 +38,7 @@ public class MenuItemv2 : Shortcut
     public MenuItemv2 (View? targetView, Command command, string? commandText = null, string? helpText = null, Menuv2? subMenu = null)
         : base (
                 targetView?.HotKeyBindings.GetFirstFromCommands (command)!,
-                string.IsNullOrEmpty (commandText) ? GlobalResources.GetString($"cmd.{command}") : commandText,
+                string.IsNullOrEmpty (commandText) ? GlobalResources.GetString ($"cmd.{command}") : commandText,
                 null,
                 string.IsNullOrEmpty (helpText) ? GlobalResources.GetString ($"cmd.{command}.Help") : helpText
                )
@@ -71,16 +70,17 @@ public class MenuItemv2 : Shortcut
             {
                 return;
             }
+
             _command = value;
 
             if (string.IsNullOrEmpty (Title))
             {
-                Title = GlobalResources.GetString ($"cmd.{_command}");
+                Title = GlobalResources.GetString ($"cmd.{_command}") ?? string.Empty;
             }
 
             if (string.IsNullOrEmpty (HelpText))
             {
-                HelpText = GlobalResources.GetString ($"cmd.{_command}.Help");
+                HelpText = GlobalResources.GetString ($"cmd.{_command}.Help") ?? string.Empty;
             }
         }
     }
@@ -91,11 +91,15 @@ public class MenuItemv2 : Shortcut
 
         if (commandContext is { Command: not Command.HotKey })
         {
-
             if (TargetView is { })
             {
                 commandContext.Command = Command;
                 ret = TargetView.InvokeCommand (Command, commandContext);
+            }
+            else
+            {
+                // Is this an Application-bound command?
+                ret = Application.InvokeCommandsBoundToKey (Key);
             }
         }
 
@@ -129,15 +133,17 @@ public class MenuItemv2 : Shortcut
                 KeyView.Text = $"{Glyphs.RightArrow}";
                 _subMenu.SuperMenuItem = this;
             }
-
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnMouseEnter (CancelEventArgs eventArgs)
     {
+        // When the mouse enters a menuitem, we set focus to it automatically.
+
         // Logging.Trace($"OnEnter {Title}");
         SetFocus ();
+
         return base.OnMouseEnter (eventArgs);
     }
 
@@ -161,7 +167,8 @@ public class MenuItemv2 : Shortcut
     }
 
     /// <summary>
-    ///     Called when the user has accepted an item in this menu (or submenu. This is used to determine when to hide the menu.
+    ///     Called when the user has accepted an item in this menu (or submenu. This is used to determine when to hide the
+    ///     menu.
     /// </summary>
     /// <remarks>
     /// </remarks>
@@ -169,16 +176,17 @@ public class MenuItemv2 : Shortcut
     protected virtual void OnAccepted (CommandEventArgs args) { }
 
     /// <summary>
-    ///     Raised when the user has accepted an item in this menu (or submenu. This is used to determine when to hide the menu.
+    ///     Raised when the user has accepted an item in this menu (or submenu. This is used to determine when to hide the
+    ///     menu.
     /// </summary>
     /// <remarks>
-    /// <para>
-    ///    See <see cref="RaiseAccepted"/> for more information.
-    /// </para>
+    ///     <para>
+    ///         See <see cref="RaiseAccepted"/> for more information.
+    ///     </para>
     /// </remarks>
     public event EventHandler<CommandEventArgs>? Accepted;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
         if (disposing)
@@ -186,6 +194,7 @@ public class MenuItemv2 : Shortcut
             SubMenu?.Dispose ();
             SubMenu = null;
         }
+
         base.Dispose (disposing);
     }
 }
