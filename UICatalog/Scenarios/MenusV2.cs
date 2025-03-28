@@ -80,8 +80,8 @@ public class MenusV2 : Scenario
                                                         return;
                                                     }
 
-                                                    Logging.Trace ($"PopoverMenu Accepted: {args?.Context?.Source?.Title}");
-                                                    eventSource.Add ($"PopoverMenu Accepted: {args?.Context?.Source?.Title}: ");
+                                                    Logging.Trace ($"FilePopoverMenu Accepted: {args?.Context?.Source?.Text}");
+                                                    eventSource.Add ($"FilePopoverMenu Accepted: {args?.Context?.Source?.Text}: ");
                                                     eventLog.MoveDown ();
                                                 };
 
@@ -99,6 +99,10 @@ public class MenusV2 : Scenario
         private CheckBox? _enableOverwriteCb;
         private CheckBox? _autoSaveCb;
         private CheckBox? _editModeCb;
+
+        private RadioGroup? _mutuallyExclusiveOptionsRg;
+
+        private ColorPicker? _menuBgColorCp;
 
         public TargetView ()
         {
@@ -413,23 +417,37 @@ public class MenusV2 : Scenario
 
             _enableOverwriteCb.Accepting += (sender, args) => args.Cancel = true;
 
-            var thirdItem = new MenuItemv2
+            var mutuallyExclusiveOptions = new MenuItemv2
             {
-                Title = "_Three",
-                Text = "TBelow the line",
-                Key = Key.T.WithAlt
+                HelpText = "3 Mutually Exclusive Options",
+                Key = Key.F7
             };
 
-            var forthItem = new MenuItemv2
+            mutuallyExclusiveOptions.CommandView = _mutuallyExclusiveOptionsRg = new RadioGroup ()
             {
-                Title = "_Four",
-                Text = "Bottom"
+                RadioLabels = [ "G_ood", "_Bad", "U_gly" ]
             };
 
-            // This ensures the checkbox state toggles when the hotkey of Title is pressed.
-            // shortcut4.Accepting += (sender, args) => args.Cancel = true;
+            var menuBGColor = new MenuItemv2
+            {
+                HelpText = "Menu BG Color",
+                Key = Key.F8,
+            };
 
-            menu.Add (autoSave, enableOverwrite, new Line (), thirdItem, forthItem);
+            menuBGColor.CommandView = _menuBgColorCp = new ColorPicker() 
+            {
+                Width = 30
+            };
+
+            _menuBgColorCp.ColorChanged += (sender, args) =>
+                                           {
+                                               menu.ColorScheme = menu.ColorScheme with
+                                               {
+                                                   Normal = new (menu.ColorScheme.Normal.Foreground, args.CurrentValue)
+                                               };
+                                           };
+
+            menu.Add (autoSave, enableOverwrite, new Line (), mutuallyExclusiveOptions, new Line (), menuBGColor);
         }
 
         private void ConfigureDetialsSubMenu (Menuv2 menu)

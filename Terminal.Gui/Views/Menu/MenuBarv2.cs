@@ -54,6 +54,12 @@ public class MenuBarv2 : Menuv2, IDesignable
             Border.Thickness = new (0);
             Border.LineStyle = LineStyle.None;
         }
+
+        // TODO: This needs to be done whenever a menuitem in any memubaritem changes
+        foreach (MenuBarItemv2? mbi in SubViews.Select(s => s as MenuBarItemv2))
+        {
+            Application.Popover?.Register (mbi?.PopoverMenu);
+        }
     }
 
     /// <inheritdoc/>

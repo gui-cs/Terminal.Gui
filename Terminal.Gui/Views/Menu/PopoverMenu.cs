@@ -194,7 +194,6 @@ public class PopoverMenu : PopoverBaseImpl
             IEnumerable<Menuv2> allMenus = GetAllSubMenus ();
 
             foreach (Menuv2 menu in allMenus)
-
             {
                 menu.Accepting += MenuOnAccepting;
                 menu.Accepted += MenuAccepted;
@@ -245,6 +244,12 @@ public class PopoverMenu : PopoverBaseImpl
                 }
             }
         }
+
+        foreach (MenuItemv2 menuItem in all.Where (mi => mi is { Command: Command.NotBound, Key.IsValid: true }))
+        {
+
+        }
+
     }
 
     /// <inheritdoc/>

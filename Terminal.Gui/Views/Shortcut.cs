@@ -180,7 +180,8 @@ public class Shortcut : View, IOrientation, IDesignable
             SetKeyViewDefaultLayout ();
         }
 
-        SetColors ();
+        // BUGBUG: Causes ever other layout to lose focus colors
+        //SetColors ();
     }
 
     // Force Width to DimAuto to calculate natural width and then set it back
@@ -719,6 +720,7 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     private ColorScheme? _nonFocusColorScheme;
+
     /// <summary>
     /// </summary>
     internal void SetColors (bool highlight = false)
@@ -781,7 +783,10 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view) { SetColors (); }
+    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view)
+    {
+        SetColors ();
+    }
 
     #endregion Focus
 

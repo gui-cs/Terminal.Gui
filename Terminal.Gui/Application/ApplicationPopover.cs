@@ -145,7 +145,8 @@ public class ApplicationPopover
                 continue;
             }
 
-            hotKeyHandled = popoverView.InvokeCommandsBoundToHotKey (key);
+           // hotKeyHandled = popoverView.InvokeCommandsBoundToHotKey (key);
+            hotKeyHandled = popoverView.NewKeyDownEvent (key);
 
             if (hotKeyHandled is true)
             {
