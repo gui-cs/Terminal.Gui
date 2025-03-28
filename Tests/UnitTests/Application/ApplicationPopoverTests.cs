@@ -42,7 +42,8 @@ public class ApplicationPopoverTests
         Assert.NotNull (Application.Popover);
         Application.Iteration += (s, a) => Application.RequestStop ();
 
-        RunState rs = Application.Begin (new Toplevel ());
+        var top = new Toplevel ();
+        RunState rs = Application.Begin (top);
 
         // Act
         Application.End (rs);
@@ -50,6 +51,7 @@ public class ApplicationPopoverTests
         // Test
         Assert.NotNull (Application.Popover);
 
+        top.Dispose ();
         Application.Shutdown ();
     }
 
@@ -61,7 +63,8 @@ public class ApplicationPopoverTests
         Application.Init (new FakeDriver ());
         Application.Iteration += (s, a) => Application.RequestStop ();
 
-        RunState rs = Application.Begin (new Toplevel ());
+        var top = new Toplevel ();
+        RunState rs = Application.Begin (top);
 
         IPopoverTestClass popover = new ();
 
@@ -70,11 +73,13 @@ public class ApplicationPopoverTests
 
         // Act
         Application.End (rs);
+        top.Dispose ();
 
         // Test
         Assert.False (popover.Visible);
         Assert.NotNull (Application.Popover);
 
+        popover.Dispose ();
         Application.Shutdown ();
     }
 
