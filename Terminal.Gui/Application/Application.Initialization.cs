@@ -163,7 +163,7 @@ public static partial class Application // Initialization (Init/Shutdown)
 
         SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext ());
 
-        // TODO: This si probably not needed
+        // TODO: This is probably not needed
         if (Popover.GetActivePopover () is View popover)
         {
             popover.Visible = false;
