@@ -317,7 +317,7 @@ public partial class View // Drawing APIs
 
     internal void DoClearViewport (DrawContext? context = null)
     {
-        if (OnClearingViewport ())
+        if (ViewportSettings.HasFlag (ViewportSettings.Transparent) || OnClearingViewport ())
         {
             return;
         }
@@ -395,7 +395,7 @@ public partial class View // Drawing APIs
         Attribute prev = SetAttribute (GetNormalColor ());
         Driver.FillRect (toClear);
 
-       // context.AddDrawnRectangle (toClear);
+        // context.AddDrawnRectangle (toClear);
 
         SetAttribute (prev);
         SetNeedsDraw ();
