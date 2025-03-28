@@ -742,6 +742,9 @@
   <data name="cmd.Open" xml:space="preserve">
     <value>_Open...</value>
   </data>
+  <data name="cmd.Quit" xml:space="preserve">
+    <value>E_xit</value>
+  </data>
   <data name="cmd.Save" xml:space="preserve">
     <value>_Save</value>
   </data>
@@ -765,6 +768,9 @@
   </data>
   <data name="cmd.Open.Help" xml:space="preserve">
     <value>Open a file</value>
+  </data>
+  <data name="cmd.Quit.Help" xml:space="preserve">
+    <value />
   </data>
   <data name="cmd.Save.Help" xml:space="preserve">
     <value>Save</value>

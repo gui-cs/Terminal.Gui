@@ -1564,6 +1564,24 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to E_xit.
+        /// </summary>
+        internal static string cmd_Quit {
+            get {
+                return ResourceManager.GetString("cmd.Quit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string cmd_Quit_Help {
+            get {
+                return ResourceManager.GetString("cmd.Quit.Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Save.
         /// </summary>
         internal static string cmd_Save {

@@ -6,7 +6,8 @@ namespace Terminal.Gui;
 ///     <see cref="PopoverMenu"/> that is shown when the <see cref="MenuBarItemv2"/> is selected.
 /// </summary>
 /// <remarks>
-///     MenuBars may be hosted by any View and will, by default, be positioned the full width across the top of the View's Viewport.
+///     MenuBars may be hosted by any View and will, by default, be positioned the full width across the top of the View's
+///     Viewport.
 /// </remarks>
 public class MenuBarv2 : Menuv2, IDesignable
 {
@@ -93,6 +94,74 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// <inheritdoc/>
     public bool EnableForDesign<TContext> (ref readonly TContext context) where TContext : notnull
     {
+        Add (
+             new MenuBarItemv2 (
+                                "_File",
+                                [
+                                    new MenuItemv2 (this, Command.New),
+                                    new MenuItemv2 (this, Command.Open),
+                                    new MenuItemv2 (this, Command.Save),
+                                    new MenuItemv2 (this, Command.SaveAs),
+                                    new Line (),
+                                    new MenuItemv2
+                                    {
+                                        Title = "_Preferences",
+                                        SubMenu = new (
+                                                       [
+                                                           new MenuItemv2
+                                                           {
+                                                               CommandView = new CheckBox ()
+                                                               {
+                                                                   Title = "O_ption",
+                                                               },
+                                                               HelpText = "Toggle option"
+                                                           },
+                                                           new MenuItemv2
+                                                           {
+                                                               Title = "_Settings...",
+                                                               HelpText = "More settings",
+                                                               Action = () =>  MessageBox.Query ("Settings", "This is the Settings Dialog\n", ["_Ok", "_Cancel"])
+                                                           }
+                                                       ]
+                                                      )
+                                    },
+                                    new Line (),
+                                    new MenuItemv2 (this, Command.Quit)
+                                ]
+                               )
+            );
+
+        Add (
+             new MenuBarItemv2 (
+                                "_Edit",
+                                [
+                                    new MenuItemv2 (this, Command.Cut),
+                                    new MenuItemv2 (this, Command.Copy),
+                                    new MenuItemv2 (this, Command.Paste),
+                                    new Line (),
+                                    new MenuItemv2 (this, Command.SelectAll)
+                                ]
+                               )
+            );
+
+        Add (
+             new MenuBarItemv2 (
+                                "_Help",
+                                [
+                                    new MenuItemv2
+                                    {
+                                        Title = "_Online Help...",
+                                        Action = () => MessageBox.Query ("Online Help", "https://gui-cs.github.io/Terminal.GuiV2Docs", "Ok")
+                                    },
+                                    new MenuItemv2
+                                    {
+                                        Title = "About...",
+                                        Action = () => MessageBox.Query ("About", "Something About Mary.", "Ok")
+                                    }
+                                ]
+                               )
+            );
+
         //        if (context is not Func<string, bool> actionFn)
         //        {
         //            actionFn = (_) => true;
@@ -262,6 +331,6 @@ public class MenuBarv2 : Menuv2, IDesignable
         //                            ),
         //            new MenuBarItem ("_About", "Top-Level", () => actionFn ("About"))
         //        ];
-        return false;
+        return true;
     }
 }

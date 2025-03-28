@@ -282,6 +282,9 @@
   <data name="cmd.Open" xml:space="preserve">
     <value>開く (_O)</value>
   </data>
+  <data name="cmd.Quit" xml:space="preserve">
+    <value />
+  </data>
   <data name="cmd.Save" xml:space="preserve">
     <value>保存 (_S)</value>
   </data>
@@ -304,6 +307,9 @@
     <value>新規 (_N)</value>
   </data>
   <data name="cmd.Open.Help" xml:space="preserve">
+    <value />
+  </data>
+  <data name="cmd.Quit.Help" xml:space="preserve">
     <value />
   </data>
   <data name="cmd.Save.Help" xml:space="preserve">

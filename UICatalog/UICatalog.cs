@@ -278,7 +278,7 @@ public class UICatalogApp
         return loggerFactory.CreateLogger ("Global Logger");
     }
 
-    private static void OpenUrl (string url)
+    public static void OpenUrl (string url)
     {
         if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
         {

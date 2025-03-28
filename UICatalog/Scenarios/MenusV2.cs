@@ -276,8 +276,7 @@ public class MenusV2 : Scenario
                 Y = Pos.Bottom (autoSaveStatusCb)
             };
             enableOverwriteStatusCb.CheckedStateChanged += (sender, args) => { _enableOverwriteCb!.CheckedState = enableOverwriteStatusCb.CheckedState; };
-            Add (enableOverwriteStatusCb);
-
+            base.Add (enableOverwriteStatusCb);
 
             AddCommand (
                         Command.EnableOverwrite,
@@ -289,8 +288,6 @@ public class MenusV2 : Scenario
                             return HandleCommand (ctx);
                         });
 
-
-
             CheckBox editModeStatusCb = new ()
             {
                 Title = "EditMode (App binding)",
@@ -298,7 +295,7 @@ public class MenusV2 : Scenario
                 Y = Pos.Bottom (enableOverwriteStatusCb)
             };
             editModeStatusCb.CheckedStateChanged += (sender, args) => { _editModeCb!.CheckedState = editModeStatusCb.CheckedState; };
-            Add (editModeStatusCb);
+            base.Add (editModeStatusCb);
 
             AddCommand (Command.Edit, ctx =>
                                       {

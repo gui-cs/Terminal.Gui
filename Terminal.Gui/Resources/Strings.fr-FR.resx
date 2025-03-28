@@ -186,6 +186,9 @@
   <data name="cmd.Open" xml:space="preserve">
     <value>_Ouvrir</value>
   </data>
+  <data name="cmd.Quit" xml:space="preserve">
+    <value />
+  </data>
   <data name="cmd.Save" xml:space="preserve">
     <value>_Enregistrer</value>
   </data>
@@ -208,6 +211,9 @@
     <value />
   </data>
   <data name="cmd.Open.Help" xml:space="preserve">
+    <value />
+  </data>
+  <data name="cmd.Quit.Help" xml:space="preserve">
     <value />
   </data>
   <data name="cmd.Save.Help" xml:space="preserve">
