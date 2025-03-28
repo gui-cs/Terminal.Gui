@@ -17,7 +17,7 @@ public interface ICommandContext
     public Command Command { get; set; }
 
     /// <summary>
-    ///     The View that was the source of hte command invocation, if any.
+    ///     The View that was the source of the command invocation, if any.
     ///     (e.g. the view the user clicked on or the view that had focus when a key was pressed).
     /// </summary>
     public View? Source { get; set; }

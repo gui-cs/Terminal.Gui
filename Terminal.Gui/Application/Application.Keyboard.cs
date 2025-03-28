@@ -59,7 +59,7 @@ public static partial class Application // Keyboard handling
     }
 
     /// <summary>
-    ///     Invokes any commands bound at the Applicaiton-level to <paramref name="key"/>.
+    ///     Invokes any commands bound at the Application-level to <paramref name="key"/>.
     /// </summary>
     /// <param name="key"></param>
     /// <returns>
