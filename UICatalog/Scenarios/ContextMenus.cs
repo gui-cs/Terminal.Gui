@@ -91,7 +91,7 @@ public class ContextMenus : Scenario
 
         void OnAppWindowOnKeyDown (object s, Key e)
         {
-            if (e.KeyCode == _winContextMenuKey)
+            if (e == _winContextMenuKey)
             {
                 // ReSharper disable once AccessToDisposedClosure
                 _winContextMenu?.MakeVisible ();

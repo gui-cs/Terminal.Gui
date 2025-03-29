@@ -122,7 +122,8 @@ public class MainLoop<T> : IMainLoop<T>
 
         if (Application.Top != null)
         {
-            bool needsDrawOrLayout = AnySubViewsNeedDrawn (Application.Top);
+            bool needsDrawOrLayout = AnySubViewsNeedDrawn (Application.Popover?.GetActivePopover () as View)
+                                     || AnySubViewsNeedDrawn (Application.Top);
 
             bool sizeChanged = WindowSizeMonitor.Poll ();
 
@@ -174,8 +175,13 @@ public class MainLoop<T> : IMainLoop<T>
         }
     }
 
-    private bool AnySubViewsNeedDrawn (View v)
+    private bool AnySubViewsNeedDrawn (View? v)
     {
+        if (v is null)
+        {
+            return false;
+        }
+
         if (v.NeedsDraw || v.NeedsLayout)
         {
             Logging.Trace ($"{v.GetType ().Name} triggered redraw (NeedsDraw={v.NeedsDraw} NeedsLayout={v.NeedsLayout}) ");

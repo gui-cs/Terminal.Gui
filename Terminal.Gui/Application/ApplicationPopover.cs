@@ -113,6 +113,7 @@ public class ApplicationPopover
         {
             popoverView.Visible = false;
             _activePopover = null;
+            Application.Top?.SetNeedsDraw ();
         }
     }
 
@@ -145,7 +146,7 @@ public class ApplicationPopover
                 continue;
             }
 
-           // hotKeyHandled = popoverView.InvokeCommandsBoundToHotKey (key);
+            // hotKeyHandled = popoverView.InvokeCommandsBoundToHotKey (key);
             hotKeyHandled = popoverView.NewKeyDownEvent (key);
 
             if (hotKeyHandled is true)
