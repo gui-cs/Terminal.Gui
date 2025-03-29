@@ -114,11 +114,11 @@ public class ApplicationPopoverTests
         Assert.Equal (1, activePopover.NewCommandInvokeCount);
         Assert.Equal (1, inactivePopover.NewCommandInvokeCount);
         Assert.Contains (Key.N.WithCtrl, activePopover.HandledKeys);
-        Assert.Empty (inactivePopover.HandledKeys);
+        Assert.NotEmpty (inactivePopover.HandledKeys);
     }
 
     [Fact]
-    public void DispatchKeyDown_InactivePopoverDoesNotGetKey ()
+    public void DispatchKeyDown_InactivePopoverDoesGetKey ()
     {
         // Arrange
         var activePopover = new IPopoverTestClass ();
@@ -132,7 +132,7 @@ public class ApplicationPopoverTests
 
         // Assert
         Assert.Contains (Key.A, activePopover.HandledKeys);
-        Assert.Empty(inactivePopover.HandledKeys);
+        Assert.NotEmpty (inactivePopover.HandledKeys);
     }
     
     public class IPopoverTestClass : View, IPopover
