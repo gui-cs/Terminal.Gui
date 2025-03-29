@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="TerminalGuiFluentTesting.With" Collapsed="true">
+    <Position X="0.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAIAAAAAA=</HashCode>
+      <FileName>With.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TerminalGuiFluentTesting.FakeInput&lt;T&gt;" Collapsed="true">
+    <Position X="7" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAACAAAQEAAAAgAAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
+      <FileName>FakeInput.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="TerminalGuiFluentTesting.FakeNetInput" Collapsed="true">
+    <Position X="8.25" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>FakeNetInput.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="TerminalGuiFluentTesting.FakeWindowsInput" Collapsed="true">
+    <Position X="6" Y="2.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>FakeWindowsInput.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="TerminalGuiFluentTesting.FakeOutput" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="5.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgCAAgAAAAAAAAAAAAAAAQAAAMAAAAAEAAAA=</HashCode>
+      <FileName>FakeOutput.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="TerminalGuiFluentTesting.GuiTestContext" BaseTypeListCollapsed="true">
+    <Position X="2.25" Y="0.5" Width="2.25" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>ABJAAAIAACBACRAAg4IAAAAgAJIEgQQAKACIBACAIgI=</HashCode>
+      <FileName>GuiTestContext.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_output" />
+      <Field Name="_winInput" />
+      <Field Name="_netInput" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="TerminalGuiFluentTesting.TextWriterLoggerProvider" Collapsed="true">
+    <Position X="10" Y="2.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>TextWriterLoggerProvider.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="TerminalGuiFluentTesting.TextWriterLogger" Collapsed="true">
+    <Position X="10" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAEAAAAAAAgAAAAAAAAIAAAAAAA=</HashCode>
+      <FileName>TextWriterLogger.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="TerminalGuiFluentTesting.NetSequences">
+    <Position X="11" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAACACAAAAAAgI=</HashCode>
+      <FileName>NetSequences.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="TerminalGuiFluentTesting.V2TestDriver">
+    <Position X="9.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAACAAA=</HashCode>
+      <FileName>V2TestDriver.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

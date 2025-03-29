@@ -87,6 +87,7 @@
         <InternalsVisibleTo Include="StressTests" />
         <InternalsVisibleTo Include="IntegrationTests" />
         <InternalsVisibleTo Include="TerminalGuiDesigner" />
+        <InternalsVisibleTo Include="TerminalGuiFluentTesting" />
         <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
     </ItemGroup>
     <!-- =================================================================== -->

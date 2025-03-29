@@ -2135,4 +2135,84 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         top.Dispose ();
     }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Menu_Opened_In_SuperView_With_TabView_Has_Precedence_On_Key_Press ()
+    {
+        var win = new Window
+        {
+            Title = "My Window",
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+
+        // Tab View
+        var tabView = new TabView
+        {
+            X = 1,
+            Y = 1,
+            Width = Dim.Fill () - 2,
+            Height = Dim.Fill () - 2
+        };
+        tabView.AddTab (new () { DisplayText = "Tab 1" }, true);
+        tabView.AddTab (new () { DisplayText = "Tab 2" }, false);
+        win.Add (tabView);
+
+        // Context Menu
+        var menuItems = new MenuBarItem (
+                                         [
+                                             new ("Item 1", "First item", () => MessageBox.Query ("Action", "Item 1 Clicked", "OK")),
+                                             new MenuBarItem (
+                                                              "Submenu",
+                                                              new List<MenuItem []>
+                                                              {
+                                                                  new []
+                                                                  {
+                                                                      new MenuItem (
+                                                                                    "Sub Item 1",
+                                                                                    "Submenu item",
+                                                                                    () => { MessageBox.Query ("Action", "Sub Item 1 Clicked", "OK"); })
+                                                                  }
+                                                              })
+                                         ]);
+
+        var cm = new ContextMenu ();
+
+        win.MouseClick += (s, e) =>
+                          {
+                              if (e.Flags.HasFlag (MouseFlags.Button3Clicked)) // Right-click
+                              {
+                                  cm.Position = e.Position;
+                                  cm.Show (menuItems);
+                              }
+                          };
+        Application.Begin (win);
+
+        cm.Show (menuItems);
+        Assert.True (cm.MenuBar!.IsMenuOpen);
+
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown));
+        Assert.True (cm.MenuBar!.IsMenuOpen);
+
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorUp));
+        Assert.True (cm.MenuBar!.IsMenuOpen);
+
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown));
+        Assert.True (cm.MenuBar!.IsMenuOpen);
+
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorRight));
+        Assert.True (cm.MenuBar!.IsMenuOpen);
+
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorLeft));
+        Assert.True (cm.MenuBar!.IsMenuOpen);
+
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorLeft));
+        Assert.False (cm.MenuBar!.IsMenuOpen);
+        Assert.True (tabView.HasFocus);
+
+        win.Dispose ();
+    }
 }
