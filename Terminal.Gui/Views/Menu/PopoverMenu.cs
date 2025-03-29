@@ -11,7 +11,30 @@ public class PopoverMenu : PopoverBaseImpl
     /// <summary>
     ///     Initializes a new instance of the <see cref="PopoverMenu"/> class.
     /// </summary>
-    public PopoverMenu () : this (null) { }
+    public PopoverMenu () : this ((Menuv2?)null) { }
+
+    /// <inheritdoc/>
+    public PopoverMenu (IEnumerable<View>? menuItems) : this (new Menuv2 (menuItems))
+    {
+        Key = DefaultKey;
+    }
+
+    private Key _key = DefaultKey;
+
+    /// <summary>Specifies the key that will activate the context menu.</summary>
+    public Key Key
+    {
+        get => _key;
+        set
+        {
+            Key oldKey = _key;
+            _key = value;
+            KeyChanged?.Invoke (this, new KeyChangedEventArgs (oldKey, _key));
+        }
+    }
+
+    /// <summary>Event raised when the <see cref="ContextMenu.Key"/> is changed
+    public event EventHandler<KeyChangedEventArgs>? KeyChanged;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PopoverMenu"/> class with the specified root <see cref="Menuv2"/>.
@@ -97,7 +120,7 @@ public class PopoverMenu : PopoverBaseImpl
     ///     The mouse flags that will cause the popover menu to be visible. The default is
     ///     <see cref="MouseFlags.Button3Clicked"/> which is typically the right mouse button.
     /// </summary>
-    public static MouseFlags MouseFlags { get; set; } = MouseFlags.Button3Clicked;
+    public MouseFlags MouseFlags { get; set; } = MouseFlags.Button3Clicked;
 
     /// <summary>The default key for activating popover menus.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]

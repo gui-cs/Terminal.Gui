@@ -74,7 +74,7 @@ public class MenuBarItemv2 : MenuItemv2
                 null,
                 Command.NotBound,
                 commandText,
-                new (new (menuItems)))
+                new (menuItems))
     { }
 
     // TODO: Hide base.SubMenu?

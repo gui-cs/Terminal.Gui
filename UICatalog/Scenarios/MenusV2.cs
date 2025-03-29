@@ -121,8 +121,6 @@ public class MenusV2 : Scenario
 
             KeyBindings.Add (PopoverMenu.DefaultKey, Command.Context);
 
-            MouseBindings.ReplaceCommands (PopoverMenu.MouseFlags, Command.Context);
-
             AddCommand (
                         Command.Cancel,
                         ctx =>

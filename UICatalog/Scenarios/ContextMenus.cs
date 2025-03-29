@@ -9,7 +9,7 @@ namespace UICatalog.Scenarios;
 public class ContextMenus : Scenario
 {
     [CanBeNull]
-    private ContextMenuv2 _winContextMenu;
+    private PopoverMenu _winContextMenu;
     private TextField _tfTopLeft, _tfTopRight, _tfMiddle, _tfBottomLeft, _tfBottomRight;
     private readonly List<CultureInfo> _cultureInfos = Application.SupportedCultures;
     private readonly Key _winContextMenuKey = Key.Space.WithCtrl;
