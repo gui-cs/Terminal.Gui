@@ -249,7 +249,7 @@ public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Color
     /// <summary>
     ///     Resets the <see cref="ColorSchemes"/> dictionary to its default values.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The reset <see cref="ColorSchemes"/> dictionary.</returns>
     public static Dictionary<string, ColorScheme?> Reset ()
     {
         lock (_lock)
