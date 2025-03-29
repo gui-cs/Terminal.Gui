@@ -1,7 +1,5 @@
 #nullable enable
 using System.Collections.Frozen;
-using System.Diagnostics.Contracts;
-using System.Drawing;
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -234,6 +232,15 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     internal static ColorName16 GetClosestNamedColor16 (Color inputColor)
     {
         return ColorExtensions.ColorToName16Map.MinBy (pair => CalculateColorDistance (inputColor, pair.Key)).Value;
+    }
+
+    /// <summary>Converts the given color value to exact named color represented by <see cref="ColorName16"/>.</summary>
+    /// <param name="inputColor"></param>
+    /// <param name="colorName16">Successfully converted named color.</param>
+    /// <returns>True if conversion succeeded; otherwise false.</returns>
+    internal static bool TryGetExactNamedColor16 (Color inputColor, out ColorName16 colorName16)
+    {
+        return ColorExtensions.ColorToName16Map.TryGetValue (inputColor, out colorName16);
     }
 
     [SkipLocalsInit]

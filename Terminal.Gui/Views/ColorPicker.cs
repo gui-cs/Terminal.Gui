@@ -1,7 +1,5 @@
 ﻿#nullable enable
 
-using System;
-
 namespace Terminal.Gui;
 
 /// <summary>
@@ -34,7 +32,7 @@ public partial class ColorPicker : View
     private Color _selectedColor = Color.Black;
 
     // TODO: Add interface
-    private readonly IColorNameResolver _colorNameResolver = new W3CColors ();
+    private readonly IColorNameResolver _colorNameResolver = new MultiStandardColorNameResolver ();
 
     private List<IColorBar> _bars = new ();
 
@@ -64,7 +62,7 @@ public partial class ColorPicker : View
                     Width = textFieldWidth
                 };
                 tfValue.HasFocusChanged += UpdateSingleBarValueFromTextField;
-                tfValue.Accepting += (s, _)=>UpdateSingleBarValueFromTextField(s);
+                tfValue.Accepting += (s, _) => UpdateSingleBarValueFromTextField (s);
                 _textFields.Add (bar, tfValue);
             }
 
@@ -182,7 +180,7 @@ public partial class ColorPicker : View
         Add (_tfHex);
 
         _tfHex.HasFocusChanged += UpdateValueFromTextField;
-        _tfHex.Accepting += (_,_)=> UpdateValueFromTextField();
+        _tfHex.Accepting += (_, _) => UpdateValueFromTextField ();
     }
 
     private void DisposeOldViews ()
@@ -266,7 +264,7 @@ public partial class ColorPicker : View
 
         if (_tfName != null)
         {
-            _tfName.Text = _colorNameResolver.TryNameColor (_selectedColor, out string name) ? name : string.Empty;
+            _tfName.Text = _colorNameResolver.TryNameColor (_selectedColor, out string? name) ? name : string.Empty;
         }
 
         if (_tfHex != null)
@@ -312,7 +310,7 @@ public partial class ColorPicker : View
         }
 
         // it is a leave event so update
-        UpdateValueFromName();
+        UpdateValueFromName ();
     }
     private void UpdateValueFromName ()
     {
