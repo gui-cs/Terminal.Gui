@@ -81,8 +81,11 @@ public class UICatalogApp
     // If set, holds the scenario the user selected
     private static Scenario? _selectedScenario;
 
-    private static MenuBarItem? _themeMenuBarItem;
-    private static MenuItem []? _themeMenuItems;
+    private static MenuBarItemv2? _themeMenuBarItem;
+    private static View []? _themeMenuItems;
+
+    private static CheckBox? _force16ColorsMenuItemCb;
+    private static CheckBox? _force16ColorsShortcutCb;
 
     private static string _topLevelColorScheme = string.Empty;
 
@@ -324,7 +327,7 @@ public class UICatalogApp
 
         Application.Init (driverName: _forceDriver);
 
-        if (_cachedTheme is null)
+        if (string.IsNullOrWhiteSpace (_cachedTheme))
         {
             _cachedTheme = Themes?.Theme;
         }
@@ -721,7 +724,6 @@ public class UICatalogApp
     public class UICatalogTopLevel : Toplevel
     {
         public ListView? CategoryList;
-        public MenuItem? MiForce16Colors;
         public MenuItem? MiIsMenuBorderDisabled;
         public MenuItem? MiIsMouseDisabled;
         public MenuItem? MiUseSubMenusSingleFrame;
@@ -745,7 +747,6 @@ public class UICatalogApp
             _diagnosticFlags = Diagnostics;
 
             _themeMenuItems = CreateThemeMenuItems ();
-            _themeMenuBarItem = new ("_Themes", _themeMenuItems!);
 
             MenuBarv2 menuBar = new (
             [
@@ -758,7 +759,7 @@ public class UICatalogApp
                                                             RequestStop
                                                            )
                                       ]),
-                    //_themeMenuBarItem,
+                    new MenuBarItemv2 ("_Themes", _themeMenuItems!),
                     //new MenuBarItemv2 ("Diag_nostics", CreateDiagnosticMenuItems ()),
                     //new MenuBarItemv2 ("_Logging", CreateLoggingMenuItems ()),
                     new MenuBarItemv2 (
@@ -834,7 +835,7 @@ public class UICatalogApp
             ((CheckBox)ShForce16Colors.CommandView).CheckedStateChanging += (sender, args) =>
             {
                 Application.Force16Colors = args.NewValue == CheckState.Checked;
-                MiForce16Colors!.Checked = Application.Force16Colors;
+                _force16ColorsMenuItemCb.CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
                 Application.LayoutAndDraw ();
             };
 
@@ -990,16 +991,13 @@ public class UICatalogApp
 
             _cachedTheme = Themes?.Theme;
 
-            _themeMenuItems = CreateThemeMenuItems ();
-            _themeMenuBarItem!.Children = _themeMenuItems;
-
-            foreach (MenuItem mi in _themeMenuItems!)
+            foreach (var themeItem in _themeMenuItems)
             {
-                if (mi is { Parent: null })
-                {
-                    mi.Parent = _themeMenuBarItem;
-                }
+                themeItem.Dispose ();
             }
+
+            _themeMenuItems = CreateThemeMenuItems ();
+            _themeMenuBarItem.Add (_themeMenuItems);
 
             ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
 
@@ -1015,58 +1013,90 @@ public class UICatalogApp
             Application.Top!.SetNeedsDraw ();
         }
 
-        public MenuItem []? CreateThemeMenuItems ()
+        public View [] CreateThemeMenuItems ()
         {
-            List<MenuItem> menuItems = CreateForce16ColorItems ().ToList ();
-            menuItems.Add (null!);
+            List<View> menuItems = [];
+
+            _force16ColorsMenuItemCb = new ()
+            {
+                Title = "Force _16 Colors",
+                CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked
+            };
+
+            _force16ColorsMenuItemCb.CheckedStateChanged += (sender, args) =>
+            {
+                Application.Force16Colors = args.CurrentValue == CheckState.Checked;
+                ((CheckBox)ShForce16Colors!.CommandView!).CheckedState =
+                    Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
+                Application.LayoutAndDraw ();
+            };
+
+            menuItems.Add (new MenuItemv2 ()
+            {
+                CommandView = _force16ColorsMenuItemCb,
+            });
+
+            menuItems.Add (new Line ());
 
             var schemeCount = 0;
 
+
             foreach (KeyValuePair<string, ThemeScope> theme in Themes!)
             {
-                var item = new MenuItem
+                var item = new CheckBox ()
                 {
                     Title = theme.Key == "Dark" ? $"{theme.Key.Substring (0, 3)}_{theme.Key.Substring (3, 1)}" : $"_{theme.Key}",
-                    ShortcutKey = new Key ((KeyCode)((uint)KeyCode.D1 + schemeCount++))
-                        .WithCtrl
+                    CheckedState = theme.Key == _cachedTheme ? CheckState.Checked : CheckState.UnChecked
                 };
-                item.CheckType |= MenuItemCheckStyle.Checked;
-                item.Checked = theme.Key == _cachedTheme; // CM.Themes.Theme;
-
-                item.Action += () =>
-                               {
-                                   Themes.Theme = _cachedTheme = theme.Key;
-                                   Apply ();
-                               };
-                menuItems.Add (item);
             }
-
-            List<MenuItem> schemeMenuItems = new ();
-
-            foreach (KeyValuePair<string, ColorScheme?> sc in Colors.ColorSchemes)
+            RadioGroup radioGroup = new RadioGroup ()
             {
-                var item = new MenuItem { Title = $"_{sc.Key}", Data = sc.Key };
-                item.CheckType |= MenuItemCheckStyle.Radio;
-                item.Checked = sc.Key == _topLevelColorScheme;
+                RadioLabels = Themes.Select (theme => theme.Key == "Dark" ? $"{theme.Key.Substring (0, 3)}_{theme.Key.Substring (3, 1)}" : $"_{theme.Key}").ToArray ()
+            };
+            radioGroup.SelectedItem = Themes.Keys.ToList ().IndexOf (_cachedTheme!.Replace ("_", string.Empty));
 
-                item.Action += () =>
-                               {
-                                   _topLevelColorScheme = (string)item.Data;
+            radioGroup.SelectedItemChanged += (_, args) =>
+                                              {
+                                                  Themes!.Theme = Themes!.Keys.ToArray () [args.SelectedItem];
+                                                  _cachedTheme = Themes!.Keys.ToArray () [args.SelectedItem];
+                                                  Apply ();
+                                                  SetNeedsDraw ();
+                                              };
 
-                                   foreach (MenuItem schemeMenuItem in schemeMenuItems)
-                                   {
-                                       schemeMenuItem.Checked = (string)schemeMenuItem.Data == _topLevelColorScheme;
-                                   }
+            MenuItemv2 menuItem = new MenuItemv2 ()
+            {
+                CommandView = radioGroup,
+                HelpText = "Themes",
+                Key = Key.F3,
+            };
+            menuItems.Add (menuItem);
 
-                                   ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
-                               };
-                item.ShortcutKey = ((Key)sc.Key [0].ToString ().ToLower ()).WithCtrl;
-                schemeMenuItems.Add (item);
-            }
+            //List<MenuItemv2> schemeMenuItems = new ();
 
-            menuItems.Add (null!);
-            var mbi = new MenuBarItem ("_Color Scheme for Application.Top", schemeMenuItems.ToArray ());
-            menuItems.Add (mbi);
+            //foreach (KeyValuePair<string, ColorScheme?> sc in Colors.ColorSchemes)
+            //{
+            //    var item = new MenuItem { Title = $"_{sc.Key}", Data = sc.Key };
+            //    item.CheckType |= MenuItemCheckStyle.Radio;
+            //    item.Checked = sc.Key == _topLevelColorScheme;
+
+            //    item.Action += () =>
+            //                   {
+            //                       _topLevelColorScheme = (string)item.Data;
+
+            //                       foreach (MenuItem schemeMenuItem in schemeMenuItems)
+            //                       {
+            //                           schemeMenuItem.Checked = (string)schemeMenuItem.Data == _topLevelColorScheme;
+            //                       }
+
+            //                       ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
+            //                   };
+            //    item.ShortcutKey = ((Key)sc.Key [0].ToString ().ToLower ()).WithCtrl;
+            //    schemeMenuItems.Add (item);
+            //}
+
+            //menuItems.Add (null!);
+            //var mbi = new MenuBarItem ("_Color Scheme for Application.Top", schemeMenuItems.ToArray ());
+            //menuItems.Add (mbi);
 
             return menuItems.ToArray ();
         }
@@ -1415,32 +1445,6 @@ public class UICatalogApp
                                                    MenuBar!.UseSubMenusSingleFrame = (bool)MiUseSubMenusSingleFrame.Checked;
                                                };
             menuItems.Add (MiUseSubMenusSingleFrame);
-
-            return menuItems.ToArray ();
-        }
-
-        private MenuItem [] CreateForce16ColorItems ()
-        {
-            List<MenuItem> menuItems = new ();
-
-            MiForce16Colors = new ()
-            {
-                Title = "Force _16 Colors",
-                ShortcutKey = Key.F6,
-                Checked = Application.Force16Colors,
-                CanExecute = () => Application.Driver?.SupportsTrueColor ?? false
-            };
-            MiForce16Colors.CheckType |= MenuItemCheckStyle.Checked;
-
-            MiForce16Colors.Action += () =>
-                                      {
-                                          MiForce16Colors.Checked = Application.Force16Colors = (bool)!MiForce16Colors.Checked!;
-
-                                          ((CheckBox)ShForce16Colors!.CommandView!).CheckedState =
-                                              Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
-                                          Application.LayoutAndDraw ();
-                                      };
-            menuItems.Add (MiForce16Colors);
 
             return menuItems.ToArray ();
         }
