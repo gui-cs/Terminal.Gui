@@ -80,8 +80,10 @@ public class UICatalogApp
 
     // If set, holds the scenario the user selected
     private static Scenario? _selectedScenario;
+
     private static MenuBarItem? _themeMenuBarItem;
     private static MenuItem []? _themeMenuItems;
+
     private static string _topLevelColorScheme = string.Empty;
 
     [SerializableConfigurationProperty (Scope = typeof (AppScope), OmitClassName = true)]
@@ -147,9 +149,9 @@ public class UICatalogApp
         // If no driver is provided, the default driver is used.
         Option<string> driverOption = new Option<string> ("--driver", "The IConsoleDriver to use.").FromAmong (
              Application.GetDriverTypes ()
-                            .Where (d=>!typeof (IConsoleDriverFacade).IsAssignableFrom (d))
+                            .Where (d => !typeof (IConsoleDriverFacade).IsAssignableFrom (d))
                             .Select (d => d!.Name)
-                            .Union (["v2","v2win","v2net"])
+                            .Union (["v2", "v2win", "v2net"])
                             .ToArray ()
             );
         driverOption.AddAlias ("-d");
@@ -175,7 +177,7 @@ public class UICatalogApp
         Option<string> debugLogLevel = new Option<string> ("--debug-log-level", $"The level to use for logging (debug console and {_logFilePath})").FromAmong (
              Enum.GetNames<LogLevel> ()
             );
-        debugLogLevel.SetDefaultValue("Warning");
+        debugLogLevel.SetDefaultValue ("Warning");
         debugLogLevel.AddAlias ("-dl");
         debugLogLevel.AddAlias ("--dl");
 
@@ -239,22 +241,22 @@ public class UICatalogApp
     private static LogEventLevel LogLevelToLogEventLevel (LogLevel logLevel)
     {
         return logLevel switch
-               {
-                   LogLevel.Trace => LogEventLevel.Verbose,
-                   LogLevel.Debug => LogEventLevel.Debug,
-                   LogLevel.Information => LogEventLevel.Information,
-                   LogLevel.Warning => LogEventLevel.Warning,
-                   LogLevel.Error => LogEventLevel.Error,
-                   LogLevel.Critical => LogEventLevel.Fatal,
-                   LogLevel.None => LogEventLevel.Fatal, // Default to Fatal if None is specified
-                   _ => LogEventLevel.Fatal // Default to Information for any unspecified LogLevel
-               };
+        {
+            LogLevel.Trace => LogEventLevel.Verbose,
+            LogLevel.Debug => LogEventLevel.Debug,
+            LogLevel.Information => LogEventLevel.Information,
+            LogLevel.Warning => LogEventLevel.Warning,
+            LogLevel.Error => LogEventLevel.Error,
+            LogLevel.Critical => LogEventLevel.Fatal,
+            LogLevel.None => LogEventLevel.Fatal, // Default to Fatal if None is specified
+            _ => LogEventLevel.Fatal // Default to Information for any unspecified LogLevel
+        };
     }
 
     private static ILogger CreateLogger ()
     {
         // Configure Serilog to write logs to a file
-        _logLevelSwitch.MinimumLevel = LogLevelToLogEventLevel(Enum.Parse<LogLevel> (_options.DebugLogLevel));
+        _logLevelSwitch.MinimumLevel = LogLevelToLogEventLevel (Enum.Parse<LogLevel> (_options.DebugLogLevel));
         Log.Logger = new LoggerConfiguration ()
                      .MinimumLevel.ControlledBy (_logLevelSwitch)
                      .Enrich.FromLogContext () // Enables dynamic enrichment
@@ -745,61 +747,48 @@ public class UICatalogApp
             _themeMenuItems = CreateThemeMenuItems ();
             _themeMenuBarItem = new ("_Themes", _themeMenuItems!);
 
-            MenuBar menuBar = new ()
-            {
-                Menus =
-                [
-                    new (
-                         "_File",
-                         new MenuItem []
-                         {
-                             new (
-                                  "_Quit",
-                                  "Quit UI Catalog",
-                                  RequestStop
-                                 )
-                         }
-                        ),
-                    _themeMenuBarItem,
-                    new ("Diag_nostics", CreateDiagnosticMenuItems ()),
-                    new ("_Logging", CreateLoggingMenuItems ()),
-                    new (
-                         "_Help",
-                         new MenuItem []
-                         {
-                             new (
-                                  "_Documentation",
-                                  "",
-                                  () => OpenUrl ("https://gui-cs.github.io/Terminal.GuiV2Docs"),
-                                  null,
-                                  null,
-                                  (KeyCode)Key.F1
-                                 ),
-                             new (
-                                  "_README",
-                                  "",
-                                  () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"),
-                                  null,
-                                  null,
-                                  (KeyCode)Key.F2
-                                 ),
-                             new (
-                                  "_About...",
-                                  "About UI Catalog",
-                                  () => MessageBox.Query (
-                                                          "",
-                                                          GetAboutBoxMessage (),
-                                                          wrapMessage: false,
-                                                          buttons: "_Ok"
-                                                         ),
-                                  null,
-                                  null,
-                                  (KeyCode)Key.A.WithCtrl
-                                 )
-                         }
-                        )
-                ]
-            };
+            MenuBarv2 menuBar = new (
+            [
+                    new MenuBarItemv2 (
+                                      "_File",
+                                      [
+                                          new MenuItemv2 (
+                                                            "_Quit",
+                                                            "Quit UI Catalog",
+                                                            RequestStop
+                                                           )
+                                      ]),
+                    //_themeMenuBarItem,
+                    //new MenuBarItemv2 ("Diag_nostics", CreateDiagnosticMenuItems ()),
+                    //new MenuBarItemv2 ("_Logging", CreateLoggingMenuItems ()),
+                    new MenuBarItemv2 (
+                                      "_Help",
+                                      [
+                                          new MenuItemv2 (
+                                                         "_Documentation",
+                                                         "",
+                                                         () => OpenUrl ("https://gui-cs.github.io/Terminal.GuiV2Docs"),
+                                                         Key.F1
+                                                        ),
+                                          new MenuItemv2(
+                                                         "_README",
+                                                         "",
+                                                         () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"),
+                                                         Key.F2
+                                                        ),
+                                          new MenuItemv2 (
+                                                         "_About...",
+                                                         "About UI Catalog",
+                                                         () => MessageBox.Query (
+                                                                                 "",
+                                                                                 GetAboutBoxMessage (),
+                                                                                 wrapMessage: false,
+                                                                                 buttons: "_Ok"
+                                                                                ),
+                                                         Key.A.WithCtrl
+                                                        )
+                                          ])
+                    ]);
 
             _statusBar = new ()
             {
@@ -823,10 +812,10 @@ public class UICatalogApp
             };
 
             statusBarShortcut.Accepting += (sender, args) =>
-                                           {
-                                               _statusBar.Visible = !_statusBar.Visible;
-                                               args.Cancel = true;
-                                           };
+            {
+                _statusBar.Visible = !_statusBar.Visible;
+                args.Cancel = true;
+            };
 
             ShForce16Colors = new ()
             {
@@ -843,25 +832,25 @@ public class UICatalogApp
             };
 
             ((CheckBox)ShForce16Colors.CommandView).CheckedStateChanging += (sender, args) =>
-                                                                            {
-                                                                                Application.Force16Colors = args.NewValue == CheckState.Checked;
-                                                                                MiForce16Colors!.Checked = Application.Force16Colors;
-                                                                                Application.LayoutAndDraw ();
-                                                                            };
+            {
+                Application.Force16Colors = args.NewValue == CheckState.Checked;
+                MiForce16Colors!.Checked = Application.Force16Colors;
+                Application.LayoutAndDraw ();
+            };
 
             _statusBar.Add (
-                            new Shortcut
-                            {
-                                CanFocus = false,
-                                Title = "Quit",
-                                Key = Application.QuitKey
-                            },
-                            statusBarShortcut,
-                            ShForce16Colors,
+            new Shortcut
+            {
+                CanFocus = false,
+                Title = "Quit",
+                Key = Application.QuitKey
+            },
+            statusBarShortcut,
+            ShForce16Colors,
 
-                            //ShDiagnostics,
-                            ShVersion
-                           );
+            //ShDiagnostics,
+            ShVersion
+            );
 
             // Create the Category list view. This list never changes.
             CategoryList = new ()
@@ -870,18 +859,18 @@ public class UICatalogApp
                 Y = Pos.Bottom (menuBar),
                 Width = Dim.Auto (),
                 Height = Dim.Fill (
-                                   Dim.Func (
-                                             () =>
+                               Dim.Func (
+                                         () =>
+                                         {
+                                             if (_statusBar.NeedsLayout)
                                              {
-                                                 if (_statusBar.NeedsLayout)
-                                                 {
-                                                     throw new LayoutException ("DimFunc.Fn aborted because dependent View needs layout.");
+                                                 throw new LayoutException ("DimFunc.Fn aborted because dependent View needs layout.");
 
-                                                     //_statusBar.Layout ();
-                                                 }
+                                                 //_statusBar.Layout ();
+                                             }
 
-                                                 return _statusBar.Frame.Height;
-                                             })),
+                                             return _statusBar.Frame.Height;
+                                         })),
                 AllowsMarking = false,
                 CanFocus = true,
                 Title = "_Categories",
@@ -904,18 +893,18 @@ public class UICatalogApp
                 Y = Pos.Bottom (menuBar),
                 Width = Dim.Fill (),
                 Height = Dim.Fill (
-                                   Dim.Func (
-                                             () =>
+                               Dim.Func (
+                                         () =>
+                                         {
+                                             if (_statusBar.NeedsLayout)
                                              {
-                                                 if (_statusBar.NeedsLayout)
-                                                 {
-                                                     throw new LayoutException ("DimFunc.Fn aborted because dependent View needs layout.");
+                                                 throw new LayoutException ("DimFunc.Fn aborted because dependent View needs layout.");
 
-                                                     //_statusBar.Layout ();
-                                                 }
+                                                 //_statusBar.Layout ();
+                                             }
 
-                                                 return _statusBar.Frame.Height;
-                                             })),
+                                             return _statusBar.Frame.Height;
+                                         })),
 
                 //AllowsMarking = false,
                 CanFocus = true,
@@ -953,9 +942,9 @@ public class UICatalogApp
             int longestName = _scenarios!.Max (s => s.GetName ().Length);
 
             ScenarioList.Style.ColumnStyles.Add (
-                                                 0,
-                                                 new () { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName }
-                                                );
+            0,
+            new () { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName }
+            );
             ScenarioList.Style.ColumnStyles.Add (1, new () { MaxWidth = 1 });
             ScenarioList.CellActivated += ScenarioView_OpenSelectedItem;
 
@@ -1341,7 +1330,7 @@ public class UICatalogApp
                                    if (item.Title == logLevelMenuStrings [(int)logLevel] && item.Checked == false)
                                    {
                                        _options.DebugLogLevel = Enum.GetName (logLevel)!;
-                                       _logLevelSwitch.MinimumLevel = LogLevelToLogEventLevel (Enum.Parse<LogLevel> (_options.DebugLogLevel)); 
+                                       _logLevelSwitch.MinimumLevel = LogLevelToLogEventLevel (Enum.Parse<LogLevel> (_options.DebugLogLevel));
                                        item.Checked = true;
                                    }
 
@@ -1478,7 +1467,10 @@ public class UICatalogApp
         {
             ConfigChanged ();
 
-            MiIsMouseDisabled!.Checked = Application.IsMouseDisabled;
+            if (MiIsMouseDisabled is { })
+            {
+                MiIsMouseDisabled.Checked = Application.IsMouseDisabled;
+            }
 
             if (ShVersion is { })
             {

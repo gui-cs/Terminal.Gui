@@ -97,6 +97,17 @@ public class MenuBarv2 : Menuv2, IDesignable
         }
     }
 
+    /// <inheritdoc />
+    protected override bool OnHasFocusChanging (bool currentHasFocus, bool newHasFocus, View? currentFocused, View? newFocused)
+    {
+        if (!currentHasFocus && newHasFocus && currentFocused is null && newFocused == this)
+        {
+            // This keeps the MenuBar from getting focused when the SuperView first gets focused
+            return true;
+        }
+        return base.OnHasFocusChanging (currentHasFocus, newHasFocus, currentFocused, newFocused);
+    }
+
     /// <inheritdoc/>
     public bool EnableForDesign<TContext> (ref readonly TContext context) where TContext : notnull
     {
