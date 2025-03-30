@@ -6,7 +6,7 @@ using Terminal.Gui.Resources;
 namespace Terminal.Gui;
 
 /// <summary>
-///     A <see cref="Shortcut"/>-dervied object to be used as a menu item in a <see cref="Menuv2"/>. Has title, an
+///     A <see cref="Shortcut"/>-derived object to be used as a menu item in a <see cref="Menuv2"/>. Has title, an
 ///     associated help text, and an action to execute on activation.
 /// </summary>
 public class MenuItemv2 : Shortcut
@@ -45,17 +45,15 @@ public class MenuItemv2 : Shortcut
     {
         TargetView = targetView;
         Command = command;
-
         SubMenu = subMenu;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public MenuItemv2 (string? commandText = null, string? helpText = null, Action? action = null, Key? key = null)
         : base (key ?? Key.Empty, commandText, action, helpText)
-    {
-    }
+    { }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public MenuItemv2 (string? commandText = null, string? helpText = null, Menuv2? subMenu = null)
         : base (Key.Empty, commandText, null, helpText)
     {
@@ -121,7 +119,7 @@ public class MenuItemv2 : Shortcut
             ret = base.DispatchCommand (commandContext);
         }
 
-        Logging.Trace ($"{commandContext?.Source?.Title}");
+        //Logging.Trace ($"{commandContext?.Source?.Title}");
 
         RaiseAccepted (commandContext);
 
@@ -163,7 +161,7 @@ public class MenuItemv2 : Shortcut
     // TODO: Consider moving Accepted to Shortcut?
 
     /// <summary>
-    ///     Riases the <see cref="OnAccepted"/>/<see cref="Accepted"/> event indicating this item (or submenu)
+    ///     Raises the <see cref="OnAccepted"/>/<see cref="Accepted"/> event indicating this item (or submenu)
     ///     was accepted. This is used to determine when to hide the menu.
     /// </summary>
     /// <param name="ctx"></param>
@@ -180,7 +178,7 @@ public class MenuItemv2 : Shortcut
     }
 
     /// <summary>
-    ///     Called when the user has accepted an item in this menu (or submenu. This is used to determine when to hide the
+    ///     Called when the user has accepted an item in this menu (or submenu). This is used to determine when to hide the
     ///     menu.
     /// </summary>
     /// <remarks>
@@ -189,7 +187,7 @@ public class MenuItemv2 : Shortcut
     protected virtual void OnAccepted (CommandEventArgs args) { }
 
     /// <summary>
-    ///     Raised when the user has accepted an item in this menu (or submenu. This is used to determine when to hide the
+    ///     Raised when the user has accepted an item in this menu (or submenu). This is used to determine when to hide the
     ///     menu.
     /// </summary>
     /// <remarks>

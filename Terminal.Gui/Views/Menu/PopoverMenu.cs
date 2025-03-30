@@ -11,7 +11,7 @@ namespace Terminal.Gui;
 ///         <see cref="MakeVisible"/>.
 ///     </para>
 /// </remarks>
-public class PopoverMenu : PopoverBaseImpl
+public class PopoverMenu : PopoverBaseImpl, IDesignable
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="PopoverMenu"/> class.
@@ -241,7 +241,7 @@ public class PopoverMenu : PopoverBaseImpl
 
         foreach (MenuItemv2 menuItem in all.Where (mi => mi.Command != Command.NotBound))
         {
-            Key? key ;
+            Key? key;
             if (menuItem.TargetView is { })
             {
                 // A TargetView implies HotKey
@@ -537,5 +537,22 @@ public class PopoverMenu : PopoverBaseImpl
         }
 
         base.Dispose (disposing);
+    }
+
+
+    /// <inheritdoc/>
+    public bool EnableForDesign<TContext> (ref readonly TContext context) where TContext : notnull
+    {
+        Root = new Menuv2 (
+                           [
+                               new MenuItemv2 (this, Command.Cut),
+                               new MenuItemv2 (this, Command.Copy),
+                               new MenuItemv2 (this, Command.Paste),
+                               new Line (),
+                               new MenuItemv2 (this, Command.SelectAll)
+                           ]);
+
+        Visible = true;
+        return true;
     }
 }

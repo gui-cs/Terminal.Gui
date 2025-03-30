@@ -1,12 +1,10 @@
 #nullable enable
 
-using System.Diagnostics;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 namespace Terminal.Gui;
 
 /// <summary>
-///     Helper class for support of <see cref="IPopover"/> views for <see cref="Application"/>. Held by <see cref="Application.Popover"/>
+///     Helper class for support of <see cref="IPopover"/> views for <see cref="Application"/>. Held by
+///     <see cref="Application.Popover"/>
 /// </summary>
 public sealed class ApplicationPopover : IDisposable
 {
@@ -27,7 +25,8 @@ public sealed class ApplicationPopover : IDisposable
     ///     This enables the popover to receive keyboard events even when it is not active.
     /// </summary>
     /// <remarks>
-    ///     When a popover is registered, the View instance lifetime is managed by the application. Call <see cref="DeRegister"/>
+    ///     When a popover is registered, the View instance lifetime is managed by the application. Call
+    ///     <see cref="DeRegister"/>
     ///     to manage the lifetime of the popover directly.
     /// </remarks>
     /// <param name="popover"></param>
@@ -47,7 +46,8 @@ public sealed class ApplicationPopover : IDisposable
     ///     keyboard bindings from the application.
     /// </summary>
     /// <remarks>
-    ///     When a popover is registered, the View instance lifetime is managed by the application. Call <see cref="DeRegister"/>
+    ///     When a popover is registered, the View instance lifetime is managed by the application. Call
+    ///     <see cref="DeRegister"/>
     ///     to manage the lifetime of the popover directly.
     /// </remarks>
     /// <param name="popover"></param>
@@ -117,7 +117,8 @@ public sealed class ApplicationPopover : IDisposable
 
     /// <summary>
     ///     Causes the specified popover to be hidden.
-    ///     If the popover is dervied from <see cref="PopoverBaseImpl"/>, this is the same as setting <see cref="View.Visible"/> to <see langword="false"/>.
+    ///     If the popover is dervied from <see cref="PopoverBaseImpl"/>, this is the same as setting
+    ///     <see cref="View.Visible"/> to <see langword="false"/>.
     /// </summary>
     /// <param name="popover"></param>
     public void Hide (IPopover? popover)
@@ -131,7 +132,6 @@ public sealed class ApplicationPopover : IDisposable
         }
     }
 
-
     /// <summary>
     ///     Called when the user presses a key. Dispatches the key to the active popover, if any,
     ///     otherwise to the popovers in the order they were registered. Inactive popovers only get hotkeys.
@@ -141,7 +141,8 @@ public sealed class ApplicationPopover : IDisposable
     internal bool DispatchKeyDown (Key key)
     {
         // Do active first - Active gets all key down events.
-        View? activePopover = GetActivePopover () as View;
+        var activePopover = GetActivePopover () as View;
+
         if (activePopover is { Visible: true })
         {
             if (activePopover.NewKeyDownEvent (key))
@@ -173,7 +174,7 @@ public sealed class ApplicationPopover : IDisposable
         return hotKeyHandled is true;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void Dispose ()
     {
         foreach (IPopover popover in _popovers)
@@ -183,6 +184,7 @@ public sealed class ApplicationPopover : IDisposable
                 view.Dispose ();
             }
         }
+
         _popovers.Clear ();
     }
 }
