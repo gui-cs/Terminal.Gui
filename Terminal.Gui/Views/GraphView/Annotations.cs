@@ -150,7 +150,7 @@ public class LegendAnnotation : View, IAnnotation
 
         if (BorderStyle != LineStyle.None)
         {
-            DrawBorderAndPadding ();
+            DrawAdornments ();
             RenderLineCanvas ();
         }
 

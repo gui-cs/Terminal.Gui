@@ -217,7 +217,7 @@ public abstract class ConsoleDriver : IConsoleDriver
                         if (Contents [Row, Col - 1].CombiningMarks.Count > 0)
                         {
                             // Just add this mark to the list
-                            Contents [Row, Col - 1].CombiningMarks.Add (rune);
+                            Contents [Row, Col - 1].AddCombiningMark (rune);
 
                             // Ignore. Don't move to next column (let the driver figure out what to do).
                         }
@@ -240,7 +240,7 @@ public abstract class ConsoleDriver : IConsoleDriver
                             else
                             {
                                 // It didn't normalize. Add it to the Cell to left's CM list
-                                Contents [Row, Col - 1].CombiningMarks.Add (rune);
+                                Contents [Row, Col - 1].AddCombiningMark (rune);
 
                                 // Ignore. Don't move to next column (let the driver figure out what to do).
                             }
@@ -298,7 +298,7 @@ public abstract class ConsoleDriver : IConsoleDriver
                         else if (!Clip.Contains (Col, Row))
                         {
                             // Our 1st column is outside the clip, so we can't display a wide character.
-                            Contents [Row, Col+1].Rune = Rune.ReplacementChar;
+                            Contents [Row, Col + 1].Rune = Rune.ReplacementChar;
                         }
                         else
                         {
@@ -682,7 +682,7 @@ public abstract class ConsoleDriver : IConsoleDriver
     public void OnKeyUp (Key a) { KeyUp?.Invoke (this, a); }
 
     // TODO: Remove this API - it was needed when we didn't have a reliable way to simulate key presses.
-    // TODO: We now do: Applicaiton.RaiseKeyDown and Application.RaiseKeyUp
+    // TODO: We now do: Application.RaiseKeyDown and Application.RaiseKeyUp
     /// <summary>Simulates a key press.</summary>
     /// <param name="keyChar">The key character.</param>
     /// <param name="key">The key.</param>

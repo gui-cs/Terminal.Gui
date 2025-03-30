@@ -5534,7 +5534,7 @@ This is the second line.
         Assert.False (tv.NewKeyDownEvent (Application.PrevTabGroupKey));
 
         Assert.True (tv.NewKeyDownEvent (ContextMenu.DefaultKey));
-        Assert.True (tv.ContextMenu != null && tv.ContextMenu.MenuBar.Visible);
+        Assert.True (tv.ContextMenu != null && tv.ContextMenu.Visible);
         top.Dispose ();
     }
 

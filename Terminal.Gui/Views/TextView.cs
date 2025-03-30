@@ -2290,11 +2290,7 @@ public class TextView : View
                     Command.Context,
                     () =>
                     {
-                        ContextMenu!.Position = new (
-                                                     CursorPosition.X - _leftColumn + 2,
-                                                     CursorPosition.Y - _topRow + 2
-                                                    );
-                        ShowContextMenu ();
+                        ShowContextMenu (true);
 
                         return true;
                     }
@@ -2410,9 +2406,7 @@ public class TextView : View
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
 
-        ContextMenu = new ();
-        ContextMenu.KeyChanged += ContextMenu_KeyChanged!;
-
+        ContextMenu = CreateContextMenu ();
         KeyBindings.Add (ContextMenu.Key, Command.Context);
     }
 
@@ -2496,8 +2490,8 @@ public class TextView : View
     /// </summary>
     public IAutocomplete Autocomplete { get; protected set; } = new TextViewAutocomplete ();
 
-    /// <summary>Get the <see cref="ContextMenu"/> for this view.</summary>
-    public ContextMenu? ContextMenu { get; }
+    /// <summary>Get the <see cref="ContextMenuv2"/> for this view.</summary>
+    public ContextMenuv2? ContextMenu { get; private set; }
 
     /// <summary>Gets the cursor column.</summary>
     /// <value>The cursor column.</value>
@@ -3505,8 +3499,12 @@ public class TextView : View
         }
         else if (ev.Flags == ContextMenu!.MouseFlags)
         {
-            ContextMenu.Position = ViewportToScreen ((Viewport with { X = ev.Position.X, Y = ev.Position.Y }).Location);
-            ShowContextMenu ();
+            ContextMenu!.X = ev.ScreenPosition.X;
+            ContextMenu!.Y = ev.ScreenPosition.Y;
+
+            ShowContextMenu (false);
+            //ContextMenu.Position = ViewportToScreen ((Viewport with { X = ev.Position.X, Y = ev.Position.Y }).Location);
+            //ShowContextMenu ();
         }
 
         return true;
@@ -4150,77 +4148,22 @@ public class TextView : View
 
     private void AppendClipboard (string text) { Clipboard.Contents += text; }
 
-    private MenuBarItem? BuildContextMenuBarItem ()
+    private ContextMenuv2 CreateContextMenu ()
     {
-        return new (
-                    new MenuItem []
+        ContextMenuv2 menu = new (new List<MenuItemv2> ()
                     {
-                        new (
-                             Strings.ctxSelectAll,
-                             "",
-                             SelectAll,
-                             null,
-                             null,
-                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.SelectAll)
-                            ),
-                        new (
-                             Strings.ctxDeleteAll,
-                             "",
-                             DeleteAll,
-                             null,
-                             null,
-                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.DeleteAll)
-                            ),
-                        new (
-                             Strings.ctxCopy,
-                             "",
-                             Copy,
-                             null,
-                             null,
-                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.Copy)
-                            ),
-                        new (
-                             Strings.ctxCut,
-                             "",
-                             Cut,
-                             null,
-                             null,
-                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.Cut)
-                            ),
-                        new (
-                             Strings.ctxPaste,
-                             "",
-                             Paste,
-                             null,
-                             null,
-                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.Paste)
-                            ),
-                        new (
-                             Strings.ctxUndo,
-                             "",
-                             Undo,
-                             null,
-                             null,
-                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.Undo)
-                            ),
-                        new (
-                             Strings.ctxRedo,
-                             "",
-                             Redo,
-                             null,
-                             null,
-                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.Redo)
-                            ),
-                        new (
-                             Strings.ctxColors,
-                             "",
-                             () => PromptForColors (),
-                             null,
-                             null,
-                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.Open)
-                            )
-                    }
-                   );
+            new (this, Command.SelectAll, Strings.ctxSelectAll),
+            new (this, Command.DeleteAll, Strings.ctxDeleteAll),
+            new (this, Command.Copy, Strings.ctxCopy),
+            new (this, Command.Cut, Strings.ctxCut),
+            new (this, Command.Paste, Strings.ctxPaste),
+            new (this, Command.Undo, Strings.ctxUndo),
+            new (this, Command.Redo, Strings.ctxRedo),
+        });
+
+        menu.KeyChanged += ContextMenu_KeyChanged;
+
+        return menu;
     }
 
     private void ClearRegion (int left, int top, int right, int bottom)
@@ -4331,7 +4274,7 @@ public class TextView : View
         DoNeededAction ();
     }
 
-    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey, e.NewKey); }
+    private void ContextMenu_KeyChanged (object? sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey, e.NewKey); }
 
     private bool DeleteTextBackwards ()
     {
@@ -6387,14 +6330,14 @@ public class TextView : View
         }
     }
 
-    private void ShowContextMenu ()
+    private void ShowContextMenu (bool keyboard)
     {
         if (!Equals (_currentCulture, Thread.CurrentThread.CurrentUICulture))
         {
             _currentCulture = Thread.CurrentThread.CurrentUICulture;
         }
 
-        ContextMenu!.Show (BuildContextMenuBarItem ());
+        ContextMenu?.MakeVisible(ViewportToScreen(new Point (CursorPosition.X, CursorPosition.Y)));
     }
 
     private void StartSelecting ()
@@ -6566,6 +6509,18 @@ public class TextView : View
             _selectionStartColumn = nStartCol;
             SetNeedsDraw ();
         }
+    }
+
+    /// <inheritdoc />
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing && ContextMenu is { })
+        {
+            ContextMenu.Visible = false;
+            ContextMenu.Dispose ();
+            ContextMenu = null;
+        }
+        base.Dispose (disposing);
     }
 }
 

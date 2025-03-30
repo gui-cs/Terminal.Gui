@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
-using System.Threading;
+﻿using System.Globalization;
+using JetBrains.Annotations;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -9,38 +8,37 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Menus")]
 public class ContextMenus : Scenario
 {
-    private List<CultureInfo> _cultureInfos = null;
-    private ContextMenu _contextMenu = new ();
-    private bool _forceMinimumPosToZero = true;
-    private MenuItem _miForceMinimumPosToZero;
-    private MenuItem _miUseSubMenusSingleFrame;
+    [CanBeNull]
+    private ContextMenuv2 _winContextMenu;
     private TextField _tfTopLeft, _tfTopRight, _tfMiddle, _tfBottomLeft, _tfBottomRight;
-    private bool _useSubMenusSingleFrame;
+    private readonly List<CultureInfo> _cultureInfos = Application.SupportedCultures;
+    private readonly Key _winContextMenuKey = Key.Space.WithCtrl;
 
     public override void Main ()
     {
         // Init
         Application.Init ();
 
-        _cultureInfos = Application.SupportedCultures;
         // Setup - Create a top-level application window and configure it.
         Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
-            Arrangement = ViewArrangement.Fixed
+            Arrangement = ViewArrangement.Fixed,
+            ColorScheme = Colors.ColorSchemes ["Toplevel"]
         };
 
         var text = "Context Menu";
         var width = 20;
-        var winContextMenuKey = (KeyCode)Key.Space.WithCtrl;
+
+        CreateWinContextMenu ();
 
         var label = new Label
         {
-            X = Pos.Center (), Y = 1, Text = $"Press '{winContextMenuKey}' to open the Window context menu."
+            X = Pos.Center (), Y = 1, Text = $"Press '{_winContextMenuKey}' to open the Window context menu."
         };
         appWindow.Add (label);
 
-        label = new()
+        label = new ()
         {
             X = Pos.Center (),
             Y = Pos.Bottom (label),
@@ -48,252 +46,198 @@ public class ContextMenus : Scenario
         };
         appWindow.Add (label);
 
-        _tfTopLeft = new() { Width = width, Text = text };
+        _tfTopLeft = new () { Id = "_tfTopLeft", Width = width, Text = text };
         appWindow.Add (_tfTopLeft);
 
-        _tfTopRight = new() { X = Pos.AnchorEnd (width), Width = width, Text = text };
+        _tfTopRight = new () { Id = "_tfTopRight", X = Pos.AnchorEnd (width), Width = width, Text = text };
         appWindow.Add (_tfTopRight);
 
-        _tfMiddle = new() { X = Pos.Center (), Y = Pos.Center (), Width = width, Text = text };
+        _tfMiddle = new () { Id = "_tfMiddle", X = Pos.Center (), Y = Pos.Center (), Width = width, Text = text };
         appWindow.Add (_tfMiddle);
 
-        _tfBottomLeft = new() { Y = Pos.AnchorEnd (1), Width = width, Text = text };
+        _tfBottomLeft = new () { Id = "_tfBottomLeft", Y = Pos.AnchorEnd (1), Width = width, Text = text };
         appWindow.Add (_tfBottomLeft);
 
-        _tfBottomRight = new() { X = Pos.AnchorEnd (width), Y = Pos.AnchorEnd (1), Width = width, Text = text };
+        _tfBottomRight = new () { Id = "_tfBottomRight", X = Pos.AnchorEnd (width), Y = Pos.AnchorEnd (1), Width = width, Text = text };
         appWindow.Add (_tfBottomRight);
 
-        Point mousePos = default;
+        appWindow.KeyDown += OnAppWindowOnKeyDown;
+        appWindow.MouseClick += OnAppWindowOnMouseClick;
 
-        appWindow.KeyDown += (s, e) =>
-                             {
-                                 if (e.KeyCode == winContextMenuKey)
-                                 {
-                                     ShowContextMenu (mousePos.X, mousePos.Y);
-                                     e.Handled = true;
-                                 }
-                             };
-
-        appWindow.MouseClick += (s, e) =>
-                                {
-                                    if (e.Flags == _contextMenu.MouseFlags)
-                                    {
-                                        ShowContextMenu (e.Position.X, e.Position.Y);
-                                        e.Handled = true;
-                                    }
-                                };
-
-        Application.MouseEvent += ApplicationMouseEvent;
-
-        void ApplicationMouseEvent (object sender, MouseEventArgs a) { mousePos = a.Position; }
-
-        appWindow.WantMousePositionReports = true;
-
-        appWindow.Closed += (s, e) =>
-                            {
-                                Thread.CurrentThread.CurrentUICulture = new ("en-US");
-                                Application.MouseEvent -= ApplicationMouseEvent;
-                            };
-
-        var top = new Toplevel ();
-        top.Add (appWindow);
+        CultureInfo originalCulture = Thread.CurrentThread.CurrentUICulture;
+        appWindow.Closed += (s, e) => { Thread.CurrentThread.CurrentUICulture = originalCulture; };
 
         // Run - Start the application.
-        Application.Run (top);
-        top.Dispose ();
+        Application.Run (appWindow);
+        appWindow.Dispose ();
+        appWindow.KeyDown -= OnAppWindowOnKeyDown;
+        appWindow.MouseClick -= OnAppWindowOnMouseClick;
+        _winContextMenu?.Dispose ();
 
         // Shutdown - Calling Application.Shutdown is required.
         Application.Shutdown ();
+
+        return;
+
+        void OnAppWindowOnMouseClick (object s, MouseEventArgs e)
+        {
+            if (e.Flags == MouseFlags.Button3Clicked)
+            {
+                // ReSharper disable once AccessToDisposedClosure
+                _winContextMenu?.MakeVisible (e.ScreenPosition);
+                e.Handled = true;
+            }
+        }
+
+        void OnAppWindowOnKeyDown (object s, Key e)
+        {
+            if (e == _winContextMenuKey)
+            {
+                // ReSharper disable once AccessToDisposedClosure
+                _winContextMenu?.MakeVisible ();
+                e.Handled = true;
+            }
+        }
     }
 
-    private MenuItem [] GetSupportedCultures ()
+    private void CreateWinContextMenu ()
     {
-        List<MenuItem> supportedCultures = new ();
-        int index = -1;
-
-        if (_cultureInfos == null)
+        if (_winContextMenu is { })
         {
-            return supportedCultures.ToArray ();
+            _winContextMenu.Dispose ();
+            _winContextMenu = null;
         }
+
+        _winContextMenu = new (
+                               [
+                                   new MenuItemv2
+                                   {
+                                       Title = "C_ultures",
+                                       SubMenu = GetSupportedCultureMenu (),
+                                   },
+                                   new Line (),
+                                   new MenuItemv2
+                                   {
+                                       Title = "_Configuration...",
+                                       HelpText = "Show configuration",
+                                       Action = () => MessageBox.Query (
+                                                                        50,
+                                                                        10,
+                                                                        "Configuration",
+                                                                        "This would be a configuration dialog",
+                                                                        "Ok"
+                                                                       )
+                                   },
+                                   new MenuItemv2
+                                   {
+                                       Title = "M_ore options",
+                                       SubMenu = new (
+                                                      [
+                                                          new MenuItemv2
+                                                          {
+                                                              Title = "_Setup...",
+                                                              HelpText = "Perform setup",
+                                                              Action = () => MessageBox
+                                                                           .Query (
+                                                                                   50,
+                                                                                   10,
+                                                                                   "Setup",
+                                                                                   "This would be a setup dialog",
+                                                                                   "Ok"
+                                                                                  ),
+                                                              Key = Key.T.WithCtrl
+                                                          },
+                                                          new MenuItemv2
+                                                          {
+                                                              Title = "_Maintenance...",
+                                                              HelpText = "Maintenance mode",
+                                                              Action = () => MessageBox
+                                                                           .Query (
+                                                                                   50,
+                                                                                   10,
+                                                                                   "Maintenance",
+                                                                                   "This would be a maintenance dialog",
+                                                                                   "Ok"
+                                                                                  )
+                                                          }
+                                                      ])
+                                   },
+                                   new Line (),
+                                   new MenuItemv2
+                                   {
+                                       Title = "_Quit",
+                                       Action = () => Application.RequestStop ()
+                                   }
+                               ])
+        {
+            Key = _winContextMenuKey
+        };
+    }
+
+    private Menuv2 GetSupportedCultureMenu ()
+    {
+        List<MenuItemv2> supportedCultures = [];
+        int index = -1;
 
         foreach (CultureInfo c in _cultureInfos)
         {
-            var culture = new MenuItem { CheckType = MenuItemCheckStyle.Checked };
+            MenuItemv2 culture = new ();
+
+            culture.CommandView = new CheckBox { CanFocus = false, HighlightStyle = HighlightStyle.None };
 
             if (index == -1)
             {
+                // Create English because GetSupportedCutures doesn't include it
+                culture.Id = "_English";
                 culture.Title = "_English";
-                culture.Help = "en-US";
-                culture.Checked = Thread.CurrentThread.CurrentUICulture.Name == "en-US";
+                culture.HelpText = "en-US";
+
+                ((CheckBox)culture.CommandView).CheckedState =
+                    Thread.CurrentThread.CurrentUICulture.Name == "en-US" ? CheckState.Checked : CheckState.UnChecked;
                 CreateAction (supportedCultures, culture);
                 supportedCultures.Add (culture);
+
                 index++;
-                culture = new() { CheckType = MenuItemCheckStyle.Checked };
+                culture = new ();
+                culture.CommandView = new CheckBox { CanFocus = false, HighlightStyle = HighlightStyle.None };
             }
 
+            culture.Id = $"_{c.Parent.EnglishName}";
             culture.Title = $"_{c.Parent.EnglishName}";
-            culture.Help = c.Name;
-            culture.Checked = Thread.CurrentThread.CurrentUICulture.Name == c.Name;
+            culture.HelpText = c.Name;
+
+            ((CheckBox)culture.CommandView).CheckedState =
+                Thread.CurrentThread.CurrentUICulture.Name == culture.HelpText ? CheckState.Checked : CheckState.UnChecked;
             CreateAction (supportedCultures, culture);
             supportedCultures.Add (culture);
         }
 
-        return supportedCultures.ToArray ();
+        Menuv2 menu = new (supportedCultures.ToArray ());
+        menu.Border.LineStyle = LineStyle.None;
+        menu.Border.Thickness = new (0,0,0,0);
 
-        void CreateAction (List<MenuItem> supportedCultures, MenuItem culture)
+       // menu.Padding.Thickness = new (1);
+
+        return menu;
+
+        void CreateAction (List<MenuItemv2> cultures, MenuItemv2 culture)
         {
             culture.Action += () =>
                               {
-                                  Thread.CurrentThread.CurrentUICulture = new (culture.Help);
-                                  culture.Checked = true;
+                                  Thread.CurrentThread.CurrentUICulture = new (culture.HelpText);
 
-                                  foreach (MenuItem item in supportedCultures)
+                                  foreach (MenuItemv2 item in cultures)
                                   {
-                                      item.Checked = item.Help == Thread.CurrentThread.CurrentUICulture.Name;
+                                      ((CheckBox)item.CommandView).CheckedState =
+                                          Thread.CurrentThread.CurrentUICulture.Name == item.HelpText ? CheckState.Checked : CheckState.UnChecked;
                                   }
                               };
         }
     }
 
-    private void ShowContextMenu (int x, int y)
-    {
-        _contextMenu = new()
-        {
-            Position = new (x, y),
-            ForceMinimumPosToZero = _forceMinimumPosToZero,
-            UseSubMenusSingleFrame = _useSubMenusSingleFrame
-        };
-
-        MenuBarItem menuItems = new (
-                                     new []
-                                     {
-                                         new MenuBarItem (
-                                                          "_Languages",
-                                                          GetSupportedCultures ()
-                                                         ),
-                                         new (
-                                              "_Configuration",
-                                              "Show configuration",
-                                              () => MessageBox.Query (
-                                                                      50,
-                                                                      5,
-                                                                      "Info",
-                                                                      "This would open settings dialog",
-                                                                      "Ok"
-                                                                     )
-                                             ),
-                                         new MenuBarItem (
-                                                          "M_ore options",
-                                                          new MenuItem []
-                                                          {
-                                                              new (
-                                                                   "_Setup",
-                                                                   "Change settings",
-                                                                   () => MessageBox
-                                                                       .Query (
-                                                                               50,
-                                                                               5,
-                                                                               "Info",
-                                                                               "This would open setup dialog",
-                                                                               "Ok"
-                                                                              ),
-                                                                   shortcutKey: KeyCode.T
-                                                                                | KeyCode
-                                                                                    .CtrlMask
-                                                                  ),
-                                                              new (
-                                                                   "_Maintenance",
-                                                                   "Maintenance mode",
-                                                                   () => MessageBox
-                                                                       .Query (
-                                                                               50,
-                                                                               5,
-                                                                               "Info",
-                                                                               "This would open maintenance dialog",
-                                                                               "Ok"
-                                                                              )
-                                                                  )
-                                                          }
-                                                         ),
-                                         _miForceMinimumPosToZero =
-                                             new (
-                                                  "Fo_rceMinimumPosToZero",
-                                                  "",
-                                                  () =>
-                                                  {
-                                                      _miForceMinimumPosToZero
-                                                              .Checked =
-                                                          _forceMinimumPosToZero =
-                                                              !_forceMinimumPosToZero;
-
-                                                      _tfTopLeft.ContextMenu
-                                                                .ForceMinimumPosToZero =
-                                                          _forceMinimumPosToZero;
-
-                                                      _tfTopRight.ContextMenu
-                                                                 .ForceMinimumPosToZero =
-                                                          _forceMinimumPosToZero;
-
-                                                      _tfMiddle.ContextMenu
-                                                               .ForceMinimumPosToZero =
-                                                          _forceMinimumPosToZero;
-
-                                                      _tfBottomLeft.ContextMenu
-                                                                   .ForceMinimumPosToZero =
-                                                          _forceMinimumPosToZero;
-
-                                                      _tfBottomRight
-                                                              .ContextMenu
-                                                              .ForceMinimumPosToZero =
-                                                          _forceMinimumPosToZero;
-                                                  }
-                                                 )
-                                             {
-                                                 CheckType =
-                                                     MenuItemCheckStyle
-                                                         .Checked,
-                                                 Checked =
-                                                     _forceMinimumPosToZero
-                                             },
-                                         _miUseSubMenusSingleFrame =
-                                             new (
-                                                  "Use_SubMenusSingleFrame",
-                                                  "",
-                                                  () => _contextMenu
-                                                                .UseSubMenusSingleFrame =
-                                                            (bool)
-                                                            (_miUseSubMenusSingleFrame
-                                                                     .Checked =
-                                                                 _useSubMenusSingleFrame =
-                                                                     !_useSubMenusSingleFrame)
-                                                 )
-                                             {
-                                                 CheckType = MenuItemCheckStyle
-                                                     .Checked,
-                                                 Checked =
-                                                     _useSubMenusSingleFrame
-                                             },
-                                         null,
-                                         new (
-                                              "_Quit",
-                                              "",
-                                              () => Application.RequestStop ()
-                                             )
-                                     }
-                                    );
-        _tfTopLeft.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
-        _tfTopRight.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
-        _tfMiddle.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
-        _tfBottomLeft.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
-        _tfBottomRight.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
-
-        _contextMenu.Show (menuItems);
-    }
-
-
     public override List<Key> GetDemoKeyStrokes ()
     {
-        var keys = new List<Key> ();
+        List<Key> keys = new ();
 
         keys.Add (Key.F10.WithShift);
         keys.Add (Key.Esc);

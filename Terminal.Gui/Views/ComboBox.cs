@@ -80,11 +80,7 @@ public class ComboBox : View, IDesignable
         // Things this view knows how to do
         AddCommand (Command.Accept, (ctx) =>
                                     {
-                                        if (ctx is not CommandContext<KeyBinding> keyCommandContext)
-                                        {
-                                            return false;
-                                        }
-                                        if (keyCommandContext.Binding.Data == _search)
+                                        if (ctx?.Source == _search)
                                         {
                                             return null;
                                         }
@@ -93,8 +89,8 @@ public class ComboBox : View, IDesignable
         AddCommand (Command.Toggle, () => ExpandCollapse ());
         AddCommand (Command.Expand, () => Expand ());
         AddCommand (Command.Collapse, () => Collapse ());
-        AddCommand (Command.Down, () => MoveDown ());
-        AddCommand (Command.Up, () => MoveUp ());
+        AddCommand (Command.Down, MoveDown);
+        AddCommand (Command.Up, MoveUp);
         AddCommand (Command.PageDown, () => PageDown ());
         AddCommand (Command.PageUp, () => PageUp ());
         AddCommand (Command.Start, () => MoveHome ());
@@ -511,7 +507,7 @@ public class ComboBox : View, IDesignable
         }
 
         Reset (true);
-        _listview.ClearViewport ();
+        _listview.ClearViewport (null);
         _listview.TabStop = TabBehavior.NoStop;
         SuperView?.MoveSubViewToStart (this);
 
@@ -812,7 +808,7 @@ public class ComboBox : View, IDesignable
         _listview.SetSource (_searchSet);
         _listview.ResumeSuspendCollectionChangedEvent ();
 
-        _listview.ClearViewport ();
+        _listview.ClearViewport (null);
         _listview.Height = CalculateHeight ();
         SuperView?.MoveSubViewToStart (this);
     }

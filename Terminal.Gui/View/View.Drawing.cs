@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.ComponentModel;
+using static Unix.Terminal.Curses;
 
 namespace Terminal.Gui;
 
@@ -27,6 +28,7 @@ public partial class View // Drawing APIs
             view.Draw (context);
         }
 
+        // Draw the margins (those whith Shadows) last to ensure they are drawn on top of the content.
         Margin.DrawMargins (viewsArray);
     }
 
@@ -57,9 +59,9 @@ public partial class View // Drawing APIs
         {
             // ------------------------------------
             // Draw the Border and Padding.
-            // Note Margin is special-cased and drawn in a separate pass to support
+            // Note Margin with a Shadow is special-cased and drawn in a separate pass to support
             // transparent shadows.
-            DoDrawBorderAndPadding (originalClip);
+            DoDrawAdornments (originalClip);
             SetClip (originalClip);
 
             // ------------------------------------
@@ -75,7 +77,7 @@ public partial class View // Drawing APIs
 
             // TODO: Simplify/optimize SetAttribute system.
             DoSetAttribute ();
-            DoClearViewport ();
+            DoClearViewport (context);
 
             // ------------------------------------
             // Draw the subviews first (order matters: SubViews, Text, Content)
@@ -106,7 +108,7 @@ public partial class View // Drawing APIs
             // ------------------------------------
             // Re-draw the border and padding subviews
             // HACK: This is a hack to ensure that the border and padding subviews are drawn after the line canvas.
-            DoDrawBorderAndPaddingSubViews ();
+            DoDrawAdornmentsSubViews ();
 
             // ------------------------------------
             // Advance the diagnostics draw indicator
@@ -116,8 +118,8 @@ public partial class View // Drawing APIs
         }
 
         // ------------------------------------
-        // This causes the Margin to be drawn in a second pass
-        // PERFORMANCE: If there is a Margin, it will be redrawn each iteration of the main loop.
+        // This causes the Margin to be drawn in a second pass if it has a ShadowStyle
+        // PERFORMANCE: If there is a Margin w/ Shadow, it will be redrawn each iteration of the main loop.
         Margin?.CacheClip ();
 
         // ------------------------------------
@@ -131,8 +133,10 @@ public partial class View // Drawing APIs
 
     #region DrawAdornments
 
-    private void DoDrawBorderAndPaddingSubViews ()
+    private void DoDrawAdornmentsSubViews ()
     {
+        // NOTE: We do not support subviews of Margin?
+
         if (Border?.SubViews is { } && Border.Thickness != Thickness.Empty)
         {
             // PERFORMANCE: Get the check for DrawIndicator out of this somehow.
@@ -164,7 +168,7 @@ public partial class View // Drawing APIs
         }
     }
 
-    private void DoDrawBorderAndPadding (Region? originalClip)
+    private void DoDrawAdornments (Region? originalClip)
     {
         if (this is Adornment)
         {
@@ -184,8 +188,7 @@ public partial class View // Drawing APIs
         if (Margin?.NeedsLayout == true)
         {
             Margin.NeedsLayout = false;
-            // BUGBUG: This should not use ClearFrame as that clears the insides too
-            Margin?.ClearFrame ();
+            Margin?.Thickness.Draw (FrameToScreen ());
             Margin?.Parent?.SetSubViewNeedsDraw ();
         }
 
@@ -194,27 +197,28 @@ public partial class View // Drawing APIs
             // A SubView may add to the LineCanvas. This ensures any Adornment LineCanvas updates happen.
             Border?.SetNeedsDraw ();
             Padding?.SetNeedsDraw ();
+            Margin?.SetNeedsDraw ();
         }
 
-        if (OnDrawingBorderAndPadding ())
+        if (OnDrawingAdornments ())
         {
             return;
         }
 
         // TODO: add event.
 
-        DrawBorderAndPadding ();
+        DrawAdornments ();
     }
 
     /// <summary>
-    ///     Causes <see cref="Border"/> and <see cref="Padding"/> to be drawn.
+    ///     Causes <see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/> to be drawn.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         <see cref="Margin"/> is drawn in a separate pass.
+    ///         <see cref="Margin"/> is drawn in a separate pass if <see cref="ShadowStyle"/> is set.
     ///     </para>
     /// </remarks>
-    public void DrawBorderAndPadding ()
+    public void DrawAdornments ()
     {
         // We do not attempt to draw Margin. It is drawn in a separate pass.
 
@@ -230,6 +234,11 @@ public partial class View // Drawing APIs
             Padding?.Draw ();
         }
 
+
+        if (Margin is { } && Margin.Thickness != Thickness.Empty && Margin.ShadowStyle == ShadowStyle.None)
+        {
+            Margin?.Draw ();
+        }
     }
 
     private void ClearFrame ()
@@ -255,7 +264,7 @@ public partial class View // Drawing APIs
     ///     false (the default), this method will cause the <see cref="LineCanvas"/> be prepared to be rendered.
     /// </summary>
     /// <returns><see langword="true"/> to stop further drawing of the Adornments.</returns>
-    protected virtual bool OnDrawingBorderAndPadding () { return false; }
+    protected virtual bool OnDrawingAdornments () { return false; }
 
     #endregion DrawAdornments
 
@@ -306,31 +315,29 @@ public partial class View // Drawing APIs
 
     #region ClearViewport
 
-    internal void DoClearViewport ()
+    internal void DoClearViewport (DrawContext? context = null)
     {
-        if (ViewportSettings.HasFlag (ViewportSettings.Transparent))
+        if (ViewportSettings.HasFlag (ViewportSettings.Transparent) || OnClearingViewport ())
         {
             return;
         }
 
-        if (OnClearingViewport ())
-        {
-            return;
-        }
-
-        var dev = new DrawEventArgs (Viewport, Rectangle.Empty, null);
+        var dev = new DrawEventArgs (Viewport, Rectangle.Empty, context);
         ClearingViewport?.Invoke (this, dev);
 
         if (dev.Cancel)
         {
+            // BUGBUG: We should add the Viewport to context.DrawRegion here?
             SetNeedsDraw ();
             return;
         }
 
-        ClearViewport ();
-
-        OnClearedViewport ();
-        ClearedViewport?.Invoke (this, new (Viewport, Viewport, null));
+        if (!ViewportSettings.HasFlag (ViewportSettings.Transparent))
+        {
+            ClearViewport (context);
+            OnClearedViewport ();
+            ClearedViewport?.Invoke (this, new (Viewport, Viewport, null));
+        }
     }
 
     /// <summary>
@@ -369,7 +376,7 @@ public partial class View // Drawing APIs
     ///         the area outside the content to be visually distinct.
     ///     </para>
     /// </remarks>
-    public void ClearViewport ()
+    public void ClearViewport (DrawContext? context = null)
     {
         if (Driver is null)
         {
@@ -387,6 +394,9 @@ public partial class View // Drawing APIs
 
         Attribute prev = SetAttribute (GetNormalColor ());
         Driver.FillRect (toClear);
+
+        // context.AddDrawnRectangle (toClear);
+
         SetAttribute (prev);
         SetNeedsDraw ();
     }
@@ -402,6 +412,7 @@ public partial class View // Drawing APIs
             return;
         }
 
+        // TODO: Get rid of this vf in lieu of the one above
         if (OnDrawingText ())
         {
             return;
@@ -534,6 +545,7 @@ public partial class View // Drawing APIs
             return;
         }
 
+        // TODO: Get rid of this vf in lieu of the one above
         if (OnDrawingSubViews ())
         {
             return;
@@ -635,7 +647,7 @@ public partial class View // Drawing APIs
     /// <summary>
     ///     Gets or sets whether this View will use it's SuperView's <see cref="LineCanvas"/> for rendering any
     ///     lines. If <see langword="true"/> the rendering of any borders drawn by this Frame will be done by its parent's
-    ///     SuperView. If <see langword="false"/> (the default) this View's <see cref="OnDrawingBorderAndPadding"/> method will
+    ///     SuperView. If <see langword="false"/> (the default) this View's <see cref="OnDrawingAdornments"/> method will
     ///     be
     ///     called to render the borders.
     /// </summary>
@@ -697,6 +709,9 @@ public partial class View // Drawing APIs
                 // Exclude the Border and Padding from the clip
                 ExcludeFromClip (Border?.Thickness.AsRegion (FrameToScreen ()));
                 ExcludeFromClip (Padding?.Thickness.AsRegion (FrameToScreen ()));
+
+                // QUESTION: This makes it so that no nesting of transparent views is possible, but is more correct?
+                //context = new DrawContext ();
             }
             else
             {
@@ -711,6 +726,7 @@ public partial class View // Drawing APIs
                 // In the non-transparent (typical case), we want to exclude the entire view area (borderFrame) from the clip
                 ExcludeFromClip (borderFrame);
 
+                // BUGBUG: There looks like a bug in Region where this Union call is not adding the rectangle right
                 // Update context.DrawnRegion to include the entire view (borderFrame), but clipped to our SuperView's viewport
                 // This enables the SuperView to know what was drawn by this view.
                 context?.AddDrawnRectangle (borderFrame);

@@ -337,7 +337,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public static T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
-        where T : Toplevel, new ()
+        where T : Toplevel, new()
     {
         return ApplicationImpl.Instance.Run<T> (errorHandler, driver);
     }
@@ -426,7 +426,16 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
     internal static void LayoutAndDrawImpl (bool forceDraw = false)
     {
-        bool neededLayout = View.Layout (TopLevels.Reverse (), Screen.Size);
+        List<View> tops = [..TopLevels];
+
+        if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
+        {
+            visiblePopover.SetNeedsDraw ();
+            visiblePopover.SetNeedsLayout ();
+            tops.Insert (0, visiblePopover);
+        }
+
+        bool neededLayout = View.Layout (tops.ToArray ().Reverse (), Screen.Size);
 
         if (ClearScreenNextIteration)
         {
@@ -440,7 +449,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         }
 
         View.SetClipToScreen ();
-        View.Draw (TopLevels, neededLayout || forceDraw);
+        View.Draw (tops, neededLayout || forceDraw);
         View.SetClipToScreen ();
         Driver?.Refresh ();
     }
@@ -554,6 +563,8 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     public static void End (RunState runState)
     {
         ArgumentNullException.ThrowIfNull (runState);
+
+        Popover?.HidePopover (Popover?.GetActivePopover ());
 
         runState.Toplevel.OnUnloaded ();
 

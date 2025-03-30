@@ -20,7 +20,7 @@ public class Bar : View, IOrientation, IDesignable
     public Bar () : this ([]) { }
 
     /// <inheritdoc/>
-    public Bar (IEnumerable<Shortcut>? shortcuts)
+    public Bar (IEnumerable<View>? shortcuts)
     {
         CanFocus = true;
 
@@ -32,9 +32,10 @@ public class Bar : View, IOrientation, IDesignable
         // Initialized += Bar_Initialized;
         MouseEvent += OnMouseEvent;
 
+
         if (shortcuts is { })
         {
-            foreach (Shortcut shortcut in shortcuts)
+            foreach (View shortcut in shortcuts)
             {
                 Add (shortcut);
             }
@@ -81,13 +82,14 @@ public class Bar : View, IOrientation, IDesignable
     }
 
     /// <inheritdoc/>
-    public override void SetBorderStyle (LineStyle value)
+    public override void SetBorderStyle (LineStyle lineStyle)
     {
         if (Border is { })
         {
             // The default changes the thickness. We don't want that. We just set the style.
-            Border.LineStyle = value;
+           Border.LineStyle = lineStyle;
         }
+        //base.SetBorderStyle(lineStyle);
     }
 
     #region IOrientation members
@@ -217,7 +219,13 @@ public class Bar : View, IOrientation, IDesignable
                     barItem.ColorScheme = ColorScheme;
                     barItem.X = Pos.Align (Alignment.Start, AlignmentModes);
                     barItem.Y = 0; //Pos.Center ();
+
+                    if (barItem is Shortcut sc)
+                    {
+                        sc.Width = sc.GetWidthDimAuto ();
+                    }
                 }
+
                 break;
 
             case Orientation.Vertical:
@@ -278,7 +286,7 @@ public class Bar : View, IOrientation, IDesignable
                     {
                         if (subView is not Line)
                         {
-                            subView.Width = Dim.Auto (DimAutoStyle.Auto, minimumContentDim: maxBarItemWidth);
+                            subView.Width = Dim.Auto (DimAutoStyle.Auto, minimumContentDim: maxBarItemWidth, maximumContentDim: maxBarItemWidth);
                         }
                     }
                 }
@@ -298,7 +306,7 @@ public class Bar : View, IOrientation, IDesignable
     }
 
     /// <inheritdoc />
-    public bool EnableForDesign ()
+    public virtual bool EnableForDesign ()
     {
         var shortcut = new Shortcut
         {

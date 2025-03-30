@@ -81,15 +81,15 @@ public class Bars : Scenario
         };
         menuBarLikeExamples.Add (label);
 
-        bar = new MenuBarv2
-        {
-            Id = "menuBar",
-            X = Pos.Right (label),
-            Y = Pos.Top (label),
-        };
+        //bar = new MenuBarv2
+        //{
+        //    Id = "menuBar",
+        //    X = Pos.Right (label),
+        //    Y = Pos.Top (label),
+        //};
 
-        ConfigMenuBar (bar);
-        menuBarLikeExamples.Add (bar);
+        //ConfigMenuBar (bar);
+        //menuBarLikeExamples.Add (bar);
 
         FrameView menuLikeExamples = new ()
         {

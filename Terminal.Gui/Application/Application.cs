@@ -103,6 +103,7 @@ public static partial class Application
                        .ToList ();
     }
 
+    // BUGBUG: This does not return en-US even though it's supported by default
     internal static List<CultureInfo> GetSupportedCultures ()
     {
         CultureInfo [] cultures = CultureInfo.GetCultures (CultureTypes.AllCultures);
@@ -147,6 +148,12 @@ public static partial class Application
         {
             t!.Running = false;
         }
+
+        if (Popover?.GetActivePopover () is View popover)
+        {
+            popover.Visible = false;
+        }
+        Popover = null;
 
         TopLevels.Clear ();
 #if DEBUG_IDISPOSABLE
@@ -197,7 +204,9 @@ public static partial class Application
         Initialized = false;
 
         // Mouse
-        _lastMousePosition = null;
+        // Do not clear _lastMousePosition; Popover's require it to stay set with
+        // last mouse pos.
+        //_lastMousePosition = null;
         _cachedViewsUnderMouse.Clear ();
         WantContinuousButtonPressedView = null;
         MouseEvent = null;

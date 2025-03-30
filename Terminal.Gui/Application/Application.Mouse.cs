@@ -1,5 +1,6 @@
 #nullable enable
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Terminal.Gui;
 
@@ -168,6 +169,20 @@ public static partial class Application // Mouse handling
             return;
         }
 
+        // Dismiss the Popover if the user presses mouse outside of it
+        if (mouseEvent.IsPressed
+            && Popover?.GetActivePopover () as View is { Visible: true } visiblePopover
+            && View.IsInHierarchy (visiblePopover, deepestViewUnderMouse, includeAdornments: true) is false)
+        {
+
+            visiblePopover.Visible = false;
+
+            // Recurse once so the event can be handled below the popover
+            RaiseMouseEvent (mouseEvent);
+
+            return;
+        }
+
         if (HandleMouseGrab (deepestViewUnderMouse, mouseEvent))
         {
             return;
@@ -216,6 +231,7 @@ public static partial class Application // Mouse handling
         else
         {
             // The mouse was outside any View's Viewport.
+            //Debug.Fail ("this should not happen.");
 
             // Debug.Fail ("This should never happen. If it does please file an Issue!!");
 

@@ -235,7 +235,7 @@ public class ConfigurationManagerTests
     public void Load_Loads_Custom_Json ()
     {
         // arrange
-        Locations = ConfigLocations.All;
+        Locations = ConfigLocations.Runtime | ConfigLocations.Default;
         Reset ();
         ThrowOnJsonErrors = true;
 

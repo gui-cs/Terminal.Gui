@@ -66,10 +66,10 @@ internal class ResourceManagerWrapper (ResourceManager resourceManager)
         return filteredValue;
     }
 
-    public string GetString (string name, CultureInfo? culture = null!)
+    public string? GetString (string name, CultureInfo? culture = null!)
     {
         // Attempt to get the string for the specified culture
-        string value = _resourceManager.GetString (name, culture)!;
+        string? value = _resourceManager.GetString (name, culture)!;
 
         // If it's already using the invariant culture return
         if (Equals (culture, CultureInfo.InvariantCulture))
@@ -80,7 +80,7 @@ internal class ResourceManagerWrapper (ResourceManager resourceManager)
         // If the string is empty or null, fall back to the invariant culture
         if (string.IsNullOrEmpty (value))
         {
-            value = _resourceManager.GetString (name, CultureInfo.InvariantCulture)!;
+            value = _resourceManager.GetString (name, CultureInfo.InvariantCulture);
         }
 
         return value;

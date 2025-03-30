@@ -252,8 +252,7 @@ internal sealed class Menu : View
     protected override bool OnKeyDownNotHandled (Key keyEvent)
     {
         // We didn't handle the key, pass it on to host
-        bool? handled = null;
-        return _host.InvokeCommandsBoundToHotKey (keyEvent, ref handled) == true;
+        return _host.InvokeCommandsBoundToHotKey (keyEvent) is true;
     }
 
     protected override bool OnMouseEvent (MouseEventArgs me)
@@ -831,7 +830,7 @@ internal sealed class Menu : View
             return;
         }
 
-        DrawBorderAndPadding ();
+        DrawAdornments ();
         RenderLineCanvas ();
 
         // BUGBUG: Views should not change the clip. Doing so is an indcation of poor design or a bug in the framework.

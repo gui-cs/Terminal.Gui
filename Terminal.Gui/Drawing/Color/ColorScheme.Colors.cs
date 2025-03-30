@@ -185,6 +185,7 @@ public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Color
         }
     }
 
+    /// <inheritdoc />
     public void CopyTo (KeyValuePair<string, ColorScheme?> [] array, int arrayIndex)
     {
         lock (_lock)
@@ -193,6 +194,7 @@ public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Color
         }
     }
 
+    /// <inheritdoc />
     public IEnumerator<KeyValuePair<string, ColorScheme?>> GetEnumerator ()
     {
         lock (_lock)
@@ -206,6 +208,7 @@ public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Color
         return GetEnumerator ();
     }
 
+    /// <inheritdoc />
     public bool Remove (KeyValuePair<string, ColorScheme?> item)
     {
         lock (_lock)
@@ -219,6 +222,7 @@ public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Color
         }
     }
 
+    /// <inheritdoc />
     public bool Remove (string key)
     {
         lock (_lock)
@@ -245,7 +249,7 @@ public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Color
     /// <summary>
     ///     Resets the <see cref="ColorSchemes"/> dictionary to its default values.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The reset <see cref="ColorSchemes"/> dictionary.</returns>
     public static Dictionary<string, ColorScheme?> Reset ()
     {
         lock (_lock)

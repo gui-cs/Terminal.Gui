@@ -73,7 +73,7 @@ public class MenuBar : View, IDesignable
         Y = 0;
         Width = Dim.Fill ();
         Height = 1; // BUGBUG: Views should avoid setting Height as doing so implies Frame.Size == GetContentSize ().
-        Menus = new MenuBarItem [] { };
+        Menus = [];
 
         //CanFocus = true;
         _selected = -1;
@@ -111,9 +111,14 @@ public class MenuBar : View, IDesignable
                     Command.Cancel,
                     () =>
                     {
-                        CloseMenuBar ();
+                        if (IsMenuOpen)
+                        {
+                            CloseMenuBar ();
 
-                        return true;
+                            return true;
+                        }
+
+                        return false;
                     }
                    );
 
@@ -436,7 +441,15 @@ public class MenuBar : View, IDesignable
             return;
         }
 
-        Application.GrabMouse (this);
+        if (_isContextMenuLoading)
+        {
+            Application.GrabMouse (_openMenu);
+            _isContextMenuLoading = false;
+        }
+        else
+        {
+            Application.GrabMouse (this);
+        }
     }
 
     /// <inheritdoc/>
@@ -488,6 +501,11 @@ public class MenuBar : View, IDesignable
 
     internal void CleanUp ()
     {
+        if (_isCleaning)
+        {
+            return;
+        }
+
         _isCleaning = true;
 
         if (_openMenu is { })
@@ -556,10 +574,10 @@ public class MenuBar : View, IDesignable
 
     private void CloseOtherOpenedMenuBar ()
     {
-        if (Application.Top is { })
+        if (SuperView is { })
         {
             // Close others menu bar opened
-            Menu? menu = Application.Top.SubViews.FirstOrDefault (v => v is Menu m && m.Host != this && m.Host.IsMenuOpen) as Menu;
+            Menu? menu = SuperView.SubViews.FirstOrDefault (v => v is Menu m && m.Host != this && m.Host.IsMenuOpen) as Menu;
             menu?.Host.CleanUp ();
         }
     }
@@ -595,7 +613,7 @@ public class MenuBar : View, IDesignable
             case false:
                 if (_openMenu is { })
                 {
-                    Application.Top?.Remove (_openMenu);
+                    SuperView?.Remove (_openMenu);
                 }
 
                 SetNeedsDraw ();
@@ -634,7 +652,7 @@ public class MenuBar : View, IDesignable
 
                     if (OpenCurrentMenu is { })
                     {
-                        Application.Top?.Remove (OpenCurrentMenu);
+                        SuperView?.Remove (OpenCurrentMenu);
                         if (Application.MouseGrabView == OpenCurrentMenu)
                         {
                             Application.UngrabMouse ();
@@ -721,6 +739,11 @@ public class MenuBar : View, IDesignable
                 }
 
                 if (_selected > -1 && !CloseMenu (true, ignoreUseSubMenusSingleFrame))
+                {
+                    return;
+                }
+
+                if (_selected == -1)
                 {
                     return;
                 }
@@ -822,7 +845,7 @@ public class MenuBar : View, IDesignable
 
                 if (_openMenu is { })
                 {
-                    Application.Top?.Remove (_openMenu);
+                    SuperView?.Remove (_openMenu);
                     if (Application.MouseGrabView == _openMenu)
                     {
                         Application.UngrabMouse ();
@@ -838,34 +861,23 @@ public class MenuBar : View, IDesignable
                     pos += Menus [i].TitleLength + (Menus [i].Help.GetColumns () > 0 ? Menus [i].Help.GetColumns () + 2 : 0) + _leftPadding + _rightPadding;
                 }
 
-                var locationOffset = Point.Empty;
 
-                // if SuperView is null then it's from a ContextMenu
-                if (SuperView is null)
-                {
-                    locationOffset = GetScreenOffset ();
-                }
 
-                if (SuperView is { } && SuperView != Application.Top)
-                {
-                    locationOffset.X += SuperView.Border.Thickness.Left;
-                    locationOffset.Y += SuperView.Border.Thickness.Top;
-                }
 
                 _openMenu = new ()
                 {
                     Host = this,
-                    X = Frame.X + pos + locationOffset.X,
-                    Y = Frame.Y + 1 + locationOffset.Y,
+                    X = Frame.X + pos,
+                    Y = Frame.Y + 1,
                     BarItems = Menus [index],
                     Parent = null
                 };
                 OpenCurrentMenu = _openMenu;
                 OpenCurrentMenu._previousSubFocused = _openMenu;
 
-                if (Application.Top is { })
+                if (SuperView is { })
                 {
-                    Application.Top.Add (_openMenu);
+                    SuperView.Add (_openMenu);
                    // _openMenu.SetRelativeLayout (Application.Screen.Size);
                 }
                 else
@@ -894,13 +906,11 @@ public class MenuBar : View, IDesignable
 
                     if (!UseSubMenusSingleFrame)
                     {
-                        locationOffset = GetLocationOffset ();
-
                         OpenCurrentMenu = new ()
                         {
                             Host = this,
-                            X = last!.Frame.Left + last.Frame.Width + locationOffset.X,
-                            Y = last.Frame.Top + locationOffset.Y + last._currentChild,
+                            X = last!.Frame.Left + last.Frame.Width,
+                            Y = last.Frame.Top + last._currentChild + 1,
                             BarItems = subMenu,
                             Parent = last
                         };
@@ -931,7 +941,7 @@ public class MenuBar : View, IDesignable
 
                     OpenCurrentMenu._previousSubFocused = last._previousSubFocused;
                     _openSubMenu.Add (OpenCurrentMenu);
-                    Application.Top?.Add (OpenCurrentMenu);
+                    SuperView?.Add (OpenCurrentMenu);
 
                     if (!OpenCurrentMenu.IsInitialized)
                     {
@@ -979,6 +989,11 @@ public class MenuBar : View, IDesignable
                     return;
                 }
 
+                if (_selected == -1)
+                {
+                    return;
+                }
+
                 OpenMenu (_selected);
 
                 if (!SelectEnabledItem (
@@ -1014,7 +1029,7 @@ public class MenuBar : View, IDesignable
         {
             foreach (Menu item in _openSubMenu)
             {
-                Application.Top!.Remove (item);
+                SuperView?.Remove (item);
                 if (Application.MouseGrabView == item)
                 {
                     Application.UngrabMouse ();
@@ -1263,7 +1278,7 @@ public class MenuBar : View, IDesignable
             if (_openSubMenu is { })
             {
                 menu = _openSubMenu [i];
-                Application.Top!.Remove (menu);
+                SuperView!.Remove (menu);
                 _openSubMenu.Remove (menu);
 
                 if (Application.MouseGrabView == menu)
@@ -1456,9 +1471,9 @@ public class MenuBar : View, IDesignable
                             Activate (i);
                         }
                     }
-                    else if (me.Flags == MouseFlags.Button1Pressed
-                             || me.Flags == MouseFlags.Button1DoubleClicked
-                             || me.Flags == MouseFlags.Button1TripleClicked)
+                    else if (me.Flags.HasFlag (MouseFlags.Button1Pressed)
+                             || me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
+                             || me.Flags.HasFlag (MouseFlags.Button1TripleClicked))
                     {
                         if (IsMenuOpen && !Menus [i].IsTopLevel)
                         {
@@ -1542,9 +1557,16 @@ public class MenuBar : View, IDesignable
                     }
                 }
 
+                if (Application.MouseGrabView != me.View)
+                {
+                    View v = me.View;
+                    Application.GrabMouse (v);
+
+                    return true;
+                }
+
                 if (me.View != current)
                 {
-                    Application.UngrabMouse ();
                     View v = me.View;
                     Application.GrabMouse (v);
                     MouseEventArgs nme;
@@ -1592,7 +1614,6 @@ public class MenuBar : View, IDesignable
             else
             {
                 _handled = false;
-                _isContextMenuLoading = false;
 
                 return false;
             }

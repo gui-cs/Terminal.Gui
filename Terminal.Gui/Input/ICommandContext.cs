@@ -15,4 +15,10 @@ public interface ICommandContext
     ///     The <see cref="Command"/> that is being invoked.
     /// </summary>
     public Command Command { get; set; }
+
+    /// <summary>
+    ///     The View that was the source of the command invocation, if any.
+    ///     (e.g. the view the user clicked on or the view that had focus when a key was pressed).
+    /// </summary>
+    public View? Source { get; set; }
 }

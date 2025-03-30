@@ -49,11 +49,10 @@ public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
     private static string FormatConsoleKeyInfoForTestCase (ConsoleKeyInfo input)
     {
         string charLiteral = input.KeyChar == '\0' ? @"'\0'" : $"'{input.KeyChar}'";
-        var expectedLiteral = "new Rune('todo')";
 
         return $"new ConsoleKeyInfo({charLiteral}, ConsoleKey.{input.Key}, "
                + $"{input.Modifiers.HasFlag (ConsoleModifiers.Shift).ToString ().ToLower ()}, "
                + $"{input.Modifiers.HasFlag (ConsoleModifiers.Alt).ToString ().ToLower ()}, "
-               + $"{input.Modifiers.HasFlag (ConsoleModifiers.Control).ToString ().ToLower ()}), {expectedLiteral}";
+               + $"{input.Modifiers.HasFlag (ConsoleModifiers.Control).ToString ().ToLower ()}),";
     }
 }

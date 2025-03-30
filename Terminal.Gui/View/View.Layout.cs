@@ -1020,6 +1020,7 @@ public partial class View // Layout APIs
 
     // BUGBUG: This method interferes with Dialog/MessageBox default min/max size.
     // TODO: Get rid of MenuBar coupling as part of https://github.com/gui-cs/Terminal.Gui/issues/2975
+    // TODO: Refactor / rewrite this - It's a mess
     /// <summary>
     ///     Gets a new location of the <see cref="View"/> that is within the Viewport of the <paramref name="viewToMove"/>'s
     ///     <see cref="View.SuperView"/> (e.g. for dragging a Window). The `out` parameters are the new X and Y coordinates.
@@ -1048,7 +1049,7 @@ public partial class View // Layout APIs
         int maxDimension;
         View? superView;
 
-        if (viewToMove is not Toplevel || viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
+        if (viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
         {
             maxDimension = Application.Screen.Width;
             superView = Application.Top;
@@ -1070,14 +1071,14 @@ public partial class View // Layout APIs
             nx = Math.Max (targetX, 0);
             nx = nx + viewToMove.Frame.Width > maxDimension ? Math.Max (maxDimension - viewToMove.Frame.Width, 0) : nx;
 
-            if (nx > viewToMove.Frame.X + viewToMove.Frame.Width)
-            {
-                nx = Math.Max (viewToMove.Frame.Right, 0);
-            }
+            //if (nx > viewToMove.Frame.X + viewToMove.Frame.Width)
+            //{
+            //    nx = Math.Max (viewToMove.Frame.Right, 0);
+            //}
         }
         else
         {
-            nx = targetX;
+            nx = 0;//targetX;
         }
 
         //System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
@@ -1136,15 +1137,19 @@ public partial class View // Layout APIs
                      ? Math.Max (maxDimension - viewToMove.Frame.Height, menuVisible ? 1 : 0)
                      : ny;
 
-            if (ny > viewToMove.Frame.Y + viewToMove.Frame.Height)
-            {
-                ny = Math.Max (viewToMove.Frame.Bottom, 0);
-            }
+            //if (ny > viewToMove.Frame.Y + viewToMove.Frame.Height)
+            //{
+            //    ny = Math.Max (viewToMove.Frame.Bottom, 0);
+            //}
+        }
+        else
+        {
+            ny = 0;
         }
 
-        //System.Diagnostics.Debug.WriteLine ($"ny:{ny}, rHeight:{rHeight}");
+            //System.Diagnostics.Debug.WriteLine ($"ny:{ny}, rHeight:{rHeight}");
 
-        return superView!;
+            return superView!;
     }
 
     #endregion Utilities

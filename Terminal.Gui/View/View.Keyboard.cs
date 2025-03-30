@@ -302,9 +302,9 @@ public partial class View // Keyboard APIs
             return true;
         }
 
-        bool? handled = false;
+        bool? handled = InvokeCommandsBoundToHotKey (key);
 
-        if (InvokeCommandsBoundToHotKey (key, ref handled))
+        if (handled is true)
         {
             return true;
         }
@@ -590,10 +590,16 @@ public partial class View // Keyboard APIs
     ///     Invokes any commands bound to <paramref name="hotKey"/> on this view and subviews.
     /// </summary>
     /// <param name="hotKey"></param>
-    /// <param name="handled"></param>
-    /// <returns></returns>
-    internal bool InvokeCommandsBoundToHotKey (Key hotKey, ref bool? handled)
+    /// <returns>
+    ///     <see langword="null"/> if no command was invoked; input processing should continue.
+    ///     <see langword="false"/> if at least one command was invoked and was not handled (or cancelled); input processing
+    ///     should continue.
+    ///     <see langword="true"/> if at least one command was invoked and handled (or cancelled); input processing should
+    ///     stop.
+    /// </returns>
+    internal bool? InvokeCommandsBoundToHotKey (Key hotKey)
     {
+        bool? handled = null;
         // Process this View
         if (HotKeyBindings.TryGet (hotKey, out KeyBinding binding))
         {
@@ -604,16 +610,16 @@ public partial class View // Keyboard APIs
         }
 
         // Now, process any HotKey bindings in the subviews
-        foreach (View subview in InternalSubViews)
+        foreach (View subview in InternalSubViews.ToList())
         {
             if (subview == Focused)
             {
                 continue;
             }
 
-            bool recurse = subview.InvokeCommandsBoundToHotKey (hotKey, ref handled);
+            bool? recurse = subview.InvokeCommandsBoundToHotKey (hotKey);
 
-            if (recurse || (handled is { } && (bool)handled))
+            if (recurse is true || (handled is { } && (bool)handled))
             {
                 return true;
             }
@@ -637,28 +643,6 @@ public partial class View // Keyboard APIs
     protected bool? DoInvokeCommands (Key key)
     {
         if (!KeyBindings.TryGet (key, out KeyBinding binding))
-        {
-            return null;
-        }
-
-        return InvokeCommands (binding.Commands, binding);
-    }
-
-    /// <summary>
-    ///     Invokes the Commands bound to <paramref name="hotKey"/>.
-    ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
-    /// </summary>
-    /// <param name="hotKey">The hot key event passed.</param>
-    /// <returns>
-    ///     <see langword="null"/> if no command was invoked; input processing should continue.
-    ///     <see langword="false"/> if at least one command was invoked and was not handled (or cancelled); input processing
-    ///     should continue.
-    ///     <see langword="true"/> if at least one command was invoked and handled (or cancelled); input processing should
-    ///     stop.
-    /// </returns>
-    protected bool? InvokeCommandsBoundToHotKey (Key hotKey)
-    {
-        if (!HotKeyBindings.TryGet (hotKey, out KeyBinding binding))
         {
             return null;
         }

@@ -11,7 +11,7 @@ public interface IConsoleOutput : IDisposable
     ///     <see cref="IOutputBuffer"/> overload.
     /// </summary>
     /// <param name="text"></param>
-    void Write (string text);
+    void Write (ReadOnlySpan<char> text);
 
     /// <summary>
     ///     Write the contents of the <paramref name="buffer"/> to the console

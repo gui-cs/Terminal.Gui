@@ -1,4 +1,8 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+
+using System.Diagnostics.CodeAnalysis;
+
+namespace Terminal.Gui;
 
 /// <summary>
 ///     When implemented by a class, allows mapping <see cref="Color"/> to
@@ -20,7 +24,7 @@ public interface IColorNameResolver
     /// <param name="color"></param>
     /// <param name="name"></param>
     /// <returns></returns>
-    bool TryNameColor (Color color, out string name);
+    bool TryNameColor (Color color, [NotNullWhen(true)]out string? name);
 
     /// <summary>
     ///     Returns <see langword="true"/> if <paramref name="name"/> is a recognized
@@ -30,5 +34,5 @@ public interface IColorNameResolver
     /// <param name="name"></param>
     /// <param name="color"></param>
     /// <returns></returns>
-    bool TryParseColor (string name, out Color color);
+    bool TryParseColor (ReadOnlySpan<char> name, out Color color);
 }
