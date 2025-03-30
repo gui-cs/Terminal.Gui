@@ -44,7 +44,7 @@ public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Color
     ///             <item>
     ///                 <term>Menu</term>
     ///                 <description>
-    ///                     The menu color scheme; used for <see cref="MenuBar"/>, <see cref="ContextMenu"/>, and
+    ///                     The menu color scheme; used for <see cref="Menu"/>, <see cref="MenuBar"/>, and
     ///                     <see cref="StatusBar"/>.
     ///                 </description>
     ///             </item>
