@@ -14,33 +14,19 @@ public class PopoverMenu : PopoverBaseImpl
     public PopoverMenu () : this ((Menuv2?)null) { }
 
     /// <inheritdoc/>
-    public PopoverMenu (IEnumerable<View>? menuItems) : this (new Menuv2 (menuItems))
-    {
-        Key = DefaultKey;
-    }
+    public PopoverMenu (IEnumerable<View>? menuItems) : this (new Menuv2 (menuItems)) { }
 
-    private Key _key = DefaultKey;
 
-    /// <summary>Specifies the key that will activate the context menu.</summary>
-    public Key Key
-    {
-        get => _key;
-        set
-        {
-            Key oldKey = _key;
-            _key = value;
-            KeyChanged?.Invoke (this, new KeyChangedEventArgs (oldKey, _key));
-        }
-    }
-
-    /// <summary>Event raised when the <see cref="ContextMenu.Key"/> is changed
-    public event EventHandler<KeyChangedEventArgs>? KeyChanged;
+    /// <inheritdoc />
+    public PopoverMenu (IEnumerable<MenuItemv2>? menuItems) : this (new Menuv2 (menuItems)) { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PopoverMenu"/> class with the specified root <see cref="Menuv2"/>.
     /// </summary>
     public PopoverMenu (Menuv2? root)
     {
+        Key = DefaultKey;
+
         base.Visible = false;
         //base.ColorScheme = Colors.ColorSchemes ["Menu"];
 
@@ -116,15 +102,32 @@ public class PopoverMenu : PopoverBaseImpl
         }
     }
 
+    private Key _key = DefaultKey;
+    /// <summary>Specifies the key that will activate the context menu.</summary>
+    public Key Key
+    {
+        get => _key;
+        set
+        {
+            Key oldKey = _key;
+            _key = value;
+            KeyChanged?.Invoke (this, new KeyChangedEventArgs (oldKey, _key));
+        }
+    }
+
+    /// <summary>Event raised when the <see cref="ContextMenu.Key"/> is changed
+    public event EventHandler<KeyChangedEventArgs>? KeyChanged;
+
+    /// <summary>The default key for activating popover menus.</summary>
+    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Key DefaultKey { get; set; } = Key.F10.WithShift;
+
     /// <summary>
     ///     The mouse flags that will cause the popover menu to be visible. The default is
     ///     <see cref="MouseFlags.Button3Clicked"/> which is typically the right mouse button.
     /// </summary>
     public MouseFlags MouseFlags { get; set; } = MouseFlags.Button3Clicked;
 
-    /// <summary>The default key for activating popover menus.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key DefaultKey { get; set; } = Key.F10.WithShift;
 
     /// <summary>
     ///     Makes the popover menu visible and locates it at <paramref name="idealScreenPosition"/>. The actual position of the menu
@@ -137,7 +140,7 @@ public class PopoverMenu : PopoverBaseImpl
     {
         UpdateKeyBindings ();
         SetPosition (idealScreenPosition);
-        Application.Popover?.ShowPopover (this);
+        Application.Popover?.Show (this);
     }
 
     /// <summary>
@@ -179,7 +182,7 @@ public class PopoverMenu : PopoverBaseImpl
         else
         {
             HideAndRemoveSubMenu (_root);
-            Application.Popover?.HidePopover (this);
+            Application.Popover?.Hide (this);
         }
     }
 

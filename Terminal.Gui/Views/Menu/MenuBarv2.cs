@@ -86,7 +86,7 @@ public class MenuBarv2 : Menuv2, IDesignable
             && Application.Popover?.GetActivePopover () is PopoverMenu popoverMenu
             && popoverMenu?.Root?.SuperMenuItem?.SuperView == this)
         {
-            Application.Popover?.HidePopover (popoverMenu);
+            Application.Popover?.Hide (popoverMenu);
         }
 
         menuBarItem?.PopoverMenu?.MakeVisible (new Point (menuBarItem.FrameToScreen ().X, menuBarItem.FrameToScreen ().Bottom));

@@ -502,22 +502,6 @@ public class MenusV2 : Scenario
 
             menu.Add (deeperDetail, new Line (), shortcut4);
         }
-
-        /// <inheritdoc/>
-        protected override void Dispose (bool disposing)
-        {
-            if (disposing)
-            {
-                //    if (FilePopoverMenu is { })
-                //    {
-                //        FilePopoverMenu.Visible = false;
-                //        FilePopoverMenu?.Dispose ();
-                //        FilePopoverMenu = null;
-                //    }
-            }
-
-            base.Dispose (disposing);
-        }
     }
 
     private const string LOGFILE_LOCATION = "./logs";

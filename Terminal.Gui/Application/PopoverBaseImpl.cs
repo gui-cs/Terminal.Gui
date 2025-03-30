@@ -6,8 +6,8 @@ namespace Terminal.Gui;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         To show a Popover, use <see cref="ApplicationPopover.ShowPopover"/>. To hide a popover,
-///         call <see cref="ApplicationPopover.ShowPopover"/> with <see langword="null"/> set <see cref="View.Visible"/> to <see langword="false"/>.
+///         To show a Popover, use <see cref="ApplicationPopover.Show"/>. To hide a popover,
+///         call <see cref="ApplicationPopover.Show"/> with <see langword="null"/> set <see cref="View.Visible"/> to <see langword="false"/>.
 ///     </para>
 ///     <para>
 ///         If the user clicks anywhere not occulded by a SubView of the Popover, presses <see cref="Application.QuitKey"/>,

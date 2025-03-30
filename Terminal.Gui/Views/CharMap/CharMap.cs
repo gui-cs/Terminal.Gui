@@ -18,8 +18,6 @@ public class CharMap : View, IDesignable
     private const int HEADER_HEIGHT = 1; // Height of the header
     private int _rowHeight = 1; // Height of each row of 16 glyphs - changing this is not tested
 
-    private PopoverMenu? _contextMenu;
-
     /// <summary>
     ///     Initializes a new instance.
     /// </summary>
@@ -505,39 +503,27 @@ public class CharMap : View, IDesignable
 
         SelectedCodePoint = newCodePoint;
 
-        MenuItemv2 [] menuItems =
-        [
-            new (
-                 Strings.charMapCopyGlyph,
-                 "",
-                 CopyGlyph,
-                 Key.G.WithCtrl
-                ),
-            new (
-                 Strings.charMapCopyCP,
-                 "",
-                 CopyCodePoint,
-                 Key.P.WithCtrl
-                )
-        ];
 
-        if (_contextMenu is null)
-        {
-            _contextMenu = new (menuItems);
-            Application.Popover?.Register(_contextMenu);
+        // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
+        // and the context menu is disposed when it is closed.
+        PopoverMenu? contextMenu = Application.Popover?.Register (
+                                                                  new PopoverMenu (
+                                                                                   [
+                                                                                       new (
+                                                                                            Strings.charMapCopyGlyph,
+                                                                                            "",
+                                                                                            CopyGlyph,
+                                                                                            Key.G.WithCtrl
+                                                                                           ),
+                                                                                       new (
+                                                                                            Strings.charMapCopyCP,
+                                                                                            "",
+                                                                                            CopyCodePoint,
+                                                                                            Key.P.WithCtrl
+                                                                                           )
+                                                                                   ])) as PopoverMenu;
 
-            _contextMenu.VisibleChanged += (sender, args) =>
-                                           {
-                                               if (_contextMenu?.Visible is false)
-                                               {
-                                                   Application.Popover?.DeRegister (_contextMenu);
-                                                   _contextMenu.Dispose ();
-                                                   _contextMenu = null;
-                                               }
-                                           };
-        }
-
-        _contextMenu.MakeVisible (ViewportToScreen (GetCursor (SelectedCodePoint)));
+        contextMenu?.MakeVisible (ViewportToScreen (GetCursor (SelectedCodePoint)));
 
         return true;
     }
@@ -649,7 +635,7 @@ public class CharMap : View, IDesignable
                                                         document.RootElement,
                                                         new
                                                             JsonSerializerOptions
-                                                            { WriteIndented = true }
+                                                        { WriteIndented = true }
                                                        );
             }
 

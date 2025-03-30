@@ -1,13 +1,14 @@
 #nullable enable
 
 using System.Diagnostics;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Terminal.Gui;
 
 /// <summary>
 ///     Helper class for support of <see cref="IPopover"/> views for <see cref="Application"/>. Held by <see cref="Application.Popover"/>
 /// </summary>
-public class ApplicationPopover
+public sealed class ApplicationPopover : IDisposable
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="ApplicationPopover"/> class.
@@ -16,27 +17,39 @@ public class ApplicationPopover
 
     private readonly List<IPopover> _popovers = [];
 
-    /// <summary></summary>
+    /// <summary>
+    ///     Gets the list of popovers registered with the application.
+    /// </summary>
     public IReadOnlyCollection<IPopover> Popovers => _popovers.AsReadOnly ();
 
     /// <summary>
     ///     Registers <paramref name="popover"/> with the application.
-    ///     This enables the popover to receive keyboard events even when when it is not active.
+    ///     This enables the popover to receive keyboard events even when it is not active.
     /// </summary>
+    /// <remarks>
+    ///     When a popover is registered, the View instance lifetime is managed by the application. Call <see cref="DeRegister"/>
+    ///     to manage the lifetime of the popover directly.
+    /// </remarks>
     /// <param name="popover"></param>
-    public void Register (IPopover? popover)
+    /// <returns><paramref name="popover"/>, after it has been registered.</returns>
+    public IPopover? Register (IPopover? popover)
     {
         if (popover is { } && !_popovers.Contains (popover))
         {
             _popovers.Add (popover);
-
         }
+
+        return popover;
     }
 
     /// <summary>
     ///     De-registers <paramref name="popover"/> with the application. Use this to remove the popover and it's
     ///     keyboard bindings from the application.
     /// </summary>
+    /// <remarks>
+    ///     When a popover is registered, the View instance lifetime is managed by the application. Call <see cref="DeRegister"/>
+    ///     to manage the lifetime of the popover directly.
+    /// </remarks>
     /// <param name="popover"></param>
     /// <returns></returns>
     public bool DeRegister (IPopover? popover)
@@ -61,22 +74,25 @@ public class ApplicationPopover
     /// <summary>
     ///     Gets the active popover, if any.
     /// </summary>
+    /// <remarks>
+    ///     Note, the active pop over does not necessarily to be registered with the application.
+    /// </remarks>
     /// <returns></returns>
     public IPopover? GetActivePopover () { return _activePopover; }
 
     /// <summary>
-    ///     Shows <paramref name="popover"/>. IPopover implementations should use OnVisibleChnaged/VisibleChanged to be
+    ///     Shows <paramref name="popover"/>. IPopover implementations should use OnVisibleChanaged/VisibleChanged to be
     ///     notified when the user has done something to cause the popover to be hidden.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Note, this API calls <see cref="Register"/>. To disable the popover from processing keyboard events,
+    ///         This API calls <see cref="Register"/>. To disable the popover from processing keyboard events,
     ///         either call <see cref="DeRegister"/> to
     ///         remove the popover from the application or set <see cref="View.Enabled"/> to <see langword="false"/>.
     ///     </para>
     /// </remarks>
     /// <param name="popover"></param>
-    public void ShowPopover (IPopover? popover)
+    public void Show (IPopover? popover)
     {
         // If there's an existing popover, hide it.
         if (_activePopover is View popoverView)
@@ -87,8 +103,6 @@ public class ApplicationPopover
 
         if (popover is View newPopover)
         {
-            Register (popover);
-
             if (!newPopover.IsInitialized)
             {
                 newPopover.BeginInit ();
@@ -106,7 +120,7 @@ public class ApplicationPopover
     ///     If the popover is dervied from <see cref="PopoverBaseImpl"/>, this is the same as setting <see cref="View.Visible"/> to <see langword="false"/>.
     /// </summary>
     /// <param name="popover"></param>
-    public void HidePopover (IPopover? popover)
+    public void Hide (IPopover? popover)
     {
         // If there's an existing popover, hide it.
         if (_activePopover is View popoverView && popoverView == popover)
@@ -127,9 +141,10 @@ public class ApplicationPopover
     internal bool DispatchKeyDown (Key key)
     {
         // Do active first - Active gets all key down events.
-        if (GetActivePopover () as View is { Visible: true } visiblePopover)
+        View? activePopover = GetActivePopover () as View;
+        if (activePopover is { Visible: true })
         {
-            if (visiblePopover.NewKeyDownEvent (key))
+            if (activePopover.NewKeyDownEvent (key))
             {
                 return true;
             }
@@ -141,7 +156,7 @@ public class ApplicationPopover
 
         foreach (IPopover popover in _popovers)
         {
-            if (GetActivePopover () == popover || popover is not View popoverView)
+            if (popover == activePopover || popover is not View popoverView)
             {
                 continue;
             }
@@ -156,5 +171,18 @@ public class ApplicationPopover
         }
 
         return hotKeyHandled is true;
+    }
+
+    /// <inheritdoc />
+    public void Dispose ()
+    {
+        foreach (IPopover popover in _popovers)
+        {
+            if (popover is View view)
+            {
+                view.Dispose ();
+            }
+        }
+        _popovers.Clear ();
     }
 }
