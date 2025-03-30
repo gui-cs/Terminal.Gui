@@ -508,8 +508,8 @@ public class CharMap : View, IDesignable
         // Note, for ephemeral Popovers, hotkeys are not supported.
         PopoverMenu? contextMenu = new (
                                         [
-                                            new (Strings.charMapCopyGlyph, "", CopyGlyph),
-                                            new (Strings.charMapCopyCP, "", CopyCodePoint)
+                                            new (Strings.charMapCopyGlyph, string.Empty, CopyGlyph),
+                                            new (Strings.charMapCopyCP, string.Empty, CopyCodePoint)
                                         ]);
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
