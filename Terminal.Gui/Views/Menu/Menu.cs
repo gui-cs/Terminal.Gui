@@ -3,8 +3,7 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     An internal class used to represent a menu pop-up menu. Created and managed by <see cref="MenuBar"/> and
-///     <see cref="ContextMenu"/>.
+///     An internal class used to represent a menu pop-up menu. Created and managed by <see cref="MenuBar"/>.
 /// </summary>
 internal sealed class Menu : View
 {

@@ -42,7 +42,7 @@ public class ContextMenus : Scenario
         {
             X = Pos.Center (),
             Y = Pos.Bottom (label),
-            Text = $"Press '{ContextMenu.DefaultKey}' to open the TextField context menu."
+            Text = $"Press '{PopoverMenu.DefaultKey}' to open the TextField context menu."
         };
         appWindow.Add (label);
 

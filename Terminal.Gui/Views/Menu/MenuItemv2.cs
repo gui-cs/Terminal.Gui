@@ -49,9 +49,17 @@ public class MenuItemv2 : Shortcut
         SubMenu = subMenu;
     }
 
+    /// <inheritdoc />
     public MenuItemv2 (string? commandText = null, string? helpText = null, Action? action = null, Key? key = null)
         : base (key ?? Key.Empty, commandText, action, helpText)
     {
+    }
+
+    /// <inheritdoc />
+    public MenuItemv2 (string? commandText = null, string? helpText = null, Menuv2? subMenu = null)
+        : base (Key.Empty, commandText, null, helpText)
+    {
+        SubMenu = subMenu;
     }
 
     // TODO: Consider moving TargetView and Command to Shortcut?

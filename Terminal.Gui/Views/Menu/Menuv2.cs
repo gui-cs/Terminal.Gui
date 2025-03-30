@@ -10,6 +10,9 @@ public class Menuv2 : Bar
     public Menuv2 () : this ([]) { }
 
     /// <inheritdoc/>
+    public Menuv2 (IEnumerable<MenuItemv2>? shortcuts) : this (shortcuts?.Cast<View>()) { }
+
+    /// <inheritdoc/>
     public Menuv2 (IEnumerable<View>? shortcuts) : base (shortcuts)
     {
         Orientation = Orientation.Vertical;
@@ -18,7 +21,6 @@ public class Menuv2 : Bar
 
         Border!.Thickness = new Thickness (1, 1, 1, 1);
         Border.LineStyle = LineStyle.Single;
-
     }
 
     /// <summary>

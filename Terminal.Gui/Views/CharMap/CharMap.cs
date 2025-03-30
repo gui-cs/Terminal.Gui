@@ -503,25 +503,18 @@ public class CharMap : View, IDesignable
 
         SelectedCodePoint = newCodePoint;
 
+        // This demonstrates how to create an ephemeral Popover; one that exists
+        // ony as long as the popover is visible.
+        // Note, for ephemeral Popovers, hotkeys are not supported.
+        PopoverMenu? contextMenu = new (
+                                        [
+                                            new (Strings.charMapCopyGlyph, "", CopyGlyph),
+                                            new (Strings.charMapCopyCP, "", CopyCodePoint)
+                                        ]);
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.
-        PopoverMenu? contextMenu = Application.Popover?.Register (
-                                                                  new PopoverMenu (
-                                                                                   [
-                                                                                       new (
-                                                                                            Strings.charMapCopyGlyph,
-                                                                                            "",
-                                                                                            CopyGlyph,
-                                                                                            Key.G.WithCtrl
-                                                                                           ),
-                                                                                       new (
-                                                                                            Strings.charMapCopyCP,
-                                                                                            "",
-                                                                                            CopyCodePoint,
-                                                                                            Key.P.WithCtrl
-                                                                                           )
-                                                                                   ])) as PopoverMenu;
+        Application.Popover?.Register (contextMenu);
 
         contextMenu?.MakeVisible (ViewportToScreen (GetCursor (SelectedCodePoint)));
 
@@ -635,7 +628,7 @@ public class CharMap : View, IDesignable
                                                         document.RootElement,
                                                         new
                                                             JsonSerializerOptions
-                                                        { WriteIndented = true }
+                                                            { WriteIndented = true }
                                                        );
             }
 

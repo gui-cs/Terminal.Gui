@@ -57,7 +57,7 @@ public class GuiTestContext : IDisposable
                                                                    .CreateLogger ("Test Logging");
                                      Logging.Logger = logger;
 
-                                     v2.Init (null, GetDriverName());
+                                     v2.Init (null, GetDriverName ());
 
                                      booting.Release ();
 
@@ -93,12 +93,12 @@ public class GuiTestContext : IDisposable
     private string GetDriverName ()
     {
         return _driver switch
-               {
-                   V2TestDriver.V2Win => "v2win",
-                   V2TestDriver.V2Net => "v2net",
-                   _ =>
-                       throw new ArgumentOutOfRangeException ()
-               };
+        {
+            V2TestDriver.V2Win => "v2win",
+            V2TestDriver.V2Net => "v2net",
+            _ =>
+                throw new ArgumentOutOfRangeException ()
+        };
     }
 
     /// <summary>
@@ -299,14 +299,14 @@ public class GuiTestContext : IDisposable
             case V2TestDriver.V2Net:
 
                 int netButton = btn switch
-                                {
-                                    WindowsConsole.ButtonState.Button1Pressed => 0,
-                                    WindowsConsole.ButtonState.Button2Pressed => 1,
-                                    WindowsConsole.ButtonState.Button3Pressed => 2,
-                                    WindowsConsole.ButtonState.RightmostButtonPressed => 2,
-                                    _ => throw new ArgumentOutOfRangeException(nameof(btn))
-                                };
-                foreach (var k in NetSequences.Click(netButton,screenX,screenY))
+                {
+                    WindowsConsole.ButtonState.Button1Pressed => 0,
+                    WindowsConsole.ButtonState.Button2Pressed => 1,
+                    WindowsConsole.ButtonState.Button3Pressed => 2,
+                    WindowsConsole.ButtonState.RightmostButtonPressed => 2,
+                    _ => throw new ArgumentOutOfRangeException (nameof (btn))
+                };
+                foreach (var k in NetSequences.Click (netButton, screenX, screenY))
                 {
                     SendNetKey (k);
                 }
@@ -452,18 +452,20 @@ public class GuiTestContext : IDisposable
 
     /// <summary>
     /// Registers a right click handler on the <see cref="LastView"/> added view (or root view) that
-    /// will open the supplied <paramref name="menuItems"/>.
+    /// will open the supplied <paramref name="contextMenu"/>.
     /// </summary>
-    /// <param name="ctx"></param>
-    /// <param name="menuItems"></param>
+    /// <param name="contextMenu"></param>
     /// <returns></returns>
-    public GuiTestContext WithContextMenu (ContextMenu ctx, MenuBarItem menuItems)
+    public GuiTestContext WithContextMenu (PopoverMenu? contextMenu)
     {
         LastView.MouseEvent += (s, e) =>
                                {
                                    if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
                                    {
-                                       ctx.Show (menuItems);
+                                       // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
+                                       // and the context menu is disposed when it is closed.
+                                       Application.Popover?.Register (contextMenu);
+                                       contextMenu?.MakeVisible (e.ScreenPosition);
                                    }
                                };
 

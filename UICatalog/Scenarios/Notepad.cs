@@ -333,39 +333,37 @@ public class Notepad : Scenario
             return;
         }
 
-        MenuBarItem items;
+        View [] items;
 
         if (e.Tab == null)
         {
-            items = new (
-                         new MenuItem [] { new ("Open", "", () => Open ()) }
-                        );
+            items = [new MenuItemv2 ("Open", "", Open)];
         }
         else
         {
             var tv = (TabView)sender;
             var t = (OpenedFile)e.Tab;
 
-            items = new (
-                         new MenuItem []
-                         {
-                             new ("Save", "", () => Save (_focusedTabView, e.Tab)),
-                             new ("Close", "", () => Close (tv, e.Tab)),
-                             null,
-                             new ("Split Up", "", () => SplitUp (tv, t)),
-                             new ("Split Down", "", () => SplitDown (tv, t)),
-                             new ("Split Right", "", () => SplitRight (tv, t)),
-                             new ("Split Left", "", () => SplitLeft (tv, t))
-                         }
-                        );
+            items =
+            [
+                new MenuItemv2 ("Save", "", () => Save (_focusedTabView, e.Tab)),
+                new MenuItemv2 ("Close", "", () => Close (tv, e.Tab)),
+                new Line (),
+                new MenuItemv2 ("Split Up", "", () => SplitUp (tv, t)),
+                new MenuItemv2 ("Split Down", "", () => SplitDown (tv, t)),
+                new MenuItemv2 ("Split Right", "", () => SplitRight (tv, t)),
+                new MenuItemv2 ("Split Left", "", () => SplitLeft (tv, t))
+            ];
+
+            PopoverMenu? contextMenu = new (items);
+
+            // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
+            // and the context menu is disposed when it is closed.
+            Application.Popover?.Register (contextMenu);
+            contextMenu?.MakeVisible (e.MouseEvent.ScreenPosition);
+
+            e.MouseEvent.Handled = true;
         }
-
-        var screen = ((View)sender).ViewportToScreen (e.MouseEvent.Position);
-
-        var contextMenu = new ContextMenu { Position = screen };
-
-        contextMenu.Show (items);
-        e.MouseEvent.Handled = true;
     }
 
     private class OpenedFile (Notepad notepad) : Tab

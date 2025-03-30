@@ -1,6 +1,4 @@
 ﻿#nullable enable
-using System.Diagnostics;
-
 namespace Terminal.Gui;
 
 /// <summary>
@@ -16,8 +14,7 @@ public class PopoverMenu : PopoverBaseImpl
     /// <inheritdoc/>
     public PopoverMenu (IEnumerable<View>? menuItems) : this (new Menuv2 (menuItems)) { }
 
-
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public PopoverMenu (IEnumerable<MenuItemv2>? menuItems) : this (new Menuv2 (menuItems)) { }
 
     /// <summary>
@@ -28,6 +25,7 @@ public class PopoverMenu : PopoverBaseImpl
         Key = DefaultKey;
 
         base.Visible = false;
+
         //base.ColorScheme = Colors.ColorSchemes ["Menu"];
 
         Root = root;
@@ -86,10 +84,10 @@ public class PopoverMenu : PopoverBaseImpl
 
         bool? MoveRight (ICommandContext? ctx)
         {
-            if (Focused == Root)
-            {
-                return false;
-            }
+            //if (Focused == Root)
+            //{
+            //    return false;
+            //}
 
             if (MostFocused is MenuItemv2 { SubMenu.Visible: true } focused)
             {
@@ -103,6 +101,7 @@ public class PopoverMenu : PopoverBaseImpl
     }
 
     private Key _key = DefaultKey;
+
     /// <summary>Specifies the key that will activate the context menu.</summary>
     public Key Key
     {
@@ -111,11 +110,11 @@ public class PopoverMenu : PopoverBaseImpl
         {
             Key oldKey = _key;
             _key = value;
-            KeyChanged?.Invoke (this, new KeyChangedEventArgs (oldKey, _key));
+            KeyChanged?.Invoke (this, new (oldKey, _key));
         }
     }
 
-    /// <summary>Event raised when the <see cref="ContextMenu.Key"/> is changed
+    /// <summary>Raised when <see cref="Key"/> is changed.</summary>
     public event EventHandler<KeyChangedEventArgs>? KeyChanged;
 
     /// <summary>The default key for activating popover menus.</summary>
@@ -128,9 +127,9 @@ public class PopoverMenu : PopoverBaseImpl
     /// </summary>
     public MouseFlags MouseFlags { get; set; } = MouseFlags.Button3Clicked;
 
-
     /// <summary>
-    ///     Makes the popover menu visible and locates it at <paramref name="idealScreenPosition"/>. The actual position of the menu
+    ///     Makes the popover menu visible and locates it at <paramref name="idealScreenPosition"/>. The actual position of the
+    ///     menu
     ///     will be adjusted to
     ///     ensure the menu fully fits on the screen, and the mouse cursor is over the first cell of the
     ///     first MenuItem.
@@ -144,7 +143,8 @@ public class PopoverMenu : PopoverBaseImpl
     }
 
     /// <summary>
-    ///     Locates the popover menu at <paramref name="idealScreenPosition"/>. The actual position of the menu will be adjusted to
+    ///     Locates the popover menu at <paramref name="idealScreenPosition"/>. The actual position of the menu will be
+    ///     adjusted to
     ///     ensure the menu fully fits on the screen, and the mouse cursor is over the first cell of the
     ///     first MenuItem (if possible).
     /// </summary>
@@ -159,10 +159,11 @@ public class PopoverMenu : PopoverBaseImpl
 
             if (!Root.IsInitialized)
             {
-                Root.BeginInit();
+                Root.BeginInit ();
                 Root.EndInit ();
                 Root.Layout ();
             }
+
             pos = GetMostVisibleLocationForSubMenu (Root, pos);
 
             Root.X = pos.X;
@@ -234,7 +235,7 @@ public class PopoverMenu : PopoverBaseImpl
         // TODO: And it needs to clear them first
         IEnumerable<MenuItemv2> all = GetMenuItemsOfAllSubMenus ();
 
-        foreach (MenuItemv2 menuItem in all.Where(mi => mi.Command != Command.NotBound))
+        foreach (MenuItemv2 menuItem in all.Where (mi => mi.Command != Command.NotBound))
         {
             if (menuItem.TargetView is { })
             {
@@ -272,10 +273,7 @@ public class PopoverMenu : PopoverBaseImpl
         }
 
         foreach (MenuItemv2 menuItem in all.Where (mi => mi is { Command: Command.NotBound, Key.IsValid: true }))
-        {
-
-        }
-
+        { }
     }
 
     /// <inheritdoc/>
@@ -362,6 +360,7 @@ public class PopoverMenu : PopoverBaseImpl
         {
             menu.Layout ();
         }
+
         // If there's a visible peer, remove / hide it
 
         // Debug.Assert (menu is null || menu?.SubViews.Count (v => v is MenuItemv2 { SubMenu.Visible: true }) < 2);
@@ -428,7 +427,6 @@ public class PopoverMenu : PopoverBaseImpl
 
             menu.ClearFocus ();
             base.Add (menu);
-
 
             // IMPORTANT: This must be done after adding the menu to the super view or Add will try
             // to set focus to it.
