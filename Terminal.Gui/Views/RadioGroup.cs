@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System;
 using System.Diagnostics;
 
 namespace Terminal.Gui;
@@ -241,7 +242,20 @@ public class RadioGroup : View, IDesignable, IOrientation
         }
     }
 
-    private List<string> _radioLabels = [];
+    private readonly List<string> _radioLabels = [];
+
+    /// <summary>
+    ///     If <see langword="true"/> the <see cref="RadioLabels"/> will each be automatically assigned a hotkey.
+    ///     <see cref="UsedHotKeys"/> will be used to ensure unique keys are assigned. Set <see cref="UsedHotKeys"/>
+    ///     before setting <see cref="RadioLabels"/> with any hotkeys that may conflict with other Views.
+    /// </summary>
+    public bool AssignHotKeysToRadioLabels { get; set; }
+
+    /// <summary>
+    ///     Gets the list of hotkeys already used by <see cref="RadioLabels"/> or that should not be used if <see cref="AssignHotKeysToRadioLabels"/>
+    ///     is enabled.
+    /// </summary>
+    public List<Key> UsedHotKeys { get; } = [];
 
     /// <summary>
     ///     The radio labels to display. A <see cref="Command.HotKey"/> key binding will be added for each label enabling the
@@ -263,16 +277,40 @@ public class RadioGroup : View, IDesignable, IOrientation
                 }
             }
 
-            int prevCount = _radioLabels.Count;
-            _radioLabels = value.ToList ();
+            _radioLabels.Clear ();
 
-            for (var index = 0; index < _radioLabels.Count; index++)
+            // Pick a unique hotkey for each radio label
+            for (var labelIndex = 0; labelIndex < value.Length; labelIndex++)
             {
-                string label = _radioLabels [index];
+                string label = value [labelIndex];
+                string? newLabel = label;
 
-                if (TextFormatter.FindHotKey (label, HotKeySpecifier, out _, out Key hotKey))
+                if (AssignHotKeysToRadioLabels)
                 {
-                    AddKeyBindingsForHotKey (Key.Empty, hotKey, index);
+                    // Find the first char in label that is [a-z], [A-Z], or [0-9]
+                    for (int i = 0; i < label.Length; i++)
+                    {
+                        if (UsedHotKeys.Contains (new Key (label [i])) || !char.IsAsciiLetterOrDigit (label [i]))
+                        {
+                            continue;
+                        }
+
+                        if (char.IsAsciiLetterOrDigit (label [i]))
+                        {
+                            char? hotChar = label [i];
+                            newLabel = label.Insert (i, "_");
+                            UsedHotKeys.Add (new Key (hotChar));
+
+                            break;
+                        }
+                    }
+                }
+
+                _radioLabels.Add (newLabel);
+
+                if (TextFormatter.FindHotKey (newLabel, HotKeySpecifier, out _, out Key hotKey))
+                {
+                    AddKeyBindingsForHotKey (Key.Empty, hotKey, labelIndex);
                 }
             }
 

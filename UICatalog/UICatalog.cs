@@ -830,7 +830,7 @@ public class UICatalogApp
             ((CheckBox)ShForce16Colors.CommandView).CheckedStateChanging += (sender, args) =>
             {
                 Application.Force16Colors = args.NewValue == CheckState.Checked;
-                _force16ColorsMenuItemCb.CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
+                _force16ColorsMenuItemCb!.CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
                 Application.LayoutAndDraw ();
             };
 
@@ -1049,7 +1049,7 @@ public class UICatalogApp
             MenuItemv2 menuItem = new MenuItemv2 ()
             {
                 CommandView = _themesRg,
-                HelpText = "Change Theme",
+                HelpText = "Cycle Through Themes",
                 Key = Key.T.WithCtrl,
             };
             menuItems.Add (menuItem);
@@ -1069,7 +1069,7 @@ public class UICatalogApp
                 SubMenu = new Menuv2 ([new ()
                 {
                     CommandView = _topSchemeRg,
-                    HelpText = "Set Color Scheme",
+                    HelpText = "Cycle Through Color Schemes",
                     Key = Key.S.WithCtrl,
                 }])
             };
@@ -1090,8 +1090,11 @@ public class UICatalogApp
                 return;
             }
 
-            _themesRg.RadioLabels =
-                Themes.Select (theme => theme.Key == "Dark" ? $"{theme.Key.Substring (0, 3)}_{theme.Key.Substring (3, 1)}" : $"_{theme.Key}").ToArray ();
+            _themesRg.AssignHotKeysToRadioLabels = true;
+            _themesRg.UsedHotKeys.Clear ();
+            _themesRg.RadioLabels = Colors.ColorSchemes.Keys.ToArray ();
+
+            _themesRg.RadioLabels = Themes!.Keys.ToArray ();
             _themesRg.SelectedItem = Themes.Keys.ToList ().IndexOf (_cachedTheme!.Replace ("_", string.Empty));
 
             if (_topSchemeRg is null)
@@ -1100,6 +1103,8 @@ public class UICatalogApp
             }
 
 
+            _topSchemeRg.AssignHotKeysToRadioLabels = true;
+            _topSchemeRg.UsedHotKeys.Clear ();
             _topSchemeRg.RadioLabels = Colors.ColorSchemes.Keys.ToArray ();
 
             if (_topLevelColorScheme is null || !Colors.ColorSchemes.ContainsKey (_topLevelColorScheme))
