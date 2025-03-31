@@ -298,7 +298,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                         if (char.IsAsciiLetterOrDigit (label [i]))
                         {
                             char? hotChar = label [i];
-                            newLabel = label.Insert (i, "_");
+                            newLabel = label.Insert (i, HotKeySpecifier.ToString());
                             UsedHotKeys.Add (new Key (hotChar));
 
                             break;
