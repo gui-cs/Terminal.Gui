@@ -1,10 +1,7 @@
 ﻿#nullable enable
-using System;
-using System.Diagnostics;
-
 namespace Terminal.Gui;
 
-/// <summary>Displays a group of labels with an idicator of which one is selected.</summary>
+/// <summary>Displays a list of mutually-exclusive items. Each items can have its own hotkey.</summary>
 public class RadioGroup : View, IDesignable, IOrientation
 {
     /// <summary>
@@ -20,7 +17,7 @@ public class RadioGroup : View, IDesignable, IOrientation
         // Select (Space key or mouse click) - The default implementation sets focus. RadioGroup does not.
         AddCommand (Command.Select, HandleSelectCommand);
 
-        // Accept (Enter key or Doubleclick) - Raise Accept event - DO NOT advance state
+        // Accept (Enter key or DoubleClick) - Raise Accept event - DO NOT advance state
         AddCommand (Command.Accept, HandleAcceptCommand);
 
         // Hotkey - ctx may indicate a radio item hotkey was pressed. Behavior depends on HasFocus
@@ -60,7 +57,7 @@ public class RadioGroup : View, IDesignable, IOrientation
 
         if (HasFocus)
         {
-            if ((item is null || HotKey == keyCommandContext.Binding.Key?.NoAlt.NoCtrl.NoShift!))
+            if (item is null || HotKey == keyCommandContext.Binding.Key?.NoAlt.NoCtrl.NoShift!)
             {
                 // It's this.HotKey OR Another View (Label?) forwarded the hotkey command to us - Act just like `Space` (Select)
                 return InvokeCommand (Command.Select);
@@ -146,14 +143,14 @@ public class RadioGroup : View, IDesignable, IOrientation
                 if (c > -1)
                 {
                     // Just like the user pressing the items' hotkey
-                    return InvokeCommand<KeyBinding> (Command.HotKey, new KeyBinding ([Command.HotKey], target: this, data: c)) == true;
+                    return InvokeCommand (Command.HotKey, new KeyBinding ([Command.HotKey], this, c)) == true;
                 }
             }
 
             return false;
         }
 
-        bool cursorChanged = false;
+        var cursorChanged = false;
 
         if (SelectedItem == Cursor)
         {
@@ -165,7 +162,7 @@ public class RadioGroup : View, IDesignable, IOrientation
             }
         }
 
-        bool selectedItemChanged = false;
+        var selectedItemChanged = false;
 
         if (SelectedItem != Cursor)
         {
@@ -210,7 +207,8 @@ public class RadioGroup : View, IDesignable, IOrientation
     }
 
     /// <summary>
-    ///     Gets or sets whether double clicking on a Radio Item will cause the <see cref="View.Accepting"/> event to be raised.
+    ///     Gets or sets whether double-clicking on a Radio Item will cause the <see cref="View.Accepting"/> event to be
+    ///     raised.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -242,8 +240,6 @@ public class RadioGroup : View, IDesignable, IOrientation
         }
     }
 
-    private readonly List<string> _radioLabels = [];
-
     /// <summary>
     ///     If <see langword="true"/> the <see cref="RadioLabels"/> will each be automatically assigned a hotkey.
     ///     <see cref="UsedHotKeys"/> will be used to ensure unique keys are assigned. Set <see cref="UsedHotKeys"/>
@@ -252,10 +248,13 @@ public class RadioGroup : View, IDesignable, IOrientation
     public bool AssignHotKeysToRadioLabels { get; set; }
 
     /// <summary>
-    ///     Gets the list of hotkeys already used by <see cref="RadioLabels"/> or that should not be used if <see cref="AssignHotKeysToRadioLabels"/>
+    ///     Gets the list of hotkeys already used by <see cref="RadioLabels"/> or that should not be used if
+    ///     <see cref="AssignHotKeysToRadioLabels"/>
     ///     is enabled.
     /// </summary>
     public List<Key> UsedHotKeys { get; } = [];
+
+    private readonly List<string> _radioLabels = [];
 
     /// <summary>
     ///     The radio labels to display. A <see cref="Command.HotKey"/> key binding will be added for each label enabling the
@@ -288,9 +287,9 @@ public class RadioGroup : View, IDesignable, IOrientation
                 if (AssignHotKeysToRadioLabels)
                 {
                     // Find the first char in label that is [a-z], [A-Z], or [0-9]
-                    for (int i = 0; i < label.Length; i++)
+                    for (var i = 0; i < label.Length; i++)
                     {
-                        if (UsedHotKeys.Contains (new Key (label [i])) || !char.IsAsciiLetterOrDigit (label [i]))
+                        if (UsedHotKeys.Contains (new (label [i])) || !char.IsAsciiLetterOrDigit (label [i]))
                         {
                             continue;
                         }
@@ -298,8 +297,8 @@ public class RadioGroup : View, IDesignable, IOrientation
                         if (char.IsAsciiLetterOrDigit (label [i]))
                         {
                             char? hotChar = label [i];
-                            newLabel = label.Insert (i, HotKeySpecifier.ToString());
-                            UsedHotKeys.Add (new Key (hotChar));
+                            newLabel = label.Insert (i, HotKeySpecifier.ToString ());
+                            UsedHotKeys.Add (new (hotChar));
 
                             break;
                         }
@@ -389,7 +388,7 @@ public class RadioGroup : View, IDesignable, IOrientation
 
                     if (j == hotPos && i == Cursor)
                     {
-                        SetAttribute (HasFocus ? GetHotFocusColor() : GetHotNormalColor ());
+                        SetAttribute (HasFocus ? GetHotFocusColor () : GetHotNormalColor ());
                     }
                     else if (j == hotPos && i != Cursor)
                     {
@@ -407,7 +406,7 @@ public class RadioGroup : View, IDesignable, IOrientation
 
                         if (i == Cursor)
                         {
-                            SetAttribute (HasFocus ? GetHotFocusColor() : GetHotNormalColor ());
+                            SetAttribute (HasFocus ? GetHotFocusColor () : GetHotNormalColor ());
                         }
                         else if (i != Cursor)
                         {
@@ -424,6 +423,7 @@ public class RadioGroup : View, IDesignable, IOrientation
                 DrawHotString (rl, HasFocus && i == Cursor);
             }
         }
+
         return true;
     }
 
