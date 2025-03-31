@@ -66,7 +66,7 @@ public class Menuv2 : Bar
 
                 void MenuItemOnAccepted (object? sender, CommandEventArgs e)
                 {
-                    //Logging.Trace ($"Accepted: {e.Context?.Source?.Title}");
+                    Logging.Trace ($"MenuItemOnAccepted: {e.Context?.Source?.Title}");
                     RaiseAccepted (e.Context);
                 }
             }
@@ -79,6 +79,18 @@ public class Menuv2 : Bar
         }
     }
 
+    protected override bool OnAccepting (CommandEventArgs args)
+    {
+        Logging.Trace($"{args.Context}");
+
+        if (SuperMenuItem is { })
+        {
+            Logging.Trace ($"Invoking Accept on SuperMenuItem: {SuperMenuItem.Title}...");
+            return SuperMenuItem?.SuperView?.InvokeCommand (Command.Accept, args.Context) is true;
+        }
+        return false;
+    }
+
     // TODO: Consider moving Accepted to Bar?
 
     /// <summary>
@@ -89,7 +101,7 @@ public class Menuv2 : Bar
     /// <returns></returns>
     protected bool? RaiseAccepted (ICommandContext? ctx)
     {
-        //Logging.Trace ($"RaiseAccepted: {ctx}");
+        Logging.Trace ($"RaiseAccepted: {ctx}");
         CommandEventArgs args = new () { Context = ctx };
 
         OnAccepted (args);

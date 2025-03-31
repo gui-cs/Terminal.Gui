@@ -58,7 +58,6 @@ public class UICatalogApp
     // are therefore cached so that when the scenario exits the
     // main app UI can be restored to previous state
     private static int _cachedScenarioIndex;
-    private static string? _cachedTheme = string.Empty;
     private static ObservableCollection<string>? _categories;
 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
@@ -81,13 +80,13 @@ public class UICatalogApp
     // If set, holds the scenario the user selected
     private static Scenario? _selectedScenario;
 
-    private static MenuBarItemv2? _themeMenuBarItem;
-    private static View []? _themeMenuItems;
-
     private static CheckBox? _force16ColorsMenuItemCb;
     private static CheckBox? _force16ColorsShortcutCb;
 
-    private static string _topLevelColorScheme = string.Empty;
+    private static string? _cachedTheme;
+    private static RadioGroup? _themesRg;
+    private static RadioGroup? _topSchemeRg;
+    private static string? _topLevelColorScheme;
 
     [SerializableConfigurationProperty (Scope = typeof (AppScope), OmitClassName = true)]
     [JsonPropertyName ("UICatalog.StatusBar")]
@@ -416,8 +415,6 @@ public class UICatalogApp
         // run it and exit when done.
         if (options.Scenario != "none")
         {
-            _topLevelColorScheme = "Base";
-
             int item = _scenarios!.IndexOf (
                                             _scenarios!.FirstOrDefault (
                                                                         s =>
@@ -746,8 +743,6 @@ public class UICatalogApp
         {
             _diagnosticFlags = Diagnostics;
 
-            _themeMenuItems = CreateThemeMenuItems ();
-
             MenuBarv2 menuBar = new (
             [
                     new MenuBarItemv2 (
@@ -759,7 +754,7 @@ public class UICatalogApp
                                                             RequestStop
                                                            )
                                       ]),
-                    new MenuBarItemv2 ("_Themes", _themeMenuItems!),
+                    new MenuBarItemv2 ("_Themes", CreateThemeMenuItems ()),
                     //new MenuBarItemv2 ("Diag_nostics", CreateDiagnosticMenuItems ()),
                     //new MenuBarItemv2 ("_Logging", CreateLoggingMenuItems ()),
                     new MenuBarItemv2 (
@@ -984,20 +979,9 @@ public class UICatalogApp
                 return;
             }
 
-            if (_topLevelColorScheme == null || !Colors.ColorSchemes.ContainsKey (_topLevelColorScheme))
-            {
-                _topLevelColorScheme = "Base";
-            }
-
             _cachedTheme = Themes?.Theme;
 
-            foreach (var themeItem in _themeMenuItems)
-            {
-                themeItem.Dispose ();
-            }
-
-            _themeMenuItems = CreateThemeMenuItems ();
-            _themeMenuBarItem.Add (_themeMenuItems);
+            UpdateThemesMenu();
 
             ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
 
@@ -1013,7 +997,7 @@ public class UICatalogApp
             Application.Top!.SetNeedsDraw ();
         }
 
-        public View [] CreateThemeMenuItems ()
+        private View [] CreateThemeMenuItems ()
         {
             List<View> menuItems = [];
 
@@ -1024,17 +1008,19 @@ public class UICatalogApp
             };
 
             _force16ColorsMenuItemCb.CheckedStateChanged += (sender, args) =>
-            {
-                Application.Force16Colors = args.CurrentValue == CheckState.Checked;
-                ((CheckBox)ShForce16Colors!.CommandView!).CheckedState =
-                    Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
-                Application.LayoutAndDraw ();
-            };
+                                                            {
+                                                                Application.Force16Colors = args.CurrentValue == CheckState.Checked;
 
-            menuItems.Add (new MenuItemv2 ()
-            {
-                CommandView = _force16ColorsMenuItemCb,
-            });
+                                                                ((CheckBox)ShForce16Colors!.CommandView!).CheckedState =
+                                                                    Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
+                                                                Application.LayoutAndDraw ();
+                                                            };
+
+            menuItems.Add (
+                           new MenuItemv2 ()
+                           {
+                               CommandView = _force16ColorsMenuItemCb,
+                           });
 
             menuItems.Add (new Line ());
 
@@ -1049,56 +1035,80 @@ public class UICatalogApp
                     CheckedState = theme.Key == _cachedTheme ? CheckState.Checked : CheckState.UnChecked
                 };
             }
-            RadioGroup radioGroup = new RadioGroup ()
-            {
-                RadioLabels = Themes.Select (theme => theme.Key == "Dark" ? $"{theme.Key.Substring (0, 3)}_{theme.Key.Substring (3, 1)}" : $"_{theme.Key}").ToArray ()
-            };
-            radioGroup.SelectedItem = Themes.Keys.ToList ().IndexOf (_cachedTheme!.Replace ("_", string.Empty));
 
-            radioGroup.SelectedItemChanged += (_, args) =>
-                                              {
-                                                  Themes!.Theme = Themes!.Keys.ToArray () [args.SelectedItem];
-                                                  _cachedTheme = Themes!.Keys.ToArray () [args.SelectedItem];
-                                                  Apply ();
-                                                  SetNeedsDraw ();
-                                              };
+            _themesRg = new RadioGroup ();
+
+            _themesRg.SelectedItemChanged += (_, args) =>
+                                             {
+                                                 Themes!.Theme = Themes!.Keys.ToArray () [args.SelectedItem];
+                                                 _cachedTheme = Themes!.Keys.ToArray () [args.SelectedItem];
+                                                 Apply ();
+                                                 SetNeedsDraw ();
+                                             };
 
             MenuItemv2 menuItem = new MenuItemv2 ()
             {
-                CommandView = radioGroup,
-                HelpText = "Themes",
-                Key = Key.F3,
+                CommandView = _themesRg,
+                HelpText = "Change Theme",
+                Key = Key.T.WithCtrl,
             };
             menuItems.Add (menuItem);
 
-            //List<MenuItemv2> schemeMenuItems = new ();
+            _topSchemeRg = new RadioGroup ();
 
-            //foreach (KeyValuePair<string, ColorScheme?> sc in Colors.ColorSchemes)
-            //{
-            //    var item = new MenuItem { Title = $"_{sc.Key}", Data = sc.Key };
-            //    item.CheckType |= MenuItemCheckStyle.Radio;
-            //    item.Checked = sc.Key == _topLevelColorScheme;
+            _topSchemeRg.SelectedItemChanged += (_, args) =>
+                                                {
+                                                    _topLevelColorScheme = Colors.ColorSchemes.Keys.ToArray () [args.SelectedItem];
+                                                    ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
+                                                    SetNeedsDraw ();
+                                                };
 
-            //    item.Action += () =>
-            //                   {
-            //                       _topLevelColorScheme = (string)item.Data;
+            menuItem = new MenuItemv2 ()
+            {
+                Title = "_Color Scheme for Application.Top",
+                SubMenu = new Menuv2 ([new ()
+                {
+                    CommandView = _topSchemeRg,
+                    HelpText = "Set Color Scheme",
+                    Key = Key.S.WithCtrl,
+                }])
+            };
 
-            //                       foreach (MenuItem schemeMenuItem in schemeMenuItems)
-            //                       {
-            //                           schemeMenuItem.Checked = (string)schemeMenuItem.Data == _topLevelColorScheme;
-            //                       }
 
-            //                       ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
-            //                   };
-            //    item.ShortcutKey = ((Key)sc.Key [0].ToString ().ToLower ()).WithCtrl;
-            //    schemeMenuItems.Add (item);
-            //}
+            menuItems.Add (new Line ());
+            menuItems.Add (menuItem);
 
-            //menuItems.Add (null!);
-            //var mbi = new MenuBarItem ("_Color Scheme for Application.Top", schemeMenuItems.ToArray ());
-            //menuItems.Add (mbi);
+            UpdateThemesMenu ();
 
             return menuItems.ToArray ();
+        }
+
+        private void UpdateThemesMenu ()
+        {
+            if (_themesRg is null)
+            {
+                return;
+            }
+
+            _themesRg.RadioLabels =
+                Themes.Select (theme => theme.Key == "Dark" ? $"{theme.Key.Substring (0, 3)}_{theme.Key.Substring (3, 1)}" : $"_{theme.Key}").ToArray ();
+            _themesRg.SelectedItem = Themes.Keys.ToList ().IndexOf (_cachedTheme!.Replace ("_", string.Empty));
+
+            if (_topSchemeRg is null)
+            {
+                return;
+            }
+
+
+            _topSchemeRg.RadioLabels = Colors.ColorSchemes.Keys.ToArray ();
+
+            if (_topLevelColorScheme is null || !Colors.ColorSchemes.ContainsKey (_topLevelColorScheme))
+            {
+                _topLevelColorScheme = "Base";
+            }
+
+            _topSchemeRg.SelectedItem = Array.IndexOf (Colors.ColorSchemes.Keys.ToArray (), _topLevelColorScheme);
+
         }
 
         private void CategoryView_SelectedChanged (object? sender, ListViewItemEventArgs? e)

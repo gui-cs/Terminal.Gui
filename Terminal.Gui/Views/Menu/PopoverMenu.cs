@@ -98,7 +98,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
                 return true;
             }
 
-            return AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+            return false;//AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         }
     }
 
@@ -220,10 +220,12 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
                 _root.Accepting += MenuOnAccepting;
             }
 
+            // TODO: This needs to be done whenever any MenuItem in the menu tree changes to support dynamic menus
+            // TODO: And it needs to clear the old bindings first
             UpdateKeyBindings ();
 
+            // TODO: This needs to be done whenever any MenuItem in the menu tree changes to support dynamic menus
             IEnumerable<Menuv2> allMenus = GetAllSubMenus ();
-
             foreach (Menuv2 menu in allMenus)
             {
                 menu.Accepting += MenuOnAccepting;
@@ -235,8 +237,6 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     private void UpdateKeyBindings ()
     {
-        // TODO: This needs to be done whenever any MenuItem in the menu tree changes to support dynamic menus
-        // TODO: And it needs to clear them first
         IEnumerable<MenuItemv2> all = GetMenuItemsOfAllSubMenus ();
 
         foreach (MenuItemv2 menuItem in all.Where (mi => mi.Command != Command.NotBound))
@@ -445,8 +445,18 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         }
     }
 
+    protected override bool OnAccepting (CommandEventArgs args)
+    {
+        Logging.Trace ($"{args.Context}");
+
+        return true;
+    }
+
     private void MenuOnAccepting (object? sender, CommandEventArgs e)
     {
+        View? senderView = sender as View;
+        Logging.Trace ($"Sender: {senderView?.GetType ().Name}, {e.Context?.Source?.Title}");
+
         if (e.Context?.Command != Command.HotKey)
         {
             Visible = false;
@@ -454,15 +464,14 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         else
         {
             // This supports the case when a hotkey of a menuitem with a submenu is pressed
-            e.Cancel = true;
+            //e.Cancel = true;
         }
 
-        //Logging.Trace ($"{e.Context?.Source?.Title}");
     }
 
     private void MenuAccepted (object? sender, CommandEventArgs e)
     {
-        //Logging.Trace ($"{e.Context?.Source?.Title}");
+        Logging.Trace ($"{e.Context?.Source?.Title}");
 
         if (e.Context?.Source is MenuItemv2 { SubMenu: null })
         {
@@ -483,7 +492,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// <returns></returns>
     protected bool? RaiseAccepted (ICommandContext? ctx)
     {
-        //Logging.Trace ($"RaiseAccepted: {ctx}");
+        Logging.Trace ($"RaiseAccepted: {ctx}");
         CommandEventArgs args = new () { Context = ctx };
 
         OnAccepted (args);
@@ -514,7 +523,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     private void MenuOnSelectedMenuItemChanged (object? sender, MenuItemv2? e)
     {
-        //Logging.Trace ($"{e}");
+        Logging.Trace ($"e: {e?.Title}");
         ShowSubMenu (e);
     }
 

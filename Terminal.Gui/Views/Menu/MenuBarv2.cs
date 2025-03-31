@@ -1,4 +1,6 @@
 ﻿#nullable enable
+using System.ComponentModel;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -17,6 +19,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// <inheritdoc/>
     public MenuBarv2 (IEnumerable<MenuBarItemv2> menuBarItems) : base (menuBarItems)
     {
+        CanFocus = false;
         TabStop = TabBehavior.TabGroup;
         Y = 0;
         Width = Dim.Fill ();
@@ -33,6 +36,16 @@ public class MenuBarv2 : Menuv2, IDesignable
         bool? MoveLeft (ICommandContext? ctx) { return AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop); }
 
         bool? MoveRight (ICommandContext? ctx) { return AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop); }
+    }
+
+    /// <inheritdoc />
+    protected override bool OnMouseEnter (CancelEventArgs eventArgs)
+    {
+        if (!HasFocus)
+        {
+            CanFocus = true;
+        }
+        return base.OnMouseEnter (eventArgs);
     }
 
     /// <inheritdoc/>
@@ -65,9 +78,14 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// <inheritdoc/>
     protected override bool OnAccepting (CommandEventArgs args)
     {
+        Logging.Trace ($"{args.Context?.Source?.Title}");
         if (args.Context?.Source is MenuBarItemv2 { PopoverMenu: { } } menuBarItem)
         {
+            CanFocus = true;
+            menuBarItem.SetFocus ();
             ShowPopover (menuBarItem);
+
+            return true;
         }
 
         return base.OnAccepting (args);
@@ -89,6 +107,23 @@ public class MenuBarv2 : Menuv2, IDesignable
             Application.Popover?.Hide (popoverMenu);
         }
 
+        if (menuBarItem is { })
+        {
+            if (menuBarItem.PopoverMenu is { })
+            {
+                menuBarItem.PopoverMenu.Accepted += (sender, args) =>
+                                                           {
+                                                               //if (!menuBarItem.PopoverMenu.Visible)
+                                                               {
+                                                                   if (HasFocus)
+                                                                   {
+                                                                       CanFocus = false;
+                                                                   }
+                                                               }
+                                                           };
+            }
+        }
+
         menuBarItem?.PopoverMenu?.MakeVisible (new Point (menuBarItem.FrameToScreen ().X, menuBarItem.FrameToScreen ().Bottom));
 
         if (menuBarItem?.PopoverMenu?.Root is { })
@@ -103,7 +138,7 @@ public class MenuBarv2 : Menuv2, IDesignable
         if (!currentHasFocus && newHasFocus && currentFocused is null && newFocused == this)
         {
             // This keeps the MenuBar from getting focused when the SuperView first gets focused
-            return true;
+            //return true;
         }
         return base.OnHasFocusChanging (currentHasFocus, newHasFocus, currentFocused, newFocused);
     }

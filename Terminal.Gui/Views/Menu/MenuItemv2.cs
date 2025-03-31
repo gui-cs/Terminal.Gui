@@ -98,6 +98,7 @@ public class MenuItemv2 : Shortcut
 
     internal override bool? DispatchCommand (ICommandContext? commandContext)
     {
+        Logging.Trace($"{commandContext?.Source?.Title}");
         bool? ret = null;
 
         if (commandContext is { Command: not Command.HotKey })
@@ -116,11 +117,11 @@ public class MenuItemv2 : Shortcut
 
         if (ret is not true)
         {
+            Logging.Trace($"Calling base.DispatchCommand");
             ret = base.DispatchCommand (commandContext);
         }
 
-        //Logging.Trace ($"{commandContext?.Source?.Title}");
-
+        Logging.Trace($"Calling RaiseAccepted");
         RaiseAccepted (commandContext);
 
         return ret;
