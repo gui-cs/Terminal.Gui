@@ -64,6 +64,9 @@ public class UICatalogApp
     private static readonly FileSystemWatcher _currentDirWatcher = new ();
 
     private static ViewDiagnosticFlags _diagnosticFlags;
+    private static FlagSelector? _diagnosticFlagsSelector;
+    private static CheckBox? _disableMouseCb;
+
     private static string _forceDriver = string.Empty;
 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
@@ -76,6 +79,7 @@ public class UICatalogApp
     private const string LOGFILE_LOCATION = "logs";
     private static string _logFilePath = string.Empty;
     private static readonly LoggingLevelSwitch _logLevelSwitch = new ();
+    private static RadioGroup? _logLevelRg;
 
     // If set, holds the scenario the user selected
     private static Scenario? _selectedScenario;
@@ -721,11 +725,6 @@ public class UICatalogApp
     public class UICatalogTopLevel : Toplevel
     {
         public ListView? CategoryList;
-        public MenuItem? MiIsMenuBorderDisabled;
-        public MenuItem? MiIsMouseDisabled;
-        public MenuItem? MiUseSubMenusSingleFrame;
-
-        public Shortcut? ShForce16Colors;
 
         //public Shortcut? ShDiagnostics;
         public Shortcut? ShVersion;
@@ -755,8 +754,8 @@ public class UICatalogApp
                                                            )
                                       ]),
                     new MenuBarItemv2 ("_Themes", CreateThemeMenuItems ()),
-                    //new MenuBarItemv2 ("Diag_nostics", CreateDiagnosticMenuItems ()),
-                    //new MenuBarItemv2 ("_Logging", CreateLoggingMenuItems ()),
+                    new MenuBarItemv2 ("Diag_nostics", CreateDiagnosticMenuItems ()),
+                    new MenuBarItemv2 ("_Logging", CreateLoggingMenuItems ()),
                     new MenuBarItemv2 (
                                       "_Help",
                                       [
@@ -813,39 +812,37 @@ public class UICatalogApp
                 args.Cancel = true;
             };
 
-            ShForce16Colors = new ()
+            _force16ColorsShortcutCb = new CheckBox
             {
-                CanFocus = false,
-                CommandView = new CheckBox
-                {
-                    Title = "16 color mode",
-                    CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
-                    CanFocus = false
-                },
-                HelpText = "",
-                BindKeyToApplication = true,
-                Key = Key.F7
+                Title = "16 color mode",
+                CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
+                CanFocus = false
             };
+            _force16ColorsShortcutCb.CheckedStateChanging += (sender, args) =>
+                                                             {
+                                                                 Application.Force16Colors = args.NewValue == CheckState.Checked;
+                                                                 _force16ColorsMenuItemCb!.CheckedState = args.NewValue;
+                                                                 Application.LayoutAndDraw ();
+                                                             };
 
-            ((CheckBox)ShForce16Colors.CommandView).CheckedStateChanging += (sender, args) =>
-            {
-                Application.Force16Colors = args.NewValue == CheckState.Checked;
-                _force16ColorsMenuItemCb!.CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
-                Application.LayoutAndDraw ();
-            };
 
             _statusBar.Add (
-            new Shortcut
-            {
-                CanFocus = false,
-                Title = "Quit",
-                Key = Application.QuitKey
-            },
-            statusBarShortcut,
-            ShForce16Colors,
-
-            //ShDiagnostics,
-            ShVersion
+                new Shortcut
+                {
+                    CanFocus = false,
+                    Title = "Quit",
+                    Key = Application.QuitKey
+                },
+                statusBarShortcut,
+                new Shortcut ()
+                {
+                    CanFocus = false,
+                    CommandView = _force16ColorsShortcutCb,
+                    HelpText = "",
+                    BindKeyToApplication = true,
+                    Key = Key.F7
+                },
+                ShVersion
             );
 
             // Create the Category list view. This list never changes.
@@ -981,7 +978,7 @@ public class UICatalogApp
 
             _cachedTheme = Themes?.Theme;
 
-            UpdateThemesMenu();
+            UpdateThemesMenu ();
 
             ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
 
@@ -990,9 +987,8 @@ public class UICatalogApp
             ((Shortcut)_statusBar!.SubViews.ElementAt (0)).Key = Application.QuitKey;
             _statusBar.Visible = ShowStatusBar;
 
-            MiIsMouseDisabled!.Checked = Application.IsMouseDisabled;
-
-            ((CheckBox)ShForce16Colors!.CommandView!).CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
+            _disableMouseCb!.CheckedState = Application.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
+            _force16ColorsShortcutCb!.CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
 
             Application.Top!.SetNeedsDraw ();
         }
@@ -1011,8 +1007,7 @@ public class UICatalogApp
                                                             {
                                                                 Application.Force16Colors = args.CurrentValue == CheckState.Checked;
 
-                                                                ((CheckBox)ShForce16Colors!.CommandView!).CheckedState =
-                                                                    Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
+                                                                _force16ColorsShortcutCb!.CheckedState = args.CurrentValue;
                                                                 Application.LayoutAndDraw ();
                                                             };
 
@@ -1024,20 +1019,7 @@ public class UICatalogApp
 
             menuItems.Add (new Line ());
 
-            var schemeCount = 0;
-
-
-            foreach (KeyValuePair<string, ThemeScope> theme in Themes!)
-            {
-                var item = new CheckBox ()
-                {
-                    Title = theme.Key == "Dark" ? $"{theme.Key.Substring (0, 3)}_{theme.Key.Substring (3, 1)}" : $"_{theme.Key}",
-                    CheckedState = theme.Key == _cachedTheme ? CheckState.Checked : CheckState.UnChecked
-                };
-            }
-
             _themesRg = new RadioGroup ();
-
             _themesRg.SelectedItemChanged += (_, args) =>
                                              {
                                                  Themes!.Theme = Themes!.Keys.ToArray () [args.SelectedItem];
@@ -1054,15 +1036,15 @@ public class UICatalogApp
             };
             menuItems.Add (menuItem);
 
-            _topSchemeRg = new RadioGroup ();
+            menuItems.Add (new Line ());
 
+            _topSchemeRg = new RadioGroup ();
             _topSchemeRg.SelectedItemChanged += (_, args) =>
                                                 {
                                                     _topLevelColorScheme = Colors.ColorSchemes.Keys.ToArray () [args.SelectedItem];
                                                     ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
                                                     SetNeedsDraw ();
                                                 };
-
             menuItem = new MenuItemv2 ()
             {
                 Title = "_Color Scheme for Application.Top",
@@ -1073,9 +1055,6 @@ public class UICatalogApp
                     Key = Key.S.WithCtrl,
                 }])
             };
-
-
-            menuItems.Add (new Line ());
             menuItems.Add (menuItem);
 
             UpdateThemesMenu ();
@@ -1154,341 +1133,110 @@ public class UICatalogApp
         private void ConfigAppliedHandler (object? sender, ConfigurationManagerEventArgs? a) { ConfigChanged (); }
 
         [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-        private MenuItem [] CreateDiagnosticFlagsMenuItems ()
+        private View [] CreateDiagnosticMenuItems ()
         {
-            const string OFF = "View Diagnostics: _Off";
-            const string RULER = "View Diagnostics: _Ruler";
-            const string THICKNESS = "View Diagnostics: _Thickness";
-            const string HOVER = "View Diagnostics: _Hover";
-            const string DRAWINDICATOR = "View Diagnostics: _DrawIndicator";
-            var index = 0;
+            List<View> menuItems = new ();
 
-            List<MenuItem> menuItems = new ();
-
-            foreach (Enum diag in Enum.GetValues (_diagnosticFlags.GetType ()))
+            _diagnosticFlagsSelector = new ()
             {
-                var item = new MenuItem
-                {
-                    Title = GetDiagnosticsTitle (diag), ShortcutKey = new Key (index.ToString () [0]).WithAlt
-                };
-                index++;
-                item.CheckType |= MenuItemCheckStyle.Checked;
+                CanFocus = false,
+                Styles = FlagSelectorStyles.ShowNone,
+                HighlightStyle = HighlightStyle.None
+            };
+            _diagnosticFlagsSelector.SetFlags (Enum.GetNames<ViewDiagnosticFlags> ().ToList ().AsReadOnly (), Enum.GetValues<ViewDiagnosticFlags> ().Select (f => (uint)f).ToList ().AsReadOnly ());
 
-                if (GetDiagnosticsTitle (ViewDiagnosticFlags.Off) == item.Title)
-                {
-                    item.Checked = !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Thickness)
-                                   && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Ruler)
-                                   && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Hover)
-                                   && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.DrawIndicator);
-                }
-                else
-                {
-                    item.Checked = _diagnosticFlags.HasFlag (diag);
-                }
+            _diagnosticFlagsSelector.ValueChanged += (sender, args) =>
+            {
+                _diagnosticFlags = (ViewDiagnosticFlags)_diagnosticFlagsSelector.Value;
+                Diagnostics = _diagnosticFlags;
+            };
 
-                item.Action += () =>
-                               {
-                                   string t = GetDiagnosticsTitle (ViewDiagnosticFlags.Off);
+            menuItems.Add (new MenuItemv2 ()
+            {
+                CommandView = _diagnosticFlagsSelector,
+                HelpText = "View Diagnostics",
+            });
 
-                                   if (item.Title == t && item.Checked == false)
-                                   {
-                                       _diagnosticFlags &= ~(ViewDiagnosticFlags.Thickness
-                                                             | ViewDiagnosticFlags.Ruler
-                                                             | ViewDiagnosticFlags.Hover
-                                                             | ViewDiagnosticFlags.DrawIndicator);
-                                       item.Checked = true;
-                                   }
-                                   else if (item.Title == t && item.Checked == true)
-                                   {
-                                       _diagnosticFlags |= ViewDiagnosticFlags.Thickness
-                                                           | ViewDiagnosticFlags.Ruler
-                                                           | ViewDiagnosticFlags.Hover
-                                                           | ViewDiagnosticFlags.DrawIndicator;
-                                       item.Checked = false;
-                                   }
-                                   else
-                                   {
-                                       Enum f = GetDiagnosticsEnumValue (item.Title);
+            menuItems.Add (new Line ());
 
-                                       if (_diagnosticFlags.HasFlag (f))
-                                       {
-                                           SetDiagnosticsFlag (f, false);
-                                       }
-                                       else
-                                       {
-                                           SetDiagnosticsFlag (f, true);
-                                       }
-                                   }
+            _disableMouseCb = new CheckBox ()
+            {
+                Title = "_Disable Mouse",
+                CheckedState = Application.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked
+            };
 
-                                   foreach (MenuItem menuItem in menuItems)
-                                   {
-                                       if (menuItem.Title == t)
-                                       {
-                                           menuItem.Checked = !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Ruler)
-                                                              && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Thickness)
-                                                              && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.Hover)
-                                                              && !_diagnosticFlags.HasFlag (ViewDiagnosticFlags.DrawIndicator);
-                                       }
-                                       else if (menuItem.Title != t)
-                                       {
-                                           menuItem.Checked = _diagnosticFlags.HasFlag (GetDiagnosticsEnumValue (menuItem.Title));
-                                       }
-                                   }
-
-                                   Diagnostics = _diagnosticFlags;
-                               };
-                menuItems.Add (item);
-            }
+            _disableMouseCb.CheckedStateChanged += (_, args) =>
+                                      {
+                                          Application.IsMouseDisabled = args.CurrentValue == CheckState.Checked;
+                                      };
+            menuItems.Add (
+                           new MenuItemv2 ()
+                           {
+                               CommandView = _disableMouseCb,
+                               HelpText = "Disable Mouse",
+                           });
 
             return menuItems.ToArray ();
-
-            string GetDiagnosticsTitle (Enum diag)
-            {
-                return Enum.GetName (_diagnosticFlags.GetType (), diag) switch
-                {
-                    "Off" => OFF,
-                    "Ruler" => RULER,
-                    "Thickness" => THICKNESS,
-                    "Hover" => HOVER,
-                    "DrawIndicator" => DRAWINDICATOR,
-                    _ => ""
-                };
-            }
-
-            Enum GetDiagnosticsEnumValue (string? title)
-            {
-                return title switch
-                {
-                    RULER => ViewDiagnosticFlags.Ruler,
-                    THICKNESS => ViewDiagnosticFlags.Thickness,
-                    HOVER => ViewDiagnosticFlags.Hover,
-                    DRAWINDICATOR => ViewDiagnosticFlags.DrawIndicator,
-                    _ => null!
-                };
-            }
-
-            void SetDiagnosticsFlag (Enum diag, bool add)
-            {
-                switch (diag)
-                {
-                    case ViewDiagnosticFlags.Ruler:
-                        if (add)
-                        {
-                            _diagnosticFlags |= ViewDiagnosticFlags.Ruler;
-                        }
-                        else
-                        {
-                            _diagnosticFlags &= ~ViewDiagnosticFlags.Ruler;
-                        }
-
-                        break;
-                    case ViewDiagnosticFlags.Thickness:
-                        if (add)
-                        {
-                            _diagnosticFlags |= ViewDiagnosticFlags.Thickness;
-                        }
-                        else
-                        {
-                            _diagnosticFlags &= ~ViewDiagnosticFlags.Thickness;
-                        }
-
-                        break;
-                    case ViewDiagnosticFlags.Hover:
-                        if (add)
-                        {
-                            _diagnosticFlags |= ViewDiagnosticFlags.Hover;
-                        }
-                        else
-                        {
-                            _diagnosticFlags &= ~ViewDiagnosticFlags.Hover;
-                        }
-
-                        break;
-                    case ViewDiagnosticFlags.DrawIndicator:
-                        if (add)
-                        {
-                            _diagnosticFlags |= ViewDiagnosticFlags.DrawIndicator;
-                        }
-                        else
-                        {
-                            _diagnosticFlags &= ~ViewDiagnosticFlags.DrawIndicator;
-                        }
-
-                        break;
-                    default:
-                        _diagnosticFlags = default (ViewDiagnosticFlags);
-
-                        break;
-                }
-            }
         }
 
-        private List<MenuItem []> CreateDiagnosticMenuItems ()
-        {
-            List<MenuItem []> menuItems = new ()
-            {
-                CreateDiagnosticFlagsMenuItems (),
-                new MenuItem [] { null! },
-                CreateDisabledEnabledMouseItems (),
-                CreateDisabledEnabledMenuBorder (),
-                CreateDisabledEnableUseSubMenusSingleFrame (),
-                CreateKeyBindingsMenuItems ()
-            };
+        //private MenuItemv2 [] CreateDiagnosticMenuItems ()
+        //{
+        //    List<MenuItemv2 []> menuItems = new ()
+        //    {
+        //        CreateDiagnosticFlagsMenuItems (),
+        //        //new MenuItem [] { null! },
+        //        //CreateDisabledEnabledMouseItems (),
+        //        //CreateDisabledEnabledMenuBorder (),
+        //    };
 
-            return menuItems;
-        }
-
-        private List<MenuItem []> CreateLoggingMenuItems ()
-        {
-            List<MenuItem []> menuItems = new ()
-            {
-                CreateLoggingFlagsMenuItems ()!
-            };
-
-            return menuItems;
-        }
+        //    return menuItems;
+        //}
 
         [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-        private MenuItem? [] CreateLoggingFlagsMenuItems ()
+        private View? [] CreateLoggingMenuItems ()
         {
-            string [] logLevelMenuStrings = Enum.GetNames<LogLevel> ().Select (n => n = "_" + n).ToArray ();
+            List<View?> menuItems = new ();
+
             LogLevel [] logLevels = Enum.GetValues<LogLevel> ();
-
-            List<MenuItem?> menuItems = new ();
-
-            foreach (LogLevel logLevel in logLevels)
+            _logLevelRg = new RadioGroup ()
             {
-                var item = new MenuItem
-                {
-                    Title = logLevelMenuStrings [(int)logLevel]
-                };
-                item.CheckType |= MenuItemCheckStyle.Checked;
-                item.Checked = Enum.Parse<LogLevel> (_options.DebugLogLevel) == logLevel;
+                AssignHotKeysToRadioLabels = true,
+                RadioLabels = Enum.GetNames<LogLevel> (),
+                SelectedItem = logLevels.ToList ().IndexOf (Enum.Parse<LogLevel> (_options.DebugLogLevel))
+            };
+            _logLevelRg.SelectedItemChanged += (_, args) =>
+                                               {
+                                                   _options.DebugLogLevel = Enum.GetName (logLevels [args.SelectedItem])!;
+                                                   _logLevelSwitch.MinimumLevel = LogLevelToLogEventLevel (Enum.Parse<LogLevel> (_options.DebugLogLevel));
+                                               };
 
-                item.Action += () =>
-                               {
-                                   foreach (MenuItem? menuItem in menuItems.Where (mi => mi is { } && logLevelMenuStrings.Contains (mi.Title)))
-                                   {
-                                       menuItem!.Checked = false;
-                                   }
-
-                                   if (item.Title == logLevelMenuStrings [(int)logLevel] && item.Checked == false)
-                                   {
-                                       _options.DebugLogLevel = Enum.GetName (logLevel)!;
-                                       _logLevelSwitch.MinimumLevel = LogLevelToLogEventLevel (Enum.Parse<LogLevel> (_options.DebugLogLevel));
-                                       item.Checked = true;
-                                   }
-
-                                   Diagnostics = _diagnosticFlags;
-                               };
-                menuItems.Add (item);
-            }
+            menuItems.Add (new MenuItemv2 ()
+            {
+                CommandView = _logLevelRg,
+                HelpText = "Cycle Through Log Levels",
+                Key = Key.L.WithCtrl
+            });
 
             // add a separator
-            menuItems.Add (null!);
+            menuItems.Add (new Line ());
 
             menuItems.Add (
-                           new (
-                                $"_Open Log Folder",
-                                "",
-                                () => OpenUrl (LOGFILE_LOCATION),
-                                null,
-                                null,
-                                null
-                               ));
+                           new MenuItemv2 (
+                                             $"_Open Log Folder",
+                                             string.Empty,
+                                             () => OpenUrl (LOGFILE_LOCATION)
+                                            ));
 
             return menuItems.ToArray ()!;
-        }
-
-        // TODO: This should be an ConfigurationManager setting
-        private MenuItem [] CreateDisabledEnabledMenuBorder ()
-        {
-            List<MenuItem> menuItems = new ();
-            MiIsMenuBorderDisabled = new () { Title = "Disable Menu _Border" };
-
-            MiIsMenuBorderDisabled.ShortcutKey =
-                new Key (MiIsMenuBorderDisabled!.Title!.Substring (14, 1) [0]).WithAlt.WithCtrl.NoShift;
-            MiIsMenuBorderDisabled.CheckType |= MenuItemCheckStyle.Checked;
-
-            MiIsMenuBorderDisabled.Action += () =>
-                                             {
-                                                 MiIsMenuBorderDisabled.Checked = (bool)!MiIsMenuBorderDisabled.Checked!;
-
-                                                 MenuBar!.MenusBorderStyle = !(bool)MiIsMenuBorderDisabled.Checked
-                                                                                 ? LineStyle.Single
-                                                                                 : LineStyle.None;
-                                             };
-            menuItems.Add (MiIsMenuBorderDisabled);
-
-            return menuItems.ToArray ();
-        }
-
-        private MenuItem [] CreateDisabledEnabledMouseItems ()
-        {
-            List<MenuItem> menuItems = new ();
-            MiIsMouseDisabled = new () { Title = "_Disable Mouse" };
-
-            MiIsMouseDisabled.ShortcutKey =
-                new Key (MiIsMouseDisabled!.Title!.Substring (1, 1) [0]).WithAlt.WithCtrl.NoShift;
-            MiIsMouseDisabled.CheckType |= MenuItemCheckStyle.Checked;
-
-            MiIsMouseDisabled.Action += () =>
-                                        {
-                                            MiIsMouseDisabled.Checked =
-                                                Application.IsMouseDisabled = (bool)!MiIsMouseDisabled.Checked!;
-                                        };
-            menuItems.Add (MiIsMouseDisabled);
-
-            return menuItems.ToArray ();
-        }
-
-        // TODO: This should be an ConfigurationManager setting
-        private MenuItem [] CreateDisabledEnableUseSubMenusSingleFrame ()
-        {
-            List<MenuItem> menuItems = new ();
-            MiUseSubMenusSingleFrame = new () { Title = "Enable _Sub-Menus Single Frame" };
-
-            MiUseSubMenusSingleFrame.ShortcutKey = KeyCode.CtrlMask
-                                                   | KeyCode.AltMask
-                                                   | (KeyCode)MiUseSubMenusSingleFrame!.Title!.Substring (8, 1) [
-                                                    0];
-            MiUseSubMenusSingleFrame.CheckType |= MenuItemCheckStyle.Checked;
-
-            MiUseSubMenusSingleFrame.Action += () =>
-                                               {
-                                                   MiUseSubMenusSingleFrame.Checked = (bool)!MiUseSubMenusSingleFrame.Checked!;
-                                                   MenuBar!.UseSubMenusSingleFrame = (bool)MiUseSubMenusSingleFrame.Checked;
-                                               };
-            menuItems.Add (MiUseSubMenusSingleFrame);
-
-            return menuItems.ToArray ();
-        }
-
-        private MenuItem [] CreateKeyBindingsMenuItems ()
-        {
-            List<MenuItem> menuItems = new ();
-            var item = new MenuItem { Title = "_Key Bindings", Help = "Change which keys do what" };
-
-            item.Action += () =>
-                           {
-                               var dlg = new KeyBindingsDialog ();
-                               Application.Run (dlg);
-                               dlg.Dispose ();
-                           };
-
-            menuItems.Add (null!);
-            menuItems.Add (item);
-
-            return menuItems.ToArray ();
         }
 
         private void LoadedHandler (object? sender, EventArgs? args)
         {
             ConfigChanged ();
 
-            if (MiIsMouseDisabled is { })
+            if (_disableMouseCb is { })
             {
-                MiIsMouseDisabled.Checked = Application.IsMouseDisabled;
+                _disableMouseCb.CheckedState = Application.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
             }
 
             if (ShVersion is { })

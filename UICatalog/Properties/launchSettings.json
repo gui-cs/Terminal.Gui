@@ -1,8 +1,7 @@
 {
   "profiles": {
     "UICatalog": {
-      "commandName": "Project",
-      "commandLineArgs": "-dl Trace"
+      "commandName": "Project"
     },
     "UICatalog --driver NetDriver": {
       "commandName": "Project",
