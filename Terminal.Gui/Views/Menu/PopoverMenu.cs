@@ -18,7 +18,7 @@ namespace Terminal.Gui;
 ///         <see cref="MakeVisible"/>.
 ///     </para>
 /// </remarks>
-public class PopoverMenu : PopoverBaseImpl, IDesignable, IDesignable
+public class PopoverMenu : PopoverBaseImpl, IDesignable
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="PopoverMenu"/> class.

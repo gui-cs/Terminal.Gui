@@ -13,9 +13,6 @@ public class Menuv2 : Bar
     public Menuv2 (IEnumerable<MenuItemv2>? shortcuts) : this (shortcuts?.Cast<View>()) { }
 
     /// <inheritdoc/>
-    public Menuv2 (IEnumerable<MenuItemv2>? shortcuts) : this (shortcuts?.Cast<View>()) { }
-
-    /// <inheritdoc/>
     public Menuv2 (IEnumerable<View>? shortcuts) : base (shortcuts)
     {
         Orientation = Orientation.Vertical;
