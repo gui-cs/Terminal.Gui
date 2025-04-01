@@ -2,8 +2,9 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     Provides a cascading menu that pops over all other content. Can be used as a context menu or a drop-down
-///     menu as part of <see cref="MenuBar"/>.
+///     Provides a cascading menu that menu that pops s over all other content. Can be used as a context menu or a drop-down
+///     all other content. Can be used as a context menu or a drop-down
+///     menu as part of <see cref="MenuBar"/> as part of <see cref="MenuBar"/>.
 /// </summary>
 /// <remarks>
 ///     <para>
@@ -11,7 +12,13 @@ namespace Terminal.Gui;
 ///         <see cref="MakeVisible"/>.
 ///     </para>
 /// </remarks>
-public class PopoverMenu : PopoverBaseImpl, IDesignable
+/// <remarks>
+///     <para>
+///         To use as a context menu, register the popover menu with <see cref="Application.Popover"/> and call
+///         <see cref="MakeVisible"/>.
+///     </para>
+/// </remarks>
+public class PopoverMenu : PopoverBaseImpl, IDesignable, IDesignable
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="PopoverMenu"/> class.
@@ -471,7 +478,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     private void MenuAccepted (object? sender, CommandEventArgs e)
     {
-        Logging.Trace ($"{e.Context?.Source?.Title}");
+        //Logging.Trace ($"{e.Context?.Source?.Title}");
 
         if (e.Context?.Source is MenuItemv2 { SubMenu: null })
         {
@@ -492,7 +499,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// <returns></returns>
     protected bool? RaiseAccepted (ICommandContext? ctx)
     {
-        Logging.Trace ($"RaiseAccepted: {ctx}");
+        //Logging.Trace ($"RaiseAccepted: {ctx}");
         CommandEventArgs args = new () { Context = ctx };
 
         OnAccepted (args);

@@ -69,6 +69,7 @@ public class MenuBarv2 : Menuv2, IDesignable
         }
 
         // TODO: This needs to be done whenever a menuitem in any MenuBarItem changes
+        // TODO: This needs to be done whenever a menuitem in any MenuBarItem changes
         foreach (MenuBarItemv2? mbi in SubViews.Select(s => s as MenuBarItemv2))
         {
             Application.Popover?.Register (mbi?.PopoverMenu);
