@@ -1143,7 +1143,7 @@ public class UICatalogApp
                 Styles = FlagSelectorStyles.ShowNone,
                 HighlightStyle = HighlightStyle.None
             };
-            _diagnosticFlagsSelector.SetFlags (Enum.GetNames<ViewDiagnosticFlags> ().ToList ().AsReadOnly (), Enum.GetValues<ViewDiagnosticFlags> ().Select (f => (uint)f).ToList ().AsReadOnly ());
+            _diagnosticFlagsSelector.SetFlags<ViewDiagnosticFlags> ();
 
             _diagnosticFlagsSelector.ValueChanged += (sender, args) =>
             {

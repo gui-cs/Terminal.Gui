@@ -1,14 +1,15 @@
 ﻿#nullable enable
-using System;
-using System.Collections.ObjectModel;
-
 namespace Terminal.Gui;
 
-/// <summary>Displays the flags in <see cref="TEnum"/> and enables selecting the flags.</summary>
+
+/// <summary>
+///     Provides a user interface for displaying and selecting flags.
+///     Flags can be set from a dictionary or directly from an enum type.
+/// </summary>
 public class FlagSelector : View, IDesignable, IOrientation
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="FlagSelector{TEnum}"/> class.
+    ///     Initializes a new instance of the <see cref="FlagSelector"/> class.
     /// </summary>
     public FlagSelector ()
     {
@@ -27,15 +28,12 @@ public class FlagSelector : View, IDesignable, IOrientation
         CreateSubViews ();
     }
 
-    private bool? HandleAcceptCommand (ICommandContext? ctx)
-    {
-        return RaiseAccepting (ctx);
-    }
+    private bool? HandleAcceptCommand (ICommandContext? ctx) { return RaiseAccepting (ctx); }
 
     private uint _value;
 
     /// <summary>
-    ///     Gets or sets the value.
+    /// Gets or sets the value of the selected flags.
     /// </summary>
     public uint Value
     {
@@ -71,20 +69,23 @@ public class FlagSelector : View, IDesignable, IOrientation
     private void RaiseValueChanged ()
     {
         OnValueChanged ();
-        ValueChanged?.Invoke (this, new EventArgs<uint> (Value));
+        ValueChanged?.Invoke (this, new (Value));
     }
 
-    protected virtual void OnValueChanged ()
-    {
-    }
+    /// <summary>
+    ///     Called when <see cref="Value"/> has changed.
+    /// </summary>
+    protected virtual void OnValueChanged () { }
 
+    /// <summary>
+    ///     Raised when <see cref="Value"/> has changed.
+    /// </summary>
     public event EventHandler<EventArgs<uint>>? ValueChanged;
-
 
     private FlagSelectorStyles _styles;
 
     /// <summary>
-    /// 
+    /// Gets or sets the styles for the flag selector.
     /// </summary>
     public FlagSelectorStyles Styles
     {
@@ -95,6 +96,7 @@ public class FlagSelector : View, IDesignable, IOrientation
             {
                 return;
             }
+
             _styles = value;
 
             CreateSubViews ();
@@ -104,31 +106,77 @@ public class FlagSelector : View, IDesignable, IOrientation
     /// <summary>
     ///     Set the flags and flag names.
     /// </summary>
-    /// <param name="names"></param>
     /// <param name="flags"></param>
-    public void SetFlags (ReadOnlyCollection<string>? names, ReadOnlyCollection<uint>? flags)
+    public void SetFlags (IReadOnlyDictionary<uint, string> flags)
     {
-        Names = names;
         Flags = flags;
-
         CreateSubViews ();
     }
 
     /// <summary>
-    ///     Gets or sets the flags.
+    ///     Set the flags and flag names from an enum type.
     /// </summary>
-    public ReadOnlyCollection<uint>? Flags { get; internal set; }
+    /// <typeparam name="TEnum">The enum type to extract flags from</typeparam>
+    /// <remarks>
+    ///     This is a convenience method that converts an enum to a dictionary of flag values and names.
+    ///     The enum values are converted to uint values and the enum names become the display text.
+    /// </remarks>
+    public void SetFlags<TEnum> () where TEnum : struct, Enum
+    {
+        // Convert enum names and values to a dictionary
+        Dictionary<uint, string> flagsDictionary = Enum.GetValues<TEnum> ()
+                                                       .ToDictionary (
+                                                                      f => Convert.ToUInt32 (f),
+                                                                      f => f.ToString ()
+                                                                     );
+
+        SetFlags (flagsDictionary);
+    }
 
     /// <summary>
-    ///     Gets or sets the flag names;
+    ///     Set the flags and flag names from an enum type with custom display names.
     /// </summary>
-    public ReadOnlyCollection<string>? Names { get; internal set; }
+    /// <typeparam name="TEnum">The enum type to extract flags from</typeparam>
+    /// <param name="nameSelector">A function that converts enum values to display names</param>
+    /// <remarks>
+    ///     This is a convenience method that converts an enum to a dictionary of flag values and custom names.
+    ///     The enum values are converted to uint values and the display names are determined by the nameSelector function.
+    /// </remarks>
+    /// <example>
+    ///     <code>
+    ///        // Use enum values with custom display names
+    ///        var flagSelector = new FlagSelector ();
+    ///        flagSelector.SetFlags<FlagSelectorStyles>
+    ///             (f => f switch {
+    ///             FlagSelectorStyles.ShowNone => "Show None Value",
+    ///             FlagSelectorStyles.ShowValueEdit => "Show Value Editor",
+    ///             FlagSelectorStyles.All => "Everything",
+    ///             _ => f.ToString()
+    ///             });
+    ///     </code>
+    /// </example>
+    public void SetFlags<TEnum> (Func<TEnum, string> nameSelector) where TEnum : struct, Enum
+    {
+        // Convert enum values and custom names to a dictionary
+        Dictionary<uint, string> flagsDictionary = Enum.GetValues<TEnum> ()
+                                                       .ToDictionary (
+                                                                      f => Convert.ToUInt32 (f),
+                                                                      nameSelector
+                                                                     );
+
+        SetFlags (flagsDictionary);
+    }
+
+    /// <summary>
+    ///     Gets the flags.
+    /// </summary>
+    public IReadOnlyDictionary<uint, string>? Flags { get; internal set; }
 
     private TextField? ValueEdit { get; set; }
 
     private void CreateSubViews ()
     {
-        if (Flags is null || Names is null)
+        if (Flags is null)
         {
             return;
         }
@@ -142,18 +190,19 @@ public class FlagSelector : View, IDesignable, IOrientation
             v.Dispose ();
         }
 
-        if (Styles.HasFlag (FlagSelectorStyles.ShowNone) && !Flags.Contains (0))
+        if (Styles.HasFlag (FlagSelectorStyles.ShowNone) && !Flags.ContainsKey (0))
         {
             Add (CreateCheckBox ("None", 0));
         }
 
         for (var index = 0; index < Flags.Count; index++)
         {
-            if (!Styles.HasFlag (FlagSelectorStyles.ShowNone) && Flags [index] == 0)
+            if (!Styles.HasFlag (FlagSelectorStyles.ShowNone) && Flags.ElementAt (index).Key == 0)
             {
                 continue;
             }
-            Add (CreateCheckBox (Names [index], Flags [index]));
+
+            Add (CreateCheckBox (Flags.ElementAt (index).Value, Flags.ElementAt (index).Key));
         }
 
         if (Styles.HasFlag (FlagSelectorStyles.ShowValueEdit))
@@ -185,11 +234,7 @@ public class FlagSelector : View, IDesignable, IOrientation
                 HighlightStyle = HighlightStyle
             };
 
-            checkbox.Selecting += (sender, args) =>
-                                  {
-                                      RaiseSelecting (args.Context);
-                                  };
-
+            checkbox.Selecting += (sender, args) => { RaiseSelecting (args.Context); };
 
             checkbox.CheckedStateChanged += (sender, args) =>
                                             {
@@ -212,6 +257,7 @@ public class FlagSelector : View, IDesignable, IOrientation
                                                 }
 
                                                 Value = newValue;
+
                                                 //UpdateChecked();
                                             };
 
@@ -232,7 +278,7 @@ public class FlagSelector : View, IDesignable, IOrientation
             {
                 sv.X = Pos.Align (Alignment.Start);
                 sv.Y = 0;
-                sv.Margin!.Thickness = new Thickness (0, 0, 1, 0);
+                sv.Margin!.Thickness = new (0, 0, 1, 0);
             }
         }
     }
@@ -257,9 +303,10 @@ public class FlagSelector : View, IDesignable, IOrientation
     {
         foreach (CheckBox cb in SubViews.Where (sv => sv is CheckBox { }).Cast<CheckBox> ())
         {
-            uint flag = (uint)cb.Data;
+            var flag = (uint)(cb.Data ?? throw new InvalidOperationException ("ComboBox.Data must be set"));
+
             // If this flag is set in Value, check the checkbox. Otherwise, uncheck it.
-            if ((uint)cb.Data == 0 && Value != 0)
+            if (flag == 0 && Value != 0)
             {
                 cb.CheckedState = CheckState.UnChecked;
             }
@@ -299,33 +346,21 @@ public class FlagSelector : View, IDesignable, IOrientation
 
     /// <summary>Called when <see cref="Orientation"/> has changed.</summary>
     /// <param name="newOrientation"></param>
-    public void OnOrientationChanged (Orientation newOrientation)
-    {
-        SetLayout ();
-    }
+    public void OnOrientationChanged (Orientation newOrientation) { SetLayout (); }
 
     #endregion IOrientation
-
-    [Flags]
-    private enum DemoFlags
-    {
-        None = 0,
-
-        First = 1,
-
-        Second = 2,
-
-        Third = 4,
-
-        Fourth = 8,
-
-        FirstAndFourth = First | Fourth
-    }
 
     /// <inheritdoc/>
     public bool EnableForDesign ()
     {
-        SetFlags (Enum.GetNames<FlagSelectorStyles> ().ToList ().AsReadOnly (), Enum.GetValues<FlagSelectorStyles> ().Select (f => (uint)f).ToList ().AsReadOnly ());
+        SetFlags<FlagSelectorStyles> (
+                                      f => f switch
+                                           {
+                                               FlagSelectorStyles.ShowNone => "Show _None Value",
+                                               FlagSelectorStyles.ShowValueEdit => "Show _Value Editor",
+                                               FlagSelectorStyles.All => "Show _All Flags Selector",
+                                               _ => f.ToString ()
+                                           });
 
         return true;
     }
