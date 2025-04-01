@@ -7,6 +7,7 @@ namespace Terminal.Gui;
 
 /// <summary>
 ///     A <see cref="Shortcut"/>-derived object to be used as a menu item in a <see cref="Menuv2"/>. Has title, an
+///     A <see cref="Shortcut"/>-derived object to be used as a menu item in a <see cref="Menuv2"/>. Has title, an
 ///     associated help text, and an action to execute on activation.
 /// </summary>
 public class MenuItemv2 : Shortcut

@@ -2,7 +2,7 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     A <see cref="Bar"/>-derived object to be used as a vertically-oriented menu. Each subview is a <see cref="MenuItemv2"/>.
+///     A <see cref="Bar"/>-derived object to be used as a verticallly-oriented menu. Each subview is a <see cref="MenuItemv2"/>.
 /// </summary>
 public class Menuv2 : Bar
 {
@@ -101,7 +101,7 @@ public class Menuv2 : Bar
     /// <returns></returns>
     protected bool? RaiseAccepted (ICommandContext? ctx)
     {
-        Logging.Trace ($"RaiseAccepted: {ctx}");
+        //Logging.Trace ($"RaiseAccepted: {ctx}");
         CommandEventArgs args = new () { Context = ctx };
 
         OnAccepted (args);
