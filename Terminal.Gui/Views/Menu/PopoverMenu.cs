@@ -452,13 +452,6 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         }
     }
 
-    protected override bool OnAccepting (CommandEventArgs args)
-    {
-        Logging.Trace ($"{args.Context}");
-
-        return true;
-    }
-
     private void MenuOnAccepting (object? sender, CommandEventArgs e)
     {
         View? senderView = sender as View;
