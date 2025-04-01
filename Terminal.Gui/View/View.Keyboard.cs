@@ -555,6 +555,11 @@ public partial class View // Keyboard APIs
 
     private static bool InvokeCommandsBoundToKeyOnAdornment (Adornment adornment, Key key, ref bool? handled)
     {
+        if (!adornment.Enabled)
+        {
+            return false;
+        }
+
         bool? adornmentHandled = adornment.InvokeCommands (key);
 
         if (adornmentHandled is true)
@@ -599,6 +604,11 @@ public partial class View // Keyboard APIs
     /// </returns>
     internal bool? InvokeCommandsBoundToHotKey (Key hotKey)
     {
+        if (!Enabled)
+        {
+            return false;
+        }
+
         bool? handled = null;
         // Process this View
         if (HotKeyBindings.TryGet (hotKey, out KeyBinding binding))

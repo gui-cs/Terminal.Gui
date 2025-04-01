@@ -77,12 +77,40 @@ public class MenuBarItemv2 : MenuItemv2
                 new (menuItems))
     { }
 
-    // TODO: Hide base.SubMenu?
+    /// <summary>
+    ///     Do not use this property. MenuBarItem does not support SubMenu. Use <see cref="PopoverMenu"/> instead.
+    /// </summary>
+    /// <exception cref="InvalidOperationException"></exception>
+    public new Menuv2? SubMenu
+    {
+        get => null;
+        set => throw new InvalidOperationException ("MenuBarItem does not support SubMenu. Use PopoverMenu instead.");
+    }
 
     /// <summary>
     ///     The Popover Menu that will be displayed when this item is selected.
     /// </summary>
     public PopoverMenu? PopoverMenu { get; set; }
+
+    /// <inheritdoc />
+    protected override bool OnKeyDownNotHandled (Key key)
+    {
+        Logging.Trace ($"{key}");
+
+        if (PopoverMenu is { Visible: true } && HotKeyBindings.TryGet (key, out _))
+        {
+            // If the user presses the hotkey for a menu item that is already open,
+            // it should close the menu item (Test: MenuBarItem_HotKey_DeActivates)
+            if (SuperView is MenuBarv2 { } menuBar)
+            {
+                menuBar.HideActiveItem ();
+            }
+
+
+            return true;
+        }
+        return false;
+    }
 
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)

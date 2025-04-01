@@ -152,11 +152,11 @@ public partial class View // Command APIs
             if (SuperView is { })
             {
                 Logging.Trace ($"Invoking Accept on SuperView: {SuperView.Title}...");
-                return SuperView?.InvokeCommand (Command.Accept, ctx) is true;
+                return SuperView?.InvokeCommand (Command.Accept, ctx);
             }
         }
 
-        return Accepting is null ? null : args.Cancel;
+        return args.Cancel;
     }
 
     /// <summary>

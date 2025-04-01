@@ -126,8 +126,8 @@ public sealed class ApplicationPopover : IDisposable
         // If there's an existing popover, hide it.
         if (_activePopover is View popoverView && popoverView == popover)
         {
-            popoverView.Visible = false;
             _activePopover = null;
+            popoverView.Visible = false;
             Application.Top?.SetNeedsDraw ();
         }
     }

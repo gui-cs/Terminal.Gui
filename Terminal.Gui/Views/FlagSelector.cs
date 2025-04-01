@@ -146,7 +146,7 @@ public class FlagSelector : View, IDesignable, IOrientation
     ///     <code>
     ///        // Use enum values with custom display names
     ///        var flagSelector = new FlagSelector ();
-    ///        flagSelector.SetFlags<FlagSelectorStyles>
+    ///        flagSelector.SetFlags&lt;FlagSelectorStyles&gt;
     ///             (f => f switch {
     ///             FlagSelectorStyles.ShowNone => "Show None Value",
     ///             FlagSelectorStyles.ShowValueEdit => "Show Value Editor",

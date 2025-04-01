@@ -1,4 +1,7 @@
 ﻿#nullable enable
+using System.ComponentModel;
+using System.Diagnostics;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -60,7 +63,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
                         return false;
                     });
 
-        KeyBindings.Add (DefaultKey, Command.Quit);
+        KeyBindings.Add (Key, Command.Quit);
         KeyBindings.ReplaceCommands (Application.QuitKey, Command.Quit);
 
         AddCommand (
@@ -74,7 +77,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
                         Visible = false;
 
-                        return RaiseAccepted (ctx);
+                        return false;//RaiseAccepted (ctx);
                     });
 
         return;
@@ -525,6 +528,16 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     {
         Logging.Trace ($"e: {e?.Title}");
         ShowSubMenu (e);
+    }
+
+    /// <inheritdoc />
+    protected override void OnSubViewAdded (View view)
+    {
+        if (Root is null && (view is Menuv2 || view is MenuItemv2))
+        {
+            throw new InvalidOperationException ("Do not add MenuItems or Menus directly to a PopoverMenu. Use the Root property.");
+        }
+        base.OnSubViewAdded (view);
     }
 
     /// <inheritdoc/>

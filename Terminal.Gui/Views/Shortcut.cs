@@ -103,9 +103,6 @@ public class Shortcut : View, IOrientation, IDesignable
         ShowHide ();
     }
 
-    /// <inheritdoc />
-    protected override bool OnClearingViewport () { return base.OnClearingViewport (); }
-
     // Helper to set Width consistently
     internal Dim GetWidthDimAuto ()
     {
@@ -504,6 +501,7 @@ public class Shortcut : View, IOrientation, IDesignable
         // This is a helper to make it easier to set the CommandView text.
         // CommandView is public and replaceable, but this is a convenience.
         _commandView.Text = Title;
+        //_commandView.Title = Title;
     }
 
     #endregion Command

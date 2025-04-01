@@ -10,7 +10,7 @@ public class Menuv2 : Bar
     public Menuv2 () : this ([]) { }
 
     /// <inheritdoc/>
-    public Menuv2 (IEnumerable<MenuItemv2>? shortcuts) : this (shortcuts?.Cast<View>()) { }
+    public Menuv2 (IEnumerable<MenuItemv2>? shortcuts) : this (shortcuts?.Cast<View> ()) { }
 
     /// <inheritdoc/>
     public Menuv2 (IEnumerable<View>? shortcuts) : base (shortcuts)
@@ -55,21 +55,21 @@ public class Menuv2 : Bar
         switch (view)
         {
             case MenuItemv2 menuItem:
-            {
-                menuItem.CanFocus = true;
-
-                AddCommand (menuItem.Command, RaiseAccepted);
-
-                menuItem.Accepted += MenuItemOnAccepted;
-
-                break;
-
-                void MenuItemOnAccepted (object? sender, CommandEventArgs e)
                 {
-                    Logging.Trace ($"MenuItemOnAccepted: {e.Context?.Source?.Title}");
-                    RaiseAccepted (e.Context);
+                    menuItem.CanFocus = true;
+
+                    AddCommand (menuItem.Command, RaiseAccepted);
+
+                    menuItem.Accepted += MenuItemOnAccepted;
+
+                    break;
+
+                    void MenuItemOnAccepted (object? sender, CommandEventArgs e)
+                    {
+                        Logging.Trace ($"MenuItemOnAccepted: {e.Context?.Source?.Title}");
+                        RaiseAccepted (e.Context);
+                    }
                 }
-            }
             case Line line:
                 // Grow line so we get auto-join line
                 line.X = Pos.Func (() => -Border!.Thickness.Left);
@@ -79,9 +79,10 @@ public class Menuv2 : Bar
         }
     }
 
+    /// <inheritdoc />
     protected override bool OnAccepting (CommandEventArgs args)
     {
-        Logging.Trace($"{args.Context}");
+        Logging.Trace ($"{args.Context}");
 
         if (SuperMenuItem is { })
         {
@@ -132,6 +133,7 @@ public class Menuv2 : Bar
     protected override void OnFocusedChanged (View? previousFocused, View? focused)
     {
         base.OnFocusedChanged (previousFocused, focused);
+
         SelectedMenuItem = focused as MenuItemv2;
         RaiseSelectedMenuItemChanged (SelectedMenuItem);
     }

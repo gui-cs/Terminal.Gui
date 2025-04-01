@@ -1047,7 +1047,7 @@ public class UICatalogApp
                                                 };
             menuItem = new MenuItemv2 ()
             {
-                Title = "_Color Scheme for Application.Top",
+                Title = "Color Scheme for Application._Top",
                 SubMenu = new Menuv2 ([new ()
                 {
                     CommandView = _topSchemeRg,
@@ -1071,8 +1071,6 @@ public class UICatalogApp
 
             _themesRg.AssignHotKeysToRadioLabels = true;
             _themesRg.UsedHotKeys.Clear ();
-            _themesRg.RadioLabels = Colors.ColorSchemes.Keys.ToArray ();
-
             _themesRg.RadioLabels = Themes!.Keys.ToArray ();
             _themesRg.SelectedItem = Themes.Keys.ToList ().IndexOf (_cachedTheme!.Replace ("_", string.Empty));
 
