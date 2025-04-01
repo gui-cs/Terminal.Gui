@@ -316,7 +316,7 @@ public class Shortcut : View, IOrientation, IDesignable
         if (Action is { })
         {
             Logging.Trace ($"Invoke Action...");
-            Application.Invoke (() => Action.Invoke ());
+            Action.Invoke ();
 
             // Assume if there's a subscriber to Action, it's handled.
             cancel = true;
