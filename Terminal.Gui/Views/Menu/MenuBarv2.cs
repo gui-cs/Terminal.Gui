@@ -329,6 +329,13 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// <inheritdoc/>
     public override bool EnableForDesign ()
     {
+        // Note: This menu is used by unit tests. If you modify it, you'll likely have to update
+        // unit tests.
+        CheckBox? bordersCb = new CheckBox ()
+        {
+            Title = "_Borders",
+            CheckedState = CheckState.Checked
+        };
         Add (
              new MenuBarItemv2 (
                                 "_File",
@@ -345,11 +352,30 @@ public class MenuBarv2 : Menuv2, IDesignable
                                                        [
                                                            new MenuItemv2
                                                            {
-                                                               CommandView = new CheckBox ()
-                                                               {
-                                                                   Title = "O_ption",
-                                                               },
-                                                               HelpText = "Toggle option"
+                                                               CommandView = bordersCb,
+                                                               HelpText = "Toggle Menu Borders",
+                                                               Action = () =>
+                                                                        {
+                                                                            foreach (MenuBarItemv2 mbi in GetSubViews<MenuBarItemv2>())
+                                                                            {
+                                                                                if (mbi is MenuBarItemv2 { PopoverMenu: { } })
+                                                                                {
+                                                                                    IEnumerable<Menuv2> subMenus = mbi.PopoverMenu.GetAllSubMenus();
+
+                                                                                    foreach (Menuv2? subMenu in subMenus)
+                                                                                    {
+                                                                                        if (bordersCb.CheckedState == CheckState.Checked)
+                                                                                        {
+                                                                                            subMenu.Border!.Thickness = new (1);
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            subMenu.Border!.Thickness = new (0);
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
                                                            },
                                                            new MenuItemv2
                                                            {

@@ -291,7 +291,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     ///     Gets all the submenus in the PopoverMenu.
     /// </summary>
     /// <returns></returns>
-    internal IEnumerable<Menuv2> GetAllSubMenus ()
+    public IEnumerable<Menuv2> GetAllSubMenus ()
     {
         List<Menuv2> result = [];
 
@@ -404,8 +404,8 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             // TODO: Find the menu item below the mouse, if any, and select it
 
             // TODO: Enable No Border menu style
-            menu.Border!.LineStyle = LineStyle.Single;
-            menu.Border.Thickness = new (1);
+            //menu.Border!.LineStyle = LineStyle.Single;
+            //menu.Border.Thickness = new (1);
 
             if (!menu.IsInitialized)
             {

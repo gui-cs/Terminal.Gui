@@ -21,6 +21,16 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// </remarks>
     public IReadOnlyCollection<View> SubViews => InternalSubViews?.AsReadOnly () ?? _empty;
 
+    /// <summary>
+    /// Gets the list of SubViews of a specific type.
+    /// </summary>
+    /// <typeparam name="T">The type of subviews to retrieve.</typeparam>
+    /// <returns>An IReadOnlyCollection of subviews of the specified type.</returns>
+    public IReadOnlyCollection<T> GetSubViews<T> () where T : View
+    {
+        return InternalSubViews.OfType<T> ().ToList ().AsReadOnly ();
+    }
+
     private View? _superView;
 
     /// <summary>

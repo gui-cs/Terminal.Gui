@@ -87,7 +87,7 @@ public class Bar : View, IOrientation, IDesignable
         if (Border is { })
         {
             // The default changes the thickness. We don't want that. We just set the style.
-           Border.LineStyle = lineStyle;
+            Border.LineStyle = lineStyle;
         }
         //base.SetBorderStyle(lineStyle);
     }
@@ -235,7 +235,7 @@ public class Bar : View, IOrientation, IDesignable
 
                     var minKeyWidth = 0;
 
-                    List<Shortcut> shortcuts = SubViews.Where (s => s is Shortcut && s.Visible).Cast<Shortcut> ().ToList ();
+                    List<Shortcut> shortcuts = GetSubViews<Shortcut> ().Where (s => s.Visible).ToList ();
 
                     foreach (Shortcut shortcut in shortcuts)
                     {

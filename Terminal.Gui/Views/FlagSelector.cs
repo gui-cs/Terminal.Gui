@@ -285,7 +285,7 @@ public class FlagSelector : View, IDesignable, IOrientation
 
     private void UncheckAll ()
     {
-        foreach (CheckBox cb in SubViews.Where (sv => sv is CheckBox cb && cb.Title != "None").Cast<CheckBox> ())
+        foreach (CheckBox cb in GetSubViews<CheckBox> ().Where (sv => sv.Title != "None"))
         {
             cb.CheckedState = CheckState.UnChecked;
         }
@@ -293,7 +293,7 @@ public class FlagSelector : View, IDesignable, IOrientation
 
     private void UncheckNone ()
     {
-        foreach (CheckBox cb in SubViews.Where (sv => sv is CheckBox { Title: "None" }).Cast<CheckBox> ())
+        foreach (CheckBox cb in GetSubViews<CheckBox> ().Where (sv => sv.Title != "None"))
         {
             cb.CheckedState = CheckState.UnChecked;
         }
@@ -301,7 +301,7 @@ public class FlagSelector : View, IDesignable, IOrientation
 
     private void UpdateChecked ()
     {
-        foreach (CheckBox cb in SubViews.Where (sv => sv is CheckBox { }).Cast<CheckBox> ())
+        foreach (CheckBox cb in GetSubViews<CheckBox> ())
         {
             var flag = (uint)(cb.Data ?? throw new InvalidOperationException ("ComboBox.Data must be set"));
 
