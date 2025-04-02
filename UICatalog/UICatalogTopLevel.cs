@@ -640,19 +640,11 @@ public class UICatalogTopLevel : Toplevel
     #region Configuration Manager
     public void ConfigChanged ()
     {
-        if (MenuBar == null)
-        {
-            // View is probably disposed
-            return;
-        }
-
         CachedTheme = Themes?.Theme;
 
         UpdateThemesMenu ();
 
         ColorScheme = Colors.ColorSchemes [CachedTopLevelColorScheme!];
-
-        MenuBar!.Menus [0].Children! [0]!.ShortcutKey = Application.QuitKey;
 
         ((Shortcut)_statusBar!.SubViews.ElementAt (0)).Key = Application.QuitKey;
         _statusBar.Visible = ShowStatusBar;
