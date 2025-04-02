@@ -146,13 +146,13 @@ public class CharacterMap : Scenario
 
         top.Add (_categoryList);
 
-        var menu = new MenuBar
+        var menu = new MenuBarv2
         {
             Menus =
             [
                 new (
                      "_File",
-                     new MenuItem []
+                     new MenuItemv2 []
                      {
                          new (
                               "_Quit",
@@ -163,7 +163,7 @@ public class CharacterMap : Scenario
                     ),
                 new (
                      "_Options",
-                     new [] { CreateMenuShowWidth () }
+                     new MenuItemv2 [] { CreateMenuShowWidth () }
                     )
             ]
         };
@@ -305,16 +305,19 @@ public class CharacterMap : Scenario
                    );
     }
 
-    private MenuItem CreateMenuShowWidth ()
+    private MenuItemv2 CreateMenuShowWidth ()
     {
-        var item = new MenuItem { Title = "_Show Glyph Width" };
-        item.CheckType |= MenuItemCheckStyle.Checked;
-        item.Checked = _charMap?.ShowGlyphWidths;
+        CheckBox cb = new ()
+        {
+            Title = "_Show Glyph Width",
+            CheckedState = _charMap!.ShowGlyphWidths ? CheckState.Checked : CheckState.None
+        };
+        var item = new MenuItemv2 { CommandView = cb };
         item.Action += () =>
                        {
                            if (_charMap is { })
                            {
-                               _charMap.ShowGlyphWidths = (bool)(item.Checked = !item.Checked)!;
+                               _charMap.ShowGlyphWidths = cb.CheckedState == CheckState.Checked;
                            }
                        };
 

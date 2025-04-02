@@ -97,6 +97,30 @@ public class MenuBarv2 : Menuv2, IDesignable
         }
     }
 
+    /// <summary>
+    ///     Sets the Menu Bar Items for this Menu Bar. This will replace any existing Menu Bar Items.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This is a convenience property to help porting from the v1 MenuBar.
+    ///     </para>
+    /// </remarks>
+    public MenuBarItemv2 []? Menus
+    {
+        set
+        {
+            RemoveAll ();
+            if (value is null)
+            {
+                return;
+            }
+            foreach (MenuBarItemv2 mbi in value)
+            {
+                Add (mbi);
+            }
+        }
+    }
+
     /// <summary>Raised when <see cref="Key"/> is changed.</summary>
     public event EventHandler<KeyChangedEventArgs>? KeyChanged;
 

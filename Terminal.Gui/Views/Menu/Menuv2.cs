@@ -10,7 +10,7 @@ public class Menuv2 : Bar
     public Menuv2 () : this ([]) { }
 
     /// <inheritdoc/>
-    public Menuv2 (IEnumerable<MenuItemv2>? shortcuts) : this (shortcuts?.Cast<View> ()) { }
+    public Menuv2 (IEnumerable<MenuItemv2>? menuItems) : this (menuItems?.Cast<View> ()) { }
 
     /// <inheritdoc/>
     public Menuv2 (IEnumerable<View>? shortcuts) : base (shortcuts)

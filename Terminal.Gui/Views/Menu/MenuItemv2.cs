@@ -55,6 +55,11 @@ public class MenuItemv2 : Shortcut
     { }
 
     /// <inheritdoc/>
+    public MenuItemv2 (string commandText, Key key, Action ? action = null)
+        : base (key ?? Key.Empty, commandText, action, null)
+    { }
+
+    /// <inheritdoc/>
     public MenuItemv2 (string? commandText = null, string? helpText = null, Menuv2? subMenu = null)
         : base (Key.Empty, commandText, null, helpText)
     {
