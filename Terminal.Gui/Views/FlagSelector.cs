@@ -24,7 +24,7 @@ public class FlagSelector : View, IOrientation, IDesignable
         // Accept (Enter key or DoubleClick) - Raise Accept event - DO NOT advance state
         AddCommand (Command.Accept, HandleAcceptCommand);
 
-        CreateSubViews ();
+        CreateCheckBoxes ();
     }
 
     private bool? HandleAcceptCommand (ICommandContext? ctx) { return RaiseAccepting (ctx); }
@@ -101,7 +101,7 @@ public class FlagSelector : View, IOrientation, IDesignable
 
             _styles = value;
 
-            CreateSubViews ();
+            CreateCheckBoxes ();
         }
     }
 
@@ -112,7 +112,8 @@ public class FlagSelector : View, IOrientation, IDesignable
     public virtual void SetFlags (IReadOnlyDictionary<uint, string> flags)
     {
         Flags = flags;
-        CreateSubViews ();
+        CreateCheckBoxes ();
+        UpdateChecked ();
     }
 
 
@@ -170,14 +171,57 @@ public class FlagSelector : View, IOrientation, IDesignable
         SetFlags (flagsDictionary);
     }
 
+    private IReadOnlyDictionary<uint, string>? _flags;
+
     /// <summary>
     ///     Gets the flag values and names.
     /// </summary>
-    public IReadOnlyDictionary<uint, string>? Flags { get; internal set; }
+    public IReadOnlyDictionary<uint, string>? Flags
+    {
+        get => _flags;
+        internal set
+        {
+            _flags = value;
+
+            if (_value is null)
+            {
+               Value = Convert.ToUInt16 (_flags?.Keys.ElementAt (0));
+            }
+        }
+    }
 
     private TextField? ValueEdit { get; set; }
 
-    private void CreateSubViews ()
+    private bool _assignHotKeysToCheckBoxes;
+
+    /// <summary>
+    ///     If <see langword="true"/> the CheckBoxes will each be automatically assigned a hotkey.
+    ///     <see cref="UsedHotKeys"/> will be used to ensure unique keys are assigned. Set <see cref="UsedHotKeys"/>
+    ///     before setting <see cref="Flags"/> with any hotkeys that may conflict with other Views.
+    /// </summary>
+    public bool AssignHotKeysToCheckBoxes
+    {
+        get => _assignHotKeysToCheckBoxes;
+        set
+        {
+            if (_assignHotKeysToCheckBoxes == value)
+            {
+                return;
+            }
+            _assignHotKeysToCheckBoxes = value;
+            CreateCheckBoxes ();
+            UpdateChecked();
+        }
+    }
+
+    /// <summary>
+    ///     Gets the list of hotkeys already used by the CheckBoxes or that should not be used if
+    ///     <see cref="AssignHotKeysToCheckBoxes"/>
+    ///     is enabled.
+    /// </summary>
+    public List<Key> UsedHotKeys { get; } = [];
+
+    private void CreateCheckBoxes ()
     {
         if (Flags is null)
         {
@@ -189,14 +233,14 @@ public class FlagSelector : View, IOrientation, IDesignable
             cb.Dispose ();
         }
 
-        if (Styles.HasFlag (FlagSelectorStyles.ShowNone) && !Flags.ContainsKey (default!))
+        if (Styles.HasFlag (FlagSelectorStyles.ShowNone) && !Flags.ContainsKey (0))
         {
-            Add (CreateCheckBox ("None", default!));
+            Add (CreateCheckBox ("None", 0));
         }
 
         for (var index = 0; index < Flags.Count; index++)
         {
-            if (!Styles.HasFlag (FlagSelectorStyles.ShowNone) && Flags.ElementAt (index).Key == default!)
+            if (!Styles.HasFlag (FlagSelectorStyles.ShowNone) && Flags.ElementAt (index).Key == 0)
             {
                 continue;
             }
@@ -224,6 +268,7 @@ public class FlagSelector : View, IOrientation, IDesignable
 
 
     }
+
     /// <summary>
     /// 
     /// </summary>
@@ -232,10 +277,33 @@ public class FlagSelector : View, IOrientation, IDesignable
     /// <returns></returns>
     protected virtual CheckBox CreateCheckBox (string name, uint flag)
     {
+        string nameWithHotKey = name;
+        if (AssignHotKeysToCheckBoxes)
+        {
+            // Find the first char in label that is [a-z], [A-Z], or [0-9]
+            for (var i = 0; i < name.Length; i++)
+            {
+                char c = char.ToLowerInvariant (name [i]);
+                if (UsedHotKeys.Contains (new (c)) || !char.IsAsciiLetterOrDigit (c))
+                {
+                    continue;
+                }
+
+                if (char.IsAsciiLetterOrDigit (c))
+                {
+                    char? hotChar = c;
+                    nameWithHotKey = name.Insert (i, HotKeySpecifier.ToString ());
+                    UsedHotKeys.Add (new (hotChar));
+
+                    break;
+                }
+            }
+        }
+
         var checkbox = new CheckBox
         {
             CanFocus = false,
-            Title = name,
+            Title = nameWithHotKey,
             Id = name,
             Data = flag,
             HighlightStyle = HighlightStyle
@@ -357,7 +425,7 @@ public class FlagSelector : View, IOrientation, IDesignable
                                       f => f switch
                                            {
                                                FlagSelectorStyles.None => "_No Style",
-                                               FlagSelectorStyles.ShowNone => "Show _None Value Style",
+                                               FlagSelectorStyles.ShowNone => "_Show None Value Style",
                                                FlagSelectorStyles.ShowValueEdit => "Show _Value Editor Style",
                                                FlagSelectorStyles.All => "_All Styles",
                                                _ => f.ToString ()

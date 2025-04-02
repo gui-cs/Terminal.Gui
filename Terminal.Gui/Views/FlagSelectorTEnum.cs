@@ -5,7 +5,7 @@ namespace Terminal.Gui;
 ///     Provides a user interface for displaying and selecting flags.
 ///     Flags can be set from a dictionary or directly from an enum type.
 /// </summary>
-public class FlagSelector<TEnum> : FlagSelector where TEnum : struct, Enum
+public sealed class FlagSelector<TEnum> : FlagSelector where TEnum : struct, Enum
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="FlagSelector{TEnum}"/> class.
@@ -34,7 +34,7 @@ public class FlagSelector<TEnum> : FlagSelector where TEnum : struct, Enum
     /// <example>
     ///     <code>
     ///        // Use enum values with custom display names
-    ///        var flagSelector = new FlagSelector();
+    ///        var flagSelector = new FlagSelector&lt;FlagSelectorStyles&gt();
     ///        flagSelector.SetFlagNames(f => f switch {
     ///             FlagSelectorStyles.ShowNone => "Show None Value",
     ///             FlagSelectorStyles.ShowValueEdit => "Show Value Editor",

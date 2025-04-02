@@ -240,12 +240,14 @@ public class UICatalogTop : Toplevel
                 Styles = FlagSelectorStyles.ShowNone,
                 HighlightStyle = HighlightStyle.None,
             };
+            _diagnosticFlagsSelector.UsedHotKeys.Add (Key.D);
+            _diagnosticFlagsSelector.AssignHotKeysToCheckBoxes = true;
             _diagnosticFlagsSelector.Value = Diagnostics;
             _diagnosticFlagsSelector.ValueChanged += (sender, args) =>
-            {
-                _diagnosticFlags = (ViewDiagnosticFlags)_diagnosticFlagsSelector.Value;
-                Diagnostics = _diagnosticFlags;
-            };
+                                                     {
+                                                         _diagnosticFlags = (ViewDiagnosticFlags)_diagnosticFlagsSelector.Value;
+                                                         Diagnostics = _diagnosticFlags;
+                                                     };
 
             menuItems.Add (
                            new MenuItemv2
