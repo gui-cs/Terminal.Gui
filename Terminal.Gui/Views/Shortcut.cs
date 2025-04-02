@@ -103,9 +103,6 @@ public class Shortcut : View, IOrientation, IDesignable
         ShowHide ();
     }
 
-    /// <inheritdoc />
-    protected override bool OnClearingViewport () { return base.OnClearingViewport (); }
-
     // Helper to set Width consistently
     internal Dim GetWidthDimAuto ()
     {
@@ -269,6 +266,7 @@ public class Shortcut : View, IOrientation, IDesignable
     /// <returns></returns>
     internal virtual bool? DispatchCommand (ICommandContext? commandContext)
     {
+        Logging.Trace($"{commandContext?.Source?.Title}");
         CommandContext<KeyBinding>? keyCommandContext = commandContext as CommandContext<KeyBinding>? ?? default (CommandContext<KeyBinding>);
 
         if (keyCommandContext?.Binding.Data != this)
@@ -276,16 +274,21 @@ public class Shortcut : View, IOrientation, IDesignable
             // Invoke Select on the CommandView to cause it to change state if it wants to
             // If this causes CommandView to raise Accept, we eat it
             keyCommandContext = keyCommandContext!.Value with { Binding = keyCommandContext.Value.Binding with { Data = this } };
+
+            Logging.Trace ($"Invoking Select on CommandView.");
+
             CommandView.InvokeCommand (Command.Select, keyCommandContext);
         }
 
         // BUGBUG: Why does this use keyCommandContext and not commandContext?
+        Logging.Trace ($"RaiseSelecting ...");
         if (RaiseSelecting (keyCommandContext) is true)
         {
             return true;
         }
 
         // The default HotKey handler sets Focus
+        Logging.Trace ($"SetFocus...");
         SetFocus ();
 
         var cancel = false;
@@ -294,6 +297,7 @@ public class Shortcut : View, IOrientation, IDesignable
         {
             commandContext.Source = this;
         }
+        Logging.Trace ($"RaiseAccepting...");
         cancel = RaiseAccepting (commandContext) is true;
 
         if (cancel)
@@ -308,6 +312,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
         if (Action is { })
         {
+            Logging.Trace ($"Invoke Action...");
             Action.Invoke ();
 
             // Assume if there's a subscriber to Action, it's handled.
@@ -496,6 +501,7 @@ public class Shortcut : View, IOrientation, IDesignable
         // This is a helper to make it easier to set the CommandView text.
         // CommandView is public and replaceable, but this is a convenience.
         _commandView.Text = Title;
+        //_commandView.Title = Title;
     }
 
     #endregion Command

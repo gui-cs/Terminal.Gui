@@ -5533,7 +5533,7 @@ This is the second line.
         Assert.False (tv.NewKeyDownEvent (Key.F6.WithShift));
         Assert.False (tv.NewKeyDownEvent (Application.PrevTabGroupKey));
 
-        Assert.True (tv.NewKeyDownEvent (ContextMenu.DefaultKey));
+        Assert.True (tv.NewKeyDownEvent (PopoverMenu.DefaultKey));
         Assert.True (tv.ContextMenu != null && tv.ContextMenu.Visible);
         top.Dispose ();
     }

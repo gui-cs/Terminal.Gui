@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Text;
 using Terminal.Gui;
 
@@ -827,10 +823,10 @@ public class TableEditor : Scenario
         var ok = new Button { Text = "Ok", IsDefault = true };
 
         ok.Accepting += (s, e) =>
-                     {
-                         okPressed = true;
-                         Application.RequestStop ();
-                     };
+                        {
+                            okPressed = true;
+                            Application.RequestStop ();
+                        };
         var cancel = new Button { Text = "Cancel" };
         cancel.Accepting += (s, e) => { Application.RequestStop (); };
         var d = new Dialog { Title = title, Buttons = [ok, cancel] };
@@ -1025,12 +1021,13 @@ public class TableEditor : Scenario
         var ok = new Button { Text = "Ok", IsDefault = true };
 
         ok.Accepting += (s, e) =>
-                     {
-                         accepted = true;
-                         Application.RequestStop ();
-                     };
+                        {
+                            accepted = true;
+                            Application.RequestStop ();
+                        };
         var cancel = new Button { Text = "Cancel" };
         cancel.Accepting += (s, e) => { Application.RequestStop (); };
+
         var d = new Dialog
         {
             Title = prompt,
@@ -1212,30 +1209,24 @@ public class TableEditor : Scenario
         string sort = GetProposedNewSortOrder (clickedCol, out bool isAsc);
         string colName = _tableView.Table.ColumnNames [clickedCol];
 
-        var contextMenu = new ContextMenu
-        {
-            Position = new (e.Position.X + 1, e.Position.Y + 1)
-        };
+        PopoverMenu? contextMenu = new (
+                                        [
+                                            new (
+                                                 $"Hide {TrimArrows (colName)}",
+                                                 "",
+                                                 () => HideColumn (clickedCol)
+                                                ),
+                                            new (
+                                                 $"Sort {StripArrows (sort)}",
+                                                 "",
+                                                 () => SortColumn (clickedCol, sort, isAsc)
+                                                )
+                                        ]);
 
-        MenuBarItem menuItems = new (
-                                     [
-                                         new (
-                                              $"Hide {TrimArrows (colName)}",
-                                              "",
-                                              () => HideColumn (clickedCol)
-                                             ),
-                                         new (
-                                              $"Sort {StripArrows (sort)}",
-                                              "",
-                                              () => SortColumn (
-                                                                clickedCol,
-                                                                sort,
-                                                                isAsc
-                                                               )
-                                             )
-                                     ]
-                                    );
-        contextMenu.Show (menuItems);
+        // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
+        // and the context menu is disposed when it is closed.
+        Application.Popover?.Register (contextMenu);
+        contextMenu?.MakeVisible (new (e.ScreenPosition.X + 1, e.ScreenPosition.Y + 1));
     }
 
     private void SortColumn (int clickedCol)
@@ -1413,7 +1404,7 @@ public class TableEditor : Scenario
                                                                              _checkedFileSystemInfos.Contains,
                                                                              CheckOrUncheckFile
                                                                             )
-            { UseRadioButtons = radio };
+                { UseRadioButtons = radio };
         }
         else
         {

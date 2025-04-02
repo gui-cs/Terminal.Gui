@@ -255,7 +255,7 @@ public class MenuItem
 
     /// <summary>
     ///     Shortcut defines a key binding to the MenuItem that will invoke the MenuItem's action globally for the
-    ///     <see cref="View"/> that is the parent of the <see cref="MenuBar"/> or <see cref="ContextMenu"/> this
+    ///     <see cref="View"/> that is the parent of the <see cref="MenuBar"/> this
     ///     <see cref="MenuItem"/>.
     ///     <para>
     ///         The <see cref="Key"/> will be drawn on the MenuItem to the right of the <see cref="Title"/> and

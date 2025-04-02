@@ -2490,8 +2490,8 @@ public class TextView : View
     /// </summary>
     public IAutocomplete Autocomplete { get; protected set; } = new TextViewAutocomplete ();
 
-    /// <summary>Get the <see cref="ContextMenuv2"/> for this view.</summary>
-    public ContextMenuv2? ContextMenu { get; private set; }
+    /// <summary>Get the Context Menu.</summary>
+    public PopoverMenu? ContextMenu { get; private set; }
 
     /// <summary>Gets the cursor column.</summary>
     /// <value>The cursor column.</value>
@@ -4148,17 +4148,17 @@ public class TextView : View
 
     private void AppendClipboard (string text) { Clipboard.Contents += text; }
 
-    private ContextMenuv2 CreateContextMenu ()
+    private PopoverMenu CreateContextMenu ()
     {
-        ContextMenuv2 menu = new (new List<MenuItemv2> ()
+        PopoverMenu menu = new (new List<View> ()
                     {
-            new (this, Command.SelectAll, Strings.ctxSelectAll),
-            new (this, Command.DeleteAll, Strings.ctxDeleteAll),
-            new (this, Command.Copy, Strings.ctxCopy),
-            new (this, Command.Cut, Strings.ctxCut),
-            new (this, Command.Paste, Strings.ctxPaste),
-            new (this, Command.Undo, Strings.ctxUndo),
-            new (this, Command.Redo, Strings.ctxRedo),
+            new MenuItemv2 (this, Command.SelectAll, Strings.ctxSelectAll),
+            new MenuItemv2 (this, Command.DeleteAll, Strings.ctxDeleteAll),
+            new MenuItemv2 (this, Command.Copy, Strings.ctxCopy),
+            new MenuItemv2 (this, Command.Cut, Strings.ctxCut),
+            new MenuItemv2 (this, Command.Paste, Strings.ctxPaste),
+            new MenuItemv2 (this, Command.Undo, Strings.ctxUndo),
+            new MenuItemv2 (this, Command.Redo, Strings.ctxRedo),
         });
 
         menu.KeyChanged += ContextMenu_KeyChanged;

@@ -2,12 +2,15 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     A <see cref="Bar"/>-derived object to be used as a verticaly-oriented menu. Each subview is a <see cref="MenuItemv2"/>.
+///     A <see cref="Bar"/>-derived object to be used as a vertically-oriented menu. Each subview is a <see cref="MenuItemv2"/>.
 /// </summary>
 public class Menuv2 : Bar
 {
     /// <inheritdoc/>
     public Menuv2 () : this ([]) { }
+
+    /// <inheritdoc/>
+    public Menuv2 (IEnumerable<MenuItemv2>? menuItems) : this (menuItems?.Cast<View> ()) { }
 
     /// <inheritdoc/>
     public Menuv2 (IEnumerable<View>? shortcuts) : base (shortcuts)
@@ -18,7 +21,6 @@ public class Menuv2 : Bar
 
         Border!.Thickness = new Thickness (1, 1, 1, 1);
         Border.LineStyle = LineStyle.Single;
-
     }
 
     /// <summary>
@@ -50,52 +52,57 @@ public class Menuv2 : Bar
     {
         base.OnSubViewAdded (view);
 
-        if (view is MenuItemv2 menuItem)
+        switch (view)
         {
-            menuItem.CanFocus = true;
+            case MenuItemv2 menuItem:
+                {
+                    menuItem.CanFocus = true;
 
-            AddCommand (menuItem.Command, RaiseAccepted);
+                    AddCommand (menuItem.Command, RaiseAccepted);
 
-            menuItem.Selecting += MenuItemOnSelecting;
-            menuItem.Accepting += MenuItemOnAccepting;
-            menuItem.Accepted += MenuItemOnAccepted;
+                    menuItem.Accepted += MenuItemOnAccepted;
 
-            void MenuItemOnSelecting (object? sender, CommandEventArgs e)
-            {
-                Logging.Trace ($"Selecting: {e.Context?.Source?.Title}");
-            }
+                    break;
 
-            void MenuItemOnAccepting (object? sender, CommandEventArgs e)
-            {
-                Logging.Trace ($"Accepting: {e.Context?.Source?.Title}");
-            }
+                    void MenuItemOnAccepted (object? sender, CommandEventArgs e)
+                    {
+                        Logging.Trace ($"MenuItemOnAccepted: {e.Context?.Source?.Title}");
+                        RaiseAccepted (e.Context);
+                    }
+                }
+            case Line line:
+                // Grow line so we get auto-join line
+                line.X = Pos.Func (() => -Border!.Thickness.Left);
+                line.Width = Dim.Fill ()! + Dim.Func (() => Border!.Thickness.Right);
 
-            void MenuItemOnAccepted (object? sender, CommandEventArgs e)
-            {
-                Logging.Trace ($"Accepted: {e.Context?.Source?.Title}");
-                RaiseAccepted (e.Context);
-            }
+                break;
         }
+    }
 
-        if (view is Line line)
+    /// <inheritdoc />
+    protected override bool OnAccepting (CommandEventArgs args)
+    {
+        Logging.Trace ($"{args.Context}");
+
+        if (SuperMenuItem is { })
         {
-            // Grow line so we get autojoin line
-            line.X = Pos.Func (() => -Border!.Thickness.Left);
-            line.Width = Dim.Fill ()! + Dim.Func (() => Border!.Thickness.Right);
+            Logging.Trace ($"Invoking Accept on SuperMenuItem: {SuperMenuItem.Title}...");
+            return SuperMenuItem?.SuperView?.InvokeCommand (Command.Accept, args.Context) is true;
         }
+        return false;
     }
 
     // TODO: Consider moving Accepted to Bar?
 
     /// <summary>
-    ///     Riases the <see cref="OnAccepted"/>/<see cref="Accepted"/> event indicating an item in this menu (or submenu)
+    ///     Raises the <see cref="OnAccepted"/>/<see cref="Accepted"/> event indicating an item in this menu (or submenu)
     ///     was accepted. This is used to determine when to hide the menu.
     /// </summary>
     /// <param name="ctx"></param>
     /// <returns></returns>
     protected bool? RaiseAccepted (ICommandContext? ctx)
     {
-        Logging.Trace ($"RaiseAccepted: {ctx}");
+        //Logging.Trace ($"RaiseAccepted: {ctx}");
         CommandEventArgs args = new () { Context = ctx };
 
         OnAccepted (args);
@@ -105,7 +112,7 @@ public class Menuv2 : Bar
     }
 
     /// <summary>
-    ///     Called when the user has accepted an item in this menu (or submenu. This is used to determine when to hide the menu.
+    ///     Called when the user has accepted an item in this menu (or submenu). This is used to determine when to hide the menu.
     /// </summary>
     /// <remarks>
     /// </remarks>
@@ -113,7 +120,7 @@ public class Menuv2 : Bar
     protected virtual void OnAccepted (CommandEventArgs args) { }
 
     /// <summary>
-    ///     Raised when the user has accepted an item in this menu (or submenu. This is used to determine when to hide the menu.
+    ///     Raised when the user has accepted an item in this menu (or submenu). This is used to determine when to hide the menu.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -126,6 +133,7 @@ public class Menuv2 : Bar
     protected override void OnFocusedChanged (View? previousFocused, View? focused)
     {
         base.OnFocusedChanged (previousFocused, focused);
+
         SelectedMenuItem = focused as MenuItemv2;
         RaiseSelectedMenuItemChanged (SelectedMenuItem);
     }
@@ -157,7 +165,7 @@ public class Menuv2 : Bar
     }
 
     /// <summary>
-    ///     Called when the the selected menu item has changed.
+    ///     Called when the selected menu item has changed.
     /// </summary>
     /// <param name="selected"></param>
     protected virtual void OnSelectedMenuItemChanged (MenuItemv2? selected)

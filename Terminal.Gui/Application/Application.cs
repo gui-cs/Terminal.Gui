@@ -153,6 +153,7 @@ public static partial class Application
         {
             popover.Visible = false;
         }
+        Popover?.Dispose ();
         Popover = null;
 
         TopLevels.Clear ();

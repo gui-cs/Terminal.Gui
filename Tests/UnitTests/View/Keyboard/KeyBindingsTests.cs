@@ -129,6 +129,28 @@ public class KeyBindingsTests ()
         top.Dispose ();
     }
 
+    [Fact]
+    [AutoInitShutdown]
+    public void HotKey_Enabled_False_Does_Not_Invoke ()
+    {
+        var view = new ScopedKeyBindingView ();
+        var keyWasHandled = false;
+        view.KeyDownNotHandled += (s, e) => keyWasHandled = true;
+
+        var top = new Toplevel ();
+        top.Add (view);
+        Application.Begin (top);
+
+        Application.RaiseKeyDownEvent (Key.Z);
+        Assert.False (keyWasHandled);
+        Assert.False (view.HotKeyCommand);
+
+        keyWasHandled = false;
+        view.Enabled = false;
+        Application.RaiseKeyDownEvent (Key.F);
+        Assert.False (view.HotKeyCommand);
+        top.Dispose ();
+    }
     // tests that test KeyBindingScope.Focus and KeyBindingScope.HotKey (tests for KeyBindingScope.Application are in Application/KeyboardTests.cs)
 
     public class ScopedKeyBindingView : View

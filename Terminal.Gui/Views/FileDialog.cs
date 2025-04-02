@@ -70,14 +70,15 @@ public class FileDialog : Dialog, IDesignable
         Canceled = true;
 
         _fileSystem = fileSystem;
-        Style = new FileDialogStyle (fileSystem);
+        Style = new (fileSystem);
 
-        _btnOk = new Button
+        _btnOk = new()
         {
             X = Pos.Align (Alignment.End, AlignmentModes.AddSpaceBetweenItems, alignmentGroupComplete),
             Y = Pos.AnchorEnd (),
             IsDefault = true, Text = Style.OkButtonText
         };
+
         _btnOk.Accepting += (s, e) =>
                             {
                                 if (e.Cancel)
@@ -88,8 +89,7 @@ public class FileDialog : Dialog, IDesignable
                                 Accept (true);
                             };
 
-
-        _btnCancel = new Button
+        _btnCancel = new()
         {
             X = Pos.Align (Alignment.End, AlignmentModes.AddSpaceBetweenItems, alignmentGroupComplete),
             Y = Pos.AnchorEnd (),
@@ -97,30 +97,31 @@ public class FileDialog : Dialog, IDesignable
         };
 
         _btnCancel.Accepting += (s, e) =>
-        {
-            if (e.Cancel)
-            {
-                return;
-            }
-            if (Modal)
-            {
-                Application.RequestStop ();
-            }
-        };
+                                {
+                                    if (e.Cancel)
+                                    {
+                                        return;
+                                    }
 
-        _btnUp = new Button { X = 0, Y = 1, NoPadding = true };
+                                    if (Modal)
+                                    {
+                                        Application.RequestStop ();
+                                    }
+                                };
+
+        _btnUp = new() { X = 0, Y = 1, NoPadding = true };
         _btnUp.Text = GetUpButtonText ();
         _btnUp.Accepting += (s, e) => _history.Up ();
 
-        _btnBack = new Button { X = Pos.Right (_btnUp) + 1, Y = 1, NoPadding = true };
+        _btnBack = new() { X = Pos.Right (_btnUp) + 1, Y = 1, NoPadding = true };
         _btnBack.Text = GetBackButtonText ();
         _btnBack.Accepting += (s, e) => _history.Back ();
 
-        _btnForward = new Button { X = Pos.Right (_btnBack) + 1, Y = 1, NoPadding = true };
+        _btnForward = new() { X = Pos.Right (_btnBack) + 1, Y = 1, NoPadding = true };
         _btnForward.Text = GetForwardButtonText ();
         _btnForward.Accepting += (s, e) => _history.Forward ();
 
-        _tbPath = new TextField { Width = Dim.Fill (), CaptionColor = new Color (Color.Black) };
+        _tbPath = new() { Width = Dim.Fill (), CaptionColor = new (Color.Black) };
 
         _tbPath.KeyDown += (s, k) =>
                            {
@@ -134,12 +135,12 @@ public class FileDialog : Dialog, IDesignable
         _tbPath.Autocomplete = new AppendAutocomplete (_tbPath);
         _tbPath.Autocomplete.SuggestionGenerator = new FilepathSuggestionGenerator ();
 
-        _splitContainer = new TileView
+        _splitContainer = new()
         {
             X = 0,
             Y = Pos.Bottom (_btnBack),
             Width = Dim.Fill (),
-            Height = Dim.Fill (Dim.Func (() => IsInitialized ? _btnOk.Frame.Height : 1)),
+            Height = Dim.Fill (Dim.Func (() => IsInitialized ? _btnOk.Frame.Height : 1))
         };
 
         Initialized += (s, e) =>
@@ -150,7 +151,7 @@ public class FileDialog : Dialog, IDesignable
 
         // this.splitContainer.Border.BorderStyle = BorderStyle.None;
 
-        _tableView = new TableView
+        _tableView = new()
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
@@ -178,7 +179,7 @@ public class FileDialog : Dialog, IDesignable
         typeStyle.MinWidth = 6;
         typeStyle.ColorGetter = ColorGetter;
 
-        _treeView = new TreeView<IFileSystemInfo> { Width = Dim.Fill (), Height = Dim.Fill () };
+        _treeView = new() { Width = Dim.Fill (), Height = Dim.Fill () };
 
         var fileDialogTreeBuilder = new FileSystemTreeBuilder ();
         _treeView.TreeBuilder = fileDialogTreeBuilder;
@@ -190,31 +191,33 @@ public class FileDialog : Dialog, IDesignable
         _splitContainer.Tiles.ElementAt (0).ContentView.Add (_treeView);
         _splitContainer.Tiles.ElementAt (1).ContentView.Add (_tableView);
 
-        _btnToggleSplitterCollapse = new Button
+        _btnToggleSplitterCollapse = new()
         {
             X = Pos.Align (Alignment.Start, AlignmentModes.AddSpaceBetweenItems, alignmentGroupInput),
             Y = Pos.AnchorEnd (), Text = GetToggleSplitterText (false)
         };
 
         _btnToggleSplitterCollapse.Accepting += (s, e) =>
-                                              {
-                                                  Tile tile = _splitContainer.Tiles.ElementAt (0);
+                                                {
+                                                    Tile tile = _splitContainer.Tiles.ElementAt (0);
 
-                                                  bool newState = !tile.ContentView.Visible;
-                                                  tile.ContentView.Visible = newState;
-                                                  _btnToggleSplitterCollapse.Text = GetToggleSplitterText (newState);
-                                                  SetNeedsLayout ();
-                                              };
+                                                    bool newState = !tile.ContentView.Visible;
+                                                    tile.ContentView.Visible = newState;
+                                                    _btnToggleSplitterCollapse.Text = GetToggleSplitterText (newState);
+                                                    SetNeedsLayout ();
+                                                };
 
-        _tbFind = new TextField
+        _tbFind = new()
         {
             X = Pos.Align (Alignment.Start, AlignmentModes.AddSpaceBetweenItems, alignmentGroupInput),
-            CaptionColor = new Color (Color.Black),
+            CaptionColor = new (Color.Black),
             Width = 30,
             Y = Pos.Top (_btnToggleSplitterCollapse),
             HotKey = Key.F.WithAlt
         };
-        _spinnerView = new SpinnerView { X = Pos.Align (Alignment.Start, AlignmentModes.AddSpaceBetweenItems, alignmentGroupInput), Y = Pos.AnchorEnd (1), Visible = false };
+
+        _spinnerView = new()
+            { X = Pos.Align (Alignment.Start, AlignmentModes.AddSpaceBetweenItems, alignmentGroupInput), Y = Pos.AnchorEnd (1), Visible = false };
 
         _tbFind.TextChanged += (s, o) => RestartSearch ();
 
@@ -242,7 +245,7 @@ public class FileDialog : Dialog, IDesignable
         _tableView.Style.ShowHorizontalHeaderUnderline = true;
         _tableView.Style.ShowHorizontalScrollIndicators = true;
 
-        _history = new FileDialogHistory (this);
+        _history = new (this);
 
         _tbPath.TextChanged += (s, e) => PathChanged ();
 
@@ -398,10 +401,10 @@ public class FileDialog : Dialog, IDesignable
 
             Move (0, Viewport.Height / 2);
 
-            SetAttribute (new Attribute (Color.Red, ColorScheme.Normal.Background));
-            Driver.AddStr (new string (' ', feedbackPadLeft));
+            SetAttribute (new (Color.Red, ColorScheme.Normal.Background));
+            Driver.AddStr (new (' ', feedbackPadLeft));
             Driver.AddStr (_feedback);
-            Driver.AddStr (new string (' ', feedbackPadRight));
+            Driver.AddStr (new (' ', feedbackPadRight));
         }
 
         return true;
@@ -430,9 +433,9 @@ public class FileDialog : Dialog, IDesignable
         _tbPath.Caption = Style.PathCaption;
         _tbFind.Caption = Style.SearchCaption;
 
-        _tbPath.Autocomplete.ColorScheme = new ColorScheme (_tbPath.ColorScheme)
+        _tbPath.Autocomplete.ColorScheme = new (_tbPath.ColorScheme)
         {
-            Normal = new Attribute (Color.Black, _tbPath.ColorScheme.Normal.Background)
+            Normal = new (Color.Black, _tbPath.ColorScheme.Normal.Background)
         };
 
         _treeRoots = Style.TreeRootGetter ();
@@ -449,18 +452,18 @@ public class FileDialog : Dialog, IDesignable
             // Fiddle factor
             int width = AllowedTypes.Max (a => a.ToString ().Length) + 6;
 
-            _allowedTypeMenu = new MenuBarItem (
-                                                "<placeholder>",
-                                                _allowedTypeMenuItems = AllowedTypes.Select (
-                                                                                             (a, i) => new MenuItem (
-                                                                                              a.ToString (),
-                                                                                              null,
-                                                                                              () => { AllowedTypeMenuClicked (i); })
-                                                                                            )
-                                                                                    .ToArray ()
-                                               );
+            _allowedTypeMenu = new (
+                                    "<placeholder>",
+                                    _allowedTypeMenuItems = AllowedTypes.Select (
+                                                                                 (a, i) => new MenuItem (
+                                                                                                         a.ToString (),
+                                                                                                         null,
+                                                                                                         () => { AllowedTypeMenuClicked (i); })
+                                                                                )
+                                                                        .ToArray ()
+                                   );
 
-            _allowedTypeMenuBar = new MenuBar
+            _allowedTypeMenuBar = new()
             {
                 Width = width,
                 Y = 1,
@@ -476,10 +479,10 @@ public class FileDialog : Dialog, IDesignable
 
             // TODO: Using v1's menu bar here is a hack. Need to upgrade this.
             _allowedTypeMenuBar.DrawingContent += (s, e) =>
-                                                       {
-                                                           _allowedTypeMenuBar.Move (e.NewViewport.Width - 1, 0);
-                                                           Driver.AddRune (Glyphs.DownArrow);
-                                                       };
+                                                  {
+                                                      _allowedTypeMenuBar.Move (e.NewViewport.Width - 1, 0);
+                                                      Driver.AddRune (Glyphs.DownArrow);
+                                                  };
 
             Add (_allowedTypeMenuBar);
         }
@@ -803,12 +806,12 @@ public class FileDialog : Dialog, IDesignable
         var black = new Color (Color.Black);
 
         // TODO: Add some kind of cache for this
-        return new ColorScheme
+        return new()
         {
-            Normal = new Attribute (color, black),
-            HotNormal = new Attribute (color, black),
-            Focus = new Attribute (black, color),
-            HotFocus = new Attribute (black, color)
+            Normal = new (color, black),
+            HotNormal = new (color, black),
+            Focus = new (black, color),
+            HotFocus = new (black, color)
         };
     }
 
@@ -895,7 +898,7 @@ public class FileDialog : Dialog, IDesignable
     private string GetToggleSplitterText (bool isExpanded)
     {
         return isExpanded
-                   ? new string ((char)Glyphs.LeftArrow.Value, 2)
+                   ? new ((char)Glyphs.LeftArrow.Value, 2)
                    : new string ((char)Glyphs.RightArrow.Value, 2);
     }
 
@@ -1225,49 +1228,48 @@ public class FileDialog : Dialog, IDesignable
             return;
         }
 
-        var contextMenu = new ContextMenu
-        {
-            Position = new Point (e.Position.X + 1, e.Position.Y + 1)
-        };
+        PopoverMenu? contextMenu = new (
+                                        [
+                                            new (Strings.fdCtxNew, string.Empty, New),
+                                            new (Strings.fdCtxRename, string.Empty, Rename),
+                                            new (Strings.fdCtxDelete, string.Empty, Delete)
+                                        ]);
 
-        var menuItems = new MenuBarItem (
-                                         [
-                                             new MenuItem (Strings.fdCtxNew, string.Empty, New),
-                                             new MenuItem (Strings.fdCtxRename, string.Empty, Rename),
-                                             new MenuItem (Strings.fdCtxDelete, string.Empty, Delete)
-                                         ]
-                                        );
         _tableView.SetSelection (clickedCell.Value.X, clickedCell.Value.Y, false);
 
-        contextMenu.Show (menuItems);
+        // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
+        // and the context menu is disposed when it is closed.
+        Application.Popover?.Register (contextMenu);
+
+        contextMenu?.MakeVisible (e.ScreenPosition);
     }
 
     private void ShowHeaderContextMenu (int clickedCol, MouseEventArgs e)
     {
         string sort = GetProposedNewSortOrder (clickedCol, out bool isAsc);
 
-        var contextMenu = new ContextMenu
-        {
-            Position = new Point (e.Position.X + 1, e.Position.Y + 1)
-        };
+        PopoverMenu? contextMenu = new (
+                                        [
+                                            new (
+                                                 string.Format (
+                                                                Strings.fdCtxHide,
+                                                                StripArrows (_tableView.Table.ColumnNames [clickedCol])
+                                                               ),
+                                                 string.Empty,
+                                                 () => HideColumn (clickedCol)
+                                                ),
+                                            new (
+                                                 StripArrows (sort),
+                                                 string.Empty,
+                                                 () => SortColumn (clickedCol, isAsc))
+                                        ]
+                                       );
 
-        var menuItems = new MenuBarItem (
-                                         [
-                                             new MenuItem (
-                                                           string.Format (
-                                                                          Strings.fdCtxHide,
-                                                                          StripArrows (_tableView.Table.ColumnNames [clickedCol])
-                                                                         ),
-                                                           string.Empty,
-                                                           () => HideColumn (clickedCol)
-                                                          ),
-                                             new MenuItem (
-                                                           StripArrows (sort),
-                                                           string.Empty,
-                                                           () => SortColumn (clickedCol, isAsc))
-                                         ]
-                                        );
-        contextMenu.Show (menuItems);
+        // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
+        // and the context menu is disposed when it is closed.
+        Application.Popover?.Register (contextMenu);
+
+        contextMenu?.MakeVisible (e.ScreenPosition);
     }
 
     private void SortColumn (int clickedCol)
@@ -1618,6 +1620,7 @@ public class FileDialog : Dialog, IDesignable
     {
         Modal = false;
         OnLoaded ();
+
         return true;
     }
 }

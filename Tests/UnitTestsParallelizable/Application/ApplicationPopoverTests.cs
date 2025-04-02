@@ -35,29 +35,29 @@ public class ApplicationPopoverTests
     }
 
     [Fact]
-    public void ShowPopover_SetsActivePopover ()
+    public void Show_SetsActivePopover ()
     {
         // Arrange
         var popover = new Mock<IPopoverTestClass> ().Object;
         var popoverManager = new ApplicationPopover ();
 
         // Act
-        popoverManager.ShowPopover (popover);
+        popoverManager.Show (popover);
 
         // Assert
         Assert.Equal (popover, popoverManager.GetActivePopover ());
     }
 
     [Fact]
-    public void HidePopover_ClearsActivePopover ()
+    public void Hide_ClearsActivePopover ()
     {
         // Arrange
         var popover = new Mock<IPopover> ().Object;
         var popoverManager = new ApplicationPopover ();
-        popoverManager.ShowPopover (popover);
+        popoverManager.Show (popover);
 
         // Act
-        popoverManager.HidePopover (popover);
+        popoverManager.Hide (popover);
 
         // Assert
         Assert.Null (popoverManager.GetActivePopover ());
@@ -70,7 +70,7 @@ public class ApplicationPopoverTests
         // Arrange
         var popover = new IPopoverTestClass ();
         var popoverManager = new ApplicationPopover ();
-        popoverManager.ShowPopover (popover);
+        popoverManager.Show (popover);
 
         // Act
         popoverManager.DispatchKeyDown (Key.A);
@@ -86,7 +86,7 @@ public class ApplicationPopoverTests
         // Arrange
         var popover = new IPopoverTestClass ();
         var popoverManager = new ApplicationPopover ();
-        popoverManager.ShowPopover (popover);
+        popoverManager.Show (popover);
 
         // Act
         popoverManager.DispatchKeyDown (Key.N.WithCtrl);
@@ -104,7 +104,7 @@ public class ApplicationPopoverTests
         var activePopover = new IPopoverTestClass () { Id = "activePopover" };
         var inactivePopover = new IPopoverTestClass () { Id = "inactivePopover" }; ;
         var popoverManager = new ApplicationPopover ();
-        popoverManager.ShowPopover (activePopover);
+        popoverManager.Show (activePopover);
         popoverManager.Register (inactivePopover);
 
         // Act
@@ -124,7 +124,7 @@ public class ApplicationPopoverTests
         var activePopover = new IPopoverTestClass ();
         var inactivePopover = new IPopoverTestClass ();
         var popoverManager = new ApplicationPopover ();
-        popoverManager.ShowPopover (activePopover);
+        popoverManager.Show (activePopover);
         popoverManager.Register (inactivePopover);
 
         // Act

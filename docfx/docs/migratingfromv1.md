@@ -470,6 +470,24 @@ In v1, only Views derived from `Toplevel` could be overlapped. In v2, any view c
 
 v1 conflated the concepts of 
 
+## `ContextMenu` replaced by `PopoverMenu`
+
+`PopoverMenu` replaces `ContrextMenu`. 
+
+## `MenuItem` is now based on `Shortcut`
+
+
+```diff
+new (
+      Strings.charMapCopyGlyph,
+      "",
+      CopyGlyph,
+-      null,
+-      null,
+      (KeyCode)Key.G.WithCtrl
+     ),
+```	
+
 ## Others...
 
 * `View` and all subclasses support `IDisposable` and must be disposed (by calling `view.Dispose ()`) by whatever code owns the instance when the instance is longer needed. 

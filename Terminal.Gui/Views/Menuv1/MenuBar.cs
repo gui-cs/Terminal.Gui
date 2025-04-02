@@ -17,7 +17,6 @@ namespace Terminal.Gui;
 ///         The <see cref="MenuBar"/> appears on the first row of the <see cref="Toplevel"/> SuperView and uses the full
 ///         width.
 ///     </para>
-///     <para>See also: <see cref="ContextMenu"/></para>
 ///     <para>The <see cref="MenuBar"/> provides global hot keys for the application. See <see cref="MenuItem.HotKey"/>.</para>
 ///     <para>
 ///         When the menu is created key bindings for each menu item and its sub-menu items are added for each menu

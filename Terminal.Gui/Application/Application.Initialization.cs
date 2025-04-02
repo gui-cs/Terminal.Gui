@@ -82,7 +82,10 @@ public static partial class Application // Initialization (Init/Shutdown)
             ResetState (ignoreDisposed: true);
         }
 
+        Debug.Assert (Navigation is null);
         Navigation = new ();
+
+        Debug.Assert(Popover is null);
         Popover = new ();
 
         // For UnitTests

@@ -63,22 +63,16 @@ public class BasicFluentAssertionTests
     {
         var clicked = false;
 
-        var ctx = new ContextMenu ();
-
-        var menuItems = new MenuBarItem (
-                                         [
-                                             new ("_New File", string.Empty, () => { clicked = true; })
-                                         ]
-                                        );
+        MenuItemv2 [] menuItems =  [new ("_New File", string.Empty, () => { clicked = true; })];
 
         using GuiTestContext c = With.A<Window> (40, 10, d)
-                                     .WithContextMenu (ctx, menuItems)
+                                     .WithContextMenu (new PopoverMenu(menuItems))
                                      .ScreenShot ("Before open menu", _out)
 
                                      // Click in main area inside border
                                      .RightClick (1, 1)
                                      .ScreenShot ("After open menu", _out)
-                                     .LeftClick (3, 3)
+                                     .LeftClick (2, 2)
                                      .Stop ()
                                      .WriteOutLogs (_out);
         Assert.True (clicked);
@@ -90,34 +84,26 @@ public class BasicFluentAssertionTests
     {
         var clicked = false;
 
-        var ctx = new ContextMenu ();
-
-
-
-        var menuItems = new MenuBarItem (
-                                         [
-                                             new MenuItem ("One", "", null),
-                                             new MenuItem ("Two", "", null),
-                                             new MenuItem ("Three", "", null),
-                                             new MenuBarItem (
-                                                              "Four",
-                                                              [
-                                                                  new MenuItem ("SubMenu1", "", null),
-                                                                  new MenuItem ("SubMenu2", "", ()=>clicked=true),
-                                                                  new MenuItem ("SubMenu3", "", null),
-                                                                  new MenuItem ("SubMenu4", "", null),
-                                                                  new MenuItem ("SubMenu5", "", null),
-                                                                  new MenuItem ("SubMenu6", "", null),
-                                                                  new MenuItem ("SubMenu7", "", null)
-                                                              ]
-                                                             ),
-                                             new MenuItem ("Five", "", null),
-                                             new MenuItem ("Six", "", null)
-                                         ]
-                                        );
+        MenuItemv2 [] menuItems = [
+                                      new ("One", "", null),
+                                      new ("Two", "", null),
+                                      new ("Three", "", null),
+                                      new ("Four", "", new (
+                                           [
+                                               new ("SubMenu1", "", null),
+                                               new ("SubMenu2", "", ()=>clicked=true),
+                                               new ("SubMenu3", "", null),
+                                               new ("SubMenu4", "", null),
+                                               new ("SubMenu5", "", null),
+                                               new ("SubMenu6", "", null),
+                                               new ("SubMenu7", "", null)
+                                           ])),
+                                      new  ("Five", "", null),
+                                      new  ("Six", "", null)
+                                  ];
 
         using GuiTestContext c = With.A<Window> (40, 10,d)
-                                     .WithContextMenu (ctx, menuItems)
+                                     .WithContextMenu (new PopoverMenu (menuItems))
                                      .ScreenShot ("Before open menu", _out)
 
                                      // Click in main area inside border

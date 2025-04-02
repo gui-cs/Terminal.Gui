@@ -418,9 +418,9 @@ public class TextField : View
     /// <summary>Gets or sets the foreground <see cref="Color"/> to use when rendering <see cref="Caption"/>.</summary>
     public Color CaptionColor { get; set; }
 
-    /// <summary>Get the <see cref="ContextMenu"/> for this view.</summary>
+    /// <summary>Get the Context Menu for this view.</summary>
     [CanBeNull]
-    public ContextMenuv2 ContextMenu { get; private set; }
+    public PopoverMenu ContextMenu { get; private set; }
 
     /// <summary>Sets or gets the current cursor position.</summary>
     public virtual int CursorPosition
@@ -800,7 +800,7 @@ public class TextField : View
             && !ev.Flags.HasFlag (MouseFlags.ReportMousePosition)
             && !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
             && !ev.Flags.HasFlag (MouseFlags.Button1TripleClicked)
-            && !ev.Flags.HasFlag (PopoverMenu.MouseFlags))
+            && !ev.Flags.HasFlag (ContextMenu!.MouseFlags))
         {
             return false;
         }
@@ -900,7 +900,7 @@ public class TextField : View
             ClearAllSelection ();
             PrepareSelection (0, _text.Count);
         }
-        else if (ev.Flags == PopoverMenu.MouseFlags)
+        else if (ev.Flags == ContextMenu!.MouseFlags)
         {
             PositionCursor (ev);
             ShowContextMenu (false);
@@ -1226,7 +1226,7 @@ public class TextField : View
     private void CreateContextMenu ()
     {
         DisposeContextMenu ();
-        ContextMenuv2 menu = new (new List<MenuItemv2> ()
+        PopoverMenu menu = new (new List<MenuItemv2> ()
         {
             new (this, Command.SelectAll, Strings.ctxSelectAll),
             new (this, Command.DeleteAll, Strings.ctxDeleteAll),

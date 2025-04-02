@@ -121,8 +121,6 @@ public class MenusV2 : Scenario
 
             KeyBindings.Add (PopoverMenu.DefaultKey, Command.Context);
 
-            MouseBindings.ReplaceCommands (PopoverMenu.MouseFlags, Command.Context);
-
             AddCommand (
                         Command.Cancel,
                         ctx =>
@@ -441,7 +439,7 @@ public class MenusV2 : Scenario
 
             _menuBgColorCp.ColorChanged += (sender, args) =>
                                            {
-                                               menu.ColorScheme = menu.ColorScheme with
+                                               menu.ColorScheme = menu.ColorScheme! with
                                                {
                                                    Normal = new (menu.ColorScheme.Normal.Foreground, args.CurrentValue)
                                                };
@@ -503,22 +501,6 @@ public class MenusV2 : Scenario
             //shortcut4.Accepting += (sender, args) => args.Cancel = true;
 
             menu.Add (deeperDetail, new Line (), shortcut4);
-        }
-
-        /// <inheritdoc/>
-        protected override void Dispose (bool disposing)
-        {
-            if (disposing)
-            {
-                //    if (FilePopoverMenu is { })
-                //    {
-                //        FilePopoverMenu.Visible = false;
-                //        FilePopoverMenu?.Dispose ();
-                //        FilePopoverMenu = null;
-                //    }
-            }
-
-            base.Dispose (disposing);
         }
     }
 

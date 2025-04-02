@@ -5,7 +5,7 @@ namespace Terminal.Gui.ApplicationTests;
 public class ApplicationPopoverTests
 {
     [Fact]
-    public void Popover_ApplicationInit_Inits ()
+    public void ApplicationInit_Initializes_PopoverManager ()
     {
         // Arrange
         Assert.Null (Application.Popover);
@@ -18,7 +18,7 @@ public class ApplicationPopoverTests
     }
 
     [Fact]
-    public void Popover_ApplicationShutdown_CleansUp ()
+    public void Application_Shutdown_CleansUp_PopoverManager ()
     {
         // Arrange
         Assert.Null (Application.Popover);
@@ -34,7 +34,7 @@ public class ApplicationPopoverTests
     }
 
     [Fact]
-    public void Popover_NotCleanedUp_On_End ()
+    public void Application_End_Does_Not_CleanedUp ()
     {
         // Arrange
         Assert.Null (Application.Popover);
@@ -56,7 +56,7 @@ public class ApplicationPopoverTests
     }
 
     [Fact]
-    public void Popover_Active_Hidden_On_End ()
+    public void Application_End_Hides_Active ()
     {
         // Arrange
         Assert.Null (Application.Popover);
@@ -66,9 +66,9 @@ public class ApplicationPopoverTests
         var top = new Toplevel ();
         RunState rs = Application.Begin (top);
 
-        IPopoverTestClass popover = new ();
+        PopoverTestClass popover = new ();
 
-        Application.Popover?.ShowPopover (popover);
+        Application.Popover?.Show (popover);
         Assert.True (popover.Visible);
 
         // Act
@@ -83,16 +83,79 @@ public class ApplicationPopoverTests
         Application.Shutdown ();
     }
 
-    public class IPopoverTestClass : View, IPopover
+    [Fact]
+    public void Application_Shutdown_Disposes_Registered_Popovers ()
     {
-        public List<Key> HandledKeys { get; } = new List<Key> ();
+        // Arrange
+        Assert.Null (Application.Popover);
+        Application.Init (new FakeDriver ());
+
+        PopoverTestClass popover = new ();
+
+        // Act
+        Application.Popover?.Register (popover);
+        Application.Shutdown ();
+
+        // Test
+        Assert.Equal(1, popover.DisposedCount);
+    }
+
+    [Fact]
+    public void Application_Shutdown_Does_Not_Dispose_DeRegistered_Popovers ()
+    {
+        // Arrange
+        Assert.Null (Application.Popover);
+        Application.Init (new FakeDriver ());
+
+        PopoverTestClass popover = new ();
+
+        Application.Popover?.Register (popover);
+
+        // Act
+        Application.Popover?.DeRegister (popover);
+        Application.Shutdown ();
+
+        // Test
+        Assert.Equal (0, popover.DisposedCount);
+
+        popover.Dispose ();
+    }
+
+    [Fact]
+    public void Application_Shutdown_Does_Not_Dispose_ActiveNotRegistered_Popover ()
+    {
+        // Arrange
+        Assert.Null (Application.Popover);
+        Application.Init (new FakeDriver ());
+
+        PopoverTestClass popover = new ();
+
+        Application.Popover?.Show (popover);
+
+        // Act
+        Application.Shutdown ();
+
+        // Test
+        Assert.Equal (0, popover.DisposedCount);
+
+        popover.Dispose ();
+    }
+
+    public class PopoverTestClass : View, IPopover
+    {
+        public List<Key> HandledKeys { get; } = [];
         public int NewCommandInvokeCount { get; private set; }
 
-        public IPopoverTestClass ()
+        // NOTE: Hides the base DisposedCount property
+        public new int DisposedCount { get; private set; }
+
+        public PopoverTestClass ()
         {
             CanFocus = true;
             AddCommand (Command.New, NewCommandHandler);
             HotKeyBindings.Add (Key.N.WithCtrl, Command.New);
+
+            return;
 
             bool? NewCommandHandler (ICommandContext ctx)
             {
@@ -107,338 +170,13 @@ public class ApplicationPopoverTests
             HandledKeys.Add (key);
             return false;
         }
+
+        /// <inheritdoc />
+        protected override void Dispose (bool disposing)
+        {
+            base.Dispose (disposing);
+            DisposedCount++;
+        }
     }
-    //[Fact]
-    //public void Popover_SetToNull ()
-    //{
-    //    // Arrange
-    //    var popover = new View ();
-    //    Application.Popover = popover;
 
-    //    // Act
-    //    Application.Popover = null;
-
-    //    // Assert
-    //    Assert.Null (Application.Popover);
-
-    //    Application.ResetState (ignoreDisposed: true);
-    //}
-
-    //[Fact]
-    //public void Popover_VisibleChangedEvent ()
-    //{
-    //    // Arrange
-    //    var popover = new View ()
-    //    {
-    //        Visible = false
-    //    };
-    //    Application.Popover = popover;
-    //    bool eventTriggered = false;
-
-    //    popover.VisibleChanged += (sender, e) => eventTriggered = true;
-
-    //    // Act
-    //    popover.Visible = true;
-
-    //    // Assert
-    //    Assert.True (eventTriggered);
-
-    //    Application.ResetState (ignoreDisposed: true);
-    //}
-
-    //[Fact]
-    //public void Popover_InitializesCorrectly ()
-    //{
-    //    // Arrange
-    //    var popover = new View ();
-
-    //    // Act
-    //    Application.Popover = popover;
-
-    //    // Assert
-    //    Assert.True (popover.IsInitialized);
-
-    //    Application.ResetState (ignoreDisposed: true);
-    //}
-
-    //[Fact]
-    //public void Popover_SetsColorScheme ()
-    //{
-    //    // Arrange
-    //    var popover = new View ();
-    //    var topColorScheme = new ColorScheme ();
-    //    Application.Top = new Toplevel { ColorScheme = topColorScheme };
-
-    //    // Act
-    //    Application.Popover = popover;
-
-    //    // Assert
-    //    Assert.Equal (topColorScheme, popover.ColorScheme);
-
-    //    Application.ResetState (ignoreDisposed: true);
-    //}
-
-    //[Fact]
-    //public void Popover_VisibleChangedToTrue_SetsFocus ()
-    //{
-    //    // Arrange
-    //    var popover = new View ()
-    //    {
-    //        Visible = false,
-    //        CanFocus = true
-    //    };
-    //    Application.Popover = popover;
-
-    //    // Act
-    //    popover.Visible = true;
-
-    //    // Assert
-    //    Assert.True (popover.Visible);
-    //    Assert.True (popover.HasFocus);
-
-    //    Application.ResetState (ignoreDisposed: true);
-    //}
-
-    //[Theory]
-    //[InlineData(-1, -1)]
-    //[InlineData (0, 0)]
-    //[InlineData (2048, 2048)]
-    //[InlineData (2049, 2049)]
-    //public void Popover_VisibleChangedToTrue_Locates_In_Visible_Position (int x, int y)
-    //{
-    //    // Arrange
-    //    var popover = new View ()
-    //    {
-    //        X = x,
-    //        Y = y,
-    //        Visible = false,
-    //        CanFocus = true,
-    //        Width = 1,
-    //        Height = 1
-    //    };
-    //    Application.Popover = popover;
-
-    //    // Act
-    //    popover.Visible = true;
-    //    Application.LayoutAndDraw();
-
-    //    // Assert
-    //    Assert.True (Application.Screen.Contains (popover.Frame));
-
-    //    Application.ResetState (ignoreDisposed: true);
-    //}
-
-    //[Fact]
-    //public void Popover_VisibleChangedToFalse_Hides_And_Removes_Focus ()
-    //{
-    //    // Arrange
-    //    var popover = new View ()
-    //    {
-    //        Visible = false,
-    //        CanFocus = true
-    //    };
-    //    Application.Popover = popover;
-    //    popover.Visible = true;
-
-    //    // Act
-    //    popover.Visible = false;
-
-    //    // Assert
-    //    Assert.False (popover.Visible);
-    //    Assert.False (popover.HasFocus);
-
-    //    Application.ResetState (ignoreDisposed: true);
-    //}
-
-    //[Fact]
-    //public void Popover_Quit_Command_Hides ()
-    //{
-    //    // Arrange
-    //    var popover = new View ()
-    //    {
-    //        Visible = false,
-    //        CanFocus = true
-    //    };
-    //    Application.Popover = popover;
-    //    popover.Visible = true;
-    //    Assert.True (popover.Visible);
-    //    Assert.True (popover.HasFocus);
-
-    //    // Act
-    //    Application.RaiseKeyDownEvent (Application.QuitKey);
-
-    //    // Assert
-    //    Assert.False (popover.Visible);
-    //    Assert.False (popover.HasFocus);
-
-    //    Application.ResetState (ignoreDisposed: true);
-    //}
-
-    //[Fact]
-    //public void Popover_MouseClick_Outside_Hides_Passes_Event_On ()
-    //{
-    //    // Arrange
-    //    Application.Top = new Toplevel ()
-    //    {
-    //        Id = "top",
-    //        Height = 10,
-    //        Width = 10,
-    //    };
-
-    //    View otherView = new ()
-    //    {
-    //        X = 1,
-    //        Y = 1,
-    //        Height = 1,
-    //        Width = 1,
-    //        Id = "otherView",
-    //    };
-
-    //    bool otherViewPressed = false;
-    //    otherView.MouseEvent += (sender, e) =>
-    //                            {
-    //                                otherViewPressed = e.Flags.HasFlag(MouseFlags.Button1Pressed);
-    //                            };
-
-    //    Application.Top.Add (otherView);
-
-    //    var popover = new View ()
-    //    {
-    //        Id = "popover",
-    //        X = 5,
-    //        Y = 5,
-    //        Width = 1,
-    //        Height = 1,
-    //        Visible = false,
-    //        CanFocus = true
-    //    };
-
-    //    Application.Popover = popover;
-    //    popover.Visible = true;
-    //    Assert.True (popover.Visible);
-    //    Assert.True (popover.HasFocus);
-
-    //    // Act
-    //    // Click on popover
-    //    Application.RaiseMouseEvent (new () { Flags = MouseFlags.Button1Pressed, ScreenPosition = new (5, 5) });
-    //    Assert.True (popover.Visible);
-
-    //    // Click outside popover (on button)
-    //    Application.RaiseMouseEvent (new () { Flags = MouseFlags.Button1Pressed, ScreenPosition = new (1, 1) });
-
-    //    // Assert
-    //    Assert.True (otherViewPressed);
-    //    Assert.False (popover.Visible);
-
-    //    Application.Top.Dispose ();
-    //    Application.ResetState (ignoreDisposed: true);
-    //}
-
-    //[Theory]
-    //[InlineData (0, 0, false)]
-    //[InlineData (5, 5, true)]
-    //[InlineData (10, 10, false)]
-    //[InlineData (5, 10, false)]
-    //[InlineData (9, 9, false)]
-    //public void Popover_MouseClick_Outside_Hides (int mouseX, int mouseY, bool expectedVisible)
-    //{
-    //    // Arrange
-    //    Application.Top = new Toplevel ()
-    //    {
-    //        Id = "top",
-    //        Height = 10,
-    //        Width = 10,
-    //    };
-    //    var popover = new View ()
-    //    {
-    //        Id = "popover",
-    //        X = 5,
-    //        Y = 5,
-    //        Width = 1,
-    //        Height = 1,
-    //        Visible = false,
-    //        CanFocus = true
-    //    };
-
-    //    Application.Popover = popover;
-    //    popover.Visible = true;
-    //    Assert.True (popover.Visible);
-    //    Assert.True (popover.HasFocus);
-
-    //    // Act
-    //    Application.RaiseMouseEvent (new () { Flags = MouseFlags.Button1Pressed, ScreenPosition = new (mouseX, mouseY) });
-
-    //    // Assert
-    //    Assert.Equal (expectedVisible, popover.Visible);
-
-    //    Application.Top.Dispose ();
-    //    Application.ResetState (ignoreDisposed: true);
-    //}
-
-    //[Fact]
-    //public void Popover_SetAndGet_ReturnsCorrectValue ()
-    //{
-    //    // Arrange
-    //    var view = new View ();
-
-    //    // Act
-    //    Application.Popover = view;
-
-    //    // Assert
-    //    Assert.Equal (view, Application.Popover);
-
-    //    Application.ResetState (ignoreDisposed: true);
-    //}
-
-    //[Fact]
-    //public void Popover_SetToNull_HidesPreviousPopover ()
-    //{
-    //    // Arrange
-    //    var view = new View { Visible = true };
-    //    Application.Popover = view;
-
-    //    // Act
-    //    Application.Popover = null;
-
-    //    // Assert
-    //    Assert.False (view.Visible);
-    //    Assert.Null (Application.Popover);
-
-    //    Application.ResetState (ignoreDisposed: true);
-    //}
-
-    //[Fact]
-    //public void Popover_SetNewPopover_HidesPreviousPopover ()
-    //{
-    //    // Arrange
-    //    var oldView = new View { Visible = true };
-    //    var newView = new View ();
-    //    Application.Popover = oldView;
-
-    //    // Act
-    //    Application.Popover = newView;
-
-    //    // Assert
-    //    Assert.False (oldView.Visible);
-    //    Assert.Equal (newView, Application.Popover);
-
-    //    Application.ResetState (ignoreDisposed: true);
-    //}
-
-    //[Fact]
-    //public void Popover_SetNewPopover_InitializesAndSetsProperties ()
-    //{
-    //    // Arrange
-    //    var view = new View ();
-
-    //    // Act
-    //    Application.Popover = view;
-
-    //    // Assert
-    //    Assert.True (view.IsInitialized);
-    //    Assert.True (view.Arrangement.HasFlag (ViewArrangement.Overlapped));
-    //    Assert.Equal (Application.Top?.ColorScheme, view.ColorScheme);
-
-    //    Application.ResetState (ignoreDisposed: true);
-    //}
 }
