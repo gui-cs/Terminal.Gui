@@ -232,65 +232,39 @@ public class MenuBarv2Tests
 
     [Theory]
     [ClassData (typeof (V2TestDrivers))]
-    public void Navigation_BetweenItems (V2TestDriver d)
+    public void Navigation_Left_Right_Wraps (V2TestDriver d)
     {
-        var menuBarActivated = false;
+        MenuBarv2? menuBar = null;
 
-        using GuiTestContext c = With.A<Window> (80, 25, d)
+        using GuiTestContext c = With.A<Window> (50, 20, d)
                                      .Then (
                                             () =>
                                             {
-                                                // Create menu items
-                                                var fileMenu = new MenuBarItemv2 (
-                                                                                  "_File",
-                                                                                  [
-                                                                                      new MenuItemv2 ("_Open", string.Empty, null),
-                                                                                      new MenuItemv2 ("_Save", string.Empty, null)
-                                                                                  ]);
-
-                                                var editMenu = new MenuBarItemv2 (
-                                                                                  "_Edit",
-                                                                                  [
-                                                                                      new MenuItemv2 ("_Cut", string.Empty, null),
-                                                                                      new MenuItemv2 ("_Copy", string.Empty, null)
-                                                                                  ]);
-
-                                                // Create menu bar and add to window
-                                                var menuBar = new MenuBarv2 ([fileMenu, editMenu]);
-                                                Application.Top.Add (menuBar);
-
-                                                // Set menu bar to active state using reflection
-                                                FieldInfo? activeField = typeof (MenuBarv2).GetField (
-                                                                                                      "_active",
-                                                                                                      BindingFlags.NonPublic | BindingFlags.Instance);
-                                                activeField?.SetValue (menuBar, true);
-                                                menuBar.CanFocus = true;
-                                                menuBarActivated = true;
-
-                                                // Give focus to the first menu item
-                                                fileMenu.SetFocus ();
-                                                Assert.True (fileMenu.HasFocus);
-
-                                                Application.LayoutAndDraw ();
+                                                menuBar = new MenuBarv2 ();
+                                                menuBar.EnableForDesign ();
+                                                Application.Top!.Add (menuBar);
                                             })
+                                     .WaitIteration ()
                                      .ScreenShot ("MenuBar initial state", _out)
-                                     .Then (
-                                            () =>
-                                            {
-                                                if (!menuBarActivated)
-                                                {
-                                                    // Skip further tests if activation failed
-                                                }
-
-                                                // Move right to select the edit menu
-                                                // This simulates navigation between menu items
-                                            })
+                                     .SendKey (MenuBarv2.DefaultKey)
+                                     .Then (() => Assert.True (Application.Popover?.GetActivePopover () is PopoverMenu))
+                                     .Then (() => Assert.True (menuBar?.IsOpen()))
+                                     .Then (() => Assert.Equal ("_New file", Application.Navigation?.GetFocused ()!.Title))
+                                     .ScreenShot ($"After {MenuBarv2.DefaultKey}", _out)
                                      .Right ()
+                                     .Then (() => Assert.True (Application.Popover?.GetActivePopover () is PopoverMenu))
                                      .ScreenShot ("After right arrow", _out)
+                                     .Then (() => Assert.Equal ("Cu_t", Application.Navigation?.GetFocused ()!.Title))
                                      .Right ()
-                                     .ScreenShot ("After second right arrow (should wrap)", _out)
+                                     .ScreenShot ("After second right arrow", _out)
+                                     .Then (() => Assert.Equal ("_Online Help...", Application.Navigation?.GetFocused ()!.Title))
+                                     .ScreenShot ("After third right arrow", _out)
+                                     .Right ()
+                                     .ScreenShot ("After fourth right arrow", _out)
+                                     .Then (() => Assert.Equal ("_New file", Application.Navigation?.GetFocused ()!.Title))
                                      .Left ()
                                      .ScreenShot ("After left arrow", _out)
+                                     .Then (() => Assert.Equal ("_Online Help...", Application.Navigation?.GetFocused ()!.Title))
                                      .WriteOutLogs (_out)
                                      .Stop ();
     }

@@ -315,9 +315,7 @@ public class GuiTestContext : IDisposable
                 throw new ArgumentOutOfRangeException ();
         }
 
-        WaitIteration ();
-
-        return this;
+        return WaitIteration (); ;
     }
 
     public GuiTestContext Down ()
@@ -326,7 +324,6 @@ public class GuiTestContext : IDisposable
         {
             case V2TestDriver.V2Win:
                 SendWindowsKey (ConsoleKeyMapping.VK.DOWN);
-                WaitIteration ();
                 break;
             case V2TestDriver.V2Net:
                 foreach (var k in NetSequences.Down)
@@ -339,7 +336,7 @@ public class GuiTestContext : IDisposable
         }
 
 
-        return this;
+        return WaitIteration (); ;
     }
 
     /// <summary>
@@ -353,7 +350,6 @@ public class GuiTestContext : IDisposable
         {
             case V2TestDriver.V2Win:
                 SendWindowsKey (ConsoleKeyMapping.VK.RIGHT);
-                WaitIteration ();
                 break;
             case V2TestDriver.V2Net:
                 foreach (var k in NetSequences.Right)
@@ -365,7 +361,7 @@ public class GuiTestContext : IDisposable
                 throw new ArgumentOutOfRangeException ();
         }
 
-        return this;
+        return WaitIteration ();
     }
 
     /// <summary>
@@ -379,7 +375,6 @@ public class GuiTestContext : IDisposable
         {
             case V2TestDriver.V2Win:
                 SendWindowsKey (ConsoleKeyMapping.VK.LEFT);
-                WaitIteration ();
                 break;
             case V2TestDriver.V2Net:
                 foreach (var k in NetSequences.Left)
@@ -391,7 +386,7 @@ public class GuiTestContext : IDisposable
                 throw new ArgumentOutOfRangeException ();
         }
 
-        return this;
+        return WaitIteration ();
     }
 
     /// <summary>
@@ -405,7 +400,6 @@ public class GuiTestContext : IDisposable
         {
             case V2TestDriver.V2Win:
                 SendWindowsKey (ConsoleKeyMapping.VK.UP);
-                WaitIteration ();
                 break;
             case V2TestDriver.V2Net:
                 foreach (var k in NetSequences.Up)
@@ -417,7 +411,7 @@ public class GuiTestContext : IDisposable
                 throw new ArgumentOutOfRangeException ();
         }
 
-        return this;
+        return WaitIteration ();
     }
 
     /// <summary>
@@ -447,7 +441,7 @@ public class GuiTestContext : IDisposable
                 throw new ArgumentOutOfRangeException ();
         }
 
-        return this;
+        return WaitIteration ();
     }
 
     /// <summary>
@@ -549,5 +543,12 @@ public class GuiTestContext : IDisposable
                                        });
 
         WaitIteration ();
+    }
+
+    public GuiTestContext SendKey (Key key)
+    {
+        Application.RaiseKeyDownEvent (key);
+
+        return WaitIteration();
     }
 }

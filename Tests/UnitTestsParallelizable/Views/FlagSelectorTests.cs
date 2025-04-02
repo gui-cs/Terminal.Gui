@@ -29,6 +29,21 @@ public class FlagSelectorTests
     }
 
     [Fact]
+    public void SetFlags_WithDictionary_ShouldSetValue ()
+    {
+        var flagSelector = new FlagSelector ();
+        var flags = new Dictionary<uint, string>
+        {
+            { 1, "Flag1" },
+            { 2, "Flag2" }
+        };
+
+        flagSelector.SetFlags (flags);
+
+        Assert.Equal ((uint)1, flagSelector.Value);
+    }
+
+    [Fact]
     public void SetFlags_WithEnum_ShouldSetFlags ()
     {
         var flagSelector = new FlagSelector ();
@@ -116,7 +131,7 @@ public class FlagSelectorTests
         bool eventRaised = false;
         flagSelector.ValueChanged += (sender, args) => eventRaised = true;
 
-        flagSelector.Value = 1;
+        flagSelector.Value = 2;
 
         Assert.True (eventRaised);
     }
@@ -141,15 +156,6 @@ public class FlagSelectorTests
         Assert.Throws<InvalidOperationException> (() => flagSelector.SetFlags (new Dictionary<uint, string> ()));
         Assert.Throws<InvalidOperationException> (() => flagSelector.SetFlags<FlagSelectorStyles> ());
         Assert.Throws<InvalidOperationException> (() => flagSelector.SetFlags<FlagSelectorStyles> (styles => null));
-    }
-
-    [Fact]
-    public void Generic_ ()
-    {
-        var flagSelector = new FlagSelector<FlagSelectorStyles> ();
-
-        var flags = flagSelector.Flags;
-
     }
 
     [Fact]
