@@ -35,6 +35,7 @@ namespace Terminal.Gui;
 ///         duplicates a shortcut (e.g. _File and Alt-F), the hot key wins.
 ///     </para>
 /// </remarks>
+[Obsolete ("Use MenuBarv2 instead.", false)]
 public class MenuBar : View, IDesignable
 {
     // Spaces before the Title

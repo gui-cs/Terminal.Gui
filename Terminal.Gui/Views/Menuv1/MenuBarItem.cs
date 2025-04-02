@@ -6,6 +6,7 @@ namespace Terminal.Gui;
 ///     <see cref="MenuBarItem"/> is a menu item on  <see cref="MenuBar"/>. MenuBarItems do not support
 ///     <see cref="MenuItem.ShortcutKey"/>.
 /// </summary>
+[Obsolete ("Use MenuBarItemv2 instead.", false)]
 public class MenuBarItem : MenuItem
 {
     /// <summary>Initializes a new <see cref="MenuBarItem"/> as a <see cref="MenuItem"/>.</summary>
