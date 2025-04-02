@@ -235,7 +235,7 @@ public class Bar : View, IOrientation, IDesignable
 
                     var minKeyWidth = 0;
 
-                    List<Shortcut> shortcuts = GetSubViews<Shortcut> ().Where (s => s.Visible).ToList ();
+                    List<Shortcut> shortcuts = SubViews.OfType<Shortcut> ().Where (s => s.Visible).ToList ();
 
                     foreach (Shortcut shortcut in shortcuts)
                     {

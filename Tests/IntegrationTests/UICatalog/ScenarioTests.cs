@@ -171,7 +171,7 @@ public class ScenarioTests : TestsAllViews
 
         var top = new Toplevel ();
 
-        Dictionary<string, Type> viewClasses = GetAllViewClasses().ToDictionary (t => t.Name);
+        Dictionary<string, Type> viewClasses = GetAllViewClasses ().ToDictionary (t => t.Name);
 
         Window leftPane = new ()
         {
@@ -277,7 +277,7 @@ public class ScenarioTests : TestsAllViews
         classListView.SelectedItemChanged += (s, args) =>
                                               {
                                                   // Remove existing class, if any
-                                                  if (curView is {})
+                                                  if (curView is { })
                                                   {
                                                       curView.SubViewsLaidOut -= LayoutCompleteHandler;
                                                       hostPane.Remove (curView);
@@ -357,10 +357,13 @@ public class ScenarioTests : TestsAllViews
                                      {
                                          classListView.MoveDown ();
 
-                                         Assert.Equal (
-                                                       curView!.GetType ().Name,
-                                                       viewClasses.Values.ToArray () [classListView.SelectedItem].Name
-                                                      );
+                                         if (curView is { })
+                                         {
+                                             Assert.Equal (
+                                                           curView.GetType ().Name,
+                                                           viewClasses.Values.ToArray () [classListView.SelectedItem].Name
+                                                          );
+                                         }
                                      }
                                      else
                                      {
@@ -507,12 +510,26 @@ public class ScenarioTests : TestsAllViews
                 // For each of the <T> arguments
                 List<Type> typeArguments = new ();
 
-                // use <object>
+                // use <object> or the original type if applicable
                 foreach (Type arg in type.GetGenericArguments ())
                 {
-                    typeArguments.Add (typeof (object));
+                    if (arg.IsValueType && Nullable.GetUnderlyingType (arg) == null)
+                    {
+                        typeArguments.Add (arg);
+                    }
+                    else
+                    {
+                        typeArguments.Add (typeof (object));
+                    }
                 }
 
+                // Ensure the type does not contain any generic parameters
+                if (type.ContainsGenericParameters)
+                {
+                    Logging.Warning ($"Cannot create an instance of {type} because it contains generic parameters.");
+                    //throw new ArgumentException ($"Cannot create an instance of {type} because it contains generic parameters.");
+                    return null;
+                }
                 // And change what type we are instantiating from MyClass<T> to MyClass<object>
                 type = type.MakeGenericType (typeArguments.ToArray ());
             }

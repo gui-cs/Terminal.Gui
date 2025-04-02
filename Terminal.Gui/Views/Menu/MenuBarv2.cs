@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System.ComponentModel;
-using System.Diagnostics;
 
 namespace Terminal.Gui;
 
@@ -27,29 +26,31 @@ public class MenuBarv2 : Menuv2, IDesignable
         Orientation = Orientation.Horizontal;
 
         Key = DefaultKey;
-        AddCommand (Command.HotKey,
-                   () =>
-                   {
-                       if (RaiseHandlingHotKey () is true)
-                       {
-                           return true;
-                       }
 
-                       if (HideActiveItem ())
-                       {
-                           return true;
-                       }
+        AddCommand (
+                    Command.HotKey,
+                    () =>
+                    {
+                        if (RaiseHandlingHotKey () is true)
+                        {
+                            return true;
+                        }
 
-                       if (GetSubViews<MenuBarItemv2> ().FirstOrDefault (mbi => mbi.PopoverMenu is { }) is { } first)
-                       {
-                           _active = true;
-                           ShowPopover (first);
+                        if (HideActiveItem ())
+                        {
+                            return true;
+                        }
 
-                           return true;
-                       }
+                        if (SubViews.OfType<MenuBarItemv2> ().FirstOrDefault (mbi => mbi.PopoverMenu is { }) is { } first)
+                        {
+                            _active = true;
+                            ShowPopover (first);
 
-                       return false;
-                   });
+                            return true;
+                        }
+
+                        return false;
+                    });
         HotKeyBindings.Add (Key, Command.HotKey);
 
         KeyBindings.Add (Key, Command.Quit);
@@ -72,7 +73,7 @@ public class MenuBarv2 : Menuv2, IDesignable
                             return true;
                         }
 
-                        return false;//RaiseAccepted (ctx);
+                        return false; //RaiseAccepted (ctx);
                     });
 
         AddCommand (Command.Right, MoveRight);
@@ -115,10 +116,12 @@ public class MenuBarv2 : Menuv2, IDesignable
         set
         {
             RemoveAll ();
+
             if (value is null)
             {
                 return;
             }
+
             foreach (MenuBarItemv2 mbi in value)
             {
                 Add (mbi);
@@ -137,10 +140,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     ///     Gets whether any of the menu bar items have a visible <see cref="PopoverMenu"/>.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public bool IsOpen ()
-    {
-        return SubViews.Count (sv => sv is MenuBarItemv2 { PopoverMenu: { Visible: true } }) > 0;
-    }
+    public bool IsOpen () { return SubViews.Count (sv => sv is MenuBarItemv2 { PopoverMenu: { Visible: true } }) > 0; }
 
     private bool _active;
 
@@ -149,12 +149,9 @@ public class MenuBarv2 : Menuv2, IDesignable
     ///     over a menu bar item will activate it.
     /// </summary>
     /// <returns></returns>
-    public bool IsActive ()
-    {
-        return _active;
-    }
+    public bool IsActive () { return _active; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnMouseEnter (CancelEventArgs eventArgs)
     {
         // If the MenuBar does not have focus and the mouse enters: Enable CanFocus
@@ -163,20 +160,22 @@ public class MenuBarv2 : Menuv2, IDesignable
         {
             CanFocus = true;
         }
+
         return base.OnMouseEnter (eventArgs);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnMouseLeave ()
     {
         if (!IsOpen ())
         {
             CanFocus = false;
         }
+
         base.OnMouseLeave ();
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
     {
         if (!newHasFocus)
@@ -298,19 +297,13 @@ public class MenuBarv2 : Menuv2, IDesignable
         menuBarItem.PopoverMenu?.MakeVisible (new Point (menuBarItem.FrameToScreen ().X, menuBarItem.FrameToScreen ().Bottom));
     }
 
-    private MenuBarItemv2? GetActiveItem ()
-    {
-        return SubViews.FirstOrDefault (sv => sv is MenuBarItemv2 { PopoverMenu: { Visible: true } }) as MenuBarItemv2;
-    }
+    private MenuBarItemv2? GetActiveItem () { return SubViews.FirstOrDefault (sv => sv is MenuBarItemv2 { PopoverMenu: { Visible: true } }) as MenuBarItemv2; }
 
     /// <summary>
     ///     Hides the popover menu associated with the active menu bar item and updates the focus state.
     /// </summary>
     /// <returns><see langword="true"/> if the popover was hidden</returns>
-    public bool HideActiveItem ()
-    {
-        return HideItem (GetActiveItem ());
-    }
+    public bool HideActiveItem () { return HideItem (GetActiveItem ()); }
 
     /// <summary>
     ///     Hides popover menu associated with the specified menu bar item and updates the focus state.
@@ -323,6 +316,7 @@ public class MenuBarv2 : Menuv2, IDesignable
         {
             return false;
         }
+
         _active = false;
         HasFocus = false;
         activeItem.PopoverMenu!.Visible = false;
@@ -336,11 +330,12 @@ public class MenuBarv2 : Menuv2, IDesignable
     {
         // Note: This menu is used by unit tests. If you modify it, you'll likely have to update
         // unit tests.
-        CheckBox? bordersCb = new CheckBox ()
+        var bordersCb = new CheckBox
         {
             Title = "_Borders",
             CheckedState = CheckState.Checked
         };
+
         Add (
              new MenuBarItemv2 (
                                 "_File",
@@ -355,38 +350,17 @@ public class MenuBarv2 : Menuv2, IDesignable
                                         Title = "_Preferences",
                                         SubMenu = new (
                                                        [
-                                                           new MenuItemv2
+                                                           new()
                                                            {
                                                                CommandView = bordersCb,
                                                                HelpText = "Toggle Menu Borders",
-                                                               Action = () =>
-                                                                        {
-                                                                            foreach (MenuBarItemv2 mbi in GetSubViews<MenuBarItemv2>())
-                                                                            {
-                                                                                if (mbi is MenuBarItemv2 { PopoverMenu: { } })
-                                                                                {
-                                                                                    IEnumerable<Menuv2> subMenus = mbi.PopoverMenu.GetAllSubMenus();
-
-                                                                                    foreach (Menuv2? subMenu in subMenus)
-                                                                                    {
-                                                                                        if (bordersCb.CheckedState == CheckState.Checked)
-                                                                                        {
-                                                                                            subMenu.Border!.Thickness = new (1);
-                                                                                        }
-                                                                                        else
-                                                                                        {
-                                                                                            subMenu.Border!.Thickness = new (0);
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        }
+                                                               Action = ToggleMenuBorders
                                                            },
-                                                           new MenuItemv2
+                                                           new()
                                                            {
                                                                Title = "_Settings...",
                                                                HelpText = "More settings",
-                                                               Action = () =>  MessageBox.Query ("Settings", "This is the Settings Dialog\n", ["_Ok", "_Cancel"])
+                                                               Action = () => MessageBox.Query ("Settings", "This is the Settings Dialog\n", "_Ok", "_Cancel")
                                                            }
                                                        ]
                                                       )
@@ -427,6 +401,30 @@ public class MenuBarv2 : Menuv2, IDesignable
                                 ]
                                )
             );
+
         return true;
+
+        void ToggleMenuBorders ()
+        {
+            foreach (MenuBarItemv2 mbi in SubViews.OfType<MenuBarItemv2> ())
+            {
+                if (mbi is not { PopoverMenu: { } })
+                {
+                    continue;
+                }
+
+                foreach (Menuv2? subMenu in mbi.PopoverMenu.GetAllSubMenus ())
+                {
+                    if (bordersCb.CheckedState == CheckState.Checked)
+                    {
+                        subMenu.Border!.Thickness = new (1);
+                    }
+                    else
+                    {
+                        subMenu.Border!.Thickness = new (0);
+                    }
+                }
+            }
+        }
     }
 }

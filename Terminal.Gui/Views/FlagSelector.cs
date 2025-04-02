@@ -1,12 +1,11 @@
 ﻿#nullable enable
 namespace Terminal.Gui;
 
-
 /// <summary>
 ///     Provides a user interface for displaying and selecting flags.
 ///     Flags can be set from a dictionary or directly from an enum type.
 /// </summary>
-public class FlagSelector : View, IDesignable, IOrientation
+public class FlagSelector : View, IOrientation, IDesignable
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="FlagSelector"/> class.
@@ -30,12 +29,12 @@ public class FlagSelector : View, IDesignable, IOrientation
 
     private bool? HandleAcceptCommand (ICommandContext? ctx) { return RaiseAccepting (ctx); }
 
-    private uint _value;
+    private uint? _value;
 
     /// <summary>
     /// Gets or sets the value of the selected flags.
     /// </summary>
-    public uint Value
+    public uint? Value
     {
         get => _value;
         set
@@ -47,19 +46,19 @@ public class FlagSelector : View, IDesignable, IOrientation
 
             _value = value;
 
-            if (_value == 0)
+            if (_value is null)
             {
+                UncheckNone ();
                 UncheckAll ();
             }
             else
             {
-                UncheckNone ();
                 UpdateChecked ();
             }
 
             if (ValueEdit is { })
             {
-                ValueEdit.Text = value.ToString ();
+                ValueEdit.Text = _value.ToString ();
             }
 
             RaiseValueChanged ();
@@ -69,7 +68,10 @@ public class FlagSelector : View, IDesignable, IOrientation
     private void RaiseValueChanged ()
     {
         OnValueChanged ();
-        ValueChanged?.Invoke (this, new (Value));
+        if (Value.HasValue)
+        {
+            ValueChanged?.Invoke (this, new EventArgs<uint> (Value.Value));
+        }
     }
 
     /// <summary>
@@ -107,11 +109,12 @@ public class FlagSelector : View, IDesignable, IOrientation
     ///     Set the flags and flag names.
     /// </summary>
     /// <param name="flags"></param>
-    public void SetFlags (IReadOnlyDictionary<uint, string> flags)
+    public virtual void SetFlags (IReadOnlyDictionary<uint, string> flags)
     {
         Flags = flags;
         CreateSubViews ();
     }
+
 
     /// <summary>
     ///     Set the flags and flag names from an enum type.
@@ -168,7 +171,7 @@ public class FlagSelector : View, IDesignable, IOrientation
     }
 
     /// <summary>
-    ///     Gets the flags.
+    ///     Gets the flag values and names.
     /// </summary>
     public IReadOnlyDictionary<uint, string>? Flags { get; internal set; }
 
@@ -181,23 +184,19 @@ public class FlagSelector : View, IDesignable, IOrientation
             return;
         }
 
-        View [] subviews = SubViews.ToArray ();
-
-        RemoveAll ();
-
-        foreach (View v in subviews)
+        foreach (CheckBox cb in RemoveAll<CheckBox> ())
         {
-            v.Dispose ();
+            cb.Dispose ();
         }
 
-        if (Styles.HasFlag (FlagSelectorStyles.ShowNone) && !Flags.ContainsKey (0))
+        if (Styles.HasFlag (FlagSelectorStyles.ShowNone) && !Flags.ContainsKey (default!))
         {
-            Add (CreateCheckBox ("None", 0));
+            Add (CreateCheckBox ("None", default!));
         }
 
         for (var index = 0; index < Flags.Count; index++)
         {
-            if (!Styles.HasFlag (FlagSelectorStyles.ShowNone) && Flags.ElementAt (index).Key == 0)
+            if (!Styles.HasFlag (FlagSelectorStyles.ShowNone) && Flags.ElementAt (index).Key == default!)
             {
                 continue;
             }
@@ -223,48 +222,52 @@ public class FlagSelector : View, IDesignable, IOrientation
 
         return;
 
-        CheckBox CreateCheckBox (string name, uint flag)
+
+    }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="flag"></param>
+    /// <returns></returns>
+    protected virtual CheckBox CreateCheckBox (string name, uint flag)
+    {
+        var checkbox = new CheckBox
         {
-            var checkbox = new CheckBox
-            {
-                CanFocus = false,
-                Title = name,
-                Id = name,
-                Data = flag,
-                HighlightStyle = HighlightStyle
-            };
+            CanFocus = false,
+            Title = name,
+            Id = name,
+            Data = flag,
+            HighlightStyle = HighlightStyle
+        };
 
-            checkbox.Selecting += (sender, args) => { RaiseSelecting (args.Context); };
+        checkbox.Selecting += (sender, args) => { RaiseSelecting (args.Context); };
 
-            checkbox.CheckedStateChanged += (sender, args) =>
+        checkbox.CheckedStateChanged += (sender, args) =>
+                                        {
+                                            uint? newValue = Value;
+
+                                            if (checkbox.CheckedState == CheckState.Checked)
                                             {
-                                                uint newValue = Value;
-
-                                                if (checkbox.CheckedState == CheckState.Checked)
+                                                if (flag == default!)
                                                 {
-                                                    if ((uint)checkbox.Data == 0)
-                                                    {
-                                                        newValue = 0;
-                                                    }
-                                                    else
-                                                    {
-                                                        newValue |= flag;
-                                                    }
+                                                    newValue = 0;
                                                 }
                                                 else
                                                 {
-                                                    newValue &= ~flag;
+                                                    newValue = newValue | flag;
                                                 }
+                                            }
+                                            else
+                                            {
+                                                newValue = newValue & ~flag;
+                                            }
 
-                                                Value = newValue;
+                                            Value = newValue;
+                                        };
 
-                                                //UpdateChecked();
-                                            };
-
-            return checkbox;
-        }
+        return checkbox;
     }
-
     private void SetLayout ()
     {
         foreach (View sv in SubViews)
@@ -285,7 +288,7 @@ public class FlagSelector : View, IDesignable, IOrientation
 
     private void UncheckAll ()
     {
-        foreach (CheckBox cb in GetSubViews<CheckBox> ().Where (sv => sv.Title != "None"))
+        foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => (uint)(sv.Data ?? default!) != default!))
         {
             cb.CheckedState = CheckState.UnChecked;
         }
@@ -293,7 +296,7 @@ public class FlagSelector : View, IDesignable, IOrientation
 
     private void UncheckNone ()
     {
-        foreach (CheckBox cb in GetSubViews<CheckBox> ().Where (sv => sv.Title != "None"))
+        foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => sv.Title != "None"))
         {
             cb.CheckedState = CheckState.UnChecked;
         }
@@ -301,7 +304,7 @@ public class FlagSelector : View, IDesignable, IOrientation
 
     private void UpdateChecked ()
     {
-        foreach (CheckBox cb in GetSubViews<CheckBox> ())
+        foreach (CheckBox cb in SubViews.OfType<CheckBox> ())
         {
             var flag = (uint)(cb.Data ?? throw new InvalidOperationException ("ComboBox.Data must be set"));
 
@@ -317,8 +320,6 @@ public class FlagSelector : View, IDesignable, IOrientation
         }
     }
 
-    /// <inheritdoc/>
-    protected override void OnSubViewAdded (View view) { }
 
     #region IOrientation
 
@@ -342,8 +343,6 @@ public class FlagSelector : View, IDesignable, IOrientation
     public event EventHandler<EventArgs<Orientation>>? OrientationChanged;
 #pragma warning restore CS0067 // The event is never used
 
-#pragma warning restore CS0067
-
     /// <summary>Called when <see cref="Orientation"/> has changed.</summary>
     /// <param name="newOrientation"></param>
     public void OnOrientationChanged (Orientation newOrientation) { SetLayout (); }
@@ -353,12 +352,14 @@ public class FlagSelector : View, IDesignable, IOrientation
     /// <inheritdoc/>
     public bool EnableForDesign ()
     {
+        Styles = FlagSelectorStyles.All;
         SetFlags<FlagSelectorStyles> (
                                       f => f switch
                                            {
-                                               FlagSelectorStyles.ShowNone => "Show _None Value",
-                                               FlagSelectorStyles.ShowValueEdit => "Show _Value Editor",
-                                               FlagSelectorStyles.All => "Show _All Flags Selector",
+                                               FlagSelectorStyles.None => "_No Style",
+                                               FlagSelectorStyles.ShowNone => "Show _None Value Style",
+                                               FlagSelectorStyles.ShowValueEdit => "Show _Value Editor Style",
+                                               FlagSelectorStyles.All => "_All Styles",
                                                _ => f.ToString ()
                                            });
 

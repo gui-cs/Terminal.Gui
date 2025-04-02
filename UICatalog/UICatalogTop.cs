@@ -105,7 +105,7 @@ public class UICatalogTop : Toplevel
     private RadioGroup? _themesRg;
     private RadioGroup? _topSchemeRg;
     private RadioGroup? _logLevelRg;
-    private FlagSelector? _diagnosticFlagsSelector;
+    private FlagSelector<ViewDiagnosticFlags>? _diagnosticFlagsSelector;
     private CheckBox? _disableMouseCb;
 
     private MenuBarv2 CreateMenuBar ()
@@ -238,10 +238,9 @@ public class UICatalogTop : Toplevel
             {
                 CanFocus = false,
                 Styles = FlagSelectorStyles.ShowNone,
-                HighlightStyle = HighlightStyle.None
+                HighlightStyle = HighlightStyle.None,
             };
-            _diagnosticFlagsSelector.SetFlags<ViewDiagnosticFlags> ();
-
+            _diagnosticFlagsSelector.Value = Diagnostics;
             _diagnosticFlagsSelector.ValueChanged += (sender, args) =>
             {
                 _diagnosticFlags = (ViewDiagnosticFlags)_diagnosticFlagsSelector.Value;

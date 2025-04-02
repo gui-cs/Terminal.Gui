@@ -92,7 +92,7 @@ public class ConfigurationEditor : Scenario
                 return;
             }
 
-            foreach (ConfigTextView t in _tabView.GetSubViews<ConfigTextView> ())
+            foreach (ConfigTextView t in _tabView.SubViews.OfType<ConfigTextView> ())
             {
                 t.ColorScheme = EditorColorScheme;
             }
