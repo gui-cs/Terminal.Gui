@@ -18,7 +18,7 @@ namespace UICatalog;
 ///     This is the main UI Catalog app view. It is run fresh when the app loads (if a Scenario has not been passed on
 ///     the command line) and each time a Scenario ends.
 /// </summary>
-public class UICatalogTopLevel : Toplevel
+public class UICatalogTop : Toplevel
 {
     // When a scenario is run, the main app is killed. The static
     // members are cached so that when the scenario exits the
@@ -32,7 +32,7 @@ public class UICatalogTopLevel : Toplevel
     // Diagnostics
     private static ViewDiagnosticFlags _diagnosticFlags;
 
-    public UICatalogTopLevel ()
+    public UICatalogTop ()
     {
         _diagnosticFlags = Diagnostics;
 
@@ -563,6 +563,7 @@ public class UICatalogTopLevel : Toplevel
     [JsonPropertyName ("UICatalog.StatusBar")]
     public static bool ShowStatusBar { get; set; } = true;
 
+    private Shortcut? _shQuit;
     private Shortcut? _shVersion;
     private CheckBox? _force16ColorsShortcutCb;
 
@@ -581,6 +582,13 @@ public class UICatalogTopLevel : Toplevel
                                      minimumContentDim: Dim.Func (() => statusBar.Visible ? 1 : 0),
                                      maximumContentDim: Dim.Func (() => statusBar.Visible ? 1 : 0));
         // ReSharper restore All
+
+        _shQuit = new ()
+        {
+            CanFocus = false,
+            Title = "Quit",
+            Key = Application.QuitKey
+        };
 
         _shVersion = new ()
         {
@@ -616,12 +624,7 @@ public class UICatalogTopLevel : Toplevel
         };
 
         statusBar.Add (
-                       new Shortcut
-                       {
-                           CanFocus = false,
-                           Title = "Quit",
-                           Key = Application.QuitKey
-                       },
+                       _shQuit,
                        statusBarShortcut,
                        new Shortcut
                        {
@@ -648,13 +651,20 @@ public class UICatalogTopLevel : Toplevel
 
         ColorScheme = Colors.ColorSchemes [CachedTopLevelColorScheme!];
 
-        ((Shortcut)_statusBar!.SubViews.ElementAt (0)).Key = Application.QuitKey;
-        _statusBar.Visible = ShowStatusBar;
+        if (_shQuit is { })
+        {
+            _shQuit.Key = Application.QuitKey;
+        }
+
+        if (_statusBar is { })
+        {
+            _statusBar.Visible = ShowStatusBar;
+        }
 
         _disableMouseCb!.CheckedState = Application.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
         _force16ColorsShortcutCb!.CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
 
-        Application.Top!.SetNeedsDraw ();
+        Application.Top?.SetNeedsDraw ();
     }
 
     private void ConfigAppliedHandler (object? sender, ConfigurationManagerEventArgs? a) { ConfigChanged (); }

@@ -327,7 +327,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     }
 
     /// <inheritdoc/>
-    public bool EnableForDesign<TContext> (ref readonly TContext context) where TContext : notnull
+    public override bool EnableForDesign ()
     {
         Add (
              new MenuBarItemv2 (
