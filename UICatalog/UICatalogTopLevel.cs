@@ -338,7 +338,9 @@ public class UICatalogTopLevel : Toplevel
 
         _topSchemeRg.AssignHotKeysToRadioLabels = true;
         _topSchemeRg.UsedHotKeys.Clear ();
+        int selected = _topSchemeRg.SelectedItem;
         _topSchemeRg.RadioLabels = Colors.ColorSchemes.Keys.ToArray ();
+        _topSchemeRg.SelectedItem = selected;
 
         if (CachedTopLevelColorScheme is null || !Colors.ColorSchemes.ContainsKey (CachedTopLevelColorScheme))
         {

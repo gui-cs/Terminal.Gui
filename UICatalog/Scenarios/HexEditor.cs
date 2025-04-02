@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Text;
+﻿using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -14,7 +13,7 @@ public class HexEditor : Scenario
 {
     private string _fileName = "demo.bin";
     private HexView _hexView;
-    private MenuItem _miAllowEdits;
+    private MenuItemv2 _miAllowEdits;
     private bool _saved = true;
     private Shortcut _scAddress;
     private Shortcut _scInfo;
@@ -48,13 +47,13 @@ public class HexEditor : Scenario
 
         app.Add (_hexView);
 
-        var menu = new MenuBar
+        var menu = new MenuBarv2
         {
             Menus =
             [
                 new (
                      "_File",
-                     new MenuItem []
+                     new MenuItemv2 []
                      {
                          new ("_New", "", () => New ()),
                          new ("_Open", "", () => Open ()),
@@ -65,7 +64,7 @@ public class HexEditor : Scenario
                     ),
                 new (
                      "_Edit",
-                     new MenuItem []
+                     new MenuItemv2 []
                      {
                          new ("_Copy", "", () => Copy ()),
                          new ("C_ut", "", () => Cut ()),
@@ -74,7 +73,7 @@ public class HexEditor : Scenario
                     ),
                 new (
                      "_Options",
-                     new []
+                     new MenuItemv2 []
                      {
                          _miAllowEdits = new (
                                               "_AllowEdits",
@@ -82,14 +81,19 @@ public class HexEditor : Scenario
                                               () => ToggleAllowEdits ()
                                              )
                          {
-                             Checked = _hexView.AllowEdits,
-                             CheckType = MenuItemCheckStyle
-                                 .Checked
+
                          }
                      }
                     )
             ]
         };
+
+        CheckBox cb = new CheckBox ()
+        {
+            Title = _miAllowEdits.Title,
+            CheckedState = _hexView.AllowEdits ? CheckState.Checked : CheckState.None,
+        };
+        _miAllowEdits.CommandView = cb;
         app.Add (menu);
 
         var addressWidthUpDown = new NumericUpDown
@@ -285,5 +289,14 @@ public class HexEditor : Scenario
         }
     }
 
-    private void ToggleAllowEdits () { _hexView.AllowEdits = (bool)(_miAllowEdits.Checked = !_miAllowEdits.Checked); }
+    private void ToggleAllowEdits ()
+    {
+        CheckBox? cb = _miAllowEdits.CommandView as CheckBox;
+        if (cb is null)
+        {
+            return;
+        }
+
+        _hexView.AllowEdits = cb.CheckedState == CheckState.Checked;
+    }
 }
