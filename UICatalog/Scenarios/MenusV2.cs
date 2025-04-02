@@ -439,7 +439,7 @@ public class MenusV2 : Scenario
 
             _menuBgColorCp.ColorChanged += (sender, args) =>
                                            {
-                                               menu.ColorScheme = menu.ColorScheme with
+                                               menu.ColorScheme = menu.ColorScheme! with
                                                {
                                                    Normal = new (menu.ColorScheme.Normal.Foreground, args.CurrentValue)
                                                };

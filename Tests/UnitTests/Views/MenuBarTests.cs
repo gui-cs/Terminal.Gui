@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class MenuBarTests (ITestOutputHelper output)
+public class MenuBarTests ()
 {
     [Fact]
     [AutoInitShutdown]

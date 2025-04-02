@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-	    <StartupObject>UICatalog.UICatalogApp</StartupObject>
+	    <StartupObject>UICatalog.UICatalog</StartupObject>
         <OutputType>Exe</OutputType>
         <!-- Version numbers are automatically updated by gitversion when a release is released -->
         <!-- In the source tree the version will always be 2.0 for all projects. -->

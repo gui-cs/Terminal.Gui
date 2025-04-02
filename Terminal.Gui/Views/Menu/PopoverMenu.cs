@@ -1,11 +1,8 @@
 ﻿#nullable enable
-using System.ComponentModel;
-using System.Diagnostics;
-
 namespace Terminal.Gui;
 
 /// <summary>
-///     Provides a cascading menu that menu that pops s over all other content. Can be used as a context menu or a drop-down
+///     Provides a cascading menu that  pops s over all other content. Can be used as a context menu or a drop-down
 ///     all other content. Can be used as a context menu or a drop-down
 ///     menu as part of <see cref="MenuBar"/> as part of <see cref="MenuBar"/>.
 /// </summary>
@@ -77,7 +74,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
                         Visible = false;
 
-                        return false;//RaiseAccepted (ctx);
+                        return false; //RaiseAccepted (ctx);
                     });
 
         return;
@@ -108,7 +105,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
                 return true;
             }
 
-            return false;//AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+            return false; //AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         }
     }
 
@@ -236,6 +233,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
             // TODO: This needs to be done whenever any MenuItem in the menu tree changes to support dynamic menus
             IEnumerable<Menuv2> allMenus = GetAllSubMenus ();
+
             foreach (Menuv2 menu in allMenus)
             {
                 menu.Accepting += MenuOnAccepting;
@@ -252,6 +250,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         foreach (MenuItemv2 menuItem in all.Where (mi => mi.Command != Command.NotBound))
         {
             Key? key;
+
             if (menuItem.TargetView is { })
             {
                 // A TargetView implies HotKey
@@ -457,19 +456,16 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     private void MenuOnAccepting (object? sender, CommandEventArgs e)
     {
-        View? senderView = sender as View;
+        var senderView = sender as View;
         Logging.Trace ($"Sender: {senderView?.GetType ().Name}, {e.Context?.Source?.Title}");
 
         if (e.Context?.Command != Command.HotKey)
         {
             Visible = false;
         }
-        else
-        {
-            // This supports the case when a hotkey of a menuitem with a submenu is pressed
-            //e.Cancel = true;
-        }
 
+        // This supports the case when a hotkey of a menuitem with a submenu is pressed
+        //e.Cancel = true;
     }
 
     private void MenuAccepted (object? sender, CommandEventArgs e)
@@ -530,13 +526,14 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         ShowSubMenu (e);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnSubViewAdded (View view)
     {
         if (Root is null && (view is Menuv2 || view is MenuItemv2))
         {
             throw new InvalidOperationException ("Do not add MenuItems or Menus directly to a PopoverMenu. Use the Root property.");
         }
+
         base.OnSubViewAdded (view);
     }
 
@@ -561,20 +558,20 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         base.Dispose (disposing);
     }
 
-
     /// <inheritdoc/>
     public bool EnableForDesign<TContext> (ref readonly TContext context) where TContext : notnull
     {
-        Root = new Menuv2 (
-                           [
-                               new MenuItemv2 (this, Command.Cut),
-                               new MenuItemv2 (this, Command.Copy),
-                               new MenuItemv2 (this, Command.Paste),
-                               new Line (),
-                               new MenuItemv2 (this, Command.SelectAll)
-                           ]);
+        Root = new (
+                    [
+                        new MenuItemv2 (this, Command.Cut),
+                        new MenuItemv2 (this, Command.Copy),
+                        new MenuItemv2 (this, Command.Paste),
+                        new Line (),
+                        new MenuItemv2 (this, Command.SelectAll)
+                    ]);
 
         Visible = true;
+
         return true;
     }
 }
