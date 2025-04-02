@@ -34,8 +34,6 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
         base.Visible = false;
 
-        //base.ColorScheme = Colors.ColorSchemes ["Menu"];
-
         Root = root;
 
         AddCommand (Command.Right, MoveRight);
@@ -68,7 +66,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
                         Visible = false;
 
-                        return false; //RaiseAccepted (ctx);
+                        return false;
                     });
 
         return;
