@@ -2,16 +2,10 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     Provides a cascading menu that  pops s over all other content. Can be used as a context menu or a drop-down
+///     Provides a cascading menu that pops over all other content. Can be used as a context menu or a drop-down
 ///     all other content. Can be used as a context menu or a drop-down
 ///     menu as part of <see cref="MenuBar"/> as part of <see cref="MenuBar"/>.
 /// </summary>
-/// <remarks>
-///     <para>
-///         To use as a context menu, register the popover menu with <see cref="Application.Popover"/> and call
-///         <see cref="MakeVisible"/>.
-///     </para>
-/// </remarks>
 /// <remarks>
 ///     <para>
 ///         To use as a context menu, register the popover menu with <see cref="Application.Popover"/> and call
