@@ -30,12 +30,17 @@ public class MenuBarv2 : Menuv2, IDesignable
         AddCommand (Command.HotKey,
                    () =>
                    {
+                       if (RaiseHandlingHotKey () is true)
+                       {
+                           return true;
+                       }
+
                        if (HideActiveItem ())
                        {
                            return true;
                        }
 
-                       if (SubViews.FirstOrDefault (sv => sv is MenuBarItemv2 { PopoverMenu: { } }) is MenuBarItemv2 { } first)
+                       if (GetSubViews<MenuBarItemv2> ().FirstOrDefault (mbi => mbi.PopoverMenu is { }) is { } first)
                        {
                            _active = true;
                            ShowPopover (first);
