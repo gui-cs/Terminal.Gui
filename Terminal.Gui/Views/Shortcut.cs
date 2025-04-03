@@ -119,18 +119,6 @@ public class Shortcut : View, IOrientation, IDesignable
     // Once Frame.Width gets below this value, LayoutStarted makes HelpView an KeyView smaller.
     private int? _minimumNaturalWidth;
 
-    /// <inheritdoc/>
-    protected override bool OnHighlight (CancelEventArgs<HighlightStyle> args)
-    {
-        if (args.NewValue.HasFlag (HighlightStyle.Hover))
-        {
-            //SetFocus ();
-            //return true;
-        }
-
-        return base.OnHighlight(args);
-    }
-
     /// <summary>
     ///     Gets or sets the <see cref="AlignmentModes"/> for this <see cref="Shortcut"/>.
     /// </summary>
@@ -176,9 +164,6 @@ public class Shortcut : View, IOrientation, IDesignable
             Add (KeyView);
             SetKeyViewDefaultLayout ();
         }
-
-        // BUGBUG: Causes ever other layout to lose focus colors
-        //SetColors ();
     }
 
     // Force Width to DimAuto to calculate natural width and then set it back
@@ -493,21 +478,12 @@ public class Shortcut : View, IOrientation, IDesignable
         CommandView.TextAlignment = Alignment.Start;
         CommandView.TextFormatter.WordWrap = false;
         //CommandView.HighlightStyle = HighlightStyle.None;
-        CommandView.GettingNormalColor += CommanandView_GettingNormalColor;
+        CommandView.GettingNormalColor += CommandViewOnGettingNormalColor;
         CommandView.GettingHotNormalColor += CommandViewOnGettingHotNormalColor;
 
     }
 
-    private void CommandViewOnGettingHotNormalColor (object? sender, CancelEventArgs<Attribute> e)
-    {
-        if (HasFocus)
-        {
-            e.Cancel = true;
-            e.NewValue = GetHotFocusColor ();
-        }
-    }
-
-    private void CommanandView_GettingNormalColor (object? sender, CancelEventArgs<Attribute>? e)
+    private void CommandViewOnGettingNormalColor (object? sender, CancelEventArgs<Attribute> e)
     {
         if (HasFocus)
         {
@@ -515,6 +491,17 @@ public class Shortcut : View, IOrientation, IDesignable
             e.NewValue = GetFocusColor ();
         }
     }
+
+    private void CommandViewOnGettingHotNormalColor (object? sender, CancelEventArgs<Attribute> e)
+    {
+        if (HasFocus && e is { })
+        {
+            e.Cancel = true;
+            e.NewValue = GetHotFocusColor ();
+        }
+    }
+
+
     private void Shortcut_TitleChanged (object? sender, EventArgs<string> e)
     {
         // If the Title changes, update the CommandView text.
@@ -554,16 +541,8 @@ public class Shortcut : View, IOrientation, IDesignable
         HelpView.TextFormatter.WordWrap = false;
         HelpView.HighlightStyle = HighlightStyle.None;
 
-        HelpView.GettingNormalColor += HelpView_GettingNormalColor;
-    }
-
-    private void HelpView_GettingNormalColor (object? sender, CancelEventArgs<Attribute>? e)
-    {
-        if (HasFocus)
-        {
-            e.Cancel = true;
-            e.NewValue = GetFocusColor ();
-        }
+        HelpView.GettingNormalColor += CommandViewOnGettingNormalColor;
+        HelpView.GettingHotNormalColor += CommandViewOnGettingHotNormalColor;
     }
 
     /// <summary>
@@ -653,7 +632,7 @@ public class Shortcut : View, IOrientation, IDesignable
     ///     Gets the subview that displays the key. Is drawn with Normal and HotNormal colors reversed.
     /// </summary>
 
-    public KeyView KeyView { get; } = new ();
+    public ShortcutKeyView KeyView { get; } = new ();
 
     private int _minimumKeyTextSize;
 
@@ -729,17 +708,6 @@ public class Shortcut : View, IOrientation, IDesignable
 
     #region Focus
 
-    ///// <inheritdoc/>
-    //public override ColorScheme? ColorScheme
-    //{
-    //    get => base.ColorScheme;
-    //    set
-    //    {
-    //        base.ColorScheme = _nonFocusColorScheme = value;
-    //        SetColors ();
-    //    }
-    //}
-
     private bool _forceFocusColors;
 
     /// <summary>
@@ -751,64 +719,11 @@ public class Shortcut : View, IOrientation, IDesignable
         set
         {
             _forceFocusColors = value;
-            SetColors (value);
-            //SetNeedsDraw();
+            SetNeedsDraw();
         }
     }
-
-    private ColorScheme? _nonFocusColorScheme;
-
-    /// <summary>
-    /// </summary>
-    internal void SetColors (bool highlight = false)
-    {
-        return;
-        if (HasFocus || highlight || ForceFocusColors)
-        {
-            if (_nonFocusColorScheme is null)
-            {
-                _nonFocusColorScheme = base.ColorScheme;
-            }
-
-            base.ColorScheme ??= new (Attribute.Default);
-
-            // When we have focus, we invert the colors
-            base.ColorScheme = new (base.ColorScheme)
-            {
-                Normal = GetFocusColor (),
-                HotNormal = GetHotFocusColor (),
-                HotFocus = GetHotNormalColor (),
-                Focus = GetNormalColor (),
-            };
-        }
-        else
-        {
-            if (_nonFocusColorScheme is { })
-            {
-                base.ColorScheme = _nonFocusColorScheme;
-                //_nonFocusColorScheme = null;
-            }
-            else
-            {
-                base.ColorScheme = SuperView?.ColorScheme ?? base.ColorScheme;
-            }
-        }
-
-        if (CommandView.Margin is { })
-        {
-            CommandView.Margin.ColorScheme = base.ColorScheme;
-        }
-        if (HelpView.Margin is { })
-        {
-            HelpView.Margin.ColorScheme = base.ColorScheme;
-        }
-
-        if (KeyView.Margin is { })
-        {
-            KeyView.Margin.ColorScheme = base.ColorScheme;
-        }
-    }
-
+    
+    /// <inheritdoc />
     public override Attribute GetNormalColor ()
     {
         if (HasFocus)
@@ -819,6 +734,7 @@ public class Shortcut : View, IOrientation, IDesignable
         return base.GetNormalColor ();
     }
 
+    /// <inheritdoc />
     public override Attribute GetHotNormalColor ()
     {
         if (HasFocus)
@@ -828,12 +744,6 @@ public class Shortcut : View, IOrientation, IDesignable
         }
 
         return base.GetHotNormalColor ();
-    }
-
-    /// <inheritdoc/>
-    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view)
-    {
-        SetColors ();
     }
 
     #endregion Focus
@@ -875,27 +785,20 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 }
 
-public class KeyView : View
+/// <summary>
+///     A helper class used by <see cref="Shortcut"/> to display the key. Reverses the Normal and HotNormal colors.
+/// </summary>
+public class ShortcutKeyView : View
 {
-
-    //      Normal = GetHotNormalColor (),
-    //        HotNormal = GetNormalColor ()
     /// <inheritdoc />
     public override Attribute GetNormalColor ()
     {
         if (SuperView is { HasFocus: true})
 
         {
-            return base.GetFocusColor ();
+            return base.GetHotFocusColor ();
         }
 
         return base.GetHotNormalColor ();
     }
-
-    /// <inheritdoc />
-    /// <inheritdoc />
-    public override Attribute GetHotNormalColor () { return base.GetNormalColor (); }
-
-    /// <inheritdoc />
-    public override Attribute GetFocusColor () { return base.GetFocusColor (); }
 }

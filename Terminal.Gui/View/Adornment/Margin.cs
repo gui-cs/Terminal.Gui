@@ -104,25 +104,86 @@ public class Margin : Adornment
         ShadowStyle = base.ShadowStyle;
     }
 
-    /// <summary>
-    ///     The color scheme for the Margin. If set to <see langword="null"/> (the default), the margin will be transparent.
-    /// </summary>
-    public override ColorScheme? ColorScheme
-    {
-        get
-        {
-            if (base.ColorScheme is { })
-            {
-                return base.ColorScheme;
-            }
+    // TODO: We may actualy need this. Not clear what broke, if anything by commenting it out. See https://github.com/gui-cs/Terminal.Gui/issues/4016
+    /////// <summary>
+    ///////     The color scheme for the Margin. If set to <see langword="null"/> (the default), the margin will be transparent.
+    /////// </summary>
+    //public override ColorScheme? ColorScheme
+    //{
+    //    get
+    //    {
+    //        //if (base.ColorScheme is { })
+    //        {
+    //            return base.ColorScheme;
+    //        }
 
-            return (Parent?.SuperView?.ColorScheme ?? Colors.ColorSchemes ["TopLevel"])!;
-        }
-        set
+    //        //return (Parent?.SuperView?.ColorScheme ?? Colors.ColorSchemes ["TopLevel"])!;
+    //    }
+    //    set
+    //    {
+    //        base.ColorScheme = value;
+    //        Parent?.SetNeedsDraw ();
+    //    }
+    //}
+
+    /// <inheritdoc />
+    public override Attribute GetNormalColor ()
+    {
+        if (_colorScheme is { })
         {
-            base.ColorScheme = value;
-            Parent?.SetNeedsDraw ();
+            return _colorScheme.Normal;
         }
+        if (Parent is { })
+        {
+            return Parent.GetNormalColor ();
+        }
+
+        return base.GetNormalColor ();
+    }
+
+    /// <inheritdoc />
+    public override Attribute GetHotNormalColor ()
+    {
+        if (Parent is { })
+        {
+            return Parent.GetHotNormalColor ();
+        }
+        return base.GetHotNormalColor ();
+    }
+
+    /// <inheritdoc />
+    public override Attribute GetFocusColor ()
+    {
+        if (Parent is { })
+        {
+            return Parent.GetFocusColor ();
+        }
+        return base.GetFocusColor ();
+    }
+
+    /// <inheritdoc />
+    public override Attribute GetHotFocusColor ()
+    {
+        if (Parent is { })
+        {
+            return Parent.GetHotFocusColor ();
+        }
+
+        return base.GetHotFocusColor ();
+    }
+
+    /// <inheritdoc />
+    protected override bool OnSettingNormalAttribute ()
+    {
+        if (Parent is { })
+        {
+            SetAttribute (Parent.GetNormalColor ());
+
+            return true;
+        }
+
+        return false;
+
     }
 
     /// <inheritdoc/>
@@ -138,6 +199,8 @@ public class Margin : Adornment
         // This just draws/clears the thickness, not the insides.
         if (Diagnostics.HasFlag (ViewDiagnosticFlags.Thickness) || base.ColorScheme is { })
         {
+            // TODO: This is a hack. See https://github.com/gui-cs/Terminal.Gui/issues/4016
+            SetAttribute (GetNormalColor ());
             Thickness.Draw (screen, Diagnostics, ToString ());
         }
 

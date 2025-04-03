@@ -239,7 +239,7 @@ public class UICatalogTop : Toplevel
 
             _diagnosticFlagsSelector = new ()
             {
-                CanFocus = false,
+                CanFocus = true,
                 Styles = FlagSelectorStyles.ShowNone,
                 HighlightStyle = HighlightStyle.None,
             };
@@ -289,7 +289,8 @@ public class UICatalogTop : Toplevel
             {
                 AssignHotKeysToCheckBoxes = true,
                 Options = Enum.GetNames<LogLevel> (),
-                SelectedItem = logLevels.ToList ().IndexOf (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel))
+                SelectedItem = logLevels.ToList ().IndexOf (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel)),
+                HighlightStyle = HighlightStyle.Hover
             };
 
             _logLevelRg.SelectedItemChanged += (_, args) =>
