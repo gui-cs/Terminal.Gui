@@ -74,13 +74,6 @@ public class Bar : View, IOrientation, IDesignable
         }
     }
 
-    /// <inheritdoc />
-    public override void EndInit ()
-    {
-        base.EndInit ();
-        ColorScheme = Colors.ColorSchemes ["Menu"];
-    }
-
     /// <inheritdoc/>
     public override void SetBorderStyle (LineStyle lineStyle)
     {
@@ -216,7 +209,7 @@ public class Bar : View, IOrientation, IDesignable
                 {
                     View barItem = SubViews.ElementAt (index);
 
-                    barItem.ColorScheme = ColorScheme;
+                    //barItem.ColorScheme = ColorScheme;
                     barItem.X = Pos.Align (Alignment.Start, AlignmentModes);
                     barItem.Y = 0; //Pos.Center ();
 
@@ -250,7 +243,7 @@ public class Bar : View, IOrientation, IDesignable
                         View barItem = SubViews.ElementAt (index);
 
 
-                        barItem.ColorScheme = ColorScheme;
+                       // barItem.ColorScheme = ColorScheme;
 
                         if (!barItem.Visible)
                         {

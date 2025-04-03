@@ -18,7 +18,7 @@ public class Menuv2 : Bar
         Orientation = Orientation.Vertical;
         Width = Dim.Auto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
-
+        base.ColorScheme = Colors.ColorSchemes ["Menu"];
         Border!.Thickness = new Thickness (1, 1, 1, 1);
         Border.LineStyle = LineStyle.Single;
     }
@@ -34,16 +34,6 @@ public class Menuv2 : Bar
         if (Visible)
         {
             SelectedMenuItem = SubViews.Where (mi => mi is MenuItemv2).ElementAtOrDefault (0) as MenuItemv2;
-        }
-    }
-
-    /// <inheritdoc />
-    public override void EndInit ()
-    {
-        base.EndInit ();
-
-        if (Border is { })
-        {
         }
     }
 

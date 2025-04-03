@@ -256,7 +256,7 @@ public class FlagSelector : View, IOrientation, IDesignable
                 CanFocus = false,
                 Text = Value.ToString (),
                 Width = 5,
-                ReadOnly = true
+                ReadOnly = true,
             };
 
             Add (ValueEdit);
@@ -302,14 +302,27 @@ public class FlagSelector : View, IOrientation, IDesignable
 
         var checkbox = new CheckBox
         {
-            CanFocus = false,
+            CanFocus = true,
             Title = nameWithHotKey,
             Id = name,
             Data = flag,
-            HighlightStyle = HighlightStyle
+            HighlightStyle = HighlightStyle.Hover
         };
 
-        checkbox.Selecting += (sender, args) => { RaiseSelecting (args.Context); };
+        checkbox.Selecting += (sender, args) =>
+                              {
+                                  if (RaiseSelecting (args.Context) is true)
+                                  {
+                                      args.Cancel = true;
+
+                                      return;
+                                  };
+
+                                  if (RaiseAccepting (args.Context) is true)
+                                  {
+                                      args.Cancel = true;
+                                  }
+                              };
 
         checkbox.CheckedStateChanged += (sender, args) =>
                                         {

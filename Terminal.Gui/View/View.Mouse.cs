@@ -99,10 +99,10 @@ public partial class View // Mouse APIs
 
             ColorScheme? cs = ColorScheme;
 
-            if (cs is null)
-            {
-                cs = new ();
-            }
+            //if (cs is null)
+            //{
+            //    cs = new ();
+            //}
 
             _savedNonHoverColorScheme = cs;
 
@@ -199,7 +199,7 @@ public partial class View // Mouse APIs
             var hover = HighlightStyle.None;
             RaiseHighlight (new (ref copy, ref hover));
 
-            if (_savedNonHoverColorScheme is { })
+           // if (_savedNonHoverColorScheme is { })
             {
                 ColorScheme = _savedNonHoverColorScheme;
                 _savedNonHoverColorScheme = null;
@@ -746,7 +746,7 @@ public partial class View // Mouse APIs
         if (args.NewValue == HighlightStyle.None)
         {
             // Unhighlight
-            if (_savedHighlightColorScheme is { })
+            //if (_savedHighlightColorScheme is { })
             {
                 ColorScheme = _savedHighlightColorScheme;
                 _savedHighlightColorScheme = null;

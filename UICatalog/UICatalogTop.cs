@@ -102,9 +102,9 @@ public class UICatalogTop : Toplevel
 
     private readonly MenuBarv2? _menuBar;
     private CheckBox? _force16ColorsMenuItemCb;
-    private RadioGroup? _themesRg;
-    private RadioGroup? _topSchemeRg;
-    private RadioGroup? _logLevelRg;
+    private OptionSelector? _themesRg;
+    private OptionSelector? _topSchemeRg;
+    private OptionSelector? _logLevelRg;
     private FlagSelector<ViewDiagnosticFlags>? _diagnosticFlagsSelector;
     private CheckBox? _disableMouseCb;
 
@@ -181,12 +181,15 @@ public class UICatalogTop : Toplevel
 
             menuItems.Add (new Line ());
 
-            _themesRg = new ();
+            _themesRg = new ()
+            {
+                HighlightStyle = HighlightStyle.Hover
+            };
 
             _themesRg.SelectedItemChanged += (_, args) =>
             {
-                Themes!.Theme = Themes!.Keys.ToArray () [args.SelectedItem];
-                CachedTheme = Themes!.Keys.ToArray () [args.SelectedItem];
+                Themes!.Theme = Themes!.Keys.ToArray () [args.SelectedItem!.Value];
+                CachedTheme = Themes!.Keys.ToArray () [args.SelectedItem!.Value];
                 Apply ();
                 SetNeedsDraw ();
             };
@@ -205,7 +208,7 @@ public class UICatalogTop : Toplevel
 
             _topSchemeRg.SelectedItemChanged += (_, args) =>
             {
-                CachedTopLevelColorScheme = Colors.ColorSchemes.Keys.ToArray () [args.SelectedItem];
+                CachedTopLevelColorScheme = Colors.ColorSchemes.Keys.ToArray () [args.SelectedItem!.Value];
                 ColorScheme = Colors.ColorSchemes [CachedTopLevelColorScheme];
                 SetNeedsDraw ();
             };
@@ -284,14 +287,14 @@ public class UICatalogTop : Toplevel
 
             _logLevelRg = new ()
             {
-                AssignHotKeysToRadioLabels = true,
-                RadioLabels = Enum.GetNames<LogLevel> (),
+                AssignHotKeysToCheckBoxes = true,
+                Options = Enum.GetNames<LogLevel> (),
                 SelectedItem = logLevels.ToList ().IndexOf (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel))
             };
 
             _logLevelRg.SelectedItemChanged += (_, args) =>
             {
-                UICatalog.Options = UICatalog.Options with { DebugLogLevel = Enum.GetName (logLevels [args.SelectedItem])! };
+                UICatalog.Options = UICatalog.Options with { DebugLogLevel = Enum.GetName (logLevels [args.SelectedItem!.Value])! };
 
                 UICatalog.LogLevelSwitch.MinimumLevel =
                     UICatalog.LogLevelToLogEventLevel (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel));
@@ -327,9 +330,9 @@ public class UICatalogTop : Toplevel
             return;
         }
 
-        _themesRg.AssignHotKeysToRadioLabels = true;
+        _themesRg.AssignHotKeysToCheckBoxes = true;
         _themesRg.UsedHotKeys.Clear ();
-        _themesRg.RadioLabels = Themes!.Keys.ToArray ();
+        _themesRg.Options = Themes!.Keys.ToArray ();
         _themesRg.SelectedItem = Themes.Keys.ToList ().IndexOf (CachedTheme!.Replace ("_", string.Empty));
 
         if (_topSchemeRg is null)
@@ -337,10 +340,10 @@ public class UICatalogTop : Toplevel
             return;
         }
 
-        _topSchemeRg.AssignHotKeysToRadioLabels = true;
+        _topSchemeRg.AssignHotKeysToCheckBoxes = true;
         _topSchemeRg.UsedHotKeys.Clear ();
-        int selected = _topSchemeRg.SelectedItem;
-        _topSchemeRg.RadioLabels = Colors.ColorSchemes.Keys.ToArray ();
+        int? selected = _topSchemeRg.SelectedItem;
+        _topSchemeRg.Options = Colors.ColorSchemes.Keys.ToArray ();
         _topSchemeRg.SelectedItem = selected;
 
         if (CachedTopLevelColorScheme is null || !Colors.ColorSchemes.ContainsKey (CachedTopLevelColorScheme))

@@ -673,7 +673,7 @@ public partial class View // Drawing APIs
                 // Get the entire map
                 if (p.Value is { })
                 {
-                    SetAttribute (p.Value.Value.Attribute ?? ColorScheme!.Normal);
+                    SetAttribute (p.Value.Value.Attribute ?? GetNormalColor ());
                     Driver.Move (p.Key.X, p.Key.Y);
 
                     // TODO: #2616 - Support combining sequences that don't normalize
