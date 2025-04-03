@@ -10,7 +10,7 @@ public partial class View
 
     #region ColorScheme
 
-    private ColorScheme? _colorScheme;
+    internal ColorScheme? _colorScheme;
 
     /// <summary>The color scheme for this view, if it is not defined, it returns the <see cref="SuperView"/>'s color scheme.</summary>
     public virtual ColorScheme? ColorScheme
@@ -43,11 +43,21 @@ public partial class View
     /// </returns>
     public virtual Attribute GetFocusColor ()
     {
+
+        Attribute currAttribute = ColorScheme?.Normal ?? Attribute.Default;
+        Attribute newAttribute = new Attribute ();
+        CancelEventArgs<Attribute> args = new CancelEventArgs<Attribute> (in currAttribute, ref newAttribute);
+        GettingFocusColor?.Invoke (this, args);
+        if (args.Cancel)
+        {
+            return args.NewValue;
+        }
         ColorScheme? cs = ColorScheme ?? new ();
 
         return Enabled ? GetColor (cs.Focus) : cs.Disabled;
     }
 
+    public event EventHandler<CancelEventArgs<Attribute>>? GettingFocusColor;
     /// <summary>Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.</summary>
     /// <returns>
     ///     <see cref="ColorScheme.Focus"/> if <see cref="Enabled"/> is <see langword="true"/> or
@@ -69,10 +79,24 @@ public partial class View
     /// </returns>
     public virtual Attribute GetHotNormalColor ()
     {
+        Attribute currAttribute = ColorScheme?.Normal ?? Attribute.Default;
+        Attribute newAttribute = new Attribute ();
+        CancelEventArgs<Attribute> args = new CancelEventArgs<Attribute> (in currAttribute, ref newAttribute);
+        GettingHotNormalColor?.Invoke (this, args);
+
+        if (args.Cancel)
+        {
+            return args.NewValue;
+        }
+
+
         ColorScheme? cs = ColorScheme ?? new ();
 
         return Enabled ? GetColor (cs.HotNormal) : cs.Disabled;
     }
+
+    public event EventHandler<CancelEventArgs<Attribute>>? GettingHotNormalColor;
+
 
     /// <summary>Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.</summary>
     /// <returns>

@@ -306,7 +306,7 @@ public class FlagSelector : View, IOrientation, IDesignable
             Title = nameWithHotKey,
             Id = name,
             Data = flag,
-           //    HighlightStyle = HighlightStyle
+            HighlightStyle = HighlightStyle.Hover
         };
 
         checkbox.GettingNormalColor += (_, e) =>
@@ -314,9 +314,56 @@ public class FlagSelector : View, IOrientation, IDesignable
                                            if (SuperView is {HasFocus: true})
                                            {
                                                e.Cancel = true;
-                                               e.NewValue = GetFocusColor ();
+
+                                               if (!HasFocus)
+                                               {
+                                                   e.NewValue = GetFocusColor ();
+                                               }
+                                               else
+                                               {
+                                                   if (checkbox._colorScheme is { })
+                                                   {
+                                                       e.NewValue = checkbox._colorScheme.Normal;
+                                                   }
+                                                   else
+                                                   {
+                                                       e.NewValue = GetNormalColor ();
+                                                   }
+                                               }
                                            }
                                        };
+
+        checkbox.GettingHotNormalColor += (_, e) =>
+                                          {
+                                              if (SuperView is { HasFocus: true })
+                                              {
+                                                  e.Cancel = true;
+                                                  if (!HasFocus)
+                                                  {
+                                                      e.NewValue = GetHotFocusColor ();
+                                                  }
+                                                  else
+                                                  {
+                                                      e.NewValue = GetHotNormalColor ();
+                                                  }
+                                              }
+                                          };
+
+        checkbox.GettingFocusColor += (_, e) =>
+                                          {
+                                              if (SuperView is { HasFocus: true })
+                                              {
+                                                  e.Cancel = true;
+                                                  if (!HasFocus)
+                                                  {
+                                                      e.NewValue = GetNormalColor ();
+                                                  }
+                                                  else
+                                                  {
+                                                      e.NewValue = GetFocusColor ();
+                                                  }
+                                              }
+                                          };
 
         checkbox.Selecting += (sender, args) => { RaiseSelecting (args.Context); };
 

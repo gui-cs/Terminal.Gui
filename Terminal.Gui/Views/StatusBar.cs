@@ -24,7 +24,7 @@ public class StatusBar : Bar, IDesignable
         Width = Dim.Fill ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
         BorderStyle = LineStyle.Dashed;
-        ColorScheme = Colors.ColorSchemes ["Menu"];
+        base.ColorScheme = Colors.ColorSchemes ["Menu"];
 
         SubViewLayout += StatusBar_LayoutStarted;
     }

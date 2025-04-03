@@ -124,11 +124,11 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         if (args.NewValue.HasFlag (HighlightStyle.Hover))
         {
-            SetFocus ();
-            return true;
+            //SetFocus ();
+            //return true;
         }
 
-        return false;
+        return base.OnHighlight(args);
     }
 
     /// <summary>
@@ -494,7 +494,17 @@ public class Shortcut : View, IOrientation, IDesignable
         CommandView.TextFormatter.WordWrap = false;
         //CommandView.HighlightStyle = HighlightStyle.None;
         CommandView.GettingNormalColor += CommanandView_GettingNormalColor;
+        CommandView.GettingHotNormalColor += CommandViewOnGettingHotNormalColor;
 
+    }
+
+    private void CommandViewOnGettingHotNormalColor (object? sender, CancelEventArgs<Attribute> e)
+    {
+        if (HasFocus)
+        {
+            e.Cancel = true;
+            e.NewValue = GetHotFocusColor ();
+        }
     }
 
     private void CommanandView_GettingNormalColor (object? sender, CancelEventArgs<Attribute>? e)
@@ -802,7 +812,6 @@ public class Shortcut : View, IOrientation, IDesignable
     public override Attribute GetNormalColor ()
     {
         if (HasFocus)
-
         {
             return base.GetFocusColor ();
         }
