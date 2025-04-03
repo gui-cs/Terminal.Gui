@@ -92,7 +92,7 @@ internal class AttributeJsonConverter : JsonConverter<Attribute>
             }
         }
 
-        throw new JsonException ();
+        throw new JsonException ("Attribute");
     }
 
     public override void Write (Utf8JsonWriter writer, Attribute value, JsonSerializerOptions options)
