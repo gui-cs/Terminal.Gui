@@ -302,12 +302,21 @@ public class FlagSelector : View, IOrientation, IDesignable
 
         var checkbox = new CheckBox
         {
-            CanFocus = false,
+            CanFocus = true,
             Title = nameWithHotKey,
             Id = name,
             Data = flag,
-            HighlightStyle = HighlightStyle
+           //    HighlightStyle = HighlightStyle
         };
+
+        checkbox.GettingNormalColor += (_, e) =>
+                                       {
+                                           if (SuperView is {HasFocus: true})
+                                           {
+                                               e.Cancel = true;
+                                               e.NewValue = GetFocusColor ();
+                                           }
+                                       };
 
         checkbox.Selecting += (sender, args) => { RaiseSelecting (args.Context); };
 

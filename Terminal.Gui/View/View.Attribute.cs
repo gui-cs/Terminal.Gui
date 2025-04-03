@@ -1,4 +1,6 @@
 ﻿#nullable enable
+using System.ComponentModel;
+
 namespace Terminal.Gui;
 
 public partial class View
@@ -80,8 +82,17 @@ public partial class View
     /// </returns>
     public virtual Attribute GetNormalColor ()
     {
-        ColorScheme? cs = ColorScheme ?? new ();
+        Attribute currAttribute = ColorScheme?.Normal ?? Attribute.Default;
+        Attribute newAttribute = new Attribute ();
+        CancelEventArgs<Attribute> args = new CancelEventArgs<Attribute> (in currAttribute, ref newAttribute);
+        GettingNormalColor?.Invoke (this, args);
 
+        if (args.Cancel)
+        {
+            return args.NewValue;
+        }
+
+        ColorScheme? cs = ColorScheme ?? new ();
         Attribute disabled = new (cs.Disabled.Foreground, cs.Disabled.Background);
 
         if (Diagnostics.HasFlag (ViewDiagnosticFlags.Hover) && _hovering)
@@ -91,6 +102,8 @@ public partial class View
 
         return Enabled ? GetColor (cs.Normal) : disabled;
     }
+
+    public event EventHandler<CancelEventArgs<Attribute>>? GettingNormalColor;
 
     private Attribute GetColor (Attribute inputAttribute)
     {
