@@ -556,72 +556,122 @@ public class Region
     /// <returns>A list of merged rectangles.</returns>
     internal static List<Rectangle> MergeRectangles (List<Rectangle> rectangles, bool minimize)
     {
-        if (rectangles.Count == 0)
+        if (rectangles.Count <= 1)
         {
-            return [];
+            return rectangles.ToList ();
         }
 
-        // Sweep-line algorithm to merge rectangles
-        List<(int x, bool isStart, int yTop, int yBottom)> events = new (rectangles.Count * 2); // Pre-allocate
-
+        // Generate events
+        List<(int x, bool isStart, int yTop, int yBottom)> events = new (rectangles.Count * 2);
         foreach (Rectangle r in rectangles)
         {
             if (!r.IsEmpty)
             {
-                events.Add ((r.Left, true, r.Top, r.Bottom)); // Start event
-                events.Add ((r.Right, false, r.Top, r.Bottom)); // End event
+                events.Add ((r.Left, true, r.Top, r.Bottom));
+                events.Add ((r.Right, false, r.Top, r.Bottom));
             }
         }
 
         if (events.Count == 0)
         {
-            return []; // Return empty list if no non-empty rectangles exist
+            return [];
         }
 
+        // Sort events:
+        // 1. Primarily by x-coordinate.
+        // 2. Secondary: End events before Start events at the same x.
+        // 3. Tertiary: By yTop coordinate as a tie-breaker.
+        // 4. Quaternary: By yBottom coordinate as a final tie-breaker.
         events.Sort (
                      (a, b) =>
                      {
+                         // 1. Sort by X
                          int cmp = a.x.CompareTo (b.x);
+                         if (cmp != 0) return cmp;
 
-                         if (cmp != 0)
-                         {
-                             return cmp;
-                         }
+                         // 2. Sort End events before Start events
+                         bool aIsEnd = !a.isStart;
+                         bool bIsEnd = !b.isStart;
+                         cmp = aIsEnd.CompareTo (bIsEnd); // True (End) comes after False (Start)
+                         if (cmp != 0) return -cmp; // Reverse: End (true) should come before Start (false)
 
-                         return a.isStart.CompareTo (b.isStart); // Start events before end events at same x
+                         // 3. Tie-breaker: Sort by yTop
+                         cmp = a.yTop.CompareTo (b.yTop);
+                         if (cmp != 0) return cmp;
+
+                         // 4. Final Tie-breaker: Sort by yBottom
+                         return a.yBottom.CompareTo (b.yBottom);
                      });
 
         List<Rectangle> merged = [];
+        // Use a dictionary to track active intervals and their overlap counts
+        Dictionary<(int yTop, int yBottom), int> activeCounts = new ();
+        // Comparer for sorting intervals when needed
+        var intervalComparer = Comparer<(int yTop, int yBottom)>.Create (
+                                                                         (a, b) =>
+                                                                         {
+                                                                             int cmp = a.yTop.CompareTo (b.yTop);
+                                                                             return cmp != 0 ? cmp : a.yBottom.CompareTo (b.yBottom);
+                                                                         });
 
-        SortedSet<(int yTop, int yBottom)> active = new (
-                                                         Comparer<(int yTop, int yBottom)>.Create (
-                                                                                                   (a, b) =>
-                                                                                                   {
-                                                                                                       int cmp = a.yTop.CompareTo (b.yTop);
-
-                                                                                                       return cmp != 0 ? cmp : a.yBottom.CompareTo (b.yBottom);
-                                                                                                   }));
-        int lastX = events [0].x;
-
-        foreach ((int x, bool isStart, int yTop, int yBottom) evt in events)
+        // Helper to get the current active intervals (where count > 0) as a SortedSet
+        SortedSet<(int yTop, int yBottom)> GetActiveIntervals ()
         {
-            // Output rectangles for the previous segment if there are active rectangles
-            if (active.Count > 0 && evt.x > lastX)
+            var set = new SortedSet<(int yTop, int yBottom)> (intervalComparer);
+            foreach (var kvp in activeCounts)
             {
-                merged.AddRange (MergeVerticalIntervals (active, lastX, evt.x));
+                if (kvp.Value > 0)
+                {
+                    set.Add (kvp.Key);
+                }
+            }
+            return set;
+        }
+
+        // Group events by x-coordinate to process all events at a given x together
+        var groupedEvents = events.GroupBy (e => e.x).OrderBy (g => g.Key);
+        int lastX = groupedEvents.First ().Key; // Initialize with the first event's x
+
+        foreach (var group in groupedEvents)
+        {
+            int currentX = group.Key;
+            // Get active intervals based on state *before* processing events at currentX
+            var currentActiveIntervals = GetActiveIntervals ();
+
+            // 1. Output rectangles for the segment ending *before* this x coordinate
+            if (currentX > lastX && currentActiveIntervals.Count > 0)
+            {
+                merged.AddRange (MergeVerticalIntervals (currentActiveIntervals, lastX, currentX));
             }
 
-            // Process the event
-            if (evt.isStart)
+            // 2. Process all events *at* this x coordinate to update counts
+            foreach (var evt in group)
             {
-                active.Add ((evt.yTop, evt.yBottom));
-            }
-            else
-            {
-                active.Remove ((evt.yTop, evt.yBottom));
+                var interval = (evt.yTop, evt.yBottom);
+                if (evt.isStart)
+                {
+                    activeCounts.TryGetValue (interval, out int count);
+                    activeCounts [interval] = count + 1;
+                }
+                else
+                {
+                    // Only decrement/remove if the interval exists
+                    if (activeCounts.TryGetValue (interval, out int count))
+                    {
+                        if (count - 1 <= 0)
+                        {
+                            activeCounts.Remove (interval);
+                        }
+                        else
+                        {
+                            activeCounts [interval] = count - 1;
+                        }
+                    }
+                }
             }
 
-            lastX = evt.x;
+            // 3. Update lastX for the next segment
+            lastX = currentX;
         }
 
         return minimize ? MinimizeRectangles (merged) : merged;
