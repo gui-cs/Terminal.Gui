@@ -19,6 +19,7 @@ public class Menuv2 : Bar
         Width = Dim.Auto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
         base.ColorScheme = Colors.ColorSchemes ["Menu"];
+
         Border!.Thickness = new Thickness (1, 1, 1, 1);
         Border.LineStyle = LineStyle.Single;
     }

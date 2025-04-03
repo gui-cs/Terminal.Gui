@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.ComponentModel;
+using static Unix.Terminal.Delegates;
 
 namespace Terminal.Gui;
 
@@ -97,19 +98,28 @@ public partial class View // Mouse APIs
                 return args.Cancel;
             }
 
-            ColorScheme? cs = ColorScheme;
-
-            //if (cs is null)
-            //{
-            //    cs = new ();
-            //}
+            ColorScheme? cs = _colorScheme;
 
             _savedNonHoverColorScheme = cs;
 
-            ColorScheme = ColorScheme?.GetHighlightColorScheme ();
+            _colorScheme = GetHighlightColorScheme ();
+            SetNeedsDraw ();
         }
 
         return false;
+    }
+
+    public ColorScheme GetHighlightColorScheme ()
+    {
+        ColorScheme? cs = _colorScheme ?? SuperView!.ColorScheme;
+
+        return cs with
+        {
+            Normal = new (GetNormalColor().Foreground.GetHighlightColor (), GetNormalColor ().Background),
+            HotNormal = new (GetHotNormalColor ().Foreground.GetHighlightColor (), GetHotNormalColor().Background),
+            Focus = new (GetFocusColor().Foreground.GetHighlightColor (), GetFocusColor().Background),
+            HotFocus = new (GetHotFocusColor().Foreground.GetHighlightColor (), GetHotFocusColor().Background)
+        };
     }
 
     /// <summary>
@@ -201,8 +211,10 @@ public partial class View // Mouse APIs
 
            // if (_savedNonHoverColorScheme is { })
             {
-                ColorScheme = _savedNonHoverColorScheme;
+                _colorScheme = _savedNonHoverColorScheme;
                 _savedNonHoverColorScheme = null;
+                SetNeedsDraw ();
+
             }
         }
     }
@@ -715,9 +727,9 @@ public partial class View // Mouse APIs
 
         if (args.NewValue.HasFlag (HighlightStyle.Pressed) || args.NewValue.HasFlag (HighlightStyle.PressedOutside))
         {
-            if (_savedHighlightColorScheme is null && ColorScheme is { })
+            if (_savedHighlightColorScheme is null && _colorScheme is { })
             {
-                _savedHighlightColorScheme ??= ColorScheme;
+                _savedHighlightColorScheme = _colorScheme;
 
                 if (CanFocus)
                 {
@@ -726,7 +738,7 @@ public partial class View // Mouse APIs
                         // Highlight the foreground focus color
                         Focus = new (ColorScheme.Focus.Foreground.GetHighlightColor (), ColorScheme.Focus.Background.GetHighlightColor ())
                     };
-                    ColorScheme = cs;
+                    _colorScheme = cs;
                 }
                 else
                 {
@@ -735,7 +747,7 @@ public partial class View // Mouse APIs
                         // Invert Focus color foreground/background. We can do this because we know the view is not going to be focused.
                         Normal = new (ColorScheme.Focus.Background, ColorScheme.Normal.Foreground)
                     };
-                    ColorScheme = cs;
+                    _colorScheme = cs;
                 }
             }
 
@@ -748,8 +760,9 @@ public partial class View // Mouse APIs
             // Unhighlight
             //if (_savedHighlightColorScheme is { })
             {
-                ColorScheme = _savedHighlightColorScheme;
+                _colorScheme = _savedHighlightColorScheme;
                 _savedHighlightColorScheme = null;
+                SetNeedsDraw ();
             }
         }
 

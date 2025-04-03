@@ -600,8 +600,8 @@ public class RadioGroupTests (ITestOutputHelper output)
     [Fact]
     public void SelectedItemChanged_Event ()
     {
-        int previousSelectedItem = -1;
-        int selectedItem = -1;
+        int? previousSelectedItem = -1;
+        int? selectedItem = -1;
         var rg = new RadioGroup { RadioLabels = ["Test", "New Test"] };
 
         rg.SelectedItemChanged += (s, e) =>

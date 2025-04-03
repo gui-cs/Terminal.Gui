@@ -8,7 +8,7 @@ public class CheckBox : View
     ///     Gets or sets the default Highlight Style.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static HighlightStyle DefaultHighlightStyle { get; set; } = HighlightStyle.PressedOutside | HighlightStyle.Pressed | HighlightStyle.Hover;
+    public static HighlightStyle DefaultHighlightStyle { get; set; } = /*HighlightStyle.PressedOutside | HighlightStyle.Pressed | */HighlightStyle.Hover;
 
     /// <summary>
     ///     Initializes a new instance of <see cref="CheckBox"/>.
@@ -41,6 +41,13 @@ public class CheckBox : View
         TitleChanged += Checkbox_TitleChanged;
 
         HighlightStyle = DefaultHighlightStyle;
+    }
+
+    /// <inheritdoc />
+    public override ColorScheme? ColorScheme
+    {
+        get => base.ColorScheme;
+        set => base.ColorScheme = value;
     }
 
     private bool? AdvanceAndSelect (ICommandContext? commandContext)

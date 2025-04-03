@@ -90,11 +90,11 @@ public class Shortcut : View, IOrientation, IDesignable
         Title = commandText ?? string.Empty;
 
         HelpView.Id = "_helpView";
-        HelpView.CanFocus = false;
+        //HelpView.CanFocus = false;
         HelpView.Text = helpText ?? string.Empty;
 
         KeyView.Id = "_keyView";
-        KeyView.CanFocus = false;
+        //KeyView.CanFocus = false;
         key ??= Key.Empty;
         Key = key;
 
@@ -124,11 +124,11 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         if (args.NewValue.HasFlag (HighlightStyle.Hover))
         {
-            SetFocus ();
-            return true;
+            //SetFocus ();
+            //return true;
         }
 
-        return false;
+        return base.OnHighlight(args);
     }
 
     /// <summary>
@@ -437,7 +437,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
             // The default behavior is for CommandView to not get focus. I
             // If you want it to get focus, you need to set it.
-            _commandView.CanFocus = false;
+           // _commandView.CanFocus = false;
 
             _commandView.HotKeyChanged += (s, e) =>
                                           {
@@ -492,9 +492,29 @@ public class Shortcut : View, IOrientation, IDesignable
         CommandView.VerticalTextAlignment = Alignment.Center;
         CommandView.TextAlignment = Alignment.Start;
         CommandView.TextFormatter.WordWrap = false;
-        CommandView.HighlightStyle = HighlightStyle.None;
+        //CommandView.HighlightStyle = HighlightStyle.None;
+        CommandView.GettingNormalColor += CommanandView_GettingNormalColor;
+        CommandView.GettingHotNormalColor += CommandViewOnGettingHotNormalColor;
+
     }
 
+    private void CommandViewOnGettingHotNormalColor (object? sender, CancelEventArgs<Attribute> e)
+    {
+        if (HasFocus)
+        {
+            e.Cancel = true;
+            e.NewValue = GetHotFocusColor ();
+        }
+    }
+
+    private void CommanandView_GettingNormalColor (object? sender, CancelEventArgs<Attribute>? e)
+    {
+        if (HasFocus)
+        {
+            e.Cancel = true;
+            e.NewValue = GetFocusColor ();
+        }
+    }
     private void Shortcut_TitleChanged (object? sender, EventArgs<string> e)
     {
         // If the Title changes, update the CommandView text.
@@ -533,6 +553,17 @@ public class Shortcut : View, IOrientation, IDesignable
         HelpView.TextAlignment = Alignment.Start;
         HelpView.TextFormatter.WordWrap = false;
         HelpView.HighlightStyle = HighlightStyle.None;
+
+        HelpView.GettingNormalColor += HelpView_GettingNormalColor;
+    }
+
+    private void HelpView_GettingNormalColor (object? sender, CancelEventArgs<Attribute>? e)
+    {
+        if (HasFocus)
+        {
+            e.Cancel = true;
+            e.NewValue = GetFocusColor ();
+        }
     }
 
     /// <summary>
@@ -619,10 +650,10 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     /// <summary>
-    ///     Gets the subview that displays the key. Internal for unit testing.
+    ///     Gets the subview that displays the key. Is drawn with Normal and HotNormal colors reversed.
     /// </summary>
 
-    public View KeyView { get; } = new ();
+    public KeyView KeyView { get; } = new ();
 
     private int _minimumKeyTextSize;
 
@@ -698,16 +729,16 @@ public class Shortcut : View, IOrientation, IDesignable
 
     #region Focus
 
-    /// <inheritdoc/>
-    public override ColorScheme? ColorScheme
-    {
-        get => base.ColorScheme;
-        set
-        {
-            base.ColorScheme = _nonFocusColorScheme = value;
-            SetColors ();
-        }
-    }
+    ///// <inheritdoc/>
+    //public override ColorScheme? ColorScheme
+    //{
+    //    get => base.ColorScheme;
+    //    set
+    //    {
+    //        base.ColorScheme = _nonFocusColorScheme = value;
+    //        SetColors ();
+    //    }
+    //}
 
     private bool _forceFocusColors;
 
@@ -731,6 +762,7 @@ public class Shortcut : View, IOrientation, IDesignable
     /// </summary>
     internal void SetColors (bool highlight = false)
     {
+        return;
         if (HasFocus || highlight || ForceFocusColors)
         {
             if (_nonFocusColorScheme is null)
@@ -762,17 +794,6 @@ public class Shortcut : View, IOrientation, IDesignable
             }
         }
 
-        // Set KeyView's colors to show "hot"
-        if (IsInitialized && base.ColorScheme is { })
-        {
-            var cs = new ColorScheme (base.ColorScheme)
-            {
-                Normal = GetHotNormalColor (),
-                HotNormal = GetNormalColor ()
-            };
-            KeyView.ColorScheme = cs;
-        }
-
         if (CommandView.Margin is { })
         {
             CommandView.Margin.ColorScheme = base.ColorScheme;
@@ -786,6 +807,27 @@ public class Shortcut : View, IOrientation, IDesignable
         {
             KeyView.Margin.ColorScheme = base.ColorScheme;
         }
+    }
+
+    public override Attribute GetNormalColor ()
+    {
+        if (HasFocus)
+        {
+            return base.GetFocusColor ();
+        }
+
+        return base.GetNormalColor ();
+    }
+
+    public override Attribute GetHotNormalColor ()
+    {
+        if (HasFocus)
+
+        {
+            return base.GetHotFocusColor ();
+        }
+
+        return base.GetHotNormalColor ();
     }
 
     /// <inheritdoc/>
@@ -831,4 +873,29 @@ public class Shortcut : View, IOrientation, IDesignable
 
         base.Dispose (disposing);
     }
+}
+
+public class KeyView : View
+{
+
+    //      Normal = GetHotNormalColor (),
+    //        HotNormal = GetNormalColor ()
+    /// <inheritdoc />
+    public override Attribute GetNormalColor ()
+    {
+        if (SuperView is { HasFocus: true})
+
+        {
+            return base.GetFocusColor ();
+        }
+
+        return base.GetHotNormalColor ();
+    }
+
+    /// <inheritdoc />
+    /// <inheritdoc />
+    public override Attribute GetHotNormalColor () { return base.GetNormalColor (); }
+
+    /// <inheritdoc />
+    public override Attribute GetFocusColor () { return base.GetFocusColor (); }
 }
