@@ -420,7 +420,7 @@ public class ShortcutTests
         Assert.False (shortcut.CommandView.CanFocus);
 
         shortcut.CommandView = new () { CanFocus = true };
-        Assert.False (shortcut.CommandView.CanFocus);
+        Assert.True (shortcut.CommandView.CanFocus);
 
         shortcut.CommandView.CanFocus = true;
         Assert.True (shortcut.CommandView.CanFocus);
