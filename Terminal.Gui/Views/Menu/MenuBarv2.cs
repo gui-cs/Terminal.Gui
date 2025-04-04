@@ -23,6 +23,7 @@ public class MenuBarv2 : Menuv2, IDesignable
         TabStop = TabBehavior.TabGroup;
         Y = 0;
         Width = Dim.Fill ();
+        Height = Dim.Auto ();
         Orientation = Orientation.Horizontal;
 
         Key = DefaultKey;
@@ -82,12 +83,34 @@ public class MenuBarv2 : Menuv2, IDesignable
         AddCommand (Command.Left, MoveLeft);
         KeyBindings.Add (Key.CursorLeft, Command.Left);
 
+        BorderStyle = DefaultBorderStyle;
+
+        Applied += OnConfigurationManagerApplied;
+
         return;
 
         bool? MoveLeft (ICommandContext? ctx) { return AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop); }
 
         bool? MoveRight (ICommandContext? ctx) { return AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop); }
     }
+
+    private void OnConfigurationManagerApplied (object? sender, ConfigurationManagerEventArgs e)
+    {
+        BorderStyle = DefaultBorderStyle;
+    }
+
+    /// <inheritdoc />
+    protected override bool OnBorderStyleChanged ()
+    {
+        HideActiveItem ();
+        return base.OnBorderStyleChanged ();
+    }
+
+    /// <summary>
+    ///     Gets or sets the default Border Style for the MenuBar. The default is <see cref="LineStyle.None"/>.
+    /// </summary>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.None;
 
     private Key _key = DefaultKey;
 
@@ -426,5 +449,13 @@ public class MenuBarv2 : Menuv2, IDesignable
                 }
             }
         }
+    }
+
+    /// <inheritdoc />
+    protected override void Dispose (bool disposing)
+    {
+        base.Dispose (disposing);
+
+        Applied -= OnConfigurationManagerApplied;
     }
 }

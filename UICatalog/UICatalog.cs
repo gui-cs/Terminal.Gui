@@ -360,9 +360,6 @@ public class UICatalog
         while (RunUICatalogTopLevel () is { } scenario)
         {
             VerifyObjectsWereDisposed ();
-            Themes!.Theme = UICatalogTop.CachedTheme!;
-            Apply ();
-            scenario.TopLevelColorScheme = UICatalogTop.CachedTopLevelColorScheme!;
 
 #if DEBUG_IDISPOSABLE
             View.DebugIDisposable = true;
@@ -412,7 +409,6 @@ public class UICatalog
         }
 
         Application.Init (driverName: _forceDriver);
-        scenario.TopLevelColorScheme = UICatalogTop.CachedTopLevelColorScheme!;
 
         if (benchmark)
         {

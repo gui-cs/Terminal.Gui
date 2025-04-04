@@ -27,6 +27,9 @@ public class UICatalogTop : Toplevel
     // Theme Management
     public static string? CachedTheme { get; set; }
 
+    // Note, we used to pass this to scenarios that run, but it just added complexity
+    // So that was removed. But we still have this here to demonstrate how changing
+    // the scheme works.
     public static string? CachedTopLevelColorScheme { get; set; }
 
     // Diagnostics
@@ -58,8 +61,6 @@ public class UICatalogTop : Toplevel
 
     private void LoadedHandler (object? sender, EventArgs? args)
     {
-        ConfigChanged ();
-
         if (_disableMouseCb is { })
         {
             _disableMouseCb.CheckedState = Application.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
@@ -648,7 +649,11 @@ public class UICatalogTop : Toplevel
     #endregion StatusBar
 
     #region Configuration Manager
-    public void ConfigChanged ()
+
+    /// <summary>
+    ///     Called when CM has applied changes.
+    /// </summary>
+    private void ConfigApplied ()
     {
         CachedTheme = Themes?.Theme;
 
@@ -672,7 +677,7 @@ public class UICatalogTop : Toplevel
         Application.Top?.SetNeedsDraw ();
     }
 
-    private void ConfigAppliedHandler (object? sender, ConfigurationManagerEventArgs? a) { ConfigChanged (); }
+    private void ConfigAppliedHandler (object? sender, ConfigurationManagerEventArgs? a) { ConfigApplied (); }
 
     #endregion Configuration Manager
 

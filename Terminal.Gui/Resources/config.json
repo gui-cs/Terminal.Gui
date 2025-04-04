@@ -53,270 +53,272 @@
         "MessageBox.DefaultBorderStyle": "Heavy",
         "Button.DefaultShadow": "Opaque",
         "Menuv2.DefaultBorderStyle": "Single",
-          "ColorSchemes": [
-            {
-              "TopLevel": {
-                "Normal": {
-                  "Foreground": "BrightGreen",
-                  "Background": "#505050" // DarkerGray
-                },
-                "Focus": {
-                  "Foreground": "White",
-                  "Background": "#696969" // DimGray
-                },
-                "HotNormal": {
-                  "Foreground": "Yellow",
-                  "Background": "#505050" // DarkerGray
-                },
-                "HotFocus": {
-                  "Foreground": "Yellow",
-                  "Background": "#696969" // DimGray
-                },
-                "Disabled": {
-                  "Foreground": "DarkGray",
-                  "Background": "#505050" // DarkerGray
-                }
-              }
-            },
-            {
-              "Base": {
-                "Normal": {
-                  "Foreground": "White",
-                  "Background": "Blue"
-                },
-                "Focus": {
-                  "Foreground": "DarkBlue",
-                  "Background": "LightGray"
-                },
-                "HotNormal": {
-                  "Foreground": "BrightCyan",
-                  "Background": "Blue"
-                },
-                "HotFocus": {
-                  "Foreground": "BrightBlue",
-                  "Background": "LightGray"
-                },
-                "Disabled": {
-                  "Foreground": "DarkGray",
-                  "Background": "Blue"
-                }
-              }
-            },
-            {
-              "Dialog": {
-                "Normal": {
-                  "Foreground": "Black",
-                  "Background": "LightGray"
-                },
-                "Focus": {
-                  "Foreground": "DarkGray",
-                  "Background": "LightGray"
-                },
-                "HotNormal": {
-                  "Foreground": "Blue",
-                  "Background": "LightGray"
-                },
-                "HotFocus": {
-                  "Foreground": "BrightBlue",
-                  "Background": "LightGray"
-                },
-                "Disabled": {
-                  "Foreground": "Gray",
-                  "Background": "DarkGray"
-                }
-              }
-            },
-            {
-              "Menu": {
-                "Normal": {
-                  "Foreground": "White",
-                  "Background": "DarkBlue"
-                },
-                "Focus": {
-                  "Foreground": "White",
-                  "Background": "Blue"
-                },
-                "HotNormal": {
-                  "Foreground": "Yellow",
-                  "Background": "DarkBlue"
-                },
-                "HotFocus": {
-                  "Foreground": "Yellow",
-                  "Background": "Blue"
-                },
-                "Disabled": {
-                  "Foreground": "Gray",
-                  "Background": "DarkGray"
-                }
-              }
-            },
-            {
-              "Error": {
-                "Normal": {
-                  "Foreground": "Red",
-                  "Background": "Pink"
-                },
-                "Focus": {
-                  "Foreground": "White",
-                  "Background": "BrightRed"
-                },
-                "HotNormal": {
-                  "Foreground": "Black",
-                  "Background": "Pink"
-                },
-                "HotFocus": {
-                  "Foreground": "Pink",
-                  "Background": "BrightRed"
-                },
-                "Disabled": {
-                  "Foreground": "DarkGray",
-                  "Background": "White"
-                }
+        "MenuBarv2.DefaultBorderStyle": "None",
+        "StatusBar.DefaultSeparatorLineStyle": "Single",
+        "ColorSchemes": [
+          {
+            "TopLevel": {
+              "Normal": {
+                "Foreground": "BrightGreen",
+                "Background": "#505050" // DarkerGray
+              },
+              "Focus": {
+                "Foreground": "White",
+                "Background": "#696969" // DimGray
+              },
+              "HotNormal": {
+                "Foreground": "Yellow",
+                "Background": "#505050" // DarkerGray
+              },
+              "HotFocus": {
+                "Foreground": "Yellow",
+                "Background": "#696969" // DimGray
+              },
+              "Disabled": {
+                "Foreground": "DarkGray",
+                "Background": "#505050" // DarkerGray
               }
             }
-          ],
-          "Glyphs.Apple": "\uD83C\uDF4E",
-          "Glyphs.AppleBMP": "❦",
-          "Glyphs.BlackCircle": "●",
-          "Glyphs.BlocksMeterSegment": "▌",
-          "Glyphs.BottomSideLineLtHv": "╽",
-          "Glyphs.BottomTee": "┴",
-          "Glyphs.BottomTeeDbl": "╩",
-          "Glyphs.BottomTeeDblH": "╧",
-          "Glyphs.BottomTeeDblV": "╨",
-          "Glyphs.BottomTeeHvDblH": "┻",
-          "Glyphs.BottomTeeHvH": "┷",
-          "Glyphs.BottomTeeHvV": "┸",
-          "Glyphs.CheckStateChecked": "☑",
-          "Glyphs.CheckStateNone": "☒",
-          "Glyphs.CheckStateUnChecked": "☐",
-          "Glyphs.Close": "✘",
-          "Glyphs.Collapse": "-",
-          "Glyphs.ContinuousMeterSegment": "█",
-          "Glyphs.Cross": "┼",
-          "Glyphs.CrossDbl": "╬",
-          "Glyphs.CrossDblH": "╪",
-          "Glyphs.CrossDblV": "╫",
-          "Glyphs.CrossHv": "╋",
-          "Glyphs.CrossHvH": "┿",
-          "Glyphs.CrossHvV": "╂",
-          "Glyphs.Diamond": "◊",
-          "Glyphs.Dot": "∙",
-          "Glyphs.DottedSquare": "⬚",
-          "Glyphs.DownArrow": "▼",
-          "Glyphs.Expand": "+",
-          "Glyphs.File": "☰",
-          "Glyphs.Folder": "꤉",
-          "Glyphs.HalfBottomLine": "╷",
-          "Glyphs.HalfBottomLineLt": "╻",
-          "Glyphs.HalfLeftLine": "╴",
-          "Glyphs.HalfLeftLineHv": "╸",
-          "Glyphs.HalfRightLine": "╶",
-          "Glyphs.HalfRightLineHv": "╺",
-          "Glyphs.HalfTopLine": "╵",
-          "Glyphs.HalfTopLineHv": "╹",
-          "Glyphs.HLine": "─",
-          "Glyphs.HLineDa2": "╌",
-          "Glyphs.HLineDa3": "┄",
-          "Glyphs.HLineDa4": "┈",
-          "Glyphs.HLineDbl": "═",
-          "Glyphs.HLineHv": "━",
-          "Glyphs.HLineHvDa2": "╍",
-          "Glyphs.HLineHvDa3": "┅",
-          "Glyphs.HLineHvDa4": "┉",
-          "Glyphs.HorizontalEllipsis": "…",
-          "Glyphs.IdenticalTo": "≡",
-          "Glyphs.LeftArrow": "◄",
-          "Glyphs.LeftBracket": "⟦",
-          "Glyphs.LeftDefaultIndicator": "►",
-          "Glyphs.LeftSideLineHvLt": "╾",
-          "Glyphs.LeftTee": "├",
-          "Glyphs.LeftTeeDbl": "╠",
-          "Glyphs.LeftTeeDblH": "╞",
-          "Glyphs.LeftTeeDblV": "╟",
-          "Glyphs.LeftTeeHvDblH": "┣",
-          "Glyphs.LeftTeeHvH": "┝",
-          "Glyphs.LeftTeeHvV": "┠",
-          "Glyphs.LLCorner": "└",
-          "Glyphs.LLCornerDbl": "╚",
-          "Glyphs.LLCornerDblSingle": "╙",
-          "Glyphs.LLCornerHv": "┗",
-          "Glyphs.LLCornerHvLt": "┖",
-          "Glyphs.LLCornerLtHv": "┕",
-          "Glyphs.LLCornerR": "╰",
-          "Glyphs.LLCornerSingleDbl": "╘",
-          "Glyphs.LRCorner": "┘",
-          "Glyphs.LRCornerDbl": "╝",
-          "Glyphs.LRCornerDblSingle": "╜",
-          "Glyphs.LRCornerHv": "┛",
-          "Glyphs.LRCornerHvLt": "┚",
-          "Glyphs.LRCornerLtHv": "┙",
-          "Glyphs.LRCornerR": "╯",
-          "Glyphs.LRCornerSingleDbl": "╛",
-          "Glyphs.Maximize": "✽",
-          "Glyphs.Minimize": "❏",
-          "Glyphs.Move": "◊",
-          "Glyphs.RightArrow": "►",
-          "Glyphs.RightBracket": "⟧",
-          "Glyphs.RightDefaultIndicator": "◄",
-          "Glyphs.RightSideLineLtHv": "╼",
-          "Glyphs.RightTee": "┤",
-          "Glyphs.RightTeeDbl": "╣",
-          "Glyphs.RightTeeDblH": "╡",
-          "Glyphs.RightTeeDblV": "╢",
-          "Glyphs.RightTeeHvDblH": "┫",
-          "Glyphs.RightTeeHvH": "┥",
-          "Glyphs.RightTeeHvV": "┨",
-          "Glyphs.Selected": "◉",
-          "Glyphs.ShadowHorizontal": "▀",
-          "Glyphs.ShadowHorizontalEnd": "▘",
-          "Glyphs.ShadowHorizontalStart": "▝",
-          "Glyphs.ShadowVertical": "▌",
-          "Glyphs.ShadowVerticalStart": "▖",
-          "Glyphs.SizeBottomLeft": "↙",
-          "Glyphs.SizeBottomRight": "↘",
-          "Glyphs.SizeHorizontal": "↔",
-          "Glyphs.SizeTopLeft": "↖",
-          "Glyphs.SizeTopRight": "↗",
-          "Glyphs.SizeVertical": "↕",
-          "Glyphs.Stipple": "░",
-          "Glyphs.TopSideLineHvLt": "╿",
-          "Glyphs.TopTee": "┬",
-          "Glyphs.TopTeeDbl": "╦",
-          "Glyphs.TopTeeDblH": "╤",
-          "Glyphs.TopTeeDblV": "╥",
-          "Glyphs.TopTeeHvDblH": "┳",
-          "Glyphs.TopTeeHvH": "┯",
-          "Glyphs.TopTeeHvV": "┰",
-          "Glyphs.ULCorner": "┌",
-          "Glyphs.ULCornerDbl": "╔",
-          "Glyphs.ULCornerDblSingle": "╓",
-          "Glyphs.ULCornerHv": "┏",
-          "Glyphs.ULCornerHvLt": "┎",
-          "Glyphs.ULCornerLtHv": "┍",
-          "Glyphs.ULCornerR": "╭",
-          "Glyphs.ULCornerSingleDbl": "╒",
-          "Glyphs.UnSelected": "○",
-          "Glyphs.UpArrow": "▲",
-          "Glyphs.URCorner": "┐",
-          "Glyphs.URCornerDbl": "╗",
-          "Glyphs.URCornerDblSingle": "╖",
-          "Glyphs.URCornerHv": "┓",
-          "Glyphs.URCornerHvLt": "┑",
-          "Glyphs.URCornerLtHv": "┒",
-          "Glyphs.URCornerR": "╮",
-          "Glyphs.URCornerSingleDbl": "╕",
-          "Glyphs.VerticalFourDots": "⁞",
-          "Glyphs.VLine": "│",
-          "Glyphs.VLineDa2": "╎",
-          "Glyphs.VLineDa3": "┆",
-          "Glyphs.VLineDa4": "┊",
-          "Glyphs.VLineDbl": "║",
-          "Glyphs.VLineHv": "┃",
-          "Glyphs.VLineHvDa2": "╏",
-          "Glyphs.VLineHvDa3": "┇",
-          "Glyphs.VLineHvDa4": "┋"
-        }
+          },
+          {
+            "Base": {
+              "Normal": {
+                "Foreground": "White",
+                "Background": "Blue"
+              },
+              "Focus": {
+                "Foreground": "DarkBlue",
+                "Background": "LightGray"
+              },
+              "HotNormal": {
+                "Foreground": "BrightCyan",
+                "Background": "Blue"
+              },
+              "HotFocus": {
+                "Foreground": "BrightBlue",
+                "Background": "LightGray"
+              },
+              "Disabled": {
+                "Foreground": "DarkGray",
+                "Background": "Blue"
+              }
+            }
+          },
+          {
+            "Dialog": {
+              "Normal": {
+                "Foreground": "Black",
+                "Background": "LightGray"
+              },
+              "Focus": {
+                "Foreground": "DarkGray",
+                "Background": "LightGray"
+              },
+              "HotNormal": {
+                "Foreground": "Blue",
+                "Background": "LightGray"
+              },
+              "HotFocus": {
+                "Foreground": "BrightBlue",
+                "Background": "LightGray"
+              },
+              "Disabled": {
+                "Foreground": "Gray",
+                "Background": "DarkGray"
+              }
+            }
+          },
+          {
+            "Menu": {
+              "Normal": {
+                "Foreground": "White",
+                "Background": "DarkBlue"
+              },
+              "Focus": {
+                "Foreground": "White",
+                "Background": "Blue"
+              },
+              "HotNormal": {
+                "Foreground": "Yellow",
+                "Background": "DarkBlue"
+              },
+              "HotFocus": {
+                "Foreground": "Yellow",
+                "Background": "Blue"
+              },
+              "Disabled": {
+                "Foreground": "Gray",
+                "Background": "DarkGray"
+              }
+            }
+          },
+          {
+            "Error": {
+              "Normal": {
+                "Foreground": "Red",
+                "Background": "Pink"
+              },
+              "Focus": {
+                "Foreground": "White",
+                "Background": "BrightRed"
+              },
+              "HotNormal": {
+                "Foreground": "Black",
+                "Background": "Pink"
+              },
+              "HotFocus": {
+                "Foreground": "Pink",
+                "Background": "BrightRed"
+              },
+              "Disabled": {
+                "Foreground": "DarkGray",
+                "Background": "White"
+              }
+            }
+          }
+        ],
+        "Glyphs.Apple": "\uD83C\uDF4E",
+        "Glyphs.AppleBMP": "❦",
+        "Glyphs.BlackCircle": "●",
+        "Glyphs.BlocksMeterSegment": "▌",
+        "Glyphs.BottomSideLineLtHv": "╽",
+        "Glyphs.BottomTee": "┴",
+        "Glyphs.BottomTeeDbl": "╩",
+        "Glyphs.BottomTeeDblH": "╧",
+        "Glyphs.BottomTeeDblV": "╨",
+        "Glyphs.BottomTeeHvDblH": "┻",
+        "Glyphs.BottomTeeHvH": "┷",
+        "Glyphs.BottomTeeHvV": "┸",
+        "Glyphs.CheckStateChecked": "☑",
+        "Glyphs.CheckStateNone": "☒",
+        "Glyphs.CheckStateUnChecked": "☐",
+        "Glyphs.Close": "✘",
+        "Glyphs.Collapse": "-",
+        "Glyphs.ContinuousMeterSegment": "█",
+        "Glyphs.Cross": "┼",
+        "Glyphs.CrossDbl": "╬",
+        "Glyphs.CrossDblH": "╪",
+        "Glyphs.CrossDblV": "╫",
+        "Glyphs.CrossHv": "╋",
+        "Glyphs.CrossHvH": "┿",
+        "Glyphs.CrossHvV": "╂",
+        "Glyphs.Diamond": "◊",
+        "Glyphs.Dot": "∙",
+        "Glyphs.DottedSquare": "⬚",
+        "Glyphs.DownArrow": "▼",
+        "Glyphs.Expand": "+",
+        "Glyphs.File": "☰",
+        "Glyphs.Folder": "꤉",
+        "Glyphs.HalfBottomLine": "╷",
+        "Glyphs.HalfBottomLineLt": "╻",
+        "Glyphs.HalfLeftLine": "╴",
+        "Glyphs.HalfLeftLineHv": "╸",
+        "Glyphs.HalfRightLine": "╶",
+        "Glyphs.HalfRightLineHv": "╺",
+        "Glyphs.HalfTopLine": "╵",
+        "Glyphs.HalfTopLineHv": "╹",
+        "Glyphs.HLine": "─",
+        "Glyphs.HLineDa2": "╌",
+        "Glyphs.HLineDa3": "┄",
+        "Glyphs.HLineDa4": "┈",
+        "Glyphs.HLineDbl": "═",
+        "Glyphs.HLineHv": "━",
+        "Glyphs.HLineHvDa2": "╍",
+        "Glyphs.HLineHvDa3": "┅",
+        "Glyphs.HLineHvDa4": "┉",
+        "Glyphs.HorizontalEllipsis": "…",
+        "Glyphs.IdenticalTo": "≡",
+        "Glyphs.LeftArrow": "◄",
+        "Glyphs.LeftBracket": "⟦",
+        "Glyphs.LeftDefaultIndicator": "►",
+        "Glyphs.LeftSideLineHvLt": "╾",
+        "Glyphs.LeftTee": "├",
+        "Glyphs.LeftTeeDbl": "╠",
+        "Glyphs.LeftTeeDblH": "╞",
+        "Glyphs.LeftTeeDblV": "╟",
+        "Glyphs.LeftTeeHvDblH": "┣",
+        "Glyphs.LeftTeeHvH": "┝",
+        "Glyphs.LeftTeeHvV": "┠",
+        "Glyphs.LLCorner": "└",
+        "Glyphs.LLCornerDbl": "╚",
+        "Glyphs.LLCornerDblSingle": "╙",
+        "Glyphs.LLCornerHv": "┗",
+        "Glyphs.LLCornerHvLt": "┖",
+        "Glyphs.LLCornerLtHv": "┕",
+        "Glyphs.LLCornerR": "╰",
+        "Glyphs.LLCornerSingleDbl": "╘",
+        "Glyphs.LRCorner": "┘",
+        "Glyphs.LRCornerDbl": "╝",
+        "Glyphs.LRCornerDblSingle": "╜",
+        "Glyphs.LRCornerHv": "┛",
+        "Glyphs.LRCornerHvLt": "┚",
+        "Glyphs.LRCornerLtHv": "┙",
+        "Glyphs.LRCornerR": "╯",
+        "Glyphs.LRCornerSingleDbl": "╛",
+        "Glyphs.Maximize": "✽",
+        "Glyphs.Minimize": "❏",
+        "Glyphs.Move": "◊",
+        "Glyphs.RightArrow": "►",
+        "Glyphs.RightBracket": "⟧",
+        "Glyphs.RightDefaultIndicator": "◄",
+        "Glyphs.RightSideLineLtHv": "╼",
+        "Glyphs.RightTee": "┤",
+        "Glyphs.RightTeeDbl": "╣",
+        "Glyphs.RightTeeDblH": "╡",
+        "Glyphs.RightTeeDblV": "╢",
+        "Glyphs.RightTeeHvDblH": "┫",
+        "Glyphs.RightTeeHvH": "┥",
+        "Glyphs.RightTeeHvV": "┨",
+        "Glyphs.Selected": "◉",
+        "Glyphs.ShadowHorizontal": "▀",
+        "Glyphs.ShadowHorizontalEnd": "▘",
+        "Glyphs.ShadowHorizontalStart": "▝",
+        "Glyphs.ShadowVertical": "▌",
+        "Glyphs.ShadowVerticalStart": "▖",
+        "Glyphs.SizeBottomLeft": "↙",
+        "Glyphs.SizeBottomRight": "↘",
+        "Glyphs.SizeHorizontal": "↔",
+        "Glyphs.SizeTopLeft": "↖",
+        "Glyphs.SizeTopRight": "↗",
+        "Glyphs.SizeVertical": "↕",
+        "Glyphs.Stipple": "░",
+        "Glyphs.TopSideLineHvLt": "╿",
+        "Glyphs.TopTee": "┬",
+        "Glyphs.TopTeeDbl": "╦",
+        "Glyphs.TopTeeDblH": "╤",
+        "Glyphs.TopTeeDblV": "╥",
+        "Glyphs.TopTeeHvDblH": "┳",
+        "Glyphs.TopTeeHvH": "┯",
+        "Glyphs.TopTeeHvV": "┰",
+        "Glyphs.ULCorner": "┌",
+        "Glyphs.ULCornerDbl": "╔",
+        "Glyphs.ULCornerDblSingle": "╓",
+        "Glyphs.ULCornerHv": "┏",
+        "Glyphs.ULCornerHvLt": "┎",
+        "Glyphs.ULCornerLtHv": "┍",
+        "Glyphs.ULCornerR": "╭",
+        "Glyphs.ULCornerSingleDbl": "╒",
+        "Glyphs.UnSelected": "○",
+        "Glyphs.UpArrow": "▲",
+        "Glyphs.URCorner": "┐",
+        "Glyphs.URCornerDbl": "╗",
+        "Glyphs.URCornerDblSingle": "╖",
+        "Glyphs.URCornerHv": "┓",
+        "Glyphs.URCornerHvLt": "┑",
+        "Glyphs.URCornerLtHv": "┒",
+        "Glyphs.URCornerR": "╮",
+        "Glyphs.URCornerSingleDbl": "╕",
+        "Glyphs.VerticalFourDots": "⁞",
+        "Glyphs.VLine": "│",
+        "Glyphs.VLineDa2": "╎",
+        "Glyphs.VLineDa3": "┆",
+        "Glyphs.VLineDa4": "┊",
+        "Glyphs.VLineDbl": "║",
+        "Glyphs.VLineHv": "┃",
+        "Glyphs.VLineHvDa2": "╏",
+        "Glyphs.VLineHvDa3": "┇",
+        "Glyphs.VLineHvDa4": "┋"
+      }
       },
     {
       "Dark": {

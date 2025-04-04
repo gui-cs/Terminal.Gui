@@ -23,16 +23,33 @@ public class StatusBar : Bar, IDesignable
         Y = Pos.AnchorEnd ();
         Width = Dim.Fill ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
-        BorderStyle = LineStyle.Dashed;
+
+        if (Border is { })
+        {
+            Border.LineStyle = DefaultSeparatorLineStyle;
+        }
+
         base.ColorScheme = Colors.ColorSchemes ["Menu"];
 
-        SubViewLayout += StatusBar_LayoutStarted;
+        Applied += OnConfigurationManagerApplied;
     }
 
-    // StatusBar arranges the items horizontally.
-    // The first item has no left border, the last item has no right border.
-    // The Shortcuts are configured with the command, help, and key views aligned in reverse order (EndToStart).
-    private void StatusBar_LayoutStarted (object sender, LayoutEventArgs e)
+    private void OnConfigurationManagerApplied (object? sender, ConfigurationManagerEventArgs e)
+    {
+        if (Border is { })
+        {
+            Border.LineStyle = DefaultSeparatorLineStyle;
+        }
+    }
+
+    /// <summary>
+    ///     Gets or sets the default Line Style for the separators between the shortcuts of the StatusBar.
+    /// </summary>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static LineStyle DefaultSeparatorLineStyle { get; set; } = LineStyle.Dashed;
+
+    /// <inheritdoc />
+    protected override void OnSubViewLayout (LayoutEventArgs args)
     {
         for (int index = 0; index < SubViews.Count; index++)
         {
@@ -40,13 +57,9 @@ public class StatusBar : Bar, IDesignable
 
             barItem.BorderStyle = BorderStyle;
 
-            if (index == SubViews.Count - 1)
+            if (barItem.Border is { })
             {
-                barItem.Border.Thickness = new Thickness (0, 0, 0, 0);
-            }
-            else
-            {
-                barItem.Border.Thickness = new Thickness (0, 0, 1, 0);
+                barItem.Border.Thickness = index == SubViews.Count - 1 ? new Thickness (0, 0, 0, 0) : new Thickness (0, 0, 1, 0);
             }
 
             if (barItem is Shortcut shortcut)
@@ -54,6 +67,7 @@ public class StatusBar : Bar, IDesignable
                 shortcut.Orientation = Orientation.Horizontal;
             }
         }
+        base.OnSubViewLayout (args);
     }
 
     /// <inheritdoc/>
@@ -138,4 +152,11 @@ public class StatusBar : Bar, IDesignable
         void Button_Clicked (object sender, EventArgs e) { MessageBox.Query ("Hi", $"You clicked {sender}"); }
     }
 
+    /// <inheritdoc />
+    protected override void Dispose (bool disposing)
+    {
+        base.Dispose (disposing);
+
+        Applied -= OnConfigurationManagerApplied;
+    }
 }

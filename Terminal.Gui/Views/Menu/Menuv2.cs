@@ -21,22 +21,20 @@ public class Menuv2 : Bar
         base.ColorScheme = Colors.ColorSchemes ["Menu"];
 
         BorderStyle = DefaultBorderStyle;
+
+        Applied += OnConfigurationManagerApplied;
     }
 
-    // BUGBUG: For some reason this config property is not working!
+    private void OnConfigurationManagerApplied (object? sender, ConfigurationManagerEventArgs e)
+    {
+        BorderStyle = DefaultBorderStyle;
+    }
+
     /// <summary>
-    ///     Gets or sets the default Highlight Style.
+    ///     Gets or sets the default Border Style for Menus. The default is <see cref="LineStyle.Single"/>.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
-
-    /// <inheritdoc />
-    protected override bool OnBorderStyleChanging (CancelEventArgs<LineStyle> e)
-    {
-        // Bar (our base) overrides this to prevent automatic changing of thickness.
-        // We don't want that so we override as well.
-        return false;
-    }
 
     /// <summary>
     ///     Gets or sets the menu item that opened this menu as a sub-menu.
@@ -182,4 +180,11 @@ public class Menuv2 : Bar
     /// </summary>
     public event EventHandler<MenuItemv2?>? SelectedMenuItemChanged;
 
+    /// <inheritdoc />
+    protected override void Dispose (bool disposing)
+    {
+        base.Dispose (disposing);
+
+        Applied -= OnConfigurationManagerApplied;
+    }
 }
