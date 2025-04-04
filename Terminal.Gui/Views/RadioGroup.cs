@@ -41,8 +41,6 @@ public class RadioGroup : View, IDesignable, IOrientation
         MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Accept);
 
         SubViewLayout += RadioGroup_LayoutStarted;
-
-        HighlightStyle = HighlightStyle.PressedOutside | HighlightStyle.Pressed;
     }
 
     private bool? HandleHotKeyCommand (ICommandContext? ctx)

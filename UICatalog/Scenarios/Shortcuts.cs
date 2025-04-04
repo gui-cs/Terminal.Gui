@@ -103,7 +103,7 @@ public class Shortcuts : Scenario
             X = 0,
             Y = Pos.Bottom (alignKeysShortcut),
             Width = Dim.Fill ()! - Dim.Width (eventLog),
-            HelpText = "Show Command first",
+            HelpText = "Show _Command first",
             CommandView = new CheckBox
             {
                 Text = "Command _First",
@@ -463,45 +463,43 @@ public class Shortcuts : Scenario
 
         Application.Top.Add (appQuitShortcut);
 
-        foreach (View sh in Application.Top.SubViews.Where (v => v is Shortcut)!)
+        foreach (Shortcut shortcut in Application.Top.SubViews.OfType<Shortcut> ())
         {
-            if (sh is Shortcut shortcut)
+            shortcut.Selecting += (o, args) =>
             {
-                shortcut.Selecting += (o, args) =>
+                if (args.Cancel)
                 {
-                    if (args.Cancel)
-                    {
-                        return;
-                    }
-                    eventSource.Add ($"{shortcut!.Id}.Selecting: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
-                    eventLog.MoveDown ();
-                };
+                    return;
+                }
+                eventSource.Add ($"{shortcut!.Id}.Selecting: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
+                eventLog.MoveDown ();
+            };
 
-                shortcut.CommandView.Selecting += (o, args) =>
+            shortcut.CommandView.Selecting += (o, args) =>
+            {
+                if (args.Cancel)
                 {
-                    if (args.Cancel)
-                    {
-                        return;
-                    }
-                    eventSource.Add ($"{shortcut!.Id}.CommandView.Selecting: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
-                    eventLog.MoveDown ();
-                    args.Cancel = true;
-                };
+                    return;
+                }
+                eventSource.Add ($"{shortcut!.Id}.CommandView.Selecting: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
+                eventLog.MoveDown ();
+                args.Cancel = true;
+            };
 
-                shortcut.Accepting += (o, args) =>
-                {
-                    eventSource.Add ($"{shortcut!.Id}.Accepting: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
-                    eventLog.MoveDown ();
-                    // We don't want this to exit the Scenario
-                    args.Cancel = true;
-                };
+            shortcut.Accepting += (o, args) =>
+            {
+                eventSource.Add ($"{shortcut!.Id}.Accepting: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
+                eventLog.MoveDown ();
+                // We don't want this to exit the Scenario
+                args.Cancel = true;
+            };
 
-                shortcut.CommandView.Accepting += (o, args) =>
-                {
-                    eventSource.Add ($"{shortcut!.Id}.CommandView.Accepting: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
-                    eventLog.MoveDown ();
-                };
-            }
+            shortcut.CommandView.Accepting += (o, args) =>
+            {
+                eventSource.Add ($"{shortcut!.Id}.CommandView.Accepting: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
+                eventLog.MoveDown ();
+            };
+
         }
     }
 

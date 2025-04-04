@@ -20,8 +20,22 @@ public class Menuv2 : Bar
         Height = Dim.Auto (DimAutoStyle.Content, 1);
         base.ColorScheme = Colors.ColorSchemes ["Menu"];
 
-        Border!.Thickness = new Thickness (1, 1, 1, 1);
-        Border.LineStyle = LineStyle.Single;
+        BorderStyle = DefaultBorderStyle;
+    }
+
+    // BUGBUG: For some reason this config property is not working!
+    /// <summary>
+    ///     Gets or sets the default Highlight Style.
+    /// </summary>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
+
+    /// <inheritdoc />
+    protected override bool OnBorderStyleChanging (CancelEventArgs<LineStyle> e)
+    {
+        // Bar (our base) overrides this to prevent automatic changing of thickness.
+        // We don't want that so we override as well.
+        return false;
     }
 
     /// <summary>
@@ -35,16 +49,6 @@ public class Menuv2 : Bar
         if (Visible)
         {
             SelectedMenuItem = SubViews.Where (mi => mi is MenuItemv2).ElementAtOrDefault (0) as MenuItemv2;
-        }
-    }
-
-    /// <inheritdoc />
-    public override void EndInit ()
-    {
-        base.EndInit ();
-
-        if (Border is { })
-        {
         }
     }
 

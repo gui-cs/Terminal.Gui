@@ -34,7 +34,7 @@ public sealed class FlagSelector<TEnum> : FlagSelector where TEnum : struct, Enu
     /// <example>
     ///     <code>
     ///        // Use enum values with custom display names
-    ///        var flagSelector = new FlagSelector&lt;FlagSelectorStyles&gt();
+    ///        var flagSelector = new FlagSelector&lt;FlagSelectorStyles&gt;();
     ///        flagSelector.SetFlagNames(f => f switch {
     ///             FlagSelectorStyles.ShowNone => "Show None Value",
     ///             FlagSelectorStyles.ShowValueEdit => "Show Value Editor",

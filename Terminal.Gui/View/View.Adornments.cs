@@ -168,8 +168,8 @@ public partial class View // Adornments
             }
 
             SetBorderStyle (e.NewValue);
-            SetAdornmentFrames ();
-            SetNeedsLayout ();
+            OnBorderStyleChanged ();
+            BorderStyleChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 
@@ -188,6 +188,16 @@ public partial class View // Adornments
     public event EventHandler<CancelEventArgs<LineStyle>>? BorderStyleChanging;
 
     /// <summary>
+    ///     Called when the <see cref="BorderStyle"/> has changed.
+    /// </summary>
+    protected virtual bool OnBorderStyleChanged () { return false; }
+
+    /// <summary>
+    ///     Fired when the <see cref="BorderStyle"/> has changed.
+    /// </summary>
+    public event EventHandler<EventArgs>? BorderStyleChanged;
+
+    /// <summary>
     ///     Sets the <see cref="BorderStyle"/> of the view to the specified value.
     /// </summary>
     /// <remarks>
@@ -204,7 +214,7 @@ public partial class View // Adornments
     ///     <para>For more advanced customization of the view's border, manipulate see <see cref="Border"/> directly.</para>
     /// </remarks>
     /// <param name="style"></param>
-    public virtual void SetBorderStyle (LineStyle style)
+    internal void SetBorderStyle (LineStyle style)
     {
         if (style != LineStyle.None)
         {
@@ -219,6 +229,9 @@ public partial class View // Adornments
         }
 
         Border.LineStyle = style;
+
+        SetAdornmentFrames ();
+        SetNeedsLayout ();
     }
 
     /// <summary>

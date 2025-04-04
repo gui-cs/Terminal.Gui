@@ -256,7 +256,7 @@ public class FlagSelector : View, IOrientation, IDesignable
                 CanFocus = false,
                 Text = Value.ToString (),
                 Width = 5,
-                ReadOnly = true
+                ReadOnly = true,
             };
 
             Add (ValueEdit);
@@ -311,7 +311,7 @@ public class FlagSelector : View, IOrientation, IDesignable
 
         checkbox.GettingNormalColor += (_, e) =>
                                        {
-                                           if (SuperView is {HasFocus: true})
+                                           if (SuperView is { HasFocus: true })
                                            {
                                                e.Cancel = true;
 
@@ -321,6 +321,7 @@ public class FlagSelector : View, IOrientation, IDesignable
                                                }
                                                else
                                                {
+                                                   // If _colorScheme was set, it's because of Hover
                                                    if (checkbox._colorScheme is { })
                                                    {
                                                        e.NewValue = checkbox._colorScheme.Normal;
@@ -349,23 +350,36 @@ public class FlagSelector : View, IOrientation, IDesignable
                                               }
                                           };
 
-        checkbox.GettingFocusColor += (_, e) =>
-                                          {
-                                              if (SuperView is { HasFocus: true })
-                                              {
-                                                  e.Cancel = true;
-                                                  if (!HasFocus)
-                                                  {
-                                                      e.NewValue = GetNormalColor ();
-                                                  }
-                                                  else
-                                                  {
-                                                      e.NewValue = GetFocusColor ();
-                                                  }
-                                              }
-                                          };
+        //checkbox.GettingFocusColor += (_, e) =>
+        //                                  {
+        //                                      if (SuperView is { HasFocus: true })
+        //                                      {
+        //                                          e.Cancel = true;
+        //                                          if (!HasFocus)
+        //                                          {
+        //                                              e.NewValue = GetNormalColor ();
+        //                                          }
+        //                                          else
+        //                                          {
+        //                                              e.NewValue = GetFocusColor ();
+        //                                          }
+        //                                      }
+        //                                  };
 
-        checkbox.Selecting += (sender, args) => { RaiseSelecting (args.Context); };
+        checkbox.Selecting += (sender, args) =>
+                              {
+                                  if (RaiseSelecting (args.Context) is true)
+                                  {
+                                      args.Cancel = true;
+
+                                      return;
+                                  };
+
+                                  if (RaiseAccepting (args.Context) is true)
+                                  {
+                                      args.Cancel = true;
+                                  }
+                              };
 
         checkbox.CheckedStateChanged += (sender, args) =>
                                         {
