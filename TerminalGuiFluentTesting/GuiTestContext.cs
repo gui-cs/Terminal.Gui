@@ -243,7 +243,18 @@ public class GuiTestContext : IDisposable
     /// <returns></returns>
     public GuiTestContext Then (Action doAction)
     {
-        doAction ();
+        try
+        {
+            doAction ();
+        }
+        catch(Exception)
+        {
+            Stop ();
+            _hardStop.Cancel();
+
+            throw;
+
+        }
 
         return this;
     }
@@ -360,6 +371,7 @@ public class GuiTestContext : IDisposable
                 {
                     SendNetKey (k);
                 }
+                WaitIteration ();
                 break;
             default:
                 throw new ArgumentOutOfRangeException ();
@@ -549,5 +561,26 @@ public class GuiTestContext : IDisposable
                                        });
 
         WaitIteration ();
+    }
+
+    /// <summary>
+    /// Sets the input focus to the given <see cref="View"/>.
+    /// Throws <see cref="ArgumentException"/> if focus did not change due to system
+    /// constraints e.g. <paramref name="toFocus"/>
+    /// <see cref="View.CanFocus"/> is <see langword="false"/>
+    /// </summary>
+    /// <param name="toFocus"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    public GuiTestContext Focus (View toFocus)
+    {
+        toFocus.FocusDeepest (NavigationDirection.Forward, TabBehavior.TabStop);
+
+        if (!toFocus.HasFocus)
+        {
+            throw new ArgumentException ("Failed to set focus, FocusDeepest did not result in HasFocus becoming true. Ensure view is added and focusable");
+        }
+
+        return WaitIteration ();
     }
 }
