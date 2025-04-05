@@ -85,18 +85,11 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         BorderStyle = DefaultBorderStyle;
 
-        Applied += OnConfigurationManagerApplied;
-
         return;
 
         bool? MoveLeft (ICommandContext? ctx) { return AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop); }
 
         bool? MoveRight (ICommandContext? ctx) { return AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop); }
-    }
-
-    private void OnConfigurationManagerApplied (object? sender, ConfigurationManagerEventArgs e)
-    {
-        BorderStyle = DefaultBorderStyle;
     }
 
     /// <inheritdoc />
@@ -449,13 +442,5 @@ public class MenuBarv2 : Menuv2, IDesignable
                 }
             }
         }
-    }
-
-    /// <inheritdoc />
-    protected override void Dispose (bool disposing)
-    {
-        base.Dispose (disposing);
-
-        Applied -= OnConfigurationManagerApplied;
     }
 }
