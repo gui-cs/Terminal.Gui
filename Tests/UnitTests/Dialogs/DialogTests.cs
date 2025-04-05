@@ -14,6 +14,24 @@ public class DialogTests
         View.DebugIDisposable = true;
 #endif
         _output = output;
+
+        // Override CM
+        ConfigurationManager.RuntimeConfig = """
+                                             {
+                                                 "Themes": [
+                                                     {
+                                                       "Default": {
+                                                             "Dialog.DefaultButtonAlignment" : "Center",
+                                                             "Dialog.DefaultBorderStyle" : "Single",
+                                                             "Dialog.DefaultShadow" : "None",
+                                                             "Button.DefaultShadow" : "None"
+                                                        }
+                                                     }
+                                                 ]
+                                             }
+                                             """;
+        ConfigurationManager.Locations = ConfigLocations.Runtime;
+        ConfigurationManager.Load ();
     }
 
     [Fact]
@@ -33,12 +51,6 @@ public class DialogTests
         // We test with one button first, but do this to get the width right for 2
         int width = $@"{Glyphs.VLine} {btn1} {btn2} {Glyphs.VLine}".Length;
         d.SetBufferSize (width, 1);
-
-        // Override CM
-        Dialog.DefaultButtonAlignment = Alignment.Center;
-        Dialog.DefaultBorderStyle = LineStyle.Single;
-        Dialog.DefaultShadow = ShadowStyle.None;
-        Button.DefaultShadow = ShadowStyle.None;
 
         // Default (center)
         var dlg = new Dialog
@@ -914,13 +926,6 @@ public class DialogTests
     {
         ((FakeDriver)Driver).SetBufferSize (20, 5);
 
-        // Override CM
-        Window.DefaultBorderStyle = LineStyle.Single;
-        Dialog.DefaultButtonAlignment = Alignment.Center;
-        Dialog.DefaultBorderStyle = LineStyle.Single;
-        Dialog.DefaultShadow = ShadowStyle.None;
-        Button.DefaultShadow = ShadowStyle.None;
-
         var win = new Window ();
 
         var iterations = 0;
@@ -1021,13 +1026,7 @@ public class DialogTests
         var win = new Window ();
 
         int iterations = -1;
-
-        // Override CM
-        Dialog.DefaultButtonAlignment = Alignment.Center;
-        Dialog.DefaultBorderStyle = LineStyle.Single;
-        Dialog.DefaultShadow = ShadowStyle.None;
-        Button.DefaultShadow = ShadowStyle.None;
-
+        
         Iteration += (s, a) =>
                      {
                          iterations++;
@@ -1065,13 +1064,7 @@ public class DialogTests
     public void Dialog_Opened_From_Another_Dialog ()
     {
         ((FakeDriver)Driver).SetBufferSize (30, 10);
-
-        // Override CM
-        Dialog.DefaultButtonAlignment = Alignment.Center;
-        Dialog.DefaultBorderStyle = LineStyle.Single;
-        Dialog.DefaultShadow = ShadowStyle.None;
-        Button.DefaultShadow = ShadowStyle.None;
-
+        
         var btn1 = new Button { Text = "press me 1" };
         Button btn2 = null;
         Button btn3 = null;
@@ -1233,12 +1226,6 @@ public class DialogTests
     [AutoInitShutdown]
     public void Location_When_Application_Top_Not_Default ()
     {
-        // Override CM
-        Window.DefaultBorderStyle = LineStyle.Single;
-        Dialog.DefaultButtonAlignment = Alignment.Center;
-        Dialog.DefaultBorderStyle = LineStyle.Single;
-        Dialog.DefaultShadow = ShadowStyle.None;
-        Button.DefaultShadow = ShadowStyle.None;
 
         var expected = 5;
         var d = new Dialog { X = expected, Y = expected, Height = 5, Width = 5 };
@@ -1267,8 +1254,6 @@ public class DialogTests
         RunState runstate = null;
 
         var d = (FakeDriver)Driver;
-
-        Button.DefaultShadow = ShadowStyle.None;
 
         var title = "";
         var btnText = "ok";
@@ -1312,8 +1297,6 @@ public class DialogTests
     [AutoInitShutdown]
     public void Size_Not_Default ()
     {
-        Dialog.DefaultShadow = ShadowStyle.None;
-        Button.DefaultShadow = ShadowStyle.None;
         var d = new Dialog { Width = 50, Height = 50 };
 
         Begin (d);
@@ -1325,7 +1308,7 @@ public class DialogTests
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [AutoInitShutdown]
     public void Zero_Buttons_Works ()
     {
         RunState runstate = null;
@@ -1353,11 +1336,6 @@ public class DialogTests
         params Button [] btns
     )
     {
-        // Override CM
-        Dialog.DefaultButtonAlignment = Alignment.Center;
-        Dialog.DefaultBorderStyle = LineStyle.Single;
-        Dialog.DefaultShadow = ShadowStyle.None;
-        Button.DefaultShadow = ShadowStyle.None;
 
         var dlg = new Dialog
         {
