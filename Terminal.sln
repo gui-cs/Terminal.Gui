@@ -65,6 +65,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.Parallelizable", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerminalGuiFluentTesting", "TerminalGuiFluentTesting\TerminalGuiFluentTesting.csproj", "{2DBA7BDC-17AE-474B-A507-00807D087607}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerminalGuiFluentTesting.Xunit", "TerminalGuiFluentTesting.Xunit\TerminalGuiFluentTesting.Xunit.csproj", "{231B9723-10F3-46DB-8EAE-50C0C0375AD3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -123,6 +125,10 @@ Global
 		{2DBA7BDC-17AE-474B-A507-00807D087607}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DBA7BDC-17AE-474B-A507-00807D087607}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2DBA7BDC-17AE-474B-A507-00807D087607}.Release|Any CPU.Build.0 = Release|Any CPU
+		{231B9723-10F3-46DB-8EAE-50C0C0375AD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{231B9723-10F3-46DB-8EAE-50C0C0375AD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{231B9723-10F3-46DB-8EAE-50C0C0375AD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{231B9723-10F3-46DB-8EAE-50C0C0375AD3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
