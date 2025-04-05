@@ -25,6 +25,8 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
                 {
                     Assert.True (type.FullName == view.GetType ().FullName);
                 }
+
+                view?.Dispose ();
             }
 
             return true;
@@ -72,6 +74,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
             Assert.Equal (1, selectingCount);
             Assert.Equal (0, acceptedCount);
         }
+        view?.Dispose ();
     }
 
     [Theory]
@@ -103,6 +106,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
             Assert.Equal (0, selectingCount);
             Assert.Equal (1, acceptedCount);
         }
+        view?.Dispose ();
     }
 
     [Theory]
@@ -138,5 +142,6 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
             Assert.Equal (1, handlingHotKeyCount);
             Assert.Equal (0, acceptedCount);
         }
+        view?.Dispose ();
     }
 }
