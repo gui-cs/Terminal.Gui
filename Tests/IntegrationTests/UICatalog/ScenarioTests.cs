@@ -107,7 +107,7 @@ public class ScenarioTests : TestsAllViews
             _output.WriteLine ($"Initialized == {a.CurrentValue}");
         }
 
-        // If the scenario doesn't close within 500ms, this will force it to quit
+        // If the scenario doesn't close within abortTime ms, this will force it to quit
         bool ForceCloseCallback ()
         {
             lock (_timeoutLock)
@@ -118,14 +118,16 @@ public class ScenarioTests : TestsAllViews
                 }
             }
 
-            Assert.Fail (
-                         $"Scenario Failed to Quit with {Application.QuitKey} after {abortTime}ms and {iterationCount} iterations. Force quit.");
 
             // Restore the configuration locations
             ConfigurationManager.Locations = savedConfigLocations;
             ConfigurationManager.Reset ();
 
             Application.ResetState (true);
+
+            Assert.Fail (
+                         $"Scenario Failed to Quit with {Application.QuitKey} after {abortTime}ms and {iterationCount} iterations. Force quit.");
+
 
             return false;
         }
