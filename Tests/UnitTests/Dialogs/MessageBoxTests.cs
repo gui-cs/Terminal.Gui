@@ -156,23 +156,8 @@ public class MessageBoxTests
         int iterations = -1;
 
         ((FakeDriver)Application.Driver!).SetBufferSize (15, 15); // 15 x 15 gives us enough room for a button with one char (9x1)
-
-
-        // Override CM
-        ConfigurationManager.RuntimeConfig = """
-                                             {
-                                                 "Themes": [
-                                                     {
-                                                       "Default": {
-                                                         "Dialog.DefaultShadow": "None",
-                                                         "Button.DefaultShadow": "None"
-                                                        }
-                                                     }
-                                                 ]
-                                             }
-                                             """;
-        ConfigurationManager.Locations = ConfigLocations.Runtime;
-        ConfigurationManager.Load ();
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         var mbFrame = Rectangle.Empty;
 
@@ -210,22 +195,10 @@ public class MessageBoxTests
             $"{Glyphs.LeftBracket}{Glyphs.LeftDefaultIndicator} btn {Glyphs.RightDefaultIndicator}{Glyphs.RightBracket}";
 
         // Override CM
-        ConfigurationManager.RuntimeConfig = """
-                                             {
-                                                 "Themes": [
-                                                     {
-                                                       "Default": {
-                                                         "Dialog.DefaultShadow": "None",
-                                                         "MessageBox.DefaultButtonAlignment": "End",
-                                                         "MessageBox.DefaultBorderStyle": "Double",
-                                                         "Button.DefaultShadow": "None"
-                                                        }
-                                                     }
-                                                 ]
-                                             }
-                                             """;
-        ConfigurationManager.Locations = ConfigLocations.Runtime;
-        ConfigurationManager.Load ();
+        MessageBox.DefaultButtonAlignment = Alignment.End;
+        MessageBox.DefaultBorderStyle = LineStyle.Double;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         Application.Iteration += (s, a) =>
                                  {
@@ -294,22 +267,10 @@ public class MessageBoxTests
             $"{Glyphs.LeftBracket}{Glyphs.LeftDefaultIndicator} btn {Glyphs.RightDefaultIndicator}{Glyphs.RightBracket}";
 
         // Override CM
-        ConfigurationManager.RuntimeConfig = """
-                                             {
-                                                 "Themes": [
-                                                     {
-                                                       "Default": {
-                                                         "Dialog.DefaultShadow": "None",
-                                                         "MessageBox.DefaultButtonAlignment": "End",
-                                                         "MessageBox.DefaultBorderStyle": "Double",
-                                                         "Button.DefaultShadow": "None"
-                                                        }
-                                                     }
-                                                 ]
-                                             }
-                                             """;
-        ConfigurationManager.Locations = ConfigLocations.Runtime;
-        ConfigurationManager.Load ();
+        MessageBox.DefaultButtonAlignment = Alignment.End;
+        MessageBox.DefaultBorderStyle = LineStyle.Double;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         Application.Iteration += (s, a) =>
                                  {
@@ -488,22 +449,10 @@ public class MessageBoxTests
         ((FakeDriver)Application.Driver).SetBufferSize (70, 15);
 
         // Override CM
-        ConfigurationManager.RuntimeConfig = """
-                                             {
-                                                 "Themes": [
-                                                     {
-                                                       "Default": {
-                                                         "Dialog.DefaultShadow": "None",
-                                                         "MessageBox.DefaultButtonAlignment": "End",
-                                                         "MessageBox.DefaultBorderStyle": "Double",
-                                                         "Button.DefaultShadow": "None"
-                                                        }
-                                                     }
-                                                 ]
-                                             }
-                                             """;
-        ConfigurationManager.Locations = ConfigLocations.Runtime;
-        ConfigurationManager.Load ();
+        MessageBox.DefaultButtonAlignment = Alignment.End;
+        MessageBox.DefaultBorderStyle = LineStyle.Double;
+        Dialog.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyle.None;
 
         Application.Iteration += (s, a) =>
                                  {
@@ -513,7 +462,7 @@ public class MessageBoxTests
                                      {
                                          MessageBox.Query (
                                                            "",
-                                                           UICatalogTop.GetAboutBoxMessage (),
+                                                           UICatalog.UICatalogTop.GetAboutBoxMessage (),
                                                            wrapMessage: false,
                                                            buttons: "_Ok"
                                                           );
