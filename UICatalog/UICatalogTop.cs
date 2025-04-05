@@ -184,7 +184,8 @@ public class UICatalogTop : Toplevel
 
             _themesRg = new ()
             {
-                HighlightStyle = HighlightStyle.Hover
+                HighlightStyle = HighlightStyle.None,
+                SelectedItem = Themes.Keys.ToList ().IndexOf (CachedTheme!.Replace ("_", string.Empty))
             };
 
             _themesRg.SelectedItemChanged += (_, args) =>
@@ -205,7 +206,11 @@ public class UICatalogTop : Toplevel
 
             menuItems.Add (new Line ());
 
-            _topSchemeRg = new ();
+            _topSchemeRg = new ()
+            {
+                HighlightStyle = HighlightStyle.None,
+                SelectedItem = Colors.ColorSchemes.Keys.ToList().IndexOf(CachedTopLevelColorScheme!)
+            };
 
             _topSchemeRg.SelectedItemChanged += (_, args) =>
             {
