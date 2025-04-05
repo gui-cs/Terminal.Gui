@@ -85,11 +85,31 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         BorderStyle = DefaultBorderStyle;
 
+        Applied += OnConfigurationManagerApplied;
+        SuperViewChanged += OnSuperViewChanged;
+
         return;
 
         bool? MoveLeft (ICommandContext? ctx) { return AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop); }
 
         bool? MoveRight (ICommandContext? ctx) { return AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop); }
+    }
+
+    private void OnSuperViewChanged (object? sender, SuperViewChangedEventArgs e)
+    {
+        if (SuperView is null)
+        {
+            // BUGBUG: This is a hack for avoiding a race condition in ConfigurationManager.Apply
+            // BUGBUG: For some reason in some unit tests, when Top is disposed, MenuBar.Dispose does not get called.
+            // BUGBUG: Yet, the MenuBar does get Removed from Top (and it's SuperView set to null).
+            // BUGBUG: Related: https://github.com/gui-cs/Terminal.Gui/issues/4021
+            Applied -= OnConfigurationManagerApplied;
+        }
+    }
+
+    private void OnConfigurationManagerApplied (object? sender, ConfigurationManagerEventArgs e)
+    {
+         BorderStyle = DefaultBorderStyle;
     }
 
     /// <inheritdoc />
@@ -442,5 +462,14 @@ public class MenuBarv2 : Menuv2, IDesignable
                 }
             }
         }
+    }
+
+    /// <inheritdoc />
+    protected override void Dispose (bool disposing)
+    {
+        base.Dispose (disposing);
+
+        SuperViewChanged += OnSuperViewChanged;
+        Applied -= OnConfigurationManagerApplied;
     }
 }

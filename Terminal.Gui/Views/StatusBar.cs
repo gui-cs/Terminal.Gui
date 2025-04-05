@@ -32,8 +32,20 @@ public class StatusBar : Bar, IDesignable
         base.ColorScheme = Colors.ColorSchemes ["Menu"];
 
         Applied += OnConfigurationManagerApplied;
+        SuperViewChanged += OnSuperViewChanged;
     }
 
+    private void OnSuperViewChanged (object? sender, SuperViewChangedEventArgs e)
+    {
+        if (SuperView is null)
+        {
+            // BUGBUG: This is a hack for avoiding a race condition in ConfigurationManager.Apply
+            // BUGBUG: For some reason in some unit tests, when Top is disposed, MenuBar.Dispose does not get called.
+            // BUGBUG: Yet, the MenuBar does get Removed from Top (and it's SuperView set to null).
+            // BUGBUG: Related: https://github.com/gui-cs/Terminal.Gui/issues/4021
+            Applied -= OnConfigurationManagerApplied;
+        }
+    }
     private void OnConfigurationManagerApplied (object? sender, ConfigurationManagerEventArgs e)
     {
         if (Border is { })
@@ -157,6 +169,7 @@ public class StatusBar : Bar, IDesignable
     {
         base.Dispose (disposing);
 
+        SuperViewChanged -= OnSuperViewChanged;
         Applied -= OnConfigurationManagerApplied;
     }
 }

@@ -21,6 +21,16 @@ public class Menuv2 : Bar
         base.ColorScheme = Colors.ColorSchemes ["Menu"];
 
         BorderStyle = DefaultBorderStyle;
+
+        Applied += OnConfigurationManagerApplied;
+    }
+
+    private void OnConfigurationManagerApplied (object? sender, ConfigurationManagerEventArgs e)
+    {
+        if (SuperView is { })
+        {
+            BorderStyle = DefaultBorderStyle;
+        }
     }
 
     /// <summary>
@@ -172,4 +182,12 @@ public class Menuv2 : Bar
     ///     Raised when the selected menu item has changed.
     /// </summary>
     public event EventHandler<MenuItemv2?>? SelectedMenuItemChanged;
+
+    /// <inheritdoc />
+    protected override void Dispose (bool disposing)
+    {
+        base.Dispose (disposing);
+
+        Applied -= OnConfigurationManagerApplied;
+    }
 }

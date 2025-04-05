@@ -121,6 +121,7 @@ public partial class View // Adornments
     /// </remarks>
     public Border? Border { get; private set; }
 
+    // TODO: Make BorderStyle nullable https://github.com/gui-cs/Terminal.Gui/issues/4021
     /// <summary>Gets or sets whether the view has a one row/col thick border.</summary>
     /// <remarks>
     ///     <para>
@@ -150,10 +151,10 @@ public partial class View // Adornments
 
             SetBorderStyle (value);
             OnBorderStyleChanged ();
-            BorderStyleChanged?.Invoke(this, EventArgs.Empty);
+            BorderStyleChanged?.Invoke (this, EventArgs.Empty);
         }
     }
-    
+
     /// <summary>
     ///     Called when the <see cref="BorderStyle"/> has changed.
     /// </summary>

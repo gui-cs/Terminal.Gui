@@ -224,7 +224,6 @@ public class UICatalog
         else
         {
             Themes!.Theme = UICatalogTop.CachedTheme;
-            Apply ();
         }
 
         Application.Run<UICatalogTop> ().Dispose ();

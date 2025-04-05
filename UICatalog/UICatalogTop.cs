@@ -90,6 +90,9 @@ public class UICatalogTop : Toplevel
         Loaded -= LoadedHandler;
         _categoryList!.EnsureSelectedItemVisible ();
         _scenarioList.EnsureSelectedCellIsVisible ();
+
+        Apply ();
+
     }
 
     private void UnloadedHandler (object? sender, EventArgs? args)
