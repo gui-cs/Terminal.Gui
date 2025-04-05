@@ -176,6 +176,54 @@ public class OptionSelector : View, IOrientation, IDesignable
             RadioStyle = true
         };
 
+        checkbox.GettingNormalColor += (_, e) =>
+        {
+            if (SuperView is { HasFocus: true })
+            {
+                e.Cancel = true;
+
+                if (!HasFocus)
+                {
+                    e.NewValue = GetFocusColor ();
+                }
+                else
+                {
+                    // If _colorScheme was set, it's because of Hover
+                    if (checkbox._colorScheme is { })
+                    {
+                        e.NewValue = checkbox._colorScheme.Normal;
+                    }
+                    else
+                    {
+                        e.NewValue = GetNormalColor ();
+                    }
+                }
+            }
+        };
+
+        checkbox.GettingHotNormalColor += (_, e) =>
+        {
+            if (SuperView is { HasFocus: true })
+            {
+                e.Cancel = true;
+                if (!HasFocus)
+                {
+                    e.NewValue = GetHotFocusColor ();
+                }
+                else
+                {
+                    // If _colorScheme was set, it's because of Hover
+                    if (checkbox._colorScheme is { })
+                    {
+                        e.NewValue = checkbox._colorScheme.Normal;
+                    }
+                    else
+                    {
+                        e.NewValue = GetNormalColor ();
+                    }
+                }
+            }
+        };
         checkbox.Selecting += (sender, args) =>
         {
             if (RaiseSelecting(args.Context) is true)
