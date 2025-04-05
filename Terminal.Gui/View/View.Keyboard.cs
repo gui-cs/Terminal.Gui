@@ -657,6 +657,10 @@ public partial class View // Keyboard APIs
             return null;
         }
 
+        if (binding.Key is null)
+        {
+            binding.Key = key;
+        }
         return InvokeCommands (binding.Commands, binding);
     }
 

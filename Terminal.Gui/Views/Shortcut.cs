@@ -73,6 +73,7 @@ public class Shortcut : View, IOrientation, IDesignable
         Width = GetWidthDimAuto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
 
+        // ReSharper disable once UseObjectOrCollectionInitializer
         _orientationHelper = new (this);
         _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
         _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
@@ -456,8 +457,9 @@ public class Shortcut : View, IOrientation, IDesignable
                 if ((e.Context is CommandContext<KeyBinding> keyCommandContext && keyCommandContext.Binding.Data != this) ||
                     e.Context is CommandContext<MouseBinding>)
                 {
-                    // Forward command to ourselves
+                    // Forward command to ourselves, ignoring result
                     InvokeCommand<KeyBinding> (Command.Select, new ([Command.Select], null, this));
+
                 }
 
                 e.Cancel = true;

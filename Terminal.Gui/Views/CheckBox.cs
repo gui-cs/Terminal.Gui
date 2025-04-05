@@ -50,6 +50,12 @@ public class CheckBox : View
 
     private bool? AdvanceAndSelect (ICommandContext? commandContext)
     {
+
+        if (RaiseSelecting (commandContext) is true)
+        {
+            return true;
+        }
+
         bool? cancelled = AdvanceCheckState ();
 
         if (cancelled is true)
@@ -57,10 +63,6 @@ public class CheckBox : View
             return true;
         }
 
-        if (RaiseSelecting (commandContext) is true)
-        {
-            return true;
-        }
 
         return commandContext?.Command == Command.HotKey ? cancelled : cancelled is false;
     }
@@ -180,7 +182,7 @@ public class CheckBox : View
     /// <summary>Called when the <see cref="CheckBox"/> state is changing.</summary>
     /// <remarks>
     ///     <para>
-    ///         The state cahnge can be cancelled by setting the args.Cancel to <see langword="true"/>.
+    ///         The state change can be cancelled by setting the args.Cancel to <see langword="true"/>.
     ///     </para>
     /// </remarks>
     protected virtual bool OnCheckedStateChanging (CancelEventArgs<CheckState> args) { return false; }
@@ -282,11 +284,21 @@ public class CheckBox : View
         };
     }
 
+    private bool _radioStyle;
+
     /// <summary>
     ///     If <see langword="true"/>, the <see cref="CheckBox"/> will display radio button style glyphs (●) instead of
     ///     checkbox style glyphs (☑).
     /// </summary>
-    public bool RadioStyle { get; set; }
+    public bool RadioStyle
+    {
+        get => _radioStyle;
+        set
+        {
+            _radioStyle = value;
+            UpdateTextFormatterText();
+        }
+    }
 
     private Rune GetRadioGlyph ()
     {

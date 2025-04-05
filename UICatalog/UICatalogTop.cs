@@ -184,7 +184,7 @@ public class UICatalogTop : Toplevel
 
             _themesRg = new ()
             {
-                HighlightStyle = HighlightStyle.Hover
+                HighlightStyle = HighlightStyle.None,
             };
 
             _themesRg.SelectedItemChanged += (_, args) =>

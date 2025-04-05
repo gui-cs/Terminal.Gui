@@ -270,7 +270,7 @@ public class Dialogs : Scenario
             {
                 Title = titleEdit.Text,
                 Text = "Dialog Text",
-                ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentRadioGroup.RadioLabels [alignmentRadioGroup.SelectedItem].Substring (1)),
+                ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentRadioGroup.RadioLabels [alignmentRadioGroup.SelectedItem.HasValue ? alignmentRadioGroup.SelectedItem.Value : 0].Substring (1)),
 
                 Buttons = buttons.ToArray ()
             };

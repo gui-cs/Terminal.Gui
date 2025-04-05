@@ -24,6 +24,7 @@ public class ScrollSlider : View, IOrientation, IDesignable
         Id = "scrollSlider";
         WantMousePositionReports = true;
 
+        // ReSharper disable once UseObjectOrCollectionInitializer
         _orientationHelper = new (this); // Do not use object initializer!
         _orientationHelper.Orientation = Orientation.Vertical;
         _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);

@@ -109,9 +109,18 @@ public partial class View // Mouse APIs
         return false;
     }
 
+    /// <summary>
+    ///    Gets the highlight color scheme for the view.
+    /// </summary>
+    /// <returns></returns>
     public ColorScheme GetHighlightColorScheme ()
     {
         ColorScheme? cs = _colorScheme ?? SuperView!.ColorScheme;
+
+        if (cs is null)
+        {
+            return new ();
+        }
 
         return cs with
         {

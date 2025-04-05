@@ -164,13 +164,13 @@ public class FileDialogExamples : Scenario
         var fd = new FileDialog
         {
             OpenMode = Enum.Parse<OpenMode> (
-                                             _rgOpenMode.RadioLabels.Select (l => TextFormatter.RemoveHotKeySpecifier(l, 0, _rgOpenMode.HotKeySpecifier)).ToArray() [_rgOpenMode.SelectedItem]
+                                             _rgOpenMode.RadioLabels.Select (l => TextFormatter.RemoveHotKeySpecifier(l, 0, _rgOpenMode.HotKeySpecifier)).ToArray() [_rgOpenMode.SelectedItem ?? 0]
                                             ),
             MustExist = _cbMustExist.CheckedState == CheckState.Checked,
             AllowsMultipleSelection = _cbAllowMultipleSelection.CheckedState == CheckState.Checked
         };
 
-        fd.Style.OkButtonText = _rgCaption.RadioLabels.Select (l => TextFormatter.RemoveHotKeySpecifier(l, 0, _rgCaption.HotKeySpecifier)).ToArray() [_rgCaption.SelectedItem];
+        fd.Style.OkButtonText = _rgCaption.RadioLabels.Select (l => TextFormatter.RemoveHotKeySpecifier(l, 0, _rgCaption.HotKeySpecifier)).ToArray() [_rgOpenMode.SelectedItem ?? 0];
 
         // If Save style dialog then give them an overwrite prompt
         if (_rgCaption.SelectedItem == 2)

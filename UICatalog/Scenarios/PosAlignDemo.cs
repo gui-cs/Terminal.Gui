@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
@@ -65,7 +65,7 @@ public sealed class PosAlignDemo : Scenario
                                                        _horizAligner.Alignment =
                                                            (Alignment)Enum.Parse (
                                                                                   typeof (Alignment),
-                                                                                  alignRadioGroup.RadioLabels [alignRadioGroup.SelectedItem]);
+                                                                                  alignRadioGroup.RadioLabels [alignRadioGroup.SelectedItem ?? 0]);
                                                        UpdatePosAlignObjects (appWindow, dimension, _horizAligner);
                                                    }
                                                    else
@@ -73,7 +73,7 @@ public sealed class PosAlignDemo : Scenario
                                                        _vertAligner.Alignment =
                                                            (Alignment)Enum.Parse (
                                                                                   typeof (Alignment),
-                                                                                  alignRadioGroup.RadioLabels [alignRadioGroup.SelectedItem]);
+                                                                                  alignRadioGroup.RadioLabels [alignRadioGroup.SelectedItem ?? 0]);
                                                        UpdatePosAlignObjects (appWindow, dimension, _vertAligner);
                                                    }
                                                };
@@ -370,7 +370,7 @@ public sealed class PosAlignDemo : Scenario
                                                         widthAligner.Alignment =
                                                             (Alignment)Enum.Parse (
                                                                                    typeof (Alignment),
-                                                                                   widthAlignRadioGroup.RadioLabels [widthAlignRadioGroup.SelectedItem]);
+                                                                                   widthAlignRadioGroup.RadioLabels [widthAlignRadioGroup.SelectedItem ?? 0]);
                                                         UpdatePosAlignObjects (container, Dimension.Width, widthAligner);
                                                     };
 
@@ -389,7 +389,7 @@ public sealed class PosAlignDemo : Scenario
                                                          heightAligner.Alignment =
                                                              (Alignment)Enum.Parse (
                                                                                     typeof (Alignment),
-                                                                                    heightAlignRadioGroup.RadioLabels [heightAlignRadioGroup.SelectedItem]);
+                                                                                    heightAlignRadioGroup.RadioLabels [heightAlignRadioGroup.SelectedItem ?? 0]);
                                                          UpdatePosAlignObjects (container, Dimension.Height, heightAligner);
                                                      };
 
