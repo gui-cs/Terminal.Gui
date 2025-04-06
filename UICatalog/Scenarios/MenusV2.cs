@@ -1,6 +1,7 @@
 #nullable enable
 
 using System.Collections.ObjectModel;
+using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Core;
@@ -10,10 +11,11 @@ using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("MenusV2", "Illustrates MenuV2")]
+[ScenarioMetadata ("Menus", "Illustrates MenuBar, Menu, and MenuItem")]
 [ScenarioCategory ("Controls")]
+[ScenarioCategory ("Menus")]
 [ScenarioCategory ("Shortcuts")]
-public class MenusV2 : Scenario
+public class Menus : Scenario
 {
     public override void Main ()
     {
@@ -36,52 +38,52 @@ public class MenusV2 : Scenario
         };
         eventLog.Border!.Thickness = new (0, 1, 0, 0);
 
-        TargetView targetView = new ()
+        MenuHost menuHostView = new ()
         {
-            Id = "targetView",
-            Title = "Target View",
+            Id = "menuHostView",
+            Title = $"Menu Host - Use {PopoverMenu.DefaultKey} for Popover Menu",
 
-            X = 5,
-            Y = 5,
-            Width = Dim.Fill (2)! - Dim.Width (eventLog),
-            Height = Dim.Fill (2),
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill ()! - Dim.Width (eventLog),
+            Height = Dim.Fill (),
             BorderStyle = LineStyle.Dotted
         };
-        app.Add (targetView);
+        app.Add (menuHostView);
 
-        targetView.CommandNotBound += (o, args) =>
+        menuHostView.CommandNotBound += (o, args) =>
                                       {
-                                          if (args.Cancel)
+                                          if (o is not View sender || args.Cancel)
                                           {
                                               return;
                                           }
 
-                                          Logging.Trace ($"targetView CommandNotBound: {args?.Context?.Command}");
-                                          eventSource.Add ($"targetView CommandNotBound: {args?.Context?.Command}");
+                                          Logging.Trace ($"{sender.Id} CommandNotBound: {args?.Context?.Command}");
+                                          eventSource.Add ($"{sender.Id} CommandNotBound: {args?.Context?.Command}");
                                           eventLog.MoveDown ();
                                       };
 
-        targetView.Accepting += (o, args) =>
+        menuHostView.Accepting += (o, args) =>
                                 {
-                                    if (args.Cancel)
+                                    if (o is not View sender || args.Cancel)
                                     {
                                         return;
                                     }
 
-                                    Logging.Trace ($"targetView Accepting: {args?.Context?.Source?.Title}");
-                                    eventSource.Add ($"targetView Accepting: {args?.Context?.Source?.Title}: ");
+                                    Logging.Trace ($"{sender.Id} Accepting: {args?.Context?.Source?.Title}");
+                                    eventSource.Add ($"{sender.Id} Accepting: {args?.Context?.Source?.Title}: ");
                                     eventLog.MoveDown ();
                                 };
 
-        targetView.FilePopoverMenu!.Accepted += (o, args) =>
+        menuHostView.DemoPopoverMenu!.Accepted += (o, args) =>
                                                 {
-                                                    if (args.Cancel)
+                                                    if (o is not View sender || args.Cancel)
                                                     {
                                                         return;
                                                     }
 
-                                                    Logging.Trace ($"FilePopoverMenu Accepted: {args?.Context?.Source?.Text}");
-                                                    eventSource.Add ($"FilePopoverMenu Accepted: {args?.Context?.Source?.Text}: ");
+                                                    Logging.Trace ($"{sender.Id} Accepted: {args?.Context?.Source?.Text}");
+                                                    eventSource.Add ($"{sender.Id} Accepted: {args?.Context?.Source?.Text}: ");
                                                     eventLog.MoveDown ();
                                                 };
 
@@ -92,9 +94,12 @@ public class MenusV2 : Scenario
         Application.Shutdown ();
     }
 
-    public class TargetView : View
+    /// <summary>
+    ///     A demo view class that contains a menu bar and a popover menu.
+    /// </summary>
+    public class MenuHost : View
     {
-        internal PopoverMenu? FilePopoverMenu { get; }
+        internal PopoverMenu? DemoPopoverMenu { get; }
 
         private CheckBox? _enableOverwriteCb;
         private CheckBox? _autoSaveCb;
@@ -104,17 +109,16 @@ public class MenusV2 : Scenario
 
         private ColorPicker? _menuBgColorCp;
 
-        public TargetView ()
+        public MenuHost ()
         {
             CanFocus = true;
-            Text = "TargetView";
             BorderStyle = LineStyle.Dashed;
 
             AddCommand (
                         Command.Context,
                         ctx =>
                         {
-                            FilePopoverMenu?.MakeVisible ();
+                            DemoPopoverMenu?.MakeVisible ();
 
                             return true;
                         });
@@ -166,49 +170,6 @@ public class MenusV2 : Scenario
 
             HotKeyBindings.Add (Key.W.WithCtrl, Command.EnableOverwrite);
 
-            var fileMenu = new Menuv2
-            {
-                Id = "fileMenu"
-            };
-            ConfigureFileMenu (fileMenu);
-
-            var optionsSubMenu = new Menuv2
-            {
-                Id = "optionsSubMenu",
-                Visible = false
-            };
-            ConfigureOptionsSubMenu (optionsSubMenu);
-
-            var optionsSubMenuItem = new MenuItemv2 (this, Command.NotBound, "O_ptions", "File options", optionsSubMenu);
-            fileMenu.Add (optionsSubMenuItem);
-
-            var detailsSubMenu = new Menuv2
-            {
-                Id = "detailsSubMenu",
-                Visible = false
-            };
-            ConfigureDetialsSubMenu (detailsSubMenu);
-
-            var detailsSubMenuItem = new MenuItemv2 (this, Command.NotBound, "_Details", "File details", detailsSubMenu);
-            fileMenu.Add (detailsSubMenuItem);
-
-            var moreDetailsSubMenu = new Menuv2
-            {
-                Id = "moreDetailsSubMenu",
-                Visible = false
-            };
-            ConfigureMoreDetailsSubMenu (moreDetailsSubMenu);
-
-            var moreDetailsSubMenuItem = new MenuItemv2 (this, Command.NotBound, "_More Details", "More details", moreDetailsSubMenu);
-            detailsSubMenu.Add (moreDetailsSubMenuItem);
-
-            FilePopoverMenu = new (fileMenu)
-            {
-                Id = "FilePopoverMenu"
-            };
-
-            MenuBarItemv2 fileMenuRootItem = new ("_File", FilePopoverMenu);
-
             AddCommand (Command.Cut, HandleCommand);
             HotKeyBindings.Add (Key.X.WithCtrl, Command.Cut);
 
@@ -221,27 +182,17 @@ public class MenusV2 : Scenario
             AddCommand (Command.SelectAll, HandleCommand);
             HotKeyBindings.Add (Key.T.WithCtrl, Command.SelectAll);
 
-            Add (new MenuBarv2 (
-                                [
-                                    fileMenuRootItem,
-                                    new MenuBarItemv2 (
-                                                       "_Edit",
-                                                       [
-                                                           new MenuItemv2 (this, Command.Cut),
-                                                           new MenuItemv2 (this, Command.Copy),
-                                                           new MenuItemv2 (this, Command.Paste),
-                                                           new Line (),
-                                                           new MenuItemv2 (this, Command.SelectAll)
-                                                       ]
-                                                      ),
-                                    new MenuBarItemv2 (this, Command.NotBound, "_Help")
-                                    {
-                                        Key = Key.F1,
-                                        Action = () => { MessageBox.Query ("Help", "This is the help...", "_Ok"); }
-                                    }
-                                ]
-                               )
-                 );
+            DemoPopoverMenu = new ()
+            {
+                Id = "FilePopoverMenu"
+            };
+            DemoPopoverMenu.EnableForDesign ();
+            DemoPopoverMenu.Visible = false;
+
+            MenuBarv2 menuBar = new MenuBarv2 ();
+            menuBar.EnableForDesign ();
+
+            base.Add (menuBar);
 
             Label lastAcceptedLabel = new ()
             {
@@ -267,9 +218,30 @@ public class MenusV2 : Scenario
                 Y = Pos.Bottom (lastAcceptedLabel)
             };
 
-            autoSaveStatusCb.CheckedStateChanged += (sender, args) => { _autoSaveCb!.CheckedState = autoSaveStatusCb.CheckedState; };
+            autoSaveStatusCb.CheckedStateChanged += (sender, args) =>
+                                                    {
+                                                        if (menuBar.GetMenuItemsWithId ("AutoSave").FirstOrDefault ()?.CommandView is CheckBox checkBox)
+                                                        {
+                                                            checkBox.CheckedState = autoSaveStatusCb.CheckedState;
+                                                        }
+                                                    };
 
             Add (autoSaveStatusCb);
+
+            Accepting += (o, args) =>
+                                         {
+                                             lastAcceptedText.Text = args?.Context?.Source?.Title!;
+
+                                             if (args?.Context?.Source is MenuItemv2 mi)
+                                             {
+                                                 if (mi.CommandView == menuBar.GetMenuItemsWithId ("AutoSave").FirstOrDefault ()?.CommandView)
+                                                 {
+                                                     autoSaveStatusCb.CheckedState = ((CheckBox)mi.CommandView).CheckedState;
+                                                     // Set Cancel to true to stop propagation of Accepting to superview
+                                                     // args.Cancel = true;
+                                                 }
+                                             }
+                                         };
 
             CheckBox enableOverwriteStatusCb = new ()
             {
@@ -310,7 +282,7 @@ public class MenusV2 : Scenario
             Application.KeyBindings.Add (Key.F9, this, Command.Edit);
 
 
-            FilePopoverMenu!.Accepted += (o, args) =>
+            DemoPopoverMenu!.Accepted += (o, args) =>
                                          {
                                              lastAcceptedText.Text = args?.Context?.Source?.Title!;
 
@@ -320,9 +292,9 @@ public class MenusV2 : Scenario
                                              }
                                          };
 
-            FilePopoverMenu!.VisibleChanged += (sender, args) =>
+            DemoPopoverMenu!.VisibleChanged += (sender, args) =>
                                                {
-                                                   if (FilePopoverMenu!.Visible)
+                                                   if (DemoPopoverMenu!.Visible)
                                                    {
                                                        lastCommandText.Text = string.Empty;
                                                    }
@@ -349,159 +321,6 @@ public class MenusV2 : Scenario
             }
         }
 
-        private void ConfigureFileMenu (Menuv2 menu)
-        {
-            var newFile = new MenuItemv2
-            {
-                Command = Command.New,
-                TargetView = this
-            };
-
-            var openFile = new MenuItemv2
-            {
-                Command = Command.Open,
-                TargetView = this
-            };
-
-            var saveFile = new MenuItemv2
-            {
-                Command = Command.Save,
-                TargetView = this
-            };
-
-            var saveFileAs = new MenuItemv2 (this, Command.SaveAs);
-
-            menu.Add (newFile, openFile, saveFile, saveFileAs, new Line ());
-        }
-
-        private void ConfigureOptionsSubMenu (Menuv2 menu)
-        {
-            // This is an example of a menu item with a checkbox that is NOT
-            // bound to a Command. The PopoverMenu will raise Accepted when Alt-U is pressed.
-            // The checkbox state will automatically toggle each time Alt-U is pressed beacuse
-            // the MenuItem actaully gets the key events.
-            var autoSave = new MenuItemv2
-            {
-                Title = "_Auto Save",
-                Text = "(no Command)",
-                Key = Key.F10
-            };
-
-            autoSave.CommandView = _autoSaveCb = new ()
-            {
-                Title = autoSave.Title,
-                HighlightStyle = HighlightStyle.None,
-                CanFocus = false
-            };
-
-            // This is an example of a MenuItem with a checkbox that is bound to a command.
-            // When the key bound to Command.EntableOverwrite is pressed, InvokeCommand will invoke it 
-            // on targetview, and thus the MenuItem will never see the key event. 
-            // Because of this, the check box will not automatically track the state.
-            var enableOverwrite = new MenuItemv2
-            {
-                Title = "Enable _Overwrite",
-                Text = "Overwrite",
-                Command = Command.EnableOverwrite,
-                TargetView = this
-            };
-
-            enableOverwrite.CommandView = _enableOverwriteCb = new ()
-            {
-                Title = enableOverwrite.Title,
-                HighlightStyle = HighlightStyle.None,
-                CanFocus = false
-            };
-
-            _enableOverwriteCb.Accepting += (sender, args) => args.Cancel = true;
-
-            var mutuallyExclusiveOptions = new MenuItemv2
-            {
-                HelpText = "3 Mutually Exclusive Options",
-                Key = Key.F7
-            };
-
-            mutuallyExclusiveOptions.CommandView = _mutuallyExclusiveOptionsRg = new RadioGroup ()
-            {
-                RadioLabels = [ "G_ood", "_Bad", "U_gly" ]
-            };
-
-            var menuBGColor = new MenuItemv2
-            {
-                HelpText = "Menu BG Color",
-                Key = Key.F8,
-            };
-
-            menuBGColor.CommandView = _menuBgColorCp = new ColorPicker() 
-            {
-                Width = 30
-            };
-
-            _menuBgColorCp.ColorChanged += (sender, args) =>
-                                           {
-                                               menu.ColorScheme = menu.ColorScheme! with
-                                               {
-                                                   Normal = new (menu.ColorScheme.Normal.Foreground, args.CurrentValue)
-                                               };
-                                           };
-
-            menu.Add (autoSave, enableOverwrite, new Line (), mutuallyExclusiveOptions, new Line (), menuBGColor);
-        }
-
-        private void ConfigureDetialsSubMenu (Menuv2 menu)
-        {
-            var shortcut2 = new MenuItemv2
-            {
-                Title = "_Detail 1",
-                Text = "Some detail #1"
-            };
-
-            var shortcut3 = new MenuItemv2
-            {
-                Title = "_Three",
-                Text = "The 3rd item"
-            };
-
-            var editMode = new MenuItemv2
-            {
-                Title = "E_dit Mode",
-                Text = "App binding to Command.Edit",
-                Command = Command.Edit,
-            };
-
-            editMode.CommandView = _editModeCb = new CheckBox
-            {
-                Title = editMode.Title,
-                HighlightStyle = HighlightStyle.None,
-                CanFocus = false
-            };
-
-            // This ensures the checkbox state toggles when the hotkey of Title is pressed.
-            //shortcut4.Accepting += (sender, args) => args.Cancel = true;
-
-            menu.Add (shortcut2, shortcut3, new Line (), editMode);
-        }
-
-        private void ConfigureMoreDetailsSubMenu (Menuv2 menu)
-        {
-            var deeperDetail = new MenuItemv2
-            {
-                Title = "_Deeper Detail",
-                Text = "Deeper Detail",
-                Action = () => { MessageBox.Query ("Deeper Detail", "Lots of details", "_Ok"); }
-            };
-
-            var shortcut4 = new MenuItemv2
-            {
-                Title = "_Third",
-                Text = "Below the line"
-            };
-
-            // This ensures the checkbox state toggles when the hotkey of Title is pressed.
-            //shortcut4.Accepting += (sender, args) => args.Cancel = true;
-
-            menu.Add (deeperDetail, new Line (), shortcut4);
-        }
     }
 
     private const string LOGFILE_LOCATION = "./logs";

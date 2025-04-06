@@ -555,7 +555,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     }
 
     /// <inheritdoc/>
-    public bool EnableForDesign<TContext> (ref readonly TContext context) where TContext : notnull
+    public bool EnableForDesign ()
     {
         Root = new (
                     [
