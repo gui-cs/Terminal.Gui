@@ -193,6 +193,11 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             toplevel.EndInit (); // Calls Layout
         }
 
+        // Call ConfigurationManager Apply here to ensure all subscribers to ConfigurationManager.Applied
+        // can update their state appropriately.
+        // BUGBUG: DO NOT DO THIS. Leave this commented out until we can figure out how to do this right
+        //Apply ();
+
         // Try to set initial focus to any TabStop
         if (!toplevel.HasFocus)
         {

@@ -57,6 +57,7 @@ public class ApplicationV2Tests
     [Fact]
     public void TestInit_ExplicitlyRequestWin ()
     {
+        Assert.Null (Application.Driver);
         var netInput = new Mock<INetInput> (MockBehavior.Strict);
         var netOutput = new Mock<IConsoleOutput> (MockBehavior.Strict);
         var winInput = new Mock<IWindowsInput> (MockBehavior.Strict);
@@ -157,6 +158,7 @@ public class ApplicationV2Tests
     [Fact]
     public void Test_NoInitThrowOnRun ()
     {
+        Assert.Null (Application.Driver);
         var app = NewApplicationV2();
 
         var ex = Assert.Throws<NotInitializedException> (() => app.Run (new Window ()));

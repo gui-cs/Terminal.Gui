@@ -121,6 +121,7 @@ public partial class View // Adornments
     /// </remarks>
     public Border? Border { get; private set; }
 
+    // TODO: Make BorderStyle nullable https://github.com/gui-cs/Terminal.Gui/issues/4021
     /// <summary>Gets or sets whether the view has a one row/col thick border.</summary>
     /// <remarks>
     ///     <para>
@@ -148,44 +149,11 @@ public partial class View // Adornments
                 return;
             }
 
-            LineStyle old = Border?.LineStyle ?? LineStyle.None;
-
-            // It's tempting to try to optimize this by checking that old != value and returning.
-            // Do not.
-
-            CancelEventArgs<LineStyle> e = new (ref old, ref value);
-
-            if (OnBorderStyleChanging (e) || e.Cancel)
-            {
-                return;
-            }
-
-            BorderStyleChanging?.Invoke (this, e);
-
-            if (e.Cancel)
-            {
-                return;
-            }
-
-            SetBorderStyle (e.NewValue);
+            SetBorderStyle (value);
             OnBorderStyleChanged ();
-            BorderStyleChanged?.Invoke(this, EventArgs.Empty);
+            BorderStyleChanged?.Invoke (this, EventArgs.Empty);
         }
     }
-
-    /// <summary>
-    ///     Called when the <see cref="BorderStyle"/> is changing.
-    /// </summary>
-    /// <remarks>
-    ///     Set e.Cancel to true to prevent the <see cref="BorderStyle"/> from changing.
-    /// </remarks>
-    /// <param name="e"></param>
-    protected virtual bool OnBorderStyleChanging (CancelEventArgs<LineStyle> e) { return false; }
-
-    /// <summary>
-    ///     Fired when the <see cref="BorderStyle"/> is changing. Allows the event to be cancelled.
-    /// </summary>
-    public event EventHandler<CancelEventArgs<LineStyle>>? BorderStyleChanging;
 
     /// <summary>
     ///     Called when the <see cref="BorderStyle"/> has changed.

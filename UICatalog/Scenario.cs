@@ -84,8 +84,6 @@ namespace UICatalog;
 public class Scenario : IDisposable
 {
     private static int _maxScenarioNameLen = 30;
-    public string TopLevelColorScheme { get; set; } = "Base";
-
     public BenchmarkResults BenchmarkResults
     {
         get { return _benchmarkResults; }

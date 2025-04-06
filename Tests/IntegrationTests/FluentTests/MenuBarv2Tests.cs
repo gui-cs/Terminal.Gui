@@ -12,7 +12,7 @@ public class MenuBarv2Tests
 {
     private readonly TextWriter _out;
 
-    public MenuBarv2Tests (ITestOutputHelper outputHelper) { _out = new BasicFluentAssertionTests.TestOutputWriter (outputHelper); }
+    public MenuBarv2Tests (ITestOutputHelper outputHelper) { _out = new TestOutputWriter (outputHelper); }
 
     [Theory]
     [ClassData (typeof (V2TestDrivers))]
