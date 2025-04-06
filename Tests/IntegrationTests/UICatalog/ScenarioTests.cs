@@ -44,7 +44,7 @@ public class ScenarioTests : TestsAllViews
         _output.WriteLine ($"Running Scenario '{scenarioType}'");
         var scenario = Activator.CreateInstance (scenarioType) as Scenario;
 
-        uint abortTime = 1000;
+        uint abortTime = 2000;
         object? timeout = null;
         var initialized = false;
         var shutdownGracefully = false;

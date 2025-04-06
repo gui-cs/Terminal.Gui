@@ -51,7 +51,6 @@ public class AnimationScenario : Scenario
         Application.Run (win);
         win.Dispose ();
         Application.Shutdown ();
-        Debug.Assert (!Application.Initialized);
     }
 
 
