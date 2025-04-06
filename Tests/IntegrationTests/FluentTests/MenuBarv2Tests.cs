@@ -24,7 +24,7 @@ public class MenuBarv2Tests
                                             {
                                                 // Create a menu bar with no items
                                                 var menuBar = new MenuBarv2 ();
-                                                Assert.Equal (0, menuBar.SubViews.Count);
+                                                Assert.Empty (menuBar.SubViews);
                                                 Assert.False (menuBar.CanFocus);
                                                 Assert.Equal (Orientation.Horizontal, menuBar.Orientation);
                                                 Assert.Equal (Key.F9, MenuBarv2.DefaultKey);
@@ -183,7 +183,7 @@ public class MenuBarv2Tests
                                                 Assert.True (menuBar.IsActive ());
 
                                                 // Test if we can hide the popover menu
-                                                fileMenuItem.PopoverMenu.Visible = true;
+                                                fileMenuItem.PopoverMenu!.Visible = true;
 
                                                 Assert.True (menuBar.HideActiveItem ());
 
@@ -205,7 +205,7 @@ public class MenuBarv2Tests
                                             () =>
                                             {
                                                 var menuBar = new MenuBarv2 ();
-                                                Application.Top.Add (menuBar);
+                                                Application.Top!.Add (menuBar);
 
                                                 // Call EnableForDesign
                                                 bool result = menuBar.EnableForDesign ();
