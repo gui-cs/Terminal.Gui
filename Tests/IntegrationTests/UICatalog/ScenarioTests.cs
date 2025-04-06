@@ -44,11 +44,12 @@ public class ScenarioTests : TestsAllViews
         _output.WriteLine ($"Running Scenario '{scenarioType}'");
         var scenario = Activator.CreateInstance (scenarioType) as Scenario;
 
-        uint abortTime = 3000;
+        uint abortTime = 1000;
         object? timeout = null;
         var initialized = false;
-        var shutdown = false;
+        var shutdownGracefully = false;
         var iterationCount = 0;
+        Key quitKey = Application.QuitKey;
 
         Application.InitializedChanged += OnApplicationOnInitializedChanged;
 
@@ -69,7 +70,9 @@ public class ScenarioTests : TestsAllViews
         }
 
         Assert.True (initialized);
-        Assert.True (shutdown);
+
+
+        Assert.True (shutdownGracefully, $"Scenario Failed to Quit with {quitKey} after {abortTime}ms and {iterationCount} iterations. Force quit.");
 
 #if DEBUG_IDISPOSABLE
         Assert.Empty (View.Instances);
@@ -101,10 +104,10 @@ public class ScenarioTests : TestsAllViews
             else
             {
                 Application.Iteration -= OnApplicationOnIteration;
-                shutdown = true;
+                shutdownGracefully = true;
             }
 
-            _output.WriteLine ($"Initialized == {a.CurrentValue}");
+            _output.WriteLine ($"Initialized == {a.CurrentValue}; shutdownGracefully == {shutdownGracefully}.");
         }
 
         // If the scenario doesn't close within abortTime ms, this will force it to quit
@@ -118,16 +121,11 @@ public class ScenarioTests : TestsAllViews
                 }
             }
 
-
             // Restore the configuration locations
             ConfigurationManager.Locations = savedConfigLocations;
             ConfigurationManager.Reset ();
 
             Application.ResetState (true);
-
-            Assert.Fail (
-                         $"Scenario Failed to Quit with {Application.QuitKey} after {abortTime}ms and {iterationCount} iterations. Force quit.");
-
 
             return false;
         }
@@ -139,8 +137,9 @@ public class ScenarioTests : TestsAllViews
             if (Application.Initialized)
             {
                 // Press QuitKey 
-                _output.WriteLine ($"Attempting to quit with {Application.QuitKey}");
-                Application.RaiseKeyDownEvent (Application.QuitKey);
+                quitKey = Application.QuitKey;
+                _output.WriteLine ($"Attempting to quit with {quitKey} after {iterationCount} iterations.");
+                Application.RaiseKeyDownEvent (quitKey);
             }
         }
     }
