@@ -736,6 +736,11 @@ public partial class View // Mouse APIs
             {
                 _savedHighlightColorScheme = _colorScheme;
 
+                if (ColorScheme is null)
+                {
+                    return false;
+                }
+
                 if (CanFocus)
                 {
                     var cs = new ColorScheme (ColorScheme)
@@ -763,12 +768,9 @@ public partial class View // Mouse APIs
         if (args.NewValue == HighlightStyle.None)
         {
             // Unhighlight
-            //if (_savedHighlightColorScheme is { })
-            {
-                _colorScheme = _savedHighlightColorScheme;
-                _savedHighlightColorScheme = null;
-                SetNeedsDraw ();
-            }
+            _colorScheme = _savedHighlightColorScheme;
+            _savedHighlightColorScheme = null;
+            SetNeedsDraw ();
         }
 
         return false;

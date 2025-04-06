@@ -61,7 +61,7 @@ public class HexEditor : Scenario
                          new ("_New", "", New),
                          new ("_Open", "", Open),
                          new ("_Save", "", Save),
-                         null,
+                         null!,                     // Passing null automatically creates a separator (a Line object).
                          new ("_Quit", "", Quit)
                      }
                     ),
