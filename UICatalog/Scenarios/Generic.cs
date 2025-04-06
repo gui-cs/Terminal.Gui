@@ -33,9 +33,9 @@ public sealed class Generic : Scenario
         };
         button.ColorScheme = Colors.ColorSchemes ["Error"];
 
-        button.Padding.Thickness = new (1);
+        button.Padding!.Thickness = new (1);
         button.Padding.ColorScheme = Colors.ColorSchemes ["Toplevel"];
-        button.Margin.Thickness = new (1);
+        button.Margin!.Thickness = new (1);
 
         button.Accepting += (s, e) =>
                             {
