@@ -109,16 +109,21 @@ public partial class View // Mouse APIs
         return false;
     }
 
-    public ColorScheme GetHighlightColorScheme ()
+    /// <summary>
+    ///     Gets the <see cref="ColorScheme"/> to use when the view is highlighted. The highlight colorscheme
+    ///     is based on the current <see cref="ColorScheme"/>, using <see cref="Color.GetHighlightColor()"/>.
+    /// </summary>
+    /// <remarks>The highlight color scheme.</remarks>
+    public ColorScheme? GetHighlightColorScheme ()
     {
-        ColorScheme? cs = _colorScheme ?? SuperView!.ColorScheme;
+        ColorScheme? cs = _colorScheme ?? SuperView?.ColorScheme ?? new ColorScheme ();
 
         return cs with
         {
-            Normal = new (GetNormalColor().Foreground.GetHighlightColor (), GetNormalColor ().Background),
-            HotNormal = new (GetHotNormalColor ().Foreground.GetHighlightColor (), GetHotNormalColor().Background),
-            Focus = new (GetFocusColor().Foreground.GetHighlightColor (), GetFocusColor().Background),
-            HotFocus = new (GetHotFocusColor().Foreground.GetHighlightColor (), GetHotFocusColor().Background)
+            Normal = new (GetNormalColor ().Foreground.GetHighlightColor (), GetNormalColor ().Background),
+            HotNormal = new (GetHotNormalColor ().Foreground.GetHighlightColor (), GetHotNormalColor ().Background),
+            Focus = new (GetFocusColor ().Foreground.GetHighlightColor (), GetFocusColor ().Background),
+            HotFocus = new (GetHotFocusColor ().Foreground.GetHighlightColor (), GetHotFocusColor ().Background)
         };
     }
 
@@ -209,7 +214,7 @@ public partial class View // Mouse APIs
             var hover = HighlightStyle.None;
             RaiseHighlight (new (ref copy, ref hover));
 
-           // if (_savedNonHoverColorScheme is { })
+            // if (_savedNonHoverColorScheme is { })
             {
                 _colorScheme = _savedNonHoverColorScheme;
                 _savedNonHoverColorScheme = null;
@@ -784,7 +789,7 @@ public partial class View // Mouse APIs
         View? start = Application.Top;
 
         // PopoverHost - If visible, start with it instead of Top
-        if (Application.Popover?.GetActivePopover () is View {Visible: true } visiblePopover && !ignoreTransparent)
+        if (Application.Popover?.GetActivePopover () is View { Visible: true } visiblePopover && !ignoreTransparent)
         {
             start = visiblePopover;
 
@@ -796,7 +801,7 @@ public partial class View // Mouse APIs
 
         while (start is { Visible: true } && start.Contains (currentLocation))
         {
-            if (!start.ViewportSettings.HasFlag(ViewportSettings.TransparentMouse))
+            if (!start.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
             {
                 viewsUnderMouse.Add (start);
             }
