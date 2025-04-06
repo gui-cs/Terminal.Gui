@@ -516,7 +516,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     public static bool RunIteration (ref RunState state, bool firstIteration = false)
     {
         // If the driver has events pending do an iteration of the driver MainLoop
-        if (MainLoop is { } && MainLoop.Running && MainLoop.EventsPending ())
+        if (MainLoop is { Running: true } && MainLoop.EventsPending ())
         {
             // Notify Toplevel it's ready
             if (firstIteration)
@@ -540,7 +540,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         if (PositionCursor ())
         {
-            Driver!.UpdateCursor ();
+            Driver?.UpdateCursor ();
         }
 
         return firstIteration;
