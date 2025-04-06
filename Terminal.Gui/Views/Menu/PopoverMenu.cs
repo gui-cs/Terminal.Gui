@@ -19,8 +19,12 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// </summary>
     public PopoverMenu () : this ((Menuv2?)null) { }
 
-    /// <inheritdoc/>
-    public PopoverMenu (IEnumerable<View>? menuItems) : this (new Menuv2 (menuItems)) { }
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PopoverMenu"/> class. If any of the elements of
+    ///     <paramref name="menuItems"/> is <see langword="null"/>,
+    ///     a see <see cref="Line"/> will be created instead.
+    /// </summary>
+    public PopoverMenu (IEnumerable<View>? menuItems) : this (new Menuv2 (menuItems?.Select (item => item ?? new Line ()))) { }
 
     /// <inheritdoc/>
     public PopoverMenu (IEnumerable<MenuItemv2>? menuItems) : this (new Menuv2 (menuItems)) { }

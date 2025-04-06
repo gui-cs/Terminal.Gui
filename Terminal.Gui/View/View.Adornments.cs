@@ -134,7 +134,7 @@ public partial class View // Adornments
     ///         <see cref="Adornment.Thickness"/> to `0` and <see cref="BorderStyle"/> to <see cref="LineStyle.None"/>.
     ///     </para>
     ///     <para>
-    ///         Calls <see cref="OnBorderStyleChanging"/> and raises <see cref="BorderStyleChanging"/>, which allows change
+    ///         Raises <see cref="OnBorderStyleChanged"/> and raises <see cref="BorderStyleChanged"/>, which allows change
     ///         to be cancelled.
     ///     </para>
     ///     <para>For more advanced customization of the view's border, manipulate see <see cref="Border"/> directly.</para>

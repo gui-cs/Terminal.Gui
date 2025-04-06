@@ -1,5 +1,7 @@
 ﻿namespace Terminal.Gui;
 
+#pragma warning disable CS0618 // Type or member is obsolete
+
 /// <summary>
 ///     An <see cref="EventArgs"/> which allows passing a cancelable menu opening event or replacing with a new
 ///     <see cref="MenuBarItem"/>.
