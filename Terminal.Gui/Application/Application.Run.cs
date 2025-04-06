@@ -494,7 +494,10 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             firstIteration = RunIteration (ref state, firstIteration);
         }
 
-        MainLoop!.Running = false;
+        if (MainLoop is { })
+        {
+            MainLoop.Running = false;
+        }
 
         // Run one last iteration to consume any outstanding input events from Driver
         // This is important for remaining OnKeyUp events.
