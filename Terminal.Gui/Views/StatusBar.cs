@@ -1,5 +1,4 @@
-using System;
-using System.Reflection;
+#nullable enable
 
 namespace Terminal.Gui;
 
@@ -134,7 +133,7 @@ public class StatusBar : Bar, IDesignable
             Text = "I'll Hide",
             // Visible = false
         };
-        button1.Accepting += Button_Clicked;
+        button1.Accepting += OnButtonClicked;
         Add (button1);
 
         shortcut.Accepting += (s, e) =>
@@ -161,7 +160,7 @@ public class StatusBar : Bar, IDesignable
 
         return true;
 
-        void Button_Clicked (object sender, EventArgs e) { MessageBox.Query ("Hi", $"You clicked {sender}"); }
+        void OnButtonClicked (object? sender, EventArgs? e) { MessageBox.Query ("Hi", $"You clicked {sender}"); }
     }
 
     /// <inheritdoc />
