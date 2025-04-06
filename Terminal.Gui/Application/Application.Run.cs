@@ -484,7 +484,10 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         for (state.Toplevel.Running = true; state.Toplevel?.Running == true;)
         {
-            MainLoop!.Running = true;
+            if (MainLoop is { })
+            {
+                MainLoop.Running = true;
+            }
 
             if (EndAfterFirstIteration && !firstIteration)
             {
@@ -513,7 +516,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     public static bool RunIteration (ref RunState state, bool firstIteration = false)
     {
         // If the driver has events pending do an iteration of the driver MainLoop
-        if (MainLoop!.Running && MainLoop.EventsPending ())
+        if (MainLoop is { } && MainLoop.Running && MainLoop.EventsPending ())
         {
             // Notify Toplevel it's ready
             if (firstIteration)
