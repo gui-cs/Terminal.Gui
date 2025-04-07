@@ -160,6 +160,13 @@ public class Menus : Scenario
             AddCommand (Command.SaveAs, HandleCommand);
             HotKeyBindings.Add (Key.A.WithCtrl, Command.SaveAs);
 
+            AddCommand (Command.Quit, () =>
+                                      {
+                                          Application.RequestStop ();
+                                          return true;
+                                      });
+            HotKeyBindings.Add (Application.QuitKey, Command.Quit);
+
             AddCommand (Command.Cut, HandleCommand);
             HotKeyBindings.Add (Key.X.WithCtrl, Command.Cut);
 
@@ -177,7 +184,6 @@ public class Menus : Scenario
             // BUGBUG: updated after the MenuBar is created.
             Application.KeyBindings.Remove (Key.F5);
             Application.KeyBindings.Add (Key.F5, this, Command.Edit);
-
 
             DemoPopoverMenu = new ()
             {

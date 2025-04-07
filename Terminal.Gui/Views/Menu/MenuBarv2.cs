@@ -505,7 +505,7 @@ public class MenuBarv2 : Menuv2, IDesignable
                                                                  )
                                                },
                                                new Line (),
-                                               new MenuItemv2 (this, Command.Quit)
+                                               new MenuItemv2 (context as View, Command.Quit)
                                            ]
                                           )
                        );
