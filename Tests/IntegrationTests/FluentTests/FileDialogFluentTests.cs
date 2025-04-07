@@ -36,11 +36,28 @@ public class FileDialogFluentTests
 
     [Theory]
     [ClassData (typeof (V2TestDrivers))]
-    public void CancelFileDialog (V2TestDriver d)
+    public void CancelFileDialog_UsingEscape (V2TestDriver d)
     {
-        var sd = new SaveDialog ( CreateExampleFileSystem ())
-            { };
-        With.A (sd, 50, 10, d)
-            .ScreenShot ("Save dialog",_out);
+        var sd = new SaveDialog ( CreateExampleFileSystem ());
+        using var c = With.A (sd, 100, 20, d)
+            .ScreenShot ("Save dialog",_out)
+            .Escape()
+            .Stop ();
+
+        Assert.True (sd.Canceled);
+    }
+
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void CancelFileDialog_UsingCancelButton (V2TestDriver d)
+    {
+        var sd = new SaveDialog (CreateExampleFileSystem ());
+        using var c = With.A (sd, 100, 20, d)
+                          .ScreenShot ("Save dialog", _out)
+                          .Focus <Button>(b=> b.Text == "_Cancel")
+                          .Enter ()
+                          .Stop ();
+
+        Assert.True (sd.Canceled);
     }
 }

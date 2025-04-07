@@ -103,6 +103,8 @@ public class FileDialog : Dialog, IDesignable
                                         return;
                                     }
 
+                                    e.Cancel = true;
+
                                     if (Modal)
                                     {
                                         Application.RequestStop ();

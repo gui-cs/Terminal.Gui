@@ -471,6 +471,75 @@ public class GuiTestContext : IDisposable
         return this;
     }
 
+
+    /// <summary>
+    /// Simulates pressing the Esc (Escape) key.
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    public GuiTestContext Escape ()
+    {
+        switch (_driver)
+        {
+            case V2TestDriver.V2Win:
+                SendWindowsKey (
+                                new WindowsConsole.KeyEventRecord
+                                {
+                                    UnicodeChar = '\u001b',
+                                    dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed,
+                                    wRepeatCount = 1,
+                                    wVirtualKeyCode = ConsoleKeyMapping.VK.ESCAPE,
+                                    wVirtualScanCode = 1
+                                });
+                break;
+            case V2TestDriver.V2Net:
+
+                // Note that this accurately describes how Esc comes in. Typically, ConsoleKey is None
+                // even though you would think it would be Escape - it isn't
+                SendNetKey (new ('\u001b', ConsoleKey.None, false, false, false));
+                break;
+            default:
+                throw new ArgumentOutOfRangeException ();
+        }
+
+        return this;
+    }
+
+
+
+    /// <summary>
+    /// Simulates pressing the Tab key.
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    public GuiTestContext Tab ()
+    {
+        switch (_driver)
+        {
+            case V2TestDriver.V2Win:
+                SendWindowsKey (
+                                new WindowsConsole.KeyEventRecord
+                                {
+                                    UnicodeChar = '\t',
+                                    dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed,
+                                    wRepeatCount = 1,
+                                    wVirtualKeyCode = 0,
+                                    wVirtualScanCode = 0
+                                });
+                break;
+            case V2TestDriver.V2Net:
+
+                // Note that this accurately describes how Tab comes in. Typically, ConsoleKey is None
+                // even though you would think it would be Tab - it isn't
+                SendNetKey (new ('\t', ConsoleKey.None, false, false, false));
+                break;
+            default:
+                throw new ArgumentOutOfRangeException ();
+        }
+
+        return this;
+    }
+
     /// <summary>
     /// Registers a right click handler on the <see cref="LastView"/> added view (or root view) that
     /// will open the supplied <paramref name="contextMenu"/>.
@@ -591,5 +660,66 @@ public class GuiTestContext : IDisposable
         }
 
         return WaitIteration ();
+    }
+
+    /// <summary>
+    /// Tabs through the UI until a View matching the <paramref name="evaluator"/>
+    /// is found (of Type T) or all views are looped through (back to the beginning)
+    /// in which case triggers hard stop and Exception
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    public GuiTestContext Focus<T> (Func<T,bool> evaluator) where T:View
+    {
+        var t = Application.Top;
+
+        HashSet<View> seen = new ();
+
+        if (t == null)
+        {
+            Fail ("Application.Top was null when trying to set focus");
+            return this;
+        }
+
+        do
+        {
+            var next = t.MostFocused;
+
+            // Is view found?
+            if (next is T v && evaluator (v))
+            {
+                return this;
+            }
+
+            // No, try tab to the next (or first)
+            this.Tab ();
+            WaitIteration ();
+            next = t.MostFocused;
+
+            if (next is null)
+            {
+                Fail ("Failed to tab to a view which matched the Type and evaluator constraints of the test because MostFocused became or was always null");
+                return this;
+            }
+
+            // Track the views we have seen
+            // We have looped around to the start again if it was already there
+            if (!seen.Add (next))
+            {
+                Fail ("Failed to tab to a view which matched the Type and evaluator constraints of the test before looping back to the original View");
+
+                return this;
+            }
+
+        }
+        while (true);
+    }
+
+    private void Fail (string reason)
+    {
+        Stop ();
+
+        throw new Exception (reason);
+
     }
 }
