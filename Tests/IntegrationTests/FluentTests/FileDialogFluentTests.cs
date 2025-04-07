@@ -49,7 +49,7 @@ public class FileDialogFluentTests
 
     [Theory]
     [ClassData (typeof (V2TestDrivers))]
-    public void CancelFileDialog_UsingCancelButton (V2TestDriver d)
+    public void CancelFileDialog_UsingCancelButton_TabThenEnter (V2TestDriver d)
     {
         var sd = new SaveDialog (CreateExampleFileSystem ());
         using var c = With.A (sd, 100, 20, d)
