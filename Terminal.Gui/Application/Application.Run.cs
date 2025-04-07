@@ -484,7 +484,10 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         for (state.Toplevel.Running = true; state.Toplevel?.Running == true;)
         {
-            MainLoop!.Running = true;
+            if (MainLoop is { })
+            {
+                MainLoop.Running = true;
+            }
 
             if (EndAfterFirstIteration && !firstIteration)
             {
@@ -494,7 +497,10 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             firstIteration = RunIteration (ref state, firstIteration);
         }
 
-        MainLoop!.Running = false;
+        if (MainLoop is { })
+        {
+            MainLoop.Running = false;
+        }
 
         // Run one last iteration to consume any outstanding input events from Driver
         // This is important for remaining OnKeyUp events.
@@ -510,7 +516,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     public static bool RunIteration (ref RunState state, bool firstIteration = false)
     {
         // If the driver has events pending do an iteration of the driver MainLoop
-        if (MainLoop!.Running && MainLoop.EventsPending ())
+        if (MainLoop is { Running: true } && MainLoop.EventsPending ())
         {
             // Notify Toplevel it's ready
             if (firstIteration)
@@ -534,7 +540,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         if (PositionCursor ())
         {
-            Driver!.UpdateCursor ();
+            Driver?.UpdateCursor ();
         }
 
         return firstIteration;

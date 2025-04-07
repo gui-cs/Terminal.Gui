@@ -107,15 +107,13 @@ public class MenuBarv2 : Menuv2, IDesignable
         }
     }
 
-    private void OnConfigurationManagerApplied (object? sender, ConfigurationManagerEventArgs e)
-    {
-         BorderStyle = DefaultBorderStyle;
-    }
+    private void OnConfigurationManagerApplied (object? sender, ConfigurationManagerEventArgs e) { BorderStyle = DefaultBorderStyle; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnBorderStyleChanged ()
     {
         HideActiveItem ();
+
         return base.OnBorderStyleChanged ();
     }
 
@@ -361,51 +359,153 @@ public class MenuBarv2 : Menuv2, IDesignable
         return true;
     }
 
+    /// <summary>
+    ///     Gets all menu items with the specified id, anywhere in the menu hierarchy.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public IEnumerable<MenuItemv2> GetMenuItemsWithId(string id)
+    {
+        if (string.IsNullOrEmpty (id))
+        {
+            return null;
+        }
+        List<MenuItemv2> menuItems = new List<MenuItemv2> ();
+        foreach (MenuBarItemv2 mbi in SubViews.OfType<MenuBarItemv2> ())
+        {
+            if (mbi.PopoverMenu is { })
+            {
+                menuItems.AddRange (mbi.PopoverMenu.GetMenuItemsOfAllSubMenus ());
+            }
+        }
+        return menuItems.Where (mi => mi.Id == id);
+    }
+
     /// <inheritdoc/>
     public override bool EnableForDesign ()
     {
         // Note: This menu is used by unit tests. If you modify it, you'll likely have to update
         // unit tests.
+
+        MenuBarItemv2? fileMenu = null;
+
         var bordersCb = new CheckBox
         {
             Title = "_Borders",
             CheckedState = CheckState.Checked
         };
 
-        Add (
-             new MenuBarItemv2 (
-                                "_File",
-                                [
-                                    new MenuItemv2 (this, Command.New),
-                                    new MenuItemv2 (this, Command.Open),
-                                    new MenuItemv2 (this, Command.Save),
-                                    new MenuItemv2 (this, Command.SaveAs),
-                                    new Line (),
-                                    new MenuItemv2
-                                    {
-                                        Title = "_Preferences",
-                                        SubMenu = new (
-                                                       [
-                                                           new()
-                                                           {
-                                                               CommandView = bordersCb,
-                                                               HelpText = "Toggle Menu Borders",
-                                                               Action = ToggleMenuBorders
-                                                           },
-                                                           new()
-                                                           {
-                                                               Title = "_Settings...",
-                                                               HelpText = "More settings",
-                                                               Action = () => MessageBox.Query ("Settings", "This is the Settings Dialog\n", "_Ok", "_Cancel")
-                                                           }
-                                                       ]
-                                                      )
-                                    },
-                                    new Line (),
-                                    new MenuItemv2 (this, Command.Quit)
-                                ]
-                               )
-            );
+        var autoSaveCb = new CheckBox
+        {
+            Title = "_Auto Save"
+        };
+
+        var enableOverwriteCb = new CheckBox
+        {
+            Title = "Enable _Overwrite",
+            HighlightStyle = HighlightStyle.None,
+            CanFocus = false
+        };
+
+        var mutuallyExclusiveOptionsSelector = new OptionSelector
+        {
+            Options = ["G_ood", "_Bad", "U_gly"],
+            SelectedItem = 0
+        };
+
+        var menuBGColor = new MenuItemv2
+        {
+            HelpText = "Menu BG Color",
+            Key = Key.F8,
+        };
+
+        var menuBgColorCp = new ColorPicker ()
+        {
+            Width = 30
+        };
+
+        menuBgColorCp.ColorChanged += (sender, args) =>
+                                      {
+                                          ColorScheme = ColorScheme! with
+                                          {
+                                              Normal = new (ColorScheme.Normal.Foreground, args.CurrentValue)
+                                          };
+                                      };
+
+        fileMenu = Add (
+                        new MenuBarItemv2 (
+                                           "_File",
+                                           [
+                                               new MenuItemv2 (this, Command.New),
+                                               new MenuItemv2 (this, Command.Open),
+                                               new MenuItemv2 (this, Command.Save),
+                                               new MenuItemv2 (this, Command.SaveAs),
+                                               new Line (),
+                                               new MenuItemv2
+                                               {
+                                                   Title = "_File Options",
+                                                   SubMenu = new (
+                                                                  [
+                                                                      new ()
+                                                                      {
+                                                                          Id = "AutoSave",
+                                                                          Text = "(no Command)",
+                                                                          Key = Key.F10,
+                                                                          CommandView = autoSaveCb
+                                                                      },
+                                                                      new ()
+                                                                      {
+                                                                          Text = "Overwrite",
+                                                                          CommandView = enableOverwriteCb,
+                                                                          Command = Command.EnableOverwrite,
+                                                                          TargetView = this
+                                                                      },
+                                                                      new ()
+                                                                      {
+                                                                          Title = "_File Settings...",
+                                                                          HelpText = "More file settings",
+                                                                          Action = () => MessageBox.Query (
+                                                                                    "File Settings",
+                                                                                    "This is the File Settings Dialog\n",
+                                                                                    "_Ok",
+                                                                                    "_Cancel")
+                                                                      }
+                                                                  ]
+                                                                 )
+                                               },
+                                               new Line (),
+                                               new MenuItemv2
+                                               {
+                                                   Title = "_Preferences",
+                                                   SubMenu = new (
+                                                                  [
+                                                                      new MenuItemv2 ()
+                                                                      {
+                                                                          CommandView = bordersCb,
+                                                                          HelpText = "Toggle Menu Borders",
+                                                                          Action = ToggleMenuBorders
+                                                                      },
+                                                                      new MenuItemv2 ()
+                                                                      {
+                                                                          HelpText = "3 Mutually Exclusive Options",
+                                                                          CommandView = mutuallyExclusiveOptionsSelector,
+                                                                          Key = Key.F7
+                                                                      },
+                                                                      new Line (),
+                                                                      new MenuItemv2 ()
+                                                                      {
+                                                                          HelpText = "MenuBar BG Color",
+                                                                          CommandView = menuBgColorCp,
+                                                                          Key = Key.F8,
+                                                                      }
+                                                                  ]
+                                                                 )
+                                               },
+                                               new Line (),
+                                               new MenuItemv2 (this, Command.Quit)
+                                           ]
+                                          )
+                       ) as MenuBarItemv2;
 
         Add (
              new MenuBarItemv2 (
@@ -415,7 +515,13 @@ public class MenuBarv2 : Menuv2, IDesignable
                                     new MenuItemv2 (this, Command.Copy),
                                     new MenuItemv2 (this, Command.Paste),
                                     new Line (),
-                                    new MenuItemv2 (this, Command.SelectAll)
+                                    new MenuItemv2 (this, Command.SelectAll),
+                                    new Line (),
+                                    new MenuItemv2 ()
+                                    {
+                                        Title = "_Details",
+                                        SubMenu = new (ConfigureDetailsSubMenu ())
+                                    },
                                 ]
                                )
             );
@@ -462,9 +568,58 @@ public class MenuBarv2 : Menuv2, IDesignable
                 }
             }
         }
+
+        MenuItemv2 [] ConfigureDetailsSubMenu ()
+        {
+            var detail = new MenuItemv2
+            {
+                Title = "_Detail 1",
+                Text = "Some detail #1"
+            };
+
+            var nestedSubMenu = new MenuItemv2
+            {
+                Title = "_Moar Details",
+                SubMenu = new (ConfigureMoreDetailsSubMenu ()),
+            };
+
+            var editMode = new MenuItemv2
+            {
+                Text = "Binding to Command.Edit",
+                Command = Command.Edit,
+                CommandView = new CheckBox
+                {
+                    Title = "E_dit Mode",
+                }
+            };
+
+            return [detail, nestedSubMenu, null!, editMode];
+
+            View [] ConfigureMoreDetailsSubMenu ()
+            {
+                var deeperDetail = new MenuItemv2
+                {
+                    Title = "_Deeper Detail",
+                    Text = "Deeper Detail",
+                    Action = () => { MessageBox.Query ("Deeper Detail", "Lots of details", "_Ok"); }
+                };
+
+                var belowLineDetail = new MenuItemv2
+                {
+                    Title = "_Even more detail",
+                    Text = "Below the line"
+                };
+
+                // This ensures the checkbox state toggles when the hotkey of Title is pressed.
+                //shortcut4.Accepting += (sender, args) => args.Cancel = true;
+
+                return [deeperDetail, new Line (), belowLineDetail];
+            }
+        }
+
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
         base.Dispose (disposing);
