@@ -51,28 +51,11 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
                     Command.NotBound,
                     ctx =>
                     {
-                        Logging.Trace ($"popoverMenu NotBound: {ctx}");
+                        //Logging.Trace ($"popoverMenu NotBound: {ctx}");
 
                         return false;
                     });
-
-        KeyBindings.Add (Key, Command.Quit);
-        KeyBindings.ReplaceCommands (Application.QuitKey, Command.Quit);
-
-        AddCommand (
-                    Command.Quit,
-                    ctx =>
-                    {
-                        if (!Visible)
-                        {
-                            return false;
-                        }
-
-                        Visible = false;
-
-                        return false;
-                    });
-
+        
         return;
 
         bool? MoveLeft (ICommandContext? ctx)
@@ -101,7 +84,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
                 return true;
             }
 
-            return false; //AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+            return false;
         }
     }
 

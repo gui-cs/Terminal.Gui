@@ -123,11 +123,11 @@ public class MenuItemv2 : Shortcut
 
         if (ret is not true)
         {
-            Logging.Trace($"Calling base.DispatchCommand");
+            //Logging.Trace($"Calling base.DispatchCommand");
             ret = base.DispatchCommand (commandContext);
         }
 
-        Logging.Trace($"Calling RaiseAccepted");
+        //Logging.Trace($"Calling RaiseAccepted");
         RaiseAccepted (commandContext);
 
         return ret;
@@ -175,7 +175,7 @@ public class MenuItemv2 : Shortcut
     /// <returns></returns>
     protected bool? RaiseAccepted (ICommandContext? ctx)
     {
-        Logging.Trace ($"RaiseAccepted: {ctx}");
+        //Logging.Trace ($"RaiseAccepted: {ctx}");
         CommandEventArgs args = new () { Context = ctx };
 
         OnAccepted (args);

@@ -296,7 +296,6 @@ public class MenuBarv2 : Menuv2, IDesignable
         }
 
         // If the active Application Popover is part of this MenuBar, hide it.
-        //HideActivePopover ();
         if (Application.Popover?.GetActivePopover () is PopoverMenu popoverMenu
             && popoverMenu?.Root?.SuperMenuItem?.SuperView == this)
         {
@@ -310,6 +309,18 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         if (menuBarItem.PopoverMenu is { })
         {
+            // TODO: This is a bit of a hack to ensure the menu bar loses focus when 
+            // TODO: a MenuBarItem's popover is hidden. In PopoverBaseImpl, see how
+            // TODO: Command.Quit raises Accepting.
+            menuBarItem.PopoverMenu.Accepting += (sender, args) =>
+                                                 {
+                                                     if (HasFocus)
+                                                     {
+                                                         CanFocus = false;
+                                                     }
+                                                 };
+
+
             menuBarItem.PopoverMenu.Accepted += (sender, args) =>
                                                 {
                                                     if (HasFocus)
@@ -364,7 +375,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    public IEnumerable<MenuItemv2> GetMenuItemsWithId(string id)
+    public IEnumerable<MenuItemv2> GetMenuItemsWithId (string id)
     {
         if (string.IsNullOrEmpty (id))
         {
@@ -382,12 +393,10 @@ public class MenuBarv2 : Menuv2, IDesignable
     }
 
     /// <inheritdoc/>
-    public override bool EnableForDesign ()
+    public bool EnableForDesign<TContext> (ref readonly TContext context) where TContext : notnull
     {
         // Note: This menu is used by unit tests. If you modify it, you'll likely have to update
         // unit tests.
-
-        MenuBarItemv2? fileMenu = null;
 
         var bordersCb = new CheckBox
         {
@@ -403,20 +412,12 @@ public class MenuBarv2 : Menuv2, IDesignable
         var enableOverwriteCb = new CheckBox
         {
             Title = "Enable _Overwrite",
-            HighlightStyle = HighlightStyle.None,
-            CanFocus = false
         };
 
         var mutuallyExclusiveOptionsSelector = new OptionSelector
         {
             Options = ["G_ood", "_Bad", "U_gly"],
             SelectedItem = 0
-        };
-
-        var menuBGColor = new MenuItemv2
-        {
-            HelpText = "Menu BG Color",
-            Key = Key.F8,
         };
 
         var menuBgColorCp = new ColorPicker ()
@@ -432,14 +433,14 @@ public class MenuBarv2 : Menuv2, IDesignable
                                           };
                                       };
 
-        fileMenu = Add (
+        Add (
                         new MenuBarItemv2 (
                                            "_File",
                                            [
-                                               new MenuItemv2 (this, Command.New),
-                                               new MenuItemv2 (this, Command.Open),
-                                               new MenuItemv2 (this, Command.Save),
-                                               new MenuItemv2 (this, Command.SaveAs),
+                                               new MenuItemv2 (context as View, Command.New),
+                                               new MenuItemv2 (context as View, Command.Open),
+                                               new MenuItemv2 (context as View, Command.Save),
+                                               new MenuItemv2 (context as View, Command.SaveAs),
                                                new Line (),
                                                new MenuItemv2
                                                {
@@ -456,9 +457,11 @@ public class MenuBarv2 : Menuv2, IDesignable
                                                                       new ()
                                                                       {
                                                                           Text = "Overwrite",
+                                                                          Id = "Overwrite",
+                                                                          Key = Key.W.WithCtrl,
                                                                           CommandView = enableOverwriteCb,
                                                                           Command = Command.EnableOverwrite,
-                                                                          TargetView = this
+                                                                          TargetView = context as View
                                                                       },
                                                                       new ()
                                                                       {
@@ -505,17 +508,17 @@ public class MenuBarv2 : Menuv2, IDesignable
                                                new MenuItemv2 (this, Command.Quit)
                                            ]
                                           )
-                       ) as MenuBarItemv2;
+                       );
 
         Add (
              new MenuBarItemv2 (
                                 "_Edit",
                                 [
-                                    new MenuItemv2 (this, Command.Cut),
-                                    new MenuItemv2 (this, Command.Copy),
-                                    new MenuItemv2 (this, Command.Paste),
+                                    new MenuItemv2 (context as View, Command.Cut),
+                                    new MenuItemv2 (context as View, Command.Copy),
+                                    new MenuItemv2 (context as View, Command.Paste),
                                     new Line (),
-                                    new MenuItemv2 (this, Command.SelectAll),
+                                    new MenuItemv2 (context as View, Command.SelectAll),
                                     new Line (),
                                     new MenuItemv2 ()
                                     {
@@ -585,7 +588,8 @@ public class MenuBarv2 : Menuv2, IDesignable
 
             var editMode = new MenuItemv2
             {
-                Text = "Binding to Command.Edit",
+                Text = "App Binding to Command.Edit",
+                Id = "EditMode",
                 Command = Command.Edit,
                 CommandView = new CheckBox
                 {

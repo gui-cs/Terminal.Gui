@@ -99,15 +99,7 @@ public class Menus : Scenario
     /// </summary>
     public class MenuHost : View
     {
-        internal PopoverMenu? DemoPopoverMenu { get; }
-
-        private CheckBox? _enableOverwriteCb;
-        private CheckBox? _autoSaveCb;
-        private CheckBox? _editModeCb;
-
-        private RadioGroup? _mutuallyExclusiveOptionsRg;
-
-        private ColorPicker? _menuBgColorCp;
+        internal PopoverMenu? DemoPopoverMenu { get; private set; }
 
         public MenuHost ()
         {
@@ -168,8 +160,6 @@ public class Menus : Scenario
             AddCommand (Command.SaveAs, HandleCommand);
             HotKeyBindings.Add (Key.A.WithCtrl, Command.SaveAs);
 
-            HotKeyBindings.Add (Key.W.WithCtrl, Command.EnableOverwrite);
-
             AddCommand (Command.Cut, HandleCommand);
             HotKeyBindings.Add (Key.X.WithCtrl, Command.Cut);
 
@@ -182,6 +172,13 @@ public class Menus : Scenario
             AddCommand (Command.SelectAll, HandleCommand);
             HotKeyBindings.Add (Key.T.WithCtrl, Command.SelectAll);
 
+            // BUGBUG: This must come before we create the MenuBar or it will not work.
+            // BUGBUG: This is due to TODO's in PopoverMenu where key bindings are not
+            // BUGBUG: updated after the MenuBar is created.
+            Application.KeyBindings.Remove (Key.F5);
+            Application.KeyBindings.Add (Key.F5, this, Command.Edit);
+
+
             DemoPopoverMenu = new ()
             {
                 Id = "FilePopoverMenu"
@@ -190,7 +187,8 @@ public class Menus : Scenario
             DemoPopoverMenu.Visible = false;
 
             MenuBarv2 menuBar = new MenuBarv2 ();
-            menuBar.EnableForDesign ();
+            MenuHost host = this;
+            menuBar.EnableForDesign<MenuHost> (ref host);
 
             base.Add (menuBar);
 
@@ -211,86 +209,104 @@ public class Menus : Scenario
 
             Add (lastAcceptedLabel, lastAcceptedText);
 
+            // MenuItem: AutoSave - Demos simple CommandView state tracking
+            // In MenuBar.EnableForDesign, the auto save MenuItem does not specify a Command. But does
+            // set a Key (F10). MenuBar adds this key as a hotkey and thus if it's pressed, it toggles the MenuItem
+            // CB.
+            // So that is needed is to mirror the two check boxes.
+            CheckBox? autoSaveMenuItemCb = menuBar.GetMenuItemsWithId ("AutoSave").FirstOrDefault ()?.CommandView as CheckBox;
             CheckBox autoSaveStatusCb = new ()
             {
-                Title = "AutoSave",
+                Title = "AutoSave Status (MenuItem Binding to F10)",
                 X = Pos.Left (lastAcceptedLabel),
                 Y = Pos.Bottom (lastAcceptedLabel)
             };
 
-            autoSaveStatusCb.CheckedStateChanged += (sender, args) =>
+            autoSaveStatusCb.CheckedStateChanged += (_, _) =>
                                                     {
-                                                        if (menuBar.GetMenuItemsWithId ("AutoSave").FirstOrDefault ()?.CommandView is CheckBox checkBox)
-                                                        {
-                                                            checkBox.CheckedState = autoSaveStatusCb.CheckedState;
-                                                        }
+                                                        autoSaveMenuItemCb!.CheckedState = autoSaveStatusCb.CheckedState;
                                                     };
-
+            autoSaveMenuItemCb!.CheckedStateChanged += (_, _) =>
+                                                    {
+                                                        autoSaveStatusCb!.CheckedState = autoSaveMenuItemCb.CheckedState;
+                                                    };
             Add (autoSaveStatusCb);
 
-            Accepting += (o, args) =>
-                                         {
-                                             lastAcceptedText.Text = args?.Context?.Source?.Title!;
-
-                                             if (args?.Context?.Source is MenuItemv2 mi)
-                                             {
-                                                 if (mi.CommandView == menuBar.GetMenuItemsWithId ("AutoSave").FirstOrDefault ()?.CommandView)
-                                                 {
-                                                     autoSaveStatusCb.CheckedState = ((CheckBox)mi.CommandView).CheckedState;
-                                                     // Set Cancel to true to stop propagation of Accepting to superview
-                                                     // args.Cancel = true;
-                                                 }
-                                             }
-                                         };
-
+            // MenuItem: Enable Overwrite - Demos View Key Binding
+            // In MenuBar.EnableForDesign, the overwrite MenuItem specifies a Command (Command.EnableOverwrite).
+            // Ctrl+W is bound to Command.EnableOverwrite by this View.
+            // Thus when Ctrl+W is pressed the MenuBar never sees it, but the command is invoked on this.
+            // If the user clicks on the MenuItem, Accept will be raised.
             CheckBox enableOverwriteStatusCb = new ()
             {
-                Title = "Enable Overwrite",
+                Title = "Enable Overwrite (View Bidning to Ctrl+W)",
                 X = Pos.Left (autoSaveStatusCb),
                 Y = Pos.Bottom (autoSaveStatusCb)
             };
-            enableOverwriteStatusCb.CheckedStateChanged += (sender, args) => { _enableOverwriteCb!.CheckedState = enableOverwriteStatusCb.CheckedState; };
-            base.Add (enableOverwriteStatusCb);
+            // The source of truth is our status CB; any time it changes, update the menu item
+            CheckBox? enableOverwriteMenuItemCb = menuBar.GetMenuItemsWithId ("Overwrite").FirstOrDefault ()?.CommandView as CheckBox;
+            enableOverwriteStatusCb.CheckedStateChanged += (_, _) => enableOverwriteMenuItemCb!.CheckedState = enableOverwriteStatusCb.CheckedState;
+            menuBar.Accepted += (o, args) =>
+                                {
+                                    if (args.Context?.Source is MenuItemv2 mi && mi.CommandView == enableOverwriteMenuItemCb)
+                                    {
+                                        // Set Cancel to true to stop propagation of Accepting to superview
+                                        args.Cancel = true;
+                                        // Since overwrite uses a MenuItem.Command the menu item CB is the source of truth
+                                        enableOverwriteStatusCb.CheckedState = ((CheckBox)mi.CommandView).CheckedState;
+                                        lastAcceptedText.Text = args?.Context?.Source?.Title!;
+                                    }
+                                };
 
+            HotKeyBindings.Add (Key.W.WithCtrl, Command.EnableOverwrite);
             AddCommand (
                         Command.EnableOverwrite,
                         ctx =>
                         {
-                            enableOverwriteStatusCb.CheckedState =
-                                enableOverwriteStatusCb.CheckedState == CheckState.UnChecked ? CheckState.Checked : CheckState.UnChecked;
-
+                            // The command was invoked. Toggle the status Cb.
+                            enableOverwriteStatusCb.AdvanceCheckState ();
                             return HandleCommand (ctx);
                         });
+            base.Add (enableOverwriteStatusCb);
 
+            // MenuItem: EditMode - Demos App Level Key Bindings
+            // In MenuBar.EnableForDesign, the edit mode MenuItem specifies a Command (Command.Edit).
+            // F5 is bound to Command.EnableOverwrite as an Applicatio-Level Key Binding
+            // Thus when F5 is pressed the MenuBar never sees it, but the command is invoked on this, via
+            // a Application.KeyBinding.
+            // If the user clicks on the MenuItem, Accept will be raised.
             CheckBox editModeStatusCb = new ()
             {
-                Title = "EditMode (App binding)",
+                Title = "EditMode (App Binding to F5)",
                 X = Pos.Left (enableOverwriteStatusCb),
                 Y = Pos.Bottom (enableOverwriteStatusCb)
             };
-            editModeStatusCb.CheckedStateChanged += (sender, args) => { _editModeCb!.CheckedState = editModeStatusCb.CheckedState; };
-            base.Add (editModeStatusCb);
+            // The source of truth is our status CB; any time it changes, update the menu item
+            CheckBox? editModeMenuItemCb = menuBar.GetMenuItemsWithId ("EditMode").FirstOrDefault ()?.CommandView as CheckBox;
+            editModeStatusCb.CheckedStateChanged += (_, _) => editModeMenuItemCb!.CheckedState = editModeStatusCb.CheckedState;
+            menuBar.Accepted += (o, args) =>
+                                {
+                                    if (args.Context?.Source is MenuItemv2 mi && mi.CommandView == editModeMenuItemCb)
+                                    {
+                                        // Set Cancel to true to stop propagation of Accepting to superview
+                                        args.Cancel = true;
+                                        // Since overwrite uses a MenuItem.Command the menu item CB is the source of truth
+                                        editModeMenuItemCb.CheckedState = ((CheckBox)mi.CommandView).CheckedState;
+                                        lastAcceptedText.Text = args?.Context?.Source?.Title!;
+                                    }
+                                };
 
             AddCommand (Command.Edit, ctx =>
                                       {
-                                          editModeStatusCb.CheckedState =
-                                              editModeStatusCb.CheckedState == CheckState.UnChecked ? CheckState.Checked : CheckState.UnChecked;
-
+                                          // The command was invoked. Toggle the status Cb.
+                                          editModeStatusCb.AdvanceCheckState ();
                                           return HandleCommand (ctx);
                                       });
 
-            Application.KeyBindings.Add (Key.F9, this, Command.Edit);
+            base.Add (editModeStatusCb);
 
-
-            DemoPopoverMenu!.Accepted += (o, args) =>
-                                         {
-                                             lastAcceptedText.Text = args?.Context?.Source?.Title!;
-
-                                             if (args?.Context?.Source is MenuItemv2 mi && mi.CommandView == _autoSaveCb)
-                                             {
-                                                 autoSaveStatusCb.CheckedState = _autoSaveCb.CheckedState;
-                                             }
-                                         };
+            // Demo of PopoverMenu as a context menu
+            DemoPopoverMenu!.Accepted += (o, args) => lastAcceptedText.Text = args?.Context?.Source?.Title!;
 
             DemoPopoverMenu!.VisibleChanged += (sender, args) =>
                                                {
@@ -299,14 +315,6 @@ public class Menus : Scenario
                                                        lastCommandText.Text = string.Empty;
                                                    }
                                                };
-
-            Add (
-                 new Button
-                 {
-                     Title = "_Button",
-                     X = Pos.Center (),
-                     Y = Pos.Center ()
-                 });
 
             autoSaveStatusCb.SetFocus ();
 
@@ -317,10 +325,22 @@ public class Menus : Scenario
             {
                 lastCommandText.Text = ctx?.Command!.ToString ()!;
 
+                Logging.Trace ($"lastCommand: {lastCommandText.Text}");
+
                 return true;
             }
         }
 
+        /// <inheritdoc />
+        protected override void Dispose (bool disposing)
+        {
+            if (DemoPopoverMenu is { })
+            {
+                DemoPopoverMenu.Dispose ();
+                DemoPopoverMenu = null;
+            }
+            base.Dispose (disposing);
+        }
     }
 
     private const string LOGFILE_LOCATION = "./logs";
