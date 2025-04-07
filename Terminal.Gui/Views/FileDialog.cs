@@ -490,7 +490,7 @@ public class FileDialog : Dialog, IDesignable
         // if no path has been provided
         if (_tbPath.Text.Length <= 0)
         {
-            Path = Environment.CurrentDirectory;
+            Path = _fileSystem.Directory.GetCurrentDirectory ();
         }
 
         // to streamline user experience and allow direct typing of paths
