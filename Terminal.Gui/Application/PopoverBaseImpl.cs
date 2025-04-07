@@ -44,6 +44,10 @@ public abstract class PopoverBaseImpl : View, IPopover
                 return null;
             }
 
+            // TODO: This is a bit of a hack to ensure the menu bar loses focus when 
+            // TODO: a MenuBarItem's popover is hidden. See in MenuBar.
+            RaiseAccepting (ctx);
+
             Visible = false;
 
             return true;

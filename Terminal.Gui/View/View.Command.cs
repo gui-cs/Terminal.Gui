@@ -115,18 +115,18 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? RaiseAccepting (ICommandContext? ctx)
     {
-        Logging.Trace($"{ctx?.Source?.Title}");
+       // Logging.Trace($"{ctx?.Source?.Title}");
         CommandEventArgs args = new () { Context = ctx };
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
-        Logging.Trace ($"Calling OnAccepting...");
+        //Logging.Trace ($"Calling OnAccepting...");
         args.Cancel = OnAccepting (args) || args.Cancel;
 
         if (!args.Cancel)
         {
             // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-            Logging.Trace ($"Raising Accepting...");
+            //Logging.Trace ($"Raising Accepting...");
             Accepting?.Invoke (this, args);
         }
 
@@ -151,7 +151,7 @@ public partial class View // Command APIs
 
             if (SuperView is { })
             {
-                Logging.Trace ($"Invoking Accept on SuperView: {SuperView.Title}...");
+                // Logging.Trace ($"Invoking Accept on SuperView: {SuperView.Title}...");
                 return SuperView?.InvokeCommand (Command.Accept, ctx);
             }
         }

@@ -208,7 +208,8 @@ public class MenuBarv2Tests
                                                 Application.Top!.Add (menuBar);
 
                                                 // Call EnableForDesign
-                                                bool result = menuBar.EnableForDesign ();
+                                                Toplevel top = Application.Top!;
+                                                bool result = menuBar.EnableForDesign (ref top);
 
                                                 // Should return true
                                                 Assert.True (result);
@@ -241,7 +242,8 @@ public class MenuBarv2Tests
                                             () =>
                                             {
                                                 menuBar = new MenuBarv2 ();
-                                                menuBar.EnableForDesign ();
+                                                Toplevel top = Application.Top!;
+                                                menuBar.EnableForDesign (ref top);
                                                 Application.Top!.Add (menuBar);
                                             })
                                      .WaitIteration ()
