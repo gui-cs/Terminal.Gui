@@ -12,7 +12,7 @@ public interface IDesignable
     /// <param name="context">Optional arbitrary, View-specific, context.</param>
     /// <typeparam name="TContext">A non-null type for <paramref name="context"/>.</typeparam>
     /// <returns><see langword="true"/> if the view successfully loaded demo data.</returns>
-    public bool EnableForDesign<TContext> (ref readonly TContext context) where TContext : notnull => EnableForDesign ();
+    public bool EnableForDesign<TContext> (ref TContext context) where TContext : notnull => EnableForDesign ();
 
     /// <summary>
     ///     Causes the View to enable design-time mode. This typically means that the view will load demo data and

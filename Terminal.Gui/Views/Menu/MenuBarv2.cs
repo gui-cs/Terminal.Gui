@@ -377,11 +377,11 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// <returns></returns>
     public IEnumerable<MenuItemv2> GetMenuItemsWithId (string id)
     {
+        List<MenuItemv2> menuItems = new ();
         if (string.IsNullOrEmpty (id))
         {
-            return null;
+            return menuItems;
         }
-        List<MenuItemv2> menuItems = new List<MenuItemv2> ();
         foreach (MenuBarItemv2 mbi in SubViews.OfType<MenuBarItemv2> ())
         {
             if (mbi.PopoverMenu is { })
@@ -393,7 +393,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     }
 
     /// <inheritdoc/>
-    public bool EnableForDesign<TContext> (ref readonly TContext context) where TContext : notnull
+    public bool EnableForDesign<TContext> (ref TContext context) where TContext : notnull
     {
         // Note: This menu is used by unit tests. If you modify it, you'll likely have to update
         // unit tests.
