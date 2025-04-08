@@ -50,7 +50,7 @@ public class Menus : Scenario
             BorderStyle = LineStyle.Dotted
         };
         app.Add (menuHostView);
-
+        
         menuHostView.CommandNotBound += (o, args) =>
                                       {
                                           if (o is not View sender || args.Cancel)
@@ -160,8 +160,9 @@ public class Menus : Scenario
             AddCommand (Command.SaveAs, HandleCommand);
             HotKeyBindings.Add (Key.A.WithCtrl, Command.SaveAs);
 
-            AddCommand (Command.Quit, () =>
+            AddCommand (Command.Quit, (ctx) =>
                                       {
+
                                           Application.RequestStop ();
                                           return true;
                                       });
@@ -321,6 +322,24 @@ public class Menus : Scenario
                                                        lastCommandText.Text = string.Empty;
                                                    }
                                                };
+
+            var openBtn = new Button { X = Pos.Center (), Y = 4, Text = "_Open Menu", IsDefault = true };
+            openBtn.Accepting += (s, e) =>
+                                 {
+                                     e.Cancel = true;
+                                     NewKeyDownEvent (menuBar.Key);
+                                 };
+
+            Add (openBtn);
+
+            //var hideBtn = new Button { X = Pos.Center (), Y = Pos.Bottom (openBtn), Text = "Toggle Menu._Visible" };
+            //hideBtn.Accepting += (s, e) => { menuBar.Visible = !menuBar.Visible; };
+            //appWindow.Add (hideBtn);
+
+            //var enableBtn = new Button { X = Pos.Center (), Y = Pos.Bottom (hideBtn), Text = "_Toggle Menu.Enable" };
+            //enableBtn.Accepting += (s, e) => { menuBar.Enabled = !menuBar.Enabled; };
+            //appWindow.Add (enableBtn);
+
 
             autoSaveStatusCb.SetFocus ();
 

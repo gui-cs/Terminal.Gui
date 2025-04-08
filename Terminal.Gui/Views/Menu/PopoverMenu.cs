@@ -46,17 +46,25 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         AddCommand (Command.Left, MoveLeft);
         KeyBindings.Add (Key.CursorLeft, Command.Left);
 
-        // TODO: Remove; for debugging for now
-        AddCommand (
-                    Command.NotBound,
-                    ctx =>
-                    {
-                        //Logging.Trace ($"popoverMenu NotBound: {ctx}");
+        AddCommand (Command.Quit, Quit);
 
-                        return false;
-                    });
-        
         return;
+
+        bool? Quit (ICommandContext? ctx)
+        {
+            if (!Visible)
+            {
+                return null;
+            }
+
+            // TODO: This is a bit of a hack to ensure the menu bar loses focus when 
+            // TODO: a MenuBarItem's popover is hidden. See in MenuBar.
+            RaiseAccepting (ctx);
+
+            Visible = false;
+
+            return true;
+        }
 
         bool? MoveLeft (ICommandContext? ctx)
         {
@@ -253,7 +261,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
             menuItem.Key = key;
 
-            //Logging.Trace ($"HotKey: {menuItem.Key}->{menuItem.Command}");
+            Logging.Trace ($"HotKey: {menuItem.Key}->{menuItem.Command}");
         }
     }
 
@@ -549,7 +557,11 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
                         new MenuItemv2 (this, Command.SelectAll)
                     ]);
 
-        Visible = true;
+        // NOTE: This is a workaround for the fact that the PopoverMenu is not visible in the designer
+        // NOTE: without being activated via Application.Popover. But we want it to be visible.
+        // NOTE: If you use PopoverView.EnableForDesign for real Popover scenarios, change back to false
+        // NOTE: after calling EnableForDesign.
+        //Visible = true;
 
         return true;
     }

@@ -52,6 +52,8 @@ public class MenuBarv2 : Menuv2, IDesignable
 
                         return false;
                     });
+
+        // If we're not focused, Key activates/deactivates
         HotKeyBindings.Add (Key, Command.HotKey);
 
         KeyBindings.Add (Key, Command.Quit);
@@ -112,7 +114,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// <inheritdoc/>
     protected override bool OnBorderStyleChanged ()
     {
-        HideActiveItem ();
+        //HideActiveItem ();
 
         return base.OnBorderStyleChanged ();
     }
@@ -310,7 +312,7 @@ public class MenuBarv2 : Menuv2, IDesignable
         if (menuBarItem.PopoverMenu is { })
         {
             // TODO: This is a bit of a hack to ensure the menu bar loses focus when 
-            // TODO: a MenuBarItem's popover is hidden. In PopoverBaseImpl, see how
+            // TODO: a MenuBarItem's popover is hidden. In PopoverMenu, see how
             // TODO: Command.Quit raises Accepting.
             menuBarItem.PopoverMenu.Accepting += (sender, args) =>
                                                  {
@@ -505,7 +507,12 @@ public class MenuBarv2 : Menuv2, IDesignable
                                                                  )
                                                },
                                                new Line (),
-                                               new MenuItemv2 (context as View, Command.Quit)
+                                               new MenuItemv2 ()
+                                               {
+                                                   TargetView = context as View,
+                                                   Key = Application.QuitKey,
+                                                   Command = Command.Quit
+                                               }
                                            ]
                                           )
                        );

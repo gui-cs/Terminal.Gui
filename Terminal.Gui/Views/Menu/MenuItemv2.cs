@@ -107,7 +107,7 @@ public class MenuItemv2 : Shortcut
         Logging.Trace($"{commandContext?.Source?.Title}");
         bool? ret = null;
 
-        if (commandContext is { Command: not Command.HotKey })
+        if (commandContext is { Command: not Command.HotKey})
         {
             if (TargetView is { })
             {
