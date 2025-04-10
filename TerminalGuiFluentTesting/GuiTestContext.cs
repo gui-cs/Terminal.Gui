@@ -23,6 +23,7 @@ public class GuiTestContext : IDisposable
     private View? _lastView;
     private readonly StringBuilder _logsSb;
     private readonly V2TestDriver _driver;
+    private bool _finished=false;
 
     internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, V2TestDriver driver)
     {
@@ -79,6 +80,7 @@ public class GuiTestContext : IDisposable
                                  {
                                      ApplicationImpl.ChangeInstance (origApp);
                                      Logging.Logger = origLogger;
+                                     _finished = true;
                                  }
                              },
                              _cts.Token);
@@ -234,7 +236,7 @@ public class GuiTestContext : IDisposable
     public GuiTestContext WaitIteration (Action? a = null)
     {
         // If application has already exited don't wait!
-        if (Application.Top == null)
+        if (_finished || _cts.Token.IsCancellationRequested || _hardStop.Token.IsCancellationRequested)
         {
             return this;
         }
