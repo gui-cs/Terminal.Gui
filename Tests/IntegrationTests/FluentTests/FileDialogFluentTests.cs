@@ -1,4 +1,6 @@
-﻿using System.IO.Abstractions.TestingHelpers;
+﻿using System.IO.Abstractions;
+using System.IO.Abstractions.TestingHelpers;
+using System.Runtime.InteropServices;
 using Terminal.Gui;
 using TerminalGuiFluentTesting;
 using TerminalGuiFluentTestingXunit;
@@ -102,7 +104,7 @@ public class FileDialogFluentTests
                           .Stop ();
 
         Assert.False (sd.Canceled);
-        Assert.Equal ($"C:{fs.Path.DirectorySeparatorChar}",sd.FileName);
+        AssertIsFileSystemRoot (fs, sd);
     }
 
     [Theory]
@@ -118,7 +120,7 @@ public class FileDialogFluentTests
                           .Stop ();
 
         Assert.False (sd.Canceled);
-        Assert.Equal ($"C:{fs.Path.DirectorySeparatorChar}", sd.FileName);
+        AssertIsFileSystemRoot (fs, sd);
     }
 
     [Theory]
@@ -135,10 +137,19 @@ public class FileDialogFluentTests
                           .Stop ();
 
         Assert.False (sd.Canceled);
-        Assert.Equal ($"C:{fs.Path.DirectorySeparatorChar}", sd.FileName);
+        AssertIsFileSystemRoot (fs,sd);
     }
 
+    private void AssertIsFileSystemRoot (IFileSystem fs, SaveDialog sd)
+    {
+        var expectedPath =
+            RuntimeInformation.IsOSPlatform (OSPlatform.Windows) ?
+                $@"C:{fs.Path.DirectorySeparatorChar}" :
+                "/";
 
+        Assert.Equal (expectedPath, sd.FileName);
+
+    }
 
     [Theory]
     [ClassData (typeof (V2TestDrivers))]
