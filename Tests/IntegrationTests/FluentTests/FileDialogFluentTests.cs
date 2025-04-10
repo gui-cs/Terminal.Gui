@@ -60,4 +60,46 @@ public class FileDialogFluentTests
 
         Assert.True (sd.Canceled);
     }
+
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void CancelFileDialog_UsingCancelButton_LeftClickButton (V2TestDriver d)
+    {
+        var sd = new SaveDialog (CreateExampleFileSystem ());
+        using var c = With.A (sd, 100, 20, d)
+                          .ScreenShot ("Save dialog", _out)
+                          .LeftClick <Button> (b => b.Text == "_Cancel")
+                          .Stop ()
+                          .WriteOutLogs (_out);
+
+        Assert.True (sd.Canceled);
+    }
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void CancelFileDialog_UsingCancelButton_AltC (V2TestDriver d)
+    {
+        var sd = new SaveDialog (CreateExampleFileSystem ());
+        using var c = With.A (sd, 100, 20, d)
+                          .ScreenShot ("Save dialog", _out)
+                          .Send (Key.C.WithAlt)
+                          .WriteOutLogs (_out)
+                          .Stop ();
+
+        Assert.True (sd.Canceled);
+    }
+
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void CancelFileDialog_UsingOkButton_Enter (V2TestDriver d)
+    {
+        var sd = new SaveDialog (CreateExampleFileSystem ()){Modal = true};
+        using var c = With.A (sd, 100, 20, d)
+                          .ScreenShot ("Save dialog", _out)
+                          .LeftClick<Button> (b => b.Text == "_Save")
+                          .WriteOutLogs (_out)
+                          .Stop ();
+
+        Assert.False (sd.Canceled);
+        Assert.Equal ("C:\\",sd.FileName);
+    }
 }

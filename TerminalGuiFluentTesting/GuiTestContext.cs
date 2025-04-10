@@ -1,7 +1,9 @@
-﻿using System.Text;
+﻿using System.Drawing;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using Terminal.Gui;
 using Terminal.Gui.ConsoleDrivers;
+using static Unix.Terminal.Curses;
 
 namespace TerminalGuiFluentTesting;
 
@@ -111,7 +113,16 @@ public class GuiTestContext : IDisposable
             return this;
         }
 
-        Application.Invoke (() => Application.RequestStop ());
+        Application.Invoke (() => {
+                                try
+                                {
+                                    Application.RequestStop ();
+                                }
+                                catch (Exception ex)
+                                {
+
+                                }
+                            });
 
         // Wait for the application to stop, but give it a 1-second timeout
         if (!_runTask.Wait (TimeSpan.FromMilliseconds (1000)))
@@ -222,6 +233,12 @@ public class GuiTestContext : IDisposable
     /// <returns></returns>
     public GuiTestContext WaitIteration (Action? a = null)
     {
+        // If application has already exited don't wait!
+        if (Application.Top == null)
+        {
+            return this;
+        }
+
         a ??= () => { };
         var ctsLocal = new CancellationTokenSource ();
 
@@ -286,8 +303,22 @@ public class GuiTestContext : IDisposable
     /// <param name="screenX">0 indexed screen coordinates</param>
     /// <param name="screenY">0 indexed screen coordinates</param>
     /// <returns></returns>
-    public GuiTestContext LeftClick (int screenX, int screenY) { return Click (WindowsConsole.ButtonState.Button1Pressed, screenX, screenY); }
+    public GuiTestContext LeftClick (int screenX, int screenY)
+    {
+        return Click (WindowsConsole.ButtonState.Button1Pressed, screenX, screenY);
+    }
 
+    public GuiTestContext LeftClick<T> (Func<T,bool> evaluator) where T : View
+    {
+        return Click (WindowsConsole.ButtonState.Button1Pressed,evaluator);
+    }
+
+    private GuiTestContext Click<T> (WindowsConsole.ButtonState btn, Func<T, bool> evaluator) where T:View
+    {
+        var v = Find (evaluator);
+        var screen = v.ViewportToScreen (new Point (0, 0));
+        return Click (btn, screen.X, screen.Y);
+    }
     private GuiTestContext Click (WindowsConsole.ButtonState btn, int screenX, int screenY)
     {
         switch (_driver)
@@ -715,11 +746,65 @@ public class GuiTestContext : IDisposable
         while (true);
     }
 
+
+
+    private T Find<T> (Func<T, bool> evaluator) where T : View
+    {
+        var t = Application.Top;
+
+        if (t == null)
+        {
+            Fail ("Application.Top was null when attempting to find view");
+        }
+        var f = FindRecursive(t!, evaluator);
+
+        if (f == null)
+        {
+            Fail ("Failed to tab to a view which matched the Type and evaluator constraints in any SubViews of top");
+        }
+
+        return f!;
+    }
+
+    private T? FindRecursive<T> (View current, Func<T, bool> evaluator) where T : View
+    {
+        foreach (var subview in current.SubViews)
+        {
+            if (subview is T match && evaluator (match))
+            {
+                return match;
+            }
+
+            // Recursive call
+            var result = FindRecursive (subview, evaluator);
+            if (result != null)
+            {
+                return result;
+            }
+        }
+
+        return null;
+    }
+
     private void Fail (string reason)
     {
         Stop ();
 
         throw new Exception (reason);
 
+    }
+
+    public GuiTestContext Send (Key key)
+    {
+        if (Application.Driver is IConsoleDriverFacade facade)
+        {
+            facade.InputProcessor.OnKeyDown (key);
+            facade.InputProcessor.OnKeyUp (key);
+        }
+        else
+        {
+            Fail ("Expected Application.Driver to be IConsoleDriverFacade");
+        }
+        return this;
     }
 }
