@@ -93,7 +93,8 @@ public class FileDialogFluentTests
     [ClassData (typeof (V2TestDrivers))]
     public void SaveFileDialog_UsingOkButton_Enter (V2TestDriver d)
     {
-        var sd = new SaveDialog (CreateExampleFileSystem ()){Modal = true};
+        var fs = CreateExampleFileSystem ();
+        var sd = new SaveDialog (fs);
         using var c = With.A (sd, 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
                           .LeftClick<Button> (b => b.Text == "_Save")
@@ -101,14 +102,15 @@ public class FileDialogFluentTests
                           .Stop ();
 
         Assert.False (sd.Canceled);
-        Assert.Equal ("C:\\",sd.FileName);
+        Assert.Equal ($"C:{fs.Path.DirectorySeparatorChar}",sd.FileName);
     }
 
     [Theory]
     [ClassData (typeof (V2TestDrivers))]
     public void SaveFileDialog_UsingOkButton_AltS (V2TestDriver d)
     {
-        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = true };
+        var fs = CreateExampleFileSystem ();
+        var sd = new SaveDialog (fs);
         using var c = With.A (sd, 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
                           .Send (Key.S.WithAlt)
@@ -116,14 +118,15 @@ public class FileDialogFluentTests
                           .Stop ();
 
         Assert.False (sd.Canceled);
-        Assert.Equal ("C:\\", sd.FileName);
+        Assert.Equal ($"C:{fs.Path.DirectorySeparatorChar}", sd.FileName);
     }
 
     [Theory]
     [ClassData (typeof (V2TestDrivers))]
     public void SaveFileDialog_UsingOkButton_TabEnter (V2TestDriver d)
     {
-        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = true };
+        var fs = CreateExampleFileSystem ();
+        var sd = new SaveDialog (fs);
         using var c = With.A (sd, 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
                           .Focus <Button> (b => b.Text == "_Save")
@@ -132,7 +135,7 @@ public class FileDialogFluentTests
                           .Stop ();
 
         Assert.False (sd.Canceled);
-        Assert.Equal ("C:\\", sd.FileName);
+        Assert.Equal ($"C:{fs.Path.DirectorySeparatorChar}", sd.FileName);
     }
 
 

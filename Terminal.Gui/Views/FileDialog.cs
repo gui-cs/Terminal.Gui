@@ -1304,7 +1304,7 @@ public class FileDialog : Dialog, IDesignable
         // really not what most users would expect
         if (Regex.IsMatch (path, "^\\w:$"))
         {
-            return _fileSystem.DirectoryInfo.New (path + System.IO.Path.DirectorySeparatorChar);
+            return _fileSystem.DirectoryInfo.New (path + _fileSystem.Path.DirectorySeparatorChar);
         }
 
         return _fileSystem.DirectoryInfo.New (path);
