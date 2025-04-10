@@ -1,6 +1,7 @@
 ﻿using System.IO.Abstractions.TestingHelpers;
 using Terminal.Gui;
 using TerminalGuiFluentTesting;
+using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
 namespace IntegrationTests.FluentTests;
@@ -90,7 +91,7 @@ public class FileDialogFluentTests
 
     [Theory]
     [ClassData (typeof (V2TestDrivers))]
-    public void CancelFileDialog_UsingOkButton_Enter (V2TestDriver d)
+    public void SaveFileDialog_UsingOkButton_Enter (V2TestDriver d)
     {
         var sd = new SaveDialog (CreateExampleFileSystem ()){Modal = true};
         using var c = With.A (sd, 100, 20, d)
@@ -101,5 +102,56 @@ public class FileDialogFluentTests
 
         Assert.False (sd.Canceled);
         Assert.Equal ("C:\\",sd.FileName);
+    }
+
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void SaveFileDialog_UsingOkButton_AltS (V2TestDriver d)
+    {
+        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = true };
+        using var c = With.A (sd, 100, 20, d)
+                          .ScreenShot ("Save dialog", _out)
+                          .Send (Key.S.WithAlt)
+                          .WriteOutLogs (_out)
+                          .Stop ();
+
+        Assert.False (sd.Canceled);
+        Assert.Equal ("C:\\", sd.FileName);
+    }
+
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void SaveFileDialog_UsingOkButton_TabEnter (V2TestDriver d)
+    {
+        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = true };
+        using var c = With.A (sd, 100, 20, d)
+                          .ScreenShot ("Save dialog", _out)
+                          .Focus <Button> (b => b.Text == "_Save")
+                          .Enter ()
+                          .WriteOutLogs (_out)
+                          .Stop ();
+
+        Assert.False (sd.Canceled);
+        Assert.Equal ("C:\\", sd.FileName);
+    }
+
+
+
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void SaveFileDialog_PressingPopTree_ShouldNotChangeCancel (V2TestDriver d)
+    {
+        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = true };
+        using var c = With.A (sd, 100, 20, d)
+                          .ScreenShot ("Save dialog", _out)
+                          .AssertTrue (sd.Canceled)
+                          .Focus<Button> (b => b.Text == "►►")
+                          .Enter ()
+                          .ScreenShot ("After pop tree", _out)
+                          .AssertTrue (sd.Canceled)
+                          .WriteOutLogs (_out)
+                          .Stop ();
+
+        Assert.True(sd.Canceled);
     }
 }

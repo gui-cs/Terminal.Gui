@@ -113,15 +113,27 @@ public class FileDialog : Dialog, IDesignable
 
         _btnUp = new() { X = 0, Y = 1, NoPadding = true };
         _btnUp.Text = GetUpButtonText ();
-        _btnUp.Accepting += (s, e) => _history.Up ();
+        _btnUp.Accepting += (s, e) =>
+                            {
+                                _history.Up ();
+                                e.Cancel = true;
+                            };
 
         _btnBack = new() { X = Pos.Right (_btnUp) + 1, Y = 1, NoPadding = true };
         _btnBack.Text = GetBackButtonText ();
-        _btnBack.Accepting += (s, e) => _history.Back ();
+        _btnBack.Accepting += (s, e) =>
+                              {
+                                  _history.Back ();
+                                  e.Cancel = true;
+                              };
 
         _btnForward = new() { X = Pos.Right (_btnBack) + 1, Y = 1, NoPadding = true };
         _btnForward.Text = GetForwardButtonText ();
-        _btnForward.Accepting += (s, e) => _history.Forward ();
+        _btnForward.Accepting += (s, e) =>
+                                 {
+                                     _history.Forward();
+                                     e.Cancel = true;
+                                 };
 
         _tbPath = new() { Width = Dim.Fill (), CaptionColor = new (Color.Black) };
 
@@ -201,6 +213,8 @@ public class FileDialog : Dialog, IDesignable
 
         _btnToggleSplitterCollapse.Accepting += (s, e) =>
                                                 {
+                                                    // Required otherwise the Save button clicks itself
+                                                    e.Cancel = true;
                                                     Tile tile = _splitContainer.Tiles.ElementAt (0);
 
                                                     bool newState = !tile.ContentView.Visible;
