@@ -282,6 +282,10 @@ public partial class View // Keyboard APIs
             return false;
         }
 
+        // TODO: We really need an event before recursing into Focused. Without, there's no way for 
+        // TODO: SuperViews to prevent SubViews from seeing certain keys. A use-case for this:
+        // TODO:    - MenuBar needs to prevent MenuItems from seeing QuitKey if the MenuItem is not visible
+
         // If there's a Focused subview, give it a chance (this recurses down the hierarchy)
         if (Focused?.NewKeyDownEvent (key) == true)
         {
@@ -613,6 +617,11 @@ public partial class View // Keyboard APIs
         // Process this View
         if (HotKeyBindings.TryGet (hotKey, out KeyBinding binding))
         {
+            if (binding.Key is null || binding.Key == Key.Empty)
+            {
+                binding.Key = hotKey;
+            }
+
             if (InvokeCommands (binding.Commands, binding) is true)
             {
                 return true;

@@ -78,25 +78,27 @@ public class PopoverMenuTests
                                      .Then (
                                             () =>
                                             {
-                                                var popverMenu = new PopoverMenu();
-                                                Application.Top!.Add (popverMenu);
+                                                var popoverMenu = new PopoverMenu ();
+                                                Application.Top!.Add (popoverMenu);
 
                                                 // Call EnableForDesign
-                                                bool result = popverMenu.EnableForDesign ();
+                                                Toplevel top = Application.Top;
+                                                bool result = popoverMenu.EnableForDesign (ref top);
 
                                                 // Should return true
                                                 Assert.True (result);
 
                                                 // Should have created menu items
-                                                Assert.True (popverMenu.SubViews.Count > 0);
+                                                Assert.NotNull (popoverMenu.Root);
+                                                Assert.Equal (7, popoverMenu.Root.SubViews.Count);
 
                                                 // Should have Cut menu item
-                                                View? cutMenuItem = popverMenu.GetMenuItemsOfAllSubMenus().FirstOrDefault (v => v?.Title == "Cu_t");
+                                                View? cutMenuItem = popoverMenu.GetMenuItemsOfAllSubMenus ().FirstOrDefault (v => v?.Title == "Cu_t");
 
                                                 Assert.NotNull (cutMenuItem);
                                             })
                                      .ScreenShot ("PopoverMenu EnableForDesign", _out)
-                                     .WriteOutLogs (_out)
+                                     //.WriteOutLogs (_out)
                                      .Stop ();
     }
 
@@ -110,10 +112,11 @@ public class PopoverMenuTests
                                      .Then (
                                             () =>
                                             {
-                                                var popverMenu = new PopoverMenu ();
+                                                var popoverMenu = new PopoverMenu ();
 
                                                 // Call EnableForDesign
-                                                bool result = popverMenu.EnableForDesign ();
+                                                Toplevel top = Application.Top;
+                                                bool result = popoverMenu.EnableForDesign (ref top);
 
                                                 View? view = new View ()
                                                 {
@@ -126,16 +129,16 @@ public class PopoverMenuTests
                                                 Application.Top!.Add (view);
 
                                                 // EnableForDesign sets to true; undo that
-                                                popverMenu.Visible = false;
+                                                popoverMenu.Visible = false;
 
-                                                Application.Popover!.Register (popverMenu);
+                                                Application.Popover!.Register (popoverMenu);
 
                                                 view.SetFocus ();
                                             })
                                      .WaitIteration ()
                                      .Then (() => Assert.False (Application.Popover?.GetActivePopover () is PopoverMenu))
                                      .Then (() => Assert.True (Application.Navigation!.GetFocused ()!.Id == "focusableView"))
-                                     .Then(() => Application.Popover!.Show(Application.Popover.Popovers.First()))
+                                     .Then (() => Application.Popover!.Show (Application.Popover.Popovers.First ()))
                                      .ScreenShot ("PopoverMenu initial state", _out)
                                      .SendKey (PopoverMenu.DefaultKey)
                                      .ScreenShot ($"After {PopoverMenu.DefaultKey}", _out)

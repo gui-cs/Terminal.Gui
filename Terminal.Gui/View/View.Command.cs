@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.ComponentModel;
+using System.Dynamic;
 
 namespace Terminal.Gui;
 
@@ -115,18 +116,18 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? RaiseAccepting (ICommandContext? ctx)
     {
-       // Logging.Trace($"{ctx?.Source?.Title}");
+        Logging.Debug ($"{ctx?.Source?.Title}");
         CommandEventArgs args = new () { Context = ctx };
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
-        //Logging.Trace ($"Calling OnAccepting...");
+        Logging.Debug ($"{ctx?.Source?.Title} - Calling OnAccepting...");
         args.Cancel = OnAccepting (args) || args.Cancel;
 
         if (!args.Cancel)
         {
             // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-            //Logging.Trace ($"Raising Accepting...");
+            Logging.Debug ($"{ctx?.Source?.Title} - Raising Accepting...");
             Accepting?.Invoke (this, args);
         }
 
@@ -142,7 +143,9 @@ public partial class View // Command APIs
             {
                 // TODO: It's a bit of a hack that this uses KeyBinding. There should be an InvokeCommmand that 
                 // TODO: is generic?
-                bool? handled = isDefaultView.InvokeCommand (Command.Accept, ctx);
+
+                Logging.Debug ($"{ctx?.Source?.Title} - InvokeCommand on Default View ({isDefaultView.Title})");
+                bool ? handled = isDefaultView.InvokeCommand (Command.Accept, ctx);
                 if (handled == true)
                 {
                     return true;
@@ -151,7 +154,7 @@ public partial class View // Command APIs
 
             if (SuperView is { })
             {
-                // Logging.Trace ($"Invoking Accept on SuperView: {SuperView.Title}...");
+                Logging.Debug ($"{ctx?.Source?.Title} - Invoking Accept on SuperView ({SuperView.Title})...");
                 return SuperView?.InvokeCommand (Command.Accept, ctx);
             }
         }
@@ -421,7 +424,12 @@ public partial class View // Command APIs
             _commandImplementations.TryGetValue (Command.NotBound, out implementation);
         }
 
-        return implementation! (null);
+        return implementation! (new CommandContext<object> ()
+        {
+            Command = command,
+            Source = this,
+            Binding = null,
+        });
 
     }
 }

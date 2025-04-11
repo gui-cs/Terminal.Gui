@@ -32,6 +32,7 @@ public class MenuBarv2 : Menuv2, IDesignable
                     Command.HotKey,
                     () =>
                     {
+                        Logging.Debug ($"{Title} - Command.HotKey");
                         if (RaiseHandlingHotKey () is true)
                         {
                             return true;
@@ -63,6 +64,7 @@ public class MenuBarv2 : Menuv2, IDesignable
                     Command.Quit,
                     ctx =>
                     {
+                        Logging.Debug ($"{Title} - Command.Quit");
                         if (HideActiveItem ())
                         {
                             return true;
@@ -251,7 +253,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// <inheritdoc/>
     protected override bool OnAccepting (CommandEventArgs args)
     {
-        Logging.Trace ($"{args.Context?.Source?.Title}");
+        Logging.Debug ($"{Title} - {args.Context?.Source?.Title}");
 
         if (Visible && args.Context?.Source is MenuBarItemv2 { PopoverMenu.Visible: false } sourceMenuBarItem)
         {
@@ -272,7 +274,7 @@ public class MenuBarv2 : Menuv2, IDesignable
             return true;
         }
 
-        return base.OnAccepting (args);
+        return false;//base.OnAccepting (args);
     }
 
     /// <summary>
@@ -281,14 +283,12 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// <param name="menuBarItem"></param>
     private void ShowPopover (MenuBarItemv2? menuBarItem)
     {
-        Logging.Trace ($"{menuBarItem?.Id}");
+        Logging.Debug ($"{Title} - {menuBarItem?.Id}");
 
         if (!_active || !Visible)
         {
             return;
         }
-
-        //menuBarItem!.PopoverMenu.Id = menuBarItem.Id;
 
         // TODO: We should init the PopoverMenu in a smarter way
         if (menuBarItem?.PopoverMenu is { IsInitialized: false })
@@ -301,6 +301,7 @@ public class MenuBarv2 : Menuv2, IDesignable
         if (Application.Popover?.GetActivePopover () is PopoverMenu popoverMenu
             && popoverMenu?.Root?.SuperMenuItem?.SuperView == this)
         {
+            Logging.Debug ($"{Title} - Application.Popover?.Hide ({popoverMenu.Title})");
             Application.Popover?.Hide (popoverMenu);
         }
 
@@ -311,22 +312,15 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         if (menuBarItem.PopoverMenu is { })
         {
-            // TODO: This is a bit of a hack to ensure the menu bar loses focus when 
-            // TODO: a MenuBarItem's popover is hidden. In PopoverMenu, see how
-            // TODO: Command.Quit raises Accepting.
-            menuBarItem.PopoverMenu.Accepting += (sender, args) =>
-                                                 {
-                                                     if (HasFocus)
-                                                     {
-                                                         CanFocus = false;
-                                                     }
-                                                 };
-
-
+            // When the PopoverMenu is Accepted make the MenuBar inactive and hide the popover
             menuBarItem.PopoverMenu.Accepted += (sender, args) =>
                                                 {
                                                     if (HasFocus)
                                                     {
+                                                        Logging.Debug ($"{Title} - Application.Popover?.Hide ({menuBarItem.PopoverMenu.Title})");
+                                                        Application.Popover?.Hide (menuBarItem.PopoverMenu);
+
+                                                        Logging.Debug ($"{Title} - Setting CanFocus to false");
                                                         CanFocus = false;
                                                     }
                                                 };
@@ -341,6 +335,7 @@ public class MenuBarv2 : Menuv2, IDesignable
             menuBarItem.PopoverMenu.Root.SuperMenuItem = menuBarItem;
         }
 
+        Logging.Debug ($"{Title} - \"{menuBarItem.PopoverMenu?.Title}\".MakeVisible");
         menuBarItem.PopoverMenu?.MakeVisible (new Point (menuBarItem.FrameToScreen ().X, menuBarItem.FrameToScreen ().Bottom));
     }
 
@@ -372,6 +367,7 @@ public class MenuBarv2 : Menuv2, IDesignable
         return true;
     }
 
+    // BUGBUG: This should not use Id, but Data? - Id is used too much for debugging.
     /// <summary>
     ///     Gets all menu items with the specified id, anywhere in the menu hierarchy.
     /// </summary>
@@ -399,6 +395,8 @@ public class MenuBarv2 : Menuv2, IDesignable
     {
         // Note: This menu is used by unit tests. If you modify it, you'll likely have to update
         // unit tests.
+
+        Title = "Demo MenuBar";
 
         var bordersCb = new CheckBox
         {
@@ -510,6 +508,9 @@ public class MenuBarv2 : Menuv2, IDesignable
                                                new MenuItemv2 ()
                                                {
                                                    TargetView = context as View,
+                                                   // BUGBUG: If a menuitem has Key = QuitKey and the menu is open, if the user presses QuitKey, the menu item gets the key first and invokescommand.
+                                                   // BUGBUG: This causes the trargetview to Stop. 
+                                                   // BUGBUG: Instead, the menu should just close. Need to figure out how to let the MenuBar, PopoverMenu, or Menu intercept Quitkey first.
                                                    Key = Application.QuitKey,
                                                    Command = Command.Quit
                                                }

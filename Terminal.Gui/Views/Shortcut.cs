@@ -60,8 +60,6 @@ public class Shortcut : View, IOrientation, IDesignable
     /// <param name="helpText">The help text to display.</param>
     public Shortcut (Key key, string? commandText, Action? action, string? helpText = null)
     {
-        Id = $"shortcut:{commandText}";
-
         HighlightStyle = HighlightStyle.None;
         CanFocus = true;
 
@@ -245,44 +243,50 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     /// <summary>
-    ///     Called when a Command has been invoked on this Shortcut.
+    ///     Dispatches the Command in the <paramref name="commandContext"/> (Raises Selected, then Accepting, then invoke the Action, if any).
+    ///     Called when Command.Select, Accept, or HotKey has been invoked on this Shortcut.
     /// </summary>
     /// <param name="commandContext"></param>
-    /// <returns></returns>
+    /// <returns>
+    ///     <see langword="null"/> if no event was raised; input processing should continue.
+    ///     <see langword="false"/> if the event was raised and was not handled (or cancelled); input processing should continue.
+    ///     <see langword="true"/> if the event was raised and handled (or cancelled); input processing should stop.
+    /// </returns>
     internal virtual bool? DispatchCommand (ICommandContext? commandContext)
     {
-        Logging.Trace($"{commandContext?.Source?.Title}");
         CommandContext<KeyBinding>? keyCommandContext = commandContext as CommandContext<KeyBinding>? ?? default (CommandContext<KeyBinding>);
+
+        Logging.Debug ($"{Title} - {commandContext?.Source?.Title} Command: {commandContext?.Command}");
 
         if (keyCommandContext?.Binding.Data != this)
         {
+            // TODO: Optimize this to only do this if CommandView is custom (non View)
             // Invoke Select on the CommandView to cause it to change state if it wants to
             // If this causes CommandView to raise Accept, we eat it
             keyCommandContext = keyCommandContext!.Value with { Binding = keyCommandContext.Value.Binding with { Data = this } };
 
-            Logging.Trace ($"Invoking Select on CommandView.");
+            Logging.Debug ($"{commandContext?.Source?.Title} - Invoking Select on CommandView ({CommandView.GetType ().Name}).");
 
             CommandView.InvokeCommand (Command.Select, keyCommandContext);
         }
 
-        // BUGBUG: Why does this use keyCommandContext and not commandContext?
-        Logging.Trace ($"RaiseSelecting ...");
-        if (RaiseSelecting (keyCommandContext) is true)
+        Logging.Debug ($"{commandContext?.Source?.Title} - RaiseSelecting ...");
+        if (RaiseSelecting (commandContext) is true)
         {
             return true;
         }
 
         // The default HotKey handler sets Focus
-        Logging.Trace ($"SetFocus...");
+        Logging.Debug ($"{commandContext?.Source?.Title} - SetFocus...");
         SetFocus ();
 
         var cancel = false;
 
-        if (commandContext is { })
+        if (commandContext is { } && commandContext.Source != this)
         {
             commandContext.Source = this;
         }
-        Logging.Trace ($"RaiseAccepting...");
+        Logging.Debug ($"{commandContext?.Source?.Title} - RaiseAccepting...");
         cancel = RaiseAccepting (commandContext) is true;
 
         if (cancel)
@@ -297,7 +301,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
         if (Action is { })
         {
-            Logging.Trace ($"Invoke Action...");
+            Logging.Debug ($"{commandContext?.Source?.Title} - Invoke Action...");
             Action.Invoke ();
 
             // Assume if there's a subscriber to Action, it's handled.
@@ -422,7 +426,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
             // The default behavior is for CommandView to not get focus. I
             // If you want it to get focus, you need to set it.
-           // _commandView.CanFocus = false;
+            // _commandView.CanFocus = false;
 
             _commandView.HotKeyChanged += (s, e) =>
                                           {
@@ -719,10 +723,10 @@ public class Shortcut : View, IOrientation, IDesignable
         set
         {
             _forceFocusColors = value;
-            SetNeedsDraw();
+            SetNeedsDraw ();
         }
     }
-    
+
     /// <inheritdoc />
     public override Attribute GetNormalColor ()
     {
@@ -793,7 +797,7 @@ public class ShortcutKeyView : View
     /// <inheritdoc />
     public override Attribute GetNormalColor ()
     {
-        if (SuperView is { HasFocus: true})
+        if (SuperView is { HasFocus: true })
 
         {
             return base.GetHotFocusColor ();

@@ -74,7 +74,7 @@ public class MenuBarItemv2 : MenuItemv2
                 null,
                 Command.NotBound,
                 commandText,
-                new (menuItems))
+                new (menuItems) { Title = $"PopoverMenu for {commandText}" })
     { }
 
     /// <summary>

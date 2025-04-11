@@ -15,10 +15,18 @@ public class Menuv2 : Bar
     /// <inheritdoc/>
     public Menuv2 (IEnumerable<View>? shortcuts) : base (shortcuts)
     {
+        // Do this to support debugging traces where Title gets set
+        base.HotKeySpecifier = (Rune)'\xffff';
+
         Orientation = Orientation.Vertical;
         Width = Dim.Auto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
         base.ColorScheme = Colors.ColorSchemes ["Menu"];
+
+        if (Border is { })
+        {
+            Border.Settings &= ~BorderSettings.Title;
+        }
 
         BorderStyle = DefaultBorderStyle;
 
@@ -72,7 +80,7 @@ public class Menuv2 : Bar
 
                     void MenuItemOnAccepted (object? sender, CommandEventArgs e)
                     {
-                        Logging.Trace ($"MenuItemOnAccepted: {e.Context?.Source?.Title}");
+                        Logging.Debug ($"MenuItemOnAccepted: Calling RaiseAccepted {e.Context?.Source?.Title}");
                         RaiseAccepted (e.Context);
                     }
                 }
@@ -85,15 +93,35 @@ public class Menuv2 : Bar
         }
     }
 
+
     /// <inheritdoc />
     protected override bool OnAccepting (CommandEventArgs args)
     {
-        Logging.Trace ($"{args.Context}");
+        Logging.Debug ($"{Title} - {args.Context?.Source?.Title} Command: {args.Context?.Command}");
 
+        // TODO: Consider having PopoverMenu subscribe to Accepting instead of us overriding OnAccepting here
+        // TODO: Doing so would be better encapsulation and might allow us to remove the SuperMenuItem property.
+        if (SuperView is { })
+        {
+            Logging.Debug ($"{Title} - SuperView is null");
+            return false;
+        }
+
+        Logging.Debug ($"{Title} - {args.Context}");
+
+        // When the user accepts a menuItem, Menu.RaiseAccepting is called, and we intercept that
+        // here. Because we may not have a SuperView (if we are in a PopoverMenu), we need to propagate
+        // Command.Accept to the SuperMenuItem if it exists.
         if (SuperMenuItem is { })
         {
-            Logging.Trace ($"Invoking Accept on SuperMenuItem: {SuperMenuItem.Title}...");
-            return SuperMenuItem?.SuperView?.InvokeCommand (Command.Accept, args.Context) is true;
+            if (Visible && args.Context is CommandContext<KeyBinding> { Binding.Key: { } } keyCommandContext && keyCommandContext.Binding.Key == Application.QuitKey)
+            {
+                // Special case QuitKey if we are Visible - This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
+                // And causes just the menu to quit.
+                return true;
+            }
+            Logging.Debug ($"{Title} - Invoking Accept on SuperMenuItem: {SuperMenuItem?.Title}...");
+            return SuperMenuItem?.InvokeCommand (Command.Accept, args.Context) is true;
         }
         return false;
     }
