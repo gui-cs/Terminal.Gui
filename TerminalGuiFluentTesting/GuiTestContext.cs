@@ -65,7 +65,7 @@ public class GuiTestContext : IDisposable
                                      booting.Release ();
 
                                      Toplevel t = topLevelBuilder ();
-
+                                     t.Closed += (s, e) => { _finished = true; };
                                      Application.Run (t); // This will block, but it's on a background thread now
 
                                      Application.Shutdown ();
@@ -115,16 +115,7 @@ public class GuiTestContext : IDisposable
             return this;
         }
 
-        Application.Invoke (() => {
-                                try
-                                {
-                                    Application.RequestStop ();
-                                }
-                                catch (Exception ex)
-                                {
-
-                                }
-                            });
+        Application.Invoke (() => {Application.RequestStop ();});
 
         // Wait for the application to stop, but give it a 1-second timeout
         if (!_runTask.Wait (TimeSpan.FromMilliseconds (1000)))
