@@ -178,7 +178,7 @@ public class FileDialogStyle
 
                     IDirectoryInfo dir = _fileSystem.DirectoryInfo.New (path);
 
-                    if (!roots.ContainsKey (dir) && dir.Exists)
+                    if (!roots.ContainsKey (dir) && !roots.ContainsValue (special.ToString ()) && dir.Exists)
                     {
                         roots.Add (dir, special.ToString ());
                     }
