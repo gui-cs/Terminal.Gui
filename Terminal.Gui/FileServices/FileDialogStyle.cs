@@ -151,14 +151,11 @@ public class FileDialogStyle
 
         try
         {
-            foreach (string d in GetLogicalDrives ())
+            foreach (string d in _fileSystem.Directory.GetLogicalDrives ())
             {
                 IDirectoryInfo dir = _fileSystem.DirectoryInfo.New (d);
 
-                if (!roots.ContainsKey (dir))
-                {
-                    roots.Add (dir, d);
-                }
+                roots.TryAdd (dir, d);
             }
         }
         catch (Exception)

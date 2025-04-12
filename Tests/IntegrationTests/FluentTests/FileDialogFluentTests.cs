@@ -174,6 +174,7 @@ public class FileDialogFluentTests
     public void SaveFileDialog_PopTree_AndNavigate (V2TestDriver d)
     {
         var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = true };
+
         using var c = With.A (sd, 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
                           .AssertTrue (sd.Canceled)
