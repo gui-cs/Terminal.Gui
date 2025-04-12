@@ -168,4 +168,29 @@ public class FileDialogFluentTests
 
         Assert.True(sd.Canceled);
     }
+
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void SaveFileDialog_PopTree_AndNavigate (V2TestDriver d)
+    {
+        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = true };
+        using var c = With.A (sd, 100, 20, d)
+                          .ScreenShot ("Save dialog", _out)
+                          .AssertTrue (sd.Canceled)
+                          .LeftClick <Button> (b => b.Text == "►►")
+                          .ScreenShot ("After pop tree", _out)
+                          .Focus <TreeView<IFileSystemInfo>> (_ => true)
+                          .Right ()
+                          .ScreenShot ("After expand tree", _out)
+                          .Down ()
+                          .ScreenShot ("After navigate down in tree", _out)
+                          .Enter ()
+                          .WaitIteration ()
+                          .AssertFalse (sd.Canceled)
+                          .AssertContains ("empty-dir", sd.FileName)
+                          .WriteOutLogs (_out)
+                          .Stop ();
+
+        Assert.False (sd.Canceled);
+    }
 }
