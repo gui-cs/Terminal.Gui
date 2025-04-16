@@ -807,34 +807,41 @@ public class ListView : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnKeyDown (Key a)
+    protected override bool OnKeyDown (Key key)
     {
         // If marking is enabled and the user presses the space key don't let CollectionNavigator
         // at it
         if (AllowsMarking)
         {
-            var keys = KeyBindings.GetAllFromCommands (Command.Select);
+            IEnumerable<Key> keys = KeyBindings.GetAllFromCommands (Command.Select);
 
-            if (keys.Contains (a))
+            if (keys.Contains (key))
             {
                 return false;
             }
 
             keys = KeyBindings.GetAllFromCommands ([Command.Select, Command.Down]);
 
-            if (keys.Contains (a))
+            if (keys.Contains (key))
             {
                 return false;
             }
 
         }
 
-        // Enable user to find & select an item by typing text
-        if (CollectionNavigatorBase.IsCompatibleKey (a))
+        // If the key was bound to a command, invoke the command. This enables overriding the default handling.
+        // See: https://github.com/gui-cs/Terminal.Gui/issues/3950#issuecomment-2807350939
+        if (KeyBindings.TryGet (key, out _))
         {
-            int? newItem = KeystrokeNavigator?.GetNextMatchingItem (SelectedItem, (char)a);
+            return false;
+        }
 
-            if (newItem is int && newItem != -1)
+        // Enable user to find & select an item by typing text
+        if (CollectionNavigatorBase.IsCompatibleKey (key))
+        {
+            int? newItem = KeystrokeNavigator?.GetNextMatchingItem (SelectedItem, (char)key);
+
+            if (newItem is { } && newItem != -1)
             {
                 SelectedItem = (int)newItem;
                 EnsureSelectedItemVisible ();

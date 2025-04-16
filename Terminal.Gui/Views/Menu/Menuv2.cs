@@ -72,7 +72,13 @@ public class Menuv2 : Bar
                 {
                     menuItem.CanFocus = true;
 
-                    AddCommand (menuItem.Command, RaiseAccepted);
+                    AddCommand (menuItem.Command, (ctx) =>
+                                                  {
+                                                      RaiseAccepted(ctx);
+
+                                                      return true;
+
+                                                  });
 
                     menuItem.Accepted += MenuItemOnAccepted;
 
