@@ -134,15 +134,13 @@ public class Menuv2 : Bar
     /// </summary>
     /// <param name="ctx"></param>
     /// <returns></returns>
-    protected bool? RaiseAccepted (ICommandContext? ctx)
+    protected void RaiseAccepted (ICommandContext? ctx)
     {
         //Logging.Trace ($"RaiseAccepted: {ctx}");
         CommandEventArgs args = new () { Context = ctx };
 
         OnAccepted (args);
         Accepted?.Invoke (this, args);
-
-        return true;
     }
 
     /// <summary>

@@ -505,15 +505,13 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// </summary>
     /// <param name="ctx"></param>
     /// <returns></returns>
-    protected bool? RaiseAccepted (ICommandContext? ctx)
+    protected void RaiseAccepted (ICommandContext? ctx)
     {
         Logging.Debug ($"{Title} - RaiseAccepted: {ctx}");
         CommandEventArgs args = new () { Context = ctx };
 
         OnAccepted (args);
         Accepted?.Invoke (this, args);
-
-        return true;
     }
 
     /// <summary>

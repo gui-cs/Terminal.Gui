@@ -102,6 +102,53 @@ public class PopoverMenuTests
                                      .Stop ();
     }
 
+
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void Activate_Set_Application_Navigation_Correctly (V2TestDriver d)
+    {
+        MenuBarv2? menuBar = null;
+
+        using GuiTestContext c = With.A<Window> (50, 20, d)
+                                     .Then (
+                                            () =>
+                                            {
+                                                var popoverMenu = new PopoverMenu ();
+
+                                                // Call EnableForDesign
+                                                Toplevel top = Application.Top!;
+                                                bool result = popoverMenu.EnableForDesign (ref top);
+
+                                                View? view = new View ()
+                                                {
+                                                    CanFocus = true,
+                                                    Height = Dim.Auto (),
+                                                    Width = Dim.Auto (),
+                                                    Id = "focusableView",
+                                                    Text = "View",
+                                                };
+                                                Application.Top!.Add (view);
+
+                                                // EnableForDesign sets to true; undo that
+                                                popoverMenu.Visible = false;
+
+                                                Application.Popover!.Register (popoverMenu);
+
+                                                view.SetFocus ();
+                                            })
+                                     .WaitIteration ()
+                                     .Then (() => Assert.False (Application.Popover?.GetActivePopover () is PopoverMenu))
+                                     .Then (() => Assert.True (Application.Navigation!.GetFocused ()!.Id == "focusableView"))
+                                     .Then (() => Application.Popover!.Show (Application.Popover.Popovers.First ()))
+                                     .ScreenShot ("PopoverMenu initial state", _out)
+                                     .SendKey (PopoverMenu.DefaultKey)
+                                     .ScreenShot ($"After {PopoverMenu.DefaultKey}", _out)
+                                     .Then (() => Assert.True (Application.Popover?.GetActivePopover () is PopoverMenu))
+                                     .Then (() => Assert.True (Application.Navigation!.GetFocused ()!.Id == "Cu_t"))
+                                     .WriteOutLogs (_out)
+                                     .Stop ();
+    }
+
     [Theory]
     [ClassData (typeof (V2TestDrivers))]
     public void QuitKey_Restores_Focus_Correctly (V2TestDriver d)
@@ -115,7 +162,7 @@ public class PopoverMenuTests
                                                 var popoverMenu = new PopoverMenu ();
 
                                                 // Call EnableForDesign
-                                                Toplevel top = Application.Top;
+                                                Toplevel top = Application.Top!;
                                                 bool result = popoverMenu.EnableForDesign (ref top);
 
                                                 View? view = new View ()
