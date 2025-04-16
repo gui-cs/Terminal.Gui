@@ -1,5 +1,6 @@
 ﻿using Terminal.Gui;
 using TerminalGuiFluentTesting;
+using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
 namespace IntegrationTests.FluentTests;
@@ -33,7 +34,6 @@ public class TreeViewFluentTests
                 bike = new ("Bike")
             ]
         };
-
         tv.AddObject (root);
 
         using GuiTestContext context =
@@ -46,10 +46,15 @@ public class TreeViewFluentTests
                 .Then (() => Assert.Null (tv.GetObjectOnRow (1)))
                 .Right ()
                 .ScreenShot ("After expanding", _out)
-                .AssertEqual (root, tv.GetObjectOnRow (0))
-                .AssertEqual (car, tv.GetObjectOnRow (1))
-                .AssertEqual (lorry, tv.GetObjectOnRow (2))
-                .AssertEqual (bike, tv.GetObjectOnRow (3))
+                .AssertMultiple (
+                                 () =>
+                                 {
+                                     Assert.Equal (root, tv.GetObjectOnRow (0));
+                                     Assert.Equal (car, tv.GetObjectOnRow (1));
+                                     Assert.Equal (lorry, tv.GetObjectOnRow (2));
+                                     Assert.Equal (bike, tv.GetObjectOnRow (3));
+                                 })
+                .AssertIsAssignableFrom <ITreeNode>(tv.SelectedObject)
                 .Then (
                        () =>
                        {
@@ -59,10 +64,14 @@ public class TreeViewFluentTests
                        })
                 .WaitIteration ()
                 .ScreenShot ("After re-order", _out)
-                .AssertEqual (root, tv.GetObjectOnRow (0))
-                .AssertEqual (bike, tv.GetObjectOnRow (1))
-                .AssertEqual (car, tv.GetObjectOnRow (2))
-                .AssertEqual (lorry, tv.GetObjectOnRow (3))
+                .AssertMultiple (
+                                 () =>
+                                 {
+                                     Assert.Equal (root, tv.GetObjectOnRow (0));
+                                     Assert.Equal (bike, tv.GetObjectOnRow (1));
+                                     Assert.Equal (car, tv.GetObjectOnRow (2));
+                                     Assert.Equal (lorry, tv.GetObjectOnRow (3));
+                                 })
                 .WriteOutLogs (_out);
 
         context.Stop ();
@@ -128,15 +137,19 @@ public class TreeViewFluentTests
                 .Add (tv)
                 .WaitIteration ()
                 .ScreenShot ("Initial State", _out)
-                .AssertEqual (root, tv.GetObjectOnRow (0))
-                .AssertEqual (car, tv.GetObjectOnRow (1))
-                .AssertEqual (mrA, tv.GetObjectOnRow (2))
-                .AssertEqual (mrB, tv.GetObjectOnRow (3))
-                .AssertEqual (lorry, tv.GetObjectOnRow (4))
-                .AssertEqual (mrC, tv.GetObjectOnRow (5))
-                .AssertEqual (bike, tv.GetObjectOnRow (6))
-                .AssertEqual (mrD, tv.GetObjectOnRow (7))
-                .AssertEqual (mrE, tv.GetObjectOnRow (8))
+                .AssertMultiple (
+                                 () =>
+                                 {
+                                     Assert.Equal (root, tv.GetObjectOnRow (0));
+                                     Assert.Equal (car, tv.GetObjectOnRow (1));
+                                     Assert.Equal (mrA, tv.GetObjectOnRow (2));
+                                     Assert.Equal (mrB, tv.GetObjectOnRow (3));
+                                     Assert.Equal (lorry, tv.GetObjectOnRow (4));
+                                     Assert.Equal (mrC, tv.GetObjectOnRow (5));
+                                     Assert.Equal (bike, tv.GetObjectOnRow (6));
+                                     Assert.Equal (mrD, tv.GetObjectOnRow (7));
+                                     Assert.Equal (mrE, tv.GetObjectOnRow (8));
+                                 })
                 .Then (
                        () =>
                        {
@@ -146,15 +159,19 @@ public class TreeViewFluentTests
                        })
                 .WaitIteration ()
                 .ScreenShot ("After re-order", _out)
-                .AssertEqual (root, tv.GetObjectOnRow (0))
-                .AssertEqual (bike, tv.GetObjectOnRow (1))
-                .AssertEqual (mrD, tv.GetObjectOnRow (2))
-                .AssertEqual (mrE, tv.GetObjectOnRow (3))
-                .AssertEqual (car, tv.GetObjectOnRow (4))
-                .AssertEqual (mrA, tv.GetObjectOnRow (5))
-                .AssertEqual (mrB, tv.GetObjectOnRow (6))
-                .AssertEqual (lorry, tv.GetObjectOnRow (7))
-                .AssertEqual (mrC, tv.GetObjectOnRow (8))
+                .AssertMultiple (
+                                 () =>
+                                 {
+                                     Assert.Equal (root, tv.GetObjectOnRow (0));
+                                     Assert.Equal (bike, tv.GetObjectOnRow (1));
+                                     Assert.Equal (mrD, tv.GetObjectOnRow (2));
+                                     Assert.Equal (mrE, tv.GetObjectOnRow (3));
+                                     Assert.Equal (car, tv.GetObjectOnRow (4));
+                                     Assert.Equal (mrA, tv.GetObjectOnRow (5));
+                                     Assert.Equal (mrB, tv.GetObjectOnRow (6));
+                                     Assert.Equal (lorry, tv.GetObjectOnRow (7));
+                                     Assert.Equal (mrC, tv.GetObjectOnRow (8));
+                                 })
                 .WriteOutLogs (_out);
 
         context.Stop ();
