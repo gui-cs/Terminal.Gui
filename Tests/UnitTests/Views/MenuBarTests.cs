@@ -182,16 +182,15 @@ public class MenuBarTests ()
         top.Dispose ();
     }
 
-
     [Fact]
     [AutoInitShutdown]
-    public void MenuItem_HotKey_Deactivates ()
+    public void MenuItems_HotKey_RaisesAction ()
     {
         // Arrange
         int action = 0;
-        var menuItem = new MenuItemv2 { Id = "menuItem", Title = "_Item", Action = () => action++ };
+        var menuItem = new MenuItemv2 { Id = "menuItem", Title = "Menu_Item", Action = () => action++ };
         var menu = new Menuv2 ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItemv2 { Id = "menuBarItem", Title = "_New" };
+        var menuBarItem = new MenuBarItemv2 { Id = "menuBarItem", Title = "_MenuBarItem" };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
@@ -204,13 +203,45 @@ public class MenuBarTests ()
         RunState rs = Application.Begin (top);
         Assert.False (menuBar.IsActive ());
 
+        Application.RaiseKeyDownEvent (Key.M.WithAlt);
+        Assert.True (menuBar.IsActive ());
+        Assert.True (menuBar.CanFocus);
+        Assert.True (menuBarItem.PopoverMenu.Visible);
+
         // Act
-        Application.RaiseKeyDownEvent (Key.N.WithAlt);
+        Application.RaiseKeyDownEvent (Key.I);
+        Assert.Equal (1, action);
+
+        Application.End (rs);
+        top.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void MenuItems_HotKey_Deactivates ()
+    {
+        // Arrange
+        var menuItem = new MenuItemv2 { Id = "menuItem", Title = "Menu_Item" };
+        var menu = new Menuv2 ([menuItem]) { Id = "menu" };
+        var menuBarItem = new MenuBarItemv2 { Id = "menuBarItem", Title = "_MenuBarItem" };
+        var menuBarItemPopover = new PopoverMenu ();
+        menuBarItem.PopoverMenu = menuBarItemPopover;
+        menuBarItemPopover.Root = menu;
+        var menuBar = new MenuBarv2 () { Id = "menuBar" };
+        menuBar.Add (menuBarItem);
+        Assert.Single (menuBar.SubViews);
+        Assert.Single (menuBarItem.SubViews);
+        var top = new Toplevel ();
+        top.Add (menuBar);
+        RunState rs = Application.Begin (top);
+        Assert.False (menuBar.IsActive ());
+
+        Application.RaiseKeyDownEvent (Key.M.WithAlt);
         Assert.True (menuBar.IsActive ());
         Assert.True (menuBarItem.PopoverMenu.Visible);
 
+        // Act
         Application.RaiseKeyDownEvent (Key.I);
-        Assert.Equal (1, action);
         Assert.False (menuBar.IsActive ());
         Assert.False (menuBar.IsOpen ());
         Assert.False (menuBar.HasFocus);

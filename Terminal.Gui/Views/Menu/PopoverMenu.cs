@@ -71,13 +71,21 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             Logging.Debug ($"{Title} Command.Quit - {ctx?.Source?.Title}");
             if (!Visible)
             {
-                return null;
+                return false;
             }
 
+            Logging.Debug ($"{Title} Command.Quit - Calling RaiseAccepting {ctx?.Source?.Title}");
             // This ensures the quit command gets propagated to the owner of the popover.
             // This is important for MenuBarItems to ensure the MenuBar loses focus when
             // the user presses QuitKey to cause the menu to close
-            bool? ret = RaiseAccepting (ctx);
+             bool? ret = RaiseAccepting (ctx);
+
+            if (ret is not true)
+            {
+                Visible = false;
+
+                return true;
+            }
 
             return ret;
         }
@@ -289,8 +297,9 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
         foreach (MenuItemv2 menuItem in all)
         {
-            if (menuItem.Key == key)
+            if (key != Application.QuitKey && menuItem.Key == key)
             {
+                Logging.Debug ($"{Title} - key: {key}");
                 return menuItem.NewKeyDownEvent (key);
             }
         }
@@ -463,8 +472,14 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             Visible = false;
         }
 
-        // This supports the case when a hotkey of a menuitem with a submenu is pressed
-        //e.Cancel = true;
+        if (e.Context is CommandContext<KeyBinding> keyCommandContext)
+        {
+            if (keyCommandContext.Binding.Key is { } && keyCommandContext.Binding.Key == Application.QuitKey && SuperView is { Visible: true })
+            {
+                Logging.Debug ($"{Title} - Setting e.Cancel = true - Application.QuitKey/Command = Command.Quit");
+                e.Cancel = true;
+            }
+        }
     }
 
     private void MenuAccepted (object? sender, CommandEventArgs e)
@@ -474,7 +489,6 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         if (e.Context?.Source is MenuItemv2 { SubMenu: null })
         {
             HideAndRemoveSubMenu (_root);
-            RaiseAccepted (e.Context);
         }
         else if (e.Context?.Source is MenuItemv2 { SubMenu: { } } menuItemWithSubMenu)
         {
@@ -483,16 +497,21 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     }
 
     /// <inheritdoc />
-    protected override bool OnAccepting (CommandEventArgs args)
+    protected override bool OnAccepting (CommandEventArgs e)
     {
-        bool? ret = base.OnAccepting (args);
+        Logging.Debug ($"{Title} - calling base.OnAccepting: {e.Context?.Command}");
+        bool? ret = base.OnAccepting (e);
 
-        if (ret is true || args.Cancel)
+        if (ret is true || e.Cancel)
         {
             return true;
         }
 
-        RaiseAccepted (args.Context);
+        // Only raise Accepted if the command came from one of our MenuItems
+        if (GetMenuItemsOfAllSubMenus ().Contains (e.Context.Source))
+        {
+            RaiseAccepted (e.Context);
+        }
 
         Visible = false;
 
@@ -536,7 +555,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     private void MenuOnSelectedMenuItemChanged (object? sender, MenuItemv2? e)
     {
-        Logging.Debug ($"{Title} - e: {e?.Title}");
+        Logging.Debug ($"{Title} - e.Title: {e?.Title}");
         ShowSubMenu (e);
     }
 

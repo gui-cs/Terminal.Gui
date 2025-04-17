@@ -99,7 +99,6 @@ public class UICatalogTop : Toplevel
     {
         Applied -= ConfigAppliedHandler;
         Unloaded -= UnloadedHandler;
-        Dispose ();
     }
 
     #region MenuBar

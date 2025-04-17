@@ -226,8 +226,10 @@ public class UICatalog
             Themes!.Theme = UICatalogTop.CachedTheme;
         }
 
-        Application.Run<UICatalogTop> ().Dispose ();
+        UICatalogTop top = Application.Run<UICatalogTop> ();
+        top.Dispose ();
         Application.Shutdown ();
+        VerifyObjectsWereDisposed ();
 
         return UICatalogTop.CachedSelectedScenario!;
     }
@@ -356,12 +358,12 @@ public class UICatalog
             return;
         }
 
+        View.DebugIDisposable = true;
         while (RunUICatalogTopLevel () is { } scenario)
         {
-            VerifyObjectsWereDisposed ();
 
 #if DEBUG_IDISPOSABLE
-            View.DebugIDisposable = true;
+            VerifyObjectsWereDisposed ();
 
             // Measure how long it takes for the app to shut down
             var sw = new Stopwatch ();
@@ -376,6 +378,7 @@ public class UICatalog
             // made by Scenario.Init() above
             // TODO: Throw if shutdown was not called already
             Application.Shutdown ();
+
             VerifyObjectsWereDisposed ();
 
 #if DEBUG_IDISPOSABLE

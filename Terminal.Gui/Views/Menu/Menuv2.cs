@@ -74,7 +74,7 @@ public class Menuv2 : Bar
 
                     AddCommand (menuItem.Command, (ctx) =>
                                                   {
-                                                      RaiseAccepted(ctx);
+                                                      RaiseAccepted (ctx);
 
                                                       return true;
 
@@ -103,6 +103,8 @@ public class Menuv2 : Bar
     /// <inheritdoc />
     protected override bool OnAccepting (CommandEventArgs args)
     {
+        // When the user accepts a menuItem, Menu.RaiseAccepting is called, and we intercept that here.
+
         Logging.Debug ($"{Title} - {args.Context?.Source?.Title} Command: {args.Context?.Command}");
 
         // TODO: Consider having PopoverMenu subscribe to Accepting instead of us overriding OnAccepting here
@@ -110,22 +112,23 @@ public class Menuv2 : Bar
         if (SuperView is { })
         {
             Logging.Debug ($"{Title} - SuperView is null");
-            return false;
+            //return false;
         }
 
         Logging.Debug ($"{Title} - {args.Context}");
 
-        // When the user accepts a menuItem, Menu.RaiseAccepting is called, and we intercept that
-        // here. Because we may not have a SuperView (if we are in a PopoverMenu), we need to propagate
-        // Command.Accept to the SuperMenuItem if it exists.
-        if (SuperMenuItem is { })
+        if (args.Context is CommandContext<KeyBinding> { Binding.Key: { } } keyCommandContext && keyCommandContext.Binding.Key == Application.QuitKey)
         {
-            if (Visible && args.Context is CommandContext<KeyBinding> { Binding.Key: { } } keyCommandContext && keyCommandContext.Binding.Key == Application.QuitKey)
-            {
-                // Special case QuitKey if we are Visible - This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
-                // And causes just the menu to quit.
-                return true;
-            }
+            // Special case QuitKey if we are Visible - This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
+            // And causes just the menu to quit.
+            Logging.Debug ($"{Title} - Returning true - Application.QuitKey/Command = Command.Quit");
+            return true;
+        }
+
+        // Because we may not have a SuperView (if we are in a PopoverMenu), we need to propagate
+        // Command.Accept to the SuperMenuItem if it exists.
+        if (SuperView is null && SuperMenuItem is { })
+        {
             Logging.Debug ($"{Title} - Invoking Accept on SuperMenuItem: {SuperMenuItem?.Title}...");
             return SuperMenuItem?.InvokeCommand (Command.Accept, args.Context) is true;
         }
@@ -220,6 +223,9 @@ public class Menuv2 : Bar
     {
         base.Dispose (disposing);
 
-        Applied -= OnConfigurationManagerApplied;
+        if (disposing)
+        {
+            Applied -= OnConfigurationManagerApplied;
+        }
     }
 }

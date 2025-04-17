@@ -116,6 +116,7 @@ public class MenuItemv2 : Shortcut
                 // This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
                 Logging.Debug ($"{Title} - Ignoring Key = Application.QuitKey/Command = Command.Quit");
                 quit = true;
+                //ret = true;
             }
         }
 
@@ -155,6 +156,22 @@ public class MenuItemv2 : Shortcut
 
         return ret;
     }
+
+    ///// <inheritdoc />
+    //protected override bool OnAccepting (CommandEventArgs e)
+    //{
+    //    Logging.Debug ($"{Title} - calling base.OnAccepting: {e.Context?.Command}");
+    //    bool? ret = base.OnAccepting (e);
+
+    //    if (ret is true || e.Cancel)
+    //    {
+    //        return true;
+    //    }
+
+    //    //RaiseAccepted (e.Context);
+
+    //    return ret is true;
+    //}
 
     private Menuv2? _subMenu;
 

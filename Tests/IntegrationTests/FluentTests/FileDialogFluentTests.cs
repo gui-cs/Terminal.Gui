@@ -41,10 +41,10 @@ public class FileDialogFluentTests
     [ClassData (typeof (V2TestDrivers))]
     public void CancelFileDialog_UsingEscape (V2TestDriver d)
     {
-        var sd = new SaveDialog ( CreateExampleFileSystem ());
+        var sd = new SaveDialog (CreateExampleFileSystem ());
         using var c = With.A (sd, 100, 20, d)
-            .ScreenShot ("Save dialog",_out)
-            .Escape()
+            .ScreenShot ("Save dialog", _out)
+            .Escape ()
             .Stop ();
 
         Assert.True (sd.Canceled);
@@ -54,10 +54,10 @@ public class FileDialogFluentTests
     [ClassData (typeof (V2TestDrivers))]
     public void CancelFileDialog_UsingCancelButton_TabThenEnter (V2TestDriver d)
     {
-        var sd = new SaveDialog (CreateExampleFileSystem ());
+        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = false };
         using var c = With.A (sd, 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
-                          .Focus <Button>(b=> b.Text == "_Cancel")
+                          .Focus<Button> (b => b.Text == "_Cancel")
                           .Enter ()
                           .Stop ();
 
@@ -71,7 +71,7 @@ public class FileDialogFluentTests
         var sd = new SaveDialog (CreateExampleFileSystem ());
         using var c = With.A (sd, 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
-                          .LeftClick <Button> (b => b.Text == "_Cancel")
+                          .LeftClick<Button> (b => b.Text == "_Cancel")
                           .Stop ()
                           .WriteOutLogs (_out);
 
@@ -128,16 +128,16 @@ public class FileDialogFluentTests
     public void SaveFileDialog_UsingOkButton_TabEnter (V2TestDriver d)
     {
         var fs = CreateExampleFileSystem ();
-        var sd = new SaveDialog (fs);
+        var sd = new SaveDialog (fs) { Modal = false };
         using var c = With.A (sd, 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
-                          .Focus <Button> (b => b.Text == "_Save")
+                          .Focus<Button> (b => b.Text == "_Save")
                           .Enter ()
                           .WriteOutLogs (_out)
                           .Stop ();
 
         Assert.False (sd.Canceled);
-        AssertIsFileSystemRoot (fs,sd);
+        AssertIsFileSystemRoot (fs, sd);
     }
 
     private void AssertIsFileSystemRoot (IFileSystem fs, SaveDialog sd)
@@ -155,7 +155,7 @@ public class FileDialogFluentTests
     [ClassData (typeof (V2TestDrivers))]
     public void SaveFileDialog_PressingPopTree_ShouldNotChangeCancel (V2TestDriver d)
     {
-        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = true };
+        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = false };
         using var c = With.A (sd, 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
                           .AssertTrue (sd.Canceled)
@@ -166,21 +166,21 @@ public class FileDialogFluentTests
                           .WriteOutLogs (_out)
                           .Stop ();
 
-        Assert.True(sd.Canceled);
+        Assert.True (sd.Canceled);
     }
 
     [Theory]
     [ClassData (typeof (V2TestDrivers))]
     public void SaveFileDialog_PopTree_AndNavigate (V2TestDriver d)
     {
-        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = true };
+        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = false };
 
         using var c = With.A (sd, 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
                           .AssertTrue (sd.Canceled)
-                          .LeftClick <Button> (b => b.Text == "►►")
+                          .LeftClick<Button> (b => b.Text == "►►")
                           .ScreenShot ("After pop tree", _out)
-                          .Focus <TreeView<IFileSystemInfo>> (_ => true)
+                          .Focus<TreeView<IFileSystemInfo>> (_ => true)
                           .Right ()
                           .ScreenShot ("After expand tree", _out)
                           .Down ()

@@ -507,9 +507,10 @@ public class MenuBarv2 : Menuv2, IDesignable
                                                new Line (),
                                                new MenuItemv2 ()
                                                {
+                                                   Id = "Quit",
                                                    TargetView = context as View,
                                                    // BUGBUG: If a menuitem has Key = QuitKey and the menu is open, if the user presses QuitKey, the menu item gets the key first and invokescommand.
-                                                   // BUGBUG: This causes the trargetview to Stop. 
+                                                   // BUGBUG: This causes the targetview to Stop. 
                                                    // BUGBUG: Instead, the menu should just close. Need to figure out how to let the MenuBar, PopoverMenu, or Menu intercept Quitkey first.
                                                    Key = Application.QuitKey,
                                                    Command = Command.Quit
@@ -635,8 +636,10 @@ public class MenuBarv2 : Menuv2, IDesignable
     protected override void Dispose (bool disposing)
     {
         base.Dispose (disposing);
-
-        SuperViewChanged += OnSuperViewChanged;
-        Applied -= OnConfigurationManagerApplied;
+        if (disposing)
+        {
+            SuperViewChanged += OnSuperViewChanged;
+            Applied -= OnConfigurationManagerApplied;
+        }
     }
 }

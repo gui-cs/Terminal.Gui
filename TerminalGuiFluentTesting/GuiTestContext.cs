@@ -203,7 +203,7 @@ public class GuiTestContext : IDisposable
 
         writer.WriteLine (text);
 
-        return WaitIteration ();
+        return this;//WaitIteration();
     }
 
     /// <summary>
@@ -215,7 +215,7 @@ public class GuiTestContext : IDisposable
     {
         writer.WriteLine (_logsSb.ToString ());
 
-        return WaitIteration ();
+        return this;//WaitIteration();
     }
 
     /// <summary>
@@ -663,7 +663,7 @@ public class GuiTestContext : IDisposable
     {
         Application.RaiseKeyDownEvent (key);
 
-        return WaitIteration();
+        return this;//WaitIteration();
     }
     
     /// <summary>

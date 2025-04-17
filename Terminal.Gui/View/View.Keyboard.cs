@@ -666,6 +666,12 @@ public partial class View // Keyboard APIs
             return null;
         }
 
+        // TODO: Should we set binding.Key = key if it's not set?
+        if (binding is {} && (binding.Key is null || !binding.Key.IsValid))
+        {
+            binding.Key = key;
+        }
+
         return InvokeCommands (binding.Commands, binding);
     }
 

@@ -13,6 +13,7 @@ public static partial class Application // Keyboard handling
     /// <returns><see langword="true"/> if the key was handled.</returns>
     public static bool RaiseKeyDownEvent (Key key)
     {
+        Logging.Debug ($"{key}");
         // TODO: This should match standard event patterns
         KeyDown?.Invoke (null, key);
 

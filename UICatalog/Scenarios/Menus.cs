@@ -50,7 +50,7 @@ public class Menus : Scenario
             BorderStyle = LineStyle.Dotted
         };
         app.Add (menuHostView);
-        
+
         menuHostView.CommandNotBound += (o, args) =>
                                       {
                                           if (o is not View sender || args.Cancel)
@@ -162,7 +162,7 @@ public class Menus : Scenario
 
             AddCommand (Command.Quit, (ctx) =>
                                       {
-
+                                          Logging.Debug($"Menus Scenario Command.Quit - RequestStop");
                                           Application.RequestStop ();
                                           return true;
                                       });
@@ -292,7 +292,7 @@ public class Menus : Scenario
                                 {
                                     if (args.Context?.Source is MenuItemv2 mi && mi.CommandView == editModeMenuItemCb)
                                     {
-                                        Logging.Debug($"menuBar.Accepted: {args.Context.Source?.Title}");
+                                        Logging.Debug ($"menuBar.Accepted: {args.Context.Source?.Title}");
                                         // Set Cancel to true to stop propagation of Accepting to superview
                                         args.Cancel = true;
                                         // Since overwrite uses a MenuItem.Command the menu item CB is the source of truth
@@ -347,7 +347,7 @@ public class Menus : Scenario
             openBtn.Accepting += (s, e) =>
                                  {
                                      e.Cancel = true;
-                                     Logging.Trace($"openBtn.Accepting - Sending F9. {e.Context?.Source?.Title}");
+                                     Logging.Trace ($"openBtn.Accepting - Sending F9. {e.Context?.Source?.Title}");
                                      NewKeyDownEvent (menuBar.Key);
                                  };
 

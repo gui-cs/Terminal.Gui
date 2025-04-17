@@ -313,7 +313,7 @@ public class MenuBarv2Tests
 
     [Theory]
     [ClassData (typeof (V2TestDrivers))]
-    public void MenuBarItem_WithOut_QuitKey_Open_QuitKey_Restores_Focus_Correctly (V2TestDriver d)
+    public void MenuBarItem_Without_QuitKey_Open_QuitKey_Restores_Focus_Correctly (V2TestDriver d)
     {
         MenuBarv2? menuBar = null;
 
@@ -347,6 +347,84 @@ public class MenuBarv2Tests
                                      .SendKey (Application.QuitKey)
                                      .Then (() => Assert.False (Application.Popover?.GetActivePopover () is PopoverMenu))
                                      .Then (() => Assert.Equal("focusableView", Application.Navigation!.GetFocused ()!.Id))
+                                     .WriteOutLogs (_out)
+                                     .Stop ();
+    }
+
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void MenuBarItem_With_QuitKey_Open_QuitKey_Does_Not_Quit_App (V2TestDriver d)
+    {
+        MenuBarv2? menuBar = null;
+
+        using GuiTestContext c = With.A<Window> (50, 20, d)
+                                     .Then (
+                                            () =>
+                                            {
+                                                menuBar = new MenuBarv2 ();
+                                                Toplevel top = Application.Top!;
+
+                                                top.Add (
+                                                         new View ()
+                                                         {
+                                                             CanFocus = true,
+                                                             Id = "focusableView",
+
+                                                         });
+                                                menuBar.EnableForDesign (ref top);
+                                                Application.Top!.Add (menuBar);
+                                            })
+                                     .WaitIteration ()
+                                     .Then (() => Assert.Equal ("focusableView", Application.Navigation!.GetFocused ()!.Id))
+                                     .ScreenShot ("MenuBar initial state", _out)
+                                     .SendKey (MenuBarv2.DefaultKey)
+                                     .Then (() => Assert.Equal ("_New file", Application.Navigation!.GetFocused ()!.Id))
+                                     .Then (() => Assert.True (Application.Top!.Running))
+                                     .ScreenShot ($"After {MenuBarv2.DefaultKey}", _out)
+                                     .SendKey (Application.QuitKey)
+                                     .Then (() => Assert.False (Application.Popover?.GetActivePopover () is PopoverMenu))
+                                     .Then (() => Assert.True (Application.Top!.Running))
+                                     .WriteOutLogs (_out)
+                                     .Stop ();
+    }
+
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void MenuBarItem_Without_QuitKey_Open_QuitKey_Does_Not_Quit_MenuBar_SuperView (V2TestDriver d)
+    {
+        MenuBarv2? menuBar = null;
+
+        using GuiTestContext c = With.A<Window> (50, 20, d)
+                                     .Then (
+                                            () =>
+                                            {
+                                                menuBar = new MenuBarv2 ();
+                                                Toplevel top = Application.Top!;
+
+                                                top.Add (
+                                                         new View ()
+                                                         {
+                                                             CanFocus = true,
+                                                             Id = "focusableView",
+
+                                                         });
+                                                menuBar.EnableForDesign (ref top);
+                                                IEnumerable<MenuItemv2> items = menuBar.GetMenuItemsWithId ("Quit");
+                                                foreach (MenuItemv2 item in items)
+                                                {
+                                                    item.Key = Key.Empty;
+                                                }
+                                                Application.Top!.Add (menuBar);
+                                            })
+                                     .WaitIteration ()
+                                     .Then (() => Assert.Equal ("focusableView", Application.Navigation!.GetFocused ()!.Id))
+                                     .ScreenShot ("MenuBar initial state", _out)
+                                     .SendKey (MenuBarv2.DefaultKey)
+                                     .Then (() => Assert.Equal ("_New file", Application.Navigation!.GetFocused ()!.Id))
+                                     .ScreenShot ($"After {MenuBarv2.DefaultKey}", _out)
+                                     .SendKey (Application.QuitKey)
+                                     .Then (() => Assert.False (Application.Popover?.GetActivePopover () is PopoverMenu))
+                                     .Then (() => Assert.True (Application.Top!.Running))
                                      .WriteOutLogs (_out)
                                      .Stop ();
     }
