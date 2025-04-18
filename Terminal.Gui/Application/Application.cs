@@ -151,6 +151,8 @@ public static partial class Application
 
         if (Popover?.GetActivePopover () is View popover)
         {
+            // This forcefully closes the popover; invoking Command.Quit would be more graceful
+            // but since this is shutdown, doing this is ok.
             popover.Visible = false;
         }
         Popover?.Dispose ();

@@ -130,13 +130,13 @@ public class MenuItemv2 : Shortcut
         {
             if (TargetView is { })
             {
-                Logging.Debug ($"{Title} -  InvokeCommand on TargetView ({TargetView.Title})...");
+                Logging.Debug ($"{Title} - InvokeCommand on TargetView ({TargetView.Title})...");
                 ret = TargetView.InvokeCommand (Command, commandContext);
             }
             else
             {
                 // Is this an Application-bound command?
-                Logging.Debug ($"{Title} -  Application.InvokeCommandsBoundToKey ({Key})...");
+                Logging.Debug ($"{Title} - Application.InvokeCommandsBoundToKey ({Key})...");
                 ret = Application.InvokeCommandsBoundToKey (Key);
             }
         }
@@ -187,6 +187,7 @@ public class MenuItemv2 : Shortcut
 
             if (_subMenu is { })
             {
+                SubMenu!.Visible = false;
                 // TODO: This is a temporary hack - add a flag or something instead
                 KeyView.Text = $"{Glyphs.RightArrow}";
                 _subMenu.SuperMenuItem = this;

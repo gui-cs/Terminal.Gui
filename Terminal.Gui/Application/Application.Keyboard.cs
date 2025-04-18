@@ -14,6 +14,15 @@ public static partial class Application // Keyboard handling
     public static bool RaiseKeyDownEvent (Key key)
     {
         Logging.Debug ($"{key}");
+
+#if DEBUG
+        if (key == Key.Empty.WithAlt || key == Key.Empty.WithCtrl)
+        {
+            Logging.Debug ($"Ignoring {key}");
+            return false;
+        }
+#endif
+
         // TODO: This should match standard event patterns
         KeyDown?.Invoke (null, key);
 

@@ -431,7 +431,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
     internal static void LayoutAndDrawImpl (bool forceDraw = false)
     {
-        List<View> tops = [..TopLevels];
+        List<View> tops = [.. TopLevels];
 
         if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
         {
@@ -575,7 +575,14 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     {
         ArgumentNullException.ThrowIfNull (runState);
 
-        Popover?.Hide (Popover?.GetActivePopover ());
+        if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
+        {
+            // TODO: Build a use/test case for the popover not handling Quit
+            if (visiblePopover.InvokeCommand (Command.Quit) is true && visiblePopover.Visible)
+            {
+                visiblePopover.Visible = false;
+            }
+        }
 
         runState.Toplevel.OnUnloaded ();
 

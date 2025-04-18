@@ -199,7 +199,7 @@ public class Menuv2 : Bar
 
     internal void RaiseSelectedMenuItemChanged (MenuItemv2? selected)
     {
-        //Logging.Trace ($"RaiseSelectedMenuItemChanged: {selected?.Title}");
+        Logging.Debug ($"{Title} ({selected?.Title})");
 
         OnSelectedMenuItemChanged (selected);
         SelectedMenuItemChanged?.Invoke (this, selected);

@@ -103,6 +103,7 @@ public sealed class ApplicationPopover : IDisposable
 
         if (popover is View newPopover)
         {
+            Register (popover);
             if (!newPopover.IsInitialized)
             {
                 newPopover.BeginInit ();

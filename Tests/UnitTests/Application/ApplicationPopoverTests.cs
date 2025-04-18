@@ -1,6 +1,4 @@
-﻿using static System.Net.Mime.MediaTypeNames;
-
-namespace Terminal.Gui.ApplicationTests;
+﻿namespace Terminal.Gui.ApplicationTests;
 
 public class ApplicationPopoverTests
 {
@@ -97,7 +95,7 @@ public class ApplicationPopoverTests
         Application.Shutdown ();
 
         // Test
-        Assert.Equal(1, popover.DisposedCount);
+        Assert.Equal (1, popover.DisposedCount);
     }
 
     [Fact]
@@ -131,6 +129,7 @@ public class ApplicationPopoverTests
         PopoverTestClass popover = new ();
 
         Application.Popover?.Show (popover);
+        Application.Popover?.DeRegister (popover);
 
         // Act
         Application.Shutdown ();
@@ -141,7 +140,7 @@ public class ApplicationPopoverTests
         popover.Dispose ();
     }
 
-    public class PopoverTestClass : View, IPopover
+    public class PopoverTestClass : PopoverBaseImpl
     {
         public List<Key> HandledKeys { get; } = [];
         public int NewCommandInvokeCount { get; private set; }
@@ -168,15 +167,15 @@ public class ApplicationPopoverTests
         protected override bool OnKeyDown (Key key)
         {
             HandledKeys.Add (key);
+
             return false;
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         protected override void Dispose (bool disposing)
         {
             base.Dispose (disposing);
             DisposedCount++;
         }
     }
-
 }

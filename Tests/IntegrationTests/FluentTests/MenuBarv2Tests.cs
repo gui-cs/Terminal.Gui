@@ -138,6 +138,79 @@ public class MenuBarv2Tests
                                      .Stop ();
     }
 
+
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void DefaultKey_Activates (V2TestDriver d)
+    {
+        MenuBarv2? menuBar = null;
+
+        using GuiTestContext c = With.A<Window> (50, 20, d)
+                                     .Then (
+                                            () =>
+                                            {
+                                                menuBar = new MenuBarv2 ();
+                                                Toplevel top = Application.Top!;
+
+                                                top.Add (
+                                                         new View ()
+                                                         {
+                                                             CanFocus = true,
+                                                             Id = "focusableView",
+
+                                                         });
+                                                menuBar.EnableForDesign (ref top);
+                                                Application.Top!.Add (menuBar);
+                                            })
+                                     .WaitIteration ()
+                                     .Then (() => Assert.Equal ("focusableView", Application.Navigation!.GetFocused ()!.Id))
+                                     .ScreenShot ("MenuBar initial state", _out)
+                                     .SendKey (MenuBarv2.DefaultKey)
+                                     .ScreenShot ($"After {MenuBarv2.DefaultKey}", _out)
+                                     .Then (() => Assert.Equal ("_New file", Application.Navigation!.GetFocused ()!.Id))
+                                     .Then (() => Assert.True (Application.Popover?.GetActivePopover () is PopoverMenu))
+                                     .Then (() => Assert.True (menuBar?.IsOpen ()))
+                                     .WriteOutLogs (_out)
+                                     .Stop ();
+    }
+
+
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void DefaultKey_DeActivates (V2TestDriver d)
+    {
+        MenuBarv2? menuBar = null;
+
+        using GuiTestContext c = With.A<Window> (50, 20, d)
+                                     .Then (
+                                            () =>
+                                            {
+                                                menuBar = new MenuBarv2 ();
+                                                Toplevel top = Application.Top!;
+
+                                                top.Add (
+                                                         new View ()
+                                                         {
+                                                             CanFocus = true,
+                                                             Id = "focusableView",
+
+                                                         });
+                                                menuBar.EnableForDesign (ref top);
+                                                Application.Top!.Add (menuBar);
+                                            })
+                                     .WaitIteration ()
+                                     .Then (() => Assert.Equal ("focusableView", Application.Navigation!.GetFocused ()!.Id))
+                                     .ScreenShot ("MenuBar initial state", _out)
+                                     .SendKey (MenuBarv2.DefaultKey)
+                                     .ScreenShot ($"After {MenuBarv2.DefaultKey}", _out)
+                                     .Then (() => Assert.Equal ("_New file", Application.Navigation!.GetFocused ()!.Id))
+                                     .SendKey (MenuBarv2.DefaultKey)
+                                     .ScreenShot ($"After {MenuBarv2.DefaultKey}", _out)
+                                     .Then (() => Assert.Equal ("focusableView", Application.Navigation!.GetFocused ()!.Id))
+                                     .WriteOutLogs (_out)
+                                     .Stop ();
+    }
+
     [Theory]
     [ClassData (typeof (V2TestDrivers))]
     public void ShowHidePopovers (V2TestDriver d)
@@ -158,7 +231,7 @@ public class MenuBarv2Tests
 
                                                 // Initially, no menu should be open
                                                 Assert.False (menuBar.IsOpen ());
-                                                Assert.False (menuBar.IsActive ());
+                                                Assert.False (menuBar.Active);
 
                                                 // Initialize the menu bar
                                                 menuBar.BeginInit ();
@@ -180,7 +253,7 @@ public class MenuBarv2Tests
                                                 showPopoverMethod?.Invoke (menuBar, new object? [] { fileMenuItem });
 
                                                 // Should be active now
-                                                Assert.True (menuBar.IsActive ());
+                                                Assert.True (menuBar.Active);
 
                                                 // Test if we can hide the popover menu
                                                 fileMenuItem.PopoverMenu!.Visible = true;
@@ -188,7 +261,7 @@ public class MenuBarv2Tests
                                                 Assert.True (menuBar.HideActiveItem ());
 
                                                 // Menu should no longer be open or active
-                                                Assert.False (menuBar.IsActive ());
+                                                Assert.False (menuBar.Active);
                                                 Assert.False (menuBar.IsOpen ());
                                                 Assert.False (menuBar.CanFocus);
                                             })
@@ -345,9 +418,9 @@ public class MenuBarv2Tests
                                      .Then (() => Assert.Equal ("Cu_t", Application.Navigation?.GetFocused ()!.Id))
                                      .ScreenShot ($"After {MenuBarv2.DefaultKey}", _out)
                                      .SendKey (Application.QuitKey)
+                                     .WriteOutLogs (_out)
                                      .Then (() => Assert.False (Application.Popover?.GetActivePopover () is PopoverMenu))
                                      .Then (() => Assert.Equal("focusableView", Application.Navigation!.GetFocused ()!.Id))
-                                     .WriteOutLogs (_out)
                                      .Stop ();
     }
 

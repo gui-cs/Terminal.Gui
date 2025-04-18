@@ -116,18 +116,18 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? RaiseAccepting (ICommandContext? ctx)
     {
-        Logging.Debug ($"{ctx?.Source?.Title}");
+        Logging.Debug ($"{Title} ({ctx?.Source?.Title})");
         CommandEventArgs args = new () { Context = ctx };
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
-        Logging.Debug ($"{ctx?.Source?.Title} - Calling OnAccepting...");
+        Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Calling OnAccepting...");
         args.Cancel = OnAccepting (args) || args.Cancel;
 
-        if (!args.Cancel)
+        if (!args.Cancel && Accepting is {})
         {
             // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-            Logging.Debug ($"{ctx?.Source?.Title} - Raising Accepting...");
+            Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Raising Accepting...");
             Accepting?.Invoke (this, args);
         }
 
@@ -144,7 +144,7 @@ public partial class View // Command APIs
                 // TODO: It's a bit of a hack that this uses KeyBinding. There should be an InvokeCommmand that 
                 // TODO: is generic?
 
-                Logging.Debug ($"{ctx?.Source?.Title} - InvokeCommand on Default View ({isDefaultView.Title})");
+                Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - InvokeCommand on Default View ({isDefaultView.Title})");
                 bool ? handled = isDefaultView.InvokeCommand (Command.Accept, ctx);
                 if (handled == true)
                 {
@@ -154,7 +154,7 @@ public partial class View // Command APIs
 
             if (SuperView is { })
             {
-                Logging.Debug ($"{ctx?.Source?.Title} - Invoking Accept on SuperView ({SuperView.Title})...");
+                Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Invoking Accept on SuperView ({SuperView.Title}/{SuperView.Id})...");
                 return SuperView?.InvokeCommand (Command.Accept, ctx);
             }
         }
@@ -200,6 +200,7 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? RaiseSelecting (ICommandContext? ctx)
     {
+        Logging.Debug ($"{Title} ({ctx?.Source?.Title})");
         CommandEventArgs args = new () { Context = ctx };
 
         // Best practice is to invoke the virtual method first.
@@ -242,6 +243,7 @@ public partial class View // Command APIs
     protected bool? RaiseHandlingHotKey ()
     {
         CommandEventArgs args = new () { Context = new CommandContext<KeyBinding> () { Command = Command.HotKey } };
+        Logging.Debug ($"{Title} ({args.Context?.Source?.Title})");
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.

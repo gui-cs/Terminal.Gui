@@ -154,7 +154,11 @@ public class UICatalogTop : Toplevel
                                                               Key.A.WithCtrl
                                                              )
                                           ])
-                                 ]);
+                                 ])
+        {
+            Title = "menuBar",
+            Id = "menuBar"
+        };
 
         return menuBar;
 
