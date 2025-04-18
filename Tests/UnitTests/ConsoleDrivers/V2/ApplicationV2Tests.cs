@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -13,6 +14,12 @@ public class ApplicationV2Tests
         SetupRunInputMockMethodToBlock (netInput);
         var winInput = new Mock<IWindowsInput> ();
         SetupRunInputMockMethodToBlock (winInput);
+
+#if DEBUG_IDISPOSABLE
+        // Always set this in tests. Because this wasn't set, these tests were not catching
+        // that Application.Top was not being disposed.
+        View.DebugIDisposable = true;
+#endif
 
         return new (
                     () => netInput.Object,
@@ -163,6 +170,7 @@ public class ApplicationV2Tests
 
         var ex = Assert.Throws<NotInitializedException> (() => app.Run (new Window ()));
         Assert.Equal ("Run cannot be accessed before Initialization", ex.Message);
+        app.Shutdown();
     }
 
     [Fact]
@@ -196,6 +204,7 @@ public class ApplicationV2Tests
         Assert.True (v2.RemoveTimeout (timeoutToken));
 
         Assert.NotNull (Application.Top);
+        Application.Top?.Dispose ();
         v2.Shutdown ();
         Assert.Null (Application.Top);
 
@@ -212,7 +221,10 @@ public class ApplicationV2Tests
 
         v2.Init ();
 
-        Toplevel top = new Window ();
+        Toplevel top = new Window ()
+        {
+            Title = "InitRunShutdown_Running_Set_To_False"
+        };
         var timeoutToken = v2.AddTimeout (TimeSpan.FromMilliseconds (150),
                                           () =>
                                           {
@@ -235,10 +247,10 @@ public class ApplicationV2Tests
         Assert.True (v2.RemoveTimeout (timeoutToken));
 
         Assert.False (top!.Running);
-        
+
         // BUGBUG: Shutdown sets Top to null, not End.
         //Assert.Null (Application.Top);
-
+        Application.Top?.Dispose ();
         v2.Shutdown ();
 
         ApplicationImpl.ChangeInstance (orig);
@@ -251,6 +263,9 @@ public class ApplicationV2Tests
 
         var v2 = NewApplicationV2 ();
         ApplicationImpl.ChangeInstance (v2);
+
+        Assert.Null (Application.Top);
+        Assert.Null (Application.Driver);
 
         v2.Init ();
 
@@ -296,6 +311,7 @@ public class ApplicationV2Tests
 
         Assert.True (v2.RemoveTimeout (timeoutToken));
 
+        Application.Top?.Dispose ();
         v2.Shutdown ();
         Assert.Equal (1, closedCount);
         Assert.Equal (1, unloadedCount);
@@ -314,7 +330,10 @@ public class ApplicationV2Tests
 
         v2.Init ();
 
-        Toplevel top = new Window ();
+        Toplevel top = new Window ()
+        {
+            Title = "InitRunShutdown_QuitKey_Quits"
+        };
         var timeoutToken = v2.AddTimeout (TimeSpan.FromMilliseconds (150),
                                           () =>
                                           {
@@ -337,6 +356,9 @@ public class ApplicationV2Tests
         Assert.True (v2.RemoveTimeout (timeoutToken));
 
         Assert.False (top!.Running);
+
+        Assert.NotNull (Application.Top);
+        top.Dispose ();
         v2.Shutdown ();
         Assert.Null (Application.Top);
 
@@ -362,6 +384,7 @@ public class ApplicationV2Tests
         v2.Run<Window> ();
 
         Assert.NotNull (Application.Top);
+        Application.Top?.Dispose ();
         v2.Shutdown ();
         Assert.Null (Application.Top);
 
@@ -406,6 +429,7 @@ public class ApplicationV2Tests
 
         v2.Run (t);
 
+        Application.Top?.Dispose ();
         v2.Shutdown ();
 
         ApplicationImpl.ChangeInstance (orig);
@@ -529,13 +553,17 @@ public class ApplicationV2Tests
 
         Assert.Null (Application.Top);
 
-        var w = new Window ();
+        var w = new Window ()
+        {
+            Title = "Open_CallsContinueWithOnUIThread"
+        };
         w.Add (b);
 
         // Blocks until the timeout call is hit
         v2.Run (w);
 
         Assert.NotNull (Application.Top);
+        Application.Top?.Dispose ();
         v2.Shutdown ();
         Assert.Null (Application.Top);
 

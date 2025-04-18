@@ -68,6 +68,7 @@ public class GuiTestContext : IDisposable
                                      t.Closed += (s, e) => { _finished = true; };
                                      Application.Run (t); // This will block, but it's on a background thread now
 
+                                     t.Dispose ();
                                      Application.Shutdown ();
                                  }
                                  catch (OperationCanceledException)

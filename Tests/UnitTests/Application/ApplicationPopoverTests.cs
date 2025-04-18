@@ -3,7 +3,7 @@
 public class ApplicationPopoverTests
 {
     [Fact]
-    public void ApplicationInit_Initializes_PopoverManager ()
+    public void Application_Init_Initializes_PopoverManager ()
     {
         // Arrange
         Assert.Null (Application.Popover);
@@ -16,7 +16,7 @@ public class ApplicationPopoverTests
     }
 
     [Fact]
-    public void Application_Shutdown_CleansUp_PopoverManager ()
+    public void Application_Shutdown_Resets_PopoverManager ()
     {
         // Arrange
         Assert.Null (Application.Popover);
@@ -32,7 +32,7 @@ public class ApplicationPopoverTests
     }
 
     [Fact]
-    public void Application_End_Does_Not_CleanedUp ()
+    public void Application_End_Does_Not_Reset_PopoverManager ()
     {
         // Arrange
         Assert.Null (Application.Popover);
@@ -77,8 +77,8 @@ public class ApplicationPopoverTests
         Assert.False (popover.Visible);
         Assert.NotNull (Application.Popover);
 
-        popover.Dispose ();
         Application.Shutdown ();
+        Assert.Equal (1, popover.DisposedCount);
     }
 
     [Fact]
@@ -117,6 +117,7 @@ public class ApplicationPopoverTests
         Assert.Equal (0, popover.DisposedCount);
 
         popover.Dispose ();
+        Assert.Equal (1, popover.DisposedCount);
     }
 
     [Fact]
@@ -138,6 +139,7 @@ public class ApplicationPopoverTests
         Assert.Equal (0, popover.DisposedCount);
 
         popover.Dispose ();
+        Assert.Equal (1, popover.DisposedCount);
     }
 
     public class PopoverTestClass : PopoverBaseImpl

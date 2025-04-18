@@ -8,7 +8,16 @@ public class BasicFluentAssertionTests
 {
     private readonly TextWriter _out;
 
-    public BasicFluentAssertionTests (ITestOutputHelper outputHelper) { _out = new TestOutputWriter (outputHelper); }
+    public BasicFluentAssertionTests (ITestOutputHelper outputHelper)
+    {
+#if DEBUG_IDISPOSABLE
+        // Always set this in tests. Because this wasn't set, these tests were not catching
+        // that Application.Top was not being disposed.
+        View.DebugIDisposable = true;
+#endif
+
+        _out = new TestOutputWriter (outputHelper);
+    }
 
 
     [Theory]
@@ -32,8 +41,10 @@ public class BasicFluentAssertionTests
 
         Toplevel top = Application.Top;
         context.SendKey (Application.QuitKey);
-        Assert.Null (Application.Top);
         Assert.False (top!.Running);
+
+        Application.Top?.Dispose ();
+        Application.Shutdown();
 
         context.WriteOutLogs (_out);
         context.Stop ();

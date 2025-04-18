@@ -164,7 +164,7 @@ public static partial class Application
         // Don't dispose the Top. It's up to caller dispose it
         if (View.DebugIDisposable && !ignoreDisposed && Top is { })
         {
-            Debug.Assert (Top.WasDisposed);
+            Debug.Assert (Top.WasDisposed, $"Title = {Top.Title}, Id = {Top.Id}");
 
             // If End wasn't called _cachedRunStateToplevel may be null
             if (_cachedRunStateToplevel is { })

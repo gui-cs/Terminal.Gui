@@ -41,7 +41,7 @@ public abstract class PopoverBaseImpl : View, IPopover
         {
             if (!Visible)
             {
-                return null;
+                return false;
             }
 
             Visible = false;

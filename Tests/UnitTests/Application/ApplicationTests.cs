@@ -175,9 +175,12 @@ public class ApplicationTests
     [Fact]
     public void End_And_Shutdown_Should_Not_Dispose_ApplicationTop ()
     {
+        Assert.Null (Application.Top);
+
         Init ();
 
         RunState rs = Application.Begin (new ());
+        Application.Top!.Title = "End_And_Shutdown_Should_Not_Dispose_ApplicationTop";
         Assert.Equal (rs.Toplevel, Application.Top);
         Application.End (rs);
 
