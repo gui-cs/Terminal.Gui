@@ -1,8 +1,8 @@
 namespace UnitTests.Parallelizable;
 
 /// <summary>
-/// Base class for parallelizable tests. Ensures that tests can run in parallel without interference
-/// by setting various Terminal.Gui static properties to their default values. E.g. View.DebugIDisposable.
+///     Base class for parallelizable tests. Ensures that tests can run in parallel without interference
+///     by setting various Terminal.Gui static properties to their default values. E.g. View.DebugIDisposable.
 /// </summary>
 [Collection ("Global Test Setup")]
 public abstract class ParallelizableBase

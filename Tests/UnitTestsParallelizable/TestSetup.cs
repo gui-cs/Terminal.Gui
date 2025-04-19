@@ -1,15 +1,17 @@
 namespace UnitTests.Parallelizable;
 
 /// <summary>
-/// Ensures that tests can run in parallel without interference
-/// by setting various Terminal.Gui static properties to their default values. E.g. View.DebugIDisposable.
+///     Ensures that tests can run in parallel without interference
+///     by setting various Terminal.Gui static properties to their default values. E.g. View.DebugIDisposable.
 /// </summary>
 public class GlobalTestSetup : IDisposable
 {
     public GlobalTestSetup ()
     {
+#if DEBUG_IDISPOSABLE
         // Ensure DebugIDisposable is false before tests run
         View.DebugIDisposable = false;
+#endif
     }
 
     public void Dispose ()
@@ -18,7 +20,6 @@ public class GlobalTestSetup : IDisposable
         // View.DebugIDisposable = true;
     }
 }
-
 
 // Define a collection for the global setup
 [CollectionDefinition ("Global Test Setup")]
