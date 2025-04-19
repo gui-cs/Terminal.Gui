@@ -3,6 +3,8 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewMouseTests;
 
+
+[Collection ("Global Test Setup")]
 [Trait ("Category", "Input")]
 public class MouseTests (ITestOutputHelper output) : TestsAllViews
 {

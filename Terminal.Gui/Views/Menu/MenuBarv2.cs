@@ -490,7 +490,7 @@ public class MenuBarv2 : Menuv2, IDesignable
                 menuItems.AddRange (mbi.PopoverMenu.GetMenuItemsOfAllSubMenus ());
             }
         }
-        return menuItems.Where (mi => mi.Id == id);
+        return menuItems.Where (mi => mi.Title == id);
     }
 
     /// <inheritdoc/>
@@ -499,7 +499,7 @@ public class MenuBarv2 : Menuv2, IDesignable
         // Note: This menu is used by unit tests. If you modify it, you'll likely have to update
         // unit tests.
 
-        Title = "Demo MenuBar";
+        Id = "DemonuBar";
 
         var bordersCb = new CheckBox
         {
@@ -610,11 +610,7 @@ public class MenuBarv2 : Menuv2, IDesignable
                                                new Line (),
                                                new MenuItemv2 ()
                                                {
-                                                   Id = "Quit",
                                                    TargetView = context as View,
-                                                   // BUGBUG: If a menuitem has Key = QuitKey and the menu is open, if the user presses QuitKey, the menu item gets the key first and invokescommand.
-                                                   // BUGBUG: This causes the targetview to Stop. 
-                                                   // BUGBUG: Instead, the menu should just close. Need to figure out how to let the MenuBar, PopoverMenu, or Menu intercept Quitkey first.
                                                    Key = Application.QuitKey,
                                                    Command = Command.Quit
                                                }

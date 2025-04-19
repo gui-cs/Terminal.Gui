@@ -4,13 +4,6 @@ namespace Terminal.Gui.ViewsTests;
 
 public class ColorPickerTests
 {
-    public ColorPickerTests ()
-    {
-#if DEBUG_IDISPOSABLE
-        View.DebugIDisposable = true;
-#endif
-    }
-
     [Fact]
     [SetupFakeDriver]
     public void ColorPicker_ChangedEvent_Fires ()

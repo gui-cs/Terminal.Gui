@@ -478,12 +478,6 @@ public partial class View : IDisposable, ISupportInitializeNotification
                 SetTitleTextFormatterSize ();
                 SetHotKeyFromTitle ();
                 SetNeedsDraw ();
-#if DEBUG
-                if (string.IsNullOrEmpty (Id))
-                {
-                    Id = _title;
-                }
-#endif // DEBUG
                 OnTitleChanged ();
             }
         }

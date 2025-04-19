@@ -4,13 +4,6 @@ namespace Terminal.Gui.ViewsTests;
 
 public class ToplevelTests
 {
-    public ToplevelTests ()
-    {
-#if DEBUG_IDISPOSABLE
-        View.DebugIDisposable = true;
-#endif
-    }
-
     [Fact]
     public void Constructor_Default ()
     {
