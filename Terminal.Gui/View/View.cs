@@ -74,31 +74,34 @@ public partial class View : IDisposable, ISupportInitializeNotification
     /// <param name="disposing"></param>
     protected virtual void Dispose (bool disposing)
     {
-        LineCanvas.Dispose ();
-
-        DisposeMouse ();
-        DisposeKeyboard ();
-        DisposeAdornments ();
-        DisposeScrollBars ();
-
-        for (int i = InternalSubViews.Count - 1; i >= 0; i--)
+        if (disposing)
         {
-            View subview = InternalSubViews [i];
-            Remove (subview);
-            subview.Dispose ();
-        }
+            LineCanvas.Dispose ();
 
-        if (!_disposedValue)
-        {
-            if (disposing)
+            DisposeMouse ();
+            DisposeKeyboard ();
+            DisposeAdornments ();
+            DisposeScrollBars ();
+
+            for (int i = InternalSubViews.Count - 1; i >= 0; i--)
             {
-                // TODO: dispose managed state (managed objects)
+                View subview = InternalSubViews [i];
+                Remove (subview);
+                subview.Dispose ();
             }
 
-            _disposedValue = true;
-        }
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects)
+                }
 
-        Debug.Assert (InternalSubViews.Count == 0);
+                _disposedValue = true;
+            }
+
+            Debug.Assert (InternalSubViews.Count == 0);
+        }
     }
 
     #region Constructors and Initialization

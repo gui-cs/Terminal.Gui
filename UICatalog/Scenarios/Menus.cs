@@ -58,7 +58,7 @@ public class Menus : Scenario
                                               return;
                                           }
 
-                                          Logging.Trace ($"{sender.Id} CommandNotBound: {args?.Context?.Command}");
+                                          Logging.Debug ($"{sender.Id} CommandNotBound: {args?.Context?.Command}");
                                           eventSource.Add ($"{sender.Id} CommandNotBound: {args?.Context?.Command}");
                                           eventLog.MoveDown ();
                                       };
@@ -70,19 +70,19 @@ public class Menus : Scenario
                                         return;
                                     }
 
-                                    Logging.Trace ($"{sender.Id} Accepting: {args?.Context?.Source?.Title}");
+                                    Logging.Debug ($"{sender.Id} Accepting: {args?.Context?.Source?.Title}");
                                     eventSource.Add ($"{sender.Id} Accepting: {args?.Context?.Source?.Title}: ");
                                     eventLog.MoveDown ();
                                 };
 
-        menuHostView.DemoPopoverMenu!.Accepted += (o, args) =>
+        menuHostView.ContextMenu!.Accepted += (o, args) =>
                                                 {
                                                     if (o is not View sender || args.Cancel)
                                                     {
                                                         return;
                                                     }
 
-                                                    Logging.Trace ($"{sender.Id} Accepted: {args?.Context?.Source?.Text}");
+                                                    Logging.Debug ($"{sender.Id} Accepted: {args?.Context?.Source?.Text}");
                                                     eventSource.Add ($"{sender.Id} Accepted: {args?.Context?.Source?.Text}: ");
                                                     eventLog.MoveDown ();
                                                 };
@@ -99,7 +99,7 @@ public class Menus : Scenario
     /// </summary>
     public class MenuHost : View
     {
-        internal PopoverMenu? DemoPopoverMenu { get; private set; }
+        internal PopoverMenu? ContextMenu { get; private set; }
 
         public MenuHost ()
         {
@@ -110,7 +110,7 @@ public class Menus : Scenario
                         Command.Context,
                         ctx =>
                         {
-                            DemoPopoverMenu?.MakeVisible ();
+                            ContextMenu?.MakeVisible ();
 
                             return true;
                         });
@@ -160,8 +160,9 @@ public class Menus : Scenario
             AddCommand (Command.SaveAs, HandleCommand);
             HotKeyBindings.Add (Key.A.WithCtrl, Command.SaveAs);
 
-            AddCommand (Command.Quit, () =>
+            AddCommand (Command.Quit, (ctx) =>
                                       {
+                                          Logging.Debug($"Menus Scenario Command.Quit - RequestStop");
                                           Application.RequestStop ();
                                           return true;
                                       });
@@ -185,14 +186,10 @@ public class Menus : Scenario
             Application.KeyBindings.Remove (Key.F5);
             Application.KeyBindings.Add (Key.F5, this, Command.Edit);
 
-            DemoPopoverMenu = new ()
+            MenuBarv2 menuBar = new MenuBarv2 ()
             {
-                Id = "FilePopoverMenu"
+                Title = "MenuHost MenuBar"
             };
-            DemoPopoverMenu.EnableForDesign ();
-            DemoPopoverMenu.Visible = false;
-
-            MenuBarv2 menuBar = new MenuBarv2 ();
             MenuHost host = this;
             menuBar.EnableForDesign<MenuHost> (ref host);
 
@@ -245,7 +242,7 @@ public class Menus : Scenario
             // If the user clicks on the MenuItem, Accept will be raised.
             CheckBox enableOverwriteStatusCb = new ()
             {
-                Title = "Enable Overwrite (View Bidning to Ctrl+W)",
+                Title = "Enable Overwrite (View Binding to Ctrl+W)",
                 X = Pos.Left (autoSaveStatusCb),
                 Y = Pos.Bottom (autoSaveStatusCb)
             };
@@ -256,6 +253,7 @@ public class Menus : Scenario
                                 {
                                     if (args.Context?.Source is MenuItemv2 mi && mi.CommandView == enableOverwriteMenuItemCb)
                                     {
+                                        Logging.Debug ($"menuBar.Accepted: {args.Context.Source?.Title}");
                                         // Set Cancel to true to stop propagation of Accepting to superview
                                         args.Cancel = true;
                                         // Since overwrite uses a MenuItem.Command the menu item CB is the source of truth
@@ -294,6 +292,7 @@ public class Menus : Scenario
                                 {
                                     if (args.Context?.Source is MenuItemv2 mi && mi.CommandView == editModeMenuItemCb)
                                     {
+                                        Logging.Debug ($"menuBar.Accepted: {args.Context.Source?.Title}");
                                         // Set Cancel to true to stop propagation of Accepting to superview
                                         args.Cancel = true;
                                         // Since overwrite uses a MenuItem.Command the menu item CB is the source of truth
@@ -311,16 +310,57 @@ public class Menus : Scenario
 
             base.Add (editModeStatusCb);
 
-            // Demo of PopoverMenu as a context menu
-            DemoPopoverMenu!.Accepted += (o, args) => lastAcceptedText.Text = args?.Context?.Source?.Title!;
+            // Set up the Context Menu
+            ContextMenu = new ()
+            {
+                Title = "ContextMenu",
+                Id = "ContextMenu"
+            };
 
-            DemoPopoverMenu!.VisibleChanged += (sender, args) =>
+            ContextMenu.EnableForDesign<MenuHost> (ref host);
+            ContextMenu.Visible = false;
+
+
+            // Demo of PopoverMenu as a context menu
+            // If we want Commands from the ContextMenu to be handled by the MenuHost
+            // we need to subscribe to the ContextMenu's Accepted event.
+            ContextMenu!.Accepted += (o, args) =>
+                                     {
+                                         Logging.Debug ($"ContextMenu.Accepted: {args.Context?.Source?.Title}");
+                                         // Forward the event to the MenuHost
+                                         if (args.Context is { })
+                                         {
+                                             InvokeCommand (args.Context.Command);
+                                         }
+                                     };
+
+            ContextMenu!.VisibleChanged += (sender, args) =>
                                                {
-                                                   if (DemoPopoverMenu!.Visible)
+                                                   if (ContextMenu!.Visible)
                                                    {
-                                                       lastCommandText.Text = string.Empty;
                                                    }
                                                };
+
+
+            // Add a button to open the contextmenu
+            var openBtn = new Button { X = Pos.Center (), Y = 4, Text = "_Open Menu", IsDefault = true };
+            openBtn.Accepting += (s, e) =>
+                                 {
+                                     e.Cancel = true;
+                                     Logging.Trace ($"openBtn.Accepting - Sending F9. {e.Context?.Source?.Title}");
+                                     NewKeyDownEvent (menuBar.Key);
+                                 };
+
+            Add (openBtn);
+
+            //var hideBtn = new Button { X = Pos.Center (), Y = Pos.Bottom (openBtn), Text = "Toggle Menu._Visible" };
+            //hideBtn.Accepting += (s, e) => { menuBar.Visible = !menuBar.Visible; };
+            //appWindow.Add (hideBtn);
+
+            //var enableBtn = new Button { X = Pos.Center (), Y = Pos.Bottom (hideBtn), Text = "_Toggle Menu.Enable" };
+            //enableBtn.Accepting += (s, e) => { menuBar.Enabled = !menuBar.Enabled; };
+            //appWindow.Add (enableBtn);
+
 
             autoSaveStatusCb.SetFocus ();
 
@@ -331,7 +371,7 @@ public class Menus : Scenario
             {
                 lastCommandText.Text = ctx?.Command!.ToString ()!;
 
-                Logging.Trace ($"lastCommand: {lastCommandText.Text}");
+                Logging.Debug ($"lastCommand: {lastCommandText.Text}");
 
                 return true;
             }
@@ -340,10 +380,10 @@ public class Menus : Scenario
         /// <inheritdoc />
         protected override void Dispose (bool disposing)
         {
-            if (DemoPopoverMenu is { })
+            if (ContextMenu is { })
             {
-                DemoPopoverMenu.Dispose ();
-                DemoPopoverMenu = null;
+                ContextMenu.Dispose ();
+                ContextMenu = null;
             }
             base.Dispose (disposing);
         }

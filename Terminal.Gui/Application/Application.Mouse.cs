@@ -174,8 +174,11 @@ public static partial class Application // Mouse handling
             && Popover?.GetActivePopover () as View is { Visible: true } visiblePopover
             && View.IsInHierarchy (visiblePopover, deepestViewUnderMouse, includeAdornments: true) is false)
         {
-
-            visiblePopover.Visible = false;
+            // TODO: Build a use/test case for the popover not handling Quit
+            if (visiblePopover.InvokeCommand (Command.Quit) is true && visiblePopover.Visible)
+            {
+                visiblePopover.Visible = false;
+            }
 
             // Recurse once so the event can be handled below the popover
             RaiseMouseEvent (mouseEvent);

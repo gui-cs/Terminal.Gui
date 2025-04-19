@@ -151,6 +151,8 @@ public static partial class Application
 
         if (Popover?.GetActivePopover () is View popover)
         {
+            // This forcefully closes the popover; invoking Command.Quit would be more graceful
+            // but since this is shutdown, doing this is ok.
             popover.Visible = false;
         }
         Popover?.Dispose ();
@@ -162,7 +164,7 @@ public static partial class Application
         // Don't dispose the Top. It's up to caller dispose it
         if (View.DebugIDisposable && !ignoreDisposed && Top is { })
         {
-            Debug.Assert (Top.WasDisposed);
+            Debug.Assert (Top.WasDisposed, $"Title = {Top.Title}, Id = {Top.Id}");
 
             // If End wasn't called _cachedRunStateToplevel may be null
             if (_cachedRunStateToplevel is { })

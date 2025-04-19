@@ -99,7 +99,6 @@ public class UICatalogTop : Toplevel
     {
         Applied -= ConfigAppliedHandler;
         Unloaded -= UnloadedHandler;
-        Dispose ();
     }
 
     #region MenuBar
@@ -155,7 +154,11 @@ public class UICatalogTop : Toplevel
                                                               Key.A.WithCtrl
                                                              )
                                           ])
-                                 ]);
+                                 ])
+        {
+            Title = "menuBar",
+            Id = "menuBar"
+        };
 
         return menuBar;
 

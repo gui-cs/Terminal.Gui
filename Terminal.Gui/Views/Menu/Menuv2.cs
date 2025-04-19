@@ -15,10 +15,18 @@ public class Menuv2 : Bar
     /// <inheritdoc/>
     public Menuv2 (IEnumerable<View>? shortcuts) : base (shortcuts)
     {
+        // Do this to support debugging traces where Title gets set
+        base.HotKeySpecifier = (Rune)'\xffff';
+
         Orientation = Orientation.Vertical;
         Width = Dim.Auto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
         base.ColorScheme = Colors.ColorSchemes ["Menu"];
+
+        if (Border is { })
+        {
+            Border.Settings &= ~BorderSettings.Title;
+        }
 
         BorderStyle = DefaultBorderStyle;
 
@@ -64,7 +72,13 @@ public class Menuv2 : Bar
                 {
                     menuItem.CanFocus = true;
 
-                    AddCommand (menuItem.Command, RaiseAccepted);
+                    AddCommand (menuItem.Command, (ctx) =>
+                                                  {
+                                                      RaiseAccepted (ctx);
+
+                                                      return true;
+
+                                                  });
 
                     menuItem.Accepted += MenuItemOnAccepted;
 
@@ -72,7 +86,7 @@ public class Menuv2 : Bar
 
                     void MenuItemOnAccepted (object? sender, CommandEventArgs e)
                     {
-                        Logging.Trace ($"MenuItemOnAccepted: {e.Context?.Source?.Title}");
+                        Logging.Debug ($"MenuItemOnAccepted: Calling RaiseAccepted {e.Context?.Source?.Title}");
                         RaiseAccepted (e.Context);
                     }
                 }
@@ -85,15 +99,38 @@ public class Menuv2 : Bar
         }
     }
 
+
     /// <inheritdoc />
     protected override bool OnAccepting (CommandEventArgs args)
     {
-        Logging.Trace ($"{args.Context}");
+        // When the user accepts a menuItem, Menu.RaiseAccepting is called, and we intercept that here.
 
-        if (SuperMenuItem is { })
+        Logging.Debug ($"{Title} - {args.Context?.Source?.Title} Command: {args.Context?.Command}");
+
+        // TODO: Consider having PopoverMenu subscribe to Accepting instead of us overriding OnAccepting here
+        // TODO: Doing so would be better encapsulation and might allow us to remove the SuperMenuItem property.
+        if (SuperView is { })
         {
-            Logging.Trace ($"Invoking Accept on SuperMenuItem: {SuperMenuItem.Title}...");
-            return SuperMenuItem?.SuperView?.InvokeCommand (Command.Accept, args.Context) is true;
+            Logging.Debug ($"{Title} - SuperView is null");
+            //return false;
+        }
+
+        Logging.Debug ($"{Title} - {args.Context}");
+
+        if (args.Context is CommandContext<KeyBinding> { Binding.Key: { } } keyCommandContext && keyCommandContext.Binding.Key == Application.QuitKey)
+        {
+            // Special case QuitKey if we are Visible - This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
+            // And causes just the menu to quit.
+            Logging.Debug ($"{Title} - Returning true - Application.QuitKey/Command = Command.Quit");
+            return true;
+        }
+
+        // Because we may not have a SuperView (if we are in a PopoverMenu), we need to propagate
+        // Command.Accept to the SuperMenuItem if it exists.
+        if (SuperView is null && SuperMenuItem is { })
+        {
+            Logging.Debug ($"{Title} - Invoking Accept on SuperMenuItem: {SuperMenuItem?.Title}...");
+            return SuperMenuItem?.InvokeCommand (Command.Accept, args.Context) is true;
         }
         return false;
     }
@@ -106,15 +143,13 @@ public class Menuv2 : Bar
     /// </summary>
     /// <param name="ctx"></param>
     /// <returns></returns>
-    protected bool? RaiseAccepted (ICommandContext? ctx)
+    protected void RaiseAccepted (ICommandContext? ctx)
     {
         //Logging.Trace ($"RaiseAccepted: {ctx}");
         CommandEventArgs args = new () { Context = ctx };
 
         OnAccepted (args);
         Accepted?.Invoke (this, args);
-
-        return true;
     }
 
     /// <summary>
@@ -164,7 +199,7 @@ public class Menuv2 : Bar
 
     internal void RaiseSelectedMenuItemChanged (MenuItemv2? selected)
     {
-        //Logging.Trace ($"RaiseSelectedMenuItemChanged: {selected?.Title}");
+        Logging.Debug ($"{Title} ({selected?.Title})");
 
         OnSelectedMenuItemChanged (selected);
         SelectedMenuItemChanged?.Invoke (this, selected);
@@ -188,6 +223,9 @@ public class Menuv2 : Bar
     {
         base.Dispose (disposing);
 
-        Applied -= OnConfigurationManagerApplied;
+        if (disposing)
+        {
+            Applied -= OnConfigurationManagerApplied;
+        }
     }
 }

@@ -96,7 +96,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                        // Logging.Trace ($"scopeT Read: {ex}");
                     }
                 }
-                Logging.Warning ($"{propertyName} = {scope! [propertyName].PropertyValue}");
+                //Logging.Warning ($"{propertyName} = {scope! [propertyName].PropertyValue}");
 
             }
             else

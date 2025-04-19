@@ -10,23 +10,23 @@ public class OptionSelector : View, IOrientation, IDesignable
     /// <summary>
     ///     Initializes a new instance of the <see cref="OptionSelector"/> class.
     /// </summary>
-    public OptionSelector()
+    public OptionSelector ()
     {
         CanFocus = true;
 
-        Width = Dim.Auto(DimAutoStyle.Content);
-        Height = Dim.Auto(DimAutoStyle.Content);
+        Width = Dim.Auto (DimAutoStyle.Content);
+        Height = Dim.Auto (DimAutoStyle.Content);
 
-        _orientationHelper = new(this);
+        _orientationHelper = new (this);
         _orientationHelper.Orientation = Orientation.Vertical;
 
         // Accept (Enter key or DoubleClick) - Raise Accept event - DO NOT advance state
-        AddCommand(Command.Accept, HandleAcceptCommand);
+        AddCommand (Command.Accept, HandleAcceptCommand);
 
-        CreateCheckBoxes();
+        CreateCheckBoxes ();
     }
 
-    private bool? HandleAcceptCommand(ICommandContext? ctx) { return RaiseAccepting(ctx); }
+    private bool? HandleAcceptCommand (ICommandContext? ctx) { return RaiseAccepting (ctx); }
 
     private int? _selectedItem;
 
@@ -46,18 +46,18 @@ public class OptionSelector : View, IOrientation, IDesignable
             int? previousSelectedItem = _selectedItem;
             _selectedItem = value;
 
-            UpdateChecked();
+            UpdateChecked ();
 
-            RaiseSelectedItemChanged(previousSelectedItem);
+            RaiseSelectedItemChanged (previousSelectedItem);
         }
     }
 
-    private void RaiseSelectedItemChanged(int? previousSelectedItem)
+    private void RaiseSelectedItemChanged (int? previousSelectedItem)
     {
-        OnSelectedItemChanged(SelectedItem, previousSelectedItem);
+        OnSelectedItemChanged (SelectedItem, previousSelectedItem);
         if (SelectedItem.HasValue)
         {
-            SelectedItemChanged?.Invoke(this, new (SelectedItem, previousSelectedItem));
+            SelectedItemChanged?.Invoke (this, new (SelectedItem, previousSelectedItem));
         }
     }
 
@@ -82,7 +82,7 @@ public class OptionSelector : View, IOrientation, IDesignable
         set
         {
             _options = value;
-            CreateCheckBoxes();
+            CreateCheckBoxes ();
         }
     }
 
@@ -103,8 +103,8 @@ public class OptionSelector : View, IOrientation, IDesignable
                 return;
             }
             _assignHotKeysToCheckBoxes = value;
-            CreateCheckBoxes();
-            UpdateChecked();
+            CreateCheckBoxes ();
+            UpdateChecked ();
         }
     }
 
@@ -113,26 +113,26 @@ public class OptionSelector : View, IOrientation, IDesignable
     ///     <see cref="AssignHotKeysToCheckBoxes"/>
     ///     is enabled.
     /// </summary>
-    public List<Key> UsedHotKeys { get; } = new();
+    public List<Key> UsedHotKeys { get; } = new ();
 
-    private void CreateCheckBoxes()
+    private void CreateCheckBoxes ()
     {
         if (Options is null)
         {
             return;
         }
 
-        foreach (CheckBox cb in RemoveAll<CheckBox>())
+        foreach (CheckBox cb in RemoveAll<CheckBox> ())
         {
-            cb.Dispose();
+            cb.Dispose ();
         }
 
         for (var index = 0; index < Options.Count; index++)
         {
-            Add(CreateCheckBox(Options[index], index));
+            Add (CreateCheckBox (Options [index], index));
         }
 
-        SetLayout();
+        SetLayout ();
     }
 
     /// <summary>
@@ -141,7 +141,7 @@ public class OptionSelector : View, IOrientation, IDesignable
     /// <param name="name"></param>
     /// <param name="index"></param>
     /// <returns></returns>
-    protected virtual CheckBox CreateCheckBox(string name, int index)
+    protected virtual CheckBox CreateCheckBox (string name, int index)
     {
         string nameWithHotKey = name;
         if (AssignHotKeysToCheckBoxes)
@@ -149,17 +149,17 @@ public class OptionSelector : View, IOrientation, IDesignable
             // Find the first char in label that is [a-z], [A-Z], or [0-9]
             for (var i = 0; i < name.Length; i++)
             {
-                char c = char.ToLowerInvariant(name[i]);
-                if (UsedHotKeys.Contains(new(c)) || !char.IsAsciiLetterOrDigit(c))
+                char c = char.ToLowerInvariant (name [i]);
+                if (UsedHotKeys.Contains (new (c)) || !char.IsAsciiLetterOrDigit (c))
                 {
                     continue;
                 }
 
-                if (char.IsAsciiLetterOrDigit(c))
+                if (char.IsAsciiLetterOrDigit (c))
                 {
                     char? hotChar = c;
-                    nameWithHotKey = name.Insert(i, HotKeySpecifier.ToString());
-                    UsedHotKeys.Add(new(hotChar));
+                    nameWithHotKey = name.Insert (i, HotKeySpecifier.ToString ());
+                    UsedHotKeys.Add (new (hotChar));
 
                     break;
                 }
@@ -226,14 +226,15 @@ public class OptionSelector : View, IOrientation, IDesignable
         };
         checkbox.Selecting += (sender, args) =>
         {
-            if (RaiseSelecting(args.Context) is true)
+            if (RaiseSelecting (args.Context) is true)
             {
                 args.Cancel = true;
 
                 return;
-            };
+            }
+            ;
 
-            if (RaiseAccepting(args.Context) is true)
+            if (RaiseAccepting (args.Context) is true)
             {
                 args.Cancel = true;
             }
@@ -250,29 +251,29 @@ public class OptionSelector : View, IOrientation, IDesignable
         return checkbox;
     }
 
-    private void SetLayout()
+    private void SetLayout ()
     {
         foreach (View sv in SubViews)
         {
             if (Orientation == Orientation.Vertical)
             {
                 sv.X = 0;
-                sv.Y = Pos.Align(Alignment.Start);
+                sv.Y = Pos.Align (Alignment.Start);
             }
             else
             {
-                sv.X = Pos.Align(Alignment.Start);
+                sv.X = Pos.Align (Alignment.Start);
                 sv.Y = 0;
-                sv.Margin!.Thickness = new(0, 0, 1, 0);
+                sv.Margin!.Thickness = new (0, 0, 1, 0);
             }
         }
     }
 
-    private void UpdateChecked()
+    private void UpdateChecked ()
     {
-        foreach (CheckBox cb in SubViews.OfType<CheckBox>())
+        foreach (CheckBox cb in SubViews.OfType<CheckBox> ())
         {
-            var index = (int)(cb.Data ?? throw new InvalidOperationException("CheckBox.Data must be set"));
+            var index = (int)(cb.Data ?? throw new InvalidOperationException ("CheckBox.Data must be set"));
 
             cb.CheckedState = index == SelectedItem ? CheckState.Checked : CheckState.UnChecked;
         }
@@ -302,15 +303,15 @@ public class OptionSelector : View, IOrientation, IDesignable
 
     /// <summary>Called when <see cref="Orientation"/> has changed.</summary>
     /// <param name="newOrientation"></param>
-    public void OnOrientationChanged(Orientation newOrientation) { SetLayout(); }
+    public void OnOrientationChanged (Orientation newOrientation) { SetLayout (); }
 
     #endregion IOrientation
 
     /// <inheritdoc/>
-    public bool EnableForDesign()
+    public bool EnableForDesign ()
     {
         AssignHotKeysToCheckBoxes = true;
-        Options = new[] { "Option 1", "Option 2", "Option 3" };
+        Options = new [] { "Option 1", "Option 2", "Option 3" };
 
         return true;
     }
