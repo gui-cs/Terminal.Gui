@@ -1,6 +1,7 @@
 #nullable enable
 
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -217,7 +218,8 @@ public class Menus : Scenario
             // set a Key (F10). MenuBar adds this key as a hotkey and thus if it's pressed, it toggles the MenuItem
             // CB.
             // So that is needed is to mirror the two check boxes.
-            CheckBox? autoSaveMenuItemCb = menuBar.GetMenuItemsWithId ("AutoSave").FirstOrDefault ()?.CommandView as CheckBox;
+            CheckBox? autoSaveMenuItemCb = menuBar.GetMenuItemsWithTitle ("_Auto Save").FirstOrDefault ()?.CommandView as CheckBox;
+            Debug.Assert(autoSaveMenuItemCb is {});
             CheckBox autoSaveStatusCb = new ()
             {
                 Title = "AutoSave Status (MenuItem Binding to F10)",
@@ -229,11 +231,13 @@ public class Menus : Scenario
                                                     {
                                                         autoSaveMenuItemCb!.CheckedState = autoSaveStatusCb.CheckedState;
                                                     };
-            autoSaveMenuItemCb!.CheckedStateChanged += (_, _) =>
-                                                    {
-                                                        autoSaveStatusCb!.CheckedState = autoSaveMenuItemCb.CheckedState;
-                                                    };
-            Add (autoSaveStatusCb);
+
+            if (autoSaveMenuItemCb is { })
+            {
+                autoSaveMenuItemCb.CheckedStateChanged += (_, _) => { autoSaveStatusCb!.CheckedState = autoSaveMenuItemCb.CheckedState; };
+            }
+
+            base.Add (autoSaveStatusCb);
 
             // MenuItem: Enable Overwrite - Demos View Key Binding
             // In MenuBar.EnableForDesign, the overwrite MenuItem specifies a Command (Command.EnableOverwrite).
@@ -247,7 +251,7 @@ public class Menus : Scenario
                 Y = Pos.Bottom (autoSaveStatusCb)
             };
             // The source of truth is our status CB; any time it changes, update the menu item
-            CheckBox? enableOverwriteMenuItemCb = menuBar.GetMenuItemsWithId ("Overwrite").FirstOrDefault ()?.CommandView as CheckBox;
+            CheckBox? enableOverwriteMenuItemCb = menuBar.GetMenuItemsWithTitle ("Overwrite").FirstOrDefault ()?.CommandView as CheckBox;
             enableOverwriteStatusCb.CheckedStateChanged += (_, _) => enableOverwriteMenuItemCb!.CheckedState = enableOverwriteStatusCb.CheckedState;
             menuBar.Accepted += (o, args) =>
                                 {
@@ -286,7 +290,7 @@ public class Menus : Scenario
                 Y = Pos.Bottom (enableOverwriteStatusCb)
             };
             // The source of truth is our status CB; any time it changes, update the menu item
-            CheckBox? editModeMenuItemCb = menuBar.GetMenuItemsWithId ("EditMode").FirstOrDefault ()?.CommandView as CheckBox;
+            CheckBox? editModeMenuItemCb = menuBar.GetMenuItemsWithTitle ("EditMode").FirstOrDefault ()?.CommandView as CheckBox;
             editModeStatusCb.CheckedStateChanged += (_, _) => editModeMenuItemCb!.CheckedState = editModeStatusCb.CheckedState;
             menuBar.Accepted += (o, args) =>
                                 {

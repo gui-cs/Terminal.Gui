@@ -487,7 +487,7 @@ public class MenuBarv2Tests
 
                                                          });
                                                 menuBar.EnableForDesign (ref top);
-                                                IEnumerable<MenuItemv2> items = menuBar.GetMenuItemsWithId ("_Quit");
+                                                IEnumerable<MenuItemv2> items = menuBar.GetMenuItemsWithTitle ("_Quit");
                                                 foreach (MenuItemv2 item in items)
                                                 {
                                                     item.Key = Key.Empty;
