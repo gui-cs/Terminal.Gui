@@ -532,7 +532,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
     /// <summary>
     ///     Set to false to disable the debug IDisposable feature.
     /// </summary>
-    public static bool DebugIDisposable { get; set; } = false;
+    public static bool DebugIDisposable { get; set; } = true;
 
     /// <summary>For debug purposes to verify objects are being disposed properly</summary>
     public bool WasDisposed { get; set; }

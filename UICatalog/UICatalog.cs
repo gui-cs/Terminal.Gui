@@ -358,7 +358,11 @@ public class UICatalog
             return;
         }
 
+
+#if DEBUG_IDISPOSABLE
         View.DebugIDisposable = true;
+#endif
+
         while (RunUICatalogTopLevel () is { } scenario)
         {
 

@@ -5,6 +5,7 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
+[Collection ("Global Test Setup")]
 public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 {
     [Theory]
