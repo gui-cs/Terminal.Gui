@@ -2,6 +2,8 @@
 
 namespace Terminal.Gui.ViewsTests;
 
+[Collection ("Global Test Setup")]
+
 [TestSubject (typeof (Shortcut))]
 public class ShortcutTests
 {

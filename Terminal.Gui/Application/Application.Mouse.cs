@@ -63,7 +63,7 @@ public static partial class Application // Mouse handling
         }
 
 #if DEBUG_IDISPOSABLE
-        if (View.DebugIDisposable)
+        if (View.EnableDebugIDisposableAsserts)
         {
             ObjectDisposedException.ThrowIf (MouseGrabView.WasDisposed, MouseGrabView);
         }
@@ -154,7 +154,7 @@ public static partial class Application // Mouse handling
         if (deepestViewUnderMouse is { })
         {
 #if DEBUG_IDISPOSABLE
-            if (View.DebugIDisposable && deepestViewUnderMouse.WasDisposed)
+            if (View.EnableDebugIDisposableAsserts && deepestViewUnderMouse.WasDisposed)
             {
                 throw new ObjectDisposedException (deepestViewUnderMouse.GetType ().FullName);
             }
@@ -300,7 +300,7 @@ public static partial class Application // Mouse handling
         if (MouseGrabView is { })
         {
 #if DEBUG_IDISPOSABLE
-            if (View.DebugIDisposable && MouseGrabView.WasDisposed)
+            if (View.EnableDebugIDisposableAsserts && MouseGrabView.WasDisposed)
             {
                 throw new ObjectDisposedException (MouseGrabView.GetType ().FullName);
             }

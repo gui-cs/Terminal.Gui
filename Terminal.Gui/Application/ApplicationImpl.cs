@@ -176,7 +176,7 @@ public class ApplicationImpl : IApplication
                 if (runState.Toplevel is null)
                 {
 #if DEBUG_IDISPOSABLE
-                if (View.DebugIDisposable)
+                if (View.EnableDebugIDisposableAsserts)
                 {
                     Debug.Assert (Application.TopLevels.Count == 0);
                 }
