@@ -298,8 +298,14 @@ public class Menus : Scenario
             };
 
             // The source of truth is our status CB; any time it changes, update the menu item
-            var editModeMenuItemCb = menuBar.GetMenuItemsWithTitle ("EditMode").FirstOrDefault ()?.CommandView as CheckBox;
-            editModeStatusCb.CheckedStateChanged += (_, _) => editModeMenuItemCb!.CheckedState = editModeStatusCb.CheckedState;
+            CheckBox? editModeMenuItemCb = menuBar.GetMenuItemsWithTitle ("EditMode").FirstOrDefault ()?.CommandView as CheckBox;
+            editModeStatusCb.CheckedStateChanged += (_, _) =>
+                                                    {
+                                                        if (editModeMenuItemCb is { })
+                                                        {
+                                                            editModeMenuItemCb.CheckedState = editModeStatusCb.CheckedState;
+                                                        }
+                                                    };
 
             menuBar.Accepted += (o, args) =>
                                 {
@@ -336,6 +342,8 @@ public class Menus : Scenario
             };
 
             ContextMenu.EnableForDesign (ref host);
+            // This is needed because PopoverMenu.EnableForDesign sets Visible to true
+            // so it will be visible in AllViewsTester
             ContextMenu.Visible = false;
 
             // Demo of PopoverMenu as a context menu

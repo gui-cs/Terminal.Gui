@@ -109,7 +109,7 @@ public class Menuv2 : Bar
 
         // TODO: Consider having PopoverMenu subscribe to Accepting instead of us overriding OnAccepting here
         // TODO: Doing so would be better encapsulation and might allow us to remove the SuperMenuItem property.
-        if (SuperView is { })
+        if (SuperView is null)
         {
             Logging.Debug ($"{Title} - SuperView is null");
             //return false;
@@ -175,6 +175,10 @@ public class Menuv2 : Bar
     {
         base.OnFocusedChanged (previousFocused, focused);
 
+        if (SelectedMenuItem == focused && SelectedMenuItem is { HasFocus: true})
+        {
+            return;
+        }
         SelectedMenuItem = focused as MenuItemv2;
         RaiseSelectedMenuItemChanged (SelectedMenuItem);
     }

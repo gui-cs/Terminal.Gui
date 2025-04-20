@@ -636,18 +636,74 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
                         new Line (),
                         new MenuItemv2 (context as View, Command.SelectAll),
                         new Line (),
+                        new MenuItemv2 ()
+                        {
+                            Title = "_Details",
+                            SubMenu = new (ConfigureDetailsSubMenu ())
+                        },
+                        new Line (),
                         new MenuItemv2 (context as View, Command.Quit)
                     ])
         {
             Title = "Popover Demo Root"
         };
 
-        // NOTE: This is a workaround for the fact that the PopoverMenu is not visible in the designer
+        // NOTE: Setting Visible to true is a workaround for the fact that the PopoverMenu is not visible in the designer
         // NOTE: without being activated via Application.Popover. But we want it to be visible.
         // NOTE: If you use PopoverView.EnableForDesign for real Popover scenarios, change back to false
         // NOTE: after calling EnableForDesign.
-        //Visible = true;
+        Visible = true;
 
         return true;
+
+
+        MenuItemv2 [] ConfigureDetailsSubMenu ()
+        {
+            var detail = new MenuItemv2
+            {
+                Title = "_Detail 1",
+                Text = "Some detail #1"
+            };
+
+            var nestedSubMenu = new MenuItemv2
+            {
+                Title = "_Moar Details",
+                SubMenu = new (ConfigureMoreDetailsSubMenu ()),
+            };
+
+            var editMode = new MenuItemv2
+            {
+                Text = "App Binding to Command.Edit",
+                Id = "EditMode",
+                Command = Command.Edit,
+                CommandView = new CheckBox
+                {
+                    Title = "E_dit Mode",
+                }
+            };
+
+            return [detail, nestedSubMenu, null!, editMode];
+
+            View [] ConfigureMoreDetailsSubMenu ()
+            {
+                var deeperDetail = new MenuItemv2
+                {
+                    Title = "_Deeper Detail",
+                    Text = "Deeper Detail",
+                    Action = () => { MessageBox.Query ("Deeper Detail", "Lots of details", "_Ok"); }
+                };
+
+                var belowLineDetail = new MenuItemv2
+                {
+                    Title = "_Even more detail",
+                    Text = "Below the line"
+                };
+
+                // This ensures the checkbox state toggles when the hotkey of Title is pressed.
+                //shortcut4.Accepting += (sender, args) => args.Cancel = true;
+
+                return [deeperDetail, new Line (), belowLineDetail];
+            }
+        }
     }
 }

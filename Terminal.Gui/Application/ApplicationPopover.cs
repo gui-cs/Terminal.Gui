@@ -1,5 +1,7 @@
 #nullable enable
 
+using System.Diagnostics;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -172,6 +174,9 @@ public sealed class ApplicationPopover : IDisposable
             {
                 return true;
             }
+
+            // ActivePopover may have changed
+            activePopover = GetActivePopover () as View;
         }
 
         return hotKeyHandled is true;
