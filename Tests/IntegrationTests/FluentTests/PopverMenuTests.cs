@@ -8,14 +8,9 @@ namespace IntegrationTests.FluentTests;
 /// <summary>
 ///     Tests for the PopoverMenu class
 /// </summary>
-public class PopoverMenuTests
+public class PopoverMenuTests (ITestOutputHelper outputHelper)
 {
-    private readonly TextWriter _out;
-
-    public PopoverMenuTests (ITestOutputHelper outputHelper)
-    {
-        _out = new TestOutputWriter (outputHelper);
-    }
+    private readonly TextWriter _out = new TestOutputWriter (outputHelper);
 
     [Theory]
     [ClassData (typeof (V2TestDrivers))]

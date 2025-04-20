@@ -252,6 +252,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
             foreach (Menuv2 menu in allMenus)
             {
+                menu.Visible = false;
                 menu.Accepting += MenuOnAccepting;
                 menu.Accepted += MenuAccepted;
                 menu.SelectedMenuItemChanged += MenuOnSelectedMenuItemChanged;
@@ -427,7 +428,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     private void AddAndShowSubMenu (Menuv2? menu)
     {
-        if (menu is { SuperView: null })
+        if (menu is { SuperView: null, Visible: false })
         {
             Logging.Debug ($"{Title} ({menu?.Title}) - menu.Visible: {menu?.Visible}");
 
