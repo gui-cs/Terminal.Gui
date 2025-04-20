@@ -1,5 +1,6 @@
 ﻿namespace Terminal.Gui.ViewTests;
 
+[Collection ("Global Test Setup")]
 public class SubViewTests
 {
     [Fact]

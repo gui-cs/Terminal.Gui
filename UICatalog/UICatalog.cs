@@ -358,7 +358,11 @@ public class UICatalog
             return;
         }
 
-        View.DebugIDisposable = true;
+
+#if DEBUG_IDISPOSABLE
+        View.EnableDebugIDisposableAsserts = true;
+#endif
+
         while (RunUICatalogTopLevel () is { } scenario)
         {
 
@@ -596,8 +600,11 @@ public class UICatalog
     private static void VerifyObjectsWereDisposed ()
     {
 #if DEBUG_IDISPOSABLE
-        if (!View.DebugIDisposable)
+        if (!View.EnableDebugIDisposableAsserts)
         {
+            View.Instances.Clear ();
+            RunState.Instances.Clear ();
+
             return;
         }
 

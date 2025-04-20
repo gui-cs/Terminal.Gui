@@ -13,7 +13,7 @@ public class ScenarioTests : TestsAllViews
     public ScenarioTests (ITestOutputHelper output)
     {
 #if DEBUG_IDISPOSABLE
-        View.DebugIDisposable = true;
+        View.EnableDebugIDisposableAsserts = true;
         View.Instances.Clear ();
 #endif
         _output = output;

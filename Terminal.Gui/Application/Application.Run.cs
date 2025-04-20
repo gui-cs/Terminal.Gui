@@ -98,7 +98,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         var rs = new RunState (toplevel);
 
 #if DEBUG_IDISPOSABLE
-        if (View.DebugIDisposable && Top is { } && toplevel != Top && !TopLevels.Contains (Top))
+        if (View.EnableDebugIDisposableAsserts && Top is { } && toplevel != Top && !TopLevels.Contains (Top))
         {
             // This assertion confirm if the Top was already disposed
             Debug.Assert (Top.WasDisposed);

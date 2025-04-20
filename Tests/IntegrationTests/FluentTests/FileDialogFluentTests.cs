@@ -14,13 +14,6 @@ public class FileDialogFluentTests
     public FileDialogFluentTests (ITestOutputHelper outputHelper)
     {
         _out = new TestOutputWriter (outputHelper);
-
-#if DEBUG_IDISPOSABLE
-        // Always set this in tests. Because this wasn't set, these tests were not catching
-        // that Application.Top was not being disposed.
-        View.DebugIDisposable = true;
-#endif
-
     }
 
     private MockFileSystem CreateExampleFileSystem ()

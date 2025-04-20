@@ -16,7 +16,7 @@ public class ApplicationTests
         Locations = ConfigLocations.Default;
 
 #if DEBUG_IDISPOSABLE
-        View.DebugIDisposable = true;
+        View.EnableDebugIDisposableAsserts = true;
         View.Instances.Clear ();
         RunState.Instances.Clear ();
 #endif
@@ -339,6 +339,9 @@ public class ApplicationTests
 
             // Navigation
             Assert.Null (Application.Navigation);
+
+            // Popover
+            Assert.Null (Application.Popover);
 
             // Events - Can't check
             //Assert.Null (Application.NotifyNewRunState);

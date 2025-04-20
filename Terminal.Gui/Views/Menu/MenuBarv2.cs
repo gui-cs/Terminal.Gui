@@ -470,16 +470,15 @@ public class MenuBarv2 : Menuv2, IDesignable
         return true;
     }
 
-    // BUGBUG: This should not use Id, but Data? - Id is used too much for debugging.
     /// <summary>
-    ///     Gets all menu items with the specified id, anywhere in the menu hierarchy.
+    ///     Gets all menu items with the specified Title, anywhere in the menu hierarchy.
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="title"></param>
     /// <returns></returns>
-    public IEnumerable<MenuItemv2> GetMenuItemsWithId (string id)
+    public IEnumerable<MenuItemv2> GetMenuItemsWithTitle (string title)
     {
         List<MenuItemv2> menuItems = new ();
-        if (string.IsNullOrEmpty (id))
+        if (string.IsNullOrEmpty (title))
         {
             return menuItems;
         }
@@ -490,7 +489,7 @@ public class MenuBarv2 : Menuv2, IDesignable
                 menuItems.AddRange (mbi.PopoverMenu.GetMenuItemsOfAllSubMenus ());
             }
         }
-        return menuItems.Where (mi => mi.Id == id);
+        return menuItems.Where (mi => mi.Title == title);
     }
 
     /// <inheritdoc/>
@@ -499,7 +498,7 @@ public class MenuBarv2 : Menuv2, IDesignable
         // Note: This menu is used by unit tests. If you modify it, you'll likely have to update
         // unit tests.
 
-        Title = "Demo MenuBar";
+        Id = "DemonuBar";
 
         var bordersCb = new CheckBox
         {
@@ -547,7 +546,7 @@ public class MenuBarv2 : Menuv2, IDesignable
                                                new Line (),
                                                new MenuItemv2
                                                {
-                                                   Title = "_File Options",
+                                                   Title = "File Op_tions",
                                                    SubMenu = new (
                                                                   [
                                                                       new ()
@@ -610,11 +609,7 @@ public class MenuBarv2 : Menuv2, IDesignable
                                                new Line (),
                                                new MenuItemv2 ()
                                                {
-                                                   Id = "Quit",
                                                    TargetView = context as View,
-                                                   // BUGBUG: If a menuitem has Key = QuitKey and the menu is open, if the user presses QuitKey, the menu item gets the key first and invokescommand.
-                                                   // BUGBUG: This causes the targetview to Stop. 
-                                                   // BUGBUG: Instead, the menu should just close. Need to figure out how to let the MenuBar, PopoverMenu, or Menu intercept Quitkey first.
                                                    Key = Application.QuitKey,
                                                    Command = Command.Quit
                                                }

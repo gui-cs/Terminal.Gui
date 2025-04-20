@@ -161,9 +161,6 @@ public class WindowTests (ITestOutputHelper output)
         Assert.Equal (0, windowWithFrameRectEmpty.Width);
         Assert.Equal (0, windowWithFrameRectEmpty.Height);
         Assert.False (windowWithFrameRectEmpty.IsCurrentTop);
-#if DEBUG
-        Assert.Equal (windowWithFrameRectEmpty.Title, windowWithFrameRectEmpty.Id);
-#endif
         Assert.False (windowWithFrameRectEmpty.WantContinuousButtonPressed);
         Assert.False (windowWithFrameRectEmpty.WantMousePositionReports);
         Assert.Null (windowWithFrameRectEmpty.SuperView);
@@ -176,11 +173,7 @@ public class WindowTests (ITestOutputHelper output)
         windowWithFrame1234.Title = "title";
         Assert.Equal ("title", windowWithFrame1234.Title);
         Assert.NotNull (windowWithFrame1234);
-#if DEBUG
-        Assert.Equal ($"Window(title){windowWithFrame1234.Frame}", windowWithFrame1234.ToString ());
-#else
         Assert.Equal ($"Window(){windowWithFrame1234.Frame}", windowWithFrame1234.ToString ());
-#endif
         Assert.True (windowWithFrame1234.CanFocus);
         Assert.False (windowWithFrame1234.HasFocus);
         Assert.Equal (new (0, 0, 1, 2), windowWithFrame1234.Viewport);
@@ -192,9 +185,6 @@ public class WindowTests (ITestOutputHelper output)
         Assert.Equal (3, windowWithFrame1234.Width);
         Assert.Equal (4, windowWithFrame1234.Height);
         Assert.False (windowWithFrame1234.IsCurrentTop);
-#if DEBUG
-        Assert.Equal (windowWithFrame1234.Title, windowWithFrame1234.Id);
-#endif
         Assert.False (windowWithFrame1234.WantContinuousButtonPressed);
         Assert.False (windowWithFrame1234.WantMousePositionReports);
         Assert.Null (windowWithFrame1234.SuperView);
