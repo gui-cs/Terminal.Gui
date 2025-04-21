@@ -3,8 +3,7 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     An internal class used to represent a menu pop-up menu. Created and managed by <see cref="MenuBar"/> and
-///     <see cref="ContextMenu"/>.
+///     An internal class used to represent a menu pop-up menu. Created and managed by <see cref="MenuBar"/>.
 /// </summary>
 internal sealed class Menu : View
 {
@@ -252,8 +251,7 @@ internal sealed class Menu : View
     protected override bool OnKeyDownNotHandled (Key keyEvent)
     {
         // We didn't handle the key, pass it on to host
-        bool? handled = null;
-        return _host.InvokeCommandsBoundToHotKey (keyEvent, ref handled) == true;
+        return _host.InvokeCommandsBoundToHotKey (keyEvent) is true;
     }
 
     protected override bool OnMouseEvent (MouseEventArgs me)

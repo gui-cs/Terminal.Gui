@@ -17,7 +17,6 @@ namespace Terminal.Gui;
 ///         The <see cref="MenuBar"/> appears on the first row of the <see cref="Toplevel"/> SuperView and uses the full
 ///         width.
 ///     </para>
-///     <para>See also: <see cref="ContextMenu"/></para>
 ///     <para>The <see cref="MenuBar"/> provides global hot keys for the application. See <see cref="MenuItem.HotKey"/>.</para>
 ///     <para>
 ///         When the menu is created key bindings for each menu item and its sub-menu items are added for each menu
@@ -441,7 +440,15 @@ public class MenuBar : View, IDesignable
             return;
         }
 
-        Application.GrabMouse (this);
+        if (_isContextMenuLoading)
+        {
+            Application.GrabMouse (_openMenu);
+            _isContextMenuLoading = false;
+        }
+        else
+        {
+            Application.GrabMouse (this);
+        }
     }
 
     /// <inheritdoc/>
@@ -493,6 +500,11 @@ public class MenuBar : View, IDesignable
 
     internal void CleanUp ()
     {
+        if (_isCleaning)
+        {
+            return;
+        }
+
         _isCleaning = true;
 
         if (_openMenu is { })
@@ -726,6 +738,11 @@ public class MenuBar : View, IDesignable
                 }
 
                 if (_selected > -1 && !CloseMenu (true, ignoreUseSubMenusSingleFrame))
+                {
+                    return;
+                }
+
+                if (_selected == -1)
                 {
                     return;
                 }
@@ -967,6 +984,11 @@ public class MenuBar : View, IDesignable
                 }
 
                 if (_selected > -1 && !CloseMenu (true, false, ignoreUseSubMenusSingleFrame))
+                {
+                    return;
+                }
+
+                if (_selected == -1)
                 {
                     return;
                 }
@@ -1448,9 +1470,9 @@ public class MenuBar : View, IDesignable
                             Activate (i);
                         }
                     }
-                    else if (me.Flags == MouseFlags.Button1Pressed
-                             || me.Flags == MouseFlags.Button1DoubleClicked
-                             || me.Flags == MouseFlags.Button1TripleClicked)
+                    else if (me.Flags.HasFlag (MouseFlags.Button1Pressed)
+                             || me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
+                             || me.Flags.HasFlag (MouseFlags.Button1TripleClicked))
                     {
                         if (IsMenuOpen && !Menus [i].IsTopLevel)
                         {
@@ -1534,16 +1556,17 @@ public class MenuBar : View, IDesignable
                     }
                 }
 
+                if (Application.MouseGrabView != me.View)
+                {
+                    View v = me.View;
+                    Application.GrabMouse (v);
+
+                    return true;
+                }
+
                 if (me.View != current)
                 {
-                    View v = current;
-                    Application.UngrabMouse ();
-
-                    if (((Menu)me.View).Host.SuperView is { } && ((Menu)me.View).Host.SuperView!.InternalSubViews.Contains(me.View))
-                    {
-                        v = me.View;
-                    }
-
+                    View v = me.View;
                     Application.GrabMouse (v);
                     MouseEventArgs nme;
 
@@ -1590,7 +1613,6 @@ public class MenuBar : View, IDesignable
             else
             {
                 _handled = false;
-                _isContextMenuLoading = false;
 
                 return false;
             }

@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.ComponentModel;
+using static Unix.Terminal.Curses;
 
 namespace Terminal.Gui;
 
@@ -76,7 +77,7 @@ public partial class View // Drawing APIs
 
             // TODO: Simplify/optimize SetAttribute system.
             DoSetAttribute ();
-            DoClearViewport ();
+            DoClearViewport (context);
 
             // ------------------------------------
             // Draw the subviews first (order matters: SubViews, Text, Content)
@@ -134,7 +135,6 @@ public partial class View // Drawing APIs
 
     private void DoDrawAdornmentsSubViews ()
     {
-
         // NOTE: We do not support subviews of Margin?
 
         if (Border?.SubViews is { } && Border.Thickness != Thickness.Empty)
@@ -188,8 +188,7 @@ public partial class View // Drawing APIs
         if (Margin?.NeedsLayout == true)
         {
             Margin.NeedsLayout = false;
-            // BUGBUG: This should not use ClearFrame as that clears the insides too
-            Margin?.ClearFrame ();
+            Margin?.Thickness.Draw (FrameToScreen ());
             Margin?.Parent?.SetSubViewNeedsDraw ();
         }
 
@@ -316,31 +315,29 @@ public partial class View // Drawing APIs
 
     #region ClearViewport
 
-    internal void DoClearViewport ()
+    internal void DoClearViewport (DrawContext? context = null)
     {
-        if (ViewportSettings.HasFlag (ViewportSettings.Transparent))
+        if (ViewportSettings.HasFlag (ViewportSettings.Transparent) || OnClearingViewport ())
         {
             return;
         }
 
-        if (OnClearingViewport ())
-        {
-            return;
-        }
-
-        var dev = new DrawEventArgs (Viewport, Rectangle.Empty, null);
+        var dev = new DrawEventArgs (Viewport, Rectangle.Empty, context);
         ClearingViewport?.Invoke (this, dev);
 
         if (dev.Cancel)
         {
+            // BUGBUG: We should add the Viewport to context.DrawRegion here?
             SetNeedsDraw ();
             return;
         }
 
-        ClearViewport ();
-
-        OnClearedViewport ();
-        ClearedViewport?.Invoke (this, new (Viewport, Viewport, null));
+        if (!ViewportSettings.HasFlag (ViewportSettings.Transparent))
+        {
+            ClearViewport (context);
+            OnClearedViewport ();
+            ClearedViewport?.Invoke (this, new (Viewport, Viewport, null));
+        }
     }
 
     /// <summary>
@@ -379,7 +376,7 @@ public partial class View // Drawing APIs
     ///         the area outside the content to be visually distinct.
     ///     </para>
     /// </remarks>
-    public void ClearViewport ()
+    public void ClearViewport (DrawContext? context = null)
     {
         if (Driver is null)
         {
@@ -397,6 +394,9 @@ public partial class View // Drawing APIs
 
         Attribute prev = SetAttribute (GetNormalColor ());
         Driver.FillRect (toClear);
+
+        // context.AddDrawnRectangle (toClear);
+
         SetAttribute (prev);
         SetNeedsDraw ();
     }
@@ -412,6 +412,7 @@ public partial class View // Drawing APIs
             return;
         }
 
+        // TODO: Get rid of this vf in lieu of the one above
         if (OnDrawingText ())
         {
             return;
@@ -544,6 +545,7 @@ public partial class View // Drawing APIs
             return;
         }
 
+        // TODO: Get rid of this vf in lieu of the one above
         if (OnDrawingSubViews ())
         {
             return;
@@ -707,6 +709,9 @@ public partial class View // Drawing APIs
                 // Exclude the Border and Padding from the clip
                 ExcludeFromClip (Border?.Thickness.AsRegion (FrameToScreen ()));
                 ExcludeFromClip (Padding?.Thickness.AsRegion (FrameToScreen ()));
+
+                // QUESTION: This makes it so that no nesting of transparent views is possible, but is more correct?
+                //context = new DrawContext ();
             }
             else
             {
@@ -721,6 +726,7 @@ public partial class View // Drawing APIs
                 // In the non-transparent (typical case), we want to exclude the entire view area (borderFrame) from the clip
                 ExcludeFromClip (borderFrame);
 
+                // BUGBUG: There looks like a bug in Region where this Union call is not adding the rectangle right
                 // Update context.DrawnRegion to include the entire view (borderFrame), but clipped to our SuperView's viewport
                 // This enables the SuperView to know what was drawn by this view.
                 context?.AddDrawnRectangle (borderFrame);

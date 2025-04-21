@@ -841,7 +841,7 @@ public class Slider<T> : View, IOrientation
     private void DrawSlider ()
     {
         // TODO: be more surgical on clear
-        ClearViewport ();
+        ClearViewport (null);
 
         // Attributes
 

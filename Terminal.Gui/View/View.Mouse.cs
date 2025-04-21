@@ -560,7 +560,7 @@ public partial class View // Mouse APIs
             if (!WantMousePositionReports && Viewport.Contains (mouseEvent.Position))
             {
 
-               return RaiseMouseClickEvent (mouseEvent);
+                return RaiseMouseClickEvent (mouseEvent);
             }
 
             return mouseEvent.Handled = true;
@@ -770,11 +770,23 @@ public partial class View // Mouse APIs
 
         View? start = Application.Top;
 
+        // PopoverHost - If visible, start with it instead of Top
+        if (Application.Popover?.GetActivePopover () is View {Visible: true } visiblePopover && !ignoreTransparent)
+        {
+            start = visiblePopover;
+
+            // Put Top on stack next
+            viewsUnderMouse.Add (Application.Top);
+        }
+
         Point currentLocation = location;
 
         while (start is { Visible: true } && start.Contains (currentLocation))
         {
-            viewsUnderMouse.Add (start);
+            if (!start.ViewportSettings.HasFlag(ViewportSettings.TransparentMouse))
+            {
+                viewsUnderMouse.Add (start);
+            }
 
             Adornment? found = null;
 
@@ -825,13 +837,14 @@ public partial class View // Mouse APIs
 
             if (subview is null)
             {
+                // In the case start is transparent, recursively add all it's subviews etc...
                 if (start.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
                 {
                     viewsUnderMouse.AddRange (View.GetViewsUnderMouse (location, true));
 
                     // De-dupe viewsUnderMouse
-                    HashSet<View?> dedupe = [..viewsUnderMouse];
-                    viewsUnderMouse = [..dedupe];
+                    HashSet<View?> hashSet = [.. viewsUnderMouse];
+                    viewsUnderMouse = [.. hashSet];
                 }
 
                 // No subview was found that's under the mouse, so we're done

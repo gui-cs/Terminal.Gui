@@ -183,4 +183,58 @@
   <data name="ctxColors" xml:space="preserve">
     <value>Co_res</value>
   </data>
+  <data name="cmd.Open" xml:space="preserve">
+    <value>_Abrir</value>
+  </data>
+  <data name="cmd.Quit" xml:space="preserve">
+    <value />
+  </data>
+  <data name="cmd.Save" xml:space="preserve">
+    <value>_Guardar</value>
+  </data>
+  <data name="cmd.SaveAs" xml:space="preserve">
+    <value>Guardar _como</value>
+  </data>
+  <data name="cmd.Cut" xml:space="preserve">
+    <value>Cor_tar</value>
+  </data>
+  <data name="cmd.Copy" xml:space="preserve">
+    <value>_Copiar</value>
+  </data>
+  <data name="cmd.Paste" xml:space="preserve">
+    <value>Co_lar</value>
+  </data>
+  <data name="cmd.SelectAll" xml:space="preserve">
+    <value>_Selecionar Tudo</value>
+  </data>
+  <data name="cmd.New" xml:space="preserve">
+    <value />
+  </data>
+  <data name="cmd.Open.Help" xml:space="preserve">
+    <value />
+  </data>
+  <data name="cmd.Quit.Help" xml:space="preserve">
+    <value />
+  </data>
+  <data name="cmd.Save.Help" xml:space="preserve">
+    <value />
+  </data>
+  <data name="cmd.SaveAs.Help" xml:space="preserve">
+    <value />
+  </data>
+  <data name="cmd.Cut.Help" xml:space="preserve">
+    <value />
+  </data>
+  <data name="cmd.Copy.Help" xml:space="preserve">
+    <value />
+  </data>
+  <data name="cmd.Paste.Help" xml:space="preserve">
+    <value />
+  </data>
+  <data name="cmd.SelectAll.Help" xml:space="preserve">
+    <value />
+  </data>
+  <data name="cmd.New.Help" xml:space="preserve">
+    <value />
+  </data>
 </root>

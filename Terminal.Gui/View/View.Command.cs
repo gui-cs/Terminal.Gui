@@ -14,6 +14,9 @@ public partial class View // Command APIs
     /// </summary>
     private void SetupCommands ()
     {
+        // NotBound - Invoked if no handler is bound
+        AddCommand (Command.NotBound, RaiseCommandNotBound);
+
         // Enter - Raise Accepted
         AddCommand (Command.Accept, RaiseAccepting);
 
@@ -51,6 +54,45 @@ public partial class View // Command APIs
     }
 
     /// <summary>
+    ///     Called when a command that has not been bound is invoked.
+    /// </summary>
+    /// <returns>
+    ///     <see langword="null"/> if no event was raised; input processing should continue.
+    ///     <see langword="false"/> if the event was raised and was not handled (or cancelled); input processing should continue.
+    ///     <see langword="true"/> if the event was raised and handled (or cancelled); input processing should stop.
+    /// </returns>
+    protected bool? RaiseCommandNotBound (ICommandContext? ctx)
+    {
+        CommandEventArgs args = new () { Context = ctx };
+
+        // Best practice is to invoke the virtual method first.
+        // This allows derived classes to handle the event and potentially cancel it.
+        if (OnCommandNotBound (args) || args.Cancel)
+        {
+            return true;
+        }
+
+        // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
+        CommandNotBound?.Invoke (this, args);
+
+        return CommandNotBound is null ? null : args.Cancel;
+    }
+
+    /// <summary>
+    ///      Called when a command that has not been bound is invoked.
+    ///     Set CommandEventArgs.Cancel to
+    ///     <see langword="true"/> and return <see langword="true"/> to cancel the event. The default implementation does nothing.
+    /// </summary>
+    /// <param name="args">The event arguments.</param>
+    /// <returns><see langword="true"/> to stop processing.</returns>
+    protected virtual bool OnCommandNotBound (CommandEventArgs args) { return false; }
+
+    /// <summary>
+    ///     Cancelable event raised when a command that has not been bound is invoked.
+    /// </summary>
+    public event EventHandler<CommandEventArgs>? CommandNotBound;
+
+    /// <summary>
     ///     Called when the user is accepting the state of the View and the <see cref="Command.Accept"/> has been invoked. Calls <see cref="OnAccepting"/> which can be cancelled; if not cancelled raises <see cref="Accepting"/>.
     ///     event. The default <see cref="Command.Accept"/> handler calls this method.
     /// </summary>
@@ -73,15 +115,18 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? RaiseAccepting (ICommandContext? ctx)
     {
+        Logging.Trace($"{ctx?.Source?.Title}");
         CommandEventArgs args = new () { Context = ctx };
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
+        Logging.Trace ($"Calling OnAccepting...");
         args.Cancel = OnAccepting (args) || args.Cancel;
 
         if (!args.Cancel)
         {
             // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
+            Logging.Trace ($"Raising Accepting...");
             Accepting?.Invoke (this, args);
         }
 
@@ -95,7 +140,9 @@ public partial class View // Command APIs
 
             if (isDefaultView != this && isDefaultView is Button { IsDefault: true } button)
             {
-                bool? handled = isDefaultView.InvokeCommand<KeyBinding> (Command.Accept, new ([Command.Accept], null, this));
+                // TODO: It's a bit of a hack that this uses KeyBinding. There should be an InvokeCommmand that 
+                // TODO: is generic?
+                bool? handled = isDefaultView.InvokeCommand (Command.Accept, ctx);
                 if (handled == true)
                 {
                     return true;
@@ -104,11 +151,12 @@ public partial class View // Command APIs
 
             if (SuperView is { })
             {
-                return SuperView?.InvokeCommand<KeyBinding> (Command.Accept, new ([Command.Accept], null, this)) is true;
+                Logging.Trace ($"Invoking Accept on SuperView: {SuperView.Title}...");
+                return SuperView?.InvokeCommand (Command.Accept, ctx);
             }
         }
 
-        return Accepting is null ? null : args.Cancel;
+        return args.Cancel;
     }
 
     /// <summary>
@@ -294,9 +342,7 @@ public partial class View // Command APIs
         {
             if (!_commandImplementations.ContainsKey (command))
             {
-                throw new NotSupportedException (
-                                                 @$"A Binding was set up for the command {command} ({binding}) but that command is not supported by this View ({GetType ().Name})"
-                                                );
+                Logging.Warning (@$"{command} is not supported by this View ({GetType ().Name}). Binding: {binding}.");
             }
 
             // each command has its own return value
@@ -327,16 +373,36 @@ public partial class View // Command APIs
     /// </returns>
     public bool? InvokeCommand<TBindingType> (Command command, TBindingType binding)
     {
-        if (_commandImplementations.TryGetValue (command, out CommandImplementation? implementation))
+        if (!_commandImplementations.TryGetValue (command, out CommandImplementation? implementation))
         {
-            return implementation (new CommandContext<TBindingType> ()
-            {
-                Command = command,
-                Binding = binding,
-            });
+            _commandImplementations.TryGetValue (Command.NotBound, out implementation);
         }
+        return implementation! (new CommandContext<TBindingType> ()
+        {
+            Command = command,
+            Source = this,
+            Binding = binding,
+        });
+    }
 
-        return null;
+
+    /// <summary>
+    /// Invokes the specified command.
+    /// </summary>
+    /// <param name="command">The command to invoke.</param>
+    /// <param name="ctx">The context to pass with the command.</param>
+    /// <returns>
+    ///     <see langword="null"/> if no command was found; input processing should continue.
+    ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should continue.
+    ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should stop.
+    /// </returns>
+    public bool? InvokeCommand (Command command, ICommandContext? ctx)
+    {
+        if (!_commandImplementations.TryGetValue (command, out CommandImplementation? implementation))
+        {
+            _commandImplementations.TryGetValue (Command.NotBound, out implementation);
+        }
+        return implementation! (ctx);
     }
 
     /// <summary>
@@ -350,11 +416,12 @@ public partial class View // Command APIs
     /// </returns>
     public bool? InvokeCommand (Command command)
     {
-        if (_commandImplementations.TryGetValue (command, out CommandImplementation? implementation))
+        if (!_commandImplementations.TryGetValue (command, out CommandImplementation? implementation))
         {
-            return implementation (null);
+            _commandImplementations.TryGetValue (Command.NotBound, out implementation);
         }
 
-        return null;
+        return implementation! (null);
+
     }
 }

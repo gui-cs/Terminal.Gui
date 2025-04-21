@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 
@@ -63,7 +64,11 @@ public class ApplicationV2 : ApplicationImpl
             _driverName = driverName;
         }
 
+        Debug.Assert(Application.Navigation is null);
         Application.Navigation = new ();
+
+        Debug.Assert (Application.Popover is null);
+        Application.Popover = new ();
 
         Application.AddKeyBindings ();
 

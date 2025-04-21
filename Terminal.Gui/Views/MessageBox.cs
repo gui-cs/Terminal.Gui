@@ -360,26 +360,20 @@ public static class MessageBox
                     b.IsDefault = true;
                     b.Accepting += (_, e) =>
                                    {
-                                       if (e.Context is not CommandContext<KeyBinding> keyCommandContext)
-                                       {
-                                           return;
-                                       }
-
-                                       // TODO: With https://github.com/gui-cs/Terminal.Gui/issues/3778 we can simplify this
-                                       if (keyCommandContext.Binding.Data is Button button)
+                                       if (e?.Context?.Source is Button button)
                                        {
                                            Clicked = (int)button.Data!;
-                                       }
-                                       else if (keyCommandContext.Binding.Target is Button btn)
-                                       {
-                                           Clicked = (int)btn.Data!;
                                        }
                                        else
                                        {
                                            Clicked = defaultButton;
                                        }
 
-                                       e.Cancel = true;
+                                       if (e is { })
+                                       {
+                                           e.Cancel = true;
+                                       }
+
                                        Application.RequestStop ();
                                    };
                 }

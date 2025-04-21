@@ -749,7 +749,15 @@ public class ColorPickerTests
         // Auto complete the color name
         Application.RaiseKeyDownEvent (Key.Tab);
 
-        Assert.Equal ("Aquamarine", name.Text);
+        // Match cyan alternative name
+        Assert.Equal ("Aqua", name.Text);
+
+        Assert.True (name.HasFocus);
+
+        Application.RaiseKeyDownEvent (Key.Tab);
+
+        // Resolves to cyan color
+        Assert.Equal ("Cyan", name.Text);
 
         // Tab out of the text field
         Application.RaiseKeyDownEvent (Key.Tab);
@@ -757,7 +765,7 @@ public class ColorPickerTests
         Assert.False (name.HasFocus);
         Assert.NotSame (name, cp.Focused);
 
-        Assert.Equal ("#7FFFD4", hex.Text);
+        Assert.Equal ("#00FFFF", hex.Text);
 
         Application.Top?.Dispose ();
         Application.ResetState (true);
@@ -817,14 +825,6 @@ public class ColorPickerTests
         };
     }
 
-    [Fact]
-    public void TestColorNames ()
-    {
-        var colors = new W3CColors ();
-        Assert.Contains ("Aquamarine", colors.GetColorNames ());
-        Assert.DoesNotContain ("Save as", colors.GetColorNames ());
-    }
-
     private ColorBar GetColorBar (ColorPicker cp, ColorPickerPart toGet)
     {
         if (toGet <= ColorPickerPart.Bar3)
@@ -845,7 +845,7 @@ public class ColorPickerTests
 
         Application.Navigation = new ();
 
-        Application.Top = new() { Width = 20, Height = 5 };
+        Application.Top = new () { Width = 20, Height = 5 };
         Application.Top.Add (cp);
 
         Application.Top.LayoutSubViews ();

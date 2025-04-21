@@ -1,4 +1,5 @@
 #nullable enable
+using System.Buffers;
 using System.Diagnostics;
 
 namespace Terminal.Gui;
@@ -9,6 +10,9 @@ namespace Terminal.Gui;
 /// </summary>
 public class TextFormatter
 {
+    // Utilized in CRLF related helper methods for faster newline char index search.
+    private static readonly SearchValues<char> NewlineSearchValues = SearchValues.Create(['\r', '\n']);
+
     private Key _hotKey = new ();
     private int _hotKeyPos = -1;
     private List<string> _lines = new ();
@@ -438,7 +442,7 @@ public class TextFormatter
             }
         }
     }
-    
+
     /// <summary>
     ///     Determines if the viewport width will be used or only the text width will be used,
     ///     If <see langword="true"/> all the viewport area will be filled with whitespaces and the same background color
@@ -938,67 +942,67 @@ public class TextFormatter
             {
                 // Horizontal Alignment
                 case Alignment.End when isVertical:
-                {
-                    int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, line, linesFormatted.Count - line, TabWidth);
-                    x = screen.Right - runesWidth;
+                    {
+                        int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, line, linesFormatted.Count - line, TabWidth);
+                        x = screen.Right - runesWidth;
 
-                    break;
-                }
+                        break;
+                    }
                 case Alignment.End:
-                {
-                    int runesWidth = StringExtensions.ToString (runes).GetColumns ();
-                    x = screen.Right - runesWidth;
+                    {
+                        int runesWidth = StringExtensions.ToString (runes).GetColumns ();
+                        x = screen.Right - runesWidth;
 
-                    break;
-                }
+                        break;
+                    }
                 case Alignment.Start when isVertical:
-                {
-                    int runesWidth = line > 0
+                    {
+                        int runesWidth = line > 0
                                          ? GetColumnsRequiredForVerticalText (linesFormatted, 0, line, TabWidth)
                                          : 0;
-                    x = screen.Left + runesWidth;
+                        x = screen.Left + runesWidth;
 
-                    break;
-                }
+                        break;
+                    }
                 case Alignment.Start:
                     x = screen.Left;
 
                     break;
                 case Alignment.Fill when isVertical:
-                {
-                    int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, linesFormatted.Count, TabWidth);
-                    int prevLineWidth = line > 0 ? GetColumnsRequiredForVerticalText (linesFormatted, line - 1, 1, TabWidth) : 0;
-                    int firstLineWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, 1, TabWidth);
-                    int lastLineWidth = GetColumnsRequiredForVerticalText (linesFormatted, linesFormatted.Count - 1, 1, TabWidth);
-                    var interval = (int)Math.Round ((double)(screen.Width + firstLineWidth + lastLineWidth) / linesFormatted.Count);
+                    {
+                        int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, linesFormatted.Count, TabWidth);
+                        int prevLineWidth = line > 0 ? GetColumnsRequiredForVerticalText (linesFormatted, line - 1, 1, TabWidth) : 0;
+                        int firstLineWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, 1, TabWidth);
+                        int lastLineWidth = GetColumnsRequiredForVerticalText (linesFormatted, linesFormatted.Count - 1, 1, TabWidth);
+                        var interval = (int)Math.Round ((double)(screen.Width + firstLineWidth + lastLineWidth) / linesFormatted.Count);
 
-                    x = line == 0
-                            ? screen.Left
-                            : line < linesFormatted.Count - 1
-                                ? screen.Width - runesWidth <= lastLineWidth ? screen.Left + prevLineWidth : screen.Left + line * interval
-                                : screen.Right - lastLineWidth;
+                        x = line == 0
+                                ? screen.Left
+                                : line < linesFormatted.Count - 1
+                                    ? screen.Width - runesWidth <= lastLineWidth ? screen.Left + prevLineWidth : screen.Left + line * interval
+                                    : screen.Right - lastLineWidth;
 
-                    break;
-                }
+                        break;
+                    }
                 case Alignment.Fill:
                     x = screen.Left;
 
                     break;
                 case Alignment.Center when isVertical:
-                {
-                    int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, linesFormatted.Count, TabWidth);
-                    int linesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, line, TabWidth);
-                    x = screen.Left + linesWidth + (screen.Width - runesWidth) / 2;
+                    {
+                        int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, linesFormatted.Count, TabWidth);
+                        int linesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, line, TabWidth);
+                        x = screen.Left + linesWidth + (screen.Width - runesWidth) / 2;
 
-                    break;
-                }
+                        break;
+                    }
                 case Alignment.Center:
-                {
-                    int runesWidth = StringExtensions.ToString (runes).GetColumns ();
-                    x = screen.Left + (screen.Width - runesWidth) / 2;
+                    {
+                        int runesWidth = StringExtensions.ToString (runes).GetColumns ();
+                        x = screen.Left + (screen.Width - runesWidth) / 2;
 
-                    break;
-                }
+                        break;
+                    }
                 default:
                     Debug.WriteLine ($"Unsupported Alignment: {nameof (VerticalAlignment)}");
 
@@ -1029,28 +1033,28 @@ public class TextFormatter
 
                     break;
                 case Alignment.Fill:
-                {
-                    var interval = (int)Math.Round ((double)(screen.Height + 2) / linesFormatted.Count);
+                    {
+                        var interval = (int)Math.Round ((double)(screen.Height + 2) / linesFormatted.Count);
 
-                    y = line == 0 ? screen.Top :
-                        line < linesFormatted.Count - 1 ? screen.Height - interval <= 1 ? screen.Top + 1 : screen.Top + line * interval : screen.Bottom - 1;
+                        y = line == 0 ? screen.Top :
+                            line < linesFormatted.Count - 1 ? screen.Height - interval <= 1 ? screen.Top + 1 : screen.Top + line * interval : screen.Bottom - 1;
 
-                    break;
-                }
+                        break;
+                    }
                 case Alignment.Center when isVertical:
-                {
-                    int s = (screen.Height - runes.Length) / 2;
-                    y = screen.Top + s;
+                    {
+                        int s = (screen.Height - runes.Length) / 2;
+                        y = screen.Top + s;
 
-                    break;
-                }
+                        break;
+                    }
                 case Alignment.Center:
-                {
-                    int s = (screen.Height - linesFormatted.Count) / 2;
-                    y = screen.Top + line + s;
+                    {
+                        int s = (screen.Height - linesFormatted.Count) / 2;
+                        y = screen.Top + line + s;
 
-                    break;
-                }
+                        break;
+                    }
                 default:
                     Debug.WriteLine ($"Unsupported Alignment: {nameof (VerticalAlignment)}");
 
@@ -1140,125 +1144,175 @@ public class TextFormatter
     public static bool IsHorizontalDirection (TextDirection textDirection)
     {
         return textDirection switch
-               {
-                   TextDirection.LeftRight_TopBottom => true,
-                   TextDirection.LeftRight_BottomTop => true,
-                   TextDirection.RightLeft_TopBottom => true,
-                   TextDirection.RightLeft_BottomTop => true,
-                   _ => false
-               };
+        {
+            TextDirection.LeftRight_TopBottom => true,
+            TextDirection.LeftRight_BottomTop => true,
+            TextDirection.RightLeft_TopBottom => true,
+            TextDirection.RightLeft_BottomTop => true,
+            _ => false
+        };
     }
 
     /// <summary>Check if it is a vertical direction</summary>
     public static bool IsVerticalDirection (TextDirection textDirection)
     {
         return textDirection switch
-               {
-                   TextDirection.TopBottom_LeftRight => true,
-                   TextDirection.TopBottom_RightLeft => true,
-                   TextDirection.BottomTop_LeftRight => true,
-                   TextDirection.BottomTop_RightLeft => true,
-                   _ => false
-               };
+        {
+            TextDirection.TopBottom_LeftRight => true,
+            TextDirection.TopBottom_RightLeft => true,
+            TextDirection.BottomTop_LeftRight => true,
+            TextDirection.BottomTop_RightLeft => true,
+            _ => false
+        };
     }
 
     /// <summary>Check if it is Left to Right direction</summary>
     public static bool IsLeftToRight (TextDirection textDirection)
     {
         return textDirection switch
-               {
-                   TextDirection.LeftRight_TopBottom => true,
-                   TextDirection.LeftRight_BottomTop => true,
-                   _ => false
-               };
+        {
+            TextDirection.LeftRight_TopBottom => true,
+            TextDirection.LeftRight_BottomTop => true,
+            _ => false
+        };
     }
 
     /// <summary>Check if it is Top to Bottom direction</summary>
     public static bool IsTopToBottom (TextDirection textDirection)
     {
         return textDirection switch
-               {
-                   TextDirection.TopBottom_LeftRight => true,
-                   TextDirection.TopBottom_RightLeft => true,
-                   _ => false
-               };
+        {
+            TextDirection.TopBottom_LeftRight => true,
+            TextDirection.TopBottom_RightLeft => true,
+            _ => false
+        };
     }
 
     // TODO: Move to StringExtensions?
-    private static string StripCRLF (string str, bool keepNewLine = false)
+    internal static string StripCRLF (string str, bool keepNewLine = false)
     {
-        List<Rune> runes = str.ToRuneList ();
-
-        for (var i = 0; i < runes.Count; i++)
+        ReadOnlySpan<char> remaining = str.AsSpan ();
+        int firstNewlineCharIndex = remaining.IndexOfAny (NewlineSearchValues);
+        // Early exit to avoid StringBuilder allocation if there are no newline characters.
+        if (firstNewlineCharIndex < 0)
         {
-            switch ((char)runes [i].Value)
-            {
-                case '\n':
-                    if (!keepNewLine)
-                    {
-                        runes.RemoveAt (i);
-                    }
-
-                    break;
-
-                case '\r':
-                    if (i + 1 < runes.Count && runes [i + 1].Value == '\n')
-                    {
-                        runes.RemoveAt (i);
-
-                        if (!keepNewLine)
-                        {
-                            runes.RemoveAt (i);
-                        }
-
-                        i++;
-                    }
-                    else
-                    {
-                        if (!keepNewLine)
-                        {
-                            runes.RemoveAt (i);
-                        }
-                    }
-
-                    break;
-            }
+            return str;
         }
 
-        return StringExtensions.ToString (runes);
+        StringBuilder stringBuilder = new();
+        ReadOnlySpan<char> firstSegment = remaining[..firstNewlineCharIndex];
+        stringBuilder.Append (firstSegment);
+
+        // The first newline is not yet skipped because the "keepNewLine" condition has not been evaluated.
+        // This means there will be 1 extra iteration because the same newline index is checked again in the loop.
+        remaining = remaining [firstNewlineCharIndex..];
+
+        while (remaining.Length > 0)
+        {
+            int newlineCharIndex = remaining.IndexOfAny (NewlineSearchValues);
+            if (newlineCharIndex == -1)
+            {
+                break;
+            }
+
+            ReadOnlySpan<char> segment = remaining[..newlineCharIndex];
+            stringBuilder.Append (segment);
+
+            int stride = segment.Length;
+            // Evaluate how many line break characters to preserve.
+            char newlineChar = remaining [newlineCharIndex];
+            if (newlineChar == '\n')
+            {
+                stride++;
+                if (keepNewLine)
+                {
+                    stringBuilder.Append ('\n');
+                }
+            }
+            else // '\r'
+            {
+                int nextCharIndex = newlineCharIndex + 1;
+                bool crlf = nextCharIndex < remaining.Length && remaining [nextCharIndex] == '\n';
+                if (crlf)
+                {
+                    stride += 2;
+                    if (keepNewLine)
+                    {
+                        stringBuilder.Append ('\n');
+                    }
+                }
+                else
+                {
+                    stride++;
+                    if (keepNewLine)
+                    {
+                        stringBuilder.Append ('\r');
+                    }
+                }
+            }
+            remaining = remaining [stride..];
+        }
+        stringBuilder.Append (remaining);
+        return stringBuilder.ToString ();
     }
 
     // TODO: Move to StringExtensions?
-    private static string ReplaceCRLFWithSpace (string str)
+    internal static string ReplaceCRLFWithSpace (string str)
     {
-        List<Rune> runes = str.ToRuneList ();
-
-        for (var i = 0; i < runes.Count; i++)
+        ReadOnlySpan<char> remaining = str.AsSpan ();
+        int firstNewlineCharIndex = remaining.IndexOfAny (NewlineSearchValues);
+        // Early exit to avoid StringBuilder allocation if there are no newline characters.
+        if (firstNewlineCharIndex < 0)
         {
-            switch (runes [i].Value)
-            {
-                case '\n':
-                    runes [i] = (Rune)' ';
-
-                    break;
-
-                case '\r':
-                    if (i + 1 < runes.Count && runes [i + 1].Value == '\n')
-                    {
-                        runes [i] = (Rune)' ';
-                        runes.RemoveAt (i + 1);
-                        i++;
-                    }
-                    else
-                    {
-                        runes [i] = (Rune)' ';
-                    }
-
-                    break;
-            }
+            return str;
         }
 
-        return StringExtensions.ToString (runes);
+        StringBuilder stringBuilder = new();
+        ReadOnlySpan<char> firstSegment = remaining[..firstNewlineCharIndex];
+        stringBuilder.Append (firstSegment);
+
+        // The first newline is not yet skipped because the newline type has not been evaluated.
+        // This means there will be 1 extra iteration because the same newline index is checked again in the loop.
+        remaining = remaining [firstNewlineCharIndex..];
+
+        while (remaining.Length > 0)
+        {
+            int newlineCharIndex = remaining.IndexOfAny (NewlineSearchValues);
+            if (newlineCharIndex == -1)
+            {
+                break;
+            }
+
+            ReadOnlySpan<char> segment = remaining[..newlineCharIndex];
+            stringBuilder.Append (segment);
+
+            int stride = segment.Length;
+            // Replace newlines
+            char newlineChar = remaining [newlineCharIndex];
+            if (newlineChar == '\n')
+            {
+                stride++;
+                stringBuilder.Append (' ');
+            }
+            else // '\r'
+            {
+                int nextCharIndex = newlineCharIndex + 1;
+                bool crlf = nextCharIndex < remaining.Length && remaining [nextCharIndex] == '\n';
+                if (crlf)
+                {
+                    stride += 2;
+                    stringBuilder.Append (' ');
+                }
+                else
+                {
+                    stride++;
+                    stringBuilder.Append (' ');
+                }
+            }
+            remaining = remaining [stride..];
+        }
+        stringBuilder.Append (remaining);
+        return stringBuilder.ToString ();
     }
 
     // TODO: Move to StringExtensions?
@@ -1570,21 +1624,21 @@ public class TextFormatter
                     case ' ':
                         return GetNextWhiteSpace (to + 1, cWidth, out incomplete, length);
                     case '\t':
-                    {
-                        length += tabWidth + 1;
-
-                        if (length == tabWidth && tabWidth > cWidth)
                         {
-                            return to + 1;
-                        }
+                            length += tabWidth + 1;
 
-                        if (length > cWidth && tabWidth > cWidth)
-                        {
-                            return to;
-                        }
+                            if (length == tabWidth && tabWidth > cWidth)
+                            {
+                                return to + 1;
+                            }
 
-                        return GetNextWhiteSpace (to + 1, cWidth, out incomplete, length);
-                    }
+                            if (length > cWidth && tabWidth > cWidth)
+                            {
+                                return to;
+                            }
+
+                            return GetNextWhiteSpace (to + 1, cWidth, out incomplete, length);
+                        }
                     default:
                         to++;
 
@@ -1593,11 +1647,11 @@ public class TextFormatter
             }
 
             return cLength switch
-                   {
-                       > 0 when to < runes.Count && runes [to].Value != ' ' && runes [to].Value != '\t' => from,
-                       > 0 when to < runes.Count && (runes [to].Value == ' ' || runes [to].Value == '\t') => from,
-                       _ => to
-                   };
+            {
+                > 0 when to < runes.Count && runes [to].Value != ' ' && runes [to].Value != '\t' => from,
+                > 0 when to < runes.Count && (runes [to].Value == ' ' || runes [to].Value == '\t') => from,
+                _ => to
+            };
         }
 
         if (start < text.GetRuneCount ())
@@ -2033,13 +2087,13 @@ public class TextFormatter
     private static string PerformCorrectFormatDirection (TextDirection textDirection, string line)
     {
         return textDirection switch
-               {
-                   TextDirection.RightLeft_BottomTop
-                       or TextDirection.RightLeft_TopBottom
-                       or TextDirection.BottomTop_LeftRight
-                       or TextDirection.BottomTop_RightLeft => StringExtensions.ToString (line.EnumerateRunes ().Reverse ()),
-                   _ => line
-               };
+        {
+            TextDirection.RightLeft_BottomTop
+                or TextDirection.RightLeft_TopBottom
+                or TextDirection.BottomTop_LeftRight
+                or TextDirection.BottomTop_RightLeft => StringExtensions.ToString (line.EnumerateRunes ().Reverse ()),
+            _ => line
+        };
     }
 
     private static List<Rune> PerformCorrectFormatDirection (TextDirection textDirection, List<Rune> runes)
@@ -2050,13 +2104,13 @@ public class TextFormatter
     private static List<string> PerformCorrectFormatDirection (TextDirection textDirection, List<string> lines)
     {
         return textDirection switch
-               {
-                   TextDirection.TopBottom_RightLeft
-                       or TextDirection.LeftRight_BottomTop
-                       or TextDirection.RightLeft_BottomTop
-                       or TextDirection.BottomTop_RightLeft => lines.ToArray ().Reverse ().ToList (),
-                   _ => lines
-               };
+        {
+            TextDirection.TopBottom_RightLeft
+                or TextDirection.LeftRight_BottomTop
+                or TextDirection.RightLeft_BottomTop
+                or TextDirection.BottomTop_RightLeft => lines.ToArray ().Reverse ().ToList (),
+            _ => lines
+        };
     }
 
     /// <summary>
@@ -2390,24 +2444,44 @@ public class TextFormatter
             return text;
         }
 
-        // Scan 
-        var start = string.Empty;
-        var i = 0;
-
-        foreach (Rune c in text.EnumerateRunes ())
+        const int maxStackallocCharBufferSize = 512; // ~1 kB
+        char[]? rentedBufferArray = null;
+        try
         {
-            if (c == hotKeySpecifier && i == hotPos)
-            {
-                i++;
+            Span<char> buffer = text.Length <= maxStackallocCharBufferSize
+                ? stackalloc char[text.Length]
+                : (rentedBufferArray = ArrayPool<char>.Shared.Rent(text.Length));
 
-                continue;
+            int i = 0;
+            var remainingBuffer = buffer;
+            foreach (Rune c in text.EnumerateRunes ())
+            {
+                if (c == hotKeySpecifier && i == hotPos)
+                {
+                    i++;
+                    continue;
+                }
+                int charsWritten = c.EncodeToUtf16 (remainingBuffer);
+                remainingBuffer = remainingBuffer [charsWritten..];
+                i++;
             }
 
-            start += c;
-            i++;
-        }
+            ReadOnlySpan<char> newText = buffer [..^remainingBuffer.Length];
+            // If the resulting string would be the same as original then just return the original.
+            if (newText.Equals(text, StringComparison.Ordinal))
+            {
+                return text;
+            }
 
-        return start;
+            return new string (newText);
+        }
+        finally
+        {
+            if (rentedBufferArray != null)
+            {
+                ArrayPool<char>.Shared.Return (rentedBufferArray);
+            }
+        }
     }
 
     #endregion // Static Members

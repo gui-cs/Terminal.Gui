@@ -6,7 +6,7 @@ namespace UnitTests.ConsoleDrivers.V2;
 public class MainLoopCoordinatorTests
 {
     [Fact]
-    public void TestMainLoopCoordinator_InputCrashes_ExceptionSurfacesMainThread ()
+    public async Task TestMainLoopCoordinator_InputCrashes_ExceptionSurfacesMainThread ()
     {
 
         var mockLogger = new Mock<ILogger> ();
@@ -26,7 +26,7 @@ public class MainLoopCoordinatorTests
 
         // StartAsync boots the main loop and the input thread. But if the input class bombs
         // on startup it is important that the exception surface at the call site and not lost
-        var ex = Assert.ThrowsAsync<AggregateException>(c.StartAsync).Result;
+        var ex = await Assert.ThrowsAsync<AggregateException>(c.StartAsync);
         Assert.Equal ("Crash on boot", ex.InnerExceptions [0].Message);
 
 

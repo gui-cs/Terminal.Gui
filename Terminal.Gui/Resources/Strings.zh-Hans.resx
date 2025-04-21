@@ -279,4 +279,58 @@
   <data name="ctxColors" xml:space="preserve">
     <value>旗帜 (_L)</value>
   </data>
+  <data name="cmd.Open" xml:space="preserve">
+    <value>打开 (_O)</value>
+  </data>
+  <data name="cmd.Quit" xml:space="preserve">
+    <value />
+  </data>
+  <data name="cmd.Save" xml:space="preserve">
+    <value>保存 (_S)</value>
+  </data>
+  <data name="cmd.SaveAs" xml:space="preserve">
+    <value>另存为 (_A)</value>
+  </data>
+  <data name="cmd.Cut" xml:space="preserve">
+    <value>剪切 (_T)</value>
+  </data>
+  <data name="cmd.Copy" xml:space="preserve">
+    <value>复制 (_C)</value>
+  </data>
+  <data name="cmd.Paste" xml:space="preserve">
+    <value>粘贴 (_P)</value>
+  </data>
+  <data name="cmd.SelectAll" xml:space="preserve">
+    <value>全选 (_S)</value>
+  </data>
+  <data name="cmd.New" xml:space="preserve">
+    <value>新建 (_N)</value>
+  </data>
+  <data name="cmd.Open.Help" xml:space="preserve">
+    <value />
+  </data>
+  <data name="cmd.Quit.Help" xml:space="preserve">
+    <value />
+  </data>
+  <data name="cmd.Save.Help" xml:space="preserve">
+    <value />
+  </data>
+  <data name="cmd.SaveAs.Help" xml:space="preserve">
+    <value />
+  </data>
+  <data name="cmd.Cut.Help" xml:space="preserve">
+    <value />
+  </data>
+  <data name="cmd.Copy.Help" xml:space="preserve">
+    <value />
+  </data>
+  <data name="cmd.Paste.Help" xml:space="preserve">
+    <value />
+  </data>
+  <data name="cmd.SelectAll.Help" xml:space="preserve">
+    <value />
+  </data>
+  <data name="cmd.New.Help" xml:space="preserve">
+    <value />
+  </data>
 </root>

@@ -162,7 +162,7 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
     ///     The first matching <typeparamref name="TEvent"/> bound to the set of commands specified by
     ///     <paramref name="commands"/>. <see langword="null"/> if the set of caommands was not found.
     /// </returns>
-    public TEvent GetFirstFromCommands (params Command [] commands) { return _bindings.FirstOrDefault (a => a.Value.Commands.SequenceEqual (commands)).Key; }
+    public TEvent? GetFirstFromCommands (params Command [] commands) { return _bindings.FirstOrDefault (a => a.Value.Commands.SequenceEqual (commands)).Key; }
 
     /// <summary>Gets all <typeparamref name="TEvent"/> bound to the set of commands specified by <paramref name="commands"/>.</summary>
     /// <param name="commands">The set of commands to search.</param>

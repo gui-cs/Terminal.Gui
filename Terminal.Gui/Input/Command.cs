@@ -14,6 +14,11 @@ namespace Terminal.Gui;
 /// </remarks>
 public enum Command
 {
+    /// <summary>
+    ///     Indicates the command is not bound or invalid. Will call <see cref="View.RaiseCommandNotBound"/>.
+    /// </summary>
+    NotBound = 0,
+
     #region Base View Commands
 
     /// <summary>
@@ -269,6 +274,9 @@ public enum Command
 
     /// <summary>Tabs back to the previous item.</summary>
     BackTab,
+
+    /// <summary>Enables arrange mode.</summary>
+    Arrange,
 
     #endregion
 

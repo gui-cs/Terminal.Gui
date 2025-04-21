@@ -13,9 +13,15 @@ public static partial class Application // Keyboard handling
     /// <returns><see langword="true"/> if the key was handled.</returns>
     public static bool RaiseKeyDownEvent (Key key)
     {
+        // TODO: This should match standard event patterns
         KeyDown?.Invoke (null, key);
 
         if (key.Handled)
+        {
+            return true;
+        }
+
+        if (Popover?.DispatchKeyDown (key) is true)
         {
             return true;
         }
@@ -43,6 +49,27 @@ public static partial class Application // Keyboard handling
             }
         }
 
+        bool? commandHandled = InvokeCommandsBoundToKey (key);
+        if(commandHandled is true)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    ///     Invokes any commands bound at the Application-level to <paramref name="key"/>.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns>
+    ///     <see langword="null"/> if no command was found; input processing should continue.
+    ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should continue.
+    ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should stop.
+    /// </returns>
+    public static bool? InvokeCommandsBoundToKey (Key key)
+    {
+        bool? handled = null;
         // Invoke any Application-scoped KeyBindings.
         // The first view that handles the key will stop the loop.
         // foreach (KeyValuePair<Key, KeyBinding> binding in KeyBindings.GetBindings (key))
@@ -52,22 +79,17 @@ public static partial class Application // Keyboard handling
             {
                 if (!binding.Target.Enabled)
                 {
-                    return false;
+                    return null;
                 }
 
-                bool? handled = binding.Target?.InvokeCommands (binding.Commands, binding);
-
-                if (handled != null && (bool)handled)
-                {
-                    return true;
-                }
+                handled = binding.Target?.InvokeCommands (binding.Commands, binding);
             }
             else
             {
                 // BUGBUG: this seems unneeded.
                 if (!KeyBindings.TryGet (key, out KeyBinding keybinding))
                 {
-                    return false;
+                    return null;
                 }
 
                 bool? toReturn = null;
@@ -77,30 +99,42 @@ public static partial class Application // Keyboard handling
                     toReturn = InvokeCommand (command, key, keybinding);
                 }
 
-                return toReturn ?? true;
+                handled = toReturn ?? true;
             }
         }
 
-        return false;
+        return handled;
+    }
 
-        static bool? InvokeCommand (Command command, Key key, KeyBinding binding)
+    /// <summary>
+    ///     Invokes an Application-bound commmand.
+    /// </summary>
+    /// <param name="command">The Command to invoke</param>
+    /// <param name="key">The Application-bound Key that was pressed.</param>
+    /// <param name="binding">Describes the binding.</param>
+    /// <returns>
+    ///     <see langword="null"/> if no command was found; input processing should continue.
+    ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should continue.
+    ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should stop.
+    /// </returns>
+    /// <exception cref="NotSupportedException"></exception>
+    public static bool? InvokeCommand (Command command, Key key, KeyBinding binding)
+    {
+        if (!_commandImplementations!.ContainsKey (command))
         {
-            if (!_commandImplementations!.ContainsKey (command))
-            {
-                throw new NotSupportedException (
-                                                 @$"A KeyBinding was set up for the command {command} ({key}) but that command is not supported by Application."
-                                                );
-            }
-
-            if (_commandImplementations.TryGetValue (command, out View.CommandImplementation? implementation))
-            {
-                CommandContext<KeyBinding> context = new (command, binding); // Create the context here
-
-                return implementation (context);
-            }
-
-            return false;
+            throw new NotSupportedException (
+                                             @$"A KeyBinding was set up for the command {command} ({key}) but that command is not supported by Application."
+                                            );
         }
+
+        if (_commandImplementations.TryGetValue (command, out View.CommandImplementation? implementation))
+        {
+            CommandContext<KeyBinding> context = new (command, null, binding); // Create the context here
+
+            return implementation (context);
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -167,7 +201,7 @@ public static partial class Application // Keyboard handling
     {
         _commandImplementations.Clear ();
 
-        // Things this view knows how to do
+        // Things Application knows how to do
         AddCommand (
                     Command.Quit,
                     static () =>
@@ -213,7 +247,7 @@ public static partial class Application // Keyboard handling
                    );
 
         AddCommand (
-                    Command.Edit,
+                    Command.Arrange,
                     static () =>
                     {
                         View? viewToArrange = Navigation?.GetFocused ();
@@ -249,7 +283,7 @@ public static partial class Application // Keyboard handling
         KeyBindings.Add (PrevTabKey, Command.PreviousTabStop);
         KeyBindings.Add (NextTabGroupKey, Command.NextTabGroup);
         KeyBindings.Add (PrevTabGroupKey, Command.PreviousTabGroup);
-        KeyBindings.Add (ArrangeKey, Command.Edit);
+        KeyBindings.Add (ArrangeKey, Command.Arrange);
 
         KeyBindings.Add (Key.CursorRight, Command.NextTabStop);
         KeyBindings.Add (Key.CursorDown, Command.NextTabStop);

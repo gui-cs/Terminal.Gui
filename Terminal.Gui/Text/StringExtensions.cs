@@ -124,14 +124,54 @@ public static class StringExtensions
     /// <returns></returns>
     public static string ToString (IEnumerable<Rune> runes)
     {
-        var str = string.Empty;
+        const int maxCharsPerRune = 2;
+        const int maxStackallocTextBufferSize = 1048; // ~2 kB
 
-        foreach (Rune rune in runes)
+        // If rune count is easily available use stackalloc buffer or alternatively rented array.
+        if (runes.TryGetNonEnumeratedCount (out int count))
         {
-            str += rune.ToString ();
+            if (count == 0)
+            {
+                return string.Empty;
+            }
+
+            char[]? rentedBufferArray = null;
+            try
+            {
+                int maxRequiredTextBufferSize = count * maxCharsPerRune;
+                Span<char> textBuffer = maxRequiredTextBufferSize <= maxStackallocTextBufferSize
+                    ? stackalloc char[maxRequiredTextBufferSize]
+                    : (rentedBufferArray = ArrayPool<char>.Shared.Rent(maxRequiredTextBufferSize));
+
+                Span<char> remainingBuffer = textBuffer;
+                foreach (Rune rune in runes)
+                {
+                    int charsWritten = rune.EncodeToUtf16 (remainingBuffer);
+                    remainingBuffer = remainingBuffer [charsWritten..];
+                }
+
+                ReadOnlySpan<char> text = textBuffer[..^remainingBuffer.Length];
+                return text.ToString ();
+            }
+            finally
+            {
+                if (rentedBufferArray != null)
+                {
+                    ArrayPool<char>.Shared.Return (rentedBufferArray);
+                }
+            }
         }
 
-        return str;
+        // Fallback to StringBuilder append.
+        StringBuilder stringBuilder = new();
+        Span<char> runeBuffer = stackalloc char[maxCharsPerRune];
+        foreach (Rune rune in runes)
+        {
+            int charsWritten = rune.EncodeToUtf16 (runeBuffer);
+            ReadOnlySpan<char> runeChars = runeBuffer [..charsWritten];
+            stringBuilder.Append (runeChars);
+        }
+        return stringBuilder.ToString ();
     }
 
     /// <summary>Converts a byte generic collection into a string in the provided encoding (default is UTF8)</summary>

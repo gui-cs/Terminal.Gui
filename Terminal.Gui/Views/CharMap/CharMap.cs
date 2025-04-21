@@ -18,8 +18,6 @@ public class CharMap : View, IDesignable
     private const int HEADER_HEIGHT = 1; // Height of the header
     private int _rowHeight = 1; // Height of each row of 16 glyphs - changing this is not tested
 
-    private ContextMenu _contextMenu = new ();
-
     /// <summary>
     ///     Initializes a new instance.
     /// </summary>
@@ -58,7 +56,7 @@ public class CharMap : View, IDesignable
         KeyBindings.Add (Key.PageDown, Command.PageDown);
         KeyBindings.Add (Key.Home, Command.Start);
         KeyBindings.Add (Key.End, Command.End);
-        KeyBindings.Add (ContextMenu.DefaultKey, Command.Context);
+        KeyBindings.Add (PopoverMenu.DefaultKey, Command.Context);
 
         MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Accept);
         MouseBindings.ReplaceCommands (MouseFlags.Button3Clicked, Command.Context);
@@ -505,32 +503,20 @@ public class CharMap : View, IDesignable
 
         SelectedCodePoint = newCodePoint;
 
-        _contextMenu = new ()
-        {
-            Position = ViewportToScreen (GetCursor (SelectedCodePoint))
-        };
+        // This demonstrates how to create an ephemeral Popover; one that exists
+        // ony as long as the popover is visible.
+        // Note, for ephemeral Popovers, hotkeys are not supported.
+        PopoverMenu? contextMenu = new (
+                                        [
+                                            new (Strings.charMapCopyGlyph, string.Empty, CopyGlyph),
+                                            new (Strings.charMapCopyCP, string.Empty, CopyCodePoint)
+                                        ]);
 
-        MenuBarItem menuItems = new (
-                                     [
-                                         new (
-                                              Strings.charMapCopyGlyph,
-                                              "",
-                                              CopyGlyph,
-                                              null,
-                                              null,
-                                              (KeyCode)Key.G.WithCtrl
-                                             ),
-                                         new (
-                                              Strings.charMapCopyCP,
-                                              "",
-                                              CopyCodePoint,
-                                              null,
-                                              null,
-                                              (KeyCode)Key.P.WithCtrl
-                                             )
-                                     ]
-                                    );
-        _contextMenu.Show (menuItems);
+        // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
+        // and the context menu is disposed when it is closed.
+        Application.Popover?.Register (contextMenu);
+
+        contextMenu?.MakeVisible (ViewportToScreen (GetCursor (SelectedCodePoint)));
 
         return true;
     }

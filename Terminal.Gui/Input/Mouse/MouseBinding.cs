@@ -25,6 +25,9 @@ public record struct MouseBinding : IInputBinding
     /// <summary>The commands this binding will invoke.</summary>
     public Command [] Commands { get; set; }
 
+    /// <inheritdoc />
+    public object? Data { get; set; }
+
     /// <summary>
     ///     The mouse event arguments.
     /// </summary>

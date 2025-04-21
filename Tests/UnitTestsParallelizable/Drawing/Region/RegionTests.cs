@@ -783,6 +783,46 @@ public class RegionTests
         Assert.True (region1.Contains (40, 40));
     }
 
+    [Fact (Skip = "Union is broken")]
+    public void Union_Third_Rect_Covering_Two_Disjoint_Merges ()
+    {
+        var origRegion = new Region ();
+
+        var region1 = new Region (new (0, 0, 1, 1));
+        var region2 = new Region (new (1, 0, 1, 1));
+
+        origRegion.Union(region1);
+        origRegion.Union(region2);
+
+        Assert.Equal (new Rectangle (0, 0, 2, 1), origRegion.GetBounds ());
+        Assert.Equal (2, origRegion.GetRectangles ().Length);
+
+        origRegion.Union(new Region(new (0, 0, 4, 1)));
+
+        Assert.Equal (new Rectangle (0, 1, 4, 1), origRegion.GetBounds ());
+        Assert.Single (origRegion.GetRectangles ());
+    }
+
+    [Fact (Skip = "MinimalUnion is broken")]
+    public void MinimalUnion_Third_Rect_Covering_Two_Disjoint_Merges ()
+    {
+        var origRegion = new Region ();
+
+        var region1 = new Region (new (0, 0, 1, 1));
+        var region2 = new Region (new (1, 0, 1, 1));
+
+        origRegion.Union (region1);
+        origRegion.Union (region2);
+
+        Assert.Equal (new Rectangle (0, 0, 2, 1), origRegion.GetBounds ());
+        Assert.Equal (2, origRegion.GetRectangles ().Length);
+
+        origRegion.MinimalUnion (new Region (new (0, 0, 4, 1)));
+
+        Assert.Equal (new Rectangle (0, 1, 4, 1), origRegion.GetBounds ());
+        Assert.Single (origRegion.GetRectangles ());
+    }
+
     /// <summary>
     ///     Proves MergeRegion does not overly combine regions.
     /// </summary>

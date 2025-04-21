@@ -682,7 +682,7 @@ public abstract class ConsoleDriver : IConsoleDriver
     public void OnKeyUp (Key a) { KeyUp?.Invoke (this, a); }
 
     // TODO: Remove this API - it was needed when we didn't have a reliable way to simulate key presses.
-    // TODO: We now do: Applicaiton.RaiseKeyDown and Application.RaiseKeyUp
+    // TODO: We now do: Application.RaiseKeyDown and Application.RaiseKeyUp
     /// <summary>Simulates a key press.</summary>
     /// <param name="keyChar">The key character.</param>
     /// <param name="key">The key.</param>

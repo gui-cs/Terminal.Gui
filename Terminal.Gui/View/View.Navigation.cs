@@ -315,6 +315,25 @@ public partial class View // Focus and cross-view navigation management (TabStop
         }
     }
 
+    internal void RaiseFocusedChanged (View? previousFocused, View? focused)
+    {
+        //Logging.Trace($"RaiseFocusedChanged: {focused.Title}");
+        OnFocusedChanged (previousFocused, focused);
+        FocusedChanged?.Invoke (this, new HasFocusEventArgs (true, true, previousFocused, focused));
+    }
+
+    /// <summary>
+    ///     Called when the focused view has changed.
+    /// </summary>
+    /// <param name="previousFocused"></param>
+    /// <param name="focused"></param>
+    protected virtual void OnFocusedChanged (View? previousFocused, View? focused) { }
+
+    /// <summary>
+    ///     Raised when the focused view has changed.
+    /// </summary>
+    public event EventHandler<HasFocusEventArgs>? FocusedChanged;
+
     /// <summary>Returns a value indicating if this View is currently on Top (Active)</summary>
     public bool IsCurrentTop => Application.Top == this;
 
@@ -371,6 +390,14 @@ public partial class View // Focus and cross-view navigation management (TabStop
         }
 
         return false;
+    }
+
+    /// <summary>
+    ///     Clears any focus state (e.g. the previously focused subview) from this view.
+    /// </summary>
+    public void ClearFocus ()
+    {
+        _previouslyFocused = null;
     }
 
     private View? FindDeepestFocusableView (NavigationDirection direction, TabBehavior? behavior)
@@ -853,6 +880,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
     private void RaiseFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
     {
+        // If we are the most focused view, we need to set the focused view in Application.Navigation
         if (newHasFocus && focusedView?.Focused is null)
         {
             Application.Navigation?.SetFocused (focusedView);
@@ -864,6 +892,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
         // Raise the event
         var args = new HasFocusEventArgs (newHasFocus, newHasFocus, previousFocusedView, focusedView);
         HasFocusChanged?.Invoke (this, args);
+
+        if (newHasFocus || focusedView is null)
+        {
+            SuperView?.RaiseFocusedChanged (previousFocusedView, focusedView);
+        }
     }
 
     /// <summary>

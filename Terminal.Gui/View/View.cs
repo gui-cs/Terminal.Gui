@@ -337,6 +337,8 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
             if (!_visible)
             {
+                // BUGBUG: Ideally we'd reset _previouslyFocused to the first focusable subview
+                _previouslyFocused = SubViews.FirstOrDefault(v => v.CanFocus);
                 if (HasFocus)
                 {
                     HasFocus = false;

@@ -9,6 +9,7 @@
 //   * Use a line separator to show the file listing, so we can use same colors as the rest
 //   * DirListView: Add mouse support
 
+using System.IO.Abstractions;
 using Terminal.Gui.Resources;
 
 namespace Terminal.Gui;
@@ -24,8 +25,15 @@ namespace Terminal.Gui;
 public class SaveDialog : FileDialog
 {
     /// <summary>Initializes a new <see cref="SaveDialog"/>.</summary>
-    public SaveDialog () { Style.OkButtonText = Strings.btnSave; }
+    public SaveDialog ()
+    {
+        Style.OkButtonText = Strings.btnSave;
+    }
 
+    internal SaveDialog (IFileSystem fileSystem) : base (fileSystem)
+    {
+        Style.OkButtonText = Strings.btnSave;
+    }
     /// <summary>
     ///     Gets the name of the file the user selected for saving, or null if the user canceled the
     ///     <see cref="SaveDialog"/>.

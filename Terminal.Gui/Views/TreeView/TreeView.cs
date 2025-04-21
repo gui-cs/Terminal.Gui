@@ -847,7 +847,7 @@ public class TreeView<T> : View, ITreeView where T : class
             return new T [0];
         }
 
-        return branch.ChildBranches?.Values?.Select (b => b.Model)?.ToArray () ?? new T [0];
+        return branch.ChildBranches?.Select (b => b.Model)?.ToArray () ?? new T [0];
     }
 
     /// <summary>Returns the maximum width line in the tree including prefix and expansion symbols.</summary>
@@ -879,10 +879,10 @@ public class TreeView<T> : View, ITreeView where T : class
                 return 0;
             }
 
-            return map.Skip (ScrollOffsetVertical).Take (Viewport.Height).Max (b => b.GetWidth (Driver));
+            return map.Skip (ScrollOffsetVertical).Take (Viewport.Height).Max (b => b.GetWidth ());
         }
 
-        return map.Max (b => b.GetWidth (Driver));
+        return map.Max (b => b.GetWidth ());
     }
 
     /// <summary>
@@ -1171,7 +1171,7 @@ public class TreeView<T> : View, ITreeView where T : class
             if (idxToRender < map.Count)
             {
                 // Render the line
-                map.ElementAt (idxToRender).Draw (Driver, ColorScheme, line, Viewport.Width);
+                map.ElementAt (idxToRender).Draw (line, Viewport.Width);
             }
             else
             {
@@ -1488,7 +1488,7 @@ public class TreeView<T> : View, ITreeView where T : class
 
         if (currentBranch.IsExpanded)
         {
-            foreach (Branch<T> subBranch in currentBranch.ChildBranches.Values)
+            foreach (Branch<T> subBranch in currentBranch.ChildBranches)
             {
                 foreach (Branch<T> sub in AddToLineMap (subBranch, weMatch, out bool childMatch))
                 {

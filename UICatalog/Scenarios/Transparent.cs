@@ -67,7 +67,7 @@ public sealed class Transparent : Scenario
         public TransparentView ()
         {
             Title = "Transparent View";
-            base.Text = "View.Text.\nThis should be opaque.\nNote how clipping works?";
+            //base.Text = "View.Text.\nThis should be opaque.\nNote how clipping works?";
             TextFormatter.Alignment = Alignment.Center;
             TextFormatter.VerticalAlignment = Alignment.Center;
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
@@ -85,17 +85,32 @@ public sealed class Transparent : Scenario
                 Height = 8,
                 BorderStyle = LineStyle.Dashed,
                 Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
-                ShadowStyle = ShadowStyle.Transparent,
+               // ShadowStyle = ShadowStyle.Transparent,
             };
             transparentSubView.Border!.Thickness = new (1, 1, 1, 1);
             transparentSubView.ColorScheme = Colors.ColorSchemes ["Dialog"];
+            transparentSubView.Visible = false;
 
             Button button = new Button ()
             {
                 Title = "_Opaque Shadows No Worky",
                 X = Pos.Center (),
-                Y = 4,
+                Y = 2,
                 ColorScheme = Colors.ColorSchemes ["Dialog"],
+            };
+            button.Visible = false;
+
+
+            var shortcut = new Shortcut ()
+            {
+                Id = "shortcut",
+                X = Pos.Center (),
+                Y = Pos.AnchorEnd(),
+                Title = "A _Shortcut",
+                HelpText = "Help!",
+                Key = Key.F11,
+                ColorScheme = Colors.ColorSchemes ["Base"]
+
             };
 
             button.ClearingViewport += (sender, args) =>
@@ -105,6 +120,7 @@ public sealed class Transparent : Scenario
 
 
             base.Add (button);
+            base.Add (shortcut);
             base.Add (transparentSubView);
         }
 

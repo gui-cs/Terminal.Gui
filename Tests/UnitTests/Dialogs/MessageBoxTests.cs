@@ -462,7 +462,7 @@ public class MessageBoxTests
                                      {
                                          MessageBox.Query (
                                                            "",
-                                                           UICatalogApp.GetAboutBoxMessage (),
+                                                           UICatalog.UICatalogTopLevel.GetAboutBoxMessage (),
                                                            wrapMessage: false,
                                                            buttons: "_Ok"
                                                           );

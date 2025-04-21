@@ -1,14 +1,20 @@
 # Logging
 
-Logging has come to Terminal.Gui! You can now enable comprehensive logging of the internals of the libray. This can help diagnose issues with specific terminals, keyboard cultures and/or operating system specific issues.
+Logging has come to Terminal.Gui! You can now enable comprehensive logging of the internals of the library. This can help diagnose issues with specific terminals, keyboard cultures and/or operating system specific issues.
 
-To enable file logging you should set the static property `Logging.Logger` to an instance of `Microsoft.Extensions.Logging.ILogger`.  If your program already uses logging you can provide a shared instance or instance from Dependency Injection (DI).
+To enable file logging you should set the static property `Logging.Logger` to an instance of `Microsoft.Extensions.Logging.ILogger`. If your program already uses logging you can provide a shared instance or instance from Dependency Injection (DI).
 
 Alternatively you can create a new log to ensure only Terminal.Gui logs appear.
 
-Any logging framework will work  (Serilog, NLog, Log4Net etc) but you should ensure you only log to File or UDP etc (i.e. not to console!).
+Any logging framework will work (Serilog, NLog, Log4Net etc) but you should ensure you don't log to the stdout console (File, Debug Output, or UDP etc... are all fine).
 
-## Worked example with Serilog to file
+## UICatalog
+
+UI Catalog has built-in UI for logging. It logs to both the debug console and a file. By default it only logs at the `Warning` level. 
+
+![UICatalog Logging](../images/UICatalog_Logging.png)
+
+## Example with Serilog to file
 
 Here is an example of how to add logging of Terminal.Gui internals to your program using Serilog file log.
 
@@ -81,7 +87,7 @@ Example logs:
 
 ## Metrics
 
-If you are finding that the UI is slow or unresponsive - or are just interested in performance metrics.  You can see these by instaling the `dotnet-counter` tool and running it for your process.
+If you are finding that the UI is slow or unresponsive - or are just interested in performance metrics. You can see these by installing the `dotnet-counter` tool and running it for your process.
 
 ```
 dotnet tool install dotnet-counters --global

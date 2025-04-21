@@ -226,10 +226,52 @@ public class ViewCommandTests
 
     #endregion OnHotKey/HotKey tests
 
+    #region InvokeCommand Tests
+
+
+    [Fact]
+    public void InvokeCommand_NotBound_Invokes_CommandNotBound ()
+    {
+        ViewEventTester view = new ();
+
+        view.InvokeCommand (Command.NotBound);
+
+        Assert.False (view.HasFocus);
+        Assert.Equal (1, view.OnCommandNotBoundCount);
+        Assert.Equal (1, view.CommandNotBoundCount);
+    }
+
+    [Fact]
+    public void InvokeCommand_Command_Not_Bound_Invokes_CommandNotBound ()
+    {
+        ViewEventTester view = new ();
+
+        view.InvokeCommand (Command.New);
+
+        Assert.False (view.HasFocus);
+        Assert.Equal (1, view.OnCommandNotBoundCount);
+        Assert.Equal (1, view.CommandNotBoundCount);
+    }
+
+    [Fact]
+    public void InvokeCommand_Command_Bound_Does_Not_Invoke_CommandNotBound ()
+    {
+        ViewEventTester view = new ();
+
+        view.InvokeCommand (Command.Accept);
+
+        Assert.False (view.HasFocus);
+        Assert.Equal (0, view.OnCommandNotBoundCount);
+        Assert.Equal (0, view.CommandNotBoundCount);
+    }
+
+    #endregion
+
     public class ViewEventTester : View
     {
         public ViewEventTester ()
         {
+            Id = "viewEventTester";
             CanFocus = true;
 
             Accepting += (s, a) =>
@@ -249,6 +291,12 @@ public class ViewCommandTests
                              a.Cancel = HandleSelecting;
                              SelectingCount++;
                          };
+
+            CommandNotBound += (s, a) =>
+                               {
+                                   a.Cancel = HandleCommandNotBound;
+                                   CommandNotBoundCount++;
+                               };
         }
 
         public int OnAcceptedCount { get; set; }
@@ -282,6 +330,8 @@ public class ViewCommandTests
         public int OnSelectingCount { get; set; }
         public int SelectingCount { get; set; }
         public bool HandleOnSelecting { get; set; }
+        public bool HandleSelecting { get; set; }
+
 
         /// <inheritdoc/>
         protected override bool OnSelecting (CommandEventArgs args)
@@ -291,6 +341,17 @@ public class ViewCommandTests
             return HandleOnSelecting;
         }
 
-        public bool HandleSelecting { get; set; }
+        public int OnCommandNotBoundCount { get; set; }
+        public int CommandNotBoundCount { get; set; }
+
+        public bool HandleOnCommandNotBound { get; set; }
+
+        public bool HandleCommandNotBound { get; set; }
+
+        protected override bool OnCommandNotBound (CommandEventArgs args)
+        {
+            OnCommandNotBoundCount++;
+            return HandleOnCommandNotBound;
+        }
     }
 }

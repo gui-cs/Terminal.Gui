@@ -1,7 +1,7 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     A button View that can be pressed with the mouse or keybaord.
+///     A button View that can be pressed with the mouse or keyboard.
 /// </summary>
 /// <remarks>
 ///     <para>
