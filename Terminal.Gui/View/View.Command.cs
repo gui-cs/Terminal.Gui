@@ -203,17 +203,24 @@ public partial class View // Command APIs
         Logging.Debug ($"{Title} ({ctx?.Source?.Title})");
         CommandEventArgs args = new () { Context = ctx };
 
-        // Best practice is to invoke the virtual method first.
-        // This allows derived classes to handle the event and potentially cancel it.
-        if (OnSelecting (args) || args.Cancel)
+        if (!args.Cancel && Selecting is { })
         {
-            return true;
+            // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
+            Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Raising Selecting...");
+            Selecting?.Invoke (this, args);
         }
 
-        // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-        Selecting?.Invoke (this, args);
+        //  - bubbled up the SuperView hierarchy.
+        if (!args.Cancel)
+        {
+            if (SuperView is { })
+            {
+                Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Invoking Select on SuperView ({SuperView.Title}/{SuperView.Id})...");
+                return SuperView?.InvokeCommand (Command.Select, ctx);
+            }
+        }
 
-        return Selecting is null ? null : args.Cancel;
+        return args.Cancel;
     }
 
     /// <summary>

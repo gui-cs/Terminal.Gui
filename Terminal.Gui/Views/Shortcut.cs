@@ -270,7 +270,7 @@ public class Shortcut : View, IOrientation, IDesignable
             CommandView.InvokeCommand (Command.Select, keyCommandContext);
         }
 
-        Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - RaiseSelecting ...");
+        Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - RaiseSelecting - Command: {commandContext?.Command}...");
 
         if (RaiseSelecting (commandContext) is true)
         {
@@ -290,7 +290,7 @@ public class Shortcut : View, IOrientation, IDesignable
         {
             commandContext.Source = this;
         }
-        Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Calling RaiseAccepting...");
+        Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Calling RaiseAccepting - Command: {commandContext?.Command}...");
         cancel = RaiseAccepting (commandContext) is true;
 
         if (cancel)

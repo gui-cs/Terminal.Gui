@@ -87,9 +87,13 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
             if (Visible && ret is not true)
             {
-                Visible = false;
+                if (SuperView is null)
+                {
+                    Visible = false;
+                    return true;
+                }
 
-                return true;
+                return false;
             }
 
             // If we are Visible, returning true will stop the QuitKey from propagating
@@ -252,7 +256,11 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
             foreach (Menuv2 menu in allMenus)
             {
-                menu.Visible = false;
+                if (SuperView is null)
+                {
+                    menu.Visible = false;
+                }
+
                 menu.Accepting += MenuOnAccepting;
                 menu.Accepted += MenuAccepted;
                 menu.SelectedMenuItemChanged += MenuOnSelectedMenuItemChanged;
@@ -377,12 +385,12 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     {
         var menu = menuItem?.SuperView as Menuv2;
 
-        Logging.Debug ($"{Title} - menuItem: {menuItem?.Title}, menu: {menu?.Title}");
+        Logging.Debug ($"{Title} - menuItem: {menuItem?.Title}, SuperView: {menu?.Title}");
 
         menu?.Layout ();
 
         // If there's a visible peer, remove / hide it
-        if (menu?.SubViews.FirstOrDefault (v => v is MenuItemv2 { SubMenu.Visible: true }) is MenuItemv2 visiblePeer)
+        if (menu?.SubViews.OfType<MenuItemv2> ().FirstOrDefault (v => v is { SubMenu.Visible: true }) is { } visiblePeer)
         {
             HideAndRemoveSubMenu (visiblePeer.SubMenu);
             visiblePeer.ForceFocusColors = false;
@@ -465,10 +473,11 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             }
 
             menu.Visible = false;
+
             menu.ClearFocus ();
             base.Remove (menu);
 
-            if (menu == Root)
+            if (SuperView is null && menu == Root)
             {
                 Visible = false;
             }
@@ -482,11 +491,14 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
         if (e.Context?.Command != Command.HotKey)
         {
-            Logging.Debug ($"{Title} - Setting Visible = false");
-            Visible = false;
+            if (SuperView is null)
+            {
+                Logging.Debug ($"{Title} - Setting Visible = false");
+                Visible = false;
+            }
         }
 
-        if (e.Context is CommandContext<KeyBinding> keyCommandContext)
+        if (SuperView is null && e.Context is CommandContext<KeyBinding> keyCommandContext)
         {
             if (keyCommandContext.Binding.Key is { } && keyCommandContext.Binding.Key == Application.QuitKey && SuperView is { Visible: true })
             {
@@ -502,7 +514,10 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
         if (e.Context?.Source is MenuItemv2 { SubMenu: null })
         {
-            HideAndRemoveSubMenu (_root);
+            if (SuperView is null)
+            {
+                HideAndRemoveSubMenu (_root);
+            }
         }
         else if (e.Context?.Source is MenuItemv2 { SubMenu: { } } menuItemWithSubMenu)
         {
@@ -546,6 +561,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         }
 
         // Always return false to enable accepting to continue propagating
+        Logging.Debug ($"{Title} ({args.Context?.Source?.Title}) Command: {args.Context?.Command} - Returning false.");
         return false;
     }
 
@@ -668,17 +684,20 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             var nestedSubMenu = new MenuItemv2
             {
                 Title = "_Moar Details",
-                SubMenu = new (ConfigureMoreDetailsSubMenu ()),
+                SubMenu = new (ConfigureMoreDetailsSubMenu ())
+                {
+                    Title = "MoreDetailsSubMenu"
+                },
             };
 
             var editMode = new MenuItemv2
             {
-                Text = "App Binding to Command.Edit",
+                Text = "Command = Edit; TargetView = null",
                 Id = "EditMode",
                 Command = Command.Edit,
                 CommandView = new CheckBox
                 {
-                    Title = "E_dit Mode",
+                    Title = "_Edit Mode",
                 }
             };
 

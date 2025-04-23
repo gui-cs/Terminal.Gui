@@ -111,26 +111,42 @@ public class MenuItemv2 : Shortcut
 
         if (commandContext is CommandContext<KeyBinding> keyCommandContext)
         {
+
+            if (SubMenu is { Visible: true } && (keyCommandContext.Command == Command.Select || keyCommandContext.Command == Command.Accept))
+            {
+                // Our submenu is open; and user pressed enter or clicked, set focus to it
+                Logging.Debug ($"{Title} - SubMenu is Visible; Accept/Select - {keyCommandContext.Command}");
+                SubMenu.SetFocus ();
+                return true;
+            }
+
+            if (SubMenu is { Visible: true } && keyCommandContext.Command == Command.HotKey)
+            {
+                // Our submenu is open; let command processing flow to it
+                Logging.Debug ($"{Title} - SubMenu Visible; HotKey - {keyCommandContext.Command}");
+                return false;
+            }
+
+
             if (keyCommandContext.Binding.Key is { } && keyCommandContext.Binding.Key == Application.QuitKey && SuperView is { Visible: true })
             {
                 // This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
                 Logging.Debug ($"{Title} - Ignoring Key = Application.QuitKey/Command = Command.Quit");
                 quit = true;
-                //ret = true;
             }
-        }
-
-        // Translate the incoming command to Command
-        if (Command != Command.NotBound && commandContext is { })
-        {
-            commandContext.Command = Command;
         }
 
         if (!quit)
         {
             if (TargetView is { })
             {
-                Logging.Debug ($"{Title} - InvokeCommand on TargetView ({TargetView.Title})...");
+                // Translate the incoming command to Command
+                if (Command != Command.NotBound && commandContext is { })
+                {
+                    commandContext.Command = Command;
+                }
+
+                Logging.Debug ($"{Title} - InvokeCommand on TargetView ({TargetView.Title}) - Command: {commandContext?.Command}...");
                 ret = TargetView.InvokeCommand (Command, commandContext);
             }
             else
@@ -143,35 +159,33 @@ public class MenuItemv2 : Shortcut
 
         if (ret is not true)
         {
-            Logging.Debug ($"{Title} - calling base.DispatchCommand...");
+            Logging.Debug ($"{Title} - calling base.DispatchCommand. - Command: {commandContext?.Command}..");
             // Base will Raise Selected, then Accepting, then invoke the Action, if any
             ret = base.DispatchCommand (commandContext);
         }
 
         if (ret is true)
         {
-            Logging.Debug ($"{Title} - Calling RaiseAccepted");
+            Logging.Debug ($"{Title} - Calling RaiseAccepted - Command: {commandContext?.Command}");
             RaiseAccepted (commandContext);
         }
 
         return ret;
     }
 
-    ///// <inheritdoc />
-    //protected override bool OnAccepting (CommandEventArgs e)
-    //{
-    //    Logging.Debug ($"{Title} - calling base.OnAccepting: {e.Context?.Command}");
-    //    bool? ret = base.OnAccepting (e);
+    /// <inheritdoc />
+    protected override bool OnAccepting (CommandEventArgs e)
+    {
+        Logging.Debug ($"{Title} - calling base.OnAccepting: {e.Context?.Command}");
+        bool? ret = base.OnAccepting (e);
 
-    //    if (ret is true || e.Cancel)
-    //    {
-    //        return true;
-    //    }
+        if (ret is true || e.Cancel)
+        {
+            return true;
+        }
 
-    //    //RaiseAccepted (e.Context);
-
-    //    return ret is true;
-    //}
+        return ret is true;
+    }
 
     private Menuv2? _subMenu;
 
@@ -194,6 +208,7 @@ public class MenuItemv2 : Shortcut
             }
         }
     }
+
 
     /// <inheritdoc/>
     protected override bool OnMouseEnter (CancelEventArgs eventArgs)
@@ -230,7 +245,10 @@ public class MenuItemv2 : Shortcut
     /// <remarks>
     /// </remarks>
     /// <param name="args"></param>
-    protected virtual void OnAccepted (CommandEventArgs args) { }
+    protected virtual void OnAccepted (CommandEventArgs args)
+    {
+        Logging.Debug ($"{Title} ({args.Context?.Command})");
+    }
 
     /// <summary>
     ///     Raised when the user has accepted an item in this menu (or submenu). This is used to determine when to hide the

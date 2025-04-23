@@ -63,6 +63,18 @@ public class Menus : Scenario
                                             eventLog.MoveDown ();
                                         };
 
+        menuHostView.Selecting += (o, args) =>
+                                  {
+                                      if (o is not View sender || args.Cancel)
+                                      {
+                                          return;
+                                      }
+
+                                      Logging.Debug ($"{sender.Id} Selecting: {args?.Context?.Source?.Title}");
+                                      eventSource.Add ($"{sender.Id} Selecting: {args?.Context?.Source?.Title}: ");
+                                      eventLog.MoveDown ();
+                                  };
+
         menuHostView.Accepting += (o, args) =>
                                   {
                                       if (o is not View sender || args.Cancel)
@@ -74,6 +86,18 @@ public class Menus : Scenario
                                       eventSource.Add ($"{sender.Id} Accepting: {args?.Context?.Source?.Title}: ");
                                       eventLog.MoveDown ();
                                   };
+
+        menuHostView.ContextMenu!.Selecting += (o, args) =>
+                                               {
+                                                   if (o is not View sender || args.Cancel)
+                                                   {
+                                                       return;
+                                                   }
+
+                                                   Logging.Debug ($"{sender.Id} Selecting: {args?.Context?.Source?.Title}");
+                                                   eventSource.Add ($"{sender.Id} Selecting: {args?.Context?.Source?.Title}: ");
+                                                   eventLog.MoveDown ();
+                                               };
 
         menuHostView.ContextMenu!.Accepted += (o, args) =>
                                               {
@@ -105,7 +129,7 @@ public class Menus : Scenario
         {
             CanFocus = true;
             BorderStyle = LineStyle.Dashed;
-
+            
             AddCommand (
                         Command.Context,
                         ctx =>
@@ -148,6 +172,7 @@ public class Menus : Scenario
             };
 
             Add (lastCommandLabel, lastCommandText);
+
 
             AddCommand (Command.New, HandleCommand);
             HotKeyBindings.Add (Key.F2, Command.New);
