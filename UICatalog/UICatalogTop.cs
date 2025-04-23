@@ -123,7 +123,7 @@ public class UICatalogTop : Toplevel
                                                   Title ="_Quit",
                                                   HelpText = "Quit UI Catalog",
                                                   Key = Application.QuitKey,
-                                                  TargetView = this,
+                                                  // By not specifying TargetView the Key Binding will be Application-level
                                                   Command = Command.Quit
                                               }
                                           ]),
