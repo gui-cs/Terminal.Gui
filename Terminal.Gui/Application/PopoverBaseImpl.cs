@@ -28,9 +28,9 @@ public abstract class PopoverBaseImpl : View, IPopover
         ViewportSettings = ViewportSettings.Transparent | ViewportSettings.TransparentMouse;
 
         // TODO: Add a diagnostic setting for this?
-        //TextFormatter.VerticalAlignment = Alignment.End;
-        //TextFormatter.Alignment = Alignment.End;
-        //base.Text = "popover";
+        TextFormatter.VerticalAlignment = Alignment.End;
+        TextFormatter.Alignment = Alignment.End;
+        base.Text = "PopoverBaseImpl";
 
         AddCommand (Command.Quit, Quit);
         KeyBindings.Add (Application.QuitKey, Command.Quit);
