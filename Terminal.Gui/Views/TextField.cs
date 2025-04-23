@@ -1062,14 +1062,20 @@ public class TextField : View
     /// <summary>Paste the selected text from the clipboard.</summary>
     public virtual void Paste ()
     {
-        if (ReadOnly || string.IsNullOrEmpty (Clipboard.Contents))
+        if (ReadOnly)
+        {
+            return;
+        }
+
+        string cbTxt = Clipboard.Contents.Split ("\n") [0] ?? "";
+
+        if (string.IsNullOrEmpty (cbTxt))
         {
             return;
         }
 
         SetSelectedStartSelectedLength ();
         int selStart = _start == -1 ? CursorPosition : _start;
-        string cbTxt = Clipboard.Contents.Split ("\n") [0] ?? "";
 
         Text = StringExtensions.ToString (_text.GetRange (0, selStart))
                + cbTxt
