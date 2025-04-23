@@ -546,7 +546,7 @@ public class MenuBarv2 : Menuv2, IDesignable
                                                new Line (),
                                                new MenuItemv2
                                                {
-                                                   Title = "File Op_tions",
+                                                   Title = "_File Options",
                                                    SubMenu = new (
                                                                   [
                                                                       new ()

@@ -234,29 +234,26 @@ public class Menuv2 : Bar, IDesignable
 
         // TODO: Consider having PopoverMenu subscribe to Accepting instead of us overriding OnAccepting here
         // TODO: Doing so would be better encapsulation and might allow us to remove the SuperMenuItem property.
+        //if (SuperView is null)
+        //{
+        //    if (keyCommandContext is { Command: Command.HotKey, Source.HotKey: { } hotkey } && hotkey == keyCommandContext.Binding.Key)
+        //    {
+        //        Logging.Debug ($"{Title} - Returning true - Accepting came from HotKey of menuitem.");
 
-        Debug.Assert (SuperView is { });
+        //        //MenuItemv2? source = keyCommandContext.Source as MenuItemv2;
 
-        if (args.Context is CommandContext<KeyBinding> { Binding.Key: { } } keyCommandContext)
-        {
-            if (keyCommandContext is { Command: Command.HotKey, Source.HotKey: { } hotkey } && hotkey == keyCommandContext.Binding.Key)
-            {
-                Logging.Debug ($"{Title} - Returning true - Accepting came from HotKey of menuitem.");
+        //        //if (source is { SubMenu.Visible: true })
+        //        //{
+        //        //    return false;
+        //        //}
+        //        return true;
+        //    }
 
-                //MenuItemv2? source = keyCommandContext.Source as MenuItemv2;
-
-                //if (source is { SubMenu.Visible: true })
-                //{
-                //    return false;
-                //}
-                return true;
-            }
-
-            // Special case QuitKey if we are Visible - This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
-            // And causes just the menu to quit.
-            //Logging.Debug ($"{Title} - Returning true - Application.QuitKey/Command = Command.Quit");
-            //return true;
-        }
+        //    // Special case QuitKey if we are Visible - This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
+        //    // And causes just the menu to quit.
+        //    //Logging.Debug ($"{Title} - Returning true - Application.QuitKey/Command = Command.Quit");
+        //    //return true;
+        //}
 
         // We need to propagate Command.Accept to the SuperMenuItem if it exists.
         var ret = false;
