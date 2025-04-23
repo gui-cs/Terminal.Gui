@@ -118,11 +118,14 @@ public class UICatalogTop : Toplevel
                                      new (
                                           "_File",
                                           [
-                                              new MenuItemv2 (
-                                                              "_Quit",
-                                                              "Quit UI Catalog",
-                                                              RequestStop
-                                                             )
+                                              new MenuItemv2 ()
+                                              {
+                                                  Title ="_Quit",
+                                                  HelpText = "Quit UI Catalog",
+                                                  Key = Application.QuitKey,
+                                                  TargetView = this,
+                                                  Command = Command.Quit
+                                              }
                                           ]),
                                      new ("_Themes", CreateThemeMenuItems ()),
                                      new ("Diag_nostics", CreateDiagnosticMenuItems ()),
