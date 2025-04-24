@@ -283,4 +283,115 @@ public class ConsoleDriverTests
     //			Application.Run (win);
     //			Application.Shutdown ();
     //		}
+
+    [Theory]
+    [InlineData ('\ud83d', '\udcc4')] // This seems right sequence but Stack is LIFO
+    [InlineData ('\ud83d', '\ud83d')]
+    [InlineData ('\udcc4', '\udcc4')]
+    public void FakeDriver_IsValidInput_Wrong_Surrogate_Sequence (char c1, char c2)
+    {
+        var driver = (IConsoleDriver)Activator.CreateInstance (typeof (FakeDriver));
+        Application.Init (driver);
+
+        Stack<ConsoleKeyInfo> mKeys = new (
+                                           [
+                                               new ('a', ConsoleKey.A, false, false, false),
+                                               new (c1, ConsoleKey.None, false, false, false),
+                                               new (c2, ConsoleKey.None, false, false, false)
+                                           ]);
+
+        Console.MockKeyPresses = mKeys;
+
+        Toplevel top = new ();
+        var view = new View { CanFocus = true };
+        var rText = "";
+        var idx = 0;
+
+        view.KeyDown += (s, e) =>
+                        {
+                            Assert.Equal (new ('a'), e.AsRune);
+                            Assert.Equal ("a", e.AsRune.ToString ());
+                            rText += e.AsRune;
+                            e.Handled = true;
+                            idx++;
+                        };
+        top.Add (view);
+
+        Application.Iteration += (s, a) =>
+                                 {
+                                     if (mKeys.Count == 0)
+                                     {
+                                         Application.RequestStop ();
+                                     }
+                                 };
+
+        Application.Run (top);
+
+        Assert.Equal ("a", rText);
+        Assert.Equal (1, idx);
+        Assert.Equal (0, ((FakeDriver)driver)._highSurrogate);
+
+        top.Dispose ();
+
+        // Shutdown must be called to safely clean up Application if Init has been called
+        Application.Shutdown ();
+    }
+
+    [Fact]
+    public void FakeDriver_IsValidInput_Correct_Surrogate_Sequence ()
+    {
+        var driver = (IConsoleDriver)Activator.CreateInstance (typeof (FakeDriver));
+        Application.Init (driver);
+
+        Stack<ConsoleKeyInfo> mKeys = new (
+                                           [
+                                               new ('a', ConsoleKey.A, false, false, false),
+                                               new ('\udcc4', ConsoleKey.None, false, false, false),
+                                               new ('\ud83d', ConsoleKey.None, false, false, false)
+                                           ]);
+
+        Console.MockKeyPresses = mKeys;
+
+        Toplevel top = new ();
+        var view = new View { CanFocus = true };
+        var rText = "";
+        var idx = 0;
+
+        view.KeyDown += (s, e) =>
+                        {
+                            if (idx == 0)
+                            {
+                                Assert.Equal (new (0x1F4C4), e.AsRune);
+                                Assert.Equal ("📄", e.AsRune.ToString ());
+                            }
+                            else
+                            {
+                                Assert.Equal (new ('a'), e.AsRune);
+                                Assert.Equal ("a", e.AsRune.ToString ());
+                            }
+
+                            rText += e.AsRune;
+                            e.Handled = true;
+                            idx++;
+                        };
+        top.Add (view);
+
+        Application.Iteration += (s, a) =>
+                                 {
+                                     if (mKeys.Count == 0)
+                                     {
+                                         Application.RequestStop ();
+                                     }
+                                 };
+
+        Application.Run (top);
+
+        Assert.Equal ("📄a", rText);
+        Assert.Equal (2, idx);
+
+        top.Dispose ();
+
+        // Shutdown must be called to safely clean up Application if Init has been called
+        Application.Shutdown ();
+    }
 }

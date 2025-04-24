@@ -924,8 +924,11 @@ internal class CursesDriver : ConsoleDriver
                 k &= ~KeyCode.Space;
             }
 
-            OnKeyDown (new Key (k));
-            OnKeyUp (new Key (k));
+            if (IsValidInput (k, out k))
+            {
+                OnKeyDown (new (k));
+                OnKeyUp (new (k));
+            }
         }
     }
 
