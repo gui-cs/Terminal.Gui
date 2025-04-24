@@ -18,7 +18,7 @@ namespace Terminal.Gui {
 		public const int STD_ERROR_HANDLE = -12;
 
 		internal IntPtr InputHandle, OutputHandle;
-		IntPtr ScreenBuffer;
+		IntPtr screenBuffer;
 		readonly uint originalConsoleMode;
 		CursorVisibility? initialCursorVisibility = null;
 		CursorVisibility? currentCursorVisibility = null;
@@ -40,47 +40,47 @@ namespace Terminal.Gui {
 
 		public bool WriteToConsole (Size size, CharInfo [] charInfoBuffer, Coord coords, SmallRect window)
 		{
-			if (ScreenBuffer == IntPtr.Zero) {
+			if (!IsWindowsTerminal && screenBuffer == IntPtr.Zero) {
 				ReadFromConsoleOutput (size, coords, ref window);
-			}
-
-			return WriteConsoleOutput (ScreenBuffer, charInfoBuffer, coords, new Coord () { X = window.Left, Y = window.Top }, ref window);
-		}
-
-		public void ReadFromConsoleOutput (Size size, Coord coords, ref SmallRect window)
-		{
-			ScreenBuffer = CreateConsoleScreenBuffer (
-				DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
-				ShareMode.FileShareRead | ShareMode.FileShareWrite,
-				IntPtr.Zero,
-				1,
-				IntPtr.Zero
-			);
-			if (ScreenBuffer == INVALID_HANDLE_VALUE) {
-				var err = Marshal.GetLastWin32Error ();
-
-				if (err != 0)
-					throw new System.ComponentModel.Win32Exception (err);
 			}
 
 			if (!initialCursorVisibility.HasValue && GetCursorVisibility (out CursorVisibility visibility)) {
 				initialCursorVisibility = visibility;
 			}
 
-			if (!SetConsoleActiveScreenBuffer (ScreenBuffer)) {
+			return WriteConsoleOutput (IsWindowsTerminal ? OutputHandle : screenBuffer, charInfoBuffer, coords, new Coord () { X = window.Left, Y = window.Top }, ref window);
+		}
+
+		public void ReadFromConsoleOutput (Size size, Coord coords, ref SmallRect window)
+		{
+			screenBuffer = CreateConsoleScreenBuffer (
+				DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
+				ShareMode.FileShareRead | ShareMode.FileShareWrite,
+				IntPtr.Zero,
+				1,
+				IntPtr.Zero
+			);
+			if (screenBuffer == INVALID_HANDLE_VALUE) {
+				var err = Marshal.GetLastWin32Error ();
+
+				if (err != 0)
+					throw new System.ComponentModel.Win32Exception (err);
+			}
+
+			if (!SetConsoleActiveScreenBuffer (screenBuffer)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
 
 			OriginalStdOutChars = new CharInfo [size.Height * size.Width];
 
-			if (!ReadConsoleOutput (ScreenBuffer, OriginalStdOutChars, coords, new Coord () { X = 0, Y = 0 }, ref window)) {
+			if (!ReadConsoleOutput (screenBuffer, OriginalStdOutChars, coords, new Coord () { X = 0, Y = 0 }, ref window)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
 		}
 
 		public bool SetCursorPosition (Coord position)
 		{
-			return SetConsoleCursorPosition (ScreenBuffer, position);
+			return SetConsoleCursorPosition (IsWindowsTerminal ? OutputHandle : screenBuffer, position);
 		}
 
 		public void SetInitialCursorVisibility ()
@@ -92,11 +92,11 @@ namespace Terminal.Gui {
 
 		public bool GetCursorVisibility (out CursorVisibility visibility)
 		{
-			if (ScreenBuffer == IntPtr.Zero) {
+			if ((IsWindowsTerminal ? OutputHandle : screenBuffer) == IntPtr.Zero) {
 				visibility = CursorVisibility.Invisible;
 				return false;
 			}
-			if (!GetConsoleCursorInfo (ScreenBuffer, out ConsoleCursorInfo info)) {
+			if (!GetConsoleCursorInfo (IsWindowsTerminal ? OutputHandle : screenBuffer, out ConsoleCursorInfo info)) {
 				var err = Marshal.GetLastWin32Error ();
 				if (err != 0) {
 					throw new System.ComponentModel.Win32Exception (err);
@@ -149,7 +149,7 @@ namespace Terminal.Gui {
 					bVisible = ((uint)visibility & 0xFF00) != 0
 				};
 
-				if (!SetConsoleCursorInfo (ScreenBuffer, ref info))
+				if (!SetConsoleCursorInfo (IsWindowsTerminal ? OutputHandle : screenBuffer, ref info))
 					return false;
 
 				currentCursorVisibility = visibility;
@@ -170,23 +170,23 @@ namespace Terminal.Gui {
 				Console.WriteLine ("Error: {0}", err);
 			}
 
-			if (ScreenBuffer != IntPtr.Zero) {
-				CloseHandle (ScreenBuffer);
+			if (screenBuffer != IntPtr.Zero) {
+				CloseHandle (screenBuffer);
 			}
 
-			ScreenBuffer = IntPtr.Zero;
+			screenBuffer = IntPtr.Zero;
 		}
 
 		internal Size GetConsoleBufferWindow (out Point position)
 		{
-			if (ScreenBuffer == IntPtr.Zero) {
+			if ((IsWindowsTerminal ? OutputHandle : screenBuffer) == IntPtr.Zero) {
 				position = Point.Empty;
 				return Size.Empty;
 			}
 
 			var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
 			csbi.cbSize = (uint)Marshal.SizeOf (csbi);
-			if (!GetConsoleScreenBufferInfoEx (ScreenBuffer, ref csbi)) {
+			if (!GetConsoleScreenBufferInfoEx ((IsWindowsTerminal ? OutputHandle : screenBuffer), ref csbi)) {
 				//throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 				position = Point.Empty;
 				return Size.Empty;
@@ -217,16 +217,16 @@ namespace Terminal.Gui {
 			var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
 			csbi.cbSize = (uint)Marshal.SizeOf (csbi);
 
-			if (!GetConsoleScreenBufferInfoEx (ScreenBuffer, ref csbi)) {
+			if (!GetConsoleScreenBufferInfoEx (IsWindowsTerminal ? OutputHandle : screenBuffer, ref csbi)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
-			var maxWinSize = GetLargestConsoleWindowSize (ScreenBuffer);
+			var maxWinSize = GetLargestConsoleWindowSize (IsWindowsTerminal ? OutputHandle : screenBuffer);
 			var newCols = Math.Min (cols, maxWinSize.X);
 			var newRows = Math.Min (rows, maxWinSize.Y);
 			csbi.dwSize = new Coord (newCols, Math.Max (newRows, (short)1));
 			csbi.srWindow = new SmallRect (0, 0, newCols, newRows);
 			csbi.dwMaximumWindowSize = new Coord (newCols, newRows);
-			if (!SetConsoleScreenBufferInfoEx (ScreenBuffer, ref csbi)) {
+			if (!SetConsoleScreenBufferInfoEx (IsWindowsTerminal ? OutputHandle : screenBuffer, ref csbi)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
 			var winRect = new SmallRect (0, 0, (short)(newCols - 1), (short)Math.Max (newRows - 1, 0));
@@ -240,21 +240,21 @@ namespace Terminal.Gui {
 
 		void SetConsoleOutputWindow (CONSOLE_SCREEN_BUFFER_INFOEX csbi)
 		{
-			if (ScreenBuffer != IntPtr.Zero && !SetConsoleScreenBufferInfoEx (ScreenBuffer, ref csbi)) {
+			if ((IsWindowsTerminal ? OutputHandle : screenBuffer) != IntPtr.Zero && !SetConsoleScreenBufferInfoEx (IsWindowsTerminal ? OutputHandle : screenBuffer, ref csbi)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
 		}
 
 		internal Size SetConsoleOutputWindow (out Point position)
 		{
-			if (ScreenBuffer == IntPtr.Zero) {
+			if ((IsWindowsTerminal ? OutputHandle : screenBuffer) == IntPtr.Zero) {
 				position = Point.Empty;
 				return Size.Empty;
 			}
 
 			var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
 			csbi.cbSize = (uint)Marshal.SizeOf (csbi);
-			if (!GetConsoleScreenBufferInfoEx (ScreenBuffer, ref csbi)) {
+			if (!GetConsoleScreenBufferInfoEx (IsWindowsTerminal ? OutputHandle : screenBuffer, ref csbi)) {
 				throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 			}
 			var sz = new Size (csbi.srWindow.Right - csbi.srWindow.Left + 1,
@@ -273,6 +273,8 @@ namespace Terminal.Gui {
 		}
 
 		//bool ContinueListeningForConsoleEvents = true;
+
+		internal bool IsWindowsTerminal { get; set; }
 
 		public uint ConsoleMode {
 			get {
@@ -734,7 +736,7 @@ namespace Terminal.Gui {
 			WinConsole = new WindowsConsole ();
 			clipboard = new WindowsClipboard ();
 
-			isWindowsTerminal = Environment.GetEnvironmentVariable ("WT_SESSION") != null;
+			WinConsole.IsWindowsTerminal = isWindowsTerminal = Environment.GetEnvironmentVariable ("WT_SESSION") != null || Environment.GetEnvironmentVariable ("VSAPPIDNAME") != null;
 		}
 
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
@@ -1970,7 +1972,21 @@ namespace Terminal.Gui {
 	class WindowsClipboard : ClipboardBase {
 		public WindowsClipboard ()
 		{
-			IsSupported = IsClipboardFormatAvailable (cfUnicodeText);
+			IsSupported = CheckClipboardIsAvailable ();
+		}
+
+		private static bool CheckClipboardIsAvailable ()
+		{
+			// Attempt to open the clipboard
+			if (OpenClipboard (IntPtr.Zero)) {
+				// Clipboard is available
+				// Close the clipboard after use
+				CloseClipboard ();
+
+				return true;
+			}
+			// Clipboard is not available
+			return false;
 		}
 
 		public override bool IsSupported { get; }

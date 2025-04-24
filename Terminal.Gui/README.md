@@ -17,7 +17,7 @@ All files required to build the **Terminal.Gui** library (and NuGet package).
     - `Window` - Derived from `TopLevel`; implements toplevel views with a visible frame and Title.
 - `Types/` - A folder (not namespace) containing implementations of `Point`, `Rect`, and `Size` which are ancient versions of the modern `System.Drawing.Point`, `System.Drawing.Size`, and `System.Drawning.Rectangle`.
 - `ConsoleDrivers/` - Source files for the three `ConsoleDriver`-based drivers: .NET: `NetDriver`, Unix & Mac: `UnixDriver`, and Windows: `WindowsDriver`.
-- `Views/` - A folder (not namespace) containing the source for all built-in classes that drive from `View` (non-modals). 
+- `Views/` - A folder (not namespace) containing the source for all built-in classes that derive from `View` (non-modals). 
 - `Windows/` - A folder (not namespace) containing the source of all built-in classes that derive from `Window`.
 
 ## Version numbers
