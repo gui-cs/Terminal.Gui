@@ -433,12 +433,13 @@ public partial class View : IDisposable, ISupportInitializeNotification
     {
         get
         {
-#if DEBUG_IDISPOSABLE
-            if (EnableDebugIDisposableAsserts && WasDisposed)
-            {
-                throw new ObjectDisposedException (GetType ().FullName);
-            }
-#endif
+// TODO: Re-enable this after Debug logging in RaiseSelecting is removed        
+//#if DEBUG_IDISPOSABLE
+//            if (EnableDebugIDisposableAsserts && WasDisposed)
+//            {
+//                throw new ObjectDisposedException (GetType ().FullName);
+//            }
+//#endif
             return _title;
         }
         set

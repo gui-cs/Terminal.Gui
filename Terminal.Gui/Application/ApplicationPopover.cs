@@ -103,12 +103,6 @@ public sealed class ApplicationPopover : IDisposable
 
         if (popover is View newPopover)
         {
-            // Don't allow Show with Popovers that have SuperViews - doesn't make sense.
-            if (newPopover.SuperView is { })
-            {
-                throw new InvalidOperationException (@"A Popover must not have a SuperView.");
-            }
-
             Register (popover);
             if (!newPopover.IsInitialized)
             {
