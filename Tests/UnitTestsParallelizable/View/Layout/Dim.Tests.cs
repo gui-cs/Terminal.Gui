@@ -6,6 +6,7 @@ using static Terminal.Gui.Dim;
 
 namespace Terminal.Gui.LayoutTests;
 
+[Collection ("Global Test Setup")]
 public class DimTests
 {
     [Fact]

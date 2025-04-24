@@ -11,7 +11,10 @@ public class FileDialogFluentTests
 {
     private readonly TextWriter _out;
 
-    public FileDialogFluentTests (ITestOutputHelper outputHelper) { _out = new TestOutputWriter (outputHelper); }
+    public FileDialogFluentTests (ITestOutputHelper outputHelper)
+    {
+        _out = new TestOutputWriter (outputHelper);
+    }
 
     private MockFileSystem CreateExampleFileSystem ()
     {
@@ -41,27 +44,25 @@ public class FileDialogFluentTests
     [ClassData (typeof (V2TestDrivers))]
     public void CancelFileDialog_UsingEscape (V2TestDriver d)
     {
-        var sd = new SaveDialog ( CreateExampleFileSystem ());
+        var sd = new SaveDialog (CreateExampleFileSystem ());
         using var c = With.A (sd, 100, 20, d)
-            .ScreenShot ("Save dialog",_out)
-            .Escape()
+            .ScreenShot ("Save dialog", _out)
+            .Escape ()
+            .Then (() => Assert.True (sd.Canceled))
             .Stop ();
-
-        Assert.True (sd.Canceled);
     }
 
     [Theory]
     [ClassData (typeof (V2TestDrivers))]
     public void CancelFileDialog_UsingCancelButton_TabThenEnter (V2TestDriver d)
     {
-        var sd = new SaveDialog (CreateExampleFileSystem ());
+        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = false };
         using var c = With.A (sd, 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
-                          .Focus <Button>(b=> b.Text == "_Cancel")
+                          .Focus<Button> (b => b.Text == "_Cancel")
+                          .Then (() => Assert.True (sd.Canceled))
                           .Enter ()
                           .Stop ();
-
-        Assert.True (sd.Canceled);
     }
 
     [Theory]
@@ -69,13 +70,13 @@ public class FileDialogFluentTests
     public void CancelFileDialog_UsingCancelButton_LeftClickButton (V2TestDriver d)
     {
         var sd = new SaveDialog (CreateExampleFileSystem ());
+
         using var c = With.A (sd, 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
-                          .LeftClick <Button> (b => b.Text == "_Cancel")
-                          .Stop ()
-                          .WriteOutLogs (_out);
-
-        Assert.True (sd.Canceled);
+                          .LeftClick<Button> (b => b.Text == "_Cancel")
+                          .WriteOutLogs (_out)
+                          .Then (() => Assert.True (sd.Canceled))
+                          .Stop ();
     }
     [Theory]
     [ClassData (typeof (V2TestDrivers))]
@@ -86,9 +87,8 @@ public class FileDialogFluentTests
                           .ScreenShot ("Save dialog", _out)
                           .Send (Key.C.WithAlt)
                           .WriteOutLogs (_out)
+                          .Then (() => Assert.True (sd.Canceled))
                           .Stop ();
-
-        Assert.True (sd.Canceled);
     }
 
     [Theory]
@@ -101,10 +101,9 @@ public class FileDialogFluentTests
                           .ScreenShot ("Save dialog", _out)
                           .LeftClick<Button> (b => b.Text == "_Save")
                           .WriteOutLogs (_out)
+                          .Then (() => Assert.False (sd.Canceled))
+                          .Then (() => AssertIsFileSystemRoot (fs, sd))
                           .Stop ();
-
-        Assert.False (sd.Canceled);
-        AssertIsFileSystemRoot (fs, sd);
     }
 
     [Theory]
@@ -117,10 +116,10 @@ public class FileDialogFluentTests
                           .ScreenShot ("Save dialog", _out)
                           .Send (Key.S.WithAlt)
                           .WriteOutLogs (_out)
+                          .Then (() => Assert.False (sd.Canceled))
+                          .Then (() => AssertIsFileSystemRoot (fs, sd))
                           .Stop ();
 
-        Assert.False (sd.Canceled);
-        AssertIsFileSystemRoot (fs, sd);
     }
 
     [Theory]
@@ -128,16 +127,15 @@ public class FileDialogFluentTests
     public void SaveFileDialog_UsingOkButton_TabEnter (V2TestDriver d)
     {
         var fs = CreateExampleFileSystem ();
-        var sd = new SaveDialog (fs);
+        var sd = new SaveDialog (fs) { Modal = false };
         using var c = With.A (sd, 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
-                          .Focus <Button> (b => b.Text == "_Save")
+                          .Focus<Button> (b => b.Text == "_Save")
                           .Enter ()
                           .WriteOutLogs (_out)
+                          .Then (() => Assert.False (sd.Canceled))
+                          .Then (() => AssertIsFileSystemRoot (fs, sd))
                           .Stop ();
-
-        Assert.False (sd.Canceled);
-        AssertIsFileSystemRoot (fs,sd);
     }
 
     private void AssertIsFileSystemRoot (IFileSystem fs, SaveDialog sd)
@@ -155,43 +153,40 @@ public class FileDialogFluentTests
     [ClassData (typeof (V2TestDrivers))]
     public void SaveFileDialog_PressingPopTree_ShouldNotChangeCancel (V2TestDriver d)
     {
-        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = true };
+        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = false };
         using var c = With.A (sd, 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
-                          .AssertTrue (sd.Canceled)
+                          .Then (() => Assert.True (sd.Canceled))
                           .Focus<Button> (b => b.Text == "►►")
                           .Enter ()
                           .ScreenShot ("After pop tree", _out)
-                          .AssertTrue (sd.Canceled)
                           .WriteOutLogs (_out)
+                          .Then (() => Assert.True (sd.Canceled))
                           .Stop ();
 
-        Assert.True(sd.Canceled);
     }
 
     [Theory]
     [ClassData (typeof (V2TestDrivers))]
     public void SaveFileDialog_PopTree_AndNavigate (V2TestDriver d)
     {
-        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = true };
+        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = false };
 
         using var c = With.A (sd, 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
-                          .AssertTrue (sd.Canceled)
-                          .LeftClick <Button> (b => b.Text == "►►")
+                          .Then (() => Assert.True (sd.Canceled))
+                          .LeftClick<Button> (b => b.Text == "►►")
                           .ScreenShot ("After pop tree", _out)
-                          .Focus <TreeView<IFileSystemInfo>> (_ => true)
+                          .Focus<TreeView<IFileSystemInfo>> (_ => true)
                           .Right ()
                           .ScreenShot ("After expand tree", _out)
                           .Down ()
                           .ScreenShot ("After navigate down in tree", _out)
                           .Enter ()
                           .WaitIteration ()
-                          .AssertFalse (sd.Canceled)
+                          .Then (() => Assert.False (sd.Canceled))
                           .AssertContains ("empty-dir", sd.FileName)
                           .WriteOutLogs (_out)
                           .Stop ();
-
-        Assert.False (sd.Canceled);
     }
 }

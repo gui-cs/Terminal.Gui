@@ -258,6 +258,7 @@ public static class ConfigurationManager
             Settings?.UpdateFromResource (Assembly.GetEntryAssembly ()!, embeddedStylesResourceName!, ConfigLocations.AppResources);
         }
 
+        // TODO: Determine if Runtime should be applied last.
         if (Locations.HasFlag (ConfigLocations.Runtime) && !string.IsNullOrEmpty (RuntimeConfig))
         {
             Settings?.Update (RuntimeConfig, "ConfigurationManager.RuntimeConfig", ConfigLocations.Runtime);

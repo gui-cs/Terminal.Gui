@@ -41,8 +41,6 @@ public class RadioGroup : View, IDesignable, IOrientation
         MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Accept);
 
         SubViewLayout += RadioGroup_LayoutStarted;
-
-        HighlightStyle = HighlightStyle.PressedOutside | HighlightStyle.Pressed;
     }
 
     private bool? HandleHotKeyCommand (ICommandContext? ctx)
@@ -281,23 +279,24 @@ public class RadioGroup : View, IDesignable, IOrientation
             // Pick a unique hotkey for each radio label
             for (var labelIndex = 0; labelIndex < value.Length; labelIndex++)
             {
-                string label = value [labelIndex];
-                string? newLabel = label;
+                string name = value [labelIndex];
+                string? nameWithHotKey = name;
 
                 if (AssignHotKeysToRadioLabels)
                 {
                     // Find the first char in label that is [a-z], [A-Z], or [0-9]
-                    for (var i = 0; i < label.Length; i++)
+                    for (var i = 0; i < name.Length; i++)
                     {
-                        if (UsedHotKeys.Contains (new (label [i])) || !char.IsAsciiLetterOrDigit (label [i]))
+                        char c = char.ToLowerInvariant (name [i]);
+                        if (UsedHotKeys.Contains (new (c)) || !char.IsAsciiLetterOrDigit (c))
                         {
                             continue;
                         }
 
-                        if (char.IsAsciiLetterOrDigit (label [i]))
+                        if (char.IsAsciiLetterOrDigit (c))
                         {
-                            char? hotChar = label [i];
-                            newLabel = label.Insert (i, HotKeySpecifier.ToString ());
+                            char? hotChar = c;
+                            nameWithHotKey = name.Insert (i, HotKeySpecifier.ToString ());
                             UsedHotKeys.Add (new (hotChar));
 
                             break;
@@ -305,9 +304,9 @@ public class RadioGroup : View, IDesignable, IOrientation
                     }
                 }
 
-                _radioLabels.Add (newLabel);
+                _radioLabels.Add (nameWithHotKey);
 
-                if (TextFormatter.FindHotKey (newLabel, HotKeySpecifier, out _, out Key hotKey))
+                if (TextFormatter.FindHotKey (nameWithHotKey, HotKeySpecifier, out _, out Key hotKey))
                 {
                     AddKeyBindingsForHotKey (Key.Empty, hotKey, labelIndex);
                 }

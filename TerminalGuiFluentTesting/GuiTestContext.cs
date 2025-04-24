@@ -3,13 +3,12 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using Terminal.Gui;
 using Terminal.Gui.ConsoleDrivers;
-using static Unix.Terminal.Curses;
 
 namespace TerminalGuiFluentTesting;
 
 /// <summary>
-/// Fluent API context for testing a Terminal.Gui application. Create
-/// an instance using <see cref="With"/> static class.
+///     Fluent API context for testing a Terminal.Gui application. Create
+///     an instance using <see cref="With"/> static class.
 /// </summary>
 public class GuiTestContext : IDisposable
 {
@@ -23,7 +22,7 @@ public class GuiTestContext : IDisposable
     private View? _lastView;
     private readonly StringBuilder _logsSb;
     private readonly V2TestDriver _driver;
-    private bool _finished=false;
+    private bool _finished;
 
     internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, V2TestDriver driver)
     {
@@ -68,6 +67,7 @@ public class GuiTestContext : IDisposable
                                      t.Closed += (s, e) => { _finished = true; };
                                      Application.Run (t); // This will block, but it's on a background thread now
 
+                                     t.Dispose ();
                                      Application.Shutdown ();
                                  }
                                  catch (OperationCanceledException)
@@ -97,12 +97,12 @@ public class GuiTestContext : IDisposable
     private string GetDriverName ()
     {
         return _driver switch
-        {
-            V2TestDriver.V2Win => "v2win",
-            V2TestDriver.V2Net => "v2net",
-            _ =>
-                throw new ArgumentOutOfRangeException ()
-        };
+               {
+                   V2TestDriver.V2Win => "v2win",
+                   V2TestDriver.V2Net => "v2net",
+                   _ =>
+                       throw new ArgumentOutOfRangeException ()
+               };
     }
 
     /// <summary>
@@ -115,7 +115,7 @@ public class GuiTestContext : IDisposable
             return this;
         }
 
-        Application.Invoke (() => {Application.RequestStop ();});
+        Application.Invoke (() => { Application.RequestStop (); });
 
         // Wait for the application to stop, but give it a 1-second timeout
         if (!_runTask.Wait (TimeSpan.FromMilliseconds (1000)))
@@ -148,7 +148,7 @@ public class GuiTestContext : IDisposable
     }
 
     /// <summary>
-    /// Cleanup to avoid state bleed between tests
+    ///     Cleanup to avoid state bleed between tests
     /// </summary>
     public void Dispose ()
     {
@@ -184,7 +184,7 @@ public class GuiTestContext : IDisposable
     }
 
     /// <summary>
-    /// Simulates changing the console size e.g. by resizing window in your operating system
+    ///     Simulates changing the console size e.g. by resizing window in your operating system
     /// </summary>
     /// <param name="width">new Width for the console.</param>
     /// <param name="height">new Height for the console.</param>
@@ -203,11 +203,11 @@ public class GuiTestContext : IDisposable
 
         writer.WriteLine (text);
 
-        return WaitIteration ();
+        return this; //WaitIteration();
     }
 
     /// <summary>
-    /// Writes all Terminal.Gui engine logs collected so far to the <paramref name="writer"/>
+    ///     Writes all Terminal.Gui engine logs collected so far to the <paramref name="writer"/>
     /// </summary>
     /// <param name="writer"></param>
     /// <returns></returns>
@@ -215,12 +215,12 @@ public class GuiTestContext : IDisposable
     {
         writer.WriteLine (_logsSb.ToString ());
 
-        return WaitIteration ();
+        return this; //WaitIteration();
     }
 
     /// <summary>
-    /// Waits until the end of the current iteration of the main loop. Optionally
-    /// running a given <paramref name="a"/> action on the UI thread at that time.
+    ///     Waits until the end of the current iteration of the main loop. Optionally
+    ///     running a given <paramref name="a"/> action on the UI thread at that time.
     /// </summary>
     /// <param name="a"></param>
     /// <returns></returns>
@@ -255,8 +255,8 @@ public class GuiTestContext : IDisposable
     }
 
     /// <summary>
-    /// Performs the supplied <paramref name="doAction"/> immediately.
-    /// Enables running commands without breaking the Fluent API calls.
+    ///     Performs the supplied <paramref name="doAction"/> immediately.
+    ///     Enables running commands without breaking the Fluent API calls.
     /// </summary>
     /// <param name="doAction"></param>
     /// <returns></returns>
@@ -266,22 +266,20 @@ public class GuiTestContext : IDisposable
         {
             doAction ();
         }
-        catch(Exception)
+        catch (Exception)
         {
             HardStop ();
 
             throw;
-
         }
 
         return this;
     }
 
-
     /// <summary>
-    /// Simulates a right click at the given screen coordinates on the current driver.
-    /// This is a raw input event that goes through entire processing pipeline as though
-    /// user had pressed the mouse button physically.
+    ///     Simulates a right click at the given screen coordinates on the current driver.
+    ///     This is a raw input event that goes through entire processing pipeline as though
+    ///     user had pressed the mouse button physically.
     /// </summary>
     /// <param name="screenX">0 indexed screen coordinates</param>
     /// <param name="screenY">0 indexed screen coordinates</param>
@@ -289,29 +287,25 @@ public class GuiTestContext : IDisposable
     public GuiTestContext RightClick (int screenX, int screenY) { return Click (WindowsConsole.ButtonState.Button3Pressed, screenX, screenY); }
 
     /// <summary>
-    /// Simulates a left click at the given screen coordinates on the current driver.
-    /// This is a raw input event that goes through entire processing pipeline as though
-    /// user had pressed the mouse button physically.
+    ///     Simulates a left click at the given screen coordinates on the current driver.
+    ///     This is a raw input event that goes through entire processing pipeline as though
+    ///     user had pressed the mouse button physically.
     /// </summary>
     /// <param name="screenX">0 indexed screen coordinates</param>
     /// <param name="screenY">0 indexed screen coordinates</param>
     /// <returns></returns>
-    public GuiTestContext LeftClick (int screenX, int screenY)
-    {
-        return Click (WindowsConsole.ButtonState.Button1Pressed, screenX, screenY);
-    }
+    public GuiTestContext LeftClick (int screenX, int screenY) { return Click (WindowsConsole.ButtonState.Button1Pressed, screenX, screenY); }
 
-    public GuiTestContext LeftClick<T> (Func<T,bool> evaluator) where T : View
-    {
-        return Click (WindowsConsole.ButtonState.Button1Pressed,evaluator);
-    }
+    public GuiTestContext LeftClick<T> (Func<T, bool> evaluator) where T : View { return Click (WindowsConsole.ButtonState.Button1Pressed, evaluator); }
 
-    private GuiTestContext Click<T> (WindowsConsole.ButtonState btn, Func<T, bool> evaluator) where T:View
+    private GuiTestContext Click<T> (WindowsConsole.ButtonState btn, Func<T, bool> evaluator) where T : View
     {
-        var v = Find (evaluator);
-        var screen = v.ViewportToScreen (new Point (0, 0));
+        T v = Find (evaluator);
+        Point screen = v.ViewportToScreen (new Point (0, 0));
+
         return Click (btn, screen.X, screen.Y);
     }
+
     private GuiTestContext Click (WindowsConsole.ButtonState btn, int screenX, int screenY)
     {
         switch (_driver)
@@ -339,29 +333,32 @@ public class GuiTestContext : IDisposable
                                                        MousePosition = new ((short)screenX, (short)screenY)
                                                    }
                                                });
+
                 break;
             case V2TestDriver.V2Net:
 
                 int netButton = btn switch
-                {
-                    WindowsConsole.ButtonState.Button1Pressed => 0,
-                    WindowsConsole.ButtonState.Button2Pressed => 1,
-                    WindowsConsole.ButtonState.Button3Pressed => 2,
-                    WindowsConsole.ButtonState.RightmostButtonPressed => 2,
-                    _ => throw new ArgumentOutOfRangeException (nameof (btn))
-                };
-                foreach (var k in NetSequences.Click (netButton, screenX, screenY))
+                                {
+                                    WindowsConsole.ButtonState.Button1Pressed => 0,
+                                    WindowsConsole.ButtonState.Button2Pressed => 1,
+                                    WindowsConsole.ButtonState.Button3Pressed => 2,
+                                    WindowsConsole.ButtonState.RightmostButtonPressed => 2,
+                                    _ => throw new ArgumentOutOfRangeException (nameof (btn))
+                                };
+
+                foreach (ConsoleKeyInfo k in NetSequences.Click (netButton, screenX, screenY))
                 {
                     SendNetKey (k);
                 }
+
                 break;
             default:
                 throw new ArgumentOutOfRangeException ();
         }
 
-        WaitIteration ();
+        return WaitIteration ();
 
-        return this;
+        ;
     }
 
     public GuiTestContext Down ()
@@ -370,24 +367,26 @@ public class GuiTestContext : IDisposable
         {
             case V2TestDriver.V2Win:
                 SendWindowsKey (ConsoleKeyMapping.VK.DOWN);
-                WaitIteration ();
+
                 break;
             case V2TestDriver.V2Net:
-                foreach (var k in NetSequences.Down)
+                foreach (ConsoleKeyInfo k in NetSequences.Down)
                 {
                     SendNetKey (k);
                 }
+
                 break;
             default:
                 throw new ArgumentOutOfRangeException ();
         }
 
+        return WaitIteration ();
 
-        return this;
+        ;
     }
 
     /// <summary>
-    /// Simulates the Right cursor key
+    ///     Simulates the Right cursor key
     /// </summary>
     /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
@@ -397,24 +396,26 @@ public class GuiTestContext : IDisposable
         {
             case V2TestDriver.V2Win:
                 SendWindowsKey (ConsoleKeyMapping.VK.RIGHT);
-                WaitIteration ();
+
                 break;
             case V2TestDriver.V2Net:
-                foreach (var k in NetSequences.Right)
+                foreach (ConsoleKeyInfo k in NetSequences.Right)
                 {
                     SendNetKey (k);
                 }
+
                 WaitIteration ();
+
                 break;
             default:
                 throw new ArgumentOutOfRangeException ();
         }
 
-        return this;
+        return WaitIteration ();
     }
 
     /// <summary>
-    /// Simulates the Left cursor key
+    ///     Simulates the Left cursor key
     /// </summary>
     /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
@@ -424,23 +425,24 @@ public class GuiTestContext : IDisposable
         {
             case V2TestDriver.V2Win:
                 SendWindowsKey (ConsoleKeyMapping.VK.LEFT);
-                WaitIteration ();
+
                 break;
             case V2TestDriver.V2Net:
-                foreach (var k in NetSequences.Left)
+                foreach (ConsoleKeyInfo k in NetSequences.Left)
                 {
                     SendNetKey (k);
                 }
+
                 break;
             default:
                 throw new ArgumentOutOfRangeException ();
         }
 
-        return this;
+        return WaitIteration ();
     }
 
     /// <summary>
-    /// Simulates the up cursor key
+    ///     Simulates the up cursor key
     /// </summary>
     /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
@@ -450,23 +452,24 @@ public class GuiTestContext : IDisposable
         {
             case V2TestDriver.V2Win:
                 SendWindowsKey (ConsoleKeyMapping.VK.UP);
-                WaitIteration ();
+
                 break;
             case V2TestDriver.V2Net:
-                foreach (var k in NetSequences.Up)
+                foreach (ConsoleKeyInfo k in NetSequences.Up)
                 {
                     SendNetKey (k);
                 }
+
                 break;
             default:
                 throw new ArgumentOutOfRangeException ();
         }
 
-        return this;
+        return WaitIteration ();
     }
 
     /// <summary>
-    /// Simulates pressing the Return/Enter (newline) key.
+    ///     Simulates pressing the Return/Enter (newline) key.
     /// </summary>
     /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
@@ -484,20 +487,21 @@ public class GuiTestContext : IDisposable
                                     wVirtualKeyCode = ConsoleKeyMapping.VK.RETURN,
                                     wVirtualScanCode = 28
                                 });
+
                 break;
             case V2TestDriver.V2Net:
                 SendNetKey (new ('\r', ConsoleKey.Enter, false, false, false));
+
                 break;
             default:
                 throw new ArgumentOutOfRangeException ();
         }
 
-        return this;
+        return WaitIteration ();
     }
 
-
     /// <summary>
-    /// Simulates pressing the Esc (Escape) key.
+    ///     Simulates pressing the Esc (Escape) key.
     /// </summary>
     /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
@@ -515,12 +519,14 @@ public class GuiTestContext : IDisposable
                                     wVirtualKeyCode = ConsoleKeyMapping.VK.ESCAPE,
                                     wVirtualScanCode = 1
                                 });
+
                 break;
             case V2TestDriver.V2Net:
 
                 // Note that this accurately describes how Esc comes in. Typically, ConsoleKey is None
                 // even though you would think it would be Escape - it isn't
                 SendNetKey (new ('\u001b', ConsoleKey.None, false, false, false));
+
                 break;
             default:
                 throw new ArgumentOutOfRangeException ();
@@ -529,10 +535,8 @@ public class GuiTestContext : IDisposable
         return this;
     }
 
-
-
     /// <summary>
-    /// Simulates pressing the Tab key.
+    ///     Simulates pressing the Tab key.
     /// </summary>
     /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
@@ -550,12 +554,14 @@ public class GuiTestContext : IDisposable
                                     wVirtualKeyCode = 0,
                                     wVirtualScanCode = 0
                                 });
+
                 break;
             case V2TestDriver.V2Net:
 
                 // Note that this accurately describes how Tab comes in. Typically, ConsoleKey is None
                 // even though you would think it would be Tab - it isn't
                 SendNetKey (new ('\t', ConsoleKey.None, false, false, false));
+
                 break;
             default:
                 throw new ArgumentOutOfRangeException ();
@@ -565,8 +571,8 @@ public class GuiTestContext : IDisposable
     }
 
     /// <summary>
-    /// Registers a right click handler on the <see cref="LastView"/> added view (or root view) that
-    /// will open the supplied <paramref name="contextMenu"/>.
+    ///     Registers a right click handler on the <see cref="LastView"/> added view (or root view) that
+    ///     will open the supplied <paramref name="contextMenu"/>.
     /// </summary>
     /// <param name="contextMenu"></param>
     /// <returns></returns>
@@ -587,7 +593,7 @@ public class GuiTestContext : IDisposable
     }
 
     /// <summary>
-    /// The last view added (e.g. with <see cref="Add"/>) or the root/current top.
+    ///     The last view added (e.g. with <see cref="Add"/>) or the root/current top.
     /// </summary>
     public View LastView => _lastView ?? Application.Top ?? throw new ("Could not determine which view to add to");
 
@@ -620,11 +626,7 @@ public class GuiTestContext : IDisposable
         WaitIteration ();
     }
 
-
-    private void SendNetKey (ConsoleKeyInfo consoleKeyInfo)
-    {
-        _netInput.InputBuffer.Enqueue (consoleKeyInfo);
-    }
+    private void SendNetKey (ConsoleKeyInfo consoleKeyInfo) { _netInput.InputBuffer.Enqueue (consoleKeyInfo); }
 
     /// <summary>
     ///     Sends a special key e.g. cursor key that does not map to a specific character
@@ -666,10 +668,23 @@ public class GuiTestContext : IDisposable
     }
 
     /// <summary>
-    /// Sets the input focus to the given <see cref="View"/>.
-    /// Throws <see cref="ArgumentException"/> if focus did not change due to system
-    /// constraints e.g. <paramref name="toFocus"/>
-    /// <see cref="View.CanFocus"/> is <see langword="false"/>
+    ///     Sends a key to the application. This goes directly to Application and does not go through
+    ///     a driver.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    public GuiTestContext RaiseKeyDownEvent (Key key)
+    {
+        Application.RaiseKeyDownEvent (key);
+
+        return this; //WaitIteration();
+    }
+
+    /// <summary>
+    ///     Sets the input focus to the given <see cref="View"/>.
+    ///     Throws <see cref="ArgumentException"/> if focus did not change due to system
+    ///     constraints e.g. <paramref name="toFocus"/>
+    ///     <see cref="View.CanFocus"/> is <see langword="false"/>
     /// </summary>
     /// <param name="toFocus"></param>
     /// <returns></returns>
@@ -687,27 +702,28 @@ public class GuiTestContext : IDisposable
     }
 
     /// <summary>
-    /// Tabs through the UI until a View matching the <paramref name="evaluator"/>
-    /// is found (of Type T) or all views are looped through (back to the beginning)
-    /// in which case triggers hard stop and Exception
+    ///     Tabs through the UI until a View matching the <paramref name="evaluator"/>
+    ///     is found (of Type T) or all views are looped through (back to the beginning)
+    ///     in which case triggers hard stop and Exception
     /// </summary>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public GuiTestContext Focus<T> (Func<T,bool> evaluator) where T:View
+    public GuiTestContext Focus<T> (Func<T, bool> evaluator) where T : View
     {
-        var t = Application.Top;
+        Toplevel? t = Application.Top;
 
         HashSet<View> seen = new ();
 
         if (t == null)
         {
             Fail ("Application.Top was null when trying to set focus");
+
             return this;
         }
 
         do
         {
-            var next = t.MostFocused;
+            View? next = t.MostFocused;
 
             // Is view found?
             if (next is T v && evaluator (v))
@@ -716,13 +732,14 @@ public class GuiTestContext : IDisposable
             }
 
             // No, try tab to the next (or first)
-            this.Tab ();
+            Tab ();
             WaitIteration ();
             next = t.MostFocused;
 
             if (next is null)
             {
                 Fail ("Failed to tab to a view which matched the Type and evaluator constraints of the test because MostFocused became or was always null");
+
                 return this;
             }
 
@@ -734,22 +751,20 @@ public class GuiTestContext : IDisposable
 
                 return this;
             }
-
         }
         while (true);
     }
 
-
-
     private T Find<T> (Func<T, bool> evaluator) where T : View
     {
-        var t = Application.Top;
+        Toplevel? t = Application.Top;
 
         if (t == null)
         {
             Fail ("Application.Top was null when attempting to find view");
         }
-        var f = FindRecursive(t!, evaluator);
+
+        T? f = FindRecursive (t!, evaluator);
 
         if (f == null)
         {
@@ -761,7 +776,7 @@ public class GuiTestContext : IDisposable
 
     private T? FindRecursive<T> (View current, Func<T, bool> evaluator) where T : View
     {
-        foreach (var subview in current.SubViews)
+        foreach (View subview in current.SubViews)
         {
             if (subview is T match && evaluator (match))
             {
@@ -769,7 +784,8 @@ public class GuiTestContext : IDisposable
             }
 
             // Recursive call
-            var result = FindRecursive (subview, evaluator);
+            T? result = FindRecursive (subview, evaluator);
+
             if (result != null)
             {
                 return result;
@@ -783,8 +799,7 @@ public class GuiTestContext : IDisposable
     {
         Stop ();
 
-        throw new Exception (reason);
-
+        throw new (reason);
     }
 
     public GuiTestContext Send (Key key)
@@ -798,6 +813,7 @@ public class GuiTestContext : IDisposable
         {
             Fail ("Expected Application.Driver to be IConsoleDriverFacade");
         }
+
         return this;
     }
 }

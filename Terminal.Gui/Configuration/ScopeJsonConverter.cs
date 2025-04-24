@@ -96,6 +96,8 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                        // Logging.Trace ($"scopeT Read: {ex}");
                     }
                 }
+                //Logging.Warning ($"{propertyName} = {scope! [propertyName].PropertyValue}");
+
             }
             else
             {
@@ -147,7 +149,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
             }
         }
 
-        throw new JsonException ();
+        throw new JsonException ("ScopeJsonConverter");
     }
 
     public override void Write (Utf8JsonWriter writer, scopeT scope, JsonSerializerOptions options)

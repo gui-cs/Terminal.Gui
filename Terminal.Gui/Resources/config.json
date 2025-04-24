@@ -52,6 +52,9 @@
         "MessageBox.DefaultButtonAlignment": "Center",
         "MessageBox.DefaultBorderStyle": "Heavy",
         "Button.DefaultShadow": "Opaque",
+        "Menuv2.DefaultBorderStyle": "Single",
+        "MenuBarv2.DefaultBorderStyle": "None",
+        "StatusBar.DefaultSeparatorLineStyle": "Single",
         "ColorSchemes": [
           {
             "TopLevel": {
@@ -132,16 +135,16 @@
                 "Background": "DarkBlue"
               },
               "Focus": {
-                "Foreground": "White",
-                "Background": "Blue"
+                "Foreground": "DarkBlue",
+                "Background": "White"
               },
               "HotNormal": {
                 "Foreground": "Yellow",
                 "Background": "DarkBlue"
               },
               "HotFocus": {
-                "Foreground": "Yellow",
-                "Background": "Blue"
+                "Foreground": "Blue",
+                "Background": "White"
               },
               "Disabled": {
                 "Foreground": "Gray",
@@ -852,6 +855,18 @@
             }
           }
         ]
+      }
+    },
+    {
+      "Minimal": {
+        "Dialog.DefaultShadow": "None",
+        "FrameView.DefaultBorderStyle": "None",
+        "Window.DefaultBorderStyle": "None",
+        "MessageBox.DefaultBorderStyle": "None",
+        "Button.DefaultShadow": "None",
+        "Menuv2.DefaultBorderStyle": "None",
+        "Glyphs.LeftBracket": "[",
+        "Glyphs.RightBracket": "]"
       }
     }
   ]

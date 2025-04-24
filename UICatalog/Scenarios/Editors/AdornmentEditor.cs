@@ -61,8 +61,8 @@ public class AdornmentEditor : EditorBase
                 _adornment.Initialized += (sender, args) =>
                                           {
                                               ColorScheme? cs = _adornment.ColorScheme;
-                                              _foregroundColorPicker.SelectedColor = cs!.Normal.Foreground.GetClosestNamedColor16 ();
-                                              _backgroundColorPicker.SelectedColor = cs.Normal.Background.GetClosestNamedColor16 ();
+                                              _foregroundColorPicker.SelectedColor = _adornment.GetNormalColor ().Foreground.GetClosestNamedColor16 ();
+                                              _backgroundColorPicker.SelectedColor = _adornment.GetNormalColor ().Background.GetClosestNamedColor16 ();
                                           };
             }
 
@@ -220,7 +220,7 @@ public class AdornmentEditor : EditorBase
                        return;
                    }
 
-                   AdornmentToEdit.ColorScheme = new (AdornmentToEdit.ColorScheme)
+                   AdornmentToEdit.ColorScheme = new (AdornmentToEdit.ColorScheme ?? AdornmentToEdit.Parent?.ColorScheme)
                    {
                        Normal = new (_foregroundColorPicker.SelectedColor, _backgroundColorPicker.SelectedColor)
                    };

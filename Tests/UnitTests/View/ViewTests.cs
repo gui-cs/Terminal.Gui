@@ -10,9 +10,6 @@ public class ViewTests
     public ViewTests (ITestOutputHelper output)
     {
         _output = output;
-#if DEBUG_IDISPOSABLE
-        View.DebugIDisposable = true;
-#endif
     }
 
     // Generic lifetime (IDisposable) tests
@@ -295,11 +292,7 @@ public class ViewTests
         Assert.Null (r.Focused);
         Assert.Null (r.ColorScheme);
         Assert.False (r.IsCurrentTop);
-#if DEBUG
-        Assert.Equal ("Vertical View", r.Id);
-#else
         Assert.Equal (string.Empty, r.Id);
-#endif
         Assert.Empty (r.SubViews);
         Assert.False (r.WantContinuousButtonPressed);
         Assert.False (r.WantMousePositionReports);

@@ -1157,4 +1157,34 @@ Item 6",
             }
         }
     }
+
+    [Fact]
+    public void CollectionNavigatorMatcher_KeybindingsOverrideNavigator ()
+    {
+        Application.Top = new ();
+
+        ObservableCollection<string> source = new () { "apricot", "arm", "bat", "batman", "bates hotel", "candle" };
+        ListView lv = new ListView { Source = new ListWrapper<string> (source) };
+
+        Application.Top.Add (lv);
+        lv.SetFocus ();
+
+        lv.KeyBindings.Add (Key.B, Command.Down);
+
+        Assert.Equal (-1, lv.SelectedItem);
+
+        // Keys should be consumed to move down the navigation i.e. to apricot
+        Assert.True (Application.RaiseKeyDownEvent (Key.B));
+        Assert.Equal (0, lv.SelectedItem);
+
+        Assert.True (Application.RaiseKeyDownEvent (Key.B));
+        Assert.Equal (1, lv.SelectedItem);
+
+        // There is no keybinding for Key.C so it hits collection navigator i.e. we jump to candle
+        Assert.True (Application.RaiseKeyDownEvent (Key.C));
+        Assert.Equal (5, lv.SelectedItem);
+
+        Application.Top.Dispose ();
+        Application.ResetState ();
+    }
 }

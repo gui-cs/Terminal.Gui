@@ -54,6 +54,7 @@ internal class ShadowView : View
     /// <inheritdoc/>
     protected override bool OnDrawingContent ()
     {
+        SetAttribute (GetNormalColor ());
         switch (ShadowStyle)
         {
             case ShadowStyle.Opaque:

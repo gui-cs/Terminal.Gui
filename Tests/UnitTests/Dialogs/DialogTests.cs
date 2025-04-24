@@ -10,9 +10,6 @@ public class DialogTests
 
     public DialogTests (ITestOutputHelper output)
     {
-#if DEBUG_IDISPOSABLE
-        View.DebugIDisposable = true;
-#endif
         _output = output;
     }
 

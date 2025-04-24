@@ -16,15 +16,26 @@ public sealed class Generic : Scenario
         Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
+            BorderStyle = LineStyle.None
         };
 
-        var button = new Shortcut ()
+        var button = new Shortcut()
         {
+            CanFocus = true,
             Id = "button",
             X = Pos.Center (),
             Y = 1,
-            Text = "_Press me!"
+            ShadowStyle = ShadowStyle.None,
+            Text = "HelpText",
+            Title = "Command",
+            Key = Key.F10,
+            HighlightStyle = HighlightStyle.None
         };
+        button.ColorScheme = Colors.ColorSchemes ["Error"];
+
+        button.Padding!.Thickness = new (1);
+        button.Padding.ColorScheme = Colors.ColorSchemes ["Toplevel"];
+        button.Margin!.Thickness = new (1);
 
         button.Accepting += (s, e) =>
                             {
