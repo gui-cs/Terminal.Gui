@@ -49,13 +49,12 @@ public class TextFieldTests
 
         tf.Selecting += (sender, args) => Assert.Fail ("Selected should not be raied.");
 
-        Application.Top = new ();
-        Application.Top.Add (tf);
+        Toplevel top = new ();
+        top.Add (tf);
         tf.SetFocus ();
-        Application.RaiseKeyDownEvent (Key.Space);
+        top.NewKeyDownEvent (Key.Space);
 
-        Application.Top.Dispose ();
-        Application.ResetState (true);
+        top.Dispose ();
     }
 
     [Fact]
@@ -66,15 +65,14 @@ public class TextFieldTests
         var selectingCount = 0;
         tf.Selecting += (sender, args) => selectingCount++;
 
-        Application.Top = new ();
-        Application.Top.Add (tf);
+        Toplevel top = new ();
+        top.Add (tf);
         tf.SetFocus ();
-        Application.RaiseKeyDownEvent (Key.Enter);
+        top.NewKeyDownEvent (Key.Enter);
 
         Assert.Equal (0, selectingCount);
 
-        Application.Top.Dispose ();
-        Application.ResetState (true);
+        top.Dispose ();
     }
 
     [Fact]
@@ -85,15 +83,14 @@ public class TextFieldTests
         var acceptedCount = 0;
         tf.Accepting += (sender, args) => acceptedCount++;
 
-        Application.Top = new ();
-        Application.Top.Add (tf);
+        Toplevel top = new ();
+        top.Add (tf);
         tf.SetFocus ();
-        Application.RaiseKeyDownEvent (Key.Enter);
+        top.NewKeyDownEvent (Key.Enter);
 
         Assert.Equal (1, acceptedCount);
 
-        Application.Top.Dispose ();
-        Application.ResetState (true);
+        top.Dispose ();
     }
 
     [Fact]
