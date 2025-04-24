@@ -28,6 +28,12 @@ cd myproj
 dotnet run
 ```
 
+To run the UICatalog demo app that shows all the controls and features of the toolkit, use the following command:
+
+```powershell
+dotnet run --project Examples/UICatalog/UICatalog.csproj
+```
+
 There is also a [visual designer](https://github.com/gui-cs/TerminalGuiDesigner) (uses Terminal.Gui itself).
 
 ## Documentation 
