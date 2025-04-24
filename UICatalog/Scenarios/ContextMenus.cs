@@ -183,7 +183,7 @@ public class ContextMenus : Scenario
         {
             MenuItemv2 culture = new ();
 
-            culture.CommandView = new CheckBox { CanFocus = false, HighlightStyle = HighlightStyle.None };
+            culture.CommandView = new CheckBox { CanFocus = false };
 
             if (index == -1)
             {
@@ -199,7 +199,7 @@ public class ContextMenus : Scenario
 
                 index++;
                 culture = new ();
-                culture.CommandView = new CheckBox { CanFocus = false, HighlightStyle = HighlightStyle.None };
+                culture.CommandView = new CheckBox { CanFocus = false };
             }
 
             culture.Id = $"_{c.Parent.EnglishName}";
@@ -213,10 +213,6 @@ public class ContextMenus : Scenario
         }
 
         Menuv2 menu = new (supportedCultures.ToArray ());
-        menu.Border.LineStyle = LineStyle.None;
-        menu.Border.Thickness = new (0,0,0,0);
-
-       // menu.Padding.Thickness = new (1);
 
         return menu;
 

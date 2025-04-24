@@ -13,6 +13,17 @@ public static partial class Application // Keyboard handling
     /// <returns><see langword="true"/> if the key was handled.</returns>
     public static bool RaiseKeyDownEvent (Key key)
     {
+        Logging.Debug ($"{key}");
+
+        // TODO: Add a way to ignore certain keys, esp for debugging.
+        //#if DEBUG
+        //        if (key == Key.Empty.WithAlt || key == Key.Empty.WithCtrl)
+        //        {
+        //            Logging.Debug ($"Ignoring {key}");
+        //            return false;
+        //        }
+        //#endif
+
         // TODO: This should match standard event patterns
         KeyDown?.Invoke (null, key);
 

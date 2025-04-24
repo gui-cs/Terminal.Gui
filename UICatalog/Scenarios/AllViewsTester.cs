@@ -276,14 +276,29 @@ public class AllViewsTester : Scenario
             // For each of the <T> arguments
             List<Type> typeArguments = new ();
 
-            // use <object>
+            // use <object> or the original type if applicable
             foreach (Type arg in type.GetGenericArguments ())
             {
-                typeArguments.Add (typeof (object));
+                if (arg.IsValueType && Nullable.GetUnderlyingType (arg) == null)
+                {
+                    typeArguments.Add (arg);
+                }
+                else
+                {
+                    typeArguments.Add (typeof (object));
+                }
             }
 
-            // And change what type we are instantiating from MyClass<T> to MyClass<object>
+            // And change what type we are instantiating from MyClass<T> to MyClass<object> or MyClass<T>
             type = type.MakeGenericType (typeArguments.ToArray ());
+        }
+
+        // Ensure the type does not contain any generic parameters
+        if (type.ContainsGenericParameters)
+        {
+            Logging.Warning($"Cannot create an instance of {type} because it contains generic parameters.");
+            //throw new ArgumentException ($"Cannot create an instance of {type} because it contains generic parameters.");
+            return;
         }
 
         // Instantiate view
@@ -315,7 +330,6 @@ public class AllViewsTester : Scenario
 
         view.Id = "_curView";
         _curView = view;
-        _curView = view;
 
         _hostPane!.Add (_curView);
         _layoutEditor!.ViewToEdit = _curView;
@@ -323,6 +337,7 @@ public class AllViewsTester : Scenario
         _arrangementEditor!.ViewToEdit = _curView;
         _curView.SetNeedsLayout ();
     }
+
 
     private void DisposeCurrentView ()
     {

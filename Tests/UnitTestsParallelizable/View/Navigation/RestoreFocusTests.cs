@@ -3,6 +3,7 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
+[Collection ("Global Test Setup")]
 public class RestoreFocusTests () : TestsAllViews
 {
     [Fact]

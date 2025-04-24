@@ -45,6 +45,8 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         frame.BeginInit ();
         frame.EndInit ();
         frame.LayoutSubViews ();
+        frame.Dispose ();
+        Application.Shutdown ();
 
         // What's the natural width/height?
         int expectedX = (frame.Frame.Width - view.Frame.Width) / 2;
@@ -59,7 +61,6 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
                      view.Frame.Top == expectedY,
                      $"{view} did not center vertically. Expected: {expectedY}. Actual: {view.Frame.Top}"
                     );
-        Application.Shutdown ();
     }
 
 }

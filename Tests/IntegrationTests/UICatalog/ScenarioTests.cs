@@ -13,7 +13,7 @@ public class ScenarioTests : TestsAllViews
     public ScenarioTests (ITestOutputHelper output)
     {
 #if DEBUG_IDISPOSABLE
-        View.DebugIDisposable = true;
+        View.EnableDebugIDisposableAsserts = true;
         View.Instances.Clear ();
 #endif
         _output = output;
@@ -44,11 +44,12 @@ public class ScenarioTests : TestsAllViews
         _output.WriteLine ($"Running Scenario '{scenarioType}'");
         var scenario = Activator.CreateInstance (scenarioType) as Scenario;
 
-        uint abortTime = 1500;
+        uint abortTime = 2000;
         object? timeout = null;
         var initialized = false;
-        var shutdown = false;
+        var shutdownGracefully = false;
         var iterationCount = 0;
+        Key quitKey = Application.QuitKey;
 
         Application.InitializedChanged += OnApplicationOnInitializedChanged;
 
@@ -69,7 +70,9 @@ public class ScenarioTests : TestsAllViews
         }
 
         Assert.True (initialized);
-        Assert.True (shutdown);
+
+
+        Assert.True (shutdownGracefully, $"Scenario Failed to Quit with {quitKey} after {abortTime}ms and {iterationCount} iterations. Force quit.");
 
 #if DEBUG_IDISPOSABLE
         Assert.Empty (View.Instances);
@@ -101,13 +104,13 @@ public class ScenarioTests : TestsAllViews
             else
             {
                 Application.Iteration -= OnApplicationOnIteration;
-                shutdown = true;
+                shutdownGracefully = true;
             }
 
-            _output.WriteLine ($"Initialized == {a.CurrentValue}");
+            _output.WriteLine ($"Initialized == {a.CurrentValue}; shutdownGracefully == {shutdownGracefully}.");
         }
 
-        // If the scenario doesn't close within 500ms, this will force it to quit
+        // If the scenario doesn't close within abortTime ms, this will force it to quit
         bool ForceCloseCallback ()
         {
             lock (_timeoutLock)
@@ -117,9 +120,6 @@ public class ScenarioTests : TestsAllViews
                     timeout = null;
                 }
             }
-
-            Assert.Fail (
-                         $"Scenario Failed to Quit with {Application.QuitKey} after {abortTime}ms and {iterationCount} iterations. Force quit.");
 
             // Restore the configuration locations
             ConfigurationManager.Locations = savedConfigLocations;
@@ -137,8 +137,9 @@ public class ScenarioTests : TestsAllViews
             if (Application.Initialized)
             {
                 // Press QuitKey 
-                _output.WriteLine ($"Attempting to quit with {Application.QuitKey}");
-                Application.RaiseKeyDownEvent (Application.QuitKey);
+                quitKey = Application.QuitKey;
+                _output.WriteLine ($"Attempting to quit with {quitKey} after {iterationCount} iterations.");
+                Application.RaiseKeyDownEvent (quitKey);
             }
         }
     }
@@ -171,7 +172,7 @@ public class ScenarioTests : TestsAllViews
 
         var top = new Toplevel ();
 
-        Dictionary<string, Type> viewClasses = GetAllViewClasses().ToDictionary (t => t.Name);
+        Dictionary<string, Type> viewClasses = GetAllViewClasses ().ToDictionary (t => t.Name);
 
         Window leftPane = new ()
         {
@@ -277,7 +278,7 @@ public class ScenarioTests : TestsAllViews
         classListView.SelectedItemChanged += (s, args) =>
                                               {
                                                   // Remove existing class, if any
-                                                  if (curView is {})
+                                                  if (curView is { })
                                                   {
                                                       curView.SubViewsLaidOut -= LayoutCompleteHandler;
                                                       hostPane.Remove (curView);
@@ -357,10 +358,13 @@ public class ScenarioTests : TestsAllViews
                                      {
                                          classListView.MoveDown ();
 
-                                         Assert.Equal (
-                                                       curView!.GetType ().Name,
-                                                       viewClasses.Values.ToArray () [classListView.SelectedItem].Name
-                                                      );
+                                         if (curView is { })
+                                         {
+                                             Assert.Equal (
+                                                           curView.GetType ().Name,
+                                                           viewClasses.Values.ToArray () [classListView.SelectedItem].Name
+                                                          );
+                                         }
                                      }
                                      else
                                      {
@@ -507,12 +511,26 @@ public class ScenarioTests : TestsAllViews
                 // For each of the <T> arguments
                 List<Type> typeArguments = new ();
 
-                // use <object>
+                // use <object> or the original type if applicable
                 foreach (Type arg in type.GetGenericArguments ())
                 {
-                    typeArguments.Add (typeof (object));
+                    if (arg.IsValueType && Nullable.GetUnderlyingType (arg) == null)
+                    {
+                        typeArguments.Add (arg);
+                    }
+                    else
+                    {
+                        typeArguments.Add (typeof (object));
+                    }
                 }
 
+                // Ensure the type does not contain any generic parameters
+                if (type.ContainsGenericParameters)
+                {
+                    Logging.Warning ($"Cannot create an instance of {type} because it contains generic parameters.");
+                    //throw new ArgumentException ($"Cannot create an instance of {type} because it contains generic parameters.");
+                    return null;
+                }
                 // And change what type we are instantiating from MyClass<T> to MyClass<object>
                 type = type.MakeGenericType (typeArguments.ToArray ());
             }

@@ -2,6 +2,8 @@
 
 namespace Terminal.Gui;
 
+#pragma warning disable CS0618 // Type or member is obsolete
+
 /// <summary>
 ///     An internal class used to represent a menu pop-up menu. Created and managed by <see cref="MenuBar"/>.
 /// </summary>

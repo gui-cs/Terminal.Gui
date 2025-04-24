@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿using System.Collections.Concurrent;
+
+namespace Terminal.Gui;
 
 /// <summary>The execution state for a <see cref="Toplevel"/> view.</summary>
 public class RunState : IDisposable
@@ -22,10 +24,7 @@ public class RunState : IDisposable
         Dispose (true);
         GC.SuppressFinalize (this);
 #if DEBUG_IDISPOSABLE
-        if (View.DebugIDisposable)
-        {
-            WasDisposed = true;
-        }
+        WasDisposed = true;
 #endif
     }
 
@@ -45,22 +44,32 @@ public class RunState : IDisposable
     }
 
 #if DEBUG_IDISPOSABLE
-    /// <summary>For debug (see DEBUG_IDISPOSABLE define) purposes to verify objects are being disposed properly</summary>
-    public bool WasDisposed;
+    /// <summary>
+    ///     Gets whether <see cref="Dispose"/> was called on this RunState or not.
+    ///     For debug purposes to verify objects are being disposed properly.
+    ///     Only valid when DEBUG_IDISPOSABLE is defined.
+    /// </summary>
+    public bool WasDisposed { get; private set; }
 
-    /// <summary>For debug (see DEBUG_IDISPOSABLE define) purposes to verify objects are being disposed properly</summary>
-    public int DisposedCount = 0;
+    /// <summary>
+    ///     Gets the number of times <see cref="Dispose"/> was called on this object.
+    ///     For debug purposes to verify objects are being disposed properly.
+    ///     Only valid when DEBUG_IDISPOSABLE is defined.
+    /// </summary>
+    public int DisposedCount { get; private set; } = 0;
 
-    /// <summary>For debug (see DEBUG_IDISPOSABLE define) purposes; the runstate instances that have been created</summary>
-    public static List<RunState> Instances = new ();
+    /// <summary>
+    ///     Gets the list of RunState objects that have been created and not yet disposed.
+    ///     Note, this is a static property and will affect all RunState objects.
+    ///     For debug purposes to verify objects are being disposed properly.
+    ///     Only valid when DEBUG_IDISPOSABLE is defined.
+    /// </summary>
+    public static ConcurrentBag<RunState> Instances { get; private set; } = [];
 
     /// <summary>Creates a new RunState object.</summary>
     public RunState ()
     {
-        if (View.DebugIDisposable)
-        {
-            Instances.Add (this);
-        }
+        Instances.Add (this);
     }
 #endif
 }

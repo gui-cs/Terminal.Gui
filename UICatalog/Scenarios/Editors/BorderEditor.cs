@@ -77,7 +77,7 @@ public class BorderEditor : AdornmentEditor
         void OnRbBorderStyleOnSelectedItemChanged (object? s, SelectedItemChangedArgs args)
         {
             LineStyle prevBorderStyle = AdornmentToEdit!.BorderStyle;
-            ((Border)AdornmentToEdit).LineStyle = (LineStyle)args.SelectedItem;
+            ((Border)AdornmentToEdit).LineStyle = (LineStyle)args.SelectedItem!;
 
             if (((Border)AdornmentToEdit).LineStyle == LineStyle.None)
             {

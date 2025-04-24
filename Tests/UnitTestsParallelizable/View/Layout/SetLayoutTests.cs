@@ -1,6 +1,8 @@
-﻿namespace Terminal.Gui.LayoutTests;
+﻿using UnitTests.Parallelizable;
 
-public class SetLayoutTests
+namespace Terminal.Gui.LayoutTests;
+
+public class SetLayoutTests : GlobalTestSetup
 {
     [Fact]
     public void Add_Does_Not_Call_Layout ()

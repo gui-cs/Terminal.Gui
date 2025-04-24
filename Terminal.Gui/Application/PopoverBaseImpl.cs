@@ -41,7 +41,7 @@ public abstract class PopoverBaseImpl : View, IPopover
         {
             if (!Visible)
             {
-                return null;
+                return false;
             }
 
             Visible = false;
@@ -54,11 +54,22 @@ public abstract class PopoverBaseImpl : View, IPopover
     protected override bool OnVisibleChanging ()
     {
         bool ret = base.OnVisibleChanging ();
-        if (!ret && !Visible)
+        if (ret is not true)
         {
-            // Whenever visible is changing to true, we need to resize;
-            // it's our only chance because we don't get laid out until we're visible
-            Layout (Application.Screen.Size);
+            if (!Visible)
+            {
+                // Whenever visible is changing to true, we need to resize;
+                // it's our only chance because we don't get laid out until we're visible
+                Layout (Application.Screen.Size);
+            }
+            else
+            {
+                // Whenever visible is changing to false, we need to reset the focus
+                if (ApplicationNavigation.IsInHierarchy(this, Application.Navigation?.GetFocused ()))
+                {
+                   Application.Navigation?.SetFocused (Application.Top?.MostFocused);
+                }
+            }
         }
 
         return ret;

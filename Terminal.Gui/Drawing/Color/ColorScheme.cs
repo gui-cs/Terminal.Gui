@@ -4,6 +4,9 @@ using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
+// TODO: Rename "ColorScheme"->"AttributeScheme" given we'll soon have non-color information in Attributes?
+// TODO: See https://github.com/gui-cs/Terminal.Gui/issues/457
+
 /// <summary>Defines a standard set of <see cref="Attribute"/>s for common visible elements in a <see cref="View"/>.</summary>
 /// <remarks>
 ///     <para>

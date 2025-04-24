@@ -245,7 +245,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             {
                 // If CanFocus is set to false and this view has focus, make it leave focus
                 // Set transversing down so we don't go back up the hierarchy...
-                SetHasFocusFalse (null, false);
+                SetHasFocusFalse (null);
             }
 
             if (_canFocus && !HasFocus && Visible && SuperView is { Focused: null })
@@ -319,7 +319,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     {
         //Logging.Trace($"RaiseFocusedChanged: {focused.Title}");
         OnFocusedChanged (previousFocused, focused);
-        FocusedChanged?.Invoke (this, new HasFocusEventArgs (true, true, previousFocused, focused));
+        FocusedChanged?.Invoke (this, new (true, true, previousFocused, focused));
     }
 
     /// <summary>
@@ -395,10 +395,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <summary>
     ///     Clears any focus state (e.g. the previously focused subview) from this view.
     /// </summary>
-    public void ClearFocus ()
-    {
-        _previouslyFocused = null;
-    }
+    public void ClearFocus () { _previouslyFocused = null; }
 
     private View? FindDeepestFocusableView (NavigationDirection direction, TabBehavior? behavior)
     {
@@ -523,11 +520,17 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <exception cref="InvalidOperationException"></exception>
     private (bool focusSet, bool cancelled) SetHasFocusTrue (View? currentFocusedView, bool traversingUp = false)
     {
-        Debug.Assert (SuperView is null || View.IsInHierarchy (SuperView, this));
+        Debug.Assert (SuperView is null || IsInHierarchy (SuperView, this));
 
         // Pre-conditions
         if (_hasFocus)
         {
+            //// See https://github.com/gui-cs/Terminal.Gui/pull/4013#issuecomment-2823934197
+            //if (Application.Navigation is { } && (Application.Navigation.GetFocused () == this || Application.Navigation.GetFocused () == MostFocused))
+            //{
+            //    throw new InvalidOperationException (@"Do not SetFocus on a view that is already MostFocused.");
+            //}
+
             return (false, false);
         }
 

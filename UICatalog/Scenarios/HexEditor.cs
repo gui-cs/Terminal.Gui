@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿#nullable enable
+
+using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -11,14 +13,14 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Files and IO")]
 public class HexEditor : Scenario
 {
-    private string _fileName = "demo.bin";
-    private HexView _hexView;
-    private MenuItemv2 _miAllowEdits;
+    private string? _fileName;
+    private HexView? _hexView;
+    private MenuItemv2? _miAllowEdits;
     private bool _saved = true;
-    private Shortcut _scAddress;
-    private Shortcut _scInfo;
-    private Shortcut _scPosition;
-    private StatusBar _statusBar;
+    private Shortcut? _scAddress;
+    private Shortcut? _scInfo;
+    private Shortcut? _scPosition;
+    private StatusBar? _statusBar;
 
     public override void Main ()
     {
@@ -29,6 +31,7 @@ public class HexEditor : Scenario
             ColorScheme = Colors.ColorSchemes ["Base"]
         };
 
+        _fileName = "demo.bin";
         CreateDemoFile (_fileName);
 
         _hexView = new (new MemoryStream (Encoding.UTF8.GetBytes ("Demo text.")))
@@ -55,20 +58,20 @@ public class HexEditor : Scenario
                      "_File",
                      new MenuItemv2 []
                      {
-                         new ("_New", "", () => New ()),
-                         new ("_Open", "", () => Open ()),
-                         new ("_Save", "", () => Save ()),
-                         null,
-                         new ("_Quit", "", () => Quit ())
+                         new ("_New", "", New),
+                         new ("_Open", "", Open),
+                         new ("_Save", "", Save),
+                         null!,                     // Passing null automatically creates a separator (a Line object).
+                         new ("_Quit", "", Quit)
                      }
                     ),
                 new (
                      "_Edit",
                      new MenuItemv2 []
                      {
-                         new ("_Copy", "", () => Copy ()),
-                         new ("C_ut", "", () => Cut ()),
-                         new ("_Paste", "", () => Paste ())
+                         new ("_Copy", "", Copy),
+                         new ("C_ut", "", Cut),
+                         new ("_Paste", "", Paste)
                      }
                     ),
                 new (
@@ -78,7 +81,7 @@ public class HexEditor : Scenario
                          _miAllowEdits = new (
                                               "_AllowEdits",
                                               "",
-                                              () => ToggleAllowEdits ()
+                                              ToggleAllowEdits
                                              )
                          {
 
@@ -164,16 +167,16 @@ public class HexEditor : Scenario
         Application.Shutdown ();
     }
 
-    private void _hexView_Edited (object sender, HexViewEditEventArgs e) { _saved = false; }
+    private void _hexView_Edited (object? sender, HexViewEditEventArgs e) { _saved = false; }
 
-    private void _hexView_PositionChanged (object sender, HexViewEventArgs obj)
+    private void _hexView_PositionChanged (object? sender, HexViewEventArgs obj)
     {
-        _scInfo.Title =
-            $"Bytes: {_hexView.Source!.Length}";
-        _scPosition.Title =
+        _scInfo!.Title =
+            $"Bytes: {_hexView!.Source!.Length}";
+        _scPosition!.Title =
             $"L: {obj.Position.Y} C: {obj.Position.X} Per Line: {obj.BytesPerLine}";
 
-        if (_scAddress.CommandView is NumericUpDown<long> addrNumericUpDown)
+        if (_scAddress!.CommandView is NumericUpDown<long> addrNumericUpDown)
         {
             addrNumericUpDown.Value = obj.Address;
         }
@@ -212,7 +215,7 @@ public class HexEditor : Scenario
     {
         var stream = new MemoryStream ();
 
-        if (!_saved && _hexView.Edits.Count > 0)
+        if (!_saved && _hexView!.Edits.Count > 0 && _hexView.Source is {})
         {
             if (MessageBox.ErrorQuery (
                                        "Save",
@@ -229,16 +232,16 @@ public class HexEditor : Scenario
             _saved = true;
         }
 
-        if (_fileName != null)
+        if (_fileName is { })
         {
             byte [] bin = File.ReadAllBytes (_fileName);
             stream.Write (bin);
-            _hexView.Title = _fileName;
+            _hexView!.Title = _fileName;
             _saved = true;
         }
         else
         {
-            _hexView.Title = _fileName ?? "Untitled";
+            _hexView!.Title = _fileName ?? "Untitled";
         }
 
         return stream;
@@ -247,7 +250,7 @@ public class HexEditor : Scenario
     private void New ()
     {
         _fileName = null;
-        _hexView.Source = LoadFile ();
+        _hexView!.Source = LoadFile ();
     }
 
     private void Open ()
@@ -258,7 +261,7 @@ public class HexEditor : Scenario
         if (!d.Canceled)
         {
             _fileName = d.FilePaths [0];
-            _hexView.Source = LoadFile ();
+            _hexView!.Source = LoadFile ();
             //_hexView.DisplayStart = 0;
         }
 
@@ -274,7 +277,7 @@ public class HexEditor : Scenario
         {
             using (var fs = new FileStream (_fileName, FileMode.OpenOrCreate))
             {
-                _hexView.ApplyEdits (fs);
+                _hexView?.ApplyEdits (fs);
 
                 //_hexView.Source.Position = 0;
                 //_hexView.Source.CopyTo (fs);
@@ -285,18 +288,17 @@ public class HexEditor : Scenario
         }
         else
         {
-            _hexView.ApplyEdits ();
+            _hexView!.ApplyEdits ();
         }
     }
 
     private void ToggleAllowEdits ()
     {
-        CheckBox? cb = _miAllowEdits.CommandView as CheckBox;
-        if (cb is null)
+        if (_miAllowEdits?.CommandView is not CheckBox cb)
         {
             return;
         }
 
-        _hexView.AllowEdits = cb.CheckedState == CheckState.Checked;
+        _hexView!.AllowEdits = cb.CheckedState == CheckState.Checked;
     }
 }

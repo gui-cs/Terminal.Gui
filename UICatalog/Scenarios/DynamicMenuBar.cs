@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Terminal.Gui;
+
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace UICatalog.Scenarios;
 
