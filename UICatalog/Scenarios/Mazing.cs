@@ -197,7 +197,9 @@ public class Mazing : Scenario
         // Optional win condition:
         if (_m.Player == _m.End)
         {
+            var hp = _m.PlayerHp;
             _m = new (); // Generate a new maze
+            _m.PlayerHp = hp;
             GenerateNpcs ();
             Application.Top!.SetNeedsDraw (); // trigger redraw
         }
