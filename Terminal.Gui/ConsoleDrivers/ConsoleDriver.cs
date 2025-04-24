@@ -691,6 +691,40 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
     public abstract void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
 
+    internal char _highSurrogate = '\0';
+
+    internal bool IsValidInput (KeyCode keyCode, out KeyCode result)
+    {
+        result = keyCode;
+
+        if (char.IsHighSurrogate ((char)keyCode))
+        {
+            _highSurrogate = (char)keyCode;
+
+            return false;
+        }
+
+        if (_highSurrogate > 0 && char.IsLowSurrogate ((char)keyCode))
+        {
+            result = (KeyCode)new Rune (_highSurrogate, (char)keyCode).Value;
+            _highSurrogate = '\0';
+
+            return true;
+        }
+
+        if (char.IsSurrogate ((char)keyCode))
+        {
+            return false;
+        }
+
+        if (_highSurrogate > 0)
+        {
+            _highSurrogate = '\0';
+        }
+
+        return true;
+    }
+
     #endregion
 
     private AnsiRequestScheduler? _scheduler;

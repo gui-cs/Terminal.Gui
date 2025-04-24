@@ -729,21 +729,11 @@ public class TextField : View
     /// <param name="useOldCursorPos">Use the previous cursor position.</param>
     public void InsertText (string toAdd, bool useOldCursorPos = true)
     {
-        foreach (char ch in toAdd)
+        foreach (Rune rune in toAdd.EnumerateRunes ())
         {
-            Key key;
-
-            try
-            {
-                key = ch;
-            }
-            catch (Exception)
-            {
-                throw new ArgumentException (
-                                             $"Cannot insert character '{ch}' because it does not map to a Key"
-                                            );
-            }
-
+            // All rune can be mapped to a Key and no exception will throw here because
+            // EnumerateRunes will replace a surrogate char with the Rune.ReplacementChar
+            Key key = rune.Value;
             InsertText (key, useOldCursorPos);
         }
     }
@@ -1072,14 +1062,20 @@ public class TextField : View
     /// <summary>Paste the selected text from the clipboard.</summary>
     public virtual void Paste ()
     {
-        if (ReadOnly || string.IsNullOrEmpty (Clipboard.Contents))
+        if (ReadOnly)
+        {
+            return;
+        }
+
+        string cbTxt = Clipboard.Contents.Split ("\n") [0] ?? "";
+
+        if (string.IsNullOrEmpty (cbTxt))
         {
             return;
         }
 
         SetSelectedStartSelectedLength ();
         int selStart = _start == -1 ? CursorPosition : _start;
-        string cbTxt = Clipboard.Contents.Split ("\n") [0] ?? "";
 
         Text = StringExtensions.ToString (_text.GetRange (0, selStart))
                + cbTxt
@@ -1114,7 +1110,7 @@ public class TextField : View
             TextModel.SetCol (ref col, Viewport.Width - 1, cols);
         }
 
-        int pos = _cursorPosition - ScrollOffset + Math.Min (Viewport.X, 0);
+        int pos = col - ScrollOffset + Math.Min (Viewport.X, 0);
         Move (pos, 0);
 
         return new Point (pos, 0);
