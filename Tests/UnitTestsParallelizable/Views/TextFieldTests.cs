@@ -459,7 +459,7 @@ public class TextFieldTests
     {
         var tf = new TextField
         {
-            Text = "Hello",
+            Text = "Hello"
         };
         tf.SetFocus ();
         tf.SelectAll ();
@@ -475,12 +475,13 @@ public class TextFieldTests
         // Now that the selection is cleared another right keypress should move focus
         Assert.False (tf.NewKeyDownEvent (Key.CursorRight));
     }
+
     [Fact]
     public void Left_CursorAtStart_WithSelection_ShouldClearSelection ()
     {
         var tf = new TextField
         {
-            Text = "Hello",
+            Text = "Hello"
         };
         tf.SetFocus ();
 
@@ -501,6 +502,7 @@ public class TextFieldTests
         // Now that the selection is cleared another left keypress should move focus
         Assert.False (tf.NewKeyDownEvent (Key.CursorLeft));
     }
+
     [Fact]
     public void Autocomplete_Visible_False_By_Default ()
     {
