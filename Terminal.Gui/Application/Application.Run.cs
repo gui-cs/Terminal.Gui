@@ -98,7 +98,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         var rs = new RunState (toplevel);
 
 #if DEBUG_IDISPOSABLE
-        if (View.DebugIDisposable && Top is { } && toplevel != Top && !TopLevels.Contains (Top))
+        if (View.EnableDebugIDisposableAsserts && Top is { } && toplevel != Top && !TopLevels.Contains (Top))
         {
             // This assertion confirm if the Top was already disposed
             Debug.Assert (Top.WasDisposed);
@@ -192,6 +192,11 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             toplevel.BeginInit ();
             toplevel.EndInit (); // Calls Layout
         }
+
+        // Call ConfigurationManager Apply here to ensure all subscribers to ConfigurationManager.Applied
+        // can update their state appropriately.
+        // BUGBUG: DO NOT DO THIS. Leave this commented out until we can figure out how to do this right
+        //Apply ();
 
         // Try to set initial focus to any TabStop
         if (!toplevel.HasFocus)
@@ -426,7 +431,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
     internal static void LayoutAndDrawImpl (bool forceDraw = false)
     {
-        List<View> tops = [..TopLevels];
+        List<View> tops = [.. TopLevels];
 
         if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
         {
@@ -479,7 +484,10 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         for (state.Toplevel.Running = true; state.Toplevel?.Running == true;)
         {
-            MainLoop!.Running = true;
+            if (MainLoop is { })
+            {
+                MainLoop.Running = true;
+            }
 
             if (EndAfterFirstIteration && !firstIteration)
             {
@@ -489,7 +497,10 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             firstIteration = RunIteration (ref state, firstIteration);
         }
 
-        MainLoop!.Running = false;
+        if (MainLoop is { })
+        {
+            MainLoop.Running = false;
+        }
 
         // Run one last iteration to consume any outstanding input events from Driver
         // This is important for remaining OnKeyUp events.
@@ -505,7 +516,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     public static bool RunIteration (ref RunState state, bool firstIteration = false)
     {
         // If the driver has events pending do an iteration of the driver MainLoop
-        if (MainLoop!.Running && MainLoop.EventsPending ())
+        if (MainLoop is { Running: true } && MainLoop.EventsPending ())
         {
             // Notify Toplevel it's ready
             if (firstIteration)
@@ -529,7 +540,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         if (PositionCursor ())
         {
-            Driver!.UpdateCursor ();
+            Driver?.UpdateCursor ();
         }
 
         return firstIteration;
@@ -564,7 +575,14 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     {
         ArgumentNullException.ThrowIfNull (runState);
 
-        Popover?.Hide (Popover?.GetActivePopover ());
+        if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
+        {
+            // TODO: Build a use/test case for the popover not handling Quit
+            if (visiblePopover.InvokeCommand (Command.Quit) is true && visiblePopover.Visible)
+            {
+                visiblePopover.Visible = false;
+            }
+        }
 
         runState.Toplevel.OnUnloaded ();
 

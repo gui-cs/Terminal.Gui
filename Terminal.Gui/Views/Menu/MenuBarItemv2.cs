@@ -4,7 +4,7 @@ namespace Terminal.Gui;
 
 /// <summary>
 ///     A <see cref="Shortcut"/>-derived object to be used as items in a <see cref="MenuBarv2"/>.
-///     MenuBarItems have a title, a hotkey, and an action to execute on activation.
+///     MenuBarItems hold a <see cref="PopoverMenu"/> instead of a <see cref="SubMenu"/>.
 /// </summary>
 public class MenuBarItemv2 : MenuItemv2
 {
@@ -74,7 +74,7 @@ public class MenuBarItemv2 : MenuItemv2
                 null,
                 Command.NotBound,
                 commandText,
-                new (menuItems))
+                new (menuItems) { Title = $"PopoverMenu for {commandText}" })
     { }
 
     /// <summary>
@@ -87,10 +87,81 @@ public class MenuBarItemv2 : MenuItemv2
         set => throw new InvalidOperationException ("MenuBarItem does not support SubMenu. Use PopoverMenu instead.");
     }
 
+    private PopoverMenu? _popoverMenu;
+
     /// <summary>
     ///     The Popover Menu that will be displayed when this item is selected.
     /// </summary>
-    public PopoverMenu? PopoverMenu { get; set; }
+    public PopoverMenu? PopoverMenu
+    {
+        get => _popoverMenu;
+        set
+        {
+            if (_popoverMenu == value)
+            {
+                return;
+            }
+
+            if (_popoverMenu is { })
+            {
+                _popoverMenu.VisibleChanged -= OnPopoverVisibleChanged;
+                _popoverMenu.Accepted -= OnPopoverMenuOnAccepted;
+            }
+
+            _popoverMenu = value;
+
+            if (_popoverMenu is { })
+            {
+                PopoverMenuOpen = _popoverMenu.Visible;
+                _popoverMenu.VisibleChanged += OnPopoverVisibleChanged;
+                _popoverMenu.Accepted += OnPopoverMenuOnAccepted;
+            }
+
+            return;
+
+            void OnPopoverVisibleChanged (object? sender, EventArgs args)
+            {
+                Logging.Debug ($"OnPopoverVisibleChanged - {Title} - Visible = {_popoverMenu?.Visible} ");
+                PopoverMenuOpen = _popoverMenu?.Visible ?? false;
+            }
+
+            void OnPopoverMenuOnAccepted (object? sender, CommandEventArgs args)
+            {
+                Logging.Debug ($"OnPopoverMenuOnAccepted - {Title} - {args.Context?.Source?.Title} - {args.Context?.Command}");
+                RaiseAccepted (args.Context);
+            }
+        }
+    }
+
+    private bool _popoverMenuOpen;
+
+    /// <summary>
+    ///     Gets or sets whether the MenuBarItem is active. This is used to determine if the MenuBarItem should be
+    /// </summary>
+    public bool PopoverMenuOpen
+    {
+        get => _popoverMenuOpen;
+        set
+        {
+            if (_popoverMenuOpen == value)
+            {
+                return;
+            }
+            _popoverMenuOpen = value;
+
+            RaisePopoverMenuOpenChanged();
+        }
+    }
+
+    public void RaisePopoverMenuOpenChanged ()
+    {
+        OnPopoverMenuOpenChanged();
+        PopoverMenuOpenChanged?.Invoke (this, new EventArgs<bool> (PopoverMenuOpen));
+    }
+
+    protected virtual void OnPopoverMenuOpenChanged () {}
+
+    public event EventHandler<EventArgs<bool>>? PopoverMenuOpenChanged;
 
     /// <inheritdoc />
     protected override bool OnKeyDownNotHandled (Key key)
@@ -110,6 +181,12 @@ public class MenuBarItemv2 : MenuItemv2
             return true;
         }
         return false;
+    }
+
+    /// <inheritdoc/>
+    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
+    {
+        Logging.Debug ($"CanFocus = {CanFocus}, HasFocus = {HasFocus}");
     }
 
     /// <inheritdoc/>

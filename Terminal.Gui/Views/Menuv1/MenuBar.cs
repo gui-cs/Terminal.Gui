@@ -35,6 +35,7 @@ namespace Terminal.Gui;
 ///         duplicates a shortcut (e.g. _File and Alt-F), the hot key wins.
 ///     </para>
 /// </remarks>
+[Obsolete ("Use MenuBarv2 instead.", false)]
 public class MenuBar : View, IDesignable
 {
     // Spaces before the Title
@@ -1680,7 +1681,7 @@ public class MenuBar : View, IDesignable
 
 
     /// <inheritdoc />
-    public bool EnableForDesign<TContext> (ref readonly TContext context) where TContext : notnull
+    public bool EnableForDesign<TContext> (ref TContext context) where TContext : notnull
     {
         if (context is not Func<string, bool> actionFn)
         {

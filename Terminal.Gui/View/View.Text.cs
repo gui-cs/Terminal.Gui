@@ -68,12 +68,6 @@ public partial class View // Text Property APIs
 
             UpdateTextFormatterText ();
             SetNeedsLayout ();
-#if DEBUG
-            if (_text is { } && string.IsNullOrEmpty (Id))
-            {
-                Id = _text;
-            }
-#endif
             OnTextChanged ();
         }
     }

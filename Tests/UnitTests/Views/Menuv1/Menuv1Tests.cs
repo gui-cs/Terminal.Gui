@@ -4,6 +4,7 @@
 
 namespace Terminal.Gui.ViewsTests;
 
+#pragma warning disable CS0618 // Type or member is obsolete
 public class Menuv1Tests
 {
     private readonly ITestOutputHelper _output;

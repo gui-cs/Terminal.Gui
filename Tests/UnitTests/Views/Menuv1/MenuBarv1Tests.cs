@@ -3,6 +3,7 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
+#pragma warning disable CS0618 // Type or member is obsolete
 public class MenuBarv1Tests (ITestOutputHelper output)
 {
     [Fact]
@@ -3884,3 +3885,4 @@ Edit
         }
     }
 }
+#pragma warning restore CS0618 // Type or member is obsolete

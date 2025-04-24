@@ -1,5 +1,4 @@
-using System;
-using System.Reflection;
+#nullable enable
 
 namespace Terminal.Gui;
 
@@ -23,16 +22,45 @@ public class StatusBar : Bar, IDesignable
         Y = Pos.AnchorEnd ();
         Width = Dim.Fill ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
-        BorderStyle = LineStyle.Dashed;
-        ColorScheme = Colors.ColorSchemes ["Menu"];
 
-        SubViewLayout += StatusBar_LayoutStarted;
+        if (Border is { })
+        {
+            Border.LineStyle = DefaultSeparatorLineStyle;
+        }
+
+        base.ColorScheme = Colors.ColorSchemes ["Menu"];
+
+        Applied += OnConfigurationManagerApplied;
+        SuperViewChanged += OnSuperViewChanged;
     }
 
-    // StatusBar arranges the items horizontally.
-    // The first item has no left border, the last item has no right border.
-    // The Shortcuts are configured with the command, help, and key views aligned in reverse order (EndToStart).
-    private void StatusBar_LayoutStarted (object sender, LayoutEventArgs e)
+    private void OnSuperViewChanged (object? sender, SuperViewChangedEventArgs e)
+    {
+        if (SuperView is null)
+        {
+            // BUGBUG: This is a hack for avoiding a race condition in ConfigurationManager.Apply
+            // BUGBUG: For some reason in some unit tests, when Top is disposed, MenuBar.Dispose does not get called.
+            // BUGBUG: Yet, the MenuBar does get Removed from Top (and it's SuperView set to null).
+            // BUGBUG: Related: https://github.com/gui-cs/Terminal.Gui/issues/4021
+            Applied -= OnConfigurationManagerApplied;
+        }
+    }
+    private void OnConfigurationManagerApplied (object? sender, ConfigurationManagerEventArgs e)
+    {
+        if (Border is { })
+        {
+            Border.LineStyle = DefaultSeparatorLineStyle;
+        }
+    }
+
+    /// <summary>
+    ///     Gets or sets the default Line Style for the separators between the shortcuts of the StatusBar.
+    /// </summary>
+    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static LineStyle DefaultSeparatorLineStyle { get; set; } = LineStyle.Dashed;
+
+    /// <inheritdoc />
+    protected override void OnSubViewLayout (LayoutEventArgs args)
     {
         for (int index = 0; index < SubViews.Count; index++)
         {
@@ -40,13 +68,9 @@ public class StatusBar : Bar, IDesignable
 
             barItem.BorderStyle = BorderStyle;
 
-            if (index == SubViews.Count - 1)
+            if (barItem.Border is { })
             {
-                barItem.Border.Thickness = new Thickness (0, 0, 0, 0);
-            }
-            else
-            {
-                barItem.Border.Thickness = new Thickness (0, 0, 1, 0);
+                barItem.Border.Thickness = index == SubViews.Count - 1 ? new Thickness (0, 0, 0, 0) : new Thickness (0, 0, 1, 0);
             }
 
             if (barItem is Shortcut shortcut)
@@ -54,6 +78,7 @@ public class StatusBar : Bar, IDesignable
                 shortcut.Orientation = Orientation.Horizontal;
             }
         }
+        base.OnSubViewLayout (args);
     }
 
     /// <inheritdoc/>
@@ -108,7 +133,7 @@ public class StatusBar : Bar, IDesignable
             Text = "I'll Hide",
             // Visible = false
         };
-        button1.Accepting += Button_Clicked;
+        button1.Accepting += OnButtonClicked;
         Add (button1);
 
         shortcut.Accepting += (s, e) =>
@@ -135,7 +160,15 @@ public class StatusBar : Bar, IDesignable
 
         return true;
 
-        void Button_Clicked (object sender, EventArgs e) { MessageBox.Query ("Hi", $"You clicked {sender}"); }
+        void OnButtonClicked (object? sender, EventArgs? e) { MessageBox.Query ("Hi", $"You clicked {sender}"); }
     }
 
+    /// <inheritdoc />
+    protected override void Dispose (bool disposing)
+    {
+        base.Dispose (disposing);
+
+        SuperViewChanged -= OnSuperViewChanged;
+        Applied -= OnConfigurationManagerApplied;
+    }
 }

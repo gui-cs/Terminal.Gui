@@ -92,7 +92,7 @@ public class ConfigurationEditor : Scenario
                 return;
             }
 
-            foreach (ConfigTextView t in _tabView.SubViews.Where (v => v is ConfigTextView).Cast<ConfigTextView> ())
+            foreach (ConfigTextView t in _tabView.SubViews.OfType<ConfigTextView> ())
             {
                 t.ColorScheme = EditorColorScheme;
             }
@@ -125,7 +125,7 @@ public class ConfigurationEditor : Scenario
             {
                 Title = config.Value.StartsWith ("resource://") ? fileInfo.Name : config.Value,
                 Width = Dim.Fill (),
-                Height = Dim.Fill(),
+                Height = Dim.Fill (),
                 FileInfo = fileInfo,
             };
 
@@ -160,7 +160,7 @@ public class ConfigurationEditor : Scenario
 
     private void Quit ()
     {
-        foreach (ConfigTextView editor in _tabView!.Tabs.Select(v =>
+        foreach (ConfigTextView editor in _tabView!.Tabs.Select (v =>
                                                                 {
                                                                     if (v.View is ConfigTextView ctv)
                                                                     {
@@ -248,7 +248,8 @@ public class ConfigurationEditor : Scenario
             {
                 Text = ConfigurationManager.RuntimeConfig!;
 
-            } else if (!FileInfo.Exists)
+            }
+            else if (!FileInfo.Exists)
             {
                 // Create empty config file
                 Text = ConfigurationManager.GetEmptyJson ();
