@@ -63,11 +63,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StressTests", "Tests\Stress
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.Parallelizable", "Tests\UnitTestsParallelizable\UnitTests.Parallelizable.csproj", "{DE780834-190A-8277-51FD-750CC666E82D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerminalGuiFluentTesting", "TerminalGuiFluentTesting\TerminalGuiFluentTesting.csproj", "{2DBA7BDC-17AE-474B-A507-00807D087607}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerminalGuiFluentTesting", "Tests\TerminalGuiFluentTesting\TerminalGuiFluentTesting.csproj", "{2DBA7BDC-17AE-474B-A507-00807D087607}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerminalGuiFluentTestingXunit", "TerminalGuiFluentTestingXunit\TerminalGuiFluentTestingXunit.csproj", "{F56BAFFD-F227-4B0A-96F0-C800FAEF2036}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerminalGuiFluentTestingXunit", "Tests\TerminalGuiFluentTestingXunit\TerminalGuiFluentTestingXunit.csproj", "{F56BAFFD-F227-4B0A-96F0-C800FAEF2036}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerminalGuiFluentTestingXunit.Generator", "TerminalGuiFluentTestingXunit.Generator\TerminalGuiFluentTestingXunit.Generator.csproj", "{199F27D8-A905-4DDC-82CA-1FE1A90B1788}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerminalGuiFluentTestingXunit.Generator", "Tests\TerminalGuiFluentTestingXunit.Generator\TerminalGuiFluentTestingXunit.Generator.csproj", "{199F27D8-A905-4DDC-82CA-1FE1A90B1788}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
