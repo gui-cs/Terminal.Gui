@@ -111,7 +111,6 @@ public class MenuItemv2 : Shortcut
 
         if (commandContext is CommandContext<KeyBinding> keyCommandContext)
         {
-
             if (SubMenu is { Visible: true } && (keyCommandContext.Command == Command.Select || keyCommandContext.Command == Command.Accept))
             {
                 // Our submenu is open; and user pressed enter or clicked, set focus to it
@@ -126,7 +125,6 @@ public class MenuItemv2 : Shortcut
                 Logging.Debug ($"{Title} - SubMenu Visible; HotKey - {keyCommandContext.Command}");
                 return false;
             }
-
 
             if (keyCommandContext.Binding.Key is { } && keyCommandContext.Binding.Key == Application.QuitKey && SuperView is { Visible: true })
             {

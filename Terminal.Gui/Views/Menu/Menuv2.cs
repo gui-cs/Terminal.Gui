@@ -68,10 +68,10 @@ public class Menuv2 : Bar, IDesignable
     }
 
     /// <summary>
-    ///     Gets or sets the default Border Style for Menus. The default is <see cref="LineStyle.Single"/>.
+    ///     Gets or sets the default Border Style for Menus.
     /// </summary>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
+    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Rounded;
 
     private MenuItemv2? _superMenuItem;
 
@@ -225,7 +225,7 @@ public class Menuv2 : Bar, IDesignable
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override bool OnAccepting (CommandEventArgs args)
     {
         // When the user accepts a menuItem, Menu.RaiseAccepting is called, and we intercept that here.
@@ -261,7 +261,7 @@ public class Menuv2 : Bar, IDesignable
         // We need to propagate Command.Accept to the SuperMenuItem if it exists.
         var ret = false;
 
-        if (SuperMenuItem is { })
+        if (args.Context is CommandContext<KeyBinding> { Binding.Key: { } } keyCommandContext && keyCommandContext.Binding.Key == Application.QuitKey)
         {
             Logging.Debug ($"{Title} - Invoking Accept on SuperMenuItem: {SuperMenuItem?.Title}...");
             ret = SuperMenuItem?.InvokeCommand (Command.Accept, args.Context) is true;
@@ -493,7 +493,7 @@ public class Menuv2 : Bar, IDesignable
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override void Dispose (bool disposing)
     {
         base.Dispose (disposing);

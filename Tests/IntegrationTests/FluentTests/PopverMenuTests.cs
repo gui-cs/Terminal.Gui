@@ -241,7 +241,6 @@ public class PopoverMenuTests (ITestOutputHelper outputHelper)
                                      .Stop ();
     }
 
-
     [Theory]
     [ClassData (typeof (V2TestDrivers))]
     public void RootMenu_MenuItem_WithSubMenu_HotKey_Activates_SubMenu (V2TestDriver d)

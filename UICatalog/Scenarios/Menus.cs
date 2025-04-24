@@ -129,7 +129,6 @@ public class Menus : Scenario
         {
             CanFocus = true;
             BorderStyle = LineStyle.Dashed;
-            
             AddCommand (
                         Command.Context,
                         ctx =>
@@ -172,7 +171,6 @@ public class Menus : Scenario
             };
 
             Add (lastCommandLabel, lastCommandText);
-
 
             AddCommand (Command.New, HandleCommand);
             HotKeyBindings.Add (Key.F2, Command.New);
