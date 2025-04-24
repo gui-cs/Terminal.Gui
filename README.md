@@ -43,21 +43,22 @@ See the [`Terminal.Gui/`README](https://github.com/gui-cs/Terminal.Gui/tree/mast
 
 ## Showcase & Examples
 
-**Terminal.Gui** can be used with any .Net language to create feature rich and robust applications.  
-[Showcase](https://github.com/gui-cs/Terminal.Gui/blob/develop/Showcase.md) is a place where you can find all kind of projects from simple examples to advanced real world apps that fully utilize capabilities of the toolkit.  
-The team is looking forward to seeing new amazing projects made by the community to be added there!
+* The [./Examples/UICatalog](./Examples/UICatalog) project is a showcase of all the controls and features of the toolkit. There are more examples in the [./Examples](./Examples) folder.
+
+* [Showcase](https://github.com/gui-cs/Terminal.Gui/blob/develop/Showcase.md) is a place where you can find all kind of projects from simple examples to advanced real world apps that fully utilize capabilities of the toolkit. The team is looking forward to seeing new amazing projects made by the community to be added there!
 
 ## Sample Usage in C#
 
 The following example shows a basic Terminal.Gui application in C#:  
-[Example (source)](./Example/Example.cs)
+[Example (source)](./Examples/Example/Example.cs)
 
 When run the application looks as follows:
 
 ![Simple Usage app](./docfx/images/Example.png)
 
 ## Sample usage in F#  
-F# examples are located [here](./FSharpExample/Program.fs)
+
+An F# example is located [here](./Examples/FSharpExample/Program.fs).
 
 ## Installing
 
