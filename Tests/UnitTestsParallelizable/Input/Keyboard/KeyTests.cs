@@ -52,7 +52,8 @@ public class KeyTests
             { "Ctrl-A", Key.A.WithCtrl },
             { "Alt-A", Key.A.WithAlt },
             { "A-Ctrl", Key.A.WithCtrl },
-            { "Alt-A-Ctrl", Key.A.WithCtrl.WithAlt }
+            { "Alt-A-Ctrl", Key.A.WithCtrl.WithAlt },
+            { "📄", (KeyCode)0x1F4C4 }
         };
 
     [Theory]
@@ -120,9 +121,12 @@ public class KeyTests
     [InlineData ('\'', (KeyCode)'\'')]
     [InlineData ('\xFFFF', (KeyCode)0xFFFF)]
     [InlineData ('\x0', (KeyCode)0x0)]
-    public void Cast_Char_To_Key (char ch, KeyCode expectedKeyCode)
+    public void Cast_Char_Int_To_Key (char ch, KeyCode expectedKeyCode)
     {
         var key = (Key)ch;
+        Assert.Equal (expectedKeyCode, key.KeyCode);
+
+        key = (int)ch;
         Assert.Equal (expectedKeyCode, key.KeyCode);
     }
 
@@ -140,23 +144,25 @@ public class KeyTests
     [InlineData (KeyCode.A | KeyCode.ShiftMask, KeyCode.A | KeyCode.ShiftMask)]
     [InlineData (KeyCode.Z, KeyCode.Z)]
     [InlineData (KeyCode.Space, KeyCode.Space)]
-    public void Cast_KeyCode_To_Key (KeyCode cdk, KeyCode expected)
+    public void Cast_KeyCode_Int_To_Key (KeyCode cdk, KeyCode expected)
     {
-        // explicit
+        // KeyCode
         var key = (Key)cdk;
         Assert.Equal (((Key)expected).ToString (), key.ToString ());
 
-        // implicit
-        key = cdk;
+        // Int
+        key = key.AsRune.Value;
         Assert.Equal (((Key)expected).ToString (), key.ToString ());
     }
 
     // string cast operators
-    [Fact]
-    public void Cast_String_To_Key ()
+    [Theory]
+    [InlineData ("Ctrl+Q", KeyCode.Q | KeyCode.CtrlMask)]
+    [InlineData ("📄", (KeyCode)0x1F4C4)]
+    public void Cast_String_To_Key (string str, KeyCode expectedKeyCode)
     {
-        var key = (Key)"Ctrl+Q";
-        Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, key.KeyCode);
+        var key = (Key)str;
+        Assert.Equal (expectedKeyCode, key.KeyCode);
     }
 
     [Theory]
@@ -190,11 +196,36 @@ public class KeyTests
     [InlineData ('\'', (KeyCode)'\'')]
     [InlineData ('\xFFFF', (KeyCode)0xFFFF)]
     [InlineData ('\x0', (KeyCode)0x0)]
-    public void Constructor_Char (char ch, KeyCode expectedKeyCode)
+    public void Constructor_Char_Int (char ch, KeyCode expectedKeyCode)
     {
         var key = new Key (ch);
         Assert.Equal (expectedKeyCode, key.KeyCode);
+
+        key = new ((int)ch);
+        Assert.Equal (expectedKeyCode, key.KeyCode);
     }
+
+    [Theory]
+    [InlineData (0x1F4C4, (KeyCode)0x1F4C4, "📄")]
+    [InlineData (0x1F64B, (KeyCode)0x1F64B, "🙋")]
+    [InlineData (0x1F46A, (KeyCode)0x1F46A, "👪")]
+    public void Constructor_Int_Non_Bmp (int value, KeyCode expectedKeyCode, string expectedString)
+    {
+        var key = new Key (value);
+        Assert.Equal (expectedKeyCode, key.KeyCode);
+        Assert.Equal (expectedString, key.AsRune.ToString ());
+        Assert.Equal (expectedString, key.ToString ());
+    }
+
+    [Theory]
+    [InlineData (-1)]
+    [InlineData (0x11FFFF)]
+    public void Constructor_Int_Invalid_Throws (int keyInt) { Assert.Throws<ArgumentOutOfRangeException> (() => new Key (keyInt)); }
+
+    [Theory]
+    [InlineData ('\ud83d')]
+    [InlineData ('\udcc4')]
+    public void Constructor_Int_Surrogate_Throws (int keyInt) { Assert.Throws<ArgumentException> (() => new Key (keyInt)); }
 
     [Fact]
     public void Constructor_Default_ShouldSetKeyToNull ()
