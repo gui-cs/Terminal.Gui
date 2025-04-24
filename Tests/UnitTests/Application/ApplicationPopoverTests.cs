@@ -1,11 +1,9 @@
-﻿using static System.Net.Mime.MediaTypeNames;
-
-namespace Terminal.Gui.ApplicationTests;
+﻿namespace Terminal.Gui.ApplicationTests;
 
 public class ApplicationPopoverTests
 {
     [Fact]
-    public void ApplicationInit_Initializes_PopoverManager ()
+    public void Application_Init_Initializes_PopoverManager ()
     {
         // Arrange
         Assert.Null (Application.Popover);
@@ -18,7 +16,7 @@ public class ApplicationPopoverTests
     }
 
     [Fact]
-    public void Application_Shutdown_CleansUp_PopoverManager ()
+    public void Application_Shutdown_Resets_PopoverManager ()
     {
         // Arrange
         Assert.Null (Application.Popover);
@@ -34,7 +32,7 @@ public class ApplicationPopoverTests
     }
 
     [Fact]
-    public void Application_End_Does_Not_CleanedUp ()
+    public void Application_End_Does_Not_Reset_PopoverManager ()
     {
         // Arrange
         Assert.Null (Application.Popover);
@@ -79,8 +77,8 @@ public class ApplicationPopoverTests
         Assert.False (popover.Visible);
         Assert.NotNull (Application.Popover);
 
-        popover.Dispose ();
         Application.Shutdown ();
+        Assert.Equal (1, popover.DisposedCount);
     }
 
     [Fact]
@@ -97,7 +95,7 @@ public class ApplicationPopoverTests
         Application.Shutdown ();
 
         // Test
-        Assert.Equal(1, popover.DisposedCount);
+        Assert.Equal (1, popover.DisposedCount);
     }
 
     [Fact]
@@ -119,6 +117,7 @@ public class ApplicationPopoverTests
         Assert.Equal (0, popover.DisposedCount);
 
         popover.Dispose ();
+        Assert.Equal (1, popover.DisposedCount);
     }
 
     [Fact]
@@ -131,6 +130,7 @@ public class ApplicationPopoverTests
         PopoverTestClass popover = new ();
 
         Application.Popover?.Show (popover);
+        Application.Popover?.DeRegister (popover);
 
         // Act
         Application.Shutdown ();
@@ -139,9 +139,10 @@ public class ApplicationPopoverTests
         Assert.Equal (0, popover.DisposedCount);
 
         popover.Dispose ();
+        Assert.Equal (1, popover.DisposedCount);
     }
 
-    public class PopoverTestClass : View, IPopover
+    public class PopoverTestClass : PopoverBaseImpl
     {
         public List<Key> HandledKeys { get; } = [];
         public int NewCommandInvokeCount { get; private set; }
@@ -168,15 +169,15 @@ public class ApplicationPopoverTests
         protected override bool OnKeyDown (Key key)
         {
             HandledKeys.Add (key);
+
             return false;
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         protected override void Dispose (bool disposing)
         {
             base.Dispose (disposing);
             DisposedCount++;
         }
     }
-
 }

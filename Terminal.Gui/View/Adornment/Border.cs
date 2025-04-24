@@ -201,6 +201,7 @@ public class Border : Adornment
                    );
     }
 
+    // TODO: Make LineStyle nullable https://github.com/gui-cs/Terminal.Gui/issues/4021
     /// <summary>
     ///     Sets the style of the border by changing the <see cref="Thickness"/>. This is a helper API for setting the
     ///     <see cref="Thickness"/> to <c>(1,1,1,1)</c> and setting the line style of the views that comprise the border. If

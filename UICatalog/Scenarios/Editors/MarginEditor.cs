@@ -41,9 +41,9 @@ public class MarginEditor : AdornmentEditor
             _rgShadow.SelectedItem = (int)((Margin)AdornmentToEdit).ShadowStyle;
         }
 
-        _rgShadow.SelectedItemChanged += (sender, args) =>
+        _rgShadow.SelectedItemChanged += (_, args) =>
                                         {
-                                            ((Margin)AdornmentToEdit!).ShadowStyle = (ShadowStyle)args.SelectedItem;
+                                            ((Margin)AdornmentToEdit!).ShadowStyle = (ShadowStyle)args.SelectedItem!;
                                         };
 
         Add (_rgShadow);

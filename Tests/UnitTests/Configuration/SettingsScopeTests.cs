@@ -95,7 +95,7 @@ public class SettingsScopeTests
         Locations = ConfigLocations.Default;
         Reset ();
 
-        Assert.Equal (5, ((Dictionary<string, ThemeScope>)Settings ["Themes"].PropertyValue).Count);
+        Assert.Equal (6, ((Dictionary<string, ThemeScope>)Settings ["Themes"].PropertyValue).Count);
 
         GetHardCodedDefaults ();
         Assert.NotEmpty (Themes);

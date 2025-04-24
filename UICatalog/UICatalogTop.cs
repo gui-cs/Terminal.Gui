@@ -18,7 +18,7 @@ namespace UICatalog;
 ///     This is the main UI Catalog app view. It is run fresh when the app loads (if a Scenario has not been passed on
 ///     the command line) and each time a Scenario ends.
 /// </summary>
-public class UICatalogTopLevel : Toplevel
+public class UICatalogTop : Toplevel
 {
     // When a scenario is run, the main app is killed. The static
     // members are cached so that when the scenario exits the
@@ -27,12 +27,15 @@ public class UICatalogTopLevel : Toplevel
     // Theme Management
     public static string? CachedTheme { get; set; }
 
+    // Note, we used to pass this to scenarios that run, but it just added complexity
+    // So that was removed. But we still have this here to demonstrate how changing
+    // the scheme works.
     public static string? CachedTopLevelColorScheme { get; set; }
 
     // Diagnostics
     private static ViewDiagnosticFlags _diagnosticFlags;
 
-    public UICatalogTopLevel ()
+    public UICatalogTop ()
     {
         _diagnosticFlags = Diagnostics;
 
@@ -58,8 +61,6 @@ public class UICatalogTopLevel : Toplevel
 
     private void LoadedHandler (object? sender, EventArgs? args)
     {
-        ConfigChanged ();
-
         if (_disableMouseCb is { })
         {
             _disableMouseCb.CheckedState = Application.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
@@ -89,23 +90,25 @@ public class UICatalogTopLevel : Toplevel
         Loaded -= LoadedHandler;
         _categoryList!.EnsureSelectedItemVisible ();
         _scenarioList.EnsureSelectedCellIsVisible ();
+
+        Apply ();
+
     }
 
     private void UnloadedHandler (object? sender, EventArgs? args)
     {
         Applied -= ConfigAppliedHandler;
         Unloaded -= UnloadedHandler;
-        Dispose ();
     }
 
     #region MenuBar
 
     private readonly MenuBarv2? _menuBar;
     private CheckBox? _force16ColorsMenuItemCb;
-    private RadioGroup? _themesRg;
-    private RadioGroup? _topSchemeRg;
-    private RadioGroup? _logLevelRg;
-    private FlagSelector? _diagnosticFlagsSelector;
+    private OptionSelector? _themesRg;
+    private OptionSelector? _topSchemeRg;
+    private OptionSelector? _logLevelRg;
+    private FlagSelector<ViewDiagnosticFlags>? _diagnosticFlagsSelector;
     private CheckBox? _disableMouseCb;
 
     private MenuBarv2 CreateMenuBar ()
@@ -115,11 +118,14 @@ public class UICatalogTopLevel : Toplevel
                                      new (
                                           "_File",
                                           [
-                                              new MenuItemv2 (
-                                                              "_Quit",
-                                                              "Quit UI Catalog",
-                                                              RequestStop
-                                                             )
+                                              new MenuItemv2 ()
+                                              {
+                                                  Title ="_Quit",
+                                                  HelpText = "Quit UI Catalog",
+                                                  Key = Application.QuitKey,
+                                                  // By not specifying TargetView the Key Binding will be Application-level
+                                                  Command = Command.Quit
+                                              }
                                           ]),
                                      new ("_Themes", CreateThemeMenuItems ()),
                                      new ("Diag_nostics", CreateDiagnosticMenuItems ()),
@@ -151,7 +157,11 @@ public class UICatalogTopLevel : Toplevel
                                                               Key.A.WithCtrl
                                                              )
                                           ])
-                                 ]);
+                                 ])
+        {
+            Title = "menuBar",
+            Id = "menuBar"
+        };
 
         return menuBar;
 
@@ -181,12 +191,16 @@ public class UICatalogTopLevel : Toplevel
 
             menuItems.Add (new Line ());
 
-            _themesRg = new ();
+            _themesRg = new ()
+            {
+                HighlightStyle = HighlightStyle.None,
+                SelectedItem = Themes.Keys.ToList ().IndexOf (CachedTheme!.Replace ("_", string.Empty))
+            };
 
             _themesRg.SelectedItemChanged += (_, args) =>
             {
-                Themes!.Theme = Themes!.Keys.ToArray () [args.SelectedItem];
-                CachedTheme = Themes!.Keys.ToArray () [args.SelectedItem];
+                Themes!.Theme = Themes!.Keys.ToArray () [args.SelectedItem!.Value];
+                CachedTheme = Themes!.Keys.ToArray () [args.SelectedItem!.Value];
                 Apply ();
                 SetNeedsDraw ();
             };
@@ -201,11 +215,15 @@ public class UICatalogTopLevel : Toplevel
 
             menuItems.Add (new Line ());
 
-            _topSchemeRg = new ();
+            _topSchemeRg = new ()
+            {
+                HighlightStyle = HighlightStyle.None,
+                SelectedItem = Colors.ColorSchemes.Keys.ToList().IndexOf(CachedTopLevelColorScheme!)
+            };
 
             _topSchemeRg.SelectedItemChanged += (_, args) =>
             {
-                CachedTopLevelColorScheme = Colors.ColorSchemes.Keys.ToArray () [args.SelectedItem];
+                CachedTopLevelColorScheme = Colors.ColorSchemes.Keys.ToArray () [args.SelectedItem!.Value];
                 ColorScheme = Colors.ColorSchemes [CachedTopLevelColorScheme];
                 SetNeedsDraw ();
             };
@@ -236,17 +254,18 @@ public class UICatalogTopLevel : Toplevel
 
             _diagnosticFlagsSelector = new ()
             {
-                CanFocus = false,
+                CanFocus = true,
                 Styles = FlagSelectorStyles.ShowNone,
-                HighlightStyle = HighlightStyle.None
+                HighlightStyle = HighlightStyle.None,
             };
-            _diagnosticFlagsSelector.SetFlags<ViewDiagnosticFlags> ();
-
+            _diagnosticFlagsSelector.UsedHotKeys.Add (Key.D);
+            _diagnosticFlagsSelector.AssignHotKeysToCheckBoxes = true;
+            _diagnosticFlagsSelector.Value = Diagnostics;
             _diagnosticFlagsSelector.ValueChanged += (sender, args) =>
-            {
-                _diagnosticFlags = (ViewDiagnosticFlags)_diagnosticFlagsSelector.Value;
-                Diagnostics = _diagnosticFlags;
-            };
+                                                     {
+                                                         _diagnosticFlags = (ViewDiagnosticFlags)_diagnosticFlagsSelector.Value;
+                                                         Diagnostics = _diagnosticFlags;
+                                                     };
 
             menuItems.Add (
                            new MenuItemv2
@@ -283,14 +302,15 @@ public class UICatalogTopLevel : Toplevel
 
             _logLevelRg = new ()
             {
-                AssignHotKeysToRadioLabels = true,
-                RadioLabels = Enum.GetNames<LogLevel> (),
-                SelectedItem = logLevels.ToList ().IndexOf (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel))
+                AssignHotKeysToCheckBoxes = true,
+                Options = Enum.GetNames<LogLevel> (),
+                SelectedItem = logLevels.ToList ().IndexOf (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel)),
+                HighlightStyle = HighlightStyle.Hover
             };
 
             _logLevelRg.SelectedItemChanged += (_, args) =>
             {
-                UICatalog.Options = UICatalog.Options with { DebugLogLevel = Enum.GetName (logLevels [args.SelectedItem])! };
+                UICatalog.Options = UICatalog.Options with { DebugLogLevel = Enum.GetName (logLevels [args.SelectedItem!.Value])! };
 
                 UICatalog.LogLevelSwitch.MinimumLevel =
                     UICatalog.LogLevelToLogEventLevel (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel));
@@ -326,9 +346,9 @@ public class UICatalogTopLevel : Toplevel
             return;
         }
 
-        _themesRg.AssignHotKeysToRadioLabels = true;
+        _themesRg.AssignHotKeysToCheckBoxes = true;
         _themesRg.UsedHotKeys.Clear ();
-        _themesRg.RadioLabels = Themes!.Keys.ToArray ();
+        _themesRg.Options = Themes!.Keys.ToArray ();
         _themesRg.SelectedItem = Themes.Keys.ToList ().IndexOf (CachedTheme!.Replace ("_", string.Empty));
 
         if (_topSchemeRg is null)
@@ -336,10 +356,10 @@ public class UICatalogTopLevel : Toplevel
             return;
         }
 
-        _topSchemeRg.AssignHotKeysToRadioLabels = true;
+        _topSchemeRg.AssignHotKeysToCheckBoxes = true;
         _topSchemeRg.UsedHotKeys.Clear ();
-        int selected = _topSchemeRg.SelectedItem;
-        _topSchemeRg.RadioLabels = Colors.ColorSchemes.Keys.ToArray ();
+        int? selected = _topSchemeRg.SelectedItem;
+        _topSchemeRg.Options = Colors.ColorSchemes.Keys.ToArray ();
         _topSchemeRg.SelectedItem = selected;
 
         if (CachedTopLevelColorScheme is null || !Colors.ColorSchemes.ContainsKey (CachedTopLevelColorScheme))
@@ -563,6 +583,7 @@ public class UICatalogTopLevel : Toplevel
     [JsonPropertyName ("UICatalog.StatusBar")]
     public static bool ShowStatusBar { get; set; } = true;
 
+    private Shortcut? _shQuit;
     private Shortcut? _shVersion;
     private CheckBox? _force16ColorsShortcutCb;
 
@@ -581,6 +602,13 @@ public class UICatalogTopLevel : Toplevel
                                      minimumContentDim: Dim.Func (() => statusBar.Visible ? 1 : 0),
                                      maximumContentDim: Dim.Func (() => statusBar.Visible ? 1 : 0));
         // ReSharper restore All
+
+        _shQuit = new ()
+        {
+            CanFocus = false,
+            Title = "Quit",
+            Key = Application.QuitKey
+        };
 
         _shVersion = new ()
         {
@@ -616,12 +644,7 @@ public class UICatalogTopLevel : Toplevel
         };
 
         statusBar.Add (
-                       new Shortcut
-                       {
-                           CanFocus = false,
-                           Title = "Quit",
-                           Key = Application.QuitKey
-                       },
+                       _shQuit,
                        statusBarShortcut,
                        new Shortcut
                        {
@@ -640,7 +663,11 @@ public class UICatalogTopLevel : Toplevel
     #endregion StatusBar
 
     #region Configuration Manager
-    public void ConfigChanged ()
+
+    /// <summary>
+    ///     Called when CM has applied changes.
+    /// </summary>
+    private void ConfigApplied ()
     {
         CachedTheme = Themes?.Theme;
 
@@ -648,16 +675,23 @@ public class UICatalogTopLevel : Toplevel
 
         ColorScheme = Colors.ColorSchemes [CachedTopLevelColorScheme!];
 
-        ((Shortcut)_statusBar!.SubViews.ElementAt (0)).Key = Application.QuitKey;
-        _statusBar.Visible = ShowStatusBar;
+        if (_shQuit is { })
+        {
+            _shQuit.Key = Application.QuitKey;
+        }
+
+        if (_statusBar is { })
+        {
+            _statusBar.Visible = ShowStatusBar;
+        }
 
         _disableMouseCb!.CheckedState = Application.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
         _force16ColorsShortcutCb!.CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
 
-        Application.Top!.SetNeedsDraw ();
+        Application.Top?.SetNeedsDraw ();
     }
 
-    private void ConfigAppliedHandler (object? sender, ConfigurationManagerEventArgs? a) { ConfigChanged (); }
+    private void ConfigAppliedHandler (object? sender, ConfigurationManagerEventArgs? a) { ConfigApplied (); }
 
     #endregion Configuration Manager
 

@@ -55,7 +55,7 @@ public class MenuItemv2 : Shortcut
     { }
 
     /// <inheritdoc/>
-    public MenuItemv2 (string commandText, Key key, Action ? action = null)
+    public MenuItemv2 (string commandText, Key key, Action? action = null)
         : base (key ?? Key.Empty, commandText, action, null)
     { }
 
@@ -104,34 +104,74 @@ public class MenuItemv2 : Shortcut
 
     internal override bool? DispatchCommand (ICommandContext? commandContext)
     {
-        Logging.Trace($"{commandContext?.Source?.Title}");
+        Logging.Debug ($"{Title} - {commandContext?.Source?.Title} Command: {commandContext?.Command}");
         bool? ret = null;
 
-        if (commandContext is { Command: not Command.HotKey })
+        bool quit = false;
+
+        if (commandContext is CommandContext<KeyBinding> keyCommandContext)
+        {
+            if (keyCommandContext.Binding.Key is { } && keyCommandContext.Binding.Key == Application.QuitKey && SuperView is { Visible: true })
+            {
+                // This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
+                Logging.Debug ($"{Title} - Ignoring Key = Application.QuitKey/Command = Command.Quit");
+                quit = true;
+                //ret = true;
+            }
+        }
+
+        // Translate the incoming command to Command
+        if (Command != Command.NotBound && commandContext is { })
+        {
+            commandContext.Command = Command;
+        }
+
+        if (!quit)
         {
             if (TargetView is { })
             {
-                commandContext.Command = Command;
+                Logging.Debug ($"{Title} - InvokeCommand on TargetView ({TargetView.Title})...");
                 ret = TargetView.InvokeCommand (Command, commandContext);
             }
             else
             {
                 // Is this an Application-bound command?
+                Logging.Debug ($"{Title} - Application.InvokeCommandsBoundToKey ({Key})...");
                 ret = Application.InvokeCommandsBoundToKey (Key);
             }
         }
 
         if (ret is not true)
         {
-            Logging.Trace($"Calling base.DispatchCommand");
+            Logging.Debug ($"{Title} - calling base.DispatchCommand...");
+            // Base will Raise Selected, then Accepting, then invoke the Action, if any
             ret = base.DispatchCommand (commandContext);
         }
 
-        Logging.Trace($"Calling RaiseAccepted");
-        RaiseAccepted (commandContext);
+        if (ret is true)
+        {
+            Logging.Debug ($"{Title} - Calling RaiseAccepted");
+            RaiseAccepted (commandContext);
+        }
 
         return ret;
     }
+
+    ///// <inheritdoc />
+    //protected override bool OnAccepting (CommandEventArgs e)
+    //{
+    //    Logging.Debug ($"{Title} - calling base.OnAccepting: {e.Context?.Command}");
+    //    bool? ret = base.OnAccepting (e);
+
+    //    if (ret is true || e.Cancel)
+    //    {
+    //        return true;
+    //    }
+
+    //    //RaiseAccepted (e.Context);
+
+    //    return ret is true;
+    //}
 
     private Menuv2? _subMenu;
 
@@ -147,6 +187,7 @@ public class MenuItemv2 : Shortcut
 
             if (_subMenu is { })
             {
+                SubMenu!.Visible = false;
                 // TODO: This is a temporary hack - add a flag or something instead
                 KeyView.Text = $"{Glyphs.RightArrow}";
                 _subMenu.SuperMenuItem = this;
@@ -173,15 +214,13 @@ public class MenuItemv2 : Shortcut
     /// </summary>
     /// <param name="ctx"></param>
     /// <returns></returns>
-    protected bool? RaiseAccepted (ICommandContext? ctx)
+    protected void RaiseAccepted (ICommandContext? ctx)
     {
-        Logging.Trace ($"RaiseAccepted: {ctx}");
+        //Logging.Trace ($"RaiseAccepted: {ctx}");
         CommandEventArgs args = new () { Context = ctx };
 
         OnAccepted (args);
         Accepted?.Invoke (this, args);
-
-        return true;
     }
 
     /// <summary>

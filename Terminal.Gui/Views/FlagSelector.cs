@@ -1,12 +1,11 @@
 ﻿#nullable enable
 namespace Terminal.Gui;
 
-
 /// <summary>
 ///     Provides a user interface for displaying and selecting flags.
 ///     Flags can be set from a dictionary or directly from an enum type.
 /// </summary>
-public class FlagSelector : View, IDesignable, IOrientation
+public class FlagSelector : View, IOrientation, IDesignable
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="FlagSelector"/> class.
@@ -25,17 +24,17 @@ public class FlagSelector : View, IDesignable, IOrientation
         // Accept (Enter key or DoubleClick) - Raise Accept event - DO NOT advance state
         AddCommand (Command.Accept, HandleAcceptCommand);
 
-        CreateSubViews ();
+        CreateCheckBoxes ();
     }
 
     private bool? HandleAcceptCommand (ICommandContext? ctx) { return RaiseAccepting (ctx); }
 
-    private uint _value;
+    private uint? _value;
 
     /// <summary>
     /// Gets or sets the value of the selected flags.
     /// </summary>
-    public uint Value
+    public uint? Value
     {
         get => _value;
         set
@@ -47,19 +46,19 @@ public class FlagSelector : View, IDesignable, IOrientation
 
             _value = value;
 
-            if (_value == 0)
+            if (_value is null)
             {
+                UncheckNone ();
                 UncheckAll ();
             }
             else
             {
-                UncheckNone ();
                 UpdateChecked ();
             }
 
             if (ValueEdit is { })
             {
-                ValueEdit.Text = value.ToString ();
+                ValueEdit.Text = _value.ToString ();
             }
 
             RaiseValueChanged ();
@@ -69,7 +68,10 @@ public class FlagSelector : View, IDesignable, IOrientation
     private void RaiseValueChanged ()
     {
         OnValueChanged ();
-        ValueChanged?.Invoke (this, new (Value));
+        if (Value.HasValue)
+        {
+            ValueChanged?.Invoke (this, new EventArgs<uint> (Value.Value));
+        }
     }
 
     /// <summary>
@@ -99,7 +101,7 @@ public class FlagSelector : View, IDesignable, IOrientation
 
             _styles = value;
 
-            CreateSubViews ();
+            CreateCheckBoxes ();
         }
     }
 
@@ -107,11 +109,13 @@ public class FlagSelector : View, IDesignable, IOrientation
     ///     Set the flags and flag names.
     /// </summary>
     /// <param name="flags"></param>
-    public void SetFlags (IReadOnlyDictionary<uint, string> flags)
+    public virtual void SetFlags (IReadOnlyDictionary<uint, string> flags)
     {
         Flags = flags;
-        CreateSubViews ();
+        CreateCheckBoxes ();
+        UpdateChecked ();
     }
+
 
     /// <summary>
     ///     Set the flags and flag names from an enum type.
@@ -167,27 +171,66 @@ public class FlagSelector : View, IDesignable, IOrientation
         SetFlags (flagsDictionary);
     }
 
+    private IReadOnlyDictionary<uint, string>? _flags;
+
     /// <summary>
-    ///     Gets the flags.
+    ///     Gets the flag values and names.
     /// </summary>
-    public IReadOnlyDictionary<uint, string>? Flags { get; internal set; }
+    public IReadOnlyDictionary<uint, string>? Flags
+    {
+        get => _flags;
+        internal set
+        {
+            _flags = value;
+
+            if (_value is null)
+            {
+               Value = Convert.ToUInt16 (_flags?.Keys.ElementAt (0));
+            }
+        }
+    }
 
     private TextField? ValueEdit { get; set; }
 
-    private void CreateSubViews ()
+    private bool _assignHotKeysToCheckBoxes;
+
+    /// <summary>
+    ///     If <see langword="true"/> the CheckBoxes will each be automatically assigned a hotkey.
+    ///     <see cref="UsedHotKeys"/> will be used to ensure unique keys are assigned. Set <see cref="UsedHotKeys"/>
+    ///     before setting <see cref="Flags"/> with any hotkeys that may conflict with other Views.
+    /// </summary>
+    public bool AssignHotKeysToCheckBoxes
+    {
+        get => _assignHotKeysToCheckBoxes;
+        set
+        {
+            if (_assignHotKeysToCheckBoxes == value)
+            {
+                return;
+            }
+            _assignHotKeysToCheckBoxes = value;
+            CreateCheckBoxes ();
+            UpdateChecked();
+        }
+    }
+
+    /// <summary>
+    ///     Gets the list of hotkeys already used by the CheckBoxes or that should not be used if
+    ///     <see cref="AssignHotKeysToCheckBoxes"/>
+    ///     is enabled.
+    /// </summary>
+    public List<Key> UsedHotKeys { get; } = [];
+
+    private void CreateCheckBoxes ()
     {
         if (Flags is null)
         {
             return;
         }
 
-        View [] subviews = SubViews.ToArray ();
-
-        RemoveAll ();
-
-        foreach (View v in subviews)
+        foreach (CheckBox cb in RemoveAll<CheckBox> ())
         {
-            v.Dispose ();
+            cb.Dispose ();
         }
 
         if (Styles.HasFlag (FlagSelectorStyles.ShowNone) && !Flags.ContainsKey (0))
@@ -213,7 +256,7 @@ public class FlagSelector : View, IDesignable, IOrientation
                 CanFocus = false,
                 Text = Value.ToString (),
                 Width = 5,
-                ReadOnly = true
+                ReadOnly = true,
             };
 
             Add (ValueEdit);
@@ -223,48 +266,146 @@ public class FlagSelector : View, IDesignable, IOrientation
 
         return;
 
-        CheckBox CreateCheckBox (string name, uint flag)
+
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="flag"></param>
+    /// <returns></returns>
+    protected virtual CheckBox CreateCheckBox (string name, uint flag)
+    {
+        string nameWithHotKey = name;
+        if (AssignHotKeysToCheckBoxes)
         {
-            var checkbox = new CheckBox
+            // Find the first char in label that is [a-z], [A-Z], or [0-9]
+            for (var i = 0; i < name.Length; i++)
             {
-                CanFocus = false,
-                Title = name,
-                Id = name,
-                Data = flag,
-                HighlightStyle = HighlightStyle
-            };
+                char c = char.ToLowerInvariant (name [i]);
+                if (UsedHotKeys.Contains (new (c)) || !char.IsAsciiLetterOrDigit (c))
+                {
+                    continue;
+                }
 
-            checkbox.Selecting += (sender, args) => { RaiseSelecting (args.Context); };
+                if (char.IsAsciiLetterOrDigit (c))
+                {
+                    char? hotChar = c;
+                    nameWithHotKey = name.Insert (i, HotKeySpecifier.ToString ());
+                    UsedHotKeys.Add (new (hotChar));
 
-            checkbox.CheckedStateChanged += (sender, args) =>
+                    break;
+                }
+            }
+        }
+
+        var checkbox = new CheckBox
+        {
+            CanFocus = true,
+            Title = nameWithHotKey,
+            Id = name,
+            Data = flag,
+            HighlightStyle = HighlightStyle.Hover
+        };
+
+        checkbox.GettingNormalColor += (_, e) =>
+                                       {
+                                           if (SuperView is { HasFocus: true })
+                                           {
+                                               e.Cancel = true;
+
+                                               if (!HasFocus)
+                                               {
+                                                   e.NewValue = GetFocusColor ();
+                                               }
+                                               else
+                                               {
+                                                   // If _colorScheme was set, it's because of Hover
+                                                   if (checkbox._colorScheme is { })
+                                                   {
+                                                       e.NewValue = checkbox._colorScheme.Normal;
+                                                   }
+                                                   else
+                                                   {
+                                                       e.NewValue = GetNormalColor ();
+                                                   }
+                                               }
+                                           }
+                                       };
+
+        checkbox.GettingHotNormalColor += (_, e) =>
+                                          {
+                                              if (SuperView is { HasFocus: true })
+                                              {
+                                                  e.Cancel = true;
+                                                  if (!HasFocus)
+                                                  {
+                                                      e.NewValue = GetHotFocusColor ();
+                                                  }
+                                                  else
+                                                  {
+                                                      e.NewValue = GetHotNormalColor ();
+                                                  }
+                                              }
+                                          };
+
+        //checkbox.GettingFocusColor += (_, e) =>
+        //                                  {
+        //                                      if (SuperView is { HasFocus: true })
+        //                                      {
+        //                                          e.Cancel = true;
+        //                                          if (!HasFocus)
+        //                                          {
+        //                                              e.NewValue = GetNormalColor ();
+        //                                          }
+        //                                          else
+        //                                          {
+        //                                              e.NewValue = GetFocusColor ();
+        //                                          }
+        //                                      }
+        //                                  };
+
+        checkbox.Selecting += (sender, args) =>
+                              {
+                                  if (RaiseSelecting (args.Context) is true)
+                                  {
+                                      args.Cancel = true;
+
+                                      return;
+                                  };
+
+                                  if (RaiseAccepting (args.Context) is true)
+                                  {
+                                      args.Cancel = true;
+                                  }
+                              };
+
+        checkbox.CheckedStateChanged += (sender, args) =>
+                                        {
+                                            uint? newValue = Value;
+
+                                            if (checkbox.CheckedState == CheckState.Checked)
                                             {
-                                                uint newValue = Value;
-
-                                                if (checkbox.CheckedState == CheckState.Checked)
+                                                if (flag == default!)
                                                 {
-                                                    if ((uint)checkbox.Data == 0)
-                                                    {
-                                                        newValue = 0;
-                                                    }
-                                                    else
-                                                    {
-                                                        newValue |= flag;
-                                                    }
+                                                    newValue = 0;
                                                 }
                                                 else
                                                 {
-                                                    newValue &= ~flag;
+                                                    newValue = newValue | flag;
                                                 }
+                                            }
+                                            else
+                                            {
+                                                newValue = newValue & ~flag;
+                                            }
 
-                                                Value = newValue;
+                                            Value = newValue;
+                                        };
 
-                                                //UpdateChecked();
-                                            };
-
-            return checkbox;
-        }
+        return checkbox;
     }
-
     private void SetLayout ()
     {
         foreach (View sv in SubViews)
@@ -285,7 +426,7 @@ public class FlagSelector : View, IDesignable, IOrientation
 
     private void UncheckAll ()
     {
-        foreach (CheckBox cb in SubViews.Where (sv => sv is CheckBox cb && cb.Title != "None").Cast<CheckBox> ())
+        foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => (uint)(sv.Data ?? default!) != default!))
         {
             cb.CheckedState = CheckState.UnChecked;
         }
@@ -293,7 +434,7 @@ public class FlagSelector : View, IDesignable, IOrientation
 
     private void UncheckNone ()
     {
-        foreach (CheckBox cb in SubViews.Where (sv => sv is CheckBox { Title: "None" }).Cast<CheckBox> ())
+        foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => sv.Title != "None"))
         {
             cb.CheckedState = CheckState.UnChecked;
         }
@@ -301,7 +442,7 @@ public class FlagSelector : View, IDesignable, IOrientation
 
     private void UpdateChecked ()
     {
-        foreach (CheckBox cb in SubViews.Where (sv => sv is CheckBox { }).Cast<CheckBox> ())
+        foreach (CheckBox cb in SubViews.OfType<CheckBox> ())
         {
             var flag = (uint)(cb.Data ?? throw new InvalidOperationException ("ComboBox.Data must be set"));
 
@@ -317,8 +458,6 @@ public class FlagSelector : View, IDesignable, IOrientation
         }
     }
 
-    /// <inheritdoc/>
-    protected override void OnSubViewAdded (View view) { }
 
     #region IOrientation
 
@@ -342,8 +481,6 @@ public class FlagSelector : View, IDesignable, IOrientation
     public event EventHandler<EventArgs<Orientation>>? OrientationChanged;
 #pragma warning restore CS0067 // The event is never used
 
-#pragma warning restore CS0067
-
     /// <summary>Called when <see cref="Orientation"/> has changed.</summary>
     /// <param name="newOrientation"></param>
     public void OnOrientationChanged (Orientation newOrientation) { SetLayout (); }
@@ -353,12 +490,14 @@ public class FlagSelector : View, IDesignable, IOrientation
     /// <inheritdoc/>
     public bool EnableForDesign ()
     {
+        Styles = FlagSelectorStyles.All;
         SetFlags<FlagSelectorStyles> (
                                       f => f switch
                                            {
-                                               FlagSelectorStyles.ShowNone => "Show _None Value",
-                                               FlagSelectorStyles.ShowValueEdit => "Show _Value Editor",
-                                               FlagSelectorStyles.All => "Show _All Flags Selector",
+                                               FlagSelectorStyles.None => "_No Style",
+                                               FlagSelectorStyles.ShowNone => "_Show None Value Style",
+                                               FlagSelectorStyles.ShowValueEdit => "Show _Value Editor Style",
+                                               FlagSelectorStyles.All => "_All Styles",
                                                _ => f.ToString ()
                                            });
 

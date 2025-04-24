@@ -23,12 +23,12 @@ internal class FakeInput<T> : IConsoleInput<T>
     /// <inheritdoc/>
     public void Initialize (ConcurrentQueue<T> inputBuffer) { InputBuffer = inputBuffer; }
 
-    public ConcurrentQueue<T> InputBuffer { get; set; }
+    public ConcurrentQueue<T>? InputBuffer { get; set; }
 
     /// <inheritdoc/>
     public void Run (CancellationToken token)
     {
         // Blocks until either the token or the hardStopToken is cancelled.
-        WaitHandle.WaitAny (new [] { token.WaitHandle, _hardStopToken.WaitHandle, _timeoutCts.Token.WaitHandle });
+        WaitHandle.WaitAny ([token.WaitHandle, _hardStopToken.WaitHandle, _timeoutCts.Token.WaitHandle]);
     }
 }

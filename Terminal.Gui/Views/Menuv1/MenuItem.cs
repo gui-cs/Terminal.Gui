@@ -6,6 +6,8 @@ namespace Terminal.Gui;
 ///     A <see cref="MenuItem"/> has title, an associated help text, and an action to execute on activation. MenuItems
 ///     can also have a checked indicator (see <see cref="Checked"/>).
 /// </summary>
+[Obsolete ("Use MenuItemv2 instead.", false)]
+
 public class MenuItem
 {
     internal MenuBar _menuBar;

@@ -8,12 +8,10 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Text and Formatting")]
 public class TextEffectsScenario : Scenario
 {
-    private TabView _tabView;
-
     /// <summary>
     ///     Enable or disable looping of the gradient colors.
     /// </summary>
-    public static bool LoopingGradient;
+    public static bool _loopingGradient;
 
     public override void Main ()
     {
@@ -45,23 +43,10 @@ public class TextEffectsScenario : Scenario
             Disabled = new (ColorName16.Gray, ColorName16.Black)
         };
 
-        // Creates a window that occupies the entire terminal with a title.
-        _tabView = new ()
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
-        };
-
         var gradientsView = new GradientsView
         {
             Width = Dim.Fill (),
             Height = Dim.Fill ()
-        };
-
-        var t1 = new Tab
-        {
-            View = gradientsView,
-            DisplayText = "Gradients"
         };
 
         var cbLooping = new CheckBox
@@ -72,29 +57,25 @@ public class TextEffectsScenario : Scenario
 
         cbLooping.CheckedStateChanging += (s, e) =>
                             {
-                                LoopingGradient = e.NewValue == CheckState.Checked;
+                                _loopingGradient = e.NewValue == CheckState.Checked;
                                 SetupGradientLineCanvas (w, w.Frame.Size);
-                                _tabView.SetNeedsDraw ();
                             };
 
         gradientsView.Add (cbLooping);
 
-        _tabView.AddTab (t1, false);
-
-        w.Add (_tabView);
+        w.Add (gradientsView);
 
         Application.Run (w);
         w.Dispose ();
 
         Application.Shutdown ();
-        Dispose ();
     }
 
     private static void SetupGradientLineCanvas (View w, Size size)
     {
         GetAppealingGradientColors (out List<Color> stops, out List<int> steps);
 
-        var g = new Gradient (stops, steps, LoopingGradient);
+        var g = new Gradient (stops, steps, _loopingGradient);
 
         var fore = new GradientFill (
                                      new (0, 0, size.Width, size.Height),
@@ -197,7 +178,7 @@ internal class GradientsView : View
         List<int> steps = [10, 10]; // 10 steps between Red -> Green, and Green -> Blue
 
         // Create the gradient
-        var radialGradient = new Gradient (stops, steps, TextEffectsScenario.LoopingGradient);
+        var radialGradient = new Gradient (stops, steps, TextEffectsScenario._loopingGradient);
 
         // Define the size of the rectangle
         int maxRow = GRADIENT_HEIGHT; // Adjusted to keep aspect ratio
@@ -247,7 +228,7 @@ internal class GradientsView : View
         ];
 
         // Create the gradient
-        var rainbowGradient = new Gradient (stops, steps, TextEffectsScenario.LoopingGradient);
+        var rainbowGradient = new Gradient (stops, steps, TextEffectsScenario._loopingGradient);
 
         for (var x = 0; x < viewport.Width; x++)
         {

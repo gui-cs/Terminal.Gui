@@ -169,6 +169,8 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         checkBox.AllowCheckStateNone = false;
         Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
+
+        Application.ResetState();
     }
 
     [Fact]

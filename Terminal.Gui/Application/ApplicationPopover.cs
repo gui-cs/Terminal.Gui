@@ -103,6 +103,7 @@ public sealed class ApplicationPopover : IDisposable
 
         if (popover is View newPopover)
         {
+            Register (popover);
             if (!newPopover.IsInitialized)
             {
                 newPopover.BeginInit ();
@@ -145,6 +146,7 @@ public sealed class ApplicationPopover : IDisposable
 
         if (activePopover is { Visible: true })
         {
+            Logging.Debug ($"Active - Calling NewKeyDownEvent ({key}) on {activePopover.Title}");
             if (activePopover.NewKeyDownEvent (key))
             {
                 return true;
@@ -163,6 +165,7 @@ public sealed class ApplicationPopover : IDisposable
             }
 
             // hotKeyHandled = popoverView.InvokeCommandsBoundToHotKey (key);
+            Logging.Debug ($"Inactive - Calling NewKeyDownEvent ({key}) on {popoverView.Title}");
             hotKeyHandled = popoverView.NewKeyDownEvent (key);
 
             if (hotKeyHandled is true)

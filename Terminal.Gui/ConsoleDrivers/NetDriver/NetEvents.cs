@@ -6,7 +6,7 @@ namespace Terminal.Gui;
 
 internal class NetEvents : IDisposable
 {
-    private readonly CancellationTokenSource _netEventsDisposed = new CancellationTokenSource ();
+    private CancellationTokenSource? _netEventsDisposed = new CancellationTokenSource ();
 
     //CancellationTokenSource _waitForStartCancellationTokenSource;
     private readonly ManualResetEventSlim _winChange = new (false);
@@ -597,6 +597,7 @@ internal class NetEvents : IDisposable
     {
         _netEventsDisposed?.Cancel ();
         _netEventsDisposed?.Dispose ();
+        _netEventsDisposed = null;
 
         try
         {
