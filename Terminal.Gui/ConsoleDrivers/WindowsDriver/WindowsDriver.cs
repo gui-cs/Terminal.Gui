@@ -507,9 +507,12 @@ internal class WindowsDriver : ConsoleDriver
                     break;
                 }
 
-                // This follows convention in NetDriver
-                OnKeyDown (new Key (map));
-                OnKeyUp (new Key (map));
+                if (IsValidInput (map, out map))
+                {
+                    // This follows convention in NetDriver
+                    OnKeyDown (new (map));
+                    OnKeyUp (new (map));
+                }
 
                 break;
 

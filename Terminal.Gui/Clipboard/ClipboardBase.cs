@@ -22,7 +22,7 @@ public abstract class ClipboardBase : IClipboard
                 return string.Empty;
             }
 
-            return GetClipboardDataImpl ();
+            return result;
         }
         catch (NotSupportedException ex)
         {
