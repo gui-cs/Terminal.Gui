@@ -39,7 +39,7 @@
         <PackageReference Include="System.CommandLine" V="" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" />
+        <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj" />
     </ItemGroup>
     <ItemGroup>
         <Using Include="System.Drawing.Rectangle" Alias="Rectangle" />

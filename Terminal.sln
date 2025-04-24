@@ -5,7 +5,7 @@ VisualStudioVersion = 17.2.32427.441
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Terminal.Gui", "Terminal.Gui\Terminal.Gui.csproj", "{00F366F8-DEE4-482C-B9FD-6DB0200B79E5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UICatalog", "UICatalog\UICatalog.csproj", "{88979F89-9A42-448F-AE3E-3060145F6375}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UICatalog", "Examples\UICatalog\UICatalog.csproj", "{88979F89-9A42-448F-AE3E-3060145F6375}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReactiveExample", "Examples\ReactiveExample\ReactiveExample.csproj", "{44E15B48-0DB2-4560-82BD-D3B7989811C3}"
 EndProject
