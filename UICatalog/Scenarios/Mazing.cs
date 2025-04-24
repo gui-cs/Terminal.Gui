@@ -1,18 +1,21 @@
-﻿using System.Text;
+﻿#nullable enable
+using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("A Mazing", "Illustrates how to make a basic maze")]
+[ScenarioMetadata ("A Mazing", "Illustrates how to make a basic maze game.")]
 [ScenarioCategory ("Drawing")]
+[ScenarioCategory ("Mouse and KeyBoard")]
+[ScenarioCategory ("Games")]
 public class Mazing : Scenario
 {
-    private Toplevel _top;
-    private MazeGenerator _m;
+    private Toplevel? _top;
+    private MazeGenerator? _m;
 
-    private List<Point> _potions;
-    private List<Point> _goblins;
-    private string _message;
+    private List<Point>? _potions;
+    private List<Point>? _goblins;
+    private string? _message;
     private bool _dead;
 
     public override void Main ()
@@ -24,71 +27,89 @@ public class Mazing : Scenario
 
         GenerateNpcs ();
 
-        _top.DrawingContent += (s, e) =>
-                              {
-                                  // Build maze
-                                  var lc = new LineCanvas (_m.BuildWallLinesFromMaze ());
+        // Define the keys for movement
+        _top.KeyBindings.Add (Key.CursorLeft, Command.Left);
+        _top.KeyBindings.Add (Key.CursorRight, Command.Right);
+        _top.KeyBindings.Add (Key.CursorUp, Command.Up);
+        _top.KeyBindings.Add (Key.CursorDown, Command.Down);
 
-                                  // Print maze
-                                  foreach (KeyValuePair<Point, Rune> p in lc.GetMap ())
-                                  {
-                                      _top.Move (p.Key.X, p.Key.Y);
-                                      _top.AddRune (p.Value);
-                                  }
+        // Changing the key-bindings of a View is not allowed, however,
+        // by default, Toplevel does't bind any of our movement keys, so
+        // we can take advantage of the CommandNotBound event to handle them
+        // 
+        // An alternative implementation would be to create a TopLevel subclass that
+        // calls AddCommand/KeyBindings.Add in the constructor. See the Snake game scenario
+        // for an example.
+        _top.CommandNotBound += TopCommandNotBound;
 
-                                  // Draw objects
-                                  _top.Move (_m.start.X, _m.start.Y);
-                                  _top.AddStr ("s");
+        _top.DrawingContent += (s, _) =>
+                               {
+                                   if (s is not Toplevel top)
+                                   {
+                                       return;
+                                   }
 
-                                  _top.Move (_m.end.X, _m.end.Y);
-                                  _top.AddStr ("e");
+                                   // Build maze
+                                   var lc = new LineCanvas (_m.BuildWallLinesFromMaze ());
 
-                                  _top.Move (_m.player.X, _m.player.Y);
-                                  _top.SetAttribute (new (Color.Cyan, _top.GetNormalColor ().Background));
-                                  _top.AddStr (_dead ? "x" : "@");
+                                   // Print maze
+                                   foreach (KeyValuePair<Point, Rune> p in lc.GetMap ())
+                                   {
+                                       top.Move (p.Key.X, p.Key.Y);
+                                       top.AddRune (p.Value);
+                                   }
 
-                                  // Draw goblins
-                                  foreach (Point goblin in _goblins)
-                                  {
-                                      _top.Move (goblin.X, goblin.Y);
-                                      _top.SetAttribute (new (Color.Red, _top.GetNormalColor ().Background));
-                                      _top.AddStr ("G");
-                                  }
+                                   // Draw objects
+                                   top.Move (_m.Start.X, _m.Start.Y);
+                                   top.AddStr ("s");
 
-                                  // Draw potions
-                                  foreach (Point potion in _potions)
-                                  {
-                                      _top.Move (potion.X, potion.Y);
-                                      _top.SetAttribute (new (Color.Yellow, _top.GetNormalColor ().Background));
-                                      _top.AddStr ("p");
-                                  }
+                                   top.Move (_m.End.X, _m.End.Y);
+                                   top.AddStr ("e");
 
-                                  // Draw UI
-                                  _top.SetAttribute (_top.GetNormalColor ());
+                                   top.Move (_m.Player.X, _m.Player.Y);
+                                   top.SetAttribute (new (Color.Cyan, top.GetNormalColor ().Background));
+                                   top.AddStr (_dead ? "x" : "@");
 
-                                  var g = new Gradient ([new (Color.Red), new (Color.BrightGreen)], [10]);
-                                  _top.Move (_m.MazeWidth + 1, 0);
-                                  _top.AddStr ("Name: Sir Flibble");
-                                  _top.Move (_m.MazeWidth + 1, 1);
-                                  _top.AddStr ("HP:");
+                                   // Draw goblins
+                                   foreach (Point goblin in _goblins!)
+                                   {
+                                       top.Move (goblin.X, goblin.Y);
+                                       top.SetAttribute (new (Color.Red, top.GetNormalColor ().Background));
+                                       top.AddStr ("G");
+                                   }
 
-                                  for (var i = 0; i < _m.playerHp; i++)
-                                  {
-                                      _top.Move (_m.MazeWidth + 1 + "HP:".Length + i, 1);
-                                      _top.SetAttribute (new (g.GetColorAtFraction (i / 20f)));
-                                      _top.AddRune ('█');
-                                  }
+                                   // Draw potions
+                                   foreach (Point potion in _potions!)
+                                   {
+                                       top.Move (potion.X, potion.Y);
+                                       top.SetAttribute (new (Color.Yellow, top.GetNormalColor ().Background));
+                                       top.AddStr ("p");
+                                   }
 
-                                  _top.SetAttribute (_top.GetNormalColor ());
+                                   // Draw UI
+                                   top.SetAttribute (top.GetNormalColor ());
 
-                                  if (!string.IsNullOrWhiteSpace (_message))
-                                  {
-                                      _top.Move (_m.MazeWidth + 2, 2);
-                                      _top.AddStr (_message);
-                                  }
-                              };
+                                   var g = new Gradient ([new (Color.Red), new (Color.BrightGreen)], [10]);
+                                   top.Move (_m.MazeWidth + 1, 0);
+                                   top.AddStr ("Name: Sir Flibble");
+                                   top.Move (_m.MazeWidth + 1, 1);
+                                   top.AddStr ("HP:");
 
-        _top.KeyDown += TopOnKeyDown;
+                                   for (var i = 0; i < _m.PlayerHp; i++)
+                                   {
+                                       top.Move (_m.MazeWidth + 1 + "HP:".Length + i, 1);
+                                       top.SetAttribute (new (g.GetColorAtFraction (i / 20f)));
+                                       top.AddRune ('█');
+                                   }
+
+                                   top.SetAttribute (top.GetNormalColor ());
+
+                                   if (!string.IsNullOrWhiteSpace (_message))
+                                   {
+                                       top.Move (_m.MazeWidth + 2, 2);
+                                       top.AddStr (_message);
+                                   }
+                               };
 
         Application.Run (_top);
 
@@ -98,138 +119,140 @@ public class Mazing : Scenario
 
     private void GenerateNpcs ()
     {
-        _goblins = _m.GenerateSpawnLocations (3, new ()); // Generate 3 goblins
-        _potions = _m.GenerateSpawnLocations (3, _goblins); // Generate 3 potions
+        _goblins = _m?.GenerateSpawnLocations (3, []); // Generate 3 goblins
+        _potions = _m?.GenerateSpawnLocations (3, _goblins!); // Generate 3 potions
     }
 
-    private void TopOnKeyDown (object sender, Key e)
+    private void TopCommandNotBound (object? sender, CommandEventArgs e)
     {
         if (_dead)
         {
             return;
         }
 
-        Point newPos = _m.player;
+        Point newPos = _m.Player;
 
-        if (e.KeyCode == Key.CursorLeft)
+        Command? command = e.Context?.Command;
+
+        if (command == Command.Left)
         {
-            newPos = new (_m.player.X - 1, _m.player.Y);
+            newPos = _m.Player with { X = _m.Player.X - 1 };
         }
 
-        if (e.KeyCode == Key.CursorRight)
+        if (command == Command.Right)
         {
-            newPos = new (_m.player.X + 1, _m.player.Y);
+            newPos = _m.Player with { X = _m.Player.X + 1 };
         }
 
-        if (e.KeyCode == Key.CursorUp)
+        if (command == Command.Up)
         {
-            newPos = new (_m.player.X, _m.player.Y - 1);
+            newPos = _m.Player with { Y = _m.Player.Y - 1 };
         }
 
-        if (e.KeyCode == Key.CursorDown)
+        if (command == Command.Down)
         {
-            newPos = new (_m.player.X, _m.player.Y + 1);
+            newPos = _m.Player with { Y = _m.Player.Y + 1 };
         }
 
         // Only move if in bounds and it's a path
-        if (newPos.X >= 0 && newPos.X < _m.maze.GetLength (1) && newPos.Y >= 0 && newPos.Y < _m.maze.GetLength (0) && _m.maze [newPos.Y, newPos.X] == 0)
+        if (newPos.X >= 0 && newPos.X < _m._maze.GetLength (1) && newPos.Y >= 0 && newPos.Y < _m._maze.GetLength (0) && _m._maze [newPos.Y, newPos.X] == 0)
         {
-            _m.player = newPos;
+            _m.Player = newPos;
 
             // Check if player is on a goblin
-            if (_goblins.Contains (_m.player))
+            if (_goblins!.Contains (_m.Player))
             {
                 _message = "You fight a goblin!";
-                _m.playerHp -= 5; // Decrease player's HP when attacked
+                _m.PlayerHp -= 5; // Decrease player's HP when attacked
 
                 // Remove the goblin
-                _goblins.Remove (_m.player);
-
+                _goblins.Remove (_m.Player);
 
                 // Check if player is dead
-                if (_m.playerHp <= 0)
+                if (_m.PlayerHp <= 0)
                 {
                     _message = "You died!";
-                    _top.SetNeedsDraw (); // trigger redraw
+                    Application.Top!.SetNeedsDraw (); // trigger redraw
                     _dead = true;
+
                     return; // Stop further action if dead
                 }
             }
-            else if (_potions.Contains (_m.player))
+            else if (_potions!.Contains (_m.Player))
             {
                 _message = "You drink a health potion!";
-                _m.playerHp = Math.Min (20, _m.playerHp + 5); // increase player's HP when drinking potion
+                _m.PlayerHp = Math.Min (20, _m.PlayerHp + 5); // increase player's HP when drinking potion
 
                 // Remove the potion
-                _potions.Remove (_m.player);
+                _potions.Remove (_m.Player);
             }
             else
             {
                 _message = string.Empty;
             }
 
-            _top.SetNeedsDraw (); // trigger redraw
+            Application.Top!.SetNeedsDraw (); // trigger redraw
         }
 
         // Optional win condition:
-        if (_m.player == _m.end)
+        if (_m.Player == _m.End)
         {
             _m = new (); // Generate a new maze
             GenerateNpcs ();
-            _top.SetNeedsDraw (); // trigger redraw
+            Application.Top!.SetNeedsDraw (); // trigger redraw
         }
     }
 }
 
 internal class MazeGenerator
 {
-    private readonly int width = 20;
-    private readonly int height = 10;
-    public int [,] maze;
-    public readonly Random rand = new ();
-    public readonly Point start;
-    public readonly Point end;
-    public Point player;
-    public int playerHp = 20;
+    private const int WIDTH = 20;
+    private const int HEIGHT = 10;
+    public int [,] _maze;
+    public Random Rand { get; } = new ();
+    public Point Start { get; }
+    public Point End { get; }
+    public Point Player { get; set; }
+    public int PlayerHp { get; set; } = 20;
 
     // Private accessors for width and height
-    public int MazeWidth => width * 2 + 1;
-    public int MazeHeight => height * 2 + 1;
+    public int MazeWidth => WIDTH * 2 + 1;
+    public int MazeHeight => HEIGHT * 2 + 1;
 
     public MazeGenerator ()
     {
-        int w = width * 2 + 1;
-        int h = height * 2 + 1;
-        maze = new int [h, w];
+        int w = WIDTH * 2 + 1;
+        int h = HEIGHT * 2 + 1;
+        _maze = new int [h, w];
 
         // Fill with walls
         for (var y = 0; y < h; y++)
         for (var x = 0; x < w; x++)
         {
-            maze [y, x] = 1;
+            _maze [y, x] = 1;
         }
 
         // Start carving from a random odd cell
-        int startX = rand.Next (width) * 2 + 1;
-        int startY = rand.Next (height) * 2 + 1;
+        int startX = Rand.Next (WIDTH) * 2 + 1;
+        int startY = Rand.Next (HEIGHT) * 2 + 1;
         Carve (new (startX, startY));
 
         // Set random entrance
-        start = GetRandomEdgePoint (w, h, true);
-        maze [start.Y, start.X] = 0;
-        player = start;
+        Start = GetRandomEdgePoint (w, h, true);
+        _maze [Start.Y, Start.X] = 0;
+        Player = Start;
 
         // Set random exit (ensure it's not same as entrance)
-        end = GetRandomEdgePoint (w, h, false, start.X, start.Y);
-        maze [end.Y, end.X] = 0;
+        End = GetRandomEdgePoint (w, h, false, Start.X, Start.Y);
+        _maze [End.Y, End.X] = 0;
     }
 
     public List<StraightLine> BuildWallLinesFromMaze ()
     {
         List<StraightLine> lines = new ();
 
-        int h = maze.GetLength (0);
-        int w = maze.GetLength (1);
+        int h = _maze.GetLength (0);
+        int w = _maze.GetLength (1);
 
         // Horizontal lines
         for (var y = 0; y < h; y++)
@@ -238,11 +261,11 @@ internal class MazeGenerator
 
             while (x < w)
             {
-                if (maze [y, x] == 1)
+                if (_maze [y, x] == 1)
                 {
                     int startX = x;
 
-                    while (x < w && maze [y, x] == 1)
+                    while (x < w && _maze [y, x] == 1)
                     {
                         x++;
                     }
@@ -268,11 +291,11 @@ internal class MazeGenerator
 
             while (y < h)
             {
-                if (maze [y, x] == 1)
+                if (_maze [y, x] == 1)
                 {
                     int startY = y;
 
-                    while (y < h && maze [y, x] == 1)
+                    while (y < h && _maze [y, x] == 1)
                     {
                         y++;
                     }
@@ -303,11 +326,11 @@ internal class MazeGenerator
 
             do
             {
-                point = new (rand.Next (1, width * 2), rand.Next (1, height * 2));
+                point = new (Rand.Next (1, WIDTH * 2), Rand.Next (1, HEIGHT * 2));
             }
 
             // Ensure the spawn point is not in the exclusion list and it's an open space (not a wall)
-            while (exclude.Contains (point) || maze [point.Y, point.X] != 0);
+            while (exclude.Contains (point) || _maze [point.Y, point.X] != 0);
 
             exclude.Add (point); // Mark this location as occupied
             locations.Add (point); // Add the location to the list
@@ -318,14 +341,14 @@ internal class MazeGenerator
 
     private void Carve (Point p)
     {
-        maze [p.Y, p.X] = 0;
+        _maze [p.Y, p.X] = 0;
 
         int [] [] dirs =
         {
-            new [] { 0, -2 },
-            new [] { 0, 2 },
-            new [] { -2, 0 },
-            new [] { 2, 0 }
+            [0, -2],
+            [0, 2],
+            [-2, 0],
+            [2, 0]
         };
 
         Shuffle (dirs);
@@ -334,9 +357,9 @@ internal class MazeGenerator
         {
             int nx = p.X + dir [0], ny = p.Y + dir [1];
 
-            if (nx > 0 && ny > 0 && nx < width * 2 && ny < height * 2 && maze [ny, nx] == 1)
+            if (nx > 0 && ny > 0 && nx < WIDTH * 2 && ny < HEIGHT * 2 && _maze [ny, nx] == 1)
             {
-                maze [p.Y + dir [1] / 2, p.X + dir [0] / 2] = 0;
+                _maze [p.Y + dir [1] / 2, p.X + dir [0] / 2] = 0;
                 Carve (new (nx, ny));
             }
         }
@@ -346,7 +369,7 @@ internal class MazeGenerator
     {
         for (int i = array.Length - 1; i > 0; i--)
         {
-            int j = rand.Next (i + 1);
+            int j = Rand.Next (i + 1);
             int [] temp = array [i];
             array [i] = array [j];
             array [j] = temp;
@@ -355,7 +378,7 @@ internal class MazeGenerator
 
     private Point GetRandomEdgePoint (int w, int h, bool isEntrance, int avoidX = -1, int avoidY = -1)
     {
-        List<Point> candidates = new ();
+        List<Point> candidates = [];
 
         for (var i = 1; i < h - 1; i += 2)
         {
@@ -375,6 +398,6 @@ internal class MazeGenerator
             candidates.RemoveAll (p => p.X == avoidX && p.Y == avoidY);
         }
 
-        return candidates [rand.Next (candidates.Count)];
+        return candidates [Rand.Next (candidates.Count)];
     }
 }
