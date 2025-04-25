@@ -16,7 +16,7 @@
   
 ### Commands
 
-See the [Command Deep Dive](commmand.md).
+See the [Command Deep Dive](command.md).
 
 ### Input
 

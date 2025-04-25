@@ -3,7 +3,7 @@
 ## See Also
 
 * [Cancellable Work Pattern](cancellable_work_pattern.md)
-* [Command Deep Dive](commmand.md)
+* [Command Deep Dive](command.md)
 
 ## Tenets for Terminal.Gui Keyboard Handling (Unless you know better ones...)
 

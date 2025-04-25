@@ -13,7 +13,7 @@
 - name: Configuration
   href: config.md
 - name: Command Deep Dive
-  href: commmand.md
+  href: command.md
 - name: Cursor
   href: cursor.md
 - name: Dim.Auto Deep Dive

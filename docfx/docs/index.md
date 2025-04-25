@@ -23,7 +23,7 @@ See [What's New in V2 For more](newinv2.md).
 * [Arrangement API](arrangement.md)
 * [Cancellable Work Pattern](cancellable_work_pattern.md)
 * [Configuration and Theme Manager](config.md)
-* [Command Deep Dive](commmand.md)
+* [Command Deep Dive](command.md)
 * [Cursor Deep Dive](cursor.md)
 * [Cross-platform Driver Model](drivers.md)
 * [Dim.Auto Deep Dive](dimauto.md)

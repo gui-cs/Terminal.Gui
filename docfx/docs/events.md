@@ -5,7 +5,7 @@ Terminal.Gui exposes and uses events in many places. This deep dive covers the p
 ## See Also
 
 * [Cancellable Work Pattern](cancellable_work_pattern.md)
-* [Command Deep Dive](commmand.md)
+* [Command Deep Dive](command.md)
 
 ## Tenets for Terminal.Gui Events (Unless you know better ones...)
 
