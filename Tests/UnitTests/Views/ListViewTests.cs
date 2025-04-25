@@ -487,7 +487,7 @@ Item 6",
         void Accepted (object sender, CommandEventArgs e)
         {
             accepted = true;
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 

@@ -50,7 +50,7 @@ public partial class LoginViewModel : ReactiveObject
 
         _isValidHelper = canLogin.ToProperty (this, x => x.IsValid);
 
-        Login = ReactiveCommand.CreateFromTask<HandledEventArgs>
+        Login = ReactiveCommand.CreateFromTask<CancelEventArgs>
             (
                 e => Task.Delay (TimeSpan.FromSeconds (1)),
                 canLogin
@@ -76,8 +76,8 @@ public partial class LoginViewModel : ReactiveObject
     }
 
     [ReactiveCommand]
-    public void Clear (HandledEventArgs args) { }
+    public void Clear (CancelEventArgs args) { }
 
     [IgnoreDataMember]
-    public ReactiveCommand<HandledEventArgs, Unit> Login { get; }
+    public ReactiveCommand<CancelEventArgs, Unit> Login { get; }
 }

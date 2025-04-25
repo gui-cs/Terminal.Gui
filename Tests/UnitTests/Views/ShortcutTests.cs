@@ -205,7 +205,7 @@ public class ShortcutTests
         var checkboxSelected = 0;
         shortcut.CommandView.Selecting += (s, e) =>
                                          {
-                                             if (e.Cancel)
+                                             if (e.Handled)
                                              {
                                                  return;
                                              }
@@ -226,7 +226,7 @@ public class ShortcutTests
         shortcut.Accepting += (s, e) =>
                              {
                                  accepted++;
-                                 e.Cancel = true;
+                                 e.Handled = true;
                              };
 
         Application.RaiseMouseEvent (
@@ -326,7 +326,7 @@ public class ShortcutTests
         shortcut.Accepting += (s, e) =>
                              {
                                  accepted++;
-                                 e.Cancel = true;
+                                 e.Handled = true;
                              };
 
         var selected = 0;

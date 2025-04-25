@@ -200,7 +200,7 @@ public class TextFieldTests
         void TextViewAccept (object sender, CommandEventArgs e)
         {
             tfAcceptedInvoked = true;
-            e.Cancel = handle;
+            e.Handled = handle;
         }
     }
 

@@ -36,7 +36,7 @@ public partial class ColorPicker
         btnOk.Accepting += (s, e) =>
                         {
                             accept = true;
-                            e.Cancel = true;
+                            e.Handled = true;
                             Application.RequestStop ();
                         };
 
@@ -50,7 +50,7 @@ public partial class ColorPicker
 
         btnCancel.Accepting += (s, e) =>
                             {
-                                e.Cancel = true;
+                                e.Handled = true;
                                 Application.RequestStop ();
                             };
 

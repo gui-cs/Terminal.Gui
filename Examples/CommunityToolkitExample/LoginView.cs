@@ -23,15 +23,15 @@ internal partial class LoginView : IRecipient<Message<LoginActions>>
                               {
                                   if (!ViewModel.CanLogin) { return; }
                                   ViewModel.LoginCommand.Execute (null);
-                                  // Anytime Accepting is handled, make sure to set e.Cancel to false.
-                                  e.Cancel = false;
+                                  // Anytime Accepting is handled, make sure to set e.Handled to false.
+                                  e.Handled = false;
                               };
 
         clearButton.Accepting += (_, e) =>
                               {
                                   ViewModel.ClearCommand.Execute (null);
-                                  // Anytime Accepting is handled, make sure to set e.Cancel to false.
-                                  e.Cancel = false;
+                                  // Anytime Accepting is handled, make sure to set e.Handled to false.
+                                  e.Handled = false;
                               };
 
         Initialized += (_, _) => { ViewModel.Initialized (); };
