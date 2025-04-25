@@ -57,9 +57,12 @@ internal class WindowsDriver : ConsoleDriver
 
         // TODO: if some other Windows-based terminal supports true color, update this logic to not
         // force 16color mode (.e.g ConEmu which really doesn't work well at all).
-        WinConsole!.IsWindowsTerminal = _isWindowsTerminal = _isWindowsTerminal =
-                                                                Environment.GetEnvironmentVariable ("WT_SESSION") is { }
-                                                                || Environment.GetEnvironmentVariable ("VSAPPIDNAME") != null;
+        if (!RunningUnitTests)
+        {
+            WinConsole!.IsWindowsTerminal = _isWindowsTerminal =
+                                                Environment.GetEnvironmentVariable ("WT_SESSION") is { }
+                                                || Environment.GetEnvironmentVariable ("VSAPPIDNAME") != null;
+        }
 
         if (!_isWindowsTerminal)
         {
