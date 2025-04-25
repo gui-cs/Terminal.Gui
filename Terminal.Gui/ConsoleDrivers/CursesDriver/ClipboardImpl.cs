@@ -203,7 +203,7 @@ internal class WSLClipboard : ClipboardBase
         }
 
         (int exitCode, string output) =
-            ClipboardProcessRunner.Process (_powershellPath, "-noprofile -command \"Get-Clipboard\"");
+            ClipboardProcessRunner.Process (_powershellPath, "-noprofile -command \"[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; Get-Clipboard\"");
 
         if (exitCode == 0)
         {

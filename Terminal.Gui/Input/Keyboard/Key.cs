@@ -139,6 +139,44 @@ public class Key : EventArgs, IEquatable<Key>
     }
 
     /// <summary>
+    ///     Constructs a new Key from an integer describing the key.
+    ///     It parses the integer as Key by calling the constructor with a char or calls the constructor with a
+    ///     KeyCode.
+    /// </summary>
+    /// <remarks>
+    ///     Don't rely on <paramref name="value"/> passed from <see cref="KeyCode.A"/> to <see cref="KeyCode.Z"/> because
+    ///     would not return the expected keys from 'a' to 'z'.
+    /// </remarks>
+    /// <param name="value">The integer describing the key.</param>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    /// <exception cref="ArgumentException"></exception>
+    public Key (int value)
+    {
+        if (value < 0 || value > RuneExtensions.MaxUnicodeCodePoint)
+        {
+            throw new ArgumentOutOfRangeException (@$"Invalid key value: {value}", nameof (value));
+        }
+
+        if (char.IsSurrogate ((char)value))
+        {
+            throw new ArgumentException (@$"Surrogate key not allowed: {value}", nameof (value));
+        }
+
+        Key key;
+
+        if (((Rune)value).IsBmp)
+        {
+            key = new ((char)value);
+        }
+        else
+        {
+            key = new ((KeyCode)value);
+        }
+
+        KeyCode = key.KeyCode;
+    }
+
+    /// <summary>
     ///     The key value as a Rune. This is the actual value of the key pressed, and is independent of the modifiers.
     ///     Useful for determining if a key represents is a printable character.
     /// </summary>
@@ -388,6 +426,11 @@ public class Key : EventArgs, IEquatable<Key>
     /// <param name="str"></param>
     public static implicit operator Key (string str) { return new (str); }
 
+    /// <summary>Cast <see langword="int"/> to a <see cref="Key"/>.</summary>
+    /// <remarks>See <see cref="Key(int)"/> for more information.</remarks>
+    /// <param name="value"></param>
+    public static implicit operator Key (int value) { return new (value); }
+
     /// <summary>Cast a <see cref="Key"/> to a <see langword="string"/>.</summary>
     /// <remarks>See <see cref="Key(string)"/> for more information.</remarks>
     /// <param name="key"></param>
@@ -550,7 +593,7 @@ public class Key : EventArgs, IEquatable<Key>
         // "Ctrl+" (trim)
         // "Ctrl++" (trim)
 
-        if (input.Length > 1 && new Rune (input [^1]) == separator && new Rune (input [^2]) != separator)
+        if (input.Length > 1 && !char.IsHighSurrogate (input [^2]) && new Rune (input [^1]) == separator && new Rune (input [^2]) != separator)
         {
             return input [..^1];
         }
@@ -638,6 +681,13 @@ public class Key : EventArgs, IEquatable<Key>
         {
             // Invalid
             return false;
+        }
+
+        if (text.Length == 2 && char.IsHighSurrogate (text [^2]) && char.IsLowSurrogate (text [^1]))
+        {
+            // It's a surrogate pair and there is no modifiers
+            key = new (new Rune (text [^2], text [^1]).Value);
+            return true;
         }
 
         // e.g. "Ctrl++"

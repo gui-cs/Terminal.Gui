@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -11,9 +7,10 @@ namespace UICatalog.Scenarios;
 [ScenarioMetadata ("Snake", "The game of apple eating.")]
 [ScenarioCategory ("Colors")]
 [ScenarioCategory ("Drawing")]
+[ScenarioCategory ("Games")]
 public class Snake : Scenario
 {
-    private bool isDisposed;
+    private bool _isDisposed;
 
     public override void Main ()
     {
@@ -33,7 +30,7 @@ public class Snake : Scenario
         Task.Run (
                   () =>
                   {
-                      while (!isDisposed)
+                      while (!_isDisposed)
                       {
                           sw.Restart ();
 
@@ -60,7 +57,7 @@ public class Snake : Scenario
 
     protected override void Dispose (bool disposing)
     {
-        isDisposed = true;
+        _isDisposed = true;
         base.Dispose (disposing);
     }
 
@@ -170,7 +167,7 @@ public class Snake : Scenario
             var middle = new Point (width / 2, height / 2);
 
             // Start snake with a length of 2
-            Snake = new List<Point> { middle, middle };
+            Snake = new () { middle, middle };
             Apple = GetNewRandomApplePoint ();
 
             SleepAfterAdvancingState = StartingSpeed;
@@ -198,19 +195,19 @@ public class Snake : Scenario
             switch (CurrentDirection)
             {
                 case Direction.Left:
-                    return new Point (Head.X - 1, Head.Y);
+                    return new (Head.X - 1, Head.Y);
 
                 case Direction.Right:
-                    return new Point (Head.X + 1, Head.Y);
+                    return new (Head.X + 1, Head.Y);
 
                 case Direction.Up:
-                    return new Point (Head.X, Head.Y - 1);
+                    return new (Head.X, Head.Y - 1);
 
                 case Direction.Down:
-                    return new Point (Head.X, Head.Y + 1);
+                    return new (Head.X, Head.Y + 1);
             }
 
-            throw new Exception ("Unknown direction");
+            throw new ("Unknown direction");
         }
 
         private Point GetNewRandomApplePoint ()
@@ -302,7 +299,7 @@ public class Snake : Scenario
             State = state;
             CanFocus = true;
 
-            ColorScheme = new ColorScheme
+            base.ColorScheme = new ()
             {
                 Normal = white,
                 Focus = white,
@@ -310,21 +307,40 @@ public class Snake : Scenario
                 HotFocus = white,
                 Disabled = white
             };
+
+            KeyBindings.Add (Key.CursorLeft, Command.Left);
+            KeyBindings.Add (Key.CursorRight, Command.Right);
+            KeyBindings.Add (Key.CursorUp, Command.Up);
+            KeyBindings.Add (Key.CursorDown, Command.Down);
+
+            AddCommand (Command.Left, () => SetDirection (Direction.Left));
+            AddCommand (Command.Right, () => SetDirection (Direction.Right));
+            AddCommand (Command.Up, () => SetDirection (Direction.Up));
+            AddCommand (Command.Down, () => SetDirection (Direction.Down));
+
+            return;
+
+            bool? SetDirection (Direction direction)
+            {
+                State.PlannedDirection = direction;
+
+                return true;
+            }
         }
 
-        public SnakeState State { get; }
+        private SnakeState State { get; }
 
         protected override bool OnDrawingContent ()
         {
             SetAttribute (white);
-            ClearViewport (null);
+            ClearViewport ();
 
             var canvas = new LineCanvas ();
 
             canvas.AddLine (Point.Empty, State.Width, Orientation.Horizontal, LineStyle.Double);
             canvas.AddLine (Point.Empty, State.Height, Orientation.Vertical, LineStyle.Double);
-            canvas.AddLine (new Point (0, State.Height - 1), State.Width, Orientation.Horizontal, LineStyle.Double);
-            canvas.AddLine (new Point (State.Width - 1, 0), State.Height, Orientation.Vertical, LineStyle.Double);
+            canvas.AddLine (new (0, State.Height - 1), State.Width, Orientation.Horizontal, LineStyle.Double);
+            canvas.AddLine (new (State.Width - 1, 0), State.Height, Orientation.Vertical, LineStyle.Double);
 
             for (var i = 1; i < State.Snake.Count; i++)
             {
@@ -354,40 +370,6 @@ public class Snake : Scenario
             SetAttribute (white);
 
             return true;
-        }
-
-        // BUGBUG: Should (can) this use key bindings instead.
-        protected override bool OnKeyDown (Key key)
-        {
-            if (key.KeyCode == KeyCode.CursorUp)
-            {
-                State.PlannedDirection = Direction.Up;
-
-                return true;
-            }
-
-            if (key.KeyCode == KeyCode.CursorDown)
-            {
-                State.PlannedDirection = Direction.Down;
-
-                return true;
-            }
-
-            if (key.KeyCode == KeyCode.CursorLeft)
-            {
-                State.PlannedDirection = Direction.Left;
-
-                return true;
-            }
-
-            if (key.KeyCode == KeyCode.CursorRight)
-            {
-                State.PlannedDirection = Direction.Right;
-
-                return true;
-            }
-
-            return false;
         }
     }
 }
