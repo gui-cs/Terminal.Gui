@@ -536,7 +536,7 @@ public class Bars : Scenario
                                                     {
                                                         button1.Visible = !button1.Visible;
                                                         button1.Enabled = button1.Visible;
-                                                        e.Handled = false;
+                                                        e.Handled = true;
                                                     };
 
         bar.Add (new Label

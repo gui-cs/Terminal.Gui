@@ -39,7 +39,7 @@ public sealed class Generic : Scenario
 
         button.Accepting += (s, e) =>
                             {
-                                // Anytime Accepting is handled, make sure to set e.Handled to false.
+                                // When Accepting is handled, set e.Handled to true to prevent further processing.
                                 e.Handled = true;
                                 MessageBox.ErrorQuery ("Error", "You pressed the button!", "_Ok");
                             };
