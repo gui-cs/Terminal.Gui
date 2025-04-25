@@ -8,7 +8,7 @@
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
-    <ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" />
+    <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj" />
   </ItemGroup>
 
 </Project>

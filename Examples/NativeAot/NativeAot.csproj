@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" />
+    <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj" />
     <TrimmerRootAssembly Include="Terminal.Gui" />
   </ItemGroup>
 
