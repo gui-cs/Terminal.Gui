@@ -68,7 +68,7 @@ public partial class View // Command APIs
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
-        // For robustness=-sake, even if the virtual method returns true, if the args 
+        // For robustness' sake, even if the virtual method returns true, if the args 
         // indicate the event should be cancelled, we honor that.
         if (OnCommandNotBound (args) || args.Cancel)
         {
