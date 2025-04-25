@@ -26,9 +26,9 @@
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj" />
-        <ProjectReference Include="..\..\TerminalGuiFluentTestingXunit\TerminalGuiFluentTestingXunit.csproj" />
-        <ProjectReference Include="..\..\TerminalGuiFluentTesting\TerminalGuiFluentTesting.csproj" />
-        <ProjectReference Include="..\..\UICatalog\UICatalog.csproj" />
+        <ProjectReference Include="..\..\Tests\TerminalGuiFluentTestingXunit\TerminalGuiFluentTestingXunit.csproj" />
+        <ProjectReference Include="..\..\Tests\TerminalGuiFluentTesting\TerminalGuiFluentTesting.csproj" />
+        <ProjectReference Include="..\..\Examples\UICatalog\UICatalog.csproj" />
         <ProjectReference Include="..\UnitTests\UnitTests.csproj" />
     </ItemGroup>
     <ItemGroup>
