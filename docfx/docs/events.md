@@ -29,36 +29,110 @@ Tenets higher in the list have precedence over tenets lower in the list.
 
 TG follows the *naming* advice provided in [.NET Naming Guidelines - Names of Events](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/names-of-type-members?redirectedfrom=MSDN#names-of-events).
 
-## `EventHandler` style event best-practices
+## Common Event Patterns
+
+### OnEvent/Event
+
+The primary pattern for events is the `OnEvent/Event` idiom. 
 
 * Implement a helper method for raising the event: `RaisexxxEvent`.
   * If the event is cancelable, the return type should be either `bool` or `bool?`.
   * Can be `private`, `internal`, or `public` depending on the situation. `internal` should only be used to enable unit tests.
-* Raising an event involves FIRST calling the `protected virtual` method, THEN invoking the `EventHandler.
+* Raising an event involves FIRST calling the `protected virtual` method, THEN invoking 
+the `EventHandler`.
 
-## `Action<T>` style callback best-practices
+### Action
 
-- tbd
+We use the `Action<T>` idiom sparingly. 
 
-## `INotifyPropertyChanged` style notification best practices
+### INotifyPropertyChanged
 
-- tbd
+We support `INotifyPropertyChanged` in cases where data binding is relevant.
 
-## Common Patterns
+## Cancellable Work Pattern
 
-The primary pattern for events is the `event/EventHandler` idiom. We use the `Action<T>` idiom sparingly. We support `INotifyPropertyChanged` in cases where data binding is relevant.
+Often there is a need for a class to do some work that can either
 
+- proceed in the default manner.
+- proceed in the default manner with some modification.
+- be cancelled.
 
+Frameworks often use inheritance and the overriding of `virtual` methods for this, but doing so requires overrides to know implementation details of the base classes in order to correctly call `base`. Instead, Terminal.Gui defines and uses the *Cancellable Work Pattern* as the primary means of supporting this.
 
-## Cancellable Event Pattern
+The *Cancellable Work Pattern* flows as follows: 
 
-A cancellable event is really two events and some activity that takes place between those events. The "pre-event" happens before the activity. The activity then takes place (or not). If the activity takes place, then the "post-event" is typically raised. So, to be precise, no event is being cancelled even though we say we have a cancellable event. Rather, the activity that takes place between the two events is what is cancelled — and likely prevented from starting at all.
+- A method is called indicating work needs to be done, e.g. `view.DoClearViewport`.
+- This method raises a **Cancelable Event** (see above). 
+- If the cancelable event was cancelled, processing stops and the method returns.
+- Otherwise, the work happens (in this case, the Viewport is cleared).
+- A non-cancelable event is raised.
+
+("Event" means an `OnEvent/Event`-style event as described above).
+
+To proceed in the default manner, a consumer does nothing.
+
+```cs
+view.Draw ();
+```
+
+To proceed in the default manner with some modification to the default work, a consumer would subscribe to both events to do additional work before and after the default work, as appropriate.
+
+```cs
+view.ClearingViewport += (s, e) =>
+            {
+                if (s is View sender)
+                {
+                    sender.FillRect (sender.Viewport, Glyphs.Stipple);
+                }
+                e.Cancel = true;
+            };
+view.Draw ();
+```
+
+To cancel, a consumer would subscribe to just the cancelable event and cancel it.
+
+```cs
+view.ClearingViewport += (s, e) => { e.Cancel = true; };
+view.Draw ();
+```
+
+### **Event Raising Method** - Standard pattern for code that raises events
+
+The standard pattern for the implementation within a Terminal.Gui class that can raise an event is to implement a `Raisexxx ()` method (where `xxx` is the name of the event).or Depending on the use-case, this event can be `private`, `protected`, or `public`.
+
+A typical implementation looks like this:
+
+```cs
+protected bool? RaiseCommandNotBound (ICommandContext? ctx)
+{
+    CommandEventArgs args = new () { Context = ctx };
+
+    // Best practice is to invoke the virtual method first.
+    // This allows derived classes to handle the event and potentially cancel it.
+    // For robustness=-sake, even if the virtual method returns true, if the args 
+    // indicate the event should be cancelled, we honor that.
+    if (OnCommandNotBound (args) || args.Cancel)
+    {
+        return true;
+    }
+
+    // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
+    CommandNotBound?.Invoke (this, args);
+
+    return CommandNotBound is null ? null : args.Cancel;
+}
+```
+
 
 ### **Before** - If any pre-conditions are met raise the "pre-event", typically named in the form of "xxxChanging". e.g.
 
-  - A `protected virtual` method is called. This method is named `OnxxxChanging` and the base implementation simply does `return false`.
+  - A `protected virtual` method is called. These method is named `OnxxxChanging` and the base implementation simply does `return false`.
   - If the `OnxxxChanging` method returns `true` it means a derived class canceled the event. Processing should stop.
   - Otherwise, the `xxxChanging` event is invoked via `xxxChanging?.Invoke(args)`. If `args.Cancel/Handled == true` it means a subscriber has cancelled the event. Processing should stop.
+
+The **Before** event, by definition is cancellable. 
+
+Generally, the terms "Canceled" or "Handled" both mean the same thing: **Do not proceed**. In some cases, Canceled makes sense (e.g. if the "work" is a change to the state of an object, like whether a View is oriented horizontally or vertically). In other cases, Handled makes more sense (e.g. if the "work" is to process some user input, like a key press).
 
 
 ### **During** - Do work.
@@ -120,7 +194,35 @@ The `OrientationHelper` class supporting `IOrientation` and a `View` having an `
    }
 ```
 
- ## `bool` or `bool?` 
+## `bool` or `bool?` 
+
+## The `Selecting` and `Accepting` Events
+
+@Terminal.Gui.View.Selecting and @Terminal.Gui.View.Accepting provide an opinionated mechanism for the most common interactions: Selecting the state and accepting the state.
+
+For a View like @Terminal.Gui.Button, where there is no state to select, only `Accepting` is relevant. For a View like @Terminal.Gui.ListView, where the user can change which list items are selected independently from indicating "do something based on which items are selected" both concepts are relevant: `Selecting` is raised when the `ListView`, and `Accepting` is raised when the user double-clicks or presses `Key.Enter` to accept the selection.
+
+
 
  
+## Command Routing
+
+@Terminal.Gui.Command defines a set of standard things @Terminal.Gui.View objects can do. Views declare which commands they support by calling @Terminal.Gui.View.AddCommmand and implementing command handlers.
+
+For example, @Terminal.Gui.HexView supports moving the cursor to the top of the current page by defining a command handler for `Command.StartOfPage`, which is bound to `Ctrl+Up`:
+
+```cs
+AddCommand (Command.StartOfPage, () => MoveUp (BytesPerLine * ((int)(Address - Viewport.Y) / BytesPerLine)));
+KeyBindings.Add (Key.CursorUp.WithCtrl, Command.StartOfPage);
+```
+
+Commands are cancellable. The command handler should `null` if no command was found; command routing should continue. `false` if the command was invoked and was not handled (or cancelled); command routing should continue. `true` if the command was invoked the command was handled (or cancelled); command handling should stop.
+
+In most cases, how commands are routed to Views is simple: @Terminal.Gui.View.InvokeCommand is called, which calls the command handler. If there is no command handler, then @Terminal.Gui.View.RaiseCommandNotBound is called, which raises the @Terminal.Gui.View.CommandNotBound event.
+
+@Terminal.Gui.Command.Select and @Terminal.Gui.Command.Accept support additional routing logic, provided by @Terminal.Gui.View.RaiseSelecting and @Terminal.Gui.View.RaiseAccepting respectively. Each of these methods raises the respective events on the View and if the View's command handler returns either `null` or `false` routes the command to the View's @Terminal.Gui.View.SuperView.
+
+> `Command.Accept` has one additional behavior: If any peer-View is a @Terminal.Gui.Button with `@Terminal.Gui.Button.IsDefault == true` the Command will be routed to that View before routing up the SuperView hierarchy. This enables default button handling.
+
+
 
