@@ -301,6 +301,9 @@ public partial class View // Command APIs
     ///     <para>
     ///         This version of AddCommand is for commands that require <see cref="ICommandContext"/>.
     ///     </para>
+    ///     <para>
+    ///         See the Commands Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/command.html"/>.
+    ///     </para>
     /// </remarks>
     /// <param name="command">The command.</param>
     /// <param name="impl">The delegate.</param>
@@ -321,6 +324,9 @@ public partial class View // Command APIs
     ///         This version of AddCommand is for commands that do not require context.
     ///         If the command requires context, use
     ///         <see cref="AddCommand(Command,CommandImplementation)"/>
+    ///     </para>
+    ///     <para>
+    ///         See the Commands Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/command.html"/>.
     ///     </para>
     /// </remarks>
     /// <param name="command">The command.</param>
