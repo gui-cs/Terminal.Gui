@@ -32,8 +32,8 @@
     <PackageVersion Include="ReactiveUI.SourceGenerators" Version="[2.1.8,3)" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="[17.13,18)" />
     <PackageVersion Include="Moq" Version="[4.20.72,5)" />
-    <PackageVersion Include="ReportGenerator" Version="[5.4.4,6)" />
-    <PackageVersion Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="[22.0.11,23)" />
+    <PackageVersion Include="ReportGenerator" Version="5.4.5" />
+    <PackageVersion Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="22.0.14" />
     <PackageVersion Include="xunit" Version="[2.9.3,3)" />
     <PackageVersion Include="Xunit.Combinatorial" Version="[1.6.24,2)" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="[2.8.2,3)" />
