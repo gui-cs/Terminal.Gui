@@ -1,4 +1,5 @@
 #nullable enable
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
@@ -302,7 +303,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     public event EventHandler<SuperViewChangedEventArgs>? SubViewRemoved;
 
     /// <summary>
-    ///     Removes all SubView (children) added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.
+    ///     Removes all SubViews added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -312,12 +313,47 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     ///         added.
     ///     </para>
     /// </remarks>
-    public virtual void RemoveAll ()
+    /// <returns>
+    ///     A list of removed Views.
+    /// </returns>
+    public virtual IReadOnlyCollection<View> RemoveAll ()
     {
+        List<View> removedList = new List<View> ();
         while (InternalSubViews.Count > 0)
         {
-            Remove (InternalSubViews [0]);
+            View? removed = Remove (InternalSubViews [0]);
+            if (removed is { })
+            {
+                removedList.Add (removed);
+            }
         }
+
+        return removedList.AsReadOnly ();
+    }
+
+    /// <summary>
+    ///     Removes all SubViews of a type added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Normally SubViews will be disposed when this View is disposed. Removing a SubView causes ownership of the
+    ///         SubView's
+    ///         lifecycle to be transferred to the caller; the caller must call <see cref="Dispose()"/> on any Views that were
+    ///         added.
+    ///     </para>
+    /// </remarks>
+    /// <returns>
+    ///     A list of removed Views.
+    /// </returns>
+    public virtual IReadOnlyCollection<TView> RemoveAll<TView> () where TView : View
+    {
+        List<TView> removedList = new List<TView> ();
+        foreach (TView view in InternalSubViews.OfType<TView> ().ToList ())
+        {
+            Remove (view);
+            removedList.Add (view);
+        }
+        return removedList.AsReadOnly ();
     }
 
 #pragma warning disable CS0067 // The event is never used

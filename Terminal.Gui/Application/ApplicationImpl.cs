@@ -34,7 +34,7 @@ public class ApplicationImpl : IApplication
     [RequiresDynamicCode ("AOT")]
     public virtual void Init (IConsoleDriver? driver = null, string? driverName = null)
     {
-            Application.InternalInit (driver, driverName);
+        Application.InternalInit (driver, driverName);
     }
 
     /// <summary>
@@ -166,34 +166,35 @@ public class ApplicationImpl : IApplication
             try
             {
 #endif
-            resume = false;
-            RunState runState = Application.Begin (view);
+                resume = false;
+                RunState runState = Application.Begin (view);
 
-            // If EndAfterFirstIteration is true then the user must dispose of the runToken
-            // by using NotifyStopRunState event.
-            Application.RunLoop (runState);
+                // If EndAfterFirstIteration is true then the user must dispose of the runToken
+                // by using NotifyStopRunState event.
+                Application.RunLoop (runState);
 
-            if (runState.Toplevel is null)
-            {
+                if (runState.Toplevel is null)
+                {
 #if DEBUG_IDISPOSABLE
-                if (View.DebugIDisposable)
+                if (View.EnableDebugIDisposableAsserts)
                 {
                     Debug.Assert (Application.TopLevels.Count == 0);
                 }
 #endif
-                runState.Dispose ();
+                    runState.Dispose ();
 
-                return;
-            }
+                    return;
+                }
 
-            if (!Application.EndAfterFirstIteration)
-            {
-                Application.End (runState);
-            }
+                if (!Application.EndAfterFirstIteration)
+                {
+                    Application.End (runState);
+                }
 #if !DEBUG
             }
             catch (Exception error)
             {
+                Logging.Warning ($"Release Build Exception: {error}");
                 if (errorHandler is null)
                 {
                     throw;
@@ -225,7 +226,7 @@ public class ApplicationImpl : IApplication
         {
             bool init = Application.Initialized;
 
-            Application.OnInitializedChanged(this, new (in init));
+            Application.OnInitializedChanged (this, new (in init));
         }
     }
 
@@ -270,7 +271,7 @@ public class ApplicationImpl : IApplication
     /// <inheritdoc />
     public virtual void AddIdle (Func<bool> func)
     {
-        if(Application.MainLoop is null)
+        if (Application.MainLoop is null)
         {
             throw new NotInitializedException ("Cannot add idle before main loop is initialized");
         }
@@ -294,7 +295,7 @@ public class ApplicationImpl : IApplication
 
     /// <inheritdoc />
     public virtual bool RemoveTimeout (object token)
-    { 
+    {
         return Application.MainLoop?.TimedEvents.RemoveTimeout (token) ?? false;
     }
 

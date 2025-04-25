@@ -22,7 +22,7 @@
 
     <PropertyGroup Condition="'$(Configuration)'=='Debug'">
         <DefineDebug>true</DefineDebug>
-        <DefineConstants>$(DefineConstants)</DefineConstants>
+        <DefineConstants>$(DefineConstants);DEBUG_IDISPOSABLE</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)'=='Release'">
         <Optimize>true</Optimize>

@@ -63,7 +63,7 @@ public static partial class Application // Mouse handling
         }
 
 #if DEBUG_IDISPOSABLE
-        if (View.DebugIDisposable)
+        if (View.EnableDebugIDisposableAsserts)
         {
             ObjectDisposedException.ThrowIf (MouseGrabView.WasDisposed, MouseGrabView);
         }
@@ -154,7 +154,7 @@ public static partial class Application // Mouse handling
         if (deepestViewUnderMouse is { })
         {
 #if DEBUG_IDISPOSABLE
-            if (View.DebugIDisposable && deepestViewUnderMouse.WasDisposed)
+            if (View.EnableDebugIDisposableAsserts && deepestViewUnderMouse.WasDisposed)
             {
                 throw new ObjectDisposedException (deepestViewUnderMouse.GetType ().FullName);
             }
@@ -174,8 +174,11 @@ public static partial class Application // Mouse handling
             && Popover?.GetActivePopover () as View is { Visible: true } visiblePopover
             && View.IsInHierarchy (visiblePopover, deepestViewUnderMouse, includeAdornments: true) is false)
         {
-
-            visiblePopover.Visible = false;
+            // TODO: Build a use/test case for the popover not handling Quit
+            if (visiblePopover.InvokeCommand (Command.Quit) is true && visiblePopover.Visible)
+            {
+                visiblePopover.Visible = false;
+            }
 
             // Recurse once so the event can be handled below the popover
             RaiseMouseEvent (mouseEvent);
@@ -297,7 +300,7 @@ public static partial class Application // Mouse handling
         if (MouseGrabView is { })
         {
 #if DEBUG_IDISPOSABLE
-            if (View.DebugIDisposable && MouseGrabView.WasDisposed)
+            if (View.EnableDebugIDisposableAsserts && MouseGrabView.WasDisposed)
             {
                 throw new ObjectDisposedException (MouseGrabView.GetType ().FullName);
             }

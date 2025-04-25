@@ -60,8 +60,6 @@ public class Shortcut : View, IOrientation, IDesignable
     /// <param name="helpText">The help text to display.</param>
     public Shortcut (Key key, string? commandText, Action? action, string? helpText = null)
     {
-        Id = $"shortcut:{commandText}";
-
         HighlightStyle = HighlightStyle.None;
         CanFocus = true;
 
@@ -90,11 +88,11 @@ public class Shortcut : View, IOrientation, IDesignable
         Title = commandText ?? string.Empty;
 
         HelpView.Id = "_helpView";
-        HelpView.CanFocus = false;
+        //HelpView.CanFocus = false;
         HelpView.Text = helpText ?? string.Empty;
 
         KeyView.Id = "_keyView";
-        KeyView.CanFocus = false;
+        //KeyView.CanFocus = false;
         key ??= Key.Empty;
         Key = key;
 
@@ -118,18 +116,6 @@ public class Shortcut : View, IOrientation, IDesignable
     // It is calculated by setting Width to DimAuto temporarily and forcing layout.
     // Once Frame.Width gets below this value, LayoutStarted makes HelpView an KeyView smaller.
     private int? _minimumNaturalWidth;
-
-    /// <inheritdoc/>
-    protected override bool OnHighlight (CancelEventArgs<HighlightStyle> args)
-    {
-        if (args.NewValue.HasFlag (HighlightStyle.Hover))
-        {
-            SetFocus ();
-            return true;
-        }
-
-        return false;
-    }
 
     /// <summary>
     ///     Gets or sets the <see cref="AlignmentModes"/> for this <see cref="Shortcut"/>.
@@ -176,9 +162,6 @@ public class Shortcut : View, IOrientation, IDesignable
             Add (KeyView);
             SetKeyViewDefaultLayout ();
         }
-
-        // BUGBUG: Causes ever other layout to lose focus colors
-        //SetColors ();
     }
 
     // Force Width to DimAuto to calculate natural width and then set it back
@@ -260,44 +243,54 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     /// <summary>
-    ///     Called when a Command has been invoked on this Shortcut.
+    ///     Dispatches the Command in the <paramref name="commandContext"/> (Raises Selected, then Accepting, then invoke the Action, if any).
+    ///     Called when Command.Select, Accept, or HotKey has been invoked on this Shortcut.
     /// </summary>
     /// <param name="commandContext"></param>
-    /// <returns></returns>
+    /// <returns>
+    ///     <see langword="null"/> if no event was raised; input processing should continue.
+    ///     <see langword="false"/> if the event was raised and was not handled (or cancelled); input processing should continue.
+    ///     <see langword="true"/> if the event was raised and handled (or cancelled); input processing should stop.
+    /// </returns>
     internal virtual bool? DispatchCommand (ICommandContext? commandContext)
     {
-        Logging.Trace($"{commandContext?.Source?.Title}");
         CommandContext<KeyBinding>? keyCommandContext = commandContext as CommandContext<KeyBinding>? ?? default (CommandContext<KeyBinding>);
+
+        Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) Command: {commandContext?.Command}");
 
         if (keyCommandContext?.Binding.Data != this)
         {
+            // TODO: Optimize this to only do this if CommandView is custom (non View)
             // Invoke Select on the CommandView to cause it to change state if it wants to
             // If this causes CommandView to raise Accept, we eat it
             keyCommandContext = keyCommandContext!.Value with { Binding = keyCommandContext.Value.Binding with { Data = this } };
 
-            Logging.Trace ($"Invoking Select on CommandView.");
+            Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Invoking Select on CommandView ({CommandView.GetType ().Name}).");
 
             CommandView.InvokeCommand (Command.Select, keyCommandContext);
         }
 
-        // BUGBUG: Why does this use keyCommandContext and not commandContext?
-        Logging.Trace ($"RaiseSelecting ...");
-        if (RaiseSelecting (keyCommandContext) is true)
+        Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - RaiseSelecting ...");
+
+        if (RaiseSelecting (commandContext) is true)
         {
             return true;
         }
 
-        // The default HotKey handler sets Focus
-        Logging.Trace ($"SetFocus...");
-        SetFocus ();
+        if (CanFocus && SuperView is { CanFocus: true })
+        {
+            // The default HotKey handler sets Focus
+            Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - SetFocus...");
+            SetFocus ();
+        }
 
         var cancel = false;
 
-        if (commandContext is { })
+        if (commandContext is { Source: null })
         {
             commandContext.Source = this;
         }
-        Logging.Trace ($"RaiseAccepting...");
+        Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Calling RaiseAccepting...");
         cancel = RaiseAccepting (commandContext) is true;
 
         if (cancel)
@@ -305,20 +298,14 @@ public class Shortcut : View, IOrientation, IDesignable
             return true;
         }
 
-        if (commandContext?.Command != Command.Accept)
-        {
-            // return false;
-        }
-
         if (Action is { })
         {
-            Logging.Trace ($"Invoke Action...");
+            Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Invoke Action...");
             Action.Invoke ();
 
             // Assume if there's a subscriber to Action, it's handled.
             cancel = true;
         }
-
 
         return cancel;
     }
@@ -437,7 +424,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
             // The default behavior is for CommandView to not get focus. I
             // If you want it to get focus, you need to set it.
-            _commandView.CanFocus = false;
+            // _commandView.CanFocus = false;
 
             _commandView.HotKeyChanged += (s, e) =>
                                           {
@@ -492,8 +479,30 @@ public class Shortcut : View, IOrientation, IDesignable
         CommandView.VerticalTextAlignment = Alignment.Center;
         CommandView.TextAlignment = Alignment.Start;
         CommandView.TextFormatter.WordWrap = false;
-        CommandView.HighlightStyle = HighlightStyle.None;
+        //CommandView.HighlightStyle = HighlightStyle.None;
+        CommandView.GettingNormalColor += CommandViewOnGettingNormalColor;
+        CommandView.GettingHotNormalColor += CommandViewOnGettingHotNormalColor;
+
     }
+
+    private void CommandViewOnGettingNormalColor (object? sender, CancelEventArgs<Attribute> e)
+    {
+        if (HasFocus)
+        {
+            e.Cancel = true;
+            e.NewValue = GetFocusColor ();
+        }
+    }
+
+    private void CommandViewOnGettingHotNormalColor (object? sender, CancelEventArgs<Attribute> e)
+    {
+        if (HasFocus && e is { })
+        {
+            e.Cancel = true;
+            e.NewValue = GetHotFocusColor ();
+        }
+    }
+
 
     private void Shortcut_TitleChanged (object? sender, EventArgs<string> e)
     {
@@ -533,6 +542,9 @@ public class Shortcut : View, IOrientation, IDesignable
         HelpView.TextAlignment = Alignment.Start;
         HelpView.TextFormatter.WordWrap = false;
         HelpView.HighlightStyle = HighlightStyle.None;
+
+        HelpView.GettingNormalColor += CommandViewOnGettingNormalColor;
+        HelpView.GettingHotNormalColor += CommandViewOnGettingHotNormalColor;
     }
 
     /// <summary>
@@ -619,10 +631,10 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     /// <summary>
-    ///     Gets the subview that displays the key. Internal for unit testing.
+    ///     Gets the subview that displays the key. Is drawn with Normal and HotNormal colors reversed.
     /// </summary>
 
-    public View KeyView { get; } = new ();
+    public ShortcutKeyView KeyView { get; } = new ();
 
     private int _minimumKeyTextSize;
 
@@ -698,17 +710,6 @@ public class Shortcut : View, IOrientation, IDesignable
 
     #region Focus
 
-    /// <inheritdoc/>
-    public override ColorScheme? ColorScheme
-    {
-        get => base.ColorScheme;
-        set
-        {
-            base.ColorScheme = _nonFocusColorScheme = value;
-            SetColors ();
-        }
-    }
-
     private bool _forceFocusColors;
 
     /// <summary>
@@ -720,78 +721,31 @@ public class Shortcut : View, IOrientation, IDesignable
         set
         {
             _forceFocusColors = value;
-            SetColors (value);
-            //SetNeedsDraw();
+            SetNeedsDraw ();
         }
     }
 
-    private ColorScheme? _nonFocusColorScheme;
-
-    /// <summary>
-    /// </summary>
-    internal void SetColors (bool highlight = false)
+    /// <inheritdoc />
+    public override Attribute GetNormalColor ()
     {
-        if (HasFocus || highlight || ForceFocusColors)
+        if (HasFocus)
         {
-            if (_nonFocusColorScheme is null)
-            {
-                _nonFocusColorScheme = base.ColorScheme;
-            }
-
-            base.ColorScheme ??= new (Attribute.Default);
-
-            // When we have focus, we invert the colors
-            base.ColorScheme = new (base.ColorScheme)
-            {
-                Normal = GetFocusColor (),
-                HotNormal = GetHotFocusColor (),
-                HotFocus = GetHotNormalColor (),
-                Focus = GetNormalColor (),
-            };
-        }
-        else
-        {
-            if (_nonFocusColorScheme is { })
-            {
-                base.ColorScheme = _nonFocusColorScheme;
-                //_nonFocusColorScheme = null;
-            }
-            else
-            {
-                base.ColorScheme = SuperView?.ColorScheme ?? base.ColorScheme;
-            }
+            return base.GetFocusColor ();
         }
 
-        // Set KeyView's colors to show "hot"
-        if (IsInitialized && base.ColorScheme is { })
-        {
-            var cs = new ColorScheme (base.ColorScheme)
-            {
-                Normal = GetHotNormalColor (),
-                HotNormal = GetNormalColor ()
-            };
-            KeyView.ColorScheme = cs;
-        }
-
-        if (CommandView.Margin is { })
-        {
-            CommandView.Margin.ColorScheme = base.ColorScheme;
-        }
-        if (HelpView.Margin is { })
-        {
-            HelpView.Margin.ColorScheme = base.ColorScheme;
-        }
-
-        if (KeyView.Margin is { })
-        {
-            KeyView.Margin.ColorScheme = base.ColorScheme;
-        }
+        return base.GetNormalColor ();
     }
 
-    /// <inheritdoc/>
-    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view)
+    /// <inheritdoc />
+    public override Attribute GetHotNormalColor ()
     {
-        SetColors ();
+        if (HasFocus)
+
+        {
+            return base.GetHotFocusColor ();
+        }
+
+        return base.GetHotNormalColor ();
     }
 
     #endregion Focus
@@ -830,5 +784,23 @@ public class Shortcut : View, IOrientation, IDesignable
         }
 
         base.Dispose (disposing);
+    }
+}
+
+/// <summary>
+///     A helper class used by <see cref="Shortcut"/> to display the key. Reverses the Normal and HotNormal colors.
+/// </summary>
+public class ShortcutKeyView : View
+{
+    /// <inheritdoc />
+    public override Attribute GetNormalColor ()
+    {
+        if (SuperView is { HasFocus: true })
+
+        {
+            return base.GetHotFocusColor ();
+        }
+
+        return base.GetHotNormalColor ();
     }
 }

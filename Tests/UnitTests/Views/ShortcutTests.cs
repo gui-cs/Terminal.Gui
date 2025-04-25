@@ -466,7 +466,7 @@ public class ShortcutTests
 
         shortcut.HasFocus = true;
 
-        Assert.NotNull (shortcut.ColorScheme);
+        Assert.Null (shortcut.ColorScheme);
 
         Application.Top.Dispose ();
         Application.ResetState ();

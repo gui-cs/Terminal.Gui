@@ -4,13 +4,6 @@ namespace Terminal.Gui.ViewsTests;
 
 public class ColorPickerTests
 {
-    public ColorPickerTests ()
-    {
-#if DEBUG_IDISPOSABLE
-        View.DebugIDisposable = true;
-#endif
-    }
-
     [Fact]
     [SetupFakeDriver]
     public void ColorPicker_ChangedEvent_Fires ()
@@ -102,6 +95,7 @@ public class ColorPickerTests
         Assert.Equal ("#800000", hex.Text);
 
         Application.Top?.Dispose ();
+        Application.ResetState();
     }
 
     [Fact]
@@ -136,6 +130,8 @@ public class ColorPickerTests
         Assert.Equal ("#FF0000", hex.Text);
 
         Application.Top?.Dispose ();
+        Application.ResetState ();
+
     }
 
     [Fact]
@@ -170,6 +166,8 @@ public class ColorPickerTests
         Assert.Equal ("#FF0000", hex.Text);
 
         Application.Top?.Dispose ();
+        Application.ResetState ();
+
     }
 
     [Fact]
@@ -223,6 +221,8 @@ public class ColorPickerTests
         Assert.IsAssignableFrom<BBar> (cp.Focused);
 
         Application.Top?.Dispose ();
+        Application.ResetState ();
+
     }
 
     [Fact]
@@ -447,6 +447,8 @@ public class ColorPickerTests
         Assert.Equal ("#000000", hex.Text);
 
         Application.Top?.Dispose ();
+        Application.ResetState (true);
+
     }
 
     [Fact]
@@ -504,6 +506,8 @@ public class ColorPickerTests
         Assert.Equal ("#FF0000", hex.Text);
 
         Application.Top.Dispose ();
+        Application.ResetState (true);
+
     }
 
     [Fact]
@@ -557,6 +561,8 @@ public class ColorPickerTests
         Assert.Equal ("#1E0000", hex.Text);
 
         Application.Top?.Dispose ();
+        Application.ResetState (true);
+
     }
 
     [Theory]
@@ -592,6 +598,8 @@ public class ColorPickerTests
         Assert.Equal (expectedHex, hex.Text);
 
         Application.Top.Dispose ();
+        Application.ResetState (true);
+
     }
 
     [Theory]
@@ -636,6 +644,8 @@ public class ColorPickerTests
         Assert.Equal (expectedHex, hex.Text);
 
         Application.Top?.Dispose ();
+        Application.ResetState (true);
+
     }
 
     [Fact]
@@ -681,6 +691,8 @@ public class ColorPickerTests
         Assert.Equal ("#FF0000", hex.Text);
 
         Application.Top!.Dispose ();
+        Application.ResetState (true);
+
     }
 
     [Fact]
@@ -717,6 +729,8 @@ public class ColorPickerTests
         Assert.Equal ("#800000", hex.Text);
 
         Application.Top?.Dispose ();
+        Application.ResetState (true);
+
     }
 
     [Fact]

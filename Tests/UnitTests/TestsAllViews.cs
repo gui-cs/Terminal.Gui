@@ -63,14 +63,30 @@ public class TestsAllViews
 
         if (type is { IsGenericType: true, IsTypeDefinition: true })
         {
-            List<Type> gTypes = new ();
+            List<Type> typeArguments = new ();
 
-            foreach (Type args in type.GetGenericArguments ())
+            // use <object> or the original type if applicable
+            foreach (Type arg in type.GetGenericArguments ())
             {
-                gTypes.Add (typeof (object));
+                if (arg.IsValueType && Nullable.GetUnderlyingType (arg) == null)
+                {
+                    typeArguments.Add (arg);
+                }
+                else
+                {
+                    typeArguments.Add (typeof (object));
+                }
             }
 
-            type = type.MakeGenericType (gTypes.ToArray ());
+            type = type.MakeGenericType (typeArguments.ToArray ());
+
+            // Ensure the type does not contain any generic parameters
+            if (type.ContainsGenericParameters)
+            {
+                Logging.Warning ($"Cannot create an instance of {type} because it contains generic parameters.");
+                //throw new ArgumentException ($"Cannot create an instance of {type} because it contains generic parameters.");
+                return null;
+            }
 
             Assert.IsType (type, (View)Activator.CreateInstance (type)!);
         }

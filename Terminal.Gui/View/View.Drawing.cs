@@ -76,25 +76,25 @@ public partial class View // Drawing APIs
             context ??= new DrawContext ();
 
             // TODO: Simplify/optimize SetAttribute system.
-            DoSetAttribute ();
+            SetNormalAttribute ();
             DoClearViewport (context);
 
             // ------------------------------------
             // Draw the subviews first (order matters: SubViews, Text, Content)
             if (SubViewNeedsDraw)
             {
-                DoSetAttribute ();
+                SetNormalAttribute ();
                 DoDrawSubViews (context);
             }
 
             // ------------------------------------
             // Draw the text
-            DoSetAttribute ();
+            SetNormalAttribute ();
             DoDrawText (context);
 
             // ------------------------------------
             // Draw the content
-            DoSetAttribute ();
+            SetNormalAttribute ();
             DoDrawContent (context);
 
             // ------------------------------------
@@ -267,51 +267,6 @@ public partial class View // Drawing APIs
     protected virtual bool OnDrawingAdornments () { return false; }
 
     #endregion DrawAdornments
-
-    #region SetAttribute
-
-    private void DoSetAttribute ()
-    {
-        if (OnSettingAttribute ())
-        {
-            return;
-        }
-
-        var args = new CancelEventArgs ();
-        SettingAttribute?.Invoke (this, args);
-
-        if (args.Cancel)
-        {
-            return;
-        }
-
-        SetNormalAttribute ();
-    }
-
-    /// <summary>
-    ///     Called when the normal attribute for the View is to be set. This is called before the View is drawn.
-    /// </summary>
-    /// <returns><see langword="true"/> to stop default behavior.</returns>
-    protected virtual bool OnSettingAttribute () { return false; }
-
-    /// <summary>Raised  when the normal attribute for the View is to be set. This is raised before the View is drawn.</summary>
-    /// <returns>
-    ///     Set <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/> to stop default behavior.
-    /// </returns>
-    public event EventHandler<CancelEventArgs>? SettingAttribute;
-
-    /// <summary>
-    ///     Sets the attribute for the View. This is called before the View is drawn.
-    /// </summary>
-    public void SetNormalAttribute ()
-    {
-        if (ColorScheme is { })
-        {
-            SetAttribute (GetNormalColor ());
-        }
-    }
-
-    #endregion
 
     #region ClearViewport
 
@@ -673,7 +628,7 @@ public partial class View // Drawing APIs
                 // Get the entire map
                 if (p.Value is { })
                 {
-                    SetAttribute (p.Value.Value.Attribute ?? ColorScheme!.Normal);
+                    SetAttribute (p.Value.Value.Attribute ?? GetNormalColor ());
                     Driver.Move (p.Key.X, p.Key.Y);
 
                     // TODO: #2616 - Support combining sequences that don't normalize

@@ -61,8 +61,8 @@ public class UICatalog
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
         }
 
-        UICatalogTopLevel.CachedScenarios = Scenario.GetScenarios ();
-        UICatalogTopLevel.CachedCategories = Scenario.GetAllCategories ();
+        UICatalogTop.CachedScenarios = Scenario.GetScenarios ();
+        UICatalogTop.CachedCategories = Scenario.GetAllCategories ();
 
         // Process command line args
 
@@ -108,7 +108,7 @@ public class UICatalog
                                                                   "The name of the Scenario to run. If not provided, the UI Catalog UI will be shown.",
                                                                   getDefaultValue: () => "none"
                                                                  ).FromAmong (
-                                                                              UICatalogTopLevel.CachedScenarios.Select (s => s.GetName ())
+                                                                              UICatalogTop.CachedScenarios.Select (s => s.GetName ())
                                                                                                .Append ("none")
                                                                                                .ToArray ()
                                                                              );
@@ -217,20 +217,21 @@ public class UICatalog
 
         Application.Init (driverName: _forceDriver);
 
-        if (string.IsNullOrWhiteSpace (UICatalogTopLevel.CachedTheme))
+        if (string.IsNullOrWhiteSpace (UICatalogTop.CachedTheme))
         {
-            UICatalogTopLevel.CachedTheme = Themes?.Theme;
+            UICatalogTop.CachedTheme = Themes?.Theme;
         }
         else
         {
-            Themes!.Theme = UICatalogTopLevel.CachedTheme;
-            Apply ();
+            Themes!.Theme = UICatalogTop.CachedTheme;
         }
 
-        Application.Run<UICatalogTopLevel> ().Dispose ();
+        UICatalogTop top = Application.Run<UICatalogTop> ();
+        top.Dispose ();
         Application.Shutdown ();
+        VerifyObjectsWereDisposed ();
 
-        return UICatalogTopLevel.CachedSelectedScenario!;
+        return UICatalogTop.CachedSelectedScenario!;
     }
 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
@@ -323,15 +324,15 @@ public class UICatalog
         // run it and exit when done.
         if (options.Scenario != "none")
         {
-            int item = UICatalogTopLevel.CachedScenarios!.IndexOf (
-                                                                   UICatalogTopLevel.CachedScenarios!.FirstOrDefault (
+            int item = UICatalogTop.CachedScenarios!.IndexOf (
+                                                                   UICatalogTop.CachedScenarios!.FirstOrDefault (
                                                                         s =>
                                                                             s.GetName ()
                                                                              .Equals (options.Scenario, StringComparison.OrdinalIgnoreCase)
                                                                        )!);
-            UICatalogTopLevel.CachedSelectedScenario = (Scenario)Activator.CreateInstance (UICatalogTopLevel.CachedScenarios [item].GetType ())!;
+            UICatalogTop.CachedSelectedScenario = (Scenario)Activator.CreateInstance (UICatalogTop.CachedScenarios [item].GetType ())!;
 
-            BenchmarkResults? results = RunScenario (UICatalogTopLevel.CachedSelectedScenario, options.Benchmark);
+            BenchmarkResults? results = RunScenario (UICatalogTop.CachedSelectedScenario, options.Benchmark);
 
             if (results is { })
             {
@@ -357,15 +358,16 @@ public class UICatalog
             return;
         }
 
-        while (RunUICatalogTopLevel () is { } scenario)
-        {
-            VerifyObjectsWereDisposed ();
-            Themes!.Theme = UICatalogTopLevel.CachedTheme!;
-            Apply ();
-            scenario.TopLevelColorScheme = UICatalogTopLevel.CachedTopLevelColorScheme!;
 
 #if DEBUG_IDISPOSABLE
-            View.DebugIDisposable = true;
+        View.EnableDebugIDisposableAsserts = true;
+#endif
+
+        while (RunUICatalogTopLevel () is { } scenario)
+        {
+
+#if DEBUG_IDISPOSABLE
+            VerifyObjectsWereDisposed ();
 
             // Measure how long it takes for the app to shut down
             var sw = new Stopwatch ();
@@ -380,6 +382,7 @@ public class UICatalog
             // made by Scenario.Init() above
             // TODO: Throw if shutdown was not called already
             Application.Shutdown ();
+
             VerifyObjectsWereDisposed ();
 
 #if DEBUG_IDISPOSABLE
@@ -412,7 +415,6 @@ public class UICatalog
         }
 
         Application.Init (driverName: _forceDriver);
-        scenario.TopLevelColorScheme = UICatalogTopLevel.CachedTopLevelColorScheme!;
 
         if (benchmark)
         {
@@ -442,7 +444,7 @@ public class UICatalog
 
         var maxScenarios = 5;
 
-        foreach (Scenario s in UICatalogTopLevel.CachedScenarios!)
+        foreach (Scenario s in UICatalogTop.CachedScenarios!)
         {
             resultsList.Add (RunScenario (s, true)!);
             maxScenarios--;
@@ -598,8 +600,11 @@ public class UICatalog
     private static void VerifyObjectsWereDisposed ()
     {
 #if DEBUG_IDISPOSABLE
-        if (!View.DebugIDisposable)
+        if (!View.EnableDebugIDisposableAsserts)
         {
+            View.Instances.Clear ();
+            RunState.Instances.Clear ();
+
             return;
         }
 

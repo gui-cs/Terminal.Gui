@@ -202,16 +202,20 @@ public class SpinnerViewStyles : Scenario
 
         void App_Unloaded (object sender, EventArgs args)
         {
-            if (spinner != null)
+            if (spinner is {})
             {
                 spinner.Dispose ();
                 spinner = null;
             }
-
-            app.Unloaded -= App_Unloaded;
         }
 
         Application.Run (app);
+        app.Unloaded -= App_Unloaded;
+        if (spinner is { })
+        {
+            spinner.Dispose ();
+            spinner = null;
+        }
         app.Dispose ();
 
         Application.Shutdown ();

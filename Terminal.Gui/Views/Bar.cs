@@ -74,24 +74,6 @@ public class Bar : View, IOrientation, IDesignable
         }
     }
 
-    /// <inheritdoc />
-    public override void EndInit ()
-    {
-        base.EndInit ();
-        ColorScheme = Colors.ColorSchemes ["Menu"];
-    }
-
-    /// <inheritdoc/>
-    public override void SetBorderStyle (LineStyle lineStyle)
-    {
-        if (Border is { })
-        {
-            // The default changes the thickness. We don't want that. We just set the style.
-           Border.LineStyle = lineStyle;
-        }
-        //base.SetBorderStyle(lineStyle);
-    }
-
     #region IOrientation members
 
     /// <summary>
@@ -216,7 +198,7 @@ public class Bar : View, IOrientation, IDesignable
                 {
                     View barItem = SubViews.ElementAt (index);
 
-                    barItem.ColorScheme = ColorScheme;
+                    //barItem.ColorScheme = ColorScheme;
                     barItem.X = Pos.Align (Alignment.Start, AlignmentModes);
                     barItem.Y = 0; //Pos.Center ();
 
@@ -235,7 +217,7 @@ public class Bar : View, IOrientation, IDesignable
 
                     var minKeyWidth = 0;
 
-                    List<Shortcut> shortcuts = SubViews.Where (s => s is Shortcut && s.Visible).Cast<Shortcut> ().ToList ();
+                    List<Shortcut> shortcuts = SubViews.OfType<Shortcut> ().Where (s => s.Visible).ToList ();
 
                     foreach (Shortcut shortcut in shortcuts)
                     {
@@ -250,7 +232,7 @@ public class Bar : View, IOrientation, IDesignable
                         View barItem = SubViews.ElementAt (index);
 
 
-                        barItem.ColorScheme = ColorScheme;
+                       // barItem.ColorScheme = ColorScheme;
 
                         if (!barItem.Visible)
                         {

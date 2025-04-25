@@ -4,6 +4,11 @@ using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
+
+// TODO: Add support for other attributes (bold, underline, etc.) once the platform drivers support them.
+// TODO: See https://github.com/gui-cs/Terminal.Gui/issues/457
+
+
 /// <summary>Attributes represent how text is styled when displayed in the terminal.</summary>
 /// <remarks>
 ///     <see cref="Attribute"/> provides a platform independent representation of colors (and someday other forms of
