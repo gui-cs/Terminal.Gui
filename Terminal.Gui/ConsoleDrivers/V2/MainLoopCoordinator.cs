@@ -164,7 +164,7 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
 
             if (!_isWindowsTerminal)
             {
-                _facade.Force16Colors = true;
+                Application.Force16Colors = _facade.Force16Colors = true;
             }
 
             Application.Driver = _facade;
