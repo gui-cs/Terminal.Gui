@@ -26,7 +26,7 @@ public class ThemeTests
         theme ["FrameView.DefaultBorderStyle"].PropertyValue = LineStyle.Double; // default is Single
 
         Themes.Theme = "testTheme";
-        Themes! [ThemeManager.SelectedTheme]!.Apply ();
+        Themes! [ThemeManager.Instance.SelectedTheme]!.Apply ();
 
         Assert.Equal (LineStyle.Double, FrameView.DefaultBorderStyle);
 
@@ -63,7 +63,7 @@ public class ThemeTests
 
         // Act
         Themes.Theme = "testTheme";
-        Themes! [ThemeManager.SelectedTheme]!.Apply ();
+        Themes! [ThemeManager.Instance.SelectedTheme]!.Apply ();
 
         // Assert
         ColorScheme updatedScheme = Colors.ColorSchemes ["test"];

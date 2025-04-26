@@ -145,6 +145,19 @@ public static class ConfigurationManager
     public static ThemeManager? Themes => ThemeManager.Instance;
 
     /// <summary>
+    /// Static property solely for configuration serialization.
+    /// </summary>
+    [JsonInclude]
+    [JsonConverter (typeof (DictionaryJsonConverter<ThemeScope>))]
+    [SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
+    public static Dictionary<string, ThemeScope>? ThemesConfig
+    {
+        get => Settings? ["Themes"]?.PropertyValue as Dictionary<string, ThemeScope>;
+        set => Settings! ["Themes"].PropertyValue = value;
+    }
+
+
+    /// <summary>
     ///     Gets or sets whether the <see cref="ConfigurationManager"/> should throw an exception if it encounters an
     ///     error on deserialization. If <see langword="false"/> (the default), the error is logged and printed to the console
     ///     when <see cref="Application.Shutdown"/> is called.
@@ -166,18 +179,18 @@ public static class ConfigurationManager
 
         try
         {
-            if (string.IsNullOrEmpty (ThemeManager.SelectedTheme))
+            if (string.IsNullOrEmpty (ThemeManager.Instance.SelectedTheme))
             {
                 // First start. Apply settings first. This ensures if a config sets Theme to something other than "Default", it gets used
                 settings = Settings?.Apply () ?? false;
 
-                themes = !string.IsNullOrEmpty (ThemeManager.SelectedTheme)
-                         && (ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false);
+                themes = !string.IsNullOrEmpty (ThemeManager.Instance.SelectedTheme)
+                         && (ThemeManager.Instance.Themes? [ThemeManager.Instance.SelectedTheme]?.Apply () ?? false);
             }
             else
             {
                 // Subsequently. Apply Themes first using whatever the SelectedTheme is
-                themes = ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false;
+                themes = ThemeManager.Instance.Themes? [ThemeManager.Instance.SelectedTheme]?.Apply () ?? false;
                 settings = Settings?.Apply () ?? false;
             }
 
@@ -285,7 +298,7 @@ public static class ConfigurationManager
             Settings?.Update ($"~/.tui/{AppName}.{_configFilename}", ConfigLocations.AppHome);
         }
 
-        ThemeManager.SelectedTheme = Settings!["Theme"].PropertyValue as string ?? "Default";
+        ThemeManager.Instance.SelectedTheme = Settings!["Theme"].PropertyValue as string ?? "Default";
     }
 
     /// <summary>
@@ -361,7 +374,7 @@ public static class ConfigurationManager
         ClearJsonErrors ();
 
         Settings = new ();
-        ThemeManager.Reset ();
+        ThemeManager.Instance.Reset ();
         AppSettings = new ();
 
         // To enable some unit tests, we only load from resources if the flag is set
@@ -377,7 +390,7 @@ public static class ConfigurationManager
         OnUpdated ();
 
         Apply ();
-        ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply ();
+        ThemeManager.Instance.Themes? [ThemeManager.Instance.SelectedTheme]?.Apply ();
         AppSettings?.Apply ();
     }
 
@@ -519,7 +532,7 @@ public static class ConfigurationManager
         }
 
         Settings = new ();
-        ThemeManager.GetHardCodedDefaults ();
+        ThemeManager.Instance.GetHardCodedDefaults ();
         AppSettings?.RetrieveValues ();
 
         foreach (KeyValuePair<string, ConfigProperty> p in Settings!.Where (cp => cp.Value.PropertyInfo is { }))
