@@ -350,7 +350,7 @@ public class TreeView<T> : View, ITreeView where T : class
     ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="Objects"/> collection as the user
     ///     types.
     /// </summary>
-    public CollectionNavigator KeystrokeNavigator { get; } = new ();
+    public IListCollectionNavigator KeystrokeNavigator { get; } = new CollectionNavigator();
 
     /// <summary>Maximum number of nodes that can be expanded in any given branch.</summary>
     public int MaxDepth { get; set; } = 100;
@@ -1206,8 +1206,15 @@ public class TreeView<T> : View, ITreeView where T : class
             return false;
         }
 
+        // If the key was bound to key command, let normal KeyDown processing happen. This enables overriding the default handling.
+        // See: https://github.com/gui-cs/Terminal.Gui/issues/3950#issuecomment-2807350939
+        if (KeyBindings.TryGet (key, out _))
+        {
+            return false;
+        }
+
         // If not a keybinding, is the key a searchable key press?
-        if (CollectionNavigatorBase.IsCompatibleKey (key) && AllowLetterBasedNavigation)
+        if (KeystrokeNavigator.Matcher.IsCompatibleKey (key) && AllowLetterBasedNavigation)
         {
             // If there has been a call to InvalidateMap since the last time
             // we need a new one to reflect the new exposed tree state
