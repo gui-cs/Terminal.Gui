@@ -1,5 +1,10 @@
 # Keyboard Deep Dive
 
+## See Also
+
+* [Cancellable Work Pattern](cancellable_work_pattern.md)
+* [Command Deep Dive](command.md)
+
 ## Tenets for Terminal.Gui Keyboard Handling (Unless you know better ones...)
 
 Tenets higher in the list have precedence over tenets lower in the list.

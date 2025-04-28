@@ -10,7 +10,12 @@ namespace Terminal.Gui;
 /// <seealso cref="View.MouseBindings"/>
 /// <seealso cref="Application.KeyBindings"/>
 /// <remarks>
-///     <see cref="Application"/> supports a subset of these commands by default, which can be overriden via <see cref="Application.KeyBindings"/>.
+///     <para>
+///         <see cref="Application"/> supports a subset of these commands by default, which can be overriden via <see cref="Application.KeyBindings"/>.
+///     </para>
+///     <para>
+///         See the Commands Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/command.html"/>.
+///     </para>
 /// </remarks>
 public enum Command
 {
