@@ -285,4 +285,19 @@ public class ThemeManager : IDictionary<string, ThemeScope>
 #pragma warning restore 1591
 
     #endregion
+
+    /// <summary>
+    ///     Helper to get the default schemes from the default theme.
+    /// </summary>
+    /// <returns></returns>
+    public static Dictionary<string, Scheme?> GetDefaultSchemes ()
+    {
+        Dictionary<string, Scheme?>? schemes = [];
+        if (Themes is { })
+        {
+           schemes = Themes ["Default"] ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
+        }
+
+        return schemes;
+    }
 }

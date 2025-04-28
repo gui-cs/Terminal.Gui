@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.ComponentModel;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace Terminal.Gui;
 
@@ -42,6 +43,8 @@ public partial class View
     /// </returns>
     public virtual Attribute GetFocusColor ()
     {
+        return GetAttributeForRole (VisualRole.Focus);
+
         Attribute currAttribute = Scheme?.Normal ?? Attribute.Default;
         var newAttribute = new Attribute ();
         CancelEventArgs<Attribute> args = new (in currAttribute, ref newAttribute);
@@ -72,6 +75,8 @@ public partial class View
     /// </returns>
     public virtual Attribute GetHotFocusColor ()
     {
+        return GetAttributeForRole (VisualRole.HotFocus);
+
         Attribute currAttribute = Scheme?.Normal ?? Attribute.Default;
         var newAttribute = new Attribute ();
         CancelEventArgs<Attribute> args = new (in currAttribute, ref newAttribute);
@@ -102,6 +107,8 @@ public partial class View
     /// </returns>
     public virtual Attribute GetHotNormalColor ()
     {
+        return GetAttributeForRole (VisualRole.HotNormal);
+
         Attribute currAttribute = Scheme?.Normal ?? Attribute.Default;
         var newAttribute = new Attribute ();
         CancelEventArgs<Attribute> args = new (in currAttribute, ref newAttribute);
@@ -132,6 +139,8 @@ public partial class View
     /// </returns>
     public virtual Attribute GetNormalColor ()
     {
+        return GetAttributeForRole (VisualRole.Normal);
+
         Attribute currAttribute = Scheme?.Normal ?? Attribute.Default;
         var newAttribute = new Attribute ();
         CancelEventArgs<Attribute> args = new (in currAttribute, ref newAttribute);
@@ -159,6 +168,59 @@ public partial class View
     ///     a different value to change the focus color.
     /// </summary>
     public event EventHandler<CancelEventArgs<Attribute>>? GettingNormalColor;
+
+    /// <summary>
+    /// Gets the <see cref="Attribute"/> associated with a specified <see cref="VisualRole"/>.
+    /// </summary>
+    /// <param name="role">The semantic <see cref="VisualRole"/> describing the element being rendered.</param>
+    /// <returns>The corresponding <see cref="Attribute"/> from the <see cref="Scheme"/>.</returns>
+    protected virtual Attribute GetAttributeForRole (VisualRole role)
+    {
+        Scheme scheme = Scheme ?? ThemeManager.GetDefaultSchemes () ["Base"]!;
+        Attribute currAttribute = GetAttributeForRole (scheme, role);
+
+        var newAttribute = new Attribute ();
+        VisualRoleEventArgs args = new (role, ref newAttribute);
+        GettingAttributeForRole?.Invoke (this, args);
+
+        if (args.Cancel)
+        {
+            return args.NewValue;
+        }
+
+        // BUGBUG: This broke ViewDiagnosticFlags.Hover
+
+        return GetAttributeForRole (scheme, role);
+    }
+
+    /// <summary>
+    ///     Raised the Attribute for a VisualRole is being retrieved, from <see cref="GetAttributeForRole(Terminal.Gui.VisualRole)"/>. Cancel the event and set the new
+    ///     attribute in the event args to
+    ///     a different value to change the attribute.
+    /// </summary>
+    public event EventHandler<VisualRoleEventArgs>? GettingAttributeForRole;
+
+    /// <summary>
+    /// Gets the <see cref="Attribute"/> associated with a specified <see cref="VisualRole"/>.
+    /// </summary>
+    /// <param name="scheme">The scheme to use.</param>
+    /// <param name="role">The semantic <see cref="VisualRole"/> describing the element being rendered.</param>
+    /// <returns>The corresponding <see cref="Attribute"/> from the <see cref="Scheme"/>.</returns>
+    protected Attribute GetAttributeForRole (Scheme scheme, VisualRole role)
+    {
+        return role switch
+               {
+                   VisualRole.Normal => scheme.Normal,
+                   VisualRole.HotNormal => scheme.HotNormal,
+                   VisualRole.Focus => scheme.Focus,
+                   VisualRole.HotFocus => scheme.HotFocus,
+                   //VisualRole.Active => scheme.Active,
+                   //VisualRole.HotActive => scheme.HotActive,
+                   VisualRole.Disabled => scheme.Disabled,
+                   //VisualRole.ReadOnly => scheme.ReadOnly,
+                   _ => scheme.Normal
+               };
+    }
 
     /// <summary>
     ///     Sets the Normal attribute if the setting process is not canceled. It triggers an event and checks for

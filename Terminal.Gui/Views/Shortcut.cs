@@ -480,26 +480,28 @@ public class Shortcut : View, IOrientation, IDesignable
         CommandView.TextAlignment = Alignment.Start;
         CommandView.TextFormatter.WordWrap = false;
         //CommandView.HighlightStyle = HighlightStyle.None;
-        CommandView.GettingNormalColor += CommandViewOnGettingNormalColor;
-        CommandView.GettingHotNormalColor += CommandViewOnGettingHotNormalColor;
-
+        CommandView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
     }
 
-    private void CommandViewOnGettingNormalColor (object? sender, CancelEventArgs<Attribute> e)
+    private void SubViewOnGettingAttributeForRole (object? sender, VisualRoleEventArgs e)
     {
-        if (HasFocus)
+        switch (e.Role)
         {
-            e.Cancel = true;
-            e.NewValue = GetFocusColor ();
-        }
-    }
+            case VisualRole.Normal:
+                if (HasFocus)
+                {
+                    e.Cancel = true;
+                    e.NewValue = GetFocusColor ();
+                }
+                break;
 
-    private void CommandViewOnGettingHotNormalColor (object? sender, CancelEventArgs<Attribute> e)
-    {
-        if (HasFocus && e is { })
-        {
-            e.Cancel = true;
-            e.NewValue = GetHotFocusColor ();
+            case VisualRole.HotNormal:
+                if (HasFocus)
+                {
+                    e.Cancel = true;
+                    e.NewValue = GetHotFocusColor ();
+                }
+                break;
         }
     }
 
@@ -543,8 +545,7 @@ public class Shortcut : View, IOrientation, IDesignable
         HelpView.TextFormatter.WordWrap = false;
         HelpView.HighlightStyle = HighlightStyle.None;
 
-        HelpView.GettingNormalColor += CommandViewOnGettingNormalColor;
-        HelpView.GettingHotNormalColor += CommandViewOnGettingHotNormalColor;
+        HelpView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
     }
 
     /// <summary>

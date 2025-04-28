@@ -176,54 +176,51 @@ public class OptionSelector : View, IOrientation, IDesignable
             RadioStyle = true
         };
 
-        checkbox.GettingNormalColor += (_, e) =>
+        checkbox.GettingAttributeForRole += (_, e) =>
         {
-            if (SuperView is { HasFocus: true })
+            if (SuperView is { HasFocus: false })
             {
-                e.Cancel = true;
+                return;
+            }
 
-                if (!HasFocus)
-                {
-                    e.NewValue = GetFocusColor ();
-                }
-                else
-                {
-                    // If _scheme was set, it's because of Hover
-                    if (checkbox._scheme is { })
+            switch (e.Role)
+            {
+                case VisualRole.Normal:
+                    e.Cancel = true;
+
+                    if (!HasFocus)
                     {
-                        e.NewValue = checkbox._scheme.Normal;
+                        e.NewValue = GetFocusColor ();
                     }
                     else
                     {
-                        e.NewValue = GetNormalColor ();
+                        // If _scheme was set, it's because of Hover
+                        if (checkbox._scheme is { })
+                        {
+                            e.NewValue = checkbox._scheme.Normal;
+                        }
+                        else
+                        {
+                            e.NewValue = GetNormalColor ();
+                        }
                     }
-                }
-            }
-        };
 
-        checkbox.GettingHotNormalColor += (_, e) =>
-        {
-            if (SuperView is { HasFocus: true })
-            {
-                e.Cancel = true;
-                if (!HasFocus)
-                {
-                    e.NewValue = GetHotFocusColor ();
-                }
-                else
-                {
-                    // If _scheme was set, it's because of Hover
-                    if (checkbox._scheme is { })
+                    break;
+
+                case VisualRole.HotNormal:
+                    if (!HasFocus)
                     {
-                        e.NewValue = checkbox._scheme.Normal;
+                        e.NewValue = GetHotFocusColor ();
                     }
                     else
                     {
-                        e.NewValue = GetNormalColor ();
+                        e.NewValue = GetHotNormalColor ();
                     }
-                }
+
+                    break;
             }
         };
+
         checkbox.Selecting += (sender, args) =>
         {
             if (RaiseSelecting (args.Context) is true)

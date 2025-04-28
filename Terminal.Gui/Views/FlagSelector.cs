@@ -185,7 +185,7 @@ public class FlagSelector : View, IOrientation, IDesignable
 
             if (_value is null)
             {
-               Value = Convert.ToUInt16 (_flags?.Keys.ElementAt (0));
+                Value = Convert.ToUInt16 (_flags?.Keys.ElementAt (0));
             }
         }
     }
@@ -210,7 +210,7 @@ public class FlagSelector : View, IOrientation, IDesignable
             }
             _assignHotKeysToCheckBoxes = value;
             CreateCheckBoxes ();
-            UpdateChecked();
+            UpdateChecked ();
         }
     }
 
@@ -309,46 +309,50 @@ public class FlagSelector : View, IOrientation, IDesignable
             HighlightStyle = HighlightStyle.Hover
         };
 
-        checkbox.GettingNormalColor += (_, e) =>
+        checkbox.GettingAttributeForRole += (_, e) =>
                                        {
-                                           if (SuperView is { HasFocus: true })
+                                           if (SuperView is { HasFocus: false })
                                            {
-                                               e.Cancel = true;
+                                               return;
+                                           }
 
-                                               if (!HasFocus)
-                                               {
-                                                   e.NewValue = GetFocusColor ();
-                                               }
-                                               else
-                                               {
-                                                   // If _scheme was set, it's because of Hover
-                                                   if (checkbox._scheme is { })
+                                           switch (e.Role)
+                                           {
+                                               case VisualRole.Normal:
+                                                   e.Cancel = true;
+
+                                                   if (!HasFocus)
                                                    {
-                                                       e.NewValue = checkbox._scheme.Normal;
+                                                       e.NewValue = GetFocusColor ();
                                                    }
                                                    else
                                                    {
-                                                       e.NewValue = GetNormalColor ();
+                                                       // If _scheme was set, it's because of Hover
+                                                       if (checkbox._scheme is { })
+                                                       {
+                                                           e.NewValue = checkbox._scheme.Normal;
+                                                       }
+                                                       else
+                                                       {
+                                                           e.NewValue = GetNormalColor ();
+                                                       }
                                                    }
-                                               }
+
+                                                   break;
+
+                                               case VisualRole.HotNormal:
+                                                   if (!HasFocus)
+                                                   {
+                                                       e.NewValue = GetHotFocusColor ();
+                                                   }
+                                                   else
+                                                   {
+                                                       e.NewValue = GetHotNormalColor ();
+                                                   }
+
+                                                   break;
                                            }
                                        };
-
-        checkbox.GettingHotNormalColor += (_, e) =>
-                                          {
-                                              if (SuperView is { HasFocus: true })
-                                              {
-                                                  e.Cancel = true;
-                                                  if (!HasFocus)
-                                                  {
-                                                      e.NewValue = GetHotFocusColor ();
-                                                  }
-                                                  else
-                                                  {
-                                                      e.NewValue = GetHotNormalColor ();
-                                                  }
-                                              }
-                                          };
 
         //checkbox.GettingFocusColor += (_, e) =>
         //                                  {
@@ -373,7 +377,8 @@ public class FlagSelector : View, IOrientation, IDesignable
                                       args.Cancel = true;
 
                                       return;
-                                  };
+                                  }
+                                  ;
 
                                   if (RaiseAccepting (args.Context) is true)
                                   {
