@@ -188,7 +188,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         tvValue.Text = string.Empty;
         tvTerminator.Text = string.Empty;
 
-            lblSuccess.ColorScheme = Colors.ColorSchemes ["Base"];
+            lblSuccess.Scheme = Colors.Schemes ["Base"];
             lblSuccess.Text = "Successful";
     }
 
@@ -199,7 +199,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         tvValue.Text = string.Empty;
         tvTerminator.Text = string.Empty;
 
-        lblSuccess.ColorScheme = Colors.ColorSchemes ["Error"];
+        lblSuccess.Scheme = Colors.Schemes ["Error"];
         lblSuccess.Text = "Error";
     }
 

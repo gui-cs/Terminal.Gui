@@ -13,7 +13,7 @@ namespace Terminal.Gui;
 /// <example>
 ///     <code>
 /// 	"Default": {
-/// 		"ColorSchemes": [
+/// 		"Schemes": [
 /// 		{
 /// 		"TopLevel": {
 /// 		"Normal": {

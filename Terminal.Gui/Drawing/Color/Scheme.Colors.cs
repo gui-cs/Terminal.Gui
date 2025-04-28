@@ -6,23 +6,23 @@ using System.Text.Json.Serialization;
 namespace Terminal.Gui;
 
 /// <summary>
-///     Holds the <see cref="ColorScheme"/>s that define the <see cref="Attribute"/>s that are used by views to render
+///     Holds the <see cref="Scheme"/>s that define the <see cref="Attribute"/>s that are used by views to render
 ///     themselves.
 /// </summary>
-public sealed class Colors : INotifyCollectionChanged, IDictionary<string, ColorScheme?>
+public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Scheme?>
 {
     private static readonly object _lock = new object ();
 
     static Colors ()
     {
-        ColorSchemes = new Dictionary<string, ColorScheme?> (5, StringComparer.InvariantCultureIgnoreCase);
+        Schemes = new Dictionary<string, Scheme?> (5, StringComparer.InvariantCultureIgnoreCase);
         Reset ();
     }
 
-    /// <summary>Gets a dictionary of defined <see cref="ColorScheme"/> objects.</summary>
+    /// <summary>Gets a dictionary of defined <see cref="Scheme"/> objects.</summary>
     /// <remarks>
     ///     <para>
-    ///         The <see cref="ColorSchemes"/> dictionary includes the following keys, by default:
+    ///         The <see cref="Schemes"/> dictionary includes the following keys, by default:
     ///         <list type="table">
     ///             <listheader>
     ///                 <term>Built-in Color Scheme</term> <description>Description</description>
@@ -64,9 +64,9 @@ public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Color
     ///     </para>
     /// </remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope), OmitClassName = true)]
-    [JsonConverter (typeof (DictionaryJsonConverter<ColorScheme?>))]
+    [JsonConverter (typeof (DictionaryJsonConverter<Scheme?>))]
     [UsedImplicitly]
-    public static Dictionary<string, ColorScheme?> ColorSchemes { get; private set; }
+    public static Dictionary<string, Scheme?> Schemes { get; private set; }
 
     /// <summary>
     ///     Raised when the collection changes.
@@ -74,29 +74,29 @@ public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Color
     public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
     /// <inheritdoc />
-    public ColorScheme? this [string key]
+    public Scheme? this [string key]
     {
         get
         {
             lock (_lock)
             {
-                return ColorSchemes [key];
+                return Schemes [key];
             }
         }
         set
         {
             lock (_lock)
             {
-                if (ColorSchemes.ContainsKey (key))
+                if (Schemes.ContainsKey (key))
                 {
-                    ColorScheme? oldValue = ColorSchemes [key];
-                    ColorSchemes [key] = value;
+                    Scheme? oldValue = Schemes [key];
+                    Schemes [key] = value;
                     CollectionChanged?.Invoke (this, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Replace, value, oldValue));
                 }
                 else
                 {
-                    ColorSchemes.Add (key, value);
-                    CollectionChanged?.Invoke (this, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, new KeyValuePair<string, ColorScheme?> (key, value)));
+                    Schemes.Add (key, value);
+                    CollectionChanged?.Invoke (this, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, new KeyValuePair<string, Scheme?> (key, value)));
                 }
             }
         }
@@ -109,7 +109,7 @@ public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Color
         {
             lock (_lock)
             {
-                return ColorSchemes.Count;
+                return Schemes.Count;
             }
         }
     }
@@ -124,37 +124,37 @@ public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Color
         {
             lock (_lock)
             {
-                return new List<string> (ColorSchemes.Keys);
+                return new List<string> (Schemes.Keys);
             }
         }
     }
 
     /// <inheritdoc />
-    public ICollection<ColorScheme?> Values
+    public ICollection<Scheme?> Values
     {
         get
         {
             lock (_lock)
             {
-                return new List<ColorScheme?> (ColorSchemes.Values);
+                return new List<Scheme?> (Schemes.Values);
             }
         }
     }
 
     /// <inheritdoc />
-    public void Add (KeyValuePair<string, ColorScheme?> item)
+    public void Add (KeyValuePair<string, Scheme?> item)
     {
         lock (_lock)
         {
-            ColorSchemes.Add (item.Key, item.Value);
+            Schemes.Add (item.Key, item.Value);
             CollectionChanged?.Invoke (this, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, item));
         }
     }
 
     /// <inheritdoc />
-    public void Add (string key, ColorScheme? value)
+    public void Add (string key, Scheme? value)
     {
-        Add (new KeyValuePair<string, ColorScheme?> (key, value));
+        Add (new KeyValuePair<string, Scheme?> (key, value));
     }
 
     /// <inheritdoc />
@@ -162,17 +162,17 @@ public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Color
     {
         lock (_lock)
         {
-            ColorSchemes.Clear ();
+            Schemes.Clear ();
             CollectionChanged?.Invoke (this, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
         }
     }
 
     /// <inheritdoc />
-    public bool Contains (KeyValuePair<string, ColorScheme?> item)
+    public bool Contains (KeyValuePair<string, Scheme?> item)
     {
         lock (_lock)
         {
-            return ColorSchemes.Contains (item);
+            return Schemes.Contains (item);
         }
     }
 
@@ -181,25 +181,25 @@ public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Color
     {
         lock (_lock)
         {
-            return ColorSchemes.ContainsKey (key);
+            return Schemes.ContainsKey (key);
         }
     }
 
     /// <inheritdoc />
-    public void CopyTo (KeyValuePair<string, ColorScheme?> [] array, int arrayIndex)
+    public void CopyTo (KeyValuePair<string, Scheme?> [] array, int arrayIndex)
     {
         lock (_lock)
         {
-            ((ICollection)ColorSchemes).CopyTo (array, arrayIndex);
+            ((ICollection)Schemes).CopyTo (array, arrayIndex);
         }
     }
 
     /// <inheritdoc />
-    public IEnumerator<KeyValuePair<string, ColorScheme?>> GetEnumerator ()
+    public IEnumerator<KeyValuePair<string, Scheme?>> GetEnumerator ()
     {
         lock (_lock)
         {
-            return new List<KeyValuePair<string, ColorScheme?>> (ColorSchemes).GetEnumerator ();
+            return new List<KeyValuePair<string, Scheme?>> (Schemes).GetEnumerator ();
         }
     }
 
@@ -209,11 +209,11 @@ public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Color
     }
 
     /// <inheritdoc />
-    public bool Remove (KeyValuePair<string, ColorScheme?> item)
+    public bool Remove (KeyValuePair<string, Scheme?> item)
     {
         lock (_lock)
         {
-            if (ColorSchemes.Remove (item.Key))
+            if (Schemes.Remove (item.Key))
             {
                 CollectionChanged?.Invoke (this, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, item));
                 return true;
@@ -227,7 +227,7 @@ public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Color
     {
         lock (_lock)
         {
-            if (ColorSchemes.Remove (key))
+            if (Schemes.Remove (key))
             {
                 CollectionChanged?.Invoke (this, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, key));
                 return true;
@@ -237,30 +237,30 @@ public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Color
     }
 
     /// <inheritdoc />
-    public bool TryGetValue (string key, out ColorScheme? value)
+    public bool TryGetValue (string key, out Scheme? value)
     {
         lock (_lock)
         {
-            return ColorSchemes.TryGetValue (key, out value);
+            return Schemes.TryGetValue (key, out value);
         }
     }
 
 
     /// <summary>
-    ///     Resets the <see cref="ColorSchemes"/> dictionary to its default values.
+    ///     Resets the <see cref="Schemes"/> dictionary to its default values.
     /// </summary>
-    /// <returns>The reset <see cref="ColorSchemes"/> dictionary.</returns>
-    public static Dictionary<string, ColorScheme?> Reset ()
+    /// <returns>The reset <see cref="Schemes"/> dictionary.</returns>
+    public static Dictionary<string, Scheme?> Reset ()
     {
         lock (_lock)
         {
-            ColorSchemes.Clear ();
-            ColorSchemes.Add ("TopLevel", new ColorScheme ());
-            ColorSchemes.Add ("Base", new ColorScheme ());
-            ColorSchemes.Add ("Dialog", new ColorScheme ());
-            ColorSchemes.Add ("Menu", new ColorScheme ());
-            ColorSchemes.Add ("Error", new ColorScheme ());
-            return ColorSchemes;
+            Schemes.Clear ();
+            Schemes.Add ("TopLevel", new Scheme ());
+            Schemes.Add ("Base", new Scheme ());
+            Schemes.Add ("Dialog", new Scheme ());
+            Schemes.Add ("Menu", new Scheme ());
+            Schemes.Add ("Error", new Scheme ());
+            return Schemes;
         }
     }
 }

@@ -2871,7 +2871,7 @@ public class TextView : View
                 return new (attributeSel);
             }
 
-            return new (ColorScheme!.Focus);
+            return new (Scheme!.Focus);
         }
 
         line = GetCurrentLine ();
@@ -2881,7 +2881,7 @@ public class TextView : View
             return new (attribute);
         }
 
-        return new (ColorScheme!.Focus);
+        return new (Scheme!.Focus);
     }
 
     /// <summary>
@@ -3243,7 +3243,7 @@ public class TextView : View
     public void Load (List<Cell> cells)
     {
         SetWrapModel ();
-        _model.LoadCells (cells, ColorScheme?.Focus);
+        _model.LoadCells (cells, Scheme?.Focus);
         _historyText.Clear (_model.GetAllLines ());
         ResetPosition ();
         SetNeedsDraw ();
@@ -3257,7 +3257,7 @@ public class TextView : View
     {
         SetWrapModel ();
         InheritsPreviousAttribute = true;
-        _model.LoadListCells (cellsList, ColorScheme?.Focus);
+        _model.LoadListCells (cellsList, Scheme?.Focus);
         _historyText.Clear (_model.GetAllLines ());
         ResetPosition ();
         SetNeedsDraw ();
@@ -3540,7 +3540,7 @@ public class TextView : View
     {
         ContentsChanged?.Invoke (this, new (CurrentRow, CurrentColumn));
 
-        ProcessInheritsPreviousColorScheme (CurrentRow, CurrentColumn);
+        ProcessInheritsPreviousScheme (CurrentRow, CurrentColumn);
         ProcessAutocomplete ();
     }
 
@@ -3957,7 +3957,7 @@ public class TextView : View
     /// <summary>
     ///     Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idxCol"/>
     ///     of the current <paramref name="line"/>. Override to provide custom coloring by calling
-    ///     <see cref="View.SetAttribute"/> Defaults to <see cref="ColorScheme.Normal"/>.
+    ///     <see cref="View.SetAttribute"/> Defaults to <see cref="Scheme.Normal"/>.
     /// </summary>
     /// <param name="line">The line.</param>
     /// <param name="idxCol">The col index.</param>
@@ -3982,7 +3982,7 @@ public class TextView : View
     /// <summary>
     ///     Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idxCol"/>
     ///     of the current <paramref name="line"/>. Override to provide custom coloring by calling
-    ///     <see cref="View.SetAttribute(Attribute)"/> Defaults to <see cref="ColorScheme.Focus"/>.
+    ///     <see cref="View.SetAttribute(Attribute)"/> Defaults to <see cref="Scheme.Focus"/>.
     /// </summary>
     /// <param name="line">The line.</param>
     /// <param name="idxCol">The col index.</param>
@@ -3994,7 +3994,7 @@ public class TextView : View
         var ev = new CellEventArgs (line, idxCol, unwrappedPos);
         DrawReadOnlyColor?.Invoke (this, ev);
 
-        Attribute? cellAttribute = line [idxCol].Attribute is { } ? line [idxCol].Attribute : ColorScheme?.Disabled;
+        Attribute? cellAttribute = line [idxCol].Attribute is { } ? line [idxCol].Attribute : Scheme?.Disabled;
         Attribute attribute;
 
         if (cellAttribute!.Value.Foreground == cellAttribute.Value.Background)
@@ -4003,7 +4003,7 @@ public class TextView : View
         }
         else
         {
-            attribute = new (cellAttribute.Value.Foreground, ColorScheme!.Focus.Background);
+            attribute = new (cellAttribute.Value.Foreground, Scheme!.Focus.Background);
         }
 
         SetAttribute (attribute);
@@ -4012,7 +4012,7 @@ public class TextView : View
     /// <summary>
     ///     Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idxCol"/>
     ///     of the current <paramref name="line"/>. Override to provide custom coloring by calling
-    ///     <see cref="View.SetAttribute(Attribute)"/> Defaults to <see cref="ColorScheme.Focus"/>.
+    ///     <see cref="View.SetAttribute(Attribute)"/> Defaults to <see cref="Scheme.Focus"/>.
     /// </summary>
     /// <param name="line">The line.</param>
     /// <param name="idxCol">The col index.</param>
@@ -4036,8 +4036,8 @@ public class TextView : View
         {
             SetAttribute (
                                  new (
-                                      ColorScheme!.Focus.Background,
-                                      ColorScheme!.Focus.Foreground
+                                      Scheme!.Focus.Background,
+                                      Scheme!.Focus.Foreground
                                      )
                                 );
         }
@@ -4046,7 +4046,7 @@ public class TextView : View
     /// <summary>
     ///     Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idxCol"/>
     ///     of the current <paramref name="line"/>. Override to provide custom coloring by calling
-    ///     <see cref="View.SetAttribute(Attribute)"/> Defaults to <see cref="ColorScheme.HotFocus"/>.
+    ///     <see cref="View.SetAttribute(Attribute)"/> Defaults to <see cref="Scheme.HotFocus"/>.
     /// </summary>
     /// <param name="line">The line.</param>
     /// <param name="idxCol">The col index.</param>
@@ -4065,13 +4065,13 @@ public class TextView : View
         }
         else
         {
-            SetValidUsedColor (ColorScheme?.Focus);
+            SetValidUsedColor (Scheme?.Focus);
         }
     }
 
     /// <summary>
     ///     Sets the driver to the default color for the control where no text is being rendered. Defaults to
-    ///     <see cref="ColorScheme.Normal"/>.
+    ///     <see cref="Scheme.Normal"/>.
     /// </summary>
     protected virtual void SetNormalColor () { SetAttribute (GetNormalColor ()); }
 
@@ -5688,10 +5688,10 @@ public class TextView : View
         return cell.Attribute;
     }
 
-    // If InheritsPreviousColorScheme is enabled this method will check if the rune cell on
+    // If InheritsPreviousScheme is enabled this method will check if the rune cell on
     // the row and col location and around has a not null color scheme. If it's null will set it with
     // the very most previous valid color scheme.
-    private void ProcessInheritsPreviousColorScheme (int row, int col)
+    private void ProcessInheritsPreviousScheme (int row, int col)
     {
         if (!InheritsPreviousAttribute || (Lines == 1 && GetLine (Lines).Count == 0))
         {
@@ -6304,7 +6304,7 @@ public class TextView : View
     private void SetValidUsedColor (Attribute? attribute)
     {
         // BUGBUG: (v2 truecolor) This code depends on 8-bit color names; disabling for now
-        //if ((colorScheme!.HotNormal.Foreground & colorScheme.Focus.Background) == colorScheme.Focus.Foreground) {
+        //if ((scheme!.HotNormal.Foreground & scheme.Focus.Background) == scheme.Focus.Foreground) {
         SetAttribute (new (attribute!.Value.Background, attribute!.Value.Foreground));
     }
 

@@ -188,10 +188,10 @@ public class OptionSelector : View, IOrientation, IDesignable
                 }
                 else
                 {
-                    // If _colorScheme was set, it's because of Hover
-                    if (checkbox._colorScheme is { })
+                    // If _scheme was set, it's because of Hover
+                    if (checkbox._scheme is { })
                     {
-                        e.NewValue = checkbox._colorScheme.Normal;
+                        e.NewValue = checkbox._scheme.Normal;
                     }
                     else
                     {
@@ -212,10 +212,10 @@ public class OptionSelector : View, IOrientation, IDesignable
                 }
                 else
                 {
-                    // If _colorScheme was set, it's because of Hover
-                    if (checkbox._colorScheme is { })
+                    // If _scheme was set, it's because of Hover
+                    if (checkbox._scheme is { })
                     {
-                        e.NewValue = checkbox._colorScheme.Normal;
+                        e.NewValue = checkbox._scheme.Normal;
                     }
                     else
                     {

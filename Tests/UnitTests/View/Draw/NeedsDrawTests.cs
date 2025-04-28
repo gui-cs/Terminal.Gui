@@ -14,7 +14,7 @@ public class NeedsDrawTests ()
 
         var label = new Label
         {
-            ColorScheme = Colors.ColorSchemes ["Menu"], X = 0, Y = 0, Text = "This should be the first line."
+            Scheme = Colors.Schemes ["Menu"], X = 0, Y = 0, Text = "This should be the first line."
         };
 
         var view = new View

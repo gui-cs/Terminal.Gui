@@ -47,10 +47,10 @@ public class Adornments : Scenario
 
         color.ColorChanged += (s, e) =>
                               {
-                                  color.SuperView.ColorScheme = new (color.SuperView.ColorScheme)
+                                  color.SuperView.Scheme = new (color.SuperView.Scheme)
                                   {
                                       Normal = new (
-                                                    color.SuperView.ColorScheme.Normal.Foreground,
+                                                    color.SuperView.Scheme.Normal.Foreground,
                                                     e.CurrentValue
                                                    )
                                   };
@@ -80,7 +80,7 @@ public class Adornments : Scenario
             Width = 40,
             Height = Dim.Percent (20),
             Text = "Label\nY=AnchorEnd(),Height=Dim.Percent(10)",
-            ColorScheme = Colors.ColorSchemes ["Dialog"]
+            Scheme = Colors.Schemes ["Dialog"]
         };
 
         window.Margin.Data = "Margin";
@@ -94,7 +94,7 @@ public class Adornments : Scenario
         window.Padding.Data = "Padding";
         window.Padding.Text = "Padding Text line 1\nPadding Text line 3\nPadding Text line 3\nPadding Text line 4\nPadding Text line 5";
         window.Padding.Thickness = new (3);
-        window.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
+        window.Padding.Scheme = Colors.Schemes ["Error"];
         window.Padding.CanFocus = true;
 
         var longLabel = new Label

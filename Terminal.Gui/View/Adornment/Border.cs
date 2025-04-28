@@ -163,12 +163,12 @@ public class Border : Adornment
     ///     The color scheme for the Border. If set to <see langword="null"/>, gets the <see cref="Adornment.Parent"/>
     ///     scheme. color scheme.
     /// </summary>
-    public override ColorScheme? ColorScheme
+    public override Scheme? Scheme
     {
-        get => base.ColorScheme ?? Parent?.ColorScheme;
+        get => base.Scheme ?? Parent?.Scheme;
         set
         {
-            base.ColorScheme = value;
+            base.Scheme = value;
             Parent?.SetNeedsDraw ();
         }
     }
@@ -262,23 +262,23 @@ public class Border : Adornment
         {
             if (!_savedForeColor.HasValue)
             {
-                _savedForeColor = ColorScheme!.Normal.Foreground;
+                _savedForeColor = Scheme!.Normal.Foreground;
             }
 
-            var cs = new ColorScheme (ColorScheme)
+            var cs = new Scheme (Scheme)
             {
-                Normal = new (ColorScheme!.Normal.Foreground.GetHighlightColor (), ColorScheme.Normal.Background)
+                Normal = new (Scheme!.Normal.Foreground.GetHighlightColor (), Scheme.Normal.Background)
             };
-            ColorScheme = cs;
+            Scheme = cs;
         }
 
         if (e.NewValue == HighlightStyle.None && _savedForeColor.HasValue)
         {
-            var cs = new ColorScheme (ColorScheme)
+            var cs = new Scheme (Scheme)
             {
-                Normal = new (_savedForeColor.Value, ColorScheme!.Normal.Background)
+                Normal = new (_savedForeColor.Value, Scheme!.Normal.Background)
             };
-            ColorScheme = cs;
+            Scheme = cs;
         }
 
         Parent?.SetNeedsDraw ();
@@ -738,7 +738,7 @@ public class Border : Adornment
 
             Attribute prevAttr = Driver?.GetAttribute () ?? Attribute.Default;
 
-            if (ColorScheme is { })
+            if (Scheme is { })
             {
                 SetAttribute (GetNormalColor ());
             }

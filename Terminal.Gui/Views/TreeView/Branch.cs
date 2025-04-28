@@ -196,7 +196,7 @@ internal class Branch<T> where T : class
         // if custom color delegate invoke it
         if (_tree.ColorGetter is { })
         {
-            ColorScheme modelScheme = _tree.ColorGetter (Model);
+            Scheme modelScheme = _tree.ColorGetter (Model);
 
             // if custom color scheme is defined for this Model
             if (modelScheme is { })

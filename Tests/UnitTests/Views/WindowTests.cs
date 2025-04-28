@@ -132,7 +132,7 @@ public class WindowTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (0, 0, Application.Screen.Width - 2, Application.Screen.Height - 2), defaultWindow.Viewport);
         Assert.Equal (new Rectangle (0, 0, Application.Screen.Width, Application.Screen.Height), defaultWindow.Frame);
         Assert.Null (defaultWindow.Focused);
-        Assert.NotNull (defaultWindow.ColorScheme);
+        Assert.NotNull (defaultWindow.Scheme);
         Assert.Equal (0, defaultWindow.X);
         Assert.Equal (0, defaultWindow.Y);
         Assert.Equal (Dim.Fill (), defaultWindow.Width);
@@ -155,7 +155,7 @@ public class WindowTests (ITestOutputHelper output)
         Assert.True (windowWithFrameRectEmpty.CanFocus);
         Assert.False (windowWithFrameRectEmpty.HasFocus);
         Assert.Null (windowWithFrameRectEmpty.Focused);
-        Assert.NotNull (windowWithFrameRectEmpty.ColorScheme);
+        Assert.NotNull (windowWithFrameRectEmpty.Scheme);
         Assert.Equal (0, windowWithFrameRectEmpty.X);
         Assert.Equal (0, windowWithFrameRectEmpty.Y);
         Assert.Equal (0, windowWithFrameRectEmpty.Width);
@@ -179,7 +179,7 @@ public class WindowTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 1, 2), windowWithFrame1234.Viewport);
         Assert.Equal (new (1, 2, 3, 4), windowWithFrame1234.Frame);
         Assert.Null (windowWithFrame1234.Focused);
-        Assert.NotNull (windowWithFrame1234.ColorScheme);
+        Assert.NotNull (windowWithFrame1234.Scheme);
         Assert.Equal (1, windowWithFrame1234.X);
         Assert.Equal (2, windowWithFrame1234.Y);
         Assert.Equal (3, windowWithFrame1234.Width);

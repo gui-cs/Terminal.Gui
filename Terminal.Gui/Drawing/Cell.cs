@@ -78,7 +78,7 @@ public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, Ru
 
     /// <summary>Converts the string into a <see cref="List{Cell}"/>.</summary>
     /// <param name="str">The string to convert.</param>
-    /// <param name="attribute">The <see cref="Gui.ColorScheme"/> to use.</param>
+    /// <param name="attribute">The <see cref="Gui.Scheme"/> to use.</param>
     /// <returns></returns>
     public static List<Cell> ToCellList (string str, Attribute? attribute = null)
     {

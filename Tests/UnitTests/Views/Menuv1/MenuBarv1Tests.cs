@@ -259,11 +259,11 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         var menuBar = new MenuBar ();
         Assert.Equal (KeyCode.F9, menuBar.Key);
         var menu = new Menu { Host = menuBar, X = 0, Y = 0, BarItems = new () };
-        Assert.Null (menu.ColorScheme);
+        Assert.Null (menu.Scheme);
         Assert.False (menu.IsInitialized);
         menu.BeginInit ();
         menu.EndInit ();
-        Assert.Equal (Colors.ColorSchemes ["Menu"], menu.ColorScheme);
+        Assert.Equal (Colors.Schemes ["Menu"], menu.Scheme);
         Assert.True (menu.CanFocus);
         Assert.False (menu.WantContinuousButtonPressed);
         Assert.Equal (LineStyle.Single, menuBar.MenusBorderStyle);
@@ -274,7 +274,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Assert.IsType<DimFill> (menuBar.Width);
         Assert.Equal (1, menuBar.Height);
         Assert.Empty (menuBar.Menus);
-        Assert.Equal (Colors.ColorSchemes ["Menu"], menuBar.ColorScheme);
+        Assert.Equal (Colors.Schemes ["Menu"], menuBar.Scheme);
         Assert.True (menuBar.WantMousePositionReports);
         Assert.False (menuBar.IsMenuOpen);
 
@@ -284,7 +284,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Assert.IsType<DimFill> (menuBar.Width);
         Assert.Equal (1, menuBar.Height);
         Assert.Empty (menuBar.Menus);
-        Assert.Equal (Colors.ColorSchemes ["Menu"], menuBar.ColorScheme);
+        Assert.Equal (Colors.Schemes ["Menu"], menuBar.Scheme);
         Assert.True (menuBar.WantMousePositionReports);
         Assert.False (menuBar.IsMenuOpen);
 
@@ -371,13 +371,13 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Attribute [] attributes =
         {
             // 0
-            menu.ColorScheme.Normal,
+            menu.Scheme.Normal,
 
             // 1
-            menu.ColorScheme.Focus,
+            menu.Scheme.Focus,
 
             // 2
-            menu.ColorScheme.Disabled
+            menu.Scheme.Disabled
         };
 
         DriverAssert.AssertDriverAttributesAre (
@@ -3280,7 +3280,7 @@ Edit
         menu.EndInit ();
 
         menu.OpenMenu ();
-        menu.ColorScheme = menu._openMenu.ColorScheme = new (Attribute.Default);
+        menu.Scheme = menu._openMenu.Scheme = new (Attribute.Default);
         Assert.True (menu.IsMenuOpen);
 
         menu.Draw ();
@@ -3575,7 +3575,7 @@ Edit
         Assert.True (menu.IsMenuOpen);
 
         menu.Draw ();
-        menu.ColorScheme = menu._openMenu.ColorScheme = new (Attribute.Default);
+        menu.Scheme = menu._openMenu.Scheme = new (Attribute.Default);
         menu._openMenu.Draw ();
 
         var expected = @"

@@ -18,7 +18,7 @@ public class MarginTests (ITestOutputHelper output)
         Application.Top = new Toplevel ();
         Application.TopLevels.Push (Gui.Application.Top);
 
-        Application.Top.ColorScheme = new()
+        Application.Top.Scheme = new()
         {
             Normal = new (Color.Red, Color.Green), Focus = new (Color.Green, Color.Red)
         };

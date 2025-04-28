@@ -2,13 +2,13 @@
 
 namespace Terminal.Gui.DrawingTests;
 
-public class ColorSchemeTests
+public class SchemeTests
 {
     [Fact]
-    public void Colors_ColorSchemes_Built_Ins ()
+    public void Colors_Schemes_Built_Ins ()
     {
         Colors.Reset ();
-        Dictionary<string, ColorScheme> schemes = Colors.ColorSchemes;
+        Dictionary<string, Scheme> schemes = Colors.Schemes;
         Assert.NotNull (schemes);
         Assert.Equal (5, schemes.Count);
         Assert.True (schemes.ContainsKey ("TopLevel"));
@@ -19,28 +19,28 @@ public class ColorSchemeTests
     }
 
     [Fact]
-    public void Colors_ColorSchemes_Property_Has_Private_Setter ()
+    public void Colors_Schemes_Property_Has_Private_Setter ()
     {
         // Resharper Code Cleanup likes to remove the `private set; `
-        // from the ColorSchemes property.  This test will fail if
+        // from the Schemes property.  This test will fail if
         // that happens.
-        PropertyInfo property = typeof (Colors).GetProperty ("ColorSchemes");
+        PropertyInfo property = typeof (Colors).GetProperty ("Schemes");
         Assert.NotNull (property);
         Assert.NotNull (property.SetMethod);
         Assert.True (property.GetSetMethod (true).IsPrivate);
     }
 
     [Fact]
-    public void ColorScheme_New ()
+    public void Scheme_New ()
     {
-        var scheme = new ColorScheme ();
+        var scheme = new Scheme ();
         var lbl = new Label ();
-        lbl.ColorScheme = scheme;
+        lbl.Scheme = scheme;
         lbl.Draw ();
     }
 
     [Fact]
-    public void ColorScheme_BigConstructor ()
+    public void Scheme_BigConstructor ()
     {
         var a = new Attribute (1);
         var b = new Attribute (2);
@@ -48,7 +48,7 @@ public class ColorSchemeTests
         var d = new Attribute (4);
         var e = new Attribute (5);
 
-        var cs = new ColorScheme (
+        var cs = new Scheme (
             normal: a,
             focus: b,
             hotNormal: c,

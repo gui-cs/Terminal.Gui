@@ -13,7 +13,7 @@ namespace Terminal.Gui;
 /// <remarks>
 ///     <see cref="Attribute"/> provides a platform independent representation of colors (and someday other forms of
 ///     text styling). They encode both the foreground and the background color and are used in the
-///     <see cref="ColorScheme"/> class to define color schemes that can be used in an application.
+///     <see cref="Scheme"/> class to define color schemes that can be used in an application.
 /// </remarks>
 [JsonConverter (typeof (AttributeJsonConverter))]
 public readonly record struct Attribute : IEqualityOperators<Attribute, Attribute, bool>

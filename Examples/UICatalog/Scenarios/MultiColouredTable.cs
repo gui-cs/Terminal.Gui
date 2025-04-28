@@ -55,11 +55,11 @@ public class MultiColouredTable : Scenario
         dt.Rows.Add (DBNull.Value, DBNull.Value);
         dt.Rows.Add (DBNull.Value, DBNull.Value);
 
-        _tableView.ColorScheme = new ()
+        _tableView.Scheme = new ()
         {
-            Disabled = appWindow.ColorScheme.Disabled,
-            HotFocus = appWindow.ColorScheme.HotFocus,
-            Focus = appWindow.ColorScheme.Focus,
+            Disabled = appWindow.Scheme.Disabled,
+            HotFocus = appWindow.Scheme.HotFocus,
+            Focus = appWindow.Scheme.Focus,
             Normal = new (Color.DarkGray, Color.Black)
         };
 

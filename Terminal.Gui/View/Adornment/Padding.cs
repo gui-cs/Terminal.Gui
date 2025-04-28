@@ -22,12 +22,12 @@ public class Padding : Adornment
     ///     The color scheme for the Padding. If set to <see langword="null"/>, gets the <see cref="Adornment.Parent"/>
     ///     scheme. color scheme.
     /// </summary>
-    public override ColorScheme? ColorScheme
+    public override Scheme? Scheme
     {
-        get => base.ColorScheme ?? Parent?.ColorScheme;
+        get => base.Scheme ?? Parent?.Scheme;
         set
         {
-            base.ColorScheme = value;
+            base.Scheme = value;
             Parent?.SetNeedsDraw ();
         }
     }

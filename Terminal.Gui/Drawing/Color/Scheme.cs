@@ -4,26 +4,23 @@ using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
-// TODO: Rename "ColorScheme"->"AttributeScheme" given we'll soon have non-color information in Attributes?
-// TODO: See https://github.com/gui-cs/Terminal.Gui/issues/457
-
 /// <summary>Defines a standard set of <see cref="Attribute"/>s for common visible elements in a <see cref="View"/>.</summary>
 /// <remarks>
 ///     <para>
-///         ColorScheme objects are immutable. Once constructed, the properties cannot be changed. To change a
-///         ColorScheme, create a new one with the desired values, using the <see cref="ColorScheme(ColorScheme)"/>
+///         Scheme objects are immutable. Once constructed, the properties cannot be changed. To change a
+///         Scheme, create a new one with the desired values, using the <see cref="Scheme(Scheme)"/>
 ///         constructor.
 ///     </para>
 /// </remarks>
-[JsonConverter (typeof (ColorSchemeJsonConverter))]
-public record ColorScheme : IEqualityOperators<ColorScheme, ColorScheme, bool>
+[JsonConverter (typeof (SchemeJsonConverter))]
+public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
 {
     /// <summary>Creates a new instance set to the default colors (see <see cref="Attribute.Default"/>).</summary>
-    public ColorScheme () : this (Attribute.Default) { }
+    public Scheme () : this (Attribute.Default) { }
 
     /// <summary>Creates a new instance, initialized with the values from <paramref name="scheme"/>.</summary>
     /// <param name="scheme">The scheme to initialize the new instance with.</param>
-    public ColorScheme (ColorScheme? scheme)
+    public Scheme (Scheme? scheme)
     {
         ArgumentNullException.ThrowIfNull (scheme);
 
@@ -36,7 +33,7 @@ public record ColorScheme : IEqualityOperators<ColorScheme, ColorScheme, bool>
 
     /// <summary>Creates a new instance, initialized with the values from <paramref name="attribute"/>.</summary>
     /// <param name="attribute">The attribute to initialize the new instance with.</param>
-    public ColorScheme (Attribute attribute)
+    public Scheme (Attribute attribute)
     {
         Normal = attribute;
         Focus = attribute;
@@ -46,7 +43,7 @@ public record ColorScheme : IEqualityOperators<ColorScheme, ColorScheme, bool>
     }
 
     /// <summary>Creates a new instance, initialized with the values provided.</summary>
-    public ColorScheme (
+    public Scheme (
         Attribute normal,
         Attribute focus,
         Attribute hotNormal,
@@ -77,11 +74,11 @@ public record ColorScheme : IEqualityOperators<ColorScheme, ColorScheme, bool>
     public Attribute Normal { get; init; }
 
     /// <summary>
-    ///     Gets a new <see cref="ColorScheme"/> with the same values as this instance, but with the foreground and background
+    ///     Gets a new <see cref="Scheme"/> with the same values as this instance, but with the foreground and background
     ///     colors adjusted to be more visible.
     /// </summary>
     /// <returns></returns>
-    public ColorScheme GetHighlightColorScheme ()
+    public Scheme GetHighlightScheme ()
     {
         return this with
         {
@@ -92,10 +89,10 @@ public record ColorScheme : IEqualityOperators<ColorScheme, ColorScheme, bool>
         };
     }
 
-    /// <summary>Compares two <see cref="ColorScheme"/> objects for equality.</summary>
+    /// <summary>Compares two <see cref="Scheme"/> objects for equality.</summary>
     /// <param name="other"></param>
     /// <returns>true if the two objects are equal</returns>
-    public virtual bool Equals (ColorScheme? other)
+    public virtual bool Equals (Scheme? other)
     {
         return other is { }
                && EqualityComparer<Attribute>.Default.Equals (Normal, other.Normal)

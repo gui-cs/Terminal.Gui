@@ -338,10 +338,10 @@ public class TreeView<T> : View, ITreeView where T : class
     public AspectGetterDelegate<T> AspectGetter { get; set; } = o => o.ToString () ?? "";
 
     /// <summary>
-    ///     Delegate for multi-colored tree views. Return the <see cref="ColorScheme"/> to use for each passed object or
+    ///     Delegate for multi-colored tree views. Return the <see cref="Scheme"/> to use for each passed object or
     ///     null to use the default.
     /// </summary>
-    public Func<T, ColorScheme> ColorGetter { get; set; }
+    public Func<T, Scheme> ColorGetter { get; set; }
 
     /// <summary>The current number of rows in the tree (ignoring the controls bounds).</summary>
     public int ContentHeight => BuildLineMap ().Count ();

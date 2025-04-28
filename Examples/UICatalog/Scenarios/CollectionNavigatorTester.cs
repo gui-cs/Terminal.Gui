@@ -82,7 +82,7 @@ public class CollectionNavigatorTester : Scenario
     public override void Main ()
     {
         Application.Init ();
-        top = new Toplevel { ColorScheme = Colors.ColorSchemes ["Base"] };
+        top = new Toplevel { Scheme = Colors.Schemes ["Base"] };
 
         var allowMarking = new MenuItem ("Allow _Marking", "", null)
         {

@@ -299,7 +299,7 @@ public class Snake : Scenario
             State = state;
             CanFocus = true;
 
-            base.ColorScheme = new ()
+            base.Scheme = new ()
             {
                 Normal = white,
                 Focus = white,

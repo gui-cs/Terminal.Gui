@@ -103,7 +103,7 @@ public partial class View
     }
 
     /// <summary>
-    ///     Utility function to draw strings that contains a hotkey using a <see cref="ColorScheme"/> and the "focused"
+    ///     Utility function to draw strings that contains a hotkey using a <see cref="Scheme"/> and the "focused"
     ///     state.
     /// </summary>
     /// <param name="text">String to display, the underscore before a letter flags the next letter as the hotkey.</param>
@@ -121,8 +121,8 @@ public partial class View
         {
             DrawHotString (
                            text,
-                           Enabled ? GetHotNormalColor () : ColorScheme!.Disabled,
-                           Enabled ? GetNormalColor () : ColorScheme!.Disabled
+                           Enabled ? GetHotNormalColor () : Scheme!.Disabled,
+                           Enabled ? GetNormalColor () : Scheme!.Disabled
                           );
         }
     }

@@ -30,7 +30,7 @@ public class UICatalogTop : Toplevel
     // Note, we used to pass this to scenarios that run, but it just added complexity
     // So that was removed. But we still have this here to demonstrate how changing
     // the scheme works.
-    public static string? CachedTopLevelColorScheme { get; set; }
+    public static string? CachedTopLevelScheme { get; set; }
 
     // Diagnostics
     private static ViewDiagnosticFlags _diagnosticFlags;
@@ -218,13 +218,13 @@ public class UICatalogTop : Toplevel
             _topSchemeRg = new ()
             {
                 HighlightStyle = HighlightStyle.None,
-                SelectedItem = Colors.ColorSchemes.Keys.ToList().IndexOf(CachedTopLevelColorScheme!)
+                SelectedItem = Colors.Schemes.Keys.ToList().IndexOf(CachedTopLevelScheme!)
             };
 
             _topSchemeRg.SelectedItemChanged += (_, args) =>
             {
-                CachedTopLevelColorScheme = Colors.ColorSchemes.Keys.ToArray () [args.SelectedItem!.Value];
-                ColorScheme = Colors.ColorSchemes [CachedTopLevelColorScheme];
+                CachedTopLevelScheme = Colors.Schemes.Keys.ToArray () [args.SelectedItem!.Value];
+                Scheme = Colors.Schemes [CachedTopLevelScheme];
                 SetNeedsDraw ();
             };
 
@@ -359,15 +359,15 @@ public class UICatalogTop : Toplevel
         _topSchemeRg.AssignHotKeysToCheckBoxes = true;
         _topSchemeRg.UsedHotKeys.Clear ();
         int? selected = _topSchemeRg.SelectedItem;
-        _topSchemeRg.Options = Colors.ColorSchemes.Keys.ToArray ();
+        _topSchemeRg.Options = Colors.Schemes.Keys.ToArray ();
         _topSchemeRg.SelectedItem = selected;
 
-        if (CachedTopLevelColorScheme is null || !Colors.ColorSchemes.ContainsKey (CachedTopLevelColorScheme))
+        if (CachedTopLevelScheme is null || !Colors.Schemes.ContainsKey (CachedTopLevelScheme))
         {
-            CachedTopLevelColorScheme = "Base";
+            CachedTopLevelScheme = "Base";
         }
 
-        _topSchemeRg.SelectedItem = Array.IndexOf (Colors.ColorSchemes.Keys.ToArray (), CachedTopLevelColorScheme);
+        _topSchemeRg.SelectedItem = Array.IndexOf (Colors.Schemes.Keys.ToArray (), CachedTopLevelScheme);
     }
 
     #endregion MenuBar
@@ -658,7 +658,7 @@ public class UICatalogTop : Toplevel
 
         UpdateThemesMenu ();
 
-        ColorScheme = Colors.ColorSchemes [CachedTopLevelColorScheme!];
+        Scheme = Colors.Schemes [CachedTopLevelScheme!];
 
         if (_shQuit is { })
         {

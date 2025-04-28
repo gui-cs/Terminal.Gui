@@ -276,7 +276,7 @@ public class DrawingArea : View
             {
                 if (c.Value is { })
                 {
-                    SetCurrentAttribute (c.Value.Value.Attribute ?? ColorScheme.Normal);
+                    SetCurrentAttribute (c.Value.Value.Attribute ?? Scheme.Normal);
 
                     // TODO: #2616 - Support combining sequences that don't normalize
                     AddRune (c.Key.X, c.Key.Y, c.Value.Value.Rune);

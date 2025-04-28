@@ -60,7 +60,7 @@ public class DrawTests (ITestOutputHelper output)
             Width = 6,
             Height = 1,
             TextAlignment = Alignment.End,
-            ColorScheme = Colors.ColorSchemes ["Base"]
+            Scheme = Colors.Schemes ["Base"]
         };
 
         var viewBottom = new View
@@ -71,7 +71,7 @@ public class DrawTests (ITestOutputHelper output)
             Width = 1,
             Height = 6,
             VerticalTextAlignment = Alignment.End,
-            ColorScheme = Colors.ColorSchemes ["Base"]
+            Scheme = Colors.Schemes ["Base"]
         };
         Toplevel top = new ();
         top.Add (viewRight, viewBottom);
@@ -107,7 +107,7 @@ public class DrawTests (ITestOutputHelper output)
                                                """,
                                                output,
                                                Application.Driver,
-                                               Colors.ColorSchemes ["Base"]!.Normal
+                                               Colors.Schemes ["Base"]!.Normal
                                               );
         top.Dispose ();
     }

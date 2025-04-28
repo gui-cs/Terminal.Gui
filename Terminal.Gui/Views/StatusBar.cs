@@ -28,7 +28,7 @@ public class StatusBar : Bar, IDesignable
             Border.LineStyle = DefaultSeparatorLineStyle;
         }
 
-        base.ColorScheme = Colors.ColorSchemes ["Menu"];
+        base.Scheme = Colors.Schemes ["Menu"];
 
         Applied += OnConfigurationManagerApplied;
         SuperViewChanged += OnSuperViewChanged;

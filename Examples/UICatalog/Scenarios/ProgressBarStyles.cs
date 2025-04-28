@@ -78,22 +78,22 @@ public class ProgressBarStyles : Scenario
                                     {
                                         if (!LineDrawing.PromptForColor (
                                                                          fgColorPickerBtn.Text,
-                                                                         editor.ViewToEdit.ColorScheme.HotNormal.Foreground,
+                                                                         editor.ViewToEdit.Scheme.HotNormal.Foreground,
                                                                          out var newColor
                                                                         ))
                                         {
                                             return;
                                         }
 
-                                        var cs = new ColorScheme (editor.ViewToEdit.ColorScheme)
+                                        var cs = new Scheme (editor.ViewToEdit.Scheme)
                                         {
                                             HotNormal = new Attribute (
                                                                        newColor,
-                                                                       editor.ViewToEdit.ColorScheme.HotNormal
+                                                                       editor.ViewToEdit.Scheme.HotNormal
                                                                              .Background
                                                                       )
                                         };
-                                        editor.ViewToEdit.ColorScheme = cs;
+                                        editor.ViewToEdit.Scheme = cs;
                                     };
 
         var bgColorPickerBtn = new Button
@@ -108,22 +108,22 @@ public class ProgressBarStyles : Scenario
                                     {
                                         if (!LineDrawing.PromptForColor (
                                                                          fgColorPickerBtn.Text,
-                                                                         editor.ViewToEdit.ColorScheme.HotNormal.Background
+                                                                         editor.ViewToEdit.Scheme.HotNormal.Background
                                                                         , out var newColor))
 
                                         {
                                             return;
                                         }
 
-                                        var cs = new ColorScheme (editor.ViewToEdit.ColorScheme)
+                                        var cs = new Scheme (editor.ViewToEdit.Scheme)
                                         {
                                             HotNormal = new Attribute (
-                                                                       editor.ViewToEdit.ColorScheme.HotNormal
+                                                                       editor.ViewToEdit.Scheme.HotNormal
                                                                              .Foreground,
                                                                        newColor
                                                                       )
                                         };
-                                        editor.ViewToEdit.ColorScheme = cs;
+                                        editor.ViewToEdit.Scheme = cs;
                                     };
 
         #endregion

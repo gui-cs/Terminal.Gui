@@ -3,11 +3,11 @@ using UnitTests;
 
 namespace Terminal.Gui.ConfigurationTests;
 
-public class ColorSchemeJsonConverterTests
+public class SchemeJsonConverterTests
 {
     //string json = @"
     //	{
-    //	""ColorSchemes"": {
+    //	""Schemes"": {
     //		""Base"": {
     //			""normal"": {
     //				""foreground"": ""White"",
@@ -34,10 +34,10 @@ public class ColorSchemeJsonConverterTests
     //	}";
     [Fact]
     [AutoInitShutdown]
-    public void TestColorSchemesSerialization ()
+    public void TestSchemesSerialization ()
     {
         // Arrange
-        var expectedColorScheme = new ColorScheme
+        var expectedScheme = new Scheme
         {
             Normal = new Attribute (Color.White, Color.Blue),
             Focus = new Attribute (Color.Black, Color.Gray),
@@ -46,14 +46,14 @@ public class ColorSchemeJsonConverterTests
             Disabled = new Attribute (Color.DarkGray, Color.Blue)
         };
 
-        string serializedColorScheme =
-            JsonSerializer.Serialize (expectedColorScheme, ConfigurationManagerTests._jsonOptions);
+        string serializedScheme =
+            JsonSerializer.Serialize (expectedScheme, ConfigurationManagerTests._jsonOptions);
 
         // Act
-        var actualColorScheme =
-            JsonSerializer.Deserialize<ColorScheme> (serializedColorScheme, ConfigurationManagerTests._jsonOptions);
+        var actualScheme =
+            JsonSerializer.Deserialize<Scheme> (serializedScheme, ConfigurationManagerTests._jsonOptions);
 
         // Assert
-        Assert.Equal (expectedColorScheme, actualColorScheme);
+        Assert.Equal (expectedScheme, actualScheme);
     }
 }

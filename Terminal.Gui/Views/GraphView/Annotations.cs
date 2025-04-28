@@ -144,7 +144,7 @@ public class LegendAnnotation : View, IAnnotation
     {
         if (!IsInitialized)
         {
-            ColorScheme = new ColorScheme { Normal = Application.Driver?.GetAttribute () ?? Attribute.Default};
+            Scheme = new Scheme { Normal = Application.Driver?.GetAttribute () ?? Attribute.Default};
             graph.Add (this);
         }
 
@@ -217,7 +217,7 @@ public class PathAnnotation : IAnnotation
     /// <param name="graph"></param>
     public void Render (GraphView graph)
     {
-        graph.SetAttribute (LineColor ?? graph.ColorScheme.Normal);
+        graph.SetAttribute (LineColor ?? graph.Scheme.Normal);
 
         foreach (LineF line in PointsToLines ())
         {

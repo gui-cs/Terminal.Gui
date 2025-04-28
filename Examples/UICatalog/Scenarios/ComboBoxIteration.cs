@@ -26,7 +26,7 @@ public class ComboBoxIteration : Scenario
 
         var lbComboBox = new Label
         {
-            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            Scheme = Colors.Schemes ["TopLevel"],
             X = Pos.Right (lbListView) + 1,
             Width = Dim.Percent (40)
         };

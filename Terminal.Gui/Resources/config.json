@@ -55,7 +55,7 @@
         "Menuv2.DefaultBorderStyle": "Single",
         "MenuBarv2.DefaultBorderStyle": "None",
         "StatusBar.DefaultSeparatorLineStyle": "Single",
-        "ColorSchemes": [
+        "Schemes": [
           {
             "TopLevel": {
               "Normal": {
@@ -331,7 +331,7 @@
         "MessageBox.DefaultButtonAlignment": "Center",
         "MessageBox.DefaultBorderStyle": "Heavy",
         "Button.DefaultShadow": "Opaque",
-        "ColorSchemes": [
+        "Schemes": [
           {
             "TopLevel": {
               "Normal": {
@@ -466,7 +466,7 @@
         "MessageBox.DefaultButtonAlignment": "Center",
         "MessageBox.DefaultBorderStyle": "Heavy",
         "Button.DefaultShadow": "Opaque",
-        "ColorSchemes": [
+        "Schemes": [
           {
             "TopLevel": {
               "Normal": {
@@ -598,7 +598,7 @@
         "MessageBox.DefaultButtonAlignment": "Center",
         "MessageBox.DefaultBorderStyle": "Heavy",
         "Button.DefaultShadow": "None",
-        "ColorSchemes": [
+        "Schemes": [
           {
             "TopLevel": {
               "Normal": {
@@ -733,7 +733,7 @@
         "MessageBox.DefaultButtonAlignment": "Center",
         "MessageBox.DefaultBorderStyle": "Heavy",
         "Button.DefaultShadow": "Opaque",
-        "ColorSchemes": [
+        "Schemes": [
           {
             "TopLevel": {
               "Normal": {

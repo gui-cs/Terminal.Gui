@@ -417,7 +417,7 @@ public class FileDialog : Dialog, IDesignable
 
             Move (0, Viewport.Height / 2);
 
-            SetAttribute (new (Color.Red, ColorScheme.Normal.Background));
+            SetAttribute (new (Color.Red, Scheme.Normal.Background));
             Driver.AddStr (new (' ', feedbackPadLeft));
             Driver.AddStr (_feedback);
             Driver.AddStr (new (' ', feedbackPadRight));
@@ -449,9 +449,9 @@ public class FileDialog : Dialog, IDesignable
         _tbPath.Caption = Style.PathCaption;
         _tbFind.Caption = Style.SearchCaption;
 
-        _tbPath.Autocomplete.ColorScheme = new (_tbPath.ColorScheme)
+        _tbPath.Autocomplete.Scheme = new (_tbPath.Scheme)
         {
-            Normal = new (Color.Black, _tbPath.ColorScheme.Normal.Background)
+            Normal = new (Color.Black, _tbPath.Scheme.Normal.Background)
         };
 
         _treeRoots = Style.TreeRootGetter ();
@@ -809,13 +809,13 @@ public class FileDialog : Dialog, IDesignable
 
     private void ClearFeedback () { _feedback = null; }
 
-    private ColorScheme ColorGetter (CellColorGetterArgs args)
+    private Scheme ColorGetter (CellColorGetterArgs args)
     {
         FileSystemInfoStats stats = RowToStats (args.RowIndex);
 
         if (!Style.UseColors)
         {
-            return _tableView.ColorScheme;
+            return _tableView.Scheme;
         }
 
         Color color = Style.ColorProvider.GetColor (stats.FileSystemInfo) ?? new Color (Color.White);

@@ -68,7 +68,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         tv.Table = new DataTableSource (dt);
         tv.NullSymbol = string.Empty;
-        tv.ColorScheme = new ColorScheme ();
+        tv.Scheme = new Scheme ();
         tv.Draw ();
 
         var expected =
@@ -83,7 +83,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         var color = new Attribute (Color.Magenta, Color.BrightBlue);
 
-        var scheme = new ColorScheme
+        var scheme = new Scheme
         {
             Normal = color,
             HotFocus = color,
@@ -113,7 +113,7 @@ public class TableViewTests (ITestOutputHelper output)
 00000000000000000000
 01111101101111111110
 ";
-        DriverAssert.AssertDriverAttributesAre (expected, output, Application.Driver, tv.ColorScheme.Normal, color);
+        DriverAssert.AssertDriverAttributesAre (expected, output, Application.Driver, tv.Scheme.Normal, color);
     }
 
     [Fact]
@@ -418,7 +418,7 @@ public class TableViewTests (ITestOutputHelper output)
         top.Add (tableView);
         RunState rs = Application.Begin (top);
 
-        tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        tableView.Scheme = Colors.Schemes ["TopLevel"];
 
         // 25 characters can be printed into table
         tableView.Viewport = new (0, 0, 25, 5);
@@ -633,7 +633,7 @@ public class TableViewTests (ITestOutputHelper output)
     public void Redraw_EmptyTable ()
     {
         var tableView = new TableView ();
-        tableView.ColorScheme = new ();
+        tableView.Scheme = new ();
         tableView.Viewport = new (0, 0, 25, 10);
 
         // Set a table with 1 column
@@ -679,7 +679,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        tableView.Scheme = Colors.Schemes ["TopLevel"];
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -758,7 +758,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        tableView.Scheme = Colors.Schemes ["TopLevel"];
         tableView.LayoutSubViews ();
 
         // 3 columns are visibile
@@ -819,7 +819,7 @@ public class TableViewTests (ITestOutputHelper output)
         var tableView = new TableView ();
         tableView.BeginInit ();
         tableView.EndInit ();
-        tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        tableView.Scheme = Colors.Schemes ["TopLevel"];
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -934,7 +934,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         TableView tableView = GetABCDEFTableView (out _);
 
-        tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        tableView.Scheme = Colors.Schemes ["TopLevel"];
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -965,7 +965,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         TableView tableView = GetABCDEFTableView (out _);
 
-        tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        tableView.Scheme = Colors.Schemes ["TopLevel"];
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -1046,7 +1046,7 @@ public class TableViewTests (ITestOutputHelper output)
         ColumnStyle bStyle = tv.Style.GetOrCreateColumnStyle (1);
 
         // when B is 2 use the custom highlight color
-        var cellHighlight = new ColorScheme
+        var cellHighlight = new Scheme
         {
             Normal = new (Color.BrightCyan, Color.DarkGray),
             HotNormal = new (Color.Green, Color.Blue),
@@ -1086,8 +1086,8 @@ public class TableViewTests (ITestOutputHelper output)
                                                expectedColors,
                                                output,
                                                Application.Driver,
-                                               tv.ColorScheme.Normal,
-                                               focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal,
+                                               tv.Scheme.Normal,
+                                               focused ? tv.Scheme.Focus : tv.Scheme.HotNormal,
                                                cellHighlight.Normal
                                               );
 
@@ -1123,8 +1123,8 @@ public class TableViewTests (ITestOutputHelper output)
                                                expectedColors,
                                                output,
                                                Application.Driver,
-                                               tv.ColorScheme.Normal,
-                                               focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal
+                                               tv.Scheme.Normal,
+                                               focused ? tv.Scheme.Focus : tv.Scheme.HotNormal
                                               );
 
         top.Dispose ();
@@ -1142,7 +1142,7 @@ public class TableViewTests (ITestOutputHelper output)
         // width exactly matches the max col widths
         tv.Viewport = new (0, 0, 5, 4);
 
-        var rowHighlight = new ColorScheme
+        var rowHighlight = new Scheme
         {
             Normal = new (Color.BrightCyan, Color.DarkGray),
             HotNormal = new (Color.Green, Color.Blue),
@@ -1182,7 +1182,7 @@ public class TableViewTests (ITestOutputHelper output)
                                                expectedColors,
                                                output,
                                                Application.Driver,
-                                               tv.ColorScheme.Normal,
+                                               tv.Scheme.Normal,
                                                focused ? rowHighlight.Focus : rowHighlight.HotNormal,
                                                rowHighlight.Normal
                                               );
@@ -1218,8 +1218,8 @@ public class TableViewTests (ITestOutputHelper output)
                                                expectedColors,
                                                output,
                                                Application.Driver,
-                                               tv.ColorScheme.Normal,
-                                               focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal
+                                               tv.Scheme.Normal,
+                                               focused ? tv.Scheme.Focus : tv.Scheme.HotNormal
                                               );
         top.Dispose ();
     }
@@ -1264,8 +1264,8 @@ public class TableViewTests (ITestOutputHelper output)
                                                expectedColors,
                                                output,
                                                Application.Driver,
-                                               tv.ColorScheme.Normal,
-                                               focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal
+                                               tv.Scheme.Normal,
+                                               focused ? tv.Scheme.Focus : tv.Scheme.HotNormal
                                               );
         top.Dispose ();
     }
@@ -1303,14 +1303,14 @@ public class TableViewTests (ITestOutputHelper output)
 01000
 ";
 
-        var invertFocus = new Attribute (tv.ColorScheme.Focus.Background, tv.ColorScheme.Focus.Foreground);
-        var invertHotNormal = new Attribute (tv.ColorScheme.HotNormal.Background, tv.ColorScheme.HotNormal.Foreground);
+        var invertFocus = new Attribute (tv.Scheme.Focus.Background, tv.Scheme.Focus.Foreground);
+        var invertHotNormal = new Attribute (tv.Scheme.HotNormal.Background, tv.Scheme.HotNormal.Foreground);
 
         DriverAssert.AssertDriverAttributesAre (
                                                expectedColors,
                                                output,
                                                Application.Driver,
-                                               tv.ColorScheme.Normal,
+                                               tv.Scheme.Normal,
                                                focused ? invertFocus : invertHotNormal
                                               );
 
@@ -1567,7 +1567,7 @@ public class TableViewTests (ITestOutputHelper output)
     public void Test_CollectionNavigator ()
     {
         var tv = new TableView ();
-        tv.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        tv.Scheme = Colors.Schemes ["TopLevel"];
         tv.Viewport = new (0, 0, 50, 7);
 
         tv.Table = new EnumerableTableSource<string> (
@@ -2211,7 +2211,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         ((FakeDriver)Application.Driver!).SetBufferSize (100, 100);
         var tv = new TableView ();
-        tv.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        tv.Scheme = Colors.Schemes ["TopLevel"];
         tv.Viewport = new (0, 0, 50, 6);
 
         tv.Table = new EnumerableTableSource<Type> (
@@ -2275,9 +2275,9 @@ public class TableViewTests (ITestOutputHelper output)
 
         DriverAssert.AssertDriverContentsAre (expected, output);
 
-        Attribute normal = tv.ColorScheme.Normal;
-        tv.ColorScheme = new (tv.ColorScheme) { Focus = new (Color.Magenta, Color.White) };
-        Attribute focus = tv.ColorScheme.Focus;
+        Attribute normal = tv.Scheme.Normal;
+        tv.Scheme = new (tv.Scheme) { Focus = new (Color.Magenta, Color.White) };
+        Attribute focus = tv.Scheme.Focus;
 
         tv.Draw ();
 
@@ -2329,9 +2329,9 @@ A B C
 
         DriverAssert.AssertDriverContentsAre (expected, output);
 
-        Attribute normal = tv.ColorScheme.Normal;
-        tv.ColorScheme = new (tv.ColorScheme) { Focus = new (Color.Magenta, Color.White) };
-        Attribute focus = tv.ColorScheme.Focus;
+        Attribute normal = tv.Scheme.Normal;
+        tv.Scheme = new (tv.Scheme) { Focus = new (Color.Magenta, Color.White) };
+        Attribute focus = tv.Scheme.Focus;
         tv.Draw ();
 
         // Focus color (1) should be used for rendering the selected line
@@ -2383,9 +2383,9 @@ A B C
 
         DriverAssert.AssertDriverContentsAre (expected, output);
 
-        Attribute normal = tv.ColorScheme.Normal;
-        tv.ColorScheme = new (tv.ColorScheme) { Focus = new (Color.Magenta, Color.White) };
-        Attribute focus = tv.ColorScheme.Focus;
+        Attribute normal = tv.Scheme.Normal;
+        tv.Scheme = new (tv.Scheme) { Focus = new (Color.Magenta, Color.White) };
+        Attribute focus = tv.Scheme.Focus;
 
         tv.Draw ();
 
@@ -2417,7 +2417,7 @@ A B C
         var tv = new TableView ();
 
         //tv.BeginInit (); tv.EndInit ();
-        tv.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        tv.Scheme = Colors.Schemes ["TopLevel"];
         tv.Viewport = new (0, 0, 25, 4);
 
         tv.Style = new ()
@@ -3422,7 +3422,7 @@ A B C
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        tableView.Scheme = Colors.Schemes ["TopLevel"];
 
         // 3 columns are visible
         tableView.Viewport = new (0, 0, 7, 5);
@@ -3448,7 +3448,7 @@ A B C
     private TableView GetPetTable (out EnumerableTableSource<PickablePet> source)
     {
         var tv = new TableView ();
-        tv.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        tv.Scheme = Colors.Schemes ["TopLevel"];
         tv.Viewport = new (0, 0, 25, 6);
 
         List<PickablePet> pets = new ()
@@ -3476,7 +3476,7 @@ A B C
     private TableView GetTwoRowSixColumnTable (out DataTable dt)
     {
         var tableView = new TableView ();
-        tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+        tableView.Scheme = Colors.Schemes ["TopLevel"];
 
         // 3 columns are visible
         tableView.Viewport = new (0, 0, 7, 5);
@@ -3521,7 +3521,7 @@ A B C
         tv.Style.GetOrCreateColumnStyle (1).MaxWidth = 1;
         tv.Style.GetOrCreateColumnStyle (1).MaxWidth = 1;
 
-        tv.ColorScheme = Colors.ColorSchemes ["Base"];
+        tv.Scheme = Colors.Schemes ["Base"];
 
         return tv;
     }

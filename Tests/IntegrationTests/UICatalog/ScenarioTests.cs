@@ -182,7 +182,7 @@ public class ScenarioTests : TestsAllViews
             Width = 15,
             Height = Dim.Fill (1), // for status bar
             CanFocus = false,
-            ColorScheme = Colors.ColorSchemes ["TopLevel"]
+            Scheme = Colors.Schemes ["TopLevel"]
         };
 
         ListView classListView = new ()
@@ -192,7 +192,7 @@ public class ScenarioTests : TestsAllViews
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             AllowsMarking = false,
-            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            Scheme = Colors.Schemes ["TopLevel"],
             Source = new ListWrapper<string> (new (viewClasses.Keys.ToList ()))
         };
         leftPane.Add (classListView);
@@ -204,7 +204,7 @@ public class ScenarioTests : TestsAllViews
             Width = Dim.Fill (),
             Height = 10,
             CanFocus = false,
-            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            Scheme = Colors.Schemes ["TopLevel"],
             Title = "Settings"
         };
 
@@ -270,7 +270,7 @@ public class ScenarioTests : TestsAllViews
             Y = Pos.Bottom (settingsPane),
             Width = Dim.Fill (),
             Height = Dim.Fill (1), // + 1 for status bar
-            ColorScheme = Colors.ColorSchemes ["Dialog"]
+            Scheme = Colors.Schemes ["Dialog"]
         };
 
         classListView.OpenSelectedItem += (s, a) => { settingsPane.SetFocus (); };
@@ -554,7 +554,7 @@ public class ScenarioTests : TestsAllViews
             }
 
             // Set the colorscheme to make it stand out if is null by default
-            view.ColorScheme ??= Colors.ColorSchemes ["Base"];
+            view.Scheme ??= Colors.Schemes ["Base"];
 
             // If the view supports a Text property, set it so we have something to look at
             if (view.GetType ().GetProperty ("Text") != null)

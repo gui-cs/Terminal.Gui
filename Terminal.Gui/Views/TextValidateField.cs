@@ -563,8 +563,8 @@ namespace Terminal.Gui
                 return true;
             }
 
-            Color bgcolor = !IsValid ? new Color (Color.BrightRed) : ColorScheme.Focus.Background;
-            var textColor = new Attribute (ColorScheme.Focus.Foreground, bgcolor);
+            Color bgcolor = !IsValid ? new Color (Color.BrightRed) : Scheme.Focus.Background;
+            var textColor = new Attribute (Scheme.Focus.Foreground, bgcolor);
 
             (int margin_left, int margin_right) = GetMargins (Viewport.Width);
 

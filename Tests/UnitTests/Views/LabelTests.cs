@@ -204,9 +204,9 @@ public class LabelTests (ITestOutputHelper output)
         Assert.False (tf1.FillRemaining);
         Assert.True (tf2.FillRemaining);
 
-        tf1.Draw (new (new (0, 1), tfSize), label.GetNormalColor (), label.ColorScheme.HotNormal);
+        tf1.Draw (new (new (0, 1), tfSize), label.GetNormalColor (), label.Scheme.HotNormal);
 
-        tf2.Draw (new (new (0, 2), tfSize), label.GetNormalColor (), label.ColorScheme.HotNormal);
+        tf2.Draw (new (new (0, 2), tfSize), label.GetNormalColor (), label.Scheme.HotNormal);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -227,10 +227,10 @@ This TextFormatter (tf2) with fill will be cleared on rewritten.       ",
         label.Draw ();
 
         tf1.Text = "This TextFormatter (tf1) is rewritten.";
-        tf1.Draw (new (new (0, 1), tfSize), label.GetNormalColor (), label.ColorScheme.HotNormal);
+        tf1.Draw (new (new (0, 1), tfSize), label.GetNormalColor (), label.Scheme.HotNormal);
 
         tf2.Text = "This TextFormatter (tf2) is rewritten.";
-        tf2.Draw (new (new (0, 2), tfSize), label.GetNormalColor (), label.ColorScheme.HotNormal);
+        tf2.Draw (new (new (0, 2), tfSize), label.GetNormalColor (), label.Scheme.HotNormal);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -846,7 +846,7 @@ e
         var label = new Label
         {
             Text = "This should be the last line.",
-            ColorScheme = Colors.ColorSchemes ["Menu"],
+            Scheme = Colors.Schemes ["Menu"],
 
             //Width = Dim.Fill (),
             X = 0, // keep unit test focused; don't use Center here
@@ -894,7 +894,7 @@ e
         var label = new Label
         {
             Text = "This should be the last line.",
-            ColorScheme = Colors.ColorSchemes ["Menu"],
+            Scheme = Colors.Schemes ["Menu"],
 
             //Width = Dim.Fill (),
             X = 0,

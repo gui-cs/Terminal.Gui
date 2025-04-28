@@ -156,7 +156,7 @@ public class Sliders : Scenario
             Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            ColorScheme = Colors.ColorSchemes ["Dialog"]
+            Scheme = Colors.Schemes ["Dialog"]
         };
 
         app.Add (configView);
@@ -487,19 +487,19 @@ public class Sliders : Scenario
 
                                                 foreach (Slider s in app.SubViews.OfType<Slider> ())
                                                 {
-                                                    s.ColorScheme = new ColorScheme (s.ColorScheme);
+                                                    s.Scheme = new Scheme (s.Scheme);
 
-                                                    s.ColorScheme = new ColorScheme (s.ColorScheme)
+                                                    s.Scheme = new Scheme (s.Scheme)
                                                     {
                                                         Normal = new Attribute (
                                                                                 data.Item2,
-                                                                                s.ColorScheme.Normal.Background
+                                                                                s.Scheme.Normal.Background
                                                                                )
                                                     };
 
                                                     s.Style.OptionChar = s.Style.OptionChar with
                                                     {
-                                                        Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background)
+                                                        Attribute = new Attribute (data.Item1, s.Scheme.Normal.Background)
                                                     };
 
                                                     s.Style.SetChar = s.Style.SetChar with
@@ -507,23 +507,23 @@ public class Sliders : Scenario
                                                         Attribute = new Attribute (
                                                                                    data.Item1,
                                                                                    s.Style.SetChar.Attribute?.Background
-                                                                                   ?? s.ColorScheme.Normal.Background
+                                                                                   ?? s.Scheme.Normal.Background
                                                                                   )
                                                     };
-                                                    s.Style.LegendAttributes.SetAttribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
+                                                    s.Style.LegendAttributes.SetAttribute = new Attribute (data.Item1, s.Scheme.Normal.Background);
 
                                                     s.Style.RangeChar = s.Style.RangeChar with
                                                     {
-                                                        Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background)
+                                                        Attribute = new Attribute (data.Item1, s.Scheme.Normal.Background)
                                                     };
 
                                                     s.Style.SpaceChar = s.Style.SpaceChar with
                                                     {
-                                                        Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background)
+                                                        Attribute = new Attribute (data.Item1, s.Scheme.Normal.Background)
                                                     };
 
                                                     s.Style.LegendAttributes.NormalAttribute =
-                                                        new Attribute (data.Item1, s.ColorScheme.Normal.Background);
+                                                        new Attribute (data.Item1, s.Scheme.Normal.Background);
                                                 }
                                             }
                                         };
@@ -557,10 +557,10 @@ public class Sliders : Scenario
 
                                                 foreach (Slider s in app.SubViews.OfType<Slider> ())
                                                 {
-                                                    s.ColorScheme = new ColorScheme (s.ColorScheme)
+                                                    s.Scheme = new Scheme (s.Scheme)
                                                     {
                                                         Normal = new Attribute (
-                                                                                s.ColorScheme.Normal.Foreground,
+                                                                                s.Scheme.Normal.Foreground,
                                                                                 data.Item2
                                                                                )
                                                     };
@@ -579,7 +579,7 @@ public class Sliders : Scenario
             Y = Pos.Bottom (spacingOptions),
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            ColorScheme = Colors.ColorSchemes ["Toplevel"],
+            Scheme = Colors.Schemes ["Toplevel"],
             Source = new ListWrapper<string> (eventSource)
         };
         configView.Add (eventLog);

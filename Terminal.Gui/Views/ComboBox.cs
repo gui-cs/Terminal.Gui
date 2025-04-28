@@ -111,13 +111,13 @@ public class ComboBox : View, IDesignable
     }
 
     /// <inheritdoc/>
-    public new ColorScheme ColorScheme
+    public new Scheme Scheme
     {
-        get => base.ColorScheme;
+        get => base.Scheme;
         set
         {
-            _listview.ColorScheme = value;
-            base.ColorScheme = value;
+            _listview.Scheme = value;
+            base.Scheme = value;
             SetNeedsDraw ();
         }
     }
@@ -142,9 +142,9 @@ public class ComboBox : View, IDesignable
 
             if (_search.ReadOnly)
             {
-                if (_search.ColorScheme is { })
+                if (_search.Scheme is { })
                 {
-                    _search.ColorScheme = new ColorScheme (_search.ColorScheme) { Normal = _search.ColorScheme.Focus };
+                    _search.Scheme = new Scheme (_search.Scheme) { Normal = _search.Scheme.Focus };
                 }
             }
         }
@@ -302,9 +302,9 @@ public class ComboBox : View, IDesignable
             return true;
         }
 
-        if (ColorScheme != null)
+        if (Scheme != null)
         {
-            SetAttribute (ColorScheme.Focus);
+            SetAttribute (Scheme.Focus);
         }
         AddRune (Viewport.Right - 1, 0, Glyphs.DownArrow);
 
@@ -890,7 +890,7 @@ public class ComboBox : View, IDesignable
 
         protected override bool OnDrawingContent ()
         {
-            Attribute current = ColorScheme?.Focus ?? Attribute.Default;
+            Attribute current = Scheme?.Focus ?? Attribute.Default;
             SetAttribute (current);
             Move (0, 0);
             Rectangle f = Frame;
@@ -908,11 +908,11 @@ public class ComboBox : View, IDesignable
 
                 if (isHighlighted || (isSelected && !_hideDropdownListOnClick))
                 {
-                    newcolor = focused ? ColorScheme.Focus : ColorScheme.HotNormal;
+                    newcolor = focused ? Scheme.Focus : Scheme.HotNormal;
                 }
                 else if (isSelected && _hideDropdownListOnClick)
                 {
-                    newcolor = focused ? ColorScheme.HotFocus : ColorScheme.HotNormal;
+                    newcolor = focused ? Scheme.HotFocus : Scheme.HotNormal;
                 }
                 else
                 {

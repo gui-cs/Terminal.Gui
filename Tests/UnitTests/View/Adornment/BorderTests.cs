@@ -19,12 +19,12 @@ public class BorderTests (ITestOutputHelper output)
         view.Border!.Thickness = new (0, 1, 0, 0);
         view.Border.LineStyle = LineStyle.Single;
 
-        view.ColorScheme = new ()
+        view.Scheme = new ()
         {
             Normal = new (Color.Red, Color.Green),
             Focus = new (Color.Green, Color.Red)
         };
-        Assert.NotEqual (view.ColorScheme.Normal.Foreground, view.ColorScheme.Focus.Foreground);
+        Assert.NotEqual (view.Scheme.Normal.Foreground, view.Scheme.Focus.Foreground);
         Assert.Equal (ColorName16.Red, view.Border.GetNormalColor ().Foreground.GetClosestNamedColor16 ());
         Assert.Equal (ColorName16.Green, view.Border.GetFocusColor ().Foreground.GetClosestNamedColor16 ());
         Assert.Equal (view.GetFocusColor (), view.Border.GetFocusColor ());
@@ -35,27 +35,27 @@ public class BorderTests (ITestOutputHelper output)
 
         var expected = @"─┤A├─";
         DriverAssert.AssertDriverContentsAre (expected, output);
-        DriverAssert.AssertDriverAttributesAre ("00000", output, null, view.ColorScheme.Normal);
+        DriverAssert.AssertDriverAttributesAre ("00000", output, null, view.Scheme.Normal);
 
         view.CanFocus = true;
         view.SetFocus ();
         View.SetClipToScreen ();
         view.Draw ();
         Assert.Equal (view.GetFocusColor (), view.Border.GetFocusColor ());
-        Assert.Equal (view.ColorScheme.Focus.Foreground, view.Border.GetFocusColor ().Foreground);
-        Assert.Equal (view.ColorScheme.Normal.Foreground, view.Border.GetNormalColor ().Foreground);
-        DriverAssert.AssertDriverAttributesAre ("00100", output, null, view.ColorScheme.Normal, view.GetFocusColor ());
+        Assert.Equal (view.Scheme.Focus.Foreground, view.Border.GetFocusColor ().Foreground);
+        Assert.Equal (view.Scheme.Normal.Foreground, view.Border.GetNormalColor ().Foreground);
+        DriverAssert.AssertDriverAttributesAre ("00100", output, null, view.Scheme.Normal, view.GetFocusColor ());
     }
 
     [Fact]
     [SetupFakeDriver]
-    public void Border_Uses_Parent_ColorScheme ()
+    public void Border_Uses_Parent_Scheme ()
     {
         var view = new View { Title = "A", Height = 2, Width = 5 };
         view.Border.Thickness = new (0, 1, 0, 0);
         view.Border.LineStyle = LineStyle.Single;
 
-        view.ColorScheme = new ()
+        view.Scheme = new ()
         {
             Normal = new (Color.Red, Color.Green), Focus = new (Color.Green, Color.Red)
         };
@@ -70,7 +70,7 @@ public class BorderTests (ITestOutputHelper output)
 
         var expected = @"─┤A├─";
         DriverAssert.AssertDriverContentsAre (expected, output);
-        DriverAssert.AssertDriverAttributesAre ("00000", output, null, view.ColorScheme.Normal);
+        DriverAssert.AssertDriverAttributesAre ("00000", output, null, view.Scheme.Normal);
     }
 
     [Theory]

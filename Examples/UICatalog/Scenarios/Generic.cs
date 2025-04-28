@@ -31,10 +31,10 @@ public sealed class Generic : Scenario
             Key = Key.F10,
             HighlightStyle = HighlightStyle.None
         };
-        button.ColorScheme = Colors.ColorSchemes ["Error"];
+        button.Scheme = Colors.Schemes ["Error"];
 
         button.Padding!.Thickness = new (1);
-        button.Padding.ColorScheme = Colors.ColorSchemes ["Toplevel"];
+        button.Padding.Scheme = Colors.Schemes ["Toplevel"];
         button.Margin!.Thickness = new (1);
 
         button.Accepting += (s, e) =>

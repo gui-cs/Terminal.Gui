@@ -170,17 +170,17 @@ public class ProgressBar : View, IDesignable
         if (ProgressBarFormat != ProgressBarFormat.Simple && !_isActivity)
         {
             var tf = new TextFormatter { Alignment = Alignment.Center, Text = Text };
-            var attr = new Attribute (ColorScheme!.HotNormal.Foreground, ColorScheme.HotNormal.Background);
+            var attr = new Attribute (Scheme!.HotNormal.Foreground, Scheme.HotNormal.Background);
 
             if (_fraction > .5)
             {
-                attr = new (ColorScheme.HotNormal.Background, ColorScheme.HotNormal.Foreground);
+                attr = new (Scheme.HotNormal.Background, Scheme.HotNormal.Foreground);
             }
 
             tf.Draw (
                      ViewportToScreen (Viewport),
                      attr,
-                     ColorScheme.Normal,
+                     Scheme.Normal,
                      SuperView?.ViewportToScreen (SuperView.Viewport) ?? default (Rectangle)
                     );
         }

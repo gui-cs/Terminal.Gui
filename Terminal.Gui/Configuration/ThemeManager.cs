@@ -21,7 +21,7 @@ namespace Terminal.Gui;
 /// 	"Themes": [
 /// 	{
 /// 		"Default": {
-/// 			"ColorSchemes": [
+/// 			"Schemes": [
 /// 			{
 /// 			"TopLevel": {
 /// 			"Normal": {

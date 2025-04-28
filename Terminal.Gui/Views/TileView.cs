@@ -181,9 +181,9 @@ public class TileView : View
     /// <inheritdoc/>
     protected override void OnDrawComplete (DrawContext? context)
     {
-        if (ColorScheme is { })
+        if (Scheme is { })
         {
-            SetAttribute (ColorScheme.Normal);
+            SetAttribute (Scheme.Normal);
         }
 
         var lc = new LineCanvas ();
@@ -239,9 +239,9 @@ public class TileView : View
             }
         }
 
-        if (ColorScheme is { })
+        if (Scheme is { })
         {
-            SetAttribute (ColorScheme.Normal);
+            SetAttribute (Scheme.Normal);
         }
 
         foreach (KeyValuePair<Point, Rune> p in lc.GetMap (Viewport))

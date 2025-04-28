@@ -104,8 +104,8 @@ public class ConfigurationManagerTests
         Assert.Equal (attrSrc, attrCopy);
 
         // Classes
-        var colorschemeDest = new ColorScheme { Disabled = new Attribute (Color.Black) };
-        var colorschemeSrc = new ColorScheme { Disabled = new Attribute (Color.White) };
+        var colorschemeDest = new Scheme { Disabled = new Attribute (Color.Black) };
+        var colorschemeSrc = new Scheme { Disabled = new Attribute (Color.White) };
         object colorschemeCopy = DeepMemberWiseCopy (colorschemeSrc, colorschemeDest);
         Assert.Equal (colorschemeSrc, colorschemeCopy);
 
@@ -520,14 +520,14 @@ public class ConfigurationManagerTests
         ConfigLocations savedLocations = Locations;
         Locations = ConfigLocations.All;
 
-        // Color.ColorSchemes is serialized as "ColorSchemes", not "Colors.ColorSchemes"
-        PropertyInfo pi = typeof (Colors).GetProperty ("ColorSchemes");
+        // Color.Schemes is serialized as "Schemes", not "Colors.Schemes"
+        PropertyInfo pi = typeof (Colors).GetProperty ("Schemes");
         var scp = (SerializableConfigurationProperty)pi!.GetCustomAttribute (typeof (SerializableConfigurationProperty));
         Assert.True (scp!.Scope == typeof (ThemeScope));
         Assert.True (scp.OmitClassName);
 
         Reset ();
-        Assert.Equal (pi, Themes! ["Default"] ["ColorSchemes"].PropertyInfo);
+        Assert.Equal (pi, Themes! ["Default"] ["Schemes"].PropertyInfo);
 
         Locations = savedLocations;
     }
@@ -538,33 +538,33 @@ public class ConfigurationManagerTests
     {
         Assert.Equal ("Default", Themes!.Theme);
 
-        Assert.Equal (new Color (Color.White), Colors.ColorSchemes ["Base"]!.Normal.Foreground);
-        Assert.Equal (new Color (Color.Blue), Colors.ColorSchemes ["Base"].Normal.Background);
+        Assert.Equal (new Color (Color.White), Colors.Schemes ["Base"]!.Normal.Foreground);
+        Assert.Equal (new Color (Color.Blue), Colors.Schemes ["Base"].Normal.Background);
 
         // Change Base
         Stream json = ToStream ();
 
         Settings!.Update (json, "TestConfigurationManagerInitDriver", ConfigLocations.Runtime);
 
-        Dictionary<string, ColorScheme> colorSchemes =
-            (Dictionary<string, ColorScheme>)Themes [Themes.Theme] ["ColorSchemes"].PropertyValue;
-        Assert.Equal (Colors.ColorSchemes ["Base"], colorSchemes! ["Base"]);
-        Assert.Equal (Colors.ColorSchemes ["TopLevel"], colorSchemes ["TopLevel"]);
-        Assert.Equal (Colors.ColorSchemes ["Error"], colorSchemes ["Error"]);
-        Assert.Equal (Colors.ColorSchemes ["Dialog"], colorSchemes ["Dialog"]);
-        Assert.Equal (Colors.ColorSchemes ["Menu"], colorSchemes ["Menu"]);
+        Dictionary<string, Scheme> schemes =
+            (Dictionary<string, Scheme>)Themes [Themes.Theme] ["Schemes"].PropertyValue;
+        Assert.Equal (Colors.Schemes ["Base"], schemes! ["Base"]);
+        Assert.Equal (Colors.Schemes ["TopLevel"], schemes ["TopLevel"]);
+        Assert.Equal (Colors.Schemes ["Error"], schemes ["Error"]);
+        Assert.Equal (Colors.Schemes ["Dialog"], schemes ["Dialog"]);
+        Assert.Equal (Colors.Schemes ["Menu"], schemes ["Menu"]);
 
-        Colors.ColorSchemes ["Base"] = colorSchemes ["Base"];
-        Colors.ColorSchemes ["TopLevel"] = colorSchemes ["TopLevel"];
-        Colors.ColorSchemes ["Error"] = colorSchemes ["Error"];
-        Colors.ColorSchemes ["Dialog"] = colorSchemes ["Dialog"];
-        Colors.ColorSchemes ["Menu"] = colorSchemes ["Menu"];
+        Colors.Schemes ["Base"] = schemes ["Base"];
+        Colors.Schemes ["TopLevel"] = schemes ["TopLevel"];
+        Colors.Schemes ["Error"] = schemes ["Error"];
+        Colors.Schemes ["Dialog"] = schemes ["Dialog"];
+        Colors.Schemes ["Menu"] = schemes ["Menu"];
 
-        Assert.Equal (colorSchemes ["Base"], Colors.ColorSchemes ["Base"]);
-        Assert.Equal (colorSchemes ["TopLevel"], Colors.ColorSchemes ["TopLevel"]);
-        Assert.Equal (colorSchemes ["Error"], Colors.ColorSchemes ["Error"]);
-        Assert.Equal (colorSchemes ["Dialog"], Colors.ColorSchemes ["Dialog"]);
-        Assert.Equal (colorSchemes ["Menu"], Colors.ColorSchemes ["Menu"]);
+        Assert.Equal (schemes ["Base"], Colors.Schemes ["Base"]);
+        Assert.Equal (schemes ["TopLevel"], Colors.Schemes ["TopLevel"]);
+        Assert.Equal (schemes ["Error"], Colors.Schemes ["Error"]);
+        Assert.Equal (schemes ["Dialog"], Colors.Schemes ["Dialog"]);
+        Assert.Equal (schemes ["Menu"], Colors.Schemes ["Menu"]);
     }
 
     [Fact]
@@ -587,7 +587,7 @@ public class ConfigurationManagerTests
 				""Themes"" : [ 
                                         {
 						""Default"" : {
-							""ColorSchemes"": [
+							""Schemes"": [
 							{
 								""UserDefined"": {
 									""hotNormal"": {
@@ -604,13 +604,13 @@ public class ConfigurationManagerTests
 
         Settings!.Update (json, "test", ConfigLocations.Runtime);
 
-        // AbNormal is not a ColorScheme attribute
+        // AbNormal is not a Scheme attribute
         json = @"
 			{
 				""Themes"" : [ 
                                         {
 						""Default"" : {
-							""ColorSchemes"": [
+							""Schemes"": [
 							{
 								""UserDefined"": {
 									""AbNormal"": {
@@ -633,7 +633,7 @@ public class ConfigurationManagerTests
 				""Themes"" :  [ 
                                         {
 						""Default"" : {
-							""ColorSchemes"": [
+							""Schemes"": [
 							{
 								""UserDefined"": {
 									""hotNormal"": {
@@ -670,7 +670,7 @@ public class ConfigurationManagerTests
 				""Themes"" : [
                                         {
 						""Default"" : {
-							""ColorSchemes"": [
+							""Schemes"": [
 							{
 								""UserDefined"": {
 									""hotNormal"": {
@@ -688,13 +688,13 @@ public class ConfigurationManagerTests
         var jsonException = Assert.Throws<JsonException> (() => Settings!.Update (json, "test", ConfigLocations.Runtime));
         Assert.Equal ("Unexpected color name: brownish.", jsonException.Message);
 
-        // AbNormal is not a ColorScheme attribute
+        // AbNormal is not a Scheme attribute
         json = @"
 			{
 				""Themes"" : [ 
                                         {
 						""Default"" : {
-							""ColorSchemes"": [
+							""Schemes"": [
 							{
 								""UserDefined"": {
 									""AbNormal"": {
@@ -710,7 +710,7 @@ public class ConfigurationManagerTests
 			}";
 
         jsonException = Assert.Throws<JsonException> (() => Settings!.Update (json, "test", ConfigLocations.Runtime));
-        Assert.Equal ("Unrecognized ColorScheme Attribute name: AbNormal.", jsonException.Message);
+        Assert.Equal ("Unrecognized Scheme Attribute name: AbNormal.", jsonException.Message);
 
         // Modify hotNormal background only
         json = @"
@@ -718,7 +718,7 @@ public class ConfigurationManagerTests
 				""Themes"" : [ 
                                         {
 						""Default"" : {
-							""ColorSchemes"": [
+							""Schemes"": [
 							{
 								""UserDefined"": {
 									""hotNormal"": {
@@ -775,7 +775,7 @@ public class ConfigurationManagerTests
   ""Themes"": [
     {
       ""Default"": {
-        ""ColorSchemes"": [
+        ""Schemes"": [
           {
             ""TopLevel"": {
               ""Normal"": {
@@ -913,13 +913,13 @@ public class ConfigurationManagerTests
 
         Assert.Equal ("Default", Themes!.Theme);
 
-        Assert.Equal (new Color (Color.White), Colors.ColorSchemes ["Base"]!.Normal.Foreground);
-        Assert.Equal (new Color (Color.Blue), Colors.ColorSchemes ["Base"].Normal.Background);
+        Assert.Equal (new Color (Color.White), Colors.Schemes ["Base"]!.Normal.Foreground);
+        Assert.Equal (new Color (Color.Blue), Colors.Schemes ["Base"].Normal.Background);
 
-        Dictionary<string, ColorScheme> colorSchemes =
-            (Dictionary<string, ColorScheme>)Themes.First ().Value ["ColorSchemes"].PropertyValue;
-        Assert.Equal (new Color (Color.White), colorSchemes! ["Base"].Normal.Foreground);
-        Assert.Equal (new Color (Color.Blue), colorSchemes ["Base"].Normal.Background);
+        Dictionary<string, Scheme> schemes =
+            (Dictionary<string, Scheme>)Themes.First ().Value ["Schemes"].PropertyValue;
+        Assert.Equal (new Color (Color.White), schemes! ["Base"].Normal.Foreground);
+        Assert.Equal (new Color (Color.Blue), schemes ["Base"].Normal.Background);
 
         // Now re-apply
         Apply ();
@@ -927,8 +927,8 @@ public class ConfigurationManagerTests
         Assert.Equal (KeyCode.Z | KeyCode.AltMask, Application.QuitKey.KeyCode);
         Assert.Equal ("Default", Themes.Theme);
 
-        Assert.Equal (new Color (Color.White), Colors.ColorSchemes ["Base"].Normal.Foreground);
-        Assert.Equal (new Color (Color.Blue), Colors.ColorSchemes ["Base"].Normal.Background);
+        Assert.Equal (new Color (Color.White), Colors.Schemes ["Base"].Normal.Foreground);
+        Assert.Equal (new Color (Color.Blue), Colors.Schemes ["Base"].Normal.Background);
         Reset ();
 
         Locations = savedLocations;

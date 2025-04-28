@@ -6,12 +6,12 @@ namespace Terminal.Gui;
 /// <summary>Delegate for providing color to <see cref="TableView"/> cells based on the value being rendered</summary>
 /// <param name="args">Contains information about the cell for which color is needed</param>
 /// <returns></returns>
-public delegate ColorScheme CellColorGetterDelegate (CellColorGetterArgs args);
+public delegate Scheme CellColorGetterDelegate (CellColorGetterArgs args);
 
 /// <summary>Delegate for providing color for a whole row of a <see cref="TableView"/></summary>
 /// <param name="args"></param>
 /// <returns></returns>
-public delegate ColorScheme RowColorGetterDelegate (RowColorGetterArgs args);
+public delegate Scheme RowColorGetterDelegate (RowColorGetterArgs args);
 
 /// <summary>
 ///     View for tabular data based on a <see cref="ITableSource"/>.
@@ -1906,10 +1906,10 @@ public class TableView : View, IDesignable
     {
         bool focused = HasFocus;
 
-        ColorScheme rowScheme = Style.RowColorGetter?.Invoke (
+        Scheme rowScheme = Style.RowColorGetter?.Invoke (
                                                               new RowColorGetterArgs (Table, rowToRender)
                                                              )
-                                ?? ColorScheme;
+                                ?? Scheme;
 
         //start by clearing the entire line
         Move (0, row);
@@ -1950,14 +1950,14 @@ public class TableView : View, IDesignable
             string representation = GetRepresentation (val, colStyle);
 
             // to get the colour scheme
-            CellColorGetterDelegate colorSchemeGetter = colStyle?.ColorGetter;
+            CellColorGetterDelegate schemeGetter = colStyle?.ColorGetter;
 
-            ColorScheme scheme;
+            Scheme scheme;
 
-            if (colorSchemeGetter is { })
+            if (schemeGetter is { })
             {
                 // user has a delegate for defining row color per cell, call it
-                scheme = colorSchemeGetter (
+                scheme = schemeGetter (
                                             new CellColorGetterArgs (
                                                                      Table,
                                                                      rowToRender,

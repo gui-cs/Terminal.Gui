@@ -8,7 +8,7 @@ namespace Terminal.Gui;
 ///     <para>
 ///         Window has <see cref="View.BorderStyle"/> set to <see cref="LineStyle.Single"/>, <see cref="View.Arrangement"/>
 ///         set to <see cref="ViewArrangement.Overlapped"/>, and
-///         uses the Base <see cref="Colors.ColorSchemes"/> color scheme by default.
+///         uses the Base <see cref="Colors.Schemes"/> color scheme by default.
 ///     </para>
 ///     <para>
 ///         To enable Window to be sized and moved by the user, adjust <see cref="View.Arrangement"/>.
@@ -25,7 +25,7 @@ public class Window : Toplevel
         CanFocus = true;
         TabStop = TabBehavior.TabGroup;
         Arrangement = ViewArrangement.Overlapped;
-        base.ColorScheme = Colors.ColorSchemes ["Base"]; // TODO: make this a theme property
+        base.Scheme = Colors.Schemes ["Base"]; // TODO: make this a theme property
         BorderStyle = DefaultBorderStyle;
         base.ShadowStyle = DefaultShadow;
     }
@@ -44,7 +44,7 @@ public class Window : Toplevel
     ///// This property can be set in a Theme to change the default <see cref="LineStyle"/> for all <see cref="Window"/>s. 
     ///// </remarks>
     /////[SerializableConfigurationProperty (Scope = typeof (ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
-    ////public static ColorScheme DefaultColorScheme { get; set; } = Colors.ColorSchemes ["Base"];
+    ////public static Scheme DefaultScheme { get; set; } = Colors.Schemes ["Base"];
 
     /// <summary>
     ///     The default <see cref="LineStyle"/> for <see cref="Window"/>'s border. The default is

@@ -34,7 +34,7 @@ public class TextEffectsScenario : Scenario
                               }
                           };
 
-        w.ColorScheme = new ()
+        w.Scheme = new ()
         {
             Normal = new (ColorName16.White, ColorName16.Black),
             Focus = new (ColorName16.Black, ColorName16.White),

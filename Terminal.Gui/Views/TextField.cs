@@ -964,7 +964,7 @@ public class TextField : View
                 SetAttribute (
                                       idx >= _start && SelectedLength > 0 && idx < _start + SelectedLength
                                           ? selColor
-                                          : ColorScheme.Focus
+                                          : Scheme.Focus
                                      );
             }
 
@@ -1292,9 +1292,9 @@ public class TextField : View
 
     private Attribute GetReadOnlyColor ()
     {
-        ColorScheme cs = ColorScheme;
+        Scheme cs = Scheme;
 
-        if (ColorScheme is null)
+        if (Scheme is null)
         {
             cs = new ();
         }

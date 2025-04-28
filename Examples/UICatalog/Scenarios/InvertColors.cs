@@ -16,7 +16,7 @@ public class InvertColors : Scenario
         var win = new Window
         {
             Title = GetQuitKeyAndName (),
-            ColorScheme = Colors.ColorSchemes ["TopLevel"]
+            Scheme = Colors.Schemes ["TopLevel"]
         };
 
         List<Label> labels = new ();
@@ -28,8 +28,8 @@ public class InvertColors : Scenario
             ColorName16 back = foreColors [(y + 1) % foreColors.Length];
             var color = new Attribute (fore, back);
 
-            var label = new Label { ColorScheme = new ColorScheme (), Y = y, Text = $"{fore} on {back}" };
-            label.ColorScheme = new ColorScheme (label.ColorScheme) { Normal = color };
+            var label = new Label { Scheme = new Scheme (), Y = y, Text = $"{fore} on {back}" };
+            label.Scheme = new Scheme (label.Scheme) { Normal = color };
             win.Add (label);
             labels.Add (label);
         }
@@ -40,10 +40,10 @@ public class InvertColors : Scenario
                           {
                               foreach (Label label in labels)
                               {
-                                  Attribute color = label.ColorScheme.Normal;
+                                  Attribute color = label.Scheme.Normal;
                                   color = new Attribute (color.Background, color.Foreground);
 
-                                  label.ColorScheme = new ColorScheme (label.ColorScheme) { Normal = color };
+                                  label.Scheme = new Scheme (label.Scheme) { Normal = color };
                                   label.Text = $"{color.Foreground} on {color.Background}";
                                   label.SetNeedsDraw ();
                               }

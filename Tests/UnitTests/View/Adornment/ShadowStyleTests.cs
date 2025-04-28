@@ -51,7 +51,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
             Height = 3,
             Width = 3,
             Text = "012ABC!@#",
-            ColorScheme = new (new Attribute (fg, bg))
+            Scheme = new (new Attribute (fg, bg))
         };
         superView.TextFormatter.WordWrap = true;
 
@@ -61,7 +61,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
             Height = Dim.Auto (),
             Text = "*",
             ShadowStyle = style,
-            ColorScheme = new (Attribute.Default)
+            Scheme = new (Attribute.Default)
         };
         superView.Add (view);
         Application.TopLevels.Push (superView);

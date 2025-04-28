@@ -3,19 +3,19 @@ using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
-/// <summary>Implements a JSON converter for <see cref="ColorScheme"/>.</summary>
-internal class ColorSchemeJsonConverter : JsonConverter<ColorScheme>
+/// <summary>Implements a JSON converter for <see cref="Scheme"/>.</summary>
+internal class SchemeJsonConverter : JsonConverter<Scheme>
 {
-    private static ColorSchemeJsonConverter instance;
+    private static SchemeJsonConverter instance;
 
     /// <summary>Singleton</summary>
-    public static ColorSchemeJsonConverter Instance
+    public static SchemeJsonConverter Instance
     {
         get
         {
             if (instance is null)
             {
-                instance = new ColorSchemeJsonConverter ();
+                instance = new SchemeJsonConverter ();
             }
 
             return instance;
@@ -23,11 +23,11 @@ internal class ColorSchemeJsonConverter : JsonConverter<ColorScheme>
     }
 
     /// <inheritdoc/>
-    public override ColorScheme Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override Scheme Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType != JsonTokenType.StartObject)
         {
-            throw new JsonException ($"Unexpected StartObject token when parsing ColorScheme: {reader.TokenType}.");
+            throw new JsonException ($"Unexpected StartObject token when parsing Scheme: {reader.TokenType}.");
         }
 
         var normal = Attribute.Default;
@@ -40,7 +40,7 @@ internal class ColorSchemeJsonConverter : JsonConverter<ColorScheme>
         {
             if (reader.TokenType == JsonTokenType.EndObject)
             {
-                var colorScheme = new ColorScheme
+                var scheme = new Scheme
                 {
                     Normal = normal,
                     Focus = focus,
@@ -49,7 +49,7 @@ internal class ColorSchemeJsonConverter : JsonConverter<ColorScheme>
                     Disabled = disabled
                 };
 
-                return colorScheme;
+                return scheme;
             }
 
             if (reader.TokenType != JsonTokenType.PropertyName)
@@ -84,7 +84,7 @@ internal class ColorSchemeJsonConverter : JsonConverter<ColorScheme>
 
                     break;
                 default:
-                    throw new JsonException ($"Unrecognized ColorScheme Attribute name: {propertyName}.");
+                    throw new JsonException ($"Unrecognized Scheme Attribute name: {propertyName}.");
             }
         }
 
@@ -92,7 +92,7 @@ internal class ColorSchemeJsonConverter : JsonConverter<ColorScheme>
     }
 
     /// <inheritdoc/>
-    public override void Write (Utf8JsonWriter writer, ColorScheme value, JsonSerializerOptions options)
+    public override void Write (Utf8JsonWriter writer, Scheme value, JsonSerializerOptions options)
     {
         writer.WriteStartObject ();
 

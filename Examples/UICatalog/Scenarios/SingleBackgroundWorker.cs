@@ -278,7 +278,7 @@ public class SingleBackgroundWorker : Scenario
             Y = 1;
             Height = Dim.Fill (1);
             Title = $"Worker started at {start}.{start:fff}";
-            ColorScheme = Colors.ColorSchemes ["Base"];
+            Scheme = Colors.Schemes ["Base"];
 
             Add (
                  new ListView

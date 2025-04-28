@@ -7,42 +7,42 @@ public partial class View
 {
     // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/4014
     // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/4016
-    // TODO: Enable ability to tell if ColorScheme was explicitly set; ColorScheme, as is, hides this.
-    internal ColorScheme? _colorScheme;
+    // TODO: Enable ability to tell if Scheme was explicitly set; Scheme, as is, hides this.
+    internal Scheme? _scheme;
 
     /// <summary>The color scheme for this view, if it is not defined, it returns the <see cref="SuperView"/>'s color scheme.</summary>
-    public virtual ColorScheme? ColorScheme
+    public virtual Scheme? Scheme
     {
-        // BUGBUG: This prevents the ability to know if ColorScheme was explicitly set or not.
-        get => _colorScheme ?? SuperView?.ColorScheme;
+        // BUGBUG: This prevents the ability to know if Scheme was explicitly set or not.
+        get => _scheme ?? SuperView?.Scheme;
         set
         {
-            if (_colorScheme == value)
+            if (_scheme == value)
             {
                 return;
             }
 
-            _colorScheme = value;
+            _scheme = value;
 
             // BUGBUG: This should be in Border.cs somehow
-            if (Border is { } && Border.LineStyle != LineStyle.None && Border.ColorScheme is { })
+            if (Border is { } && Border.LineStyle != LineStyle.None && Border.Scheme is { })
             {
-                Border.ColorScheme = _colorScheme;
+                Border.Scheme = _scheme;
             }
 
             SetNeedsDraw ();
         }
     }
 
-    /// <summary>Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.</summary>
+    /// <summary>Determines the current <see cref="Scheme"/> based on the <see cref="Enabled"/> value.</summary>
     /// <returns>
-    ///     <see cref="ColorScheme.Focus"/> if <see cref="Enabled"/> is <see langword="true"/> or
-    ///     <see cref="ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>. If it's
+    ///     <see cref="Scheme.Focus"/> if <see cref="Enabled"/> is <see langword="true"/> or
+    ///     <see cref="Scheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>. If it's
     ///     overridden can return other values.
     /// </returns>
     public virtual Attribute GetFocusColor ()
     {
-        Attribute currAttribute = ColorScheme?.Normal ?? Attribute.Default;
+        Attribute currAttribute = Scheme?.Normal ?? Attribute.Default;
         var newAttribute = new Attribute ();
         CancelEventArgs<Attribute> args = new (in currAttribute, ref newAttribute);
         GettingFocusColor?.Invoke (this, args);
@@ -52,7 +52,7 @@ public partial class View
             return args.NewValue;
         }
 
-        ColorScheme? cs = ColorScheme ?? new ();
+        Scheme? cs = Scheme ?? new ();
 
         return Enabled ? GetColor (cs.Focus) : cs.Disabled;
     }
@@ -64,15 +64,15 @@ public partial class View
     /// </summary>
     public event EventHandler<CancelEventArgs<Attribute>>? GettingFocusColor;
 
-    /// <summary>Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.</summary>
+    /// <summary>Determines the current <see cref="Scheme"/> based on the <see cref="Enabled"/> value.</summary>
     /// <returns>
-    ///     <see cref="ColorScheme.Focus"/> if <see cref="Enabled"/> is <see langword="true"/> or
-    ///     <see cref="ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>. If it's
+    ///     <see cref="Scheme.Focus"/> if <see cref="Enabled"/> is <see langword="true"/> or
+    ///     <see cref="Scheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>. If it's
     ///     overridden can return other values.
     /// </returns>
     public virtual Attribute GetHotFocusColor ()
     {
-        Attribute currAttribute = ColorScheme?.Normal ?? Attribute.Default;
+        Attribute currAttribute = Scheme?.Normal ?? Attribute.Default;
         var newAttribute = new Attribute ();
         CancelEventArgs<Attribute> args = new (in currAttribute, ref newAttribute);
         GettingHotFocusColor?.Invoke (this, args);
@@ -82,7 +82,7 @@ public partial class View
             return args.NewValue;
         }
 
-        ColorScheme? cs = ColorScheme ?? new ();
+        Scheme? cs = Scheme ?? new ();
 
         return Enabled ? GetColor (cs.HotFocus) : cs.Disabled;
     }
@@ -94,15 +94,15 @@ public partial class View
     /// </summary>
     public event EventHandler<CancelEventArgs<Attribute>>? GettingHotFocusColor;
 
-    /// <summary>Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.</summary>
+    /// <summary>Determines the current <see cref="Scheme"/> based on the <see cref="Enabled"/> value.</summary>
     /// <returns>
-    ///     <see cref="ColorScheme.HotNormal"/> if <see cref="Enabled"/> is <see langword="true"/> or
-    ///     <see cref="ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>. If it's
+    ///     <see cref="Scheme.HotNormal"/> if <see cref="Enabled"/> is <see langword="true"/> or
+    ///     <see cref="Scheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>. If it's
     ///     overridden can return other values.
     /// </returns>
     public virtual Attribute GetHotNormalColor ()
     {
-        Attribute currAttribute = ColorScheme?.Normal ?? Attribute.Default;
+        Attribute currAttribute = Scheme?.Normal ?? Attribute.Default;
         var newAttribute = new Attribute ();
         CancelEventArgs<Attribute> args = new (in currAttribute, ref newAttribute);
         GettingHotNormalColor?.Invoke (this, args);
@@ -112,7 +112,7 @@ public partial class View
             return args.NewValue;
         }
 
-        ColorScheme? cs = ColorScheme ?? new ();
+        Scheme? cs = Scheme ?? new ();
 
         return Enabled ? GetColor (cs.HotNormal) : cs.Disabled;
     }
@@ -124,15 +124,15 @@ public partial class View
     /// </summary>
     public event EventHandler<CancelEventArgs<Attribute>>? GettingHotNormalColor;
 
-    /// <summary>Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.</summary>
+    /// <summary>Determines the current <see cref="Scheme"/> based on the <see cref="Enabled"/> value.</summary>
     /// <returns>
-    ///     <see cref="ColorScheme.Normal"/> if <see cref="Enabled"/> is <see langword="true"/> or
-    ///     <see cref="ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>. If it's
+    ///     <see cref="Scheme.Normal"/> if <see cref="Enabled"/> is <see langword="true"/> or
+    ///     <see cref="Scheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>. If it's
     ///     overridden can return other values.
     /// </returns>
     public virtual Attribute GetNormalColor ()
     {
-        Attribute currAttribute = ColorScheme?.Normal ?? Attribute.Default;
+        Attribute currAttribute = Scheme?.Normal ?? Attribute.Default;
         var newAttribute = new Attribute ();
         CancelEventArgs<Attribute> args = new (in currAttribute, ref newAttribute);
         GettingNormalColor?.Invoke (this, args);
@@ -142,7 +142,7 @@ public partial class View
             return args.NewValue;
         }
 
-        ColorScheme? cs = ColorScheme ?? new ();
+        Scheme? cs = Scheme ?? new ();
         Attribute disabled = new (cs.Disabled.Foreground, cs.Disabled.Background);
 
         if (Diagnostics.HasFlag (ViewDiagnosticFlags.Hover) && _hovering)
@@ -179,7 +179,7 @@ public partial class View
             return;
         }
 
-        if (ColorScheme is { })
+        if (Scheme is { })
         {
             SetAttribute (GetNormalColor ());
         }

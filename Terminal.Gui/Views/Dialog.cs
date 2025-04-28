@@ -2,7 +2,7 @@
 
 /// <summary>
 ///     The <see cref="Dialog"/> <see cref="View"/> is a <see cref="Window"/> that by default is centered and contains
-///     one or more <see cref="Button"/>s. It defaults to the <c>Colors.ColorSchemes ["Dialog"]</c> color scheme and has a
+///     one or more <see cref="Button"/>s. It defaults to the <c>Colors.Schemes ["Dialog"]</c> color scheme and has a
 ///     1 cell padding around the edges.
 /// </summary>
 /// <remarks>
@@ -75,27 +75,27 @@ public class Dialog : Window
         Width = Dim.Auto (DimAutoStyle.Auto, Dim.Percent (DefaultMinimumWidth), Dim.Percent (90));
         Height = Dim.Auto (DimAutoStyle.Auto, Dim.Percent (DefaultMinimumHeight), Dim.Percent (90));
 
-        ColorScheme = Colors.ColorSchemes ["Dialog"];
+        Scheme = Colors.Schemes ["Dialog"];
 
         Modal = true;
         ButtonAlignment = DefaultButtonAlignment;
         ButtonAlignmentModes = DefaultButtonAlignmentModes;
     }
 
-    // BUGBUG: We override GetNormal/FocusColor because "Dialog" ColorScheme is goofy.
+    // BUGBUG: We override GetNormal/FocusColor because "Dialog" Scheme is goofy.
     // BUGBUG: By defn, a Dialog is Modal, and thus HasFocus is always true. OnDrawContent
     // BUGBUG: Calls these methods.
     // TODO: Fix this in https://github.com/gui-cs/Terminal.Gui/issues/2381
     /// <inheritdoc />
     public override Attribute GetNormalColor ()
     {
-        return ColorScheme!.Normal;
+        return Scheme!.Normal;
     }
 
     /// <inheritdoc />
     public override Attribute GetFocusColor ()
     {
-        return ColorScheme!.Normal;
+        return Scheme!.Normal;
     }
 
     private bool _canceled;

@@ -239,9 +239,9 @@ public class GraphViewExample : Scenario
 
         _about.Text = "Housing Expenditures by income thirds 1996-2003";
 
-        Color fore = _graphView.ColorScheme.Normal.Foreground == Color.Black
+        Color fore = _graphView.Scheme.Normal.Foreground == Color.Black
                          ? Color.White
-                         : _graphView.ColorScheme.Normal.Foreground;
+                         : _graphView.Scheme.Normal.Foreground;
         var black = new Attribute (fore, Color.Black);
         var cyan = new Attribute (Color.BrightCyan, Color.Black);
         var magenta = new Attribute (Color.BrightMagenta, Color.Black);
@@ -533,7 +533,7 @@ public class GraphViewExample : Scenario
 
         _about.Text = "This graph shows random points";
 
-        var black = new Attribute (_graphView.ColorScheme.Normal.Foreground, Color.Black);
+        var black = new Attribute (_graphView.Scheme.Normal.Foreground, Color.Black);
         var cyan = new Attribute (Color.BrightCyan, Color.Black);
         var magenta = new Attribute (Color.BrightMagenta, Color.Black);
         var red = new Attribute (Color.BrightRed, Color.Black);

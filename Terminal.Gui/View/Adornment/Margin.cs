@@ -5,7 +5,7 @@ namespace Terminal.Gui;
 /// <summary>The Margin for a <see cref="View"/>. Accessed via <see cref="View.Margin"/></summary>
 /// <remarks>
 ///     <para>
-///         The Margin is transparent by default. This can be overriden by explicitly setting <see cref="ColorScheme"/>.
+///         The Margin is transparent by default. This can be overriden by explicitly setting <see cref="Scheme"/>.
 ///     </para>
 ///     <para>
 ///         Margins are drawn after all other Views in the application View hierarchy are drawn.
@@ -108,20 +108,20 @@ public class Margin : Adornment
     /////// <summary>
     ///////     The color scheme for the Margin. If set to <see langword="null"/> (the default), the margin will be transparent.
     /////// </summary>
-    //public override ColorScheme? ColorScheme
+    //public override Scheme? Scheme
     //{
     //    get
     //    {
-    //        //if (base.ColorScheme is { })
+    //        //if (base.Scheme is { })
     //        {
-    //            return base.ColorScheme;
+    //            return base.Scheme;
     //        }
 
-    //        //return (Parent?.SuperView?.ColorScheme ?? Colors.ColorSchemes ["TopLevel"])!;
+    //        //return (Parent?.SuperView?.Scheme ?? Colors.Schemes ["TopLevel"])!;
     //    }
     //    set
     //    {
-    //        base.ColorScheme = value;
+    //        base.Scheme = value;
     //        Parent?.SetNeedsDraw ();
     //    }
     //}
@@ -129,9 +129,9 @@ public class Margin : Adornment
     /// <inheritdoc />
     public override Attribute GetNormalColor ()
     {
-        if (_colorScheme is { })
+        if (_scheme is { })
         {
-            return _colorScheme.Normal;
+            return _scheme.Normal;
         }
         if (Parent is { })
         {
@@ -197,7 +197,7 @@ public class Margin : Adornment
         Rectangle screen = ViewportToScreen (Viewport);
 
         // This just draws/clears the thickness, not the insides.
-        if (Diagnostics.HasFlag (ViewDiagnosticFlags.Thickness) || base.ColorScheme is { })
+        if (Diagnostics.HasFlag (ViewDiagnosticFlags.Thickness) || base.Scheme is { })
         {
             // TODO: This is a hack. See https://github.com/gui-cs/Terminal.Gui/issues/4016
             SetAttribute (GetNormalColor ());

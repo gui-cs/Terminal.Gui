@@ -217,8 +217,8 @@ public class ColorPickers : Scenario
         app.Add (cbShowName);
 
         // Set default colors.
-        foregroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Foreground.GetClosestNamedColor16 ();
-        backgroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Background.GetClosestNamedColor16 ();
+        foregroundColorPicker.SelectedColor = _demoView.SuperView.Scheme.Normal.Foreground.GetClosestNamedColor16 ();
+        backgroundColorPicker.SelectedColor = _demoView.SuperView.Scheme.Normal.Background.GetClosestNamedColor16 ();
 
         Application.Run (app);
         app.Dispose ();
@@ -259,7 +259,7 @@ public class ColorPickers : Scenario
     /// <summary>Update Demo Label.</summary>
     private void UpdateDemoLabel ()
     {
-        _demoView.ColorScheme = new ColorScheme
+        _demoView.Scheme = new Scheme
         {
             Normal = new Attribute (
                                     foregroundColorPicker.Visible ?

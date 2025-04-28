@@ -5,7 +5,7 @@
   "FileDialogStyle.DefaultUseUnicodeCharacters": false,
   "AppSettings": {
     "UICatalog.StatusBar": true,
-    "ConfigurationEditor.EditorColorScheme": {
+    "ConfigurationEditor.EditorScheme": {
       "Normal": {
         "Foreground": "Red",
         "Background": "White"
@@ -34,7 +34,7 @@
         "Button.DefaultShadow": "Opaque",
         "Dialog.DefaultShadow": "Transparent",
         "Dialog.DefaultButtonAlignment": "Center",
-        "ColorSchemes": [
+        "Schemes": [
           {
             "Toplevel": {
               "Normal": {
@@ -163,7 +163,7 @@
         "Button.DefaultShadow": "Opaque",
         "Dialog.DefaultShadow": "Transparent",
         "Dialog.DefaultButtonAlignment": "Center",
-        "ColorSchemes": [
+        "Schemes": [
           {
             "UI Catalog Scheme": {
               "Normal": {

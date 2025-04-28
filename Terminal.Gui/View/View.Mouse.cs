@@ -48,7 +48,7 @@ public partial class View // Mouse APIs
     #region MouseEnterLeave
 
     private bool _hovering;
-    private ColorScheme? _savedNonHoverColorScheme;
+    private Scheme? _savedNonHoverScheme;
 
     /// <summary>
     ///     INTERNAL Called by <see cref="Application.RaiseMouseEvent"/> when the mouse moves over the View's
@@ -98,11 +98,11 @@ public partial class View // Mouse APIs
                 return args.Cancel;
             }
 
-            ColorScheme? cs = _colorScheme;
+            Scheme? cs = _scheme;
 
-            _savedNonHoverColorScheme = cs;
+            _savedNonHoverScheme = cs;
 
-            _colorScheme = GetHighlightColorScheme ();
+            _scheme = GetHighlightScheme ();
             SetNeedsDraw ();
         }
 
@@ -110,13 +110,13 @@ public partial class View // Mouse APIs
     }
 
     /// <summary>
-    ///     Gets the <see cref="ColorScheme"/> to use when the view is highlighted. The highlight colorscheme
-    ///     is based on the current <see cref="ColorScheme"/>, using <see cref="Color.GetHighlightColor()"/>.
+    ///     Gets the <see cref="Scheme"/> to use when the view is highlighted. The highlight colorscheme
+    ///     is based on the current <see cref="Scheme"/>, using <see cref="Color.GetHighlightColor()"/>.
     /// </summary>
     /// <remarks>The highlight color scheme.</remarks>
-    public ColorScheme? GetHighlightColorScheme ()
+    public Scheme? GetHighlightScheme ()
     {
-        ColorScheme? cs = _colorScheme ?? SuperView?.ColorScheme ?? new ColorScheme ();
+        Scheme? cs = _scheme ?? SuperView?.Scheme ?? new Scheme ();
 
         return cs with
         {
@@ -214,10 +214,10 @@ public partial class View // Mouse APIs
             var hover = HighlightStyle.None;
             RaiseHighlight (new (ref copy, ref hover));
 
-            // if (_savedNonHoverColorScheme is { })
+            // if (_savedNonHoverScheme is { })
             {
-                _colorScheme = _savedNonHoverColorScheme;
-                _savedNonHoverColorScheme = null;
+                _scheme = _savedNonHoverScheme;
+                _savedNonHoverScheme = null;
                 SetNeedsDraw ();
 
             }
@@ -642,7 +642,7 @@ public partial class View // Mouse APIs
     #region Highlight Handling
 
     // Used for Pressed highlighting
-    private ColorScheme? _savedHighlightColorScheme;
+    private Scheme? _savedHighlightScheme;
 
     /// <summary>
     ///     Gets or sets whether the <see cref="View"/> will be highlighted visually by mouse interaction.
@@ -732,32 +732,32 @@ public partial class View // Mouse APIs
 
         if (args.NewValue.HasFlag (HighlightStyle.Pressed) || args.NewValue.HasFlag (HighlightStyle.PressedOutside))
         {
-            if (_savedHighlightColorScheme is null && _colorScheme is { })
+            if (_savedHighlightScheme is null && _scheme is { })
             {
-                _savedHighlightColorScheme = _colorScheme;
+                _savedHighlightScheme = _scheme;
 
-                if (ColorScheme is null)
+                if (Scheme is null)
                 {
                     return false;
                 }
 
                 if (CanFocus)
                 {
-                    var cs = new ColorScheme (ColorScheme)
+                    var cs = new Scheme (Scheme)
                     {
                         // Highlight the foreground focus color
-                        Focus = new (ColorScheme.Focus.Foreground.GetHighlightColor (), ColorScheme.Focus.Background.GetHighlightColor ())
+                        Focus = new (Scheme.Focus.Foreground.GetHighlightColor (), Scheme.Focus.Background.GetHighlightColor ())
                     };
-                    _colorScheme = cs;
+                    _scheme = cs;
                 }
                 else
                 {
-                    var cs = new ColorScheme (ColorScheme)
+                    var cs = new Scheme (Scheme)
                     {
                         // Invert Focus color foreground/background. We can do this because we know the view is not going to be focused.
-                        Normal = new (ColorScheme.Focus.Background, ColorScheme.Normal.Foreground)
+                        Normal = new (Scheme.Focus.Background, Scheme.Normal.Foreground)
                     };
-                    _colorScheme = cs;
+                    _scheme = cs;
                 }
             }
 
@@ -768,8 +768,8 @@ public partial class View // Mouse APIs
         if (args.NewValue == HighlightStyle.None)
         {
             // Unhighlight
-            _colorScheme = _savedHighlightColorScheme;
-            _savedHighlightColorScheme = null;
+            _scheme = _savedHighlightScheme;
+            _savedHighlightScheme = null;
             SetNeedsDraw ();
         }
 

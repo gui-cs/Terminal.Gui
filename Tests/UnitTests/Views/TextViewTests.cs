@@ -6362,8 +6362,8 @@ This is the second line.
 
         Attribute [] attributes =
         {
-            _textView.ColorScheme.Focus,
-            new (_textView.ColorScheme.Focus.Background, _textView.ColorScheme.Focus.Foreground)
+            _textView.Scheme.Focus,
+            new (_textView.Scheme.Focus.Background, _textView.Scheme.Focus.Foreground)
         };
 
         //                                             TAB to jump between text fields.
@@ -8542,7 +8542,7 @@ line.
             //         01234567890123456789012345678901=32 (Length)
             byte [] buff = Encoding.Unicode.GetBytes (Txt);
             byte [] ms = new MemoryStream (buff).ToArray ();
-            _textView = new() { Width = 30, Height = 10, ColorScheme = Colors.ColorSchemes ["Base"] };
+            _textView = new() { Width = 30, Height = 10, Scheme = Colors.Schemes ["Base"] };
             _textView.Text = Encoding.Unicode.GetString (ms);
         }
     }
@@ -8946,7 +8946,7 @@ line.  ",
     {
         List<Cell> cells = [];
 
-        foreach (KeyValuePair<string, ColorScheme> color in Colors.ColorSchemes)
+        foreach (KeyValuePair<string, Scheme> color in Colors.Schemes)
         {
             string csName = color.Key;
 
@@ -8978,22 +8978,22 @@ Error   ";
         Attribute [] attributes =
         {
             // 0
-            Colors.ColorSchemes ["TopLevel"].Normal,
+            Colors.Schemes ["TopLevel"].Normal,
 
             // 1
-            Colors.ColorSchemes ["Base"].Normal,
+            Colors.Schemes ["Base"].Normal,
 
             // 2
-            Colors.ColorSchemes ["Dialog"].Normal,
+            Colors.Schemes ["Dialog"].Normal,
 
             // 3
-            Colors.ColorSchemes ["Menu"].Normal,
+            Colors.Schemes ["Menu"].Normal,
 
             // 4
-            Colors.ColorSchemes ["Error"].Normal,
+            Colors.Schemes ["Error"].Normal,
 
             // 5
-            tv.ColorScheme!.Focus
+            tv.Scheme!.Focus
         };
 
         var expectedColor = @"
@@ -9081,7 +9081,7 @@ ror       ";
     }
 
     [Fact]
-    public void Cell_LoadCells_Without_ColorScheme_Is_Never_Null ()
+    public void Cell_LoadCells_Without_Scheme_Is_Never_Null ()
     {
         List<Cell> cells = new ()
         {

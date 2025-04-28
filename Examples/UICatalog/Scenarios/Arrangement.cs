@@ -165,7 +165,7 @@ public class Arrangement : Scenario
         };
         colorPicker.ApplyStyleChanges ();
 
-        colorPicker.SelectedColor = testFrame.ColorScheme!.Normal.Background;
+        colorPicker.SelectedColor = testFrame.Scheme!.Normal.Background;
         colorPicker.ColorChanged += ColorPicker_ColorChanged;
         overlappedView2.Add (colorPicker);
         overlappedView2.Width = 50;
@@ -176,7 +176,7 @@ public class Arrangement : Scenario
             Y = 17,
             Id = "datePicker",
             Title = "Not _Sizeable",
-            ColorScheme = Colors.ColorSchemes ["Toplevel"],
+            Scheme = Colors.Schemes ["Toplevel"],
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,
             TabStop = TabBehavior.TabGroup,
@@ -215,7 +215,7 @@ public class Arrangement : Scenario
 
         void ColorPicker_ColorChanged (object sender, ColorEventArgs e)
         {
-            testFrame.ColorScheme = testFrame.ColorScheme! with { Normal = new (testFrame.ColorScheme.Normal.Foreground, e.CurrentValue) };
+            testFrame.Scheme = testFrame.Scheme! with { Normal = new (testFrame.Scheme.Normal.Foreground, e.CurrentValue) };
         }
     }
 
@@ -228,7 +228,7 @@ public class Arrangement : Scenario
             Width = Dim.Auto (minimumContentDim: 15),
             Height = Dim.Auto (minimumContentDim: 3),
             Title = $"Overlapped{id} _{GetNextHotKey ()}",
-            ColorScheme = Colors.ColorSchemes ["Toplevel"],
+            Scheme = Colors.Schemes ["Toplevel"],
             Id = $"Overlapped{id}",
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,
@@ -353,7 +353,7 @@ public class TransparentView : FrameView
         Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
         ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent | Terminal.Gui.ViewportSettings.TransparentMouse;
         BorderStyle = LineStyle.RoundedDotted;
-        base.ColorScheme = Colors.ColorSchemes ["Menu"];
+        base.Scheme = Colors.Schemes ["Menu"];
 
         var transparentSubView = new View ()
         {
@@ -369,14 +369,14 @@ public class TransparentView : FrameView
             //ViewportSettings = Terminal.Gui.ViewportSettings.Transparent
         };
         transparentSubView.Border.Thickness = new (1, 1, 1, 1);
-        transparentSubView.ColorScheme = Colors.ColorSchemes ["Dialog"];
+        transparentSubView.Scheme = Colors.Schemes ["Dialog"];
 
         Button button = new Button ()
         {
             Title = "_Opaque Shadows No Worky",
             X = Pos.Center (),
             Y = 4,
-            ColorScheme = Colors.ColorSchemes ["Dialog"],
+            Scheme = Colors.Schemes ["Dialog"],
         };
 
         button.ClearingViewport += (sender, args) =>

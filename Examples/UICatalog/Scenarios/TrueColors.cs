@@ -107,7 +107,7 @@ public class TrueColors : Scenario
                                       {
                                           Attribute normal = e.View.GetNormalColor ();
 
-                                          lblLighter.ColorScheme = new (e.View.ColorScheme)
+                                          lblLighter.Scheme = new (e.View.Scheme)
                                           {
                                               Normal = new (
                                                             normal.Foreground,
@@ -141,7 +141,7 @@ public class TrueColors : Scenario
                 {
                     X = dx++,
                     Y = y,
-                    ColorScheme = new()
+                    Scheme = new()
                     {
                         Normal = new (
                                       colorFunc (Math.Clamp (i, 0, 255)),

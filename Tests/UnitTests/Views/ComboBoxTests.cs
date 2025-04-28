@@ -542,10 +542,10 @@ Three ",
         Attribute [] attributes =
         {
             // 0
-            cb.SubViews.ElementAt (0).ColorScheme.Focus,
+            cb.SubViews.ElementAt (0).Scheme.Focus,
 
             // 1
-            cb.SubViews.ElementAt (1).ColorScheme.HotFocus,
+            cb.SubViews.ElementAt (1).Scheme.HotFocus,
 
             // 2
             cb.SubViews.ElementAt (1).GetNormalColor ()

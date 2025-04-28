@@ -14,7 +14,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Scrolling")]
 public class ListColumns : Scenario
 {
-    private ColorScheme _alternatingColorScheme;
+    private Scheme _alternatingScheme;
     private DataTable _currentTable;
     private TableView _listColView;
     private MenuItem _miAlternatingColors;
@@ -238,11 +238,11 @@ public class ListColumns : Scenario
 
         //SetupScrollBar ();
 
-        _alternatingColorScheme = new ()
+        _alternatingScheme = new ()
         {
-            Disabled = appWindow.ColorScheme.Disabled,
-            HotFocus = appWindow.ColorScheme.HotFocus,
-            Focus = appWindow.ColorScheme.Focus,
+            Disabled = appWindow.Scheme.Disabled,
+            HotFocus = appWindow.Scheme.HotFocus,
+            Focus = appWindow.Scheme.Focus,
             Normal = new (Color.White, Color.BrightBlue)
         };
 
@@ -382,7 +382,7 @@ public class ListColumns : Scenario
 
         if (_miAlternatingColors.Checked == true)
         {
-            _listColView.Style.RowColorGetter = a => { return a.RowIndex % 2 == 0 ? _alternatingColorScheme : null; };
+            _listColView.Style.RowColorGetter = a => { return a.RowIndex % 2 == 0 ? _alternatingScheme : null; };
         }
         else
         {

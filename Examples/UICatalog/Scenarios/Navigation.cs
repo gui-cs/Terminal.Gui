@@ -179,7 +179,7 @@ public class Navigation : Scenario
         };
         colorPicker.ApplyStyleChanges ();
 
-        colorPicker.SelectedColor = testFrame.ColorScheme.Normal.Background;
+        colorPicker.SelectedColor = testFrame.Scheme.Normal.Background;
         colorPicker.ColorChanged += ColorPicker_ColorChanged;
         overlappedView2.Add (colorPicker);
         overlappedView2.Width = 50;
@@ -192,7 +192,7 @@ public class Navigation : Scenario
             X = 1,
             Y = 7,
             Id = "datePicker",
-            ColorScheme = Colors.ColorSchemes ["Toplevel"],
+            Scheme = Colors.Schemes ["Toplevel"],
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,
             CanFocus = true, // Can't drag without this? BUGBUG
@@ -223,7 +223,7 @@ public class Navigation : Scenario
 
         void ColorPicker_ColorChanged (object sender, ColorEventArgs e)
         {
-            testFrame.ColorScheme = testFrame.ColorScheme with { Normal = new (testFrame.ColorScheme.Normal.Foreground, e.CurrentValue) };
+            testFrame.Scheme = testFrame.Scheme with { Normal = new (testFrame.Scheme.Normal.Foreground, e.CurrentValue) };
         }
     }
 
@@ -236,7 +236,7 @@ public class Navigation : Scenario
             Height = Dim.Auto (),
             Width = Dim.Auto (),
             Title = $"Overlapped{id} _{GetNextHotKey ()}",
-            ColorScheme = Colors.ColorSchemes ["Toplevel"],
+            Scheme = Colors.Schemes ["Toplevel"],
             Id = $"Overlapped{id}",
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,

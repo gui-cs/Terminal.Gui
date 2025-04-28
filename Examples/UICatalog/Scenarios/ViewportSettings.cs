@@ -19,7 +19,7 @@ public class ViewportSettings : Scenario
             Id = "ViewportSettingsDemoView";
             Width = Dim.Fill ();
             Height = Dim.Fill ();
-            base.ColorScheme = Colors.ColorSchemes ["Base"];
+            base.Scheme = Colors.Schemes ["Base"];
 
             base.Text =
                 "Text (ViewportSettingsDemoView.Text). This is long text.\nThe second line.\n3\n4\n5th line\nLine 6. This is a longer line that should wrap automatically.";
@@ -103,7 +103,7 @@ public class ViewportSettings : Scenario
             Title = GetQuitKeyAndName (),
 
             // Use a different colorscheme so ViewSettings.ClearContentOnly is obvious
-            ColorScheme = Colors.ColorSchemes ["Toplevel"],
+            Scheme = Colors.Schemes ["Toplevel"],
             BorderStyle = LineStyle.None
         };
 
@@ -139,10 +139,10 @@ public class ViewportSettings : Scenario
 
         colorPicker.ColorChanged += (s, e) =>
                                     {
-                                        colorPicker.SuperView.ColorScheme = new (colorPicker.SuperView.ColorScheme)
+                                        colorPicker.SuperView.Scheme = new (colorPicker.SuperView.Scheme)
                                         {
                                             Normal = new (
-                                                          colorPicker.SuperView.ColorScheme.Normal.Foreground,
+                                                          colorPicker.SuperView.Scheme.Normal.Foreground,
                                                           e.CurrentValue
                                                          )
                                         };

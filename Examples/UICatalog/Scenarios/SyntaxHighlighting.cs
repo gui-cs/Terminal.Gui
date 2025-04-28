@@ -237,7 +237,7 @@ public class SyntaxHighlighting : Scenario
 
         List<Cell> cells = new ();
 
-        foreach (KeyValuePair<string, ColorScheme> color in Colors.ColorSchemes)
+        foreach (KeyValuePair<string, Scheme> color in Colors.Schemes)
         {
             string csName = color.Key;
 
@@ -271,7 +271,7 @@ public class SyntaxHighlighting : Scenario
         _blue = new Attribute (Color.Blue, Color.Black);
         _magenta = new Attribute (Color.Magenta, Color.Black);
         _white = new Attribute (Color.White, Color.Black);
-        _textView.ColorScheme = new () { Focus = _white };
+        _textView.Scheme = new () { Focus = _white };
 
         _textView.Text =
             "/*Query to select:\nLots of data*/\nSELECT TOP 100 * \nfrom\n MyDb.dbo.Biochemistry where TestCode = 'blah';";
@@ -296,7 +296,7 @@ public class SyntaxHighlighting : Scenario
     private void HighlightTextBasedOnKeywords ()
     {
         // Comment blocks, quote blocks etc
-        Dictionary<Rune, ColorScheme> blocks = new ();
+        Dictionary<Rune, Scheme> blocks = new ();
 
         var comments = new Regex (@"/\*.*?\*/", RegexOptions.Singleline);
         MatchCollection commentMatches = comments.Matches (_textView.Text);

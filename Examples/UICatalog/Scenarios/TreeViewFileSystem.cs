@@ -251,11 +251,11 @@ public class TreeViewFileSystem : Scenario
                                                  {
                                                      Focus = new (
                                                                   Color.BrightRed,
-                                                                  _treeViewFiles.ColorScheme.Focus.Background
+                                                                  _treeViewFiles.Scheme.Focus.Background
                                                                  ),
                                                      Normal = new (
                                                                    Color.BrightYellow,
-                                                                   _treeViewFiles.ColorScheme.Normal.Background
+                                                                   _treeViewFiles.Scheme.Normal.Background
                                                                   )
                                                  };
 
@@ -268,11 +268,11 @@ public class TreeViewFileSystem : Scenario
                                                  {
                                                      Focus = new (
                                                                   Color.BrightRed,
-                                                                  _treeViewFiles.ColorScheme.Focus.Background
+                                                                  _treeViewFiles.Scheme.Focus.Background
                                                                  ),
                                                      Normal = new (
                                                                    Color.BrightYellow,
-                                                                   _treeViewFiles.ColorScheme.Normal.Background
+                                                                   _treeViewFiles.Scheme.Normal.Background
                                                                   )
                                                  };
 

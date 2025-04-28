@@ -14,7 +14,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("TextView")]
 public class ConfigurationEditor : Scenario
 {
-    private static ColorScheme _editorColorScheme = new ()
+    private static Scheme _editorScheme = new ()
     {
         Normal = new Attribute (Color.Red, Color.White),
         Focus = new Attribute (Color.Red, Color.Black),
@@ -22,18 +22,18 @@ public class ConfigurationEditor : Scenario
         HotNormal = new Attribute (Color.Magenta, Color.White)
     };
 
-    private static Action? _editorColorSchemeChanged;
+    private static Action? _editorSchemeChanged;
     private TabView? _tabView;
     private Shortcut? _lenShortcut;
 
     [SerializableConfigurationProperty (Scope = typeof (AppScope))]
-    public static ColorScheme EditorColorScheme
+    public static Scheme EditorScheme
     {
-        get => _editorColorScheme;
+        get => _editorScheme;
         set
         {
-            _editorColorScheme = value;
-            _editorColorSchemeChanged?.Invoke ();
+            _editorScheme = value;
+            _editorSchemeChanged?.Invoke ();
         }
     }
 
@@ -82,10 +82,10 @@ public class ConfigurationEditor : Scenario
         top.Loaded += (s, a) =>
                       {
                           Open ();
-                          _editorColorSchemeChanged?.Invoke ();
+                          _editorSchemeChanged?.Invoke ();
                       };
 
-        void OnEditorColorSchemeChanged ()
+        void OnEditorSchemeChanged ()
         {
             if (Application.Top is { })
             {
@@ -94,14 +94,14 @@ public class ConfigurationEditor : Scenario
 
             foreach (ConfigTextView t in _tabView.SubViews.OfType<ConfigTextView> ())
             {
-                t.ColorScheme = EditorColorScheme;
+                t.Scheme = EditorScheme;
             }
         }
 
-        _editorColorSchemeChanged += OnEditorColorSchemeChanged;
+        _editorSchemeChanged += OnEditorSchemeChanged;
 
         Application.Run (top);
-        _editorColorSchemeChanged -= OnEditorColorSchemeChanged;
+        _editorSchemeChanged -= OnEditorSchemeChanged;
         top.Dispose ();
 
         Application.Shutdown ();

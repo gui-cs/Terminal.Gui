@@ -441,16 +441,16 @@ public class ShortcutTests
     }
 
     [Fact]
-    public void ColorScheme_SetsAndGetsCorrectly ()
+    public void Scheme_SetsAndGetsCorrectly ()
     {
-        var colorScheme = new ColorScheme ();
+        var scheme = new Scheme ();
 
         var shortcut = new Shortcut
         {
-            ColorScheme = colorScheme
+            Scheme = scheme
         };
 
-        Assert.Same (colorScheme, shortcut.ColorScheme);
+        Assert.Same (scheme, shortcut.Scheme);
     }
 
 }

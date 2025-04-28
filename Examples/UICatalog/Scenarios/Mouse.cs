@@ -205,7 +205,7 @@ public class Mouse : Scenario
             Y = Pos.Bottom (label),
             Width = 50,
             Height = Dim.Fill (),
-            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            Scheme = Colors.Schemes ["TopLevel"],
             Source = new ListWrapper<string> (appLogList)
         };
         win.Add (label, appLog);
@@ -236,7 +236,7 @@ public class Mouse : Scenario
             Y = Pos.Bottom (label),
             Width = Dim.Percent (50),
             Height = Dim.Fill (),
-            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            Scheme = Colors.Schemes ["TopLevel"],
             Source = new ListWrapper<string> (winLogList)
         };
         win.Add (label, winLog);
@@ -287,19 +287,19 @@ public class Mouse : Scenario
                 TextAlignment = Alignment.Center;
                 VerticalTextAlignment = Alignment.Center;
 
-                Padding.ColorScheme = new ColorScheme (new Attribute (Color.Black));
+                Padding.Scheme = new Scheme (new Attribute (Color.Black));
 
                 Padding.MouseEnter += PaddingOnMouseEnter;
                 Padding.MouseLeave += PaddingOnMouseLeave;
 
                 void PaddingOnMouseEnter (object o, CancelEventArgs e)
                 {
-                    Padding.ColorScheme = Colors.ColorSchemes ["Error"];
+                    Padding.Scheme = Colors.Schemes ["Error"];
                 }
 
                 void PaddingOnMouseLeave (object o, EventArgs e)
                 {
-                    Padding.ColorScheme = Colors.ColorSchemes ["Dialog"];
+                    Padding.Scheme = Colors.Schemes ["Dialog"];
                 }
 
                 Border.Thickness = new Thickness (1);

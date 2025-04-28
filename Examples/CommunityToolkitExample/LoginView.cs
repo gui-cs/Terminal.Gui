@@ -47,7 +47,7 @@ internal partial class LoginView : IRecipient<Message<LoginActions>>
                 {
                     loginProgressLabel.Text = ViewModel.LoginProgressMessage;
                     validationLabel.Text = ViewModel.ValidationMessage;
-                    validationLabel.ColorScheme = ViewModel.ValidationColorScheme;
+                    validationLabel.Scheme = ViewModel.ValidationScheme;
                     break;
                 }
             case LoginActions.LoginProgress:
@@ -58,7 +58,7 @@ internal partial class LoginView : IRecipient<Message<LoginActions>>
             case LoginActions.Validation:
                 {
                     validationLabel.Text = ViewModel.ValidationMessage;
-                    validationLabel.ColorScheme = ViewModel.ValidationColorScheme;
+                    validationLabel.Scheme = ViewModel.ValidationScheme;
                     break;
                 }
         }

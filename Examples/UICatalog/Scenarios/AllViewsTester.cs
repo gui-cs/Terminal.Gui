@@ -38,7 +38,7 @@ public class AllViewsTester : Scenario
         var app = new Window
         {
             Title = GetQuitKeyAndName (),
-            ColorScheme = Colors.ColorSchemes ["TopLevel"],
+            Scheme = Colors.Schemes ["TopLevel"],
         };
 
         // Set the BorderStyle we use for all subviews, but disable the app border thickness
@@ -240,15 +240,15 @@ public class AllViewsTester : Scenario
             Height = Dim.Fill (),
             CanFocus = true,
             TabStop = TabBehavior.TabStop,
-            ColorScheme = Colors.ColorSchemes ["Base"],
+            Scheme = Colors.Schemes ["Base"],
             Arrangement = ViewArrangement.LeftResizable | ViewArrangement.BottomResizable | ViewArrangement.RightResizable,
             BorderStyle = LineStyle.Double,
             SuperViewRendersLineCanvas = true
         };
-        _hostPane.Border!.ColorScheme = app.ColorScheme;
+        _hostPane.Border!.Scheme = app.Scheme;
         _hostPane.Padding!.Thickness = new (1);
         _hostPane.Padding.Diagnostics = ViewDiagnosticFlags.Ruler;
-        _hostPane.Padding.ColorScheme = app.ColorScheme;
+        _hostPane.Padding.Scheme = app.Scheme;
 
         app.Add (_classListView, _adornmentsEditor, _arrangementEditor, _layoutEditor, _viewportSettingsEditor, _settingsPane, _eventLog, _hostPane);
 

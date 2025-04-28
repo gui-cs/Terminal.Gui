@@ -145,7 +145,7 @@ internal sealed class Menu : View
         if (_barItems is { IsTopLevel: true })
         {
             // This is a standalone MenuItem on a MenuBar
-            ColorScheme = _host.ColorScheme;
+            Scheme = _host.Scheme;
             CanFocus = true;
         }
         else
@@ -162,7 +162,7 @@ internal sealed class Menu : View
                 }
             }
 
-            ColorScheme = _host.ColorScheme;
+            Scheme = _host.Scheme;
             CanFocus = true;
             WantMousePositionReports = _host.WantMousePositionReports;
         }
@@ -418,7 +418,7 @@ internal sealed class Menu : View
         return true;
     }
 
-    internal Attribute DetermineColorSchemeFor (MenuItem? item, int index)
+    internal Attribute DetermineSchemeFor (MenuItem? item, int index)
     {
         if (item is null)
         {
@@ -430,7 +430,7 @@ internal sealed class Menu : View
             return GetFocusColor ();
         }
 
-        return !item.IsEnabled () ? ColorScheme!.Disabled : GetNormalColor ();
+        return !item.IsEnabled () ? Scheme!.Disabled : GetNormalColor ();
     }
 
     internal required MenuBar Host
@@ -871,7 +871,7 @@ internal sealed class Menu : View
                 Move (0, i);
             }
 
-            SetAttribute (DetermineColorSchemeFor (item, i));
+            SetAttribute (DetermineSchemeFor (item, i));
 
             for (int p = Viewport.X; p < Frame.Width - 2; p++)
             {
@@ -955,7 +955,7 @@ internal sealed class Menu : View
 
                 if (!item.IsEnabled ())
                 {
-                    DrawHotString (textToDraw, ColorScheme!.Disabled, ColorScheme.Disabled);
+                    DrawHotString (textToDraw, Scheme!.Disabled, Scheme.Disabled);
                 }
                 else if (i == 0 && _host.UseSubMenusSingleFrame && item.Parent!.Parent is { })
                 {
@@ -970,7 +970,7 @@ internal sealed class Menu : View
                     tf.Draw (
                              ViewportToScreen (new Rectangle (1, i, Frame.Width - 3, 1)),
                              i == _currentChild ? GetFocusColor () : GetNormalColor (),
-                             i == _currentChild ? ColorScheme!.HotFocus : ColorScheme!.HotNormal,
+                             i == _currentChild ? Scheme!.HotFocus : Scheme!.HotNormal,
                              SuperView?.ViewportToScreen (SuperView.Viewport) ?? Rectangle.Empty
                             );
                 }
@@ -978,7 +978,7 @@ internal sealed class Menu : View
                 {
                     DrawHotString (
                                    textToDraw,
-                                   i == _currentChild ? ColorScheme!.HotFocus : ColorScheme!.HotNormal,
+                                   i == _currentChild ? Scheme!.HotFocus : Scheme!.HotNormal,
                                    i == _currentChild ? GetFocusColor () : GetNormalColor ()
                                   );
                 }

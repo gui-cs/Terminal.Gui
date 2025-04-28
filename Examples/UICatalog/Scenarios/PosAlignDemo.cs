@@ -25,9 +25,9 @@ public sealed class PosAlignDemo : Scenario
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()} - {GetDescription ()}"
         };
 
-        SetupControls (appWindow, Dimension.Width, Colors.ColorSchemes ["TopLevel"]);
+        SetupControls (appWindow, Dimension.Width, Colors.Schemes ["TopLevel"]);
 
-        SetupControls (appWindow, Dimension.Height, Colors.ColorSchemes ["Error"]);
+        SetupControls (appWindow, Dimension.Height, Colors.Schemes ["Error"]);
 
         Setup3By3Grid (appWindow);
 
@@ -39,12 +39,12 @@ public sealed class PosAlignDemo : Scenario
         Application.Shutdown ();
     }
 
-    private void SetupControls (Window appWindow, Dimension dimension, ColorScheme colorScheme)
+    private void SetupControls (Window appWindow, Dimension dimension, Scheme scheme)
     {
         RadioGroup alignRadioGroup = new ()
         {
             RadioLabels = Enum.GetNames<Alignment> (),
-            ColorScheme = colorScheme
+            Scheme = scheme
         };
 
         if (dimension == Dimension.Width)
@@ -81,7 +81,7 @@ public sealed class PosAlignDemo : Scenario
 
         CheckBox endToStartCheckBox = new ()
         {
-            ColorScheme = colorScheme,
+            Scheme = scheme,
             Text = "EndToStart"
         };
 
@@ -119,7 +119,7 @@ public sealed class PosAlignDemo : Scenario
 
         CheckBox ignoreFirstOrLast = new ()
         {
-            ColorScheme = colorScheme,
+            Scheme = scheme,
             Text = "IgnoreFirstOrLast"
         };
 
@@ -157,7 +157,7 @@ public sealed class PosAlignDemo : Scenario
 
         CheckBox addSpacesBetweenItems = new ()
         {
-            ColorScheme = colorScheme,
+            Scheme = scheme,
             Text = "AddSpaceBetweenItems"
         };
 
@@ -196,7 +196,7 @@ public sealed class PosAlignDemo : Scenario
 
         CheckBox margin = new ()
         {
-            ColorScheme = colorScheme,
+            Scheme = scheme,
             Text = "Margin"
         };
 
@@ -240,7 +240,7 @@ public sealed class PosAlignDemo : Scenario
         {
             Width = 9,
             Title = "Added",
-            ColorScheme = colorScheme,
+            Scheme = scheme,
             BorderStyle = LineStyle.None,
             Value = addedViews.Count
         };
@@ -353,7 +353,7 @@ public sealed class PosAlignDemo : Scenario
             Height = Dim.Percent (40)
         };
         container.Padding.Thickness = new (8, 1, 0, 0);
-        container.Padding.ColorScheme = Colors.ColorSchemes ["error"];
+        container.Padding.Scheme = Colors.Schemes ["error"];
 
         Aligner widthAligner = new () { AlignmentModes = AlignmentModes.StartToEnd };
 

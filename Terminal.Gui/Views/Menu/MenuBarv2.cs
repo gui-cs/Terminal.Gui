@@ -529,9 +529,9 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         menuBgColorCp.ColorChanged += (sender, args) =>
                                       {
-                                          ColorScheme = ColorScheme! with
+                                          Scheme = Scheme! with
                                           {
-                                              Normal = new (ColorScheme.Normal.Foreground, args.CurrentValue)
+                                              Normal = new (Scheme.Normal.Foreground, args.CurrentValue)
                                           };
                                       };
 

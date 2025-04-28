@@ -310,22 +310,22 @@ public class MouseTests : TestsAllViews
         var enablingHighlight = 0;
         var disablingHighlight = 0;
         view.Highlight += ViewHighlight;
-        view.ColorScheme = new (new Attribute (ColorName16.Red, ColorName16.Blue));
-        ColorScheme originalColorScheme = view.ColorScheme;
+        view.Scheme = new (new Attribute (ColorName16.Red, ColorName16.Blue));
+        Scheme originalScheme = view.Scheme;
 
         view.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
 
         if (highlightOnPress != HighlightStyle.None)
         {
-            Assert.NotEqual (originalColorScheme, view.ColorScheme);
+            Assert.NotEqual (originalScheme, view.Scheme);
         }
         else
         {
-            Assert.Equal (originalColorScheme, view.ColorScheme);
+            Assert.Equal (originalScheme, view.Scheme);
         }
 
         view.NewMouseEvent (new () { Flags = MouseFlags.Button1Released });
-        Assert.Equal (originalColorScheme, view.ColorScheme);
+        Assert.Equal (originalScheme, view.Scheme);
         Assert.Equal (expectedEnabling, enablingHighlight);
         Assert.Equal (expectedDisabling, disablingHighlight);
 

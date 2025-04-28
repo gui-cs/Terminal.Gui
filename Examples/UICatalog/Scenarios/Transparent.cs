@@ -17,7 +17,7 @@ public sealed class Transparent : Scenario
             Title = GetQuitKeyAndName (),
         };
         appWindow.BorderStyle = LineStyle.None;
-        appWindow.ColorScheme = Colors.ColorSchemes ["Error"];
+        appWindow.Scheme = Colors.Schemes ["Error"];
 
         appWindow.Text = "App Text - Centered Vertically and Horizontally.\n2nd Line of Text.\n3rd Line of Text.";
         appWindow.TextAlignment = Alignment.Center;
@@ -77,7 +77,7 @@ public sealed class Transparent : Scenario
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
             ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent | Terminal.Gui.ViewportSettings.TransparentMouse;
             BorderStyle = LineStyle.RoundedDotted;
-            base.ColorScheme = Colors.ColorSchemes ["Base"];
+            base.Scheme = Colors.Schemes ["Base"];
 
             var transparentSubView = new View ()
             {
@@ -92,7 +92,7 @@ public sealed class Transparent : Scenario
                // ShadowStyle = ShadowStyle.Transparent,
             };
             transparentSubView.Border!.Thickness = new (1, 1, 1, 1);
-            transparentSubView.ColorScheme = Colors.ColorSchemes ["Dialog"];
+            transparentSubView.Scheme = Colors.Schemes ["Dialog"];
             transparentSubView.Visible = false;
 
             Button button = new Button ()
@@ -100,7 +100,7 @@ public sealed class Transparent : Scenario
                 Title = "_Opaque Shadows No Worky",
                 X = Pos.Center (),
                 Y = 2,
-                ColorScheme = Colors.ColorSchemes ["Dialog"],
+                Scheme = Colors.Schemes ["Dialog"],
             };
             button.Visible = false;
 
@@ -113,7 +113,7 @@ public sealed class Transparent : Scenario
                 Title = "A _Shortcut",
                 HelpText = "Help!",
                 Key = Key.F11,
-                ColorScheme = Colors.ColorSchemes ["Base"]
+                Scheme = Colors.Schemes ["Base"]
 
             };
 
