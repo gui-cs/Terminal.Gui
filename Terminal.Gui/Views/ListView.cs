@@ -234,7 +234,7 @@ public class ListView : View, IDesignable
     ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="ListView.Source"/> collection as the
     ///     user types.
     /// </summary>
-    public CollectionNavigator KeystrokeNavigator { get; } = new ();
+    public IListCollectionNavigator KeystrokeNavigator { get; } = new CollectionNavigator();
 
     /// <summary>Gets or sets the leftmost column that is currently visible (when scrolling horizontally).</summary>
     /// <value>The left position.</value>
@@ -809,27 +809,7 @@ public class ListView : View, IDesignable
     /// <inheritdoc/>
     protected override bool OnKeyDown (Key key)
     {
-        // If marking is enabled and the user presses the space key don't let CollectionNavigator
-        // at it
-        if (AllowsMarking)
-        {
-            IEnumerable<Key> keys = KeyBindings.GetAllFromCommands (Command.Select);
-
-            if (keys.Contains (key))
-            {
-                return false;
-            }
-
-            keys = KeyBindings.GetAllFromCommands ([Command.Select, Command.Down]);
-
-            if (keys.Contains (key))
-            {
-                return false;
-            }
-
-        }
-
-        // If the key was bound to a command, invoke the command. This enables overriding the default handling.
+        // If the key was bound to key command, let normal KeyDown processing happen. This enables overriding the default handling.
         // See: https://github.com/gui-cs/Terminal.Gui/issues/3950#issuecomment-2807350939
         if (KeyBindings.TryGet (key, out _))
         {
@@ -837,7 +817,7 @@ public class ListView : View, IDesignable
         }
 
         // Enable user to find & select an item by typing text
-        if (CollectionNavigatorBase.IsCompatibleKey (key))
+        if (KeystrokeNavigator.Matcher.IsCompatibleKey (key))
         {
             int? newItem = KeystrokeNavigator?.GetNextMatchingItem (SelectedItem, (char)key);
 
