@@ -27,7 +27,7 @@ Use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.template
 
 The following example shows a basic Terminal.Gui application in C# (this is `./Example/Example.cs`):
 
-[!code-csharp[Program.cs](../../Example/Example.cs)]
+[!code-csharp[Program.cs](../../Examples/Example/Example.cs)]
 
 When run the application looks as follows:
 
