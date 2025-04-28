@@ -191,7 +191,7 @@ public static partial class Application // Initialization (Init/Shutdown)
         Load ();
         if (Themes is { } && !string.IsNullOrEmpty (previousTheme) && previousTheme != "Default")
         {
-            ThemeManager.SelectedTheme = previousTheme;
+            ThemeManager.Instance.SelectedTheme = previousTheme;
         }
         Apply ();
     }
