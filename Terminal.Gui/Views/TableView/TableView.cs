@@ -306,7 +306,7 @@ public class TableView : View, IDesignable
     }
 
     /// <summary>Navigator for cycling the selected item in the table by typing. Set to null to disable this feature.</summary>
-    public CollectionNavigatorBase CollectionNavigator { get; set; }
+    public ICollectionNavigator CollectionNavigator { get; set; }
 
     /// <summary>
     ///     Horizontal scroll offset.  The index of the first column in <see cref="Table"/> to display when when rendering
@@ -1010,12 +1010,19 @@ public class TableView : View, IDesignable
             return false;
         }
 
+        // If the key was bound to key command, let normal KeyDown processing happen. This enables overriding the default handling.
+        // See: https://github.com/gui-cs/Terminal.Gui/issues/3950#issuecomment-2807350939
+        if (KeyBindings.TryGet (key, out _))
+        {
+            return false;
+        }
+
         if (CollectionNavigator != null
             && HasFocus
             && Table.Rows != 0
             && key != KeyBindings.GetFirstFromCommands (Command.Accept)
             && key != CellActivationKey
-            && CollectionNavigatorBase.IsCompatibleKey (key)
+            && CollectionNavigator.Matcher.IsCompatibleKey (key)
             && !key.KeyCode.HasFlag (KeyCode.CtrlMask)
             && !key.KeyCode.HasFlag (KeyCode.AltMask)
             && Rune.IsLetterOrDigit ((Rune)key))

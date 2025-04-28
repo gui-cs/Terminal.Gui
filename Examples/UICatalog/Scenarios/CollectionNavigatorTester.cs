@@ -58,7 +58,7 @@ public class CollectionNavigatorTester : Scenario
         "$200.00",
         "$210.99",
         "$$",
-        "appricot",
+        "apricot",
         "arm",
         "丗丙业丞",
         "丗丙丛",

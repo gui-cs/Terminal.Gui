@@ -8,8 +8,12 @@
   href: migratingfromv1.md  
 - name: Arrangement
   href: arrangement.md
+- name: Cancellable Work Pattern
+  href: cancellable_work_pattern.md
 - name: Configuration
   href: config.md
+- name: Command Deep Dive
+  href: command.md
 - name: Cursor
   href: cursor.md
 - name: Dim.Auto Deep Dive

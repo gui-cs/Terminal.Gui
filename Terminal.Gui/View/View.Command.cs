@@ -68,6 +68,8 @@ public partial class View // Command APIs
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
+        // For robustness' sake, even if the virtual method returns true, if the args 
+        // indicate the event should be cancelled, we honor that.
         if (OnCommandNotBound (args) || args.Cancel)
         {
             return true;
@@ -299,6 +301,9 @@ public partial class View // Command APIs
     ///     <para>
     ///         This version of AddCommand is for commands that require <see cref="ICommandContext"/>.
     ///     </para>
+    ///     <para>
+    ///         See the Commands Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/command.html"/>.
+    ///     </para>
     /// </remarks>
     /// <param name="command">The command.</param>
     /// <param name="impl">The delegate.</param>
@@ -319,6 +324,9 @@ public partial class View // Command APIs
     ///         This version of AddCommand is for commands that do not require context.
     ///         If the command requires context, use
     ///         <see cref="AddCommand(Command,CommandImplementation)"/>
+    ///     </para>
+    ///     <para>
+    ///         See the Commands Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/command.html"/>.
     ///     </para>
     /// </remarks>
     /// <param name="command">The command.</param>
