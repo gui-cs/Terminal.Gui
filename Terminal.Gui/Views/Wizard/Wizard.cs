@@ -145,7 +145,7 @@ public class Wizard : Dialog
 
             if (base.Modal)
             {
-                Scheme = Colors.Schemes ["Dialog"];
+                Scheme = SchemeManager.Schemes ["Dialog"];
                 BorderStyle = LineStyle.Rounded;
             }
             else
@@ -156,7 +156,7 @@ public class Wizard : Dialog
                 }
                 else
                 {
-                    Scheme = Colors.Schemes ["Base"];
+                    Scheme = SchemeManager.Schemes ["Base"];
                 }
 
                 CanFocus = true;

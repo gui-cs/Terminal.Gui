@@ -9,14 +9,21 @@ namespace Terminal.Gui;
 ///     Holds the <see cref="Scheme"/>s that define the <see cref="Attribute"/>s that are used by views to render
 ///     themselves.
 /// </summary>
-public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Scheme?>
+public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string, Scheme?>
 {
-    private static readonly object _lock = new object ();
+    private readonly object _lock = new object ();
 
-    static Colors ()
+    /// <summary>
+    /// 
+    /// </summary>
+    public SchemeManager ()
     {
-        Schemes = new Dictionary<string, Scheme?> (5, StringComparer.InvariantCultureIgnoreCase);
         Reset ();
+    }
+
+    internal void Reset ()
+    {
+        Schemes = View.GetHardCodedSchemes ();
     }
 
     /// <summary>Gets a dictionary of defined <see cref="Scheme"/> objects.</summary>
@@ -66,7 +73,8 @@ public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Schem
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope), OmitClassName = true)]
     [JsonConverter (typeof (DictionaryJsonConverter<Scheme?>))]
     [UsedImplicitly]
-    public static Dictionary<string, Scheme?> Schemes { get; private set; }
+    public static Dictionary<string, Scheme?>? Schemes { get; private set; }
+
 
     /// <summary>
     ///     Raised when the collection changes.
@@ -100,6 +108,32 @@ public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Schem
                 }
             }
         }
+    }
+
+    /// <summary>
+    ///     Helper to get the default schemes from the default theme loaded from configuration.
+    /// </summary>
+    /// <returns></returns>
+    public static Dictionary<string, Scheme?> GetDefaultSchemes ()
+    {
+        if (!IsInitialized ())
+        {
+            // If CM has not been initialized, we return the values that are in the current static members.
+            ThemeScope themes = new ThemeScope ();
+            themes.RetrieveValues ();
+
+            // If CM has not been initialized, ThemeScope gets loaded with the default values.
+            return themes ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
+
+        }
+
+        Dictionary<string, Scheme?>? schemes = [];
+        if (ThemeManager.Themes is { })
+        {
+            schemes = ThemeManager.Themes ["Default"] ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
+        }
+
+        return schemes;
     }
 
     /// <inheritdoc />
@@ -242,25 +276,6 @@ public sealed class Colors : INotifyCollectionChanged, IDictionary<string, Schem
         lock (_lock)
         {
             return Schemes.TryGetValue (key, out value);
-        }
-    }
-
-
-    /// <summary>
-    ///     Resets the <see cref="Schemes"/> dictionary to its default values.
-    /// </summary>
-    /// <returns>The reset <see cref="Schemes"/> dictionary.</returns>
-    public static Dictionary<string, Scheme?> Reset ()
-    {
-        lock (_lock)
-        {
-            Schemes.Clear ();
-            Schemes.Add ("TopLevel", new Scheme ());
-            Schemes.Add ("Base", new Scheme ());
-            Schemes.Add ("Dialog", new Scheme ());
-            Schemes.Add ("Menu", new Scheme ());
-            Schemes.Add ("Error", new Scheme ());
-            return Schemes;
         }
     }
 }

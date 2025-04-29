@@ -120,7 +120,7 @@ public class Clipping : Scenario
             Height = Dim.Auto (minimumContentDim: 4),
             Width = Dim.Auto (minimumContentDim: 14),
             Title = $"Overlapped{id} _{GetNextHotKey ()}",
-            Scheme = Colors.Schemes ["Toplevel"],
+            Scheme = SchemeManager.Schemes ["Toplevel"],
             Id = $"Overlapped{id}",
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,

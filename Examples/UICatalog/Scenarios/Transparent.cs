@@ -17,7 +17,7 @@ public sealed class Transparent : Scenario
             Title = GetQuitKeyAndName (),
         };
         appWindow.BorderStyle = LineStyle.None;
-        appWindow.Scheme = Colors.Schemes ["Error"];
+        appWindow.Scheme = SchemeManager.Schemes ["Error"];
 
         appWindow.Text = "App Text - Centered Vertically and Horizontally.\n2nd Line of Text.\n3rd Line of Text.";
         appWindow.TextAlignment = Alignment.Center;
@@ -77,7 +77,7 @@ public sealed class Transparent : Scenario
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
             ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent | Terminal.Gui.ViewportSettings.TransparentMouse;
             BorderStyle = LineStyle.RoundedDotted;
-            base.Scheme = Colors.Schemes ["Base"];
+            base.Scheme = SchemeManager.Schemes ["Base"];
 
             var transparentSubView = new View ()
             {
@@ -92,7 +92,7 @@ public sealed class Transparent : Scenario
                // ShadowStyle = ShadowStyle.Transparent,
             };
             transparentSubView.Border!.Thickness = new (1, 1, 1, 1);
-            transparentSubView.Scheme = Colors.Schemes ["Dialog"];
+            transparentSubView.Scheme = SchemeManager.Schemes ["Dialog"];
             transparentSubView.Visible = false;
 
             Button button = new Button ()
@@ -100,7 +100,7 @@ public sealed class Transparent : Scenario
                 Title = "_Opaque Shadows No Worky",
                 X = Pos.Center (),
                 Y = 2,
-                Scheme = Colors.Schemes ["Dialog"],
+                Scheme = SchemeManager.Schemes ["Dialog"],
             };
             button.Visible = false;
 
@@ -113,7 +113,7 @@ public sealed class Transparent : Scenario
                 Title = "A _Shortcut",
                 HelpText = "Help!",
                 Key = Key.F11,
-                Scheme = Colors.Schemes ["Base"]
+                Scheme = SchemeManager.Schemes ["Base"]
 
             };
 

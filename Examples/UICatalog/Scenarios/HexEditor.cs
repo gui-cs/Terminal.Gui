@@ -28,7 +28,7 @@ public class HexEditor : Scenario
 
         var app = new Toplevel
         {
-            Scheme = Colors.Schemes ["Base"]
+            Scheme = SchemeManager.Schemes ["Base"]
         };
 
         _fileName = "demo.bin";

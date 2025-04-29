@@ -40,7 +40,7 @@ public class WindowsAndFrameViews : Scenario
             Y = 1,
             Width = Dim.Fill (15),
             Height = 10,
-            Scheme = Colors.Schemes ["Dialog"],
+            Scheme = SchemeManager.Schemes ["Dialog"],
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable | ViewArrangement.Resizable
         };
         win.Padding.Thickness = new (padding);
@@ -50,7 +50,7 @@ public class WindowsAndFrameViews : Scenario
         {
             X = Pos.Center (),
             Y = 0,
-            Scheme = Colors.Schemes ["Error"],
+            Scheme = SchemeManager.Schemes ["Error"],
             Text = $"Padding of container is {padding}"
         };
         paddingButton.Accepting += (s, e) => About ();
@@ -61,7 +61,7 @@ public class WindowsAndFrameViews : Scenario
                  {
                      X = Pos.Center (),
                      Y = Pos.AnchorEnd (),
-                     Scheme = Colors.Schemes ["Error"],
+                     Scheme = SchemeManager.Schemes ["Error"],
                      Text = "Press ME! (Y = Pos.AnchorEnd(1))"
                  }
                 );
@@ -92,11 +92,11 @@ public class WindowsAndFrameViews : Scenario
             };
             loopWin.Padding.Thickness = new (pad);
 
-            loopWin.Scheme = Colors.Schemes ["Dialog"];
+            loopWin.Scheme = SchemeManager.Schemes ["Dialog"];
 
             var pressMeButton = new Button
             {
-                X = Pos.Center (), Y = 0, Scheme = Colors.Schemes ["Error"], Text = "Press me! (Y = 0)",
+                X = Pos.Center (), Y = 0, Scheme = SchemeManager.Schemes ["Error"], Text = "Press me! (Y = 0)",
             };
 
             pressMeButton.Accepting += (s, e) =>
@@ -110,14 +110,14 @@ public class WindowsAndFrameViews : Scenario
                 Y = 1,
                 Width = Dim.Percent (50),
                 Height = 5,
-                Scheme = Colors.Schemes ["Base"],
+                Scheme = SchemeManager.Schemes ["Base"],
                 Text = "The Text in the Window",
                 Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable | ViewArrangement.Resizable
 
             };
 
             subWin.Add (
-                        new TextField { Y = 1, Scheme = Colors.Schemes ["Error"], Text = "Edit me! " + loopWin.Title }
+                        new TextField { Y = 1, Scheme = SchemeManager.Schemes ["Error"], Text = "Edit me! " + loopWin.Title }
                        );
             loopWin.Add (subWin);
 
@@ -127,7 +127,7 @@ public class WindowsAndFrameViews : Scenario
                 Y = 1,
                 Width = Dim.Percent (100, DimPercentMode.Position), // Or Dim.Percent (50)
                 Height = 5,
-                Scheme = Colors.Schemes ["Base"],
+                Scheme = SchemeManager.Schemes ["Base"],
                 Text = "The Text in the FrameView",
                 Title = "This is a Sub-FrameView"
             };
@@ -151,12 +151,12 @@ public class WindowsAndFrameViews : Scenario
             Height = contentHeight + 2, // 2 for default padding
             Title = "This is a FrameView"
         };
-        frame.Scheme = Colors.Schemes ["Dialog"];
+        frame.Scheme = SchemeManager.Schemes ["Dialog"];
 
         frame.Add (
                    new Label
                    {
-                       X = Pos.Center (), Y = 0, Scheme = Colors.Schemes ["Error"], Text = "This is a Label! (Y = 0)"
+                       X = Pos.Center (), Y = 0, Scheme = SchemeManager.Schemes ["Error"], Text = "This is a Label! (Y = 0)"
                    }
                   );
 
@@ -167,14 +167,14 @@ public class WindowsAndFrameViews : Scenario
             Y = 1,
             Width = Dim.Percent (50),
             Height = Dim.Fill () - 1,
-            Scheme = Colors.Schemes ["Base"],
+            Scheme = SchemeManager.Schemes ["Base"],
             Text = "The Text in the Window",
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable | ViewArrangement.Resizable
 
         };
 
         subWinofFV.Add (
-                        new TextField { Scheme = Colors.Schemes ["Error"], Text = "Edit Me" }
+                        new TextField { Scheme = SchemeManager.Schemes ["Error"], Text = "Edit Me" }
                        );
 
         subWinofFV.Add (new CheckBox { Y = 1, Text = "Check me" });
@@ -188,7 +188,7 @@ public class WindowsAndFrameViews : Scenario
             Y = 1,
             Width = Dim.Percent (100),
             Height = Dim.Fill () - 1,
-            Scheme = Colors.Schemes ["Base"],
+            Scheme = SchemeManager.Schemes ["Base"],
             Text = "The Text in the FrameView",
             Title = "this is a Sub-FrameView"
         };
@@ -209,7 +209,7 @@ public class WindowsAndFrameViews : Scenario
         app.Add (frame);
         listWin.Add (frame);
 
-        app.Scheme = Colors.Schemes ["Base"];
+        app.Scheme = SchemeManager.Schemes ["Base"];
 
         Application.Run (app);
         app.Dispose ();

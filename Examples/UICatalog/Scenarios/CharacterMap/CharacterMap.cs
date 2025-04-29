@@ -79,7 +79,7 @@ public class CharacterMap : Scenario
         {
             X = Pos.Right (jumpEdit) + 1,
             Y = Pos.Y (_charMap),
-            Scheme = Colors.Schemes ["error"],
+            Scheme = SchemeManager.Schemes ["error"],
             Text = "err",
             Visible = false
 

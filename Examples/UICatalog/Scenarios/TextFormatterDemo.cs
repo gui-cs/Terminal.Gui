@@ -31,7 +31,7 @@ public class TextFormatterDemo : Scenario
 
         var blockText = new Label
         {
-            Scheme = Colors.Schemes ["TopLevel"],
+            Scheme = SchemeManager.Schemes ["TopLevel"],
             X = 0,
             Y = 0,
 
@@ -78,7 +78,7 @@ public class TextFormatterDemo : Scenario
 
                 Width = Dim.Fill (),
                 Height = 1,
-                Scheme = Colors.Schemes ["Dialog"],
+                Scheme = SchemeManager.Schemes ["Dialog"],
                 Text = text
             };
 
@@ -89,7 +89,7 @@ public class TextFormatterDemo : Scenario
 
                 Width = Dim.Fill (),
                 Height = multiLineHeight,
-                Scheme = Colors.Schemes ["Dialog"],
+                Scheme = SchemeManager.Schemes ["Dialog"],
                 Text = text
             };
         }

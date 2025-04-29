@@ -320,7 +320,7 @@ public class ClearViewportTests (ITestOutputHelper output)
     [InlineData (false)]
     public void Clear_Does_Not_Spillover_Its_Parent (bool label)
     {
-        var root = new View { Width = 20, Height = 10, Scheme = Colors.Schemes ["Base"] };
+        var root = new View { Width = 20, Height = 10, Scheme = SchemeManager.Schemes ["Base"] };
 
         string text = new ('c', 100);
 
@@ -358,9 +358,9 @@ cccccccccccccccccccc",
 
         Attribute [] attributes =
         {
-            Colors.Schemes ["TopLevel"]!.Normal,
-            Colors.Schemes ["Base"]!.Normal,
-            Colors.Schemes ["Base"]!.Focus
+            SchemeManager.Schemes ["TopLevel"]!.Normal,
+            SchemeManager.Schemes ["Base"]!.Normal,
+            SchemeManager.Schemes ["Base"]!.Focus
         };
 
         if (label)

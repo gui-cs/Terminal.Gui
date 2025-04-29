@@ -8542,7 +8542,7 @@ line.
             //         01234567890123456789012345678901=32 (Length)
             byte [] buff = Encoding.Unicode.GetBytes (Txt);
             byte [] ms = new MemoryStream (buff).ToArray ();
-            _textView = new() { Width = 30, Height = 10, Scheme = Colors.Schemes ["Base"] };
+            _textView = new() { Width = 30, Height = 10, Scheme = SchemeManager.Schemes ["Base"] };
             _textView.Text = Encoding.Unicode.GetString (ms);
         }
     }
@@ -8946,7 +8946,7 @@ line.  ",
     {
         List<Cell> cells = [];
 
-        foreach (KeyValuePair<string, Scheme> color in Colors.Schemes)
+        foreach (KeyValuePair<string, Scheme> color in SchemeManager.Schemes)
         {
             string csName = color.Key;
 
@@ -8978,19 +8978,19 @@ Error   ";
         Attribute [] attributes =
         {
             // 0
-            Colors.Schemes ["TopLevel"].Normal,
+            SchemeManager.Schemes ["TopLevel"].Normal,
 
             // 1
-            Colors.Schemes ["Base"].Normal,
+            SchemeManager.Schemes ["Base"].Normal,
 
             // 2
-            Colors.Schemes ["Dialog"].Normal,
+            SchemeManager.Schemes ["Dialog"].Normal,
 
             // 3
-            Colors.Schemes ["Menu"].Normal,
+            SchemeManager.Schemes ["Menu"].Normal,
 
             // 4
-            Colors.Schemes ["Error"].Normal,
+            SchemeManager.Schemes ["Error"].Normal,
 
             // 5
             tv.Scheme!.Focus

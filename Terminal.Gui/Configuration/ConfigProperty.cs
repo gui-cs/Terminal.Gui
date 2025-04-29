@@ -86,7 +86,8 @@ public class ConfigProperty
     }
 
     /// <summary>
-    ///     Retrieves (using reflection) the value of the static property described in <see cref="PropertyInfo"/> into
+    ///     Retrieves (using reflection) the value of the static  <see cref="SerializableConfigurationProperty"/>
+    ///     property described in <see cref="PropertyInfo"/> into
     ///     <see cref="PropertyValue"/>.
     /// </summary>
     /// <returns></returns>

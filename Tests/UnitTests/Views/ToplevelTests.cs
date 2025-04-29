@@ -9,7 +9,7 @@ public class ToplevelTests
     {
         var top = new Toplevel ();
 
-        Assert.Equal (Colors.Schemes ["TopLevel"], top.Scheme);
+        Assert.Equal (SchemeManager.Schemes ["TopLevel"], top.Scheme);
         Assert.Equal ("Fill(Absolute(0))", top.Width.ToString ());
         Assert.Equal ("Fill(Absolute(0))", top.Height.ToString ());
         Assert.False (top.Running);

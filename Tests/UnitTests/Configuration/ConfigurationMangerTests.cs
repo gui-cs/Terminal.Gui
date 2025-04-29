@@ -23,9 +23,48 @@ public class ConfigurationManagerTests
     };
 
     [Fact]
-    public void Apply_Raises_Applied ()
+    public void Initialize_Sets_Statics ()
+    {
+        Assert.Null (_classesWithConfigProps);
+        Assert.Null (_allConfigProperties);
+
+        ConfigurationManager.Initialize ();
+
+        Assert.NotNull (_classesWithConfigProps);
+        Assert.NotNull (_allConfigProperties);
+    }
+
+    [Fact]
+    public void Reset_Clears_Statics ()
     {
         Reset ();
+
+        Assert.Null (_classesWithConfigProps);
+        Assert.Null (_allConfigProperties);
+
+        Initialize ();
+
+        Assert.NotNull (_classesWithConfigProps);
+        Assert.NotNull (_allConfigProperties);
+
+        Reset ();
+
+        Assert.Null (_classesWithConfigProps);
+        Assert.Null (_allConfigProperties);
+        Assert.Null (_settings);
+        Assert.Null (_themes);
+        Assert.Null (_appSettings);
+        Assert.Equal (ConfigLocations.All, Locations);
+        //        Assert.Null (RuntimeConfig);
+        //Assert.Null (ThrowOnJsonErrors);
+
+
+    }
+
+    [Fact]
+    public void Apply_Raises_Applied ()
+    {
+        ResetAllSettings ();
         Applied += ConfigurationManager_Applied;
         var fired = false;
 
@@ -50,7 +89,7 @@ public class ConfigurationManagerTests
         Assert.True (fired);
 
         Applied -= ConfigurationManager_Applied;
-        Reset ();
+        ResetAllSettings ();
     }
 
     [Fact]
@@ -174,7 +213,7 @@ public class ConfigurationManagerTests
         Assert.Equal (Key.Q.WithCtrl.GetHashCode (), eq.GetHashCode (DeepCopyTest.key));
         Assert.True (dict.ContainsKey (Key.Esc));
 
-        dict.Remove (Key.Esc);  
+        dict.Remove (Key.Esc);
         dict.Add (new (DeepCopyTest.key), "Ctrl+Q");
         Assert.True (dict.ContainsKey (Key.Q.WithCtrl));
     }
@@ -184,7 +223,7 @@ public class ConfigurationManagerTests
     {
         ThrowOnJsonErrors = true;
         Locations = ConfigLocations.All;
-        Reset ();
+        ResetAllSettings ();
         Assert.Equal (Key.Esc, (((Key)Settings! ["Application.QuitKey"].PropertyValue)!).KeyCode);
 
         Updated += ConfigurationManager_Updated;
@@ -206,14 +245,14 @@ public class ConfigurationManagerTests
 
         // clean up
         Locations = ConfigLocations.Default;
-        Reset ();
+        ResetAllSettings ();
     }
 
     [Fact]
     public void Load_Performance_Check ()
     {
         Locations = ConfigLocations.All;
-        Reset ();
+        ResetAllSettings ();
 
         // Start stopwatch
         Stopwatch stopwatch = new Stopwatch ();
@@ -221,7 +260,7 @@ public class ConfigurationManagerTests
 
         // Act
         Load (true);
-        Apply();
+        Apply ();
 
         // Stop stopwatch
         stopwatch.Stop ();
@@ -236,7 +275,7 @@ public class ConfigurationManagerTests
     {
         // arrange
         Locations = ConfigLocations.Runtime | ConfigLocations.Default;
-        Reset ();
+        ResetAllSettings ();
         ThrowOnJsonErrors = true;
 
         Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue);
@@ -255,7 +294,7 @@ public class ConfigurationManagerTests
 
         // clean up
         Locations = ConfigLocations.Default;
-        Reset ();
+        ResetAllSettings ();
     }
 
     //[Fact]
@@ -296,11 +335,11 @@ public class ConfigurationManagerTests
 
 
     [Fact]
-    public void Reset_Raises_Updated ()
+    public void ResetAllSettings_Raises_Updated ()
     {
         ConfigLocations savedLocations = Locations;
         Locations = ConfigLocations.All;
-        Reset ();
+        ResetAllSettings ();
 
         Settings! ["Application.QuitKey"].PropertyValue = Key.Q;
 
@@ -313,24 +352,24 @@ public class ConfigurationManagerTests
         }
 
         // Act
-        Reset ();
+        ResetAllSettings ();
 
         // assert
         Assert.True (fired);
 
         Updated -= ConfigurationManager_Updated;
-        Reset ();
+        ResetAllSettings ();
         Locations = savedLocations;
     }
 
 
     [Fact]
-    public void Reset_and_ResetLoadWithLibraryResourcesOnly_are_same ()
+    public void ResetAllSettings_and_ResetLoadWithLibraryResourcesOnly_are_same ()
     {
         Locations = ConfigLocations.Default;
 
         // arrange
-        Reset ();
+        ResetAllSettings ();
         Settings! ["Application.QuitKey"].PropertyValue = Key.Q;
         Settings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
         Settings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
@@ -342,7 +381,7 @@ public class ConfigurationManagerTests
         Assert.Equal (KeyCode.B, Application.PrevTabGroupKey.KeyCode);
 
         //act
-        Reset ();
+        ResetAllSettings ();
 
         // assert
         Assert.NotEmpty (Themes!);
@@ -360,7 +399,7 @@ public class ConfigurationManagerTests
         Locations = ConfigLocations.Default;
 
         // act
-        Reset ();
+        ResetAllSettings ();
         Load ();
 
         // assert
@@ -369,16 +408,28 @@ public class ConfigurationManagerTests
         Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
         Assert.Equal (Key.F6, Application.NextTabGroupKey);
         Assert.Equal (Key.F6.WithShift, Application.PrevTabGroupKey);
-        Reset ();
+        ResetAllSettings ();
     }
 
     [Fact]
-    public void Reset_Resets ()
+    public void ResetAllSettings_Resets ()
     {
-        Locations = ConfigLocations.Default;
-        Reset ();
-        Assert.NotEmpty (Themes!);
+        Initialize ();
+
+        Locations = ConfigLocations.None;
+
+        // Act
+        ResetAllSettings ();
+
+        Assert.NotNull (Settings);
+        Assert.NotNull (AppSettings);
+        Assert.NotNull (Themes);
+
+        // Default Theme should be "Default"
+        Assert.Equal (0, Themes.Keys.Count);
         Assert.Equal ("Default", Themes.Theme);
+
+        //Assert.Equal();
     }
 
     //[Fact ()]
@@ -462,10 +513,10 @@ public class ConfigurationManagerTests
     public void SaveDefaults ()
     {
         Initialize ();
-        Reset ();
+        ResetAllSettings ();
 
         // Get the hard coded settings
-        GetHardCodedDefaults ();
+        ResetToCurrentValues ();
 
         // Serialize to a JSON string
         string json = ToJson ();
@@ -478,7 +529,7 @@ public class ConfigurationManagerTests
     public void TestConfigProperties ()
     {
         Locations = ConfigLocations.All;
-        Reset ();
+        ResetAllSettings ();
 
         Assert.NotEmpty (Settings!);
 
@@ -521,12 +572,12 @@ public class ConfigurationManagerTests
         Locations = ConfigLocations.All;
 
         // Color.Schemes is serialized as "Schemes", not "Colors.Schemes"
-        PropertyInfo pi = typeof (Colors).GetProperty ("Schemes");
+        PropertyInfo pi = typeof (SchemeManager).GetProperty ("Schemes");
         var scp = (SerializableConfigurationProperty)pi!.GetCustomAttribute (typeof (SerializableConfigurationProperty));
         Assert.True (scp!.Scope == typeof (ThemeScope));
         Assert.True (scp.OmitClassName);
 
-        Reset ();
+        ResetAllSettings ();
         Assert.Equal (pi, Themes! ["Default"] ["Schemes"].PropertyInfo);
 
         Locations = savedLocations;
@@ -538,8 +589,8 @@ public class ConfigurationManagerTests
     {
         Assert.Equal ("Default", Themes!.Theme);
 
-        Assert.Equal (new Color (Color.White), Colors.Schemes ["Base"]!.Normal.Foreground);
-        Assert.Equal (new Color (Color.Blue), Colors.Schemes ["Base"].Normal.Background);
+        Assert.Equal (new Color (Color.White), SchemeManager.Schemes ["Base"]!.Normal.Foreground);
+        Assert.Equal (new Color (Color.Blue), SchemeManager.Schemes ["Base"].Normal.Background);
 
         // Change Base
         Stream json = ToStream ();
@@ -548,23 +599,23 @@ public class ConfigurationManagerTests
 
         Dictionary<string, Scheme> schemes =
             (Dictionary<string, Scheme>)Themes [Themes.Theme] ["Schemes"].PropertyValue;
-        Assert.Equal (Colors.Schemes ["Base"], schemes! ["Base"]);
-        Assert.Equal (Colors.Schemes ["TopLevel"], schemes ["TopLevel"]);
-        Assert.Equal (Colors.Schemes ["Error"], schemes ["Error"]);
-        Assert.Equal (Colors.Schemes ["Dialog"], schemes ["Dialog"]);
-        Assert.Equal (Colors.Schemes ["Menu"], schemes ["Menu"]);
+        Assert.Equal (SchemeManager.Schemes ["Base"], schemes! ["Base"]);
+        Assert.Equal (SchemeManager.Schemes ["TopLevel"], schemes ["TopLevel"]);
+        Assert.Equal (SchemeManager.Schemes ["Error"], schemes ["Error"]);
+        Assert.Equal (SchemeManager.Schemes ["Dialog"], schemes ["Dialog"]);
+        Assert.Equal (SchemeManager.Schemes ["Menu"], schemes ["Menu"]);
 
-        Colors.Schemes ["Base"] = schemes ["Base"];
-        Colors.Schemes ["TopLevel"] = schemes ["TopLevel"];
-        Colors.Schemes ["Error"] = schemes ["Error"];
-        Colors.Schemes ["Dialog"] = schemes ["Dialog"];
-        Colors.Schemes ["Menu"] = schemes ["Menu"];
+        SchemeManager.Schemes ["Base"] = schemes ["Base"];
+        SchemeManager.Schemes ["TopLevel"] = schemes ["TopLevel"];
+        SchemeManager.Schemes ["Error"] = schemes ["Error"];
+        SchemeManager.Schemes ["Dialog"] = schemes ["Dialog"];
+        SchemeManager.Schemes ["Menu"] = schemes ["Menu"];
 
-        Assert.Equal (schemes ["Base"], Colors.Schemes ["Base"]);
-        Assert.Equal (schemes ["TopLevel"], Colors.Schemes ["TopLevel"]);
-        Assert.Equal (schemes ["Error"], Colors.Schemes ["Error"]);
-        Assert.Equal (schemes ["Dialog"], Colors.Schemes ["Dialog"]);
-        Assert.Equal (schemes ["Menu"], Colors.Schemes ["Menu"]);
+        Assert.Equal (schemes ["Base"], SchemeManager.Schemes ["Base"]);
+        Assert.Equal (schemes ["TopLevel"], SchemeManager.Schemes ["TopLevel"]);
+        Assert.Equal (schemes ["Error"], SchemeManager.Schemes ["Error"]);
+        Assert.Equal (schemes ["Dialog"], SchemeManager.Schemes ["Dialog"]);
+        Assert.Equal (schemes ["Menu"], SchemeManager.Schemes ["Menu"]);
     }
 
     [Fact]
@@ -753,8 +804,8 @@ public class ConfigurationManagerTests
     [AutoInitShutdown]
     public void TestConfigurationManagerToJson ()
     {
-        Reset ();
-        GetHardCodedDefaults ();
+        ResetAllSettings ();
+        ResetToCurrentValues ();
         Stream stream = ToStream ();
 
         Settings!.Update (stream, "TestConfigurationManagerToJson", ConfigLocations.Runtime);
@@ -903,7 +954,7 @@ public class ConfigurationManagerTests
 }					
 			";
 
-        Reset ();
+        ResetAllSettings ();
         ThrowOnJsonErrors = true;
 
         Settings!.Update (json, "TestConfigurationManagerUpdateFromJson", ConfigLocations.Runtime);
@@ -913,8 +964,8 @@ public class ConfigurationManagerTests
 
         Assert.Equal ("Default", Themes!.Theme);
 
-        Assert.Equal (new Color (Color.White), Colors.Schemes ["Base"]!.Normal.Foreground);
-        Assert.Equal (new Color (Color.Blue), Colors.Schemes ["Base"].Normal.Background);
+        Assert.Equal (new Color (Color.White), SchemeManager.Schemes ["Base"]!.Normal.Foreground);
+        Assert.Equal (new Color (Color.Blue), SchemeManager.Schemes ["Base"].Normal.Background);
 
         Dictionary<string, Scheme> schemes =
             (Dictionary<string, Scheme>)Themes.First ().Value ["Schemes"].PropertyValue;
@@ -927,9 +978,9 @@ public class ConfigurationManagerTests
         Assert.Equal (KeyCode.Z | KeyCode.AltMask, Application.QuitKey.KeyCode);
         Assert.Equal ("Default", Themes.Theme);
 
-        Assert.Equal (new Color (Color.White), Colors.Schemes ["Base"].Normal.Foreground);
-        Assert.Equal (new Color (Color.Blue), Colors.Schemes ["Base"].Normal.Background);
-        Reset ();
+        Assert.Equal (new Color (Color.White), SchemeManager.Schemes ["Base"].Normal.Foreground);
+        Assert.Equal (new Color (Color.Blue), SchemeManager.Schemes ["Base"].Normal.Background);
+        ResetAllSettings ();
 
         Locations = savedLocations;
     }

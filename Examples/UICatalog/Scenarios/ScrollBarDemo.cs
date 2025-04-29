@@ -25,7 +25,7 @@ public class ScrollBarDemo : Scenario
             X = 0,
             Width = 75,
             Height = 25 + 4,
-            Scheme = Colors.Schemes ["Base"],
+            Scheme = SchemeManager.Schemes ["Base"],
             Arrangement = ViewArrangement.Resizable
         };
         demoFrame!.Padding!.Thickness = new (1);
@@ -46,7 +46,7 @@ public class ScrollBarDemo : Scenario
             X = Pos.AnchorEnd (),
             Width = 5,
             Height = Dim.Fill (),
-            Scheme = Colors.Schemes ["Error"],
+            Scheme = SchemeManager.Schemes ["Error"],
         };
 
         demoFrame.Add (controlledList);

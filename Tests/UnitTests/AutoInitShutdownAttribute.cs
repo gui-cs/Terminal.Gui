@@ -107,7 +107,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
         // Reset to defaults
         ConfigurationManager.Locations = ConfigLocations.Default;
-        ConfigurationManager.Reset ();
+        ConfigurationManager.ResetAllSettings ();
 
         // Enable subsequent tests that call Init to get all config files (the default).
         //Locations = ConfigLocations.All;

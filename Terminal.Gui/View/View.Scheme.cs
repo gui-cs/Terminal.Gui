@@ -11,6 +11,65 @@ public partial class View
     // TODO: Enable ability to tell if Scheme was explicitly set; Scheme, as is, hides this.
     internal Scheme? _scheme;
 
+    /// <summary>
+    ///     Gets the hard-coded set of <see cref="Scheme"/>s. Used for geneeating the built-in config.json and for
+    ///     unit tests that don't depend on ConfigurationManager.
+    /// </summary>
+    /// <returns></returns>
+    internal static Dictionary<string, Scheme?> GetHardCodedSchemes ()
+    {
+        return new ()
+        {
+            {
+                "TopLevel", new Scheme (
+                                        normal: new Attribute (new Color ("BrightGreen"), new Color ("#505050")),
+                                        focus: new Attribute (new Color ("White"), new Color ("#696969")),
+                                        hotNormal: new Attribute (new Color ("Yellow"), new Color ("#505050")),
+                                        hotFocus: new Attribute (new Color ("Yellow"), new Color ("#505050")),
+                                        disabled: new Attribute (new Color ("DarkGray"), new Color ("#505050"))
+                                       )
+            },
+            {
+                "Base", new Scheme (
+                                    normal: new Attribute (new Color ("White"), new Color ("Blue")),
+                                    focus: new Attribute (new Color ("DarkBlue"), new Color ("LightGray")),
+                                    hotNormal: new Attribute (new Color ("BrightCyan"), new Color ("Blue")),
+                                    hotFocus: new Attribute (new Color ("BrightCyan"), new Color ("LightGray")),
+                                    disabled: new Attribute (new Color ("DarkGray"), new Color ("Blue"))
+                                   )
+            },
+            {
+
+                "Dialog", new Scheme (
+                                      normal: new Attribute (new Color ("Black"), new Color ("LightGray")),
+                                      focus: new Attribute (new Color ("DarkGray"), new Color ("LightGray")),
+                                      hotNormal: new Attribute (new Color ("Blue"), new Color ("LightGray")),
+                                      hotFocus: new Attribute (new Color ("BrightBlue"), new Color ("LightGray")),
+                                      disabled: new Attribute (new Color ("Gray"), new Color ("DarkGray"))
+                                     )
+            },
+            {
+                "Menu", new Scheme (
+                                    normal: new Attribute (new Color ("White"), new Color ("DarkBlue")),
+                                    focus: new Attribute (new Color ("DarkBlue"), new Color ("White")),
+                                    hotNormal: new Attribute (new Color ("Yellow"), new Color ("DarkBlue")),
+                                    hotFocus: new Attribute (new Color ("Blue"), new Color ("White")),
+                                    disabled: new Attribute (new Color ("Gray"), new Color ("DarkGray"))
+                                   )
+            },
+            {
+                "Error", new Scheme (
+                                     normal: new Attribute (new Color ("Red"), new Color ("Pink")),
+                                     focus: new Attribute (new Color ("White"), new Color ("BrightRed")),
+                                     hotNormal: new Attribute (new Color ("Black"), new Color ("Pink")),
+                                     hotFocus: new Attribute (new Color ("Pink"), new Color ("BrightRed")),
+                                     disabled: new Attribute (new Color ("DarkGray"), new Color ("White"))
+                                    )
+            }
+        };
+    }
+
+    // TODO: Remove `virtual`. only Border and Padding override and they can use a different method.
     /// <summary>The color scheme for this view, if it is not defined, it returns the <see cref="SuperView"/>'s color scheme.</summary>
     public virtual Scheme? Scheme
     {
@@ -174,53 +233,57 @@ public partial class View
     /// </summary>
     /// <param name="role">The semantic <see cref="VisualRole"/> describing the element being rendered.</param>
     /// <returns>The corresponding <see cref="Attribute"/> from the <see cref="Scheme"/>.</returns>
-    protected virtual Attribute GetAttributeForRole (VisualRole role)
+    public Attribute GetAttributeForRole (VisualRole role)
     {
-        Scheme scheme = Scheme ?? ThemeManager.GetDefaultSchemes () ["Base"]!;
-        Attribute currAttribute = GetAttributeForRole (scheme, role);
+        Scheme scheme = Scheme ?? SchemeManager.GetDefaultSchemes () ["Base"]!;
+        Attribute curAttribute = scheme.GetAttributeForRole (role);
 
-        var newAttribute = new Attribute ();
-        VisualRoleEventArgs args = new (role, ref newAttribute);
+        if (OnGettingAttributeForRole (role, ref curAttribute))
+        {
+            // The ipmlementation may have changed the attribute
+            return curAttribute;
+        }
+
+        VisualRoleEventArgs args = new (role, newValue: ref curAttribute, currentValue: ref curAttribute);
         GettingAttributeForRole?.Invoke (this, args);
 
         if (args.Cancel)
         {
+            // A handler may have changed the attribute
             return args.NewValue;
         }
 
-        // BUGBUG: This broke ViewDiagnosticFlags.Hover
+        // TODO: 
+        Scheme? cs = Scheme ?? new ();
+        Attribute disabled = new (cs.Disabled.Foreground, cs.Disabled.Background);
 
-        return GetAttributeForRole (scheme, role);
+        if (Diagnostics.HasFlag (ViewDiagnosticFlags.Hover) && _hovering)
+        {
+            disabled = new (disabled.Foreground.GetDarkerColor (), disabled.Background.GetDarkerColor ());
+        }
+        // BUGBUG: This broke ViewDiagnosticFlags.Hover
+        return Enabled ? curAttribute : disabled;
     }
 
     /// <summary>
-    ///     Raised the Attribute for a VisualRole is being retrieved, from <see cref="GetAttributeForRole(Terminal.Gui.VisualRole)"/>. Cancel the event and set the new
-    ///     attribute in the event args to
-    ///     a different value to change the attribute.
+    ///     Called when the Attribute for a <see cref="GetAttributeForRole(Terminal.Gui.VisualRole)"/> is being retrieved. Implementations can
+    ///     return <see langword="true"/> to stop further processing and optionally set the <see cref="Attribute"/> in the event args to a different value.
+    /// </summary>
+    /// <param name="role"></param>
+    /// <param name="currentAttribute">The current value of the Attribute for the VisualRole. This by-ref value can be changed</param>
+    /// <returns></returns>
+    protected virtual bool OnGettingAttributeForRole (VisualRole role, ref Attribute currentAttribute)
+    {
+        return false;
+    }
+
+    /// <summary>
+    ///     Raised when the Attribute for a <see cref="GetAttributeForRole(Terminal.Gui.VisualRole)"/> is being retrieved. Handelers should check if <see cref="CancelEventArgs.Cancel"/>
+    ///     has been set to <see langword="true"/> and do nothing if so. If Cancel is <see langword="false"/>
+    ///     a handler can set it to <see langword="true"/> to stop further processing optionally change the <see cref="VisualRoleEventArgs.CurrentValue"/> in the event args to a different value.
     /// </summary>
     public event EventHandler<VisualRoleEventArgs>? GettingAttributeForRole;
 
-    /// <summary>
-    /// Gets the <see cref="Attribute"/> associated with a specified <see cref="VisualRole"/>.
-    /// </summary>
-    /// <param name="scheme">The scheme to use.</param>
-    /// <param name="role">The semantic <see cref="VisualRole"/> describing the element being rendered.</param>
-    /// <returns>The corresponding <see cref="Attribute"/> from the <see cref="Scheme"/>.</returns>
-    protected Attribute GetAttributeForRole (Scheme scheme, VisualRole role)
-    {
-        return role switch
-               {
-                   VisualRole.Normal => scheme.Normal,
-                   VisualRole.HotNormal => scheme.HotNormal,
-                   VisualRole.Focus => scheme.Focus,
-                   VisualRole.HotFocus => scheme.HotFocus,
-                   //VisualRole.Active => scheme.Active,
-                   //VisualRole.HotActive => scheme.HotActive,
-                   VisualRole.Disabled => scheme.Disabled,
-                   //VisualRole.ReadOnly => scheme.ReadOnly,
-                   _ => scheme.Normal
-               };
-    }
 
     /// <summary>
     ///     Sets the Normal attribute if the setting process is not canceled. It triggers an event and checks for

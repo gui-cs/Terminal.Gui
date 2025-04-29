@@ -16,7 +16,7 @@ public class InvertColors : Scenario
         var win = new Window
         {
             Title = GetQuitKeyAndName (),
-            Scheme = Colors.Schemes ["TopLevel"]
+            Scheme = SchemeManager.Schemes ["TopLevel"]
         };
 
         List<Label> labels = new ();

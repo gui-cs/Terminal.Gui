@@ -133,7 +133,7 @@ public class StatusBarTests
         
         Assert.Empty (sb.SubViews);
         Assert.True (sb.CanFocus);
-        Assert.Equal (Colors.Schemes ["Menu"], sb.Scheme);
+        Assert.Equal (SchemeManager.Schemes ["Menu"], sb.Scheme);
         Assert.Equal (0, sb.X);
         Assert.Equal ("AnchorEnd", sb.Y.ToString ());
         Assert.Equal (Dim.Fill (), sb.Width);

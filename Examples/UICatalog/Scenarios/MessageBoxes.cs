@@ -221,7 +221,7 @@ public class MessageBoxes : Scenario
         {
             X = Pos.Center (),
             Y = Pos.Bottom (label) + 1,
-            Scheme = Colors.Schemes ["Error"],
+            Scheme = SchemeManager.Schemes ["Error"],
             TextAlignment = Alignment.Center,
             Text = " "
         };

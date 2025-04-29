@@ -41,7 +41,7 @@ public class Shortcuts : Scenario
             X = Pos.AnchorEnd (),
             Y = 0,
             Height = Dim.Fill (4),
-            Scheme = Colors.Schemes ["Toplevel"],
+            Scheme = SchemeManager.Schemes ["Toplevel"],
             Source = new ListWrapper<string> (eventSource),
             BorderStyle = LineStyle.Double,
             Title = "E_vents"
@@ -322,12 +322,12 @@ public class Shortcuts : Scenario
 
         if (framedShortcut.CommandView.Margin is { })
         {
-            framedShortcut.CommandView.Margin.Scheme = framedShortcut.CommandView.Scheme = Colors.Schemes ["Error"];
-            framedShortcut.HelpView.Margin!.Scheme = framedShortcut.HelpView.Scheme = Colors.Schemes ["Dialog"];
-            framedShortcut.KeyView.Margin!.Scheme = framedShortcut.KeyView.Scheme = Colors.Schemes ["Menu"];
+            framedShortcut.CommandView.Margin.Scheme = framedShortcut.CommandView.Scheme = SchemeManager.Schemes ["Error"];
+            framedShortcut.HelpView.Margin!.Scheme = framedShortcut.HelpView.Scheme = SchemeManager.Schemes ["Dialog"];
+            framedShortcut.KeyView.Margin!.Scheme = framedShortcut.KeyView.Scheme = SchemeManager.Schemes ["Menu"];
         }
 
-        framedShortcut.Scheme = Colors.Schemes ["Toplevel"];
+        framedShortcut.Scheme = SchemeManager.Schemes ["Toplevel"];
         Application.Top.Add (framedShortcut);
 
         // Horizontal

@@ -263,7 +263,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Assert.False (menu.IsInitialized);
         menu.BeginInit ();
         menu.EndInit ();
-        Assert.Equal (Colors.Schemes ["Menu"], menu.Scheme);
+        Assert.Equal (SchemeManager.Schemes ["Menu"], menu.Scheme);
         Assert.True (menu.CanFocus);
         Assert.False (menu.WantContinuousButtonPressed);
         Assert.Equal (LineStyle.Single, menuBar.MenusBorderStyle);
@@ -274,7 +274,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Assert.IsType<DimFill> (menuBar.Width);
         Assert.Equal (1, menuBar.Height);
         Assert.Empty (menuBar.Menus);
-        Assert.Equal (Colors.Schemes ["Menu"], menuBar.Scheme);
+        Assert.Equal (SchemeManager.Schemes ["Menu"], menuBar.Scheme);
         Assert.True (menuBar.WantMousePositionReports);
         Assert.False (menuBar.IsMenuOpen);
 
@@ -284,7 +284,7 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         Assert.IsType<DimFill> (menuBar.Width);
         Assert.Equal (1, menuBar.Height);
         Assert.Empty (menuBar.Menus);
-        Assert.Equal (Colors.Schemes ["Menu"], menuBar.Scheme);
+        Assert.Equal (SchemeManager.Schemes ["Menu"], menuBar.Scheme);
         Assert.True (menuBar.WantMousePositionReports);
         Assert.False (menuBar.IsMenuOpen);
 

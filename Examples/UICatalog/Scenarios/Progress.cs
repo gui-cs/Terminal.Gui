@@ -175,7 +175,7 @@ public class Progress : Scenario
 
         internal ProgressDemo ()
         {
-            Scheme = Colors.Schemes ["Dialog"];
+            Scheme = SchemeManager.Schemes ["Dialog"];
 
             LeftFrame = new FrameView
             {
@@ -214,7 +214,7 @@ public class Progress : Scenario
                 Width = Dim.Fill () - 1,
                 Height = 1,
                 Fraction = 0.25F,
-                Scheme = Colors.Schemes ["Error"]
+                Scheme = SchemeManager.Schemes ["Error"]
             };
             Add (ActivityProgressBar);
 
@@ -233,7 +233,7 @@ public class Progress : Scenario
                 Y = Pos.Bottom (ActivityProgressBar) + 1,
                 Width = Dim.Fill () - Spinner.Width,
                 Height = 1,
-                Scheme = Colors.Schemes ["Error"]
+                Scheme = SchemeManager.Schemes ["Error"]
             };
             Add (PulseProgressBar);
 

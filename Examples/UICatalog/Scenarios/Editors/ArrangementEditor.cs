@@ -107,7 +107,7 @@ public sealed class ArrangementEditor : EditorBase
             if (ViewToEdit.Arrangement.HasFlag (ViewArrangement.Overlapped))
             {
                 ViewToEdit.ShadowStyle = ShadowStyle.Transparent;
-                ViewToEdit.Scheme = Colors.Schemes ["Toplevel"];
+                ViewToEdit.Scheme = SchemeManager.Schemes ["Toplevel"];
             }
             else
             {

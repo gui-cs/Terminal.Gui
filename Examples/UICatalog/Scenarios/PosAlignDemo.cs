@@ -25,9 +25,9 @@ public sealed class PosAlignDemo : Scenario
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()} - {GetDescription ()}"
         };
 
-        SetupControls (appWindow, Dimension.Width, Colors.Schemes ["TopLevel"]);
+        SetupControls (appWindow, Dimension.Width, SchemeManager.Schemes ["TopLevel"]);
 
-        SetupControls (appWindow, Dimension.Height, Colors.Schemes ["Error"]);
+        SetupControls (appWindow, Dimension.Height, SchemeManager.Schemes ["Error"]);
 
         Setup3By3Grid (appWindow);
 
@@ -353,7 +353,7 @@ public sealed class PosAlignDemo : Scenario
             Height = Dim.Percent (40)
         };
         container.Padding.Thickness = new (8, 1, 0, 0);
-        container.Padding.Scheme = Colors.Schemes ["error"];
+        container.Padding.Scheme = SchemeManager.Schemes ["error"];
 
         Aligner widthAligner = new () { AlignmentModes = AlignmentModes.StartToEnd };
 

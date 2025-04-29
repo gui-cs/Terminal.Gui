@@ -24,7 +24,7 @@ public class ContextMenus : Scenario
         {
             Title = GetQuitKeyAndName (),
             Arrangement = ViewArrangement.Fixed,
-            Scheme = Colors.Schemes ["Toplevel"]
+            Scheme = SchemeManager.Schemes ["Toplevel"]
         };
 
         var text = "Context Menu";

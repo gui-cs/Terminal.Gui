@@ -156,7 +156,7 @@ public class Sliders : Scenario
             Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            Scheme = Colors.Schemes ["Dialog"]
+            Scheme = SchemeManager.Schemes ["Dialog"]
         };
 
         app.Add (configView);
@@ -579,7 +579,7 @@ public class Sliders : Scenario
             Y = Pos.Bottom (spacingOptions),
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            Scheme = Colors.Schemes ["Toplevel"],
+            Scheme = SchemeManager.Schemes ["Toplevel"],
             Source = new ListWrapper<string> (eventSource)
         };
         configView.Add (eventLog);

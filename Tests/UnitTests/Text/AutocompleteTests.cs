@@ -281,7 +281,7 @@ This an long line and against TextView.",
         var tv = new TextView ();
 
         // to begin with we should be using the default menu color scheme
-        Assert.Same (Colors.Schemes ["Menu"], tv.Autocomplete.Scheme);
+        Assert.Same (SchemeManager.Schemes ["Menu"], tv.Autocomplete.Scheme);
 
         // allocate a new custom scheme
         tv.Autocomplete.Scheme = new ()
@@ -290,7 +290,7 @@ This an long line and against TextView.",
         };
 
         // should be separate instance
-        Assert.NotSame (Colors.Schemes ["Menu"], tv.Autocomplete.Scheme);
+        Assert.NotSame (SchemeManager.Schemes ["Menu"], tv.Autocomplete.Scheme);
 
         // with the values we set on it
         Assert.Equal (new (Color.Black), tv.Autocomplete.Scheme.Normal.Foreground);

@@ -30,7 +30,7 @@ public class ComputedLayout : Scenario
             Y = 0,
             Width = Dim.Fill (),
             Height = 1,
-            Scheme = Colors.Schemes ["Error"],
+            Scheme = SchemeManager.Schemes ["Error"],
             Text = rule
         };
 
@@ -45,7 +45,7 @@ public class ComputedLayout : Scenario
             Y = 0,
             Width = 1,
             Height = Dim.Fill (),
-            Scheme = Colors.Schemes ["Error"],
+            Scheme = SchemeManager.Schemes ["Error"],
             Text = vrule
         };
 
@@ -103,7 +103,7 @@ public class ComputedLayout : Scenario
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
-                           Scheme = Colors.Schemes ["Dialog"],
+                           Scheme = SchemeManager.Schemes ["Dialog"],
                            Text = $"{i++}-{txt}"
                        }
                       );
@@ -115,7 +115,7 @@ public class ComputedLayout : Scenario
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
-                           Scheme = Colors.Schemes ["Dialog"],
+                           Scheme = SchemeManager.Schemes ["Dialog"],
                            Text = $"{i++}-{txt}"
                        }
                       );
@@ -127,7 +127,7 @@ public class ComputedLayout : Scenario
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
-                           Scheme = Colors.Schemes ["Dialog"],
+                           Scheme = SchemeManager.Schemes ["Dialog"],
                            Text = $"{i++}-{txt}"
                        }
                       );
@@ -139,7 +139,7 @@ public class ComputedLayout : Scenario
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
-                           Scheme = Colors.Schemes ["Dialog"],
+                           Scheme = SchemeManager.Schemes ["Dialog"],
                            Text = $"{i++}-{txt}"
                        }
                       );
@@ -165,7 +165,7 @@ public class ComputedLayout : Scenario
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
-                           Scheme = Colors.Schemes ["Dialog"],
+                           Scheme = SchemeManager.Schemes ["Dialog"],
                            Text = $"{i++}-{txt}"
                        }
                       );
@@ -177,7 +177,7 @@ public class ComputedLayout : Scenario
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
-                           Scheme = Colors.Schemes ["Dialog"],
+                           Scheme = SchemeManager.Schemes ["Dialog"],
                            Text = $"{i++}-{txt}"
                        }
                       );
@@ -189,7 +189,7 @@ public class ComputedLayout : Scenario
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
-                           Scheme = Colors.Schemes ["Dialog"],
+                           Scheme = SchemeManager.Schemes ["Dialog"],
                            Text = $"{i++}-{txt}"
                        }
                       );
@@ -201,7 +201,7 @@ public class ComputedLayout : Scenario
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
-                           Scheme = Colors.Schemes ["Dialog"],
+                           Scheme = SchemeManager.Schemes ["Dialog"],
                            Text = $"{i++}-{txt}"
                        }
                       );
@@ -231,7 +231,7 @@ public class ComputedLayout : Scenario
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
-                           Scheme = Colors.Schemes ["Dialog"],
+                           Scheme = SchemeManager.Schemes ["Dialog"],
                            Text = $"{i++}-{txt}"
                        }
                       );
@@ -243,7 +243,7 @@ public class ComputedLayout : Scenario
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
-                           Scheme = Colors.Schemes ["Dialog"],
+                           Scheme = SchemeManager.Schemes ["Dialog"],
                            Text = $"{i++}-{txt}"
                        }
                       );
@@ -255,7 +255,7 @@ public class ComputedLayout : Scenario
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
-                           Scheme = Colors.Schemes ["Dialog"],
+                           Scheme = SchemeManager.Schemes ["Dialog"],
                            Text = $"{i++}-{txt}"
                        }
                       );
@@ -267,7 +267,7 @@ public class ComputedLayout : Scenario
                            Width = Dim.Fill (),
                            X = 0,
                            Y = Pos.Bottom (labelList.LastOrDefault ()),
-                           Scheme = Colors.Schemes ["Dialog"],
+                           Scheme = SchemeManager.Schemes ["Dialog"],
                            Text = $"{i++}-{txt}"
                        }
                       );
@@ -281,7 +281,7 @@ public class ComputedLayout : Scenario
             Y = Pos.Percent (50),
             Width = Dim.Percent (80),
             Height = Dim.Percent (10),
-            Scheme = Colors.Schemes ["TopLevel"]
+            Scheme = SchemeManager.Schemes ["TopLevel"]
         };
 
         textView.Text =
@@ -384,7 +384,7 @@ public class ComputedLayout : Scenario
         {
             Text = "This Label should be the 3rd to last line (AnchorEnd (3)).",
             TextAlignment = Alignment.Center,
-            Scheme = Colors.Schemes ["Menu"],
+            Scheme = SchemeManager.Schemes ["Menu"],
             Width = Dim.Fill (5),
             X = 5,
             Y = Pos.AnchorEnd (3)
@@ -398,7 +398,7 @@ public class ComputedLayout : Scenario
             Text =
                 "This TextField should be the 4th to last line (AnchorEnd (3) - 1).",
             TextAlignment = Alignment.Start,
-            Scheme = Colors.Schemes ["Menu"],
+            Scheme = SchemeManager.Schemes ["Menu"],
             Width = Dim.Fill (5),
             X = 5,
             Y = Pos.AnchorEnd (3) - 1 // Pos.Combine

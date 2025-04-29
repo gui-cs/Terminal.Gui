@@ -31,14 +31,14 @@ public class SettingsScopeTests
 
         // clean up
         Locations = ConfigLocations.All;
-        Reset ();
+        ResetAllSettings ();
     }
 
     [Fact]
     public void Apply_ShouldApplyProperties ()
     {
         Locations = ConfigLocations.Default;
-        Reset();
+        ResetAllSettings();
 
         // arrange
         Assert.Equal (Key.Esc, (Key)Settings ["Application.QuitKey"].PropertyValue);
@@ -66,7 +66,7 @@ public class SettingsScopeTests
         Assert.Equal (Key.B, Application.PrevTabGroupKey);
 
         Locations = ConfigLocations.All;
-        Reset ();
+        ResetAllSettings ();
 
     }
 
@@ -93,11 +93,11 @@ public class SettingsScopeTests
     {
         ConfigLocations savedLocations = Locations;
         Locations = ConfigLocations.Default;
-        Reset ();
+        ResetAllSettings ();
 
         Assert.Equal (6, ((Dictionary<string, ThemeScope>)Settings ["Themes"].PropertyValue).Count);
 
-        GetHardCodedDefaults ();
+        ResetToCurrentValues ();
         Assert.NotEmpty (Themes);
         Assert.Equal ("Default", Themes.Theme);
 
@@ -112,6 +112,6 @@ public class SettingsScopeTests
         Assert.Single ((Dictionary<string, ThemeScope>)Settings ["Themes"].PropertyValue);
 
         Locations = ConfigLocations.All;
-        Reset ();
+        ResetAllSettings ();
     }
 }

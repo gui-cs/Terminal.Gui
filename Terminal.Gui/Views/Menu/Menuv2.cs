@@ -21,7 +21,7 @@ public class Menuv2 : Bar
         Orientation = Orientation.Vertical;
         Width = Dim.Auto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
-        base.Scheme = Colors.Schemes ["Menu"];
+        base.Scheme = SchemeManager.Schemes ["Menu"];
 
         if (Border is { })
         {

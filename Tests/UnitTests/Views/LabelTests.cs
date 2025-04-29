@@ -846,7 +846,7 @@ e
         var label = new Label
         {
             Text = "This should be the last line.",
-            Scheme = Colors.Schemes ["Menu"],
+            Scheme = SchemeManager.Schemes ["Menu"],
 
             //Width = Dim.Fill (),
             X = 0, // keep unit test focused; don't use Center here
@@ -894,7 +894,7 @@ e
         var label = new Label
         {
             Text = "This should be the last line.",
-            Scheme = Colors.Schemes ["Menu"],
+            Scheme = SchemeManager.Schemes ["Menu"],
 
             //Width = Dim.Fill (),
             X = 0,

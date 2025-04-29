@@ -218,13 +218,13 @@ public class UICatalogTop : Toplevel
             _topSchemeRg = new ()
             {
                 HighlightStyle = HighlightStyle.None,
-                SelectedItem = Colors.Schemes.Keys.ToList().IndexOf(CachedTopLevelScheme!)
+                SelectedItem = SchemeManager.Schemes.Keys.ToList().IndexOf(CachedTopLevelScheme!)
             };
 
             _topSchemeRg.SelectedItemChanged += (_, args) =>
             {
-                CachedTopLevelScheme = Colors.Schemes.Keys.ToArray () [args.SelectedItem!.Value];
-                Scheme = Colors.Schemes [CachedTopLevelScheme];
+                CachedTopLevelScheme = SchemeManager.Schemes.Keys.ToArray () [args.SelectedItem!.Value];
+                Scheme = SchemeManager.Schemes [CachedTopLevelScheme];
                 SetNeedsDraw ();
             };
 
@@ -359,15 +359,15 @@ public class UICatalogTop : Toplevel
         _topSchemeRg.AssignHotKeysToCheckBoxes = true;
         _topSchemeRg.UsedHotKeys.Clear ();
         int? selected = _topSchemeRg.SelectedItem;
-        _topSchemeRg.Options = Colors.Schemes.Keys.ToArray ();
+        _topSchemeRg.Options = SchemeManager.Schemes.Keys.ToArray ();
         _topSchemeRg.SelectedItem = selected;
 
-        if (CachedTopLevelScheme is null || !Colors.Schemes.ContainsKey (CachedTopLevelScheme))
+        if (CachedTopLevelScheme is null || !SchemeManager.Schemes.ContainsKey (CachedTopLevelScheme))
         {
             CachedTopLevelScheme = "Base";
         }
 
-        _topSchemeRg.SelectedItem = Array.IndexOf (Colors.Schemes.Keys.ToArray (), CachedTopLevelScheme);
+        _topSchemeRg.SelectedItem = Array.IndexOf (SchemeManager.Schemes.Keys.ToArray (), CachedTopLevelScheme);
     }
 
     #endregion MenuBar
@@ -658,7 +658,7 @@ public class UICatalogTop : Toplevel
 
         UpdateThemesMenu ();
 
-        Scheme = Colors.Schemes [CachedTopLevelScheme!];
+        Scheme = SchemeManager.Schemes [CachedTopLevelScheme!];
 
         if (_shQuit is { })
         {

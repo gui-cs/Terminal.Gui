@@ -5,10 +5,9 @@ namespace Terminal.Gui.DrawingTests;
 public class SchemeTests
 {
     [Fact]
-    public void Colors_Schemes_Built_Ins ()
+    public void Schemes_Built_Ins ()
     {
-        Colors.Reset ();
-        Dictionary<string, Scheme> schemes = Colors.Schemes;
+        Dictionary<string, Scheme> schemes = SchemeManager.Schemes;
         Assert.NotNull (schemes);
         Assert.Equal (5, schemes.Count);
         Assert.True (schemes.ContainsKey ("TopLevel"));
@@ -24,7 +23,7 @@ public class SchemeTests
         // Resharper Code Cleanup likes to remove the `private set; `
         // from the Schemes property.  This test will fail if
         // that happens.
-        PropertyInfo property = typeof (Colors).GetProperty ("Schemes");
+        PropertyInfo property = typeof (SchemeManager).GetProperty ("Schemes");
         Assert.NotNull (property);
         Assert.NotNull (property.SetMethod);
         Assert.True (property.GetSetMethod (true).IsPrivate);

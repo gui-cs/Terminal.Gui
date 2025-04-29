@@ -15,7 +15,7 @@ public class ThemeTests
     [AutoInitShutdown (configLocation: ConfigLocations.Default)]
     public void TestApply ()
     {
-        Reset ();
+        ResetAllSettings ();
 
         var theme = new ThemeScope ();
         Assert.NotEmpty (theme);
@@ -30,7 +30,7 @@ public class ThemeTests
 
         Assert.Equal (LineStyle.Double, FrameView.DefaultBorderStyle);
 
-        Reset ();
+        ResetAllSettings ();
     }
 
     [Fact]
@@ -38,9 +38,9 @@ public class ThemeTests
     public void TestApply_UpdatesColors ()
     {
         // Arrange
-        Reset ();
+        ResetAllSettings ();
 
-        Assert.False (Colors.Schemes.ContainsKey ("test"));
+        Assert.False (SchemeManager.Schemes.ContainsKey ("test"));
 
         var theme = new ThemeScope ();
         Assert.NotEmpty (theme);
@@ -66,21 +66,21 @@ public class ThemeTests
         Themes! [ThemeManager.SelectedTheme]!.Apply ();
 
         // Assert
-        Scheme updatedScheme = Colors.Schemes ["test"];
+        Scheme updatedScheme = SchemeManager.Schemes ["test"];
         Assert.Equal (new Color (Color.Red), updatedScheme.Normal.Foreground);
         Assert.Equal (new Color (Color.Green), updatedScheme.Normal.Background);
 
         // remove test Scheme from Colors to avoid failures on others unit tests with Scheme
-        Colors.Schemes.Remove ("test");
-        Assert.Equal (5, Colors.Schemes.Count);
-        Reset ();
+        SchemeManager.Schemes.Remove ("test");
+        Assert.Equal (5, SchemeManager.Schemes.Count);
+        ResetAllSettings ();
     }
 
     [Fact]
     public void TestSerialize_RoundTrip ()
     {
         // This is needed to test only this alone
-        Reset ();
+        ResetAllSettings ();
 
         var theme = new ThemeScope ();
         theme ["Dialog.DefaultButtonAlignment"].PropertyValue = Alignment.End;
@@ -93,25 +93,25 @@ public class ThemeTests
                       Alignment.End,
                       (Alignment)deserialized ["Dialog.DefaultButtonAlignment"].PropertyValue
                      );
-        Reset ();
+        ResetAllSettings ();
     }
 
     [Fact]
     public void TestUpdatFrom_Add ()
     {
         // arrange
-        Reset ();
+        ResetAllSettings ();
 
         var theme = new ThemeScope ();
         Assert.NotEmpty (theme);
 
-        Assert.Equal (5, Colors.Schemes.Count);
+        Assert.Equal (5, SchemeManager.Schemes.Count);
 
-        theme ["Schemes"].PropertyValue = Colors.Schemes;
+        theme ["Schemes"].PropertyValue = SchemeManager.Schemes;
 
         Dictionary<string, Scheme> schemes =
             (Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue;
-        Assert.Equal (Colors.Schemes.Count, schemes.Count);
+        Assert.Equal (SchemeManager.Schemes.Count, schemes.Count);
 
         var newTheme = new ThemeScope ();
 
@@ -126,14 +126,14 @@ public class ThemeTests
             Disabled = new Attribute (Color.Gray, Color.DarkGray)
         };
 
-        newTheme ["Schemes"].PropertyValue = Colors.Reset ();
-        Assert.Equal (5, Colors.Schemes.Count);
+        newTheme ["Schemes"].PropertyValue = SchemeManager.GetDefaultSchemes ();
+        Assert.Equal (5, SchemeManager.Schemes.Count);
 
         // add a new Scheme to the newTheme
         ((Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue) ["test"] = scheme;
 
         schemes = (Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue;
-        Assert.Equal (Colors.Schemes.Count, schemes.Count);
+        Assert.Equal (SchemeManager.Schemes.Count, schemes.Count);
 
         // Act
         theme.Update (newTheme);
@@ -142,14 +142,14 @@ public class ThemeTests
         schemes = (Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue;
         Assert.Equal (schemes ["Test"].Normal, scheme.Normal);
         Assert.Equal (schemes ["Test"].Focus, scheme.Focus);
-        Reset ();
+        ResetAllSettings ();
     }
 
     [Fact]
     public void TestUpdatFrom_Change ()
     {
         // arrange
-        Reset ();
+        ResetAllSettings ();
 
         var theme = new ThemeScope ();
         Assert.NotEmpty (theme);
@@ -164,7 +164,7 @@ public class ThemeTests
             HotFocus = new Attribute (Color.Green, Color.BrightGreen),
             Disabled = new Attribute (Color.Gray, Color.DarkGray)
         };
-        theme ["Schemes"].PropertyValue = Colors.Reset ();
+        theme ["Schemes"].PropertyValue = SchemeManager.GetDefaultSchemes ();
         ((Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue) ["test"] = scheme;
 
         Dictionary<string, Scheme> schemes =
@@ -183,7 +183,7 @@ public class ThemeTests
             HotFocus = scheme.HotFocus,
             Disabled = scheme.Disabled
         };
-        newTheme ["Schemes"].PropertyValue = Colors.Reset ();
+        newTheme ["Schemes"].PropertyValue = SchemeManager.GetDefaultSchemes ();
         ((Dictionary<string, Scheme>)newTheme ["Schemes"].PropertyValue) ["test"] = newScheme;
 
         // Act
@@ -197,6 +197,6 @@ public class ThemeTests
         Assert.Equal (new Color (Color.BrightBlue), schemes ["Test"].Normal.Background);
         Assert.Equal (new Color (Color.Cyan), schemes ["Test"].Focus.Foreground);
         Assert.Equal (new Color (Color.BrightCyan), schemes ["Test"].Focus.Background);
-        Reset ();
+        ResetAllSettings ();
     }
 }

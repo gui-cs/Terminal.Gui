@@ -99,7 +99,7 @@ public static partial class Application // Initialization (Init/Shutdown)
                 if (Locations == ConfigLocations.All)
                 {
                     Locations = ConfigLocations.Default;
-                    Reset ();
+                    ResetAllSettings ();
                 }
             }
         }

@@ -66,7 +66,7 @@ public class Threading : Scenario
             Y = Pos.Y (_btnActionCancel) + 6,
             Width = 10,
             Height = 10,
-            Scheme = Colors.Schemes ["TopLevel"]
+            Scheme = SchemeManager.Schemes ["TopLevel"]
         };
 
         win.Add (new Label { X = Pos.Right (_itemsList) + 10, Y = Pos.Y (_btnActionCancel) + 4, Text = "Task Logs:" });
@@ -77,7 +77,7 @@ public class Threading : Scenario
             Y = Pos.Y (_itemsList),
             Width = 50,
             Height = Dim.Fill (),
-            Scheme = Colors.Schemes ["TopLevel"],
+            Scheme = SchemeManager.Schemes ["TopLevel"],
             Source = new ListWrapper<string> (_log)
         };
 

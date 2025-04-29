@@ -79,7 +79,7 @@ public class MenuBar : View, IDesignable
         _selected = -1;
         _selectedSub = -1;
         // ReSharper disable once VirtualMemberCallInConstructor
-        Scheme = Colors.Schemes ["Menu"];
+        Scheme = SchemeManager.Schemes ["Menu"];
         // ReSharper disable once VirtualMemberCallInConstructor
         WantMousePositionReports = true;
         IsMenuOpen = false;

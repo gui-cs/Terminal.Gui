@@ -1635,7 +1635,7 @@ Les Miśerables",
             //Application.Top.Scheme = Colors.Schemes ["Base"];
             _textField = new ()
             {
-                Scheme = new (Colors.Schemes ["Base"]),
+                Scheme = new (SchemeManager.Schemes ["Base"]),
 
                 //                1         2         3 
                 //      01234567890123456789012345678901=32 (Length)

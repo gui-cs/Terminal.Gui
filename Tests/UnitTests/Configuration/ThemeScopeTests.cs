@@ -19,7 +19,7 @@ public class ThemeScopeTests
     [AutoInitShutdown (configLocation: ConfigLocations.Default)]
     public void AllThemesPresent ()
     {
-        Reset ();
+        ResetAllSettings ();
         Assert.True (Themes.ContainsKey ("Default"));
         Assert.True (Themes.ContainsKey ("Dark"));
         Assert.True (Themes.ContainsKey ("Light"));
@@ -29,7 +29,7 @@ public class ThemeScopeTests
     [AutoInitShutdown (configLocation: ConfigLocations.Default)]
     public void Apply_ShouldApplyUpdatedProperties ()
     {
-        Reset ();
+        ResetAllSettings ();
         Assert.NotEmpty (Themes);
         Alignment savedValue = Dialog.DefaultButtonAlignment;
         Alignment newValue = Alignment.Center != savedValue ? Alignment.Center : Alignment.Start;
@@ -48,8 +48,8 @@ public class ThemeScopeTests
     [Fact]
     public void GetHardCodedDefaults_ShouldSetProperties ()
     {
-        Reset ();
-        GetHardCodedDefaults ();
+        ResetAllSettings ();
+        ResetToCurrentValues ();
         Assert.NotEmpty (Themes);
         Assert.Equal ("Default", Themes.Theme);
     }
@@ -58,7 +58,7 @@ public class ThemeScopeTests
     [AutoInitShutdown (configLocation: ConfigLocations.Default)]
     public void TestSerialize_RoundTrip ()
     {
-        Reset ();
+        ResetAllSettings ();
 
         Dictionary<string, ThemeScope> initial = ThemeManager.Themes;
 
@@ -75,7 +75,7 @@ public class ThemeScopeTests
     [AutoInitShutdown (configLocation: ConfigLocations.Default)]
     public void ThemeManager_ClassMethodsWork ()
     {
-        Reset ();
+        ResetAllSettings ();
         Assert.Equal (ThemeManager.Instance, Themes);
         Assert.NotEmpty (ThemeManager.Themes);
 

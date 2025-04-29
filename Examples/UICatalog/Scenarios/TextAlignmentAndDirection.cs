@@ -46,7 +46,7 @@ public class TextAlignmentAndDirection : Scenario
             Width = 6,
             Height = 1,
             TextAlignment = Alignment.End,
-            Scheme = Colors.Schemes ["Dialog"],
+            Scheme = SchemeManager.Schemes ["Dialog"],
             Text = "Start",
         };
 
@@ -57,7 +57,7 @@ public class TextAlignmentAndDirection : Scenario
             Width = 6,
             Height = 1,
             TextAlignment = Alignment.End,
-            Scheme = Colors.Schemes ["Dialog"],
+            Scheme = SchemeManager.Schemes ["Dialog"],
             Text = "Center"
         };
 
@@ -68,7 +68,7 @@ public class TextAlignmentAndDirection : Scenario
             Width = 6,
             Height = 1,
             TextAlignment = Alignment.End,
-            Scheme = Colors.Schemes ["Dialog"],
+            Scheme = SchemeManager.Schemes ["Dialog"],
             Text = "End"
         };
 
@@ -79,7 +79,7 @@ public class TextAlignmentAndDirection : Scenario
             Width = 6,
             Height = 1,
             TextAlignment = Alignment.End,
-            Scheme = Colors.Schemes ["Dialog"],
+            Scheme = SchemeManager.Schemes ["Dialog"],
             Text = "Fill"
         };
 

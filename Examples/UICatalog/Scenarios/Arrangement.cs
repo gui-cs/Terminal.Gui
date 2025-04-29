@@ -176,7 +176,7 @@ public class Arrangement : Scenario
             Y = 17,
             Id = "datePicker",
             Title = "Not _Sizeable",
-            Scheme = Colors.Schemes ["Toplevel"],
+            Scheme = SchemeManager.Schemes ["Toplevel"],
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,
             TabStop = TabBehavior.TabGroup,
@@ -228,7 +228,7 @@ public class Arrangement : Scenario
             Width = Dim.Auto (minimumContentDim: 15),
             Height = Dim.Auto (minimumContentDim: 3),
             Title = $"Overlapped{id} _{GetNextHotKey ()}",
-            Scheme = Colors.Schemes ["Toplevel"],
+            Scheme = SchemeManager.Schemes ["Toplevel"],
             Id = $"Overlapped{id}",
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,
@@ -353,7 +353,7 @@ public class TransparentView : FrameView
         Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
         ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent | Terminal.Gui.ViewportSettings.TransparentMouse;
         BorderStyle = LineStyle.RoundedDotted;
-        base.Scheme = Colors.Schemes ["Menu"];
+        base.Scheme = SchemeManager.Schemes ["Menu"];
 
         var transparentSubView = new View ()
         {
@@ -369,14 +369,14 @@ public class TransparentView : FrameView
             //ViewportSettings = Terminal.Gui.ViewportSettings.Transparent
         };
         transparentSubView.Border.Thickness = new (1, 1, 1, 1);
-        transparentSubView.Scheme = Colors.Schemes ["Dialog"];
+        transparentSubView.Scheme = SchemeManager.Schemes ["Dialog"];
 
         Button button = new Button ()
         {
             Title = "_Opaque Shadows No Worky",
             X = Pos.Center (),
             Y = 4,
-            Scheme = Colors.Schemes ["Dialog"],
+            Scheme = SchemeManager.Schemes ["Dialog"],
         };
 
         button.ClearingViewport += (sender, args) =>

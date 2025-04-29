@@ -87,7 +87,7 @@ public class Keys : Scenario
             Height = Dim.Fill (),
             Source = new ListWrapper<string> (keyList)
         };
-        appKeyListView.Scheme = Colors.Schemes ["TopLevel"];
+        appKeyListView.Scheme = SchemeManager.Schemes ["TopLevel"];
         win.Add (appKeyListView);
 
         // View key events...
@@ -115,7 +115,7 @@ public class Keys : Scenario
             Height = Dim.Fill (),
             Source = new ListWrapper<string> (keyDownList)
         };
-        onKeyDownListView.Scheme = Colors.Schemes ["TopLevel"];
+        onKeyDownListView.Scheme = SchemeManager.Schemes ["TopLevel"];
         win.Add (onKeyDownListView);
 
         // KeyDownNotHandled
@@ -135,7 +135,7 @@ public class Keys : Scenario
             Height = Dim.Fill (),
             Source = new ListWrapper<string> (keyDownNotHandledList)
         };
-        onKeyDownNotHandledListView.Scheme = Colors.Schemes ["TopLevel"];
+        onKeyDownNotHandledListView.Scheme = SchemeManager.Schemes ["TopLevel"];
         win.Add (onKeyDownNotHandledListView);
 
 
@@ -156,7 +156,7 @@ public class Keys : Scenario
             Height = Dim.Fill (),
             Source = new ListWrapper<string> (swallowedList)
         };
-        onSwallowedListView.Scheme = Colors.Schemes ["TopLevel"];
+        onSwallowedListView.Scheme = SchemeManager.Schemes ["TopLevel"];
         win.Add (onSwallowedListView);
 
         if (Application.Driver is IConsoleDriverFacade fac)

@@ -33,7 +33,7 @@ public partial class Toplevel : View
         Arrangement = ViewArrangement.Overlapped;
         Width = Dim.Fill ();
         Height = Dim.Fill ();
-        base.Scheme = Colors.Schemes ["TopLevel"];
+        base.Scheme = SchemeManager.Schemes ["TopLevel"];
         MouseClick += Toplevel_MouseClick;
     }
 

@@ -19,13 +19,13 @@ public class AppScopeTests
     [AutoInitShutdown (configLocation: ConfigLocations.Default)]
     public void Apply_ShouldApplyUpdatedProperties ()
     {
-        Reset ();
+        ResetAllSettings ();
         Assert.Null (AppSettingsTestClass.TestProperty);
         Assert.NotEmpty (AppSettings);
         Assert.Null (AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue);
 
         AppSettingsTestClass.TestProperty = true;
-        Reset ();
+        ResetAllSettings ();
         Assert.True (AppSettingsTestClass.TestProperty);
         Assert.NotEmpty (AppSettings);
         Assert.Null (AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue as bool?);
@@ -53,13 +53,13 @@ public class AppScopeTests
         Assert.Null (AppSettingsTestClass.TestProperty);
 
         Initialize ();
-        GetHardCodedDefaults ();
+        ResetToCurrentValues ();
         Apply ();
         Assert.Null (AppSettingsTestClass.TestProperty);
 
         AppSettingsTestClass.TestProperty = true;
         Initialize ();
-        GetHardCodedDefaults ();
+        ResetToCurrentValues ();
         Assert.NotNull (AppSettingsTestClass.TestProperty);
         Apply ();
         Assert.NotNull (AppSettingsTestClass.TestProperty);
@@ -68,7 +68,7 @@ public class AppScopeTests
     [Fact]
     public void TestSerialize_RoundTrip ()
     {
-        Reset ();
+        ResetAllSettings ();
 
         AppScope initial = AppSettings;
 

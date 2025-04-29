@@ -85,7 +85,7 @@ public class ScenarioTests : TestsAllViews
 
         // Restore the configuration locations
         ConfigurationManager.Locations = savedConfigLocations;
-        ConfigurationManager.Reset ();
+        ConfigurationManager.ResetAllSettings ();
 
         return;
 
@@ -123,7 +123,7 @@ public class ScenarioTests : TestsAllViews
 
             // Restore the configuration locations
             ConfigurationManager.Locations = savedConfigLocations;
-            ConfigurationManager.Reset ();
+            ConfigurationManager.ResetAllSettings ();
 
             Application.ResetState (true);
 
@@ -182,7 +182,7 @@ public class ScenarioTests : TestsAllViews
             Width = 15,
             Height = Dim.Fill (1), // for status bar
             CanFocus = false,
-            Scheme = Colors.Schemes ["TopLevel"]
+            Scheme = SchemeManager.Schemes ["TopLevel"]
         };
 
         ListView classListView = new ()
@@ -192,7 +192,7 @@ public class ScenarioTests : TestsAllViews
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             AllowsMarking = false,
-            Scheme = Colors.Schemes ["TopLevel"],
+            Scheme = SchemeManager.Schemes ["TopLevel"],
             Source = new ListWrapper<string> (new (viewClasses.Keys.ToList ()))
         };
         leftPane.Add (classListView);
@@ -204,7 +204,7 @@ public class ScenarioTests : TestsAllViews
             Width = Dim.Fill (),
             Height = 10,
             CanFocus = false,
-            Scheme = Colors.Schemes ["TopLevel"],
+            Scheme = SchemeManager.Schemes ["TopLevel"],
             Title = "Settings"
         };
 
@@ -270,7 +270,7 @@ public class ScenarioTests : TestsAllViews
             Y = Pos.Bottom (settingsPane),
             Width = Dim.Fill (),
             Height = Dim.Fill (1), // + 1 for status bar
-            Scheme = Colors.Schemes ["Dialog"]
+            Scheme = SchemeManager.Schemes ["Dialog"]
         };
 
         classListView.OpenSelectedItem += (s, a) => { settingsPane.SetFocus (); };
@@ -381,7 +381,7 @@ public class ScenarioTests : TestsAllViews
 
         // Restore the configuration locations
         ConfigurationManager.Locations = savedConfigLocations;
-        ConfigurationManager.Reset ();
+        ConfigurationManager.ResetAllSettings ();
 
         void DimPosChanged (View? view)
         {
@@ -554,7 +554,7 @@ public class ScenarioTests : TestsAllViews
             }
 
             // Set the colorscheme to make it stand out if is null by default
-            view.Scheme ??= Colors.Schemes ["Base"];
+            view.Scheme ??= SchemeManager.Schemes ["Base"];
 
             // If the view supports a Text property, set it so we have something to look at
             if (view.GetType ().GetProperty ("Text") != null)
@@ -680,7 +680,7 @@ public class ScenarioTests : TestsAllViews
 
         // Restore the configuration locations
         ConfigurationManager.Locations = savedConfigLocations;
-        ConfigurationManager.Reset ();
+        ConfigurationManager.ResetAllSettings ();
 
 #if DEBUG_IDISPOSABLE
         Assert.Empty (View.Instances);

@@ -8,7 +8,6 @@ using System.Runtime.Versioning;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.Extensions.Logging;
 
 #nullable enable
 
@@ -54,8 +53,9 @@ namespace Terminal.Gui;
 [ComponentGuarantees (ComponentGuaranteesOptions.None)]
 public static class ConfigurationManager
 {
+
     /// <summary>
-    ///     A dictionary of all properties in the Terminal.Gui project that are decorated with the
+    ///     A cache of all properties in the Terminal.Gui project that are decorated with the
     ///     <see cref="SerializableConfigurationProperty"/> attribute. The keys are the property names pre-pended with the
     ///     class that implements the property (e.g. <c>Application.UseSystemConsole</c>). The values are instances of
     ///     <see cref="ConfigProperty"/> which hold the property's value and the <see cref="PropertyInfo"/> that allows
@@ -64,6 +64,59 @@ public static class ConfigurationManager
     /// <remarks>Is <see langword="null"/> until <see cref="Initialize"/> is called.</remarks>
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     internal static Dictionary<string, ConfigProperty>? _allConfigProperties;
+
+    /// <summary>
+    ///     A cache of all classes that have properties decorated with the <see cref="SerializableConfigurationProperty"/>.
+    /// </summary>
+    /// <remarks>Is <see langword="null"/> until <see cref="Initialize"/> is called.</remarks>
+    [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+    internal static Dictionary<string, Type>? _classesWithConfigProps;
+
+    [RequiresUnreferencedCode ("AOT")]
+    internal static void Initialize ()
+    {
+        Debug.Assert (_allConfigProperties is null);
+        Debug.Assert (_classesWithConfigProps is null);
+        Debug.Assert (_settings is null);
+        Debug.Assert (_themes is null);
+        Debug.Assert (_appSettings is null);
+
+        // Step 1: Cache all classes with configuration properties
+        _classesWithConfigProps = GetClassesWithConfigProperties ();
+
+        // Step 2: Cache all configuration properties
+        _allConfigProperties = GetAllConfigProperties ();
+
+        // Step 3: Sort the properties
+        _allConfigProperties = _allConfigProperties.OrderBy (x => x.Key)
+                                                    .ToDictionary (
+                                                        x => x.Key,
+                                                        x => x.Value,
+                                                        StringComparer.InvariantCultureIgnoreCase);
+    }
+
+
+    internal static void Reset ()
+    {
+        _allConfigProperties = null;
+        _classesWithConfigProps = null;
+        _settings = null;
+        _themes = null;
+        _appSettings = null;
+
+        Locations = ConfigLocations.All;
+
+        // TODO: Should _jsonErrors be reset?
+    }
+
+    /// <summary>
+    ///     Gets whether the <see cref="ConfigurationManager"/> has been initialized.
+    /// </summary>
+    /// <returns></returns>
+    public static bool IsInitialized ()
+    {
+        return _allConfigProperties is { };
+    }
 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     internal static readonly JsonSerializerOptions SerializerOptions = new ()
@@ -96,26 +149,37 @@ public static class ConfigurationManager
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     private static readonly string _configFilename = "config.json";
 
-    /// <summary>The backing property for <see cref="Settings"/>.</summary>
-    /// <remarks>
-    ///     Is <see langword="null"/> until <see cref="Reset"/> is called. Gets set to a new instance by deserialization
-    ///     (see <see cref="Load"/>).
-    /// </remarks>
-    private static SettingsScope? _settings;
+    /// <summary>
+    ///     Gets and sets the locations where <see cref="ConfigurationManager"/> will look for config files. The default value is
+    ///     <see cref="ConfigLocations.All"/>.
+    /// </summary>
+    public static ConfigLocations Locations { get; set; } = ConfigLocations.All;
 
     /// <summary>Name of the running application. By default, this property is set to the application's assembly name.</summary>
     public static string AppName { get; set; } = Assembly.GetEntryAssembly ()?.FullName?.Split (',') [0]?.Trim ()!;
 
-    /// <summary>Application-specific configuration settings scope.</summary>
+    /// <summary>The backing property for <see cref="AppSettings"/> (config settings of <see cref="AppScope"/>).</summary>
+    /// <remarks>
+    ///     Is <see langword="null"/> until <see cref="ResetAllSettings"/> is called. Gets set to a new instance by deserialization
+    ///     (see <see cref="Load"/>).
+    /// </remarks>
+    internal static AppScope? _appSettings;
+
+    /// <summary>Application-specific configuration settings (conifg properties with the <see cref="AppScope"/> scope.</summary>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
     [JsonPropertyName ("AppSettings")]
-    public static AppScope? AppSettings { get; set; }
+    public static AppScope? AppSettings
+    {
+        get => _appSettings;
+        set => _appSettings = value;
+    }
 
-    /// <summary>
-    ///     Gets and sets the locations where <see cref="ConfigurationManager"/> will look for config files. The value is
-    ///     <see cref="ConfigLocations.All"/>.
-    /// </summary>
-    public static ConfigLocations Locations { get; set; } = ConfigLocations.All;
+    /// <summary>The backing property for <see cref="Settings"/> (config settings of <see cref="SettingsScope"/>).</summary>
+    /// <remarks>
+    ///     Is <see langword="null"/> until <see cref="ResetAllSettings"/> is called. Gets set to a new instance by deserialization
+    ///     (see <see cref="Load"/>).
+    /// </remarks>
+    internal static SettingsScope? _settings;
 
     /// <summary>
     ///     The root object of Terminal.Gui configuration settings / JSON schema. Contains only properties with the
@@ -123,26 +187,40 @@ public static class ConfigurationManager
     /// </summary>
     public static SettingsScope? Settings
     {
-        [RequiresUnreferencedCode ("AOT")]
-        [RequiresDynamicCode ("AOT")]
         get
         {
-            if (_settings is null)
-            {
-                // If Settings is null, we need to initialize it.
-                Reset ();
-            }
+            Debug.Assert (IsInitialized ());
+            //if (_settings is null)
+            //{
+            //    // If Settings is null, we need to initialize it.
+            //    ResetAllSettings ();
+            //}
 
             return _settings;
         }
         set => _settings = value!;
     }
 
+
+    /// <summary>The backing property for <see cref="Themes"/> (a Dictionary of named <see cref="ThemeScope"/> objects).</summary>
+    /// <remarks>
+    ///     Is <see langword="null"/> until <see cref="ResetAllSettings"/> is called. Gets set to a new instance by deserialization
+    ///     (see <see cref="Load"/>).
+    /// </remarks>
+    internal static ThemeManager? _themes;
+
     /// <summary>
-    ///     The root object of Terminal.Gui themes manager. Contains only properties with the <see cref="ThemeScope"/>
-    ///     attribute value.
+    ///     The root object of Terminal.Gui themes manager. ThemeManager is a Dictionary of named <see cref="ThemeScope"/> objects.
     /// </summary>
-    public static ThemeManager? Themes => ThemeManager.Instance;
+    public static ThemeManager? Themes
+    {
+        get
+        {
+            Debug.Assert (IsInitialized ());
+            return _themes;
+        }
+        set => _themes = value!;
+    }
 
     /// <summary>
     ///     Gets or sets whether the <see cref="ConfigurationManager"/> should throw an exception if it encounters an
@@ -224,9 +302,9 @@ public static class ConfigurationManager
     ///     <see cref="SerializableConfigurationProperty"/> to the defaults.
     /// </summary>
     /// <remarks>
-    /// <para>
-    ///     Use <see cref="Apply"/> to cause the loaded settings to be applied to the running application.
-    /// </para>
+    ///     <para>
+    ///         Use <see cref="Apply"/> to cause the loaded settings to be applied to the running application.
+    ///     </para>
     /// </remarks>
     /// <param name="reset">
     ///     If <see langword="true"/> the state of <see cref="ConfigurationManager"/> will be reset to the
@@ -240,7 +318,7 @@ public static class ConfigurationManager
 
         if (reset)
         {
-            Reset ();
+            ResetAllSettings ();
         }
 
         if (Locations.HasFlag (ConfigLocations.AppResources))
@@ -274,7 +352,6 @@ public static class ConfigurationManager
             Settings?.Update ($"~/.tui/{_configFilename}", ConfigLocations.GlobalHome);
         }
 
-
         if (Locations.HasFlag (ConfigLocations.AppCurrent))
         {
             Settings?.Update ($"./.tui/{AppName}.{_configFilename}", ConfigLocations.AppCurrent);
@@ -285,7 +362,7 @@ public static class ConfigurationManager
             Settings?.Update ($"~/.tui/{AppName}.{_configFilename}", ConfigLocations.AppHome);
         }
 
-        ThemeManager.SelectedTheme = Settings!["Theme"].PropertyValue as string ?? "Default";
+        ThemeManager.SelectedTheme = Settings! ["Theme"].PropertyValue as string ?? "Default";
     }
 
     /// <summary>
@@ -326,7 +403,6 @@ public static class ConfigurationManager
         }
     }
 
-
     /// <summary>
     ///     Logs Json deserialization errors that occurred during deserialization.
     /// </summary>
@@ -335,34 +411,38 @@ public static class ConfigurationManager
         if (_jsonErrors.Length > 0)
         {
             Logging.Error (
-                               @"Encountered the following errors while deserializing configuration files:"
-                              );
+                           @"Encountered the following errors while deserializing configuration files:"
+                          );
             Logging.Error (_jsonErrors.ToString ());
         }
     }
 
     /// <summary>
-    ///     Resets the state of <see cref="ConfigurationManager"/>. Should be called whenever a new app session (e.g. in
+    ///     Resets all settings managed by <see cref="ConfigurationManager"/> to the values in the <see cref="ConfigLocations.Default"/> resource.
+    ///     Should be called whenever a new app session (e.g. in
     ///     <see cref="Application.Init"/> starts. Called by <see cref="Load"/> if the <c>reset</c> parameter is
     ///     <see langword="true"/>.
     /// </summary>
-    /// <remarks></remarks>
+    /// <remarks>If <see cref="Locations"/> does not include <see cref="ConfigLocations.Default"/>, the settings will all be <see langword="null"/> or <see langword="default"/>.</remarks>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public static void Reset ()
+    public static void ResetAllSettings ()
     {
-        Logging.Trace ($"_allConfigProperties = {_allConfigProperties}");
-
-        if (_allConfigProperties is null)
+        if (!IsInitialized ())
         {
-            Initialize ();
+            throw new InvalidOperationException ("Initialize must be called first.");
         }
 
         ClearJsonErrors ();
 
-        Settings = new ();
+        Settings = new SettingsScope ();
         ThemeManager.Reset ();
+        Themes = ThemeManager.Instance;
+        Settings ["Theme"].PropertyValue = Themes.Theme;
+        Settings ["Themes"].PropertyValue = Themes;
         AppSettings = new ();
+
+       // Debug.Assert (Locations.HasFlag (ConfigLocations.Default));
 
         // To enable some unit tests, we only load from resources if the flag is set
         if (Locations.HasFlag (ConfigLocations.Default))
@@ -492,9 +572,9 @@ public static class ConfigurationManager
         return destination;
     }
 
-
     /// <summary>
-    ///     Retrieves the hard coded default settings (static properites) from the Terminal.Gui library implementation. Used in
+    ///     Resets ConfigurationManager to the current values of the static properites attributed with
+    ///     <see cref="SerializableConfigurationProperty"/> in the Terminal.Gui library. Used in
     ///     development of
     ///     the library to generate the default configuration file.
     /// </summary>
@@ -511,15 +591,15 @@ public static class ConfigurationManager
     /// </remarks>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    internal static void GetHardCodedDefaults ()
+    internal static void ResetToCurrentValues ()
     {
-        if (_allConfigProperties is null)
+        if (!IsInitialized ())
         {
             throw new InvalidOperationException ("Initialize must be called first.");
         }
 
         Settings = new ();
-        ThemeManager.GetHardCodedDefaults ();
+        ThemeManager.ResetToCurrentValues ();
         AppSettings?.RetrieveValues ();
 
         foreach (KeyValuePair<string, ConfigProperty> p in Settings!.Where (cp => cp.Value.PropertyInfo is { }))
@@ -529,95 +609,88 @@ public static class ConfigurationManager
     }
 
     /// <summary>
-    ///     Initializes the internal state of ConfigurationManager. Nominally called once as part of application startup
-    ///     to initialize global state. Also called from some Unit Tests to ensure correctness (e.g. Reset()).
+    /// Retrieves a dictionary of classes with configuration properties.
     /// </summary>
     [RequiresUnreferencedCode ("AOT")]
-    internal static void Initialize ()
+    private static Dictionary<string, Type> GetClassesWithConfigProperties ()
     {
-        _allConfigProperties = new ();
-        _settings = null;
+        var classesWithConfigProps = new Dictionary<string, Type> (StringComparer.InvariantCultureIgnoreCase);
 
-        Dictionary<string, Type> classesWithConfigProps = new (StringComparer.InvariantCultureIgnoreCase);
+        var types = from assembly in AppDomain.CurrentDomain.GetAssemblies ()
+                    from type in assembly.GetTypes ()
+                    where type.GetProperties ()
+                              .Any (prop => prop.GetCustomAttribute (typeof (SerializableConfigurationProperty)) != null)
+                    select type;
 
-        // Get Terminal.Gui.dll classes
-
-        IEnumerable<Type> types = from assembly in AppDomain.CurrentDomain.GetAssemblies ()
-                                  from type in assembly.GetTypes ()
-                                  where type.GetProperties ()
-                                            .Any (
-                                                  prop => prop.GetCustomAttribute (
-                                                                                   typeof (SerializableConfigurationProperty)
-                                                                                  )
-                                                          != null
-                                                 )
-                                  select type;
-
-        foreach (Type? classWithConfig in types)
+        foreach (var classWithConfig in types)
         {
             classesWithConfigProps.Add (classWithConfig.Name, classWithConfig);
         }
 
-        //Logging.Trace ($"ConfigManager.getConfigProperties found {classesWithConfigProps.Count} classes:");
-        classesWithConfigProps.ToList ().ForEach (x => Logging.Trace ($"  Class: {x.Key}"));
+        return classesWithConfigProps;
+    }
 
-        foreach (PropertyInfo? p in from c in classesWithConfigProps
-                                    let props = c.Value
-                                                 .GetProperties (
-                                                                 BindingFlags.Instance
-                                                                 |
-                                                                 BindingFlags.Static
-                                                                 |
-                                                                 BindingFlags.NonPublic
-                                                                 |
-                                                                 BindingFlags.Public
-                                                                )
-                                                 .Where (
-                                                         prop =>
-                                                             prop.GetCustomAttribute (
-                                                                                      typeof (SerializableConfigurationProperty)
-                                                                                     ) is
-                                                                 SerializableConfigurationProperty
-                                                        )
-                                    let enumerable = props
-                                    from p in enumerable
-                                    select p)
+    /// <summary>
+    /// Retrieves all configuration properties
+    /// </summary>
+    [RequiresUnreferencedCode ("AOT")]
+    private static Dictionary<string, ConfigProperty> GetAllConfigProperties ()
+    {
+        var allConfigProperties = new Dictionary<string, ConfigProperty> (StringComparer.InvariantCultureIgnoreCase);
+
+        foreach (var property in from c in _classesWithConfigProps
+                                 let props = c.Value.GetProperties (
+                                     BindingFlags.Instance |
+                                     BindingFlags.Static |
+                                     BindingFlags.NonPublic |
+                                     BindingFlags.Public)
+                                 .Where (prop => prop.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is SerializableConfigurationProperty)
+                                 from property in props
+                                 select property)
         {
-            if (p.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is SerializableConfigurationProperty
-                scp)
+            if (property.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is SerializableConfigurationProperty scp)
             {
-                if (p.GetGetMethod (true)!.IsStatic)
+                if (property.GetGetMethod (true)!.IsStatic)
                 {
-                    // If the class name is omitted, JsonPropertyName is allowed. 
-                    _allConfigProperties!.Add (
-                                               scp.OmitClassName
-                                                   ? ConfigProperty.GetJsonPropertyName (p)
-                                                   : $"{p.DeclaringType?.Name}.{p.Name}",
-                                               new () { PropertyInfo = p, PropertyValue = null }
-                                              );
+                    var key = scp.OmitClassName
+                        ? ConfigProperty.GetJsonPropertyName (property)
+                        : $"{property.DeclaringType?.Name}.{property.Name}";
+
+                    allConfigProperties.Add (key, new ConfigProperty
+                    {
+                        PropertyInfo = property,
+                        PropertyValue = null
+                    });
                 }
                 else
                 {
-                    throw new (
-                               $"Property {p.Name} in class {p.DeclaringType?.Name} is not static. All SerializableConfigurationProperty properties must be static."
-                              );
+                    throw new InvalidOperationException (
+                        $"Property {property.Name} in class {property.DeclaringType?.Name} is not static. All SerializableConfigurationProperty properties must be static.");
                 }
             }
         }
 
-        _allConfigProperties = _allConfigProperties!.OrderBy (x => x.Key)
-                                                    .ToDictionary (
-                                                                   x => x.Key,
-                                                                   x => x.Value,
-                                                                   StringComparer.InvariantCultureIgnoreCase
-                                                                  );
-
-        //Logging.Trace ($"Found {_allConfigProperties.Count} properties:");
-
-        //_allConfigProperties.ToList ().ForEach (x => Logging.Trace ($"  Property: {x.Key}"));
-
-        AppSettings = new ();
+        return allConfigProperties;
     }
+
+    /// <summary>
+    /// Retrieves all configuration properties that belong to a specific scope.
+    /// </summary>
+    [RequiresUnreferencedCode ("AOT")]
+    internal static IEnumerable<KeyValuePair<string, ConfigProperty>> GetConfigPropertiesByScope (Type scopeType)
+    {
+        Dictionary<string, ConfigProperty>? allProperties = _allConfigProperties;
+        if (!IsInitialized ())
+        {
+            // If CM has not been initialized, we return the a new list
+            // PERFORMANCE: This should not be used in situations where perf is important.
+            allProperties = GetAllConfigProperties ();
+        }
+        // Filter properties by scope
+        return allProperties!.Where (cp =>
+                                         cp.Value.PropertyInfo?.GetCustomAttribute<SerializableConfigurationProperty> ()?.Scope == scopeType);
+    }
+
 
     /// <summary>Creates a JSON document with the configuration specified.</summary>
     /// <returns></returns>

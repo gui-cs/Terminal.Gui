@@ -29,6 +29,7 @@ public class SettingsScope : Scope<SettingsScope>
     /// <summary>The list of paths to the configuration files.</summary>
     public Dictionary<ConfigLocations, string> Sources { get; } = new ();
 
+    // TODO: This should be in ConfiguraionManager
     /// <summary>Points to our JSON schema.</summary>
     [JsonInclude]
     [JsonPropertyName ("$schema")]

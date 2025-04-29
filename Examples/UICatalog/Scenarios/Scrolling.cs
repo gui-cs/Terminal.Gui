@@ -137,7 +137,7 @@ public class DemoView : View
 {
     public DemoView ()
     {
-        base.Scheme = Colors.Schemes ["TopLevel"];
+        base.Scheme = SchemeManager.Schemes ["TopLevel"];
         CanFocus = true;
         BorderStyle = LineStyle.Heavy;
         Arrangement = ViewArrangement.Resizable;
@@ -158,7 +158,7 @@ public class DemoView : View
         rulerView.Border!.Thickness = new (1);
         rulerView.Border.LineStyle = LineStyle.None;
         rulerView.Border.Diagnostics = ViewDiagnosticFlags.Ruler;
-        rulerView.Border.Scheme = Colors.Schemes ["Error"];
+        rulerView.Border.Scheme = SchemeManager.Schemes ["Error"];
 
         Add (rulerView);
 
@@ -197,7 +197,7 @@ public class DemoView : View
                  X = Pos.Left (pressMeButton),
                  Y = Pos.Bottom (aLongButton) + 1,
                  Width = 50,
-                 Scheme = Colors.Schemes ["Dialog"],
+                 Scheme = SchemeManager.Schemes ["Dialog"],
                  Text = "This is a test of..."
              }
             );
@@ -208,7 +208,7 @@ public class DemoView : View
                  X = Pos.Left (pressMeButton),
                  Y = Pos.Bottom (aLongButton) + 3,
                  Width = 50,
-                 Scheme = Colors.Schemes ["Dialog"],
+                 Scheme = SchemeManager.Schemes ["Dialog"],
                  Text = "... the emergency broadcast system."
              }
             );
@@ -219,7 +219,7 @@ public class DemoView : View
                  X = Pos.Left (pressMeButton),
                  Y = 40,
                  Width = 50,
-                 Scheme = Colors.Schemes ["Error"],
+                 Scheme = SchemeManager.Schemes ["Error"],
                  Text = "Last line - Beyond content area @ Y = 40"
              }
             );

@@ -33,7 +33,6 @@ public class SchemeJsonConverterTests
     //		}
     //	}";
     [Fact]
-    [AutoInitShutdown]
     public void TestSchemesSerialization ()
     {
         // Arrange

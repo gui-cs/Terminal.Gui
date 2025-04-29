@@ -133,11 +133,11 @@ internal class NumericUpDownEditor<T> : View where T : notnull
                 }
                 catch (System.FormatException)
                 {
-                    _value.Scheme = Colors.Schemes ["Error"];
+                    _value.Scheme = SchemeManager.Schemes ["Error"];
                 }
                 catch (InvalidCastException)
                 {
-                    _value.Scheme = Colors.Schemes ["Error"];
+                    _value.Scheme = SchemeManager.Schemes ["Error"];
                 }
                 finally
                 {
@@ -181,11 +181,11 @@ internal class NumericUpDownEditor<T> : View where T : notnull
                 }
                 catch (System.FormatException)
                 {
-                    _format.Scheme = Colors.Schemes ["Error"];
+                    _format.Scheme = SchemeManager.Schemes ["Error"];
                 }
                 catch (InvalidCastException)
                 {
-                    _format.Scheme = Colors.Schemes ["Error"];
+                    _format.Scheme = SchemeManager.Schemes ["Error"];
                 }
                 finally
                 {
@@ -236,11 +236,11 @@ internal class NumericUpDownEditor<T> : View where T : notnull
                 }
                 catch (System.FormatException)
                 {
-                    _increment.Scheme = Colors.Schemes ["Error"];
+                    _increment.Scheme = SchemeManager.Schemes ["Error"];
                 }
                 catch (InvalidCastException)
                 {
-                    _increment.Scheme = Colors.Schemes ["Error"];
+                    _increment.Scheme = SchemeManager.Schemes ["Error"];
                 }
                 finally
                 {

@@ -58,6 +58,28 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         HotFocus = hotFocus;
     }
 
+
+    /// <summary>
+    /// Gets the <see cref="Attribute"/> associated with a specified <see cref="VisualRole"/>.
+    /// </summary>
+    /// <param name="role">The semantic <see cref="VisualRole"/> describing the element being rendered.</param>
+    /// <returns>The corresponding <see cref="Attribute"/> from the <see cref="Scheme"/>.</returns>
+    public Attribute GetAttributeForRole (VisualRole role)
+    {
+        return role switch
+               {
+                   VisualRole.Normal => Normal,
+                   VisualRole.HotNormal => HotNormal,
+                   VisualRole.Focus => Focus,
+                   VisualRole.HotFocus => HotFocus,
+                   //VisualRole.Active => Active,
+                   //VisualRole.HotActive => HotActive,
+                   VisualRole.Disabled => Disabled,
+                   //VisualRole.ReadOnly => ReadOnly,
+                   _ => Normal
+               };
+    }
+
     /// <summary>The default foreground and background color for text when the view is disabled.</summary>
     public Attribute Disabled { get; init; }
 

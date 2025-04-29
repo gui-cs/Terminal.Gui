@@ -96,7 +96,7 @@ public class LoginView : Window, IViewFor<LoginViewModel>
 
                 ViewModel
                     .WhenAnyValue (x => x.IsValid)
-                    .Select (valid => valid ? Colors.Schemes ["Base"] : Colors.Schemes ["Error"])
+                    .Select (valid => valid ? SchemeManager.Schemes ["Base"] : SchemeManager.Schemes ["Error"])
                     .BindTo (validation, x => x.Scheme)
                     .DisposeWith (_disposable);
             })

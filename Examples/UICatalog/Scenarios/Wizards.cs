@@ -21,7 +21,7 @@ public class Wizards : Scenario
             X = Pos.Center (),
             Y = 0,
             Width = Dim.Percent (75),
-            Scheme = Colors.Schemes ["Base"],
+            Scheme = SchemeManager.Schemes ["Base"],
             Title = "Wizard Options"
         };
         win.Add (frame);
@@ -99,7 +99,7 @@ public class Wizards : Scenario
 
         var actionLabel = new Label
         {
-            X = Pos.Right (label), Y = Pos.AnchorEnd (1), Scheme = Colors.Schemes ["Error"]
+            X = Pos.Right (label), Y = Pos.AnchorEnd (1), Scheme = SchemeManager.Schemes ["Error"]
         };
         win.Add (actionLabel);
 
@@ -278,7 +278,7 @@ public class Wizards : Scenario
                                                Width = Dim.Fill (),
                                                WordWrap = true,
                                                AllowsTab = false,
-                                               Scheme = Colors.Schemes ["Base"]
+                                               Scheme = SchemeManager.Schemes ["Base"]
                                            };
 
                                            someText.Height = Dim.Fill (

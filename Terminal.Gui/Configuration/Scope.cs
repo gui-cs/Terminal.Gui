@@ -1,6 +1,5 @@
 ﻿#nullable enable
-using System.Diagnostics;
-using System.Reflection;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui;
 
@@ -9,17 +8,21 @@ namespace Terminal.Gui;
 ///     scopes for configuration settings. Each scope is a JSON object that contains a set of configuration settings.
 /// </summary>
 public class Scope<T> : Dictionary<string, ConfigProperty>
-{ //, IScope<Scope<T>> {
+{
     /// <summary>Crates a new instance.</summary>
+    [RequiresUnreferencedCode ("AOT")]
     public Scope () : base (StringComparer.InvariantCultureIgnoreCase)
     {
-        foreach (KeyValuePair<string, ConfigProperty> p in GetScopeProperties ())
+        foreach (KeyValuePair<string, ConfigProperty> p in GetConfigPropertiesByScope (typeof (ThemeScope)))
         {
-            Add (p.Key, new ConfigProperty { PropertyInfo = p.Value.PropertyInfo, PropertyValue = null });
+            Add (p.Key, new () { PropertyInfo = p.Value.PropertyInfo, PropertyValue = null });
         }
     }
 
-    /// <summary>Retrieves the values of the properties of this scope from their corresponding static properties.</summary>
+    /// <summary>
+    ///     Retrieves the values of the properties of this scope from their corresponding static
+    ///     <see cref="SerializableConfigurationProperty"/> properties.
+    /// </summary>
     public void RetrieveValues ()
     {
         foreach (KeyValuePair<string, ConfigProperty> p in this.Where (cp => cp.Value.PropertyInfo is { }))
@@ -54,10 +57,7 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
     {
         var set = false;
 
-        foreach (KeyValuePair<string, ConfigProperty> p in this.Where (
-                                                                       t => t.Value != null
-                                                                            && t.Value.PropertyValue != null
-                                                                      ))
+        foreach (KeyValuePair<string, ConfigProperty> p in this.Where (t => t.Value is { PropertyValue: { } }))
         {
             if (p.Value.Apply ())
             {
@@ -66,17 +66,5 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
         }
 
         return set;
-    }
-
-    private IEnumerable<KeyValuePair<string, ConfigProperty>> GetScopeProperties ()
-    {
-        return _allConfigProperties!.Where (
-                                            cp =>
-                                                (cp.Value.PropertyInfo?.GetCustomAttribute (
-                                                                                            typeof (SerializableConfigurationProperty)
-                                                                                           )
-                                                     as SerializableConfigurationProperty)?.Scope
-                                                == GetType ()
-                                           );
     }
 }

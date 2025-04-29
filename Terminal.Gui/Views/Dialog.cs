@@ -75,7 +75,7 @@ public class Dialog : Window
         Width = Dim.Auto (DimAutoStyle.Auto, Dim.Percent (DefaultMinimumWidth), Dim.Percent (90));
         Height = Dim.Auto (DimAutoStyle.Auto, Dim.Percent (DefaultMinimumHeight), Dim.Percent (90));
 
-        Scheme = Colors.Schemes ["Dialog"];
+        Scheme = SchemeManager.Schemes ["Dialog"];
 
         Modal = true;
         ButtonAlignment = DefaultButtonAlignment;

@@ -44,6 +44,6 @@ public class GlyphTests
         Assert.Equal((Rune)'[', Glyphs.LeftBracket);
 
         // clean up
-        Reset ();
+        ResetAllSettings ();
     }
 }

@@ -79,20 +79,34 @@ public class ThemeManager : IDictionary<string, ThemeScope>
     {
         [RequiresUnreferencedCode ("AOT")]
         [RequiresDynamicCode ("AOT")]
-        get => Settings? ["Themes"]
-                       ?.PropertyValue as
-                   Dictionary<string, ThemeScope>; // themes ?? new Dictionary<string, ThemeScope> ();
+        get
+        {
+            if (Settings is { } && Settings.TryGetValue ("Themes", out ConfigProperty? themes))
+            {
+                return themes.PropertyValue as Dictionary<string, ThemeScope>;
+            }
+
+            return null;
+        }
+
+        // themes ?? new Dictionary<string, ThemeScope> ();
 
         [RequiresUnreferencedCode ("AOT")]
         [RequiresDynamicCode ("AOT")]
-        set =>
-
+        set
+        {
             //if (themes is null || value is null) {
             //	themes = value;
             //} else {
             //	themes = (Dictionary<string, ThemeScope>)DeepMemberwiseCopy (value!, themes!)!;
             //}
-            Settings! ["Themes"].PropertyValue = value;
+
+            // BUGBUG: We should not be setting Settings here. Instead, Settings should subscrube to something and update
+            if (Settings is { } && Settings.TryGetValue ("Themes", out ConfigProperty? themes))
+            {
+                Settings ["Themes"].PropertyValue = value;
+            }
+        }
     }
 
     /// <summary>The currently selected theme. This is the internal version; see <see cref="Theme"/>.</summary>
@@ -107,15 +121,28 @@ public class ThemeManager : IDictionary<string, ThemeScope>
         [RequiresDynamicCode ("Calls Terminal.Gui.ConfigurationManager.Settings")]
         set
         {
-            string oldTheme = _theme;
+            string prevousThemeValue = _theme;
+
             _theme = value;
 
-            if ((oldTheme != _theme
-                 || oldTheme != Settings! ["Theme"].PropertyValue as string)
-                 && Settings! ["Themes"]?.PropertyValue is Dictionary<string, ThemeScope> themes && themes.ContainsKey (_theme))
+            if (Settings is null || !Settings.TryGetValue ("Theme", out ConfigProperty? themeCp))
             {
-                Settings! ["Theme"].PropertyValue = _theme;
-                Instance.OnThemeChanged (oldTheme);
+                return;
+            }
+
+            if (themeCp.PropertyValue is string { } theme && Settings.TryGetValue ("Themes", out ConfigProperty? themesCp))
+            {
+                // Check if the theme is in the themes dictionary
+                if (themesCp.PropertyValue is not Dictionary<string, ThemeScope> themes || !themes.TryGetValue (theme, out _))
+                {
+                    return;
+                }
+
+                if (prevousThemeValue != _theme || prevousThemeValue != theme)
+                {
+                    Settings! ["Theme"].PropertyValue = _theme;
+                    Instance.OnThemeChanged (prevousThemeValue);
+                }
             }
         }
     }
@@ -125,7 +152,7 @@ public class ThemeManager : IDictionary<string, ThemeScope>
 
     [RequiresUnreferencedCode ("Calls Terminal.Gui.ThemeManager.Themes")]
     [RequiresDynamicCode ("Calls Terminal.Gui.ThemeManager.Themes")]
-    internal static void GetHardCodedDefaults ()
+    internal static void ResetToCurrentValues ()
     {
         //Logging.Trace ("Themes.GetHardCodedDefaults()");
         var theme = new ThemeScope ();
@@ -150,9 +177,10 @@ public class ThemeManager : IDictionary<string, ThemeScope>
     internal static void Reset ()
     {
         //Logging.Trace ("Themes.Reset()");
-        Colors.Reset ();
-        Themes?.Clear ();
-        SelectedTheme = string.Empty;
+        ResetToCurrentValues ();
+        //Themes?.Clear ();
+        //Themes?.Add ("Default", new ThemeScope ());
+        SelectedTheme = "Default";
     }
 
     #region IDictionary
@@ -285,19 +313,4 @@ public class ThemeManager : IDictionary<string, ThemeScope>
 #pragma warning restore 1591
 
     #endregion
-
-    /// <summary>
-    ///     Helper to get the default schemes from the default theme.
-    /// </summary>
-    /// <returns></returns>
-    public static Dictionary<string, Scheme?> GetDefaultSchemes ()
-    {
-        Dictionary<string, Scheme?>? schemes = [];
-        if (Themes is { })
-        {
-           schemes = Themes ["Default"] ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
-        }
-
-        return schemes;
-    }
 }

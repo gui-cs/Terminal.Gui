@@ -192,7 +192,7 @@ public class Navigation : Scenario
             X = 1,
             Y = 7,
             Id = "datePicker",
-            Scheme = Colors.Schemes ["Toplevel"],
+            Scheme = SchemeManager.Schemes ["Toplevel"],
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,
             CanFocus = true, // Can't drag without this? BUGBUG
@@ -236,7 +236,7 @@ public class Navigation : Scenario
             Height = Dim.Auto (),
             Width = Dim.Auto (),
             Title = $"Overlapped{id} _{GetNextHotKey ()}",
-            Scheme = Colors.Schemes ["Toplevel"],
+            Scheme = SchemeManager.Schemes ["Toplevel"],
             Id = $"Overlapped{id}",
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,

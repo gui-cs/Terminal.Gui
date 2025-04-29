@@ -418,7 +418,7 @@ public class TableViewTests (ITestOutputHelper output)
         top.Add (tableView);
         RunState rs = Application.Begin (top);
 
-        tableView.Scheme = Colors.Schemes ["TopLevel"];
+        tableView.Scheme = SchemeManager.Schemes ["TopLevel"];
 
         // 25 characters can be printed into table
         tableView.Viewport = new (0, 0, 25, 5);
@@ -679,7 +679,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        tableView.Scheme = Colors.Schemes ["TopLevel"];
+        tableView.Scheme = SchemeManager.Schemes ["TopLevel"];
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -758,7 +758,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        tableView.Scheme = Colors.Schemes ["TopLevel"];
+        tableView.Scheme = SchemeManager.Schemes ["TopLevel"];
         tableView.LayoutSubViews ();
 
         // 3 columns are visibile
@@ -819,7 +819,7 @@ public class TableViewTests (ITestOutputHelper output)
         var tableView = new TableView ();
         tableView.BeginInit ();
         tableView.EndInit ();
-        tableView.Scheme = Colors.Schemes ["TopLevel"];
+        tableView.Scheme = SchemeManager.Schemes ["TopLevel"];
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -934,7 +934,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         TableView tableView = GetABCDEFTableView (out _);
 
-        tableView.Scheme = Colors.Schemes ["TopLevel"];
+        tableView.Scheme = SchemeManager.Schemes ["TopLevel"];
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -965,7 +965,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         TableView tableView = GetABCDEFTableView (out _);
 
-        tableView.Scheme = Colors.Schemes ["TopLevel"];
+        tableView.Scheme = SchemeManager.Schemes ["TopLevel"];
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -1567,7 +1567,7 @@ public class TableViewTests (ITestOutputHelper output)
     public void Test_CollectionNavigator ()
     {
         var tv = new TableView ();
-        tv.Scheme = Colors.Schemes ["TopLevel"];
+        tv.Scheme = SchemeManager.Schemes ["TopLevel"];
         tv.Viewport = new (0, 0, 50, 7);
 
         tv.Table = new EnumerableTableSource<string> (
@@ -2211,7 +2211,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         ((FakeDriver)Application.Driver!).SetBufferSize (100, 100);
         var tv = new TableView ();
-        tv.Scheme = Colors.Schemes ["TopLevel"];
+        tv.Scheme = SchemeManager.Schemes ["TopLevel"];
         tv.Viewport = new (0, 0, 50, 6);
 
         tv.Table = new EnumerableTableSource<Type> (
@@ -2417,7 +2417,7 @@ A B C
         var tv = new TableView ();
 
         //tv.BeginInit (); tv.EndInit ();
-        tv.Scheme = Colors.Schemes ["TopLevel"];
+        tv.Scheme = SchemeManager.Schemes ["TopLevel"];
         tv.Viewport = new (0, 0, 25, 4);
 
         tv.Style = new ()
@@ -2570,7 +2570,7 @@ A B C
     public void TestTableViewCheckboxes_ByObject ()
     {
         ConfigurationManager.Locations = ConfigLocations.Default;
-        ConfigurationManager.Reset();
+        ConfigurationManager.ResetAllSettings();
 
         TableView tv = GetPetTable (out EnumerableTableSource<PickablePet> source);
         tv.LayoutSubViews ();
@@ -3422,7 +3422,7 @@ A B C
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        tableView.Scheme = Colors.Schemes ["TopLevel"];
+        tableView.Scheme = SchemeManager.Schemes ["TopLevel"];
 
         // 3 columns are visible
         tableView.Viewport = new (0, 0, 7, 5);
@@ -3448,7 +3448,7 @@ A B C
     private TableView GetPetTable (out EnumerableTableSource<PickablePet> source)
     {
         var tv = new TableView ();
-        tv.Scheme = Colors.Schemes ["TopLevel"];
+        tv.Scheme = SchemeManager.Schemes ["TopLevel"];
         tv.Viewport = new (0, 0, 25, 6);
 
         List<PickablePet> pets = new ()
@@ -3476,7 +3476,7 @@ A B C
     private TableView GetTwoRowSixColumnTable (out DataTable dt)
     {
         var tableView = new TableView ();
-        tableView.Scheme = Colors.Schemes ["TopLevel"];
+        tableView.Scheme = SchemeManager.Schemes ["TopLevel"];
 
         // 3 columns are visible
         tableView.Viewport = new (0, 0, 7, 5);
@@ -3521,7 +3521,7 @@ A B C
         tv.Style.GetOrCreateColumnStyle (1).MaxWidth = 1;
         tv.Style.GetOrCreateColumnStyle (1).MaxWidth = 1;
 
-        tv.Scheme = Colors.Schemes ["Base"];
+        tv.Scheme = SchemeManager.Schemes ["Base"];
 
         return tv;
     }

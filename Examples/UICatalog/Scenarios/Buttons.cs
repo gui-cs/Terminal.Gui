@@ -44,7 +44,7 @@ public class Buttons : Scenario
             Width = 45,
             Height = 3,
             Text = "S_wap Default (Size = 45, 3)",
-            Scheme = Colors.Schemes ["Error"]
+            Scheme = SchemeManager.Schemes ["Error"]
         };
 
         swapButton.Accepting += (s, e) =>
@@ -80,7 +80,7 @@ public class Buttons : Scenario
 
         View prev = colorButtonsLabel;
 
-        foreach (KeyValuePair<string, Scheme> scheme in Colors.Schemes)
+        foreach (KeyValuePair<string, Scheme> scheme in SchemeManager.Schemes)
         {
             var colorButton = new Button
             {
@@ -138,7 +138,7 @@ public class Buttons : Scenario
         var removeButton = new Button
         {
             X = 2, Y = Pos.Bottom (button) + 1,
-            Scheme = Colors.Schemes ["Error"], Text = "Remove this button"
+            Scheme = SchemeManager.Schemes ["Error"], Text = "Remove this button"
         };
         main.Add (removeButton);
 
@@ -165,7 +165,7 @@ public class Buttons : Scenario
             X = 0,
             Y = Pos.Center () - 1,
             Width = 30,
-            Scheme = Colors.Schemes ["Error"],
+            Scheme = SchemeManager.Schemes ["Error"],
             Text = "Move This \u263b Button v_ia Pos"
         };
 
@@ -183,7 +183,7 @@ public class Buttons : Scenario
             X = 0,
             Width = 30,
             Text = "Grow This \u263a Button _via Pos",
-            Scheme = Colors.Schemes ["Error"],
+            Scheme = SchemeManager.Schemes ["Error"],
         };
 
         sizeBtn.Accepting += (s, e) =>
@@ -204,7 +204,7 @@ public class Buttons : Scenario
         main.Add (absoluteFrame);
 
         // Demonstrates how changing the View.Frame property can move Views
-        var moveBtnA = new Button { Scheme = Colors.Schemes ["Error"], Text = "Move This Button via Frame" };
+        var moveBtnA = new Button { Scheme = SchemeManager.Schemes ["Error"], Text = "Move This Button via Frame" };
 
         moveBtnA.Accepting += (s, e) =>
                            {
@@ -221,7 +221,7 @@ public class Buttons : Scenario
         // Demonstrates how changing the View.Frame property can SIZE Views (#583)
         var sizeBtnA = new Button
         {
-            Y = 2, Scheme = Colors.Schemes ["Error"], Text = " ~  s  gui.cs   master ↑_10 = Сохранить"
+            Y = 2, Scheme = SchemeManager.Schemes ["Error"], Text = " ~  s  gui.cs   master ↑_10 = Сохранить"
         };
 
         sizeBtnA.Accepting += (s, e) =>
@@ -294,7 +294,7 @@ public class Buttons : Scenario
             X = 2,
             Y = Pos.Bottom (radioGroup) + 1,
             Width = Dim.Width (computedFrame) - 2,
-            Scheme = Colors.Schemes ["TopLevel"],
+            Scheme = SchemeManager.Schemes ["TopLevel"],
             Text = mhkb
         };
         moveHotKeyBtn.Accepting += (s, e) =>
@@ -311,7 +311,7 @@ public class Buttons : Scenario
             X = Pos.Left (absoluteFrame) + 1,
             Y = Pos.Bottom (radioGroup) + 1,
             Width = Dim.Width (absoluteFrame) - 2,
-            Scheme = Colors.Schemes ["TopLevel"],
+            Scheme = SchemeManager.Schemes ["TopLevel"],
             Text = muhkb
         };
         moveUnicodeHotKeyBtn.Accepting += (s, e) =>

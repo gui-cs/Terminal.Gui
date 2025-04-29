@@ -205,7 +205,7 @@ public class Mouse : Scenario
             Y = Pos.Bottom (label),
             Width = 50,
             Height = Dim.Fill (),
-            Scheme = Colors.Schemes ["TopLevel"],
+            Scheme = SchemeManager.Schemes ["TopLevel"],
             Source = new ListWrapper<string> (appLogList)
         };
         win.Add (label, appLog);
@@ -236,7 +236,7 @@ public class Mouse : Scenario
             Y = Pos.Bottom (label),
             Width = Dim.Percent (50),
             Height = Dim.Fill (),
-            Scheme = Colors.Schemes ["TopLevel"],
+            Scheme = SchemeManager.Schemes ["TopLevel"],
             Source = new ListWrapper<string> (winLogList)
         };
         win.Add (label, winLog);
@@ -294,12 +294,12 @@ public class Mouse : Scenario
 
                 void PaddingOnMouseEnter (object o, CancelEventArgs e)
                 {
-                    Padding.Scheme = Colors.Schemes ["Error"];
+                    Padding.Scheme = SchemeManager.Schemes ["Error"];
                 }
 
                 void PaddingOnMouseLeave (object o, EventArgs e)
                 {
-                    Padding.Scheme = Colors.Schemes ["Dialog"];
+                    Padding.Scheme = SchemeManager.Schemes ["Dialog"];
                 }
 
                 Border.Thickness = new Thickness (1);

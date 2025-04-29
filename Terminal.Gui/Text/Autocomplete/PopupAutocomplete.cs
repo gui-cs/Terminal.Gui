@@ -28,7 +28,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         {
             if (_scheme is null)
             {
-                _scheme = Colors.Schemes ["Menu"];
+                _scheme = SchemeManager.Schemes ["Menu"];
             }
 
             return _scheme;

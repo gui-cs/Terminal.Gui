@@ -91,7 +91,7 @@ public class ScenariosStressTests : TestsAllViews
 
         // Restore the configuration locations
         ConfigurationManager.Locations = savedConfigLocations;
-        ConfigurationManager.Reset ();
+        ConfigurationManager.ResetAllSettings ();
 
         return;
 
