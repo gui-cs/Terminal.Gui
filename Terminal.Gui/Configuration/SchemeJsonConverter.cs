@@ -1,9 +1,12 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
 /// <summary>Implements a JSON converter for <see cref="Scheme"/>.</summary>
+[RequiresUnreferencedCode ("AOT")]
+
 internal class SchemeJsonConverter : JsonConverter<Scheme>
 {
     private static SchemeJsonConverter instance;

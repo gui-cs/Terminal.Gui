@@ -12,6 +12,8 @@ namespace Terminal.Gui;
 ///     data to/from <see cref="ConfigurationManager"/> JSON documents.
 /// </summary>
 /// <typeparam name="scopeT"></typeparam>
+
+[RequiresUnreferencedCode ("AOT")]
 internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] scopeT> : JsonConverter<scopeT> where scopeT : Scope<scopeT>
 {
     [RequiresDynamicCode ("Calls System.Type.MakeGenericType(params Type[])")]

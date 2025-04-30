@@ -1,9 +1,12 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
 /// <summary>Json converter from the <see cref="Attribute"/> class.</summary>
+[RequiresUnreferencedCode ("AOT")]
+
 internal class AttributeJsonConverter : JsonConverter<Attribute>
 {
     private static AttributeJsonConverter _instance;

@@ -45,8 +45,8 @@ public class KeyJsonConverterTests
         // Arrange
 
         // Act
-        string json = JsonSerializer.Serialize ((Key)key, ConfigurationManager.SerializerOptions);
-        var deserializedKey = JsonSerializer.Deserialize<Key> (json, ConfigurationManager.SerializerOptions);
+        string json = JsonSerializer.Serialize ((Key)key, ConfigurationManager.SerializerContext.Options);
+        var deserializedKey = JsonSerializer.Deserialize<Key> (json, ConfigurationManager.SerializerContext.Options);
 
         // Assert
         Assert.Equal (expectedStringTo, deserializedKey.ToString ());
@@ -60,7 +60,7 @@ public class KeyJsonConverterTests
 
         // Act
         string json = "\"Ctrl+Q\"";
-        Key deserializedKey = JsonSerializer.Deserialize<Key> (json, ConfigurationManager.SerializerOptions);
+        Key deserializedKey = JsonSerializer.Deserialize<Key> (json, ConfigurationManager.SerializerContext.Options);
 
         // Assert
         Assert.Equal (key, deserializedKey);
@@ -70,7 +70,7 @@ public class KeyJsonConverterTests
     public void Separator_Property_Serializes_As_Glyph ()
     {
         // Act
-        string json = JsonSerializer.Serialize (Key.Separator, ConfigurationManager.SerializerOptions);
+        string json = JsonSerializer.Serialize (Key.Separator, ConfigurationManager.SerializerContext.Options);
 
         // Assert
         Assert.Equal ($"\"{Key.Separator}\"", json);
@@ -85,7 +85,7 @@ public class KeyJsonConverterTests
         {
             // Act
             Key.Separator = (Rune)'*';
-            string json = JsonSerializer.Serialize (Key.Separator, ConfigurationManager.SerializerOptions);
+            string json = JsonSerializer.Serialize (Key.Separator, ConfigurationManager.SerializerContext.Options);
 
             // Assert
             Assert.Equal ("\"*\"", json);
@@ -124,7 +124,7 @@ public class KeyJsonConverterTests
             // Act
             Key.Separator = (Rune)separator;
 
-            Key deserializedKey = JsonSerializer.Deserialize<Key> (json, ConfigurationManager.SerializerOptions);
+            Key deserializedKey = JsonSerializer.Deserialize<Key> (json, ConfigurationManager.SerializerContext.Options);
 
             Key expectedKey = new Key ((KeyCode)keyChar).WithCtrl.WithAlt;
             // Assert

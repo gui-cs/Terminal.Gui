@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Collections;
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
@@ -9,6 +10,7 @@ namespace Terminal.Gui;
 ///     Holds the <see cref="Scheme"/>s that define the <see cref="Attribute"/>s that are used by views to render
 ///     themselves.
 /// </summary>
+
 public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string, Scheme?>
 {
     private readonly object _lock = new object ();
@@ -67,14 +69,13 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     ///     <para>Changing the values of an entry in this dictionary will affect all views that use the scheme.</para>
     ///     <para>
     ///         <see cref="ConfigurationManager"/> can be used to override the default values for these schemes and add
-    ///         additional schemes. See <see cref="ConfigurationManager.Themes"/>.
+    ///         additional schemes. See <see cref="ConfigurationManager.ThemeManager"/>.
     ///     </para>
     /// </remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope), OmitClassName = true)]
     [JsonConverter (typeof (DictionaryJsonConverter<Scheme?>))]
     [UsedImplicitly]
     public static Dictionary<string, Scheme?>? Schemes { get; private set; }
-
 
     /// <summary>
     ///     Raised when the collection changes.
@@ -88,14 +89,14 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
         {
             lock (_lock)
             {
-                return Schemes [key];
+                return Schemes? [key];
             }
         }
         set
         {
             lock (_lock)
             {
-                if (Schemes.ContainsKey (key))
+                if (Schemes is { } && Schemes.TryGetValue (key, out _))
                 {
                     Scheme? oldValue = Schemes [key];
                     Schemes [key] = value;
@@ -103,7 +104,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
                 }
                 else
                 {
-                    Schemes.Add (key, value);
+                    Schemes?.Add (key, value);
                     CollectionChanged?.Invoke (this, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, new KeyValuePair<string, Scheme?> (key, value)));
                 }
             }
@@ -114,7 +115,9 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     ///     Helper to get the default schemes from the default theme loaded from configuration.
     /// </summary>
     /// <returns></returns>
-    public static Dictionary<string, Scheme?> GetDefaultSchemes ()
+    [RequiresDynamicCode ("AOT")]
+
+    public static Dictionary<string, Scheme?>? GetDefaultSchemes ()
     {
         if (!IsInitialized ())
         {
@@ -124,13 +127,12 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
 
             // If CM has not been initialized, ThemeScope gets loaded with the default values.
             return themes ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
-
         }
 
         Dictionary<string, Scheme?>? schemes = [];
-        if (ThemeManager.Themes is { })
+        if (CM.ThemeManager is { })
         {
-            schemes = ThemeManager.Themes ["Default"] ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
+            schemes = CM.ThemeManager ["Default"] ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
         }
 
         return schemes;
@@ -143,7 +145,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
         {
             lock (_lock)
             {
-                return Schemes.Count;
+                return Schemes!.Count;
             }
         }
     }
@@ -158,7 +160,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
         {
             lock (_lock)
             {
-                return new List<string> (Schemes.Keys);
+                return new List<string> (Schemes!.Keys);
             }
         }
     }
@@ -170,7 +172,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
         {
             lock (_lock)
             {
-                return new List<Scheme?> (Schemes.Values);
+                return new List<Scheme?> (Schemes!.Values);
             }
         }
     }
@@ -180,7 +182,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     {
         lock (_lock)
         {
-            Schemes.Add (item.Key, item.Value);
+            Schemes?.Add (item.Key, item.Value);
             CollectionChanged?.Invoke (this, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, item));
         }
     }
@@ -196,7 +198,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     {
         lock (_lock)
         {
-            Schemes.Clear ();
+            Schemes?.Clear ();
             CollectionChanged?.Invoke (this, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
         }
     }
@@ -206,7 +208,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     {
         lock (_lock)
         {
-            return Schemes.Contains (item);
+            return Schemes is { } && Schemes.Contains (item);
         }
     }
 
@@ -215,7 +217,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     {
         lock (_lock)
         {
-            return Schemes.ContainsKey (key);
+            return Schemes is { } && Schemes.ContainsKey(key);
         }
     }
 
@@ -224,7 +226,10 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     {
         lock (_lock)
         {
-            ((ICollection)Schemes).CopyTo (array, arrayIndex);
+            if (Schemes is { })
+            {
+                ((ICollection)Schemes).CopyTo (array, arrayIndex);
+            }
         }
     }
 
@@ -233,8 +238,13 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     {
         lock (_lock)
         {
-            return new List<KeyValuePair<string, Scheme?>> (Schemes).GetEnumerator ();
+            if (Schemes is { })
+            {
+                return new List<KeyValuePair<string, Scheme?>> (Schemes).GetEnumerator ();
+            }
         }
+
+        return null!;
     }
 
     IEnumerator IEnumerable.GetEnumerator ()
@@ -247,7 +257,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     {
         lock (_lock)
         {
-            if (Schemes.Remove (item.Key))
+            if (Schemes is { } && Schemes.Remove (item.Key))
             {
                 CollectionChanged?.Invoke (this, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, item));
                 return true;
@@ -261,7 +271,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     {
         lock (_lock)
         {
-            if (Schemes.Remove (key))
+            if (Schemes is { } && Schemes.Remove (key))
             {
                 CollectionChanged?.Invoke (this, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, key));
                 return true;
@@ -275,7 +285,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     {
         lock (_lock)
         {
-            return Schemes.TryGetValue (key, out value);
+            return Schemes!.TryGetValue (key, out value);
         }
     }
 }

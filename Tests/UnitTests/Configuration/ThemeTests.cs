@@ -20,13 +20,13 @@ public class ThemeTests
         var theme = new ThemeScope ();
         Assert.NotEmpty (theme);
 
-        Themes.Add ("testTheme", theme);
+        ConfigurationManager.ThemeManager.Add ("testTheme", theme);
 
         Assert.Equal (LineStyle.Single, FrameView.DefaultBorderStyle);
         theme ["FrameView.DefaultBorderStyle"].PropertyValue = LineStyle.Double; // default is Single
 
-        Themes.Theme = "testTheme";
-        Themes! [ThemeManager.SelectedTheme]!.Apply ();
+        ConfigurationManager.ThemeManager.Theme = "testTheme";
+        ConfigurationManager.ThemeManager! [ThemeManager.SelectedTheme]!.Apply ();
 
         Assert.Equal (LineStyle.Double, FrameView.DefaultBorderStyle);
 
@@ -45,7 +45,7 @@ public class ThemeTests
         var theme = new ThemeScope ();
         Assert.NotEmpty (theme);
 
-        Themes.Add ("testTheme", theme);
+        ConfigurationManager.ThemeManager.Add ("testTheme", theme);
 
         var scheme = new Scheme { Normal = new Attribute (Color.Red, Color.Green) };
 
@@ -62,8 +62,8 @@ public class ThemeTests
                      );
 
         // Act
-        Themes.Theme = "testTheme";
-        Themes! [ThemeManager.SelectedTheme]!.Apply ();
+        ConfigurationManager.ThemeManager.Theme = "testTheme";
+        ConfigurationManager.ThemeManager! [ThemeManager.SelectedTheme]!.Apply ();
 
         // Assert
         Scheme updatedScheme = SchemeManager.Schemes ["test"];

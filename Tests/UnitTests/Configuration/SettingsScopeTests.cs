@@ -24,7 +24,7 @@ public class SettingsScopeTests
                            }
                    """;
 
-        Settings!.Update (json, "test", ConfigLocations.Runtime);
+        CM.SourcesManager?.Update(Settings!, json, "test", ConfigLocations.Runtime);
 
         // assert
         Assert.Equal (Key.Q.WithCtrl, (Key)Settings ["Application.QuitKey"].PropertyValue);
@@ -98,8 +98,8 @@ public class SettingsScopeTests
         Assert.Equal (6, ((Dictionary<string, ThemeScope>)Settings ["Themes"].PropertyValue).Count);
 
         ResetToCurrentValues ();
-        Assert.NotEmpty (Themes);
-        Assert.Equal ("Default", Themes.Theme);
+        Assert.NotEmpty (ConfigurationManager.ThemeManager);
+        Assert.Equal ("Default", ConfigurationManager.ThemeManager.Theme);
 
         Assert.True (Settings ["Application.QuitKey"].PropertyValue is Key);
         Assert.True (Settings ["Application.NextTabGroupKey"].PropertyValue is Key);

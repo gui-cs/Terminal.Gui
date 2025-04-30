@@ -20,9 +20,9 @@ public class ThemeScopeTests
     public void AllThemesPresent ()
     {
         ResetAllSettings ();
-        Assert.True (Themes.ContainsKey ("Default"));
-        Assert.True (Themes.ContainsKey ("Dark"));
-        Assert.True (Themes.ContainsKey ("Light"));
+        Assert.True (ConfigurationManager.ThemeManager.ContainsKey ("Default"));
+        Assert.True (ConfigurationManager.ThemeManager.ContainsKey ("Dark"));
+        Assert.True (ConfigurationManager.ThemeManager.ContainsKey ("Light"));
     }
 
     [Fact]
@@ -30,18 +30,18 @@ public class ThemeScopeTests
     public void Apply_ShouldApplyUpdatedProperties ()
     {
         ResetAllSettings ();
-        Assert.NotEmpty (Themes);
+        Assert.NotEmpty (ConfigurationManager.ThemeManager);
         Alignment savedValue = Dialog.DefaultButtonAlignment;
         Alignment newValue = Alignment.Center != savedValue ? Alignment.Center : Alignment.Start;
 
-        Themes ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue = newValue;
+        ConfigurationManager.ThemeManager ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue = newValue;
 
-        ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
+        CM.ThemeManager! [ThemeManager.SelectedTheme]!.Apply ();
         Assert.Equal (newValue, Dialog.DefaultButtonAlignment);
 
         // Replace with the savedValue to avoid failures on other unit tests that rely on the default value
-        Themes ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue = savedValue;
-        ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
+        ConfigurationManager.ThemeManager ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue = savedValue;
+        CM.ThemeManager! [ThemeManager.SelectedTheme]!.Apply ();
         Assert.Equal (savedValue, Dialog.DefaultButtonAlignment);
     }
 
@@ -50,8 +50,8 @@ public class ThemeScopeTests
     {
         ResetAllSettings ();
         ResetToCurrentValues ();
-        Assert.NotEmpty (Themes);
-        Assert.Equal ("Default", Themes.Theme);
+        Assert.NotEmpty (ConfigurationManager.ThemeManager);
+        Assert.Equal ("Default", ConfigurationManager.ThemeManager.Theme);
     }
 
     [Fact]
@@ -60,9 +60,9 @@ public class ThemeScopeTests
     {
         ResetAllSettings ();
 
-        Dictionary<string, ThemeScope> initial = ThemeManager.Themes;
+        Dictionary<string, ThemeScope> initial = ConfigurationManager.ThemeManager!.Themes;
 
-        string serialized = JsonSerializer.Serialize<IDictionary<string, ThemeScope>> (Themes, _jsonOptions);
+        string serialized = JsonSerializer.Serialize<IDictionary<string, ThemeScope>> (ConfigurationManager.ThemeManager, _jsonOptions);
 
         IDictionary<string, ThemeScope> deserialized =
             JsonSerializer.Deserialize<IDictionary<string, ThemeScope>> (serialized, _jsonOptions);
@@ -76,14 +76,14 @@ public class ThemeScopeTests
     public void ThemeManager_ClassMethodsWork ()
     {
         ResetAllSettings ();
-        Assert.Equal (ThemeManager.Instance, Themes);
-        Assert.NotEmpty (ThemeManager.Themes);
+        Assert.Equal (ConfigurationManager.ThemeManager!, ConfigurationManager.ThemeManager);
+        Assert.NotEmpty (ConfigurationManager.ThemeManager!);
 
         ThemeManager.SelectedTheme = "foo";
         Assert.Equal ("foo", ThemeManager.SelectedTheme);
-        ThemeManager.Reset ();
+        CM.ThemeManager.Clear ();
         Assert.Equal (string.Empty, ThemeManager.SelectedTheme);
 
-        Assert.Empty (ThemeManager.Themes);
+        Assert.Empty (ConfigurationManager.ThemeManager!);
     }
 }

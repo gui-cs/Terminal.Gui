@@ -38,7 +38,7 @@ public class AppScopeTests
         Assert.True (AppSettingsTestClass.TestProperty);
 
         // ConfigurationManager.Themes should NOT apply theme settings
-        ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
+        CM.ThemeManager! [ThemeManager.SelectedTheme]!.Apply ();
         Assert.True (AppSettingsTestClass.TestProperty);
 
         // ConfigurationManager.AppSettings should NOT apply theme settings

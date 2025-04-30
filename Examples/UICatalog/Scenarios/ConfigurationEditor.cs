@@ -116,7 +116,7 @@ public class ConfigurationEditor : Scenario
 
     private void Open ()
     {
-        foreach (var config in ConfigurationManager.Settings!.Sources)
+        foreach (var config in ConfigurationManager.SourcesManager!.Sources)
         {
             var homeDir = $"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}";
             var fileInfo = new FileInfo (config.Value.Replace ("~", homeDir));
@@ -252,7 +252,7 @@ public class ConfigurationEditor : Scenario
             else if (!FileInfo.Exists)
             {
                 // Create empty config file
-                Text = ConfigurationManager.GetEmptyJson ();
+                Text = ConfigurationManager.GetEmptyConfig ();
             }
             else
             {

@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json;
+using Terminal.Gui.Configuration;
 using UnitTests;
 using Xunit.Abstractions;
 using static Terminal.Gui.ConfigurationManager;
@@ -37,7 +38,7 @@ public class ConfigurationManagerTests
     [Fact]
     public void Reset_Clears_Statics ()
     {
-        Reset ();
+        UnInitialize ();
 
         Assert.Null (_classesWithConfigProps);
         Assert.Null (_allConfigProperties);
@@ -47,12 +48,12 @@ public class ConfigurationManagerTests
         Assert.NotNull (_classesWithConfigProps);
         Assert.NotNull (_allConfigProperties);
 
-        Reset ();
+        UnInitialize ();
 
         Assert.Null (_classesWithConfigProps);
         Assert.Null (_allConfigProperties);
         Assert.Null (_settings);
-        Assert.Null (_themes);
+        Assert.Null (_themeManager);
         Assert.Null (_appSettings);
         Assert.Equal (ConfigLocations.All, Locations);
         //        Assert.Null (RuntimeConfig);
@@ -92,131 +93,6 @@ public class ConfigurationManagerTests
         ResetAllSettings ();
     }
 
-    [Fact]
-    public void DeepMemberWiseCopyTest ()
-    {
-        // Value types
-        var stringDest = "Destination";
-        var stringSrc = "Source";
-        object stringCopy = DeepMemberWiseCopy (stringSrc, stringDest);
-        Assert.Equal (stringSrc, stringCopy);
-
-        stringDest = "Destination";
-        stringSrc = "Destination";
-        stringCopy = DeepMemberWiseCopy (stringSrc, stringDest);
-        Assert.Equal (stringSrc, stringCopy);
-
-        stringDest = "Destination";
-        stringSrc = null;
-        stringCopy = DeepMemberWiseCopy (stringSrc, stringDest);
-        Assert.Equal (stringSrc, stringCopy);
-
-        stringDest = "Destination";
-        stringSrc = string.Empty;
-        stringCopy = DeepMemberWiseCopy (stringSrc, stringDest);
-        Assert.Equal (stringSrc, stringCopy);
-
-        var boolDest = true;
-        var boolSrc = false;
-        object boolCopy = DeepMemberWiseCopy (boolSrc, boolDest);
-        Assert.Equal (boolSrc, boolCopy);
-
-        boolDest = false;
-        boolSrc = true;
-        boolCopy = DeepMemberWiseCopy (boolSrc, boolDest);
-        Assert.Equal (boolSrc, boolCopy);
-
-        boolDest = true;
-        boolSrc = true;
-        boolCopy = DeepMemberWiseCopy (boolSrc, boolDest);
-        Assert.Equal (boolSrc, boolCopy);
-
-        boolDest = false;
-        boolSrc = false;
-        boolCopy = DeepMemberWiseCopy (boolSrc, boolDest);
-        Assert.Equal (boolSrc, boolCopy);
-
-        // Structs
-        var attrDest = new Attribute (Color.Black);
-        var attrSrc = new Attribute (Color.White);
-        object attrCopy = DeepMemberWiseCopy (attrSrc, attrDest);
-        Assert.Equal (attrSrc, attrCopy);
-
-        // Classes
-        var colorschemeDest = new Scheme { Disabled = new Attribute (Color.Black) };
-        var colorschemeSrc = new Scheme { Disabled = new Attribute (Color.White) };
-        object colorschemeCopy = DeepMemberWiseCopy (colorschemeSrc, colorschemeDest);
-        Assert.Equal (colorschemeSrc, colorschemeCopy);
-
-        // Dictionaries
-        Dictionary<string, Attribute> dictDest = new () { { "Disabled", new Attribute (Color.Black) } };
-        Dictionary<string, Attribute> dictSrc = new () { { "Disabled", new Attribute (Color.White) } };
-        Dictionary<string, Attribute> dictCopy = (Dictionary<string, Attribute>)DeepMemberWiseCopy (dictSrc, dictDest);
-        Assert.Equal (dictSrc, dictCopy);
-
-        dictDest = new Dictionary<string, Attribute> { { "Disabled", new Attribute (Color.Black) } };
-
-        dictSrc = new Dictionary<string, Attribute>
-        {
-            { "Disabled", new Attribute (Color.White) }, { "Normal", new Attribute (Color.Blue) }
-        };
-        dictCopy = (Dictionary<string, Attribute>)DeepMemberWiseCopy (dictSrc, dictDest);
-        Assert.Equal (dictSrc, dictCopy);
-
-        // src adds an item
-        dictDest = new Dictionary<string, Attribute> { { "Disabled", new Attribute (Color.Black) } };
-
-        dictSrc = new Dictionary<string, Attribute>
-        {
-            { "Disabled", new Attribute (Color.White) }, { "Normal", new Attribute (Color.Blue) }
-        };
-        dictCopy = (Dictionary<string, Attribute>)DeepMemberWiseCopy (dictSrc, dictDest);
-        Assert.Equal (2, dictCopy!.Count);
-        Assert.Equal (dictSrc ["Disabled"], dictCopy ["Disabled"]);
-        Assert.Equal (dictSrc ["Normal"], dictCopy ["Normal"]);
-
-        // src updates only one item
-        dictDest = new Dictionary<string, Attribute>
-        {
-            { "Disabled", new Attribute (Color.Black) }, { "Normal", new Attribute (Color.White) }
-        };
-        dictSrc = new Dictionary<string, Attribute> { { "Disabled", new Attribute (Color.White) } };
-        dictCopy = (Dictionary<string, Attribute>)DeepMemberWiseCopy (dictSrc, dictDest);
-        Assert.Equal (2, dictCopy!.Count);
-        Assert.Equal (dictSrc ["Disabled"], dictCopy ["Disabled"]);
-        Assert.Equal (dictDest ["Normal"], dictCopy ["Normal"]);
-    }
-
-    public class DeepCopyTest ()
-    {
-        public static Key key = Key.Esc;
-    }
-
-    [Fact]
-    public void Illustrate_DeepMemberWiseCopy_Breaks_Dictionary ()
-    {
-        Assert.Equal (Key.Esc, DeepCopyTest.key);
-
-        Dictionary<Key, string> dict = new Dictionary<Key, string> (new KeyEqualityComparer ());
-        dict.Add (new (DeepCopyTest.key), "Esc");
-        Assert.Contains (Key.Esc, dict);
-
-        DeepCopyTest.key = (Key)DeepMemberWiseCopy (Key.Q.WithCtrl, DeepCopyTest.key);
-
-        Assert.Equal (Key.Q.WithCtrl, DeepCopyTest.key);
-        Assert.Equal (Key.Esc, dict.Keys.ToArray () [0]);
-
-        var eq = new KeyEqualityComparer ();
-        Assert.True (eq.Equals (Key.Q.WithCtrl, DeepCopyTest.key));
-        Assert.Equal (Key.Q.WithCtrl.GetHashCode (), DeepCopyTest.key.GetHashCode ());
-        Assert.Equal (eq.GetHashCode (Key.Q.WithCtrl), eq.GetHashCode (DeepCopyTest.key));
-        Assert.Equal (Key.Q.WithCtrl.GetHashCode (), eq.GetHashCode (DeepCopyTest.key));
-        Assert.True (dict.ContainsKey (Key.Esc));
-
-        dict.Remove (Key.Esc);
-        dict.Add (new (DeepCopyTest.key), "Ctrl+Q");
-        Assert.True (dict.ContainsKey (Key.Q.WithCtrl));
-    }
 
     [Fact]
     public void Load_Raises_Updated ()
@@ -384,8 +260,8 @@ public class ConfigurationManagerTests
         ResetAllSettings ();
 
         // assert
-        Assert.NotEmpty (Themes!);
-        Assert.Equal ("Default", Themes.Theme);
+        Assert.NotEmpty (ConfigurationManager.ThemeManager!);
+        Assert.Equal ("Default", ConfigurationManager.ThemeManager.Theme);
         Assert.Equal (Key.Esc, Application.QuitKey);
         Assert.Equal (Key.F6, Application.NextTabGroupKey);
         Assert.Equal (Key.F6.WithShift, Application.PrevTabGroupKey);
@@ -403,8 +279,8 @@ public class ConfigurationManagerTests
         Load ();
 
         // assert
-        Assert.NotEmpty (Themes);
-        Assert.Equal ("Default", Themes.Theme);
+        Assert.NotEmpty (ConfigurationManager.ThemeManager);
+        Assert.Equal ("Default", ConfigurationManager.ThemeManager.Theme);
         Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
         Assert.Equal (Key.F6, Application.NextTabGroupKey);
         Assert.Equal (Key.F6.WithShift, Application.PrevTabGroupKey);
@@ -423,11 +299,11 @@ public class ConfigurationManagerTests
 
         Assert.NotNull (Settings);
         Assert.NotNull (AppSettings);
-        Assert.NotNull (Themes);
+        Assert.NotNull (ConfigurationManager.ThemeManager);
 
         // Default Theme should be "Default"
-        Assert.Equal (0, Themes.Keys.Count);
-        Assert.Equal ("Default", Themes.Theme);
+        Assert.Equal (0, ConfigurationManager.ThemeManager.Keys.Count);
+        Assert.Equal ("Default", ConfigurationManager.ThemeManager.Theme);
 
         //Assert.Equal();
     }
@@ -519,7 +395,7 @@ public class ConfigurationManagerTests
         ResetToCurrentValues ();
 
         // Serialize to a JSON string
-        string json = ToJson ();
+        string json = CM.SourcesManager?.ToJson (Settings);
 
         // Write the JSON string to the file
         File.WriteAllText ("config.json", json);
@@ -561,8 +437,8 @@ public class ConfigurationManagerTests
         // FrameView is not a static class and DefaultBorderStyle is Scope.Scheme
         pi = typeof (FrameView).GetProperty ("DefaultBorderStyle");
         Assert.False (Settings.ContainsKey ("FrameView.DefaultBorderStyle"));
-        Assert.True (Themes! ["Default"].ContainsKey ("FrameView.DefaultBorderStyle"));
-        Assert.Equal (pi, Themes! ["Default"] ["FrameView.DefaultBorderStyle"].PropertyInfo);
+        Assert.True (ConfigurationManager.ThemeManager! ["Default"].ContainsKey ("FrameView.DefaultBorderStyle"));
+        Assert.Equal (pi, ConfigurationManager.ThemeManager! ["Default"] ["FrameView.DefaultBorderStyle"].PropertyInfo);
     }
 
     [Fact]
@@ -578,7 +454,7 @@ public class ConfigurationManagerTests
         Assert.True (scp.OmitClassName);
 
         ResetAllSettings ();
-        Assert.Equal (pi, Themes! ["Default"] ["Schemes"].PropertyInfo);
+        Assert.Equal (pi, ConfigurationManager.ThemeManager! ["Default"] ["Schemes"].PropertyInfo);
 
         Locations = savedLocations;
     }
@@ -587,18 +463,18 @@ public class ConfigurationManagerTests
     [AutoInitShutdown (configLocation: ConfigLocations.Default)]
     public void TestConfigurationManagerInitDriver ()
     {
-        Assert.Equal ("Default", Themes!.Theme);
+        Assert.Equal ("Default", ConfigurationManager.ThemeManager!.Theme);
 
         Assert.Equal (new Color (Color.White), SchemeManager.Schemes ["Base"]!.Normal.Foreground);
         Assert.Equal (new Color (Color.Blue), SchemeManager.Schemes ["Base"].Normal.Background);
 
         // Change Base
-        Stream json = ToStream ();
+        Stream json = CM.SourcesManager?.ToStream(Settings);
 
-        Settings!.Update (json, "TestConfigurationManagerInitDriver", ConfigLocations.Runtime);
+        CM.SourcesManager?.Update (Settings, json, "TestConfigurationManagerInitDriver", ConfigLocations.Runtime);
 
         Dictionary<string, Scheme> schemes =
-            (Dictionary<string, Scheme>)Themes [Themes.Theme] ["Schemes"].PropertyValue;
+            (Dictionary<string, Scheme>)ConfigurationManager.ThemeManager [ConfigurationManager.ThemeManager.Theme] ["Schemes"].PropertyValue;
         Assert.Equal (SchemeManager.Schemes ["Base"], schemes! ["Base"]);
         Assert.Equal (SchemeManager.Schemes ["TopLevel"], schemes ["TopLevel"]);
         Assert.Equal (SchemeManager.Schemes ["Error"], schemes ["Error"]);
@@ -653,7 +529,7 @@ public class ConfigurationManagerTests
 				}
 			}";
 
-        Settings!.Update (json, "test", ConfigLocations.Runtime);
+        CM.SourcesManager?.Update (Settings, json, "test", ConfigLocations.Runtime);
 
         // AbNormal is not a Scheme attribute
         json = @"
@@ -676,7 +552,7 @@ public class ConfigurationManagerTests
 				}
 			}";
 
-        Settings.Update (json, "test", ConfigLocations.Runtime);
+        CM.SourcesManager?.Update (Settings, json, "test", ConfigLocations.Runtime);
 
         // Modify hotNormal background only
         json = @"
@@ -698,9 +574,9 @@ public class ConfigurationManagerTests
 				}
 			}";
 
-        Settings.Update (json, "test", ConfigLocations.Runtime);
+        CM.SourcesManager?.Update(Settings, json, "test", ConfigLocations.Runtime);
 
-        Settings.Update ("{}}", "test", ConfigLocations.Runtime);
+        CM.SourcesManager?.Update(Settings, "{}}", "test", ConfigLocations.Runtime);
 
         Assert.NotEqual (0, _jsonErrors.Length);
 
@@ -736,7 +612,7 @@ public class ConfigurationManagerTests
 				]
 			}";
 
-        var jsonException = Assert.Throws<JsonException> (() => Settings!.Update (json, "test", ConfigLocations.Runtime));
+        var jsonException = Assert.Throws<JsonException> (() => CM.SourcesManager?.Update(Settings, json, "test", ConfigLocations.Runtime));
         Assert.Equal ("Unexpected color name: brownish.", jsonException.Message);
 
         // AbNormal is not a Scheme attribute
@@ -760,7 +636,7 @@ public class ConfigurationManagerTests
 				]
 			}";
 
-        jsonException = Assert.Throws<JsonException> (() => Settings!.Update (json, "test", ConfigLocations.Runtime));
+        jsonException = Assert.Throws<JsonException> (() => CM.SourcesManager?.Update(Settings, json, "test", ConfigLocations.Runtime));
         Assert.Equal ("Unrecognized Scheme Attribute name: AbNormal.", jsonException.Message);
 
         // Modify hotNormal background only
@@ -783,7 +659,7 @@ public class ConfigurationManagerTests
 				]
 			}";
 
-        jsonException = Assert.Throws<JsonException> (() => Settings!.Update (json, "test", ConfigLocations.Runtime));
+        jsonException = Assert.Throws<JsonException> (() => CM.SourcesManager?.Update(Settings, json, "test", ConfigLocations.Runtime));
         Assert.Equal ("Both Foreground and Background colors must be provided.", jsonException.Message);
 
         // Unknown property
@@ -792,7 +668,7 @@ public class ConfigurationManagerTests
 				""Unknown"" : ""Not known""
 			}";
 
-        jsonException = Assert.Throws<JsonException> (() => Settings!.Update (json, "test", ConfigLocations.Runtime));
+        jsonException = Assert.Throws<JsonException> (() => CM.SourcesManager?.Update(Settings, json, "test", ConfigLocations.Runtime));
         Assert.StartsWith ("Unknown property", jsonException.Message);
 
         Assert.Equal (0, _jsonErrors.Length);
@@ -806,9 +682,9 @@ public class ConfigurationManagerTests
     {
         ResetAllSettings ();
         ResetToCurrentValues ();
-        Stream stream = ToStream ();
+        Stream stream = CM.SourcesManager?.ToStream (Settings);
 
-        Settings!.Update (stream, "TestConfigurationManagerToJson", ConfigLocations.Runtime);
+        CM.SourcesManager?.Update(Settings, stream, "TestConfigurationManagerToJson", ConfigLocations.Runtime);
     }
 
     [Fact]
@@ -957,18 +833,18 @@ public class ConfigurationManagerTests
         ResetAllSettings ();
         ThrowOnJsonErrors = true;
 
-        Settings!.Update (json, "TestConfigurationManagerUpdateFromJson", ConfigLocations.Runtime);
+        CM.SourcesManager?.Update(Settings, json, "TestConfigurationManagerUpdateFromJson", ConfigLocations.Runtime);
 
         Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
         Assert.Equal (KeyCode.Z | KeyCode.AltMask, ((Key)Settings ["Application.QuitKey"].PropertyValue)!.KeyCode);
 
-        Assert.Equal ("Default", Themes!.Theme);
+        Assert.Equal ("Default", ConfigurationManager.ThemeManager!.Theme);
 
         Assert.Equal (new Color (Color.White), SchemeManager.Schemes ["Base"]!.Normal.Foreground);
         Assert.Equal (new Color (Color.Blue), SchemeManager.Schemes ["Base"].Normal.Background);
 
         Dictionary<string, Scheme> schemes =
-            (Dictionary<string, Scheme>)Themes.First ().Value ["Schemes"].PropertyValue;
+            (Dictionary<string, Scheme>)ConfigurationManager.ThemeManager.First ().Value ["Schemes"].PropertyValue;
         Assert.Equal (new Color (Color.White), schemes! ["Base"].Normal.Foreground);
         Assert.Equal (new Color (Color.Blue), schemes ["Base"].Normal.Background);
 
@@ -976,7 +852,7 @@ public class ConfigurationManagerTests
         Apply ();
 
         Assert.Equal (KeyCode.Z | KeyCode.AltMask, Application.QuitKey.KeyCode);
-        Assert.Equal ("Default", Themes.Theme);
+        Assert.Equal ("Default", ConfigurationManager.ThemeManager.Theme);
 
         Assert.Equal (new Color (Color.White), SchemeManager.Schemes ["Base"].Normal.Foreground);
         Assert.Equal (new Color (Color.Blue), SchemeManager.Schemes ["Base"].Normal.Background);

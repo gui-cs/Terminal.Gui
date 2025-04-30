@@ -16,7 +16,7 @@ public class GlyphTests
 
         Assert.Equal ((Rune)'⟦', Glyphs.LeftBracket);
 
-        var glyph = (Rune)Themes ["Default"] ["Glyphs.LeftBracket"].PropertyValue;
+        var glyph = (Rune)ConfigurationManager.ThemeManager ["Default"] ["Glyphs.LeftBracket"].PropertyValue;
         Assert.Equal ((Rune)'⟦', glyph);
 
         ThrowOnJsonErrors = true;
@@ -35,11 +35,11 @@ public class GlyphTests
                    }
                    """;
 
-        Settings!.Update (json, "Overrides_Defaults", ConfigLocations.Runtime);
+        CM.SourcesManager?.Update(Settings, json, "Overrides_Defaults", ConfigLocations.Runtime);
         Apply();
 
         // assert
-        glyph = glyph = (Rune)Themes ["Default"] ["Glyphs.LeftBracket"].PropertyValue;
+        glyph = glyph = (Rune)ConfigurationManager.ThemeManager ["Default"] ["Glyphs.LeftBracket"].PropertyValue;
         Assert.Equal ((Rune)'[', glyph);
         Assert.Equal((Rune)'[', Glyphs.LeftBracket);
 

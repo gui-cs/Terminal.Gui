@@ -13,7 +13,9 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
     [RequiresUnreferencedCode ("AOT")]
     public Scope () : base (StringComparer.InvariantCultureIgnoreCase)
     {
-        foreach (KeyValuePair<string, ConfigProperty> p in GetConfigPropertiesByScope (typeof (ThemeScope)))
+        // Ensure that the static CM properties are initialized
+        CM.Initialize();
+        foreach (KeyValuePair<string, ConfigProperty> p in GetConfigPropertiesByScope (typeof (T)))
         {
             Add (p.Key, new () { PropertyInfo = p.Value.PropertyInfo, PropertyValue = null });
         }
@@ -32,11 +34,11 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
     }
 
     /// <summary>Updates this instance from the specified source scope.</summary>
-    /// <param name="source"></param>
+    /// <param name="scope"></param>
     /// <returns>The updated scope (this).</returns>
-    public Scope<T>? Update (Scope<T> source)
+    public Scope<T>? Update (Scope<T> scope)
     {
-        foreach (KeyValuePair<string, ConfigProperty> prop in source)
+        foreach (KeyValuePair<string, ConfigProperty> prop in scope)
         {
             if (ContainsKey (prop.Key))
             {

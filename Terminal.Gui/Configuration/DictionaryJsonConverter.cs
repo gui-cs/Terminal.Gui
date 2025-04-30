@@ -1,7 +1,10 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
+
+[RequiresUnreferencedCode ("AOT")]
 
 internal class DictionaryJsonConverter<T> : JsonConverter<Dictionary<string, T>>
 {

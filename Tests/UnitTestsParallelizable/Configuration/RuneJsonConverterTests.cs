@@ -31,13 +31,13 @@ public class RuneJsonConverterTests
     public void RoundTripConversion_Negative (string rune)
     {
         // Act
-        string json = JsonSerializer.Serialize (rune, ConfigurationManager.SerializerOptions);
+        string json = JsonSerializer.Serialize (rune, ConfigurationManager.SerializerContext.Options);
 
         // Assert
         Assert.Throws<JsonException> (
                                       () => JsonSerializer.Deserialize<Rune> (
                                                                               json,
-                                                                              ConfigurationManager.SerializerOptions
+                                                                              ConfigurationManager.SerializerContext.Options
                                                                              )
                                      );
     }
@@ -61,8 +61,8 @@ public class RuneJsonConverterTests
         // Arrange
 
         // Act
-        string json = JsonSerializer.Serialize (rune, ConfigurationManager.SerializerOptions);
-        var deserialized = JsonSerializer.Deserialize<Rune> (json, ConfigurationManager.SerializerOptions);
+        string json = JsonSerializer.Serialize (rune, ConfigurationManager.SerializerContext.Options);
+        var deserialized = JsonSerializer.Deserialize<Rune> (json, ConfigurationManager.SerializerContext.Options);
 
         // Assert
         Assert.Equal (expected, deserialized.ToString ());
@@ -74,7 +74,7 @@ public class RuneJsonConverterTests
         // Arrange
 
         // Act
-        string json = JsonSerializer.Serialize ((Rune)'a', ConfigurationManager.SerializerOptions);
+        string json = JsonSerializer.Serialize ((Rune)'a', ConfigurationManager.SerializerContext.Options);
 
         // Assert
         Assert.Equal ("\"a\"", json);
@@ -86,7 +86,7 @@ public class RuneJsonConverterTests
         // Arrange
 
         // Act
-        string json = JsonSerializer.Serialize ((Rune)0x01, ConfigurationManager.SerializerOptions);
+        string json = JsonSerializer.Serialize ((Rune)0x01, ConfigurationManager.SerializerContext.Options);
 
         // Assert
         Assert.Equal ("\"\\u0001\"", json);
@@ -99,7 +99,7 @@ public class RuneJsonConverterTests
         var json = "\"a\"";
 
         // Act
-        var deserialized = JsonSerializer.Deserialize<Rune> (json, ConfigurationManager.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<Rune> (json, ConfigurationManager.SerializerContext.Options);
 
         // Assert
         Assert.Equal ("a", deserialized.ToString ());
@@ -112,7 +112,7 @@ public class RuneJsonConverterTests
         var json = "\"\\u0061\"";
 
         // Act
-        var deserialized = JsonSerializer.Deserialize<Rune> (json, ConfigurationManager.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<Rune> (json, ConfigurationManager.SerializerContext.Options);
 
         // Assert
         Assert.Equal ("a", deserialized.ToString ());
@@ -125,7 +125,7 @@ public class RuneJsonConverterTests
         var json = "\"U+0061\"";
 
         // Act
-        var deserialized = JsonSerializer.Deserialize<Rune> (json, ConfigurationManager.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<Rune> (json, ConfigurationManager.SerializerContext.Options);
 
         // Assert
         Assert.Equal ("a", deserialized.ToString ());
@@ -138,7 +138,7 @@ public class RuneJsonConverterTests
         var json = "97";
 
         // Act
-        var deserialized = JsonSerializer.Deserialize<Rune> (json, ConfigurationManager.SerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<Rune> (json, ConfigurationManager.SerializerContext.Options);
 
         // Assert
         Assert.Equal ("a", deserialized.ToString ());

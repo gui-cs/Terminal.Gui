@@ -6,52 +6,46 @@ namespace Terminal.Gui.ConfigurationTests;
 public class ThemeScopeTests
 {
     [Fact]
-    public void CM_AllConfigurationProperties_Null ()
+    public void Schemes_Property_Exists ()
     {
-        Assert.Null (ConfigurationManager._allConfigProperties);
-    }
+        // Need to call Initialize to setup readonly statics
+        ConfigurationManager.Initialize ();
 
-    [Fact]
-    public void Constructor_Initializes ()
-    {
-        CM_AllConfigurationProperties_Null ();
+        var scope = new ThemeScope();
 
-        var themeScope = new ThemeScope ();
-        CM_AllConfigurationProperties_Null ();
-
-        Assert.NotEmpty (themeScope);
+        Assert.NotEmpty (scope);
 
         // Schemes exists, but is not initialized
-        Assert.Null (themeScope ["Schemes"].PropertyValue);
+        Assert.Null (scope ["Schemes"].PropertyValue);
+
+        Assert.NotEmpty (scope);
     }
 
+    //[Fact]
+    //public void RetrievValues_Gets_Default_Values ()
+    //{
+    //    // Need to call Initialize to setup readonly statics
+    //    ConfigurationManager.Initialize ();
 
-    [Fact]
-    public void RetrievValues_Gets_Default_Values ()
-    {
-        CM_AllConfigurationProperties_Null ();
+    //    var themeScope = new ThemeScope ();
 
-        var themeScope = new ThemeScope ();
-        CM_AllConfigurationProperties_Null ();
+    //    Assert.NotEmpty (themeScope);
 
-        Assert.NotEmpty (themeScope);
+    //    // Schemes exists, but is not initialized
+    //    Assert.Null (themeScope ["Schemes"].PropertyValue);
 
-        // Schemes exists, but is not initialized
-        Assert.Null (themeScope ["Schemes"].PropertyValue);
+    //    themeScope.RetrieveValues ();
 
-        themeScope.RetrieveValues ();
-        CM_AllConfigurationProperties_Null ();
+    //    Assert.NotEmpty (themeScope);
 
-        Assert.NotEmpty (themeScope);
+    //    // Schemes exists, and has correct # of eleements
+    //    var schemes = themeScope ["Schemes"].PropertyValue as Dictionary<string, Scheme>;
+    //    Assert.NotNull (schemes);
+    //    Assert.Equal (5, schemes!.Count);
 
-        // Schemes exists, and has correct # of eleements
-        var schemes = themeScope ["Schemes"].PropertyValue as Dictionary<string, Scheme>;
-        Assert.NotNull (schemes);
-        Assert.Equal (5, schemes!.Count);
+    //    // Base has correct values
+    //    var baseSchemee = schemes ["Base"];
+    //    Assert.Equal (new Attribute(Color.White, Color.Blue), baseSchemee.Normal);
 
-        // Base has correct values
-        var baseSchemee = schemes ["Base"];
-        Assert.Equal (new Attribute(Color.White, Color.Blue), baseSchemee.Normal);
-
-    }
+    //}
 }

@@ -219,11 +219,11 @@ public class UICatalog
 
         if (string.IsNullOrWhiteSpace (UICatalogTop.CachedTheme))
         {
-            UICatalogTop.CachedTheme = Themes?.Theme;
+            UICatalogTop.CachedTheme = ConfigurationManager.ThemeManager?.Theme;
         }
         else
         {
-            Themes!.Theme = UICatalogTop.CachedTheme;
+            ConfigurationManager.ThemeManager!.Theme = UICatalogTop.CachedTheme;
         }
 
         UICatalogTop top = Application.Run<UICatalogTop> ();

@@ -8,6 +8,7 @@ using System.Runtime.Versioning;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Terminal.Gui.Configuration;
 
 #nullable enable
 
@@ -53,7 +54,6 @@ namespace Terminal.Gui;
 [ComponentGuarantees (ComponentGuaranteesOptions.None)]
 public static class ConfigurationManager
 {
-
     /// <summary>
     ///     A cache of all properties in the Terminal.Gui project that are decorated with the
     ///     <see cref="SerializableConfigurationProperty"/> attribute. The keys are the property names pre-pended with the
@@ -75,33 +75,30 @@ public static class ConfigurationManager
     [RequiresUnreferencedCode ("AOT")]
     internal static void Initialize ()
     {
-        Debug.Assert (_allConfigProperties is null);
-        Debug.Assert (_classesWithConfigProps is null);
-        Debug.Assert (_settings is null);
-        Debug.Assert (_themes is null);
-        Debug.Assert (_appSettings is null);
-
-        // Step 1: Cache all classes with configuration properties
+        // Cache all classes with configuration properties
         _classesWithConfigProps = GetClassesWithConfigProperties ();
 
-        // Step 2: Cache all configuration properties
+        // Cache all configuration properties
         _allConfigProperties = GetAllConfigProperties ();
 
-        // Step 3: Sort the properties
+        // Sort the properties
         _allConfigProperties = _allConfigProperties.OrderBy (x => x.Key)
-                                                    .ToDictionary (
-                                                        x => x.Key,
-                                                        x => x.Value,
-                                                        StringComparer.InvariantCultureIgnoreCase);
+                                                   .ToDictionary (
+                                                                  x => x.Key,
+                                                                  x => x.Value,
+                                                                  StringComparer.InvariantCultureIgnoreCase);
     }
 
+    /// <summary>
+    ///     Un-initializes CM. To be called as a pair with <see cref="Initialize"/>.
+    /// </summary>
 
-    internal static void Reset ()
+    internal static void UnInitialize ()
     {
         _allConfigProperties = null;
         _classesWithConfigProps = null;
         _settings = null;
-        _themes = null;
+        _themeManager = null;
         _appSettings = null;
 
         Locations = ConfigLocations.All;
@@ -119,7 +116,7 @@ public static class ConfigurationManager
     }
 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    internal static readonly JsonSerializerOptions SerializerOptions = new ()
+    internal static readonly SourceGenerationContext SerializerContext = new (new JsonSerializerOptions ()
     {
         ReadCommentHandling = JsonCommentHandling.Skip,
         PropertyNameCaseInsensitive = true,
@@ -138,22 +135,21 @@ public static class ConfigurationManager
         // Enables Key to be "Ctrl+Q" vs "Ctrl\u002BQ"
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         TypeInfoResolver = SourceGenerationContext.Default
-    };
-
-    [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    internal static readonly SourceGenerationContext SerializerContext = new (SerializerOptions);
+    });
 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     internal static StringBuilder _jsonErrors = new ();
-
-    [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    private static readonly string _configFilename = "config.json";
 
     /// <summary>
     ///     Gets and sets the locations where <see cref="ConfigurationManager"/> will look for config files. The default value is
     ///     <see cref="ConfigLocations.All"/>.
     /// </summary>
     public static ConfigLocations Locations { get; set; } = ConfigLocations.All;
+
+    /// <summary>
+    ///     Gets the Sources Manager - manages the loading of configuration sources from files and resources.
+    /// </summary>
+    public static SourcesManager? SourcesManager { get; internal set; } = new SourcesManager ();
 
     /// <summary>Name of the running application. By default, this property is set to the application's assembly name.</summary>
     public static string AppName { get; set; } = Assembly.GetEntryAssembly ()?.FullName?.Split (',') [0]?.Trim ()!;
@@ -202,24 +198,22 @@ public static class ConfigurationManager
     }
 
 
-    /// <summary>The backing property for <see cref="Themes"/> (a Dictionary of named <see cref="ThemeScope"/> objects).</summary>
+    /// <summary>The backing property for <see cref="ThemeManager"/> (a Dictionary of named <see cref="ThemeScope"/> objects).</summary>
     /// <remarks>
     ///     Is <see langword="null"/> until <see cref="ResetAllSettings"/> is called. Gets set to a new instance by deserialization
     ///     (see <see cref="Load"/>).
     /// </remarks>
-    internal static ThemeManager? _themes;
+    internal static ThemeManager? _themeManager = new ();
 
     /// <summary>
     ///     The root object of Terminal.Gui themes manager. ThemeManager is a Dictionary of named <see cref="ThemeScope"/> objects.
     /// </summary>
-    public static ThemeManager? Themes
+    [SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
+    [JsonPropertyName ("Themes")]
+    public static ThemeManager? ThemeManager
     {
-        get
-        {
-            Debug.Assert (IsInitialized ());
-            return _themes;
-        }
-        set => _themes = value!;
+        get => _themeManager;
+        set => _themeManager = value!;
     }
 
     /// <summary>
@@ -250,12 +244,12 @@ public static class ConfigurationManager
                 settings = Settings?.Apply () ?? false;
 
                 themes = !string.IsNullOrEmpty (ThemeManager.SelectedTheme)
-                         && (ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false);
+                         && (CM.ThemeManager! [ThemeManager.SelectedTheme]?.Apply () ?? false);
             }
             else
             {
                 // Subsequently. Apply Themes first using whatever the SelectedTheme is
-                themes = ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false;
+                themes = CM.ThemeManager! [ThemeManager.SelectedTheme]?.Apply () ?? false;
                 settings = Settings?.Apply () ?? false;
             }
 
@@ -283,18 +277,22 @@ public static class ConfigurationManager
 
     /// <summary>Returns an empty Json document with just the $schema tag.</summary>
     /// <returns></returns>
-    public static string GetEmptyJson ()
+    public static string GetEmptyConfig ()
     {
         var emptyScope = new SettingsScope ();
         emptyScope.Clear ();
 
-        return JsonSerializer.Serialize (emptyScope, typeof (SettingsScope), SerializerContext);
+        return JsonSerializer.Serialize (emptyScope, typeof (SettingsScope), CM.SerializerContext!);
     }
 
     /// <summary>
     ///     Gets or sets the in-memory config.json. See <see cref="ConfigLocations.Runtime"/>.
     /// </summary>
     public static string? RuntimeConfig { get; set; } = """{  }""";
+
+
+    [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+    private static readonly string _configFilename = "config.json";
 
     /// <summary>
     ///     Loads all settings found in the configuration storage locations (<see cref="ConfigLocations"/>). Optionally, resets
@@ -316,7 +314,7 @@ public static class ConfigurationManager
     {
         Logging.Trace ($"reset = {reset}");
 
-        if (reset)
+        if (reset || Settings is null)
         {
             ResetAllSettings ();
         }
@@ -333,33 +331,33 @@ public static class ConfigurationManager
                 embeddedStylesResourceName = _configFilename;
             }
 
-            Settings?.UpdateFromResource (Assembly.GetEntryAssembly ()!, embeddedStylesResourceName!, ConfigLocations.AppResources);
+            SourcesManager?.UpdateFromResource (Settings, Assembly.GetEntryAssembly ()!, embeddedStylesResourceName!, ConfigLocations.AppResources);
         }
 
         // TODO: Determine if Runtime should be applied last.
         if (Locations.HasFlag (ConfigLocations.Runtime) && !string.IsNullOrEmpty (RuntimeConfig))
         {
-            Settings?.Update (RuntimeConfig, "ConfigurationManager.RuntimeConfig", ConfigLocations.Runtime);
+            SourcesManager?.Update (Settings, RuntimeConfig, "ConfigurationManager.RuntimeConfig", ConfigLocations.Runtime);
         }
 
         if (Locations.HasFlag (ConfigLocations.GlobalCurrent))
         {
-            Settings?.Update ($"./.tui/{_configFilename}", ConfigLocations.GlobalCurrent);
+            SourcesManager?.Update (Settings, $"./.tui/{_configFilename}", ConfigLocations.GlobalCurrent);
         }
 
         if (Locations.HasFlag (ConfigLocations.GlobalHome))
         {
-            Settings?.Update ($"~/.tui/{_configFilename}", ConfigLocations.GlobalHome);
+            SourcesManager?.Update (Settings, $"~/.tui/{_configFilename}", ConfigLocations.GlobalHome);
         }
 
         if (Locations.HasFlag (ConfigLocations.AppCurrent))
         {
-            Settings?.Update ($"./.tui/{AppName}.{_configFilename}", ConfigLocations.AppCurrent);
+            SourcesManager?.Update (Settings, $"./.tui/{AppName}.{_configFilename}", ConfigLocations.AppCurrent);
         }
 
         if (Locations.HasFlag (ConfigLocations.AppHome))
         {
-            Settings?.Update ($"~/.tui/{AppName}.{_configFilename}", ConfigLocations.AppHome);
+            SourcesManager?.Update (Settings, $"~/.tui/{AppName}.{_configFilename}", ConfigLocations.AppHome);
         }
 
         ThemeManager.SelectedTheme = Settings! ["Theme"].PropertyValue as string ?? "Default";
@@ -436,28 +434,28 @@ public static class ConfigurationManager
         ClearJsonErrors ();
 
         Settings = new SettingsScope ();
-        ThemeManager.Reset ();
-        Themes = ThemeManager.Instance;
-        Settings ["Theme"].PropertyValue = Themes.Theme;
-        Settings ["Themes"].PropertyValue = Themes;
+        ThemeManager?.Reset ();
+        Settings ["Theme"].PropertyValue = ThemeManager.Theme;
+        Settings ["Themes"].PropertyValue = ThemeManager;
         AppSettings = new ();
 
-       // Debug.Assert (Locations.HasFlag (ConfigLocations.Default));
+        // Debug.Assert (Locations.HasFlag (ConfigLocations.Default));
 
         // To enable some unit tests, we only load from resources if the flag is set
         if (Locations.HasFlag (ConfigLocations.Default))
         {
-            Settings.UpdateFromResource (
-                                         typeof (ConfigurationManager).Assembly,
-                                         $"Terminal.Gui.Resources.{_configFilename}",
-                                         ConfigLocations.Default
-                                        );
+            SourcesManager?.UpdateFromResource (
+                                               Settings,
+                                               typeof (ConfigurationManager).Assembly,
+                                               $"Terminal.Gui.Resources.{_configFilename}",
+                                               ConfigLocations.Default
+                                              );
         }
 
         OnUpdated ();
 
         Apply ();
-        ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply ();
+        ThemeManager [ThemeManager.SelectedTheme]?.Apply ();
         AppSettings?.Apply ();
     }
 
@@ -468,108 +466,6 @@ public static class ConfigurationManager
     {
         Logging.Trace ($"error = {error}");
         _jsonErrors.AppendLine (error);
-    }
-
-    /// <summary>
-    ///     System.Text.Json does not support copying a deserialized object to an existing instance. To work around this,
-    ///     we implement a 'deep, member-wise copy' method.
-    /// </summary>
-    /// <remarks>TOOD: When System.Text.Json implements `PopulateObject` revisit https://github.com/dotnet/corefx/issues/37627</remarks>
-    /// <param name="source"></param>
-    /// <param name="destination"></param>
-    /// <returns><paramref name="destination"/> updated from <paramref name="source"/></returns>
-    internal static object? DeepMemberWiseCopy (object? source, object? destination)
-    {
-        ArgumentNullException.ThrowIfNull (destination);
-
-        if (source is null)
-        {
-            return null!;
-        }
-
-        if (source.GetType () == typeof (SettingsScope))
-        {
-            return ((SettingsScope)destination).Update ((SettingsScope)source);
-        }
-
-        if (source.GetType () == typeof (ThemeScope))
-        {
-            return ((ThemeScope)destination).Update ((ThemeScope)source);
-        }
-
-        if (source.GetType () == typeof (AppScope))
-        {
-            return ((AppScope)destination).Update ((AppScope)source);
-        }
-
-        // If value type, just use copy constructor.
-        if (source.GetType ().IsValueType || source is string)
-        {
-            return source;
-        }
-
-        // HACK: Key is a class, but we want to treat it as a value type so just _keyCode gets copied.
-        if (source.GetType () == typeof (Key))
-        {
-            return source;
-        }
-
-        // Dictionary
-        if (source.GetType ().IsGenericType
-            && source.GetType ().GetGenericTypeDefinition ().IsAssignableFrom (typeof (Dictionary<,>)))
-        {
-            foreach (object? srcKey in ((IDictionary)source).Keys)
-            {
-                if (((IDictionary)destination).Contains (srcKey))
-                {
-                    ((IDictionary)destination) [srcKey] =
-                        DeepMemberWiseCopy (((IDictionary)source) [srcKey], ((IDictionary)destination) [srcKey]);
-                }
-                else
-                {
-                    ((IDictionary)destination).Add (srcKey, ((IDictionary)source) [srcKey]);
-                }
-            }
-
-            return destination;
-        }
-
-        // ALl other object types
-        List<PropertyInfo>? sourceProps = source?.GetType ().GetProperties ().Where (x => x.CanRead).ToList ();
-        List<PropertyInfo>? destProps = destination?.GetType ().GetProperties ().Where (x => x.CanWrite).ToList ()!;
-
-        foreach ((PropertyInfo? sourceProp, PropertyInfo? destProp) in
-                 from sourceProp in sourceProps
-                 where destProps.Any (x => x.Name == sourceProp.Name)
-                 let destProp = destProps.First (x => x.Name == sourceProp.Name)
-                 where destProp.CanWrite
-                 select (sourceProp, destProp))
-        {
-            object? sourceVal = sourceProp.GetValue (source);
-            object? destVal = destProp.GetValue (destination);
-
-            if (sourceVal is { })
-            {
-                try
-                {
-                    if (destVal is { })
-                    {
-                        // Recurse
-                        destProp.SetValue (destination, DeepMemberWiseCopy (sourceVal, destVal));
-                    }
-                    else
-                    {
-                        destProp.SetValue (destination, sourceVal);
-                    }
-                }
-                catch (ArgumentException e)
-                {
-                    throw new JsonException ($"Error Applying Configuration Change: {e.Message}", e);
-                }
-            }
-        }
-
-        return destination;
     }
 
     /// <summary>
@@ -636,6 +532,11 @@ public static class ConfigurationManager
     [RequiresUnreferencedCode ("AOT")]
     private static Dictionary<string, ConfigProperty> GetAllConfigProperties ()
     {
+        if (_classesWithConfigProps is null)
+        {
+            throw new InvalidOperationException ("GetClassesWithConfigProperties must be called first.");
+        }
+
         var allConfigProperties = new Dictionary<string, ConfigProperty> (StringComparer.InvariantCultureIgnoreCase);
 
         foreach (var property in from c in _classesWithConfigProps
@@ -648,25 +549,34 @@ public static class ConfigurationManager
                                  from property in props
                                  select property)
         {
-            if (property.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is SerializableConfigurationProperty scp)
+            if (property.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is not SerializableConfigurationProperty scp)
             {
-                if (property.GetGetMethod (true)!.IsStatic)
-                {
-                    var key = scp.OmitClassName
-                        ? ConfigProperty.GetJsonPropertyName (property)
-                        : $"{property.DeclaringType?.Name}.{property.Name}";
+                continue;
+            }
 
-                    allConfigProperties.Add (key, new ConfigProperty
-                    {
-                        PropertyInfo = property,
-                        PropertyValue = null
-                    });
-                }
-                else
+            if (!property.GetGetMethod (true)!.IsPublic)
+            {
+                throw new InvalidOperationException (
+                                                     $"Property {property.Name} in class {property.DeclaringType?.Name} is not public. SerializableConfigurationProperty properties must be public.");
+
+            }
+
+            if (property.GetGetMethod (true)!.IsStatic)
+            {
+                var key = scp.OmitClassName
+                              ? ConfigProperty.GetJsonPropertyName (property)
+                              : $"{property.DeclaringType?.Name}.{property.Name}";
+
+                allConfigProperties.Add (key, new ConfigProperty
                 {
-                    throw new InvalidOperationException (
-                        $"Property {property.Name} in class {property.DeclaringType?.Name} is not static. All SerializableConfigurationProperty properties must be static.");
-                }
+                    PropertyInfo = property,
+                    PropertyValue = null
+                });
+            }
+            else
+            {
+                throw new InvalidOperationException (
+                                                     $"Property {property.Name} in class {property.DeclaringType?.Name} is not static. SerializableConfigurationProperty properties must be static.");
             }
         }
 
@@ -691,33 +601,7 @@ public static class ConfigurationManager
                                          cp.Value.PropertyInfo?.GetCustomAttribute<SerializableConfigurationProperty> ()?.Scope == scopeType);
     }
 
-
-    /// <summary>Creates a JSON document with the configuration specified.</summary>
-    /// <returns></returns>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-    internal static string ToJson ()
-    {
-        //Logging.Trace ("ConfigurationManager.ToJson()");
-
-        return JsonSerializer.Serialize (Settings!, typeof (SettingsScope), SerializerContext);
-    }
-
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-    internal static Stream ToStream ()
-    {
-        string json = JsonSerializer.Serialize (Settings!, typeof (SettingsScope), SerializerContext);
-
-        // turn it into a stream
-        var stream = new MemoryStream ();
-        var writer = new StreamWriter (stream);
-        writer.Write (json);
-        writer.Flush ();
-        stream.Position = 0;
-
-        return stream;
-    }
-
     private static void ClearJsonErrors () { _jsonErrors.Clear (); }
+
+
 }

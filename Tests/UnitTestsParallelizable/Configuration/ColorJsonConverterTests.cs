@@ -1,10 +1,14 @@
-﻿using System.Text;
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace Terminal.Gui.ConfigurationTests;
 
 public class ColorJsonConverterTests
 {
+    public static readonly JsonSerializerOptions JsonOptions = new ()
+    {
+        Converters = { new AttributeJsonConverter (), new ColorJsonConverter () }
+    };
+
     [Theory]
     [InlineData ("\"#000000\"", 0, 0, 0)]
     public void DeserializesFromHexCode (string hexCode, int r, int g, int b)
@@ -106,7 +110,7 @@ public class ColorJsonConverterTests
         var json = $"\"{colorName}\"";
 
         // Act
-        var actualColor = JsonSerializer.Deserialize<Color> (json, ConfigurationManagerTests._jsonOptions);
+        var actualColor = JsonSerializer.Deserialize<Color> (json, JsonOptions);
 
         // Assert
         Assert.Equal (new Color (expectedColor), actualColor);

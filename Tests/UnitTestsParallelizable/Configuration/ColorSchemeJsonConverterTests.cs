@@ -1,10 +1,14 @@
 ﻿using System.Text.Json;
-using UnitTests;
 
 namespace Terminal.Gui.ConfigurationTests;
 
 public class SchemeJsonConverterTests
 {
+    public static readonly JsonSerializerOptions JsonOptions = new ()
+    {
+        Converters = { new AttributeJsonConverter (), new ColorJsonConverter () }
+    };
+
     //string json = @"
     //	{
     //	""Schemes"": {
@@ -46,11 +50,11 @@ public class SchemeJsonConverterTests
         };
 
         string serializedScheme =
-            JsonSerializer.Serialize (expectedScheme, ConfigurationManagerTests._jsonOptions);
+            JsonSerializer.Serialize (expectedScheme, JsonOptions);
 
         // Act
         var actualScheme =
-            JsonSerializer.Deserialize<Scheme> (serializedScheme, ConfigurationManagerTests._jsonOptions);
+            JsonSerializer.Deserialize<Scheme> (serializedScheme, JsonOptions);
 
         // Assert
         Assert.Equal (expectedScheme, actualScheme);

@@ -181,15 +181,19 @@ public static partial class Application // Initialization (Init/Shutdown)
     [RequiresDynamicCode ("AOT")]
     internal static void InitializeConfigurationManagement ()
     {
+        // Need to call Initialize to setup CM's readonly statics
+        // Note this does NOT initialize any settings; just the members that are readonly
+        ConfigurationManager.Initialize ();
+
         // Start the process of configuration management.
         // Note that we end up calling LoadConfigurationFromAllSources
         // multiple times. We need to do this because some settings are only
         // valid after a Driver is loaded. In this case we need just
         // `Settings` so we can determine which driver to use.
         // Don't reset, so we can inherit the theme from the previous run.
-        string previousTheme = Themes?.Theme ?? string.Empty;
+        string previousTheme = ConfigurationManager.ThemeManager?.Theme ?? string.Empty;
         Load ();
-        if (Themes is { } && !string.IsNullOrEmpty (previousTheme) && previousTheme != "Default")
+        if (ConfigurationManager.ThemeManager is { } && !string.IsNullOrEmpty (previousTheme) && previousTheme != "Default")
         {
             ThemeManager.SelectedTheme = previousTheme;
         }

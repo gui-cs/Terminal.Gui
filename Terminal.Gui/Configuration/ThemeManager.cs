@@ -14,7 +14,7 @@ namespace Terminal.Gui;
 /// <para>
 ///     <see cref="ThemeManager"/> is a singleton class. It is created when the first <see cref="ThemeManager"/> property
 ///     is accessed. Accessing <see cref="ThemeManager.Instance"/> is the same as accessing
-///     <see cref="ConfigurationManager.Themes"/>.
+///     <see cref="ConfigurationManager.ThemeManager"/>.
 /// </para>
 /// <example>
 ///     <code>
@@ -53,12 +53,51 @@ namespace Terminal.Gui;
 /// </example>
 public class ThemeManager : IDictionary<string, ThemeScope>
 {
-    private static string _theme = string.Empty;
-    static ThemeManager () { } // Make sure it's truly lazy
-    private ThemeManager () { } // Prevent instantiation outside
+    //static ThemeManager () { } // Make sure it's truly lazy
+    //private ThemeManager () { } // Prevent instantiation outside
 
-    /// <summary>Class is a singleton...</summary>
-    public static ThemeManager Instance { get; } = new ();
+    ///// <summary>Class is a singleton...</summary>
+    //public static ThemeManager Instance { get; } = new ();
+
+    /// <summary>Holds the <see cref="ThemeScope"/> definitions.</summary>
+    //[JsonInclude]
+    //[JsonConverter (typeof (DictionaryJsonConverter<ThemeScope>))]
+    //[SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
+    private Dictionary<string, ThemeScope>? Themes { get; set; } = new ();
+    //{
+    //    [RequiresUnreferencedCode ("AOT")]
+    //    [RequiresDynamicCode ("AOT")]
+    //    get
+    //    {
+    //        if (Settings is { } && Settings.TryGetValue ("Themes", out ConfigProperty? themes))
+    //        {
+    //            return themes.PropertyValue as Dictionary<string, ThemeScope>;
+    //        }
+
+    //        return null;
+    //    }
+
+    //    // themes ?? new Dictionary<string, ThemeScope> ();
+
+    //    [RequiresUnreferencedCode ("AOT")]
+    //    [RequiresDynamicCode ("AOT")]
+    //    set
+    //    {
+    //        //if (themes is null || value is null) {
+    //        //	themes = value;
+    //        //} else {
+    //        //	themes = (Dictionary<string, ThemeScope>)DeepMemberwiseCopy (value!, themes!)!;
+    //        //}
+
+    //        // BUGBUG: We should not be setting Settings here. Instead, Settings should subscrube to something and update
+    //        if (Settings is { } && Settings.TryGetValue ("Themes", out ConfigProperty? themes))
+    //        {
+    //            Settings ["Themes"].PropertyValue = value;
+    //        }
+    //    }
+    //}
+
+    private static string _selectedTheme = string.Empty;
 
     /// <summary>Gets or sets the currently selected theme. The value is persisted to the "Theme" property.</summary>
     [JsonIgnore]
@@ -71,59 +110,21 @@ public class ThemeManager : IDictionary<string, ThemeScope>
         set => SelectedTheme = value;
     }
 
-    /// <summary>Holds the <see cref="ThemeScope"/> definitions.</summary>
-    [JsonInclude]
-    [JsonConverter (typeof (DictionaryJsonConverter<ThemeScope>))]
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
-    public static Dictionary<string, ThemeScope>? Themes
-    {
-        [RequiresUnreferencedCode ("AOT")]
-        [RequiresDynamicCode ("AOT")]
-        get
-        {
-            if (Settings is { } && Settings.TryGetValue ("Themes", out ConfigProperty? themes))
-            {
-                return themes.PropertyValue as Dictionary<string, ThemeScope>;
-            }
-
-            return null;
-        }
-
-        // themes ?? new Dictionary<string, ThemeScope> ();
-
-        [RequiresUnreferencedCode ("AOT")]
-        [RequiresDynamicCode ("AOT")]
-        set
-        {
-            //if (themes is null || value is null) {
-            //	themes = value;
-            //} else {
-            //	themes = (Dictionary<string, ThemeScope>)DeepMemberwiseCopy (value!, themes!)!;
-            //}
-
-            // BUGBUG: We should not be setting Settings here. Instead, Settings should subscrube to something and update
-            if (Settings is { } && Settings.TryGetValue ("Themes", out ConfigProperty? themes))
-            {
-                Settings ["Themes"].PropertyValue = value;
-            }
-        }
-    }
-
     /// <summary>The currently selected theme. This is the internal version; see <see cref="Theme"/>.</summary>
     [JsonInclude]
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
     [JsonPropertyName ("Theme")]
-    internal static string SelectedTheme
+    public static string SelectedTheme
     {
-        get => _theme;
+        get => _selectedTheme;
 
         [RequiresUnreferencedCode ("Calls Terminal.Gui.ConfigurationManager.Settings")]
         [RequiresDynamicCode ("Calls Terminal.Gui.ConfigurationManager.Settings")]
         set
         {
-            string prevousThemeValue = _theme;
+            string prevousThemeValue = _selectedTheme;
 
-            _theme = value;
+            _selectedTheme = value;
 
             if (Settings is null || !Settings.TryGetValue ("Theme", out ConfigProperty? themeCp))
             {
@@ -138,10 +139,10 @@ public class ThemeManager : IDictionary<string, ThemeScope>
                     return;
                 }
 
-                if (prevousThemeValue != _theme || prevousThemeValue != theme)
+                if (prevousThemeValue != _selectedTheme || prevousThemeValue != theme)
                 {
-                    Settings! ["Theme"].PropertyValue = _theme;
-                    Instance.OnThemeChanged (prevousThemeValue);
+                    Settings! ["Theme"].PropertyValue = _selectedTheme;
+                    //Instance.OnThemeChanged (prevousThemeValue);
                 }
             }
         }
@@ -152,16 +153,15 @@ public class ThemeManager : IDictionary<string, ThemeScope>
 
     [RequiresUnreferencedCode ("Calls Terminal.Gui.ThemeManager.Themes")]
     [RequiresDynamicCode ("Calls Terminal.Gui.ThemeManager.Themes")]
-    internal static void ResetToCurrentValues ()
+    internal void ResetToCurrentValues ()
     {
         //Logging.Trace ("Themes.GetHardCodedDefaults()");
         var theme = new ThemeScope ();
         theme.RetrieveValues ();
 
-        Themes = new Dictionary<string, ThemeScope> (StringComparer.InvariantCultureIgnoreCase)
-        {
-            { "Default", theme }
-        };
+        Clear();
+        Add ("Default", theme);
+        // TODO: Determine if this shouild be done here.
         SelectedTheme = "Default";
     }
 
@@ -174,12 +174,13 @@ public class ThemeManager : IDictionary<string, ThemeScope>
 
     [RequiresUnreferencedCode ("Calls Terminal.Gui.ThemeManager.Themes")]
     [RequiresDynamicCode ("Calls Terminal.Gui.ThemeManager.Themes")]
-    internal static void Reset ()
+    internal void Reset ()
     {
         //Logging.Trace ("Themes.Reset()");
-        ResetToCurrentValues ();
-        //Themes?.Clear ();
-        //Themes?.Add ("Default", new ThemeScope ());
+        //ResetToCurrentValues ();
+
+        Clear ();
+        Add ("Default", new ThemeScope());
         SelectedTheme = "Default";
     }
 
@@ -264,7 +265,13 @@ public class ThemeManager : IDictionary<string, ThemeScope>
     [RequiresDynamicCode ("AOT")]
 #pragma warning disable IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
 #pragma warning disable IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-    public void Clear () { ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).Clear (); }
+    public void Clear ()
+    {
+        if (Themes is { })
+        {
+            ((ICollection<KeyValuePair<string, ThemeScope>>)Themes).Clear ();
+        }
+    }
 #pragma warning restore IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
 #pragma warning restore IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
 
@@ -299,7 +306,15 @@ public class ThemeManager : IDictionary<string, ThemeScope>
     [RequiresDynamicCode ("AOT")]
 #pragma warning disable IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
 #pragma warning disable IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-    public IEnumerator<KeyValuePair<string, ThemeScope>> GetEnumerator () { return ((IEnumerable<KeyValuePair<string, ThemeScope>>)Themes!).GetEnumerator (); }
+    public IEnumerator<KeyValuePair<string, ThemeScope>> GetEnumerator ()
+    {
+        if (Themes is { })
+        {
+            return ((IEnumerable<KeyValuePair<string, ThemeScope>>)Themes).GetEnumerator ();
+        }
+
+        return null!;
+    }
 #pragma warning restore IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
 #pragma warning restore IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
 
