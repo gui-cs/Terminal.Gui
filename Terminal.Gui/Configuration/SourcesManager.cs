@@ -1,8 +1,10 @@
 ﻿#nullable enable
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json;
+using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui.Configuration;
 
@@ -32,14 +34,17 @@ public class SourcesManager
         // Update the existing settings with the new settings.
         try
         {
+#if DEBUG
+            string? json = new StreamReader (stream).ReadToEnd ();
+            stream.Position = 0;
+            Debug.Assert (json != null, "json != null");
+#endif
             settingsScope.Update ((SettingsScope)JsonSerializer.Deserialize (stream, typeof (SettingsScope), SerializerContext.Options)!);
             CM.OnUpdated ();
-            Logging.Trace ($"Read from \"{source}\"");
-            if (!Sources.ContainsValue (source))
-            {
-                Sources.Add (location, source);
-            }
 
+            AddSource (location, source);
+
+            Logging.Trace ($"Read configuration from \"{source}\" - ConfigLocation: {location}");
             return true;
         }
         catch (JsonException e)
@@ -53,6 +58,15 @@ public class SourcesManager
         }
 
         return false;
+    }
+
+    private void AddSource (ConfigLocations location, string source)
+    {
+        if (!Sources.TryAdd (location, source))
+        {
+            Logging.Warning ($"{location} has already been added to Sources.");
+            Sources [location] = source;
+        }
     }
 
     /// <summary>Updates the <see cref="SettingsScope"/> with the settings in a JSON file.</summary>
@@ -69,11 +83,9 @@ public class SourcesManager
         if (!File.Exists (realPath))
         {
             Logging.Warning ($"\"{realPath}\" does not exist.");
-            if (!Sources.ContainsValue (filePath))
-            {
-                Sources.Add (location, filePath);
-            }
 
+            // Always add the source even if it doesn't exist.
+            AddSource (location, filePath);
             return true;
         }
 
@@ -114,6 +126,7 @@ public class SourcesManager
     [RequiresDynamicCode ("AOT")]
     public bool Update (SettingsScope? settingsScope, string? json, string source, ConfigLocations location)
     {
+        Debug.Assert(location != ConfigLocations.All);
         if (string.IsNullOrEmpty (json))
         {
             return false;
@@ -161,8 +174,7 @@ public class SourcesManager
     [RequiresDynamicCode ("AOT")]
     internal string ToJson (SettingsScope? scope)
     {
-        //Logging.Trace ("ConfigurationManager.ToJson()");
-
+        //Logging.Debug  ("ConfigurationManager.ToJson()");
         return JsonSerializer.Serialize (scope, typeof (SettingsScope), SerializerContext);
     }
 

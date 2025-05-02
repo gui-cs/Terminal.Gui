@@ -87,6 +87,8 @@ public static class ConfigurationManager
                                                                   x => x.Key,
                                                                   x => x.Value,
                                                                   StringComparer.InvariantCultureIgnoreCase);
+
+        // Note, we do not set _settings, _appSettings, or _themeManager here. They get set in Load
     }
 
     /// <summary>
@@ -98,8 +100,8 @@ public static class ConfigurationManager
         _allConfigProperties = null;
         _classesWithConfigProps = null;
         _settings = null;
-        _themeManager = null;
         _appSettings = null;
+        _themeManager = null;
 
         Locations = ConfigLocations.All;
 
@@ -186,34 +188,35 @@ public static class ConfigurationManager
         get
         {
             Debug.Assert (IsInitialized ());
-            //if (_settings is null)
-            //{
-            //    // If Settings is null, we need to initialize it.
-            //    ResetAllSettings ();
-            //}
+            if (_settings is null)
+            {
+                // If Settings is null, we need to initialize it.
+                ResetAllSettings ();
+            }
 
             return _settings;
         }
-        set => _settings = value!;
+        set => _settings = value;
     }
 
-
-    /// <summary>The backing property for <see cref="ThemeManager"/> (a Dictionary of named <see cref="ThemeScope"/> objects).</summary>
-    /// <remarks>
-    ///     Is <see langword="null"/> until <see cref="ResetAllSettings"/> is called. Gets set to a new instance by deserialization
-    ///     (see <see cref="Load"/>).
-    /// </remarks>
-    internal static ThemeManager? _themeManager = new ();
+    internal static ThemeManager? _themeManager;
 
     /// <summary>
-    ///     The root object of Terminal.Gui themes manager. ThemeManager is a Dictionary of named <see cref="ThemeScope"/> objects.
+    /// 
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
-    [JsonPropertyName ("Themes")]
     public static ThemeManager? ThemeManager
     {
-        get => _themeManager;
-        set => _themeManager = value!;
+        get
+        {
+            Debug.Assert (IsInitialized ());
+            if (_themeManager is null)
+            {
+                ResetAllSettings ();
+            }
+
+            return _themeManager;
+        }
+        set => _themeManager = value;
     }
 
     /// <summary>
@@ -244,12 +247,12 @@ public static class ConfigurationManager
                 settings = Settings?.Apply () ?? false;
 
                 themes = !string.IsNullOrEmpty (ThemeManager.SelectedTheme)
-                         && (CM.ThemeManager! [ThemeManager.SelectedTheme]?.Apply () ?? false);
+                         && (ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false);
             }
             else
             {
                 // Subsequently. Apply Themes first using whatever the SelectedTheme is
-                themes = CM.ThemeManager! [ThemeManager.SelectedTheme]?.Apply () ?? false;
+                themes = ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false;
                 settings = Settings?.Apply () ?? false;
             }
 
@@ -289,7 +292,6 @@ public static class ConfigurationManager
     ///     Gets or sets the in-memory config.json. See <see cref="ConfigLocations.Runtime"/>.
     /// </summary>
     public static string? RuntimeConfig { get; set; } = """{  }""";
-
 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     private static readonly string _configFilename = "config.json";
@@ -394,24 +396,8 @@ public static class ConfigurationManager
     {
         if (_jsonErrors.Length > 0)
         {
-            Console.WriteLine (
-                               @"Terminal.Gui ConfigurationManager encountered the following errors while deserializing configuration files:"
-                              );
+            Console.WriteLine (@"Terminal.Gui ConfigurationManager encountered the following errors while deserializing configuration files:");
             Console.WriteLine (_jsonErrors.ToString ());
-        }
-    }
-
-    /// <summary>
-    ///     Logs Json deserialization errors that occurred during deserialization.
-    /// </summary>
-    public static void LogJsonErrors ()
-    {
-        if (_jsonErrors.Length > 0)
-        {
-            Logging.Error (
-                           @"Encountered the following errors while deserializing configuration files:"
-                          );
-            Logging.Error (_jsonErrors.ToString ());
         }
     }
 
@@ -433,13 +419,15 @@ public static class ConfigurationManager
 
         ClearJsonErrors ();
 
-        Settings = new SettingsScope ();
+        _settings = new ();
+        _appSettings = new ();
+        _themeManager = new ();
         ThemeManager?.Reset ();
-        Settings ["Theme"].PropertyValue = ThemeManager.Theme;
-        Settings ["Themes"].PropertyValue = ThemeManager;
-        AppSettings = new ();
 
-        // Debug.Assert (Locations.HasFlag (ConfigLocations.Default));
+        if (Locations == ConfigLocations.None)
+        {
+            ResetToCurrentValues();
+        }
 
         // To enable some unit tests, we only load from resources if the flag is set
         if (Locations.HasFlag (ConfigLocations.Default))
@@ -455,7 +443,7 @@ public static class ConfigurationManager
         OnUpdated ();
 
         Apply ();
-        ThemeManager [ThemeManager.SelectedTheme]?.Apply ();
+        ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply ();
         AppSettings?.Apply ();
     }
 
@@ -464,7 +452,7 @@ public static class ConfigurationManager
 
     internal static void AddJsonError (string error)
     {
-        Logging.Trace ($"error = {error}");
+        Logging.Error ($"{error}");
         _jsonErrors.AppendLine (error);
     }
 
@@ -495,7 +483,7 @@ public static class ConfigurationManager
         }
 
         Settings = new ();
-        ThemeManager.ResetToCurrentValues ();
+        ThemeManager?.ResetToCurrentValues ();
         AppSettings?.RetrieveValues ();
 
         foreach (KeyValuePair<string, ConfigProperty> p in Settings!.Where (cp => cp.Value.PropertyInfo is { }))

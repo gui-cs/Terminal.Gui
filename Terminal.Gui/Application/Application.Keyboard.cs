@@ -278,12 +278,12 @@ public static partial class Application // Keyboard handling
                     });
 
         // Resources/config.json overrides
-        QuitKey = Key.Esc;
-        NextTabKey = Key.Tab;
-        PrevTabKey = Key.Tab.WithShift;
-        NextTabGroupKey = Key.F6;
-        PrevTabGroupKey = Key.F6.WithShift;
-        ArrangeKey = Key.F5.WithCtrl;
+        //QuitKey = Key.Esc;
+        //NextTabKey = Key.Tab;
+        //PrevTabKey = Key.Tab.WithShift;
+        //NextTabGroupKey = Key.F6;
+        //PrevTabGroupKey = Key.F6.WithShift;
+        //ArrangeKey = Key.F5.WithCtrl;
 
         // Need to clear after setting the above to ensure actually clear
         // because set_QuitKey etc.. may call Add

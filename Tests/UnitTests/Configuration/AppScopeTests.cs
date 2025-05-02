@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿#nullable enable
+using System.Text.Json;
 using UnitTests;
 using static Terminal.Gui.ConfigurationManager;
 
@@ -20,49 +21,47 @@ public class AppScopeTests
     public void Apply_ShouldApplyUpdatedProperties ()
     {
         ResetAllSettings ();
-        Assert.Null (AppSettingsTestClass.TestProperty);
+        Assert.Null (AppSettingsTestClass.NullableValueProperty);
         Assert.NotEmpty (AppSettings);
-        Assert.Null (AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue);
+        Assert.Null (AppSettings ["AppSettingsTestClass.NullableValueProperty"].PropertyValue);
 
-        AppSettingsTestClass.TestProperty = true;
+        AppSettingsTestClass.NullableValueProperty = true;
         ResetAllSettings ();
-        Assert.True (AppSettingsTestClass.TestProperty);
+        Assert.True (AppSettingsTestClass.NullableValueProperty);
         Assert.NotEmpty (AppSettings);
-        Assert.Null (AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue as bool?);
+        Assert.Null (AppSettings ["AppSettingsTestClass.NullableValueProperty"].PropertyValue as bool?);
 
-        AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue = false;
-        Assert.False (AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue as bool?);
+        AppSettings ["AppSettingsTestClass.NullableValueProperty"].PropertyValue = false;
+        Assert.False (AppSettings ["AppSettingsTestClass.NullableValueProperty"].PropertyValue as bool?);
 
         // ConfigurationManager.Settings should NOT apply theme settings
         Settings.Apply ();
-        Assert.True (AppSettingsTestClass.TestProperty);
+        Assert.True (AppSettingsTestClass.NullableValueProperty);
 
         // ConfigurationManager.Themes should NOT apply theme settings
-        CM.ThemeManager! [ThemeManager.SelectedTheme]!.Apply ();
-        Assert.True (AppSettingsTestClass.TestProperty);
+        ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
+        Assert.True (AppSettingsTestClass.NullableValueProperty);
 
         // ConfigurationManager.AppSettings should NOT apply theme settings
         AppSettings.Apply ();
-        Assert.False (AppSettingsTestClass.TestProperty);
+        Assert.False (AppSettingsTestClass.NullableValueProperty);
     }
 
     [Fact]
     public void TestNullable ()
     {
-        AppSettingsTestClass.TestProperty = null;
-        Assert.Null (AppSettingsTestClass.TestProperty);
+        AppSettingsTestClass.NullableValueProperty = null;
+        Assert.Null (AppSettingsTestClass.NullableValueProperty);
 
-        Initialize ();
         ResetToCurrentValues ();
         Apply ();
-        Assert.Null (AppSettingsTestClass.TestProperty);
+        Assert.Null (AppSettingsTestClass.NullableValueProperty);
 
-        AppSettingsTestClass.TestProperty = true;
-        Initialize ();
+        AppSettingsTestClass.NullableValueProperty = true;
         ResetToCurrentValues ();
-        Assert.NotNull (AppSettingsTestClass.TestProperty);
+        Assert.NotNull (AppSettingsTestClass.NullableValueProperty);
         Apply ();
-        Assert.NotNull (AppSettingsTestClass.TestProperty);
+        Assert.NotNull (AppSettingsTestClass.NullableValueProperty);
     }
 
     [Fact]
@@ -82,6 +81,15 @@ public class AppScopeTests
     public class AppSettingsTestClass
     {
         [SerializableConfigurationProperty (Scope = typeof (AppScope))]
-        public static bool? TestProperty { get; set; }
+        public static bool ValueProperty { get; set; }
+
+        [SerializableConfigurationProperty (Scope = typeof (AppScope))]
+        public static bool? NullableValueProperty { get; set; }
+
+        [SerializableConfigurationProperty (Scope = typeof (AppScope))]
+        public static string ReferenceProperty { get; set; } = "test";
+
+        [SerializableConfigurationProperty (Scope = typeof (AppScope))]
+        public static string? NullableReferenceProperty { get; set; }
     }
 }

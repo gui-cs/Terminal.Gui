@@ -9,6 +9,7 @@ using Terminal.Gui;
 using static Terminal.Gui.ConfigurationManager;
 using Command = Terminal.Gui.Command;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
+using ThemeManager = Terminal.Gui.ThemeManager;
 
 #nullable enable
 
@@ -194,13 +195,13 @@ public class UICatalogTop : Toplevel
             _themesRg = new ()
             {
                 HighlightStyle = HighlightStyle.None,
-                SelectedItem = ConfigurationManager.ThemeManager.Keys.ToList ().IndexOf (CachedTheme!.Replace ("_", string.Empty))
+                SelectedItem = ThemeManager.Themes!.Keys.ToList ().IndexOf (CachedTheme!.Replace ("_", string.Empty))
             };
 
             _themesRg.SelectedItemChanged += (_, args) =>
             {
-                ConfigurationManager.ThemeManager!.Theme = ConfigurationManager.ThemeManager!.Keys.ToArray () [args.SelectedItem!.Value];
-                CachedTheme = ConfigurationManager.ThemeManager!.Keys.ToArray () [args.SelectedItem!.Value];
+                ThemeManager.SelectedTheme = ThemeManager.Themes!.Keys.ToArray () [args.SelectedItem!.Value];
+                CachedTheme = ThemeManager.Themes!.Keys.ToArray () [args.SelectedItem!.Value];
                 Apply ();
                 SetNeedsDraw ();
             };
@@ -348,8 +349,8 @@ public class UICatalogTop : Toplevel
 
         _themesRg.AssignHotKeysToCheckBoxes = true;
         _themesRg.UsedHotKeys.Clear ();
-        _themesRg.Options = ConfigurationManager.ThemeManager!.Keys.ToArray ();
-        _themesRg.SelectedItem = ConfigurationManager.ThemeManager.Keys.ToList ().IndexOf (CachedTheme!.Replace ("_", string.Empty));
+        _themesRg.Options = ThemeManager.Themes!.Keys.ToArray ();
+        _themesRg.SelectedItem = ThemeManager.Themes.Keys.ToList ().IndexOf (CachedTheme!.Replace ("_", string.Empty));
 
         if (_topSchemeRg is null)
         {
@@ -654,7 +655,7 @@ public class UICatalogTop : Toplevel
     /// </summary>
     private void ConfigApplied ()
     {
-        CachedTheme = ConfigurationManager.ThemeManager?.Theme;
+        CachedTheme = ThemeManager.SelectedTheme;
 
         UpdateThemesMenu ();
 

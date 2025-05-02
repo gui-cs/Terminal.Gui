@@ -21,8 +21,10 @@ public class SchemeTests
     [Fact]
     public void GetAttributeForRole_Normal ()
     {
+        // Need to call Initialize to setup readonly statics
+       // ConfigurationManager.Initialize();
+
         ThemeScope ts = new ThemeScope ();
-        
 
         var view = new View { Scheme = SchemeManager.GetDefaultSchemes () ["Base"] };
 

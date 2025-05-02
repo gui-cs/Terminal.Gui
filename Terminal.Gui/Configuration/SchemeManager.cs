@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Collections;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
@@ -13,21 +14,35 @@ namespace Terminal.Gui;
 
 public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string, Scheme?>
 {
-    private readonly object _lock = new object ();
+    private readonly object _scheesLock = new object ();
 
     /// <summary>
     /// 
     /// </summary>
     public SchemeManager ()
     {
-        Reset ();
+        ResetToHardCodedDefaults ();
     }
 
-    internal void Reset ()
+    internal void ResetToHardCodedDefaults ()
     {
-        Schemes = View.GetHardCodedSchemes ();
+        lock (_scheesLock)
+        {
+            Schemes = GetHardCodedSchemes ();
+        }
     }
 
+    /// <summary>
+    ///     Gets the hard-coded schemes defined by <see cref="View"/>. These are not loaded from the configuration files,
+    ///     but are hard-coded in the source code. Used for unit testing when ConfigurationManager is not initialized.
+    /// </summary>
+    /// <returns></returns>
+    public static Dictionary<string, Scheme?>? GetHardCodedSchemes ()
+    {
+        return View.GetHardCodedSchemes ();
+    }
+
+    // TODO: Make this case-insenstive
     /// <summary>Gets a dictionary of defined <see cref="Scheme"/> objects.</summary>
     /// <remarks>
     ///     <para>
@@ -69,13 +84,22 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     ///     <para>Changing the values of an entry in this dictionary will affect all views that use the scheme.</para>
     ///     <para>
     ///         <see cref="ConfigurationManager"/> can be used to override the default values for these schemes and add
-    ///         additional schemes. See <see cref="ConfigurationManager.ThemeManager"/>.
+    ///         additional schemes. See <see cref="ThemeManager.Themes"/>.
     ///     </para>
     /// </remarks>
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope), OmitClassName = true)]
     [JsonConverter (typeof (DictionaryJsonConverter<Scheme?>))]
     [UsedImplicitly]
-    public static Dictionary<string, Scheme?>? Schemes { get; private set; }
+    public static Dictionary<string, Scheme?>? Schemes
+    {
+        get => GetDefaultSchemes ();
+
+        private set
+        {
+            // TODO: Figure out what to really do here
+            return;
+        }
+    }
 
     /// <summary>
     ///     Raised when the collection changes.
@@ -87,14 +111,14 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     {
         get
         {
-            lock (_lock)
+            lock (_scheesLock)
             {
                 return Schemes? [key];
             }
         }
         set
         {
-            lock (_lock)
+            lock (_scheesLock)
             {
                 if (Schemes is { } && Schemes.TryGetValue (key, out _))
                 {
@@ -111,6 +135,27 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
         }
     }
 
+
+    /// <summary>
+    ///     Helper to get the schemes from the selected theme loaded from configuration.
+    /// </summary>
+    /// <returns></returns>
+    [RequiresDynamicCode ("AOT")]
+
+    public static Dictionary<string, Scheme?>? GetCurrentSchemes ()
+    {
+        Debug.Assert (ThemeManager.Themes.TryGetValue ("Default", out _));
+
+        Dictionary<string, Scheme?>? schemes = [];
+
+        if (ThemeManager.Themes is { })
+        {
+            schemes = ThemeManager.Themes [ThemeManager.SelectedTheme] ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
+        }
+
+        return schemes;
+    }
+
     /// <summary>
     ///     Helper to get the default schemes from the default theme loaded from configuration.
     /// </summary>
@@ -119,20 +164,19 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
 
     public static Dictionary<string, Scheme?>? GetDefaultSchemes ()
     {
-        if (!IsInitialized ())
-        {
-            // If CM has not been initialized, we return the values that are in the current static members.
-            ThemeScope themes = new ThemeScope ();
-            themes.RetrieveValues ();
-
-            // If CM has not been initialized, ThemeScope gets loaded with the default values.
-            return themes ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
-        }
+        Debug.Assert (ThemeManager.Themes is {});
+        Debug.Assert (ThemeManager.Themes.TryGetValue ("Default", out _));
 
         Dictionary<string, Scheme?>? schemes = [];
-        if (CM.ThemeManager is { })
+
+        if (ThemeManager.Themes is { })
         {
-            schemes = CM.ThemeManager ["Default"] ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
+            schemes = ThemeManager.Themes ["Default"] ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
+
+            if (schemes is null)
+            {
+                schemes = GetHardCodedSchemes ();
+            }
         }
 
         return schemes;
@@ -143,7 +187,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     {
         get
         {
-            lock (_lock)
+            lock (_scheesLock)
             {
                 return Schemes!.Count;
             }
@@ -158,7 +202,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     {
         get
         {
-            lock (_lock)
+            lock (_scheesLock)
             {
                 return new List<string> (Schemes!.Keys);
             }
@@ -170,7 +214,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     {
         get
         {
-            lock (_lock)
+            lock (_scheesLock)
             {
                 return new List<Scheme?> (Schemes!.Values);
             }
@@ -180,7 +224,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     /// <inheritdoc />
     public void Add (KeyValuePair<string, Scheme?> item)
     {
-        lock (_lock)
+        lock (_scheesLock)
         {
             Schemes?.Add (item.Key, item.Value);
             CollectionChanged?.Invoke (this, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, item));
@@ -196,7 +240,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     /// <inheritdoc />
     public void Clear ()
     {
-        lock (_lock)
+        lock (_scheesLock)
         {
             Schemes?.Clear ();
             CollectionChanged?.Invoke (this, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
@@ -206,7 +250,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     /// <inheritdoc />
     public bool Contains (KeyValuePair<string, Scheme?> item)
     {
-        lock (_lock)
+        lock (_scheesLock)
         {
             return Schemes is { } && Schemes.Contains (item);
         }
@@ -215,16 +259,16 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     /// <inheritdoc />
     public bool ContainsKey (string key)
     {
-        lock (_lock)
+        lock (_scheesLock)
         {
-            return Schemes is { } && Schemes.ContainsKey(key);
+            return Schemes is { } && Schemes.ContainsKey (key);
         }
     }
 
     /// <inheritdoc />
     public void CopyTo (KeyValuePair<string, Scheme?> [] array, int arrayIndex)
     {
-        lock (_lock)
+        lock (_scheesLock)
         {
             if (Schemes is { })
             {
@@ -236,7 +280,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     /// <inheritdoc />
     public IEnumerator<KeyValuePair<string, Scheme?>> GetEnumerator ()
     {
-        lock (_lock)
+        lock (_scheesLock)
         {
             if (Schemes is { })
             {
@@ -255,7 +299,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     /// <inheritdoc />
     public bool Remove (KeyValuePair<string, Scheme?> item)
     {
-        lock (_lock)
+        lock (_scheesLock)
         {
             if (Schemes is { } && Schemes.Remove (item.Key))
             {
@@ -269,7 +313,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     /// <inheritdoc />
     public bool Remove (string key)
     {
-        lock (_lock)
+        lock (_scheesLock)
         {
             if (Schemes is { } && Schemes.Remove (key))
             {
@@ -283,7 +327,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     /// <inheritdoc />
     public bool TryGetValue (string key, out Scheme? value)
     {
-        lock (_lock)
+        lock (_scheesLock)
         {
             return Schemes!.TryGetValue (key, out value);
         }

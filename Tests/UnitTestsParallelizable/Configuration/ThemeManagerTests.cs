@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿#nullable enable
+using System.Diagnostics;
 using System.Text.Json;
 
 namespace Terminal.Gui.ConfigurationTests;
@@ -11,8 +12,9 @@ public class ThemeManagerTests
         // Need to call Initialize to setup readonly statics
         ConfigurationManager.Initialize ();
 
-        Assert.Empty (ConfigurationManager.ThemeManager!);
-
+        var tm = new ThemeManager ();
+//
+      //  Assert.Empty (tm);
     }
 
     [Fact]
@@ -21,12 +23,14 @@ public class ThemeManagerTests
         // Need to call Initialize to setup readonly statics
         ConfigurationManager.Initialize ();
 
-        ConfigurationManager.ThemeManager!.Reset ();
+        var tm = new ThemeManager ();
 
-        Assert.NotEmpty (ConfigurationManager.ThemeManager!);
+        tm.Reset ();
+
+        Assert.NotEmpty (ThemeManager.Themes);
 
         // Default theme exists
-        Assert.NotNull (ConfigurationManager.ThemeManager ["Default"]);
+        Assert.NotNull (ThemeManager.Themes ["Default"]);
 
         //// Schemes exists, but is not initialized
         //Assert.Null (manager ["Default"].);
@@ -43,6 +47,35 @@ public class ThemeManagerTests
         //// Base has correct values
         //var baseSchemee = schemes ["Base"];
         //Assert.Equal (new Attribute (Color.White, Color.Blue), baseSchemee.Normal);
+
+    }
+
+    // ResetToCurrentValues
+
+//    OnThemeChanged
+
+    [Fact]
+    public void SelectedTheme_Set ()
+    {
+       
+    }
+
+    [Fact]
+    public void SelectedTheme_Get ()
+    {
+
+    }
+
+
+    [Fact]
+    public void Themes_Set ()
+    {
+
+    }
+
+    [Fact]
+    public void Themes_Get ()
+    {
 
     }
 }

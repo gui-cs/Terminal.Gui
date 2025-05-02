@@ -98,8 +98,8 @@ public class SettingsScopeTests
         Assert.Equal (6, ((Dictionary<string, ThemeScope>)Settings ["Themes"].PropertyValue).Count);
 
         ResetToCurrentValues ();
-        Assert.NotEmpty (ConfigurationManager.ThemeManager);
-        Assert.Equal ("Default", ConfigurationManager.ThemeManager.Theme);
+        Assert.NotEmpty (ThemeManager.Themes);
+        Assert.Equal ("Default", ThemeManager.SelectedTheme);
 
         Assert.True (Settings ["Application.QuitKey"].PropertyValue is Key);
         Assert.True (Settings ["Application.NextTabGroupKey"].PropertyValue is Key);

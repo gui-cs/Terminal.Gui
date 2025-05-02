@@ -21,6 +21,8 @@ public class ConfigProperty
     /// <summary>Describes the property.</summary>
     public PropertyInfo? PropertyInfo { get; set; }
 
+    private object? _propertyValue;
+
     /// <summary>
     ///     Holds the property's value as it was either read from the class's implementation or from a config file. If the
     ///     property has not been set (e.g. because no configuration file specified a value), this will be
@@ -30,7 +32,17 @@ public class ConfigProperty
     ///     On <see langword="set"/>, performs a sparse-copy of the new value to the existing value (only copies elements
     ///     of the object that are non-null).
     /// </remarks>
-    public object? PropertyValue { get; set; }
+    public object? PropertyValue
+    {
+        get => _propertyValue;
+        set
+        {
+            _propertyValue = value;
+            HasValue = true;
+        }
+    }
+
+    public bool HasValue { get; set; }
 
     /// <summary>Applies the <see cref="PropertyValue"/> to the static property described by <see cref="PropertyInfo"/>.</summary>
     /// <returns></returns>

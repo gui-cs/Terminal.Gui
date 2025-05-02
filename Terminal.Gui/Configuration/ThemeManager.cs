@@ -6,64 +6,42 @@ using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
-/// <summary>Contains a dictionary of the <see cref="ThemeManager.Theme"/>s for a Terminal.Gui application.</summary>
+/// <summary>Manages Themes.</summary>
 /// <remarks>
 ///     <para>A Theme is a collection of settings that are named. The default theme is named "Default".</para>
-///     <para>The <see cref="ThemeManager.Theme"/> property is used to determine the currently active theme.</para>
+///     <para>The <see cref="SelectedTheme"/> property is used to determine the currently active theme.</para>
+///     <para>The <see cref="Themes"/> property is a dictionary of themes.</para>
 /// </remarks>
-/// <para>
-///     <see cref="ThemeManager"/> is a singleton class. It is created when the first <see cref="ThemeManager"/> property
-///     is accessed. Accessing <see cref="ThemeManager.Instance"/> is the same as accessing
-///     <see cref="ConfigurationManager.ThemeManager"/>.
-/// </para>
-/// <example>
-///     <code>
-/// 	"Themes": [
-/// 	{
-/// 		"Default": {
-/// 			"Schemes": [
-/// 			{
-/// 			"TopLevel": {
-/// 			"Normal": {
-/// 				"Foreground": "BrightGreen",
-/// 				"Background": "Black"
-/// 			},
-/// 			"Focus": {
-/// 			"Foreground": "White",
-/// 				"Background": "Cyan"
-/// 
-/// 			},
-/// 			"HotNormal": {
-/// 				"Foreground": "Yellow",
-/// 				"Background": "Black"
-/// 
-/// 			},
-/// 			"HotFocus": {
-/// 				"Foreground": "Blue",
-/// 				"Background": "Cyan"
-/// 			},
-/// 			"Disabled": {
-/// 				"Foreground": "DarkGray",
-/// 				"Background": "Black"
-/// 
-/// 			}
-/// 		}
-/// 	}
-/// </code>
-/// </example>
-public class ThemeManager : IDictionary<string, ThemeScope>
+public class ThemeManager
 {
-    //static ThemeManager () { } // Make sure it's truly lazy
-    //private ThemeManager () { } // Prevent instantiation outside
+    /// <summary>
+    ///     The Themes dictionary. The backing store is <see cref="ConfigurationManager.Settings"/>` ["Themes"]`.
+    /// </summary>
+    /// <exception cref="InvalidOperationException"></exception>
+    [JsonConverter (typeof (DictionaryJsonConverter<ThemeScope>))]
+    [SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
+    public static Dictionary<string, ThemeScope>? Themes
+    {
+        get
+        {
+            if (Settings is { } && Settings.TryGetValue ("Themes", out ConfigProperty? themes))
+            {
+                Debug.Assert (themes.PropertyValue is Dictionary<string, ThemeScope>);
+                return themes.PropertyValue as Dictionary<string, ThemeScope>;
+            }
 
-    ///// <summary>Class is a singleton...</summary>
-    //public static ThemeManager Instance { get; } = new ();
+            throw new InvalidOperationException ("Settings is invalid.");
+        }
+        set
+        {
+            // BUGBUG: We should not be setting Settings here. Instead, Settings should subscrube to something and update
+            if (Settings is { } && Settings.TryGetValue ("Themes", out ConfigProperty? themes))
+            {
+                Settings ["Themes"].PropertyValue = value;
+            }
+        }
+    }
 
-    /// <summary>Holds the <see cref="ThemeScope"/> definitions.</summary>
-    //[JsonInclude]
-    //[JsonConverter (typeof (DictionaryJsonConverter<ThemeScope>))]
-    //[SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
-    private Dictionary<string, ThemeScope>? Themes { get; set; } = new ();
     //{
     //    [RequiresUnreferencedCode ("AOT")]
     //    [RequiresDynamicCode ("AOT")]
@@ -99,18 +77,8 @@ public class ThemeManager : IDictionary<string, ThemeScope>
 
     private static string _selectedTheme = string.Empty;
 
-    /// <summary>Gets or sets the currently selected theme. The value is persisted to the "Theme" property.</summary>
-    [JsonIgnore]
-    public string Theme
-    {
-        get => SelectedTheme;
-
-        [RequiresUnreferencedCode ("AOT")]
-        [RequiresDynamicCode ("AOT")]
-        set => SelectedTheme = value;
-    }
-
-    /// <summary>The currently selected theme. This is the internal version; see <see cref="Theme"/>.</summary>
+    // TODO: Rename to "THeme"
+    /// <summary>The currently selected theme. The backing store is <see cref="ConfigurationManager.Settings"/>` ["Theme"]`.</summary>
     [JsonInclude]
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
     [JsonPropertyName ("Theme")]
@@ -155,14 +123,13 @@ public class ThemeManager : IDictionary<string, ThemeScope>
     [RequiresDynamicCode ("Calls Terminal.Gui.ThemeManager.Themes")]
     internal void ResetToCurrentValues ()
     {
-        //Logging.Trace ("Themes.GetHardCodedDefaults()");
+        //Logging.Debug ("");
+        Reset ();
+
         var theme = new ThemeScope ();
         theme.RetrieveValues ();
 
-        Clear();
-        Add ("Default", theme);
-        // TODO: Determine if this shouild be done here.
-        SelectedTheme = "Default";
+        Themes! [SelectedTheme] = theme;
     }
 
     /// <summary>Called when the selected theme has changed. Fires the <see cref="ThemeChanged"/> event.</summary>
@@ -176,156 +143,12 @@ public class ThemeManager : IDictionary<string, ThemeScope>
     [RequiresDynamicCode ("Calls Terminal.Gui.ThemeManager.Themes")]
     internal void Reset ()
     {
-        //Logging.Trace ("Themes.Reset()");
-        //ResetToCurrentValues ();
+        //Logging.Debug ("");
 
-        Clear ();
-        Add ("Default", new ThemeScope());
+        Settings! ["Themes"].PropertyValue = new Dictionary<string, ThemeScope> ();
+
+        Themes?.Add ("Default", new ThemeScope ());
+
         SelectedTheme = "Default";
     }
-
-    #region IDictionary
-
-#pragma warning disable 1591
-    [UnconditionalSuppressMessage ("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
-    [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "<Pending>")]
-    public ICollection<string> Keys => ((IDictionary<string, ThemeScope>)Themes!).Keys;
-
-    [UnconditionalSuppressMessage ("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
-    [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "<Pending>")]
-    public ICollection<ThemeScope> Values => ((IDictionary<string, ThemeScope>)Themes!).Values;
-
-    [UnconditionalSuppressMessage ("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
-    [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "<Pending>")]
-    public int Count => ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).Count;
-
-    [UnconditionalSuppressMessage ("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
-    [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "<Pending>")]
-    public bool IsReadOnly => ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).IsReadOnly;
-
-    public ThemeScope this [string key]
-    {
-        [RequiresUnreferencedCode ("AOT")]
-        [RequiresDynamicCode ("AOT")]
-#pragma warning disable IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning disable IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-        get => ((IDictionary<string, ThemeScope>)Themes!) [key];
-#pragma warning restore IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning restore IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-
-        [RequiresUnreferencedCode ("AOT")]
-        [RequiresDynamicCode ("AOT")]
-#pragma warning disable IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning disable IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-        set => ((IDictionary<string, ThemeScope>)Themes!) [key] = value;
-#pragma warning restore IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning restore IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-    }
-
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-#pragma warning disable IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning disable IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-    public void Add (string key, ThemeScope value) { ((IDictionary<string, ThemeScope>)Themes!).Add (key, value); }
-#pragma warning restore IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning restore IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-#pragma warning disable IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning disable IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-    public bool ContainsKey (string key) { return ((IDictionary<string, ThemeScope>)Themes!).ContainsKey (key); }
-#pragma warning restore IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning restore IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-#pragma warning disable IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning disable IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-    public bool Remove (string key) { return ((IDictionary<string, ThemeScope>)Themes!).Remove (key); }
-#pragma warning restore IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning restore IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-#pragma warning disable IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning disable IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-    public bool TryGetValue (string key, out ThemeScope value) { return ((IDictionary<string, ThemeScope>)Themes!).TryGetValue (key, out value!); }
-#pragma warning restore IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning restore IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-#pragma warning disable IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning disable IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-    public void Add (KeyValuePair<string, ThemeScope> item) { ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).Add (item); }
-#pragma warning restore IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning restore IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-#pragma warning disable IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning disable IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-    public void Clear ()
-    {
-        if (Themes is { })
-        {
-            ((ICollection<KeyValuePair<string, ThemeScope>>)Themes).Clear ();
-        }
-    }
-#pragma warning restore IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning restore IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-#pragma warning disable IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning disable IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-    public bool Contains (KeyValuePair<string, ThemeScope> item) { return ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).Contains (item); }
-#pragma warning restore IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning restore IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-#pragma warning disable IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning disable IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-    public void CopyTo (KeyValuePair<string, ThemeScope> [] array, int arrayIndex)
-#pragma warning restore IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning restore IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-    {
-        ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).CopyTo (array, arrayIndex);
-    }
-
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-#pragma warning disable IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning disable IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-    public bool Remove (KeyValuePair<string, ThemeScope> item) { return ((ICollection<KeyValuePair<string, ThemeScope>>)Themes!).Remove (item); }
-#pragma warning restore IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning restore IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-#pragma warning disable IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning disable IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-    public IEnumerator<KeyValuePair<string, ThemeScope>> GetEnumerator ()
-    {
-        if (Themes is { })
-        {
-            return ((IEnumerable<KeyValuePair<string, ThemeScope>>)Themes).GetEnumerator ();
-        }
-
-        return null!;
-    }
-#pragma warning restore IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning restore IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.ThemeManager.Themes")]
-    [RequiresDynamicCode ("Calls Terminal.Gui.ThemeManager.Themes")]
-#pragma warning disable IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning disable IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-    IEnumerator IEnumerable.GetEnumerator () { return ((IEnumerable)Themes!).GetEnumerator (); }
-#pragma warning restore IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning restore IL2046 // 'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.
-#pragma warning restore 1591
-
-    #endregion
 }

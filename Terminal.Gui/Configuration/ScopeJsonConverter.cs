@@ -24,7 +24,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
         if (reader.TokenType != JsonTokenType.StartObject)
         {
             throw new JsonException (
-                                     $"Expected a JSON object (\"{{ \"propName\" : ... }}\"), but got \"{reader.TokenType}\"."
+                                     $$"""Expected a JSON object ("{ "propName" : ... }"), but got "{{reader.TokenType}}"."""
                                     );
         }
 
@@ -32,6 +32,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
 
         while (reader.Read ())
         {
+            string? propertyName = string.Empty;
             if (reader.TokenType == JsonTokenType.EndObject)
             {
                 return scope!;
@@ -39,10 +40,10 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
 
             if (reader.TokenType != JsonTokenType.PropertyName)
             {
-                throw new JsonException ($"Expected a JSON property name, but got \"{reader.TokenType}\".");
+                throw new JsonException ($"""Expected a JSON property name, but got "{reader.TokenType}" - Last propertyName: "{propertyName}".""");
             }
 
-            string? propertyName = reader.GetString ();
+            propertyName = reader.GetString ();
             reader.Read ();
 
             if (propertyName is { } && scope!.TryGetValue (propertyName, out ConfigProperty? configProp))
@@ -66,16 +67,11 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                         }
                     }
 
-                    var readHelper = Activator.CreateInstance (
-                                                               (Type?)typeof (ReadHelper<>).MakeGenericType (
-                                                                    typeof (scopeT),
-                                                                    propertyType!
-                                                                   )!,
-                                                               converter
-                                                              ) as ReadHelper;
-
                     try
                     {
+                        Type? type = (Type?)typeof (ReadHelper<>).MakeGenericType (typeof (scopeT), propertyType!);
+                        ReadHelper? readHelper = Activator.CreateInstance (type!, converter) as ReadHelper;
+
                         scope! [propertyName].PropertyValue = readHelper?.Read (ref reader, propertyType!, options);
                     }
                     catch (NotSupportedException e)
@@ -85,6 +81,17 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                                                  e
                                                 );
                     }
+                    catch (TargetInvocationException tie)
+                    {
+                        try
+                        {
+                            scope! [propertyName].PropertyValue = JsonSerializer.Deserialize (ref reader, propertyType!, options);
+                        }
+                        catch (Exception)
+                        {
+                            // Logging.Trace ($"scopeT Read: {ex}");
+                        }
+}
                 }
                 else
                 {

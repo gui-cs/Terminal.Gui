@@ -10,10 +10,9 @@ namespace Terminal.Gui;
 [Flags]
 public enum ConfigLocations
 {
-    /// <summary>No configuration will be loaded.</summary>
+    /// <summary>The values of the <see cref="ConfigProperty"/>s (static properites) will be loaded.</summary>
     /// <remarks>
-    ///     Used for development and testing only. For Terminal,Gui to function properly, at least
-    ///     <see cref="Default"/> should be set.
+    ///     Inteneded to be used for development and testing only.
     /// </remarks>
     None = 0,
 

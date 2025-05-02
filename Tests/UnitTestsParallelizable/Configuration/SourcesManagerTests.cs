@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text.Json;
 using Terminal.Gui.Configuration;
 
 public class SourcesManagerTests
@@ -25,8 +26,6 @@ public class SourcesManagerTests
     public void Update_WithValidStream_UpdatesSettingsScope ()
     {
         // Arrange
-        // Need to call Initialize to setup readonly statics
-        ConfigurationManager.Initialize ();
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
         settingsScope ["Application.QuitKey"].PropertyValue = Key.Q.WithCtrl;
@@ -107,8 +106,6 @@ public class SourcesManagerTests
     public void Update_WithValidFile_UpdatesSettingsScope ()
     {
         // Arrange
-        // Need to call Initialize to setup readonly statics
-        ConfigurationManager.Initialize ();
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
         settingsScope ["Application.QuitKey"].PropertyValue = Key.Q.WithCtrl;
@@ -197,8 +194,6 @@ public class SourcesManagerTests
     public void Update_WithValidJson_UpdatesSettingsScope ()
     {
         // Arrange
-        // Need to call Initialize to setup readonly statics
-        ConfigurationManager.Initialize ();
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
         settingsScope ["Application.QuitKey"].PropertyValue = Key.Q.WithCtrl;
@@ -228,8 +223,6 @@ public class SourcesManagerTests
     public void UpdateFromResource_WithNullResourceName_ReturnsFalse ()
     {
         // Arrange
-        // Need to call Initialize to setup readonly statics
-        ConfigurationManager.Initialize ();
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
         settingsScope ["Application.QuitKey"].PropertyValue = Key.Q.WithCtrl;
@@ -248,8 +241,6 @@ public class SourcesManagerTests
     public void UpdateFromResource_WithValidResource_UpdatesSettingsScope ()
     {
         // Arrange
-        // Need to call Initialize to setup readonly statics
-        ConfigurationManager.Initialize ();
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
 
@@ -274,8 +265,6 @@ public class SourcesManagerTests
     public void ToJson_WithValidScope_ReturnsJsonString ()
     {
         // Arrange
-        // Need to call Initialize to setup readonly statics
-        ConfigurationManager.Initialize ();
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
         settingsScope ["Application.QuitKey"].PropertyValue = Key.Q.WithCtrl;
@@ -291,8 +280,6 @@ public class SourcesManagerTests
     public void ToStream_WithValidScope_ReturnsStream ()
     {
         // Arrange
-        // Need to call Initialize to setup readonly statics
-        ConfigurationManager.Initialize ();
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
         settingsScope ["Application.QuitKey"].PropertyValue = Key.Q.WithCtrl;
@@ -309,4 +296,196 @@ public class SourcesManagerTests
     }
 
     #endregion
+
+    #region Sources Dictionary Tests
+
+    [Fact]
+    public void Sources_Dictionary_IsInitializedEmpty ()
+    {
+        // Arrange & Act
+        var sourcesManager = new SourcesManager ();
+
+        // Assert
+        Assert.NotNull (sourcesManager.Sources);
+        Assert.Empty (sourcesManager.Sources);
+    }
+
+    [Fact]
+    public void Update_WhenCalledMultipleTimes_MaintainsLastSourceForLocation ()
+    {
+        // Arrange
+        var sourcesManager = new SourcesManager ();
+        var settingsScope = new SettingsScope ();
+
+        // Act - Update with first source for location
+        var firstSource = "first.json";
+        sourcesManager.Update (settingsScope, """{"Application.QuitKey": "Ctrl+A"}""", firstSource, ConfigLocations.Runtime);
+
+        // Update with second source for same location
+        var secondSource = "second.json";
+        sourcesManager.Update (settingsScope, """{"Application.QuitKey": "Ctrl+B"}""", secondSource, ConfigLocations.Runtime);
+
+        // Assert - Only the last source should be stored for the location
+        Assert.Single (sourcesManager.Sources);
+        Assert.Equal (secondSource, sourcesManager.Sources [ConfigLocations.Runtime]);
+    }
+
+    [Fact]
+    public void Update_WithDifferentLocations_AddsAllSourcesToCollection ()
+    {
+        // Arrange
+        var sourcesManager = new SourcesManager ();
+        var settingsScope = new SettingsScope ();
+
+        var locations = new []
+        {
+        ConfigLocations.Default,
+        ConfigLocations.Runtime,
+        ConfigLocations.AppCurrent,
+        ConfigLocations.GlobalHome
+    };
+
+        // Act - Update with different sources for different locations
+        foreach (var location in locations)
+        {
+            var source = $"config-{location}.json";
+            sourcesManager.Update (settingsScope, """{"Application.QuitKey": "Ctrl+Z"}""", source, location);
+        }
+
+        // Assert
+        Assert.Equal (locations.Length, sourcesManager.Sources.Count);
+        foreach (var location in locations)
+        {
+            Assert.Contains (location, sourcesManager.Sources.Keys);
+            Assert.Equal ($"config-{location}.json", sourcesManager.Sources [location]);
+        }
+    }
+    
+    [Fact]
+    public void UpdateFromResource_AddsResourceSourceToCollection ()
+    {
+        // Arrange
+        var sourcesManager = new SourcesManager ();
+        var settingsScope = new SettingsScope ();
+
+        var assembly = Assembly.GetAssembly (typeof (ConfigurationManager));
+        var resourceName = "Terminal.Gui.Resources.config.json";
+        var location = ConfigLocations.Default;
+
+        // Act
+        bool result = sourcesManager.UpdateFromResource (settingsScope, assembly!, resourceName, location);
+
+        // Assert
+        Assert.True (result);
+        Assert.Contains (location, sourcesManager.Sources.Keys);
+        Assert.Equal ($"resource://[{assembly!.GetName ().Name}]/{resourceName}", sourcesManager.Sources [location]);
+    }
+
+    [Fact]
+    public void Update_WithNonExistentFileAndDifferentLocations_TracksAllSources ()
+    {
+        // Arrange
+        var sourcesManager = new SourcesManager ();
+        var settingsScope = new SettingsScope ();
+
+        // Define multiple files and locations
+        var fileLocations = new Dictionary<string, ConfigLocations>
+    {
+        { "file1.json", ConfigLocations.AppCurrent },
+        { "file2.json", ConfigLocations.GlobalHome },
+        { "file3.json", ConfigLocations.AppHome }
+    };
+
+        // Act
+        foreach (var pair in fileLocations)
+        {
+            sourcesManager.Update (settingsScope, pair.Key, pair.Value);
+        }
+
+        // Assert
+        Assert.Equal (fileLocations.Count, sourcesManager.Sources.Count);
+        foreach (var pair in fileLocations)
+        {
+            Assert.Contains (pair.Value, sourcesManager.Sources.Keys);
+            Assert.Equal (pair.Key, sourcesManager.Sources [pair.Value]);
+        }
+    }
+
+    [Fact]
+    public void Sources_IsPreservedAcrossOperations ()
+    {
+        // Arrange
+        var sourcesManager = new SourcesManager ();
+        var settingsScope = new SettingsScope ();
+
+        // First operation - file update
+        var filePath = "testfile.json";
+        var location1 = ConfigLocations.AppCurrent;
+        sourcesManager.Update (settingsScope, filePath, location1);
+
+        // Second operation - json string update
+        var jsonSource = "jsonstring";
+        var location2 = ConfigLocations.Runtime;
+        sourcesManager.Update (settingsScope, """{"Application.QuitKey": "Ctrl+Z"}""", jsonSource, location2);
+
+        // Perform a stream operation
+        var streamSource = "streamdata";
+        var location3 = ConfigLocations.GlobalCurrent;
+        var stream = new MemoryStream ();
+        var writer = new StreamWriter (stream);
+        writer.Write ("""{"Application.QuitKey": "Ctrl+Z"}""");
+        writer.Flush ();
+        stream.Position = 0;
+        sourcesManager.Update (settingsScope, stream, streamSource, location3);
+
+        // Assert - all sources should be preserved
+        Assert.Equal (3, sourcesManager.Sources.Count);
+        Assert.Equal (filePath, sourcesManager.Sources [location1]);
+        Assert.Equal (jsonSource, sourcesManager.Sources [location2]);
+        Assert.Equal (streamSource, sourcesManager.Sources [location3]);
+    }
+
+    [Fact]
+    public void Sources_StaysConsistentWhenUpdateFails ()
+    {
+        // Arrange
+        var sourcesManager = new SourcesManager ();
+        var settingsScope = new SettingsScope ();
+
+        // Add one successful source
+        var validSource = "valid.json";
+        var validLocation = ConfigLocations.Runtime;
+        sourcesManager.Update (settingsScope, """{"Application.QuitKey": "Ctrl+Z"}""", validSource, validLocation);
+
+        try
+        {
+            // Configure to throw on errors
+            ConfigurationManager.ThrowOnJsonErrors = true;
+
+            // Act & Assert - attempt to update with invalid JSON
+            var invalidSource = "invalid.json";
+            var invalidLocation = ConfigLocations.AppCurrent;
+            var invalidJson = "{ invalid json }";
+
+            Assert.Throws<JsonException> (
+                                          () =>
+                                              sourcesManager.Update (settingsScope, invalidJson, invalidSource, invalidLocation));
+
+            // The valid source should still be there
+            Assert.Single (sourcesManager.Sources);
+            Assert.Equal (validSource, sourcesManager.Sources [validLocation]);
+
+            // The invalid source should not have been added
+            Assert.DoesNotContain (invalidLocation, sourcesManager.Sources.Keys);
+        }
+        finally
+        {
+            // Reset for other tests
+            ConfigurationManager.ThrowOnJsonErrors = false;
+
+        }
+    }
+
+    #endregion
+
 }

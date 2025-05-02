@@ -7,6 +7,7 @@ namespace Terminal.Gui;
 
 public static partial class Application // Initialization (Init/Shutdown)
 {
+
     /// <summary>Initializes a new instance of a Terminal.Gui Application. <see cref="Shutdown"/> must be called when the application is closing.</summary>
     /// <para>Call this method once per instance (or after <see cref="Shutdown"/> has been called).</para>
     /// <para>
@@ -181,9 +182,8 @@ public static partial class Application // Initialization (Init/Shutdown)
     [RequiresDynamicCode ("AOT")]
     internal static void InitializeConfigurationManagement ()
     {
-        // Need to call Initialize to setup CM's readonly statics
-        // Note this does NOT initialize any settings; just the members that are readonly
-        ConfigurationManager.Initialize ();
+        // ConfigurationManager.Initialize() is now called by the ModuleInitializer
+        // So we don't need to call it here again
 
         // Start the process of configuration management.
         // Note that we end up calling LoadConfigurationFromAllSources
@@ -191,9 +191,9 @@ public static partial class Application // Initialization (Init/Shutdown)
         // valid after a Driver is loaded. In this case we need just
         // `Settings` so we can determine which driver to use.
         // Don't reset, so we can inherit the theme from the previous run.
-        string previousTheme = ConfigurationManager.ThemeManager?.Theme ?? string.Empty;
+        string previousTheme = ThemeManager.SelectedTheme ?? string.Empty;
         Load ();
-        if (ConfigurationManager.ThemeManager is { } && !string.IsNullOrEmpty (previousTheme) && previousTheme != "Default")
+        if (ThemeManager.SelectedTheme is { } && !string.IsNullOrEmpty (previousTheme) && previousTheme != "Default")
         {
             ThemeManager.SelectedTheme = previousTheme;
         }

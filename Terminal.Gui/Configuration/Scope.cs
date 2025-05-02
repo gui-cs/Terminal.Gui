@@ -13,8 +13,6 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
     [RequiresUnreferencedCode ("AOT")]
     public Scope () : base (StringComparer.InvariantCultureIgnoreCase)
     {
-        // Ensure that the static CM properties are initialized
-        CM.Initialize();
         foreach (KeyValuePair<string, ConfigProperty> p in GetConfigPropertiesByScope (typeof (T)))
         {
             Add (p.Key, new () { PropertyInfo = p.Value.PropertyInfo, PropertyValue = null });

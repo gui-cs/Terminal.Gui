@@ -20,13 +20,13 @@ public class ThemeTests
         var theme = new ThemeScope ();
         Assert.NotEmpty (theme);
 
-        ConfigurationManager.ThemeManager.Add ("testTheme", theme);
+        ThemeManager.Themes.Add ("testTheme", theme);
 
         Assert.Equal (LineStyle.Single, FrameView.DefaultBorderStyle);
         theme ["FrameView.DefaultBorderStyle"].PropertyValue = LineStyle.Double; // default is Single
 
-        ConfigurationManager.ThemeManager.Theme = "testTheme";
-        ConfigurationManager.ThemeManager! [ThemeManager.SelectedTheme]!.Apply ();
+        ThemeManager.SelectedTheme = "testTheme";
+        ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
 
         Assert.Equal (LineStyle.Double, FrameView.DefaultBorderStyle);
 
@@ -45,7 +45,7 @@ public class ThemeTests
         var theme = new ThemeScope ();
         Assert.NotEmpty (theme);
 
-        ConfigurationManager.ThemeManager.Add ("testTheme", theme);
+        ThemeManager.Themes.Add ("testTheme", theme);
 
         var scheme = new Scheme { Normal = new Attribute (Color.Red, Color.Green) };
 
@@ -62,8 +62,8 @@ public class ThemeTests
                      );
 
         // Act
-        ConfigurationManager.ThemeManager.Theme = "testTheme";
-        ConfigurationManager.ThemeManager! [ThemeManager.SelectedTheme]!.Apply ();
+        ThemeManager.SelectedTheme = "testTheme";
+        ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
 
         // Assert
         Scheme updatedScheme = SchemeManager.Schemes ["test"];
@@ -109,8 +109,7 @@ public class ThemeTests
 
         theme ["Schemes"].PropertyValue = SchemeManager.Schemes;
 
-        Dictionary<string, Scheme> schemes =
-            (Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue;
+        Dictionary<string, Scheme> schemes = (Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue;
         Assert.Equal (SchemeManager.Schemes.Count, schemes.Count);
 
         var newTheme = new ThemeScope ();
@@ -130,7 +129,7 @@ public class ThemeTests
         Assert.Equal (5, SchemeManager.Schemes.Count);
 
         // add a new Scheme to the newTheme
-        ((Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue) ["test"] = scheme;
+        ((Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue) ["Test"] = scheme;
 
         schemes = (Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue;
         Assert.Equal (SchemeManager.Schemes.Count, schemes.Count);
@@ -165,7 +164,7 @@ public class ThemeTests
             Disabled = new Attribute (Color.Gray, Color.DarkGray)
         };
         theme ["Schemes"].PropertyValue = SchemeManager.GetDefaultSchemes ();
-        ((Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue) ["test"] = scheme;
+        ((Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue) ["Test"] = scheme;
 
         Dictionary<string, Scheme> schemes =
             (Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue;
@@ -184,7 +183,7 @@ public class ThemeTests
             Disabled = scheme.Disabled
         };
         newTheme ["Schemes"].PropertyValue = SchemeManager.GetDefaultSchemes ();
-        ((Dictionary<string, Scheme>)newTheme ["Schemes"].PropertyValue) ["test"] = newScheme;
+        ((Dictionary<string, Scheme>)newTheme ["Schemes"].PropertyValue) ["Test"] = newScheme;
 
         // Act
         theme.Update (newTheme);

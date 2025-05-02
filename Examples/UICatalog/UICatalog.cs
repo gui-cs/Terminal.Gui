@@ -17,6 +17,7 @@ using Terminal.Gui;
 using static Terminal.Gui.ConfigurationManager;
 using Command = Terminal.Gui.Command;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
+using ThemeManager = Terminal.Gui.ThemeManager;
 
 #nullable enable
 
@@ -219,11 +220,11 @@ public class UICatalog
 
         if (string.IsNullOrWhiteSpace (UICatalogTop.CachedTheme))
         {
-            UICatalogTop.CachedTheme = ConfigurationManager.ThemeManager?.Theme;
+            UICatalogTop.CachedTheme = ThemeManager.SelectedTheme;
         }
         else
         {
-            ConfigurationManager.ThemeManager!.Theme = UICatalogTop.CachedTheme;
+            ThemeManager.SelectedTheme = UICatalogTop.CachedTheme;
         }
 
         UICatalogTop top = Application.Run<UICatalogTop> ();
