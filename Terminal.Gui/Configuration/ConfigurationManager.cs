@@ -159,6 +159,8 @@ public static class ConfigurationManager
         set => _appSettings = value;
     }
 
+    private static readonly object _settingsLock = new object ();
+
     /// <summary>The backing property for <see cref="Settings"/> (config settings of <see cref="SettingsScope"/>).</summary>
     /// <remarks>
     ///     Is <see langword="null"/> until <see cref="ResetAllSettings"/> is called. Gets set to a new instance by deserialization
@@ -178,7 +180,10 @@ public static class ConfigurationManager
             if (_settings is null)
             {
                 // If Settings is null, we need to initialize it.
-                ResetAllSettings ();
+                lock (_settingsLock)
+                {
+                    ResetAllSettings ();
+                }
             }
 
             return _settings;
@@ -228,19 +233,23 @@ public static class ConfigurationManager
 
         try
         {
-            if (string.IsNullOrEmpty (ThemeManager.SelectedTheme))
+            lock (_settingsLock)
             {
-                // First start. Apply settings first. This ensures if a config sets Theme to something other than "Default", it gets used
-                settings = Settings?.Apply () ?? false;
 
-                themes = !string.IsNullOrEmpty (ThemeManager.SelectedTheme)
-                         && (ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false);
-            }
-            else
-            {
-                // Subsequently. Apply Themes first using whatever the SelectedTheme is
-                themes = ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false;
-                settings = Settings?.Apply () ?? false;
+                if (string.IsNullOrEmpty (ThemeManager.SelectedTheme))
+                {
+                    // First start. Apply settings first. This ensures if a config sets Theme to something other than "Default", it gets used
+                    settings = Settings?.Apply () ?? false;
+
+                    themes = !string.IsNullOrEmpty (ThemeManager.SelectedTheme)
+                             && (ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false);
+                }
+                else
+                {
+                    // Subsequently. Apply Themes first using whatever the SelectedTheme is
+                    themes = ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply () ?? false;
+                    settings = Settings?.Apply () ?? false;
+                }
             }
 
             appSettings = AppSettings?.Apply () ?? false;
@@ -404,33 +413,38 @@ public static class ConfigurationManager
             throw new InvalidOperationException ("Initialize must be called first.");
         }
 
-        ClearJsonErrors ();
-
-        _settings = new ();
-        _appSettings = new ();
-        _themeManager = new ();
-        ThemeManager?.Reset ();
-
-        if (Locations == ConfigLocations.None)
+        lock (_settingsLock)
         {
-            ResetToCurrentValues ();
+
+            ClearJsonErrors ();
+
+            _settings = new ();
+            _appSettings = new ();
+            _themeManager = new ();
+            ThemeManager?.Reset ();
+
+            if (Locations == ConfigLocations.None)
+            {
+                ResetToCurrentValues ();
+            }
+
+            // To enable some unit tests, we only load from resources if the flag is set
+            if (Locations.HasFlag (ConfigLocations.Default))
+            {
+                SourcesManager?.UpdateFromResource (
+                                                    Settings,
+                                                    typeof (ConfigurationManager).Assembly,
+                                                    $"Terminal.Gui.Resources.{_configFilename}",
+                                                    ConfigLocations.Default
+                                                   );
+            }
+
+            OnUpdated ();
+
+            Apply ();
+            ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply ();
         }
 
-        // To enable some unit tests, we only load from resources if the flag is set
-        if (Locations.HasFlag (ConfigLocations.Default))
-        {
-            SourcesManager?.UpdateFromResource (
-                                               Settings,
-                                               typeof (ConfigurationManager).Assembly,
-                                               $"Terminal.Gui.Resources.{_configFilename}",
-                                               ConfigLocations.Default
-                                              );
-        }
-
-        OnUpdated ();
-
-        Apply ();
-        ThemeManager.Themes? [ThemeManager.SelectedTheme]?.Apply ();
         AppSettings?.Apply ();
     }
 
@@ -469,13 +483,17 @@ public static class ConfigurationManager
             throw new InvalidOperationException ("Initialize must be called first.");
         }
 
-        Settings = new ();
-        ThemeManager?.ResetToCurrentValues ();
-        AppSettings?.RetrieveValues ();
-
-        foreach (KeyValuePair<string, ConfigProperty> p in Settings!.Where (cp => cp.Value.PropertyInfo is { }))
+        lock (_settingsLock)
         {
-            Settings! [p.Key].PropertyValue = p.Value.PropertyInfo?.GetValue (null);
+
+            Settings = new ();
+            ThemeManager?.ResetToCurrentValues ();
+            AppSettings?.RetrieveValues ();
+
+            foreach (KeyValuePair<string, ConfigProperty> p in Settings!.Where (cp => cp.Value.PropertyInfo is { }))
+            {
+                Settings! [p.Key].PropertyValue = p.Value.PropertyInfo?.GetValue (null);
+            }
         }
     }
 

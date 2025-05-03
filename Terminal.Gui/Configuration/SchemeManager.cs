@@ -136,6 +136,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
 
     public static Dictionary<string, Scheme?>? GetCurrentSchemes ()
     {
+        Debug.Assert(IsInitialized());
         Debug.Assert (ThemeManager.Themes.TryGetValue ("Default", out _));
 
         Dictionary<string, Scheme?>? schemes = new (StringComparer.InvariantCultureIgnoreCase) { };

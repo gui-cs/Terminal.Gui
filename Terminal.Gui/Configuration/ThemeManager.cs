@@ -14,6 +14,7 @@ namespace Terminal.Gui;
 /// </remarks>
 public class ThemeManager
 {
+    private static readonly object _themesLock = new object ();
     /// <summary>
     ///     The Themes dictionary. The backing store is <see cref="ConfigurationManager.Settings"/>` ["Themes"]`.
     /// </summary>
@@ -24,20 +25,27 @@ public class ThemeManager
     {
         get
         {
-            if (Settings is { } && Settings.TryGetValue ("Themes", out ConfigProperty? themes))
+            lock (_themesLock)
             {
-                Debug.Assert (themes.PropertyValue is Dictionary<string, ThemeScope>);
-                return themes.PropertyValue as Dictionary<string, ThemeScope>;
+                if (Settings is { } && Settings.TryGetValue ("Themes", out ConfigProperty? themes))
+                {
+                    Debug.Assert (themes.PropertyValue is Dictionary<string, ThemeScope>);
+
+                    return themes.PropertyValue as Dictionary<string, ThemeScope>;
+                }
             }
 
             throw new InvalidOperationException ("Settings is invalid.");
         }
         set
         {
-            // BUGBUG: We should not be setting Settings here? Instead, Settings should subscrube to something and update
-            if (Settings is { } && Settings.TryGetValue ("Themes", out ConfigProperty? themes))
+            lock (_themesLock)
             {
-                Settings ["Themes"].PropertyValue = value;
+                // BUGBUG: We should not be setting Settings here? Instead, Settings should subscrube to something and update
+                if (Settings is { } && Settings.TryGetValue ("Themes", out ConfigProperty? themes))
+                {
+                    Settings ["Themes"].PropertyValue = value;
+                }
             }
         }
     }
@@ -100,18 +108,22 @@ public class ThemeManager
                 return;
             }
 
-            if (themeCp.PropertyValue is string { } theme && Settings.TryGetValue ("Themes", out ConfigProperty? themesCp))
+            lock (_themesLock)
             {
-                // Check if the theme is in the themes dictionary
-                if (themesCp.PropertyValue is not Dictionary<string, ThemeScope> themes || !themes.TryGetValue (theme, out _))
+                if (themeCp.PropertyValue is string { } theme && Settings.TryGetValue ("Themes", out ConfigProperty? themesCp))
                 {
-                    return;
-                }
+                    // Check if the theme is in the themes dictionary
+                    if (themesCp.PropertyValue is not Dictionary<string, ThemeScope> themes || !themes.TryGetValue (theme, out _))
+                    {
+                        return;
+                    }
 
-                if (prevousThemeValue != _selectedTheme || prevousThemeValue != theme)
-                {
-                    Settings! ["Theme"].PropertyValue = _selectedTheme;
-                    //Instance.OnThemeChanged (prevousThemeValue);
+                    if (prevousThemeValue != _selectedTheme || prevousThemeValue != theme)
+                    {
+                        Settings! ["Theme"].PropertyValue = _selectedTheme;
+
+                        //Instance.OnThemeChanged (prevousThemeValue);
+                    }
                 }
             }
         }
@@ -130,7 +142,11 @@ public class ThemeManager
         var theme = new ThemeScope ();
         theme.RetrieveValues ();
 
-        Themes! [SelectedTheme] = theme;
+        lock (_themesLock)
+        {
+
+            Themes! [SelectedTheme] = theme;
+        }
     }
 
     /// <summary>Called when the selected theme has changed. Fires the <see cref="ThemeChanged"/> event.</summary>
@@ -145,10 +161,13 @@ public class ThemeManager
     internal void Reset ()
     {
         //Logging.Debug ("");
+        lock (_themesLock)
+        {
 
-        Settings! ["Themes"].PropertyValue = new Dictionary<string, ThemeScope> (StringComparer.InvariantCultureIgnoreCase);
+            Settings! ["Themes"].PropertyValue = new Dictionary<string, ThemeScope> (StringComparer.InvariantCultureIgnoreCase);
 
-        Themes?.Add ("Default", new ThemeScope ());
+            Themes?.Add ("Default", new ThemeScope ());
+        }
 
         SelectedTheme = "Default";
     }
