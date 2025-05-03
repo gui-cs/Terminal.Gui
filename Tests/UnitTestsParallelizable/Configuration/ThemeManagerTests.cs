@@ -24,10 +24,10 @@ public class ThemeManagerTests
 
         tm.Reset ();
 
-        Assert.NotEmpty (ThemeManager.Themes);
+        Assert.NotEmpty (ThemeManager.Themes!);
 
         // Default theme exists
-        Assert.NotNull (ThemeManager.Themes ["Default"]);
+        Assert.NotNull (ThemeManager.Themes? ["Default"]);
 
         //// Schemes exists, but is not initialized
         //Assert.Null (manager ["Default"].);

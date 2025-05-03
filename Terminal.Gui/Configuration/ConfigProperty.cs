@@ -54,7 +54,7 @@ public class ConfigProperty
         {
             if (PropertyInfo?.GetValue (null) is { })
             {
-                var val = DeepMemberWiseCopy (PropertyValue, PropertyInfo?.GetValue (null));
+                var val = ScopeExtensions.DeepMemberWiseCopy (PropertyValue, PropertyInfo?.GetValue (null));
                 PropertyInfo?.SetValue (null, val);
             }
         }
@@ -132,7 +132,7 @@ public class ConfigProperty
 
         if (PropertyValue is { })
         {
-            PropertyValue = DeepMemberWiseCopy (source, PropertyValue);
+            PropertyValue = ScopeExtensions.DeepMemberWiseCopy (source, PropertyValue);
         }
         else
         {
@@ -244,131 +244,6 @@ public class ConfigProperty
 
         // Sort the properties
         return allConfigProperties.ToImmutableSortedDictionary (StringComparer.InvariantCultureIgnoreCase);
-    }
-
-    /// <summary>
-    ///     System.Text.Json does not support copying a deserialized object to an existing instance. To work around this,
-    ///     we implement a 'deep, member-wise copy' method.
-    /// </summary>
-    /// <remarks>TOOD: When System.Text.Json implements `PopulateObject` revisit https://github.com/dotnet/corefx/issues/37627</remarks>
-    /// <param name="source"></param>
-    /// <param name="destination"></param>
-    /// <returns><paramref name="destination"/> updated from <paramref name="source"/></returns>
-    internal static object? DeepMemberWiseCopy (object? source, object? destination)
-    {
-        ArgumentNullException.ThrowIfNull (destination);
-
-        if (source is null)
-        {
-            return null!;
-        }
-
-        if (source.GetType () == typeof (SettingsScope))
-        {
-            return ((SettingsScope)destination).Update ((SettingsScope)source);
-        }
-
-        if (source.GetType () == typeof (ThemeScope))
-        {
-            return ((ThemeScope)destination).Update ((ThemeScope)source);
-        }
-
-        if (source.GetType () == typeof (AppScope))
-        {
-            return ((AppScope)destination).Update ((AppScope)source);
-        }
-
-        // If value type, just use copy constructor.
-        if (source.GetType ().IsValueType || source is string)
-        {
-            return source;
-        }
-
-        // HACK: Key is a class, but we want to treat it as a value type so just _keyCode gets copied.
-        if (source.GetType () == typeof (Key))
-        {
-            return source;
-        }
-
-        // Handle arrays
-        if (source.GetType ().IsArray && destination.GetType ().IsArray)
-        {
-            var sourceArray = (Array)source;
-            var destinationArray = (Array)destination;
-
-            if (sourceArray.Length != destinationArray.Length)
-            {
-                throw new ArgumentException ("Source and destination arrays must have the same length.");
-            }
-
-            for (int i = 0; i < sourceArray.Length; i++)
-            {
-                var sourceElement = sourceArray.GetValue (i);
-                var destinationElement = destinationArray.GetValue (i);
-
-                // Recursively copy elements
-                destinationArray.SetValue (DeepMemberWiseCopy (sourceElement, destinationElement), i);
-            }
-
-            return destinationArray;
-        }
-
-        // Dictionary
-        if (source.GetType ().IsGenericType
-            && source.GetType ().GetGenericTypeDefinition ().IsAssignableFrom (typeof (Dictionary<,>)))
-        {
-            foreach (object? srcKey in ((IDictionary)source).Keys)
-            {
-                if (((IDictionary)destination).Contains (srcKey))
-                {
-                    ((IDictionary)destination) [srcKey] =
-                        DeepMemberWiseCopy (((IDictionary)source) [srcKey], ((IDictionary)destination) [srcKey]);
-                }
-                else
-                {
-                    ((IDictionary)destination).Add (srcKey, ((IDictionary)source) [srcKey]);
-                }
-            }
-
-            return destination;
-        }
-
-        // All other object types
-        List<PropertyInfo>? sourceProps = source?.GetType ().GetProperties ().Where (x => x.CanRead).ToList ();
-        List<PropertyInfo>? destProps = destination?.GetType ().GetProperties ().Where (x => x.CanWrite).ToList ()!;
-
-        foreach ((PropertyInfo? sourceProp, PropertyInfo? destProp) in
-                 from sourceProp in sourceProps
-                 where destProps.Any (x => x.Name == sourceProp.Name)
-                 let destProp = destProps.First (x => x.Name == sourceProp.Name)
-                 where destProp.CanWrite
-                 select (sourceProp, destProp))
-        {
-            object? sourceVal = sourceProp.GetValue (source);
-            object? destVal = destProp.GetValue (destination);
-
-            if (sourceVal is { })
-            {
-                try
-                {
-                    if (destVal is { })
-                    {
-                        // Recurse
-                        destProp.SetValue (destination, DeepMemberWiseCopy (sourceVal, destVal));
-                    }
-                    else
-                    {
-                        destProp.SetValue (destination, sourceVal);
-                    }
-                }
-                catch (ArgumentException e)
-                {
-                    throw new JsonException ($"Error Applying Configuration Change: {e.Message}", e);
-                }
-            }
-        }
-
-        return destination;
     }
 
 }

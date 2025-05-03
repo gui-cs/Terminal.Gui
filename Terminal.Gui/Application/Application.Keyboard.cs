@@ -203,7 +203,11 @@ public static partial class Application // Keyboard handling
 
     #region Application-scoped KeyBindings
 
-    static Application () { AddKeyBindings (); }
+    static Application ()
+    {
+        AddKeyBindings ();
+        SetKeysToHardCodedDefaults ();
+    }
 
     /// <summary>Gets the Application-scoped key bindings.</summary>
     public static KeyBindings KeyBindings { get; internal set; } = new (null);
@@ -277,7 +281,7 @@ public static partial class Application // Keyboard handling
                         return false;
                     });
 
-        SetKeysToHardCodedDefaults ();
+        //SetKeysToHardCodedDefaults ();
 
         // Need to clear after setting the above to ensure actually clear
         // because set_QuitKey etc.. may call Add
@@ -307,10 +311,6 @@ public static partial class Application // Keyboard handling
 
     private static void SetKeysToHardCodedDefaults ()
     {
-        if (Locations == ConfigLocations.None)
-        {
-            return;
-        }
         // Resources/config.json overrides
         // BUGBUG: We reset these here becaues they may have been changed. But 
         // BUGBUG: These may not actually be the correct default values.

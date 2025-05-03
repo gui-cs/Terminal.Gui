@@ -318,11 +318,14 @@ public class ApplicationTests
             Assert.Null (Application.Driver);
             Assert.Null (Application.MainLoop);
             Assert.False (Application.EndAfterFirstIteration);
-            Assert.Equal (Key.Tab.WithShift, Application.PrevTabKey);
-            Assert.Equal (Key.Tab, Application.NextTabKey);
-            Assert.Equal (Key.F6.WithShift, Application.PrevTabGroupKey);
-            Assert.Equal (Key.F6, Application.NextTabGroupKey);
-            Assert.Equal (Key.Esc, Application.QuitKey);
+
+            // Commented out because if CM changed the defaults, those changes should
+            // persist across Inits.
+            //Assert.Equal (Key.Tab.WithShift, Application.PrevTabKey);
+            //Assert.Equal (Key.Tab, Application.NextTabKey);
+            //Assert.Equal (Key.F6.WithShift, Application.PrevTabGroupKey);
+            //Assert.Equal (Key.F6, Application.NextTabGroupKey);
+            //Assert.Equal (Key.Esc, Application.QuitKey);
 
             // Internal properties
             Assert.False (Application.Initialized);

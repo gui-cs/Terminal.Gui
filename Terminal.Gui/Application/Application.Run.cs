@@ -15,7 +15,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         get => _quitKey;
         set
         {
-            if (_quitKey != value)
+            //if (_quitKey != value)
             {
                 KeyBindings.Replace (_quitKey, value);
                 _quitKey = value;
@@ -32,7 +32,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         get => _arrangeKey;
         set
         {
-            if (_arrangeKey != value)
+            //if (_arrangeKey != value)
             {
                 KeyBindings.Replace (_arrangeKey, value);
                 _arrangeKey = value;

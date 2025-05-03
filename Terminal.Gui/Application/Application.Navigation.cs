@@ -20,7 +20,7 @@ public static partial class Application // Navigation stuff
         get => _nextTabGroupKey;
         set
         {
-            if (_nextTabGroupKey != value)
+            //if (_nextTabGroupKey != value)
             {
                 KeyBindings.Replace (_nextTabGroupKey, value);
                 _nextTabGroupKey = value;
@@ -35,7 +35,7 @@ public static partial class Application // Navigation stuff
         get => _nextTabKey;
         set
         {
-            if (_nextTabKey != value)
+            //if (_nextTabKey != value)
             {
                 KeyBindings.Replace (_nextTabKey, value);
                 _nextTabKey = value;
@@ -64,7 +64,7 @@ public static partial class Application // Navigation stuff
         get => _prevTabGroupKey;
         set
         {
-            if (_prevTabGroupKey != value)
+            //if (_prevTabGroupKey != value)
             {
                 KeyBindings.Replace (_prevTabGroupKey, value);
                 _prevTabGroupKey = value;
@@ -79,7 +79,7 @@ public static partial class Application // Navigation stuff
         get => _prevTabKey;
         set
         {
-            if (_prevTabKey != value)
+            //if (_prevTabKey != value)
             {
                 KeyBindings.Replace (_prevTabKey, value);
                 _prevTabKey = value;

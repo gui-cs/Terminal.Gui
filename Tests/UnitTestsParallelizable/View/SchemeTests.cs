@@ -10,7 +10,7 @@ public class SchemeTests
     [CombinatorialData]
     public void GetAttributeForRole (VisualRole role)
     {
-        var view = new View { Scheme = SchemeManager.GetDefaultSchemes () ["Base"] };
+        var view = new View { Scheme = SchemeManager.GetDefaultSchemes ()? ["Base"] };
 
         Assert.Equal (view.Scheme!.GetAttributeForRole (role), view.GetAttributeForRole (role));
 
@@ -26,7 +26,7 @@ public class SchemeTests
 
         ThemeScope ts = new ThemeScope ();
 
-        var view = new View { Scheme = SchemeManager.GetDefaultSchemes () ["Base"] };
+        var view = new View { Scheme = SchemeManager.GetDefaultSchemes()? ["Base"] };
 
         Assert.Equal (view.Scheme!.Normal, view.GetAttributeForRole (VisualRole.Normal));
 
@@ -37,7 +37,7 @@ public class SchemeTests
     [Fact]
     public void GetAttributeForRole_Normal_DisabledView_Returns_Disabled ()
     {
-        var view = new View { Scheme = SchemeManager.GetDefaultSchemes () ["Base"] };
+        var view = new View { Scheme = SchemeManager.GetDefaultSchemes()? ["Base"] };
 
         Assert.Equal (view.Scheme!.Normal, view.GetAttributeForRole (VisualRole.Normal));
 
@@ -50,7 +50,7 @@ public class SchemeTests
     [Fact]
     public void GetHotNormalColor_Scheme ()
     {
-        var view = new View { Scheme = SchemeManager.GetDefaultSchemes () ["Base"] };
+        var view = new View { Scheme = SchemeManager.GetDefaultSchemes()? ["Base"] };
 
         Assert.Equal (view.Scheme!.HotNormal, view.GetHotNormalColor ());
 
@@ -62,7 +62,7 @@ public class SchemeTests
     [Fact]
     public void GetNormalColor_Scheme ()
     {
-        var view = new View { Scheme = SchemeManager.GetDefaultSchemes () ["Base"] };
+        var view = new View { Scheme = SchemeManager.GetDefaultSchemes()? ["Base"] };
 
         Assert.Equal (view.Scheme!.Normal, view.GetNormalColor ());
 
