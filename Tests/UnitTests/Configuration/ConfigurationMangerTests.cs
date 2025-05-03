@@ -35,14 +35,14 @@ public class ConfigurationManagerTests
         UnInitialize ();
 
         // Confirm statics are cleared
-        Assert.Null (_classesWithConfigProps);
+        Assert.Null (ConfigProperty._classesWithConfigProps);
         Assert.Null (_allConfigProperties);
 
         // Re-initialize - this simulates what the ModuleInitializer does
         Initialize ();
 
         // Verify initialization was successful
-        Assert.NotNull (_classesWithConfigProps);
+        Assert.NotNull (ConfigProperty._classesWithConfigProps);
         Assert.NotNull (_allConfigProperties);
     }
 
@@ -51,14 +51,14 @@ public class ConfigurationManagerTests
     {
         // First ensure we're initialized
         Initialize ();
-        Assert.NotNull (_classesWithConfigProps);
+        Assert.NotNull (ConfigProperty._classesWithConfigProps);
         Assert.NotNull (_allConfigProperties);
 
         // Act - Uninitialize
         UnInitialize ();
 
         // Assert all statics are cleared
-        Assert.Null (_classesWithConfigProps);
+        Assert.Null (ConfigProperty._classesWithConfigProps);
         Assert.Null (_allConfigProperties);
         Assert.Null (_settings);
         Assert.Null (_themeManager);

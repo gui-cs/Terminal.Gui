@@ -9,9 +9,6 @@ public class ThemeManagerTests
     [Fact]
     public void Intialize_Clears ()
     {
-        // Need to call Initialize to setup readonly statics
-        ConfigurationManager.Initialize ();
-
         var tm = new ThemeManager ();
 //
       //  Assert.Empty (tm);

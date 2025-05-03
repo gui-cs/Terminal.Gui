@@ -1,6 +1,7 @@
 ﻿global using static Terminal.Gui.ConfigurationManager;
 global using CM = Terminal.Gui.ConfigurationManager;
 using System.Collections;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -63,30 +64,16 @@ public static class ConfigurationManager
     /// </summary>
     /// <remarks>Is <see langword="null"/> until <see cref="Initialize"/> is called.</remarks>
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    internal static Dictionary<string, ConfigProperty>? _allConfigProperties;
-
-    /// <summary>
-    ///     A cache of all classes that have properties decorated with the <see cref="SerializableConfigurationProperty"/>.
-    /// </summary>
-    /// <remarks>Is <see langword="null"/> until <see cref="Initialize"/> is called.</remarks>
-    [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    internal static Dictionary<string, Type>? _classesWithConfigProps;
+    internal static ImmutableSortedDictionary<string, ConfigProperty>? _allConfigProperties;
 
     [RequiresUnreferencedCode ("AOT")]
     internal static void Initialize ()
     {
-        // Cache all classes with configuration properties
-        _classesWithConfigProps = GetClassesWithConfigProperties ();
+        // Ensure we have a list of all the classes with config properties.
+        ConfigProperty.Initialize ();
 
         // Cache all configuration properties
-        _allConfigProperties = GetAllConfigProperties ();
-
-        // Sort the properties
-        _allConfigProperties = _allConfigProperties.OrderBy (x => x.Key)
-                                                   .ToDictionary (
-                                                                  x => x.Key,
-                                                                  x => x.Value,
-                                                                  StringComparer.InvariantCultureIgnoreCase);
+        _allConfigProperties = ConfigProperty.GetAllConfigProperties ();
 
         // Note, we do not set _settings, _appSettings, or _themeManager here. They get set in Load
     }
@@ -97,8 +84,8 @@ public static class ConfigurationManager
 
     internal static void UnInitialize ()
     {
+        ConfigProperty.UnInitialize ();
         _allConfigProperties = null;
-        _classesWithConfigProps = null;
         _settings = null;
         _appSettings = null;
         _themeManager = null;
@@ -426,7 +413,7 @@ public static class ConfigurationManager
 
         if (Locations == ConfigLocations.None)
         {
-            ResetToCurrentValues();
+            ResetToCurrentValues ();
         }
 
         // To enable some unit tests, we only load from resources if the flag is set
@@ -493,103 +480,15 @@ public static class ConfigurationManager
     }
 
     /// <summary>
-    /// Retrieves a dictionary of classes with configuration properties.
-    /// </summary>
-    [RequiresUnreferencedCode ("AOT")]
-    private static Dictionary<string, Type> GetClassesWithConfigProperties ()
-    {
-        var classesWithConfigProps = new Dictionary<string, Type> (StringComparer.InvariantCultureIgnoreCase);
-
-        var types = from assembly in AppDomain.CurrentDomain.GetAssemblies ()
-                    from type in assembly.GetTypes ()
-                    where type.GetProperties ()
-                              .Any (prop => prop.GetCustomAttribute (typeof (SerializableConfigurationProperty)) != null)
-                    select type;
-
-        foreach (var classWithConfig in types)
-        {
-            classesWithConfigProps.Add (classWithConfig.Name, classWithConfig);
-        }
-
-        return classesWithConfigProps;
-    }
-
-    /// <summary>
-    /// Retrieves all configuration properties
-    /// </summary>
-    [RequiresUnreferencedCode ("AOT")]
-    private static Dictionary<string, ConfigProperty> GetAllConfigProperties ()
-    {
-        if (_classesWithConfigProps is null)
-        {
-            throw new InvalidOperationException ("GetClassesWithConfigProperties must be called first.");
-        }
-
-        var allConfigProperties = new Dictionary<string, ConfigProperty> (StringComparer.InvariantCultureIgnoreCase);
-
-        foreach (var property in from c in _classesWithConfigProps
-                                 let props = c.Value.GetProperties (
-                                     BindingFlags.Instance |
-                                     BindingFlags.Static |
-                                     BindingFlags.NonPublic |
-                                     BindingFlags.Public)
-                                 .Where (prop => prop.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is SerializableConfigurationProperty)
-                                 from property in props
-                                 select property)
-        {
-            if (property.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is not SerializableConfigurationProperty scp)
-            {
-                continue;
-            }
-
-            if (!property.GetGetMethod (true)!.IsPublic)
-            {
-                throw new InvalidOperationException (
-                                                     $"Property {property.Name} in class {property.DeclaringType?.Name} is not public. SerializableConfigurationProperty properties must be public.");
-
-            }
-
-            if (property.GetGetMethod (true)!.IsStatic)
-            {
-                var key = scp.OmitClassName
-                              ? ConfigProperty.GetJsonPropertyName (property)
-                              : $"{property.DeclaringType?.Name}.{property.Name}";
-
-                allConfigProperties.Add (key, new ConfigProperty
-                {
-                    PropertyInfo = property,
-                    PropertyValue = null
-                });
-            }
-            else
-            {
-                throw new InvalidOperationException (
-                                                     $"Property {property.Name} in class {property.DeclaringType?.Name} is not static. SerializableConfigurationProperty properties must be static.");
-            }
-        }
-
-        return allConfigProperties;
-    }
-
-    /// <summary>
     /// Retrieves all configuration properties that belong to a specific scope.
     /// </summary>
     [RequiresUnreferencedCode ("AOT")]
     internal static IEnumerable<KeyValuePair<string, ConfigProperty>> GetConfigPropertiesByScope (Type scopeType)
     {
-        Dictionary<string, ConfigProperty>? allProperties = _allConfigProperties;
-        if (!IsInitialized ())
-        {
-            // If CM has not been initialized, we return the a new list
-            // PERFORMANCE: This should not be used in situations where perf is important.
-            allProperties = GetAllConfigProperties ();
-        }
         // Filter properties by scope
-        return allProperties!.Where (cp =>
-                                         cp.Value.PropertyInfo?.GetCustomAttribute<SerializableConfigurationProperty> ()?.Scope == scopeType);
+        return _allConfigProperties!.Where (cp =>
+                                                cp.Value.PropertyInfo?.GetCustomAttribute<SerializableConfigurationProperty> ()?.Scope == scopeType);
     }
 
     private static void ClearJsonErrors () { _jsonErrors.Clear (); }
-
-
 }

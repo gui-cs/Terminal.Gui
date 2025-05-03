@@ -14,19 +14,11 @@ namespace Terminal.Gui;
 
 public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string, Scheme?>
 {
-    private readonly object _scheesLock = new object ();
+    private static readonly object _schemesLock = new object ();
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public SchemeManager ()
+    internal static void ResetToHardCodedDefaults ()
     {
-        ResetToHardCodedDefaults ();
-    }
-
-    internal void ResetToHardCodedDefaults ()
-    {
-        lock (_scheesLock)
+        lock (_schemesLock)
         {
             Schemes = GetHardCodedSchemes ();
         }
@@ -111,14 +103,14 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     {
         get
         {
-            lock (_scheesLock)
+            lock (_schemesLock)
             {
                 return Schemes? [key];
             }
         }
         set
         {
-            lock (_scheesLock)
+            lock (_schemesLock)
             {
                 if (Schemes is { } && Schemes.TryGetValue (key, out _))
                 {
@@ -146,7 +138,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     {
         Debug.Assert (ThemeManager.Themes.TryGetValue ("Default", out _));
 
-        Dictionary<string, Scheme?>? schemes = [];
+        Dictionary<string, Scheme?>? schemes = new (StringComparer.InvariantCultureIgnoreCase) { };
 
         if (ThemeManager.Themes is { })
         {
@@ -167,7 +159,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
         Debug.Assert (ThemeManager.Themes is {});
         Debug.Assert (ThemeManager.Themes.TryGetValue ("Default", out _));
 
-        Dictionary<string, Scheme?>? schemes = [];
+        Dictionary<string, Scheme?>? schemes = new (StringComparer.InvariantCultureIgnoreCase) { };
 
         if (ThemeManager.Themes is { })
         {
@@ -187,7 +179,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     {
         get
         {
-            lock (_scheesLock)
+            lock (_schemesLock)
             {
                 return Schemes!.Count;
             }
@@ -202,7 +194,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     {
         get
         {
-            lock (_scheesLock)
+            lock (_schemesLock)
             {
                 return new List<string> (Schemes!.Keys);
             }
@@ -214,7 +206,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     {
         get
         {
-            lock (_scheesLock)
+            lock (_schemesLock)
             {
                 return new List<Scheme?> (Schemes!.Values);
             }
@@ -224,7 +216,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     /// <inheritdoc />
     public void Add (KeyValuePair<string, Scheme?> item)
     {
-        lock (_scheesLock)
+        lock (_schemesLock)
         {
             Schemes?.Add (item.Key, item.Value);
             CollectionChanged?.Invoke (this, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, item));
@@ -240,7 +232,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     /// <inheritdoc />
     public void Clear ()
     {
-        lock (_scheesLock)
+        lock (_schemesLock)
         {
             Schemes?.Clear ();
             CollectionChanged?.Invoke (this, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset));
@@ -250,7 +242,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     /// <inheritdoc />
     public bool Contains (KeyValuePair<string, Scheme?> item)
     {
-        lock (_scheesLock)
+        lock (_schemesLock)
         {
             return Schemes is { } && Schemes.Contains (item);
         }
@@ -259,7 +251,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     /// <inheritdoc />
     public bool ContainsKey (string key)
     {
-        lock (_scheesLock)
+        lock (_schemesLock)
         {
             return Schemes is { } && Schemes.ContainsKey (key);
         }
@@ -268,7 +260,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     /// <inheritdoc />
     public void CopyTo (KeyValuePair<string, Scheme?> [] array, int arrayIndex)
     {
-        lock (_scheesLock)
+        lock (_schemesLock)
         {
             if (Schemes is { })
             {
@@ -280,7 +272,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     /// <inheritdoc />
     public IEnumerator<KeyValuePair<string, Scheme?>> GetEnumerator ()
     {
-        lock (_scheesLock)
+        lock (_schemesLock)
         {
             if (Schemes is { })
             {
@@ -299,7 +291,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     /// <inheritdoc />
     public bool Remove (KeyValuePair<string, Scheme?> item)
     {
-        lock (_scheesLock)
+        lock (_schemesLock)
         {
             if (Schemes is { } && Schemes.Remove (item.Key))
             {
@@ -313,7 +305,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     /// <inheritdoc />
     public bool Remove (string key)
     {
-        lock (_scheesLock)
+        lock (_schemesLock)
         {
             if (Schemes is { } && Schemes.Remove (key))
             {
@@ -327,7 +319,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     /// <inheritdoc />
     public bool TryGetValue (string key, out Scheme? value)
     {
-        lock (_scheesLock)
+        lock (_schemesLock)
         {
             return Schemes!.TryGetValue (key, out value);
         }

@@ -337,13 +337,13 @@ public class SourcesManagerTests
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
 
-        var locations = new []
-        {
-        ConfigLocations.Default,
-        ConfigLocations.Runtime,
-        ConfigLocations.AppCurrent,
-        ConfigLocations.GlobalHome
-    };
+        ConfigLocations[] locations =
+        [
+            ConfigLocations.Default,
+            ConfigLocations.Runtime,
+            ConfigLocations.AppCurrent,
+            ConfigLocations.GlobalHome
+        ];
 
         // Act - Update with different sources for different locations
         foreach (var location in locations)
@@ -389,7 +389,7 @@ public class SourcesManagerTests
         var settingsScope = new SettingsScope ();
 
         // Define multiple files and locations
-        var fileLocations = new Dictionary<string, ConfigLocations>
+        var fileLocations = new Dictionary<string, ConfigLocations> (StringComparer.InvariantCultureIgnoreCase)
     {
         { "file1.json", ConfigLocations.AppCurrent },
         { "file2.json", ConfigLocations.GlobalHome },

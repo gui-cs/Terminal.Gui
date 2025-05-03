@@ -1,5 +1,7 @@
 ﻿#nullable enable
 using System.Collections;
+using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -124,13 +126,7 @@ public class ConfigProperty
         if (source.GetType () != PropertyInfo!.PropertyType && ut is { } && source.GetType () != ut)
         {
             throw new ArgumentException (
-                                         $"The source object ({
-                                             PropertyInfo!.DeclaringType
-                                         }.{
-                                             PropertyInfo!.Name
-                                         }) is not of type {
-                                             PropertyInfo!.PropertyType
-                                         }."
+                                         $"The source object ({PropertyInfo!.DeclaringType}.{PropertyInfo!.Name}) is not of type {PropertyInfo!.PropertyType}."
                                         );
         }
 
@@ -146,6 +142,109 @@ public class ConfigProperty
         return PropertyValue;
     }
 
+    /// <summary>
+    ///     A cache of all classes that have properties decorated with the <see cref="SerializableConfigurationProperty"/>.
+    /// </summary>
+    /// <remarks>Is <see langword="null"/> until <see cref="Initialize"/> is called.</remarks>
+    [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+    internal static ImmutableSortedDictionary<string, Type>? _classesWithConfigProps;
+
+    /// <summary>
+    /// Retrieves a dictionary of classes with properties annotated with see <see cref="SerializableConfigurationProperty"/>.
+    /// The dictionary is case-insensitive and contains the class name as the key and the type as the value.
+    /// To be called from the <see cref="ModuleInitializers.InitializeConfigurationManager"/>..
+    /// </summary>
+    [RequiresUnreferencedCode ("AOT")]
+    internal static void Initialize ()
+    {
+        if (_classesWithConfigProps is { })
+        {
+            return;
+        }
+
+        Dictionary<string, Type> dict = new (StringComparer.InvariantCultureIgnoreCase);
+
+        IEnumerable<Type> types = from assembly in AppDomain.CurrentDomain.GetAssemblies ()
+                                  from type in assembly.GetTypes ()
+                                  where type.GetProperties ()
+                                            .Any (prop => prop.GetCustomAttribute (typeof (SerializableConfigurationProperty)) != null)
+                                  select type;
+
+        foreach (Type classWithConfig in types)
+        {
+            dict.Add (classWithConfig.Name, classWithConfig);
+        }
+
+        _classesWithConfigProps = dict.ToImmutableSortedDictionary ();
+    }
+
+    /// <summary>
+    ///   Uninitializes the <see cref="_classesWithConfigProps"/> dictionary. For unit testing.
+    /// </summary>
+    internal static void UnInitialize ()
+    {
+        _classesWithConfigProps = null;
+    }
+
+
+    /// <summary>
+    /// Retrieves a dictionary of all properties annotated with <see cref="SerializableConfigurationProperty"/> from the classes
+    /// </summary>
+    [RequiresUnreferencedCode ("AOT")]
+    internal static ImmutableSortedDictionary<string, ConfigProperty> GetAllConfigProperties ()
+    {
+        if (_classesWithConfigProps is null)
+        {
+            throw new InvalidOperationException ("Initialize has not been called.");
+        }
+
+        var allConfigProperties = new Dictionary<string, ConfigProperty> (StringComparer.InvariantCultureIgnoreCase);
+
+        foreach (var property in from c in _classesWithConfigProps
+                                 let props = c.Value.GetProperties (
+                                                                    BindingFlags.Instance |
+                                                                    BindingFlags.Static |
+                                                                    BindingFlags.NonPublic |
+                                                                    BindingFlags.Public)
+                                              .Where (prop => prop.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is SerializableConfigurationProperty)
+                                 from property in props
+                                 select property)
+        {
+            if (property.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is not SerializableConfigurationProperty scp)
+            {
+                continue;
+            }
+
+            // This code is disabled to call out that internal is explicitly supported.
+            //if (!property.GetGetMethod (true)!.IsPublic)
+            //{
+            //    throw new InvalidOperationException (
+            //                                         $"Property {property.Name} in class {property.DeclaringType?.Name} is not public. SerializableConfigurationProperty properties must be public.");
+
+            //}
+
+            if (property.GetGetMethod (true)!.IsStatic)
+            {
+                var key = scp.OmitClassName
+                              ? ConfigProperty.GetJsonPropertyName (property)
+                              : $"{property.DeclaringType?.Name}.{property.Name}";
+
+                allConfigProperties.Add (key, new ConfigProperty
+                {
+                    PropertyInfo = property,
+                    PropertyValue = null
+                });
+            }
+            else
+            {
+                throw new InvalidOperationException (
+                                                     $"Property {property.Name} in class {property.DeclaringType?.Name} is not static. SerializableConfigurationProperty properties must be static.");
+            }
+        }
+
+        // Sort the properties
+        return allConfigProperties.ToImmutableSortedDictionary (StringComparer.InvariantCultureIgnoreCase);
+    }
 
     /// <summary>
     ///     System.Text.Json does not support copying a deserialized object to an existing instance. To work around this,
@@ -191,6 +290,29 @@ public class ConfigProperty
             return source;
         }
 
+        // Handle arrays
+        if (source.GetType ().IsArray && destination.GetType ().IsArray)
+        {
+            var sourceArray = (Array)source;
+            var destinationArray = (Array)destination;
+
+            if (sourceArray.Length != destinationArray.Length)
+            {
+                throw new ArgumentException ("Source and destination arrays must have the same length.");
+            }
+
+            for (int i = 0; i < sourceArray.Length; i++)
+            {
+                var sourceElement = sourceArray.GetValue (i);
+                var destinationElement = destinationArray.GetValue (i);
+
+                // Recursively copy elements
+                destinationArray.SetValue (DeepMemberWiseCopy (sourceElement, destinationElement), i);
+            }
+
+            return destinationArray;
+        }
+
         // Dictionary
         if (source.GetType ().IsGenericType
             && source.GetType ().GetGenericTypeDefinition ().IsAssignableFrom (typeof (Dictionary<,>)))
@@ -211,7 +333,7 @@ public class ConfigProperty
             return destination;
         }
 
-        // ALl other object types
+        // All other object types
         List<PropertyInfo>? sourceProps = source?.GetType ().GetProperties ().Where (x => x.CanRead).ToList ();
         List<PropertyInfo>? destProps = destination?.GetType ().GetProperties ().Where (x => x.CanWrite).ToList ()!;
 

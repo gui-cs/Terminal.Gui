@@ -49,7 +49,7 @@ public class ThemeTests
 
         var scheme = new Scheme { Normal = new Attribute (Color.Red, Color.Green) };
 
-        theme ["Schemes"].PropertyValue = new Dictionary<string, Scheme> { { "test", scheme } };
+        theme ["Schemes"].PropertyValue = new Dictionary<string, Scheme> (StringComparer.InvariantCultureIgnoreCase) { { "test", scheme } };
 
         Assert.Equal (
                       new Color (Color.Red),

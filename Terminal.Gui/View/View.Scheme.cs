@@ -34,7 +34,7 @@ public partial class View
                                     normal: new Attribute (new Color ("White"), new Color ("Blue")),
                                     focus: new Attribute (new Color ("DarkBlue"), new Color ("LightGray")),
                                     hotNormal: new Attribute (new Color ("BrightCyan"), new Color ("Blue")),
-                                    hotFocus: new Attribute (new Color ("BrightCyan"), new Color ("LightGray")),
+                                    hotFocus: new Attribute (new Color ("BrightBlue"), new Color ("LightGray")),
                                     disabled: new Attribute (new Color ("DarkGray"), new Color ("Blue"))
                                    )
             },

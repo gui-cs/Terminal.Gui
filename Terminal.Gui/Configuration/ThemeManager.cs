@@ -34,7 +34,7 @@ public class ThemeManager
         }
         set
         {
-            // BUGBUG: We should not be setting Settings here. Instead, Settings should subscrube to something and update
+            // BUGBUG: We should not be setting Settings here? Instead, Settings should subscrube to something and update
             if (Settings is { } && Settings.TryGetValue ("Themes", out ConfigProperty? themes))
             {
                 Settings ["Themes"].PropertyValue = value;
@@ -84,6 +84,7 @@ public class ThemeManager
     [JsonPropertyName ("Theme")]
     public static string SelectedTheme
     {
+        // BUGBUG: The backing store is supposed to be Settings!
         get => _selectedTheme;
 
         [RequiresUnreferencedCode ("Calls Terminal.Gui.ConfigurationManager.Settings")]
@@ -145,7 +146,7 @@ public class ThemeManager
     {
         //Logging.Debug ("");
 
-        Settings! ["Themes"].PropertyValue = new Dictionary<string, ThemeScope> ();
+        Settings! ["Themes"].PropertyValue = new Dictionary<string, ThemeScope> (StringComparer.InvariantCultureIgnoreCase);
 
         Themes?.Add ("Default", new ThemeScope ());
 

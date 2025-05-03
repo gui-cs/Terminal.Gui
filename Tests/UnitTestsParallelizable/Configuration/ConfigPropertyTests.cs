@@ -298,4 +298,222 @@ public class ConfigPropertyTests
         Assert.Equal (dictSrc ["Disabled"], dictCopy ["Disabled"]);
         Assert.Equal (dictDest ["Normal"], dictCopy ["Normal"]);
     }
+
+    [Fact]
+    public void DeepMemberWiseCopy_SourceIsNull_ReturnsNull ()
+    {
+        // Arrange
+        object? source = null;
+        object destination = new object ();
+
+        // Act
+        var result = ConfigProperty.DeepMemberWiseCopy (source, destination);
+
+        // Assert
+        Assert.Null (result);
+    }
+
+    [Fact]
+    public void DeepMemberWiseCopy_DestinationIsNull_ThrowsArgumentNullException ()
+    {
+        // Arrange
+        object source = new object ();
+        object? destination = null;
+
+        // Act & Assert
+        Assert.Throws<ArgumentNullException> (() => ConfigProperty.DeepMemberWiseCopy (source, destination));
+    }
+
+    public class CircularReference
+    {
+        public CircularReference? Child { get; set; }
+    }
+
+    [Fact (Skip = "AI Generated test")]
+    public void DeepMemberWiseCopy_CircularReferences_DoesNotThrow ()
+    {
+        // Arrange
+        var source = new CircularReference ();
+        source.Child = source;
+
+        var destination = new CircularReference ();
+
+        // Act
+        var result = ConfigProperty.DeepMemberWiseCopy (source, destination);
+
+        // Assert
+        Assert.NotNull (result);
+        Assert.Same (result, ((CircularReference)result).Child);
+    }
+
+    [Fact (Skip = "AI Generated test")]
+    public void DeepMemberWiseCopy_List_CopiesElements ()
+    {
+        // Arrange
+        var source = new List<int> { 1, 2, 3 };
+        var destination = new List<int> ();
+
+        // Act
+        var result = ConfigProperty.DeepMemberWiseCopy (source, destination);
+
+        // Assert
+        Assert.Equal (source, result);
+    }
+
+    [Fact]
+    public void DeepMemberWiseCopy_Array_CopiesElements ()
+    {
+        // Arrange
+        var source = new int [] { 1, 2, 3 };
+        var destination = new int [3];
+
+        // Act
+        var result = ConfigProperty.DeepMemberWiseCopy (source, destination);
+
+        // Assert
+        Assert.Equal (source, result);
+    }
+
+    public class NestedObject
+    {
+        public string? Name { get; set; }
+        public NestedObject? Child { get; set; }
+    }
+
+    [Fact]
+    public void DeepMemberWiseCopy_NestedObjects_CopiesAllLevels ()
+    {
+        // Arrange
+        var source = new NestedObject
+        {
+            Name = "Parent",
+            Child = new NestedObject { Name = "Child" }
+        };
+        var destination = new NestedObject ();
+
+        // Act
+        var result = ConfigProperty.DeepMemberWiseCopy (source, destination);
+
+        // Assert
+        Assert.Equal (source.Name, ((NestedObject)result).Name);
+        Assert.Equal (source.Child?.Name, ((NestedObject)result).Child?.Name);
+    }
+    public class ComplexKey
+    {
+        public int Id { get; set; }
+        public override bool Equals (object? obj) => obj is ComplexKey key && Id == key.Id;
+        public override int GetHashCode () => Id.GetHashCode ();
+    }
+
+    [Fact]
+    public void DeepMemberWiseCopy_DictionaryWithComplexKeys_CopiesCorrectly ()
+    {
+        // Arrange
+        var source = new Dictionary<ComplexKey, string>
+        {
+            { new ComplexKey { Id = 1 }, "Value1" }
+        };
+        var destination = new Dictionary<ComplexKey, string> ();
+
+        // Act
+        var result = ConfigProperty.DeepMemberWiseCopy (source, destination);
+
+        // Assert
+        Assert.Equal (source.Keys.First ().Id, ((Dictionary<ComplexKey, string>)result).Keys.First ().Id);
+        Assert.Equal (source.Values.First (), ((Dictionary<ComplexKey, string>)result).Values.First ());
+    }
+
+    [Fact (Skip = "AI Generated test")]
+    public void DeepMemberWiseCopy_UnsupportedType_ThrowsException ()
+    {
+        // Arrange
+        var source = new System.IO.StreamReader (Stream.Null);
+        var destination = new System.IO.StreamReader (Stream.Null);
+
+        // Act & Assert
+        Assert.Throws<JsonException> (() => ConfigProperty.DeepMemberWiseCopy (source, destination));
+    }
+    [Fact]
+    public void DeepMemberWiseCopy_ImmutableObject_ReturnsSource ()
+    {
+        // Arrange
+        var source = "ImmutableString";
+        var destination = "AnotherString";
+
+        // Act
+        var result = ConfigProperty.DeepMemberWiseCopy (source, destination);
+
+        // Assert
+        Assert.Equal (source, result);
+    }
+
+    [Fact (Skip = "AI Generated test")]
+    public void DeepMemberWiseCopy_LargeObject_PerformsWithinLimit ()
+    {
+        // Arrange
+        var source = new List<int> (Enumerable.Range (1, 10000));
+        var destination = new List<int> ();
+
+        // Act
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew ();
+        var result = ConfigProperty.DeepMemberWiseCopy (source, destination);
+        stopwatch.Stop ();
+
+        // Assert
+        Assert.Equal (source, result);
+        Assert.True (stopwatch.ElapsedMilliseconds < 1000); // Ensure it completes within 1 second
+    }
+
+    public class CustomType
+    {
+        public int Value { get; set; }
+        public override bool Equals (object? obj) => obj is CustomType other && Value == other.Value;
+        public override int GetHashCode () => Value.GetHashCode ();
+    }
+
+    [Fact]
+    public void DeepMemberWiseCopy_CustomType_CopiesCorrectly ()
+    {
+        // Arrange
+        var source = new CustomType { Value = 42 };
+        var destination = new CustomType ();
+
+        // Act
+        var result = ConfigProperty.DeepMemberWiseCopy (source, destination);
+
+        // Assert
+        Assert.Equal (source.Value, ((CustomType)result).Value);
+    }
+
+    public class MixedObject
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public List<string>? Tags { get; set; }
+        public NestedObject? Child { get; set; }
+    }
+
+    [Fact]
+    public void DeepMemberWiseCopy_MixedObject_CopiesAllProperties ()
+    {
+        // Arrange
+        var source = new MixedObject
+        {
+            Id = 1,
+            Name = "Test",
+            Tags = new List<string> { "Tag1", "Tag2" },
+            Child = new NestedObject { Name = "Child" }
+        };
+        var destination = new MixedObject ();
+
+        // Act
+        var result = ConfigProperty.DeepMemberWiseCopy (source, destination);
+
+        // Assert
+        Assert.Equal (source.Id, ((MixedObject)result).Id);
+        Assert.Equal (source.Name, ((MixedObject)result).Name);
+        Assert.Equal (source.Tags, ((MixedObject)result).Tags);
+        Assert.Equal (source.Child?.Name, ((MixedObject)result).Child?.Name);
+    }
+
 }

@@ -216,7 +216,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                 {
                     converter.GetType ()
                              .GetMethod ("Write")
-                             ?.Invoke (converter, new [] { writer, p.Value.PropertyValue, options });
+                             ?.Invoke (converter, [writer, p.Value.PropertyValue, options]);
                 }
             }
             else
