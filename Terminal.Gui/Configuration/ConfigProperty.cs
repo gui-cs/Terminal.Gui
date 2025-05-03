@@ -54,26 +54,24 @@ public class ConfigProperty
         {
             if (PropertyInfo?.GetValue (null) is { })
             {
-                var val = ScopeExtensions.DeepMemberWiseCopy (PropertyValue, PropertyInfo?.GetValue (null));
-                PropertyInfo?.SetValue (null, val);
+                object? currentValue = PropertyInfo.GetValue (null);
+
+                // generic deep copy
+                var val = ScopeExtensions.DeepMemberWiseCopy (PropertyValue, currentValue);
+                PropertyInfo.SetValue (null, val);
+
             }
         }
         catch (TargetInvocationException tie)
         {
-            // Check if there is an inner exception
             if (tie.InnerException is { })
             {
-                // Handle the inner exception separately without catching the outer exception
-                Exception? innerException = tie.InnerException;
-
-                // Handle the inner exception here
                 throw new JsonException (
-                                         $"Error Applying Configuration Change: {innerException.Message}",
-                                         innerException
+                                         $"Error Applying Configuration Change: {tie.InnerException.Message}",
+                                         tie.InnerException
                                         );
             }
 
-            // Handle the outer exception or rethrow it if needed
             throw new JsonException ($"Error Applying Configuration Change: {tie.Message}", tie);
         }
         catch (ArgumentException ae)
@@ -86,6 +84,7 @@ public class ConfigProperty
 
         return PropertyValue != null;
     }
+
 
     /// <summary>
     ///     Helper to get either the Json property named (specified by [JsonPropertyName(name)] or the actual property
@@ -114,25 +113,42 @@ public class ConfigProperty
     /// <param name="source"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    internal object? UpdateValueFrom (object source)
+    internal object? UpdateValueFrom (object? source)
     {
         if (source is null)
         {
             return PropertyValue;
         }
 
-        Type? ut = Nullable.GetUnderlyingType (PropertyInfo!.PropertyType);
+        Type? underlyingType = Nullable.GetUnderlyingType (PropertyInfo!.PropertyType);
 
-        if (source.GetType () != PropertyInfo!.PropertyType && ut is { } && source.GetType () != ut)
+        if (source.GetType () != PropertyInfo.PropertyType && underlyingType is { } && source.GetType () != underlyingType)
         {
             throw new ArgumentException (
-                                         $"The source object ({PropertyInfo!.DeclaringType}.{PropertyInfo!.Name}) is not of type {PropertyInfo!.PropertyType}."
+                                         $"The source object ({PropertyInfo.DeclaringType}.{PropertyInfo.Name}) is not of type {PropertyInfo.PropertyType}."
                                         );
         }
 
         if (PropertyValue is { })
         {
-            PropertyValue = ScopeExtensions.DeepMemberWiseCopy (source, PropertyValue);
+            // Handle Scope<T>-specific logic
+            if (source is SettingsScope settingsSource && PropertyValue is SettingsScope settingsDest)
+            {
+                PropertyValue = settingsDest.Update (settingsSource);
+            }
+            else if (source is ThemeScope themeSource && PropertyValue is ThemeScope themeDest)
+            {
+                PropertyValue = themeDest.Update (themeSource);
+            }
+            else if (source is AppScope appSource && PropertyValue is AppScope appDest)
+            {
+                PropertyValue = appDest.Update (appSource);
+            }
+            else
+            {
+                // Fallback to generic deep copy
+                PropertyValue = ScopeExtensions.DeepMemberWiseCopy (source, PropertyValue);
+            }
         }
         else
         {
@@ -141,6 +157,7 @@ public class ConfigProperty
 
         return PropertyValue;
     }
+
 
     /// <summary>
     ///     A cache of all classes that have properties decorated with the <see cref="SerializableConfigurationProperty"/>.

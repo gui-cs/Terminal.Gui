@@ -24,22 +24,6 @@ public static class ScopeExtensions
             return null!;
         }
 
-        // Handle specific Scope types
-        if (source is SettingsScope settingsSource && destination is SettingsScope settingsDest)
-        {
-            return settingsDest.Update (settingsSource);
-        }
-
-        if (source is ThemeScope themeSource && destination is ThemeScope themeDest)
-        {
-            return themeDest.Update (themeSource);
-        }
-
-        if (source is AppScope appSource && destination is AppScope appDest)
-        {
-            return appDest.Update (appSource);
-        }
-
         // Handle value types and strings
         if (source.GetType ().IsValueType || source is string)
         {
@@ -54,12 +38,11 @@ public static class ScopeExtensions
                 throw new ArgumentException ("Source and destination arrays must have the same length.");
             }
 
-            for (var i = 0; i < sourceArray.Length; i++)
+            for (int i = 0; i < sourceArray.Length; i++)
             {
                 object? sourceElement = sourceArray.GetValue (i);
                 object? destinationElement = destinationArray.GetValue (i);
 
-                // Recursively copy elements
                 destinationArray.SetValue (DeepMemberWiseCopy (sourceElement, destinationElement), i);
             }
 
@@ -93,8 +76,8 @@ public static class ScopeExtensions
             foreach (PropertyInfo property in sourceType.GetProperties (BindingFlags.Public | BindingFlags.Instance)
                                                         .Where (p => p.CanRead && p.CanWrite))
             {
-                var sourceValue = property.GetValue (source);
-                var destinationValue = property.GetValue (destination);
+                object? sourceValue = property.GetValue (source);
+                object? destinationValue = property.GetValue (destination);
 
                 if (sourceValue is { })
                 {
@@ -107,4 +90,5 @@ public static class ScopeExtensions
 
         return destination;
     }
+
 }

@@ -51,16 +51,31 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
         return this;
     }
 
-    /// <summary>Applies the values of the properties of this scope to their corresponding static properties.</summary>
+    /// <summary>
+    ///     Applies the values of the properties of this scope to their corresponding static properties.
+    /// </summary>
     /// <returns></returns>
-    internal virtual bool Apply ()
+    internal bool Apply ()
     {
         var set = false;
 
         foreach (KeyValuePair<string, ConfigProperty> p in this.Where (t => t.Value is { PropertyValue: { } }))
         {
-            if (p.Value.Apply ())
+            if (p.Value.PropertyInfo != null)
             {
+                object? currentValue = p.Value.PropertyInfo.GetValue (null);
+
+                if (p.Value.PropertyValue is Scope<T> scopeSource && currentValue is Scope<T> scopeDest)
+                {
+                    p.Value.PropertyInfo.SetValue (null, scopeDest.Update (scopeSource));
+                }
+                else
+                {
+                    // Fallback to generic deep copy
+                    object? val = ScopeExtensions.DeepMemberWiseCopy (p.Value.PropertyValue, currentValue);
+                    p.Value.PropertyInfo.SetValue (null, val);
+                }
+
                 set = true;
             }
         }
