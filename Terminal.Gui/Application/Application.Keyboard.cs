@@ -277,13 +277,7 @@ public static partial class Application // Keyboard handling
                         return false;
                     });
 
-        // Resources/config.json overrides
-        //QuitKey = Key.Esc;
-        //NextTabKey = Key.Tab;
-        //PrevTabKey = Key.Tab.WithShift;
-        //NextTabGroupKey = Key.F6;
-        //PrevTabGroupKey = Key.F6.WithShift;
-        //ArrangeKey = Key.F5.WithCtrl;
+        SetKeysToHardCodedDefaults ();
 
         // Need to clear after setting the above to ensure actually clear
         // because set_QuitKey etc.. may call Add
@@ -309,6 +303,25 @@ public static partial class Application // Keyboard handling
         {
             KeyBindings.Add (Key.Z.WithCtrl, Command.Suspend);
         }
+    }
+
+    private static void SetKeysToHardCodedDefaults ()
+    {
+        if (Locations == ConfigLocations.None)
+        {
+            return;
+        }
+        // Resources/config.json overrides
+        // BUGBUG: We reset these here becaues they may have been changed. But 
+        // BUGBUG: These may not actually be the correct default values.
+        // BUGBUG: AND there are other settings that might be similarly overridden.
+        // BUGBUG: Need a better way to do this.
+        QuitKey = Key.Esc;
+        NextTabKey = Key.Tab;
+        PrevTabKey = Key.Tab.WithShift;
+        NextTabGroupKey = Key.F6;
+        PrevTabGroupKey = Key.F6.WithShift;
+        ArrangeKey = Key.F5.WithCtrl;
     }
 
     #endregion Application-scoped KeyBindings

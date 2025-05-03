@@ -38,4 +38,16 @@ public class SchemeManagerTests
 
         Assert.Equal (hardCoded! ["Base"], current! ["Base"]);
     }
+
+    [Fact]
+    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
+    public void Not_Case_Sensitive ()
+    {
+        Dictionary<string, Scheme?>? current = SchemeManager.GetDefaultSchemes ();
+        Assert.NotNull (current);
+
+        Assert.True (current!.ContainsKey ("Base"));
+        Assert.True (current.ContainsKey ("base"));
+    }
+
 }

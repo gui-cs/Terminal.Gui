@@ -24,7 +24,6 @@ public class SchemeManagerTests
         
     }
 
-
     [Fact]
     public void Schemes_Set ()
     {

@@ -18,7 +18,7 @@ public partial class View
     /// <returns></returns>
     internal static Dictionary<string, Scheme?> GetHardCodedSchemes ()
     {
-        return new ()
+        return new (StringComparer.InvariantCultureIgnoreCase)
         {
             {
                 "TopLevel", new Scheme (

@@ -78,7 +78,7 @@ public static partial class Application // Navigation stuff
     {
         get => _prevTabKey;
         set
-        {   
+        {
             if (_prevTabKey != value)
             {
                 KeyBindings.Replace (_prevTabKey, value);

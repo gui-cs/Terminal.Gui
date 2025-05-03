@@ -5,7 +5,6 @@ using System.Text.Json.Serialization;
 namespace Terminal.Gui;
 
 [RequiresUnreferencedCode ("AOT")]
-
 internal class DictionaryJsonConverter<T> : JsonConverter<Dictionary<string, T>>
 {
     public override Dictionary<string, T> Read (
@@ -19,7 +18,11 @@ internal class DictionaryJsonConverter<T> : JsonConverter<Dictionary<string, T>>
             throw new JsonException ($"Expected a JSON array (\"[ {{ ... }} ]\"), but got \"{reader.TokenType}\".");
         }
 
-        Dictionary<string, T> dictionary = new ();
+        // If the Json options indicate ignoring case, use the invariant culture ignore case comparer.
+        Dictionary<string, T> dictionary = new (
+                                                options.PropertyNameCaseInsensitive
+                                                    ? StringComparer.InvariantCultureIgnoreCase
+                                                    : StringComparer.InvariantCulture);
 
         while (reader.Read ())
         {
@@ -31,7 +34,7 @@ internal class DictionaryJsonConverter<T> : JsonConverter<Dictionary<string, T>>
                 {
                     string key = reader.GetString ();
                     reader.Read ();
-                    var value = JsonSerializer.Deserialize (ref reader, typeof (T), SerializerContext);
+                    object value = JsonSerializer.Deserialize (ref reader, typeof (T), SerializerContext);
                     dictionary.Add (key, (T)value);
                 }
             }
