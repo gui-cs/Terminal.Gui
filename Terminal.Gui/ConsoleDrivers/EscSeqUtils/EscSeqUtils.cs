@@ -1887,7 +1887,7 @@ public static class EscSeqUtils
         {
             // Special case: Unlike other styles, bold and faint text are mutually exclusive. They also both have the same disable code: ^[[22m
             // This also means disabling codes must be put before enabling codes, so that you can disable bold/faint text and enable the other at the same time.
-            if (disabled.HasFlag (TextStyle.Bold | TextStyle.Faint))
+            if (disabled.HasFlag (TextStyle.Bold) || disabled.HasFlag (TextStyle.Faint))
             {
                 sgr.Add (22);
             }
@@ -1922,7 +1922,7 @@ public static class EscSeqUtils
         {
             // Special case: As before, bold and faint are mutually exclusive. Activating both will leave it up to the terminal to decide which to actually
             // apply. So that behavior is always consistent, we'll enforce precedence of bold over faint, since bold is more commonly used.
-            if (enabled.HasFlag (TextStyle.Bold | TextStyle.Faint))
+            if (enabled.HasFlag (TextStyle.Bold) || enabled.HasFlag(TextStyle.Faint))
             {
                 sgr.Add (enabled.HasFlag (TextStyle.Bold) ? 1 : 2);
             }
