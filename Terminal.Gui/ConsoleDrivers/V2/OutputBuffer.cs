@@ -33,7 +33,8 @@ public class OutputBuffer : IOutputBuffer
             // TODO: This makes IConsoleDriver dependent on Application, which is not ideal. Once Attribute.PlatformColor is removed, this can be fixed.
             if (Application.Driver is { })
             {
-                _currentAttribute = new (value.Foreground, value.Background);
+                // TODO: Update this when attributes can include TextStyle in the constructor
+                _currentAttribute = new (value.Foreground, value.Background) { TextStyle = value.TextStyle };
 
                 return;
             }
