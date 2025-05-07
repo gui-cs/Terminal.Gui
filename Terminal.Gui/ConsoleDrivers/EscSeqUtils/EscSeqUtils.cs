@@ -1972,11 +1972,6 @@ public static class EscSeqUtils
             }
         }
 
-        if (sgr.Count == 0)
-        {
-            return;
-        }
-
         output.Append ("\x1b[");
         output.Append (string.Join (';', sgr));
         output.Append ('m');
