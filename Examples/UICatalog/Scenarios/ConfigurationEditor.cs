@@ -129,6 +129,12 @@ public class ConfigurationEditor : Scenario
                 FileInfo = fileInfo,
             };
 
+            if (config.Value == "HardCoded")
+            {
+                editor.Title = "HardCoded";
+
+            }
+
             Tab tab = new Tab ()
             {
                 View = editor,
@@ -244,10 +250,15 @@ public class ConfigurationEditor : Scenario
                 return;
             }
 
-            if (FileInfo!.FullName.Contains ("RuntimeConfig"))
+            if (FileInfo!.FullName.Contains ("HardCoded"))
+            {
+                Text = ConfigurationManager.GetHardCodedConfig()!;
+                ReadOnly = true;
+                Enabled = true;
+            }
+            else if (FileInfo!.FullName.Contains ("RuntimeConfig"))
             {
                 Text = ConfigurationManager.RuntimeConfig!;
-
             }
             else if (!FileInfo.Exists)
             {

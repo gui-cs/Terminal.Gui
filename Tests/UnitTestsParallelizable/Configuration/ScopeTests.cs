@@ -14,7 +14,7 @@ public class ScopeTests
         // Assert
         Assert.NotNull (scope);
         Assert.Empty (scope);
-        Assert.NotNull (CM._allConfigProperties);
+        Assert.NotNull (CM._allConfigPropertiesCache);
     }
 
     [SerializableConfigurationProperty (Scope = typeof (ScopeTestsScope))]

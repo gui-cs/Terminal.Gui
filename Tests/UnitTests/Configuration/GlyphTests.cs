@@ -11,7 +11,7 @@ public class GlyphTests
     public void Overrides_Defaults ()
     {
         // arrange
-        Locations = ConfigLocations.Default;
+        Locations = ConfigLocations.LibraryResources;
         Load (true);
 
         Assert.Equal ((Rune)'⟦', Glyphs.LeftBracket);
@@ -44,6 +44,6 @@ public class GlyphTests
         Assert.Equal((Rune)'[', Glyphs.LeftBracket);
 
         // clean up
-        ResetAllSettings ();
+        Reset ();
     }
 }

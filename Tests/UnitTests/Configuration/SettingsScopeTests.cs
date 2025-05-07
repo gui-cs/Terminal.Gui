@@ -9,7 +9,7 @@ public class SettingsScopeTests
     public void Update_Overrides_Defaults ()
     {
         // arrange
-        Locations = ConfigLocations.Default;
+        Locations = ConfigLocations.LibraryResources;
         Load (true);
 
         Assert.Equal (Key.Esc, (Key)Settings ["Application.QuitKey"].PropertyValue);
@@ -31,14 +31,14 @@ public class SettingsScopeTests
 
         // clean up
         Locations = ConfigLocations.All;
-        ResetAllSettings ();
+        Reset ();
     }
 
     [Fact]
     public void Apply_ShouldApplyProperties ()
     {
-        Locations = ConfigLocations.Default;
-        ResetAllSettings();
+        Locations = ConfigLocations.LibraryResources;
+        Reset();
 
         // arrange
         Assert.Equal (Key.Esc, (Key)Settings ["Application.QuitKey"].PropertyValue);
@@ -66,7 +66,7 @@ public class SettingsScopeTests
         Assert.Equal (Key.B, Application.PrevTabGroupKey);
 
         Locations = ConfigLocations.All;
-        ResetAllSettings ();
+        Reset ();
 
     }
 
@@ -92,14 +92,14 @@ public class SettingsScopeTests
     public void GetHardCodedDefaults_ShouldSetProperties ()
     {
         ConfigLocations savedLocations = Locations;
-        Locations = ConfigLocations.Default;
-        ResetAllSettings ();
+        Locations = ConfigLocations.LibraryResources;
+        Reset ();
 
         Assert.Equal (6, ((Dictionary<string, ThemeScope>)Settings ["Themes"].PropertyValue).Count);
 
         ResetToCurrentValues ();
         Assert.NotEmpty (ThemeManager.Themes);
-        Assert.Equal ("Default", ThemeManager.SelectedTheme);
+        Assert.Equal ("Default", ThemeManager.Theme);
 
         Assert.True (Settings ["Application.QuitKey"].PropertyValue is Key);
         Assert.True (Settings ["Application.NextTabGroupKey"].PropertyValue is Key);
@@ -112,6 +112,23 @@ public class SettingsScopeTests
         Assert.Single ((Dictionary<string, ThemeScope>)Settings ["Themes"].PropertyValue);
 
         Locations = ConfigLocations.All;
-        ResetAllSettings ();
+        Reset ();
+    }
+
+
+    [Fact]
+    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
+    public void Themes_Property_Exists ()
+    {
+        var settingsScope = new SettingsScope ();
+
+        Assert.NotEmpty (settingsScope);
+
+        // Themes exists, but is not initialized
+        Assert.Null (settingsScope ["Themes"].PropertyValue);
+
+        settingsScope.RetrieveValues ();
+
+        Assert.NotEmpty (settingsScope);
     }
 }

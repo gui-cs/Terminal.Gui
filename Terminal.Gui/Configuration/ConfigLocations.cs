@@ -2,27 +2,35 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     Describes the location of the configuration files. The constants can be combined (bitwise) to specify multiple
-///     locations. The more significant the bit, the higher the priority meaning that the last location will override the
+///     Describes the location of the configuration settings. The constants can be combined (bitwise) to specify multiple
+///     locations. The more significant the bit, the higher the priority the location, meaning that the last location will
+///     override the
 ///     earlier ones.
 /// </summary>
-
 [Flags]
 public enum ConfigLocations
 {
-    /// <summary>The values of the <see cref="ConfigProperty"/>s (static properites) will be loaded.</summary>
-    /// <remarks>
-    ///     Inteneded to be used for development and testing only.
-    /// </remarks>
-    None = 0,
-
     /// <summary>
-    ///    Deafult configuration in <c>Terminal.Gui.dll</c>'s resources (<c>Terminal.Gui.Resources.config.json</c>).
+    ///     Settings of the <see cref="SerializableConfigurationProperty"/> static properites when the module is
+    ///     initiallly loaded.
+    ///     <para>
+    ///         When the module is initialized, the <see cref="ConfigurationManager"/> will retrieve the values of the
+    ///         configuration
+    ///         properties
+    ///         from their corresponding static properties. These are default settigs available even if
+    ///         <see cref="ConfigurationManager.IsEnabled"/>
+    ///         is <see langword="false"/>.
+    ///     </para>
     /// </summary>
-    Default = 0b_0000_0001,
+    HardCoded = 0b_0000_0000,
 
     /// <summary>
-    ///     App resources (e.g. <c>MyApp.Resources.config.json</c>).
+    ///     Settings defined in <c>Terminal.Gui.dll</c>'s resources (<c>Terminal.Gui.Resources.config.json</c>).
+    /// </summary>
+    LibraryResources = 0b_0000_0001,
+
+    /// <summary>
+    ///     App resources (e.g. <c>MyApp.Resources.config.json</c>). See <see cref="AppScope"/>.
     /// </summary>
     AppResources = 0b_0000_0010,
 
@@ -37,7 +45,7 @@ public enum ConfigLocations
     GlobalCurrent = 0b_0000_1000,
 
     /// <summary>
-    ///    Global settings in the home directory (e.g. <c>~/.tui/config.json</c>).
+    ///     Global settings in the home directory (e.g. <c>~/.tui/config.json</c>).
     /// </summary>
     GlobalHome = 0b_0001_0000,
 

@@ -17,16 +17,16 @@ public class AppScopeTests
     };
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
+    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
     public void Apply_ShouldApplyUpdatedProperties ()
     {
-        ResetAllSettings ();
+        Reset ();
         Assert.Null (AppSettingsTestClass.NullableValueProperty);
         Assert.NotEmpty (AppSettings);
         Assert.Null (AppSettings ["AppSettingsTestClass.NullableValueProperty"].PropertyValue);
 
         AppSettingsTestClass.NullableValueProperty = true;
-        ResetAllSettings ();
+        Reset ();
         Assert.True (AppSettingsTestClass.NullableValueProperty);
         Assert.NotEmpty (AppSettings);
         Assert.Null (AppSettings ["AppSettingsTestClass.NullableValueProperty"].PropertyValue as bool?);
@@ -39,7 +39,7 @@ public class AppScopeTests
         Assert.True (AppSettingsTestClass.NullableValueProperty);
 
         // ConfigurationManager.Themes should NOT apply theme settings
-        ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
+        ThemeManager.Themes! [ThemeManager.Theme]!.Apply ();
         Assert.True (AppSettingsTestClass.NullableValueProperty);
 
         // ConfigurationManager.AppSettings should NOT apply theme settings
@@ -67,7 +67,7 @@ public class AppScopeTests
     [Fact]
     public void TestSerialize_RoundTrip ()
     {
-        ResetAllSettings ();
+        Reset ();
 
         AppScope initial = AppSettings;
 

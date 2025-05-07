@@ -12,10 +12,10 @@ public class ThemeTests
     };
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
+    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
     public void TestApply ()
     {
-        ResetAllSettings ();
+        Reset ();
 
         var theme = new ThemeScope ();
         Assert.NotEmpty (theme);
@@ -25,20 +25,20 @@ public class ThemeTests
         Assert.Equal (LineStyle.Single, FrameView.DefaultBorderStyle);
         theme ["FrameView.DefaultBorderStyle"].PropertyValue = LineStyle.Double; // default is Single
 
-        ThemeManager.SelectedTheme = "testTheme";
-        ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
+        ThemeManager.Theme = "testTheme";
+        ThemeManager.Themes! [ThemeManager.Theme]!.Apply ();
 
         Assert.Equal (LineStyle.Double, FrameView.DefaultBorderStyle);
 
-        ResetAllSettings ();
+        Reset ();
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
+    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
     public void TestApply_UpdatesColors ()
     {
         // Arrange
-        ResetAllSettings ();
+        Reset ();
 
         Assert.False (SchemeManager.Schemes.ContainsKey ("test"));
 
@@ -62,8 +62,8 @@ public class ThemeTests
                      );
 
         // Act
-        ThemeManager.SelectedTheme = "testTheme";
-        ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
+        ThemeManager.Theme = "testTheme";
+        ThemeManager.Themes! [ThemeManager.Theme]!.Apply ();
 
         // Assert
         Scheme updatedScheme = SchemeManager.Schemes ["test"];
@@ -73,14 +73,14 @@ public class ThemeTests
         // remove test Scheme from Colors to avoid failures on others unit tests with Scheme
         SchemeManager.Schemes.Remove ("test");
         Assert.Equal (5, SchemeManager.Schemes.Count);
-        ResetAllSettings ();
+        Reset ();
     }
 
     [Fact]
     public void TestSerialize_RoundTrip ()
     {
         // This is needed to test only this alone
-        ResetAllSettings ();
+        Reset ();
 
         var theme = new ThemeScope ();
         theme ["Dialog.DefaultButtonAlignment"].PropertyValue = Alignment.End;
@@ -93,14 +93,14 @@ public class ThemeTests
                       Alignment.End,
                       (Alignment)deserialized ["Dialog.DefaultButtonAlignment"].PropertyValue
                      );
-        ResetAllSettings ();
+        Reset ();
     }
 
     [Fact]
     public void TestUpdatFrom_Add ()
     {
         // arrange
-        ResetAllSettings ();
+        Reset ();
 
         var theme = new ThemeScope ();
         Assert.NotEmpty (theme);
@@ -141,14 +141,14 @@ public class ThemeTests
         schemes = (Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue;
         Assert.Equal (schemes ["Test"].Normal, scheme.Normal);
         Assert.Equal (schemes ["Test"].Focus, scheme.Focus);
-        ResetAllSettings ();
+        Reset ();
     }
 
     [Fact]
     public void TestUpdatFrom_Change ()
     {
         // arrange
-        ResetAllSettings ();
+        Reset ();
 
         var theme = new ThemeScope ();
         Assert.NotEmpty (theme);
@@ -196,6 +196,6 @@ public class ThemeTests
         Assert.Equal (new Color (Color.BrightBlue), schemes ["Test"].Normal.Background);
         Assert.Equal (new Color (Color.Cyan), schemes ["Test"].Focus.Foreground);
         Assert.Equal (new Color (Color.BrightCyan), schemes ["Test"].Focus.Background);
-        ResetAllSettings ();
+        Reset ();
     }
 }

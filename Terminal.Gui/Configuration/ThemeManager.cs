@@ -1,7 +1,9 @@
 ﻿#nullable enable
 using System.Collections;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
@@ -9,14 +11,14 @@ namespace Terminal.Gui;
 /// <summary>Manages Themes.</summary>
 /// <remarks>
 ///     <para>A Theme is a collection of settings that are named. The default theme is named "Default".</para>
-///     <para>The <see cref="SelectedTheme"/> property is used to determine the currently active theme.</para>
+///     <para>The <see cref="Theme"/> property is used to determine the currently active theme.</para>
 ///     <para>The <see cref="Themes"/> property is a dictionary of themes.</para>
 /// </remarks>
-public class ThemeManager
+public static class ThemeManager
 {
-    private static readonly object _themesLock = new object ();
     /// <summary>
-    ///     The Themes dictionary. The backing store is <see cref="ConfigurationManager.Settings"/>` ["Themes"]`.
+    ///     The Themes dictionary. The backing store is <c><see cref="ConfigurationManager.Settings"/> ["Themes"]</c>.
+    ///     However, if <see cref="ConfigurationManager.IsInitialized"/> is <c>false</c>, this property will return the hard-coded themes.
     /// </summary>
     /// <exception cref="InvalidOperationException"></exception>
     [JsonConverter (typeof (DictionaryJsonConverter<ThemeScope>))]
@@ -25,150 +27,214 @@ public class ThemeManager
     {
         get
         {
-            lock (_themesLock)
+            if (!IsInitialized ())
             {
-                if (Settings is { } && Settings.TryGetValue ("Themes", out ConfigProperty? themes))
+                // We're being called from the module initializer.
+                // We need to provide a dictionary of themes containing the hard-coded theme.
+                ThemeScope? hardCodedThemeScope = GetHardCodedThemeScope ();
+                if (hardCodedThemeScope is null)
                 {
-                    Debug.Assert (themes.PropertyValue is Dictionary<string, ThemeScope>);
-
-                    return themes.PropertyValue as Dictionary<string, ThemeScope>;
+                    throw new InvalidOperationException ("Hard coded theme scope is null.");
                 }
+
+                Dictionary<string, ThemeScope> hardCodedThemes = new (StringComparer.InvariantCultureIgnoreCase)
+                {
+                    { Theme, hardCodedThemeScope }
+                };
+                return hardCodedThemes;
             }
 
-            throw new InvalidOperationException ("Settings is invalid.");
+            if (!IsEnabled)
+            {
+                // If CM is not enabled, return current value
+                ThemeScope? currentThemeScope = new ThemeScope ();
+                currentThemeScope.RetrieveValues ();
+
+                Dictionary<string, ThemeScope> currentThemes = new (StringComparer.InvariantCultureIgnoreCase)
+                {
+                    { Theme, currentThemeScope }
+                };
+                return currentThemes;
+            }
+
+            if (Settings is { })
+            {
+                if (Settings.TryGetValue ("Themes", out ConfigProperty? themes))
+                {
+                    return themes.PropertyValue as Dictionary<string, ThemeScope>;
+                }
+
+                throw new InvalidOperationException ("Settings has no Themes property.");
+            }
+
+            throw new InvalidOperationException ("Settings is null.");
         }
         set
         {
-            lock (_themesLock)
+            // TODO: For better decoupling, perhaps we should use events for this?
+            if (Settings is { } && Settings.TryGetValue ("Themes", out ConfigProperty? themes))
             {
-                // BUGBUG: We should not be setting Settings here? Instead, Settings should subscrube to something and update
-                if (Settings is { } && Settings.TryGetValue ("Themes", out ConfigProperty? themes))
-                {
-                    Settings ["Themes"].PropertyValue = value;
-                }
+                Settings ["Themes"].PropertyValue = value;
             }
         }
     }
 
-    //{
-    //    [RequiresUnreferencedCode ("AOT")]
-    //    [RequiresDynamicCode ("AOT")]
-    //    get
-    //    {
-    //        if (Settings is { } && Settings.TryGetValue ("Themes", out ConfigProperty? themes))
-    //        {
-    //            return themes.PropertyValue as Dictionary<string, ThemeScope>;
-    //        }
+    /// <summary>
+    ///     Returns a dictionary of hard-coded ThemeScope properties.
+    /// </summary>
+    /// <returns></returns>
+    private static ThemeScope? GetHardCodedThemeScope ()
+    {
+        IEnumerable<KeyValuePair<string, ConfigProperty>>? hardCodedThemeProperties = GetHardCodedConfigPropertiesByScope (typeof (ThemeScope));
 
-    //        return null;
-    //    }
+        if (hardCodedThemeProperties is null)
+        {
+            throw new InvalidOperationException ("Hard coded theme properties are null.");
+        }
 
-    //    // themes ?? new Dictionary<string, ThemeScope> ();
+        Dictionary<string, ConfigProperty>? dict = hardCodedThemeProperties?.ToDictionary ();
 
-    //    [RequiresUnreferencedCode ("AOT")]
-    //    [RequiresDynamicCode ("AOT")]
-    //    set
-    //    {
-    //        //if (themes is null || value is null) {
-    //        //	themes = value;
-    //        //} else {
-    //        //	themes = (Dictionary<string, ThemeScope>)DeepMemberwiseCopy (value!, themes!)!;
-    //        //}
+        ThemeScope? hardCodedThemeScope = new ThemeScope ();
+        foreach (KeyValuePair<string, ConfigProperty> p in hardCodedThemeScope)
+        {
+            p.Value.PropertyValue = dict [p.Key].PropertyValue;
+        }
+        return hardCodedThemeScope;
+    }
 
-    //        // BUGBUG: We should not be setting Settings here. Instead, Settings should subscrube to something and update
-    //        if (Settings is { } && Settings.TryGetValue ("Themes", out ConfigProperty? themes))
-    //        {
-    //            Settings ["Themes"].PropertyValue = value;
-    //        }
-    //    }
-    //}
+    /// <summary>
+    ///     Since Theme is a dynamic property, we need to cache the value of the selected theme for when CM is not enabled.
+    /// </summary>
+    private static string? _cachedThemeName;
 
-    private static string _selectedTheme = string.Empty;
-
-    // TODO: Rename to "THeme"
-    /// <summary>The currently selected theme. The backing store is <see cref="ConfigurationManager.Settings"/>` ["Theme"]`.</summary>
+    /// <summary>
+    ///     The currently selected theme. The backing store is <c><see cref="ConfigurationManager.Settings"/> ["Theme"]</c>.
+    /// </summary>
     [JsonInclude]
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
     [JsonPropertyName ("Theme")]
-    public static string SelectedTheme
+    public static string Theme
     {
-        // BUGBUG: The backing store is supposed to be Settings!
-        get => _selectedTheme;
+        get
+        {
+            if (!IsInitialized ())
+            {
+                // We're being called from the module initializer.
+                // Hard coded default value
+                return _cachedThemeName = "Default";
+            }
+
+            if (!IsEnabled)
+            {
+                // If CM is not enabled, return current value
+                return _cachedThemeName!;
+            }
+
+            if (Settings is { } && Settings.TryGetValue ("Theme", out ConfigProperty? themeCp))
+            {
+                return (themeCp.PropertyValue as string)!;
+            }
+            throw new InvalidOperationException ("Settings is null.");
+        }
 
         [RequiresUnreferencedCode ("Calls Terminal.Gui.ConfigurationManager.Settings")]
         [RequiresDynamicCode ("Calls Terminal.Gui.ConfigurationManager.Settings")]
         set
         {
-            string prevousThemeValue = _selectedTheme;
-
-            _selectedTheme = value;
-
-            if (Settings is null || !Settings.TryGetValue ("Theme", out ConfigProperty? themeCp))
+            if (!IsInitialized ())
             {
+                throw new InvalidOperationException ("Theme cannot be set before ConfigurationManager is initialized.");
+            }
+
+            if (!IsEnabled)
+            {
+                _cachedThemeName = value;
+
                 return;
             }
 
-            lock (_themesLock)
+            if (Settings is null || !Settings.TryGetValue ("Theme", out ConfigProperty? themeCp))
             {
-                if (themeCp.PropertyValue is string { } theme && Settings.TryGetValue ("Themes", out ConfigProperty? themesCp))
-                {
-                    // Check if the theme is in the themes dictionary
-                    if (themesCp.PropertyValue is not Dictionary<string, ThemeScope> themes || !themes.TryGetValue (theme, out _))
-                    {
-                        return;
-                    }
+                throw new InvalidOperationException ("Settings is null.");
+            }
 
-                    if (prevousThemeValue != _selectedTheme || prevousThemeValue != theme)
-                    {
-                        Settings! ["Theme"].PropertyValue = _selectedTheme;
+            if (themeCp is null || !themeCp.HasValue || themeCp.PropertyValue is null)
+            {
+                throw new InvalidOperationException ("Theme has no value.");
+            }
 
-                        //Instance.OnThemeChanged (prevousThemeValue);
-                    }
-                }
+            if (!Settings.TryGetValue ("Themes", out ConfigProperty? themesCp))
+            {
+                throw new InvalidOperationException ("Settings has no Themes property.");
+            }
+
+            if (themeCp.PropertyValue is not string { } selectedThemeName)
+            {
+                throw new InvalidOperationException ("Theme property is not a string.");
+            }
+
+            if (themesCp.PropertyValue is not Dictionary<string, ThemeScope> themes || !themes.TryGetValue (selectedThemeName, out _))
+            {
+                throw new InvalidOperationException ($"Theme '{selectedThemeName}' not found in themes dictionary.");
+            }
+
+            // Check if the theme is the same as the previous one
+            if (value != _cachedThemeName)
+            {
+                // Update the backing store
+                Settings! ["Theme"].PropertyValue = value;
+
+                //Instance.OnThemeChanged (prevousThemeValue);
             }
         }
     }
 
     /// <summary>Event fired he selected theme has changed. application.</summary>
-    public event EventHandler<ThemeManagerEventArgs>? ThemeChanged;
+    public static event EventHandler<ThemeManagerEventArgs>? ThemeChanged;
 
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.ThemeManager.Themes")]
-    [RequiresDynamicCode ("Calls Terminal.Gui.ThemeManager.Themes")]
-    internal void ResetToCurrentValues ()
+
+    /// <summary>
+    ///    Resets the <see cref="Themes"/> dictionary to the empty values and sets <see cref="Theme"/> to "Default".
+    /// </summary>
+    internal static void Reset ()
     {
         //Logging.Debug ("");
+        if (!IsEnabled)
+        {
+            //return;
+        }
+
+        Themes = new Dictionary<string, ThemeScope> (StringComparer.InvariantCultureIgnoreCase);
+
+        //Themes?.Add ("Default", new ThemeScope ());
+        //Theme = "Default";
+    }
+
+    /// <summary>
+    ///    Resets <see cref="Themes"/> to the current values of the static <see cref="SerializableConfigurationProperty"/> properties.
+    /// </summary>
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.ThemeManager.Themes")]
+    [RequiresDynamicCode ("Calls Terminal.Gui.ThemeManager.Themes")]
+    internal static void ResetToCurrentValues ()
+    {
+        //Logging.Debug ("");
+        if (!IsEnabled)
+        {
+           // return;
+        }
+
         Reset ();
 
-        var theme = new ThemeScope ();
-        theme.RetrieveValues ();
-
-        lock (_themesLock)
-        {
-
-            Themes! [SelectedTheme] = theme;
-        }
+        Themes! [Theme].RetrieveValues ();
     }
 
     /// <summary>Called when the selected theme has changed. Fires the <see cref="ThemeChanged"/> event.</summary>
-    internal void OnThemeChanged (string theme)
+    internal static void OnThemeChanged (string theme)
     {
         //Logging.Trace ($"Themes.OnThemeChanged({theme}) -> {Theme}");
-        ThemeChanged?.Invoke (this, new ThemeManagerEventArgs (theme));
+        ThemeChanged?.Invoke (null, new ThemeManagerEventArgs (theme));
     }
 
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.ThemeManager.Themes")]
-    [RequiresDynamicCode ("Calls Terminal.Gui.ThemeManager.Themes")]
-    internal void Reset ()
-    {
-        //Logging.Debug ("");
-        lock (_themesLock)
-        {
 
-            Settings! ["Themes"].PropertyValue = new Dictionary<string, ThemeScope> (StringComparer.InvariantCultureIgnoreCase);
 
-            Themes?.Add ("Default", new ThemeScope ());
-        }
-
-        SelectedTheme = "Default";
-    }
 }

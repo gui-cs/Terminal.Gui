@@ -54,7 +54,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
+    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
     public void CellEventsBackgroundFill ()
     {
         var tv = new TableView { Width = 20, Height = 4 };
@@ -409,7 +409,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
+    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
     public void LongColumnTest ()
     {
         var tableView = new TableView ();
@@ -590,7 +590,7 @@ public class TableViewTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
+    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
     [Fact]
     public void PageDown_ExcludesHeaders ()
     {
@@ -990,7 +990,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
+    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
     public void TableView_Activate ()
     {
         string activatedValue = null;
@@ -1030,7 +1030,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
+    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
     [InlineData (false)]
     [InlineData (true)]
     public void TableView_ColorsTest_ColorGetter (bool focused)
@@ -1131,7 +1131,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
+    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
     [InlineData (false)]
     [InlineData (true)]
     public void TableView_ColorsTest_RowColorGetter (bool focused)
@@ -1225,7 +1225,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
+    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
     [InlineData (false)]
     [InlineData (true)]
     public void TableView_ColorTests_FocusedOrNot (bool focused)
@@ -1563,7 +1563,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
+    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
     public void Test_CollectionNavigator ()
     {
         var tv = new TableView ();
@@ -2569,8 +2569,8 @@ A B C
     [SetupFakeDriver]
     public void TestTableViewCheckboxes_ByObject ()
     {
-        ConfigurationManager.Locations = ConfigLocations.Default;
-        ConfigurationManager.ResetAllSettings();
+        ConfigurationManager.Locations = ConfigLocations.LibraryResources;
+        ConfigurationManager.Reset();
 
         TableView tv = GetPetTable (out EnumerableTableSource<PickablePet> source);
         tv.LayoutSubViews ();

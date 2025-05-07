@@ -96,17 +96,19 @@ public static partial class Application // Initialization (Init/Shutdown)
 
             if (driver is FakeDriver)
             {
-                // We're running unit tests. Disable loading config files other than default
-                if (Locations == ConfigLocations.All)
-                {
-                    Locations = ConfigLocations.Default;
-                    ResetAllSettings ();
-                }
+                //// We're running unit tests. Disable loading config files other than default
+                //if (Locations == ConfigLocations.All)
+                //{
+                //    Locations = ConfigLocations.Default;
+                //    ResetAllSettings ();
+                //}
             }
         }
 
         AddKeyBindings ();
 
+        // TODO: Move CM out of Application initialization. CM is per-process, not application, and a ton 
+        // TODO: complexity is added to Application for CM that is probably not needed.
         InitializeConfigurationManagement ();
 
         // Ignore Configuration for ForceDriver if driverName is specified
@@ -182,6 +184,10 @@ public static partial class Application // Initialization (Init/Shutdown)
     [RequiresDynamicCode ("AOT")]
     internal static void InitializeConfigurationManagement ()
     {
+        if (!CM.IsEnabled)
+        {
+            return;
+        }
         // ConfigurationManager.Initialize() is now called by the ModuleInitializer
         // So we don't need to call it here again
 
@@ -190,14 +196,15 @@ public static partial class Application // Initialization (Init/Shutdown)
         // multiple times. We need to do this because some settings are only
         // valid after a Driver is loaded. In this case we need just
         // `Settings` so we can determine which driver to use.
+
+        string previousTheme = ThemeManager.Theme ?? string.Empty;
         // Don't reset, so we can inherit the theme from the previous run.
-        string previousTheme = ThemeManager.SelectedTheme ?? string.Empty;
-        Load ();
-        if (ThemeManager.SelectedTheme is { } && !string.IsNullOrEmpty (previousTheme) && previousTheme != "Default")
+        CM.Load (reset: false);
+        if (ThemeManager.Theme is { } && !string.IsNullOrEmpty (previousTheme) && previousTheme != "Default")
         {
-            ThemeManager.SelectedTheme = previousTheme;
+            ThemeManager.Theme = previousTheme;
         }
-        Apply ();
+        CM.Apply ();
     }
 
     internal static void SubscribeDriverEvents ()

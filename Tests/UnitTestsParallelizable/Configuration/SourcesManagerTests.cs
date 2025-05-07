@@ -35,7 +35,7 @@ public class SourcesManagerTests
                         "Application.QuitKey": "Ctrl+Z"
                    }
                    """;
-        var location = ConfigLocations.None;
+        var location = ConfigLocations.HardCoded;
         var source = "stream";
 
         var stream = new MemoryStream ();
@@ -116,7 +116,7 @@ public class SourcesManagerTests
                    }
                    """;
         var source = Path.GetTempFileName ();
-        var location = ConfigLocations.None;
+        var location = ConfigLocations.HardCoded;
 
         File.WriteAllText (source, json);
 
@@ -204,7 +204,7 @@ public class SourcesManagerTests
                    }
                    """;
         var source = "test.json";
-        var location = ConfigLocations.None;
+        var location = ConfigLocations.HardCoded;
 
         // Act
         bool result = sourcesManager.Update (settingsScope, json, source, location);
@@ -246,7 +246,7 @@ public class SourcesManagerTests
 
         var assembly = Assembly.GetAssembly (typeof (ConfigurationManager));
         var resourceName = "Terminal.Gui.Resources.config.json";
-        var location = ConfigLocations.Default;
+        var location = ConfigLocations.LibraryResources;
 
         // Act
         bool result = sourcesManager.UpdateFromResource (settingsScope, assembly!, resourceName, location);
@@ -339,7 +339,7 @@ public class SourcesManagerTests
 
         ConfigLocations[] locations =
         [
-            ConfigLocations.Default,
+            ConfigLocations.LibraryResources,
             ConfigLocations.Runtime,
             ConfigLocations.AppCurrent,
             ConfigLocations.GlobalHome
@@ -370,7 +370,7 @@ public class SourcesManagerTests
 
         var assembly = Assembly.GetAssembly (typeof (ConfigurationManager));
         var resourceName = "Terminal.Gui.Resources.config.json";
-        var location = ConfigLocations.Default;
+        var location = ConfigLocations.LibraryResources;
 
         // Act
         bool result = sourcesManager.UpdateFromResource (settingsScope, assembly!, resourceName, location);

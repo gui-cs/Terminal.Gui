@@ -315,7 +315,7 @@ public class ClearViewportTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
+    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
     [InlineData (true)]
     [InlineData (false)]
     public void Clear_Does_Not_Spillover_Its_Parent (bool label)

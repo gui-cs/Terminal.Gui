@@ -60,7 +60,7 @@ public class SourcesManager
         return false;
     }
 
-    private void AddSource (ConfigLocations location, string source)
+    internal void AddSource (ConfigLocations location, string source)
     {
         if (!Sources.TryAdd (location, source))
         {

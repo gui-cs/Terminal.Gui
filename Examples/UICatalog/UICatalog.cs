@@ -78,6 +78,11 @@ public class UICatalog
         driverOption.AddAlias ("-d");
         driverOption.AddAlias ("--d");
 
+        // Configuration Management
+        Option<bool> disableConfigManagement = new ("--disable-cm", "Indicates Configuration Management should not be enabled. Only `ConfigLocations.HardCoded` settings will be loaded.");
+        disableConfigManagement.AddAlias ("-dcm");
+        disableConfigManagement.AddAlias ("--dcm");
+
         Option<bool> benchmarkFlag = new ("--benchmark", "Enables benchmarking. If a Scenario is specified, just that Scenario will be benchmarked.");
         benchmarkFlag.AddAlias ("-b");
         benchmarkFlag.AddAlias ("--b");
@@ -116,7 +121,7 @@ public class UICatalog
 
         var rootCommand = new RootCommand ("A comprehensive sample library and test app for Terminal.Gui")
         {
-            scenarioArgument, debugLogLevel, benchmarkFlag, benchmarkTimeout, resultsFile, driverOption
+            scenarioArgument, debugLogLevel, benchmarkFlag, benchmarkTimeout, resultsFile, driverOption, disableConfigManagement
         };
 
         rootCommand.SetHandler (
@@ -126,6 +131,7 @@ public class UICatalog
                                     {
                                         Scenario = context.ParseResult.GetValueForArgument (scenarioArgument),
                                         Driver = context.ParseResult.GetValueForOption (driverOption) ?? string.Empty,
+                                        DontEnableConfigurationManagement = context.ParseResult.GetValueForOption (disableConfigManagement),
                                         Benchmark = context.ParseResult.GetValueForOption (benchmarkFlag),
                                         BenchmarkTimeout = context.ParseResult.GetValueForOption (benchmarkTimeout),
                                         ResultsFile = context.ParseResult.GetValueForOption (resultsFile) ?? string.Empty,
@@ -163,16 +169,16 @@ public class UICatalog
     public static LogEventLevel LogLevelToLogEventLevel (LogLevel logLevel)
     {
         return logLevel switch
-               {
-                   LogLevel.Trace => LogEventLevel.Verbose,
-                   LogLevel.Debug => LogEventLevel.Debug,
-                   LogLevel.Information => LogEventLevel.Information,
-                   LogLevel.Warning => LogEventLevel.Warning,
-                   LogLevel.Error => LogEventLevel.Error,
-                   LogLevel.Critical => LogEventLevel.Fatal,
-                   LogLevel.None => LogEventLevel.Fatal, // Default to Fatal if None is specified
-                   _ => LogEventLevel.Fatal // Default to Information for any unspecified LogLevel
-               };
+        {
+            LogLevel.Trace => LogEventLevel.Verbose,
+            LogLevel.Debug => LogEventLevel.Debug,
+            LogLevel.Information => LogEventLevel.Information,
+            LogLevel.Warning => LogEventLevel.Warning,
+            LogLevel.Error => LogEventLevel.Error,
+            LogLevel.Critical => LogEventLevel.Fatal,
+            LogLevel.None => LogEventLevel.Fatal, // Default to Fatal if None is specified
+            _ => LogEventLevel.Fatal // Default to Information for any unspecified LogLevel
+        };
     }
 
     private static ILogger CreateLogger ()
@@ -213,6 +219,11 @@ public class UICatalog
         // Run UI Catalog UI. When it exits, if _selectedScenario is != null then
         // a Scenario was selected. Otherwise, the user wants to quit UI Catalog.
 
+        if (!Options.DontEnableConfigurationManagement)
+        {
+            ConfigurationManager.Enable ();
+        }
+
         // If the user specified a driver on the command line then use it,
         // ignoring Config files.
 
@@ -220,11 +231,11 @@ public class UICatalog
 
         if (string.IsNullOrWhiteSpace (UICatalogTop.CachedTheme))
         {
-            UICatalogTop.CachedTheme = ThemeManager.SelectedTheme;
+            UICatalogTop.CachedTheme = ThemeManager.Theme;
         }
         else
         {
-            ThemeManager.SelectedTheme = UICatalogTop.CachedTheme;
+            ThemeManager.Theme = UICatalogTop.CachedTheme;
         }
 
         UICatalogTop top = Application.Run<UICatalogTop> ();
@@ -309,7 +320,7 @@ public class UICatalog
             return;
         }
 
-        Load ();
+        Load (reset: false);
         Apply ();
     }
 

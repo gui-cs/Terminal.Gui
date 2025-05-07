@@ -63,6 +63,10 @@
     "Charmap": {
       "commandName": "Project",
       "commandLineArgs": "Bars -b"
+    },
+    "UICatalog --disable-cm": {
+      "commandName": "Project",
+      "commandLineArgs": "--disable-cm\r\n"
     }
   }
 }

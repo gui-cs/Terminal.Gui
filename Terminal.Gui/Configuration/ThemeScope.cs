@@ -44,6 +44,7 @@ namespace Terminal.Gui;
 /// </example>
 [JsonConverter (typeof (ScopeJsonConverter<ThemeScope>))]
 public class ThemeScope : Scope<ThemeScope>
-{ }
+{
+}
 
 

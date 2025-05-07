@@ -200,7 +200,7 @@ public class UICatalogTop : Toplevel
 
             _themesRg.SelectedItemChanged += (_, args) =>
             {
-                ThemeManager.SelectedTheme = ThemeManager.Themes!.Keys.ToArray () [args.SelectedItem!.Value];
+                ThemeManager.Theme = ThemeManager.Themes!.Keys.ToArray () [args.SelectedItem!.Value];
                 CachedTheme = ThemeManager.Themes!.Keys.ToArray () [args.SelectedItem!.Value];
                 Apply ();
                 SetNeedsDraw ();
@@ -643,6 +643,11 @@ public class UICatalogTop : Toplevel
                        _shVersion
                       );
 
+        if (UICatalog.Options.DontEnableConfigurationManagement)
+        {
+            statusBar.AddShortcutAt (statusBar.SubViews.ToList ().IndexOf (_shVersion), new Shortcut () { Title = "CM is Disabled" });
+        }
+
         return statusBar;
     }
 
@@ -655,7 +660,7 @@ public class UICatalogTop : Toplevel
     /// </summary>
     private void ConfigApplied ()
     {
-        CachedTheme = ThemeManager.SelectedTheme;
+        CachedTheme = ThemeManager.Theme;
 
         UpdateThemesMenu ();
 

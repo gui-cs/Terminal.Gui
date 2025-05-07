@@ -76,6 +76,9 @@ public class ApplicationV2 : ApplicationImpl
         // making it use custom driver in future shutdown/init calls where no driver is specified
         CreateDriver (driverName ?? _driverName);
 
+        // BUGBUG: Because ICM gets called after CreateDriver, setting the ForceDriver in CM will not work
+        // TODO: Move CM out of Application initialization. CM is per-process, not application, and a ton 
+        // TODO: complexity is added to Application for CM that is probably not needed.
         Application.InitializeConfigurationManagement ();
 
         Application.Initialized = true;

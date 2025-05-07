@@ -16,49 +16,49 @@ public class ThemeScopeTests
     };
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
+    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
     public void AllThemesPresent ()
     {
-        ResetAllSettings ();
+        Reset ();
         Assert.True (ThemeManager.Themes.ContainsKey ("Default"));
         Assert.True (ThemeManager.Themes.ContainsKey ("Dark"));
         Assert.True (ThemeManager.Themes.ContainsKey ("Light"));
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
+    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
     public void Apply_ShouldApplyUpdatedProperties ()
     {
-        ResetAllSettings ();
+        Reset ();
         Assert.NotEmpty (ThemeManager.Themes);
         Alignment savedValue = Dialog.DefaultButtonAlignment;
         Alignment newValue = Alignment.Center != savedValue ? Alignment.Center : Alignment.Start;
 
         ThemeManager.Themes ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue = newValue;
 
-        ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
+        ThemeManager.Themes! [ThemeManager.Theme]!.Apply ();
         Assert.Equal (newValue, Dialog.DefaultButtonAlignment);
 
         // Replace with the savedValue to avoid failures on other unit tests that rely on the default value
         ThemeManager.Themes ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue = savedValue;
-        ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
+        ThemeManager.Themes! [ThemeManager.Theme]!.Apply ();
         Assert.Equal (savedValue, Dialog.DefaultButtonAlignment);
     }
 
     [Fact]
     public void GetHardCodedDefaults_ShouldSetProperties ()
     {
-        ResetAllSettings ();
+        Reset ();
         ResetToCurrentValues ();
         Assert.NotEmpty (ThemeManager.Themes);
-        Assert.Equal ("Default", ThemeManager.SelectedTheme);
+        Assert.Equal ("Default", ThemeManager.Theme);
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
+    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
     public void TestSerialize_RoundTrip ()
     {
-        ResetAllSettings ();
+        Reset ();
 
         IDictionary<string, ThemeScope> initial = ThemeManager.Themes;
 

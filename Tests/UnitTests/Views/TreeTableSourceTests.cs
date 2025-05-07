@@ -156,7 +156,7 @@ public class TreeTableSourceTests : IDisposable
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation:ConfigLocations.Default)]
+    [AutoInitShutdown (configLocation:ConfigLocations.LibraryResources)]
     public void TestTreeTableSource_CombinedWithCheckboxes ()
     {
         Toplevel top = new ();

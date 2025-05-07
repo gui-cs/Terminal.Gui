@@ -36,7 +36,7 @@ public class ScenariosStressTests : TestsAllViews
 
         // Disable any UIConfig settings
         ConfigLocations savedConfigLocations = ConfigurationManager.Locations;
-        ConfigurationManager.Locations = ConfigLocations.Default;
+        ConfigurationManager.Locations = ConfigLocations.LibraryResources;
 
         // If a previous test failed, this will ensure that the Application is in a clean state
         Application.ResetState (true);
@@ -91,7 +91,7 @@ public class ScenariosStressTests : TestsAllViews
 
         // Restore the configuration locations
         ConfigurationManager.Locations = savedConfigLocations;
-        ConfigurationManager.ResetAllSettings ();
+        ConfigurationManager.Reset ();
 
         return;
 

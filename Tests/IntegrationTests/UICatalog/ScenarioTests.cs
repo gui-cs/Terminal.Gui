@@ -36,7 +36,7 @@ public class ScenarioTests : TestsAllViews
 
         // Disable any UIConfig settings
         ConfigLocations savedConfigLocations = ConfigurationManager.Locations;
-        ConfigurationManager.Locations = ConfigLocations.Default;
+        ConfigurationManager.Locations = ConfigLocations.LibraryResources;
 
         // If a previous test failed, this will ensure that the Application is in a clean state
         Application.ResetState (true);
@@ -85,7 +85,7 @@ public class ScenarioTests : TestsAllViews
 
         // Restore the configuration locations
         ConfigurationManager.Locations = savedConfigLocations;
-        ConfigurationManager.ResetAllSettings ();
+        ConfigurationManager.Reset ();
 
         return;
 
@@ -123,7 +123,7 @@ public class ScenarioTests : TestsAllViews
 
             // Restore the configuration locations
             ConfigurationManager.Locations = savedConfigLocations;
-            ConfigurationManager.ResetAllSettings ();
+            ConfigurationManager.Reset ();
 
             Application.ResetState (true);
 
@@ -155,7 +155,7 @@ public class ScenarioTests : TestsAllViews
     {
         // Disable any UIConfig settings
         ConfigLocations savedConfigLocations = ConfigurationManager.Locations;
-        ConfigurationManager.Locations = ConfigLocations.Default;
+        ConfigurationManager.Locations = ConfigLocations.LibraryResources;
 
         View? curView = null;
 
@@ -381,7 +381,7 @@ public class ScenarioTests : TestsAllViews
 
         // Restore the configuration locations
         ConfigurationManager.Locations = savedConfigLocations;
-        ConfigurationManager.ResetAllSettings ();
+        ConfigurationManager.Reset ();
 
         void DimPosChanged (View? view)
         {
@@ -615,7 +615,7 @@ public class ScenarioTests : TestsAllViews
     {
         // Disable any UIConfig settings
         ConfigLocations savedConfigLocations = ConfigurationManager.Locations;
-        ConfigurationManager.Locations = ConfigLocations.Default;
+        ConfigurationManager.Locations = ConfigLocations.LibraryResources;
 
         ObservableCollection<Scenario> scenarios = Scenario.GetScenarios ();
         Assert.NotEmpty (scenarios);
@@ -680,7 +680,7 @@ public class ScenarioTests : TestsAllViews
 
         // Restore the configuration locations
         ConfigurationManager.Locations = savedConfigLocations;
-        ConfigurationManager.ResetAllSettings ();
+        ConfigurationManager.Reset ();
 
 #if DEBUG_IDISPOSABLE
         Assert.Empty (View.Instances);

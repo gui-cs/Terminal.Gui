@@ -495,7 +495,7 @@ public class ComboBoxTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
+    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
     public void HideDropdownListOnClick_True_Highlight_Current_Item ()
     {
         var selected = "";

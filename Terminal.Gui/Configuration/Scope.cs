@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui;
@@ -9,15 +10,24 @@ namespace Terminal.Gui;
 /// </summary>
 public class Scope<T> : Dictionary<string, ConfigProperty>
 {
-    /// <summary>Crates a new instance.</summary>
+    /// <summary>
+    ///     Crates a new instance. The dictionary will be populated with uninitizlied (<see cref="ConfigProperty.HasValue"/> will be <see langword="false"/>)."
+    /// </summary>
     [RequiresUnreferencedCode ("AOT")]
     public Scope () : base (StringComparer.InvariantCultureIgnoreCase)
     {
+        // Populate the dictionary with uninitialized, mutable, properties
         foreach (KeyValuePair<string, ConfigProperty> p in GetConfigPropertiesByScope (typeof (T)))
         {
-            Add (p.Key, new () { PropertyInfo = p.Value.PropertyInfo, PropertyValue = null });
+            Add (p.Key, new ()
+            {
+                // Copy just the PropertyInfo, NOT PropertyValue
+                PropertyInfo = p.Value.PropertyInfo,
+                Immutable = false
+            });
         }
     }
+
 
     /// <summary>
     ///     Retrieves the values of the properties of this scope from their corresponding static
@@ -36,6 +46,7 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
     /// <returns>The updated scope (this).</returns>
     public Scope<T>? Update (Scope<T> scope)
     {
+        Debug.Assert(Locations != ConfigLocations.HardCoded);
         foreach (KeyValuePair<string, ConfigProperty> prop in scope)
         {
             if (ContainsKey (prop.Key))
@@ -52,15 +63,23 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
     }
 
     /// <summary>
-    ///     Applies the values of the properties of this scope to their corresponding static properties.
+    ///     Applies the values of the properties of this scope to their corresponding <see cref="SerializableConfigurationProperty"/> properties.
     /// </summary>
-    /// <returns></returns>
+    /// <returns><see langword="true"/> if one or more property value was applied.</returns>
     internal bool Apply ()
     {
+        Debug.Assert (Locations != ConfigLocations.HardCoded);
         var set = false;
 
         foreach (KeyValuePair<string, ConfigProperty> p in this.Where (t => t.Value is { PropertyValue: { } }))
         {
+            if (!p.Value.HasValue)
+            {
+                continue;
+
+                //throw new ArgumentException ($"Property {p.Key} has no value.");
+            }
+
             if (p.Value.PropertyInfo != null)
             {
                 object? currentValue = p.Value.PropertyInfo.GetValue (null);

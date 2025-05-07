@@ -13,7 +13,7 @@ public class ApplicationTests
     {
         _output = output;
         ConsoleDriver.RunningUnitTests = true;
-        Locations = ConfigLocations.Default;
+        Locations = ConfigLocations.LibraryResources;
 
 #if DEBUG_IDISPOSABLE
         View.EnableDebugIDisposableAsserts = true;
@@ -540,19 +540,27 @@ public class ApplicationTests
     }
 
     [Fact]
-    public void Init_KeyBindings_Set_To_Defaults ()
+    public void Init_KeyBindings_Are_Not_Reset ()
     {
-        // arrange
-        Locations = ConfigLocations.All;
-        ThrowOnJsonErrors = true;
+        Debug.Assert(!IsEnabled);
 
-        Application.QuitKey = Key.Q;
+        try
+        {
+            // arrange
+            Locations = ConfigLocations.LibraryResources;
+            ThrowOnJsonErrors = true;
 
-        Application.Init (new FakeDriver ());
+            Application.QuitKey = Key.Q;
+            Assert.Equal (Key.Q, Application.QuitKey);
 
-        Assert.Equal (Key.Esc, Application.QuitKey);
+            Application.Init (new FakeDriver ());
 
-        Application.Shutdown ();
+            Assert.Equal (Key.Q, Application.QuitKey);
+        }
+        finally
+        {
+            Application.ResetState (false);
+        }
     }
 
     [Fact]
@@ -578,7 +586,7 @@ public class ApplicationTests
         Assert.True (Application.KeyBindings.TryGet (Key.Q.WithCtrl, out _));
 
         Application.Shutdown ();
-        Locations = ConfigLocations.Default;
+        Locations = ConfigLocations.LibraryResources;
     }
 
     [Fact]
