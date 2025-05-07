@@ -36,7 +36,7 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
 
     // TODO: Add constructors which permit including a TextStyle.
     /// <summary>The text style (bold, italic, underlined, etc.).</summary>
-    public TextStyle TextStyle { get; } = TextStyle.None;
+    public TextStyle TextStyle { get; init; } = TextStyle.None;
 
     /// <summary>Initializes a new instance with default values.</summary>
     public Attribute ()
