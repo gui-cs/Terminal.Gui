@@ -12,6 +12,9 @@ public class NetOutput : IConsoleOutput
 
     private CursorVisibility? _cachedCursorVisibility;
 
+    // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
+    private TextStyle _redrawTextStyle = TextStyle.None;
+
     /// <summary>
     ///     Creates a new instance of the <see cref="NetOutput"/> class.
     /// </summary>
@@ -117,7 +120,7 @@ public class NetOutput : IConsoleOutput
                     Attribute attr = buffer.Contents [row, col].Attribute.Value;
 
                     // Performance: Only send the escape sequence if the attribute has changed.
-                    if (attr != redrawAttr)
+                    if (attr != redrawAttr || attr.TextStyle != _redrawTextStyle)
                     {
                         redrawAttr = attr;
 
@@ -134,6 +137,10 @@ public class NetOutput : IConsoleOutput
                             attr.Background.G,
                             attr.Background.B
                         );
+
+                        EscSeqUtils.CSI_AppendTextStyleChange (output, _redrawTextStyle, attr.TextStyle);
+
+                        _redrawTextStyle = attr.TextStyle;
                     }
 
                     outputWidth++;
