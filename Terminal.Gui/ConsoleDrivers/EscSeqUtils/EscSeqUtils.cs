@@ -1885,11 +1885,27 @@ public static class EscSeqUtils
 
         if (disabled != TextStyle.None)
         {
-            // Special case: Unlike other styles, bold and faint text are mutually exclusive. They also both have the same disable code: ^[[22m
-            // This also means disabling codes must be put before enabling codes, so that you can disable bold/faint text and enable the other at the same time.
-            if (disabled.HasFlag (TextStyle.Bold) || disabled.HasFlag (TextStyle.Faint))
+            // Special case: Both bold and faint have the same disabling code. While unusual, it can be valid to have both enabled at the same time, so when
+            // one and only one of them is being disabled, we need to re-enable the other afterward. We can check what flags remain enabled by taking
+            // prev & next, as this is the set of flags both have.
+            if (disabled.HasFlag (TextStyle.Bold))
             {
                 sgr.Add (22);
+
+                if ((prev & next).HasFlag (TextStyle.Faint))
+                {
+                    sgr.Add (2);
+                }
+            }
+
+            if (disabled.HasFlag (TextStyle.Faint))
+            {
+                sgr.Add (22);
+
+                if ((prev & next).HasFlag (TextStyle.Bold))
+                {
+                    sgr.Add (1);
+                }
             }
 
             if (disabled.HasFlag (TextStyle.Italic))
@@ -1920,11 +1936,14 @@ public static class EscSeqUtils
 
         if (enabled != TextStyle.None)
         {
-            // Special case: As before, bold and faint are mutually exclusive. Activating both will leave it up to the terminal to decide which to actually
-            // apply. So that behavior is always consistent, we'll enforce precedence of bold over faint, since bold is more commonly used.
-            if (enabled.HasFlag (TextStyle.Bold) || enabled.HasFlag(TextStyle.Faint))
+            if (enabled.HasFlag (TextStyle.Bold))
             {
-                sgr.Add (enabled.HasFlag (TextStyle.Bold) ? 1 : 2);
+                sgr.Add (1);
+            }
+
+            if (enabled.HasFlag (TextStyle.Faint))
+            {
+                sgr.Add (2);
             }
 
             if (enabled.HasFlag (TextStyle.Italic))

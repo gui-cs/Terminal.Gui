@@ -12,6 +12,12 @@ namespace Terminal.Gui;
 ///         Multiple styles can be combined using bitwise operations. Use <see cref="Attribute.TextStyle"/>
 ///         to get or set these styles on an <see cref="Attribute"/>.
 ///     </para>
+///     <para>
+///         Note that <see cref="TextStyle.Bold"/> and <see cref="TextStyle.Faint"/> may be mutually exclusive depending on
+///         the user's terminal and its settings. For instance, if a terminal displays faint text as a darker color, and
+///         bold text as a lighter color, then both cannot
+///         be shown at the same time, and it will be up to the terminal to decide which to display.
+///     </para>
 /// </remarks>
 [Flags]
 public enum TextStyle : byte
@@ -25,13 +31,20 @@ public enum TextStyle : byte
     /// <summary>
     ///     Bold text.
     /// </summary>
-    /// <remarks>SGR code: 1 (Bold).</remarks>
+    /// <remarks>
+    ///     SGR code: 1 (Bold). May be mutually exclusive with <see cref="TextStyle.Faint"/>, see <see cref="TextStyle"/>
+    ///     remarks.
+    /// </remarks>
     Bold = 0b_0000_0001,
 
     /// <summary>
     ///     Faint (dim) text.
     /// </summary>
-    /// <remarks>SGR code: 2 (Faint). Not widely supported on all terminals.</remarks>
+    /// <remarks>
+    ///     SGR code: 2 (Faint). Not widely supported on all terminals. May be mutually exclusive with
+    ///     <see cref="TextStyle.Bold"/>, see
+    ///     <see cref="TextStyle"/> remarks.
+    /// </remarks>
     Faint = 0b_0000_0010,
 
     /// <summary>
