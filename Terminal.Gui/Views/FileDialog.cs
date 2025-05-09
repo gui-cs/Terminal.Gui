@@ -170,8 +170,8 @@ public class FileDialog : Dialog, IDesignable
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             FullRowSelect = true,
-            CollectionNavigator = new FileDialogCollectionNavigator (this)
         };
+        _tableView.CollectionNavigator = new FileDialogCollectionNavigator (this, _tableView);
         _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Select);
         _tableView.MouseClick += OnTableViewMouseClick;
         _tableView.Style.InvertSelectedCellFirstCharacter = true;
@@ -1463,29 +1463,6 @@ public class FileDialog : Dialog, IDesignable
 
         ApplySort ();
         _tableView.Update ();
-    }
-
-    internal class FileDialogCollectionNavigator : CollectionNavigatorBase
-    {
-        private readonly FileDialog _fileDialog;
-        public FileDialogCollectionNavigator (FileDialog fileDialog) { _fileDialog = fileDialog; }
-
-        protected override object ElementAt (int idx)
-        {
-            object val = FileDialogTableSource.GetRawColumnValue (
-                                                                  _fileDialog._tableView.SelectedColumn,
-                                                                  _fileDialog.State?.Children [idx]
-                                                                 );
-
-            if (val is null)
-            {
-                return string.Empty;
-            }
-
-            return val.ToString ().Trim ('.');
-        }
-
-        protected override int GetCollectionLength () { return _fileDialog.State?.Children.Length ?? 0; }
     }
 
     /// <summary>State representing a recursive search from <see cref="FileDialogState.Directory"/> downwards.</summary>
