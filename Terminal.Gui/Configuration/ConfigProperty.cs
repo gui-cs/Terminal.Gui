@@ -1,9 +1,11 @@
 ﻿#nullable enable
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui;
 
@@ -65,10 +67,8 @@ public class ConfigProperty
         {
             if (PropertyInfo?.GetValue (null) is { })
             {
-                object? currentValue = PropertyInfo.GetValue (null);
-
-                // generic deep copy
-                var val = ScopeExtensions.DeepMemberWiseCopy (PropertyValue, currentValue);
+                // Use DeepCloner to create a deep copy of PropertyValue
+                object? val = DeepCloner.DeepClone (PropertyValue);
                 PropertyInfo.SetValue (null, val);
 
             }
@@ -129,11 +129,15 @@ public class ConfigProperty
     /// <exception cref="ArgumentException"></exception>
     internal object? UpdateValueFrom (object? source)
     {
+        // If the source (higher-priority layer) doesn't provide a value, keep the existing value
+        // In the context of layering, a null source means the higher-priority layer doesn't specify a value,
+        // so we should retain the value from the lower-priority layer.
         if (source is null)
         {
             return PropertyValue;
         }
 
+        // Validate that the source type matches the property type
         Type? underlyingType = Nullable.GetUnderlyingType (PropertyInfo!.PropertyType);
 
         if (source.GetType () != PropertyInfo.PropertyType && underlyingType is { } && source.GetType () != underlyingType)
@@ -143,34 +147,29 @@ public class ConfigProperty
                                         );
         }
 
-        if (PropertyValue is { })
+        // The source provides a value, so update PropertyValue
+        // Handle Scope<T>-specific logic for nested configuration scopes
+        if (source is SettingsScope settingsSource && PropertyValue is SettingsScope settingsDest)
         {
-            // Handle Scope<T>-specific logic
-            if (source is SettingsScope settingsSource && PropertyValue is SettingsScope settingsDest)
-            {
-                PropertyValue = settingsDest.Update (settingsSource);
-            }
-            else if (source is ThemeScope themeSource && PropertyValue is ThemeScope themeDest)
-            {
-                PropertyValue = themeDest.Update (themeSource);
-            }
-            else if (source is AppScope appSource && PropertyValue is AppScope appDest)
-            {
-                PropertyValue = appDest.Update (appSource);
-            }
-            else
-            {
-                // Fallback to generic deep copy
-                PropertyValue = ScopeExtensions.DeepMemberWiseCopy (source, PropertyValue);
-            }
+            PropertyValue = settingsDest.Update (settingsSource);
+        }
+        else if (source is ThemeScope themeSource && PropertyValue is ThemeScope themeDest)
+        {
+            PropertyValue = themeDest.Update (themeSource);
+        }
+        else if (source is AppScope appSource && PropertyValue is AppScope appDest)
+        {
+            PropertyValue = appDest.Update (appSource);
         }
         else
         {
-            PropertyValue = source;
+            // For non-scope types, perform a deep copy of the source value to ensure immutability
+            PropertyValue = DeepCloner.DeepClone (source);
         }
 
         return PropertyValue;
     }
+
 
 
     /// <summary>

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json;
 using UnitTests;
@@ -32,7 +33,78 @@ public class ConfigurationManagerTests
     }
 
     [Fact]
-    public void Disabled_Loads_Onliy_HardCoded_Values ()
+    public void HardCodedDefaultCache_Properties_Are_Copies ()
+    {
+        Disable ();
+        Locations = ConfigLocations.HardCoded;
+        Enable ();
+
+        Assert.Equal (Key.Esc, Application.QuitKey);
+
+        ConfigProperty fromSettings = Settings! ["Application.QuitKey"];
+
+        FrozenDictionary<string, ConfigProperty> initialCache = GetHardCodedConfigPropertyCache ();
+        Assert.NotNull (initialCache);
+
+        ConfigProperty fromCache = initialCache ["Application.QuitKey"];
+
+        // Assert
+        Assert.NotEqual(fromCache, fromSettings);
+    }
+
+    [Fact]
+    public void HardCodedDefaultCache_Properties_Are_Immutable ()
+    {
+        Disable ();
+        Locations = ConfigLocations.HardCoded;
+        Enable ();
+
+        Assert.Equal (Key.Esc, Application.QuitKey);
+
+        FrozenDictionary<string, ConfigProperty> initialCache = GetHardCodedConfigPropertyCache ();
+        Assert.NotNull (initialCache);
+        Assert.Equal (Key.Esc, (Key)initialCache ["Application.QuitKey"].PropertyValue);
+
+
+        // Act
+        Settings! ["Application.QuitKey"].PropertyValue = Key.Q;
+        Assert.Equal (Key.Q, (Key)Settings ["Application.QuitKey"].PropertyValue);
+
+        Settings ["Application.QuitKey"].Apply ();
+        Assert.Equal (Key.Q, Application.QuitKey);  
+
+        //Apply ();
+
+        //Application.QuitKey = Key.K;
+
+        // Assert
+        FrozenDictionary<string, ConfigProperty> cache = GetHardCodedConfigPropertyCache ();
+        Assert.Equal (initialCache, cache);
+        Assert.True (initialCache ["Application.QuitKey"].Immutable);
+        Assert.Equal (Key.Esc, (Key)initialCache ["Application.QuitKey"].PropertyValue);
+    }
+
+    [Fact]
+    public void Disable_Settings_Is_Null ()
+    {
+        Disable ();
+
+
+        Assert.Null (Settings);
+    }
+
+    [Fact]
+    public void Enable_Settings_Is_Valid ()
+    {
+        Disable ();
+
+        Enable ();
+
+        Assert.NotNull (Settings);
+    }
+
+    [Fact]
+    public void Disabled_Loads_Only_HardCoded_Values ()
     {
         try
         {

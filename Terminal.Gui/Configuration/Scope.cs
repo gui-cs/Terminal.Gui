@@ -7,11 +7,16 @@ namespace Terminal.Gui;
 /// <summary>
 ///     Defines a configuration settings scope. Classes that inherit from this abstract class can be used to define
 ///     scopes for configuration settings. Each scope is a JSON object that contains a set of configuration settings.
+///     <para>
+///         When constructed, the dictionary will be populated with the uninitialized configuration properties for the scope (<see cref="ConfigProperty.HasValue"/> will be <see langword="false"/>).
+///     </para>
+///     <para>
+///     </para>
 /// </summary>
 public class Scope<T> : Dictionary<string, ConfigProperty>
 {
     /// <summary>
-    ///     Crates a new instance. The dictionary will be populated with uninitizlied (<see cref="ConfigProperty.HasValue"/> will be <see langword="false"/>)."
+    ///     Crates a new instance. The dictionary will be populated with uninitialized (<see cref="ConfigProperty.HasValue"/> will be <see langword="false"/>).
     /// </summary>
     [RequiresUnreferencedCode ("AOT")]
     public Scope () : base (StringComparer.InvariantCultureIgnoreCase)
@@ -41,6 +46,7 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
         }
     }
 
+    // TODO: Should this take a Dictionary<string, ConfigProperty> instead of a Scope<T>?
     /// <summary>Updates this instance from the specified source scope.</summary>
     /// <param name="scope"></param>
     /// <returns>The updated scope (this).</returns>
@@ -55,20 +61,26 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
             }
             else
             {
+                // Add the property to this scope
+                Add (prop.Key, new ());
                 this [prop.Key].PropertyValue = prop.Value.PropertyValue;
             }
         }
 
         return this;
     }
-
     /// <summary>
     ///     Applies the values of the properties of this scope to their corresponding <see cref="SerializableConfigurationProperty"/> properties.
     /// </summary>
-    /// <returns><see langword="true"/> if one or more property value was applied.</returns>
+    /// <returns><see langword="true"/> if one or more property value was applied; <see langword="false"/> otherwise.</returns>
     internal bool Apply ()
     {
-        Debug.Assert (Locations != ConfigLocations.HardCoded);
+        if (!IsEnabled)
+        {
+            return false;
+        }
+
+        //Debug.Assert(Locations != ConfigLocations.HardCoded);
         var set = false;
 
         foreach (KeyValuePair<string, ConfigProperty> p in this.Where (t => t.Value is { PropertyValue: { } }))
@@ -76,8 +88,7 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
             if (!p.Value.HasValue)
             {
                 continue;
-
-                //throw new ArgumentException ($"Property {p.Key} has no value.");
+                //throw new ArgumentException($"Property {p.Key} has no value.");
             }
 
             if (p.Value.PropertyInfo != null)
@@ -90,8 +101,8 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
                 }
                 else
                 {
-                    // Fallback to generic deep copy
-                    object? val = ScopeExtensions.DeepMemberWiseCopy (p.Value.PropertyValue, currentValue);
+                    // Use DeepCloner to create a deep copy of the property value
+                    object? val = DeepCloner.DeepClone (p.Value.PropertyValue);
                     p.Value.PropertyInfo.SetValue (null, val);
                 }
 

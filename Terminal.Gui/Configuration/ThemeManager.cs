@@ -204,7 +204,9 @@ public static class ThemeManager
             //return;
         }
 
-        Themes = new Dictionary<string, ThemeScope> (StringComparer.InvariantCultureIgnoreCase);
+        // TODO: Fix
+
+        //Themes = new Dictionary<string, ThemeScope> (StringComparer.InvariantCultureIgnoreCase);
 
         //Themes?.Add ("Default", new ThemeScope ());
         //Theme = "Default";
@@ -225,7 +227,8 @@ public static class ThemeManager
 
         Reset ();
 
-        Themes! [Theme].RetrieveValues ();
+        // TODO: Fix
+        //Themes! [Theme].RetrieveValues ();
     }
 
     /// <summary>Called when the selected theme has changed. Fires the <see cref="ThemeChanged"/> event.</summary>

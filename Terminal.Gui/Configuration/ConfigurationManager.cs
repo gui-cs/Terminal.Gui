@@ -115,7 +115,7 @@ public static class ConfigurationManager
             // _allConfigProperties: for ordered, iterable access (LINQ-friendly)
             // _frozenConfigPropertyCache: for high-speed key lookup (frozen)
 
-            // Note GetAllConfigProperties returns a new instance and all the properties are set to Immutable.
+            // Note GetAllConfigProperties returns a new instance and all the properties !HasValue and Immutable.
             _allConfigPropertiesCache = ConfigProperty.GetAllConfigProperties ();
         }
 
@@ -157,6 +157,7 @@ public static class ConfigurationManager
     public static void Disable ()
     {
         _enabled = false;
+        Reset ();
     }
 
     /// <summary>
@@ -567,7 +568,14 @@ public static class ConfigurationManager
 
         try
         {
-            _settings = new ();
+            if (IsEnabled)
+            {
+                _settings = new ();
+            }
+            else
+            {
+                _settings = null;
+            }
         }
         finally
         {
@@ -578,7 +586,14 @@ public static class ConfigurationManager
 
         try
         {
-            _cachedAppSettings = new ();
+            if (IsEnabled)
+            {
+                _cachedAppSettings = new ();
+            }
+            else
+            {
+                _cachedAppSettings = null;
+            }
         }
         finally
         {
@@ -587,8 +602,7 @@ public static class ConfigurationManager
 
         if (!IsEnabled)
         {
-            Logging.Error ($"ConfigurationManager is not enabled. Resettig CM to current values.");
-            ResetToCurrentValues ();
+            Logging.Error ($"ConfigurationManager is not enabled. Settings are invalid.");
 
             return;
         }
@@ -727,7 +741,7 @@ public static class ConfigurationManager
     }
 
 
-    /// <summary>Returns an empty Json document with just the $schema tag.</summary>
+    /// <summary>Returns a Json document containing the hard-coded config.</summary>
     /// <returns></returns>
     public static string GetHardCodedConfig ()
     {

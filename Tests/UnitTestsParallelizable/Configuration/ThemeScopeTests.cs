@@ -8,9 +8,6 @@ public class ThemeScopeTests
     [Fact]
     public void Schemes_Property_Exists ()
     {
-        // Need to call Initialize to setup readonly statics
-        ConfigurationManager.Initialize ();
-
         var scope = new ThemeScope();
 
         Assert.NotEmpty (scope);
