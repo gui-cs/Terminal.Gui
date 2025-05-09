@@ -611,7 +611,7 @@ public class UICatalogTop : Toplevel
         statusBarShortcut.Accepting += (sender, args) =>
         {
             statusBar.Visible = !_statusBar!.Visible;
-            args.Cancel = true;
+            args.Handled = true;
         };
 
         _force16ColorsShortcutCb = new ()

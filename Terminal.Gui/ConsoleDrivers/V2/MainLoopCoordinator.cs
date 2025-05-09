@@ -25,6 +25,7 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
     private ConsoleDriverFacade<T> _facade;
     private Task _inputTask;
     private readonly ITimedEvents _timedEvents;
+    private readonly bool _isWindowsTerminal;
 
     private readonly SemaphoreSlim _startupSemaphore = new (0, 1);
 
@@ -60,6 +61,7 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
         _inputProcessor = inputProcessor;
         _outputFactory = outputFactory;
         _loop = loop;
+        _isWindowsTerminal = Environment.GetEnvironmentVariable ("WT_SESSION") is { } || Environment.GetEnvironmentVariable ("VSAPPIDNAME") != null;
     }
 
     /// <summary>
@@ -159,6 +161,12 @@ internal class MainLoopCoordinator<T> : IMainLoopCoordinator
                            _output,
                            _loop.AnsiRequestScheduler,
                            _loop.WindowSizeMonitor);
+
+            if (!_isWindowsTerminal)
+            {
+                Application.Force16Colors = _facade.Force16Colors = true;
+            }
+
             Application.Driver = _facade;
 
             _startupSemaphore.Release ();

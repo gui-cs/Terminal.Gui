@@ -53,7 +53,7 @@ public class Menus : Scenario
 
         menuHostView.CommandNotBound += (o, args) =>
                                         {
-                                            if (o is not View sender || args.Cancel)
+                                            if (o is not View sender || args.Handled)
                                             {
                                                 return;
                                             }
@@ -65,7 +65,7 @@ public class Menus : Scenario
 
         menuHostView.Accepting += (o, args) =>
                                   {
-                                      if (o is not View sender || args.Cancel)
+                                      if (o is not View sender || args.Handled)
                                       {
                                           return;
                                       }
@@ -77,7 +77,7 @@ public class Menus : Scenario
 
         menuHostView.ContextMenu!.Accepted += (o, args) =>
                                               {
-                                                  if (o is not View sender || args.Cancel)
+                                                  if (o is not View sender || args.Handled)
                                                   {
                                                       return;
                                                   }
@@ -263,7 +263,7 @@ public class Menus : Scenario
                                         Logging.Debug ($"menuBar.Accepted: {args.Context.Source?.Title}");
 
                                         // Set Cancel to true to stop propagation of Accepting to superview
-                                        args.Cancel = true;
+                                        args.Handled = true;
 
                                         // Since overwrite uses a MenuItem.Command the menu item CB is the source of truth
                                         enableOverwriteStatusCb.CheckedState = ((CheckBox)mi.CommandView).CheckedState;
@@ -308,7 +308,7 @@ public class Menus : Scenario
                                         Logging.Debug ($"menuBar.Accepted: {args.Context.Source?.Title}");
 
                                         // Set Cancel to true to stop propagation of Accepting to superview
-                                        args.Cancel = true;
+                                        args.Handled = true;
 
                                         // Since overwrite uses a MenuItem.Command the menu item CB is the source of truth
                                         editModeMenuItemCb.CheckedState = ((CheckBox)mi.CommandView).CheckedState;
@@ -363,7 +363,7 @@ public class Menus : Scenario
 
             openBtn.Accepting += (s, e) =>
                                  {
-                                     e.Cancel = true;
+                                     e.Handled = true;
                                      Logging.Trace ($"openBtn.Accepting - Sending F9. {e.Context?.Source?.Title}");
                                      NewKeyDownEvent (menuBar.Key);
                                  };

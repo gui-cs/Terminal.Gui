@@ -490,8 +490,8 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         {
             if (keyCommandContext.Binding.Key is { } && keyCommandContext.Binding.Key == Application.QuitKey && SuperView is { Visible: true })
             {
-                Logging.Debug ($"{Title} - Setting e.Cancel = true - Application.QuitKey/Command = Command.Quit");
-                e.Cancel = true;
+                Logging.Debug ($"{Title} - Setting e.Handled = true - Application.QuitKey/Command = Command.Quit");
+                e.Handled = true;
             }
         }
     }
@@ -533,9 +533,9 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         Logging.Debug ($"{Title} - calling base.OnAccepting: {args.Context?.Command}");
         bool? ret = base.OnAccepting (args);
 
-        if (ret is true || args.Cancel)
+        if (ret is true || args.Handled)
         {
-            return args.Cancel = true;
+            return args.Handled = true;
         }
 
         // Only raise Accepted if the command came from one of our MenuItems

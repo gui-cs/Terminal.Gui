@@ -28,7 +28,7 @@ public class ViewCommandTests
         btnA.Accepting += (s, e) =>
                           {
                               aAcceptedCount++;
-                              e.Cancel = aCancelAccepting;
+                              e.Handled = aCancelAccepting;
                           };
 
         var btnB = new Button ()
@@ -40,7 +40,7 @@ public class ViewCommandTests
         btnB.Accepting += (s, e) =>
                           {
                               bAcceptedCount++;
-                              e.Cancel = bCancelAccepting;
+                              e.Handled = bCancelAccepting;
                           };
         w.Add (btnA, btnB);
 
@@ -96,7 +96,7 @@ public class ViewCommandTests
         w.Accepting += (s, e) =>
                        {
                            wAcceptedCount++;
-                           e.Cancel = wCancelAccepting;
+                           e.Handled = wCancelAccepting;
                        };
 
         int btnAcceptedCount = 0;
@@ -112,7 +112,7 @@ public class ViewCommandTests
         btn.Accepting += (s, e) =>
                          {
                              btnAcceptedCount++;
-                             e.Cancel = btnCancelAccepting;
+                             e.Handled = btnCancelAccepting;
                          };
 
         w.Add (btn);

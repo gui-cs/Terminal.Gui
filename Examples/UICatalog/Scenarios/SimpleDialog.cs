@@ -44,7 +44,7 @@ public sealed class SimpleDialog : Scenario
         button.Accepting += (s, e) =>
                             {
                                 Application.Run (dialog);
-                                e.Cancel = true;
+                                e.Handled = true;
                             };
         appWindow.Add (button);
 

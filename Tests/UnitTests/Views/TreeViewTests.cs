@@ -1425,7 +1425,7 @@ oot two
         void Accept (object sender, CommandEventArgs e)
         {
             accepted = true;
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 }
