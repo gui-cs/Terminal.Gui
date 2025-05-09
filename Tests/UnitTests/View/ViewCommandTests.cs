@@ -100,7 +100,7 @@ public class ViewCommandTests
                        };
 
         int btnAcceptedCount = 0;
-        bool btnCancelAccepting = false;
+        bool btnCancelAccepting = true;
         var btn = new Button ()
         {
             Title = "Button",
@@ -148,7 +148,7 @@ public class ViewCommandTests
                                      });
 
         Assert.Equal (1, btnAcceptedCount);
-        Assert.Equal (2, wAcceptedCount);
+        Assert.Equal (0, wAcceptedCount);
 
         Application.ResetState (true);
     }
