@@ -120,7 +120,7 @@ public class NetOutput : IConsoleOutput
                     Attribute attr = buffer.Contents [row, col].Attribute.Value;
 
                     // Performance: Only send the escape sequence if the attribute has changed.
-                    if (attr != redrawAttr || attr.TextStyle != _redrawTextStyle)
+                    if (attr != redrawAttr)
                     {
                         redrawAttr = attr;
 
