@@ -22,8 +22,8 @@ public class AppScopeTests
     {
         Reset ();
         Assert.Null (AppSettingsTestClass.NullableValueProperty);
-        Assert.NotEmpty (AppSettings);
-        Assert.Null (AppSettings ["AppSettingsTestClass.NullableValueProperty"].PropertyValue);
+        Assert.NotEmpty (AppSettings!);
+        Assert.Null (AppSettings! ["AppSettingsTestClass.NullableValueProperty"].PropertyValue);
 
         AppSettingsTestClass.NullableValueProperty = true;
         Reset ();
@@ -35,7 +35,7 @@ public class AppScopeTests
         Assert.False (AppSettings ["AppSettingsTestClass.NullableValueProperty"].PropertyValue as bool?);
 
         // ConfigurationManager.Settings should NOT apply theme settings
-        Settings.Apply ();
+        Settings!.Apply ();
         Assert.True (AppSettingsTestClass.NullableValueProperty);
 
         // ConfigurationManager.Themes should NOT apply theme settings
@@ -69,13 +69,13 @@ public class AppScopeTests
     {
         Reset ();
 
-        AppScope initial = AppSettings;
+        AppScope initial = AppSettings!;
 
         string serialized = JsonSerializer.Serialize (AppSettings, _jsonOptions);
         var deserialized = JsonSerializer.Deserialize<AppScope> (serialized, _jsonOptions);
 
         Assert.NotEqual (initial, deserialized);
-        Assert.Equal (deserialized.Count, initial.Count);
+        Assert.Equal (deserialized!.Count, initial.Count);
     }
 
     public class AppSettingsTestClass

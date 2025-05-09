@@ -30,6 +30,7 @@ public class ConfigurationManagerTests
     public void ModuleInitializer_Was_Called ()
     {
         Assert.True (IsInitialized ());
+        Assert.True (IsInitialized ());
     }
 
     [Fact]
@@ -185,10 +186,10 @@ public class ConfigurationManagerTests
     public void Apply_Raises_Applied ()
     {
         Reset ();
-        Applied += ConfigurationManager_Applied;
+        Applied += ConfigurationManagerApplied;
         var fired = false;
 
-        void ConfigurationManager_Applied (object sender, ConfigurationManagerEventArgs obj)
+        void ConfigurationManagerApplied (object sender, ConfigurationManagerEventArgs obj)
         {
             fired = true;
 
@@ -208,7 +209,7 @@ public class ConfigurationManagerTests
         // assert
         Assert.True (fired);
 
-        Applied -= ConfigurationManager_Applied;
+        Applied -= ConfigurationManagerApplied;
         Reset ();
     }
 
@@ -220,7 +221,9 @@ public class ConfigurationManagerTests
         {
             Enable ();
             ThrowOnJsonErrors = true;
-            Locations = ConfigLocations.All;
+            // Only select locations under test control
+            Locations = ConfigLocations.LibraryResources | ConfigLocations.AppResources | ConfigLocations.Runtime;
+
             Reset ();
             Assert.Equal (Key.Esc, (((Key)Settings! ["Application.QuitKey"].PropertyValue)!).KeyCode);
 
@@ -252,7 +255,9 @@ public class ConfigurationManagerTests
     public void Load_Performance_Check ()
     {
         Enable ();
-        Locations = ConfigLocations.All;
+        // Only select locations under test control
+        Locations = ConfigLocations.LibraryResources | ConfigLocations.AppResources | ConfigLocations.Runtime;
+
         Reset ();
 
         // Start stopwatch
@@ -356,7 +361,9 @@ public class ConfigurationManagerTests
         try
         {
             Enable ();
-            Locations = ConfigLocations.All;
+            // Only select locations under test control
+            Locations = ConfigLocations.LibraryResources | ConfigLocations.AppResources | ConfigLocations.Runtime;
+
             Reset ();
 
             Settings! ["Application.QuitKey"].PropertyValue = Key.Q;
@@ -467,7 +474,10 @@ public class ConfigurationManagerTests
         {
             // arrange
             Enable ();
-            Locations = ConfigLocations.All;
+
+            // Only select locations under test control
+            Locations = ConfigLocations.LibraryResources | ConfigLocations.AppResources | ConfigLocations.Runtime;
+
             Reset ();
             ThrowOnJsonErrors = true;
 
@@ -528,7 +538,9 @@ public class ConfigurationManagerTests
     [Fact]
     public void TestConfigProperties ()
     {
-        Locations = ConfigLocations.All;
+        // Only select locations under test control
+        Locations = ConfigLocations.LibraryResources | ConfigLocations.AppResources | ConfigLocations.Runtime;
+
         Reset ();
 
         Assert.NotEmpty (Settings!);
@@ -543,7 +555,7 @@ public class ConfigurationManagerTests
                                             )
                    );
 
-#pragma warning disable xUnit2029
+#pragma warning disable xUnit2030
         Assert.Empty (
                       Settings.Where (
                                       cp => cp.Value.PropertyInfo!.GetCustomAttribute (
@@ -552,7 +564,7 @@ public class ConfigurationManagerTests
                                             == null
                                      )
                      );
-#pragma warning restore xUnit2029
+#pragma warning restore xUnit2030
 
         // Application is a static class
         PropertyInfo pi = typeof (Application).GetProperty ("QuitKey");
@@ -569,7 +581,8 @@ public class ConfigurationManagerTests
     public void TestConfigPropertyOmitClassName ()
     {
         ConfigLocations savedLocations = Locations;
-        Locations = ConfigLocations.All;
+        // Only select locations under test control
+        Locations = ConfigLocations.LibraryResources | ConfigLocations.AppResources | ConfigLocations.Runtime;
 
         // Color.Schemes is serialized as "Schemes", not "Colors.Schemes"
         PropertyInfo pi = typeof (SchemeManager).GetProperty ("Schemes");

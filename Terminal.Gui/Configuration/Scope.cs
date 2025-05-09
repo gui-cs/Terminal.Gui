@@ -22,7 +22,7 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
     public Scope () : base (StringComparer.InvariantCultureIgnoreCase)
     {
         // Populate the dictionary with uninitialized, mutable, properties
-        foreach (KeyValuePair<string, ConfigProperty> p in GetConfigPropertiesByScope (typeof (T)))
+        foreach (KeyValuePair<string, ConfigProperty> p in GetConfigPropertiesByScope (typeof (T))!)
         {
             Add (p.Key, new ()
             {

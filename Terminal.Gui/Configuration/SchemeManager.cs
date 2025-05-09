@@ -159,12 +159,12 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
                 {
                     Scheme? oldValue = Schemes [key];
                     Schemes [key] = value;
-                    CollectionChanged?.Invoke (this, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Replace, value, oldValue));
+                    CollectionChanged?.Invoke (this, new (NotifyCollectionChangedAction.Replace, value, oldValue));
                 }
                 else
                 {
                     Schemes?.Add (key, value);
-                    CollectionChanged?.Invoke (this, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, new KeyValuePair<string, Scheme?> (key, value)));
+                    CollectionChanged?.Invoke (this, new (NotifyCollectionChangedAction.Add, new KeyValuePair<string, Scheme?> (key, value)));
                 }
             }
         }
@@ -181,14 +181,9 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     {
         Debug.Assert(IsInitialized());
 
-        Debug.Assert (ThemeManager.Themes.TryGetValue ("Default", out _));
+        Debug.Assert (ThemeManager.Themes!.TryGetValue ("Default", out _));
 
-        Dictionary<string, Scheme?>? schemes = new (StringComparer.InvariantCultureIgnoreCase) { };
-
-        if (ThemeManager.Themes is { })
-        {
-            schemes = ThemeManager.Themes [ThemeManager.Theme] ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
-        }
+        Dictionary<string, Scheme?>? schemes = ThemeManager.Themes [ThemeManager.Theme] ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
 
         return schemes;
     }
@@ -201,10 +196,6 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
 
     public static Dictionary<string, Scheme?>? GetDefaultSchemes ()
     {
-        //if (!IsEnabled)
-        //{
-        //    return GetHardCodedSchemes ();
-        //}
         Dictionary<string, Scheme?>? schemes = new (StringComparer.InvariantCultureIgnoreCase) { };
 
         if (ThemeManager.Themes is { })

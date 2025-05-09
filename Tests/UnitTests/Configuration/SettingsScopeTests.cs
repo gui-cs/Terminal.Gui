@@ -91,7 +91,7 @@ public class SettingsScopeTests
     [Fact]
     public void GetHardCodedDefaults_ShouldSetProperties ()
     {
-        ConfigLocations savedLocations = Locations;
+        Enable();
         Locations = ConfigLocations.LibraryResources;
         Reset ();
 

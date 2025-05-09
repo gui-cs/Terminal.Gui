@@ -97,7 +97,7 @@ public static class ThemeManager
         ThemeScope? hardCodedThemeScope = new ThemeScope ();
         foreach (KeyValuePair<string, ConfigProperty> p in hardCodedThemeScope)
         {
-            p.Value.PropertyValue = dict [p.Key].PropertyValue;
+            p.Value.PropertyValue = dict! [p.Key].PropertyValue;
         }
         return hardCodedThemeScope;
     }

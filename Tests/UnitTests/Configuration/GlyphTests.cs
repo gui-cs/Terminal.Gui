@@ -11,6 +11,7 @@ public class GlyphTests
     public void Overrides_Defaults ()
     {
         // arrange
+        Enable();
         Locations = ConfigLocations.LibraryResources;
         Load (true);
 

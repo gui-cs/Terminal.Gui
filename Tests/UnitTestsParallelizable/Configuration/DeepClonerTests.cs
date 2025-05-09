@@ -236,29 +236,6 @@ public class DeepClonerTests
     }
 
     [Fact]
-    public void ImmutableDictionary_ClonesSuccessfully ()
-    {
-        // Arrange
-        ImmutableDictionary<string, int> source = ImmutableDictionary.Create<string, int> ()
-                                                                     .Add ("A", 1)
-                                                                     .Add ("B", 2);
-
-        // Act
-        ImmutableDictionary<string, int> result = DeepCloner.DeepClone (source)!;
-
-        // Assert
-        Assert.NotNull (result);
-        Assert.NotSame (source, result);
-        Assert.Equal (source, result);
-        Assert.IsType<ImmutableDictionary<string, int>> (result);
-
-        // Modify result (create a new instance since ImmutableDictionary is immutable)
-        result = result.Add ("C", 3);
-        Assert.Equal (2, source.Count);
-        Assert.Equal (3, result.Count);
-    }
-
-    [Fact]
     public void ImmutableList_ThrowsNotSupported ()
     {
         ImmutableList<string> source = ImmutableList.Create ("One", "Two");
@@ -275,12 +252,12 @@ public class DeepClonerTests
     [Fact]
     public void Dictionary_SourceAddsItem_ClonesCorrectly ()
     {
-        Dictionary<string, Attribute> source = new ()
+        Dictionary<string, Attribute>? source = new ()
         {
             { "Disabled", new (Color.White) },
             { "Normal", new (Color.Blue) }
         };
-        Dictionary<string, Attribute> result = DeepCloner.DeepClone (source);
+        Dictionary<string, Attribute>? result = DeepCloner.DeepClone (source);
 
         Assert.NotNull (result);
         Assert.NotSame (source, result);
@@ -292,8 +269,8 @@ public class DeepClonerTests
     [Fact]
     public void Dictionary_SourceUpdatesOneItem_ClonesCorrectly ()
     {
-        Dictionary<string, Attribute> source = new () { { "Disabled", new (Color.White) } };
-        Dictionary<string, Attribute> result = DeepCloner.DeepClone (source);
+        Dictionary<string, Attribute>? source = new () { { "Disabled", new (Color.White) } };
+        Dictionary<string, Attribute>? result = DeepCloner.DeepClone (source);
 
         Assert.NotNull (result);
         Assert.NotSame (source, result);
@@ -304,11 +281,11 @@ public class DeepClonerTests
     [Fact]
     public void Dictionary_WithComplexKeys_ClonesCorrectly ()
     {
-        Dictionary<ComplexKey, string> source = new ()
+        Dictionary<ComplexKey, string>? source = new ()
         {
             { new() { Id = 1 }, "Value1" }
         };
-        Dictionary<ComplexKey, string> result = DeepCloner.DeepClone (source);
+        Dictionary<ComplexKey, string>? result = DeepCloner.DeepClone (source);
 
         Assert.NotNull (result);
         Assert.NotSame (source, result);
@@ -334,13 +311,6 @@ public class DeepClonerTests
         // Modify result, ensure source unchanged
         result [new (KeyCode.Q)] = "Q";
         Assert.False (source.ContainsKey (new (KeyCode.Q)));
-    }
-
-    [Fact]
-    public void UnsupportedType_ThrowsException ()
-    {
-        var source = new StreamReader (Stream.Null);
-        Assert.Throws<ArgumentException> (() => DeepCloner.DeepClone (source));
     }
 
     // Nested Objects

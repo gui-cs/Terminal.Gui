@@ -1,19 +1,32 @@
 #nullable enable
 
-using System;
 using System.Collections;
 using System.Collections.Concurrent;
-using System.Collections.Immutable;
 using System.Reflection;
+using System.Runtime.Serialization;
 
 namespace Terminal.Gui;
-
 
 /// <summary>
 ///     Provides deep cloning functionality for Terminal.Gui configuration objects.
 ///     Creates a deep copy of an object by recursively cloning public properties,
 ///     handling collections, arrays, dictionaries, and circular references.
 /// </summary>
+/// <remarks>
+///     This class does not use <see cref="ICloneable"/> because it does not guarantee deep cloning,
+///     may not handle circular references, and is not widely implemented in modern .NET types.
+///     Instead, it uses reflection to ensure consistent deep cloning behavior across all types.
+///     <para>
+///         Limitations:
+///         - Types without a parameterless constructor (and not handled as simple types, arrays, dictionaries, or
+///         collections) may be instantiated using uninitialized objects, which could lead to runtime errors if not
+///         properly handled.
+///         - Immutable collections (e.g., <see cref="System.Collections.Immutable.ImmutableDictionary{TKey,TValue}"/>) are
+///         not supported and will throw a <see cref="NotSupportedException"/>.
+///         - Only public, writable properties are cloned; private fields, read-only properties, and non-public members are
+///         ignored.
+///     </para>
+/// </remarks>
 public static class DeepCloner
 {
     /// <summary>
@@ -26,10 +39,11 @@ public static class DeepCloner
     {
         if (source is null)
         {
-            return default;
+            return default (T?);
         }
 
         ConcurrentDictionary<object, object> visited = new (ReferenceEqualityComparer.Instance);
+
         return (T?)DeepCloneInternal (source, visited);
     }
 
@@ -78,12 +92,6 @@ public static class DeepCloner
             return CloneCollection (source, visited);
         }
 
-        // Validate that the type can be cloned
-        if (type.GetConstructor (Type.EmptyTypes) == null && type.GetMethod ("<Clone>$") == null)
-        {
-            throw new ArgumentException ($"Type '{type.Name}' cannot be cloned because it lacks a parameterless constructor and is not a supported type (simple type, array, dictionary, or collection).");
-        }
-
         // Create new instance
         object clone = CreateInstance (type);
 
@@ -92,7 +100,7 @@ public static class DeepCloner
 
         // Clone writable public properties
         foreach (PropertyInfo prop in type.GetProperties (BindingFlags.Instance | BindingFlags.Public)
-                                          .Where (p => p.CanRead && p.CanWrite && p.GetIndexParameters ().Length == 0))
+                                          .Where (p => p is { CanRead: true, CanWrite: true } && p.GetIndexParameters ().Length == 0))
         {
             object? value = prop.GetValue (source);
             object? clonedValue = DeepCloneInternal (value, visited);
@@ -104,25 +112,32 @@ public static class DeepCloner
 
     private static bool IsSimpleType (Type type)
     {
-        if (type.IsPrimitive ||
-            type.IsEnum ||
-            type == typeof (decimal) ||
-            type == typeof (DateTime) ||
-            type == typeof (DateTimeOffset) ||
-            type == typeof (TimeSpan) ||
-            type == typeof (Guid) ||
-            type == typeof (Rune) ||
-            type == typeof (string))
+        if (type.IsPrimitive
+            || type.IsEnum
+            || type == typeof (decimal)
+            || type == typeof (DateTime)
+            || type == typeof (DateTimeOffset)
+            || type == typeof (TimeSpan)
+            || type == typeof (Guid)
+            || type == typeof (Rune)
+            || type == typeof (string))
         {
             return true;
         }
 
         // Treat structs with no writable public properties as simple types (immutable structs)
-        if (type.IsValueType) // Structs are value types
+        if (type.IsValueType)
         {
-            var writableProperties = type.GetProperties (BindingFlags.Instance | BindingFlags.Public)
-                                         .Where (p => p.CanRead && p.CanWrite && p.GetIndexParameters ().Length == 0);
+            IEnumerable<PropertyInfo> writableProperties = type.GetProperties (BindingFlags.Instance | BindingFlags.Public)
+                                                               .Where (p => p is { CanRead: true, CanWrite: true } && p.GetIndexParameters ().Length == 0);
+
             return !writableProperties.Any ();
+        }
+
+        // Treat PropertyInfo (e.g., RuntimePropertyInfo) as a simple type since it's metadata and shouldn't be cloned
+        if (typeof (PropertyInfo).IsAssignableFrom (type))
+        {
+            return true;
         }
 
         return false;
@@ -143,17 +158,17 @@ public static class DeepCloner
         }
 
         // Fallback to uninitialized object
-        return System.Runtime.Serialization.FormatterServices.GetUninitializedObject (type);
+        return FormatterServices.GetUninitializedObject (type);
     }
 
     private static object CloneArray (object source, ConcurrentDictionary<object, object> visited)
     {
-        Array array = (Array)source;
+        var array = (Array)source;
         Type elementType = array.GetType ().GetElementType ()!;
-        Array newArray = Array.CreateInstance (elementType, array.Length);
+        var newArray = Array.CreateInstance (elementType, array.Length);
         visited.TryAdd (source, newArray);
 
-        for (int i = 0; i < array.Length; i++)
+        for (var i = 0; i < array.Length; i++)
         {
             object? value = array.GetValue (i);
             object? clonedValue = DeepCloneInternal (value, visited);
@@ -172,6 +187,7 @@ public static class DeepCloner
         if (type.IsGenericType)
         {
             Type genericTypeDef = type.GetGenericTypeDefinition ();
+
             if (genericTypeDef.FullName != null && genericTypeDef.FullName.StartsWith ("System.Collections.Immutable"))
             {
                 throw new NotSupportedException ($"Cloning of immutable collections like {type.Name} is not supported.");
@@ -179,7 +195,10 @@ public static class DeepCloner
         }
 
         Type listType = typeof (List<>).MakeGenericType (elementType);
-        IList tempList = (IList)Activator.CreateInstance (listType)!;
+        var tempList = (IList)Activator.CreateInstance (listType)!;
+
+        // Add to visited before cloning contents to prevent circular reference issues
+        visited.TryAdd (source, tempList);
 
         foreach (object? item in (IEnumerable)source)
         {
@@ -188,24 +207,49 @@ public static class DeepCloner
         }
 
         // Try to create the original collection type if possible
-        if (type != listType && type.GetConstructor (new [] { listType }) != null)
+        if (type != listType && type.GetConstructor ([listType]) != null)
         {
             object result = Activator.CreateInstance (type, tempList)!;
-            visited.TryAdd (source, result);
+            visited [source] = result;
+
             return result;
         }
 
-        visited.TryAdd (source, tempList);
         return tempList;
     }
 
     private static object CloneDictionary (object source, ConcurrentDictionary<object, object> visited)
     {
-        IDictionary sourceDict = (IDictionary)source;
+        var sourceDict = (IDictionary)source;
         Type type = source.GetType ();
+
+        // Check for frozen or immutable dictionaries and throw if found
+        if (type.IsGenericType)
+        {
+            Type genericTypeDef = type.GetGenericTypeDefinition ();
+            Type? currentType = type;
+
+            while (currentType != null && currentType != typeof (object))
+            {
+                if (currentType.IsGenericType)
+                {
+                    genericTypeDef = currentType.GetGenericTypeDefinition ();
+
+                    if (genericTypeDef.FullName != null
+                        && (genericTypeDef.FullName.StartsWith ("System.Collections.Frozen")
+                            || genericTypeDef.FullName.StartsWith ("System.Collections.Immutable")))
+                    {
+                        throw new NotSupportedException ($"Cloning of frozen or immutable dictionaries like {type.Name} is not supported.");
+                    }
+                }
+
+                currentType = currentType.BaseType;
+            }
+        }
 
         Type [] genericArgs = type.GetGenericArguments ();
         Type dictType;
+
         if (genericArgs.Length == 2)
         {
             dictType = typeof (Dictionary<,>).MakeGenericType (genericArgs);
@@ -216,7 +260,7 @@ public static class DeepCloner
         }
 
         // Create a temporary dictionary to hold the cloned key-value pairs
-        IDictionary tempDict = (IDictionary)Activator.CreateInstance (dictType)!;
+        var tempDict = (IDictionary)Activator.CreateInstance (dictType)!;
 
         // Add to visited before cloning contents to prevent circular reference issues
         visited.TryAdd (source, tempDict);
@@ -229,45 +273,24 @@ public static class DeepCloner
             object? clonedValue = DeepCloneInternal (value, visited);
 
             // Handle duplicate keys by updating the value (last value wins, aligning with layering)
-            if (tempDict.Contains (clonedKey))
+            if (tempDict.Contains (clonedKey!))
             {
-                tempDict [clonedKey] = clonedValue;
+                tempDict [clonedKey!] = clonedValue;
             }
             else
             {
-                tempDict.Add (clonedKey, clonedValue);
+                tempDict.Add (clonedKey!, clonedValue);
             }
-        }
-
-        // Handle ImmutableDictionary specifically
-        if (type.IsGenericType && type.GetGenericTypeDefinition () == typeof (ImmutableDictionary<,>))
-        {
-            // Use ToImmutableDictionary to create a new instance with cloned key-value pairs
-            var keyValuePairType = typeof (KeyValuePair<,>).MakeGenericType (genericArgs);
-            var enumerableType = typeof (IEnumerable<>).MakeGenericType (keyValuePairType);
-            var toImmutableDictMethod = typeof (ImmutableDictionary)
-                                        .GetMethods ()
-                                        .Where (m => m.Name == "ToImmutableDictionary" && m.GetParameters ().Length == 3)
-                                        .First (m => m.GetParameters () [0].ParameterType == enumerableType)
-                                        .MakeGenericMethod (genericArgs [0], genericArgs [1]);
-
-            // Convert tempDict to an IEnumerable<KeyValuePair<TKey, TValue>>
-            var keyValueList = (IEnumerable)tempDict;
-
-            // Create the new ImmutableDictionary
-            object immutableDict = toImmutableDictMethod.Invoke (null, new object [] { keyValueList, null, null })!;
-
-            // Update visited to point to the final object
-            visited [source] = immutableDict;
-            return immutableDict;
         }
 
         // Try to create an instance of the original dictionary type if it has a parameterless constructor
         if (type.GetConstructor (Type.EmptyTypes) != null)
         {
-            IDictionary newDict = (IDictionary)Activator.CreateInstance (type)!;
+            var newDict = (IDictionary)Activator.CreateInstance (type)!;
+
             // Clear any pre-populated keys from the constructor
             newDict.Clear ();
+
             // Update visited to point to the final object
             visited [source] = newDict;
 
@@ -286,7 +309,7 @@ public static class DeepCloner
 
             // Clone any additional properties of the derived dictionary type
             foreach (PropertyInfo prop in type.GetProperties (BindingFlags.Instance | BindingFlags.Public)
-                                             .Where (p => p.CanRead && p.CanWrite && p.GetIndexParameters ().Length == 0))
+                                              .Where (p => p is { CanRead: true, CanWrite: true } && p.GetIndexParameters ().Length == 0))
             {
                 object? value = prop.GetValue (source);
                 object? clonedValue = DeepCloneInternal (value, visited);
