@@ -11,7 +11,7 @@ namespace Terminal.Gui;
 public enum ConfigLocations
 {
     /// <summary>
-    ///     Settings of the <see cref="SerializableConfigurationProperty"/> static properites when the module is
+    ///     Settings of the <see cref="ConfigurationPropertyAttribute"/> static properites when the module is
     ///     initiallly loaded.
     ///     <para>
     ///         When the module is initialized, the <see cref="ConfigurationManager"/> will retrieve the values of the
@@ -30,7 +30,7 @@ public enum ConfigLocations
     LibraryResources = 0b_0000_0001,
 
     /// <summary>
-    ///     App resources (e.g. <c>MyApp.Resources.config.json</c>). See <see cref="AppScope"/>.
+    ///     App resources (e.g. <c>MyApp.Resources.config.json</c>). See <see cref="AppSettingsScope"/>.
     /// </summary>
     AppResources = 0b_0000_0010,
 

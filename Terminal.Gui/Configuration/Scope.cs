@@ -36,7 +36,7 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
 
     /// <summary>
     ///     Retrieves the values of the properties of this scope from their corresponding static
-    ///     <see cref="SerializableConfigurationProperty"/> properties.
+    ///     <see cref="ConfigurationPropertyAttribute"/> properties.
     /// </summary>
     public void RetrieveValues ()
     {
@@ -70,7 +70,7 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
         return this;
     }
     /// <summary>
-    ///     Applies the values of the properties of this scope to their corresponding <see cref="SerializableConfigurationProperty"/> properties.
+    ///     Applies the values of the properties of this scope to their corresponding <see cref="ConfigurationPropertyAttribute"/> properties.
     /// </summary>
     /// <returns><see langword="true"/> if one or more property value was applied; <see langword="false"/> otherwise.</returns>
     internal bool Apply ()

@@ -22,7 +22,7 @@ public static class ThemeManager
     /// </summary>
     /// <exception cref="InvalidOperationException"></exception>
     [JsonConverter (typeof (DictionaryJsonConverter<ThemeScope>))]
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
+    [ConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
     public static Dictionary<string, ThemeScope>? Themes
     {
         get
@@ -111,7 +111,7 @@ public static class ThemeManager
     ///     The currently selected theme. The backing store is <c><see cref="ConfigurationManager.Settings"/> ["Theme"]</c>.
     /// </summary>
     [JsonInclude]
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
+    [ConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
     [JsonPropertyName ("Theme")]
     public static string Theme
     {
@@ -213,7 +213,7 @@ public static class ThemeManager
     }
 
     /// <summary>
-    ///    Resets <see cref="Themes"/> to the current values of the static <see cref="SerializableConfigurationProperty"/> properties.
+    ///    Resets <see cref="Themes"/> to the current values of the static <see cref="ConfigurationPropertyAttribute"/> properties.
     /// </summary>
     [RequiresUnreferencedCode ("Calls Terminal.Gui.ThemeManager.Themes")]
     [RequiresDynamicCode ("Calls Terminal.Gui.ThemeManager.Themes")]
@@ -237,7 +237,4 @@ public static class ThemeManager
         //Logging.Trace ($"Themes.OnThemeChanged({theme}) -> {Theme}");
         ThemeChanged?.Invoke (null, new ThemeManagerEventArgs (theme));
     }
-
-
-
 }

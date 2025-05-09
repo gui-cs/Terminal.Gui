@@ -14,7 +14,7 @@ public static partial class Application // Mouse handling
     public static Point? GetLastMousePosition () { return _lastMousePosition; }
 
     /// <summary>Disable or enable the mouse. The mouse is enabled by default.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool IsMouseDisabled { get; set; }
 
     /// <summary>The current <see cref="View"/> object that wants continuous mouse button pressed events.</summary>

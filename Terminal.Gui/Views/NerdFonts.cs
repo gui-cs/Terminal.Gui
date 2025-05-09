@@ -15,7 +15,7 @@ internal class NerdFonts
     ///     If <see langword="true"/>, enables the use of Nerd unicode symbols. This requires specific font(s) to be
     ///     installed on the users machine to work correctly.  Defaults to <see langword="false"/>.
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static bool Enable { get; set; } = false;
 
     /// <summary>Mapping of file extension to <see cref="Glyphs"/> name.</summary>

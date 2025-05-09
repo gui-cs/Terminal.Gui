@@ -6,14 +6,14 @@ using System.Text.Json.Serialization.Metadata;
 
 namespace Terminal.Gui.ConfigurationTests;
 
-public class SerializableConfigurationPropertyTests
+public class ConfigurationPropertyAttributeTests
 {
 
     /// <summary>
     ///     If this test fails, you need to add a new property to <see cref="SourceGenerationContext"/> to support serialization of the new property type.
     /// </summary>
     [Fact]
-    public void Test_SerializableConfigurationProperty_Types_Added_To_JsonSerializerContext ()
+    public void Verify_Types_Added_To_JsonSerializerContext ()
     {
         // The assembly containing the types to inspect
         var assembly = Assembly.GetAssembly (typeof (SourceGenerationContext));
@@ -21,12 +21,12 @@ public class SerializableConfigurationPropertyTests
         // Get all types from the assembly
         var types = assembly!.GetTypes ();
 
-        // Find all properties with the SerializableConfigurationProperty attribute
+        // Find all properties with the [ConfigurationProperty] attribute
         var properties = new List<PropertyInfo> ();
         foreach (var type in types)
         {
             properties.AddRange (type.GetProperties ().Where (p =>
-                p.GetCustomAttributes (typeof (SerializableConfigurationProperty), false).Any ()));
+                p.GetCustomAttributes (typeof (ConfigurationPropertyAttribute), false).Any ()));
         }
 
         // Get the types of the properties

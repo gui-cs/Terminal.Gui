@@ -550,7 +550,7 @@ public class ConfigurationManagerTests
                     Settings,
                     item => Assert.NotEmpty (
                                              item.Value.PropertyInfo!.CustomAttributes.Where (
-                                                                                              a => a.AttributeType == typeof (SerializableConfigurationProperty)
+                                                                                              a => a.AttributeType == typeof (ConfigurationPropertyAttribute)
                                                                                              )
                                             )
                    );
@@ -559,7 +559,7 @@ public class ConfigurationManagerTests
         Assert.Empty (
                       Settings.Where (
                                       cp => cp.Value.PropertyInfo!.GetCustomAttribute (
-                                                                                       typeof (SerializableConfigurationProperty)
+                                                                                       typeof (ConfigurationPropertyAttribute)
                                                                                       )
                                             == null
                                      )
@@ -586,7 +586,7 @@ public class ConfigurationManagerTests
 
         // Color.Schemes is serialized as "Schemes", not "Colors.Schemes"
         PropertyInfo pi = typeof (SchemeManager).GetProperty ("Schemes");
-        var scp = (SerializableConfigurationProperty)pi!.GetCustomAttribute (typeof (SerializableConfigurationProperty));
+        var scp = (ConfigurationPropertyAttribute)pi!.GetCustomAttribute (typeof (ConfigurationPropertyAttribute));
         Assert.True (scp!.Scope == typeof (ThemeScope));
         Assert.True (scp.OmitClassName);
 

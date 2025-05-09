@@ -1,21 +1,19 @@
 ﻿#nullable enable
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui;
 
 /// <summary>
 ///     Holds a property's value and the <see cref="PropertyInfo"/> that allows <see cref="ConfigurationManager"/> to
-///     get and set the property's value.
+///     retrieve and apply the property's value.
 /// </summary>
 /// <remarks>
-///     Configuration properties must be <see langword="public"/> and <see langword="static"/> and have the
-///     <see cref="SerializableConfigurationProperty"/> attribute. If the type of the property requires specialized JSON
+///     Configuration properties must be <see langword="public"/>/<see langword="internal"/> and <see langword="static"/> and have the
+///     <see cref="ConfigurationPropertyAttribute"/> attribute. If the type of the property requires specialized JSON
 ///     serialization, a <see cref="JsonConverter"/> must be provided using the <see cref="JsonConverterAttribute"/>
 ///     attribute.
 /// </remarks>
@@ -30,11 +28,6 @@ public class ConfigProperty
     ///     Holds the property's value as it was either read from the class's implementation or from a config file. If the
     ///     property has not been set (e.g. because no configuration file specified a value), <see cref="HasValue"/> will be <see langword="false"/>.
     /// </summary>
-    /// <remarks>
-    ///  // BUGBUG: This is not true. Has not been true for a long time???
-    ///     On <see langword="set"/>, performs a sparse-copy of the new value to the existing value (only copies elements
-    ///     of the object that are non-null).
-    /// </remarks>
     public object? PropertyValue
     {
         get => _propertyValue;
@@ -111,7 +104,7 @@ public class ConfigProperty
     }
 
     /// <summary>
-    ///     Retrieves (using reflection) the value of the static  <see cref="SerializableConfigurationProperty"/>
+    ///     Retrieves (using reflection) the value of the static  <see cref="ConfigurationPropertyAttribute"/>
     ///     property described in <see cref="PropertyInfo"/> into
     ///     <see cref="PropertyValue"/>.
     /// </summary>
@@ -157,7 +150,7 @@ public class ConfigProperty
         {
             PropertyValue = themeDest.Update (themeSource);
         }
-        else if (source is AppScope appSource && PropertyValue is AppScope appDest)
+        else if (source is AppSettingsScope appSource && PropertyValue is AppSettingsScope appDest)
         {
             PropertyValue = appDest.Update (appSource);
         }
@@ -170,16 +163,16 @@ public class ConfigProperty
         return PropertyValue;
     }
 
-
+    #region Initialization
 
     /// <summary>
-    ///     A cache of all classes that have properties decorated with the <see cref="SerializableConfigurationProperty"/>.
+    ///     INTERNAL: A cache of all classes that have properties decorated with the <see cref="ConfigurationPropertyAttribute"/>.
     /// </summary>
     /// <remarks>Is <see langword="null"/> until <see cref="Initialize"/> is called.</remarks>
     internal static ImmutableSortedDictionary<string, Type>? _classesWithConfigProps;
 
     /// <summary>
-    /// To be called from the <see cref="ModuleInitializers.InitializeConfigurationManager"/> method to initialize the
+    /// INTERNAL: Called from the <see cref="ModuleInitializers.InitializeConfigurationManager"/> method to initialize the
     /// _classesWithConfigProps dictionary.
     /// </summary>
     [RequiresUnreferencedCode ("AOT")]
@@ -195,7 +188,7 @@ public class ConfigProperty
         IEnumerable<Type> types = from assembly in AppDomain.CurrentDomain.GetAssemblies ()
                                   from type in assembly.GetTypes ()
                                   where type.GetProperties ()
-                                            .Any (prop => prop.GetCustomAttribute (typeof (SerializableConfigurationProperty)) != null)
+                                            .Any (prop => prop.GetCustomAttribute (typeof (ConfigurationPropertyAttribute)) != null)
                                   select type;
 
         foreach (Type classWithConfig in types)
@@ -206,9 +199,10 @@ public class ConfigProperty
         _classesWithConfigProps = dict.ToImmutableSortedDictionary ();
     }
 
+
     /// <summary>
-    /// Retrieves a dictionary of all properties annotated with <see cref="SerializableConfigurationProperty"/> from the classes in the module.
-    /// THe dictionary case-insensitive and sorted.
+    /// INTERNAL: Retrieves a dictionary of all properties annotated with <see cref="ConfigurationPropertyAttribute"/> from the classes in the module.
+    /// The dictionary case-insensitive and sorted.
     /// The <see cref="ConfigProperty"/> items have <see cref="PropertyInfo"/> set, but not <see cref="PropertyValue"/>. 
     /// <see cref="Immutable"/> is set to <see langword="true"/>.
     /// </summary>
@@ -226,13 +220,13 @@ public class ConfigProperty
                                            let props = c.Value.GetProperties (
                                                                               BindingFlags.Instance |
                                                                               BindingFlags.Static |
-                                                                              BindingFlags.NonPublic |
+                                                                              //BindingFlags.NonPublic |  // Private properties are NOT supported
                                                                               BindingFlags.Public)
-                                                        .Where (prop => prop.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is SerializableConfigurationProperty)
+                                                        .Where (prop => prop.GetCustomAttribute (typeof (ConfigurationPropertyAttribute)) is ConfigurationPropertyAttribute)
                                            from property in props
                                            select property)
         {
-            if (propertyInfo.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is not SerializableConfigurationProperty scp)
+            if (propertyInfo.GetCustomAttribute (typeof (ConfigurationPropertyAttribute)) is not ConfigurationPropertyAttribute scp)
             {
                 continue;
             }
@@ -241,7 +235,7 @@ public class ConfigProperty
             //if (!property.GetGetMethod (true)!.IsPublic)
             //{
             //    throw new InvalidOperationException (
-            //                                         $"Property {property.Name} in class {property.DeclaringType?.Name} is not public. SerializableConfigurationProperty properties must be public.");
+            //                                         $"Property {property.Name} in class {property.DeclaringType?.Name} is not public. ConfigurationProperty properties must be public.");
 
             //}
 
@@ -253,7 +247,7 @@ public class ConfigProperty
 
                 allConfigProperties.Add (key, new ConfigProperty
                 {
-                    // Set onlly PropertyInfo. Do not set PropertyValue (or HasValue will be set)
+                    // Set only PropertyInfo. Do not set PropertyValue (or HasValue will be set)
                     PropertyInfo = propertyInfo,
                     // By default, properties are immutable
                     Immutable = true
@@ -262,11 +256,14 @@ public class ConfigProperty
             else
             {
                 throw new InvalidOperationException (
-                                                     $"Property {propertyInfo.Name} in class {propertyInfo.DeclaringType?.Name} is not static. SerializableConfigurationProperty properties must be static.");
+                                                     $"Property {propertyInfo.Name} in class {propertyInfo.DeclaringType?.Name} is not static. [ConfigurationProperty] properties must be static.");
             }
         }
 
         // Sort the properties
         return allConfigProperties.ToImmutableSortedDictionary (StringComparer.InvariantCultureIgnoreCase);
     }
+
+    #endregion Initialization
+
 }

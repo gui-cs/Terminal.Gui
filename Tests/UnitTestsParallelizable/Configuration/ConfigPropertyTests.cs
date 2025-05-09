@@ -137,7 +137,7 @@ public class ConfigPropertyTests
         private static string _testStringProperty = "Default";
         public static int TestStringPropertySetCount { get; set; }
 
-        [SerializableConfigurationProperty]
+        [ConfigurationProperty]
         public static string TestStringProperty
         {
             get => _testStringProperty;
@@ -152,7 +152,7 @@ public class ConfigPropertyTests
 
         public static int TestKeyPropertySetCount { get; set; }
 
-        [SerializableConfigurationProperty]
+        [ConfigurationProperty]
         public static Key TestKeyProperty
         {
             get => _testKeyProperty;

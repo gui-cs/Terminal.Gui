@@ -186,10 +186,10 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                                                                        cp =>
                                                                            cp.Value.PropertyInfo?.GetCustomAttribute (
                                                                                     typeof (
-                                                                                        SerializableConfigurationProperty)
+                                                                                        ConfigurationPropertyAttribute)
                                                                                    )
                                                                                is
-                                                                               SerializableConfigurationProperty scp
+                                                                               ConfigurationPropertyAttribute scp
                                                                            && scp?.Scope == typeof (scopeT)
                                                                       )
                                                            where p.Value.PropertyValue != null

@@ -9,7 +9,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     private static Key _quitKey = Key.Esc; // Resources/config.json overrides
 
     /// <summary>Gets or sets the key to quit the application.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key QuitKey
     {
         get => _quitKey;
@@ -26,7 +26,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     private static Key _arrangeKey = Key.F5.WithCtrl; // Resources/config.json overrides
 
     /// <summary>Gets or sets the key to activate arranging views using the keyboard.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key ArrangeKey
     {
         get => _arrangeKey;

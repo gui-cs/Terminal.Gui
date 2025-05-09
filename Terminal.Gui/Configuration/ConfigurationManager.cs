@@ -38,15 +38,26 @@ namespace Terminal.Gui;
 ///     Settings are applied using the precedence defined in <see cref="ConfigLocations"/>.
 ///     </para>
 ///     <para>
-///     Configuration Management can be disabled by setting <see cref="ConfigurationManager.Locations"/>
-///     to <see cref="ConfigLocations.HardCoded"/>.
+///     Configuration Management is based on static properties decorated with the <see cref="ConfigurationPropertyAttribute"/>. Since these properties are static, changes to
+///     configuration settings are applied at the process level.
+///     </para>
+///     <para>
+///     Configuration Management is disabled by default and can be enabled by setting calling <see cref="ConfigurationManager.Enable"/>.
+///     </para>
+///     <para>
+///     See the UICatalog example for a complete example of how to use ConfigurationManager.
+///     See the Configuration Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/config.html"/>.
 ///     </para>
 /// </summary>
 [ComponentGuarantees (ComponentGuaranteesOptions.None)]
 public static class ConfigurationManager
 {
-    private static bool _initialized;
+    #region Initialization
 
+    // ConfigurationManager is initialized when the module is loaded, via ModuleInitializers.InitializeConfigurationManager
+    // Once initialized, the ConfigurationManager is never un-initialized.
+    // The _initialized field is set to true when the module is loaded and the ConfigurationManager is initialized.
+    private static bool _initialized;
     private static readonly object _initializedLock = new ();
 
     /// <summary>
@@ -62,7 +73,7 @@ public static class ConfigurationManager
     }
 
     /// <summary>
-    ///     A cache of all<see cref="SerializableConfigurationProperty"/> properties and their hard coded values.
+    ///     A cache of all<see cref="ConfigurationPropertyAttribute"/> properties and their hard coded values.
     /// </summary> 
     /// <remarks>Is <see langword="null"/> until <see cref="Initialize"/> is called.</remarks>
     internal static FrozenDictionary<string, ConfigProperty>? _hardCodedConfigPropertyCache;
@@ -79,7 +90,7 @@ public static class ConfigurationManager
 
     /// <summary>
     ///     An immutable cache of all <see cref="ConfigProperty"/>s in module decorated with the
-    ///     <see cref="SerializableConfigurationProperty"/> attribute. Bott the dictionary and the contained <see cref="ConfigProperty"/>s
+    ///     <see cref="ConfigurationPropertyAttribute"/> attribute. Bott the dictionary and the contained <see cref="ConfigProperty"/>s
     ///     are immutable.
     /// </summary>
     /// <remarks>Is <see langword="null"/> until <see cref="Initialize"/> is called.</remarks>
@@ -89,7 +100,7 @@ public static class ConfigurationManager
 
 
     /// <summary>
-    ///     Initializes the <see cref="ConfigurationManager"/>.
+    ///     INTERNAL: Initializes the <see cref="ConfigurationManager"/>.
     ///     This method is called when the module is loaded,
     ///     via <see cref="ModuleInitializers.InitializeConfigurationManager"/>.
     ///     For ConfigurationManager to access config resources, <see cref="IsEnabled"/> needs to be
@@ -139,6 +150,8 @@ public static class ConfigurationManager
         // Note, we do not set _settings, _appSettings, or _themeManager here. They get set in Load
 
     }
+
+    #endregion Initialization
 
     private static bool _enabled = false;
 
@@ -199,6 +212,7 @@ public static class ConfigurationManager
     internal static StringBuilder _jsonErrors = new ();
 
     // TODO: If Locations gets set to HardCoded, should we disable CM?
+    // TODO: Remove Locations in favor of a parameter to Load().
     /// <summary>
     ///     Gets and sets the locations where <see cref="ConfigurationManager"/> will look for config files. The default value
     ///     is
@@ -217,22 +231,22 @@ public static class ConfigurationManager
     /// <summary>
     ///     Since AppSettings is a dynamic property, we need to cache the value of the current appsettings for when CM is not enabled.
     /// </summary>
-    private static AppScope? _cachedAppSettings;
+    private static AppSettingsScope? _cachedAppSettings;
 
     private static readonly ReaderWriterLockSlim _cachedAppSettingsLock = new ();
 
-    /// <summary>Application-specific configuration settings (config properties with the <see cref="AppScope"/> scope.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
+    /// <summary>Application-specific configuration settings (config properties with the <see cref="AppSettingsScope"/> scope.</summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
     [JsonPropertyName ("AppSettings")]
-    public static AppScope? AppSettings
+    public static AppSettingsScope? AppSettings
     {
         get
         {
             if (!IsInitialized ())
             {
                 // We're being called from the module initializer.
-                // Hard coded default value is an empty AppScope
-                return _cachedAppSettings = new AppScope ();
+                // Hard coded default value is an empty AppSettingsScope
+                return _cachedAppSettings = new AppSettingsScope ();
             }
 
             if (!IsEnabled)
@@ -243,7 +257,7 @@ public static class ConfigurationManager
 
             if (Settings is { } && Settings.TryGetValue ("AppSettings", out ConfigProperty? appsettingsConfigProperty))
             {
-                return (appsettingsConfigProperty.PropertyValue as AppScope)!;
+                return (appsettingsConfigProperty.PropertyValue as AppSettingsScope)!;
             }
 
             throw new InvalidOperationException ("Settings is null.");
@@ -341,14 +355,14 @@ public static class ConfigurationManager
     ///     error on deserialization. If <see langword="false"/> (the default), the error is logged and printed to the console
     ///     when <see cref="Application.Shutdown"/> is called.
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool? ThrowOnJsonErrors { get; set; } = false;
 
     /// <summary>Event fired when an updated configuration has been applied to the application.</summary>
     public static event EventHandler<ConfigurationManagerEventArgs>? Applied;
 
     /// <summary>
-    ///     Applies the configuration settings to static <see cref="SerializableConfigurationProperty"/> properties.
+    ///     Applies the configuration settings to static <see cref="ConfigurationPropertyAttribute"/> properties.
     /// </summary>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
@@ -413,7 +427,7 @@ public static class ConfigurationManager
     /// <summary>
     ///     Loads all settings found in the configuration storage locations (<see cref="ConfigLocations"/>). Optionally, resets
     ///     all settings attributed with
-    ///     <see cref="SerializableConfigurationProperty"/> to the those loaded from <see cref="ConfigLocations.LibraryResources"/>, or if
+    ///     <see cref="ConfigurationPropertyAttribute"/> to the those loaded from <see cref="ConfigLocations.LibraryResources"/>, or if
     ///     a property is not found, to the value the static property was initialized with when the module loaded.
     /// </summary>
     /// <remarks>
@@ -644,7 +658,7 @@ public static class ConfigurationManager
 
     /// <summary>
     ///     Resets ConfigurationManager to the current values of the static properites attributed with
-    ///     <see cref="SerializableConfigurationProperty"/> in the Terminal.Gui library. Used in
+    ///     <see cref="ConfigurationPropertyAttribute"/> in the Terminal.Gui library. Used in
     ///     development of
     ///     the library to generate the default configuration file.
     /// </summary>
@@ -685,17 +699,23 @@ public static class ConfigurationManager
     ///     cache. They do not have values and have <see cref="ConfigProperty.Immutable"/> set.
     /// </summary>
     [RequiresUnreferencedCode ("AOT")]
-    internal static IEnumerable<KeyValuePair<string, ConfigProperty>>? GetConfigPropertiesByScope (Type scopeType)
+    public static IEnumerable<KeyValuePair<string, ConfigProperty>>? GetConfigPropertiesByScope (Type? scopeType)
     {
         if (_allConfigPropertiesCache is null)
         {
             throw new InvalidOperationException ("_allConfigPropertiesCache has not been set.");
         }
 
+        if (scopeType is null)
+        {
+            return _allConfigPropertiesCache;
+        }
+
         // Filter properties by scope
         IEnumerable<KeyValuePair<string, ConfigProperty>>? filtered = _allConfigPropertiesCache?.Where (
                                                                                                       cp =>
-                                                                                                          cp.Value.PropertyInfo?.GetCustomAttribute<SerializableConfigurationProperty> ()?.Scope == scopeType);
+                                                                                                          // TODO: Consider stashing the scope as a field in ConfigProperty to avoid reflection here
+                                                                                                          cp.Value.PropertyInfo?.GetCustomAttribute<ConfigurationPropertyAttribute> ()?.Scope == scopeType);
 
         Debug.Assert (filtered is { });
         return filtered;
@@ -720,7 +740,8 @@ public static class ConfigurationManager
         IEnumerable<KeyValuePair<string, ConfigProperty>>? scopedCache = cache?.Where (
                                                                                        cp =>
                                                                                        {
-                                                                                           var ret = cp.Value.PropertyInfo?.GetCustomAttribute<SerializableConfigurationProperty> ()?.Scope == scopeType;
+                                                                                           // TODO: Consider stashing the scope as a field in ConfigProperty to avoid reflection here
+                                                                                           var ret = cp.Value.PropertyInfo?.GetCustomAttribute<ConfigurationPropertyAttribute> ()?.Scope == scopeType;
 
                                                                                            return ret;
                                                                                        });
@@ -752,7 +773,7 @@ public static class ConfigurationManager
         {
             throw new InvalidOperationException ("GetHardCodedConfigPropertiesByScope returned null.");
         }
-        var settingsDict = settings.ToDictionary();
+        var settingsDict = settings.ToDictionary ();
 
         foreach (KeyValuePair<string, ConfigProperty> p in Settings!.Where (cp => cp.Value.PropertyInfo is { }))
         {

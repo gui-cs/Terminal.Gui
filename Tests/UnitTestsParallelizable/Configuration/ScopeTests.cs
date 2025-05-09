@@ -20,7 +20,7 @@ public class ScopeTests
     }
 
     // The property key will be "ScopeTests.ScopeTestProperty"
-    [SerializableConfigurationProperty (Scope = typeof (ScopeTestsScope))]
+    [ConfigurationProperty (Scope = typeof (ScopeTestsScope))]
     static public bool? ScopeTestProperty { get; set; } = true;
 
     public class ScopeTestsScope : Scope<ScopeTestsScope>

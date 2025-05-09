@@ -84,7 +84,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     ///         additional schemes. See <see cref="ThemeManager.Themes"/>.
     ///     </para>
     /// </remarks>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope), OmitClassName = true)]
+    [ConfigurationProperty (Scope = typeof (ThemeScope), OmitClassName = true)]
     [JsonConverter (typeof (DictionaryJsonConverter<Scheme?>))]
     [UsedImplicitly]
     public static Dictionary<string, Scheme?>? Schemes

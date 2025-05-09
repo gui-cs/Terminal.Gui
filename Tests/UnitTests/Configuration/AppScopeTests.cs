@@ -5,7 +5,7 @@ using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui.ConfigurationTests;
 
-public class AppScopeTests
+public class AppSettingsScopeTests
 {
     public static readonly JsonSerializerOptions _jsonOptions = new ()
     {
@@ -69,10 +69,10 @@ public class AppScopeTests
     {
         Reset ();
 
-        AppScope initial = AppSettings!;
+        AppSettingsScope initial = AppSettings!;
 
         string serialized = JsonSerializer.Serialize (AppSettings, _jsonOptions);
-        var deserialized = JsonSerializer.Deserialize<AppScope> (serialized, _jsonOptions);
+        var deserialized = JsonSerializer.Deserialize<AppSettingsScope> (serialized, _jsonOptions);
 
         Assert.NotEqual (initial, deserialized);
         Assert.Equal (deserialized!.Count, initial.Count);
@@ -80,16 +80,16 @@ public class AppScopeTests
 
     public class AppSettingsTestClass
     {
-        [SerializableConfigurationProperty (Scope = typeof (AppScope))]
+        [ConfigurationProperty (Scope = typeof (AppSettingsScope))]
         public static bool ValueProperty { get; set; }
 
-        [SerializableConfigurationProperty (Scope = typeof (AppScope))]
+        [ConfigurationProperty (Scope = typeof (AppSettingsScope))]
         public static bool? NullableValueProperty { get; set; }
 
-        [SerializableConfigurationProperty (Scope = typeof (AppScope))]
+        [ConfigurationProperty (Scope = typeof (AppSettingsScope))]
         public static string ReferenceProperty { get; set; } = "test";
 
-        [SerializableConfigurationProperty (Scope = typeof (AppScope))]
+        [ConfigurationProperty (Scope = typeof (AppSettingsScope))]
         public static string? NullableReferenceProperty { get; set; }
     }
 }
