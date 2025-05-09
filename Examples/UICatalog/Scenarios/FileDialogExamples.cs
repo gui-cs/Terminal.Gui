@@ -141,7 +141,7 @@ public class FileDialogExamples : Scenario
                             }
                             finally
                             {
-                                e.Cancel = true;
+                                e.Handled = true;
                             }
                         };
         win.Add (btn);
@@ -168,7 +168,15 @@ public class FileDialogExamples : Scenario
         var fd = new FileDialog
         {
             OpenMode = Enum.Parse<OpenMode> (
-                                             _rgOpenMode.RadioLabels.Select (l => TextFormatter.RemoveHotKeySpecifier(l, 0, _rgOpenMode.HotKeySpecifier)).ToArray() [_rgOpenMode.SelectedItem]
+                                             _rgOpenMode.RadioLabels
+                                                        .Select (l => TextFormatter.FindHotKey (l, _rgOpenMode.HotKeySpecifier, out int hotPos, out Key _)
+
+                                                                          // Remove the hotkey specifier at the found position
+                                                                          ? TextFormatter.RemoveHotKeySpecifier (l, hotPos, _rgOpenMode.HotKeySpecifier)
+
+                                                                          // No hotkey found, return the label as is
+                                                                          : l)
+                                                        .ToArray () [_rgOpenMode.SelectedItem]
                                             ),
             MustExist = _cbMustExist.CheckedState == CheckState.Checked,
             AllowsMultipleSelection = _cbAllowMultipleSelection.CheckedState == CheckState.Checked

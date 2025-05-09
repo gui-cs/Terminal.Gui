@@ -228,7 +228,7 @@ public class OptionSelector : View, IOrientation, IDesignable
         {
             if (RaiseSelecting (args.Context) is true)
             {
-                args.Cancel = true;
+                args.Handled = true;
 
                 return;
             }
@@ -236,7 +236,7 @@ public class OptionSelector : View, IOrientation, IDesignable
 
             if (RaiseAccepting (args.Context) is true)
             {
-                args.Cancel = true;
+                args.Handled = true;
             }
         };
 
