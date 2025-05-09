@@ -2,6 +2,8 @@ using System.IO.Abstractions;
 using System.Text.RegularExpressions;
 using Terminal.Gui.Resources;
 
+#nullable enable
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -1135,7 +1137,7 @@ public class FileDialog : Dialog, IDesignable
             }
             else if (setPathText)
             {
-                Path = newState.Directory.FullName;
+                SetPathToSelectedObject (newState.Directory);
             }
 
             State = newState;
@@ -1393,7 +1395,7 @@ public class FileDialog : Dialog, IDesignable
         {
             _pushingState = true;
 
-            Path = dest.FullName;
+            SetPathToSelectedObject (dest);
             State.Selected = stats;
             _tbPath.Autocomplete.ClearSuggestions ();
         }
@@ -1405,12 +1407,32 @@ public class FileDialog : Dialog, IDesignable
 
     private void TreeView_SelectionChanged (object sender, SelectionChangedEventArgs<IFileSystemInfo> e)
     {
-        if (e.NewValue is null)
+        SetPathToSelectedObject (e.NewValue);
+    }
+
+    private void SetPathToSelectedObject (IFileSystemInfo? selected)
+    {
+        if (selected is null)
         {
             return;
         }
 
-        Path = e.NewValue.FullName;
+        if (selected is IDirectoryInfo && Style.PreserveFilenameOnDirectoryChanges)
+        {
+            if (!string.IsNullOrWhiteSpace (Path) && !_fileSystem.Directory.Exists (Path))
+            {
+                var currentFile = _fileSystem.Path.GetFileName (Path);
+
+                if (!string.IsNullOrWhiteSpace (currentFile))
+                {
+                    Path = _fileSystem.Path.Combine (selected.FullName, currentFile);
+
+                    return;
+                }
+            }
+        }
+
+        Path = selected.FullName;
     }
 
     private bool TryAcceptMulti ()

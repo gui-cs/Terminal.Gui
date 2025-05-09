@@ -189,4 +189,174 @@ public class FileDialogFluentTests
                           .WriteOutLogs (_out)
                           .Stop ();
     }
+
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void SaveFileDialog_PopTree_AndNavigate_PreserveFilenameOnDirectoryChanges_True (V2TestDriver d)
+    {
+        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = false };
+        sd.Style.PreserveFilenameOnDirectoryChanges = true;
+
+        using var c = With.A (sd, 100, 20, d)
+                          .ScreenShot ("Save dialog", _out)
+                          .Then (() => Assert.True (sd.Canceled))
+                          .Focus<TextField> (_=>true)
+                          // Clear selection by pressing right in 'file path' text box
+                          .RaiseKeyDownEvent (Key.CursorRight)
+                          .AssertIsType <TextField>(sd.Focused)
+                          // Type a filename into the dialog
+                          .RaiseKeyDownEvent (Key.H)
+                          .RaiseKeyDownEvent (Key.E)
+                          .RaiseKeyDownEvent (Key.L)
+                          .RaiseKeyDownEvent (Key.L)
+                          .RaiseKeyDownEvent (Key.O)
+                          .WaitIteration ()
+                          .ScreenShot ("After typing filename 'hello'", _out)
+                          .AssertEndsWith ("hello", sd.Path)
+                          .LeftClick<Button> (b => b.Text == "►►")
+                          .ScreenShot ("After pop tree", _out)
+                          .Focus<TreeView<IFileSystemInfo>> (_ => true)
+                          .Right ()
+                          .ScreenShot ("After expand tree", _out)
+                          // Because of PreserveFilenameOnDirectoryChanges we should select the new dir but keep the filename
+                          .AssertEndsWith ("hello", sd.Path)
+                          .Down ()
+                          .ScreenShot ("After navigate down in tree", _out)
+                          // Because of PreserveFilenameOnDirectoryChanges we should select the new dir but keep the filename
+                          .AssertContains ("empty-dir",sd.Path)
+                          .AssertEndsWith ("hello", sd.Path)
+                          .Enter ()
+                          .WaitIteration ()
+                          .Then (() => Assert.False (sd.Canceled))
+                          .AssertContains ("empty-dir", sd.FileName)
+                          .WriteOutLogs (_out)
+                          .Stop ();
+    }
+
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void SaveFileDialog_PopTree_AndNavigate_PreserveFilenameOnDirectoryChanges_False (V2TestDriver d)
+    {
+        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = false };
+        sd.Style.PreserveFilenameOnDirectoryChanges = false;
+
+        using var c = With.A (sd, 100, 20, d)
+                          .ScreenShot ("Save dialog", _out)
+                          .Then (() => Assert.True (sd.Canceled))
+                          .Focus<TextField> (_ => true)
+                          // Clear selection by pressing right in 'file path' text box
+                          .RaiseKeyDownEvent (Key.CursorRight)
+                          .AssertIsType<TextField> (sd.Focused)
+                          // Type a filename into the dialog
+                          .RaiseKeyDownEvent (Key.H)
+                          .RaiseKeyDownEvent (Key.E)
+                          .RaiseKeyDownEvent (Key.L)
+                          .RaiseKeyDownEvent (Key.L)
+                          .RaiseKeyDownEvent (Key.O)
+                          .WaitIteration ()
+                          .ScreenShot ("After typing filename 'hello'", _out)
+                          .AssertEndsWith ("hello", sd.Path)
+                          .LeftClick<Button> (b => b.Text == "►►")
+                          .ScreenShot ("After pop tree", _out)
+                          .Focus<TreeView<IFileSystemInfo>> (_ => true)
+                          .Right ()
+                          .ScreenShot ("After expand tree", _out)
+                          .Down ()
+                          .ScreenShot ("After navigate down in tree", _out)
+                          // PreserveFilenameOnDirectoryChanges is false so just select new path
+                          .AssertEndsWith ("empty-dir", sd.Path)
+                          .AssertDoesNotContain ("hello", sd.Path)
+                          .Enter ()
+                          .WaitIteration ()
+                          .Then (() => Assert.False (sd.Canceled))
+                          .AssertContains ("empty-dir", sd.FileName)
+                          .WriteOutLogs (_out)
+                          .Stop ();
+    }
+
+    [Theory]
+    [ClassData (typeof (V2TestDrivers_WithTrueFalseParameter))]
+    public void SaveFileDialog_TableView_UpDown_PreserveFilenameOnDirectoryChanges_True (V2TestDriver d, bool preserve)
+    {
+        var sd = new SaveDialog (CreateExampleFileSystem ()) { Modal = false };
+        sd.Style.PreserveFilenameOnDirectoryChanges = preserve;
+
+        using var c = With.A (sd, 100, 20, d)
+                          .ScreenShot ("Save dialog", _out)
+                          .Then (() => Assert.True (sd.Canceled))
+                          .Focus<TextField> (_ => true)
+                          // Clear selection by pressing right in 'file path' text box
+                          .RaiseKeyDownEvent (Key.CursorRight)
+                          .AssertIsType<TextField> (sd.Focused)
+                          // Type a filename into the dialog
+                          .RaiseKeyDownEvent (Key.H)
+                          .RaiseKeyDownEvent (Key.E)
+                          .RaiseKeyDownEvent (Key.L)
+                          .RaiseKeyDownEvent (Key.L)
+                          .RaiseKeyDownEvent (Key.O)
+                          .WaitIteration ()
+                          .ScreenShot ("After typing filename 'hello'", _out)
+                          .AssertEndsWith ("hello", sd.Path)
+                          .Focus<TableView> (_ => true)
+                          .ScreenShot ("After focus table", _out)
+                          .Down ()
+                          .ScreenShot ("After down in table", _out);
+
+        if (preserve)
+        {
+            c.AssertContains ("logs", sd.Path)
+             .AssertEndsWith ("hello", sd.Path);
+        }
+        else
+        {
+            c.AssertContains ("logs", sd.Path)
+             .AssertDoesNotContain ("hello", sd.Path);
+        }
+
+        c.Up ()
+         .ScreenShot ("After up in table", _out);
+
+        if (preserve)
+        {
+            c.AssertContains ("empty-dir", sd.Path)
+             .AssertEndsWith ("hello", sd.Path);
+        }
+        else
+        {
+            c.AssertContains ("empty-dir", sd.Path)
+             .AssertDoesNotContain ("hello", sd.Path);
+        }
+
+        c.Enter ()
+         .ScreenShot ("After enter in table", _out); ;
+
+
+        if (preserve)
+        {
+            c.AssertContains ("empty-dir", sd.Path)
+             .AssertEndsWith ("hello", sd.Path);
+        }
+        else
+        {
+            c.AssertContains ("empty-dir", sd.Path)
+             .AssertDoesNotContain ("hello", sd.Path);
+        }
+
+        c.LeftClick<Button> (b => b.Text == "_Save");
+        c.AssertFalse (sd.Canceled);
+
+        if (preserve)
+        {
+            c.AssertContains ("empty-dir", sd.Path)
+             .AssertEndsWith ("hello", sd.Path);
+        }
+        else
+        {
+            c.AssertContains ("empty-dir", sd.Path)
+             .AssertDoesNotContain ("hello", sd.Path);
+        }
+
+        c.WriteOutLogs (_out)
+         .Stop ();
+    }
 }

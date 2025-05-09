@@ -16,6 +16,7 @@ public class FileDialogExamples : Scenario
     private CheckBox _cbAlwaysTableShowHeaders;
     private CheckBox _cbCaseSensitive;
     private CheckBox _cbDrivesOnlyInTree;
+    private CheckBox _cbPreserveFilenameOnDirectoryChanges;
     private CheckBox _cbFlipButtonOrder;
     private CheckBox _cbMustExist;
     private CheckBox _cbShowTreeBranchLines;
@@ -54,6 +55,9 @@ public class FileDialogExamples : Scenario
 
         _cbDrivesOnlyInTree = new CheckBox { CheckedState = CheckState.UnChecked, Y = y++, X = x, Text = "Only Show _Drives" };
         win.Add (_cbDrivesOnlyInTree);
+
+        _cbPreserveFilenameOnDirectoryChanges = new CheckBox { CheckedState = CheckState.UnChecked, Y = y++, X = x, Text = "Preserve Filename" };
+        win.Add (_cbPreserveFilenameOnDirectoryChanges);
 
         y = 0;
         x = 24;
@@ -197,6 +201,9 @@ public class FileDialogExamples : Scenario
         {
             fd.Style.TreeRootGetter = () => { return Environment.GetLogicalDrives ().ToDictionary (dirInfoFactory.New, k => k); };
         }
+
+        fd.Style.PreserveFilenameOnDirectoryChanges = _cbPreserveFilenameOnDirectoryChanges.CheckedState == CheckState.Checked;
+        
 
         if (_rgAllowedTypes.SelectedItem > 0)
         {
