@@ -16,7 +16,7 @@ public class SourcesManagerTests
         var location = ConfigLocations.AppCurrent;
 
         // Act
-        bool result = sourcesManager.Update (null, stream, source, location);
+        bool result = sourcesManager.Load (null, stream, source, location);
 
         // Assert
         Assert.False (result);
@@ -45,7 +45,7 @@ public class SourcesManagerTests
         stream.Position = 0;
 
         // Act
-        bool result = sourcesManager.Update (settingsScope, stream, source, location);
+        bool result = sourcesManager.Load (settingsScope, stream, source, location);
 
         // Assert
         // Assert
@@ -72,7 +72,7 @@ public class SourcesManagerTests
         var location = ConfigLocations.AppCurrent;
 
         // Act
-        bool result = sourcesManager.Update (settingsScope, stream, source, location);
+        bool result = sourcesManager.Load (settingsScope, stream, source, location);
 
         // Assert
         Assert.False (result);
@@ -95,7 +95,7 @@ public class SourcesManagerTests
         var location = ConfigLocations.AppCurrent;
 
         // Act
-        bool result = sourcesManager.Update (settingsScope, filePath, location);
+        bool result = sourcesManager.Load (settingsScope, filePath, location);
 
         // Assert
         Assert.True (result);
@@ -123,7 +123,7 @@ public class SourcesManagerTests
         try
         {
             // Act
-            bool result = sourcesManager.Update (settingsScope, source, location);
+            bool result = sourcesManager.Load (settingsScope, source, location);
 
             // Assert
             Assert.True (result);
@@ -155,7 +155,7 @@ public class SourcesManagerTests
             using FileStream fileStream = File.Open (filePath, FileMode.Open, FileAccess.Read, FileShare.None);
 
             // Act
-            bool result = sourcesManager.Update (settingsScope, filePath, location);
+            bool result = sourcesManager.Load (settingsScope, filePath, location);
 
             // Assert
             Assert.False (result);
@@ -182,8 +182,8 @@ public class SourcesManagerTests
         var location = ConfigLocations.AppCurrent;
 
         // Act
-        bool resultWithNull = sourcesManager.Update (settingsScope, json: null, source, location);
-        bool resultWithEmpty = sourcesManager.Update (settingsScope, string.Empty, source, location);
+        bool resultWithNull = sourcesManager.Load (settingsScope, json: null, source, location);
+        bool resultWithEmpty = sourcesManager.Load (settingsScope, string.Empty, source, location);
 
         // Assert
         Assert.False (resultWithNull);
@@ -207,7 +207,7 @@ public class SourcesManagerTests
         var location = ConfigLocations.HardCoded;
 
         // Act
-        bool result = sourcesManager.Update (settingsScope, json, source, location);
+        bool result = sourcesManager.Load (settingsScope, json, source, location);
 
         // Assert
         Assert.True (result);
@@ -231,7 +231,7 @@ public class SourcesManagerTests
         var location = ConfigLocations.AppResources;
 
         // Act
-        bool result = sourcesManager.UpdateFromResource (settingsScope, assembly, null, location);
+        bool result = sourcesManager.Load (settingsScope, assembly, null, location);
 
         // Assert
         Assert.False (result);
@@ -249,7 +249,7 @@ public class SourcesManagerTests
         var location = ConfigLocations.LibraryResources;
 
         // Act
-        bool result = sourcesManager.UpdateFromResource (settingsScope, assembly!, resourceName, location);
+        bool result = sourcesManager.Load (settingsScope, assembly!, resourceName, location);
 
         // Assert
         Assert.True (result);
@@ -319,11 +319,11 @@ public class SourcesManagerTests
 
         // Act - Update with first source for location
         var firstSource = "first.json";
-        sourcesManager.Update (settingsScope, """{"Application.QuitKey": "Ctrl+A"}""", firstSource, ConfigLocations.Runtime);
+        sourcesManager.Load (settingsScope, """{"Application.QuitKey": "Ctrl+A"}""", firstSource, ConfigLocations.Runtime);
 
         // Update with second source for same location
         var secondSource = "second.json";
-        sourcesManager.Update (settingsScope, """{"Application.QuitKey": "Ctrl+B"}""", secondSource, ConfigLocations.Runtime);
+        sourcesManager.Load (settingsScope, """{"Application.QuitKey": "Ctrl+B"}""", secondSource, ConfigLocations.Runtime);
 
         // Assert - Only the last source should be stored for the location
         Assert.Single (sourcesManager.Sources);
@@ -349,7 +349,7 @@ public class SourcesManagerTests
         foreach (var location in locations)
         {
             var source = $"config-{location}.json";
-            sourcesManager.Update (settingsScope, """{"Application.QuitKey": "Ctrl+Z"}""", source, location);
+            sourcesManager.Load (settingsScope, """{"Application.QuitKey": "Ctrl+Z"}""", source, location);
         }
 
         // Assert
@@ -373,7 +373,7 @@ public class SourcesManagerTests
         var location = ConfigLocations.LibraryResources;
 
         // Act
-        bool result = sourcesManager.UpdateFromResource (settingsScope, assembly!, resourceName, location);
+        bool result = sourcesManager.Load (settingsScope, assembly!, resourceName, location);
 
         // Assert
         Assert.True (result);
@@ -399,7 +399,7 @@ public class SourcesManagerTests
         // Act
         foreach (var pair in fileLocations)
         {
-            sourcesManager.Update (settingsScope, pair.Key, pair.Value);
+            sourcesManager.Load (settingsScope, pair.Key, pair.Value);
         }
 
         // Assert
@@ -421,12 +421,12 @@ public class SourcesManagerTests
         // First operation - file update
         var filePath = "testfile.json";
         var location1 = ConfigLocations.AppCurrent;
-        sourcesManager.Update (settingsScope, filePath, location1);
+        sourcesManager.Load (settingsScope, filePath, location1);
 
         // Second operation - json string update
         var jsonSource = "jsonstring";
         var location2 = ConfigLocations.Runtime;
-        sourcesManager.Update (settingsScope, """{"Application.QuitKey": "Ctrl+Z"}""", jsonSource, location2);
+        sourcesManager.Load (settingsScope, """{"Application.QuitKey": "Ctrl+Z"}""", jsonSource, location2);
 
         // Perform a stream operation
         var streamSource = "streamdata";
@@ -436,7 +436,7 @@ public class SourcesManagerTests
         writer.Write ("""{"Application.QuitKey": "Ctrl+Z"}""");
         writer.Flush ();
         stream.Position = 0;
-        sourcesManager.Update (settingsScope, stream, streamSource, location3);
+        sourcesManager.Load (settingsScope, stream, streamSource, location3);
 
         // Assert - all sources should be preserved
         Assert.Equal (3, sourcesManager.Sources.Count);
@@ -455,7 +455,7 @@ public class SourcesManagerTests
         // Add one successful source
         var validSource = "valid.json";
         var validLocation = ConfigLocations.Runtime;
-        sourcesManager.Update (settingsScope, """{"Application.QuitKey": "Ctrl+Z"}""", validSource, validLocation);
+        sourcesManager.Load (settingsScope, """{"Application.QuitKey": "Ctrl+Z"}""", validSource, validLocation);
 
         try
         {
@@ -469,7 +469,7 @@ public class SourcesManagerTests
 
             Assert.Throws<JsonException> (
                                           () =>
-                                              sourcesManager.Update (settingsScope, invalidJson, invalidSource, invalidLocation));
+                                              sourcesManager.Load (settingsScope, invalidJson, invalidSource, invalidLocation));
 
             // The valid source should still be there
             Assert.Single (sourcesManager.Sources);

@@ -34,12 +34,6 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
         return View.GetHardCodedSchemes ();
     }
 
-
-    /// <summary>
-    ///     Since Schemes is a dynamic property, we need to cache the value of the current schemes for when CM is not enabled.
-    /// </summary>
-    private static Dictionary<string, Scheme?>? _cachedSchemes;
-
     /// <summary>Gets a dictionary of defined <see cref="Scheme"/> objects.</summary>
     /// <remarks>
     ///     <para>
@@ -95,17 +89,10 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
             {
                 // We're being called from the module initializer.
                 // Hard coded default value
-                return _cachedSchemes = GetHardCodedSchemes ();
+                return GetHardCodedSchemes ();
             }
 
-            if (!IsEnabled)
-            {
-                // If CM is not enabled, return current value
-                return _cachedSchemes!;
-            }
-
-
-            return GetDefaultSchemes ();
+            return GetCurrentSchemes ();
         }
 
         private set
@@ -115,24 +102,12 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
                 throw new InvalidOperationException ("Schemes cannot be set before ConfigurationManager is initialized.");
             }
 
-            if (!IsEnabled)
-            {
-                _cachedSchemes = value;
-
-                return;
-            }
-
             Dictionary<string, Scheme?>? schemes = ThemeManager.Themes? ["Default"] ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
 
-            // Check if the theme is the same as the previous one
-            if (value != _cachedSchemes)
-            {
-                _cachedSchemes = value;
-                // Update the backing store
-                ThemeManager.Themes! ["Default"] ["Schemes"].PropertyValue = value;
+            // Update the backing store
+            ThemeManager.Themes! ["Default"] ["Schemes"].PropertyValue = value;
 
-                //Instance.OnThemeChanged (prevousValue);
-            }
+            //Instance.OnThemeChanged (prevousValue);
         }
     }
 
@@ -179,32 +154,13 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
 
     public static Dictionary<string, Scheme?>? GetCurrentSchemes ()
     {
-        Debug.Assert(IsInitialized());
+        Debug.Assert (IsInitialized ());
 
         Debug.Assert (ThemeManager.Themes!.TryGetValue ("Default", out _));
 
         Dictionary<string, Scheme?>? schemes = ThemeManager.Themes [ThemeManager.Theme] ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
 
         return schemes;
-    }
-
-    /// <summary>
-    ///     Helper to get the default schemes from the default theme loaded from configuration.
-    /// </summary>
-    /// <returns></returns>
-    [RequiresDynamicCode ("AOT")]
-
-    public static Dictionary<string, Scheme?>? GetDefaultSchemes ()
-    {
-        Dictionary<string, Scheme?>? schemes = new (StringComparer.InvariantCultureIgnoreCase) { };
-
-        if (ThemeManager.Themes is { })
-        {
-            return ThemeManager.Themes ["Default"] ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
-        }
-
-        throw new InvalidOperationException ("???");
-
     }
 
     /// <inheritdoc />

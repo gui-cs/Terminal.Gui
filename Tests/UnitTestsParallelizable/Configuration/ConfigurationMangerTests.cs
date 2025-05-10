@@ -18,7 +18,7 @@ public class ConfigurationManagerTests
     [Fact]
     public void GetConfigPropertiesByScope_Gets ()
     {
-        var props = ConfigurationManager.GetConfigPropertiesByScope (typeof (CMTestsScope));
+        var props = ConfigurationManager.GetConfigPropertiesByScope ("CMTestsScope");
 
         Assert.NotNull (props);
         Assert.NotEmpty (props);

@@ -17,7 +17,7 @@ public class AppSettingsScopeTests
     };
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
+    [AutoInitShutdown]
     public void Apply_ShouldApplyUpdatedProperties ()
     {
         Reset ();
@@ -53,12 +53,12 @@ public class AppSettingsScopeTests
         AppSettingsTestClass.NullableValueProperty = null;
         Assert.Null (AppSettingsTestClass.NullableValueProperty);
 
-        ResetToCurrentValues ();
+        Reset ();
         Apply ();
         Assert.Null (AppSettingsTestClass.NullableValueProperty);
 
         AppSettingsTestClass.NullableValueProperty = true;
-        ResetToCurrentValues ();
+        Reset ();
         Assert.NotNull (AppSettingsTestClass.NullableValueProperty);
         Apply ();
         Assert.NotNull (AppSettingsTestClass.NullableValueProperty);

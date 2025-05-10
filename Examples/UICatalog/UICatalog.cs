@@ -320,7 +320,7 @@ public class UICatalog
             return;
         }
 
-        Load (reset: false);
+        Load (ConfigLocations.All);
         Apply ();
     }
 

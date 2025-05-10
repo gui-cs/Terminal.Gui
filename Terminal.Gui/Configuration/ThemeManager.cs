@@ -31,37 +31,18 @@ public static class ThemeManager
             {
                 // We're being called from the module initializer.
                 // We need to provide a dictionary of themes containing the hard-coded theme.
-                ThemeScope? hardCodedThemeScope = GetHardCodedThemeScope ();
-                if (hardCodedThemeScope is null)
-                {
-                    throw new InvalidOperationException ("Hard coded theme scope is null.");
-                }
-
-                Dictionary<string, ThemeScope> hardCodedThemes = new (StringComparer.InvariantCultureIgnoreCase)
-                {
-                    { Theme, hardCodedThemeScope }
-                };
-                return hardCodedThemes;
-            }
-
-            if (!IsEnabled)
-            {
-                // If CM is not enabled, return current value
-                ThemeScope? currentThemeScope = new ThemeScope ();
-                currentThemeScope.RetrieveValues ();
-
-                Dictionary<string, ThemeScope> currentThemes = new (StringComparer.InvariantCultureIgnoreCase)
-                {
-                    { Theme, currentThemeScope }
-                };
-                return currentThemes;
+                return HardCodedThemes ();
             }
 
             if (Settings is { })
             {
                 if (Settings.TryGetValue ("Themes", out ConfigProperty? themes))
                 {
-                    return themes.PropertyValue as Dictionary<string, ThemeScope>;
+                    if (themes.HasValue)
+                    {
+                        return themes.PropertyValue as Dictionary<string, ThemeScope>;
+                    }
+                    return HardCodedThemes ();
                 }
 
                 throw new InvalidOperationException ("Settings has no Themes property.");
@@ -79,13 +60,28 @@ public static class ThemeManager
         }
     }
 
+    private static Dictionary<string, ThemeScope>? HardCodedThemes ()
+    {
+        ThemeScope? hardCodedThemeScope = GetHardCodedThemeScope ();
+        if (hardCodedThemeScope is null)
+        {
+            throw new InvalidOperationException ("Hard coded theme scope is null.");
+        }
+
+        Dictionary<string, ThemeScope> hardCodedThemes = new (StringComparer.InvariantCultureIgnoreCase)
+        {
+            { DEFAULT_THEME_NAME, hardCodedThemeScope }
+        };
+        return hardCodedThemes;
+    }
+
     /// <summary>
     ///     Returns a dictionary of hard-coded ThemeScope properties.
     /// </summary>
     /// <returns></returns>
     private static ThemeScope? GetHardCodedThemeScope ()
     {
-        IEnumerable<KeyValuePair<string, ConfigProperty>>? hardCodedThemeProperties = GetHardCodedConfigPropertiesByScope (typeof (ThemeScope));
+        IEnumerable<KeyValuePair<string, ConfigProperty>>? hardCodedThemeProperties = GetHardCodedConfigPropertiesByScope ("ThemeScope");
 
         if (hardCodedThemeProperties is null)
         {
@@ -105,7 +101,7 @@ public static class ThemeManager
     /// <summary>
     ///     Since Theme is a dynamic property, we need to cache the value of the selected theme for when CM is not enabled.
     /// </summary>
-    private static string? _cachedThemeName;
+    private const string DEFAULT_THEME_NAME = "Default";
 
     /// <summary>
     ///     The currently selected theme. The backing store is <c><see cref="ConfigurationManager.Settings"/> ["Theme"]</c>.
@@ -121,18 +117,17 @@ public static class ThemeManager
             {
                 // We're being called from the module initializer.
                 // Hard coded default value
-                return _cachedThemeName = "Default";
-            }
-
-            if (!IsEnabled)
-            {
-                // If CM is not enabled, return current value
-                return _cachedThemeName!;
+                return DEFAULT_THEME_NAME;
             }
 
             if (Settings is { } && Settings.TryGetValue ("Theme", out ConfigProperty? themeCp))
             {
-                return (themeCp.PropertyValue as string)!;
+                if (themeCp.HasValue)
+                {
+                    return (themeCp.PropertyValue as string)!;
+                }
+
+                return DEFAULT_THEME_NAME;
             }
             throw new InvalidOperationException ("Settings is null.");
         }
@@ -146,19 +141,12 @@ public static class ThemeManager
                 throw new InvalidOperationException ("Theme cannot be set before ConfigurationManager is initialized.");
             }
 
-            if (!IsEnabled)
-            {
-                _cachedThemeName = value;
-
-                return;
-            }
-
             if (Settings is null || !Settings.TryGetValue ("Theme", out ConfigProperty? themeCp))
             {
                 throw new InvalidOperationException ("Settings is null.");
             }
 
-            if (themeCp is null || !themeCp.HasValue || themeCp.PropertyValue is null)
+            if (themeCp is null || !themeCp.HasValue)
             {
                 throw new InvalidOperationException ("Theme has no value.");
             }
@@ -168,24 +156,10 @@ public static class ThemeManager
                 throw new InvalidOperationException ("Settings has no Themes property.");
             }
 
-            if (themeCp.PropertyValue is not string { } selectedThemeName)
-            {
-                throw new InvalidOperationException ("Theme property is not a string.");
-            }
+            // Update the backing store
+            Settings! ["Theme"].PropertyValue = value;
 
-            if (themesCp.PropertyValue is not Dictionary<string, ThemeScope> themes || !themes.TryGetValue (selectedThemeName, out _))
-            {
-                throw new InvalidOperationException ($"Theme '{selectedThemeName}' not found in themes dictionary.");
-            }
-
-            // Check if the theme is the same as the previous one
-            if (value != _cachedThemeName)
-            {
-                // Update the backing store
-                Settings! ["Theme"].PropertyValue = value;
-
-                //Instance.OnThemeChanged (prevousThemeValue);
-            }
+            //Instance.OnThemeChanged (prevousThemeValue);
         }
     }
 
@@ -194,41 +168,45 @@ public static class ThemeManager
 
 
     /// <summary>
-    ///    Resets the <see cref="Themes"/> dictionary to the empty values and sets <see cref="Theme"/> to "Default".
-    /// </summary>
-    internal static void Reset ()
-    {
-        //Logging.Debug ("");
-        if (!IsEnabled)
-        {
-            //return;
-        }
-
-        // TODO: Fix
-
-        //Themes = new Dictionary<string, ThemeScope> (StringComparer.InvariantCultureIgnoreCase);
-
-        //Themes?.Add ("Default", new ThemeScope ());
-        //Theme = "Default";
-    }
-
-    /// <summary>
-    ///    Resets <see cref="Themes"/> to the current values of the static <see cref="ConfigurationPropertyAttribute"/> properties.
+    ///   INTERNAL: Updates <see cref="Themes"/> to the current values of the static <see cref="ConfigurationPropertyAttribute"/> properties.
     /// </summary>
     [RequiresUnreferencedCode ("Calls Terminal.Gui.ThemeManager.Themes")]
     [RequiresDynamicCode ("Calls Terminal.Gui.ThemeManager.Themes")]
-    internal static void ResetToCurrentValues ()
+    internal static void UpdateToCurrentValues ()
     {
-        //Logging.Debug ("");
-        if (!IsEnabled)
+        Themes! [Theme].UpdateToCurrentValues ();
+    }
+
+
+    /// <summary>
+    ///     INTERNAL: Resets all themes to the values the <see cref="ConfigurationPropertyAttribute"/> properties contained
+    ///     when the module was initialized.
+    /// </summary>
+    internal static void UpdateToHardCodedDefaults ()
+    {
+        if (!IsInitialized ())
         {
-           // return;
+            throw new InvalidOperationException ("ThemeManager is not initialized.");
         }
 
-        Reset ();
+        if (Settings is null)
+        {
+            return;
+        }
 
-        // TODO: Fix
-        //Themes! [Theme].RetrieveValues ();
+        ThemeScope? hardCodedThemeScope = GetHardCodedThemeScope ();
+        if (hardCodedThemeScope is null)
+        {
+            throw new InvalidOperationException ("Hard coded theme scope is null.");
+        }
+
+        Dictionary<string, ThemeScope> hardCodedThemes = new (StringComparer.InvariantCultureIgnoreCase)
+        {
+            { Theme, hardCodedThemeScope }
+        };
+
+        Settings ["Themes"].PropertyValue = hardCodedThemes;
+        Settings ["Theme"].PropertyValue = "Default";
     }
 
     /// <summary>Called when the selected theme has changed. Fires the <see cref="ThemeChanged"/> event.</summary>
@@ -237,4 +215,5 @@ public static class ThemeManager
         //Logging.Trace ($"Themes.OnThemeChanged({theme}) -> {Theme}");
         ThemeChanged?.Invoke (null, new ThemeManagerEventArgs (theme));
     }
+
 }

@@ -4,7 +4,6 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
@@ -38,8 +37,9 @@ public static class DeepCloner
     /// <typeparam name="T">The type of the object to clone.</typeparam>
     /// <param name="source">The object to clone.</param>
     /// <returns>A deep copy of the source object, or default if source is null.</returns>
-    [RequiresUnreferencedCode ("Deep cloning uses reflection which may be incompatible with AOT compilation")]
-    [RequiresDynamicCode ("Deep cloning uses reflection that requires runtime code generation")]
+    [RequiresUnreferencedCode ("Deep cloning may use reflection which might be incompatible with AOT compilation if types aren't registered in SourceGenerationContext")]
+    [RequiresDynamicCode ("Deep cloning may use reflection that requires runtime code generation if source generation fails")]
+
     public static T? DeepClone<T> (T? source)
     {
         if (source is null)
@@ -47,14 +47,22 @@ public static class DeepCloner
             return default (T?);
         }
 
-        // For AOT environments, try using source generation first
-        if (IsAotEnvironment () && TryUseSourceGeneratedCloner<T> (source, out T? result))
+        // For AOT environments, use source generation exclusively
+        if (IsAotEnvironment ())
         {
-            return result;
+            if (TryUseSourceGeneratedCloner<T> (source, out T? result))
+            {
+                return result;
+            }
+
+            // If in AOT but source generation failed, throw an exception
+            // instead of silently falling back to reflection
+            throw new InvalidOperationException (
+                                                 $"Type {typeof (T).FullName} is not properly registered in SourceGenerationContext " +
+                                                 $"for AOT-compatible cloning.");
         }
 
-        // Fall back to reflection-based approach
-
+        // Use reflection-based approach, which should have better performance in non-AOT environments
         ConcurrentDictionary<object, object> visited = new (ReferenceEqualityComparer.Instance);
 
         return (T?)DeepCloneInternal (source, visited);

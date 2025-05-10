@@ -6,7 +6,8 @@ Terminal.Gui provides persistent configuration settings via the [`ConfigurationM
 
 The following terms are used for Configuration Management:
 
-- `Load` - Load the configuration from the given location. Loading does not apply the settings to the application; that happens when the `Apply` method is called.
+- `Load` - Load configuration from the given location(s), updating the configuration with any new values. Loading does not apply the settings to the application; that happens when the `Apply` method is called.
+- `Reset` - Reset the configuration to either the current values or the hard-coded defaults. Resetting does not load the configuration; it only resets the configuration to the default values.
 - `Apply` - Apply the configuration to the application; this means the settings are copied from the configuration properties to the corresponding `static` `[ConfigurationProperty]` properties.
 - `Setting` - A setting is a property that is part of a configuration.
 - `Theme` - A theme is a named collection of settings that impact the visual style of Terminal.Gui applications.
@@ -35,7 +36,7 @@ The `ConfigurationManager` class is disabled by default. To enable it, call @Ter
 ConfigurationManager.Enable();
 ```
 
-If `ConfigurationManager.Enable()` is not called, then all configuration settings are ignored and ConfigurationManager will effectively be a no-op. All `[ConfigurationProperty]` properties will initially be their hard-coded default values. Calling @Terminal.Gui.ConfigurationManager.Reset will reset all configuration properties back to their hard-coded default values.
+If `ConfigurationManager.Enable()` is not called (`ConfigurationManager.IsEnabled` is 'false'), all configuration settings are ignored and ConfigurationManager will effectively be a no-op. All `[ConfigurationProperty]` properties will initially be their hard-coded default values. Calling @Terminal.Gui.ConfigurationManager.Reset will reset all configuration properties back to their hard-coded default values.
 
 Other than that, no other ConfigurationManager APIs will have any effect.
 

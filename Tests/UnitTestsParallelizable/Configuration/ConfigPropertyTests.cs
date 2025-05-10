@@ -61,7 +61,7 @@ public class ConfigPropertyTests
         };
 
         // Act
-        var value = configProperty.RetrieveValue ();
+        var value = configProperty.UpdateToCurrentValue ();
 
         // Assert
         Assert.Equal ("CurrentValue", value);
@@ -69,7 +69,7 @@ public class ConfigPropertyTests
     }
 
     [Fact]
-    public void UpdateValueFrom_Updates_String_Property_Value ()
+    public void DeepCloneFrom_Updates_String_Property_Value ()
     {
         // Arrange
         TestConfiguration.Reset ();
@@ -81,7 +81,7 @@ public class ConfigPropertyTests
         };
 
         // Act
-        var updatedValue = configProperty.UpdateValueFrom ("NewValue");
+        var updatedValue = configProperty.DeepCloneFrom ("NewValue");
 
         // Assert
         Assert.Equal (0, TestConfiguration.TestStringPropertySetCount);

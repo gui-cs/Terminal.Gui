@@ -1,30 +1,30 @@
 ﻿#nullable enable
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json;
-using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui.Configuration;
 
 /// <summary>
-///     Encapsulates the logic for reading and writing <see cref="SettingsScope"/> objects to configuration sources
+///    Manages the <see cref="ConfigurationManager"/> Sources and provides the API for loading them. Source is a location where a configuration can be stored. Sources are defined in <see cref="ConfigLocations"/>.
 /// </summary>
 public class SourcesManager
 {
-    /// <summary>The list of paths to the configuration files.</summary>
+    /// <summary>
+    ///     Provides a map from each of the <see cref="ConfigLocations"/> to file system and resource paths that have been loaded by <see cref="ConfigurationManager"/>.
+    /// </summary>
     public Dictionary<ConfigLocations, string> Sources { get; } = new ();
 
-    /// <summary>Updates the <see cref="SettingsScope"/> with the settings in a JSON string.</summary>
-    /// <param name="settingsScope">The Settings Scope object ot update.</param>
+    /// <summary>INTERNAL: Loads <paramref name="stream"/> into the specified <see cref="SettingsScope"/>.</summary>
+    /// <param name="settingsScope">The Settings Scope object that <paramref name="stream"/> will be loaded into.</param>
     /// <param name="stream">Json document to update the settings with.</param>
     /// <param name="source">The source (filename/resource name) the Json document was read from.</param>
-    /// <param name="location">The Config Location correspondig to <paramref name="source"/></param>
-    /// <returns><see langword="true"/> if the source was updated.</returns>
+    /// <param name="location">The Config Location corresponding to <paramref name="source"/></param>
+    /// <returns><see langword="true"/> if the settingsScope was updated.</returns>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public bool Update (SettingsScope? settingsScope, Stream stream, string source, ConfigLocations location)
+    internal bool Load (SettingsScope? settingsScope, Stream stream, string source, ConfigLocations location)
     {
         if (settingsScope is null)
         {
@@ -39,7 +39,7 @@ public class SourcesManager
             stream.Position = 0;
             Debug.Assert (json != null, "json != null");
 #endif
-            settingsScope.Update ((SettingsScope)JsonSerializer.Deserialize (stream, typeof (SettingsScope), SerializerContext.Options)!);
+            settingsScope.DeepCloneFrom ((SettingsScope)JsonSerializer.Deserialize (stream, typeof (SettingsScope), SerializerContext.Options)!);
             CM.OnUpdated ();
 
             AddSource (location, source);
@@ -69,14 +69,15 @@ public class SourcesManager
         }
     }
 
-    /// <summary>Updates the <see cref="SettingsScope"/> with the settings in a JSON file.</summary>
-    /// <param name="settingsScope">The Settings Scope object ot update.</param>
-    /// <param name="filePath">The source (filename/resource name) the Json document was read from.</param>
-    /// <param name="location">The Config Location correspondig to <paramref name="filePath"/></param>
-    /// <returns><see langword="true"/> if the source was updated.</returns>
+
+    /// <summary>INTERNAL: Loads the `config.json` file a <paramref name="filePath"/> into the specified <see cref="SettingsScope"/>.</summary>
+    /// <param name="settingsScope">The Settings Scope object that <paramref name="filePath"/> will be loaded into.</param>
+    /// <param name="filePath">Json document to update the settings with.</param>
+    /// <param name="location">The Config Location corresponding to <paramref name="filePath"/></param>
+    /// <returns><see langword="true"/> if the settingsScope was updated.</returns>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public bool Update (SettingsScope? settingsScope, string filePath, ConfigLocations location)
+    internal bool Load (SettingsScope? settingsScope, string filePath, ConfigLocations location)
     {
         string realPath = filePath.Replace ("~", Environment.GetFolderPath (Environment.SpecialFolder.UserProfile));
 
@@ -99,7 +100,7 @@ public class SourcesManager
             {
                 FileStream? stream = File.OpenRead (realPath);
 
-                bool ret = Update (settingsScope, stream, filePath, location);
+                bool ret = Load (settingsScope, stream, filePath, location);
                 stream.Close ();
                 stream.Dispose ();
 
@@ -116,15 +117,15 @@ public class SourcesManager
         return false;
     }
 
-    /// <summary>Updates the <see cref="SettingsScope"/> with the settings in a JSON string.</summary>
-    /// <param name="settingsScope">The Settings Scope object ot update.</param>
+    /// <summary>INTERNAL: Loads the Json document in <paramref name="json"/> into the specified <see cref="SettingsScope"/>.</summary>
+    /// <param name="settingsScope">The Settings Scope object that <paramref name="json"/> will be loaded into.</param>
     /// <param name="json">Json document to update the settings with.</param>
     /// <param name="source">The source (filename/resource name) the Json document was read from.</param>
-    /// <param name="location">The location.</param>
-    /// <returns><see langword="true"/> if the source was updated.</returns>
+    /// <param name="location">The Config Location corresponding to <paramref name="json"/></param>
+    /// <returns><see langword="true"/> if the settingsScope was updated.</returns>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public bool Update (SettingsScope? settingsScope, string? json, string source, ConfigLocations location)
+    internal bool Load (SettingsScope? settingsScope, string? json, string source, ConfigLocations location)
     {
         Debug.Assert(location != ConfigLocations.All);
         if (string.IsNullOrEmpty (json))
@@ -137,18 +138,18 @@ public class SourcesManager
         writer.Flush ();
         stream.Position = 0;
 
-        return Update (settingsScope, stream, source, location);
+        return Load (settingsScope, stream, source, location);
     }
 
-    /// <summary>Updates the <see cref="SettingsScope"/> with the settings from a Json resource.</summary>
-    /// <param name="settingsScope">The Settings Scope object ot update.</param>
-    /// <param name="assembly">The assembly to get the config resource from.</param>
-    /// <param name="resourceName">The name of the Resources in the assembly containing the Json document.</param>
-    /// <param name="location">The location.</param>
-    /// <returns><see langword="true"/> if the source was updated.</returns>
+    /// <summary>INTERNAL: Loads the Json document from the resource named <see cref="resourceName"/> from <paramref name="assembly"/> into the specified <see cref="SettingsScope"/>.</summary>
+    /// <param name="settingsScope">The Settings Scope object that <paramref name="resourceName"/> will be loaded into.</param>
+    /// <param name="assembly">The assembly containing the resource.</param>
+    /// <param name="resourceName">The name of the resource containing the Json document was read from.</param>
+    /// <param name="location">The Config Location corresponding to <paramref name="resourceName"/></param>
+    /// <returns><see langword="true"/> if the settingsScope was updated.</returns>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public bool UpdateFromResource (SettingsScope? settingsScope, Assembly assembly, string resourceName, ConfigLocations location)
+    internal bool Load (SettingsScope? settingsScope, Assembly assembly, string resourceName, ConfigLocations location)
     {
         if (string.IsNullOrEmpty (resourceName))
         {
@@ -164,12 +165,14 @@ public class SourcesManager
             return false;
         }
 
-        return Update (settingsScope, stream, $"resource://[{assembly.GetName ().Name}]/{resourceName}", location);
+        return Load (settingsScope, stream, $"resource://[{assembly.GetName ().Name}]/{resourceName}", location);
     }
 
 
-    /// <summary>Creates a JSON document with the configuration specified.</summary>
-    /// <returns></returns>
+    /// <summary>
+    ///     INTERNAL: Returns a JSON document with the configuration specified.
+    /// </summary>
+    /// <param name="scope"></param>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     internal string ToJson (SettingsScope? scope)
@@ -178,6 +181,10 @@ public class SourcesManager
         return JsonSerializer.Serialize (scope, typeof (SettingsScope), SerializerContext);
     }
 
+    /// <summary>
+    ///     INTERNAL: Returns a stream with the configuration specified.
+    /// </summary>
+    /// <param name="scope"></param>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     internal Stream ToStream (SettingsScope? scope)
@@ -193,6 +200,5 @@ public class SourcesManager
 
         return stream;
     }
-
 }
 

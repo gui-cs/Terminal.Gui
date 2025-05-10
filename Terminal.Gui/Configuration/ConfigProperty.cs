@@ -19,8 +19,14 @@ namespace Terminal.Gui;
 /// </remarks>
 public class ConfigProperty
 {
-    /// <summary>Describes the property.</summary>
-    public PropertyInfo? PropertyInfo { get; set; }
+    /// <summary>INTERNAL: Describes the property.</summary>
+    internal PropertyInfo? PropertyInfo { get; set; }
+
+    /// <summary>INTERNAL: Cached value of ConfigurationPropertyAttribute.OmitClassName; makes more AOT friendly.</summary>
+    internal bool OmitClassName { get; set; }
+
+    /// <summary>INTERNAL: Cached value of ConfigurationPropertyAttribute.Scope; makes more AOT friendly.</summary>
+    internal string? ScopeType { get; set; }
 
     private object? _propertyValue;
 
@@ -48,12 +54,14 @@ public class ConfigProperty
     public bool HasValue { get; set; }
 
     /// <summary>
-    ///     Gets or sets whether this property is immutable. If <see langword="true"/>, the property cannot be changed.
+    ///     INTERNAL: Gets or sets whether this property is immutable. If <see langword="true"/>, the property cannot be changed.
     /// </summary>
-    public bool Immutable { get; set; }
+    internal bool Immutable { get; set; }
 
     /// <summary>Applies the <see cref="PropertyValue"/> to the static property described by <see cref="PropertyInfo"/>.</summary>
     /// <returns></returns>
+    [RequiresDynamicCode ("Uses reflection to get and set property values")]
+    [RequiresUnreferencedCode ("Uses DeepCloner which requires types to be registered in SourceGenerationContext")]
     public bool Apply ()
     {
         try
@@ -89,14 +97,55 @@ public class ConfigProperty
         return PropertyValue != null;
     }
 
+    /// <summary>
+    /// INTERNAL: Create a ConfigProperty with cached attribute information
+    /// </summary>
+    /// <param name="propertyInfo">The PropertyInfo to create from</param>
+    /// <returns>A new ConfigProperty with attribute data cached</returns>
+    [RequiresDynamicCode ("Uses reflection to access custom attributes")]
+    internal static ConfigProperty CreateWithAttributeInfo (PropertyInfo propertyInfo)
+    {
+        var attr = propertyInfo.GetCustomAttribute (typeof (ConfigurationPropertyAttribute)) as ConfigurationPropertyAttribute;
+        return new ConfigProperty
+        {
+            PropertyInfo = propertyInfo,
+            OmitClassName = attr?.OmitClassName ?? false,
+            ScopeType = attr?.Scope!.Name,
+            // By default, properties are immutable
+            Immutable = true
+        };
+    }
 
     /// <summary>
-    ///     Helper to get either the Json property named (specified by [JsonPropertyName(name)] or the actual property
+    /// INTERNAL: Helper method to get the ConfigurationPropertyAttribute for a PropertyInfo
+    /// </summary>
+    /// <param name="propertyInfo">The PropertyInfo to get the attribute from</param>
+    /// <returns>The ConfigurationPropertyAttribute if found; otherwise, null</returns>
+    [RequiresDynamicCode ("Uses reflection to access custom attributes")]
+    internal static ConfigurationPropertyAttribute? GetConfigurationPropertyAttribute (PropertyInfo propertyInfo)
+    {
+        return propertyInfo.GetCustomAttribute (typeof (ConfigurationPropertyAttribute)) as ConfigurationPropertyAttribute;
+    }
+
+    /// <summary>
+    /// INTERNAL: Helper method to check if a PropertyInfo has a ConfigurationPropertyAttribute
+    /// </summary>
+    /// <param name="propertyInfo">The PropertyInfo to check</param>
+    /// <returns>True if the PropertyInfo has a ConfigurationPropertyAttribute; otherwise, false</returns>
+    [RequiresDynamicCode ("Uses reflection to access custom attributes")]
+    internal static bool HasConfigurationPropertyAttribute (PropertyInfo propertyInfo)
+    {
+        return propertyInfo.GetCustomAttribute (typeof (ConfigurationPropertyAttribute)) != null;
+    }
+
+    /// <summary>
+    ///     INTERNAL: Helper to get either the Json property named (specified by [JsonPropertyName(name)] or the actual property
     ///     name.
     /// </summary>
     /// <param name="pi"></param>
     /// <returns></returns>
-    public static string GetJsonPropertyName (PropertyInfo pi)
+    [RequiresDynamicCode ("Uses reflection to access custom attributes")]
+    internal static string GetJsonPropertyName (PropertyInfo pi)
     {
         var attr = pi.GetCustomAttribute (typeof (JsonPropertyNameAttribute)) as JsonPropertyNameAttribute;
 
@@ -104,23 +153,24 @@ public class ConfigProperty
     }
 
     /// <summary>
-    ///     Retrieves (using reflection) the value of the static  <see cref="ConfigurationPropertyAttribute"/>
-    ///     property described in <see cref="PropertyInfo"/> into
-    ///     <see cref="PropertyValue"/>.
+    ///     Updates (using reflection) the <see cref="PropertyValue"/> from the static  <see cref="ConfigurationPropertyAttribute"/>
+    ///     property described in <see cref="PropertyInfo"/>.
     /// </summary>
     /// <returns></returns>
-    public object? RetrieveValue ()
+    [RequiresDynamicCode ("Uses reflection to retrieve property values")]
+    public object? UpdateToCurrentValue ()
     {
         return PropertyValue = PropertyInfo!.GetValue (null);
     }
 
     /// <summary>
-    ///     Updates (using reflection) <see cref="PropertyValue"/> with the value in <paramref name="source"/> using a deep memberwise copy.
+    ///     INTERNAL: Updates (using reflection) <see cref="PropertyValue"/> with the value in <paramref name="source"/> using a deep memberwise copy.
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    internal object? UpdateValueFrom (object? source)
+    [RequiresUnreferencedCode ("Uses DeepCloner which requires types to be registered in SourceGenerationContext")]
+    internal object? DeepCloneFrom (object? source)
     {
         // If the source (higher-priority layer) doesn't provide a value, keep the existing value
         // In the context of layering, a null source means the higher-priority layer doesn't specify a value,
@@ -144,15 +194,15 @@ public class ConfigProperty
         // Handle Scope<T>-specific logic for nested configuration scopes
         if (source is SettingsScope settingsSource && PropertyValue is SettingsScope settingsDest)
         {
-            PropertyValue = settingsDest.Update (settingsSource);
+            PropertyValue = settingsDest.DeepCloneFrom (settingsSource);
         }
         else if (source is ThemeScope themeSource && PropertyValue is ThemeScope themeDest)
         {
-            PropertyValue = themeDest.Update (themeSource);
+            PropertyValue = themeDest.DeepCloneFrom (themeSource);
         }
         else if (source is AppSettingsScope appSource && PropertyValue is AppSettingsScope appDest)
         {
-            PropertyValue = appDest.Update (appSource);
+            PropertyValue = appDest.DeepCloneFrom (appSource);
         }
         else
         {
@@ -175,7 +225,11 @@ public class ConfigProperty
     /// INTERNAL: Called from the <see cref="ModuleInitializers.InitializeConfigurationManager"/> method to initialize the
     /// _classesWithConfigProps dictionary.
     /// </summary>
-    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("Uses reflection to scan assemblies for configuration properties. " +
+                        "Only called during initialization and not needed during normal operation. " +
+                        "In AOT environments, ensure all types with ConfigurationPropertyAttribute are preserved.")]
+    [RequiresUnreferencedCode ("Reflection requires all types with ConfigurationPropertyAttribute to be preserved in AOT. " +
+                             "Use the SourceGenerationContext to register all configuration property types.")]
     internal static void Initialize ()
     {
         if (_classesWithConfigProps is { })
@@ -185,20 +239,51 @@ public class ConfigProperty
 
         Dictionary<string, Type> dict = new (StringComparer.InvariantCultureIgnoreCase);
 
-        IEnumerable<Type> types = from assembly in AppDomain.CurrentDomain.GetAssemblies ()
-                                  from type in assembly.GetTypes ()
-                                  where type.GetProperties ()
-                                            .Any (prop => prop.GetCustomAttribute (typeof (ConfigurationPropertyAttribute)) != null)
-                                  select type;
-
-        foreach (Type classWithConfig in types)
+        // Process assemblies directly to avoid LINQ overhead
+        Assembly [] assemblies = AppDomain.CurrentDomain.GetAssemblies ();
+        foreach (Assembly assembly in assemblies)
         {
-            dict.Add (classWithConfig.Name, classWithConfig);
+            try
+            {
+                if (assembly.IsDynamic)
+                {
+                    continue;
+                }
+
+                foreach (Type type in assembly.GetTypes ())
+                {
+                    PropertyInfo [] properties = type.GetProperties ();
+
+                    // Check if any property has the ConfigurationPropertyAttribute
+                    var hasConfigProp = false;
+                    foreach (PropertyInfo prop in properties)
+                    {
+                        if (HasConfigurationPropertyAttribute (prop))
+                        {
+                            hasConfigProp = true;
+                            break;
+                        }
+                    }
+
+                    if (hasConfigProp)
+                    {
+                        dict [type.Name] = type;
+                    }
+                }
+            }
+            // Skip problematic assemblies that can't be loaded or analyzed
+            catch (ReflectionTypeLoadException)
+            {
+                continue;
+            }
+            catch (BadImageFormatException)
+            {
+                continue;
+            }
         }
 
         _classesWithConfigProps = dict.ToImmutableSortedDictionary ();
     }
-
 
     /// <summary>
     /// INTERNAL: Retrieves a dictionary of all properties annotated with <see cref="ConfigurationPropertyAttribute"/> from the classes in the module.
@@ -206,7 +291,11 @@ public class ConfigProperty
     /// The <see cref="ConfigProperty"/> items have <see cref="PropertyInfo"/> set, but not <see cref="PropertyValue"/>. 
     /// <see cref="Immutable"/> is set to <see langword="true"/>.
     /// </summary>
-    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("Uses reflection to scan assemblies for configuration properties. " +
+                         "Only called during initialization and not needed during normal operation. " +
+                         "In AOT environments, ensure all types with ConfigurationPropertyAttribute are preserved.")]
+    [RequiresUnreferencedCode ("Reflection requires all types with ConfigurationPropertyAttribute to be preserved in AOT. " +
+                              "Use the SourceGenerationContext to register all configuration property types.")]
     internal static ImmutableSortedDictionary<string, ConfigProperty> GetAllConfigProperties ()
     {
         if (_classesWithConfigProps is null)
@@ -214,56 +303,50 @@ public class ConfigProperty
             throw new InvalidOperationException ("Initialize has not been called.");
         }
 
-        var allConfigProperties = new Dictionary<string, ConfigProperty> (StringComparer.InvariantCultureIgnoreCase);
+        // Estimate capacity to reduce resizing operations
+        int estimatedCapacity = _classesWithConfigProps.Count * 5; // Assume ~5 properties per class
+        Dictionary<string, ConfigProperty> allConfigProperties = new (estimatedCapacity, StringComparer.InvariantCultureIgnoreCase);
 
-        foreach (PropertyInfo? propertyInfo in from c in _classesWithConfigProps
-                                           let props = c.Value.GetProperties (
-                                                                              BindingFlags.Instance |
-                                                                              BindingFlags.Static |
-                                                                              //BindingFlags.NonPublic |  // Private properties are NOT supported
-                                                                              BindingFlags.Public)
-                                                        .Where (prop => prop.GetCustomAttribute (typeof (ConfigurationPropertyAttribute)) is ConfigurationPropertyAttribute)
-                                           from property in props
-                                           select property)
+        // Process each class with direct iteration instead of LINQ
+        foreach (KeyValuePair<string, Type> classEntry in _classesWithConfigProps)
         {
-            if (propertyInfo.GetCustomAttribute (typeof (ConfigurationPropertyAttribute)) is not ConfigurationPropertyAttribute scp)
+            Type type = classEntry.Value;
+
+            // Get all public static/instance properties
+            BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance;
+            PropertyInfo [] properties = type.GetProperties (bindingFlags);
+
+            foreach (PropertyInfo propertyInfo in properties)
             {
-                continue;
-            }
-
-            // This code is disabled to call out that internal is explicitly supported.
-            //if (!property.GetGetMethod (true)!.IsPublic)
-            //{
-            //    throw new InvalidOperationException (
-            //                                         $"Property {property.Name} in class {property.DeclaringType?.Name} is not public. ConfigurationProperty properties must be public.");
-
-            //}
-
-            if (propertyInfo.GetGetMethod (true)!.IsStatic)
-            {
-                var key = scp.OmitClassName
-                              ? ConfigProperty.GetJsonPropertyName (propertyInfo)
-                              : $"{propertyInfo.DeclaringType?.Name}.{propertyInfo.Name}";
-
-                allConfigProperties.Add (key, new ConfigProperty
+                // Skip properties without our attribute
+                if (!HasConfigurationPropertyAttribute (propertyInfo))
                 {
-                    // Set only PropertyInfo. Do not set PropertyValue (or HasValue will be set)
-                    PropertyInfo = propertyInfo,
-                    // By default, properties are immutable
-                    Immutable = true
-                });
-            }
-            else
-            {
-                throw new InvalidOperationException (
-                                                     $"Property {propertyInfo.Name} in class {propertyInfo.DeclaringType?.Name} is not static. [ConfigurationProperty] properties must be static.");
+                    continue;
+                }
+
+                // Verify the property is static
+                if (!propertyInfo.GetGetMethod (true)!.IsStatic)
+                {
+                    throw new InvalidOperationException (
+                        $"Property {propertyInfo.Name} in class {propertyInfo.DeclaringType?.Name} is not static. " +
+                        "[ConfigurationProperty] properties must be static.");
+                }
+
+                // Create config property with cached attribute data
+                ConfigProperty configProperty = CreateWithAttributeInfo (propertyInfo);
+
+                // Use cached attribute data to determine the key
+                string key = configProperty.OmitClassName
+                    ? GetJsonPropertyName (propertyInfo)
+                    : $"{propertyInfo.DeclaringType?.Name}.{propertyInfo.Name}";
+
+                allConfigProperties.Add (key, configProperty);
             }
         }
 
-        // Sort the properties
         return allConfigProperties.ToImmutableSortedDictionary (StringComparer.InvariantCultureIgnoreCase);
     }
 
-    #endregion Initialization
 
+    #endregion Initialization
 }

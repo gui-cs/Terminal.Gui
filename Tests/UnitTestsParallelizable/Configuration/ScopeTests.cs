@@ -65,7 +65,7 @@ public class ScopeTests
         });
 
         // Act
-        scope.Update (scopeWithAddedProperty);
+        scope.DeepCloneFrom (scopeWithAddedProperty);
 
         // Assert
         Assert.NotNull (scope);

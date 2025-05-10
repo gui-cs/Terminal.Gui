@@ -8,7 +8,7 @@ namespace Terminal.Gui.ConfigurationTests;
 public class SchemeManagerTests
 {
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
+    [AutoInitShutdown]
     public void GetCurrentSchemes_Gets_Current_Schemes ()
     {
         Scheme? expected = SchemeManager.GetHardCodedSchemes ()! ["Base"];
@@ -29,7 +29,7 @@ public class SchemeManagerTests
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
+    [AutoInitShutdown]
     public void GetDefautSchemes_Gets_Default_Theme_Schemes ()
     {
         Dictionary<string, Scheme?>? hardCoded = SchemeManager.GetHardCodedSchemes ();
@@ -40,7 +40,7 @@ public class SchemeManagerTests
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
+    [AutoInitShutdown]
     public void Not_Case_Sensitive ()
     {
         Dictionary<string, Scheme?>? current = SchemeManager.GetDefaultSchemes ();

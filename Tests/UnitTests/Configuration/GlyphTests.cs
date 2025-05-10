@@ -11,9 +11,9 @@ public class GlyphTests
     public void Overrides_Defaults ()
     {
         // arrange
-        Enable();
-        Locations = ConfigLocations.LibraryResources;
-        Load (true);
+        Enable ();
+        Load (ConfigLocations.LibraryResources);
+
 
         Assert.Equal ((Rune)'⟦', Glyphs.LeftBracket);
 
@@ -36,7 +36,7 @@ public class GlyphTests
                    }
                    """;
 
-        CM.SourcesManager?.Update(Settings, json, "Overrides_Defaults", ConfigLocations.Runtime);
+        CM.SourcesManager?.Load(Settings, json, "Overrides_Defaults", ConfigLocations.Runtime);
         Apply();
 
         // assert
@@ -45,6 +45,7 @@ public class GlyphTests
         Assert.Equal((Rune)'[', Glyphs.LeftBracket);
 
         // clean up
-        Reset ();
+        Disable ();
+        ResetToHardCodedDefaults ();
     }
 }

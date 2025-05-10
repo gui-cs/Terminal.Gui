@@ -9,7 +9,6 @@ public class ApplicationStressTests : TestsAllViews
     public ApplicationStressTests (ITestOutputHelper output)
     {
         ConsoleDriver.RunningUnitTests = true;
-        ConfigurationManager.Locations = ConfigLocations.LibraryResources;
     }
 
     private static volatile int _tbCounter;

@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Terminal.Gui;
 using UICatalog;
 using UnitTests;
@@ -34,9 +35,7 @@ public class ScenarioTests : TestsAllViews
         Assert.Null (_timeoutLock);
         _timeoutLock = new ();
 
-        // Disable any UIConfig settings
-        ConfigLocations savedConfigLocations = ConfigurationManager.Locations;
-        ConfigurationManager.Locations = ConfigLocations.LibraryResources;
+        ConfigurationManager.Disable();
 
         // If a previous test failed, this will ensure that the Application is in a clean state
         Application.ResetState (true);
@@ -84,8 +83,8 @@ public class ScenarioTests : TestsAllViews
         }
 
         // Restore the configuration locations
-        ConfigurationManager.Locations = savedConfigLocations;
-        ConfigurationManager.Reset ();
+        ConfigurationManager.Disable();
+        ConfigurationManager.ResetToHardCodedDefaults();
 
         return;
 
@@ -122,8 +121,8 @@ public class ScenarioTests : TestsAllViews
             }
 
             // Restore the configuration locations
-            ConfigurationManager.Locations = savedConfigLocations;
-            ConfigurationManager.Reset ();
+            ConfigurationManager.Disable ();
+            ConfigurationManager.ResetToHardCodedDefaults ();
 
             Application.ResetState (true);
 
@@ -154,8 +153,7 @@ public class ScenarioTests : TestsAllViews
     public void Run_All_Views_Tester_Scenario ()
     {
         // Disable any UIConfig settings
-        ConfigLocations savedConfigLocations = ConfigurationManager.Locations;
-        ConfigurationManager.Locations = ConfigLocations.LibraryResources;
+        ConfigurationManager.Disable ();
 
         View? curView = null;
 
@@ -380,8 +378,8 @@ public class ScenarioTests : TestsAllViews
         Application.Shutdown ();
 
         // Restore the configuration locations
-        ConfigurationManager.Locations = savedConfigLocations;
-        ConfigurationManager.Reset ();
+        ConfigurationManager.Disable ();
+        ConfigurationManager.ResetToHardCodedDefaults ();
 
         void DimPosChanged (View? view)
         {
@@ -614,8 +612,7 @@ public class ScenarioTests : TestsAllViews
     public void Run_Generic ()
     {
         // Disable any UIConfig settings
-        ConfigLocations savedConfigLocations = ConfigurationManager.Locations;
-        ConfigurationManager.Locations = ConfigLocations.LibraryResources;
+        ConfigurationManager.Disable();
 
         ObservableCollection<Scenario> scenarios = Scenario.GetScenarios ();
         Assert.NotEmpty (scenarios);
@@ -679,8 +676,8 @@ public class ScenarioTests : TestsAllViews
         Application.Shutdown ();
 
         // Restore the configuration locations
-        ConfigurationManager.Locations = savedConfigLocations;
-        ConfigurationManager.Reset ();
+        ConfigurationManager.Disable ();
+        ConfigurationManager.ResetToHardCodedDefaults ();
 
 #if DEBUG_IDISPOSABLE
         Assert.Empty (View.Instances);
