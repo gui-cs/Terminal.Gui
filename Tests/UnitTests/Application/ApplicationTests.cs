@@ -13,7 +13,6 @@ public class ApplicationTests
     {
         _output = output;
         ConsoleDriver.RunningUnitTests = true;
-        Locations = ConfigLocations.LibraryResources;
 
 #if DEBUG_IDISPOSABLE
         View.EnableDebugIDisposableAsserts = true;
@@ -547,7 +546,6 @@ public class ApplicationTests
         try
         {
             // arrange
-            Locations = ConfigLocations.LibraryResources;
             ThrowOnJsonErrors = true;
 
             Application.QuitKey = Key.Q;
@@ -567,7 +565,7 @@ public class ApplicationTests
     public void Init_KeyBindings_Set_To_Custom ()
     {
         // arrange
-        Locations = ConfigLocations.Runtime;
+        Enable();
         ThrowOnJsonErrors = true;
 
         RuntimeConfig = """
@@ -575,6 +573,9 @@ public class ApplicationTests
                                "Application.QuitKey": "Ctrl-Q"
                          }
                  """;
+
+        Load (ConfigLocations.Runtime);
+        Apply();
 
         Assert.Equal (Key.Esc, Application.QuitKey);
 
@@ -586,7 +587,7 @@ public class ApplicationTests
         Assert.True (Application.KeyBindings.TryGet (Key.Q.WithCtrl, out _));
 
         Application.Shutdown ();
-        Locations = ConfigLocations.LibraryResources;
+        Disable();
     }
 
     [Fact]

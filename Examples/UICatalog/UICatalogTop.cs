@@ -565,7 +565,7 @@ public class UICatalogTop : Toplevel
 
     private readonly StatusBar? _statusBar;
 
-    [SerializableConfigurationProperty (Scope = typeof (AppScope), OmitClassName = true)]
+    [ConfigurationProperty (Scope = typeof (AppSettingsScope), OmitClassName = true)]
     [JsonPropertyName ("UICatalog.StatusBar")]
     public static bool ShowStatusBar { get; set; } = true;
 

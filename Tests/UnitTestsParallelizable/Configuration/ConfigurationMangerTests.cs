@@ -8,7 +8,7 @@ namespace Terminal.Gui.ConfigurationTests;
 
 public class ConfigurationManagerTests
 {
-    [SerializableConfigurationProperty (Scope = typeof (CMTestsScope))]
+    [ConfigurationProperty (Scope = typeof (CMTestsScope))]
     public static bool? TestProperty { get; set; }
 
     private class CMTestsScope : Scope<CMTestsScope>
@@ -18,8 +18,7 @@ public class ConfigurationManagerTests
     [Fact]
     public void GetConfigPropertiesByScope_Gets ()
     {
-        CM.Initialize ();
-        var props = ConfigurationManager.GetConfigPropertiesByScope (typeof (CMTestsScope));
+        var props = ConfigurationManager.GetConfigPropertiesByScope ("CMTestsScope");
 
         Assert.NotNull (props);
         Assert.NotEmpty (props);

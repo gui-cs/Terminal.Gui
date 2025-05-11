@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
+// TODO: Change to internal to prevent app usage
 /// <summary>
 ///     The root object for a Theme. A Theme is a set of settings that are applied to the running
 ///     <see cref="Application"/> as a group.

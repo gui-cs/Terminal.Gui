@@ -235,12 +235,12 @@ public partial class View
     /// <returns>The corresponding <see cref="Attribute"/> from the <see cref="Scheme"/>.</returns>
     public Attribute GetAttributeForRole (VisualRole role)
     {
-        Scheme scheme = Scheme ?? SchemeManager.GetDefaultSchemes () ["Base"]!;
+        Scheme scheme = Scheme ?? SchemeManager.GetCurrentSchemes()? ["Base"]!;
         Attribute curAttribute = scheme.GetAttributeForRole (role);
 
         if (OnGettingAttributeForRole (role, ref curAttribute))
         {
-            // The ipmlementation may have changed the attribute
+            // The implementation may have changed the attribute
             return curAttribute;
         }
 

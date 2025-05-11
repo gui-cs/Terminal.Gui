@@ -26,7 +26,7 @@ public class ConfigurationEditor : Scenario
     private TabView? _tabView;
     private Shortcut? _lenShortcut;
 
-    [SerializableConfigurationProperty (Scope = typeof (AppScope))]
+    [ConfigurationProperty (Scope = typeof (AppSettingsScope))]
     public static Scheme EditorScheme
     {
         get => _editorScheme;

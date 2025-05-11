@@ -81,7 +81,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                                                  e
                                                 );
                     }
-                    catch (TargetInvocationException tie)
+                    catch (TargetInvocationException _)
                     {
                         try
                         {
@@ -153,6 +153,8 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                 else
                 {
                     // Unknown property
+                    // TODO: To support forward compatibility, we should just ignore unknown properties?
+                    // TODO: Eg if we read an unknown property, it's possible that the property was added in a later version
                     throw new JsonException ($"Unknown property name \"{propertyName}\".");
                 }
             }
@@ -184,10 +186,10 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                                                                        cp =>
                                                                            cp.Value.PropertyInfo?.GetCustomAttribute (
                                                                                     typeof (
-                                                                                        SerializableConfigurationProperty)
+                                                                                        ConfigurationPropertyAttribute)
                                                                                    )
                                                                                is
-                                                                               SerializableConfigurationProperty scp
+                                                                               ConfigurationPropertyAttribute scp
                                                                            && scp?.Scope == typeof (scopeT)
                                                                       )
                                                            where p.Value.PropertyValue != null

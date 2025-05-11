@@ -199,7 +199,7 @@ public static partial class Application // Initialization (Init/Shutdown)
 
         string previousTheme = ThemeManager.Theme ?? string.Empty;
         // Don't reset, so we can inherit the theme from the previous run.
-        CM.Load (reset: false);
+        CM.Load (ConfigLocations.All);
         if (ThemeManager.Theme is { } && !string.IsNullOrEmpty (previousTheme) && previousTheme != "Default")
         {
             ThemeManager.Theme = previousTheme;

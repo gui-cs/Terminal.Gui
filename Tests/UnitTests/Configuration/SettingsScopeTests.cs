@@ -9,8 +9,8 @@ public class SettingsScopeTests
     public void Update_Overrides_Defaults ()
     {
         // arrange
-        Locations = ConfigLocations.LibraryResources;
-        Load (true);
+        Enable();
+        Load (ConfigLocations.LibraryResources);
 
         Assert.Equal (Key.Esc, (Key)Settings ["Application.QuitKey"].PropertyValue);
 
@@ -24,21 +24,22 @@ public class SettingsScopeTests
                            }
                    """;
 
-        CM.SourcesManager?.Update(Settings!, json, "test", ConfigLocations.Runtime);
+        CM.SourcesManager?.Load(Settings!, json, "test", ConfigLocations.Runtime);
 
         // assert
         Assert.Equal (Key.Q.WithCtrl, (Key)Settings ["Application.QuitKey"].PropertyValue);
 
         // clean up
-        Locations = ConfigLocations.All;
-        Reset ();
+        Disable ();
+        ResetToHardCodedDefaults ();
+
     }
 
     [Fact]
     public void Apply_ShouldApplyProperties ()
     {
-        Locations = ConfigLocations.LibraryResources;
-        Reset();
+        Enable ();
+        Load (ConfigLocations.LibraryResources);
 
         // arrange
         Assert.Equal (Key.Esc, (Key)Settings ["Application.QuitKey"].PropertyValue);
@@ -65,8 +66,9 @@ public class SettingsScopeTests
         Assert.Equal (Key.F, Application.NextTabGroupKey);
         Assert.Equal (Key.B, Application.PrevTabGroupKey);
 
-        Locations = ConfigLocations.All;
-        Reset ();
+        Disable ();
+        ResetToHardCodedDefaults ();
+
 
     }
 
@@ -82,42 +84,35 @@ public class SettingsScopeTests
         updatedSettings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
         updatedSettings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
 
-        Settings.Update (updatedSettings);
+        Settings.DeepCloneFrom (updatedSettings);
         Assert.Equal (KeyCode.End, ((Key)Settings ["Application.QuitKey"].PropertyValue).KeyCode);
         Assert.Equal (KeyCode.F, ((Key)updatedSettings ["Application.NextTabGroupKey"].PropertyValue).KeyCode);
         Assert.Equal (KeyCode.B, ((Key)updatedSettings ["Application.PrevTabGroupKey"].PropertyValue).KeyCode);
     }
 
     [Fact]
-    public void GetHardCodedDefaults_ShouldSetProperties ()
+    public void ResetToHardCodedDefaults_Resets_Config_Does_Not_Apply ()
     {
-        ConfigLocations savedLocations = Locations;
-        Locations = ConfigLocations.LibraryResources;
-        Reset ();
+        Enable ();
+        Load (ConfigLocations.LibraryResources);
 
-        Assert.Equal (6, ((Dictionary<string, ThemeScope>)Settings ["Themes"].PropertyValue).Count);
+        Assert.True (Settings! ["Application.QuitKey"].PropertyValue is Key);
+        Assert.Equal (Key.Esc, Settings ["Application.QuitKey"].PropertyValue as Key);
+        Settings ["Application.QuitKey"].PropertyValue = Key.Q;
+        Apply ();
+        Assert.Equal (Key.Q, Application.QuitKey);
 
-        ResetToCurrentValues ();
-        Assert.NotEmpty (ThemeManager.Themes);
-        Assert.Equal ("Default", ThemeManager.Theme);
+        // Act
+        ResetToHardCodedDefaults ();
+        Assert.Equal (Key.Esc, Settings ["Application.QuitKey"].PropertyValue as Key);
+        Assert.Equal (Key.Q, Application.QuitKey);
 
-        Assert.True (Settings ["Application.QuitKey"].PropertyValue is Key);
-        Assert.True (Settings ["Application.NextTabGroupKey"].PropertyValue is Key);
-        Assert.True (Settings ["Application.PrevTabGroupKey"].PropertyValue is Key);
-
-        Assert.True (Settings ["Theme"].PropertyValue is string);
-        Assert.Equal ("Default", Settings ["Theme"].PropertyValue as string);
-
-        Assert.True (Settings ["Themes"].PropertyValue is Dictionary<string, ThemeScope>);
-        Assert.Single ((Dictionary<string, ThemeScope>)Settings ["Themes"].PropertyValue);
-
-        Locations = ConfigLocations.All;
-        Reset ();
+        Disable ();
     }
 
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
+    [AutoInitShutdown]
     public void Themes_Property_Exists ()
     {
         var settingsScope = new SettingsScope ();
@@ -127,8 +122,28 @@ public class SettingsScopeTests
         // Themes exists, but is not initialized
         Assert.Null (settingsScope ["Themes"].PropertyValue);
 
-        settingsScope.RetrieveValues ();
+        settingsScope.UpdateToCurrentValues ();
 
         Assert.NotEmpty (settingsScope);
+    }
+
+
+    [Fact]
+    public void ResetToHardCodedDefaults_Resets ()
+    {
+        // Arrange
+        CM.Enable ();
+        Assert.Equal (Key.Esc, Application.QuitKey);
+        var settingsScope = new SettingsScope ();
+
+        // Act
+        settingsScope ["Application.QuitKey"].PropertyValue = Key.Q;
+        settingsScope.Apply ();
+        Assert.Equal (Key.Q, Application.QuitKey);
+        settingsScope.UpdateToHardCodedDefaults ();
+        settingsScope.Apply ();
+
+        // Assert
+        Assert.Equal (Key.Esc, Application.QuitKey);
     }
 }

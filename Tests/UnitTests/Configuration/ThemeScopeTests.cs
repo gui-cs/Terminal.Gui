@@ -16,7 +16,7 @@ public class ThemeScopeTests
     };
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
+    [AutoInitShutdown]
     public void AllThemesPresent ()
     {
         Reset ();
@@ -26,7 +26,7 @@ public class ThemeScopeTests
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
+    [AutoInitShutdown]
     public void Apply_ShouldApplyUpdatedProperties ()
     {
         Reset ();
@@ -46,16 +46,26 @@ public class ThemeScopeTests
     }
 
     [Fact]
-    public void GetHardCodedDefaults_ShouldSetProperties ()
+    public void UpdateToHardCodedDefaults_Resets_Config_Does_Not_Apply ()
     {
-        Reset ();
-        ResetToCurrentValues ();
-        Assert.NotEmpty (ThemeManager.Themes);
+        Enable ();
+        Load (ConfigLocations.LibraryResources);
+
         Assert.Equal ("Default", ThemeManager.Theme);
+        ThemeManager.Theme = "Dark";
+        Assert.Equal ("Default", ThemeManager.Theme);
+        Apply ();
+        Assert.Equal ("Dark", ThemeManager.Theme);
+
+        // Act
+        ThemeManager.UpdateToHardCodedDefaults ();
+        Assert.Equal ("Default", ThemeManager.Theme);
+
+        Disable ();
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
+    [AutoInitShutdown]
     public void TestSerialize_RoundTrip ()
     {
         Reset ();

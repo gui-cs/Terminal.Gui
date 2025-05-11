@@ -44,7 +44,7 @@ public class Menuv2 : Bar
     /// <summary>
     ///     Gets or sets the default Border Style for Menus. The default is <see cref="LineStyle.Single"/>.
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Rounded;
 
     /// <summary>

@@ -132,7 +132,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     // TODO: ColorName and AnsiColorCode are only needed when a driver is in Force16Color mode and we
     // TODO: should be able to remove these from any non-Driver-specific usages.
     /// <summary>Gets or sets the 3-byte/6-character hexadecimal value for each of the legacy 16-color values.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
+    [ConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
     public static Dictionary<ColorName16, string> Colors16
     {
         get =>

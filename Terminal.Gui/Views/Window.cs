@@ -33,7 +33,7 @@ public class Window : Toplevel
     /// <summary>
     ///     Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
 
     // TODO: enable this
@@ -43,7 +43,7 @@ public class Window : Toplevel
     ///// <remarks>
     ///// This property can be set in a Theme to change the default <see cref="LineStyle"/> for all <see cref="Window"/>s. 
     ///// </remarks>
-    /////[SerializableConfigurationProperty (Scope = typeof (ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
+    /////[ConfigurationProperty (Scope = typeof (ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
     ////public static Scheme DefaultScheme { get; set; } = Colors.Schemes ["Base"];
 
     /// <summary>
@@ -54,6 +54,6 @@ public class Window : Toplevel
     ///     This property can be set in a Theme to change the default <see cref="LineStyle"/> for all <see cref="Window"/>
     ///     s.
     /// </remarks>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
 }

@@ -125,7 +125,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// <summary>
     ///     Gets or sets the default Border Style for the MenuBar. The default is <see cref="LineStyle.None"/>.
     /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.None;
 
     private Key _key = DefaultKey;
@@ -218,7 +218,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     public event EventHandler<KeyChangedEventArgs>? KeyChanged;
 
     /// <summary>The default key for activating menu bars.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key DefaultKey { get; set; } = Key.F9;
 
     /// <summary>

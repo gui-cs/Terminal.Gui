@@ -8,14 +8,14 @@ public class ThemeManagerTests
 {
    
     [Fact]
-    public void Reset_Adds_Default_Theme ()
+    public void ResetToCurrentValues_Adds_Default_Theme ()
     {
         try
         {
             CM.Enable();
             Assert.NotEmpty (ThemeManager.Themes!);
 
-            ThemeManager.Reset ();
+            ThemeManager.UpdateToCurrentValues();
 
             Assert.NotEmpty (ThemeManager.Themes!);
 

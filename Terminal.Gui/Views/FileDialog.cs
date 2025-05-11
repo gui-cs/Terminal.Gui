@@ -325,7 +325,7 @@ public class FileDialog : Dialog, IDesignable
 
     /// <summary>The maximum number of results that will be collected when searching before stopping.</summary>
     /// <remarks>This prevents performance issues e.g. when searching root of file system for a common letter (e.g. 'e').</remarks>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static int MaxSearchResults { get; set; } = 10000;
 
     /// <summary>

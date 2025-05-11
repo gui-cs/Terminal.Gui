@@ -7,8 +7,9 @@ using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
+// TODO: Change to internal to prevent app usage
 /// <summary>
-///     The root object of Terminal.Gui configuration settings / JSON schema. Contains only properties attributed with
+///     INTERNAL: The root object of Terminal.Gui configuration settings / JSON schema. Contains only properties attributed with
 ///     <see cref="SettingsScope"/>.
 /// </summary>
 /// <example>

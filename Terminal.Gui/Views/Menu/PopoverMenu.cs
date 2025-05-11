@@ -145,7 +145,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     public event EventHandler<KeyChangedEventArgs>? KeyChanged;
 
     /// <summary>The default key for activating popover menus.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key DefaultKey { get; set; } = Key.F10.WithShift;
 
     /// <summary>

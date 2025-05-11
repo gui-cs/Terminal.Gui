@@ -45,7 +45,6 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         bool useFakeClipboard = true,
         bool fakeClipboardAlwaysThrowsNotSupportedException = false,
         bool fakeClipboardIsSupportedAlwaysTrue = false,
-        ConfigLocations configLocation = ConfigLocations.LibraryResources, // DefaultOnly is the default for tests
         bool verifyShutdown = false
     )
     {
@@ -57,7 +56,6 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         FakeDriver.FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException =
             fakeClipboardAlwaysThrowsNotSupportedException;
         FakeDriver.FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
-        ConfigurationManager.Locations = configLocation;
         _verifyShutdown = verifyShutdown;
     }
 
@@ -104,13 +102,6 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 #endif
             }
         }
-
-        // Reset to defaults
-        ConfigurationManager.Locations = ConfigLocations.LibraryResources;
-        ConfigurationManager.Reset ();
-
-        // Enable subsequent tests that call Init to get all config files (the default).
-        //Locations = ConfigLocations.All;
     }
 
     public override void Before (MethodInfo methodUnderTest)

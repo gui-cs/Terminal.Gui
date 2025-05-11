@@ -12,7 +12,7 @@ public class ThemeTests
     };
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
+    [AutoInitShutdown]
     public void TestApply ()
     {
         Reset ();
@@ -34,7 +34,7 @@ public class ThemeTests
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.LibraryResources)]
+    [AutoInitShutdown]
     public void TestApply_UpdatesColors ()
     {
         // Arrange
@@ -135,7 +135,7 @@ public class ThemeTests
         Assert.Equal (SchemeManager.Schemes.Count, schemes.Count);
 
         // Act
-        theme.Update (newTheme);
+        theme.DeepCloneFrom (newTheme);
 
         // Assert
         schemes = (Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue;
@@ -186,7 +186,7 @@ public class ThemeTests
         ((Dictionary<string, Scheme>)newTheme ["Schemes"].PropertyValue) ["Test"] = newScheme;
 
         // Act
-        theme.Update (newTheme);
+        theme.DeepCloneFrom (newTheme);
 
         // Assert
         schemes = (Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue;

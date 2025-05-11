@@ -7,12 +7,12 @@ namespace Terminal.Gui;
 /// <remarks></remarks>
 /// <example>
 ///     <para>
-///         Use the <see cref="SerializableConfigurationProperty"/> attribute to mark properties that should be
+///         Use the <see cref="ConfigurationPropertyAttribute"/> attribute to mark properties that should be
 ///         serialized as part of application-defined configuration settings.
 ///     </para>
 ///     <code>
 ///  public class MyAppSettings {
-/// 	[SerializableConfigurationProperty (Scope = typeof (AppScope))]
+/// 	[ConfigurationProperty]
 /// 	public static bool? MyProperty { get; set; } = true;
 ///  }
 ///  </code>
@@ -24,6 +24,6 @@ namespace Terminal.Gui;
 ///    },
 ///  </code>
 /// </example>
-[JsonConverter (typeof (ScopeJsonConverter<AppScope>))]
-public class AppScope : Scope<AppScope>
+[JsonConverter (typeof (ScopeJsonConverter<AppSettingsScope>))]
+public class AppSettingsScope : Scope<AppSettingsScope>
 { }
