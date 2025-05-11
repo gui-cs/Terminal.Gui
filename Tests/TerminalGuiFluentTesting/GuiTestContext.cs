@@ -706,10 +706,14 @@ public class GuiTestContext : IDisposable
     ///     is found (of Type T) or all views are looped through (back to the beginning)
     ///     in which case triggers hard stop and Exception
     /// </summary>
+    /// <param name="evaluator">Delegate that returns true if the passed View is the one
+    /// you are trying to focus. Leave <see langword="null"/> to focus the first view of type
+    /// <typeparamref name="T"/></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public GuiTestContext Focus<T> (Func<T, bool> evaluator) where T : View
+    public GuiTestContext Focus<T> (Func<T, bool>? evaluator = null) where T : View
     {
+        evaluator ??= _ => true;
         Toplevel? t = Application.Top;
 
         HashSet<View> seen = new ();
@@ -815,5 +819,14 @@ public class GuiTestContext : IDisposable
         }
 
         return this;
+    }
+
+    /// <summary>
+    /// Returns the last set position of the cursor.
+    /// </summary>
+    /// <returns></returns>
+    public Point GetCursorPosition ()
+    {
+        return _output.CursorPosition;
     }
 }

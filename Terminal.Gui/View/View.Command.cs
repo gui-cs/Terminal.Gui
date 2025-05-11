@@ -30,6 +30,8 @@ public partial class View // Command APIs
 
                         SetFocus ();
 
+                        // Always return true on hotkey, even if SetFocus fails because 
+                        // hotkeys are always handled by the View (unless RaiseHandlingHotKey cancels).
                         return true;
                     });
 
@@ -45,9 +47,9 @@ public partial class View // Command APIs
 
                         if (CanFocus)
                         {
-                            SetFocus ();
-
-                            return true;
+                            // For Select, if the view is focusable and SetFocus succeeds, by defition,
+                            // the event is handled. So return what SetFocus returns.
+                            return SetFocus ();
                         }
 
                         return false;
