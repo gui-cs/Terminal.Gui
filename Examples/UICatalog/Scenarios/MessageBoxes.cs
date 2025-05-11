@@ -279,7 +279,7 @@ public class MessageBoxes : Scenario
                                                buttonPressedLabel.Text = "Invalid Options";
                                            }
 
-                                           e.Cancel = true;
+                                           e.Handled = true;
                                        };
         app.Add (showMessageBoxButton);
 

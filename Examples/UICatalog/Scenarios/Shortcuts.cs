@@ -426,7 +426,7 @@ public class Shortcuts : Scenario
                                              return;
                                          }
                                          bgColor.SelectedColor++;
-                                         args.Cancel = true;
+                                         args.Handled = true;
                                      };
 
         bgColor.ColorChanged += (o, args) =>
@@ -467,7 +467,7 @@ public class Shortcuts : Scenario
         {
             shortcut.Selecting += (o, args) =>
             {
-                if (args.Cancel)
+                if (args.Handled)
                 {
                     return;
                 }
@@ -477,13 +477,13 @@ public class Shortcuts : Scenario
 
             shortcut.CommandView.Selecting += (o, args) =>
             {
-                if (args.Cancel)
+                if (args.Handled)
                 {
                     return;
                 }
                 eventSource.Add ($"{shortcut!.Id}.CommandView.Selecting: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
                 eventLog.MoveDown ();
-                args.Cancel = true;
+                args.Handled = true;
             };
 
             shortcut.Accepting += (o, args) =>
@@ -491,7 +491,7 @@ public class Shortcuts : Scenario
                 eventSource.Add ($"{shortcut!.Id}.Accepting: {shortcut!.CommandView.Text} {shortcut!.CommandView.GetType ().Name}");
                 eventLog.MoveDown ();
                 // We don't want this to exit the Scenario
-                args.Cancel = true;
+                args.Handled = true;
             };
 
             shortcut.CommandView.Accepting += (o, args) =>
@@ -505,7 +505,7 @@ public class Shortcuts : Scenario
 
     private void Button_Clicked (object? sender, CommandEventArgs e)
     {
-        e.Cancel = true;
+        e.Handled = true;
         View? view = sender as View;
         MessageBox.Query ("Hi", $"You clicked {view?.Text}", "_Ok");
     }

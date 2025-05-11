@@ -180,7 +180,7 @@ public class CheckBox : View
     /// <summary>Called when the <see cref="CheckBox"/> state is changing.</summary>
     /// <remarks>
     ///     <para>
-    ///         The state cahnge can be cancelled by setting the args.Cancel to <see langword="true"/>.
+    ///         The state change can be cancelled by setting the args.Cancel to <see langword="true"/>.
     ///     </para>
     /// </remarks>
     protected virtual bool OnCheckedStateChanging (CancelEventArgs<CheckState> args) { return false; }

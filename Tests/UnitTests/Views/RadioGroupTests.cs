@@ -689,7 +689,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         radioGroup.Accepting += (s, e) =>
                              {
                                  acceptedCount++;
-                                 e.Cancel = handleAccepted;
+                                 e.Handled = handleAccepted;
                              };
 
         Assert.True (radioGroup.DoubleClickAccepts);
@@ -742,7 +742,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         superView.Accepting += (s, a) =>
                             {
                                 superViewAcceptCount++;
-                                a.Cancel = true;
+                                a.Handled = true;
                             };
 
         Assert.Equal (0, superViewAcceptCount);

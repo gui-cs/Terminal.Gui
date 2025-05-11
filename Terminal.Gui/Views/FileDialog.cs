@@ -2,6 +2,8 @@ using System.IO.Abstractions;
 using System.Text.RegularExpressions;
 using Terminal.Gui.Resources;
 
+#nullable enable
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -81,7 +83,7 @@ public class FileDialog : Dialog, IDesignable
 
         _btnOk.Accepting += (s, e) =>
                             {
-                                if (e.Cancel)
+                                if (e.Handled)
                                 {
                                     return;
                                 }
@@ -98,12 +100,12 @@ public class FileDialog : Dialog, IDesignable
 
         _btnCancel.Accepting += (s, e) =>
                                 {
-                                    if (e.Cancel)
+                                    if (e.Handled)
                                     {
                                         return;
                                     }
 
-                                    e.Cancel = true;
+                                    e.Handled = true;
 
                                     if (Modal)
                                     {
@@ -116,7 +118,7 @@ public class FileDialog : Dialog, IDesignable
         _btnUp.Accepting += (s, e) =>
                             {
                                 _history.Up ();
-                                e.Cancel = true;
+                                e.Handled = true;
                             };
 
         _btnBack = new() { X = Pos.Right (_btnUp) + 1, Y = 1, NoPadding = true };
@@ -124,7 +126,7 @@ public class FileDialog : Dialog, IDesignable
         _btnBack.Accepting += (s, e) =>
                               {
                                   _history.Back ();
-                                  e.Cancel = true;
+                                  e.Handled = true;
                               };
 
         _btnForward = new() { X = Pos.Right (_btnBack) + 1, Y = 1, NoPadding = true };
@@ -132,7 +134,7 @@ public class FileDialog : Dialog, IDesignable
         _btnForward.Accepting += (s, e) =>
                                  {
                                      _history.Forward();
-                                     e.Cancel = true;
+                                     e.Handled = true;
                                  };
 
         _tbPath = new() { Width = Dim.Fill (), CaptionColor = new (Color.Black) };
@@ -214,7 +216,7 @@ public class FileDialog : Dialog, IDesignable
         _btnToggleSplitterCollapse.Accepting += (s, e) =>
                                                 {
                                                     // Required otherwise the Save button clicks itself
-                                                    e.Cancel = true;
+                                                    e.Handled = true;
                                                     Tile tile = _splitContainer.Tiles.ElementAt (0);
 
                                                     bool newState = !tile.ContentView.Visible;
@@ -1135,7 +1137,7 @@ public class FileDialog : Dialog, IDesignable
             }
             else if (setPathText)
             {
-                Path = newState.Directory.FullName;
+                SetPathToSelectedObject (newState.Directory);
             }
 
             State = newState;
@@ -1393,7 +1395,7 @@ public class FileDialog : Dialog, IDesignable
         {
             _pushingState = true;
 
-            Path = dest.FullName;
+            SetPathToSelectedObject (dest);
             State.Selected = stats;
             _tbPath.Autocomplete.ClearSuggestions ();
         }
@@ -1405,12 +1407,32 @@ public class FileDialog : Dialog, IDesignable
 
     private void TreeView_SelectionChanged (object sender, SelectionChangedEventArgs<IFileSystemInfo> e)
     {
-        if (e.NewValue is null)
+        SetPathToSelectedObject (e.NewValue);
+    }
+
+    private void SetPathToSelectedObject (IFileSystemInfo? selected)
+    {
+        if (selected is null)
         {
             return;
         }
 
-        Path = e.NewValue.FullName;
+        if (selected is IDirectoryInfo && Style.PreserveFilenameOnDirectoryChanges)
+        {
+            if (!string.IsNullOrWhiteSpace (Path) && !_fileSystem.Directory.Exists (Path))
+            {
+                var currentFile = _fileSystem.Path.GetFileName (Path);
+
+                if (!string.IsNullOrWhiteSpace (currentFile))
+                {
+                    Path = _fileSystem.Path.Combine (selected.FullName, currentFile);
+
+                    return;
+                }
+            }
+        }
+
+        Path = selected.FullName;
     }
 
     private bool TryAcceptMulti ()

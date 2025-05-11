@@ -133,7 +133,7 @@ public class Border : Adornment
             };
             CloseButton.Accept += (s, e) =>
             {
-                e.Cancel = Parent.InvokeCommand (Command.QuitToplevel) == true;
+                e.Handled = Parent.InvokeCommand (Command.QuitToplevel) == true;
             };
             Add (CloseButton);
 

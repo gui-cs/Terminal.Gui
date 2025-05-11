@@ -16,6 +16,7 @@ public class FileDialogExamples : Scenario
     private CheckBox _cbAlwaysTableShowHeaders;
     private CheckBox _cbCaseSensitive;
     private CheckBox _cbDrivesOnlyInTree;
+    private CheckBox _cbPreserveFilenameOnDirectoryChanges;
     private CheckBox _cbFlipButtonOrder;
     private CheckBox _cbMustExist;
     private CheckBox _cbShowTreeBranchLines;
@@ -54,6 +55,9 @@ public class FileDialogExamples : Scenario
 
         _cbDrivesOnlyInTree = new CheckBox { CheckedState = CheckState.UnChecked, Y = y++, X = x, Text = "Only Show _Drives" };
         win.Add (_cbDrivesOnlyInTree);
+
+        _cbPreserveFilenameOnDirectoryChanges = new CheckBox { CheckedState = CheckState.UnChecked, Y = y++, X = x, Text = "Preserve Filename" };
+        win.Add (_cbPreserveFilenameOnDirectoryChanges);
 
         y = 0;
         x = 24;
@@ -137,7 +141,7 @@ public class FileDialogExamples : Scenario
                             }
                             finally
                             {
-                                e.Cancel = true;
+                                e.Handled = true;
                             }
                         };
         win.Add (btn);
@@ -164,7 +168,15 @@ public class FileDialogExamples : Scenario
         var fd = new FileDialog
         {
             OpenMode = Enum.Parse<OpenMode> (
-                                             _rgOpenMode.RadioLabels.Select (l => TextFormatter.RemoveHotKeySpecifier(l, 0, _rgOpenMode.HotKeySpecifier)).ToArray() [_rgOpenMode.SelectedItem]
+                                             _rgOpenMode.RadioLabels
+                                                        .Select (l => TextFormatter.FindHotKey (l, _rgOpenMode.HotKeySpecifier, out int hotPos, out Key _)
+
+                                                                          // Remove the hotkey specifier at the found position
+                                                                          ? TextFormatter.RemoveHotKeySpecifier (l, hotPos, _rgOpenMode.HotKeySpecifier)
+
+                                                                          // No hotkey found, return the label as is
+                                                                          : l)
+                                                        .ToArray () [_rgOpenMode.SelectedItem]
                                             ),
             MustExist = _cbMustExist.CheckedState == CheckState.Checked,
             AllowsMultipleSelection = _cbAllowMultipleSelection.CheckedState == CheckState.Checked
@@ -197,6 +209,9 @@ public class FileDialogExamples : Scenario
         {
             fd.Style.TreeRootGetter = () => { return Environment.GetLogicalDrives ().ToDictionary (dirInfoFactory.New, k => k); };
         }
+
+        fd.Style.PreserveFilenameOnDirectoryChanges = _cbPreserveFilenameOnDirectoryChanges.CheckedState == CheckState.Checked;
+        
 
         if (_rgAllowedTypes.SelectedItem > 0)
         {

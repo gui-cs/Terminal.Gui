@@ -1110,7 +1110,7 @@ public class TextField : View
             TextModel.SetCol (ref col, Viewport.Width - 1, cols);
         }
 
-        int pos = col - ScrollOffset + Math.Min (Viewport.X, 0);
+        int pos = col + Math.Min (Viewport.X, 0);
         Move (pos, 0);
 
         return new Point (pos, 0);

@@ -765,7 +765,7 @@ public class TextFieldTests (ITestOutputHelper output)
         void TextFieldAccept (object sender, CommandEventArgs e)
         {
             textFieldAccept++;
-            e.Cancel = handleAccept;
+            e.Handled = handleAccept;
         }
 
         void ButtonAccept (object sender, CommandEventArgs e) { buttonAccept++; }

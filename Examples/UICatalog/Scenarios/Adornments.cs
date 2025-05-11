@@ -143,7 +143,7 @@ public class Adornments : Scenario
                                 view.Border.CloseButton.Accept += (s, e) =>
                                                                   {
                                                                       MessageBox.Query (20, 7, "Hi", "Window Close Button Pressed!", "Ok");
-                                                                      e.Cancel = true;
+                                                                      e.Handled = true;
                                                                   };
 
                                 view.Accept += (s, e) => MessageBox.Query (20, 7, "Hi", "Window Close Button Pressed!", "Ok");

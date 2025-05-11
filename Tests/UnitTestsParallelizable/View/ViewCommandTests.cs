@@ -49,7 +49,7 @@ public class ViewCommandTests
         void ViewOnAccept (object sender, CommandEventArgs e)
         {
             acceptInvoked = true;
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 
@@ -180,7 +180,7 @@ public class ViewCommandTests
         void ViewOnSelect (object sender, CommandEventArgs e)
         {
             selectingInvoked = true;
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 
@@ -276,25 +276,25 @@ public class ViewCommandTests
 
             Accepting += (s, a) =>
                          {
-                             a.Cancel = HandleAccepted;
+                             a.Handled = HandleAccepted;
                              AcceptedCount++;
                          };
 
             HandlingHotKey += (s, a) =>
                               {
-                                  a.Cancel = HandleHandlingHotKey;
+                                  a.Handled = HandleHandlingHotKey;
                                   HandlingHotKeyCount++;
                               };
 
             Selecting += (s, a) =>
                          {
-                             a.Cancel = HandleSelecting;
+                             a.Handled = HandleSelecting;
                              SelectingCount++;
                          };
 
             CommandNotBound += (s, a) =>
                                {
-                                   a.Cancel = HandleCommandNotBound;
+                                   a.Handled = HandleCommandNotBound;
                                    CommandNotBoundCount++;
                                };
         }

@@ -198,7 +198,7 @@ public class Dialogs : Scenario
                                                                      );
                                        Application.Run (dlg);
                                        dlg.Dispose ();
-                                       e.Cancel = true;
+                                       e.Handled = true;
                                    };
 
         app.Add (showDialogButton);
@@ -258,7 +258,7 @@ public class Dialogs : Scenario
                 button.Accepting += (s, e) =>
                                  {
                                      clicked = buttonId;
-                                     e.Cancel = true;
+                                     e.Handled = true;
                                      Application.RequestStop ();
                                  };
                 buttons.Add (button);
@@ -313,7 +313,7 @@ public class Dialogs : Scenario
                                                {
                                                    clicked = buttonId;
                                                    Application.RequestStop ();
-                                                   e.Cancel = true;
+                                                   e.Handled = true;
                                                };
                               buttons.Add (button);
                               dialog.AddButton (button);
@@ -322,7 +322,7 @@ public class Dialogs : Scenario
                               //{
                               //    button.TabIndex = buttons [buttons.Count - 2].TabIndex + 1;
                               //}
-                              e.Cancel = true;
+                              e.Handled = true;
                           };
             dialog.Add (add);
 
@@ -340,7 +340,7 @@ public class Dialogs : Scenario
                                       button.Text += char.ConvertFromUtf32 (CODE_POINT);
                                   }
 
-                                  e.Cancel = true;
+                                  e.Handled = true;
                               };
             dialog.Add (addChar);
 

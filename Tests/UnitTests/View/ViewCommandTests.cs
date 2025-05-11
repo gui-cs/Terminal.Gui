@@ -28,7 +28,7 @@ public class ViewCommandTests
         btnA.Accepting += (s, e) =>
                           {
                               aAcceptedCount++;
-                              e.Cancel = aCancelAccepting;
+                              e.Handled = aCancelAccepting;
                           };
 
         var btnB = new Button ()
@@ -40,7 +40,7 @@ public class ViewCommandTests
         btnB.Accepting += (s, e) =>
                           {
                               bAcceptedCount++;
-                              e.Cancel = bCancelAccepting;
+                              e.Handled = bCancelAccepting;
                           };
         w.Add (btnA, btnB);
 
@@ -96,11 +96,11 @@ public class ViewCommandTests
         w.Accepting += (s, e) =>
                        {
                            wAcceptedCount++;
-                           e.Cancel = wCancelAccepting;
+                           e.Handled = wCancelAccepting;
                        };
 
         int btnAcceptedCount = 0;
-        bool btnCancelAccepting = false;
+        bool btnCancelAccepting = true;
         var btn = new Button ()
         {
             Title = "Button",
@@ -112,7 +112,7 @@ public class ViewCommandTests
         btn.Accepting += (s, e) =>
                          {
                              btnAcceptedCount++;
-                             e.Cancel = btnCancelAccepting;
+                             e.Handled = btnCancelAccepting;
                          };
 
         w.Add (btn);
@@ -148,7 +148,7 @@ public class ViewCommandTests
                                      });
 
         Assert.Equal (1, btnAcceptedCount);
-        Assert.Equal (2, wAcceptedCount);
+        Assert.Equal (0, wAcceptedCount);
 
         Application.ResetState (true);
     }

@@ -114,7 +114,7 @@ public class DimEditor : EditorBase
             {
                 // ignored
             }
-            args.Cancel = true;
+            args.Handled = true;
         };
         Add (_valueEdit);
 

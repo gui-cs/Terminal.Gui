@@ -153,7 +153,7 @@ public class LineDrawing : Scenario
         btnOk.Accepting += (s, e) =>
                         {
                             accept = true;
-                            e.Cancel = true;
+                            e.Handled = true;
                             Application.RequestStop ();
                         };
 
@@ -167,7 +167,7 @@ public class LineDrawing : Scenario
 
         btnCancel.Accepting += (s, e) =>
                             {
-                                e.Cancel = true;
+                                e.Handled = true;
                                 Application.RequestStop ();
                             };
 

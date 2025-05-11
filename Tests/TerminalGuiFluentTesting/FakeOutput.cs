@@ -24,5 +24,10 @@ internal class FakeOutput : IConsoleOutput
     public void SetCursorVisibility (CursorVisibility visibility) { }
 
     /// <inheritdoc/>
-    public void SetCursorPosition (int col, int row) { }
+    public void SetCursorPosition (int col, int row) { CursorPosition = new Point (col, row); }
+
+    /// <summary>
+    /// The last value set by calling <see cref="SetCursorPosition"/>
+    /// </summary>
+    public Point CursorPosition { get; private set; }
 }

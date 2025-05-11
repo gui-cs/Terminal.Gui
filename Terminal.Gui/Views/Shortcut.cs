@@ -450,7 +450,7 @@ public class Shortcut : View, IOrientation, IDesignable
             void CommandViewOnAccepted (object? sender, CommandEventArgs e)
             {
                 // Always eat CommandView.Accept
-                e.Cancel = true;
+                e.Handled = true;
             }
 
             void CommandViewOnSelecting (object? sender, CommandEventArgs e)
@@ -462,7 +462,7 @@ public class Shortcut : View, IOrientation, IDesignable
                     InvokeCommand<KeyBinding> (Command.Select, new ([Command.Select], null, this));
                 }
 
-                e.Cancel = true;
+                e.Handled = true;
             }
         }
     }
