@@ -1,5 +1,4 @@
 #nullable enable
-using SixLabors.ImageSharp.ColorSpaces;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -33,19 +32,19 @@ public sealed class TestStyles : Scenario
 
     private void OnAppWindowOnDrawingContent (object? sender, DrawEventArgs args)
     {
-        View? sendingView = sender as View;
-        if (sendingView is { })
+        if (sender is View { } sendingView)
         {
-            int y = 0;
-            int x = 0;
+            var y = 0;
+            var x = 0;
             int maxWidth = sendingView.Viewport.Width; // Get the available width of the view
-            var allStyles = Enum.GetValues (typeof (TextStyle))
-                .Cast<TextStyle> ()
-                .Where (style => style != TextStyle.None)
-                .ToArray ();
+
+            TextStyle [] allStyles = Enum.GetValues (typeof (TextStyle))
+                                         .Cast<TextStyle> ()
+                                         .Where (style => style != TextStyle.None)
+                                         .ToArray ();
 
             // Draw individual flags on the first line
-            foreach (var style in allStyles)
+            foreach (TextStyle style in allStyles)
             {
                 string text = Enum.GetName (typeof (TextStyle), style)!;
                 int textWidth = text.Length;
@@ -58,6 +57,7 @@ public sealed class TestStyles : Scenario
                 }
 
                 sendingView.Move (x, y);
+
                 var attr = new Attribute (sendingView.GetNormalColor ())
                 {
                     TextStyle = style
@@ -69,17 +69,18 @@ public sealed class TestStyles : Scenario
             }
 
             // Add a blank line
-            y+=2;
+            y += 2;
             x = 0;
 
             // Generate all combinations of TextStyle (excluding individual flags)
             int totalCombinations = 1 << allStyles.Length; // 2^n combinations
-            for (int i = 1; i < totalCombinations; i++) // Start from 1 to skip "None"
+
+            for (var i = 1; i < totalCombinations; i++) // Start from 1 to skip "None"
             {
                 var combination = (TextStyle)0;
-                var styleNames = new List<string> ();
+                List<string> styleNames = new ();
 
-                for (int bit = 0; bit < allStyles.Length; bit++)
+                for (var bit = 0; bit < allStyles.Length; bit++)
                 {
                     if ((i & (1 << bit)) != 0)
                     {
@@ -105,6 +106,7 @@ public sealed class TestStyles : Scenario
                 }
 
                 sendingView.Move (x, y);
+
                 var attr = new Attribute (sendingView.GetNormalColor ())
                 {
                     TextStyle = combination
@@ -117,7 +119,5 @@ public sealed class TestStyles : Scenario
 
             args.Cancel = true;
         }
-
     }
-
 }
