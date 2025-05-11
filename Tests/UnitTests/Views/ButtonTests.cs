@@ -513,7 +513,7 @@ public class ButtonTests (ITestOutputHelper output)
         void ButtonAccept (object sender, CommandEventArgs e)
         {
             acceptInvoked = true;
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 
@@ -616,7 +616,7 @@ public class ButtonTests (ITestOutputHelper output)
         button.Accepting += (s, e) =>
                             {
                                 acceptedCount++;
-                                e.Cancel = true;
+                                e.Handled = true;
                             };
 
         me = new ();
@@ -661,7 +661,7 @@ public class ButtonTests (ITestOutputHelper output)
         button.Accepting += (s, e) =>
                             {
                                 acceptedCount++;
-                                e.Cancel = true;
+                                e.Handled = true;
                             };
 
         var selectingCount = 0;
@@ -669,7 +669,7 @@ public class ButtonTests (ITestOutputHelper output)
         button.Selecting += (s, e) =>
                             {
                                 selectingCount++;
-                                e.Cancel = true;
+                                e.Handled = true;
                             };
 
         me.Flags = pressed;

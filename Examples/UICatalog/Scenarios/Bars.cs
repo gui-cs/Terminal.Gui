@@ -486,7 +486,7 @@ public class Bars : Scenario
             CanFocus = false
         };
         // This ensures the checkbox state toggles when the hotkey of Title is pressed.
-        shortcut4.Accepting += (sender, args) => args.Cancel = true;
+        shortcut4.Accepting += (sender, args) => args.Handled = true;
 
         bar.Add (shortcut1, shortcut2, shortcut3, line, shortcut4);
     }
@@ -536,7 +536,7 @@ public class Bars : Scenario
                                                     {
                                                         button1.Visible = !button1.Visible;
                                                         button1.Enabled = button1.Visible;
-                                                        e.Cancel = false;
+                                                        e.Handled = true;
                                                     };
 
         bar.Add (new Label
