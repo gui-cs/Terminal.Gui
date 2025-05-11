@@ -222,18 +222,6 @@ public class ApplicationV2 : ApplicationImpl
         // All RequestStop does is set the Running property to false - In the next iteration
         // this will be detected
         top.Running = false;
-
-        //// TODO: This definition of stop seems sketchy
-        //Application.TopLevels.TryPop (out _);
-
-        //if (Application.TopLevels.Count > 0)
-        //{
-        //    Application.Top = Application.TopLevels.Peek ();
-        //}
-        //else
-        //{
-        //    Application.Top = null;
-        //}
     }
 
     /// <inheritdoc/>

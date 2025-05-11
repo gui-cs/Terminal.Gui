@@ -47,8 +47,6 @@ public class PopoverMenuTests (ITestOutputHelper outputHelper)
     [ClassData (typeof (V2TestDrivers))]
     public void Activate_Sets_Application_Navigation_Correctly (V2TestDriver d)
     {
-        MenuBarv2? menuBar = null;
-
         using GuiTestContext c = With.A<Window> (50, 20, d)
                                      .Then (
                                             () =>
@@ -93,8 +91,6 @@ public class PopoverMenuTests (ITestOutputHelper outputHelper)
     [ClassData (typeof (V2TestDrivers))]
     public void QuitKey_Hides (V2TestDriver d)
     {
-        MenuBarv2? menuBar = null;
-
         using GuiTestContext c = With.A<Window> (50, 20, d)
                                      .Then (
                                             () =>
@@ -145,8 +141,6 @@ public class PopoverMenuTests (ITestOutputHelper outputHelper)
     [ClassData (typeof (V2TestDrivers))]
     public void QuitKey_Restores_Focus_Correctly (V2TestDriver d)
     {
-        MenuBarv2? menuBar = null;
-
         using GuiTestContext c = With.A<Window> (50, 20, d)
                                      .Then (
                                             () =>
@@ -195,8 +189,6 @@ public class PopoverMenuTests (ITestOutputHelper outputHelper)
     [ClassData (typeof (V2TestDrivers))]
     public void MenuBarItem_With_QuitKey_Open_QuitKey_Does_Not_Quit_App (V2TestDriver d)
     {
-        MenuBarv2? menuBar = null;
-
         using GuiTestContext c = With.A<Window> (50, 20, d)
                                      .Then (
                                             () =>
@@ -240,7 +232,6 @@ public class PopoverMenuTests (ITestOutputHelper outputHelper)
                                      .WriteOutLogs (_out)
                                      .Stop ();
     }
-
 
     [Theory]
     [ClassData (typeof (V2TestDrivers))]

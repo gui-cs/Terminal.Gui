@@ -652,23 +652,17 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
                         new Line (),
                         new MenuItemv2 (context as View, Command.SelectAll),
                         new Line (),
-                        new MenuItemv2 ()
-                        {
-                            Title = "_Details",
-                            SubMenu = new (ConfigureDetailsSubMenu ())
-                        },
-                        new Line (),
                         new MenuItemv2 (context as View, Command.Quit)
                     ])
         {
             Title = "Popover Demo Root"
         };
 
-        // NOTE: Setting Visible to true is a workaround for the fact that the PopoverMenu is not visible in the designer
+        // NOTE: This is a workaround for the fact that the PopoverMenu is not visible in the designer
         // NOTE: without being activated via Application.Popover. But we want it to be visible.
         // NOTE: If you use PopoverView.EnableForDesign for real Popover scenarios, change back to false
         // NOTE: after calling EnableForDesign.
-        Visible = true;
+        //Visible = true;
 
         return true;
 

@@ -1,8 +1,5 @@
 #nullable enable
 
-using System.ComponentModel;
-using System.Diagnostics;
-
 namespace Terminal.Gui;
 
 /// <summary>
@@ -106,12 +103,6 @@ public sealed class ApplicationPopover : IDisposable
 
         if (popover is View newPopover)
         {
-            // Don't allow Show with Popovers that have SuperViews - doesn't make sense.
-            if (newPopover.SuperView is { })
-            {
-                throw new InvalidOperationException (@"A Popover must not have a SuperView.");
-            }
-
             Register (popover);
             if (!newPopover.IsInitialized)
             {
@@ -181,9 +172,6 @@ public sealed class ApplicationPopover : IDisposable
             {
                 return true;
             }
-
-            // ActivePopover may have changed
-            activePopover = GetActivePopover () as View;
         }
 
         return hotKeyHandled is true;

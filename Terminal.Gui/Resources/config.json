@@ -135,16 +135,16 @@
                 "Background": "DarkBlue"
               },
               "Focus": {
-                "Foreground": "White",
-                "Background": "Blue"
+                "Foreground": "DarkBlue",
+                "Background": "White"
               },
               "HotNormal": {
                 "Foreground": "Yellow",
                 "Background": "DarkBlue"
               },
               "HotFocus": {
-                "Foreground": "Yellow",
-                "Background": "Blue"
+                "Foreground": "Blue",
+                "Background": "White"
               },
               "Disabled": {
                 "Foreground": "Gray",
@@ -855,6 +855,18 @@
             }
           }
         ]
+      }
+    },
+    {
+      "Minimal": {
+        "Dialog.DefaultShadow": "None",
+        "FrameView.DefaultBorderStyle": "None",
+        "Window.DefaultBorderStyle": "None",
+        "MessageBox.DefaultBorderStyle": "None",
+        "Button.DefaultShadow": "None",
+        "Menuv2.DefaultBorderStyle": "None",
+        "Glyphs.LeftBracket": "[",
+        "Glyphs.RightBracket": "]"
       }
     }
   ]

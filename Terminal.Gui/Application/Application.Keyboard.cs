@@ -15,13 +15,14 @@ public static partial class Application // Keyboard handling
     {
         Logging.Debug ($"{key}");
 
-//#if DEBUG
-//        if (key == Key.Empty.WithAlt || key == Key.Empty.WithCtrl)
-//        {
-//            Logging.Debug ($"Ignoring {key}");
-//            return false;
-//        }
-//#endif
+        // TODO: Add a way to ignore certain keys, esp for debugging.
+        //#if DEBUG
+        //        if (key == Key.Empty.WithAlt || key == Key.Empty.WithCtrl)
+        //        {
+        //            Logging.Debug ($"Ignoring {key}");
+        //            return false;
+        //        }
+        //#endif
 
         // TODO: This should match standard event patterns
         KeyDown?.Invoke (null, key);
