@@ -70,6 +70,7 @@ public class Label : View, IDesignable
         {
             SetFocus ();
 
+            // QUESTION: Why do we always return true here?
             return true;
         }
 

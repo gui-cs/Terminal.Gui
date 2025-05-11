@@ -30,6 +30,7 @@ public partial class View // Command APIs
 
                         SetFocus ();
 
+                        // QUESTION: Why do we always return true here?
                         return true;
                     });
 
@@ -43,14 +44,7 @@ public partial class View // Command APIs
                             return true;
                         }
 
-                        if (CanFocus)
-                        {
-                            SetFocus ();
-
-                            return true;
-                        }
-
-                        return false;
+                        return SetFocus ();
                     });
     }
 
