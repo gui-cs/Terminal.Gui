@@ -233,6 +233,118 @@ public class PopoverMenuTests (ITestOutputHelper outputHelper)
                                      .Stop ();
     }
 
+
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void Not_Active_DoesNotEat_Space (V2TestDriver d)
+    {
+        int spaceKeyDownCount = 0;
+        View testView = new View ()
+        {
+            CanFocus = true,
+            Id = "testView",
+        };
+
+        testView.KeyDown += (sender, key) =>
+        {
+            if (key == Key.Space)
+            {
+                spaceKeyDownCount++;
+            }
+        };
+
+        using GuiTestContext c = With.A<Window> (50, 20, d)
+                                     .Then (
+                                            () =>
+                                            {
+                                                var popoverMenu = new PopoverMenu();
+                                                Toplevel top = Application.Top!;
+                                                popoverMenu.EnableForDesign (ref top);
+                                                Application.Popover!.Register (popoverMenu);
+                                            })
+                                     .Add (testView)
+                                     .WaitIteration ()
+                                     .Focus (testView)
+                                     .RaiseKeyDownEvent (Key.Space)
+                                     .Then (() => Assert.Equal (1, spaceKeyDownCount))
+                                     .WriteOutLogs (_out)
+                                     .Stop ();
+    }
+
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void Not_Active_DoesNotEat_Enter (V2TestDriver d)
+    {
+        int enterKeyDownCount = 0;
+        View testView = new View ()
+        {
+            CanFocus = true,
+            Id = "testView",
+        };
+
+        testView.KeyDown += (sender, key) =>
+        {
+            if (key == Key.Enter)
+            {
+                enterKeyDownCount++;
+            }
+        };
+
+        using GuiTestContext c = With.A<Window> (50, 20, d)
+                                     .Then (
+                                            () =>
+                                            {
+                                                var popoverMenu = new PopoverMenu ();
+                                                Toplevel top = Application.Top!;
+                                                popoverMenu.EnableForDesign (ref top);
+                                                Application.Popover!.Register (popoverMenu);
+                                            })
+                                     .Add (testView)
+                                     .WaitIteration ()
+                                     .Focus (testView)
+                                     .RaiseKeyDownEvent (Key.Enter)
+                                     .Then (() => Assert.Equal (1, enterKeyDownCount))
+                                     .WriteOutLogs (_out)
+                                     .Stop ();
+    }
+
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void Not_Active_DoesNotEat_QuitKey (V2TestDriver d)
+    {
+        int quitKeyDownCount = 0;
+        View testView = new View ()
+        {
+            CanFocus = true,
+            Id = "testView",
+        };
+
+        testView.KeyDown += (sender, key) =>
+                            {
+                                if (key == Application.QuitKey)
+                                {
+                                    quitKeyDownCount++;
+                                }
+                            };
+
+        using GuiTestContext c = With.A<Window> (50, 20, d)
+                                     .Then (
+                                            () =>
+                                            {
+                                                var popoverMenu = new PopoverMenu ();
+                                                Toplevel top = Application.Top!;
+                                                popoverMenu.EnableForDesign (ref top);
+                                                Application.Popover!.Register (popoverMenu);
+                                            })
+                                     .Add (testView)
+                                     .WaitIteration ()
+                                     .Focus (testView)
+                                     .RaiseKeyDownEvent (Application.QuitKey)
+                                     .Then (() => Assert.Equal (1, quitKeyDownCount))
+                                     .WriteOutLogs (_out)
+                                     .Stop ();
+    }
+
     [Theory]
     [ClassData (typeof (V2TestDrivers))]
     public void RootMenu_MenuItem_WithSubMenu_HotKey_Activates_SubMenu (V2TestDriver d)

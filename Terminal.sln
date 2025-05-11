@@ -5,15 +5,15 @@ VisualStudioVersion = 17.2.32427.441
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Terminal.Gui", "Terminal.Gui\Terminal.Gui.csproj", "{00F366F8-DEE4-482C-B9FD-6DB0200B79E5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UICatalog", "UICatalog\UICatalog.csproj", "{88979F89-9A42-448F-AE3E-3060145F6375}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UICatalog", "Examples\UICatalog\UICatalog.csproj", "{88979F89-9A42-448F-AE3E-3060145F6375}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReactiveExample", "ReactiveExample\ReactiveExample.csproj", "{44E15B48-0DB2-4560-82BD-D3B7989811C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReactiveExample", "Examples\ReactiveExample\ReactiveExample.csproj", "{44E15B48-0DB2-4560-82BD-D3B7989811C3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example", "Example\Example.csproj", "{B0A602CD-E176-449D-8663-64238D54F857}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example", "Examples\Example\Example.csproj", "{B0A602CD-E176-449D-8663-64238D54F857}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E143FB1F-0B88-48CB-9086-72CDCECFCD22}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunityToolkitExample", "CommunityToolkitExample\CommunityToolkitExample.csproj", "{58FDCA8F-08F7-4D80-9DA3-6A9AED01E163}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunityToolkitExample", "Examples\CommunityToolkitExample\CommunityToolkitExample.csproj", "{58FDCA8F-08F7-4D80-9DA3-6A9AED01E163}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Settings", "Settings", "{B8F48EE8-34A6-43B7-B00E-CD91CDD93962}"
 	ProjectSection(SolutionItems) = preProject
@@ -49,11 +49,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{C7A51224-5
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SelfContained", "SelfContained\SelfContained.csproj", "{524DEA78-7E7C-474D-B42D-52ED4C04FF14}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SelfContained", "Examples\SelfContained\SelfContained.csproj", "{524DEA78-7E7C-474D-B42D-52ED4C04FF14}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NativeAot", "NativeAot\NativeAot.csproj", "{E6D716C6-AC94-4150-B10A-44AE13F79344}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NativeAot", "Examples\NativeAot\NativeAot.csproj", "{E6D716C6-AC94-4150-B10A-44AE13F79344}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "Benchmarks\Benchmarks.csproj", "{242FBD3E-2EC6-4274-BD40-8E62AF9327B2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "Tests\Benchmarks\Benchmarks.csproj", "{242FBD3E-2EC6-4274-BD40-8E62AF9327B2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "Tests\UnitTests\UnitTests.csproj", "{038B09F5-EF3A-F21E-7C10-A6551866ECE2}"
 EndProject
@@ -63,11 +63,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StressTests", "Tests\Stress
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.Parallelizable", "Tests\UnitTestsParallelizable\UnitTests.Parallelizable.csproj", "{DE780834-190A-8277-51FD-750CC666E82D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerminalGuiFluentTesting", "TerminalGuiFluentTesting\TerminalGuiFluentTesting.csproj", "{2DBA7BDC-17AE-474B-A507-00807D087607}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerminalGuiFluentTesting", "Tests\TerminalGuiFluentTesting\TerminalGuiFluentTesting.csproj", "{2DBA7BDC-17AE-474B-A507-00807D087607}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerminalGuiFluentTestingXunit", "TerminalGuiFluentTestingXunit\TerminalGuiFluentTestingXunit.csproj", "{F56BAFFD-F227-4B0A-96F0-C800FAEF2036}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerminalGuiFluentTestingXunit", "Tests\TerminalGuiFluentTestingXunit\TerminalGuiFluentTestingXunit.csproj", "{F56BAFFD-F227-4B0A-96F0-C800FAEF2036}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerminalGuiFluentTestingXunit.Generator", "TerminalGuiFluentTestingXunit.Generator\TerminalGuiFluentTestingXunit.Generator.csproj", "{199F27D8-A905-4DDC-82CA-1FE1A90B1788}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerminalGuiFluentTestingXunit.Generator", "Tests\TerminalGuiFluentTestingXunit.Generator\TerminalGuiFluentTestingXunit.Generator.csproj", "{199F27D8-A905-4DDC-82CA-1FE1A90B1788}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

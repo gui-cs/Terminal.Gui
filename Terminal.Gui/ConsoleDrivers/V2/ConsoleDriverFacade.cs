@@ -141,7 +141,11 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
     ///         <see langword="false"/>, indicating that the <see cref="ConsoleDriver"/> cannot support TrueColor.
     ///     </para>
     /// </remarks>
-    public bool Force16Colors { get; set; }
+    public bool Force16Colors
+    {
+        get => Application.Force16Colors || !SupportsTrueColor;
+        set => Application.Force16Colors = value || !SupportsTrueColor;
+    }
 
     /// <summary>
     ///     The <see cref="Attribute"/> that will be used for the next <see cref="AddRune(Rune)"/> or <see cref="AddStr"/>

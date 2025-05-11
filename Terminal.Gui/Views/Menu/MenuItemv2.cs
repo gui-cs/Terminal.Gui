@@ -177,7 +177,7 @@ public class MenuItemv2 : Shortcut
         Logging.Debug ($"{Title} - calling base.OnAccepting: {e.Context?.Command}");
         bool? ret = base.OnAccepting (e);
 
-        if (ret is true || e.Cancel)
+        if (ret is true || e.Handled)
         {
             return true;
         }

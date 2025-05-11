@@ -371,7 +371,7 @@ public static class MessageBox
 
                                        if (e is { })
                                        {
-                                           e.Cancel = true;
+                                           e.Handled = true;
                                        }
 
                                        Application.RequestStop ();

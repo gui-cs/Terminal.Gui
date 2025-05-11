@@ -68,11 +68,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         tv.Table = new DataTableSource (dt);
         tv.NullSymbol = string.Empty;
-
-        var top = new Toplevel ();
-        top.Add (tv);
-        Application.Begin (top);
-
+        tv.ColorScheme = new ColorScheme ();
         tv.Draw ();
 
         var expected =
@@ -105,6 +101,8 @@ public class TableViewTests (ITestOutputHelper output)
             style.ColorGetter = e => { return scheme; };
         }
 
+        // Required or won't draw properly
+        Application.Driver.Clip = new Region (tv.Frame);
         tv.SetNeedsDraw ();
         tv.Draw ();
 
@@ -116,7 +114,6 @@ public class TableViewTests (ITestOutputHelper output)
 01111101101111111110
 ";
         DriverAssert.AssertDriverAttributesAre (expected, output, Application.Driver, tv.ColorScheme.Normal, color);
-        top.Dispose ();
     }
 
     [Fact]
