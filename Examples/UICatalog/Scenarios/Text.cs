@@ -452,7 +452,7 @@ public class Text : Scenario
 
         void WinOnAccept (object sender, CommandEventArgs e)
         {
-            e.Cancel = true; // Don't let it close
+            e.Handled = true; // Don't let it close
 
             acceptView.Text = $"Accept was Invoked via {win.Focused.GetType().Name}";
 

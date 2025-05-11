@@ -56,6 +56,9 @@ internal partial class WindowsOutput : IConsoleOutput
     [DllImport ("kernel32.dll")]
     private static extern bool SetConsoleCursorPosition (nint hConsoleOutput, Coord dwCursorPosition);
 
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern bool SetConsoleCursorInfo (nint hConsoleOutput, [In] ref ConsoleCursorInfo lpConsoleCursorInfo);
+
     private readonly nint _screenBuffer;
 
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
@@ -173,7 +176,7 @@ internal partial class WindowsOutput : IConsoleOutput
                              outputBuffer,
                              bufferCoords,
                              damageRegion,
-                             false))
+                             Application.Driver!.Force16Colors))
         {
             int err = Marshal.GetLastWin32Error ();
 
@@ -309,10 +312,23 @@ internal partial class WindowsOutput : IConsoleOutput
     /// <inheritdoc/>
     public void SetCursorVisibility (CursorVisibility visibility)
     {
-        string cursorVisibilitySequence = visibility != CursorVisibility.Invisible
-            ? EscSeqUtils.CSI_ShowCursor
-            : EscSeqUtils.CSI_HideCursor;
-        Write (cursorVisibilitySequence);
+        if (Application.Driver!.Force16Colors)
+        {
+            var info = new ConsoleCursorInfo
+            {
+                dwSize = (uint)visibility & 0x00FF,
+                bVisible = ((uint)visibility & 0xFF00) != 0
+            };
+
+            SetConsoleCursorInfo (_screenBuffer, ref info);
+        }
+        else
+        {
+            string cursorVisibilitySequence = visibility != CursorVisibility.Invisible
+                                                  ? EscSeqUtils.CSI_ShowCursor
+                                                  : EscSeqUtils.CSI_HideCursor;
+            Write (cursorVisibilitySequence);
+        }
     }
 
     private Point _lastCursorPosition;

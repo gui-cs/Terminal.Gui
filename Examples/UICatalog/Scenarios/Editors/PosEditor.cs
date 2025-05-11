@@ -115,7 +115,7 @@ public class PosEditor : EditorBase
                                         // ignored
                                     }
 
-                                    args.Cancel = true;
+                                    args.Handled = true;
                                 };
         Add (_valueEdit);
 

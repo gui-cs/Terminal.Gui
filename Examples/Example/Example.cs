@@ -78,8 +78,8 @@ public class ExampleWindow : Window
                                {
                                    MessageBox.ErrorQuery ("Logging In", "Incorrect username or password", "Ok");
                                }
-                               // Anytime Accepting is handled, make sure to set e.Cancel to false.
-                               e.Cancel = false;
+                               // When Accepting is handled, set e.Handled to true to prevent further processing.
+                               e.Handled = true;
                            };
 
         // Add the views to the Window

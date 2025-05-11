@@ -246,7 +246,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         void ViewOnAccept (object sender, CommandEventArgs e)
         {
             acceptInvoked = true;
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 
@@ -313,7 +313,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         checkBox.Accepting += (s, e) =>
                               {
                                   acceptCount++;
-                                  e.Cancel = true;
+                                  e.Handled = true;
                               };
 
         checkBox.HasFocus = true;
@@ -596,7 +596,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         void OnSelecting (object sender, CommandEventArgs e)
         {
             checkedInvoked = true;
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 

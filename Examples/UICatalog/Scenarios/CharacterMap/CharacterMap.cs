@@ -256,7 +256,7 @@ public class CharacterMap : Scenario
             _charMap.SetFocus ();
 
             // Cancel the event to prevent ENTER from being handled elsewhere
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 
