@@ -30,7 +30,8 @@ public partial class View // Command APIs
 
                         SetFocus ();
 
-                        // QUESTION: Why do we always return true here?
+                        // Always return true on hotkey, even if SetFocus fails because 
+                        // hotkeys are always handled by the View (unless RaiseHandlingHotKey cancels).
                         return true;
                     });
 
@@ -44,7 +45,14 @@ public partial class View // Command APIs
                             return true;
                         }
 
-                        return SetFocus ();
+                        if (CanFocus)
+                        {
+                            SetFocus ();
+
+                            return true;
+                        }
+
+                        return false;
                     });
     }
 
