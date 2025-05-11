@@ -95,7 +95,7 @@ public sealed class TestStyles : Scenario
                     continue;
                 }
 
-                string text = string.Join (" | ", styleNames);
+                string text = $"[{string.Join (" | ", styleNames)}]";
                 int textWidth = text.Length;
 
                 // Check if the text fits in the current line
