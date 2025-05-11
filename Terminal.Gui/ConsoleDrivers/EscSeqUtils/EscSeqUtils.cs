@@ -1849,6 +1849,136 @@ public static class EscSeqUtils
 
     #endregion
 
+    #region Text Styles
+
+    /// <summary>
+    /// Appends an ANSI SGR (Select Graphic Rendition) escape sequence to switch printed text from one <see cref="TextStyle"/> to another.
+    /// </summary>
+    /// <param name="output"><see cref="StringBuilder"/> to add escape sequence to.</param>
+    /// <param name="prev">Previous <see cref="TextStyle"/> to change away from.</param>
+    /// <param name="next">Next <see cref="TextStyle"/> to change to.</param>
+    /// <remarks>
+    /// <para>
+    /// Unlike colors, most text styling options are not mutually exclusive with each other, and can be applied independently. This creates a problem when
+    /// switching from one style to another: For instance, if your previous style is just bold, and your next style is just italic, then simply adding the
+    /// sequence to enable italic text would cause the text to remain bold. This method automatically handles this problem, enabling and disabling styles as
+    /// necessary to apply exactly the next style.
+    /// </para>
+    /// </remarks>
+    internal static void CSI_AppendTextStyleChange (StringBuilder output, TextStyle prev, TextStyle next)
+    {
+        // Do nothing if styles are the same, as no changes are necessary.
+        if (prev == next)
+        {
+            return;
+        }
+
+        // Bitwise operations to determine flag changes. A ^ B are the flags different between two flag sets. These different flags that exist in the next flag
+        // set (diff & next) are the ones that were enabled in the switch, those that exist in the previous flag set (diff & prev) are the ones that were
+        // disabled.
+        var diff = prev ^ next;
+        var enabled = diff & next;
+        var disabled = diff & prev;
+
+        // List of escape codes to apply.
+        var sgr = new List<int> ();
+
+        if (disabled != TextStyle.None)
+        {
+            // Special case: Both bold and faint have the same disabling code. While unusual, it can be valid to have both enabled at the same time, so when
+            // one and only one of them is being disabled, we need to re-enable the other afterward. We can check what flags remain enabled by taking
+            // prev & next, as this is the set of flags both have.
+            if (disabled.HasFlag (TextStyle.Bold))
+            {
+                sgr.Add (22);
+
+                if ((prev & next).HasFlag (TextStyle.Faint))
+                {
+                    sgr.Add (2);
+                }
+            }
+
+            if (disabled.HasFlag (TextStyle.Faint))
+            {
+                sgr.Add (22);
+
+                if ((prev & next).HasFlag (TextStyle.Bold))
+                {
+                    sgr.Add (1);
+                }
+            }
+
+            if (disabled.HasFlag (TextStyle.Italic))
+            {
+                sgr.Add (23);
+            }
+
+            if (disabled.HasFlag (TextStyle.Underline))
+            {
+                sgr.Add (24);
+            }
+
+            if (disabled.HasFlag (TextStyle.Blink))
+            {
+                sgr.Add (25);
+            }
+
+            if (disabled.HasFlag (TextStyle.Reverse))
+            {
+                sgr.Add (27);
+            }
+
+            if (disabled.HasFlag (TextStyle.Strikethrough))
+            {
+                sgr.Add (29);
+            }
+        }
+
+        if (enabled != TextStyle.None)
+        {
+            if (enabled.HasFlag (TextStyle.Bold))
+            {
+                sgr.Add (1);
+            }
+
+            if (enabled.HasFlag (TextStyle.Faint))
+            {
+                sgr.Add (2);
+            }
+
+            if (enabled.HasFlag (TextStyle.Italic))
+            {
+                sgr.Add (3);
+            }
+
+            if (enabled.HasFlag (TextStyle.Underline))
+            {
+                sgr.Add (4);
+            }
+
+            if (enabled.HasFlag (TextStyle.Blink))
+            {
+                sgr.Add (5);
+            }
+
+            if (enabled.HasFlag (TextStyle.Reverse))
+            {
+                sgr.Add (7);
+            }
+
+            if (enabled.HasFlag (TextStyle.Strikethrough))
+            {
+                sgr.Add (9);
+            }
+        }
+
+        output.Append ("\x1b[");
+        output.Append (string.Join (';', sgr));
+        output.Append ('m');
+    }
+
+    #endregion Text Styles
+
     #region Requests
 
     /// <summary>
