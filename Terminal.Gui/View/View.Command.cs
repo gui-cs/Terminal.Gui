@@ -47,9 +47,9 @@ public partial class View // Command APIs
 
                         if (CanFocus)
                         {
-                            SetFocus ();
-
-                            return true;
+                            // For Select, if the view is focusable and SetFocus succeeds, by defition,
+                            // the event is handled. So return what SetFocus returns.
+                            return SetFocus ();
                         }
 
                         return false;
