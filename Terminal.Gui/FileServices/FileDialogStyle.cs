@@ -10,7 +10,6 @@ namespace Terminal.Gui;
 public class FileDialogStyle
 {
     private readonly IFileSystem _fileSystem;
-    private bool _preserveFilenameOnDirectoryChanges;
 
     /// <summary>Creates a new instance of the <see cref="FileDialogStyle"/> class.</summary>
     public FileDialogStyle (IFileSystem fileSystem)
