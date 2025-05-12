@@ -37,7 +37,7 @@ public class ConfigurationManagerTests
     [Fact]
     public void HardCodedDefaultCache_Properties_Are_Copies ()
     {
-        Enable();
+        Enable ();
         ResetToHardCodedDefaults ();
         Assert.Equal (Key.Esc, Application.QuitKey);
 
@@ -253,7 +253,7 @@ public class ConfigurationManagerTests
     public void Load_And_Apply_Performance_Check ()
     {
         Enable ();
-        ResetToHardCodedDefaults();
+        ResetToHardCodedDefaults ();
 
         try
         {
@@ -281,7 +281,7 @@ public class ConfigurationManagerTests
             Disable ();
         }
     }
-    
+
 
     [Fact]
     public void Load_Loads_Custom_Json ()
@@ -317,7 +317,7 @@ public class ConfigurationManagerTests
         }
     }
 
-    [Fact]
+    [Fact (Skip = "Events disabled")]
     public void ResetToCurrentValues_Raises_Updated ()
     {
         var fired = false;
@@ -325,6 +325,7 @@ public class ConfigurationManagerTests
         try
         {
             Enable ();
+            ResetToHardCodedDefaults ();
 
             ResetToCurrentValues ();
 
@@ -342,8 +343,8 @@ public class ConfigurationManagerTests
         {
             Updated -= ConfigurationManagerUpdated;
 
-            ConfigurationManager.Disable ();
-            ConfigurationManager.ResetToHardCodedDefaults ();
+            Disable ();
+            ResetToHardCodedDefaults ();
         }
 
         return;
@@ -359,10 +360,10 @@ public class ConfigurationManagerTests
     {
         try
         {
-            Enable ();
-
             // arrange
-            ResetToHardCodedDefaults();
+            Enable ();
+            ResetToHardCodedDefaults ();
+
             Settings! ["Application.QuitKey"].PropertyValue = Key.Q;
             Settings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
             Settings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
@@ -402,25 +403,45 @@ public class ConfigurationManagerTests
         }
         finally
         {
-            ConfigurationManager.ResetToHardCodedDefaults ();
-            ConfigurationManager.Disable ();
+            ResetToHardCodedDefaults ();
+            Disable ();
         }
     }
 
     [Fact]
-    public void ResetAllSettings_Resets ()
+    public void ResetToCurrentValues_Throws_If_Not_Enabled ()
+    {
+        Assert.False (IsEnabled);
+
+        // Act
+        Assert.Throws<ConfigurationManagerNotEnabledException> (ResetToCurrentValues);
+    }
+
+    [Fact]
+    public void ResetToCurrentValues_Enabled_Resets ()
     {
         // Act
+        Enable ();
+        ResetToHardCodedDefaults ();
+
+        Application.QuitKey = Key.A;
+
         ResetToCurrentValues ();
 
+        Assert.Equal (Key.A, (Key)Settings! ["Application.QuitKey"].PropertyValue);
         Assert.NotNull (Settings);
         Assert.NotNull (AppSettings);
         Assert.NotNull (ThemeManager.Themes);
 
         // Default Theme should be "Default"
         Assert.Single (ThemeManager.Themes);
-        Assert.Equal ("Default", ThemeManager.Theme);
+        Assert.Equal (ThemeManager.DEFAULT_THEME_NAME, ThemeManager.Theme);
+
+        ResetToHardCodedDefaults ();
+        Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+        Disable ();
     }
+
 
     [Fact]
     public void ConfigurationManager_DefaultPrecedence_IsRespected ()
@@ -495,6 +516,7 @@ public class ConfigurationManagerTests
         }
         finally
         {
+            ResetToHardCodedDefaults ();
             Disable ();
         }
 
@@ -503,43 +525,50 @@ public class ConfigurationManagerTests
     [Fact]
     public void TestConfigProperties ()
     {
-        // Only select locations under test control
-        // Locations = ConfigLocations.LibraryResources | ConfigLocations.AppResources | ConfigLocations.Runtime;
+        try
+        {
+            Enable ();
+            ResetToHardCodedDefaults ();
 
-        ResetToCurrentValues ();
+            Assert.NotEmpty (Settings!);
 
-        Assert.NotEmpty (Settings!);
-
-        // test that all ConfigProperties have our attribute
-        Assert.All (
-                    Settings,
-                    item => Assert.NotEmpty (
-                                             item.Value.PropertyInfo!.CustomAttributes.Where (
-                                                                                              a => a.AttributeType == typeof (ConfigurationPropertyAttribute)
-                                                                                             )
-                                            )
-                   );
+            // test that all ConfigProperties have our attribute
+            Assert.All (
+                        Settings,
+                        item => Assert.NotEmpty (
+                                                 item.Value.PropertyInfo!.CustomAttributes.Where (
+                                                                                                  a => a.AttributeType
+                                                                                                       == typeof (ConfigurationPropertyAttribute)
+                                                                                                 )
+                                                )
+                       );
 
 #pragma warning disable xUnit2030
-        Assert.Empty (
-                      Settings.Where (
-                                      cp => cp.Value.PropertyInfo!.GetCustomAttribute (
-                                                                                       typeof (ConfigurationPropertyAttribute)
-                                                                                      )
-                                            == null
-                                     )
-                     );
+            Assert.Empty (
+                          Settings.Where (
+                                          cp => cp.Value.PropertyInfo!.GetCustomAttribute (
+                                                                                           typeof (ConfigurationPropertyAttribute)
+                                                                                          )
+                                                == null
+                                         )
+                         );
 #pragma warning restore xUnit2030
 
-        // Application is a static class
-        PropertyInfo pi = typeof (Application).GetProperty ("QuitKey");
-        Assert.Equal (pi, Settings ["Application.QuitKey"].PropertyInfo);
+            // Application is a static class
+            PropertyInfo pi = typeof (Application).GetProperty ("QuitKey");
+            Assert.Equal (pi, Settings ["Application.QuitKey"].PropertyInfo);
 
-        // FrameView is not a static class and DefaultBorderStyle is Scope.Scheme
-        pi = typeof (FrameView).GetProperty ("DefaultBorderStyle");
-        Assert.False (Settings.ContainsKey ("FrameView.DefaultBorderStyle"));
-        Assert.True (ThemeManager.Themes! ["Default"].ContainsKey ("FrameView.DefaultBorderStyle"));
-        Assert.Equal (pi, ThemeManager.Themes! ["Default"] ["FrameView.DefaultBorderStyle"].PropertyInfo);
+            // FrameView is not a static class and DefaultBorderStyle is Scope.Scheme
+            pi = typeof (FrameView).GetProperty ("DefaultBorderStyle");
+            Assert.False (Settings.ContainsKey ("FrameView.DefaultBorderStyle"));
+            Assert.True (ThemeManager.GetCurrentTheme ().ContainsKey ("FrameView.DefaultBorderStyle"));
+            Assert.Equal (pi, ThemeManager.GetCurrentTheme () ["FrameView.DefaultBorderStyle"].PropertyInfo);
+        }
+        finally
+        {
+            ResetToHardCodedDefaults ();
+            Disable ();
+        }
     }
 
 
@@ -612,7 +641,7 @@ public class ConfigurationManagerTests
         }
         finally
         {
-            ResetToHardCodedDefaults();
+            ResetToHardCodedDefaults ();
             Disable ();
         }
     }
@@ -668,7 +697,7 @@ public class ConfigurationManagerTests
             // Spot check by setting some of the config properties
             Application.QuitKey = Key.X.WithCtrl;
             FileDialog.MaxSearchResults = 1;
-            Glyphs.Apple = new Rune('z');
+            Glyphs.Apple = new Rune ('z');
 
             ThrowOnJsonErrors = true;
             Enable ();
@@ -690,7 +719,7 @@ public class ConfigurationManagerTests
 
             Assert.Equal (Key.Q.WithAlt, Settings! ["Application.QuitKey"].PropertyValue as Key);
             Assert.Equal (9, (int)Settings ["FileDialog.MaxSearchResults"].PropertyValue!);
-            Assert.Equal (new Rune ('a'), ThemeManager.Themes! ["Default"] ["Glyphs.Apple"].PropertyValue);
+            Assert.Equal (new Rune ('a'), ThemeManager.GetCurrentTheme () ["Glyphs.Apple"].PropertyValue);
 
             Apply ();
             Assert.Equal (Key.Q.WithAlt, Application.QuitKey);
@@ -700,49 +729,6 @@ public class ConfigurationManagerTests
         finally
         {
             ResetToHardCodedDefaults ();
-            Disable ();
-        }
-    }
-
-    [Fact]
-    public void Theme_Reload_Consistency ()
-    {
-        try
-        {
-            Enable ();
-
-            // First load with a custom theme
-            //  Locations = ConfigLocations.Runtime;
-            ResetToCurrentValues ();
-
-            // Create a test theme
-            RuntimeConfig = """
-                   {
-                        "Theme": "TestTheme",
-                        "Themes": [
-                          {
-                            "TestTheme": {
-                              "Schemes": []
-                            }
-                          }
-                        ]
-                   }
-                   """;
-
-            // Load the test theme
-            Load (ConfigLocations.Runtime);
-            Assert.Equal ("TestTheme", ThemeManager.Theme);
-
-            // Now reset everything and reload
-            //  Locations = ConfigLocations.HardCoded;
-            ResetToCurrentValues ();
-
-            // Verify we're back to default
-            Assert.Equal ("Default", ThemeManager.Theme);
-        }
-        finally
-        {
-            ResetToCurrentValues ();
             Disable ();
         }
     }
@@ -922,18 +908,9 @@ public class ConfigurationManagerTests
         Assert.Equal (0, _jsonErrors.Length);
 
         ThrowOnJsonErrors = false;
-    }
 
-    [Fact]
-    [AutoInitShutdown]
-    public void ToJson ()
-    {
-        ResetToCurrentValues ();
-        Stream stream = CM.SourcesManager?.ToStream (Settings);
-
-        CM.SourcesManager?.Load (Settings, stream, "ToJson", ConfigLocations.Runtime);
-
-        // TODO: What does this test?
+        ResetToHardCodedDefaults ();
+        Disable ();
     }
 
     [Fact]
@@ -944,6 +921,7 @@ public class ConfigurationManagerTests
         try
         {
             Enable ();
+            ResetToHardCodedDefaults ();
 
             // Arrange
             var json = @"

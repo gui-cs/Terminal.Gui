@@ -17,7 +17,48 @@ namespace Terminal.Gui;
 public static class ThemeManager
 {
     /// <summary>
-    ///     The Themes dictionary. The backing store is <c><see cref="ConfigurationManager.Settings"/> ["Themes"]</c>.
+    ///     Convenience method to get the current theme. The current theme is the item in the <see cref="Themes"/> dictionary, with they key of <see cref="Theme"/>.     
+    /// </summary>
+    /// <returns></returns>
+    public static ThemeScope GetCurrentTheme ()
+    {
+        return Themes! [Theme];
+    }
+
+    /// <summary>
+    ///     Convenience method to get the themes dictionary. The themes dictionary is a dictionary of <see cref="ThemeScope"/> objects, with the key being the name of the theme.
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static Dictionary<string, ThemeScope> GetThemes ()
+    {
+        if (!IsInitialized ())
+        {
+            // We're being called from the module initializer.
+            // We need to provide a dictionary of themes containing the hard-coded theme.
+            return HardCodedThemes ()!;
+        }
+
+        if (Settings is { })
+        {
+            if (Settings.TryGetValue ("Themes", out ConfigProperty? themes))
+            {
+                if (themes.HasValue)
+                {
+                    return (themes.PropertyValue as Dictionary<string, ThemeScope>)!;
+                }
+                return HardCodedThemes ()!;
+            }
+
+            throw new InvalidOperationException ("Settings has no Themes property.");
+        }
+
+        throw new InvalidOperationException ("Settings is null.");
+    }
+
+    /// <summary>
+    ///     Gets the Themes dictionary. <see cref="GetThemes"/> is preferred.
+    ///     The backing store is <c><see cref="ConfigurationManager.Settings"/> ["Themes"]</c>.
     ///     However, if <see cref="ConfigurationManager.IsInitialized"/> is <c>false</c>, this property will return the hard-coded themes.
     /// </summary>
     /// <exception cref="InvalidOperationException"></exception>
@@ -25,43 +66,31 @@ public static class ThemeManager
     [ConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
     public static Dictionary<string, ThemeScope>? Themes
     {
-        get
+        // Note: This property getter must be public; DeepClone depends on it.
+        get => GetThemes ();
+        internal set => SetThemes (value);
+    }
+
+    private static void SetThemes (Dictionary<string, ThemeScope>? dictionary)
+    {
+        if (!IsEnabled)
         {
-            if (!IsInitialized ())
-            {
-                // We're being called from the module initializer.
-                // We need to provide a dictionary of themes containing the hard-coded theme.
-                return HardCodedThemes ();
-            }
-
-            if (Settings is { })
-            {
-                if (Settings.TryGetValue ("Themes", out ConfigProperty? themes))
-                {
-                    if (themes.HasValue)
-                    {
-                        return themes.PropertyValue as Dictionary<string, ThemeScope>;
-                    }
-                    return HardCodedThemes ();
-                }
-
-                throw new InvalidOperationException ("Settings has no Themes property.");
-            }
-
-            throw new InvalidOperationException ("Settings is null.");
+            throw new InvalidOperationException ("Can't set Themes when ConfigurationManager is disabled.");
         }
-        set
+
+        if (dictionary is { } && !dictionary.ContainsKey (DEFAULT_THEME_NAME))
         {
-            // TODO: For better decoupling, perhaps we should use events for this?
-            if (Settings is { } && Settings.TryGetValue ("Themes", out ConfigProperty? themes))
-            {
-                Settings ["Themes"].PropertyValue = value;
-
-                return;
-            }
-
-            throw new InvalidOperationException ("Settings is null.");
+            throw new InvalidOperationException ($"Themes must include an item named {DEFAULT_THEME_NAME}");
         }
+
+        if (Settings is { } && Settings.TryGetValue ("Themes", out ConfigProperty? themes))
+        {
+            Settings ["Themes"].PropertyValue = dictionary;
+
+            return;
+        }
+
+        throw new InvalidOperationException ("Settings is null.");
     }
 
     private static Dictionary<string, ThemeScope>? HardCodedThemes ()
@@ -105,7 +134,7 @@ public static class ThemeManager
     /// <summary>
     ///     Since Theme is a dynamic property, we need to cache the value of the selected theme for when CM is not enabled.
     /// </summary>
-    private const string DEFAULT_THEME_NAME = "Default";
+    internal const string DEFAULT_THEME_NAME = "Default";
 
     /// <summary>
     ///     The currently selected theme. The backing store is <c><see cref="ConfigurationManager.Settings"/> ["Theme"]</c>.
@@ -145,6 +174,11 @@ public static class ThemeManager
                 throw new InvalidOperationException ("Theme cannot be set before ConfigurationManager is initialized.");
             }
 
+            if (!IsEnabled)
+            {
+                throw new InvalidOperationException ("Can't set Theme when ConfigurationManager is disabled.");
+            }
+
             if (Settings is null || !Settings.TryGetValue ("Theme", out ConfigProperty? themeCp))
             {
                 throw new InvalidOperationException ("Settings is null.");
@@ -162,6 +196,11 @@ public static class ThemeManager
 
             // Update the backing store
             Settings! ["Theme"].PropertyValue = value;
+
+            if (!Settings.ContainsKey (value))
+            {
+                Logging.Warning ($"{value} is not a valid theme name.");
+            }
 
             //Instance.OnThemeChanged (prevousThemeValue);
         }
@@ -210,7 +249,7 @@ public static class ThemeManager
         };
 
         Settings ["Themes"].PropertyValue = hardCodedThemes;
-        Settings ["Theme"].PropertyValue = "Default";
+        Settings ["Theme"].PropertyValue = DEFAULT_THEME_NAME;
     }
 
     /// <summary>Called when the selected theme has changed. Fires the <see cref="ThemeChanged"/> event.</summary>

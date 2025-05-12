@@ -61,7 +61,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                     {
                         var factory = (JsonConverterFactory)converter;
 
-                        if (propertyType is { } && factory.CanConvert (propertyType))
+                        if (factory.CanConvert (propertyType))
                         {
                             converter = factory.CreateConverter (propertyType, options);
                         }

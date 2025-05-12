@@ -56,6 +56,10 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
     {
         foreach (KeyValuePair<string, ConfigProperty> hardCodedKeyValuePair in GetHardCodedConfigPropertiesByScope (typeof (T).Name)!)
         {
+            if (!ContainsKey (hardCodedKeyValuePair.Key))
+            {
+                continue;
+            }
             this [hardCodedKeyValuePair.Key].PropertyValue = hardCodedKeyValuePair.Value.PropertyValue;
         }
     }
@@ -73,17 +77,25 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
             {
                 continue;
             }
-            if (ContainsKey (prop.Key))
+            if (!ContainsKey (prop.Key))
             {
+                if (!prop.Value.HasValue)
+                {
+                    continue;
+                }
+                // Add the property to this scope
+                ConfigProperty? copy = new ConfigProperty ()
+                {
+                    Immutable = false,
+                    PropertyInfo = prop.Value.PropertyInfo,
+                    OmitClassName = prop.Value.OmitClassName,
+                    ScopeType = prop.Value.ScopeType,
+                    HasValue = false
+                };
+                Add (prop.Key, copy);
                 this [prop.Key].UpdateFrom (prop.Value.PropertyValue);
             }
-            else
-            {
-                // Add the property to this scope
-                // BUGBUG: This isn't correct. The ConfigProperty should be created with the correct PropertyInfo.
-                Add (prop.Key, new ());
-                this [prop.Key].PropertyValue = prop.Value.PropertyValue;
-            }
+            this [prop.Key].UpdateFrom (prop.Value.PropertyValue);
         }
 
         return this;
@@ -107,6 +119,8 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
             if (propWithValue.Value.PropertyInfo != null)
             {
                 object? currentValue = propWithValue.Value.PropertyInfo.GetValue (null);
+
+                // QUESTION: Should we avoid setting if currentValue == newValue?
 
                 if (propWithValue.Value.PropertyValue is Scope<T> scopeSource && currentValue is Scope<T> scopeDest)
                 {

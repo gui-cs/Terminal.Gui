@@ -2,6 +2,7 @@
 
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 
 namespace Terminal.Gui.ConfigurationTests;
@@ -321,7 +322,7 @@ public class DeepClonerTests
         CollectionContainer? source = new ()
         {
             Strings = ["A", "B"],
-            Counts = new() { { "X", 1 }, { "Y", 2 } },
+            Counts = new () { { "X", 1 }, { "Y", 2 } },
             Numbers = [10, 20]
         };
         CollectionContainer? result = DeepCloner.DeepClone (source);
@@ -349,8 +350,8 @@ public class DeepClonerTests
     {
         NestedObject? source = new ()
         {
-            Inner = new() { Name = "Inner", Count = 5 },
-            Values = new()
+            Inner = new () { Name = "Inner", Count = 5 },
+            Values = new ()
             {
                 new() { Number = 1, Flag = true },
                 new() { Number = 2, Flag = false }
@@ -419,13 +420,30 @@ public class DeepClonerTests
     }
 
     [Fact]
+    public void ConfigProperty_CreatesDeepCopy ()
+    {
+        ConfigProperty? source = ConfigProperty.CreateWithAttributeInfo (CM.GetHardCodedConfigPropertyCache ()! ["Application.QuitKey"].PropertyInfo!);
+        source.Immutable = false;
+        source.PropertyValue = Key.A;
+        ConfigProperty? result = DeepCloner.DeepClone (source);
+
+        Assert.NotNull (result);
+        Assert.NotNull (result.PropertyInfo);
+        Assert.NotSame (source, result);
+        Assert.NotSame (source.PropertyValue, result!.PropertyValue);
+        // PropertyInfo is effectively a simple type
+        Assert.Same (source.PropertyInfo, result!.PropertyInfo);
+        Assert.Equal (source.Immutable, result.Immutable);
+    }
+
+    [Fact]
     public void SettingsScopeMockWithKey_CreatesDeepCopy ()
     {
         SettingsScopeMock? source = new ()
         {
             Theme = "Dark",
-            ["KeyBinding"] = new() { PropertyValue = new Key (KeyCode.A) { Handled = true } },
-            ["Counts"] = new() { PropertyValue = new Dictionary<string, int> { { "X", 1 } } }
+            ["KeyBinding"] = new () { PropertyValue = new Key (KeyCode.A) { Handled = true } },
+            ["Counts"] = new () { PropertyValue = new Dictionary<string, int> { { "X", 1 } } }
         };
         SettingsScopeMock? result = DeepCloner.DeepClone (source);
 
@@ -463,7 +481,7 @@ public class DeepClonerTests
         Assert.True (darkThemeScope.ContainsKey ("Button.DefaultHighlightStyle"));
 
         // Create a Themes list with two themes
-        List<Dictionary<string, ThemeScope>> themesList = new()
+        List<Dictionary<string, ThemeScope>> themesList = new ()
         {
             new() { { "Default", defaultThemeScope } },
             new() { { "Dark", darkThemeScope } }
@@ -503,8 +521,7 @@ public class DeepClonerTests
         Assert.NotNull (result);
         Assert.IsType<SettingsScope> (result);
 
-        // There are no HasValue properties, so DeepClone...
-        Assert.False (result.ContainsKey ("Themes"));
+        Assert.True (result.ContainsKey ("Themes"));
     }
 
     [Fact]

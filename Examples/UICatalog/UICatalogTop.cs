@@ -195,13 +195,13 @@ public class UICatalogTop : Toplevel
             _themesRg = new ()
             {
                 HighlightStyle = HighlightStyle.None,
-                SelectedItem = ThemeManager.Themes!.Keys.ToList ().IndexOf (CachedTheme!.Replace ("_", string.Empty))
+                SelectedItem = ThemeManager.GetThemes().Keys.ToList ().IndexOf (CachedTheme!.Replace ("_", string.Empty))
             };
 
             _themesRg.SelectedItemChanged += (_, args) =>
             {
-                ThemeManager.Theme = ThemeManager.Themes!.Keys.ToArray () [args.SelectedItem!.Value];
-                CachedTheme = ThemeManager.Themes!.Keys.ToArray () [args.SelectedItem!.Value];
+                ThemeManager.Theme = ThemeManager.GetThemes ().Keys.ToArray () [args.SelectedItem!.Value];
+                CachedTheme = ThemeManager.GetThemes().Keys.ToArray () [args.SelectedItem!.Value];
                 Apply ();
                 SetNeedsDraw ();
             };
@@ -349,8 +349,8 @@ public class UICatalogTop : Toplevel
 
         _themesRg.AssignHotKeysToCheckBoxes = true;
         _themesRg.UsedHotKeys.Clear ();
-        _themesRg.Options = ThemeManager.Themes!.Keys.ToArray ();
-        _themesRg.SelectedItem = ThemeManager.Themes.Keys.ToList ().IndexOf (CachedTheme!.Replace ("_", string.Empty));
+        _themesRg.Options = ThemeManager.GetThemes().Keys.ToArray ();
+        _themesRg.SelectedItem = ThemeManager.GetThemes ().Keys.ToList ().IndexOf (CachedTheme!.Replace ("_", string.Empty));
 
         if (_topSchemeRg is null)
         {

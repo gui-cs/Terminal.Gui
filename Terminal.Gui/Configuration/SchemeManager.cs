@@ -102,10 +102,10 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
                 throw new InvalidOperationException ("Schemes cannot be set before ConfigurationManager is initialized.");
             }
 
-            Dictionary<string, Scheme?>? schemes = ThemeManager.Themes? ["Default"] ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
+            Dictionary<string, Scheme?>? schemes = ThemeManager.Themes? [ThemeManager.DEFAULT_THEME_NAME] ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
 
             // Update the backing store
-            ThemeManager.Themes! ["Default"] ["Schemes"].PropertyValue = value;
+            ThemeManager.Themes! [ThemeManager.DEFAULT_THEME_NAME] ["Schemes"].PropertyValue = value;
 
             //Instance.OnThemeChanged (prevousValue);
         }
@@ -156,7 +156,7 @@ public sealed class SchemeManager : INotifyCollectionChanged, IDictionary<string
     {
         Debug.Assert (IsInitialized ());
 
-        Debug.Assert (ThemeManager.Themes!.TryGetValue ("Default", out _));
+        Debug.Assert (ThemeManager.Themes!.TryGetValue (ThemeManager.DEFAULT_THEME_NAME, out _));
 
         Dictionary<string, Scheme?>? schemes = ThemeManager.Themes [ThemeManager.Theme] ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
 

@@ -35,6 +35,78 @@ public class SettingsScopeTests
 
     }
 
+
+    [Fact]
+    public void Load_Dictionary_Property_Overrides_Defaults ()
+    {
+        // arrange
+        Enable ();
+        ResetToHardCodedDefaults ();
+        ThrowOnJsonErrors = true;
+
+        ConfigProperty themesConfigProperty = Settings! ["Themes"];
+        Dictionary<string, ThemeScope>? dict = themesConfigProperty.PropertyValue as Dictionary<string, ThemeScope>;
+
+        Assert.NotNull (dict);
+        Assert.Single (dict);
+        Assert.NotEmpty ((Dictionary<string, ThemeScope>)themesConfigProperty.PropertyValue);
+
+        ThemeScope? scope = dict [ThemeManager.DEFAULT_THEME_NAME];
+        Assert.NotNull (scope);
+        Assert.Equal (HighlightStyle.Hover | HighlightStyle.Pressed, scope ["Button.DefaultHighlightStyle"].PropertyValue);
+
+
+        RuntimeConfig = """
+                        {
+                            "Themes": [
+                                {
+                                  "Default": 
+                                     {
+                                         "Button.DefaultHighlightStyle": "None"
+                                     }
+                                },
+                                {
+                                  "NewTheme":
+                                    {
+                                        "Button.DefaultHighlightStyle": "Hover"
+                                    }
+                                }                        
+                            ]
+                        }
+                        """;
+
+        Load (ConfigLocations.Runtime);
+
+        // assert
+        Assert.Equal (2, ThemeManager.GetThemes ().Count);
+        Assert.Equal (HighlightStyle.None, (HighlightStyle)ThemeManager.GetCurrentTheme () ["Button.DefaultHighlightStyle"].PropertyValue!);
+        Assert.Equal (HighlightStyle.Hover, (HighlightStyle)ThemeManager.GetThemes() ["NewTheme"] ["Button.DefaultHighlightStyle"].PropertyValue!);
+
+        RuntimeConfig = """
+                        {
+                            "Themes": [
+                                {
+                                  "Default": 
+                                     {
+                                         "Button.DefaultHighlightStyle": "Pressed"
+                                     }
+                                }
+                            ]
+                        }
+                        """;
+        Load (ConfigLocations.Runtime);
+
+        // assert
+        Assert.Equal (2, ThemeManager.GetThemes ().Count);
+        Assert.Equal (HighlightStyle.Pressed, (HighlightStyle)ThemeManager.Themes! [ThemeManager.DEFAULT_THEME_NAME] ["Button.DefaultHighlightStyle"].PropertyValue!);
+        Assert.Equal (HighlightStyle.Hover, (HighlightStyle)ThemeManager.Themes! ["NewTheme"] ["Button.DefaultHighlightStyle"].PropertyValue!);
+
+        // clean up
+        ResetToHardCodedDefaults ();
+        Disable ();
+
+    }
+
     [Fact]
     public void Apply_ShouldApplyProperties ()
     {
@@ -42,7 +114,7 @@ public class SettingsScopeTests
         Load (ConfigLocations.LibraryResources);
 
         // arrange
-        Assert.Equal (Key.Esc, (Key)Settings ["Application.QuitKey"].PropertyValue);
+        Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue);
 
         Assert.Equal (
                       Key.F6,
@@ -78,7 +150,7 @@ public class SettingsScopeTests
 
         var updatedSettings = new SettingsScope ();
 
-        ///Don't set Quitkey
+        // Don't set Quitkey
         updatedSettings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
         updatedSettings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
 

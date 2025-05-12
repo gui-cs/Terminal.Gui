@@ -521,10 +521,12 @@ public static class ConfigurationManager
     internal static readonly SourceGenerationContext SerializerContext = new (
                                                                               new JsonSerializerOptions
                                                                               {
+                                                                                  // Be relaxed
                                                                                   ReadCommentHandling = JsonCommentHandling.Skip,
                                                                                   PropertyNameCaseInsensitive = true,
                                                                                   DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                                                                                   WriteIndented = true,
+
                                                                                   Converters =
                                                                                   {
                                                                                       // We override the standard Rune converter to support specifying Glyphs in
@@ -560,7 +562,7 @@ public static class ConfigurationManager
     // TODO: Encapsulate in AppSettingsManager like ThemeManager
 
     /// <summary>
-    ///     Since AppSettings is a dynamic property, we need to cache the value of the current appsettings for when CM is not enabled.
+    ///     AppSettings's source of truth.
     /// </summary>
     private static AppSettingsScope? _cachedAppSettings;
 
@@ -577,18 +579,21 @@ public static class ConfigurationManager
             {
                 // We're being called from the module initializer.
                 // Hard coded default value is an empty AppSettingsScope
-                return _cachedAppSettings = new AppSettingsScope ();
+                var appSettings = new AppSettingsScope ();
+                appSettings.Clear ();
+                return appSettings;
             }
 
             if (!IsEnabled)
             {
-                // If CM is not enabled, return current value
-                return _cachedAppSettings!;
+                // If CM is not enabled, e
+                var appSettings = new AppSettingsScope ();
+                return _cachedAppSettings = appSettings;
             }
 
             if (Settings is { } && Settings.TryGetValue ("AppSettings", out ConfigProperty? appsettingsConfigProperty))
             {
-                return (appsettingsConfigProperty.PropertyValue as AppSettingsScope)!;
+                return _cachedAppSettings;//(appsettingsConfigProperty.PropertyValue as AppSettingsScope)!;
             }
 
             throw new InvalidOperationException ("Settings is null.");
@@ -602,26 +607,12 @@ public static class ConfigurationManager
 
             if (!IsEnabled)
             {
-                _cachedAppSettingsLock.EnterWriteLock ();
-
-                try
-                {
-                    _cachedAppSettings = value;
-                }
-                finally
-                {
-                    _cachedAppSettingsLock.ExitWriteLock ();
-                }
-
-                return;
+                throw new ConfigurationManagerNotEnabledException ();
             }
 
             // Check if the AppSettings is the same as the previous one
             if (value != _cachedAppSettings)
             {
-                // Update the backing store
-                Settings! ["AppSettings"].PropertyValue = value;
-
                 _cachedAppSettingsLock.EnterWriteLock ();
 
                 try
@@ -632,6 +623,10 @@ public static class ConfigurationManager
                 {
                     _cachedAppSettingsLock.ExitWriteLock ();
                 }
+
+                // Update the backing store
+                Settings! ["AppSettings"].PropertyValue = value;
+
                 //Instance.OnThemeChanged (previousThemeValue);
             }
         }

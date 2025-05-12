@@ -35,10 +35,21 @@ public class ScopeTests
     [ConfigurationProperty (Scope = typeof (ScopeTestsScope))]
     public static Dictionary<string, ConfigProperty> DictionaryProperty { get; set; }
 
-
     public class ScopeTestsScope : Scope<ScopeTestsScope>
     {
     }
+
+    // The property key will be "ScopeTests.DictionaryItemProperty1"
+    [ConfigurationProperty (Scope = typeof (ScopeTestsDictionaryItemScope))]
+    public static string? DictionaryItemProperty1 { get; set; } // null
+
+    // The property key will be "ScopeTests.DictionaryItemProperty2"
+    [ConfigurationProperty (Scope = typeof (ScopeTestsDictionaryItemScope))]
+    public static string? DictionaryItemProperty2 { get; set; } // null
+    public class ScopeTestsDictionaryItemScope : Scope<ScopeTestsDictionaryItemScope>
+    {
+    }
+
 
     [Fact]
     public void TestScope_Constructor_Creates_Properties ()
@@ -116,19 +127,20 @@ public class ScopeTests
         // Arrange
         ScopeTestsScope originalScope = new ScopeTestsScope ();
         originalScope.LoadHardCodedDefaults ();
-        Assert.Equal (null, originalScope ["ScopeTests.DictionaryProperty"].PropertyValue);
+        Assert.Null (originalScope ["ScopeTests.DictionaryProperty"].PropertyValue);
+
+        // QUESTION: Should this be done automatically?
+        originalScope ["ScopeTests.DictionaryProperty"].PropertyValue = new Dictionary<string, ConfigProperty> ();
 
         ScopeTestsScope sourceScope = new ScopeTestsScope ();
-
         sourceScope ["ScopeTests.DictionaryProperty"].PropertyValue = new Dictionary<string, ConfigProperty> ()
         {
-            { "item1", ConfigProperty.GetAllConfigProperties () ["ScopeTests.DictionaryProperty"] },
-            { "item2", ConfigProperty.GetAllConfigProperties () ["ScopeTests.DictionaryProperty"] }
+            { "item1", ConfigProperty.GetAllConfigProperties () ["ScopeTests.DictionaryItemProperty1"] },
+            { "item2", ConfigProperty.GetAllConfigProperties () ["ScopeTests.DictionaryItemProperty2"] }
         };
 
         Assert.False (sourceScope ["ScopeTests.KeyProperty"].HasValue);
         Assert.True (sourceScope ["ScopeTests.DictionaryProperty"].HasValue);
-
 
         Dictionary<string, ConfigProperty>? sourceDict = sourceScope ["ScopeTests.DictionaryProperty"].PropertyValue as Dictionary<string, ConfigProperty>;
         sourceDict! ["item1"].Immutable = false;
@@ -140,9 +152,10 @@ public class ScopeTests
         Assert.False (sourceDict ["item1"].HasValue);
         Assert.False (sourceDict ["item1"].Immutable);
 
-        // Act
+        // Update the original scope with the source scope, which has no values
         originalScope.UpdateFrom (sourceScope);
 
+        // Confirm original is unchanged
         Assert.NotNull (originalScope ["ScopeTests.DictionaryProperty"].PropertyValue);
         Dictionary<string, ConfigProperty>? destDict = originalScope ["ScopeTests.DictionaryProperty"].PropertyValue as Dictionary<string, ConfigProperty>;
         Assert.NotNull (destDict);
@@ -150,24 +163,32 @@ public class ScopeTests
         Assert.False (destDict.ContainsKey ("item1"));
         Assert.False (destDict.ContainsKey ("item2"));
 
+        // Confirm source is unchanged
         sourceDict ["item1"].PropertyValue = "hello";
         Assert.True (sourceDict ["item1"].HasValue);
+        Assert.Equal ("hello", sourceDict ["item1"].PropertyValue);
 
+        // Now update the original scope with the source scope again
         originalScope.UpdateFrom (sourceScope);
-        Assert.True (sourceDict ["item1"].HasValue);
 
+        // Confirm the original has been updated with only the values in source that have been set
+        Assert.NotNull (originalScope ["ScopeTests.DictionaryProperty"].PropertyValue);
         destDict = originalScope ["ScopeTests.DictionaryProperty"].PropertyValue as Dictionary<string, ConfigProperty>;
+
+        // 1 item (item1) should now be in the original scope
         Assert.Equal (1, destDict!.Count);
         Assert.True (destDict ["item1"].HasValue);
         Assert.Equal ("hello", destDict ["item1"].PropertyValue);
 
         originalScope.Apply ();
 
-        // Assert
+        // Verify apply worked
         Assert.Equal ("hello", DictionaryProperty ["item1"].PropertyValue);
-        Assert.True (originalScope ["ScopeTests.KeyProperty"].HasValue);
-        Assert.True (originalScope ["ScopeTests.DictionaryProperty"].HasValue);
-        Assert.NotNull (originalScope ["ScopeTests.DictionaryProperty"].PropertyValue);
+
+        // The item property should not have had its value set
+        Assert.Equal (null, DictionaryItemProperty1);
+
+        DictionaryItemProperty1 = null;
     }
 
 }

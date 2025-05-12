@@ -307,11 +307,6 @@ public static class DeepCloner
             object? clonedKey = DeepCloneInternal (key, visited);
             object? clonedValue = DeepCloneInternal (value, visited);
 
-            //if (clonedValue is ConfigProperty { HasValue: false })
-            //{
-            //    continue;
-            //}
-
             // Handle duplicate keys by updating the value (last value wins, aligning with layering)
             if (tempDict.Contains (clonedKey!))
             {

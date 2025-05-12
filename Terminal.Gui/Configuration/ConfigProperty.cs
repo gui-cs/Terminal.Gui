@@ -19,8 +19,8 @@ namespace Terminal.Gui;
 /// </remarks>
 public class ConfigProperty
 {
-    /// <summary>INTERNAL: Describes the property.</summary>
-    internal PropertyInfo? PropertyInfo { get; set; }
+    /// <summary>Describes the property.</summary>
+    public PropertyInfo? PropertyInfo { get; set; }
 
     /// <summary>INTERNAL: Cached value of ConfigurationPropertyAttribute.OmitClassName; makes more AOT friendly.</summary>
     internal bool OmitClassName { get; set; }
@@ -191,40 +191,49 @@ public class ConfigProperty
                                         );
         }
 
-        // The source provides a value, so update PropertyValue
-        // Handle Scope<T>-specific logic for nested configuration scopes
-        if (source is SettingsScope settingsSource && PropertyValue is SettingsScope settingsDest)
+        if (source is Dictionary<string, ThemeScope> themeDictSource && PropertyValue is Dictionary<string, ThemeScope> themeDictDest)
         {
-            PropertyValue = settingsDest.UpdateFrom (settingsSource);
-        }
-        else if (source is ThemeScope themeSource && PropertyValue is ThemeScope themeDest)
-        {
-            PropertyValue = themeDest.UpdateFrom (themeSource);
-        }
-        else if (source is AppSettingsScope appSource && PropertyValue is AppSettingsScope appDest)
-        {
-            PropertyValue = appDest.UpdateFrom (appSource);
-        }
-        else if (source is Dictionary<string, ThemeScope> dictSource && PropertyValue is Dictionary<string, ThemeScope> dictDest)
-        {
-            foreach (KeyValuePair<string, ThemeScope> prop in dictSource)
+            // Special case for ThemeScope dictionaries
+            foreach (KeyValuePair<string, ThemeScope> scope in themeDictSource)
             {
-                if (dictDest.ContainsKey (prop.Key))
+                if (!themeDictDest.ContainsKey (scope.Key))
                 {
-                    dictDest [prop.Key].UpdateFrom (prop.Value);
+                    themeDictDest.Add (scope.Key, scope.Value);
                 }
-                else
-                {
-                    //// Add the property to this scope
-                    //// BUGBUG: This isn't correct. The ConfigProperty should be created with the correct PropertyInfo.
-                    //Add (prop.Key, new ());
-                    //this [prop.Key].PropertyValue = prop.Value.PropertyValue;
-                }
+                themeDictDest [scope.Key].UpdateFrom (scope.Value);
             }
         }
-        else if (source is ConfigProperty configProperty && PropertyValue is ConfigProperty configDest)
+        else if (source is Dictionary<string, ConfigProperty> dictSource && PropertyValue is Dictionary<string, ConfigProperty> dictDest)
         {
-            PropertyValue = configDest.UpdateFrom (configProperty);
+            foreach (KeyValuePair<string, ConfigProperty> sourceProp in dictSource)
+            {
+                if (!sourceProp.Value.HasValue)
+                {
+                    continue;
+                }
+
+                if (!dictDest.ContainsKey (sourceProp.Key))
+                {
+                    // Add the property to this scope
+                    ConfigProperty? copy = new ConfigProperty ()
+                    {
+                        Immutable = false,
+                        PropertyInfo = sourceProp.Value.PropertyInfo,
+                        OmitClassName = sourceProp.Value.OmitClassName,
+                        ScopeType = sourceProp.Value.ScopeType,
+                        HasValue = false
+                    };
+                    dictDest.Add (sourceProp.Key, copy);
+                }
+                dictDest [sourceProp.Key].UpdateFrom (sourceProp.Value);
+            }
+        }
+        else if (source is ConfigProperty configProperty)
+        {
+            if (configProperty.HasValue)
+            {
+                PropertyValue = DeepCloner.DeepClone (configProperty.PropertyValue);
+            }
         }
         else
         {

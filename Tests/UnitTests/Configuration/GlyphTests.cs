@@ -12,11 +12,11 @@ public class GlyphTests
     {
         // arrange
         Enable ();
-        ResetToHardCodedDefaults();
-        
+        ResetToHardCodedDefaults ();
+
         Assert.Equal ((Rune)'⟦', Glyphs.LeftBracket);
 
-        var glyph = (Rune)ThemeManager.Themes ["Default"] ["Glyphs.LeftBracket"].PropertyValue;
+        var glyph = (Rune)ThemeManager.GetCurrentTheme () ["Glyphs.LeftBracket"].PropertyValue!;
         Assert.Equal ((Rune)'⟦', glyph);
 
         ThrowOnJsonErrors = true;
@@ -36,12 +36,12 @@ public class GlyphTests
                    """;
 
         Load (ConfigLocations.Runtime);
-        Apply();
+        Apply ();
 
         // assert
-        glyph = (Rune)ThemeManager.Themes ["Default"] ["Glyphs.LeftBracket"].PropertyValue;
+        glyph = (Rune)ThemeManager.GetCurrentTheme () ["Glyphs.LeftBracket"].PropertyValue!;
         Assert.Equal ((Rune)'[', glyph);
-        Assert.Equal((Rune)'[', Glyphs.LeftBracket);
+        Assert.Equal ((Rune)'[', Glyphs.LeftBracket);
 
         // clean up
         ResetToHardCodedDefaults ();
