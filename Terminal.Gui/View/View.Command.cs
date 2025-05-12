@@ -229,14 +229,14 @@ public partial class View // Command APIs
         }
 
         //  - bubbled up the SuperView hierarchy.
-        if (!args.Handled)
-        {
-            if (SuperView is { })
-            {
-                Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Invoking Select on SuperView ({SuperView.Title}/{SuperView.Id})...");
-                return SuperView?.InvokeCommand (Command.Select, ctx);
-            }
-        }
+        //if (!args.Handled)
+        //{
+        //    if (SuperView is { })
+        //    {
+        //        Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Invoking Select on SuperView ({SuperView.Title}/{SuperView.Id})...");
+        //        return SuperView?.InvokeCommand (Command.Select, ctx);
+        //    }
+        //}
 
         return args.Handled;
     }
