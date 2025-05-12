@@ -87,13 +87,13 @@ public class ScrollBar : View, IOrientation, IDesignable
         void OnDecreaseButtonOnAccept (object? s, CommandEventArgs e)
         {
             Position -= Increment;
-            e.Cancel = true;
+            e.Handled = true;
         }
 
         void OnIncreaseButtonOnAccept (object? s, CommandEventArgs e)
         {
             Position += Increment;
-            e.Cancel = true;
+            e.Handled = true;
         }
     }
 

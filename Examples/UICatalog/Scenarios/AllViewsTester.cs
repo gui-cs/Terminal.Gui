@@ -83,7 +83,7 @@ public class AllViewsTester : Scenario
         _classListView.Accepting += (sender, args) =>
                                     {
                                         _curView?.SetFocus ();
-                                        args.Cancel = true;
+                                        args.Handled = true;
                                     };
 
         _adornmentsEditor = new ()

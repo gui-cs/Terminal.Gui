@@ -17,7 +17,7 @@ internal partial class WindowsConsole
 
     private readonly nint _inputHandle;
     private nint _outputHandle;
-    //private nint _screenBuffer;
+    private nint _screenBuffer;
     private readonly uint _originalConsoleMode;
     private CursorVisibility? _initialCursorVisibility;
     private CursorVisibility? _currentCursorVisibility;
@@ -147,10 +147,12 @@ internal partial class WindowsConsole
     {
         //Debug.WriteLine ("WriteToConsole");
 
-        //if (_screenBuffer == nint.Zero)
-        //{
-        //    ReadFromConsoleOutput (size, bufferSize, ref window);
-        //}
+        if (!IsWindowsTerminal && _screenBuffer == nint.Zero)
+        {
+            ReadFromConsoleOutput (size, bufferSize, ref window);
+        }
+
+        SetInitialCursorVisibility ();
 
         var result = false;
 
@@ -169,7 +171,7 @@ internal partial class WindowsConsole
                 };
             }
 
-            result = WriteConsoleOutput (_outputHandle, ci, bufferSize, new Coord { X = window.Left, Y = window.Top }, ref window);
+            result = WriteConsoleOutput (IsWindowsTerminal ? _outputHandle : _screenBuffer, ci, bufferSize, new Coord { X = window.Left, Y = window.Top }, ref window);
         }
         else
         {
@@ -222,7 +224,7 @@ internal partial class WindowsConsole
             foreach (var sixel in Application.Sixel)
             {
                 SetCursorPosition (new Coord ((short)sixel.ScreenPosition.X, (short)sixel.ScreenPosition.Y));
-                WriteConsole (_outputHandle, sixel.SixelData, (uint)sixel.SixelData.Length, out uint _, nint.Zero);
+                WriteConsole (IsWindowsTerminal ? _outputHandle : _screenBuffer, sixel.SixelData, (uint)sixel.SixelData.Length, out uint _, nint.Zero);
             }
         }
 
@@ -252,34 +254,32 @@ internal partial class WindowsConsole
 
     public void ReadFromConsoleOutput (Size size, Coord coords, ref SmallRect window)
     {
-        //_screenBuffer = CreateConsoleScreenBuffer (
-        //                                           DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
-        //                                           ShareMode.FileShareRead | ShareMode.FileShareWrite,
-        //                                           nint.Zero,
-        //                                           1,
-        //                                           nint.Zero
-        //                                          );
+        _screenBuffer = CreateConsoleScreenBuffer (
+                                                   DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
+                                                   ShareMode.FileShareRead | ShareMode.FileShareWrite,
+                                                   nint.Zero,
+                                                   1,
+                                                   nint.Zero
+                                                  );
 
-        //if (_screenBuffer == INVALID_HANDLE_VALUE)
-        //{
-        //    int err = Marshal.GetLastWin32Error ();
+        if (_screenBuffer == INVALID_HANDLE_VALUE)
+        {
+            int err = Marshal.GetLastWin32Error ();
 
-        //    if (err != 0)
-        //    {
-        //        throw new Win32Exception (err);
-        //    }
-        //}
+            if (err != 0)
+            {
+                throw new Win32Exception (err);
+            }
+        }
 
-        SetInitialCursorVisibility ();
-
-        //if (!SetConsoleActiveScreenBuffer (_screenBuffer))
-        //{
-        //    throw new Win32Exception (Marshal.GetLastWin32Error ());
-        //}
+        if (!SetConsoleActiveScreenBuffer (_screenBuffer))
+        {
+            throw new Win32Exception (Marshal.GetLastWin32Error ());
+        }
 
         _originalStdOutChars = new CharInfo [size.Height * size.Width];
 
-        if (!ReadConsoleOutput (_outputHandle, _originalStdOutChars, coords, new Coord { X = 0, Y = 0 }, ref window))
+        if (!ReadConsoleOutput (_screenBuffer, _originalStdOutChars, coords, new Coord { X = 0, Y = 0 }, ref window))
         {
             throw new Win32Exception (Marshal.GetLastWin32Error ());
         }
@@ -287,7 +287,7 @@ internal partial class WindowsConsole
 
     public bool SetCursorPosition (Coord position)
     {
-        return SetConsoleCursorPosition (_outputHandle, position);
+        return SetConsoleCursorPosition (IsWindowsTerminal ? _outputHandle : _screenBuffer, position);
     }
 
     public void SetInitialCursorVisibility ()
@@ -300,14 +300,14 @@ internal partial class WindowsConsole
 
     public bool GetCursorVisibility (out CursorVisibility visibility)
     {
-        if (_outputHandle == nint.Zero)
+        if ((IsWindowsTerminal ? _outputHandle : _screenBuffer) == nint.Zero)
         {
             visibility = CursorVisibility.Invisible;
 
             return false;
         }
 
-        if (!GetConsoleCursorInfo (_outputHandle, out ConsoleCursorInfo info))
+        if (!GetConsoleCursorInfo (IsWindowsTerminal ? _outputHandle : _screenBuffer, out ConsoleCursorInfo info))
         {
             int err = Marshal.GetLastWin32Error ();
 
@@ -375,7 +375,7 @@ internal partial class WindowsConsole
                 bVisible = ((uint)visibility & 0xFF00) != 0
             };
 
-            if (!SetConsoleCursorInfo (_outputHandle, ref info))
+            if (!SetConsoleCursorInfo (IsWindowsTerminal ? _outputHandle : _screenBuffer, ref info))
             {
                 return false;
             }
@@ -411,12 +411,12 @@ internal partial class WindowsConsole
             Console.WriteLine ("Error: {0}", err);
         }
 
-        //if (_screenBuffer != nint.Zero)
-        //{
-        //    CloseHandle (_screenBuffer);
-        //}
+        if (_screenBuffer != nint.Zero)
+        {
+            CloseHandle (_screenBuffer);
+        }
 
-        //_screenBuffer = nint.Zero;
+        _screenBuffer = nint.Zero;
 
         _inputReadyCancellationTokenSource?.Cancel ();
         _inputReadyCancellationTokenSource?.Dispose ();
@@ -425,7 +425,7 @@ internal partial class WindowsConsole
 
     internal Size GetConsoleBufferWindow (out Point position)
     {
-        if (_outputHandle == nint.Zero)
+        if ((IsWindowsTerminal ? _outputHandle : _screenBuffer) == nint.Zero)
         {
             position = Point.Empty;
 
@@ -435,7 +435,7 @@ internal partial class WindowsConsole
         var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
         csbi.cbSize = (uint)Marshal.SizeOf (csbi);
 
-        if (!GetConsoleScreenBufferInfoEx (_outputHandle, ref csbi))
+        if (!GetConsoleScreenBufferInfoEx (IsWindowsTerminal ? _outputHandle : _screenBuffer, ref csbi))
         {
             //throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
             position = Point.Empty;
@@ -469,85 +469,89 @@ internal partial class WindowsConsole
         return sz;
     }
 
-    //internal Size SetConsoleWindow (short cols, short rows)
-    //{
-    //    var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
-    //    csbi.cbSize = (uint)Marshal.SizeOf (csbi);
+    internal Size SetConsoleWindow (short cols, short rows)
+    {
+        var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
+        csbi.cbSize = (uint)Marshal.SizeOf (csbi);
 
-    //    if (!GetConsoleScreenBufferInfoEx (_screenBuffer, ref csbi))
-    //    {
-    //        throw new Win32Exception (Marshal.GetLastWin32Error ());
-    //    }
+        if (!GetConsoleScreenBufferInfoEx (IsWindowsTerminal ? _outputHandle : _screenBuffer, ref csbi))
+        {
+            throw new Win32Exception (Marshal.GetLastWin32Error ());
+        }
 
-    //    Coord maxWinSize = GetLargestConsoleWindowSize (_screenBuffer);
-    //    short newCols = Math.Min (cols, maxWinSize.X);
-    //    short newRows = Math.Min (rows, maxWinSize.Y);
-    //    csbi.dwSize = new Coord (newCols, Math.Max (newRows, (short)1));
-    //    csbi.srWindow = new SmallRect (0, 0, newCols, newRows);
-    //    csbi.dwMaximumWindowSize = new Coord (newCols, newRows);
+        Coord maxWinSize = GetLargestConsoleWindowSize (IsWindowsTerminal ? _outputHandle : _screenBuffer);
+        short newCols = Math.Min (cols, maxWinSize.X);
+        short newRows = Math.Min (rows, maxWinSize.Y);
+        csbi.dwSize = new Coord (newCols, Math.Max (newRows, (short)1));
+        csbi.srWindow = new SmallRect (0, 0, newCols, newRows);
+        csbi.dwMaximumWindowSize = new Coord (newCols, newRows);
 
-    //    if (!SetConsoleScreenBufferInfoEx (_screenBuffer, ref csbi))
-    //    {
-    //        throw new Win32Exception (Marshal.GetLastWin32Error ());
-    //    }
+        if (!SetConsoleScreenBufferInfoEx (IsWindowsTerminal ? _outputHandle : _screenBuffer, ref csbi))
+        {
+            throw new Win32Exception (Marshal.GetLastWin32Error ());
+        }
 
-    //    var winRect = new SmallRect (0, 0, (short)(newCols - 1), (short)Math.Max (newRows - 1, 0));
+        var winRect = new SmallRect (0, 0, (short)(newCols - 1), (short)Math.Max (newRows - 1, 0));
 
-    //    if (!SetConsoleWindowInfo (_outputHandle, true, ref winRect))
-    //    {
-    //        //throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
-    //        return new (cols, rows);
-    //    }
+        if (!SetConsoleWindowInfo (_outputHandle, true, ref winRect))
+        {
+            //throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
+            return new (cols, rows);
+        }
 
-    //    SetConsoleOutputWindow (csbi);
+        SetConsoleOutputWindow (csbi);
 
-    //    return new (winRect.Right + 1, newRows - 1 < 0 ? 0 : winRect.Bottom + 1);
-    //}
+        return new (winRect.Right + 1, newRows - 1 < 0 ? 0 : winRect.Bottom + 1);
+    }
 
-    //private void SetConsoleOutputWindow (CONSOLE_SCREEN_BUFFER_INFOEX csbi)
-    //{
-    //    if (_screenBuffer != nint.Zero && !SetConsoleScreenBufferInfoEx (_screenBuffer, ref csbi))
-    //    {
-    //        throw new Win32Exception (Marshal.GetLastWin32Error ());
-    //    }
-    //}
+    private void SetConsoleOutputWindow (CONSOLE_SCREEN_BUFFER_INFOEX csbi)
+    {
+        if ((IsWindowsTerminal
+                ? _outputHandle
+                : _screenBuffer) != nint.Zero && !SetConsoleScreenBufferInfoEx (IsWindowsTerminal ? _outputHandle : _screenBuffer, ref csbi))
+        {
+            throw new Win32Exception (Marshal.GetLastWin32Error ());
+        }
+    }
 
-    //internal Size SetConsoleOutputWindow (out Point position)
-    //{
-    //    if (_screenBuffer == nint.Zero)
-    //    {
-    //        position = Point.Empty;
+    internal Size SetConsoleOutputWindow (out Point position)
+    {
+        if ((IsWindowsTerminal ? _outputHandle : _screenBuffer) == nint.Zero)
+        {
+            position = Point.Empty;
 
-    //        return Size.Empty;
-    //    }
+            return Size.Empty;
+        }
 
-    //    var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
-    //    csbi.cbSize = (uint)Marshal.SizeOf (csbi);
+        var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
+        csbi.cbSize = (uint)Marshal.SizeOf (csbi);
 
-    //    if (!GetConsoleScreenBufferInfoEx (_screenBuffer, ref csbi))
-    //    {
-    //        throw new Win32Exception (Marshal.GetLastWin32Error ());
-    //    }
+        if (!GetConsoleScreenBufferInfoEx (IsWindowsTerminal ? _outputHandle : _screenBuffer, ref csbi))
+        {
+            throw new Win32Exception (Marshal.GetLastWin32Error ());
+        }
 
-    //    Size sz = new (
-    //                       csbi.srWindow.Right - csbi.srWindow.Left + 1,
-    //                       Math.Max (csbi.srWindow.Bottom - csbi.srWindow.Top + 1, 0));
-    //    position = new (csbi.srWindow.Left, csbi.srWindow.Top);
-    //    SetConsoleOutputWindow (csbi);
-    //    var winRect = new SmallRect (0, 0, (short)(sz.Width - 1), (short)Math.Max (sz.Height - 1, 0));
+        Size sz = new (
+                           csbi.srWindow.Right - csbi.srWindow.Left + 1,
+                           Math.Max (csbi.srWindow.Bottom - csbi.srWindow.Top + 1, 0));
+        position = new (csbi.srWindow.Left, csbi.srWindow.Top);
+        SetConsoleOutputWindow (csbi);
+        var winRect = new SmallRect (0, 0, (short)(sz.Width - 1), (short)Math.Max (sz.Height - 1, 0));
 
-    //    if (!SetConsoleScreenBufferInfoEx (_outputHandle, ref csbi))
-    //    {
-    //        throw new Win32Exception (Marshal.GetLastWin32Error ());
-    //    }
+        if (!SetConsoleScreenBufferInfoEx (_outputHandle, ref csbi))
+        {
+            throw new Win32Exception (Marshal.GetLastWin32Error ());
+        }
 
-    //    if (!SetConsoleWindowInfo (_outputHandle, true, ref winRect))
-    //    {
-    //        throw new Win32Exception (Marshal.GetLastWin32Error ());
-    //    }
+        if (!SetConsoleWindowInfo (_outputHandle, true, ref winRect))
+        {
+            throw new Win32Exception (Marshal.GetLastWin32Error ());
+        }
 
-    //    return sz;
-    //}
+        return sz;
+    }
+
+    internal bool IsWindowsTerminal { get; set; }
 
     private uint ConsoleMode
     {

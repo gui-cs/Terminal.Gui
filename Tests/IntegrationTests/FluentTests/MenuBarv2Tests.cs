@@ -506,4 +506,79 @@ public class MenuBarv2Tests
                                      .WriteOutLogs (_out)
                                      .Stop ();
     }
+
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void MenuBar_Not_Active_DoesNotEat_Space (V2TestDriver d)
+    {
+        int spaceKeyDownCount = 0;
+        View testView = new View ()
+        {
+            CanFocus = true,
+            Id = "testView",
+        };
+
+        testView.KeyDown += (sender, key) =>
+                            {
+                                if (key == Key.Space)
+                                {
+                                    spaceKeyDownCount++;
+                                }
+                            };
+
+        using GuiTestContext c = With.A<Window> (50, 20, d)
+                                     .Then (
+                                            () =>
+                                            {
+                                                var menuBar = new MenuBarv2 ();
+                                                Toplevel top = Application.Top!;
+                                                menuBar.EnableForDesign (ref top);
+                                                Application.Top!.Add (menuBar);
+                                            })
+                                     .Add (testView)
+                                     .WaitIteration ()
+                                     .Focus (testView)
+                                     .RaiseKeyDownEvent (Key.Space)
+                                     .Then (() => Assert.Equal (1, spaceKeyDownCount))
+                                     .WriteOutLogs (_out)
+                                     .Stop ();
+    }
+
+    [Theory]
+    [ClassData (typeof (V2TestDrivers))]
+    public void MenuBar_Not_Active_DoesNotEat_Enter (V2TestDriver d)
+    {
+        int enterKeyDownCount = 0;
+        View testView = new View ()
+        {
+            CanFocus = true,
+            Id = "testView",
+        };
+
+        testView.KeyDown += (sender, key) =>
+                            {
+                                if (key == Key.Enter)
+                                {
+                                    enterKeyDownCount++;
+                                }
+                            };
+
+        using GuiTestContext c = With.A<Window> (50, 20, d)
+                                     .Then (
+                                            () =>
+                                            {
+                                                var menuBar = new MenuBarv2 ();
+                                                Toplevel top = Application.Top!;
+                                                menuBar.EnableForDesign (ref top);
+                                                Application.Top!.Add (menuBar);
+                                            })
+                                     .Add (testView)
+                                     .WaitIteration ()
+                                     .Focus (testView)
+                                     .RaiseKeyDownEvent (Key.Enter)
+                                     .Then (() => Assert.Equal (1, enterKeyDownCount))
+                                     .WriteOutLogs (_out)
+                                     .Stop ();
+    }
+
 }

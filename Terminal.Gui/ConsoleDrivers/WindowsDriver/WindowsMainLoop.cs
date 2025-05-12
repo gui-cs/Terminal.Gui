@@ -1,5 +1,7 @@
 ﻿#nullable enable
 
+#define HACK_CHECK_WINCHANGED
+
 using System.Collections.Concurrent;
 
 namespace Terminal.Gui;

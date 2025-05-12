@@ -8687,7 +8687,7 @@ line.
         void TextViewAccept (object sender, CommandEventArgs e)
         {
             textViewAccept++;
-            e.Cancel = handleAccept;
+            e.Handled = handleAccept;
         }
 
         void ButtonAccept (object sender, CommandEventArgs e) { buttonAccept++; }

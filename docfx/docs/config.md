@@ -9,6 +9,7 @@ The following terms are used for Configuration Management:
 - `Load` - Load configuration from the given location(s), updating the configuration with any new values. Loading does not apply the settings to the application; that happens when the `Apply` method is called.
 - `Reset` - Reset the configuration to either the current values or the hard-coded defaults. Resetting does not load the configuration; it only resets the configuration to the default values.
 - `Apply` - Apply the configuration to the application; this means the settings are copied from the configuration properties to the corresponding `static` `[ConfigurationProperty]` properties.
+- `Sources` - A source is a location where a configuration can be stored. Sources are defined in the `ConfigLocations` enum.
 - `Setting` - A setting is a property that is part of a configuration.
 - `Theme` - A theme is a named collection of settings that impact the visual style of Terminal.Gui applications.
 - `AppSettings` - Application-specific settings are stored in the application's resources.

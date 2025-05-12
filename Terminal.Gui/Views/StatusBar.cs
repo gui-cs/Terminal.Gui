@@ -140,7 +140,7 @@ public class StatusBar : Bar, IDesignable
                            {
                                button1.Visible = !button1.Visible;
                                button1.Enabled = button1.Visible;
-                               e.Cancel = false;
+                               e.Handled = false;
                            };
 
         Add (new Label
