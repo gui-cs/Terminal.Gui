@@ -56,7 +56,11 @@ public static class ThemeManager
             if (Settings is { } && Settings.TryGetValue ("Themes", out ConfigProperty? themes))
             {
                 Settings ["Themes"].PropertyValue = value;
+
+                return;
             }
+
+            throw new InvalidOperationException ("Settings is null.");
         }
     }
 
@@ -174,7 +178,7 @@ public static class ThemeManager
     [RequiresDynamicCode ("Calls Terminal.Gui.ThemeManager.Themes")]
     internal static void UpdateToCurrentValues ()
     {
-        Themes! [Theme].UpdateToCurrentValues ();
+        Themes! [Theme].LoadCurrentValues ();
     }
 
 
@@ -182,7 +186,7 @@ public static class ThemeManager
     ///     INTERNAL: Resets all themes to the values the <see cref="ConfigurationPropertyAttribute"/> properties contained
     ///     when the module was initialized.
     /// </summary>
-    internal static void UpdateToHardCodedDefaults ()
+    internal static void ResetToHardCodedDefaults ()
     {
         if (!IsInitialized ())
         {

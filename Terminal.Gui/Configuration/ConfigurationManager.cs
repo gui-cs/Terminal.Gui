@@ -53,7 +53,7 @@ public static class ConfigurationManager
 {
     /// <summary>The backing property for <see cref="Settings"/> (config settings of <see cref="SettingsScope"/>).</summary>
     /// <remarks>
-    ///     Is <see langword="null"/> until <see cref="Reset"/> is called. Gets set to a new instance by
+    ///     Is <see langword="null"/> until <see cref="ResetToCurrentValues"/> is called. Gets set to a new instance by
     ///     deserialization
     ///     (see <see cref="Load"/>).
     /// </remarks>
@@ -189,7 +189,7 @@ public static class ConfigurationManager
             _initialized = true;
         }
 
-        ResetToHardCodedDefaults();
+        LoadHardCodedDefaults ();
     }
 
     #endregion Initialization
@@ -265,7 +265,7 @@ public static class ConfigurationManager
     /// </summary>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    internal static void Reset ()
+    internal static void ResetToCurrentValues ()
     {
         if (!IsInitialized ())
         {
@@ -296,30 +296,12 @@ public static class ConfigurationManager
             _cachedAppSettingsLock.ExitWriteLock ();
         }
 
-        ResetToCurrentValues ();
-    }
-
-    /// <summary>
-    ///     INTERNAL: Resets all settings to the current values of the static <see cref="ConfigurationPropertyAttribute"/> properties.
-    /// </summary>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-    internal static void ResetToCurrentValues ()
-    {
-        if (!IsInitialized ())
-        {
-            throw new InvalidOperationException ("Initialize must be called first.");
-        }
-
-        Settings = new ();
-        Settings.UpdateToCurrentValues ();
+        Settings!.LoadCurrentValues ();
         ThemeManager.UpdateToCurrentValues ();
-        AppSettings?.UpdateToCurrentValues ();
+        AppSettings?.LoadCurrentValues ();
 
-        //foreach (KeyValuePair<string, ConfigProperty> p in Settings!.Where (cp => cp.Value.PropertyInfo is { }))
-        //{
-        //    Settings! [p.Key].PropertyValue = p.Value.PropertyInfo?.GetValue (null);
-        //}
+        Apply();
+
     }
 
     /// <summary>
@@ -330,18 +312,8 @@ public static class ConfigurationManager
     [RequiresDynamicCode ("AOT")]
     internal static void ResetToHardCodedDefaults ()
     {
-        if (!IsInitialized ())
-        {
-            throw new InvalidOperationException ("Initialize must be called first.");
-        }
-
-        SourcesManager!.Sources.Clear();
-        SourcesManager.AddSource (ConfigLocations.HardCoded, "HardCoded");
-
-        Settings = new ();
-        Settings!.UpdateToHardCodedDefaults ();
-        ThemeManager.UpdateToHardCodedDefaults ();
-        AppSettings!.UpdateToHardCodedDefaults ();
+        LoadHardCodedDefaults();
+        Apply();
     }
 
     #endregion Reset
@@ -352,15 +324,39 @@ public static class ConfigurationManager
     // Loading does not apply the settings to the application; that happens when the `Apply` method is called.
 
     /// <summary>
+    ///     INTERNAL: Loads all hard-coded configuration properties. Use <see cref="Apply"/> to cause the loaded settings to be applied to the running application.
+    /// </summary>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
+    internal static void LoadHardCodedDefaults ()
+    {
+        if (!IsInitialized ())
+        {
+            throw new InvalidOperationException ("Initialize must be called first.");
+        }
+
+        RuntimeConfig = null;
+        SourcesManager!.Sources.Clear ();
+        SourcesManager.AddSource (ConfigLocations.HardCoded, "HardCoded");
+
+        Settings = new ();
+        Settings!.LoadHardCodedDefaults ();
+        ThemeManager.ResetToHardCodedDefaults ();
+        AppSettings!.LoadHardCodedDefaults ();
+    }
+
+    /// <summary>
     ///     Loads all settings found in <paramref name="locations"/>. Use <see cref="Apply"/> to cause the loaded settings to be applied to the running application.
     /// </summary>
+    /// <exception cref="ConfigurationManagerNotEnabledException">Configuration manager is not enabled.</exception>
+
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public static void Load (ConfigLocations locations)
     {
         if (!IsEnabled)
         {
-            throw new InvalidOperationException ("ConfigurationManager is not enabled.");
+            throw new ConfigurationManagerNotEnabledException ();
         }
 
         // TODO: We ignore HardCodedDefaults. Use ResetToHardCodedDefaults to reset to hard coded defaults? Or 
@@ -368,12 +364,8 @@ public static class ConfigurationManager
 
         if (locations.HasFlag (ConfigLocations.LibraryResources))
         {
-            SourcesManager?.Load (
-                                                Settings,
-                                                typeof (ConfigurationManager).Assembly,
-                                                $"Terminal.Gui.Resources.{_configFilename}",
-                                                ConfigLocations.LibraryResources
-                                               );
+            SourcesManager?.Load (Settings, typeof (ConfigurationManager).Assembly, $"Terminal.Gui.Resources.{_configFilename}",
+                                  ConfigLocations.LibraryResources);
         }
 
         if (locations.HasFlag (ConfigLocations.AppResources))
@@ -446,16 +438,16 @@ public static class ConfigurationManager
     // configuration properties to the corresponding `static` `[ConfigurationProperty]` properties.
 
     /// <summary>
-    ///     Applies the configuration settings to static <see cref="ConfigurationPropertyAttribute"/> properties.
+    ///     Applies the configuration settings to static <see cref="ConfigurationPropertyAttribute"/> properties. ConfigurationManager must be Enabled.
     /// </summary>
+    /// <exception cref="ConfigurationManagerNotEnabledException">Configuration Manager is not enabled.</exception>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public static void Apply ()
     {
         if (!IsEnabled)
         {
-            Logging.Trace ("ConfigurationManager is disabled.");
-            return;
+            throw new ConfigurationManagerNotEnabledException ();
         }
 
         var settings = false;

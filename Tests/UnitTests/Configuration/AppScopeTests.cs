@@ -20,13 +20,13 @@ public class AppSettingsScopeTests
     [AutoInitShutdown]
     public void Apply_ShouldApplyUpdatedProperties ()
     {
-        Reset ();
+        ResetToCurrentValues ();
         Assert.Null (AppSettingsTestClass.NullableValueProperty);
         Assert.NotEmpty (AppSettings!);
         Assert.Null (AppSettings! ["AppSettingsTestClass.NullableValueProperty"].PropertyValue);
 
         AppSettingsTestClass.NullableValueProperty = true;
-        Reset ();
+        ResetToCurrentValues ();
         Assert.True (AppSettingsTestClass.NullableValueProperty);
         Assert.NotEmpty (AppSettings);
         Assert.Null (AppSettings ["AppSettingsTestClass.NullableValueProperty"].PropertyValue as bool?);
@@ -53,12 +53,12 @@ public class AppSettingsScopeTests
         AppSettingsTestClass.NullableValueProperty = null;
         Assert.Null (AppSettingsTestClass.NullableValueProperty);
 
-        Reset ();
+        ResetToCurrentValues ();
         Apply ();
         Assert.Null (AppSettingsTestClass.NullableValueProperty);
 
         AppSettingsTestClass.NullableValueProperty = true;
-        Reset ();
+        ResetToCurrentValues ();
         Assert.NotNull (AppSettingsTestClass.NullableValueProperty);
         Apply ();
         Assert.NotNull (AppSettingsTestClass.NullableValueProperty);
@@ -67,7 +67,7 @@ public class AppSettingsScopeTests
     [Fact]
     public void TestSerialize_RoundTrip ()
     {
-        Reset ();
+        ResetToCurrentValues ();
 
         AppSettingsScope initial = AppSettings!;
 

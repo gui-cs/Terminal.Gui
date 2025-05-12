@@ -16,20 +16,22 @@ public class ThemeScopeTests
     };
 
     [Fact]
-    [AutoInitShutdown]
-    public void AllThemesPresent ()
+    public void Load_AllThemesPresent ()
     {
-        Reset ();
+        Enable();
+        Load (ConfigLocations.All);
         Assert.True (ThemeManager.Themes.ContainsKey ("Default"));
         Assert.True (ThemeManager.Themes.ContainsKey ("Dark"));
         Assert.True (ThemeManager.Themes.ContainsKey ("Light"));
+        ResetToHardCodedDefaults();
+        Disable ();
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Apply_ShouldApplyUpdatedProperties ()
     {
-        Reset ();
+        Enable ();
+        ResetToHardCodedDefaults ();
         Assert.NotEmpty (ThemeManager.Themes);
         Alignment savedValue = Dialog.DefaultButtonAlignment;
         Alignment newValue = Alignment.Center != savedValue ? Alignment.Center : Alignment.Start;
@@ -43,6 +45,8 @@ public class ThemeScopeTests
         ThemeManager.Themes ["Default"] ["Dialog.DefaultButtonAlignment"].PropertyValue = savedValue;
         ThemeManager.Themes! [ThemeManager.Theme]!.Apply ();
         Assert.Equal (savedValue, Dialog.DefaultButtonAlignment);
+        ResetToHardCodedDefaults ();
+        Disable ();
     }
 
     [Fact]
@@ -58,17 +62,18 @@ public class ThemeScopeTests
         Assert.Equal ("Dark", ThemeManager.Theme);
 
         // Act
-        ThemeManager.UpdateToHardCodedDefaults ();
+        ThemeManager.ResetToHardCodedDefaults ();
         Assert.Equal ("Default", ThemeManager.Theme);
 
+        ResetToHardCodedDefaults ();
         Disable ();
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void TestSerialize_RoundTrip ()
     {
-        Reset ();
+        Enable ();
+        ResetToCurrentValues ();
 
         IDictionary<string, ThemeScope> initial = ThemeManager.Themes;
 
@@ -79,6 +84,9 @@ public class ThemeScopeTests
 
         Assert.NotEqual (initial, deserialized);
         Assert.Equal (deserialized.Count, initial.Count);
+
+        ResetToHardCodedDefaults ();
+        Disable ();
     }
 
 }

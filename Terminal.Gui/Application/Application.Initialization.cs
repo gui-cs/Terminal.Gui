@@ -197,14 +197,14 @@ public static partial class Application // Initialization (Init/Shutdown)
         // valid after a Driver is loaded. In this case we need just
         // `Settings` so we can determine which driver to use.
 
-        string previousTheme = ThemeManager.Theme ?? string.Empty;
-        // Don't reset, so we can inherit the theme from the previous run.
-        CM.Load (ConfigLocations.All);
-        if (ThemeManager.Theme is { } && !string.IsNullOrEmpty (previousTheme) && previousTheme != "Default")
-        {
-            ThemeManager.Theme = previousTheme;
-        }
-        CM.Apply ();
+        //string previousTheme = ThemeManager.Theme ?? string.Empty;
+        //// Don't reset, so we can inherit the theme from the previous run.
+        //CM.Load (ConfigLocations.All);
+        //if (ThemeManager.Theme is { } && !string.IsNullOrEmpty (previousTheme) && previousTheme != "Default")
+        //{
+        //    ThemeManager.Theme = previousTheme;
+        //}
+        //CM.Apply ();
     }
 
     internal static void SubscribeDriverEvents ()

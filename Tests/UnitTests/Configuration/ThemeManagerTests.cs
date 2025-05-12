@@ -41,7 +41,7 @@ public class ThemeManagerTests
         }
         finally
         {
-            CM.Reset ();
+            CM.ResetToCurrentValues ();
         }
 
     }

@@ -37,7 +37,6 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     ///     Only valid if <paramref name="autoInit"/> is true. Only valid if
     ///     <see cref="IConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
     /// </param>
-    /// <param name="configLocation">Determines what config file locations <see cref="ConfigurationManager"/> will load from.</param>
     /// <param name="verifyShutdown">If true and <see cref="Application.Initialized"/> is true, the test will fail.</param>
     public AutoInitShutdownAttribute (
         bool autoInit = true,
@@ -52,7 +51,6 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
         _driverType = consoleDriverType ?? typeof (FakeDriver);
         FakeDriver.FakeBehaviors.UseFakeClipboard = useFakeClipboard;
-
         FakeDriver.FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException =
             fakeClipboardAlwaysThrowsNotSupportedException;
         FakeDriver.FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
@@ -102,11 +100,16 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 #endif
             }
         }
+
+        CM.Disable();
+        CM.ResetToHardCodedDefaults ();
     }
 
     public override void Before (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
+
+        Debug.Assert(!CM.IsEnabled, "Some other test left ConfigurationManager enabled.");
 
         if (AutoInit)
         {

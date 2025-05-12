@@ -164,13 +164,14 @@ public class ConfigProperty
     }
 
     /// <summary>
-    ///     INTERNAL: Updates (using reflection) <see cref="PropertyValue"/> with the value in <paramref name="source"/> using a deep memberwise copy.
+    ///     INTERNAL: Updates (using reflection) <see cref="PropertyValue"/> with the value in <paramref name="source"/> using a deep memberwise copy that
+    ///     copies only the values that <see cref="HasValue"/>.
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
     [RequiresUnreferencedCode ("Uses DeepCloner which requires types to be registered in SourceGenerationContext")]
-    internal object? DeepCloneFrom (object? source)
+    internal object? UpdateFrom (object? source)
     {
         // If the source (higher-priority layer) doesn't provide a value, keep the existing value
         // In the context of layering, a null source means the higher-priority layer doesn't specify a value,
@@ -194,15 +195,36 @@ public class ConfigProperty
         // Handle Scope<T>-specific logic for nested configuration scopes
         if (source is SettingsScope settingsSource && PropertyValue is SettingsScope settingsDest)
         {
-            PropertyValue = settingsDest.DeepCloneFrom (settingsSource);
+            PropertyValue = settingsDest.UpdateFrom (settingsSource);
         }
         else if (source is ThemeScope themeSource && PropertyValue is ThemeScope themeDest)
         {
-            PropertyValue = themeDest.DeepCloneFrom (themeSource);
+            PropertyValue = themeDest.UpdateFrom (themeSource);
         }
         else if (source is AppSettingsScope appSource && PropertyValue is AppSettingsScope appDest)
         {
-            PropertyValue = appDest.DeepCloneFrom (appSource);
+            PropertyValue = appDest.UpdateFrom (appSource);
+        }
+        else if (source is Dictionary<string, ThemeScope> dictSource && PropertyValue is Dictionary<string, ThemeScope> dictDest)
+        {
+            foreach (KeyValuePair<string, ThemeScope> prop in dictSource)
+            {
+                if (dictDest.ContainsKey (prop.Key))
+                {
+                    dictDest [prop.Key].UpdateFrom (prop.Value);
+                }
+                else
+                {
+                    //// Add the property to this scope
+                    //// BUGBUG: This isn't correct. The ConfigProperty should be created with the correct PropertyInfo.
+                    //Add (prop.Key, new ());
+                    //this [prop.Key].PropertyValue = prop.Value.PropertyValue;
+                }
+            }
+        }
+        else if (source is ConfigProperty configProperty && PropertyValue is ConfigProperty configDest)
+        {
+            PropertyValue = configDest.UpdateFrom (configProperty);
         }
         else
         {

@@ -502,7 +502,9 @@ public class DeepClonerTests
         // Assert
         Assert.NotNull (result);
         Assert.IsType<SettingsScope> (result);
-        Assert.True (result.ContainsKey ("Themes"));
+
+        // There are no HasValue properties, so DeepClone...
+        Assert.False (result.ContainsKey ("Themes"));
     }
 
     [Fact]

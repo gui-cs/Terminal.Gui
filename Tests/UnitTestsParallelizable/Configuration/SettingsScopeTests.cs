@@ -27,7 +27,7 @@ public class SettingsScopeTests
         settingsScope ["Application.QuitKey"].PropertyValue = Key.Q;
         settingsScope.Apply ();
         Assert.Equal (Key.Q, Application.QuitKey);
-        settingsScope.UpdateToHardCodedDefaults();
+        settingsScope.LoadHardCodedDefaults();
         settingsScope.Apply ();
 
         // Assert

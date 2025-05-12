@@ -1,8 +1,9 @@
 ﻿#nullable enable
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
+using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui.Configuration;
 
@@ -39,7 +40,8 @@ public class SourcesManager
             stream.Position = 0;
             Debug.Assert (json != null, "json != null");
 #endif
-            settingsScope.DeepCloneFrom ((SettingsScope)JsonSerializer.Deserialize (stream, typeof (SettingsScope), SerializerContext.Options)!);
+            SettingsScope? scope = JsonSerializer.Deserialize (stream, typeof (SettingsScope), SerializerContext.Options) as SettingsScope;
+            settingsScope.UpdateFrom (scope!);
             CM.OnUpdated ();
 
             AddSource (location, source);
@@ -127,7 +129,8 @@ public class SourcesManager
     [RequiresDynamicCode ("AOT")]
     internal bool Load (SettingsScope? settingsScope, string? json, string source, ConfigLocations location)
     {
-        Debug.Assert(location != ConfigLocations.All);
+        Debug.Assert (location != ConfigLocations.All);
+
         if (string.IsNullOrEmpty (json))
         {
             return false;
@@ -153,7 +156,7 @@ public class SourcesManager
     {
         if (string.IsNullOrEmpty (resourceName))
         {
-            Logging.Warning($"{resourceName} must not be null or empty.");
+            Logging.Warning ($"{resourceName} must not be null or empty.");
             return false;
         }
 

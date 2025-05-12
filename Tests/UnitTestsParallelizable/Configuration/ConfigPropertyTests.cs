@@ -81,7 +81,7 @@ public class ConfigPropertyTests
         };
 
         // Act
-        var updatedValue = configProperty.DeepCloneFrom ("NewValue");
+        var updatedValue = configProperty.UpdateFrom ("NewValue");
 
         // Assert
         Assert.Equal (0, TestConfiguration.TestStringPropertySetCount);

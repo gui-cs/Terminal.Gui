@@ -41,7 +41,7 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
     ///     <see cref="ConfigurationPropertyAttribute"/> properties.
     /// </summary>
     [RequiresDynamicCode ("Uses reflection to retrieve property values")]
-    internal void UpdateToCurrentValues ()
+    internal void LoadCurrentValues ()
     {
         foreach (KeyValuePair<string, ConfigProperty> validProperties in this.Where (cp => cp.Value.PropertyInfo is { }))
         {
@@ -52,7 +52,7 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
     /// <summary>
     ///     INTERNAL: Updates the values of the properties of this scope to their corresponding hard-coded original values.
     /// </summary>
-    internal void UpdateToHardCodedDefaults ()
+    internal void LoadHardCodedDefaults ()
     {
         foreach (KeyValuePair<string, ConfigProperty> hardCodedKeyValuePair in GetHardCodedConfigPropertiesByScope (typeof (T).Name)!)
         {
@@ -65,17 +65,22 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
     /// </summary>
     /// <param name="scope"></param>
     /// <returns>The updated scope (this).</returns>
-    internal Scope<T>? DeepCloneFrom (Scope<T> scope)
+    internal Scope<T>? UpdateFrom (Scope<T> scope)
     {
         foreach (KeyValuePair<string, ConfigProperty> prop in scope)
         {
+            if (!prop.Value.HasValue)
+            {
+                continue;
+            }
             if (ContainsKey (prop.Key))
             {
-                this [prop.Key].PropertyValue = this [prop.Key].DeepCloneFrom (prop.Value.PropertyValue!);
+                this [prop.Key].UpdateFrom (prop.Value.PropertyValue);
             }
             else
             {
                 // Add the property to this scope
+                // BUGBUG: This isn't correct. The ConfigProperty should be created with the correct PropertyInfo.
                 Add (prop.Key, new ());
                 this [prop.Key].PropertyValue = prop.Value.PropertyValue;
             }
@@ -92,7 +97,7 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
     {
         if (!IsEnabled)
         {
-            return false;
+            Logging.Warning($"Apply called when CM is not Enabled. This should only be done from unit tests where side-effects are managed.");
         }
 
         var set = false;
@@ -105,7 +110,7 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
 
                 if (propWithValue.Value.PropertyValue is Scope<T> scopeSource && currentValue is Scope<T> scopeDest)
                 {
-                    propWithValue.Value.PropertyInfo.SetValue (null, scopeDest.DeepCloneFrom (scopeSource));
+                    propWithValue.Value.PropertyInfo.SetValue (null, scopeDest.UpdateFrom (scopeSource));
                 }
                 else
                 {
