@@ -61,6 +61,9 @@ internal partial class WindowsOutput : IConsoleOutput
 
     private readonly nint _screenBuffer;
 
+    // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
+    private TextStyle _redrawTextStyle = TextStyle.None;
+
     public WindowsOutput ()
     {
         Logging.Logger.LogInformation ($"Creating {nameof (WindowsOutput)}");
@@ -233,6 +236,8 @@ internal partial class WindowsOutput : IConsoleOutput
                     prev = attr;
                     EscSeqUtils.CSI_AppendForegroundColorRGB (stringBuilder, attr.Foreground.R, attr.Foreground.G, attr.Foreground.B);
                     EscSeqUtils.CSI_AppendBackgroundColorRGB (stringBuilder, attr.Background.R, attr.Background.G, attr.Background.B);
+                    EscSeqUtils.CSI_AppendTextStyleChange (stringBuilder, _redrawTextStyle, attr.TextStyle);
+                    _redrawTextStyle = attr.TextStyle;
                 }
 
                 if (info.Char != '\x1b')
