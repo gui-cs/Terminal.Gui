@@ -19,7 +19,7 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
     {
         Debug.WriteLine ($"After: {methodUnderTest.Name}");
 
-        Debug.Assert (!CM.IsEnabled, "This test left ConfigurationManager enabled!");
+        Debug.Assert (!CM.IsEnabled, "This test may have left ConfigurationManager enabled!");
 
         // Turn off diagnostic flags in case some test left them on
         View.Diagnostics = ViewDiagnosticFlags.Off;

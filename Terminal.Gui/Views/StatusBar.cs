@@ -30,7 +30,7 @@ public class StatusBar : Bar, IDesignable
 
         base.Scheme = SchemeManager.Schemes ["Menu"];
 
-        Applied += OnConfigurationManagerApplied;
+        ConfigurationManager.Applied += OnConfigurationManagerApplied;
         SuperViewChanged += OnSuperViewChanged;
     }
 
@@ -42,7 +42,7 @@ public class StatusBar : Bar, IDesignable
             // BUGBUG: For some reason in some unit tests, when Top is disposed, MenuBar.Dispose does not get called.
             // BUGBUG: Yet, the MenuBar does get Removed from Top (and it's SuperView set to null).
             // BUGBUG: Related: https://github.com/gui-cs/Terminal.Gui/issues/4021
-            Applied -= OnConfigurationManagerApplied;
+            ConfigurationManager.Applied -= OnConfigurationManagerApplied;
         }
     }
     private void OnConfigurationManagerApplied (object? sender, ConfigurationManagerEventArgs e)
@@ -169,6 +169,6 @@ public class StatusBar : Bar, IDesignable
         base.Dispose (disposing);
 
         SuperViewChanged -= OnSuperViewChanged;
-        Applied -= OnConfigurationManagerApplied;
+        ConfigurationManager.Applied -= OnConfigurationManagerApplied;
     }
 }

@@ -40,9 +40,9 @@ public class SourcesManager
             stream.Position = 0;
             Debug.Assert (json != null, "json != null");
 #endif
-            SettingsScope? scope = JsonSerializer.Deserialize (stream, typeof (SettingsScope), SerializerContext.Options) as SettingsScope;
+            SettingsScope? scope = JsonSerializer.Deserialize (stream, typeof (SettingsScope), ConfigurationManager.SerializerContext.Options) as SettingsScope;
             settingsScope.UpdateFrom (scope!);
-            CM.OnUpdated ();
+            ConfigurationManager.OnUpdated ();
 
             AddSource (location, source);
 
@@ -51,12 +51,12 @@ public class SourcesManager
         }
         catch (JsonException e)
         {
-            if (ThrowOnJsonErrors ?? false)
+            if (ConfigurationManager.ThrowOnJsonErrors ?? false)
             {
                 throw;
             }
 
-            AddJsonError ($"Error deserializing {source}: {e.Message}");
+            ConfigurationManager.AddJsonError ($"Error deserializing {source}: {e.Message}");
         }
 
         return false;
@@ -181,7 +181,7 @@ public class SourcesManager
     internal string ToJson (SettingsScope? scope)
     {
         //Logging.Debug  ("ConfigurationManager.ToJson()");
-        return JsonSerializer.Serialize (scope, typeof (SettingsScope), SerializerContext);
+        return JsonSerializer.Serialize (scope, typeof (SettingsScope), ConfigurationManager.SerializerContext);
     }
 
     /// <summary>
@@ -192,7 +192,7 @@ public class SourcesManager
     [RequiresDynamicCode ("AOT")]
     internal Stream ToStream (SettingsScope? scope)
     {
-        string json = JsonSerializer.Serialize (scope, typeof (SettingsScope), SerializerContext);
+        string json = JsonSerializer.Serialize (scope, typeof (SettingsScope), ConfigurationManager.SerializerContext);
 
         // turn it into a stream
         var stream = new MemoryStream ();

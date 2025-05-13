@@ -30,7 +30,7 @@ public class Menuv2 : Bar
 
         BorderStyle = DefaultBorderStyle;
 
-        Applied += OnConfigurationManagerApplied;
+        ConfigurationManager.Applied += OnConfigurationManagerApplied;
     }
 
     private void OnConfigurationManagerApplied (object? sender, ConfigurationManagerEventArgs e)
@@ -225,7 +225,7 @@ public class Menuv2 : Bar
 
         if (disposing)
         {
-            Applied -= OnConfigurationManagerApplied;
+            ConfigurationManager.Applied -= OnConfigurationManagerApplied;
         }
     }
 }

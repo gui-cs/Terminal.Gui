@@ -32,16 +32,16 @@ public static class ThemeManager
     /// <exception cref="InvalidOperationException"></exception>
     public static Dictionary<string, ThemeScope> GetThemes ()
     {
-        if (!IsInitialized ())
+        if (!ConfigurationManager.IsInitialized ())
         {
             // We're being called from the module initializer.
             // We need to provide a dictionary of themes containing the hard-coded theme.
             return HardCodedThemes ()!;
         }
 
-        if (Settings is { })
+        if (ConfigurationManager.Settings is { })
         {
-            if (Settings.TryGetValue ("Themes", out ConfigProperty? themes))
+            if (ConfigurationManager.Settings.TryGetValue ("Themes", out ConfigProperty? themes))
             {
                 if (themes.HasValue)
                 {
@@ -54,6 +54,43 @@ public static class ThemeManager
         }
 
         throw new InvalidOperationException ("Settings is null.");
+    }
+
+    /// <summary>
+    ///     Convenience method to get a list of theme names.
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static ImmutableList<string> GetThemeNames ()
+    {
+        if (!ConfigurationManager.IsInitialized ())
+        {
+            // We're being called from the module initializer.
+            // We need to provide a dictionary of themes containing the hard-coded theme.
+            return HardCodedThemes ()!.Keys.ToImmutableList ();
+        }
+        if (ConfigurationManager.Settings is { })
+        {
+            if (ConfigurationManager.Settings.TryGetValue ("Themes", out ConfigProperty? themes))
+            {
+                if (themes.HasValue)
+                {
+                    return (((Dictionary<string, ThemeScope>)themes.PropertyValue!)!).Keys.ToImmutableList ();
+                }
+                return HardCodedThemes ()!.Keys.ToImmutableList ();
+            }
+            throw new InvalidOperationException ("Settings has no Themes property.");
+        }
+        throw new InvalidOperationException ("Settings is null.");
+    }
+
+    /// <summary>
+    ///     Convenience method to get the current theme name. The current theme name is the value of <see cref="Theme"/>.
+    /// </summary>
+    /// <returns></returns>
+    public static string GetCurrentThemeName ()
+    {
+        return Theme!;
     }
 
     /// <summary>
@@ -73,7 +110,7 @@ public static class ThemeManager
 
     private static void SetThemes (Dictionary<string, ThemeScope>? dictionary)
     {
-        if (!IsEnabled)
+        if (!ConfigurationManager.IsEnabled)
         {
             throw new InvalidOperationException ("Can't set Themes when ConfigurationManager is disabled.");
         }
@@ -83,9 +120,9 @@ public static class ThemeManager
             throw new InvalidOperationException ($"Themes must include an item named {DEFAULT_THEME_NAME}");
         }
 
-        if (Settings is { } && Settings.TryGetValue ("Themes", out ConfigProperty? themes))
+        if (ConfigurationManager.Settings is { } && ConfigurationManager.Settings.TryGetValue ("Themes", out ConfigProperty? themes))
         {
-            Settings ["Themes"].PropertyValue = dictionary;
+            ConfigurationManager.Settings ["Themes"].PropertyValue = dictionary;
 
             return;
         }
@@ -114,7 +151,7 @@ public static class ThemeManager
     /// <returns></returns>
     private static ThemeScope? GetHardCodedThemeScope ()
     {
-        IEnumerable<KeyValuePair<string, ConfigProperty>>? hardCodedThemeProperties = GetHardCodedConfigPropertiesByScope ("ThemeScope");
+        IEnumerable<KeyValuePair<string, ConfigProperty>>? hardCodedThemeProperties = ConfigurationManager.GetHardCodedConfigPropertiesByScope ("ThemeScope");
 
         if (hardCodedThemeProperties is null)
         {
@@ -146,14 +183,14 @@ public static class ThemeManager
     {
         get
         {
-            if (!IsInitialized ())
+            if (!ConfigurationManager.IsInitialized ())
             {
                 // We're being called from the module initializer.
                 // Hard coded default value
                 return DEFAULT_THEME_NAME;
             }
 
-            if (Settings is { } && Settings.TryGetValue ("Theme", out ConfigProperty? themeCp))
+            if (ConfigurationManager.Settings is { } && ConfigurationManager.Settings.TryGetValue ("Theme", out ConfigProperty? themeCp))
             {
                 if (themeCp.HasValue)
                 {
@@ -169,17 +206,17 @@ public static class ThemeManager
         [RequiresDynamicCode ("Calls Terminal.Gui.ConfigurationManager.Settings")]
         set
         {
-            if (!IsInitialized ())
+            if (!ConfigurationManager.IsInitialized ())
             {
                 throw new InvalidOperationException ("Theme cannot be set before ConfigurationManager is initialized.");
             }
 
-            if (!IsEnabled)
+            if (!ConfigurationManager.IsEnabled)
             {
                 throw new InvalidOperationException ("Can't set Theme when ConfigurationManager is disabled.");
             }
 
-            if (Settings is null || !Settings.TryGetValue ("Theme", out ConfigProperty? themeCp))
+            if (ConfigurationManager.Settings is null || !ConfigurationManager.Settings.TryGetValue ("Theme", out ConfigProperty? themeCp))
             {
                 throw new InvalidOperationException ("Settings is null.");
             }
@@ -189,15 +226,15 @@ public static class ThemeManager
                 throw new InvalidOperationException ("Theme has no value.");
             }
 
-            if (!Settings.TryGetValue ("Themes", out ConfigProperty? themesCp))
+            if (!ConfigurationManager.Settings.TryGetValue ("Themes", out ConfigProperty? themesCp))
             {
                 throw new InvalidOperationException ("Settings has no Themes property.");
             }
 
             // Update the backing store
-            Settings! ["Theme"].PropertyValue = value;
+            ConfigurationManager.Settings! ["Theme"].PropertyValue = value;
 
-            if (!Settings.ContainsKey (value))
+            if (!ConfigurationManager.Settings.ContainsKey (value))
             {
                 Logging.Warning ($"{value} is not a valid theme name.");
             }
@@ -227,12 +264,12 @@ public static class ThemeManager
     /// </summary>
     internal static void ResetToHardCodedDefaults ()
     {
-        if (!IsInitialized ())
+        if (!ConfigurationManager.IsInitialized ())
         {
             throw new InvalidOperationException ("ThemeManager is not initialized.");
         }
 
-        if (Settings is null)
+        if (ConfigurationManager.Settings is null)
         {
             return;
         }
@@ -248,8 +285,8 @@ public static class ThemeManager
             { Theme, hardCodedThemeScope }
         };
 
-        Settings ["Themes"].PropertyValue = hardCodedThemes;
-        Settings ["Theme"].PropertyValue = DEFAULT_THEME_NAME;
+        ConfigurationManager.Settings ["Themes"].PropertyValue = hardCodedThemes;
+        ConfigurationManager.Settings ["Theme"].PropertyValue = DEFAULT_THEME_NAME;
     }
 
     /// <summary>Called when the selected theme has changed. Fires the <see cref="ThemeChanged"/> event.</summary>

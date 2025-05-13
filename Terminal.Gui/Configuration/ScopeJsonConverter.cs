@@ -98,7 +98,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                     try
                     {
                         scope! [propertyName].PropertyValue =
-                            JsonSerializer.Deserialize (ref reader, propertyType!, SerializerContext);
+                            JsonSerializer.Deserialize (ref reader, propertyType!, ConfigurationManager.SerializerContext);
                     }
                     catch (Exception)
                     {
@@ -148,7 +148,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                 if (property is { })
                 {
                     PropertyInfo prop = scope.GetType ().GetProperty (propertyName!)!;
-                    prop.SetValue (scope, JsonSerializer.Deserialize (ref reader, prop.PropertyType, SerializerContext));
+                    prop.SetValue (scope, JsonSerializer.Deserialize (ref reader, prop.PropertyType, ConfigurationManager.SerializerContext));
                 }
                 else
                 {
@@ -178,7 +178,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
         {
             writer.WritePropertyName (ConfigProperty.GetJsonPropertyName (p));
             object? prop = scope.GetType ().GetProperty (p.Name)?.GetValue (scope);
-            JsonSerializer.Serialize (writer, prop, prop!.GetType (), SerializerContext);
+            JsonSerializer.Serialize (writer, prop, prop!.GetType (), ConfigurationManager.SerializerContext);
         }
 
         foreach (KeyValuePair<string, ConfigProperty> p in from p in scope
@@ -224,7 +224,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
             else
             {
                 object? prop = p.Value.PropertyValue;
-                JsonSerializer.Serialize (writer, prop, prop!.GetType (), SerializerContext);
+                JsonSerializer.Serialize (writer, prop, prop!.GetType (), ConfigurationManager.SerializerContext);
             }
         }
 

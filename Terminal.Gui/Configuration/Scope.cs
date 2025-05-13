@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui;
@@ -8,7 +7,8 @@ namespace Terminal.Gui;
 ///     Defines a configuration settings scope. Classes that inherit from this abstract class can be used to define
 ///     scopes for configuration settings. Each scope is a JSON object that contains a set of configuration settings.
 ///     <para>
-///         When constructed, the dictionary will be populated with the uninitialized configuration properties for the scope (<see cref="ConfigProperty.HasValue"/> will be <see langword="false"/>).
+///         When constructed, the dictionary will be populated with the uninitialized configuration properties for the
+///         scope (<see cref="ConfigProperty.HasValue"/> will be <see langword="false"/>).
 ///     </para>
 ///     <para>
 ///     </para>
@@ -16,25 +16,28 @@ namespace Terminal.Gui;
 public class Scope<T> : Dictionary<string, ConfigProperty>
 {
     /// <summary>
-    ///     Creates a new instance. The dictionary will be populated with uninitialized (<see cref="ConfigProperty.HasValue"/> will be <see langword="false"/>).
+    ///     Creates a new instance. The dictionary will be populated with uninitialized (<see cref="ConfigProperty.HasValue"/>
+    ///     will be <see langword="false"/>).
     /// </summary>
-    [RequiresUnreferencedCode ("Uses cached configuration properties filtered by type T. This is AOT-safe as long as T is one of the known scope types (SettingsScope, ThemeScope, AppSettingsScope).")]
+    [RequiresUnreferencedCode (
+                                  "Uses cached configuration properties filtered by type T. This is AOT-safe as long as T is one of the known scope types (SettingsScope, ThemeScope, AppSettingsScope).")]
     public Scope () : base (StringComparer.InvariantCultureIgnoreCase)
     {
         // Populate the dictionary with uninitialized, mutable, properties
-        foreach (KeyValuePair<string, ConfigProperty> p in GetConfigPropertiesByScope (typeof (T).Name)!)
+        foreach (KeyValuePair<string, ConfigProperty> p in ConfigurationManager.GetConfigPropertiesByScope (typeof (T).Name)!)
         {
-            Add (p.Key, new ()
-            {
-                // Copy just the PropertyInfo, NOT PropertyValue
-                PropertyInfo = p.Value.PropertyInfo,
-                OmitClassName = p.Value.OmitClassName,
-                ScopeType = p.Value.ScopeType,
-                Immutable = false
-            });
+            Add (
+                 p.Key,
+                 new ()
+                 {
+                     // Copy just the PropertyInfo, NOT PropertyValue
+                     PropertyInfo = p.Value.PropertyInfo,
+                     OmitClassName = p.Value.OmitClassName,
+                     ScopeType = p.Value.ScopeType,
+                     Immutable = false
+                 });
         }
     }
-
 
     /// <summary>
     ///     INTERNAL: Updates the values of the properties of this scope to their corresponding static
@@ -54,7 +57,7 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
     /// </summary>
     internal void LoadHardCodedDefaults ()
     {
-        foreach (KeyValuePair<string, ConfigProperty> hardCodedKeyValuePair in GetHardCodedConfigPropertiesByScope (typeof (T).Name)!)
+        foreach (KeyValuePair<string, ConfigProperty> hardCodedKeyValuePair in ConfigurationManager.GetHardCodedConfigPropertiesByScope (typeof (T).Name)!)
         {
             if (!ContainsKey (hardCodedKeyValuePair.Key))
             {
@@ -78,14 +81,16 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
             {
                 continue;
             }
+
             if (!ContainsKey (prop.Key))
             {
                 if (!prop.Value.HasValue)
                 {
                     continue;
                 }
+
                 // Add the property to this scope
-                ConfigProperty? copy = new ConfigProperty ()
+                var copy = new ConfigProperty
                 {
                     Immutable = false,
                     PropertyInfo = prop.Value.PropertyInfo,
@@ -96,21 +101,24 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
                 Add (prop.Key, copy);
                 this [prop.Key].UpdateFrom (prop.Value.PropertyValue);
             }
+
             this [prop.Key].UpdateFrom (prop.Value.PropertyValue);
         }
 
         return this;
     }
+
     /// <summary>
-    ///     INTERNAL: Applies the values of the properties of this scope to their corresponding <see cref="ConfigurationPropertyAttribute"/> properties.
+    ///     INTERNAL: Applies the values of the properties of this scope to their corresponding
+    ///     <see cref="ConfigurationPropertyAttribute"/> properties.
     /// </summary>
     /// <returns><see langword="true"/> if one or more property value was applied; <see langword="false"/> otherwise.</returns>
     [RequiresDynamicCode ("Uses reflection to get and set property values")]
     internal bool Apply ()
     {
-        if (!IsEnabled)
+        if (!ConfigurationManager.IsEnabled)
         {
-            Logging.Warning($"Apply called when CM is not Enabled. This should only be done from unit tests where side-effects are managed.");
+            Logging.Warning ("Apply called when CM is not Enabled. This should only be done from unit tests where side-effects are managed.");
         }
 
         var set = false;

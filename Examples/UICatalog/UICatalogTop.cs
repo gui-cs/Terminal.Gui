@@ -1,15 +1,12 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using Terminal.Gui;
-using static Terminal.Gui.ConfigurationManager;
 using Command = Terminal.Gui.Command;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
-using ThemeManager = Terminal.Gui.ThemeManager;
 
 #nullable enable
 
@@ -24,9 +21,6 @@ public class UICatalogTop : Toplevel
     // When a scenario is run, the main app is killed. The static
     // members are cached so that when the scenario exits the
     // main app UI can be restored to previous state
-
-    // Theme Management
-    public static string? CachedTheme { get; set; }
 
     // Note, we used to pass this to scenarios that run, but it just added complexity
     // So that was removed. But we still have this here to demonstrate how changing
@@ -54,7 +48,7 @@ public class UICatalogTop : Toplevel
         _categoryList.SelectedItem = _cachedCategoryIndex;
         _scenarioList.SelectedRow = _cachedScenarioIndex;
 
-        Applied += ConfigAppliedHandler;
+        ConfigurationManager.Applied += ConfigAppliedHandler;
     }
 
 
@@ -91,14 +85,11 @@ public class UICatalogTop : Toplevel
         Loaded -= LoadedHandler;
         _categoryList!.EnsureSelectedItemVisible ();
         _scenarioList.EnsureSelectedCellIsVisible ();
-
-        Apply ();
-
     }
 
     private void UnloadedHandler (object? sender, EventArgs? args)
     {
-        Applied -= ConfigAppliedHandler;
+        ConfigurationManager.Applied -= ConfigAppliedHandler;
         Unloaded -= UnloadedHandler;
     }
 
@@ -192,59 +183,69 @@ public class UICatalogTop : Toplevel
 
             menuItems.Add (new Line ());
 
-            _themesRg = new ()
+            if (ConfigurationManager.IsEnabled)
             {
-                HighlightStyle = HighlightStyle.None,
-                SelectedItem = ThemeManager.GetThemes().Keys.ToList ().IndexOf (CachedTheme!.Replace ("_", string.Empty))
-            };
+                _themesRg = new ()
+                {
+                    HighlightStyle = HighlightStyle.None,
+                    SelectedItem = ThemeManager.GetThemeNames ().IndexOf (ThemeManager.GetCurrentThemeName ())
+                };
 
-            _themesRg.SelectedItemChanged += (_, args) =>
+                _themesRg.SelectedItemChanged += (_, args) =>
+                                                 {
+                                                     ThemeManager.Theme = ThemeManager.GetThemeNames () [args.SelectedItem!.Value];
+                                                     ConfigurationManager.Apply ();
+                                                     SetNeedsDraw ();
+                                                 };
+
+                var menuItem = new MenuItemv2
+                {
+                    CommandView = _themesRg,
+                    HelpText = "Cycle Through Themes",
+                    Key = Key.T.WithCtrl
+                };
+                menuItems.Add (menuItem);
+
+                menuItems.Add (new Line ());
+
+                _topSchemeRg = new ()
+                {
+                    HighlightStyle = HighlightStyle.None,
+                    SelectedItem = SchemeManager.GetCurrentSchemes ()!.Keys.ToList ().IndexOf (CachedTopLevelScheme!)
+                };
+
+                _topSchemeRg.SelectedItemChanged += (_, args) =>
+                                                    {
+                                                        CachedTopLevelScheme = SchemeManager.GetCurrentSchemes ()!.Keys.ToArray () [args.SelectedItem!.Value];
+                                                        Scheme = SchemeManager.GetCurrentSchemes ()! [CachedTopLevelScheme];
+                                                        SetNeedsDraw ();
+                                                    };
+
+                menuItem = new ()
+                {
+                    Title = "Color Scheme for Application._Top",
+                    SubMenu = new (
+                                   [
+                                       new ()
+                                       {
+                                           CommandView = _topSchemeRg,
+                                           HelpText = "Cycle Through Color Schemes",
+                                           Key = Key.S.WithCtrl
+                                       }
+                                   ])
+                };
+                menuItems.Add (menuItem);
+
+                UpdateThemesMenu ();
+            }
+            else
             {
-                ThemeManager.Theme = ThemeManager.GetThemes ().Keys.ToArray () [args.SelectedItem!.Value];
-                CachedTheme = ThemeManager.GetThemes().Keys.ToArray () [args.SelectedItem!.Value];
-                Apply ();
-                SetNeedsDraw ();
-            };
-
-            var menuItem = new MenuItemv2
-            {
-                CommandView = _themesRg,
-                HelpText = "Cycle Through Themes",
-                Key = Key.T.WithCtrl
-            };
-            menuItems.Add (menuItem);
-
-            menuItems.Add (new Line ());
-
-            _topSchemeRg = new ()
-            {
-                HighlightStyle = HighlightStyle.None,
-                SelectedItem = SchemeManager.Schemes.Keys.ToList().IndexOf(CachedTopLevelScheme!)
-            };
-
-            _topSchemeRg.SelectedItemChanged += (_, args) =>
-            {
-                CachedTopLevelScheme = SchemeManager.Schemes.Keys.ToArray () [args.SelectedItem!.Value];
-                Scheme = SchemeManager.Schemes [CachedTopLevelScheme];
-                SetNeedsDraw ();
-            };
-
-            menuItem = new ()
-            {
-                Title = "Color Scheme for Application._Top",
-                SubMenu = new (
-                               [
-                                   new ()
-                               {
-                                   CommandView = _topSchemeRg,
-                                   HelpText = "Cycle Through Color Schemes",
-                                   Key = Key.S.WithCtrl
-                               }
-                               ])
-            };
-            menuItems.Add (menuItem);
-
-            UpdateThemesMenu ();
+                menuItems.Add (new MenuItemv2 ()
+                {
+                    Title = "Configuration Manager is not Enabled",
+                    Enabled = false
+                });
+            }
 
             return menuItems.ToArray ();
         }
@@ -349,8 +350,8 @@ public class UICatalogTop : Toplevel
 
         _themesRg.AssignHotKeysToCheckBoxes = true;
         _themesRg.UsedHotKeys.Clear ();
-        _themesRg.Options = ThemeManager.GetThemes().Keys.ToArray ();
-        _themesRg.SelectedItem = ThemeManager.GetThemes ().Keys.ToList ().IndexOf (CachedTheme!.Replace ("_", string.Empty));
+        _themesRg.Options = ThemeManager.GetThemeNames ();
+        _themesRg.SelectedItem = ThemeManager.GetThemeNames ().IndexOf (ThemeManager.GetCurrentThemeName ());
 
         if (_topSchemeRg is null)
         {
@@ -660,11 +661,9 @@ public class UICatalogTop : Toplevel
     /// </summary>
     private void ConfigApplied ()
     {
-        CachedTheme = ThemeManager.Theme;
-
         UpdateThemesMenu ();
 
-        Scheme = SchemeManager.Schemes [CachedTopLevelScheme!];
+        Scheme = SchemeManager.Schemes! [CachedTopLevelScheme!];
 
         if (_shQuit is { })
         {
