@@ -2,7 +2,6 @@
 
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Reflection;
 using System.Text;
 
 namespace Terminal.Gui.ConfigurationTests;
@@ -17,7 +16,7 @@ public class DeepClonerTests
     private class SimpleValueType
     {
         public int Number { get; set; }
-        public bool Flag { get; set; }
+        public bool Flag { get; init; }
     }
 
     private class SimpleReferenceType
@@ -27,20 +26,21 @@ public class DeepClonerTests
 
         public override bool Equals (object? obj) { return obj is SimpleReferenceType other && Name == other.Name && Count == other.Count; }
 
+        // ReSharper disable twice NonReadonlyMemberInGetHashCode
         public override int GetHashCode () { return HashCode.Combine (Name, Count); }
     }
 
     private class CollectionContainer
     {
-        public List<string>? Strings { get; set; }
-        public Dictionary<string, int>? Counts { get; set; }
-        public int []? Numbers { get; set; }
+        public List<string>? Strings { get; init; }
+        public Dictionary<string, int>? Counts { get; init; }
+        public int []? Numbers { get; init; }
     }
 
     private class NestedObject
     {
-        public SimpleReferenceType? Inner { get; set; }
-        public List<SimpleValueType>? Values { get; set; }
+        public SimpleReferenceType? Inner { get; init; }
+        public List<SimpleValueType>? Values { get; init; }
     }
 
     private class CircularReference
@@ -51,8 +51,8 @@ public class DeepClonerTests
 
     private class ConfigPropertyMock
     {
-        public object? PropertyValue { get; set; }
-        public bool Immutable { get; set; }
+        public object? PropertyValue { get; init; }
+        public bool Immutable { get; init; }
     }
 
     private class SettingsScopeMock : Dictionary<string, ConfigPropertyMock>
@@ -62,7 +62,7 @@ public class DeepClonerTests
 
     private class ComplexKey
     {
-        public int Id { get; set; }
+        public int Id { get; init; }
         public override bool Equals (object? obj) { return obj is ComplexKey key && Id == key.Id; }
 
         public override int GetHashCode () { return Id.GetHashCode (); }
@@ -218,6 +218,49 @@ public class DeepClonerTests
         result! ["C"] = 3;
         Assert.Equal (2, source.Count);
         Assert.Equal (3, result.Count);
+    }
+
+    [Fact]
+    public void Dictionary_CreatesDeepCopy_Including_Comparer_Options ()
+    {
+        Dictionary<string, int>? source = new (StringComparer.InvariantCultureIgnoreCase) { { "A", 1 }, { "B", 2 } };
+        Dictionary<string, int>? result = DeepCloner.DeepClone (source);
+
+        Assert.NotNull (result);
+        Assert.NotSame (source, result);
+        Assert.Equal (source, result);
+        Assert.Equal (source.Comparer, result.Comparer);
+
+        // Modify result, ensure source unchanged
+        result! ["C"] = 3;
+        Assert.Equal (2, source.Count);
+        Assert.Equal (3, result.Count);
+
+        Assert.Contains ("A", result);
+        Assert.Contains ("a", result);
+    }
+
+    [Fact]
+    public void Dictionary_CreatesDeepCopy_WithCapacity ()
+    {
+        // Arrange: Create a dictionary with a specific capacity
+        Dictionary<string, int> source = new (100) // Set initial capacity to 100
+        {
+            { "Key1", 1 },
+            { "Key2", 2 }
+        };
+
+        // Act: Clone the dictionary
+        Dictionary<string, int>? result = DeepCloner.DeepClone (source);
+
+        // Assert: Verify the dictionary was cloned correctly
+        Assert.NotNull (result);
+        Assert.NotSame (source, result);
+        Assert.Equal (source, result); // Verify key-value pairs are cloned
+
+        // Verify that the capacity is preserved (if supported)
+        Assert.True (result.Count <= result.EnsureCapacity (0)); // EnsureCapacity(0) returns the current capacity
+        Assert.True (source.Count <= source.EnsureCapacity (0)); // EnsureCapacity(0) returns the current capacity
     }
 
     [Fact]
@@ -558,4 +601,5 @@ public class DeepClonerTests
         Assert.Equal (source, result);
         Assert.True (stopwatch.ElapsedMilliseconds < 1000); // Ensure it completes within 1 second
     }
+
 }

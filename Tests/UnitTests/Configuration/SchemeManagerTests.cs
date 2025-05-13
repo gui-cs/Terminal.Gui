@@ -13,6 +13,8 @@ public class SchemeManagerTests
         Dictionary<string, Scheme?>? schemes = SchemeManager.GetCurrentSchemes ();
         Assert.NotNull (schemes);
         Assert.NotNull (schemes ["Base"]);
+        Assert.True (schemes!.ContainsKey ("Base"));
+        Assert.True (schemes.ContainsKey ("base"));
     }
 
     [Fact]
@@ -23,6 +25,8 @@ public class SchemeManagerTests
         Dictionary<string, Scheme?>? schemes = SchemeManager.GetCurrentSchemes ();
         Assert.NotNull (schemes);
         Assert.NotNull (schemes ["Base"]);
+        Assert.True (schemes!.ContainsKey ("Base"));
+        Assert.True (schemes.ContainsKey ("base"));
 
         CM.Disable();
     }
@@ -37,13 +41,34 @@ public class SchemeManagerTests
     }
 
     [Fact]
-    public void Not_Case_Sensitive ()
+    public void Not_Case_Sensitive_Disabled ()
     {
+        Assert.False (IsEnabled);
         Dictionary<string, Scheme?>? current = SchemeManager.GetCurrentSchemes ();
         Assert.NotNull (current);
 
         Assert.True (current!.ContainsKey ("Base"));
         Assert.True (current.ContainsKey ("base"));
+    }
+
+    [Fact]
+    public void Not_Case_Sensitive_Enabled ()
+    {
+        Assert.False (IsEnabled);
+        Enable();
+
+        Assert.True (SchemeManager.GetCurrentSchemes ()!.ContainsKey ("Base"));
+        Assert.True (SchemeManager.GetCurrentSchemes ()!.ContainsKey ("base"));
+
+        ResetToHardCodedDefaults ();
+        Dictionary<string, Scheme?>? current = SchemeManager.GetCurrentSchemes ();
+        Assert.NotNull (current);
+
+        Assert.True (current!.ContainsKey ("Base"));
+        Assert.True (current.ContainsKey ("base"));
+
+        ResetToHardCodedDefaults ();
+        Disable();
     }
 
 
@@ -52,7 +77,7 @@ public class SchemeManagerTests
     {
         // arrange
         Enable ();
-        ResetToCurrentValues ();
+        ResetToHardCodedDefaults ();
 
 
         var theme = new ThemeScope ();
@@ -103,7 +128,7 @@ public class SchemeManagerTests
     {
         // arrange
         Enable ();
-        ResetToCurrentValues ();
+        ResetToHardCodedDefaults ();
 
 
         var theme = new ThemeScope ();

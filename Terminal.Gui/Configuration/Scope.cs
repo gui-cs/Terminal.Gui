@@ -60,6 +60,7 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
             {
                 continue;
             }
+
             this [hardCodedKeyValuePair.Key].PropertyValue = hardCodedKeyValuePair.Value.PropertyValue;
         }
     }

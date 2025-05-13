@@ -285,20 +285,20 @@ public static class ConfigurationManager
             _settingsLockSlim.ExitWriteLock ();
         }
 
-        _cachedAppSettingsLock.EnterWriteLock ();
+        //_cachedAppSettingsLock.EnterWriteLock ();
 
-        try
-        {
-            _cachedAppSettings = new ();
-        }
-        finally
-        {
-            _cachedAppSettingsLock.ExitWriteLock ();
-        }
+        //try
+        //{
+        //    _cachedAppSettings = new ();
+        //}
+        //finally
+        //{
+        //    _cachedAppSettingsLock.ExitWriteLock ();
+        //}
 
         Settings!.LoadCurrentValues ();
         ThemeManager.UpdateToCurrentValues ();
-        AppSettings?.LoadCurrentValues ();
+        //AppSettings?.LoadCurrentValues ();
 
         Apply();
 
@@ -342,7 +342,6 @@ public static class ConfigurationManager
         Settings = new ();
         Settings!.LoadHardCodedDefaults ();
         ThemeManager.ResetToHardCodedDefaults ();
-        AppSettings!.LoadHardCodedDefaults ();
     }
 
     /// <summary>
@@ -561,12 +560,12 @@ public static class ConfigurationManager
     #region AppSettings
     // TODO: Encapsulate in AppSettingsManager like ThemeManager
 
-    /// <summary>
-    ///     AppSettings's source of truth.
-    /// </summary>
-    private static AppSettingsScope? _cachedAppSettings;
+    ///// <summary>
+    /////     AppSettings's source of truth.
+    ///// </summary>
+    //private static AppSettingsScope? _cachedAppSettings;
 
-    private static readonly ReaderWriterLockSlim _cachedAppSettingsLock = new ();
+    //private static readonly ReaderWriterLockSlim _cachedAppSettingsLock = new ();
 
     /// <summary>Application-specific configuration settings (config properties with the <see cref="AppSettingsScope"/> scope.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
@@ -580,20 +579,26 @@ public static class ConfigurationManager
                 // We're being called from the module initializer.
                 // Hard coded default value is an empty AppSettingsScope
                 var appSettings = new AppSettingsScope ();
-                appSettings.Clear ();
+                appSettings.LoadCurrentValues();
                 return appSettings;
             }
 
-            if (!IsEnabled)
-            {
-                // If CM is not enabled, e
-                var appSettings = new AppSettingsScope ();
-                return _cachedAppSettings = appSettings;
-            }
+            //if (!IsEnabled)
+            //{
+            //     If CM is not enabled, e
+            //    var appSettings = new AppSettingsScope ();
+            //    return _cachedAppSettings = appSettings;
+            //}
 
-            if (Settings is { } && Settings.TryGetValue ("AppSettings", out ConfigProperty? appsettingsConfigProperty))
+            if (Settings is { } && Settings.TryGetValue ("AppSettings", out ConfigProperty? appSettingsConfigProperty))
             {
-                return _cachedAppSettings;//(appsettingsConfigProperty.PropertyValue as AppSettingsScope)!;
+                if (!appSettingsConfigProperty.HasValue)
+                {
+                    var appSettings = new AppSettingsScope ();
+                    appSettings.LoadCurrentValues ();
+                    return appSettings;
+                }
+                return (appSettingsConfigProperty.PropertyValue as AppSettingsScope)!;
             }
 
             throw new InvalidOperationException ("Settings is null.");
@@ -611,18 +616,18 @@ public static class ConfigurationManager
             }
 
             // Check if the AppSettings is the same as the previous one
-            if (value != _cachedAppSettings)
+            if (value != Settings! ["AppSettings"].PropertyValue)
             {
-                _cachedAppSettingsLock.EnterWriteLock ();
+                //_cachedAppSettingsLock.EnterWriteLock ();
 
-                try
-                {
-                    _cachedAppSettings = value;
-                }
-                finally
-                {
-                    _cachedAppSettingsLock.ExitWriteLock ();
-                }
+                //try
+                //{
+                //    _cachedAppSettings = value;
+                //}
+                //finally
+                //{
+                //    _cachedAppSettingsLock.ExitWriteLock ();
+                //}
 
                 // Update the backing store
                 Settings! ["AppSettings"].PropertyValue = value;

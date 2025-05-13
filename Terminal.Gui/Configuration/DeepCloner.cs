@@ -253,6 +253,8 @@ public static class DeepCloner
         return tempList;
     }
 
+    #region Dictionary Support
+
     private static object CloneDictionary (object source, ConcurrentDictionary<object, object> visited)
     {
         var sourceDict = (IDictionary)source;
@@ -261,53 +263,26 @@ public static class DeepCloner
         // Check for frozen or immutable dictionaries and throw if found
         if (type.IsGenericType)
         {
-            Type genericTypeDef = type.GetGenericTypeDefinition ();
-            Type? currentType = type;
-
-            while (currentType != null && currentType != typeof (object))
-            {
-                if (currentType.IsGenericType)
-                {
-                    genericTypeDef = currentType.GetGenericTypeDefinition ();
-
-                    if (genericTypeDef.FullName != null
-                        && (genericTypeDef.FullName.StartsWith ("System.Collections.Frozen")
-                            || genericTypeDef.FullName.StartsWith ("System.Collections.Immutable")))
-                    {
-                        throw new NotSupportedException ($"Cloning of frozen or immutable dictionaries like {type.Name} is not supported.");
-                    }
-                }
-
-                currentType = currentType.BaseType;
-            }
+            CheckForUnsupportedDictionaryTypes (type);
         }
 
+        // Determine dictionary type and comparer
         Type [] genericArgs = type.GetGenericArguments ();
-        Type dictType;
+        Type dictType = genericArgs.Length == 2
+            ? typeof (Dictionary<,>).MakeGenericType (genericArgs)
+            : typeof (Dictionary<object, object>);
+        object? comparer = type.GetProperty ("Comparer")?.GetValue (source);
 
-        if (genericArgs.Length == 2)
-        {
-            dictType = typeof (Dictionary<,>).MakeGenericType (genericArgs);
-        }
-        else
-        {
-            dictType = typeof (Dictionary<object, object>);
-        }
-
-        // Create a temporary dictionary to hold the cloned key-value pairs
-        var tempDict = (IDictionary)Activator.CreateInstance (dictType)!;
-
-        // Add to visited before cloning contents to prevent circular reference issues
+        // Create a temporary dictionary to hold cloned key-value pairs
+        IDictionary tempDict = CreateDictionaryInstance (dictType, comparer);
         visited.TryAdd (source, tempDict);
 
         // Clone all key-value pairs
         foreach (object? key in sourceDict.Keys)
         {
-            object? value = sourceDict [key];
             object? clonedKey = DeepCloneInternal (key, visited);
-            object? clonedValue = DeepCloneInternal (value, visited);
+            object? clonedValue = DeepCloneInternal (sourceDict [key], visited);
 
-            // Handle duplicate keys by updating the value (last value wins, aligning with layering)
             if (tempDict.Contains (clonedKey!))
             {
                 tempDict [clonedKey!] = clonedValue;
@@ -318,44 +293,104 @@ public static class DeepCloner
             }
         }
 
-        // Try to create an instance of the original dictionary type if it has a parameterless constructor
+        // If the original dictionary type has a parameterless constructor, create a new instance
         if (type.GetConstructor (Type.EmptyTypes) != null)
         {
-            var newDict = (IDictionary)Activator.CreateInstance (type)!;
-
-            // Clear any pre-populated keys from the constructor
-            newDict.Clear ();
-
-            // Update visited to point to the final object
-            visited [source] = newDict;
-
-            // Copy the cloned key-value pairs to the new dictionary, handling duplicates
-            foreach (object? key in tempDict.Keys)
-            {
-                if (newDict.Contains (key))
-                {
-                    newDict [key] = tempDict [key];
-                }
-                else
-                {
-                    newDict.Add (key, tempDict [key]);
-                }
-            }
-
-            // Clone any additional properties of the derived dictionary type
-            foreach (PropertyInfo prop in type.GetProperties (BindingFlags.Instance | BindingFlags.Public)
-                                              .Where (p => p is { CanRead: true, CanWrite: true } && p.GetIndexParameters ().Length == 0))
-            {
-                object? value = prop.GetValue (source);
-                object? clonedValue = DeepCloneInternal (value, visited);
-                prop.SetValue (newDict, clonedValue);
-            }
-
-            return newDict;
+            return CreateFinalDictionary (type, comparer, tempDict, source, visited);
         }
 
         return tempDict;
     }
+
+    private static IDictionary CreateDictionaryInstance (Type dictType, object? comparer)
+    {
+        try
+        {
+            // Try to create the dictionary with the comparer
+            return comparer != null
+                ? (IDictionary)Activator.CreateInstance (dictType, comparer)!
+                : (IDictionary)Activator.CreateInstance (dictType)!;
+        }
+        catch (MissingMethodException)
+        {
+            // Fallback to parameterless constructor if comparer constructor is not available
+            return (IDictionary)Activator.CreateInstance (dictType)!;
+        }
+    }
+
+    private static void CheckForUnsupportedDictionaryTypes (Type type)
+    {
+        Type? currentType = type;
+
+        while (currentType != null && currentType != typeof (object))
+        {
+            if (currentType.IsGenericType)
+            {
+                string? genericTypeName = currentType.GetGenericTypeDefinition ().FullName;
+
+                if (genericTypeName != null &&
+                    (genericTypeName.StartsWith ("System.Collections.Frozen") ||
+                     genericTypeName.StartsWith ("System.Collections.Immutable")))
+                {
+                    throw new NotSupportedException ($"Cloning of frozen or immutable dictionaries like {type.Name} is not supported.");
+                }
+            }
+
+            currentType = currentType.BaseType;
+        }
+    }
+
+    private static object CreateFinalDictionary (
+        Type type,
+        object? comparer,
+        IDictionary tempDict,
+        object source,
+        ConcurrentDictionary<object, object> visited)
+    {
+        IDictionary newDict;
+
+        try
+        {
+            // Try to create the dictionary with the comparer
+            newDict = comparer != null
+                ? (IDictionary)Activator.CreateInstance (type, comparer)!
+                : (IDictionary)Activator.CreateInstance (type)!;
+        }
+        catch (MissingMethodException)
+        {
+            // Fallback to parameterless constructor if comparer constructor is not available
+            newDict = (IDictionary)Activator.CreateInstance (type)!;
+        }
+
+        newDict.Clear ();
+        visited [source] = newDict;
+
+        // Copy cloned key-value pairs to the new dictionary
+        foreach (object? key in tempDict.Keys)
+        {
+            if (newDict.Contains (key))
+            {
+                newDict [key] = tempDict [key];
+            }
+            else
+            {
+                newDict.Add (key, tempDict [key]);
+            }
+        }
+
+        // Clone additional properties of the derived dictionary type
+        foreach (PropertyInfo prop in type.GetProperties (BindingFlags.Instance | BindingFlags.Public)
+                                          .Where (p => p.CanRead && p.CanWrite && p.GetIndexParameters ().Length == 0))
+        {
+            object? value = prop.GetValue (source);
+            object? clonedValue = DeepCloneInternal (value, visited);
+            prop.SetValue (newDict, clonedValue);
+        }
+
+        return newDict;
+    }
+
+    #endregion Dictionary Support
 
     #region AOT Support
 
