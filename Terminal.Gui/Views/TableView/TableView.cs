@@ -1941,7 +1941,7 @@ public class TableView : View, IDesignable
             // move to start of cell (in line with header positions)
             Move (current.X, row);
 
-            // Set color scheme based on whether the current cell is the selected one
+            // Set scheme based on whether the current cell is the selected one
             bool isSelectedCell = IsSelected (current.Column, rowToRender);
 
             object val = Table [rowToRender, current.Column];
@@ -2001,7 +2001,7 @@ public class TableView : View, IDesignable
                 RenderCell (cellColor.Value, render, isPrimaryCell);
             }
 
-            // Reset color scheme to normal for drawing separators if we drew text with custom scheme
+            // Reset scheme to normal for drawing separators if we drew text with custom scheme
             if (scheme != rowScheme)
             {
                 if (isSelectedCell)
@@ -2016,7 +2016,7 @@ public class TableView : View, IDesignable
                 SetAttribute (color.Value);
             }
 
-            // If not in full row select mode always, reset color scheme to normal and render the vertical line (or space) at the end of the cell
+            // If not in full row select mode always, reset scheme to normal and render the vertical line (or space) at the end of the cell
             if (!FullRowSelect)
             {
                 if (rowScheme is { })

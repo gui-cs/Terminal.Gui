@@ -1,4 +1,5 @@
 #nullable enable
+using System.ComponentModel;
 using System.Diagnostics;
 
 namespace Terminal.Gui;
@@ -56,6 +57,7 @@ public class Border : Adornment
         ThicknessChanged += OnThicknessChanged;
     }
 
+
     // TODO: Move DrawIndicator out of Border and into View
 
     private void OnThicknessChanged (object? sender, EventArgs e)
@@ -72,7 +74,7 @@ public class Border : Adornment
         {
             if (DrawIndicator is null)
             {
-                DrawIndicator = new()
+                DrawIndicator = new ()
                 {
                     Id = "DrawIndicator",
                     X = 1,
@@ -158,20 +160,6 @@ public class Border : Adornment
         CloseButton.Y = 0;
 }
 #endif
-
-    /// <summary>
-    ///     The color scheme for the Border. If set to <see langword="null"/>, gets the <see cref="Adornment.Parent"/>
-    ///     scheme. color scheme.
-    /// </summary>
-    public override Scheme? Scheme
-    {
-        get => base.Scheme ?? Parent?.Scheme;
-        set
-        {
-            base.Scheme = value;
-            Parent?.SetNeedsDraw ();
-        }
-    }
 
     internal Rectangle GetBorderRectangle ()
     {
@@ -294,8 +282,8 @@ public class Border : Adornment
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/3312
         if (!_dragPosition.HasValue && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
 
-            // HACK: Prevents Window from being draggable if it's Top
-            //&& Parent is Toplevel { Modal: true }
+           // HACK: Prevents Window from being draggable if it's Top
+           //&& Parent is Toplevel { Modal: true }
            )
         {
             Parent!.SetFocus ();
@@ -492,8 +480,8 @@ public class Border : Adornment
                                                            out int nx,
                                                            out int ny
 
-                                                           //,
-                                                           // out _
+                                                          //,
+                                                          // out _
                                                           );
 
                         Parent.X = parentLoc.X - _startGrabPoint.X;

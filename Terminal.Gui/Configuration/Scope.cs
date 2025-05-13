@@ -73,6 +73,8 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
     /// </summary>
     /// <param name="scope"></param>
     /// <returns>The updated scope (this).</returns>
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
+    [RequiresDynamicCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
     internal Scope<T>? UpdateFrom (Scope<T> scope)
     {
         foreach (KeyValuePair<string, ConfigProperty> prop in scope)
@@ -114,6 +116,7 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
     /// </summary>
     /// <returns><see langword="true"/> if one or more property value was applied; <see langword="false"/> otherwise.</returns>
     [RequiresDynamicCode ("Uses reflection to get and set property values")]
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.DeepCloner.DeepClone<T>(T)")]
     internal bool Apply ()
     {
         if (!ConfigurationManager.IsEnabled)

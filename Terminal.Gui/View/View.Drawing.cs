@@ -234,7 +234,6 @@ public partial class View // Drawing APIs
             Padding?.Draw ();
         }
 
-
         if (Margin is { } && Margin.Thickness != Thickness.Empty && Margin.ShadowStyle == ShadowStyle.None)
         {
             Margin?.Draw ();

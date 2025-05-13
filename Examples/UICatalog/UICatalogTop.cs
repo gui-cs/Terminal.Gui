@@ -223,13 +223,13 @@ public class UICatalogTop : Toplevel
 
                 menuItem = new ()
                 {
-                    Title = "Color Scheme for Application._Top",
+                    Title = "scheme for Application._Top",
                     SubMenu = new (
                                    [
                                        new ()
                                        {
                                            CommandView = _topSchemeRg,
-                                           HelpText = "Cycle Through Color Schemes",
+                                           HelpText = "Cycle Through schemes",
                                            Key = Key.S.WithCtrl
                                        }
                                    ])

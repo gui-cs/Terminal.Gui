@@ -68,9 +68,9 @@ public static class DeepCloner
         return (T?)DeepCloneInternal (source, visited);
     }
 
-    private static object? DeepCloneInternal ([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor |
-                                                                          DynamicallyAccessedMemberTypes.PublicProperties)] object? source,
-                                              ConcurrentDictionary<object, object> visited)
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.DeepCloner.CreateInstance(Type)")]
+    [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "<Pending>")]
+    private static object? DeepCloneInternal (object? source, ConcurrentDictionary<object, object> visited)
     {
         if (source is null)
         {
@@ -133,7 +133,7 @@ public static class DeepCloner
         return clone;
     }
 
-    private static bool IsSimpleType (Type type)
+    private static bool IsSimpleType ([DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.PublicProperties)] Type type)
     {
         if (type.IsPrimitive
             || type.IsEnum
@@ -166,6 +166,8 @@ public static class DeepCloner
         return false;
     }
 
+    [RequiresUnreferencedCode ("Calls System.Text.Json.JsonSerializer.Deserialize(String, Type, JsonSerializerOptions)")]
+    [RequiresDynamicCode ("Calls System.Text.Json.JsonSerializer.Deserialize(String, Type, JsonSerializerOptions)")]
     private static object CreateInstance ([DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type type)
     {
         try
@@ -196,6 +198,8 @@ public static class DeepCloner
         }
     }
 
+    [RequiresDynamicCode ("Calls System.Array.CreateInstance(Type, Int32)")]
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.DeepCloner.DeepCloneInternal(Object, ConcurrentDictionary<Object, Object>)")]
     private static object CloneArray (object source, ConcurrentDictionary<object, object> visited)
     {
         var array = (Array)source;
@@ -213,6 +217,8 @@ public static class DeepCloner
         return newArray;
     }
 
+    [RequiresDynamicCode ("Calls System.Type.MakeGenericType(params Type[])")]
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.DeepCloner.DeepCloneInternal(Object, ConcurrentDictionary<Object, Object>)")]
     private static object CloneCollection (object source, ConcurrentDictionary<object, object> visited)
     {
         Type type = source.GetType ();
@@ -255,6 +261,8 @@ public static class DeepCloner
 
     #region Dictionary Support
 
+    [RequiresDynamicCode ("Calls System.Type.MakeGenericType(params Type[])")]
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.DeepCloner.DeepCloneInternal(Object, ConcurrentDictionary<Object, Object>)")]
     private static object CloneDictionary (object source, ConcurrentDictionary<object, object> visited)
     {
         var sourceDict = (IDictionary)source;
@@ -302,7 +310,7 @@ public static class DeepCloner
         return tempDict;
     }
 
-    private static IDictionary CreateDictionaryInstance (Type dictType, object? comparer)
+    private static IDictionary CreateDictionaryInstance ([DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.PublicConstructors)] Type dictType, object? comparer)
     {
         try
         {
@@ -340,8 +348,9 @@ public static class DeepCloner
         }
     }
 
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.DeepCloner.DeepCloneInternal(Object, ConcurrentDictionary<Object, Object>)")]
     private static object CreateFinalDictionary (
-        Type type,
+        [DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.NonPublicConstructors | DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.NonPublicProperties)] Type type,
         object? comparer,
         IDictionary tempDict,
         object source,

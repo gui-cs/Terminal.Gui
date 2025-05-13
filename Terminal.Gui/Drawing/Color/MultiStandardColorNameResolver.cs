@@ -65,7 +65,7 @@ public class MultiStandardColorNameResolver : IColorNameResolver
                 bool substituted = false;
                 // Alternative names cause issues with ColorPicker etc. when combined with ANSI and prioritizing ANSI resolver.
                 // For example Aqua is not in ColorName16 but the actual color value resolves to ANSI Cyan
-                // so autocomplete for Aqua suddenly changes to Cyan because they happen to have same color value in both color scheme.
+                // so autocomplete for Aqua suddenly changes to Cyan because they happen to have same color value in both scheme.
                 // Also DarkGrey would cause inconsistencies because the alternative DarkGray exists in ANSI and has different color value.
                 foreach (string name in names)
                 {

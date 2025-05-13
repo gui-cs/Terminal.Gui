@@ -171,6 +171,7 @@ public class ConfigProperty
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
     [RequiresUnreferencedCode ("Uses DeepCloner which requires types to be registered in SourceGenerationContext")]
+    [RequiresDynamicCode ("Calls Terminal.Gui.DeepCloner.DeepClone<T>(T)")]
     internal object? UpdateFrom (object? source)
     {
         // If the source (higher-priority layer) doesn't provide a value, keep the existing value
@@ -250,7 +251,7 @@ public class ConfigProperty
     ///     INTERNAL: A cache of all classes that have properties decorated with the <see cref="ConfigurationPropertyAttribute"/>.
     /// </summary>
     /// <remarks>Is <see langword="null"/> until <see cref="Initialize"/> is called.</remarks>
-    internal static ImmutableSortedDictionary<string, Type>? _classesWithConfigProps;
+    private static ImmutableSortedDictionary<string, Type>? _classesWithConfigProps;
 
     /// <summary>
     /// INTERNAL: Called from the <see cref="ModuleInitializers.InitializeConfigurationManager"/> method to initialize the

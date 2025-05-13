@@ -204,8 +204,6 @@ public static class ConfigurationManager
 
     /// <summary>
     ///     Gets whether <see cref="ConfigurationManager"/> is enabled or not.
-    ///     If <see langword="true"/>, the <see cref="ConfigurationManager"/> is enabled <see cref="Load"/> will load
-    ///     configurations from <see cref="Locations"/>.
     ///     If <see langword="false"/>, only the hard coded defaults will be loaded. See <see cref="Enable"/> and
     ///     <see cref="Disable"/>
     /// </summary>
@@ -225,6 +223,8 @@ public static class ConfigurationManager
     ///     to
     ///     with the current values of the static <see cref="ConfigurationPropertyAttribute"/> properties.
     /// </summary>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     public static void Enable ()
     {
         if (IsEnabled)
@@ -588,15 +588,13 @@ public static class ConfigurationManager
     ///// <summary>
     /////     AppSettings's source of truth.
     ///// </summary>
-    //private static AppSettingsScope? _cachedAppSettings;
-
-    //private static readonly ReaderWriterLockSlim _cachedAppSettingsLock = new ();
-
     /// <summary>Application-specific configuration settings (config properties with the <see cref="AppSettingsScope"/> scope.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
     [JsonPropertyName ("AppSettings")]
     public static AppSettingsScope? AppSettings
     {
+        [RequiresUnreferencedCode ("AOT")]
+        [RequiresDynamicCode ("AOT")]
         get
         {
             if (!IsInitialized ())
@@ -631,6 +629,8 @@ public static class ConfigurationManager
 
             throw new InvalidOperationException ("Settings is null.");
         }
+        [RequiresUnreferencedCode ("AOT")]
+        [RequiresDynamicCode ("AOT")]
         set
         {
             if (!IsInitialized ())

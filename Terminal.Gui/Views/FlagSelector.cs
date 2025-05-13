@@ -328,9 +328,9 @@ public class FlagSelector : View, IOrientation, IDesignable
                                                    else
                                                    {
                                                        // If _scheme was set, it's because of Hover
-                                                       if (checkbox._scheme is { })
+                                                       if (checkbox.HasScheme)
                                                        {
-                                                           e.NewValue = checkbox._scheme.Normal;
+                                                           e.NewValue = checkbox.Scheme!.Normal;
                                                        }
                                                        else
                                                        {

@@ -108,7 +108,7 @@ public partial class View
     /// </summary>
     /// <param name="text">String to display, the underscore before a letter flags the next letter as the hotkey.</param>
     /// <param name="focused">
-    ///     If set to <see langword="true"/> this uses the focused colors from the color scheme, otherwise
+    ///     If set to <see langword="true"/> this uses the focused colors from the scheme, otherwise
     ///     the regular ones.
     /// </param>
     public void DrawHotString (string text, bool focused)

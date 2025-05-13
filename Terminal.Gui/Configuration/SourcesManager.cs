@@ -144,7 +144,7 @@ public class SourcesManager
         return Load (settingsScope, stream, source, location);
     }
 
-    /// <summary>INTERNAL: Loads the Json document from the resource named <see cref="resourceName"/> from <paramref name="assembly"/> into the specified <see cref="SettingsScope"/>.</summary>
+    /// <summary>INTERNAL: Loads the Json document from the resource named <paramref name="resourceName"/> from <paramref name="assembly"/> into the specified <see cref="SettingsScope"/>.</summary>
     /// <param name="settingsScope">The Settings Scope object that <paramref name="resourceName"/> will be loaded into.</param>
     /// <param name="assembly">The assembly containing the resource.</param>
     /// <param name="resourceName">The name of the resource containing the Json document was read from.</param>

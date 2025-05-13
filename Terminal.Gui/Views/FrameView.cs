@@ -9,7 +9,7 @@ namespace Terminal.Gui;
 /// <remarks>
 ///     <para>
 ///         FrameView has <see cref="View.BorderStyle"/> set to <see cref="LineStyle.Single"/> and
-///         inherits it's color scheme from the <see cref="View.SuperView"/>.
+///         inherits it's scheme from the <see cref="View.SuperView"/>.
 ///     </para>
 ///     <para>
 ///         

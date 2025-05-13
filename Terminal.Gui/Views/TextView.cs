@@ -5689,8 +5689,8 @@ public class TextView : View
     }
 
     // If InheritsPreviousScheme is enabled this method will check if the rune cell on
-    // the row and col location and around has a not null color scheme. If it's null will set it with
-    // the very most previous valid color scheme.
+    // the row and col location and around has a not null scheme. If it's null will set it with
+    // the very most previous valid scheme.
     private void ProcessInheritsPreviousScheme (int row, int col)
     {
         if (!InheritsPreviousAttribute || (Lines == 1 && GetLine (Lines).Count == 0))

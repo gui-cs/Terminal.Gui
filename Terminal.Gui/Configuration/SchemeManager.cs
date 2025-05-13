@@ -36,33 +36,33 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     ///         The <see cref="Schemes"/> dictionary includes the following keys, by default:
     ///         <list type="table">
     ///             <listheader>
-    ///                 <term>Built-in Color Scheme</term> <description>Description</description>
+    ///                 <term>Built-in scheme</term> <description>Description</description>
     ///             </listheader>
     ///             <item>
-    ///                 <term>Base</term> <description>The base color scheme used for most Views.</description>
+    ///                 <term>Base</term> <description>The base scheme used for most Views.</description>
     ///             </item>
     ///             <item>
     ///                 <term>TopLevel</term>
-    ///                 <description>The application Toplevel color scheme; used for the <see cref="Toplevel"/> View.</description>
+    ///                 <description>The application Toplevel scheme; used for the <see cref="Toplevel"/> View.</description>
     ///             </item>
     ///             <item>
     ///                 <term>Dialog</term>
     ///                 <description>
-    ///                     The dialog color scheme; used for <see cref="Dialog"/>, <see cref="MessageBox"/>, and
+    ///                     The dialog scheme; used for <see cref="Dialog"/>, <see cref="MessageBox"/>, and
     ///                     other views dialog-like views.
     ///                 </description>
     ///             </item>
     ///             <item>
     ///                 <term>Menu</term>
     ///                 <description>
-    ///                     The menu color scheme; used for <see cref="Menu"/>, <see cref="MenuBar"/>, and
+    ///                     The menu scheme; used for <see cref="Menu"/>, <see cref="MenuBar"/>, and
     ///                     <see cref="StatusBar"/>.
     ///                 </description>
     ///             </item>
     ///             <item>
     ///                 <term>Error</term>
     ///                 <description>
-    ///                     The color scheme for showing errors, such as in
+    ///                     The scheme for showing errors, such as in
     ///                     <see cref="MessageBox.ErrorQuery(string, string, string[])"/>.
     ///                 </description>
     ///             </item>
