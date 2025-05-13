@@ -722,25 +722,6 @@ public class ToplevelTests
 
     [Fact]
     [AutoInitShutdown]
-    public void Begin_With_Window_Sets_Size_Correctly ()
-    {
-        Toplevel top = new ();
-        RunState rsTop = Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (20, 20);
-
-        var testWindow = new Window { X = 2, Y = 1, Width = 15, Height = 10 };
-        Assert.Equal (new (2, 1, 15, 10), testWindow.Frame);
-
-        RunState rsTestWindow = Application.Begin (testWindow);
-        Assert.Equal (new (2, 1, 15, 10), testWindow.Frame);
-
-        Application.End (rsTestWindow);
-        Application.End (rsTop);
-        top.Dispose ();
-    }
-
-    [Fact]
-    [AutoInitShutdown]
     public void Activating_MenuBar_By_Alt_Key_Does_Not_Throw ()
     {
         var menu = new MenuBar

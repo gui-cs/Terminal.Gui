@@ -313,6 +313,8 @@ public static class ConfigurationManager
     internal static void ResetToHardCodedDefaults ()
     {
         LoadHardCodedDefaults();
+        Applied = null;
+        Updated = null;
         Apply();
     }
 
@@ -420,6 +422,12 @@ public static class ConfigurationManager
     public static void OnUpdated ()
     {
         //Logging.Trace (@"");
+
+        if (!IsEnabled)
+        {
+            return;
+        }
+
         // Use a local copy of the event delegate when invoking it to avoid race conditions.
         EventHandler<ConfigurationManagerEventArgs>? handler = Updated;
         handler?.Invoke (null, new ());
@@ -497,7 +505,10 @@ public static class ConfigurationManager
     /// </summary>
     public static void OnApplied ()
     {
-        //Logging.Trace ("");
+        if (!IsEnabled)
+        {
+            return;
+        }
 
         // Use a local copy of the event delegate when invoking it to avoid race conditions.
         EventHandler<ConfigurationManagerEventArgs>? handler = Applied;

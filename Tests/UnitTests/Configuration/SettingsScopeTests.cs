@@ -216,5 +216,8 @@ public class SettingsScopeTests
 
         // Assert
         Assert.Equal (Key.Esc, Application.QuitKey);
+
+        ResetToHardCodedDefaults ();
+        Disable();
     }
 }

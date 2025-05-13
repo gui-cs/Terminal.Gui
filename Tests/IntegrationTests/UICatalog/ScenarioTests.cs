@@ -83,8 +83,9 @@ public class ScenarioTests : TestsAllViews
         }
 
         // Restore the configuration locations
-        ConfigurationManager.Disable();
+        ConfigurationManager.Enable ();
         ConfigurationManager.ResetToHardCodedDefaults();
+        ConfigurationManager.Disable ();
 
         return;
 
@@ -378,8 +379,9 @@ public class ScenarioTests : TestsAllViews
         Application.Shutdown ();
 
         // Restore the configuration locations
-        ConfigurationManager.Disable ();
+        ConfigurationManager.Enable ();
         ConfigurationManager.ResetToHardCodedDefaults ();
+        ConfigurationManager.Disable ();
 
         void DimPosChanged (View? view)
         {
@@ -676,8 +678,9 @@ public class ScenarioTests : TestsAllViews
         Application.Shutdown ();
 
         // Restore the configuration locations
-        ConfigurationManager.Disable ();
+        ConfigurationManager.Enable ();
         ConfigurationManager.ResetToHardCodedDefaults ();
+        ConfigurationManager.Disable ();
 
 #if DEBUG_IDISPOSABLE
         Assert.Empty (View.Instances);

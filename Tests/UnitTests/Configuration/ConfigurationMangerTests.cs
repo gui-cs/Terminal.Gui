@@ -3,9 +3,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
-using UnitTests;
 using Xunit.Abstractions;
-using static System.Net.WebRequestMethods;
 using static Terminal.Gui.ConfigurationManager;
 using File = System.IO.File;
 
@@ -13,30 +11,28 @@ using File = System.IO.File;
 
 namespace Terminal.Gui.ConfigurationTests;
 
-public class ConfigurationManagerTests
+public class ConfigurationManagerTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public ConfigurationManagerTests (ITestOutputHelper output)
-    {
-        Debug.Assert (!IsEnabled);
-        _output = output;
-    }
-
-    public static readonly JsonSerializerOptions _jsonOptions = new ()
-    {
-        Converters = { new AttributeJsonConverter (), new ColorJsonConverter () }
-    };
-
     [Fact]
     public void ModuleInitializer_Was_Called ()
     {
+        Assert.False (IsEnabled);
         Assert.True (IsInitialized ());
+    }
+
+    [Fact]
+    public void Initialize_Throws_If_Called_Explicitly ()
+    {
+        Assert.False (IsEnabled);
+
+        Assert.Throws<InvalidOperationException> (Initialize);
     }
 
     [Fact]
     public void HardCodedDefaultCache_Properties_Are_Copies ()
     {
+        Assert.False (IsEnabled);
+
         Enable ();
         ResetToHardCodedDefaults ();
         Assert.Equal (Key.Esc, Application.QuitKey);
@@ -69,7 +65,6 @@ public class ConfigurationManagerTests
             Assert.NotNull (initialCache);
             Assert.Equal (Key.Esc, (Key)initialCache ["Application.QuitKey"].PropertyValue);
 
-
             // Act
             Settings! ["Application.QuitKey"].PropertyValue = Key.Q;
             Assert.Equal (Key.Q, (Key)Settings ["Application.QuitKey"].PropertyValue);
@@ -95,6 +90,8 @@ public class ConfigurationManagerTests
     [Fact]
     public void Disable_Settings_Is_NotNull ()
     {
+        Assert.False (IsEnabled);
+
         Disable ();
         Assert.NotNull (Settings);
     }
@@ -102,6 +99,8 @@ public class ConfigurationManagerTests
     [Fact]
     public void Enable_Settings_Is_Valid ()
     {
+        Assert.False (IsEnabled);
+
         Disable ();
         Enable ();
 
@@ -191,6 +190,8 @@ public class ConfigurationManagerTests
     [Fact]
     public void Apply_Raises_Applied ()
     {
+        Assert.False (IsEnabled);
+
         Enable ();
         ResetToCurrentValues ();
         Applied += ConfigurationManagerApplied;
@@ -224,12 +225,14 @@ public class ConfigurationManagerTests
     [Fact]
     public void Load_Raises_Updated ()
     {
+        Assert.False (IsEnabled);
+
         var fired = false;
         Enable ();
         ResetToCurrentValues ();
 
         ThrowOnJsonErrors = true;
-        Assert.Equal (Key.Esc, (((Key)Settings! ["Application.QuitKey"].PropertyValue)!).KeyCode);
+        Assert.Equal (Key.Esc, ((Key)Settings! ["Application.QuitKey"].PropertyValue)!.KeyCode);
 
         Updated += ConfigurationManagerUpdated;
 
@@ -246,19 +249,22 @@ public class ConfigurationManagerTests
         Disable ();
 
         return;
+
         void ConfigurationManagerUpdated (object sender, ConfigurationManagerEventArgs obj) { fired = true; }
     }
 
     [Fact]
     public void Load_And_Apply_Performance_Check ()
     {
+        Assert.False (IsEnabled);
+
         Enable ();
         ResetToHardCodedDefaults ();
 
         try
         {
             // Start stopwatch
-            Stopwatch stopwatch = new Stopwatch ();
+            var stopwatch = new Stopwatch ();
             stopwatch.Start ();
 
             // Act
@@ -269,10 +275,11 @@ public class ConfigurationManagerTests
             stopwatch.Stop ();
 
             // Assert
-            _output.WriteLine ($"Load took {stopwatch.ElapsedMilliseconds} ms");
+            output.WriteLine ($"Load took {stopwatch.ElapsedMilliseconds} ms");
 
             // Ensure load time is reasonable (adjust threshold as needed)
-            Assert.True (stopwatch.ElapsedMilliseconds < 1000,
+            Assert.True (
+                         stopwatch.ElapsedMilliseconds < 1000,
                          $"Loading configuration took {stopwatch.ElapsedMilliseconds}ms, which exceeds reasonable threshold");
         }
         finally
@@ -282,10 +289,11 @@ public class ConfigurationManagerTests
         }
     }
 
-
     [Fact]
     public void Load_Loads_Custom_Json ()
     {
+        Assert.False (IsEnabled);
+
         try
         {
             Enable ();
@@ -306,11 +314,9 @@ public class ConfigurationManagerTests
 
             // assert
             Assert.Equal (Key.Q.WithCtrl, (Key)Settings ["Application.QuitKey"].PropertyValue);
-
         }
         finally
         {
-
             // clean up
             ResetToHardCodedDefaults ();
             Disable ();
@@ -320,6 +326,8 @@ public class ConfigurationManagerTests
     [Fact (Skip = "Events disabled")]
     public void ResetToCurrentValues_Raises_Updated ()
     {
+        Assert.False (IsEnabled);
+
         var fired = false;
 
         try
@@ -349,15 +357,14 @@ public class ConfigurationManagerTests
 
         return;
 
-        void ConfigurationManagerUpdated (object sender, ConfigurationManagerEventArgs obj)
-        {
-            fired = true;
-        }
+        void ConfigurationManagerUpdated (object sender, ConfigurationManagerEventArgs obj) { fired = true; }
     }
 
     [Fact]
     public void ResetToHardCodedDefaults_and_Load_LibraryResourcesOnly_are_same ()
     {
+        Assert.False (IsEnabled);
+
         try
         {
             // arrange
@@ -420,6 +427,8 @@ public class ConfigurationManagerTests
     [Fact]
     public void ResetToCurrentValues_Enabled_Resets ()
     {
+        Assert.False (IsEnabled);
+
         // Act
         Enable ();
         ResetToHardCodedDefaults ();
@@ -442,10 +451,10 @@ public class ConfigurationManagerTests
         Disable ();
     }
 
-
     [Fact]
     public void ConfigurationManager_DefaultPrecedence_IsRespected ()
     {
+        Assert.False (IsEnabled);
 
         try
         {
@@ -473,7 +482,7 @@ public class ConfigurationManagerTests
                                 """;
 
             // Update default config first (lower precedence)
-            CM.SourcesManager?.Load (Settings, defaultConfig, "default-test", ConfigLocations.LibraryResources);
+            SourcesManager?.Load (Settings, defaultConfig, "default-test", ConfigLocations.LibraryResources);
 
             // Then load runtime config, which should override default
             Load (ConfigLocations.Runtime);
@@ -499,14 +508,17 @@ public class ConfigurationManagerTests
     [Fact]
     public void Save_HardCodedDefaults_To_config_json ()
     {
+        Assert.False (IsEnabled);
+
         try
         {
             Enable ();
+
             // Get the hard coded settings
             ResetToHardCodedDefaults ();
 
             // Serialize to a JSON string
-            string json = CM.SourcesManager?.ToJson (Settings);
+            string json = SourcesManager?.ToJson (Settings);
 
             // Write the JSON string to the file
             File.WriteAllText ("config.json", json);
@@ -519,12 +531,13 @@ public class ConfigurationManagerTests
             ResetToHardCodedDefaults ();
             Disable ();
         }
-
     }
 
     [Fact]
     public void TestConfigProperties ()
     {
+        Assert.False (IsEnabled);
+
         try
         {
             Enable ();
@@ -570,40 +583,6 @@ public class ConfigurationManagerTests
             Disable ();
         }
     }
-
-
-    //[Fact]
-    //public void InitDriver ()
-    //{
-    //    Assert.Equal ("Default", ThemeManager.Theme);
-
-    //    Assert.Equal (new Color (Color.White), SchemeManager.Schemes ["Base"]!.Normal.Foreground);
-    //    Assert.Equal (new Color (Color.Blue), SchemeManager.Schemes ["Base"].Normal.Background);
-
-    //    // Change Base
-    //    Stream json = CM.SourcesManager?.ToStream (Settings);
-
-    //    CM.SourcesManager?.Load (Settings, json, "InitDriver", ConfigLocations.Runtime);
-
-    //    Dictionary<string, Scheme> schemes = (Dictionary<string, Scheme>)ThemeManager.Themes [ThemeManager.Theme] ["Schemes"].PropertyValue;
-    //    Assert.Equal (SchemeManager.Schemes ["Base"], schemes! ["Base"]);
-    //    Assert.Equal (SchemeManager.Schemes ["TopLevel"], schemes ["TopLevel"]);
-    //    Assert.Equal (SchemeManager.Schemes ["Error"], schemes ["Error"]);
-    //    Assert.Equal (SchemeManager.Schemes ["Dialog"], schemes ["Dialog"]);
-    //    Assert.Equal (SchemeManager.Schemes ["Menu"], schemes ["Menu"]);
-
-    //    SchemeManager.Schemes ["Base"] = schemes ["Base"];
-    //    SchemeManager.Schemes ["TopLevel"] = schemes ["TopLevel"];
-    //    SchemeManager.Schemes ["Error"] = schemes ["Error"];
-    //    SchemeManager.Schemes ["Dialog"] = schemes ["Dialog"];
-    //    SchemeManager.Schemes ["Menu"] = schemes ["Menu"];
-
-    //    Assert.Equal (schemes ["Base"], SchemeManager.Schemes ["Base"]);
-    //    Assert.Equal (schemes ["TopLevel"], SchemeManager.Schemes ["TopLevel"]);
-    //    Assert.Equal (schemes ["Error"], SchemeManager.Schemes ["Error"]);
-    //    Assert.Equal (schemes ["Dialog"], SchemeManager.Schemes ["Dialog"]);
-    //    Assert.Equal (schemes ["Menu"], SchemeManager.Schemes ["Menu"]);
-    //}
 
     [Fact]
     public void Load_And_Apply_HardCoded ()
@@ -697,7 +676,7 @@ public class ConfigurationManagerTests
             // Spot check by setting some of the config properties
             Application.QuitKey = Key.X.WithCtrl;
             FileDialog.MaxSearchResults = 1;
-            Glyphs.Apple = new Rune ('z');
+            Glyphs.Apple = new ('z');
 
             ThrowOnJsonErrors = true;
             Enable ();
@@ -724,7 +703,7 @@ public class ConfigurationManagerTests
             Apply ();
             Assert.Equal (Key.Q.WithAlt, Application.QuitKey);
             Assert.Equal (9, FileDialog.MaxSearchResults);
-            Assert.Equal (new Rune ('a'), Glyphs.Apple);
+            Assert.Equal (new ('a'), Glyphs.Apple);
         }
         finally
         {
@@ -736,6 +715,8 @@ public class ConfigurationManagerTests
     [Fact]
     public void InvalidJsonLogs ()
     {
+        Assert.False (IsEnabled);
+
         Enable ();
 
         ThrowOnJsonErrors = false;
@@ -761,7 +742,7 @@ public class ConfigurationManagerTests
 				}
 			}";
 
-        CM.SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime);
+        SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime);
 
         // AbNormal is not a Scheme attribute
         json = @"
@@ -784,7 +765,7 @@ public class ConfigurationManagerTests
 				}
 			}";
 
-        CM.SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime);
+        SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime);
 
         // Modify hotNormal background only
         json = @"
@@ -806,9 +787,9 @@ public class ConfigurationManagerTests
 				}
 			}";
 
-        CM.SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime);
+        SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime);
 
-        CM.SourcesManager?.Load (Settings, "{}}", "test", ConfigLocations.Runtime);
+        SourcesManager?.Load (Settings, "{}}", "test", ConfigLocations.Runtime);
 
         Assert.NotEqual (0, _jsonErrors.Length);
 
@@ -822,6 +803,7 @@ public class ConfigurationManagerTests
     public void InvalidJsonThrows ()
     {
         Assert.False (IsEnabled);
+
         Enable ();
         ThrowOnJsonErrors = true;
 
@@ -846,7 +828,7 @@ public class ConfigurationManagerTests
 				]
 			}";
 
-        var jsonException = Assert.Throws<JsonException> (() => CM.SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime));
+        var jsonException = Assert.Throws<JsonException> (() => SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime));
         Assert.Equal ("Unexpected color name: brownish.", jsonException.Message);
 
         // AbNormal is not a Scheme attribute
@@ -870,7 +852,7 @@ public class ConfigurationManagerTests
 				]
 			}";
 
-        jsonException = Assert.Throws<JsonException> (() => CM.SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime));
+        jsonException = Assert.Throws<JsonException> (() => SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime));
         Assert.Equal ("Unrecognized Scheme Attribute name: AbNormal.", jsonException.Message);
 
         // Modify hotNormal background only
@@ -893,7 +875,7 @@ public class ConfigurationManagerTests
 				]
 			}";
 
-        jsonException = Assert.Throws<JsonException> (() => CM.SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime));
+        jsonException = Assert.Throws<JsonException> (() => SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime));
         Assert.Equal ("Both Foreground and Background colors must be provided.", jsonException.Message);
 
         // Unknown property
@@ -902,7 +884,7 @@ public class ConfigurationManagerTests
 				""Unknown"" : ""Not known""
 			}";
 
-        jsonException = Assert.Throws<JsonException> (() => CM.SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime));
+        jsonException = Assert.Throws<JsonException> (() => SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime));
         Assert.StartsWith ("Unknown property", jsonException.Message);
 
         Assert.Equal (0, _jsonErrors.Length);
@@ -1063,20 +1045,20 @@ public class ConfigurationManagerTests
             ResetToCurrentValues ();
             ThrowOnJsonErrors = true;
 
-            CM.SourcesManager?.Load (Settings, json, "UpdateFromJson", ConfigLocations.Runtime);
+            SourcesManager?.Load (Settings, json, "UpdateFromJson", ConfigLocations.Runtime);
 
             Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
             Assert.Equal (KeyCode.Z | KeyCode.AltMask, ((Key)Settings ["Application.QuitKey"].PropertyValue)!.KeyCode);
 
             Assert.Equal ("Default", ThemeManager.Theme);
 
-            Assert.Equal (new Color (Color.White), SchemeManager.Schemes ["Base"]!.Normal.Foreground);
-            Assert.Equal (new Color (Color.Blue), SchemeManager.Schemes ["Base"].Normal.Background);
+            Assert.Equal (new (Color.White), SchemeManager.Schemes ["Base"]!.Normal.Foreground);
+            Assert.Equal (new (Color.Blue), SchemeManager.Schemes ["Base"].Normal.Background);
 
             Dictionary<string, Scheme> schemes =
                 (Dictionary<string, Scheme>)ThemeManager.Themes.First ().Value ["Schemes"].PropertyValue;
-            Assert.Equal (new Color (Color.White), schemes! ["Base"].Normal.Foreground);
-            Assert.Equal (new Color (Color.Blue), schemes ["Base"].Normal.Background);
+            Assert.Equal (new (Color.White), schemes! ["Base"].Normal.Foreground);
+            Assert.Equal (new (Color.Blue), schemes ["Base"].Normal.Background);
 
             // Now re-apply
             Apply ();
@@ -1084,19 +1066,13 @@ public class ConfigurationManagerTests
             Assert.Equal (KeyCode.Z | KeyCode.AltMask, Application.QuitKey.KeyCode);
             Assert.Equal ("Default", ThemeManager.Theme);
 
-            Assert.Equal (new Color (Color.White), SchemeManager.Schemes ["Base"].Normal.Foreground);
-            Assert.Equal (new Color (Color.Blue), SchemeManager.Schemes ["Base"].Normal.Background);
+            Assert.Equal (new (Color.White), SchemeManager.Schemes ["Base"].Normal.Foreground);
+            Assert.Equal (new (Color.Blue), SchemeManager.Schemes ["Base"].Normal.Background);
         }
         finally
         {
             ResetToCurrentValues ();
             Disable ();
         }
-    }
-
-    [Fact]
-    public void Initialize_Throws_If_Called_Explicitly ()
-    {
-        Assert.Throws<InvalidOperationException> (Initialize);
     }
 }

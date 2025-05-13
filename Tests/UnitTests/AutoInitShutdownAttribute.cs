@@ -101,15 +101,23 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
             }
         }
 
-        CM.Disable();
+        Debug.Assert (!CM.IsEnabled, "This test left ConfigurationManager enabled!");
+
+        // Force the ConfigurationManager to reset to its hardcoded defaults
+        CM.Enable();
         CM.ResetToHardCodedDefaults ();
+        CM.Disable();
     }
 
     public override void Before (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
 
-        Debug.Assert(!CM.IsEnabled, "Some other test left ConfigurationManager enabled.");
+        // Force the ConfigurationManager to reset to its hardcoded defaults
+        CM.Enable ();
+        CM.ResetToHardCodedDefaults ();
+        CM.Disable ();
+        //Debug.Assert(!CM.IsEnabled, "Some other test left ConfigurationManager enabled.");
 
         if (AutoInit)
         {
