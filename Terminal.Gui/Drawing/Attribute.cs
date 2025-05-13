@@ -4,11 +4,6 @@ using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
-
-// TODO: Add support for other attributes (bold, underline, etc.) once the platform drivers support them.
-// TODO: See https://github.com/gui-cs/Terminal.Gui/issues/457
-
-
 /// <summary>Attributes represent how text is styled when displayed in the terminal.</summary>
 /// <remarks>
 ///     <see cref="Attribute"/> provides a platform independent representation of colors (and someday other forms of
@@ -34,9 +29,9 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     [JsonConverter (typeof (ColorJsonConverter))]
     public Color Background { get; init; }
 
-    // TODO: Add constructors which permit including a TextStyle.
-    /// <summary>The text style (bold, italic, underlined, etc.).</summary>
-    public TextStyle TextStyle { get; init; } = TextStyle.None;
+    // TODO: Add constructors which permit including a Style.
+    /// <summary>The style (bold, italic, underlined, etc.).</summary>
+    public Style Style { get; init; } = Style.None;
 
     /// <summary>Initializes a new instance with default values.</summary>
     public Attribute ()
@@ -105,13 +100,13 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     public Attribute (in Color color) : this (color, color) { }
 
     /// <inheritdoc/>
-    public override int GetHashCode () { return HashCode.Combine (PlatformColor, Foreground, Background, TextStyle); }
+    public override int GetHashCode () { return HashCode.Combine (PlatformColor, Foreground, Background, Style); }
 
     // TODO: Add TextStyle to Attribute.ToString(), modify unit tests to account
     /// <inheritdoc/>
     public override string ToString ()
     {
         // Note: Unit tests are dependent on this format
-        return $"[{Foreground},{Background},{TextStyle}]";
+        return $"[{Foreground},{Background},{Style}]";
     }
 }

@@ -38,15 +38,15 @@ public sealed class TestStyles : Scenario
             var x = 0;
             int maxWidth = sendingView.Viewport.Width; // Get the available width of the view
 
-            TextStyle [] allStyles = Enum.GetValues (typeof (TextStyle))
-                                         .Cast<TextStyle> ()
-                                         .Where (style => style != TextStyle.None)
+            Style [] allStyles = Enum.GetValues (typeof (Style))
+                                         .Cast<Style> ()
+                                         .Where (style => style != Style.None)
                                          .ToArray ();
 
             // Draw individual flags on the first line
-            foreach (TextStyle style in allStyles)
+            foreach (Style style in allStyles)
             {
-                string text = Enum.GetName (typeof (TextStyle), style)!;
+                string text = Enum.GetName (typeof (Style), style)!;
                 int textWidth = text.Length;
 
                 // Check if the text fits in the current line
@@ -60,7 +60,7 @@ public sealed class TestStyles : Scenario
 
                 var attr = new Attribute (sendingView.GetNormalColor ())
                 {
-                    TextStyle = style
+                    Style = style
                 };
                 sendingView.SetAttribute (attr);
                 sendingView.AddStr (text);
@@ -77,7 +77,7 @@ public sealed class TestStyles : Scenario
 
             for (var i = 1; i < totalCombinations; i++) // Start from 1 to skip "None"
             {
-                var combination = (TextStyle)0;
+                var combination = (Style)0;
                 List<string> styleNames = new ();
 
                 for (var bit = 0; bit < allStyles.Length; bit++)
@@ -85,7 +85,7 @@ public sealed class TestStyles : Scenario
                     if ((i & (1 << bit)) != 0)
                     {
                         combination |= allStyles [bit];
-                        styleNames.Add (Enum.GetName (typeof (TextStyle), allStyles [bit])!);
+                        styleNames.Add (Enum.GetName (typeof (Style), allStyles [bit])!);
                     }
                 }
 
@@ -109,7 +109,7 @@ public sealed class TestStyles : Scenario
 
                 var attr = new Attribute (sendingView.GetNormalColor ())
                 {
-                    TextStyle = combination
+                    Style = combination
                 };
                 sendingView.SetAttribute (attr);
                 sendingView.AddStr (text);

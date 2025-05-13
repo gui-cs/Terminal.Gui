@@ -1854,11 +1854,11 @@ public static class EscSeqUtils
     #region Text Styles
 
     /// <summary>
-    /// Appends an ANSI SGR (Select Graphic Rendition) escape sequence to switch printed text from one <see cref="TextStyle"/> to another.
+    /// Appends an ANSI SGR (Select Graphic Rendition) escape sequence to switch printed text from one <see cref="Style"/> to another.
     /// </summary>
     /// <param name="output"><see cref="StringBuilder"/> to add escape sequence to.</param>
-    /// <param name="prev">Previous <see cref="TextStyle"/> to change away from.</param>
-    /// <param name="next">Next <see cref="TextStyle"/> to change to.</param>
+    /// <param name="prev">Previous <see cref="Style"/> to change away from.</param>
+    /// <param name="next">Next <see cref="Style"/> to change to.</param>
     /// <remarks>
     /// <para>
     /// Unlike colors, most text styling options are not mutually exclusive with each other, and can be applied independently. This creates a problem when
@@ -1867,7 +1867,7 @@ public static class EscSeqUtils
     /// necessary to apply exactly the next style.
     /// </para>
     /// </remarks>
-    internal static void CSI_AppendTextStyleChange (StringBuilder output, TextStyle prev, TextStyle next)
+    internal static void CSI_AppendTextStyleChange (StringBuilder output, Style prev, Style next)
     {
         // Do nothing if styles are the same, as no changes are necessary.
         if (prev == next)
@@ -1885,90 +1885,90 @@ public static class EscSeqUtils
         // List of escape codes to apply.
         var sgr = new List<int> ();
 
-        if (disabled != TextStyle.None)
+        if (disabled != Style.None)
         {
             // Special case: Both bold and faint have the same disabling code. While unusual, it can be valid to have both enabled at the same time, so when
             // one and only one of them is being disabled, we need to re-enable the other afterward. We can check what flags remain enabled by taking
             // prev & next, as this is the set of flags both have.
-            if (disabled.HasFlag (TextStyle.Bold))
+            if (disabled.HasFlag (Style.Bold))
             {
                 sgr.Add (22);
 
-                if ((prev & next).HasFlag (TextStyle.Faint))
+                if ((prev & next).HasFlag (Style.Faint))
                 {
                     sgr.Add (2);
                 }
             }
 
-            if (disabled.HasFlag (TextStyle.Faint))
+            if (disabled.HasFlag (Style.Faint))
             {
                 sgr.Add (22);
 
-                if ((prev & next).HasFlag (TextStyle.Bold))
+                if ((prev & next).HasFlag (Style.Bold))
                 {
                     sgr.Add (1);
                 }
             }
 
-            if (disabled.HasFlag (TextStyle.Italic))
+            if (disabled.HasFlag (Style.Italic))
             {
                 sgr.Add (23);
             }
 
-            if (disabled.HasFlag (TextStyle.Underline))
+            if (disabled.HasFlag (Style.Underline))
             {
                 sgr.Add (24);
             }
 
-            if (disabled.HasFlag (TextStyle.Blink))
+            if (disabled.HasFlag (Style.Blink))
             {
                 sgr.Add (25);
             }
 
-            if (disabled.HasFlag (TextStyle.Reverse))
+            if (disabled.HasFlag (Style.Reverse))
             {
                 sgr.Add (27);
             }
 
-            if (disabled.HasFlag (TextStyle.Strikethrough))
+            if (disabled.HasFlag (Style.Strikethrough))
             {
                 sgr.Add (29);
             }
         }
 
-        if (enabled != TextStyle.None)
+        if (enabled != Style.None)
         {
-            if (enabled.HasFlag (TextStyle.Bold))
+            if (enabled.HasFlag (Style.Bold))
             {
                 sgr.Add (1);
             }
 
-            if (enabled.HasFlag (TextStyle.Faint))
+            if (enabled.HasFlag (Style.Faint))
             {
                 sgr.Add (2);
             }
 
-            if (enabled.HasFlag (TextStyle.Italic))
+            if (enabled.HasFlag (Style.Italic))
             {
                 sgr.Add (3);
             }
 
-            if (enabled.HasFlag (TextStyle.Underline))
+            if (enabled.HasFlag (Style.Underline))
             {
                 sgr.Add (4);
             }
 
-            if (enabled.HasFlag (TextStyle.Blink))
+            if (enabled.HasFlag (Style.Blink))
             {
                 sgr.Add (5);
             }
 
-            if (enabled.HasFlag (TextStyle.Reverse))
+            if (enabled.HasFlag (Style.Reverse))
             {
                 sgr.Add (7);
             }
 
-            if (enabled.HasFlag (TextStyle.Strikethrough))
+            if (enabled.HasFlag (Style.Strikethrough))
             {
                 sgr.Add (9);
             }

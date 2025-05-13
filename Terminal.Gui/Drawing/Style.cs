@@ -1,7 +1,7 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     Defines non-color text style flags for an <see cref="Attribute"/>.
+///     Defines non-color style flags for an <see cref="Attribute"/>.
 /// </summary>
 /// <remarks>
 ///     <para>
@@ -9,18 +9,18 @@ namespace Terminal.Gui;
 ///         Styles that are poorly supported, non-visual, or redundant with other APIs are omitted.
 ///     </para>
 ///     <para>
-///         Multiple styles can be combined using bitwise operations. Use <see cref="Attribute.TextStyle"/>
+///         Multiple styles can be combined using bitwise operations. Use <see cref="Attribute.Style"/>
 ///         to get or set these styles on an <see cref="Attribute"/>.
 ///     </para>
 ///     <para>
-///         Note that <see cref="TextStyle.Bold"/> and <see cref="TextStyle.Faint"/> may be mutually exclusive depending on
+///         Note that <see cref="Style.Bold"/> and <see cref="Style.Faint"/> may be mutually exclusive depending on
 ///         the user's terminal and its settings. For instance, if a terminal displays faint text as a darker color, and
 ///         bold text as a lighter color, then both cannot
 ///         be shown at the same time, and it will be up to the terminal to decide which to display.
 ///     </para>
 /// </remarks>
 [Flags]
-public enum TextStyle : byte
+public enum Style : byte
 {
     /// <summary>
     ///     No text style.
@@ -32,7 +32,7 @@ public enum TextStyle : byte
     ///     Bold text.
     /// </summary>
     /// <remarks>
-    ///     SGR code: 1 (Bold). May be mutually exclusive with <see cref="TextStyle.Faint"/>, see <see cref="TextStyle"/>
+    ///     SGR code: 1 (Bold). May be mutually exclusive with <see cref="Style.Faint"/>, see <see cref="Style"/>
     ///     remarks.
     /// </remarks>
     Bold = 0b_0000_0001,
@@ -42,8 +42,8 @@ public enum TextStyle : byte
     /// </summary>
     /// <remarks>
     ///     SGR code: 2 (Faint). Not widely supported on all terminals. May be mutually exclusive with
-    ///     <see cref="TextStyle.Bold"/>, see
-    ///     <see cref="TextStyle"/> remarks.
+    ///     <see cref="Style.Bold"/>, see
+    ///     <see cref="Style"/> remarks.
     /// </remarks>
     Faint = 0b_0000_0010,
 

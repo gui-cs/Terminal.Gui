@@ -9,7 +9,7 @@ public partial class View
     // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/4014
 
     /// <summary>
-    ///     Gets the hard-coded set of <see cref="Scheme"/>s. Used for geneeating the built-in config.json and for
+    ///     Gets the hard-coded set of <see cref="Scheme"/>s. Used for generating the built-in config.json and for
     ///     unit tests that don't depend on ConfigurationManager.
     /// </summary>
     /// <returns></returns>

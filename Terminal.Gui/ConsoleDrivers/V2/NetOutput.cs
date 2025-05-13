@@ -13,7 +13,7 @@ public class NetOutput : IConsoleOutput
     private CursorVisibility? _cachedCursorVisibility;
 
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
-    private TextStyle _redrawTextStyle = TextStyle.None;
+    private Style _redrawTextStyle = Style.None;
 
     /// <summary>
     ///     Creates a new instance of the <see cref="NetOutput"/> class.
@@ -138,9 +138,9 @@ public class NetOutput : IConsoleOutput
                             attr.Background.B
                         );
 
-                        EscSeqUtils.CSI_AppendTextStyleChange (output, _redrawTextStyle, attr.TextStyle);
+                        EscSeqUtils.CSI_AppendTextStyleChange (output, _redrawTextStyle, attr.Style);
 
-                        _redrawTextStyle = attr.TextStyle;
+                        _redrawTextStyle = attr.Style;
                     }
 
                     outputWidth++;

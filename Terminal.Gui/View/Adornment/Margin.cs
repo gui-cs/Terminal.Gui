@@ -175,7 +175,7 @@ public class Margin : Adornment
         Rectangle screen = ViewportToScreen (Viewport);
 
         // This just draws/clears the thickness, not the insides.
-        if (Diagnostics.HasFlag (ViewDiagnosticFlags.Thickness) || base.Scheme is { })
+        if (Diagnostics.HasFlag (ViewDiagnosticFlags.Thickness) || HasScheme)
         {
             // TODO: This is a hack. See https://github.com/gui-cs/Terminal.Gui/issues/4016
             SetAttribute (GetNormalColor ());
