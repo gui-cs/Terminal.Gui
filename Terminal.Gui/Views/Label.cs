@@ -25,7 +25,7 @@ public class Label : View, IDesignable
         Width = Dim.Auto (DimAutoStyle.Text);
 
         // On HoKey, pass it to the next view
-        AddCommand (Command.HotKey, InvokeHotKeyOnNext);
+        AddCommand (Command.HotKey, InvokeHotKeyOnNextPeer);
 
         TitleChanged += Label_TitleChanged;
         MouseClick += Label_MouseClick;
@@ -59,7 +59,7 @@ public class Label : View, IDesignable
         set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value;
     }
 
-    private bool? InvokeHotKeyOnNext (ICommandContext commandContext)
+    private bool? InvokeHotKeyOnNextPeer (ICommandContext commandContext)
     {
         if (RaiseHandlingHotKey () == true)
         {
@@ -70,16 +70,19 @@ public class Label : View, IDesignable
         {
             SetFocus ();
 
+            // Always return true on hotkey, even if SetFocus fails because
+            // hotkeys are always handled by the View (unless RaiseHandlingHotKey cancels).
+            // This is the same behavior as the base (View).
             return true;
         }
 
         if (HotKey.IsValid)
         {
+            // If the Label has a hotkey, we need to find the next view in the subview list
             int me = SuperView?.SubViews.IndexOf (this) ?? -1;
 
             if (me != -1 && me < SuperView?.SubViews.Count - 1)
             {
-
                 return SuperView?.SubViews.ElementAt (me + 1).InvokeCommand (Command.HotKey) == true;
             }
         }

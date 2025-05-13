@@ -14,7 +14,7 @@
 // the WindowsConsole.EventType.WindowBufferSize event. However, on Init the window size is
 // still incorrect so we still need this hack.
 
-//#define HACK_CHECK_WINCHANGED
+#define HACK_CHECK_WINCHANGED
 
 using System.ComponentModel;
 using System.Diagnostics;
@@ -57,8 +57,12 @@ internal class WindowsDriver : ConsoleDriver
 
         // TODO: if some other Windows-based terminal supports true color, update this logic to not
         // force 16color mode (.e.g ConEmu which really doesn't work well at all).
-        _isWindowsTerminal = _isWindowsTerminal =
-                                 Environment.GetEnvironmentVariable ("WT_SESSION") is { } || Environment.GetEnvironmentVariable ("VSAPPIDNAME") != null;
+        if (!RunningUnitTests)
+        {
+            WinConsole!.IsWindowsTerminal = _isWindowsTerminal =
+                                                Environment.GetEnvironmentVariable ("WT_SESSION") is { }
+                                                || Environment.GetEnvironmentVariable ("VSAPPIDNAME") != null;
+        }
 
         if (!_isWindowsTerminal)
         {
@@ -422,7 +426,7 @@ internal class WindowsDriver : ConsoleDriver
                 {
                     // BUGBUG: The results from GetConsoleOutputWindow are incorrect when called from Init.
                     // Our thread in WindowsMainLoop.CheckWin will get the correct results. See #if HACK_CHECK_WINCHANGED
-                    Size winSize = WinConsole.GetConsoleOutputWindow (out Point _);
+                    Size winSize = WinConsole.GetConsoleOutputWindow (out _);
                     Cols = winSize.Width;
                     Rows = winSize.Height;
                     OnSizeChanged (new SizeChangedEventArgs (new (Cols, Rows)));
@@ -466,7 +470,7 @@ internal class WindowsDriver : ConsoleDriver
 
         if (!RunningUnitTests)
         {
-        WinConsole?.SetInitialCursorVisibility ();
+            WinConsole?.SetInitialCursorVisibility ();
         }
 
         return new MainLoop (_mainLoopDriver);

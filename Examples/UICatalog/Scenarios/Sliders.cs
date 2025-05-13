@@ -591,7 +591,7 @@ public class Sliders : Scenario
                              {
                                  eventSource.Add ($"Accept: {string.Join(",", slider.GetSetOptions ())}");
                                  eventLog.MoveDown ();
-                                 args.Cancel = true;
+                                 args.Handled = true;
                              };
             slider.OptionsChanged += (o, args) =>
                              {

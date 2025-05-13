@@ -19,28 +19,17 @@ public sealed class Generic : Scenario
             BorderStyle = LineStyle.None
         };
 
-        var button = new Shortcut()
+        var button = new Button ()
         {
-            CanFocus = true,
-            Id = "button",
             X = Pos.Center (),
             Y = 1,
-            ShadowStyle = ShadowStyle.None,
-            Text = "HelpText",
-            Title = "Command",
-            Key = Key.F10,
-            HighlightStyle = HighlightStyle.None
+            Title = "_Button",
         };
-        button.ColorScheme = Colors.ColorSchemes ["Error"];
-
-        button.Padding!.Thickness = new (1);
-        button.Padding.ColorScheme = Colors.ColorSchemes ["Toplevel"];
-        button.Margin!.Thickness = new (1);
 
         button.Accepting += (s, e) =>
                             {
-                                // Anytime Accepting is handled, make sure to set e.Cancel to false.
-                                e.Cancel = true;
+                                // When Accepting is handled, set e.Handled to true to prevent further processing.
+                                e.Handled = true;
                                 MessageBox.ErrorQuery ("Error", "You pressed the button!", "_Ok");
                             };
 
