@@ -43,7 +43,7 @@ internal partial class DriverAssert
         expectedLook = expectedLook.Trim ();
         driver ??= Application.Driver;
 
-        Cell [,] contents = driver.Contents;
+        Cell [,] contents = driver!.Contents;
 
         var line = 0;
 
@@ -51,7 +51,7 @@ internal partial class DriverAssert
         {
             for (var c = 0; c < lineString.Length; c++)
             {
-                Attribute? val = contents [line, c].Attribute;
+                Attribute? val = contents! [line, c].Attribute;
 
                 List<Attribute> match = expectedAttributes.Where (e => e == val).ToList ();
 
@@ -60,8 +60,8 @@ internal partial class DriverAssert
                     case 0:
                         output.WriteLine (
                                           $"{Application.ToString (driver)}\n"
-                                          + $"Expected Attribute {val} (PlatformColor = {val.Value.PlatformColor}) at Contents[{line},{c}] {contents [line, c]} ((PlatformColor = {contents [line, c].Attribute.Value.PlatformColor}) was not found.\n"
-                                          + $" Expected: {string.Join (",", expectedAttributes.Select (c => c))}\n"
+                                          + $"Expected Attribute {val} (PlatformColor = {val!.Value.PlatformColor}) at Contents[{line},{c}] {contents [line, c]} ((PlatformColor = {contents [line, c].Attribute.Value.PlatformColor}) was not found.\n"
+                                          + $" Expected: {string.Join (",", expectedAttributes.Select (attr => attr))}\n"
                                           + $"  But Was: <not found>"
                                          );
                         Assert.Empty (match);

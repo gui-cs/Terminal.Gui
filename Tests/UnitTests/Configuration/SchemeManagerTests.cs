@@ -79,7 +79,6 @@ public class SchemeManagerTests
         Enable ();
         ResetToHardCodedDefaults ();
 
-
         var theme = new ThemeScope ();
         Assert.NotEmpty (theme);
 
@@ -130,11 +129,10 @@ public class SchemeManagerTests
         Enable ();
         ResetToHardCodedDefaults ();
 
-
-        var theme = new ThemeScope ();
+        ThemeScope? theme = new ThemeScope ();
         Assert.NotEmpty (theme);
 
-        var scheme = new Scheme
+        Scheme? scheme = new Scheme
         {
             // note: Scheme's can't be partial; default for each attribute
             // is always White/Black
@@ -145,17 +143,17 @@ public class SchemeManagerTests
             Disabled = new Attribute (Color.Gray, Color.DarkGray)
         };
         theme ["Schemes"].PropertyValue = SchemeManager.GetCurrentSchemes ();
-        ((Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue) ["Test"] = scheme;
 
-        Dictionary<string, Scheme> schemes =
-            (Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue;
+        (((Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue!)!) ["Test"] = scheme;
+
+        Dictionary<string, Scheme>? schemes = (Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue!;
         Assert.Equal (scheme.Normal, schemes ["Test"].Normal);
         Assert.Equal (scheme.Focus, schemes ["Test"].Focus);
 
         // Change just Normal
-        var newTheme = new ThemeScope ();
+        ThemeScope? newTheme = new ThemeScope ();
 
-        var newScheme = new Scheme
+        Scheme? newScheme = new Scheme
         {
             Normal = new Attribute (Color.Blue, Color.BrightBlue),
             Focus = scheme.Focus,
@@ -164,19 +162,19 @@ public class SchemeManagerTests
             Disabled = scheme.Disabled
         };
         newTheme ["Schemes"].PropertyValue = SchemeManager.GetCurrentSchemes ();
-        ((Dictionary<string, Scheme>)newTheme ["Schemes"].PropertyValue) ["Test"] = newScheme;
+        (((Dictionary<string, Scheme>)newTheme ["Schemes"].PropertyValue!)!) ["Test"] = newScheme;
 
         // Act
         theme.UpdateFrom (newTheme);
 
         // Assert
-        schemes = (Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue;
+        schemes = (Dictionary<string, Scheme>)theme["Schemes"].PropertyValue!;
 
         // Normal should have changed
-        Assert.Equal (new Color (Color.Blue), schemes ["Test"].Normal.Foreground);
-        Assert.Equal (new Color (Color.BrightBlue), schemes ["Test"].Normal.Background);
-        Assert.Equal (new Color (Color.Cyan), schemes ["Test"].Focus.Foreground);
-        Assert.Equal (new Color (Color.BrightCyan), schemes ["Test"].Focus.Background);
+        Assert.Equal (new Attribute(Color.Blue, Color.BrightBlue), schemes ["Test"].Normal);
+        Assert.Equal (Color.BrightBlue, schemes ["Test"].Normal.Background);
+        Assert.Equal (Color.Cyan, schemes ["Test"].Focus.Foreground);
+        Assert.Equal (Color.BrightCyan, schemes ["Test"].Focus.Background);
         ResetToHardCodedDefaults ();
         Disable ();
     }

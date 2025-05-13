@@ -610,7 +610,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Assert.NotNull (SchemeManager.Schemes);
             Assert.NotEmpty (SchemeManager.Schemes);
 
-            // Veriify "Base" has correct values
+            // Verify "Base" has correct values
             Assert.Equal (Color.White, SchemeManager.Schemes ["Base"]!.Normal.Foreground);
             Assert.Equal (Color.Blue, SchemeManager.Schemes ["Base"].Normal.Background);
 
@@ -651,7 +651,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Assert.NotNull (SchemeManager.Schemes);
             Assert.NotEmpty (SchemeManager.Schemes);
 
-            // Veriify "Base" has correct values
+            // Verify "Base" has correct values
             Assert.Equal (Color.White, SchemeManager.Schemes ["Base"]!.Normal.Foreground);
             Assert.Equal (Color.Blue, SchemeManager.Schemes ["Base"].Normal.Background);
 
@@ -1052,7 +1052,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
             Assert.Equal ("Default", ThemeManager.Theme);
 
-            Assert.Equal (new (Color.White), SchemeManager.Schemes ["Base"]!.Normal.Foreground);
+            Assert.Equal (new (Color.White), SchemeManager.Schemes! ["Base"]!.Normal.Foreground);
             Assert.Equal (new (Color.Blue), SchemeManager.Schemes ["Base"].Normal.Background);
 
             Dictionary<string, Scheme> schemes =

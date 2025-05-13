@@ -28,11 +28,11 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
 
     /// <summary>The foreground color.</summary>
     [JsonConverter (typeof (ColorJsonConverter))]
-    public Color Foreground { get; }
+    public Color Foreground { get; init; }
 
     /// <summary>The background color.</summary>
     [JsonConverter (typeof (ColorJsonConverter))]
-    public Color Background { get; }
+    public Color Background { get; init; }
 
     // TODO: Add constructors which permit including a TextStyle.
     /// <summary>The text style (bold, italic, underlined, etc.).</summary>
@@ -105,13 +105,13 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     public Attribute (in Color color) : this (color, color) { }
 
     /// <inheritdoc/>
-    public override int GetHashCode () { return HashCode.Combine (PlatformColor, Foreground, Background); }
+    public override int GetHashCode () { return HashCode.Combine (PlatformColor, Foreground, Background, TextStyle); }
 
     // TODO: Add TextStyle to Attribute.ToString(), modify unit tests to account
     /// <inheritdoc/>
     public override string ToString ()
     {
         // Note: Unit tests are dependent on this format
-        return $"[{Foreground},{Background}]";
+        return $"[{Foreground},{Background},{TextStyle}]";
     }
 }

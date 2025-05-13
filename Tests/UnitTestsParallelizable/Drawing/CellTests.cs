@@ -45,7 +45,7 @@ public class CellTests ()
         Assert.Equal ("[\0, ]", c1.ToString ());
 
         Assert.Equal (
-                      "[a, [Red,Red]]",
+                      "[a, [Red,Red,None]]",
                       c2.ToString ()
                      );
     }
