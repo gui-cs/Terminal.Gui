@@ -1,13 +1,15 @@
 ﻿#nullable enable
-using System.Diagnostics;
-using System.Reflection;
-using System.Text.Json;
-using Xunit.Abstractions;
-
 namespace Terminal.Gui.ConfigurationTests;
 
 public class ConfigurationManagerTests
 {
+    [Fact]
+    public void Disable_With_ResetToHardCodedDefaults_True_Works_When_Disabled ()
+    {
+        Assert.False (ConfigurationManager.IsEnabled);
+        ConfigurationManager.Disable (true);
+    }
+
     [ConfigurationProperty (Scope = typeof (CMTestsScope))]
     public static bool? TestProperty { get; set; }
 

@@ -96,16 +96,6 @@ public class ThemeManagerTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Theme_Set_Throws_If_Not_Enabled ()
-    {
-        Assert.False (IsEnabled);
-
-        Assert.Equal (ThemeManager.DEFAULT_THEME_NAME, ThemeManager.Theme);
-        Assert.Throws<InvalidOperationException> (() => ThemeManager.Theme = "Test");
-        Assert.Equal (ThemeManager.DEFAULT_THEME_NAME, ThemeManager.Theme);
-    }
-
-    [Fact]
     public void Theme_ResetToHardCodedDefaults_Sets_To_Default ()
     {
         Assert.False (IsEnabled);

@@ -101,7 +101,6 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
     {
         Assert.False (IsEnabled);
 
-        Disable ();
         Enable ();
 
         Assert.NotNull (Settings);
@@ -413,15 +412,6 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             ResetToHardCodedDefaults ();
             Disable ();
         }
-    }
-
-    [Fact]
-    public void ResetToCurrentValues_Throws_If_Not_Enabled ()
-    {
-        Assert.False (IsEnabled);
-
-        // Act
-        Assert.Throws<ConfigurationManagerNotEnabledException> (ResetToCurrentValues);
     }
 
     [Fact]
