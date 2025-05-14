@@ -192,7 +192,7 @@ public class SchemeManagerTests
         var theme = new ThemeScope ();
         Assert.NotEmpty (theme);
 
-        ThemeManager.Themes!.Add ("testTheme", theme);
+        ThemeManager.Themes!.TryAdd ("testTheme", theme);
 
         var scheme = new Scheme { Normal = new Attribute (Color.Red, Color.Green) };
 

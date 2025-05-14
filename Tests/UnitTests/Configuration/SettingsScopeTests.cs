@@ -1,4 +1,5 @@
-﻿using UnitTests;
+﻿using System.Collections.Concurrent;
+using UnitTests;
 using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui.ConfigurationTests;
@@ -45,11 +46,11 @@ public class SettingsScopeTests
         ThrowOnJsonErrors = true;
 
         ConfigProperty themesConfigProperty = Settings! ["Themes"];
-        Dictionary<string, ThemeScope>? dict = themesConfigProperty.PropertyValue as Dictionary<string, ThemeScope>;
+        ConcurrentDictionary<string, ThemeScope>? dict = themesConfigProperty.PropertyValue as ConcurrentDictionary<string, ThemeScope>;
 
         Assert.NotNull (dict);
         Assert.Single (dict);
-        Assert.NotEmpty ((Dictionary<string, ThemeScope>)themesConfigProperty.PropertyValue);
+        Assert.NotEmpty ((ConcurrentDictionary<string, ThemeScope>)themesConfigProperty.PropertyValue);
 
         ThemeScope? scope = dict [ThemeManager.DEFAULT_THEME_NAME];
         Assert.NotNull (scope);

@@ -83,22 +83,27 @@ public class Scope<T> : ConcurrentDictionary<string, ConfigProperty>
                 continue;
             }
 
-            // Add or update the property in this scope
-            AddOrUpdate (
-                prop.Key,
-                _ => new ConfigProperty
+            if (!ContainsKey (prop.Key))
+            {
+                if (!prop.Value.HasValue)
+                {
+                    continue;
+                }
+
+                // Add an empty (HasValue = false) property to this scope
+                var copy = new ConfigProperty
                 {
                     Immutable = false,
                     PropertyInfo = prop.Value.PropertyInfo,
                     OmitClassName = prop.Value.OmitClassName,
                     ScopeType = prop.Value.ScopeType,
                     HasValue = false
-                },
-                (_, existing) =>
-                {
-                    existing.UpdateFrom (prop.Value.PropertyValue);
-                    return existing;
-                });
+                };
+                TryAdd (prop.Key, copy);
+            }
+
+            // Update the property value
+            this [prop.Key].UpdateFrom (prop.Value.PropertyValue);
         }
 
         return this;

@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Collections.Concurrent;
 using System.Diagnostics.Metrics;
 using System.Text;
 using Xunit.Abstractions;
@@ -148,16 +149,22 @@ public class ThemeManagerTests (ITestOutputHelper output)
 
         Assert.Single (ThemeManager.Themes!);
 
-        ThemeManager.Themes = new ()
-        {
-            { "Default", new () },
-            { "test", new () }
-        };
+        // Use ConcurrentDictionary instead of a regular dictionary
+        ThemeManager.Themes = new ConcurrentDictionary<string, ThemeScope> (
+                                                                            new Dictionary<string, ThemeScope>
+                                                                            {
+                                                                                { "Default", new ThemeScope() },
+                                                                                { "test", new ThemeScope() }
+                                                                            },
+                                                                            StringComparer.InvariantCultureIgnoreCase
+                                                                           );
+
         Assert.Contains ("test", ThemeManager.Themes!);
 
         ResetToHardCodedDefaults ();
         Disable ();
     }
+
 
     [Fact]
     public void Themes_Set_Throws_If_No_Default_Theme_In_Dictionary ()
@@ -170,11 +177,13 @@ public class ThemeManagerTests (ITestOutputHelper output)
         Assert.Single (ThemeManager.Themes!);
 
         Assert.Throws<InvalidOperationException> (
-                                                  () => ThemeManager.Themes = new ()
-                                                  {
-                                                      { "not default", new () },
-                                                      { "test", new () }
-                                                  });
+                                                  () => ThemeManager.Themes = new ConcurrentDictionary<string, ThemeScope> (
+                                                             new Dictionary<string, ThemeScope>
+                                                             {
+                                                                 { "test", new ThemeScope() }
+                                                             },
+                                                             StringComparer.InvariantCultureIgnoreCase
+                                                            ));
         Assert.Single (ThemeManager.Themes!);
 
         ResetToHardCodedDefaults ();
@@ -187,6 +196,26 @@ public class ThemeManagerTests (ITestOutputHelper output)
     #endregion Tests Settings["Themes"] and ThemeManager.Themes
 
     [Fact]
+    public void Themes_TryAdd_Adds ()
+    {
+        Enable ();
+        ResetToCurrentValues ();
+
+        // Verify that the Themes dictionary contains only the Default theme
+        Assert.Single (ThemeManager.Themes!);
+        Assert.Contains (ThemeManager.DEFAULT_THEME_NAME, ThemeManager.Themes!);
+
+        var theme = new ThemeScope ();
+        Assert.NotEmpty (theme);
+
+        Assert.True (ThemeManager.Themes!.TryAdd ("testTheme", theme));
+        Assert.Equal (2, ThemeManager.Themes.Count);
+
+        ResetToHardCodedDefaults ();
+        Disable ();
+    }
+
+    [Fact]
     public void Apply_Applies ()
     {
         Enable ();
@@ -195,7 +224,8 @@ public class ThemeManagerTests (ITestOutputHelper output)
         var theme = new ThemeScope ();
         Assert.NotEmpty (theme);
 
-        ThemeManager.Themes!.Add ("testTheme", theme);
+        Assert.True(ThemeManager.Themes!.TryAdd ("testTheme", theme));
+        Assert.Equal (2, ThemeManager.Themes.Count);
 
         Assert.Equal (LineStyle.Single, FrameView.DefaultBorderStyle);
         theme ["FrameView.DefaultBorderStyle"].PropertyValue = LineStyle.Double; // default is Single
@@ -235,6 +265,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
                             """;
 
             // Load the test theme
+            ThrowOnJsonErrors = true;
             Load (ConfigLocations.Runtime);
             Assert.Equal ("TestTheme", ThemeManager.Theme);
 

@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -164,12 +165,12 @@ public class ConfigProperty
     }
 
     /// <summary>
-    ///     INTERNAL: Updates (using reflection) <see cref="PropertyValue"/> with the value in <paramref name="source"/> using a deep memberwise copy that
+    ///     INTERNAL: Updates <see cref="PropertyValue"/> with the value in <paramref name="source"/> using a deep memberwise copy that
     ///     copies only the values that <see cref="HasValue"/>.
     /// </summary>
-    /// <param name="source"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
+    /// <param name="source">The source object to copy values from.</param>
+    /// <returns>The updated property value.</returns>
+    /// <exception cref="ArgumentException">Thrown when the source type doesn't match the property type.</exception>
     [RequiresUnreferencedCode ("Uses DeepCloner which requires types to be registered in SourceGenerationContext")]
     [RequiresDynamicCode ("Calls Terminal.Gui.DeepCloner.DeepClone<T>(T)")]
     internal object? UpdateFrom (object? source)
@@ -182,52 +183,21 @@ public class ConfigProperty
             return PropertyValue;
         }
 
-        // Validate that the source type matches the property type
-        Type? underlyingType = Nullable.GetUnderlyingType (PropertyInfo!.PropertyType);
-
-        if (source.GetType () != PropertyInfo.PropertyType && underlyingType is { } && source.GetType () != underlyingType)
+        // Process the source based on its type
+        if (source is ConcurrentDictionary<string, ThemeScope> themeDictSource &&
+            PropertyValue is ConcurrentDictionary<string, ThemeScope> themeDictDest)
         {
-            throw new ArgumentException (
-                                         $"The source object ({PropertyInfo.DeclaringType}.{PropertyInfo.Name}) is not of type {PropertyInfo.PropertyType}."
-                                        );
+            UpdateThemeScopeDictionary (themeDictSource, themeDictDest);
         }
-
-        if (source is Dictionary<string, ThemeScope> themeDictSource && PropertyValue is Dictionary<string, ThemeScope> themeDictDest)
+        else if (source is ConcurrentDictionary<string, ConfigProperty> concurrentDictSource &&
+                 PropertyValue is ConcurrentDictionary<string, ConfigProperty> concurrentDictDest)
         {
-            // Special case for ThemeScope dictionaries
-            foreach (KeyValuePair<string, ThemeScope> scope in themeDictSource)
-            {
-                if (!themeDictDest.ContainsKey (scope.Key))
-                {
-                    themeDictDest.Add (scope.Key, scope.Value);
-                }
-                themeDictDest [scope.Key].UpdateFrom (scope.Value);
-            }
+            UpdateConfigPropertyConcurrentDictionary (concurrentDictSource, concurrentDictDest);
         }
-        else if (source is Dictionary<string, ConfigProperty> dictSource && PropertyValue is Dictionary<string, ConfigProperty> dictDest)
+        else if (source is Dictionary<string, ConfigProperty> dictSource &&
+                 PropertyValue is Dictionary<string, ConfigProperty> dictDest)
         {
-            foreach (KeyValuePair<string, ConfigProperty> sourceProp in dictSource)
-            {
-                if (!sourceProp.Value.HasValue)
-                {
-                    continue;
-                }
-
-                if (!dictDest.ContainsKey (sourceProp.Key))
-                {
-                    // Add the property to this scope
-                    ConfigProperty? copy = new ConfigProperty ()
-                    {
-                        Immutable = false,
-                        PropertyInfo = sourceProp.Value.PropertyInfo,
-                        OmitClassName = sourceProp.Value.OmitClassName,
-                        ScopeType = sourceProp.Value.ScopeType,
-                        HasValue = false
-                    };
-                    dictDest.Add (sourceProp.Key, copy);
-                }
-                dictDest [sourceProp.Key].UpdateFrom (sourceProp.Value);
-            }
+            UpdateConfigPropertyDictionary (dictSource, dictDest);
         }
         else if (source is ConfigProperty configProperty)
         {
@@ -238,11 +208,130 @@ public class ConfigProperty
         }
         else
         {
+            // Validate type compatibility for non-dictionary types
+            ValidateTypeCompatibility (source);
+
             // For non-scope types, perform a deep copy of the source value to ensure immutability
             PropertyValue = DeepCloner.DeepClone (source);
         }
 
         return PropertyValue;
+    }
+
+    /// <summary>
+    /// Validates that the source type is compatible with the property type.
+    /// </summary>
+    /// <param name="source">The source object to validate.</param>
+    /// <exception cref="ArgumentException">Thrown when the source type doesn't match the property type.</exception>
+    private void ValidateTypeCompatibility (object source)
+    {
+        Type? underlyingType = Nullable.GetUnderlyingType (PropertyInfo!.PropertyType);
+
+        bool isCompatibleType = source.GetType () == PropertyInfo.PropertyType ||
+                               (underlyingType is { } && source.GetType () == underlyingType);
+
+        if (!isCompatibleType)
+        {
+            throw new ArgumentException (
+                $"The source object ({PropertyInfo.DeclaringType}.{PropertyInfo.Name}) is not of type {PropertyInfo.PropertyType}."
+            );
+        }
+    }
+
+    /// <summary>
+    /// Updates a ThemeScope dictionary with values from a source dictionary.
+    /// </summary>
+    /// <param name="source">The source ThemeScope dictionary.</param>
+    /// <param name="destination">The destination ThemeScope dictionary.</param>
+    private static void UpdateThemeScopeDictionary (
+        ConcurrentDictionary<string, ThemeScope> source,
+        ConcurrentDictionary<string, ThemeScope> destination)
+    {
+        foreach (KeyValuePair<string, ThemeScope> scope in source)
+        {
+            if (!destination.ContainsKey (scope.Key))
+            {
+                destination.TryAdd (scope.Key, scope.Value);
+                continue;
+            }
+
+            destination [scope.Key].UpdateFrom (scope.Value);
+        }
+    }
+
+    /// <summary>
+    /// Updates a ConfigProperty dictionary with values from a source dictionary.
+    /// </summary>
+    /// <param name="source">The source ConfigProperty dictionary.</param>
+    /// <param name="destination">The destination ConfigProperty dictionary.</param>
+    private void UpdateConfigPropertyConcurrentDictionary (
+        ConcurrentDictionary<string, ConfigProperty> source,
+        ConcurrentDictionary<string, ConfigProperty> destination)
+    {
+        foreach (KeyValuePair<string, ConfigProperty> sourceProp in source)
+        {
+            // Skip properties without values
+            if (!sourceProp.Value.HasValue)
+            {
+                continue;
+            }
+
+            if (!destination.ContainsKey (sourceProp.Key))
+            {
+                // Add the property to the destination
+                var copy = CreateConfigPropertyCopy (sourceProp.Value);
+                destination.TryAdd (sourceProp.Key, copy);
+            }
+
+            // Update the value in the destination
+            destination [sourceProp.Key].UpdateFrom (sourceProp.Value);
+        }
+    }
+
+    /// <summary>
+    /// Updates a ConfigProperty dictionary with values from a source dictionary.
+    /// </summary>
+    /// <param name="source">The source ConfigProperty dictionary.</param>
+    /// <param name="destination">The destination ConfigProperty dictionary.</param>
+    private void UpdateConfigPropertyDictionary (
+        Dictionary<string, ConfigProperty> source,
+        Dictionary<string, ConfigProperty> destination)
+    {
+        foreach (KeyValuePair<string, ConfigProperty> sourceProp in source)
+        {
+            // Skip properties without values
+            if (!sourceProp.Value.HasValue)
+            {
+                continue;
+            }
+
+            if (!destination.ContainsKey (sourceProp.Key))
+            {
+                // Add the property to the destination
+                var copy = CreateConfigPropertyCopy (sourceProp.Value);
+                destination.Add (sourceProp.Key, copy);
+            }
+
+            // Update the value in the destination
+            destination [sourceProp.Key].UpdateFrom (sourceProp.Value);
+        }
+    }
+
+    /// <summary>
+    /// Creates a copy of a ConfigProperty with the same metadata but no value.
+    /// </summary>
+    /// <param name="source">The source ConfigProperty.</param>
+    /// <returns>A new ConfigProperty instance.</returns>
+    private static ConfigProperty CreateConfigPropertyCopy (ConfigProperty source)
+    {
+        return new ConfigProperty
+        {
+            Immutable = false,
+            PropertyInfo = source.PropertyInfo,
+            OmitClassName = source.OmitClassName,
+            ScopeType = source.ScopeType,
+            HasValue = false
+        };
     }
 
     #region Initialization

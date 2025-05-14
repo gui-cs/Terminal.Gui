@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Collections.Concurrent;
+using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
@@ -33,7 +34,7 @@ namespace Terminal.Gui;
 [JsonSerializable (typeof (Scope<string>))]
 [JsonSerializable (typeof (AppSettingsScope))]
 [JsonSerializable (typeof (SettingsScope))]
-[JsonSerializable (typeof (Dictionary<string, ThemeScope>))]
+[JsonSerializable (typeof (ConcurrentDictionary<string, ThemeScope>))]
 [JsonSerializable (typeof (Dictionary<string, Scheme>))]
 
 internal partial class SourceGenerationContext : JsonSerializerContext

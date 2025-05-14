@@ -1,9 +1,7 @@
 ﻿#nullable enable
-using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
@@ -17,7 +15,7 @@ namespace Terminal.Gui;
 public static class ThemeManager
 {
     /// <summary>
-    ///     Convenience method to get the current theme. The current theme is the item in the <see cref="Themes"/> dictionary, with they key of <see cref="Theme"/>.     
+    ///     Convenience method to get the current theme. The current theme is the item in the <see cref="Themes"/> dictionary, with the key of <see cref="Theme"/>.     
     /// </summary>
     /// <returns></returns>
     public static ThemeScope GetCurrentTheme ()
@@ -30,7 +28,7 @@ public static class ThemeManager
     /// </summary>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public static Dictionary<string, ThemeScope> GetThemes ()
+    public static ConcurrentDictionary<string, ThemeScope> GetThemes ()
     {
         if (!ConfigurationManager.IsInitialized ())
         {
@@ -45,7 +43,11 @@ public static class ThemeManager
             {
                 if (themes.HasValue)
                 {
-                    return (themes.PropertyValue as Dictionary<string, ThemeScope>)!;
+                    return (themes.PropertyValue as ConcurrentDictionary<string, ThemeScope>)!;
+
+                    // new ConcurrentDictionary<string, ThemeScope>(
+                    //(themes.PropertyValue as ConcurrentDictionary<string, ThemeScope>)!,
+                    //StringComparer.InvariantCultureIgnoreCase);
                 }
                 return HardCodedThemes ()!;
             }
@@ -75,7 +77,8 @@ public static class ThemeManager
             {
                 if (themes.HasValue)
                 {
-                    return (((Dictionary<string, ThemeScope>)themes.PropertyValue!)!).Keys.ToImmutableList ();
+                    ConcurrentDictionary<string, ThemeScope>? themesValue = themes.PropertyValue as ConcurrentDictionary<string, ThemeScope>;
+                    return themesValue!.Keys.ToImmutableList ();
                 }
                 return HardCodedThemes ()!.Keys.ToImmutableList ();
             }
@@ -99,16 +102,16 @@ public static class ThemeManager
     ///     However, if <see cref="ConfigurationManager.IsInitialized"/> is <c>false</c>, this property will return the hard-coded themes.
     /// </summary>
     /// <exception cref="InvalidOperationException"></exception>
-    [JsonConverter (typeof (DictionaryJsonConverter<ThemeScope>))]
+    [JsonConverter (typeof (ConcurrentDictionaryJsonConverter<ThemeScope>))]
     [ConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
-    public static Dictionary<string, ThemeScope>? Themes
+    public static ConcurrentDictionary<string, ThemeScope>? Themes
     {
         // Note: This property getter must be public; DeepClone depends on it.
         get => GetThemes ();
         internal set => SetThemes (value);
     }
 
-    private static void SetThemes (Dictionary<string, ThemeScope>? dictionary)
+    private static void SetThemes (ConcurrentDictionary<string, ThemeScope>? dictionary)
     {
         if (!ConfigurationManager.IsEnabled)
         {
@@ -130,7 +133,7 @@ public static class ThemeManager
         throw new InvalidOperationException ("Settings is null.");
     }
 
-    private static Dictionary<string, ThemeScope>? HardCodedThemes ()
+    private static ConcurrentDictionary<string, ThemeScope>? HardCodedThemes ()
     {
         ThemeScope? hardCodedThemeScope = GetHardCodedThemeScope ();
         if (hardCodedThemeScope is null)
@@ -138,11 +141,12 @@ public static class ThemeManager
             throw new InvalidOperationException ("Hard coded theme scope is null.");
         }
 
-        Dictionary<string, ThemeScope> hardCodedThemes = new (StringComparer.InvariantCultureIgnoreCase)
-        {
-            { DEFAULT_THEME_NAME, hardCodedThemeScope }
-        };
-        return hardCodedThemes;
+        return new ConcurrentDictionary<string, ThemeScope> (
+            new Dictionary<string, ThemeScope>
+            {
+                { DEFAULT_THEME_NAME, hardCodedThemeScope }
+            },
+            StringComparer.InvariantCultureIgnoreCase);
     }
 
     /// <summary>
@@ -245,9 +249,8 @@ public static class ThemeManager
         }
     }
 
-    /// <summary>Event fired he selected theme has changed. application.</summary>
+    /// <summary>Event fired when the selected theme has changed.</summary>
     public static event EventHandler<ThemeManagerEventArgs>? ThemeChanged;
-
 
     /// <summary>
     ///   INTERNAL: Updates <see cref="Themes"/> to the current values of the static <see cref="ConfigurationPropertyAttribute"/> properties.
@@ -258,7 +261,6 @@ public static class ThemeManager
     {
         Themes! [Theme].LoadCurrentValues ();
     }
-
 
     /// <summary>
     ///     INTERNAL: Resets all themes to the values the <see cref="ConfigurationPropertyAttribute"/> properties contained
@@ -282,10 +284,12 @@ public static class ThemeManager
             throw new InvalidOperationException ("Hard coded theme scope is null.");
         }
 
-        Dictionary<string, ThemeScope> hardCodedThemes = new (StringComparer.InvariantCultureIgnoreCase)
-        {
-            { Theme, hardCodedThemeScope }
-        };
+        ConcurrentDictionary<string, ThemeScope> hardCodedThemes = new (
+                                                                        new Dictionary<string, ThemeScope>
+                                                                        {
+                                                                            { Theme, hardCodedThemeScope }
+                                                                        },
+                                                                        StringComparer.InvariantCultureIgnoreCase);
 
         ConfigurationManager.Settings ["Themes"].PropertyValue = hardCodedThemes;
         ConfigurationManager.Settings ["Theme"].PropertyValue = DEFAULT_THEME_NAME;
@@ -297,5 +301,4 @@ public static class ThemeManager
         Logging.Debug ($"Themes.OnThemeChanged({theme}) -> {Theme}");
         ThemeChanged?.Invoke (null, new (theme));
     }
-
 }

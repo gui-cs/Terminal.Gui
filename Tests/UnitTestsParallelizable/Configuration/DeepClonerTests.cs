@@ -1,5 +1,6 @@
 #nullable enable
 
+using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Text;
@@ -261,6 +262,22 @@ public class DeepClonerTests
         // Verify that the capacity is preserved (if supported)
         Assert.True (result.Count <= result.EnsureCapacity (0)); // EnsureCapacity(0) returns the current capacity
         Assert.True (source.Count <= source.EnsureCapacity (0)); // EnsureCapacity(0) returns the current capacity
+    }
+
+    [Fact]
+    public void ConcurrentDictionary_CreatesDeepCopy ()
+    {
+        ConcurrentDictionary<string, int>? source = new (new Dictionary<string, int> () { { "A", 1 }, { "B", 2 } });
+        ConcurrentDictionary<string, int>? result = DeepCloner.DeepClone (source);
+
+        Assert.NotNull (result);
+        Assert.NotSame (source, result);
+        Assert.Equal (source, result);
+
+        // Modify result, ensure source unchanged
+        result! ["C"] = 3;
+        Assert.Equal (2, source.Count);
+        Assert.Equal (3, result.Count);
     }
 
     [Fact]

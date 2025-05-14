@@ -28,6 +28,47 @@ Terminal.Gui provides persistent configuration settings via the [`ConfigurationM
 | **Themes** | Collection of named Theme definitions bundling visual and layout settings. |
 | **VisualRole** | Semantic role/purpose of a visual element (Normal, Focus, HotFocus, Active, Disabled, ReadOnly). |
 
+## Fundamentals
+
+The `ConfigurationManager` class provides a way to store and retrieve configuration settings for an application. The configuration is stored in JSON documents, which can be located in the user's home directory, the current working directory, in memory, or as a resource within the application's main assembly.
+
+Settings are defined in JSON format, according to this schema: https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json.
+
+Terminal.Gui library developers can define settings in code and set the default values in the Terminal.Gui assembly's resources (e.g. `Terminal.Gui.Resources.config.json`).
+
+Terminal.Gui application developers can define settings in their apps' code and set the default values in their apps' resources (e.g. `Resources/config.json`) or by setting @Terminal.Gui.Application.RuntimeConfig to string containing JSON.
+
+Users can change settings on a global or per-application basis by providing JSON formatted configuration files. The configuration files can be placed in at .tui folder in the user's home directory (e.g. `C:/Users/username/.tui`, or `/usr/username/.tui`) or the folder where the Terminal.Gui application was launched from (e.g. `./.tui`).
+
+## CM is Disabled by Default
+
+The `ConfigurationManager` class is disabled by default. To enable it, call @Terminal.Gui.ConfigurationManager.Enable() in your application's `Main` method.
+
+```csharp
+ConfigurationManager.Enable();
+```
+
+If `ConfigurationManager.Enable()` is not called (`ConfigurationManager.IsEnabled` is 'false'), all configuration settings are ignored and ConfigurationManager will effectively be a no-op. All `[ConfigurationProperty]` properties will initially be their hard-coded default values. Calling @Terminal.Gui.ConfigurationManager.Reset will reset all configuration properties back to their hard-coded default values.
+
+Other than that, no other ConfigurationManager APIs will have any effect.
+
+## Loading and Applying Configuration
+
+The `ConfigurationManager` class provides a `Load` method that loads the configuration from the given location. The `Load` method does not apply the settings to the application; that happens when the `Apply` method is called.
+
+When a configuration has been loaded, the @Terminal.Gui.ConfigurationManager.Apply method must be called to apply the settings to the application. This method uses reflection to find all static fields decorated with the `[ConfigurationProperty]` attribute and applies the settings to the corresponding properties.
+
+```csharp
+// Load the configuration from just the users home directory.
+
+ConfigurationManager.Load(ConfigLocations.GlobalHome);
+ConfigurationManager.Apply();
+```
+
+> [!IMPORTANT]
+>  Configuration Settings Apply at the Process Level. 
+> Configuration settings are applied at the process level, which means that they are applied to all applications that are part of the same process. This is due to the fact that configuration properties are defined as static fields, which are static for the process.
+
 ## Configuration Types and Scopes
 
 Terminal.Gui supports three main configuration scopes:
@@ -112,47 +153,6 @@ Themes provide a way to bundle visual settings together. Themes can inherit from
   ]
 }
 ```
-
-## Fundamentals
-
-The `ConfigurationManager` class provides a way to store and retrieve configuration settings for an application. The configuration is stored in a JSON file, which can be located in the user's home directory, the current working directory, or as a resource within the application's main assembly.
-
-Settings are defined in JSON format, according to this schema: https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json.
-
-Terminal.Gui library developers can define settings in code and set the default values in the Terminal.Gui assembly's resources (e.g. `Terminal.Gui.Resources.config.json`).
-
-Terminal.Gui application developers can define settings in their apps' code and set the default values in their apps' resources (e.g. `Resources/config.json`) or by setting @Terminal.Gui.Application.RuntimeConfig to string containing JSON.
-
-Users can change settings on a global or per-application basis by providing JSON formatted configuration files. The configuration files can be placed in at .tui folder in the user's home directory (e.g. `C:/Users/username/.tui`, or `/usr/username/.tui`) or the folder where the Terminal.Gui application was launched from (e.g. `./.tui`).
-
-## CM is Disabled by Default
-
-The `ConfigurationManager` class is disabled by default. To enable it, call @Terminal.Gui.ConfigurationManager.Enable() in your application's `Main` method.
-
-```csharp
-ConfigurationManager.Enable();
-```
-
-If `ConfigurationManager.Enable()` is not called (`ConfigurationManager.IsEnabled` is 'false'), all configuration settings are ignored and ConfigurationManager will effectively be a no-op. All `[ConfigurationProperty]` properties will initially be their hard-coded default values. Calling @Terminal.Gui.ConfigurationManager.Reset will reset all configuration properties back to their hard-coded default values.
-
-Other than that, no other ConfigurationManager APIs will have any effect.
-
-## Loading and Applying Configuration
-
-The `ConfigurationManager` class provides a `Load` method that loads the configuration from the given location. The `Load` method does not apply the settings to the application; that happens when the `Apply` method is called.
-
-When a configuration has been loaded, the @Terminal.Gui.ConfigurationManager.Apply method must be called to apply the settings to the application. This method uses reflection to find all static fields decorated with the `[ConfigurationProperty]` attribute and applies the settings to the corresponding properties.
-
-```csharp
-// Load the configuration from just the users home directory.
-
-ConfigurationManager.Load(ConfigLocations.GlobalHome);
-ConfigurationManager.Apply();
-```
-
-> [!IMPORTANT]
->  Configuration Settings Apply at the Process Level. 
-> Configuration settings are applied at the process level, which means that they are applied to all applications that are part of the same process. This is due to the fact that configuration properties are defined as static fields, which are static for the process.
 
 ## How Settings are Defined 
 
