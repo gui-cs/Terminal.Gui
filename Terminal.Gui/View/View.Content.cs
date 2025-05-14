@@ -5,6 +5,8 @@ public partial class View
 {
     #region Content Area
 
+    // nullable holder of developer specified Content Size. If null then the developer did not
+    // explicitly set it and contentsize will be calculated dynamically.
     internal Size? _contentSize;
 
     /// <summary>
@@ -66,10 +68,7 @@ public partial class View
     ///         <see cref="Viewport"/>.
     ///     </para>
     ///     <para>
-    ///         If the content size was not explicitly set by <see cref="SetContentSize"/>, and the View has visible subviews, <see cref="GetContentSize ()"/> will return the
-    ///         maximum
-    ///         position + dimension of the SubViews, supporting <see cref="Dim.Auto"/> with the
-    ///         <see cref="DimAutoStyle.Content"/> flag set.
+    ///         If the content size was not explicitly set by <see cref="SetContentSize"/>, this function will return the Viewport size.
     ///     </para>
     ///     <para>
     ///         If set <see cref="Viewport"/> describes the portion of the content currently visible to the user. This enables
