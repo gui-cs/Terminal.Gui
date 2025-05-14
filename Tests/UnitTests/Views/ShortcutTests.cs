@@ -462,11 +462,13 @@ public class ShortcutTests
 
         Application.Top.Scheme = null;
 
-        Assert.Null (shortcut.Scheme);
+        Assert.False(shortcut.HasScheme);
+        Assert.NotNull (shortcut.Scheme);
 
         shortcut.HasFocus = true;
 
-        Assert.Null (shortcut.Scheme);
+        Assert.False (shortcut.HasScheme);
+        Assert.NotNull (shortcut.Scheme);
 
         Application.Top.Dispose ();
         Application.ResetState ();
