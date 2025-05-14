@@ -324,7 +324,7 @@ public class ClearViewportTests (ITestOutputHelper output)
         ConfigurationManager.Load (ConfigLocations.LibraryResources);
         ConfigurationManager.Apply ();
 
-        var root = new View { Width = 20, Height = 10, Scheme = SchemeManager.Schemes! ["Base"] };
+        var root = new View { Width = 20, Height = 10, Scheme = SchemeManager.Schemes! ["Base"]! };
 
         string text = new ('c', 100);
 

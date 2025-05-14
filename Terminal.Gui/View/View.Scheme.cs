@@ -75,7 +75,7 @@ public partial class View
     public bool HasScheme => _scheme is { };
 
     /// <summary>Gets or sets the Scheme for this view. If the Scheme has not been explicitly set (see <see cref="HasScheme"/>), gets <see cref="SuperView"/>'s Scheme.</summary>
-    public Scheme? Scheme
+    public Scheme Scheme
     {
         get => GetScheme ();
         set => SetScheme (value);
@@ -86,18 +86,18 @@ public partial class View
     ///     Gets the Scheme for the View. If the Scheme has not been explicitly set (see <see cref="HasScheme"/>), gets <see cref="SuperView"/>'s Scheme.
     /// </summary>
     /// <returns></returns>
-    public Scheme? GetScheme ()
+    public Scheme GetScheme ()
     {
         if (OnGettingScheme (out Scheme? newScheme))
         {
-            return newScheme;
+            return newScheme!;
         }
 
         var args = new SchemeEventArgs (in _scheme, ref newScheme);
         GettingScheme?.Invoke (this, args);
         if (args.Cancel)
         {
-            return args.NewScheme;
+            return args.NewScheme!;
         }
 
         if (!HasScheme)
@@ -105,7 +105,7 @@ public partial class View
             return SuperView?.Scheme ?? SchemeManager.GetCurrentSchemes () ["Base"]!;
         }
 
-        return _scheme;
+        return _scheme!;
     }
 
 
@@ -293,7 +293,7 @@ public partial class View
     }
 
     /// <summary>
-    ///     Raised when the Attribute for a <see cref="GetAttributeForRole(Terminal.Gui.VisualRole)"/> is being retrieved. Handelers should check if <see cref="CancelEventArgs.Cancel"/>
+    ///     Raised when the Attribute for a <see cref="GetAttributeForRole(Terminal.Gui.VisualRole)"/> is being retrieved. Handlers should check if <see cref="CancelEventArgs.Cancel"/>
     ///     has been set to <see langword="true"/> and do nothing if so. If Cancel is <see langword="false"/>
     ///     a handler can set it to <see langword="true"/> to stop further processing optionally change the <see cref="VisualRoleEventArgs.CurrentValue"/> in the event args to a different value.
     /// </summary>

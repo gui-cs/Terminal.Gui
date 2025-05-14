@@ -118,9 +118,9 @@ public partial class View // Mouse APIs
     ///     is based on the current <see cref="Scheme"/>, using <see cref="Color.GetHighlightColor()"/>.
     /// </summary>
     /// <remarks>The highlight scheme.</remarks>
-    public Scheme? GetHighlightScheme ()
+    public Scheme GetHighlightScheme ()
     {
-        Scheme? cs = GetScheme () ?? new Scheme ();
+        Scheme cs = GetScheme ();
 
         return cs with
         {

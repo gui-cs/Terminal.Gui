@@ -33,7 +33,7 @@ public class ScopeTests
 
     // The property key will be "ScopeTests.DictionaryProperty"
     [ConfigurationProperty (Scope = typeof (ScopeTestsScope))]
-    public static Dictionary<string, ConfigProperty> DictionaryProperty { get; set; }
+    public static Dictionary<string, ConfigProperty>? DictionaryProperty { get; set; }
 
     public class ScopeTestsScope : Scope<ScopeTestsScope>
     {
@@ -183,7 +183,7 @@ public class ScopeTests
         originalScope.Apply ();
 
         // Verify apply worked
-        Assert.Equal ("hello", DictionaryProperty ["item1"].PropertyValue);
+        Assert.Equal ("hello", DictionaryProperty? ["item1"].PropertyValue);
 
         // The item property should not have had its value set
         Assert.Equal (null, DictionaryItemProperty1);
