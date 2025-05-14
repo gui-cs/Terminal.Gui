@@ -20,10 +20,10 @@ internal class ConcurrentDictionaryJsonConverter<T> : JsonConverter<ConcurrentDi
         }
 
         // If the Json options indicate ignoring case, use the invariant culture ignore case comparer
-        var dictionary = new ConcurrentDictionary<string, T>(
-            options.PropertyNameCaseInsensitive
-                ? StringComparer.InvariantCultureIgnoreCase
-                : StringComparer.InvariantCulture);
+        ConcurrentDictionary<string, T> dictionary = new (
+                                                          options.PropertyNameCaseInsensitive
+                                                              ? StringComparer.InvariantCultureIgnoreCase
+                                                              : StringComparer.InvariantCulture);
 
         while (reader.Read())
         {

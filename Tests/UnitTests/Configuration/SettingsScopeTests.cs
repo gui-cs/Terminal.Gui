@@ -10,8 +10,7 @@ public class SettingsScopeTests
     public void Load_Overrides_Defaults ()
     {
         // arrange
-        Enable ();
-        ResetToHardCodedDefaults ();
+        Enable (resetToHardCodedDefaults: true);
 
         Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue);
 
@@ -31,8 +30,7 @@ public class SettingsScopeTests
         Assert.Equal (Key.Q.WithCtrl, (Key)Settings ["Application.QuitKey"].PropertyValue);
 
         // clean up
-        ResetToHardCodedDefaults ();
-        Disable ();
+        Disable (resetToHardCodedDefaults: true);
 
     }
 
@@ -41,8 +39,7 @@ public class SettingsScopeTests
     public void Load_Dictionary_Property_Overrides_Defaults ()
     {
         // arrange
-        Enable ();
-        ResetToHardCodedDefaults ();
+        Enable (resetToHardCodedDefaults: true);
         ThrowOnJsonErrors = true;
 
         ConfigProperty themesConfigProperty = Settings! ["Themes"];
@@ -103,8 +100,7 @@ public class SettingsScopeTests
         Assert.Equal (HighlightStyle.Hover, (HighlightStyle)ThemeManager.Themes! ["NewTheme"] ["Button.DefaultHighlightStyle"].PropertyValue!);
 
         // clean up
-        ResetToHardCodedDefaults ();
-        Disable ();
+        Disable (resetToHardCodedDefaults: true);
 
     }
 
@@ -139,8 +135,7 @@ public class SettingsScopeTests
         Assert.Equal (Key.F, Application.NextTabGroupKey);
         Assert.Equal (Key.B, Application.PrevTabGroupKey);
 
-        ResetToHardCodedDefaults ();
-        Disable ();
+        Disable (resetToHardCodedDefaults: true);
     }
 
     [Fact]
@@ -159,8 +154,7 @@ public class SettingsScopeTests
         Assert.Equal (KeyCode.End, ((Key)Settings ["Application.QuitKey"].PropertyValue).KeyCode);
         Assert.Equal (KeyCode.F, ((Key)updatedSettings ["Application.NextTabGroupKey"].PropertyValue).KeyCode);
         Assert.Equal (KeyCode.B, ((Key)updatedSettings ["Application.PrevTabGroupKey"].PropertyValue).KeyCode);
-        ResetToHardCodedDefaults ();
-        Disable ();
+        Disable (resetToHardCodedDefaults: true);
     }
 
     [Fact]
@@ -218,7 +212,6 @@ public class SettingsScopeTests
         // Assert
         Assert.Equal (Key.Esc, Application.QuitKey);
 
-        ResetToHardCodedDefaults ();
-        Disable();
+        Disable (resetToHardCodedDefaults: true);
     }
 }

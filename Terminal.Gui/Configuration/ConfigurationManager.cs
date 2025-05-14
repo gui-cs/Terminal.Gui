@@ -108,8 +108,9 @@ public static class ConfigurationManager
     {
         lock (_initializedLock)
         {
-        {
-            return _initialized;
+            {
+                return _initialized;
+            }
         }
     }
 
@@ -222,7 +223,8 @@ public static class ConfigurationManager
     ///     Enables <see cref="ConfigurationManager"/>.
     /// </summary>
     /// <param name="resetToHardCodedDefaults">
-    ///     If <see langword="true"/> Configuration Manager will be reset and all static <see cref="ConfigurationPropertyAttribute"/> properties will be reset to their initial, hard-coded
+    ///     If <see langword="true"/> Configuration Manager will be reset and all static
+    ///     <see cref="ConfigurationPropertyAttribute"/> properties will be reset to their initial, hard-coded
     ///     defaults. Otherwise, Configuration Manager will be unchanged from its current state.
     /// </param>
     [RequiresUnreferencedCode ("AOT")]
@@ -249,7 +251,8 @@ public static class ConfigurationManager
     ///     Disables <see cref="ConfigurationManager"/>.
     /// </summary>
     /// <param name="resetToHardCodedDefaults">
-    ///     If <see langword="true"/> all static <see cref="ConfigurationPropertyAttribute"/> properties will be reset to their initial, hard-coded
+    ///     If <see langword="true"/> all static <see cref="ConfigurationPropertyAttribute"/> properties will be reset to their
+    ///     initial, hard-coded
     ///     defaults.
     /// </param>
     public static void Disable (bool resetToHardCodedDefaults = false)
@@ -301,7 +304,8 @@ public static class ConfigurationManager
     }
 
     /// <summary>
-    ///     INTERNAL: Resets <see cref="ConfigurationManager"/>. Loads the hard-coded values of the <see cref="ConfigurationPropertyAttribute"/> properties and applies them.
+    ///     INTERNAL: Resets <see cref="ConfigurationManager"/>. Loads the hard-coded values of the
+    ///     <see cref="ConfigurationPropertyAttribute"/> properties and applies them.
     /// </summary>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
@@ -574,7 +578,8 @@ public static class ConfigurationManager
     #region AppSettings
 
     /// <summary>
-    ///     Gets or sets the application-specific configuration settings (config properties with the <see cref="AppSettingsScope"/> scope.
+    ///     Gets or sets the application-specific configuration settings (config properties with the
+    ///     <see cref="AppSettingsScope"/> scope.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
     [JsonPropertyName ("AppSettings")]
@@ -610,7 +615,6 @@ public static class ConfigurationManager
 
                 return (appSettingsConfigProperty.PropertyValue as AppSettingsScope)!;
             }
-
         }
         [RequiresUnreferencedCode ("AOT")]
         [RequiresDynamicCode ("AOT")]

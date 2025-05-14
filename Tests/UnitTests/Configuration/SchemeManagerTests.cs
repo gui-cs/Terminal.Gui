@@ -8,7 +8,7 @@ public class SchemeManagerTests
     [Fact]
     public void GetCurrentSchemes_Not_Enabled_Gets_Schemes ()
     {
-        CM.Disable ();
+        Disable (resetToHardCodedDefaults: true);
 
         Dictionary<string, Scheme?>? schemes = SchemeManager.GetCurrentSchemes ();
         Assert.NotNull (schemes);
@@ -28,7 +28,7 @@ public class SchemeManagerTests
         Assert.True (schemes!.ContainsKey ("Base"));
         Assert.True (schemes.ContainsKey ("base"));
 
-        CM.Disable();
+        Disable (resetToHardCodedDefaults: true);
     }
 
     [Fact]
@@ -67,8 +67,7 @@ public class SchemeManagerTests
         Assert.True (current!.ContainsKey ("Base"));
         Assert.True (current.ContainsKey ("base"));
 
-        ResetToHardCodedDefaults ();
-        Disable();
+        Disable (resetToHardCodedDefaults: true);
     }
 
 
@@ -76,8 +75,7 @@ public class SchemeManagerTests
     public void Load_Adds ()
     {
         // arrange
-        Enable ();
-        ResetToHardCodedDefaults ();
+        Enable (resetToHardCodedDefaults: true);
 
         var theme = new ThemeScope ();
         Assert.NotEmpty (theme);
@@ -118,16 +116,14 @@ public class SchemeManagerTests
         schemes = (Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue;
         Assert.Equal (schemes ["Test"].Normal, scheme.Normal);
         Assert.Equal (schemes ["Test"].Focus, scheme.Focus);
-        ResetToHardCodedDefaults ();
-        Disable ();
+        Disable (resetToHardCodedDefaults: true);
     }
 
     [Fact]
     public void Load_Changes ()
     {
         // arrange
-        Enable ();
-        ResetToHardCodedDefaults ();
+        Enable (resetToHardCodedDefaults: true);
 
         ThemeScope? theme = new ThemeScope ();
         Assert.NotEmpty (theme);
@@ -175,16 +171,14 @@ public class SchemeManagerTests
         Assert.Equal (Color.BrightBlue, schemes ["Test"].Normal.Background);
         Assert.Equal (Color.Cyan, schemes ["Test"].Focus.Foreground);
         Assert.Equal (Color.BrightCyan, schemes ["Test"].Focus.Background);
-        ResetToHardCodedDefaults ();
-        Disable ();
+        Disable (resetToHardCodedDefaults: true);
     }
 
 
     [Fact (Skip = "WIP")]
     public void Apply_UpdatesSchemes ()
     {
-        Enable ();
-        ResetToCurrentValues ();
+        Enable (resetToHardCodedDefaults: true);
 
         Assert.False (SchemeManager.Schemes!.ContainsKey ("test"));
         Assert.Equal (5, SchemeManager.Schemes.Count); // base, toplevel, menu, error, dialog
@@ -222,7 +216,6 @@ public class SchemeManagerTests
         SchemeManager.Schemes.Remove ("test");
         Assert.Equal (5, SchemeManager.Schemes.Count);
 
-        ResetToHardCodedDefaults ();
-        Disable ();
+        Disable (resetToHardCodedDefaults: true);
     }
 }
