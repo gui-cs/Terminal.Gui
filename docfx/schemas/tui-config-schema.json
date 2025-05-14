@@ -97,6 +97,93 @@
       "default": false,
       "description": "Whether the FileDialog should use Unicode characters for icons by default."
     },
+    "Colors16": {
+      "type": "object",
+      "description": "Defines the 3-byte/6-character hexadecimal string values for the 16 legacy ANSI color names (ColorName16). These definitions can be overridden by the user to customize the base 16 color palette.",
+      "properties": {
+        "Black": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.Black (typically #000000)."
+        },
+        "Blue": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.Blue (typically #000080, a dark blue like Navy)."
+        },
+        "Green": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.Green (typically #008000, a dark green)."
+        },
+        "Cyan": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.Cyan (typically #008080, a dark cyan like Teal)."
+        },
+        "Red": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.Red (typically #800000, a dark red like Maroon)."
+        },
+        "Magenta": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.Magenta (typically #800080, a dark magenta like Purple)."
+        },
+        "Yellow": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.Yellow (typically #808000, a dark yellow like Olive)."
+        },
+        "Gray": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.Gray (typically #C0C0C0, a light gray like Silver)."
+        },
+        "DarkGray": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.DarkGray (typically #808080, a medium gray)."
+        },
+        "BrightBlue": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.BrightBlue (typically #0000FF)."
+        },
+        "BrightGreen": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.BrightGreen (typically #00FF00, like Lime)."
+        },
+        "BrightCyan": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.BrightCyan (typically #00FFFF, like Aqua)."
+        },
+        "BrightRed": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.BrightRed (typically #FF0000)."
+        },
+        "BrightMagenta": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.BrightMagenta (typically #FF00FF, like Fuchsia)."
+        },
+        "BrightYellow": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.BrightYellow (typically #FFFF00)."
+        },
+        "White": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.White (typically #FFFFFF)."
+        }
+      },
+      "additionalProperties": false
+    },
     "Theme": {
       "type": "string",
       "default": "Default",
@@ -122,7 +209,7 @@
   "additionalProperties": true,
   "definitions": {
     "Color": {
-      "description": "One be either one of the W3C standard color names, an rgb(r,g,b) tuple, or a hex color string in the format #RRGGBB.",
+      "description": "One be either one of the W3C standard color names, a ColorName16 (e.g. 'BrightBlue'), an rgb(r,g,b) tuple, or a hex color string in the format #RRGGBB.",
       "$schema": "http://json-schema.org/draft-07/schema#",
       "type": "string",
       "oneOf": [
@@ -149,7 +236,8 @@
             "Purple", "RebeccaPurple", "Red", "RosyBrown", "RoyalBlue", "SaddleBrown", "Salmon",
             "SandyBrown", "SeaGreen", "SeaShell", "Sienna", "Silver", "SkyBlue", "SlateBlue",
             "SlateGray", "Snow", "SpringGreen", "SteelBlue", "Tan", "Teal", "Thistle", "Tomato",
-            "Turquoise", "Violet", "Wheat", "White", "WhiteSmoke", "Yellow", "YellowGreen"
+            "Turquoise", "Violet", "Wheat", "White", "WhiteSmoke", "Yellow", "YellowGreen",
+            "BrightBlue", "BrightGreen", "BrightCyan", "BrightRed", "BrightMagenta", "BrightYellow"
           ]
         },
         {
