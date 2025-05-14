@@ -1,17 +1,19 @@
 ﻿#nullable enable
+using System.Diagnostics.Metrics;
+using System.Text;
+using Xunit.Abstractions;
 using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui.ConfigurationTests;
 
-public class ThemeManagerTests
+public class ThemeManagerTests (ITestOutputHelper output)
 {
-
     [Fact]
     public void ResetToCurrentValues_Adds_Default_Theme ()
     {
         try
         {
-            CM.Enable ();
+            Enable ();
             Assert.NotEmpty (ThemeManager.Themes!);
 
             ThemeManager.UpdateToCurrentValues ();
@@ -36,13 +38,11 @@ public class ThemeManagerTests
             //// Base has correct values
             //var baseSchemee = schemes ["Base"];
             //Assert.Equal (new Attribute (Color.White, Color.Blue), baseSchemee.Normal);
-
         }
         finally
         {
-            CM.ResetToCurrentValues ();
+            ResetToCurrentValues ();
         }
-
     }
 
     // ResetToCurrentValues
@@ -50,7 +50,6 @@ public class ThemeManagerTests
     //    OnThemeChanged
 
     #region Tests Settings["Theme"] and ThemeManager.Theme
-
 
     [Fact]
     public void Theme_Settings_Theme_Equals_ThemeManager_Theme ()
@@ -76,7 +75,6 @@ public class ThemeManagerTests
         Disable ();
     }
 
-
     [Fact]
     public void Theme_Set_Sets ()
     {
@@ -95,7 +93,6 @@ public class ThemeManagerTests
         ResetToHardCodedDefaults ();
         Disable ();
     }
-
 
     [Fact]
     public void Theme_Set_Throws_If_Not_Enabled ()
@@ -137,7 +134,7 @@ public class ThemeManagerTests
         Assert.False (IsEnabled);
 
         Assert.Single (ThemeManager.Themes!);
-        Assert.Throws<InvalidOperationException> (() => ThemeManager.Themes = new Dictionary<string, ThemeScope> ());
+        Assert.Throws<InvalidOperationException> (() => ThemeManager.Themes = new ());
         Assert.Single (ThemeManager.Themes!);
     }
 
@@ -150,12 +147,13 @@ public class ThemeManagerTests
         ResetToHardCodedDefaults ();
 
         Assert.Single (ThemeManager.Themes!);
-        ThemeManager.Themes = new Dictionary<string, ThemeScope> ()
+
+        ThemeManager.Themes = new ()
         {
-            { "Default", new ThemeScope() },
-            { "test", new ThemeScope() }
+            { "Default", new () },
+            { "test", new () }
         };
-        Assert.Contains("test", ThemeManager.Themes!);
+        Assert.Contains ("test", ThemeManager.Themes!);
 
         ResetToHardCodedDefaults ();
         Disable ();
@@ -170,11 +168,13 @@ public class ThemeManagerTests
         ResetToHardCodedDefaults ();
 
         Assert.Single (ThemeManager.Themes!);
-        Assert.Throws<InvalidOperationException> (() => ThemeManager.Themes = new Dictionary<string, ThemeScope> ()
-        {
-            { "not default", new ThemeScope() },
-            { "test", new ThemeScope() }
-        });
+
+        Assert.Throws<InvalidOperationException> (
+                                                  () => ThemeManager.Themes = new ()
+                                                  {
+                                                      { "not default", new () },
+                                                      { "test", new () }
+                                                  });
         Assert.Single (ThemeManager.Themes!);
 
         ResetToHardCodedDefaults ();
@@ -182,10 +182,7 @@ public class ThemeManagerTests
     }
 
     [Fact]
-    public void Themes_Get ()
-    {
-
-    }
+    public void Themes_Get () { }
 
     #endregion Tests Settings["Themes"] and ThemeManager.Themes
 
@@ -211,7 +208,6 @@ public class ThemeManagerTests
         ResetToHardCodedDefaults ();
         Disable ();
     }
-
 
     [Fact]
     public void Theme_Reload_Consistency ()
@@ -256,5 +252,27 @@ public class ThemeManagerTests
         }
     }
 
+    [Fact]
+    public void In_Memory_Themes_Size_Is_Reasonable ()
+    {
+        output.WriteLine ($"Start: Themes dictionary size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
+        Enable ();
+        output.WriteLine ($"After Enable: Themes dictionary size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
 
+        ResetToHardCodedDefaults ();
+        Assert.Single (ThemeManager.Themes!);
+        output.WriteLine ($"After ResetToHardCodedDefaults: Themes dictionary size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
+
+        Load (ConfigLocations.LibraryResources);
+        Assert.Equal (6, ThemeManager.Themes!.Count);
+        output.WriteLine ($"After Load: Themes dictionary size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
+
+        output.WriteLine ($"Total Settings Size: {(MemorySizeEstimator.EstimateSize (Settings!)) / 1024} Kb");
+
+        // Assert that the size is within a reasonable range (e.g., less than 1 MB)
+        //Assert.True (MemorySizeEstimator.EstimateSize (ThemeManager.Themes!) < (64 * 1024), $"Themes dictionary size is too large: {MemorySizeEstimator.EstimateSize (ThemeManager.Themes!) / 1024} Kb");
+
+        ResetToHardCodedDefaults ();
+        Disable ();
+    }
 }
