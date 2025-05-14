@@ -14,28 +14,22 @@ public partial class View
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         See the View Layout Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+    ///         See the View Layout Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         Negative sizes are not supported.
     ///     </para>
     ///     <para>
-    ///         If not explicitly set, and the View has no visible subviews, <see cref="GetContentSize ()"/> will return the
-    ///         size of
-    ///         <see cref="Viewport"/>.
+    ///         If not explicitly set to a non-<see langword="null"/> value, and the View has Subviews,
+    ///         <see cref="GetContentSize ()"/> will return
+    ///         the size of the <see cref="Viewport"/>.
     ///     </para>
     ///     <para>
-    ///         If not explicitly set, and the View has visible subviews, <see cref="GetContentSize ()"/> will return the
-    ///         maximum
-    ///         position + dimension of the SubViews, supporting <see cref="Dim.Auto"/> with the
-    ///         <see cref="DimAutoStyle.Content"/> flag set.
-    ///     </para>
-    ///     <para>
-    ///         If set <see cref="Viewport"/> describes the portion of the content currently visible to the user. This enables
-    ///         virtual scrolling.
-    ///     </para>
-    ///     <para>
-    ///         If set the behavior of <see cref="DimAutoStyle.Content"/> will be to use the ContentSize to determine the size
+    ///         If set to a non-<see langword="null"/> value, <see cref="Viewport"/> describes the portion of the content
+    ///         currently visible to the user. This enables
+    ///         virtual scrolling and the behavior of <see cref="DimAutoStyle.Content"/> will be to use
+    ///         <see cref="GetContentSize ()"/> to determine the size
     ///         of the view.
     ///     </para>
     /// </remarks>
