@@ -61,72 +61,18 @@ public partial class View // Focus and cross-view navigation management (TabStop
             if (direction == NavigationDirection.Forward && focused == focusChain [^1] && SuperView is null)
             {
                 // We're at the top of the focus chain. Go back down the focus chain and focus the first TabGroup
-                if (focusChain.Length > 0)
+                if (AdvanceFocusChain ())
                 {
-                    // Get the index of the currently focused view
-                    int focusedTabGroupIndex = focusChain.IndexOf (Focused); // Will return -1 if Focused can't be found or is null
-
-                    if (focusedTabGroupIndex + 1 > focusChain.Length - 1)
-                    {
-                        focusedTabGroupIndex = 0;
-                    }
-                    else
-                    {
-                        focusedTabGroupIndex++;
-                    }
-
-                    View [] subViews = focusChain [focusedTabGroupIndex].GetFocusChain (NavigationDirection.Forward, TabBehavior.TabStop);
-
-                    if (subViews.Length > 0)
-                    {
-                        if (focusChain [focusedTabGroupIndex]._previouslyFocused is { }
-                            && subViews.Any (v => v == focusChain [focusedTabGroupIndex]._previouslyFocused))
-                        {
-                            return focusChain [focusedTabGroupIndex]._previouslyFocused!.SetFocus ();
-                        }
-
-                        // We have a subview that can be focused
-                        if (subViews [0].SetFocus ())
-                        {
-                            return true;
-                        }
-                    }
+                    return true;
                 }
             }
 
             if (direction == NavigationDirection.Backward && focused == focusChain [0] && SuperView is null)
             {
                 // We're at the bottom of the focus chain
-                if (focusChain.Length > 0)
+                if (AdvanceFocusChain ())
                 {
-                    // Get the index of the currently focused view
-                    int focusedTabGroupIndex = focusChain.IndexOf (Focused); // Will return -1 if Focused can't be found or is null
-
-                    if (focusedTabGroupIndex + 1 > focusChain.Length - 1)
-                    {
-                        focusedTabGroupIndex = 0;
-                    }
-                    else
-                    {
-                        focusedTabGroupIndex++;
-                    }
-
-                    View [] subViews = focusChain [focusedTabGroupIndex].GetFocusChain (NavigationDirection.Forward, TabBehavior.TabStop);
-
-                    if (subViews.Length > 0)
-                    {
-                        if (focusChain [focusedTabGroupIndex]._previouslyFocused is { }
-                            && subViews.Any (v => v == focusChain [focusedTabGroupIndex]._previouslyFocused))
-                        {
-                            return focusChain [focusedTabGroupIndex]._previouslyFocused!.SetFocus ();
-                        }
-
-                        // We have a subview that can be focused
-                        if (subViews [0].SetFocus ())
-                        {
-                            return true;
-                        }
-                    }
+                    return true;
                 }
             }
         }
@@ -182,6 +128,46 @@ public partial class View // Focus and cross-view navigation management (TabStop
         (bool focusSet, bool _) = view.SetHasFocusTrue (Focused);
 
         return focusSet;
+
+        bool AdvanceFocusChain ()
+        {
+            if (focusChain.Length > 0)
+            {
+                // Get the index of the currently focused view
+                int focusedTabGroupIndex = focusChain.IndexOf (Focused); // Will return -1 if Focused can't be found or is null
+
+                if (focusedTabGroupIndex + 1 > focusChain.Length - 1)
+                {
+                    focusedTabGroupIndex = 0;
+                }
+                else
+                {
+                    focusedTabGroupIndex++;
+                }
+
+                View [] subViews = focusChain [focusedTabGroupIndex].GetFocusChain (NavigationDirection.Forward, TabBehavior.TabStop);
+
+                if (subViews.Length > 0)
+                {
+                    if (focusChain [focusedTabGroupIndex]._previouslyFocused is { }
+                        && subViews.Any (v => v == focusChain [focusedTabGroupIndex]._previouslyFocused))
+                    {
+                        if (focusChain [focusedTabGroupIndex]._previouslyFocused!.SetFocus ())
+                        {
+                            return true;
+                        }
+                    }
+
+                    // We have a subview that can be focused
+                    if (subViews [0].SetFocus ())
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
     }
 
     private bool RaiseAdvancingFocus (NavigationDirection direction, TabBehavior? behavior)
