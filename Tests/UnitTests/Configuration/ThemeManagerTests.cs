@@ -223,6 +223,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
         {
             Enable (resetToHardCodedDefaults: true);
 
+            // BUGBUG: Setting Schemes to empty array is not valid!
             // Create a test theme
             RuntimeConfig = """
                             {

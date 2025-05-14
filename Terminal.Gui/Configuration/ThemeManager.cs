@@ -82,10 +82,10 @@ public static class ThemeManager
         {
             ConcurrentDictionary<string, ThemeScope>? themesValue = themes.PropertyValue as ConcurrentDictionary<string, ThemeScope>;
 
-            return themesValue!.Keys.ToImmutableList ();
+            return themesValue!.Keys.OrderBy (key => key).ToImmutableList ();
         }
 
-        return HardCodedThemes ()!.Keys.ToImmutableList ();
+        return HardCodedThemes ()!.Keys.OrderBy (key => key).ToImmutableList ();
 
     }
 
@@ -226,13 +226,25 @@ public static class ThemeManager
 
             string previousThemeValue = GetCurrentThemeName ();
 
-            // Update the backing store
-            ConfigurationManager.Settings! ["Theme"].PropertyValue = value;
-
             if (!Themes!.ContainsKey (value))
             {
                 Logging.Warning ($"{value} is not a valid theme name.");
             }
+
+            // When a new theme is set, that's not default, we need to ensure it has values for every
+            // property. We use the hard-coded theme as the source of truth.
+            if (value != DEFAULT_THEME_NAME)
+            {
+                ThemeScope? hardCodedThemeScope = GetHardCodedThemeScope ();
+                if (hardCodedThemeScope is null)
+                {
+                    throw new InvalidOperationException ("Hard coded theme scope is null.");
+                }
+                //  Themes [value].UpdateFrom (hardCodedThemeScope);
+            }
+
+            // Update the backing store
+            ConfigurationManager.Settings! ["Theme"].PropertyValue = value;
 
             OnThemeChanged (previousThemeValue);
         }

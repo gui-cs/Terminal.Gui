@@ -67,7 +67,7 @@ public partial class View
     }
 
     /// <summary>
-    ///     Gets or sets the name of the Scheme to use for this View. If set, it will override the Scheme set in 
+    ///     Gets or sets the name of the Scheme to use for this View. If set, it will override the Scheme set in
     ///     the <see cref="Scheme"/> property.
     /// </summary>
     public string? SchemeName { get; set; }

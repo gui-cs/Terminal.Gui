@@ -175,6 +175,83 @@ public class SchemeManagerTests
     }
 
 
+    [Fact]
+    public void Load_Null_Scheme ()
+    {
+        try
+        {
+            Enable (resetToHardCodedDefaults: true);
+            ThrowOnJsonErrors = true;
+
+            // Create a test theme
+            RuntimeConfig = """
+                            {
+                                 "Theme": "TestTheme",
+                                 "Themes": [
+                                   {
+                                     "TestTheme": {
+                                     }
+                                   }
+                                 ]
+                            }
+                            """;
+
+            // Load the test theme
+            Load (ConfigLocations.Runtime);
+            Assert.Equal ("TestTheme", ThemeManager.Theme);
+
+
+            // Now reset everything and reload
+            ResetToCurrentValues ();
+
+            // Verify we're back to default
+            Assert.Equal ("Default", ThemeManager.Theme);
+        }
+        finally
+        {
+            Disable (resetToHardCodedDefaults: true);
+        }
+    }
+
+    [Fact]
+    public void Load_Empty_Scheme_Throws ()
+    {
+        try
+        {
+            Enable (resetToHardCodedDefaults: true);
+            ThrowOnJsonErrors = true;
+
+            // Create a test theme
+            RuntimeConfig = """
+                            {
+                                 "Theme": "TestTheme",
+                                 "Themes": [
+                                   {
+                                     "TestTheme": {
+                                       "Schemes": []
+                                     }
+                                   }
+                                 ]
+                            }
+                            """;
+
+            // Load the test theme
+            Load (ConfigLocations.Runtime);
+            Assert.Equal ("TestTheme", ThemeManager.Theme);
+
+            // Now reset everything and reload
+            ResetToCurrentValues ();
+
+            // Verify we're back to default
+            Assert.Equal ("Default", ThemeManager.Theme);
+        }
+        finally
+        {
+            Disable (resetToHardCodedDefaults: true);
+        }
+    }
+
+
     [Fact (Skip = "WIP")]
     public void Apply_UpdatesSchemes ()
     {

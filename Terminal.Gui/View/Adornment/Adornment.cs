@@ -89,7 +89,7 @@ public class Adornment : View, IDesignable
     /// <inheritdoc />
     protected override bool OnGettingScheme (out Scheme? scheme)
     {
-        scheme = _scheme ?? Parent?.GetScheme () ?? SchemeManager.GetCurrentSchemes () ["Base"]!;
+        scheme = _scheme ?? Parent?.GetScheme () ?? SchemeManager.GetScheme (Schemes.Base);
 
         return true;
     }

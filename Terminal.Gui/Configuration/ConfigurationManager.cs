@@ -777,6 +777,6 @@ public static class ConfigurationManager
         // Use the cached ScopeType property instead of reflection
         IEnumerable<KeyValuePair<string, ConfigProperty>>? scopedCache = cache?.Where (cp => cp.Value.ScopeType == scopeType);
 
-        return scopedCache;
+        return scopedCache!;
     }
 }

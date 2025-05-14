@@ -78,9 +78,7 @@ public class MenuBar : View, IDesignable
         //CanFocus = true;
         _selected = -1;
         _selectedSub = -1;
-        // ReSharper disable once VirtualMemberCallInConstructor
-        Scheme = SchemeManager.Schemes ["Menu"];
-        // ReSharper disable once VirtualMemberCallInConstructor
+        SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Menu);
         WantMousePositionReports = true;
         IsMenuOpen = false;
 
@@ -148,7 +146,7 @@ public class MenuBar : View, IDesignable
                                     {
                                         if (ctx is not CommandContext<KeyBinding> keyCommandContext)
                                         {
-                                            return false ;
+                                            return false;
                                         }
                                         if (keyCommandContext.Binding.Data is MouseEventArgs)
                                         {
@@ -391,7 +389,7 @@ public class MenuBar : View, IDesignable
                 mi = parent?.Children?.Length > 0 ? parent.Children [_openMenu!._currentChild] : null;
             }
         }
-        
+
         MenuOpened?.Invoke (this, new (parent, mi));
     }
 
@@ -625,7 +623,7 @@ public class MenuBar : View, IDesignable
 
                 if (Application.MouseGrabView == _openMenu)
                 {
-                    Application.UngrabMouse();
+                    Application.UngrabMouse ();
                 }
                 _openMenu?.Dispose ();
                 _openMenu = null;
@@ -878,7 +876,7 @@ public class MenuBar : View, IDesignable
                 if (SuperView is { })
                 {
                     SuperView.Add (_openMenu);
-                   // _openMenu.SetRelativeLayout (Application.Screen.Size);
+                    // _openMenu.SetRelativeLayout (Application.Screen.Size);
                 }
                 else
                 {

@@ -25,7 +25,7 @@ public class CharMap : View, IDesignable
     [RequiresDynamicCode ("AOT")]
     public CharMap ()
     {
-        base.Scheme = SchemeManager.Schemes! ["Dialog"]!;
+        SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
         CanFocus = true;
         CursorVisibility = CursorVisibility.Default;
 

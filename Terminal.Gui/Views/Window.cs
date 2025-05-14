@@ -25,7 +25,7 @@ public class Window : Toplevel
         CanFocus = true;
         TabStop = TabBehavior.TabGroup;
         Arrangement = ViewArrangement.Overlapped;
-        base.Scheme = SchemeManager.GetCurrentSchemes () ["Base"]!;
+        SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
         BorderStyle = DefaultBorderStyle;
         base.ShadowStyle = DefaultShadow;
     }
