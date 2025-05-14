@@ -14,7 +14,10 @@ internal static class ModuleInitializers
     /// of the library is used.
     /// </summary>
     [RequiresUnreferencedCode ("AOT")]
+#pragma warning disable CA2255
     [ModuleInitializer]
+    [RequiresDynamicCode ("Calls Terminal.Gui.ConfigurationManager.Initialize()")]
+#pragma warning restore CA2255
     internal static void InitializeConfigurationManager ()
     {
         // Initialize ConfigurationManager to ensure all configuration properties

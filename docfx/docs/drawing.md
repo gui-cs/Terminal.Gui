@@ -1,5 +1,19 @@
 # Drawing (Text, Lines, and Color)
 
+## Drawing Lexicon and Taxonomy
+
+| Term | Meaning |
+|:-----|:--------|
+| **Attribute** | Defines the concrete visual styling for a visual element, including Foreground color, Background color, and TextStyle. |
+| **BackgroundColor** | A property of `Attribute` that describes the color of background text. |
+| **Color** | Base terminal color (part of the color palette; supports TrueColor and named values like White, Black, Cyan, etc.). |
+| **ForegroundColor** | A property of `Attribute` that describes the color of foreground text. |
+| **Scheme** | A mapping from `VisualRole` to `Attribute`. Defines how visual elements should look based on their semantic purpose. |
+| **Style** | A property of `Attribute` that captures additional font-like hints such as bold, italic, underline, beyond color. |
+| **Theme** | A single named instance containing specific appearance settings (e.g., "Default", "Dark"). |
+| **Themes** | A collection of named Theme definitions, each of which bundles visual and layout settings. |
+| **VisualRole** | The semantic role/purpose of a visual element inside a View (e.g., Normal, Focus, HotFocus, Active, Disabled, ReadOnly). |
+
 Terminal.Gui provides a set of APIs for formatting text, line drawing, and character-based graphing. The fundamental concept is a @Terminal.Gui.Cell which occupies a particular row and column in the terminal. A Cell includes the character (glyph) that should be rendred by the terminal, and attributes that indicate how the glyph should be rendered (e.g. the foreground and background color).
 
 Color is supported on all platforms, including Windows, Mac, and Linux. The default colors are 24-bit RGB colors, but the library will gracefully degrade to 16-colors if the terminal does not support 24-bit color, and black and white if the terminal does not support 16-colors.

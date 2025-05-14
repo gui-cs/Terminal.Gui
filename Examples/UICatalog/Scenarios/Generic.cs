@@ -19,23 +19,12 @@ public sealed class Generic : Scenario
             BorderStyle = LineStyle.None
         };
 
-        var button = new Shortcut()
+        var button = new Button ()
         {
-            CanFocus = true,
-            Id = "button",
             X = Pos.Center (),
             Y = 1,
-            ShadowStyle = ShadowStyle.None,
-            Text = "HelpText",
-            Title = "Command",
-            Key = Key.F10,
-            HighlightStyle = HighlightStyle.None
+            Title = "_Button",
         };
-        button.Scheme = SchemeManager.Schemes ["Error"];
-
-        button.Padding!.Thickness = new (1);
-        button.Padding.Scheme = SchemeManager.Schemes ["Toplevel"];
-        button.Margin!.Thickness = new (1);
 
         button.Accepting += (s, e) =>
                             {

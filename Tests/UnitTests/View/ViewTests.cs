@@ -209,7 +209,9 @@ public class ViewTests
         Assert.Equal (new (0, 0, 0, 0), r.Viewport);
         Assert.Equal (new (0, 0, 0, 0), r.Frame);
         Assert.Null (r.Focused);
-        Assert.Null (r.Scheme);
+        Assert.False (r.HasScheme);
+        Assert.NotNull (r.Scheme);
+        Assert.Equal (r.Scheme, SchemeManager.GetCurrentSchemes () ["Base"]);
         Assert.Equal (0, r.Width);
         Assert.Equal (0, r.Height);
         Assert.Equal (0, r.X);
@@ -233,7 +235,9 @@ public class ViewTests
         Assert.Equal (new (0, 0, 0, 0), r.Viewport);
         Assert.Equal (new (0, 0, 0, 0), r.Frame);
         Assert.Null (r.Focused);
-        Assert.Null (r.Scheme);
+        Assert.False (r.HasScheme);
+        Assert.NotNull (r.Scheme);
+        Assert.Equal (r.Scheme, SchemeManager.GetCurrentSchemes () ["Base"]);
         Assert.Equal (0, r.Width);
         Assert.Equal (0, r.Height);
         Assert.Equal (0, r.X);
@@ -257,7 +261,9 @@ public class ViewTests
         Assert.Equal (new (0, 0, 3, 4), r.Viewport);
         Assert.Equal (new (1, 2, 3, 4), r.Frame);
         Assert.Null (r.Focused);
-        Assert.Null (r.Scheme);
+        Assert.False (r.HasScheme);
+        Assert.NotNull (r.Scheme);
+        Assert.Equal (r.Scheme, SchemeManager.GetCurrentSchemes () ["Base"]);
         Assert.Equal (3, r.Width);
         Assert.Equal (4, r.Height);
         Assert.Equal (1, r.X);
@@ -290,7 +296,9 @@ public class ViewTests
         Assert.Equal (new (0, 0, 1, 13), r.Viewport);
         Assert.Equal (new (0, 0, 1, 13), r.Frame);
         Assert.Null (r.Focused);
-        Assert.Null (r.Scheme);
+        Assert.False (r.HasScheme);
+        Assert.NotNull (r.Scheme);
+        Assert.Equal (r.Scheme, SchemeManager.GetCurrentSchemes () ["Base"]);
         Assert.False (r.IsCurrentTop);
         Assert.Equal (string.Empty, r.Id);
         Assert.Empty (r.SubViews);

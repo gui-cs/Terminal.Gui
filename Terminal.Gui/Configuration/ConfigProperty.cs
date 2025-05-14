@@ -19,8 +19,8 @@ namespace Terminal.Gui;
 /// </remarks>
 public class ConfigProperty
 {
-    /// <summary>INTERNAL: Describes the property.</summary>
-    internal PropertyInfo? PropertyInfo { get; set; }
+    /// <summary>Describes the property.</summary>
+    public PropertyInfo? PropertyInfo { get; set; }
 
     /// <summary>INTERNAL: Cached value of ConfigurationPropertyAttribute.OmitClassName; makes more AOT friendly.</summary>
     internal bool OmitClassName { get; set; }
@@ -164,13 +164,15 @@ public class ConfigProperty
     }
 
     /// <summary>
-    ///     INTERNAL: Updates (using reflection) <see cref="PropertyValue"/> with the value in <paramref name="source"/> using a deep memberwise copy.
+    ///     INTERNAL: Updates (using reflection) <see cref="PropertyValue"/> with the value in <paramref name="source"/> using a deep memberwise copy that
+    ///     copies only the values that <see cref="HasValue"/>.
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
     [RequiresUnreferencedCode ("Uses DeepCloner which requires types to be registered in SourceGenerationContext")]
-    internal object? DeepCloneFrom (object? source)
+    [RequiresDynamicCode ("Calls Terminal.Gui.DeepCloner.DeepClone<T>(T)")]
+    internal object? UpdateFrom (object? source)
     {
         // If the source (higher-priority layer) doesn't provide a value, keep the existing value
         // In the context of layering, a null source means the higher-priority layer doesn't specify a value,
@@ -190,19 +192,49 @@ public class ConfigProperty
                                         );
         }
 
-        // The source provides a value, so update PropertyValue
-        // Handle Scope<T>-specific logic for nested configuration scopes
-        if (source is SettingsScope settingsSource && PropertyValue is SettingsScope settingsDest)
+        if (source is Dictionary<string, ThemeScope> themeDictSource && PropertyValue is Dictionary<string, ThemeScope> themeDictDest)
         {
-            PropertyValue = settingsDest.DeepCloneFrom (settingsSource);
+            // Special case for ThemeScope dictionaries
+            foreach (KeyValuePair<string, ThemeScope> scope in themeDictSource)
+            {
+                if (!themeDictDest.ContainsKey (scope.Key))
+                {
+                    themeDictDest.Add (scope.Key, scope.Value);
+                }
+                themeDictDest [scope.Key].UpdateFrom (scope.Value);
+            }
         }
-        else if (source is ThemeScope themeSource && PropertyValue is ThemeScope themeDest)
+        else if (source is Dictionary<string, ConfigProperty> dictSource && PropertyValue is Dictionary<string, ConfigProperty> dictDest)
         {
-            PropertyValue = themeDest.DeepCloneFrom (themeSource);
+            foreach (KeyValuePair<string, ConfigProperty> sourceProp in dictSource)
+            {
+                if (!sourceProp.Value.HasValue)
+                {
+                    continue;
+                }
+
+                if (!dictDest.ContainsKey (sourceProp.Key))
+                {
+                    // Add the property to this scope
+                    ConfigProperty? copy = new ConfigProperty ()
+                    {
+                        Immutable = false,
+                        PropertyInfo = sourceProp.Value.PropertyInfo,
+                        OmitClassName = sourceProp.Value.OmitClassName,
+                        ScopeType = sourceProp.Value.ScopeType,
+                        HasValue = false
+                    };
+                    dictDest.Add (sourceProp.Key, copy);
+                }
+                dictDest [sourceProp.Key].UpdateFrom (sourceProp.Value);
+            }
         }
-        else if (source is AppSettingsScope appSource && PropertyValue is AppSettingsScope appDest)
+        else if (source is ConfigProperty configProperty)
         {
-            PropertyValue = appDest.DeepCloneFrom (appSource);
+            if (configProperty.HasValue)
+            {
+                PropertyValue = DeepCloner.DeepClone (configProperty.PropertyValue);
+            }
         }
         else
         {
@@ -219,7 +251,7 @@ public class ConfigProperty
     ///     INTERNAL: A cache of all classes that have properties decorated with the <see cref="ConfigurationPropertyAttribute"/>.
     /// </summary>
     /// <remarks>Is <see langword="null"/> until <see cref="Initialize"/> is called.</remarks>
-    internal static ImmutableSortedDictionary<string, Type>? _classesWithConfigProps;
+    private static ImmutableSortedDictionary<string, Type>? _classesWithConfigProps;
 
     /// <summary>
     /// INTERNAL: Called from the <see cref="ModuleInitializers.InitializeConfigurationManager"/> method to initialize the

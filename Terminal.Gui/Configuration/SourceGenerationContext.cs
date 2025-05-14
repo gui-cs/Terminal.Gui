@@ -30,6 +30,7 @@ namespace Terminal.Gui;
 [JsonSerializable (typeof (Dictionary<string, ConfigProperty>))]
 [JsonSerializable (typeof (ConfigProperty))]
 
+[JsonSerializable (typeof (Scope<string>))]
 [JsonSerializable (typeof (AppSettingsScope))]
 [JsonSerializable (typeof (SettingsScope))]
 [JsonSerializable (typeof (Dictionary<string, ThemeScope>))]

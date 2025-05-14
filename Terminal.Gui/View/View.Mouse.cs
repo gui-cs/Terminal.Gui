@@ -87,7 +87,7 @@ public partial class View // Mouse APIs
         }
 
         // Post-conditions
-        if (HighlightStyle.HasFlag (HighlightStyle.Hover) || Diagnostics.HasFlag (ViewDiagnosticFlags.Hover))
+        if (HighlightStyle.HasFlag (HighlightStyle.Hover)/* || Diagnostics.HasFlag (ViewDiagnosticFlags.Hover)*/)
         {
             HighlightStyle copy = HighlightStyle;
             var hover = HighlightStyle.Hover;
@@ -98,11 +98,15 @@ public partial class View // Mouse APIs
                 return args.Cancel;
             }
 
-            Scheme? cs = _scheme;
+            if (HasScheme)
+            {
+                Scheme? cs = Scheme;
 
-            _savedNonHoverScheme = cs;
+                _savedNonHoverScheme = cs;
 
-            _scheme = GetHighlightScheme ();
+                Scheme = GetHighlightScheme ();
+            }
+
             SetNeedsDraw ();
         }
 
@@ -113,10 +117,10 @@ public partial class View // Mouse APIs
     ///     Gets the <see cref="Scheme"/> to use when the view is highlighted. The highlight colorscheme
     ///     is based on the current <see cref="Scheme"/>, using <see cref="Color.GetHighlightColor()"/>.
     /// </summary>
-    /// <remarks>The highlight color scheme.</remarks>
-    public Scheme? GetHighlightScheme ()
+    /// <remarks>The highlight scheme.</remarks>
+    public Scheme GetHighlightScheme ()
     {
-        Scheme? cs = _scheme ?? SuperView?.Scheme ?? new Scheme ();
+        Scheme cs = GetScheme ();
 
         return cs with
         {
@@ -208,18 +212,17 @@ public partial class View // Mouse APIs
         // Post-conditions
         _hovering = false;
 
-        if (HighlightStyle.HasFlag (HighlightStyle.Hover) || Diagnostics.HasFlag (ViewDiagnosticFlags.Hover))
+        if (HighlightStyle.HasFlag (HighlightStyle.Hover)/* || Diagnostics.HasFlag (ViewDiagnosticFlags.Hover)*/)
         {
             HighlightStyle copy = HighlightStyle;
             var hover = HighlightStyle.None;
             RaiseHighlight (new (ref copy, ref hover));
 
-            // if (_savedNonHoverScheme is { })
+            if (HasScheme && _savedNonHoverScheme is { })
             {
-                _scheme = _savedNonHoverScheme;
+                Scheme = _savedNonHoverScheme;
                 _savedNonHoverScheme = null;
                 SetNeedsDraw ();
-
             }
         }
     }
@@ -732,9 +735,9 @@ public partial class View // Mouse APIs
 
         if (args.NewValue.HasFlag (HighlightStyle.Pressed) || args.NewValue.HasFlag (HighlightStyle.PressedOutside))
         {
-            if (_savedHighlightScheme is null && _scheme is { })
+            if (_savedHighlightScheme is null && HasScheme)
             {
-                _savedHighlightScheme = _scheme;
+                _savedHighlightScheme = Scheme;
 
                 if (Scheme is null)
                 {
@@ -748,7 +751,7 @@ public partial class View // Mouse APIs
                         // Highlight the foreground focus color
                         Focus = new (Scheme.Focus.Foreground.GetHighlightColor (), Scheme.Focus.Background.GetHighlightColor ())
                     };
-                    _scheme = cs;
+                    Scheme = cs;
                 }
                 else
                 {
@@ -757,7 +760,7 @@ public partial class View // Mouse APIs
                         // Invert Focus color foreground/background. We can do this because we know the view is not going to be focused.
                         Normal = new (Scheme.Focus.Background, Scheme.Normal.Foreground)
                     };
-                    _scheme = cs;
+                    Scheme = cs;
                 }
             }
 
@@ -765,10 +768,10 @@ public partial class View // Mouse APIs
             return false;
         }
 
-        if (args.NewValue == HighlightStyle.None)
+        if (HasScheme && args.NewValue == HighlightStyle.None)
         {
             // Unhighlight
-            _scheme = _savedHighlightScheme;
+            Scheme = _savedHighlightScheme;
             _savedHighlightScheme = null;
             SetNeedsDraw ();
         }

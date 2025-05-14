@@ -104,34 +104,12 @@ public class Margin : Adornment
         ShadowStyle = base.ShadowStyle;
     }
 
-    // TODO: We may actualy need this. Not clear what broke, if anything by commenting it out. See https://github.com/gui-cs/Terminal.Gui/issues/4016
-    /////// <summary>
-    ///////     The color scheme for the Margin. If set to <see langword="null"/> (the default), the margin will be transparent.
-    /////// </summary>
-    //public override Scheme? Scheme
-    //{
-    //    get
-    //    {
-    //        //if (base.Scheme is { })
-    //        {
-    //            return base.Scheme;
-    //        }
-
-    //        //return (Parent?.SuperView?.Scheme ?? Colors.Schemes ["TopLevel"])!;
-    //    }
-    //    set
-    //    {
-    //        base.Scheme = value;
-    //        Parent?.SetNeedsDraw ();
-    //    }
-    //}
-
     /// <inheritdoc />
     public override Attribute GetNormalColor ()
     {
-        if (_scheme is { })
+        if (Scheme is { })
         {
-            return _scheme.Normal;
+            return Scheme.Normal;
         }
         if (Parent is { })
         {
@@ -197,7 +175,7 @@ public class Margin : Adornment
         Rectangle screen = ViewportToScreen (Viewport);
 
         // This just draws/clears the thickness, not the insides.
-        if (Diagnostics.HasFlag (ViewDiagnosticFlags.Thickness) || base.Scheme is { })
+        if (Diagnostics.HasFlag (ViewDiagnosticFlags.Thickness) || HasScheme)
         {
             // TODO: This is a hack. See https://github.com/gui-cs/Terminal.Gui/issues/4016
             SetAttribute (GetNormalColor ());

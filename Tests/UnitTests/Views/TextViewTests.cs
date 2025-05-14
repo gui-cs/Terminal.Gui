@@ -4802,7 +4802,7 @@ This is the second line.
             {
                 foreach (Cell cell in cells)
                 {
-                    Assert.Equal ("[Red,Green]", cell.Attribute.ToString ());
+                    Assert.Equal ("[Red,Green,None]", cell.Attribute.ToString ());
                 }
             }
         }

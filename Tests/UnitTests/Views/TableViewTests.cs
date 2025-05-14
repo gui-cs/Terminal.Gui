@@ -2569,9 +2569,6 @@ A B C
     [SetupFakeDriver]
     public void TestTableViewCheckboxes_ByObject ()
     {
-        CM.Enable ();
-        CM.Load (ConfigLocations.LibraryResources);
-
         TableView tv = GetPetTable (out EnumerableTableSource<PickablePet> source);
         tv.LayoutSubViews ();
         IReadOnlyCollection<PickablePet> pets = source.Data;

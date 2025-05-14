@@ -280,7 +280,7 @@ This an long line and against TextView.",
     {
         var tv = new TextView ();
 
-        // to begin with we should be using the default menu color scheme
+        // to begin with we should be using the default menu scheme
         Assert.Same (SchemeManager.Schemes ["Menu"], tv.Autocomplete.Scheme);
 
         // allocate a new custom scheme

@@ -3,11 +3,13 @@
 
 // A simple Terminal.Gui example in C# - using C# 9.0 Top-level statements
 
-using System;
 using Terminal.Gui;
 
 // Override the default configuration for the application to use the Light theme
+ConfigurationManager.Enable();
 ConfigurationManager.RuntimeConfig = """{ "Theme": "Light" }""";
+ConfigurationManager.Load (ConfigLocations.Runtime);
+ConfigurationManager.Apply ();
 
 Application.Run<ExampleWindow> ().Dispose ();
 
@@ -21,7 +23,7 @@ Console.WriteLine ($@"Username: {ExampleWindow.UserName}");
 // Defines a top-level window with border and title
 public class ExampleWindow : Window
 {
-    public static string UserName;
+    public static string UserName { get; set; }
 
     public ExampleWindow ()
     {

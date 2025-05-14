@@ -1,13 +1,10 @@
 ﻿#nullable enable
 
-global using static Terminal.Gui.ConfigurationManager;
-global using CM = Terminal.Gui.ConfigurationManager;
 using System.Collections.Frozen;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Runtime.Versioning;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -35,25 +32,28 @@ namespace Terminal.Gui;
 ///         <c>UICatalog.config.json</c>).
 ///     </para>
 ///     <para>
-///     Settings are applied using the precedence defined in <see cref="ConfigLocations"/>.
+///         Settings are applied using the precedence defined in <see cref="ConfigLocations"/>.
 ///     </para>
 ///     <para>
-///     Configuration Management is based on static properties decorated with the <see cref="ConfigurationPropertyAttribute"/>. Since these properties are static, changes to
-///     configuration settings are applied process-wide.
+///         Configuration Management is based on static properties decorated with the
+///         <see cref="ConfigurationPropertyAttribute"/>. Since these properties are static, changes to
+///         configuration settings are applied process-wide.
 ///     </para>
 ///     <para>
-///     Configuration Management is disabled by default and can be enabled by setting calling <see cref="ConfigurationManager.Enable"/>.
+///         Configuration Management is disabled by default and can be enabled by setting calling
+///         <see cref="ConfigurationManager.Enable"/>.
 ///     </para>
 ///     <para>
-///     See the UICatalog example for a complete example of how to use ConfigurationManager.
-///     See the Configuration Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/config.html"/>.
+///         See the UICatalog example for a complete example of how to use ConfigurationManager.
+///         See the Configuration Deep Dive for more information:
+///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/config.html"/>.
 ///     </para>
 /// </summary>
 public static class ConfigurationManager
 {
     /// <summary>The backing property for <see cref="Settings"/> (config settings of <see cref="SettingsScope"/>).</summary>
     /// <remarks>
-    ///     Is <see langword="null"/> until <see cref="Reset"/> is called. Gets set to a new instance by
+    ///     Is <see langword="null"/> until <see cref="ResetToCurrentValues"/> is called. Gets set to a new instance by
     ///     deserialization
     ///     (see <see cref="Load"/>).
     /// </remarks>
@@ -131,7 +131,8 @@ public static class ConfigurationManager
 
     /// <summary>
     ///     An immutable cache of all <see cref="ConfigProperty"/>s in module decorated with the
-    ///     <see cref="ConfigurationPropertyAttribute"/> attribute. Bott the dictionary and the contained <see cref="ConfigProperty"/>s
+    ///     <see cref="ConfigurationPropertyAttribute"/> attribute. Bott the dictionary and the contained
+    ///     <see cref="ConfigProperty"/>s
     ///     are immutable.
     /// </summary>
     /// <remarks>Is <see langword="null"/> until <see cref="Initialize"/> is called.</remarks>
@@ -146,11 +147,13 @@ public static class ConfigurationManager
     ///     For ConfigurationManager to access config resources, <see cref="IsEnabled"/> needs to be
     ///     set to <see langword="true"/> after this method has been called.
     /// </summary>
-    [RequiresDynamicCode ("Uses reflection to scan assemblies for configuration properties. " +
-                          "Only called during initialization and not needed during normal operation. " +
-                          "In AOT environments, ensure all types with ConfigurationPropertyAttribute are preserved.")]
-    [RequiresUnreferencedCode ("Reflection requires all types with ConfigurationPropertyAttribute to be preserved in AOT. " +
-                               "Use the SourceGenerationContext to register all configuration property types.")]
+    [RequiresDynamicCode (
+                             "Uses reflection to scan assemblies for configuration properties. "
+                             + "Only called during initialization and not needed during normal operation. "
+                             + "In AOT environments, ensure all types with ConfigurationPropertyAttribute are preserved.")]
+    [RequiresUnreferencedCode (
+                                  "Reflection requires all types with ConfigurationPropertyAttribute to be preserved in AOT. "
+                                  + "Use the SourceGenerationContext to register all configuration property types.")]
     internal static void Initialize ()
     {
         lock (_initializedLock)
@@ -189,18 +192,18 @@ public static class ConfigurationManager
             _initialized = true;
         }
 
-        ResetToHardCodedDefaults();
+        LoadHardCodedDefaults ();
     }
 
     #endregion Initialization
 
     #region Enable/Disable
 
-    private static bool _enabled = false;
+    private static bool _enabled;
     private static readonly object _enabledLock = new ();
+
     /// <summary>
     ///     Gets whether <see cref="ConfigurationManager"/> is enabled or not.
-    ///     If <see langword="true"/>, the <see cref="ConfigurationManager"/> is enabled <see cref="Load"/> will load configurations from <see cref="Locations"/>.
     ///     If <see langword="false"/>, only the hard coded defaults will be loaded. See <see cref="Enable"/> and
     ///     <see cref="Disable"/>
     /// </summary>
@@ -216,9 +219,12 @@ public static class ConfigurationManager
     }
 
     /// <summary>
-    ///     Enables <see cref="ConfigurationManager"/>. The first time Enable is called, <see cref="Settings"/> will be reset to
+    ///     Enables <see cref="ConfigurationManager"/>. The first time Enable is called, <see cref="Settings"/> will be reset
+    ///     to
     ///     with the current values of the static <see cref="ConfigurationPropertyAttribute"/> properties.
     /// </summary>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     public static void Enable ()
     {
         if (IsEnabled)
@@ -229,13 +235,13 @@ public static class ConfigurationManager
         lock (_enabledLock)
         {
             _enabled = true;
+
             if (_settings is null)
             {
                 // If _settings is null, we need to load the settings from the current values of the static properties
                 ResetToCurrentValues ();
             }
         }
-
     }
 
     /// <summary>
@@ -257,15 +263,17 @@ public static class ConfigurationManager
     #endregion Enable/Disable
 
     #region Reset
+
     // `Reset` - Reset the configuration to either the current values or the hard-coded defaults.
     // Resetting does not load the configuration; it only resets the configuration to the default values.
 
     /// <summary>
-    ///     INTERNAL: Resets <see cref="ConfigurationManager"/>. Clears JsonErrors and loads all settings from the current values of the static <see cref="ConfigurationPropertyAttribute"/> properties.
+    ///     INTERNAL: Resets <see cref="ConfigurationManager"/>. Clears JsonErrors and loads all settings from the current
+    ///     values of the static <see cref="ConfigurationPropertyAttribute"/> properties.
     /// </summary>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    internal static void Reset ()
+    internal static void ResetToCurrentValues ()
     {
         if (!IsInitialized ())
         {
@@ -285,41 +293,23 @@ public static class ConfigurationManager
             _settingsLockSlim.ExitWriteLock ();
         }
 
-        _cachedAppSettingsLock.EnterWriteLock ();
+        //_cachedAppSettingsLock.EnterWriteLock ();
 
-        try
-        {
-            _cachedAppSettings = new ();
-        }
-        finally
-        {
-            _cachedAppSettingsLock.ExitWriteLock ();
-        }
-
-        ResetToCurrentValues ();
-    }
-
-    /// <summary>
-    ///     INTERNAL: Resets all settings to the current values of the static <see cref="ConfigurationPropertyAttribute"/> properties.
-    /// </summary>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-    internal static void ResetToCurrentValues ()
-    {
-        if (!IsInitialized ())
-        {
-            throw new InvalidOperationException ("Initialize must be called first.");
-        }
-
-        Settings = new ();
-        Settings.UpdateToCurrentValues ();
-        ThemeManager.UpdateToCurrentValues ();
-        AppSettings?.UpdateToCurrentValues ();
-
-        //foreach (KeyValuePair<string, ConfigProperty> p in Settings!.Where (cp => cp.Value.PropertyInfo is { }))
+        //try
         //{
-        //    Settings! [p.Key].PropertyValue = p.Value.PropertyInfo?.GetValue (null);
+        //    _cachedAppSettings = new ();
         //}
+        //finally
+        //{
+        //    _cachedAppSettingsLock.ExitWriteLock ();
+        //}
+
+        Settings!.LoadCurrentValues ();
+        ThemeManager.UpdateToCurrentValues ();
+
+        //AppSettings?.LoadCurrentValues ();
+
+        Apply ();
     }
 
     /// <summary>
@@ -330,37 +320,53 @@ public static class ConfigurationManager
     [RequiresDynamicCode ("AOT")]
     internal static void ResetToHardCodedDefaults ()
     {
+        LoadHardCodedDefaults ();
+        Applied = null;
+        Updated = null;
+        Apply ();
+    }
+
+    #endregion Reset
+
+    #region Load
+
+    // `Load` - Load configuration from the given location(s), updating the configuration with any new values.
+    // Loading does not apply the settings to the application; that happens when the `Apply` method is called.
+
+    /// <summary>
+    ///     INTERNAL: Loads all hard-coded configuration properties. Use <see cref="Apply"/> to cause the loaded settings to be
+    ///     applied to the running application.
+    /// </summary>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
+    internal static void LoadHardCodedDefaults ()
+    {
         if (!IsInitialized ())
         {
             throw new InvalidOperationException ("Initialize must be called first.");
         }
 
-        SourcesManager!.Sources.Clear();
+        RuntimeConfig = null;
+        SourcesManager!.Sources.Clear ();
         SourcesManager.AddSource (ConfigLocations.HardCoded, "HardCoded");
 
         Settings = new ();
-        Settings!.UpdateToHardCodedDefaults ();
-        ThemeManager.UpdateToHardCodedDefaults ();
-        AppSettings!.UpdateToHardCodedDefaults ();
+        Settings!.LoadHardCodedDefaults ();
+        ThemeManager.ResetToHardCodedDefaults ();
     }
 
-    #endregion Reset
-
-
-    #region Load
-    // `Load` - Load configuration from the given location(s), updating the configuration with any new values.
-    // Loading does not apply the settings to the application; that happens when the `Apply` method is called.
-
     /// <summary>
-    ///     Loads all settings found in <paramref name="locations"/>. Use <see cref="Apply"/> to cause the loaded settings to be applied to the running application.
+    ///     Loads all settings found in <paramref name="locations"/>. Use <see cref="Apply"/> to cause the loaded settings to
+    ///     be applied to the running application.
     /// </summary>
+    /// <exception cref="ConfigurationManagerNotEnabledException">Configuration manager is not enabled.</exception>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public static void Load (ConfigLocations locations)
     {
         if (!IsEnabled)
         {
-            throw new InvalidOperationException ("ConfigurationManager is not enabled.");
+            throw new ConfigurationManagerNotEnabledException ();
         }
 
         // TODO: We ignore HardCodedDefaults. Use ResetToHardCodedDefaults to reset to hard coded defaults? Or 
@@ -369,11 +375,10 @@ public static class ConfigurationManager
         if (locations.HasFlag (ConfigLocations.LibraryResources))
         {
             SourcesManager?.Load (
-                                                Settings,
-                                                typeof (ConfigurationManager).Assembly,
-                                                $"Terminal.Gui.Resources.{_configFilename}",
-                                                ConfigLocations.LibraryResources
-                                               );
+                                  Settings,
+                                  typeof (ConfigurationManager).Assembly,
+                                  $"Terminal.Gui.Resources.{_configFilename}",
+                                  ConfigLocations.LibraryResources);
         }
 
         if (locations.HasFlag (ConfigLocations.AppResources))
@@ -429,6 +434,12 @@ public static class ConfigurationManager
     public static void OnUpdated ()
     {
         //Logging.Trace (@"");
+
+        if (!IsEnabled)
+        {
+            return;
+        }
+
         // Use a local copy of the event delegate when invoking it to avoid race conditions.
         EventHandler<ConfigurationManagerEventArgs>? handler = Updated;
         handler?.Invoke (null, new ());
@@ -439,23 +450,23 @@ public static class ConfigurationManager
 
     #endregion Load
 
-
-
     #region Apply
+
     // `Apply` - Apply the configuration to the application; this means the settings are copied from the
     // configuration properties to the corresponding `static` `[ConfigurationProperty]` properties.
 
     /// <summary>
     ///     Applies the configuration settings to static <see cref="ConfigurationPropertyAttribute"/> properties.
+    ///     ConfigurationManager must be Enabled.
     /// </summary>
+    /// <exception cref="ConfigurationManagerNotEnabledException">Configuration Manager is not enabled.</exception>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public static void Apply ()
     {
         if (!IsEnabled)
         {
-            Logging.Trace ("ConfigurationManager is disabled.");
-            return;
+            throw new ConfigurationManagerNotEnabledException ();
         }
 
         var settings = false;
@@ -468,8 +479,9 @@ public static class ConfigurationManager
             {
                 // First start. Apply settings first.
                 settings = Settings?.Apply () ?? false;
+
                 themes = !string.IsNullOrEmpty (ThemeManager.Theme)
-                                             && (ThemeManager.Themes? [ThemeManager.Theme]?.Apply () ?? false);
+                         && (ThemeManager.Themes? [ThemeManager.Theme]?.Apply () ?? false);
             }
             else
             {
@@ -506,7 +518,10 @@ public static class ConfigurationManager
     /// </summary>
     public static void OnApplied ()
     {
-        //Logging.Trace ("");
+        if (!IsEnabled)
+        {
+            return;
+        }
 
         // Use a local copy of the event delegate when invoking it to avoid race conditions.
         EventHandler<ConfigurationManagerEventArgs>? handler = Applied;
@@ -523,16 +538,19 @@ public static class ConfigurationManager
     #endregion Apply
 
     #region Sources
+
     // `Sources` - A source is a location where a configuration can be stored. Sources are defined in the `ConfigLocations` enum.
 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     internal static readonly SourceGenerationContext SerializerContext = new (
                                                                               new JsonSerializerOptions
                                                                               {
+                                                                                  // Be relaxed
                                                                                   ReadCommentHandling = JsonCommentHandling.Skip,
                                                                                   PropertyNameCaseInsensitive = true,
                                                                                   DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                                                                                   WriteIndented = true,
+
                                                                                   Converters =
                                                                                   {
                                                                                       // We override the standard Rune converter to support specifying Glyphs in
@@ -547,7 +565,6 @@ public static class ConfigurationManager
                                                                                   Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
                                                                                   TypeInfoResolver = SourceGenerationContext.Default
                                                                               });
-
 
     /// <summary>
     ///     Gets the Sources Manager - manages the loading of configuration sources from files and resources.
@@ -565,42 +582,55 @@ public static class ConfigurationManager
     #endregion Sources
 
     #region AppSettings
+
     // TODO: Encapsulate in AppSettingsManager like ThemeManager
 
-    /// <summary>
-    ///     Since AppSettings is a dynamic property, we need to cache the value of the current appsettings for when CM is not enabled.
-    /// </summary>
-    private static AppSettingsScope? _cachedAppSettings;
-
-    private static readonly ReaderWriterLockSlim _cachedAppSettingsLock = new ();
-
+    ///// <summary>
+    /////     AppSettings's source of truth.
+    ///// </summary>
     /// <summary>Application-specific configuration settings (config properties with the <see cref="AppSettingsScope"/> scope.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
     [JsonPropertyName ("AppSettings")]
     public static AppSettingsScope? AppSettings
     {
+        [RequiresUnreferencedCode ("AOT")]
+        [RequiresDynamicCode ("AOT")]
         get
         {
             if (!IsInitialized ())
             {
                 // We're being called from the module initializer.
                 // Hard coded default value is an empty AppSettingsScope
-                return _cachedAppSettings = new AppSettingsScope ();
+                var appSettings = new AppSettingsScope ();
+                appSettings.LoadCurrentValues ();
+
+                return appSettings;
             }
 
-            if (!IsEnabled)
-            {
-                // If CM is not enabled, return current value
-                return _cachedAppSettings!;
-            }
+            //if (!IsEnabled)
+            //{
+            //     If CM is not enabled, e
+            //    var appSettings = new AppSettingsScope ();
+            //    return _cachedAppSettings = appSettings;
+            //}
 
-            if (Settings is { } && Settings.TryGetValue ("AppSettings", out ConfigProperty? appsettingsConfigProperty))
+            if (Settings is { } && Settings.TryGetValue ("AppSettings", out ConfigProperty? appSettingsConfigProperty))
             {
-                return (appsettingsConfigProperty.PropertyValue as AppSettingsScope)!;
+                if (!appSettingsConfigProperty.HasValue)
+                {
+                    var appSettings = new AppSettingsScope ();
+                    appSettings.LoadCurrentValues ();
+
+                    return appSettings;
+                }
+
+                return (appSettingsConfigProperty.PropertyValue as AppSettingsScope)!;
             }
 
             throw new InvalidOperationException ("Settings is null.");
         }
+        [RequiresUnreferencedCode ("AOT")]
+        [RequiresDynamicCode ("AOT")]
         set
         {
             if (!IsInitialized ())
@@ -610,36 +640,26 @@ public static class ConfigurationManager
 
             if (!IsEnabled)
             {
-                _cachedAppSettingsLock.EnterWriteLock ();
-
-                try
-                {
-                    _cachedAppSettings = value;
-                }
-                finally
-                {
-                    _cachedAppSettingsLock.ExitWriteLock ();
-                }
-
-                return;
+                throw new ConfigurationManagerNotEnabledException ();
             }
 
             // Check if the AppSettings is the same as the previous one
-            if (value != _cachedAppSettings)
+            if (value != Settings! ["AppSettings"].PropertyValue)
             {
+                //_cachedAppSettingsLock.EnterWriteLock ();
+
+                //try
+                //{
+                //    _cachedAppSettings = value;
+                //}
+                //finally
+                //{
+                //    _cachedAppSettingsLock.ExitWriteLock ();
+                //}
+
                 // Update the backing store
                 Settings! ["AppSettings"].PropertyValue = value;
 
-                _cachedAppSettingsLock.EnterWriteLock ();
-
-                try
-                {
-                    _cachedAppSettings = value;
-                }
-                finally
-                {
-                    _cachedAppSettingsLock.ExitWriteLock ();
-                }
                 //Instance.OnThemeChanged (previousThemeValue);
             }
         }
@@ -716,6 +736,7 @@ public static class ConfigurationManager
         {
             throw new InvalidOperationException ("GetHardCodedConfigPropertiesByScope returned null.");
         }
+
         Dictionary<string, ConfigProperty> settingsDict = settings.ToDictionary ();
 
         foreach (KeyValuePair<string, ConfigProperty> p in Settings!.Where (cp => cp.Value.PropertyInfo is { }))
@@ -754,6 +775,7 @@ public static class ConfigurationManager
         IEnumerable<KeyValuePair<string, ConfigProperty>>? filtered = _allConfigPropertiesCache?.Where (cp => cp.Value.ScopeType == scopeType);
 
         Debug.Assert (filtered is { });
+
         return filtered;
     }
 

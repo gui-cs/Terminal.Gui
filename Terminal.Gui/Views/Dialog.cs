@@ -2,7 +2,7 @@
 
 /// <summary>
 ///     The <see cref="Dialog"/> <see cref="View"/> is a <see cref="Window"/> that by default is centered and contains
-///     one or more <see cref="Button"/>s. It defaults to the <c>Colors.Schemes ["Dialog"]</c> color scheme and has a
+///     one or more <see cref="Button"/>s. It defaults to the <c>Colors.Schemes ["Dialog"]</c> scheme and has a
 ///     1 cell padding around the edges.
 /// </summary>
 /// <remarks>

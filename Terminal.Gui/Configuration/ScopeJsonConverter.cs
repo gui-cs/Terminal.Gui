@@ -11,14 +11,14 @@ namespace Terminal.Gui;
 ///     Converts <see cref="Scope{T}"/> instances to/from JSON. Does all the heavy lifting of reading/writing config
 ///     data to/from <see cref="ConfigurationManager"/> JSON documents.
 /// </summary>
-/// <typeparam name="scopeT"></typeparam>
+/// <typeparam name="TScopeT"></typeparam>
 
 [RequiresUnreferencedCode ("AOT")]
-internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] scopeT> : JsonConverter<scopeT> where scopeT : Scope<scopeT>
+internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TScopeT> : JsonConverter<TScopeT> where TScopeT : Scope<TScopeT>
 {
     [RequiresDynamicCode ("Calls System.Type.MakeGenericType(params Type[])")]
 #pragma warning disable IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
-    public override scopeT Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override TScopeT Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 #pragma warning restore IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
     {
         if (reader.TokenType != JsonTokenType.StartObject)
@@ -28,7 +28,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                                     );
         }
 
-        var scope = (scopeT)Activator.CreateInstance (typeof (scopeT))!;
+        var scope = (TScopeT)Activator.CreateInstance (typeof (TScopeT))!;
 
         while (reader.Read ())
         {
@@ -61,7 +61,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                     {
                         var factory = (JsonConverterFactory)converter;
 
-                        if (propertyType is { } && factory.CanConvert (propertyType))
+                        if (factory.CanConvert (propertyType))
                         {
                             converter = factory.CreateConverter (propertyType, options);
                         }
@@ -69,7 +69,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
 
                     try
                     {
-                        Type? type = (Type?)typeof (ReadHelper<>).MakeGenericType (typeof (scopeT), propertyType!);
+                        Type? type = (Type?)typeof (ReadHelper<>).MakeGenericType (typeof (TScopeT), propertyType!);
                         ReadHelper? readHelper = Activator.CreateInstance (type!, converter) as ReadHelper;
 
                         scope! [propertyName].PropertyValue = readHelper?.Read (ref reader, propertyType!, options);
@@ -81,7 +81,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                                                  e
                                                 );
                     }
-                    catch (TargetInvocationException _)
+                    catch (TargetInvocationException)
                     {
                         try
                         {
@@ -98,7 +98,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                     try
                     {
                         scope! [propertyName].PropertyValue =
-                            JsonSerializer.Deserialize (ref reader, propertyType!, SerializerContext);
+                            JsonSerializer.Deserialize (ref reader, propertyType!, ConfigurationManager.SerializerContext);
                     }
                     catch (Exception)
                     {
@@ -148,7 +148,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                 if (property is { })
                 {
                     PropertyInfo prop = scope.GetType ().GetProperty (propertyName!)!;
-                    prop.SetValue (scope, JsonSerializer.Deserialize (ref reader, prop.PropertyType, SerializerContext));
+                    prop.SetValue (scope, JsonSerializer.Deserialize (ref reader, prop.PropertyType, ConfigurationManager.SerializerContext));
                 }
                 else
                 {
@@ -163,7 +163,8 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
         throw new JsonException ("ScopeJsonConverter");
     }
 
-    public override void Write (Utf8JsonWriter writer, scopeT scope, JsonSerializerOptions options)
+    [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "<Pending>")]
+    public override void Write (Utf8JsonWriter writer, TScopeT scope, JsonSerializerOptions options)
     {
         writer.WriteStartObject ();
 
@@ -178,7 +179,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
         {
             writer.WritePropertyName (ConfigProperty.GetJsonPropertyName (p));
             object? prop = scope.GetType ().GetProperty (p.Name)?.GetValue (scope);
-            JsonSerializer.Serialize (writer, prop, prop!.GetType (), SerializerContext);
+            JsonSerializer.Serialize (writer, prop, prop!.GetType (), ConfigurationManager.SerializerContext);
         }
 
         foreach (KeyValuePair<string, ConfigProperty> p in from p in scope
@@ -190,7 +191,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                                                                                    )
                                                                                is
                                                                                ConfigurationPropertyAttribute scp
-                                                                           && scp?.Scope == typeof (scopeT)
+                                                                           && scp?.Scope == typeof (TScopeT)
                                                                       )
                                                            where p.Value.PropertyValue != null
                                                            select p)
@@ -224,7 +225,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
             else
             {
                 object? prop = p.Value.PropertyValue;
-                JsonSerializer.Serialize (writer, prop, prop!.GetType (), SerializerContext);
+                JsonSerializer.Serialize (writer, prop, prop!.GetType (), ConfigurationManager.SerializerContext);
             }
         }
 
@@ -237,18 +238,16 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
         public abstract object? Read (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options);
     }
 
-    internal class ReadHelper<converterT> : ReadHelper
+    [method: RequiresUnreferencedCode ("Calls System.Delegate.CreateDelegate(Type, Object, String)")]
+    internal class ReadHelper<TConverter> (object converter) : ReadHelper
     {
-        private readonly ReadDelegate _readDelegate;
-
-        [RequiresUnreferencedCode ("Calls System.Delegate.CreateDelegate(Type, Object, String)")]
-        public ReadHelper (object converter) { _readDelegate = (ReadDelegate)Delegate.CreateDelegate (typeof (ReadDelegate), converter, "Read"); }
+        private readonly ReadDelegate _readDelegate = (ReadDelegate)Delegate.CreateDelegate (typeof (ReadDelegate), converter, "Read");
 
         public override object? Read (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options)
         {
             return _readDelegate.Invoke (ref reader, type, options);
         }
 
-        private delegate converterT ReadDelegate (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options);
+        private delegate TConverter ReadDelegate (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options);
     }
 }

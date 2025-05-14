@@ -20,6 +20,9 @@ public class TestRespondersDisposedAttribute : BeforeAfterTestAttribute
     public override void After (MethodInfo methodUnderTest)
     {
         Debug.WriteLine ($"After: {methodUnderTest.Name}");
+
+        Debug.Assert (!CM.IsEnabled, "This test left ConfigurationManager enabled!");
+
         base.After (methodUnderTest);
 
 #if DEBUG_IDISPOSABLE

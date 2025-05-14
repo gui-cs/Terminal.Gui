@@ -14,10 +14,8 @@ using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using Terminal.Gui;
-using static Terminal.Gui.ConfigurationManager;
 using Command = Terminal.Gui.Command;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
-using ThemeManager = Terminal.Gui.ThemeManager;
 
 #nullable enable
 
@@ -219,24 +217,10 @@ public class UICatalog
         // Run UI Catalog UI. When it exits, if _selectedScenario is != null then
         // a Scenario was selected. Otherwise, the user wants to quit UI Catalog.
 
-        if (!Options.DontEnableConfigurationManagement)
-        {
-            ConfigurationManager.Enable ();
-        }
-
         // If the user specified a driver on the command line then use it,
         // ignoring Config files.
 
         Application.Init (driverName: _forceDriver);
-
-        if (string.IsNullOrWhiteSpace (UICatalogTop.CachedTheme))
-        {
-            UICatalogTop.CachedTheme = ThemeManager.Theme;
-        }
-        else
-        {
-            ThemeManager.Theme = UICatalogTop.CachedTheme;
-        }
 
         UICatalogTop top = Application.Run<UICatalogTop> ();
         top.Dispose ();
@@ -320,13 +304,16 @@ public class UICatalog
             return;
         }
 
-        Load (ConfigLocations.All);
-        Apply ();
+        ConfigurationManager.Load (ConfigLocations.All);
+        ConfigurationManager.Apply ();
     }
 
     private static void UICatalogMain (UICatalogCommandLineOptions options)
     {
-        StartConfigFileWatcher ();
+        if (ConfigurationManager.IsEnabled)
+        {
+            StartConfigFileWatcher ();
+        }
 
         // By setting _forceDriver we ensure that if the user has specified a driver on the command line, it will be used
         // regardless of what's in a config file.
@@ -336,6 +323,13 @@ public class UICatalog
         // run it and exit when done.
         if (options.Scenario != "none")
         {
+            if (!Options.DontEnableConfigurationManagement)
+            {
+                ConfigurationManager.Enable ();
+                ConfigurationManager.Load (ConfigLocations.All);
+                ConfigurationManager.Apply ();
+            }
+
             int item = UICatalogTop.CachedScenarios!.IndexOf (
                                                                    UICatalogTop.CachedScenarios!.FirstOrDefault (
                                                                         s =>
@@ -374,6 +368,13 @@ public class UICatalog
 #if DEBUG_IDISPOSABLE
         View.EnableDebugIDisposableAsserts = true;
 #endif
+        
+        if (!Options.DontEnableConfigurationManagement)
+        {
+            ConfigurationManager.Enable ();
+            ConfigurationManager.Load (ConfigLocations.All);
+            ConfigurationManager.Apply ();
+        }
 
         while (RunUICatalogTopLevel () is { } scenario)
         {

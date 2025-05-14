@@ -6,32 +6,104 @@ namespace Terminal.Gui.ConfigurationTests;
 public class SettingsScopeTests
 {
     [Fact]
-    public void Update_Overrides_Defaults ()
+    public void Load_Overrides_Defaults ()
     {
         // arrange
-        Enable();
-        Load (ConfigLocations.LibraryResources);
+        Enable ();
+        ResetToHardCodedDefaults ();
 
-        Assert.Equal (Key.Esc, (Key)Settings ["Application.QuitKey"].PropertyValue);
+        Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue);
 
         ThrowOnJsonErrors = true;
 
         // act
-        var json = """
+        RuntimeConfig = """
                    
                            {
                                  "Application.QuitKey": "Ctrl-Q"
                            }
                    """;
 
-        CM.SourcesManager?.Load(Settings!, json, "test", ConfigLocations.Runtime);
+        Load (ConfigLocations.Runtime);
 
         // assert
         Assert.Equal (Key.Q.WithCtrl, (Key)Settings ["Application.QuitKey"].PropertyValue);
 
         // clean up
-        Disable ();
         ResetToHardCodedDefaults ();
+        Disable ();
+
+    }
+
+
+    [Fact]
+    public void Load_Dictionary_Property_Overrides_Defaults ()
+    {
+        // arrange
+        Enable ();
+        ResetToHardCodedDefaults ();
+        ThrowOnJsonErrors = true;
+
+        ConfigProperty themesConfigProperty = Settings! ["Themes"];
+        Dictionary<string, ThemeScope>? dict = themesConfigProperty.PropertyValue as Dictionary<string, ThemeScope>;
+
+        Assert.NotNull (dict);
+        Assert.Single (dict);
+        Assert.NotEmpty ((Dictionary<string, ThemeScope>)themesConfigProperty.PropertyValue);
+
+        ThemeScope? scope = dict [ThemeManager.DEFAULT_THEME_NAME];
+        Assert.NotNull (scope);
+        Assert.Equal (HighlightStyle.Hover | HighlightStyle.Pressed, scope ["Button.DefaultHighlightStyle"].PropertyValue);
+
+
+        RuntimeConfig = """
+                        {
+                            "Themes": [
+                                {
+                                  "Default": 
+                                     {
+                                         "Button.DefaultHighlightStyle": "None"
+                                     }
+                                },
+                                {
+                                  "NewTheme":
+                                    {
+                                        "Button.DefaultHighlightStyle": "Hover"
+                                    }
+                                }                        
+                            ]
+                        }
+                        """;
+
+        Load (ConfigLocations.Runtime);
+
+        // assert
+        Assert.Equal (2, ThemeManager.GetThemes ().Count);
+        Assert.Equal (HighlightStyle.None, (HighlightStyle)ThemeManager.GetCurrentTheme () ["Button.DefaultHighlightStyle"].PropertyValue!);
+        Assert.Equal (HighlightStyle.Hover, (HighlightStyle)ThemeManager.GetThemes() ["NewTheme"] ["Button.DefaultHighlightStyle"].PropertyValue!);
+
+        RuntimeConfig = """
+                        {
+                            "Themes": [
+                                {
+                                  "Default": 
+                                     {
+                                         "Button.DefaultHighlightStyle": "Pressed"
+                                     }
+                                }
+                            ]
+                        }
+                        """;
+        Load (ConfigLocations.Runtime);
+
+        // assert
+        Assert.Equal (2, ThemeManager.GetThemes ().Count);
+        Assert.Equal (HighlightStyle.Pressed, (HighlightStyle)ThemeManager.Themes! [ThemeManager.DEFAULT_THEME_NAME] ["Button.DefaultHighlightStyle"].PropertyValue!);
+        Assert.Equal (HighlightStyle.Hover, (HighlightStyle)ThemeManager.Themes! ["NewTheme"] ["Button.DefaultHighlightStyle"].PropertyValue!);
+
+        // clean up
+        ResetToHardCodedDefaults ();
+        Disable ();
 
     }
 
@@ -42,7 +114,7 @@ public class SettingsScopeTests
         Load (ConfigLocations.LibraryResources);
 
         // arrange
-        Assert.Equal (Key.Esc, (Key)Settings ["Application.QuitKey"].PropertyValue);
+        Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue);
 
         Assert.Equal (
                       Key.F6,
@@ -66,32 +138,32 @@ public class SettingsScopeTests
         Assert.Equal (Key.F, Application.NextTabGroupKey);
         Assert.Equal (Key.B, Application.PrevTabGroupKey);
 
-        Disable ();
         ResetToHardCodedDefaults ();
-
-
+        Disable ();
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void CopyUpdatedPropertiesFrom_ShouldCopyChangedPropertiesOnly ()
     {
+        Enable ();
         Settings ["Application.QuitKey"].PropertyValue = Key.End;
 
         var updatedSettings = new SettingsScope ();
 
-        ///Don't set Quitkey
+        // Don't set Quitkey
         updatedSettings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
         updatedSettings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
 
-        Settings.DeepCloneFrom (updatedSettings);
+        Settings.UpdateFrom (updatedSettings);
         Assert.Equal (KeyCode.End, ((Key)Settings ["Application.QuitKey"].PropertyValue).KeyCode);
         Assert.Equal (KeyCode.F, ((Key)updatedSettings ["Application.NextTabGroupKey"].PropertyValue).KeyCode);
         Assert.Equal (KeyCode.B, ((Key)updatedSettings ["Application.PrevTabGroupKey"].PropertyValue).KeyCode);
+        ResetToHardCodedDefaults ();
+        Disable ();
     }
 
     [Fact]
-    public void ResetToHardCodedDefaults_Resets_Config_Does_Not_Apply ()
+    public void ResetToHardCodedDefaults_Resets_Config_And_Applies ()
     {
         Enable ();
         Load (ConfigLocations.LibraryResources);
@@ -105,14 +177,13 @@ public class SettingsScopeTests
         // Act
         ResetToHardCodedDefaults ();
         Assert.Equal (Key.Esc, Settings ["Application.QuitKey"].PropertyValue as Key);
-        Assert.Equal (Key.Q, Application.QuitKey);
+        Assert.Equal (Key.Esc, Application.QuitKey);
 
         Disable ();
     }
 
 
     [Fact]
-    [AutoInitShutdown]
     public void Themes_Property_Exists ()
     {
         var settingsScope = new SettingsScope ();
@@ -122,7 +193,7 @@ public class SettingsScopeTests
         // Themes exists, but is not initialized
         Assert.Null (settingsScope ["Themes"].PropertyValue);
 
-        settingsScope.UpdateToCurrentValues ();
+        settingsScope.LoadCurrentValues ();
 
         Assert.NotEmpty (settingsScope);
     }
@@ -140,10 +211,13 @@ public class SettingsScopeTests
         settingsScope ["Application.QuitKey"].PropertyValue = Key.Q;
         settingsScope.Apply ();
         Assert.Equal (Key.Q, Application.QuitKey);
-        settingsScope.UpdateToHardCodedDefaults ();
+        settingsScope.LoadHardCodedDefaults ();
         settingsScope.Apply ();
 
         // Assert
         Assert.Equal (Key.Esc, Application.QuitKey);
+
+        ResetToHardCodedDefaults ();
+        Disable();
     }
 }

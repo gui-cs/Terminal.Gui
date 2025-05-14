@@ -562,35 +562,6 @@ public class ApplicationTests
     }
 
     [Fact]
-    public void Init_KeyBindings_Set_To_Custom ()
-    {
-        // arrange
-        Enable();
-        ThrowOnJsonErrors = true;
-
-        RuntimeConfig = """
-                         {
-                               "Application.QuitKey": "Ctrl-Q"
-                         }
-                 """;
-
-        Load (ConfigLocations.Runtime);
-        Apply();
-
-        Assert.Equal (Key.Esc, Application.QuitKey);
-
-        // Act
-        Application.Init (new FakeDriver ());
-
-        Assert.Equal (Key.Q.WithCtrl, Application.QuitKey);
-
-        Assert.True (Application.KeyBindings.TryGet (Key.Q.WithCtrl, out _));
-
-        Application.Shutdown ();
-        Disable();
-    }
-
-    [Fact]
     [AutoInitShutdown (verifyShutdown: true)]
     public void Internal_Properties_Correct ()
     {

@@ -259,7 +259,8 @@ public class MenuBarv1Tests (ITestOutputHelper output)
         var menuBar = new MenuBar ();
         Assert.Equal (KeyCode.F9, menuBar.Key);
         var menu = new Menu { Host = menuBar, X = 0, Y = 0, BarItems = new () };
-        Assert.Null (menu.Scheme);
+        Assert.False (menu.HasScheme);
+        Assert.NotNull (menu.Scheme);
         Assert.False (menu.IsInitialized);
         menu.BeginInit ();
         menu.EndInit ();

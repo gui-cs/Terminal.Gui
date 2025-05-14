@@ -8,7 +8,7 @@ namespace Terminal.Gui;
 ///     <para>
 ///         Window has <see cref="View.BorderStyle"/> set to <see cref="LineStyle.Single"/>, <see cref="View.Arrangement"/>
 ///         set to <see cref="ViewArrangement.Overlapped"/>, and
-///         uses the Base <see cref="SchemeManager.Schemes"/> color scheme by default.
+///         uses the Base <see cref="SchemeManager.Schemes"/> scheme by default.
 ///     </para>
 ///     <para>
 ///         To enable Window to be sized and moved by the user, adjust <see cref="View.Arrangement"/>.
@@ -25,7 +25,7 @@ public class Window : Toplevel
         CanFocus = true;
         TabStop = TabBehavior.TabGroup;
         Arrangement = ViewArrangement.Overlapped;
-        base.Scheme = SchemeManager.GetCurrentSchemes ()? ["Base"];
+        base.Scheme = SchemeManager.GetCurrentSchemes () ["Base"]!;
         BorderStyle = DefaultBorderStyle;
         base.ShadowStyle = DefaultShadow;
     }

@@ -189,7 +189,7 @@ internal class Branch<T> where T : class
             availableWidth -= lineBody.Length;
         }
 
-        // default behaviour is for model to use the color scheme
+        // default behaviour is for model to use the scheme
         // of the tree view
         Attribute modelColor = textColor;
 
@@ -198,7 +198,7 @@ internal class Branch<T> where T : class
         {
             Scheme modelScheme = _tree.ColorGetter (Model);
 
-            // if custom color scheme is defined for this Model
+            // if custom scheme is defined for this Model
             if (modelScheme is { })
             {
                 // use it

@@ -1,8 +1,9 @@
 ﻿#nullable enable
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
+using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui.Configuration;
 
@@ -39,8 +40,9 @@ public class SourcesManager
             stream.Position = 0;
             Debug.Assert (json != null, "json != null");
 #endif
-            settingsScope.DeepCloneFrom ((SettingsScope)JsonSerializer.Deserialize (stream, typeof (SettingsScope), SerializerContext.Options)!);
-            CM.OnUpdated ();
+            SettingsScope? scope = JsonSerializer.Deserialize (stream, typeof (SettingsScope), ConfigurationManager.SerializerContext.Options) as SettingsScope;
+            settingsScope.UpdateFrom (scope!);
+            ConfigurationManager.OnUpdated ();
 
             AddSource (location, source);
 
@@ -49,12 +51,12 @@ public class SourcesManager
         }
         catch (JsonException e)
         {
-            if (ThrowOnJsonErrors ?? false)
+            if (ConfigurationManager.ThrowOnJsonErrors ?? false)
             {
                 throw;
             }
 
-            AddJsonError ($"Error deserializing {source}: {e.Message}");
+            ConfigurationManager.AddJsonError ($"Error deserializing {source}: {e.Message}");
         }
 
         return false;
@@ -127,7 +129,8 @@ public class SourcesManager
     [RequiresDynamicCode ("AOT")]
     internal bool Load (SettingsScope? settingsScope, string? json, string source, ConfigLocations location)
     {
-        Debug.Assert(location != ConfigLocations.All);
+        Debug.Assert (location != ConfigLocations.All);
+
         if (string.IsNullOrEmpty (json))
         {
             return false;
@@ -141,7 +144,7 @@ public class SourcesManager
         return Load (settingsScope, stream, source, location);
     }
 
-    /// <summary>INTERNAL: Loads the Json document from the resource named <see cref="resourceName"/> from <paramref name="assembly"/> into the specified <see cref="SettingsScope"/>.</summary>
+    /// <summary>INTERNAL: Loads the Json document from the resource named <paramref name="resourceName"/> from <paramref name="assembly"/> into the specified <see cref="SettingsScope"/>.</summary>
     /// <param name="settingsScope">The Settings Scope object that <paramref name="resourceName"/> will be loaded into.</param>
     /// <param name="assembly">The assembly containing the resource.</param>
     /// <param name="resourceName">The name of the resource containing the Json document was read from.</param>
@@ -153,7 +156,7 @@ public class SourcesManager
     {
         if (string.IsNullOrEmpty (resourceName))
         {
-            Logging.Warning($"{resourceName} must not be null or empty.");
+            Logging.Warning ($"{resourceName} must not be null or empty.");
             return false;
         }
 
@@ -178,7 +181,7 @@ public class SourcesManager
     internal string ToJson (SettingsScope? scope)
     {
         //Logging.Debug  ("ConfigurationManager.ToJson()");
-        return JsonSerializer.Serialize (scope, typeof (SettingsScope), SerializerContext);
+        return JsonSerializer.Serialize (scope, typeof (SettingsScope), ConfigurationManager.SerializerContext);
     }
 
     /// <summary>
@@ -189,7 +192,7 @@ public class SourcesManager
     [RequiresDynamicCode ("AOT")]
     internal Stream ToStream (SettingsScope? scope)
     {
-        string json = JsonSerializer.Serialize (scope, typeof (SettingsScope), SerializerContext);
+        string json = JsonSerializer.Serialize (scope, typeof (SettingsScope), ConfigurationManager.SerializerContext);
 
         // turn it into a stream
         var stream = new MemoryStream ();

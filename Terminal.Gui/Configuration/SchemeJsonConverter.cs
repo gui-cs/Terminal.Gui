@@ -62,7 +62,7 @@ internal class SchemeJsonConverter : JsonConverter<Scheme>
 
             string propertyName = reader.GetString ();
             reader.Read ();
-            var attribute = JsonSerializer.Deserialize (ref reader, SerializerContext.Attribute);
+            var attribute = JsonSerializer.Deserialize (ref reader, ConfigurationManager.SerializerContext.Attribute);
 
             switch (propertyName.ToLower ())
             {

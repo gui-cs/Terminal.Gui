@@ -16,7 +16,7 @@ public class DeepClonerTests
     private class SimpleValueType
     {
         public int Number { get; set; }
-        public bool Flag { get; set; }
+        public bool Flag { get; init; }
     }
 
     private class SimpleReferenceType
@@ -26,20 +26,21 @@ public class DeepClonerTests
 
         public override bool Equals (object? obj) { return obj is SimpleReferenceType other && Name == other.Name && Count == other.Count; }
 
+        // ReSharper disable twice NonReadonlyMemberInGetHashCode
         public override int GetHashCode () { return HashCode.Combine (Name, Count); }
     }
 
     private class CollectionContainer
     {
-        public List<string>? Strings { get; set; }
-        public Dictionary<string, int>? Counts { get; set; }
-        public int []? Numbers { get; set; }
+        public List<string>? Strings { get; init; }
+        public Dictionary<string, int>? Counts { get; init; }
+        public int []? Numbers { get; init; }
     }
 
     private class NestedObject
     {
-        public SimpleReferenceType? Inner { get; set; }
-        public List<SimpleValueType>? Values { get; set; }
+        public SimpleReferenceType? Inner { get; init; }
+        public List<SimpleValueType>? Values { get; init; }
     }
 
     private class CircularReference
@@ -50,8 +51,8 @@ public class DeepClonerTests
 
     private class ConfigPropertyMock
     {
-        public object? PropertyValue { get; set; }
-        public bool Immutable { get; set; }
+        public object? PropertyValue { get; init; }
+        public bool Immutable { get; init; }
     }
 
     private class SettingsScopeMock : Dictionary<string, ConfigPropertyMock>
@@ -61,7 +62,7 @@ public class DeepClonerTests
 
     private class ComplexKey
     {
-        public int Id { get; set; }
+        public int Id { get; init; }
         public override bool Equals (object? obj) { return obj is ComplexKey key && Id == key.Id; }
 
         public override int GetHashCode () { return Id.GetHashCode (); }
@@ -220,6 +221,49 @@ public class DeepClonerTests
     }
 
     [Fact]
+    public void Dictionary_CreatesDeepCopy_Including_Comparer_Options ()
+    {
+        Dictionary<string, int>? source = new (StringComparer.InvariantCultureIgnoreCase) { { "A", 1 }, { "B", 2 } };
+        Dictionary<string, int>? result = DeepCloner.DeepClone (source);
+
+        Assert.NotNull (result);
+        Assert.NotSame (source, result);
+        Assert.Equal (source, result);
+        Assert.Equal (source.Comparer, result.Comparer);
+
+        // Modify result, ensure source unchanged
+        result! ["C"] = 3;
+        Assert.Equal (2, source.Count);
+        Assert.Equal (3, result.Count);
+
+        Assert.Contains ("A", result);
+        Assert.Contains ("a", result);
+    }
+
+    [Fact]
+    public void Dictionary_CreatesDeepCopy_WithCapacity ()
+    {
+        // Arrange: Create a dictionary with a specific capacity
+        Dictionary<string, int> source = new (100) // Set initial capacity to 100
+        {
+            { "Key1", 1 },
+            { "Key2", 2 }
+        };
+
+        // Act: Clone the dictionary
+        Dictionary<string, int>? result = DeepCloner.DeepClone (source);
+
+        // Assert: Verify the dictionary was cloned correctly
+        Assert.NotNull (result);
+        Assert.NotSame (source, result);
+        Assert.Equal (source, result); // Verify key-value pairs are cloned
+
+        // Verify that the capacity is preserved (if supported)
+        Assert.True (result.Count <= result.EnsureCapacity (0)); // EnsureCapacity(0) returns the current capacity
+        Assert.True (source.Count <= source.EnsureCapacity (0)); // EnsureCapacity(0) returns the current capacity
+    }
+
+    [Fact]
     public void Array_CreatesDeepCopy ()
     {
         int []? source = { 1, 2, 3 };
@@ -321,7 +365,7 @@ public class DeepClonerTests
         CollectionContainer? source = new ()
         {
             Strings = ["A", "B"],
-            Counts = new() { { "X", 1 }, { "Y", 2 } },
+            Counts = new () { { "X", 1 }, { "Y", 2 } },
             Numbers = [10, 20]
         };
         CollectionContainer? result = DeepCloner.DeepClone (source);
@@ -349,8 +393,8 @@ public class DeepClonerTests
     {
         NestedObject? source = new ()
         {
-            Inner = new() { Name = "Inner", Count = 5 },
-            Values = new()
+            Inner = new () { Name = "Inner", Count = 5 },
+            Values = new ()
             {
                 new() { Number = 1, Flag = true },
                 new() { Number = 2, Flag = false }
@@ -419,13 +463,30 @@ public class DeepClonerTests
     }
 
     [Fact]
+    public void ConfigProperty_CreatesDeepCopy ()
+    {
+        ConfigProperty? source = ConfigProperty.CreateWithAttributeInfo (CM.GetHardCodedConfigPropertyCache ()! ["Application.QuitKey"].PropertyInfo!);
+        source.Immutable = false;
+        source.PropertyValue = Key.A;
+        ConfigProperty? result = DeepCloner.DeepClone (source);
+
+        Assert.NotNull (result);
+        Assert.NotNull (result.PropertyInfo);
+        Assert.NotSame (source, result);
+        Assert.NotSame (source.PropertyValue, result!.PropertyValue);
+        // PropertyInfo is effectively a simple type
+        Assert.Same (source.PropertyInfo, result!.PropertyInfo);
+        Assert.Equal (source.Immutable, result.Immutable);
+    }
+
+    [Fact]
     public void SettingsScopeMockWithKey_CreatesDeepCopy ()
     {
         SettingsScopeMock? source = new ()
         {
             Theme = "Dark",
-            ["KeyBinding"] = new() { PropertyValue = new Key (KeyCode.A) { Handled = true } },
-            ["Counts"] = new() { PropertyValue = new Dictionary<string, int> { { "X", 1 } } }
+            ["KeyBinding"] = new () { PropertyValue = new Key (KeyCode.A) { Handled = true } },
+            ["Counts"] = new () { PropertyValue = new Dictionary<string, int> { { "X", 1 } } }
         };
         SettingsScopeMock? result = DeepCloner.DeepClone (source);
 
@@ -463,7 +524,7 @@ public class DeepClonerTests
         Assert.True (darkThemeScope.ContainsKey ("Button.DefaultHighlightStyle"));
 
         // Create a Themes list with two themes
-        List<Dictionary<string, ThemeScope>> themesList = new()
+        List<Dictionary<string, ThemeScope>> themesList = new ()
         {
             new() { { "Default", defaultThemeScope } },
             new() { { "Dark", darkThemeScope } }
@@ -502,6 +563,7 @@ public class DeepClonerTests
         // Assert
         Assert.NotNull (result);
         Assert.IsType<SettingsScope> (result);
+
         Assert.True (result.ContainsKey ("Themes"));
     }
 
@@ -539,4 +601,5 @@ public class DeepClonerTests
         Assert.Equal (source, result);
         Assert.True (stopwatch.ElapsedMilliseconds < 1000); // Ensure it completes within 1 second
     }
+
 }

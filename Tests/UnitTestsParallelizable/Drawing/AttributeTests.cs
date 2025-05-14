@@ -339,12 +339,12 @@ public class AttributeTests
     }
 
     [Fact]
-    public void ToString_ShouldReturnFormattedStringWithForegroundAndBackground ()
+    public void ToString_Formats_Correctly ()
     {
         // Arrange
         var foregroundColor = new Color (0, 0, 255);
         var backgroundColor = new Color (255, 255, 255);
-        var expectedString = $"[{foregroundColor},{backgroundColor}]";
+        var expectedString = $"[{foregroundColor},{backgroundColor},None]";
 
         // Act
         var attribute = new Attribute (foregroundColor, backgroundColor);

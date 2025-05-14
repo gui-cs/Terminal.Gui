@@ -64,6 +64,17 @@ public class ConfigurationPropertyAttributeTests
         }
     }
 
+
+    [Fact]
+    public void OmitClassName_Omits ()
+    {
+        // Color.Schemes is serialized as "Schemes", not "Colors.Schemes"
+        PropertyInfo pi = typeof (SchemeManager).GetProperty ("Schemes")!;
+        var scp = (ConfigurationPropertyAttribute)pi!.GetCustomAttribute (typeof (ConfigurationPropertyAttribute))!;
+        Assert.True (scp!.Scope == typeof (ThemeScope));
+        Assert.True (scp.OmitClassName);
+    }
+
     private static IEnumerable<Type> GetRegisteredTypes (Type contextType)
     {
         // Use reflection to find which types are registered in the JsonSerializerContext

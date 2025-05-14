@@ -4,16 +4,11 @@ using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
-
-// TODO: Add support for other attributes (bold, underline, etc.) once the platform drivers support them.
-// TODO: See https://github.com/gui-cs/Terminal.Gui/issues/457
-
-
 /// <summary>Attributes represent how text is styled when displayed in the terminal.</summary>
 /// <remarks>
 ///     <see cref="Attribute"/> provides a platform independent representation of colors (and someday other forms of
 ///     text styling). They encode both the foreground and the background color and are used in the
-///     <see cref="Scheme"/> class to define color schemes that can be used in an application.
+///     <see cref="Scheme"/> class to define schemes that can be used in an application.
 /// </remarks>
 [JsonConverter (typeof (AttributeJsonConverter))]
 public readonly record struct Attribute : IEqualityOperators<Attribute, Attribute, bool>
@@ -28,11 +23,15 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
 
     /// <summary>The foreground color.</summary>
     [JsonConverter (typeof (ColorJsonConverter))]
-    public Color Foreground { get; }
+    public Color Foreground { get; init; }
 
     /// <summary>The background color.</summary>
     [JsonConverter (typeof (ColorJsonConverter))]
-    public Color Background { get; }
+    public Color Background { get; init; }
+
+    // TODO: Add constructors which permit including a Style.
+    /// <summary>The style (bold, italic, underlined, etc.).</summary>
+    public Style Style { get; init; } = Style.None;
 
     /// <summary>Initializes a new instance with default values.</summary>
     public Attribute ()
@@ -101,12 +100,13 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     public Attribute (in Color color) : this (color, color) { }
 
     /// <inheritdoc/>
-    public override int GetHashCode () { return HashCode.Combine (PlatformColor, Foreground, Background); }
+    public override int GetHashCode () { return HashCode.Combine (PlatformColor, Foreground, Background, Style); }
 
+    // TODO: Add TextStyle to Attribute.ToString(), modify unit tests to account
     /// <inheritdoc/>
     public override string ToString ()
     {
         // Note: Unit tests are dependent on this format
-        return $"[{Foreground},{Background}]";
+        return $"[{Foreground},{Background},{Style}]";
     }
 }

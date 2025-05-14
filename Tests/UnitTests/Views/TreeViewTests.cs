@@ -1215,7 +1215,7 @@ oot two
         tv.LayoutSubViews ();
         tv.Draw ();
 
-        // create a new color scheme
+        // create a new scheme
         var pink = new Attribute (Color.Magenta, Color.Black);
         var hotpink = new Attribute (Color.BrightMagenta, Color.Black);
 
@@ -1246,7 +1246,7 @@ oot two
 
         var pinkScheme = new Scheme { Normal = pink, Focus = hotpink };
 
-        // and a delegate that uses the pink color scheme 
+        // and a delegate that uses the pink scheme 
         // for nodes "pink"
         tv.ColorGetter = n => n.Text.Equals ("pink") ? pinkScheme : null;
 

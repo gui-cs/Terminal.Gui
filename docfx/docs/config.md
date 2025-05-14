@@ -2,19 +2,116 @@
 
 Terminal.Gui provides persistent configuration settings via the [`ConfigurationManager`](~/api/Terminal.Gui.ConfigurationManager.yml) class.
 
-## Lexicon and Taxonomy
+## Configuration Lexicon and Taxonomy
 
-The following terms are used for Configuration Management:
+| Term | Meaning |
+|:-----|:--------|
+| **AppSettings** | Application-specific settings stored in the application's resources. |
+| **Apply** | Apply the configuration to the application; copies settings from configuration properties to corresponding `static` `[ConfigProperty]` properties. |
+| **Attribute** | Defines concrete visual styling for a visual element (Foreground color, Background color, TextStyle). |
+| **BackgroundColor** | A property of `Attribute` describing the background text color. |
+| **Color** | Base terminal color (supports TrueColor and named values like White, Black, Cyan, etc.). |
+| **ConfigProperty** | A property decorated with `[ConfigProperty]` that can be configured via the configuration system. |
+| **Configuration** | A collection of settings defining application behavior and appearance. |
+| **ConfigurationManager** | System that loads and manages application runtime settings from external sources. |
+| **ForegroundColor** | A property of `Attribute` describing the foreground text color. |
+| **Load** | Load configuration from given location(s), updating with new values. Loading doesn't apply settings automatically. |
+| **Location** | Storage location for configuration (e.g., user's home directory, application directory). |
+| **Reset** | Reset configuration to current values or hard-coded defaults. Does not load configuration. |
+| **Scope** | Defines the context where configuration applies (Settings, Theme, or AppSettings). |
+| **Scheme** | Maps `VisualRole` to `Attribute`, defining visual element appearance (color and style) based on semantic purpose. |
+| **Settings** | Runtime options including both system settings and application-specific settings. |
+| **Sources** | Set of locations where configuration can be stored (@Terminal.Gui.ConfigLocations enum). |
+| **Style** | Property of `Attribute` for font-like hints (bold, italic, underline). |
+| **Theme** | Named instance containing specific appearance settings. |
+| **ThemeInheritance** | Mechanism where themes can inherit and override settings from other themes. |
+| **Themes** | Collection of named Theme definitions bundling visual and layout settings. |
+| **VisualRole** | Semantic role/purpose of a visual element (Normal, Focus, HotFocus, Active, Disabled, ReadOnly). |
 
-- `Load` - Load configuration from the given location(s), updating the configuration with any new values. Loading does not apply the settings to the application; that happens when the `Apply` method is called.
-- `Reset` - Reset the configuration to either the current values or the hard-coded defaults. Resetting does not load the configuration; it only resets the configuration to the default values.
-- `Apply` - Apply the configuration to the application; this means the settings are copied from the configuration properties to the corresponding `static` `[ConfigurationProperty]` properties.
-- `Setting` - A setting is a property that is part of a configuration.
-- `Theme` - A theme is a named collection of settings that impact the visual style of Terminal.Gui applications.
-- `AppSettings` - Application-specific settings are stored in the application's resources.
-- `Configuration` - A collection of settings that impact the behavior of an application.
-- `ConfigurationProperty` - A property that is part of a configuration.
-- `ConfigLocation` - A location where a configuration can be stored.
+## Configuration Types and Scopes
+
+Terminal.Gui supports three main configuration scopes:
+
+### SettingsScope
+System-level settings that affect Terminal.Gui behavior:
+```csharp
+[ConfigurationProperty(Scope = typeof(SettingsScope))]
+public static bool AlwaysShowScrollBars { get; set; } = false;
+```
+
+### ThemeScope
+Visual appearance settings that can be themed:
+```csharp
+[ConfigurationProperty(Scope = typeof(ThemeScope))]
+public static ColorScheme Colors { get; set; }
+```
+
+### AppSettingsScope (default)
+Application-specific settings:
+```csharp
+[ConfigurationProperty] // AppSettingsScope is default
+public static string MyAppSetting { get; set; } = "default";
+```
+
+## Configuration Precedence
+
+Configuration values are applied in the following order (later sources override earlier ones):
+
+1. Hard-coded defaults (lowest precedence)
+2. Terminal.Gui assembly defaults
+3. Runtime configuration
+4. App resources
+5. App-specific user home directory
+6. App-specific current directory
+7. Global user home directory
+8. Global current directory (highest precedence)
+
+```mermaid
+graph TD
+    A[Hard-coded Defaults] --> B[Terminal.Gui Defaults]
+    B --> C[Runtime Config]
+    C --> D[App Resources]
+    D --> E[App Home Directory]
+    E --> F[App Current Directory]
+    F --> G[Global Home Directory]
+    G --> H[Global Current Directory]
+```
+
+## Configuration Events
+
+The ConfigurationManager provides several events to track configuration changes:
+
+```csharp
+// Called after configuration is applied
+ConfigurationManager.Applied += (sender, e) => {
+    // Handle configuration changes
+};
+
+// Called when the active theme changes
+ConfigurationManager.ThemeChanged += (sender, e) => {
+    // Handle theme changes
+};
+```
+
+## Theme Configuration
+
+Themes provide a way to bundle visual settings together. Themes can inherit from other themes:
+
+```json
+{
+  "Themes": [
+    "MyCustomTheme": {
+      "BasedOn": "Default",
+      "Colors": {
+        "Normal": {
+          "Foreground": "White",
+          "Background": "Blue"
+        }
+      }
+    }
+  ]
+}
+```
 
 ## Fundamentals
 
@@ -48,8 +145,8 @@ When a configuration has been loaded, the @Terminal.Gui.ConfigurationManager.App
 
 ```csharp
 // Load the configuration from just the users home directory.
-ConfigurationManager.Locations = ConfigLocations.GlobalHome;
-ConfigurationManager.Load();
+
+ConfigurationManager.Load(ConfigLocations.GlobalHome);
 ConfigurationManager.Apply();
 ```
 
@@ -144,7 +241,7 @@ Methods for discovering what can be configured are available in the `Configurati
 
 A Theme is a named collection of settings that impact the visual style of Terminal.Gui applications. The default theme is named "Default". The built-in configuration within the Terminal.Gui library defines two more themes: "Dark", and "Light". Additional themes can be defined in the configuration files. The JSON property `Theme` defines the name of the theme that will be used. If the theme is not found, the default theme will be used.
 
-Themes support defining ColorSchemes as well as various default settings for Views. Both the default color schemes and user-defined color schemes can be configured. See [ColorSchemes](~/api/Terminal.Gui.Colors.yml) for more information.
+Themes support defining Schemes (a set of colors and styles that define the appearance of views) as well as various default settings for Views. Both the default color schemes and user-defined color schemes can be configured. See [Schemes](~/api/Terminal.Gui.Schemes.yml) for more information.
 
 Themes support changing the standard set of glyphs used by views (e.g. the default indicator for [Button](~/api/Terminal.Gui.Button.yml)) and line drawing (e.g. [LineCanvas](~/api/Terminal.Gui.LineCanvas.yml)).
 
@@ -161,7 +258,71 @@ The value can be either a decimal number or a string. The string may be:
   "Glyphs.UpArrow": 965010
 ```
 
-The `UI Catalog` application defines a `UICatlog` Theme. Look at the UI Catalog's `./Resources/config.json` file to see how to define a theme.
+The `UI Catalog` application defines a `UICatalog` Theme. Look at the UI Catalog's `./Resources/config.json` file to see how to define a theme.
+
+
+## Theme and Scheme Management
+
+Terminal.Gui provides two key managers for handling visual themes and schemes:
+
+### ThemeManager
+
+The ThemeManager provides convenient methods for working with themes:
+
+```csharp
+// Get the currently active theme
+ThemeScope currentTheme = ThemeManager.GetCurrentTheme();
+
+// Get all available themes
+Dictionary<string, ThemeScope> themes = ThemeManager.GetThemes();
+
+// Get list of theme names
+ImmutableList<string> themeNames = ThemeManager.GetThemeNames();
+
+// Get/Set current theme name
+string currentThemeName = ThemeManager.GetCurrentThemeName();
+ThemeManager.Theme = "Dark"; // Switch themes
+
+// Listen for theme changes
+ThemeManager.ThemeChanged += (sender, e) => {
+    // Handle theme changes
+};
+```
+
+### SchemeManager
+
+The SchemeManager handles schemes within themes. Each theme contains multiple schemes for different UI contexts:
+
+```csharp
+// Get current schemes
+Dictionary<string, Scheme> schemes = SchemeManager.GetCurrentSchemes();
+
+// Get list of scheme names
+ImmutableList<string> schemeNames = SchemeManager.GetSchemeNames();
+
+// Access specific schemes
+Scheme topLevelScheme = SchemeManager.Schemes["TopLevel"];
+Scheme dialogScheme = SchemeManager.Schemes["Dialog"];
+Scheme menuScheme = SchemeManager.Schemes["Menu"];
+
+// Listen for scheme changes
+SchemeManager.CollectionChanged += (sender, e) => {
+    // Handle scheme changes
+};
+```
+
+### Built-in Schemes
+
+The following schemes are available by default:
+
+- **TopLevel**: Used for the application's top-level windows
+- **Base**: Default scheme for most views
+- **Dialog**: Used for dialogs and message boxes
+- **Menu**: Used for menus and status bars
+- **Error**: Used for error messages and dialogs
+
+Each scheme defines colors and attributes for different view states (Normal, Focus, HotNormal, HotFocus, Disabled).
+
 
 # Key Bindings
 
@@ -187,3 +348,138 @@ https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json
 To illustrate the syntax, the below is the `config.json` file found in `Terminal.Gui.dll`:
 
 [!code-json[config.json](../../Terminal.Gui/Resources/config.json)]
+
+## Application Settings
+
+Terminal.Gui provides several top-level application settings:
+
+```json
+{
+  "Key.Separator": "+",
+  "Application.ArrangeKey": "Ctrl+F5",
+  "Application.Force16Colors": false,
+  "Application.IsMouseDisabled": false,
+  "Application.NextTabGroupKey": "F6",
+  "Application.NextTabKey": "Tab",
+  "Application.PrevTabGroupKey": "Shift+F6",
+  "Application.PrevTabKey": "Shift+Tab",
+  "Application.QuitKey": "Esc"
+}
+```
+
+## View-Specific Settings
+
+Settings that control specific view behaviors:
+
+```json
+{
+  "PopoverMenu.DefaultKey": "Shift+F10",
+  "FileDialog.MaxSearchResults": 10000,
+  "FileDialogStyle.DefaultUseColors": false,
+  "FileDialogStyle.DefaultUseUnicodeCharacters": false
+}
+```
+
+## Configuration Management
+
+### Loading Configuration
+
+The ConfigurationManager searches for configuration files in this order:
+
+1. Terminal.Gui assembly resources
+2. Application resources
+3. `.tui` folder in application directory
+4. `.tui` folder in user's home directory
+
+```csharp
+// Enable configuration with specific locations
+ConfigurationManager.Enable();
+ConfigurationManager.Locations = ConfigLocations.Global | ConfigLocations.User;
+ConfigurationManager.Load();
+ConfigurationManager.Apply();
+```
+
+### Configuration Events
+
+```csharp
+// Configuration applied event
+ConfigurationManager.Applied += (s, e) => {
+    // Handle configuration changes
+};
+
+// Configuration loading event
+ConfigurationManager.Loading += (s, e) => {
+    Console.WriteLine($"Loading from: {e.Location}");
+};
+```
+
+### Error Handling
+
+```json
+{
+  "ConfigurationManager.ThrowOnJsonErrors": false
+}
+```
+
+Set to `true` to throw exceptions on JSON parsing errors instead of silent failures.
+
+### Configuration Properties
+
+Define configurable properties using the ConfigurationProperty attribute:
+
+```csharp
+public class MyView : View {
+    [ConfigurationProperty]
+    public static int DefaultWidth { get; set; } = 20;
+
+    [ConfigurationProperty(Scope = typeof(ThemeScope))]
+    public static ColorScheme Colors { get; set; }
+
+    [ConfigurationProperty(Scope = typeof(SettingsScope))]
+    public static bool AlwaysShowScrollBars { get; set; }
+}
+```
+
+### AOT Support
+
+When using AOT compilation:
+
+```csharp
+[JsonSourceGenerationOptions(WriteIndented = true)]
+[JsonSerializable(typeof(Configuration))]
+internal partial class ConfigurationContext : JsonSerializerContext { }
+
+// Enable with AOT support
+ConfigurationManager.Enable(options => {
+    options.JsonSerializerContext = ConfigurationContext.Default;
+});
+```
+
+## Best Practices
+
+1. **Configuration Organization**
+   - Group related settings
+   - Use meaningful property names
+   - Provide default values
+   - Document configuration requirements
+
+2. **Performance**
+   - Minimize configuration file size
+   - Cache configuration values when needed
+   - Use appropriate ConfigLocations
+
+3. **Security**
+   - Validate configuration inputs
+   - Don't store sensitive data
+   - Use appropriate file permissions
+   - Handle missing/invalid configurations gracefully
+
+4. **Maintenance**
+   - Version configuration schemas
+   - Document breaking changes
+   - Include configuration in backups
+   - Provide migration guides
+
+For complete schema details and examples, refer to:
+- Schema: https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json
+- Default configuration: Terminal.Gui/Resources/config.json

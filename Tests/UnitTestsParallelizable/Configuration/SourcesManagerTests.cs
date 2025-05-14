@@ -217,10 +217,10 @@ public class SourcesManagerTests
 
     #endregion
 
-    #region UpdateFromResource
+    #region Load
 
     [Fact]
-    public void UpdateFromResource_WithNullResourceName_ReturnsFalse ()
+    public void Load_WithNullResourceName_ReturnsFalse ()
     {
         // Arrange
         var sourcesManager = new SourcesManager ();
@@ -238,7 +238,7 @@ public class SourcesManagerTests
     }
 
     [Fact]
-    public void UpdateFromResource_WithValidResource_UpdatesSettingsScope ()
+    public void Load_WithValidResource_UpdatesSettingsScope ()
     {
         // Arrange
         var sourcesManager = new SourcesManager ();
@@ -255,6 +255,43 @@ public class SourcesManagerTests
         Assert.True (result);
 
         // Verify settingsScope is updated as expected
+    }
+
+    [Fact]
+    public void Load_Runtime_Overrides ()
+    {
+        // Arrange
+        var sourcesManager = new SourcesManager ();
+        var settingsScope = new SettingsScope ();
+
+        var assembly = Assembly.GetAssembly (typeof (ConfigurationManager));
+        var resourceName = "Terminal.Gui.Resources.config.json";
+        var location = ConfigLocations.LibraryResources;
+        sourcesManager.Load (settingsScope, assembly!, resourceName, location);
+
+        Assert.Equal(Key.Esc, settingsScope ["Application.QuitKey"].PropertyValue);
+
+        var runtimeJson = """
+                          {
+                               "Application.QuitKey": "Ctrl+Z"
+                          }
+                          """;
+        var runtimeSource = "runtime.json";
+        var runtimeLocation = ConfigLocations.Runtime;
+        var runtimeStream = new MemoryStream ();
+        var writer = new StreamWriter (runtimeStream);
+        writer.Write (runtimeJson);
+        writer.Flush ();
+        runtimeStream.Position = 0;
+
+        // Act
+        bool result = sourcesManager.Load (settingsScope, runtimeStream, runtimeSource, runtimeLocation);
+
+        // Assert
+        Assert.True (result);
+
+        // Verify settingsScope is updated as expected
+        Assert.Equal (Key.Z.WithCtrl, settingsScope ["Application.QuitKey"].PropertyValue);
     }
 
     #endregion
@@ -362,7 +399,7 @@ public class SourcesManagerTests
     }
     
     [Fact]
-    public void UpdateFromResource_AddsResourceSourceToCollection ()
+    public void Load_AddsResourceSourceToCollection ()
     {
         // Arrange
         var sourcesManager = new SourcesManager ();

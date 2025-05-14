@@ -7,12 +7,9 @@ namespace Terminal.Gui;
 public partial class View
 {
     // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/4014
-    // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/4016
-    // TODO: Enable ability to tell if Scheme was explicitly set; Scheme, as is, hides this.
-    internal Scheme? _scheme;
 
     /// <summary>
-    ///     Gets the hard-coded set of <see cref="Scheme"/>s. Used for geneeating the built-in config.json and for
+    ///     Gets the hard-coded set of <see cref="Scheme"/>s. Used for generating the built-in config.json and for
     ///     unit tests that don't depend on ConfigurationManager.
     /// </summary>
     /// <returns></returns>
@@ -69,30 +66,120 @@ public partial class View
         };
     }
 
-    // TODO: Remove `virtual`. only Border and Padding override and they can use a different method.
-    /// <summary>The color scheme for this view, if it is not defined, it returns the <see cref="SuperView"/>'s color scheme.</summary>
-    public virtual Scheme? Scheme
+    // Both holds the set Scheme and is used to determine if a Scheme has been set or not
+    private Scheme? _scheme;
+
+    /// <summary>
+    ///     Gets whether the Scheme has been explicitly set for this View.
+    /// </summary>
+    public bool HasScheme => _scheme is { };
+
+    /// <summary>Gets or sets the Scheme for this view. If the Scheme has not been explicitly set (see <see cref="HasScheme"/>), gets <see cref="SuperView"/>'s Scheme.</summary>
+    public Scheme Scheme
     {
-        // BUGBUG: This prevents the ability to know if Scheme was explicitly set or not.
-        get => _scheme ?? SuperView?.Scheme;
-        set
-        {
-            if (_scheme == value)
-            {
-                return;
-            }
-
-            _scheme = value;
-
-            // BUGBUG: This should be in Border.cs somehow
-            if (Border is { } && Border.LineStyle != LineStyle.None && Border.Scheme is { })
-            {
-                Border.Scheme = _scheme;
-            }
-
-            SetNeedsDraw ();
-        }
+        get => GetScheme ();
+        set => SetScheme (value);
     }
+
+
+    /// <summary>
+    ///     Gets the Scheme for the View. If the Scheme has not been explicitly set (see <see cref="HasScheme"/>), gets <see cref="SuperView"/>'s Scheme.
+    /// </summary>
+    /// <returns></returns>
+    public Scheme GetScheme ()
+    {
+        if (OnGettingScheme (out Scheme? newScheme))
+        {
+            return newScheme!;
+        }
+
+        var args = new SchemeEventArgs (in _scheme, ref newScheme);
+        GettingScheme?.Invoke (this, args);
+        if (args.Cancel)
+        {
+            return args.NewScheme!;
+        }
+
+        if (!HasScheme)
+        {
+            return SuperView?.Scheme ?? SchemeManager.GetCurrentSchemes () ["Base"]!;
+        }
+
+        return _scheme!;
+    }
+
+
+    /// <summary>
+    ///     Called when the <see cref="Scheme"/> for the View is being retrieved. Overrides can return <see langword="true"/> to
+    ///     stop further processing and optionally set <paramref name="scheme"/> to a different value.
+    /// </summary>
+    /// <returns><see langword="true"/> to stop default behavior.</returns>
+    protected virtual bool OnGettingScheme (out Scheme? scheme)
+    {
+        scheme = null;
+        return false;
+    }
+
+    /// <summary>
+    ///     Raised when the <see cref="Scheme"/> for the View is being retrieved. Overrides can return <see langword="true"/> to
+    ///     stop further processing and optionally set the <see cref="Scheme"/> in the event args to a different value.
+    /// </summary>
+    /// <returns>
+    ///     Set <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/> to stop default behavior.
+    /// </returns>
+    public event EventHandler<CancelEventArgs>? GettingScheme;
+
+    /// <summary>
+    ///     Sets the Scheme for the View. Raises <see cref="SettingScheme"/> event before setting the scheme. 
+    /// </summary>
+    /// <param name="scheme">The scheme to set. If <see langword="null"/> <see cref="HasScheme"/> will be <see langword="false"/>.</param>
+    /// <returns><see langword="true"/> if the scheme was set.</returns>
+    public bool SetScheme (Scheme? scheme)
+    {
+        if (_scheme == scheme)
+        {
+            return false;
+        }
+
+        if (OnSettingScheme (in scheme))
+        {
+            return false;
+        }
+
+        var args = new CancelEventArgs ();
+        SettingScheme?.Invoke (this, args);
+        if (args.Cancel)
+        {
+            return false;
+        }
+
+        _scheme = scheme;
+
+        // BUGBUG: This should be in Border.cs somehow
+        if (Border is { } && Border.LineStyle != LineStyle.None && Border.HasScheme)
+        {
+            Border.Scheme = _scheme;
+        }
+
+        SetNeedsDraw ();
+        return true;
+    }
+
+    /// <summary>
+    ///     Called when the <see cref="Scheme"/> for the View is to be set. 
+    /// </summary>
+    /// <param name="scheme"></param>
+    /// <returns><see langword="true"/> to stop default behavior.</returns>
+    protected virtual bool OnSettingScheme (in Scheme? scheme) { return false; }
+
+
+    #region VisualRole
+
+    /// <summary>Raised when the <see cref="Scheme"/> for the View is to be set.</summary>
+    /// <returns>
+    ///     Set <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/> to stop default behavior.
+    /// </returns>
+    public event EventHandler<CancelEventArgs>? SettingScheme;
 
     /// <summary>Determines the current <see cref="Scheme"/> based on the <see cref="Enabled"/> value.</summary>
     /// <returns>
@@ -103,20 +190,6 @@ public partial class View
     public virtual Attribute GetFocusColor ()
     {
         return GetAttributeForRole (VisualRole.Focus);
-
-        Attribute currAttribute = Scheme?.Normal ?? Attribute.Default;
-        var newAttribute = new Attribute ();
-        CancelEventArgs<Attribute> args = new (in currAttribute, ref newAttribute);
-        GettingFocusColor?.Invoke (this, args);
-
-        if (args.Cancel)
-        {
-            return args.NewValue;
-        }
-
-        Scheme? cs = Scheme ?? new ();
-
-        return Enabled ? GetColor (cs.Focus) : cs.Disabled;
     }
 
     /// <summary>
@@ -135,20 +208,6 @@ public partial class View
     public virtual Attribute GetHotFocusColor ()
     {
         return GetAttributeForRole (VisualRole.HotFocus);
-
-        Attribute currAttribute = Scheme?.Normal ?? Attribute.Default;
-        var newAttribute = new Attribute ();
-        CancelEventArgs<Attribute> args = new (in currAttribute, ref newAttribute);
-        GettingHotFocusColor?.Invoke (this, args);
-
-        if (args.Cancel)
-        {
-            return args.NewValue;
-        }
-
-        Scheme? cs = Scheme ?? new ();
-
-        return Enabled ? GetColor (cs.HotFocus) : cs.Disabled;
     }
 
     /// <summary>
@@ -167,20 +226,6 @@ public partial class View
     public virtual Attribute GetHotNormalColor ()
     {
         return GetAttributeForRole (VisualRole.HotNormal);
-
-        Attribute currAttribute = Scheme?.Normal ?? Attribute.Default;
-        var newAttribute = new Attribute ();
-        CancelEventArgs<Attribute> args = new (in currAttribute, ref newAttribute);
-        GettingHotNormalColor?.Invoke (this, args);
-
-        if (args.Cancel)
-        {
-            return args.NewValue;
-        }
-
-        Scheme? cs = Scheme ?? new ();
-
-        return Enabled ? GetColor (cs.HotNormal) : cs.Disabled;
     }
 
     /// <summary>
@@ -199,26 +244,6 @@ public partial class View
     public virtual Attribute GetNormalColor ()
     {
         return GetAttributeForRole (VisualRole.Normal);
-
-        Attribute currAttribute = Scheme?.Normal ?? Attribute.Default;
-        var newAttribute = new Attribute ();
-        CancelEventArgs<Attribute> args = new (in currAttribute, ref newAttribute);
-        GettingNormalColor?.Invoke (this, args);
-
-        if (args.Cancel)
-        {
-            return args.NewValue;
-        }
-
-        Scheme? cs = Scheme ?? new ();
-        Attribute disabled = new (cs.Disabled.Foreground, cs.Disabled.Background);
-
-        if (Diagnostics.HasFlag (ViewDiagnosticFlags.Hover) && _hovering)
-        {
-            disabled = new (disabled.Foreground.GetDarkerColor (), disabled.Background.GetDarkerColor ());
-        }
-
-        return Enabled ? GetColor (cs.Normal) : disabled;
     }
 
     /// <summary>
@@ -235,8 +260,7 @@ public partial class View
     /// <returns>The corresponding <see cref="Attribute"/> from the <see cref="Scheme"/>.</returns>
     public Attribute GetAttributeForRole (VisualRole role)
     {
-        Scheme scheme = Scheme ?? SchemeManager.GetCurrentSchemes()? ["Base"]!;
-        Attribute curAttribute = scheme.GetAttributeForRole (role);
+        Attribute curAttribute = GetScheme ()!.GetAttributeForRole (role);
 
         if (OnGettingAttributeForRole (role, ref curAttribute))
         {
@@ -253,16 +277,7 @@ public partial class View
             return args.NewValue;
         }
 
-        // TODO: 
-        Scheme? cs = Scheme ?? new ();
-        Attribute disabled = new (cs.Disabled.Foreground, cs.Disabled.Background);
-
-        if (Diagnostics.HasFlag (ViewDiagnosticFlags.Hover) && _hovering)
-        {
-            disabled = new (disabled.Foreground.GetDarkerColor (), disabled.Background.GetDarkerColor ());
-        }
-        // BUGBUG: This broke ViewDiagnosticFlags.Hover
-        return Enabled ? curAttribute : disabled;
+        return Enabled || role == VisualRole.Disabled ? curAttribute : GetAttributeForRole (VisualRole.Disabled);
     }
 
     /// <summary>
@@ -278,7 +293,7 @@ public partial class View
     }
 
     /// <summary>
-    ///     Raised when the Attribute for a <see cref="GetAttributeForRole(Terminal.Gui.VisualRole)"/> is being retrieved. Handelers should check if <see cref="CancelEventArgs.Cancel"/>
+    ///     Raised when the Attribute for a <see cref="GetAttributeForRole(Terminal.Gui.VisualRole)"/> is being retrieved. Handlers should check if <see cref="CancelEventArgs.Cancel"/>
     ///     has been set to <see langword="true"/> and do nothing if so. If Cancel is <see langword="false"/>
     ///     a handler can set it to <see langword="true"/> to stop further processing optionally change the <see cref="VisualRoleEventArgs.CurrentValue"/> in the event args to a different value.
     /// </summary>
@@ -322,15 +337,18 @@ public partial class View
     /// </returns>
     public event EventHandler<CancelEventArgs>? SettingNormalAttribute;
 
-    private Attribute GetColor (Attribute inputAttribute)
+    private Attribute GetDiagnosticsColor (Attribute inputAttribute)
     {
         Attribute attr = inputAttribute;
 
-        if (Diagnostics.HasFlag (ViewDiagnosticFlags.Hover) && _hovering)
-        {
-            attr = new (attr.Foreground.GetDarkerColor (), attr.Background.GetDarkerColor ());
-        }
+        //if (Diagnostics.HasFlag (ViewDiagnosticFlags.Hover) && _hovering)
+        //{
+        //    attr = new (attr.Foreground.GetDarkerColor (), attr.Background.GetDarkerColor ());
+        //}
 
         return attr;
     }
+
+    #endregion VisualRole
+
 }

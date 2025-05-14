@@ -82,6 +82,28 @@ public class Adornment : View, IDesignable
     #endregion Thickness
 
     #region View Overrides
+
+    // If a scheme is explicitly set, use that. Otherwise, use the scheme of the parent view.
+    private Scheme? _scheme;
+
+    /// <inheritdoc />
+    protected override bool OnGettingScheme (out Scheme? scheme)
+    {
+        scheme = _scheme ?? Parent?.GetScheme () ?? SchemeManager.GetCurrentSchemes () ["Base"]!;
+
+        return true;
+    }
+
+    /// <param name="scheme"></param>
+    /// <inheritdoc />
+    protected override bool OnSettingScheme (in Scheme? scheme)
+    {
+        Parent?.SetNeedsDraw ();
+
+        _scheme = scheme;
+        return false;
+    }
+
     /// <summary>
     ///     Gets the rectangle that describes the area of the Adornment. The Location is always (0,0).
     ///     The size is the size of the <see cref="View.Frame"/>.
