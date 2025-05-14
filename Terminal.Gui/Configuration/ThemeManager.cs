@@ -231,15 +231,17 @@ public static class ThemeManager
                 throw new InvalidOperationException ("Settings has no Themes property.");
             }
 
+            string previousThemeValue = GetCurrentThemeName ();
+
             // Update the backing store
             ConfigurationManager.Settings! ["Theme"].PropertyValue = value;
 
-            if (!ConfigurationManager.Settings.ContainsKey (value))
+            if (!Themes!.ContainsKey (value))
             {
                 Logging.Warning ($"{value} is not a valid theme name.");
             }
 
-            //Instance.OnThemeChanged (prevousThemeValue);
+            OnThemeChanged (previousThemeValue);
         }
     }
 
@@ -292,8 +294,8 @@ public static class ThemeManager
     /// <summary>Called when the selected theme has changed. Fires the <see cref="ThemeChanged"/> event.</summary>
     internal static void OnThemeChanged (string theme)
     {
-        //Logging.Trace ($"Themes.OnThemeChanged({theme}) -> {Theme}");
-        ThemeChanged?.Invoke (null, new ThemeManagerEventArgs (theme));
+        Logging.Debug ($"Themes.OnThemeChanged({theme}) -> {Theme}");
+        ThemeChanged?.Invoke (null, new (theme));
     }
 
 }

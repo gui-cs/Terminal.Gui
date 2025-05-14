@@ -82,7 +82,7 @@ public class ScopeTests
         // Arrange
         var scope = new ScopeTestsScope ();
         var scopeWithAddedProperty = new ScopeTestsScope ();
-        scopeWithAddedProperty.Add ("AddedProperty", new ConfigProperty ()
+        scopeWithAddedProperty.TryAdd ("AddedProperty", new ConfigProperty ()
         {
             Immutable = false,
             PropertyInfo = scope ["ScopeTests.BoolProperty"].PropertyInfo, // cheat and reuse the same PropertyInfo
@@ -190,5 +190,48 @@ public class ScopeTests
 
         DictionaryItemProperty1 = null;
     }
+
+    #region Concurrency Testing
+
+    [Fact]
+    public void Scope_Concurrent_Additions ()
+    {
+        // Arrange
+        var scope = new Scope<object> ();
+        int threadCount = 10;
+        int itemsPerThread = 100;
+        var tasks = new List<Task> ();
+
+        // Act
+        for (int t = 0; t < threadCount; t++)
+        {
+            int threadId = t;
+            tasks.Add (Task.Run (() =>
+                                 {
+                                     for (int i = 0; i < itemsPerThread; i++)
+                                     {
+                                         string key = $"Thread{threadId}_Item{i}";
+                                         scope.TryAdd (key, new ConfigProperty { PropertyValue = i });
+                                     }
+                                 }));
+        }
+
+        Task.WaitAll (tasks.ToArray ());
+
+        // Assert
+        Assert.Equal (threadCount * itemsPerThread, scope.Count);
+        for (int t = 0; t < threadCount; t++)
+        {
+            for (int i = 0; i < itemsPerThread; i++)
+            {
+                string key = $"Thread{t}_Item{i}";
+                Assert.True (scope.ContainsKey (key));
+                Assert.Equal (i, scope [key].PropertyValue);
+            }
+        }
+    }
+
+
+    #endregion
 
 }
