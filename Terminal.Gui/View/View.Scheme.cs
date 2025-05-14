@@ -102,7 +102,7 @@ public partial class View
 
         if (!HasScheme)
         {
-            return SuperView?.Scheme;
+            return SuperView?.Scheme ?? SchemeManager.GetCurrentSchemes () ["Base"]!;
         }
 
         return _scheme;
@@ -260,8 +260,7 @@ public partial class View
     /// <returns>The corresponding <see cref="Attribute"/> from the <see cref="Scheme"/>.</returns>
     public Attribute GetAttributeForRole (VisualRole role)
     {
-        Scheme scheme = Scheme ?? SchemeManager.GetCurrentSchemes ()? ["Base"]!;
-        Attribute curAttribute = scheme.GetAttributeForRole (role);
+        Attribute curAttribute = GetScheme ()!.GetAttributeForRole (role);
 
         if (OnGettingAttributeForRole (role, ref curAttribute))
         {
@@ -278,16 +277,7 @@ public partial class View
             return args.NewValue;
         }
 
-        // TODO: 
-        Scheme? cs = Scheme ?? new ();
-        Attribute disabled = new (cs.Disabled.Foreground, cs.Disabled.Background);
-
-        //if (Diagnostics.HasFlag (ViewDiagnosticFlags.Hover) && _hovering)
-        //{
-        //    disabled = new (disabled.Foreground.GetDarkerColor (), disabled.Background.GetDarkerColor ());
-        //}
-
-        return Enabled ? GetDiagnosticsColor (cs.Normal) : disabled;
+        return Enabled || role == VisualRole.Disabled ? curAttribute : GetAttributeForRole (VisualRole.Disabled);
     }
 
     /// <summary>

@@ -84,12 +84,12 @@ public class Adornment : View, IDesignable
     #region View Overrides
 
     // If a scheme is explicitly set, use that. Otherwise, use the scheme of the parent view.
-    private new Scheme? _scheme;
+    private Scheme? _scheme;
 
     /// <inheritdoc />
     protected override bool OnGettingScheme (out Scheme? scheme)
     {
-        scheme = _scheme ?? Parent?.GetScheme ();
+        scheme = _scheme ?? Parent?.GetScheme () ?? SchemeManager.GetCurrentSchemes () ["Base"]!;
 
         return true;
     }
