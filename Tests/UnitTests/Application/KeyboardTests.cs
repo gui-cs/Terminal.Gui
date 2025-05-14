@@ -215,7 +215,7 @@ public class KeyboardTests
                                      Assert.True (v3.HasFocus);
 
                                      Application.RaiseKeyDownEvent (Key.F6);
-                                     Assert.True (v1.HasFocus);
+                                     Assert.True (v2.HasFocus); // previously focused view was preserved
 
                                      Application.RequestStop ();
                                  };

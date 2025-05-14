@@ -119,6 +119,38 @@ public class SubViewTests
     }
 
     [Fact]
+    public void MoveOverlappedSubViewToEnd ()
+    {
+        View superView = new ();
+
+        var subview1 = new View
+        {
+            Id = "subview1"
+        };
+
+        var subview2 = new View
+        {
+            Id = "subview2"
+        };
+
+        var subview3 = new View
+        {
+            Id = "subview3"
+        };
+
+        superView.Add (subview1, subview2, subview3);
+
+        superView.MoveOverlappedSubViewToEnd (subview1);
+        Assert.Equal ([subview2, subview3, subview1], superView.SubViews.ToArray ());
+
+        superView.MoveOverlappedSubViewToEnd (subview2);
+        Assert.Equal ([subview3, subview1, subview2], superView.SubViews.ToArray ());
+
+        superView.MoveOverlappedSubViewToEnd (subview3);
+        Assert.Equal ([subview1, subview2, subview3], superView.SubViews.ToArray ());
+    }
+
+    [Fact]
     public void MoveSubViewToStart ()
     {
         View superView = new ();

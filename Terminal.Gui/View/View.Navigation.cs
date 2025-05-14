@@ -61,14 +61,31 @@ public partial class View // Focus and cross-view navigation management (TabStop
             if (direction == NavigationDirection.Forward && focused == focusChain [^1] && SuperView is null)
             {
                 // We're at the top of the focus chain. Go back down the focus chain and focus the first TabGroup
-                View [] views = GetFocusChain (NavigationDirection.Forward, TabBehavior.TabGroup);
-
-                if (views.Length > 0)
+                if (focusChain.Length > 0)
                 {
-                    View [] subViews = views [0].GetFocusChain (NavigationDirection.Forward, TabBehavior.TabStop);
+                    // Get the index of the currently focused view
+                    int focusedTabGroupIndex = focusChain.IndexOf (Focused); // Will return -1 if Focused can't be found or is null
+
+                    if (focusedTabGroupIndex + 1 > focusChain.Length - 1)
+                    {
+                        focusedTabGroupIndex = 0;
+                    }
+                    else
+                    {
+                        focusedTabGroupIndex++;
+                    }
+
+                    View [] subViews = focusChain [focusedTabGroupIndex].GetFocusChain (NavigationDirection.Forward, TabBehavior.TabStop);
 
                     if (subViews.Length > 0)
                     {
+                        if (focusChain [focusedTabGroupIndex]._previouslyFocused is { }
+                            && subViews.Any (v => v == focusChain [focusedTabGroupIndex]._previouslyFocused))
+                        {
+                            return focusChain [focusedTabGroupIndex]._previouslyFocused!.SetFocus ();
+                        }
+
+                        // We have a subview that can be focused
                         if (subViews [0].SetFocus ())
                         {
                             return true;
@@ -77,17 +94,34 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 }
             }
 
-            if (direction == NavigationDirection.Backward && focused == focusChain [0])
+            if (direction == NavigationDirection.Backward && focused == focusChain [0] && SuperView is null)
             {
                 // We're at the bottom of the focus chain
-                View [] views = GetFocusChain (NavigationDirection.Forward, TabBehavior.TabGroup);
-
-                if (views.Length > 0)
+                if (focusChain.Length > 0)
                 {
-                    View [] subViews = views [^1].GetFocusChain (NavigationDirection.Forward, TabBehavior.TabStop);
+                    // Get the index of the currently focused view
+                    int focusedTabGroupIndex = focusChain.IndexOf (Focused); // Will return -1 if Focused can't be found or is null
+
+                    if (focusedTabGroupIndex + 1 > focusChain.Length - 1)
+                    {
+                        focusedTabGroupIndex = 0;
+                    }
+                    else
+                    {
+                        focusedTabGroupIndex++;
+                    }
+
+                    View [] subViews = focusChain [focusedTabGroupIndex].GetFocusChain (NavigationDirection.Forward, TabBehavior.TabStop);
 
                     if (subViews.Length > 0)
                     {
+                        if (focusChain [focusedTabGroupIndex]._previouslyFocused is { }
+                            && subViews.Any (v => v == focusChain [focusedTabGroupIndex]._previouslyFocused))
+                        {
+                            return focusChain [focusedTabGroupIndex]._previouslyFocused!.SetFocus ();
+                        }
+
+                        // We have a subview that can be focused
                         if (subViews [0].SetFocus ())
                         {
                             return true;
@@ -619,7 +653,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         if (Arrangement.HasFlag (ViewArrangement.Overlapped))
         {
-            SuperView?.MoveSubViewToEnd (this);
+            SuperView?.MoveOverlappedSubViewToEnd (this);
         }
 
         // Focus work is done. Notify.
