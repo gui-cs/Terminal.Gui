@@ -456,14 +456,14 @@ internal sealed class Menu : View
         int maxW = (items.Max (z => z?.Width) ?? 0) + borderOffset;
         int maxH = items.Length + borderOffset;
 
-        if (parent is { } && x + maxW > Driver.Cols)
+        if (parent is { } && x + maxW > Application.Screen.Width)
         {
             minX = Math.Max (parent.Frame.Right - parent.Frame.Width - maxW, 0);
         }
 
-        if (y + maxH > Driver.Rows)
+        if (y + maxH > Application.Screen.Height)
         {
-            minY = Math.Max (Driver.Rows - maxH, 0);
+            minY = Math.Max (Application.Screen.Height - maxH, 0);
         }
 
         return new (minX, minY, maxW, maxH);

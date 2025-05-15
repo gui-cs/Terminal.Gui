@@ -92,11 +92,11 @@ public class TextAnnotation : IAnnotation
 
         if (Text.Length < availableWidth)
         {
-            View.Driver.AddStr (Text);
+            graph.Driver?.AddStr (Text);
         }
         else
         {
-            View.Driver.AddStr (Text.Substring (0, availableWidth));
+            graph.Driver?.AddStr (Text.Substring (0, availableWidth));
         }
     }
 }

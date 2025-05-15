@@ -148,9 +148,9 @@ public partial class View
     ///     stop further processing and optionally set the <see cref="Scheme"/> in the event args to a different value.
     /// </summary>
     /// <returns>
-    ///     Set <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/> to stop default behavior.
+    ///     Set <see cref="SchemeEventArgs.Cancel"/> to <see langword="true"/> to stop default behavior.
     /// </returns>
-    public event EventHandler<CancelEventArgs>? GettingScheme;
+    public event EventHandler<SchemeEventArgs>? GettingScheme;
 
     /// <summary>
     ///     Sets the Scheme for the View. Raises <see cref="SettingScheme"/> event before setting the scheme.

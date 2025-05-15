@@ -291,7 +291,7 @@ public class Snake : Scenario
         {
             _appleRune = Glyphs.Apple;
 
-            if (!Driver.IsRuneSupported (_appleRune))
+            if (!Application.Driver!.IsRuneSupported (_appleRune))
             {
                 _appleRune = Glyphs.AppleBMP;
             }

@@ -64,7 +64,7 @@ public class UICatalogTop : Toplevel
 
         if (_shVersion is { })
         {
-            _shVersion.Title = $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {Driver!.GetVersionInfo ()}";
+            _shVersion.Title = $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {Application.Driver!.GetVersionInfo ()}";
         }
 
         if (CachedSelectedScenario != null)

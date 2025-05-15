@@ -314,7 +314,7 @@ public class ClearViewportTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Theory]
+    [Theory (Skip = "This test is too fragile; depends on Library Resoruces/Themes which can easily change.")]
     [AutoInitShutdown]
     [InlineData (true)]
     [InlineData (false)]

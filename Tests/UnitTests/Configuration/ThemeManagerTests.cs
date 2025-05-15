@@ -197,6 +197,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
     [Fact]
     public void Apply_Applies ()
     {
+        Assert.False (IsEnabled);
         Enable (resetToHardCodedDefaults: true);
 
         var theme = new ThemeScope ();
@@ -268,7 +269,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
         output.WriteLine ($"After ResetToHardCodedDefaults: Themes dictionary size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
 
         Load (ConfigLocations.LibraryResources);
-        Assert.Equal (6, ThemeManager.Themes!.Count);
+        Assert.Equal (7, ThemeManager.Themes!.Count);
         output.WriteLine ($"After Load: Themes dictionary size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
 
         output.WriteLine ($"Total Settings Size: {(MemorySizeEstimator.EstimateSize (Settings!)) / 1024} Kb");

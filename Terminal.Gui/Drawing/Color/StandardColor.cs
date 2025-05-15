@@ -114,6 +114,14 @@ public enum StandardColor
     BurlyWood = 0xDEB887,
 
     /// <summary>
+    ///     Cadet blue RGB(95, 158, 160).
+    ///     <para>
+    ///         A light bluish-green color, first used as a color name in English in 1892.
+    ///     </para>
+    /// </summary>
+    CadetBlue = 0x5F9EA0,
+
+    /// <summary>
     ///     Charcoal RGB(54, 69, 79).
     ///     <para>
     ///         A dark grayish-black color, resembling burnt wood.

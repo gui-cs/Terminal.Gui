@@ -38,7 +38,7 @@ public partial class View
             return args.NewValue;
         }
 
-        return Enabled || role == VisualRole.Disabled ? schemeAttribute : GetAttributeForRole (VisualRole.Disabled);
+        return schemeAttribute;// Enabled || role == VisualRole.Disabled ? schemeAttribute : GetAttributeForRole (VisualRole.Disabled);
     }
 
     /// <summary>
