@@ -62,7 +62,7 @@ internal partial class WindowsOutput : IConsoleOutput
     private readonly nint _screenBuffer;
 
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
-    private Style _redrawTextStyle = Style.None;
+    private TextStyle _redrawTextStyle = TextStyle.None;
 
     public WindowsOutput ()
     {

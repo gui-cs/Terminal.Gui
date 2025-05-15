@@ -261,7 +261,7 @@
           "default": "None",
           "description": "Text style. Can be a single style or a comma-separated list (e.g., 'Bold,Italic').",
           "enum": [
-            "None", "Bold", "Italic", "Underline", "Dim", "Blink", "Reverse", "Hidden", "StrikeThrough",
+            "None", "Bold", "Italic", "Underline", "Faint", "Blink", "Reverse", "Strikethrough",
             "Bold,Italic", "Bold,Underline"
             // Note: Terminal.Gui.Style is a flags enum, so many combinations are possible.
             // This enum provides common examples. For full flexibility, a pattern might be needed

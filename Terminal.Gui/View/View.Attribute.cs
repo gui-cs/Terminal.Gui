@@ -14,6 +14,8 @@ public partial class View
     /// <summary>
     ///     Gets the <see cref="Attribute"/> associated with a specified <see cref="VisualRole"/>
     ///     from the <see cref="Scheme"/>.
+    ///     Raises <see cref="OnGettingAttributeForRole"/>/<see cref="GettingAttributeForRole"/>
+    ///     which can cancel the default behavior, and optionally change the attribute in the event args.
     /// </summary>
     /// <param name="role">The semantic <see cref="VisualRole"/> describing the element being rendered.</param>
     /// <returns>The corresponding <see cref="Attribute"/> from the <see cref="Scheme"/>.</returns>
@@ -75,10 +77,11 @@ public partial class View
     /// <summary>
     ///     Selects the Attribute associated with the specified <see cref="VisualRole"/>
     ///     as the Attribute to use for subsquent calls to <see cref="AddRune(System.Text.Rune)"/> and <see cref="AddStr"/>.
-    ///     Raises an event and checks for cancellation before setting the Attribute.
+    ///     Raises <see cref="OnSettingAttributeForRole"/>/<see cref="SettingAttributeForRole"/> and checks for cancellation
+    ///     before setting the Attribute.
     /// </summary>
     /// <param name="role">The semantic <see cref="VisualRole"/> describing the element being rendered.</param>
-    /// <returns>The previously set Attribute. <see langword="null"/> if the operation was cancelled.</returns>
+    /// <returns>The previously set Attribute.</returns>
     public Attribute? SetAttributeForRole (VisualRole role)
     {
         Attribute schemeAttribute = GetScheme ().GetAttributeForRole (role);
@@ -86,7 +89,7 @@ public partial class View
 
         if (OnSettingAttributeForRole (in role, in currentAttribute, ref schemeAttribute))
         {
-            return null;
+            return currentAttribute;
         }
 
         var args = new VisualRoleEventArgs (role, in currentAttribute, ref schemeAttribute);
@@ -94,7 +97,7 @@ public partial class View
 
         if (args.Cancel)
         {
-            return null;
+            return currentAttribute;
         }
 
         return SetAttribute (schemeAttribute);
@@ -105,7 +108,7 @@ public partial class View
     ///     This is raised by <see cref="SetAttributeForRole"/>.
     /// </summary>
     /// <returns>
-    ///   <see langword="true"/> to cancel the setting of the attribute.
+    ///     <see langword="true"/> to cancel the setting of the attribute.
     /// </returns>
     private bool OnSettingAttributeForRole (in VisualRole role, in Attribute currentAttribute, ref Attribute schemeAttribute) { return false; }
 

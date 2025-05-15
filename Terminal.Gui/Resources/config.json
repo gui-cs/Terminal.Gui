@@ -59,24 +59,26 @@
           {
             "TopLevel": {
               "Normal": {
-                "Foreground": "BrightGreen",
-                "Background": "DarkSlateGray"
+                "Foreground": "AntiqueWhite",
+                "Background": "DimGray"
               },
               "Focus": {
                 "Foreground": "White",
-                "Background": "DimGray"
+                "Background": "DarkGray"
               },
               "HotNormal": {
-                "Foreground": "Yellow",
-                "Background": "DarkSlateGray"
+                "Foreground": "Wheat",
+                "Background": "DarkGray",
+                "Style": "Underline"
               },
               "HotFocus": {
-                "Foreground": "Yellow",
-                "Background": "DimGray"
+                "Foreground": "LightYellow",
+                "Background": "DimGray",
+                "Style": "Underline"
               },
               "Disabled": {
-                "Foreground": "DarkGray",
-                "Background": "DarkSlateGray"
+                "Foreground": "Black",
+                "Background": "DimGray"
               }
             }
           },
@@ -132,23 +134,28 @@
             "Menu": {
               "Normal": {
                 "Foreground": "White",
-                "Background": "DarkBlue"
+                "Background": "DarkBlue",
+                "Style": "None"
               },
               "Focus": {
                 "Foreground": "DarkBlue",
-                "Background": "White"
+                "Background": "White",
+                "Style": "Italic"
               },
               "HotNormal": {
-                "Foreground": "Yellow",
-                "Background": "DarkBlue"
+                "Foreground": "White",
+                "Background": "DarkBlue",
+                "Style": "Underline"
               },
               "HotFocus": {
-                "Foreground": "Blue",
-                "Background": "White"
+                "Foreground": "DarkBlue",
+                "Background": "White",
+                "Style": "Italic,Underline"
               },
               "Disabled": {
                 "Foreground": "Gray",
-                "Background": "DarkGray"
+                "Background": "DarkGray",
+                "Style": "Faint"
               }
             }
           },

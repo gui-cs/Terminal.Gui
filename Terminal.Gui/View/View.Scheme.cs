@@ -6,7 +6,7 @@ namespace Terminal.Gui;
 public partial class View
 {
     /// <summary>
-    ///     Gets the hard-coded set of <see cref="Scheme"/>s. Used for generating the built-in config.json and for
+    ///     INTERNAL: Gets the hard-coded set of <see cref="Scheme"/>s. Used for generating the built-in config.json and for
     ///     unit tests that don't depend on ConfigurationManager.
     /// </summary>
     /// <returns></returns>
@@ -15,50 +15,55 @@ public partial class View
         return new (StringComparer.InvariantCultureIgnoreCase)
         {
             {
-                "TopLevel", new (
-                                 new (new Color ("BrightGreen"), new Color ("#505050")),
-                                 new (new Color ("White"), new Color ("#696969")),
-                                 new (new Color ("Yellow"), new Color ("#505050")),
-                                 hotFocus: new (new Color ("Yellow"), new Color ("#505050")),
-                                 disabled: new (new Color ("DarkGray"), new Color ("#505050"))
-                                )
+                SchemeManager.SchemesToSchemeName (Schemes.Base)!,
+                new (
+                     new (new Color ("White"), new Color ("Blue")),
+                     new (new Color ("DarkBlue"), new Color ("LightGray")),
+                     new (new Color ("BrightCyan"), new Color ("Blue")),
+                     hotFocus: new (new Color ("BrightBlue"), new Color ("LightGray")),
+                     disabled: new (new Color ("DarkGray"), new Color ("Blue"))
+                    )
             },
             {
-                "Base", new (
-                             new (new Color ("White"), new Color ("Blue")),
-                             new (new Color ("DarkBlue"), new Color ("LightGray")),
-                             new (new Color ("BrightCyan"), new Color ("Blue")),
-                             hotFocus: new (new Color ("BrightBlue"), new Color ("LightGray")),
-                             disabled: new (new Color ("DarkGray"), new Color ("Blue"))
-                            )
-            },
-            {
-                "Dialog", new (
+                SchemeManager.SchemesToSchemeName (Schemes.Dialog)!,
+                new (
                                new (new Color ("Black"), new Color ("LightGray")),
-                               new (new Color ("DarkGray"), new Color ("LightGray")),
-                               new (new Color ("Blue"), new Color ("LightGray")),
-                               hotFocus: new (new Color ("BrightBlue"), new Color ("LightGray")),
-                               disabled: new (new Color ("Gray"), new Color ("DarkGray"))
-                              )
+                     new (new Color ("DarkGray"), new Color ("LightGray")),
+                     new (new Color ("Blue"), new Color ("LightGray")),
+                     hotFocus: new (new Color ("BrightBlue"), new Color ("LightGray")),
+                     disabled: new (new Color ("Gray"), new Color ("DarkGray"))
+                    )
             },
             {
-                "Menu", new (
-                             new (new Color ("White"), new Color ("DarkBlue")),
-                             new (new Color ("DarkBlue"), new Color ("White")),
-                             new (new Color ("Yellow"), new Color ("DarkBlue")),
-                             hotFocus: new (new Color ("Blue"), new Color ("White")),
-                             disabled: new (new Color ("Gray"), new Color ("DarkGray"))
-                            )
-            },
-            {
-                "Error", new (
+                SchemeManager.SchemesToSchemeName (Schemes.Error)!,
+                new (
                               new (new Color ("Red"), new Color ("Pink")),
-                              new (new Color ("White"), new Color ("BrightRed")),
-                              new (new Color ("Black"), new Color ("Pink")),
-                              hotFocus: new (new Color ("Pink"), new Color ("BrightRed")),
-                              disabled: new (new Color ("DarkGray"), new Color ("White"))
-                             )
-            }
+                     new (new Color ("White"), new Color ("BrightRed")),
+                     new (new Color ("Black"), new Color ("Pink")),
+                     hotFocus: new (new Color ("Pink"), new Color ("BrightRed")),
+                     disabled: new (new Color ("DarkGray"), new Color ("White"))
+                    )
+            },
+            {
+                SchemeManager.SchemesToSchemeName (Schemes.Menu)!,
+                new (
+                     new (new Color ("White"), new Color ("DarkBlue")),
+                     new (new Color ("DarkBlue"), new Color ("White")),
+                     new (new Color ("Yellow"), new Color ("DarkBlue")),
+                     hotFocus: new (new Color ("Blue"), new Color ("White")),
+                     disabled: new (new Color ("Gray"), new Color ("DarkGray"))
+                    )
+            },
+            {
+                SchemeManager.SchemesToSchemeName (Schemes.Toplevel)!,
+                new (
+                     normal: new (new Color ("White"), new Color ("DarkSlateGray")),
+                     hotNormal: new (new Color ("Yellow"), new Color ("DarkSlateGray")),
+                     focus: new (new Color ("White"), new Color ("DimGray")),
+                     hotFocus: new (new Color ("Yellow"), new Color ("DarkSlateGray")),
+                     disabled: new (new Color ("DarkGray"), new Color ("DarkSlateGray"))
+                    )
+            },
         };
     }
 

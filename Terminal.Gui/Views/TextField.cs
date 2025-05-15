@@ -723,7 +723,7 @@ public class TextField : View
     {
         if (role == VisualRole.Normal)
         {
-            currentAttribute = GetScheme ().GetAttributeForRole (VisualRole.Focus);
+            currentAttribute = GetAttributeForRole (VisualRole.Focus);
 
             return true;
         }

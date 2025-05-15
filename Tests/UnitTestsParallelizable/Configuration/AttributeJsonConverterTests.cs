@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Moq;
 using UnitTests;
 
 namespace Terminal.Gui.ConfigurationTests;
@@ -26,6 +27,24 @@ public class AttributeJsonConverterTests
         Assert.Equal (Color.BrightGreen, attribute.Background.GetClosestNamedColor16 ());
     }
 
+
+    [Fact]
+    public void Deserialize_TextStyle ()
+    {
+        var justStyleJson = "\"Bold\"";
+        TextStyle textStyle = JsonSerializer.Deserialize<TextStyle> (justStyleJson, JsonOptions);
+        Assert.Equal (TextStyle.Bold, textStyle);
+
+        justStyleJson = "\"Bold,Underline\"";
+        textStyle = JsonSerializer.Deserialize<TextStyle> (justStyleJson, JsonOptions);
+        Assert.Equal (TextStyle.Bold | TextStyle.Underline, textStyle);
+
+        var json = "{\"Foreground\":\"Blue\",\"Background\":\"Green\",\"Style\":\"Bold\"}";
+        Attribute attribute = JsonSerializer.Deserialize<Attribute> (json, JsonOptions);
+        Assert.Equal (TextStyle.Bold, attribute.Style);
+    }
+
+
     [Fact]
     public void TestSerialize ()
     {
@@ -33,5 +52,19 @@ public class AttributeJsonConverterTests
         var attribute = new Attribute (Color.Blue, Color.Green);
         string json = JsonSerializer.Serialize (attribute, JsonOptions);
         Assert.Equal ("{\"Foreground\":\"Blue\",\"Background\":\"Green\"}", json);
+    }
+
+    [Fact]
+    public void Serialize_TextStyle ()
+    {
+        // Test serializing to human-readable color names
+        var attribute = new Attribute (Color.Blue, Color.Green, TextStyle.Bold);
+        string json = JsonSerializer.Serialize (attribute, JsonOptions);
+        Assert.Equal ("{\"Foreground\":\"Blue\",\"Background\":\"Green\",\"Style\":\"Bold\"}", json);
+
+        attribute = new Attribute (Color.Blue, Color.Green, TextStyle.Bold | TextStyle.Italic);
+        json = JsonSerializer.Serialize (attribute, JsonOptions);
+        Assert.Equal ("{\"Foreground\":\"Blue\",\"Background\":\"Green\",\"Style\":\"Bold, Italic\"}", json);
+
     }
 }

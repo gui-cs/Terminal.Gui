@@ -272,7 +272,7 @@ public class ScrollSlider : View, IOrientation, IDesignable
     {
         if (role == VisualRole.Normal)
         {
-            currentAttribute = GetScheme ().GetAttributeForRole (VisualRole.HotNormal);
+            currentAttribute = GetAttributeForRole (VisualRole.HotNormal);
 
             return true;
         }

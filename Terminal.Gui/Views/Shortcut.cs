@@ -736,13 +736,13 @@ public class Shortcut : View, IOrientation, IDesignable
 
         if (role == VisualRole.Normal)
         {
-            currentAttribute = GetScheme ().GetAttributeForRole (VisualRole.Focus);
+            currentAttribute = GetAttributeForRole (VisualRole.Focus);
 
             return true;
         }
         if (role == VisualRole.HotNormal)
         {
-            currentAttribute = GetScheme ().GetAttributeForRole (VisualRole.HotFocus);
+            currentAttribute = GetAttributeForRole (VisualRole.HotFocus);
 
             return true;
         }

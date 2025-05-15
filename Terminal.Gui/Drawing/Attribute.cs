@@ -31,7 +31,7 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
 
     // TODO: Add constructors which permit including a Style.
     /// <summary>The style (bold, italic, underlined, etc.).</summary>
-    public Style Style { get; init; } = Style.None;
+    public TextStyle Style { get; init; } = TextStyle.None;
 
     /// <summary>Initializes a new instance with default values.</summary>
     public Attribute ()
@@ -66,6 +66,20 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
 
         // TODO: Once CursesDriver supports true color all the PlatformColor stuff goes away
         PlatformColor = Application.Driver?.MakeColor(in foreground, in background).PlatformColor ?? -1;
+    }
+
+    /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
+    /// <param name="foreground">Foreground</param>
+    /// <param name="background">Background</param>
+    /// <param name="style">Text Style</param>
+    public Attribute (in Color foreground, in Color background, in TextStyle style)
+    {
+        Foreground = foreground;
+        Background = background;
+        Style = style;
+
+        // TODO: Once CursesDriver supports true color all the PlatformColor stuff goes away
+        PlatformColor = Application.Driver?.MakeColor (in foreground, in background).PlatformColor ?? -1;
     }
 
     /// <summary>

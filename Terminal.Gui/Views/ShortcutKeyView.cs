@@ -11,7 +11,7 @@ public class ShortcutKeyView : View
     {
         if (role == VisualRole.Normal && SuperView is { HasFocus: true })
         {
-            currentAttribute = GetScheme ().GetAttributeForRole (VisualRole.HotFocus);
+            currentAttribute = GetAttributeForRole (VisualRole.HotFocus);
 
             return true;
         }

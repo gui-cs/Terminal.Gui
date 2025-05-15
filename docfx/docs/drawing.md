@@ -99,6 +99,20 @@ Use @Terminal.Gui.View.SetAttribute to indicate which Attribute subsequent @Term
 ```cs
 SetAttribute (new Attribute (Color.Red, Color.Black, Style.Underline));
 AddStr ("Red on Black Underlined.");
+```
+
+In the above example a hard-coded Attribute is set. Normally, developers will use @Terminal.Gui.View.SetAttributeForRole(VisualRole) to have the system use the Attributes associated with a `VisualRole` (see below).
+
+```cs
+// Modify the View's Scheme such that Focus is Red on Black Underlined
+Scheme = new Scheme (Scheme)
+    {
+        Focus = new Attribute (Color.Red, Color.Black, Style.Underline)
+    };
+    
+SetAttributeForRole (VisualRole.Focus);
+AddStr ("Red on Black Underlined.");
+```
 
 ## Color
 
