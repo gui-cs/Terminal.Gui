@@ -24,8 +24,8 @@ public class MarginTests (ITestOutputHelper output)
         };
 
         Application.Top.Add (view);
-        Assert.Equal (ColorName16.Red, view.Margin.GetNormalColor ().Foreground.GetClosestNamedColor16 ());
-        Assert.Equal (ColorName16.Red, Application.Top.GetNormalColor ().Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (ColorName16.Red, view.Margin.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (ColorName16.Red, Application.Top.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
 
         Application.Top.BeginInit ();
         Application.Top.EndInit ();
@@ -38,7 +38,7 @@ M M
 MMM",
                                              output
                                             );
-        DriverAssert.AssertDriverAttributesAre ("0", output, null, Application.Top.GetNormalColor ());
+        DriverAssert.AssertDriverAttributesAre ("0", output, null, Application.Top.GetAttributeForRole (VisualRole.Normal));
 
         Application.ResetState (true);
     }

@@ -422,15 +422,15 @@ internal sealed class Menu : View
     {
         if (item is null)
         {
-            return GetNormalColor ();
+            return GetAttributeForRole (VisualRole.Normal);
         }
 
         if (index == _currentChild)
         {
-            return GetFocusColor ();
+            return GetAttributeForRole (VisualRole.Focus);
         }
 
-        return !item.IsEnabled () ? Scheme!.Disabled : GetNormalColor ();
+        return !item.IsEnabled () ? Scheme!.Disabled : GetAttributeForRole (VisualRole.Normal);
     }
 
     internal required MenuBar Host
@@ -837,7 +837,7 @@ internal sealed class Menu : View
         // BUGBUG: Views should not change the clip. Doing so is an indcation of poor design or a bug in the framework.
         Region? savedClip = SetClipToScreen ();
 
-        SetAttribute (GetNormalColor ());
+        SetAttribute (GetAttributeForRole (VisualRole.Normal));
 
         for (int i = Viewport.Y; i < _barItems!.Children.Length; i++)
         {
@@ -856,8 +856,8 @@ internal sealed class Menu : View
             SetAttribute (
 
                           // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-                          item is null ? GetNormalColor () :
-                          i == _currentChild ? GetFocusColor () : GetNormalColor ()
+                          item is null ? GetAttributeForRole (VisualRole.Normal) :
+                          i == _currentChild ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal)
                          );
 
             if (item is null && BorderStyle != LineStyle.None)
@@ -969,7 +969,7 @@ internal sealed class Menu : View
                     // The -3 is left/right border + one space (not sure what for)
                     tf.Draw (
                              ViewportToScreen (new Rectangle (1, i, Frame.Width - 3, 1)),
-                             i == _currentChild ? GetFocusColor () : GetNormalColor (),
+                             i == _currentChild ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal),
                              i == _currentChild ? Scheme!.HotFocus : Scheme!.HotNormal,
                              SuperView?.ViewportToScreen (SuperView.Viewport) ?? Rectangle.Empty
                             );
@@ -979,7 +979,7 @@ internal sealed class Menu : View
                     DrawHotString (
                                    textToDraw,
                                    i == _currentChild ? Scheme!.HotFocus : Scheme!.HotNormal,
-                                   i == _currentChild ? GetFocusColor () : GetNormalColor ()
+                                   i == _currentChild ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal)
                                   );
                 }
 

@@ -183,7 +183,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
         {
             if (Schemes is { })
             {
-                return Schemes.Keys.OrderBy (key => key).ToImmutableList ();
+                return Schemes.Keys.ToImmutableList ();
             }
         }
 

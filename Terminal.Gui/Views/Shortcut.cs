@@ -491,7 +491,7 @@ public class Shortcut : View, IOrientation, IDesignable
                 if (HasFocus)
                 {
                     e.Cancel = true;
-                    e.NewValue = GetFocusColor ();
+                    e.NewValue = GetAttributeForRole (VisualRole.Focus);
                 }
                 break;
 
@@ -499,7 +499,7 @@ public class Shortcut : View, IOrientation, IDesignable
                 if (HasFocus)
                 {
                     e.Cancel = true;
-                    e.NewValue = GetHotFocusColor ();
+                    e.NewValue = GetAttributeForRole (VisualRole.HotFocus);
                 }
                 break;
         }
@@ -727,26 +727,27 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     /// <inheritdoc />
-    public override Attribute GetNormalColor ()
+    protected override bool OnGettingAttributeForRole (VisualRole role, ref Attribute currentAttribute)
     {
-        if (HasFocus)
+        if (!HasFocus)
         {
-            return base.GetFocusColor ();
+            return base.OnGettingAttributeForRole (role, ref currentAttribute);
         }
 
-        return base.GetNormalColor ();
-    }
-
-    /// <inheritdoc />
-    public override Attribute GetHotNormalColor ()
-    {
-        if (HasFocus)
-
+        if (role == VisualRole.Normal)
         {
-            return base.GetHotFocusColor ();
+            currentAttribute = GetAttributeForRole (VisualRole.Focus);
+
+            return true;
+        }
+        if (role == VisualRole.HotNormal)
+        {
+            currentAttribute = GetAttributeForRole (VisualRole.HotFocus);
+
+            return true;
         }
 
-        return base.GetHotNormalColor ();
+        return base.OnGettingAttributeForRole (role, ref currentAttribute);
     }
 
     #endregion Focus
@@ -785,23 +786,5 @@ public class Shortcut : View, IOrientation, IDesignable
         }
 
         base.Dispose (disposing);
-    }
-}
-
-/// <summary>
-///     A helper class used by <see cref="Shortcut"/> to display the key. Reverses the Normal and HotNormal colors.
-/// </summary>
-public class ShortcutKeyView : View
-{
-    /// <inheritdoc />
-    public override Attribute GetNormalColor ()
-    {
-        if (SuperView is { HasFocus: true })
-
-        {
-            return base.GetHotFocusColor ();
-        }
-
-        return base.GetHotNormalColor ();
     }
 }

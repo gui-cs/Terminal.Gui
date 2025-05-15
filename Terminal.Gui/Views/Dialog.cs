@@ -86,16 +86,19 @@ public class Dialog : Window
     // BUGBUG: By defn, a Dialog is Modal, and thus HasFocus is always true. OnDrawContent
     // BUGBUG: Calls these methods.
     // TODO: Fix this in https://github.com/gui-cs/Terminal.Gui/issues/2381
-    /// <inheritdoc />
-    public override Attribute GetNormalColor ()
-    {
-        return Scheme!.Normal;
-    }
 
     /// <inheritdoc />
-    public override Attribute GetFocusColor ()
+    /// <inheritdoc />
+    protected override bool OnGettingAttributeForRole (VisualRole role, ref Attribute currentAttribute)
     {
-        return Scheme!.Normal;
+        if (role == VisualRole.Normal || role == VisualRole.Focus)
+        {
+            currentAttribute = Scheme!.Normal;
+
+            return true;
+        }
+
+        return base.OnGettingAttributeForRole (role, ref currentAttribute);
     }
 
     private bool _canceled;

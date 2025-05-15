@@ -432,7 +432,7 @@ public class HexView : View, IDesignable
         }
 
         Attribute currentAttribute = Attribute.Default;
-        Attribute current = GetFocusColor ();
+        Attribute current = GetAttributeForRole (VisualRole.Focus);
         SetAttribute (current);
         Move (-Viewport.X, 0);
 
@@ -443,10 +443,10 @@ public class HexView : View, IDesignable
         Source.Position = addressOfFirstLine;
         long bytesRead = Source!.Read (data, 0, data.Length);
 
-        Attribute selectedAttribute = GetHotNormalColor ();
-        Attribute editedAttribute = new Attribute (GetNormalColor ().Foreground.GetHighlightColor (), GetNormalColor ().Background);
-        Attribute editingAttribute = new Attribute (GetFocusColor ().Background, GetFocusColor ().Foreground);
-        Attribute addressAttribute = new Attribute (GetNormalColor ().Foreground.GetHighlightColor (), GetNormalColor ().Background);
+        Attribute selectedAttribute = GetAttributeForRole (VisualRole.HotNormal);
+        Attribute editedAttribute = new Attribute (GetAttributeForRole (VisualRole.Normal).Foreground.GetHighlightColor (), GetAttributeForRole (VisualRole.Normal).Background);
+        Attribute editingAttribute = new Attribute (GetAttributeForRole (VisualRole.Focus).Background, GetAttributeForRole (VisualRole.Focus).Foreground);
+        Attribute addressAttribute = new Attribute (GetAttributeForRole (VisualRole.Normal).Foreground.GetHighlightColor (), GetAttributeForRole (VisualRole.Normal).Background);
         for (var line = 0; line < Viewport.Height; line++)
         {
             Move (-Viewport.X, line);
@@ -458,12 +458,12 @@ public class HexView : View, IDesignable
             }
             else
             {
-                SetAttribute (new Attribute (GetNormalColor ().Background.GetHighlightColor (), addressAttribute.Background));
+                SetAttribute (new Attribute (GetAttributeForRole (VisualRole.Normal).Background.GetHighlightColor (), addressAttribute.Background));
             }
             var address = $"{addressOfLine:x8}";
             AddStr ($"{address.Substring (8 - AddressWidth)}");
 
-            SetAttribute (GetNormalColor ());
+            SetAttribute (GetAttributeForRole (VisualRole.Normal));
             if (AddressWidth > 0)
             {
                 AddStr (" ");
@@ -483,11 +483,11 @@ public class HexView : View, IDesignable
                     }
                     else
                     {
-                        SetAttribute (edited ? editedAttribute : GetNormalColor ());
+                        SetAttribute (edited ? editedAttribute : GetAttributeForRole (VisualRole.Normal));
                     }
 
                     AddStr (offset >= bytesRead && !edited ? "  " : $"{value:x2}");
-                    SetAttribute (GetNormalColor ());
+                    SetAttribute (GetAttributeForRole (VisualRole.Normal));
                     AddRune (_spaceCharRune);
                 }
 
@@ -541,7 +541,7 @@ public class HexView : View, IDesignable
                 }
                 else
                 {
-                    SetAttribute (edited ? editedAttribute : GetNormalColor ());
+                    SetAttribute (edited ? editedAttribute : GetAttributeForRole (VisualRole.Normal));
                 }
 
                 AddRune (c);

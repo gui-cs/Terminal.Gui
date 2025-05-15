@@ -736,8 +736,8 @@ public class ListView : View, IDesignable
         {
             bool isSelected = item == _selected;
 
-            Attribute newcolor = focused ? isSelected ? Scheme.Focus : GetNormalColor () :
-                                 isSelected ? Scheme.HotNormal : GetNormalColor ();
+            Attribute newcolor = focused ? isSelected ? Scheme.Focus : GetAttributeForRole (VisualRole.Normal) :
+                                 isSelected ? Scheme.HotNormal : GetAttributeForRole (VisualRole.Normal);
 
             if (newcolor != current)
             {

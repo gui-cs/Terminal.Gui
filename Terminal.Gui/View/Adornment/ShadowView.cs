@@ -11,33 +11,39 @@ internal class ShadowView : View
 {
     private ShadowStyle _shadowStyle;
 
-    /// <inheritdoc/>
-    public override Attribute GetNormalColor ()
+    /// <inheritdoc />
+    protected override bool OnGettingAttributeForRole (VisualRole role, ref Attribute currentAttribute)
     {
-        if (SuperView is not Adornment adornment)
+        if (role == VisualRole.Normal)
         {
-            return base.GetNormalColor ();
+            if (SuperView is not Adornment adornment)
+            {
+                return false;
+            }
+
+            var attr = Attribute.Default;
+
+            if (adornment.Parent?.SuperView is { })
+            {
+                attr = adornment.Parent.SuperView.GetAttributeForRole (VisualRole.Normal);
+            }
+            else if (Application.Top is { })
+            {
+                attr = Application.Top.GetAttributeForRole (VisualRole.Normal);
+            }
+
+            currentAttribute =
+                        new Attribute (
+                                       ShadowStyle == ShadowStyle.Opaque ? Color.Black : attr.Foreground.GetDarkerColor (),
+                                       ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Background.GetDarkerColor ());
+
+
+            return true;
         }
 
-        var attr = Attribute.Default;
-
-        if (adornment.Parent?.SuperView is { })
-        {
-            attr = adornment.Parent.SuperView.GetNormalColor ();
-        }
-        else if (Application.Top is { })
-        {
-            attr = Application.Top.GetNormalColor ();
-        }
-
-        return new (
-                    new Attribute (
-                                   ShadowStyle == ShadowStyle.Opaque ? Color.Black : attr.Foreground.GetDarkerColor (),
-                                   ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Background.GetDarkerColor ()));
-
+        return base.OnGettingAttributeForRole (role, ref currentAttribute);
     }
 
-    /// <inheritdoc />
     /// <inheritdoc />
     protected override bool OnDrawingText ()
     {
@@ -54,7 +60,7 @@ internal class ShadowView : View
     /// <inheritdoc/>
     protected override bool OnDrawingContent ()
     {
-        SetAttribute (GetNormalColor ());
+        SetAttribute (GetAttributeForRole (VisualRole.Normal));
         switch (ShadowStyle)
         {
             case ShadowStyle.Opaque:

@@ -52,10 +52,10 @@ public class SchemeTests
     {
         var view = new View { Scheme = SchemeManager.GetHardCodedSchemes()? ["Base"]! };
 
-        Assert.Equal (view.Scheme!.HotNormal, view.GetHotNormalColor ());
+        Assert.Equal (view.Scheme!.HotNormal, view.GetAttributeForRole (VisualRole.HotNormal));
 
         view.Enabled = false;
-        Assert.Equal (view.Scheme.Disabled, view.GetHotNormalColor ());
+        Assert.Equal (view.Scheme.Disabled, view.GetAttributeForRole (VisualRole.HotNormal));
         view.Dispose ();
     }
 
@@ -64,10 +64,10 @@ public class SchemeTests
     {
         var view = new View { Scheme = SchemeManager.GetHardCodedSchemes ()? ["Base"]! };
 
-        Assert.Equal (view.Scheme!.Normal, view.GetNormalColor ());
+        Assert.Equal (view.Scheme!.Normal, view.GetAttributeForRole (VisualRole.Normal));
 
         view.Enabled = false;
-        Assert.Equal (view.Scheme.Disabled, view.GetNormalColor ());
+        Assert.Equal (view.Scheme.Disabled, view.GetAttributeForRole (VisualRole.Normal));
         view.Dispose ();
     }
 }

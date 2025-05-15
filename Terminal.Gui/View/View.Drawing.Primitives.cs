@@ -115,14 +115,14 @@ public partial class View
     {
         if (focused)
         {
-            DrawHotString (text, GetHotFocusColor (), GetFocusColor ());
+            DrawHotString (text, GetAttributeForRole (VisualRole.HotFocus), GetAttributeForRole (VisualRole.Focus));
         }
         else
         {
             DrawHotString (
                            text,
-                           Enabled ? GetHotNormalColor () : Scheme!.Disabled,
-                           Enabled ? GetNormalColor () : Scheme!.Disabled
+                           Enabled ? GetAttributeForRole (VisualRole.HotNormal) : Scheme!.Disabled,
+                           Enabled ? GetAttributeForRole (VisualRole.Normal) : Scheme!.Disabled
                           );
         }
     }
@@ -139,7 +139,7 @@ public partial class View
 
         Region prevClip = AddViewportToClip ();
         Rectangle toClear = ViewportToScreen (rect);
-        Attribute prev = SetAttribute (new (color ?? GetNormalColor ().Background));
+        Attribute prev = SetAttribute (new (color ?? GetAttributeForRole (VisualRole.Normal).Background));
         Driver.FillRect (toClear);
         SetAttribute (prev);
         SetClip (prevClip);

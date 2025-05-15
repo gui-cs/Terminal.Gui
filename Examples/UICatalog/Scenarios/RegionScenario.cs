@@ -301,8 +301,8 @@ public class AttributeView : View
         Color fg = Value?.Foreground ?? Color.Black;
         Color bg = Value?.Background ?? Color.Black;
 
-        bool isTransparentFg = fg == GetNormalColor ().Background;
-        bool isTransparentBg = bg == GetNormalColor ().Background;
+        bool isTransparentFg = fg == GetAttributeForRole (VisualRole.Normal).Background;
+        bool isTransparentBg = bg == GetAttributeForRole (VisualRole.Normal).Background;
 
         SetAttribute (new (fg, isTransparentFg ? Color.Gray : fg));
 

@@ -105,7 +105,7 @@ public class TrueColors : Scenario
 
                                       if (e.Flags == MouseFlags.Button1Clicked)
                                       {
-                                          Attribute normal = e.View.GetNormalColor ();
+                                          Attribute normal = e.View.GetAttributeForRole (VisualRole.Normal);
 
                                           lblLighter.Scheme = new (e.View.Scheme)
                                           {
@@ -117,7 +117,7 @@ public class TrueColors : Scenario
                                       }
                                       else
                                       {
-                                          Attribute normal = e.View.GetNormalColor ();
+                                          Attribute normal = e.View.GetAttributeForRole (VisualRole.Normal);
                                           lblRed.Text = normal.Foreground.R.ToString ();
                                           lblGreen.Text = normal.Foreground.G.ToString ();
                                           lblBlue.Text = normal.Foreground.B.ToString ();

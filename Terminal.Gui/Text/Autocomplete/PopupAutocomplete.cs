@@ -28,7 +28,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         {
             if (_scheme is null)
             {
-                _scheme = SchemeManager.GetScheme (Schemes.Base);
+                _scheme = SchemeManager.GetScheme (Schemes.Menu);
             }
 
             return _scheme;

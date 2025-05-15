@@ -59,24 +59,26 @@
           {
             "TopLevel": {
               "Normal": {
-                "Foreground": "BrightGreen",
-                "Background": "DarkSlateGray"
+                "Foreground": "AntiqueWhite",
+                "Background": "DimGray"
               },
               "Focus": {
                 "Foreground": "White",
-                "Background": "DimGray"
+                "Background": "DarkGray"
               },
               "HotNormal": {
-                "Foreground": "Yellow",
-                "Background": "DarkSlateGray"
+                "Foreground": "AntiqueWhite",
+                "Background": "DimGray",
+                "Style": "Underline"
               },
               "HotFocus": {
-                "Foreground": "Yellow",
-                "Background": "DimGray"
+                "Foreground": "White",
+                "Background": "DarkGray",
+                "Style": "Underline"
               },
               "Disabled": {
-                "Foreground": "DarkGray",
-                "Background": "DarkSlateGray"
+                "Foreground": "Black",
+                "Background": "DimGray"
               }
             }
           },
@@ -91,23 +93,25 @@
                 "Background": "LightGray"
               },
               "HotNormal": {
-                "Foreground": "BrightCyan",
-                "Background": "Blue"
+                "Foreground": "White",
+                "Background": "Blue",
+                "Style": "Underline"
               },
               "HotFocus": {
-                "Foreground": "BrightBlue",
+                "Foreground": "DarkBlue",
                 "Background": "LightGray"
               },
               "Disabled": {
                 "Foreground": "DarkGray",
-                "Background": "Blue"
+                "Background": "Blue",
+                "Style": "Underline"
               }
             }
           },
           {
             "Dialog": {
               "Normal": {
-                "Foreground": "Black",
+                "Foreground": "BrightBlue",
                 "Background": "LightGray"
               },
               "Focus": {
@@ -115,12 +119,14 @@
                 "Background": "LightGray"
               },
               "HotNormal": {
-                "Foreground": "Blue",
-                "Background": "LightGray"
+                "Foreground": "BrightBlue",
+                "Background": "LightGray",
+                "Style": "Underline"
               },
               "HotFocus": {
-                "Foreground": "BrightBlue",
-                "Background": "LightGray"
+                "Foreground": "DarkGray",
+                "Background": "LightGray",
+                "Style": "Underline"
               },
               "Disabled": {
                 "Foreground": "Gray",
@@ -132,23 +138,28 @@
             "Menu": {
               "Normal": {
                 "Foreground": "White",
-                "Background": "DarkBlue"
+                "Background": "DarkBlue",
+                "Style": "Bold"
               },
               "Focus": {
                 "Foreground": "DarkBlue",
-                "Background": "White"
+                "Background": "White",
+                "Style": "Bold"
               },
               "HotNormal": {
-                "Foreground": "Yellow",
-                "Background": "DarkBlue"
+                "Foreground": "White",
+                "Background": "DarkBlue",
+                "Style": "Underline,Bold"
               },
               "HotFocus": {
-                "Foreground": "Blue",
-                "Background": "White"
+                "Foreground": "DarkBlue",
+                "Background": "White",
+                "Style": "Bold,Underline"
               },
               "Disabled": {
                 "Foreground": "Gray",
-                "Background": "DarkGray"
+                "Background": "DarkGray",
+                "Style": "Faint,Bold"
               }
             }
           },
@@ -156,23 +167,28 @@
             "Error": {
               "Normal": {
                 "Foreground": "Red",
-                "Background": "Pink"
+                "Background": "WhiteSmoke",
+                "Style": "Italic"
               },
               "Focus": {
-                "Foreground": "White",
-                "Background": "BrightRed"
+                "Foreground": "WhiteSmoke",
+                "Background": "BrightRed",
+                "Style": "Italic"
               },
               "HotNormal": {
-                "Foreground": "Black",
-                "Background": "Pink"
+                "Foreground": "Red",
+                "Background": "WhiteSmoke",
+                "Style": "Italic,Underline"
               },
               "HotFocus": {
-                "Foreground": "Pink",
-                "Background": "BrightRed"
+                "Foreground": "White",
+                "Background": "BrightRed",
+                "Style": "Italic,Underline"
               },
               "Disabled": {
                 "Foreground": "DarkGray",
-                "Background": "White"
+                "Background": "WhiteSmoke",
+                "Style": "Italic"
               }
             }
           }
@@ -335,24 +351,29 @@
           {
             "TopLevel": {
               "Normal": {
-                "Foreground": "Gray",
-                "Background": "Black"
+                "Foreground": "LightSlateGray",
+                "Background": "Black",
+                "Style": "None"
               },
               "Focus": {
-                "Foreground": "White",
-                "Background": "BrightGreen"
+                "Foreground": "LightSlateGray",
+                "Background": "Black",
+                "Style": "Underline"
               },
               "HotNormal": {
-                "Foreground": "BrightGreen",
-                "Background": "Black"
+                "Foreground": "LightSlateGray",
+                "Background": "Black",
+                "Style": "Underline,Bold,Italic"
               },
               "HotFocus": {
-                "Foreground": "Cyan",
-                "Background": "Black"
+                "Foreground": "LightSlateGray",
+                "Background": "Black",
+                "Style": "Underline,Bold,Italic"
               },
               "Disabled": {
                 "Foreground": "Black",
-                "Background": "Gray"
+                "Background": "Gray",
+                "Style": "None"
               }
             }
           },
@@ -363,16 +384,19 @@
                 "Background": "Black"
               },
               "Focus": {
-                "Foreground": "BrightYellow",
-                "Background": "DarkGray"
+                "Foreground": "Gray",
+                "Background": "Black",
+                "Style": "Underline"
               },
               "HotNormal": {
-                "Foreground": "BrightYellow",
-                "Background": "Black"
+                "Foreground": "Gray",
+                "Background": "Black",
+                "Style": "Underline,Bold,Italic"
               },
               "HotFocus": {
-                "Foreground": "Cyan",
-                "Background": "Black"
+                "Foreground": "White",
+                "Background": "Black",
+                "Style": "Underline,Bold,Italic"
               },
               "Disabled": {
                 "Foreground": "Black",
@@ -387,16 +411,18 @@
                 "Background": "Black"
               },
               "Focus": {
-                "Foreground": "BrightCyan",
-                "Background": "Black"
+                "Foreground": "Wheat",
+                "Background": "DarkGray"
               },
               "HotNormal": {
-                "Foreground": "White",
-                "Background": "Black"
+                "Foreground": "Gray",
+                "Background": "Black",
+                "Style": "Underline"
               },
               "HotFocus": {
                 "Foreground": "White",
-                "Background": "Black"
+                "Background": "Black",
+                "Style": "Underline"
               },
               "Disabled": {
                 "Foreground": "Black",
@@ -407,48 +433,58 @@
           {
             "Menu": {
               "Normal": {
-                "Foreground": "LightGray",
-                "Background": "DarkSlateGray"
+                "Foreground": "LightSlateGray",
+                "Background": "Black",
+                "Style": "Bold"
               },
               "Focus": {
                 "Foreground": "White",
-                "Background": "Black"
+                "Background": "Black",
+                "Style": "Bold"
               },
               "HotNormal": {
-                "Foreground": "White",
-                "Background": "DarkSlateGray"
+                "Foreground": "LightSlateGray",
+                "Background": "Black",
+                "Style": "Underline,Bold"
               },
               "HotFocus": {
-                "Foreground": "White",
-                "Background": "Black"
+                "Foreground": "LightGray",
+                "Background": "Black",
+                "Style": "Underline, Bold"
               },
               "Disabled": {
-                "Foreground": "Gray",
-                "Background": "Black"
+                "Foreground": "Black",
+                "Background": "Gray",
+                "Style": "Bold"
               }
             }
           },
           {
             "Error": {
               "Normal": {
-                "Foreground": "BrightYellow",
-                "Background": "DarkGray"
+                "Foreground": "DarkRed",
+                "Background": "DimGray",
+                "Style": "Italic"
               },
               "Focus": {
-                "Foreground": "DarkGray",
-                "Background": "BrightYellow"
+                "Foreground": "Red",
+                "Background": "DimGray",
+                "Style": "Italic"
               },
               "HotNormal": {
-                "Foreground": "BrightYellow",
-                "Background": "DarkGray"
+                "Foreground": "DarkRed",
+                "Background": "DimGray",
+                "Style": "Underline,Italic"
               },
               "HotFocus": {
                 "Foreground": "Red",
-                "Background": "BrightYellow"
+                "Background": "DimGray",
+                "Style": "Underline,Italic"
               },
               "Disabled": {
-                "Foreground": "DarkGray",
-                "Background": "Gray"
+                "Foreground": "Black",
+                "Background": "DimGray",
+                "Style": "Italic"
               }
             }
           }

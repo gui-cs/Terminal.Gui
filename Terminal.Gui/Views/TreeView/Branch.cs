@@ -83,8 +83,8 @@ internal class Branch<T> where T : class
         bool isSelected = _tree.IsSelected (Model);
 
         Attribute textColor =
-            isSelected ? _tree.HasFocus ? _tree.GetFocusColor () : _tree.GetHotNormalColor () : _tree.GetNormalColor ();
-        Attribute symbolColor = _tree.Style.HighlightModelTextOnly ? _tree.GetNormalColor () : textColor;
+            isSelected ? _tree.HasFocus ? _tree.GetAttributeForRole (VisualRole.Focus) : _tree.GetAttributeForRole (VisualRole.HotNormal) : _tree.GetAttributeForRole (VisualRole.Normal);
+        Attribute symbolColor = _tree.Style.HighlightModelTextOnly ? _tree.GetAttributeForRole (VisualRole.Normal) : textColor;
 
         // Everything on line before the expansion run and branch text
         Rune [] prefix = GetLinePrefix ().ToArray ();
@@ -120,12 +120,12 @@ internal class Branch<T> where T : class
             {
                 if (isSelected)
                 {
-                    color = _tree.Style.HighlightModelTextOnly ? _tree.GetHotNormalColor () :
-                            _tree.HasFocus ? _tree.GetHotFocusColor () : _tree.GetHotNormalColor ();
+                    color = _tree.Style.HighlightModelTextOnly ? _tree.GetAttributeForRole (VisualRole.HotNormal) :
+                            _tree.HasFocus ? _tree.GetAttributeForRole (VisualRole.HotFocus) : _tree.GetAttributeForRole (VisualRole.HotNormal);
                 }
                 else
                 {
-                    color = _tree.GetHotNormalColor ();
+                    color = _tree.GetAttributeForRole (VisualRole.HotNormal);
                 }
             }
             else
@@ -246,7 +246,7 @@ internal class Branch<T> where T : class
             }
         }
 
-        _tree.SetAttribute (_tree.GetNormalColor());
+        _tree.SetAttribute (_tree.GetAttributeForRole (VisualRole.Normal));
     }
 
     /// <summary>Expands the current branch if possible.</summary>
@@ -531,5 +531,5 @@ internal class Branch<T> where T : class
         return Parent.ChildBranches.LastOrDefault () == this;
     }
 
-    private static Cell NewCell (Attribute attr, Rune r) { return new() { Rune = r, Attribute = new (attr) }; }
+    private static Cell NewCell (Attribute attr, Rune r) { return new () { Rune = r, Attribute = new (attr) }; }
 }

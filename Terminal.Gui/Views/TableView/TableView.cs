@@ -935,7 +935,7 @@ public class TableView : View, IDesignable
         // What columns to render at what X offset in viewport
         ColumnToRender [] columnsToRender = CalculateViewport (Viewport).ToArray ();
 
-        SetAttribute (GetNormalColor ());
+        SetAttribute (GetAttributeForRole (VisualRole.Normal));
 
         //invalidate current row (prevents scrolling around leaving old characters in the frame
         Driver?.AddStr (new string (' ', Viewport.Width));
@@ -1532,7 +1532,7 @@ public class TableView : View, IDesignable
             return;
         }
         Move (0, row);
-        SetAttribute (GetNormalColor ());
+        SetAttribute (GetAttributeForRole (VisualRole.Normal));
         Driver.AddStr (new string (' ', width));
     }
 

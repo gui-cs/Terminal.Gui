@@ -243,6 +243,7 @@ public static class ConfigurationManager
 
         if (resetToHardCodedDefaults)
         {
+            ClearJsonErrors();
             ResetToHardCodedDefaults ();
         }
     }
@@ -659,7 +660,7 @@ public static class ConfigurationManager
 
         lock (_jsonErrorsLock)
         {
-            _jsonErrors.AppendLine (error);
+            _jsonErrors.AppendLine (@$"  {error}");
         }
     }
 

@@ -35,6 +35,7 @@ internal class AttributeJsonConverter : JsonConverter<Attribute>
         var attribute = new Attribute ();
         Color? foreground = null;
         Color? background = null;
+        TextStyle? style = null;
 
         while (reader.Read ())
         {
@@ -45,7 +46,14 @@ internal class AttributeJsonConverter : JsonConverter<Attribute>
                     throw new JsonException ("Both Foreground and Background colors must be provided.");
                 }
 
-                return new Attribute (foreground.Value, background.Value);
+                if (style.HasValue)
+                {
+                    return new Attribute (foreground.Value, background.Value, style.Value);
+                }
+                else
+                {
+                    return new Attribute (foreground.Value, background.Value);
+                }
             }
 
             if (reader.TokenType != JsonTokenType.PropertyName)
@@ -55,19 +63,22 @@ internal class AttributeJsonConverter : JsonConverter<Attribute>
 
             string propertyName = reader.GetString ();
             reader.Read ();
-            var color = $"\"{reader.GetString ()}\"";
+            var property = $"\"{reader.GetString ()}\"";
 
             switch (propertyName?.ToLower ())
             {
                 case "foreground":
-                    foreground = JsonSerializer.Deserialize (color, ConfigurationManager.SerializerContext.Color);
+                    foreground = JsonSerializer.Deserialize (property, ConfigurationManager.SerializerContext.Color);
 
                     break;
                 case "background":
-                    background = JsonSerializer.Deserialize (color, ConfigurationManager.SerializerContext.Color);
+                    background = JsonSerializer.Deserialize (property, ConfigurationManager.SerializerContext.Color);
 
                     break;
+                case "style":
+                    style = JsonSerializer.Deserialize (property, ConfigurationManager.SerializerContext.TextStyle);
 
+                    break;
                 //case "bright":
                 //case "bold":
                 //	attribute.Bright = reader.GetBoolean ();
@@ -105,6 +116,11 @@ internal class AttributeJsonConverter : JsonConverter<Attribute>
         ColorJsonConverter.Instance.Write (writer, value.Foreground, options);
         writer.WritePropertyName (nameof (Attribute.Background));
         ColorJsonConverter.Instance.Write (writer, value.Background, options);
+        if (value.Style != TextStyle.None)
+        {
+            writer.WritePropertyName (nameof (Attribute.Style));
+            JsonSerializer.Serialize (writer, value.Style, ConfigurationManager.SerializerContext.TextStyle);
+        }
 
         writer.WriteEndObject ();
     }

@@ -28,7 +28,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                                     );
         }
 
-        var scope = (TScopeT)Activator.CreateInstance (typeof (TScopeT))!;
+        TScopeT scope = (TScopeT)Activator.CreateInstance (typeof (TScopeT))!;
 
         while (reader.Read ())
         {
@@ -111,7 +111,10 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
             else
             {
                 // It is not a config property. Maybe it's just a property on the Scope with [JsonInclude]
-                // like ScopeSettings.$schema...
+                // like ScopeSettings.$schema.
+                // If so, don't add it to the dictionary but apply it to the underlying property on 
+                // the scopeT. 
+                // BUGBUG: This is a really bad design. The only time it's used is for $schema though.
                 PropertyInfo? property = scope!.GetType ()
                                                .GetProperties ()
                                                .Where (
@@ -147,6 +150,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
 
                 if (property is { })
                 {
+                    // Set the value of propertyName on the scopeT.
                     PropertyInfo prop = scope.GetType ().GetProperty (propertyName!)!;
                     prop.SetValue (scope, JsonSerializer.Deserialize (ref reader, prop.PropertyType, ConfigurationManager.SerializerContext));
                 }

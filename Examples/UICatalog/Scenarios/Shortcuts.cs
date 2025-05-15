@@ -438,7 +438,7 @@ public class Shortcuts : Scenario
 
                 Application.Top.Scheme = new Scheme (Application.Top.Scheme)
                 {
-                    Normal = new (Application.Top!.GetNormalColor ().Foreground, args.CurrentValue),
+                    Normal = new (Application.Top!.GetAttributeForRole (VisualRole.Normal).Foreground, args.CurrentValue),
                 };
             }
         };

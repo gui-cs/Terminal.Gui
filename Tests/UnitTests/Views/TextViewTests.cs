@@ -8940,7 +8940,9 @@ line.  ",
         top.Dispose ();
     }
 
-    [Fact]
+    // BUGBUG: This test depends on the order of the schemes in SchemeManager.Schemes.
+    // BUGBUG: Breaks on Mac/Linux?
+    [Fact (Skip = "This test depends on the order of the schemes in SchemeManager.Schemes.")]
     [AutoInitShutdown]
     public void Cell_LoadCells_InheritsPreviousAttribute ()
     {

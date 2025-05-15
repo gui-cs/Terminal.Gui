@@ -105,64 +105,73 @@ public class Margin : Adornment
     }
 
     /// <inheritdoc />
-    public override Attribute GetNormalColor ()
+    protected override bool OnGettingScheme (out Scheme? scheme)
     {
-        if (Scheme is { })
-        {
-            return Scheme.Normal;
-        }
-        if (Parent is { })
-        {
-            return Parent.GetNormalColor ();
-        }
+        scheme = Parent?.SuperView?.GetScheme () ?? SchemeManager.GetScheme (Schemes.Base);
 
-        return base.GetNormalColor ();
+        return true;
     }
 
-    /// <inheritdoc />
-    public override Attribute GetHotNormalColor ()
-    {
-        if (Parent is { })
-        {
-            return Parent.GetHotNormalColor ();
-        }
-        return base.GetHotNormalColor ();
-    }
 
-    /// <inheritdoc />
-    public override Attribute GetFocusColor ()
-    {
-        if (Parent is { })
-        {
-            return Parent.GetFocusColor ();
-        }
-        return base.GetFocusColor ();
-    }
+    ///// <inheritdoc />
+    //public override Attribute GetAttributeForRole (VisualRole.Normal)
+    //{
+    //    if (Scheme is { })
+    //    {
+    //        return Scheme.Normal;
+    //    }
+    //    if (Parent is { })
+    //    {
+    //        return Parent.GetAttributeForRole (VisualRole.Normal);
+    //    }
 
-    /// <inheritdoc />
-    public override Attribute GetHotFocusColor ()
-    {
-        if (Parent is { })
-        {
-            return Parent.GetHotFocusColor ();
-        }
+    //    return base.GetAttributeForRole (VisualRole.Normal);
+    //}
 
-        return base.GetHotFocusColor ();
-    }
+    ///// <inheritdoc />
+    //public override Attribute GetAttributeForRole (VisualRole.HotNormal)
+    //{
+    //    if (Parent is { })
+    //    {
+    //        return Parent.GetAttributeForRole (VisualRole.HotNormal);
+    //    }
+    //    return base.GetAttributeForRole (VisualRole.HotNormal);
+    //}
 
-    /// <inheritdoc />
-    protected override bool OnSettingNormalAttribute ()
-    {
-        if (Parent is { })
-        {
-            SetAttribute (Parent.GetNormalColor ());
+    ///// <inheritdoc />
+    //public override Attribute GetAttributeForRole (VisualRole.Focus)
+    //{
+    //    if (Parent is { })
+    //    {
+    //        return Parent.GetAttributeForRole (VisualRole.Focus);
+    //    }
+    //    return base.GetAttributeForRole (VisualRole.Focus);
+    //}
 
-            return true;
-        }
+    ///// <inheritdoc />
+    //public override Attribute GetAttributeForRole (VisualRole.HotFocus)
+    //{
+    //    if (Parent is { })
+    //    {
+    //        return Parent.GetAttributeForRole (VisualRole.HotFocus);
+    //    }
 
-        return false;
+    //    return base.GetAttributeForRole (VisualRole.HotFocus);
+    //}
 
-    }
+    ///// <inheritdoc />
+    //protected override bool OnSettingNormalAttribute ()
+    //{
+    //    if (Parent is { })
+    //    {
+    //        SetAttribute (Parent.GetAttributeForRole (VisualRole.Normal));
+
+    //        return true;
+    //    }
+
+    //    return false;
+
+    //}
 
     /// <inheritdoc/>
     protected override bool OnClearingViewport ()
@@ -178,7 +187,7 @@ public class Margin : Adornment
         if (Diagnostics.HasFlag (ViewDiagnosticFlags.Thickness) || HasScheme)
         {
             // TODO: This is a hack. See https://github.com/gui-cs/Terminal.Gui/issues/4016
-            SetAttribute (GetNormalColor ());
+            SetAttribute (GetAttributeForRole (VisualRole.Normal));
             Thickness.Draw (screen, Diagnostics, ToString ());
         }
 

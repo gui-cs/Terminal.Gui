@@ -133,7 +133,7 @@ public class ProgressBar : View, IDesignable
     ///<inheritdoc/>
     protected override bool OnDrawingContent ()
     {
-        SetAttribute (GetHotNormalColor ());
+        SetAttribute (GetAttributeForRole (VisualRole.HotNormal));
 
         Move (0, 0);
 

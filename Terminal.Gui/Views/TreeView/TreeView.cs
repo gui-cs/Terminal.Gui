@@ -1178,7 +1178,7 @@ public class TreeView<T> : View, ITreeView where T : class
             {
                 // Else clear the line to prevent stale symbols due to scrolling etc
                 Move (0, line);
-                SetAttribute (GetNormalColor ());
+                SetAttribute (GetAttributeForRole (VisualRole.Normal));
                 Driver?.AddStr (new (' ', Viewport.Width));
             }
         }
