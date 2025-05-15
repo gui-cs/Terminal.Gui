@@ -698,20 +698,20 @@ public class Border : Adornment
             && Settings.FastHasFlags (BorderSettings.Title)
             && !string.IsNullOrEmpty (Parent?.Title))
         {
-            Attribute focus = Parent.GetNormalColor ();
+            Attribute focus = Parent.GetAttributeForRole (VisualRole.Normal);
 
             if (Parent.SuperView is { } && Parent.SuperView?.SubViews!.Count (s => s.CanFocus) > 1)
             {
                 // Only use focus color if there are multiple focusable views
-                focus = GetFocusColor ();
+                focus = GetAttributeForRole (VisualRole.Focus);
             }
 
             Rectangle titleRect = new (borderBounds.X + 2, titleY, maxTitleWidth, 1);
 
             Parent.TitleTextFormatter.Draw (
                                             titleRect,
-                                            Parent.HasFocus ? focus : GetNormalColor (),
-                                            Parent.HasFocus ? focus : GetHotNormalColor ());
+                                            Parent.HasFocus ? focus : GetAttributeForRole (VisualRole.Normal),
+                                            Parent.HasFocus ? focus : GetAttributeForRole (VisualRole.HotNormal));
             Parent?.LineCanvas.Exclude (new (titleRect));
         }
 
@@ -728,11 +728,11 @@ public class Border : Adornment
 
             if (Scheme is { })
             {
-                SetAttribute (GetNormalColor ());
+                SetAttribute (GetAttributeForRole (VisualRole.Normal));
             }
             else
             {
-                SetAttribute (Parent!.GetNormalColor ());
+                SetAttribute (Parent!.GetAttributeForRole (VisualRole.Normal));
             }
 
             if (drawTop)
@@ -893,8 +893,8 @@ public class Border : Adornment
                 {
                     Parent!.TitleTextFormatter.Draw (
                                                      new (borderBounds.X + 2, titleY, maxTitleWidth, 1),
-                                                     Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor (),
-                                                     Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor ());
+                                                     Parent.HasFocus ? Parent.GetAttributeForRole (VisualRole.Focus) : Parent.GetAttributeForRole (VisualRole.Normal),
+                                                     Parent.HasFocus ? Parent.GetAttributeForRole (VisualRole.Focus) : Parent.GetAttributeForRole (VisualRole.Normal));
                 }
 
                 //Left
@@ -946,7 +946,7 @@ public class Border : Adornment
         var g = new Gradient (stops, steps);
 
         var fore = new GradientFill (rect, g, GradientDirection.Diagonal);
-        var back = new SolidFill (GetNormalColor ().Background);
+        var back = new SolidFill (GetAttributeForRole (VisualRole.Normal).Background);
 
         lc.Fill = new (fore, back);
     }

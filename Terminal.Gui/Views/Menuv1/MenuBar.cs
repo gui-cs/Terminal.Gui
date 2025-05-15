@@ -320,13 +320,13 @@ public class MenuBar : View, IDesignable
 
             if (i == _selected && IsMenuOpen)
             {
-                hotColor = i == _selected ? Scheme!.HotFocus : GetHotNormalColor ();
-                normalColor = i == _selected ? GetFocusColor () : GetNormalColor ();
+                hotColor = i == _selected ? Scheme!.HotFocus : GetAttributeForRole (VisualRole.HotNormal);
+                normalColor = i == _selected ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal);
             }
             else
             {
-                hotColor = GetHotNormalColor ();
-                normalColor = GetNormalColor ();
+                hotColor = GetAttributeForRole (VisualRole.HotNormal);
+                normalColor = GetAttributeForRole (VisualRole.Normal);
             }
 
             // Note Help on MenuBar is drawn with parens around it

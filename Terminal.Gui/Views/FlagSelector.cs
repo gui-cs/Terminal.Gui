@@ -323,7 +323,7 @@ public class FlagSelector : View, IOrientation, IDesignable
 
                                                    if (!HasFocus)
                                                    {
-                                                       e.NewValue = GetFocusColor ();
+                                                       e.NewValue = GetAttributeForRole (VisualRole.Focus);
                                                    }
                                                    else
                                                    {
@@ -334,7 +334,7 @@ public class FlagSelector : View, IOrientation, IDesignable
                                                        }
                                                        else
                                                        {
-                                                           e.NewValue = GetNormalColor ();
+                                                           e.NewValue = GetAttributeForRole (VisualRole.Normal);
                                                        }
                                                    }
 
@@ -343,11 +343,11 @@ public class FlagSelector : View, IOrientation, IDesignable
                                                case VisualRole.HotNormal:
                                                    if (!HasFocus)
                                                    {
-                                                       e.NewValue = GetHotFocusColor ();
+                                                       e.NewValue = GetAttributeForRole (VisualRole.HotFocus);
                                                    }
                                                    else
                                                    {
-                                                       e.NewValue = GetHotNormalColor ();
+                                                       e.NewValue = GetAttributeForRole (VisualRole.HotNormal);
                                                    }
 
                                                    break;
@@ -361,11 +361,11 @@ public class FlagSelector : View, IOrientation, IDesignable
         //                                          e.Cancel = true;
         //                                          if (!HasFocus)
         //                                          {
-        //                                              e.NewValue = GetNormalColor ();
+        //                                              e.NewValue = GetAttributeForRole (VisualRole.Normal);
         //                                          }
         //                                          else
         //                                          {
-        //                                              e.NewValue = GetFocusColor ();
+        //                                              e.NewValue = GetAttributeForRole (VisualRole.Focus);
         //                                          }
         //                                      }
         //                                  };

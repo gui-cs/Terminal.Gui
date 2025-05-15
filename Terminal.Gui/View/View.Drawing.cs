@@ -76,25 +76,25 @@ public partial class View // Drawing APIs
             context ??= new DrawContext ();
 
             // TODO: Simplify/optimize SetAttribute system.
-            SetNormalAttribute ();
+            SetAttributeForRole (VisualRole.Normal);
             DoClearViewport (context);
 
             // ------------------------------------
             // Draw the subviews first (order matters: SubViews, Text, Content)
             if (SubViewNeedsDraw)
             {
-                SetNormalAttribute ();
+                SetAttributeForRole (VisualRole.Normal);
                 DoDrawSubViews (context);
             }
 
             // ------------------------------------
             // Draw the text
-            SetNormalAttribute ();
+            SetAttributeForRole (VisualRole.Normal);
             DoDrawText (context);
 
             // ------------------------------------
             // Draw the content
-            SetNormalAttribute ();
+            SetAttributeForRole (VisualRole.Normal);
             DoDrawContent (context);
 
             // ------------------------------------
@@ -250,7 +250,7 @@ public partial class View // Drawing APIs
         // Get screen-relative coords
         Rectangle toClear = FrameToScreen ();
 
-        Attribute prev = SetAttribute (GetNormalColor ());
+        Attribute prev = SetAttribute (GetAttributeForRole (VisualRole.Normal));
         Driver.FillRect (toClear);
         SetAttribute (prev);
         SetNeedsDraw ();
@@ -346,7 +346,7 @@ public partial class View // Drawing APIs
             toClear = Rectangle.Intersect (toClear, visibleContent);
         }
 
-        Attribute prev = SetAttribute (GetNormalColor ());
+        Attribute prev = SetAttribute (GetAttributeForRole (VisualRole.Normal));
         Driver.FillRect (toClear);
 
         // context.AddDrawnRectangle (toClear);
@@ -429,8 +429,8 @@ public partial class View // Drawing APIs
 
         TextFormatter?.Draw (
                              drawRect,
-                             HasFocus ? GetFocusColor () : GetNormalColor (),
-                             HasFocus ? GetHotFocusColor () : GetHotNormalColor (),
+                             HasFocus ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal),
+                             HasFocus ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal),
                              Rectangle.Empty
                             );
 
@@ -627,7 +627,7 @@ public partial class View // Drawing APIs
                 // Get the entire map
                 if (p.Value is { })
                 {
-                    SetAttribute (p.Value.Value.Attribute ?? GetNormalColor ());
+                    SetAttribute (p.Value.Value.Attribute ?? GetAttributeForRole (VisualRole.Normal));
                     Driver.Move (p.Key.X, p.Key.Y);
 
                     // TODO: #2616 - Support combining sequences that don't normalize

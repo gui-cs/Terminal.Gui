@@ -99,7 +99,7 @@ public partial class ColorPicker : View
     /// <inheritdoc/>
     protected override bool OnDrawingContent ()
     {
-        Attribute normal = GetNormalColor ();
+        Attribute normal = GetAttributeForRole (VisualRole.Normal);
         SetAttribute (new (SelectedColor, normal.Background));
         int y = _bars.Count + (Style.ShowColorName ? 1 : 0);
         AddRune (13, y, (Rune)'■');

@@ -120,7 +120,7 @@ public class LineDrawing : Scenario
 
         win.Add (canvas);
         win.Add (tools);
-        tools.CurrentColor = canvas.GetNormalColor ();
+        tools.CurrentColor = canvas.GetAttributeForRole (VisualRole.Normal);
         canvas.CurrentAttribute = tools.CurrentColor;
 
         win.KeyDown += (s, e) => { e.Handled = canvas.NewKeyDownEvent (e); };
@@ -380,8 +380,8 @@ public class AttributeView : View
         Color fg = Value.Foreground;
         Color bg = Value.Background;
 
-        bool isTransparentFg = fg == GetNormalColor ().Background;
-        bool isTransparentBg = bg == GetNormalColor ().Background;
+        bool isTransparentFg = fg == GetAttributeForRole (VisualRole.Normal).Background;
+        bool isTransparentBg = bg == GetAttributeForRole (VisualRole.Normal).Background;
 
         SetAttribute (new (fg, isTransparentFg ? Color.Gray : fg));
 

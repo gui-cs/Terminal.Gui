@@ -124,10 +124,10 @@ public partial class View // Mouse APIs
 
         return cs with
         {
-            Normal = new (GetNormalColor ().Foreground.GetHighlightColor (), GetNormalColor ().Background),
-            HotNormal = new (GetHotNormalColor ().Foreground.GetHighlightColor (), GetHotNormalColor ().Background),
-            Focus = new (GetFocusColor ().Foreground.GetHighlightColor (), GetFocusColor ().Background),
-            HotFocus = new (GetHotFocusColor ().Foreground.GetHighlightColor (), GetHotFocusColor ().Background)
+            Normal = new (GetAttributeForRole (VisualRole.Normal).Foreground.GetHighlightColor (), GetAttributeForRole (VisualRole.Normal).Background),
+            HotNormal = new (GetAttributeForRole (VisualRole.HotNormal).Foreground.GetHighlightColor (), GetAttributeForRole (VisualRole.HotNormal).Background),
+            Focus = new (GetAttributeForRole (VisualRole.Focus).Foreground.GetHighlightColor (), GetAttributeForRole (VisualRole.Focus).Background),
+            HotFocus = new (GetAttributeForRole (VisualRole.HotFocus).Foreground.GetHighlightColor (), GetAttributeForRole (VisualRole.HotFocus).Background)
         };
     }
 

@@ -432,10 +432,10 @@ public class Sliders : Scenario
 
         foreach (Slider s in app.SubViews.OfType<Slider> ())
         {
-            s.Style.OptionChar = s.Style.OptionChar with { Attribute = app.GetNormalColor () };
-            s.Style.SetChar = s.Style.SetChar with { Attribute = app.GetNormalColor () };
-            s.Style.LegendAttributes.SetAttribute = app.GetNormalColor ();
-            s.Style.RangeChar = s.Style.RangeChar with { Attribute = app.GetNormalColor () };
+            s.Style.OptionChar = s.Style.OptionChar with { Attribute = app.GetAttributeForRole (VisualRole.Normal) };
+            s.Style.SetChar = s.Style.SetChar with { Attribute = app.GetAttributeForRole (VisualRole.Normal) };
+            s.Style.LegendAttributes.SetAttribute = app.GetAttributeForRole (VisualRole.Normal);
+            s.Style.RangeChar = s.Style.RangeChar with { Attribute = app.GetAttributeForRole (VisualRole.Normal) };
         }
 
         Slider<(Color, Color)> sliderFGColor = new ()

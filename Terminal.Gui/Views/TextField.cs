@@ -718,8 +718,17 @@ public class TextField : View
         }
     }
 
-    /// <inheritdoc/>
-    public override Attribute GetNormalColor () { return GetFocusColor (); }
+    /// <inheritdoc />
+    protected override bool OnGettingAttributeForRole (VisualRole role, ref Attribute currentAttribute)
+    {
+        if (role == VisualRole.Normal)
+        {
+            currentAttribute = GetScheme ().GetAttributeForRole (VisualRole.Focus);
+
+            return true;
+        }
+        return base.OnGettingAttributeForRole (role, ref currentAttribute);
+    }
 
     /// <summary>
     ///     Inserts the given <paramref name="toAdd"/> text at the current cursor position exactly as if the user had just
@@ -922,10 +931,10 @@ public class TextField : View
     {
         _isDrawing = true;
 
-        var selColor = new Attribute (GetFocusColor ().Background, GetFocusColor ().Foreground);
+        var selColor = new Attribute (GetAttributeForRole (VisualRole.Focus).Background, GetAttributeForRole (VisualRole.Focus).Foreground);
         SetSelectedStartSelectedLength ();
 
-        SetAttribute (GetNormalColor ());
+        SetAttribute (GetAttributeForRole (VisualRole.Normal));
         Move (0, 0);
 
         int p = ScrollOffset;
@@ -953,7 +962,7 @@ public class TextField : View
             }
             else if (!HasFocus && Enabled)
             {
-                SetAttribute (GetFocusColor ());
+                SetAttribute (GetAttributeForRole (VisualRole.Focus));
             }
             else if (!Enabled)
             {
@@ -984,7 +993,7 @@ public class TextField : View
             }
         }
 
-        SetAttribute (GetFocusColor ());
+        SetAttribute (GetAttributeForRole (VisualRole.Focus));
 
         for (int i = col; i < width; i++)
         {
@@ -1720,7 +1729,7 @@ public class TextField : View
             return;
         }
 
-        var color = new Attribute (CaptionColor, GetNormalColor ().Background);
+        var color = new Attribute (CaptionColor, GetAttributeForRole (VisualRole.Normal).Background);
         SetAttribute (color);
 
         Move (0, 0);

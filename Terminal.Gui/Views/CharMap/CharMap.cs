@@ -252,7 +252,7 @@ public class CharMap : View, IDesignable
         int cursorCol = GetCursor (SelectedCodePoint).X + Viewport.X - RowLabelWidth - 1;
         int cursorRow = GetCursor (SelectedCodePoint).Y + Viewport.Y - 1;
 
-        SetAttribute (GetHotNormalColor ());
+        SetAttribute (GetAttributeForRole (VisualRole.HotNormal));
         Move (0, 0);
         AddStr (new (' ', RowLabelWidth + 1));
 
@@ -266,11 +266,11 @@ public class CharMap : View, IDesignable
             if (x > RowLabelWidth - 2)
             {
                 Move (x, 0);
-                SetAttribute (GetHotNormalColor ());
+                SetAttribute (GetAttributeForRole (VisualRole.HotNormal));
                 AddStr (" ");
-                SetAttribute (HasFocus && cursorCol + firstColumnX == x ? GetHotFocusColor () : GetHotNormalColor ());
+                SetAttribute (HasFocus && cursorCol + firstColumnX == x ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal));
                 AddStr ($"{hexDigit:x}");
-                SetAttribute (GetHotNormalColor ());
+                SetAttribute (GetAttributeForRole (VisualRole.HotNormal));
                 AddStr (" ");
             }
         }
@@ -289,7 +289,7 @@ public class CharMap : View, IDesignable
             }
 
             Move (firstColumnX + COLUMN_WIDTH, y);
-            SetAttribute (GetNormalColor ());
+            SetAttribute (GetAttributeForRole (VisualRole.Normal));
 
             for (var col = 0; col < 16; col++)
             {
@@ -305,7 +305,7 @@ public class CharMap : View, IDesignable
                 // If we're at the cursor position, and we don't have focus, invert the colors.
                 if (row == cursorRow && x == cursorCol && !HasFocus)
                 {
-                    SetAttribute (GetFocusColor ());
+                    SetAttribute (GetAttributeForRole (VisualRole.Focus));
                 }
 
                 int scalar = val + col;
@@ -356,21 +356,21 @@ public class CharMap : View, IDesignable
                 else
                 {
                     // Draw the width of the rune
-                    SetAttribute (GetHotNormalColor ());
+                    SetAttribute (GetAttributeForRole (VisualRole.HotNormal));
                     AddStr ($"{width}");
                 }
 
                 // If we're at the cursor position, and we don't have focus, revert the colors to normal
                 if (row == cursorRow && x == cursorCol && !HasFocus)
                 {
-                    SetAttribute (GetNormalColor ());
+                    SetAttribute (GetAttributeForRole (VisualRole.Normal));
                 }
             }
 
             // Draw row label (U+XXXX_)
             Move (0, y);
 
-            SetAttribute (HasFocus && y + Viewport.Y - 1 == cursorRow ? GetHotFocusColor () : GetHotNormalColor ());
+            SetAttribute (HasFocus && y + Viewport.Y - 1 == cursorRow ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal));
 
             if (!ShowGlyphWidths || (y + Viewport.Y) % _rowHeight > 0)
             {

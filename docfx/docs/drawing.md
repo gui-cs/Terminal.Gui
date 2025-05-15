@@ -94,6 +94,12 @@ See the Character Map sample app in the [UI Catalog](https://gui-cs.github.io/Te
 
 The @Terminal.Gui.Attribute class represents the formatting attributes of a `Cell`. It exposes properties for the foreground and background colors as well as the text style. The foreground and background colors are of type @Terminal.Gui.Color. Bold, underline, and other formatting attributes are supported via the @Terminal.Gui.Attribute.Style property.
 
+Use @Terminal.Gui.View.SetAttribute to indicate which Attribute subsequent @Terminal.Gui.View.AddRune and @Terminal.Gui.View.AddStr calls will use:
+
+```cs
+SetAttribute (new Attribute (Color.Red, Color.Black, Style.Underline));
+AddStr ("Red on Black Underlined.");
+
 ## Color
 
 Color is supported on all platforms, including Windows, Mac, and Linux. The default colors are 24-bit RGB colors, but the library will gracefully degrade to 16-colors if the terminal does not support 24-bit color, and black and white if the terminal does not support 16-colors.
@@ -131,6 +137,10 @@ var scheme = SchemeManager.GetCurrentSchemes () ["TopLevel"];
 ```
 
 [ConfigurationManager](config.md) can be used to override the default values for these schemes and add additional schemes. 
+
+## View.Scheme
+
+@Terminal.Gui.View.Scheme gets or sets the Scheme used by a View to draw itself. 
 
 ## Text Formatting
 

@@ -5,17 +5,118 @@ namespace Terminal.Gui;
 
 public partial class View
 {
-    /// <summary>Selects the specified attribute as the attribute to use for future calls to AddRune and AddString.</summary>
-    /// <remarks></remarks>
-    /// <param name="attribute">THe Attribute to set.</param>
-    public Attribute SetAttribute (Attribute attribute)
-    {
-        return Driver?.SetAttribute (attribute) ?? Attribute.Default;
-    }
+    #region Get
 
     /// <summary>Gets the current <see cref="Attribute"/>.</summary>
     /// <returns>The current attribute.</returns>
-    public Attribute GetAttribute () { return Driver?.GetAttribute () ?? Attribute.Default; }
+    public Attribute GetCurrentAttribute () { return Driver?.GetAttribute () ?? Attribute.Default; }
 
+    /// <summary>
+    ///     Gets the <see cref="Attribute"/> associated with a specified <see cref="VisualRole"/>
+    ///     from the <see cref="Scheme"/>.
+    /// </summary>
+    /// <param name="role">The semantic <see cref="VisualRole"/> describing the element being rendered.</param>
+    /// <returns>The corresponding <see cref="Attribute"/> from the <see cref="Scheme"/>.</returns>
+    public Attribute GetAttributeForRole (VisualRole role)
+    {
+        Attribute schemeAttribute = GetScheme ()!.GetAttributeForRole (role);
 
+        if (OnGettingAttributeForRole (role, ref schemeAttribute))
+        {
+            // The implementation may have changed the attribute
+            return schemeAttribute;
+        }
+
+        VisualRoleEventArgs args = new (role, newValue: ref schemeAttribute, currentValue: ref schemeAttribute);
+        GettingAttributeForRole?.Invoke (this, args);
+
+        if (args.Cancel)
+        {
+            // A handler may have changed the attribute
+            return args.NewValue;
+        }
+
+        return Enabled || role == VisualRole.Disabled ? schemeAttribute : GetAttributeForRole (VisualRole.Disabled);
+    }
+
+    /// <summary>
+    ///     Called when the Attribute for a <see cref="GetAttributeForRole(Terminal.Gui.VisualRole)"/> is being retrieved.
+    ///     Implementations can
+    ///     return <see langword="true"/> to stop further processing and optionally set the <see cref="Attribute"/> in the
+    ///     event args to a different value.
+    /// </summary>
+    /// <param name="role"></param>
+    /// <param name="currentAttribute">The current value of the Attribute for the VisualRole. This by-ref value can be changed</param>
+    /// <returns></returns>
+    protected virtual bool OnGettingAttributeForRole (VisualRole role, ref Attribute currentAttribute) { return false; }
+
+    /// <summary>
+    ///     Raised when the Attribute for a <see cref="GetAttributeForRole(Terminal.Gui.VisualRole)"/> is being retrieved.
+    ///     Handlers should check if <see cref="CancelEventArgs.Cancel"/>
+    ///     has been set to <see langword="true"/> and do nothing if so. If Cancel is <see langword="false"/>
+    ///     a handler can set it to <see langword="true"/> to stop further processing optionally change the
+    ///     <see cref="VisualRoleEventArgs.CurrentValue"/> in the event args to a different value.
+    /// </summary>
+    public event EventHandler<VisualRoleEventArgs>? GettingAttributeForRole;
+
+    #endregion Get
+
+    #region Set
+
+    /// <summary>
+    ///     Selects the specified Attribute
+    ///     as the Attribute to use for subsquent calls to <see cref="AddRune(System.Text.Rune)"/> and <see cref="AddStr"/>.
+    /// </summary>
+    /// <remarks></remarks>
+    /// <param name="attribute">THe Attribute to set.</param>
+    /// <returns>The previously set Attribute.</returns>
+    public Attribute SetAttribute (Attribute attribute) { return Driver?.SetAttribute (attribute) ?? Attribute.Default; }
+
+    /// <summary>
+    ///     Selects the Attribute associated with the specified <see cref="VisualRole"/>
+    ///     as the Attribute to use for subsquent calls to <see cref="AddRune(System.Text.Rune)"/> and <see cref="AddStr"/>.
+    ///     Raises an event and checks for cancellation before setting the Attribute.
+    /// </summary>
+    /// <param name="role">The semantic <see cref="VisualRole"/> describing the element being rendered.</param>
+    /// <returns>The previously set Attribute. <see langword="null"/> if the operation was cancelled.</returns>
+    public Attribute? SetAttributeForRole (VisualRole role)
+    {
+        Attribute schemeAttribute = GetScheme ().GetAttributeForRole (role);
+        Attribute currentAttribute = GetCurrentAttribute ();
+
+        if (OnSettingAttributeForRole (in role, in currentAttribute, ref schemeAttribute))
+        {
+            return null;
+        }
+
+        var args = new VisualRoleEventArgs (role, in currentAttribute, ref schemeAttribute);
+        SettingAttributeForRole?.Invoke (this, args);
+
+        if (args.Cancel)
+        {
+            return null;
+        }
+
+        return SetAttribute (schemeAttribute);
+    }
+
+    /// <summary>
+    ///     Raised when the Attribute associated with the specified <see cref="VisualRole"/> for the View being set.
+    ///     This is raised by <see cref="SetAttributeForRole"/>.
+    /// </summary>
+    /// <returns>
+    ///   <see langword="true"/> to cancel the setting of the attribute.
+    /// </returns>
+    private bool OnSettingAttributeForRole (in VisualRole role, in Attribute currentAttribute, ref Attribute schemeAttribute) { return false; }
+
+    /// <summary>
+    ///     Raised when the Attribute associated with the specified <see cref="VisualRole"/> for the View being set.
+    ///     This is raised by <see cref="SetAttributeForRole"/>.
+    /// </summary>
+    /// <para>
+    ///     Set <see cref="VisualRoleEventArgs.Cancel"/> to <see langword="true"/> to cancel the setting of the attribute.
+    /// </para>
+    public event EventHandler<VisualRoleEventArgs>? SettingAttributeForRole;
+
+    #endregion Set
 }

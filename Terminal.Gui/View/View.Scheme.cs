@@ -5,8 +5,6 @@ namespace Terminal.Gui;
 
 public partial class View
 {
-    // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/4014
-
     /// <summary>
     ///     Gets the hard-coded set of <see cref="Scheme"/>s. Used for generating the built-in config.json and for
     ///     unit tests that don't depend on ConfigurationManager.
@@ -82,7 +80,8 @@ public partial class View
     /// <summary>
     ///     Gets or sets the Scheme for this view.
     ///     <para>
-    ///         If the Scheme has not been explicitly set (<see cref="HasScheme"/> is <see langword="false"/>), this property gets
+    ///         If the Scheme has not been explicitly set (<see cref="HasScheme"/> is <see langword="false"/>), this property
+    ///         gets
     ///         <see cref="SuperView"/>'s Scheme.
     ///     </para>
     /// </summary>
@@ -203,162 +202,6 @@ public partial class View
     ///     Set <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/> to stop default behavior.
     /// </returns>
     public event EventHandler<CancelEventArgs>? SettingScheme;
-
-    /// <summary>Determines the current <see cref="Scheme"/> based on the <see cref="Enabled"/> value.</summary>
-    /// <returns>
-    ///     <see cref="Scheme.Focus"/> if <see cref="Enabled"/> is <see langword="true"/> or
-    ///     <see cref="Scheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>. If it's
-    ///     overridden can return other values.
-    /// </returns>
-    public virtual Attribute GetFocusColor () { return GetAttributeForRole (VisualRole.Focus); }
-
-    /// <summary>
-    ///     Raised the Focus Color is being retrieved, from <see cref="GetFocusColor"/>. Cancel the event and set the new
-    ///     attribute in the event args to
-    ///     a different value to change the focus color.
-    /// </summary>
-    public event EventHandler<CancelEventArgs<Attribute>>? GettingFocusColor;
-
-    /// <summary>Determines the current <see cref="Scheme"/> based on the <see cref="Enabled"/> value.</summary>
-    /// <returns>
-    ///     <see cref="Scheme.Focus"/> if <see cref="Enabled"/> is <see langword="true"/> or
-    ///     <see cref="Scheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>. If it's
-    ///     overridden can return other values.
-    /// </returns>
-    public virtual Attribute GetHotFocusColor () { return GetAttributeForRole (VisualRole.HotFocus); }
-
-    /// <summary>
-    ///     Raised the HotFocus Color is being retrieved, from <see cref="GetHotFocusColor"/>. Cancel the event and set the new
-    ///     attribute in the event args to
-    ///     a different value to change the focus color.
-    /// </summary>
-    public event EventHandler<CancelEventArgs<Attribute>>? GettingHotFocusColor;
-
-    /// <summary>Determines the current <see cref="Scheme"/> based on the <see cref="Enabled"/> value.</summary>
-    /// <returns>
-    ///     <see cref="Scheme.HotNormal"/> if <see cref="Enabled"/> is <see langword="true"/> or
-    ///     <see cref="Scheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>. If it's
-    ///     overridden can return other values.
-    /// </returns>
-    public virtual Attribute GetHotNormalColor () { return GetAttributeForRole (VisualRole.HotNormal); }
-
-    /// <summary>
-    ///     Raised the HotNormal Color is being retrieved, from <see cref="GetHotNormalColor"/>. Cancel the event and set the
-    ///     new attribute in the event args to
-    ///     a different value to change the focus color.
-    /// </summary>
-    public event EventHandler<CancelEventArgs<Attribute>>? GettingHotNormalColor;
-
-    /// <summary>Determines the current <see cref="Scheme"/> based on the <see cref="Enabled"/> value.</summary>
-    /// <returns>
-    ///     <see cref="Scheme.Normal"/> if <see cref="Enabled"/> is <see langword="true"/> or
-    ///     <see cref="Scheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>. If it's
-    ///     overridden can return other values.
-    /// </returns>
-    public virtual Attribute GetNormalColor () { return GetAttributeForRole (VisualRole.Normal); }
-
-    /// <summary>
-    ///     Raised the Normal Color is being retrieved, from <see cref="GetNormalColor"/>. Cancel the event and set the new
-    ///     attribute in the event args to
-    ///     a different value to change the focus color.
-    /// </summary>
-    public event EventHandler<CancelEventArgs<Attribute>>? GettingNormalColor;
-
-    /// <summary>
-    ///     Gets the <see cref="Attribute"/> associated with a specified <see cref="VisualRole"/>.
-    /// </summary>
-    /// <param name="role">The semantic <see cref="VisualRole"/> describing the element being rendered.</param>
-    /// <returns>The corresponding <see cref="Attribute"/> from the <see cref="Scheme"/>.</returns>
-    public Attribute GetAttributeForRole (VisualRole role)
-    {
-        Attribute curAttribute = GetScheme ()!.GetAttributeForRole (role);
-
-        if (OnGettingAttributeForRole (role, ref curAttribute))
-        {
-            // The implementation may have changed the attribute
-            return curAttribute;
-        }
-
-        VisualRoleEventArgs args = new (role, newValue: ref curAttribute, currentValue: ref curAttribute);
-        GettingAttributeForRole?.Invoke (this, args);
-
-        if (args.Cancel)
-        {
-            // A handler may have changed the attribute
-            return args.NewValue;
-        }
-
-        return Enabled || role == VisualRole.Disabled ? curAttribute : GetAttributeForRole (VisualRole.Disabled);
-    }
-
-    /// <summary>
-    ///     Called when the Attribute for a <see cref="GetAttributeForRole(Terminal.Gui.VisualRole)"/> is being retrieved.
-    ///     Implementations can
-    ///     return <see langword="true"/> to stop further processing and optionally set the <see cref="Attribute"/> in the
-    ///     event args to a different value.
-    /// </summary>
-    /// <param name="role"></param>
-    /// <param name="currentAttribute">The current value of the Attribute for the VisualRole. This by-ref value can be changed</param>
-    /// <returns></returns>
-    protected virtual bool OnGettingAttributeForRole (VisualRole role, ref Attribute currentAttribute) { return false; }
-
-    /// <summary>
-    ///     Raised when the Attribute for a <see cref="GetAttributeForRole(Terminal.Gui.VisualRole)"/> is being retrieved.
-    ///     Handlers should check if <see cref="CancelEventArgs.Cancel"/>
-    ///     has been set to <see langword="true"/> and do nothing if so. If Cancel is <see langword="false"/>
-    ///     a handler can set it to <see langword="true"/> to stop further processing optionally change the
-    ///     <see cref="VisualRoleEventArgs.CurrentValue"/> in the event args to a different value.
-    /// </summary>
-    public event EventHandler<VisualRoleEventArgs>? GettingAttributeForRole;
-
-    /// <summary>
-    ///     Sets the Normal attribute if the setting process is not canceled. It triggers an event and checks for
-    ///     cancellation before proceeding.
-    /// </summary>
-    public void SetNormalAttribute ()
-    {
-        if (OnSettingNormalAttribute ())
-        {
-            return;
-        }
-
-        var args = new CancelEventArgs ();
-        SettingNormalAttribute?.Invoke (this, args);
-
-        if (args.Cancel)
-        {
-            return;
-        }
-
-        if (Scheme is { })
-        {
-            SetAttribute (GetNormalColor ());
-        }
-    }
-
-    /// <summary>
-    ///     Called when the normal attribute for the View is to be set. This is called before the View is drawn.
-    /// </summary>
-    /// <returns><see langword="true"/> to stop default behavior.</returns>
-    protected virtual bool OnSettingNormalAttribute () { return false; }
-
-    /// <summary>Raised  when the normal attribute for the View is to be set. This is raised before the View is drawn.</summary>
-    /// <returns>
-    ///     Set <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/> to stop default behavior.
-    /// </returns>
-    public event EventHandler<CancelEventArgs>? SettingNormalAttribute;
-
-    private Attribute GetDiagnosticsColor (Attribute inputAttribute)
-    {
-        Attribute attr = inputAttribute;
-
-        //if (Diagnostics.HasFlag (ViewDiagnosticFlags.Hover) && _hovering)
-        //{
-        //    attr = new (attr.Foreground.GetDarkerColor (), attr.Background.GetDarkerColor ());
-        //}
-
-        return attr;
-    }
 
     #endregion VisualRole
 }

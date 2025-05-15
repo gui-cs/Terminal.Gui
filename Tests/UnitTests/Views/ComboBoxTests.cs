@@ -548,7 +548,7 @@ Three ",
             cb.SubViews.ElementAt (1).Scheme.HotFocus,
 
             // 2
-            cb.SubViews.ElementAt (1).GetNormalColor ()
+            cb.SubViews.ElementAt (1).GetAttributeForRole (VisualRole.Normal)
         };
 
         DriverAssert.AssertDriverAttributesAre (

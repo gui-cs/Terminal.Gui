@@ -3160,8 +3160,17 @@ public class TextView : View
     /// <returns></returns>
     public List<Cell> GetLine (int line) { return _model.GetLine (line); }
 
-    /// <inheritdoc/>
-    public override Attribute GetNormalColor () { return GetFocusColor (); }
+    /// <inheritdoc />
+    protected override bool OnGettingAttributeForRole (VisualRole role, ref Attribute currentAttribute)
+    {
+        if (role == VisualRole.Normal)
+        {
+            currentAttribute = GetScheme ().GetAttributeForRole (VisualRole.Focus);
+
+            return true;
+        }
+        return base.OnGettingAttributeForRole (role, ref currentAttribute);
+    }
 
     /// <summary>
     ///     Inserts the given <paramref name="toAdd"/> text at the current cursor position exactly as if the user had just
@@ -3975,7 +3984,7 @@ public class TextView : View
         }
         else
         {
-            SetAttribute (GetNormalColor ());
+            SetAttribute (GetAttributeForRole (VisualRole.Normal));
         }
     }
 
@@ -4073,7 +4082,7 @@ public class TextView : View
     ///     Sets the driver to the default color for the control where no text is being rendered. Defaults to
     ///     <see cref="Scheme.Normal"/>.
     /// </summary>
-    protected virtual void SetNormalColor () { SetAttribute (GetNormalColor ()); }
+    protected virtual void SetNormalColor () { SetAttribute (GetAttributeForRole (VisualRole.Normal)); }
 
     private void Adjust ()
     {

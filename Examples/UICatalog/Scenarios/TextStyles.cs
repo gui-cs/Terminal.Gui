@@ -58,7 +58,7 @@ public sealed class TestStyles : Scenario
 
                 sendingView.Move (x, y);
 
-                var attr = new Attribute (sendingView.GetNormalColor ())
+                var attr = new Attribute (sendingView.GetAttributeForRole (VisualRole.Normal))
                 {
                     Style = style
                 };
@@ -107,7 +107,7 @@ public sealed class TestStyles : Scenario
 
                 sendingView.Move (x, y);
 
-                var attr = new Attribute (sendingView.GetNormalColor ())
+                var attr = new Attribute (sendingView.GetAttributeForRole (VisualRole.Normal))
                 {
                     Style = combination
                 };

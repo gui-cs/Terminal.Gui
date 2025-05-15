@@ -61,8 +61,8 @@ public class AdornmentEditor : EditorBase
                 _adornment.Initialized += (sender, args) =>
                                           {
                                               Scheme? cs = _adornment.Scheme;
-                                              _foregroundColorPicker.SelectedColor = _adornment.GetNormalColor ().Foreground.GetClosestNamedColor16 ();
-                                              _backgroundColorPicker.SelectedColor = _adornment.GetNormalColor ().Background.GetClosestNamedColor16 ();
+                                              _foregroundColorPicker.SelectedColor = _adornment.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ();
+                                              _backgroundColorPicker.SelectedColor = _adornment.GetAttributeForRole (VisualRole.Normal).Background.GetClosestNamedColor16 ();
                                           };
             }
 

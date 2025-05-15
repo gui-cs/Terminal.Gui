@@ -916,7 +916,7 @@ public class ComboBox : View, IDesignable
                 }
                 else
                 {
-                    newcolor = focused ? GetNormalColor () : GetNormalColor ();
+                    newcolor = focused ? GetAttributeForRole (VisualRole.Normal) : GetAttributeForRole (VisualRole.Normal);
                 }
 
                 if (newcolor != current)

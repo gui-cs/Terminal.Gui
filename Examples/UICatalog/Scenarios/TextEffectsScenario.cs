@@ -159,7 +159,7 @@ internal class GradientsView : View
 
         int width = text.Length;
         int x = xOffset + (GRADIENT_WIDTH - width) / 2; // Center the text within the gradient area width
-        SetAttribute (GetNormalColor ());
+        SetAttribute (GetAttributeForRole (VisualRole.Normal));
         Move (x, yOffset + 1);
         AddStr (text);
     }

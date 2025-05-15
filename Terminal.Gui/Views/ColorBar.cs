@@ -89,7 +89,7 @@ internal abstract class ColorBar : View, IColorBar
         if (!string.IsNullOrWhiteSpace (Text))
         {
             Move (0, 0);
-            SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
+            SetAttribute (HasFocus ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal));
             Driver?.AddStr (Text);
 
             // TODO: is there a better method than this? this is what it is in TableView
