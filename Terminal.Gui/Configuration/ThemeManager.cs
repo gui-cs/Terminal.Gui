@@ -78,14 +78,20 @@ public static class ThemeManager
             throw new InvalidOperationException ("Settings has no Themes property.");
         }
 
+        ConcurrentDictionary<string, ThemeScope>? returnConcurrentDictionary;
+
         if (themes.HasValue)
         {
-            ConcurrentDictionary<string, ThemeScope>? themesValue = themes.PropertyValue as ConcurrentDictionary<string, ThemeScope>;
-
-            return themesValue!.Keys.OrderBy (key => key).ToImmutableList ();
+            returnConcurrentDictionary = themes.PropertyValue as ConcurrentDictionary<string, ThemeScope>;
+        }
+        else
+        {
+            returnConcurrentDictionary = HardCodedThemes ();
         }
 
-        return HardCodedThemes ()!.Keys.OrderBy (key => key).ToImmutableList ();
+        return returnConcurrentDictionary!.Keys
+                                          .OrderBy (key => key == DEFAULT_THEME_NAME ? string.Empty : key) // Ensure DEFAULT_THEME_NAME is first
+                                          .ToImmutableList ();
 
     }
 

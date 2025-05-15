@@ -105,64 +105,73 @@ public class Margin : Adornment
     }
 
     /// <inheritdoc />
-    public override Attribute GetNormalColor ()
+    protected override bool OnGettingScheme (out Scheme? scheme)
     {
-        if (Scheme is { })
-        {
-            return Scheme.Normal;
-        }
-        if (Parent is { })
-        {
-            return Parent.GetNormalColor ();
-        }
+        scheme = Parent?.SuperView?.GetScheme () ?? SchemeManager.GetScheme (Schemes.Base);
 
-        return base.GetNormalColor ();
+        return true;
     }
 
-    /// <inheritdoc />
-    public override Attribute GetHotNormalColor ()
-    {
-        if (Parent is { })
-        {
-            return Parent.GetHotNormalColor ();
-        }
-        return base.GetHotNormalColor ();
-    }
 
-    /// <inheritdoc />
-    public override Attribute GetFocusColor ()
-    {
-        if (Parent is { })
-        {
-            return Parent.GetFocusColor ();
-        }
-        return base.GetFocusColor ();
-    }
+    ///// <inheritdoc />
+    //public override Attribute GetNormalColor ()
+    //{
+    //    if (Scheme is { })
+    //    {
+    //        return Scheme.Normal;
+    //    }
+    //    if (Parent is { })
+    //    {
+    //        return Parent.GetNormalColor ();
+    //    }
 
-    /// <inheritdoc />
-    public override Attribute GetHotFocusColor ()
-    {
-        if (Parent is { })
-        {
-            return Parent.GetHotFocusColor ();
-        }
+    //    return base.GetNormalColor ();
+    //}
 
-        return base.GetHotFocusColor ();
-    }
+    ///// <inheritdoc />
+    //public override Attribute GetHotNormalColor ()
+    //{
+    //    if (Parent is { })
+    //    {
+    //        return Parent.GetHotNormalColor ();
+    //    }
+    //    return base.GetHotNormalColor ();
+    //}
 
-    /// <inheritdoc />
-    protected override bool OnSettingNormalAttribute ()
-    {
-        if (Parent is { })
-        {
-            SetAttribute (Parent.GetNormalColor ());
+    ///// <inheritdoc />
+    //public override Attribute GetFocusColor ()
+    //{
+    //    if (Parent is { })
+    //    {
+    //        return Parent.GetFocusColor ();
+    //    }
+    //    return base.GetFocusColor ();
+    //}
 
-            return true;
-        }
+    ///// <inheritdoc />
+    //public override Attribute GetHotFocusColor ()
+    //{
+    //    if (Parent is { })
+    //    {
+    //        return Parent.GetHotFocusColor ();
+    //    }
 
-        return false;
+    //    return base.GetHotFocusColor ();
+    //}
 
-    }
+    ///// <inheritdoc />
+    //protected override bool OnSettingNormalAttribute ()
+    //{
+    //    if (Parent is { })
+    //    {
+    //        SetAttribute (Parent.GetNormalColor ());
+
+    //        return true;
+    //    }
+
+    //    return false;
+
+    //}
 
     /// <inheritdoc/>
     protected override bool OnClearingViewport ()

@@ -23,7 +23,8 @@ public class Scope<T> : ConcurrentDictionary<string, ConfigProperty>
     public Scope () : base (StringComparer.InvariantCultureIgnoreCase)
     {
         // Populate the dictionary with uninitialized, mutable, properties
-        foreach (KeyValuePair<string, ConfigProperty> p in ConfigurationManager.GetConfigPropertiesByScope (typeof (T).Name)!)
+        IEnumerable<KeyValuePair<string, ConfigProperty>>? props = ConfigurationManager.GetConfigPropertiesByScope (typeof (T).Name);
+        foreach (KeyValuePair<string, ConfigProperty> p in props!)
         {
             TryAdd (
                 p.Key,
