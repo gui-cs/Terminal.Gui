@@ -278,7 +278,7 @@ public class SingleBackgroundWorker : Scenario
             Y = 1;
             Height = Dim.Fill (1);
             Title = $"Worker started at {start}.{start:fff}";
-            Scheme = SchemeManager.Schemes ["Base"];
+            SchemeName = "Base";
 
             Add (
                  new ListView

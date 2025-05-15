@@ -144,7 +144,8 @@ public class LegendAnnotation : View, IAnnotation
     {
         if (!IsInitialized)
         {
-            Scheme = new Scheme { Normal = Application.Driver?.GetAttribute () ?? Attribute.Default};
+            // BUGBUG: We should be getting a visual role here?
+            SetScheme (new Scheme { Normal = Application.Driver?.GetAttribute () ?? Attribute.Default});
             graph.Add (this);
         }
 
@@ -217,7 +218,7 @@ public class PathAnnotation : IAnnotation
     /// <param name="graph"></param>
     public void Render (GraphView graph)
     {
-        graph.SetAttribute (LineColor ?? graph.Scheme.Normal);
+        graph.SetAttribute (LineColor ?? graph.GetAttributeForRole(VisualRole.Normal));
 
         foreach (LineF line in PointsToLines ())
         {

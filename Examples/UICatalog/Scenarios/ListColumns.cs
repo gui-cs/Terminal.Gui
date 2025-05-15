@@ -240,9 +240,9 @@ public class ListColumns : Scenario
 
         _alternatingScheme = new ()
         {
-            Disabled = appWindow.Scheme.Disabled,
-            HotFocus = appWindow.Scheme.HotFocus,
-            Focus = appWindow.Scheme.Focus,
+            Disabled = appWindow.GetAttributeForRole(VisualRole.Disabled),
+            HotFocus = appWindow.GetAttributeForRole (VisualRole.HotFocus),
+            Focus = appWindow.GetAttributeForRole(VisualRole.Focus),
             Normal = new (Color.White, Color.BrightBlue)
         };
 

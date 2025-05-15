@@ -181,13 +181,13 @@ public class AllViewsTester : Scenario
                                             };
         _settingsPane.Add (label, _orientation);
 
-        label = new () { X = Pos.Right(_orientation) + 1, Y = 0, Text = "_Enabled:" };
+        label = new () { X = Pos.Right (_orientation) + 1, Y = 0, Text = "_Enabled:" };
 
         _enabledCheckBox = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            CheckedState = _curView is { } ? (_curView.Enabled ? CheckState.Checked : CheckState.UnChecked ) : CheckState.UnChecked
+            CheckedState = _curView is { } ? (_curView.Enabled ? CheckState.Checked : CheckState.UnChecked) : CheckState.UnChecked
         };
 
         _enabledCheckBox.CheckedStateChanged += (s, args) =>
@@ -266,10 +266,10 @@ public class AllViewsTester : Scenario
             BorderStyle = LineStyle.Double,
             SuperViewRendersLineCanvas = true
         };
-        _hostPane.Border!.Scheme = app.Scheme;
+        _hostPane.Border!.SetScheme (app.GetScheme ());
         _hostPane.Padding!.Thickness = new (1);
         _hostPane.Padding.Diagnostics = ViewDiagnosticFlags.Ruler;
-        _hostPane.Padding.Scheme = app.Scheme;
+        _hostPane.Padding.SetScheme (app.GetScheme ());
 
         app.Add (_classListView, _adornmentsEditor, _arrangementEditor, _layoutEditor, _viewportSettingsEditor, _settingsPane, _eventLog, _hostPane);
 
@@ -317,7 +317,7 @@ public class AllViewsTester : Scenario
         // Ensure the type does not contain any generic parameters
         if (type.ContainsGenericParameters)
         {
-            Logging.Warning($"Cannot create an instance of {type} because it contains generic parameters.");
+            Logging.Warning ($"Cannot create an instance of {type} because it contains generic parameters.");
             //throw new ArgumentException ($"Cannot create an instance of {type} because it contains generic parameters.");
             return;
         }
@@ -402,7 +402,7 @@ public class AllViewsTester : Scenario
             return;
         }
 
-        if (view.Width == Dim.Absolute(0) || view.Width is null)
+        if (view.Width == Dim.Absolute (0) || view.Width is null)
         {
             view.Width = Dim.Fill ();
         }

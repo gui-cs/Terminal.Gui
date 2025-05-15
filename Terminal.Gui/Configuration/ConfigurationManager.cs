@@ -243,7 +243,7 @@ public static class ConfigurationManager
 
         if (resetToHardCodedDefaults)
         {
-            ClearJsonErrors();
+            ClearJsonErrors ();
             ResetToHardCodedDefaults ();
         }
     }
@@ -469,21 +469,9 @@ public static class ConfigurationManager
 
         try
         {
-            if (string.IsNullOrEmpty (ThemeManager.Theme))
-            {
-                // First start. Apply settings first.
-                settings = Settings?.Apply () ?? false;
-
-                themes = !string.IsNullOrEmpty (ThemeManager.Theme)
-                         && (ThemeManager.Themes? [ThemeManager.Theme]?.Apply () ?? false);
-            }
-            else
-            {
-                // Subsequently. Apply Themes first.
-                themes = ThemeManager.Themes? [ThemeManager.Theme]?.Apply () ?? false;
-                settings = Settings?.Apply () ?? false;
-            }
-
+            // Apply Themes first so that ???
+            themes = ThemeManager.Themes? [ThemeManager.Theme]?.Apply () ?? false;
+            settings = Settings?.Apply () ?? false;
             appSettings = AppSettings?.Apply () ?? false;
         }
         catch (JsonException e)

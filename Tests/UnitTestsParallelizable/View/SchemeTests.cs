@@ -13,7 +13,7 @@ public class SchemeTests
         var view = new View ();
         var baseScheme = SchemeManager.GetHardCodedSchemes ()? ["Base"];
 
-        Assert.Equal (baseScheme, view.Scheme);
+        Assert.Equal (baseScheme, view.GetScheme ());
         view.Dispose ();
     }
 
@@ -23,10 +23,10 @@ public class SchemeTests
         var view = new View ();
         var dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
 
-        view.Scheme = dialogScheme;
+        view.SetScheme (dialogScheme);
 
         Assert.True (view.HasScheme);
-        Assert.Equal (dialogScheme, view.Scheme);
+        Assert.Equal (dialogScheme, view.GetScheme ());
         view.Dispose ();
     }
 
@@ -39,9 +39,9 @@ public class SchemeTests
         superView.Add (subView);
 
         var dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
-        superView.Scheme = dialogScheme;
+        superView.SetScheme (dialogScheme);
 
-        Assert.Equal (dialogScheme, subView.Scheme);
+        Assert.Equal (dialogScheme, subView.GetScheme ());
         Assert.False (subView.HasScheme);
 
         subView.Dispose ();
@@ -55,14 +55,14 @@ public class SchemeTests
         view.SchemeName = "Dialog";
 
         var dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
-        Assert.Equal (dialogScheme, view.Scheme);
+        Assert.Equal (dialogScheme, view.GetScheme ());
         view.Dispose ();
     }
 
     [Fact]
     public void GetAttribute_ReturnsCorrectAttribute_Via_Mock ()
     {
-        var view = new View { Scheme = SchemeManager.GetHardCodedSchemes ()? ["Base"] };
+        var view = new View { SchemeName = "Base" };
         view.Driver = new MockConsoleDriver ();
         view.Driver.SetAttribute (new Attribute (Color.Red, Color.Green));
 
@@ -76,13 +76,13 @@ public class SchemeTests
     [Fact]
     public void GetAttributeForRole_ReturnsCorrectAttribute ()
     {
-        var view = new View { Scheme = SchemeManager.GetHardCodedSchemes ()? ["Base"] };
+        var view = new View { SchemeName = "Base" };
 
-        Assert.Equal (view.Scheme!.Normal, view.GetAttributeForRole (VisualRole.Normal));
-        Assert.Equal (view.Scheme.HotNormal, view.GetAttributeForRole (VisualRole.HotNormal));
-        Assert.Equal (view.Scheme.Focus, view.GetAttributeForRole (VisualRole.Focus));
-        Assert.Equal (view.Scheme.HotFocus, view.GetAttributeForRole (VisualRole.HotFocus));
-        Assert.Equal (view.Scheme.Disabled, view.GetAttributeForRole (VisualRole.Disabled));
+        Assert.Equal (view.GetScheme ().Normal, view.GetAttributeForRole (VisualRole.Normal));
+        Assert.Equal (view.GetScheme ().HotNormal, view.GetAttributeForRole (VisualRole.HotNormal));
+        Assert.Equal (view.GetScheme ().Focus, view.GetAttributeForRole (VisualRole.Focus));
+        Assert.Equal (view.GetScheme ().HotFocus, view.GetAttributeForRole (VisualRole.HotFocus));
+        Assert.Equal (view.GetScheme ().Disabled, view.GetAttributeForRole (VisualRole.Disabled));
 
         view.Dispose ();
     }
@@ -90,11 +90,11 @@ public class SchemeTests
     [Fact]
     public void GetAttributeForRole_DisabledView_ReturnsCorrectAttribute ()
     {
-        var view = new View { Scheme = SchemeManager.GetHardCodedSchemes ()? ["Base"] };
+        var view = new View { SchemeName = "Base" };
 
         view.Enabled = false;
-        Assert.Equal (view.Scheme.Disabled, view.GetAttributeForRole (VisualRole.Normal));
-        Assert.Equal (view.Scheme.Disabled, view.GetAttributeForRole (VisualRole.HotNormal));
+        Assert.Equal (view.GetScheme ().Disabled, view.GetAttributeForRole (VisualRole.Normal));
+        Assert.Equal (view.GetScheme ().Disabled, view.GetAttributeForRole (VisualRole.HotNormal));
 
         view.Dispose ();
     }
@@ -102,12 +102,12 @@ public class SchemeTests
     [Fact]
     public void SetAttributeForRole_SetsCorrectAttribute ()
     {
-        var view = new View { Scheme = SchemeManager.GetHardCodedSchemes ()? ["Base"] };
+        var view = new View { SchemeName = "Base" };
         view.Driver = new MockConsoleDriver ();
         view.Driver.SetAttribute (new Attribute (Color.Red, Color.Green));
 
         var previousAttribute = view.SetAttributeForRole (VisualRole.Focus);
-        Assert.Equal (view.Scheme.Focus, view.GetCurrentAttribute ());
+        Assert.Equal (view.GetScheme ().Focus, view.GetCurrentAttribute ());
         Assert.NotEqual (previousAttribute, view.GetCurrentAttribute ());
 
         view.Dispose ();
@@ -119,7 +119,7 @@ public class SchemeTests
         var view = new CustomView ();
         var customScheme = SchemeManager.GetHardCodedSchemes ()? ["Error"];
 
-        Assert.Equal (customScheme, view.Scheme);
+        Assert.Equal (customScheme, view.GetScheme ());
         view.Dispose ();
     }
 
@@ -129,9 +129,9 @@ public class SchemeTests
         var view = new CustomView ();
         var dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
 
-        view.Scheme = dialogScheme;
+        view.SetScheme (dialogScheme);
 
-        Assert.NotEqual (dialogScheme, view.Scheme);
+        Assert.NotEqual (dialogScheme, view.GetScheme ());
         view.Dispose ();
     }
 
@@ -147,7 +147,7 @@ public class SchemeTests
             args.Cancel = true;
         };
 
-        Assert.Equal (customScheme, view.Scheme);
+        Assert.Equal (customScheme, view.GetScheme ());
         view.Dispose ();
     }
 
@@ -159,16 +159,16 @@ public class SchemeTests
 
         view.SettingScheme += (sender, args) => args.Cancel = true;
 
-        view.Scheme = dialogScheme;
+        view.SetScheme (dialogScheme);
 
-        Assert.NotEqual (dialogScheme, view.Scheme);
+        Assert.NotEqual (dialogScheme, view.GetScheme ());
         view.Dispose ();
     }
 
     [Fact]
     public void GetAttributeForRole_Event_CanOverrideAttribute ()
     {
-        var view = new View { Scheme = SchemeManager.GetHardCodedSchemes ()? ["Base"] };
+        var view = new View { SchemeName = "Base" };
         var customAttribute = new Attribute (Color.BrightRed, Color.BrightYellow);
 
         view.GettingAttributeForRole += (sender, args) =>
@@ -187,7 +187,7 @@ public class SchemeTests
     [Fact]
     public void SetAttributeForRole_Event_CanCancelAttributeChange ()
     {
-        var view = new View { Scheme = SchemeManager.GetHardCodedSchemes ()? ["Base"] };
+        var view = new View { SchemeName = "Base" };
 
         view.SettingAttributeForRole += (sender, args) =>
         {
@@ -198,7 +198,7 @@ public class SchemeTests
         };
 
         var previousAttribute = view.SetAttributeForRole (VisualRole.Focus);
-        Assert.NotEqual (view.Scheme.Focus, view.GetCurrentAttribute ());
+        Assert.NotEqual (view.GetScheme ().Focus, view.GetCurrentAttribute ());
         Assert.Equal (previousAttribute, view.GetCurrentAttribute ());
 
         view.Dispose ();
@@ -228,7 +228,7 @@ public class SchemeTests
         subView.SchemeName = "Error";
 
         var errorScheme = SchemeManager.GetHardCodedSchemes ()? ["Error"];
-        Assert.Equal (errorScheme, subView.Scheme);
+        Assert.Equal (errorScheme, subView.GetScheme());
 
         subView.Dispose ();
         superView.Dispose ();
@@ -240,7 +240,7 @@ public class SchemeTests
         var view = new View ();
         var baseScheme = SchemeManager.GetHardCodedSchemes ()? ["Base"];
 
-        Assert.Equal (baseScheme, view.Scheme);
+        Assert.Equal (baseScheme, view.GetScheme());
         view.Dispose ();
     }
 
@@ -251,7 +251,7 @@ public class SchemeTests
         view.SchemeName = "Dialog";
 
         var dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
-        Assert.Equal (dialogScheme, view.Scheme);
+        Assert.Equal (dialogScheme, view.GetScheme());
 
         view.Dispose ();
     }

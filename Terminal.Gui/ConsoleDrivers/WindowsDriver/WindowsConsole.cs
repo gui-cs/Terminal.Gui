@@ -141,6 +141,10 @@ internal partial class WindowsConsole
         }
     }
 
+
+    // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
+    private TextStyle _redrawTextStyle = TextStyle.None;
+
     private CharInfo []? _originalStdOutChars;
 
     public bool WriteToConsole (Size size, ExtendedCharInfo [] charInfoBuffer, Coord bufferSize, SmallRect window, bool force16Colors)
@@ -191,6 +195,8 @@ internal partial class WindowsConsole
                     prev = attr;
                     EscSeqUtils.CSI_AppendForegroundColorRGB (_stringBuilder, attr.Foreground.R, attr.Foreground.G, attr.Foreground.B);
                     EscSeqUtils.CSI_AppendBackgroundColorRGB (_stringBuilder, attr.Background.R, attr.Background.G, attr.Background.B);
+                    EscSeqUtils.CSI_AppendTextStyleChange (_stringBuilder, _redrawTextStyle, attr.Style);
+                    _redrawTextStyle = attr.Style;
                 }
 
                 if (info.Char != '\x1b')

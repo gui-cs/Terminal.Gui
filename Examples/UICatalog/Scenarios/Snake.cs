@@ -299,14 +299,7 @@ public class Snake : Scenario
             State = state;
             CanFocus = true;
 
-            base.Scheme = new ()
-            {
-                Normal = white,
-                Focus = white,
-                HotNormal = white,
-                HotFocus = white,
-                Disabled = white
-            };
+            base.SetScheme (new (white));
 
             KeyBindings.Add (Key.CursorLeft, Command.Left);
             KeyBindings.Add (Key.CursorRight, Command.Right);

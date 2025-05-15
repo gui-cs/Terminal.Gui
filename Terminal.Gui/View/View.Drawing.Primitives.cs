@@ -121,8 +121,8 @@ public partial class View
         {
             DrawHotString (
                            text,
-                           Enabled ? GetAttributeForRole (VisualRole.HotNormal) : Scheme!.Disabled,
-                           Enabled ? GetAttributeForRole (VisualRole.Normal) : Scheme!.Disabled
+                           Enabled ? GetAttributeForRole (VisualRole.HotNormal) : GetScheme ()!.Disabled,
+                           Enabled ? GetAttributeForRole (VisualRole.Normal) : GetScheme ()!.Disabled
                           );
         }
     }

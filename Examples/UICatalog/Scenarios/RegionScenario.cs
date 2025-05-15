@@ -37,7 +37,7 @@ public class RegionScenario : Scenario
 
         var tools = new ToolsView { Title = "Tools", X = Pos.AnchorEnd (), Y = 2 };
 
-        tools.CurrentAttribute = app.Scheme!.HotNormal;
+        tools.CurrentAttribute = app.GetAttributeForRole (VisualRole.HotNormal);
 
         tools.SetStyle += b =>
                           {

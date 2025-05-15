@@ -100,7 +100,7 @@ public class SyntaxHighlighting : Scenario
     /// <typeparam name="T">The type of object to read from the file.</typeparam>
     /// <param name="filePath">The file path to read the object instance from.</param>
     /// <returns>Returns a new instance of the object read from the Json file.</returns>
-    public static T ReadFromJsonFile<T> (string filePath) where T : new ()
+    public static T ReadFromJsonFile<T> (string filePath) where T : new()
     {
         TextReader reader = null;
 
@@ -170,7 +170,7 @@ public class SyntaxHighlighting : Scenario
         };
         appWindow.Add (menu);
 
-        _textView = new()
+        _textView = new ()
         {
             Y = 1,
             Width = Dim.Fill (),
@@ -212,7 +212,7 @@ public class SyntaxHighlighting : Scenario
     ///     If false the file will be overwritten if it already exists. If true the contents will be appended
     ///     to the file.
     /// </param>
-    public static void WriteToJsonFile<T> (string filePath, T objectToWrite, bool append = false) where T : new ()
+    public static void WriteToJsonFile<T> (string filePath, T objectToWrite, bool append = false) where T : new()
     {
         TextWriter writer = null;
 
@@ -243,10 +243,10 @@ public class SyntaxHighlighting : Scenario
 
             foreach (Rune rune in csName.EnumerateRunes ())
             {
-                cells.Add (new() { Rune = rune, Attribute = color.Value.Normal });
+                cells.Add (new () { Rune = rune, Attribute = color.Value.Normal });
             }
 
-            cells.Add (new() { Rune = (Rune)'\n', Attribute = color.Value.Focus });
+            cells.Add (new () { Rune = (Rune)'\n', Attribute = color.Value.Focus });
         }
 
         if (File.Exists (_path))
@@ -271,7 +271,7 @@ public class SyntaxHighlighting : Scenario
         _blue = new Attribute (Color.Blue, Color.Black);
         _magenta = new Attribute (Color.Magenta, Color.Black);
         _white = new Attribute (Color.White, Color.Black);
-        _textView.Scheme = new () { Focus = _white };
+        _textView.SetScheme (new () { Focus = _white });
 
         _textView.Text =
             "/*Query to select:\nLots of data*/\nSELECT TOP 100 * \nfrom\n MyDb.dbo.Biochemistry where TestCode = 'blah';";

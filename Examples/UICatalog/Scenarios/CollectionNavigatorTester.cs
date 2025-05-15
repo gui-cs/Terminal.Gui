@@ -82,7 +82,7 @@ public class CollectionNavigatorTester : Scenario
     public override void Main ()
     {
         Application.Init ();
-        top = new Toplevel { Scheme = SchemeManager.Schemes ["Base"] };
+        top = new Toplevel { SchemeName = "Base" };
 
         var allowMarking = new MenuItem ("Allow _Marking", "", null)
         {

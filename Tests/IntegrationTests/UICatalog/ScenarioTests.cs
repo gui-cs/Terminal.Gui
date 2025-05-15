@@ -176,7 +176,7 @@ public class ScenarioTests : TestsAllViews
             Width = 15,
             Height = Dim.Fill (1), // for status bar
             CanFocus = false,
-            Scheme = SchemeManager.Schemes ["TopLevel"]
+            SchemeName = "TopLevel"
         };
 
         ListView classListView = new ()
@@ -186,7 +186,7 @@ public class ScenarioTests : TestsAllViews
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             AllowsMarking = false,
-            Scheme = SchemeManager.Schemes ["TopLevel"],
+            SchemeName = "TopLevel",
             Source = new ListWrapper<string> (new (viewClasses.Keys.ToList ()))
         };
         leftPane.Add (classListView);
@@ -198,7 +198,7 @@ public class ScenarioTests : TestsAllViews
             Width = Dim.Fill (),
             Height = 10,
             CanFocus = false,
-            Scheme = SchemeManager.Schemes ["TopLevel"],
+            SchemeName = "TopLevel",
             Title = "Settings"
         };
 
@@ -264,7 +264,7 @@ public class ScenarioTests : TestsAllViews
             Y = Pos.Bottom (settingsPane),
             Width = Dim.Fill (),
             Height = Dim.Fill (1), // + 1 for status bar
-            Scheme = SchemeManager.Schemes ["Dialog"]
+            SchemeName = "Dialog"
         };
 
         classListView.OpenSelectedItem += (s, a) => { settingsPane.SetFocus (); };
@@ -545,7 +545,10 @@ public class ScenarioTests : TestsAllViews
             }
 
             // Set the colorscheme to make it stand out if is null by default
-            view.Scheme ??= SchemeManager.Schemes ["Base"];
+            if (!view.HasScheme)
+            {
+                view.SchemeName = "Base";
+            }
 
             // If the view supports a Text property, set it so we have something to look at
             if (view.GetType ().GetProperty ("Text") != null)
@@ -618,7 +621,7 @@ public class ScenarioTests : TestsAllViews
         // BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
         // by adding this Space it seems to work.
 
-        Assert.Equal(Key.Esc, Application.QuitKey);
+        Assert.Equal (Key.Esc, Application.QuitKey);
         FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
 
         var ms = 100;

@@ -128,16 +128,16 @@ internal class NumericUpDownEditor<T> : View where T : notnull
                         _numericUpDown.Value = (T)Convert.ChangeType (_value.Text, typeof (T));
                     }
 
-                    _value.Scheme = SuperView!.Scheme;
+                    _value.SetScheme (SuperView!.GetScheme ());
 
                 }
                 catch (System.FormatException)
                 {
-                    _value.Scheme = SchemeManager.Schemes ["Error"];
+                    _value.SchemeName = "Error";
                 }
                 catch (InvalidCastException)
                 {
-                    _value.Scheme = SchemeManager.Schemes ["Error"];
+                    _value.SchemeName = "Error";
                 }
                 finally
                 {
@@ -176,16 +176,16 @@ internal class NumericUpDownEditor<T> : View where T : notnull
                     _ = string.Format (_format.Text, _value);
                     _numericUpDown.Format = _format.Text;
 
-                    _format.Scheme = SuperView!.Scheme;
+                    _format.SetScheme (SuperView!.GetScheme ());
 
                 }
                 catch (System.FormatException)
                 {
-                    _format.Scheme = SchemeManager.Schemes ["Error"];
+                    _format.SchemeName = "Error";
                 }
                 catch (InvalidCastException)
                 {
-                    _format.Scheme = SchemeManager.Schemes ["Error"];
+                    _format.SchemeName = "Error";
                 }
                 finally
                 {
@@ -231,16 +231,16 @@ internal class NumericUpDownEditor<T> : View where T : notnull
                         _numericUpDown.Increment = (T)Convert.ChangeType (_increment.Text, typeof (T));
                     }
 
-                    _increment.Scheme = SuperView!.Scheme;
+                    _increment.SetScheme (SuperView!.GetScheme ());
 
                 }
                 catch (System.FormatException)
                 {
-                    _increment.Scheme = SchemeManager.Schemes ["Error"];
+                    _increment.SchemeName = "Error";
                 }
                 catch (InvalidCastException)
                 {
-                    _increment.Scheme = SchemeManager.Schemes ["Error"];
+                    _increment.SchemeName = "Error";
                 }
                 finally
                 {

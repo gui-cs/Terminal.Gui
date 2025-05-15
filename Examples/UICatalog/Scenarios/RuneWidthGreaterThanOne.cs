@@ -75,7 +75,7 @@ public class RuneWidthGreaterThanOne : Scenario
 
         _label = new Label
         {
-            X = Pos.Center (), Y = 1, Scheme = new Scheme { Normal = SchemeManager.Schemes ["Base"].Focus }
+            X = Pos.Center (), Y = 1,
         };
         _text = new TextField { X = Pos.Center (), Y = 3, Width = 20 };
         _button = new Button { X = Pos.Center (), Y = 5 };

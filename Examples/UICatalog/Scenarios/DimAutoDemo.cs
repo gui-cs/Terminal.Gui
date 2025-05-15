@@ -74,7 +74,7 @@ public class DimAutoDemo : Scenario
             Y = Pos.Bottom (textEdit) + 1,
             Width = Dim.Auto (DimAutoStyle.Text, 1),
             Height = Dim.Auto (DimAutoStyle.Text, 8),
-            Scheme = SchemeManager.Schemes ["Error"],
+            SchemeName = "Error",
             TextDirection = TextDirection.TopBottom_LeftRight
         };
         vlabel.Id = "vlabel";
@@ -87,7 +87,7 @@ public class DimAutoDemo : Scenario
             Y = Pos.Bottom (textEdit),
             Width = Dim.Auto (DimAutoStyle.Text, 20),
             Height = Dim.Auto (DimAutoStyle.Text, 1),
-            Scheme = SchemeManager.Schemes ["Error"]
+            SchemeName = "Error"
         };
         hlabel.Id = "hlabel";
         dimAutoFrameView.Add (hlabel);
@@ -98,7 +98,7 @@ public class DimAutoDemo : Scenario
             Y = Pos.Bottom (hlabel) + 1,
             Width = 20,
             Height = Dim.Auto (),
-            Scheme = SchemeManager.Schemes ["Error"],
+            SchemeName = "Error",
             Title = "W: 20, H: Auto",
             BorderStyle = LineStyle.Rounded
         };
@@ -111,7 +111,7 @@ public class DimAutoDemo : Scenario
             Y = Pos.Bottom (hlabel) + 1,
             Width = Dim.Auto (),
             Height = 5,
-            Scheme = SchemeManager.Schemes ["Error"],
+            SchemeName = "Error",
             Title = "W: Auto, H: 5",
             BorderStyle = LineStyle.Rounded
         };
@@ -124,7 +124,7 @@ public class DimAutoDemo : Scenario
             Y = Pos.Bottom (hlabel) + 1,
             Width = Dim.Auto (),
             Height = Dim.Auto (),
-            Scheme = SchemeManager.Schemes ["Error"],
+            SchemeName = "Error",
             Title = "W: Auto, H: Auto",
             BorderStyle = LineStyle.Rounded
         };

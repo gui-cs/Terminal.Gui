@@ -107,14 +107,14 @@ internal partial class LoginViewModel : ObservableObject
              case LoginActions.Clear:
                 LoginProgressMessage = message;
                 ValidationMessage = INVALID_LOGIN_MESSAGE;
-                ValidationScheme = SchemeManager.Schemes ["Error"];
+                ValidationScheme = SchemeManager.GetScheme ("Error");
                 break;
             case LoginActions.LoginProgress:
                 LoginProgressMessage = message;
                 break;
             case LoginActions.Validation:
                 ValidationMessage = CanLogin ? VALID_LOGIN_MESSAGE : INVALID_LOGIN_MESSAGE;
-                ValidationScheme = CanLogin ? SchemeManager.Schemes ["Base"] : SchemeManager.Schemes ["Error"];
+                ValidationScheme = CanLogin ? SchemeManager.GetScheme ("Base") : SchemeManager.GetScheme("Error");
                 break;
         }
         WeakReferenceMessenger.Default.Send (new Message<LoginActions> { Value = loginAction });

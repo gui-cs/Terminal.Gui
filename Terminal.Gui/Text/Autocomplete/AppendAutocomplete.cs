@@ -13,7 +13,7 @@ public class AppendAutocomplete : AutocompleteBase
     public AppendAutocomplete (TextField textField)
     {
         this.textField = textField;
-        SelectionKey = KeyCode.Tab;
+        base.SelectionKey = KeyCode.Tab;
 
         Scheme = new Scheme
         {
@@ -109,7 +109,7 @@ public class AppendAutocomplete : AutocompleteBase
         textField.SetAttribute (
                                new Attribute (
                                               Scheme.Normal.Foreground,
-                                              textField.Scheme.Focus.Background
+                                              textField.GetAttributeForRole(VisualRole.Focus).Background
                                              )
                               );
         textField.Move (textField.Text.Length, 0);

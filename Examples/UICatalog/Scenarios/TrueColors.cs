@@ -107,13 +107,13 @@ public class TrueColors : Scenario
                                       {
                                           Attribute normal = e.View.GetAttributeForRole (VisualRole.Normal);
 
-                                          lblLighter.Scheme = new (e.View.Scheme)
+                                          lblLighter.SetScheme (new (e.View.GetScheme ())
                                           {
                                               Normal = new (
                                                             normal.Foreground,
                                                             normal.Background.GetHighlightColor ()
                                                            )
-                                          };
+                                          });
                                       }
                                       else
                                       {
@@ -140,16 +140,15 @@ public class TrueColors : Scenario
                 var l = new Label
                 {
                     X = dx++,
-                    Y = y,
-                    Scheme = new()
-                    {
-                        Normal = new (
-                                      colorFunc (Math.Clamp (i, 0, 255)),
-                                      colorFunc (Math.Clamp (i, 0, 255))
-                                     )
-                    },
-                    Text = " "
+                    Y = y
                 };
+                l.SetScheme (new ()
+                {
+                    Normal = new (
+                                  colorFunc (Math.Clamp (i, 0, 255)),
+                                  colorFunc (Math.Clamp (i, 0, 255))
+                                 )
+                });
                 app.Add (l);
             }
 

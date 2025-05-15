@@ -34,14 +34,14 @@ public class TextEffectsScenario : Scenario
                               }
                           };
 
-        w.Scheme = new ()
+        w.SetScheme (new ()
         {
             Normal = new (ColorName16.White, ColorName16.Black),
             Focus = new (ColorName16.Black, ColorName16.White),
             HotNormal = new (ColorName16.White, ColorName16.Black),
             HotFocus = new (ColorName16.White, ColorName16.Black),
             Disabled = new (ColorName16.Gray, ColorName16.Black)
-        };
+        });
 
         var gradientsView = new GradientsView
         {

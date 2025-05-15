@@ -666,25 +666,25 @@ public class TableEditor : Scenario
 
         _redScheme = new ()
         {
-            Disabled = appWindow.Scheme.Disabled,
-            HotFocus = appWindow.Scheme.HotFocus,
-            Focus = appWindow.Scheme.Focus,
-            Normal = new (Color.Red, appWindow.Scheme.Normal.Background)
+            Disabled = appWindow.GetAttributeForRole(VisualRole.Disabled),
+            HotFocus = appWindow.GetAttributeForRole(VisualRole.HotFocus),
+            Focus = appWindow.GetAttributeForRole(VisualRole.Focus),
+            Normal = new (Color.Red, appWindow.GetAttributeForRole(VisualRole.Normal).Background)
         };
 
         _alternatingScheme = new ()
         {
-            Disabled = appWindow.Scheme.Disabled,
-            HotFocus = appWindow.Scheme.HotFocus,
-            Focus = appWindow.Scheme.Focus,
+            Disabled = appWindow.GetAttributeForRole(VisualRole.Disabled),
+            HotFocus = appWindow.GetAttributeForRole(VisualRole.HotFocus),
+            Focus = appWindow.GetAttributeForRole(VisualRole.Focus),
             Normal = new (Color.White, Color.BrightBlue)
         };
 
         _redSchemeAlt = new ()
         {
-            Disabled = appWindow.Scheme.Disabled,
-            HotFocus = appWindow.Scheme.HotFocus,
-            Focus = appWindow.Scheme.Focus,
+            Disabled = appWindow.GetAttributeForRole(VisualRole.Disabled),
+            HotFocus = appWindow.GetAttributeForRole(VisualRole.HotFocus),
+            Focus = appWindow.GetAttributeForRole(VisualRole.Focus),
             Normal = new (Color.Red, Color.BrightBlue)
         };
 

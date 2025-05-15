@@ -78,22 +78,22 @@ public class ProgressBarStyles : Scenario
                                     {
                                         if (!LineDrawing.PromptForColor (
                                                                          fgColorPickerBtn.Text,
-                                                                         editor.ViewToEdit.Scheme.HotNormal.Foreground,
+                                                                         editor.ViewToEdit!.GetAttributeForRole (VisualRole.Normal).Foreground,
                                                                          out var newColor
                                                                         ))
                                         {
                                             return;
                                         }
 
-                                        var cs = new Scheme (editor.ViewToEdit.Scheme)
+                                        var cs = new Scheme (editor.ViewToEdit.GetScheme ())
                                         {
                                             HotNormal = new Attribute (
                                                                        newColor,
-                                                                       editor.ViewToEdit.Scheme.HotNormal
+                                                                       editor.ViewToEdit.GetAttributeForRole (VisualRole.HotNormal)
                                                                              .Background
                                                                       )
                                         };
-                                        editor.ViewToEdit.Scheme = cs;
+                                        editor.ViewToEdit.SetScheme (cs);
                                     };
 
         var bgColorPickerBtn = new Button
@@ -108,22 +108,22 @@ public class ProgressBarStyles : Scenario
                                     {
                                         if (!LineDrawing.PromptForColor (
                                                                          fgColorPickerBtn.Text,
-                                                                         editor.ViewToEdit.Scheme.HotNormal.Background
+                                                                         editor.ViewToEdit.GetAttributeForRole (VisualRole.HotNormal)
+                                                                               .Background
                                                                         , out var newColor))
 
                                         {
                                             return;
                                         }
 
-                                        var cs = new Scheme (editor.ViewToEdit.Scheme)
+                                        var cs = new Scheme (editor.ViewToEdit.GetScheme ())
                                         {
                                             HotNormal = new Attribute (
-                                                                       editor.ViewToEdit.Scheme.HotNormal
-                                                                             .Foreground,
+                                                                       editor.ViewToEdit!.GetAttributeForRole (VisualRole.Normal).Foreground,
                                                                        newColor
                                                                       )
                                         };
-                                        editor.ViewToEdit.Scheme = cs;
+                                        editor.ViewToEdit.SetScheme (cs);
                                     };
 
         #endregion
@@ -210,7 +210,7 @@ public class ProgressBarStyles : Scenario
         {
             X = Pos.Center (),
             Y = Pos.Bottom (continuousPB),
-            Text = "BidirectionalMarquee", 
+            Text = "BidirectionalMarquee",
             CheckedState = CheckState.Checked
         };
         container.Add (ckbBidirectional);

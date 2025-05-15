@@ -25,7 +25,7 @@ public class LineCanvasExperiment : Scenario
             Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            Scheme = SchemeManager.Schemes ["Base"]
+            SchemeName = "Base"
            ,
             SuperViewRendersLineCanvas = true
         };

@@ -145,7 +145,7 @@ internal sealed class Menu : View
         if (_barItems is { IsTopLevel: true })
         {
             // This is a standalone MenuItem on a MenuBar
-            Scheme = _host.Scheme;
+            SetScheme (_host.GetScheme ());
             CanFocus = true;
         }
         else
@@ -162,7 +162,7 @@ internal sealed class Menu : View
                 }
             }
 
-            Scheme = _host.Scheme;
+            SetScheme (_host.GetScheme ());
             CanFocus = true;
             WantMousePositionReports = _host.WantMousePositionReports;
         }
@@ -430,7 +430,7 @@ internal sealed class Menu : View
             return GetAttributeForRole (VisualRole.Focus);
         }
 
-        return !item.IsEnabled () ? Scheme!.Disabled : GetAttributeForRole (VisualRole.Normal);
+        return !item.IsEnabled () ? GetAttributeForRole (VisualRole.Disabled) : GetAttributeForRole (VisualRole.Normal);
     }
 
     internal required MenuBar Host
@@ -955,7 +955,7 @@ internal sealed class Menu : View
 
                 if (!item.IsEnabled ())
                 {
-                    DrawHotString (textToDraw, Scheme!.Disabled, Scheme.Disabled);
+                    DrawHotString (textToDraw, GetAttributeForRole (VisualRole.Disabled), GetAttributeForRole (VisualRole.Disabled));
                 }
                 else if (i == 0 && _host.UseSubMenusSingleFrame && item.Parent!.Parent is { })
                 {
@@ -970,7 +970,7 @@ internal sealed class Menu : View
                     tf.Draw (
                              ViewportToScreen (new Rectangle (1, i, Frame.Width - 3, 1)),
                              i == _currentChild ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal),
-                             i == _currentChild ? Scheme!.HotFocus : Scheme!.HotNormal,
+                             i == _currentChild ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal),
                              SuperView?.ViewportToScreen (SuperView.Viewport) ?? Rectangle.Empty
                             );
                 }
@@ -978,7 +978,7 @@ internal sealed class Menu : View
                 {
                     DrawHotString (
                                    textToDraw,
-                                   i == _currentChild ? Scheme!.HotFocus : Scheme!.HotNormal,
+                                   i == _currentChild ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal),
                                    i == _currentChild ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal)
                                   );
                 }
