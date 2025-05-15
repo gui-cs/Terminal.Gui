@@ -66,6 +66,12 @@ public partial class View
         };
     }
 
+    /// <summary>
+    ///     Gets or sets the name of the Scheme to use for this View. If set, it will override the Scheme set in
+    ///     the <see cref="Scheme"/> property.
+    /// </summary>
+    public string? SchemeName { get; set; }
+
     // Both holds the set Scheme and is used to determine if a Scheme has been set or not
     private Scheme? _scheme;
 
@@ -100,9 +106,14 @@ public partial class View
             return args.NewScheme!;
         }
 
+        if (!string.IsNullOrEmpty (SchemeName))
+        {
+            return SchemeManager.GetCurrentSchemes () [SchemeName]!;
+        }
+
         if (!HasScheme)
         {
-            return SuperView?.Scheme ?? SchemeManager.GetCurrentSchemes () ["Base"]!;
+            return SuperView?.GetScheme() ?? SchemeManager.GetCurrentSchemes () ["Base"]!;
         }
 
         return _scheme!;

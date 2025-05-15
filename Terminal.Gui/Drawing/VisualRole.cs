@@ -1,11 +1,10 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     Represents the semantic visual role of a visual element rendered by a View.
+///     Represents the semantic visual role of a visual element rendered by a <see cref="View"/> (e.g., Normal text, Focused item, Active selection).
 /// </summary>
 /// <remarks>
-///     A single View may render multiple elements, each associated with a different <see cref="VisualRole"/>.
-///     VisualRoles describe the intended purpose of the element (e.g., Normal text, Focused item, Active selection).
+///     A single View may render as one or multiple elements. Each element can be associated with a different <see cref="VisualRole"/>.
 /// </remarks>
 public enum VisualRole
 {
@@ -38,6 +37,11 @@ public enum VisualRole
     ///     The visual role for elements that are active and have a HotKey indicator.
     /// </summary>
     HotActive,
+
+    /// <summary>
+    ///     The visual role for elements that are highlighted (e.g., when the mouse is hovering over a Button).
+    /// </summary>
+    Highlight,
 
     /// <summary>
     ///     The visual role for elements that are disabled and not interactable.

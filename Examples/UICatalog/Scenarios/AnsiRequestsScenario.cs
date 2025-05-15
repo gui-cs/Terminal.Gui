@@ -169,8 +169,8 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
                                                                           {
                                                                               Request = ansiEscapeSequenceRequest.Request,
                                                                               Terminator = ansiEscapeSequenceRequest.Terminator,
-                                                                              ResponseReceived = (s)=>OnSuccess(s, tvResponse, tvError, tvValue, tvTerminator,lblSuccess),
-                                                                              Abandoned =()=> OnFail (tvResponse, tvError, tvValue, tvTerminator, lblSuccess)
+                                                                              ResponseReceived = (s) => OnSuccess (s, tvResponse, tvError, tvValue, tvTerminator, lblSuccess),
+                                                                              Abandoned = () => OnFail (tvResponse, tvError, tvValue, tvTerminator, lblSuccess)
                                                                           });
                                  };
 
@@ -181,15 +181,15 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         return w;
     }
 
-    private void OnSuccess (string response, TextView tvResponse, TextView tvError, TextView tvValue, TextView tvTerminator,Label lblSuccess)
+    private void OnSuccess (string response, TextView tvResponse, TextView tvError, TextView tvValue, TextView tvTerminator, Label lblSuccess)
     {
         tvResponse.Text = response;
         tvError.Text = string.Empty;
         tvValue.Text = string.Empty;
         tvTerminator.Text = string.Empty;
 
-            lblSuccess.Scheme = SchemeManager.Schemes ["Base"];
-            lblSuccess.Text = "Successful";
+        lblSuccess.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
+        lblSuccess.Text = "Successful";
     }
 
     private void OnFail (TextView tvResponse, TextView tvError, TextView tvValue, TextView tvTerminator, Label lblSuccess)
@@ -199,7 +199,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         tvValue.Text = string.Empty;
         tvTerminator.Text = string.Empty;
 
-        lblSuccess.Scheme = SchemeManager.Schemes ["Error"];
+        lblSuccess.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Error);
         lblSuccess.Text = "Error";
     }
 
@@ -320,7 +320,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
     private void UpdateResponses ()
     {
         _lblSummary.Text = GetSummary ();
-        _lblSummary.SetNeedsDraw();
+        _lblSummary.SetNeedsDraw ();
     }
 
     private string GetSummary ()
@@ -369,7 +369,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
                                         .Select (g => new PointF (g.Key, g.Count ()))
                                         .ToList ();
         //  _graphView.ScrollOffset  = new PointF(,0);
-        _graphView.SetNeedsDraw();
+        _graphView.SetNeedsDraw ();
 
     }
 

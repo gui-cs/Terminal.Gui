@@ -1,37 +1,27 @@
-﻿using System.Text.Json;
-using UnitTests;
+﻿using System.Collections.Concurrent;
+using System.Text.Json;
 using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui.ConfigurationTests;
 
 public class ThemeScopeTests
 {
-    public static readonly JsonSerializerOptions _jsonOptions = new ()
-    {
-        Converters =
-        {
-            //new AttributeJsonConverter (),
-            //new ColorJsonConverter ()
-        }
-    };
-
     [Fact]
     public void Load_AllThemesPresent ()
     {
-        Enable();
+        Enable (true);
+
         Load (ConfigLocations.All);
         Assert.True (ThemeManager.Themes.ContainsKey ("Default"));
         Assert.True (ThemeManager.Themes.ContainsKey ("Dark"));
         Assert.True (ThemeManager.Themes.ContainsKey ("Light"));
-        ResetToHardCodedDefaults();
-        Disable ();
+        Disable (true);
     }
 
     [Fact]
     public void Apply_ShouldApplyUpdatedProperties ()
     {
-        Enable ();
-        ResetToHardCodedDefaults ();
+        Enable (true);
         Assert.NotEmpty (ThemeManager.Themes);
         Alignment savedValue = Dialog.DefaultButtonAlignment;
         Alignment newValue = Alignment.Center != savedValue ? Alignment.Center : Alignment.Start;
@@ -45,14 +35,14 @@ public class ThemeScopeTests
         ThemeManager.GetCurrentTheme () ["Dialog.DefaultButtonAlignment"].PropertyValue = savedValue;
         ThemeManager.GetCurrentTheme ().Apply ();
         Assert.Equal (savedValue, Dialog.DefaultButtonAlignment);
-        ResetToHardCodedDefaults ();
-        Disable ();
+        Disable (true);
     }
 
     [Fact]
     public void UpdateToHardCodedDefaults_Resets_Config_Does_Not_Apply ()
     {
-        Enable ();
+        Enable (true);
+
         Load (ConfigLocations.LibraryResources);
 
         Assert.Equal ("Default", ThemeManager.Theme);
@@ -65,53 +55,44 @@ public class ThemeScopeTests
         ThemeManager.ResetToHardCodedDefaults ();
         Assert.Equal ("Default", ThemeManager.Theme);
 
-        ResetToHardCodedDefaults ();
-        Disable ();
+        Disable (true);
     }
 
     [Fact]
     public void Serialize_Themes_RoundTrip ()
     {
-        Enable ();
-        ResetToCurrentValues ();
+        Enable (true);
 
         IDictionary<string, ThemeScope> initial = ThemeManager.Themes;
 
-        string serialized = JsonSerializer.Serialize<IDictionary<string, ThemeScope>> (ThemeManager.Themes, _jsonOptions);
+        string serialized = JsonSerializer.Serialize (ThemeManager.Themes, SerializerContext.Options);
 
-        IDictionary<string, ThemeScope> deserialized =
-            JsonSerializer.Deserialize<IDictionary<string, ThemeScope>> (serialized, _jsonOptions);
+        ConcurrentDictionary<string, ThemeScope> deserialized =
+            JsonSerializer.Deserialize<ConcurrentDictionary<string, ThemeScope>> (serialized, SerializerContext.Options);
 
         Assert.NotEqual (initial, deserialized);
         Assert.Equal (deserialized.Count, initial!.Count);
 
-        ResetToHardCodedDefaults ();
-        Disable ();
+        Disable (true);
     }
-
-
 
     [Fact]
     public void Serialize_New_RoundTrip ()
     {
-        Enable ();
-        ResetToCurrentValues ();
+        Enable (true);
 
         var theme = new ThemeScope ();
         theme ["Dialog.DefaultButtonAlignment"].PropertyValue = Alignment.End;
 
-        string json = JsonSerializer.Serialize (theme, _jsonOptions);
+        string json = JsonSerializer.Serialize (theme, SerializerContext.Options);
 
-        var deserialized = JsonSerializer.Deserialize<ThemeScope> (json, _jsonOptions);
+        var deserialized = JsonSerializer.Deserialize<ThemeScope> (json, SerializerContext.Options);
 
         Assert.Equal (
                       Alignment.End,
                       (Alignment)deserialized ["Dialog.DefaultButtonAlignment"].PropertyValue!
                      );
 
-        ResetToHardCodedDefaults ();
-        Disable ();
+        Disable (true);
     }
-
-
 }

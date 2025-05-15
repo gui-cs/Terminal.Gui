@@ -290,6 +290,8 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
 
     #region Legacy Color Names
 
+    // ReSharper disable InconsistentNaming
+
     /// <summary>The black color.</summary>
     public const ColorName16 Black = ColorName16.Black;
 

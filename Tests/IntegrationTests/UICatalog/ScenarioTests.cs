@@ -35,7 +35,7 @@ public class ScenarioTests : TestsAllViews
         Assert.Null (_timeoutLock);
         _timeoutLock = new ();
 
-        ConfigurationManager.Disable();
+        ConfigurationManager.Disable (resetToHardCodedDefaults: true);
 
         // If a previous test failed, this will ensure that the Application is in a clean state
         Application.ResetState (true);
@@ -82,10 +82,7 @@ public class ScenarioTests : TestsAllViews
             _timeoutLock = null;
         }
 
-        // Restore the configuration locations
-        ConfigurationManager.Enable ();
-        ConfigurationManager.ResetToHardCodedDefaults();
-        ConfigurationManager.Disable ();
+        ConfigurationManager.Disable (resetToHardCodedDefaults: true);
 
         return;
 
@@ -121,9 +118,7 @@ public class ScenarioTests : TestsAllViews
                 }
             }
 
-            // Restore the configuration locations
-            ConfigurationManager.Disable ();
-            ConfigurationManager.ResetToHardCodedDefaults ();
+            ConfigurationManager.Disable (resetToHardCodedDefaults: true);
 
             Application.ResetState (true);
 
@@ -154,7 +149,7 @@ public class ScenarioTests : TestsAllViews
     public void Run_All_Views_Tester_Scenario ()
     {
         // Disable any UIConfig settings
-        ConfigurationManager.Disable ();
+        ConfigurationManager.Disable (resetToHardCodedDefaults: true);
 
         View? curView = null;
 
@@ -377,11 +372,7 @@ public class ScenarioTests : TestsAllViews
 
         top.Dispose ();
         Application.Shutdown ();
-
-        // Restore the configuration locations
-        ConfigurationManager.Enable ();
-        ConfigurationManager.ResetToHardCodedDefaults ();
-        ConfigurationManager.Disable ();
+        ConfigurationManager.Disable (resetToHardCodedDefaults: true);
 
         void DimPosChanged (View? view)
         {
@@ -613,8 +604,8 @@ public class ScenarioTests : TestsAllViews
     [Fact]
     public void Run_Generic ()
     {
-        // Disable any UIConfig settings
-        ConfigurationManager.Disable();
+        ConfigurationManager.Disable (resetToHardCodedDefaults: true);
+        Assert.Equal (Key.Esc, Application.QuitKey);
 
         ObservableCollection<Scenario> scenarios = Scenario.GetScenarios ();
         Assert.NotEmpty (scenarios);
@@ -627,6 +618,7 @@ public class ScenarioTests : TestsAllViews
         // BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
         // by adding this Space it seems to work.
 
+        Assert.Equal(Key.Esc, Application.QuitKey);
         FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
 
         var ms = 100;
@@ -663,7 +655,7 @@ public class ScenarioTests : TestsAllViews
                                      }
                                  };
 
-        Application.KeyDown += (sender, args) => { Assert.Equal (Application.QuitKey, args.KeyCode); };
+        Application.KeyDown += (sender, args) => { Assert.Equal (Application.QuitKey, args); };
 
         generic.Main ();
 
@@ -676,11 +668,7 @@ public class ScenarioTests : TestsAllViews
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
-
-        // Restore the configuration locations
-        ConfigurationManager.Enable ();
-        ConfigurationManager.ResetToHardCodedDefaults ();
-        ConfigurationManager.Disable ();
+        ConfigurationManager.Disable (resetToHardCodedDefaults: true);
 
 #if DEBUG_IDISPOSABLE
         Assert.Empty (View.Instances);

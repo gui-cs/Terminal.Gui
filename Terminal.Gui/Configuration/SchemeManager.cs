@@ -9,7 +9,8 @@ namespace Terminal.Gui;
 
 /// <summary>
 ///     Holds the <see cref="Scheme"/>s that define the <see cref="Attribute"/>s that are used by views to render
-///     themselves.
+///     themselves. A Scheme is a mapping from <see cref="VisualRole"/>s (such as <see cref="VisualRole.Focus"/>) to <see cref="Attribute"/>s.
+///     A Scheme defines how a `View` should look based on its purpose (e.g. Menu or Dialog).
 /// </summary>
 public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<string, Scheme?>
 {
@@ -30,13 +31,13 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     /// <returns></returns>
     public static Dictionary<string, Scheme?>? GetHardCodedSchemes () { return View.GetHardCodedSchemes (); }
 
-    /// <summary>Gets a dictionary of defined <see cref="Scheme"/> objects.</summary>
+    /// <summary>Gets a dictionary of defined <see cref="Scheme"/>s.</summary>
     /// <remarks>
     ///     <para>
     ///         The <see cref="Schemes"/> dictionary includes the following keys, by default:
     ///         <list type="table">
     ///             <listheader>
-    ///                 <term>Built-in scheme</term> <description>Description</description>
+    ///                 <term>Built-in scheme name</term> <description>Description</description>
     ///             </listheader>
     ///             <item>
     ///                 <term>Base</term> <description>The base scheme used for most Views.</description>
@@ -98,8 +99,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
                 throw new InvalidOperationException ("Schemes cannot be set before ConfigurationManager is initialized.");
             }
 
-            Dictionary<string, Scheme?>? schemes =
-                ThemeManager.Themes? [ThemeManager.DEFAULT_THEME_NAME] ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
+            Debug.Assert(value is {});
 
             // Update the backing store
             ThemeManager.Themes! [ThemeManager.DEFAULT_THEME_NAME] ["Schemes"].PropertyValue = value;
@@ -109,37 +109,56 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     }
 
     /// <summary>
-    ///     Raised when the collection changes.
+    ///     Gets the <see cref="Scheme"/> for the specified <see cref="Gui.Schemes"/>.
     /// </summary>
-    public event NotifyCollectionChangedEventHandler? CollectionChanged;
-
-    /// <inheritdoc/>
-    public Scheme? this [string key]
+    /// <param name="schemeName"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    public static Scheme GetScheme (Schemes schemeName)
     {
-        get
+        // Convert schemeName to string via Enum api
+        string? schemeNameString = SchemesToSchemeName (schemeName);
+        if (schemeNameString is null)
         {
-            lock (_schemesLock)
-            {
-                return Schemes? [key];
-            }
+            throw new ArgumentException ($"Invalid scheme name: {schemeName}");
         }
-        set
+
+        return Schemes! [schemeNameString]!;
+    }
+
+    /// <summary>
+    ///     Gets the <see cref="Scheme"/> for the specified string.
+    /// </summary>
+    /// <param name="schemeName"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    public static Scheme GetScheme (string schemeName)
+    {
+        return Schemes! [schemeName]!;
+    }
+
+    /// <summary>
+    ///     Gets the name of the specified <see cref="Schemes"/>.
+    /// </summary>
+    /// <param name="schemeName"></param>
+    /// <returns></returns>
+    public static string? SchemesToSchemeName (Schemes schemeName)
+    {
+        return Enum.GetName (typeof (Schemes), schemeName);
+    }
+
+    /// <summary>
+    ///     Gets the <see cref="Schemes"/> enum value given the name of the scheme.
+    /// </summary>
+    /// <param name="schemeName"><see langword="null"/> if the schemeName is not a built-in Scheme name.</param>
+    /// <returns></returns>
+    public static string? SchemeNameToSchemes (string schemeName)
+    {
+        if (Enum.TryParse (typeof (Schemes), schemeName, out object? value))
         {
-            lock (_schemesLock)
-            {
-                if (Schemes is { } && Schemes.TryGetValue (key, out _))
-                {
-                    Scheme? oldValue = Schemes [key];
-                    Schemes [key] = value;
-                    CollectionChanged?.Invoke (this, new (NotifyCollectionChangedAction.Replace, value, oldValue));
-                }
-                else
-                {
-                    Schemes?.Add (key, value);
-                    CollectionChanged?.Invoke (this, new (NotifyCollectionChangedAction.Add, new KeyValuePair<string, Scheme?> (key, value)));
-                }
-            }
+            return value?.ToString ();
         }
+        return null;
     }
 
     /// <summary>
@@ -149,7 +168,6 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     public static Dictionary<string, Scheme?> GetCurrentSchemes ()
     {
         Debug.Assert (ConfigurationManager.IsInitialized ());
-
         Dictionary<string, Scheme?>? schemes = ThemeManager.GetCurrentTheme () ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
 
         return schemes!;
@@ -165,159 +183,10 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
         {
             if (Schemes is { })
             {
-                return Schemes.Keys.ToImmutableList ();
+                return Schemes.Keys.OrderBy (key => key).ToImmutableList ();
             }
         }
 
         throw new InvalidOperationException ("Schemes is not set.");
     }
-
-    ///// <inheritdoc/>
-    //public int Count
-    //{
-    //    get
-    //    {
-    //        lock (_schemesLock)
-    //        {
-    //            return Schemes!.Count;
-    //        }
-    //    }
-    //}
-
-    ///// <inheritdoc/>
-    //public bool IsReadOnly => false;
-
-    ///// <inheritdoc/>
-    //public ICollection<string> Keys
-    //{
-    //    get
-    //    {
-    //        lock (_schemesLock)
-    //        {
-    //            return new List<string> (Schemes!.Keys);
-    //        }
-    //    }
-    //}
-
-    ///// <inheritdoc/>
-    //public ICollection<Scheme?> Values
-    //{
-    //    get
-    //    {
-    //        lock (_schemesLock)
-    //        {
-    //            return new List<Scheme?> (Schemes!.Values);
-    //        }
-    //    }
-    //}
-
-    ///// <inheritdoc/>
-    //public void Add (KeyValuePair<string, Scheme?> item)
-    //{
-    //    lock (_schemesLock)
-    //    {
-    //        Schemes?.Add (item.Key, item.Value);
-    //        CollectionChanged?.Invoke (this, new (NotifyCollectionChangedAction.Add, item));
-    //    }
-    //}
-
-    ///// <inheritdoc/>
-    //public void Add (string key, Scheme? value) { Add (new (key, value)); }
-
-    ///// <inheritdoc/>
-    //public void Clear ()
-    //{
-    //    lock (_schemesLock)
-    //    {
-    //        Schemes?.Clear ();
-    //        CollectionChanged?.Invoke (this, new (NotifyCollectionChangedAction.Reset));
-    //    }
-    //}
-
-    ///// <inheritdoc/>
-    //public bool Contains (KeyValuePair<string, Scheme?> item)
-    //{
-    //    lock (_schemesLock)
-    //    {
-    //        return Schemes is { } && Schemes.Contains (item);
-    //    }
-    //}
-
-    ///// <inheritdoc/>
-    //public bool ContainsKey (string key)
-    //{
-    //    lock (_schemesLock)
-    //    {
-    //        return Schemes is { } && Schemes.ContainsKey (key);
-    //    }
-    //}
-
-    ///// <inheritdoc/>
-    //public void CopyTo (KeyValuePair<string, Scheme?> [] array, int arrayIndex)
-    //{
-    //    lock (_schemesLock)
-    //    {
-    //        if (Schemes is { })
-    //        {
-    //            ((ICollection)Schemes).CopyTo (array, arrayIndex);
-    //        }
-    //    }
-    //}
-
-    ///// <inheritdoc/>
-    //public IEnumerator<KeyValuePair<string, Scheme?>> GetEnumerator ()
-    //{
-    //    lock (_schemesLock)
-    //    {
-    //        if (Schemes is { })
-    //        {
-    //            return new List<KeyValuePair<string, Scheme?>> (Schemes).GetEnumerator ();
-    //        }
-    //    }
-
-    //    return null!;
-    //}
-
-    //IEnumerator IEnumerable.GetEnumerator () { return GetEnumerator (); }
-
-    ///// <inheritdoc/>
-    //public bool Remove (KeyValuePair<string, Scheme?> item)
-    //{
-    //    lock (_schemesLock)
-    //    {
-    //        if (Schemes is { } && Schemes.Remove (item.Key))
-    //        {
-    //            CollectionChanged?.Invoke (this, new (NotifyCollectionChangedAction.Remove, item));
-
-    //            return true;
-    //        }
-
-    //        return false;
-    //    }
-    //}
-
-    ///// <inheritdoc/>
-    //public bool Remove (string key)
-    //{
-    //    lock (_schemesLock)
-    //    {
-    //        if (Schemes is { } && Schemes.Remove (key))
-    //        {
-    //            CollectionChanged?.Invoke (this, new (NotifyCollectionChangedAction.Remove, key));
-
-    //            return true;
-    //        }
-
-    //        return false;
-    //    }
-    //}
-
-    ///// <inheritdoc/>
-    //public bool TryGetValue (string key, out Scheme? value)
-    //{
-    //    lock (_schemesLock)
-    //    {
-    //        return Schemes!.TryGetValue (key, out value);
-    //    }
-    //}
 }

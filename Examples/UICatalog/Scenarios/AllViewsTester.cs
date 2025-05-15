@@ -38,7 +38,7 @@ public class AllViewsTester : Scenario
         var app = new Window
         {
             Title = GetQuitKeyAndName (),
-            Scheme = SchemeManager.Schemes ["TopLevel"],
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Toplevel)
         };
 
         // Set the BorderStyle we use for all subviews, but disable the app border thickness
@@ -240,7 +240,7 @@ public class AllViewsTester : Scenario
             Height = Dim.Fill (),
             CanFocus = true,
             TabStop = TabBehavior.TabStop,
-            Scheme = SchemeManager.Schemes ["Base"],
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base),
             Arrangement = ViewArrangement.LeftResizable | ViewArrangement.BottomResizable | ViewArrangement.RightResizable,
             BorderStyle = LineStyle.Double,
             SuperViewRendersLineCanvas = true

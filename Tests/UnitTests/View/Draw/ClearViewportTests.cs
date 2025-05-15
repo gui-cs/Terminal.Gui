@@ -412,7 +412,6 @@ cccccccccccccccccccc",
         Application.End (runState);
         top.Dispose ();
 
-        ConfigurationManager.ResetToHardCodedDefaults ();
-        ConfigurationManager.Disable ();
+        CM.Disable (resetToHardCodedDefaults: true);
     }
 }

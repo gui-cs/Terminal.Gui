@@ -17,14 +17,13 @@ public class AppSettingsScopeTests
         AppSettingsScope? appSettings = (Settings! ["AppSettings"].PropertyValue as AppSettingsScope);
         Assert.Equal (4, appSettings!.Count); // 4 properties on AppSettingsTestClass
 
-        Assert.Equal("test", (((AppSettingsScope)Settings! ["AppSettings"].PropertyValue!)!) ["AppSettingsTestClass.ReferenceProperty"].PropertyValue );
+        Assert.Equal ("test", (((AppSettingsScope)Settings! ["AppSettings"].PropertyValue!)!) ["AppSettingsTestClass.ReferenceProperty"].PropertyValue);
     }
 
     [Fact]
     public void Empty_By_Default_Enabled ()
     {
-        Enable ();
-        ResetToHardCodedDefaults ();
+        Enable (resetToHardCodedDefaults: true);
 
         Assert.NotNull (Settings! ["AppSettings"].PropertyValue);
 
@@ -32,15 +31,14 @@ public class AppSettingsScopeTests
         Assert.Equal (4, appSettings!.Count); // 4 properties on AppSettingsTestClass
         Assert.Equal ("test", (((AppSettingsScope)Settings! ["AppSettings"].PropertyValue!)!) ["AppSettingsTestClass.ReferenceProperty"].PropertyValue);
 
-        ResetToHardCodedDefaults ();
-        Disable ();
+        Disable (resetToHardCodedDefaults: true);
     }
 
     [Fact]
     public void Apply_ShouldApplyUpdatedProperties ()
     {
-        Enable();
-        ResetToHardCodedDefaults ();
+        Enable (resetToHardCodedDefaults: true);
+
         Assert.Null (AppSettingsTestClass.NullableValueProperty);
         Assert.NotEmpty (AppSettings!);
         Assert.Null (AppSettings! ["AppSettingsTestClass.NullableValueProperty"].PropertyValue);
@@ -65,15 +63,13 @@ public class AppSettingsScopeTests
         // ConfigurationManager.AppSettings should NOT apply theme settings
         AppSettings.Apply ();
         Assert.False (AppSettingsTestClass.NullableValueProperty);
-        ResetToHardCodedDefaults();
-        Disable();
+        Disable (resetToHardCodedDefaults: true);
     }
 
     [Fact]
     public void TestNullable ()
     {
-        Enable ();
-        ResetToHardCodedDefaults ();
+        Enable (resetToHardCodedDefaults: true);
 
         AppSettingsTestClass.NullableValueProperty = null;
         Assert.Null (AppSettingsTestClass.NullableValueProperty);
@@ -88,15 +84,13 @@ public class AppSettingsScopeTests
         Apply ();
         Assert.NotNull (AppSettingsTestClass.NullableValueProperty);
 
-        ResetToHardCodedDefaults ();
-        Disable ();
+        Disable (resetToHardCodedDefaults: true);
     }
 
     [Fact]
     public void TestSerialize_RoundTrip ()
     {
-        Enable ();
-        ResetToHardCodedDefaults ();
+        Enable (resetToHardCodedDefaults: true);
 
         AppSettingsScope initial = AppSettings!;
 
@@ -106,8 +100,7 @@ public class AppSettingsScopeTests
         Assert.NotEqual (initial, deserialized);
         Assert.Equal (deserialized!.Count, initial.Count);
 
-        ResetToHardCodedDefaults ();
-        Disable ();
+        Disable (resetToHardCodedDefaults: true);
     }
 
     public class AppSettingsTestClass

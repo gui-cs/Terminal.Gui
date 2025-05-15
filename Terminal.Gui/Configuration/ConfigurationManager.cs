@@ -13,7 +13,8 @@ using Terminal.Gui.Configuration;
 namespace Terminal.Gui;
 
 /// <summary>
-///     Provides settings and configuration management for Terminal.Gui applications.
+///     Provides settings and configuration management for Terminal.Gui applications. See the Configuration Deep Dive for
+///     more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/config.html"/>.
 ///     <para>
 ///         Users can set Terminal.Gui settings on a global or per-application basis by providing JSON formatted
 ///         configuration files. The configuration files can be placed in at <c>.tui</c> folder in the user's home
@@ -45,8 +46,6 @@ namespace Terminal.Gui;
 ///     </para>
 ///     <para>
 ///         See the UICatalog example for a complete example of how to use ConfigurationManager.
-///         See the Configuration Deep Dive for more information:
-///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/config.html"/>.
 ///     </para>
 /// </summary>
 public static class ConfigurationManager
@@ -109,7 +108,9 @@ public static class ConfigurationManager
     {
         lock (_initializedLock)
         {
-            return _initialized;
+            {
+                return _initialized;
+            }
         }
     }
 
@@ -219,13 +220,16 @@ public static class ConfigurationManager
     }
 
     /// <summary>
-    ///     Enables <see cref="ConfigurationManager"/>. The first time Enable is called, <see cref="Settings"/> will be reset
-    ///     to
-    ///     with the current values of the static <see cref="ConfigurationPropertyAttribute"/> properties.
+    ///     Enables <see cref="ConfigurationManager"/>.
     /// </summary>
+    /// <param name="resetToHardCodedDefaults">
+    ///     If <see langword="true"/> Configuration Manager will be reset and all static
+    ///     <see cref="ConfigurationPropertyAttribute"/> properties will be reset to their initial, hard-coded
+    ///     defaults. Otherwise, Configuration Manager will be unchanged from its current state.
+    /// </param>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public static void Enable ()
+    public static void Enable (bool resetToHardCodedDefaults = false)
     {
         if (IsEnabled)
         {
@@ -235,28 +239,32 @@ public static class ConfigurationManager
         lock (_enabledLock)
         {
             _enabled = true;
+        }
 
-            if (_settings is null)
-            {
-                // If _settings is null, we need to load the settings from the current values of the static properties
-                ResetToCurrentValues ();
-            }
+        if (resetToHardCodedDefaults)
+        {
+            ResetToHardCodedDefaults ();
         }
     }
 
     /// <summary>
     ///     Disables <see cref="ConfigurationManager"/>.
     /// </summary>
-    public static void Disable ()
+    /// <param name="resetToHardCodedDefaults">
+    ///     If <see langword="true"/> all static <see cref="ConfigurationPropertyAttribute"/> properties will be reset to their
+    ///     initial, hard-coded
+    ///     defaults.
+    /// </param>
+    public static void Disable (bool resetToHardCodedDefaults = false)
     {
-        if (!IsEnabled)
-        {
-            return;
-        }
-
         lock (_enabledLock)
         {
             _enabled = false;
+        }
+
+        if (resetToHardCodedDefaults)
+        {
+            ResetToHardCodedDefaults ();
         }
     }
 
@@ -268,7 +276,7 @@ public static class ConfigurationManager
     // Resetting does not load the configuration; it only resets the configuration to the default values.
 
     /// <summary>
-    ///     INTERNAL: Resets <see cref="ConfigurationManager"/>. Clears JsonErrors and loads all settings from the current
+    ///     INTERNAL: Resets <see cref="ConfigurationManager"/>. Loads settings from the current
     ///     values of the static <see cref="ConfigurationPropertyAttribute"/> properties.
     /// </summary>
     [RequiresUnreferencedCode ("AOT")]
@@ -279,8 +287,6 @@ public static class ConfigurationManager
         {
             throw new InvalidOperationException ("Initialize must be called first.");
         }
-
-        ClearJsonErrors ();
 
         _settingsLockSlim.EnterWriteLock ();
 
@@ -293,28 +299,13 @@ public static class ConfigurationManager
             _settingsLockSlim.ExitWriteLock ();
         }
 
-        //_cachedAppSettingsLock.EnterWriteLock ();
-
-        //try
-        //{
-        //    _cachedAppSettings = new ();
-        //}
-        //finally
-        //{
-        //    _cachedAppSettingsLock.ExitWriteLock ();
-        //}
-
         Settings!.LoadCurrentValues ();
         ThemeManager.UpdateToCurrentValues ();
-
-        //AppSettings?.LoadCurrentValues ();
-
-        Apply ();
     }
 
     /// <summary>
-    ///     INTERNAL: Resets settings to the values the <see cref="ConfigurationPropertyAttribute"/> properties contained
-    ///     when the module was initialized.
+    ///     INTERNAL: Resets <see cref="ConfigurationManager"/>. Loads the hard-coded values of the
+    ///     <see cref="ConfigurationPropertyAttribute"/> properties and applies them.
     /// </summary>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
@@ -323,7 +314,9 @@ public static class ConfigurationManager
         LoadHardCodedDefaults ();
         Applied = null;
         Updated = null;
-        Apply ();
+
+        // Works even if ConfigurationManager is not enabled.
+        InternalApply ();
     }
 
     #endregion Reset
@@ -368,9 +361,6 @@ public static class ConfigurationManager
         {
             throw new ConfigurationManagerNotEnabledException ();
         }
-
-        // TODO: We ignore HardCodedDefaults. Use ResetToHardCodedDefaults to reset to hard coded defaults? Or 
-        // TODO: Add an if (locations == ConfigLocations.HardCoded) to the switch statement?
 
         if (locations.HasFlag (ConfigLocations.LibraryResources))
         {
@@ -421,8 +411,6 @@ public static class ConfigurationManager
         {
             SourcesManager?.Load (Settings, $"~/.tui/{AppName}.{_configFilename}", ConfigLocations.AppHome);
         }
-
-        ThemeManager.Theme = Settings! ["Theme"].PropertyValue as string ?? throw new InvalidOperationException ();
     }
 
     // TODO: Rename to Loaded?
@@ -469,6 +457,11 @@ public static class ConfigurationManager
             throw new ConfigurationManagerNotEnabledException ();
         }
 
+        InternalApply ();
+    }
+
+    private static void InternalApply ()
+    {
         var settings = false;
         var themes = false;
         var appSettings = false;
@@ -516,7 +509,8 @@ public static class ConfigurationManager
     ///     Called when an updated configuration has been applied to the application. Fires the <see cref="Applied"/>
     ///     event.
     /// </summary>
-    public static void OnApplied ()
+    /// <exception cref="ConfigurationManagerNotEnabledException">Configuration manager is not enabled.</exception>
+    private static void OnApplied ()
     {
         if (!IsEnabled)
         {
@@ -583,12 +577,10 @@ public static class ConfigurationManager
 
     #region AppSettings
 
-    // TODO: Encapsulate in AppSettingsManager like ThemeManager
-
-    ///// <summary>
-    /////     AppSettings's source of truth.
-    ///// </summary>
-    /// <summary>Application-specific configuration settings (config properties with the <see cref="AppSettingsScope"/> scope.</summary>
+    /// <summary>
+    ///     Gets or sets the application-specific configuration settings (config properties with the
+    ///     <see cref="AppSettingsScope"/> scope.
+    /// </summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
     [JsonPropertyName ("AppSettings")]
     public static AppSettingsScope? AppSettings
@@ -607,14 +599,11 @@ public static class ConfigurationManager
                 return appSettings;
             }
 
-            //if (!IsEnabled)
-            //{
-            //     If CM is not enabled, e
-            //    var appSettings = new AppSettingsScope ();
-            //    return _cachedAppSettings = appSettings;
-            //}
+            if (Settings is null || !Settings.TryGetValue ("AppSettings", out ConfigProperty? appSettingsConfigProperty))
+            {
+                throw new InvalidOperationException ("Settings is null.");
+            }
 
-            if (Settings is { } && Settings.TryGetValue ("AppSettings", out ConfigProperty? appSettingsConfigProperty))
             {
                 if (!appSettingsConfigProperty.HasValue)
                 {
@@ -626,8 +615,6 @@ public static class ConfigurationManager
 
                 return (appSettingsConfigProperty.PropertyValue as AppSettingsScope)!;
             }
-
-            throw new InvalidOperationException ("Settings is null.");
         }
         [RequiresUnreferencedCode ("AOT")]
         [RequiresDynamicCode ("AOT")]
@@ -638,25 +625,9 @@ public static class ConfigurationManager
                 throw new InvalidOperationException ("AppSettings cannot be set before ConfigurationManager is initialized.");
             }
 
-            if (!IsEnabled)
-            {
-                throw new ConfigurationManagerNotEnabledException ();
-            }
-
             // Check if the AppSettings is the same as the previous one
             if (value != Settings! ["AppSettings"].PropertyValue)
             {
-                //_cachedAppSettingsLock.EnterWriteLock ();
-
-                //try
-                //{
-                //    _cachedAppSettings = value;
-                //}
-                //finally
-                //{
-                //    _cachedAppSettingsLock.ExitWriteLock ();
-                //}
-
                 // Update the backing store
                 Settings! ["AppSettings"].PropertyValue = value;
 
@@ -806,6 +777,6 @@ public static class ConfigurationManager
         // Use the cached ScopeType property instead of reflection
         IEnumerable<KeyValuePair<string, ConfigProperty>>? scopedCache = cache?.Where (cp => cp.Value.ScopeType == scopeType);
 
-        return scopedCache;
+        return scopedCache!;
     }
 }

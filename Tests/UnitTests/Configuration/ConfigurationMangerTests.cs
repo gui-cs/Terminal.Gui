@@ -32,9 +32,8 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
     public void HardCodedDefaultCache_Properties_Are_Copies ()
     {
         Assert.False (IsEnabled);
+        Enable (true);
 
-        Enable ();
-        ResetToHardCodedDefaults ();
         Assert.Equal (Key.Esc, Application.QuitKey);
 
         ConfigProperty fromSettings = Settings! ["Application.QuitKey"];
@@ -46,8 +45,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
         // Assert
         Assert.NotEqual (fromCache, fromSettings);
-        ResetToHardCodedDefaults ();
-        Disable ();
+        Disable (true);
     }
 
     [Fact]
@@ -57,8 +55,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
         try
         {
-            Enable ();
-            ResetToHardCodedDefaults ();
+            Enable (true);
             Assert.Equal (Key.Esc, Application.QuitKey);
 
             FrozenDictionary<string, ConfigProperty> initialCache = GetHardCodedConfigPropertyCache ();
@@ -82,8 +79,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         }
         finally
         {
-            ResetToHardCodedDefaults ();
-            Disable ();
+            Disable (true);
         }
     }
 
@@ -101,7 +97,6 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
     {
         Assert.False (IsEnabled);
 
-        Disable ();
         Enable ();
 
         Assert.NotNull (Settings);
@@ -109,91 +104,13 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         Disable ();
     }
 
-    //[Fact]
-    //public void Disabled_Loads_Only_HardCoded_Values ()
-    //{
-    //    try
-    //    {
-    //        CM.Enable ();
-    //        Assert.NotEmpty (ThemeManager.Themes!);
-
-    //        ThemeManager.Reset ();
-
-    //        Assert.NotEmpty (ThemeManager.Themes!);
-
-    //        // Default theme exists
-    //        Assert.NotNull (ThemeManager.Themes? ["Default"]);
-
-    //        //// Schemes exists, but is not initialized
-    //        //Assert.Null (manager ["Default"].);
-
-    //        //manager.RetrieveValues ();
-
-    //        //Assert.NotEmpty (manager);
-
-    //        //// Schemes exists, and has correct # of eleements
-    //        //var schemes = manager ["Schemes"].PropertyValue as Dictionary<string, Scheme>;
-    //        //Assert.NotNull (schemes);
-    //        //Assert.Equal (5, schemes!.Count);
-
-    //        //// Base has correct values
-    //        //var baseSchemee = schemes ["Base"];
-    //        //Assert.Equal (new Attribute (Color.White, Color.Blue), baseSchemee.Normal);
-
-    //    }
-    //    finally
-    //    {
-    //        CM.Reset ();
-    //    }
-
-    //}
-
-    //[Fact]
-    //public void Enabled_ ()
-    //{
-    //    try
-    //    {
-    //        CM.Enable ();
-    //        Assert.NotEmpty (ThemeManager.Themes!);
-
-    //        ThemeManager.Reset ();
-
-    //        Assert.NotEmpty (ThemeManager.Themes!);
-
-    //        // Default theme exists
-    //        Assert.NotNull (ThemeManager.Themes? ["Default"]);
-
-    //        //// Schemes exists, but is not initialized
-    //        //Assert.Null (manager ["Default"].);
-
-    //        //manager.RetrieveValues ();
-
-    //        //Assert.NotEmpty (manager);
-
-    //        //// Schemes exists, and has correct # of eleements
-    //        //var schemes = manager ["Schemes"].PropertyValue as Dictionary<string, Scheme>;
-    //        //Assert.NotNull (schemes);
-    //        //Assert.Equal (5, schemes!.Count);
-
-    //        //// Base has correct values
-    //        //var baseSchemee = schemes ["Base"];
-    //        //Assert.Equal (new Attribute (Color.White, Color.Blue), baseSchemee.Normal);
-
-    //    }
-    //    finally
-    //    {
-    //        CM.Reset ();
-    //    }
-
-    //}
-
     [Fact]
     public void Apply_Raises_Applied ()
     {
         Assert.False (IsEnabled);
 
-        Enable ();
-        ResetToCurrentValues ();
+        Enable (resetToHardCodedDefaults: true);
+
         Applied += ConfigurationManagerApplied;
         var fired = false;
 
@@ -218,8 +135,8 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         Assert.True (fired);
 
         Applied -= ConfigurationManagerApplied;
-        ResetToCurrentValues ();
-        Disable ();
+
+        Disable (resetToHardCodedDefaults: true);
     }
 
     [Fact]
@@ -228,8 +145,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         Assert.False (IsEnabled);
 
         var fired = false;
-        Enable ();
-        ResetToCurrentValues ();
+        Enable (resetToHardCodedDefaults: true);
 
         ThrowOnJsonErrors = true;
         Assert.Equal (Key.Esc, ((Key)Settings! ["Application.QuitKey"].PropertyValue)!.KeyCode);
@@ -245,8 +161,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
         // clean up
         Updated -= ConfigurationManagerUpdated;
-        ResetToHardCodedDefaults ();
-        Disable ();
+        Disable (true);
 
         return;
 
@@ -258,8 +173,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
     {
         Assert.False (IsEnabled);
 
-        Enable ();
-        ResetToHardCodedDefaults ();
+        Enable (true);
 
         try
         {
@@ -284,8 +198,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         }
         finally
         {
-            ResetToHardCodedDefaults ();
-            Disable ();
+            Disable (true);
         }
     }
 
@@ -296,9 +209,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
         try
         {
-            Enable ();
-
-            ResetToCurrentValues ();
+            Enable (resetToHardCodedDefaults: true);
             ThrowOnJsonErrors = true;
 
             Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue);
@@ -318,8 +229,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         finally
         {
             // clean up
-            ResetToHardCodedDefaults ();
-            Disable ();
+            Disable (true);
         }
     }
 
@@ -332,10 +242,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
         try
         {
-            Enable ();
-            ResetToHardCodedDefaults ();
-
-            ResetToCurrentValues ();
+            Enable (true);
 
             Settings! ["Application.QuitKey"].PropertyValue = Key.Q;
 
@@ -351,8 +258,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         {
             Updated -= ConfigurationManagerUpdated;
 
-            Disable ();
-            ResetToHardCodedDefaults ();
+            Disable (true);
         }
 
         return;
@@ -368,8 +274,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         try
         {
             // arrange
-            Enable ();
-            ResetToHardCodedDefaults ();
+            Enable (true);
 
             Settings! ["Application.QuitKey"].PropertyValue = Key.Q;
             Settings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
@@ -410,18 +315,8 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         }
         finally
         {
-            ResetToHardCodedDefaults ();
-            Disable ();
+            Disable (true);
         }
-    }
-
-    [Fact]
-    public void ResetToCurrentValues_Throws_If_Not_Enabled ()
-    {
-        Assert.False (IsEnabled);
-
-        // Act
-        Assert.Throws<ConfigurationManagerNotEnabledException> (ResetToCurrentValues);
     }
 
     [Fact]
@@ -430,8 +325,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         Assert.False (IsEnabled);
 
         // Act
-        Enable ();
-        ResetToHardCodedDefaults ();
+        Enable (true);
 
         Application.QuitKey = Key.A;
 
@@ -459,12 +353,8 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         try
         {
             // arrange
-            Enable ();
+            Enable (true);
 
-            // Only select locations under test control
-            //Locations = ConfigLocations.LibraryResources | ConfigLocations.AppResources | ConfigLocations.Runtime;
-
-            ResetToCurrentValues ();
             ThrowOnJsonErrors = true;
 
             // Setup multiple configurations with the same setting
@@ -490,13 +380,10 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             // Assert - the runtime config should win due to precedence
             Assert.Equal (Key.Q.WithAlt, (Key)Settings! ["Application.QuitKey"].PropertyValue);
 
-            // clean up
-            //Locations = ConfigLocations.LibraryResources;
         }
         finally
         {
-            ResetToCurrentValues ();
-            Disable ();
+            Disable (true);
         }
     }
 
@@ -528,8 +415,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         }
         finally
         {
-            ResetToHardCodedDefaults ();
-            Disable ();
+            Disable (true);
         }
     }
 
@@ -540,8 +426,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
         try
         {
-            Enable ();
-            ResetToHardCodedDefaults ();
+            Enable (true);
 
             Assert.NotEmpty (Settings!);
 
@@ -579,8 +464,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         }
         finally
         {
-            ResetToHardCodedDefaults ();
-            Disable ();
+            Disable (true);
         }
     }
 
@@ -620,8 +504,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         }
         finally
         {
-            ResetToHardCodedDefaults ();
-            Disable ();
+            Disable (true);
         }
     }
 
@@ -661,8 +544,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         }
         finally
         {
-            ResetToHardCodedDefaults ();
-            Disable ();
+            Disable (true);
         }
     }
 
@@ -707,8 +589,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         }
         finally
         {
-            ResetToHardCodedDefaults ();
-            Disable ();
+            Disable (true);
         }
     }
 
@@ -717,7 +598,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
     {
         Assert.False (IsEnabled);
 
-        Enable ();
+        Enable (resetToHardCodedDefaults: true);
 
         ThrowOnJsonErrors = false;
 
@@ -795,16 +676,15 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
         ThrowOnJsonErrors = false;
 
-        ResetToHardCodedDefaults ();
-        Disable ();
+        Disable (true);
     }
 
     [Fact]
     public void InvalidJsonThrows ()
     {
         Assert.False (IsEnabled);
+        Enable (resetToHardCodedDefaults: true);
 
-        Enable ();
         ThrowOnJsonErrors = true;
 
         // "yellow" is not a color
@@ -891,8 +771,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
         ThrowOnJsonErrors = false;
 
-        ResetToHardCodedDefaults ();
-        Disable ();
+        Disable (true);
     }
 
     [Fact]
@@ -902,8 +781,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
         try
         {
-            Enable ();
-            ResetToHardCodedDefaults ();
+            Enable (true);
 
             // Arrange
             var json = @"
@@ -1071,8 +949,8 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         }
         finally
         {
-            ResetToCurrentValues ();
-            Disable ();
+            Disable (resetToHardCodedDefaults: true);
+
         }
     }
 }

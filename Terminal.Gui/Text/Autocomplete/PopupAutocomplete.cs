@@ -28,7 +28,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         {
             if (_scheme is null)
             {
-                _scheme = SchemeManager.Schemes ["Menu"];
+                _scheme = SchemeManager.GetScheme (Schemes.Base);
             }
 
             return _scheme;
@@ -51,7 +51,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
 
             if (_hostControl is null)
             {
-                RemovePopupFromTop();
+                RemovePopupFromTop ();
                 _top.Removed -= _top_Removed;
                 _top = null;
 

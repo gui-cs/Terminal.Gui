@@ -28,7 +28,7 @@ public class StatusBar : Bar, IDesignable
             Border.LineStyle = DefaultSeparatorLineStyle;
         }
 
-        SetScheme (SchemeManager.GetCurrentSchemes() ["Menu"]);
+        SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Menu);
 
         ConfigurationManager.Applied += OnConfigurationManagerApplied;
         SuperViewChanged += OnSuperViewChanged;

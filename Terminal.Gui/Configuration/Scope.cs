@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui;
@@ -7,35 +8,33 @@ namespace Terminal.Gui;
 ///     Defines a configuration settings scope. Classes that inherit from this abstract class can be used to define
 ///     scopes for configuration settings. Each scope is a JSON object that contains a set of configuration settings.
 ///     <para>
-///         When constructed, the dictionary will be populated with the uninitialized configuration properties for the
+///         When constructed, the dictionary will be populated with uninitialized configuration properties for the
 ///         scope (<see cref="ConfigProperty.HasValue"/> will be <see langword="false"/>).
 ///     </para>
-///     <para>
-///     </para>
 /// </summary>
-public class Scope<T> : Dictionary<string, ConfigProperty>
+public class Scope<T> : ConcurrentDictionary<string, ConfigProperty>
 {
     /// <summary>
     ///     Creates a new instance. The dictionary will be populated with uninitialized (<see cref="ConfigProperty.HasValue"/>
     ///     will be <see langword="false"/>).
     /// </summary>
     [RequiresUnreferencedCode (
-                                  "Uses cached configuration properties filtered by type T. This is AOT-safe as long as T is one of the known scope types (SettingsScope, ThemeScope, AppSettingsScope).")]
+        "Uses cached configuration properties filtered by type T. This is AOT-safe as long as T is one of the known scope types (SettingsScope, ThemeScope, AppSettingsScope).")]
     public Scope () : base (StringComparer.InvariantCultureIgnoreCase)
     {
         // Populate the dictionary with uninitialized, mutable, properties
         foreach (KeyValuePair<string, ConfigProperty> p in ConfigurationManager.GetConfigPropertiesByScope (typeof (T).Name)!)
         {
-            Add (
-                 p.Key,
-                 new ()
-                 {
-                     // Copy just the PropertyInfo, NOT PropertyValue
-                     PropertyInfo = p.Value.PropertyInfo,
-                     OmitClassName = p.Value.OmitClassName,
-                     ScopeType = p.Value.ScopeType,
-                     Immutable = false
-                 });
+            TryAdd (
+                p.Key,
+                new ConfigProperty
+                {
+                    // Copy just the PropertyInfo, NOT PropertyValue
+                    PropertyInfo = p.Value.PropertyInfo,
+                    OmitClassName = p.Value.OmitClassName,
+                    ScopeType = p.Value.ScopeType,
+                    Immutable = false
+                });
         }
     }
 
@@ -91,7 +90,7 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
                     continue;
                 }
 
-                // Add the property to this scope
+                // Add an empty (HasValue = false) property to this scope
                 var copy = new ConfigProperty
                 {
                     Immutable = false,
@@ -100,10 +99,10 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
                     ScopeType = prop.Value.ScopeType,
                     HasValue = false
                 };
-                Add (prop.Key, copy);
-                this [prop.Key].UpdateFrom (prop.Value.PropertyValue);
+                TryAdd (prop.Key, copy);
             }
 
+            // Update the property value
             this [prop.Key].UpdateFrom (prop.Value.PropertyValue);
         }
 

@@ -411,7 +411,7 @@ public static class MessageBox
             d.Height = height;
         }
 
-        d.Scheme = useErrorColors ? SchemeManager.Schemes ["Error"] : SchemeManager.Schemes ["Dialog"];
+        d.SchemeName = useErrorColors ? SchemeManager.SchemesToSchemeName (Schemes.Error) : SchemeManager.SchemesToSchemeName (Schemes.Dialog);
 
         d.HotKeySpecifier = new Rune ('\xFFFF');
         d.Text = message;

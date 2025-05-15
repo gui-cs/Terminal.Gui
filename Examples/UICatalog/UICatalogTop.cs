@@ -48,6 +48,7 @@ public class UICatalogTop : Toplevel
         _categoryList.SelectedItem = _cachedCategoryIndex;
         _scenarioList.SelectedRow = _cachedScenarioIndex;
 
+        SchemeName = CachedTopLevelScheme = SchemeManager.SchemesToSchemeName (Schemes.Base);
         ConfigurationManager.Applied += ConfigAppliedHandler;
     }
 
@@ -217,13 +218,13 @@ public class UICatalogTop : Toplevel
                 _topSchemeRg.SelectedItemChanged += (_, args) =>
                                                     {
                                                         CachedTopLevelScheme = SchemeManager.GetCurrentSchemes ()!.Keys.ToArray () [args.SelectedItem!.Value];
-                                                        Scheme = SchemeManager.GetCurrentSchemes ()! [CachedTopLevelScheme];
+                                                        SchemeName = CachedTopLevelScheme;
                                                         SetNeedsDraw ();
                                                     };
 
                 menuItem = new ()
                 {
-                    Title = "scheme for Application._Top",
+                    Title = "Scheme for Toplevel",
                     SubMenu = new (
                                    [
                                        new ()
@@ -361,15 +362,20 @@ public class UICatalogTop : Toplevel
         _topSchemeRg.AssignHotKeysToCheckBoxes = true;
         _topSchemeRg.UsedHotKeys.Clear ();
         int? selected = _topSchemeRg.SelectedItem;
-        _topSchemeRg.Options = SchemeManager.Schemes.Keys.ToArray ();
+        _topSchemeRg.Options = SchemeManager.GetSchemeNames ();
         _topSchemeRg.SelectedItem = selected;
 
-        if (CachedTopLevelScheme is null || !SchemeManager.Schemes.ContainsKey (CachedTopLevelScheme))
+        if (CachedTopLevelScheme is null || !SchemeManager.GetSchemeNames ().Contains (CachedTopLevelScheme))
         {
-            CachedTopLevelScheme = "Base";
+            CachedTopLevelScheme = SchemeManager.SchemesToSchemeName (Schemes.Base);
         }
 
-        _topSchemeRg.SelectedItem = Array.IndexOf (SchemeManager.Schemes.Keys.ToArray (), CachedTopLevelScheme);
+        int newSelectedItem = SchemeManager.GetSchemeNames ().IndexOf (CachedTopLevelScheme!);
+        // if the item is in bounds then select it
+        if (newSelectedItem >= 0 && newSelectedItem < SchemeManager.GetSchemeNames ().Count)
+        {
+            _topSchemeRg.SelectedItem = newSelectedItem;
+        }
     }
 
     #endregion MenuBar
@@ -663,7 +669,7 @@ public class UICatalogTop : Toplevel
     {
         UpdateThemesMenu ();
 
-        Scheme = SchemeManager.Schemes! [CachedTopLevelScheme!];
+        SchemeName = CachedTopLevelScheme;
 
         if (_shQuit is { })
         {

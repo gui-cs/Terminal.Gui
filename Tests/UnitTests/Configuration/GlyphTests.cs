@@ -11,8 +11,7 @@ public class GlyphTests
     public void Apply_Applies_Over_Defaults ()
     {
         // arrange
-        Enable ();
-        ResetToHardCodedDefaults ();
+        Enable (resetToHardCodedDefaults: true);
 
         Assert.Equal ((Rune)'⟦', Glyphs.LeftBracket);
 
@@ -44,7 +43,6 @@ public class GlyphTests
         Assert.Equal ((Rune)'[', Glyphs.LeftBracket);
 
         // clean up
-        ResetToHardCodedDefaults ();
-        Disable ();
+        Disable (resetToHardCodedDefaults: true);
     }
 }

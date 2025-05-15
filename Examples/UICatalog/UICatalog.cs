@@ -368,10 +368,10 @@ public class UICatalog
 #if DEBUG_IDISPOSABLE
         View.EnableDebugIDisposableAsserts = true;
 #endif
-        
+
         if (!Options.DontEnableConfigurationManagement)
         {
-            ConfigurationManager.Enable ();
+            ConfigurationManager.Enable (resetToHardCodedDefaults: true);
             ConfigurationManager.Load (ConfigLocations.All);
             ConfigurationManager.Apply ();
         }
