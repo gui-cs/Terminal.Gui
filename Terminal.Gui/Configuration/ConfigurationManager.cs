@@ -243,6 +243,7 @@ public static class ConfigurationManager
 
         if (resetToHardCodedDefaults)
         {
+            ClearJsonErrors();
             ResetToHardCodedDefaults ();
         }
     }
