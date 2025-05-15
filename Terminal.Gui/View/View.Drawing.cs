@@ -75,26 +75,23 @@ public partial class View // Drawing APIs
             // If no context ...
             context ??= new DrawContext ();
 
-            // TODO: Simplify/optimize SetAttribute system.
-            SetAttributeForRole (VisualRole.Normal);
+            SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
             DoClearViewport (context);
 
             // ------------------------------------
             // Draw the subviews first (order matters: SubViews, Text, Content)
             if (SubViewNeedsDraw)
             {
-                SetAttributeForRole (VisualRole.Normal);
                 DoDrawSubViews (context);
             }
 
             // ------------------------------------
             // Draw the text
-            SetAttributeForRole (VisualRole.Normal);
+            SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
             DoDrawText (context);
 
             // ------------------------------------
             // Draw the content
-            SetAttributeForRole (VisualRole.Normal);
             DoDrawContent (context);
 
             // ------------------------------------
@@ -346,12 +343,10 @@ public partial class View // Drawing APIs
             toClear = Rectangle.Intersect (toClear, visibleContent);
         }
 
-        Attribute prev = SetAttribute (GetAttributeForRole (VisualRole.Normal));
         Driver.FillRect (toClear);
 
         // context.AddDrawnRectangle (toClear);
 
-        SetAttribute (prev);
         SetNeedsDraw ();
     }
 

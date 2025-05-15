@@ -7,6 +7,8 @@ using Color = Terminal.Gui.Color;
 
 internal class MockConsoleDriver : IConsoleDriver
 {
+    public event EventHandler<Attribute>? AttributeSet;
+
     private IClipboard? _clipboard;
     private Rectangle _screen;
     private Region? _clip;
@@ -93,46 +95,55 @@ internal class MockConsoleDriver : IConsoleDriver
     }
 
     /// <inheritdoc />
-    public string GetVersionInfo () { throw new NotImplementedException (); }
+    public string GetVersionInfo () { return string.Empty; }
 
     /// <inheritdoc />
-    public void WriteRaw (string ansi) { throw new NotImplementedException (); }
+    public void WriteRaw (string ansi) {  }
 
     /// <inheritdoc />
-    public bool IsRuneSupported (Rune rune) { throw new NotImplementedException (); }
+    public bool IsRuneSupported (Rune rune) { return true; }
 
     /// <inheritdoc />
-    public bool IsValidLocation (Rune rune, int col, int row) { throw new NotImplementedException (); }
+    public bool IsValidLocation (Rune rune, int col, int row) { return true; }
 
     /// <inheritdoc />
-    public void Move (int col, int row) { throw new NotImplementedException (); }
+    public void Move (int col, int row)
+    {
+        _col = col;
+        _row = row;
+    }
 
     /// <inheritdoc />
-    public void AddRune (Rune rune) { throw new NotImplementedException (); }
+    public void AddRune (Rune rune) {  }
 
     /// <inheritdoc />
-    public void AddRune (char c) { throw new NotImplementedException (); }
+    public void AddRune (char c) {  }
 
     /// <inheritdoc />
-    public void AddStr (string str) { throw new NotImplementedException (); }
+    public void AddStr (string str) {  }
 
     /// <inheritdoc />
-    public void ClearContents () { throw new NotImplementedException (); }
+    public void ClearContents () { }
 
     /// <inheritdoc />
     public event EventHandler<EventArgs>? ClearedContents;
 
     /// <inheritdoc />
-    public void FillRect (Rectangle rect, Rune rune = default) { throw new NotImplementedException (); }
+    public void FillRect (Rectangle rect, Rune rune = default) { }
 
     /// <inheritdoc />
-    public void FillRect (Rectangle rect, char c) { throw new NotImplementedException (); }
+    public void FillRect (Rectangle rect, char c) {  }
 
     /// <inheritdoc />
-    public bool GetCursorVisibility (out CursorVisibility visibility) { throw new NotImplementedException (); }
+    public bool GetCursorVisibility (out CursorVisibility visibility)
+    {
+        visibility = CursorVisibility.Invisible;
+        return false;
+
+    }
 
     /// <inheritdoc />
-    public void Refresh () { throw new NotImplementedException (); }
+    public void Refresh () { }
 
     /// <inheritdoc />
     public bool SetCursorVisibility (CursorVisibility visibility) { throw new NotImplementedException (); }
@@ -141,34 +152,34 @@ internal class MockConsoleDriver : IConsoleDriver
     public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
     /// <inheritdoc />
-    public void Suspend () { throw new NotImplementedException (); }
+    public void Suspend () {  }
 
     /// <inheritdoc />
-    public void UpdateCursor () { throw new NotImplementedException (); }
+    public void UpdateCursor () {}
 
     /// <inheritdoc />
-    public MainLoop Init () { throw new NotImplementedException (); }
+    public MainLoop Init () { return null!; }
 
     /// <inheritdoc />
-    public void End () { throw new NotImplementedException (); }
+    public void End () {  }
 
     /// <inheritdoc />
-
-    private Attribute? _attribute = null;
 
     /// <inheritdoc />
     public Attribute SetAttribute (Attribute c)
     {
-        Attribute? oldAttribute = _attribute;
-        _attribute = c;
+        Attribute oldAttribute = _currentAttribute;
+        _currentAttribute = c;
 
-        return oldAttribute ?? Attribute.Default;
+        AttributeSet?.Invoke (this, c);
+
+        return oldAttribute;
     }
 
     /// <inheritdoc />
     public Attribute GetAttribute ()
     {
-        return _attribute ?? Attribute.Default;
+        return _currentAttribute;
     }
 
 

@@ -181,10 +181,7 @@ public class TileView : View
     /// <inheritdoc/>
     protected override void OnDrawComplete (DrawContext? context)
     {
-        if (Scheme is { })
-        {
-            SetAttribute (Scheme.Normal);
-        }
+        SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
 
         var lc = new LineCanvas ();
 
@@ -239,10 +236,7 @@ public class TileView : View
             }
         }
 
-        if (Scheme is { })
-        {
-            SetAttribute (Scheme.Normal);
-        }
+        SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
 
         foreach (KeyValuePair<Point, Rune> p in lc.GetMap (Viewport))
         {

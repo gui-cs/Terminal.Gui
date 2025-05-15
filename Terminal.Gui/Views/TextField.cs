@@ -966,7 +966,7 @@ public class TextField : View
             }
             else if (!Enabled)
             {
-                SetAttribute (roc);
+                SetAttributeForRole(VisualRole.Disabled);
             }
             else
             {

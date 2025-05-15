@@ -147,7 +147,15 @@ public class ColorPicker16 : View
                     continue;
                 }
 
-                SetAttribute (new ((ColorName16)foregroundColorIndex, (ColorName16)colorIndex));
+                if (Enabled)
+                {
+                    SetAttribute (new ((ColorName16)foregroundColorIndex, (ColorName16)colorIndex));
+                }
+                else
+                {
+                    SetAttribute (new ((ColorName16)foregroundColorIndex, ((Color)(ColorName16)colorIndex).GetDarkerColor (), TextStyle.Faint));
+                }
+
                 bool selected = x == Cursor.X && y == Cursor.Y;
                 DrawColorBox (x, y, selected);
                 colorIndex++;

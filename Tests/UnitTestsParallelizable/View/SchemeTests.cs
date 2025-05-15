@@ -93,8 +93,8 @@ public class SchemeTests
         var view = new View { Scheme = SchemeManager.GetHardCodedSchemes ()? ["Base"] };
 
         view.Enabled = false;
-        Assert.Equal (view.Scheme.Normal, view.GetAttributeForRole (VisualRole.Normal));
-        Assert.Equal (view.Scheme.HotNormal, view.GetAttributeForRole (VisualRole.HotNormal));
+        Assert.Equal (view.Scheme.Disabled, view.GetAttributeForRole (VisualRole.Normal));
+        Assert.Equal (view.Scheme.Disabled, view.GetAttributeForRole (VisualRole.HotNormal));
 
         view.Dispose ();
     }

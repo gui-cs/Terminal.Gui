@@ -23,6 +23,7 @@ public class AllViewsTester : Scenario
     private ViewportSettingsEditor? _viewportSettingsEditor;
     private FrameView? _settingsPane;
     private RadioGroup? _orientation;
+    private CheckBox? _enabledCheckBox;
     private string _demoText = "This, that, and the other thing.";
     private TextView? _demoTextView;
 
@@ -44,6 +45,7 @@ public class AllViewsTester : Scenario
         // Set the BorderStyle we use for all subviews, but disable the app border thickness
         app.Border!.LineStyle = LineStyle.Heavy;
         app.Border.Thickness = new (0);
+
 
         _viewClasses = GetAllViewClassesCollection ()
                        .OrderBy (t => t.Name)
@@ -179,7 +181,26 @@ public class AllViewsTester : Scenario
                                             };
         _settingsPane.Add (label, _orientation);
 
-        label = new () { X = 0, Y = Pos.Bottom (_orientation), Text = "_Text:" };
+        label = new () { X = Pos.Right(_orientation) + 1, Y = 0, Text = "_Enabled:" };
+
+        _enabledCheckBox = new ()
+        {
+            X = Pos.Right (label) + 1,
+            Y = Pos.Top (label),
+            CheckedState = _curView is { } ? (_curView.Enabled ? CheckState.Checked : CheckState.UnChecked ) : CheckState.UnChecked
+        };
+
+        _enabledCheckBox.CheckedStateChanged += (s, args) =>
+                                                {
+                                                    if (_curView is { })
+                                                    {
+                                                        _curView.Enabled = _enabledCheckBox.CheckedState == CheckState.Checked;
+                                                    }
+
+                                                };
+        _settingsPane.Add (label, _enabledCheckBox);
+
+        label = new () { X = 0, Y = Pos.Bottom (_enabledCheckBox), Text = "_Text:" };
 
         _demoTextView = new ()
         {
@@ -324,6 +345,8 @@ public class AllViewsTester : Scenario
         {
             _orientation!.Enabled = false;
         }
+
+        _enabledCheckBox!.CheckedState = view.Enabled ? CheckState.Checked : CheckState.UnChecked;
 
         view.Initialized += CurrentView_Initialized;
         view.SubViewsLaidOut += CurrentView_LayoutComplete;

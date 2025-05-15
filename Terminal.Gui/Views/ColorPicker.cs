@@ -5,7 +5,7 @@ namespace Terminal.Gui;
 /// <summary>
 ///     True color picker using HSL
 /// </summary>
-public partial class ColorPicker : View
+public partial class ColorPicker : View, IDesignable
 {
     /// <summary>
     ///     Creates a new instance of <see cref="ColorPicker"/>. Use
@@ -100,7 +100,7 @@ public partial class ColorPicker : View
     protected override bool OnDrawingContent ()
     {
         Attribute normal = GetAttributeForRole (VisualRole.Normal);
-        SetAttribute (new (SelectedColor, normal.Background));
+        SetAttribute (new (SelectedColor, normal.Background, Enabled ? TextStyle.None : TextStyle.Faint));
         int y = _bars.Count + (Style.ShowColorName ? 1 : 0);
         AddRune (13, y, (Rune)'■');
 
@@ -357,6 +357,14 @@ public partial class ColorPicker : View
             // value is invalid, revert the value in the text field back to current state
             SyncSubViewValues (false);
         }
+    }
+
+    /// <inheritdoc/>
+    public bool EnableForDesign ()
+    {
+        SelectedColor = Color.BrightRed;
+
+        return true;
     }
 
     /// <inheritdoc />

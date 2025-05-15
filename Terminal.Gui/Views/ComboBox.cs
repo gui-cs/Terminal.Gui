@@ -302,10 +302,7 @@ public class ComboBox : View, IDesignable
             return true;
         }
 
-        if (Scheme != null)
-        {
-            SetAttribute (Scheme.Focus);
-        }
+        SetAttributeForRole (Enabled ? VisualRole.Focus : VisualRole.Disabled);
         AddRune (Viewport.Right - 1, 0, Glyphs.DownArrow);
 
         return true;

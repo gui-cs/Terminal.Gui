@@ -198,7 +198,7 @@ internal abstract class ColorBar : View, IColorBar
             if (isSelectedCell)
             {
                 // Draw the triangle at the closest position
-                SetAttribute (new (triangleColor, color));
+                SetAttribute (new (triangleColor, color, Enabled ? TextStyle.None : TextStyle.Faint));
                 AddRune (x + xOffset, yOffset, new ('▲'));
 
                 // Record for tests
@@ -206,7 +206,7 @@ internal abstract class ColorBar : View, IColorBar
             }
             else
             {
-                SetAttribute (new (color, color));
+                SetAttribute (new (color, color, Enabled ? TextStyle.None : TextStyle.Faint));
                 AddRune (x + xOffset, yOffset, new ('█'));
             }
         }
