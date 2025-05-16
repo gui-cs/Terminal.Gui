@@ -10,7 +10,7 @@ public class SettingsScopeTests
     public void Load_Overrides_Defaults ()
     {
         // arrange
-        Enable (resetToHardCodedDefaults: true);
+        Enable (ConfigLocations.HardCoded);
 
         Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue);
 
@@ -39,7 +39,7 @@ public class SettingsScopeTests
     public void Load_Dictionary_Property_Overrides_Defaults ()
     {
         // arrange
-        Enable (resetToHardCodedDefaults: true);
+        Enable (ConfigLocations.HardCoded);
         ThrowOnJsonErrors = true;
 
         ConfigProperty themesConfigProperty = Settings! ["Themes"];
@@ -107,7 +107,7 @@ public class SettingsScopeTests
     [Fact]
     public void Apply_ShouldApplyProperties ()
     {
-        Enable ();
+        Enable (ConfigLocations.HardCoded);
         Load (ConfigLocations.LibraryResources);
 
         // arrange
@@ -141,7 +141,7 @@ public class SettingsScopeTests
     [Fact]
     public void CopyUpdatedPropertiesFrom_ShouldCopyChangedPropertiesOnly ()
     {
-        Enable ();
+        Enable (ConfigLocations.HardCoded);
         Settings ["Application.QuitKey"].PropertyValue = Key.End;
 
         var updatedSettings = new SettingsScope ();
@@ -160,7 +160,7 @@ public class SettingsScopeTests
     [Fact]
     public void ResetToHardCodedDefaults_Resets_Config_And_Applies ()
     {
-        Enable ();
+        Enable (ConfigLocations.HardCoded);
         Load (ConfigLocations.LibraryResources);
 
         Assert.True (Settings! ["Application.QuitKey"].PropertyValue is Key);
@@ -198,7 +198,7 @@ public class SettingsScopeTests
     public void ResetToHardCodedDefaults_Resets ()
     {
         // Arrange
-        CM.Enable ();
+        CM.Enable (ConfigLocations.HardCoded);
         Assert.Equal (Key.Esc, Application.QuitKey);
         var settingsScope = new SettingsScope ();
 

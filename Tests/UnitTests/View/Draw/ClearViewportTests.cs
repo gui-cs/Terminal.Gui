@@ -320,9 +320,7 @@ public class ClearViewportTests (ITestOutputHelper output)
     [InlineData (false)]
     public void Clear_Does_Not_Spillover_Its_Parent (bool label)
     {
-        ConfigurationManager.Enable();
-        ConfigurationManager.Load (ConfigLocations.LibraryResources);
-        ConfigurationManager.Apply ();
+        ConfigurationManager.Enable (ConfigLocations.LibraryResources);
 
         var root = new View { Width = 20, Height = 10 };
 

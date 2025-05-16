@@ -6,10 +6,8 @@
 using Terminal.Gui;
 
 // Override the default configuration for the application to use the Light theme
-ConfigurationManager.Enable();
 ConfigurationManager.RuntimeConfig = """{ "Theme": "Light" }""";
-ConfigurationManager.Load (ConfigLocations.Runtime);
-ConfigurationManager.Apply ();
+ConfigurationManager.Enable(ConfigLocations.All);
 
 Application.Run<ExampleWindow> ().Dispose ();
 

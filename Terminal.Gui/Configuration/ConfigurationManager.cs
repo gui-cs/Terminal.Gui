@@ -220,16 +220,17 @@ public static class ConfigurationManager
     }
 
     /// <summary>
-    ///     Enables <see cref="ConfigurationManager"/>.
+    ///     Enables <see cref="ConfigurationManager"/>. If <paramref name="locations"/> is <see cref="ConfigLocations.None"/>,
+    ///     ConfigurationManager will be enabled as-is; no configuration will be loaded or applied. If
+    ///     <paramref name="locations"/> is <see cref="ConfigLocations.HardCoded"/>,
+    ///     ConfigurationManager will be enabled and reset to hard-coded defaults.
+    ///     For any other value,
+    ///     ConfigurationManager will be enabled and the configuration will be loaded from the specified locations and applied.
     /// </summary>
-    /// <param name="resetToHardCodedDefaults">
-    ///     If <see langword="true"/> Configuration Manager will be reset and all static
-    ///     <see cref="ConfigurationPropertyAttribute"/> properties will be reset to their initial, hard-coded
-    ///     defaults. Otherwise, Configuration Manager will be unchanged from its current state.
-    /// </param>
+    /// <param name="locations"></param>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public static void Enable (bool resetToHardCodedDefaults = false)
+    public static void Enable (ConfigLocations locations)
     {
         if (IsEnabled)
         {
@@ -241,11 +242,17 @@ public static class ConfigurationManager
             _enabled = true;
         }
 
-        if (resetToHardCodedDefaults)
+        ClearJsonErrors ();
+
+        if (locations == ConfigLocations.None)
         {
-            ClearJsonErrors ();
-            ResetToHardCodedDefaults ();
+            return;
         }
+
+        Load (locations);
+
+        // Works even if ConfigurationManager is not enabled.
+        InternalApply ();
     }
 
     /// <summary>
@@ -361,6 +368,12 @@ public static class ConfigurationManager
         if (!IsEnabled)
         {
             throw new ConfigurationManagerNotEnabledException ();
+        }
+
+        // Only load the hard-coded defaults if the user has not specified any locations.
+        if (locations == ConfigLocations.HardCoded)
+        {
+            LoadHardCodedDefaults ();
         }
 
         if (locations.HasFlag (ConfigLocations.LibraryResources))

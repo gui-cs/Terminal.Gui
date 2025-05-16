@@ -11,7 +11,7 @@ public class GlyphTests
     public void Apply_Applies_Over_Defaults ()
     {
         // arrange
-        Enable (resetToHardCodedDefaults: true);
+        Enable (ConfigLocations.HardCoded);
 
         Assert.Equal ((Rune)'⟦', Glyphs.LeftBracket);
 

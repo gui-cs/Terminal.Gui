@@ -22,7 +22,7 @@ public class SchemeManagerTests
     [Fact]
     public void GetSchemes_Enabled_Gets_Current ()
     {
-        Enable ();
+        Enable (ConfigLocations.HardCoded);
 
         Dictionary<string, Scheme?>? schemes = SchemeManager.GetSchemesForCurrentTheme ();
         Assert.NotNull (schemes);
@@ -38,7 +38,7 @@ public class SchemeManagerTests
     [Fact]
     public void GetSchemes_Get_Schemes_After_Load ()
     {
-        Enable (true);
+        Enable (ConfigLocations.HardCoded);
         Load (ConfigLocations.All);
         Apply ();
 
@@ -69,7 +69,7 @@ public class SchemeManagerTests
     public void Not_Case_Sensitive_Enabled ()
     {
         Assert.False (IsEnabled);
-        Enable ();
+        Enable (ConfigLocations.HardCoded);
 
         Assert.True (SchemeManager.GetSchemesForCurrentTheme ()!.ContainsKey ("Base"));
         Assert.True (SchemeManager.GetSchemesForCurrentTheme ()!.ContainsKey ("base"));
@@ -88,7 +88,7 @@ public class SchemeManagerTests
     public void Load_Adds ()
     {
         // arrange
-        Enable (true);
+        Enable (ConfigLocations.HardCoded);
 
         var theme = new ThemeScope ();
         Assert.NotEmpty (theme);
@@ -136,7 +136,7 @@ public class SchemeManagerTests
     public void Load_Changes ()
     {
         // arrange
-        Enable (true);
+        Enable (ConfigLocations.HardCoded);
 
         var theme = new ThemeScope ();
         Assert.NotEmpty (theme);
@@ -192,7 +192,7 @@ public class SchemeManagerTests
     {
         try
         {
-            Enable (true);
+            Enable (ConfigLocations.HardCoded);
             ThrowOnJsonErrors = true;
 
             // Create a test theme
@@ -229,7 +229,7 @@ public class SchemeManagerTests
     {
         try
         {
-            Enable (true);
+            Enable (ConfigLocations.HardCoded);
             ThrowOnJsonErrors = true;
 
             // Create a test theme
@@ -267,7 +267,7 @@ public class SchemeManagerTests
     {
         try
         {
-            Enable (true);
+            Enable (ConfigLocations.HardCoded);
             ThrowOnJsonErrors = true;
 
             // Create a test theme
@@ -436,7 +436,7 @@ public class SchemeManagerTests
     [Fact (Skip = "WIP")]
     public void Apply_UpdatesSchemes ()
     {
-        Enable (true);
+        Enable (ConfigLocations.HardCoded);
 
         Assert.False (SchemeManager.GetSchemes ()!.ContainsKey ("test"));
         Assert.Equal (5, SchemeManager.GetSchemes ().Count); // base, toplevel, menu, error, dialog
