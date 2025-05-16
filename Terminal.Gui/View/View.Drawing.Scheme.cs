@@ -105,12 +105,12 @@ public partial class View
 
         if (!HasScheme && !string.IsNullOrEmpty (SchemeName))
         {
-            return SchemeManager.GetCurrentSchemes () [SchemeName]!;
+            return SchemeManager.GetSchemes () [SchemeName]!;
         }
 
         if (!HasScheme)
         {
-            return SuperView?.GetScheme () ?? SchemeManager.GetCurrentSchemes () ["Base"]!;
+            return SuperView?.GetScheme () ?? SchemeManager.GetSchemes () ["Base"]!;
         }
 
         return _scheme!;

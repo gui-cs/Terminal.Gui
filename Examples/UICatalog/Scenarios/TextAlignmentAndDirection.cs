@@ -13,7 +13,7 @@ public class TextAlignmentAndDirection : Scenario
 
     internal class AlignmentAndDirectionView : View
     {
-        public AlignmentAndDirectionView()
+        public AlignmentAndDirectionView ()
         {
             ViewportSettings = Terminal.Gui.ViewportSettings.Transparent;
             BorderStyle = LineStyle.Dotted;
@@ -31,8 +31,8 @@ public class TextAlignmentAndDirection : Scenario
 
         var txt = $"Hello World{Environment.NewLine}HELLO WORLD{Environment.NewLine}世界 您好";
 
-        SchemeManager.Schemes!.Add("TextAlignmentAndDirection1", new Scheme { Normal = new (Color.Black, Color.Gray) });
-        SchemeManager.Schemes.Add ("TextAlignmentAndDirection2", new Scheme { Normal = new (Color.Black, Color.DarkGray) });
+        SchemeManager.AddScheme ("TextAlignmentAndDirection1", new Scheme { Normal = new (Color.Black, Color.Gray) });
+        SchemeManager.AddScheme ("TextAlignmentAndDirection2", new Scheme { Normal = new (Color.Black, Color.DarkGray) });
 
         List<View> singleLineLabels = new (); // single line
         List<View> multiLineLabels = new (); // multi line
@@ -388,7 +388,7 @@ public class TextAlignmentAndDirection : Scenario
         var txtLabelBR = new AlignmentAndDirectionView
         {
             X = Pos.X (txtLabelMR),
-            Y = Pos.Bottom(txtLabelMR),
+            Y = Pos.Bottom (txtLabelMR),
             Width = Dim.Percent (100, DimPercentMode.Position),
             Height = Dim.Percent (100, DimPercentMode.Position),
             TextAlignment = Alignment.End,

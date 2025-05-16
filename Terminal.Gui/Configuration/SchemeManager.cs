@@ -89,7 +89,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
                 return GetHardCodedSchemes ();
             }
 
-            return GetCurrentSchemes ();
+            return GetSchemes ();
         }
 
         private set
@@ -105,6 +105,27 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
             ThemeManager.Themes! [ThemeManager.DEFAULT_THEME_NAME] ["Schemes"].PropertyValue = value;
 
             //Instance.OnThemeChanged (prevousValue);
+        }
+    }
+
+    /// <summary>
+    ///     Adds a new <see cref="Scheme"/> to <see cref="SchemeManager"/>.
+    /// </summary>
+    /// <param name="schemeName">The name of the Scheme. This must be unique.</param>
+    /// <param name="scheme"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="ArgumentException"></exception>
+    public static void AddScheme (string schemeName, Scheme scheme)
+    {
+        if (Schemes is null)
+        {
+            throw new InvalidOperationException ("Schemes is not set.");
+        }
+
+        if (!Schemes.TryAdd (schemeName, scheme))
+        {
+            throw new ArgumentException ($"Scheme with name {schemeName} already exists.");
         }
     }
 
@@ -165,12 +186,12 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     ///     Convenience method to get the schemes from the selected theme loaded from configuration.
     /// </summary>
     /// <returns></returns>
-    public static Dictionary<string, Scheme?> GetCurrentSchemes ()
+    public static Dictionary<string, Scheme?> GetSchemes ()
     {
         Debug.Assert (ConfigurationManager.IsInitialized ());
-        Dictionary<string, Scheme?>? schemes = ThemeManager.GetCurrentTheme () ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
+        //Dictionary<string, Scheme?>? schemes = ThemeManager.GetCurrentTheme () ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
 
-        return schemes!;
+        return Schemes!;
     }
 
     /// <summary>

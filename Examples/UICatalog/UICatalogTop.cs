@@ -212,12 +212,12 @@ public class UICatalogTop : Toplevel
                 _topSchemeRg = new ()
                 {
                     HighlightStyle = HighlightStyle.None,
-                    SelectedItem = SchemeManager.GetCurrentSchemes ()!.Keys.ToList ().IndexOf (CachedTopLevelScheme!)
+                    SelectedItem = SchemeManager.GetSchemes ()!.Keys.ToList ().IndexOf (CachedTopLevelScheme!)
                 };
 
                 _topSchemeRg.SelectedItemChanged += (_, args) =>
                                                     {
-                                                        CachedTopLevelScheme = SchemeManager.GetCurrentSchemes ()!.Keys.ToArray () [args.SelectedItem!.Value];
+                                                        CachedTopLevelScheme = SchemeManager.GetSchemes ()!.Keys.ToArray () [args.SelectedItem!.Value];
                                                         SchemeName = CachedTopLevelScheme;
                                                         SetNeedsDraw ();
                                                     };

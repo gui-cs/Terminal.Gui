@@ -36,7 +36,7 @@ A `View`'s appearance is primarily determined by its `Scheme`, which maps semant
         *   It first checks if a scheme has been explicitly set via the `_scheme` field (see point 2).
         *   If not, and if `SchemeName` is set, it tries to resolve the scheme by name from `SchemeManager`.
         *   If still no scheme, it recursively calls `SuperView.GetScheme()`.
-        *   As a final fallback, it uses `SchemeManager.GetCurrentSchemes()["Base"]!`.
+        *   As a final fallback, it uses `SchemeManager.GetCurrentSchemes()["Base"]`.
 
 2.  **Explicit Scheme Assignment**:
     *   You can directly assign a `Scheme` object to a `View` using the `View.Scheme` property (which calls `SetScheme(value)`). This overrides any inherited scheme. The `HasScheme` property will then return `true`.
