@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
-using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui.Configuration;
 
@@ -66,7 +65,7 @@ public class SourcesManager
     {
         if (!Sources.TryAdd (location, source))
         {
-            Logging.Warning ($"{location} has already been added to Sources.");
+            //Logging.Warning ($"{location} has already been added to Sources.");
             Sources [location] = source;
         }
     }
@@ -85,7 +84,7 @@ public class SourcesManager
 
         if (!File.Exists (realPath))
         {
-            Logging.Warning ($"\"{realPath}\" does not exist.");
+            //Logging.Warning ($"\"{realPath}\" does not exist.");
 
             // Always add the source even if it doesn't exist.
             AddSource (location, filePath);
@@ -110,7 +109,7 @@ public class SourcesManager
             }
             catch (IOException ioe)
             {
-                Logging.Warning ($"Couldn't open {filePath}. Retrying...: {ioe}");
+                Logging.Warning ($"{ioe.Message}. Retrying...");
                 Task.Delay (100);
                 retryCount++;
             }

@@ -67,7 +67,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
         Debug.Assert (value is { });
 
         // Update the backing store
-        ThemeManager.Themes! [ThemeManager.DEFAULT_THEME_NAME] ["Schemes"].PropertyValue = value;
+        ThemeManager.Themes! [ThemeManager.DEFAULT_THEME_NAME] ["Schemes"].UpdateFrom (value);
 
         //Instance.OnThemeChanged (prevousValue);
     }

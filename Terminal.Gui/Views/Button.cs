@@ -32,7 +32,7 @@ public class Button : View, IDesignable
     ///     Gets or sets whether <see cref="Button"/>s are shown with a shadow effect by default.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
+    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Opaque;
 
     /// <summary>
     ///     Gets or sets the default Highlight Style.

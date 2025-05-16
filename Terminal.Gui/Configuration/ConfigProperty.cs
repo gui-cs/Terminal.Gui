@@ -206,6 +206,7 @@ public class ConfigProperty
                 PropertyValue = DeepCloner.DeepClone (configProperty.PropertyValue);
             }
         }
+        // BUGBUG: Need to Add updater for Scheme
         else
         {
             // Validate type compatibility for non-dictionary types

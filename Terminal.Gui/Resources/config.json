@@ -41,6 +41,12 @@
   // --------------- Themes -----------------
   "Themes": [
     {
+      "Default": {
+        // Note: We do not override any hard-coded properties for Default here; 
+        // Default, should be, by definition the same as hard-coded.
+      }
+    },
+    {
       "Anders": {
         "Schemes": [
           {
@@ -501,8 +507,7 @@
           }
         ]
       }
-    }
-,
+    },
     {
       "Black & White": {
         "Dialog.DefaultShadow": "None",
