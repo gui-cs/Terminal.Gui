@@ -23,7 +23,7 @@ public class AppSettingsScopeTests
     [Fact]
     public void Empty_By_Default_Enabled ()
     {
-        Enable (resetToHardCodedDefaults: true);
+        Enable (ConfigLocations.HardCoded);
 
         Assert.NotNull (Settings! ["AppSettings"].PropertyValue);
 
@@ -37,7 +37,7 @@ public class AppSettingsScopeTests
     [Fact]
     public void Apply_ShouldApplyUpdatedProperties ()
     {
-        Enable (resetToHardCodedDefaults: true);
+        Enable (ConfigLocations.HardCoded);
 
         Assert.Null (AppSettingsTestClass.NullableValueProperty);
         Assert.NotEmpty (AppSettings!);
@@ -69,7 +69,7 @@ public class AppSettingsScopeTests
     [Fact]
     public void TestNullable ()
     {
-        Enable (resetToHardCodedDefaults: true);
+        Enable (ConfigLocations.HardCoded);
 
         AppSettingsTestClass.NullableValueProperty = null;
         Assert.Null (AppSettingsTestClass.NullableValueProperty);
@@ -90,7 +90,7 @@ public class AppSettingsScopeTests
     [Fact]
     public void TestSerialize_RoundTrip ()
     {
-        Enable (resetToHardCodedDefaults: true);
+        Enable (ConfigLocations.HardCoded);
 
         AppSettingsScope initial = AppSettings!;
 

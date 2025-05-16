@@ -325,9 +325,7 @@ public class UICatalog
         {
             if (!Options.DontEnableConfigurationManagement)
             {
-                ConfigurationManager.Enable ();
-                ConfigurationManager.Load (ConfigLocations.All);
-                ConfigurationManager.Apply ();
+                ConfigurationManager.Enable (ConfigLocations.All);
             }
 
             int item = UICatalogTop.CachedScenarios!.IndexOf (
@@ -371,9 +369,7 @@ public class UICatalog
 
         if (!Options.DontEnableConfigurationManagement)
         {
-            ConfigurationManager.Enable (resetToHardCodedDefaults: true);
-            ConfigurationManager.Load (ConfigLocations.All);
-            ConfigurationManager.Apply ();
+            ConfigurationManager.Enable (ConfigLocations.All);
         }
 
         while (RunUICatalogTopLevel () is { } scenario)

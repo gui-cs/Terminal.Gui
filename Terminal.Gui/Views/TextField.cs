@@ -316,7 +316,7 @@ public class TextField : View
                     Command.Context,
                     () =>
                     {
-                        ShowContextMenu (keyboard: true);
+                        ShowContextMenu (true);
 
                         return true;
                     }
@@ -718,7 +718,7 @@ public class TextField : View
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnGettingAttributeForRole (VisualRole role, ref Attribute currentAttribute)
     {
         if (role == VisualRole.Normal)
@@ -727,6 +727,7 @@ public class TextField : View
 
             return true;
         }
+
         return base.OnGettingAttributeForRole (role, ref currentAttribute);
     }
 
@@ -931,7 +932,10 @@ public class TextField : View
     {
         _isDrawing = true;
 
-        var selColor = new Attribute (GetAttributeForRole (VisualRole.Focus).Background, GetAttributeForRole (VisualRole.Focus).Foreground);
+        var selColor = new Attribute (
+                                      GetAttributeForRole (VisualRole.Focus).Background,
+                                      GetAttributeForRole (VisualRole.Focus).Foreground,
+                                      GetAttributeForRole (VisualRole.Focus).Style);
         SetSelectedStartSelectedLength ();
 
         SetAttribute (GetAttributeForRole (VisualRole.Normal));
@@ -955,10 +959,10 @@ public class TextField : View
             else if (ReadOnly)
             {
                 SetAttribute (
-                                      idx >= _start && SelectedLength > 0 && idx < _start + SelectedLength
-                                          ? selColor
-                                          : roc
-                                     );
+                              idx >= _start && SelectedLength > 0 && idx < _start + SelectedLength
+                                  ? selColor
+                                  : roc
+                             );
             }
             else if (!HasFocus && Enabled)
             {
@@ -971,10 +975,10 @@ public class TextField : View
             else
             {
                 SetAttribute (
-                                      idx >= _start && SelectedLength > 0 && idx < _start + SelectedLength
-                                          ? selColor
-                                          : GetAttributeForRole (VisualRole.Focus)
-                                     );
+                              idx >= _start && SelectedLength > 0 && idx < _start + SelectedLength
+                                  ? selColor
+                                  : GetAttributeForRole (VisualRole.Focus)
+                             );
             }
 
             if (col + cols <= width)
@@ -1034,7 +1038,7 @@ public class TextField : View
         return false;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnKeyDownNotHandled (Key a)
     {
         // Remember the cursor position because the new calculated cursor position is needed
@@ -1231,16 +1235,18 @@ public class TextField : View
     private void CreateContextMenu ()
     {
         DisposeContextMenu ();
-        PopoverMenu menu = new (new List<MenuItemv2> ()
-        {
-            new (this, Command.SelectAll, Strings.ctxSelectAll),
-            new (this, Command.DeleteAll, Strings.ctxDeleteAll),
-            new (this, Command.Copy, Strings.ctxCopy),
-            new (this, Command.Cut, Strings.ctxCut),
-            new (this, Command.Paste, Strings.ctxPaste),
-            new (this, Command.Undo, Strings.ctxUndo),
-            new (this, Command.Redo, Strings.ctxRedo),
-        });
+
+        PopoverMenu menu = new (
+                                new List<MenuItemv2>
+                                {
+                                    new (this, Command.SelectAll, Strings.ctxSelectAll),
+                                    new (this, Command.DeleteAll, Strings.ctxDeleteAll),
+                                    new (this, Command.Copy, Strings.ctxCopy),
+                                    new (this, Command.Cut, Strings.ctxCut),
+                                    new (this, Command.Paste, Strings.ctxPaste),
+                                    new (this, Command.Undo, Strings.ctxUndo),
+                                    new (this, Command.Redo, Strings.ctxRedo)
+                                });
 
         HotKeyBindings.Remove (menu.Key);
         HotKeyBindings.Add (menu.Key, Command.Context);
@@ -1249,10 +1255,7 @@ public class TextField : View
         ContextMenu = menu;
     }
 
-    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e)
-    {
-        KeyBindings.Replace (e.OldKey.KeyCode, e.NewKey.KeyCode);
-    }
+    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey.KeyCode, e.NewKey.KeyCode); }
 
     private List<Rune> DeleteSelectedText ()
     {
@@ -1302,20 +1305,6 @@ public class TextField : View
     private Attribute GetReadOnlyColor ()
     {
         return GetAttributeForRole (VisualRole.ReadOnly);
-
-        Scheme cs = GetScheme ();
-
-        if (!HasScheme)
-        {
-            cs = new ();
-        }
-
-        if (cs.Disabled.Foreground == cs.Focus.Background)
-        {
-            return new (cs.Focus.Foreground, cs.Focus.Background);
-        }
-
-        return new (cs.Disabled.Foreground, cs.Focus.Background);
     }
 
     private void HistoryText_ChangeText (object sender, HistoryText.HistoryTextItemEventArgs obj)
@@ -1467,16 +1456,18 @@ public class TextField : View
     }
 
     /// <summary>
-    /// Moves the cursor +/- the given <paramref name="distance"/>, clearing
-    /// any selection and returning true if any meaningful changes were made.
+    ///     Moves the cursor +/- the given <paramref name="distance"/>, clearing
+    ///     any selection and returning true if any meaningful changes were made.
     /// </summary>
-    /// <param name="distance">Distance to move the cursor, will be clamped to
-    /// text length. Positive for right, Negative for left.</param>
+    /// <param name="distance">
+    ///     Distance to move the cursor, will be clamped to
+    ///     text length. Positive for right, Negative for left.
+    /// </param>
     /// <returns></returns>
     private bool Move (int distance)
     {
-        var oldCursorPosition = _cursorPosition;
-        var hadSelection = _selectedText != null && _selectedText.Length > 0;
+        int oldCursorPosition = _cursorPosition;
+        bool hadSelection = _selectedText != null && _selectedText.Length > 0;
 
         _cursorPosition = Math.Min (_text.Count, Math.Max (0, _cursorPosition + distance));
         ClearAllSelection ();
@@ -1485,10 +1476,7 @@ public class TextField : View
         return _cursorPosition != oldCursorPosition || hadSelection;
     }
 
-    private bool MoveLeft ()
-    {
-        return Move (-1);
-    }
+    private bool MoveLeft () { return Move (-1); }
 
     private void MoveLeftExtend ()
     {
@@ -1498,10 +1486,7 @@ public class TextField : View
         }
     }
 
-    private bool MoveRight ()
-    {
-        return Move (1);
-    }
+    private bool MoveRight () { return Move (1); }
 
     private void MoveRightExtend ()
     {
@@ -1731,7 +1716,7 @@ public class TextField : View
             return;
         }
 
-        var color = new Attribute (CaptionColor, GetAttributeForRole (VisualRole.Normal).Background);
+        var color = new Attribute (CaptionColor, GetAttributeForRole (VisualRole.Normal).Background, GetAttributeForRole (VisualRole.Normal).Style);
         SetAttribute (color);
 
         Move (0, 0);
@@ -1776,7 +1761,6 @@ public class TextField : View
 
     private void ShowContextMenu (bool keyboard)
     {
-
         if (!Equals (_currentCulture, Thread.CurrentThread.CurrentUICulture))
         {
             _currentCulture = Thread.CurrentThread.CurrentUICulture;
@@ -1840,13 +1824,14 @@ public class TextField : View
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
         if (disposing)
         {
             DisposeContextMenu ();
         }
+
         base.Dispose (disposing);
     }
 }

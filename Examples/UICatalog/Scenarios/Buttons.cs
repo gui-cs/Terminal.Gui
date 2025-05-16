@@ -80,7 +80,7 @@ public class Buttons : Scenario
 
         View prev = colorButtonsLabel;
 
-        foreach (KeyValuePair<string, Scheme> scheme in SchemeManager.GetSchemes ())
+        foreach (KeyValuePair<string, Scheme> scheme in SchemeManager.GetSchemesForCurrentTheme ())
         {
             var colorButton = new Button
             {

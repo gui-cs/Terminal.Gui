@@ -14,7 +14,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
     {
         try
         {
-            Enable ();
+            Enable (ConfigLocations.HardCoded);
             Assert.NotEmpty (ThemeManager.Themes!);
 
             ThemeManager.UpdateToCurrentValues ();
@@ -66,7 +66,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
     {
         Assert.False (IsEnabled);
 
-        Enable (resetToHardCodedDefaults: true);
+        Enable (ConfigLocations.HardCoded);
 
         Assert.Equal (Settings! ["Theme"].PropertyValue, ThemeManager.Theme);
         Assert.Equal (ThemeManager.DEFAULT_THEME_NAME, ThemeManager.Theme);
@@ -79,7 +79,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
     {
         Assert.False (IsEnabled);
 
-        Enable (resetToHardCodedDefaults: true);
+        Enable (ConfigLocations.HardCoded);
 
         Assert.Equal (ThemeManager.DEFAULT_THEME_NAME, ThemeManager.Theme);
 
@@ -97,7 +97,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
         Assert.False (IsEnabled);
         Assert.Equal (ThemeManager.DEFAULT_THEME_NAME, ThemeManager.Theme);
 
-        Enable (resetToHardCodedDefaults: true);
+        Enable (ConfigLocations.HardCoded);
         Assert.Equal ("Default", ThemeManager.Theme);
 
         ThemeManager.Theme = "Test";
@@ -129,7 +129,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
     {
         Assert.False (IsEnabled);
 
-        Enable (resetToHardCodedDefaults: true);
+        Enable (ConfigLocations.HardCoded);
 
         Assert.Single (ThemeManager.Themes!);
 
@@ -154,7 +154,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
     {
         Assert.False (IsEnabled);
 
-        Enable (resetToHardCodedDefaults: true);
+        Enable (ConfigLocations.HardCoded);
 
         Assert.Single (ThemeManager.Themes!);
 
@@ -179,7 +179,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
     [Fact]
     public void Themes_TryAdd_Adds ()
     {
-        Enable (resetToHardCodedDefaults: true);
+        Enable (ConfigLocations.HardCoded);
 
         // Verify that the Themes dictionary contains only the Default theme
         Assert.Single (ThemeManager.Themes!);
@@ -198,7 +198,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
     public void Apply_Applies ()
     {
         Assert.False (IsEnabled);
-        Enable (resetToHardCodedDefaults: true);
+        Enable (ConfigLocations.HardCoded);
 
         var theme = new ThemeScope ();
         Assert.NotEmpty (theme);
@@ -222,7 +222,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
     {
         try
         {
-            Enable (resetToHardCodedDefaults: true);
+            Enable (ConfigLocations.HardCoded);
 
             // BUGBUG: Setting Schemes to empty array is not valid!
             // Create a test theme
@@ -260,7 +260,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
     public void In_Memory_Themes_Size_Is_Reasonable ()
     {
         output.WriteLine ($"Start: Themes dictionary size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
-        Enable (resetToHardCodedDefaults: true);
+        Enable (ConfigLocations.HardCoded);
 
         output.WriteLine ($"After Enable: Themes dictionary size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
 

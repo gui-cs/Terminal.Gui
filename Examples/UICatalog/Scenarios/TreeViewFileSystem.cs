@@ -447,7 +447,8 @@ public class TreeViewFileSystem : Scenario
 
                     cell.Attribute = new Attribute (
                                                     Color.BrightYellow,
-                                                    cell.Attribute!.Value.Background
+                                                    cell.Attribute!.Value.Background,
+                                                    cell.Attribute!.Value.Style
                                                    );
                 }
             }

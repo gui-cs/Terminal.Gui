@@ -105,7 +105,7 @@ public class DrawTests (ITestOutputHelper output)
                                                """,
                                                output,
                                                Application.Driver,
-                                               SchemeManager.Schemes ["Base"]!.Normal
+                                               SchemeManager.GetSchemes () ["Base"]!.Normal
                                               );
         top.Dispose ();
     }

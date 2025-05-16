@@ -8948,7 +8948,7 @@ line.  ",
     {
         List<Cell> cells = [];
 
-        foreach (KeyValuePair<string, Scheme> color in SchemeManager.Schemes)
+        foreach (KeyValuePair<string, Scheme> color in SchemeManager.GetSchemes ())
         {
             string csName = color.Key;
 
@@ -8980,19 +8980,19 @@ Error   ";
         Attribute [] attributes =
         {
             // 0
-            SchemeManager.Schemes ["TopLevel"].Normal,
+            SchemeManager.GetSchemes () ["TopLevel"].Normal,
 
             // 1
-            SchemeManager.Schemes ["Base"].Normal,
+            SchemeManager.GetSchemes () ["Base"].Normal,
 
             // 2
-            SchemeManager.Schemes ["Dialog"].Normal,
+            SchemeManager.GetSchemes () ["Dialog"].Normal,
 
             // 3
-            SchemeManager.Schemes ["Menu"].Normal,
+            SchemeManager.GetSchemes () ["Menu"].Normal,
 
             // 4
-            SchemeManager.Schemes ["Error"].Normal,
+            SchemeManager.GetSchemes () ["Error"].Normal,
 
             // 5
             tv.GetScheme ()!.Focus

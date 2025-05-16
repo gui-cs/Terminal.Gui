@@ -6,30 +6,45 @@ namespace Terminal.Gui.ConfigurationTests;
 public class SchemeManagerTests
 {
     [Fact]
-    public void GetCurrentSchemes_Not_Enabled_Gets_Schemes ()
+    public void GetSchemes_Not_Enabled_Gets_Schemes ()
     {
         Disable (true);
 
-        Dictionary<string, Scheme?>? schemes = SchemeManager.GetSchemes ();
+        Dictionary<string, Scheme?>? schemes = SchemeManager.GetSchemesForCurrentTheme ();
         Assert.NotNull (schemes);
         Assert.NotNull (schemes ["Base"]);
         Assert.True (schemes!.ContainsKey ("Base"));
         Assert.True (schemes.ContainsKey ("base"));
+
+        Assert.Equal(SchemeManager.GetSchemes (), schemes);
     }
 
     [Fact]
-    public void GetCurrentSchemes_Enabled_Gets_Current ()
+    public void GetSchemes_Enabled_Gets_Current ()
     {
-        Enable ();
+        Enable (ConfigLocations.HardCoded);
 
-        Dictionary<string, Scheme?>? schemes = SchemeManager.GetSchemes ();
+        Dictionary<string, Scheme?>? schemes = SchemeManager.GetSchemesForCurrentTheme ();
         Assert.NotNull (schemes);
         Assert.NotNull (schemes ["Base"]);
         Assert.True (schemes!.ContainsKey ("Base"));
         Assert.True (schemes.ContainsKey ("base"));
 
+        Assert.Equal (SchemeManager.GetSchemes (), schemes);
+
         Disable (true);
     }
+
+    [Fact]
+    public void GetSchemes_Get_Schemes_After_Load ()
+    {
+        Enable (ConfigLocations.HardCoded);
+        Load (ConfigLocations.All);
+        Apply ();
+
+        Assert.Equal (SchemeManager.GetSchemes (), SchemeManager.GetSchemesForCurrentTheme ());
+    }
+
 
     [Fact]
     public void GetHardCodedSchemes_Gets_HardCoded_Theme_Schemes ()
@@ -43,7 +58,7 @@ public class SchemeManagerTests
     public void Not_Case_Sensitive_Disabled ()
     {
         Assert.False (IsEnabled);
-        Dictionary<string, Scheme?>? current = SchemeManager.GetSchemes ();
+        Dictionary<string, Scheme?>? current = SchemeManager.GetSchemesForCurrentTheme ();
         Assert.NotNull (current);
 
         Assert.True (current!.ContainsKey ("Base"));
@@ -54,13 +69,13 @@ public class SchemeManagerTests
     public void Not_Case_Sensitive_Enabled ()
     {
         Assert.False (IsEnabled);
-        Enable ();
+        Enable (ConfigLocations.HardCoded);
 
-        Assert.True (SchemeManager.GetSchemes ()!.ContainsKey ("Base"));
-        Assert.True (SchemeManager.GetSchemes ()!.ContainsKey ("base"));
+        Assert.True (SchemeManager.GetSchemesForCurrentTheme ()!.ContainsKey ("Base"));
+        Assert.True (SchemeManager.GetSchemesForCurrentTheme ()!.ContainsKey ("base"));
 
         ResetToHardCodedDefaults ();
-        Dictionary<string, Scheme?>? current = SchemeManager.GetSchemes ();
+        Dictionary<string, Scheme?>? current = SchemeManager.GetSchemesForCurrentTheme ();
         Assert.NotNull (current);
 
         Assert.True (current!.ContainsKey ("Base"));
@@ -73,17 +88,17 @@ public class SchemeManagerTests
     public void Load_Adds ()
     {
         // arrange
-        Enable (true);
+        Enable (ConfigLocations.HardCoded);
 
         var theme = new ThemeScope ();
         Assert.NotEmpty (theme);
 
-        Assert.Equal (5, SchemeManager.Schemes.Count);
+        Assert.Equal (5, SchemeManager.GetSchemes ().Count);
 
-        theme ["Schemes"].PropertyValue = SchemeManager.Schemes;
+        theme ["Schemes"].PropertyValue = SchemeManager.GetSchemes ();
 
         Dictionary<string, Scheme> schemes = (Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue;
-        Assert.Equal (SchemeManager.Schemes.Count, schemes.Count);
+        Assert.Equal (SchemeManager.GetSchemes ().Count, schemes.Count);
 
         var newTheme = new ThemeScope ();
 
@@ -98,14 +113,14 @@ public class SchemeManagerTests
             Disabled = new (Color.Gray, Color.DarkGray)
         };
 
-        newTheme ["Schemes"].PropertyValue = SchemeManager.GetSchemes ();
-        Assert.Equal (5, SchemeManager.Schemes.Count);
+        newTheme ["Schemes"].PropertyValue = SchemeManager.GetSchemesForCurrentTheme ();
+        Assert.Equal (5, SchemeManager.GetSchemes ().Count);
 
         // add a new Scheme to the newTheme
         ((Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue) ["Test"] = scheme;
 
         schemes = (Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue;
-        Assert.Equal (SchemeManager.Schemes.Count, schemes.Count);
+        Assert.Equal (SchemeManager.GetSchemes ().Count, schemes.Count);
 
         // Act
         theme.UpdateFrom (newTheme);
@@ -121,7 +136,7 @@ public class SchemeManagerTests
     public void Load_Changes ()
     {
         // arrange
-        Enable (true);
+        Enable (ConfigLocations.HardCoded);
 
         var theme = new ThemeScope ();
         Assert.NotEmpty (theme);
@@ -136,7 +151,7 @@ public class SchemeManagerTests
             HotFocus = new (Color.Green, Color.BrightGreen),
             Disabled = new (Color.Gray, Color.DarkGray)
         };
-        theme ["Schemes"].PropertyValue = SchemeManager.GetSchemes ();
+        theme ["Schemes"].PropertyValue = SchemeManager.GetSchemesForCurrentTheme ();
 
         ((Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue!)! ["Test"] = scheme;
 
@@ -155,7 +170,7 @@ public class SchemeManagerTests
             HotFocus = scheme.HotFocus,
             Disabled = scheme.Disabled
         };
-        newTheme ["Schemes"].PropertyValue = SchemeManager.GetSchemes ();
+        newTheme ["Schemes"].PropertyValue = SchemeManager.GetSchemesForCurrentTheme ();
         ((Dictionary<string, Scheme>)newTheme ["Schemes"].PropertyValue!)! ["Test"] = newScheme;
 
         // Act
@@ -177,7 +192,7 @@ public class SchemeManagerTests
     {
         try
         {
-            Enable (true);
+            Enable (ConfigLocations.HardCoded);
             ThrowOnJsonErrors = true;
 
             // Create a test theme
@@ -214,7 +229,7 @@ public class SchemeManagerTests
     {
         try
         {
-            Enable (true);
+            Enable (ConfigLocations.HardCoded);
             ThrowOnJsonErrors = true;
 
             // Create a test theme
@@ -252,7 +267,7 @@ public class SchemeManagerTests
     {
         try
         {
-            Enable (true);
+            Enable (ConfigLocations.HardCoded);
             ThrowOnJsonErrors = true;
 
             // Create a test theme
@@ -401,7 +416,7 @@ public class SchemeManagerTests
             Load (ConfigLocations.Runtime);
             Assert.Equal ("TestTheme", ThemeManager.Theme);
 
-            TextStyle style = SchemeManager.GetSchemes () ["Menu"]!.Normal.Style;
+            TextStyle style = SchemeManager.GetSchemesForCurrentTheme () ["Menu"]!.Normal.Style;
 
             Assert.Equal (TextStyle.Bold, style);
 
@@ -410,6 +425,7 @@ public class SchemeManagerTests
 
             // Verify we're back to default
             Assert.Equal ("Default", ThemeManager.Theme);
+
         }
         finally
         {
@@ -420,10 +436,10 @@ public class SchemeManagerTests
     [Fact (Skip = "WIP")]
     public void Apply_UpdatesSchemes ()
     {
-        Enable (true);
+        Enable (ConfigLocations.HardCoded);
 
-        Assert.False (SchemeManager.Schemes!.ContainsKey ("test"));
-        Assert.Equal (5, SchemeManager.Schemes.Count); // base, toplevel, menu, error, dialog
+        Assert.False (SchemeManager.GetSchemes ()!.ContainsKey ("test"));
+        Assert.Equal (5, SchemeManager.GetSchemes ().Count); // base, toplevel, menu, error, dialog
 
         var theme = new ThemeScope ();
         Assert.NotEmpty (theme);
@@ -447,16 +463,16 @@ public class SchemeManagerTests
         // Act
         ThemeManager.Theme = "testTheme";
         ThemeManager.Themes! [ThemeManager.Theme]!.Apply ();
-        Assert.Equal (5, SchemeManager.Schemes.Count); // base, toplevel, menu, error, dialog
+        Assert.Equal (5, SchemeManager.GetSchemes ().Count); // base, toplevel, menu, error, dialog
 
         // Assert
-        Scheme updatedScheme = SchemeManager.Schemes ["test"];
+        Scheme updatedScheme = SchemeManager.GetSchemes () ["test"];
         Assert.Equal (new (Color.Red), updatedScheme.Normal.Foreground);
         Assert.Equal (new (Color.Green), updatedScheme.Normal.Background);
 
         // remove test Scheme from Colors to avoid failures on others unit tests with Scheme
-        SchemeManager.Schemes.Remove ("test");
-        Assert.Equal (5, SchemeManager.Schemes.Count);
+        SchemeManager.GetSchemes ().Remove ("test");
+        Assert.Equal (5, SchemeManager.GetSchemes ().Count);
 
         Disable (true);
     }

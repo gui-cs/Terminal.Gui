@@ -9,7 +9,7 @@ public class ThemeScopeTests
     [Fact]
     public void Load_AllThemesPresent ()
     {
-        Enable (true);
+        Enable (ConfigLocations.HardCoded);
 
         Load (ConfigLocations.All);
         Assert.True (ThemeManager.Themes.ContainsKey ("Default"));
@@ -21,7 +21,7 @@ public class ThemeScopeTests
     [Fact]
     public void Apply_ShouldApplyUpdatedProperties ()
     {
-        Enable (true);
+        Enable (ConfigLocations.HardCoded);
         Assert.NotEmpty (ThemeManager.Themes);
         Alignment savedValue = Dialog.DefaultButtonAlignment;
         Alignment newValue = Alignment.Center != savedValue ? Alignment.Center : Alignment.Start;
@@ -41,7 +41,7 @@ public class ThemeScopeTests
     [Fact]
     public void UpdateToHardCodedDefaults_Resets_Config_Does_Not_Apply ()
     {
-        Enable (true);
+        Enable (ConfigLocations.HardCoded);
 
         Load (ConfigLocations.LibraryResources);
 
@@ -61,7 +61,7 @@ public class ThemeScopeTests
     [Fact]
     public void Serialize_Themes_RoundTrip ()
     {
-        Enable (true);
+        Enable (ConfigLocations.HardCoded);
 
         IDictionary<string, ThemeScope> initial = ThemeManager.Themes;
 
@@ -79,7 +79,7 @@ public class ThemeScopeTests
     [Fact]
     public void Serialize_New_RoundTrip ()
     {
-        Enable (true);
+        Enable (ConfigLocations.HardCoded);
 
         var theme = new ThemeScope ();
         theme ["Dialog.DefaultButtonAlignment"].PropertyValue = Alignment.End;

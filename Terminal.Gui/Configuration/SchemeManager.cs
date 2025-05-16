@@ -20,7 +20,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     {
         lock (_schemesLock)
         {
-            Schemes = GetHardCodedSchemes ();
+            SetSchemes (GetHardCodedSchemes ());
         }
     }
 
@@ -31,81 +31,45 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     /// <returns></returns>
     public static Dictionary<string, Scheme?>? GetHardCodedSchemes () { return View.GetHardCodedSchemes (); }
 
-    /// <summary>Gets a dictionary of defined <see cref="Scheme"/>s.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         The <see cref="Schemes"/> dictionary includes the following keys, by default:
-    ///         <list type="table">
-    ///             <listheader>
-    ///                 <term>Built-in scheme name</term> <description>Description</description>
-    ///             </listheader>
-    ///             <item>
-    ///                 <term>Base</term> <description>The base scheme used for most Views.</description>
-    ///             </item>
-    ///             <item>
-    ///                 <term>TopLevel</term>
-    ///                 <description>The application Toplevel scheme; used for the <see cref="Toplevel"/> View.</description>
-    ///             </item>
-    ///             <item>
-    ///                 <term>Dialog</term>
-    ///                 <description>
-    ///                     The dialog scheme; used for <see cref="Dialog"/>, <see cref="MessageBox"/>, and
-    ///                     other views dialog-like views.
-    ///                 </description>
-    ///             </item>
-    ///             <item>
-    ///                 <term>Menu</term>
-    ///                 <description>
-    ///                     The menu scheme; used for <see cref="Menu"/>, <see cref="MenuBar"/>, and
-    ///                     <see cref="StatusBar"/>.
-    ///                 </description>
-    ///             </item>
-    ///             <item>
-    ///                 <term>Error</term>
-    ///                 <description>
-    ///                     The scheme for showing errors, such as in
-    ///                     <see cref="MessageBox.ErrorQuery(string, string, string[])"/>.
-    ///                 </description>
-    ///             </item>
-    ///         </list>
-    ///     </para>
-    ///     <para>Changing the values of an entry in this dictionary will affect all views that use the scheme.</para>
-    ///     <para>
-    ///         <see cref="ConfigurationManager"/> can be used to override the default values for these schemes and add
-    ///         additional schemes. See <see cref="ThemeManager.Themes"/>.
-    ///     </para>
-    /// </remarks>
+    /// <summary>
+    ///     Use <see cref="AddScheme"/>, <see cref="GetScheme(Terminal.Gui.Schemes)"/>, <see cref="GetSchemeNames"/>, <see cref="GetSchemesForCurrentTheme"/>, etc... instead.
+    /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope), OmitClassName = true)]
     [JsonConverter (typeof (DictionaryJsonConverter<Scheme?>))]
     [UsedImplicitly]
     public static Dictionary<string, Scheme?>? Schemes
     {
-        get
-        {
-            if (!ConfigurationManager.IsInitialized ())
-            {
-                // We're being called from the module initializer.
-                // Hard coded default value
-                return GetHardCodedSchemes ();
-            }
+        get => GetSchemes ();
+        private set => SetSchemes (value);
+    }
 
-            return GetSchemes ();
+    /// <summary>INTERNAL: Gets the dictionary of defined <see cref="Scheme"/>s. The get method for <see cref="Schemes"/>.</summary>
+    internal static Dictionary<string, Scheme?>? GetSchemes ()
+    {
+        if (!ConfigurationManager.IsInitialized ())
+        {
+            // We're being called from the module initializer.
+            // Hard coded default value
+            return GetHardCodedSchemes ();
         }
 
-        private set
+        return GetSchemesForCurrentTheme ();
+    }
+
+    /// <summary>INTERNAL: Gets the dictionary of defined <see cref="Scheme"/>s. The set method for <see cref="Schemes"/>.</summary>
+    private static void SetSchemes (Dictionary<string, Scheme?>? value)
+    {
+        if (!ConfigurationManager.IsInitialized ())
         {
-            if (!ConfigurationManager.IsInitialized ())
-            {
-                throw new InvalidOperationException ("Schemes cannot be set before ConfigurationManager is initialized.");
-            }
-
-            Debug.Assert(value is {});
-
-            // Update the backing store
-            ThemeManager.Themes! [ThemeManager.DEFAULT_THEME_NAME] ["Schemes"].PropertyValue = value;
-
-            //Instance.OnThemeChanged (prevousValue);
+            throw new InvalidOperationException ("Schemes cannot be set before ConfigurationManager is initialized.");
         }
+
+        Debug.Assert (value is { });
+
+        // Update the backing store
+        ThemeManager.Themes! [ThemeManager.DEFAULT_THEME_NAME] ["Schemes"].PropertyValue = value;
+
+        //Instance.OnThemeChanged (prevousValue);
     }
 
     /// <summary>
@@ -118,12 +82,12 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     /// <exception cref="ArgumentException"></exception>
     public static void AddScheme (string schemeName, Scheme scheme)
     {
-        if (Schemes is null)
+        if (GetSchemes () is null)
         {
             throw new InvalidOperationException ("Schemes is not set.");
         }
 
-        if (!Schemes.TryAdd (schemeName, scheme))
+        if (!GetSchemes ()!.TryAdd (schemeName, scheme))
         {
             throw new ArgumentException ($"Scheme with name {schemeName} already exists.");
         }
@@ -144,7 +108,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
             throw new ArgumentException ($"Invalid scheme name: {schemeName}");
         }
 
-        return Schemes! [schemeNameString]!;
+        return GetSchemesForCurrentTheme ()! [schemeNameString]!;
     }
 
     /// <summary>
@@ -155,24 +119,25 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     /// <exception cref="ArgumentException"></exception>
     public static Scheme GetScheme (string schemeName)
     {
-        return Schemes! [schemeName]!;
+        return GetSchemesForCurrentTheme ()! [schemeName]!;
     }
 
     /// <summary>
-    ///     Gets the name of the specified <see cref="Schemes"/>.
+    ///     Gets the name of the specified <see cref="Schemes"/>. Will throw an exception if <paramref name="schemeName"/>
+    ///     is not a built-in Scheme.
     /// </summary>
     /// <param name="schemeName"></param>
-    /// <returns></returns>
+    /// <returns>The name of scheme.</returns>
     public static string? SchemesToSchemeName (Schemes schemeName)
     {
         return Enum.GetName (typeof (Schemes), schemeName);
     }
 
     /// <summary>
-    ///     Gets the <see cref="Schemes"/> enum value given the name of the scheme.
+    ///     Converts a string to a <see cref="Schemes"/> enum value.
     /// </summary>
     /// <param name="schemeName"><see langword="null"/> if the schemeName is not a built-in Scheme name.</param>
-    /// <returns></returns>
+    /// <returns><see langword="null"/> if <paramref name="schemeName"/> is not the name of a built-in Scheme.</returns>
     public static string? SchemeNameToSchemes (string schemeName)
     {
         if (Enum.TryParse (typeof (Schemes), schemeName, out object? value))
@@ -183,10 +148,10 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     }
 
     /// <summary>
-    ///     Convenience method to get the schemes from the selected theme loaded from configuration.
+    ///     Get the dictionary schemes from the selected theme loaded from configuration.
     /// </summary>
     /// <returns></returns>
-    public static Dictionary<string, Scheme?> GetSchemes ()
+    public static Dictionary<string, Scheme?> GetSchemesForCurrentTheme ()
     {
         Debug.Assert (ConfigurationManager.IsInitialized ());
         Dictionary<string, Scheme?>? schemes = ThemeManager.GetCurrentTheme () ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
@@ -202,9 +167,9 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     {
         lock (_schemesLock)
         {
-            if (Schemes is { })
+            if (GetSchemes () is { })
             {
-                return Schemes.Keys.ToImmutableList ();
+                return GetSchemes ()!.Keys.ToImmutableList ();
             }
         }
 

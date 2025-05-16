@@ -320,9 +320,7 @@ public class ClearViewportTests (ITestOutputHelper output)
     [InlineData (false)]
     public void Clear_Does_Not_Spillover_Its_Parent (bool label)
     {
-        ConfigurationManager.Enable();
-        ConfigurationManager.Load (ConfigLocations.LibraryResources);
-        ConfigurationManager.Apply ();
+        ConfigurationManager.Enable (ConfigLocations.LibraryResources);
 
         var root = new View { Width = 20, Height = 10 };
 
@@ -362,9 +360,9 @@ cccccccccccccccccccc",
 
         Attribute [] attributes =
         {
-            SchemeManager.Schemes ["TopLevel"]!.Normal,
-            SchemeManager.Schemes ["Base"]!.Normal,
-            SchemeManager.Schemes ["Base"]!.Focus
+            SchemeManager.GetSchemes () ["TopLevel"]!.Normal,
+            SchemeManager.GetSchemes () ["Base"]!.Normal,
+            SchemeManager.GetSchemes () ["Base"]!.Focus
         };
 
         if (label)

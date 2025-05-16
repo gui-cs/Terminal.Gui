@@ -109,7 +109,8 @@ public class AppendAutocomplete : AutocompleteBase
         textField.SetAttribute (
                                new Attribute (
                                               Scheme.Normal.Foreground,
-                                              textField.GetAttributeForRole(VisualRole.Focus).Background
+                                              textField.GetAttributeForRole(VisualRole.Focus).Background,
+                                              Scheme.Normal.Style
                                              )
                               );
         textField.Move (textField.Text.Length, 0);

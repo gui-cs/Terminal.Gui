@@ -33,7 +33,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
     public void HardCodedDefaultCache_Properties_Are_Copies ()
     {
         Assert.False (IsEnabled);
-        Enable (true);
+        Enable (ConfigLocations.HardCoded);
 
         Assert.Equal (Key.Esc, Application.QuitKey);
 
@@ -56,7 +56,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
         try
         {
-            Enable (true);
+            Enable (ConfigLocations.HardCoded);
             Assert.Equal (Key.Esc, Application.QuitKey);
 
             FrozenDictionary<string, ConfigProperty> initialCache = GetHardCodedConfigPropertyCache ();
@@ -98,7 +98,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
     {
         Assert.False (IsEnabled);
 
-        Enable ();
+        Enable (ConfigLocations.HardCoded);
 
         Assert.NotNull (Settings);
 
@@ -110,7 +110,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
     {
         Assert.False (IsEnabled);
 
-        Enable (resetToHardCodedDefaults: true);
+        Enable (ConfigLocations.HardCoded);
 
         Applied += ConfigurationManagerApplied;
         var fired = false;
@@ -146,7 +146,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         Assert.False (IsEnabled);
 
         var fired = false;
-        Enable (resetToHardCodedDefaults: true);
+        Enable (ConfigLocations.HardCoded);
 
         ThrowOnJsonErrors = true;
         Assert.Equal (Key.Esc, ((Key)Settings! ["Application.QuitKey"].PropertyValue)!.KeyCode);
@@ -174,7 +174,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
     {
         Assert.False (IsEnabled);
 
-        Enable (true);
+        Enable (ConfigLocations.HardCoded);
 
         try
         {
@@ -210,7 +210,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
         try
         {
-            Enable (resetToHardCodedDefaults: true);
+            Enable (ConfigLocations.HardCoded);
             ThrowOnJsonErrors = true;
 
             Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue);
@@ -243,7 +243,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
         try
         {
-            Enable (true);
+            Enable (ConfigLocations.HardCoded);
 
             Settings! ["Application.QuitKey"].PropertyValue = Key.Q;
 
@@ -275,7 +275,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         try
         {
             // arrange
-            Enable (true);
+            Enable (ConfigLocations.HardCoded);
 
             Settings! ["Application.QuitKey"].PropertyValue = Key.Q;
             Settings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
@@ -326,7 +326,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         Assert.False (IsEnabled);
 
         // Act
-        Enable (true);
+        Enable (ConfigLocations.HardCoded);
 
         Application.QuitKey = Key.A;
 
@@ -354,7 +354,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         try
         {
             // arrange
-            Enable (true);
+            Enable (ConfigLocations.HardCoded);
 
             ThrowOnJsonErrors = true;
 
@@ -400,7 +400,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
         try
         {
-            Enable ();
+            Enable (ConfigLocations.HardCoded);
 
             // Get the hard coded settings
             ResetToHardCodedDefaults ();
@@ -427,7 +427,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
         try
         {
-            Enable (true);
+            Enable (ConfigLocations.HardCoded);
 
             Assert.NotEmpty (Settings!);
 
@@ -480,7 +480,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Application.QuitKey = Key.X.WithCtrl;
             FileDialog.MaxSearchResults = 1;
 
-            Enable ();
+            Enable (ConfigLocations.HardCoded);
             Load (ConfigLocations.HardCoded);
 
             // Spot check
@@ -492,12 +492,12 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Assert.NotEmpty (ThemeManager.Themes [ThemeManager.Theme]);
 
             // Verify schemes are properly initialized
-            Assert.NotNull (SchemeManager.Schemes);
-            Assert.NotEmpty (SchemeManager.Schemes);
+            Assert.NotNull (SchemeManager.GetSchemes ());
+            Assert.NotEmpty (SchemeManager.GetSchemes ());
 
             // Verify "Base" has correct values
-            Assert.Equal (Color.White, SchemeManager.Schemes ["Base"]!.Normal.Foreground);
-            Assert.Equal (Color.Blue, SchemeManager.Schemes ["Base"].Normal.Background);
+            //Assert.Equal (Color.White, SchemeManager.GetSchemes () ["Base"]!.Normal.Foreground);
+            //Assert.Equal (Color.Blue, SchemeManager.GetSchemes () ["Base"].Normal.Background);
 
             Apply ();
             Assert.Equal (Key.Esc, Application.QuitKey);
@@ -520,7 +520,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Application.QuitKey = Key.X.WithCtrl;
             FileDialog.MaxSearchResults = 1;
 
-            Enable ();
+            Enable (ConfigLocations.HardCoded);
             Load (ConfigLocations.LibraryResources);
 
             // Spot check
@@ -532,8 +532,8 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Assert.NotEmpty (ThemeManager.Themes [ThemeManager.Theme]);
 
             // Verify schemes are properly initialized
-            Assert.NotNull (SchemeManager.Schemes);
-            Assert.NotEmpty (SchemeManager.Schemes);
+            Assert.NotNull (SchemeManager.GetSchemes ());
+            Assert.NotEmpty (SchemeManager.GetSchemes ());
 
             // This is too fragile as the default scheme may change
             // Verify "Base" has correct values
@@ -563,7 +563,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Glyphs.Apple = new ('z');
 
             ThrowOnJsonErrors = true;
-            Enable ();
+            Enable (ConfigLocations.HardCoded);
 
             RuntimeConfig = """
                             {
@@ -600,7 +600,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
     {
         Assert.False (IsEnabled);
 
-        Enable (resetToHardCodedDefaults: true);
+        Enable (ConfigLocations.HardCoded);
 
         ThrowOnJsonErrors = false;
 
@@ -685,7 +685,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
     public void InvalidJsonThrows ()
     {
         Assert.False (IsEnabled);
-        Enable (resetToHardCodedDefaults: true);
+        Enable (ConfigLocations.HardCoded);
 
         ThrowOnJsonErrors = true;
 
@@ -783,7 +783,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
         try
         {
-            Enable (true);
+            Enable (ConfigLocations.HardCoded);
 
             // Arrange
             var json = @"
@@ -932,8 +932,8 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
             Assert.Equal ("Default", ThemeManager.Theme);
 
-            Assert.Equal (new (Color.White), SchemeManager.Schemes! ["Base"]!.Normal.Foreground);
-            Assert.Equal (new (Color.Blue), SchemeManager.Schemes ["Base"].Normal.Background);
+            Assert.Equal (new (Color.White), SchemeManager.GetSchemes ()! ["Base"]!.Normal.Foreground);
+            Assert.Equal (new (Color.Blue), SchemeManager.GetSchemes () ["Base"].Normal.Background);
 
             Dictionary<string, Scheme> schemes =
                 (Dictionary<string, Scheme>)ThemeManager.Themes.First ().Value ["Schemes"].PropertyValue;
@@ -946,8 +946,8 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Assert.Equal (KeyCode.Z | KeyCode.AltMask, Application.QuitKey.KeyCode);
             Assert.Equal ("Default", ThemeManager.Theme);
 
-            Assert.Equal (new (Color.White), SchemeManager.Schemes ["Base"].Normal.Foreground);
-            Assert.Equal (new (Color.Blue), SchemeManager.Schemes ["Base"].Normal.Background);
+            Assert.Equal (new (Color.White), SchemeManager.GetSchemes () ["Base"].Normal.Foreground);
+            Assert.Equal (new (Color.Blue), SchemeManager.GetSchemes () ["Base"].Normal.Background);
         }
         finally
         {

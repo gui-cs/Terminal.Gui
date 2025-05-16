@@ -12,61 +12,63 @@ public partial class View
     /// <returns></returns>
     internal static Dictionary<string, Scheme?> GetHardCodedSchemes ()
     {
+        // ReSharper disable All
         return new (StringComparer.InvariantCultureIgnoreCase)
-    {
         {
-            SchemeManager.SchemesToSchemeName(Schemes.Base)!,
-            new(
-                new(new Color("LightSlateGray"), new Color("RaisinBlack"), TextStyle.None),
-                new(new Color("RaisinBlack"), new Color("LightSlateGray"), TextStyle.None),
-                new(new Color("LightSlateGray"), new Color("RaisinBlack"), TextStyle.Underline | TextStyle.Bold),
-                disabled: new(new Color("LightSlateGray"), new Color("RaisinBlack"), TextStyle.Faint),
-                hotFocus: new(new Color("RaisinBlack"), new Color("LightSlateGray"), TextStyle.Underline | TextStyle.Bold)
-            )
-        },
-        {
-            SchemeManager.SchemesToSchemeName(Schemes.Dialog)!,
-            new(
-                new(new Color("Black"), new Color("LightSlateGray"), TextStyle.None),
-                new(new Color("LightSlateGray"), new Color("Black"), TextStyle.None),
-                new(new Color("Black"), new Color("LightSlateGray"), TextStyle.Underline | TextStyle.Bold),
-                disabled: new(new Color("Black"), new Color("LightSlateGray"), TextStyle.Faint),
-                hotFocus: new(new Color("LightSlateGray"), new Color("Black"), TextStyle.Underline | TextStyle.Bold)
-            )
-        },
-        {
-            SchemeManager.SchemesToSchemeName(Schemes.Error)!,
-            new(
-                new(new Color("DarkRed"), new Color("DimGray"), TextStyle.Italic),
-                new(new Color("Red"), new Color("DimGray"), TextStyle.Italic),
-                new(new Color("DarkRed"), new Color("DimGray"), TextStyle.Underline | TextStyle.Italic),
-                disabled: new(new Color("Black"), new Color("DimGray"), TextStyle.Italic),
-                hotFocus: new(new Color("Red"), new Color("DimGray"), TextStyle.Underline | TextStyle.Italic)
-            )
-        },
-        {
-            SchemeManager.SchemesToSchemeName(Schemes.Menu)!,
-            new(
-                new(new Color("LightSlateGray"), new Color("Black"), TextStyle.Bold),
-                new(new Color("White"), new Color("Black"), TextStyle.Bold),
-                new(new Color("LightSlateGray"), new Color("Black"), TextStyle.Underline | TextStyle.Bold),
-                disabled: new(new Color("Black"), new Color("Gray"), TextStyle.Bold),
-                hotFocus: new(new Color("LightGray"), new Color("Black"), TextStyle.Underline | TextStyle.Bold)
-            )
-        },
-        {
-            SchemeManager.SchemesToSchemeName(Schemes.Toplevel)!,
-            new(
-                new(new Color("LightSlateGray"), new Color("RaisinBlack"), TextStyle.None),
-                new(new Color("LightSlateGray"), new Color("RaisinBlack"), TextStyle.Underline | TextStyle.Bold),
-                new(new Color("RaisinBlack"), new Color("LightSlateGray"), TextStyle.None),
-                disabled: new(new Color("LightSlateGray"), new Color("RaisinBlack"), TextStyle.Faint),
-                hotFocus: new(new Color("RaisinBlack"), new Color("LightSlateGray"), TextStyle.Underline | TextStyle.Bold)
-            )
-        }
-    };
-    }
+            {
+                SchemeManager.SchemesToSchemeName (Schemes.Base)!,
+                new (
+                     normal: new (new Color ("LightSlateGray"), new Color ("RaisinBlack"), TextStyle.None),
+                     focus: new (new Color ("RaisinBlack"), new Color ("LightSlateGray"), TextStyle.None),
+                     hotNormal: new (new Color ("LightSlateGray"), new Color ("RaisinBlack"), TextStyle.Underline | TextStyle.Bold),
+                     disabled: new (new Color ("LightSlateGray"), new Color ("RaisinBlack"), TextStyle.Faint),
+                     hotFocus: new (new Color ("RaisinBlack"), new Color ("LightSlateGray"), TextStyle.Underline | TextStyle.Bold)
+                    )
+            },
+            {
+                SchemeManager.SchemesToSchemeName (Schemes.Dialog)!,
+                new (
+                     normal: new (new Color ("Black"), new Color ("LightSlateGray"), TextStyle.None),
+                     focus: new (new Color ("LightSlateGray"), new Color ("Black"), TextStyle.None),
+                     hotNormal: new (new Color ("Black"), new Color ("LightSlateGray"), TextStyle.Underline | TextStyle.Bold),
+                     disabled: new (new Color ("Black"), new Color ("LightSlateGray"), TextStyle.Faint),
+                     hotFocus: new (new Color ("LightSlateGray"), new Color ("Black"), TextStyle.Underline | TextStyle.Bold)
+                    )
+            },
+            {
+                SchemeManager.SchemesToSchemeName (Schemes.Error)!,
+                new (
+                     normal: new (new Color ("DarkRed"), new Color ("DimGray"), TextStyle.Italic),
+                     focus: new (new Color ("Red"), new Color ("DimGray"), TextStyle.Italic),
+                     hotNormal: new (new Color ("DarkRed"), new Color ("DimGray"), TextStyle.Underline | TextStyle.Italic),
+                     disabled: new (new Color ("Black"), new Color ("DimGray"), TextStyle.Italic),
+                     hotFocus: new (new Color ("Red"), new Color ("DimGray"), TextStyle.Underline | TextStyle.Italic)
+                    )
+            },
+            {
+                SchemeManager.SchemesToSchemeName (Schemes.Menu)!,
+                new (
+                     normal: new (new Color ("LightSlateGray"), new Color ("Black"), TextStyle.Bold),
+                     focus: new (new Color ("White"), new Color ("Black"), TextStyle.Bold),
+                     hotNormal: new (new Color ("LightSlateGray"), new Color ("Black"), TextStyle.Underline | TextStyle.Bold),
+                     disabled: new (new Color ("Black"), new Color ("Gray"), TextStyle.Bold),
+                     hotFocus: new (new Color ("LightGray"), new Color ("Black"), TextStyle.Underline | TextStyle.Bold)
+                    )
+            },
+            {
+                SchemeManager.SchemesToSchemeName (Schemes.Toplevel)!,
+                new (
+                     normal: new (new Color ("LightSlateGray"), new Color ("Black"), TextStyle.None),
+                     focus: new (new Color ("Black"), new Color ("LightSlateGray"), TextStyle.None),
+                     hotNormal: new (new Color ("LightSlateGray"), new Color ("Black"), TextStyle.Underline | TextStyle.Bold),
+                     disabled: new (new Color ("LightSlateGray"), new Color ("Black"), TextStyle.Faint),
+                     hotFocus: new (new Color ("Black"), new Color ("LightSlateGray"), TextStyle.Underline | TextStyle.Bold)
+                    )
+            }
+        };
 
+        // ReSharper disable All
+    }
 
     /// <summary>
     ///     Gets or sets the name of the Scheme to use for this View. If set, it will override the scheme inherited from the
@@ -79,7 +81,8 @@ public partial class View
     private Scheme? _scheme;
 
     /// <summary>
-    ///     Gets whether a Scheme has been explicitly set for this View, or if it will inherit the Scheme from its <see cref="SuperView"/>.
+    ///     Gets whether a Scheme has been explicitly set for this View, or if it will inherit the Scheme from its
+    ///     <see cref="SuperView"/>.
     /// </summary>
     public bool HasScheme => _scheme is { };
 
@@ -105,12 +108,12 @@ public partial class View
 
         if (!HasScheme && !string.IsNullOrEmpty (SchemeName))
         {
-            return SchemeManager.GetSchemes () [SchemeName]!;
+            return SchemeManager.GetScheme (SchemeName);
         }
 
         if (!HasScheme)
         {
-            return SuperView?.GetScheme () ?? SchemeManager.GetSchemes () ["Base"]!;
+            return SuperView?.GetScheme () ?? SchemeManager.GetScheme (Schemes.Base);
         }
 
         return _scheme!;

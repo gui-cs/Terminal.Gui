@@ -457,7 +457,7 @@ public class AttributeView : View
     {
         if (LineDrawing.PromptForColor ("Background", Value.Background, out Color newColor))
         {
-            Value = new (Value.Foreground, newColor);
+            Value = new (Value.Foreground, newColor, Value.Style);
             SetNeedsDraw ();
         }
     }

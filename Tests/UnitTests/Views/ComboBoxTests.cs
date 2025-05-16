@@ -518,7 +518,7 @@ public class ComboBoxTests (ITestOutputHelper output)
 
         Assert.True (
                      cb.NewMouseEvent (
-                                       new() { Position = new (cb.Viewport.Right - 1, 0), Flags = MouseFlags.Button1Pressed }
+                                       new () { Position = new (cb.Viewport.Right - 1, 0), Flags = MouseFlags.Button1Pressed }
                                       )
                     );
         Assert.Equal ("", selected);
@@ -542,13 +542,13 @@ Three ",
         Attribute [] attributes =
         {
             // 0
-            cb.SubViews.ElementAt (0).GetScheme().Focus,
+            cb.SubViews.ElementAt (0).GetAttributeForRole(VisualRole.Focus),
 
             // 1
-            cb.SubViews.ElementAt(1).GetScheme().HotFocus,
+            cb.SubViews.ElementAt(1).GetAttributeForRole(VisualRole.HotFocus),
 
             // 2
-            cb.SubViews.ElementAt (1).GetScheme().Normal
+            cb.SubViews.ElementAt(1).GetAttributeForRole(VisualRole.Normal)
         };
 
         DriverAssert.AssertDriverAttributesAre (
