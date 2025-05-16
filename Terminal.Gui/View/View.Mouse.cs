@@ -97,14 +97,16 @@ public partial class View // Mouse APIs
                 return args.Cancel;
             }
 
-            if (HasScheme)
-            {
-                Scheme? cs = GetScheme ();
+            // BUGBUG: HighlightSty;e impl breaks Schemes - Disable it until fixed
 
-                _savedNonHoverScheme = cs;
+            //if (HasScheme)
+            //{
+            //    Scheme? cs = GetScheme ();
 
-                SetScheme (GetHighlightScheme ());
-            }
+            //    _savedNonHoverScheme = cs;
+
+            //    SetScheme (GetHighlightScheme ());
+            //}
 
             SetNeedsDraw ();
         }
@@ -773,7 +775,7 @@ public partial class View // Mouse APIs
                         // Invert Focus color foreground/background. We can do this because we know the view is not going to be focused.
                         Normal = new (GetScheme ().Focus.Background,
                                       GetScheme ().Normal.Foreground,
-                                      GetScheme().Focus.Style)
+                                      GetScheme ().Focus.Style)
                     };
                     SetScheme (cs);
                 }

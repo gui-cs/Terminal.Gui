@@ -80,6 +80,43 @@ public partial class View
     public Size GetContentSize () { return _contentSize ?? Viewport.Size; }
 
     /// <summary>
+    ///     Gets the size required for all of the View's SubViews.
+    /// </summary>
+    /// <returns></returns>
+    public Size GetSizeRequiredForSubViews ()
+    {
+        int maxWidth = 0;
+        int maxHeight = 0;
+
+        // If ContentSizeTracksViewport is false and there are no subviews, use the explicitly set ContentSize
+        if (!ContentSizeTracksViewport && InternalSubViews.Count == 0)
+        {
+            return GetContentSize ();
+        }
+
+        // Iterate through all subviews to calculate the maximum width and height
+        foreach (View subView in InternalSubViews)
+        {
+            // Calculate the width
+            if (subView.Width is { })
+            {
+                int subViewWidth = subView.X.GetAnchor (0) + subView.Width.Calculate (0, GetContentSize ().Width, subView, Dimension.Width);
+                maxWidth = Math.Max (maxWidth, subViewWidth);
+            }
+
+            // Calculate the height
+            if (subView.Height is { })
+            {
+                int subViewHeight = subView.Y.GetAnchor (0) + subView.Height.Calculate (0, GetContentSize ().Height, subView, Dimension.Height);
+                maxHeight = Math.Max (maxHeight, subViewHeight);
+            }
+        }
+
+        // Return the calculated maximum content size
+        return new Size (maxWidth, maxHeight);
+    }
+
+    /// <summary>
     ///     Gets or sets a value indicating whether the view's content size tracks the <see cref="Viewport"/>'s
     ///     size or not.
     /// </summary>
