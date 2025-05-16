@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Numerics;
 using System.Text.Json.Serialization;
 
@@ -80,13 +81,15 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                    VisualRole.HotNormal => HotNormal,
                    VisualRole.Focus => Focus,
                    VisualRole.HotFocus => HotFocus,
-
-                   //VisualRole.Active => Active,
-                   //VisualRole.HotActive => HotActive,
                    VisualRole.Disabled => Disabled,
 
                    // BUGBUG: This is a temporary test/hack
                    VisualRole.ReadOnly => Normal with { Style = TextStyle.Faint },
+
+                   // TODO: Add these to Attribute and implement them.
+                   //VisualRole.Active => Active,
+                   //VisualRole.HotActive => HotActive,
+                   //VisualRole.Highlight => Highlight,
                    _ => Normal
                };
     }
