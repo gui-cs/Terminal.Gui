@@ -170,11 +170,18 @@ public class ProgressBar : View, IDesignable
         if (ProgressBarFormat != ProgressBarFormat.Simple && !_isActivity)
         {
             var tf = new TextFormatter { Alignment = Alignment.Center, Text = Text };
-            var attr = new Attribute (GetAttributeForRole (VisualRole.HotNormal).Foreground, GetAttributeForRole (VisualRole.HotNormal).Background);
+
+            var attr = new Attribute (
+                                      GetAttributeForRole (VisualRole.HotNormal).Foreground,
+                                      GetAttributeForRole (VisualRole.HotNormal).Background,
+                                      GetAttributeForRole (VisualRole.HotNormal).Style);
 
             if (_fraction > .5)
             {
-                attr = new (GetAttributeForRole (VisualRole.HotNormal).Background, GetAttributeForRole (VisualRole.HotNormal).Foreground);
+                attr = new (
+                            GetAttributeForRole (VisualRole.HotNormal).Background,
+                            GetAttributeForRole (VisualRole.HotNormal).Foreground,
+                            GetAttributeForRole (VisualRole.HotNormal).Style);
             }
 
             tf.Draw (

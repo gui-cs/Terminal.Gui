@@ -115,7 +115,7 @@ namespace Terminal.Gui
                     string current = _provider != null
                                          ? _provider.ToString (false, false)
                                          : string.Empty;
-                    _provider = new MaskedTextProvider (value == string.Empty ? "&&&&&&" : value);
+                    _provider = new (value == string.Empty ? "&&&&&&" : value);
 
                     if (!string.IsNullOrEmpty (current))
                     {
@@ -206,7 +206,7 @@ namespace Terminal.Gui
 
                 if (result)
                 {
-                    OnTextChanged (new EventArgs<string> (in oldValue));
+                    OnTextChanged (new (in oldValue));
                 }
 
                 return result;
@@ -220,7 +220,7 @@ namespace Terminal.Gui
 
                 if (result)
                 {
-                    OnTextChanged (new EventArgs<string> (in oldValue));
+                    OnTextChanged (new (in oldValue));
                 }
 
                 return result;
@@ -333,7 +333,7 @@ namespace Terminal.Gui
                 {
                     string oldValue = Text;
                     _text.RemoveAt (pos);
-                    OnTextChanged (new EventArgs<string> (in oldValue));
+                    OnTextChanged (new (in oldValue));
                 }
 
                 return true;
@@ -349,7 +349,7 @@ namespace Terminal.Gui
                 {
                     string oldValue = Text;
                     _text.Insert (pos, (Rune)ch);
-                    OnTextChanged (new EventArgs<string> (in oldValue));
+                    OnTextChanged (new (in oldValue));
 
                     return true;
                 }
@@ -361,7 +361,7 @@ namespace Terminal.Gui
             public void OnTextChanged (EventArgs<string> args) { TextChanged?.Invoke (this, args); }
 
             /// <summary>Compiles the regex pattern for validation./></summary>
-            private void CompileMask () { _regex = new Regex (StringExtensions.ToString (_pattern), RegexOptions.Compiled); }
+            private void CompileMask () { _regex = new (StringExtensions.ToString (_pattern), RegexOptions.Compiled); }
 
             private void SetupText ()
             {
@@ -370,7 +370,7 @@ namespace Terminal.Gui
                     return;
                 }
 
-                _text = new List<Rune> ();
+                _text = new ();
             }
 
             private bool Validate (List<Rune> text)
@@ -563,8 +563,8 @@ namespace Terminal.Gui
                 return true;
             }
 
-            Color bgcolor = !IsValid ? new Color (Color.BrightRed) : GetAttributeForRole(VisualRole.Focus).Background;
-            var textColor = new Attribute (GetAttributeForRole(VisualRole.Focus).Foreground, bgcolor);
+            Color bgcolor = !IsValid ? new (Color.BrightRed) : GetAttributeForRole (VisualRole.Focus).Background;
+            var textColor = new Attribute (GetAttributeForRole (VisualRole.Focus).Foreground, bgcolor, GetAttributeForRole (VisualRole.Focus).Style);
 
             (int margin_left, int margin_right) = GetMargins (Viewport.Width);
 
@@ -641,6 +641,7 @@ namespace Terminal.Gui
             {
                 curPos = _cursorPosition + left;
             }
+
             Move (curPos, 0);
 
             return new (curPos, 0);

@@ -533,7 +533,7 @@ public class GraphViewExample : Scenario
 
         _about.Text = "This graph shows random points";
 
-        var black = new Attribute (_graphView.GetAttributeForRole (VisualRole.Normal).Foreground, Color.Black);
+        var black = new Attribute (_graphView.GetAttributeForRole (VisualRole.Normal).Foreground, Color.Black, _graphView.GetAttributeForRole (VisualRole.Normal).Style);
         var cyan = new Attribute (Color.BrightCyan, Color.Black);
         var magenta = new Attribute (Color.BrightMagenta, Color.Black);
         var red = new Attribute (Color.BrightRed, Color.Black);

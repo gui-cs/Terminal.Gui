@@ -90,7 +90,8 @@ public class ProgressBarStyles : Scenario
                                             HotNormal = new Attribute (
                                                                        newColor,
                                                                        editor.ViewToEdit.GetAttributeForRole (VisualRole.HotNormal)
-                                                                             .Background
+                                                                             .Background,
+                                                                          editor.ViewToEdit.GetAttributeForRole (VisualRole.HotNormal).Style
                                                                       )
                                         };
                                         editor.ViewToEdit.SetScheme (cs);
@@ -120,7 +121,8 @@ public class ProgressBarStyles : Scenario
                                         {
                                             HotNormal = new Attribute (
                                                                        editor.ViewToEdit!.GetAttributeForRole (VisualRole.Normal).Foreground,
-                                                                       newColor
+                                                                       newColor,
+                                                                       editor.ViewToEdit!.GetAttributeForRole (VisualRole.Normal).Style
                                                                       )
                                         };
                                         editor.ViewToEdit.SetScheme (cs);

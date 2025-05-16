@@ -2900,7 +2900,8 @@ public class TextView : View
 
         var attribute = new Attribute (
                                        newAttribute.Foreground,
-                                       newAttribute.Background
+                                       newAttribute.Background,
+                                       newAttribute.Style
                                       );
 
         ApplyCellsAttribute (attribute);
@@ -4008,11 +4009,11 @@ public class TextView : View
 
         if (cellAttribute!.Value.Foreground == cellAttribute.Value.Background)
         {
-            attribute = new (cellAttribute.Value.Foreground, cellAttribute.Value.Background);
+            attribute = new (cellAttribute.Value.Foreground, cellAttribute.Value.Background, cellAttribute.Value.Style);
         }
         else
         {
-            attribute = new (cellAttribute.Value.Foreground, GetAttributeForRole (VisualRole.Focus).Background);
+            attribute = new (cellAttribute.Value.Foreground, GetAttributeForRole (VisualRole.Focus).Background, cellAttribute.Value.Style);
         }
 
         SetAttribute (attribute);
@@ -4038,7 +4039,7 @@ public class TextView : View
             Attribute? attribute = line [idxCol].Attribute;
 
             SetAttribute (
-                                 new (attribute!.Value.Background, attribute.Value.Foreground)
+                                 new (attribute!.Value.Background, attribute.Value.Foreground, attribute!.Value.Style)
                                 );
         }
         else
@@ -4046,7 +4047,8 @@ public class TextView : View
             SetAttribute (
                                  new (
                                       GetAttributeForRole (VisualRole.Focus).Background,
-                                      GetAttributeForRole (VisualRole.Focus).Foreground
+                                      GetAttributeForRole (VisualRole.Focus).Foreground,
+                                      GetAttributeForRole (VisualRole.Focus).Style
                                      )
                                 );
         }
@@ -6314,7 +6316,7 @@ public class TextView : View
     {
         // BUGBUG: (v2 truecolor) This code depends on 8-bit color names; disabling for now
         //if ((scheme!.HotNormal.Foreground & scheme.Focus.Background) == scheme.Focus.Foreground) {
-        SetAttribute (new (attribute!.Value.Background, attribute!.Value.Foreground));
+        SetAttribute (new (attribute!.Value.Background, attribute!.Value.Foreground, attribute!.Value.Style));
     }
 
     /// <summary>Restore from original model.</summary>

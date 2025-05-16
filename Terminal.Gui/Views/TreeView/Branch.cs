@@ -135,7 +135,7 @@ internal class Branch<T> where T : class
 
             if (_tree.Style.InvertExpandSymbolColors)
             {
-                color = new (color.Background, color.Foreground);
+                color = new (color.Background, color.Foreground, color.Style);
             }
 
             attr = color;

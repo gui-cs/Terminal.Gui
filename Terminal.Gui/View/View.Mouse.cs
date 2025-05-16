@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System.ComponentModel;
-using static Unix.Terminal.Delegates;
 
 namespace Terminal.Gui;
 
@@ -87,7 +86,7 @@ public partial class View // Mouse APIs
         }
 
         // Post-conditions
-        if (HighlightStyle.HasFlag (HighlightStyle.Hover)/* || Diagnostics.HasFlag (ViewDiagnosticFlags.Hover)*/)
+        if (HighlightStyle.HasFlag (HighlightStyle.Hover) /* || Diagnostics.HasFlag (ViewDiagnosticFlags.Hover)*/)
         {
             HighlightStyle copy = HighlightStyle;
             var hover = HighlightStyle.Hover;
@@ -124,10 +123,22 @@ public partial class View // Mouse APIs
 
         return cs with
         {
-            Normal = new (GetAttributeForRole (VisualRole.Normal).Foreground.GetHighlightColor (), GetAttributeForRole (VisualRole.Normal).Background),
-            HotNormal = new (GetAttributeForRole (VisualRole.HotNormal).Foreground.GetHighlightColor (), GetAttributeForRole (VisualRole.HotNormal).Background),
-            Focus = new (GetAttributeForRole (VisualRole.Focus).Foreground.GetHighlightColor (), GetAttributeForRole (VisualRole.Focus).Background),
-            HotFocus = new (GetAttributeForRole (VisualRole.HotFocus).Foreground.GetHighlightColor (), GetAttributeForRole (VisualRole.HotFocus).Background)
+            Normal = new (
+                          GetAttributeForRole (VisualRole.Normal).Foreground.GetHighlightColor (),
+                          GetAttributeForRole (VisualRole.Normal).Background,
+                          GetAttributeForRole (VisualRole.Normal).Style),
+            HotNormal = new (
+                             GetAttributeForRole (VisualRole.HotNormal).Foreground.GetHighlightColor (),
+                             GetAttributeForRole (VisualRole.HotNormal).Background,
+                             GetAttributeForRole (VisualRole.HotNormal).Style),
+            Focus = new (
+                         GetAttributeForRole (VisualRole.Focus).Foreground.GetHighlightColor (),
+                         GetAttributeForRole (VisualRole.Focus).Background,
+                         GetAttributeForRole (VisualRole.Focus).Style),
+            HotFocus = new (
+                            GetAttributeForRole (VisualRole.HotFocus).Foreground.GetHighlightColor (),
+                            GetAttributeForRole (VisualRole.HotFocus).Background,
+                            GetAttributeForRole (VisualRole.HotFocus).Style)
         };
     }
 
@@ -212,7 +223,7 @@ public partial class View // Mouse APIs
         // Post-conditions
         _hovering = false;
 
-        if (HighlightStyle.HasFlag (HighlightStyle.Hover)/* || Diagnostics.HasFlag (ViewDiagnosticFlags.Hover)*/)
+        if (HighlightStyle.HasFlag (HighlightStyle.Hover) /* || Diagnostics.HasFlag (ViewDiagnosticFlags.Hover)*/)
         {
             HighlightStyle copy = HighlightStyle;
             var hover = HighlightStyle.None;
@@ -579,7 +590,6 @@ public partial class View // Mouse APIs
             // If mouse is still in bounds, generate a click
             if (!WantMousePositionReports && Viewport.Contains (mouseEvent.Position))
             {
-
                 return RaiseMouseClickEvent (mouseEvent);
             }
 
@@ -749,7 +759,10 @@ public partial class View // Mouse APIs
                     var cs = new Scheme (GetScheme ())
                     {
                         // Highlight the foreground focus color
-                        Focus = new (GetScheme ().Focus.Foreground.GetHighlightColor (), GetScheme ().Focus.Background.GetHighlightColor ())
+                        Focus = new (
+                                     GetScheme ().Focus.Foreground.GetHighlightColor (),
+                                     GetScheme ().Focus.Background.GetHighlightColor (),
+                                     GetScheme ().Focus.Style)
                     };
                     SetScheme (cs);
                 }
@@ -758,7 +771,9 @@ public partial class View // Mouse APIs
                     var cs = new Scheme (GetScheme ())
                     {
                         // Invert Focus color foreground/background. We can do this because we know the view is not going to be focused.
-                        Normal = new (GetScheme ().Focus.Background, GetScheme ().Normal.Foreground)
+                        Normal = new (GetScheme ().Focus.Background,
+                                      GetScheme ().Normal.Foreground,
+                                      GetScheme().Focus.Style)
                     };
                     SetScheme (cs);
                 }
@@ -863,7 +878,7 @@ public partial class View // Mouse APIs
                 // In the case start is transparent, recursively add all it's subviews etc...
                 if (start.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
                 {
-                    viewsUnderMouse.AddRange (View.GetViewsUnderMouse (location, true));
+                    viewsUnderMouse.AddRange (GetViewsUnderMouse (location, true));
 
                     // De-dupe viewsUnderMouse
                     HashSet<View?> hashSet = [.. viewsUnderMouse];

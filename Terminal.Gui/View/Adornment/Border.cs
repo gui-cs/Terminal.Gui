@@ -256,7 +256,9 @@ public class Border : Adornment
 
             var cs = new Scheme (GetScheme ())
             {
-                Normal = new (GetScheme ().Normal.Foreground.GetHighlightColor (), GetScheme ().Normal.Background)
+                Normal = new (GetScheme ().Normal.Foreground.GetHighlightColor (), 
+                              GetScheme ().Normal.Background,
+                              GetScheme ().Normal.Style)
             };
             SetScheme (cs);
         }
@@ -265,7 +267,7 @@ public class Border : Adornment
         {
             var cs = new Scheme (GetScheme ())
             {
-                Normal = new (_savedForeColor.Value, GetScheme ().Normal.Background)
+                Normal = new (_savedForeColor.Value, GetScheme ().Normal.Background, GetScheme().Normal.Style)
             };
             SetScheme (cs);
         }

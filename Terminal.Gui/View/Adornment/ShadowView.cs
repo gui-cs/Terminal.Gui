@@ -35,7 +35,8 @@ internal class ShadowView : View
             currentAttribute =
                         new Attribute (
                                        ShadowStyle == ShadowStyle.Opaque ? Color.Black : attr.Foreground.GetDarkerColor (),
-                                       ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Background.GetDarkerColor ());
+                                       ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Background.GetDarkerColor (),
+                                       attr.Style);
 
 
             return true;

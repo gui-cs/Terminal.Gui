@@ -108,7 +108,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
             throw new ArgumentException ($"Invalid scheme name: {schemeName}");
         }
 
-        return GetSchemes ()! [schemeNameString]!;
+        return GetSchemesForCurrentTheme ()! [schemeNameString]!;
     }
 
     /// <summary>
@@ -119,7 +119,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     /// <exception cref="ArgumentException"></exception>
     public static Scheme GetScheme (string schemeName)
     {
-        return GetSchemes ()! [schemeName]!;
+        return GetSchemesForCurrentTheme ()! [schemeName]!;
     }
 
     /// <summary>
