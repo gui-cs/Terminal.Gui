@@ -189,14 +189,15 @@ public class UICatalogTop : Toplevel
                 _themesRg = new ()
                 {
                     HighlightStyle = HighlightStyle.None,
-                    SelectedItem = ThemeManager.GetThemeNames ().IndexOf (ThemeManager.GetCurrentThemeName ())
                 };
 
                 _themesRg.SelectedItemChanged += (_, args) =>
                                                  {
+                                                     if (args.SelectedItem is null)
+                                                     {
+                                                         return;
+                                                     }
                                                      ThemeManager.Theme = ThemeManager.GetThemeNames () [args.SelectedItem!.Value];
-                                                     ConfigurationManager.Apply ();
-                                                     SetNeedsDraw ();
                                                  };
 
                 var menuItem = new MenuItemv2
@@ -212,11 +213,14 @@ public class UICatalogTop : Toplevel
                 _topSchemeRg = new ()
                 {
                     HighlightStyle = HighlightStyle.None,
-                    SelectedItem = SchemeManager.GetSchemesForCurrentTheme ()!.Keys.ToList ().IndexOf (CachedTopLevelScheme!)
                 };
 
                 _topSchemeRg.SelectedItemChanged += (_, args) =>
                                                     {
+                                                        if (args.SelectedItem is null)
+                                                        {
+                                                            return;
+                                                        }
                                                         CachedTopLevelScheme = SchemeManager.GetSchemesForCurrentTheme ()!.Keys.ToArray () [args.SelectedItem!.Value];
                                                         SchemeName = CachedTopLevelScheme;
                                                         SetNeedsDraw ();
@@ -349,10 +353,11 @@ public class UICatalogTop : Toplevel
             return;
         }
 
+        _themesRg.SelectedItem = null;
         _themesRg.AssignHotKeysToCheckBoxes = true;
         _themesRg.UsedHotKeys.Clear ();
         _themesRg.Options = ThemeManager.GetThemeNames ();
-        _themesRg.SelectedItem = ThemeManager.GetThemeNames ().IndexOf (ThemeManager.GetCurrentThemeName ());
+        _themesRg.SelectedItem =ThemeManager.GetThemeNames ().IndexOf (ThemeManager.GetCurrentThemeName ());
 
         if (_topSchemeRg is null)
         {
@@ -361,9 +366,9 @@ public class UICatalogTop : Toplevel
 
         _topSchemeRg.AssignHotKeysToCheckBoxes = true;
         _topSchemeRg.UsedHotKeys.Clear ();
-        int? selected = _topSchemeRg.SelectedItem;
+        int? selectedScheme = _topSchemeRg.SelectedItem;
         _topSchemeRg.Options = SchemeManager.GetSchemeNames ();
-        _topSchemeRg.SelectedItem = selected;
+        _topSchemeRg.SelectedItem = selectedScheme;
 
         if (CachedTopLevelScheme is null || !SchemeManager.GetSchemeNames ().Contains (CachedTopLevelScheme))
         {
