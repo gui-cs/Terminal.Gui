@@ -25,9 +25,9 @@ public sealed class PosAlignDemo : Scenario
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()} - {GetDescription ()}"
         };
 
-        SetupControls (appWindow, Dimension.Width, SchemeManager.Schemes ["TopLevel"]);
+        SetupControls (appWindow, Dimension.Width, Schemes.Toplevel);
 
-        SetupControls (appWindow, Dimension.Height, SchemeManager.Schemes ["Error"]);
+        SetupControls (appWindow, Dimension.Height, Schemes.Error);
 
         Setup3By3Grid (appWindow);
 
@@ -39,12 +39,12 @@ public sealed class PosAlignDemo : Scenario
         Application.Shutdown ();
     }
 
-    private void SetupControls (Window appWindow, Dimension dimension, Scheme scheme)
+    private void SetupControls (Window appWindow, Dimension dimension, Schemes scheme)
     {
         RadioGroup alignRadioGroup = new ()
         {
             RadioLabels = Enum.GetNames<Alignment> (),
-            Scheme = scheme
+            SchemeName = SchemeManager.SchemesToSchemeName (scheme),
         };
 
         if (dimension == Dimension.Width)
@@ -81,7 +81,7 @@ public sealed class PosAlignDemo : Scenario
 
         CheckBox endToStartCheckBox = new ()
         {
-            Scheme = scheme,
+            SchemeName = SchemeManager.SchemesToSchemeName (scheme),
             Text = "EndToStart"
         };
 
@@ -119,7 +119,7 @@ public sealed class PosAlignDemo : Scenario
 
         CheckBox ignoreFirstOrLast = new ()
         {
-            Scheme = scheme,
+            SchemeName = SchemeManager.SchemesToSchemeName (scheme),
             Text = "IgnoreFirstOrLast"
         };
 
@@ -157,7 +157,7 @@ public sealed class PosAlignDemo : Scenario
 
         CheckBox addSpacesBetweenItems = new ()
         {
-            Scheme = scheme,
+            SchemeName = SchemeManager.SchemesToSchemeName (scheme),
             Text = "AddSpaceBetweenItems"
         };
 
@@ -196,7 +196,7 @@ public sealed class PosAlignDemo : Scenario
 
         CheckBox margin = new ()
         {
-            Scheme = scheme,
+            SchemeName = SchemeManager.SchemesToSchemeName (scheme),
             Text = "Margin"
         };
 
@@ -240,7 +240,7 @@ public sealed class PosAlignDemo : Scenario
         {
             Width = 9,
             Title = "Added",
-            Scheme = scheme,
+            SchemeName = SchemeManager.SchemesToSchemeName (scheme),
             BorderStyle = LineStyle.None,
             Value = addedViews.Count
         };
@@ -353,7 +353,7 @@ public sealed class PosAlignDemo : Scenario
             Height = Dim.Percent (40)
         };
         container.Padding.Thickness = new (8, 1, 0, 0);
-        container.Padding.Scheme = SchemeManager.Schemes ["error"];
+        container.Padding.SchemeName = "Error";
 
         Aligner widthAligner = new () { AlignmentModes = AlignmentModes.StartToEnd };
 

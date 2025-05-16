@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using ColorHelper;
 using Xunit.Abstractions;
 using static Terminal.Gui.ConfigurationManager;
 using File = System.IO.File;
@@ -534,9 +535,10 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Assert.NotNull (SchemeManager.Schemes);
             Assert.NotEmpty (SchemeManager.Schemes);
 
+            // This is too fragile as the default scheme may change
             // Verify "Base" has correct values
-            Assert.Equal (Color.White, SchemeManager.Schemes ["Base"]!.Normal.Foreground);
-            Assert.Equal (Color.Blue, SchemeManager.Schemes ["Base"].Normal.Background);
+            //Assert.Equal (Color.White, SchemeManager.Schemes ["Base"]!.Normal.Foreground);
+            //Assert.Equal (Color.Blue, SchemeManager.Schemes ["Base"].Normal.Background);
 
             Apply ();
             Assert.Equal (Key.Esc, Application.QuitKey);

@@ -23,6 +23,7 @@ public class AllViewsTester : Scenario
     private ViewportSettingsEditor? _viewportSettingsEditor;
     private FrameView? _settingsPane;
     private RadioGroup? _orientation;
+    private CheckBox? _enabledCheckBox;
     private string _demoText = "This, that, and the other thing.";
     private TextView? _demoTextView;
 
@@ -44,6 +45,7 @@ public class AllViewsTester : Scenario
         // Set the BorderStyle we use for all subviews, but disable the app border thickness
         app.Border!.LineStyle = LineStyle.Heavy;
         app.Border.Thickness = new (0);
+
 
         _viewClasses = GetAllViewClassesCollection ()
                        .OrderBy (t => t.Name)
@@ -179,7 +181,26 @@ public class AllViewsTester : Scenario
                                             };
         _settingsPane.Add (label, _orientation);
 
-        label = new () { X = 0, Y = Pos.Bottom (_orientation), Text = "_Text:" };
+        label = new () { X = Pos.Right (_orientation) + 1, Y = 0, Text = "_Enabled:" };
+
+        _enabledCheckBox = new ()
+        {
+            X = Pos.Right (label) + 1,
+            Y = Pos.Top (label),
+            CheckedState = _curView is { } ? (_curView.Enabled ? CheckState.Checked : CheckState.UnChecked) : CheckState.UnChecked
+        };
+
+        _enabledCheckBox.CheckedStateChanged += (s, args) =>
+                                                {
+                                                    if (_curView is { })
+                                                    {
+                                                        _curView.Enabled = _enabledCheckBox.CheckedState == CheckState.Checked;
+                                                    }
+
+                                                };
+        _settingsPane.Add (label, _enabledCheckBox);
+
+        label = new () { X = 0, Y = Pos.Bottom (_enabledCheckBox), Text = "_Text:" };
 
         _demoTextView = new ()
         {
@@ -245,10 +266,10 @@ public class AllViewsTester : Scenario
             BorderStyle = LineStyle.Double,
             SuperViewRendersLineCanvas = true
         };
-        _hostPane.Border!.Scheme = app.Scheme;
+        _hostPane.Border!.SetScheme (app.GetScheme ());
         _hostPane.Padding!.Thickness = new (1);
         _hostPane.Padding.Diagnostics = ViewDiagnosticFlags.Ruler;
-        _hostPane.Padding.Scheme = app.Scheme;
+        _hostPane.Padding.SetScheme (app.GetScheme ());
 
         app.Add (_classListView, _adornmentsEditor, _arrangementEditor, _layoutEditor, _viewportSettingsEditor, _settingsPane, _eventLog, _hostPane);
 
@@ -296,7 +317,7 @@ public class AllViewsTester : Scenario
         // Ensure the type does not contain any generic parameters
         if (type.ContainsGenericParameters)
         {
-            Logging.Warning($"Cannot create an instance of {type} because it contains generic parameters.");
+            Logging.Warning ($"Cannot create an instance of {type} because it contains generic parameters.");
             //throw new ArgumentException ($"Cannot create an instance of {type} because it contains generic parameters.");
             return;
         }
@@ -324,6 +345,8 @@ public class AllViewsTester : Scenario
         {
             _orientation!.Enabled = false;
         }
+
+        _enabledCheckBox!.CheckedState = view.Enabled ? CheckState.Checked : CheckState.UnChecked;
 
         view.Initialized += CurrentView_Initialized;
         view.SubViewsLaidOut += CurrentView_LayoutComplete;
@@ -379,7 +402,7 @@ public class AllViewsTester : Scenario
             return;
         }
 
-        if (view.Width == Dim.Absolute(0) || view.Width is null)
+        if (view.Width == Dim.Absolute (0) || view.Width is null)
         {
             view.Width = Dim.Fill ();
         }

@@ -18,10 +18,10 @@ public class MarginTests (ITestOutputHelper output)
         Application.Top = new Toplevel ();
         Application.TopLevels.Push (Gui.Application.Top);
 
-        Application.Top.Scheme = new()
+        Application.Top.SetScheme (new()
         {
             Normal = new (Color.Red, Color.Green), Focus = new (Color.Green, Color.Red)
-        };
+        });
 
         Application.Top.Add (view);
         Assert.Equal (ColorName16.Red, view.Margin.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());

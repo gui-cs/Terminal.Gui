@@ -19,12 +19,12 @@ public class BorderTests (ITestOutputHelper output)
         view.Border!.Thickness = new (0, 1, 0, 0);
         view.Border.LineStyle = LineStyle.Single;
 
-        view.Scheme = new ()
+        view.SetScheme (new ()
         {
             Normal = new (Color.Red, Color.Green),
             Focus = new (Color.Green, Color.Red)
-        };
-        Assert.NotEqual (view.Scheme.Normal.Foreground, view.Scheme.Focus.Foreground);
+        });
+        Assert.NotEqual (view.GetScheme ().Normal.Foreground, view.GetScheme ().Focus.Foreground);
         Assert.Equal (ColorName16.Red, view.Border.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
         Assert.Equal (ColorName16.Green, view.Border.GetAttributeForRole (VisualRole.Focus).Foreground.GetClosestNamedColor16 ());
         Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border.GetAttributeForRole (VisualRole.Focus));
@@ -35,16 +35,16 @@ public class BorderTests (ITestOutputHelper output)
 
         var expected = @"─┤A├─";
         DriverAssert.AssertDriverContentsAre (expected, output);
-        DriverAssert.AssertDriverAttributesAre ("00000", output, null, view.Scheme.Normal);
+        DriverAssert.AssertDriverAttributesAre ("00000", output, null, view.GetScheme ().Normal);
 
         view.CanFocus = true;
         view.SetFocus ();
         View.SetClipToScreen ();
         view.Draw ();
         Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border.GetAttributeForRole (VisualRole.Focus));
-        Assert.Equal (view.Scheme.Focus.Foreground, view.Border.GetAttributeForRole (VisualRole.Focus).Foreground);
-        Assert.Equal (view.Scheme.Normal.Foreground, view.Border.GetAttributeForRole (VisualRole.Normal).Foreground);
-        DriverAssert.AssertDriverAttributesAre ("00100", output, null, view.Scheme.Normal, view.GetAttributeForRole (VisualRole.Focus));
+        Assert.Equal (view.GetScheme ().Focus.Foreground, view.Border.GetAttributeForRole (VisualRole.Focus).Foreground);
+        Assert.Equal (view.GetScheme ().Normal.Foreground, view.Border.GetAttributeForRole (VisualRole.Normal).Foreground);
+        DriverAssert.AssertDriverAttributesAre ("00100", output, null, view.GetScheme ().Normal, view.GetAttributeForRole (VisualRole.Focus));
     }
 
     [Fact]
@@ -55,10 +55,10 @@ public class BorderTests (ITestOutputHelper output)
         view.Border.Thickness = new (0, 1, 0, 0);
         view.Border.LineStyle = LineStyle.Single;
 
-        view.Scheme = new ()
+        view.SetScheme (new ()
         {
             Normal = new (Color.Red, Color.Green), Focus = new (Color.Green, Color.Red)
-        };
+        });
         Assert.Equal (ColorName16.Red, view.Border.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
         Assert.Equal (ColorName16.Green, view.Border.GetAttributeForRole (VisualRole.Focus).Foreground.GetClosestNamedColor16 ());
         Assert.Equal (view.GetAttributeForRole (VisualRole.Normal), view.Border.GetAttributeForRole (VisualRole.Normal));
@@ -70,7 +70,7 @@ public class BorderTests (ITestOutputHelper output)
 
         var expected = @"─┤A├─";
         DriverAssert.AssertDriverContentsAre (expected, output);
-        DriverAssert.AssertDriverAttributesAre ("00000", output, null, view.Scheme.Normal);
+        DriverAssert.AssertDriverAttributesAre ("00000", output, null, view.GetScheme ().Normal);
     }
 
     [Theory]

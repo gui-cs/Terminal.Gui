@@ -34,7 +34,7 @@ public class SchemeTests
     {
         var scheme = new Scheme ();
         var lbl = new Label ();
-        lbl.Scheme = scheme;
+        lbl.SetScheme (scheme);
         lbl.Draw ();
     }
 

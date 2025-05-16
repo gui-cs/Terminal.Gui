@@ -320,7 +320,7 @@ public class MenuBar : View, IDesignable
 
             if (i == _selected && IsMenuOpen)
             {
-                hotColor = i == _selected ? Scheme!.HotFocus : GetAttributeForRole (VisualRole.HotNormal);
+                hotColor = i == _selected ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal);
                 normalColor = i == _selected ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal);
             }
             else

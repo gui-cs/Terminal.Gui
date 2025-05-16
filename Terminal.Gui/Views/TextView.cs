@@ -2871,7 +2871,7 @@ public class TextView : View
                 return new (attributeSel);
             }
 
-            return new (Scheme!.Focus);
+            return GetAttributeForRole (VisualRole.Focus);
         }
 
         line = GetCurrentLine ();
@@ -2881,7 +2881,7 @@ public class TextView : View
             return new (attribute);
         }
 
-        return new (Scheme!.Focus);
+        return GetAttributeForRole (VisualRole.Focus);
     }
 
     /// <summary>
@@ -3252,7 +3252,7 @@ public class TextView : View
     public void Load (List<Cell> cells)
     {
         SetWrapModel ();
-        _model.LoadCells (cells, Scheme?.Focus);
+        _model.LoadCells (cells, GetAttributeForRole (VisualRole.Focus));
         _historyText.Clear (_model.GetAllLines ());
         ResetPosition ();
         SetNeedsDraw ();
@@ -3266,7 +3266,7 @@ public class TextView : View
     {
         SetWrapModel ();
         InheritsPreviousAttribute = true;
-        _model.LoadListCells (cellsList, Scheme?.Focus);
+        _model.LoadListCells (cellsList, GetAttributeForRole (VisualRole.Focus));
         _historyText.Clear (_model.GetAllLines ());
         ResetPosition ();
         SetNeedsDraw ();
@@ -4003,7 +4003,7 @@ public class TextView : View
         var ev = new CellEventArgs (line, idxCol, unwrappedPos);
         DrawReadOnlyColor?.Invoke (this, ev);
 
-        Attribute? cellAttribute = line [idxCol].Attribute is { } ? line [idxCol].Attribute : Scheme?.Disabled;
+        Attribute? cellAttribute = line [idxCol].Attribute is { } ? line [idxCol].Attribute : GetAttributeForRole (VisualRole.ReadOnly);
         Attribute attribute;
 
         if (cellAttribute!.Value.Foreground == cellAttribute.Value.Background)
@@ -4012,7 +4012,7 @@ public class TextView : View
         }
         else
         {
-            attribute = new (cellAttribute.Value.Foreground, Scheme!.Focus.Background);
+            attribute = new (cellAttribute.Value.Foreground, GetAttributeForRole (VisualRole.Focus).Background);
         }
 
         SetAttribute (attribute);
@@ -4045,8 +4045,8 @@ public class TextView : View
         {
             SetAttribute (
                                  new (
-                                      Scheme!.Focus.Background,
-                                      Scheme!.Focus.Foreground
+                                      GetAttributeForRole (VisualRole.Focus).Background,
+                                      GetAttributeForRole (VisualRole.Focus).Foreground
                                      )
                                 );
         }
@@ -4074,7 +4074,7 @@ public class TextView : View
         }
         else
         {
-            SetValidUsedColor (Scheme?.Focus);
+            SetValidUsedColor (GetAttributeForRole (VisualRole.Focus));
         }
     }
 
@@ -6346,7 +6346,7 @@ public class TextView : View
             _currentCulture = Thread.CurrentThread.CurrentUICulture;
         }
 
-        ContextMenu?.MakeVisible(ViewportToScreen(new Point (CursorPosition.X, CursorPosition.Y)));
+        ContextMenu?.MakeVisible (ViewportToScreen (new Point (CursorPosition.X, CursorPosition.Y)));
     }
 
     private void StartSelecting ()
@@ -6396,7 +6396,7 @@ public class TextView : View
 
     private void TextView_SuperViewChanged (object sender, SuperViewChangedEventArgs e)
     {
-        if (e.SuperView is {})
+        if (e.SuperView is { })
         {
             if (Autocomplete.HostControl is null)
             {

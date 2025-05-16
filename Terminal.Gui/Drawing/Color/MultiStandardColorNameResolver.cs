@@ -12,7 +12,7 @@ namespace Terminal.Gui;
 public class MultiStandardColorNameResolver : IColorNameResolver
 {
     private static readonly AnsiColorNameResolver Ansi = new();
-    private static readonly W3cColorNameResolver W3c = new();
+    private static readonly StandardColorsNameResolver W3c = new();
     private static readonly FrozenSet<Color> W3cBlockedColors;
     private static readonly ImmutableArray<string> CombinedColorNames;
     private static readonly FrozenDictionary<int, (string Name, Color Color)> W3cSubstituteColors;

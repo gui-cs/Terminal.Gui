@@ -156,7 +156,7 @@ public class Sliders : Scenario
             Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            Scheme = SchemeManager.Schemes ["Dialog"]
+            SchemeName = "Dialog"
         };
 
         app.Add (configView);
@@ -487,19 +487,17 @@ public class Sliders : Scenario
 
                                                 foreach (Slider s in app.SubViews.OfType<Slider> ())
                                                 {
-                                                    s.Scheme = new Scheme (s.Scheme);
-
-                                                    s.Scheme = new Scheme (s.Scheme)
+                                                    s.SetScheme (new Scheme (s.GetScheme ())
                                                     {
                                                         Normal = new Attribute (
                                                                                 data.Item2,
-                                                                                s.Scheme.Normal.Background
+                                                                                s.GetAttributeForRole (VisualRole.Normal).Background
                                                                                )
-                                                    };
+                                                    });
 
                                                     s.Style.OptionChar = s.Style.OptionChar with
                                                     {
-                                                        Attribute = new Attribute (data.Item1, s.Scheme.Normal.Background)
+                                                        Attribute = new Attribute (data.Item1, s.GetAttributeForRole (VisualRole.Normal).Background)
                                                     };
 
                                                     s.Style.SetChar = s.Style.SetChar with
@@ -507,23 +505,23 @@ public class Sliders : Scenario
                                                         Attribute = new Attribute (
                                                                                    data.Item1,
                                                                                    s.Style.SetChar.Attribute?.Background
-                                                                                   ?? s.Scheme.Normal.Background
+                                                                                   ?? s.GetAttributeForRole (VisualRole.Normal).Background
                                                                                   )
                                                     };
-                                                    s.Style.LegendAttributes.SetAttribute = new Attribute (data.Item1, s.Scheme.Normal.Background);
+                                                    s.Style.LegendAttributes.SetAttribute = new Attribute (data.Item1, s.GetAttributeForRole (VisualRole.Normal).Background);
 
                                                     s.Style.RangeChar = s.Style.RangeChar with
                                                     {
-                                                        Attribute = new Attribute (data.Item1, s.Scheme.Normal.Background)
+                                                        Attribute = new Attribute (data.Item1, s.GetAttributeForRole (VisualRole.Normal).Background)
                                                     };
 
                                                     s.Style.SpaceChar = s.Style.SpaceChar with
                                                     {
-                                                        Attribute = new Attribute (data.Item1, s.Scheme.Normal.Background)
+                                                        Attribute = new Attribute (data.Item1, s.GetAttributeForRole (VisualRole.Normal).Background)
                                                     };
 
                                                     s.Style.LegendAttributes.NormalAttribute =
-                                                        new Attribute (data.Item1, s.Scheme.Normal.Background);
+                                                        new Attribute (data.Item1, s.GetAttributeForRole (VisualRole.Normal).Background);
                                                 }
                                             }
                                         };
@@ -557,13 +555,13 @@ public class Sliders : Scenario
 
                                                 foreach (Slider s in app.SubViews.OfType<Slider> ())
                                                 {
-                                                    s.Scheme = new Scheme (s.Scheme)
+                                                    s.SetScheme (new Scheme (s.GetScheme ())
                                                     {
                                                         Normal = new Attribute (
-                                                                                s.Scheme.Normal.Foreground,
+                                                                                s.GetAttributeForRole (VisualRole.Normal).Foreground,
                                                                                 data.Item2
                                                                                )
-                                                    };
+                                                    });
                                                 }
                                             }
                                         };
@@ -579,7 +577,7 @@ public class Sliders : Scenario
             Y = Pos.Bottom (spacingOptions),
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            Scheme = SchemeManager.Schemes ["Toplevel"],
+            SchemeName = "TopLevel",
             Source = new ListWrapper<string> (eventSource)
         };
         configView.Add (eventLog);
@@ -589,7 +587,7 @@ public class Sliders : Scenario
         {
             slider.Accepting += (o, args) =>
                              {
-                                 eventSource.Add ($"Accept: {string.Join(",", slider.GetSetOptions ())}");
+                                 eventSource.Add ($"Accept: {string.Join (",", slider.GetSetOptions ())}");
                                  eventLog.MoveDown ();
                                  args.Handled = true;
                              };

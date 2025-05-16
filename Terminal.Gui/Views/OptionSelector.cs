@@ -197,7 +197,7 @@ public class OptionSelector : View, IOrientation, IDesignable
                         // If _scheme was set, it's because of Hover
                         if (checkbox.HasScheme)
                         {
-                            e.NewValue = checkbox.Scheme!.Normal;
+                            e.NewValue = checkbox.GetAttributeForRole(VisualRole.Normal);
                         }
                         else
                         {

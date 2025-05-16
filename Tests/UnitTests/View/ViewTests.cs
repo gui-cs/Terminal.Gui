@@ -210,8 +210,8 @@ public class ViewTests
         Assert.Equal (new (0, 0, 0, 0), r.Frame);
         Assert.Null (r.Focused);
         Assert.False (r.HasScheme);
-        Assert.NotNull (r.Scheme);
-        Assert.Equal (r.Scheme, SchemeManager.GetCurrentSchemes () ["Base"]);
+        Assert.NotNull (r.GetScheme ());
+        Assert.Equal (r.GetScheme (), SchemeManager.GetSchemes () ["Base"]);
         Assert.Equal (0, r.Width);
         Assert.Equal (0, r.Height);
         Assert.Equal (0, r.X);
@@ -236,8 +236,8 @@ public class ViewTests
         Assert.Equal (new (0, 0, 0, 0), r.Frame);
         Assert.Null (r.Focused);
         Assert.False (r.HasScheme);
-        Assert.NotNull (r.Scheme);
-        Assert.Equal (r.Scheme, SchemeManager.GetCurrentSchemes () ["Base"]);
+        Assert.NotNull (r.GetScheme ());
+        Assert.Equal (r.GetScheme (), SchemeManager.GetSchemes () ["Base"]);
         Assert.Equal (0, r.Width);
         Assert.Equal (0, r.Height);
         Assert.Equal (0, r.X);
@@ -262,8 +262,8 @@ public class ViewTests
         Assert.Equal (new (1, 2, 3, 4), r.Frame);
         Assert.Null (r.Focused);
         Assert.False (r.HasScheme);
-        Assert.NotNull (r.Scheme);
-        Assert.Equal (r.Scheme, SchemeManager.GetCurrentSchemes () ["Base"]);
+        Assert.NotNull (r.GetScheme ());
+        Assert.Equal (r.GetScheme (), SchemeManager.GetSchemes () ["Base"]);
         Assert.Equal (3, r.Width);
         Assert.Equal (4, r.Height);
         Assert.Equal (1, r.X);
@@ -297,8 +297,8 @@ public class ViewTests
         Assert.Equal (new (0, 0, 1, 13), r.Frame);
         Assert.Null (r.Focused);
         Assert.False (r.HasScheme);
-        Assert.NotNull (r.Scheme);
-        Assert.Equal (r.Scheme, SchemeManager.GetCurrentSchemes () ["Base"]);
+        Assert.NotNull (r.GetScheme ());
+        Assert.Equal (r.GetScheme (), SchemeManager.GetSchemes () ["Base"]);
         Assert.False (r.IsCurrentTop);
         Assert.Equal (string.Empty, r.Id);
         Assert.Empty (r.SubViews);
@@ -331,7 +331,7 @@ public class ViewTests
     [AutoInitShutdown]
     public void Test_Nested_Views_With_Height_Equal_To_One ()
     {
-        var v = new View { Width = 11, Height = 3, Scheme = new () };
+        var v = new View { Width = 11, Height = 3 };
 
         var top = new View { Width = Dim.Fill (), Height = 1 };
         var bottom = new View { Width = Dim.Fill (), Height = 1, Y = 2 };

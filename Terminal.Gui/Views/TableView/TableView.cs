@@ -1909,7 +1909,7 @@ public class TableView : View, IDesignable
         Scheme rowScheme = Style.RowColorGetter?.Invoke (
                                                               new RowColorGetterArgs (Table, rowToRender)
                                                              )
-                                ?? Scheme;
+                                ?? GetScheme ();
 
         //start by clearing the entire line
         Move (0, row);

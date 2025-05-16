@@ -68,7 +68,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         tv.Table = new DataTableSource (dt);
         tv.NullSymbol = string.Empty;
-        tv.Scheme = new Scheme ();
+        //tv.Scheme = new Scheme ();
         tv.Draw ();
 
         var expected =
@@ -113,7 +113,7 @@ public class TableViewTests (ITestOutputHelper output)
 00000000000000000000
 01111101101111111110
 ";
-        DriverAssert.AssertDriverAttributesAre (expected, output, Application.Driver, tv.Scheme.Normal, color);
+        DriverAssert.AssertDriverAttributesAre (expected, output, Application.Driver, tv.GetScheme ().Normal, color);
     }
 
     [Fact]
@@ -418,7 +418,7 @@ public class TableViewTests (ITestOutputHelper output)
         top.Add (tableView);
         RunState rs = Application.Begin (top);
 
-        tableView.Scheme = SchemeManager.Schemes ["TopLevel"];
+        tableView.SchemeName = "TopLevel";
 
         // 25 characters can be printed into table
         tableView.Viewport = new (0, 0, 25, 5);
@@ -633,7 +633,7 @@ public class TableViewTests (ITestOutputHelper output)
     public void Redraw_EmptyTable ()
     {
         var tableView = new TableView ();
-        tableView.Scheme = new ();
+        //tableView.Scheme = new ();
         tableView.Viewport = new (0, 0, 25, 10);
 
         // Set a table with 1 column
@@ -679,7 +679,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        tableView.Scheme = SchemeManager.Schemes ["TopLevel"];
+        tableView.SchemeName = "TopLevel";
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -758,7 +758,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        tableView.Scheme = SchemeManager.Schemes ["TopLevel"];
+        tableView.SchemeName = "TopLevel";
         tableView.LayoutSubViews ();
 
         // 3 columns are visibile
@@ -819,7 +819,7 @@ public class TableViewTests (ITestOutputHelper output)
         var tableView = new TableView ();
         tableView.BeginInit ();
         tableView.EndInit ();
-        tableView.Scheme = SchemeManager.Schemes ["TopLevel"];
+        tableView.SchemeName = "TopLevel";
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -934,7 +934,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         TableView tableView = GetABCDEFTableView (out _);
 
-        tableView.Scheme = SchemeManager.Schemes ["TopLevel"];
+        tableView.SchemeName = "TopLevel";
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -965,7 +965,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         TableView tableView = GetABCDEFTableView (out _);
 
-        tableView.Scheme = SchemeManager.Schemes ["TopLevel"];
+        tableView.SchemeName = "TopLevel";
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -1086,8 +1086,8 @@ public class TableViewTests (ITestOutputHelper output)
                                                expectedColors,
                                                output,
                                                Application.Driver,
-                                               tv.Scheme.Normal,
-                                               focused ? tv.Scheme.Focus : tv.Scheme.HotNormal,
+                                               tv.GetScheme ().Normal,
+                                               focused ? tv.GetAttributeForRole (VisualRole.Focus) : tv.GetAttributeForRole (VisualRole.HotNormal),
                                                cellHighlight.Normal
                                               );
 
@@ -1123,8 +1123,8 @@ public class TableViewTests (ITestOutputHelper output)
                                                expectedColors,
                                                output,
                                                Application.Driver,
-                                               tv.Scheme.Normal,
-                                               focused ? tv.Scheme.Focus : tv.Scheme.HotNormal
+                                               tv.GetScheme ().Normal,
+                                               focused ? tv.GetAttributeForRole (VisualRole.Focus) : tv.GetAttributeForRole (VisualRole.HotNormal)
                                               );
 
         top.Dispose ();
@@ -1182,7 +1182,7 @@ public class TableViewTests (ITestOutputHelper output)
                                                expectedColors,
                                                output,
                                                Application.Driver,
-                                               tv.Scheme.Normal,
+                                               tv.GetScheme ().Normal,
                                                focused ? rowHighlight.Focus : rowHighlight.HotNormal,
                                                rowHighlight.Normal
                                               );
@@ -1218,8 +1218,8 @@ public class TableViewTests (ITestOutputHelper output)
                                                expectedColors,
                                                output,
                                                Application.Driver,
-                                               tv.Scheme.Normal,
-                                               focused ? tv.Scheme.Focus : tv.Scheme.HotNormal
+                                               tv.GetScheme ().Normal,
+                                               focused ? tv.GetScheme ().Focus : tv.GetScheme ().HotNormal
                                               );
         top.Dispose ();
     }
@@ -1264,8 +1264,8 @@ public class TableViewTests (ITestOutputHelper output)
                                                expectedColors,
                                                output,
                                                Application.Driver,
-                                               tv.Scheme.Normal,
-                                               focused ? tv.Scheme.Focus : tv.Scheme.HotNormal
+                                               tv.GetScheme ().Normal,
+                                               focused ? tv.GetScheme ().Focus : tv.GetScheme ().HotNormal
                                               );
         top.Dispose ();
     }
@@ -1303,14 +1303,14 @@ public class TableViewTests (ITestOutputHelper output)
 01000
 ";
 
-        var invertFocus = new Attribute (tv.Scheme.Focus.Background, tv.Scheme.Focus.Foreground);
-        var invertHotNormal = new Attribute (tv.Scheme.HotNormal.Background, tv.Scheme.HotNormal.Foreground);
+        var invertFocus = new Attribute (tv.GetScheme ().Focus.Background, tv.GetScheme ().Focus.Foreground);
+        var invertHotNormal = new Attribute (tv.GetScheme ().HotNormal.Background, tv.GetScheme ().HotNormal.Foreground);
 
         DriverAssert.AssertDriverAttributesAre (
                                                expectedColors,
                                                output,
                                                Application.Driver,
-                                               tv.Scheme.Normal,
+                                               tv.GetScheme ().Normal,
                                                focused ? invertFocus : invertHotNormal
                                               );
 
@@ -1567,7 +1567,7 @@ public class TableViewTests (ITestOutputHelper output)
     public void Test_CollectionNavigator ()
     {
         var tv = new TableView ();
-        tv.Scheme = SchemeManager.Schemes ["TopLevel"];
+        tv.SchemeName = "TopLevel";
         tv.Viewport = new (0, 0, 50, 7);
 
         tv.Table = new EnumerableTableSource<string> (
@@ -2211,7 +2211,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         ((FakeDriver)Application.Driver!).SetBufferSize (100, 100);
         var tv = new TableView ();
-        tv.Scheme = SchemeManager.Schemes ["TopLevel"];
+        tv.SchemeName = "TopLevel";
         tv.Viewport = new (0, 0, 50, 6);
 
         tv.Table = new EnumerableTableSource<Type> (
@@ -2275,9 +2275,9 @@ public class TableViewTests (ITestOutputHelper output)
 
         DriverAssert.AssertDriverContentsAre (expected, output);
 
-        Attribute normal = tv.Scheme.Normal;
-        tv.Scheme = new (tv.Scheme) { Focus = new (Color.Magenta, Color.White) };
-        Attribute focus = tv.Scheme.Focus;
+        Attribute normal = tv.GetScheme ().Normal;
+        tv.SetScheme (new (tv.GetScheme ()) { Focus = new (Color.Magenta, Color.White) });
+        Attribute focus = tv.GetScheme ().Focus;
 
         tv.Draw ();
 
@@ -2329,9 +2329,9 @@ A B C
 
         DriverAssert.AssertDriverContentsAre (expected, output);
 
-        Attribute normal = tv.Scheme.Normal;
-        tv.Scheme = new (tv.Scheme) { Focus = new (Color.Magenta, Color.White) };
-        Attribute focus = tv.Scheme.Focus;
+        Attribute normal = tv.GetScheme ().Normal;
+        tv.SetScheme (new (tv.GetScheme ()) { Focus = new (Color.Magenta, Color.White) });
+        Attribute focus = tv.GetScheme ().Focus;
         tv.Draw ();
 
         // Focus color (1) should be used for rendering the selected line
@@ -2383,9 +2383,9 @@ A B C
 
         DriverAssert.AssertDriverContentsAre (expected, output);
 
-        Attribute normal = tv.Scheme.Normal;
-        tv.Scheme = new (tv.Scheme) { Focus = new (Color.Magenta, Color.White) };
-        Attribute focus = tv.Scheme.Focus;
+        Attribute normal = tv.GetScheme ().Normal;
+        tv.SetScheme (new (tv.GetScheme ()) { Focus = new (Color.Magenta, Color.White) });
+        Attribute focus = tv.GetScheme ().Focus;
 
         tv.Draw ();
 
@@ -2417,7 +2417,7 @@ A B C
         var tv = new TableView ();
 
         //tv.BeginInit (); tv.EndInit ();
-        tv.Scheme = SchemeManager.Schemes ["TopLevel"];
+        tv.SchemeName = "TopLevel";
         tv.Viewport = new (0, 0, 25, 4);
 
         tv.Style = new ()
@@ -3365,7 +3365,7 @@ A B C
     [InlineData (false, 1, 0)]
     public void TableCollectionNavigator_FullRowSelect_True_False (bool fullRowSelect, int selectedCol, int expectedRow)
     {
-        TableView tableView = new () { FullRowSelect = fullRowSelect, SelectedColumn = selectedCol};
+        TableView tableView = new () { FullRowSelect = fullRowSelect, SelectedColumn = selectedCol };
         tableView.BeginInit ();
         tableView.EndInit ();
 
@@ -3419,7 +3419,7 @@ A B C
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        tableView.Scheme = SchemeManager.Schemes ["TopLevel"];
+        tableView.SchemeName = "TopLevel";
 
         // 3 columns are visible
         tableView.Viewport = new (0, 0, 7, 5);
@@ -3445,7 +3445,7 @@ A B C
     private TableView GetPetTable (out EnumerableTableSource<PickablePet> source)
     {
         var tv = new TableView ();
-        tv.Scheme = SchemeManager.Schemes ["TopLevel"];
+        tv.SchemeName = "TopLevel";
         tv.Viewport = new (0, 0, 25, 6);
 
         List<PickablePet> pets = new ()
@@ -3473,7 +3473,7 @@ A B C
     private TableView GetTwoRowSixColumnTable (out DataTable dt)
     {
         var tableView = new TableView ();
-        tableView.Scheme = SchemeManager.Schemes ["TopLevel"];
+        tableView.SchemeName = "TopLevel";
 
         // 3 columns are visible
         tableView.Viewport = new (0, 0, 7, 5);
@@ -3518,7 +3518,7 @@ A B C
         tv.Style.GetOrCreateColumnStyle (1).MaxWidth = 1;
         tv.Style.GetOrCreateColumnStyle (1).MaxWidth = 1;
 
-        tv.Scheme = SchemeManager.Schemes ["Base"];
+        tv.SchemeName = "Base";
 
         return tv;
     }

@@ -32,7 +32,7 @@ public class Navigation : Scenario
         };
         app.Add (adornmentsEditor);
 
-        var arrangementEditor = new ArrangementEditor()
+        var arrangementEditor = new ArrangementEditor ()
         {
             X = Pos.Right (adornmentsEditor),
             Y = 0,
@@ -179,7 +179,7 @@ public class Navigation : Scenario
         };
         colorPicker.ApplyStyleChanges ();
 
-        colorPicker.SelectedColor = testFrame.Scheme.Normal.Background;
+        colorPicker.SelectedColor = testFrame.GetAttributeForRole (VisualRole.Normal).Background;
         colorPicker.ColorChanged += ColorPicker_ColorChanged;
         overlappedView2.Add (colorPicker);
         overlappedView2.Width = 50;
@@ -192,7 +192,7 @@ public class Navigation : Scenario
             X = 1,
             Y = 7,
             Id = "datePicker",
-            Scheme = SchemeManager.Schemes ["Toplevel"],
+            SchemeName = "TopLevel",
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,
             CanFocus = true, // Can't drag without this? BUGBUG
@@ -215,7 +215,7 @@ public class Navigation : Scenario
 
         testFrame.SetFocus ();
         Application.Run (app);
-       // timer.Close ();
+        // timer.Close ();
         app.Dispose ();
         Application.Shutdown ();
 
@@ -223,7 +223,7 @@ public class Navigation : Scenario
 
         void ColorPicker_ColorChanged (object sender, ColorEventArgs e)
         {
-            testFrame.Scheme = testFrame.Scheme with { Normal = new (testFrame.Scheme.Normal.Foreground, e.CurrentValue) };
+            testFrame.SetScheme (testFrame.GetScheme () with { Normal = new (testFrame.GetAttributeForRole (VisualRole.Normal).Foreground, e.CurrentValue) });
         }
     }
 
@@ -236,7 +236,7 @@ public class Navigation : Scenario
             Height = Dim.Auto (),
             Width = Dim.Auto (),
             Title = $"Overlapped{id} _{GetNextHotKey ()}",
-            Scheme = SchemeManager.Schemes ["Toplevel"],
+            SchemeName = "TopLevel",
             Id = $"Overlapped{id}",
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,

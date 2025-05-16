@@ -145,20 +145,11 @@ public class Wizard : Dialog
 
             if (base.Modal)
             {
-                Scheme = SchemeManager.Schemes ["Dialog"];
+                SchemeName = "Dialog";
                 BorderStyle = LineStyle.Rounded;
             }
             else
             {
-                if (SuperView is { })
-                {
-                    Scheme = SuperView.Scheme;
-                }
-                else
-                {
-                    Scheme = SchemeManager.Schemes ["Base"];
-                }
-
                 CanFocus = true;
                 BorderStyle = LineStyle.None;
             }

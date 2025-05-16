@@ -177,7 +177,7 @@ public class Dialogs : Scenario
 
         var buttonPressedLabel = new Label
         {
-            X = Pos.Center (), Y = Pos.Bottom (frame) + 5, Scheme = SchemeManager.Schemes ["Error"], Text = " "
+            X = Pos.Center (), Y = Pos.Bottom (frame) + 5, SchemeName = "Error", Text = " "
         };
 
         var showDialogButton = new Button

@@ -85,7 +85,8 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                    //VisualRole.HotActive => HotActive,
                    VisualRole.Disabled => Disabled,
 
-                   //VisualRole.ReadOnly => ReadOnly,
+                   // BUGBUG: This is a temporary test/hack
+                   VisualRole.ReadOnly => Normal with { Style = TextStyle.Faint },
                    _ => Normal
                };
     }

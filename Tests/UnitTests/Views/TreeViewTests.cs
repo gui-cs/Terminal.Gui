@@ -705,7 +705,7 @@ public class TreeViewTests (ITestOutputHelper output)
                                                          );
 
         tv.AddObject ("1");
-        tv.Scheme = new Scheme ();
+        tv.SetScheme (new Scheme ());
 
         tv.LayoutSubViews ();
         tv.Draw ();
@@ -744,7 +744,7 @@ public class TreeViewTests (ITestOutputHelper output)
                                                          );
 
         tv.AddObject ("1");
-        tv.Scheme = new Scheme ();
+        tv.SetScheme (new Scheme ());
 
         tv.LayoutSubViews ();
         tv.Draw ();
@@ -820,7 +820,7 @@ public class TreeViewTests (ITestOutputHelper output)
         tv.AddObject (n2);
         tv.Expand (n1);
 
-        tv.Scheme = new Scheme ();
+        tv.SetScheme (new Scheme ());
         tv.LayoutSubViews ();
         tv.Draw ();
 
@@ -875,7 +875,7 @@ public class TreeViewTests (ITestOutputHelper output)
         tv.AddObject (n2);
         tv.Expand (n1);
 
-        tv.Scheme = new Scheme ();
+        tv.SetScheme (new Scheme ());
         tv.LayoutSubViews ();
         View.SetClipToScreen ();
         tv.Draw ();
@@ -950,7 +950,7 @@ public class TreeViewTests (ITestOutputHelper output)
         tv.AddObject (n2);
         tv.Expand (n1);
 
-        tv.Scheme = new Scheme ();
+        tv.SetScheme (new Scheme ());
         tv.LayoutSubViews ();
         View.SetClipToScreen ();
         tv.Draw ();
@@ -1026,7 +1026,7 @@ public class TreeViewTests (ITestOutputHelper output)
         tv.AddObject (n2);
         tv.Expand (n1);
 
-        tv.Scheme = new Scheme ();
+        tv.SetScheme (new Scheme ());
         tv.LayoutSubViews ();
         tv.Draw ();
 
@@ -1066,7 +1066,7 @@ FFFFFFFFFF
         tv.AddObject (n2);
         tv.Expand (n1);
 
-        tv.Scheme = new Scheme ();
+        tv.SetScheme (new Scheme ());
         tv.LayoutSubViews ();
         tv.Draw ();
 
@@ -1122,7 +1122,7 @@ oot two
         tv.AddObject (n2);
         tv.Expand (n1);
 
-        tv.Scheme = new Scheme ();
+        tv.SetScheme (new Scheme ());
         tv.LayoutSubViews ();
         tv.Draw ();
 
@@ -1211,7 +1211,7 @@ oot two
         tv.AddObject (n2);
         tv.Expand (n1);
 
-        tv.Scheme = new Scheme ();
+        tv.SetScheme (new Scheme ());
         tv.LayoutSubViews ();
         tv.Draw ();
 
@@ -1240,7 +1240,7 @@ oot two
 ",
                                                output,
                                                Application.Driver,
-                                               tv.Scheme.Normal,
+                                               tv.GetScheme ().Normal,
                                                pink
                                               );
 
@@ -1278,7 +1278,7 @@ oot two
 ",
                                                output,
                                                Application.Driver,
-                                               tv.Scheme.Normal,
+                                               tv.GetScheme ().Normal,
                                                pink
                                               );
     }

@@ -41,7 +41,7 @@ public class Shortcuts : Scenario
             X = Pos.AnchorEnd (),
             Y = 0,
             Height = Dim.Fill (4),
-            Scheme = SchemeManager.Schemes ["Toplevel"],
+            SchemeName = "TopLevel",
             Source = new ListWrapper<string> (eventSource),
             BorderStyle = LineStyle.Double,
             Title = "E_vents"
@@ -322,12 +322,12 @@ public class Shortcuts : Scenario
 
         if (framedShortcut.CommandView.Margin is { })
         {
-            framedShortcut.CommandView.Margin.Scheme = framedShortcut.CommandView.Scheme = SchemeManager.Schemes ["Error"];
-            framedShortcut.HelpView.Margin!.Scheme = framedShortcut.HelpView.Scheme = SchemeManager.Schemes ["Dialog"];
-            framedShortcut.KeyView.Margin!.Scheme = framedShortcut.KeyView.Scheme = SchemeManager.Schemes ["Menu"];
+            framedShortcut.CommandView.Margin.SchemeName = framedShortcut.CommandView.SchemeName = "Error";
+            framedShortcut.HelpView.Margin!.SchemeName = framedShortcut.HelpView.SchemeName = "Dialog";
+            framedShortcut.KeyView.Margin!.SchemeName = framedShortcut.KeyView.SchemeName = "Menu";
         }
 
-        framedShortcut.Scheme = SchemeManager.Schemes ["Toplevel"];
+        framedShortcut.SchemeName = "TopLevel";
         Application.Top.Add (framedShortcut);
 
         // Horizontal
@@ -436,10 +436,10 @@ public class Shortcuts : Scenario
                 eventSource.Add ($"ColorChanged: {o.GetType ().Name} - {args.CurrentValue}");
                 eventLog.MoveDown ();
 
-                Application.Top.Scheme = new Scheme (Application.Top.Scheme)
+                Application.Top.SetScheme (new Scheme (Application.Top.GetScheme())
                 {
                     Normal = new (Application.Top!.GetAttributeForRole (VisualRole.Normal).Foreground, args.CurrentValue),
-                };
+                });
             }
         };
         bgColorShortcut.CommandView = bgColor;

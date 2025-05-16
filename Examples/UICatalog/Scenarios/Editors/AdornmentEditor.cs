@@ -60,7 +60,7 @@ public class AdornmentEditor : EditorBase
 
                 _adornment.Initialized += (sender, args) =>
                                           {
-                                              Scheme? cs = _adornment.Scheme;
+                                              Scheme? cs = _adornment.GetScheme ();
                                               _foregroundColorPicker.SelectedColor = _adornment.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ();
                                               _backgroundColorPicker.SelectedColor = _adornment.GetAttributeForRole (VisualRole.Normal).Background.GetClosestNamedColor16 ();
                                           };
@@ -220,10 +220,11 @@ public class AdornmentEditor : EditorBase
                        return;
                    }
 
-                   AdornmentToEdit.Scheme = new (AdornmentToEdit.Scheme ?? AdornmentToEdit.Parent?.Scheme)
+                   AdornmentToEdit.SetScheme (new (AdornmentToEdit.GetScheme ())
                    {
                        Normal = new (_foregroundColorPicker.SelectedColor, _backgroundColorPicker.SelectedColor)
-                   };
+                   })
+                   ;
                };
     }
 

@@ -13,63 +13,64 @@ public partial class View
     internal static Dictionary<string, Scheme?> GetHardCodedSchemes ()
     {
         return new (StringComparer.InvariantCultureIgnoreCase)
+    {
         {
-            {
-                SchemeManager.SchemesToSchemeName (Schemes.Base)!,
-                new (
-                     new (new Color ("White"), new Color ("Blue")),
-                     new (new Color ("DarkBlue"), new Color ("LightGray")),
-                     new (new Color ("BrightCyan"), new Color ("Blue")),
-                     hotFocus: new (new Color ("BrightBlue"), new Color ("LightGray")),
-                     disabled: new (new Color ("DarkGray"), new Color ("Blue"))
-                    )
-            },
-            {
-                SchemeManager.SchemesToSchemeName (Schemes.Dialog)!,
-                new (
-                               new (new Color ("Black"), new Color ("LightGray")),
-                     new (new Color ("DarkGray"), new Color ("LightGray")),
-                     new (new Color ("Blue"), new Color ("LightGray")),
-                     hotFocus: new (new Color ("BrightBlue"), new Color ("LightGray")),
-                     disabled: new (new Color ("Gray"), new Color ("DarkGray"))
-                    )
-            },
-            {
-                SchemeManager.SchemesToSchemeName (Schemes.Error)!,
-                new (
-                              new (new Color ("Red"), new Color ("Pink")),
-                     new (new Color ("White"), new Color ("BrightRed")),
-                     new (new Color ("Black"), new Color ("Pink")),
-                     hotFocus: new (new Color ("Pink"), new Color ("BrightRed")),
-                     disabled: new (new Color ("DarkGray"), new Color ("White"))
-                    )
-            },
-            {
-                SchemeManager.SchemesToSchemeName (Schemes.Menu)!,
-                new (
-                     new (new Color ("White"), new Color ("DarkBlue")),
-                     new (new Color ("DarkBlue"), new Color ("White")),
-                     new (new Color ("Yellow"), new Color ("DarkBlue")),
-                     hotFocus: new (new Color ("Blue"), new Color ("White")),
-                     disabled: new (new Color ("Gray"), new Color ("DarkGray"))
-                    )
-            },
-            {
-                SchemeManager.SchemesToSchemeName (Schemes.Toplevel)!,
-                new (
-                     normal: new (new Color ("White"), new Color ("DarkSlateGray")),
-                     hotNormal: new (new Color ("Yellow"), new Color ("DarkSlateGray")),
-                     focus: new (new Color ("White"), new Color ("DimGray")),
-                     hotFocus: new (new Color ("Yellow"), new Color ("DarkSlateGray")),
-                     disabled: new (new Color ("DarkGray"), new Color ("DarkSlateGray"))
-                    )
-            },
-        };
+            SchemeManager.SchemesToSchemeName(Schemes.Base)!,
+            new(
+                new(new Color("LightSlateGray"), new Color("RaisinBlack"), TextStyle.None),
+                new(new Color("RaisinBlack"), new Color("LightSlateGray"), TextStyle.None),
+                new(new Color("LightSlateGray"), new Color("RaisinBlack"), TextStyle.Underline | TextStyle.Bold),
+                disabled: new(new Color("LightSlateGray"), new Color("RaisinBlack"), TextStyle.Faint),
+                hotFocus: new(new Color("RaisinBlack"), new Color("LightSlateGray"), TextStyle.Underline | TextStyle.Bold)
+            )
+        },
+        {
+            SchemeManager.SchemesToSchemeName(Schemes.Dialog)!,
+            new(
+                new(new Color("Black"), new Color("LightSlateGray"), TextStyle.None),
+                new(new Color("LightSlateGray"), new Color("Black"), TextStyle.None),
+                new(new Color("Black"), new Color("LightSlateGray"), TextStyle.Underline | TextStyle.Bold),
+                disabled: new(new Color("Black"), new Color("LightSlateGray"), TextStyle.Faint),
+                hotFocus: new(new Color("LightSlateGray"), new Color("Black"), TextStyle.Underline | TextStyle.Bold)
+            )
+        },
+        {
+            SchemeManager.SchemesToSchemeName(Schemes.Error)!,
+            new(
+                new(new Color("DarkRed"), new Color("DimGray"), TextStyle.Italic),
+                new(new Color("Red"), new Color("DimGray"), TextStyle.Italic),
+                new(new Color("DarkRed"), new Color("DimGray"), TextStyle.Underline | TextStyle.Italic),
+                disabled: new(new Color("Black"), new Color("DimGray"), TextStyle.Italic),
+                hotFocus: new(new Color("Red"), new Color("DimGray"), TextStyle.Underline | TextStyle.Italic)
+            )
+        },
+        {
+            SchemeManager.SchemesToSchemeName(Schemes.Menu)!,
+            new(
+                new(new Color("LightSlateGray"), new Color("Black"), TextStyle.Bold),
+                new(new Color("White"), new Color("Black"), TextStyle.Bold),
+                new(new Color("LightSlateGray"), new Color("Black"), TextStyle.Underline | TextStyle.Bold),
+                disabled: new(new Color("Black"), new Color("Gray"), TextStyle.Bold),
+                hotFocus: new(new Color("LightGray"), new Color("Black"), TextStyle.Underline | TextStyle.Bold)
+            )
+        },
+        {
+            SchemeManager.SchemesToSchemeName(Schemes.Toplevel)!,
+            new(
+                new(new Color("LightSlateGray"), new Color("RaisinBlack"), TextStyle.None),
+                new(new Color("LightSlateGray"), new Color("RaisinBlack"), TextStyle.Underline | TextStyle.Bold),
+                new(new Color("RaisinBlack"), new Color("LightSlateGray"), TextStyle.None),
+                disabled: new(new Color("LightSlateGray"), new Color("RaisinBlack"), TextStyle.Faint),
+                hotFocus: new(new Color("RaisinBlack"), new Color("LightSlateGray"), TextStyle.Underline | TextStyle.Bold)
+            )
+        }
+    };
     }
+
 
     /// <summary>
     ///     Gets or sets the name of the Scheme to use for this View. If set, it will override the scheme inherited from the
-    ///     SuperView. If <see cref="Scheme"/> was explicitly set (<see cref="HasScheme"/> is <see langword="true"/>),
+    ///     SuperView. If a Scheme was explicitly set (<see cref="HasScheme"/> is <see langword="true"/>),
     ///     this property will be ignored.
     /// </summary>
     public string? SchemeName { get; set; }
@@ -78,23 +79,9 @@ public partial class View
     private Scheme? _scheme;
 
     /// <summary>
-    ///     Gets whether <see cref="Scheme"/> has been explicitly set for this View.
+    ///     Gets whether a Scheme has been explicitly set for this View, or if it will inherit the Scheme from its <see cref="SuperView"/>.
     /// </summary>
     public bool HasScheme => _scheme is { };
-
-    /// <summary>
-    ///     Gets or sets the Scheme for this view.
-    ///     <para>
-    ///         If the Scheme has not been explicitly set (<see cref="HasScheme"/> is <see langword="false"/>), this property
-    ///         gets
-    ///         <see cref="SuperView"/>'s Scheme.
-    ///     </para>
-    /// </summary>
-    public Scheme Scheme
-    {
-        get => GetScheme ();
-        set => SetScheme (value);
-    }
 
     /// <summary>
     ///     Gets the Scheme for the View. If the Scheme has not been explicitly set (see <see cref="HasScheme"/>), gets
@@ -118,12 +105,12 @@ public partial class View
 
         if (!HasScheme && !string.IsNullOrEmpty (SchemeName))
         {
-            return SchemeManager.GetCurrentSchemes () [SchemeName]!;
+            return SchemeManager.GetSchemes () [SchemeName]!;
         }
 
         if (!HasScheme)
         {
-            return SuperView?.GetScheme () ?? SchemeManager.GetCurrentSchemes () ["Base"]!;
+            return SuperView?.GetScheme () ?? SchemeManager.GetSchemes () ["Base"]!;
         }
 
         return _scheme!;
@@ -148,9 +135,9 @@ public partial class View
     ///     stop further processing and optionally set the <see cref="Scheme"/> in the event args to a different value.
     /// </summary>
     /// <returns>
-    ///     Set <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/> to stop default behavior.
+    ///     Set <see cref="SchemeEventArgs.Cancel"/> to <see langword="true"/> to stop default behavior.
     /// </returns>
-    public event EventHandler<CancelEventArgs>? GettingScheme;
+    public event EventHandler<SchemeEventArgs>? GettingScheme;
 
     /// <summary>
     ///     Sets the Scheme for the View. Raises <see cref="SettingScheme"/> event before setting the scheme.
@@ -185,7 +172,7 @@ public partial class View
         // BUGBUG: This should be in Border.cs somehow
         if (Border is { } && Border.LineStyle != LineStyle.None && Border.HasScheme)
         {
-            Border.Scheme = _scheme;
+            Border.SetScheme (_scheme);
         }
 
         SetNeedsDraw ();
@@ -200,13 +187,9 @@ public partial class View
     /// <returns><see langword="true"/> to stop default behavior.</returns>
     protected virtual bool OnSettingScheme (in Scheme? scheme) { return false; }
 
-    #region VisualRole
-
     /// <summary>Raised when the <see cref="Scheme"/> for the View is to be set.</summary>
     /// <returns>
     ///     Set <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/> to stop default behavior.
     /// </returns>
     public event EventHandler<CancelEventArgs>? SettingScheme;
-
-    #endregion VisualRole
 }

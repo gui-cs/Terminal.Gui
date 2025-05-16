@@ -460,15 +460,15 @@ public class ShortcutTests
         Application.Navigation = new ();
         var shortcut = new Shortcut ();
 
-        Application.Top.Scheme = null;
+        Application.Top.SetScheme (null);
 
-        Assert.False(shortcut.HasScheme);
-        Assert.NotNull (shortcut.Scheme);
+        Assert.False (shortcut.HasScheme);
+        Assert.NotNull (shortcut.GetScheme ());
 
         shortcut.HasFocus = true;
 
         Assert.False (shortcut.HasScheme);
-        Assert.NotNull (shortcut.Scheme);
+        Assert.NotNull (shortcut.GetScheme ());
 
         Application.Top.Dispose ();
         Application.ResetState ();

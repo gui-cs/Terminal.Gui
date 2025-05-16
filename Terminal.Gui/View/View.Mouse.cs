@@ -100,11 +100,11 @@ public partial class View // Mouse APIs
 
             if (HasScheme)
             {
-                Scheme? cs = Scheme;
+                Scheme? cs = GetScheme ();
 
                 _savedNonHoverScheme = cs;
 
-                Scheme = GetHighlightScheme ();
+                SetScheme (GetHighlightScheme ());
             }
 
             SetNeedsDraw ();
@@ -220,7 +220,7 @@ public partial class View // Mouse APIs
 
             if (HasScheme && _savedNonHoverScheme is { })
             {
-                Scheme = _savedNonHoverScheme;
+                SetScheme (_savedNonHoverScheme);
                 _savedNonHoverScheme = null;
                 SetNeedsDraw ();
             }
@@ -737,30 +737,30 @@ public partial class View // Mouse APIs
         {
             if (_savedHighlightScheme is null && HasScheme)
             {
-                _savedHighlightScheme = Scheme;
+                _savedHighlightScheme = GetScheme ();
 
-                if (Scheme is null)
+                if (GetScheme () is null)
                 {
                     return false;
                 }
 
                 if (CanFocus)
                 {
-                    var cs = new Scheme (Scheme)
+                    var cs = new Scheme (GetScheme ())
                     {
                         // Highlight the foreground focus color
-                        Focus = new (Scheme.Focus.Foreground.GetHighlightColor (), Scheme.Focus.Background.GetHighlightColor ())
+                        Focus = new (GetScheme ().Focus.Foreground.GetHighlightColor (), GetScheme ().Focus.Background.GetHighlightColor ())
                     };
-                    Scheme = cs;
+                    SetScheme (cs);
                 }
                 else
                 {
-                    var cs = new Scheme (Scheme)
+                    var cs = new Scheme (GetScheme ())
                     {
                         // Invert Focus color foreground/background. We can do this because we know the view is not going to be focused.
-                        Normal = new (Scheme.Focus.Background, Scheme.Normal.Foreground)
+                        Normal = new (GetScheme ().Focus.Background, GetScheme ().Normal.Foreground)
                     };
-                    Scheme = cs;
+                    SetScheme (cs);
                 }
             }
 
@@ -771,7 +771,7 @@ public partial class View // Mouse APIs
         if (HasScheme && args.NewValue == HighlightStyle.None)
         {
             // Unhighlight
-            Scheme = _savedHighlightScheme;
+            SetScheme (_savedHighlightScheme);
             _savedHighlightScheme = null;
             SetNeedsDraw ();
         }

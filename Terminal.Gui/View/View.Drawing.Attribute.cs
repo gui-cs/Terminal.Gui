@@ -14,8 +14,14 @@ public partial class View
     /// <summary>
     ///     Gets the <see cref="Attribute"/> associated with a specified <see cref="VisualRole"/>
     ///     from the <see cref="Scheme"/>.
+    /// <para>
     ///     Raises <see cref="OnGettingAttributeForRole"/>/<see cref="GettingAttributeForRole"/>
     ///     which can cancel the default behavior, and optionally change the attribute in the event args.
+    /// </para>
+    /// <para>
+    ///     If the View is disabled (<see cref="Enabled"/> is <see langword="false"/>), <see cref="VisualRole.Disabled"/>
+    ///     will be used instead of <paramref name="role"/>. Cancel the event to override this behavior.
+    /// </para>
     /// </summary>
     /// <param name="role">The semantic <see cref="VisualRole"/> describing the element being rendered.</param>
     /// <returns>The corresponding <see cref="Attribute"/> from the <see cref="Scheme"/>.</returns>
@@ -67,19 +73,28 @@ public partial class View
 
     /// <summary>
     ///     Selects the specified Attribute
-    ///     as the Attribute to use for subsquent calls to <see cref="AddRune(System.Text.Rune)"/> and <see cref="AddStr"/>.
+    ///     as the Attribute to use for subsequent calls to <see cref="AddRune(System.Text.Rune)"/> and <see cref="AddStr"/>.
     /// </summary>
-    /// <remarks></remarks>
     /// <param name="attribute">THe Attribute to set.</param>
     /// <returns>The previously set Attribute.</returns>
     public Attribute SetAttribute (Attribute attribute) { return Driver?.SetAttribute (attribute) ?? Attribute.Default; }
 
     /// <summary>
     ///     Selects the Attribute associated with the specified <see cref="VisualRole"/>
-    ///     as the Attribute to use for subsquent calls to <see cref="AddRune(System.Text.Rune)"/> and <see cref="AddStr"/>.
-    ///     Raises <see cref="OnSettingAttributeForRole"/>/<see cref="SettingAttributeForRole"/> and checks for cancellation
-    ///     before setting the Attribute.
+    ///     as the Attribute to use for subsequent calls to <see cref="AddRune(System.Text.Rune)"/> and <see cref="AddStr"/>.
+    ///     <para>
+    ///         Raises <see cref="OnSettingAttributeForRole"/>/<see cref="SettingAttributeForRole"/> and checks for
+    ///         cancellation
+    ///         before setting the Attribute via <see cref="SetAttribute"/>.
+    ///     </para>
     /// </summary>
+    /// <remarks>
+    ///     If the View is disabled (<see cref="Enabled"/> is <see langword="false"/>), <see cref="VisualRole.Disabled"/>
+    ///     will be used instead of
+    ///     <param name="role"></param>
+    ///     . To override this behavior use  <see cref="OnSettingAttributeForRole"/>/<see cref="SettingAttributeForRole"/>
+    ///     to cancel the method, and call <see cref="SetAttribute"/> directly.
+    /// </remarks>
     /// <param name="role">The semantic <see cref="VisualRole"/> describing the element being rendered.</param>
     /// <returns>The previously set Attribute.</returns>
     public Attribute? SetAttributeForRole (VisualRole role)
@@ -99,6 +114,7 @@ public partial class View
         {
             return currentAttribute;
         }
+
 
         return SetAttribute (schemeAttribute);
     }

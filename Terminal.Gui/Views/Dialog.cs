@@ -93,7 +93,7 @@ public class Dialog : Window
     {
         if (role == VisualRole.Normal || role == VisualRole.Focus)
         {
-            currentAttribute = Scheme!.Normal;
+            currentAttribute = GetScheme ().Normal;
 
             return true;
         }

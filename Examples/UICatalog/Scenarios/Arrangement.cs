@@ -165,8 +165,8 @@ public class Arrangement : Scenario
         };
         colorPicker.ApplyStyleChanges ();
 
-        colorPicker.SelectedColor = testFrame.Scheme!.Normal.Background;
-        colorPicker.ColorChanged += ColorPicker_ColorChanged;
+        colorPicker.SelectedColor = testFrame.GetAttributeForRole (VisualRole.Normal).Background;
+        colorPicker.ColorChanged += ColorPickerColorChanged;
         overlappedView2.Add (colorPicker);
         overlappedView2.Width = 50;
 
@@ -213,9 +213,9 @@ public class Arrangement : Scenario
 
         return;
 
-        void ColorPicker_ColorChanged (object sender, ColorEventArgs e)
+        void ColorPickerColorChanged (object sender, ColorEventArgs e)
         {
-            testFrame.Scheme = testFrame.Scheme! with { Normal = new (testFrame.Scheme.Normal.Foreground, e.CurrentValue) };
+            testFrame.SetScheme (testFrame.GetScheme () with { Normal = new (testFrame.GetAttributeForRole (VisualRole.Normal).Foreground, e.CurrentValue) });
         }
     }
 
@@ -228,7 +228,7 @@ public class Arrangement : Scenario
             Width = Dim.Auto (minimumContentDim: 15),
             Height = Dim.Auto (minimumContentDim: 3),
             Title = $"Overlapped{id} _{GetNextHotKey ()}",
-            SchemeName = SchemeManager.SchemesToSchemeName(Schemes.Toplevel),
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Toplevel),
             Id = $"Overlapped{id}",
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,
@@ -318,7 +318,7 @@ public class Arrangement : Scenario
 
     public class TransparentView : FrameView
     {
-        public TransparentView()
+        public TransparentView ()
         {
             Title = "Transparent";
             Text = "Text";
@@ -376,7 +376,7 @@ public class TransparentView : FrameView
             Title = "_Opaque Shadows No Worky",
             X = Pos.Center (),
             Y = 4,
-            SchemeName = SchemeManager.SchemesToSchemeName(Schemes.Dialog),
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog),
         };
 
         button.ClearingViewport += (sender, args) =>

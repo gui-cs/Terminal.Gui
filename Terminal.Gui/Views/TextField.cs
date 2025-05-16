@@ -966,14 +966,14 @@ public class TextField : View
             }
             else if (!Enabled)
             {
-                SetAttribute (roc);
+                SetAttributeForRole (VisualRole.Disabled);
             }
             else
             {
                 SetAttribute (
                                       idx >= _start && SelectedLength > 0 && idx < _start + SelectedLength
                                           ? selColor
-                                          : Scheme.Focus
+                                          : GetAttributeForRole (VisualRole.Focus)
                                      );
             }
 
@@ -1301,9 +1301,11 @@ public class TextField : View
 
     private Attribute GetReadOnlyColor ()
     {
-        Scheme cs = Scheme;
+        return GetAttributeForRole (VisualRole.ReadOnly);
 
-        if (Scheme is null)
+        Scheme cs = GetScheme ();
+
+        if (!HasScheme)
         {
             cs = new ();
         }
@@ -1787,7 +1789,7 @@ public class TextField : View
 
         if (keyboard)
         {
-            ContextMenu?.MakeVisible(ViewportToScreen (new Point (_cursorPosition - ScrollOffset, 1)));
+            ContextMenu?.MakeVisible (ViewportToScreen (new Point (_cursorPosition - ScrollOffset, 1)));
         }
         else
         {
@@ -1797,7 +1799,7 @@ public class TextField : View
 
     private void TextField_SuperViewChanged (object sender, SuperViewChangedEventArgs e)
     {
-        if (e.SuperView is {})
+        if (e.SuperView is { })
         {
             if (Autocomplete.HostControl is null)
             {

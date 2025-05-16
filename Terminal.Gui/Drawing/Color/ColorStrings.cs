@@ -9,7 +9,7 @@ namespace Terminal.Gui;
 public static class ColorStrings
 {
     private static readonly AnsiColorNameResolver Ansi = new();
-    private static readonly W3cColorNameResolver W3c = new();
+    private static readonly StandardColorsNameResolver W3c = new();
     private static readonly MultiStandardColorNameResolver Multi = new();
 
     /// <summary>

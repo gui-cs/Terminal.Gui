@@ -183,11 +183,11 @@ public class Margin : Adornment
 
         Rectangle screen = ViewportToScreen (Viewport);
 
-        // This just draws/clears the thickness, not the insides.
         if (Diagnostics.HasFlag (ViewDiagnosticFlags.Thickness) || HasScheme)
         {
+            // This just draws/clears the thickness, not the insides.
             // TODO: This is a hack. See https://github.com/gui-cs/Terminal.Gui/issues/4016
-            SetAttribute (GetAttributeForRole (VisualRole.Normal));
+            //SetAttribute (GetAttributeForRole (VisualRole.Normal));
             Thickness.Draw (screen, Diagnostics, ToString ());
         }
 

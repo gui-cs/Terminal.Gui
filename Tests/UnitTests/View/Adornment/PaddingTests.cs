@@ -14,10 +14,10 @@ public class PaddingTests (ITestOutputHelper output)
         view.Padding!.Thickness = new (1);
         view.Padding.Diagnostics = ViewDiagnosticFlags.Thickness;
 
-        view.Scheme = new()
+        view.SetScheme (new()
         {
             Normal = new (Color.Red, Color.Green), Focus = new (Color.Green, Color.Red)
-        };
+        });
 
         Assert.Equal (ColorName16.Red, view.Padding.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
         Assert.Equal (view.GetAttributeForRole (VisualRole.Normal), view.Padding.GetAttributeForRole (VisualRole.Normal));

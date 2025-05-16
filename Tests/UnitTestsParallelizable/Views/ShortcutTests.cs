@@ -439,18 +439,4 @@ public class ShortcutTests
         Assert.False (shortcut.CanFocus);
         Assert.True (shortcut.CommandView.CanFocus);
     }
-
-    [Fact]
-    public void Scheme_SetsAndGetsCorrectly ()
-    {
-        var scheme = new Scheme ();
-
-        var shortcut = new Shortcut
-        {
-            Scheme = scheme
-        };
-
-        Assert.Same (scheme, shortcut.Scheme);
-    }
-
 }

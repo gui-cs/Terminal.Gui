@@ -61,14 +61,14 @@ public class Text : Scenario
         textField.TextChanged += (s, prev) => { labelMirroringTextField.Text = textField.Text; };
 
         // TextView is a rich (as in functionality, not formatting) text editing control
-        label = new() { Text = "T_extView:", Y = Pos.Bottom (label) + 1 };
+        label = new () { Text = "T_extView:", Y = Pos.Bottom (label) + 1 };
         win.Add (label);
 
         var textView = new TextView
         {
-            X = Pos.Right (label) + 1, 
-            Y = Pos.Top (label), 
-            Width = Dim.Percent (50) - 1, 
+            X = Pos.Right (label) + 1,
+            Y = Pos.Top (label),
+            Width = Dim.Percent (50) - 1,
             Height = Dim.Percent (20)
         };
         textView.Text = "TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!";
@@ -169,7 +169,7 @@ public class Text : Scenario
         win.Add (chxCaptureTabs);
 
         // Hex editor
-        label = new() { Text = "_HexView:", Y = Pos.Bottom (chxMultiline) + 1 };
+        label = new () { Text = "_HexView:", Y = Pos.Bottom (chxMultiline) + 1 };
         win.Add (label);
 
         var hexEditor =
@@ -201,7 +201,7 @@ public class Text : Scenario
         win.Add (labelMirroringHexEditor);
 
         // DateField
-        label = new() { Text = "_DateField:", Y = Pos.Bottom (hexEditor) + 1 };
+        label = new () { Text = "_DateField:", Y = Pos.Bottom (hexEditor) + 1 };
         win.Add (label);
 
         var dateField = new DateField (DateTime.Now) { X = Pos.Right (label) + 1, Y = Pos.Bottom (hexEditor) + 1, Width = 20 };
@@ -221,10 +221,10 @@ public class Text : Scenario
         dateField.TextChanged += (s, prev) => { labelMirroringDateField.Text = dateField.Text; };
 
         // TimeField
-        label = new() { Text = "T_imeField:", Y = Pos.Top (dateField), X = Pos.Right (labelMirroringDateField) + 5 };
+        label = new () { Text = "T_imeField:", Y = Pos.Top (dateField), X = Pos.Right (labelMirroringDateField) + 5 };
         win.Add (label);
 
-        _timeField = new()
+        _timeField = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (dateField),
@@ -234,7 +234,7 @@ public class Text : Scenario
         };
         win.Add (_timeField);
 
-        _labelMirroringTimeField = new()
+        _labelMirroringTimeField = new ()
         {
             X = Pos.Right (_timeField) + 1,
             Y = Pos.Top (_timeField),
@@ -324,7 +324,7 @@ public class Text : Scenario
 
         appendAutocompleteTextField.Autocomplete.SuggestionGenerator = new SingleWordSuggestionGenerator
         {
-            AllSuggestions = new()
+            AllSuggestions = new ()
             {
                 "fish",
                 "flipper",
@@ -454,7 +454,7 @@ public class Text : Scenario
         {
             e.Handled = true; // Don't let it close
 
-            acceptView.Text = $"Accept was Invoked via {win.Focused.GetType().Name}";
+            acceptView.Text = $"Accept was Invoked via {win.Focused.GetType ().Name}";
 
             // Start a task that will set acceptView.Text to an empty string after 1 second
             System.Threading.Tasks.Task.Run (async () =>

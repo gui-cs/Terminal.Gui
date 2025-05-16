@@ -17,7 +17,7 @@ public sealed class Transparent : Scenario
             Title = GetQuitKeyAndName (),
         };
         appWindow.BorderStyle = LineStyle.None;
-        appWindow.Scheme = SchemeManager.Schemes ["Error"];
+        appWindow.SchemeName = "Error";
 
         appWindow.Text = "App Text - Centered Vertically and Horizontally.\n2nd Line of Text.\n3rd Line of Text.";
         appWindow.TextAlignment = Alignment.Center;
@@ -77,7 +77,7 @@ public sealed class Transparent : Scenario
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
             ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent | Terminal.Gui.ViewportSettings.TransparentMouse;
             BorderStyle = LineStyle.RoundedDotted;
-            base.Scheme = SchemeManager.Schemes ["Base"];
+            SchemeName = "Base";
 
             var transparentSubView = new View ()
             {
@@ -89,10 +89,10 @@ public sealed class Transparent : Scenario
                 Height = 8,
                 BorderStyle = LineStyle.Dashed,
                 Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
-               // ShadowStyle = ShadowStyle.Transparent,
+                // ShadowStyle = ShadowStyle.Transparent,
             };
             transparentSubView.Border!.Thickness = new (1, 1, 1, 1);
-            transparentSubView.Scheme = SchemeManager.Schemes ["Dialog"];
+            transparentSubView.SchemeName = "Dialog";
             transparentSubView.Visible = false;
 
             Button button = new Button ()
@@ -100,7 +100,7 @@ public sealed class Transparent : Scenario
                 Title = "_Opaque Shadows No Worky",
                 X = Pos.Center (),
                 Y = 2,
-                Scheme = SchemeManager.Schemes ["Dialog"],
+                SchemeName = "Dialog",
             };
             button.Visible = false;
 
@@ -109,11 +109,11 @@ public sealed class Transparent : Scenario
             {
                 Id = "shortcut",
                 X = Pos.Center (),
-                Y = Pos.AnchorEnd(),
+                Y = Pos.AnchorEnd (),
                 Title = "A _Shortcut",
                 HelpText = "Help!",
                 Key = Key.F11,
-                Scheme = SchemeManager.Schemes ["Base"]
+                SchemeName = "Base"
 
             };
 

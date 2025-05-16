@@ -239,6 +239,7 @@ public class Border : Adornment
 
     private void Border_Highlight (object? sender, CancelEventArgs<HighlightStyle> e)
     {
+        // BUGBUG: The whole highlight thing needs be reworked. It should not change Scheme, but use the events.
         if (!Parent!.Arrangement.HasFlag (ViewArrangement.Movable))
         {
             e.Cancel = true;
@@ -250,23 +251,23 @@ public class Border : Adornment
         {
             if (!_savedForeColor.HasValue)
             {
-                _savedForeColor = Scheme!.Normal.Foreground;
+                _savedForeColor = GetScheme ().Normal.Foreground;
             }
 
-            var cs = new Scheme (Scheme)
+            var cs = new Scheme (GetScheme ())
             {
-                Normal = new (Scheme!.Normal.Foreground.GetHighlightColor (), Scheme.Normal.Background)
+                Normal = new (GetScheme ().Normal.Foreground.GetHighlightColor (), GetScheme ().Normal.Background)
             };
-            Scheme = cs;
+            SetScheme (cs);
         }
 
         if (e.NewValue == HighlightStyle.None && _savedForeColor.HasValue)
         {
-            var cs = new Scheme (Scheme)
+            var cs = new Scheme (GetScheme ())
             {
-                Normal = new (_savedForeColor.Value, Scheme!.Normal.Background)
+                Normal = new (_savedForeColor.Value, GetScheme ().Normal.Background)
             };
-            Scheme = cs;
+            SetScheme (cs);
         }
 
         Parent?.SetNeedsDraw ();
@@ -726,14 +727,7 @@ public class Border : Adornment
 
             Attribute prevAttr = Driver?.GetAttribute () ?? Attribute.Default;
 
-            if (Scheme is { })
-            {
-                SetAttribute (GetAttributeForRole (VisualRole.Normal));
-            }
-            else
-            {
-                SetAttribute (Parent!.GetAttributeForRole (VisualRole.Normal));
-            }
+            SetAttributeForRole (VisualRole.Normal);
 
             if (drawTop)
             {

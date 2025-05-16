@@ -94,7 +94,7 @@ public class ConfigurationEditor : Scenario
 
             foreach (ConfigTextView t in _tabView.SubViews.OfType<ConfigTextView> ())
             {
-                t.Scheme = EditorScheme;
+                t.SetScheme (EditorScheme);
             }
         }
 
@@ -252,7 +252,7 @@ public class ConfigurationEditor : Scenario
 
             if (FileInfo!.FullName.Contains ("HardCoded"))
             {
-                Text = ConfigurationManager.GetHardCodedConfig()!;
+                Text = ConfigurationManager.GetHardCodedConfig ()!;
                 ReadOnly = true;
                 Enabled = true;
             }

@@ -67,6 +67,10 @@
     "UICatalog --disable-cm": {
       "commandName": "Project",
       "commandLineArgs": "--disable-cm\r\n"
+    },
+    "UICatalog --disable-cm --driver v2win": {
+      "commandName": "Project",
+      "commandLineArgs": "--disable-cm --driver v2win"
     }
   }
 }

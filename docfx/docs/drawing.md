@@ -132,29 +132,9 @@ Change the colors of a view by setting the @Terminal.Gui.View.ColorScheme proper
 
 ## Schemes
 
-A Scheme is named a mapping from `VisualRole`s (e.g. `VisualRole.Focus`) to `Attribute`s, defining how a `View` should look based on its purpose (e.g. Menu or Dialog). @Terminal.Gui.SchemeManager.Schemes is a dictionary of `Scheme`s, indexed by name.
+[!code-md[Scheme Overview](scheme.md#Scheme-Overview)]
 
-A Scheme defines how Views look based on their semantic purpose. The following schemes are supported:
-
-| Scheme Name | Description |
-|:-----|:--------|
-| **Base** | The base scheme used for most Views. |
-| **TopLevel** | The application Toplevel scheme; used for the Toplevel View. |
-| **Dialog** | The dialog scheme; used for Dialog, MessageBox, and other views dialog-like views. |
-| **Menu** | The menu scheme; used for Terminal.Gui.Menu, MenuBar, and StatusBar. |
-| **Error** | The scheme for showing errors, such as in `ErrorQuery`. |
-
-@Terminal.Gui.SchemeManager manages the set of available schemes and provides a set of convenience methods for getting the current scheme and for overriding the default values for these schemes.
-
-```csharp
-var scheme = SchemeManager.GetCurrentSchemes () ["TopLevel"];
-```
-
-[ConfigurationManager](config.md) can be used to override the default values for these schemes and add additional schemes. 
-
-## View.Scheme
-
-@Terminal.Gui.View.Scheme gets or sets the Scheme used by a View to draw itself. 
+See [Scheme Deep Dive](scheme.md) for more details.
 
 ## Text Formatting
 

@@ -723,8 +723,7 @@ public class ListView : View, IDesignable
     /// <inheritdoc/>
     protected override bool OnDrawingContent ()
     {
-        Attribute current = Scheme?.Focus ?? Attribute.Default;
-        SetAttribute (current);
+        Attribute current = GetAttributeForRole (VisualRole.Focus);
         Move (0, 0);
         Rectangle f = Viewport;
         int item = Viewport.Y;
@@ -736,8 +735,8 @@ public class ListView : View, IDesignable
         {
             bool isSelected = item == _selected;
 
-            Attribute newcolor = focused ? isSelected ? Scheme.Focus : GetAttributeForRole (VisualRole.Normal) :
-                                 isSelected ? Scheme.HotNormal : GetAttributeForRole (VisualRole.Normal);
+            Attribute newcolor = focused ? isSelected ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal) :
+                                 isSelected ? GetAttributeForRole (VisualRole.HotNormal) : GetAttributeForRole (VisualRole.Normal);
 
             if (newcolor != current)
             {

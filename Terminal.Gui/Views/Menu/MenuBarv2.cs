@@ -225,7 +225,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     ///     Gets whether any of the menu bar items have a visible <see cref="PopoverMenu"/>.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public bool IsOpen () { return SubViews.OfType<MenuBarItemv2>().Count (sv => sv is { PopoverMenuOpen: true }) > 0; }
+    public bool IsOpen () { return SubViews.OfType<MenuBarItemv2> ().Count (sv => sv is { PopoverMenuOpen: true }) > 0; }
 
     private bool _active;
 
@@ -340,7 +340,7 @@ public class MenuBarv2 : Menuv2, IDesignable
                 // We are not Active; change that
                 Active = true;
 
-                ShowItem(sourceMenuBarItem);
+                ShowItem (sourceMenuBarItem);
 
                 if (!sourceMenuBarItem.HasFocus)
                 {
@@ -529,10 +529,11 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         menuBgColorCp.ColorChanged += (sender, args) =>
                                       {
-                                          Scheme = Scheme! with
+                                          // BUGBUG: This is weird.
+                                          SetScheme (GetScheme () with
                                           {
-                                              Normal = new (Scheme.Normal.Foreground, args.CurrentValue)
-                                          };
+                                              Normal = new Attribute (GetAttributeForRole (VisualRole.Normal).Foreground, args.CurrentValue)
+                                          });
                                       };
 
         Add (

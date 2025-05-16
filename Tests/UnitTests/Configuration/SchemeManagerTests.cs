@@ -10,7 +10,7 @@ public class SchemeManagerTests
     {
         Disable (true);
 
-        Dictionary<string, Scheme?>? schemes = SchemeManager.GetCurrentSchemes ();
+        Dictionary<string, Scheme?>? schemes = SchemeManager.GetSchemes ();
         Assert.NotNull (schemes);
         Assert.NotNull (schemes ["Base"]);
         Assert.True (schemes!.ContainsKey ("Base"));
@@ -22,7 +22,7 @@ public class SchemeManagerTests
     {
         Enable ();
 
-        Dictionary<string, Scheme?>? schemes = SchemeManager.GetCurrentSchemes ();
+        Dictionary<string, Scheme?>? schemes = SchemeManager.GetSchemes ();
         Assert.NotNull (schemes);
         Assert.NotNull (schemes ["Base"]);
         Assert.True (schemes!.ContainsKey ("Base"));
@@ -43,7 +43,7 @@ public class SchemeManagerTests
     public void Not_Case_Sensitive_Disabled ()
     {
         Assert.False (IsEnabled);
-        Dictionary<string, Scheme?>? current = SchemeManager.GetCurrentSchemes ();
+        Dictionary<string, Scheme?>? current = SchemeManager.GetSchemes ();
         Assert.NotNull (current);
 
         Assert.True (current!.ContainsKey ("Base"));
@@ -56,11 +56,11 @@ public class SchemeManagerTests
         Assert.False (IsEnabled);
         Enable ();
 
-        Assert.True (SchemeManager.GetCurrentSchemes ()!.ContainsKey ("Base"));
-        Assert.True (SchemeManager.GetCurrentSchemes ()!.ContainsKey ("base"));
+        Assert.True (SchemeManager.GetSchemes ()!.ContainsKey ("Base"));
+        Assert.True (SchemeManager.GetSchemes ()!.ContainsKey ("base"));
 
         ResetToHardCodedDefaults ();
-        Dictionary<string, Scheme?>? current = SchemeManager.GetCurrentSchemes ();
+        Dictionary<string, Scheme?>? current = SchemeManager.GetSchemes ();
         Assert.NotNull (current);
 
         Assert.True (current!.ContainsKey ("Base"));
@@ -98,7 +98,7 @@ public class SchemeManagerTests
             Disabled = new (Color.Gray, Color.DarkGray)
         };
 
-        newTheme ["Schemes"].PropertyValue = SchemeManager.GetCurrentSchemes ();
+        newTheme ["Schemes"].PropertyValue = SchemeManager.GetSchemes ();
         Assert.Equal (5, SchemeManager.Schemes.Count);
 
         // add a new Scheme to the newTheme
@@ -136,7 +136,7 @@ public class SchemeManagerTests
             HotFocus = new (Color.Green, Color.BrightGreen),
             Disabled = new (Color.Gray, Color.DarkGray)
         };
-        theme ["Schemes"].PropertyValue = SchemeManager.GetCurrentSchemes ();
+        theme ["Schemes"].PropertyValue = SchemeManager.GetSchemes ();
 
         ((Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue!)! ["Test"] = scheme;
 
@@ -155,7 +155,7 @@ public class SchemeManagerTests
             HotFocus = scheme.HotFocus,
             Disabled = scheme.Disabled
         };
-        newTheme ["Schemes"].PropertyValue = SchemeManager.GetCurrentSchemes ();
+        newTheme ["Schemes"].PropertyValue = SchemeManager.GetSchemes ();
         ((Dictionary<string, Scheme>)newTheme ["Schemes"].PropertyValue!)! ["Test"] = newScheme;
 
         // Act
@@ -401,7 +401,7 @@ public class SchemeManagerTests
             Load (ConfigLocations.Runtime);
             Assert.Equal ("TestTheme", ThemeManager.Theme);
 
-            TextStyle style = SchemeManager.GetCurrentSchemes () ["Menu"]!.Normal.Style;
+            TextStyle style = SchemeManager.GetSchemes () ["Menu"]!.Normal.Style;
 
             Assert.Equal (TextStyle.Bold, style);
 

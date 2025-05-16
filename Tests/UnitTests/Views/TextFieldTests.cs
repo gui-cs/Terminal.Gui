@@ -808,10 +808,10 @@ public class TextFieldTests (ITestOutputHelper output)
 
         Attribute [] attributes =
         {
-            _textField.Scheme.Focus,
+            _textField.GetAttributeForRole (VisualRole.Focus),
             new (
-                 _textField.Scheme.Focus.Background,
-                 _textField.Scheme.Focus.Foreground
+                 _textField.GetAttributeForRole (VisualRole.Focus).Background,
+                 _textField.GetAttributeForRole (VisualRole.Focus).Foreground
                 )
         };
 
@@ -1635,8 +1635,6 @@ Les Miśerables",
             //Application.Top.Scheme = Colors.Schemes ["Base"];
             _textField = new ()
             {
-                Scheme = new (SchemeManager.Schemes ["Base"]),
-
                 //                1         2         3 
                 //      01234567890123456789012345678901=32 (Length)
                 Text = "TAB to jump between text fields.",
