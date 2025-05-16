@@ -99,6 +99,10 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
             if (_lastWasPressed [2])
             {
                 mouseFlags |= MouseFlags.Button3Released;
+
+                // Removes the moved flag when raising released flags (see https://github.com/gui-cs/Terminal.Gui/issues/4088)
+                mouseFlags &= ~MouseFlags.ReportMousePosition;
+
                 _lastWasPressed [2] = false;
             }
         }
