@@ -237,7 +237,7 @@ public class SyntaxHighlighting : Scenario
 
         List<Cell> cells = new ();
 
-        foreach (KeyValuePair<string, Scheme> color in SchemeManager.GetSchemes ())
+        foreach (KeyValuePair<string, Scheme> color in SchemeManager.GetSchemesForCurrentTheme ())
         {
             string csName = color.Key;
 

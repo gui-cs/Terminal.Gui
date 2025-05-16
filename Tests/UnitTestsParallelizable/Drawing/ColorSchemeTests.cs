@@ -7,7 +7,7 @@ public class SchemeTests
     [Fact]
     public void Schemes_Built_Ins ()
     {
-        Dictionary<string, Scheme> schemes = SchemeManager.Schemes;
+        Dictionary<string, Scheme> schemes = SchemeManager.GetSchemes ();
         Assert.NotNull (schemes);
         Assert.Equal (5, schemes.Count);
         Assert.True (schemes.ContainsKey ("TopLevel"));

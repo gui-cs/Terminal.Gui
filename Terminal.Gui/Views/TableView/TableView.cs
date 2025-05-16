@@ -1914,21 +1914,18 @@ public class TableView : View, IDesignable
         //start by clearing the entire line
         Move (0, row);
 
-        Attribute? color;
+        Attribute? attribute;
 
         if (FullRowSelect && IsSelected (0, rowToRender))
         {
-            color = focused ? rowScheme?.Focus : rowScheme?.HotNormal;
+            attribute = focused ? rowScheme?.Focus : rowScheme?.HotNormal;
         }
         else
         {
-            color = Enabled ? rowScheme?.Normal : rowScheme?.Disabled;
+            attribute = Enabled ? rowScheme?.Normal : rowScheme?.Disabled;
         }
 
-        if (color is { })
-        {
-            SetAttribute (color.Value);
-        }
+        SetAttribute (attribute.Value);
         Driver?.AddStr (new string (' ', Viewport.Width));
 
         // Render cells for each visible header for the current row
@@ -2006,14 +2003,14 @@ public class TableView : View, IDesignable
             {
                 if (isSelectedCell)
                 {
-                    color = focused ? rowScheme.Focus : rowScheme.HotNormal;
+                    attribute = focused ? rowScheme.Focus : rowScheme.HotNormal;
                 }
                 else
                 {
-                    color = Enabled ? rowScheme.Normal : rowScheme.Disabled;
+                    attribute = Enabled ? rowScheme.Normal : rowScheme.Disabled;
                 }
 
-                SetAttribute (color.Value);
+                SetAttribute (attribute.Value);
             }
 
             // If not in full row select mode always, reset scheme to normal and render the vertical line (or space) at the end of the cell

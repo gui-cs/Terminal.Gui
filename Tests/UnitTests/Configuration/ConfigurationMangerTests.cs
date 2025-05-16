@@ -492,12 +492,12 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Assert.NotEmpty (ThemeManager.Themes [ThemeManager.Theme]);
 
             // Verify schemes are properly initialized
-            Assert.NotNull (SchemeManager.Schemes);
-            Assert.NotEmpty (SchemeManager.Schemes);
+            Assert.NotNull (SchemeManager.GetSchemes ());
+            Assert.NotEmpty (SchemeManager.GetSchemes ());
 
             // Verify "Base" has correct values
-            Assert.Equal (Color.White, SchemeManager.Schemes ["Base"]!.Normal.Foreground);
-            Assert.Equal (Color.Blue, SchemeManager.Schemes ["Base"].Normal.Background);
+            Assert.Equal (Color.White, SchemeManager.GetSchemes () ["Base"]!.Normal.Foreground);
+            Assert.Equal (Color.Blue, SchemeManager.GetSchemes () ["Base"].Normal.Background);
 
             Apply ();
             Assert.Equal (Key.Esc, Application.QuitKey);
@@ -532,8 +532,8 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Assert.NotEmpty (ThemeManager.Themes [ThemeManager.Theme]);
 
             // Verify schemes are properly initialized
-            Assert.NotNull (SchemeManager.Schemes);
-            Assert.NotEmpty (SchemeManager.Schemes);
+            Assert.NotNull (SchemeManager.GetSchemes ());
+            Assert.NotEmpty (SchemeManager.GetSchemes ());
 
             // This is too fragile as the default scheme may change
             // Verify "Base" has correct values
@@ -932,8 +932,8 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
             Assert.Equal ("Default", ThemeManager.Theme);
 
-            Assert.Equal (new (Color.White), SchemeManager.Schemes! ["Base"]!.Normal.Foreground);
-            Assert.Equal (new (Color.Blue), SchemeManager.Schemes ["Base"].Normal.Background);
+            Assert.Equal (new (Color.White), SchemeManager.GetSchemes ()! ["Base"]!.Normal.Foreground);
+            Assert.Equal (new (Color.Blue), SchemeManager.GetSchemes () ["Base"].Normal.Background);
 
             Dictionary<string, Scheme> schemes =
                 (Dictionary<string, Scheme>)ThemeManager.Themes.First ().Value ["Schemes"].PropertyValue;
@@ -946,8 +946,8 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Assert.Equal (KeyCode.Z | KeyCode.AltMask, Application.QuitKey.KeyCode);
             Assert.Equal ("Default", ThemeManager.Theme);
 
-            Assert.Equal (new (Color.White), SchemeManager.Schemes ["Base"].Normal.Foreground);
-            Assert.Equal (new (Color.Blue), SchemeManager.Schemes ["Base"].Normal.Background);
+            Assert.Equal (new (Color.White), SchemeManager.GetSchemes () ["Base"].Normal.Foreground);
+            Assert.Equal (new (Color.Blue), SchemeManager.GetSchemes () ["Base"].Normal.Background);
         }
         finally
         {

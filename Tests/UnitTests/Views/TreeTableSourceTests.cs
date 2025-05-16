@@ -222,7 +222,7 @@ public class TreeTableSourceTests : IDisposable
 │ │Name             │Description       │
 ├─┼─────────────────┼──────────────────┤
 │☐│├-Lost Highway   │Exciting night roa│
-│☑││ ├─Ford Trans-Am│Talking thunderbir│
+│☒││ ├─Ford Trans-Am│Talking thunderbir│
 │☐││ └─DeLorean     │Time travelling ca│
 │☐│└+Route 66       │Great race course │
 ";
@@ -240,7 +240,6 @@ public class TreeTableSourceTests : IDisposable
     private TableView GetTreeTable (out TreeView<IDescribedThing> tree)
     {
         var tableView = new TableView ();
-        tableView.SchemeName = "TopLevel";
         tableView.SchemeName = "TopLevel";
         tableView.Viewport = new Rectangle (0, 0, 40, 6);
 

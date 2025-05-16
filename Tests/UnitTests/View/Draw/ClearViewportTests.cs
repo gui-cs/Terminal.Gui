@@ -362,9 +362,9 @@ cccccccccccccccccccc",
 
         Attribute [] attributes =
         {
-            SchemeManager.Schemes ["TopLevel"]!.Normal,
-            SchemeManager.Schemes ["Base"]!.Normal,
-            SchemeManager.Schemes ["Base"]!.Focus
+            SchemeManager.GetSchemes () ["TopLevel"]!.Normal,
+            SchemeManager.GetSchemes () ["Base"]!.Normal,
+            SchemeManager.GetSchemes () ["Base"]!.Focus
         };
 
         if (label)
