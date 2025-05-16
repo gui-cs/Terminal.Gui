@@ -189,9 +189,9 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     public static Dictionary<string, Scheme?> GetSchemes ()
     {
         Debug.Assert (ConfigurationManager.IsInitialized ());
-        //Dictionary<string, Scheme?>? schemes = ThemeManager.GetCurrentTheme () ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
+        Dictionary<string, Scheme?>? schemes = ThemeManager.GetCurrentTheme () ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
 
-        return Schemes!;
+        return schemes!;
     }
 
     /// <summary>
