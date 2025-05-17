@@ -138,7 +138,7 @@ public partial class View
     ///     stop further processing and optionally set the <see cref="Scheme"/> in the event args to a different value.
     /// </summary>
     /// <returns>
-    ///     Set <see cref="SchemeEventArgs.Cancel"/> to <see langword="true"/> to stop default behavior.
+    ///     Set `Cancel` to <see langword="true"/> to stop default behavior.
     /// </returns>
     public event EventHandler<SchemeEventArgs>? GettingScheme;
 
