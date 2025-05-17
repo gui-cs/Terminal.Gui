@@ -37,7 +37,7 @@ public class SchemeJsonConverterTests
     //		}
     //	}";
     [Fact]
-    public void TestSchemesSerialization ()
+    public void TestSchemesSerialization_Equality ()
     {
         // Arrange
         var expectedScheme = new Scheme
@@ -59,4 +59,31 @@ public class SchemeJsonConverterTests
         // Assert
         Assert.Equal (expectedScheme, actualScheme);
     }
+
+    [Fact]
+    public void TestSchemesSerialization ()
+    {
+        var expected = new Scheme
+        {
+            Normal = new (Color.White, Color.Blue),
+            Focus = new (Color.Black, Color.Gray),
+            HotNormal = new (Color.BrightCyan, Color.Blue),
+            HotFocus = new (Color.BrightBlue, Color.Gray),
+            Disabled = new (Color.DarkGray, Color.Blue)
+        };
+
+        string json = JsonSerializer.Serialize (expected, JsonOptions);
+        Scheme? actual = JsonSerializer.Deserialize<Scheme> (json, JsonOptions);
+
+        Assert.NotNull (actual);
+
+        foreach (VisualRole role in Enum.GetValues<VisualRole> ())
+        {
+            Attribute expectedAttr = expected.GetAttributeForRole (role);
+            Attribute actualAttr = actual.GetAttributeForRole (role);
+
+            Assert.Equal (expectedAttr, actualAttr);
+        }
+    }
+
 }

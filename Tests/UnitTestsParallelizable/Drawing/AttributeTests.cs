@@ -1,14 +1,55 @@
-// Alias Console to MockConsole so we don't accidentally use Console
+﻿// Alias Console to MockConsole so we don't accidentally use Console
 
 namespace Terminal.Gui.DrawingTests;
 
 public class AttributeTests
 {
     [Fact]
+    public void Constructor_SetsExplicitByDefault ()
+    {
+        var attr = new Attribute (Color.White, Color.Black, TextStyle.Bold);
+        Assert.True (attr.IsExplicitlySet); // ❌ fails today unless you explicitly set it
+    }
+
+
+    [Fact]
+    public void AsExplicitlySet_CopiesData ()
+    {
+        var original = new Attribute (Color.Red, Color.Black, TextStyle.Italic);
+        Attribute explicitAttr = original.AsExplicitlySet ();
+
+        Assert.Equal (original, explicitAttr);
+        Assert.True (explicitAttr.IsExplicitlySet);
+    }
+
+    [Fact]
+    public void AsImplicit_CopiesData ()
+    {
+        var original = new Attribute (Color.Green, Color.Blue, TextStyle.Underline);
+        Attribute implicitAttr = original.AsImplicit ();
+
+        Assert.Equal (original, implicitAttr);
+        Assert.False (implicitAttr.IsExplicitlySet);
+    }
+
+    [Fact]
     public void Attribute_Is_Value_Type ()
     {
         // prove that Color is a value type
         Assert.True (typeof (Attribute).IsValueType);
+    }
+
+    [Fact]
+    public void Attribute_ToString_ShouldFailComparison_IfDifferentInstancesSameContent ()
+    {
+        var original = new Attribute (Color.White, Color.White);
+        var clone = new Attribute (Color.White, Color.White);
+
+        // These print the same
+        Assert.Equal (original.ToString (), clone.ToString ());
+
+        // But this will fail if anything differs under the hood
+        Assert.Equal (original, clone); // Should pass — record struct
     }
 
     [Fact]
@@ -21,7 +62,7 @@ public class AttributeTests
 
         // Assert
         Assert.Equal (foregroundColor, attribute.Foreground);
-        Assert.Equal (new Color (backgroundColorName), attribute.Background);
+        Assert.Equal (new (backgroundColorName), attribute.Background);
     }
 
     [Fact]
@@ -46,7 +87,7 @@ public class AttributeTests
         var attribute = new Attribute (foregroundColorName, backgroundColor);
 
         // Assert
-        Assert.Equal (new Color (foregroundColorName), attribute.Foreground);
+        Assert.Equal (new (foregroundColorName), attribute.Foreground);
         Assert.Equal (backgroundColor, attribute.Background);
     }
 
@@ -57,8 +98,8 @@ public class AttributeTests
         var attribute = new Attribute (ColorName16.Blue);
 
         // Assert
-        Assert.Equal (new Color (Color.Blue), attribute.Foreground);
-        Assert.Equal (new Color (Color.Blue), attribute.Background);
+        Assert.Equal (new (Color.Blue), attribute.Foreground);
+        Assert.Equal (new (Color.Blue), attribute.Background);
     }
 
     [Fact]
@@ -71,31 +112,31 @@ public class AttributeTests
         var attr = new Attribute ();
 
         Assert.Equal (-1, attr.PlatformColor);
-        Assert.Equal (new Color (Color.White), attr.Foreground);
-        Assert.Equal (new Color (Color.Black), attr.Background);
+        Assert.Equal (new (Color.White), attr.Foreground);
+        Assert.Equal (new (Color.Black), attr.Background);
 
         // Test foreground, background
         var fg = new Color ();
-        fg = new Color (Color.Red);
+        fg = new (Color.Red);
 
         var bg = new Color ();
-        bg = new Color (Color.Blue);
+        bg = new (Color.Blue);
 
-        attr = new Attribute (fg, bg);
+        attr = new (fg, bg);
 
         //Assert.True (attr.Initialized);
         //Assert.True (attr.HasValidColors);
         Assert.Equal (fg, attr.Foreground);
         Assert.Equal (bg, attr.Background);
 
-        attr = new Attribute (fg);
+        attr = new (fg);
 
         //Assert.True (attr.Initialized);
         //Assert.True (attr.HasValidColors);
         Assert.Equal (fg, attr.Foreground);
         Assert.Equal (fg, attr.Background);
 
-        attr = new Attribute (bg);
+        attr = new (bg);
 
         //Assert.True (attr.Initialized);
         //Assert.True (attr.HasValidColors);
@@ -114,8 +155,8 @@ public class AttributeTests
         // Assert
         //Assert.False (attribute.Initialized);
         Assert.Equal (-1, attribute.PlatformColor);
-        Assert.Equal (new Color (Color.White), attribute.Foreground);
-        Assert.Equal (new Color (Color.Black), attribute.Background);
+        Assert.Equal (new (Color.White), attribute.Foreground);
+        Assert.Equal (new (Color.Black), attribute.Background);
     }
 
     [Fact]
@@ -141,6 +182,17 @@ public class AttributeTests
     }
 
     [Fact]
+    public void Equality_IncludesStyle ()
+    {
+        var attr1 = new Attribute (Color.Red, Color.Black, TextStyle.Bold);
+        var attr2 = new Attribute (Color.Red, Color.Black, TextStyle.Bold);
+        var attr3 = new Attribute (Color.Red, Color.Black, TextStyle.Underline);
+
+        Assert.Equal (attr1, attr2);
+        Assert.NotEqual (attr1, attr3);
+    }
+
+    [Fact]
     public void Equals_Initialized ()
     {
         var attr1 = new Attribute (Color.Red, Color.Green);
@@ -161,6 +213,16 @@ public class AttributeTests
     }
 
     [Fact]
+    public void GetHashCode_ConsistentWithEquals ()
+    {
+        var attr1 = new Attribute (Color.Red, Color.Black, TextStyle.Bold);
+        var attr2 = new Attribute (Color.Red, Color.Black, TextStyle.Bold);
+
+        Assert.Equal (attr1, attr2);
+        Assert.Equal (attr1.GetHashCode (), attr2.GetHashCode ());
+    }
+
+    [Fact]
     public void Implicit_Assign ()
     {
         var driver = new FakeDriver ();
@@ -170,13 +232,13 @@ public class AttributeTests
 
         var value = 42;
         var fg = new Color ();
-        fg = new Color (Color.Red);
+        fg = new (Color.Red);
 
         var bg = new Color ();
-        bg = new Color (Color.Blue);
+        bg = new (Color.Blue);
 
         // Test conversion to int
-        attr = new Attribute (value, fg, bg);
+        attr = new (value, fg, bg);
         int value_implicit = attr.PlatformColor;
         Assert.Equal (value, value_implicit);
 
@@ -208,16 +270,25 @@ public class AttributeTests
     }
 
     [Fact]
+    public void IsExplicitlySet_DoesNotAffectEquality ()
+    {
+        Attribute attr1 = new Attribute (Color.Red, Color.Black).AsExplicitlySet ();
+        Attribute attr2 = new Attribute (Color.Red, Color.Black).AsImplicit ();
+
+        Assert.Equal (attr1, attr2);
+    }
+
+    [Fact]
     public void Make_Creates ()
     {
         var driver = new FakeDriver ();
         driver.Init ();
 
         var fg = new Color ();
-        fg = new Color (Color.Red);
+        fg = new (Color.Red);
 
         var bg = new Color ();
-        bg = new Color (Color.Blue);
+        bg = new (Color.Blue);
 
         var attr = new Attribute (fg, bg);
 
@@ -232,10 +303,10 @@ public class AttributeTests
     public void Make_Creates_NoDriver ()
     {
         var fg = new Color ();
-        fg = new Color (Color.Red);
+        fg = new (Color.Red);
 
         var bg = new Color ();
-        bg = new Color (Color.Blue);
+        bg = new (Color.Blue);
 
         var attr = new Attribute (fg, bg);
 
@@ -248,10 +319,10 @@ public class AttributeTests
     public void Make_SetsNotInitialized_NoDriver ()
     {
         var fg = new Color ();
-        fg = new Color (Color.Red);
+        fg = new (Color.Red);
 
         var bg = new Color ();
-        bg = new Color (Color.Blue);
+        bg = new (Color.Blue);
 
         var a = new Attribute (fg, bg);
 
@@ -285,7 +356,7 @@ public class AttributeTests
 
         // Assert
         Assert.Equal (foregroundColor, attribute.Foreground);
-        Assert.Equal (new Color (backgroundColorName), attribute.Background);
+        Assert.Equal (new (backgroundColorName), attribute.Background);
     }
 
     [Fact]
@@ -299,7 +370,7 @@ public class AttributeTests
         var attribute = new Attribute (foregroundColorName, backgroundColor);
 
         // Assert
-        Assert.Equal (new Color (foregroundColorName), attribute.Foreground);
+        Assert.Equal (new (foregroundColorName), attribute.Foreground);
         Assert.Equal (backgroundColor, attribute.Background);
     }
 
@@ -314,8 +385,8 @@ public class AttributeTests
         var attribute = new Attribute (foregroundColorName, backgroundColorName);
 
         // Assert
-        Assert.Equal (new Color (foregroundColorName), attribute.Foreground);
-        Assert.Equal (new Color (backgroundColorName), attribute.Background);
+        Assert.Equal (new (foregroundColorName), attribute.Foreground);
+        Assert.Equal (new (backgroundColorName), attribute.Background);
     }
 
     [Fact]

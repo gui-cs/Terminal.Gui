@@ -118,7 +118,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
     }
 
     /// <summary>Creates a new instance set to the default attributes (see <see cref="Attribute.Default"/>).</summary>
-    public Scheme () : this (Attribute.Default) { }
+    public Scheme () : this (Attribute.Default.AsExplicitlySet ()) { }
 
     /// <summary>Creates a new instance, initialized with the values from <paramref name="scheme"/>.</summary>
     /// <param name="scheme">The scheme to initialize the new instance with.</param>
@@ -126,6 +126,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
     {
         ArgumentNullException.ThrowIfNull (scheme);
 
+        // Copy attributes preserving their IsExplicitlySet status
         Normal = scheme.Normal;
         HotNormal = scheme.HotNormal;
         Focus = scheme.Focus;
@@ -142,39 +143,115 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
     /// <param name="attribute">The attribute to initialize the new instance with.</param>
     public Scheme (Attribute attribute)
     {
-        Normal = attribute;
-        HotNormal = attribute;
-        Focus = attribute;
-        HotFocus = attribute;
-        Active = attribute;
-        HotActive = attribute;
-        Highlight = attribute;
-        Editable = attribute;
-        ReadOnly = attribute;
-        Disabled = attribute;
+        // Only set Normal as explicitly set
+        Normal = attribute.AsExplicitlySet ();
+
+        // All others are implicit and will inherit from Normal
+        HotNormal = attribute.AsImplicit ();
+        Focus = attribute.AsImplicit ();
+        HotFocus = attribute.AsImplicit ();
+        Active = attribute.AsImplicit ();
+        HotActive = attribute.AsImplicit ();
+        Highlight = attribute.AsImplicit ();
+        Editable = attribute.AsImplicit ();
+        ReadOnly = attribute.AsImplicit ();
+        Disabled = attribute.AsImplicit ();
     }
 
     /// <summary>
-    ///     Gets the <see cref="Attribute"/> associated with a specified <see cref="VisualRole"/>.
+    ///     Gets the <see cref="Attribute"/> associated with a specified <see cref="VisualRole"/>,
+    ///     applying inheritance rules for attributes not explicitly set.
     /// </summary>
     /// <param name="role">The semantic <see cref="VisualRole"/> describing the element being rendered.</param>
-    /// <returns>The corresponding <see cref="Attribute"/> from the <see cref="Scheme"/>.</returns>
+    /// <returns>The corresponding <see cref="Attribute"/> from the <see cref="Scheme"/>, possibly derived if not explicitly set.</returns>
     public Attribute GetAttributeForRole (VisualRole role)
     {
+        // Get the base attribute for the role
+        var attr = role switch
+        {
+            VisualRole.Normal => Normal,
+            VisualRole.HotNormal => HotNormal,
+            VisualRole.Focus => Focus,
+            VisualRole.HotFocus => HotFocus,
+            VisualRole.Active => Active,
+            VisualRole.HotActive => HotActive,
+            VisualRole.Highlight => Highlight,
+            VisualRole.Editable => Editable,
+            VisualRole.ReadOnly => ReadOnly,
+            VisualRole.Disabled => Disabled,
+            _ => Normal
+        };
+
+        // If explicitly set or it's the Normal role (which must always be set), return as is
+        if (attr.IsExplicitlySet || role == VisualRole.Normal)
+        {
+            return attr;
+        }
+
+        // Otherwise apply inheritance rules
+        return DeriveAttributeForRole (role);
+    }
+
+    /// <summary>
+    /// Derives an attribute for a visual role based on inheritance rules.
+    /// </summary>
+    private Attribute DeriveAttributeForRole (VisualRole role)
+    {
         return role switch
-               {
-                   VisualRole.Normal => Normal,
-                   VisualRole.HotNormal => HotNormal,
-                   VisualRole.Focus => Focus,
-                   VisualRole.HotFocus => HotFocus,
-                   VisualRole.Active => Active,
-                   VisualRole.HotActive => HotActive,
-                   VisualRole.Highlight => Highlight,
-                   VisualRole.Editable => Editable,
-                   VisualRole.ReadOnly => ReadOnly,
-                   VisualRole.Disabled => Disabled,
-                   _ => Normal
-               };
+        {
+            VisualRole.HotNormal => Normal with { Style = Normal.Style | TextStyle.Underline, IsExplicitlySet = false },
+            VisualRole.Focus => Normal with { Background = Normal.Background.GetHighlightColor (), IsExplicitlySet = false },
+            VisualRole.HotFocus => GetDerivedAttribute (VisualRole.Focus) with { Style = GetDerivedAttribute (VisualRole.Focus).Style | TextStyle.Underline, IsExplicitlySet = false },
+            VisualRole.Active => GetDerivedAttribute (VisualRole.Focus) with { Style = GetDerivedAttribute (VisualRole.Focus).Style | TextStyle.Bold, IsExplicitlySet = false },
+            VisualRole.HotActive => GetDerivedAttribute (VisualRole.Active) with { Style = GetDerivedAttribute (VisualRole.Active).Style | TextStyle.Underline, IsExplicitlySet = false },
+            VisualRole.Highlight => Normal with { Background = Normal.Background.GetHighlightColor (), IsExplicitlySet = false },
+            VisualRole.Editable => Normal with { Foreground = new Color ("LightYellow"), IsExplicitlySet = false },
+            VisualRole.ReadOnly => GetDerivedAttribute (VisualRole.Editable) with { Style = GetDerivedAttribute (VisualRole.Editable).Style | TextStyle.Italic, IsExplicitlySet = false },
+            VisualRole.Disabled => Normal with { Style = Normal.Style | TextStyle.Faint, IsExplicitlySet = false },
+            _ => Normal
+        };
+    }
+
+    /// <summary>
+    /// Helper method to get an attribute (explicitly set or derived) for a role.
+    /// Avoids potential infinite recursion by handling each role directly.
+    /// </summary>
+    private Attribute GetDerivedAttribute (VisualRole role)
+    {
+        var attr = role switch
+        {
+            VisualRole.Normal => Normal,
+            VisualRole.HotNormal => HotNormal,
+            VisualRole.Focus => Focus,
+            VisualRole.HotFocus => HotFocus,
+            VisualRole.Active => Active,
+            VisualRole.HotActive => HotActive,
+            VisualRole.Highlight => Highlight,
+            VisualRole.Editable => Editable,
+            VisualRole.ReadOnly => ReadOnly,
+            VisualRole.Disabled => Disabled,
+            _ => Normal
+        };
+
+        if (attr.IsExplicitlySet || role == VisualRole.Normal)
+        {
+            return attr;
+        }
+
+        // Direct derivation for each role to avoid recursion issues
+        return role switch
+        {
+            VisualRole.HotNormal => Normal with { Style = Normal.Style | TextStyle.Underline, IsExplicitlySet = false },
+            VisualRole.Focus => Normal with { Background = Normal.Background.GetHighlightColor (), IsExplicitlySet = false },
+            VisualRole.HotFocus => Normal with { Background = Normal.Background.GetHighlightColor (), Style = Normal.Style | TextStyle.Underline, IsExplicitlySet = false },
+            VisualRole.Active => Normal with { Background = Normal.Background.GetHighlightColor (), Style = Normal.Style | TextStyle.Bold, IsExplicitlySet = false },
+            VisualRole.HotActive => Normal with { Background = Normal.Background.GetHighlightColor (), Style = Normal.Style | TextStyle.Bold | TextStyle.Underline, IsExplicitlySet = false },
+            VisualRole.Highlight => Normal with { Background = Normal.Background.GetHighlightColor (), IsExplicitlySet = false },
+            VisualRole.Editable => Normal with { Foreground = new Color ("LightYellow"), IsExplicitlySet = false },
+            VisualRole.ReadOnly => Normal with { Foreground = new Color ("LightYellow"), Style = Normal.Style | TextStyle.Italic, IsExplicitlySet = false },
+            VisualRole.Disabled => Normal with { Style = Normal.Style | TextStyle.Faint, IsExplicitlySet = false },
+            _ => Normal
+        };
     }
 
     /// <summary>

@@ -323,7 +323,7 @@ public class DeepClonerTests
         Assert.NotNull (result);
         Assert.NotSame (source, result);
         Assert.Equal (2, result.Count);
-        Assert.Equal (source ["Disabled"], result ["Disabled"]);
+        Assert.Equal ((Attribute)source ["Disabled"], (Attribute)result ["Disabled"]);
         Assert.Equal (source ["Normal"], result ["Normal"]);
     }
 

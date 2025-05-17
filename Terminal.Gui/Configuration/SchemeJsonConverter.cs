@@ -4,6 +4,8 @@ using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
+// ReSharper disable StringLiteralTypo
+
 /// <summary>Implements a JSON converter for <see cref="Scheme"/>.</summary>
 [RequiresUnreferencedCode ("AOT")]
 
@@ -26,6 +28,7 @@ internal class SchemeJsonConverter : JsonConverter<Scheme>
     }
 
     /// <inheritdoc/>
+
     public override Scheme Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType != JsonTokenType.StartObject)
@@ -33,25 +36,13 @@ internal class SchemeJsonConverter : JsonConverter<Scheme>
             throw new JsonException ($"Unexpected StartObject token when parsing Scheme: {reader.TokenType}.");
         }
 
-        var normal = Attribute.Default;
-        var focus = Attribute.Default;
-        var hotNormal = Attribute.Default;
-        var hotFocus = Attribute.Default;
-        var disabled = Attribute.Default;
+        // Create a default scheme with all attributes marked as implicit
+        var scheme = new Scheme (Attribute.Default.AsImplicit ());
 
         while (reader.Read ())
         {
             if (reader.TokenType == JsonTokenType.EndObject)
             {
-                var scheme = new Scheme
-                {
-                    Normal = normal,
-                    Focus = focus,
-                    HotNormal = hotNormal,
-                    HotFocus = hotFocus,
-                    Disabled = disabled
-                };
-
                 return scheme;
             }
 
@@ -62,33 +53,25 @@ internal class SchemeJsonConverter : JsonConverter<Scheme>
 
             string propertyName = reader.GetString ();
             reader.Read ();
-            var attribute = JsonSerializer.Deserialize (ref reader, ConfigurationManager.SerializerContext.Attribute);
 
-            switch (propertyName.ToLower ())
-            {
-                case "normal":
-                    normal = attribute;
+            // Make sure attributes are marked as explicitly set when deserialized
+            var attribute = JsonSerializer.Deserialize (ref reader, ConfigurationManager.SerializerContext.Attribute)
+                                          .AsExplicitlySet ();
 
-                    break;
-                case "focus":
-                    focus = attribute;
-
-                    break;
-                case "hotnormal":
-                    hotNormal = attribute;
-
-                    break;
-                case "hotfocus":
-                    hotFocus = attribute;
-
-                    break;
-                case "disabled":
-                    disabled = attribute;
-
-                    break;
-                default:
-                    throw new JsonException ($"Unrecognized Scheme Attribute name: {propertyName}.");
-            }
+            scheme = propertyName.ToLowerInvariant () switch
+                     {
+                         "normal" => scheme with { Normal = attribute },
+                         "hotnormal" => scheme with { HotNormal = attribute },
+                         "focus" => scheme with { Focus = attribute },
+                         "hotfocus" => scheme with { HotFocus = attribute },
+                         "active" => scheme with { Active = attribute },
+                         "hotactive" => scheme with { HotActive = attribute },
+                         "highlight" => scheme with { Highlight = attribute },
+                         "editable" => scheme with { Editable = attribute },
+                         "readonly" => scheme with { ReadOnly = attribute },
+                         "disabled" => scheme with { Disabled = attribute },
+                         _ => throw new JsonException ($"Unrecognized Scheme Attribute name: {propertyName}.")
+                     };
         }
 
         throw new JsonException ();
@@ -99,16 +82,64 @@ internal class SchemeJsonConverter : JsonConverter<Scheme>
     {
         writer.WriteStartObject ();
 
+        // Always write Normal
         writer.WritePropertyName ("Normal");
         AttributeJsonConverter.Instance.Write (writer, value.Normal, options);
-        writer.WritePropertyName ("Focus");
-        AttributeJsonConverter.Instance.Write (writer, value.Focus, options);
-        writer.WritePropertyName ("HotNormal");
-        AttributeJsonConverter.Instance.Write (writer, value.HotNormal, options);
-        writer.WritePropertyName ("HotFocus");
-        AttributeJsonConverter.Instance.Write (writer, value.HotFocus, options);
-        writer.WritePropertyName ("Disabled");
-        AttributeJsonConverter.Instance.Write (writer, value.Disabled, options);
+
+        // Only write explicitly set attributes
+        if (value.HotNormal.IsExplicitlySet)
+        {
+            writer.WritePropertyName ("HotNormal");
+            AttributeJsonConverter.Instance.Write (writer, value.HotNormal, options);
+        }
+
+        if (value.Focus.IsExplicitlySet)
+        {
+            writer.WritePropertyName ("Focus");
+            AttributeJsonConverter.Instance.Write (writer, value.Focus, options);
+        }
+
+        if (value.HotFocus.IsExplicitlySet)
+        {
+            writer.WritePropertyName ("HotFocus");
+            AttributeJsonConverter.Instance.Write (writer, value.HotFocus, options);
+        }
+
+        if (value.Active.IsExplicitlySet)
+        {
+            writer.WritePropertyName ("Active");
+            AttributeJsonConverter.Instance.Write (writer, value.Active, options);
+        }
+
+        if (value.HotActive.IsExplicitlySet)
+        {
+            writer.WritePropertyName ("HotActive");
+            AttributeJsonConverter.Instance.Write (writer, value.HotActive, options);
+        }
+
+        if (value.Highlight.IsExplicitlySet)
+        {
+            writer.WritePropertyName ("Highlight");
+            AttributeJsonConverter.Instance.Write (writer, value.Highlight, options);
+        }
+
+        if (value.Editable.IsExplicitlySet)
+        {
+            writer.WritePropertyName ("Editable");
+            AttributeJsonConverter.Instance.Write (writer, value.Editable, options);
+        }
+
+        if (value.ReadOnly.IsExplicitlySet)
+        {
+            writer.WritePropertyName ("ReadOnly");
+            AttributeJsonConverter.Instance.Write (writer, value.ReadOnly, options);
+        }
+
+        if (value.Disabled.IsExplicitlySet)
+        {
+            writer.WritePropertyName ("Disabled");
+            AttributeJsonConverter.Instance.Write (writer, value.Disabled, options);
+        }
 
         writer.WriteEndObject ();
     }

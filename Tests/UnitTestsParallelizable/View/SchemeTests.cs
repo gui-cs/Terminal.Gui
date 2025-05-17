@@ -7,6 +7,7 @@ namespace Terminal.Gui.ViewTests;
 [Trait ("Category", "View.Scheme")]
 public class SchemeTests
 {
+
     [Fact]
     public void GetScheme_Default_ReturnsBaseScheme ()
     {

@@ -1,15 +1,14 @@
-#nullable enable
+﻿#nullable enable
 using System.Numerics;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
-/// <summary>Attributes represent how text is styled when displayed in the terminal.</summary>
-/// <remarks>
-///     <see cref="Attribute"/> provides a platform independent representation of colors (and someday other forms of
-///     text styling). They encode both the foreground and the background color and are used in the
-///     <see cref="Scheme"/> class to define schemes that can be used in an application.
-/// </remarks>
+/// <summary>Attributes are a platform independent representation of colors and text styling.</summary>
+/// <seealso cref="Color"/>
+/// <seealso cref="TextStyle"/>
+/// <seealso cref="VisualRole"/>
+/// <seealso cref="Scheme"/>
 [JsonConverter (typeof (AttributeJsonConverter))]
 public readonly record struct Attribute : IEqualityOperators<Attribute, Attribute, bool>
 {
@@ -17,6 +16,14 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     [JsonIgnore]
     public static Attribute Default => new (Color.White, Color.Black);
 
+    /// <summary>
+    /// Indicates whether this attribute was explicitly set or is a default/derived value.
+    /// Used internally by <see cref="Scheme"/> to determine which attributes should be inherited.
+    /// </summary>
+    [JsonIgnore (Condition = JsonIgnoreCondition.Always)]
+    internal bool IsExplicitlySet { get; init; }
+
+    // TODO: Once CursesDriver is dead, remove this property
     /// <summary>The <see cref="IConsoleDriver"/>-specific color value.</summary>
     [JsonIgnore (Condition = JsonIgnoreCondition.Always)]
     internal int PlatformColor { get; init; }
@@ -36,13 +43,13 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     /// <summary>Initializes a new instance with default values.</summary>
     public Attribute ()
     {
-        this = Default with { PlatformColor = -1 };
+        this = Default with { PlatformColor = -1, IsExplicitlySet = false };
     }
 
     /// <summary>Initializes a new instance from an existing instance.</summary>
     public Attribute (in Attribute attr)
     {
-        this = attr with { PlatformColor = -1 };
+        this = attr with { PlatformColor = -1, IsExplicitlySet = attr.IsExplicitlySet };
     }
 
     /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
@@ -54,6 +61,8 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
         Foreground = foreground;
         Background = background;
         PlatformColor = platformColor;
+        IsExplicitlySet = true;
+        Style = TextStyle.None;
     }
 
     /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
@@ -63,9 +72,11 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     {
         Foreground = foreground;
         Background = background;
+        IsExplicitlySet = true;
 
         // TODO: Once CursesDriver supports true color all the PlatformColor stuff goes away
-        PlatformColor = Application.Driver?.MakeColor(in foreground, in background).PlatformColor ?? -1;
+        PlatformColor = Application.Driver?.MakeColor (in foreground, in background).PlatformColor ?? -1;
+        Style = TextStyle.None;
     }
 
     /// <summary>Initializes a new instance of the <see cref="Attribute"/> struct.</summary>
@@ -77,6 +88,7 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
         Foreground = foreground;
         Background = background;
         Style = style;
+        IsExplicitlySet = true;
 
         // TODO: Once CursesDriver supports true color all the PlatformColor stuff goes away
         PlatformColor = Application.Driver?.MakeColor (in foreground, in background).PlatformColor ?? -1;
@@ -113,10 +125,41 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     /// <param name="color">The color.</param>
     public Attribute (in Color color) : this (color, color) { }
 
-    /// <inheritdoc/>
-    public override int GetHashCode () { return HashCode.Combine (PlatformColor, Foreground, Background, Style); }
+    /// <summary>
+    /// Creates a version of this attribute marked as explicitly set.
+    /// </summary>
+    /// <returns>A copy of this attribute with IsExplicitlySet = true.</returns>
+    internal Attribute AsExplicitlySet ()
+    {
+        return this with { IsExplicitlySet = true };
+    }
 
-    // TODO: Add TextStyle to Attribute.ToString(), modify unit tests to account
+    /// <summary>
+    /// Creates a version of this attribute marked as not explicitly set (implicit/derived).
+    /// </summary>
+    /// <returns>A copy of this attribute with IsExplicitlySet = false.</returns>
+    internal Attribute AsImplicit ()
+    {
+        return this with { IsExplicitlySet = false };
+    }
+
+    /// <inheritdoc />
+    public bool Equals (Attribute other)
+    {
+        return PlatformColor == other.PlatformColor
+               && Foreground.Equals (other.Foreground)
+               && Background.Equals (other.Background)
+               && Style == other.Style;
+        // ❌ do not include IsExplicitlySet
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode ()
+    {
+        return HashCode.Combine (PlatformColor, Foreground, Background, Style);
+        // ❌ do not include IsExplicitlySet
+    }
+
     /// <inheritdoc/>
     public override string ToString ()
     {
