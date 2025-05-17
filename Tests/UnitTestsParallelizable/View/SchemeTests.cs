@@ -207,7 +207,7 @@ public class SchemeTests
     [Fact]
     public void GetHardCodedSchemes_ReturnsExpectedSchemes ()
     {
-        var schemes = View.GetHardCodedSchemes ();
+        var schemes = Scheme.GetHardCodedSchemes ();
 
         Assert.NotNull (schemes);
         Assert.Contains ("Base", schemes.Keys);

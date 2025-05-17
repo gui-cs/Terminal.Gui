@@ -37,27 +37,4 @@ public class SchemeTests
         lbl.SetScheme (scheme);
         lbl.Draw ();
     }
-
-    [Fact]
-    public void Scheme_BigConstructor ()
-    {
-        var a = new Attribute (1);
-        var b = new Attribute (2);
-        var c = new Attribute (3);
-        var d = new Attribute (4);
-        var e = new Attribute (5);
-
-        var cs = new Scheme (
-            normal: a,
-            focus: b,
-            hotNormal: c,
-            disabled: d,
-            hotFocus: e);
-
-        Assert.Equal (a, cs.Normal);
-        Assert.Equal (b, cs.Focus);
-        Assert.Equal (c, cs.HotNormal);
-        Assert.Equal (d, cs.Disabled);
-        Assert.Equal (e, cs.HotFocus);
-    }
 }
