@@ -5,14 +5,6 @@ namespace Terminal.Gui.DrawingTests;
 public class AttributeTests
 {
     [Fact]
-    public void Constructor_SetsExplicitByDefault ()
-    {
-        var attr = new Attribute (Color.White, Color.Black, TextStyle.Bold);
-        Assert.True (attr.IsExplicitlySet); // ❌ fails today unless you explicitly set it
-    }
-
-
-    [Fact]
     public void AsExplicitlySet_CopiesData ()
     {
         var original = new Attribute (Color.Red, Color.Black, TextStyle.Italic);
@@ -23,6 +15,16 @@ public class AttributeTests
     }
 
     [Fact]
+    public void AsExplicitlySet_PreservesStyle ()
+    {
+        var original = new Attribute (Color.White, Color.Black, TextStyle.Faint);
+        Attribute copy = original.AsExplicitlySet ();
+
+        Assert.Equal (original.Style, copy.Style);
+        Assert.True (copy.IsExplicitlySet);
+    }
+
+    [Fact]
     public void AsImplicit_CopiesData ()
     {
         var original = new Attribute (Color.Green, Color.Blue, TextStyle.Underline);
@@ -30,26 +32,6 @@ public class AttributeTests
 
         Assert.Equal (original, implicitAttr);
         Assert.False (implicitAttr.IsExplicitlySet);
-    }
-
-    [Fact]
-    public void Attribute_Is_Value_Type ()
-    {
-        // prove that Color is a value type
-        Assert.True (typeof (Attribute).IsValueType);
-    }
-
-    [Fact]
-    public void Attribute_ToString_ShouldFailComparison_IfDifferentInstancesSameContent ()
-    {
-        var original = new Attribute (Color.White, Color.White);
-        var clone = new Attribute (Color.White, Color.White);
-
-        // These print the same
-        Assert.Equal (original.ToString (), clone.ToString ());
-
-        // But this will fail if anything differs under the hood
-        Assert.Equal (original, clone); // Should pass — record struct
     }
 
     [Fact]
@@ -103,6 +85,13 @@ public class AttributeTests
     }
 
     [Fact]
+    public void Constructor_SetsExplicitByDefault ()
+    {
+        var attr = new Attribute (Color.White, Color.Black, TextStyle.Bold);
+        Assert.True (attr.IsExplicitlySet); // ❌ fails today unless you explicitly set it
+    }
+
+    [Fact]
     public void Constructors_Construct ()
     {
         var driver = new FakeDriver ();
@@ -147,6 +136,13 @@ public class AttributeTests
     }
 
     [Fact]
+    public void Default_IsImplicit ()
+    {
+        var attr = new Attribute ();
+        Assert.False (attr.IsExplicitlySet);
+    }
+
+    [Fact]
     public void DefaultConstructor ()
     {
         // Arrange & Act
@@ -157,6 +153,17 @@ public class AttributeTests
         Assert.Equal (-1, attribute.PlatformColor);
         Assert.Equal (new (Color.White), attribute.Foreground);
         Assert.Equal (new (Color.Black), attribute.Background);
+    }
+
+    [Fact]
+    public void Equality_IncludesStyle ()
+    {
+        var attr1 = new Attribute (Color.Red, Color.Black, TextStyle.Bold);
+        var attr2 = new Attribute (Color.Red, Color.Black, TextStyle.Bold);
+        var attr3 = new Attribute (Color.Red, Color.Black, TextStyle.Underline);
+
+        Assert.Equal (attr1, attr2);
+        Assert.NotEqual (attr1, attr3);
     }
 
     [Fact]
@@ -179,17 +186,6 @@ public class AttributeTests
 
         // Act & Assert
         Assert.True (attribute1 == attribute2);
-    }
-
-    [Fact]
-    public void Equality_IncludesStyle ()
-    {
-        var attr1 = new Attribute (Color.Red, Color.Black, TextStyle.Bold);
-        var attr2 = new Attribute (Color.Red, Color.Black, TextStyle.Bold);
-        var attr3 = new Attribute (Color.Red, Color.Black, TextStyle.Underline);
-
-        Assert.Equal (attr1, attr2);
-        Assert.NotEqual (attr1, attr3);
     }
 
     [Fact]
@@ -270,12 +266,28 @@ public class AttributeTests
     }
 
     [Fact]
+    public void Is_Value_Type ()
+    {
+        // prove that Color is a value type
+        Assert.True (typeof (Attribute).IsValueType);
+    }
+
+    [Fact]
     public void IsExplicitlySet_DoesNotAffectEquality ()
     {
         Attribute attr1 = new Attribute (Color.Red, Color.Black).AsExplicitlySet ();
         Attribute attr2 = new Attribute (Color.Red, Color.Black).AsImplicit ();
 
         Assert.Equal (attr1, attr2);
+    }
+
+    [Fact]
+    public void List_RoundTrip_EqualityHolds ()
+    {
+        List<Attribute> list1 = [new (Color.Red, Color.Black, TextStyle.Bold)];
+        List<Attribute> list2 = new (list1);
+
+        Assert.Equal (list1, list2);
     }
 
     [Fact]
@@ -423,5 +435,30 @@ public class AttributeTests
 
         // Assert
         Assert.Equal (expectedString, attributeString);
+    }
+
+    [Theory]
+    [InlineData (TextStyle.Bold, "Bold")]
+    [InlineData (TextStyle.Bold | TextStyle.Underline, "Bold, Underline")]
+    [InlineData (TextStyle.None, "None")]
+    public void ToString_IncludesStyle (TextStyle style, string expectedStyleString)
+    {
+        var attr = new Attribute (Color.Red, Color.Black, style);
+        var result = attr.ToString ();
+
+        Assert.Contains (expectedStyleString, result);
+    }
+
+    [Fact]
+    public void ToString_ShouldFailComparison_IfDifferentInstancesSameContent ()
+    {
+        var original = new Attribute (Color.White, Color.White);
+        var clone = new Attribute (Color.White, Color.White);
+
+        // These print the same
+        Assert.Equal (original.ToString (), clone.ToString ());
+
+        // But this will fail if anything differs under the hood
+        Assert.Equal (original, clone); // Should pass — record struct
     }
 }
