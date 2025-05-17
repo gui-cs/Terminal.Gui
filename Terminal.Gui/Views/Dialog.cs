@@ -17,7 +17,7 @@ public class Dialog : Window
     /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
     /// <remarks>This property can be set in a Theme.</remarks>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End; // Default is set in config.json
+    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End;
 
     /// <summary>The default <see cref="AlignmentModes"/> for <see cref="Dialog"/>.</summary>
     /// <remarks>This property can be set in a Theme.</remarks>
@@ -43,7 +43,7 @@ public class Dialog : Window
     /// Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public new static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None; // Default is set in config.json
+    public new static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Transparent;
 
     /// <summary>
     ///     Defines the default border styling for <see cref="Dialog"/>. Can be configured via
@@ -51,7 +51,7 @@ public class Dialog : Window
     /// </summary>
 
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single; // Default is set in config.json
+    public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Heavy;
 
     private readonly List<Button> _buttons = new ();
 

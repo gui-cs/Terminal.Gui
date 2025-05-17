@@ -1,4 +1,6 @@
 #nullable enable
+using System.Diagnostics;
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -31,13 +33,18 @@ public class OptionSelector : View, IOrientation, IDesignable
     private int? _selectedItem;
 
     /// <summary>
-    /// Gets or sets the index of the selected item.
+    /// Gets or sets the index of the selected item. Will be <see langword="null"/> if no item is selected.
     /// </summary>
     public int? SelectedItem
     {
         get => _selectedItem;
         set
         {
+            if (value < 0 || value >= SubViews.OfType<CheckBox> ().Count ())
+            {
+                throw new ArgumentOutOfRangeException (nameof (value), @$"SelectedItem must be between 0 and {SubViews.OfType<CheckBox> ().Count ()-1}");
+
+            }
             if (_selectedItem == value)
             {
                 return;

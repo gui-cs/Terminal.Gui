@@ -29,12 +29,12 @@ public static class MessageBox
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single; // Default is set in config.json
+    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Heavy;
 
     /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
     /// <remarks>This property can be set in a Theme.</remarks>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.Center; // Default is set in config.json
+    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.Center;
 
     /// <summary>
     ///     Defines the default minimum MessageBox width, as a percentage of the screen width. Can be configured via

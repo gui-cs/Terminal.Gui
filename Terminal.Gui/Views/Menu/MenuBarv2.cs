@@ -33,7 +33,7 @@ public class MenuBarv2 : Menuv2, IDesignable
                     Command.HotKey,
                     () =>
                     {
-                        Logging.Debug ($"{Title} - Command.HotKey");
+                        // Logging.Debug ($"{Title} - Command.HotKey");
 
                         if (RaiseHandlingHotKey () is true)
                         {
@@ -66,7 +66,7 @@ public class MenuBarv2 : Menuv2, IDesignable
                     Command.Quit,
                     ctx =>
                     {
-                        Logging.Debug ($"{Title} - Command.Quit");
+                        // Logging.Debug ($"{Title} - Command.Quit");
 
                         if (HideActiveItem ())
                         {
@@ -207,7 +207,7 @@ public class MenuBarv2 : Menuv2, IDesignable
 
     private void OnMenuBarItemAccepted (object? sender, CommandEventArgs e)
     {
-        Logging.Debug ($"{Title} ({e.Context?.Source?.Title}) Command: {e.Context?.Command}");
+        // Logging.Debug ($"{Title} ({e.Context?.Source?.Title}) Command: {e.Context?.Command}");
 
         RaiseAccepted (e.Context);
     }
@@ -244,7 +244,7 @@ public class MenuBarv2 : Menuv2, IDesignable
             }
 
             _active = value;
-            Logging.Debug ($"Active set to {_active} - CanFocus: {CanFocus}, HasFocus: {HasFocus}");
+            // Logging.Debug ($"Active set to {_active} - CanFocus: {CanFocus}, HasFocus: {HasFocus}");
 
             if (!_active)
             {
@@ -253,7 +253,7 @@ public class MenuBarv2 : Menuv2, IDesignable
             }
 
             CanFocus = value;
-            Logging.Debug ($"Set CanFocus: {CanFocus}, HasFocus: {HasFocus}");
+            // Logging.Debug ($"Set CanFocus: {CanFocus}, HasFocus: {HasFocus}");
         }
     }
 
@@ -262,7 +262,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     {
         // If the MenuBar does not have focus and the mouse enters: Enable CanFocus
         // But do NOT show a Popover unless the user clicks or presses a hotkey
-        Logging.Debug ($"CanFocus = {CanFocus}, HasFocus = {HasFocus}");
+        // Logging.Debug ($"CanFocus = {CanFocus}, HasFocus = {HasFocus}");
 
         if (!HasFocus)
         {
@@ -275,7 +275,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// <inheritdoc/>
     protected override void OnMouseLeave ()
     {
-        Logging.Debug ($"CanFocus = {CanFocus}, HasFocus = {HasFocus}");
+        // Logging.Debug ($"CanFocus = {CanFocus}, HasFocus = {HasFocus}");
 
         if (!IsOpen ())
         {
@@ -288,7 +288,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
     {
-        Logging.Debug ($"CanFocus = {CanFocus}, HasFocus = {HasFocus}");
+        // Logging.Debug ($"CanFocus = {CanFocus}, HasFocus = {HasFocus}");
 
         if (!newHasFocus)
         {
@@ -299,7 +299,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// <inheritdoc/>
     protected override void OnSelectedMenuItemChanged (MenuItemv2? selected)
     {
-        Logging.Debug ($"{Title} ({selected?.Title}) - IsOpen: {IsOpen ()}");
+        // Logging.Debug ($"{Title} ({selected?.Title}) - IsOpen: {IsOpen ()}");
 
         if (IsOpen () && selected is MenuBarItemv2 { PopoverMenuOpen: false } selectedMenuBarItem)
         {
@@ -328,7 +328,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// <inheritdoc/>
     protected override bool OnAccepting (CommandEventArgs args)
     {
-        Logging.Debug ($"{Title} ({args.Context?.Source?.Title})");
+        // Logging.Debug ($"{Title} ({args.Context?.Source?.Title})");
 
         // TODO: Ensure sourceMenuBar is actually one of our bar items
         if (Visible && Enabled && args.Context?.Source is MenuBarItemv2 { PopoverMenuOpen: false } sourceMenuBarItem)
@@ -362,7 +362,7 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// <inheritdoc/>
     protected override void OnAccepted (CommandEventArgs args)
     {
-        Logging.Debug ($"{Title} ({args.Context?.Source?.Title}) Command: {args.Context?.Command}");
+        // Logging.Debug ($"{Title} ({args.Context?.Source?.Title}) Command: {args.Context?.Command}");
         base.OnAccepted (args);
 
         if (SubViews.OfType<MenuBarItemv2> ().Contains (args.Context?.Source))
@@ -379,11 +379,11 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// <param name="menuBarItem"></param>
     private void ShowItem (MenuBarItemv2? menuBarItem)
     {
-        Logging.Debug ($"{Title} - {menuBarItem?.Id}");
+        // Logging.Debug ($"{Title} - {menuBarItem?.Id}");
 
         if (!Active || !Visible)
         {
-            Logging.Debug ($"{Title} - {menuBarItem?.Id} - Not Active, not showing.");
+            // Logging.Debug ($"{Title} - {menuBarItem?.Id} - Not Active, not showing.");
 
             return;
         }
@@ -399,13 +399,13 @@ public class MenuBarv2 : Menuv2, IDesignable
         if (Application.Popover?.GetActivePopover () is PopoverMenu popoverMenu
             && popoverMenu?.Root?.SuperMenuItem?.SuperView == this)
         {
-            Logging.Debug ($"{Title} - Calling Application.Popover?.Hide ({popoverMenu.Title})");
+            // Logging.Debug ($"{Title} - Calling Application.Popover?.Hide ({popoverMenu.Title})");
             Application.Popover?.Hide (popoverMenu);
         }
 
         if (menuBarItem is null)
         {
-            Logging.Debug ($"{Title} - menuBarItem is null.");
+            // Logging.Debug ($"{Title} - menuBarItem is null.");
 
             return;
         }
@@ -418,7 +418,7 @@ public class MenuBarv2 : Menuv2, IDesignable
             menuBarItem.PopoverMenu.Root.SuperMenuItem = menuBarItem;
         }
 
-        Logging.Debug ($"{Title} - \"{menuBarItem.PopoverMenu?.Title}\".MakeVisible");
+        // Logging.Debug ($"{Title} - \"{menuBarItem.PopoverMenu?.Title}\".MakeVisible");
         menuBarItem.PopoverMenu?.MakeVisible (new Point (menuBarItem.FrameToScreen ().X, menuBarItem.FrameToScreen ().Bottom));
 
         menuBarItem.Accepting += OnMenuItemAccepted;
@@ -427,7 +427,7 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         void OnMenuItemAccepted (object? sender, EventArgs args)
         {
-            Logging.Debug ($"{Title} - OnMenuItemAccepted");
+            // Logging.Debug ($"{Title} - OnMenuItemAccepted");
             menuBarItem.PopoverMenu!.VisibleChanged -= OnMenuItemAccepted;
 
             if (Active && menuBarItem.PopoverMenu is { Visible: false })
@@ -453,11 +453,11 @@ public class MenuBarv2 : Menuv2, IDesignable
     /// <returns><see langword="true"/> if the popover was hidden</returns>
     public bool HideItem (MenuBarItemv2? activeItem)
     {
-        Logging.Debug ($"{Title} ({activeItem?.Title}) - Active: {Active}, CanFocus: {CanFocus}, HasFocus: {HasFocus}");
+        // Logging.Debug ($"{Title} ({activeItem?.Title}) - Active: {Active}, CanFocus: {CanFocus}, HasFocus: {HasFocus}");
 
         if (activeItem is null || !activeItem.PopoverMenu!.Visible)
         {
-            Logging.Debug ($"{Title} No active item.");
+            // Logging.Debug ($"{Title} No active item.");
 
             return false;
         }

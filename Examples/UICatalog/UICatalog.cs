@@ -77,7 +77,9 @@ public class UICatalog
         driverOption.AddAlias ("--d");
 
         // Configuration Management
-        Option<bool> disableConfigManagement = new ("--disable-cm", "Indicates Configuration Management should not be enabled. Only `ConfigLocations.HardCoded` settings will be loaded.");
+        Option<bool> disableConfigManagement = new (
+                                                    "--disable-cm",
+                                                    "Indicates Configuration Management should not be enabled. Only `ConfigLocations.HardCoded` settings will be loaded.");
         disableConfigManagement.AddAlias ("-dcm");
         disableConfigManagement.AddAlias ("--dcm");
 
@@ -113,8 +115,8 @@ public class UICatalog
                                                                   getDefaultValue: () => "none"
                                                                  ).FromAmong (
                                                                               UICatalogTop.CachedScenarios.Select (s => s.GetName ())
-                                                                                               .Append ("none")
-                                                                                               .ToArray ()
+                                                                                          .Append ("none")
+                                                                                          .ToArray ()
                                                                              );
 
         var rootCommand = new RootCommand ("A comprehensive sample library and test app for Terminal.Gui")
@@ -167,16 +169,16 @@ public class UICatalog
     public static LogEventLevel LogLevelToLogEventLevel (LogLevel logLevel)
     {
         return logLevel switch
-        {
-            LogLevel.Trace => LogEventLevel.Verbose,
-            LogLevel.Debug => LogEventLevel.Debug,
-            LogLevel.Information => LogEventLevel.Information,
-            LogLevel.Warning => LogEventLevel.Warning,
-            LogLevel.Error => LogEventLevel.Error,
-            LogLevel.Critical => LogEventLevel.Fatal,
-            LogLevel.None => LogEventLevel.Fatal, // Default to Fatal if None is specified
-            _ => LogEventLevel.Fatal // Default to Information for any unspecified LogLevel
-        };
+               {
+                   LogLevel.Trace => LogEventLevel.Verbose,
+                   LogLevel.Debug => LogEventLevel.Debug,
+                   LogLevel.Information => LogEventLevel.Information,
+                   LogLevel.Warning => LogEventLevel.Warning,
+                   LogLevel.Error => LogEventLevel.Error,
+                   LogLevel.Critical => LogEventLevel.Fatal,
+                   LogLevel.None => LogEventLevel.Fatal, // Default to Fatal if None is specified
+                   _ => LogEventLevel.Fatal // Default to Information for any unspecified LogLevel
+               };
     }
 
     private static ILogger CreateLogger ()
@@ -222,7 +224,7 @@ public class UICatalog
 
         Application.Init (driverName: _forceDriver);
 
-        UICatalogTop top = Application.Run<UICatalogTop> ();
+        var top = Application.Run<UICatalogTop> ();
         top.Dispose ();
         Application.Shutdown ();
         VerifyObjectsWereDisposed ();
@@ -304,17 +306,13 @@ public class UICatalog
             return;
         }
 
+        Logging.Debug ($"{e.FullPath} {e.ChangeType} - Loading and Applying");
         ConfigurationManager.Load (ConfigLocations.All);
         ConfigurationManager.Apply ();
     }
 
     private static void UICatalogMain (UICatalogCommandLineOptions options)
     {
-        if (ConfigurationManager.IsEnabled)
-        {
-            StartConfigFileWatcher ();
-        }
-
         // By setting _forceDriver we ensure that if the user has specified a driver on the command line, it will be used
         // regardless of what's in a config file.
         Application.ForceDriver = _forceDriver = options.Driver;
@@ -329,11 +327,11 @@ public class UICatalog
             }
 
             int item = UICatalogTop.CachedScenarios!.IndexOf (
-                                                                   UICatalogTop.CachedScenarios!.FirstOrDefault (
-                                                                        s =>
-                                                                            s.GetName ()
-                                                                             .Equals (options.Scenario, StringComparison.OrdinalIgnoreCase)
-                                                                       )!);
+                                                              UICatalogTop.CachedScenarios!.FirstOrDefault (
+                                                                   s =>
+                                                                       s.GetName ()
+                                                                        .Equals (options.Scenario, StringComparison.OrdinalIgnoreCase)
+                                                                  )!);
             UICatalogTop.CachedSelectedScenario = (Scenario)Activator.CreateInstance (UICatalogTop.CachedScenarios [item].GetType ())!;
 
             BenchmarkResults? results = RunScenario (UICatalogTop.CachedSelectedScenario, options.Benchmark);
@@ -362,7 +360,6 @@ public class UICatalog
             return;
         }
 
-
 #if DEBUG_IDISPOSABLE
         View.EnableDebugIDisposableAsserts = true;
 #endif
@@ -370,11 +367,11 @@ public class UICatalog
         if (!Options.DontEnableConfigurationManagement)
         {
             ConfigurationManager.Enable (ConfigLocations.All);
+            StartConfigFileWatcher ();
         }
 
         while (RunUICatalogTopLevel () is { } scenario)
         {
-
 #if DEBUG_IDISPOSABLE
             VerifyObjectsWereDisposed ();
 

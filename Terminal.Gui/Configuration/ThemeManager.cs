@@ -232,6 +232,11 @@ public static class ThemeManager
 
             string previousThemeValue = GetCurrentThemeName ();
 
+            if (value == previousThemeValue)
+            {
+                return;
+            }
+
             if (!Themes!.ContainsKey (value))
             {
                 Logging.Warning ($"{value} is not a valid theme name.");
