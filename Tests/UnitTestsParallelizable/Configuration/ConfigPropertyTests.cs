@@ -428,6 +428,10 @@ public class ConfigPropertyTests
         [ConfigurationProperty]
         public static ConcurrentDictionary<string, ConfigProperty>? TestConfigDictionaryProperty { get; set; }
 
+        [ConfigurationProperty]
+        public static Scheme? TestSchemeProperty { get; set; }
+
+
         public static void Reset ()
         {
             TestStringPropertySetCount = 0;
@@ -436,6 +440,26 @@ public class ConfigPropertyTests
             TestRegularDictionaryProperty = null;
             TestConfigDictionaryProperty = null;
         }
+    }
+    [Fact]
+    public void UpdateFrom_SchemeSource_DoesNotUpdateValue_Yet ()
+    {
+        // Arrange
+        var propertyInfo = typeof (TestConfiguration).GetProperty (nameof (TestConfiguration.TestSchemeProperty));
+        var expected = new Scheme (new Attribute (Color.Red, Color.Blue));
+
+        var configProperty = new ConfigProperty
+        {
+            PropertyInfo = propertyInfo!,
+            PropertyValue = new Scheme (new Attribute (Color.White, Color.Black)) // different from expected
+        };
+
+        // Act: this should ideally update to expected, but currently does not
+        object? result = configProperty.UpdateFrom (expected);
+
+        // Assert
+        Assert.NotEqual (expected, result);
+        Assert.NotEqual (expected, configProperty.PropertyValue); // shows bug
     }
 
 }
