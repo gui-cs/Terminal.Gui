@@ -63,7 +63,7 @@ public partial class View
     ///     Handlers should check if <see cref="CancelEventArgs.Cancel"/>
     ///     has been set to <see langword="true"/> and do nothing if so. If Cancel is <see langword="false"/>
     ///     a handler can set it to <see langword="true"/> to stop further processing optionally change the
-    ///     <see cref="VisualRoleEventArgs.CurrentValue"/> in the event args to a different value.
+    ///     `CurrentValue` in the event args to a different value.
     /// </summary>
     public event EventHandler<VisualRoleEventArgs>? GettingAttributeForRole;
 
@@ -91,7 +91,7 @@ public partial class View
     /// <remarks>
     ///     If the View is disabled (<see cref="Enabled"/> is <see langword="false"/>), <see cref="VisualRole.Disabled"/>
     ///     will be used instead of
-    ///     <param name="role"></param>
+    ///     <paramref name="role"></paramref>
     ///     . To override this behavior use  <see cref="OnSettingAttributeForRole"/>/<see cref="SettingAttributeForRole"/>
     ///     to cancel the method, and call <see cref="SetAttribute"/> directly.
     /// </remarks>
@@ -133,7 +133,7 @@ public partial class View
     ///     This is raised by <see cref="SetAttributeForRole"/>.
     /// </summary>
     /// <para>
-    ///     Set <see cref="VisualRoleEventArgs.Cancel"/> to <see langword="true"/> to cancel the setting of the attribute.
+    ///     Set `Cancel` to <see langword="true"/> to cancel the setting of the attribute.
     /// </para>
     public event EventHandler<VisualRoleEventArgs>? SettingAttributeForRole;
 

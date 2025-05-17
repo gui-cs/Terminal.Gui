@@ -42,10 +42,10 @@ public class Menuv2 : Bar
     }
 
     /// <summary>
-    ///     Gets or sets the default Border Style for Menus. The default is <see cref="LineStyle.Single"/>.
+    ///     Gets or sets the default Border Style for Menus. The default is <see cref="LineStyle.None"/>.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Rounded;
+    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.None;
 
     /// <summary>
     ///     Gets or sets the menu item that opened this menu as a sub-menu.

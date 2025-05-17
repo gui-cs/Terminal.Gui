@@ -51,7 +51,7 @@ public class SchemeManagerTests
     {
         Dictionary<string, Scheme?>? hardCoded = SchemeManager.GetHardCodedSchemes ();
 
-        Assert.Equal (View.GetHardCodedSchemes (), hardCoded);
+        Assert.Equal (Scheme.GetHardCodedSchemes (), hardCoded);
     }
 
     [Fact]

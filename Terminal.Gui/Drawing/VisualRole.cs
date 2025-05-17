@@ -49,6 +49,11 @@ public enum VisualRole
     Disabled,
 
     /// <summary>
+    ///     The visual role for elements that are editible
+    /// </summary>
+    Editable,
+
+    /// <summary>
     ///     The visual role for elements that are normally editable but currently read-only.
     /// </summary>
     ReadOnly
