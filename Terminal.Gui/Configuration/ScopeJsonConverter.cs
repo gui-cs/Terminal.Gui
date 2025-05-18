@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
@@ -12,9 +11,9 @@ namespace Terminal.Gui;
 ///     data to/from <see cref="ConfigurationManager"/> JSON documents.
 /// </summary>
 /// <typeparam name="TScopeT"></typeparam>
-
 [RequiresUnreferencedCode ("AOT")]
-internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TScopeT> : JsonConverter<TScopeT> where TScopeT : Scope<TScopeT>
+internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TScopeT> : JsonConverter<TScopeT>
+    where TScopeT : Scope<TScopeT>
 {
     [RequiresDynamicCode ("Calls System.Type.MakeGenericType(params Type[])")]
 #pragma warning disable IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
@@ -28,11 +27,11 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                                     );
         }
 
-        TScopeT scope = (TScopeT)Activator.CreateInstance (typeof (TScopeT))!;
+        var scope = (TScopeT)Activator.CreateInstance (typeof (TScopeT))!;
+        var propertyName = string.Empty;
 
         while (reader.Read ())
         {
-            string? propertyName = string.Empty;
             if (reader.TokenType == JsonTokenType.EndObject)
             {
                 return scope!;
@@ -40,7 +39,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
 
             if (reader.TokenType != JsonTokenType.PropertyName)
             {
-                throw new JsonException ($"""Expected a JSON property name, but got "{reader.TokenType}" - Last propertyName: "{propertyName}".""");
+                throw new JsonException ($"After {propertyName}: Expected a JSON property name, but got \"{reader.TokenType}\"");
             }
 
             propertyName = reader.GetString ();
@@ -69,15 +68,15 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
 
                     try
                     {
-                        Type? type = (Type?)typeof (ReadHelper<>).MakeGenericType (typeof (TScopeT), propertyType!);
-                        ReadHelper? readHelper = Activator.CreateInstance (type!, converter) as ReadHelper;
+                        var type = (Type?)typeof (ReadHelper<>).MakeGenericType (typeof (TScopeT), propertyType!);
+                        var readHelper = Activator.CreateInstance (type!, converter) as ReadHelper;
 
                         scope! [propertyName].PropertyValue = readHelper?.Read (ref reader, propertyType!, options);
                     }
                     catch (NotSupportedException e)
                     {
                         throw new JsonException (
-                                                 $"Error reading property \"{propertyName}\" of type \"{propertyType?.Name}\".",
+                                                 $"{propertyName}: Error reading property of type \"{propertyType?.Name}\".",
                                                  e
                                                 );
                     }
@@ -91,7 +90,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                         {
                             // Logging.Trace ($"scopeT Read: {ex}");
                         }
-}
+                    }
                 }
                 else
                 {
@@ -102,11 +101,11 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                     }
                     catch (Exception)
                     {
-                       // Logging.Trace ($"scopeT Read: {ex}");
+                        // Logging.Trace ($"scopeT Read: {ex}");
                     }
                 }
-                //Logging.Warning ($"{propertyName} = {scope! [propertyName].PropertyValue}");
 
+                //Logging.Warning ($"{propertyName} = {scope! [propertyName].PropertyValue}");
             }
             else
             {
@@ -155,15 +154,18 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                     // Unknown property
                     // TODO: To support forward compatibility, we should just ignore unknown properties?
                     // TODO: Eg if we read an unknown property, it's possible that the property was added in a later version
-                    throw new JsonException ($"Unknown property name \"{propertyName}\".");
+                    throw new JsonException ($"{propertyName}: Unknown property name.");
                 }
             }
         }
 
-        throw new JsonException ("ScopeJsonConverter");
+        throw new JsonException ($"{propertyName}: Json error in ScopeJsonConverter");
     }
 
-    [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "<Pending>")]
+    [UnconditionalSuppressMessage (
+                                      "AOT",
+                                      "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+                                      Justification = "<Pending>")]
     public override void Write (Utf8JsonWriter writer, TScopeT scope, JsonSerializerOptions options)
     {
         writer.WriteStartObject ();

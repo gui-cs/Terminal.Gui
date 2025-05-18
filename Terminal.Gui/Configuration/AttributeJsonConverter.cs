@@ -67,23 +67,30 @@ internal class AttributeJsonConverter : JsonConverter<Attribute>
             reader.Read ();
             var property = $"\"{reader.GetString ()}\"";
 
-            switch (propertyName?.ToLower ())
+            try
             {
-                case "foreground":
-                    foreground = JsonSerializer.Deserialize (property, ConfigurationManager.SerializerContext.Color);
+                switch (propertyName?.ToLower ())
+                {
+                    case "foreground":
+                        foreground = JsonSerializer.Deserialize (property, ConfigurationManager.SerializerContext.Color);
 
-                    break;
-                case "background":
-                    background = JsonSerializer.Deserialize (property, ConfigurationManager.SerializerContext.Color);
+                        break;
+                    case "background":
+                        background = JsonSerializer.Deserialize (property, ConfigurationManager.SerializerContext.Color);
 
-                    break;
-                case "style":
-                    style = JsonSerializer.Deserialize (property, ConfigurationManager.SerializerContext.TextStyle);
+                        break;
+                    case "style":
+                        style = JsonSerializer.Deserialize (property, ConfigurationManager.SerializerContext.TextStyle);
 
-                    break;
+                        break;
 
-                default:
-                    throw new JsonException ($"{propertyName}: Unknown Attribute property .");
+                    default:
+                        throw new JsonException ($"{propertyName}: Unknown Attribute property .");
+                }
+            }
+            catch (JsonException ex)
+            {
+                throw new JsonException ($"{propertyName}: \"{property}\" - {ex.Message}");
             }
         }
 
