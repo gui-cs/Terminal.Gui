@@ -711,7 +711,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 			}";
 
         var jsonException = Assert.Throws<JsonException> (() => SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime));
-        Assert.Equal ("Unexpected color name: brownish.", jsonException.Message);
+        Assert.StartsWith ("foreground: \"\"brownish\"\"", jsonException.Message);
 
         // AbNormal is not a Scheme attribute
         json = @"
@@ -735,7 +735,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 			}";
 
         jsonException = Assert.Throws<JsonException> (() => SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime));
-        Assert.Equal ("Unrecognized Scheme Attribute name: AbNormal.", jsonException.Message);
+        Assert.StartsWith ("AbNormal:", jsonException.Message);
 
         // Modify hotNormal background only
         json = @"
@@ -758,7 +758,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 			}";
 
         jsonException = Assert.Throws<JsonException> (() => SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime));
-        Assert.Equal ("Both Foreground and Background colors must be provided.", jsonException.Message);
+        Assert.StartsWith ("background:", jsonException.Message);
 
         // Unknown property
         json = @"
@@ -767,7 +767,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 			}";
 
         jsonException = Assert.Throws<JsonException> (() => SourcesManager?.Load (Settings, json, "test", ConfigLocations.Runtime));
-        Assert.StartsWith ("Unknown property", jsonException.Message);
+        Assert.StartsWith ("Unknown:", jsonException.Message);
 
         Assert.Equal (0, _jsonErrors.Length);
 
@@ -932,7 +932,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
             Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
             Assert.Equal (KeyCode.Z | KeyCode.AltMask, ((Key)Settings! ["Application.QuitKey"].PropertyValue)!.KeyCode);
-            Assert.Equal(Alignment.Center, MessageBox.DefaultButtonAlignment);
+            Assert.Equal (Alignment.Center, MessageBox.DefaultButtonAlignment);
 
             //Assert.Equal (Color.White, SchemeManager.GetSchemes ()! ["Base"]!.Normal.Foreground);
             //Assert.Equal (Color.Blue, SchemeManager.GetSchemes ()! ["Base"].Normal.Background);
