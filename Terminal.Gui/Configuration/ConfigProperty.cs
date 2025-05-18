@@ -206,6 +206,11 @@ public class ConfigProperty
                 PropertyValue = DeepCloner.DeepClone (configProperty.PropertyValue);
             }
         }
+        else if (source is Dictionary<string, Scheme> dictSchemeSource &&
+                 PropertyValue is Dictionary<string, Scheme> dictSchemesDest)
+        {
+            UpdateSchemeDictionary (dictSchemeSource, dictSchemesDest);
+        }
         else if (source is Scheme scheme)
         {
             PropertyValue = new Scheme (scheme); // use copy constructor
@@ -387,6 +392,30 @@ public class ConfigProperty
 
             // Update the value in the destination
             destination [sourceProp.Key].UpdateFrom (sourceProp.Value);
+        }
+    }
+
+    /// <summary>
+    /// Updates a ConfigProperty dictionary with values from a source dictionary.
+    /// </summary>
+    /// <param name="source">The source ConfigProperty dictionary.</param>
+    /// <param name="destination">The destination ConfigProperty dictionary.</param>
+    private void UpdateSchemeDictionary (
+        Dictionary<string, Scheme> source,
+        Dictionary<string, Scheme> destination)
+    {
+        foreach (KeyValuePair<string, Scheme> sourceProp in source)
+        {
+            if (!destination.ContainsKey (sourceProp.Key))
+            {
+                // Add the property to the destination
+                // Schemes are structs are passed by val
+                destination.Add (sourceProp.Key, sourceProp.Value);
+            }
+
+            // Update the value in the destination
+            // Schemes are structs are passed by val
+            destination [sourceProp.Key] = sourceProp.Value;
         }
     }
 

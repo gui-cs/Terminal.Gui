@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Concurrent;
+using System.Reflection;
 using System.Text.Json;
 
 namespace Terminal.Gui.ConfigurationTests;
@@ -439,27 +440,29 @@ public class ConfigPropertyTests
             TestDictionaryProperty = null;
             TestRegularDictionaryProperty = null;
             TestConfigDictionaryProperty = null;
+            TestSchemeProperty = null;
         }
     }
+
     [Fact]
-    public void UpdateFrom_SchemeSource_DoesNotUpdateValue_Yet ()
+    public void UpdateFrom_SchemeSource_UpdatesValue ()
     {
         // Arrange
-        var propertyInfo = typeof (TestConfiguration).GetProperty (nameof (TestConfiguration.TestSchemeProperty));
-        var expected = new Scheme (new Attribute (Color.Red, Color.Blue));
+        PropertyInfo? propertyInfo = typeof (TestConfiguration).GetProperty (nameof (TestConfiguration.TestSchemeProperty));
+        Scheme sourceScheme = new (new Attribute (Color.Red, Color.Blue, TextStyle.Bold).AsExplicitlySet ());
 
         var configProperty = new ConfigProperty
         {
             PropertyInfo = propertyInfo!,
-            PropertyValue = new Scheme (new Attribute (Color.White, Color.Black)) // different from expected
+            PropertyValue = new Scheme (new Attribute (Color.White, Color.Black, TextStyle.None))
         };
 
-        // Act: this should ideally update to expected, but currently does not
-        object? result = configProperty.UpdateFrom (expected);
+        // Act
+        object? result = configProperty.UpdateFrom (sourceScheme);
 
         // Assert
-        Assert.NotEqual (expected, result);
-        Assert.NotEqual (expected, configProperty.PropertyValue); // shows bug
+        Assert.Equal (sourceScheme, result);
+        Assert.Equal (sourceScheme, configProperty.PropertyValue);
+        Assert.NotSame (sourceScheme, configProperty.PropertyValue); // Prove it's a clone, not a ref
     }
-
 }

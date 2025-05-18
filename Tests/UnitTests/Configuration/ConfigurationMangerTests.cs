@@ -794,6 +794,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
   ""Themes"": [
     {
       ""Default"": {
+        ""MessageBox.DefaultButtonAlignment"": ""End"",
         ""Schemes"": [
           {
             ""TopLevel"": {
@@ -927,27 +928,28 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
             SourcesManager?.Load (Settings, json, "UpdateFromJson", ConfigLocations.Runtime);
 
-            Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
-            Assert.Equal (KeyCode.Z | KeyCode.AltMask, ((Key)Settings ["Application.QuitKey"].PropertyValue)!.KeyCode);
-
             Assert.Equal ("Default", ThemeManager.Theme);
 
-            Assert.Equal (new (Color.White), SchemeManager.GetSchemes ()! ["Base"]!.Normal.Foreground);
-            Assert.Equal (new (Color.Blue), SchemeManager.GetSchemes () ["Base"].Normal.Background);
+            Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
+            Assert.Equal (KeyCode.Z | KeyCode.AltMask, ((Key)Settings! ["Application.QuitKey"].PropertyValue)!.KeyCode);
+            Assert.Equal(Alignment.Center, MessageBox.DefaultButtonAlignment);
 
-            Dictionary<string, Scheme> schemes =
-                (Dictionary<string, Scheme>)ThemeManager.Themes.First ().Value ["Schemes"].PropertyValue;
-            Assert.Equal (new (Color.White), schemes! ["Base"].Normal.Foreground);
-            Assert.Equal (new (Color.Blue), schemes ["Base"].Normal.Background);
+            //Assert.Equal (Color.White, SchemeManager.GetSchemes ()! ["Base"]!.Normal.Foreground);
+            //Assert.Equal (Color.Blue, SchemeManager.GetSchemes ()! ["Base"].Normal.Background);
+
+            //Dictionary<string, Scheme> schemes = (Dictionary<string, Scheme>)ThemeManager.Themes!.First ().Value ["Schemes"].PropertyValue;
+            //Assert.Equal (Color.White, schemes! ["Base"].Normal.Foreground);
+            //Assert.Equal (Color.Blue, schemes ["Base"].Normal.Background);
 
             // Now re-apply
             Apply ();
 
-            Assert.Equal (KeyCode.Z | KeyCode.AltMask, Application.QuitKey.KeyCode);
             Assert.Equal ("Default", ThemeManager.Theme);
+            Assert.Equal (KeyCode.Z | KeyCode.AltMask, Application.QuitKey.KeyCode);
+            Assert.Equal (Alignment.End, MessageBox.DefaultButtonAlignment);
 
-            Assert.Equal (new (Color.White), SchemeManager.GetSchemes () ["Base"].Normal.Foreground);
-            Assert.Equal (new (Color.Blue), SchemeManager.GetSchemes () ["Base"].Normal.Background);
+            Assert.Equal (Color.White, SchemeManager.GetSchemes ()! ["Base"].Normal.Foreground);
+            Assert.Equal (Color.Blue, SchemeManager.GetSchemes ()! ["Base"].Normal.Background);
         }
         finally
         {

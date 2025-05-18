@@ -723,7 +723,7 @@ public class ListView : View, IDesignable
     /// <inheritdoc/>
     protected override bool OnDrawingContent ()
     {
-        Attribute current = GetAttributeForRole (VisualRole.Focus);
+        Attribute current = Attribute.Default;
         Move (0, 0);
         Rectangle f = Viewport;
         int item = Viewport.Y;

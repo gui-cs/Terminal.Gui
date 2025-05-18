@@ -5,30 +5,11 @@ using System.Text.Json.Serialization;
 namespace Terminal.Gui;
 
 // ReSharper disable StringLiteralTypo
-
 /// <summary>Implements a JSON converter for <see cref="Scheme"/>.</summary>
 [RequiresUnreferencedCode ("AOT")]
-
 internal class SchemeJsonConverter : JsonConverter<Scheme>
 {
-    private static SchemeJsonConverter instance;
-
-    /// <summary>Singleton</summary>
-    public static SchemeJsonConverter Instance
-    {
-        get
-        {
-            if (instance is null)
-            {
-                instance = new SchemeJsonConverter ();
-            }
-
-            return instance;
-        }
-    }
-
     /// <inheritdoc/>
-
     public override Scheme Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType != JsonTokenType.StartObject)
@@ -38,6 +19,7 @@ internal class SchemeJsonConverter : JsonConverter<Scheme>
 
         // Create a default scheme with all attributes marked as implicit
         var scheme = new Scheme (Attribute.Default.AsImplicit ());
+        var propertyName = string.Empty;
 
         while (reader.Read ())
         {
@@ -48,33 +30,40 @@ internal class SchemeJsonConverter : JsonConverter<Scheme>
 
             if (reader.TokenType != JsonTokenType.PropertyName)
             {
-                throw new JsonException ($"Unexpected token when parsing Attribute: {reader.TokenType}.");
+                throw new JsonException ($"After {propertyName}: Expected PropertyName but got another token when parsing Attribute: {reader.TokenType}.");
             }
 
-            string propertyName = reader.GetString ();
+            propertyName = reader.GetString ();
             reader.Read ();
 
             // Make sure attributes are marked as explicitly set when deserialized
             var attribute = JsonSerializer.Deserialize (ref reader, ConfigurationManager.SerializerContext.Attribute)
                                           .AsExplicitlySet ();
 
-            scheme = propertyName.ToLowerInvariant () switch
-                     {
-                         "normal" => scheme with { Normal = attribute },
-                         "hotnormal" => scheme with { HotNormal = attribute },
-                         "focus" => scheme with { Focus = attribute },
-                         "hotfocus" => scheme with { HotFocus = attribute },
-                         "active" => scheme with { Active = attribute },
-                         "hotactive" => scheme with { HotActive = attribute },
-                         "highlight" => scheme with { Highlight = attribute },
-                         "editable" => scheme with { Editable = attribute },
-                         "readonly" => scheme with { ReadOnly = attribute },
-                         "disabled" => scheme with { Disabled = attribute },
-                         _ => throw new JsonException ($"Unrecognized Scheme Attribute name: {propertyName}.")
-                     };
+            if (propertyName is { })
+            {
+                scheme = propertyName.ToLowerInvariant () switch
+                         {
+                             "normal" => scheme with { Normal = attribute },
+                             "hotnormal" => scheme with { HotNormal = attribute },
+                             "focus" => scheme with { Focus = attribute },
+                             "hotfocus" => scheme with { HotFocus = attribute },
+                             "active" => scheme with { Active = attribute },
+                             "hotactive" => scheme with { HotActive = attribute },
+                             "highlight" => scheme with { Highlight = attribute },
+                             "editable" => scheme with { Editable = attribute },
+                             "readonly" => scheme with { ReadOnly = attribute },
+                             "disabled" => scheme with { Disabled = attribute },
+                             _ => throw new JsonException ($"{propertyName}: Unrecognized Scheme Attribute name.")
+                         };
+            }
+            else
+            {
+                throw new JsonException ("null property name.");
+            }
         }
 
-        throw new JsonException ();
+        throw new JsonException ($"After {propertyName}: Invalid Json.");
     }
 
     /// <inheritdoc/>

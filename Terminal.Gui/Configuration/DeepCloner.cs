@@ -46,7 +46,6 @@ public static class DeepCloner
         {
             return default (T?);
         }
-
         // For AOT environments, use source generation exclusively
         if (IsAotEnvironment ())
         {
@@ -121,8 +120,9 @@ public static class DeepCloner
         // Add to visited before cloning properties
         visited.TryAdd (source, clone);
 
-        // Clone writable public properties
-        foreach (PropertyInfo prop in type.GetProperties (BindingFlags.Instance | BindingFlags.Public)
+        // Clone writable public and internal properties
+        foreach (PropertyInfo prop in type.GetProperties (BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                                          .Where (p => !p.IsSpecialName) // exclude private backing fields or compiler-generated props
                                           .Where (p => p is { CanRead: true, CanWrite: true } && p.GetIndexParameters ().Length == 0))
         {
             object? value = prop.GetValue (source);

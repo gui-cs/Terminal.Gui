@@ -120,19 +120,15 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                                                .Where (
                                                        p =>
                                                        {
-                                                           var jia =
-                                                               p.GetCustomAttribute (typeof (JsonIncludeAttribute)) as
-                                                                   JsonIncludeAttribute;
-
-                                                           if (jia is { })
+                                                           if (p.GetCustomAttribute (typeof (JsonIncludeAttribute)) is JsonIncludeAttribute { } jia)
                                                            {
-                                                               var jpna =
+                                                               var jsonPropertyNameAttribute =
                                                                    p.GetCustomAttribute (
                                                                                          typeof (JsonPropertyNameAttribute)
                                                                                         ) as
                                                                        JsonPropertyNameAttribute;
 
-                                                               if (jpna?.Name == propertyName)
+                                                               if (jsonPropertyNameAttribute?.Name == propertyName)
                                                                {
                                                                    // Bit of a hack, modifying propertyName in an enumerator...
                                                                    propertyName = p.Name;

@@ -546,6 +546,7 @@ public static class ConfigurationManager
                                                                                   PropertyNameCaseInsensitive = true,
                                                                                   DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                                                                                   WriteIndented = true,
+                                                                                  AllowTrailingCommas = true,
 
                                                                                   Converters =
                                                                                   {

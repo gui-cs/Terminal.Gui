@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
@@ -161,6 +161,54 @@ public class DeepClonerTests
         Assert.Equal (source, result);
 
         source = new (Color.White);
+        result = DeepCloner.DeepClone (source);
+        Assert.Equal (source, result);
+    }
+
+    [Fact]
+    public void DoesNotClone_ImmutableStructsCompletely ()
+    {
+        Attribute attr = new (Color.White, Color.Black, TextStyle.Bold);
+        Attribute clone = DeepCloner.DeepClone (attr);
+
+        Assert.True (attr.IsExplicitlySet);
+        Assert.True (clone.IsExplicitlySet); // ❌ fails
+    }
+
+    [Fact]
+    public void Scheme_Normal_Set_ReturnsEqualValue ()
+    {
+        var source = new Scheme (new Scheme (new Attribute (Color.Red, Color.Green, TextStyle.Bold)));
+        Scheme? result = DeepCloner.DeepClone (source);
+        Assert.Equal (source, result);
+
+        source = new Scheme (new Scheme ());
+        result = DeepCloner.DeepClone (source);
+        Assert.Equal (source, result);
+    }
+
+    [Fact]
+    public void Scheme_All_Set_ReturnsEqualValue ()
+    {
+        Scheme? source = new ()
+        {
+            Normal = new (new ("LightGray"), new ("RaisinBlack"), TextStyle.None), // Material Theme: Panel Background
+            Focus = new (new ("White"), new ("DarkGray"), TextStyle.None), // Slightly lighter background for focus
+            HotNormal = new (new ("Silver"), new ("RaisinBlack"), TextStyle.Underline), // Lighter text for hotkeys
+            Disabled = new (new ("DarkGray"), new ("RaisinBlack"), TextStyle.Faint), // Dimmed text for disabled
+            HotFocus = new (new ("White"), new ("DarkGray"), TextStyle.Underline), // Underlined white text on focus
+            Active = new (new ("White"), new ("Charcoal"), TextStyle.Bold), // White text on active
+            HotActive = new (new ("White"), new ("Charcoal"), TextStyle.Underline | TextStyle.Bold), // Underlined white text on active
+            Highlight = new (new ("White"), new ("Onyx"), TextStyle.None), // Highlight with slightly lighter background
+            Editable = new (new ("LightYellow"), new ("RaisinBlack"), TextStyle.None), // Yellowish text for editable fields
+            ReadOnly = new (new ("Gray"), new ("RaisinBlack"), TextStyle.Italic) // Gray italic text for read-only
+        };
+        Scheme? result = DeepCloner.DeepClone (source);
+        Assert.True (result!.Focus.IsExplicitlySet);
+
+        Assert.Equal (source, result);
+
+        source = new Scheme (new Scheme ());
         result = DeepCloner.DeepClone (source);
         Assert.Equal (source, result);
     }
