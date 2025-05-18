@@ -32,7 +32,7 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
         InputProcessor.KeyUp += (s, e) => KeyUp?.Invoke (s, e);
         InputProcessor.MouseEvent += (s, e) =>
                                      {
-                                         Logging.Logger.LogTrace ($"Mouse {e.Flags} at x={e.ScreenPosition.X} y={e.ScreenPosition.Y}");
+                                         //Logging.Logger.LogTrace ($"Mouse {e.Flags} at x={e.ScreenPosition.X} y={e.ScreenPosition.Y}");
                                          MouseEvent?.Invoke (s, e);
                                      };
 
