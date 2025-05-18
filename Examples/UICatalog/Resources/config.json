@@ -4,29 +4,7 @@
   "FileDialogStyle.DefaultUseColors": false,
   "FileDialogStyle.DefaultUseUnicodeCharacters": false,
   "AppSettings": {
-    "UICatalog.StatusBar": true,
-    "ConfigurationEditor.EditorScheme": {
-      "Normal": {
-        "Foreground": "Red",
-        "Background": "White"
-      },
-      "Focus": {
-        "Foreground": "Green",
-        "Background": "White"
-      },
-      "HotNormal": {
-        "Foreground": "Black",
-        "Background": "White"
-      },
-      "HotFocus": {
-        "Foreground": "White",
-        "Background": "BrightRed"
-      },
-      "Disabled": {
-        "Foreground": "DarkGray",
-        "Background": "White"
-      }
-    }
+    "UICatalog.StatusBar": true
   },
   "Themes": [
     {

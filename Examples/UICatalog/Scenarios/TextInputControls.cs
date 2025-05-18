@@ -1,8 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 using Terminal.Gui;
 using Terminal.Gui.TextValidateProviders;
@@ -13,7 +9,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Mouse and Keyboard")]
 [ScenarioCategory ("Text and Formatting")]
-public class Text : Scenario
+public class TextInputControls : Scenario
 {
     private Label _labelMirroringTimeField;
     private TimeField _timeField;
@@ -22,8 +18,9 @@ public class Text : Scenario
     {
         Application.Init ();
         var win = new Window { Title = GetQuitKeyAndName () };
+
         // TextField is a simple, single-line text input control
-        var label = new Label { Text = "_TextField:" };
+        var label = new Label { Text = " _TextField:" };
         win.Add (label);
 
         var textField = new TextField
@@ -36,9 +33,9 @@ public class Text : Scenario
 
         var singleWordGenerator = new SingleWordSuggestionGenerator ();
         textField.Autocomplete.SuggestionGenerator = singleWordGenerator;
-        textField.TextChanging += TextField_TextChanging;
+        textField.TextChanging += TextFieldTextChanging;
 
-        void TextField_TextChanging (object sender, CancelEventArgs<string> e)
+        void TextFieldTextChanging (object sender, CancelEventArgs<string> e)
         {
             singleWordGenerator.AllSuggestions = Regex.Matches (e.NewValue, "\\w+")
                                                       .Select (s => s.Value)
@@ -60,6 +57,24 @@ public class Text : Scenario
         win.Add (labelMirroringTextField);
         textField.TextChanged += (s, prev) => { labelMirroringTextField.Text = textField.Text; };
 
+        label = new Label
+        {
+            Text = "Te_xtField2:",
+            X = 0,
+            Y = Pos.Bottom (textField)
+        };
+        win.Add (label);
+
+        textField = new TextField
+        {
+            X = Pos.Right (label) + 1,
+            Y = Pos.Bottom (textField),
+            Width = Dim.Percent (50) - 1,
+            Caption = "TextField with caption"
+        };
+
+        win.Add (textField);
+
         // TextView is a rich (as in functionality, not formatting) text editing control
         label = new () { Text = "T_extView:", Y = Pos.Bottom (label) + 1 };
         win.Add (label);
@@ -69,7 +84,7 @@ public class Text : Scenario
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             Width = Dim.Percent (50) - 1,
-            Height = Dim.Percent (20)
+            Height = Dim.Percent (10)
         };
         textView.Text = "TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!";
         textView.DrawingContent += TextView_DrawContent;
@@ -444,8 +459,11 @@ public class Text : Scenario
 
         win.Accepting += WinOnAccept;
 
+        ConfigurationManager.Applied += ConfigurationManagerOnApplied;
+
         Application.Run (win);
         win.Dispose ();
+        win = null;
         Application.Shutdown ();
 
         return;
@@ -463,7 +481,16 @@ public class Text : Scenario
                 Application.Invoke (() => acceptView.Text = "");
             });
         }
+
+        void ConfigurationManagerOnApplied (object sender, ConfigurationManagerEventArgs e)
+        {
+            if (win is { })
+            {
+                win.SetNeedsDraw ();
+            }
+        }
     }
+
 
 
     private void TimeChanged (object sender, DateTimeEventArgs<TimeSpan> e) { _labelMirroringTimeField.Text = _timeField.Text; }

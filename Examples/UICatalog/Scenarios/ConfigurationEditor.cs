@@ -14,34 +14,28 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("TextView")]
 public class ConfigurationEditor : Scenario
 {
-    private static Scheme _editorScheme = new ()
-    {
-        Normal = new Attribute (Color.Red, Color.White),
-        Focus = new Attribute (Color.Red, Color.Black),
-        HotFocus = new Attribute (Color.BrightRed, Color.Black),
-        HotNormal = new Attribute (Color.Magenta, Color.White)
-    };
+    //private static Scheme _editorScheme = SchemeManager.GetScheme (Schemes.Base);
 
-    private static Action? _editorSchemeChanged;
+    //private static Action? _editorSchemeChanged;
     private TabView? _tabView;
     private Shortcut? _lenShortcut;
 
-    [ConfigurationProperty (Scope = typeof (AppSettingsScope))]
-    public static Scheme EditorScheme
-    {
-        get => _editorScheme;
-        set
-        {
-            _editorScheme = value;
-            _editorSchemeChanged?.Invoke ();
-        }
-    }
+    //[ConfigurationProperty (Scope = typeof (AppSettingsScope))]
+    //public static Scheme EditorScheme
+    //{
+    //    get => _editorScheme;
+    //    set
+    //    {
+    //        _editorScheme = value;
+    //        _editorSchemeChanged?.Invoke ();
+    //    }
+    //}
 
     public override void Main ()
     {
         Application.Init ();
 
-        Toplevel top = new ();
+        Window? win = new ();
 
         _lenShortcut = new Shortcut ()
         {
@@ -77,34 +71,49 @@ public class ConfigurationEditor : Scenario
             Height = Dim.Fill (Dim.Func (() => statusBar.Frame.Height))
         };
 
-        top.Add (_tabView, statusBar);
+        win.Add (_tabView, statusBar);
 
-        top.Loaded += (s, a) =>
+        win.Loaded += (s, a) =>
                       {
                           Open ();
-                          _editorSchemeChanged?.Invoke ();
+                          //_editorSchemeChanged?.Invoke ();
                       };
 
-        void OnEditorSchemeChanged ()
-        {
-            if (Application.Top is { })
-            {
-                return;
-            }
 
-            foreach (ConfigTextView t in _tabView.SubViews.OfType<ConfigTextView> ())
-            {
-                t.SetScheme (EditorScheme);
-            }
-        }
 
-        _editorSchemeChanged += OnEditorSchemeChanged;
+        //_editorSchemeChanged += OnEditorSchemeChanged;
 
-        Application.Run (top);
-        _editorSchemeChanged -= OnEditorSchemeChanged;
-        top.Dispose ();
+        ConfigurationManager.Applied += ConfigurationManagerOnApplied;
+
+        Application.Run (win);
+        //_editorSchemeChanged -= OnEditorSchemeChanged;
+        win.Dispose ();
+        win = null;
 
         Application.Shutdown ();
+
+        return;
+
+        //void OnEditorSchemeChanged ()
+        //{
+        //    if (Application.Top is { })
+        //    {
+        //        return;
+        //    }
+
+        //    foreach (ConfigTextView t in _tabView.SubViews.OfType<ConfigTextView> ())
+        //    {
+        //        t.SetScheme (EditorScheme);
+        //    }
+        //}
+
+        void ConfigurationManagerOnApplied (object? sender, ConfigurationManagerEventArgs e)
+        {
+            if (win is { })
+            {
+                win.SetNeedsDraw ();
+            }
+        }
     }
     public void Save ()
     {

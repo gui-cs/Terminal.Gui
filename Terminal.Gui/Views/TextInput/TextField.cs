@@ -5,7 +5,7 @@ namespace Terminal.Gui;
 
 /// <summary>Single-line text entry <see cref="View"/></summary>
 /// <remarks>The <see cref="TextField"/> <see cref="View"/> provides editing functionality and mouse support.</remarks>
-public class TextField : View
+public class TextField : View, IDesignable
 {
     private readonly HistoryText _historyText;
     private CultureInfo _currentCulture;
@@ -28,7 +28,10 @@ public class TextField : View
         _isButtonReleased = true;
         _selectedStart = -1;
         _text = new ();
-        CaptionColor = new (Color.DarkGray);
+
+        // TODO: Determine if this is a good choice. Previously this was hard coded to 
+        // TODO: DarkGray which was NOT a good choice.
+        CaptionColor = GetAttributeForRole (VisualRole.Normal).Foreground.GetHighlightColor();
         ReadOnly = false;
         Autocomplete = new TextFieldAutocomplete ();
         Height = Dim.Auto (DimAutoStyle.Text, 1);
@@ -537,14 +540,14 @@ public class TextField : View
             if (!Secret && !_historyText.IsFromHistory)
             {
                 _historyText.Add (
-                                  new () { Cell.ToCellList (oldText) },
+                                  [Cell.ToCellList (oldText)],
                                   new (_cursorPosition, 0)
                                  );
 
                 _historyText.Add (
-                                  new () { Cell.ToCells (_text) },
+                                  [Cell.ToCells (_text)],
                                   new (_cursorPosition, 0),
-                                  HistoryText.LineStatus.Replaced
+                                  TextEditingLineStatus.Replaced
                                  );
             }
 
@@ -932,10 +935,14 @@ public class TextField : View
     {
         _isDrawing = true;
 
-        var selColor = new Attribute (
-                                      GetAttributeForRole (VisualRole.Focus).Background,
-                                      GetAttributeForRole (VisualRole.Focus).Foreground,
-                                      GetAttributeForRole (VisualRole.Focus).Style);
+        // Cache attributes as GetAttributeForRole might raise events
+        Attribute selectedAttribute = new Attribute (
+                                                     GetAttributeForRole (VisualRole.Focus).Background,
+                                                     GetAttributeForRole (VisualRole.Focus).Foreground,
+                                                     GetAttributeForRole (VisualRole.Focus).Style);
+        Attribute readonlyAttribute = GetAttributeForRole (VisualRole.ReadOnly);
+        Attribute normalAttribute = GetAttributeForRole (VisualRole.Editable);
+
         SetSelectedStartSelectedLength ();
 
         SetAttribute (GetAttributeForRole (VisualRole.Normal));
@@ -945,39 +952,41 @@ public class TextField : View
         var col = 0;
         int width = Viewport.Width + OffSetBackground ();
         int tcount = _text.Count;
-        Attribute roc = GetReadOnlyColor ();
 
         for (int idx = p; idx < tcount; idx++)
         {
             Rune rune = _text [idx];
             int cols = rune.GetColumns ();
 
-            if (idx == _cursorPosition && HasFocus && !Used && SelectedLength == 0 && !ReadOnly)
+            if (!Enabled)
             {
-                SetAttribute (selColor);
+                // Disabled
+                SetAttributeForRole (VisualRole.Disabled);
+            } 
+            else if (idx == _cursorPosition && HasFocus && !Used && SelectedLength == 0 && !ReadOnly)
+            {
+                // Selected text
+                SetAttribute (selectedAttribute);
             }
             else if (ReadOnly)
             {
                 SetAttribute (
                               idx >= _start && SelectedLength > 0 && idx < _start + SelectedLength
-                                  ? selColor
-                                  : roc
+                                  ? selectedAttribute
+                                  : readonlyAttribute
                              );
             }
             else if (!HasFocus && Enabled)
             {
-                SetAttribute (GetAttributeForRole (VisualRole.Focus));
-            }
-            else if (!Enabled)
-            {
-                SetAttributeForRole (VisualRole.Disabled);
+                // Normal text
+                SetAttribute (normalAttribute);
             }
             else
             {
                 SetAttribute (
                               idx >= _start && SelectedLength > 0 && idx < _start + SelectedLength
-                                  ? selColor
-                                  : GetAttributeForRole (VisualRole.Focus)
+                                  ? selectedAttribute
+                                  : normalAttribute
                              );
             }
 
@@ -997,8 +1006,9 @@ public class TextField : View
             }
         }
 
-        SetAttribute (GetAttributeForRole (VisualRole.Focus));
+        SetAttribute (normalAttribute);
 
+        // Fill rest of line with spaces
         for (int i = col; i < width; i++)
         {
             Driver?.AddRune ((Rune)' ');
@@ -1302,12 +1312,7 @@ public class TextField : View
         return model;
     }
 
-    private Attribute GetReadOnlyColor ()
-    {
-        return GetAttributeForRole (VisualRole.ReadOnly);
-    }
-
-    private void HistoryText_ChangeText (object sender, HistoryText.HistoryTextItemEventArgs obj)
+    private void HistoryText_ChangeText (object sender, HistoryTextItemEventArgs obj)
     {
         if (obj is null)
         {
@@ -1716,7 +1721,7 @@ public class TextField : View
             return;
         }
 
-        var color = new Attribute (CaptionColor, GetAttributeForRole (VisualRole.Normal).Background, GetAttributeForRole (VisualRole.Normal).Style);
+        var color = new Attribute (CaptionColor, GetAttributeForRole (VisualRole.Editable).Background, GetAttributeForRole (VisualRole.Editable).Style);
         SetAttribute (color);
 
         Move (0, 0);
@@ -1822,6 +1827,15 @@ public class TextField : View
             ContextMenu.Dispose ();
             ContextMenu = null;
         }
+    }
+
+    /// <inheritdoc />
+    public bool EnableForDesign ()
+    {
+        Text = "This is a test.";
+        Caption = "Caption";
+
+        return true;
     }
 
     /// <inheritdoc/>

@@ -1161,15 +1161,15 @@ This is the second line.
     {
         var ht = new HistoryText ();
 
-        foreach (object ls in Enum.GetValues (typeof (HistoryText.LineStatus)))
+        foreach (object ls in Enum.GetValues (typeof (TextEditingLineStatus)))
         {
-            if ((HistoryText.LineStatus)ls != HistoryText.LineStatus.Original)
+            if ((TextEditingLineStatus)ls != TextEditingLineStatus.Original)
             {
                 Assert.Throws<ArgumentException> (
                                                   () => ht.Add (
-                                                                new () { new () },
+                                                                new List<List<Cell>> (),
                                                                 Point.Empty,
-                                                                (HistoryText.LineStatus)ls
+                                                                (TextEditingLineStatus)ls
                                                                )
                                                  );
             }
