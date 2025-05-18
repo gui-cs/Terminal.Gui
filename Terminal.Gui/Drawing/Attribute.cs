@@ -34,6 +34,10 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     [JsonConverter (typeof (ColorJsonConverter))]
     public Color Background { get; }
 
+    // TODO: Add constructors which permit including a TextStyle.
+    /// <summary>The text style (bold, italic, underlined, etc.).</summary>
+    public TextStyle TextStyle { get; init; } = TextStyle.None;
+
     /// <summary>Initializes a new instance with default values.</summary>
     public Attribute ()
     {
@@ -103,6 +107,7 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     /// <inheritdoc/>
     public override int GetHashCode () { return HashCode.Combine (PlatformColor, Foreground, Background); }
 
+    // TODO: Add TextStyle to Attribute.ToString(), modify unit tests to account
     /// <inheritdoc/>
     public override string ToString ()
     {
