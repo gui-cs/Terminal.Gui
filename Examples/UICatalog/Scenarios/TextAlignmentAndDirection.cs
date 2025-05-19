@@ -578,6 +578,12 @@ public class TextAlignmentAndDirection : Scenario
         app.Dispose ();
         Application.Shutdown ();
 
+        // Be a good citizen and remove the schemes we added
+        SchemeManager.RemoveScheme ("TextAlignmentAndDirection1");
+        SchemeManager.RemoveScheme ("TextAlignmentAndDirection2");
+
+        return;
+
         void ToggleJustify (bool oldValue, bool wasJustOptions = false)
         {
             if (oldValue)
