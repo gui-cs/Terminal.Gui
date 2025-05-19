@@ -100,6 +100,9 @@ public class CharMap : View, IDesignable
 
         // The scrollbars are in the Padding. VisualRole.Focus/Active are used to draw the
         // CharMap headers. Override Padding to force it to draw to match.
+        // Note: We could use either SettingAttributeForRole or GettingAttributeForRole for this.
+        // Using SettingAttributeForRole is preferable since it gets called last before 
+        // SetAttribute.
         Padding!.SettingAttributeForRole += PaddingOnSettingAttributeForRole;
     }
 
@@ -271,7 +274,8 @@ public class CharMap : View, IDesignable
         int firstColumnX = RowLabelWidth - Viewport.X;
 
         // Header
-        int x = 0;
+        var x = 0;
+
         for (var hexDigit = 0; hexDigit < 16; hexDigit++)
         {
             x = firstColumnX + hexDigit * COLUMN_WIDTH;
@@ -316,10 +320,11 @@ public class CharMap : View, IDesignable
                 // No row
                 Move (0, y);
                 AddStr (new (' ', RowLabelWidth));
+
                 continue;
             }
 
-            if ((!ShowGlyphWidths || (y + Viewport.Y) % _rowHeight > 0))
+            if (!ShowGlyphWidths || (y + Viewport.Y) % _rowHeight > 0)
             {
                 AddStr ($"U+{val / 16:x5}_");
             }
@@ -328,10 +333,9 @@ public class CharMap : View, IDesignable
                 AddStr (new (' ', RowLabelWidth));
             }
 
-
-
             // Draw the row
             SetAttributeForRole (VisualRole.Normal);
+
             for (var col = 0; col < 16; col++)
             {
                 x = firstColumnX + COLUMN_WIDTH * col + 1;
@@ -397,7 +401,7 @@ public class CharMap : View, IDesignable
                 else
                 {
                     // Draw the width of the rune faint
-                    var attr = GetAttributeForRole (VisualRole.Normal);
+                    Attribute attr = GetAttributeForRole (VisualRole.Normal);
                     SetAttribute (attr with { Style = attr.Style | TextStyle.Faint });
                     AddStr ($"{width}");
                 }
@@ -408,7 +412,6 @@ public class CharMap : View, IDesignable
                     SetAttributeForRole (VisualRole.Normal);
                 }
             }
-
         }
 
         return true;
@@ -657,7 +660,7 @@ public class CharMap : View, IDesignable
                                                         document.RootElement,
                                                         new
                                                             JsonSerializerOptions
-                                                        { WriteIndented = true }
+                                                            { WriteIndented = true }
                                                        );
             }
 
