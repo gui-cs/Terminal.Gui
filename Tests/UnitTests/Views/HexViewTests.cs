@@ -43,13 +43,13 @@ public class HexViewTests
         Assert.True (Application.RaiseKeyDownEvent (Key.Tab)); // Move to left side
 
         Assert.Empty (hv.Edits);
-        hv.AllowEdits = false;
+        hv.ReadOnly = false;
         Assert.True (Application.RaiseKeyDownEvent (Key.Home));
         Assert.False (Application.RaiseKeyDownEvent (Key.A));
         Assert.Empty (hv.Edits);
         Assert.Equal (126, hv.Source!.Length);
 
-        hv.AllowEdits = true;
+        hv.ReadOnly = true;
         Assert.True (Application.RaiseKeyDownEvent (Key.D4));
         Assert.True (Application.RaiseKeyDownEvent (Key.D1));
         Assert.Single (hv.Edits);
@@ -133,13 +133,13 @@ public class HexViewTests
         Assert.NotNull (hv.Source);
         Assert.IsAssignableFrom<MemoryStream> (hv.Source);
         Assert.True (hv.CanFocus);
-        Assert.True (hv.AllowEdits);
+        Assert.True (hv.ReadOnly);
 
         hv = new (new MemoryStream ());
         Assert.NotNull (hv.Source);
         Assert.IsAssignableFrom<Stream> (hv.Source);
         Assert.True (hv.CanFocus);
-        Assert.True (hv.AllowEdits);
+        Assert.True (hv.ReadOnly);
     }
 
     [Fact]

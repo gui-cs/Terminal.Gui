@@ -21,7 +21,7 @@ namespace Terminal.Gui;
 ///     </para>
 ///     <para>Users can switch from one side to the other by using the tab key.</para>
 ///     <para>
-///         To enable editing, set <see cref="AllowEdits"/> to true. When <see cref="AllowEdits"/> is true the user can
+///         To enable editing, set <see cref="ReadOnly"/> to true. When <see cref="ReadOnly"/> is true the user can
 ///         make changes to the hexadecimal values of the <see cref="Stream"/>. Any changes are tracked in the
 ///         <see cref="Edits"/> property (a <see cref="SortedDictionary{TKey, TValue}"/>) indicating the position where the
 ///         changes were made and the new values. A convenience method, <see cref="ApplyEdits"/> will apply the edits to
@@ -125,10 +125,9 @@ public class HexView : View, IDesignable
 
     /// <summary>
     ///     Gets or sets whether this <see cref="HexView"/> allows editing of the <see cref="Stream"/> of the underlying
-    ///     <see cref="Stream"/>.
+    ///     <see cref="Stream"/>. The default is <see langword="false"/>.
     /// </summary>
-    /// <value><c>true</c> to allow edits; otherwise, <c>false</c>.</value>
-    public bool AllowEdits { get; set; } = true;
+    public bool ReadOnly { get; set; } = false;
 
     /// <summary>Gets the current edit position.</summary>
     /// <param name="address"></param>
@@ -622,7 +621,7 @@ public class HexView : View, IDesignable
     /// <inheritdoc/>
     protected override bool OnKeyDownNotHandled (Key keyEvent)
     {
-        if (!AllowEdits || _source is null)
+        if (ReadOnly || _source is null)
         {
             return false;
         }
