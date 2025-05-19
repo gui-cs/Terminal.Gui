@@ -1592,7 +1592,7 @@
       }
     },
     {
-      "Minimal": {
+      "Legacy": {
         "Dialog.DefaultShadow": "None",
         "FrameView.DefaultBorderStyle": "None",
         "Window.DefaultBorderStyle": "None",
@@ -1600,7 +1600,230 @@
         "Button.DefaultShadow": "None",
         "Menuv2.DefaultBorderStyle": "None",
         "Glyphs.LeftBracket": "[",
-        "Glyphs.RightBracket": "]"
+        "Glyphs.RightBracket": "]",
+        "Schemes": [
+          {
+            "TopLevel": {
+              "Normal": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Focus": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "HotNormal": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "HotFocus": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Disabled": {
+                "Foreground": "Black",
+                "Background": "Black"
+              },
+              "Active": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "HotActive": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Highlight": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "Editable": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "ReadOnly": {
+                "Foreground": "White",
+                "Background": "Black"
+              }
+            }
+          },
+          {
+            "Base": {
+              "Normal": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Focus": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "HotNormal": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "HotFocus": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Disabled": {
+                "Foreground": "Black",
+                "Background": "Black"
+              },
+              "Active": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "HotActive": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Highlight": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "Editable": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "ReadOnly": {
+                "Foreground": "White",
+                "Background": "Black"
+              }
+            }
+          },
+          {
+            "Dialog": {
+              "Normal": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "Focus": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "HotNormal": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "HotFocus": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "Disabled": {
+                "Foreground": "White",
+                "Background": "White"
+              },
+              "Active": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "HotActive": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "Highlight": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Editable": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "ReadOnly": {
+                "Foreground": "Black",
+                "Background": "White"
+              }
+            }
+          },
+          {
+            "Menu": {
+              "Normal": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "Focus": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "HotNormal": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "HotFocus": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "Disabled": {
+                "Foreground": "White",
+                "Background": "White"
+              },
+              "Active": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "HotActive": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "Highlight": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Editable": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "ReadOnly": {
+                "Foreground": "Black",
+                "Background": "White"
+              }
+            }
+          },
+          {
+            "Error": {
+              "Normal": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Focus": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "HotNormal": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "HotFocus": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Disabled": {
+                "Foreground": "Black",
+                "Background": "Black"
+              },
+              "Active": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "HotActive": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "Highlight": {
+                "Foreground": "Black",
+                "Background": "White"
+              },
+              "Editable": {
+                "Foreground": "White",
+                "Background": "Black"
+              },
+              "ReadOnly": {
+                "Foreground": "White",
+                "Background": "Black"
+              }
+            }
+          }
+        ]
+
       }
     }
   ]

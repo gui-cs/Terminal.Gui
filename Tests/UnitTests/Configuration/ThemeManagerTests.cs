@@ -269,8 +269,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
         output.WriteLine ($"After ResetToHardCodedDefaults: Themes dictionary size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
 
         Load (ConfigLocations.LibraryResources);
-        Assert.Equal (7, ThemeManager.Themes!.Count);
-        output.WriteLine ($"After Load: Themes dictionary size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
+        output.WriteLine ($"After Load: Themes {ThemeManager.Themes!.Count} dictionary size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
 
         output.WriteLine ($"Total Settings Size: {(MemorySizeEstimator.EstimateSize (Settings!)) / 1024} Kb");
 

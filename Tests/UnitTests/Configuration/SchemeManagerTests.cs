@@ -16,7 +16,7 @@ public class SchemeManagerTests
         Assert.True (schemes!.ContainsKey ("Base"));
         Assert.True (schemes.ContainsKey ("base"));
 
-        Assert.Equal(SchemeManager.GetSchemes (), schemes);
+        Assert.Equal (SchemeManager.GetSchemes (), schemes);
     }
 
     [Fact]
@@ -188,7 +188,7 @@ public class SchemeManagerTests
     }
 
     [Fact]
-    public void Load_Null_Scheme ()
+    public void Load_Null_Scheme_Throws ()
     {
         try
         {
@@ -209,8 +209,11 @@ public class SchemeManagerTests
                             """;
 
             // Load the test theme
+            // TODO: This should throw an exception!
             Load (ConfigLocations.Runtime);
             Assert.Equal ("TestTheme", ThemeManager.Theme);
+
+            Assert.Throws<InvalidOperationException> (SchemeManager.GetSchemes);
 
             // Now reset everything and reload
             ResetToCurrentValues ();
