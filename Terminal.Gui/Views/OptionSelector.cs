@@ -179,7 +179,7 @@ public class OptionSelector : View, IOrientation, IDesignable
             Title = nameWithHotKey,
             Id = name,
             Data = index,
-            HighlightStyle = HighlightStyle.Hover,
+            //HighlightStyle = HighlightStyle.Hover,
             RadioStyle = true
         };
 
@@ -215,6 +215,8 @@ public class OptionSelector : View, IOrientation, IDesignable
                     break;
 
                 case VisualRole.HotNormal:
+                    e.Cancel = true;
+
                     if (!HasFocus)
                     {
                         e.NewValue = GetAttributeForRole (VisualRole.HotFocus);

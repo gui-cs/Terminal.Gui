@@ -635,7 +635,7 @@ public class Shortcut : View, IOrientation, IDesignable
     ///     Gets the subview that displays the key. Is drawn with Normal and HotNormal colors reversed.
     /// </summary>
 
-    public ShortcutKeyView KeyView { get; } = new ();
+    public View KeyView { get; } = new ();
 
     private int _minimumKeyTextSize;
 
@@ -676,7 +676,20 @@ public class Shortcut : View, IOrientation, IDesignable
         KeyView.VerticalTextAlignment = Alignment.Center;
         KeyView.KeyBindings.Clear ();
         KeyView.HighlightStyle = HighlightStyle.None;
-        //KeyView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
+
+        KeyView.GettingAttributeForRole += (sender, args) =>
+                                           {
+                                               if (args.Role == VisualRole.Normal)
+                                               {
+                                                   args.NewValue = SuperView?.GetAttributeForRole (HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal) ?? Attribute.Default;
+                                                   args.Cancel = true;
+                                               }
+                                           };
+        KeyView.ClearingViewport += (sender, args) =>
+                                          {
+                                              // Do not clear; otherwise spaces will be printed with underlines
+                                              args.Cancel = true;
+                                          };
     }
 
     private void UpdateKeyBindings (Key oldKey)

@@ -280,9 +280,14 @@
         "Focus": { "$ref": "#/definitions/attribute", "description": "Appearance when the element has input focus." },
         "HotNormal": { "$ref": "#/definitions/attribute", "description": "Appearance for a 'hot' element (e.g., mouse hover) that is not focused." },
         "HotFocus": { "$ref": "#/definitions/attribute", "description": "Appearance for a 'hot' element that also has input focus." },
-        "Disabled": { "$ref": "#/definitions/attribute", "description": "Appearance when the element is disabled." }
+        "Disabled": { "$ref": "#/definitions/attribute", "description": "Appearance when the element is disabled." },
+        "Active": { "$ref": "#/definitions/attribute", "description": "Appearance when the element is active." },
+        "HotActive": { "$ref": "#/definitions/attribute", "description": "Appearance for a 'hot' element that is also active." },
+        "Highlight": { "$ref": "#/definitions/attribute", "description": "Appearance for a highlighted element." },
+        "Editable": { "$ref": "#/definitions/attribute", "description": "Appearance for an editable element." },
+        "ReadOnly": { "$ref": "#/definitions/attribute", "description": "Appearance for a read-only element." } 
       },
-      "required": ["Normal", "Focus", "HotNormal", "HotFocus", "Disabled"],
+      "required": ["Normal"],
       "additionalProperties": false
     },
     "themeSettings": {
