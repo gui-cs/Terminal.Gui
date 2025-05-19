@@ -1789,7 +1789,7 @@ public class TextView : View, IDesignable
     {
         _isDrawing = true;
 
-        SetAttributeForRole (VisualRole.Editable);
+        SetAttributeForRole (Enabled ? VisualRole.Editable : VisualRole.Disabled);
 
         (int width, int height) offB = OffSetBackground ();
         int right = Viewport.Width + offB.width;
