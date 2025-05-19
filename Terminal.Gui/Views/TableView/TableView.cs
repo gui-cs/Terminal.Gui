@@ -1926,7 +1926,7 @@ public class TableView : View, IDesignable
 
         if (FullRowSelect && IsSelected (0, rowToRender))
         {
-            attribute = focused ? rowScheme?.Focus : rowScheme?.HotNormal;
+            attribute = focused ? rowScheme?.Focus : rowScheme?.Active;
         }
         else
         {
@@ -1989,7 +1989,7 @@ public class TableView : View, IDesignable
 
             if (isSelectedCell)
             {
-                cellColor = focused ? scheme?.Focus : scheme?.HotNormal;
+                cellColor = focused ? scheme?.Focus : scheme?.Active;
             }
             else
             {
@@ -2011,7 +2011,7 @@ public class TableView : View, IDesignable
             {
                 if (isSelectedCell)
                 {
-                    attribute = focused ? rowScheme.Focus : rowScheme.HotNormal;
+                    attribute = focused ? rowScheme.Focus : rowScheme.Active;
                 }
                 else
                 {

@@ -771,7 +771,7 @@ public class ColorPickerTests
         Application.RaiseKeyDownEvent (Key.Tab);
 
         // Resolves to cyan color
-        Assert.Equal ("Cyan", name.Text);
+        Assert.Equal ("Aqua", name.Text);
 
         // Tab out of the text field
         Application.RaiseKeyDownEvent (Key.Tab);

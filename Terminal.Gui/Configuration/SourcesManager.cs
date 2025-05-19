@@ -55,7 +55,7 @@ public class SourcesManager
                 throw;
             }
 
-            ConfigurationManager.AddJsonError ($"Error deserializing {source}: {e.Message}");
+            ConfigurationManager.AddJsonError ($"Error reading {source}: {e.Message}");
         }
 
         return false;

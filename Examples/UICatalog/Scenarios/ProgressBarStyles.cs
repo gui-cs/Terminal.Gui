@@ -87,11 +87,11 @@ public class ProgressBarStyles : Scenario
 
                                         var cs = new Scheme (editor.ViewToEdit.GetScheme ())
                                         {
-                                            HotNormal = new Attribute (
+                                            Active = new Attribute (
                                                                        newColor,
-                                                                       editor.ViewToEdit.GetAttributeForRole (VisualRole.HotNormal)
+                                                                       editor.ViewToEdit.GetAttributeForRole (VisualRole.Active)
                                                                              .Background,
-                                                                          editor.ViewToEdit.GetAttributeForRole (VisualRole.HotNormal).Style
+                                                                          editor.ViewToEdit.GetAttributeForRole (VisualRole.Active).Style
                                                                       )
                                         };
                                         editor.ViewToEdit.SetScheme (cs);
@@ -109,7 +109,7 @@ public class ProgressBarStyles : Scenario
                                     {
                                         if (!LineDrawing.PromptForColor (
                                                                          fgColorPickerBtn.Text,
-                                                                         editor.ViewToEdit.GetAttributeForRole (VisualRole.HotNormal)
+                                                                         editor.ViewToEdit!.GetAttributeForRole (VisualRole.Active)
                                                                                .Background
                                                                         , out var newColor))
 
@@ -119,11 +119,11 @@ public class ProgressBarStyles : Scenario
 
                                         var cs = new Scheme (editor.ViewToEdit.GetScheme ())
                                         {
-                                            HotNormal = new Attribute (
-                                                                       editor.ViewToEdit!.GetAttributeForRole (VisualRole.Normal).Foreground,
-                                                                       newColor,
-                                                                       editor.ViewToEdit!.GetAttributeForRole (VisualRole.Normal).Style
-                                                                      )
+                                            Active = new Attribute (
+                                                                    editor.ViewToEdit!.GetAttributeForRole (VisualRole.Normal).Foreground,
+                                                                    newColor,
+                                                                    editor.ViewToEdit!.GetAttributeForRole (VisualRole.Normal).Style
+                                                                   )
                                         };
                                         editor.ViewToEdit.SetScheme (cs);
                                     };

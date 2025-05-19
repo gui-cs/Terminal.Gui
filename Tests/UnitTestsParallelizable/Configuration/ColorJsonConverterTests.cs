@@ -47,10 +47,10 @@ public class ColorJsonConverterTests
     [InlineData (ColorName16.Black, "Black")]
     [InlineData (ColorName16.Blue, "Blue")]
     [InlineData (ColorName16.Green, "Green")]
-    [InlineData (ColorName16.Cyan, "Cyan")]
+    [InlineData (ColorName16.Cyan, "Aqua")] // W3C+ Standard overrides
     [InlineData (ColorName16.Gray, "Gray")]
     [InlineData (ColorName16.Red, "Red")]
-    [InlineData (ColorName16.Magenta, "Magenta")]
+    [InlineData (ColorName16.Magenta, "Fuchsia")]   // W3C+ Standard overrides
     [InlineData (ColorName16.Yellow, "Yellow")]
     [InlineData (ColorName16.DarkGray, "DarkGray")]
     [InlineData (ColorName16.BrightBlue, "BrightBlue")]

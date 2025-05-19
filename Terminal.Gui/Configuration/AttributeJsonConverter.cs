@@ -37,13 +37,15 @@ internal class AttributeJsonConverter : JsonConverter<Attribute>
         Color? background = null;
         TextStyle? style = null;
 
+        string propertyName = string.Empty;
+
         while (reader.Read ())
         {
             if (reader.TokenType == JsonTokenType.EndObject)
             {
                 if (foreground is null || background is null)
                 {
-                    throw new JsonException ("Both Foreground and Background colors must be provided.");
+                    throw new JsonException ($"{propertyName}: Both Foreground and Background colors must be provided.");
                 }
 
                 if (style.HasValue)
@@ -58,55 +60,41 @@ internal class AttributeJsonConverter : JsonConverter<Attribute>
 
             if (reader.TokenType != JsonTokenType.PropertyName)
             {
-                throw new JsonException ($"Unexpected token when parsing Attribute: {reader.TokenType}.");
+                throw new JsonException ($"{propertyName}: Unexpected token when parsing Attribute: {reader.TokenType}.");
             }
 
-            string propertyName = reader.GetString ();
+            propertyName = reader.GetString ();
             reader.Read ();
             var property = $"\"{reader.GetString ()}\"";
 
-            switch (propertyName?.ToLower ())
+            try
             {
-                case "foreground":
-                    foreground = JsonSerializer.Deserialize (property, ConfigurationManager.SerializerContext.Color);
+                switch (propertyName?.ToLower ())
+                {
+                    case "foreground":
+                        foreground = JsonSerializer.Deserialize (property, ConfigurationManager.SerializerContext.Color);
 
-                    break;
-                case "background":
-                    background = JsonSerializer.Deserialize (property, ConfigurationManager.SerializerContext.Color);
+                        break;
+                    case "background":
+                        background = JsonSerializer.Deserialize (property, ConfigurationManager.SerializerContext.Color);
 
-                    break;
-                case "style":
-                    style = JsonSerializer.Deserialize (property, ConfigurationManager.SerializerContext.TextStyle);
+                        break;
+                    case "style":
+                        style = JsonSerializer.Deserialize (property, ConfigurationManager.SerializerContext.TextStyle);
 
-                    break;
-                //case "bright":
-                //case "bold":
-                //	attribute.Bright = reader.GetBoolean ();
-                //	break;
-                //case "dim":
-                //	attribute.Dim = reader.GetBoolean ();
-                //	break;
-                //case "underline":
-                //	attribute.Underline = reader.GetBoolean ();
-                //	break;
-                //case "blink":
-                //	attribute.Blink = reader.GetBoolean ();
-                //	break;
-                //case "reverse":
-                //	attribute.Reverse = reader.GetBoolean ();
-                //	break;
-                //case "hidden":
-                //	attribute.Hidden = reader.GetBoolean ();
-                //	break;
-                //case "strike-through":
-                //	attribute.StrikeThrough = reader.GetBoolean ();
-                //	break;				
-                default:
-                    throw new JsonException ($"Unknown Attribute property {propertyName}.");
+                        break;
+
+                    default:
+                        throw new JsonException ($"{propertyName}: Unknown Attribute property .");
+                }
+            }
+            catch (JsonException ex)
+            {
+                throw new JsonException ($"{propertyName}: \"{property}\" - {ex.Message}");
             }
         }
 
-        throw new JsonException ("Attribute");
+        throw new JsonException ($"{propertyName}: Bad Attribute.");
     }
 
     public override void Write (Utf8JsonWriter writer, Attribute value, JsonSerializerOptions options)

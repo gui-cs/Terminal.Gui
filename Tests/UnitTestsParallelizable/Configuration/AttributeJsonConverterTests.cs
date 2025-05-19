@@ -67,4 +67,23 @@ public class AttributeJsonConverterTests
         Assert.Equal ("{\"Foreground\":\"Blue\",\"Background\":\"Green\",\"Style\":\"Bold, Italic\"}", json);
 
     }
+
+    [Fact]
+    public void JsonRoundTrip_PreservesEquality ()
+    {
+        Attribute original = new (Color.Red, Color.Green, TextStyle.None);
+
+        string json = JsonSerializer.Serialize (original, new JsonSerializerOptions
+        {
+            Converters = { new AttributeJsonConverter (), new ColorJsonConverter () }
+        });
+
+        Attribute roundTripped = JsonSerializer.Deserialize<Attribute> (json, new JsonSerializerOptions
+        {
+            Converters = { new AttributeJsonConverter (), new ColorJsonConverter () }
+        })!;
+
+        Assert.Equal (original, roundTripped); // ✅ This should pass if all fields are faithfully round-tripped
+    }
+
 }

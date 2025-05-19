@@ -153,7 +153,13 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     /// <returns></returns>
     public static Dictionary<string, Scheme?> GetSchemesForCurrentTheme ()
     {
-        Debug.Assert (ConfigurationManager.IsInitialized ());
+        if (!ConfigurationManager.IsInitialized ())
+        {
+            Dictionary<string, Scheme?> hardCoded = Scheme.GetHardCodedSchemes ();
+
+            return hardCoded;
+        }
+
         Dictionary<string, Scheme?>? schemes = ThemeManager.GetCurrentTheme () ["Schemes"].PropertyValue as Dictionary<string, Scheme?>;
 
         return schemes!;

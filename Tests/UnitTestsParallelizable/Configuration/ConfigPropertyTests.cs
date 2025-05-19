@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Concurrent;
+using System.Reflection;
 using System.Text.Json;
 
 namespace Terminal.Gui.ConfigurationTests;
@@ -428,6 +429,10 @@ public class ConfigPropertyTests
         [ConfigurationProperty]
         public static ConcurrentDictionary<string, ConfigProperty>? TestConfigDictionaryProperty { get; set; }
 
+        [ConfigurationProperty]
+        public static Scheme? TestSchemeProperty { get; set; }
+
+
         public static void Reset ()
         {
             TestStringPropertySetCount = 0;
@@ -435,7 +440,29 @@ public class ConfigPropertyTests
             TestDictionaryProperty = null;
             TestRegularDictionaryProperty = null;
             TestConfigDictionaryProperty = null;
+            TestSchemeProperty = null;
         }
     }
 
+    [Fact]
+    public void UpdateFrom_SchemeSource_UpdatesValue ()
+    {
+        // Arrange
+        PropertyInfo? propertyInfo = typeof (TestConfiguration).GetProperty (nameof (TestConfiguration.TestSchemeProperty));
+        Scheme sourceScheme = new (new Attribute (Color.Red, Color.Blue, TextStyle.Bold).AsExplicitlySet ());
+
+        var configProperty = new ConfigProperty
+        {
+            PropertyInfo = propertyInfo!,
+            PropertyValue = new Scheme (new Attribute (Color.White, Color.Black, TextStyle.None))
+        };
+
+        // Act
+        object? result = configProperty.UpdateFrom (sourceScheme);
+
+        // Assert
+        Assert.Equal (sourceScheme, result);
+        Assert.Equal (sourceScheme, configProperty.PropertyValue);
+        Assert.NotSame (sourceScheme, configProperty.PropertyValue); // Prove it's a clone, not a ref
+    }
 }

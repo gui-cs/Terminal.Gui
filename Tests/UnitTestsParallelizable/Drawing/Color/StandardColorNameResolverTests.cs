@@ -1,8 +1,10 @@
 ﻿#nullable enable
 
+using Xunit.Abstractions;
+
 namespace Terminal.Gui.DrawingTests;
 
-public class W3cColorNameResolverTests
+public class StandardColorNameResolverTests (ITestOutputHelper output)
 {
     private readonly StandardColorsNameResolver _candidate = new();
 
@@ -13,6 +15,78 @@ public class W3cColorNameResolverTests
 
         Assert.Equal (alphabeticallyOrderedNames, _candidate.GetColorNames ());
     }
+
+    [Fact]
+    public void TryParseColor_Resolves_All_StandardColor_Enum_Values ()
+    {
+        foreach (StandardColor sc in Enum.GetValues<StandardColor> ())
+        {
+            bool success = _candidate.TryParseColor (sc.ToString (), out Color actual);
+            Assert.True (success, $"Expected to parse StandardColor.{sc}");
+            Color expected = new ((int)sc);
+            Assert.Equal (expected.R, actual.R);
+            Assert.Equal (expected.G, actual.G);
+            Assert.Equal (expected.B, actual.B);
+        }
+    }
+
+    [Fact]
+    public void TryNameColor_Resolves_FirstName_For_UniqueArgbValues ()
+    {
+        Dictionary<uint, string> seen = new ();
+
+        foreach (StandardColor sc in Enum.GetValues<StandardColor> ())
+        {
+            uint argb = StandardColors.GetArgb (sc);
+            if (seen.ContainsKey (argb))
+            {
+                continue;
+            }
+
+            Color color = new (argb);
+            bool success = _candidate.TryNameColor (color, out string? resolved);
+
+            Assert.True (success, $"Expected name resolution for {sc} -> ARGB #{argb:X8}");
+            Assert.NotNull (resolved);
+
+            List<string> expectedNames = new ();
+            foreach (string name in Enum.GetNames<StandardColor> ())
+            {
+                StandardColor parsed = Enum.Parse<StandardColor> (name);
+                if (StandardColors.GetArgb (parsed) == argb)
+                {
+                    expectedNames.Add (name);
+                }
+            }
+
+            Assert.Contains (resolved, expectedNames);
+            seen [argb] = resolved!;
+        }
+    }
+
+
+    [Fact]
+    public void TryNameColor_Logs_StandardColor_Aliases ()
+    {
+        var map = new Dictionary<uint, List<string>> ();
+
+        foreach (StandardColor sc in Enum.GetValues<StandardColor> ())
+        {
+            var color = new Color ((int)sc);
+            if (!map.TryGetValue (color.Argb, out var list))
+            {
+                list = new List<string> ();
+                map [color.Argb] = list;
+            }
+            list.Add (sc.ToString ());
+        }
+
+        foreach (var kvp in map.Where (kvp => kvp.Value.Count > 1))
+        {
+            output.WriteLine ($"ARGB #{kvp.Key:X8} maps to: {string.Join (", ", kvp.Value)}");
+        }
+    }
+
 
     [Theory]
     [InlineData (nameof (StandardColor.Aqua))]

@@ -133,7 +133,7 @@ public class ProgressBar : View, IDesignable
     ///<inheritdoc/>
     protected override bool OnDrawingContent ()
     {
-        SetAttribute (GetAttributeForRole (VisualRole.HotNormal));
+        SetAttribute (GetAttributeForRole (VisualRole.Active));
 
         Move (0, 0);
 
@@ -172,19 +172,19 @@ public class ProgressBar : View, IDesignable
             var tf = new TextFormatter { Alignment = Alignment.Center, Text = Text };
 
             var attr = new Attribute (
-                                      GetAttributeForRole (VisualRole.HotNormal).Foreground,
-                                      GetAttributeForRole (VisualRole.HotNormal).Background,
-                                      GetAttributeForRole (VisualRole.HotNormal).Style);
+                                      GetAttributeForRole (VisualRole.Active).Foreground,
+                                      GetAttributeForRole (VisualRole.Active).Background,
+                                      GetAttributeForRole (VisualRole.Active).Style);
 
             if (_fraction > .5)
             {
                 attr = new (
-                            GetAttributeForRole (VisualRole.HotNormal).Background,
-                            GetAttributeForRole (VisualRole.HotNormal).Foreground,
-                            GetAttributeForRole (VisualRole.HotNormal).Style);
+                            GetAttributeForRole (VisualRole.Active).Background,
+                            GetAttributeForRole (VisualRole.Active).Foreground,
+                            GetAttributeForRole (VisualRole.Active).Style);
             }
 
-            tf.Draw (
+            tf.Draw (   
                      ViewportToScreen (Viewport),
                      attr,
                      GetAttributeForRole (VisualRole.Normal),

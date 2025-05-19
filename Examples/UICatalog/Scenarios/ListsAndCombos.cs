@@ -46,7 +46,7 @@ public class ListsAndCombos : Scenario
         var listview = new ListView
         {
             X = 0,
-            Y = Pos.Bottom (lbListView) + 1,
+            Y = Pos.Bottom (lbListView) + 2,
             Height = Dim.Fill (2),
             Width = Dim.Percent (40),
             Source = new ListWrapper<string> (items)

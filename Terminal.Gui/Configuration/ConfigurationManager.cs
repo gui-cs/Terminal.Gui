@@ -546,6 +546,7 @@ public static class ConfigurationManager
                                                                                   PropertyNameCaseInsensitive = true,
                                                                                   DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                                                                                   WriteIndented = true,
+                                                                                  AllowTrailingCommas = true,
 
                                                                                   Converters =
                                                                                   {
@@ -680,7 +681,8 @@ public static class ConfigurationManager
         {
             if (_jsonErrors.Length > 0)
             {
-                Console.WriteLine (@"Terminal.Gui ConfigurationManager encountered the following errors while deserializing configuration files:");
+                Console.WriteLine (@"Terminal.Gui ConfigurationManager encountered these errors while reading configuration files"+
+                                   @"(set ThrowOnJsonErrors to have these caught during execution):");
                 Console.WriteLine (_jsonErrors.ToString ());
             }
         }
