@@ -39,12 +39,12 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                 new ()
                 {
                     Normal = new (new ("LightGray"), new ("RaisinBlack"), TextStyle.None), // Material Theme: Panel Background
-                    Focus = new (new ("White"), new ("DarkGray"), TextStyle.None), // Slightly lighter background for focus
+                    Focus = new (new ("White"), new ("DarkGray"), TextStyle.Bold), // Slightly lighter background for focus
                     HotNormal = new (new ("Silver"), new ("RaisinBlack"), TextStyle.Underline), // Lighter text for hotkeys
                     Disabled = new (new ("DarkGray"), new ("RaisinBlack"), TextStyle.Faint), // Dimmed text for disabled
-                    HotFocus = new (new ("White"), new ("DarkGray"), TextStyle.Underline), // Underlined white text on focus
-                    Active = new (new ("White"), new ("Charcoal"), TextStyle.Bold), // White text on active
-                    HotActive = new (new ("White"), new ("Charcoal"), TextStyle.Underline | TextStyle.Bold), // Underlined white text on active
+                    HotFocus = new (new ("White"), new ("DarkGray"), TextStyle.Underline|TextStyle.Bold), // Underlined white text on focus
+                    Active = new (new ("White"), new ("Charcoal"), TextStyle.None), // White text on active
+                    HotActive = new (new ("White"), new ("Charcoal"), TextStyle.Underline), // Underlined white text on active
                     Highlight = new (new ("White"), new ("Onyx"), TextStyle.None), // Highlight with slightly lighter background
                     Editable = new (new ("LightYellow"), new ("RaisinBlack"), TextStyle.None), // Yellowish text for editable fields
                     ReadOnly = new (new ("Gray"), new ("RaisinBlack"), TextStyle.Italic) // Gray italic text for read-only

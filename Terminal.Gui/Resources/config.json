@@ -240,7 +240,7 @@
               "HotActive": {
                 "Foreground": "White",
                 "Background": "Onyx",
-                "Style": "Underline,Bold"
+                "Style": "Underline"
               },
               "Highlight": {
                 "Foreground": "White",
@@ -289,12 +289,11 @@
               "Active": {
                 "Foreground": "White",
                 "Background": "Onyx",
-                "Style": "Bold"
               },
               "HotActive": {
                 "Foreground": "White",
                 "Background": "Onyx",
-                "Style": "Underline,Bold"
+                "Style": "Underline"
               },
               "Highlight": {
                 "Foreground": "White",

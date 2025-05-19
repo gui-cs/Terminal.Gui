@@ -701,20 +701,12 @@ public class Border : Adornment
             && Settings.FastHasFlags (BorderSettings.Title)
             && !string.IsNullOrEmpty (Parent?.Title))
         {
-            Attribute focus = Parent.GetAttributeForRole (VisualRole.Normal);
-
-            if (Parent.SuperView is { } && Parent.SuperView?.SubViews!.Count (s => s.CanFocus) > 1)
-            {
-                // Only use focus color if there are multiple focusable views
-                focus = GetAttributeForRole (VisualRole.Focus);
-            }
-
             Rectangle titleRect = new (borderBounds.X + 2, titleY, maxTitleWidth, 1);
 
             Parent.TitleTextFormatter.Draw (
                                             titleRect,
-                                            Parent.HasFocus ? focus : GetAttributeForRole (VisualRole.Normal),
-                                            Parent.HasFocus ? focus : GetAttributeForRole (VisualRole.HotNormal));
+                                            GetAttributeForRole (Parent.HasFocus ? VisualRole.Focus : VisualRole.Normal),
+                                            GetAttributeForRole (Parent.HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal));
             Parent?.LineCanvas.Exclude (new (titleRect));
         }
 
