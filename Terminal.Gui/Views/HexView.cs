@@ -7,6 +7,7 @@
 // TODO: Support shrinking the stream (e.g. del/backspace should work).
 // 
 
+using System;
 using System.Buffers;
 
 namespace Terminal.Gui;
@@ -439,11 +440,6 @@ public class HexView : View, IDesignable
             return true;
         }
 
-        var currentAttribute = Attribute.Default;
-        Attribute current = GetAttributeForRole (VisualRole.Focus);
-        SetAttribute (current);
-        Move (-Viewport.X, 0);
-
         long addressOfFirstLine = Viewport.Y * BytesPerLine;
 
         int nBlocks = BytesPerLine / NUM_BYTES_PER_HEX_COLUMN;
@@ -451,26 +447,18 @@ public class HexView : View, IDesignable
         Source.Position = addressOfFirstLine;
         long bytesRead = Source!.Read (data, 0, data.Length);
 
-        Attribute selectedAttribute = GetAttributeForRole (VisualRole.HotNormal);
+        Attribute selectedAttribute = GetAttributeForRole (VisualRole.Active);
 
-        var editedAttribute = new Attribute (
-                                             GetAttributeForRole (VisualRole.Normal).Foreground.GetHighlightColor (),
-                                             GetAttributeForRole (VisualRole.Normal).Background,
-                                             GetAttributeForRole (VisualRole.Normal).Style);
-
-        var editingAttribute = new Attribute (
-                                              GetAttributeForRole (VisualRole.Focus).Background,
-                                              GetAttributeForRole (VisualRole.Focus).Foreground,
-                                              GetAttributeForRole (VisualRole.Focus).Style);
-
-        var addressAttribute = new Attribute (
-                                              GetAttributeForRole (VisualRole.Normal).Foreground.GetHighlightColor (),
-                                              GetAttributeForRole (VisualRole.Normal).Background,
-                                              GetAttributeForRole (VisualRole.Normal).Style);
+        Attribute editedAttribute = GetAttributeForRole (VisualRole.Editable);
+        editedAttribute = editedAttribute with { Style = editedAttribute.Style | TextStyle.Italic | TextStyle.Underline };
+        Attribute editingAttribute = GetAttributeForRole (ReadOnly ? VisualRole.ReadOnly : VisualRole.Editable);
+        Attribute addressAttribute = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
 
         for (var line = 0; line < Viewport.Height; line++)
         {
-            Move (-Viewport.X, line);
+            int max  = -Viewport.X;
+
+            Move (max, line);
             long addressOfLine = addressOfFirstLine + line * nBlocks * NUM_BYTES_PER_HEX_COLUMN;
 
             if (addressOfLine <= GetEditedSize ())
@@ -479,17 +467,13 @@ public class HexView : View, IDesignable
             }
             else
             {
-                SetAttribute (
-                              new (
-                                   GetAttributeForRole (VisualRole.Normal).Background.GetHighlightColor (),
-                                   addressAttribute.Background,
-                                   GetAttributeForRole (VisualRole.Normal).Style));
+                SetAttributeForRole (VisualRole.Disabled);
             }
 
             var address = $"{addressOfLine:x8}";
             AddStr ($"{address.Substring (8 - AddressWidth)}");
 
-            SetAttribute (GetAttributeForRole (VisualRole.Normal));
+            SetAttribute (editingAttribute);
 
             if (AddressWidth > 0)
             {
@@ -506,15 +490,15 @@ public class HexView : View, IDesignable
                     if (offset + addressOfFirstLine == Address)
                     {
                         // Selected
-                        SetAttribute (_leftSideHasFocus ? editingAttribute : edited ? editedAttribute : selectedAttribute);
+                        SetAttribute (_leftSideHasFocus ? editingAttribute : edited ? editedAttribute : GetAttributeForRole (VisualRole.Focus));
                     }
                     else
                     {
-                        SetAttribute (edited ? editedAttribute : GetAttributeForRole (VisualRole.Normal));
+                        SetAttribute (edited ? editedAttribute : editingAttribute);
                     }
 
                     AddStr (offset >= bytesRead && !edited ? "  " : $"{value:x2}");
-                    SetAttribute (GetAttributeForRole (VisualRole.Normal));
+                    SetAttribute (editingAttribute);
                     AddRune (_spaceCharRune);
                 }
 
@@ -542,18 +526,18 @@ public class HexView : View, IDesignable
 
                         //    break;
                         case > 127:
-                        {
-                            byte [] utf8 = GetData (data, offset, 4, out bool _);
-
-                            OperationStatus status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
-
-                            while (status == OperationStatus.NeedMoreData)
                             {
-                                status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
-                            }
+                                byte [] utf8 = GetData (data, offset, 4, out bool _);
 
-                            break;
-                        }
+                                OperationStatus status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
+
+                                while (status == OperationStatus.NeedMoreData)
+                                {
+                                    status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
+                                }
+
+                                break;
+                            }
                         default:
                             Rune.DecodeFromUtf8 (new (ref b), out c, out _);
 
@@ -568,7 +552,7 @@ public class HexView : View, IDesignable
                 }
                 else
                 {
-                    SetAttribute (edited ? editedAttribute : GetAttributeForRole (VisualRole.Normal));
+                    SetAttribute (edited ? editedAttribute : editingAttribute);
                 }
 
                 AddRune (c);
@@ -578,6 +562,13 @@ public class HexView : View, IDesignable
                     byteIndex++;
                     AddRune (_periodCharRune);
                 }
+            }
+
+            SetAttribute (editingAttribute);
+            // Fill rest of line
+            for (int x = max; x < Viewport.Width; x++)
+            {
+                AddRune (new Rune (' '));
             }
         }
 

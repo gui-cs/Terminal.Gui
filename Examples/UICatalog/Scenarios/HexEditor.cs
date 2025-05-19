@@ -26,9 +26,9 @@ public class HexEditor : Scenario
     {
         Application.Init ();
 
-        var app = new Toplevel
+        var app = new Window ()
         {
-            SchemeName = "Base"
+            BorderStyle = LineStyle.None
         };
 
         _fileName = "demo.bin";
