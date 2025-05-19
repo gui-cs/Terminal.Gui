@@ -25,7 +25,6 @@ public class CharMap : View, IDesignable
     [RequiresDynamicCode ("AOT")]
     public CharMap ()
     {
-        SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
         CanFocus = true;
         CursorVisibility = CursorVisibility.Default;
 
@@ -98,6 +97,16 @@ public class CharMap : View, IDesignable
         VerticalScrollBar.Visible = false;
         VerticalScrollBar.X = Pos.AnchorEnd ();
         VerticalScrollBar.Y = HEADER_HEIGHT; // Header
+
+        // The scrollbars are in the Padding. VisualRole.Focus/Active are used to draw the
+        // CharMap headers. Override Padding to force it to draw to match.
+        Padding!.SettingAttributeForRole += PaddingOnSettingAttributeForRole;
+    }
+
+    private void PaddingOnSettingAttributeForRole (object? sender, VisualRoleEventArgs e)
+    {
+        SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
+        e.Cancel = true;
     }
 
     private bool? Move (ICommandContext? commandContext, int cpOffset)
@@ -252,25 +261,35 @@ public class CharMap : View, IDesignable
         int cursorCol = GetCursor (SelectedCodePoint).X + Viewport.X - RowLabelWidth - 1;
         int cursorRow = GetCursor (SelectedCodePoint).Y + Viewport.Y - 1;
 
-        SetAttribute (GetAttributeForRole (VisualRole.HotNormal));
+        // Headers
+
+        // Clear the header area
         Move (0, 0);
-        AddStr (new (' ', RowLabelWidth + 1));
+        SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
+        AddStr (new (' ', Viewport.Width));
 
         int firstColumnX = RowLabelWidth - Viewport.X;
 
         // Header
+        int x = 0;
         for (var hexDigit = 0; hexDigit < 16; hexDigit++)
         {
-            int x = firstColumnX + hexDigit * COLUMN_WIDTH;
+            x = firstColumnX + hexDigit * COLUMN_WIDTH;
 
             if (x > RowLabelWidth - 2)
             {
                 Move (x, 0);
-                SetAttribute (GetAttributeForRole (VisualRole.HotNormal));
+                SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
                 AddStr (" ");
-                SetAttribute (HasFocus && cursorCol + firstColumnX == x ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal));
+
+                // Swap Active/Focus so the selected column is highlighted
+                if (cursorCol + firstColumnX == x)
+                {
+                    SetAttributeForRole (HasFocus ? VisualRole.Active : VisualRole.Focus);
+                }
+
                 AddStr ($"{hexDigit:x}");
-                SetAttribute (GetAttributeForRole (VisualRole.HotNormal));
+                SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
                 AddStr (" ");
             }
         }
@@ -280,32 +299,54 @@ public class CharMap : View, IDesignable
         {
             // What row is this?
             int row = (y + Viewport.Y - 1) / _rowHeight;
-
             int val = row * 16;
+
+            // Draw the row label (U+XXXX_)
+            SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
+            Move (0, y);
+
+            // Swap Active/Focus so the selected row is highlighted
+            if (y + Viewport.Y - 1 == cursorRow)
+            {
+                SetAttributeForRole (HasFocus ? VisualRole.Active : VisualRole.Focus);
+            }
 
             if (val > MAX_CODE_POINT)
             {
-                break;
+                // No row
+                Move (0, y);
+                AddStr (new (' ', RowLabelWidth));
+                continue;
             }
 
-            Move (firstColumnX + COLUMN_WIDTH, y);
-            SetAttribute (GetAttributeForRole (VisualRole.Normal));
+            if ((!ShowGlyphWidths || (y + Viewport.Y) % _rowHeight > 0))
+            {
+                AddStr ($"U+{val / 16:x5}_");
+            }
+            else
+            {
+                AddStr (new (' ', RowLabelWidth));
+            }
 
+
+
+            // Draw the row
+            SetAttributeForRole (VisualRole.Normal);
             for (var col = 0; col < 16; col++)
             {
-                int x = firstColumnX + COLUMN_WIDTH * col + 1;
+                x = firstColumnX + COLUMN_WIDTH * col + 1;
 
-                if (x < 0 || x > Viewport.Width - 1)
+                if (x < RowLabelWidth || x > Viewport.Width - 1)
                 {
                     continue;
                 }
 
                 Move (x, y);
 
-                // If we're at the cursor position, and we don't have focus, invert the colors.
+                // If we're at the cursor position, and we don't have focus
                 if (row == cursorRow && x == cursorCol && !HasFocus)
                 {
-                    SetAttribute (GetAttributeForRole (VisualRole.Focus));
+                    SetAttributeForRole (VisualRole.Active);
                 }
 
                 int scalar = val + col;
@@ -355,31 +396,19 @@ public class CharMap : View, IDesignable
                 }
                 else
                 {
-                    // Draw the width of the rune
-                    SetAttribute (GetAttributeForRole (VisualRole.HotNormal));
+                    // Draw the width of the rune faint
+                    var attr = GetAttributeForRole (VisualRole.Normal);
+                    SetAttribute (attr with { Style = attr.Style | TextStyle.Faint });
                     AddStr ($"{width}");
                 }
 
-                // If we're at the cursor position, and we don't have focus, revert the colors to normal
+                // If we're at the cursor position, and we don't have focus
                 if (row == cursorRow && x == cursorCol && !HasFocus)
                 {
-                    SetAttribute (GetAttributeForRole (VisualRole.Normal));
+                    SetAttributeForRole (VisualRole.Normal);
                 }
             }
 
-            // Draw row label (U+XXXX_)
-            Move (0, y);
-
-            SetAttribute (HasFocus && y + Viewport.Y - 1 == cursorRow ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal));
-
-            if (!ShowGlyphWidths || (y + Viewport.Y) % _rowHeight > 0)
-            {
-                AddStr ($"U+{val / 16:x5}_ ");
-            }
-            else
-            {
-                AddStr (new (' ', RowLabelWidth));
-            }
         }
 
         return true;
@@ -628,7 +657,7 @@ public class CharMap : View, IDesignable
                                                         document.RootElement,
                                                         new
                                                             JsonSerializerOptions
-                                                            { WriteIndented = true }
+                                                        { WriteIndented = true }
                                                        );
             }
 

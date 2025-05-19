@@ -102,16 +102,16 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                 SchemeManager.SchemesToSchemeName (Schemes.Menu)!,
                 new()
                 {
-                    Normal = new (new ("Gainsboro"), new ("Charcoal"), TextStyle.Bold), // Lighter text
-                    Focus = new (new ("White"), new ("DarkSlateGray"), TextStyle.Bold), // White on slightly lighter
-                    HotNormal = new (new ("Gainsboro"), new ("Charcoal"), TextStyle.Underline | TextStyle.Bold), // Lighter underline
-                    Disabled = new (new ("Gray"), new ("Charcoal"), TextStyle.Faint), // Grayed out
-                    HotFocus = new (new ("White"), new ("DarkSlateGray"), TextStyle.Underline | TextStyle.Bold), // White on lighter underline
-                    Active = new (new ("White"), new ("DimGray"), TextStyle.Bold), // White on even lighter
-                    HotActive = new (new ("White"), new ("DimGray"), TextStyle.Underline | TextStyle.Bold), // White on even lighter underline
-                    Highlight = new (new ("White"), new ("Onyx"), TextStyle.None), // Highlighted
-                    Editable = new (new ("LemonChiffon"), new ("Charcoal"), TextStyle.None), // Yellowish text for editable fields
-                    ReadOnly = new (new ("Silver"), new ("Charcoal"), TextStyle.Italic) // Gray italic text for read-only
+                    Normal     = new (new ("Charcoal"),    new ("WhiteSmoke"), TextStyle.Bold), // Dark text on very light gray
+                    Focus      = new (new ("Black"),       new ("SlateGray"),  TextStyle.Bold), // Black on light gray
+                    HotNormal  = new (new ("Charcoal"),    new ("WhiteSmoke"), TextStyle.Underline | TextStyle.Bold),
+                    Disabled   = new (new ("Gray"),        new ("Gainsboro"),  TextStyle.Faint),
+                    HotFocus   = new (new ("Black"),       new ("SlateGray"),  TextStyle.Underline | TextStyle.Bold),
+                    Active     = new (new ("White"),       new ("LightGray"),  TextStyle.Bold),
+                    HotActive  = new (new ("White"),       new ("LightGray"),  TextStyle.Underline | TextStyle.Bold),
+                    Highlight  = new (new ("White"),       new ("SlateGray"),  TextStyle.None),
+                    Editable   = new (new ("Charcoal"),    new ("WhiteSmoke"), TextStyle.None),
+                    ReadOnly   = new (new ("Silver"),      new ("WhiteSmoke"), TextStyle.Italic)
                 }
             }
         };

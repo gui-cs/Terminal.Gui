@@ -33,7 +33,8 @@ public class CharacterMap : Scenario
 
         var top = new Window
         {
-            BorderStyle = LineStyle.None
+            BorderStyle = LineStyle.None,
+            //SchemeName = "Dialog"
         };
 
         _charMap = new ()
@@ -41,7 +42,9 @@ public class CharacterMap : Scenario
             X = 0,
             Y = 1,
             Width = Dim.Fill (Dim.Func (() => _categoryList!.Frame.Width)),
-            Height = Dim.Fill ()
+            Height = Dim.Fill (),
+           // SchemeName = "Base"
+
         };
         top.Add (_charMap);
 
@@ -50,7 +53,8 @@ public class CharacterMap : Scenario
             X = Pos.Right (_charMap) + 1,
             Y = Pos.Y (_charMap),
             HotKeySpecifier = (Rune)'_',
-            Text = "_Jump To:"
+            Text = "_Jump To:",
+            //SchemeName = "Dialog"
         };
         top.Add (jumpLabel);
 
@@ -60,6 +64,7 @@ public class CharacterMap : Scenario
             Y = Pos.Y (_charMap),
             Width = 17,
             Caption = "e.g. 01BE3 or ✈",
+            //SchemeName = "Dialog"
         };
         top.Add (jumpEdit);
 
@@ -82,7 +87,6 @@ public class CharacterMap : Scenario
             SchemeName = "error",
             Text = "err",
             Visible = false
-
         };
         top.Add (_errorLabel);
 
@@ -92,6 +96,7 @@ public class CharacterMap : Scenario
             X = Pos.Right (_charMap), 
             Y = Pos.Bottom (jumpLabel), 
             Height = Dim.Fill (),
+            //SchemeName = "Dialog"
         };
         _categoryList.FullRowSelect = true;
         _categoryList.MultiSelect = false;
