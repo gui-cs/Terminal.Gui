@@ -675,7 +675,8 @@ public class Shortcut : View, IOrientation, IDesignable
         KeyView.TextAlignment = Alignment.End;
         KeyView.VerticalTextAlignment = Alignment.Center;
         KeyView.KeyBindings.Clear ();
-        HelpView.HighlightStyle = HighlightStyle.None;
+        KeyView.HighlightStyle = HighlightStyle.None;
+        //KeyView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
     }
 
     private void UpdateKeyBindings (Key oldKey)
