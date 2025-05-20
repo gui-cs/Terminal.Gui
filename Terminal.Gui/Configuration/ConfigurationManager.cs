@@ -430,9 +430,9 @@ public static class ConfigurationManager
             SourcesManager?.Load (Settings, $"~/.tui/{AppName}.{_configFilename}", ConfigLocations.AppHome);
         }
 
-        Settings.Validate();
+        Settings.Validate ();
         ThemeManager.Validate ();
-        AppSettings.Validate();
+        AppSettings.Validate ();
     }
 
     // TODO: Rename to Loaded?
@@ -713,6 +713,7 @@ public static class ConfigurationManager
     public static string GetHardCodedConfig ()
     {
         var emptyScope = new SettingsScope ();
+        emptyScope.LoadHardCodedDefaults ();
         IEnumerable<KeyValuePair<string, ConfigProperty>>? settings = GetHardCodedConfigPropertiesByScope ("SettingsScope");
 
         if (settings is null)
