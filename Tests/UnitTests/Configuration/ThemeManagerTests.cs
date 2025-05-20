@@ -272,7 +272,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
         ThemeScope themeScope = new ThemeScope ();
         output.WriteLine ($"Start: ThemeScope ({themeScope.Count}) size: {(MemorySizeEstimator.EstimateSize (themeScope))} b");
 
-        themeScope.Add ("Schemes", Scheme.GetHardCodedSchemes ());
+        themeScope.AddValue ("Schemes", Scheme.GetHardCodedSchemes ());
         output.WriteLine ($"Start: ThemeScope ({themeScope.Count}) size: {(MemorySizeEstimator.EstimateSize (themeScope))} b");
 
         output.WriteLine ($"Start: HardCoded Schemes ({SchemeManager.Schemes.Count}) size: {(MemorySizeEstimator.EstimateSize (SchemeManager.Schemes!))} b");

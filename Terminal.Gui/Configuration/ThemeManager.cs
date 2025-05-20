@@ -162,7 +162,7 @@ public static class ThemeManager
         var hardCodedThemeScope = new ThemeScope ();
         foreach (KeyValuePair<string, ConfigProperty> p in hardCodedThemeProperties)
         {
-            hardCodedThemeScope.Add (p.Key, p.Value.PropertyValue);
+            hardCodedThemeScope.AddValue (p.Key, p.Value.PropertyValue);
         }
 
         return hardCodedThemeScope;

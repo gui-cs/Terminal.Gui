@@ -530,7 +530,7 @@ public class DeepClonerTests
     [Fact]
     public void ConfigProperty_CreatesDeepCopy ()
     {
-        ConfigProperty? source = ConfigProperty.CreateWithAttributeInfo (CM.GetHardCodedConfigPropertyCache ()! ["Application.QuitKey"].PropertyInfo!);
+        ConfigProperty? source = ConfigProperty.CreateImmutableWithAttributeInfo (CM.GetHardCodedConfigPropertyCache ()! ["Application.QuitKey"].PropertyInfo!);
         source.Immutable = false;
         source.PropertyValue = Key.A;
         ConfigProperty? result = DeepCloner.DeepClone (source);

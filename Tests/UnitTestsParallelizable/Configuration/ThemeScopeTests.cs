@@ -8,12 +8,12 @@ public class ThemeScopeTests
     [Fact]
     public void Schemes_Property_Exists ()
     {
-        var scope = new ThemeScope();
+        var scope = new ThemeScope ();
+        scope.LoadHardCodedDefaults();
 
         Assert.NotEmpty (scope);
 
-        // Schemes exists, but is not initialized
-        Assert.Null (scope ["Schemes"].PropertyValue);
+        Assert.NotNull(scope ["Schemes"].PropertyValue);
 
         Assert.NotEmpty (scope);
     }

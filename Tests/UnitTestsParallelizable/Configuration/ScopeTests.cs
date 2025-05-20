@@ -82,6 +82,7 @@ public class ScopeTests
     {
         // Arrange
         var scope = new ScopeTestsScope ();
+        scope.LoadHardCodedDefaults ();
         var scopeWithAddedProperty = new ScopeTestsScope ();
         scopeWithAddedProperty.TryAdd ("AddedProperty", new ConfigProperty ()
         {
@@ -109,8 +110,16 @@ public class ScopeTests
         Assert.Equal (Key.A, originalScope ["ScopeTests.KeyProperty"].PropertyValue);
 
         ScopeTestsScope sourceScope = new ScopeTestsScope ();
+        sourceScope.TryAdd ("ScopeTests.KeyProperty", new ConfigProperty
+        {
+            Immutable = false,
+            PropertyInfo = originalScope ["ScopeTests.KeyProperty"].PropertyInfo,
+        });
         sourceScope ["ScopeTests.KeyProperty"].PropertyValue = Key.B;
-        Assert.False (sourceScope ["ScopeTests.StringProperty"].HasValue);
+
+        // StringProperty is set to null
+        Assert.DoesNotContain("ScopeTests.StringProperty", sourceScope);
+
         Assert.True (sourceScope ["ScopeTests.KeyProperty"].HasValue);
 
         // Act
@@ -141,7 +150,7 @@ public class ScopeTests
             { "item2", ConfigProperty.GetAllConfigProperties () ["ScopeTests.DictionaryItemProperty2"] }
         };
 
-        Assert.False (sourceScope ["ScopeTests.KeyProperty"].HasValue);
+        Assert.True (sourceScope ["ScopeTests.KeyProperty"].HasValue);
         Assert.True (sourceScope ["ScopeTests.DictionaryProperty"].HasValue);
 
         Dictionary<string, ConfigProperty>? sourceDict = sourceScope ["ScopeTests.DictionaryProperty"].PropertyValue as Dictionary<string, ConfigProperty>;

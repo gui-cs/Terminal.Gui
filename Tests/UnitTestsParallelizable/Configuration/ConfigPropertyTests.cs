@@ -354,7 +354,7 @@ public class ConfigPropertyTests
         var propertyInfo = typeof(TestConfiguration).GetProperty(nameof(TestConfiguration.TestStringProperty));
 
         // Act
-        var configProperty = ConfigProperty.CreateWithAttributeInfo(propertyInfo!);
+        var configProperty = ConfigProperty.CreateImmutableWithAttributeInfo(propertyInfo!);
 
         // Assert
         Assert.Equal(propertyInfo, configProperty.PropertyInfo);
