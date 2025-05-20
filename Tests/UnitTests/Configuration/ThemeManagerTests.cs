@@ -186,6 +186,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
         Assert.Contains (ThemeManager.DEFAULT_THEME_NAME, ThemeManager.Themes!);
 
         var theme = new ThemeScope ();
+        theme.LoadHardCodedDefaults ();
         Assert.NotEmpty (theme);
 
         Assert.True (ThemeManager.Themes!.TryAdd ("testTheme", theme));
@@ -201,6 +202,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
         Enable (ConfigLocations.HardCoded);
 
         var theme = new ThemeScope ();
+        theme.LoadHardCodedDefaults ();
         Assert.NotEmpty (theme);
 
         Assert.True (ThemeManager.Themes!.TryAdd ("testTheme", theme));
@@ -259,17 +261,30 @@ public class ThemeManagerTests (ITestOutputHelper output)
     [Fact]
     public void In_Memory_Themes_Size_Is_Reasonable ()
     {
-        output.WriteLine ($"Start: Themes dictionary size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
+        output.WriteLine ($"Start: Color size: {(MemorySizeEstimator.EstimateSize (Color.Red))} b");
+
+        output.WriteLine ($"Start: Attribute size: {(MemorySizeEstimator.EstimateSize (Attribute.Default))} b");
+
+        output.WriteLine ($"Start: Base Scheme size: {(MemorySizeEstimator.EstimateSize (Scheme.GetHardCodedSchemes ()))} b");
+
+        output.WriteLine ($"Start: PropertyInfo size: {(MemorySizeEstimator.EstimateSize (ConfigurationManager.Settings ["Application.QuitKey"]))} b");
+
+        ThemeScope themeScope = new ThemeScope ();
+        output.WriteLine ($"Start: ThemeScope ({themeScope.Count}) size: {(MemorySizeEstimator.EstimateSize (themeScope))} b");
+
+        themeScope.Add ("Schemes", Scheme.GetHardCodedSchemes ());
+        output.WriteLine ($"Start: ThemeScope ({themeScope.Count}) size: {(MemorySizeEstimator.EstimateSize (themeScope))} b");
+
+        output.WriteLine ($"Start: HardCoded Schemes ({SchemeManager.Schemes.Count}) size: {(MemorySizeEstimator.EstimateSize (SchemeManager.Schemes!))} b");
+
+        output.WriteLine ($"Start: Themes dictionary ({ThemeManager.Themes.Count}) size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
+
         Enable (ConfigLocations.HardCoded);
 
-        output.WriteLine ($"After Enable: Themes dictionary size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
-
-        ResetToHardCodedDefaults ();
-        Assert.Single (ThemeManager.Themes!);
-        output.WriteLine ($"After ResetToHardCodedDefaults: Themes dictionary size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
+        output.WriteLine ($"Enabled: Themes dictionary ({ThemeManager.Themes.Count}) size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
 
         Load (ConfigLocations.LibraryResources);
-        output.WriteLine ($"After Load: Themes {ThemeManager.Themes!.Count} dictionary size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
+        output.WriteLine ($"After Load: Themes dictionary ({ThemeManager.Themes!.Count}) size: {(MemorySizeEstimator.EstimateSize (ThemeManager.Themes!)) / 1024} Kb");
 
         output.WriteLine ($"Total Settings Size: {(MemorySizeEstimator.EstimateSize (Settings!)) / 1024} Kb");
 

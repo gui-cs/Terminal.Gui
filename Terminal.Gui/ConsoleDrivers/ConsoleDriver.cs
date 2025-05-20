@@ -629,7 +629,7 @@ public abstract class ConsoleDriver : IConsoleDriver
     {
         // Encode the colors into the int value.
         return new (
-                    -1, // only used by cursesdriver!
+                    0xFF, // only used by cursesdriver!
                     foreground,
                     background
                    );

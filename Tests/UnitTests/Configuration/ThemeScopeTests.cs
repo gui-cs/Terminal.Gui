@@ -82,6 +82,7 @@ public class ThemeScopeTests
         Enable (ConfigLocations.HardCoded);
 
         var theme = new ThemeScope ();
+        theme.LoadHardCodedDefaults ();
         theme ["Dialog.DefaultButtonAlignment"].PropertyValue = Alignment.End;
 
         string json = JsonSerializer.Serialize (theme, SerializerContext.Options);

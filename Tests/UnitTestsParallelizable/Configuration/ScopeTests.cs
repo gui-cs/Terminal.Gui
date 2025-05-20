@@ -16,7 +16,7 @@ public class ScopeTests
         // Assert
         Assert.NotNull (scope);
         Assert.Empty (scope);
-        Assert.NotNull (CM._allConfigPropertiesCache);
+        Assert.NotNull (CM._uninitializedConfigPropertiesCache);
     }
 
     // The property key will be "ScopeTests.BoolProperty"

@@ -159,13 +159,10 @@ public static class ThemeManager
             throw new InvalidOperationException ("Hard coded theme properties are null.");
         }
 
-        Dictionary<string, ConfigProperty>? dict = hardCodedThemeProperties?.ToDictionary ();
-
         var hardCodedThemeScope = new ThemeScope ();
-
-        foreach (KeyValuePair<string, ConfigProperty> p in hardCodedThemeScope)
+        foreach (KeyValuePair<string, ConfigProperty> p in hardCodedThemeProperties)
         {
-            p.Value.PropertyValue = dict! [p.Key].PropertyValue;
+            hardCodedThemeScope.Add (p.Key, p.Value.PropertyValue);
         }
 
         return hardCodedThemeScope;
@@ -311,5 +308,13 @@ public static class ThemeManager
     {
         Logging.Debug ($"Themes.OnThemeChanged({theme}) -> {Theme}");
         ThemeChanged?.Invoke (null, new (theme));
+    }
+
+    public static void Validate ()
+    {
+        foreach (ThemeScope theme in Themes.Values)
+        {
+            theme.Validate ();
+        }
     }
 }

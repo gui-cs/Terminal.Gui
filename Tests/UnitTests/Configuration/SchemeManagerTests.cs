@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Text.Json;
 using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui.ConfigurationTests;
@@ -91,6 +92,7 @@ public class SchemeManagerTests
         Enable (ConfigLocations.HardCoded);
 
         var theme = new ThemeScope ();
+        theme.LoadHardCodedDefaults ();
         Assert.NotEmpty (theme);
 
         Assert.Equal (5, SchemeManager.GetSchemes ().Count);
@@ -101,6 +103,7 @@ public class SchemeManagerTests
         Assert.Equal (SchemeManager.GetSchemes ().Count, schemes.Count);
 
         var newTheme = new ThemeScope ();
+        newTheme.LoadHardCodedDefaults ();
 
         var scheme = new Scheme
         {
@@ -139,6 +142,7 @@ public class SchemeManagerTests
         Enable (ConfigLocations.HardCoded);
 
         var theme = new ThemeScope ();
+        theme.LoadHardCodedDefaults ();
         Assert.NotEmpty (theme);
 
         var scheme = new Scheme
@@ -161,6 +165,7 @@ public class SchemeManagerTests
 
         // Change just Normal
         var newTheme = new ThemeScope ();
+        newTheme.LoadHardCodedDefaults ();
 
         var newScheme = new Scheme
         {
@@ -210,10 +215,10 @@ public class SchemeManagerTests
 
             // Load the test theme
             // TODO: This should throw an exception!
-            Load (ConfigLocations.Runtime);
+            Assert.Throws<JsonException> (() => Load (ConfigLocations.Runtime));
+            Assert.Contains ("TestTheme", ThemeManager.Themes!);
             Assert.Equal ("TestTheme", ThemeManager.Theme);
-
-            Assert.Throws<InvalidOperationException> (SchemeManager.GetSchemes);
+            Assert.Throws<System.Collections.Generic.KeyNotFoundException> (SchemeManager.GetSchemes);
 
             // Now reset everything and reload
             ResetToCurrentValues ();

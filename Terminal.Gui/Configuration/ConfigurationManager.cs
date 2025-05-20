@@ -132,12 +132,12 @@ public static class ConfigurationManager
 
     /// <summary>
     ///     An immutable cache of all <see cref="ConfigProperty"/>s in module decorated with the
-    ///     <see cref="ConfigurationPropertyAttribute"/> attribute. Bott the dictionary and the contained
+    ///     <see cref="ConfigurationPropertyAttribute"/> attribute. Both the dictionary and the contained
     ///     <see cref="ConfigProperty"/>s
     ///     are immutable.
     /// </summary>
     /// <remarks>Is <see langword="null"/> until <see cref="Initialize"/> is called.</remarks>
-    internal static ImmutableSortedDictionary<string, ConfigProperty>? _allConfigPropertiesCache;
+    internal static ImmutableSortedDictionary<string, ConfigProperty>? _uninitializedConfigPropertiesCache;
 
     private static readonly object _allConfigPropertiesCacheLock = new ();
 
@@ -175,10 +175,11 @@ public static class ConfigurationManager
             // _frozenConfigPropertyCache: for high-speed key lookup (frozen)
 
             // Note GetAllConfigProperties returns a new instance and all the properties !HasValue and Immutable.
-            _allConfigPropertiesCache = ConfigProperty.GetAllConfigProperties ();
+            _uninitializedConfigPropertiesCache = ConfigProperty.GetAllConfigProperties ();
         }
 
-        _hardCodedConfigPropertyCache = _allConfigPropertiesCache.ToFrozenDictionary ();
+        // Create a COPY of the _allConfigPropertiesCache to ensure that the original is not modified.
+        _hardCodedConfigPropertyCache = ConfigProperty.GetAllConfigProperties ().ToFrozenDictionary ();
 
         foreach (KeyValuePair<string, ConfigProperty> hardCodedProperty in _hardCodedConfigPropertyCache)
         {
@@ -301,6 +302,7 @@ public static class ConfigurationManager
         try
         {
             _settings = new ();
+            _settings.LoadHardCodedDefaults ();
         }
         finally
         {
@@ -309,6 +311,7 @@ public static class ConfigurationManager
 
         Settings!.LoadCurrentValues ();
         ThemeManager.UpdateToCurrentValues ();
+        AppSettings!.LoadCurrentValues ();
     }
 
     /// <summary>
@@ -354,6 +357,7 @@ public static class ConfigurationManager
         Settings = new ();
         Settings!.LoadHardCodedDefaults ();
         ThemeManager.ResetToHardCodedDefaults ();
+        AppSettings!.LoadHardCodedDefaults ();
     }
 
     /// <summary>
@@ -425,6 +429,10 @@ public static class ConfigurationManager
         {
             SourcesManager?.Load (Settings, $"~/.tui/{AppName}.{_configFilename}", ConfigLocations.AppHome);
         }
+
+        Settings.Validate();
+        ThemeManager.Validate ();
+        AppSettings.Validate();
     }
 
     // TODO: Rename to Loaded?
@@ -597,7 +605,7 @@ public static class ConfigurationManager
                 // We're being called from the module initializer.
                 // Hard coded default value is an empty AppSettingsScope
                 var appSettings = new AppSettingsScope ();
-                appSettings.LoadCurrentValues ();
+                appSettings.LoadHardCodedDefaults ();
 
                 return appSettings;
             }
@@ -681,7 +689,7 @@ public static class ConfigurationManager
         {
             if (_jsonErrors.Length > 0)
             {
-                Console.WriteLine (@"Terminal.Gui ConfigurationManager encountered these errors while reading configuration files"+
+                Console.WriteLine (@"Terminal.Gui ConfigurationManager encountered these errors while reading configuration files" +
                                    @"(set ThrowOnJsonErrors to have these caught during execution):");
                 Console.WriteLine (_jsonErrors.ToString ());
             }
@@ -730,28 +738,31 @@ public static class ConfigurationManager
     ///     The items in the collection are references to the original <see cref="ConfigProperty"/> objects in the
     ///     cache. They do not have values and have <see cref="ConfigProperty.Immutable"/> set.
     /// </summary>
-    internal static IEnumerable<KeyValuePair<string, ConfigProperty>>? GetConfigPropertiesByScope (string scopeType)
+    internal static IEnumerable<KeyValuePair<string, ConfigProperty>>? GetUninitializedConfigPropertiesByScope (string scopeType)
     {
         // AOT Note: This method does NOT need the RequiresUnreferencedCode attribute as it is not using reflection
         // and is not using any dynamic code. _allConfigProperties is a static property that is set in the module initializer
         // and is not using any dynamic code. In addition, ScopeType are registered in SourceGenerationContext.
 
-        if (_allConfigPropertiesCache is null)
+        if (_uninitializedConfigPropertiesCache is null)
         {
             throw new InvalidOperationException ("_allConfigPropertiesCache has not been set.");
         }
 
         if (string.IsNullOrEmpty (scopeType))
         {
-            return _allConfigPropertiesCache;
+            return _uninitializedConfigPropertiesCache;
         }
 
         // Filter properties by scope using the cached ScopeType property instead of reflection
-        IEnumerable<KeyValuePair<string, ConfigProperty>>? filtered = _allConfigPropertiesCache?.Where (cp => cp.Value.ScopeType == scopeType);
+        IEnumerable<KeyValuePair<string, ConfigProperty>>? filtered = _uninitializedConfigPropertiesCache?.Where (cp => cp.Value.ScopeType == scopeType);
 
         Debug.Assert (filtered is { });
 
-        return filtered;
+        IEnumerable<KeyValuePair<string, ConfigProperty>> configPropertiesByScope = filtered as KeyValuePair<string, ConfigProperty> [] ?? filtered.ToArray ();
+        Debug.Assert (configPropertiesByScope.All (v => !v.Value.HasValue));
+
+        return configPropertiesByScope;
     }
 
     /// <summary>
