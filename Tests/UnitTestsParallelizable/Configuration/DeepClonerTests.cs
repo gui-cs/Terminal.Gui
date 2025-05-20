@@ -583,9 +583,11 @@ public class DeepClonerTests
     {
         // Arrange: Create a ThemeScope and verify a property exists
         var defaultThemeScope = new ThemeScope ();
+        defaultThemeScope.LoadHardCodedDefaults ();
         Assert.True (defaultThemeScope.ContainsKey ("Button.DefaultHighlightStyle"));
 
         var darkThemeScope = new ThemeScope ();
+        darkThemeScope.LoadHardCodedDefaults ();
         Assert.True (darkThemeScope.ContainsKey ("Button.DefaultHighlightStyle"));
 
         // Create a Themes list with two themes
@@ -597,6 +599,7 @@ public class DeepClonerTests
 
         // Create a SettingsScope and set the Themes property
         var settingsScope = new SettingsScope ();
+        settingsScope.LoadHardCodedDefaults ();
         Assert.True (settingsScope.ContainsKey ("Themes"));
         settingsScope ["Themes"].PropertyValue = themesList;
 

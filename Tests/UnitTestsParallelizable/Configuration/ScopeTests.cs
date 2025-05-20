@@ -58,6 +58,7 @@ public class ScopeTests
 
         // Act
         var scope = new ScopeTestsScope ();
+        scope.LoadHardCodedDefaults ();
 
         var cache = CM.GetHardCodedConfigPropertyCache ();
 
@@ -68,12 +69,12 @@ public class ScopeTests
         Assert.True (scope.ContainsKey ("ScopeTests.BoolProperty"));
 
         Assert.Equal (typeof (ScopeTests).GetProperty ("BoolProperty"), scope ["ScopeTests.BoolProperty"].PropertyInfo);
-        Assert.Null (scope ["ScopeTests.BoolProperty"].PropertyValue);
-        Assert.False (scope ["ScopeTests.BoolProperty"].HasValue);
+        Assert.True ((bool)scope ["ScopeTests.BoolProperty"].PropertyValue!);
+        Assert.True (scope ["ScopeTests.BoolProperty"].HasValue);
 
         Assert.Equal (typeof (ScopeTests).GetProperty ("StringProperty"), scope ["ScopeTests.StringProperty"].PropertyInfo);
         Assert.Null (scope ["ScopeTests.StringProperty"].PropertyValue);
-        Assert.False (scope ["ScopeTests.StringProperty"].HasValue);
+        Assert.True (scope ["ScopeTests.StringProperty"].HasValue);
     }
 
     [Fact]
@@ -133,6 +134,7 @@ public class ScopeTests
         originalScope ["ScopeTests.DictionaryProperty"].PropertyValue = new Dictionary<string, ConfigProperty> ();
 
         ScopeTestsScope sourceScope = new ScopeTestsScope ();
+        sourceScope.LoadHardCodedDefaults ();
         sourceScope ["ScopeTests.DictionaryProperty"].PropertyValue = new Dictionary<string, ConfigProperty> ()
         {
             { "item1", ConfigProperty.GetAllConfigProperties () ["ScopeTests.DictionaryItemProperty1"] },
