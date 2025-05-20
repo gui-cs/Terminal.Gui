@@ -490,9 +490,8 @@ public static class ConfigurationManager
 
         try
         {
-            // Apply Themes first so that ???
-            themes = ThemeManager.Themes? [ThemeManager.Theme]?.Apply () ?? false;
             settings = Settings?.Apply () ?? false;
+            themes = ThemeManager.Themes? [ThemeManager.Theme]?.Apply () ?? false;
             appSettings = AppSettings?.Apply () ?? false;
         }
         catch (JsonException e)

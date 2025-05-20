@@ -100,14 +100,27 @@ public partial class View
             // Calculate the width
             if (subView.Width is { })
             {
-                int subViewWidth = subView.X.GetAnchor (0) + subView.Width.Calculate (0, GetContentSize ().Width, subView, Dimension.Width);
+                int width = GetContentSize ().Width;
+
+                if (width == 0)
+                {
+                    width = Viewport.Width;
+                }
+                int subViewWidth = subView.X.GetAnchor (0) + subView.Width.Calculate (0, width, subView, Dimension.Width);
                 maxWidth = Math.Max (maxWidth, subViewWidth);
             }
 
             // Calculate the height
             if (subView.Height is { })
             {
-                int subViewHeight = subView.Y.GetAnchor (0) + subView.Height.Calculate (0, GetContentSize ().Height, subView, Dimension.Height);
+                int height = GetContentSize ().Height;
+
+                if (height == 0)
+                {
+                    height = Viewport.Height;
+                }
+
+                int subViewHeight = subView.Y.GetAnchor (0) + subView.Height.Calculate (0, height, subView, Dimension.Height);
                 maxHeight = Math.Max (maxHeight, subViewHeight);
             }
         }

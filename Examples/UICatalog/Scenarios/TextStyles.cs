@@ -28,9 +28,9 @@ public sealed class TestStyles : Scenario
 
         appWindow.SubViewsLaidOut += (sender, _) =>
                                      {
-                                         if (sender is View sendingVioew)
+                                         if (sender is View sendingView)
                                          {
-                                             sendingVioew.SetContentSize (sendingVioew.GetSizeRequiredForSubViews ());
+                                             sendingView.SetContentSize (sendingView.GetSizeRequiredForSubViews ());
                                          }
                                      };
 

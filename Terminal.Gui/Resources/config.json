@@ -40,12 +40,12 @@
 
   // --------------- Themes -----------------
   "Themes": [
-    {
-      "Default": {
-        // Note: We do not override any hard-coded properties for Default here; 
-        // Default, should be, by definition the same as hard-coded.
-      }
-    },
+    // We do not override any hard-coded properties for Default here; 
+    // Default is by definition the same as hard-coded.
+    //{
+    //  "Default": {
+    //  }
+    //},
     {
       "Anders": {
         "Schemes": [
@@ -288,7 +288,7 @@
               },
               "Active": {
                 "Foreground": "White",
-                "Background": "Onyx",
+                "Background": "Onyx"
               },
               "HotActive": {
                 "Foreground": "White",
@@ -1040,18 +1040,22 @@
     },
     {
       "Green Phosphor": {
+        "Dialog.DefaultShadow": "None",
+        "FrameView.DefaultBorderStyle": "Single",
+        "Window.DefaultBorderStyle": "Single",
+        "MessageBox.DefaultBorderStyle": "Single",
+        "Button.DefaultShadow": "None",
+        "Menuv2.DefaultBorderStyle": "None",
         "Schemes": [
           {
             "TopLevel": {
               "Normal": {
                 "Foreground": "GreenPhosphor",
                 "Background": "Black",
-                "Style": "None"
               },
               "Focus": {
-                "Foreground": "GreenPhosphor",
-                "Background": "Black",
-                "Style": "Bold"
+                "Foreground": "Black",
+                "Background": "GreenPhosphor",
               },
               "HotNormal": {
                 "Foreground": "GreenPhosphor",
@@ -1059,9 +1063,9 @@
                 "Style": "Underline"
               },
               "HotFocus": {
-                "Foreground": "GreenPhosphor",
-                "Background": "Black",
-                "Style": "Underline,Bold"
+                "Foreground": "Black",
+                "Background": "GreenPhosphor",
+                "Style": "Underline"
               },
               "Disabled": {
                 "Foreground": "GreenPhosphor",
@@ -1081,17 +1085,17 @@
               "Highlight": {
                 "Foreground": "GreenPhosphor",
                 "Background": "Black",
-                "Style": "None"
+                "Style": "Italic"
               },
               "Editable": {
                 "Foreground": "GreenPhosphor",
-                "Background": "Black",
+                "Background": "DarkGreen",
                 "Style": "None"
               },
               "ReadOnly": {
                 "Foreground": "GreenPhosphor",
-                "Background": "Black",
-                "Style": "Italic"
+                "Background": "DarkGreen",
+                "Style": "Faint"
               }
             }
           },
@@ -1099,13 +1103,11 @@
             "Base": {
               "Normal": {
                 "Foreground": "GreenPhosphor",
-                "Background": "Black",
-                "Style": "None"
+                "Background": "Black"
               },
               "Focus": {
-                "Foreground": "GreenPhosphor",
-                "Background": "Black",
-                "Style": "Bold"
+                "Foreground": "Black",
+                "Background": "GreenPhosphor"
               },
               "HotNormal": {
                 "Foreground": "GreenPhosphor",
@@ -1113,9 +1115,9 @@
                 "Style": "Underline"
               },
               "HotFocus": {
-                "Foreground": "GreenPhosphor",
-                "Background": "Black",
-                "Style": "Underline,Bold"
+                "Foreground": "Black",
+                "Background": "GreenPhosphor",
+                "Style": "Underline"
               },
               "Disabled": {
                 "Foreground": "GreenPhosphor",
@@ -1135,17 +1137,17 @@
               "Highlight": {
                 "Foreground": "GreenPhosphor",
                 "Background": "Black",
-                "Style": "None"
+                "Style": "Italic"
               },
               "Editable": {
                 "Foreground": "GreenPhosphor",
-                "Background": "Black",
+                "Background": "DarkGreen",
                 "Style": "None"
               },
               "ReadOnly": {
                 "Foreground": "GreenPhosphor",
-                "Background": "Black",
-                "Style": "Italic"
+                "Background": "DarkGreen",
+                "Style": "Faint"
               }
             }
           },
@@ -1316,6 +1318,12 @@
     },
     {
       "Amber Phosphor": {
+        "Dialog.DefaultShadow": "None",
+        "FrameView.DefaultBorderStyle": "Single",
+        "Window.DefaultBorderStyle": "Single",
+        "MessageBox.DefaultBorderStyle": "Single",
+        "Button.DefaultShadow": "None",
+        "Menuv2.DefaultBorderStyle": "None",
         "Schemes": [
           {
             "TopLevel": {
@@ -1325,8 +1333,8 @@
                 "Style": "None"
               },
               "Focus": {
-                "Foreground": "AmberPhosphor",
-                "Background": "Black",
+                "Foreground": "Black",
+                "Background": "AmberPhosphor",
                 "Style": "Bold"
               },
               "HotNormal": {
@@ -1335,12 +1343,12 @@
                 "Style": "Underline"
               },
               "HotFocus": {
-                "Foreground": "AmberPhosphor",
-                "Background": "Black",
+                "Foreground": "Black",
+                "Background": "AmberPhosphor",
                 "Style": "Underline,Bold"
               },
               "Disabled": {
-                "Foreground": "AmberPhosphor",
+                "Foreground": "Charcoal",
                 "Background": "Black",
                 "Style": "Faint"
               },
@@ -1361,13 +1369,13 @@
               },
               "Editable": {
                 "Foreground": "AmberPhosphor",
-                "Background": "Black",
+                "Background": "Charcoal",
                 "Style": "None"
               },
               "ReadOnly": {
                 "Foreground": "AmberPhosphor",
-                "Background": "Black",
-                "Style": "Italic"
+                "Background": "Charcoal",
+                "Style": "Faint"
               }
             }
           },
@@ -1379,8 +1387,8 @@
                 "Style": "None"
               },
               "Focus": {
-                "Foreground": "AmberPhosphor",
-                "Background": "Black",
+                "Foreground": "Black",
+                "Background": "AmberPhosphor",
                 "Style": "Bold"
               },
               "HotNormal": {
@@ -1389,12 +1397,12 @@
                 "Style": "Underline"
               },
               "HotFocus": {
-                "Foreground": "AmberPhosphor",
-                "Background": "Black",
+                "Foreground": "Black",
+                "Background": "AmberPhosphor",
                 "Style": "Underline,Bold"
               },
               "Disabled": {
-                "Foreground": "AmberPhosphor",
+                "Foreground": "Charcoal",
                 "Background": "Black",
                 "Style": "Faint"
               },
@@ -1415,13 +1423,13 @@
               },
               "Editable": {
                 "Foreground": "AmberPhosphor",
-                "Background": "Black",
+                "Background": "Charcoal",
                 "Style": "None"
               },
               "ReadOnly": {
                 "Foreground": "AmberPhosphor",
-                "Background": "Black",
-                "Style": "Italic"
+                "Background": "Charcoal",
+                "Style": "Faint"
               }
             }
           },
@@ -1591,15 +1599,150 @@
       }
     },
     {
-      "Legacy": {
+      "8-Bit": {
         "Dialog.DefaultShadow": "None",
-        "FrameView.DefaultBorderStyle": "None",
-        "Window.DefaultBorderStyle": "None",
-        "MessageBox.DefaultBorderStyle": "None",
+        "FrameView.DefaultBorderStyle": "Single",
+        "Window.DefaultBorderStyle": "Single",
+        "MessageBox.DefaultBorderStyle": "Single",
         "Button.DefaultShadow": "None",
         "Menuv2.DefaultBorderStyle": "None",
         "Glyphs.LeftBracket": "[",
         "Glyphs.RightBracket": "]",
+        "Glyphs.CheckStateChecked": "X",
+        "Glyphs.CheckStateUnChecked": "O",
+        "Glyphs.CheckStateNone": " ",
+        "Glyphs.Selected": "*",
+        "Glyphs.UnSelected": " ",
+        "Glyphs.RightArrow": ">",
+        "Glyphs.LeftArrow": "<",
+        "Glyphs.DownArrow": "v",
+        "Glyphs.UpArrow": "^",
+        "Glyphs.LeftDefaultIndicator": ">",
+        "Glyphs.RightDefaultIndicator": "<",
+        "Glyphs.BlocksMeterSegment": "#",
+        "Glyphs.ContinuousMeterSegment": "=",
+        "Glyphs.Stipple": ".",
+        "Glyphs.Diamond": "+",
+        "Glyphs.Close": "X",
+        "Glyphs.Minimize": "_",
+        "Glyphs.Maximize": "^",
+        "Glyphs.Dot": ".",
+        "Glyphs.DottedSquare": "#",
+        "Glyphs.BlackCircle": "O",
+        "Glyphs.Expand": "+",
+        "Glyphs.Collapse": "-",
+        "Glyphs.IdenticalTo": "=",
+        "Glyphs.Move": "+",
+        "Glyphs.SizeHorizontal": "-",
+        "Glyphs.SizeVertical": "|",
+        "Glyphs.SizeTopLeft": "/",
+        "Glyphs.SizeTopRight": "\\",
+        "Glyphs.SizeBottomRight": "/",
+        "Glyphs.SizeBottomLeft": "\\",
+        "Glyphs.Apple": "@",
+        "Glyphs.AppleBMP": "@",
+        "Glyphs.HLine": "-",
+        "Glyphs.VLine": "|",
+        "Glyphs.HLineDbl": "=",
+        "Glyphs.VLineDbl": "|",
+        "Glyphs.HLineHvDa2": "-",
+        "Glyphs.VLineHvDa2": "|",
+        "Glyphs.HLineHvDa3": "-",
+        "Glyphs.VLineHvDa3": "|",
+        "Glyphs.HLineHvDa4": "-",
+        "Glyphs.VLineHvDa4": "|",
+        "Glyphs.HLineDa2": "-",
+        "Glyphs.VLineDa2": "|",
+        "Glyphs.HLineDa3": "-",
+        "Glyphs.VLineDa3": "|",
+        "Glyphs.HLineDa4": "-",
+        "Glyphs.VLineDa4": "|",
+        "Glyphs.HLineHv": "=",
+        "Glyphs.VLineHv": "|",
+        "Glyphs.HalfLeftLine": "-",
+        "Glyphs.HalfTopLine": "|",
+        "Glyphs.HalfRightLine": "-",
+        "Glyphs.HalfBottomLine": "|",
+        "Glyphs.HalfLeftLineHv": "-",
+        "Glyphs.HalfTopLineHv": "|",
+        "Glyphs.HalfRightLineHv": "-",
+        "Glyphs.HalfBottomLineLt": "|",
+        "Glyphs.RightSideLineLtHv": "-",
+        "Glyphs.BottomSideLineLtHv": "|",
+        "Glyphs.LeftSideLineHvLt": "-",
+        "Glyphs.TopSideLineHvLt": "|",
+        "Glyphs.ULCorner": "+",
+        "Glyphs.ULCornerDbl": "+",
+        "Glyphs.ULCornerR": "+",
+        "Glyphs.ULCornerHv": "+",
+        "Glyphs.ULCornerHvLt": "+",
+        "Glyphs.ULCornerLtHv": "+",
+        "Glyphs.ULCornerDblSingle": "+",
+        "Glyphs.ULCornerSingleDbl": "+",
+        "Glyphs.LLCorner": "+",
+        "Glyphs.LLCornerHv": "+",
+        "Glyphs.LLCornerHvLt": "+",
+        "Glyphs.LLCornerLtHv": "+",
+        "Glyphs.LLCornerDbl": "+",
+        "Glyphs.LLCornerSingleDbl": "+",
+        "Glyphs.LLCornerDblSingle": "+",
+        "Glyphs.LLCornerR": "+",
+        "Glyphs.URCorner": "+",
+        "Glyphs.URCornerDbl": "+",
+        "Glyphs.URCornerR": "+",
+        "Glyphs.URCornerHv": "+",
+        "Glyphs.URCornerHvLt": "+",
+        "Glyphs.URCornerLtHv": "+",
+        "Glyphs.URCornerDblSingle": "+",
+        "Glyphs.URCornerSingleDbl": "+",
+        "Glyphs.LRCorner": "+",
+        "Glyphs.LRCornerDbl": "+",
+        "Glyphs.LRCornerR": "+",
+        "Glyphs.LRCornerHv": "+",
+        "Glyphs.LRCornerDblSingle": "+",
+        "Glyphs.LRCornerSingleDbl": "+",
+        "Glyphs.LRCornerLtHv": "+",
+        "Glyphs.LRCornerHvLt": "+",
+        "Glyphs.LeftTee": "+",
+        "Glyphs.LeftTeeDblH": "+",
+        "Glyphs.LeftTeeDblV": "+",
+        "Glyphs.LeftTeeDbl": "+",
+        "Glyphs.LeftTeeHvH": "+",
+        "Glyphs.LeftTeeHvV": "+",
+        "Glyphs.LeftTeeHvDblH": "+",
+        "Glyphs.RightTee": "+",
+        "Glyphs.RightTeeDblH": "+",
+        "Glyphs.RightTeeDblV": "+",
+        "Glyphs.RightTeeDbl": "+",
+        "Glyphs.RightTeeHvH": "+",
+        "Glyphs.RightTeeHvV": "+",
+        "Glyphs.RightTeeHvDblH": "+",
+        "Glyphs.TopTee": "+",
+        "Glyphs.TopTeeDblH": "+",
+        "Glyphs.TopTeeDblV": "+",
+        "Glyphs.TopTeeDbl": "+",
+        "Glyphs.TopTeeHvH": "+",
+        "Glyphs.TopTeeHvV": "+",
+        "Glyphs.TopTeeHvDblH": "+",
+        "Glyphs.BottomTee": "+",
+        "Glyphs.BottomTeeDblH": "+",
+        "Glyphs.BottomTeeDblV": "+",
+        "Glyphs.BottomTeeDbl": "+",
+        "Glyphs.BottomTeeHvH": "+",
+        "Glyphs.BottomTeeHvV": "+",
+        "Glyphs.BottomTeeHvDblH": "+",
+        "Glyphs.Cross": "+",
+        "Glyphs.CrossDblH": "+",
+        "Glyphs.CrossDblV": "+",
+        "Glyphs.CrossDbl": "+",
+        "Glyphs.CrossHvH": "+",
+        "Glyphs.CrossHvV": "+",
+        "Glyphs.CrossHv": "+",
+        "Glyphs.ShadowVerticalStart": "|",
+        "Glyphs.ShadowVertical": "|",
+        "Glyphs.ShadowHorizontalStart": "-",
+        "Glyphs.ShadowHorizontal": "-",
+        "Glyphs.ShadowHorizontalEnd": "-",
         "Schemes": [
           {
             "TopLevel": {

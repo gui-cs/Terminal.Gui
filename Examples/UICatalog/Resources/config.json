@@ -9,9 +9,6 @@
   "Themes": [
     {
       "Hot Dog Stand": {
-        "Button.DefaultShadow": "Opaque",
-        "Dialog.DefaultShadow": "Transparent",
-        "Dialog.DefaultButtonAlignment": "Center",
         "Schemes": [
           {
             "Toplevel": {
@@ -138,9 +135,23 @@
     },
     {
       "UI Catalog Theme": {
-        "Button.DefaultShadow": "Opaque",
-        "Dialog.DefaultShadow": "Transparent",
-        "Dialog.DefaultButtonAlignment": "Center",
+        "Window.DefaultShadow": "Transparent",
+        "CheckBox.DefaultHighlightStyle": "Hover, Pressed, PressedOutside",
+        "MessageBox.DefaultButtonAlignment": "Start",
+        "StatusBar.DefaultSeparatorLineStyle": "Single",
+        "Dialog.DefaultMinimumWidth": 80,
+        "MessageBox.DefaultBorderStyle": "Dotted",
+        "NerdFonts.Enable": false,
+        "MessageBox.DefaultMinimumWidth": 0,
+        "Window.DefaultBorderStyle": "Double",
+        "Dialog.DefaultShadow": "Opaque",
+        "Dialog.DefaultButtonAlignment": "Start",
+        "Button.DefaultShadow": "Transparent",
+        "FrameView.DefaultBorderStyle": "Double",
+        "MessageBox.DefaultMinimumHeight": 0,
+        "Button.DefaultHighlightStyle": "Hover, Pressed",
+        "Menuv2.DefaultBorderStyle": "Heavy",
+        "MenuBarv2.DefaultBorderStyle": "Heavy",
         "Schemes": [
           {
             "UI Catalog Scheme": {

@@ -105,6 +105,31 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         Disable ();
     }
 
+
+    [Fact]
+    public void Apply_Applies_Theme ()
+    {
+        Assert.False (IsEnabled);
+        Enable (ConfigLocations.HardCoded);
+
+        var theme = new ThemeScope ();
+        theme.LoadHardCodedDefaults ();
+        Assert.NotEmpty (theme);
+
+        Assert.True (ThemeManager.Themes!.TryAdd ("testTheme", theme));
+        Assert.Equal (2, ThemeManager.Themes.Count);
+
+        Assert.Equal (LineStyle.Single, FrameView.DefaultBorderStyle);
+        theme ["FrameView.DefaultBorderStyle"].PropertyValue = LineStyle.Double; // default is Single
+
+        ThemeManager.Theme = "testTheme";
+        ConfigurationManager.Apply ();
+
+        Assert.Equal (LineStyle.Double, FrameView.DefaultBorderStyle);
+
+        Disable (resetToHardCodedDefaults: true);
+    }
+
     [Fact]
     public void Apply_Raises_Applied ()
     {

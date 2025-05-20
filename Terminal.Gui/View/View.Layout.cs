@@ -62,7 +62,7 @@ public partial class View // Layout APIs
                 _width = _frame!.Value.Width;
                 _height = _frame!.Value.Height;
 
-                // Implicit layout is ok here because we are setting the Frame directly.
+                // Explicit layout is ok here because we are setting the Frame directly.
                 Layout ();
             }
         }
@@ -758,6 +758,7 @@ public partial class View // Layout APIs
             Padding.SetNeedsLayout ();
         }
 
+        // TODO: Optimize this - see Setting_Thickness_Causes_Adornment_SubView_Layout
         // Use a stack to avoid recursion
         Stack<View> stack = new (SubViews);
 
