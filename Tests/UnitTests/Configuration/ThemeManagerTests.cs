@@ -288,8 +288,12 @@ public class ThemeManagerTests (ITestOutputHelper output)
 
         output.WriteLine ($"Total Settings Size: {(MemorySizeEstimator.EstimateSize (Settings!)) / 1024} Kb");
 
-        // Assert that the size is within a reasonable range (e.g., less than 1 MB)
-        //Assert.True (MemorySizeEstimator.EstimateSize (ThemeManager.Themes!) < (64 * 1024), $"Themes dictionary size is too large: {MemorySizeEstimator.EstimateSize (ThemeManager.Themes!) / 1024} Kb");
+        string json = SourcesManager?.ToJson (Settings)!;
+
+        // In memory size should be less than the size of the json
+        output.WriteLine ($"JSON size: {json.Length / 1024} Kb");
+
+        Assert.True (json.Length > MemorySizeEstimator.EstimateSize (ThemeManager.Themes!), $"In memory size ({(MemorySizeEstimator.EstimateSize (Settings!)) / 1024} Kb) is > json size ({json.Length / 1024} Kb)");
 
         Disable (resetToHardCodedDefaults: true);
     }
