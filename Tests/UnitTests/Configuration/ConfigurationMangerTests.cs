@@ -409,10 +409,39 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             string json = SourcesManager?.ToJson (Settings);
 
             // Write the JSON string to the file
-            File.WriteAllText ("config.json", json);
+            File.WriteAllText ("hard_coded_defaults_config.json", json);
 
             // Verify the file was created
-            Assert.True (File.Exists ("config.json"), "Failed to create config.json file");
+            Assert.True (File.Exists ("hard_coded_defaults_config.json"), "Failed to create config.json file");
+        }
+        finally
+        {
+            Disable (true);
+        }
+    }
+
+    /// <summary>Save the `config.json` file; this can be used to update the file in `Terminal.Gui.Resources.config.json'.</summary>
+    /// <remarks>
+    ///     IMPORTANT: For the file generated to be valid, this must be the ONLY test run. Config Properties are all
+    ///     static and thus can be overwritten by other tests.
+    /// </remarks>
+    [Fact]
+    public void Save_Library_Defaults_To_config_json ()
+    {
+        Assert.False (IsEnabled);
+
+        try
+        {
+            Enable (ConfigLocations.LibraryResources);
+
+            // Serialize to a JSON string
+            string json = SourcesManager?.ToJson (Settings);
+
+            // Write the JSON string to the file
+            File.WriteAllText ("library_defaults_config.json", json);
+
+            // Verify the file was created
+            Assert.True (File.Exists ("library_defaults_config.json"), "Failed to create config.json file");
         }
         finally
         {
