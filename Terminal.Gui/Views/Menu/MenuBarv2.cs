@@ -423,6 +423,8 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         menuBarItem.Accepting += OnMenuItemAccepted;
 
+        menuBarItem.PopoverMenu!.Root.SchemeName = SchemeName;
+
         return;
 
         void OnMenuItemAccepted (object? sender, EventArgs args)

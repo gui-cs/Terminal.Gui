@@ -49,6 +49,8 @@ public sealed class Themes : Scenario
             X = Pos.Right (themeListView)
         };
 
+
+
         Dictionary<string, Type> viewClasses = GetAllViewClassesCollection ()
                                                .OrderBy (t => t.Name)
                                                .Select (t => new KeyValuePair<string, Type> (t.Name, t))
@@ -56,7 +58,7 @@ public sealed class Themes : Scenario
 
         ListView? viewListView = new ListView ()
         {
-            X = Pos.Right(themeViewer),
+            X = Pos.Right (themeViewer),
             Title = "_Views",
             BorderStyle = LineStyle.Double,
             Width = Dim.Auto (),
@@ -72,6 +74,7 @@ public sealed class Themes : Scenario
             BorderStyle = LineStyle.Single,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
+            TabStop = TabBehavior.TabStop
         };
         viewFrame.Border.Thickness = new (0, 1, 0, 0);
 
@@ -92,13 +95,28 @@ public sealed class Themes : Scenario
                                                 {
                                                     _view.CanFocus = false;
                                                     viewFrame.Add (_view);
-                                                    _view.CanFocus = true;
                                                 }
                                             };
 
         appWindow.Add (themeListView, themeViewer, viewListView, viewFrame);
 
         viewListView.SelectedItem = 0;
+
+        themeViewer.SettingSchemeName += (sender, args) =>
+                                         {
+                                             if (_view is { })
+                                             {
+                                                 Application.Top.SchemeName = args.NewString;
+                                                 //viewListView.SchemeName = args.NewString;
+                                                 //viewFrame.SchemeName = args.NewString;
+
+                                                 if (_view.HasScheme)
+                                                 {
+                                                     _view.SetScheme (null);
+                                                 }
+                                                 _view.SchemeName = args.NewString;
+                                             }
+                                         };
 
         // Run - Start the application.
         Application.Run (appWindow);
@@ -196,6 +214,7 @@ public class ThemeViewer : FrameView
 {
     public ThemeViewer ()
     {
+        TabStop = TabBehavior.TabStop;
         CanFocus = true;
         Height = Dim.Fill ();
         Width = Dim.Auto ();
@@ -263,7 +282,21 @@ public class ThemeViewer : FrameView
         ThemeManager.ThemeChanged += OnThemeManagerOnThemeChanged;
     }
 
-    private void OnThemeManagerOnThemeChanged (object? _, StringPropertyEventArgs args) { Title = args.NewString!; }
+    /// <inheritdoc />
+    protected override void OnFocusedChanged (View? previousFocused, View? focused)
+    {
+        base.OnFocusedChanged (previousFocused, focused);
+
+        if (focused is { })
+        {
+            SchemeName = focused.Title;
+        }
+    }
+
+    private void OnThemeManagerOnThemeChanged (object? _, StringPropertyEventArgs args)
+    {
+        Title = args.NewString!;
+    }
 
     protected override void Dispose (bool disposing)
     {
@@ -279,6 +312,7 @@ public class SchemeViewer : FrameView
 {
     public SchemeViewer ()
     {
+        TabStop = TabBehavior.TabStop;
         CanFocus = true;
         Height = Dim.Auto ();
         Width = Dim.Auto ();
@@ -317,7 +351,7 @@ public class VisualRoleViewer : View
 {
     public VisualRoleViewer ()
     {
-        CanFocus = true;
+        CanFocus = false;
         Height = Dim.Auto (DimAutoStyle.Text);
         Width = Dim.Auto (DimAutoStyle.Text);
     }
