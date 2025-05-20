@@ -741,7 +741,7 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     /// <inheritdoc />
-    protected override bool OnGettingAttributeForRole (VisualRole role, ref Attribute currentAttribute)
+    protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
     {
         if (!HasFocus)
         {

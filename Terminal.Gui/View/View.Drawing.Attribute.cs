@@ -62,7 +62,7 @@ public partial class View
     /// <param name="role"></param>
     /// <param name="currentAttribute">The current value of the Attribute for the VisualRole. This by-ref value can be changed</param>
     /// <returns></returns>
-    protected virtual bool OnGettingAttributeForRole (VisualRole role, ref Attribute currentAttribute) { return false; }
+    protected virtual bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute) { return false; }
 
     /// <summary>
     ///     Raised when the Attribute for a <see cref="GetAttributeForRole(Terminal.Gui.VisualRole)"/> is being retrieved.
@@ -128,7 +128,7 @@ public partial class View
     /// <returns>
     ///     <see langword="true"/> to cancel the setting of the attribute.
     /// </returns>
-    private bool OnSettingAttributeForRole (in VisualRole role, in Attribute currentAttribute, ref Attribute schemeAttribute) { return false; }
+    protected virtual bool OnSettingAttributeForRole (in VisualRole role, in Attribute currentAttribute, ref Attribute newAttribute) { return false; }
 
     /// <summary>
     ///     Raised when the Attribute associated with the specified <see cref="VisualRole"/> for the View being set.

@@ -5,13 +5,55 @@ namespace Terminal.Gui;
 
 public partial class View
 {
+    private string? _schemeName;
 
     /// <summary>
     ///     Gets or sets the name of the Scheme to use for this View. If set, it will override the scheme inherited from the
     ///     SuperView. If a Scheme was explicitly set (<see cref="HasScheme"/> is <see langword="true"/>),
     ///     this property will be ignored.
     /// </summary>
-    public string? SchemeName { get; set; }
+    public string? SchemeName
+    {
+        get => _schemeName;
+        set
+        {
+            if (_schemeName == value)
+            {
+                return;
+            }
+
+            if (OnSettingSchemeName (in _schemeName, ref value))
+            {
+                _schemeName = value;
+                return;
+            }
+
+            StringPropertyEventArgs args = new (in _schemeName, ref value);
+            SettingSchemeName?.Invoke (this, args);
+
+            if (args.Cancel)
+            {
+                _schemeName = args.NewString;
+
+                return;
+            }
+
+            _schemeName = value;
+        }
+    }
+
+    /// <summary>
+    ///     Called when the <see cref="Scheme"/> for the View is to be set.
+    /// </summary>
+    /// <param name="schemeName"></param>
+    /// <returns><see langword="true"/> to stop default behavior.</returns>
+    protected virtual bool OnSettingSchemeName (in string? currentName, ref string? newName) { return false; }
+
+    /// <summary>Raised when the <see cref="Scheme"/> for the View is to be set.</summary>
+    /// <returns>
+    ///     Set <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/> to stop default behavior.
+    /// </returns>
+    public event EventHandler<StringPropertyEventArgs>? SettingSchemeName;
 
     // Both holds the set Scheme and is used to determine if a Scheme has been set or not
     private Scheme? _scheme;

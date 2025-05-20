@@ -89,7 +89,7 @@ public class Dialog : Window
 
     /// <inheritdoc />
     /// <inheritdoc />
-    protected override bool OnGettingAttributeForRole (VisualRole role, ref Attribute currentAttribute)
+    protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
     {
         if (role == VisualRole.Normal || role == VisualRole.Focus)
         {

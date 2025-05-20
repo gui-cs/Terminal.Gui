@@ -1390,7 +1390,7 @@ public class TextView : View, IDesignable
     public List<Cell> GetLine (int line) { return _model.GetLine (line); }
 
     /// <inheritdoc/>
-    protected override bool OnGettingAttributeForRole (VisualRole role, ref Attribute currentAttribute)
+    protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
     {
         if (role == VisualRole.Normal)
         {
