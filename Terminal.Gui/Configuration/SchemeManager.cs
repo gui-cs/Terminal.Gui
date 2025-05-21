@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
 using System.Diagnostics;
@@ -20,7 +21,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     {
         lock (_schemesLock)
         {
-            SetSchemes (GetHardCodedSchemes ());
+            SetSchemes (GetHardCodedSchemes ()!.ToDictionary (StringComparer.InvariantCultureIgnoreCase));
         }
     }
 
@@ -29,7 +30,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     ///     but are hard-coded in the source code. Used for unit testing when ConfigurationManager is not initialized.
     /// </summary>
     /// <returns></returns>
-    public static Dictionary<string, Scheme?>? GetHardCodedSchemes () { return Scheme.GetHardCodedSchemes (); }
+    public static ConcurrentDictionary<string, Scheme?>? GetHardCodedSchemes () { return Scheme.GetHardCodedSchemes (); }
 
     /// <summary>
     ///     Use <see cref="AddScheme"/>, <see cref="GetScheme(Terminal.Gui.Schemes)"/>, <see cref="GetSchemeNames"/>, <see cref="GetSchemesForCurrentTheme"/>, etc... instead.
@@ -50,7 +51,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
         {
             // We're being called from the module initializer.
             // Hard coded default value
-            return GetHardCodedSchemes ()!;
+            return GetHardCodedSchemes ()!.ToDictionary (StringComparer.InvariantCultureIgnoreCase);
         }
 
         return GetSchemesForCurrentTheme ();
@@ -94,7 +95,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     /// <exception cref="InvalidOperationException">If the scheme is a built-in Scheme or was not previously added.</exception>
     public static void RemoveScheme (string schemeName)
     {
-        if (SchemeNameToSchemes (schemeName) is {})
+        if (SchemeNameToSchemes (schemeName) is { })
         {
             throw new InvalidOperationException ($@"{schemeName}: Cannot remove a built-in Scheme.");
         }
@@ -169,7 +170,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     {
         if (!ConfigurationManager.IsInitialized ())
         {
-            Dictionary<string, Scheme?> hardCoded = Scheme.GetHardCodedSchemes ();
+            Dictionary<string, Scheme?> hardCoded = Scheme.GetHardCodedSchemes ()!.ToDictionary (StringComparer.InvariantCultureIgnoreCase);
 
             return hardCoded;
         }

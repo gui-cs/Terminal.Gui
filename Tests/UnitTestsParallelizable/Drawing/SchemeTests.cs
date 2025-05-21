@@ -33,7 +33,7 @@ public class SchemeTests
     [Fact]
     public void HardcodedSchemes_ExplicitAttributes_AreMarkedExplicit ()
     {
-        Dictionary<string, Scheme?> schemes = Scheme.GetHardCodedSchemes ();
+        Dictionary<string, Scheme?> schemes = Scheme.GetHardCodedSchemes ().ToDictionary (StringComparer.InvariantCultureIgnoreCase);
 
         foreach (KeyValuePair<string, Scheme?> pair in schemes)
         {
