@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui;
 
@@ -29,7 +30,11 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
 
         InputProcessor.KeyDown += (s, e) => KeyDown?.Invoke (s, e);
         InputProcessor.KeyUp += (s, e) => KeyUp?.Invoke (s, e);
-        InputProcessor.MouseEvent += (s, e) => MouseEvent?.Invoke (s, e);
+        InputProcessor.MouseEvent += (s, e) =>
+                                     {
+                                         //Logging.Logger.LogTrace ($"Mouse {e.Flags} at x={e.ScreenPosition.X} y={e.ScreenPosition.Y}");
+                                         MouseEvent?.Invoke (s, e);
+                                     };
 
         windowSizeMonitor.SizeChanging += (_, e) => SizeChanged?.Invoke (this, e);
 
