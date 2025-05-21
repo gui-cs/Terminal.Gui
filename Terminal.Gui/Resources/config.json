@@ -708,13 +708,13 @@
           {
             "Error": {
               "Normal": {
-                "Foreground": "Firebrick",
+                "Foreground": "FireBrick",
                 "Background": "WhiteSmoke",
                 "Style": "None"
               },
               "Focus": {
                 "Foreground": "WhiteSmoke",
-                "Background": "Firebrick",
+                "Background": "FireBrick",
                 "Style": "None"
               },
               "HotNormal": {
@@ -729,7 +729,7 @@
               },
               "HotFocus": {
                 "Foreground": "WhiteSmoke",
-                "Background": "Firebrick",
+                "Background": "FireBrick",
                 "Style": "Underline"
               },
               "Active": {
@@ -744,7 +744,7 @@
               },
               "Highlight": {
                 "Foreground": "WhiteSmoke",
-                "Background": "Firebrick",
+                "Background": "FireBrick",
                 "Style": "None"
               },
               "Editable": {
@@ -1051,11 +1051,11 @@
             "TopLevel": {
               "Normal": {
                 "Foreground": "GreenPhosphor",
-                "Background": "Black",
+                "Background": "Black"
               },
               "Focus": {
                 "Foreground": "Black",
-                "Background": "GreenPhosphor",
+                "Background": "GreenPhosphor"
               },
               "HotNormal": {
                 "Foreground": "GreenPhosphor",

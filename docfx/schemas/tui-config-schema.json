@@ -30,8 +30,19 @@
       "description": "If true, forces the console driver to output only the basic 16 ANSI colors, even if the terminal supports more (e.g., 256 colors or TrueColor)."
     },
     "Application.ForceDriver": {
-      "type": ["string", "null"],
-      "enum": ["", "fake", "ansi", "curses", "net", "windows", null],
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "",
+        "fake",
+        "ansi",
+        "curses",
+        "net",
+        "windows",
+        null
+      ],
       "default": "",
       "description": "Forces the use of a specific console driver. If empty or null, Terminal.Gui will attempt to auto-detect the best driver. Options: 'fake', 'ansi', 'curses', 'net', 'windows'."
     },
@@ -209,35 +220,174 @@
   "additionalProperties": true,
   "definitions": {
     "Color": {
-      "description": "One be either one of the W3C standard color names, a ColorName16 (e.g. 'BrightBlue'), an rgb(r,g,b) tuple, or a hex color string in the format #RRGGBB.",
+      "description": "One be either one of the W3C standard color names (parsed case-insensitively), a ColorName16 (e.g. 'BrightBlue', parsed case-insensitively), an rgb(r,g,b) tuple, or a hex color string in the format #RRGGBB.",
       "$schema": "http://json-schema.org/draft-07/schema#",
       "type": "string",
       "oneOf": [
         {
           "type": "string",
           "enum": [
-            "AliceBlue", "AntiqueWhite", "Aqua", "Aquamarine", "Azure", "Beige", "Bisque", "Black",
-            "BlanchedAlmond", "Blue", "BlueViolet", "Brown", "BurlyWood", "CadetBlue", "Chartreuse",
-            "Chocolate", "Coral", "CornflowerBlue", "Cornsilk", "Crimson", "Cyan", "DarkBlue",
-            "DarkCyan", "DarkGoldenRod", "DarkGray", "DarkGreen", "DarkKhaki", "DarkMagenta",
-            "DarkOliveGreen", "DarkOrange", "DarkOrchid", "DarkRed", "DarkSalmon", "DarkSeaGreen",
-            "DarkSlateBlue", "DarkSlateGray", "DarkTurquoise", "DarkViolet", "DeepPink", "DeepSkyBlue",
-            "DimGray", "DodgerBlue", "FireBrick", "FloralWhite", "ForestGreen", "Fuchsia", "Gainsboro",
-            "GhostWhite", "Gold", "GoldenRod", "Gray", "Green", "GreenYellow", "HoneyDew", "HotPink",
-            "IndianRed", "Indigo", "Ivory", "Khaki", "Lavender", "LavenderBlush", "LawnGreen",
-            "LemonChiffon", "LightBlue", "LightCoral", "LightCyan", "LightGoldenRodYellow", "LightGray",
-            "LightGreen", "LightPink", "LightSalmon", "LightSeaGreen", "LightSkyBlue", "LightSlateGray",
-            "LightSteelBlue", "LightYellow", "Lime", "LimeGreen", "Linen", "Magenta", "Maroon",
-            "MediumAquaMarine", "MediumBlue", "MediumOrchid", "MediumPurple", "MediumSeaGreen",
-            "MediumSlateBlue", "MediumSpringGreen", "MediumTurquoise", "MediumVioletRed", "MidnightBlue",
-            "MintCream", "MistyRose", "Moccasin", "NavajoWhite", "Navy", "OldLace", "Olive",
-            "OliveDrab", "Orange", "OrangeRed", "Orchid", "PaleGoldenRod", "PaleGreen", "PaleTurquoise",
-            "PaleVioletRed", "PapayaWhip", "PeachPuff", "Peru", "Pink", "Plum", "PowderBlue",
-            "Purple", "RebeccaPurple", "Red", "RosyBrown", "RoyalBlue", "SaddleBrown", "Salmon",
-            "SandyBrown", "SeaGreen", "SeaShell", "Sienna", "Silver", "SkyBlue", "SlateBlue",
-            "SlateGray", "Snow", "SpringGreen", "SteelBlue", "Tan", "Teal", "Thistle", "Tomato",
-            "Turquoise", "Violet", "Wheat", "White", "WhiteSmoke", "Yellow", "YellowGreen",
-            "BrightBlue", "BrightGreen", "BrightCyan", "BrightRed", "BrightMagenta", "BrightYellow"
+            "AliceBlue",
+            "AmberPhosphor",
+            "AntiqueWhite",
+            "Aqua",
+            "Aquamarine",
+            "Azure",
+            "Beige",
+            "Bisque",
+            "Black",
+            "BlanchedAlmond",
+            "Blue",
+            "BlueViolet",
+            "BrightBlue",
+            "BrightCyan",
+            "BrightGreen",
+            "BrightMagenta",
+            "BrightRed",
+            "BrightYellow",
+            "Brown",
+            "BurlyWood",
+            "CadetBlue",
+            "Charcoal",
+            "CornflowerBlue",
+            "Cornsilk",
+            "Crimson",
+            "Cyan",
+            "DarkBlue",
+            "DarkCyan",
+            "DarkGoldenrod",
+            "DarkGray",
+            "DarkGreen",
+            "DarkGrey",
+            "DarkKhaki",
+            "DarkMagenta",
+            "DarkOliveGreen",
+            "DarkOrange",
+            "DarkOrchid",
+            "DarkRed",
+            "DarkSalmon",
+            "DarkSeaGreen",
+            "DarkSlateBlue",
+            "DarkSlateGray",
+            "DarkSlateGrey",
+            "DarkTurquoise",
+            "DarkViolet",
+            "DeepPink",
+            "DeepSkyBlue",
+            "DimGray",
+            "DimGrey",
+            "DodgerBlue",
+            "Ebony",
+            "FireBrick",
+            "FloralWhite",
+            "FluorescentOrange",
+            "ForestGreen",
+            "Fuchsia",
+            "Gainsboro",
+            "GhostWhite",
+            "Gold",
+            "Goldenrod",
+            "Gray",
+            "Green",
+            "GreenPhosphor",
+            "GreenYellow",
+            "Grey",
+            "GuppieGreen",
+            "HoneyDew",
+            "HotPink",
+            "IndianRed",
+            "Indigo",
+            "Ivory",
+            "Jet",
+            "Khaki",
+            "Lavender",
+            "LavenderBlush",
+            "LawnGreen",
+            "LemonChiffon",
+            "LightBlue",
+            "LightCoral",
+            "LightCyan",
+            "LightGoldenrodYellow",
+            "LightGray",
+            "LightGreen",
+            "LightGrey",
+            "LightPink",
+            "LightSalmon",
+            "LightSeaGreen",
+            "LightSkyBlue",
+            "LightSlateGray",
+            "LightSlateGrey",
+            "LightSteelBlue",
+            "LightYellow",
+            "Lime",
+            "LimeGreen",
+            "Linen",
+            "Magenta",
+            "Maroon",
+            "MediumAquaMarine",
+            "MediumBlue",
+            "MediumOrchid",
+            "MediumPurple",
+            "MediumSeaGreen",
+            "MediumSlateBlue",
+            "MediumSpringGreen",
+            "MediumTurquoise",
+            "MediumVioletRed",
+            "MidnightBlue",
+            "MintCream",
+            "MistyRose",
+            "Moccasin",
+            "NavajoWhite",
+            "Navy",
+            "OldLace",
+            "Olive",
+            "OliveDrab",
+            "Onyx",
+            "Orange",
+            "OrangeRed",
+            "Orchid",
+            "OuterSpace",
+            "PaleGoldenRod",
+            "PaleGreen",
+            "PaleTurquoise",
+            "PaleVioletRed",
+            "PapayaWhip",
+            "PeachPuff",
+            "Peru",
+            "Pink",
+            "Plum",
+            "PowderBlue",
+            "Purple",
+            "RaisinBlack",
+            "RebeccaPurple",
+            "Red",
+            "RosyBrown",
+            "RoyalBlue",
+            "SaddleBrown",
+            "Salmon",
+            "SandyBrown",
+            "SeaGreen",
+            "SeaShell",
+            "Sienna",
+            "Silver",
+            "SkyBlue",
+            "SlateBlue",
+            "SlateGray",
+            "SlateGrey",
+            "Snow",
+            "SpringGreen",
+            "SteelBlue",
+            "Tan",
+            "Teal",
+            "Thistle",
+            "Tomato",
+            "Turquoise",
+            "Violet",
+            "Wheat",
+            "White",
+            "WhiteSmoke",
+            "Yellow",
+            "YellowGreen"
           ]
         },
         {
@@ -254,40 +404,73 @@
       "type": "object",
       "description": "Defines the foreground color, background color, and style for a specific UI element state.",
       "properties": {
-        "Foreground": { "$ref": "#/definitions/Color" },
-        "Background": { "$ref": "#/definitions/Color" },
+        "Foreground": {
+          "$ref": "#/definitions/Color"
+        },
+        "Background": {
+          "$ref": "#/definitions/Color"
+        },
         "Style": {
           "type": "string",
           "default": "None",
-          "description": "Text style. Can be a single style or a comma-separated list (e.g., 'Bold,Italic').",
-          "enum": [
-            "None", "Bold", "Italic", "Underline", "Faint", "Blink", "Reverse", "Strikethrough",
-            "Bold,Italic", "Bold,Underline"
-            // Note: Terminal.Gui.Style is a flags enum, so many combinations are possible.
-            // This enum provides common examples. For full flexibility, a pattern might be needed
-            // or rely on the application to parse the comma-separated string.
-          ]
+          "description": "Text style. Parsed case-insensitively by the application. Can be a single style or a comma-separated list of the following valid flags: None, Bold, Italic, Underline, Faint, Blink, Reverse, Strikethrough (e.g., 'Bold,Italic').",
+          "pattern": "^(None|Bold|Italic|Underline|Faint|Blink|Reverse|Strikethrough)(\\s*,\\s*(None|Bold|Italic|Underline|Faint|Blink|Reverse|Strikethrough))*$"
         }
       },
-      "required": ["Foreground", "Background"],
+      "required": [
+        "Foreground",
+        "Background"
+      ],
       "additionalProperties": false
     },
     "scheme": {
       "type": "object",
       "description": "A collection of attributes defining the appearance of UI elements in different states (normal, focused, etc.).",
       "properties": {
-        "Normal": { "$ref": "#/definitions/attribute", "description": "Appearance in the normal, non-focused state." },
-        "Focus": { "$ref": "#/definitions/attribute", "description": "Appearance when the element has input focus." },
-        "HotNormal": { "$ref": "#/definitions/attribute", "description": "Appearance for a 'hot' element (e.g., mouse hover) that is not focused." },
-        "HotFocus": { "$ref": "#/definitions/attribute", "description": "Appearance for a 'hot' element that also has input focus." },
-        "Disabled": { "$ref": "#/definitions/attribute", "description": "Appearance when the element is disabled." },
-        "Active": { "$ref": "#/definitions/attribute", "description": "Appearance when the element is active." },
-        "HotActive": { "$ref": "#/definitions/attribute", "description": "Appearance for a 'hot' element that is also active." },
-        "Highlight": { "$ref": "#/definitions/attribute", "description": "Appearance for a highlighted element." },
-        "Editable": { "$ref": "#/definitions/attribute", "description": "Appearance for an editable element." },
-        "ReadOnly": { "$ref": "#/definitions/attribute", "description": "Appearance for a read-only element." } 
+        "Normal": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance in the normal, non-focused state."
+        },
+        "Focus": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance when the element has input focus."
+        },
+        "HotNormal": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for a 'hot' element (e.g., mouse hover) that is not focused."
+        },
+        "HotFocus": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for a 'hot' element that also has input focus."
+        },
+        "Disabled": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance when the element is disabled."
+        },
+        "Active": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance when the element is active."
+        },
+        "HotActive": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for a 'hot' element that is also active."
+        },
+        "Highlight": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for a highlighted element."
+        },
+        "Editable": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for an editable element."
+        },
+        "ReadOnly": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for a read-only element."
+        }
       },
-      "required": ["Normal"],
+      "required": [
+        "Normal"
+      ],
       "additionalProperties": false
     },
     "themeSettings": {
@@ -295,68 +478,131 @@
       "description": "Contains all settings for a specific theme, including default styles for various UI elements, glyphs, and color schemes.",
       "properties": {
         "BasedOn": {
-            "type": "string",
-            "description": "The name of another theme that this theme inherits settings from. Settings in the current theme will override those from the base theme."
+          "type": "string",
+          "description": "The name of another theme that this theme inherits settings from. Settings in the current theme will override those from the base theme."
         },
         "Dialog.DefaultButtonAlignment": {
           "type": "string",
-          "enum": ["Start", "End", "Center", "Fill"],
+          "enum": [
+            "Start",
+            "End",
+            "Center",
+            "Fill"
+          ],
           "description": "Default horizontal alignment for buttons within Dialog views."
         },
         "Dialog.DefaultButtonAlignmentModes": {
           "type": "string",
-          "enum": ["None", "AddSpaceBetweenItems", "AddSpaceAroundItems"],
+          "enum": [
+            "None",
+            "AddSpaceBetweenItems",
+            "AddSpaceAroundItems"
+          ],
           "description": "Specifies how extra space is distributed between buttons in Dialog views when alignment is 'Start', 'End', or 'Center'."
         },
         "Dialog.DefaultBorderStyle": {
           "type": "string",
-          "enum": ["None", "Single", "Double", "Heavy", "Rounded"],
+          "enum": [
+            "None",
+            "Single",
+            "Double",
+            "Heavy",
+            "Rounded"
+          ],
           "description": "Default border style for Dialog views."
         },
         "Dialog.DefaultShadow": {
           "type": "string",
-          "enum": ["None", "Transparent", "Opaque"],
+          "enum": [
+            "None",
+            "Transparent",
+            "Opaque"
+          ],
           "description": "Default shadow style for Dialog views, rendered behind the dialog."
         },
         "FrameView.DefaultBorderStyle": {
           "type": "string",
-          "enum": ["None", "Single", "Double", "Heavy", "Rounded"],
+          "enum": [
+            "None",
+            "Single",
+            "Double",
+            "Heavy",
+            "Rounded"
+          ],
           "description": "Default border style for FrameView controls."
         },
         "Window.DefaultBorderStyle": {
           "type": "string",
-          "enum": ["None", "Single", "Double", "Heavy", "Rounded"],
+          "enum": [
+            "None",
+            "Single",
+            "Double",
+            "Heavy",
+            "Rounded"
+          ],
           "description": "Default border style for Window views."
         },
         "MessageBox.DefaultButtonAlignment": {
           "type": "string",
-          "enum": ["Start", "End", "Center", "Fill"],
+          "enum": [
+            "Start",
+            "End",
+            "Center",
+            "Fill"
+          ],
           "description": "Default horizontal alignment for buttons within MessageBox views."
         },
         "MessageBox.DefaultBorderStyle": {
           "type": "string",
-          "enum": ["None", "Single", "Double", "Heavy", "Rounded"],
+          "enum": [
+            "None",
+            "Single",
+            "Double",
+            "Heavy",
+            "Rounded"
+          ],
           "description": "Default border style for MessageBox views."
         },
         "Button.DefaultShadow": {
           "type": "string",
-          "enum": ["None", "Transparent", "Opaque"],
+          "enum": [
+            "None",
+            "Transparent",
+            "Opaque"
+          ],
           "description": "Default shadow style for Button controls, often used for 3D effect."
         },
         "Menuv2.DefaultBorderStyle": {
           "type": "string",
-          "enum": ["None", "Single", "Double", "Heavy", "Rounded"],
+          "enum": [
+            "None",
+            "Single",
+            "Double",
+            "Heavy",
+            "Rounded"
+          ],
           "description": "Default border style for the newer Menuv2 control and its sub-menus."
         },
         "MenuBarv2.DefaultBorderStyle": {
-            "type": "string",
-            "enum": ["None", "Single", "Double", "Heavy", "Rounded"],
-            "description": "Default border style for the MenuBarv2 control."
+          "type": "string",
+          "enum": [
+            "None",
+            "Single",
+            "Double",
+            "Heavy",
+            "Rounded"
+          ],
+          "description": "Default border style for the MenuBarv2 control."
         },
         "StatusBar.DefaultSeparatorLineStyle": {
-            "type": "string",
-            "enum": ["None", "Single", "Double", "Heavy"],
-            "description": "Default style for separator lines in the StatusBar."
+          "type": "string",
+          "enum": [
+            "None",
+            "Single",
+            "Double",
+            "Heavy"
+          ],
+          "description": "Default style for separator lines in the StatusBar."
         },
         "Schemes": {
           "type": "array",
@@ -384,4 +630,3 @@
     }
   }
 }
-
