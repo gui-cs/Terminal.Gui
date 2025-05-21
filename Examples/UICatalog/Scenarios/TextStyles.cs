@@ -30,7 +30,7 @@ public sealed class TestStyles : Scenario
                                      {
                                          if (sender is View sendingView)
                                          {
-                                             sendingView.SetContentSize (sendingView.GetSizeRequiredForSubViews ());
+                                             sendingView.SetContentSize (new Size(sendingView.GetContentSize().Width, sendingView.GetHeightRequiredForSubViews()));
                                          }
                                      };
 

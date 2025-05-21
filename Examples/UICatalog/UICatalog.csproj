@@ -27,14 +27,14 @@
         <None Update="Scenarios\AnimationScenario\Spinning_globe_dark_small.gif" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="JetBrains.Annotations"  PrivateAssets="all" />
-        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets"/>
+        <PackageReference Include="JetBrains.Annotations" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
         <PackageReference Include="Serilog" />
         <PackageReference Include="Serilog.Extensions.Logging" />
-        <PackageReference Include="Serilog.Sinks.Debug"  />
+        <PackageReference Include="Serilog.Sinks.Debug" />
         <PackageReference Include="Serilog.Sinks.File" />
         <PackageReference Include="SixLabors.ImageSharp" />
-        <PackageReference Include="CsvHelper"  />
+        <PackageReference Include="CsvHelper" />
         <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" />
         <PackageReference Include="System.CommandLine" V="" />
     </ItemGroup>
