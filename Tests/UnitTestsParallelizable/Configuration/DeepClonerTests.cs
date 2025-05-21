@@ -383,7 +383,7 @@ public class DeepClonerTests
 
         Assert.NotNull (result);
         Assert.NotSame (source, result);
-        Assert.Equal (1, result.Count);
+        Assert.Single (result);
         Assert.Equal (source ["Disabled"], result ["Disabled"]);
     }
 
@@ -575,7 +575,7 @@ public class DeepClonerTests
         ((Dictionary<string, int>)result ["Counts"].PropertyValue!).Add ("Y", 2);
         Assert.Equal ("Dark", source.Theme);
         Assert.True (((Key)source ["KeyBinding"].PropertyValue!).Handled);
-        Assert.Equal (1, ((Dictionary<string, int>)source ["Counts"].PropertyValue!).Count);
+        Assert.Single ((Dictionary<string, int>)source ["Counts"].PropertyValue!);
     }
 
     [Fact]

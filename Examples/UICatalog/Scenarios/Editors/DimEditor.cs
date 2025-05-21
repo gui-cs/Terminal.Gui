@@ -27,11 +27,11 @@ public class DimEditor : EditorBase
     {
         if (ViewToEdit is { })
         {
-            ViewToEdit.SubViewsLaidOut += (_, _) => { OnUpdateSettings (); };
+            ViewToEdit.SubViewsLaidOut += (_, _) => { OnUpdateLayoutSettings (); };
         }
     }
 
-    protected override void OnUpdateSettings ()
+    protected override void OnUpdateLayoutSettings ()
     {
         Enabled = ViewToEdit is not Adornment;
 
@@ -130,7 +130,7 @@ public class DimEditor : EditorBase
 
     private void DimChanged ()
     {
-        if (ViewToEdit == null || UpdatingSettings)
+        if (ViewToEdit == null || UpdatingLayoutSettings)
         {
             return;
         }

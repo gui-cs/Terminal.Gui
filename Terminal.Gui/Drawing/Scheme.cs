@@ -46,7 +46,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                     Active = new (new ("White"), new ("Charcoal"), TextStyle.None), // White text on active
                     HotActive = new (new ("White"), new ("Charcoal"), TextStyle.Underline), // Underlined white text on active
                     Highlight = new (new ("White"), new ("Onyx"), TextStyle.None), // Highlight with slightly lighter background
-                    Editable = new (new ("LightYellow"), new ("RaisinBlack"), TextStyle.None), // Yellowish text for editable fields
+                    Editable = new (new ("LightYellow"), new ("OuterSpace"), TextStyle.None), // Yellowish text for editable fields
                     ReadOnly = new (new ("Gray"), new ("RaisinBlack"), TextStyle.Italic) // Gray italic text for read-only
                 }
             },
@@ -62,7 +62,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                     Active = new (new ("White"), new ("DarkSlateGray"), TextStyle.Bold),
                     HotActive = new (new ("White"), new ("DarkSlateGray"), TextStyle.Underline | TextStyle.Bold),
                     Highlight = new (new ("White"), new ("Onyx"), TextStyle.None),
-                    Editable = new (new ("LemonChiffon"), new ("OuterSpace"), TextStyle.None),
+                    Editable = new (new ("LemonChiffon"), new ("RaisinBlack"), TextStyle.None),
                     ReadOnly = new (new ("Silver"), new ("OuterSpace"), TextStyle.Italic)
                 }
             },

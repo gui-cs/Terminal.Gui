@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿#nullable enable
+using System.Reflection;
 
 namespace Terminal.Gui.DrawingTests;
 
@@ -10,10 +11,10 @@ public class SchemeTests
         // Resharper Code Cleanup likes to remove the `private set; `
         // from the Schemes property.  This test will fail if
         // that happens.
-        PropertyInfo property = typeof (SchemeManager).GetProperty ("Schemes");
+        PropertyInfo? property = typeof (SchemeManager).GetProperty ("Schemes");
         Assert.NotNull (property);
         Assert.NotNull (property.SetMethod);
-        Assert.True (property.GetSetMethod (true).IsPrivate);
+        Assert.True (property.GetSetMethod (true)!.IsPrivate);
     }
 
     [Fact]
@@ -69,7 +70,7 @@ public class SchemeTests
     [Fact]
     public void Schemes_Built_Ins ()
     {
-        Dictionary<string, Scheme> schemes = SchemeManager.GetSchemes ();
+        Dictionary<string, Scheme>? schemes = SchemeManager.GetSchemes ();
         Assert.NotNull (schemes);
         Assert.Equal (5, schemes.Count);
         Assert.True (schemes.ContainsKey ("TopLevel"));

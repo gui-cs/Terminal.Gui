@@ -2233,8 +2233,6 @@ public class TextView : View, IDesignable
         DrawReadOnlyColor?.Invoke (this, ev);
 
         Attribute? cellAttribute = line [idxCol].Attribute is { } ? line [idxCol].Attribute : GetAttributeForRole (VisualRole.ReadOnly);
-        Attribute attribute;
-
 
         if (cellAttribute!.Value.Foreground == cellAttribute.Value.Background)
         {

@@ -1,6 +1,4 @@
 ﻿#nullable enable
-using System.Diagnostics;
-using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -9,10 +7,9 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Colors")]
 [ScenarioCategory ("Drawing")]
 [ScenarioCategory ("Configuration")]
-
 public sealed class Themes : Scenario
 {
-    private View? _view = null;
+    private View? _view;
 
     public override void Main ()
     {
@@ -26,64 +23,82 @@ public sealed class Themes : Scenario
             BorderStyle = LineStyle.None
         };
 
-        ListView? themeListView = new ListView ()
+        string[]  options = ThemeManager.GetThemeNames ().Select (option => option = "_" + option).ToArray ();
+        RadioGroup themeOptionSelector = new ()
         {
             Title = "_Themes",
-            BorderStyle = LineStyle.Double,
+            BorderStyle = LineStyle.Rounded,
             Width = Dim.Auto (),
             Height = Dim.Auto (),
-            Source = new ListWrapper<string> (new (ThemeManager.GetThemeNames ())),
+            RadioLabels= options,
             SelectedItem = ThemeManager.GetThemeNames ().IndexOf (ThemeManager.Theme)
         };
+        themeOptionSelector.Border!.Thickness = new (0, 1, 0, 0);
+        themeOptionSelector.Margin!.Thickness = new (0, 0, 1, 0);
 
-        themeListView.SelectedItemChanged += (sender, args) =>
+        themeOptionSelector.SelectedItemChanged += (sender, args) =>
                                              {
-                                                 ListView? listView = sender as ListView;
-                                                 string? newTheme = listView!.Source.ToList () [args.Item] as string;
-                                                 ThemeManager.Theme = newTheme!;
+                                                 RadioGroup? optionSelector = sender as RadioGroup;
+                                                 if (optionSelector is null)
+                                                 {
+                                                     return;
+                                                 }
+                                                 var newTheme = optionSelector!.RadioLabels! [(int)args.SelectedItem!] as string;
+                                                 // strip off the leading underscore
+                                                 ThemeManager.Theme = newTheme!.Substring (1);
                                                  ConfigurationManager.Apply ();
                                              };
 
-        ThemeViewer? themeViewer = new ThemeViewer ()
+        var themeViewer = new ThemeViewer
         {
-            X = Pos.Right (themeListView)
+            X = Pos.Right (themeOptionSelector)
         };
-
-
 
         Dictionary<string, Type> viewClasses = GetAllViewClassesCollection ()
                                                .OrderBy (t => t.Name)
                                                .Select (t => new KeyValuePair<string, Type> (t.Name, t))
                                                .ToDictionary (t => t.Key, t => t.Value);
 
-        ListView? viewListView = new ListView ()
+        ListView viewListView = new ()
         {
             X = Pos.Right (themeViewer),
             Title = "_Views",
-            BorderStyle = LineStyle.Double,
+            BorderStyle = LineStyle.Rounded,
             Width = Dim.Auto (),
             Height = Dim.Fill (),
-            Source = new ListWrapper<string> (new (viewClasses.Keys)),
+            Source = new ListWrapper<string> (new (viewClasses.Keys))
         };
+        viewListView.Border!.Thickness = new (0, 1, 0, 0);
+        viewListView.Margin!.Thickness = new (0, 0, 1, 0);
+
         viewListView.VerticalScrollBar.AutoShow = true;
 
-        FrameView? viewFrame = new FrameView ()
+        ViewPropertiesEditor viewPropertiesEditor = new ()
         {
             X = Pos.Right (viewListView),
+            Width = Dim.Fill (),
+            Height = Dim.Auto (),
+        };
+
+        FrameView viewFrame = new ()
+        {
+            X = Pos.Right (viewListView),
+            Y = Pos.Bottom(viewPropertiesEditor),
             Title = "The View",
-            BorderStyle = LineStyle.Single,
+            BorderStyle = LineStyle.Rounded,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             TabStop = TabBehavior.TabStop
         };
-        viewFrame.Border.Thickness = new (0, 1, 0, 0);
+        viewFrame.Border!.Thickness = new (0, 1, 0, 0);
 
         viewListView.SelectedItemChanged += (sender, args) =>
                                             {
-                                                ListView? listView = sender as ListView;
+                                                var listView = sender as ListView;
 
                                                 if (_view is { })
                                                 {
+                                                    viewPropertiesEditor.ViewToEdit = null;
                                                     viewFrame.Remove (_view);
                                                     _view.Dispose ();
                                                     _view = null;
@@ -95,10 +110,12 @@ public sealed class Themes : Scenario
                                                 {
                                                     _view.CanFocus = false;
                                                     viewFrame.Add (_view);
+                                                    viewPropertiesEditor.ViewToEdit = _view;
                                                 }
                                             };
 
-        appWindow.Add (themeListView, themeViewer, viewListView, viewFrame);
+
+        appWindow.Add (themeOptionSelector, themeViewer, viewListView, viewPropertiesEditor, viewFrame);
 
         viewListView.SelectedItem = 0;
 
@@ -106,14 +123,13 @@ public sealed class Themes : Scenario
                                          {
                                              if (_view is { })
                                              {
-                                                 Application.Top.SchemeName = args.NewString;
-                                                 //viewListView.SchemeName = args.NewString;
-                                                 //viewFrame.SchemeName = args.NewString;
+                                                 Application.Top!.SchemeName = args.NewString;
 
                                                  if (_view.HasScheme)
                                                  {
                                                      _view.SetScheme (null);
                                                  }
+
                                                  _view.SchemeName = args.NewString;
                                              }
                                          };
@@ -125,7 +141,6 @@ public sealed class Themes : Scenario
         // Shutdown - Calling Application.Shutdown is required.
         Application.Shutdown ();
     }
-
 
     private static List<Type> GetAllViewClassesCollection ()
     {
@@ -169,13 +184,15 @@ public sealed class Themes : Scenario
         if (type.ContainsGenericParameters)
         {
             Logging.Warning ($"Cannot create an instance of {type} because it contains generic parameters.");
+
             //throw new ArgumentException ($"Cannot create an instance of {type} because it contains generic parameters.");
             return null;
         }
 
         // Instantiate view
         var view = (View)Activator.CreateInstance (type)!;
-        string demoText = "This, that, and the other thing.";
+        var demoText = "This, that, and the other thing.";
+
         if (view is IDesignable designable)
         {
             designable.EnableForDesign (ref demoText);
@@ -214,6 +231,9 @@ public class ThemeViewer : FrameView
 {
     public ThemeViewer ()
     {
+        BorderStyle = LineStyle.Rounded;
+        Border!.Thickness = new (0, 1, 0, 0);
+        Margin!.Thickness = new (0, 0, 1, 0);
         TabStop = TabBehavior.TabStop;
         CanFocus = true;
         Height = Dim.Fill ();
@@ -224,20 +244,36 @@ public class ThemeViewer : FrameView
         HorizontalScrollBar.AutoShow = true;
 
         SubViewsLaidOut += (sender, _) =>
-                                     {
-                                         if (sender is View sendingView)
-                                         {
-                                             sendingView.SetContentSize (sendingView.GetSizeRequiredForSubViews ());
-                                         }
-                                     };
+                           {
+                               if (sender is View sendingView)
+                               {
+                                   sendingView.SetContentSize (sendingView.GetSizeRequiredForSubViews ());
+                               }
+                           };
 
         AddCommand (Command.Up, () => ScrollVertical (-1));
         AddCommand (Command.Down, () => ScrollVertical (1));
 
         AddCommand (Command.PageUp, () => ScrollVertical (-SubViews.OfType<SchemeViewer> ().First ().Frame.Height));
         AddCommand (Command.PageDown, () => ScrollVertical (SubViews.OfType<SchemeViewer> ().First ().Frame.Height));
-        AddCommand (Command.Start, () => { Viewport = Viewport with { Y = 0 }; return true; });
-        AddCommand (Command.End, () => { Viewport = Viewport with { Y = GetContentSize ().Height }; return true; });
+
+        AddCommand (
+                    Command.Start,
+                    () =>
+                    {
+                        Viewport = Viewport with { Y = 0 };
+
+                        return true;
+                    });
+
+        AddCommand (
+                    Command.End,
+                    () =>
+                    {
+                        Viewport = Viewport with { Y = GetContentSize ().Height };
+
+                        return true;
+                    });
 
         AddCommand (Command.ScrollDown, () => ScrollVertical (1));
         AddCommand (Command.ScrollUp, () => ScrollVertical (-1));
@@ -263,13 +299,15 @@ public class ThemeViewer : FrameView
         MouseBindings.Add (MouseFlags.WheeledRight, Command.ScrollRight);
 
         SchemeViewer? prevSchemeViewer = null;
+
         foreach (KeyValuePair<string, Scheme?> kvp in SchemeManager.GetSchemesForCurrentTheme ())
         {
-            SchemeViewer? schemeViewer = new SchemeViewer ()
+            var schemeViewer = new SchemeViewer
             {
                 Id = $"schemeViewer for {kvp.Key}",
-                SchemeName = kvp.Key,
+                SchemeName = kvp.Key
             };
+
             if (prevSchemeViewer is { })
             {
                 schemeViewer.Y = Pos.Bottom (prevSchemeViewer);
@@ -282,7 +320,7 @@ public class ThemeViewer : FrameView
         ThemeManager.ThemeChanged += OnThemeManagerOnThemeChanged;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnFocusedChanged (View? previousFocused, View? focused)
     {
         base.OnFocusedChanged (previousFocused, focused);
@@ -293,10 +331,7 @@ public class ThemeViewer : FrameView
         }
     }
 
-    private void OnThemeManagerOnThemeChanged (object? _, StringPropertyEventArgs args)
-    {
-        Title = args.NewString!;
-    }
+    private void OnThemeManagerOnThemeChanged (object? _, StringPropertyEventArgs args) { Title = args.NewString!; }
 
     protected override void Dispose (bool disposing)
     {
@@ -304,6 +339,7 @@ public class ThemeViewer : FrameView
         {
             ThemeManager.ThemeChanged -= OnThemeManagerOnThemeChanged;
         }
+
         base.Dispose (disposing);
     }
 }
@@ -318,23 +354,26 @@ public class SchemeViewer : FrameView
         Width = Dim.Auto ();
 
         VisualRoleViewer? prevRoleViewer = null;
+
         foreach (VisualRole role in Enum.GetValues<VisualRole> ())
         {
-            VisualRoleViewer? roleViewer = new VisualRoleViewer ()
+            var roleViewer = new VisualRoleViewer
             {
-                Role = role,
+                Role = role
             };
+
             if (prevRoleViewer is { })
             {
                 roleViewer.Y = Pos.Bottom (prevRoleViewer);
             }
+
             base.Add (roleViewer);
 
             prevRoleViewer = roleViewer;
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnSettingSchemeName (in string? currentName, ref string? newName)
     {
         Title = newName ?? "null";
@@ -343,6 +382,7 @@ public class SchemeViewer : FrameView
         {
             v.SchemeName = newName;
         }
+
         return base.OnSettingSchemeName (in currentName, ref newName);
     }
 }
@@ -364,16 +404,17 @@ public class VisualRoleViewer : View
         set
         {
             _role = value;
-            Text = $"{Role?.ToString ()?.PadRight (10)} 0123456789 𝔽𝕆𝕆𝔹𝔸ℝ {SchemeName}";
+            Text = $"{Role?.ToString ()?.PadRight (10)} {SchemeName}";
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
     {
         if (role != Role)
         {
             currentAttribute = GetAttributeForRole (Role!.Value);
+
             return true;
         }
 

@@ -73,7 +73,7 @@ public class SchemeJsonConverterTests
         };
 
         string json = JsonSerializer.Serialize (expected, JsonOptions);
-        Scheme? actual = JsonSerializer.Deserialize<Scheme> (json, JsonOptions);
+        Scheme actual = JsonSerializer.Deserialize<Scheme> (json, JsonOptions);
 
         Assert.NotNull (actual);
 

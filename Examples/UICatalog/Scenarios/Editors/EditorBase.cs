@@ -65,15 +65,15 @@ public abstract class EditorBase : View
         }
     }
 
-    public bool UpdatingSettings { get; private set; } = false;
+    public bool UpdatingLayoutSettings { get; private set; } = false;
 
     private void View_LayoutComplete (object? sender, LayoutEventArgs e)
     {
-        UpdatingSettings = true;
+        UpdatingLayoutSettings = true;
 
-        OnUpdateSettings ();
+        OnUpdateLayoutSettings ();
 
-        UpdatingSettings = false;
+        UpdatingLayoutSettings = false;
     }
 
 
@@ -108,7 +108,7 @@ public abstract class EditorBase : View
 
     protected virtual void OnViewToEditChanged () { }
 
-    protected virtual void OnUpdateSettings () { }
+    protected virtual void OnUpdateLayoutSettings () { }
 
     /// <summary>
     ///     Gets or sets whether the DimEditor should automatically select the View to edit

@@ -343,6 +343,8 @@ public class ConfigProperty
     /// </summary>
     /// <param name="source">The source ThemeScope dictionary.</param>
     /// <param name="destination">The destination ThemeScope dictionary.</param>
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.Scope<T>.UpdateFrom(Scope<T>)")]
+    [RequiresDynamicCode ("Calls Terminal.Gui.Scope<T>.UpdateFrom(Scope<T>)")]
     private static void UpdateThemeScopeDictionary (
         ConcurrentDictionary<string, ThemeScope> source,
         ConcurrentDictionary<string, ThemeScope> destination)
@@ -364,7 +366,9 @@ public class ConfigProperty
     /// </summary>
     /// <param name="source">The source ConfigProperty dictionary.</param>
     /// <param name="destination">The destination ConfigProperty dictionary.</param>
-    private void UpdateConfigPropertyConcurrentDictionary (
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
+    [RequiresDynamicCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
+    private static void UpdateConfigPropertyConcurrentDictionary (
         ConcurrentDictionary<string, ConfigProperty> source,
         ConcurrentDictionary<string, ConfigProperty> destination)
     {
@@ -393,7 +397,9 @@ public class ConfigProperty
     /// </summary>
     /// <param name="source">The source ConfigProperty dictionary.</param>
     /// <param name="destination">The destination ConfigProperty dictionary.</param>
-    private void UpdateConfigPropertyDictionary (
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
+    [RequiresDynamicCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
+    private static void UpdateConfigPropertyDictionary (
         Dictionary<string, ConfigProperty> source,
         Dictionary<string, ConfigProperty> destination)
     {
@@ -422,7 +428,7 @@ public class ConfigProperty
     /// </summary>
     /// <param name="source">The source ConfigProperty dictionary.</param>
     /// <param name="destination">The destination ConfigProperty dictionary.</param>
-    private void UpdateSchemeDictionary (
+    private static void UpdateSchemeDictionary (
         Dictionary<string, Scheme> source,
         Dictionary<string, Scheme> destination)
     {

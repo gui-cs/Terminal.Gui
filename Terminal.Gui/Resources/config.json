@@ -1620,7 +1620,7 @@
         "Glyphs.LeftDefaultIndicator": ">",
         "Glyphs.RightDefaultIndicator": "<",
         "Glyphs.BlocksMeterSegment": "#",
-        "Glyphs.ContinuousMeterSegment": "=",
+        "Glyphs.ContinuousMeterSegment": " ",
         "Glyphs.Stipple": ".",
         "Glyphs.Diamond": "+",
         "Glyphs.Close": "X",

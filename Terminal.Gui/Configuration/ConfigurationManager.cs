@@ -56,9 +56,11 @@ public static class ConfigurationManager
     ///     deserialization
     ///     (see <see cref="Load"/>).
     /// </remarks>
-    internal static SettingsScope? _settings;
+    private static SettingsScope? _settings;
 
+#pragma warning disable IDE1006 // Naming Styles
     private static readonly ReaderWriterLockSlim _settingsLockSlim = new ();
+#pragma warning restore IDE1006 // Naming Styles
 
     /// <summary>
     ///     The root object of Terminal.Gui configuration settings / JSON schema.
@@ -99,7 +101,9 @@ public static class ConfigurationManager
     // Once initialized, the ConfigurationManager is never un-initialized.
     // The _initialized field is set to true when the module is loaded and the ConfigurationManager is initialized.
     private static bool _initialized;
+#pragma warning disable IDE1006 // Naming Styles
     private static readonly object _initializedLock = new ();
+#pragma warning restore IDE1006 // Naming Styles
 
     /// <summary>
     ///     INTERNAL: For Testing - Indicates whether the <see cref="ConfigurationManager"/> has been initialized.
@@ -118,7 +122,9 @@ public static class ConfigurationManager
     ///     A cache of all<see cref="ConfigurationPropertyAttribute"/> properties and their hard coded values.
     /// </summary>
     /// <remarks>Is <see langword="null"/> until <see cref="Initialize"/> is called.</remarks>
+#pragma warning disable IDE1006 // Naming Styles
     internal static FrozenDictionary<string, ConfigProperty>? _hardCodedConfigPropertyCache;
+#pragma warning restore IDE1006 // Naming Styles
 
     internal static FrozenDictionary<string, ConfigProperty>? GetHardCodedConfigPropertyCache ()
     {
@@ -137,9 +143,11 @@ public static class ConfigurationManager
     ///     are immutable.
     /// </summary>
     /// <remarks>Is <see langword="null"/> until <see cref="Initialize"/> is called.</remarks>
-    internal static ImmutableSortedDictionary<string, ConfigProperty>? _uninitializedConfigPropertiesCache;
+    private static ImmutableSortedDictionary<string, ConfigProperty>? _uninitializedConfigPropertiesCache;
 
+#pragma warning disable IDE1006 // Naming Styles
     private static readonly object _allConfigPropertiesCacheLock = new ();
+#pragma warning restore IDE1006 // Naming Styles
 
     /// <summary>
     ///     INTERNAL: Initializes the <see cref="ConfigurationManager"/>.
@@ -202,7 +210,9 @@ public static class ConfigurationManager
     #region Enable/Disable
 
     private static bool _enabled;
+#pragma warning disable IDE1006 // Naming Styles
     private static readonly object _enabledLock = new ();
+#pragma warning restore IDE1006 // Naming Styles
 
     /// <summary>
     ///     Gets whether <see cref="ConfigurationManager"/> is enabled or not.
@@ -264,6 +274,8 @@ public static class ConfigurationManager
     ///     initial, hard-coded
     ///     defaults.
     /// </param>
+    [RequiresUnreferencedCode ("Calls ResetToHardCodedDefaults")]
+    [RequiresDynamicCode ("Calls ResetToHardCodedDefaults")]
     public static void Disable (bool resetToHardCodedDefaults = false)
     {
         lock (_enabledLock)
@@ -430,9 +442,9 @@ public static class ConfigurationManager
             SourcesManager?.Load (Settings, $"~/.tui/{AppName}.{_configFilename}", ConfigLocations.AppHome);
         }
 
-        Settings.Validate ();
+        Settings!.Validate ();
         ThemeManager.Validate ();
-        AppSettings.Validate ();
+        AppSettings!.Validate ();
     }
 
     // TODO: Rename to Loaded?
@@ -482,6 +494,8 @@ public static class ConfigurationManager
         InternalApply ();
     }
 
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.Scope<T>.Apply()")]
+    [RequiresDynamicCode ("Calls Terminal.Gui.Scope<T>.Apply()")]
     private static void InternalApply ()
     {
         var settings = false;
@@ -661,7 +675,9 @@ public static class ConfigurationManager
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool? ThrowOnJsonErrors { get; set; } = false;
 
+#pragma warning disable IDE1006 // Naming Styles
     private static readonly object _jsonErrorsLock = new ();
+#pragma warning restore IDE1006 // Naming Styles
 
     internal static void AddJsonError (string error)
     {

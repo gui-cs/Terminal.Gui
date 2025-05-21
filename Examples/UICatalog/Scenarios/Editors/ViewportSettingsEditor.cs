@@ -17,19 +17,13 @@ public sealed class ViewportSettingsEditor : EditorBase
         Initialized += ViewportSettingsEditor_Initialized;
     }
 
-    protected override void OnUpdateSettings ()
+    protected override void OnViewToEditChanged ()
     {
         foreach (View subview in SubViews)
         {
             subview.Enabled = ViewToEdit is not Adornment;
         }
 
-        if (ViewToEdit is null)
-        { }
-    }
-
-    protected override void OnViewToEditChanged ()
-    {
         if (ViewToEdit is { } and not Adornment)
         {
             //ViewToEdit.VerticalScrollBar.AutoShow = true;

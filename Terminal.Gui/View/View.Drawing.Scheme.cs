@@ -45,7 +45,8 @@ public partial class View
     /// <summary>
     ///     Called when the <see cref="Scheme"/> for the View is to be set.
     /// </summary>
-    /// <param name="schemeName"></param>
+    /// <param name="currentName"></param>
+    /// <param name="newName"></param>
     /// <returns><see langword="true"/> to stop default behavior.</returns>
     protected virtual bool OnSettingSchemeName (in string? currentName, ref string? newName) { return false; }
 
