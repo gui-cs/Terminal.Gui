@@ -87,6 +87,7 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
         mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, ButtonState.Button2Pressed, MouseFlags.Button2Pressed, MouseFlags.Button2Released, 1);
         mouseFlags = UpdateMouseFlags (mouseFlags, e.ButtonState, ButtonState.Button4Pressed, MouseFlags.Button4Pressed, MouseFlags.Button4Released, 3);
 
+
         // Deal with button 3 separately because it is considered same as 'rightmost button'
         if (e.ButtonState.HasFlag (ButtonState.Button3Pressed) || e.ButtonState.HasFlag (ButtonState.RightmostButtonPressed))
         {
@@ -98,6 +99,10 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
             if (_lastWasPressed [2])
             {
                 mouseFlags |= MouseFlags.Button3Released;
+
+                // Removes the moved flag when raising released flags (see https://github.com/gui-cs/Terminal.Gui/issues/4088)
+                mouseFlags &= ~MouseFlags.ReportMousePosition;
+
                 _lastWasPressed [2] = false;
             }
         }
@@ -148,6 +153,9 @@ internal class WindowsInputProcessor : InputProcessor<InputRecord>
             if (_lastWasPressed [buttonIndex])
             {
                 current |= releasedFlag;
+
+                // Removes the moved flag when raising released flags (see https://github.com/gui-cs/Terminal.Gui/issues/4088)
+                current &= ~MouseFlags.ReportMousePosition;
                 _lastWasPressed [buttonIndex] = false;
             }
         }

@@ -14,7 +14,7 @@
     },
     "UICatalog --driver v2win": {
       "commandName": "Project",
-      "commandLineArgs": "--driver v2win"
+      "commandLineArgs": "--driver v2win -dl Trace"
     },
     "UICatalog --driver v2net": {
       "commandName": "Project",
