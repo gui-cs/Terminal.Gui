@@ -1,4 +1,6 @@
 ﻿#nullable enable
+using System.Collections.Concurrent;
+using System.Collections.Immutable;
 using System.Text.Json;
 using static Terminal.Gui.ConfigurationManager;
 
@@ -50,7 +52,7 @@ public class SchemeManagerTests
     [Fact]
     public void GetHardCodedSchemes_Gets_HardCoded_Theme_Schemes ()
     {
-        Dictionary<string, Scheme?>? hardCoded = SchemeManager.GetHardCodedSchemes ();
+        ImmutableDictionary<string, Scheme?>? hardCoded = SchemeManager.GetHardCodedSchemes ();
 
         Assert.Equal (Scheme.GetHardCodedSchemes (), hardCoded);
     }

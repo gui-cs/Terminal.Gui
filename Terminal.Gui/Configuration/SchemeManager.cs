@@ -19,10 +19,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
 
     internal static void ResetToHardCodedDefaults ()
     {
-        lock (_schemesLock)
-        {
-            SetSchemes (GetHardCodedSchemes ()!.ToDictionary (StringComparer.InvariantCultureIgnoreCase));
-        }
+        SetSchemes (GetHardCodedSchemes ()!.ToDictionary (StringComparer.InvariantCultureIgnoreCase));
     }
 
     /// <summary>
@@ -30,7 +27,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
     ///     but are hard-coded in the source code. Used for unit testing when ConfigurationManager is not initialized.
     /// </summary>
     /// <returns></returns>
-    public static ConcurrentDictionary<string, Scheme?>? GetHardCodedSchemes () { return Scheme.GetHardCodedSchemes (); }
+    public static ImmutableDictionary<string, Scheme?>? GetHardCodedSchemes () { return Scheme.GetHardCodedSchemes (); }
 
     /// <summary>
     ///     Use <see cref="AddScheme"/>, <see cref="GetScheme(Terminal.Gui.Schemes)"/>, <see cref="GetSchemeNames"/>, <see cref="GetSchemesForCurrentTheme"/>, etc... instead.
@@ -57,7 +54,7 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
         return GetSchemesForCurrentTheme ();
     }
 
-    /// <summary>INTERNAL: Gets the dictionary of defined <see cref="Scheme"/>s. The set method for <see cref="Schemes"/>.</summary>
+    /// <summary>INTERNAL: The set method for <see cref="Schemes"/>.</summary>
     private static void SetSchemes (Dictionary<string, Scheme?>? value)
     {
         if (!ConfigurationManager.IsInitialized ())
@@ -67,8 +64,11 @@ public sealed class SchemeManager// : INotifyCollectionChanged, IDictionary<stri
 
         Debug.Assert (value is { });
 
-        // Update the backing store
-        ThemeManager.Themes! [ThemeManager.Theme] ["Schemes"].UpdateFrom (value);
+        lock (_schemesLock)
+        {
+            // Update the backing store
+            ThemeManager.GetCurrentTheme () ["Schemes"].UpdateFrom (value);
+        }
 
         //Instance.OnThemeChanged (prevousValue);
     }

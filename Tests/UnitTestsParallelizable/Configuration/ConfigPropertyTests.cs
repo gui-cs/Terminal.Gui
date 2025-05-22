@@ -35,12 +35,15 @@ public class ConfigPropertyTests
 
         int numTasks = 20;
         Parallel.For (0, numTasks, i =>
-        {
-            var newValue = $"Thread_{i}";
-            configProperty.UpdateFrom (newValue);
-            Assert.Equal (newValue, configProperty.PropertyValue);
-        });
+                                   {
+                                       var newValue = $"Thread_{i}";
+                                       configProperty.UpdateFrom (newValue);
+                                   });
+
+        var finalValue = configProperty.PropertyValue as string;
+        Assert.StartsWith ("Thread_", finalValue);
     }
+
 
     [Fact]
     public void DeepCloner_DeepClone_IsThreadSafe ()

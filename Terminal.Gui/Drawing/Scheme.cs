@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Concurrent;
+using System.Collections.Immutable;
 using System.Numerics;
 using System.Text.Json.Serialization;
 
@@ -32,9 +33,10 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
     /// </summary>
     /// <returns></returns>
 
-    internal static ConcurrentDictionary<string, Scheme?> GetHardCodedSchemes ()
+    internal static ImmutableDictionary<string, Scheme?> GetHardCodedSchemes ()
     {
-        return new ConcurrentDictionary<string, Scheme?> (
+        return ImmutableDictionary.CreateRange (
+            StringComparer.InvariantCultureIgnoreCase,
             new []
             {
             new KeyValuePair<string, Scheme?>(
@@ -117,8 +119,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                     ReadOnly = new Attribute(new Color("Silver"), new Color("WhiteSmoke"), TextStyle.Italic)
                 }
             )
-            },
-            StringComparer.InvariantCultureIgnoreCase
+            }
         );
     }
 
